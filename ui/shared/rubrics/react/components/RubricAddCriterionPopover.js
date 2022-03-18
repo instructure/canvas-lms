@@ -20,10 +20,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 
-const I18n = useI18nScope('RubricAddCriterionPopover');
+const I18n = useI18nScope('RubricAddCriterionPopover')
 
 class RubricAddCriterionPopover extends React.Component {
   static propTypes = {

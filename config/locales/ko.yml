@@ -1453,6 +1453,7 @@ ko:
   are_you_sure_you_want_to_delete_this_discussion_334554e0: "이 토론을 삭제하시겠습니까?"
   are_you_sure_you_want_to_delete_this_entry_9aecd6d3: "이 항목을 삭제하시겠습니까?"
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "이 평가 구성표를 삭제하시겠습니까?"
+  are_you_sure_you_want_to_delete_your_copy_of_this__8490c9d4: "이 메시지의 사본을 삭제하시겠습니까? 이 작업은 실행을 취소할 수 없습니다."
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "이 도구를 제거하시겠습니까?"
   are_you_sure_you_want_to_remove_this_user_s_profil_6d703c4: "이 사용자의 프로필 사진을 제거하시겠습니까?"
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: "이 프로필 사진을 신고하시겠습니까?"
@@ -4178,6 +4179,8 @@ ko:
         everyone_tab: 모두
         groups: 그룹
       roster_user: 
+        ? " pending_acceptance_explanation"
+        : "이 사용자는 아직 과목 초대를 수락하지 않음"
         links: 
           edit_sections: "섹션 편집"
           link_to_students: "학생에게 연결"
@@ -4871,6 +4874,10 @@ ko:
       new_quiz: "새 퀴즈"
     edit_crumb: 편집
     edit_view: 
+      ? " saving"
+      : "저장 중..."
+      ? " topic_title"
+      : "주제 제목"
       allow_threaded_replies: "계층 구조 답변 허용"
       attachment: 첨부
       available_from: "다음부터 사용 가능"
@@ -5514,6 +5521,7 @@ ko:
     sis_id_in_use: "SIS ID \"%{sis_id}\"이(가) 이미 사용 중임"
     unsaved_changes: "저장하지 않은 변경 사항이 있습니다."
     wrong_file_extension: "선택한 파일의 확장자 \"%{extension}\"는 제출이 허용되지 않습니다."
+  event_title_7f1051a6: "행사 제목"
   everyone_854554dd: 모두
   everyone_else_6c6dc7b6: "나머지 모든 사람"
   everyone_else_cc5f6888: "다른 모든 사람"
@@ -5654,6 +5662,7 @@ ko:
   external_toolsHomeworkSubmissionLtiContainer: 
     no_tools_found: "도구 없음"
   external_tools_6e77821: 외부도구
+  failed_at_f471dfd3: "실패 시각"
   failed_please_report_the_following_error_code_to_y_42248d60: "실패했습니다. 다음 오류 코드를 시스템 관라지에게 알려주시기 바랍니다: ErrorReport:%{error};"
   failed_to_load_external_feeds_7ac8411d: "외부 피드 불러오기 실패"
   feature_flags: 
@@ -6645,6 +6654,7 @@ ko:
     unassigned_students: "할당 안 된 학생 (%{count}명)"
     unassigned_users: "할당 안 된 사용자 (%{count}명)"
   groups_6c90e26a: 그룹
+  handler_7912052f: 처리기
   helpDialog: 
     Back: 뒤로
     Help: 도움말
@@ -6954,6 +6964,7 @@ ko:
     titles: 
       job_handler: "작업 처리기"
       last_error: "마지막 오류"
+  jobs_ec5d59d8: 작업
   join_6cafecca: 참여
   joining_81f8b6c9: 참여하기
   jquery: 
@@ -6972,6 +6983,7 @@ ko:
   key_name_7311d22: "키 이름:"
   key_settings_44df6a41: "키 설정"
   language_6b3e2c7c: 언어
+  last_error_a3832668: "마지막 오류"
   last_modified_by_ca4bb5e1: "마지막 수정한 사람"
   late_assignment_user_name_assignment_name_2df32e01: "지연된 과제: %{user_name}, %{assignment_name}"
   latest_f604a75: 최신
@@ -7122,6 +7134,8 @@ ko:
   locales: 
     ko: 한국말
   lock_date_cannot_be_before_due_date_ac30f54: "잠금 설정 날짜는 기한으로 설정한 날짜보다 이전일 수 없습니다."
+  locked_at_cda02889: "잠긴 시각"
+  locked_by_983c07f7: "잠근 사용자"
   log_in_5c66644d: 로그인
   log_in_c9e240ef: 로그인
   logged_in_user_id_5a54b1ae: "로그인한 사용자 ID"
@@ -7234,6 +7248,7 @@ ko:
       miscellaneous: 기타
       operators: 연산자
       relationships: 관계
+  max_attempts_ae7b90bc: "최대 시도"
   media_af190855: 미디어
   media_comment_dialog_manager: 
     messages: 
@@ -8031,6 +8046,10 @@ ko:
         course_starts_next_week: "과목이 다음 주에 시작함"
     dialog: 
       title: "회신 메시지 보내기"
+    discussion_mention: 
+      email: 
+        html: 
+          link: "대화에 참여하려면 여기를 클릭"
     email: 
       footer: |-
           Canvas를 이용해서 하나 이상의 수업에 참여하고 있기 때문에 이 메일을 받았습니다. 이메일 알림을 끄거나 바꾸려면 다음 URL을 방문하십시오:
@@ -9098,6 +9117,7 @@ ko:
     where_to_move: "*%{name}*을(를) 어디로 이동하시겠습니까?"
   move_dialog_select: 
     move_to_end: "-- 아래에 --"
+  move_to_1c208ae5: "다음으로 이동..."
   multi_factor_authentication_configured_865b1bde: "다단계 인증 구성"
   must_be_255_characters_or_less_e8e7f25e: "255글자보다 적어야 함"
   mute_dialog: 
@@ -9919,6 +9939,7 @@ ko:
       requirements_must_be_completed: "이 페이지를 잠금 해제하기 전에 다음 요구 사항이 완료되어야 합니다."
   previous_module_8801a74b: "이전 모듈"
   print_grades_9d5dd50f: "평점 인쇄"
+  priority_dd4381ee: "우선 순위"
   privacy_290109ea: "개인 정보"
   privacy_level_f0ec09a3: "개인 정보 보호 수준"
   private_3883d133: 비공개
@@ -12975,6 +12996,7 @@ ko:
     settings: 설정
     syllabus: "강의 계획"
   tag_7bb005ff: 태그
+  tags_2b72a03b: 태그
   take_a_picture_d582acf1: "사진 촬영"
   take_the_quiz_87214d7e: "퀴즈 치르기"
   take_the_quiz_again_8ea51a6c: "퀴즈 다시 치르기"

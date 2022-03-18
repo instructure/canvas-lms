@@ -20,9 +20,9 @@ import '@canvas/datetime'/* datetimeString */
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
 import INST from 'browser-sniffer'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('content_locks');
+const I18n = useI18nScope('content_locks')
 
 INST.lockExplanation = function(data, type) {
   // Any additions to this function should also be added to similar logic in ApplicationController.rb

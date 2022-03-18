@@ -1747,6 +1747,7 @@ he:
           has_one: "אין אפשרות לבטל רשומה כיון שיש %{record} התלויה בה"
           many: "אין אפשרות לבטל רשומה כיון שקיימת %{record} הקשורה אליה"
           one: "אין אפשרות לבטל רשומה כיון שיש %{record} התלויה בה"
+  activity_13915493: פעילות
   activity_by_category_9c2033d1: "פעילות לפי קטגוריה"
   activity_by_date_878c5b49: "פעילות לפי תאריך"
   activity_compared_to_class_8133cb0: "פעילות מושווית לכתה"
@@ -2259,6 +2260,7 @@ he:
     one: "האם אתם בטוחים שרוצים לבטל עותק של שיחה זו? אין אפשרות לשחזר את הביטול."
     other: "האם אתם בטוחים שרוצים לבטל עותק של שיחות אלו? אין אפשרות לשחזר את הביטול."
     two: "האם אתם בטוחים שרוצים לבטל עותק של שיחות אלו? אין אפשרות לשחזר את הביטול."
+  are_you_sure_you_want_to_delete_your_copy_of_this__8490c9d4: "בטוח/ה שרוצה לבטל או להעתיק את ההודעה הזו? אין אפשרות להתחרט על פעולה זו."
   are_you_sure_you_want_to_delete_your_reservation_t_5ae87209: "בטוחים שרוצים לבטל את הרשמתכם לאירוע זה?"
   are_you_sure_you_want_to_disable_sync_to_sisname_f_f24245c1: "האם אתם בטוחים שרוצים למנוע את הסיכנכרוניזציה ל %{sisName} לכל המשימות האלו?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "בטוח/ה שרוצה לבצע פעולה זו? לא ניתן לשחזר זאת והפעולה תדרוס ציונים קיימים בספר הציונים."
@@ -5879,6 +5881,8 @@ he:
         everyone_tab: "כל אחד"
         groups: קבוצות
       roster_user: 
+        ? " pending_acceptance_explanation"
+        : "משתמש זה טרם אישר את ההזמנה לקורס"
         links: 
           edit_sections: "עריכת הקבצה"
           link_to_students: "קישור לתלמידים"
@@ -6869,6 +6873,10 @@ he:
       new_quiz: "בוחן חדש"
     edit_crumb: עריכה
     edit_view: 
+      ? " saving"
+      : שומר...
+      ? " topic_title"
+      : "כותרת נושא"
       allow_liking: "הרשאת סימוני אהבתי"
       allow_threaded_replies: "הרשאת שירשור תגובות"
       attachment: תצריף
@@ -7824,6 +7832,7 @@ he:
   event_fe9ba3fe: אירוע
   event_start_time_441b491f: "זמן תחילת אירוע"
   event_title_57a50568: "כותרת אירוע:"
+  event_title_7f1051a6: "שם האירוע"
   event_title_course_name_changed_to_37510fbb: "%{event_title}, %{course_name} השתנה ל-"
   every_665d821e: כל
   everyone_854554dd: "כל אחד"
@@ -8028,6 +8037,7 @@ he:
   fail_62dbb06a: נכשל
   failed_276786d: נכשל
   failed_307449e1: "נכשל:"
+  failed_at_f471dfd3: "נכשל ב-"
   failed_creating_user_b706a1c5: "יצירת משתמש נכשלה"
   failed_loading_associations_component_is_your_netw_fa49fb32: "כשלון בטעינת רכיב קשור. האם החיבור לרשת תקין?"
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "טעינת חלקי הקורס נכשלה. יש לרענן ולנסות שוב"
@@ -9593,6 +9603,7 @@ he:
   handlebars_helpers: 
     time: 
       event: "בתאריך %{date} בשעה %{time}"
+  handler_7912052f: Handler
   has_similarity_score_d5f332b4: "כולל ציון תאימות"
   has_turnitin_score_3e1cacf6: "קיבלו ציון  Turnitin "
   haven_t_been_graded_d7dee5bb: "לא התבצעה הערכה"
@@ -10134,6 +10145,7 @@ he:
     titles: 
       job_handler: "מנהל תהליכי עיבוד"
       last_error: "השגיאה האחרונה "
+  jobs_ec5d59d8: "תהליכי עיבוד"
   join_6cafecca: הצטרפות
   join_course_511e6cb3: "הצטרף/י ל %{course}"
   join_group_group_name_871a5e3f: "הצטרפות לקבוצה %{group_name}"
@@ -10177,6 +10189,7 @@ he:
     lock_module_until: "נעילה עד"
   language_6b3e2c7c: שפה
   last_enrollment_activity_10fe15ba: "פעילות הרשמה אחרונה"
+  last_error_a3832668: "השגיאה האחרונה "
   last_export_899a04c5: "ייצוא אחרון:"
   last_first_name_95a078f5: "שם משפחה, פרטי"
   last_item_79583712: "פריט אחרון:"
@@ -10459,6 +10472,8 @@ he:
   lock_this_setting_for_sub_accounts_2ae5af17: "נעילת הגדרות אלו לחשבונות משנה"
   locked_762f138b: נעול
   locked_796957c7: "נעול:"
+  locked_at_cda02889: "ננעל ב-"
+  locked_by_983c07f7: "ננעל ע\"י"
   locked_click_to_unlock_50747e11: "נעול: הקש/י להסרת נעילה"
   locked_content_f4ef2968: "תוכן נעול"
   locked_object_configuration_d1fb1b82: "הגדרות של פריט נעול:"
@@ -10684,6 +10699,7 @@ he:
       miscellaneous: אחר
       operators: מפעילים
       relationships: יחסים
+  max_attempts_ae7b90bc: "מספר מרבי של נסיונות"
   max_dd02d615: מכסימום
   max_membership_bd0ddc68: max_membership
   max_users_groups_per_appointment_867c505b: "מספר מרבי של משתמשים/קבוצות לפגישה"
@@ -11588,6 +11604,10 @@ he:
         course_starts_next_week: "הקורס שלך מתחיל בשבוע הבא"
     dialog: 
       title: "שיגור הודעת תגובה"
+    discussion_mention: 
+      email: 
+        html: 
+          link: "הקלק/י כאן כדי להצטרף לדיון"
     email: 
       footer: |-
           קיבלת הודעת דוא"ל זו עקב השתתפות באחת או יותר כיתות שמשתמשות בקנבס. ניתן לשנות הגדרות או להפסיק קבלת התראות דוא"ל בקישור:
@@ -12696,6 +12716,7 @@ he:
   move_this_module_4a262aaf: "העברת מודול זה"
   move_this_page_4a05c813: "העברת דף זה"
   move_this_section_890bee38: "העברת הקבצה זו"
+  move_to_1c208ae5: "העברה אל..."
   move_to_25d7ef11: "העבר ל"
   move_to_9b91c6e0: "העברה אל..."
   move_to_dde1a5e1: "העברה אל..."
@@ -13345,6 +13366,7 @@ he:
       ודרישות מוקדמות
   organize_epub_by_content_type_default_is_by_module_6f44ae06: "ארגון ePub לפי סוג תוכן (ברירת המחדל לפי מודול) "
   organize_your_course_content_c3c7ed03: "ארגון תוכן הקורס שלך"
+  original_job_id_d81afbb3: "מזהה מקורי של תהליך עיבוד"
   originality_report_5d461681: "דוח אורגינליות"
   other_1c6d9c79: אחר
   other_carrier_45531207: "קריירה אחרת"
@@ -14178,6 +14200,7 @@ he:
   primary_color_630fc6f3: "צבע ראשי"
   primary_color_button_b75db628: "כפתור צבע ראשי"
   primary_color_button_disabled_9081ddff: "כפתור צבע ראשי לא פעיל"
+  priority_dd4381ee: עדיפות
   privacy_290109ea: פרטיות
   processing_2fcc9739: מעבד
   product_name: קנבס
@@ -18370,6 +18393,7 @@ he:
     tab_location_error: "מיקום הלשונית הזו אינו חוקי"
     tab_unmanagable_error: "%{css_class} אינו בר ניהול"
   tag_7bb005ff: תג
+  tags_2b72a03b: תגים
   take_a_picture_d582acf1: "צילום תמונה"
   take_a_snapshot_now_5b622d85: "צור צילום מצב כעת"
   take_the_quiz_87214d7e: "בצע/י את הבוחן"

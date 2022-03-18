@@ -23,6 +23,10 @@ function destroyColumnHeader(column, $node, gridSupport) {
 }
 
 export default class Columns {
+  grid: any
+
+  gridSupport: any
+
   constructor(grid, gridSupport) {
     this.grid = grid
     this.gridSupport = gridSupport
@@ -40,7 +44,7 @@ export default class Columns {
     this.grid.onColumnsResized.subscribe((sourceEvent, _object) => {
       const event = sourceEvent.originalEvent || sourceEvent
       const columns = this.grid.getColumns()
-      const resizedColumns = []
+      const resizedColumns: any[] = []
 
       for (let i = 0; i < columns.length; i++) {
         const column = columns[i]
@@ -73,7 +77,7 @@ export default class Columns {
     return columnIds.map(columnId => columnMap[columnId])
   }
 
-  updateColumnHeaders(columnIds = []) {
+  updateColumnHeaders(columnIds: string[] = []) {
     if (this.gridSupport.options.columnHeaderRenderer) {
       const columns = columnIds.length ? this.getColumnsById(columnIds) : this.grid.getColumns()
 

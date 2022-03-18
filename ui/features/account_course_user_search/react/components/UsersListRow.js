@@ -22,12 +22,12 @@ import {Button} from '@instructure/ui-buttons'
 import {Table} from '@instructure/ui-table'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconMasqueradeLine, IconMessageLine, IconEditLine} from '@instructure/ui-icons'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import CreateOrUpdateUserModal from './CreateOrUpdateUserModal'
 import UserLink from './UserLink'
 
-const I18n = useI18nScope('account_course_user_search');
+const I18n = useI18nScope('account_course_user_search')
 
 export default function UsersListRow({accountId, user, permissions, handleSubmitEditUserForm}) {
   return (

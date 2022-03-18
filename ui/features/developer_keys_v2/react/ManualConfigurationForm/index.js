@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React from 'react'
 import get from 'lodash/get'
@@ -29,7 +29,7 @@ import Services from './Services'
 import AdditionalSettings from './AdditionalSettings'
 import Placements from './Placements'
 
-const I18n = useI18nScope('react_developer_keys');
+const I18n = useI18nScope('react_developer_keys')
 
 export default class ManualConfigurationForm extends React.Component {
   state = {

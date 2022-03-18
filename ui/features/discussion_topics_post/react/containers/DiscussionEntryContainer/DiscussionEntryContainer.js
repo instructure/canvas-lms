@@ -21,7 +21,7 @@ import {AnonymousUser} from '../../../graphql/AnonymousUser'
 import {AuthorInfo} from '../../components/AuthorInfo/AuthorInfo'
 import {CREATE_DISCUSSION_ENTRY_DRAFT} from '../../../graphql/Mutations'
 import {DeletedPostMessage} from '../../components/DeletedPostMessage/DeletedPostMessage'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {PostMessage} from '../../components/PostMessage/PostMessage'
 import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
@@ -36,7 +36,7 @@ import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
 import {ReplyPreview} from '../../components/ReplyPreview/ReplyPreview'
 
-const I18n = useI18nScope('discussion_posts');
+const I18n = useI18nScope('discussion_posts')
 
 export const DiscussionEntryContainer = props => {
   const [draftSaved, setDraftSaved] = useState(true)

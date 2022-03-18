@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React, {useState} from 'react'
 
@@ -30,7 +30,7 @@ import {responsiveQuerySizes} from '../../utils/index'
 import {TrayDisplayer} from '../TrayDisplayer/TrayDisplayer'
 import {Flex} from '@instructure/ui-flex'
 
-const I18n = useI18nScope('discussion_posts');
+const I18n = useI18nScope('discussion_posts')
 
 export function DiscussionAvailabilityContainer({...props}) {
   const [availabilityTrayOpen, setAvailabilityTrayOpen] = useState(false)

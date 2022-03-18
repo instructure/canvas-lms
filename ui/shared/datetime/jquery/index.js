@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import tz from '@canvas/timezone'
 import htmlEscape from 'html-escape'
@@ -28,7 +28,7 @@ import '@canvas/keycodes'
 import 'date'/* Date.parse, Date.UTC, Date.today */
 import 'jqueryui/datepicker'
 
-const I18n = useI18nScope('instructure_date_and_time');
+const I18n = useI18nScope('instructure_date_and_time')
 
 // these functions were extracted to @canvas/datetime/date-functions so they
 // could more easily be reused by non-jQuery-reliant code. See their

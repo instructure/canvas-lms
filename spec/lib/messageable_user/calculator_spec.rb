@@ -32,18 +32,18 @@ describe "MessageableUser::Calculator" do
     expect(calc2.instance_variables.sort).to eq @calculator.instance_variables.sort
   end
 
-  describe "section specific discussion topic" do
-    def add_section_to_topic(topic, section)
-      topic.is_section_specific = true
-      topic.discussion_topic_section_visibilities <<
-        DiscussionTopicSectionVisibility.new(
-          discussion_topic: topic,
-          course_section: section,
-          workflow_state: "active"
-        )
-      topic.save!
-    end
+  def add_section_to_topic(topic, section)
+    topic.is_section_specific = true
+    topic.discussion_topic_section_visibilities <<
+      DiscussionTopicSectionVisibility.new(
+        discussion_topic: topic,
+        course_section: section,
+        workflow_state: "active"
+      )
+    topic.save!
+  end
 
+  describe "section specific discussion topic" do
     before do
       course_factory(course_name: "Course Name", active_all: true)
 
@@ -97,6 +97,100 @@ describe "MessageableUser::Calculator" do
     it "mentionable users should have six students and the teacher when teacher" do
       calculator = MessageableUser::Calculator.new(@teacher)
       expect(calculator.search_in_context_scope(context: @dt, search: "").pluck(:name)).to eq(["User1 Section1", "User2 Section1", "User3 Section2", "User4 Section2", "User5 Section3", "User6 Section3", "Teacher"])
+    end
+  end
+
+  describe "section specific discussion topic with teacher without limit_privileges_to_course_section" do
+    before do
+      course_factory(course_name: "Course Name", active_all: true)
+
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+      section3 = @course.course_sections.create!(name: "Section 3")
+
+      @u1_s1 = student_in_course(course: @course, section: section1, name: "User1 Section1", active_all: true).user
+      @u2_s1 = student_in_course(course: @course, section: section1, name: "User2 Section1", active_all: true).user
+      @u3_s2 = student_in_course(course: @course, section: section2, name: "User3 Section2", active_all: true).user
+      @u4_s2 = student_in_course(course: @course, section: section2, name: "User4 Section2", active_all: true).user
+      @u5_s3 = student_in_course(course: @course, section: section3, name: "User5 Section3", active_all: true).user
+      @u6_s3 = student_in_course(course: @course, section: section3, name: "User6 Section3", active_all: true).user
+
+      @teacher = User.create(name: "Teacher")
+
+      enrollment = @course.enroll_user(@teacher, "TeacherEnrollment", limit_privileges_to_course_section: false)
+      enrollment.workflow_state = "active"
+      enrollment.save
+
+      @dt1 = @course.discussion_topics.create!(title: "Section 1 Specific Discussion Topic")
+      add_section_to_topic(@dt1, section1)
+      @dt1.reload
+
+      @dt2 = @course.discussion_topics.create!(title: "Section 2 Specific Discussion Topic")
+      add_section_to_topic(@dt2, section2)
+      @dt2.reload
+
+      @dt3 = @course.discussion_topics.create!(title: "Section 3 Specific Discussion Topic")
+      add_section_to_topic(@dt3, section3)
+      @dt3.reload
+    end
+
+    it "will return section members" do
+      calculator = MessageableUser::Calculator.new(@teacher)
+      expect(calculator.search_in_context_scope(context: @dt1, search: "").pluck(:name)).to eq(["User1 Section1", "User2 Section1"])
+
+      calculator = MessageableUser::Calculator.new(@teacher)
+      expect(calculator.search_in_context_scope(context: @dt2, search: "").pluck(:name)).to eq(["User3 Section2", "User4 Section2"])
+
+      calculator = MessageableUser::Calculator.new(@teacher)
+      expect(calculator.search_in_context_scope(context: @dt3, search: "").pluck(:name)).to eq(["User5 Section3", "User6 Section3"])
+    end
+  end
+
+  describe "section specific discussion topic with teacher with limit_privileges_to_course_section" do
+    before do
+      course_factory(course_name: "Course Name", active_all: true)
+
+      section1 = @course.course_sections.create!(name: "Section 1")
+      section2 = @course.course_sections.create!(name: "Section 2")
+      section3 = @course.course_sections.create!(name: "Section 3")
+
+      @u1_s1 = student_in_course(course: @course, section: section1, name: "User1 Section1", active_all: true).user
+      @u2_s1 = student_in_course(course: @course, section: section1, name: "User2 Section1", active_all: true).user
+      @u3_s2 = student_in_course(course: @course, section: section2, name: "User3 Section2", active_all: true).user
+      @u4_s2 = student_in_course(course: @course, section: section2, name: "User4 Section2", active_all: true).user
+      @u5_s3 = student_in_course(course: @course, section: section3, name: "User5 Section3", active_all: true).user
+      @u6_s3 = student_in_course(course: @course, section: section3, name: "User6 Section3", active_all: true).user
+
+      @teacher = User.create(name: "Teacher")
+
+      enrollment = @course.enroll_user(@teacher, "TeacherEnrollment", section: section1, limit_privileges_to_course_section: true)
+      enrollment.workflow_state = "active"
+      enrollment.save
+
+      @dt1 = @course.discussion_topics.create!(title: "Section 1 Specific Discussion Topic")
+      add_section_to_topic(@dt1, section1)
+      @dt1.reload
+
+      @dt2 = @course.discussion_topics.create!(title: "Section 2 Specific Discussion Topic")
+      add_section_to_topic(@dt2, section2)
+      @dt2.reload
+
+      @dt3 = @course.discussion_topics.create!(title: "Section 3 Specific Discussion Topic")
+      add_section_to_topic(@dt3, section3)
+      @dt3.reload
+    end
+
+    it "will return the section 1 members" do
+      calculator = MessageableUser::Calculator.new(@teacher)
+      expect(calculator.search_in_context_scope(context: @dt1, search: "").pluck(:name)).to eq(["User1 Section1", "User2 Section1", "Teacher"])
+    end
+
+    it "will return an empty collection of section members" do
+      calculator = MessageableUser::Calculator.new(@teacher)
+      expect(calculator.search_in_context_scope(context: @dt2, search: "").pluck(:name)).to eq([])
+
+      calculator = MessageableUser::Calculator.new(@teacher)
+      expect(calculator.search_in_context_scope(context: @dt3, search: "").pluck(:name)).to eq([])
     end
   end
 

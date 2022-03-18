@@ -17,9 +17,9 @@
  */
 
 import Backbone from '@canvas/backbone'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('file_status');
+const I18n = useI18nScope('file_status')
 
 // Handles getting the status for a file.
 //

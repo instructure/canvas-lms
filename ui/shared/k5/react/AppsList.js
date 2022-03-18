@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 
@@ -26,7 +26,7 @@ import {View} from '@instructure/ui-view'
 import K5AppLink, {AppShape} from './K5AppLink'
 import LoadingWrapper from './LoadingWrapper'
 
-const I18n = useI18nScope('apps_list');
+const I18n = useI18nScope('apps_list')
 
 const AppsList = ({isLoading, apps, courseId}) => {
   return (

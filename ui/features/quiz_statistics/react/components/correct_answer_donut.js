@@ -22,9 +22,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import round from '@canvas/quiz-legacy-client-apps/util/round'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('quiz_statistics');
+const I18n = useI18nScope('quiz_statistics')
 
 const CorrectAnswerDonut = props => {
   return (

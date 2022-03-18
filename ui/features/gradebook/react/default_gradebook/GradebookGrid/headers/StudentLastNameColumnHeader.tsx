@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,28 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import ReactDOM from 'react-dom'
+import {useScope as useI18nScope} from '@canvas/i18n'
+import StudentColumnHeader from './StudentColumnHeader'
 
-import TotalGradeOverrideColumnHeader from './TotalGradeOverrideColumnHeader'
+const I18n = useI18nScope('gradebook')
 
-function getProps(options) {
-  return {
-    ref: options.ref
-  }
-}
-
-export default class TotalGradeOverrideColumnHeaderRenderer {
-  constructor(gradebook) {
-    this.gradebook = gradebook
+export default class StudentLastNameColumnHeader extends StudentColumnHeader {
+  getColumnHeaderName() {
+    return I18n.t('Student Last Name')
   }
 
-  render(column, $container, _gridSupport, options) {
-    const props = getProps(options)
-    ReactDOM.render(<TotalGradeOverrideColumnHeader {...props} />, $container)
+  getColumnHeaderOptions() {
+    return I18n.t('Student Last Name Options')
   }
 
-  destroy(_column, $container, _gridSupport) {
-    ReactDOM.unmountComponentAtNode($container)
+  showDisplayAsViewOption() {
+    return false
   }
 }

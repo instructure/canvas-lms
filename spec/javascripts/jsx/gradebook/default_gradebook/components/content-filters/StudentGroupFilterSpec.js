@@ -19,7 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 
-import StudentGroupFilter from 'ui/features/gradebook/react/default_gradebook/components/content-filters/StudentGroupFilter.js'
+import StudentGroupFilter from 'ui/features/gradebook/react/default_gradebook/components/content-filters/StudentGroupFilter'
 import ContentFilterDriver from './ContentFilterDriver'
 
 QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () => {
@@ -37,12 +37,18 @@ QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () 
 
         studentGroupSets: [
           {
-            groups: [{id: '2103', name: 'Group B1'}, {id: '2104', name: 'Group B2'}],
+            groups: [
+              {id: '2103', name: 'Group B1'},
+              {id: '2104', name: 'Group B2'}
+            ],
             id: '2152',
             name: 'Group Set B'
           },
           {
-            groups: [{id: '2101', name: 'Group A2'}, {id: '2102', name: 'Group A1'}],
+            groups: [
+              {id: '2101', name: 'Group A2'},
+              {id: '2102', name: 'Group A1'}
+            ],
             id: '2151',
             name: 'Group Set A'
           }

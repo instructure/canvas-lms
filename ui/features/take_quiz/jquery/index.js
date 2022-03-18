@@ -18,7 +18,7 @@
 
 import FileUploadQuestionView from '../backbone/views/FileUploadQuestionView'
 import File from '@canvas/files/backbone/models/File.coffee'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import numberHelper from '@canvas/i18n/numberHelper'
 import $ from 'jquery'
 import autoBlurActiveInput from './behaviors/autoBlurActiveInput'
@@ -37,7 +37,7 @@ import '@canvas/rails-flash-notifications'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import '@canvas/quizzes/jquery/behaviors/quiz_selectmenu'
 
-const I18n = useI18nScope('quizzes.take_quiz');
+const I18n = useI18nScope('quizzes.take_quiz')
 
 RichContentEditor.preloadRemoteModule()
 

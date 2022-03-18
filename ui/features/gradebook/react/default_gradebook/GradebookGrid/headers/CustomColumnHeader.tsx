@@ -16,29 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default class GridEvent {
-  handlers = []
+import React from 'react'
+import {string} from 'prop-types'
+import {Text} from '@instructure/ui-text'
+import ColumnHeader from './ColumnHeader'
 
-  subscribe(handler) {
-    if (!this.handlers.includes(handler)) {
-      this.handlers.push(handler)
-    }
+export default class CustomColumnHeader extends ColumnHeader {
+  static propTypes = {
+    title: string.isRequired
   }
 
-  unsubscribe(handler) {
-    const index = this.handlers.indexOf(handler)
-    if (index !== -1) {
-      this.handlers.splice(index, 1)
-    }
-  }
-
-  trigger(event, data) {
-    for (let i = 0; i < this.handlers.length; i++) {
-      if (this.handlers[i](event, data) === false) {
-        return false // prevent additional handlers from continuing
-      }
-    }
-
-    return true // continue handling
+  render() {
+    return (
+      <div className="Gradebook__ColumnHeaderContent">
+        <span
+          className="Gradebook__ColumnHeaderDetail Gradebook__ColumnHeaderDetail--OneLine"
+          style={{textAlign: 'center', width: '100%'}}
+        >
+          <Text tag="span" size="x-small">
+            {this.props.title}
+          </Text>
+        </span>
+      </div>
+    )
   }
 }

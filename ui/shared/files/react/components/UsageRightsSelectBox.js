@@ -19,10 +19,10 @@
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import filesEnv from '../modules/filesEnv'
 
-const I18n = useI18nScope('usageRightsSelectBox');
+const I18n = useI18nScope('usageRightsSelectBox')
 
 function omitEmptyValues(obj) {
   Object.keys(obj).forEach(k => {

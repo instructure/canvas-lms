@@ -22,12 +22,12 @@ import {Query} from 'react-apollo'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {TEACHER_QUERY} from '../assignmentData'
 import TeacherView from './TeacherView'
 
-const I18n = useI18nScope('assignments_2');
+const I18n = useI18nScope('assignments_2')
 
 TeacherQuery.propTypes = {
   assignmentLid: string,

@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useRef} from 'react'
 import {bool, func, number} from 'prop-types'
 import shortid from 'shortid'
 import {FormField} from '@instructure/ui-form-field'
 import {NumberInput} from '@instructure/ui-number-input'
 
-const I18n = useI18nScope('allowed_attempts');
+const I18n = useI18nScope('allowed_attempts')
 
 AllowedAttempts.propTypes = {
   limited: bool.isRequired,

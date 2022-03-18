@@ -25,14 +25,14 @@ import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Tray} from '@instructure/ui-tray'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import AssessmentSummary from './components/AssessmentSummary'
 import AuditTrail from './components/AuditTrail/index'
 import Api from './Api'
 import buildAuditTrail from './buildAuditTrail'
 
-const I18n = useI18nScope('speed_grader');
+const I18n = useI18nScope('speed_grader')
 
 export default class AssessmentAuditTray extends Component {
   static propTypes = {

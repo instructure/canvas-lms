@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import ImmutablePropTypes from 'react-immutable-proptypes'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
@@ -32,7 +32,7 @@ import Outcome from './Outcome'
 import * as shapes from './shapes'
 import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
 
-const I18n = useI18nScope('IndividualStudentMasteryOutcomeGroup');
+const I18n = useI18nScope('IndividualStudentMasteryOutcomeGroup')
 
 const outcomeGroupHeader = (outcomeGroup, numMastered, numGroup, isVertical) => (
   <Flex

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -25,7 +25,7 @@ import {ToggleDetails} from '@instructure/ui-toggle-details'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import {string} from 'prop-types'
 
-const I18n = useI18nScope('assignment_2_assignment_toggle_details');
+const I18n = useI18nScope('assignment_2_assignment_toggle_details')
 
 function AssignmentDetailsText(description) {
   return description

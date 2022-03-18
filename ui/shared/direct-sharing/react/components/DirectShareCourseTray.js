@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {lazy} from 'react'
 import CanvasLazyTray from '@canvas/trays/react/LazyTray'
 
-const I18n = useI18nScope('direct_share_course_tray');
+const I18n = useI18nScope('direct_share_course_tray')
 
 const DirectShareCoursePanel = lazy(() => import('./DirectShareCoursePanel'))
 

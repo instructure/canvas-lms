@@ -16,12 +16,12 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import preventDefault from 'prevent-default'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('profile');
+const I18n = useI18nScope('profile')
 
 $(() => {
   let resending = false

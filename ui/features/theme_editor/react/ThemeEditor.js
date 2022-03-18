@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
@@ -30,7 +30,7 @@ import ThemeEditorModal from './ThemeEditorModal'
 import ThemeEditorSidebar from './ThemeEditorSidebar'
 import getCookie from '@instructure/get-cookie'
 
-const I18n = useI18nScope('theme_editor');
+const I18n = useI18nScope('theme_editor')
 
 /* eslint no-alert:0 */
 const TABS = [

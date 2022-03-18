@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {createActions} from 'redux-actions'
 import $ from 'jquery'
 
 import * as apiClient from './apiClient'
 import {createPaginationActions} from '@canvas/pagination/redux/actions'
 
-const I18n = useI18nScope('discussions_v2');
+const I18n = useI18nScope('discussions_v2')
 
 const getDiscussionOpts = {
   fetchAll: true,

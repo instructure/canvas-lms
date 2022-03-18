@@ -20,11 +20,11 @@ import React from 'react'
 import createReactClass from 'create-react-class'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import PublishCloud from './LegacyPublishCloud'
 import 'jqueryui/dialog'
 
-const I18n = useI18nScope('publish_cloud');
+const I18n = useI18nScope('publish_cloud')
 
 // Function Summary
 // Create a blank dialog window via jQuery, then dump the RestrictedDialogForm into that

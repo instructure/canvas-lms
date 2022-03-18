@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
 import cx from 'classnames'
 
@@ -24,7 +24,7 @@ import {Text} from '@instructure/ui-text'
 
 import propTypes from '@canvas/blueprint-courses/react/propTypes'
 
-const I18n = useI18nScope('blueprint_MasterChildStack');
+const I18n = useI18nScope('blueprint_MasterChildStack')
 
 export default class MasterChildStack extends Component {
   static propTypes = {

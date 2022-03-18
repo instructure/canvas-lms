@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
@@ -25,7 +25,7 @@ import '@canvas/jquery/jquery.instructure_misc_helpers' // replaceTags
 import 'jquery-tinypubsub' // /\.publish/
 import 'jqueryui/button'
 
-const I18n = useI18nScope('alerts');
+const I18n = useI18nScope('alerts')
 
 $(function() {
   const $list = $('.alerts_list')

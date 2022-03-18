@@ -18,7 +18,7 @@
 
 import PropTypes from 'prop-types'
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import numberFormat from '@canvas/i18n/numberFormat'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -26,7 +26,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 
-const I18n = useI18nScope('assignments_2_student_points_display');
+const I18n = useI18nScope('assignments_2_student_points_display')
 
 export default function PointsDisplay(props) {
   const ungradedVisualString = () => {

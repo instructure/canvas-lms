@@ -18,11 +18,11 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import '@canvas/datetime'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 
-const I18n = useI18nScope('speed_grader_helpers');
+const I18n = useI18nScope('speed_grader_helpers')
 
 const speedGraderHelpers = {
   getHistory() {

@@ -137,8 +137,6 @@ def tearDownNode(prefix) {
 
   if (env.CRYSTALBALL_MAP == '1') {
     sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results/crystalball_results tmp/crystalball canvas_ --allow-error --clean-dir'
-    sh 'ls tmp/crystalball'
-    sh 'ls -R'
     archiveArtifacts allowEmptyArchive: true, artifacts: 'tmp/crystalball/**/*'
   }
 
@@ -147,7 +145,7 @@ def tearDownNode(prefix) {
     archiveArtifacts(artifacts: "tmp/docker-${prefix}-${CI_NODE_INDEX}.log")
   }
 
-  if (env.ENABLE_AXE_SELENIUM == '1') {
+  if (env.ENABLE_AXE_SELENIUM == '1' || env.COVERAGE == '1') {
     archiveArtifacts allowEmptyArchive: true, artifacts: 'tmp/rspec_results/**/*'
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2018 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,29 +17,29 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
-import {Text} from '@instructure/ui-text'
-import ColumnHeader from './ColumnHeader'
+import ReactDOM from 'react-dom'
 
-const {string} = PropTypes
+import TotalGradeOverrideColumnHeader from './TotalGradeOverrideColumnHeader'
 
-export default class CustomColumnHeader extends ColumnHeader {
-  static propTypes = {
-    title: string.isRequired
+function getProps(options) {
+  return {
+    ref: options.ref
+  }
+}
+
+export default class TotalGradeOverrideColumnHeaderRenderer {
+  gradebook: any
+
+  constructor(gradebook) {
+    this.gradebook = gradebook
   }
 
-  render() {
-    return (
-      <div className="Gradebook__ColumnHeaderContent">
-        <span
-          className="Gradebook__ColumnHeaderDetail Gradebook__ColumnHeaderDetail--OneLine"
-          style={{textAlign: 'center', width: '100%'}}
-        >
-          <Text tag="span" size="x-small">
-            {this.props.title}
-          </Text>
-        </span>
-      </div>
-    )
+  render(column, $container, _gridSupport, options) {
+    const props = getProps(options)
+    ReactDOM.render(<TotalGradeOverrideColumnHeader {...props} />, $container)
+  }
+
+  destroy(_column, $container, _gridSupport) {
+    ReactDOM.unmountComponentAtNode($container)
   }
 }

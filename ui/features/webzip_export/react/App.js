@@ -19,13 +19,13 @@
 import React from 'react'
 import axios from '@canvas/axios'
 import {Spinner} from '@instructure/ui-spinner'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import splitAssetString from '@canvas/util/splitAssetString'
 import ExportList from './components/ExportList'
 import ExportInProgress from './components/ExportInProgress'
 import Errors from './components/Errors'
 
-const I18n = useI18nScope('webzip_exports');
+const I18n = useI18nScope('webzip_exports')
 
 class WebZipExportApp extends React.Component {
   static webZipFormat(webZipExports, newExportId = null) {
