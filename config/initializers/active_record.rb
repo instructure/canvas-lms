@@ -708,6 +708,18 @@ class ActiveRecord::Base
     end
     changes_applied
   end
+
+  unless CANVAS_RAILS6_0
+    def self.override_db_configs(override)
+      configurations.configs_for.each do |config|
+        config.instance_variable_set(:@configuration_hash, config.configuration_hash.merge(override).freeze)
+      end
+      clear_all_connections!
+
+      # Just return something that isn't an ar connection object so consoles don't explode
+      override
+    end
+  end
 end
 
 module UsefulFindInBatches

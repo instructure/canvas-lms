@@ -21,5 +21,9 @@ if ENV["RAILS_DATABASE_ENVIRONMENT"]
   GuardRail.activate!(ENV["RAILS_DATABASE_ENVIRONMENT"].to_sym)
 end
 if ENV["RAILS_DATABASE_USER"]
-  GuardRail.apply_config!(username: ENV["RAILS_DATABASE_USER"], password: nil)
+  if CANVAS_RAILS6_0
+    GuardRail.apply_config!(username: ENV["RAILS_DATABASE_USER"], password: nil)
+  else
+    ActiveRecord::Base.override_db_configs(username: ENV["RAILS_DATABASE_USER"], password: nil)
+  end
 end
