@@ -2015,6 +2015,10 @@ module ConnectionWithMaxRuntime
   end
 
   def runtime
+    # Sometimes connections seem to lose their created_at, so just set it to the present
+    # That way the connection still eventually expires
+    @created_at ||= Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
     Process.clock_gettime(Process::CLOCK_MONOTONIC) - @created_at
   end
 end

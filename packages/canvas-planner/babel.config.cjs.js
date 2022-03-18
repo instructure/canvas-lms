@@ -16,26 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// this target is intended for use in browsers, refer to
-// ui-build/babel-recommendations.md for guidance
+// this target is intended for Jest / JSDOM Node.js environments and is not
+// suitable for the browser or production
 module.exports = {
-  assumptions: {
-    setPublicClassFields: true
-  },
-  env: {
-    production: {
-      plugins: [
-        'transform-react-remove-prop-types',
-        '@babel/plugin-transform-react-inline-elements',
-        '@babel/plugin-transform-react-constant-elements'
-      ]
-    }
-  },
   presets: [
     ['@babel/preset-env', {
-      useBuiltIns: 'entry',
-      corejs: '3.20',
-      modules: false,
+      modules: 'commonjs',
+      include: ['transform-classes']
     }],
     ['@babel/preset-react', { useBuiltIns: true }],
   ],
@@ -45,10 +32,10 @@ module.exports = {
     ['@babel/plugin-transform-runtime', {
       corejs: 3,
       helpers: true,
-      useESModules: true,
+      useESModules: false,
       regenerator: true
     }],
-
+    ['@babel/plugin-proposal-class-properties', { loose: true }],
     ['@instructure/babel-plugin-themeable-styles', {
       postcssrc: require('@instructure/ui-postcss-config')()(),
       themeablerc: require('./themeable.config.js'),
@@ -56,7 +43,6 @@ module.exports = {
   ],
 
   targets: {
-    browsers: 'last 2 versions',
-    esmodules: true
-  }
+    node: 'current'
+  },
 }

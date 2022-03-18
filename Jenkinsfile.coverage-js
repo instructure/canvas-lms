@@ -42,6 +42,52 @@ def getKarmaRunnerImage() {
   }
 }
 
+def getPatchsetTag() {
+  (env.GERRIT_REFSPEC.contains('master')) ? "${configuration.buildRegistryPath()}:${env.GERRIT_BRANCH}" : imageTag.patchset()
+}
+
+def generateSkippedSpecsReport() {
+  try {
+    copyArtifacts(
+      filter: 'js-results/**',
+      optional: false,
+      projectName: env.JOB_NAME,
+      selector: specific(env.BUILD_NUMBER),
+    )
+
+    withEnv(['COMPOSE_FILE=docker-compose.new-jenkins.yml']) {
+      withCredentials([usernamePassword(credentialsId: 'INSENG_CANVAS_CI_AWS_ACCESS', usernameVariable: 'INSENG_AWS_ACCESS_KEY_ID', passwordVariable: 'INSENG_AWS_SECRET_ACCESS_KEY')]) {
+        def awsCreds = "AWS_DEFAULT_REGION=us-west-2 AWS_ACCESS_KEY_ID=${INSENG_AWS_ACCESS_KEY_ID} AWS_SECRET_ACCESS_KEY=${INSENG_AWS_SECRET_ACCESS_KEY}"
+        sh "$awsCreds aws s3 cp s3://instructure-canvas-ci/skipped_specs_js.json skipped_specs.json"
+        sh """
+          docker run -v \$(pwd)/\$LOCAL_WORKDIR/js-results/:/tmp/js-results \
+          -v \$(pwd)/\$LOCAL_WORKDIR/skipped_specs.json:/usr/src/app/skipped_specs.json \
+          --name skipped-spec-collator $PATCHSET_TAG bash -c \
+          "bundle install; ruby build/new-jenkins/skipped_specs_manager.rb js"
+        """
+        sh 'docker cp skipped-spec-collator:/tmp/skipped_specs.json skipped_specs.json'
+        sh "$awsCreds aws s3 cp skipped_specs.json s3://instructure-canvas-ci/skipped_specs_js.json"
+      }
+      sendSkippedSpecsSlackReport()
+      archiveArtifacts allowEmptyArchive: true, artifacts: 'skipped_specs.json'
+    }
+  } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
+    slackSend channel: '#canvas-test-stats', color: 'danger', message: "<$env.BUILD_URL|coverage-js failed to generate skipped specs report!>"
+  }
+}
+
+def sendSkippedSpecsSlackReport() {
+  def jsSkippedSpecs = sh(script: "grep -o 'file_indicator' skipped_specs.json | wc -l", returnStdout: true).trim() ?: '0'
+  def color = 'danger'
+  if(jsSkippedSpecs.toInteger() < 100) {
+    color = 'good'
+  } else if (jsSkippedSpecs.toInteger() < 300) {
+    color = 'warning'
+  }
+  def jobInfo = "<$env.BUILD_URL|JS>"
+  slackSend channel: '#canvas-test-stats', color: color, message: "$jsSkippedSpecs skipped specs in $jobInfo! "
+}
+
 pipeline {
   agent none
   options {
@@ -55,6 +101,7 @@ pipeline {
     FORCE_FAILURE = configuration.forceFailureJS()
 
     KARMA_RUNNER_IMAGE = getKarmaRunnerImage()
+    PATCHSET_TAG = getPatchsetTag()
 
     BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
     COMPOSE_DOCKER_CLI_BUILD = 1
@@ -103,6 +150,7 @@ pipeline {
                   uploadDest: 'canvas-lms-js/coverage'
                 ])
               }
+              generateSkippedSpecsReport()
             }
           ]
 
