@@ -54,13 +54,13 @@ nn:
       previous: k
       show_assign: f
   AssignmentListItemView: 
-    complete: Fullført
+    complete: Godkjent
     grade_gpa_scale_screenreader: "Vurdering: %{grade}"
     grade_letter_grade_screenreader: "Vurdering: %{grade}"
     grade_pass_fail_screenreader: "Vurdering: %{grade}"
     grade_percent: "%{grade}%"
     grade_percent_screenreader: "Vurdering: %{grade}%"
-    incomplete: "Ikkje fullført"
+    incomplete: "Ikkje godkjent"
   CollectionView: 
     no_items: "Ingen element."
   CreateAssignmentView: 
@@ -9276,7 +9276,7 @@ nn:
   event_fe9ba3fe: Hending
   event_start_time_441b491f: "Starttidspunkt for hending"
   event_title_57a50568: "Tittel på hending:"
-  event_title_7f1051a6: "Tittel på hending"
+  event_title_7f1051a6: Hendingstittel
   event_title_course_name_changed_to_37510fbb: "%{event_title}, %{course_name} endra til"
   everthing_updated_after_start_date_f3be8ba: "Alt oppdatert etter startdato"
   every_665d821e: Kvar
