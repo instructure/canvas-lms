@@ -224,13 +224,13 @@ export const MOCK_PLANNER_ITEM = [
     new_activity: false,
     plannable: {
       created_at: '2021-03-16T17:17:17Z',
-      due_at: moment().toISOString(),
+      due_at: moment()?.toISOString(),
       id: '15',
       points_possible: 10,
       title: 'Assignment 15',
       updated_at: '2021-03-16T17:31:52Z'
     },
-    plannable_date: moment().toISOString(),
+    plannable_date: moment()?.toISOString(),
     plannable_id: '15',
     plannable_type: 'assignment',
     planner_override: null,
