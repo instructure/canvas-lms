@@ -7235,7 +7235,7 @@ nl:
         attachment: "Bestand om bij te voegen"
         remove_attachment: "Bijlage verwijderen"
     all_courses: "Alle cursussen"
-    all_in_context: "Alles in %{context}"
+    all_in_context: "Iedereen in %{context}"
     archive: Archiveren
     autocomplete_result: 
       group_people: "Personen: %{people}"
@@ -7296,7 +7296,7 @@ nl:
       mark_as_unread: "Markeren als ongelezen"
       more_options: "Meer opties"
       page_title_header: Gesprekken
-      reply: Beantwoorden
+      reply: Reageren
       reply_all: "Allen beantwoorden"
       search_for_recipients: "Ontvangers zoeken"
       search_names_groups_courses: "Namen, groepen en cursussen zoeken"
@@ -9887,7 +9887,7 @@ nl:
       manage_discussion_entry: "Discussie-vermelding beheren"
       open_in_speedgrader: "Openen in SpeedGrader"
       unknown_author: ">Onbekende auteur"
-      write_a_reply: Beantwoorden
+      write_a_reply: Reageren
     entry_stats: 
       show_more: "Meer tonen"
     flash: 
@@ -9920,7 +9920,7 @@ nl:
       attach_file: Bijlage
       cancel: Annuleren
       post_reply: "Antwoord posten"
-      write_a_reply: Beantwoorden
+      write_a_reply: Reageren
     results_entry: 
       authors_name: "Naam auteur"
       edited_comment: "Bewerkt door *%{editor.display_name}* op %{edited_at}"
@@ -16781,7 +16781,7 @@ nl:
         subject: "Nieuw Canvas-account"
     message: 
       actions: 
-        reply: Beantwoorden
+        reply: Reageren
       meta_data: "Meta gegevens"
       plain_text: "Tekst zonder opmaak"
       titles: 
@@ -22513,7 +22513,7 @@ nl:
   repliescount_replies_a7fcb2e1: 
     one: "%{repliesCount} antwoord"
     other: "%{repliesCount} antwoorden"
-  reply_389d6fb9: Beantwoorden
+  reply_389d6fb9: Reageren
   reply_all_80298bee: "Allen beantwoorden"
   reply_all_b864cd0e: "Allen beantwoorden"
   reply_from_name: "%{name} via Canvas waarschuwingen"
