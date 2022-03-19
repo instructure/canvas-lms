@@ -82,7 +82,10 @@ module Lti
       TeacherEnrollment => ["http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"].freeze,
       DesignerEnrollment => ["http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper"].freeze,
       ObserverEnrollment => ["http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor"].freeze,
-      StudentViewEnrollment => ["http://purl.imsglobal.org/vocab/lis/v2/membership#Learner"].freeze,
+      StudentViewEnrollment => [
+        "http://purl.imsglobal.org/vocab/lis/v2/membership#Learner",
+        "http://purl.imsglobal.org/vocab/lti/system/person#TestUser",
+      ].freeze,
       :group_member => ["http://purl.imsglobal.org/vocab/lis/v2/membership#Member"].freeze,
       :group_leader => [
         "http://purl.imsglobal.org/vocab/lis/v2/membership#Member",
@@ -142,8 +145,7 @@ module Lti
       end
 
       if @user
-        context_roles = course_enrollments.each_with_object(Set.new) { |role, set| set.add([*role_map[role.class]].join(",")) }
-
+        context_roles = course_enrollments.flat_map { |e| role_map[e.class] }
         institution_roles = @user.roles(@root_account, true).flat_map { |role| role_map[role] }
         if Account.site_admin.account_users_for(@user).present?
           institution_roles.push(*role_map["siteadmin"])

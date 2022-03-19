@@ -458,6 +458,7 @@ describe Lti::IMS::NamesAndRolesController do
       let!(:ta_enrollment) { ta_in_course(course: course, active_all: true) }
       let!(:observer_enrollment) { observer_in_course(course: course, active_all: true) }
       let!(:designer_enrollment) { designer_in_course(course: course, active_all: true) }
+
       let!(:enrollments) do
         [
           teacher_enrollment,
@@ -523,6 +524,18 @@ describe Lti::IMS::NamesAndRolesController do
         it "limits results to Canvas Designers" do
           send_request
           expect_enrollment_response_page_of([designer_enrollment])
+        end
+      end
+
+      context "and the role param specifies the LTI TestUser role" do
+        let(:total_items) { 1 }
+        let(:pass_thru_params) { super().merge(role: "http://purl.imsglobal.org/vocab/lti/system/person#TestUser") }
+
+        it "limits results to test students" do
+          student_view_enrollment =
+            course_with_user("StudentViewEnrollment", course: course, active_all: true)
+          send_request
+          expect_enrollment_response_page_of([student_view_enrollment])
         end
       end
 
