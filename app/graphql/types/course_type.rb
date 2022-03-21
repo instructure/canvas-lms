@@ -319,6 +319,11 @@ module Types
       course.sis_course_id
     end
 
+    field :allow_final_grade_override, Boolean, null: true
+    def allow_final_grade_override
+      course.allow_final_grade_override?
+    end
+
     field :root_outcome_group, LearningOutcomeGroupType, null: false
   end
 end

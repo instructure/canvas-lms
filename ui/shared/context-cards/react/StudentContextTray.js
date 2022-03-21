@@ -299,7 +299,11 @@ export default class StudentContextTray extends React.Component {
                   </div>
                 </header>
                 {this.renderQuickLinks(user, course)}
-                <MetricsList user={user} analytics={user.analytics} />
+                <MetricsList
+                  user={user}
+                  analytics={user.analytics}
+                  allowFinalGradeOverride={course.allowFinalGradeOverride}
+                />
                 <SubmissionProgressBars
                   submissions={course.submissionsConnection.edges.map(n => n.submission)}
                 />
