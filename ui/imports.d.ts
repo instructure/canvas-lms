@@ -33,7 +33,6 @@ interface MissingInputProps {
   onClick?: MouseEventHandler<HTMLElement>
   onKeyDown?: KeyboardEventHandler<HTMLElement>
   role?: string
-  disabled?: boolean
 }
 
 interface MissingElementProps {
@@ -75,23 +74,5 @@ declare module '@instructure/ui-view' {
 declare module '@instructure/ui-buttons' {
   export interface ButtonProps {
     id?: string
-  }
-}
-
-declare module '@instructure/ui-menu' {
-  export interface Menu {
-    contentRef?: any
-  }
-}
-
-declare module '@instructure/ui-link' {
-  export interface Link {
-    size?: string
-  }
-}
-
-declare module '@instructure/ui-text' {
-  export interface Text {
-    tag?: string
   }
 }

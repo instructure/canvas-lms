@@ -136,7 +136,7 @@
                     <td>
                         <%= ddt.select :value, options_for_select(default_due_time_options(@account), default_due_time_key(@account)) %>
                         <p class="aside">
-                          <%= t("This influences the user interface for setting due dates. It does not change when any existing assignment is due.") %>
+                          <%= t("This influences the user interface for setting due dates. It does not change the time due for any existing assignments.") %>
                         </p>
                     </td>
                   </tr>

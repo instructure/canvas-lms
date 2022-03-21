@@ -35,12 +35,6 @@ describe('MentionDropdownOption tests', () => {
     expect(optionElement).toBeTruthy()
   })
 
-  it('should apply a data-ignore-a11y-check attribute on the avatar image', () => {
-    const {container} = setup()
-    const img = container.querySelector('img')
-    expect(img).toHaveAttribute('data-ignore-a11y-check')
-  })
-
   it('should call onSelect when selected', () => {
     const selectSpy = jest.fn()
     const {container} = setup({onSelect: selectSpy})
