@@ -19,14 +19,14 @@
 import _ from 'lodash'
 
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import fakeENV from 'helpers/fakeENV'
 import numberHelper from '@canvas/i18n/numberHelper'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import GradeSummary from 'ui/features/grade_summary/jquery/index.js'
 import {createCourseGradesWithGradingPeriods} from '../gradebook/GradeCalculatorSpecHelper'
 
-const I18n = useI18nScope('gradingGradeSummary');
+const I18n = useI18nScope('gradingGradeSummary')
 
 const $fixtures = $('#fixtures')
 

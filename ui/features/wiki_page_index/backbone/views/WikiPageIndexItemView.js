@@ -17,7 +17,7 @@
 
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import WikiPageIndexEditDialog from './WikiPageIndexEditDialog'
 import WikiPageDeleteDialog from '@canvas/wiki/backbone/views/WikiPageDeleteDialog'
 import PublishIconView from '@canvas/publish-icon-view'
@@ -25,7 +25,7 @@ import LockIconView from '@canvas/lock-icon'
 import template from '../../jst/WikiPageIndexItem.handlebars'
 import '../../jquery/redirectClickTo'
 
-const I18n = useI18nScope('pages');
+const I18n = useI18nScope('pages')
 
 export default class WikiPageIndexItemView extends Backbone.View {
   static initClass() {

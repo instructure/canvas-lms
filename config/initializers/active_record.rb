@@ -708,6 +708,18 @@ class ActiveRecord::Base
     end
     changes_applied
   end
+
+  unless CANVAS_RAILS6_0
+    def self.override_db_configs(override)
+      configurations.configs_for.each do |config|
+        config.instance_variable_set(:@configuration_hash, config.configuration_hash.merge(override).freeze)
+      end
+      clear_all_connections!
+
+      # Just return something that isn't an ar connection object so consoles don't explode
+      override
+    end
+  end
 end
 
 module UsefulFindInBatches
@@ -2003,6 +2015,10 @@ module ConnectionWithMaxRuntime
   end
 
   def runtime
+    # Sometimes connections seem to lose their created_at, so just set it to the present
+    # That way the connection still eventually expires
+    @created_at ||= Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
     Process.clock_gettime(Process::CLOCK_MONOTONIC) - @created_at
   end
 end

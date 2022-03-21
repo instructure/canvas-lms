@@ -17,7 +17,7 @@
 
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import template from '../../jst/userDateRangeSearchForm.handlebars'
 import ValidatedMixin from '@canvas/forms/backbone/views/ValidatedMixin.coffee'
 import '@canvas/jquery/jquery.ajaxJSON'
@@ -25,7 +25,7 @@ import '@canvas/datetime'
 import 'jqueryui/dialog'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('user_date_range_search');
+const I18n = useI18nScope('user_date_range_search')
 
 export default class UserDateRangeSearchFormView extends Backbone.View {
   static initClass() {

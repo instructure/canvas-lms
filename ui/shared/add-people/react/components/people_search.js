@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {Text} from '@instructure/ui-text'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -28,7 +28,7 @@ import {IconUserSolid} from '@instructure/ui-icons'
 import {courseParamsShape, inputParamsShape} from './shapes'
 import {parseNameList, findEmailInEntry, emailValidator} from '../helpers'
 
-const I18n = useI18nScope('PeopleSearch');
+const I18n = useI18nScope('PeopleSearch')
 
 class PeopleSearch extends React.Component {
   static propTypes = {...inputParamsShape, ...courseParamsShape}

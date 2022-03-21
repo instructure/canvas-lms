@@ -20,14 +20,14 @@ import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import classSet from '@canvas/quiz-legacy-client-apps/util/class_set'
 import formatNumber from '../../../util/format_number'
 import Help from './help'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import K from '../../../constants'
 import React, { useState } from 'react'
 import ScreenReaderContent from '@canvas/quiz-legacy-client-apps/react/components/screen_reader_content'
 import SightedUserContent from '@canvas/quiz-legacy-client-apps/react/components/sighted_user_content'
 import {IconQuestionLine} from '@instructure/ui-icons'
 
-const I18n = useI18nScope('quiz_statistics.discrimination_index');
+const I18n = useI18nScope('quiz_statistics.discrimination_index')
 
 const DiscriminationIndex = ({discriminationIndex: di = 0}) => {
   const [displayingHelp, displayHelp] = useState(false)

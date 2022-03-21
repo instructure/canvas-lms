@@ -20,9 +20,9 @@ import {CURRENT_USER} from './constants'
 import {DISCUSSION_SUBENTRIES_QUERY} from '../../graphql/Queries'
 import {Discussion} from '../../graphql/Discussion'
 import {DiscussionEntry} from '../../graphql/DiscussionEntry'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('discussion_topics_post');
+const I18n = useI18nScope('discussion_topics_post')
 
 export const getSpeedGraderUrl = (authorId = null) => {
   let speedGraderUrl = ENV.SPEEDGRADER_URL_TEMPLATE

@@ -18,7 +18,7 @@
 
 import React, {useMemo} from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {IconButton} from '@instructure/ui-buttons'
 import {IconEditLine} from '@instructure/ui-icons'
@@ -27,7 +27,7 @@ import {Flex} from '@instructure/ui-flex'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import {ImmersiveReaderButton} from '@canvas/immersive-reader/ImmersiveReader'
 
-const I18n = useI18nScope('overview_page');
+const I18n = useI18nScope('overview_page')
 
 export default function OverviewPage({content, url, canEdit, showImmersiveReader}) {
   const html = useMemo(() => apiUserContent.convert(content), [content])

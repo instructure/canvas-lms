@@ -17,10 +17,10 @@
  */
 import initializeExternalTools from '@canvas/tinymce-external-tools'
 import INST from 'browser-sniffer'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('loadEventListeners');
+const I18n = useI18nScope('loadEventListeners')
 
 export default function loadEventListeners(callbacks = {}) {
   const validCallbacks = ['equationCB', 'equellaCB', 'externalToolCB']

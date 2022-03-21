@@ -93,7 +93,7 @@ def featureFlagStage(stages, buildConfig) {
       .hooks(buildSummaryReportHooks.call())
       .nodeRequirements(container: 'feature-flag')
       .obeysAllowStages(false)
-      .required(filesChangedStage.hasFeatureFlagFiles(buildConfig))
+      .required(filesChangedStage.hasFeatureFlagFiles(buildConfig) && env.GERRIT_CHANGE_ID != "0")
       .queue(stages) {
         slackSend(
           channel: configuration.getString('feature-flag-report-channel'),

@@ -450,7 +450,7 @@ pipeline {
                   extendedStage('Generate Crystalball Prediction')
                     .hooks(buildSummaryReportHooks.call())
                     .obeysAllowStages(false)
-                    .required(!configuration.isChangeMerged())
+                    .required(!configuration.isChangeMerged() && env.GERRIT_REFSPEC != "refs/heads/master")
                     .timeout(2)
                     .execute {
                       try {
@@ -552,7 +552,7 @@ pipeline {
                   extendedStage('Linters')
                     .hooks([onNodeReleasing: lintersStage.tearDownNode()])
                     .nodeRequirements(label: 'canvas-docker', podTemplate: lintersStage.nodeRequirementsTemplate())
-                    .required(!configuration.isChangeMerged())
+                    .required(!configuration.isChangeMerged() && env.GERRIT_CHANGE_ID != '0')
                     .execute {
                       def nestedStages = [:]
 

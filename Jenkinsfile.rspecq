@@ -34,7 +34,7 @@ def setupNode() {
   checkout scm
 
   distribution.stashBuildScripts()
-  if (!configuration.isChangeMerged() && env.ENABLE_CRYSTALBALL == '1') {
+  if (!configuration.isChangeMerged() && env.GERRIT_REFSPEC != "refs/heads/master" && env.ENABLE_CRYSTALBALL == '1') {
     copyArtifacts filter: 'tmp/crystalball_spec_list.txt', projectName: "${env.UPSTREAM}", selector: upstream()
     copyArtifacts filter: 'tmp/crystalball_map_version.txt', projectName: "${env.UPSTREAM}", selector: upstream()
   }
@@ -182,7 +182,7 @@ pipeline {
           def postRunnerHandler = [
             onStageEnded: { stageName, stageConfig, result ->
               node('master') {
-                if (!configuration.isChangeMerged() && env.ENABLE_CRYSTALBALL == '1') {
+                if (!configuration.isChangeMerged() && env.GERRIT_REFSPEC != "refs/heads/master" && env.ENABLE_CRYSTALBALL == '1') {
                   sendCrystalballSlack(summaryMessage, crystalballColor, stageConfig.status())
                 }
                 buildSummaryReport.saveRunManifest()
@@ -192,7 +192,7 @@ pipeline {
 
           def postBuildHandler = [
             onNodeReleasing: {
-              if (!configuration.isChangeMerged() && env.ENABLE_CRYSTALBALL == '1') {
+              if (!configuration.isChangeMerged() && env.GERRIT_REFSPEC != "refs/heads/master" && env.ENABLE_CRYSTALBALL == '1') {
                 sendCrystalballMetrics()
               }
             }
@@ -210,7 +210,7 @@ pipeline {
                 setupNode()
               }
 
-              if (!configuration.isChangeMerged() && env.ENABLE_CRYSTALBALL == '1') {
+              if (!configuration.isChangeMerged() && env.GERRIT_REFSPEC != "refs/heads/master" && env.ENABLE_CRYSTALBALL == '1') {
                 stage('Compute Build Distribution') {
                   computeTestCount()
                 }

@@ -24,7 +24,7 @@ describe Importers::LtiResourceLinkImporter do
   let!(:source_course) { course_model }
   let!(:destination_course) { course_model }
   let!(:migration) { ContentMigration.create(context: destination_course, source_course: source_course) }
-  let!(:tool) { external_tool_model(context: destination_course) }
+  let!(:tool) { external_tool_1_3_model(context: destination_course) }
 
   context "when `lti_resource_links` is not given" do
     let(:hash) { { lti_resource_links: nil } }
@@ -55,7 +55,8 @@ describe Importers::LtiResourceLinkImporter do
       let!(:assignment) do
         destination_course.assignments.create!(
           submission_types: "external_tool",
-          external_tool_tag_attributes: { content: tool }
+          external_tool_tag_attributes: { content: tool },
+          points_possible: 10
         )
       end
       let!(:resource_link) do

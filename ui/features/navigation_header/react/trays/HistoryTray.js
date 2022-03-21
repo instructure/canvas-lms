@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {bool} from 'prop-types'
 import {HistoryShape} from '../HistoryShape'
@@ -24,7 +24,7 @@ import HistoryList from '../HistoryList'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 
-const I18n = useI18nScope('new_nav');
+const I18n = useI18nScope('new_nav')
 
 HistoryTray.propTypes = {
   history: HistoryShape.isRequired,

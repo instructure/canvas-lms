@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
 import DialogBaseView from '@canvas/dialog-base-view'
@@ -27,7 +27,7 @@ import '../../jquery/ContextSearch'
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.disableWhileLoading'
 
-const I18n = useI18nScope('course_settings');
+const I18n = useI18nScope('course_settings')
 
 export default class EditSectionsView extends DialogBaseView {
   static initClass() {

@@ -20,9 +20,9 @@ import {useState, useEffect} from 'react'
 import {groupBy} from 'lodash'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {loadRollups} from '../apiClient'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('OutcomeManagement');
+const I18n = useI18nScope('OutcomeManagement')
 
 const getRow = (studentRollups, outcomes) =>
   studentRollups[0].scores.map(score => {

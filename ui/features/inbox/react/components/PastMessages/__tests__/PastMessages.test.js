@@ -19,6 +19,15 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import {PastMessages} from '../PastMessages'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+const I18n = useI18nScope('conversations_2')
+const dateOptions = {
+  month: 'short',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: 'numeric'
+}
 
 describe('PastMessages', () => {
   it('renders past messages', () => {
@@ -26,56 +35,59 @@ describe('PastMessages', () => {
       messages: [
         {
           author: {
-            name: 'Gandalf',
+            name: 'Gandalf'
           },
           body: "No. No, it isn't",
-          createdAt: 'TA 3019',
+          createdAt: 'TA 3019'
         },
         {
           author: {
-            name: 'Pippin',
+            name: 'Pippin'
           },
           body: "Well, that isn't so bad.",
-          createdAt: 'TA 3019',
+          createdAt: 'TA 3019'
         },
         {
           author: {
-            name: 'Gandalf',
+            name: 'Gandalf'
           },
           body: 'White shores, and beyond, a far green country under a swift sunrise.',
-          createdAt: 'TA 3019',
+          createdAt: 'TA 3019'
         },
         {
           author: {
-            name: 'Pippin',
+            name: 'Pippin'
           },
           body: 'What? Gandalf? See what?',
-          createdAt: 'TA 3019',
+          createdAt: 'TA 3019'
         },
         {
           author: {
-            name: 'Gandalf',
+            name: 'Gandalf'
           },
-          body:
-            "End? No, the journey doesn't end here. Death is just another path, one that we all must take. The grey rain-curtain of this world rolls back, and all turns to silver glass, and then you see it.",
-          createdAt: 'TA 3019',
+          body: "End? No, the journey doesn't end here. Death is just another path, one that we all must take. The grey rain-curtain of this world rolls back, and all turns to silver glass, and then you see it.",
+          createdAt: 'TA 3019'
         },
         {
           author: {
-            name: 'Pippin',
+            name: 'Pippin'
           },
           body: "I didn't think it would end this way.",
-          createdAt: 'TA 3019',
-        },
-      ],
+          createdAt: 'TA 3019'
+        }
+      ]
     }
 
     const {getAllByText, getByText} = render(<PastMessages {...props} />)
 
-    props.messages.forEach((message) => {
+    props.messages.forEach(message => {
+      const expectedDate = Intl.DateTimeFormat(I18n.currentLocale(), dateOptions).format(
+        new Date(message.createdAt)
+      )
+
       expect(getAllByText(message.author.name).length > 0).toBe(true)
       expect(getByText(message.body)).toBeInTheDocument()
-      expect(getAllByText(message.createdAt).length > 0).toBe(true)
+      expect(getAllByText(expectedDate).length > 0).toBe(true)
     })
   })
 })

@@ -23,7 +23,7 @@ import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import SVGWithTextPlaceholder from '../../SVGWithTextPlaceholder'
 import ClosedDiscussionSVG from '../../../images/ClosedDiscussions.svg'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
@@ -35,7 +35,7 @@ import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Quer
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {useQuery} from 'react-apollo'
 
-const I18n = useI18nScope('assignments_2');
+const I18n = useI18nScope('assignments_2')
 
 export default function CommentsTrayBody(props) {
   const [isFetchingMoreComments, setIsFetchingMoreComments] = useState(false)

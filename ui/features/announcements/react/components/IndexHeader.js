@@ -20,7 +20,7 @@ import {bindActionCreators} from 'redux'
 import {bool, func, number, string} from 'prop-types'
 import {connect} from 'react-redux'
 import {debounce} from 'lodash'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {FormField} from '@instructure/ui-form-field'
@@ -42,7 +42,7 @@ import propTypes from '../propTypes'
 import select from 'obj-select'
 import {showConfirmDelete} from './ConfirmDeleteModal'
 
-const I18n = useI18nScope('announcements_v2');
+const I18n = useI18nScope('announcements_v2')
 
 // Delay the search so as not to overzealously read out the number
 // of search results to the user

@@ -26,11 +26,11 @@ import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Tray as InstuiTray} from '@instructure/ui-tray'
 import {IconArrowOpenStartLine} from '@instructure/ui-icons'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import Comment from './Comment'
 import TrayTextArea from './TrayTextArea'
 
-const I18n = useI18nScope('CommentLibrary');
+const I18n = useI18nScope('CommentLibrary')
 
 const Tray = ({
   isOpen,

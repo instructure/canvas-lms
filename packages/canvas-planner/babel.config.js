@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,29 +16,47 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// this target is intended for use in browsers, refer to
+// ui-build/babel-recommendations.md for guidance
 module.exports = {
+  assumptions: {
+    setPublicClassFields: true
+  },
+  env: {
+    production: {
+      plugins: [
+        'transform-react-remove-prop-types',
+        '@babel/plugin-transform-react-inline-elements',
+        '@babel/plugin-transform-react-constant-elements'
+      ]
+    }
+  },
   presets: [
-    [
-      '@instructure/ui-babel-preset',
-      {
-        coverage: process.env.BABEL_ENV === 'test-node',
-        transformImports: false,
-        node: ['test-node', 'test'].includes(process.env.BABEL_ENV) || process.env.JEST_WORKER_ID,
-        esModules: !(
-          ['test-node', 'test'].includes(process.env.BABEL_ENV) || process.env.JEST_WORKER_ID
-        )
-      }
-    ]
+    ['@babel/preset-env', {
+      useBuiltIns: 'entry',
+      corejs: '3.20',
+      modules: false,
+    }],
+    ['@babel/preset-react', { useBuiltIns: true }],
   ],
+
   plugins: [
-    'inline-react-svg',
-    // something changed in @instructure/ui-babel-preset that necessitated
-    // @babel/plugin-proposal-private-methods, {loose: true}
-    // to stop the build from flooding the console output with warnings.
-    // then that broke decorators, which RCEWrapper uses. The other
-    // 2 plugin-proposal-* plugins fix that and get rid of the wornings
-    ['@babel/plugin-proposal-decorators', {legacy: true}],
-    ['@babel/plugin-proposal-class-properties', {loose: true}],
-    ['@babel/plugin-proposal-private-methods', {loose: true}]
-  ]
+    ['inline-react-svg'],
+    ['@babel/plugin-transform-runtime', {
+      corejs: 3,
+      helpers: true,
+      useESModules: true,
+      regenerator: true
+    }],
+
+    ['@instructure/babel-plugin-themeable-styles', {
+      postcssrc: require('@instructure/ui-postcss-config')()(),
+      themeablerc: require('./themeable.config.js'),
+    }]
+  ],
+
+  targets: {
+    browsers: 'last 2 versions',
+    esmodules: true
+  }
 }

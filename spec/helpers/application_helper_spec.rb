@@ -221,7 +221,7 @@ describe ApplicationHelper do
                                                css_overrides: "https://example.com/child/account.css",
                                                js_overrides: "https://example.com/child/account.js"
                                              })
-      bc.parent = @domain_root_account.brand_config
+      bc.parent_md5 = @domain_root_account.brand_config.md5
       bc.save!
       @child_account.save!
 
@@ -230,7 +230,7 @@ describe ApplicationHelper do
                                                     css_overrides: "https://example.com/grandchild/account.css",
                                                     js_overrides: "https://example.com/grandchild/account.js"
                                                   })
-      bc.parent = @child_account.brand_config
+      bc.parent_md5 = @child_account.brand_config.md5
       bc.save!
       @grandchild_account.save!
     end
@@ -723,6 +723,7 @@ describe ApplicationHelper do
     end
 
     it "returns 'K12 Theme' if a k12 school has chosen 'canvas default' in Theme Editor" do
+      @domain_root_account = Account.default
       allow(helper).to receive(:k12?).and_return(true)
       allow(BrandConfig).to receive(:k12_config)
 

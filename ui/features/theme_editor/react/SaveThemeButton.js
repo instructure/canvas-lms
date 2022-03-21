@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
 import customTypes from '@canvas/theme-editor/react/PropTypes'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 
-const I18n = useI18nScope('theme_editor');
+const I18n = useI18nScope('theme_editor')
 
 export default class SaveThemeButton extends Component {
   static propTypes = {

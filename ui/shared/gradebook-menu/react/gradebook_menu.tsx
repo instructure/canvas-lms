@@ -21,9 +21,9 @@ import {IconMiniArrowDownSolid} from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('gradebook');
+const I18n = useI18nScope('gradebook')
 
 // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
 const {Item, Separator} = Menu as any

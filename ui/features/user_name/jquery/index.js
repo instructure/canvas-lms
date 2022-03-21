@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
@@ -28,7 +28,7 @@ import '@canvas/util/templateData'
 
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
 
-const I18n = useI18nScope('user_name');
+const I18n = useI18nScope('user_name')
 
 $(document).ready(function() {
   $('#name_and_email').delegate('.edit_user_link', 'click', event => {

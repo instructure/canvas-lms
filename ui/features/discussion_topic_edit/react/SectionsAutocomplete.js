@@ -19,11 +19,11 @@ import CanvasMultiSelect from '@canvas/multi-select'
 import {View} from '@instructure/ui-view'
 import React from 'react'
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import propTypes from './proptypes/sectionShape'
 
-const I18n = useI18nScope('sections_autocomplete');
+const I18n = useI18nScope('sections_autocomplete')
 
 const ALL_SECTIONS_OBJ = {id: 'all', name: I18n.t('All Sections')}
 

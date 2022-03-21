@@ -15,13 +15,13 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import OutcomeGroup from '@canvas/outcomes/backbone/models/OutcomeGroup.coffee'
 import FindDialog from '@canvas/outcomes/backbone/views/FindDialog'
 import rubricEditing from '../../jquery/edit_rubric'
 
-const I18n = useI18nScope('EditRubricPage');
+const I18n = useI18nScope('EditRubricPage')
 
 export default class EditRubricPage {
   static initClass() {

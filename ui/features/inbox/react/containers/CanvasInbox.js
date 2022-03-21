@@ -24,7 +24,7 @@ import MessageListActionContainer from './MessageListActionContainer'
 import ConversationListContainer from './ConversationListContainer'
 import {NoSelectedConversation} from '../components/NoSelectedConversation/NoSelectedConversation'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {useMutation} from 'react-apollo'
 import {DELETE_CONVERSATIONS} from '../../graphql/Mutations'
 import {CONVERSATIONS_QUERY} from '../../graphql/Queries'
@@ -38,7 +38,7 @@ import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('conversations_2');
+const I18n = useI18nScope('conversations_2')
 
 const CanvasInbox = () => {
   const [scope, setScope] = useState('inbox')

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {createActions} from 'redux-actions'
 import isEqual from 'lodash/isEqual'
 import range from 'lodash/range'
@@ -27,7 +27,7 @@ import * as apiClient from './apiClient'
 import {createPaginationActions} from '@canvas/pagination/redux/actions'
 import {notificationActions} from '@canvas/notifications/redux/actions'
 
-const I18n = useI18nScope('announcements_v2');
+const I18n = useI18nScope('announcements_v2')
 
 function fetchAnnouncements(dispatch, getState, payload) {
   return (resolve, reject) => {

@@ -17,9 +17,9 @@
 
 import Backbone from '@canvas/backbone'
 import _ from 'underscore'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('publishable');
+const I18n = useI18nScope('publishable')
 
 export default class Publishable extends Backbone.Model {
   initialize(attributes, options) {

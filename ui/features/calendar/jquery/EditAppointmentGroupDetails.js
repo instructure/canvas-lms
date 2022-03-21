@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import htmlEscape from 'html-escape'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 import TimeBlockList from './TimeBlockList'
@@ -32,7 +32,7 @@ import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import '@canvas/forms/jquery/jquery.instructure_forms'
 
-const I18n = useI18nScope('EditAppointmentGroupDetails');
+const I18n = useI18nScope('EditAppointmentGroupDetails')
 
 export default class EditAppointmentGroupDetails {
   constructor(selector, apptGroup, contexts, closeCB, event, useScheduler) {

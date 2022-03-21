@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import {duplicateSetShape} from './shapes'
@@ -27,7 +27,7 @@ import {RadioInput} from '@instructure/ui-radio-input'
 import {TextInput} from '@instructure/ui-text-input'
 import {Button} from '@instructure/ui-buttons'
 
-const I18n = useI18nScope('add_people_duplicate_section');
+const I18n = useI18nScope('add_people_duplicate_section')
 
 const CREATE_NEW = '__CREATE_NEW__'
 const SKIP = '__SKIP'

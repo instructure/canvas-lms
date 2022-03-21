@@ -20,7 +20,7 @@ import React from 'react'
 import {arrayOf, shape, string} from 'prop-types'
 
 import natcompare from '@canvas/util/natcompare'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import ContentFilter from '@canvas/gradebook-content-filters/react/ContentFilter'
 

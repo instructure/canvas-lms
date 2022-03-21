@@ -19,9 +19,9 @@
 import {send} from '@canvas/rce/RceCommandShim'
 import $ from 'jquery'
 import ContentItemProcessor from '../ContentItemProcessor'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('external_content.success');
+const I18n = useI18nScope('external_content.success')
 
 export default function processEditorContentItems(event, editor, dialog) {
   const processor = ContentItemProcessor.fromEvent(event, processHandler)
