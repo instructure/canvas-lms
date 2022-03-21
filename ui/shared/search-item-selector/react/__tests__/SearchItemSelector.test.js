@@ -164,6 +164,34 @@ describe('SearchItemSelector', () => {
     expect(selectInput.value).toBe('')
   })
 
+  it('supports prepopulating search text (which can be changed by the user)', () => {
+    const handleCourseSelected = jest.fn()
+    const {getByLabelText} = render(
+      <SearchItemSelector
+        itemSearchFunction={testSearchFunction}
+        onItemSelected={handleCourseSelected}
+        renderLabel="Select a course"
+        manualSelection="bar"
+      />
+    )
+    const selectInput = getByLabelText(/select a course/i)
+    expect(selectInput.value).toBe('bar')
+    expect(testSearchFunction).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        params: {}
+      })
+    )
+
+    fireEvent.click(selectInput)
+    fireEvent.change(selectInput, {target: {value: 'baz'}})
+    act(() => jest.runAllTimers())
+    expect(testSearchFunction).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        params: {term: 'baz', search_term: 'baz'}
+      })
+    )
+  })
+
   // not sure how to suppress the error output this creates. oh well.
   it('throws errors for handling by an ErrorBoundary', () => {
     const testError = new Error('test error')

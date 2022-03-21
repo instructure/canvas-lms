@@ -149,7 +149,7 @@ describe "Jobs V2 API", type: :request do
         it "searches by singleton" do
           json = api_call(:get, "/api/v1/jobs2/queued/by_singleton/search?term=2000",
                           { controller: "jobs_v2", action: "search", format: "json", bucket: "queued", group: "singleton", term: "2000" })
-          expect(json).to eq({ "foobar2000" => 1, "zombo20001" => 1 })
+          expect(json.to_a).to eq([["foobar2000", 1], ["zombo20001", 1]])
         end
       end
 
