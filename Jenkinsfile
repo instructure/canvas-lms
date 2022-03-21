@@ -552,7 +552,7 @@ pipeline {
                   extendedStage('Linters')
                     .hooks([onNodeReleasing: lintersStage.tearDownNode()])
                     .nodeRequirements(label: 'canvas-docker', podTemplate: lintersStage.nodeRequirementsTemplate())
-                    .required(!configuration.isChangeMerged() && env.GERRIT_PATCHSET_REVISION != '0')
+                    .required(!configuration.isChangeMerged() && env.GERRIT_CHANGE_ID != '0')
                     .execute {
                       def nestedStages = [:]
 
