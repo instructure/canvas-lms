@@ -10,7 +10,7 @@
   </div>
   <% end %>
 
-  <% if can_do(@context, @current_user, :manage_content) %>
+  <% if can_do(@context, @current_user, :manage_content, :manage_course_content_add) %>
   <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_content_migrations_url) %>">
     <i class="icon-import"></i>
     <%= t('links.import', %{Import Existing Content}) %>
@@ -20,7 +20,7 @@
   <% if @can_manage || @can_create_announcements || @course_home_view != 'feed' || @course_home_sub_navigation_tools.present? %>
   <div class="course-options">
     <%= external_tools_menu_items(@course_home_sub_navigation_tools, {link_class: "btn button-sidebar-wide course-home-sub-navigation-lti", settings_key: :course_home_sub_navigation}) %>
-    <% if can_do(@context, @current_user, :manage_content) && !@context.elementary_homeroom_course? %>
+    <% if can_do(@context, @current_user, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS) && !@context.elementary_homeroom_course? %>
     <div id="choose_home_page"></div>
     <div id="choose_home_page_not_modules"></div>
     <% end %>

@@ -159,7 +159,7 @@
                   <li><a href="#", class="direct-share-copy-to-menu-item"><i class="icon-duplicate" aria-hidden="true"></i> <%= t("Copy To...") %></a></li>
                 <% end %>
 
-                <% if can_do(@context, @current_user, :manage_content) %>
+                <% if can_do(@context, @current_user, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS) %>
                   <%= external_tools_menu_items((@discussion_topic_menu_tools || []), {link_class: "menu_tool_link", settings_key: :discussion_topic_menu, in_list: true, url_params: {:discussion_topics => [@topic.id]}}) %>
                 <% end %>
               </ul>

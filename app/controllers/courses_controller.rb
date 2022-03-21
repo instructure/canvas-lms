@@ -2268,7 +2268,7 @@ class CoursesController < ApplicationController
         @course_home_sub_navigation_tools =
           ContextExternalTool.all_tools_for(@context, placements: :course_home_sub_navigation,
                                                       root_account: @domain_root_account, current_user: @current_user).to_a
-        unless @context.grants_right?(@current_user, session, :manage_content)
+        unless @context.grants_any_right?(@current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
           @course_home_sub_navigation_tools.reject! { |tool| tool.course_home_sub_navigation(:visibility) == "admins" }
         end
 
@@ -2299,7 +2299,7 @@ class CoursesController < ApplicationController
             end_date = start_date + 28.days
             scope = Announcement.where(context_type: "Course", context_id: @context.id, workflow_state: "active")
                                 .ordered_between(start_date, end_date)
-            unless @context.grants_any_right?(@current_user, session, :read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS, :manage_content)
+            unless @context.grants_any_right?(@current_user, session, :read_as_admin, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
               scope = scope.visible_to_student_sections(@current_user)
             end
             latest_announcement = scope.limit(1).first
@@ -2923,11 +2923,12 @@ class CoursesController < ApplicationController
       return
     end
 
-    if authorized_action(@course, @current_user, [:update, :manage_content])
+    if authorized_action(@course, @current_user, %i[update manage_content manage_course_content_edit])
       return render_update_success if params[:for_reload]
 
       unless @course.grants_right?(@current_user, :update)
-        params_for_update = params_for_update.slice(:syllabus_body) # let users with :manage_content only update the body
+        # let users with :manage_couse_content_edit only update the body
+        params_for_update = params_for_update.slice(:syllabus_body)
       end
       if params_for_update.key?(:syllabus_body)
         params_for_update[:syllabus_body] = process_incoming_html_content(params_for_update[:syllabus_body])
@@ -3655,7 +3656,7 @@ class CoursesController < ApplicationController
 
   def link_validation
     get_context
-    return unless authorized_action(@context, @current_user, :manage_content)
+    return unless authorized_action(@context, @current_user, [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS])
 
     if (progress = CourseLinkValidator.current_progress(@context))
       render json: progress_json(progress, @current_user, session)
@@ -3686,14 +3687,14 @@ class CoursesController < ApplicationController
 
   def start_link_validation
     get_context
-    return unless authorized_action(@context, @current_user, :manage_content)
+    return unless authorized_action(@context, @current_user, [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS])
 
     CourseLinkValidator.queue_course(@context)
     render json: { success: true }
   end
 
   def link_validator
-    return unless authorized_action(@context, @current_user, :manage_content)
+    return unless authorized_action(@context, @current_user, [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS])
     # render view
   end
 

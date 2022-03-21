@@ -66,7 +66,7 @@ class ContextModulesController < ApplicationController
       @section_visibility = @context.course_section_visibility(@current_user)
       @combined_active_quizzes = combined_active_quizzes
 
-      @can_edit = can_do(@context, @current_user, :manage_content)
+      @can_edit = @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_edit)
       @can_view_grades = can_do(@context, @current_user, :view_all_grades)
       @is_student = @context.grants_right?(@current_user, session, :participate_as_student)
       @can_view_unpublished = @context.grants_right?(@current_user, session, :read_as_admin)
@@ -106,7 +106,9 @@ class ContextModulesController < ApplicationController
         @menu_tools[:module_group_menu] = []
       end
 
-      module_file_details = load_module_file_details if @context.grants_right?(@current_user, session, :manage_content)
+      if @context.grants_any_right?(@current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+        module_file_details = load_module_file_details
+      end
       js_env course_id: @context.id,
              CONTEXT_URL_ROOT: polymorphic_path([@context]),
              FILES_CONTEXTS: [{ asset_string: @context.asset_string }],

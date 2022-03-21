@@ -82,7 +82,7 @@
     <% end %>
   <% end %>
 
-  <% if can_do(@context, @current_user, :manage_content) %>
+  <% if can_do(@context, @current_user, :manage_content, :manage_course_content_add) %>
     <%= link_to context_url(@context, :context_content_migrations_url), :class => 'Button Button--link Button--link--has-divider Button--course-settings import_content' do %>
       <i class="icon-upload"></i><%= t('links.import', 'Import Course Content') %>
     <% end %>
@@ -115,7 +115,7 @@
     </div>
   <% end %>
 
-  <% if can_do(@context, @current_user, :manage_content) %>
+  <% if can_do(@context, @current_user, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS) %>
     <%= link_to context_url(@context, :course_link_validator_url), :class => 'Button Button--link Button--link--has-divider Button--course-settings validator_link' do %>
       <i class="icon-link"></i><%= t('Validate Links in Content') %>
     <% end %>

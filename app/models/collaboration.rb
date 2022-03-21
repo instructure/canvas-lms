@@ -75,8 +75,25 @@ class Collaboration < ActiveRecord::Base
     given { |user, session| context.grants_right?(user, session, :create_collaborations) }
     can :create
 
-    given { |user, session| context.grants_right?(user, session, :manage_content) }
+    #################### Begin legacy permission block #########################
+    given do |user, session|
+      user && !context.root_account.feature_enabled?(:granular_permissions_manage_course_content) &&
+        context.grants_right?(user, session, :manage_content)
+    end
     can :read and can :update and can :delete
+    ##################### End legacy permission block ##########################
+
+    given do |user, session|
+      user && context.root_account.feature_enabled?(:granular_permissions_manage_course_content) &&
+        context.grants_right?(user, session, :manage_course_content_edit)
+    end
+    can :read and can :update
+
+    given do |user, session|
+      user && context.root_account.feature_enabled?(:granular_permissions_manage_course_content) &&
+        context.grants_right?(user, session, :manage_coure_content_delete)
+    end
+    can :read and can :delete
 
     given do |user, session|
       user && user_id == user.id &&

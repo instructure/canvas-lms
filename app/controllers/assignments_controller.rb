@@ -556,7 +556,7 @@ class AssignmentsController < ApplicationController
     @course_home_sub_navigation_tools =
       ContextExternalTool.all_tools_for(@context, placements: :course_home_sub_navigation,
                                                   root_account: @domain_root_account, current_user: @current_user).to_a
-    unless @context.grants_right?(@current_user, session, :manage_content)
+    unless @context.grants_any_right?(@current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
       @course_home_sub_navigation_tools.reject! { |tool| tool.course_home_sub_navigation(:visibility) == "admins" }
     end
 

@@ -187,7 +187,7 @@ class CollaborationsController < ApplicationController
                                    .eager_load(:user)
                                    .where(type: "ExternalToolCollaboration")
 
-    unless @context.grants_right?(@current_user, session, :manage_content)
+    unless @context.grants_any_right?(@current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
       where_collaborators = Collaboration.arel_table[:user_id].eq(@current_user&.id)
                                          .or(Collaborator.arel_table[:user_id].eq(@current_user&.id))
       if @context.instance_of?(Course)

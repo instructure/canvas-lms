@@ -130,7 +130,7 @@ class TabsController < ApplicationController
   #
   # @returns Tab
   def update
-    return unless authorized_action(@context, @current_user, :manage_content) && @context.is_a?(Course)
+    return unless @context.is_a?(Course) && authorized_action(@context, @current_user, [:manage_content, :manage_course_content_edit])
 
     css_class = params["tab_id"]
     new_pos = params["position"].to_i if params["position"]

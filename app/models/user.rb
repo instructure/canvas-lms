@@ -1236,6 +1236,9 @@ class User < ActiveRecord::Base
       can :read_as_admin and
       can :manage and
       can :manage_content and
+      can :manage_course_content_add and
+      can :manage_course_content_edit and
+      can :manage_course_content_delete and
       can :manage_files_add and
       can :manage_files_edit and
       can :manage_files_delete and
