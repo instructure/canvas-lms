@@ -19,7 +19,7 @@
 
 class JobsV2Controller < ApplicationController
   BUCKETS = %w[queued running future failed].freeze
-  SEARCH_LIMIT = 50
+  SEARCH_LIMIT = 100
 
   before_action :require_view_jobs
   before_action :require_bucket, only: %i[grouped_info list search]
@@ -135,7 +135,7 @@ class JobsV2Controller < ApplicationController
     result = jobs_scope
              .where(ActiveRecord::Base.wildcard(@group, term))
              .group(@group)
-             .order(count_id: :DESC)
+             .order({ count_id: :DESC }, @group)
              .limit(SEARCH_LIMIT)
              .count(:id)
 

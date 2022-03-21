@@ -17,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useCallback} from 'react'
 import {func, string, object, number, shape, instanceOf} from 'prop-types'
 
 import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
@@ -36,6 +36,7 @@ SearchItemSelector.propTypes = {
   minimumSearchLength: number,
   isSearchableTerm: func,
   placeholder: string,
+  manualSelection: string,
   mountNodeRef: shape({
     current: instanceOf(Element)
   })
@@ -46,7 +47,7 @@ SearchItemSelector.defaultProps = {
   itemSearchFunction: () => {},
   renderLabel: '',
   minimumSearchLength: MINIMUM_SEARCH_LENGTH,
-  isSearchableTerm: () => true,
+  isSearchableTerm: term => (term?.length || 0) >= MINIMUM_SEARCH_LENGTH,
   additionalParams: {}
 }
 
@@ -60,7 +61,8 @@ export default function SearchItemSelector({
   mountNodeRef,
   minimumSearchLength,
   isSearchableTerm,
-  placeholder
+  placeholder,
+  manualSelection
 }) {
   const [items, setItems] = useState(null)
   const [error, setError] = useState(null)
@@ -75,6 +77,19 @@ export default function SearchItemSelector({
     handleInputChanged({target: {value: ''}})
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [contextId])
+
+  // allow the parent to manually select an item known to exist
+  useEffect(() => {
+    if (typeof manualSelection === 'string') {
+      setInputValue(manualSelection)
+      setSelectedItem({name: manualSelection})
+    }
+  }, [manualSelection])
+
+  // avoid actually searching for the manually selected term until we need to
+  const onFocus = useCallback(() => {
+    if (searchTerm !== inputValue) setSearchTerm(inputValue)
+  }, [inputValue, searchTerm, setSearchTerm])
 
   const searchParams = searchTerm.length === 0 ? {} : {term: searchTerm, search_term: searchTerm}
   if (contextId) searchParams.contextId = contextId
@@ -129,7 +144,8 @@ export default function SearchItemSelector({
     noOptionsLabel,
     onInputChange: handleInputChanged,
     onOptionSelected: handleItemSelected,
-    mountNode: mountNodeRef?.current
+    mountNode: mountNodeRef?.current,
+    onFocus
   }
   return <CanvasAsyncSelect {...selectProps}>{itemOptions}</CanvasAsyncSelect>
 }

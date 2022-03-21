@@ -23,13 +23,17 @@ import JobsHeader from './components/JobsHeader'
 import JobsTable from './components/JobsTable'
 import GroupsTable from './components/GroupsTable'
 import JobDetails from './components/JobDetails'
+import SearchBox from './components/SearchBox'
 import {Heading} from '@instructure/ui-heading'
+import {Flex} from '@instructure/ui-flex'
+import {IconButton} from '@instructure/ui-buttons'
+import {IconXSolid} from '@instructure/ui-icons'
 
 const I18n = useI18nScope('jobs_v2')
 
 function jobsReducer(prevState, action) {
   if (action.type === 'CHANGE_BUCKET') {
-    return {...prevState, bucket: action.payload, groups: [], jobs: [], job: null, group_text: ''}
+    return {...prevState, bucket: action.payload, groups: [], jobs: [], job: null}
   } else if (action.type === 'CHANGE_GROUP_TYPE') {
     return {...prevState, group_type: action.payload, groups: [], jobs: [], job: null}
   } else if (action.type === 'CHANGE_GROUP_ORDER') {
@@ -40,8 +44,7 @@ function jobsReducer(prevState, action) {
     if (prevState.group_text !== action.payload) {
       return {...prevState, group_text: action.payload, jobs: [], job: null}
     } else {
-      // clicking the same tag again will toggle the filter off
-      return {...prevState, group_text: '', jobs: [], job: null}
+      return prevState
     }
   } else if (action.type === 'CHANGE_JOBS_ORDER') {
     return {...prevState, jobs_order: action.payload, jobs: [], job: null}
@@ -134,9 +137,33 @@ export default function JobsIndex() {
         onClickGroup={text => dispatch({type: 'CHANGE_GROUP_TEXT', payload: text})}
         onClickHeader={col => dispatch({type: 'CHANGE_GROUP_ORDER', payload: col})}
       />
-      <Heading level="h2" margin="large 0 small 0">
-        {I18n.t('Jobs')}
-      </Heading>
+      <Flex alignItems="end">
+        <Flex.Item size="33%">
+          <Heading level="h2" margin="large 0 small 0">
+            {I18n.t('Jobs')}
+          </Heading>
+        </Flex.Item>
+        <Flex.Item size="33%" shouldGrow padding="medium 0 small 0">
+          <SearchBox
+            bucket={state.bucket}
+            group={state.group_type}
+            manualSelection={state.group_text}
+            setSelectedItem={item => {
+              dispatch({type: 'CHANGE_GROUP_TEXT', payload: item?.name || ''})
+            }}
+          />
+        </Flex.Item>
+        <Flex.Item padding="medium 0 small xx-small">
+          <IconButton
+            withBorder={false}
+            withBackground={false}
+            screenReaderLabel={I18n.t('Clear search')}
+            renderIcon={<IconXSolid />}
+            interaction={state.group_text === '' ? 'disabled' : 'enabled'}
+            onClick={() => dispatch({type: 'CHANGE_GROUP_TEXT', payload: ''})}
+          />
+        </Flex.Item>
+      </Flex>
       <JobsTable
         bucket={state.bucket}
         jobs={state.jobs}
