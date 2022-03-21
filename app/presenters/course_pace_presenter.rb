@@ -33,8 +33,6 @@ class CoursePacePresenter
       course_section_id: course_pace.course_section_id,
       user_id: course_pace.user_id,
       workflow_state: course_pace.workflow_state,
-      start_date: course_pace.start_date,
-      end_date: course_pace.end_date,
       exclude_weekends: course_pace.exclude_weekends,
       hard_end_dates: course_pace.hard_end_dates,
       created_at: course_pace.created_at,
@@ -44,7 +42,7 @@ class CoursePacePresenter
       modules: modules_json,
       context_id: context_id,
       context_type: context_type
-    }
+    }.merge(course_pace.start_date(with_context: true)).merge(course_pace.end_date(with_context: true))
   end
 
   private
