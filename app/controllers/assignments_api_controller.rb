@@ -644,6 +644,26 @@
 #         "annotatable_attachment_id": {
 #           "description": "The id of the attachment to be annotated by students. Relevant only if submission_types includes 'student_annotation'.",
 #           "type": "integer"
+#         },
+#         "anonymize_students": {
+#           "description": "(Optional) Boolean indicating whether student names are anonymized",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "require_lockdown_browser": {
+#           "description": "(Optional) Boolean indicating whether the Respondus LockDown Browser® is required for this assignment.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "important_dates": {
+#           "description": "(Optional) Boolean indicating whether this assignment has important dates.",
+#           "example": false,
+#           "type": "boolean"
+#         },
+#         "muted": {
+#           "description": "(Optional, Deprecated) Boolean indicating whether notifications are muted for this assignment.",
+#           "example": false,
+#           "type": "boolean"
 #         }
 #       }
 #     }
