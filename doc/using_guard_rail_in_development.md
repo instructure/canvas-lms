@@ -12,6 +12,7 @@ For more information on GuardRail see [The Canvas Manual](https://instructure.at
 ## 2. Add the following to the `common` YML section:
 ```
 secondary:
+    replica: true
     username: canvas_read_only
 ```
 
@@ -22,6 +23,7 @@ common: &common
   host: <%= ENV.fetch('CANVAS_DATABASE_HOST', 'postgres') %>
   ...
   secondary:
+    replica: true
     username: canvas_read_only
 ```
 
