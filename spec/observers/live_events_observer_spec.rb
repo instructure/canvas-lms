@@ -609,4 +609,22 @@ describe LiveEventsObserver do
       MasterCourses::MasterTemplate.create!(course: @course)
     end
   end
+
+  describe "MasterCourses::MasterMigration" do
+    it "posts update events when the migration completes" do
+      course_model
+      master_template = MasterCourses::MasterTemplate.create!(course: @course)
+      master_migration = MasterCourses::MasterMigration.create!(master_template: master_template)
+      expect(Canvas::LiveEvents).to receive(:master_migration_completed).once
+      master_migration.update(workflow_state: "completed")
+    end
+
+    it "does not post update events when the migration updates for other reasons" do
+      course_model
+      master_template = MasterCourses::MasterTemplate.create!(course: @course)
+      master_migration = MasterCourses::MasterMigration.create!(master_template: master_template)
+      expect(Canvas::LiveEvents).not_to receive(:master_migration_completed)
+      master_migration.update(workflow_state: "exports_failed")
+    end
+  end
 end

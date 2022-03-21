@@ -984,6 +984,18 @@ module Canvas::LiveEvents
     }
   end
 
+  def self.master_migration_completed(master_migration)
+    post_event_stringified("master_migration_completed", master_migration_completed_data(master_migration))
+  end
+
+  def self.master_migration_completed_data(master_migration)
+    {
+      master_migration_id: master_migration.id,
+      master_template_id: master_migration.master_template_id,
+      root_account_id: master_migration.root_account_id
+    }
+  end
+
   def self.heartbeat
     data = {
       environment: Canvas.environment,
