@@ -15,6 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import moxios from 'moxios'
+import moment from 'moment-timezone'
+import {MOCK_CARDS, MOCK_PLANNER_ITEM} from '@canvas/k5/react/__tests__/fixtures'
 
 export const MOCK_TODOS = [
   {
@@ -106,3 +109,125 @@ export const MOCK_TODOS = [
     type: 'submitting'
   }
 ]
+
+export const opportunities = [
+  {
+    id: '1',
+    course_id: '1',
+    name: 'Assignment 1',
+    points_possible: 23,
+    html_url: '/courses/1/assignments/1',
+    due_at: '2021-01-10T05:59:00Z',
+    submission_types: ['online_quiz']
+  },
+  {
+    id: '2',
+    course_id: '1',
+    name: 'Assignment 2',
+    points_possible: 10,
+    html_url: '/courses/1/assignments/2',
+    due_at: '2021-01-15T05:59:00Z',
+    submission_types: ['online_url']
+  }
+]
+
+export function createPlannerMocks() {
+  moxios.stubRequest(/\/api\/v1\/dashboard\/dashboard_cards$/, {
+    status: 200,
+    response: MOCK_CARDS
+  })
+  moxios.stubRequest(/api\/v1\/planner\/items\?start_date=.*end_date=.*/, {
+    status: 200,
+    headers: {link: 'url; rel="current"'},
+    response: MOCK_PLANNER_ITEM
+  })
+  moxios.stubRequest(/api\/v1\/planner\/items\?start_date=.*per_page=1/, {
+    status: 200,
+    headers: {link: 'url; rel="current"'},
+    response: [
+      {
+        context_name: 'Course2',
+        context_type: 'Course',
+        course_id: '1',
+        html_url: '/courses/2/announcements/12',
+        new_activity: false,
+        plannable: {
+          created_at: '2020-03-16T17:17:17Z',
+          id: '12',
+          title: 'Announcement 12',
+          updated_at: '2020-03-16T17:31:52Z'
+        },
+        plannable_date: moment().subtract(6, 'months').toISOString(),
+        plannable_id: '12',
+        plannable_type: 'announcement',
+        planner_override: null,
+        submissions: {}
+      }
+    ]
+  })
+  moxios.stubRequest(/api\/v1\/planner\/items\?end_date=.*per_page=1/, {
+    status: 200,
+    headers: {link: 'url; rel="current"'},
+    response: [
+      {
+        context_name: 'Course2',
+        context_type: 'Course',
+        course_id: '1',
+        html_url: '/courses/2/discussion_topics/8',
+        new_activity: false,
+        plannable: {
+          created_at: '2022-03-16T17:17:17Z',
+          id: '8',
+          title: 'Discussion 8',
+          updated_at: '2022-03-16T17:31:52Z'
+        },
+        plannable_date: moment().add(6, 'months').toISOString(),
+        plannable_id: '8',
+        plannable_type: 'discussion',
+        planner_override: null,
+        submissions: {}
+      }
+    ]
+  })
+  moxios.stubRequest(/\/api\/v1\/users\/self\/missing_submission.*/, {
+    status: 200,
+    headers: {link: 'url; rel="current"'},
+    response: opportunities
+  })
+}
+
+const currentUser = {
+  id: '1',
+  display_name: 'Geoffrey Jellineck',
+  name: 'Geoffrey Jellineck',
+  avatar_image_url: 'http://avatar'
+}
+
+export const defaultEnv = {
+  current_user: currentUser,
+  current_user_id: '1',
+  K5_USER: true,
+  PREFERENCES: {
+    hide_dashcard_color_overlays: false
+  },
+  MOMENT_LOCALE: 'en',
+  TIMEZONE: 'America/Denver'
+}
+
+export const defaultK5DashboardProps = {
+  canDisableElementaryDashboard: false,
+  currentUser,
+  currentUserRoles: ['admin'],
+  createPermission: null,
+  restrictCourseCreation: false,
+  plannerEnabled: false,
+  loadingOpportunities: false,
+  loadAllOpportunities: () => {},
+  timeZone: defaultEnv.TIMEZONE,
+  hideGradesTabForStudents: false,
+  selectedContextCodes: ['course_1', 'course_3'],
+  selectedContextsLimit: 2,
+  canAddObservee: false,
+  observedUsersList: [{id: currentUser.id, name: currentUser.display_name}],
+  openTodosInNewTab: true
+}
