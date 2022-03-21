@@ -79,11 +79,9 @@ module Outcomes
     end
 
     def suboutcomes_by_group_id(learning_outcome_group_id, args = {})
-      learning_outcome_groups_ids = children_ids_with_self(learning_outcome_group_id)
-      relation = ContentTag.active.learning_outcome_links
-                           .where(associated_asset_id: learning_outcome_groups_ids)
-                           .joins(:learning_outcome_content)
-                           .joins("INNER JOIN #{LearningOutcomeGroup.quoted_table_name} AS logs
+      relation = outcome_links(learning_outcome_group_id)
+      relation = relation.joins(:learning_outcome_content)
+                         .joins("INNER JOIN #{LearningOutcomeGroup.quoted_table_name} AS logs
               ON logs.id = content_tags.associated_asset_id")
 
       if args[:search_query]
@@ -112,7 +110,11 @@ module Outcomes
 
     def outcome_links(learning_outcome_group_id)
       group_ids = children_ids_with_self(learning_outcome_group_id)
-      ContentTag.active.learning_outcome_links.where(associated_asset_id: group_ids)
+      relation = ContentTag.active.learning_outcome_links
+                           .where(associated_asset_id: group_ids)
+      # Check that the LearningOutcome the content tag is aligned to is not deleted
+      tag_ids = relation.reject { |tag| LearningOutcome.find(tag.content_id).workflow_state == "deleted" }.map(&:id)
+      ContentTag.where(id: tag_ids)
     end
 
     def total_outcomes_for(learning_outcome_group_id, args = {})
