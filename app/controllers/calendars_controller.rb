@@ -74,7 +74,7 @@ class CalendarsController < ApplicationController
         assignment_groups: context.respond_to?("assignments") ? context.assignment_groups.active.pluck(:id, :name).map { |id, name| { id: id, name: name } } : [],
         can_create_appointment_groups: ag_permission,
         can_make_reservation: context.grants_right?(@current_user, :participate_as_student),
-        can_update_todo_date: context.grants_right?(@current_user, session, :manage_content),
+        can_update_todo_date: context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_edit),
         can_update_discussion_topic: context.grants_right?(@current_user, session, :moderate_forum),
         can_update_wiki_page: context.grants_right?(@current_user, session, :update),
         concluded: (context.is_a? Course) ? context.concluded? : false,

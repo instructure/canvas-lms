@@ -449,6 +449,7 @@ describe "Roles API", type: :request do
       before do
         @account.root_account.disable_feature!(:granular_permissions_manage_users)
         @account.root_account.disable_feature!(:granular_permissions_manage_courses)
+        @account.root_account.disable_feature!(:granular_permissions_manage_course_content)
         @account.root_account.disable_feature!(:granular_permissions_manage_groups)
         @expected_permissions = %w[
           become_user change_course_state create_collaborations
@@ -594,6 +595,28 @@ describe "Roles API", type: :request do
                                                          "enabled" => false,
                                                          "locked" => false
                                                        })
+      end
+
+      it "returns the expected json format with granular manage course content permission on" do
+        @account.root_account.enable_feature!(:granular_permissions_manage_course_content)
+        expected_perms = @expected_permissions - ["manage_content"]
+        expected_perms += %w[
+          manage_course_content_add
+          manage_course_content_edit
+          manage_course_content_delete
+        ]
+
+        json = api_call_with_settings
+        expect(json.keys.sort).to eq %w[
+          account base_role_type created_at id is_account_role label last_updated_at
+          permissions role workflow_state
+        ]
+        expect(json["account"]["id"]).to eq @account.id
+        expect(json["id"]).to eq @role.id
+        expect(json["role"]).to eq @role_name
+        expect(json["base_role_type"]).to eq Role::DEFAULT_ACCOUNT_TYPE
+
+        expect(expected_perms.intersection(json["permissions"].keys)).to eq expected_perms
       end
 
       it "only returns manageable permissions" do

@@ -41,7 +41,14 @@ class DiscussionTopic::ScopedToSections < ScopeFilter
   private
 
   def scope_for_user_sections(scope)
-    return scope if context.grants_any_right?(user, :read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS, :manage_content)
+    return scope if context.grants_any_right?(
+      user,
+      :read_as_admin,
+      :manage_grades,
+      *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS,
+      :manage_content,
+      *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
+    )
 
     context.is_a?(Course) ? scope.visible_to_student_sections(user) : scope
   end

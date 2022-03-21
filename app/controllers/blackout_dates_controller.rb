@@ -63,6 +63,7 @@ class BlackoutDatesController < ApplicationController
   before_action :require_feature_flag
   before_action :authorize_action
   before_action :load_blackout_date, only: %i[show edit update destroy]
+  include GranularPermissionEnforcement
 
   # @API List blackout dates
   # Returns the list of blackout dates for the current context.
@@ -184,7 +185,19 @@ class BlackoutDatesController < ApplicationController
   private
 
   def authorize_action
-    authorized_action(@context, @current_user, :manage_content)
+    enforce_granular_permissions(
+      @context,
+      overrides: [:manage_content],
+      actions: {
+        index: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
+        show: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
+        new: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
+        create: [:manage_course_content_add],
+        update: [:manage_course_content_edit],
+        bulk_update: [:manage_course_content_edit],
+        destroy: [:manage_course_content_delete]
+      }
+    )
   end
 
   def require_feature_flag

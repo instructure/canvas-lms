@@ -2645,8 +2645,27 @@ describe CoursesController do
     end
 
     it "lets admins without course edit rights update only the syllabus body" do
+      @course.root_account.disable_feature!(:granular_permissions_manage_course_content)
       role = custom_account_role("grade viewer", account: Account.default)
       account_admin_user_with_role_changes(role: role, role_changes: { manage_content: true })
+      user_session(@user)
+
+      name = "some name"
+      body = "some body"
+      put "update", params: { id: @course.id, course: { name: name, syllabus_body: body } }
+
+      @course.reload
+      expect(@course.name).to_not eq name
+      expect(@course.syllabus_body).to eq body
+    end
+
+    it "lets admins without course edit rights update only the syllabus body (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_course_content)
+      role = custom_account_role("grade viewer", account: Account.default)
+      account_admin_user_with_role_changes(
+        role: role,
+        role_changes: { manage_course_content_edit: true }
+      )
       user_session(@user)
 
       name = "some name"

@@ -852,7 +852,13 @@ class UsersController < ApplicationController
     end[0, limit]
 
     if params[:enforce_manage_grant_requirement]
-      @courses.select! { |c| c.grants_right?(@current_user, :manage_content) }
+      @courses.select! do |c|
+        c.grants_any_right?(
+          @current_user,
+          :manage_content,
+          *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
+        )
+      end
     else
       @courses.select! { |c| c.grants_all_rights?(@current_user, :read_as_admin, :read) }
     end

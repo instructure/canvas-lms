@@ -301,7 +301,7 @@ class ContextController < ApplicationController
                       quizzes rubrics wiki_pages rubric_associations_with_deleted].freeze
   ITEM_TYPES = WORKFLOW_TYPES + [:attachments, :all_group_categories].freeze
   def undelete_index
-    if authorized_action(@context, @current_user, :manage_content)
+    if authorized_action(@context, @current_user, [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS])
       @item_types =
         WORKFLOW_TYPES.each_with_object([]) do |workflow_type, item_types|
           if @context.class.reflections.key?(workflow_type.to_s)
@@ -322,7 +322,7 @@ class ContextController < ApplicationController
   end
 
   def undelete_item
-    if authorized_action(@context, @current_user, :manage_content)
+    if authorized_action(@context, @current_user, [:manage_content, :manage_course_content_add])
       type = params[:asset_string].split("_")
       id = type.pop
       type = type.join("_")

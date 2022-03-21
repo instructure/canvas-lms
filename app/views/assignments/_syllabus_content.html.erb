@@ -50,7 +50,7 @@ To add some comments, click the "Edit" link at the top.
   <% if show_summary %>
     <a href="#" class="jump_to_today_link"><%= t 'links.jump_to_today', "Jump to Today" %></a>
   <% end %>
-  <% if can_do(@context, @current_user, :manage_content) %>
+  <% if can_do(@context, @current_user, :manage_content, :manage_course_content_edit) %>
     <a href="#" class="edit_syllabus_link btn button-sidebar-wide"><i class="icon-edit"></i> <%= t 'links.edit_syllabus_description', "Edit" %></a>
   <% end %>
   </div>
@@ -59,7 +59,7 @@ To add some comments, click the "Edit" link at the top.
 <div id="course_syllabus" style="margin-bottom: 10px;" class="user_content">
   <%= user_content(@syllabus_body) %>
 </div>
-<div id="course_syllabus_details" style="<%= hidden unless can_do(@context, @current_user, :manage_content) && (!@context.syllabus_body || @context.syllabus_body.strip.empty?) %>">
+<div id="course_syllabus_details" style="<%= hidden unless can_do(@context, @current_user, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS) && (!@context.syllabus_body || @context.syllabus_body.strip.empty?) %>">
   <%= help_text %>
 </div>
 <%= form_for @context.class.to_s.underscore.to_sym, :url => context_url(@context, :context_url), :html => {:id => 'edit_course_syllabus_form', :style => 'display: none; margin-bottom: 10px;', :method => :put} do |f| %>

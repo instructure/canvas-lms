@@ -29,11 +29,31 @@ describe ContextModule do
   describe "index" do
     it "requires manage_content permission before showing add controls" do
       course_with_teacher_logged_in active_all: true
+      @course.root_account.disable_feature!(:granular_permissions_manage_course_content)
       get "/courses/#{@course.id}/modules"
       doc = Nokogiri::HTML5(response.body)
       expect(doc.at_css(".add_module_link")).not_to be_nil
 
       @course.account.role_overrides.create! role: ta_role, permission: "manage_content", enabled: false
+      course_with_ta course: @course
+      user_session(@ta)
+      get "/courses/#{@course.id}/modules"
+      doc = Nokogiri::HTML5(response.body)
+      expect(doc.at_css(".add_module_link")).to be_nil
+    end
+
+    it "requires manage_course_content_edit permission before showing add controls (granular permissions)" do
+      course_with_teacher_logged_in active_all: true
+      @course.root_account.enable_feature!(:granular_permissions_manage_course_content)
+      get "/courses/#{@course.id}/modules"
+      doc = Nokogiri::HTML5(response.body)
+      expect(doc.at_css(".add_module_link")).not_to be_nil
+
+      @course.account.role_overrides.create!(
+        role: ta_role,
+        permission: "manage_course_content_edit",
+        enabled: false
+      )
       course_with_ta course: @course
       user_session(@ta)
       get "/courses/#{@course.id}/modules"

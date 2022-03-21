@@ -56,9 +56,40 @@ class MediaObject < ActiveRecord::Base
     super
   end
 
+  def context_root_account(user = nil)
+    # Granular Permissions
+    #
+    # The primary use case for this method is for accurately checking
+    # feature flag enablement, given a user and the calling context.
+    # We want to prefer finding the root_account through the context
+    # of the authorizing resource or fallback to the user's active
+    # pseudonym's residing account.
+    return context.account if context.is_a?(User)
+
+    # return nil and don't raise if receiver doesn't respond to :root_account
+    context.try(:root_account) || user&.account
+  end
+
   set_policy do
-    given { |user| (self.user && self.user == user) || context&.grants_right?(user, :manage_content) }
+    #################### Begin legacy permission block #########################
+    given do |user|
+      !context_root_account(user).feature_enabled?(:granular_permissions_manage_course_content) &&
+        ((self.user && self.user == user) || context&.grants_right?(user, :manage_content))
+    end
     can :add_captions and can :delete_captions
+    ##################### End legacy permission block ##########################
+
+    given do |user|
+      context_root_account(user).feature_enabled?(:granular_permissions_manage_course_content) &&
+        ((self.user && self.user == user) || context&.grants_right?(user, :manage_course_content_add))
+    end
+    can :add_captions
+
+    given do |user|
+      context_root_account(user).feature_enabled?(:granular_permissions_manage_course_content) &&
+        ((self.user && self.user == user) || context&.grants_right?(user, :manage_course_content_delete))
+    end
+    can :delete_captions
   end
 
   # if wait_for_completion is true, this will wait SYNCHRONOUSLY for the bulk

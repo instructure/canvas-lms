@@ -80,6 +80,8 @@ class RoleOverride < ActiveRecord::Base
 
   # Common set of granular permissions for checking rights against
   GRANULAR_FILE_PERMISSIONS = %i[manage_files_add manage_files_edit manage_files_delete].freeze
+  GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS =
+    %i[manage_course_content_add manage_course_content_edit manage_course_content_delete].freeze
   GRANULAR_MANAGE_GROUPS_PERMISSIONS = %i[manage_groups_add manage_groups_manage manage_groups_delete].freeze
   GRANULAR_MANAGE_LTI_PERMISSIONS = %i[manage_lti_add manage_lti_edit manage_lti_delete].freeze
   GRANULAR_MANAGE_USER_PERMISSIONS = %i[
@@ -930,8 +932,9 @@ class RoleOverride < ActiveRecord::Base
           AccountAdmin
         ]
       },
+      # legacy role override
       manage_content: {
-        label: -> { t("permissions.manage_content", "Manage all other course content") },
+        label: -> { t("Manage all other course content") },
         label_v2: -> { t("Course Content - add / edit / delete") },
         available_to: %w[
           TaEnrollment
@@ -946,7 +949,71 @@ class RoleOverride < ActiveRecord::Base
           TeacherEnrollment
           DesignerEnrollment
           AccountAdmin
-        ]
+        ],
+        account_allows: ->(a) { !a.root_account.feature_enabled?(:granular_permissions_manage_course_content) }
+      },
+      manage_course_content_add: {
+        label: -> { t("Add all other course content") },
+        label_v2: -> { t("Course Content - add") },
+        group: "manage_course_content",
+        group_label: -> { t("Manage Course Content") },
+        available_to: %w[
+          TaEnrollment
+          TeacherEnrollment
+          DesignerEnrollment
+          ObserverEnrollment
+          AccountAdmin
+          AccountMembership
+        ],
+        true_for: %w[
+          TaEnrollment
+          TeacherEnrollment
+          DesignerEnrollment
+          AccountAdmin
+        ],
+        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_course_content) }
+      },
+      manage_course_content_edit: {
+        label: -> { t("Edit all other course content") },
+        label_v2: -> { t("Course Content - edit") },
+        group: "manage_course_content",
+        group_label: -> { t("Manage Course Content") },
+        available_to: %w[
+          TaEnrollment
+          TeacherEnrollment
+          DesignerEnrollment
+          ObserverEnrollment
+          AccountAdmin
+          AccountMembership
+        ],
+        true_for: %w[
+          TaEnrollment
+          TeacherEnrollment
+          DesignerEnrollment
+          AccountAdmin
+        ],
+        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_course_content) }
+      },
+      manage_course_content_delete: {
+        label: -> { t("Delete all other course content") },
+        label_v2: -> { t("Course Content - delete") },
+        group: "manage_course_content",
+        group_label: -> { t("Manage Course Content") },
+        available_to: %w[
+          TaEnrollment
+          TeacherEnrollment
+          DesignerEnrollment
+          ObserverEnrollment
+          AccountAdmin
+          AccountMembership
+        ],
+        true_for: %w[
+          TaEnrollment
+          TeacherEnrollment
+          DesignerEnrollment
+          AccountAdmin
+        ],
+        account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_course_content) }
       },
       # Course Template account permissions
       add_course_template: {

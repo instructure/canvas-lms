@@ -500,6 +500,9 @@ class Group < ActiveRecord::Base
     can :participate and
       can :manage_calendar and
       can :manage_content and
+      can :manage_course_content_add and
+      can :manage_course_content_edit and
+      can :manage_course_content_delete and
       can :manage_files_add and
       can :manage_files_edit and
       can :manage_files_delete and
@@ -564,12 +567,14 @@ class Group < ActiveRecord::Base
       end
       can :create and can :create_collaborations and can :delete and can :manage and
         can :manage_admin_users and can :allow_course_admin_actions and can :manage_calendar and
-        can :manage_content and can :manage_files_add and can :manage_files_edit and
-        can :manage_files_delete and can :manage_students and can :manage_wiki_create and
-        can :manage_wiki_delete and can :manage_wiki_update and can :moderate_forum and
-        can :post_to_forum and can :create_forum and can :read and can :read_forum and
-        can :read_announcements and can :read_roster and can :send_messages and
-        can :send_messages_all and can :update and can :view_unpublished_items
+        can :manage_content and can :manage_course_content_add and
+        can :manage_course_content_edit and can :manage_course_content_delete and
+        can :manage_files_add and can :manage_files_edit and can :manage_files_delete and
+        can :manage_students and can :manage_wiki_create and can :manage_wiki_delete and
+        can :manage_wiki_update and can :moderate_forum and can :post_to_forum and
+        can :create_forum and can :read and can :read_forum and can :read_announcements and
+        can :read_roster and can :send_messages and can :send_messages_all and can :update and
+        can :view_unpublished_items
 
       ##################### End legacy permission block ##########################
 
@@ -586,12 +591,13 @@ class Group < ActiveRecord::Base
       end
       can :read and can :update and can :create_collaborations and can :manage and
         can :manage_admin_users and can :allow_course_admin_actions and can :manage_calendar and
-        can :manage_content and can :manage_files_add and can :manage_files_edit and
-        can :manage_files_delete and can :manage_students and can :manage_wiki_create and
-        can :manage_wiki_delete and can :manage_wiki_update and can :moderate_forum and
-        can :post_to_forum and can :create_forum and can :read_forum and
-        can :read_announcements and can :read_roster and can :send_messages and
-        can :send_messages_all and can :view_unpublished_items
+        can :manage_content and can :manage_course_content_add and
+        can :manage_course_content_edit and can :manage_course_content_delete and
+        can :manage_files_add and can :manage_files_edit and can :manage_files_delete and
+        can :manage_students and can :manage_wiki_create and can :manage_wiki_delete and
+        can :manage_wiki_update and can :moderate_forum and can :post_to_forum and
+        can :create_forum and can :read_forum and can :read_announcements and can :read_roster and
+        can :send_messages and can :send_messages_all and can :view_unpublished_items
 
       given do |user, session|
         context.root_account.feature_enabled?(:granular_permissions_manage_groups) &&
@@ -615,7 +621,20 @@ class Group < ActiveRecord::Base
       given { |user| user && (self.group_category.try(:allows_multiple_memberships?) || allow_self_signup?(user)) }
       can :leave
 
-      given { |user, session| grants_right?(user, session, :manage_content) && context && context.grants_right?(user, session, :create_conferences) }
+      #################### Begin legacy permission block #########################
+      given do |user, session|
+        !context.root_account.feature_enabled?(:granular_permissions_manage_course_content) &&
+          grants_right?(user, session, :manage_content) && context &&
+          context.grants_right?(user, session, :create_conferences)
+      end
+      can :create_conferences
+      ##################### End legacy permission block ##########################
+
+      given do |user, session|
+        context.root_account.feature_enabled?(:granular_permissions_manage_course_content) &&
+          grants_right?(user, session, :manage_course_content_add) && context &&
+          context.grants_right?(user, session, :create_conferences)
+      end
       can :create_conferences
 
       given { |user, session| context&.grants_right?(user, session, :read_as_admin) }
