@@ -169,7 +169,6 @@ pipeline {
     ENABLE_AXE_SELENIUM = "${env.ENABLE_AXE_SELENIUM}"
     POSTGRES_PASSWORD = 'sekret'
     RSPECQ_REDIS_URL = redisUrl()
-    CANVAS_ZEITWERK = '1'
   }
 
   stages {

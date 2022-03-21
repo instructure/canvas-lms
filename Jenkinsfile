@@ -481,28 +481,6 @@ pipeline {
                       sh 'build/new-jenkins/consumer-smoke-test.sh'
                     }
 
-                    extendedStage('Zeitwerk Check').hooks(buildSummaryReportHooks.call()).queue(stages) {
-                      withEnv([
-                          'COMPOSE_FILE=docker-compose.new-jenkins.yml',
-                          'CANVAS_ZEITWERK=1'
-                      ]) {
-                        // the purpose of this stage is to ensure any new code introduce to canvas or any
-                        // autoloaded/eager-loaded dependencies conforms to our zeitwerk config
-                        // so we can start using zeitwerk as our code loader.
-                        //
-                        // the generally expected file structure can be found here: https://github.com/fxn/zeitwerk#file-structure
-                        sh '''
-                          echo "HEY HUMAN!"
-                          echo "**********"
-                          echo "Are you debugging a build failure here?"
-                          echo "see general zeitwerk rules, it may help: https://github.com/fxn/zeitwerk#file-structure"
-                          echo "**********"
-                          echo "HEY HUMAN!"
-                          docker-compose -p "zeitwerk-check" run --rm canvas bash -c "./bin/rails zeitwerk:check"
-                        '''
-                      }
-                    }
-
                     extendedStage(JS_BUILD_IMAGE_STAGE)
                       .hooks(buildSummaryReportHooks.call())
                       .queue(stages, buildDockerImageStage.&jsImage)
