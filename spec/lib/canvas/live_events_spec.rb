@@ -2000,6 +2000,25 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe "master migration" do
+    before do
+      @course = course_model
+      @master_template = MasterCourses::MasterTemplate.create!(course: @course)
+      @master_migration = MasterCourses::MasterMigration.create!(master_template: @master_template)
+    end
+
+    context "completed" do
+      it "triggers an master_migration_completed live event" do
+        expect_event("master_migration_completed", {
+                       master_template_id: @master_template.id.to_s,
+                       master_migration_id: @master_migration.id.to_s,
+                       root_account_id: @master_migration.root_account_id.to_s
+                     }).once
+        Canvas::LiveEvents.master_migration_completed(@master_migration)
+      end
+    end
+  end
+
   describe "heartbeat" do
     context "when database region is not set (local/open source)" do
       it "sets region to not_configured" do

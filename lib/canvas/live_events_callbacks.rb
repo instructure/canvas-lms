@@ -188,6 +188,10 @@ module Canvas::LiveEventsCallbacks
       Canvas::LiveEvents.outcome_calculation_method_updated(obj)
     when OutcomeFriendlyDescription
       Canvas::LiveEvents.outcome_friendly_description_updated(obj)
+    when MasterCourses::MasterMigration
+      if changes["workflow_state"] && obj.workflow_state == "completed"
+        Canvas::LiveEvents.master_migration_completed(obj)
+      end
     end
   end
 
