@@ -132,7 +132,6 @@ const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
       onContentChange={onContentChange}
       onInit={onInit}
       use_rce_buttons_and_icons={shouldUseFeature(Feature.ButtonsAndIcons, window.ENV)}
-      use_rce_a11y_checker_notifications={!!window.ENV?.use_rce_a11y_checker_notifications}
       {...rest}
     />
   )

@@ -5,13 +5,6 @@ rce_mentions_in_discussions:
   description: |-
     When enabled, turns on "@mention" functionality in course discussions.
   applies_to: SiteAdmin
-rce_a11y_checker_notifications:
-  state: allowed
-  display_name: Accessibility Checker Notifications
-  description: |-
-    Show accessibility checker notifications while editing.
-  applies_to: Course
-  root_opt_in: true
 new_equation_editor:
   state: hidden
   display_name: RCE's new and improved equation editor dialog
