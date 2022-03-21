@@ -44,14 +44,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Transition} from '@instructure/ui-motion'
 
-const I18n = useI18nScope('ajaxflashalert');
+const I18n = useI18nScope('ajaxflashalert')
 
 const messageHolderId = 'flashalert_message_holder' // specs fail if I reuse jquery's elements
 const screenreaderMessageHolderId = 'flash_screenreader_holder'

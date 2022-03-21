@@ -21,7 +21,7 @@ import {render} from 'react-dom'
 import PropTypes from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
 import {ApplyTheme} from '@instructure/ui-themeable'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {Img} from '@instructure/ui-img'
 import {Flex} from '@instructure/ui-flex'
@@ -33,7 +33,7 @@ import ZoomIcon from '../images/zoom.svg'
 import MeetIcon from '../images/meet.svg'
 import TeamsIcon from '../images/teams.svg'
 
-const I18n = useI18nScope('conferences_alternatives');
+const I18n = useI18nScope('conferences_alternatives')
 
 const theme = {
   [Alert.theme]: {

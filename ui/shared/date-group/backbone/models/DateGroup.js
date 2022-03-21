@@ -17,10 +17,10 @@
  */
 
 import Backbone from '@canvas/backbone'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import tz from '@canvas/timezone'
 
-const I18n = useI18nScope('models_DateGroup');
+const I18n = useI18nScope('models_DateGroup')
 
 export default class DateGroup extends Backbone.Model {
   dueAt() {

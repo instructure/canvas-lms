@@ -19,7 +19,7 @@
 #
 
 RSpec.describe Lti::ResourceLink, type: :model do
-  let(:tool) { external_tool_model }
+  let(:tool) { external_tool_1_3_model }
   let(:course) { Course.create!(name: "Course") }
   let(:assignment) { Assignment.create!(course: course, name: "Assignment") }
   let(:resource_link) do
@@ -83,13 +83,13 @@ RSpec.describe Lti::ResourceLink, type: :model do
       end
 
       context "when a matching tool exists in the specified context" do
-        let(:second_tool) { external_tool_model(context: context) }
+        let(:second_tool) { external_tool_1_3_model(context: context) }
 
         it { is_expected.to eq second_tool }
       end
 
       context "when a matching tool exists up the context account chain" do
-        let(:second_tool) { external_tool_model(context: context.root_account) }
+        let(:second_tool) { external_tool_1_3_model(context: context.root_account) }
 
         it { is_expected.to eq second_tool }
       end
@@ -136,7 +136,7 @@ RSpec.describe Lti::ResourceLink, type: :model do
     end
 
     let(:context) { course }
-    let(:tool) { external_tool_model(context: context) }
+    let(:tool) { external_tool_1_3_model(context: context) }
     let(:resource_link) do
       Lti::ResourceLink.create!(context_external_tool: tool, context: course)
     end
@@ -171,7 +171,7 @@ RSpec.describe Lti::ResourceLink, type: :model do
 
         it "ContextExternalTool.find_external_tool to look up the tool" do
           expect(ContextExternalTool).to receive(:find_external_tool)
-            .with(tool.url, context).and_call_original
+            .with(tool.url, context, only_1_3: true).and_call_original
           subject
         end
       end

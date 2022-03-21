@@ -18,9 +18,9 @@
 
 import {bool, func} from 'prop-types'
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('GraderCommentVisibilityCheckbox');
+const I18n = useI18nScope('GraderCommentVisibilityCheckbox')
 
 export default class GraderCommentVisibilityCheckbox extends React.Component {
   static propTypes = {

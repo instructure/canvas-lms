@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {
   IconCalendarMonthLine,
@@ -34,7 +34,7 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 
 import k5Theme from '@canvas/k5/react/k5-theme'
 
-const I18n = useI18nScope('important_date_item');
+const I18n = useI18nScope('important_date_item')
 
 const itemTypes = [
   {

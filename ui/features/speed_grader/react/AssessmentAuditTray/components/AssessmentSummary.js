@@ -23,13 +23,13 @@ import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {Pill} from '@instructure/ui-pill'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import {overallAnonymityStates} from '../AuditTrailHelpers'
 import * as propTypes from './AuditTrail/propTypes'
 
-const I18n = useI18nScope('speed_grader');
+const I18n = useI18nScope('speed_grader')
 
 function getOverallAnonymityLabel(overallAnonymity) {
   switch (overallAnonymity) {

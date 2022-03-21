@@ -18,14 +18,14 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import ReceivedContentView from './react/ReceivedContentView'
 import ErrorBoundary from '@canvas/error-boundary'
 import GenericErrorPage from '@canvas/generic-error-page'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import ready from '@instructure/ready'
 
-const I18n = useI18nScope('content_share');
+const I18n = useI18nScope('content_share')
 
 ready(() => {
   const container = document.getElementById('content')

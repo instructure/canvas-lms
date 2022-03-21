@@ -18,12 +18,12 @@
 
 import axios from '@canvas/axios'
 import {camelize} from 'convert-case'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {createClient, gql} from '@canvas/apollo'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('finalGradeOverrideApi');
+const I18n = useI18nScope('finalGradeOverrideApi')
 
 export function getFinalGradeOverrides(courseId) {
   const url = `/courses/${courseId}/gradebook/final_grade_overrides`

@@ -18,7 +18,7 @@
 
 import React, {useState} from 'react'
 import {string} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {darken} from '@instructure/ui-color-utils'
 import {IconButton} from '@instructure/ui-buttons'
@@ -27,7 +27,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('course_color_selector');
+const I18n = useI18nScope('course_color_selector')
 
 export const COLOR_OPTIONS = [
   '#AF4525',

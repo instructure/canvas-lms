@@ -21,9 +21,9 @@ import PropTypes from 'prop-types'
 import {List} from 'immutable'
 import shortid from 'shortid'
 import classNames from 'classnames'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('conditional_release');
+const I18n = useI18nScope('conditional_release')
 
 const {object, func} = PropTypes
 

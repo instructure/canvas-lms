@@ -22,9 +22,9 @@ import React, {useCallback, useState} from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {IconWarningLine} from '@instructure/ui-icons'
 import {arrayOf, shape, string} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('admin_split');
+const I18n = useI18nScope('admin_split')
 
 export default function AdminSplit({user, splitUrl, splitUsers}) {
   const [loading, setLoading] = useState(false)

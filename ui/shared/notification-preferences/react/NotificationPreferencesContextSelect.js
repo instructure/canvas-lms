@@ -21,10 +21,10 @@ import {arrayOf, func, string} from 'prop-types'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Flex} from '@instructure/ui-flex'
 import {EnrollmentShape} from './Shape'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {groupBy, sortBy, sortedUniqBy} from 'lodash'
 
-const I18n = useI18nScope('notification_preferences');
+const I18n = useI18nScope('notification_preferences')
 
 export default function NotificationPreferencesContextSelect(props) {
   const sortedGroupedUniqueEnrollments = useMemo(() => {

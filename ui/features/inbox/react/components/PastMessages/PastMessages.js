@@ -23,8 +23,17 @@ import React from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const PastMessage = (props) => (
+const I18n = useI18nScope('conversations_2')
+const dateOptions = {
+  month: 'short',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: 'numeric'
+}
+
+const PastMessage = props => (
   <View as="div" borderWidth="small none none none">
     <Flex direction="column" margin="medium">
       <Flex.Item>
@@ -33,7 +42,11 @@ const PastMessage = (props) => (
             <Text>{props.author.name}</Text>
           </Flex.Item>
           <Flex.Item>
-            <Text weight="light">{props.createdAt}</Text>
+            <Text weight="light">
+              {Intl.DateTimeFormat(I18n.currentLocale(), dateOptions).format(
+                new Date(props.createdAt)
+              )}
+            </Text>
           </Flex.Item>
         </Flex>
       </Flex.Item>
@@ -44,10 +57,10 @@ const PastMessage = (props) => (
   </View>
 )
 
-export const PastMessages = (props) => {
+export const PastMessages = props => {
   return (
     <Flex direction="column" data-testid="past-messages">
-      {props.messages.map((message) => (
+      {props.messages.map(message => (
         <Flex.Item key={btoa(JSON.stringify(message))}>
           <PastMessage {...message} />
         </Flex.Item>
@@ -57,5 +70,5 @@ export const PastMessages = (props) => {
 }
 
 PastMessages.propTypes = {
-  messages: PropTypes.arrayOf(ConversationMessage.shape),
+  messages: PropTypes.arrayOf(ConversationMessage.shape)
 }

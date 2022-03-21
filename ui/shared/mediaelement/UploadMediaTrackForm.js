@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
 import template from './jst/UploadMediaTrackForm.handlebars'
 import mejs from './index'
@@ -25,7 +25,7 @@ import CopyToClipboard from '@canvas/copy-to-clipboard'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-const I18n = useI18nScope('UploadMediaTrackForm');
+const I18n = useI18nScope('UploadMediaTrackForm')
 
 export default class UploadMediaTrackForm {
   // video url needs to be the url to mp4 version of the video.

@@ -1103,13 +1103,7 @@ describe ContextExternalTool do
         let(:requested_url) { "" }
         let(:url) { "https://www.test.com/foo?bar=1" }
         let(:lti_1_1_tool) { external_tool_model(context: context, opts: opts) }
-        let(:developer_key) { DeveloperKey.create! }
-        let(:lti_1_3_tool) do
-          t = external_tool_model(context: context, opts: opts.merge({ developer_key_id: developer_key.id }))
-          t.use_1_3 = true
-          t.save!
-          t
-        end
+        let(:lti_1_3_tool) { external_tool_1_3_model(context: context, opts: opts) }
 
         context "with an exact URL match" do
           let(:requested_url) { url }
@@ -1222,6 +1216,31 @@ describe ContextExternalTool do
 
         it "finds duplicate tool" do
           expect(ContextExternalTool.find_external_tool(url, @course)).to eq duplicate
+        end
+      end
+    end
+
+    describe "when only_1_3 is passed in" do
+      let(:url) { "http://example.com/launch" }
+      let(:tool) do
+        @course.context_external_tools.create!(name: "test", domain: "example.com", url: url, consumer_key: "12345", shared_secret: "secret")
+      end
+
+      context "when the matching tool is 1.1" do
+        it "returns nil" do
+          expect(ContextExternalTool.find_external_tool(url, @course, only_1_3: true)).to eq nil
+        end
+      end
+
+      context "when the matching tool is 1.3" do
+        before do
+          tool.use_1_3 = true
+          tool.developer_key = DeveloperKey.create!
+          tool.save!
+        end
+
+        it "returns the tool" do
+          expect(ContextExternalTool.find_external_tool(url, @course, only_1_3: true)).to eq tool
         end
       end
     end

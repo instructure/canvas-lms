@@ -941,7 +941,12 @@ class ContextExternalTool < ActiveRecord::Base
   # the teacher).
   #
   # Tools with exclude_tool_id as their ID will never be returned.
-  def self.find_external_tool(url, context, preferred_tool_id = nil, exclude_tool_id = nil, preferred_client_id = nil)
+  def self.find_external_tool(
+    url,
+    context,
+    preferred_tool_id = nil, exclude_tool_id = nil, preferred_client_id = nil,
+    only_1_3: false
+  )
     GuardRail.activate(:secondary) do
       preferred_tool = ContextExternalTool.active.where(id: preferred_tool_id).first if preferred_tool_id
       can_use_preferred_tool = preferred_tool && contexts_to_search(context).member?(preferred_tool.context)
@@ -950,7 +955,11 @@ class ContextExternalTool < ActiveRecord::Base
       return preferred_tool if url.blank? && can_use_preferred_tool
       return nil unless url
 
-      sorted_external_tools = find_and_order_tools(context, preferred_tool_id, exclude_tool_id, preferred_client_id)
+      sorted_external_tools = find_and_order_tools(
+        context,
+        preferred_tool_id, exclude_tool_id, preferred_client_id,
+        only_1_3: only_1_3
+      )
 
       # Check for a tool that exactly matches the given URL
       match = find_tool_match(
@@ -1002,7 +1011,11 @@ class ContextExternalTool < ActiveRecord::Base
   # Theoretically once this method is done, the very first tool to match the URL will be
   # the right tool, making it possible to eventually perform the rest of the URL matching
   # in SQL as well.
-  def self.find_and_order_tools(context, preferred_tool_id, exclude_tool_id, preferred_client_id)
+  def self.find_and_order_tools(
+    context,
+    preferred_tool_id, exclude_tool_id, preferred_client_id,
+    only_1_3: false
+  )
     context.shard.activate do
       contexts = contexts_to_search(context)
       context_order = contexts.map.with_index { |c, i| "(#{c.id},'#{c.class.polymorphic_name}',#{i})" }.join(",")
@@ -1021,6 +1034,7 @@ class ContextExternalTool < ActiveRecord::Base
       order_clauses << sort_by_sql_string("#{quoted_table_name}.id = #{preferred_tool_id}") if preferred_tool_id
 
       query = ContextExternalTool.where(context: contexts).active
+      query = query.where.not(developer_key_id: nil) if only_1_3
       query = query.where(developer_key_id: preferred_client_id) if preferred_client_id
       query = query.where.not(id: exclude_tool_id) if exclude_tool_id
 

@@ -28,9 +28,9 @@ import * as actions from './actions'
 import ScoringRange from './components/scoring-range'
 import AssignmentPickerModal from './components/assignment-picker-modal'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('conditional_release');
+const I18n = useI18nScope('conditional_release')
 
 const {object, func} = PropTypes
 

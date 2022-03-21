@@ -1241,9 +1241,9 @@ class SubmissionsApiController < ApplicationController
   #
   # @returns Progress
   def bulk_update
-    grade_data = params[:grade_data].to_unsafe_h
+    grade_data = params[:grade_data]&.to_unsafe_h
     unless grade_data.is_a?(Hash) && grade_data.present?
-      return render json: "'grade_data' parameter required", status: :bad_request
+      return render json: { error: "'grade_data' parameter required" }, status: :bad_request
     end
 
     # singular case doesn't require the user to pass an assignment_id in

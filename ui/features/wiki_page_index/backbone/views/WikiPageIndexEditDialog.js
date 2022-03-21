@@ -15,11 +15,11 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import DialogFormView, {getResponsiveWidth} from '@canvas/forms/backbone/views/DialogFormView.coffee'
 import wrapperTemplate from '../../jst/WikiPageIndexEditDialog.handlebars'
 
-const I18n = useI18nScope('pages');
+const I18n = useI18nScope('pages')
 
 const dialogDefaults = {
   fixDialogButtons: false,

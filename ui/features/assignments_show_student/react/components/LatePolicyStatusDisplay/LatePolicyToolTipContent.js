@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {Text} from '@instructure/ui-text'
@@ -23,7 +23,7 @@ import {Flex} from '@instructure/ui-flex'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import AccessibleTipContent from './AccessibleTipContent'
 
-const I18n = useI18nScope('a2LatePolicyToolTipContent');
+const I18n = useI18nScope('a2LatePolicyToolTipContent')
 
 export default function LatePolicyToolTipContent(props) {
   // TODO - At this point we really should just pass in the whole assignment and

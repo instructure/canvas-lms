@@ -17,9 +17,9 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('quiz_log_auditing');
+const I18n = useI18nScope('quiz_log_auditing')
 
 export default () => (
   <em className="ic-QuestionInspector__NoAnswer">{I18n.t('no_answer', 'No answer')}</em>

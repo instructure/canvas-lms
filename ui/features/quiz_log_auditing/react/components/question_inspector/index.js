@@ -19,12 +19,12 @@
 import $ from 'jquery'
 import Answer from './answer'
 import classSet from '@canvas/quiz-legacy-client-apps/util/class_set'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import K from '../../../constants'
 import NoAnswer from './answers/no_answer'
 import React from 'react'
 
-const I18n = useI18nScope('quiz_log_auditing');
+const I18n = useI18nScope('quiz_log_auditing')
 
 class QuestionInspector extends React.Component {
   static defaultProps = {

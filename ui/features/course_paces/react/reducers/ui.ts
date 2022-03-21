@@ -32,7 +32,7 @@ export const initialState: UIState = {
   editingBlackoutDates: false,
   showLoadingOverlay: false,
   responsiveSize: 'large',
-  showProjections: false
+  showProjections: true
 }
 
 /* Selectors */

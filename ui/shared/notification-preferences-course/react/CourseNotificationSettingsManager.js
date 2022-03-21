@@ -18,14 +18,14 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {bool, string} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {useMutation} from 'react-apollo'
 import NotificationPreferences from '@canvas/notification-preferences'
 import {NotificationPreferencesShape} from '@canvas/notification-preferences/react/Shape'
 import React, {useContext} from 'react'
 import {UPDATE_COURSE_NOTIFICATION_PREFERENCES} from '../graphql/Mutations'
 
-const I18n = useI18nScope('courses');
+const I18n = useI18nScope('courses')
 
 export default function CourseNotificationSettingsManager(props) {
   const {setOnSuccess, setOnFailure} = useContext(AlertManagerContext)

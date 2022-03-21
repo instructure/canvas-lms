@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
 import {tabIdFromElement} from './course_settings_helper'
@@ -39,7 +39,7 @@ import 'jqueryui/autocomplete'
 import 'jqueryui/sortable'
 import 'jqueryui/tabs'
 
-const I18n = useI18nScope('course_settings');
+const I18n = useI18nScope('course_settings')
 
 var GradePublishing = {
   status: null,

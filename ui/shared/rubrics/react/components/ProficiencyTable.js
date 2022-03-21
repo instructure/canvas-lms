@@ -27,7 +27,7 @@ import PropTypes from 'prop-types'
 import {Billboard} from '@instructure/ui-billboard'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconPlusLine} from '@instructure/ui-icons'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
 import {Spinner} from '@instructure/ui-spinner'
@@ -39,7 +39,7 @@ import {fetchProficiency, saveProficiency} from '../api'
 import NumberHelper from '@canvas/i18n/numberHelper'
 import SVGWrapper from '@canvas/svg-wrapper'
 
-const I18n = useI18nScope('ProficiencyTable');
+const I18n = useI18nScope('ProficiencyTable')
 
 const ADD_DEFAULT_COLOR = 'EF4437'
 

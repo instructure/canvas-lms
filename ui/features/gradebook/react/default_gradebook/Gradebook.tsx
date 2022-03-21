@@ -72,7 +72,7 @@ import GradingPeriodSetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
 // @ts-ignore
 import InputFilterView from 'backbone-input-filter-view'
 // @ts-ignore
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import * as EffectiveDueDates from '@canvas/grading/EffectiveDueDates'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
@@ -182,7 +182,7 @@ import {
   columnWidths
 } from './initialState'
 
-const I18n = useI18nScope('gradebook');
+const I18n = useI18nScope('gradebook')
 
 const GradebookGrid = React.lazy(() => import('./components/GradebookGrid'))
 

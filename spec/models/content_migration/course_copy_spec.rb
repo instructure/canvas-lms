@@ -470,7 +470,7 @@ describe ContentMigration do
       @copy_from.save!
 
       @copy_from.lti_resource_links.create!(
-        context_external_tool: external_tool_model(context: @copy_from),
+        context_external_tool: external_tool_1_3_model(context: @copy_from),
         custom: nil,
         lookup_uuid: "1b302c1e-c0a2-42dc-88b6-c029699a7c7a"
       )

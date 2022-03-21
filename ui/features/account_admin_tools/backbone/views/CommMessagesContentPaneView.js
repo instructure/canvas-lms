@@ -17,12 +17,12 @@
 
 import Backbone from '@canvas/backbone'
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import template from '../../jst/commMessagesContentPane.handlebars'
 import overviewTemplate from '../../jst/commMessagesSearchOverview.handlebars'
 import '@canvas/datetime'
 
-const I18n = useI18nScope('comm_messages');
+const I18n = useI18nScope('comm_messages')
 
 export default class CommMessagesContentPaneView extends Backbone.View {
   static initClass() {

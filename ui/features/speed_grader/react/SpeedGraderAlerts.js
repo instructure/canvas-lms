@@ -17,10 +17,10 @@
  */
 
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('speed_grader');
+const I18n = useI18nScope('speed_grader')
 
 function showStudentGroupChangeAlert({selectedStudentGroup = null, reasonForChange = null} = {}) {
   const groupName = selectedStudentGroup?.name

@@ -18,9 +18,9 @@
 
 import React from 'react'
 import KeyboardShortcutModal from './KeyboardShortcutModal'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('discussionTopicKeyboradShortcutModal');
+const I18n = useI18nScope('discussionTopicKeyboradShortcutModal')
 
 const SHORTCUTS = [
   {keycode: 'j', description: I18n.t('Next Message')},

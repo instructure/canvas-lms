@@ -74,7 +74,7 @@ import round from 'round'
 import _ from 'underscore'
 import INST from 'browser-sniffer'
 // @ts-ignore
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import natcompare from '@canvas/util/natcompare'
 import qs from 'qs'
 import tz from '@canvas/timezone'
@@ -123,7 +123,7 @@ import 'jquery-selectmenu'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import '@canvas/util/jquery/fixDialogButtons'
 
-const I18n = useI18nScope('speed_grader');
+const I18n = useI18nScope('speed_grader')
 
 const {Alert} = Alerts as any
 

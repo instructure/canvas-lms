@@ -18,13 +18,13 @@
 
 import React from 'react'
 import {string, shape, arrayOf, func} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import CoursesListRow from './CoursesListRow'
 import CoursesListHeader from './CoursesListHeader'
 import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-const I18n = useI18nScope('account_course_user_search');
+const I18n = useI18nScope('account_course_user_search')
 
 export default function CoursesList(props) {
   // The 'sis_course_id' field is only included in the api response if the user has

@@ -137,4 +137,75 @@ describe BrandConfigRegenerator do
     expect(@child_shared_config.reload.brand_config.parent).to eq(@parent_account.brand_config)
     expect(@child_shared_config.brand_config).to eq(@child_account.brand_config)
   end
+
+  context "With Sharding" do
+    specs_require_sharding
+
+    let(:sharded_parent_config) do
+      @shard1.activate do
+        bc = BrandConfig.for(variables: { "ic-brand-primary" => "red" })
+        bc.save!
+        bc
+      end
+    end
+
+    let(:sharded_parent_account) do
+      @shard1.activate do
+        Account.create!(brand_config: sharded_parent_config)
+      end
+    end
+
+    let(:sharded_parent_shared_config) do
+      sharded_parent_account.shared_brand_configs.create!(
+        name: "parent theme",
+        brand_config_md5: sharded_parent_config.md5
+      )
+    end
+
+    let(:sharded_child_config) do
+      @shard1.activate do
+        bc = BrandConfig.for(variables: { "ic-brand-global-nav-bgd" => "white" }, parent_md5: sharded_parent_config.md5)
+        bc.save!
+        bc
+      end
+    end
+
+    let(:sharded_child_account) do
+      @shard1.activate do
+        Account.create!(parent_account: sharded_parent_account, name: "child", brand_config: sharded_child_config)
+      end
+    end
+
+    let(:sharded_child_shared_config) do
+      sharded_child_account.shared_brand_configs.create!(
+        name: "child theme",
+        brand_config_md5: sharded_child_config.md5
+      )
+    end
+
+    before do
+      # Ensure they are already in the database before the spec
+      sharded_parent_shared_config
+      sharded_child_shared_config
+    end
+
+    it "handles cross-shard site_admin" do
+      site_admin_config = BrandConfig.for(variables: { "ic-brand-primary" => "orange" })
+      site_admin_config.save!
+
+      BrandConfigRegenerator.process(Account.site_admin, user_factory, new_brand_config)
+
+      Delayed::Testing.drain
+
+      expect(Account.site_admin.brand_config).to eq(new_brand_config)
+
+      expect(sharded_parent_account.reload.brand_config.parent).to eq(new_brand_config)
+      expect(sharded_parent_shared_config.reload.brand_config.parent).to eq(new_brand_config)
+      expect(sharded_parent_shared_config.brand_config).to eq(sharded_parent_account.brand_config)
+
+      expect(sharded_child_account.reload.brand_config.parent).to eq(sharded_parent_account.brand_config)
+      expect(sharded_child_shared_config.reload.brand_config.parent).to eq(sharded_parent_account.brand_config)
+      expect(sharded_child_shared_config.brand_config).to eq(sharded_child_account.brand_config)
+    end
+  end
 end
