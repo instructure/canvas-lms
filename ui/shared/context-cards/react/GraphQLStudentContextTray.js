@@ -27,6 +27,7 @@ const SCC_QUERY = gql`
     course(id: $courseId) {
       _id
       name
+      allowFinalGradeOverride
       permissions {
         become_user: becomeUser
         manage_grades: manageGrades
