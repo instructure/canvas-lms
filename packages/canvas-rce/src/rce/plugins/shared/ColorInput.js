@@ -138,12 +138,9 @@ export const ColorInput = ({
     )
   }
 
-  const renderLabel = () => (
-    <>
-      {label}
-      <ScreenReaderContent>{colorName || ''}</ScreenReaderContent>
-    </>
-  )
+  const pickerLabel = colorName
+    ? formatMessage('Color Picker ({colorName} selected)', {colorName})
+    : formatMessage('Color Picker')
 
   return (
     <View as="div">
@@ -154,8 +151,8 @@ export const ColorInput = ({
         onChange={(e, value) => handleColorChange(value)}
         placeholder={formatMessage('None')}
         renderBeforeInput={<ColorPreview color={color} disabled margin="0" />}
-        renderAfterInput={renderPopover()}
-        renderLabel={renderLabel()}
+        renderAfterInput={<span aria-label={pickerLabel}>{renderPopover(colorName)}</span>}
+        renderLabel={label}
         shouldNotWrap
         value={inputValue || ''}
         width={width}
