@@ -1982,6 +1982,24 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe "master template" do
+    before do
+      @course = course_model
+      @master_template = MasterCourses::MasterTemplate.create!(course: @course)
+    end
+
+    context "created" do
+      it "triggers an master_template_created live event" do
+        expect_event("master_template_created", {
+                       master_template_id: @master_template.id.to_s,
+                       master_course_id: @master_template.course_id.to_s,
+                       root_account_id: @master_template.root_account_id.to_s
+                     }).once
+        Canvas::LiveEvents.master_template_created(@master_template)
+      end
+    end
+  end
+
   describe "heartbeat" do
     context "when database region is not set (local/open source)" do
       it "sets region to not_configured" do

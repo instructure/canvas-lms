@@ -89,6 +89,8 @@ module Canvas::LiveEventsCallbacks
       Canvas::LiveEvents.outcome_calculation_method_created(obj)
     when OutcomeFriendlyDescription
       Canvas::LiveEvents.outcome_friendly_description_created(obj)
+    when MasterCourses::MasterTemplate
+      Canvas::LiveEvents.master_template_created(obj)
     end
   end
 

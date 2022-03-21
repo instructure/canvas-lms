@@ -601,4 +601,12 @@ describe LiveEventsObserver do
       friendly_description.destroy
     end
   end
+
+  describe "MasterCourses::MasterTemplate" do
+    it "posts create events" do
+      course_model
+      expect(Canvas::LiveEvents).to receive(:master_template_created).once
+      MasterCourses::MasterTemplate.create!(course: @course)
+    end
+  end
 end
