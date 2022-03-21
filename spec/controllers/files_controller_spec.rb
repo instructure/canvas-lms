@@ -367,7 +367,7 @@ describe FilesController do
 
       # second use after verifier expiration but before session expiration.
       # expired verifier should be ignored but session should still be extended
-      Timecop.freeze((Users::AccessVerifier::TTL_MINUTES + 1).minutes.from_now) do
+      Timecop.freeze((Setting.get("access_verifier.ttl_minutes", "5").to_i + 1).minutes.from_now) do
         get "show", params: verifier.merge(id: file.id)
       end
       expect(response).to be_successful
