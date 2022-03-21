@@ -132,7 +132,7 @@ export class ToDoSidebar extends Component {
               }}
               item={item}
               courses={this.props.courses}
-              handleDismissClick={() => this.handleDismissClick(itemIndex, item)}
+              handleDismissClick={(...args) => this.handleDismissClick(itemIndex, item)}
               locale={this.props.locale}
               timeZone={this.props.timeZone}
             />
@@ -174,7 +174,6 @@ export class ToDoSidebar extends Component {
 }
 
 const mapStateToProps = state => ({
-  courses: state.courses,
   items: state.sidebar.items,
   loaded: state.sidebar.loaded
 })

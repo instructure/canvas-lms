@@ -77,15 +77,7 @@ const MentionDropdownOption = props => {
         onClick={props.onSelect}
       >
         <View as="div">
-          <Avatar
-            name={props.name}
-            margin="0 small 0 0"
-            size="x-small"
-            elementRef={ref => {
-              const img = ref?.querySelector('img')
-              img?.setAttribute('data-ignore-a11y-check', '')
-            }}
-          />
+          <Avatar name={props.name} margin="0 small 0 0" size="x-small" />
           <Text
             color={
               (isHover && props.highlightMouse) || (props.isSelected && !props.highlightMouse)

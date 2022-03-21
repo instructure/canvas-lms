@@ -44,8 +44,7 @@ module.exports = {
       {
         suiteName: 'Jest Tests',
         outputDirectory: process.env.TEST_RESULT_OUTPUT_DIR || './coverage-js/junit-reports',
-        outputName: 'jest.xml',
-        addFileAttribute: 'true'
+        outputName: 'jest.xml'
       }
     ]
   ],
