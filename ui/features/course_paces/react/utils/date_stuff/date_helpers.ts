@@ -109,6 +109,10 @@ export const addDays = (
   return formatDate(date.startOf('day'))
 }
 
+const msInADay = 1000 * 60 * 60 * 24
+export const rawDaysBetweenInclusive = (start_date: string, end_date: string): number =>
+  Math.round(moment(end_date).diff(moment(start_date)) / msInADay) + 1
+
 export const stripTimezone = (date: string): string => {
   return date.split('T')[0]
 }

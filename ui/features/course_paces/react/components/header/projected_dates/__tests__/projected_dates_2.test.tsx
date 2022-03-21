@@ -26,7 +26,7 @@ import {ProjectedDates} from '../projected_dates_2'
 const defaultProps = {
   coursePace: PRIMARY_PACE,
   assignments: 5,
-  paceWeeks: 8,
+  paceDuration: {weeks: 2, days: 3},
   projectedEndDate: '2021-12-01',
   blackoutDates: [],
   weekendsDisabled: false,
@@ -75,7 +75,7 @@ describe('ProjectedDates', () => {
     expect(getByText('Student enrollment date')).toBeInTheDocument()
     expect(getByText('End Date')).toBeInTheDocument()
     expect(getByText('Determined by course pace')).toBeInTheDocument()
-    expect(getByText(/\d+ assignments/)).toBeInTheDocument()
+    expect(getByText(/2 weeks 3 days/)).toBeInTheDocument()
     expect(getByText(/\d+ weeks/)).toBeInTheDocument()
     expect(getByText('Dates shown in course time zone')).toBeInTheDocument()
   })
@@ -87,7 +87,7 @@ describe('ProjectedDates', () => {
 
     expect(queryByText('Start Date')).not.toBeInTheDocument()
     expect(queryByText('End Date')).not.toBeInTheDocument()
-    expect(queryByText(/\d+ assignments/)).toBeInTheDocument()
+    expect(queryByText(/2 weeks 3 days/)).toBeInTheDocument()
     expect(queryByText(/\d+ weeks/)).toBeInTheDocument()
     expect(queryByText('Dates shown in course time zone')).toBeInTheDocument()
   })
@@ -103,7 +103,7 @@ describe('ProjectedDates', () => {
     expect(getByText('End Date')).toBeInTheDocument()
     const end = getByTestId('coursepace-end-date')
     expect(within(end).getByText(/Not Specified/)).toBeInTheDocument()
-    expect(getByText(/\d+ assignments/)).toBeInTheDocument()
+    expect(getByText(/2 weeks 3 days/)).toBeInTheDocument()
     expect(getByText(/\d+ weeks/)).toBeInTheDocument()
     expect(getByText('Dates shown in course time zone')).toBeInTheDocument()
   })
