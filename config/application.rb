@@ -27,51 +27,20 @@ require "rails/test_unit/railtie"
 
 Bundler.require(*Rails.groups)
 
-# Zeitwerk does not HAVE to be enabled with rails 6
-# Use this environment variable (which may have other file-based ways
-# to trigger it later) in order to determine which autoloader we should
-# use.  The goal is to move to zeitwerk over time.
-# https://guides.rubyonrails.org/autoloading_and_reloading_constants.html
-# One way to set this in development would be to use your docker-compose.override.yml
-# file to pass an env var to the web container:
-#
-#  web:
-#    <<: *BASE
-#    environment:
-#      <<: *BASE-ENV
-#      VIRTUAL_HOST: .canvas.docker
-#      ...
-#      CANVAS_ZEITWERK: 1
-unless defined?(CANVAS_ZEITWERK)
-  # choose to force zeitwerk on
-  # unless overridden with
-  # an env var or file
-  CANVAS_ZEITWERK = if ENV["CANVAS_ZEITWERK"]
-                      (ENV["CANVAS_ZEITWERK"] == "1")
-                    elsif Rails.root && (zw_settings = ConfigFile.load("zeitwerk"))
-                      zw_settings["enabled"]
-                    else
-                      true
-                    end
-end
+# TODO: remove once no plugins require this
+CANVAS_ZEITWERK = true
 
 module CanvasRails
   class Application < Rails::Application
-    # this CANVAS_ZEITWERK constant flag is defined above in this file.
-    # It should be temporary,
-    # and removed once we've fully upgraded to zeitwerk autoloading,
-    # at which point the stuff inside this conditional block should remain.
-    if CANVAS_ZEITWERK
-      config.autoloader = :zeitwerk
+    config.autoloader = :zeitwerk
 
-      # TODO: someday we can use this line, which will NOT
-      # add anything on the autoload paths the actual ruby
-      # $LOAD_PATH because zeitwerk will take care of anything
-      # we autolaod.  This will make ACTUAL require statements
-      # that are necessary work faster because they'll have a smaller
-      # load path to scan.
-      # config.add_autoload_paths_to_load_path = false
-    end
+    # TODO: someday we can use this line, which will NOT
+    # add anything on the autoload paths the actual ruby
+    # $LOAD_PATH because zeitwerk will take care of anything
+    # we autolaod.  This will make ACTUAL require statements
+    # that are necessary work faster because they'll have a smaller
+    # load path to scan.
+    # config.add_autoload_paths_to_load_path = false
 
     $LOAD_PATH << config.root.to_s
     config.encoding = "utf-8"

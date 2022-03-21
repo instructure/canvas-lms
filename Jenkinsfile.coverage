@@ -112,7 +112,6 @@ pipeline {
     POSTGRES_PASSWORD = 'sekret'
     RSPECQ_REDIS_URL = redisUrl()
     PATCHSET_TAG = getPatchsetTag()
-    CANVAS_ZEITWERK = '1'
 
     CASSANDRA_PREFIX = configuration.buildRegistryPath('cassandra-migrations')
     DYNAMODB_PREFIX = configuration.buildRegistryPath('dynamodb-migrations')

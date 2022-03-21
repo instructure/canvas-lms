@@ -17,7 +17,6 @@ services:
       RERUNS_RETRY:
       COVERAGE:
       FORCE_FAILURE:
-      CANVAS_ZEITWERK:
       TEST_CACHE_CLASSES:
 
       # parallel_tests
