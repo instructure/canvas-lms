@@ -930,8 +930,7 @@ describe "RCE next tests", ignore_js_errors: true do
         expect(a11y_checker_tray).to be_displayed
       end
 
-      it "with the rce_a11y_checker_notifications flag on should show notification badge" do
-        Account.site_admin.enable_feature! :rce_a11y_checker_notifications
+      it "shows notification badge" do
         visit_front_page_edit(@course)
 
         switch_to_html_view
@@ -949,23 +948,6 @@ describe "RCE next tests", ignore_js_errors: true do
         html_view = f("textarea#wiki_page_body")
         html_view.clear
         html_view.send_keys("test text")
-        switch_to_editor_view
-
-        expect(
-          wait_for_no_such_element(method: nil, timeout: 5) do
-            fxpath('//button[@data-btn-id="rce-a11y-btn"]/following-sibling::span')
-          end
-        ).to be_truthy
-      end
-
-      it "with the rce_a11y_checker_notifications flag off should show not notification badge" do
-        Account.site_admin.disable_feature! :rce_a11y_checker_notifications
-        visit_front_page_edit(@course)
-
-        switch_to_html_view
-        switch_to_raw_html_editor
-        html_view = f("textarea#wiki_page_body")
-        html_view.send_keys('<img src="image.jpg" alt="image.jpg" />')
         switch_to_editor_view
 
         expect(
