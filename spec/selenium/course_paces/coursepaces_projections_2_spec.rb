@@ -78,11 +78,11 @@ describe "course pacing page" do
       visit_course_paces_page
 
       expect(number_of_assignments.text).to eq("2 assignments")
-      expect(number_of_weeks.text).to eq("0 weeks")
+      expect(number_of_weeks.text).to eq("0 weeks 1 day")
 
       update_module_item_duration(0, 6)
 
-      expect(number_of_weeks.text).to eq("1 week")
+      expect(number_of_weeks.text).to eq("1 week 2 days")
     end
 
     it "shows Dates shown in course time zone text" do
