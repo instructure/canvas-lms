@@ -23,10 +23,8 @@ const Helpers = {
       case 'image/gif':
       case 'image/png':
         return true
-        break
       default:
         return false
-        break
     }
   },
 
@@ -42,6 +40,46 @@ const Helpers = {
     }
 
     return {file, type}
+  },
+
+  // resize the user's selected image to more closely match
+  // the eventual size it's rendered in the course card. This
+  // avoids the latency from having to retrieve an image that's
+  // larger than necessary. This was especially an issue in the
+  // Respondus browser which would time out.
+  resizeImageToFit(file, target_width, target_height) {
+    const doc = document // for jest
+    const target_ar = target_width / target_height
+    const p = new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => {
+        const img = doc.createElement('img')
+        img.onload = () => {
+          if (img.width <= target_width || img.height <= target_height) {
+            // the image is small enought, just use it.
+            resolve(file)
+          } else {
+            // resize the image to more closely fit in the card
+            const imgAspectRatio = img.width / img.height
+            const cnvs = doc.createElement('canvas')
+            cnvs.width = imgAspectRatio > target_ar ? target_height * imgAspectRatio : target_width
+            cnvs.height = imgAspectRatio > target_ar ? target_height : target_width / imgAspectRatio
+            const ctx = cnvs.getContext('2d')
+            ctx.drawImage(img, 0, 0, cnvs.width, cnvs.height)
+            cnvs.toBlob(blob => {
+              const imgFile = new File([blob], file.name, {type: file.type})
+              resolve(imgFile)
+            }, 'image/jpg')
+          }
+        }
+        img.src = reader.result
+      }
+      if (!/^image/.test(file.type)) {
+        reject(new Error(`Invalid image file type '${file.type}'`))
+      }
+      reader.readAsDataURL(file)
+    })
+    return p
   }
 }
 export default Helpers

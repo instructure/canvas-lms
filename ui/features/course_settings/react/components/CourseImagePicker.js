@@ -27,10 +27,16 @@ import {Text} from '@instructure/ui-text'
 import FlickrSearch from './FlickrSearch'
 import ImageSearch from './ImageSearch'
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
+import Helpers from '../helpers'
 
 const I18n = useI18nScope('course_images')
 
 const dropIcon = getIconByType('image')
+
+// eventual size of the course imagee on the
+// dashboard card determined by inspection
+const COURSE_IMG_W = 262
+const COURSE_IMG_H = 146
 
 export default class CourseImagePicker extends React.Component {
   static propTypes = {
@@ -57,11 +63,18 @@ export default class CourseImagePicker extends React.Component {
     })
   }
 
-  handleDropAccepted = files => {
+  handleDropAccepted = async files => {
     this.setState({fileDropMessages: null})
+    let filesToUpload = files
+    try {
+      const imageBlob = await Helpers.resizeImageToFit(files[0], COURSE_IMG_W, COURSE_IMG_H)
+      filesToUpload = [imageBlob]
+    } catch (_e) {
+      // ignore
+    }
     this.props.handleFileUpload(
       {
-        dataTransfer: {files},
+        dataTransfer: {files: filesToUpload},
         preventDefault: () => {},
         stopPropagagtion: () => {}
       },
