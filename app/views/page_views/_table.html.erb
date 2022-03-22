@@ -16,37 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<div id="pageviews_datefilter">
-  <div class="nobr">
-    <label class="ic-Label" for="page_view_date"><%= t('Filter by date') %></label>
-    <input type="datetime" class="ic-Input" id="page_view_date"/>
-  </div>
+<div id="pageviews" data-user-id="<%= @user.id %>" style="overflow-x:auto; overflow-y:hidden">
 </div>
 
-<div id="pageviews">
-  <table data-user-id="<%= @user.id %>" class="ic-Table ic-Table--hover-row ic-Table--condensed ic-Table--striped">
-    <thead class='ui-widget-header'>
-      <tr>
-        <th><%= t('headers.url', "URL") %></th>
-        <th><%= t('headers.date', "Date") %></th>
-        <th><%= t('headers.participated', "Participated") %></th>
-        <th><%= t('headers.time', "Time") %></th>
-        <th>
-          <div style="float:<%= direction('right') %>; margin-<%= direction('right') %>: 4px">
-            <%= link_to(t('page views csv'),
-                user_page_views_path(@user, :format => :csv),
-                class: 'icon-ms-excel',
-                id: 'page_views_csv_link',
-                'aria-label' => t('Download Page Views CSV'))
-            %>
-          </div>
-          <%= t('headers.user_agent', "User Agent") %>
-        </th>
-      </tr>
-    </thead>
-    <tbody id="page_view_results">
-    </tbody>
-  </table>
-</div>
 <% css_bundle :page_views %>
 <% js_bundle  :page_views %>
