@@ -36,7 +36,13 @@ class SimplyVersioned::Partitioner
 
         log "Done. Bye!"
         log "*" * 80
-        ActiveRecord::Base.connection_pool.current_pool.disconnect! unless Rails.env.test?
+        unless Rails.env.test?
+          if CANVAS_RAILS6_0
+            ActiveRecord::Base.connection_pool.current_pool.disconnect!
+          else
+            ActiveRecord::Base.connection_pool.disconnect!
+          end
+        end
       end
     end
   end
