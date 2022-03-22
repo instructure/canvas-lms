@@ -315,7 +315,7 @@ export default class EquationEditorModal extends Component {
                   borderRadius: '4px'
                 }}
                 ref={this.handleFieldRef}
-                default-mode="math"
+                default-mode="inline-math"
                 virtual-keyboard-mode="off"
                 keypress-sound="none"
                 plonk-sound="none"
