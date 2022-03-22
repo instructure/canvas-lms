@@ -45,7 +45,11 @@
     </td>
   </tr><tr id="google_docs_description" style="display: none;" class="collaboration_type <%= 'unauthorized' unless @user_has_google_drive %>">
     <td colspan="2" style="padding: 5px 20px 10px">
-      <%= mt 'descriptions.google_docs', "Google Docs is a great place to collaborate on a group project.  It's like Microsoft Word, but lets you work together with others on the same file at the same time without having to email it around.  \n  \n**Warning**: you (and all your collaborators) will need a Google account in order to participate in any Google Docs collaborations." %>
+      <%= mt 'descriptions.google_docs',
+        "**Warning:** you (and all your collaborators) will need accounts from the supported web tool in order to participate in any collaborations.
+         Free online web tools are an excellent place for students to work on group projects or papers, take shared notes, etc.
+         Teachers or students can set up group collaborations."
+      %>
     </td>
   </tr><tr id="etherpad_description" style="display: none;" class="collaboration_type">
     <td colspan="2" style="padding: 5px 20px 10px">
