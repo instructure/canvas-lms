@@ -846,6 +846,7 @@ describe ApplicationHelper do
       end
 
       it "returns false for the observer if not k5_user and observer_picker flag is disabled" do
+        Account.site_admin.disable_feature!(:observer_picker)
         allow(helper).to receive(:k5_user?).and_return(false)
         @current_user = @observer
         expect(helper.planner_enabled?).to be false
