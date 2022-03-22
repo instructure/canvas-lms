@@ -21,8 +21,9 @@ import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 
 import PacePicker from './pace_picker'
-import ProjectedDates from './projected_dates/projected_dates_2'
+import ProjectedDates from './projected_dates/projected_dates'
 import Settings from './settings/settings'
+import ShowProjectionsButton from './show_projections_button'
 import UnpublishedChangesIndicator from '../unpublished_changes_indicator'
 
 export type HeaderProps = {
@@ -38,6 +39,7 @@ const Header = (props: HeaderProps) => (
         </Flex.Item>
         <Flex.Item margin="0 0 small" shouldGrow>
           <Settings margin="0 0 0 small" />
+          <ShowProjectionsButton margin="0 auto 0 small" />
         </Flex.Item>
         <Flex.Item textAlign="end" margin="0 0 small small">
           <UnpublishedChangesIndicator onClick={props.handleDrawerToggle} />

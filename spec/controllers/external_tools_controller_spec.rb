@@ -211,36 +211,27 @@ describe ExternalToolsController do
     end
 
     context "basic-lti-launch-request" do
-      let(:tool) do
-        @course.account.context_external_tools.new(
-          name: "bob",
-          consumer_key: "bob",
-          shared_secret: "bob",
-          url: "http://www.example.com/basic_lti"
-        )
-      end
+      it "launches account tools for non-admins" do
+        user_session(@teacher)
+        tool = @course.account.context_external_tools.new(name: "bob",
+                                                          consumer_key: "bob",
+                                                          shared_secret: "bob")
+        tool.url = "http://www.example.com/basic_lti"
+        tool.account_navigation = { enabled: true }
+        tool.save!
 
-      before { user_session(@teacher) }
+        get :show, params: { account_id: @course.account.id, id: tool.id }
 
-      context "launching account tools for non-admins" do
-        before do
-          tool.account_navigation = { enabled: true }
-          tool.save!
-
-          get :show, params: { account_id: @course.account.id, id: tool.id }
-        end
-
-        it "launches successfully" do
-          expect(response).to be_successful
-        end
-
-        it "sets a crumb with the tool name" do
-          expect(assigns[:_crumbs].last).to eq(["bob", nil, {}])
-        end
+        expect(response).to be_successful
       end
 
       context "when required_permissions set" do
         it "does not launch account tool for non-admins" do
+          user_session(@teacher)
+          tool = @course.account.context_external_tools.new(name: "bob",
+                                                            consumer_key: "bob",
+                                                            shared_secret: "bob")
+          tool.url = "http://www.example.com/basic_lti"
           tool.account_navigation = { enabled: true, required_permissions: "manage_data_services" }
           tool.save!
 
@@ -251,6 +242,11 @@ describe ExternalToolsController do
       end
 
       it "generates the resource_link_id correctly for a course navigation launch" do
+        user_session(@teacher)
+        tool = @course.context_external_tools.new(name: "bob",
+                                                  consumer_key: "bob",
+                                                  shared_secret: "bob")
+        tool.url = "http://www.example.com/basic_lti"
         tool.course_navigation = { enabled: true }
         tool.save!
 
@@ -259,8 +255,13 @@ describe ExternalToolsController do
       end
 
       it "generates the correct resource_link_id for a homework submission" do
+        user_session(@teacher)
         assignment = @course.assignments.create!(name: "an assignment")
         assignment.save!
+        tool = @course.context_external_tools.new(name: "bob",
+                                                  consumer_key: "bob",
+                                                  shared_secret: "bob")
+        tool.url = "http://www.example.com/basic_lti"
         tool.course_navigation = { enabled: true }
         tool.homework_submission = { enabled: true }
         tool.save!
@@ -273,6 +274,7 @@ describe ExternalToolsController do
       end
 
       it "returns flash error if the tool is not found" do
+        user_session(@teacher)
         get :show, params: { account_id: @course.account.id, id: 0 }
         expect(response).to be_redirect
         expect(flash[:error]).to match(/find valid settings/)
@@ -893,11 +895,10 @@ describe ExternalToolsController do
       assert_unauthorized
     end
 
-    it "finds tools matching by domain" do
+    it "finds tools matching by exact url" do
       user_session(@teacher)
-      tool = @course.context_external_tools.new(
-        name: "bob", consumer_key: "bob", shared_secret: "bob", domain: "www.example.com"
-      )
+      tool = @course.context_external_tools.new(name: "bob", consumer_key: "bob", shared_secret: "bob")
+      tool.url = "http://www.example.com/basic_lti"
       tool.save!
       get "retrieve", params: { course_id: @course.id, url: "http://www.example.com/basic_lti" }
       expect(response).to be_successful
@@ -905,20 +906,13 @@ describe ExternalToolsController do
       expect(assigns[:lti_launch].params).not_to be_nil
     end
 
-    it "finds tools matching by exact url" do
+    it "finds tools matching by domain" do
       user_session(@teacher)
-      tool = new_valid_tool(@course) # this tool has a url and no domain
+      tool = new_valid_tool(@course)
       get "retrieve", params: { course_id: @course.id, url: "http://www.example.com/basic_lti" }
       expect(response).to be_successful
       expect(assigns[:tool]).to eq tool
       expect(assigns[:lti_launch].params).not_to be_nil
-    end
-
-    it "sets a breadcrumb with the tool name" do
-      user_session(@teacher)
-      new_valid_tool(@course)
-      get "retrieve", params: { course_id: @course.id, url: "http://www.example.com/basic_lti" }
-      expect(assigns[:_crumbs].last).to eq(["bob", nil, {}])
     end
 
     it "redirects if no matching tools are found" do

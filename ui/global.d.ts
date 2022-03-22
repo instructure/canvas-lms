@@ -58,7 +58,6 @@ declare global {
     datetimeString: any
     ajaxJSONFiles: any
     isPreviewable: any
-    toSentence: any
   }
 
   declare interface Array<T> {
