@@ -79,16 +79,6 @@ const ObserverOptions = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const selectAvatar =
-    /* don't show the default Canvas avatar */
-    selectedUser?.avatarUrl && !selectedUser.avatarUrl.includes('avatar-50.png') ? (
-      /* hack to shrink the avatar - should be able to use size="xx-small" on inst-ui 7.9.0 */
-      <span style={{fontSize: '0.5rem', verticalAlign: 'middle'}}>
-        <Avatar name={selectedUser.name} src={selectedUser.avatarUrl} size="auto" />
-      </span>
-    ) : (
-      <IconUserLine />
-    )
   const onNewStudentPaired = async () => {
     try {
       const {json} = await doFetchApi({
@@ -117,6 +107,20 @@ const ObserverOptions = ({
       })
     }
   }
+
+  const userAvatar = user => {
+    /* don't show the default Canvas avatar */
+    return user?.avatarUrl && !user.avatarUrl.includes('avatar-50.png') ? (
+      /* hack to shrink the avatar - should be able to use size="xx-small" on inst-ui 7.9.0 */
+      <span style={{fontSize: '0.5rem', verticalAlign: 'middle'}}>
+        <Avatar name={user.name} src={user.avatarUrl} size="auto" />
+      </span>
+    ) : (
+      <IconUserLine />
+    )
+  }
+
+  const selectAvatar = userAvatar(selectedUser)
 
   const addStudentOption = (
     <CanvasAsyncSelect.Option
@@ -155,7 +159,7 @@ const ObserverOptions = ({
           key={u.id}
           id={u.id}
           value={u.id}
-          renderBeforeLabel={<IconUserLine />}
+          renderBeforeLabel={userAvatar(u)}
         >
           {u.name}
         </CanvasAsyncSelect.Option>
