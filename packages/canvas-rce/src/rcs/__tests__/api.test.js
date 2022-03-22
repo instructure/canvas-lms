@@ -31,12 +31,12 @@ beforeEach(() => {
   })
 
   apiSource.fetchPage = jest.fn()
+
   fetchMock.mock('/api/session', '{}')
 })
 
 afterEach(() => {
   fetchMock.restore()
-  jest.resetAllMocks()
 })
 
 describe('fetchImages()', () => {
@@ -83,9 +83,40 @@ describe('fetchFilesForFolder()', () => {
     fetchMock.mock('/api/files', '[]')
   })
 
-  it.only('includes the "uncategorized" category in the request', () => {
+  it('includes the "uncategorized" category in the request', () => {
     subject()
     expect(apiSource.fetchPage).toHaveBeenCalledWith('/api/files?&category=uncategorized', 'theJWT')
+  })
+})
+
+describe('fetchMedia', () => {
+  let apiProps
+
+  const subject = () => apiSource.fetchMedia(apiProps)
+
+  beforeEach(() => {
+    apiProps = {
+      host: 'test.com',
+      jwt: 'asd.asdf.asdf',
+      contextType: 'course',
+      media: {course: {}},
+      sortBy: {
+        sort: 'name',
+        dir: 'asc'
+      },
+      contextId: 1
+    }
+
+    apiSource.apiFetch = jest.fn()
+    fetchMock.mock('/api/documents', '[]')
+  })
+
+  it('fetches media documents', () => {
+    subject()
+    expect(apiSource.apiFetch).toHaveBeenCalledWith(
+      'http://test.com/api/documents?contextType=course&contextId=1&content_types=video,audio&sort=name&order=asc',
+      {Authorization: 'Bearer theJWT'}
+    )
   })
 })
 

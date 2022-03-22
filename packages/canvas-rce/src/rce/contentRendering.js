@@ -50,8 +50,9 @@ export function renderLink(data, contents) {
 }
 
 export function renderDoc(doc) {
-  return `<a target="_blank" rel="noopener noreferrer" href="${doc.href}">${doc.display_name ||
-    doc.filename}</a>`
+  return `<a target="_blank" rel="noopener noreferrer" href="${doc.href}">${
+    doc.display_name || doc.filename
+  }</a>`
 }
 
 export function renderLinkedImage(linkElem, image) {
@@ -99,7 +100,7 @@ export function renderVideo(video) {
   <iframe
       allow="fullscreen"
       allowfullscreen
-      data-media-id="${video.media_id || video.id || video.file_id}"
+      data-media-id="${getMediaId(video)}"
       data-media-type="video"
       src="${src}"
       style="width:${VIDEO_SIZE_DEFAULT.width};height:${
@@ -117,7 +118,7 @@ export function renderAudio(audio) {
   const src = mediaPlayerURLFromFile(audio)
   return `
   <iframe
-      data-media-id="${audio.media_id || audio.id || audio.file_id}"
+      data-media-id="${getMediaId(audio)}"
       data-media-type="audio"
       src="${src}"
       style="width:${AUDIO_PLAYER_SIZE.width};height:${
@@ -129,4 +130,10 @@ export function renderAudio(audio) {
   `
     .trim()
     .replace(/\s+/g, ' ')
+}
+
+export function getMediaId(media) {
+  if (!media) return
+
+  return media.media_id || media.media_entry_id || media.id || media.file_id
 }

@@ -145,6 +145,33 @@ describe('RCE "Documents" Plugin > Document', () => {
       expect(onClick).toHaveBeenCalled()
     })
 
+    it('passes all attributes to the click handler', () => {
+      const onClick = jest.fn()
+      const {getByText} = renderComponent({
+        display_name: 'click me',
+        onClick,
+        media_entry_id: 'media-entry-id',
+        title: 'title',
+        type: 'type'
+      })
+
+      const btn = getByText('click me')
+      btn.click()
+      expect(onClick).toHaveBeenCalledWith({
+        class: 'instructure_file_link instructure_scribd_file inline_disabled',
+        content_type: 'text/plain',
+        'data-canvas-previewable': true,
+        embedded_iframe_url: undefined,
+        href: 'http://192.168.86.175:3000/files/469/download?download_frd=1',
+        id: 469,
+        media_entry_id: 'media-entry-id',
+        target: '_blank',
+        text: 'click me',
+        title: 'title',
+        type: 'type'
+      })
+    })
+
     it('calls onClick on <Enter>', () => {
       const onClick = jest.fn()
       const {getByText} = renderComponent({display_name: 'click me', onClick})
