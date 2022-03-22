@@ -43,25 +43,25 @@ HEREDOC
 
 <div id="no_collaborations_message" style="<%= hidden unless @collaborations.empty? %>">
   <% if can_do(@context, @current_user, :manage_content) %>
-    <p><%= mt :description_teacher, <<-HEREDOC, :google_url => "http://docs.google.com"
-**What do we mean by collaborations?**  We're talking about web-based tools that most
-likely your students are already familiar with.  Students can use resources like
-[Google Docs](%{google_url})
-to work collaboratively on tasks like group papers or note-taking.  This page gives them
-(and you) an easy place to keep track of those collaborations, and also to set them
-up without having to swap emails.
-HEREDOC
-        %></p>
+    <p>
+      <%= mt :description_teacher,
+        "**What do we mean by collaborations?** We're talking
+        about web-based tools that students are already familiar with. Students can use
+        online web tools to work collaboratively on tasks like group papers or note-taking.
+        This page gives teachers and students an easy place to keep track of those
+        collaborations, and also to set them up without having to swap emails."
+      %>
+    </p>
   <% else %>
-    <p><%= mt :description_student, <<-HEREDOC, :google_url => "http://docs.google.com"
-**What do we mean by collaborations?**  We're talking about web-based tools for
-working together on a shared document.  You can use resources like
-[Google Docs](%{google_url})
-to work collaboratively on tasks like group papers or note-taking.  This page is
-an easy place to keep track of those collaborations, and also to set them
-up without having to swap emails.
-HEREDOC
-        %></p>
+    <p>
+      <%= mt :description_student,
+        "**What do we mean by collaborations?**  We're talking about web-based tools for
+        working together on a shared document.
+        You can use online web tools to work collaboratively on tasks like group papers or note-taking.  This page is
+        an easy place to keep track of those collaborations, and also to set them
+        up without having to swap emails."
+      %>
+    </p>
   <% end %>
   <% if can_do(@context, @current_user, :create_collaborations) && !@hide_create_ui %>
     <p>
