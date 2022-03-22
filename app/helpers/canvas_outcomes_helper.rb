@@ -19,6 +19,22 @@
 #
 
 module CanvasOutcomesHelper
+  def get_lmgb_results_jwt(context, assignment_ids, assignment_type)
+    return if assignment_ids.blank? || assignment_type.blank?
+
+    domain, jwt = extract_domain_jwt(
+      context.root_account,
+      "lmgb_results.show",
+      {
+        associated_asset_id_list: assignment_ids,
+        associated_asset_type: assignment_type
+      }
+    )
+    return if domain.nil? || jwt.nil?
+
+    jwt
+  end
+
   def set_outcomes_alignment_js_env(artifact, context, props)
     context =
       case context
@@ -48,7 +64,7 @@ module CanvasOutcomesHelper
     )
   end
 
-  def extract_domain_jwt(account, scope)
+  def extract_domain_jwt(account, scope, **props)
     settings = account.settings.dig(:provision, "outcomes") || {}
     domain = nil
     jwt = nil
@@ -60,7 +76,8 @@ module CanvasOutcomesHelper
         host: domain,
         consumer_key: consumer_key,
         scope: scope,
-        exp: 1.day.from_now.to_i
+        exp: 1.day.from_now.to_i,
+        **props
       }
       jwt = JWT.encode(payload, jwt_secret, "HS512")
     end

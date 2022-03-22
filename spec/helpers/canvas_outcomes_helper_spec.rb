@@ -131,4 +131,58 @@ describe CanvasOutcomesHelper do
       expect(subject.extract_domain_jwt(account, "")).to eq ["domain", "encoded"]
     end
   end
+
+  describe "#get_lmgb_results_jwt" do
+    context "without account outcome settings" do
+      it "returns nil with no provision settings" do
+        expect(subject.get_lmgb_results_jwt(account, "1", "assign.type")).to eq nil
+      end
+
+      it "returns nil with no outcome provision settings" do
+        account.settings[:provision] = {}
+        account.save!
+        expect(subject.get_lmgb_results_jwt(account, "1", "assign.type")).to eq nil
+      end
+    end
+
+    context "with account outcome settings" do
+      before do
+        settings = { consumer_key: "key", jwt_secret: "secret", domain: "domain" }
+        account.settings[:provision] = { "outcomes" => settings }
+        account.save!
+      end
+
+      context "without assignment ids" do
+        it "returns nil when assignment ids is nil" do
+          expect(subject.get_lmgb_results_jwt(account, nil, "assign.type")).to eq nil
+        end
+
+        it "returns nil when assignment ids is empty" do
+          expect(subject.get_lmgb_results_jwt(account, "", "assign.type")).to eq nil
+        end
+      end
+
+      context "without assignment type" do
+        it "returns nil when assignment type is nil" do
+          expect(subject.get_lmgb_results_jwt(account, "1", nil)).to eq nil
+        end
+
+        it "returns nil when assignment type is empty" do
+          expect(subject.get_lmgb_results_jwt(account, "1", "")).to eq nil
+        end
+      end
+
+      context "with outcomes provision settings" do
+        it "returns jwt with multiple assignment ids" do
+          expect(JWT).to receive(:encode).and_return "encoded"
+          expect(subject.get_lmgb_results_jwt(account, "1,2,3", "assign.type")).to eq "encoded"
+        end
+
+        it "returns jwt with single assignment" do
+          expect(JWT).to receive(:encode).and_return "encoded"
+          expect(subject.get_lmgb_results_jwt(account, "1", "assign.type")).to eq "encoded"
+        end
+      end
+    end
+  end
 end
