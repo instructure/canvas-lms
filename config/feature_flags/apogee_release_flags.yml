@@ -144,3 +144,15 @@ submission_comment_emojis:
       state: allowed_on # enable for automated testings builds and local testing
     development:
       state: allowed_on # enable for local development
+updated_mastery_connect_icon:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Updated Mastery Connect Icon
+  description: If set, displays updated mastery connect icon
+  environments:
+    ci:
+      state: on # enable for automated testings builds and local testing
+    development:
+      state: on # enable for local development
+    test:
+      state: on # enable for the deployed 'test' environment
