@@ -179,7 +179,7 @@ class RceApiSource {
 
   fetchMedia(props) {
     const media = props.media[props.contextType]
-    const uri = media.bookmark || this.uriFor('media_objects', props)
+    const uri = media.bookmark || this.uriFor('media', props)
     return this.apiFetch(uri, headerFor(this.jwt))
   }
 

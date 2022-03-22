@@ -60,7 +60,8 @@ export default function Link(props) {
       // media_objects have these
       title: props.title,
       type: props.type,
-      embedded_iframe_url: props.embedded_iframe_url
+      embedded_iframe_url: props.embedded_iframe_url,
+      media_entry_id: props.media_entry_id
     }
     if (canPreview) {
       attrs['data-canvas-previewable'] = true
