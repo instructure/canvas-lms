@@ -1228,12 +1228,12 @@ modules.initModuleManagement = function (duplicate) {
         let displayType
         const data = $(this).getTemplateData({textValues: ['id', 'type']})
         data.title = $(this).find('.title').attr('title')
-        if (data.type === 'assignment') {
+        if (data.type === 'quiz' || data.type === 'lti-quiz' || $(this).hasClass('lti-quiz')) {
+          displayType = I18n.t('optgroup.quizzes', 'Quizzes')
+        } else if (data.type === 'assignment') {
           displayType = I18n.t('optgroup.assignments', 'Assignments')
         } else if (data.type === 'attachment') {
           displayType = I18n.t('optgroup.files', 'Files')
-        } else if (data.type === 'quiz' || data.type === 'lti-quiz') {
-          displayType = I18n.t('optgroup.quizzes', 'Quizzes')
         } else if (data.type === 'external_url') {
           displayType = I18n.t('optgroup.external_urls', 'External URLs')
         } else if (data.type === 'context_external_tool') {
