@@ -79,22 +79,32 @@ class ContextModulesController < ApplicationController
         @last_web_export = @context.web_zip_exports.visible_to(@current_user).order("epub_exports.created_at").last
       end
 
-      @menu_tools = {}
-      placements = %i[assignment_menu discussion_topic_menu file_menu module_menu quiz_menu wiki_page_menu]
+      placements = %i[
+        assignment_menu
+        discussion_topic_menu
+        file_menu
+        module_menu
+        quiz_menu
+        wiki_page_menu
+        module_index_menu
+        module_group_menu
+        module_index_menu_modal
+      ]
       tools = GuardRail.activate(:secondary) do
         ContextExternalTool.all_tools_for(@context, placements: placements,
                                                     root_account: @domain_root_account, current_user: @current_user).to_a
       end
-      placements.select { |p| @menu_tools[p] = tools.select { |t| t.has_placement? p } }
 
-      favorites_enabled = @domain_root_account&.feature_enabled?(:commons_favorites)
-      @module_index_tools = favorites_enabled ? external_tools_display_hashes(:module_index_menu) : []
-      @module_group_tools = favorites_enabled ? external_tools_display_hashes(:module_group_menu) : []
-      @module_menu_tools = GuardRail.activate(:secondary) do
-        ContextExternalTool.all_tools_for(@context, placements: :module_index_menu_modal,
-                                                    root_account: @domain_root_account, current_user: @current_user).to_a
+      @menu_tools = {}
+      placements.each do |p|
+        @menu_tools[p] = tools.select { |t| t.has_placement? p }
       end
-      module_menu_tool_definitions = Lti::AppLaunchCollator.launch_definitions(@module_menu_tools, [:module_index_menu_modal])
+
+      # only show tray tools when feature flag is enabled
+      unless @domain_root_account&.feature_enabled?(:commons_favorites)
+        @menu_tools[:module_index_menu] = []
+        @menu_tools[:module_group_menu] = []
+      end
 
       module_file_details = load_module_file_details if @context.grants_right?(@current_user, session, :manage_content)
       js_env course_id: @context.id,
@@ -105,8 +115,7 @@ class ContextModulesController < ApplicationController
                usage_rights_required: @context.usage_rights_required?,
                manage_files_edit: @context.grants_right?(@current_user, session, :manage_files_edit)
              },
-             MODULE_TRAY_TOOLS: { module_index_menu: @module_index_tools, module_group_menu: @module_group_tools },
-             MODULE_MENU_TOOLS: module_menu_tool_definitions,
+             MODULE_TOOLS: module_tool_definitions,
              DEFAULT_POST_TO_SIS: @context.account.sis_default_grade_export[:value] && !AssignmentUtil.due_date_required_for_account?(@context.account),
              new_quizzes_modules_support: Account.site_admin.feature_enabled?(:new_quizzes_modules_support)
 
@@ -124,6 +133,19 @@ class ContextModulesController < ApplicationController
     end
 
     private
+
+    def module_tool_definitions
+      tools = {}
+      # commons favorites tray placements expect tool in display_hash format
+      %i[module_index_menu module_group_menu].each do |type|
+        tools[type] = @menu_tools[type].map { |t| external_tool_display_hash(t, type) }
+      end
+      # newer modal placements expect tool in launch_definition format
+      %i[module_index_menu_modal].each do |type|
+        tools[type] = Lti::AppLaunchCollator.launch_definitions(@menu_tools[type], [type])
+      end
+      tools
+    end
 
     def combined_active_quizzes
       classic_quizzes = @context
