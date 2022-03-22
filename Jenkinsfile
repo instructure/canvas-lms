@@ -563,6 +563,11 @@ pipeline {
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                     ])
 
+                  // Trigger Crystalball map build if spec files were added or removed, will not vote on builds.
+                  if (configuration.isChangeMerged() && filesChangedStage.hasNewDeletedSpecFiles(buildConfig)) {
+                    build(wait: false, job: 'Canvas/proofs-of-concept/crystalball-map')
+                  }
+
                   extendedStage('Flakey Spec Catcher')
                     .hooks(buildSummaryReportHooks.call())
                     .required(!configuration.isChangeMerged() && filesChangedStage.hasSpecFiles(buildConfig) || configuration.forceFailureFSC() == '1')
