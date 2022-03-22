@@ -207,10 +207,29 @@ module CanvasRails
     Autoextend.hook(:"ActiveRecord::ConnectionAdapters::PostgreSQLAdapter",
                     PostgreSQLEarlyExtensions,
                     method: :prepend)
-
     Autoextend.hook(:"ActiveRecord::ConnectionAdapters::PostgreSQL::OID::TypeMapInitializer",
                     TypeMapInitializerExtensions,
                     method: :prepend)
+
+    module RailsCacheShim
+      def delete(key, options = nil)
+        r1 = super(key, (options || {}).merge(use_new_rails: !CANVAS_RAILS6_0)) # prefer rails new if on old rails and vice versa
+        r2 = super(key, (options || {}).merge(use_new_rails: CANVAS_RAILS6_0))
+        r1 || r2
+      end
+
+      private
+
+      def normalize_key(key, options)
+        namespaced = options&.key?(:use_new_rails) ? options[:use_new_rails] : !CANVAS_RAILS6_0
+        super(key, options.merge(namespace: namespaced ? "rails61#{options.fetch(:namespace, "")}" : options[:namespace]))
+      end
+    end
+
+    Autoextend.hook(:"ActiveSupport::Cache::Store",
+                    RailsCacheShim,
+                    method: :prepend)
+
     module PatchThorWarning
       # active_model_serializers should be passing `type: :boolean` here:
       # https://github.com/rails-api/active_model_serializers/blob/v0.9.0.alpha1/lib/active_model/serializer/generators/serializer/scaffold_controller_generator.rb#L10
