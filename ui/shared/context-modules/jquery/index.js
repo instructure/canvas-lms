@@ -2686,14 +2686,15 @@ $(document).ready(function () {
       ev.preventDefault()
     }
     const launchType = ev.target.dataset.toolLaunchType
+    // modal placements use ExternalToolModalLauncher which expects a tool in the launch_definition format
+    const idAttribute = launchType.includes('modal') ? 'definition_id' : 'id'
+    const tool = findToolFromEvent(ENV.MODULE_TOOLS[launchType], idAttribute, ev)
 
     if (launchType === 'module_index_menu_modal') {
-      const tool = findToolFromEvent(ENV.MODULE_MENU_TOOLS, 'definition_id', ev)
       setExternalToolModal(tool, launchType, $('.al-trigger')[0], true)
       return
     }
 
-    const tool = findToolFromEvent(ENV.MODULE_TRAY_TOOLS[launchType], 'id', ev)
     const moduleData = []
     if (launchType == 'module_index_menu') {
       // include all modules
