@@ -59,10 +59,11 @@ module Lti
                     homework_submission
                     link_selection
                     migration_selection
-                    module_menu
                     module_group_menu
                     module_index_menu
                     module_index_menu_modal
+                    module_menu
+                    module_menu_modal
                     post_grades
                     quiz_menu
                     quiz_index_menu

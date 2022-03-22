@@ -56,7 +56,8 @@ export default class Placement extends React.Component {
     'link_selection',
     'collaboration',
     'course_assignments_menu',
-    'module_index_menu_modal'
+    'module_index_menu_modal',
+    'module_menu_modal'
   ]
 
   isAlwaysDeeplinking(placementName) {
@@ -65,7 +66,7 @@ export default class Placement extends React.Component {
 
   messageTypeSelectable(placementName) {
     if (
-      placementName === 'course_assignments_menu' &&
+      ['course_assignments_menu', 'module_menu_modal'].includes(placementName) &&
       !ENV.FEATURES.lti_multiple_assignment_deep_linking
     ) {
       return false
