@@ -27,9 +27,6 @@ require "rails/test_unit/railtie"
 
 Bundler.require(*Rails.groups)
 
-# TODO: remove once no plugins require this
-CANVAS_ZEITWERK = true
-
 module CanvasRails
   class Application < Rails::Application
     config.autoloader = :zeitwerk
