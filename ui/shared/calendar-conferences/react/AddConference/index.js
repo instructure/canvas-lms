@@ -51,6 +51,23 @@ const AddConference = ({
       setRetrievingLTI(false)
       const {title, text: description, ...ltiSettings} = ltiContent
       ltiSettings.tool_id = selectedType?.lti_settings?.tool_id
+
+      // A deep linking response may contain settings for launching the LTI Tool
+      //   ltiContent?.iframe?.src
+      //   ltiContent?.iframe?.width
+      //   ltiContent?.iframe?.height
+
+      // the conference_selection placement launches the LTI tool in a new tab, so the only useful attribute in the
+      // response is the src
+      if (ltiContent?.iframe?.src) {
+        ltiSettings.url = ltiContent?.iframe?.src
+      }
+
+      // don't set Conference with iframe Object in ltiSettings, it is not used
+      if (ltiSettings.iframe) {
+        delete ltiSettings.iframe
+      }
+
       setConference({
         conference_type: 'LtiConference',
         title: title || I18n.t('%{name} Conference', {name: selectedType.name}),
