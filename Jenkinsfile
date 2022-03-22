@@ -470,7 +470,17 @@ pipeline {
                         archiveArtifacts allowEmptyArchive: true, artifacts: 'tmp/crystalball_map_version.txt'
                       /* groovylint-disable-next-line CatchException */
                       } catch (Exception e) {
-                        // don't fail build for this
+                        // default to full run of specs
+                        sh 'echo -n "." > tmp/crystalball_spec_list.txt'
+                        sh 'echo -n "broken map, defaulting to run all tests" > tmp/crystalball_map_version.txt'
+
+                        archiveArtifacts allowEmptyArchive: true, artifacts: 'tmp/crystalball_spec_list.txt, tmp/crystalball_map_version.txt'
+
+                        slackSend(
+                          channel: '#crystalball-noisy',
+                          color: 'danger',
+                          message: "${env.JOB_NAME} <${getSummaryUrl()}|#${env.BUILD_NUMBER}>\n\nFailed to generate prediction!"
+                        )
                       }
                     }
 
