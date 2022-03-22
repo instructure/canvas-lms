@@ -220,6 +220,21 @@ describe ImportedHtmlConverter do
       expect(convert_and_replace(test_string)).to eq repaired_string
     end
 
+    it "converts source tags to RCE media iframes" do
+      test_string = %(<video style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt"><source src="/media_objects_iframe/0_l4l5n0wt?type=video" data-media-id="0_l4l5n0wt" data-media-type="video"></video>)
+      converted_string = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt" src="/media_objects_iframe/0_l4l5n0wt?type=video"></iframe>)
+      expect(convert_and_replace(test_string)).to eq converted_string
+
+      test_string = %(<audio style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="audio" data-media-id="0_l4l5n0wt"><source src="/media_objects_iframe/0_l4l5n0wt?type=audio" data-media-id="0_l4l5n0wt" data-media-type="audio"></audio>)
+      converted_string = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="audio" data-media-id="0_l4l5n0wt" src="/media_objects_iframe/0_l4l5n0wt?type=audio"></iframe>)
+      expect(convert_and_replace(test_string)).to eq converted_string
+    end
+
+    it "leaves source tags without data-media-id alone" do
+      test_string = %(<video style="width: 400px; height: 225px; display: inline-block;" title="this is a non-canvas video" allowfullscreen="allowfullscreen" allow="fullscreen"><source src="http://www.example.com/video.mov"></video>)
+      expect(convert_and_replace(test_string)).to eq test_string
+    end
+
     it "only converts url params" do
       test_string = <<~HTML
         <object>

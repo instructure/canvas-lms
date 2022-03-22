@@ -118,11 +118,11 @@ describe CC::CCHelper do
       expect(translated).to eq html
     end
 
-    it "translates new RCE media iframes" do
+    it "translates RCE media iframes to relevant HTML tags" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
       html = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="http://example.com/media_objects_iframe/abcde?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde"></iframe>)
       translated = @exporter.html_content(html)
-      expect(translated).to include %(src="$IMS-CC-FILEBASE$/media_objects/abcde.mp4")
+      expect(translated).to include %(<source src="$IMS-CC-FILEBASE$/media_objects/abcde.mp4" data-media-id="abcde" data-media-type="video">)
       expect(@exporter.media_object_infos[@obj.id]).not_to be_nil
       expect(@exporter.media_object_infos[@obj.id][:asset][:id]).to eq "one"
     end
@@ -152,11 +152,11 @@ describe CC::CCHelper do
       expect(translated).to include %(src="$IMS-CC-FILEBASE$/media_objects/abcde.mp4")
     end
 
-    it "ignores new RCE media iframes with an unknown media id" do
+    it "leaves sources unchanged for media iframes with unknown media id" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
       html = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="http://example.com/media_objects_iframe/deadbeef?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="deadbeef"></iframe>)
       translated = @exporter.html_content(html)
-      expect(translated).to eq html
+      expect(translated).to include %(src="http://example.com/media_objects_iframe/deadbeef?type=video")
       expect(@exporter.media_object_infos).to be_empty
     end
 
