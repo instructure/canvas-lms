@@ -89,6 +89,7 @@ class ContextModulesController < ApplicationController
         module_index_menu
         module_group_menu
         module_index_menu_modal
+        module_menu_modal
       ]
       tools = GuardRail.activate(:secondary) do
         ContextExternalTool.all_tools_for(@context, placements: placements,
@@ -143,7 +144,7 @@ class ContextModulesController < ApplicationController
         tools[type] = @menu_tools[type].map { |t| external_tool_display_hash(t, type) }
       end
       # newer modal placements expect tool in launch_definition format
-      %i[module_index_menu_modal].each do |type|
+      %i[module_index_menu_modal module_menu_modal].each do |type|
         tools[type] = Lti::AppLaunchCollator.launch_definitions(@menu_tools[type], [type])
       end
       tools

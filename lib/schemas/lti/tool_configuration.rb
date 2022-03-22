@@ -122,6 +122,7 @@ module Schemas::Lti
                             module_index_menu
                             module_index_menu_modal
                             module_menu
+                            module_menu_modal
                             post_grades
                             quiz_index_menu
                             quiz_menu
