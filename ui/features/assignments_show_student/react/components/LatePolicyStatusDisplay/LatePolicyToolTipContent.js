@@ -67,7 +67,9 @@ export default function LatePolicyToolTipContent(props) {
               <Text size="small">{I18n.t('Late Penalty')}</Text>
             </Flex.Item>
             <Flex.Item grow textAlign="end">
-              <Text size="small">-{props.pointsDeducted}</Text>
+              <Text size="small">
+                {pointsDeducted ? `-${props.pointsDeducted}` : I18n.t('None')}
+              </Text>
             </Flex.Item>
           </Flex>
         </Flex.Item>
