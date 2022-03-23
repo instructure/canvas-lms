@@ -36,7 +36,6 @@ pipeline {
     DOCKER_BUILDKIT = 1
     FORCE_FAILURE = configuration.forceFailureJS()
     PROGRESS_NO_TRUNC = 1
-    JEST_SPLIT_COUNT = 2
   }
 
   stages {
