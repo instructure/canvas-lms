@@ -150,7 +150,9 @@ pipeline {
                   uploadDest: 'canvas-lms-js/coverage'
                 ])
               }
-              generateSkippedSpecsReport()
+              if (env.GERRIT_EVENT_TYPE != 'comment-added') {
+                generateSkippedSpecsReport()
+              }
             }
           ]
 

@@ -169,7 +169,9 @@ pipeline {
                   uploadDest: env.COVERAGE_LOCATION
                 ])
               }
-              generateSkippedSpecsReport()
+              if (env.GERRIT_EVENT_TYPE != 'comment-added') {
+                generateSkippedSpecsReport()
+              }
             }
           ]
 
