@@ -218,8 +218,11 @@ module CanvasRails
       private
 
       def normalize_key(key, options)
-        namespaced = options&.key?(:use_new_rails) ? options[:use_new_rails] : !CANVAS_RAILS6_0
-        super(key, options.merge(namespace: namespaced ? "rails61#{options.fetch(:namespace, "")}" : options[:namespace]))
+        result = super
+        if options&.key?(:use_new_rails) ? options[:use_new_rails] : !CANVAS_RAILS6_0
+          result = "rails61:#{result}"
+        end
+        result
       end
     end
 
