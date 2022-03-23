@@ -35,6 +35,12 @@ describe "Jobs V2 API", type: :request do
              {}, {}, expected_status: 401)
   end
 
+  it "requries site admin for lookup" do
+    api_call(:get, "/api/v1/jobs2/123",
+             { controller: "jobs_v2", action: "lookup", format: "json", id: "123" },
+             {}, {}, expected_status: 401)
+  end
+
   context "as site admin" do
     before :once do
       site_admin_user
@@ -44,12 +50,14 @@ describe "Jobs V2 API", type: :request do
       before :once do
         ::Kernel.delay(run_at: 1.hour.ago).pp
         ::Kernel.delay(run_at: 2.hours.ago).p
-        ::Kernel.delay(run_at: 1.day.ago).pp
+        @queued_job_id = Delayed::Job.last.id
 
         # fake a held job to make sure it does appear
+        ::Kernel.delay(run_at: 1.day.ago).pp
         Delayed::Job.last.update locked_by: ::Delayed::Backend::Base::ON_HOLD_LOCKED_BY
+        @held_job_id = Delayed::Job.last.id
 
-        # fake a running job and a held job to be sure it doesn't appear
+        # fake a running job to be sure it doesn't appear
         ::Kernel.delay(run_at: 3.hours.ago).puts
         Delayed::Job.last.update locked_by: "foo", locked_at: 1.hour.ago
       end
@@ -177,6 +185,22 @@ describe "Jobs V2 API", type: :request do
                         { controller: "jobs_v2", action: "search", format: "json", bucket: "queued", group: "tag", term: "p" })
         expect(json).to eq({ "Kernel.pp" => 2, "Kernel.p" => 1 })
       end
+
+      it "finds a held job by id" do
+        json = api_call(:get, "/api/v1/jobs2/#{@held_job_id}",
+                        { controller: "jobs_v2", action: "lookup", format: "json", id: @held_job_id.to_s })
+        item = json.find { |row| row["id"] == @held_job_id }
+        expect(item["tag"]).to eq "Kernel.pp"
+        expect(item["bucket"]).to eq "queued"
+      end
+
+      it "finds a queued job by id" do
+        json = api_call(:get, "/api/v1/jobs2/#{@queued_job_id}",
+                        { controller: "jobs_v2", action: "lookup", format: "json", id: @queued_job_id.to_s })
+        item = json.find { |row| row["id"] == @queued_job_id }
+        expect(item["tag"]).to eq "Kernel.p"
+        expect(item["bucket"]).to eq "queued"
+      end
     end
 
     describe "running jobs" do
@@ -251,6 +275,15 @@ describe "Jobs V2 API", type: :request do
                         { controller: "jobs_v2", action: "search", format: "json", bucket: "running", group: "tag", term: "p" })
         expect(json).to eq({ "Kernel.pp" => 2, "Kernel.p" => 1 })
       end
+
+      it "finds a job by id" do
+        job = Delayed::Job.where(locked_by: "foo").take
+        json = api_call(:get, "/api/v1/jobs2/#{job.id}",
+                        { controller: "jobs_v2", action: "lookup", format: "json", id: job.to_param })
+        item = json.find { |row| row["id"] == job.id }
+        expect(item["tag"]).to eq "Kernel.p"
+        expect(item["bucket"]).to eq "running"
+      end
     end
 
     describe "future" do
@@ -314,6 +347,15 @@ describe "Jobs V2 API", type: :request do
                         { controller: "jobs_v2", action: "search", format: "json", bucket: "future", group: "tag", term: "p" })
         expect(json).to eq({ "Kernel.pp" => 1, "Kernel.p" => 1 })
       end
+
+      it "finds a job by id" do
+        job = Delayed::Job.last
+        json = api_call(:get, "/api/v1/jobs2/#{job.id}",
+                        { controller: "jobs_v2", action: "lookup", format: "json", id: job.to_param })
+        item = json.find { |row| row["id"] == job.id }
+        expect(item["tag"]).to eq "Kernel.p"
+        expect(item["bucket"]).to eq "future"
+      end
     end
 
     describe "failed" do
@@ -353,6 +395,24 @@ describe "Jobs V2 API", type: :request do
         json = api_call(:get, "/api/v1/jobs2/failed/by_tag/search?term=ais",
                         { controller: "jobs_v2", action: "search", format: "json", bucket: "failed", group: "tag", term: "ais" })
         expect(json).to eq({ "Kernel.raise" => 2 })
+      end
+
+      it "finds a failed job by id" do
+        job = Delayed::Job::Failed.last
+        json = api_call(:get, "/api/v1/jobs2/#{job.id}",
+                        { controller: "jobs_v2", action: "lookup", format: "json", id: job.to_param })
+        item = json.find { |row| row["id"] == job.id }
+        expect(item["tag"]).to eq "Kernel.raise"
+        expect(item["bucket"]).to eq "failed"
+      end
+
+      it "finds a failed job by original_job_id" do
+        job = Delayed::Job::Failed.last
+        json = api_call(:get, "/api/v1/jobs2/#{job.original_job_id}",
+                        { controller: "jobs_v2", action: "lookup", format: "json", id: job.original_job_id.to_s })
+        item = json.find { |row| row["original_job_id"] == job.original_job_id }
+        expect(item["tag"]).to eq "Kernel.raise"
+        expect(item["bucket"]).to eq "failed"
       end
     end
   end

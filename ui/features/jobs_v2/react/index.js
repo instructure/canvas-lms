@@ -24,6 +24,7 @@ import JobsTable from './components/JobsTable'
 import GroupsTable from './components/GroupsTable'
 import JobDetails from './components/JobDetails'
 import SearchBox from './components/SearchBox'
+import JobLookup from './components/JobLookup'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
@@ -143,7 +144,7 @@ export default function JobsIndex() {
             {I18n.t('Jobs')}
           </Heading>
         </Flex.Item>
-        <Flex.Item size="33%" shouldGrow padding="medium 0 small 0">
+        <Flex.Item size="33%" shouldGrow padding="large 0 small 0">
           <SearchBox
             bucket={state.bucket}
             group={state.group_type}
@@ -153,7 +154,7 @@ export default function JobsIndex() {
             }}
           />
         </Flex.Item>
-        <Flex.Item padding="medium 0 small xx-small">
+        <Flex.Item padding="large 0 small xx-small">
           <IconButton
             withBorder={false}
             withBackground={false}
@@ -172,9 +173,31 @@ export default function JobsIndex() {
         onClickJob={job => dispatch({type: 'SELECT_JOB', payload: job})}
         onClickHeader={col => dispatch({type: 'CHANGE_JOBS_ORDER', payload: col})}
       />
-      <Heading level="h2" margin="large 0 small 0">
-        {I18n.t('Details')}
-      </Heading>
+      <Flex alignItems="end">
+        <Flex.Item size="33%">
+          <Heading level="h2" margin="large 0 small 0">
+            {I18n.t('Details')}
+          </Heading>
+        </Flex.Item>
+        <Flex.Item size="33%" shouldGrow padding="large 0 small 0">
+          <JobLookup
+            manualSelection={state.job?.id || ''}
+            setSelectedItem={item => {
+              dispatch({type: 'SELECT_JOB', payload: item})
+            }}
+          />
+        </Flex.Item>
+        <Flex.Item padding="large 0 small xx-small">
+          <IconButton
+            withBorder={false}
+            withBackground={false}
+            screenReaderLabel={I18n.t('Clear job selection')}
+            renderIcon={<IconXSolid />}
+            interaction={state.job ? 'enabled' : 'disabled'}
+            onClick={() => dispatch({type: 'SELECT_JOB', payload: null})}
+          />
+        </Flex.Item>
+      </Flex>
       <JobDetails job={state.job} />
     </>
   )

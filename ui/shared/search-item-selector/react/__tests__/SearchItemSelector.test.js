@@ -125,6 +125,22 @@ describe('SearchItemSelector', () => {
     expect(handleCourseSelected).toHaveBeenCalledWith(null)
   })
 
+  it("doesn't trigger onItemSelected when changing a manualSelection", () => {
+    testSearchFunction.mockImplementationOnce(({success}) => success([{id: 'foo', name: 'bar'}]))
+    const handleCourseSelected = jest.fn()
+    const {getByLabelText} = render(
+      <SearchItemSelector
+        itemSearchFunction={testSearchFunction}
+        onItemSelected={handleCourseSelected}
+        renderLabel="Select a course"
+        manualSelection="bar"
+      />
+    )
+    const selectInput = getByLabelText(/select a course/i)
+    fireEvent.change(selectInput, {target: {value: 'barn'}})
+    expect(handleCourseSelected).not.toHaveBeenCalled()
+  })
+
   it('renders no results if search comes back empty', async () => {
     testSearchFunction.mockImplementationOnce(({success}) => success([]))
     const {getByLabelText, findByText} = render(

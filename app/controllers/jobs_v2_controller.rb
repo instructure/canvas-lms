@@ -123,7 +123,7 @@ class JobsV2Controller < ApplicationController
   #   Search term
   #
   # @example_request
-  #     curl https://<canvas>/jobs2/running/by_tag/search?term=foo \
+  #     curl https://<canvas>/api/v1/jobs2/running/by_tag/search?term=foo \
   #          -H 'Authorization: Bearer <token>'
   #
   # @example_response
@@ -140,6 +140,32 @@ class JobsV2Controller < ApplicationController
              .count(:id)
 
     render json: result
+  end
+
+  # @{not an}API Lookup job by id or original_job_id
+  #
+  # Searches all job buckets including queued, running, future, and failed.
+  # for failed jobs, it will find by original_job_id or id, in that order
+  # of preference. theoretically two jobs could be returned if a failed job's
+  # id matches a different failed job's original_job_id, but in production
+  # original job ids are much greater than failed job ids so overlap is rare.
+  #
+  # an additional +bucket+ will be returned indicating whether the job is
+  # running, queued, future, or failed
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/jobs2/123 \
+  #          -H 'Authorization: Bearer <token>'
+  def lookup
+    id = params[:id]
+    raise ActionController::BadRequest unless id.present?
+
+    jobs = Delayed::Job.where(id: id).to_a
+    jobs.concat Delayed::Job::Failed.where(id: id).or(
+      Delayed::Job::Failed.where(original_job_id: id)
+    ).order(:id).to_a
+
+    render json: jobs.map { |job| job_json(job) }
   end
 
   protected
@@ -171,11 +197,28 @@ class JobsV2Controller < ApplicationController
     { :count => row.count, group => row[group], :info => grouped_info_data(row, base_time: base_time) }
   end
 
-  def job_json(job, base_time:)
+  def job_json(job, base_time: nil)
     job_fields = %w[id tag strand singleton shard_id max_concurrent priority attempts max_attempts locked_by run_at locked_at handler]
-    job_fields += %w[failed_at original_job_id last_error] if @bucket == "failed"
+    job_fields += %w[failed_at original_job_id last_error] if job.is_a?(Delayed::Job::Failed)
     json = api_json(job, @current_user, nil, only: job_fields)
-    json.merge("info" => list_info_data(job, base_time: base_time))
+    if @bucket && base_time
+      json["info"] = list_info_data(job, base_time: base_time)
+    else
+      json["bucket"] = infer_bucket(job)
+    end
+    json
+  end
+
+  def infer_bucket(job)
+    if job.is_a?(Delayed::Job::Failed)
+      "failed"
+    elsif job.locked_at && job.locked_by != ::Delayed::Backend::Base::ON_HOLD_LOCKED_BY
+      "running"
+    elsif job.run_at <= Time.zone.now
+      "queued"
+    else
+      "future"
+    end
   end
 
   def grouped_order_clause(group_type)
