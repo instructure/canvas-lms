@@ -20,7 +20,6 @@
 
 describe I18n do
   context "_core_en.js" do
-
     # HINT: if this spec fails, run `rake i18n:generate_js`...
     # it probably means you added a format or a new language
     it "is up-to-date" do
@@ -33,7 +32,7 @@ describe I18n do
       # computations that need to happen so let's do the next best thing and just check that
       # the expected scopes exist and are rendered correctly.
       translations.each do |scope, scope_translations|
-        expected_translations_js = I18nTasks::Utils.lazy_translations_js('en', scope, {}, scope_translations)
+        expected_translations_js = I18nTasks::Utils.lazy_translations_js("en", scope, {}, scope_translations)
 
         expect(file_contents).to include(expected_translations_js)
       end
