@@ -2436,7 +2436,8 @@ CanvasRails::Application.routes.draw do
     scope(controller: :jobs_v2) do
       get "jobs2/:bucket/by_:group/search", action: :search
       get "jobs2/:bucket/by_:group", action: :grouped_info, as: :jobs_grouped_info
-      get "jobs2/:bucket", action: :list, as: :jobs_list
+      get "jobs2/:bucket", action: :list, as: :jobs_list, constraints: { bucket: /running|queued|future|failed/ }
+      get "jobs2/:id", action: :lookup, constraints: { id: /\d+/ }
     end
   end
 

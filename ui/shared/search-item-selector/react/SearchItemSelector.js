@@ -113,7 +113,7 @@ export default function SearchItemSelector({
   const handleInputChanged = ev => {
     setInputValue(ev.target.value)
     setSearchTerm(ev.target.value)
-    if (selectedItem !== null) onItemSelected(null)
+    if (selectedItem !== null && !manualSelection) onItemSelected(null)
     setSelectedItem(null)
   }
 
