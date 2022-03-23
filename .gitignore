@@ -22,7 +22,7 @@
 !/config/crystalball.yml
 /config/environments/*-local.rb
 /config/locales/generated/
-/config/RAILS6_1
+/config/RAILS_VERSION
 /coverage/
 /coverage-js/
 /db/schema.rb

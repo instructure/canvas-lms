@@ -19,7 +19,7 @@
 
 module Autoextend
   class Railtie < Rails::Railtie
-    # CANVAS_RAILS6_1 this method will need changing for a post-rails 6.1 world
+    # CANVAS_RAILS="6.1" this method will need changing for a post-rails 6.1 world
     initializer "inject autoextend hooks" do
       ::Autoextend.inject_into_zetwerk
     end
