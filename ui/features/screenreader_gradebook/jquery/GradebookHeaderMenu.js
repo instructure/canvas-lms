@@ -180,8 +180,9 @@ export default class GradebookHeaderMenu {
     return dialog.show()
   }
 
-  // TODO(EVAL): This needs to be implemented in EVAL-2064.
-  handleSendMessageStudentsWho = () => {}
+  handleSendMessageStudentsWho = args => {
+    this.gradebook.sendMesssageStudentsWho(args)
+  }
 
   messageStudentsWho(
     opts = {

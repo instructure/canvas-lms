@@ -90,6 +90,19 @@ function updateGradebookFilter(courseId, filter) {
   })
 }
 
+function sendMesssageStudentsWho(recipientsIds, subject, body, contextCode) {
+  const params = {
+    recipients: recipientsIds,
+    subject,
+    body,
+    context_code: contextCode,
+    mode: 'async',
+    group_conversation: true,
+    bulk_message: true
+  }
+  return axios.post('/api/v1/conversations', params)
+}
+
 export default {
   applyScoreToUngradedSubmissions,
   createGradebookFilter,
@@ -99,5 +112,6 @@ export default {
   updateColumnOrder,
   updateGradebookFilter,
   updateSubmission,
-  updateTeacherNotesColumn
+  updateTeacherNotesColumn,
+  sendMesssageStudentsWho
 }

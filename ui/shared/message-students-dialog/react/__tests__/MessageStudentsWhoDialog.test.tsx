@@ -959,4 +959,184 @@ describe('MessageStudentsWhoDialog', () => {
       expectToBeSelected(observerCells[0])
     })
   })
+
+  describe('send message button', () => {
+    it('is disabled when the message body is empty', async () => {
+      const mocks = await makeMocks()
+
+      const {findByRole, getByTestId} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <MessageStudentsWhoDialog {...makeProps()} />
+        </MockedProvider>
+      )
+
+      const recipientsButton = await findByRole('button', {name: 'Show all recipients'})
+      fireEvent.click(recipientsButton)
+
+      const messageTextArea = getByTestId('message-input')
+      fireEvent.change(messageTextArea, {target: {value: ''}})
+
+      const sendButton = await findByRole('button', {name: 'Send'})
+      expect(sendButton.disabled).toBe(true)
+    })
+
+    it('is disabled when there are no students/observers selected', async () => {
+      const mocks = await makeMocks()
+
+      const {findByRole} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <MessageStudentsWhoDialog {...makeProps()} />
+        </MockedProvider>
+      )
+
+      const recipientsButton = await findByRole('button', {name: 'Show all recipients'})
+      const checkbox = (await findByRole('checkbox', {name: /Students/})) as HTMLInputElement
+
+      fireEvent.click(recipientsButton)
+      fireEvent.click(checkbox)
+
+      const sendButton = await findByRole('button', {name: 'Send'})
+      expect(sendButton.disabled).toBe(true)
+    })
+
+    it('is enabled when the message body is not empty and there is at least one student/observer selected', async () => {
+      const mocks = await makeMocks()
+
+      const {findByRole, getByTestId} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <MessageStudentsWhoDialog {...makeProps()} />
+        </MockedProvider>
+      )
+
+      const recipientsButton = await findByRole('button', {name: 'Show all recipients'})
+      fireEvent.click(recipientsButton)
+
+      const messageTextArea = getByTestId('message-input')
+      fireEvent.change(messageTextArea, {target: {value: 'FOO BAR'}})
+
+      const sendButton = await findByRole('button', {name: 'Send'})
+      expect(sendButton.disabled).toBe(false)
+    })
+  })
+
+  describe('onSend', () => {
+    let onClose: jest.Mock<any, any>
+    let onSend: jest.Mock<any, any>
+
+    beforeEach(() => {
+      onClose = jest.fn()
+      onSend = jest.fn()
+    })
+
+    it('is called with the specified subject', async () => {
+      const mocks = await makeMocks()
+
+      const {findByRole, getByTestId} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <MessageStudentsWhoDialog {...makeProps({onClose, onSend})} />
+        </MockedProvider>
+      )
+
+      const recipientsButton = await findByRole('button', {name: 'Show all recipients'})
+      fireEvent.click(recipientsButton)
+
+      const subjectInput = getByTestId('subject-input')
+      fireEvent.change(subjectInput, {target: {value: 'SUBJECT'}})
+
+      const messageTextArea = getByTestId('message-input')
+      fireEvent.change(messageTextArea, {target: {value: 'BODY'}})
+
+      const sendButton = await findByRole('button', {name: 'Send'})
+      fireEvent.click(sendButton)
+
+      expect(onSend).toHaveBeenCalledWith(expect.objectContaining({subject: 'SUBJECT'}))
+      expect(onClose).toHaveBeenCalled()
+    })
+
+    it('is called with the specified body', async () => {
+      const mocks = await makeMocks()
+
+      const {findByRole, getByTestId} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <MessageStudentsWhoDialog {...makeProps({onClose, onSend})} />
+        </MockedProvider>
+      )
+
+      const recipientsButton = await findByRole('button', {name: 'Show all recipients'})
+      fireEvent.click(recipientsButton)
+
+      const subjectInput = getByTestId('subject-input')
+      fireEvent.change(subjectInput, {target: {value: 'SUBJECT'}})
+
+      const messageTextArea = getByTestId('message-input')
+      fireEvent.change(messageTextArea, {target: {value: 'BODY'}})
+
+      const sendButton = await findByRole('button', {name: 'Send'})
+      fireEvent.click(sendButton)
+
+      expect(onSend).toHaveBeenCalledWith(expect.objectContaining({body: 'BODY'}))
+      expect(onClose).toHaveBeenCalled()
+    })
+
+    it('is called with the selected students', async () => {
+      const mocks = await makeMocks()
+
+      const {findByRole, getByRole, getByTestId} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <MessageStudentsWhoDialog {...makeProps({onClose, onSend})} />
+        </MockedProvider>
+      )
+
+      const recipientsButton = await findByRole('button', {name: 'Show all recipients'})
+      fireEvent.click(recipientsButton)
+
+      const studentCells = students.map(({name}) => getByRole('button', {name}))
+      fireEvent.click(studentCells[0])
+
+      const subjectInput = getByTestId('subject-input')
+      fireEvent.change(subjectInput, {target: {value: 'SUBJECT'}})
+
+      const messageTextArea = getByTestId('message-input')
+      fireEvent.change(messageTextArea, {target: {value: 'BODY'}})
+
+      const sendButton = await findByRole('button', {name: 'Send'})
+      fireEvent.click(sendButton)
+
+      expect(onSend).toHaveBeenCalledWith(expect.objectContaining({recipientsIds: ["101", "102", "103"]}))
+      expect(onClose).toHaveBeenCalled()
+    })
+
+    it('is called with the selected observers', async () => {
+      const mocks = await makeMocks()
+
+      const {findByRole, getByRole, getByTestId} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <MessageStudentsWhoDialog {...makeProps({onClose, onSend})} />
+        </MockedProvider>
+      )
+
+      const recipientsButton = await findByRole('button', {name: 'Show all recipients'})
+      fireEvent.click(recipientsButton)
+
+      const checkbox = (await findByRole('checkbox', {name: /Students/})) as HTMLInputElement
+      fireEvent.click(checkbox)
+
+      const observerCells = allObserverNames().map(name => getByRole('button', {name}))
+      fireEvent.click(observerCells[0])
+      fireEvent.click(observerCells[1])
+
+      const subjectInput = getByTestId('subject-input')
+      fireEvent.change(subjectInput, {target: {value: 'SUBJECT'}})
+
+      const messageTextArea = getByTestId('message-input')
+      fireEvent.change(messageTextArea, {target: {value: 'BODY'}})
+
+      const sendButton = await findByRole('button', {name: 'Send'})
+      fireEvent.click(sendButton)
+
+      const observerIds = mocks[0].result.data.course.enrollmentsConnection.nodes.map(node => node.user._id)
+      expect(onSend).toHaveBeenCalledWith(expect.objectContaining({recipientsIds: observerIds}))
+      expect(onClose).toHaveBeenCalled()
+    })
+  })
 })
