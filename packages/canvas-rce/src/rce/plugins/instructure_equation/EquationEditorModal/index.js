@@ -222,6 +222,7 @@ export default class EquationEditorModal extends Component {
         return {advanced: true, workingFormula: this.mathField.getValue()}
       }
     })
+    this.setPreviewElementContent()
   }
 
   handleOpen = () => {
