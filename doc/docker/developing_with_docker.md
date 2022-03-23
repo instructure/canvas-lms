@@ -29,8 +29,8 @@ the `./script/docker_dev_setup.sh` (as well as the `./script/docker_dev_update.s
 one into the root directory for docker-compose to use.
 The `docker-compose.override.yml` file is ignored by git in the `.gitignore` file, so you must provide one or run the
 setup script before running docker-compose.
-You may manually copy the `config/docker-compose.override.yml.example` to `docker-compose.override.yml` with the following
-command: `cp config/docker-compose.override.yml.example docker-compose.override.yml`.
+You may manually copy the `docker-compose/config/docker-compose.override.yml.example` to `docker-compose.override.yml` with the following
+command: `cp docker-compose/config/docker-compose.override.yml.example docker-compose.override.yml`.
 Keep in mind copying this manually will overwrite any existing `docker-compose.override.yml` file, whereas the setup
 script will not overwrite an existing configuration.
 If you need more than what the default override provides you should use a `.env` file to set your `COMPOSE_FILE` environment variable.

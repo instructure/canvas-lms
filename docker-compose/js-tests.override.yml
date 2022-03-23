@@ -6,22 +6,8 @@ services:
   js-tests:
     build: ./docker-compose/karma
     volumes:
-      - .:/usr/src/app
-      - brandable_css_brands:/usr/src/app/stylesheets/brandable_css_brands
-      - public_dist:/usr/src/app/public/dist
-      - i18nliner_node_modules:/usr/src/app/gems/canvas_i18nliner/node_modules
-      - log:/usr/src/app/log
-      - node_modules:/usr/src/app/node_modules
-      - tmp:/usr/src/app/tmp
+      - code:/usr/src/app
       - yarn-cache:/home/docker/.cache/yarn
     environment:
       NODE_ENV: CI
     command: yarn run test:karma:watch:headless
-volumes:
-  brandable_css_brands: {}
-  public_dist: {}
-  i18nliner_node_modules: {}
-  log: {}
-  node_modules: {}
-  tmp: {}
-  yarn-cache: {}

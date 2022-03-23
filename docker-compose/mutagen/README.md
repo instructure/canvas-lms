@@ -25,7 +25,7 @@ Then follow the instructions at https://github.com/mutagen-io/mutagen-compose#in
 
 # Setting up and running canvas
 
-You can use the `docker_dev_setup.sh --mutagen` to get setup. It will copy the `docker-compose.override.yml` for mutagen.
+You can use the `docker_dev_setup.sh` to get setup. It will copy the `docker-compose.override.yml` for mutagen.
 Or you can do your initial setup using manual steps documented in
 [develping_with_docker.md](../../doc/docker/developing_with_docker.md) but using the `docker-compose.override.yml` file
 in this directory as your base.
