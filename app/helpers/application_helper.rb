@@ -972,8 +972,8 @@ module ApplicationHelper
   end
 
   def add_uri_scheme_name(uri)
-    noSchemeName = !uri.match(%r{^(.+)://(.+)})
-    uri = "http://" + uri if noSchemeName
+    no_scheme_name = !uri.match(%r{^(.+)://(.+)})
+    uri = "http://" + uri if no_scheme_name
     uri
   end
 
@@ -981,10 +981,7 @@ module ApplicationHelper
     # may be overridden by a plugin
     @agree_to_terms ||
       I18n.t(
-        "I agree to the *terms of use*.",
-        wrapper: {
-          "*" => link_to('\1', "#", class: "terms_of_service_link")
-        }
+        "I agree to the *terms of use*.", wrapper: '<span class="terms_of_service_link">\1</span>'
       )
   end
 
