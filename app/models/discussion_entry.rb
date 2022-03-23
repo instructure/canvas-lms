@@ -92,6 +92,16 @@ class DiscussionEntry < ActiveRecord::Base
     end
   end
 
+  def parse_message(user)
+    if message.include?("instructure_inline_media_comment")
+      api_user_content(message, discussion_topic.context, user)
+    else
+      message
+    end
+  rescue NoMethodError
+    message
+  end
+
   def mentioned_users
     User.where(id: mentions.distinct.select("user_id")).to_a
   end
