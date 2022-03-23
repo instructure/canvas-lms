@@ -42,9 +42,17 @@ module Types
     def message
       if object.deleted?
         nil
+      elsif object.message.include?("instructure_inline_media_comment") && object.message.include?("video_comment")
+        load_association(:discussion_topic).then do |topic|
+          message_id = object.message.match(%r{<a.*>.*</a>}).to_s.match(/m-[[:alnum:]]*/)
+          translated_to_video_tag = "<div><video preload=\"none\" class=\"instructure_inline_media_comment\" data-media_comment_id=\"#{message_id}\" data-media_comment_type=\"video\" controls=\"controls\" poster=\"#{request&.protocol}#{request&.domain}/media_objects/#{message_id}/thumbnail?height=448&amp;type=3&amp;width=550\" src=\"#{request&.protocol}#{request&.domain}/#{topic.context_type.pluralize.downcase}/#{topic.context_id}/media_download?entryId=#{message_id}&amp;media_type=video&amp;redirect=1\" data-alt=\"\"></video></div>"
+          object.message.split(%r{<a.*>.*</a>}).join(translated_to_video_tag)
+        end
       else
-        object.parse_message(current_user)
+        object.message
       end
+    rescue NoMethodError
+      "message not processed"
     end
 
     field :preview_message, String, null: true
