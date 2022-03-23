@@ -25,7 +25,8 @@ module Lti::IMS::Concerns
     ALLOW_LINE_ITEM_PLACEMENTS = %w[course_assignments_menu module_index_menu_modal assignment_selection link_selection].freeze
 
     def create_resources_from_content_items?
-      add_module_items? || add_assignment?
+      add_item_to_existing_module = params[:context_module_id].present?
+      create_new_module? || add_item_to_existing_module || add_assignment?
     end
 
     def add_assignment?
@@ -42,20 +43,10 @@ module Lti::IMS::Concerns
       ALLOW_LINE_ITEM_PLACEMENTS.include?(params[:placement])
     end
 
-    def add_module_items?
-      return true if create_new_module?
-
-      add_item_to_existing_module? && lti_resource_links.length > 1
-    end
-
     def create_new_module?
       return false unless @context.root_account.feature_enabled?(:lti_deep_linking_module_index_menu_modal)
 
       CREATE_NEW_MODULE_PLACEMENTS.include?(params[:placement])
-    end
-
-    def add_item_to_existing_module?
-      params[:context_module_id].present?
     end
 
     # the iframe property in a deep linking response can contain
