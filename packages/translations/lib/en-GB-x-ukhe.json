@@ -101,6 +101,9 @@
     "arrows_464a3e54": {
         "message": "Arrows"
     },
+    "art_icon_8e1daad": {
+        "message": "Art Icon"
+    },
     "aspect_ratio_will_be_preserved_cb5fdfb8": {
         "message": "Aspect ratio will be preserved"
     },
@@ -205,6 +208,9 @@
     },
     "clear_2084585f": {
         "message": "Clear"
+    },
+    "clear_image_3213fe62": {
+        "message": "Clear image"
     },
     "clear_selected_file_82388e50": {
         "message": "Clear selected file"
@@ -313,6 +319,9 @@
     },
     "creative_commons_license_725584ae": {
         "message": "Creative Commons Licence:"
+    },
+    "crop_image_41bf940c": {
+        "message": "Crop image"
     },
     "crop_image_807ebb08": {
         "message": "Crop Image"
@@ -476,6 +485,12 @@
     "embedded_content_aaeb4d3d": {
         "message": "embedded content"
     },
+    "engineering_icon_f8f3cf43": {
+        "message": "Engineering Icon"
+    },
+    "english_icon_25bfe845": {
+        "message": "English Icon"
+    },
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "Enter at least 3 characters to search"
     },
@@ -520,6 +535,12 @@
     },
     "extra_small_9ae33252": {
         "message": "Extra Small"
+    },
+    "extracurricular_icon_67c8ca42": {
+        "message": "Extracurricular Icon"
+    },
+    "failed_getting_course_list_49846a93": {
+        "message": "Failed getting module list"
     },
     "failed_peeking_into_your_future_e95b9306": {
         "message": "Failed peeking into your future"
@@ -650,6 +671,9 @@
     "heading_4_b2e74be7": {
         "message": "Heading 4"
     },
+    "health_icon_8d292eb5": {
+        "message": "Health Icon"
+    },
     "height_69b03e15": {
         "message": "Height"
     },
@@ -676,6 +700,9 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "I hold the copyright"
+    },
+    "icon_color_b86dd6d6": {
+        "message": "Icon Colour"
     },
     "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
         "message": "If you do not select usage rights now, this file will be unpublished after it''s uploaded."
@@ -743,6 +770,12 @@
     "language_arts_35b79a8b": {
         "message": "Language Arts"
     },
+    "language_arts_icon_a798b0f8": {
+        "message": "Language Arts Icon"
+    },
+    "languages_icon_9d20539": {
+        "message": "Languages Icon"
+    },
     "large_9c5e80e7": {
         "message": "Large"
     },
@@ -751,6 +784,9 @@
     },
     "left_to_right_e9b4fd06": {
         "message": "Left-to-Right"
+    },
+    "library_icon_ae1e54cf": {
+        "message": "Library Icon"
     },
     "link_7262adec": {
         "message": "Link"
@@ -821,6 +857,9 @@
     "math_ede93050": {
         "message": "Maths"
     },
+    "math_icon_ad4e9d03": {
+        "message": "Math Icon"
+    },
     "media_af190855": {
         "message": "Media"
     },
@@ -847,6 +886,9 @@
     },
     "multi_color_image_63d7372f": {
         "message": "Multi Colour Image"
+    },
+    "music_icon_4db5c972": {
+        "message": "Music Icon"
     },
     "must_be_at_least_percentage_22e373b6": {
         "message": "Must be at least { percentage }%"
@@ -998,6 +1040,12 @@
     "percentage_must_be_a_number_8033c341": {
         "message": "Percentage must be a number"
     },
+    "performing_arts_icon_f3497486": {
+        "message": "Performing Arts Icon"
+    },
+    "physical_education_icon_d7dffd3e": {
+        "message": "Physical Education Icon"
+    },
     "pixels_52ece7d1": {
         "message": "Pixels"
     },
@@ -1063,6 +1111,9 @@
     },
     "relationships_6602af70": {
         "message": "Relationships"
+    },
+    "religion_icon_246e0be1": {
+        "message": "Religion Icon"
     },
     "reminder_date_4564d12d": {
         "message": "Reminder: { date }"
@@ -1483,5 +1534,11 @@
     },
     "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
         "message": "You''ve scrolled back to your very first to-do!"
+    },
+    "zoom_in_image_bb97d4f": {
+        "message": "Zoom in image"
+    },
+    "zoom_out_image_d0a0a2ec": {
+        "message": "Zoom out image"
     }
 }
