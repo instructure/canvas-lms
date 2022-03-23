@@ -26,6 +26,18 @@ import {
 const $fixtures = document.getElementById('fixtures')
 
 QUnit.module('Gradebook#getViewOptionsMenuProps', () => {
+  test('hideAssignmentGroupTotals is true when settings.hide_assignment_group_totals is "true"', () => {
+    const settings = {hide_assignment_group_totals: 'true'}
+    const {hideAssignmentGroupTotals} = createGradebook({settings}).getViewOptionsMenuProps()
+    strictEqual(hideAssignmentGroupTotals, true)
+  })
+
+  test('hideAssignmentGroupTotals is false when settings.hide_assignment_group_totals is "false"', () => {
+    const settings = {hide_assignment_group_totals: 'false'}
+    const {hideAssignmentGroupTotals} = createGradebook({settings}).getViewOptionsMenuProps()
+    strictEqual(hideAssignmentGroupTotals, false)
+  })
+
   test('showSeparateFirstLastNames is false', () => {
     const {showSeparateFirstLastNames} = createGradebook().getViewOptionsMenuProps()
     strictEqual(showSeparateFirstLastNames, false)
