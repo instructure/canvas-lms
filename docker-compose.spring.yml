@@ -15,43 +15,14 @@ services:
     build: .
     command: bundle exec spring server
     volumes:
-      - .:/usr/src/app
-      - api_docs:/usr/src/app/public/doc/api
-      - brandable_css_brands:/usr/src/app/app/stylesheets/brandable_css_brands
-      - bundler:/home/docker/.bundle/
+      - code:/usr/src/app
+      - bundle:/home/docker/.bundle/
       - canvas-docker-gems:/home/docker/.gem/
-      - canvas-media_es:/usr/src/app/packages/canvas-media/es
-      - canvas-media_lib:/usr/src/app/packages/canvas-media/lib
-      - canvas-media_node_modules:/usr/src/app/packages/canvas-media/node_modules
-      - canvas-planner_node_modules:/usr/src/app/packages/canvas-planner/node_modules
-      - canvas-planner_lib:/usr/src/app/packages/canvas-planner/lib
-      - canvas-rce_canvas:/usr/src/app/packages/canvas-rce/canvas
-      - canvas-rce_lib:/usr/src/app/packages/canvas-rce/lib
-      - canvas-rce_node_modules:/usr/src/app/packages/canvas-rce/node_modules
-      - i18nliner_node_modules:/usr/src/app/gems/canvas_i18nliner/node_modules
-      - jest-moxios-utils_node_modules:/usr/src/app/packages/jest-moxios-utils/node_modules
-      - js-utils_es:/usr/src/app/packages/js-utils/es
-      - js-utils_lib:/usr/src/app/packages/js-utils/lib
-      - js-utils_node_modules:/usr/src/app/packages/js-utils/node_modules
-      - k5uploader_es:/usr/src/app/packages/k5uploader/es
-      - k5uploader_lib:/usr/src/app/packages/k5uploader/lib
-      - k5uploader_node_modules:/usr/src/app/packages/k5uploader/node_modules
-      - locales:/usr/src/app/config/locales/generated
-      - log:/usr/src/app/log
-      - node_modules:/usr/src/app/node_modules
-      - old-copy-of-react-14-that-is-just-here-so-if-analytics-is-checked-out-it-doesnt-change-yarn.lock_node_modules:/usr/src/app/packages/old-copy-of-react-14-that-is-just-here-so-if-analytics-is-checked-out-it-doesnt-change-yarn.lock/node_modules
-      - pacts:/usr/src/app/pacts
-      - public_dist:/usr/src/app/public/dist
-      - reports:/usr/src/app/reports
-      - styleguide:/usr/src/app/app/views/info
-      - tmp:/usr/src/app/tmp
-      - translations:/usr/src/app/public/javascripts/translations
-      - yardoc:/usr/src/app/.yardoc
       - yarn-cache:/home/docker/.cache/yarn
     environment:
-      ENCRYPTION_KEY: facdd3a131ddd8988b14f6e4e01039c93cfa0160
-      POSTGRES_PASSWORD: sekret
       RAILS_ENV: development
+      ENCRYPTION_KEY: facdd3a131ddd8988b14f6e4e01039c93cfa0160
       SPRING_TMP_PATH: tmp
       SPRING_SOCKET: tmp/spring.sock
       SPRING_PIDFILE: tmp/spring.pid
+      POSTGRES_PASSWORD: sekret
