@@ -130,7 +130,7 @@ module CanvasRails
       Canvas::Plugins::DefaultPlugins.apply_all
       ActiveSupport::JSON::Encoding.escape_html_entities_in_json = true
 
-      if CANVAS_RAILS6_0
+      if Rails.version < "6.1"
         # On rails 6.1, this comes from switchman; on rails 6.0 canvas provides it
         require_relative "#{__dir__}/../app/models/unsharded_record.rb"
         Switchman::UnshardedRecord = UnshardedRecord
