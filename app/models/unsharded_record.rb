@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# TODO: CANVAS_RAILS6_0 remove this whole class since we will always get it from switchman
+# TODO: CANVAS_RAILS="6.0" remove this whole class since we will always get it from switchman
 class UnshardedRecord < ::ActiveRecord::Base
   self.abstract_class = true
 

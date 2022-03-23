@@ -57,7 +57,7 @@ group :test do
     gem "pact-support", "1.16.8", require: false
   gem "pact-messages", "0.2.0"
   gem "pact_broker-client", "1.40.0"
-  if CANVAS_RAILS6_0
+  if CANVAS_RAILS == "6.0"
     gem "database_cleaner", "~> 1.5", ">= 1.5.3"
   else
     gem "database_cleaner", "~> 2.0"

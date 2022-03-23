@@ -390,7 +390,7 @@ pipeline {
                 buildParameters += string(name: 'PATCHSET_TAG', value: "${env.PATCHSET_TAG}")
                 buildParameters += string(name: 'POSTGRES', value: "${env.POSTGRES}")
                 buildParameters += string(name: 'RUBY', value: "${env.RUBY}")
-                buildParameters += string(name: 'CANVAS_RAILS6_1', value: "${env.CANVAS_RAILS6_1}")
+                buildParameters += string(name: 'CANVAS_RAILS', value: "${env.CANVAS_RAILS}")
 
                 // If modifying any of our Jenkinsfiles set JENKINSFILE_REFSPEC for sub-builds to use Jenkinsfiles in
                 // the gerrit rather than master. Stable branches also need to check out the JENKINSFILE_REFSPEC to prevent

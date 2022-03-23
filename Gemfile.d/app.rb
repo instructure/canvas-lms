@@ -27,7 +27,7 @@ def gem_override(name, version)
   end
 end
 
-if CANVAS_RAILS6_0
+if CANVAS_RAILS == "6.0"
   gem "rails", "6.0.4.2"
     gem "tzinfo", "1.2.7"
   gem_override "switchman", "2.2.3"
