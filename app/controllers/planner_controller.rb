@@ -352,7 +352,7 @@ class PlannerController < ApplicationController
       @contexts = Context.find_all_by_asset_string(context_ids) if public_access?
 
       # so we get user notes too if a superobserver
-      @user_ids = [params[:observed_user_id]] if params.key?(:observed_user_id) && @user.grants_right?(@current_user, session, :read_as_parent)
+      @user_ids = [@user.id] if params.key?(:observed_user_id) && @user.grants_right?(@current_user, session, :read_as_parent)
     end
 
     # make IDs relative to the user's shard
@@ -369,6 +369,11 @@ class PlannerController < ApplicationController
         @user_ids &= [@user.id]
       else
         @course_ids = @group_ids = @user_ids = []
+      end
+
+      # allow observers additional access to courses where they're enrolled as an observer
+      if @user != @current_user && params.key?(:observed_user_id)
+        @course_ids |= @current_user.observer_enrollments.active.where(associated_user: @user).shard(@current_user).pluck(:course_id).map { |id| Shard.relative_id_for(id, @current_user.shard, @user.shard) }
       end
 
       # fetch all the objects they requested that weren't immediately available;
