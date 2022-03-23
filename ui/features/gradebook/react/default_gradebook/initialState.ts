@@ -58,6 +58,7 @@ export function getInitialGridDisplaySettings(settings, colors): GridDisplaySett
     enterGradesAs: settings.enter_grades_as || {},
     filterColumnsBy,
     filterRowsBy,
+    hideAssignmentGroupTotals: settings.hide_assignment_group_totals === 'true',
     selectedPrimaryInfo,
     selectedSecondaryInfo,
     selectedViewOptionsFilters: settings.selected_view_options_filters || [],

@@ -410,6 +410,12 @@ export default class GradebookSettingsModal extends React.Component {
                         this.setViewOption('showSeparateFirstLastNames', value)
                       }
                     }}
+                    hideAssignmentGroupTotals={{
+                      checked: this.state.viewOptions.hideAssignmentGroupTotals,
+                      onChange: value => {
+                        this.setViewOption('hideAssignmentGroupTotals', value)
+                      }
+                    }}
                     viewUngradedAsZero={{
                       allowed: this.props.allowViewUngradedAsZero,
                       checked: this.state.viewOptions.viewUngradedAsZero,
