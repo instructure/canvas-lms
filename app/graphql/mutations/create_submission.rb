@@ -18,20 +18,22 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class OnlineSubmissionType < Types::BaseEnum
-  VALID_SUBMISSION_TYPES = %w[
-    basic_lti_launch
-    student_annotation
-    media_recording
-    online_text_entry
-    online_upload
-    online_url
-  ].freeze
+module Types
+  class OnlineSubmissionType < Types::BaseEnum
+    VALID_SUBMISSION_TYPES = %w[
+      basic_lti_launch
+      student_annotation
+      media_recording
+      online_text_entry
+      online_upload
+      online_url
+    ].freeze
 
-  graphql_name "OnlineSubmissionType"
-  description "Types that can be submitted online"
+    graphql_name "OnlineSubmissionType"
+    description "Types that can be submitted online"
 
-  VALID_SUBMISSION_TYPES.each { |type| value(type) }
+    VALID_SUBMISSION_TYPES.each { |type| value(type) }
+  end
 end
 
 class Mutations::CreateSubmission < Mutations::BaseMutation
@@ -50,7 +52,7 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
            required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Attachment")
   argument :media_id, ID, required: false
   argument :resource_link_lookup_uuid, String, required: false
-  argument :submission_type, OnlineSubmissionType, required: true
+  argument :submission_type, Types::OnlineSubmissionType, required: true
   argument :url, String, required: false
 
   field :submission, Types::SubmissionType, null: true
