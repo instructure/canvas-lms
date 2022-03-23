@@ -59,8 +59,8 @@ describe "self enrollment" do
       move_to_click("#initial_action label[for=selfEnrollmentAuthRegCreate]")
       wait_for_ajaximations
       f("#student_name").send_keys("new guy")
-      # terms of use button should be populated by TermsOfServiceModal.js
-      expect(fj("button:contains('Acceptable Use Policy')")).to be_displayed
+      # terms of use link should be populated by TermsOfServiceModal.js
+      expect(fj("a:contains('Acceptable Use Policy')")).to be_displayed
       driver.execute_script("$('#enroll_form label[for=selfEnrollmentAuthRegLoginAgreeTerms]').click()") # because clicking the label clicks on the links in the label
       expect_new_page_load do
         submit_form("#enroll_form")

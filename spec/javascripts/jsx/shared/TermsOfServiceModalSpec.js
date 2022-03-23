@@ -33,13 +33,13 @@ QUnit.module('Terms of Service Modal Link', {
 test('renders correct link when preview is provided', () => {
   ENV.TERMS_OF_SERVICE_CUSTOM_CONTENT = 'Hello World'
   const wrapper = mount(<TermsOfServiceModal preview />)
-  const renderedLink = wrapper.find('button')
+  const renderedLink = wrapper.find('a')
   equal(renderedLink.text(), 'Preview')
 })
 
 test('renders correct link when preview is not provided', () => {
   ENV.TERMS_OF_SERVICE_CUSTOM_CONTENT = 'Hello World'
   const wrapper = mount(<TermsOfServiceModal />)
-  const renderedLink = wrapper.find('button')
+  const renderedLink = wrapper.find('a')
   equal(renderedLink.text(), 'Acceptable Use Policy')
 })
