@@ -33,12 +33,12 @@ end
 ruby ">= 2.7.0", "< 3.1"
 
 # force a different lockfile for next rails
-unless CANVAS_RAILS6_0
+if CANVAS_RAILS >= "6.1"
   Bundler::SharedHelpers.class_eval do
     class << self
       def default_lockfile
         lockfile = +"#{Bundler.default_gemfile}.lock"
-        lockfile << ".next" unless CANVAS_RAILS6_0
+        lockfile << ".next"
         Pathname.new(lockfile)
       end
     end
