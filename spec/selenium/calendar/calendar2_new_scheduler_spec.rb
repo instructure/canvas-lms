@@ -96,8 +96,8 @@ describe "scheduler" do
     end
 
     it "reserves appointment slots in find appointment mode", priority: "1" do
-      skip("Skip for flakiness and fix with: LS-2145")
       get "/calendar2"
+      wait_for_ajaximations
       open_select_courses_modal(@course1.name)
       f(".fc-content").click
       wait_for_ajaximations
