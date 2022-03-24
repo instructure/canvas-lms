@@ -73,7 +73,7 @@ export const AddressBook = ({
   const popoverInstanceId = useRef(`address-book-menu-${nanoid()}`)
   const [isMenuOpen, setIsMenuOpen] = useState(open)
   const [selectedItem, setSelectedItem] = useState(null)
-  const [selectedUsers, setSelectedUsers] = useState([])
+  const [selectedMenuItems, setSelectedMenuItems] = useState([])
   const [isLimitReached, setLimitReached] = useState(false)
   const [popoverWidth, setPopoverWidth] = useState('200px')
   const menuRef = useRef(null)
@@ -120,20 +120,20 @@ export const AddressBook = ({
 
   // Limit amount of selected tags and close menu when limit reached
   useEffect(() => {
-    if (!limitTagCount || selectedUsers.length < limitTagCount) {
+    if (!limitTagCount || selectedMenuItems.length < limitTagCount) {
       setLimitReached(false)
       textInputRef?.current?.removeAttribute('disabled', '')
-    } else if (selectedUsers.length >= limitTagCount) {
+    } else if (selectedMenuItems.length >= limitTagCount) {
       setLimitReached(true)
       textInputRef?.current?.setAttribute('disabled', true)
       setIsMenuOpen(false)
     }
-  }, [selectedUsers, limitTagCount, textInputRef])
+  }, [selectedMenuItems, limitTagCount, textInputRef])
 
   // Provide selected IDs via callabck
   useEffect(() => {
-    onSelectedIdsChange(selectedUsers)
-  }, [onSelectedIdsChange, selectedUsers])
+    onSelectedIdsChange(selectedMenuItems)
+  }, [onSelectedIdsChange, selectedMenuItems])
 
   // Creates an oberserver on the last scroll item to fetch more data when it becomes visible
   useEffect(() => {
@@ -163,14 +163,14 @@ export const AddressBook = ({
   }, [fetchMoreMenuData, hasMoreMenuData, menuItemCurrent])
 
   // Render individual menu items
-  const renderMenuItem = (user, isCourse, isBackButton, isHeader, isLast, isSubmenu) => {
+  const renderMenuItem = (menuItem, isCourse, isBackButton, isHeader, isLast, isSubmenu) => {
     if (isHeader) {
-      return renderHeaderItem(user.name)
+      return renderHeaderItem(menuItem.name)
     }
 
     return (
       <View
-        key={`address-book-item-${user.id}`}
+        key={`address-book-item-${menuItem.id}`}
         elementRef={el => {
           if (isLast) {
             onItemRefSet(el)
@@ -181,22 +181,22 @@ export const AddressBook = ({
           iconAfter={isCourse || isSubmenu ? <IconArrowOpenEndLine /> : null}
           iconBefore={isBackButton ? <IconArrowOpenStartLine /> : null}
           as="div"
-          isSelected={selectedItem?.id === user.id}
+          isSelected={selectedItem?.id === menuItem.id}
           hasPopup={!!(isCourse || isSubmenu)}
-          id={`address-book-menu-item-${user.id}`}
+          id={`address-book-menu-item-${menuItem.id}`}
           onSelect={() => {
-            selectHandler(user, isCourse, isBackButton, isSubmenu)
+            selectHandler(menuItem, isCourse, isBackButton, isSubmenu)
           }}
           onHover={() => {
             if (focusType !== MOUSE_FOCUS_TYPE) {
               setFocusType(MOUSE_FOCUS_TYPE)
             }
-            setSelectedItem(user)
+            setSelectedItem(menuItem)
           }}
           menuRef={menuRef}
           isKeyboardFocus={focusType === KEYBOARD_FOCUS_TYPE}
         >
-          {user.name}
+          {menuItem.name}
         </AddressBookItem>
       </View>
     )
@@ -249,18 +249,18 @@ export const AddressBook = ({
       return renderNoResultsFound()
     }
 
-    return data.map(user => {
+    return data.map(menuItem => {
       return renderMenuItem(
-        user,
-        user.id.includes(COURSE_TYPE),
-        user.id.includes(BACK_BUTTON_TYPE),
-        user.id.includes(HEADER_TEXT_TYPE),
-        user?.isLast,
-        user.id.includes(SUBMENU_TYPE)
+        menuItem,
+        menuItem.id.includes(COURSE_TYPE),
+        menuItem.id.includes(BACK_BUTTON_TYPE),
+        menuItem.id.includes(HEADER_TEXT_TYPE),
+        menuItem?.isLast,
+        menuItem.id.includes(SUBMENU_TYPE)
       )
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, selectedItem, selectedUsers, focusType])
+  }, [data, selectedItem, selectedMenuItems, focusType])
 
   // Loading renderer
   const renderLoading = () => {
@@ -281,27 +281,27 @@ export const AddressBook = ({
   }
 
   const renderedSelectedTags = useMemo(() => {
-    return selectedUsers.map(user => {
+    return selectedMenuItems.map(menuItem => {
       return (
-        <span data-testid="address-book-tag" key={`address-book-tag-${user.id}`}>
+        <span data-testid="address-book-tag" key={`address-book-tag-${menuItem.id}`}>
           <Tag
             text={
-              <AccessibleContent alt={`${I18n.t('Remove')} ${user.name}`}>
-                {user.name}
+              <AccessibleContent alt={`${I18n.t('Remove')} ${menuItem.name}`}>
+                {menuItem.name}
               </AccessibleContent>
             }
             dismissible
             margin="0 xx-small 0 0"
             onClick={() => {
-              removeTag(user)
+              removeTag(menuItem)
             }}
-            key={`address-book-tag-${user.id}`}
+            key={`address-book-tag-${menuItem.id}`}
           />
         </span>
       )
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedUsers])
+  }, [selectedMenuItems])
 
   // Key handler for input
   const inputKeyHandler = e => {
@@ -344,7 +344,7 @@ export const AddressBook = ({
         break
       case 8: // Backspace
         if (inputValue === '') {
-          removeTag(selectedUsers[selectedUsers.length - 1])
+          removeTag(selectedMenuItems[selectedMenuItems.length - 1])
         }
         break
       case 27: // Escape
@@ -360,50 +360,52 @@ export const AddressBook = ({
 
   // Handler for selecting an item
   // Controls callback + tag addition
-  const selectHandler = (user, isCourse, isBackButton, isSubmenu) => {
+  const selectHandler = (menuItem, isCourse, isBackButton, isSubmenu) => {
     // If information is not available, quickly find it from data state
     if (isCourse === undefined && isBackButton === undefined && isSubmenu === undefined) {
-      const selectedUser = data.find(u => u.id === selectedItem?.id)
-      isCourse = selectedUser.id.includes(COURSE_TYPE)
-      isSubmenu = user.id.includes(SUBMENU_TYPE)
-      isBackButton = selectedUser.id.includes(BACK_BUTTON_TYPE)
+      const selectedMenuItem = data.find(u => u.id === selectedItem?.id)
+      isCourse = selectedMenuItem.id.includes(COURSE_TYPE)
+      isSubmenu = selectedMenuItem.id.includes(SUBMENU_TYPE)
+      isBackButton = selectedMenuItem.id.includes(BACK_BUTTON_TYPE)
     }
 
     // Only add tags for users
     if (!isBackButton && !isCourse && !isSubmenu) {
-      addTag(user)
-      onSelect(user.id)
+      addTag(menuItem)
+      onSelect(menuItem.id)
       if (onUserFilterSelect) {
-        onUserFilterSelect(user?._id ? `user_${user?._id}` : undefined)
+        onUserFilterSelect(menuItem?._id ? `user_${menuItem?._id}` : undefined)
       }
     } else {
       setIsSubMenuSelection(true)
-      onSelect(user.id, isCourse, isBackButton, isSubmenu)
+      onSelect(menuItem.id, isCourse, isBackButton, isSubmenu)
     }
   }
 
-  const addTag = user => {
-    const newSelectedUsers = selectedUsers
-    const matchedUsers = newSelectedUsers.filter(u => {
-      return u.id === user.id
+  const addTag = menuItem => {
+    const newSelectedMenuItems = selectedMenuItems
+    const matchedMenuItems = newSelectedMenuItems.filter(u => {
+      return u.id === menuItem.id
     })
 
     // Prevent duplicate IDs from being added
-    if (matchedUsers.length === 0) {
-      newSelectedUsers.push(user)
+    if (matchedMenuItems.length === 0) {
+      newSelectedMenuItems.push(menuItem)
       onTextChange('')
     }
 
-    setSelectedUsers([...newSelectedUsers])
+    setSelectedMenuItems([...newSelectedMenuItems])
   }
 
-  const removeTag = removeUser => {
-    let newSelectedUsers = selectedUsers
+  const removeTag = removeMenuItem => {
+    let newSelectedMenuItems = selectedMenuItems
     if (onUserFilterSelect) {
       onUserFilterSelect(undefined)
     }
-    newSelectedUsers = newSelectedUsers.filter(user => user.id !== removeUser.id)
-    setSelectedUsers([...newSelectedUsers])
+    newSelectedMenuItems = newSelectedMenuItems.filter(
+      menuItem => menuItem.id !== removeMenuItem.id
+    )
+    setSelectedMenuItems([...newSelectedMenuItems])
   }
 
   return (
@@ -432,7 +434,7 @@ export const AddressBook = ({
                   renderLabel={
                     <ScreenReaderContent>{I18n.t('Address Book Input')}</ScreenReaderContent>
                   }
-                  renderBeforeInput={selectedUsers.length === 0 ? null : renderedSelectedTags}
+                  renderBeforeInput={selectedMenuItems.length === 0 ? null : renderedSelectedTags}
                   onFocus={() => {
                     if (!isLimitReached) {
                       setIsMenuOpen(true)
