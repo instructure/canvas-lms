@@ -386,6 +386,9 @@
   "resize_ec83d538": { "message": "Resize" },
   "restore_auto_save_deccd84b": { "message": "Restore auto-save?" },
   "rich_content_editor_2708ef21": { "message": "Rich Content Editor" },
+  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+    "message": "Rich Text Area. Press ALT+0 for Rich Content Editor shortcuts."
+  },
   "right_to_left_9cfb092a": { "message": "Right-to-Left" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Sadly, the pretty HTML editor is not keyboard accessible. Access the raw HTML editor here."
