@@ -575,7 +575,7 @@ pipeline {
 
                   // Trigger Crystalball map build if spec files were added or removed, will not vote on builds.
                   if (configuration.isChangeMerged() && filesChangedStage.hasNewDeletedSpecFiles(buildConfig)) {
-                    build(wait: false, job: 'Canvas/proofs-of-concept/crystalball-map')
+                    build(wait: false, job: 'Canvas/helpers/crystalball-map')
                   }
 
                   extendedStage('Flakey Spec Catcher')
