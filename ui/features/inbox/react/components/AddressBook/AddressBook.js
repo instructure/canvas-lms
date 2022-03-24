@@ -46,10 +46,13 @@ const I18n = useI18nScope('conversations_2')
 
 const MOUSE_FOCUS_TYPE = 'mouse'
 const KEYBOARD_FOCUS_TYPE = 'keyboard'
-export const COURSE_TYPE = 'course'
+
+export const CONTEXT_TYPE = 'context'
+export const USER_TYPE = 'user'
 export const SUBMENU_TYPE = 'subMenu'
 export const BACK_BUTTON_TYPE = 'backButton'
 export const HEADER_TEXT_TYPE = 'headerText'
+export const SELECT_ENTIRE_CONTEXT_TYPE = 'selectContext'
 
 export const AddressBook = ({
   menuData,
@@ -78,11 +81,15 @@ export const AddressBook = ({
   const [popoverWidth, setPopoverWidth] = useState('200px')
   const menuRef = useRef(null)
   const [focusType, setFocusType] = useState(KEYBOARD_FOCUS_TYPE) // Options are 'keyboard' and 'mouse'
-  const backButtonArray = isSubMenu ? [{id: 'backButton', name: I18n.t('Back')}] : []
-  const headerArray = headerText ? [{id: 'headerText', name: headerText, focusSkip: true}] : []
+  const backButtonArray = isSubMenu
+    ? [{id: 'backButton', name: I18n.t('Back'), itemType: BACK_BUTTON_TYPE}]
+    : []
+  const headerArray = headerText
+    ? [{id: 'headerText', name: headerText, focusSkip: true, itemType: HEADER_TEXT_TYPE}]
+    : []
   const homeMenu = [
-    {id: 'subMenuCourse', name: I18n.t('Courses')},
-    {id: 'subMenuStudents', name: I18n.t('Students')}
+    {id: 'subMenuCourse', name: I18n.t('Courses'), itemType: SUBMENU_TYPE},
+    {id: 'subMenuStudents', name: I18n.t('Students'), itemType: SUBMENU_TYPE}
   ]
   const [data, setData] = useState([
     ...backButtonArray,
@@ -163,7 +170,12 @@ export const AddressBook = ({
   }, [fetchMoreMenuData, hasMoreMenuData, menuItemCurrent])
 
   // Render individual menu items
-  const renderMenuItem = (menuItem, isCourse, isBackButton, isHeader, isLast, isSubmenu) => {
+  const renderMenuItem = (menuItem, isLast) => {
+    const isSubmenu = menuItem.itemType === SUBMENU_TYPE
+    const isHeader = menuItem.itemType === HEADER_TEXT_TYPE
+    const isBackButton = menuItem.itemType === BACK_BUTTON_TYPE
+    const isContext = menuItem.itemType === CONTEXT_TYPE
+
     if (isHeader) {
       return renderHeaderItem(menuItem.name)
     }
@@ -178,14 +190,14 @@ export const AddressBook = ({
         }}
       >
         <AddressBookItem
-          iconAfter={isCourse || isSubmenu ? <IconArrowOpenEndLine /> : null}
+          iconAfter={isContext || isSubmenu ? <IconArrowOpenEndLine /> : null}
           iconBefore={isBackButton ? <IconArrowOpenStartLine /> : null}
           as="div"
           isSelected={selectedItem?.id === menuItem.id}
-          hasPopup={!!(isCourse || isSubmenu)}
+          hasPopup={!!(isContext || isSubmenu)}
           id={`address-book-menu-item-${menuItem.id}`}
           onSelect={() => {
-            selectHandler(menuItem, isCourse, isBackButton, isSubmenu)
+            selectHandler(menuItem, isContext, isBackButton, isSubmenu)
           }}
           onHover={() => {
             if (focusType !== MOUSE_FOCUS_TYPE) {
@@ -250,14 +262,7 @@ export const AddressBook = ({
     }
 
     return data.map(menuItem => {
-      return renderMenuItem(
-        menuItem,
-        menuItem.id.includes(COURSE_TYPE),
-        menuItem.id.includes(BACK_BUTTON_TYPE),
-        menuItem.id.includes(HEADER_TEXT_TYPE),
-        menuItem?.isLast,
-        menuItem.id.includes(SUBMENU_TYPE)
-      )
+      return renderMenuItem(menuItem, menuItem?.isLast)
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, selectedItem, selectedMenuItems, focusType])
@@ -360,25 +365,25 @@ export const AddressBook = ({
 
   // Handler for selecting an item
   // Controls callback + tag addition
-  const selectHandler = (menuItem, isCourse, isBackButton, isSubmenu) => {
+  const selectHandler = (menuItem, isContext, isBackButton, isSubmenu) => {
     // If information is not available, quickly find it from data state
-    if (isCourse === undefined && isBackButton === undefined && isSubmenu === undefined) {
+    if (isContext === undefined && isBackButton === undefined && isSubmenu === undefined) {
       const selectedMenuItem = data.find(u => u.id === selectedItem?.id)
-      isCourse = selectedMenuItem.id.includes(COURSE_TYPE)
-      isSubmenu = selectedMenuItem.id.includes(SUBMENU_TYPE)
-      isBackButton = selectedMenuItem.id.includes(BACK_BUTTON_TYPE)
+      isSubmenu = selectedMenuItem.itemType === SUBMENU_TYPE
+      isBackButton = selectedMenuItem.itemType === BACK_BUTTON_TYPE
+      isContext = selectedMenuItem.itemType === CONTEXT_TYPE
     }
 
     // Only add tags for users
-    if (!isBackButton && !isCourse && !isSubmenu) {
+    if (!isBackButton && !isContext && !isSubmenu) {
       addTag(menuItem)
-      onSelect(menuItem.id)
+      onSelect(menuItem)
       if (onUserFilterSelect) {
         onUserFilterSelect(menuItem?._id ? `user_${menuItem?._id}` : undefined)
       }
     } else {
       setIsSubMenuSelection(true)
-      onSelect(menuItem.id, isCourse, isBackButton, isSubmenu)
+      onSelect(menuItem, isContext, isBackButton, isSubmenu)
     }
   }
 
@@ -581,6 +586,9 @@ AddressBook.propTypes = {
    * Bool which determines if menu is fetching more data
    */
   isLoadingMoreMenuData: PropTypes.bool,
+  /**
+   * State variable that controls the search input string value
+   */
   inputValue: PropTypes.string
 }
 

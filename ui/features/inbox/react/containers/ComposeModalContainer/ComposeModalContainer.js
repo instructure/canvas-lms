@@ -133,8 +133,8 @@ const ComposeModalContainer = props => {
     setSendIndividualMessages(prev => !prev)
   }
 
-  const onContextSelect = id => {
-    setSelectedContext(id)
+  const onContextSelect = context => {
+    setSelectedContext({contextID: context.contextID, contextName: context.contextName})
   }
 
   const onSelectedIdsChange = ids => {
@@ -184,7 +184,7 @@ const ComposeModalContainer = props => {
           attachmentIds: attachments.map(a => a.id),
           body,
           userNote,
-          contextCode: selectedContext,
+          contextCode: selectedContext?.contextID,
           recipients: selectedIds.map(rec => rec?._id || rec.id),
           subject,
           groupConversation: !sendIndividualMessages,

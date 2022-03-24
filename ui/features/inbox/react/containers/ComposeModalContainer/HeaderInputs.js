@@ -73,7 +73,9 @@ const HeaderInputs = props => {
 
   const canAddUserNote = useMemo(() => {
     let canAddFacultyNote = false
-    const selectedCourseID = props.activeCourseFilter ? props.activeCourseFilter.split('_')[1] : ''
+    const selectedCourseID = props.activeCourseFilter?.contextID
+      ? props.activeCourseFilter?.contextID.split('_')[1]
+      : ''
 
     if (
       props.activeCourseFilter &&
@@ -117,7 +119,7 @@ const HeaderInputs = props => {
                   groups: props.courses?.favoriteGroupsConnection.nodes
                 }}
                 onCourseFilterSelect={props.onContextSelect}
-                activeCourseFilter={props.activeCourseFilter}
+                activeCourseFilterID={props.activeCourseFilter?.contextID}
               />
             )
           }
@@ -211,7 +213,7 @@ HeaderInputs.propTypes = {
   sendIndividualMessages: PropTypes.bool,
   subject: PropTypes.string,
   mediaAttachmentTitle: PropTypes.string,
-  activeCourseFilter: PropTypes.string,
+  activeCourseFilter: PropTypes.object,
   onRemoveMediaComment: PropTypes.func,
   selectedRecipients: PropTypes.array,
   setUserNote: PropTypes.func,
