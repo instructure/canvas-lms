@@ -24,8 +24,9 @@ class ParallelSequencer extends Sequencer {
   jobIndex = parseInt(process.env.CI_NODE_INDEX, 10)
 
   sort(tests) {
-    const stats = {}
+    if (!process.env.CI) return tests
 
+    const stats = {}
     const fileSize = ({path, context: {hasteFS}}) =>
       stats[path] || (stats[path] = hasteFS.getSize(path) || 0)
     const hasFailed = (cache, test) => cache[test.path] && cache[test.path][0] === 0
