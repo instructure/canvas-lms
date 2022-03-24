@@ -851,12 +851,10 @@ class UsersController < ApplicationController
       ]
     end[0, limit]
 
-    # Since concluded courses aren't manageable, we check the read_as_admin grant in those cases
-    # Otherwise we check manageability along with the read grant (so admins won't get cluttered w/ courses)
-    if include_concluded
-      @courses.select! { |c| c.grants_right?(@current_user, :read_as_admin) && c.grants_right?(@current_user, :read) }
+    if params[:enforce_manage_grant_requirement]
+      @courses.select! { |c| c.grants_right?(@current_user, :manage_content) }
     else
-      @courses.select! { |c| c.grants_right?(@current_user, :manage_content) && c.grants_right?(@current_user, :read) }
+      @courses.select! { |c| c.grants_all_rights?(@current_user, :read_as_admin, :read) }
     end
 
     render json: @courses.map { |c|

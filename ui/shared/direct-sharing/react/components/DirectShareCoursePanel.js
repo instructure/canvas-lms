@@ -84,6 +84,8 @@ export default function DirectShareCoursePanel({sourceCourseId, contentSelection
         setSelectedModule={setSelectedModule}
         setModuleItemPosition={setSelectedPosition}
         disableModuleInsertion={contentSelection && 'modules' in contentSelection}
+        moduleFilteringOpts={{per_page: 50}}
+        courseFilteringOpts={{enforce_manage_grant_requirement: true}}
       />
       <Alert variant="warning" hasShadow={false}>
         {I18n.t(

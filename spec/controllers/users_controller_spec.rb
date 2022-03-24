@@ -317,42 +317,21 @@ describe UsersController do
       expect(courses.map { |c| c["label"] }).to eq %w[E c d a b]
     end
 
-    it "does not include courses that an admin can't content-manage" do
+    it "does not include courses for which the user doesnt have the appropriate rights" do
       @role1 = custom_account_role("subadmin", account: Account.default)
-      account_admin_user_with_role_changes(role: @role1, role_changes: {
-                                             read_course_content: true,
-                                             read_course_list: true,
-                                             manage_content: false
-                                           })
-      user_session(@admin)
+      account_admin_user_with_role_changes(role: @role1, role_changes: { manage_content: false, read_course_content: false })
+      course_with_user("TeacherEnrollment", course_name: "A", active_all: true, user: @admin)
+      course_with_user("StudentEnrollment", course_name: "B", active_all: true, user: @admin)
 
-      course_with_teacher(course_name: "A", active_all: true, user: @admin)
-      course_with_teacher(course_name: "B", active_all: true)
-      course_with_teacher(course_name: "C", active_all: true, user: @admin)
-      course_with_teacher(course_name: "D", active_all: true)
+      user_session(@admin)
 
       get "manageable_courses", params: { user_id: @admin.id }
       expect(response).to be_successful
+      expect(json_parse.map { |c| c["label"] }).to eq %w[A B]
 
-      courses = json_parse
-      expect(courses.map { |c| c["label"] }).to eq %w[A C]
-    end
-
-    it "does not include courses that an admin doesn't have rights to see" do
-      @role1 = custom_account_role("subadmin", account: Account.default)
-      account_admin_user_with_role_changes(role: @role1, role_changes: { manage_content: true })
-      user_session(@admin)
-
-      course_with_teacher(course_name: "A", active_all: true, user: @admin)
-      course_with_teacher(course_name: "B", active_all: true)
-      course_with_teacher(course_name: "C", active_all: true, user: @admin)
-      course_with_teacher(course_name: "D", active_all: true)
-
-      get "manageable_courses", params: { user_id: @admin.id }
+      get "manageable_courses", params: { user_id: @admin.id, enforce_manage_grant_requirement: true }
       expect(response).to be_successful
-
-      courses = json_parse
-      expect(courses.map { |c| c["label"] }).to eq %w[A C]
+      expect(json_parse.map { |c| c["label"] }).to eq %w[A]
     end
 
     context "query matching" do
@@ -410,20 +389,6 @@ describe UsersController do
         expect(response).to be_successful
         courses = json_parse
         expect(courses.map { |c| c["id"] }).to eq [@course.id]
-      end
-
-      it "does not include courses that an admin doesn't have rights to see when passing include = 'concluded'" do
-        @role1 = custom_account_role("subadmin", account: Account.default)
-        account_admin_user_with_role_changes(role: @role1, role_changes: { manage_content: true })
-        user_session(@admin)
-
-        course_with_teacher(course_name: "MyAdminCourse", active_all: true, user: @admin)
-
-        get "manageable_courses", params: { user_id: @admin.id, include: "concluded" }
-        expect(response).to be_successful
-        courses = json_parse
-
-        expect(courses.map { |c| c["course_code"] }.sort).to eq ["MyAdminCourse"].sort
       end
 
       it "includes concluded courses for teachers when passing include = 'concluded'" do
