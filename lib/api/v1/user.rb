@@ -230,7 +230,7 @@ module Api::V1::User
     {
       anonymous_id: submission.anonymous_id,
       avatar_image_url: User.default_avatar_fallback,
-      display_name: assignment.anonymous_student_identities[submission.user_id]
+      display_name: assignment.anonymous_student_identities.dig(submission.user_id, :name)
     }
   end
 
