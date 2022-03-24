@@ -103,14 +103,14 @@ import vericiteInfoTemplate from '../jst/_vericiteInfo.handlebars'
 // @ts-ignore
 import vericiteScoreTemplate from '@canvas/grading/jst/_vericiteScore.handlebars'
 import 'jqueryui/draggable'
-import '@canvas/jquery/jquery.ajaxJSON'/* getJSON, ajaxJSON */
-import '@canvas/forms/jquery/jquery.instructure_forms'/* ajaxJSONFiles */
-import '@canvas/doc-previews'/* loadDocPreview */
-import '@canvas/datetime'/* datetimeString */
+import '@canvas/jquery/jquery.ajaxJSON' /* getJSON, ajaxJSON */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* ajaxJSONFiles */
+import '@canvas/doc-previews' /* loadDocPreview */
+import '@canvas/datetime' /* datetimeString */
 import 'jqueryui/dialog'
 import 'jqueryui/menu'
-import '@canvas/jquery/jquery.instructure_misc_helpers'/* replaceTags */
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* confirmDelete, showIf, hasScrollbar */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf, hasScrollbar */
 import '@canvas/keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
@@ -357,7 +357,7 @@ function mergeStudentsAndSubmission() {
   // need to presort by anonymous_id for anonymous assignments so that the index property can be consistent
   if (isAnonymous)
     window.jsonData.studentsWithSubmissions.sort((a, b) =>
-      a.anonymous_id > b.anonymous_id ? 1 : -1
+      a.anonymous_name_position > b.anonymous_name_position ? 1 : -1
     )
 
   window.jsonData.studentsWithSubmissions.forEach((student, index) => {
@@ -797,7 +797,7 @@ function initCommentBox() {
     }
 
     const formatComment = function (current_comment) {
-      return current_comment.replace(/<p><\/p>/g, '\n\n').replace(/<br>/g, '\n');
+      return current_comment.replace(/<p><\/p>/g, '\n\n').replace(/<br>/g, '\n')
     }
 
     $('.speech_recognition_link').click(() => {

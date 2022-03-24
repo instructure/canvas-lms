@@ -31,21 +31,25 @@ describe Assignment do
       @assignment = @course.assignments.create!(anonymous_grading: true)
     end
 
-    it "returns student identities, sorted by anonymous_id" do
-      @assignment.submissions.find_by(user: @first_student).update!(anonymous_id: "a")
-      @assignment.submissions.find_by(user: @second_student).update!(anonymous_id: "b")
+    it "returns an anonymous student name and position for each assigned student" do
+      @assignment.submissions.find_by(user: @first_student).update!(anonymous_id: "A")
+      @assignment.submissions.find_by(user: @second_student).update!(anonymous_id: "B")
+      identity = @assignment.anonymous_student_identities[@first_student.id]
+      aggregate_failures do
+        expect(identity[:name]).to eq "Student 1"
+        expect(identity[:position]).to eq 1
+      end
+    end
+
+    it "sorts identities by anonymous_id, case sensitive" do
+      @assignment.submissions.find_by(user: @first_student).update!(anonymous_id: "A")
+      @assignment.submissions.find_by(user: @second_student).update!(anonymous_id: "B")
 
       expect do
-        @assignment.submissions.find_by(user: @first_student).update!(anonymous_id: "c")
+        @assignment.submissions.find_by(user: @first_student).update!(anonymous_id: "a")
       end.to change {
-        Assignment.find(@assignment.id).anonymous_student_identities
-      }.from({
-               @first_student.id => "Student 1",
-               @second_student.id => "Student 2"
-             }).to({
-                     @first_student.id => "Student 2",
-                     @second_student.id => "Student 1"
-                   })
+        Assignment.find(@assignment.id).anonymous_student_identities.dig(@first_student.id, :position)
+      }.from(1).to(2)
     end
 
     it "performs a secondary sort on hashed ID" do
@@ -54,10 +58,8 @@ describe Assignment do
       sub2 = @assignment.submissions.find_by(user: @second_student)
       sub2.update!(anonymous_id: nil)
       initial_student_first = Digest::MD5.hexdigest(sub1.id.to_s) < Digest::MD5.hexdigest(sub2.id.to_s)
-      expect(@assignment.anonymous_student_identities).to eq({
-                                                               @first_student.id => initial_student_first ? "Student 1" : "Student 2",
-                                                               @second_student.id => initial_student_first ? "Student 2" : "Student 1"
-                                                             })
+      first_student_position = @assignment.anonymous_student_identities.dig(@first_student.id, :position)
+      expect(first_student_position).to eq(initial_student_first ? 1 : 2)
     end
   end
 end

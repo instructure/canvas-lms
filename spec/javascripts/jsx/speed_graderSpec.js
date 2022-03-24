@@ -2411,10 +2411,10 @@ QUnit.module('SpeedGrader', rootHooks => {
       })
 
       QUnit.module('when students are anonymous', contextHooks => {
-        const alpha = {anonymous_id: '00000'}
-        const beta = {anonymous_id: '99999'}
-        const gamma = {anonymous_id: 'aaaaa'}
-        const delta = {anonymous_id: 'zzzzz'}
+        const alpha = {anonymous_id: '00000', anonymous_name_position: 1}
+        const beta = {anonymous_id: '99999', anonymous_name_position: 2}
+        const gamma = {anonymous_id: 'aaaaa', anonymous_name_position: 3}
+        const delta = {anonymous_id: 'zzzzz', anonymous_name_position: 4}
 
         contextHooks.beforeEach(() => {
           window.jsonData.anonymize_students = true
@@ -3600,8 +3600,8 @@ QUnit.module('SpeedGrader', rootHooks => {
       const originalJsonData = window.jsonData
       const alphaIdPair = {id: '1'}
       const omegaIdPair = {id: '9'}
-      const alphaAnonymousIdPair = {anonymous_id: '00000'}
-      const omegaAnonymousIdPair = {anonymous_id: 'ZZZZZ'}
+      const alphaAnonymousIdPair = {anonymous_id: '00000', anonymous_name_position: 1}
+      const omegaAnonymousIdPair = {anonymous_id: 'ZZZZZ', anonymous_name_position: 2}
 
       const baseAssignment = {}
       const assignment = {
@@ -3913,8 +3913,8 @@ QUnit.module('SpeedGrader', rootHooks => {
       anonymousHooks.beforeEach(() => {
         assignment = {anonymize_students: true}
         originalJsonData = window.jsonData
-        alpha = {anonymous_id: '00000', anonymous_name: 'Student 1'}
-        omega = {anonymous_id: 'zzzzz', anonymous_name: 'Student 2'}
+        alpha = {anonymous_id: '00000', anonymous_name: 'Student 1', anonymous_name_position: 1}
+        omega = {anonymous_id: 'zzzzz', anonymous_name: 'Student 2', anonymous_name_position: 2}
         alphaStudent = {
           ...alpha,
           submission_history: [],
