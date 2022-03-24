@@ -56,6 +56,62 @@ describe('Should load <AddressBookContainer> normally', () => {
       </ApolloProvider>
     )
   }
+
+  describe('With Context Selection enabled', () => {
+    const contextSelectionDefaultProps = {hasSelectAllFilterOption: true}
+
+    describe('Rendering', () => {
+      it('Does not show context select in initial menu', async () => {
+        setup(contextSelectionDefaultProps)
+        const items = await screen.findAllByTestId('address-book-item')
+        expect(items.length).toBe(2)
+        expect(screen.queryByText('Students')).toBeInTheDocument()
+        expect(screen.queryByText('Courses')).toBeInTheDocument()
+      })
+
+      it('Does not show context select for initial "Courses" submenu', async () => {
+        setup(contextSelectionDefaultProps)
+        let items = await screen.findAllByTestId('address-book-item')
+        fireEvent.mouseDown(items[0])
+
+        items = await screen.findAllByTestId('address-book-item')
+        expect(items.length).toBe(2)
+        expect(screen.queryByText('Back')).toBeInTheDocument()
+        expect(screen.queryByText('Testing 101')).toBeInTheDocument()
+      })
+
+      it('Does not show context select for initial students submenu', async () => {
+        setup()
+        let items = await screen.findAllByTestId('address-book-item')
+        fireEvent.mouseDown(items[1])
+
+        items = await screen.findAllByTestId('address-book-item')
+        expect(items.length).toBe(4)
+        expect(screen.queryByText('Back')).toBeInTheDocument()
+        expect(screen.queryByText('Frederick Dukes')).toBeInTheDocument()
+        expect(screen.queryByText('Trevor Fitzroy')).toBeInTheDocument()
+        expect(screen.queryByText('Null Forge')).toBeInTheDocument()
+      })
+
+      it('Shows context select for course selection', async () => {
+        setup(contextSelectionDefaultProps)
+        let items = await screen.findAllByTestId('address-book-item')
+        fireEvent.mouseDown(items[0])
+
+        items = await screen.findAllByTestId('address-book-item')
+        expect(items.length).toBe(2)
+        expect(screen.queryByText('Back')).toBeInTheDocument()
+        expect(screen.queryByText('Testing 101')).toBeInTheDocument()
+
+        fireEvent.mouseDown(items[1])
+        items = await screen.findAllByTestId('address-book-item')
+        expect(items.length).toBe(3)
+        expect(screen.queryByText('Back')).toBeInTheDocument()
+        expect(screen.queryByText('All in Testing 101')).toBeInTheDocument()
+      })
+    })
+  })
+
   describe('Behaviors', () => {
     it('should render', () => {
       const {container} = setup()

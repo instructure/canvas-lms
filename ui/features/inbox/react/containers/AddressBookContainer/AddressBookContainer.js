@@ -75,9 +75,9 @@ export const AddressBookContainer = props => {
   }
 
   const addFilterHistory = chosenFilter => {
-    const newFilterHistor = filterHistory
-    newFilterHistor.push(chosenFilter)
-    setFilterHistory([...newFilterHistor])
+    const newFilterHistory = filterHistory
+    newFilterHistory.push(chosenFilter)
+    setFilterHistory([...newFilterHistory])
   }
 
   const removeLastFilterHistory = () => {
@@ -189,6 +189,8 @@ export const AddressBookContainer = props => {
       limitTagCount={props.limitTagCount}
       width={props.width}
       open={props.open}
+      hasSelectAllFilterOption={props.hasSelectAllFilterOption}
+      currentFilter={filterHistory[filterHistory.length - 1]}
     />
   )
 }
@@ -199,7 +201,7 @@ AddressBookContainer.propTypes = {
    */
   onSelectedIdsChange: PropTypes.func,
   /**
-   * Number that liits selected item count
+   * Number that limits selected item count
    */
   limitTagCount: PropTypes.number,
   /**
@@ -215,13 +217,18 @@ AddressBookContainer.propTypes = {
    */
   onUserFilterSelect: PropTypes.func,
   /**
-   * use State function to set current context for addressbook
+   * object that contains the current course filter information for the compose modal
    */
-  activeCourseFilter: PropTypes.object
+  activeCourseFilter: PropTypes.object,
+  /**
+   * bool which determines if "select all" in a context menu appears
+   */
+  hasSelectAllFilterOption: PropTypes.bool
 }
 
 AddressBookContainer.defaultProps = {
-  onSelectedIdsChange: () => {}
+  onSelectedIdsChange: () => {},
+  hasSelectAllFilterOption: false
 }
 
 export default AddressBookContainer
