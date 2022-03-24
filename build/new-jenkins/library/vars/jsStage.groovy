@@ -107,6 +107,7 @@ def queueJestDistribution(index) {
     def jestEnvVars = [
       "CI_NODE_INDEX=${index}",
       "CI_NODE_TOTAL=${JEST_NODE_COUNT}",
+      'CI=1',
     ]
 
     callableWithDelegate(queueTestStage())(stages, "jest${index}", jestEnvVars, 'bundle exec rails graphql:schema && yarn test:jest')
