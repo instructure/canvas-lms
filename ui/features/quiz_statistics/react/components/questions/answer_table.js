@@ -145,9 +145,11 @@ class AnswerRow extends React.Component {
       <tr className={datum.correct ? 'correct' : undefined}>
         <th scope="row" className="answer-textfield">
           <span className="screenreader-only">{answerLabel}</span>
-          <span className="answerText" aria-hidden="true">
-            {answerText}
-          </span>
+          <span
+            className="answerText"
+            aria-hidden="true"
+            dangerouslySetInnerHTML={{__html: answerText}}
+          />
         </th>
         <td className="respondent-link">{this.dialogBuilder(datum.answer)}</td>
         <td className="answer-ratio">
