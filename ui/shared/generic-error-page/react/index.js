@@ -43,7 +43,8 @@ export default class GenericErrorPage extends React.Component {
   static propTypes = {
     errorSubject: string,
     errorCategory: string,
-    imageUrl: string.isRequired
+    imageUrl: string.isRequired,
+    stack: string
   }
 
   static defaultProps = {
@@ -82,7 +83,8 @@ export default class GenericErrorPage extends React.Component {
         category: this.props.errorCategory,
         url: window.location.href,
         comments: this.state.textAreaComment,
-        email: this.state.email
+        email: this.state.email,
+        backtrace: this.props.stack
       }
     }
     this.setState({submitLoading: true, showingCommentBox: false})
