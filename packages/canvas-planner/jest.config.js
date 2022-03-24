@@ -35,7 +35,7 @@ module.exports = {
   snapshotSerializers: ['enzyme-to-json/serializer'],
   setupFiles: ['jest-canvas-mock', './jest-env.js'],
   setupFilesAfterEnv: ['@testing-library/jest-dom/extend-expect'],
-  testPathIgnorePatterns: ['<rootDir>/node_modues', '<rootDir>/lib'],
+  testPathIgnorePatterns: ['<rootDir>/node_modules', '<rootDir>/lib'],
   testRegex: '/__tests__/.*\\.(test|spec)\\.js$',
   coverageReporters: ['html', 'text', 'json'],
   collectCoverageFrom: ['src/**/*.js'],
