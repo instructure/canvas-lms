@@ -53,7 +53,8 @@ describe DueDateCacher do
     it "queues a delayed job in an assignment-specific singleton in production" do
       expect(DueDateCacher).to receive(:new).and_return(@instance)
       expect(@instance).to receive(:delay_if_production)
-        .with(strand: "cached_due_date:calculator:Course:Assignments:#{@assignment.context.global_id}",
+        .with(singleton: "cached_due_date:calculator:Assignment:#{@assignment.global_id}:UpdateGrades:0",
+              strand: "cached_due_date:calculator:Course:#{@assignment.context.global_id}",
               max_attempts: 10).and_return(@instance)
       expect(@instance).to receive(:recompute)
       DueDateCacher.recompute(@assignment)
@@ -62,12 +63,20 @@ describe DueDateCacher do
     it "calls recompute with the value of update_grades if it is set to true" do
       expect(DueDateCacher).to receive(:new).with(@course, [@assignment.id], hash_including(update_grades: true))
                                             .and_return(@instance)
+      expect(@instance).to receive(:delay_if_production)
+        .with(singleton: "cached_due_date:calculator:Assignment:#{@assignment.global_id}:UpdateGrades:1",
+              strand: "cached_due_date:calculator:Course:#{@assignment.context.global_id}",
+              max_attempts: 10).and_return(@instance)
       DueDateCacher.recompute(@assignment, update_grades: true)
     end
 
     it "calls recompute with the value of update_grades if it is set to false" do
       expect(DueDateCacher).to receive(:new).with(@course, [@assignment.id], hash_including(update_grades: false))
                                             .and_return(@instance)
+      expect(@instance).to receive(:delay_if_production)
+        .with(singleton: "cached_due_date:calculator:Assignment:#{@assignment.global_id}:UpdateGrades:0",
+              strand: "cached_due_date:calculator:Course:#{@assignment.context.global_id}",
+              max_attempts: 10).and_return(@instance)
       DueDateCacher.recompute(@assignment, update_grades: false)
     end
 
@@ -136,7 +145,10 @@ describe DueDateCacher do
     it "queues a delayed job in a singleton in production if assignments.nil" do
       expect(DueDateCacher).to receive(:new).and_return(@instance)
       expect(@instance).to receive(:delay_if_production)
-        .with(singleton: "cached_due_date:calculator:Course:#{@course.global_id}", max_attempts: 10)
+        .with(
+          singleton: "cached_due_date:calculator:Course:#{@course.global_id}:UpdateGrades:0", max_attempts: 10,
+          strand: "cached_due_date:calculator:Course:#{@course.global_id}"
+        )
         .and_return(@instance)
       expect(@instance).to receive(:recompute)
       DueDateCacher.recompute_course(@course)
@@ -144,7 +156,7 @@ describe DueDateCacher do
 
     it "queues a delayed job without a singleton if assignments is passed" do
       expect(DueDateCacher).to receive(:new).and_return(@instance)
-      expect(@instance).to receive(:delay_if_production).with(max_attempts: 10)
+      expect(@instance).to receive(:delay_if_production).with(max_attempts: 10, strand: "cached_due_date:calculator:Course:#{@course.global_id}")
                                                         .and_return(@instance)
       expect(@instance).to receive(:recompute)
       DueDateCacher.recompute_course(@course, assignments: @assignments)
@@ -168,7 +180,10 @@ describe DueDateCacher do
         .with(@course, match_array(@assignments.map(&:id).sort), hash_including(update_grades: false))
         .and_return(@instance)
       expect(@instance).to receive(:delay_if_production)
-        .with(singleton: "cached_due_date:calculator:Course:#{@course.global_id}", max_attempts: 10)
+        .with(
+          singleton: "cached_due_date:calculator:Course:#{@course.global_id}:UpdateGrades:0", max_attempts: 10,
+          strand: "cached_due_date:calculator:Course:#{@course.global_id}"
+        )
         .and_return(@instance)
       expect(@instance).to receive(:recompute)
       DueDateCacher.recompute_course(@course.id)
@@ -256,7 +271,8 @@ describe DueDateCacher do
       expect(DueDateCacher).to receive(:new).and_return(@instance)
       expect(@instance).to receive(:delay_if_production)
         .with(
-          singleton: "cached_due_date:calculator:Users:#{@course.global_id}:#{Digest::SHA256.hexdigest(student_1.id.to_s)}",
+          singleton: "cached_due_date:calculator:Course:#{@course.global_id}:Users:#{Digest::SHA256.hexdigest(student_1.id.to_s)}:UpdateGrades:0",
+          strand: "cached_due_date:calculator:Course:#{@course.global_id}",
           max_attempts: 10
         )
         .and_return(@instance)
@@ -268,10 +284,10 @@ describe DueDateCacher do
       @instance = double
       expect(DueDateCacher).to receive(:new).and_return(@instance)
       expect(@instance).to receive(:delay_if_production)
-        .with(singleton: "what:up:dog", max_attempts: 10)
+        .with(singleton: "what:up:dog", max_attempts: 10, strand: "cached_due_date:calculator:Course:#{@course.global_id}")
         .and_return(@instance)
       expect(@instance).to receive(:recompute)
-      DueDateCacher.recompute_users_for_course(student_1.id, @course, nil, singleton: "what:up:dog")
+      DueDateCacher.recompute_users_for_course(student_1.id, @course, nil, singleton: "what:up:dog", strand: "cached_due_date:calculator:Course:#{@course.global_id}")
     end
 
     it "initializes a DueDateCacher with the value of executing_user if set" do
