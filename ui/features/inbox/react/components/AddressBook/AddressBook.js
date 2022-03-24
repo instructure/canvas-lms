@@ -69,7 +69,9 @@ export const AddressBook = ({
   fetchMoreMenuData,
   hasMoreMenuData,
   isLoadingMoreMenuData,
-  inputValue
+  inputValue,
+  hasSelectAllFilterOption,
+  currentFilter
 }) => {
   const textInputRef = useRef(null)
   const componentViewRef = useRef(null)
@@ -101,11 +103,52 @@ export const AddressBook = ({
   const [menuItemCurrent, setMenuItemCurrent] = useState(null)
   const [isSubMenuSelection, setIsSubMenuSelection] = useState(true)
 
+  const showContextSelect = useMemo(() => {
+    // Legacy discussions don't allow messages to all groups/sections
+    // The mutation also doesn't allow using a course groups or sections asset string as a recipient
+    const disabledContextSelectOptions = ['groups', 'sections']
+    let contextID = currentFilter?.context?.contextID
+
+    if (!hasSelectAllFilterOption || !contextID || inputValue) {
+      return false
+    }
+
+    // The groups and sections asset string has the identifier at the end of the string
+    contextID = contextID.split('_')
+    let contextIdentifier = contextID[contextID.length - 1]
+
+    if (disabledContextSelectOptions.includes(contextIdentifier)) {
+      return false
+    }
+
+    // Currently only context information is returned for a course and section query
+    const contextSelectionsWithoutUserData = ['course', 'section']
+    // The course and section asset string has the identifier at the front of the string
+    contextIdentifier = contextID[0]
+
+    if (contextSelectionsWithoutUserData.includes(contextIdentifier)) {
+      return true
+    }
+
+    // Show the context select if there are student in the context
+    return menuData.userData.length !== 0
+  }, [hasSelectAllFilterOption, currentFilter, menuData, inputValue])
+
+  const selectAllContextArray = showContextSelect
+    ? [
+        {
+          id: currentFilter.context.contextID,
+          name: `${I18n.t('All in')} ${currentFilter.context.contextName}`,
+          itemType: SELECT_ENTIRE_CONTEXT_TYPE
+        }
+      ]
+    : []
+
   const onItemRefSet = useCallback(refCurrent => {
     setMenuItemCurrent(refCurrent)
   }, [])
 
-  // Update width to match componetViewRef width
+  // Update width to match componentViewRef width
   useEffect(() => {
     setPopoverWidth(componentViewRef?.current?.offsetWidth + 'px')
   }, [componentViewRef])
@@ -115,7 +158,13 @@ export const AddressBook = ({
     if (!isSubMenu) {
       setData([...homeMenu])
     } else {
-      setData([...backButtonArray, ...headerArray, ...menuData.contextData, ...menuData.userData])
+      setData([
+        ...backButtonArray,
+        ...headerArray,
+        ...selectAllContextArray,
+        ...menuData.contextData,
+        ...menuData.userData
+      ])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [menuData, isSubMenu])
@@ -137,12 +186,12 @@ export const AddressBook = ({
     }
   }, [selectedMenuItems, limitTagCount, textInputRef])
 
-  // Provide selected IDs via callabck
+  // Provide selected IDs via callback
   useEffect(() => {
     onSelectedIdsChange(selectedMenuItems)
   }, [onSelectedIdsChange, selectedMenuItems])
 
-  // Creates an oberserver on the last scroll item to fetch more data when it becomes visible
+  // Creates an observer on the last scroll item to fetch more data when it becomes visible
   useEffect(() => {
     if (menuItemCurrent && hasMoreMenuData) {
       const observer = new IntersectionObserver(
@@ -182,7 +231,7 @@ export const AddressBook = ({
 
     return (
       <View
-        key={`address-book-item-${menuItem.id}`}
+        key={`address-book-item-${menuItem.id}-${menuItem.itemType}`}
         elementRef={el => {
           if (isLast) {
             onItemRefSet(el)
@@ -195,7 +244,7 @@ export const AddressBook = ({
           as="div"
           isSelected={selectedItem?.id === menuItem.id}
           hasPopup={!!(isContext || isSubmenu)}
-          id={`address-book-menu-item-${menuItem.id}`}
+          id={`address-book-menu-item-${menuItem.id}-${menuItem.itemType}`}
           onSelect={() => {
             selectHandler(menuItem, isContext, isBackButton, isSubmenu)
           }}
@@ -288,7 +337,10 @@ export const AddressBook = ({
   const renderedSelectedTags = useMemo(() => {
     return selectedMenuItems.map(menuItem => {
       return (
-        <span data-testid="address-book-tag" key={`address-book-tag-${menuItem.id}`}>
+        <span
+          data-testid="address-book-tag"
+          key={`address-book-tag-${menuItem.id}-${menuItem.itemType}`}
+        >
           <Tag
             text={
               <AccessibleContent alt={`${I18n.t('Remove')} ${menuItem.name}`}>
@@ -300,7 +352,7 @@ export const AddressBook = ({
             onClick={() => {
               removeTag(menuItem)
             }}
-            key={`address-book-tag-${menuItem.id}`}
+            key={`address-book-tag-${menuItem.id}-${menuItem.itemType}`}
           />
         </span>
       )
@@ -312,7 +364,7 @@ export const AddressBook = ({
   const inputKeyHandler = e => {
     setFocusType(KEYBOARD_FOCUS_TYPE)
 
-    // Reremove unfocusable items
+    // Remove unfocusable items
     const focusableData = data.filter(item => !item.focusSkip)
 
     const currentPosition = focusableData.findIndex(item => {
@@ -452,7 +504,7 @@ export const AddressBook = ({
                   }}
                   onKeyDown={inputKeyHandler}
                   aria-expanded={isMenuOpen}
-                  aria-activedescendant={`address-book-menu-item-${selectedItem?.id}`}
+                  aria-activedescendant={`address-book-menu-item-${selectedItem?.id}-${selectedItem?.itemType}`}
                   type="search"
                   aria-owns={popoverInstanceId.current}
                   aria-label={ariaAddressBookLabel}
@@ -567,7 +619,7 @@ AddressBook.propTypes = {
    */
   width: PropTypes.string,
   /**
-   * Bool which determines if addressbook is intialed open
+   * Bool which determines if addressbook is open
    */
   open: PropTypes.bool,
   /**
@@ -589,7 +641,15 @@ AddressBook.propTypes = {
   /**
    * State variable that controls the search input string value
    */
-  inputValue: PropTypes.string
+  inputValue: PropTypes.string,
+  /**
+   * bool which determines if "select all" in a context menu appears
+   */
+  hasSelectAllFilterOption: PropTypes.bool,
+  /**
+   * object that contains the current context filter information
+   */
+  currentFilter: PropTypes.object
 }
 
 export default AddressBook
