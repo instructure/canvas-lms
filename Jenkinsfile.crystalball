@@ -173,11 +173,25 @@ pipeline {
         sh 'docker cp crystalball-parser:/usr/src/app/crystalball_map.yml .'
         archiveArtifacts allowEmptyArchive: true, artifacts: 'crystalball_map.yml'
 
-        // Only alert and push to s3 on periodic jobs, not ones resulting from manual tests
-        if (env.CRYSTALBALL_MAP_PUSH_TO_S3 == '1' && env.GERRIT_EVENT_TYPE != 'comment-added') {
-          sh 'aws s3 cp crystalball_map.yml s3://instructure-canvas-ci/'
-          slackSend channel: '#crystalball-noisy', message: "<$env.BUILD_URL/testReport|Latest Crystalball Map Generated> - <${getResultsHTMLUrl()}|Map>"
+        def message = "<$env.BUILD_URL/testReport|Latest Crystalball Map Generated> - <${getResultsHTMLUrl()}|Map>\n"
+        try {
+          def mapSpecInfo = sh(script: """
+              docker-compose run --rm \
+              -v \$(pwd)/\$LOCAL_WORKDIR/crystalball_map.yml/:/usr/src/app/crystalball_map.yml \
+              -v \$(pwd)/\$LOCAL_WORKDIR/build:/usr/src/app/build \
+              web bash -c 'ruby build/new-jenkins/crystalball_map_smoke_test.rb'
+            """, returnStdout: true)
+          message = message + "\n" + mapSpecInfo
+          // Only alert and push to s3 on periodic jobs, not ones resulting from manual tests
+          if (env.CRYSTALBALL_MAP_PUSH_TO_S3 == '1' && env.GERRIT_EVENT_TYPE != 'comment-added') {
+            sh 'aws s3 cp crystalball_map.yml s3://instructure-canvas-ci/'
+          }
+        } catch(e) {
+          message = message + "\n" + 'Map Invalid!'
+        } finally {
+          slackSend channel: '#crystalball-noisy', message: message
         }
+
       }
     }
     cleanup {
