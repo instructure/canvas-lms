@@ -2991,4 +2991,35 @@ describe UsersController do
       expect(@user.preferences[:elementary_dashboard_disabled]).to be_truthy
     end
   end
+
+  describe "#show_k5_dashboard" do
+    before :once do
+      @observer = user_factory(active_all: true)
+      @student = user_factory(active_all: true)
+      course_factory(active_all: true)
+      @course.enroll_student(@student)
+    end
+
+    before do
+      user_session(@observer)
+    end
+
+    it "returns unauthorized for arbitrary user" do
+      get "show_k5_dashboard", params: { id: @student.id }, format: "json"
+      assert_unauthorized
+    end
+
+    it "returns value for self" do
+      allow(controller).to receive(:k5_user?).with({ user: @observer }).and_return(true)
+      get "show_k5_dashboard", params: { id: "self" }, format: "json"
+      expect(json_parse["k5_user"]).to be_truthy
+    end
+
+    it "returns value for linked student" do
+      @course.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @student)
+      allow(controller).to receive(:k5_user?).with({ user: @student }).and_return(true)
+      get "show_k5_dashboard", params: { id: @student.id }, format: "json"
+      expect(json_parse["k5_user"]).to be_truthy
+    end
+  end
 end
