@@ -52,4 +52,12 @@ describe('useModuleCourseSearchApi', () => {
       expect.objectContaining({id: '2', name: 'Module Water'})
     ])
   })
+
+  it('passes "per_page" query param on to the xhr call', async () => {
+    setupCourseModulesResponse()
+    const success = jest.fn()
+    renderHook(() => useModuleCourseSearchApi({success, params: {contextId: 1, per_page: 50}}))
+    await fetchMock.flush(true)
+    expect(fetchMock.lastCall()[0]).toBe('/api/v1/courses/1/modules?per_page=50')
+  })
 })
