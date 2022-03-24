@@ -1592,12 +1592,13 @@ describe "Submissions API", type: :request do
       course_with_teacher(active_all: true)
       @course.enroll_student(@student).accept!
       @a1 = @course.assignments.create!(title: "assignment1", grading_type: "letter_grade", points_possible: 15, turnitin_enabled: true)
+      @a2 = @course.assignments.create!(title: "assignment2", grading_type: "letter_grade", points_possible: 15, vericite_enabled: true)
       @a1.update(turnitin_settings: { originality_report_visibility: "after_grading" })
       @submission = submit_homework(@a1, @student)
+      @submission2 = submit_homework(@a2, @student)
     end
 
     it "returns vericite data if present and vericite is enabled for the assignment" do
-      @a1.update(vericite_enabled: true, turnitin_enabled: false)
       sample_vericite_data = {
         :last_processed_attempt => 1,
         "attachment_504177" => {
@@ -1611,13 +1612,13 @@ describe "Submissions API", type: :request do
         },
         :provider => "vericite"
       }
-      @submission.update(turnitin_data: sample_vericite_data)
+      @submission2.update(turnitin_data: sample_vericite_data)
 
       json = api_call(:get,
-                      "/api/v1/courses/#{@course.id}/assignments/#{@a1.id}/submissions/#{@student.id}.json",
+                      "/api/v1/courses/#{@course.id}/assignments/#{@a2.id}/submissions/#{@student.id}.json",
                       { controller: "submissions_api", action: "show",
                         format: "json", course_id: @course.id.to_s,
-                        assignment_id: @a1.id.to_s, user_id: @student.id.to_s })
+                        assignment_id: @a2.id.to_s, user_id: @student.id.to_s })
       expect(json).to have_key "vericite_data"
       sample_vericite_data.delete :last_processed_attempt
       expect(json["vericite_data"]).to eq sample_vericite_data.with_indifferent_access

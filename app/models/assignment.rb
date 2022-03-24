@@ -163,6 +163,8 @@ class Assignment < ActiveRecord::Base
 
   validates_associated :external_tool_tag, if: :external_tool?
   validate :group_category_changes_ok?
+  validate :turnitin_changes_ok?
+  validate :vericite_changes_ok?
   validate :anonymous_grading_changes_ok?
   validate :no_anonymous_group_assignments
   validate :due_date_ok?, unless: :active_assignment_overrides?
@@ -417,6 +419,26 @@ class Assignment < ActiveRecord::Base
     end
   end
   private :group_category_changes_ok?
+
+  def turnitin_changes_ok?
+    return unless turnitin_enabled_changed?
+
+    if has_submitted_submissions?
+      errors.add :turnitin_enabled,
+                 I18n.t("The plagiarism platform settings can't be changed because students have already submitted on this assignment")
+    end
+  end
+  private :turnitin_changes_ok?
+
+  def vericite_changes_ok?
+    return unless vericite_enabled_changed?
+
+    if has_submitted_submissions?
+      errors.add :vericite_enabled,
+                 I18n.t("The plagiarism platform settings can't be changed because students have already submitted on this assignment")
+    end
+  end
+  private :vericite_changes_ok?
 
   def anonymous_grading_changes_ok?
     return unless anonymous_grading_changed?

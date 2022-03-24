@@ -4320,12 +4320,19 @@ describe AssignmentsApiController, type: :request do
 
     context "when turnitin is enabled on the context" do
       before :once do
+        plugin = Canvas::Plugin.find(:vericite)
+        plugin_setting = PluginSetting.find_by(name: plugin.id) || PluginSetting.new(name: plugin.id, settings: plugin.default_settings)
+        plugin_setting.posted_settings = { comments: "vericite comments" }
+        plugin_setting.save!
         @assignment = @course.assignments.create!
         acct = @course.account
         acct.turnitin_account_id = 0
         acct.turnitin_shared_secret = "blah"
         acct.settings[:enable_turnitin] = true
+        acct.settings[:enable_vericite] = true
         acct.save!
+        @student = User.create!
+        @course.enroll_user(@student, "StudentEnrollment", section: @section, enrollment_state: :active)
       end
 
       it "allows setting turnitin_enabled" do
@@ -4338,6 +4345,48 @@ describe AssignmentsApiController, type: :request do
                                      "turnitin_enabled" => "0",
                                    })
         expect(@assignment.reload).not_to be_turnitin_enabled
+      end
+
+      it "does not allow changing turnitin setting after submissions have been made" do
+        expect do
+          api_update_assignment_call(@course, @assignment, {
+                                       "turnitin_enabled" => "1",
+                                     })
+        end.to change {
+          @assignment.reload.turnitin_enabled
+        }
+
+        @assignment.submit_homework(@student, submission_type: "online_text_entry")
+
+        expect do
+          json = api_update_assignment_call(@course, @assignment, {
+                                              "turnitin_enabled" => "0",
+                                            })
+          expect(json["errors"]["turnitin_enabled"][0]["message"]).to eq("The plagiarism platform settings can't be changed because students have already submitted on this assignment")
+        end.not_to change {
+          @assignment.reload.turnitin_enabled
+        }
+      end
+
+      it "does not allow changing vericite setting after submissions have been made" do
+        expect do
+          api_update_assignment_call(@course, @assignment, {
+                                       "vericite_enabled" => "1",
+                                     })
+        end.to change {
+          @assignment.reload.vericite_enabled
+        }
+
+        @assignment.submit_homework(@student, submission_type: "online_text_entry")
+
+        expect do
+          json = api_update_assignment_call(@course, @assignment, {
+                                              "vericite_enabled" => "0",
+                                            })
+          expect(json["errors"]["vericite_enabled"][0]["message"]).to eq("The plagiarism platform settings can't be changed because students have already submitted on this assignment")
+        end.not_to change {
+          @assignment.reload.vericite_enabled
+        }
       end
 
       it "allows setting valid turnitin_settings" do
