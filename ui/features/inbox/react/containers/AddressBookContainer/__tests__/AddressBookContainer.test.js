@@ -64,7 +64,7 @@ describe('Should load <AddressBookContainer> normally', () => {
 
     it('should filter menu by initial context', async () => {
       setup({
-        activeCourseFilter: 'course_123'
+        activeCourseFilter: {contextID: 'course_123', contextName: 'course name'}
       })
       const items = await screen.findAllByTestId('address-book-item')
       expect(items.length).toBe(2)

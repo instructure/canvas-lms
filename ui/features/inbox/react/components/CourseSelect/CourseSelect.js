@@ -99,16 +99,16 @@ export class CourseSelect extends React.Component {
       )
     }).isRequired,
     onCourseFilterSelect: PropTypes.func,
-    activeCourseFilter: PropTypes.string
+    activeCourseFilterID: PropTypes.string
   }
 
   static getDerivedStateFromProps(props, state) {
     if (props.options !== state.options) {
-      const activeCourseInputValue = getCourseName(props.activeCourseFilter, props.options)
+      const activeCourseInputValue = getCourseName(props.activeCourseFilterID, props.options)
       return {
         filteredOptions: filterOptions(activeCourseInputValue, props.options),
         inputValue: activeCourseInputValue,
-        selectedOptionId: props.activeCourseFilter ? props.activeCourseFilter : null
+        selectedOptionId: props.activeCourseFilterID ? props.activeCourseFilterID : null
       }
     }
     return null
@@ -183,7 +183,7 @@ export class CourseSelect extends React.Component {
     const contextName = option.contextName
     if (!option) return // prevent selecting of empty options
     if (id === 'all_courses') id = null
-    this.props.onCourseFilterSelect(id)
+    this.props.onCourseFilterSelect({contextID: id, contextName})
     this.setState(
       {
         selectedOptionId: id,

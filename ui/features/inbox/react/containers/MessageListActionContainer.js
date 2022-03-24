@@ -379,8 +379,10 @@ const MessageListActionContainer = props => {
               <CourseSelect
                 mainPage
                 options={courseSelectorOptions}
-                activeCourseFilter={props.activeCourseFilter}
-                onCourseFilterSelect={props.onCourseFilterSelect}
+                activeCourseFilterID={props.activeCourseFilter}
+                onCourseFilterSelect={contextObject => {
+                  props.onCourseFilterSelect(contextObject.contextID)
+                }}
               />
             </Flex.Item>
             <Flex.Item
