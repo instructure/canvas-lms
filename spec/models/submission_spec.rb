@@ -7368,10 +7368,36 @@ describe Submission do
   end
 
   describe "#update_line_item_result" do
-    it "does nothing if lti_result does not exist" do
-      submission = submission_model assignment: @assignment
-      expect(submission).to receive(:update_line_item_result)
-      submission.save!
+    let(:submission) { submission_model(assignment: @assignment) }
+
+    context "when lti_result does not exist" do
+      it "does nothing when there is no line item" do
+        expect do
+          submission.update!(score: 1.3)
+        end.to_not change { submission.lti_result }.from(nil)
+      end
+
+      context "when there is a line item" do
+        before { line_item_model(assignment: @assignment) }
+
+        it "does nothing if score has not changed" do
+          expect do
+            submission.update!(body: "hello abc")
+          end.to_not change { submission.lti_result }.from(nil)
+        end
+
+        it "creates an the lti_result with the correct score_given if the score has changed" do
+          expect do
+            submission.update!(score: 1.3)
+          end.to change { submission.lti_result&.reload&.result_score }.from(nil).to(1.3)
+        end
+
+        it "does nothing if the lti_result was updated by a tool" do
+          expect do
+            submission.update!(score: 1.3, grader_id: -123)
+          end.to_not change { submission.lti_result }.from(nil)
+        end
+      end
     end
 
     context "with lti_result" do
