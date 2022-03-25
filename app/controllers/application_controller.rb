@@ -240,6 +240,7 @@ class ApplicationController < ActionController::Base
 
             errors_sample_rate: Setting.get("sentry_frontend_errors_sample_rate", "0.0"),
             traces_sample_rate: Setting.get("sentry_frontend_traces_sample_rate", "0.0"),
+            url_deny_pattern: Setting.get("sentry_frontend_url_deny_pattern", ""), # regexp
 
             # these values need to correlate with the backend for Sentry features to work properly
             environment: Canvas.environment,
