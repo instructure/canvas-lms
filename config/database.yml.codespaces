@@ -1,0 +1,16 @@
+# do not create a queue: section for your test environment
+test:
+  adapter: postgresql
+  encoding: utf8
+  database: canvas_test
+  host: localhost
+  username: canvas
+  timeout: 5000
+
+development:
+  adapter: postgresql
+  encoding: utf8
+  host: localhost
+  username: canvas
+  database: canvas_development
+  timeout: 5000

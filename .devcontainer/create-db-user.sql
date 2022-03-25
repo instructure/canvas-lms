@@ -1,0 +1,3 @@
+CREATE USER canvas WITH SUPERUSER;
+CREATE DATABASE canvas_test WITH OWNER canvas;
+CREATE DATABASE canvas_development WITH OWNER canvas;
