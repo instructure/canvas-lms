@@ -614,6 +614,10 @@ class ApplicationController < ActionController::Base
       params[:controller] != "question_banks"
   end
 
+  def user_url(*opts)
+    opts[0] == @current_user ? user_profile_url(@current_user) : super
+  end
+
   protected
 
   # we track the cost of each request in RequestThrottle in order
@@ -772,10 +776,6 @@ class ApplicationController < ActionController::Base
       reset_session
       redirect_to login_url
     end
-  end
-
-  def user_url(*opts)
-    opts[0] == @current_user ? user_profile_url(@current_user) : super
   end
 
   def tab_enabled?(id, opts = {})
