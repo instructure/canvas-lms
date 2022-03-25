@@ -23,11 +23,14 @@ import {CloseButton, Button} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {Flex} from '@instructure/ui-flex'
 import {debounce} from '@instructure/debounce'
 
 import formatMessage from '../../../../format-message'
 
-import EquationEditorToolbar from '../EquationEditorToolbar'
+import MemoizedEquationEditorToolbar from '../EquationEditorToolbar'
+import {containsAdvancedSyntax} from './advancedOnlySyntax'
 
 import {css} from 'aphrodite'
 import mathml from './mathml'
@@ -94,6 +97,7 @@ export default class EquationEditorModal extends Component {
 
     editor.selection.setRng(range)
     this.originalFormula = this.selectionToLatex(currentFormula)
+    this.forceAdvancedModeIfNecessary(this.originalFormula)
     this.mathField.setValue(this.originalFormula || ' ')
   }
 
@@ -101,16 +105,20 @@ export default class EquationEditorModal extends Component {
     const {editor} = this.props
     const selection = editor.selection.getContent()
 
+    // check if highlighted text is inline latex
     if (selection && this.selectionIsLatex(selection)) {
       this.originalFormula = this.selectionToLatex(selection)
+      this.forceAdvancedModeIfNecessary(this.originalFormula)
       this.mathField.setValue(this.originalFormula || ' ')
     } else {
+      // check if we launched modal from an equation image
       const selnode = editor.selection.getNode()
       if (selnode.tagName === 'IMG' && selnode.classList.contains('equation_image')) {
         try {
           const src = new URL(selnode.src)
           const encoded_eq = src.pathname.replace(/^\/equation_images\//, '')
           this.originalFormula = decodeURIComponent(decodeURIComponent(encoded_eq))
+          this.forceAdvancedModeIfNecessary(this.originalFormula)
           this.mathField.setValue(this.originalFormula || ' ')
         } catch (ex) {
           // probably failed to create the new URL
@@ -118,6 +126,7 @@ export default class EquationEditorModal extends Component {
           console.error(ex)
         }
       } else {
+        // check if the cursor was within inline latex when launched
         const editorRange = editor.selection.getRng()
         const startContainer = editorRange.startContainer
         const wholeText = startContainer.wholeText
@@ -136,6 +145,11 @@ export default class EquationEditorModal extends Component {
         }
       }
     }
+  }
+
+  advancedModeOnly(latex) {
+    const normalizedLatex = latex.replace(/\s+/, '')
+    return containsAdvancedSyntax(normalizedLatex)
   }
 
   selectionIsLatex(selection) {
@@ -225,6 +239,22 @@ export default class EquationEditorModal extends Component {
     this.setPreviewElementContent()
   }
 
+  registerBasicEditorListener = () => {
+    const basicEditor = document.querySelector('math-field')
+    basicEditor.addEventListener('input', e => {
+      if (this.advancedModeOnly(e.target.value)) {
+        this.toggleAdvanced()
+        this.setState({workingFormula: e.target.value})
+      }
+    })
+  }
+
+  forceAdvancedModeIfNecessary(latex) {
+    if (this.advancedModeOnly(latex)) {
+      this.toggleAdvanced()
+    }
+  }
+
   handleOpen = () => {
     this.originalFormula = null
   }
@@ -254,11 +284,36 @@ export default class EquationEditorModal extends Component {
     )
   }
 
+  renderToggle = () => {
+    const lockToggle = this.state.advanced && this.advancedModeOnly(this.state.workingFormula)
+
+    const defaultToggle =
+      <Checkbox
+        onChange={this.toggleAdvanced}
+        checked={this.state.advanced}
+        label={formatMessage('Directly Edit LaTeX')}
+        variant="toggle"
+        disabled={lockToggle}
+        data-testid="advanced-toggle"
+      />
+
+    const tooltipToggle =
+      <Tooltip
+        renderTip={formatMessage('This equation cannot be rendered in Basic View.')}
+        on={['hover', 'focus']}
+      >
+        {defaultToggle}
+      </Tooltip>
+
+    return lockToggle ? tooltipToggle : defaultToggle
+  }
+
   handleRef = node => {
     this.modalFooter = node
   }
 
   componentDidMount() {
+    this.registerBasicEditorListener()
     this.setPreviewElementContent()
   }
 
@@ -301,7 +356,7 @@ export default class EquationEditorModal extends Component {
             className={css(styles.mathfieldContainer)}
           >
             <div>
-              <EquationEditorToolbar executeCommand={this.executeCommand} />
+              <MemoizedEquationEditorToolbar executeCommand={this.executeCommand} />
             </div>
 
             <div
@@ -341,12 +396,11 @@ export default class EquationEditorModal extends Component {
             </div>
 
             <div className={css(styles.latexToggle)}>
-              <Checkbox
-                onChange={this.toggleAdvanced}
-                checked={this.state.advanced}
-                label={formatMessage('Directly Edit LaTeX')}
-                variant="toggle"
-              />
+              <Flex>
+                <Flex.Item>
+                  {this.renderToggle()}
+                </Flex.Item>
+              </Flex>
             </div>
 
             <div style={{display: this.state.advanced ? null : 'none', marginTop: '1em'}}>
