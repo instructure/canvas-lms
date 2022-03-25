@@ -270,6 +270,23 @@ describe "Jobs V2 API", type: :request do
         expect(json[2]["info"].seconds).to be_within(1.minute).of(30.minutes)
       end
 
+      it "orders running jobs by strand_singleton" do
+        Delayed::Job.where(tag: "Kernel.p").update_all(strand: "barfood")
+
+        ::Kernel.delay(strand: "foo", singleton: "singletonB").pp
+        Delayed::Job.last.update locked_at: 1.hour.ago, locked_by: "me"
+        ::Kernel.delay(strand: "foo", singleton: "singletonA").pp
+        Delayed::Job.last.update locked_at: 1.hour.ago, locked_by: "me"
+        ::Kernel.delay(strand: "foo", singleton: "singletonC").pp
+        Delayed::Job.last.update locked_at: 1.hour.ago, locked_by: "me"
+
+        json = api_call(:get, "/api/v1/jobs2/running",
+                        { controller: "jobs_v2", action: "list", format: "json", bucket: "running", order: "strand_singleton" })
+        expect(json.size).to eq 6
+        expect(json.map { |x| x["strand"] }).to eq ["barfood", "foo", "foo", "foo", nil, nil]
+        expect(json.map { |x| x["singleton"] }).to eq [nil, "singletonA", "singletonB", "singletonC", nil, nil]
+      end
+
       it "searches running tags" do
         json = api_call(:get, "/api/v1/jobs2/running/by_tag/search?term=p",
                         { controller: "jobs_v2", action: "search", format: "json", bucket: "running", group: "tag", term: "p" })
