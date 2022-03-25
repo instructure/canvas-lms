@@ -37,11 +37,12 @@ import * as DateHelpers from '../../utils/date_stuff/date_helpers'
 const I18n = useI18nScope('course_pace_date_input')
 
 export type CoursePacesDateInputProps = {
-  id?: string
-  dateValue?: string
-  label: string | JSX.Element
-  helpText?: string
-  message?: CanvasDateInputMessageType
+  readonly id?: string
+  readonly dateValue?: string
+  readonly label: string | JSX.Element
+  readonly helpText?: string
+  readonly permitEmpty?: boolean
+  readonly message?: CanvasDateInputMessageType
   onDateChange: (rawDate: string) => void
   /**
    * Callback that takes a date and returns a truthy error message if it is invalid (or a falsy value if it is valid).
@@ -79,6 +80,7 @@ const CoursePaceDateInput = ({
   label,
   helpText,
   message,
+  permitEmpty,
   onDateChange,
   validateDay,
   interaction = 'enabled',
@@ -91,8 +93,14 @@ const CoursePaceDateInput = ({
   const [customErrors, setCustomErrors] = useState<string[]>([])
   const formatDate = useDateTimeFormat('date.formats.long', coursePaceTimezone, ENV.LOCALE)
 
-  const calculateErrors = (date: Moment = moment(dateValue)): string[] => {
+  const calculateErrors = (date: Moment | undefined): string[] => {
     const errors: string[] = []
+
+    if (!date && permitEmpty) return errors
+
+    if (!date) {
+      date = moment(dateValue)
+    }
 
     if (!date.isValid()) return [I18n.t('The date entered was invalid.')]
 

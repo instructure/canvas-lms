@@ -27,7 +27,8 @@ import * as BlackoutDatesApi from '../../api/blackout_dates_api'
 export enum Constants {
   ADD_BLACKOUT_DATE = 'BLACKOUT_DATES/ADD',
   DELETE_BLACKOUT_DATE = 'BLACKOUT_DATES/DELETE',
-  ADD_BACKEND_ID = 'BLACKOUT_DATES/ADD_BACKEND_ID'
+  ADD_BACKEND_ID = 'BLACKOUT_DATES/ADD_BACKEND_ID',
+  UPDATE_BLACKOUT_DATES = 'BLACKOUT_DATES/UPDATE'
 }
 
 /* Action Creators */
@@ -37,7 +38,9 @@ const regularActions = {
     createAction(Constants.ADD_BACKEND_ID, {tempId, id}),
   deleteBlackoutDate: (id: number | string) => createAction(Constants.DELETE_BLACKOUT_DATE, id),
   addBlackoutDate: (blackoutDate: BlackoutDate) =>
-    createAction(Constants.ADD_BLACKOUT_DATE, blackoutDate)
+    createAction(Constants.ADD_BLACKOUT_DATE, blackoutDate),
+  updateBlackoutDates: (blackoutDates: BlackoutDate[]) =>
+    createAction(Constants.UPDATE_BLACKOUT_DATES, blackoutDates)
 }
 
 const thunkActions = {
@@ -55,14 +58,14 @@ const thunkActions = {
 
       dispatch(regularActions.addBlackoutDate(blackoutDateWithTempId))
 
-      BlackoutDatesApi.create(blackoutDateWithTempId)
-        .then(newBlackoutDate => {
-          if (!newBlackoutDate) throw new Error('Response body was empty')
-          dispatch(actions.addBackendId(tempId, newBlackoutDate.id as number))
-        })
-        .catch(error => {
-          console.error(error) // eslint-disable-line no-console
-        })
+      // BlackoutDatesApi.create(blackoutDateWithTempId)
+      //   .then(newBlackoutDate => {
+      //     if (!newBlackoutDate) throw new Error('Response body was empty')
+      //     dispatch(actions.addBackendId(tempId, newBlackoutDate.id as number))
+      //   })
+      //   .catch(error => {
+      //     console.error(error) // eslint-disable-line no-console
+      //   })
     }
   },
   deleteBlackoutDate: (id: number | string): ThunkAction<void, StoreState, void, Action> => {

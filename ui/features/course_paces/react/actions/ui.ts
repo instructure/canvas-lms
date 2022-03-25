@@ -37,8 +37,7 @@ export enum Constants {
   SET_SELECTED_PACE_CONTEXT = 'UI/SET_SELECTED_PACE_CONTEXT',
   SET_RESPONSIVE_SIZE = 'UI/SET_RESPONSIVE_SIZE',
   SHOW_LOADING_OVERLAY = 'UI/SHOW_LOADING_OVERLAY',
-  HIDE_LOADING_OVERLAY = 'UI/HIDE_LOADING_OVERLAY',
-  SET_EDITING_BLACKOUT_DATES = 'UI/SET_EDITING_BLACKOUT_DATES'
+  HIDE_LOADING_OVERLAY = 'UI/HIDE_LOADING_OVERLAY'
 }
 
 /* Action creators */
@@ -53,8 +52,6 @@ export const regularActions = {
   toggleShowProjections: () => createAction(Constants.TOGGLE_SHOW_PROJECTIONS),
   showLoadingOverlay: (message: string) => createAction(Constants.SHOW_LOADING_OVERLAY, message),
   hideLoadingOverlay: () => createAction(Constants.HIDE_LOADING_OVERLAY),
-  setEditingBlackoutDates: (editing: boolean) =>
-    createAction(Constants.SET_EDITING_BLACKOUT_DATES, editing),
   setSelectedPaceContext: (
     contextType: PaceContextTypes,
     contextId: string,

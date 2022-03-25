@@ -118,6 +118,7 @@ export type ResponsiveSizes = 'small' | 'large'
 export type CategoryErrors = {[category: string]: string}
 export type OriginalState = {
   coursePace: CoursePace
+  blackoutDates: BlackoutDate[]
 }
 
 export interface UIState {

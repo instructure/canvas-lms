@@ -45,14 +45,14 @@ import {Constants as UIConstants, SetSelectedPaceType} from '../actions/ui'
 import {getCourse} from './course'
 import {getEnrollments} from './enrollments'
 import {getSections} from './sections'
-import {getOriginalPace} from './original'
+import {getInitialCoursePace, getOriginalBlackoutDates, getOriginalPace} from './original'
 import {getBlackoutDates} from '../shared/reducers/blackout_dates'
 import {Change, summarizeChanges} from '../utils/change_tracking'
 
 const initialProgress = window.ENV.COURSE_PACE_PROGRESS
 
 export const initialState: CoursePacesState = ({
-  ...window.ENV.COURSE_PACE,
+  ...getInitialCoursePace(),
   course: window.ENV.COURSE,
   publishingProgress: initialProgress
 } || {}) as CoursePacesState
@@ -102,8 +102,10 @@ export const getSettingChanges = createDeepEqualSelector(
   getExcludeWeekends,
   getHardEndDates,
   getOriginalPace,
+  getBlackoutDates,
+  getOriginalBlackoutDates,
   getEndDate,
-  (excludeWeekends, hardEndDates, originalPace, endDate) => {
+  (excludeWeekends, hardEndDates, originalPace, blackoutDates, originalBlackoutDates, endDate) => {
     const changes: Change[] = []
 
     if (excludeWeekends !== originalPace.exclude_weekends)
@@ -112,6 +114,14 @@ export const getSettingChanges = createDeepEqualSelector(
         oldValue: originalPace.exclude_weekends,
         newValue: excludeWeekends
       })
+
+    if (!deepEqual(blackoutDates, originalBlackoutDates)) {
+      changes.push({
+        id: 'blackout_dates',
+        oldValue: originalBlackoutDates,
+        newValue: blackoutDates
+      })
+    }
 
     // we want to validate that if hardEndDates is true that the endDate is a valid date
     if (

@@ -51,7 +51,7 @@ const UnpublishedChangesTrayContents = ({
           <Text weight="bold">{I18n.t('Unpublished Changes')}</Text>
         </h4>
       </View>
-      <List margin="none" isUnstyled itemSpacing="small">
+      <List margin="none" as="ol" itemSpacing="small">
         {changes.map(c => c.summary && <Item key={c.id}>{c.summary}</Item>)}
       </List>
     </View>

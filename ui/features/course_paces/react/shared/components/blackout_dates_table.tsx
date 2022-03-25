@@ -22,8 +22,10 @@ import {IconButton} from '@instructure/ui-buttons'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
-
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {BlackoutDate} from '../types'
+
+const I18n = useI18nScope('course_paces_blackout_dates_table')
 
 // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
 const {Body, Cell, ColHeader, Head, Row} = Table as any
@@ -77,9 +79,18 @@ export class BlackoutDatesTable extends React.Component<ComponentProps, LocalSta
 
   /* Renderers */
 
-  // @ts-ignore
-  renderRows = () =>
-    this.sortedBlackoutDates().map(bd => (
+  renderRows = () => {
+    const dates = this.sortedBlackoutDates()
+    if (dates.length === 0) {
+      return (
+        <Row key="blackout-date-empty">
+          <Cell colSpan={4} textAlign="center">
+            {I18n.t('No blackout dates')}
+          </Cell>
+        </Row>
+      )
+    }
+    return dates.map(bd => (
       <Row key={`blackout-date-${bd.id}`}>
         <Cell>{bd.event_title}</Cell>
         <Cell>{bd.start_date.format('L')}</Cell>
@@ -87,6 +98,7 @@ export class BlackoutDatesTable extends React.Component<ComponentProps, LocalSta
         <Cell textAlign="end">{this.renderTrash(bd)}</Cell>
       </Row>
     ))
+  }
 
   renderTrash = (blackoutDate: BlackoutDate) => {
     if (this.props.displayType === 'course' && blackoutDate.admin_level) {
@@ -105,7 +117,7 @@ export class BlackoutDatesTable extends React.Component<ComponentProps, LocalSta
 
   render() {
     return (
-      <Table caption="Blackout Dates">
+      <Table caption="Blackout Dates" data-testid="blackout_dates_table">
         <Head>
           <Row>
             <ColHeader id="blackout-dates-title">Event Title</ColHeader>

@@ -16,38 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import moment from 'moment-timezone'
-
 import {StoreState as CoursePageStoreState} from '../../types'
 import {BlackoutDate} from '../types'
 import {Constants, BlackoutDatesAction} from '../actions/blackout_dates'
+import {getInitialBlackoutDates} from '../../reducers/original'
 
-const blackoutDates: BlackoutDate[] = (window.ENV.BLACKOUT_DATES || []) as BlackoutDate[]
-
-if (blackoutDates && blackoutDates.forEach) {
-  blackoutDates.forEach(blackoutDate => {
-    blackoutDate.start_date = moment(blackoutDate.start_date)
-    blackoutDate.end_date = moment(blackoutDate.end_date)
-  })
+export const getBlackoutDates = (state: CoursePageStoreState) => {
+  return state.blackoutDates
 }
-
-export const blackoutDatesInitialState = blackoutDates
-
-/* Selectors */
-
-export const getBlackoutDates = (state: CoursePageStoreState) => state.blackoutDates
 
 /* Reducers */
 
 export const blackoutDatesReducer = (
-  state = blackoutDatesInitialState,
+  state = getInitialBlackoutDates(),
   action: BlackoutDatesAction
 ): BlackoutDate[] => {
   switch (action.type) {
-    case Constants.ADD_BLACKOUT_DATE:
-      return [...state, action.payload]
-    case Constants.DELETE_BLACKOUT_DATE:
-      return state.filter(blackoutDate => blackoutDate.id !== action.payload)
+    // case Constants.ADD_BLACKOUT_DATE:
+    //   return [...state, action.payload]
+    // case Constants.DELETE_BLACKOUT_DATE:
+    //   return state.filter(blackoutDate => blackoutDate.id !== action.payload)
+    case Constants.UPDATE_BLACKOUT_DATES:
+      return action.payload.sort((a, b) => {
+        if (a.start_date.isBefore(b.start_date)) return -1
+        if (a.start_date.isAfter(b.start_date)) return 1
+        return 0
+      }) as BlackoutDate[]
     case Constants.ADD_BACKEND_ID:
       return state.map(blackoutDate => {
         if (blackoutDate.temp_id === action.payload.tempId) {

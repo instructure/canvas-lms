@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import moment from 'moment'
 import {keyBy} from 'lodash'
 
 import {BlackoutDate, Course} from '../shared/types'
@@ -34,8 +35,6 @@ import {
   OriginalState
 } from '../types'
 
-export const BLACKOUT_DATES: BlackoutDate[] = []
-
 window.ENV.TIMEZONE = 'America/Denver'
 window.ENV.CONTEXT_TIMEZONE = 'America/Denver'
 
@@ -47,6 +46,16 @@ export const COURSE: Course = {
   end_at: '2021-12-31T00:00:00-07:00',
   time_zone: window.ENV.CONTEXT_TIMEZONE
 }
+
+export const BLACKOUT_DATES: BlackoutDate[] = [
+  {
+    id: '30',
+    course_id: COURSE.id,
+    event_title: 'Spring break',
+    start_date: moment('2022-03-21'),
+    end_date: moment('2022-03-25')
+  }
+]
 
 export const ENROLLMENT_1: Enrollment = {
   id: '20',

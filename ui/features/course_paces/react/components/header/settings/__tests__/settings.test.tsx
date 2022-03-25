@@ -19,30 +19,31 @@
 import React from 'react'
 import {act, screen} from '@testing-library/react'
 
-import {COURSE, PRIMARY_PACE} from '../../../../__tests__/fixtures'
+import {BLACKOUT_DATES, COURSE, PRIMARY_PACE} from '../../../../__tests__/fixtures'
 import {renderConnected} from '../../../../__tests__/utils'
 
 import {Settings} from '../settings'
 
 const loadLatestPaceByContext = jest.fn()
-const setEditingBlackoutDates = jest.fn()
 const showLoadingOverlay = jest.fn()
 const toggleExcludeWeekends = jest.fn()
 const toggleHardEndDates = jest.fn()
 const setEndDate = jest.fn()
+const updateBlackoutDates = jest.fn()
 
 const defaultProps = {
+  blackoutDates: BLACKOUT_DATES,
   course: COURSE,
   courseId: COURSE.id,
   excludeWeekends: PRIMARY_PACE.exclude_weekends,
   coursePace: PRIMARY_PACE,
   pacePublishing: false,
   loadLatestPaceByContext,
-  setEditingBlackoutDates,
   showLoadingOverlay,
   toggleExcludeWeekends,
   toggleHardEndDates,
-  setEndDate
+  setEndDate,
+  updateBlackoutDates
 }
 
 beforeAll(() => {
@@ -50,6 +51,8 @@ beforeAll(() => {
     end_at: {date: COURSE.start_at, date_context: 'course'},
     start_at: {date: COURSE.end_at, date_context: 'course'}
   }
+  window.ENV.FEATURES ||= {}
+  window.ENV.FEATURES.course_paces_blackout_dates = true
 })
 afterEach(() => {
   jest.clearAllMocks()
@@ -88,19 +91,34 @@ describe('Settings', () => {
     expect(skipWeekendsToggle).toBeDisabled()
   })
 
-  // Skipped since we're not implementing this feature yet
-  it.skip('shows and hides the blackout dates modal correctly', () => {
+  it('shows and hides the blackout dates modal correctly', () => {
     const {getByRole} = renderConnected(<Settings {...defaultProps} />)
     const settingsButton = getByRole('button', {name: 'Modify Settings'})
     act(() => settingsButton.click())
 
-    act(() => screen.getByRole('button', {name: 'View Blackout Dates'}).click())
+    act(() => screen.getByRole('button', {name: 'Manage Blackout Dates'}).click())
     expect(screen.getByRole('heading', {name: 'Blackout Dates'})).toBeInTheDocument()
-    const closeButtons = screen.getAllByRole('button', {name: 'Close'})
-    expect(closeButtons.length).toBe(2)
+    const cancelButton = screen.getByRole('button', {name: 'Cancel'})
+    expect(cancelButton).toBeInTheDocument()
 
-    act(() => closeButtons[0].click())
+    act(() => cancelButton.click())
     expect(screen.queryByRole('heading', {name: 'Blackout Dates'})).not.toBeInTheDocument()
     expect(screen.queryByRole('checkbox', {name: 'Skip Weekends'})).not.toBeInTheDocument()
+  })
+
+  it('saves blackout dates from modal correctly', () => {
+    const {getByRole} = renderConnected(<Settings {...defaultProps} />)
+    const settingsButton = getByRole('button', {name: 'Modify Settings'})
+    act(() => settingsButton.click())
+
+    act(() => screen.getByRole('button', {name: 'Manage Blackout Dates'}).click())
+    expect(screen.getByRole('heading', {name: 'Blackout Dates'})).toBeInTheDocument()
+    const saveButton = screen.getByRole('button', {name: 'Save'})
+    expect(saveButton).toBeInTheDocument()
+
+    act(() => saveButton.click())
+    expect(screen.queryByRole('heading', {name: 'Blackout Dates'})).not.toBeInTheDocument()
+    expect(screen.queryByRole('checkbox', {name: 'Skip Weekends'})).not.toBeInTheDocument()
+    expect(updateBlackoutDates).toHaveBeenCalledWith(defaultProps.blackoutDates)
   })
 })

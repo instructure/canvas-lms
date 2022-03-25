@@ -34,6 +34,16 @@ course_paces:
     feedback by joining the Course Pacing User Group.
   applies_to: Account
   beta: true
+course_paces_blackout_dates:
+  state: hidden
+  display_name: 'Course pacing blackout dates'
+  description: Add blackout dates UI to course pacing. Requires course_paces enabled.
+  applies_to: SiteAdmin
+  environments:
+    development:
+      state: allowed_on
+    ci:
+      state: allowed_on
 create_course_subaccount_picker:
   state: hidden
   applies_to: RootAccount
@@ -43,10 +53,10 @@ create_course_subaccount_picker:
     "Manually Created Courses" sub-account, when enabled, this feature allows
     people who can manually create courses to put those courses into any sub-account
     where they have enrollments.
-  enable_at: "2021-11-20"
+  enable_at: '2021-11-20'
   environments:
     beta:
-      enable_at: "2021-10-18"
+      enable_at: '2021-10-18'
 conferencing_in_planner:
   state: hidden
   applies_to: SiteAdmin
@@ -54,10 +64,10 @@ conferencing_in_planner:
   description: |-
     When enabled, this flag shows a "Join" button on Canvas calendar
     events in the student planner
-  enable_at: "2021-11-20"
+  enable_at: '2021-11-20'
   environments:
     beta:
-      enable_at: "2021-10-18"
+      enable_at: '2021-10-18'
 submission_feedback_indicators:
   state: allowed
   applies_to: RootAccount

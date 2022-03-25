@@ -20,7 +20,7 @@ import moment from 'moment-timezone'
 
 export interface BlackoutDate {
   readonly id?: number | string
-  readonly temp_id?: string
+  temp_id?: string
   readonly course_id?: number | string
   readonly event_title: string
   start_date: moment.Moment

@@ -21,28 +21,27 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import moment from 'moment-timezone'
 import {connect} from 'react-redux'
 
-import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
+import {CondensedButton, IconButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
-import {Heading} from '@instructure/ui-heading'
 import {IconSettingsLine} from '@instructure/ui-icons'
-import {Modal} from '@instructure/ui-modal'
 import {Popover} from '@instructure/ui-popover'
 import {View} from '@instructure/ui-view'
+import {uid} from '@instructure/uid'
 
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import BlackoutDates from './blackout_dates'
-import * as CoursePaceApi from '../../../api/course_pace_api'
+import BlackoutDatesModal from '../../../shared/components/blackout_dates_modal'
 import {StoreState, CoursePace} from '../../../types'
-import {Course} from '../../../shared/types'
+import {Course, BlackoutDate} from '../../../shared/types'
 import {getCourse} from '../../../reducers/course'
 import {getExcludeWeekends, getCoursePace, getPacePublishing} from '../../../reducers/course_paces'
 import {coursePaceActions} from '../../../actions/course_paces'
 import {actions as uiActions} from '../../../actions/ui'
-import UpdateExistingPacesModal from '../../../shared/components/update_existing_paces_modal'
+import {actions as blackoutDateActions} from '../../../shared/actions/blackout_dates'
+import {getBlackoutDates} from '../../../shared/reducers/blackout_dates'
 
 const I18n = useI18nScope('course_paces_settings')
 
 interface StoreProps {
+  readonly blackoutDates: BlackoutDate[]
   readonly course: Course
   readonly courseId: string
   readonly excludeWeekends: boolean
@@ -52,10 +51,10 @@ interface StoreProps {
 
 interface DispatchProps {
   readonly loadLatestPaceByContext: typeof coursePaceActions.loadLatestPaceByContext
-  readonly setEditingBlackoutDates: typeof uiActions.setEditingBlackoutDates
   readonly setEndDate: typeof coursePaceActions.setEndDate
   readonly showLoadingOverlay: typeof uiActions.showLoadingOverlay
   readonly toggleExcludeWeekends: typeof coursePaceActions.toggleExcludeWeekends
+  readonly updateBlackoutDates: typeof blackoutDateActions.updateBlackoutDates
 }
 
 interface PassedProps {
@@ -65,20 +64,18 @@ interface PassedProps {
 type ComponentProps = StoreProps & DispatchProps & PassedProps
 
 interface LocalState {
-  readonly changeMadeToBlackoutDates: boolean
   readonly showBlackoutDatesModal: boolean
   readonly showSettingsPopover: boolean
-  readonly showUpdateExistingPacesModal: boolean
+  readonly blackoutDatesModalKey: string
 }
 
 export class Settings extends React.Component<ComponentProps, LocalState> {
   constructor(props: ComponentProps) {
     super(props)
     this.state = {
-      changeMadeToBlackoutDates: false,
       showBlackoutDatesModal: false,
       showSettingsPopover: false,
-      showUpdateExistingPacesModal: false
+      blackoutDatesModalKey: uid('bod_', 2)
     }
   }
 
@@ -86,40 +83,18 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
 
   showBlackoutDatesModal = () => {
     this.setState({showBlackoutDatesModal: true})
-    this.props.setEditingBlackoutDates(true)
   }
 
-  republishAllPaces = () => {
-    this.props.showLoadingOverlay('Publishing...')
-    CoursePaceApi.republishAllPacesForCourse(this.props.courseId)
-      .then(this.onCloseUpdateExistingPacesModal)
-      .catch(err => {
-        showFlashAlert({
-          message: I18n.t('Failed publishing pace'),
-          err,
-          type: 'error'
-        })
-      })
-  }
-
-  onCloseBlackoutDatesModal = () => {
-    this.setState(({changeMadeToBlackoutDates}) => ({
+  closeBlackoutDatesModal = (): void => {
+    this.setState({
       showBlackoutDatesModal: false,
-      showUpdateExistingPacesModal: changeMadeToBlackoutDates,
-      changeMadeToBlackoutDates: false
-    }))
-    if (!this.state.changeMadeToBlackoutDates) {
-      this.props.setEditingBlackoutDates(false)
-    }
+      blackoutDatesModalKey: uid()
+    })
   }
 
-  onCloseUpdateExistingPacesModal = async () => {
-    this.setState({showUpdateExistingPacesModal: false})
-    await this.props.loadLatestPaceByContext(
-      this.props.coursePace.context_type,
-      this.props.coursePace.context_id
-    )
-    this.props.setEditingBlackoutDates(false)
+  handleSaveBlackoutDates = (updatedBlackoutDates: BlackoutDate[]) => {
+    this.props.updateBlackoutDates(updatedBlackoutDates)
+    this.closeBlackoutDatesModal()
   }
 
   validateEnd = (date: moment.Moment) => {
@@ -138,54 +113,21 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
 
   /* Renderers */
 
-  renderBlackoutDatesModal() {
-    return (
-      <Modal
-        open={this.state.showBlackoutDatesModal}
-        onDismiss={() => this.setState({showBlackoutDatesModal: false})}
-        label="Blackout Dates"
-        shouldCloseOnDocumentClick
-      >
-        <Modal.Header>
-          <CloseButton
-            placement="end"
-            offset="medium"
-            variant="icon"
-            onClick={this.onCloseBlackoutDatesModal}
-          >
-            Close
-          </CloseButton>
-          <Heading>Blackout Dates</Heading>
-        </Modal.Header>
-
-        <Modal.Body>
-          <View as="div" width="36rem">
-            <BlackoutDates onChange={() => this.setState({changeMadeToBlackoutDates: true})} />
-          </View>
-        </Modal.Body>
-
-        <Modal.Footer>
-          <Button color="secondary" onClick={this.onCloseBlackoutDatesModal}>
-            Close
-          </Button>
-          &nbsp;
-        </Modal.Footer>
-      </Modal>
-    )
-  }
-
   render() {
     if (this.props.coursePace.context_type === 'Enrollment') {
       return null
     }
     return (
       <div style={{display: 'inline-block'}}>
-        {this.renderBlackoutDatesModal()}
-        <UpdateExistingPacesModal
-          open={this.state.showUpdateExistingPacesModal}
-          onDismiss={this.onCloseUpdateExistingPacesModal}
-          confirm={this.republishAllPaces}
-        />
+        {ENV.FEATURES.course_paces_blackout_dates && (
+          <BlackoutDatesModal
+            key={this.state.blackoutDatesModalKey}
+            blackoutDates={this.props.blackoutDates}
+            open={this.state.showBlackoutDatesModal}
+            onSave={this.handleSaveBlackoutDates}
+            onCancel={this.closeBlackoutDatesModal}
+          />
+        )}
         <Popover
           on="click"
           renderTrigger={
@@ -209,19 +151,19 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
                 onChange={() => this.props.toggleExcludeWeekends()}
               />
             </View>
-            {/* Commented out since we're not implementing these features yet */}
-            {/* </View> */}
-            {/* <CondensedButton */}
-            {/*  onClick={() => { */}
-            {/*    this.setState({showSettingsPopover: false}) */}
-            {/*    this.showBlackoutDatesModal() */}
-            {/*  }} */}
-            {/*  margin="small 0 0" */}
-            {/* > */}
-            {/*  <AccessibleContent alt={I18n.t('View Blackout Dates')}> */}
-            {/*    {I18n.t('Blackout Dates')} */}
-            {/*  </AccessibleContent> */}
-            {/* </CondensedButton> */}
+            {ENV.FEATURES.course_paces_blackout_dates && (
+              <View as="div">
+                <CondensedButton
+                  onClick={() => {
+                    this.setState({showSettingsPopover: false})
+                    this.showBlackoutDatesModal()
+                  }}
+                  margin="small 0 0"
+                >
+                  {I18n.t('Manage Blackout Dates')}
+                </CondensedButton>
+              </View>
+            )}
           </View>
         </Popover>
       </div>
@@ -231,6 +173,7 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
 
 const mapStateToProps = (state: StoreState): StoreProps => {
   return {
+    blackoutDates: getBlackoutDates(state),
     course: getCourse(state),
     courseId: getCourse(state).id,
     excludeWeekends: getExcludeWeekends(state),
@@ -241,8 +184,8 @@ const mapStateToProps = (state: StoreState): StoreProps => {
 
 export default connect(mapStateToProps, {
   loadLatestPaceByContext: coursePaceActions.loadLatestPaceByContext,
-  setEditingBlackoutDates: uiActions.setEditingBlackoutDates,
   setEndDate: coursePaceActions.setEndDate,
   showLoadingOverlay: uiActions.showLoadingOverlay,
-  toggleExcludeWeekends: coursePaceActions.toggleExcludeWeekends
+  toggleExcludeWeekends: coursePaceActions.toggleExcludeWeekends,
+  updateBlackoutDates: blackoutDateActions.updateBlackoutDates
 })(Settings)
