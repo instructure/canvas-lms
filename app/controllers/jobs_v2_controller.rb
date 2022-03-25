@@ -35,6 +35,7 @@ class JobsV2Controller < ApplicationController
       format.html do
         @page_title = t("Jobs Control Panel v2")
 
+        css_bundle :jobs_v2
         js_bundle :jobs_v2
 
         render html: "", layout: true
@@ -268,7 +269,9 @@ class JobsV2Controller < ApplicationController
 
   def list_order_clause
     case params[:order]
-    when "tag", "strand", "singleton"
+    when "strand_singleton"
+      "LOWER(strand) ASC, LOWER(singleton) ASC"
+    when "tag"
       "LOWER(#{params[:order]})"
     when "id"
       { id: :DESC }
