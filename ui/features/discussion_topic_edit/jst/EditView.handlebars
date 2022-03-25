@@ -35,8 +35,8 @@
         <h1 id="discussion-title" class="title">{{title}}</h1>
         <input type="hidden" name="title" value="{{title}}" />
         {{else}}
-        <label style="float:none" class="control-label" for="discussion-title">
-        {{#t "topic_title"}}Topic Title{{/t}}
+        <label for="discussion-title">
+          {{#t "topic_title"}}Topic Title{{/t}}
         </label>
         <input type="text" id="discussion-title" name="title" placeholder="{{#t " topic_title"}}Topic Title{{/t}}"
           value="{{title}}" maxlength="254" class="input-block-level">
