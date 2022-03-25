@@ -46,7 +46,7 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
 
   addBlackoutDate = () => {
     const blackoutDate: BlackoutDate = {
-      event_title: this.state.eventTitle,
+      event_title: this.state.eventTitle.trim(),
       start_date: moment(this.state.startDate),
       end_date: moment(this.state.endDate)
     }
@@ -63,7 +63,7 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
 
   onChangeStartDate = (date: string) => {
     const startDate = DateHelpers.formatDate(date)
-    this.setState(({endDate}) => ({startDate, endDate: endDate || startDate}))
+    this.setState({startDate})
   }
 
   onChangeEndDate = (date: string) => {
@@ -71,14 +71,14 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
   }
 
   disabledAdd = () => {
-    return this.state.eventTitle.length < 1 || !this.state.startDate || !this.state.endDate
+    return this.state.eventTitle.trim().length < 1 || !this.state.startDate || !this.state.endDate
   }
 
   /* Renderers */
 
   render() {
     return (
-      <div>
+      <div data-testid="new_blackout_dates_form">
         <Flex alignItems="end" justifyItems="space-between" wrap="wrap" margin="0 0 large">
           <TextInput
             renderLabel="Event Title"
@@ -90,6 +90,7 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
           <CoursePaceDateInput
             dateValue={this.state.startDate}
             label="Start Date"
+            permitEmpty
             onDateChange={this.onChangeStartDate}
             endDate={this.state.endDate}
             width="140px"
@@ -97,6 +98,7 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
           <CoursePaceDateInput
             dateValue={this.state.endDate}
             label="End Date"
+            permitEmpty
             onDateChange={this.onChangeEndDate}
             startDate={this.state.startDate}
             width="140px"
@@ -104,7 +106,9 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
           <Button
             color="primary"
             interaction={this.disabledAdd() ? 'disabled' : 'enabled'}
-            onClick={this.addBlackoutDate}
+            onClick={() => {
+              this.addBlackoutDate()
+            }}
           >
             Add
           </Button>

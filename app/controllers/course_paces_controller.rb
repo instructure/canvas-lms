@@ -20,6 +20,7 @@
 class CoursePacesController < ApplicationController
   before_action :load_context
   before_action :load_course
+  before_action :load_blackout_dates, only: %i[index]
   before_action :require_feature_flag
   before_action :authorize_action
   before_action :load_course_pace, only: %i[api_show publish update]
@@ -55,7 +56,7 @@ class CoursePacesController < ApplicationController
     end
 
     js_env({
-             BLACKOUT_DATES: [],
+             BLACKOUT_DATES: @blackout_dates.as_json(include_root: false),
              COURSE: course_json(@context, @current_user, session, [], nil),
              ENROLLMENTS: enrollments_json(@context),
              SECTIONS: sections_json(@context),
@@ -225,6 +226,10 @@ class CoursePacesController < ApplicationController
 
   def load_course
     @course = @context.respond_to?(:course) ? @context.course : @context
+  end
+
+  def load_blackout_dates
+    @blackout_dates = @context.respond_to?(:blackout_dates) ? @context.blackout_dates : []
   end
 
   def update_params
