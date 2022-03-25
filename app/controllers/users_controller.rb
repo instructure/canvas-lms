@@ -502,6 +502,7 @@ class UsersController < ApplicationController
 
     # Reload user settings so we don't get a stale value for K5_USER when switching dashboards
     @current_user.reload
+    observed_users_list = observed_users(@current_user, session)
     k5_disabled = k5_disabled?
     k5_user = k5_user?(check_disabled: false)
     js_env({ K5_USER: k5_user && !k5_disabled }, true)
@@ -518,12 +519,12 @@ class UsersController < ApplicationController
              STUDENT_PLANNER_ENABLED: planner_enabled?,
              STUDENT_PLANNER_COURSES: planner_enabled? && map_courses_for_menu(@current_user.courses_with_primary_enrollment),
              STUDENT_PLANNER_GROUPS: planner_enabled? && map_groups_for_planner(@current_user.current_groups),
-             CAN_ENABLE_K5_DASHBOARD: k5_disabled && k5_user,
+             ALLOW_ELEMENTARY_DASHBOARD: k5_disabled && k5_user,
              CREATE_COURSES_PERMISSIONS: {
                PERMISSION: create_permission_root_account || create_permission_mcc_account,
                RESTRICT_TO_MCC_ACCOUNT: !!(!create_permission_root_account && create_permission_mcc_account)
              },
-             OBSERVED_USERS_LIST: observed_users(@current_user, session),
+             OBSERVED_USERS_LIST: observed_users_list,
              CAN_ADD_OBSERVEE: @current_user
                                  .profile
                                  .tabs_available(@current_user, root_account: @domain_root_account)
@@ -2739,7 +2740,10 @@ class UsersController < ApplicationController
 
   # @API Get whether user sees Canvas for Elementary dashboard
   #
-  # Returns a boolean indicating whether the user sees the Canvas for Elementary dashboard.
+  # Returns +true+ if the provided user sees the Canvas for Elementary dashboard, and +false+ otherwise.
+  # If the requesting user has user preference +:elementary_dashboard_disabled+ set, then this
+  # request will return +false+. Only considers courses where the requesting user is observing the
+  # provided user when making the determination.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/users/self/show_k5_dashboard \
@@ -2750,8 +2754,11 @@ class UsersController < ApplicationController
   def show_k5_dashboard
     user = api_find(User, params[:id])
     if user
-      if user.grants_right?(@current_user, session, :read) || @current_user.observer_enrollments.active.where(associated_user: user).shard(@current_user.in_region_associated_shards).exists?
-        render json: { k5_user: k5_user?(user: user) }
+      scope = @current_user.observer_enrollments.active_or_pending_by_date.where(associated_user: user).shard(@current_user.in_region_associated_shards)
+      if user.grants_right?(@current_user, session, :read) || scope.exists?
+        # Reload @current_user to make sure we get a current value for their :elementary_dashboard_disabled preference
+        @current_user.reload
+        render json: { k5_user: k5_user?(user: user, course_ids: scope.pluck(:course_id)) }
       else
         render_unauthorized_action
       end

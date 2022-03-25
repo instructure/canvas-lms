@@ -42,6 +42,7 @@ ready(() => {
         observedUsersList={ENV.OBSERVED_USERS_LIST}
         canAddObservee={ENV.CAN_ADD_OBSERVEE}
         openTodosInNewTab={ENV.OPEN_TEACHER_TODOS_IN_NEW_TAB}
+        observerPickerEnabled={ENV.FEATURES.observer_picker}
       />,
       dashboardContainer
     )

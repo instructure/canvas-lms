@@ -17,6 +17,7 @@
  */
 
 import natcompare from '@canvas/util/natcompare'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 export const parseObservedUsersList = users =>
   users
@@ -51,3 +52,6 @@ export const parseObservedUsersResponse = (enrollments, isOnlyObserver, currentU
   }
   return users
 }
+
+export const fetchShowK5Dashboard = id =>
+  doFetchApi({path: `/api/v1/users/${id}/show_k5_dashboard`}).then(({json}) => json.k5_user)
