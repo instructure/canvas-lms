@@ -62,6 +62,30 @@ describe('RCE "Documents" Plugin > Document', () => {
       expect(getByText(formattedValue)).toBeInTheDocument()
     })
 
+    describe('when the file is pending', () => {
+      let props
+
+      const subject = () => renderComponent(props)
+
+      beforeEach(() => (props = {disabled: true, disabledMessage: 'Media is processing'}))
+
+      it('renders the disabled message', () => {
+        const {getByText} = subject()
+
+        expect(getByText(props.disabledMessage)).toBeInTheDocument()
+      })
+
+      it('does not add callbacks', () => {
+        const onClick = jest.fn()
+        const {getByText} = renderComponent({display_name: 'click me', onClick, ...props})
+
+        const btn = getByText('click me')
+        btn.click()
+
+        expect(onClick).not.toHaveBeenCalled()
+      })
+    })
+
     it('the date that change by timezone', () => {
       const value = '2019-04-24T01:00:00Z'
       const formattedValue = 'April 23, 2019'
