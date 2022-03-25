@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
-import EquationEditorToolbar from '../index'
+import MemoizedEquationEditorToolbar from '../index'
 import buttons from '../buttons'
 
 function defaultProps() {
@@ -29,10 +29,10 @@ function defaultProps() {
 
 function renderToolbar(overrideProps = {}) {
   const props = defaultProps()
-  return render(<EquationEditorToolbar {...props} {...overrideProps} />)
+  return render(<MemoizedEquationEditorToolbar {...props} {...overrideProps} />)
 }
 
-describe('EquationEditorToolbar', () => {
+describe('MemoizedEquationEditorToolbar', () => {
   it('renders all buttons', () => {
     const {container, getByText} = renderToolbar()
 
