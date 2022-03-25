@@ -304,13 +304,7 @@ describe "assignment rubrics" do
       f(".assess_submission_link").click
       wait_for_ajaximations
       check_element_has_focus(f(".hide_rubric_link"))
-      driver.action.key_down(:shift)
-            .send_keys(:tab)
-            .key_up(:shift)
-            .perform
-      check_element_has_focus(f(".save_rubric_button"))
-      driver.action.send_keys(:tab).perform
-      check_element_has_focus(f(".hide_rubric_link"))
+      expect(f(".save_rubric_button").enabled?).to be_falsey
       f(".hide_rubric_link").click
       wait_for_ajaximations
       check_element_has_focus(f(".assess_submission_link"))

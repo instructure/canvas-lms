@@ -21,12 +21,13 @@ import ReactDOM from 'react-dom'
 import round from 'round'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
+import isNumber from 'lodash/isNumber'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms'/* ajaxJSONFiles */
-import '@canvas/datetime'/* datetimeString */
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* fragmentChange, showIf */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* ajaxJSONFiles */
+import '@canvas/datetime' /* datetimeString */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* fragmentChange, showIf */
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
 import '@canvas/media-comments'
@@ -186,8 +187,27 @@ function closeRubric() {
 function openRubric() {
   $('#rubric_holder').fadeIn(function () {
     toggleRubric($(this))
+    toggleSaveCommentButton($(this))
     $(this).find('.hide_rubric_link').focus()
   })
+}
+function toggleSaveCommentButton($rubricHolder) {
+  const $rubric = $rubricHolder.find('.rubric')
+  const rubricData = rubricAssessment.assessmentData($rubric)
+  const complete = isRubricComplete(rubricData)
+
+  $('.save_rubric_button').prop('disabled', !complete)
+}
+function isRubricComplete(rubricData) {
+  return Object.keys(rubricData).some(key => {
+    return hasPoints(key, rubricData) || hasComments(key, rubricData)
+  })
+}
+function hasComments(key, data) {
+  return key.indexOf('[comments]') !== -1 && data[key].trim() !== ''
+}
+function hasPoints(key, data) {
+  return key.indexOf('[points]') !== -1 && isNumber(data[key])
 }
 function windowResize() {
   const $frame = $('#preview_frame')
@@ -322,6 +342,12 @@ export function setup() {
     $('.save_rubric_button').click(function () {
       const $rubric = $(this).parents('#rubric_holder').find('.rubric')
       const submitted_data = rubricAssessment.assessmentData($rubric)
+
+      if (!isRubricComplete(submitted_data)) {
+        $('.save_rubric_button').prop('disabled', true)
+        return false
+      }
+
       const url = $('.update_rubric_assessment_url').attr('href')
       const method = 'POST'
       $rubric.loadingImage()
@@ -407,6 +433,22 @@ export function setup() {
         $('#rubric_holder .save_rubric_button').showIf(current_user)
       })
       .change()
+    $('#rubric_holder .rubric tbody input').on('change', () => {
+      const $rubricHolder = $('#rubric_holder')
+      toggleSaveCommentButton($rubricHolder)
+    })
+    // uses event delegation since the text area isn't on the DOM until you click on the comment icon
+    $('#rubric_holder .rubric tbody').on('change', 'textarea', () => {
+      const $rubricHolder = $('#rubric_holder')
+      toggleSaveCommentButton($rubricHolder)
+    })
+    $('#rubric_holder .rubric .rating-tier').on('click', () => {
+      // wait for next tick so that rubric data is populated with latest change
+      setTimeout(() => {
+        const $rubricHolder = $('#rubric_holder')
+        toggleSaveCommentButton($rubricHolder)
+      }, 0)
+    })
     $('.media_comment_link').click(event => {
       event.preventDefault()
       $('#media_media_recording').show()
