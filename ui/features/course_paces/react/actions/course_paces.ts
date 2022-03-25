@@ -22,7 +22,14 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 // @ts-ignore: TS doesn't understand i18n scoped imports
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-import {CoursePaceItemDueDates, CoursePace, PaceContextTypes, Progress, StoreState} from '../types'
+import {
+  CoursePaceItemDueDates,
+  CoursePace,
+  PaceContextTypes,
+  Progress,
+  StoreState,
+  OptionalDate
+} from '../types'
 import {createAction, ActionsUnion} from '../shared/types'
 import {actions as uiActions} from './ui'
 import * as Api from '../api/course_pace_api'
@@ -37,7 +44,8 @@ export enum Constants {
   SET_START_DATE = 'COURSE_PACE/SET_START_DATE',
   PUBLISH_PACE = 'COURSE_PACE/PUBLISH_PACE',
   TOGGLE_EXCLUDE_WEEKENDS = 'COURSE_PACE/TOGGLE_EXCLUDE_WEEKENDS',
-  SET_COURSE_PACE = 'COURSE_PACE/SET_COURSE_PACE',
+  SAVE_COURSE_PACE = 'COURSE_PACE/SAVE',
+  COURSE_PACE_SAVED = 'COURSE_PACE/SAVED',
   PACE_CREATED = 'COURSE_PACE/PACE_CREATED',
   TOGGLE_HARD_END_DATES = 'COURSE_PACE/TOGGLE_HARD_END_DATES',
   RESET_PACE = 'COURSE_PACE/RESET_PACE',
@@ -53,8 +61,7 @@ type LoadingAfterAction = (pace: CoursePace) => any
 type SetEndDate = {type: Constants.SET_END_DATE; payload: string}
 
 const regularActions = {
-  setCoursePace: (pace: CoursePace) =>
-    createAction(Constants.SET_COURSE_PACE, {...pace, originalPace: pace}),
+  saveCoursePace: (pace: CoursePace) => createAction(Constants.SAVE_COURSE_PACE, pace),
   setStartDate: (date: string) => createAction(Constants.SET_START_DATE, date),
   setEndDate: (date: string): SetEndDate => createAction(Constants.SET_END_DATE, date),
   setCompressedItemDates: (compressedItemDates: CoursePaceItemDueDates) =>
@@ -62,12 +69,26 @@ const regularActions = {
   uncompressDates: () => createAction(Constants.UNCOMPRESS_DATES),
   paceCreated: (pace: CoursePace) => createAction(Constants.PACE_CREATED, pace),
   toggleExcludeWeekends: () => createAction(Constants.TOGGLE_EXCLUDE_WEEKENDS),
-  toggleHardEndDates: () => createAction(Constants.TOGGLE_HARD_END_DATES),
-  resetPace: () => createAction(Constants.RESET_PACE),
-  setProgress: (progress?: Progress) => createAction(Constants.SET_PROGRESS, progress)
+  toggleHardEndDates: (original_end_date: OptionalDate) =>
+    createAction(Constants.TOGGLE_HARD_END_DATES, original_end_date),
+  resetPace: (originalPace: CoursePace) => createAction(Constants.RESET_PACE, originalPace),
+  setProgress: (progress?: Progress) => createAction(Constants.SET_PROGRESS, progress),
+  coursePaceSaved: (coursePace: CoursePace) => createAction(Constants.COURSE_PACE_SAVED, coursePace)
 }
 
 const thunkActions = {
+  onToggleHardEndDates: (): ThunkAction<void, StoreState, void, Action> => {
+    return (dispatch, getState) => {
+      const originalEndDate = getState().original.coursePace.end_date
+      return dispatch(regularActions.toggleHardEndDates(originalEndDate))
+    }
+  },
+  onResetPace: (): ThunkAction<void, StoreState, void, Action> => {
+    return (dispatch, getState) => {
+      const originalPace = getState().original.coursePace
+      return dispatch(regularActions.resetPace(originalPace))
+    }
+  },
   publishPace: (): ThunkAction<Promise<void>, StoreState, void, Action> => {
     return (dispatch, getState) => {
       dispatch(uiActions.showLoadingOverlay(I18n.t('Starting publish...')))
@@ -77,7 +98,7 @@ const thunkActions = {
         .then(responseBody => {
           if (!responseBody) throw new Error(I18n.t('Response body was empty'))
           const {course_pace: updatedPace, progress} = responseBody
-          dispatch(coursePaceActions.setCoursePace(updatedPace))
+          dispatch(coursePaceActions.saveCoursePace(updatedPace))
           dispatch(coursePaceActions.setProgress(progress))
           dispatch(coursePaceActions.pollForPublishStatus())
           dispatch(uiActions.hideLoadingOverlay())
@@ -111,6 +132,7 @@ const thunkActions = {
                 type: 'success',
                 srOnly: true
               })
+              dispatch(coursePaceActions.coursePaceSaved(getState().coursePace))
             } else {
               setTimeout(pollingLoop, PUBLISH_STATUS_POLLING_MS)
             }
@@ -135,7 +157,7 @@ const thunkActions = {
       return Api.resetToLastPublished(contextType, contextId)
         .then(coursePace => {
           if (!coursePace) throw new Error(I18n.t('Response body was empty'))
-          dispatch(coursePaceActions.setCoursePace(coursePace))
+          dispatch(coursePaceActions.saveCoursePace(coursePace))
           dispatch(uiActions.hideLoadingOverlay())
         })
         .catch(error => {
@@ -148,7 +170,7 @@ const thunkActions = {
   loadLatestPaceByContext: (
     contextType: PaceContextTypes,
     contextId: string,
-    afterAction: LoadingAfterAction = coursePaceActions.setCoursePace
+    afterAction: LoadingAfterAction = coursePaceActions.saveCoursePace
   ): ThunkAction<void, StoreState, void, Action> => {
     return async (dispatch, getState) => {
       dispatch(uiActions.showLoadingOverlay(I18n.t('Loading...')))
@@ -182,7 +204,7 @@ const thunkActions = {
       return Api.relinkToParentPace(coursePaceId)
         .then(coursePace => {
           if (!coursePace) throw new Error(I18n.t('Response body was empty'))
-          dispatch(coursePaceActions.setCoursePace(coursePace))
+          dispatch(coursePaceActions.saveCoursePace(coursePace))
           dispatch(uiActions.hideLoadingOverlay())
         })
         .catch(error => {

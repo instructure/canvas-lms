@@ -39,7 +39,7 @@ const dispatch = jest.fn()
 const mockGetState = (pace, originalPace) => () => ({
   ...DEFAULT_STORE_STATE,
   coursePace: {...pace},
-  originalPace: {...originalPace}
+  originalPace: {coursePace: {...originalPace}}
 })
 
 beforeEach(() => {
@@ -68,7 +68,7 @@ describe('Course paces actions', () => {
 
       expect(dispatch.mock.calls[0]).toEqual([uiActions.showLoadingOverlay('Starting publish...')])
       expect(dispatch.mock.calls[1]).toEqual([uiActions.clearCategoryError('publish')])
-      expect(dispatch.mock.calls[2]).toEqual([coursePaceActions.setCoursePace(updatedPace)])
+      expect(dispatch.mock.calls[2]).toEqual([coursePaceActions.saveCoursePace(updatedPace)])
       expect(dispatch.mock.calls[3]).toEqual([coursePaceActions.setProgress(PROGRESS_RUNNING)])
       // Compare dispatched functions by name since they won't be directly equal
       expect(JSON.stringify(dispatch.mock.calls[4])).toEqual(
@@ -149,9 +149,12 @@ describe('Course paces actions', () => {
       jest.advanceTimersByTime(PUBLISH_STATUS_POLLING_MS)
 
       await waitFor(() => {
-        expect(dispatch.mock.calls.length).toBe(4)
+        expect(dispatch.mock.calls.length).toBe(5)
         expect(dispatch.mock.calls[1]).toEqual([uiActions.clearCategoryError('checkPublishStatus')])
         expect(dispatch.mock.calls[2]).toEqual([coursePaceActions.setProgress(undefined)])
+        expect(dispatch.mock.calls[4]).toEqual([
+          coursePaceActions.coursePaceSaved(getState().coursePace)
+        ])
         expect(screen.getByText('Finished publishing pace')).toBeInTheDocument()
       })
     })
@@ -194,7 +197,7 @@ describe('Course paces actions', () => {
       // Compare dispatched functions by name since they won't be directly equal
       expect(dispatch.mock.calls[3]).toEqual([uiActions.hideLoadingOverlay()])
       // compress() POSTs a flattened and stripped-down version of the course pace
-      expect(fetchMock.calls()[0][1].body).toEqual(
+      expect(fetchMock.calls()[0][1]?.body).toEqual(
         JSON.stringify({
           course_pace: {
             start_date: updatedPace.start_date,

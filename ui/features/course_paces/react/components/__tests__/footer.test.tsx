@@ -22,13 +22,13 @@ import {act, render, within} from '@testing-library/react'
 import {Footer} from '../footer'
 
 const publishPace = jest.fn()
-const resetPace = jest.fn()
+const onResetPace = jest.fn()
 
 const defaultProps = {
   autoSaving: false,
   pacePublishing: false,
   publishPace,
-  resetPace,
+  onResetPace,
   showLoadingOverlay: false,
   studentPace: false,
   unpublishedChanges: true
@@ -45,7 +45,7 @@ describe('Footer', () => {
     const cancelButton = getByRole('button', {name: 'Cancel'})
     expect(cancelButton).toBeInTheDocument()
     act(() => cancelButton.click())
-    expect(resetPace).toHaveBeenCalled()
+    expect(onResetPace).toHaveBeenCalled()
 
     const publishButton = getByRole('button', {name: 'Publish'})
     expect(publishButton).toBeInTheDocument()

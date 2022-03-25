@@ -34,7 +34,7 @@ const defaultProps = {
   setStartDate: () => {},
   compressDates: jest.fn(),
   uncompressDates: jest.fn(),
-  toggleHardEndDates: jest.fn()
+  onToggleHardEndDates: jest.fn()
 }
 
 afterEach(() => {

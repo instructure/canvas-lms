@@ -34,7 +34,7 @@ const defaultProps = {
   setStartDate: () => {},
   compressDates: jest.fn(),
   uncompressDates: jest.fn(),
-  toggleHardEndDates: jest.fn(),
+  onToggleHardEndDates: jest.fn(),
   showProjections: true
 }
 
@@ -248,7 +248,7 @@ describe('ProjectedDates', () => {
       })
       expect(hardEndDatesToggle).not.toBeDisabled()
       act(() => hardEndDatesToggle.click())
-      expect(defaultProps.toggleHardEndDates).toHaveBeenCalled()
+      expect(defaultProps.onToggleHardEndDates).toHaveBeenCalled()
     })
 
     it('is disabled while the pace is publishing', () => {
