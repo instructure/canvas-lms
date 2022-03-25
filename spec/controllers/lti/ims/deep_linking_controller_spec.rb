@@ -68,7 +68,7 @@ module Lti
           end
         end
 
-        context "create resource links" do
+        context "when only creating resource links" do
           let(:launch_url) { "http://tool.url/launch" }
           let(:content_items) do
             [
@@ -89,21 +89,48 @@ module Lti
             tool
           end
 
-          it "create a resource link into the account context" do
-            subject
+          shared_examples_for "creates resource links in context" do
+            let(:context) { raise "set in examples " }
 
-            expect(account.lti_resource_links.size).to eq 1
-            expect(account.lti_resource_links.first.current_external_tool(account)).to eq tool
-            expect(account.lti_resource_links.first.context).to eq account
+            before do
+              subject
+            end
+
+            it "creates a resource link in the context" do
+              expect(context.lti_resource_links.size).to eq 1
+              expect(context.lti_resource_links.first.current_external_tool(context)).to eq tool
+              expect(context.lti_resource_links.first.context).to eq context
+            end
+
+            it "sends resource link uuid in content item response" do
+              expect(controller.content_items.first["lookup_uuid"]).to eq context.lti_resource_links.first.lookup_uuid
+            end
           end
 
-          it "add the lookup_uuid to the to the content item" do
-            subject
+          context "when context is an account" do
+            let(:params) { { JWT: deep_linking_jwt, account_id: account.id } }
 
-            content_items = controller.content_items
-            lti_resource_links = account.lti_resource_links
+            it_behaves_like "creates resource links in context" do
+              let(:context) { account }
+            end
+          end
 
-            expect(content_items.first["lookup_uuid"]).to eq lti_resource_links.first.lookup_uuid
+          context "when context is a course" do
+            let(:course) { course_model(account: account) }
+            let(:params) { { JWT: deep_linking_jwt, course_id: course.id } }
+
+            it_behaves_like "creates resource links in context" do
+              let(:context) { course }
+            end
+          end
+
+          context "when context is a group" do
+            let(:group) { group_model(context: course_model(account: account)) }
+            let(:params) { { JWT: deep_linking_jwt, group_id: group.id } }
+
+            it_behaves_like "creates resource links in context" do
+              let(:context) { group }
+            end
           end
         end
 
