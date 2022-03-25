@@ -36,7 +36,8 @@ import {applyTimezoneOffsetToDate} from '../../shared/dateUtils'
 
 export default function Link(props) {
   const [isHovering, setIsHovering] = useState(false)
-  const {filename, display_name, title, content_type, published, date} = props
+  const {filename, display_name, title, content_type, published, date, disabled, disabledMessage} =
+    props
   const Icon = getIconFromType(content_type)
   const color = published ? 'success' : 'primary'
   // Uses user locale and timezone
@@ -94,6 +95,34 @@ export default function Link(props) {
     setIsHovering(e.type === 'mouseenter')
   }
 
+  function buildCallback(callback) {
+    if (disabled) return
+
+    return callback
+  }
+
+  function dateOrMessage(dateString) {
+    if (disabled && disabledMessage) {
+      return (
+        <View display="block">
+          <span style={textStyles()}>
+            <Text fontStyle="italic">{disabledMessage}</Text>
+          </span>
+        </View>
+      )
+    }
+
+    if (dateString) {
+      return <View as="div">{dateString}</View>
+    }
+  }
+
+  function textStyles() {
+    if (disabled) return {color: 'gray'}
+
+    return {}
+  }
+
   let elementRef = null
   if (props.focusRef) {
     elementRef = ref => (props.focusRef.current = ref)
@@ -103,10 +132,10 @@ export default function Link(props) {
     <div
       data-testid="instructure_links-Link"
       draggable
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-      onMouseEnter={handleHover}
-      onMouseLeave={handleHover}
+      onDragStart={buildCallback(handleDragStart)}
+      onDragEnd={buildCallback(handleDragEnd)}
+      onMouseEnter={buildCallback(handleHover)}
+      onMouseLeave={buildCallback(handleHover)}
       style={{position: 'relative'}}
     >
       <View
@@ -122,8 +151,9 @@ export default function Link(props) {
         borderWidth="0 0 small 0"
         padding="x-small"
         width="100%"
-        onClick={handleLinkClick}
-        onKeyDown={handleLinkKey}
+        onClick={buildCallback(handleLinkClick)}
+        onKeyDown={buildCallback(handleLinkKey)}
+        aria-disabled={disabled}
       >
         <div style={{pointerEvents: 'none'}}>
           <Flex>
@@ -139,9 +169,9 @@ export default function Link(props) {
                 </Flex.Item>
                 <Flex.Item padding="0 x-small 0 0" grow shrink textAlign="start">
                   <View as="div" margin="0">
-                    {display_name || title || filename}
+                    <span style={textStyles()}>{display_name || title || filename}</span>
                   </View>
-                  {dateString ? <View as="div">{dateString}</View> : null}
+                  {dateOrMessage(dateString)}
                 </Flex.Item>
                 <Flex.Item>
                   <AccessibleContent alt={publishedMsg}>
