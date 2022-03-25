@@ -29,6 +29,12 @@ import {
   defaultK5DashboardProps as defaultProps,
   defaultEnv
 } from './mocks'
+import {fetchShowK5Dashboard} from '@canvas/observer-picker/react/utils'
+
+jest.mock('@canvas/observer-picker/react/utils', () => ({
+  ...jest.requireActual('@canvas/observer-picker/react/utils'),
+  fetchShowK5Dashboard: jest.fn()
+}))
 
 const currentUserId = defaultProps.currentUser.id
 
@@ -40,11 +46,14 @@ describe('K5Dashboard Schedule Section', () => {
   afterAll(() => {
     jest.setTimeout(5000)
   })
+
   beforeEach(() => {
     moxios.install()
     createPlannerMocks()
     global.ENV = defaultEnv
+    fetchShowK5Dashboard.mockImplementation(() => Promise.resolve(true))
   })
+
   afterEach(() => {
     moxios.uninstall()
     global.ENV = {}

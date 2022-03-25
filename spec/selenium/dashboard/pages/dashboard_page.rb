@@ -41,6 +41,10 @@ module DashboardPage
     "body"
   end
 
+  def todo_list_header_selector
+    ".todo-list-header"
+  end
+
   #------------------------- Elements --------------------------
   def card_container
     f(card_container_selector)
@@ -60,5 +64,9 @@ module DashboardPage
 
   def body
     f(body_selector)
+  end
+
+  def todo_list_header
+    f(todo_list_header_selector)
   end
 end

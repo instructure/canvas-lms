@@ -2242,6 +2242,7 @@ RSpec.describe ApplicationController do
     before :once do
       @k5_account = Account.create!(parent_account_id: Account.default)
       course_with_teacher(active_all: true, account: @k5_account)
+      @teacher1 = @teacher
       @student1 = student_in_course(context: @course).user
       toggle_k5_setting(@k5_account)
     end
@@ -2349,6 +2350,24 @@ RSpec.describe ApplicationController do
       expect(@controller.send(:k5_user?, { user: @student1 })).to be_truthy
     end
 
+    it "returns false for a k5 observer observing a non-k5 student" do
+      @student = course_with_student(active_all: true).user
+      @course.enroll_user(@teacher1, "ObserverEnrollment", enrollment_state: :active, associated_user_id: @student)
+      user_session(@teacher1)
+      @controller.instance_variable_set(:@current_user, @teacher1)
+      @controller.instance_variable_set(:@selected_observed_user, @student)
+      expect(@controller.send(:k5_user?)).to be_falsey
+    end
+
+    it "only considers provided courses if course_ids is passed" do
+      @k5_course = @course
+      @classic_course = course_factory(active_all: true)
+      @classic_course.enroll_student(@student1, enrollment_state: :active)
+      expect(@controller.send(:k5_user?, { user: @student1, course_ids: [@classic_course.id] })).to be_falsey
+      expect(@controller.send(:k5_user?, { user: @student1, course_ids: [@k5_course.id] })).to be_truthy
+      expect(@controller.send(:k5_user?, { user: @student1, course_ids: [@k5_course.id, @classic_course.id] })).to be_truthy
+    end
+
     context "with sharding" do
       specs_require_sharding
 
@@ -2402,6 +2421,17 @@ RSpec.describe ApplicationController do
         @shard2.activate do
           expect(@controller.send(:k5_user?)).to be_falsey
         end
+      end
+
+      it "handles course_ids with course ids from multiple shards properly" do
+        @k5_course = @course
+        @shard2.activate do
+          @classic_course = course_factory(active_all: true, account: Account.create!)
+        end
+        @classic_course.enroll_student(@student1, enrollment_state: :active)
+        expect(@controller.send(:k5_user?, { user: @student1, course_ids: [@classic_course.id] })).to be_falsey
+        expect(@controller.send(:k5_user?, { user: @student1, course_ids: [@k5_course.id] })).to be_truthy
+        expect(@controller.send(:k5_user?, { user: @student1, course_ids: [@k5_course.id, @classic_course.id] })).to be_truthy
       end
     end
   end

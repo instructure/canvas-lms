@@ -26,6 +26,11 @@ import sinon from 'sinon'
 import $ from 'jquery'
 import {DashboardHeader} from 'ui/features/dashboard/react/DashboardHeader'
 import {resetPlanner} from '@instructure/canvas-planner'
+import fetchMock from 'fetch-mock'
+import {
+  SHOW_K5_DASHBOARD_ROUTE,
+  showK5DashboardResponse
+} from '@canvas/observer-picker/react/__tests__/fixtures'
 
 const container = document.getElementById('fixtures')
 
@@ -335,6 +340,12 @@ QUnit.module('Dashboard Header', hooks => {
         {id: '17', name: 'bob', avatar_url: undefined},
         {id: '19', name: 'mary', avatar_url: undefined}
       ]
+
+      fetchMock.get(SHOW_K5_DASHBOARD_ROUTE, JSON.stringify(showK5DashboardResponse(false)))
+    })
+
+    hooks2.afterEach(() => {
+      fetchMock.restore()
     })
 
     test('it should show the observer options Select on planner dashboard', () => {

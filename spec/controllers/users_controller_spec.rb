@@ -3010,14 +3010,14 @@ describe UsersController do
     end
 
     it "returns value for self" do
-      allow(controller).to receive(:k5_user?).with({ user: @observer }).and_return(true)
+      allow(controller).to receive(:k5_user?).with({ user: @observer, course_ids: [] }).and_return(true)
       get "show_k5_dashboard", params: { id: "self" }, format: "json"
       expect(json_parse["k5_user"]).to be_truthy
     end
 
     it "returns value for linked student" do
       @course.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @student)
-      allow(controller).to receive(:k5_user?).with({ user: @student }).and_return(true)
+      allow(controller).to receive(:k5_user?).with({ user: @student, course_ids: [@course.id] }).and_return(true)
       get "show_k5_dashboard", params: { id: @student.id }, format: "json"
       expect(json_parse["k5_user"]).to be_truthy
     end

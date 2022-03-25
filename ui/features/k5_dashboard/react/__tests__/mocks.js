@@ -229,5 +229,6 @@ export const defaultK5DashboardProps = {
   selectedContextsLimit: 2,
   canAddObservee: false,
   observedUsersList: [{id: currentUser.id, name: currentUser.display_name}],
-  openTodosInNewTab: true
+  openTodosInNewTab: true,
+  observerPickerEnabled: true
 }

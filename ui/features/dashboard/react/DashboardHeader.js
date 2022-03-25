@@ -39,6 +39,7 @@ import '@canvas/jquery/jquery.disableWhileLoading'
 import {CreateCourseModal} from '@canvas/create-course-modal/react/CreateCourseModal'
 import ObserverOptions from '@canvas/observer-picker'
 import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
+import {fetchShowK5Dashboard} from '@canvas/observer-picker/react/utils'
 import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('dashboard')
@@ -60,7 +61,7 @@ class DashboardHeader extends React.Component {
     dashboard_view: string,
     planner_enabled: bool.isRequired,
     screenReaderFlashMessage: func,
-    canEnableElementaryDashboard: bool,
+    allowElementaryDashboard: bool,
     env: object,
     loadDashboardSidebar: func,
     responsiveSize: oneOf(['small', 'medium', 'large'])
@@ -231,16 +232,24 @@ class DashboardHeader extends React.Component {
   }
 
   handleChangeObservedUser(id) {
-    this.reloadDashboardForObserver(id)
-    if (this.props.planner_enabled) {
-      this.planner_init_promise
-        .then(() => {
-          reloadPlannerForObserver(id)
-        })
-        .catch(() => {
-          // ignore. handled elsewhere
-        })
-    }
+    fetchShowK5Dashboard(id)
+      .then(isK5User => {
+        if (!isK5User) {
+          this.reloadDashboardForObserver(id)
+          if (this.props.planner_enabled) {
+            this.planner_init_promise
+              .then(() => {
+                reloadPlannerForObserver(id)
+              })
+              .catch(() => {
+                // ignore. handled elsewhere
+              })
+          }
+        } else {
+          window.location.reload()
+        }
+      })
+      .catch(err => showFlashError(I18n.t('Unable to switch students'))(err))
   }
 
   changeDashboard = newView => {
@@ -289,6 +298,9 @@ class DashboardHeader extends React.Component {
   }
 
   render() {
+    const canEnableElementaryDashboard =
+      this.props.allowElementaryDashboard &&
+      (!observerMode() || this.state.selectedObserveeId === ENV.current_user_id)
     return (
       <div className={classnames(this.props.responsiveSize, 'ic-Dashboard-header__layout')}>
         <h1 className="ic-Dashboard-header__title">
@@ -321,7 +333,7 @@ class DashboardHeader extends React.Component {
               menuButtonRef={ref => {
                 this.menuButtonFocusable = ref
               }}
-              canEnableElementaryDashboard={this.props.canEnableElementaryDashboard}
+              canEnableElementaryDashboard={canEnableElementaryDashboard}
             />
           </div>
           {this.props.planner_enabled && <div id="dashboard-planner-header-aux" />}
