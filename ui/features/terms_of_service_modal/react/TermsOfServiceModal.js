@@ -90,6 +90,7 @@ export default class TermsOfServiceModal extends React.Component {
           elementRef={c => {
             this.link = c
           }}
+          href="#"
           onClick={this.handleLinkClick}
         >
           {this.props.preview ? I18n.t('Preview') : termsOfServiceText}
