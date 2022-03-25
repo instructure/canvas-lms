@@ -111,12 +111,14 @@ export interface Progress {
 
 export type EnrollmentsState = Enrollments
 export type CoursePacesState = CoursePace & {
-  originalPace: CoursePace
   publishingProgress?: Progress
 }
 export type SectionsState = Sections
 export type ResponsiveSizes = 'small' | 'large'
 export type CategoryErrors = {[category: string]: string}
+export type OriginalState = {
+  coursePace: CoursePace
+}
 
 export interface UIState {
   readonly autoSaving: boolean
@@ -132,6 +134,7 @@ export interface UIState {
 }
 
 export interface StoreState {
+  readonly original: OriginalState
   readonly coursePace: CoursePacesState
   readonly enrollments: EnrollmentsState
   readonly sections: SectionsState

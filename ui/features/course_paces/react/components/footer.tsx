@@ -43,7 +43,7 @@ interface StoreProps {
 
 interface DispatchProps {
   publishPace: typeof coursePaceActions.publishPace
-  resetPace: typeof coursePaceActions.resetPace
+  onResetPace: typeof coursePaceActions.onResetPace
 }
 
 type ComponentProps = StoreProps & DispatchProps
@@ -52,7 +52,7 @@ export const Footer: React.FC<ComponentProps> = ({
   autoSaving,
   pacePublishing,
   publishPace,
-  resetPace,
+  onResetPace,
   showLoadingOverlay,
   studentPace,
   unpublishedChanges
@@ -82,7 +82,7 @@ export const Footer: React.FC<ComponentProps> = ({
   return (
     <Flex as="section" justifyItems="end">
       <Tooltip renderTip={disabled && cancelTip} on={disabled ? ['hover', 'focus'] : []}>
-        <Button color="secondary" margin="0 small 0" onClick={() => disabled || resetPace()}>
+        <Button color="secondary" margin="0 small 0" onClick={() => disabled || onResetPace()}>
           {I18n.t('Cancel')}
         </Button>
       </Tooltip>
@@ -107,5 +107,5 @@ const mapStateToProps = (state: StoreState): StoreProps => {
 
 export default connect(mapStateToProps, {
   publishPace: coursePaceActions.publishPace,
-  resetPace: coursePaceActions.resetPace
+  onResetPace: coursePaceActions.onResetPace
 })(Footer)

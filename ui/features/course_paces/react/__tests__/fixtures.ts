@@ -30,7 +30,8 @@ import {
   Section,
   Sections,
   SectionsState,
-  UIState
+  UIState,
+  OriginalState
 } from '../types'
 
 export const BLACKOUT_DATES: BlackoutDate[] = []
@@ -227,12 +228,14 @@ export interface DefaultStoreState {
   readonly ui?: UIState
   readonly course?: Course
   readonly blackoutDates?: BlackoutDate[]
+  readonly original: OriginalState
 }
 
 export const DEFAULT_STORE_STATE: DefaultStoreState = {
   blackoutDates: BLACKOUT_DATES,
   course: COURSE,
   enrollments: ENROLLMENTS,
-  coursePace: {...PRIMARY_PACE, originalPace: PRIMARY_PACE},
-  sections: SECTIONS
+  coursePace: {...PRIMARY_PACE},
+  sections: SECTIONS,
+  original: {coursePace: PRIMARY_PACE}
 }

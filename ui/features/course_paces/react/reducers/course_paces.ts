@@ -21,6 +21,7 @@ import {deepEqual} from '@instructure/ui-utils'
 import moment from 'moment-timezone'
 
 import {Constants as CoursePaceConstants, CoursePaceAction} from '../actions/course_paces'
+import {CoursePaceItemAction} from '../actions/course_pace_items'
 import coursePaceItemsReducer from './course_pace_items'
 import * as DateHelpers from '../utils/date_stuff/date_helpers'
 import * as PaceDueDatesCalculator from '../utils/date_stuff/pace_due_dates_calculator'
@@ -44,6 +45,7 @@ import {Constants as UIConstants, SetSelectedPaceType} from '../actions/ui'
 import {getCourse} from './course'
 import {getEnrollments} from './enrollments'
 import {getSections} from './sections'
+import {getOriginalPace} from './original'
 import {getBlackoutDates} from '../shared/reducers/blackout_dates'
 import {Change, summarizeChanges} from '../utils/change_tracking'
 
@@ -52,7 +54,6 @@ const initialProgress = window.ENV.COURSE_PACE_PROGRESS
 export const initialState: CoursePacesState = ({
   ...window.ENV.COURSE_PACE,
   course: window.ENV.COURSE,
-  originalPace: window.ENV.COURSE_PACE,
   publishingProgress: initialProgress
 } || {}) as CoursePacesState
 
@@ -71,7 +72,6 @@ const getModuleItems = (modules: Module[]) =>
 const createDeepEqualSelector = createSelectorCreator(defaultMemoize, deepEqual)
 
 export const getExcludeWeekends = (state: StoreState): boolean => state.coursePace.exclude_weekends
-export const getOriginalPace = (state: StoreState) => state.coursePace.originalPace
 export const getCoursePace = (state: StoreState): CoursePacesState => state.coursePace
 export const getCoursePaceModules = (state: StoreState) => state.coursePace.modules
 export const getCoursePaceType = (state: StoreState): PaceContextTypes =>
@@ -88,6 +88,8 @@ export const getPublishingError = (state: StoreState): string | undefined => {
   return progress.message
 }
 export const getEndDate = (state: StoreState): OptionalDate => state.coursePace.end_date
+export const getOriginalEndDate = (state: StoreState): OptionalDate =>
+  state.original.coursePace.end_date
 export const isStudentPace = (state: StoreState) => state.coursePace.context_type === 'Enrollment'
 export const getIsPaceCompressed = (state: StoreState): boolean =>
   !!state.coursePace.compressed_due_dates
@@ -365,7 +367,7 @@ export default (
   action: CoursePaceAction | SetSelectedPaceType
 ): CoursePacesState => {
   switch (action.type) {
-    case CoursePaceConstants.SET_COURSE_PACE:
+    case CoursePaceConstants.SAVE_COURSE_PACE:
       return {...state, ...action.payload}
     case CoursePaceConstants.SET_START_DATE:
       return {...state, start_date: DateHelpers.formatDate(action.payload)}
@@ -383,10 +385,7 @@ export default (
         published_at: action.payload.published_at
       }
     case UIConstants.SET_SELECTED_PACE_CONTEXT:
-      return {
-        ...action.payload.newSelectedPace,
-        originalPace: action.payload.newSelectedPace
-      }
+      return {...action.payload.newSelectedPace}
     case CoursePaceConstants.TOGGLE_EXCLUDE_WEEKENDS:
       if (state.exclude_weekends) {
         return {...state, exclude_weekends: false}
@@ -397,7 +396,7 @@ export default (
       if (state.hard_end_dates) {
         return {...state, hard_end_dates: false, end_date: ''}
       } else {
-        let endDate = state.originalPace.end_date
+        let endDate = action.payload as OptionalDate
         if (!endDate) {
           if (state.course.end_at) {
             endDate = state.course.end_at
@@ -410,8 +409,7 @@ export default (
 
     case CoursePaceConstants.RESET_PACE:
       return {
-        ...state.originalPace,
-        originalPace: state.originalPace,
+        ...(action.payload as CoursePace),
         updated_at: new Date().toISOString() // kicks react into re-rendering the assignment_rows
       }
     case CoursePaceConstants.SET_PROGRESS:
@@ -424,6 +422,9 @@ export default (
     case CoursePaceConstants.UNCOMPRESS_DATES:
       return {...state, compressed_due_dates: undefined}
     default:
-      return {...state, modules: coursePaceItemsReducer(state.modules, action)}
+      return {
+        ...state,
+        modules: coursePaceItemsReducer(state.modules, action as CoursePaceItemAction)
+      }
   }
 }
