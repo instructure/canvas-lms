@@ -610,7 +610,7 @@ class ActiveRecord::Base
   end
 
   def self.current_xlog_location
-    Shard.current(send(CANVAS_RAILS6_0 ? :shard_category : :connection_classes)).database_server.unguard do
+    Shard.current(send(Rails.version < "6.1" ? :shard_category : :connection_classes)).database_server.unguard do
       GuardRail.activate(:primary) do
         if Rails.env.test? ? in_transaction_in_test? : connection.open_transactions > 0
           raise "don't run current_xlog_location in a transaction"
@@ -709,7 +709,7 @@ class ActiveRecord::Base
     changes_applied
   end
 
-  unless CANVAS_RAILS6_0
+  if Rails.version >= "6.1"
     def self.override_db_configs(override)
       configurations.configs_for.each do |config|
         config.instance_variable_set(:@configuration_hash, config.configuration_hash.merge(override).freeze)
@@ -732,7 +732,7 @@ module UsefulFindInBatches
     else
       enum_for(:find_each, start: start, finish: finish, order: order, **kwargs) do
         relation = self
-        if CANVAS_RAILS6_0
+        if Rails.version < "6.1"
           apply_limits(relation, start, finish).size
         else
           apply_limits(relation, start, finish, order).size
@@ -746,7 +746,7 @@ module UsefulFindInBatches
     relation = self
     unless block_given?
       return to_enum(:find_in_batches, start: start, finish: finish, order: order, batch_size: batch_size, **kwargs) do
-        total = if CANVAS_RAILS6_0
+        total = if Rails.version < "6.1"
                   apply_limits(relation, start, finish).size
                 else
                   apply_limits(relation, start, finish, order).size
@@ -776,7 +776,7 @@ module UsefulFindInBatches
     if strategy == :id
       raise ArgumentError, "GROUP BY is incompatible with :id batches strategy" unless group_values.empty?
 
-      if CANVAS_RAILS6_0
+      if Rails.version < "6.1"
         return activate { |r| r.call_super(:in_batches, UsefulFindInBatches, start: start, finish: finish, **kwargs, &block) }
       else
         return activate { |r| r.call_super(:in_batches, UsefulFindInBatches, start: start, finish: finish, order: order, **kwargs, &block) }
@@ -825,7 +825,7 @@ module UsefulFindInBatches
 
   def in_batches_with_cursor(of: 1000, start: nil, finish: nil, order: :asc, load: false)
     klass.transaction do
-      relation = if CANVAS_RAILS6_0
+      relation = if Rails.version < "6.1"
                    apply_limits(clone, start, finish)
                  else
                    apply_limits(clone, start, finish, order)
@@ -869,7 +869,7 @@ module UsefulFindInBatches
     limited_query = limit(0).to_sql
 
     relation = self
-    relation_for_copy = if CANVAS_RAILS6_0
+    relation_for_copy = if Rails.version < "6.1"
                           apply_limits(relation, start, finish)
                         else
                           apply_limits(relation, start, finish, order)
@@ -967,7 +967,7 @@ module UsefulFindInBatches
   # and yields the objects in batches in the same order as the scope specified
   # so the DB connection can be fully recycled during each block.
   def in_batches_with_pluck_ids(of: 1000, start: nil, finish: nil, order: :asc, load: false)
-    relation = if CANVAS_RAILS6_0
+    relation = if Rails.version < "6.1"
                  apply_limits(self, start, finish)
                else
                  apply_limits(self, start, finish, order)
@@ -999,7 +999,7 @@ module UsefulFindInBatches
              group, or order)."
       end
 
-      relation = if CANVAS_RAILS6_0
+      relation = if Rails.version < "6.1"
                    apply_limits(self, start, finish)
                  else
                    apply_limits(self, start, finish, order)
@@ -1144,7 +1144,7 @@ module UsefulBatchEnumerator
     @relation.send(:_substitute_values, updates).any? do |(attr, update)|
       found_match = false
       predicates.any? do |pred|
-        next unless pred.is_a?(Arel::Nodes::Binary) || (!CANVAS_RAILS6_0 && pred.is_a?(Arel::Nodes::HomogeneousIn))
+        next unless pred.is_a?(Arel::Nodes::Binary) || (Rails.version >= "6.1" && pred.is_a?(Arel::Nodes::HomogeneousIn))
         next unless pred.left == attr
 
         found_match = true
@@ -1170,7 +1170,7 @@ module UsefulBatchEnumerator
           pred.right.exclude?(update)
         elsif pred.instance_of?(Arel::Nodes::NotIn) && pred.right.is_a?(Array)
           pred.right.include?(update)
-        elsif !CANVAS_RAILS6_0 && pred.instance_of?(Arel::Nodes::HomogeneousIn)
+        elsif Rails.version >= "6.1" && pred.instance_of?(Arel::Nodes::HomogeneousIn)
           case pred.type
           when :in
             pred.right.map(&:value).exclude?(update.value.value)
@@ -1368,7 +1368,7 @@ module UpdateAndDeleteWithJoins
   end
 
   def update_all(updates, *args)
-    db = Shard.current(klass.send(CANVAS_RAILS6_0 ? :shard_category : :connection_classes)).database_server
+    db = Shard.current(klass.send(Rails.version < "6.1" ? :shard_category : :connection_classes)).database_server
     if joins_values.empty?
       if ::GuardRail.environment == db.guard_rail_environment
         return super
@@ -1618,7 +1618,7 @@ module Migrator
     super.select(&:runnable?)
   end
 
-  if CANVAS_RAILS6_0
+  if Rails.version < "6.1"
     def execute_migration_in_transaction(migration, direct)
       old_in_migration, ActiveRecord::Base.in_migration = ActiveRecord::Base.in_migration, true
       if defined?(Marginalia)
@@ -1785,7 +1785,7 @@ ActiveRecord::Associations::CollectionAssociation.class_eval do
   end
 end
 
-if CANVAS_RAILS6_0
+if Rails.version < "6.1"
   module UnscopeCallbacks
     def run_callbacks(kind)
       return super if __callbacks[kind].empty?
@@ -2002,7 +2002,7 @@ ActiveRecord::Relation.prepend(DontExplicitlyNameColumnsBecauseOfIgnores)
 module PreserveShardAfterTransaction
   def after_transaction_commit(&block)
     shards = Shard.send(:active_shards)
-    shards[CANVAS_RAILS6_0 ? :delayed_jobs : Delayed::Backend::ActiveRecord::AbstractJob] = Shard.current.delayed_jobs_shard if ::ActiveRecord::Migration.open_migrations.positive?
+    shards[Rails.version < "6.1" ? :delayed_jobs : Delayed::Backend::ActiveRecord::AbstractJob] = Shard.current.delayed_jobs_shard if ::ActiveRecord::Migration.open_migrations.positive?
     super { Shard.activate(shards, &block) }
   end
 end
@@ -2051,7 +2051,7 @@ ActiveRecord::ConnectionAdapters::ConnectionPool.prepend(RestoreConnectionConnec
 module MaxRuntimeConnectionPool
   def max_runtime
     # TODO: Rails 6.1 uses a PoolConfig object instead
-    if CANVAS_RAILS6_0
+    if Rails.version < "6.1"
       @spec.config[:max_runtime]
     else
       db_config.configuration_hash[:max_runtime]
@@ -2172,7 +2172,7 @@ module UserContentSerialization
 end
 ActiveRecord::Base.include(UserContentSerialization)
 
-unless CANVAS_RAILS6_0
+if Rails.version >= "6.1"
   # Hopefully this can be removed with https://github.com/rails/rails/commit/6beee45c3f071c6a17149be0fabb1697609edbe8
   # having made a released version of rails; if not bump the rails version in this comment and leave the comment to be revisited
   # on the next rails bump

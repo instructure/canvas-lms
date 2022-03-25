@@ -762,7 +762,7 @@ describe ActiveRecord::Migration::CommandRecorder do
                                       [:add_index, [:accounts, :id, { if_not_exists: true }]],
                                       [:add_foreign_key, [:enrollments, :users, { if_not_exists: true }]],
                                       [:add_column, [:courses, :id, :integer, { limit: 8, if_not_exists: true }], nil],
-                                      (if CANVAS_RAILS6_0
+                                      (if Rails.version < "6.1"
                                          [:remove_index, [:accounts, { algorithm: :concurrently, column: :course_template_id, if_exists: true }]]
                                        else
                                          [:remove_index, [:accounts, :course_template_id, { algorithm: :concurrently, if_exists: true }], nil]

@@ -21,14 +21,21 @@
 # that need to be set before rails initialization even starts.
 # That's why it is required directly from the Gemfile.
 
-# You can disable the Rails 6.0 support by either defining a
-# CANVAS_RAILS6_0=0 env var, creating an empty RAILS5_2 file in the canvas config dir,
-# or setting `private/canvas/rails6.0` to `false` in a locally accessible consul
-unless defined?(CANVAS_RAILS6_0)
-  if ENV["CANVAS_RAILS6_1"]
-    CANVAS_RAILS6_0 = ENV["CANVAS_RAILS6_1"] != "1"
-  elsif File.exist?(File.expand_path("RAILS6_1", __dir__))
-    CANVAS_RAILS6_0 = false
+# You can set the Rails version to use by:
+# 1. CANVAS_RAILS="<supported version>"
+# 2. Create a file RAILS_VERSION with <supported version> as the contents
+# 3. Create a Consul setting private/canvas/rails_version with <supported version> as the contents
+
+DEFAULT_VERSION = "6.0"
+SUPPORTED_VERSIONS = %w[6.0 6.1].freeze
+
+unless defined?(CANVAS_RAILS)
+  file_path = File.expand_path("RAILS_VERSION", __dir__)
+
+  if ENV["CANVAS_RAILS"]
+    CANVAS_RAILS = ENV["CANVAS_RAILS"]
+  elsif File.exist?(file_path)
+    CANVAS_RAILS = File.read(file_path).strip
   else
     begin
       # have to do the consul communication without any gems, because
@@ -41,11 +48,11 @@ unless defined?(CANVAS_RAILS6_0)
       environment = YAML.safe_load(File.read(File.expand_path("consul.yml", __dir__))).dig(ENV["RAILS_ENV"] || "development", "environment")
 
       keys = [
-        ["private/canvas", environment, $canvas_cluster, "rails6.1"].compact.join("/"),
-        ["private/canvas", environment, "rails6.1"].compact.join("/"),
-        ["private/canvas", "rails6.1"].compact.join("/"),
-        ["global/private/canvas", environment, "rails6.1"].compact.join("/"),
-        ["global/private/canvas", "rails6.1"].compact.join("/")
+        ["private/canvas", environment, $canvas_cluster, "rails_version"].compact.join("/"),
+        ["private/canvas", environment, "rails_version"].compact.join("/"),
+        ["private/canvas", "rails_version"].compact.join("/"),
+        ["global/private/canvas", environment, "rails_version"].compact.join("/"),
+        ["global/private/canvas", "rails_version"].compact.join("/")
       ].uniq
 
       result = nil
@@ -54,9 +61,13 @@ unless defined?(CANVAS_RAILS6_0)
         result = nil unless result.is_a?(Net::HTTPSuccess)
         break if result
       end
-      CANVAS_RAILS6_0 = !result || Base64.decode64(JSON.parse(result.body).first["Value"]) == "false"
+      CANVAS_RAILS = result ? Base64.decode64(JSON.parse(result.body).first["Value"]).strip : DEFAULT_VERSION
     rescue
-      CANVAS_RAILS6_0 = true
+      CANVAS_RAILS = DEFAULT_VERSION
     end
   end
+end
+
+unless SUPPORTED_VERSIONS.any?(CANVAS_RAILS)
+  raise "unsupported Rails version specified #{CANVAS_RAILS}"
 end
