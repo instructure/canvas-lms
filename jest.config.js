@@ -59,6 +59,16 @@ module.exports = {
 
   coverageDirectory: '<rootDir>/coverage-jest/',
 
+  // skip flaky timeout tests from coverage until they can be addressed
+  // Related JIRA tickets for the skipped coverage tests;
+  // k5_dashboard: LS-2243
+  // discussion_topics_post: VICE-2646
+  collectCoverageFrom: [
+    '**/__tests__/**/?(*.)(spec|test).[jt]s?(x)',
+    '!<rootDir>/ui/features/k5_dashboard/react/__tests__/k5DashboardPlanner.test.js',
+    '!<rootDir>/ui/features/discussion_topics_post/react/__tests__/DiscussionsIsolatedView.test.js'
+  ],
+
   moduleFileExtensions: [...defaults.moduleFileExtensions, 'coffee', 'handlebars'],
   restoreMocks: true,
 
