@@ -69,6 +69,11 @@ class Group < ActiveRecord::Base
   has_many :usage_rights, as: :context, inverse_of: :context, class_name: "UsageRights", dependent: :destroy
   belongs_to :avatar_attachment, class_name: "Attachment"
   belongs_to :leader, class_name: "User"
+  has_many :lti_resource_links,
+           as: :context,
+           inverse_of: :context,
+           class_name: "Lti::ResourceLink",
+           dependent: :destroy
 
   before_validation :ensure_defaults
   before_save :maintain_category_attribute
