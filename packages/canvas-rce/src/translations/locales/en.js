@@ -112,6 +112,10 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Collapse to hide { types }"
   },
+  "color_picker_6b359edf": { "message": "Color Picker" },
+  "color_picker_colorname_selected_ad4cf400": {
+    "message": "Color Picker ({ colorName } selected)"
+  },
   "computer_1d7dfa6f": { "message": "Computer" },
   "content_1440204b": { "message": "Content" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
