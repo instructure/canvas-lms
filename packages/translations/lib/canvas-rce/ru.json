@@ -28,6 +28,9 @@
   "announcement_list_da155734": { "message": "Список объявлений" },
   "announcements_a4b8ed4a": { "message": "Объявления" },
   "apply_781a2546": { "message": "Применить" },
+  "apply_changes_to_all_instances_of_this_icon_maker__2642f466": {
+    "message": "Применить изменения ко всем экземплярам этого значка, созданного с помощью средства создания значков в курсе"
+  },
   "apps_54d24a47": { "message": "Приложения" },
   "arrows_464a3e54": { "message": "Стрелки" },
   "art_icon_8e1daad": { "message": "Значок искусства" },
@@ -50,7 +53,10 @@
   "available_folders_694d0436": { "message": "Доступные папки" },
   "basic_554cdc0a": { "message": "Основной" },
   "below_81d4dceb": { "message": "Ниже" },
+  "black_4cb01371": { "message": "Черный" },
+  "blue_daf8fea9": { "message": "Синий" },
   "bottom_third_5f5fec1d": { "message": "Нижняя треть" },
+  "brick_f2656265": { "message": "Блок" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 г. Acme Inc." },
   "cancel_caeb1e68": { "message": "Отменить" },
   "choose_caption_file_9c45bc4e": {
@@ -119,6 +125,10 @@
   "course_links_b56959b9": { "message": "Ссылки курса" },
   "course_media_ec759ad": { "message": "Мультимедиа курса" },
   "course_navigation_dd035109": { "message": "Навигация курса" },
+  "create_icon_110d6463": { "message": "Создать значок" },
+  "create_icon_maker_icon_c716bffe": {
+    "message": "Создать значок, созданный с помощью Средства создания значков"
+  },
   "creative_commons_license_725584ae": {
     "message": "Лицензионное соглашение Creative Commons:"
   },
@@ -126,9 +136,11 @@
   "crop_image_807ebb08": { "message": "Обрезать изображение" },
   "current_image_f16c249c": { "message": "Текущее изображение" },
   "custom_6979cd81": { "message": "Пользовательская" },
+  "cyan_c1d5f68a": { "message": "Голубой" },
   "date_added_ed5ad465": { "message": "Дата добавления" },
   "decorative_image_3c28aa7d": { "message": "Декоративное изображение" },
   "decrease_indent_de6343ab": { "message": "Уменьшить отступ" },
+  "deep_purple_bb3e2907": { "message": "Темно-фиолетовый" },
   "default_bulleted_unordered_list_47079da8": {
     "message": "маркированный неупорядоченный список по умолчанию"
   },
@@ -230,6 +242,8 @@
   },
   "grades_a61eba0a": { "message": "Оценки" },
   "greek_65c5b3f7": { "message": "Греческий" },
+  "green_15af4778": { "message": "Зеленый" },
+  "grey_a55dceff": { "message": "Серый" },
   "group_documents_8bfd6ae6": { "message": "Документы группы" },
   "group_files_4324f3df": { "message": "Файлы группы" },
   "group_files_82e5dcdb": { "message": "Файлы группы" },
@@ -253,6 +267,13 @@
   },
   "i_hold_the_copyright_71ee91b1": { "message": "Я являюсь правообладателем" },
   "icon_color_b86dd6d6": { "message": "Цвет значка" },
+  "icon_maker_icons_cc560f7e": {
+    "message": "Значки, созданные с помощью средства создания значков"
+  },
+  "icon_outline_e978dc0c": { "message": "Контур значка" },
+  "icon_outline_size_33f39b86": { "message": "Размер контура значка" },
+  "icon_shape_30b61e7": { "message": "Форма значка" },
+  "icon_size_9353edea": { "message": "Размер значка" },
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "Если вы не выберете права пользования сейчас, этот файл не будет опубликован после отправки."
   },
@@ -262,6 +283,7 @@
   "image_to_crop_3a34487d": { "message": "Обрезаемое изображение" },
   "images_7ce26570": { "message": "Изображения" },
   "increase_indent_6d550a4a": { "message": "Увеличить отступ" },
+  "indigo_2035fc55": { "message": "Индиго" },
   "insert_593145ef": { "message": "Вставить" },
   "insert_equella_links_49a8dacd": { "message": "Вставить ссылки на Equella" },
   "insert_link_6dc23cae": { "message": "Вставить ссылку" },
@@ -277,6 +299,7 @@
   "large_9c5e80e7": { "message": "Большой" },
   "left_to_right_e9b4fd06": { "message": "Слева направо" },
   "library_icon_ae1e54cf": { "message": "Значок библиотеки" },
+  "light_blue_5374f600": { "message": "Светло-синий" },
   "link_7262adec": { "message": "Ссылка" },
   "link_options_a16b758b": { "message": "Параметры ссылки" },
   "links_14b70841": { "message": "Ссылки" },
@@ -294,6 +317,7 @@
   },
   "loading_preview_9f077aa1": { "message": "Загрузка предпросмотра" },
   "locked_762f138b": { "message": "Заблокировано" },
+  "magenta_4a65993c": { "message": "Пурпурный" },
   "math_icon_ad4e9d03": { "message": "Значок математики" },
   "media_af190855": { "message": "Мультимедиа" },
   "medium_5a8e9ead": { "message": "Средний" },
@@ -311,6 +335,7 @@
   },
   "my_files_2f621040": { "message": "Мои файлы" },
   "name_1aed4a1b": { "message": "Имя" },
+  "name_color_ceec76ff": { "message": "{ name } ({ color })" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Навигация в меню или панели инструментов"
   },
@@ -330,6 +355,7 @@
   "none_3b5e34d2": { "message": "Нет" },
   "none_selected_b93d56d2": { "message": "Нет выбранных элементов" },
   "octagon_e48be9f": { "message": "Восьмиугольник" },
+  "olive_6a3e4d6b": { "message": "Оливковый" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Открыть этот диалог комбинаций клавиш"
   },
@@ -337,6 +363,7 @@
     "message": "Открыть приложение { title }"
   },
   "operators_a2ef9a93": { "message": "Операторы" },
+  "orange_81386a62": { "message": "Оранжевый" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Упорядоченные и неупорядоченные списки"
   },
@@ -358,6 +385,7 @@
     "message": "Значок исполнительских видов искусства"
   },
   "physical_education_icon_d7dffd3e": { "message": "Значок физкультуры" },
+  "pink_68ad45cb": { "message": "Розовый" },
   "pixels_52ece7d1": { "message": "Пиксели" },
   "posted_when_a578f5ab": { "message": "Размещено: { when }" },
   "preformatted_d0670862": { "message": "Предварительно форматированный" },
@@ -375,12 +403,15 @@
   },
   "published_c944a23d": { "message": "опубликовано" },
   "published_when_302d8e23": { "message": "Опубликовано: { when }" },
+  "pumpkin_904428d5": { "message": "Цвет тыквы" },
+  "purple_7678a9fc": { "message": "Пурпурный" },
   "quizzes_7e598f57": { "message": "Тесты" },
   "raw_html_editor_e3993e41": { "message": "Редактор Raw HTML" },
   "record_7c9448b": { "message": "Запись" },
   "record_upload_media_5fdce166": {
     "message": "Записать / загрузить мультимедиа"
   },
+  "red_8258edf3": { "message": "Красный" },
   "relationships_6602af70": { "message": "Отношения" },
   "religion_icon_246e0be1": { "message": "Значок религии" },
   "remove_link_d1f2f4d0": { "message": "Удалить ссылку" },
@@ -394,6 +425,9 @@
     "message": "К сожалению, возможность доступа к редактору Pretty HTML с клавиатуры отсутствует. Обратитесь к редактору Raw HTML здесь."
   },
   "save_11a80ec3": { "message": "Сохранить" },
+  "saved_icon_maker_icons_df86e2a1": {
+    "message": "Сохраненные значки, созданные с помощью Средства создания значков"
+  },
   "search_280d00bd": { "message": "Поиск" },
   "search_term_b2d2235": { "message": "критерий поиска" },
   "select_crop_shape_d441feeb": { "message": "Выберите обрезку формы" },
@@ -407,6 +441,7 @@
   "show_link_options_545338fd": { "message": "Показать параметры ссылки" },
   "show_video_options_6ed3721a": { "message": "Показать параметры видео" },
   "single_color_image_4e5d4dbc": { "message": "Одноцветное изображение" },
+  "single_color_image_color_95fa9a87": { "message": "Одноцветное изображение" },
   "size_b30e1077": { "message": "Размер" },
   "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
     "message": "Размер файла субтитров больше допустимого максимального размера в { max } Кб."
@@ -432,6 +467,7 @@
     "message": "заключить неупорядоченный список в квадрат"
   },
   "star_8d156e09": { "message": "Звезда" },
+  "steel_blue_14296f08": { "message": "Синий со стальным отливом" },
   "styles_2aa721ef": { "message": "Стили" },
   "submit_a3cc6859": { "message": "Отправить" },
   "subscript_59744f96": { "message": "Надпись снизу" },
@@ -447,6 +483,7 @@
   },
   "syllabus_f191f65b": { "message": "Содержание курса" },
   "tab_arrows_4cf5abfc": { "message": "TAB/Стрелки" },
+  "teal_f729a294": { "message": "Бирюзовый" },
   "text_7f4593da": { "message": "Текст" },
   "text_background_color_16e61c3f": { "message": "Цвет фона текста" },
   "text_color_acf75eb6": { "message": "Цвет текста" },
@@ -553,6 +590,7 @@
   "view_title_description_67940918": {
     "message": "Просмотреть описание { title }"
   },
+  "white_87fa64fd": { "message": "Белый" },
   "width_492fec76": { "message": "Ширина" },
   "width_and_height_must_be_numbers_110ab2e3": {
     "message": "Ширина и высоты должны выражаться числами"

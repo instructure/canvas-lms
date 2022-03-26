@@ -92,6 +92,9 @@
     "apply_781a2546": {
         "message": "Appliquer"
     },
+    "apply_changes_to_all_instances_of_this_icon_maker__2642f466": {
+        "message": "Appliquer les modifications à toutes les instances de cette icône Icon Maker dans le cours"
+    },
     "apps_54d24a47": {
         "message": "Applications"
     },
@@ -176,8 +179,17 @@
     "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
         "message": "Vous trouverez ci-dessous un exemple de ce à quoi ressemblera l’emploi du temps pour les élèves."
     },
+    "black_4cb01371": {
+        "message": "Noir"
+    },
+    "blue_daf8fea9": {
+        "message": "Bleu"
+    },
     "bottom_third_5f5fec1d": {
         "message": "Tiers inférieur"
+    },
+    "brick_f2656265": {
+        "message": "Brique"
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
@@ -317,6 +329,12 @@
     "course_to_do_bcbbab54": {
         "message": "{ course } À FAIRE"
     },
+    "create_icon_110d6463": {
+        "message": "Créer une icône"
+    },
+    "create_icon_maker_icon_c716bffe": {
+        "message": "Créer une icône Icon Maker"
+    },
     "creative_commons_license_725584ae": {
         "message": "Licence Creative Commons :"
     },
@@ -331,6 +349,9 @@
     },
     "custom_6979cd81": {
         "message": "Personnalisé"
+    },
+    "cyan_c1d5f68a": {
+        "message": "Cyan"
     },
     "date_added_ed5ad465": {
         "message": "Date ajoutée"
@@ -355,6 +376,9 @@
     },
     "decrease_indent_de6343ab": {
         "message": "Diminuer le retrait"
+    },
+    "deep_purple_bb3e2907": {
+        "message": "Violet foncé"
     },
     "default_bulleted_unordered_list_47079da8": {
         "message": "liste à puce non ordonnée par défaut"
@@ -641,6 +665,12 @@
     "greek_65c5b3f7": {
         "message": "Grec"
     },
+    "green_15af4778": {
+        "message": "Vert"
+    },
+    "grey_a55dceff": {
+        "message": "Gris"
+    },
     "group_documents_8bfd6ae6": {
         "message": "Documents du groupe"
     },
@@ -704,6 +734,21 @@
     "icon_color_b86dd6d6": {
         "message": "Icône couleur"
     },
+    "icon_maker_icons_cc560f7e": {
+        "message": "Icônes Icon Maker"
+    },
+    "icon_outline_e978dc0c": {
+        "message": "Contour de l’icône"
+    },
+    "icon_outline_size_33f39b86": {
+        "message": "Taille du contour de l’icône"
+    },
+    "icon_shape_30b61e7": {
+        "message": "Forme de l’icône"
+    },
+    "icon_size_9353edea": {
+        "message": "Taille de l’icône"
+    },
     "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
         "message": "Si vous ne sélectionnez pas de droits d''utilisation maintenant, ce fichier sera envoyé mais non publié."
     },
@@ -724,6 +769,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "Augmenter le retrait"
+    },
+    "indigo_2035fc55": {
+        "message": "Indigo"
     },
     "insert_593145ef": {
         "message": "Insérer"
@@ -787,6 +835,9 @@
     },
     "library_icon_ae1e54cf": {
         "message": "Icône bibliothèque"
+    },
+    "light_blue_5374f600": {
+        "message": "Bleu clair"
     },
     "link_7262adec": {
         "message": "Lien"
@@ -854,6 +905,9 @@
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Apparemment, il n''y a rien ici."
     },
+    "magenta_4a65993c": {
+        "message": "Magenta"
+    },
     "math_ede93050": {
         "message": "Mathématiques"
     },
@@ -904,6 +958,9 @@
     },
     "name_1aed4a1b": {
         "message": "Nom"
+    },
+    "name_color_ceec76ff": {
+        "message": "{ name } ({ color })"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Naviguer dans le menu ou la barre d''outils"
@@ -986,6 +1043,9 @@
     "octagon_e48be9f": {
         "message": "Octogone"
     },
+    "olive_6a3e4d6b": {
+        "message": "Olive"
+    },
     "only_most_recent_grading_period_shown_f1ad6458": {
         "message": "*Seule la période de notation la plus récente est indiquée."
     },
@@ -1003,6 +1063,9 @@
     },
     "optional_add_course_ef0d70fc": {
         "message": "Facultatif : Ajouter un cours"
+    },
+    "orange_81386a62": {
+        "message": "Orange"
     },
     "ordered_and_unordered_lists_cfadfc38": {
         "message": "Listes ordonnées et non ordonnées"
@@ -1045,6 +1108,9 @@
     },
     "physical_education_icon_d7dffd3e": {
         "message": "Icône éducation physique"
+    },
+    "pink_68ad45cb": {
+        "message": "Rose"
     },
     "pixels_52ece7d1": {
         "message": "Pixels"
@@ -1091,6 +1157,12 @@
     "published_when_302d8e23": {
         "message": "Publié : { when }"
     },
+    "pumpkin_904428d5": {
+        "message": "Citrouille"
+    },
+    "purple_7678a9fc": {
+        "message": "Violet"
+    },
     "quiz_e0dcce8f": {
         "message": "Questionnaire"
     },
@@ -1105,6 +1177,9 @@
     },
     "record_upload_media_5fdce166": {
         "message": "Enregistrement / Téléchargement de média"
+    },
+    "red_8258edf3": {
+        "message": "Rouge"
     },
     "redo_363c58b7": {
         "message": "Refaire"
@@ -1141,6 +1216,9 @@
     },
     "save_11a80ec3": {
         "message": "Enregistrer"
+    },
+    "saved_icon_maker_icons_df86e2a1": {
+        "message": "Icônes Icon Maker enregistrées"
     },
     "schedule_preview_3bcda153": {
         "message": "Aperçu de l’emploi du temps"
@@ -1192,6 +1270,9 @@
     },
     "single_color_image_4e5d4dbc": {
         "message": "Image monocolore"
+    },
+    "single_color_image_color_95fa9a87": {
+        "message": "Couleur de l’image monochrome"
     },
     "size_b30e1077": {
         "message": "Taille"
@@ -1247,6 +1328,9 @@
     "starttime_to_endtime_d7cc249d": {
         "message": "{ startTime } à { endTime }"
     },
+    "steel_blue_14296f08": {
+        "message": "Bleu métallisé"
+    },
     "styles_2aa721ef": {
         "message": "Styles"
     },
@@ -1282,6 +1366,9 @@
     },
     "task_16b0ef38": {
         "message": "Tâche"
+    },
+    "teal_f729a294": {
+        "message": "Sarcelle"
     },
     "text_7f4593da": {
         "message": "Texte"
@@ -1501,6 +1588,9 @@
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "Navigation dans l’emploi du temps hebdomadaire"
+    },
+    "white_87fa64fd": {
+        "message": "Blanc"
     },
     "width_492fec76": {
         "message": "Largeur"

@@ -92,6 +92,9 @@
     "apply_781a2546": {
         "message": "Aplike"
     },
+    "apply_changes_to_all_instances_of_this_icon_maker__2642f466": {
+        "message": "Aplike tout chanjman Ikòn Kreyatè Ikòn sa a nan Kou a"
+    },
     "apps_54d24a47": {
         "message": "Apps"
     },
@@ -176,8 +179,17 @@
     "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
         "message": "Pi ba a se yon egzanp sou kijan elèv yo ap wè orè yo"
     },
+    "black_4cb01371": {
+        "message": "Nwa"
+    },
+    "blue_daf8fea9": {
+        "message": "Ble"
+    },
     "bottom_third_5f5fec1d": {
         "message": "Tyè Enferyè"
+    },
+    "brick_f2656265": {
+        "message": "Brik"
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
@@ -317,6 +329,12 @@
     "course_to_do_bcbbab54": {
         "message": "{ course } Pou Fè"
     },
+    "create_icon_110d6463": {
+        "message": "Kreye ikòn"
+    },
+    "create_icon_maker_icon_c716bffe": {
+        "message": "Kreye Ikòn Kreyatè Ikòn"
+    },
     "creative_commons_license_725584ae": {
         "message": "Lisans Creative Commons"
     },
@@ -331,6 +349,9 @@
     },
     "custom_6979cd81": {
         "message": "Pèsonalize"
+    },
+    "cyan_c1d5f68a": {
+        "message": "Blesyèl"
     },
     "date_added_ed5ad465": {
         "message": "Dat Ajoute"
@@ -355,6 +376,9 @@
     },
     "decrease_indent_de6343ab": {
         "message": "Diminye endantasyon"
+    },
+    "deep_purple_bb3e2907": {
+        "message": "Mov Fonse"
     },
     "default_bulleted_unordered_list_47079da8": {
         "message": "lis non òdone a pis pa defo"
@@ -641,6 +665,12 @@
     "greek_65c5b3f7": {
         "message": "Grèk"
     },
+    "green_15af4778": {
+        "message": "Vèt"
+    },
+    "grey_a55dceff": {
+        "message": "Gri"
+    },
     "group_documents_8bfd6ae6": {
         "message": "Gwoupe Dokiman"
     },
@@ -704,6 +734,21 @@
     "icon_color_b86dd6d6": {
         "message": "Ikòn Koulè"
     },
+    "icon_maker_icons_cc560f7e": {
+        "message": "Ikòn Kreyatè Ikòn"
+    },
+    "icon_outline_e978dc0c": {
+        "message": "Kontou Ikòn"
+    },
+    "icon_outline_size_33f39b86": {
+        "message": "Gwosè Kontou Ikòn"
+    },
+    "icon_shape_30b61e7": {
+        "message": "Fòm Ikòn"
+    },
+    "icon_size_9353edea": {
+        "message": "Gwosè Ikòn"
+    },
     "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
         "message": "Si w pa chwazi dwa itilizasyon yo kounye a, fichye sa a pa p pibliye aprè w fin transfere li."
     },
@@ -724,6 +769,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "Ogmante endantasyon"
+    },
+    "indigo_2035fc55": {
+        "message": "Indigo"
     },
     "insert_593145ef": {
         "message": "Ensere"
@@ -787,6 +835,9 @@
     },
     "library_icon_ae1e54cf": {
         "message": "Ikòn Bibliyotèk"
+    },
+    "light_blue_5374f600": {
+        "message": "Limyè Ble"
     },
     "link_7262adec": {
         "message": "Lyen"
@@ -854,6 +905,9 @@
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Ta sanble pa gen anyen la a"
     },
+    "magenta_4a65993c": {
+        "message": "Magenta"
+    },
     "math_ede93050": {
         "message": "Matematik"
     },
@@ -904,6 +958,9 @@
     },
     "name_1aed4a1b": {
         "message": "Non"
+    },
+    "name_color_ceec76ff": {
+        "message": "{ name } ({ color })"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Navige atravè meni oswa ba zouti a"
@@ -986,6 +1043,9 @@
     "octagon_e48be9f": {
         "message": "Oktagòn"
     },
+    "olive_6a3e4d6b": {
+        "message": "Oliv"
+    },
     "only_most_recent_grading_period_shown_f1ad6458": {
         "message": "*Peryòd notasyon ki pi resan an ki afiche sèlman."
     },
@@ -1003,6 +1063,9 @@
     },
     "optional_add_course_ef0d70fc": {
         "message": "Opsyonèl: Ajoute Kou"
+    },
+    "orange_81386a62": {
+        "message": "Zoranj"
     },
     "ordered_and_unordered_lists_cfadfc38": {
         "message": "Lis Òdone e non Òdone"
@@ -1045,6 +1108,9 @@
     },
     "physical_education_icon_d7dffd3e": {
         "message": "Ikòn Edikasyon Fizik"
+    },
+    "pink_68ad45cb": {
+        "message": "Woz"
     },
     "pixels_52ece7d1": {
         "message": "Piksèl"
@@ -1091,6 +1157,12 @@
     "published_when_302d8e23": {
         "message": "pibliye: { when }"
     },
+    "pumpkin_904428d5": {
+        "message": "Pumpkin"
+    },
+    "purple_7678a9fc": {
+        "message": "Mov"
+    },
     "quiz_e0dcce8f": {
         "message": "Quiz"
     },
@@ -1105,6 +1177,9 @@
     },
     "record_upload_media_5fdce166": {
         "message": "Anrejistre/Chaje Medya"
+    },
+    "red_8258edf3": {
+        "message": "Wouj"
     },
     "redo_363c58b7": {
         "message": "Refè"
@@ -1141,6 +1216,9 @@
     },
     "save_11a80ec3": {
         "message": "Anrejistre"
+    },
+    "saved_icon_maker_icons_df86e2a1": {
+        "message": "Sovgade Ikòn Kreyatè Ikòn"
     },
     "schedule_preview_3bcda153": {
         "message": "Apèsi Pwogram"
@@ -1192,6 +1270,9 @@
     },
     "single_color_image_4e5d4dbc": {
         "message": "Imaj Yon sèl Koulè"
+    },
+    "single_color_image_color_95fa9a87": {
+        "message": "Koulè Inik Imaj la"
     },
     "size_b30e1077": {
         "message": "Dimansyon"
@@ -1247,6 +1328,9 @@
     "starttime_to_endtime_d7cc249d": {
         "message": "{ startTime } a { endTime }"
     },
+    "steel_blue_14296f08": {
+        "message": "Ble Gri"
+    },
     "styles_2aa721ef": {
         "message": "Stil"
     },
@@ -1282,6 +1366,9 @@
     },
     "task_16b0ef38": {
         "message": "Tach"
+    },
+    "teal_f729a294": {
+        "message": "Ble vèt"
     },
     "text_7f4593da": {
         "message": "Tèks"
@@ -1501,6 +1588,9 @@
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "Navigasyon kalandriye pa semenn"
+    },
+    "white_87fa64fd": {
+        "message": "Blan"
     },
     "width_492fec76": {
         "message": "Lajè"
