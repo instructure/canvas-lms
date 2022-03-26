@@ -28,6 +28,9 @@
   "announcement_list_da155734": { "message": "Lis Anons" },
   "announcements_a4b8ed4a": { "message": "Anons" },
   "apply_781a2546": { "message": "Aplike" },
+  "apply_changes_to_all_instances_of_this_icon_maker__2642f466": {
+    "message": "Aplike tout chanjman Ikòn Kreyatè Ikòn sa a nan Kou a"
+  },
   "apps_54d24a47": { "message": "Apps" },
   "arrows_464a3e54": { "message": "Flèch" },
   "art_icon_8e1daad": { "message": "Ikòn la" },
@@ -46,7 +49,10 @@
   "available_folders_694d0436": { "message": "Dosye disponib" },
   "basic_554cdc0a": { "message": "Bazik" },
   "below_81d4dceb": { "message": "Anba" },
+  "black_4cb01371": { "message": "Nwa" },
+  "blue_daf8fea9": { "message": "Ble" },
   "bottom_third_5f5fec1d": { "message": "Tyè Enferyè" },
+  "brick_f2656265": { "message": "Brik" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Anile" },
   "choose_caption_file_9c45bc4e": { "message": "Chwazi fichye soutit" },
@@ -103,14 +109,18 @@
   "course_links_b56959b9": { "message": "Lyen Kou" },
   "course_media_ec759ad": { "message": "Medya Kou" },
   "course_navigation_dd035109": { "message": "Navigasyon Kou" },
+  "create_icon_110d6463": { "message": "Kreye ikòn" },
+  "create_icon_maker_icon_c716bffe": { "message": "Kreye Ikòn Kreyatè Ikòn" },
   "creative_commons_license_725584ae": { "message": "Lisans Creative Commons" },
   "crop_image_41bf940c": { "message": "Koupe imaj" },
   "crop_image_807ebb08": { "message": "Koupe Imaj" },
   "current_image_f16c249c": { "message": "Imaj Aktyèl" },
   "custom_6979cd81": { "message": "Pèsonalize" },
+  "cyan_c1d5f68a": { "message": "Blesyèl" },
   "date_added_ed5ad465": { "message": "Dat Ajoute" },
   "decorative_image_3c28aa7d": { "message": "Imaj Dekoratif" },
   "decrease_indent_de6343ab": { "message": "Diminye endantasyon" },
+  "deep_purple_bb3e2907": { "message": "Mov Fonse" },
   "default_bulleted_unordered_list_47079da8": {
     "message": "lis non òdone a pis pa defo"
   },
@@ -198,6 +208,8 @@
   },
   "grades_a61eba0a": { "message": "Nòt" },
   "greek_65c5b3f7": { "message": "Grèk" },
+  "green_15af4778": { "message": "Vèt" },
+  "grey_a55dceff": { "message": "Gri" },
   "group_documents_8bfd6ae6": { "message": "Gwoupe Dokiman" },
   "group_files_4324f3df": { "message": "Gwoup Fichye" },
   "group_files_82e5dcdb": { "message": "Gwoup fichye" },
@@ -223,6 +235,11 @@
   },
   "i_hold_the_copyright_71ee91b1": { "message": "Mwen gen dwa dotè a" },
   "icon_color_b86dd6d6": { "message": "Ikòn Koulè" },
+  "icon_maker_icons_cc560f7e": { "message": "Ikòn Kreyatè Ikòn" },
+  "icon_outline_e978dc0c": { "message": "Kontou Ikòn" },
+  "icon_outline_size_33f39b86": { "message": "Gwosè Kontou Ikòn" },
+  "icon_shape_30b61e7": { "message": "Fòm Ikòn" },
+  "icon_size_9353edea": { "message": "Gwosè Ikòn" },
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "Si w pa chwazi dwa itilizasyon yo kounye a, fichye sa a pa p pibliye aprè w fin transfere li."
   },
@@ -232,6 +249,7 @@
   "image_to_crop_3a34487d": { "message": "Imaj pou koupe" },
   "images_7ce26570": { "message": "Imaj" },
   "increase_indent_6d550a4a": { "message": "Ogmante endantasyon" },
+  "indigo_2035fc55": { "message": "Indigo" },
   "insert_593145ef": { "message": "Ensere" },
   "insert_equella_links_49a8dacd": { "message": "Ensere lyen Equella" },
   "insert_link_6dc23cae": { "message": "Ensere Lyen" },
@@ -245,6 +263,7 @@
   "large_9c5e80e7": { "message": "Laj" },
   "left_to_right_e9b4fd06": { "message": "De Goch a Dwat" },
   "library_icon_ae1e54cf": { "message": "Ikòn Bibliyotèk" },
+  "light_blue_5374f600": { "message": "Limyè Ble" },
   "link_7262adec": { "message": "Lyen" },
   "link_options_a16b758b": { "message": "Opsyon Lyen" },
   "links_14b70841": { "message": "Lyen" },
@@ -258,6 +277,7 @@
   "loading_please_wait_d276220a": { "message": "Chajman, tanpri tann" },
   "loading_preview_9f077aa1": { "message": "Chajman apèsi" },
   "locked_762f138b": { "message": "Bloke" },
+  "magenta_4a65993c": { "message": "Magenta" },
   "math_icon_ad4e9d03": { "message": "Ikòn Matematik" },
   "media_af190855": { "message": "Medya" },
   "medium_5a8e9ead": { "message": "Mwayen" },
@@ -275,6 +295,7 @@
   },
   "my_files_2f621040": { "message": "Fichye Mwen" },
   "name_1aed4a1b": { "message": "Non" },
+  "name_color_ceec76ff": { "message": "{ name } ({ color })" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navige atravè meni oswa ba zouti a"
   },
@@ -294,6 +315,7 @@
   "none_3b5e34d2": { "message": "Okenn" },
   "none_selected_b93d56d2": { "message": "Anyen Seleksyone" },
   "octagon_e48be9f": { "message": "Oktagòn" },
+  "olive_6a3e4d6b": { "message": "Oliv" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Ouvri dyalòg rakousi klavye sa a"
   },
@@ -301,6 +323,7 @@
     "message": "Ouvri { title } aplikasyon"
   },
   "operators_a2ef9a93": { "message": "Operatè" },
+  "orange_81386a62": { "message": "Zoranj" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Lis Òdone e non Òdone"
   },
@@ -320,6 +343,7 @@
   },
   "performing_arts_icon_f3497486": { "message": "Ikòn Pèfòmans Da" },
   "physical_education_icon_d7dffd3e": { "message": "Ikòn Edikasyon Fizik" },
+  "pink_68ad45cb": { "message": "Woz" },
   "pixels_52ece7d1": { "message": "Piksèl" },
   "posted_when_a578f5ab": { "message": "Poste: { when }" },
   "preformatted_d0670862": { "message": "Prefòmate" },
@@ -333,10 +357,13 @@
   },
   "published_c944a23d": { "message": "pibliye" },
   "published_when_302d8e23": { "message": "pibliye: { when }" },
+  "pumpkin_904428d5": { "message": "Pumpkin" },
+  "purple_7678a9fc": { "message": "Mov" },
   "quizzes_7e598f57": { "message": "Quiz" },
   "raw_html_editor_e3993e41": { "message": "Editè HTML Brit" },
   "record_7c9448b": { "message": "Anrejistre" },
   "record_upload_media_5fdce166": { "message": "Anrejistre/Chaje Medya" },
+  "red_8258edf3": { "message": "Wouj" },
   "relationships_6602af70": { "message": "Relasyon" },
   "religion_icon_246e0be1": { "message": "Ikòn Relijyon" },
   "remove_link_d1f2f4d0": { "message": "Elimine Lyen" },
@@ -350,6 +377,7 @@
     "message": "Malerezman, bèl editè HTML la pa aksesib sou klavye. Gen aksè a bèl editè HTML la la a."
   },
   "save_11a80ec3": { "message": "Anrejistre" },
+  "saved_icon_maker_icons_df86e2a1": { "message": "Sovgade Ikòn Kreyatè Ikòn" },
   "search_280d00bd": { "message": "Chèche" },
   "search_term_b2d2235": { "message": "Tèm Rechèch" },
   "select_crop_shape_d441feeb": { "message": "Seleksyone koupe fòm" },
@@ -363,6 +391,7 @@
   "show_link_options_545338fd": { "message": "Afiche opsyon lyen" },
   "show_video_options_6ed3721a": { "message": "Afiche opsyon videyo" },
   "single_color_image_4e5d4dbc": { "message": "Imaj Yon sèl Koulè" },
+  "single_color_image_color_95fa9a87": { "message": "Koulè Inik Imaj la" },
   "size_b30e1077": { "message": "Dimansyon" },
   "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
     "message": "Fichye soutit la depase kantite maksimòm { max } kb yo otorize a."
@@ -386,6 +415,7 @@
   "square_511eb3b3": { "message": "Kare" },
   "square_unordered_list_b15ce93b": { "message": "lis kare non òdone" },
   "star_8d156e09": { "message": "Etwal" },
+  "steel_blue_14296f08": { "message": "Ble Gri" },
   "styles_2aa721ef": { "message": "Stil" },
   "submit_a3cc6859": { "message": "Soumèt" },
   "subscript_59744f96": { "message": "Endis" },
@@ -399,6 +429,7 @@
   },
   "syllabus_f191f65b": { "message": "Pwogram" },
   "tab_arrows_4cf5abfc": { "message": "TAB/Flèch" },
+  "teal_f729a294": { "message": "Ble vèt" },
   "text_7f4593da": { "message": "Tèks" },
   "text_background_color_16e61c3f": { "message": "Koulè Fon Tèks" },
   "text_color_acf75eb6": { "message": "Koulè Tèks" },
@@ -501,6 +532,7 @@
   "view_title_description_67940918": {
     "message": "Afiche { title } deskripsyon"
   },
+  "white_87fa64fd": { "message": "Blan" },
   "width_492fec76": { "message": "Lajè" },
   "width_and_height_must_be_numbers_110ab2e3": {
     "message": "Lajè a wotè a dwe se chif"

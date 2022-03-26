@@ -92,6 +92,9 @@
     "apply_781a2546": {
         "message": "Áp Dụng"
     },
+    "apply_changes_to_all_instances_of_this_icon_maker__2642f466": {
+        "message": "Áp dụng thay đổi cho tất cả phiên bản của Biểu Tượng Trình Tạo Biểu Tượng này trong Khóa Học"
+    },
     "apps_54d24a47": {
         "message": "Ứng Dụng"
     },
@@ -176,8 +179,17 @@
     "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
         "message": "Bên dưới là ví dụ sinh viên sẽ thấy lịch trình của mình như thế nào"
     },
+    "black_4cb01371": {
+        "message": "Đen"
+    },
+    "blue_daf8fea9": {
+        "message": "Xanh Dương"
+    },
     "bottom_third_5f5fec1d": {
         "message": "Một Phần Ba Dưới"
+    },
+    "brick_f2656265": {
+        "message": "Gạch"
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
@@ -317,6 +329,12 @@
     "course_to_do_bcbbab54": {
         "message": "{ course } VIỆC CẦN LÀM"
     },
+    "create_icon_110d6463": {
+        "message": "Tạo Biểu Tượng"
+    },
+    "create_icon_maker_icon_c716bffe": {
+        "message": "Tạo Biểu Tượng Trình Tạo Biểu Tượng"
+    },
     "creative_commons_license_725584ae": {
         "message": "Giấy Phép Creative Commons:"
     },
@@ -331,6 +349,9 @@
     },
     "custom_6979cd81": {
         "message": "Tùy Chỉnh"
+    },
+    "cyan_c1d5f68a": {
+        "message": "Xanh Lá Mạ"
     },
     "date_added_ed5ad465": {
         "message": "Ngày Thêm"
@@ -355,6 +376,9 @@
     },
     "decrease_indent_de6343ab": {
         "message": "Giảm thụt lề"
+    },
+    "deep_purple_bb3e2907": {
+        "message": "Tía Đen"
     },
     "default_bulleted_unordered_list_47079da8": {
         "message": "danh sách không theo thứ tự đánh dấu đầu dòng mặc định"
@@ -641,6 +665,12 @@
     "greek_65c5b3f7": {
         "message": "Hy Lạp"
     },
+    "green_15af4778": {
+        "message": "Xanh Lục"
+    },
+    "grey_a55dceff": {
+        "message": "Xám"
+    },
     "group_documents_8bfd6ae6": {
         "message": "Tài Liệu Nhóm"
     },
@@ -704,6 +734,21 @@
     "icon_color_b86dd6d6": {
         "message": "Màu Biểu Tượng"
     },
+    "icon_maker_icons_cc560f7e": {
+        "message": "Biểu Tượng Trình Tạo Biểu Tượng"
+    },
+    "icon_outline_e978dc0c": {
+        "message": "Viền Biểu Tượng"
+    },
+    "icon_outline_size_33f39b86": {
+        "message": "Cỡ Viền Biểu Tượng"
+    },
+    "icon_shape_30b61e7": {
+        "message": "Hình Dạng Biểu Tượng"
+    },
+    "icon_size_9353edea": {
+        "message": "Cỡ Biểu Tượng"
+    },
     "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
         "message": "Nếu bạn không chọn quyền sử dụng lúc này thì tập tin sẽ không được công bố sau khi tải lên."
     },
@@ -724,6 +769,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "Tăng thụt lề"
+    },
+    "indigo_2035fc55": {
+        "message": "Chàm"
     },
     "insert_593145ef": {
         "message": "Chèn"
@@ -787,6 +835,9 @@
     },
     "library_icon_ae1e54cf": {
         "message": "Biểu Tượng Thư Viện"
+    },
+    "light_blue_5374f600": {
+        "message": "Xanh Dương Nhạt"
     },
     "link_7262adec": {
         "message": "Liên Kết"
@@ -854,6 +905,9 @@
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Có vẻ như ở đây không có gì cả"
     },
+    "magenta_4a65993c": {
+        "message": "Hồng Sẫm"
+    },
     "math_ede93050": {
         "message": "Toán"
     },
@@ -904,6 +958,9 @@
     },
     "name_1aed4a1b": {
         "message": "Tên"
+    },
+    "name_color_ceec76ff": {
+        "message": "{ name } ({ color })"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Điều hướng qua menu hoặc thanh công cụ"
@@ -986,6 +1043,9 @@
     "octagon_e48be9f": {
         "message": "Bát Giác"
     },
+    "olive_6a3e4d6b": {
+        "message": "Ô liu"
+    },
     "only_most_recent_grading_period_shown_f1ad6458": {
         "message": "*Chỉ các thời gian phân loại điểm gần nhất được hiển thị."
     },
@@ -1003,6 +1063,9 @@
     },
     "optional_add_course_ef0d70fc": {
         "message": "Không bắt buộc: Thêm Khóa Học"
+    },
+    "orange_81386a62": {
+        "message": "Cam"
     },
     "ordered_and_unordered_lists_cfadfc38": {
         "message": "Danh Sách Theo Thứ Tự Và Không Theo Thứ Tự"
@@ -1045,6 +1108,9 @@
     },
     "physical_education_icon_d7dffd3e": {
         "message": "Biểu Tượng Giáo Dục Thể Chất"
+    },
+    "pink_68ad45cb": {
+        "message": "Hồng"
     },
     "pixels_52ece7d1": {
         "message": "Pixel"
@@ -1091,6 +1157,12 @@
     "published_when_302d8e23": {
         "message": "Đã Phát Hành: { when }"
     },
+    "pumpkin_904428d5": {
+        "message": "Bí Ngô"
+    },
+    "purple_7678a9fc": {
+        "message": "Tía"
+    },
     "quiz_e0dcce8f": {
         "message": "Kiểm Tra"
     },
@@ -1105,6 +1177,9 @@
     },
     "record_upload_media_5fdce166": {
         "message": "Ghi/Tải Lên Nội Dung Phương Tiện"
+    },
+    "red_8258edf3": {
+        "message": "Đỏ"
     },
     "redo_363c58b7": {
         "message": "Làm lại"
@@ -1141,6 +1216,9 @@
     },
     "save_11a80ec3": {
         "message": "Lưu"
+    },
+    "saved_icon_maker_icons_df86e2a1": {
+        "message": "Biểu Tượng Trình Tạo Biểu Tượng Đã Lưu"
     },
     "schedule_preview_3bcda153": {
         "message": "Xem Trước Lịch Trình"
@@ -1192,6 +1270,9 @@
     },
     "single_color_image_4e5d4dbc": {
         "message": "Ảnh Đơn Màu"
+    },
+    "single_color_image_color_95fa9a87": {
+        "message": "Màu Hình Ảnh Đơn Màu"
     },
     "size_b30e1077": {
         "message": "Cỡ"
@@ -1247,6 +1328,9 @@
     "starttime_to_endtime_d7cc249d": {
         "message": "{ startTime } đến { endTime }"
     },
+    "steel_blue_14296f08": {
+        "message": "Xanh Thép"
+    },
     "styles_2aa721ef": {
         "message": "Kiểu"
     },
@@ -1282,6 +1366,9 @@
     },
     "task_16b0ef38": {
         "message": "Nhiệm vụ"
+    },
+    "teal_f729a294": {
+        "message": "Xanh Mòng Két"
     },
     "text_7f4593da": {
         "message": "Văn Bản"
@@ -1501,6 +1588,9 @@
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "Điều hướng lịch trình hằng tuần"
+    },
+    "white_87fa64fd": {
+        "message": "Trắng"
     },
     "width_492fec76": {
         "message": "Chiều Rộng"

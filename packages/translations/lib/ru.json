@@ -92,6 +92,9 @@
     "apply_781a2546": {
         "message": "Применить"
     },
+    "apply_changes_to_all_instances_of_this_icon_maker__2642f466": {
+        "message": "Применить изменения ко всем экземплярам этого значка, созданного с помощью средства создания значков в курсе"
+    },
     "apps_54d24a47": {
         "message": "Приложения"
     },
@@ -176,8 +179,17 @@
     "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
         "message": "Ниже приводится пример того, в каком виде будет отображаться расписание для студентов"
     },
+    "black_4cb01371": {
+        "message": "Черный"
+    },
+    "blue_daf8fea9": {
+        "message": "Синий"
+    },
     "bottom_third_5f5fec1d": {
         "message": "Нижняя треть"
+    },
+    "brick_f2656265": {
+        "message": "Блок"
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 г. Acme Inc."
@@ -317,6 +329,12 @@
     "course_to_do_bcbbab54": {
         "message": "{ course } ЗАДАЧИ"
     },
+    "create_icon_110d6463": {
+        "message": "Создать значок"
+    },
+    "create_icon_maker_icon_c716bffe": {
+        "message": "Создать значок, созданный с помощью Средства создания значков"
+    },
     "creative_commons_license_725584ae": {
         "message": "Лицензионное соглашение Creative Commons:"
     },
@@ -331,6 +349,9 @@
     },
     "custom_6979cd81": {
         "message": "Пользовательская"
+    },
+    "cyan_c1d5f68a": {
+        "message": "Голубой"
     },
     "date_added_ed5ad465": {
         "message": "Дата добавления"
@@ -355,6 +376,9 @@
     },
     "decrease_indent_de6343ab": {
         "message": "Уменьшить отступ"
+    },
+    "deep_purple_bb3e2907": {
+        "message": "Темно-фиолетовый"
     },
     "default_bulleted_unordered_list_47079da8": {
         "message": "маркированный неупорядоченный список по умолчанию"
@@ -641,6 +665,12 @@
     "greek_65c5b3f7": {
         "message": "Греческий"
     },
+    "green_15af4778": {
+        "message": "Зеленый"
+    },
+    "grey_a55dceff": {
+        "message": "Серый"
+    },
     "group_documents_8bfd6ae6": {
         "message": "Документы группы"
     },
@@ -704,6 +734,21 @@
     "icon_color_b86dd6d6": {
         "message": "Цвет значка"
     },
+    "icon_maker_icons_cc560f7e": {
+        "message": "Значки, созданные с помощью средства создания значков"
+    },
+    "icon_outline_e978dc0c": {
+        "message": "Контур значка"
+    },
+    "icon_outline_size_33f39b86": {
+        "message": "Размер контура значка"
+    },
+    "icon_shape_30b61e7": {
+        "message": "Форма значка"
+    },
+    "icon_size_9353edea": {
+        "message": "Размер значка"
+    },
     "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
         "message": "Если вы не выберете права пользования сейчас, этот файл не будет опубликован после отправки."
     },
@@ -724,6 +769,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "Увеличить отступ"
+    },
+    "indigo_2035fc55": {
+        "message": "Индиго"
     },
     "insert_593145ef": {
         "message": "Вставить"
@@ -787,6 +835,9 @@
     },
     "library_icon_ae1e54cf": {
         "message": "Значок библиотеки"
+    },
+    "light_blue_5374f600": {
+        "message": "Светло-синий"
     },
     "link_7262adec": {
         "message": "Ссылка"
@@ -854,6 +905,9 @@
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Похоже, здесь ничего нет"
     },
+    "magenta_4a65993c": {
+        "message": "Пурпурный"
+    },
     "math_ede93050": {
         "message": "Математика"
     },
@@ -904,6 +958,9 @@
     },
     "name_1aed4a1b": {
         "message": "Имя"
+    },
+    "name_color_ceec76ff": {
+        "message": "{ name } ({ color })"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Навигация в меню или панели инструментов"
@@ -986,6 +1043,9 @@
     "octagon_e48be9f": {
         "message": "Восьмиугольник"
     },
+    "olive_6a3e4d6b": {
+        "message": "Оливковый"
+    },
     "only_most_recent_grading_period_shown_f1ad6458": {
         "message": "*Показан только самый последний академический период."
     },
@@ -1003,6 +1063,9 @@
     },
     "optional_add_course_ef0d70fc": {
         "message": "Опционально: Добавить курс"
+    },
+    "orange_81386a62": {
+        "message": "Оранжевый"
     },
     "ordered_and_unordered_lists_cfadfc38": {
         "message": "Упорядоченные и неупорядоченные списки"
@@ -1045,6 +1108,9 @@
     },
     "physical_education_icon_d7dffd3e": {
         "message": "Значок физкультуры"
+    },
+    "pink_68ad45cb": {
+        "message": "Розовый"
     },
     "pixels_52ece7d1": {
         "message": "Пиксели"
@@ -1091,6 +1157,12 @@
     "published_when_302d8e23": {
         "message": "Опубликовано: { when }"
     },
+    "pumpkin_904428d5": {
+        "message": "Цвет тыквы"
+    },
+    "purple_7678a9fc": {
+        "message": "Пурпурный"
+    },
     "quiz_e0dcce8f": {
         "message": "Тест"
     },
@@ -1105,6 +1177,9 @@
     },
     "record_upload_media_5fdce166": {
         "message": "Записать / загрузить мультимедиа"
+    },
+    "red_8258edf3": {
+        "message": "Красный"
     },
     "redo_363c58b7": {
         "message": "Повторить"
@@ -1141,6 +1216,9 @@
     },
     "save_11a80ec3": {
         "message": "Сохранить"
+    },
+    "saved_icon_maker_icons_df86e2a1": {
+        "message": "Сохраненные значки, созданные с помощью Средства создания значков"
     },
     "schedule_preview_3bcda153": {
         "message": "Предварительный просмотр расписания"
@@ -1191,6 +1269,9 @@
         "message": "Показать параметры видео"
     },
     "single_color_image_4e5d4dbc": {
+        "message": "Одноцветное изображение"
+    },
+    "single_color_image_color_95fa9a87": {
         "message": "Одноцветное изображение"
     },
     "size_b30e1077": {
@@ -1247,6 +1328,9 @@
     "starttime_to_endtime_d7cc249d": {
         "message": "{ startTime } до { endTime }"
     },
+    "steel_blue_14296f08": {
+        "message": "Синий со стальным отливом"
+    },
     "styles_2aa721ef": {
         "message": "Стили"
     },
@@ -1282,6 +1366,9 @@
     },
     "task_16b0ef38": {
         "message": "Задача"
+    },
+    "teal_f729a294": {
+        "message": "Бирюзовый"
     },
     "text_7f4593da": {
         "message": "Текст"
@@ -1501,6 +1588,9 @@
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "Навигация по еженедельному расписанию"
+    },
+    "white_87fa64fd": {
+        "message": "Белый"
     },
     "width_492fec76": {
         "message": "Ширина"
