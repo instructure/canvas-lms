@@ -22,7 +22,12 @@ import {OBSERVER_COOKIE_PREFIX} from '@canvas/observer-picker/ObserverGetObserve
 import {act, render, waitFor} from '@testing-library/react'
 import K5Dashboard from '../K5Dashboard'
 import moxios from 'moxios'
-import {opportunities, defaultK5DashboardProps as defaultProps, defaultEnv} from './mocks'
+import {
+  opportunities,
+  createPlannerMocks,
+  defaultK5DashboardProps as defaultProps,
+  defaultEnv
+} from './mocks'
 import {resetCardCache} from '@canvas/dashboard-card'
 import {MOCK_CARDS, MOCK_CARDS_2} from '@canvas/k5/react/__tests__/fixtures'
 import {fetchShowK5Dashboard} from '@canvas/observer-picker/react/utils'
@@ -36,6 +41,13 @@ const currentUserId = defaultProps.currentUser.id
 const observedUserCookieName = `${OBSERVER_COOKIE_PREFIX}${currentUserId}`
 
 describe('K5Dashboard Parent Support', () => {
+  beforeAll(() => {
+    jest.setTimeout(15000)
+  })
+
+  afterAll(() => {
+    jest.setTimeout(5000)
+  })
   beforeEach(() => {
     document.cookie = `${observedUserCookieName}=4;path=/`
     moxios.install()
@@ -144,8 +156,8 @@ describe('K5Dashboard Parent Support', () => {
     // 2 total requests - one for student 4, one for student 2
     expect(moxios.requests.count()).toBe(2)
   })
-  // Skipping for flakiness. See https://instructure.atlassian.net/browse/LS-3048.
-  it.skip('shows the observee missing items on dashboard cards', async () => {
+
+  it('shows the observee missing items on dashboard cards', async () => {
     moxios.stubs.reset()
     moxios.requests.reset()
     moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=4', {
@@ -166,7 +178,7 @@ describe('K5Dashboard Parent Support', () => {
       headers: {link: 'url; rel="current"'},
       response: opportunities2
     })
-    // createPlannerMocks()
+    createPlannerMocks()
 
     const {getByText, findByRole, getByRole} = render(
       <K5Dashboard
