@@ -31,7 +31,13 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
   end
 
   let(:tool) do
-    @course.context_external_tools.create(name: "a", url: "http://google.com", consumer_key: "12345", shared_secret: "secret", tool_id: "Quizzes 2")
+    @course.context_external_tools.create(
+      name: "a",
+      url: "http://google.com",
+      consumer_key: "12345",
+      shared_secret: "secret",
+      tool_id: "Quizzes 2"
+    )
   end
 
   let(:assignment) do
@@ -186,7 +192,7 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
         ]
       end
 
-      it "outputs only the lastest version for each url(attempt)" do
+      it "outputs only the latest version for each url(attempt)" do
         output_rows = [
           { url: urls[0], grade: 0.12 },
           { url: urls[1], grade: 0.24 },
@@ -302,46 +308,106 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
       )
     end
 
-    it "sends notification to users" do
-      expect(submission).to receive(:without_versioning).and_call_original
-      # expect 4 :save! calls:
-      # 1 - save an initial unsubmitted version; 2 - create a new data version;
-      # 3 - update status to submitted; 4 - update actual data (score, url, ...)
-      expect(submission).to receive(:save!).exactly(4).times.and_call_original
+    let!(:resubmission_notification) do
+      Notification.create!(
+        name: "Assignment Resubmitted",
+        workflow_state: "active",
+        subject: "No Subject",
+        category: "TestImmediately"
+      )
+    end
+
+    it "sends an 'Assignment Submitted' notification for the first attempt that is submitted" do
+      expect(submission).to receive(:without_versioning).once.and_call_original
+      expect(submission).to receive(:with_versioning).with(false).once.and_call_original
+
+      # :with_versioning calls:
+      # 1 - initialize_version
+      # 2 - save_submission!
+      expect(submission).to receive(:with_versioning).with({ explicit: true }).twice.and_call_original
+
       expect(BroadcastPolicy.notifier).to receive(:send_notification).with(
+        submission,
+        "Assignment Submitted",
+        notification,
+        any_args
+      ).once
+
+      subject.commit_history("http://url", "77", -1)
+      expect(submission.versions.count).to eq 2
+    end
+
+    it "does not send an 'Assignment Submitted' notification after the first attempt submitted" do
+      subject.commit_history("http://url", "77", -1)
+      expect(submission.versions.count).to eq 2
+
+      expect(BroadcastPolicy.notifier).not_to receive(:send_notification).with(
         submission,
         "Assignment Submitted",
         notification,
         any_args
       )
 
-      subject.commit_history("http://url", "77", -1)
+      subject.commit_history("http://url2", "90", -1)
+      expect(submission.versions.count).to eq 3
+
+      subject.commit_history("http://url3", "95", -1)
+      expect(submission.versions.count).to eq 4
     end
 
-    it "sends an 'Assignment Submitted' notification for each new attempt that is submitted" do
+    it "sends an 'Assignment Resubmitted' notification after the second attempt submitted" do
+      subject.commit_history("http://url", "77", -1)
+      expect(submission.versions.count).to eq 2
+
       expect(BroadcastPolicy.notifier).to receive(:send_notification).with(
         submission,
-        "Assignment Submitted",
-        notification,
+        "Assignment Resubmitted",
+        resubmission_notification,
         any_args
-      ).exactly(3).times
+      ).twice
 
-      subject.commit_history("http://url", "77", -1)
-      subject.commit_history("http://url2", "100", -1)
-      subject.commit_history("http://url3", "90", -1)
+      subject.commit_history("http://url2", "90", -1)
+      expect(submission.versions.count).to eq 3
+
+      subject.commit_history("http://url3", "100", -1)
+      expect(submission.versions.count).to eq 4
     end
 
     it "does not send an 'Assignment Submitted' notification when an existing attempt is regraded" do
-      expect(BroadcastPolicy.notifier).to receive(:send_notification).with(
+      subject.commit_history("http://url", "77", -1)
+      expect(submission.versions.count).to eq 2
+
+      expect(BroadcastPolicy.notifier).not_to receive(:send_notification).with(
         submission,
         "Assignment Submitted",
         notification,
         any_args
-      ).exactly(1).time
-
-      subject.commit_history("http://url", "77", -1)
+      )
       subject.commit_history("http://url", "100", -1)
+      expect(submission.versions.count).to eq 2
+
       subject.commit_history("http://url", "80", -1)
+      expect(submission.versions.count).to eq 2
+    end
+
+    it "does not send an 'Assignment Resubmitted' notification when an existing attempt is regraded" do
+      subject.commit_history("http://url", "77", -1)
+      expect(submission.versions.count).to eq 2
+
+      expect(BroadcastPolicy.notifier).not_to receive(:send_notification).with(
+        submission,
+        resubmission_notification.name,
+        resubmission_notification,
+        any_args
+      )
+      subject.commit_history("http://url", "80", -1)
+      expect(submission.versions.count).to eq 2
+
+      subject.commit_history("http://url", "90", -1)
+      expect(submission.versions.count).to eq 2
+
+      subject.commit_history("http://url", "100", -1)
+      expect(submission.versions.count).to eq 2
     end
 
     it "sends a 'Submission Graded' notification when a submission is regraded" do

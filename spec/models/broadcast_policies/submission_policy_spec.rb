@@ -116,6 +116,7 @@ module BroadcastPolicies
       specify { wont_send_when { allow(course).to receive(:available?).and_return false } }
       specify { wont_send_when { allow(submission).to receive(:submitted?).and_return false } }
       specify { wont_send_when { allow(submission).to receive(:late?).and_return true } }
+      specify { wont_send_when { allow(policy).to receive(:is_a_resubmission?).and_return true } }
     end
 
     describe "#should_dispatch_assignment_resubmitted" do

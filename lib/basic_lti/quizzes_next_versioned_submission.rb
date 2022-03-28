@@ -99,40 +99,40 @@ module BasicLTI
 
     def save_submission!(launch_url, grade, score, grader_id)
       initialize_version
-      with_versioning(launch_url) do |is_different_attempt|
-        # Don't "resubmit" the submission if this is just a regrade
-        submit_submission if is_different_attempt
+
+      if new_submission?(launch_url)
+        initialize_submission
+
+        # it will notify students with 'Assignment Submitted' *or* 'Assignment Resubmitted' notification
+        # see SubmissionPolicy#should_dispatch_assignment_submitted? and SubmissionPolicy#should_dispatch_assignment_resubmitted?
+        save_without_versioning
+
         grade_submission(launch_url, grade, score, grader_id)
+
+        # at this point the submission is ready to be versioned
+        save_with_versioning
+      else
+        # teacher regrading only, it won't notify students with 'Assignment Submitted' and 'Assignment Resubmitted' notifications
+        grade_submission(launch_url, grade, score, grader_id)
+        submission.save!
       end
     end
 
+    # create a padding unsubmitted version for reopen request
     def initialize_version
       return if submission.versions.present?
 
-      # create a padding unsubmitted version for reopen request
       save_with_versioning
     end
 
-    def with_versioning(launch_url)
-      is_initial_unsubmitted_version = submission.versions.count == 1 && submission.submitted_at.blank?
-      is_updatable_nil_version = !is_initial_unsubmitted_version && submission.submitted_at.blank?
-      is_different_attempt = submission.url != launch_url
-      # create a new version if the open (last) version is another attempt
-      #   and the open version is not a nil version (excluding the first padding)
-
-      save_with_versioning if !is_updatable_nil_version && is_different_attempt
-      yield is_different_attempt
-    end
-
-    def submit_submission
+    def initialize_submission
       submission.submission_type = params[:submission_type] || "basic_lti_launch"
       submission.submitted_at = params[:submitted_at] || Time.zone.now
       submission.graded_at = params[:graded_at] || Time.zone.now
       submission.grade_matches_current_submission = false
-      # this step is important, to send user notifications
+      # this step is important to send user notifications
       # see SubmissionPolicy
       submission.workflow_state = "submitted"
-      submission.without_versioning(&:save!)
     end
 
     def grade_submission(launch_url, grade, score, grader_id)
@@ -147,11 +147,14 @@ module BasicLTI
       clear_cache
       # We always want to update the launch_url to match what new quizzes is laying down.
       submission.url = launch_url
-      submission.save!
     end
 
     def save_with_versioning
       submission.with_versioning(explicit: true) { submission.save! }
+    end
+
+    def save_without_versioning
+      submission.without_versioning(&:save!)
     end
 
     def clear_cache
@@ -197,6 +200,10 @@ module BasicLTI
 
     def prioritize_non_tool_grade?
       @prioritize_non_tool_grade
+    end
+
+    def new_submission?(launch_url)
+      submission.url != launch_url
     end
   end
 end
