@@ -295,7 +295,14 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
       ed = new FakeEditor()
     })
 
-    const subject = () => render(<ButtonsTray onClose={jest.fn()} editor={ed} />)
+    const subject = () =>
+      render(
+        <ButtonsTray
+          onClose={jest.fn()}
+          editor={ed}
+          rceConfig={{contextType: 'course', contextId: 2}}
+        />
+      )
 
     it('loads the standard SVG metadata', async () => {
       const {getByLabelText, getAllByTestId} = subject()
@@ -323,7 +330,15 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
       ed.setSelectedNode(ed.dom.select('#test-image')[0])
     })
 
-    const subject = () => render(<ButtonsTray onClose={jest.fn()} editing editor={ed} />)
+    const subject = () =>
+      render(
+        <ButtonsTray
+          onClose={jest.fn()}
+          editing
+          editor={ed}
+          rcsConfig={{contextType: 'course', contextId: 2}}
+        />
+      )
 
     beforeEach(() => {
       fetchMock.mock('*', {

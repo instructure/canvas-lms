@@ -29,7 +29,11 @@ describe('useSvgSettings()', () => {
 
   beforeEach(() => {
     ed = new Editor()
-    rcs = {getFile: jest.fn(() => Promise.resolve({name: 'Test Button.svg'}))}
+    rcs = {
+      getFile: jest.fn(() => Promise.resolve({name: 'Test Button.svg'})),
+      contextType: 'course',
+      contextId: 1
+    }
     RceApiSource.mockImplementation(() => rcs)
   })
 
@@ -248,6 +252,19 @@ describe('useSvgSettings()', () => {
         expect(calledUrl).toMatch(
           /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=23&ts=\d+&download_frd=1/
         )
+      })
+    })
+
+    it('uses replacement chain context info in request for file name', async () => {
+      const {result, waitForValueToChange} = renderHook(() => useSvgSettings(ed, editing, rcs))
+
+      await waitForValueToChange(() => {
+        return result.current[0]
+      })
+
+      expect(rcs.getFile).toHaveBeenCalledWith('1', {
+        replacement_chain_context_id: 1,
+        replacement_chain_context_type: 'course'
       })
     })
 

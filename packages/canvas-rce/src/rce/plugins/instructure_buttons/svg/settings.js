@@ -103,7 +103,10 @@ export function useSvgSettings(editor, editing, rcsConfig) {
 
         const rcs = new RceApiSource(rcsConfig)
 
-        const fileData = await rcs.getFile(fileId)
+        const fileData = await rcs.getFile(fileId, {
+          replacement_chain_context_type: rcsConfig.contextType,
+          replacement_chain_context_id: rcsConfig.contextId
+        })
         const fileName = fileData.name.replace(/\.[^\.]+$/, '')
 
         const metadataJson = JSON.parse(metadata)

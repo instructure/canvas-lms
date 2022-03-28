@@ -436,11 +436,40 @@ class RceApiSource {
     return this.apiFetch(uri, headers, {skipParse: true})
   }
 
-  getFile(id) {
+  getFile(id, options = {}) {
     const headers = headerFor(this.jwt)
     const base = this.baseUri('file')
-    const uri = `${base}/${id}`
+
+    // Valid query parameters for getFile
+    const {replacement_chain_context_type, replacement_chain_context_id} = options
+
+    const uri = this.addParamsIfPresent(`${base}/${id}`, {
+      replacement_chain_context_type,
+      replacement_chain_context_id
+    })
+
     return this.apiFetch(uri, headers).then(normalizeFileData)
+  }
+
+  // @private
+  addParamsIfPresent(uri, params) {
+    let url
+
+    try {
+      url = new URL(uri)
+    } catch (e) {
+      // Just return the URI if it was invalid
+      return uri
+    }
+
+    // Add all truthy parameters to the URL
+    for (const [name, value] of Object.entries(params)) {
+      if (!value) continue
+
+      url.searchParams.append(name, value)
+    }
+
+    return url.toString()
   }
 
   // @private
