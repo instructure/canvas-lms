@@ -1139,6 +1139,37 @@ describe "Files API", type: :request do
       expect(json.keys & prohibited_fields).to be_empty
     end
 
+    context "when the attachment is locked and replacement params are inlucded" do
+      subject do
+        api_call(
+          :get,
+          "/api/v1/files/#{old_attachment.id}",
+          { controller: "files", action: "api_show", format: "json", id: old_attachment.id.to_param }.merge(params)
+        )
+      end
+
+      let(:old_attachment) do
+        old = @course.attachments.build(display_name: "old file")
+        old.file_state = "deleted"
+        old.replacement_attachment = attachment
+        old.save!
+        old
+      end
+
+      let(:attachment) { @att }
+      let(:params) do
+        {
+          id: old_attachment.id,
+          replacement_chain_context_type: "course",
+          replacement_chain_context_id: @course.id
+        }
+      end
+
+      it "returns the replacement file" do
+        expect(subject["id"]).to eq attachment.id
+      end
+    end
+
     context "as a student" do
       subject do
         api_call(:get, "/api/v1/files/#{attachment.id}", { controller: "files", action: "api_show", format: "json", id: attachment.id.to_param }, { include: ["enhanced_preview_url"] })
