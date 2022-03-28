@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {CoursePace, PaceContextTypes, Progress, WorkflowStates} from '../types'
+import {CoursePace, OptionalDate, PaceContextTypes, Progress, WorkflowStates} from '../types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 enum ApiMode {
@@ -157,7 +157,7 @@ interface ApiCoursePaceModuleItemsAttributes {
 
 interface CompressApiFormattedCoursePace {
   readonly start_date?: string
-  readonly end_date?: string
+  readonly end_date: OptionalDate
   readonly exclude_weekends: boolean
   readonly course_pace_module_items_attributes: ApiCoursePaceModuleItemsAttributes[]
 }

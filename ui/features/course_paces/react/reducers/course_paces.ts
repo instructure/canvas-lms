@@ -257,6 +257,15 @@ export const getProjectedEndDate = createDeepEqualSelector(
   }
 )
 
+// return the due date of the last module item
+export const getPlannedEndDate = createDeepEqualSelector(
+  getCoursePaceItems,
+  getDueDates,
+  (items: CoursePaceItem[], dueDates: CoursePaceItemDueDates): OptionalDate => {
+    return items.length ? dueDates[items[items.length - 1].module_item_id] : undefined
+  }
+)
+
 /**
  * These 3 functions support the original projected_dates.tsx
  * which is not used but is being kept around as a reference
@@ -303,11 +312,13 @@ export const getPaceDuration = createSelector(
   getCoursePace,
   getProjectedEndDate,
   (coursePace: CoursePace, projectedEndDate?: string): PaceDuration => {
-    let planDays = 0
-    if (coursePace.start_date) {
-      const endDate = projectedEndDate || coursePace.end_date || coursePace.start_date
-      planDays = DateHelpers.rawDaysBetweenInclusive(coursePace.start_date, endDate)
-    }
+    if (!coursePace.start_date) return {weeks: 0, days: 0}
+
+    const paceStart = moment(coursePace.start_date).endOf('day')
+    const paceEnd = moment(coursePace.end_date).endOf('day')
+    const projectedEnd = moment(projectedEndDate).endOf('day')
+    const endDate = projectedEnd.isAfter(paceEnd) ? paceEnd : projectedEnd
+    const planDays = DateHelpers.rawDaysBetweenInclusive(paceStart, endDate)
     return {weeks: Math.floor(planDays / 7), days: planDays % 7}
   }
 )
@@ -334,17 +345,16 @@ export const getActivePaceContext = createSelector(
   }
 )
 
-export const getIsCompressing = createSelector(
+// return ms between projectedEndDate and the pace end_date
+// if > 0, we are compressing
+// need this rather than a boolean so the value changes and will
+// trigger a rerender to update due dates.
+export const getCompression = createSelector(
   getCoursePace,
-  getHardEndDates,
   getProjectedEndDate,
-  (
-    coursePace: CoursePacesState,
-    hardEndDates: boolean,
-    projectedEndDate: string | undefined
-  ): boolean => {
-    const realEnd = hardEndDates ? coursePace.end_date : ENV.VALID_DATE_RANGE.end_at.date
-    return !!projectedEndDate && projectedEndDate > realEnd
+  (coursePace: CoursePacesState, projectedEndDate: string | undefined): number => {
+    if (!projectedEndDate || !coursePace.end_date) return 0
+    return moment(projectedEndDate).endOf('day').diff(moment(coursePace.end_date).endOf('day'))
   }
 )
 
@@ -373,7 +383,10 @@ export default (
         published_at: action.payload.published_at
       }
     case UIConstants.SET_SELECTED_PACE_CONTEXT:
-      return {...action.payload.newSelectedPace, originalPace: action.payload.newSelectedPace}
+      return {
+        ...action.payload.newSelectedPace,
+        originalPace: action.payload.newSelectedPace
+      }
     case CoursePaceConstants.TOGGLE_EXCLUDE_WEEKENDS:
       if (state.exclude_weekends) {
         return {...state, exclude_weekends: false}

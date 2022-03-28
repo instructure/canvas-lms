@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import {connect} from 'react-redux'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 
@@ -24,28 +25,45 @@ import PacePicker from './pace_picker'
 import ProjectedDates from './projected_dates/projected_dates_2'
 import Settings from './settings/settings'
 import UnpublishedChangesIndicator from '../unpublished_changes_indicator'
+import {getSelectedContextId, getSelectedContextType} from '../../reducers/ui'
+import {StoreState} from '../../types'
 
-export type HeaderProps = {
+const {Item: FlexItem} = Flex as any
+
+type StoreProps = {
+  readonly context_type: string
+  readonly context_id: string
+}
+
+type PassedProps = {
   handleDrawerToggle?: () => void
 }
+
+export type HeaderProps = PassedProps & StoreProps
 
 const Header = (props: HeaderProps) => (
   <View as="div">
     <View as="div" borderWidth="0 0 small 0" margin="0 0 medium" padding="0 0 small">
       <Flex as="section" alignItems="end" wrapItems>
-        <Flex.Item margin="0 0 small">
+        <FlexItem margin="0 0 small">
           <PacePicker />
-        </Flex.Item>
-        <Flex.Item margin="0 0 small" shouldGrow>
+        </FlexItem>
+        <FlexItem margin="0 0 small" shouldGrow>
           <Settings margin="0 0 0 small" />
-        </Flex.Item>
-        <Flex.Item textAlign="end" margin="0 0 small small">
+        </FlexItem>
+        <FlexItem textAlign="end" margin="0 0 small small">
           <UnpublishedChangesIndicator onClick={props.handleDrawerToggle} />
-        </Flex.Item>
+        </FlexItem>
       </Flex>
     </View>
-    <ProjectedDates />
+    <ProjectedDates key={`${props.context_type}-${props.context_id}`} />
   </View>
 )
 
-export default Header
+const mapStateToProps = (state: StoreState) => {
+  return {
+    context_type: getSelectedContextType(state),
+    context_id: getSelectedContextId(state)
+  }
+}
+export default connect(mapStateToProps)(Header)

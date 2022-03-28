@@ -24,12 +24,13 @@ import {PRIMARY_PACE, STUDENT_PACE} from '../../../../__tests__/fixtures'
 import {ProjectedDates} from '../projected_dates_2'
 
 const defaultProps = {
-  coursePace: PRIMARY_PACE,
+  coursePace: PRIMARY_PACE, // 2021-09-01 -> 2021-12-15
   assignments: 5,
   paceDuration: {weeks: 2, days: 3},
   projectedEndDate: '2021-12-01',
   blackoutDates: [],
   weekendsDisabled: false,
+  compression: 0,
   setStartDate: () => {},
   compressDates: jest.fn(),
   uncompressDates: jest.fn(),
@@ -123,5 +124,19 @@ describe('ProjectedDates', () => {
     expect(getByText(/\d+ assignments/)).toBeInTheDocument()
     expect(getByText(/\d+ weeks/)).toBeInTheDocument()
     expect(getByText('Dates shown in course time zone')).toBeInTheDocument()
+  })
+
+  it('compresses dates if projectedEndDate is after pace end_date', () => {
+    renderConnected(
+      <ProjectedDates {...defaultProps} projectedEndDate="2021-12-17" compression={1000} />
+    )
+    expect(defaultProps.compressDates).toHaveBeenCalled()
+    expect(defaultProps.uncompressDates).not.toHaveBeenCalled()
+  })
+
+  it('uncompresses dates of projectedEndDate is before pace end_date', () => {
+    renderConnected(<ProjectedDates {...defaultProps} />)
+    expect(defaultProps.compressDates).not.toHaveBeenCalled()
+    expect(defaultProps.uncompressDates).toHaveBeenCalled()
   })
 })

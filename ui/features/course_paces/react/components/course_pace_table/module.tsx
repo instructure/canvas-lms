@@ -49,7 +49,7 @@ interface PassedProps {
   readonly coursePace: CoursePace
   readonly responsiveSize: ResponsiveSizes
   readonly showProjections: boolean
-  readonly isCompressing: boolean
+  readonly compression: number
 }
 
 export const Module: React.FC<PassedProps> = props => {
@@ -92,7 +92,7 @@ export const Module: React.FC<PassedProps> = props => {
           padding={headerPadding}
         >
           <View id="due-date-column-title">{I18n.t('Due Date')} </View>
-          {props.isCompressing && (
+          {props.compression > 0 && (
             <Tooltip
               renderTip={I18n.t(
                 'Due Dates are being compressed based on your start and end dates.'
@@ -121,7 +121,7 @@ export const Module: React.FC<PassedProps> = props => {
     // status changes or the course pace changes. This is necessary because the AssignmentRow maintains the duration in local state,
     // and applying updates with componentWillReceiveProps makes it buggy (because the Redux updates can be slow, causing changes to
     // get reverted as you type).
-    const key = `${item.id}|${item.module_item_id}|${props.coursePace.hard_end_dates}|${props.coursePace.updated_at}`
+    const key = `${item.id}|${item.module_item_id}|${props.compression}|${props.coursePace.updated_at}`
     return (
       <AssignmentRow
         key={key}
