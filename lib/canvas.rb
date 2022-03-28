@@ -133,6 +133,10 @@ module Canvas
                 end
   end
 
+  def self.semver_revision
+    revision&.gsub(/-/, "")
+  end
+
   DEFAULT_RETRY_CALLBACK = lambda do |ex, tries|
     Rails.logger.debug do
       {
