@@ -1,19 +1,9 @@
-# Append `:docker-compose.spring.yml` to COMPOSE_FILE in `.env`
-# invoke a console with `docker-compose run --rm web bin/rails console`
-# or with specs: `docker-compose run --rm web bin/rspec spec/path/to/file_spec.rb`
+# See doc/docker/README.md or https://github.com/instructure/canvas-lms/tree/master/doc/docker
 version: '2.3'
 services:
-  web:
-    environment:
-      SPRING_TMP_PATH: tmp
-      SPRING_SOCKET: tmp/spring.sock
-      SPRING_PIDFILE: tmp/spring.pid
-    depends_on:
-      - spring
-
-  spring:
-    build: .
-    command: bundle exec spring server
+  jobs: &BASE
+    build:
+      context: .
     volumes:
       - .:/usr/src/app
       - api_docs:/usr/src/app/public/doc/api
@@ -48,10 +38,70 @@ services:
       - translations:/usr/src/app/public/javascripts/translations
       - yardoc:/usr/src/app/.yardoc
       - yarn-cache:/home/docker/.cache/yarn
-    environment:
+    environment: &BASE-ENV
       ENCRYPTION_KEY: facdd3a131ddd8988b14f6e4e01039c93cfa0160
-      POSTGRES_PASSWORD: sekret
       RAILS_ENV: development
-      SPRING_TMP_PATH: tmp
-      SPRING_SOCKET: tmp/spring.sock
-      SPRING_PIDFILE: tmp/spring.pid
+
+  webpack:
+    <<: *BASE
+    command: yarn run webpack
+    env_file:
+      - ./.env
+
+  web:
+    <<: *BASE
+    environment:
+      <<: *BASE-ENV
+      VIRTUAL_HOST: .canvas.docker
+      HTTPS_METHOD: noredirect
+      # AR_QUERY_TRACE: 'true'
+      # AR_QUERY_TRACE_TYPE: 'all' # 'all', 'write', or 'read'
+      # AR_QUERY_TRACE_LINES: 10
+
+  postgres:
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  githook_installer:
+    build:
+      context: .
+      dockerfile: 'Dockerfile.githook'
+    volumes:
+      - ./.git:/tmp/.git
+      - ./hooks:/tmp/hooks
+      - ./script:/tmp/script
+
+volumes:
+  api_docs: {}
+  brandable_css_brands: {}
+  bundler: {}
+  canvas-docker-gems: {}
+  canvas-media_es: {}
+  canvas-media_lib: {}
+  canvas-media_node_modules: {}
+  canvas-planner_node_modules: {}
+  canvas-planner_lib: {}
+  canvas-rce_canvas: {}
+  canvas-rce_lib: {}
+  canvas-rce_node_modules: {}
+  i18nliner_node_modules: {}
+  jest-moxios-utils_node_modules: {}
+  js-utils_es: {}
+  js-utils_lib: {}
+  js-utils_node_modules: {}
+  k5uploader_es: {}
+  k5uploader_lib: {}
+  k5uploader_node_modules: {}
+  locales: {}
+  log: {}
+  node_modules: {}
+  old-copy-of-react-14-that-is-just-here-so-if-analytics-is-checked-out-it-doesnt-change-yarn.lock_node_modules: {}
+  pg_data: {}
+  pacts: {}
+  public_dist: {}
+  reports: {}
+  styleguide: {}
+  tmp: {}
+  translations: {}
+  yardoc: {}
+  yarn-cache: {}

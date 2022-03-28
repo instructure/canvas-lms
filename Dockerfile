@@ -70,7 +70,35 @@ USER docker
 
 RUN set -eux; \
   mkdir -p \
+    .yardoc \
+    app/stylesheets/brandable_css_brands \
+    app/views/info \
+    config/locales/generated \
+    gems/canvas_i18nliner/node_modules \
+    log \
+    node_modules \
+    packages/canvas-media/es \
+    packages/canvas-media/lib \
+    packages/canvas-media/node_modules \
+    packages/canvas-planner/lib \
+    packages/canvas-planner/node_modules \
+    packages/canvas-rce/canvas \
+    packages/canvas-rce/lib \
+    packages/canvas-rce/node_modules \
+    packages/jest-moxios-utils/node_modules \
+    packages/js-utils/es \
+    packages/js-utils/lib \
+    packages/js-utils/node_modules \
+    packages/k5uploader/es \
+    packages/k5uploader/lib \
+    packages/k5uploader/node_modules \
+    packages/old-copy-of-react-14-that-is-just-here-so-if-analytics-is-checked-out-it-doesnt-change-yarn.lock/node_modules \
+    pacts \
+    public/dist \
+    public/doc/api \
+    public/javascripts/translations \
+    reports \
+    tmp \
     /home/docker/.bundle/ \
     /home/docker/.cache/yarn \
-    /home/docker/.gem/ \
-    /usr/src/app
+    /home/docker/.gem/
