@@ -242,7 +242,7 @@ module Importers
         hash[:assignment_overrides].each do |o|
           next if o[:set_id].to_i == AssignmentOverride::NOOP_MASTERY_PATHS &&
                   o[:set_type] == AssignmentOverride::SET_TYPE_NOOP &&
-                  !context.feature_enabled?(:conditional_release)
+                  !context.conditional_release?
 
           override = item.assignment_overrides.where(o.slice(:set_type, :set_id)).first
           override ||= item.assignment_overrides.build
@@ -259,7 +259,7 @@ module Importers
           migration.add_imported_item(override,
                                       key: [item.migration_id, override.set_type, override.set_id].join("/"))
         end
-        can_restrict = added_overrides || (item.submission_types == "wiki_page" && context.feature_enabled?(:conditional_release))
+        can_restrict = added_overrides || (item.submission_types == "wiki_page" && context.conditional_release?)
         if hash.key?(:only_visible_to_overrides) && can_restrict
           item.only_visible_to_overrides = hash[:only_visible_to_overrides]
         end

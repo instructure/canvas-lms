@@ -1187,7 +1187,7 @@ describe UserLearningObjectScopes do
     end
 
     it "does not show wiki pages that are not released to the user" do
-      @course.enable_feature!(:conditional_release)
+      @course.conditional_release = true
       @course_page.todo_date = 1.day.from_now
       @course_page.save!
       add_section("Section 2")

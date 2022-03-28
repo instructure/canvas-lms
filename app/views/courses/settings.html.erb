@@ -482,6 +482,28 @@
           <% end %>
         </div>
       </div>
+      <div class="form-row">
+        <div class="form-label">
+          <label for="conditional_release"><%= before_label('conditional_release', %{Mastery Paths}) %></label>
+        </div>
+        <div id="conditional_release">
+          <div class="checkbox-flex-container">
+            <%= f.check_box :conditional_release, :class => "conditional_release_checkbox", :disabled => !can_manage || @context.account.conditional_release[:locked] %>
+            <%= f.label :conditional_release, t("Enable individual learning paths for students based on assessment") %>
+          </div>
+          <div id="conditional_release_caution_text" class="aside palign caution-text">
+            <i class='icon-warning-borderless'></i>
+            <div>
+              <p>
+                <%= t do %>
+                  Disabling the Mastery Paths feature will release configured assignments and content to all students.
+                  If the feature is re-enabled, these assignments will need to be configured for Mastery Paths again.
+                <% end %>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
       <% if @context.feature_enabled?(:epub_export) && !@context.account.enable_offline_web_export? %>
         <div class="form-row">
           <div class="form-label"><label for="course_epub_export"><%= before_label('course_epub_export', %{Epub Export}) %></label></div>
@@ -521,7 +543,7 @@
               <%= f.check_box :enable_course_paces, :disabled => !can_manage %>
               <%= f.label :enable_course_paces, :en => "Enable Course Pacing" %><br/>
             </div>
-            <div id="course_paces_caution_text" class="aside palign course-paces-caution-text">
+            <div id="course_paces_caution_text" class="aside palign caution-text">
               <i class='icon-warning-borderless'></i>
               <div>
                 <p>

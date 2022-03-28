@@ -1442,7 +1442,8 @@ class CoursesController < ApplicationController
   #     "lock_all_announcements": true,
   #     "usage_rights_required": false,
   #     "homeroom_course": false,
-  #     "default_due_time": "23:59:59"
+  #     "default_due_time": "23:59:59",
+  #     "conditional_release": false
   #   }
   def api_settings
     get_context
@@ -1648,6 +1649,9 @@ class CoursesController < ApplicationController
   #   when setting a due date for an assignment. It does not change when any existing assignment is due. It should be
   #   given in 24-hour HH:MM:SS format. The default is "23:59:59". Use "inherit" to inherit the account setting.
   #
+  # @argument conditional_release [Boolean]
+  #   Enable or disable individual learning paths for students based on assessment
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id>/settings \
   #     -X PUT \
@@ -1690,9 +1694,13 @@ class CoursesController < ApplicationController
       :homeroom_course_id,
       :course_color,
       :friendly_name,
-      :enable_course_paces
+      :enable_course_paces,
+      :conditional_release
     )
     changes = changed_settings(@course.changes, @course.settings, old_settings)
+
+    conditional_release_after_change_hook if changes[:conditional_release]&.last == false
+
     @course.delay_if_production(priority: Delayed::LOW_PRIORITY)
            .touch_content_if_public_visibility_changed(changes)
 
@@ -2882,6 +2890,9 @@ class CoursesController < ApplicationController
   #   enabled for the sub-account. Otherwise, Course Pacing are always disabled.
   #     Note: Course Pacing is in active development.
   #
+  # @argument course[conditional_release] [Boolean]
+  #   Enable or disable individual learning paths for students based on assessment
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id> \
   #     -X PUT \
@@ -3145,6 +3156,7 @@ class CoursesController < ApplicationController
       if @course.account.feature_enabled?(:course_paces) && (changes.keys & %w[start_at conclude_at restrict_enrollments_to_course_dates]).present?
         @course.course_paces.find_each(&:create_publish_progress)
       end
+      disable_conditional_release if changes[:conditional_release]&.last == false
 
       # RUBY 3.0 - **{} can go away, because data won't implicitly convert to kwargs
       @course.delay_if_production(priority: Delayed::LOW_PRIORITY).touch_content_if_public_visibility_changed(changes, **{})
@@ -3955,7 +3967,13 @@ class CoursesController < ApplicationController
       :locale, :integration_id, :hide_final_grades, :hide_distribution_graphs, :hide_sections_on_course_users_page, :lock_all_announcements, :public_syllabus,
       :quiz_engine_selected, :public_syllabus_to_auth, :course_format, :time_zone, :organize_epub_by_content_type, :enable_offline_web_export,
       :show_announcements_on_home_page, :home_page_announcement_limit, :allow_final_grade_override, :filter_speed_grader_by_student_group, :homeroom_course,
-      :template, :course_color, :homeroom_course_id, :sync_enrollments_from_homeroom, :friendly_name, :enable_course_paces, :default_due_time
+      :template, :course_color, :homeroom_course_id, :sync_enrollments_from_homeroom, :friendly_name, :enable_course_paces, :default_due_time, :conditional_release
     )
+  end
+
+  def disable_conditional_release
+    ConditionalRelease::Service.delay_if_production(priority: Delayed::LOW_PRIORITY,
+                                                    n_strand: ["conditional_release_unassignment", @course.global_root_account_id])
+                               .release_mastery_paths_content_in_course(@course)
   end
 end

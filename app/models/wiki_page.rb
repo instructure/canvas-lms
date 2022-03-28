@@ -58,7 +58,7 @@ class WikiPage < ActiveRecord::Base
   validate :validate_front_page_visibility
 
   before_save :default_submission_values,
-              if: proc { context.try(:feature_enabled?, :conditional_release) }
+              if: proc { context.try(:conditional_release?) }
   before_save :set_revised_at
   before_validation :ensure_wiki_and_context
   before_validation :ensure_unique_title
@@ -66,7 +66,7 @@ class WikiPage < ActiveRecord::Base
 
   after_save  :touch_context
   after_save  :update_assignment,
-              if: proc { context.try(:feature_enabled?, :conditional_release) }
+              if: proc { context.try(:conditional_release?) }
 
   scope :starting_with_title, lambda { |title|
     where("title ILIKE ?", "#{title}%")

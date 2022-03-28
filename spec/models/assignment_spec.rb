@@ -5641,7 +5641,10 @@ describe Assignment do
       let(:submission_class) { WikiPage }
 
       context "feature enabled" do
-        before(:once) { @course.enable_feature!(:conditional_release) }
+        before(:once) do
+          @course.conditional_release = true
+          @course.save!
+        end
 
         include_examples "submittable"
       end
@@ -6221,7 +6224,8 @@ describe Assignment do
     end
 
     it "is locked when associated wiki page is part of a locked module" do
-      @course.enable_feature!(:conditional_release)
+      @course.conditional_release = true
+      @course.save!
       a1 = assignment_model(course: @course, submission_types: "wiki_page")
       a1.reload
       expect(a1.locked_for?(@user)).to be_falsey
@@ -6713,7 +6717,8 @@ describe Assignment do
 
     it "destroys the associated page if enabled" do
       course_factory
-      @course.enable_feature!(:conditional_release)
+      @course.conditional_release = true
+      @course.save!
       wiki_page_assignment_model course: @course
       @assignment.destroy
       expect(@page.reload).to be_deleted

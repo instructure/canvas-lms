@@ -289,7 +289,7 @@ class AssignmentsController < ApplicationController
         elsif @assignment.discussion_topic? &&
               @assignment.discussion_topic.grants_right?(@current_user, session, :read)
           return redirect_to named_context_url(@context, :context_discussion_topic_url, @assignment.discussion_topic.id)
-        elsif @context.feature_enabled?(:conditional_release) && @assignment.wiki_page? &&
+        elsif @context.conditional_release? && @assignment.wiki_page? &&
               @assignment.wiki_page.grants_right?(@current_user, session, :read)
           return redirect_to named_context_url(@context, :context_wiki_page_url, @assignment.wiki_page.id)
         elsif @assignment.submission_types == "external_tool" && @assignment.external_tool_tag && @unlocked
@@ -648,7 +648,7 @@ class AssignmentsController < ApplicationController
 
     if params[:submission_types] == "discussion_topic"
       redirect_to new_polymorphic_url([@context, :discussion_topic], index_edit_params)
-    elsif @context.feature_enabled?(:conditional_release) && params[:submission_types] == "wiki_page"
+    elsif @context.conditional_release? && params[:submission_types] == "wiki_page"
       redirect_to new_polymorphic_url([@context, :wiki_page], index_edit_params)
     else
       @assignment.quiz_lti! if params.key?(:quiz_lti)
@@ -678,7 +678,7 @@ class AssignmentsController < ApplicationController
         return redirect_to edit_course_quiz_url(@context, @assignment.quiz, index_edit_params)
       elsif @assignment.submission_types == "discussion_topic" && @assignment.discussion_topic
         return redirect_to edit_polymorphic_url([@context, @assignment.discussion_topic], index_edit_params)
-      elsif @context.feature_enabled?(:conditional_release) &&
+      elsif @context.conditional_release? &&
             @assignment.submission_types == "wiki_page" && @assignment.wiki_page
         return redirect_to edit_polymorphic_url([@context, @assignment.wiki_page], index_edit_params)
       end

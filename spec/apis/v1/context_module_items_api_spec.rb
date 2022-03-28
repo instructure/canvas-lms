@@ -1318,7 +1318,8 @@ describe "Module Items API", type: :request do
                                                                                              ])
                                                      ])
         @cyoe_rule = @course.conditional_release_rules.create!(trigger_assignment_id: @quiz.assignment_id, scoring_ranges: [range])
-        @course.enable_feature!(:conditional_release)
+        @course.conditional_release = true
+        @course.save!
 
         graded_submission(@quiz, @student)
       end

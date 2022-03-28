@@ -369,6 +369,7 @@ class Account < ActiveRecord::Base
   add_setting :emoji_deny_list, root_only: true
 
   add_setting :default_due_time, inheritable: true
+  add_setting :conditional_release, default: false, boolean: true, inheritable: true
 
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
@@ -471,6 +472,10 @@ class Account < ActiveRecord::Base
   def enable_as_k5_account!
     settings[:enable_as_k5_account] = { value: true }
     save!
+  end
+
+  def conditional_release?
+    conditional_release[:value]
   end
 
   def open_registration?

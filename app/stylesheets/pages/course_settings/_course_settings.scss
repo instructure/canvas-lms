@@ -472,7 +472,7 @@ td.center-text {
   margin-#{direction(left)}: 18px;
 }
 
-.course-paces-caution-text {
+.caution-text {
   display: flex;
   & i {
     color: $ic-color-danger;

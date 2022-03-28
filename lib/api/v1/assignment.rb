@@ -601,7 +601,7 @@ module Api::V1::Assignment
 
     if assignment_params["submission_types"].present? &&
        !assignment_params["submission_types"].all? do |s|
-         return false if s == "wiki_page" && !context.try(:feature_enabled?, :conditional_release)
+         return false if s == "wiki_page" && !context.try(:conditional_release?)
 
          API_ALLOWED_SUBMISSION_TYPES.include?(s) || (s == "default_external_tool" && assignment.unpublished?)
        end

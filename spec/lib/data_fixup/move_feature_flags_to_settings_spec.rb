@@ -187,6 +187,24 @@ describe DataFixup::MoveFeatureFlagsToSettings do
       expect(@course.settings).not_to have_key(:some_course_setting)
     end
 
+    it "works for course feature flag when allowed_on" do
+      with_feature_definitions do
+        @root_account.set_feature_flag!(:course_feature_going_away, Feature::STATE_DEFAULT_ON)
+        @sub_account.set_feature_flag!(:course_feature_going_away, Feature::STATE_DEFAULT_ON)
+      end
+      DataFixup::MoveFeatureFlagsToSettings.run(:course_feature_going_away, "AccountAndCourseInherited", :some_course_setting)
+      reload_all
+
+      expect(@root_account.some_course_setting[:value]).to eq(true)
+      expect(@root_account.some_course_setting[:locked]).to eq(false)
+      expect(@root_account.settings).to have_key(:some_course_setting)
+      expect(@sub_account.some_course_setting[:value]).to eq(true)
+      expect(@sub_account.some_course_setting[:locked]).to eq(false)
+      expect(@sub_account.settings).to have_key(:some_course_setting)
+      expect(@course.some_course_setting).to eq(true)
+      expect(@course.settings).not_to have_key(:some_course_setting)
+    end
+
     it "works for course feature flag when not overridden" do
       with_feature_definitions do
         @root_account.allow_feature!(:course_feature_going_away)

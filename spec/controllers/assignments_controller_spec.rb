@@ -776,7 +776,8 @@ describe AssignmentsController do
     end
 
     it "redirects to wiki page if assignment is linked to wiki page" do
-      @course.enable_feature!(:conditional_release)
+      @course.conditional_release = true
+      @course.save!
       user_session(@student)
       @assignment.reload.submission_types = "wiki_page"
       @assignment.save!
@@ -786,7 +787,8 @@ describe AssignmentsController do
     end
 
     it "does not redirect to wiki page" do
-      @course.disable_feature!(:conditional_release)
+      @course.conditional_release = false
+      @course.save!
       user_session(@student)
       @assignment.submission_types = "wiki_page"
       @assignment.save!
@@ -2102,7 +2104,8 @@ describe AssignmentsController do
       end
 
       it "to wiki page" do
-        @course.enable_feature!(:conditional_release)
+        @course.conditional_release = true
+        @course.save!
         wiki_page_assignment_model course: @course
         get "edit", params: { course_id: @course.id, id: @page.assignment.id }
         expect(response).to redirect_to controller.edit_course_wiki_page_path(@course, @page)
