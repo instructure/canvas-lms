@@ -40,7 +40,8 @@ module BroadcastPolicies
         submission.submitted? &&
         submission.has_submission? &&
         # don't send a submitted message because we already sent an :assignment_submitted_late message
-        !submission.late?
+        !submission.late? &&
+        !is_a_resubmission?
     end
 
     def should_dispatch_assignment_resubmitted?
