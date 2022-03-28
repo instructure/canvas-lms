@@ -31,6 +31,8 @@ import {
 } from '../types'
 import {createAction, ActionsUnion} from '../shared/types'
 import {actions as uiActions} from './ui'
+import {actions as blackoutDateActions} from '../shared/actions/blackout_dates'
+import {getBlackoutDatesUnsynced} from '../shared/reducers/blackout_dates'
 import * as Api from '../api/course_pace_api'
 
 const I18n = useI18nScope('course_paces_actions')
@@ -84,13 +86,14 @@ const thunkActions = {
   },
   onResetPace: (): ThunkAction<void, StoreState, void, Action> => {
     return (dispatch, getState) => {
+      dispatch(blackoutDateActions.resetBlackoutDates())
       const originalPace = getState().original.coursePace
       return dispatch(regularActions.resetPace(originalPace))
     }
   },
   publishPace: (): ThunkAction<Promise<void>, StoreState, void, Action> => {
     return (dispatch, getState) => {
-      dispatch(uiActions.showLoadingOverlay(I18n.t('Starting publish...')))
+      dispatch(uiActions.startSyncing())
       dispatch(uiActions.clearCategoryError('publish'))
 
       return Api.publish(getState().coursePace)
@@ -100,12 +103,42 @@ const thunkActions = {
           dispatch(coursePaceActions.saveCoursePace(updatedPace))
           dispatch(coursePaceActions.setProgress(progress))
           dispatch(coursePaceActions.pollForPublishStatus())
-          dispatch(uiActions.hideLoadingOverlay())
+          dispatch(uiActions.syncingCompleted())
         })
         .catch(error => {
-          dispatch(uiActions.hideLoadingOverlay())
           dispatch(uiActions.setCategoryError('publish', error?.toString()))
+          dispatch(uiActions.syncingCompleted())
         })
+    }
+  },
+  // TODO: when blackout dates are changed we have to possibly publish changes
+  // to the pace in the UI + save all existing paces
+  publishPaceAndSaveAll: (): ThunkAction<Promise<void>, StoreState, void, Action> => {
+    return (dispatch, _getState) => {
+      return dispatch(coursePaceActions.publishPace())
+    }
+  },
+  // I have no idea how to declare the return type of this function
+  // an error message said: ThunkDispatch<StoreState, void, Action>
+  // but that just moved the error
+  syncUnpublishedChanges: () => {
+    return (dispatch, getState) => {
+      dispatch(uiActions.clearCategoryError('publish'))
+
+      if (ENV.FEATURES.course_paces_blackout_dates && getBlackoutDatesUnsynced(getState())) {
+        dispatch(uiActions.startSyncing())
+        return dispatch(blackoutDateActions.syncBlackoutDates())
+          .then(() => {
+            return dispatch(coursePaceActions.publishPaceAndSaveAll()).then(() => {
+              dispatch(uiActions.syncingCompleted())
+            })
+          })
+          .catch(() => {
+            dispatch(uiActions.syncingCompleted())
+          })
+      } else {
+        return dispatch(coursePaceActions.publishPace())
+      }
     }
   },
   pollForPublishStatus: (): ThunkAction<void, StoreState, void, Action> => {

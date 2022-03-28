@@ -17,44 +17,64 @@
  */
 
 import {StoreState as CoursePageStoreState} from '../../types'
-import {BlackoutDate} from '../types'
+import {BlackoutDate, SyncState, BlackoutDateState} from '../types'
 import {Constants, BlackoutDatesAction} from '../actions/blackout_dates'
 import {getInitialBlackoutDates} from '../../reducers/original'
 
 export const getBlackoutDates = (state: CoursePageStoreState) => {
-  return state.blackoutDates
+  return state.blackoutDates.blackoutDates
+}
+
+export const getBlackoutDatesSyncing = (state: CoursePageStoreState) => {
+  return state.blackoutDates.syncing === SyncState.SYNCING
+}
+
+export const getBlackoutDatesUnsynced = (state: CoursePageStoreState) => {
+  return state.blackoutDates.syncing === SyncState.UNSYNCED
 }
 
 /* Reducers */
 
 export const blackoutDatesReducer = (
-  state = getInitialBlackoutDates(),
+  state = {
+    syncing: SyncState.SYNCED,
+    blackoutDates: getInitialBlackoutDates()
+  },
   action: BlackoutDatesAction
-): BlackoutDate[] => {
+): BlackoutDateState => {
   switch (action.type) {
-    // case Constants.ADD_BLACKOUT_DATE:
-    //   return [...state, action.payload]
-    // case Constants.DELETE_BLACKOUT_DATE:
-    //   return state.filter(blackoutDate => blackoutDate.id !== action.payload)
     case Constants.UPDATE_BLACKOUT_DATES:
-      return action.payload.sort((a, b) => {
-        if (a.start_date.isBefore(b.start_date)) return -1
-        if (a.start_date.isAfter(b.start_date)) return 1
-        return 0
-      }) as BlackoutDate[]
-    case Constants.ADD_BACKEND_ID:
-      return state.map(blackoutDate => {
-        if (blackoutDate.temp_id === action.payload.tempId) {
-          return {
-            ...blackoutDate,
-            temp_id: undefined,
-            id: action.payload.id
-          }
-        } else {
-          return blackoutDate
-        }
-      })
+      return {
+        syncing: SyncState.UNSYNCED,
+        blackoutDates: action.payload.sort(compareBlackoutDatesByStartDate)
+      }
+    case Constants.BLACKOUT_DATES_SYNCING:
+      return {...state, syncing: SyncState.SYNCING}
+    case Constants.BLACKOUT_DATES_SYNCED:
+      return {
+        syncing: SyncState.SYNCED,
+        blackoutDates: action.payload
+          ? action.payload.sort((a, b) => {
+              if (a.start_date.isBefore(b.start_date)) return -1
+              if (a.start_date.isAfter(b.start_date)) return 1
+              return 0
+            })
+          : state.blackoutDates
+      } as BlackoutDateState
+    case Constants.BLACKOUT_DATES_SYNC_FAILED:
+      return {...state, syncing: SyncState.UNSYNCED}
+    case Constants.RESET_BLACKOUT_DATES:
+      return {
+        syncing: SyncState.SYNCED,
+        blackoutDates: action.payload
+      }
     default:
       return state
   }
+}
+
+function compareBlackoutDatesByStartDate(a: BlackoutDate, b: BlackoutDate): number {
+  if (a.start_date.isBefore(b.start_date)) return -1
+  if (a.start_date.isAfter(b.start_date)) return 1
+  return 0
 }

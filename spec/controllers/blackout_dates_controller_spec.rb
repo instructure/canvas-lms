@@ -127,4 +127,28 @@ describe BlackoutDatesController, type: :controller do
       expect(BlackoutDate.find_by(id: @blackout_date.id)).to be_nil
     end
   end
+
+  describe "PUT #bulk_update" do
+    it "syncs the blackout dates with incoming data" do
+      blackout_date2 = @course.blackout_dates.create!(start_date: "2022-11-11", end_date: "2022-11-11", event_title: "My birthday")
+      put :bulk_update, {
+        params: {
+          course_id: @course.id,
+          blackout_dates: [
+            { id: blackout_date2.id, start_date: blackout_date2.start_date.iso8601, end_date: blackout_date2.end_date.iso8601, event_title: "update me" },
+            { start_date: "2022-05-31", end_date: "2022-09-01", event_title: "summer break" }
+          ]
+        }
+      }
+      @course.reload
+      blackout_dates = @course.blackout_dates
+      expect(response).to be_successful
+      # deleted
+      expect(blackout_dates.find_by(id: @blackout_date.id)).to be_nil
+      # updated
+      expect(blackout_dates.find_by(id: blackout_date2.id).event_title).to eq("update me")
+      # created
+      expect(blackout_dates.find_by(event_title: "summer break")).to_not be_nil
+    end
+  end
 end

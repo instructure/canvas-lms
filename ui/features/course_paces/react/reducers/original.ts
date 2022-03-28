@@ -21,6 +21,7 @@ import moment from 'moment-timezone'
 import {StoreState, OriginalState, CoursePace} from '../types'
 import {BlackoutDate} from '../shared/types'
 import {Constants as CoursePaceConstants} from '../actions/course_paces'
+import {Constants as BlackoutDateConstants} from '../shared/actions/blackout_dates'
 import {Constants as UIConstants} from '../actions/ui'
 
 const initialBlackoutDates: BlackoutDate[] = (window.ENV.BLACKOUT_DATES || []) as BlackoutDate[]
@@ -56,6 +57,8 @@ export const originalReducer = (state = initialState, action: any): OriginalStat
   switch (action.type) {
     case CoursePaceConstants.COURSE_PACE_SAVED:
       return {...state, coursePace: action.payload}
+    case BlackoutDateConstants.BLACKOUT_DATES_SYNCED:
+      return {...state, blackoutDates: action.payload}
     case UIConstants.SET_SELECTED_PACE_CONTEXT:
       return {...state, coursePace: action.payload.newSelectedPace}
     default:

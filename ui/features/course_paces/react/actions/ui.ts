@@ -37,7 +37,9 @@ export enum Constants {
   SET_SELECTED_PACE_CONTEXT = 'UI/SET_SELECTED_PACE_CONTEXT',
   SET_RESPONSIVE_SIZE = 'UI/SET_RESPONSIVE_SIZE',
   SHOW_LOADING_OVERLAY = 'UI/SHOW_LOADING_OVERLAY',
-  HIDE_LOADING_OVERLAY = 'UI/HIDE_LOADING_OVERLAY'
+  HIDE_LOADING_OVERLAY = 'UI/HIDE_LOADING_OVERLAY',
+  START_SYNCING = 'UI/START_SYNCING',
+  SYNCING_COMPLETED = 'UI/SYNCING_COMPLETED'
 }
 
 /* Action creators */
@@ -58,7 +60,9 @@ export const regularActions = {
     newSelectedPace: CoursePace
   ) => createAction(Constants.SET_SELECTED_PACE_CONTEXT, {contextType, contextId, newSelectedPace}),
   setResponsiveSize: (responsiveSize: ResponsiveSizes) =>
-    createAction(Constants.SET_RESPONSIVE_SIZE, responsiveSize)
+    createAction(Constants.SET_RESPONSIVE_SIZE, responsiveSize),
+  startSyncing: () => createAction(Constants.START_SYNCING),
+  syncingCompleted: () => createAction(Constants.SYNCING_COMPLETED)
 }
 
 export const thunkActions = {

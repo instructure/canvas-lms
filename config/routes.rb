@@ -2407,6 +2407,7 @@ CanvasRails::Application.routes.draw do
       put "accounts/:account_id/blackout_dates/:id", action: :update
       delete "courses/:course_id/blackout_dates/:id", action: :destroy
       delete "accounts/:account_id/blackout_dates/:id", action: :destroy
+      put "courses/:course_id/blackout_dates", action: :bulk_update
     end
 
     scope(controller: :eportfolios_api) do

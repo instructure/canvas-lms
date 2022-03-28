@@ -46,12 +46,11 @@ import {
   getDueDate,
   getExcludeWeekends,
   getCoursePaceItemPosition,
-  getPacePublishing,
   isStudentPace
 } from '../../reducers/course_paces'
 import {actions} from '../../actions/course_pace_items'
 import * as DateHelpers from '../../utils/date_stuff/date_helpers'
-import {getShowProjections} from '../../reducers/ui'
+import {getShowProjections, getSyncing} from '../../reducers/ui'
 import {getBlackoutDates} from '../../shared/reducers/blackout_dates'
 
 const I18n = useI18nScope('course_paces_assignment_row')
@@ -73,7 +72,7 @@ interface StoreProps {
   readonly excludeWeekends: boolean
   readonly coursePaceItemPosition: number
   readonly blackoutDates: BlackoutDate[]
-  readonly pacePublishing: boolean
+  readonly isSyncing: boolean
   readonly showProjections: boolean
   readonly isStudentPace: boolean
 }
@@ -125,7 +124,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
       nextProps.coursePace.context_type !== this.props.coursePace.context_type ||
       (nextProps.coursePace.context_type === this.props.coursePace.context_type &&
         nextProps.coursePace.context_id !== this.props.coursePace.context_id) ||
-      nextProps.pacePublishing !== this.props.pacePublishing ||
+      nextProps.isSyncing !== this.props.isSyncing ||
       nextProps.showProjections !== this.props.showProjections ||
       nextProps.datesVisible !== this.props.datesVisible
     )
@@ -169,6 +168,8 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
   }
 
   onDecrementOrIncrement = (_e: React.FormEvent<HTMLInputElement>, direction: number) => {
+    // it's either this error or a typescript typing error using the function version of setState
+    // eslint-disable-next-line react/no-access-state-in-setstate
     const newValue = (this.parsePositiveNumber(this.state.duration) || 0) + direction
     if (newValue < 0) return
     this.setState({duration: newValue.toString()})
@@ -256,7 +257,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
 
     return (
       <NumberInput
-        interaction={this.props.pacePublishing ? 'disabled' : 'enabled'}
+        interaction={this.props.isSyncing ? 'disabled' : 'enabled'}
         renderLabel={
           <ScreenReaderContent>
             Duration for module {this.props.coursePaceItem.assignment_title}
@@ -351,7 +352,7 @@ const mapStateToProps = (state: StoreState, props: PassedProps): StoreProps => {
     excludeWeekends: getExcludeWeekends(state),
     coursePaceItemPosition: getCoursePaceItemPosition(state, props),
     blackoutDates: getBlackoutDates(state),
-    pacePublishing: getPacePublishing(state),
+    isSyncing: getSyncing(state),
     showProjections: getShowProjections(state),
     isStudentPace: isStudentPace(state)
   }

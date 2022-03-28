@@ -32,11 +32,12 @@ import BlackoutDatesModal from '../../../shared/components/blackout_dates_modal'
 import {StoreState, CoursePace} from '../../../types'
 import {Course, BlackoutDate} from '../../../shared/types'
 import {getCourse} from '../../../reducers/course'
-import {getExcludeWeekends, getCoursePace, getPacePublishing} from '../../../reducers/course_paces'
+import {getExcludeWeekends, getCoursePace} from '../../../reducers/course_paces'
 import {coursePaceActions} from '../../../actions/course_paces'
 import {actions as uiActions} from '../../../actions/ui'
 import {actions as blackoutDateActions} from '../../../shared/actions/blackout_dates'
 import {getBlackoutDates} from '../../../shared/reducers/blackout_dates'
+import {getSyncing} from '../../../reducers/ui'
 
 const I18n = useI18nScope('course_paces_settings')
 
@@ -46,7 +47,7 @@ interface StoreProps {
   readonly courseId: string
   readonly excludeWeekends: boolean
   readonly coursePace: CoursePace
-  readonly pacePublishing: boolean
+  readonly isSyncing: boolean
 }
 
 interface DispatchProps {
@@ -82,13 +83,15 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
   /* Callbacks */
 
   showBlackoutDatesModal = () => {
-    this.setState({showBlackoutDatesModal: true})
+    this.setState({
+      showBlackoutDatesModal: true,
+      blackoutDatesModalKey: uid()
+    })
   }
 
   closeBlackoutDatesModal = (): void => {
     this.setState({
-      showBlackoutDatesModal: false,
-      blackoutDatesModalKey: uid()
+      showBlackoutDatesModal: false
     })
   }
 
@@ -147,13 +150,14 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
                 data-testid="skip-weekends-toggle"
                 label={I18n.t('Skip Weekends')}
                 checked={this.props.excludeWeekends}
-                disabled={this.props.pacePublishing}
+                disabled={this.props.isSyncing}
                 onChange={() => this.props.toggleExcludeWeekends()}
               />
             </View>
             {ENV.FEATURES.course_paces_blackout_dates && (
               <View as="div">
                 <CondensedButton
+                  interaction={this.props.isSyncing ? 'disabled' : 'enabled'}
                   onClick={() => {
                     this.setState({showSettingsPopover: false})
                     this.showBlackoutDatesModal()
@@ -178,7 +182,7 @@ const mapStateToProps = (state: StoreState): StoreProps => {
     courseId: getCourse(state).id,
     excludeWeekends: getExcludeWeekends(state),
     coursePace: getCoursePace(state),
-    pacePublishing: getPacePublishing(state)
+    isSyncing: getSyncing(state)
   }
 }
 

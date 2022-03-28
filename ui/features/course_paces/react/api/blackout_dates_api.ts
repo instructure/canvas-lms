@@ -16,43 +16,61 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import moment from 'moment-timezone'
 import {BlackoutDate} from '../shared/types'
 import * as DateHelpers from '../utils/date_stuff/date_helpers'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 /* API methods */
 
-export const create = (blackoutDate: BlackoutDate) =>
-  doFetchApi<{blackout_date: BlackoutDate}>({
-    path: '/api/v1/blackout_dates',
-    method: 'POST',
-    body: transformBlackoutDateForApi(blackoutDate)
-  }).then(({json}) => json?.blackout_date)
+export const sync = (blackoutDates: BlackoutDate[], course_id: string | number) => {
+  const path = course_id
+    ? `/api/v1/courses/${course_id}/blackout_dates`
+    : '/api/v1/acccounts/???/blackout_dates' // this hasn't been worked out yet.
 
-export const deleteBlackoutDate = async (id: number | string) =>
-  (await doFetchApi({path: `/api/v1/blackout_dates/${id}`, method: 'DELETE'})).json
+  return doFetchApi<ApiFormattedBlackoutDate[]>({
+    path,
+    method: 'PUT',
+    body: {
+      blackout_dates: blackoutDates.map(
+        (bd: BlackoutDate): ApiFormattedBlackoutDate => transformBlackoutDateForApi(bd)
+      )
+    }
+  })
+    .then(result => {
+      if (!result.response.ok) {
+        throw new Error(result.response.statusText)
+      }
+      return result
+    })
+    .then(result => {
+      return ((result.json || []) as Array<ApiFormattedBlackoutDate>).map(bd =>
+        transformBlackoutDateFromApi(bd)
+      )
+    })
+}
 
 /* API transformers */
-
 interface ApiFormattedBlackoutDate {
-  course_id?: number | string
   event_title: string
   start_date: string
   end_date: string
-  admin_level: boolean
 }
 
-const transformBlackoutDateForApi = (blackoutDate: BlackoutDate): ApiFormattedBlackoutDate => {
+function transformBlackoutDateForApi(blackoutDate: BlackoutDate): ApiFormattedBlackoutDate {
   const formattedBlackoutDate: ApiFormattedBlackoutDate = {
     event_title: blackoutDate.event_title,
     start_date: DateHelpers.formatDate(blackoutDate.start_date),
-    end_date: DateHelpers.formatDate(blackoutDate.end_date),
-    admin_level: !!blackoutDate.admin_level
+    end_date: DateHelpers.formatDate(blackoutDate.end_date)
   }
-
-  if (blackoutDate.course_id) {
-    formattedBlackoutDate.course_id = blackoutDate.course_id
-  }
-
   return formattedBlackoutDate
+}
+
+function transformBlackoutDateFromApi(response: ApiFormattedBlackoutDate): BlackoutDate {
+  const transformedBlackoutDate: BlackoutDate = {
+    ...response,
+    start_date: moment(response.start_date),
+    end_date: moment(response.end_date)
+  }
+  return transformedBlackoutDate
 }
