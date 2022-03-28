@@ -1579,6 +1579,19 @@ describe DiscussionTopicsController do
       end
     end
 
+    describe "metrics" do
+      before do
+        allow(InstStatsd::Statsd).to receive(:increment)
+      end
+
+      it "increment discussion_topic.created" do
+        user_session @teacher
+        post "create", params: topic_params(@course), format: :json
+        expect(response).to be_successful
+        expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_topic.created").at_least(:once)
+      end
+    end
+
     describe "discussion anonymity" do
       it "allows full_anonymity" do
         Account.site_admin.enable_feature! :react_discussions_post
