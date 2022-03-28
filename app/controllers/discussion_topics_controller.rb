@@ -1246,6 +1246,10 @@ class DiscussionTopicsController < ApplicationController
   def process_discussion_topic_runner(is_new:)
     @errors = {}
 
+    if is_new
+      InstStatsd::Statsd.increment("discussion_topic.created")
+    end
+
     anonymous_discussions_disabled = !(Account.site_admin.feature_enabled?(:discussion_anonymity) && @context.feature_enabled?(:react_discussions_post))
     if is_new && anonymous_discussions_disabled
       params[:anonymous_state] = nil
