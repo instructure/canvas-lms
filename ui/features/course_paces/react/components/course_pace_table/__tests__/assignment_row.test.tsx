@@ -39,7 +39,7 @@ const defaultProps = {
   excludeWeekends: false,
   coursePaceItem: PRIMARY_PACE.modules[0].items[0],
   coursePaceItemPosition: 0,
-  pacePublishing: false,
+  isSyncing: false,
   blackoutDates: BLACKOUT_DATES,
   autosaving: false,
   disabledDaysOfWeek: [],
@@ -118,7 +118,7 @@ describe('AssignmentRow', () => {
   })
 
   it('disables duration inputs while publishing', () => {
-    const {getByRole} = renderConnected(<AssignmentRow {...defaultProps} pacePublishing />)
+    const {getByRole} = renderConnected(<AssignmentRow {...defaultProps} isSyncing />)
     const daysInput = getByRole('textbox', {
       name: 'Duration for module Basic encryption/decryption'
     })

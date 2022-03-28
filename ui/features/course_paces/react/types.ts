@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {BlackoutDate, Course} from './shared/types'
+import {BlackoutDateState, BlackoutDate, Course} from './shared/types'
 
 /* Model types */
 
@@ -123,6 +123,7 @@ export type OriginalState = {
 
 export interface UIState {
   readonly autoSaving: boolean
+  readonly syncing: number
   readonly errors: CategoryErrors
   readonly divideIntoWeeks: boolean
   readonly selectedContextType: PaceContextTypes
@@ -141,7 +142,7 @@ export interface StoreState {
   readonly sections: SectionsState
   readonly ui: UIState
   readonly course: Course
-  readonly blackoutDates: BlackoutDate[]
+  readonly blackoutDates: BlackoutDateState
 }
 
 /* Random types  */

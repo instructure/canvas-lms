@@ -37,7 +37,7 @@ const defaultProps = {
   courseId: COURSE.id,
   excludeWeekends: PRIMARY_PACE.exclude_weekends,
   coursePace: PRIMARY_PACE,
-  pacePublishing: false,
+  isSyncing: false,
   loadLatestPaceByContext,
   showLoadingOverlay,
   toggleExcludeWeekends,
@@ -67,8 +67,7 @@ describe('Settings', () => {
     act(() => settingsButton.click())
 
     expect(screen.getByRole('checkbox', {name: 'Skip Weekends'})).toBeInTheDocument()
-    // Commented out since we're not implementing these features yet
-    // expect(screen.getByRole('button', {name: 'View Blackout Dates'})).toBeInTheDocument()
+    expect(screen.getByRole('button', {name: 'Manage Blackout Dates'})).toBeInTheDocument()
   })
 
   it('toggles the associated setting when the checkboxes are clicked', () => {
@@ -82,13 +81,15 @@ describe('Settings', () => {
     expect(toggleExcludeWeekends).toHaveBeenCalled()
   })
 
-  it('disables all settings while publishing', () => {
-    const {getByRole} = renderConnected(<Settings {...defaultProps} pacePublishing />)
+  it('disables all settings while syncing', () => {
+    const {getByRole} = renderConnected(<Settings {...defaultProps} isSyncing />)
     const settingsButton = getByRole('button', {name: 'Modify Settings'})
     act(() => settingsButton.click())
 
     const skipWeekendsToggle = screen.getByRole('checkbox', {name: 'Skip Weekends'})
     expect(skipWeekendsToggle).toBeDisabled()
+    const blackoutDatesBtn = screen.getByRole('button', {name: 'Manage Blackout Dates'})
+    expect(blackoutDatesBtn).toBeDisabled()
   })
 
   it('shows and hides the blackout dates modal correctly', () => {

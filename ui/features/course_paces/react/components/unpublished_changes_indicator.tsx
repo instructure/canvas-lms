@@ -20,9 +20,10 @@ import React, {useEffect} from 'react'
 import {CondensedButton} from '@instructure/ui-buttons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {getCoursePace, getPacePublishing, getUnpublishedChangeCount} from '../reducers/course_paces'
+import {getBlackoutDatesSyncing} from '../shared/reducers/blackout_dates'
 import {StoreState} from '../types'
 import {connect} from 'react-redux'
-import {getCategoryError} from '../reducers/ui'
+import {getCategoryError, getSyncing} from '../reducers/ui'
 import {Spinner} from '@instructure/ui-spinner'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
@@ -31,10 +32,12 @@ import {View} from '@instructure/ui-view'
 const I18n = useI18nScope('unpublished_changes_button_props')
 
 type StateProps = {
-  changeCount: number
-  pacePublishing: boolean
-  newPace: boolean
-  publishError?: string
+  readonly changeCount: number
+  readonly blackoutDatesSyncing: boolean
+  readonly pacePublishing: boolean
+  readonly isSyncing: boolean
+  readonly newPace: boolean
+  readonly publishError?: string
 }
 
 export type UnpublishedChangesIndicatorProps = StateProps & {
@@ -70,7 +73,9 @@ export const UnpublishedChangesIndicator = ({
   margin,
   newPace,
   onClick,
+  blackoutDatesSyncing,
   pacePublishing,
+  isSyncing,
   publishError,
   onUnpublishedNavigation = triggerBrowserWarning
 }: UnpublishedChangesIndicatorProps) => {
@@ -93,12 +98,19 @@ export const UnpublishedChangesIndicator = ({
     )
   }
 
-  if (pacePublishing) {
+  let publishingMessage
+  if (pacePublishing || isSyncing) {
+    publishingMessage = I18n.t('Publishing pace...')
+  } else if (blackoutDatesSyncing) {
+    publishingMessage = I18n.t('Saving blackout dates...')
+  }
+
+  if (isSyncing) {
     return (
       <View>
         <Spinner size="x-small" margin="0 x-small 0" renderTitle={I18n.t('Publishing pace...')} />
         <PresentationContent>
-          <Text>{I18n.t('Publishing pace...')}</Text>
+          <Text>{publishingMessage}</Text>
         </PresentationContent>
       </View>
     )
@@ -117,9 +129,11 @@ export const UnpublishedChangesIndicator = ({
 
 const mapStateToProps = (state: StoreState) => ({
   changeCount: getUnpublishedChangeCount(state),
+  blackoutDatesSyncing: getBlackoutDatesSyncing(state),
   pacePublishing: getPacePublishing(state),
+  isSyncing: getSyncing(state),
   newPace: !getCoursePace(state)?.id,
-  publishError: getCategoryError(state, 'publish')
+  publishError: getCategoryError(state, ['publish', 'blackout_dates'])
 })
 
 export default connect(mapStateToProps)(UnpublishedChangesIndicator)

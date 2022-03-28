@@ -113,9 +113,8 @@ export const getNewCoursePaceFor = (
 
 export const republishAllPacesForCourse = (courseId: string) =>
   doFetchApi({
-    path: `/api/v1/course_paces/republish_all_paces`,
-    method: 'POST',
-    body: {course_id: courseId}
+    path: `/api/v1/courses/${courseId}/course_paces/republish_all`,
+    method: 'POST'
   }).then(({json}) => json)
 
 export const republishAllPaces = () =>

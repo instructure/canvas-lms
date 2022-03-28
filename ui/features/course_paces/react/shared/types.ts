@@ -28,6 +28,16 @@ export interface BlackoutDate {
   readonly admin_level?: boolean
 }
 
+export enum SyncState {
+  SYNCED, // up to date
+  SYNCING, // actively syncing
+  UNSYNCED // there are pending changes
+}
+export interface BlackoutDateState {
+  syncing: SyncState
+  blackoutDates: BlackoutDate[]
+}
+
 export type CourseExternalToolStatus = 'OFF' | 'ON' | 'HIDE'
 export type InputInteraction = 'enabled' | 'disabled' | 'readonly'
 

@@ -22,12 +22,15 @@ import {screen, waitFor} from '@testing-library/react'
 import {actions as uiActions} from '../ui'
 import {coursePaceActions, PUBLISH_STATUS_POLLING_MS} from '../course_paces'
 import {
+  BLACKOUT_DATES,
+  DEFAULT_BLACKOUT_DATE_STATE,
   COURSE,
   DEFAULT_STORE_STATE,
   PRIMARY_PACE,
   PROGRESS_FAILED,
   PROGRESS_RUNNING
 } from '../../__tests__/fixtures'
+import {SyncState} from '../../shared/types'
 
 const CREATE_API = `/api/v1/courses/${COURSE.id}/course_paces`
 const UPDATE_API = `/api/v1/courses/${COURSE.id}/course_paces/${PRIMARY_PACE.id}`
@@ -36,11 +39,22 @@ const COMPRESS_API = `/api/v1/courses/${COURSE.id}/course_paces/compress_dates`
 
 const dispatch = jest.fn()
 
-const mockGetState = (pace, originalPace) => () => ({
-  ...DEFAULT_STORE_STATE,
-  coursePace: {...pace},
-  originalPace: {coursePace: {...originalPace}}
-})
+const mockGetState =
+  (
+    pace,
+    originalPace,
+    blackoutDates = DEFAULT_BLACKOUT_DATE_STATE,
+    originalBlackoutDates = BLACKOUT_DATES
+  ) =>
+  () => ({
+    ...DEFAULT_STORE_STATE,
+    coursePace: {...pace},
+    blackoutDates,
+    original: {
+      coursePace: originalPace,
+      blackoutDates: originalBlackoutDates
+    }
+  })
 
 beforeEach(() => {
   jest.useFakeTimers()
@@ -66,7 +80,7 @@ describe('Course paces actions', () => {
       const thunkedAction = coursePaceActions.publishPace()
       await thunkedAction(dispatch, getState)
 
-      expect(dispatch.mock.calls[0]).toEqual([uiActions.showLoadingOverlay('Starting publish...')])
+      expect(dispatch.mock.calls[0]).toEqual([uiActions.startSyncing()])
       expect(dispatch.mock.calls[1]).toEqual([uiActions.clearCategoryError('publish')])
       expect(dispatch.mock.calls[2]).toEqual([coursePaceActions.saveCoursePace(updatedPace)])
       expect(dispatch.mock.calls[3]).toEqual([coursePaceActions.setProgress(PROGRESS_RUNNING)])
@@ -74,7 +88,7 @@ describe('Course paces actions', () => {
       expect(JSON.stringify(dispatch.mock.calls[4])).toEqual(
         JSON.stringify([coursePaceActions.pollForPublishStatus()])
       )
-      expect(dispatch.mock.calls[5]).toEqual([uiActions.hideLoadingOverlay()])
+      expect(dispatch.mock.calls[5]).toEqual([uiActions.syncingCompleted()])
       expect(fetchMock.called(UPDATE_API, 'PUT')).toBe(true)
     })
 
@@ -101,10 +115,10 @@ describe('Course paces actions', () => {
       await thunkedAction(dispatch, getState)
 
       expect(dispatch.mock.calls).toEqual([
-        [uiActions.showLoadingOverlay('Starting publish...')],
+        [uiActions.startSyncing()],
         [uiActions.clearCategoryError('publish')],
-        [uiActions.hideLoadingOverlay()],
-        [uiActions.setCategoryError('publish', error.toString())]
+        [uiActions.setCategoryError('publish', error.toString())],
+        [uiActions.syncingCompleted()]
       ])
     })
   })
@@ -238,6 +252,58 @@ describe('Course paces actions', () => {
         [uiActions.hideLoadingOverlay()],
         [uiActions.setCategoryError('compress', error.toString())]
       ])
+    })
+  })
+
+  describe('syncUnpublishedChanges', () => {
+    beforeEach(() => {
+      ENV.FEATURES ||= {}
+      ENV.FEATURES.course_paces_blackout_dates = true
+    })
+
+    it('dispatches publishPace only if flag is not enabled', async () => {
+      ENV.FEATURES.course_paces_blackout_dates = false
+      const asyncDispatch = jest.fn(() => Promise.resolve())
+      const updatedPace = {...PRIMARY_PACE, excludeWeekends: false}
+      const getState = mockGetState(updatedPace, PRIMARY_PACE, {
+        syncing: SyncState.UNSYNCED,
+        blackoutDates: BLACKOUT_DATES
+      })
+
+      const thunkedAction = coursePaceActions.syncUnpublishedChanges()
+      await thunkedAction(asyncDispatch, getState)
+
+      expect(asyncDispatch.mock.calls.length).toBe(2)
+    })
+
+    it('saves blackout dates and publishes the pace', async () => {
+      const asyncDispatch = jest.fn(() => Promise.resolve())
+      const updatedPace = {...PRIMARY_PACE, excludeWeekends: false}
+      const getState = mockGetState(updatedPace, PRIMARY_PACE, {
+        syncing: SyncState.UNSYNCED,
+        blackoutDates: BLACKOUT_DATES
+      })
+
+      const thunkedAction = coursePaceActions.syncUnpublishedChanges()
+      await thunkedAction(asyncDispatch, getState)
+
+      expect(asyncDispatch.mock.calls.length).toBe(5)
+      expect(asyncDispatch.mock.calls[0]).toEqual([uiActions.clearCategoryError('publish')])
+      expect(asyncDispatch.mock.calls[1]).toEqual([uiActions.startSyncing()])
+      expect(typeof asyncDispatch.mock.calls[2][0]).toBe('function') // dispatch syncBlackoutDates
+      expect(typeof asyncDispatch.mock.calls[3][0]).toBe('function') // dispatch publishPace
+      expect(asyncDispatch.mock.calls[4]).toEqual([uiActions.syncingCompleted()])
+    })
+
+    it('only publishes the pace if blackout dates have not changed', async () => {
+      const asyncDispatch = jest.fn(() => Promise.resolve())
+      const updatedPace = {...PRIMARY_PACE, excludeWeekends: false}
+      const getState = mockGetState(updatedPace, PRIMARY_PACE)
+
+      const thunkedAction = coursePaceActions.syncUnpublishedChanges()
+      await thunkedAction(asyncDispatch, getState)
+
+      expect(asyncDispatch.mock.calls.length).toBe(2)
     })
   })
 })

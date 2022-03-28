@@ -19,7 +19,7 @@
 import moment from 'moment'
 import {keyBy} from 'lodash'
 
-import {BlackoutDate, Course} from '../shared/types'
+import {BlackoutDate, BlackoutDateState, SyncState, Course} from '../shared/types'
 import {
   Enrollment,
   Enrollments,
@@ -56,6 +56,11 @@ export const BLACKOUT_DATES: BlackoutDate[] = [
     end_date: moment('2022-03-25')
   }
 ]
+
+export const DEFAULT_BLACKOUT_DATE_STATE = {
+  syncing: SyncState.SYNCED,
+  blackoutDates: BLACKOUT_DATES
+}
 
 export const ENROLLMENT_1: Enrollment = {
   id: '20',
@@ -236,15 +241,15 @@ export interface DefaultStoreState {
   readonly sections?: SectionsState
   readonly ui?: UIState
   readonly course?: Course
-  readonly blackoutDates?: BlackoutDate[]
+  readonly blackoutDates: BlackoutDateState
   readonly original: OriginalState
 }
 
 export const DEFAULT_STORE_STATE: DefaultStoreState = {
-  blackoutDates: BLACKOUT_DATES,
+  blackoutDates: DEFAULT_BLACKOUT_DATE_STATE,
   course: COURSE,
   enrollments: ENROLLMENTS,
   coursePace: {...PRIMARY_PACE},
   sections: SECTIONS,
-  original: {coursePace: PRIMARY_PACE}
+  original: {coursePace: PRIMARY_PACE, blackoutDates: BLACKOUT_DATES}
 }

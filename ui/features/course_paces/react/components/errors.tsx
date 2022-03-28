@@ -34,12 +34,12 @@ type StoreProps = {
 }
 
 type DispatchProps = {
-  publishPace: typeof coursePaceActions.publishPace
+  syncUnpublishedChanges: typeof coursePaceActions.syncUnpublishedChanges
 }
 
 export type ErrorsProps = StoreProps & DispatchProps
 
-export const Errors = ({errors, responsiveSize, publishPace}: ErrorsProps) => {
+export const Errors = ({errors, responsiveSize, syncUnpublishedChanges}: ErrorsProps) => {
   const alerts = Object.entries(errors).map(([category, error]) => {
     const result: {
       category: string
@@ -53,18 +53,30 @@ export const Errors = ({errors, responsiveSize, publishPace}: ErrorsProps) => {
 
     switch (category) {
       case 'publish':
-        result.focusRef = createRef()
-        result.contents = (
-          <>
-            <div ref={result.focusRef} tabIndex={-1}>
-              {I18n.t('There was an error publishing your course pace.')}
-            </div>
-            <Button variant="primary" display="block" margin="x-small 0 0" onClick={publishPace}>
-              {I18n.t('Retry')}
-            </Button>
-          </>
-        )
-        result.shouldTransferFocus = true
+      case 'blackout_dates':
+        {
+          const msg =
+            category === 'publish'
+              ? I18n.t('There was an error publishing your course pace.')
+              : I18n.t('There was an error saving your blackout dates')
+          result.focusRef = createRef()
+          result.contents = (
+            <>
+              <div ref={result.focusRef} tabIndex={-1}>
+                {msg}
+              </div>
+              <Button
+                variant="primary"
+                display="block"
+                margin="x-small 0 0"
+                onClick={syncUnpublishedChanges}
+              >
+                {I18n.t('Retry')}
+              </Button>
+            </>
+          )
+          result.shouldTransferFocus = true
+        }
         break
       case 'resetToLastPublished':
         result.contents = result.summary = I18n.t(
@@ -101,7 +113,7 @@ export const Errors = ({errors, responsiveSize, publishPace}: ErrorsProps) => {
         <ExpandableErrorAlert
           key={a.category}
           margin="small 0"
-          error={a.error}
+          error={window.INST.environment !== 'production' ? a.error : undefined}
           closeable={a.category !== 'publish'}
           liveRegionText={a.summary}
           transferFocus={a.shouldTransferFocus}
@@ -122,5 +134,5 @@ const mapStateToProps = (state: StoreState): StoreProps => {
 }
 
 export default connect(mapStateToProps, {
-  publishPace: coursePaceActions.publishPace
+  syncUnpublishedChanges: coursePaceActions.syncUnpublishedChanges
 })(Errors)
