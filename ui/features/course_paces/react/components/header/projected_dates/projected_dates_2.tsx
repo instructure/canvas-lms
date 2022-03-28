@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import {connect} from 'react-redux'
 import moment from 'moment-timezone'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -26,15 +26,18 @@ import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
-import {StoreState, CoursePace, PaceDuration} from '../../../types'
+import {coursePaceActions as actions} from '../../../actions/course_paces'
+import {StoreState, CoursePace, OptionalDate, PaceDuration} from '../../../types'
 import {
   getCoursePace,
   getCoursePaceItems,
+  getCompression,
   getPaceDuration,
-  getProjectedEndDate
+  getPlannedEndDate
 } from '../../../reducers/course_paces'
 import {coursePaceTimezone} from '../../../shared/api/backend_serializer'
 
+const {Item: FlexItem} = Flex as any
 const I18n = useI18nScope('course_paces_projected_dates')
 
 const DASH = String.fromCharCode(0x2013)
@@ -60,18 +63,24 @@ const END_DATE_CAPTIONS = {
   hypothetical: I18n.t('Determined by course pace')
 }
 
-type ComponentProps = {
+type StoreProps = {
   readonly coursePace: CoursePace
   readonly assignments: number
   readonly paceDuration: PaceDuration
-  readonly projectedEndDate: string
+  readonly plannedEndDate: OptionalDate
+  readonly compressDates: typeof actions.compressDates
+  readonly uncompressDates: typeof actions.uncompressDates
+  readonly compression: number
 }
 
-export const ProjectedDates: React.FC<ComponentProps> = ({
+export const ProjectedDates: React.FC<StoreProps> = ({
   coursePace,
   assignments,
   paceDuration,
-  projectedEndDate
+  plannedEndDate,
+  compressDates,
+  uncompressDates,
+  compression
 }) => {
   const formatDate = useDateTimeFormat('date.formats.long', coursePaceTimezone, ENV.LOCALE)
   const enrollmentType = coursePace.context_type === 'Enrollment'
@@ -79,13 +88,21 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
   const startHelpText = START_DATE_CAPTIONS[coursePace.start_date_context]
   let endDateValue, endHelpText
   if (enrollmentType) {
-    endDateValue = projectedEndDate
+    endDateValue = plannedEndDate
     endHelpText = END_DATE_CAPTIONS.user
   } else {
     endDateValue =
-      coursePace.end_date_context === 'hypothetical' ? projectedEndDate : coursePace.end_date
+      coursePace.end_date_context === 'hypothetical' ? plannedEndDate : coursePace.end_date
     endHelpText = END_DATE_CAPTIONS[coursePace.end_date_context]
   }
+
+  useEffect(() => {
+    if (compression > 0) {
+      compressDates()
+    } else {
+      uncompressDates()
+    }
+  }, [compressDates, compression, uncompressDates])
 
   const hasAtLeastOneDate = () => !!(startDateValue || endDateValue)
 
@@ -116,7 +133,7 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
   const renderSummary = () => {
     return (
       <Flex as="section" direction="column" alignItems="end" wrap="wrap">
-        <Flex.Item margin="0">
+        <FlexItem margin="0">
           <View padding="0 xxx-small 0 0" margin="0 x-small 0 0">
             <Text data-testid="number-of-assignments" size="small" fontStyle="italic">
               {I18n.t(
@@ -150,12 +167,12 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
               )}{' '}
             </Text>
           </View>
-        </Flex.Item>
-        <Flex.Item margin="0">
+        </FlexItem>
+        <FlexItem margin="0">
           <Text data-testid="dates-shown-time-zone" fontStyle="italic" size="small">
             {I18n.t('Dates shown in course time zone')}
           </Text>
-        </Flex.Item>
+        </FlexItem>
       </Flex>
     )
   }
@@ -165,22 +182,22 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
       <Flex as="section" alignItems="end" margin="0" wrap="wrap">
         {hasAtLeastOneDate() && (
           <>
-            <Flex.Item margin="0 medium medium 0">
+            <FlexItem margin="0 medium medium 0">
               {renderDate(
                 I18n.t('Start Date'),
                 startDateValue,
                 startHelpText,
                 'coursepace-start-date'
               )}
-            </Flex.Item>
-            <Flex.Item margin="0 medium medium 0" shouldGrow>
+            </FlexItem>
+            <FlexItem margin="0 medium medium 0" shouldGrow>
               {renderDate(I18n.t('End Date'), endDateValue, endHelpText, 'coursepace-end-date')}
-            </Flex.Item>
+            </FlexItem>
           </>
         )}
-        <Flex.Item margin="0 0 x-small 0" shouldGrow>
+        <FlexItem margin="0 0 x-small 0" shouldGrow>
           {renderSummary()}
-        </Flex.Item>
+        </FlexItem>
       </Flex>
     </div>
   )
@@ -191,7 +208,11 @@ const mapStateToProps = (state: StoreState) => {
     coursePace: getCoursePace(state),
     assignments: getCoursePaceItems(state).length,
     paceDuration: getPaceDuration(state),
-    projectedEndDate: getProjectedEndDate(state)
+    plannedEndDate: getPlannedEndDate(state),
+    compression: getCompression(state)
   }
 }
-export default connect(mapStateToProps)(ProjectedDates)
+export default connect(mapStateToProps, {
+  compressDates: actions.compressDates,
+  uncompressDates: actions.uncompressDates
+})(ProjectedDates)

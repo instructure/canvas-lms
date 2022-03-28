@@ -42,7 +42,7 @@ class CoursePacePresenter
       modules: modules_json,
       context_id: context_id,
       context_type: context_type
-    }.merge(course_pace.start_date(with_context: true)).merge(course_pace.end_date(with_context: true))
+    }.merge(course_pace.start_date(with_context: true)).merge(course_pace.effective_end_date(with_context: true))
   end
 
   private

@@ -49,7 +49,7 @@ module CoursePacesDateHelpers
       return nil if end_date.nil?
 
       BusinessTime::Config.with(business_time_config(exclude_weekends, blackout_dates)) do
-        start_date.business_days_until(end_date, inclusive_end)
+        start_date.to_date.business_days_until(end_date, inclusive_end)
       end
     end
 
