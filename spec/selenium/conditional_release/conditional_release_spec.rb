@@ -27,7 +27,9 @@ describe "native canvas conditional release" do
 
   include_context "in-process server selenium tests"
   before(:once) do
-    Account.default.enable_feature! :conditional_release
+    account = Account.default
+    account.settings[:conditional_release] = { value: true }
+    account.save!
   end
 
   before do
@@ -41,7 +43,9 @@ describe "native canvas conditional release" do
     end
 
     it "does not show Allow in Mastery Paths when feature disabled" do
-      Account.default.disable_feature! :conditional_release
+      account = Account.default
+      account.settings[:conditional_release] = { value: false }
+      account.save!
       get "/courses/#{@course.id}/pages/new/edit"
       expect(ConditionalReleaseObjects.conditional_content_exists?).to eq(false)
     end

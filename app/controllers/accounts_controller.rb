@@ -959,6 +959,12 @@ class AccountsController < ApplicationController
   # @argument account[settings][restrict_student_future_listing][locked] [Boolean]
   #   Lock this setting for sub-accounts and courses
   #
+  # @argument account[settings][conditional_release][value] [Boolean]
+  #   Enable or disable individual learning paths for students based on assessment
+  #
+  # @argument account[settings][conditional_release][locked] [Boolean]
+  #   Lock this setting for sub-accounts and courses
+  #
   # @argument account[settings][lock_outcome_proficiency][value] [Boolean]
   #   [DEPRECATED] Restrict instructors from changing mastery scale
   #
@@ -1764,7 +1770,8 @@ class AccountsController < ApplicationController
                                    { enable_as_k5_account: [:value, :locked] }.freeze,
                                    :enable_push_notifications, :teachers_can_create_courses_anywhere,
                                    :students_can_create_courses_anywhere,
-                                   { default_due_time: [:value] }.freeze].freeze
+                                   { default_due_time: [:value] }.freeze,
+                                   { conditional_release: [:value, :locked] }.freeze,].freeze
 
   def permitted_account_attributes
     [:name, :turnitin_account_id, :turnitin_shared_secret, :include_crosslisted_courses,

@@ -2006,7 +2006,7 @@ class Submission < ActiveRecord::Base
       return unless graded? && posted?
       # use request caches to handle n+1's when updating a lot of submissions in the same course in one request
       return unless RequestCache.cache("conditional_release_feature_enabled", course_id) do
-        course.feature_enabled?(:conditional_release)
+        course.conditional_release?
       end
 
       if ConditionalRelease::Rule.is_trigger_assignment?(assignment)

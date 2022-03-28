@@ -614,7 +614,8 @@ describe WikiPage do
     before(:once) { course_factory }
 
     it "destroys its assignment if enabled" do
-      @course.enable_feature!(:conditional_release)
+      @course.conditional_release = true
+      @course.save!
       wiki_page_assignment_model course: @course
       @page.destroy
       expect(@page.reload).to be_deleted
@@ -649,7 +650,8 @@ describe WikiPage do
     end
 
     it "restores a linked assignment if enabled" do
-      @course.enable_feature!(:conditional_release)
+      @course.conditional_release = true
+      @course.save!
       wiki_page_assignment_model course: @course
       @page.workflow_state = "deleted"
       @page.save!

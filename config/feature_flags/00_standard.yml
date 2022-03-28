@@ -57,16 +57,6 @@ compact_live_event_payloads:
   display_name: Remove null values from live event payloads
   description: Canvas will remove keys with null values from live event payloads if
     this feature is enabled.
-conditional_release:
-  type: setting
-  state: allowed
-  display_name: Mastery Paths
-  description: Configure individual learning paths for students based on assessment
-    results.
-  applies_to: Course
-  root_opt_in: true
-  custom_transition_proc: conditional_release_transition_hook
-  after_state_change_proc: conditional_release_after_change_hook
 default_due_time:
   state: hidden
   display_name: Default Due Time

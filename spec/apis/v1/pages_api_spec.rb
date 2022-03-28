@@ -654,12 +654,13 @@ describe "Pages API", type: :request do
           @course.wiki_pages.where(url: json["url"]).first!
         end
 
-        it "unless flag is disabled" do
+        it "unless setting is disabled" do
           expect(page.assignment).to be_nil
         end
 
-        it "if flag is enabled" do
-          @course.enable_feature!(:conditional_release)
+        it "if setting is enabled" do
+          @course.conditional_release = true
+          @course.save!
           expect(page.assignment).not_to be_nil
           expect(page.assignment.title).to eq "Assignable Page"
           expect(page.assignment.submission_types).to eq "wiki_page"
@@ -923,7 +924,10 @@ describe "Pages API", type: :request do
       end
 
       context "feature enabled" do
-        before { @course.enable_feature!(:conditional_release) }
+        before do
+          @course.conditional_release = true
+          @course.save!
+        end
 
         it "updates a linked assignment" do
           wiki_page_assignment_model(wiki_page: @hidden_page)
@@ -1590,7 +1594,8 @@ describe "Pages API", type: :request do
 
     context "enabled" do
       before(:once) do
-        @course.enable_feature!(:conditional_release)
+        @course.conditional_release = true
+        @course.save!
       end
 
       it "lets the teacher see all pages" do
@@ -1641,7 +1646,8 @@ describe "Pages API", type: :request do
 
     context "disabled" do
       before(:once) do
-        @course.disable_feature!(:conditional_release)
+        @course.conditional_release = false
+        @course.save!
       end
 
       it "lets the teacher see all pages" do

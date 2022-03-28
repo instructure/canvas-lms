@@ -106,7 +106,7 @@ class WikiPagesController < ApplicationController
       end
 
       if authorized_action(@page, @current_user, :read) &&
-         (!@context.feature_enabled?(:conditional_release) || enforce_assignment_visible(@page))
+         (!@context.conditional_release? || enforce_assignment_visible(@page))
         add_crumb(@page.title)
         log_asset_access(@page, "wiki", @wiki)
         wiki_pages_js_env(@context)
@@ -137,7 +137,7 @@ class WikiPagesController < ApplicationController
 
   def revisions
     if @page.grants_right?(@current_user, session, :read_revisions)
-      if !@context.feature_enabled?(:conditional_release) || enforce_assignment_visible(@page)
+      if !@context.conditional_release? || enforce_assignment_visible(@page)
         add_crumb(@page.title, polymorphic_url([@context, @page]))
         add_crumb(t("#crumbs.revisions", "Revisions"))
 

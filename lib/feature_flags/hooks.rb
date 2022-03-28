@@ -85,23 +85,6 @@ module FeatureFlags
       transitions["off"]["reload_page"] = true
     end
 
-    def self.conditional_release_transition_hook(_user, context, _from_state, transitions)
-      if context.is_a?(Course)
-        transitions["off"] ||= {}
-        transitions["off"]["message"] =
-          I18n.t("Disabling the Mastery Paths feature will release configured assignments and content to all students.
-                  If the feature is re-enabled, these assignments will need to be configured for Mastery Paths again.")
-      end
-    end
-
-    def self.conditional_release_after_change_hook(_user, context, _old_state, new_state)
-      if context.is_a?(Course) && new_state == "off"
-        ConditionalRelease::Service.delay_if_production(priority: Delayed::LOW_PRIORITY,
-                                                        n_strand: ["conditional_release_unassignment", context.global_root_account_id])
-                                   .release_mastery_paths_content_in_course(context)
-      end
-    end
-
     def self.mastery_scales_after_change_hook(_user, context, _old_state, new_state)
       if context.is_a?(Account) && OutcomesService::Service.enabled_in_context?(context)
         OutcomesService::Service.delay_if_production(priority: Delayed::LOW_PRIORITY,
