@@ -238,7 +238,7 @@ class ApplicationController < ActionController::Base
 
             # these values need to correlate with the backend for Sentry features to work properly
             environment: Canvas.environment,
-            revision: Canvas.revision
+            revision: "canvas-lms@#{Canvas.semver_revision}"
           }
         end
 
