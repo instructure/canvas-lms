@@ -19,6 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useCallback, useReducer, useMemo} from 'react'
 import useFetchApi from '@canvas/use-fetch-api-hook'
+import Paginator from '@canvas/instui-bindings/react/Paginator'
 import JobsHeader from './components/JobsHeader'
 import JobsTable from './components/JobsTable'
 import GroupsTable from './components/GroupsTable'
@@ -34,16 +35,50 @@ const I18n = useI18nScope('jobs_v2')
 
 function jobsReducer(prevState, action) {
   if (action.type === 'CHANGE_BUCKET') {
-    return {...prevState, bucket: action.payload, groups: [], jobs: [], job: null}
+    return {
+      ...prevState,
+      bucket: action.payload,
+      groups: [],
+      jobs: [],
+      job: null,
+      groups_page: 1,
+      jobs_page: 1,
+      groups_page_count: 1,
+      jobs_page_count: 1
+    }
   } else if (action.type === 'CHANGE_GROUP_TYPE') {
-    return {...prevState, group_type: action.payload, groups: [], jobs: [], job: null}
+    return {
+      ...prevState,
+      group_type: action.payload,
+      groups: [],
+      jobs: [],
+      job: null,
+      groups_page: 1,
+      jobs_page: 1,
+      groups_page_count: 1,
+      jobs_page_count: 1
+    }
   } else if (action.type === 'CHANGE_GROUP_ORDER') {
     return {...prevState, group_order: action.payload, groups: []}
   } else if (action.type === 'FETCHED_GROUPS') {
     return {...prevState, groups: action.payload}
+  } else if (action.type === 'GROUP_METADATA') {
+    if (action.payload.link) {
+      const last = parseInt(action.payload.link.last.page, 10)
+      return {...prevState, groups_page_count: last}
+    }
+  } else if (action.type === 'CHANGE_GROUPS_PAGE') {
+    return {...prevState, groups_page: action.payload}
   } else if (action.type === 'CHANGE_GROUP_TEXT') {
     if (prevState.group_text !== action.payload) {
-      return {...prevState, group_text: action.payload, jobs: [], job: null}
+      return {
+        ...prevState,
+        group_text: action.payload,
+        jobs: [],
+        job: null,
+        jobs_page: 1,
+        jobs_page_count: 1
+      }
     } else {
       return prevState
     }
@@ -51,6 +86,13 @@ function jobsReducer(prevState, action) {
     return {...prevState, jobs_order: action.payload, jobs: [], job: null}
   } else if (action.type === 'FETCHED_JOBS') {
     return {...prevState, jobs: action.payload, job: null}
+  } else if (action.type === 'JOBS_METADATA') {
+    if (action.payload.link) {
+      const last = parseInt(action.payload.link.last.page, 10)
+      return {...prevState, jobs_page_count: last}
+    }
+  } else if (action.type === 'CHANGE_JOBS_PAGE') {
+    return {...prevState, jobs_page: action.payload}
   } else if (action.type === 'SELECT_JOB') {
     return {...prevState, job: action.payload}
   }
@@ -65,7 +107,11 @@ export default function JobsIndex() {
     jobs_order: 'info',
     groups: [],
     jobs: [],
-    job: null
+    job: null,
+    jobs_page: 1,
+    jobs_page_count: 1,
+    groups_page: 1,
+    groups_page_count: 1
   })
 
   const bucketCaptions = useMemo(() => {
@@ -96,8 +142,12 @@ export default function JobsIndex() {
   useFetchApi({
     path: `/api/v1/jobs2/${state.bucket}/by_${state.group_type}`,
     params: {
-      order: state.group_order
+      order: state.group_order,
+      page: state.groups_page
     },
+    meta: useCallback(response => {
+      dispatch({type: 'GROUP_METADATA', payload: response})
+    }, []),
     success: useCallback(response => {
       dispatch({type: 'FETCHED_GROUPS', payload: response})
     }, [])
@@ -107,8 +157,12 @@ export default function JobsIndex() {
     path: `/api/v1/jobs2/${state.bucket}`,
     params: {
       [state.group_type]: state.group_text,
-      order: state.jobs_order
+      order: state.jobs_order,
+      page: state.jobs_page
     },
+    meta: useCallback(response => {
+      dispatch({type: 'JOBS_METADATA', payload: response})
+    }, []),
     success: useCallback(response => {
       dispatch({type: 'FETCHED_JOBS', payload: response})
     }, [])
@@ -138,6 +192,14 @@ export default function JobsIndex() {
         onClickGroup={text => dispatch({type: 'CHANGE_GROUP_TEXT', payload: text})}
         onClickHeader={col => dispatch({type: 'CHANGE_GROUP_ORDER', payload: col})}
       />
+      {state.groups_page_count > 1 ? (
+        <Paginator
+          pageCount={state.groups_page_count}
+          page={state.groups_page}
+          loadPage={page => dispatch({type: 'CHANGE_GROUPS_PAGE', payload: page})}
+          margin="small"
+        />
+      ) : null}
       <Flex alignItems="end">
         <Flex.Item size="33%">
           <Heading level="h2" margin="large 0 small 0">
@@ -173,6 +235,14 @@ export default function JobsIndex() {
         onClickJob={job => dispatch({type: 'SELECT_JOB', payload: job})}
         onClickHeader={col => dispatch({type: 'CHANGE_JOBS_ORDER', payload: col})}
       />
+      {state.jobs_page_count > 1 ? (
+        <Paginator
+          pageCount={state.jobs_page_count}
+          page={state.jobs_page}
+          loadPage={page => dispatch({type: 'CHANGE_JOBS_PAGE', payload: page})}
+          margin="small"
+        />
+      ) : null}
       <Flex alignItems="end">
         <Flex.Item size="33%">
           <Heading level="h2" margin="large 0 small 0">
