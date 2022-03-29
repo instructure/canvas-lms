@@ -62,6 +62,47 @@ describe "Jobs V2 API", type: :request do
         Delayed::Job.last.update locked_by: "foo", locked_at: 1.hour.ago
       end
 
+      it "scopes the query to the current account" do
+        ::Kernel.delay(run_at: 1.hour.ago, account_id: Account.default).pp
+        ::Kernel.delay(run_at: 1.hour.ago, account_id: Account.default).pp
+
+        json = api_call(:get, "/api/v1/jobs2/queued",
+                        { controller: "jobs_v2", action: "list", format: "json", bucket: "queued", scope: "account" })
+        expect(json.size).to eq 2
+      end
+
+      context "sharding" do
+        specs_require_sharding
+
+        before do
+          @shard1.activate do
+            ::Kernel.delay(run_at: 1.hour.ago).pp
+            ::Kernel.delay(run_at: 1.hour.ago).pp
+
+            @a1 = Account.create!
+          end
+
+          Shard.default.activate do
+            ::Kernel.delay(run_at: 1.hour.ago).pp
+            ::Kernel.delay(run_at: 1.hour.ago).pp
+          end
+        end
+
+        it "scopes the query to the current shard" do
+          json = api_call(:get, "/api/v1/jobs2/queued",
+                          { controller: "jobs_v2", action: "list", format: "json", bucket: "queued", scope: "shard" },
+                          {}, {}, { domain_root_account: @a1 })
+          expect(json.size).to eq 2
+        end
+
+        it "scopes the query to the current cluster" do
+          json = api_call(:get, "/api/v1/jobs2/queued",
+                          { controller: "jobs_v2", action: "list", format: "json", bucket: "queued", scope: "cluster" },
+                          {}, {}, { domain_root_account: @a1 })
+          expect(json.size).to eq 4
+        end
+      end
+
       describe "grouped by tag" do
         it "returns queued jobs sorted by oldest" do
           json = api_call(:get, "/api/v1/jobs2/queued/by_tag",
