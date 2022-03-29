@@ -104,6 +104,18 @@ function jobsReducer(prevState, action) {
     return {...prevState, jobs_page: action.payload}
   } else if (action.type === 'SELECT_JOB') {
     return {...prevState, job: action.payload}
+  } else if (action.type === 'CHANGE_SCOPE') {
+    return {
+      ...prevState,
+      groups: [],
+      jobs: [],
+      job: null,
+      groups_page: 1,
+      jobs_page: 1,
+      groups_page_count: 1,
+      jobs_page_count: 1,
+      scope: action.payload
+    }
   }
 }
 
@@ -124,7 +136,8 @@ export default function JobsIndex() {
     groups_loading: false,
     groups_page: 1,
     groups_page_count: 1,
-    groups_refresh_nonce: 1
+    groups_refresh_nonce: 1,
+    scope: Object.keys(ENV.jobs_scope_filter)[0]
   })
 
   const bucketCaptions = useMemo(() => {
@@ -157,7 +170,8 @@ export default function JobsIndex() {
       path: `/api/v1/jobs2/${state.bucket}/by_${state.group_type}`,
       params: {
         order: state.group_order,
-        page: state.groups_page
+        page: state.groups_page,
+        scope: state.scope
       },
       loading: useCallback(loading => {
         dispatch({type: 'GROUPS_LOADING', payload: loading})
@@ -178,7 +192,8 @@ export default function JobsIndex() {
       params: {
         [state.group_type]: state.group_text,
         order: state.jobs_order,
-        page: state.jobs_page
+        page: state.jobs_page,
+        scope: state.scope
       },
       loading: useCallback(loading => {
         dispatch({type: 'JOBS_LOADING', payload: loading})
@@ -203,6 +218,8 @@ export default function JobsIndex() {
         onChangeBucket={event => dispatch({type: 'CHANGE_BUCKET', payload: event.target.value})}
         jobGroup={state.group_type}
         onChangeGroup={event => dispatch({type: 'CHANGE_GROUP_TYPE', payload: event.target.value})}
+        jobScope={state.scope}
+        onChangeScope={(event, {id}) => dispatch({type: 'CHANGE_SCOPE', payload: id})}
       />
       <SectionRefreshHeader
         title={groupTitles[state.group_type]}

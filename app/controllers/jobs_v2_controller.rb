@@ -37,6 +37,14 @@ class JobsV2Controller < ApplicationController
 
         css_bundle :jobs_v2
         js_bundle :jobs_v2
+        js_env(
+          jobs_scope_filter: {
+            jobs_server: @domain_root_account.shard.delayed_jobs_shard&.database_server_id || t("All Jobs"),
+            cluster: @domain_root_account.shard&.database_server_id,
+            shard: @domain_root_account.shard.name,
+            account: @domain_root_account.name,
+          }.compact
+        )
 
         render html: "", layout: true
       end
@@ -192,11 +200,22 @@ class JobsV2Controller < ApplicationController
   end
 
   def jobs_scope
-    case @bucket
-    when "queued" then queued_scope
-    when "running" then Delayed::Job.running
-    when "future" then Delayed::Job.future
-    when "failed" then Delayed::Job::Failed
+    scope = case @bucket
+            when "queued" then queued_scope
+            when "running" then Delayed::Job.running
+            when "future" then Delayed::Job.future
+            when "failed" then Delayed::Job::Failed
+            end
+
+    case params[:scope]
+    when "cluster"
+      database_server_id = @domain_root_account.shard.database_server_id
+      shard_ids = Shard.where(database_server_id: database_server_id).pluck(:id)
+
+      scope.where(shard_id: shard_ids)
+    when "shard" then scope.where(shard_id: @domain_root_account.shard)
+    when "account" then scope.where(account_id: @domain_root_account)
+    else scope
     end
   end
 

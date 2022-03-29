@@ -22,10 +22,18 @@ import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
+import {SimpleSelect} from '@instructure/ui-simple-select'
 
 const I18n = useI18nScope('jobs_v2')
 
-export default function JobsHeader({jobBucket, onChangeBucket, jobGroup, onChangeGroup}) {
+export default function JobsHeader({
+  jobBucket,
+  onChangeBucket,
+  jobGroup,
+  onChangeGroup,
+  jobScope,
+  onChangeScope
+}) {
   return (
     <Flex wrap="wrap">
       <Flex.Item>
@@ -63,6 +71,22 @@ export default function JobsHeader({jobBucket, onChangeBucket, jobGroup, onChang
             <RadioInput label={I18n.t('Singleton')} value="singleton" />
           </RadioInputGroup>
         </FormFieldGroup>
+      </Flex.Item>
+      <Flex.Item margin="0 large"> | </Flex.Item>
+      <Flex.Item align="end" shouldGrow>
+        <SimpleSelect
+          renderLabel={I18n.t('Scope')}
+          onChange={onChangeScope}
+          value={ENV.jobs_scope_filter[jobScope]}
+        >
+          {Object.entries(ENV.jobs_scope_filter).map(([key, value]) => {
+            return (
+              <SimpleSelect.Option id={key} key={key} value={value}>
+                {value}
+              </SimpleSelect.Option>
+            )
+          })}
+        </SimpleSelect>
       </Flex.Item>
     </Flex>
   )
