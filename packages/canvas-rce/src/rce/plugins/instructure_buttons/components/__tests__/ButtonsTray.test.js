@@ -63,13 +63,14 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
   }
 
   beforeAll(() => {
-    ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN = 'https://domain.from.env'
-
     global.fetch = jest.fn().mockResolvedValue({
       blob: () => Promise.resolve(new Blob())
     })
 
-    rcs = {getFile: jest.fn(() => Promise.resolve({name: 'Test Button.svg'}))}
+    rcs = {
+      getFile: jest.fn(() => Promise.resolve({name: 'Test Button.svg'})),
+      canvasUrl: 'https://domain.from.env'
+    }
     RceApiSource.mockImplementation(() => rcs)
   })
 
@@ -336,7 +337,11 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
           onClose={jest.fn()}
           editing
           editor={ed}
-          rcsConfig={{contextType: 'course', contextId: 2}}
+          rcsConfig={{
+            contextType: 'course',
+            contextId: 2,
+            canvasUrl: 'https://canvas.instructure.com'
+          }}
         />
       )
 
