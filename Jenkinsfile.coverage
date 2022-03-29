@@ -169,7 +169,7 @@ pipeline {
                   uploadDest: env.COVERAGE_LOCATION
                 ])
               }
-              if (env.GERRIT_EVENT_TYPE != 'comment-added') {
+              if (env.GERRIT_EVENT_TYPE != 'comment-added' && env.COVERAGE_TYPE == 'ruby-total') {
                 generateSkippedSpecsReport()
               }
             }
