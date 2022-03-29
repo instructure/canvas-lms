@@ -378,6 +378,7 @@ describe "AuthenticationProviders API", type: :request do
       @saml_hash["sig_alg"] = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
       @saml_hash["strip_domain_from_login_attribute"] = false
       @saml_hash["mfa_required"] = false
+      @saml_hash["skip_internal_mfa"] = false
       expect(json).to eq @saml_hash
     end
 
@@ -393,6 +394,7 @@ describe "AuthenticationProviders API", type: :request do
       @ldap_hash["identifier_format"] = nil
       @ldap_hash["position"] = 1
       @ldap_hash["mfa_required"] = false
+      @ldap_hash["skip_internal_mfa"] = false
       expect(json).to eq @ldap_hash
     end
 
@@ -406,6 +408,7 @@ describe "AuthenticationProviders API", type: :request do
       @cas_hash["unknown_user_url"] = nil
       @cas_hash["federated_attributes"] = {}
       @cas_hash["mfa_required"] = false
+      @cas_hash["skip_internal_mfa"] = false
       expect(json).to eq @cas_hash
     end
 

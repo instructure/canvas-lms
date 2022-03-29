@@ -50,10 +50,31 @@
           <%= render partial: "debugging", locals: { provider: aac } %>
         <% end %>
 
-        <% if aac.account.mfa_settings != :disabled && aac.account.mfa_settings != :required %>
-          <div class="ic-Form-control">
-            <%= f.label :mfa_required, t('MFA Required'), class: 'ic-Label', for: "mfa_required_#{presenter.id_suffix(aac)}" %>
-            <%= f.check_box :mfa_required, class: 'mfa_required_checkbox', id: "mfa_required_#{presenter.id_suffix(aac)}" %>
+        <% if aac.account.mfa_settings != :disabled && (aac.auth_type != 'canvas' || aac.account.mfa_settings != :required) %>
+          <div class="ic-Form-control ic-Form-control--radio" %>
+            <span class="ic-Label"><%= t('MFA Required') %></span>
+            <div class="ic-Radio">
+              <%# Make the value 'default' if MFA is required and this provider doesn't already require it so it doesn't become surprise sticky %>
+              <%= f.radio_button :mfa_option, aac.account.mfa_settings != :required || !!aac.settings["mfa_required"] ? 'required' : 'default',
+                                 id: "mfa_option_required_#{presenter.id_suffix(aac)}",
+                                 checked: !!aac.settings["mfa_required"] || (!aac.skip_internal_mfa? && aac.account.mfa_settings == :required) %>
+              <%= f.label :mfa_option, t('Canvas enforces MFA *When logging in through this Provider, Canvas will challenge the user with MFA, or require it to be configured.*',
+                                         wrappers: ['<br/><span class="ic-Form-help-text">\1</span>']), for: "mfa_option_required_#{presenter.id_suffix(aac)}", class: 'ic-Label' %>
+            </div>
+            <% if aac.auth_type != 'canvas' %>
+              <div class="ic-Radio">
+                <%= f.radio_button :mfa_option, 'bypass', id: "mfa_option_bypass_#{presenter.id_suffix(aac)}", checked: aac.skip_internal_mfa? %>
+                <%= f.label :mfa_option, t('Provider enforces MFA *When logging in through this Provider, Canvas will explicitly skip MFA enforcement. This should only be used if the Provider has already guaranteed MFA before SSO into Canvas.*',
+                                          wrappers: ['<br/><span class="ic-Form-help-text">\1</span>']), for: "mfa_option_bypass_#{presenter.id_suffix(aac)}", class: 'ic-Label' %>
+              </div>
+            <%end%>
+            <% if aac.account.mfa_settings != :required %>
+              <div class="ic-Radio">
+                <%= f.radio_button :mfa_option, 'optional', id: "mfa_option_optional_#{presenter.id_suffix(aac)}", checked: !aac.mfa_required? && !aac.skip_internal_mfa? %>
+                <%= f.label :mfa_option, t('User can opt in to MFA *Canvas will only challenge the user with MFA if they have configured it previously.*',
+                                           wrappers: ['<br/><span class="ic-Form-help-text">\1</span>']), for: "mfa_option_optional_#{presenter.id_suffix(aac)}", class: 'ic-Label' %>
+              </div>
+            <%end%>
           </div>
         <% end %>
 
