@@ -107,6 +107,15 @@ function handleYoutubeLink() {
 }
 trackEvent('Route', window.location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/')
 const JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE = '.dialog, .draggable, .resizable, .sortable, .tabs'
+
+function buildUrl(url) {
+  try {
+    return new URL(url)
+  } catch {
+    // Don't raise an error
+  }
+}
+
 export function enhanceUserContent() {
   if (ENV.SKIP_ENHANCING_USER_CONTENT) {
     return
@@ -211,7 +220,11 @@ export function enhanceUserContent() {
 
   $('a.instructure_file_link, a.instructure_scribd_file').each(function () {
     const $link = $(this)
-    const href = new URL($link[0].href)
+    const href = buildUrl($link[0].href)
+
+    // Don't attempt to enhance links with no href
+    if (!href) return
+
     const matchesCanvasFile = href.pathname.match(
       /(?:\/(courses|groups|users)\/(\d+))?\/files\/(\d+)/
     )
