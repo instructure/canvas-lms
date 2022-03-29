@@ -42,7 +42,10 @@ window.addEventListener('canvasReadyStateChange', function({ detail }) {
     configureDateTime()
   }
 })
-enableDTNPI()
+
+enableDTNPI({
+  endpoint: window.ENV.DATA_COLLECTION_ENDPOINT
+})
 
 async function setupSentry() {
   const Raven = await import('raven-js')

@@ -18,6 +18,7 @@
 
 import { up as enableDTNPI, down as disableDTNPI } from '../enableDTNPI'
 import { log } from '@canvas/datetime-natural-parsing-instrument'
+import fetchMock from 'fetch-mock'
 
 describe('enableDTNPI', () => {
   let consoleLog
@@ -63,18 +64,28 @@ describe('enableDTNPI', () => {
   })
 
   it('submits tracked events to the backend', async () => {
+    const endpoint = 'https://blahblah/submit'
+
     localStorage.setItem('dtnpi', JSON.stringify([{
+      id: 'a',
       locale: 'en',
       method: 'paste',
       parsed: '2021-08-18T06:00:00.000Z',
       value: 'wed aug 18',
     }]))
 
-    await enableDTNPI()
+    fetchMock.put(endpoint, 200)
 
-    const logEntry = consoleLog.mock.calls.find(x => x.join().startsWith('[dtnpi]'))
+    expect(fetchMock.called()).toBeFalsy()
 
-    expect(logEntry).toBeTruthy()
-    expect(logEntry.join('')).toMatch('[dtnpi] submitting 1 events')
+    await enableDTNPI({ endpoint })
+
+    expect(fetchMock.called()).toBeTruthy()
+    expect(fetchMock.lastCall()[0]).toEqual(endpoint)
+
+    const payload = JSON.parse(fetchMock.lastCall()[1].body)
+
+    expect(payload.length).toEqual(1)
+    expect(payload.map(x => x.id)).toEqual(['a'])
   })
 })
