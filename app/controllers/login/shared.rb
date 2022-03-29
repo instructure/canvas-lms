@@ -42,7 +42,7 @@ module Login::Shared
     Canvas::LiveEvents.logged_in(session, user, pseudonym)
 
     otp_passed ||= user.validate_otp_secret_key_remember_me_cookie(cookies["canvas_otp_remember_me"], request.remote_ip)
-    unless otp_passed
+    unless otp_passed || pseudonym.authentication_provider.skip_internal_mfa
       mfa_settings = user.mfa_settings(pseudonym_hint: @current_pseudonym)
       if (user.otp_secret_key && mfa_settings == :optional) ||
          mfa_settings == :required

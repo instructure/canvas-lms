@@ -133,7 +133,7 @@ class AuthenticationProvider < ActiveRecord::Base
   end
 
   def self.recognized_params
-    [:mfa_required].freeze
+    [:mfa_required, :skip_internal_mfa].freeze
   end
 
   def self.site_admin_params
@@ -219,6 +219,15 @@ class AuthenticationProvider < ActiveRecord::Base
   def mfa_required=(value)
     value = false if account.mfa_settings == :disabled
     settings["mfa_required"] = ::Canvas::Plugin.value_to_boolean(value)
+  end
+
+  def skip_internal_mfa?
+    !!settings["skip_internal_mfa"]
+  end
+  alias_method :skip_internal_mfa, :skip_internal_mfa?
+
+  def skip_internal_mfa=(value)
+    settings["skip_internal_mfa"] = ::Canvas::Plugin.value_to_boolean(value)
   end
 
   def federated_attributes_for_api

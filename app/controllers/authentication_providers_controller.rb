@@ -994,13 +994,19 @@ class AuthenticationProvidersController < ApplicationController
     federated_attributes = data[:federated_attributes]
     federated_attributes = {} if federated_attributes == ""
     federated_attributes = federated_attributes.to_unsafe_h if federated_attributes.is_a?(ActionController::Parameters)
-    data = data.permit(klass.recognized_params)
+    # mfa_option is so we can keep mfa_required a boolean for backwards compatibility but still use a radio input for it
+    data = data.permit(klass.recognized_params + [:mfa_option])
     data = data.reject { |k, _| klass.site_admin_params.include?(k.to_sym) } unless @domain_root_account.grants_right?(@current_user, :manage_site_settings)
     data[:federated_attributes] = federated_attributes if federated_attributes
     data[:auth_type] = auth_type
     if data[:auth_type] == "ldap"
       data[:auth_over_tls] = "start_tls" unless data.key?(:auth_over_tls)
       data[:auth_over_tls] = AuthenticationProvider::LDAP.auth_over_tls_setting(data[:auth_over_tls])
+    end
+    if data[:mfa_option]
+      data[:mfa_required] = data[:mfa_option] == "required"
+      data[:skip_internal_mfa] = data[:mfa_option] == "bypass"
+      data.delete(:mfa_option)
     end
     data
   end
