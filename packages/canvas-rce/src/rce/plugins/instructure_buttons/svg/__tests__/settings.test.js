@@ -32,7 +32,8 @@ describe('useSvgSettings()', () => {
     rcs = {
       getFile: jest.fn(() => Promise.resolve({name: 'Test Button.svg'})),
       contextType: 'course',
-      contextId: 1
+      contextId: 1,
+      canvasUrl: 'https://domain.from.env'
     }
     RceApiSource.mockImplementation(() => rcs)
   })
@@ -138,11 +139,6 @@ describe('useSvgSettings()', () => {
     beforeEach(() => {
       editing = true
 
-      ENV = {
-        COURSE_ID: 23,
-        DEEP_LINKING_POST_MESSAGE_ORIGIN: 'https://domain.from.env'
-      }
-
       // Add an image to the editor and select it
       ed.setContent(
         '<img id="test-image" data-inst-icon-maker-icon="true" src="https://canvas.instructure.com/svg" data-download-url="https://canvas.instructure.com/files/1/download" alt="a red circle" />'
@@ -194,7 +190,7 @@ describe('useSvgSettings()', () => {
 
       expect(mock.called('download-url')).toBe(true)
       expect(mock.calls('download-url')[0][0]).toMatch(
-        /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=23&ts=\d+&download_frd=1/
+        /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=1&ts=\d+&download_frd=1/
       )
     })
 
@@ -211,7 +207,7 @@ describe('useSvgSettings()', () => {
 
         expect(mock.called('download-url')).toBe(true)
         expect(mock.calls('download-url')[0][0]).toMatch(
-          /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=23&ts=\d+&download_frd=1/
+          /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=1&ts=\d+&download_frd=1/
         )
       })
     })
@@ -228,18 +224,13 @@ describe('useSvgSettings()', () => {
         subject()
         const calledUrl = mock.calls('download-url')[0][0]
         expect(calledUrl).toMatch(
-          /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=23&ts=\d+&download_frd=1/
+          /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=1&ts=\d+&download_frd=1/
         )
       })
     })
 
     describe('with a containing element selected', () => {
       beforeEach(() => {
-        ENV = {
-          COURSE_ID: 23,
-          DEEP_LINKING_POST_MESSAGE_ORIGIN: 'https://domain.from.env'
-        }
-
         ed.setContent(
           '<p id="containing"><img data-inst-icon-maker-icon="true" src="https://canvas.instructure.com/svg" data-download-url="/files/1/download" alt="a red circle" /></p>'
         )
@@ -250,7 +241,7 @@ describe('useSvgSettings()', () => {
         subject()
         const calledUrl = mock.calls('download-url')[0][0]
         expect(calledUrl).toMatch(
-          /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=23&ts=\d+&download_frd=1/
+          /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=1&ts=\d+&download_frd=1/
         )
       })
     })

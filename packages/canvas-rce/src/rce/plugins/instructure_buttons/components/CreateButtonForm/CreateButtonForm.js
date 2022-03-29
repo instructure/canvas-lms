@@ -30,7 +30,8 @@ export const CreateButtonForm = ({
   editor,
   editing,
   allowNameChange,
-  nameRef
+  nameRef,
+  rcsConfig
 }) => {
   return (
     <>
@@ -43,7 +44,13 @@ export const CreateButtonForm = ({
       <ShapeSection settings={settings} onChange={dispatch} />
       <ColorSection settings={settings} onChange={dispatch} />
       <TextSection settings={settings} onChange={dispatch} />
-      <ImageSection editor={editor} settings={settings} onChange={dispatch} editing={editing} />
+      <ImageSection
+        editor={editor}
+        settings={settings}
+        onChange={dispatch}
+        editing={editing}
+        rcsConfig={rcsConfig}
+      />
     </>
   )
 }

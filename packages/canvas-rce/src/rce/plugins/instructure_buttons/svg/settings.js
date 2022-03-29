@@ -68,7 +68,7 @@ export function useSvgSettings(editor, editing, rcsConfig) {
     // Adding the Course ID to the request causes Canvas to follow the chain
     // of files that were uploaded and "replaced" previous versions of the file.
     downloadURL.searchParams.append('replacement_chain_context_type', 'course')
-    downloadURL.searchParams.append('replacement_chain_context_id', ENV.COURSE_ID)
+    downloadURL.searchParams.append('replacement_chain_context_id', rcsConfig.contextId)
 
     // Prevent the browser from using an old cached SVGs
     downloadURL.searchParams.append('ts', Date.now())
@@ -91,7 +91,7 @@ export function useSvgSettings(editor, editing, rcsConfig) {
         // Parse out the file ID from something like
         // /courses/1/files/3/preview?...
         const fileId = urlFromNode.split('files/')[1]?.split('/')[0]
-        const downloadUrl = buildFilesUrl(fileId, ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN)
+        const downloadUrl = buildFilesUrl(fileId, rcsConfig.canvasUrl)
 
         // Parse SVG. If no SVG found, return defaults
         const svg = await svgFromUrl(downloadUrl)

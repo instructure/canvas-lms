@@ -35,7 +35,7 @@ import {transformForShape} from '../../../svg/image'
 
 const getColorSection = () => document.querySelector('#buttons-tray-color-section')
 
-export const ImageSection = ({settings, onChange, editing, editor}) => {
+export const ImageSection = ({settings, onChange, editing, editor, rcsConfig}) => {
   const [state, dispatch] = useReducer(reducer, initialState)
   const bottomRef = useRef()
 
@@ -170,7 +170,7 @@ export const ImageSection = ({settings, onChange, editing, editor}) => {
               <Text weight="bold">{formatMessage('Current Image')}</Text>
             </Flex.Item>
             <Flex.Item>
-              <ImageOptions state={state} dispatch={dispatch} />
+              <ImageOptions state={state} dispatch={dispatch} rcsConfig={rcsConfig} />
             </Flex.Item>
           </Flex>
         </Flex.Item>
