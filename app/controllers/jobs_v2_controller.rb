@@ -66,6 +66,9 @@ class JobsV2Controller < ApplicationController
             .group(@group)
             .order(grouped_order_clause(@group))
 
+    # This seems silly, but it forces postgres to use the available indicies.
+    scope = scope.where("locked_by IS NULL OR locked_by IS NOT NULL") if @group == :singleton
+
     tag_info = Api.paginate(scope, self, api_v1_jobs_grouped_info_url)
     now = Delayed::Job.db_time_now
     render json: tag_info.map { |row| grouped_info_json(row, @group, base_time: now) }
@@ -104,6 +107,9 @@ class JobsV2Controller < ApplicationController
     %i[tag strand singleton account_id shard_id].each do |filter_param|
       scope = scope.where(filter_param => params[filter_param]) if params[filter_param].present?
     end
+
+    # This seems silly, but it forces postgres to use the available indicies.
+    scope = scope.where("locked_by IS NULL OR locked_by IS NOT NULL") if params[:singleton].present?
     scope = scope.order(list_order_clause)
 
     jobs = Api.paginate(scope, self, api_v1_jobs_list_url)
