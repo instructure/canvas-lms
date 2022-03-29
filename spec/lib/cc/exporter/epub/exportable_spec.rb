@@ -25,62 +25,20 @@ describe "Exportable" do
       include CC::Exporter::Epub::Exportable
 
       def attachment
-        @attachment ||= Attachment.create({
-                                            context: Course.create,
-                                            filename: "exportable-test-file",
-                                            uploaded_data: File.open(cartridge_path)
-                                          })
-      end
-
-      def cartridge_path
-        File.join(File.dirname(__FILE__), "/../../../../fixtures/migration/unicode-filename-test-export.imscc")
+        cartridge_path = File.join(File.dirname(__FILE__), "/../../../../fixtures/migration/unicode-filename-test-export.imscc")
+        @attachment ||= Attachment.create({ context: Course.create, filename: "exportable-test-file", uploaded_data: File.open(cartridge_path) })
       end
     end
   end
 
   context "#convert_to_epub" do
-    before :all do
-      skip "LS-1504 (9/30/2020)"
-    end
-
-    before do
+    it "creates proper zip and an epub files" do
       @epub_export = klass.new.convert_to_epub
-    end
-
-    let(:epub_path) do
-      @epub_export.first
-    end
-
-    let(:zip_path) do
-      @epub_export.last
-    end
-
-    let(:epub) do
-      File.open(epub_path)
-    end
-
-    let(:zip) do
-      File.open(zip_path)
-    end
-
-    it "creates an epub file" do
-      skip "LS-1504 (9/30/2020)"
-      expect(epub).not_to be_nil
-    end
-
-    it "creates a zip file" do
-      skip "LS-1504 (9/30/2020)"
-      expect(zip).not_to be_nil
-    end
-
-    it "creates a zip file whose name includes the cartridge's name" do
-      skip "LS-1504 (9/30/2020)"
-      expect(zip_path).to include("unicode-filename-test")
-    end
-
-    after do
-      File.delete(epub_path) if File.exist?(epub_path)
-      File.delete(zip_path) if File.exist?(zip_path)
+      expect(File.exist?(@epub_export.first) && File.exist?(@epub_export.last)).to be true
+      sleep 0.1 # Wait just enough so we don't delete a parallel test's file
+      File.delete(@epub_export.first) if File.exist?(@epub_export.first)
+      File.delete(@epub_export.last) if File.exist?(@epub_export.last)
+      expect(@epub_export.last).to include("unicode-filename-test")
     end
   end
 end
