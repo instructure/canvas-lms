@@ -57,35 +57,41 @@ function abortable({success, error, loading, meta}) {
 //
 // If that doesn't suit your use case, another approach would be the useCallback hook to preserve
 // the identity of your callbacks.
-export default function useFetchApi({
-  // data output callbacks
-  success, // (parsed json object of the response body) => {}
-  error, // (Error object from doFetchApi) => {}
-  loading, // (boolean that specifies whether a fetch is in progress) => {}
-  meta, // other information about the fetch: ({link, response}) => {}. called only when success is called.
+//
+// You can optionally pass an array of additional dependencies as a second argument. If any of
+// these change, the fetch will be repeated.
+export default function useFetchApi(
+  {
+    // data output callbacks
+    success, // (parsed json object of the response body) => {}
+    error, // (Error object from doFetchApi) => {}
+    loading, // (boolean that specifies whether a fetch is in progress) => {}
+    meta, // other information about the fetch: ({link, response}) => {}. called only when success is called.
 
-  // inputs
-  path, // the url to fetch; often a relative path
-  convert, // allows you to convert the json response data into another format before calling success
-  forceResult, // specify this to bypass the fetch and report this to success instead. meta is not called.
-  params = {}, // url parameters
-  headers = {}, // additional request headers
+    // inputs
+    path, // the url to fetch; often a relative path
+    convert, // allows you to convert the json response data into another format before calling success
+    forceResult, // specify this to bypass the fetch and report this to success instead. meta is not called.
+    params = {}, // url parameters
+    headers = {}, // additional request headers
 
-  // Setting fetchAllPages makes useFetchApi continually fetch pages while the Link header indicates
-  // there is a next page. The success callback will be invoked for each page with a flattened array
-  // of the results accumulated thus far. The meta callback will also be called once for each page.
-  // If an error occurs on any page, the error callback will be called and pagination will stop. The
-  // loading callback will only be called with false when pagination ends. If any of the parameters
-  // change, the pagination starts over. Overrides fetchNumPages.
-  fetchAllPages = false,
+    // Setting fetchAllPages makes useFetchApi continually fetch pages while the Link header indicates
+    // there is a next page. The success callback will be invoked for each page with a flattened array
+    // of the results accumulated thus far. The meta callback will also be called once for each page.
+    // If an error occurs on any page, the error callback will be called and pagination will stop. The
+    // loading callback will only be called with false when pagination ends. If any of the parameters
+    // change, the pagination starts over. Overrides fetchNumPages.
+    fetchAllPages = false,
 
-  // Setting fetchNumPages makes useFetchApi continually fetch the next page while the Link header
-  // supplies the next page or until the provided limit is reached. The same implications listed in
-  // comments for fetchAllPages option apply. Overridden by fetchAllPages, if that param is true.
-  fetchNumPages = 0,
+    // Setting fetchNumPages makes useFetchApi continually fetch the next page while the Link header
+    // supplies the next page or until the provided limit is reached. The same implications listed in
+    // comments for fetchAllPages option apply. Overridden by fetchAllPages, if that param is true.
+    fetchNumPages = 0,
 
-  fetchOpts = {} // other options to pass to fetch
-}) {
+    fetchOpts = {} // other options to pass to fetch
+  },
+  additionalDependencies = []
+) {
   // useImmediate for deep comparisons and may help avoid browser flickering
   useImmediate(
     () => {
@@ -142,6 +148,7 @@ export default function useFetchApi({
       return abort
     },
     [
+      ...additionalDependencies,
       success,
       error,
       loading,
