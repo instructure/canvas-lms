@@ -252,6 +252,10 @@ class ApplicationController < ActionController::Base
           @js_env[:API_GATEWAY_URI] = dynamic_settings_tree["api_gateway_uri"]
         end
 
+        if dynamic_settings_tree["frontend_data_collection_endpoint"]
+          @js_env[:DATA_COLLECTION_ENDPOINT] = dynamic_settings_tree["frontend_data_collection_endpoint"]
+        end
+
         @js_env[:flashAlertTimeout] = 1.day.in_milliseconds if @current_user&.prefers_no_toast_timeout?
         @js_env[:KILL_JOY] = @domain_root_account.kill_joy? if @domain_root_account&.kill_joy?
 
