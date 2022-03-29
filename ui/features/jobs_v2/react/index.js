@@ -26,6 +26,7 @@ import GroupsTable from './components/GroupsTable'
 import JobDetails from './components/JobDetails'
 import SearchBox from './components/SearchBox'
 import JobLookup from './components/JobLookup'
+import SectionRefreshHeader from './components/SectionRefreshHeader'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
@@ -60,6 +61,10 @@ function jobsReducer(prevState, action) {
     }
   } else if (action.type === 'CHANGE_GROUP_ORDER') {
     return {...prevState, group_order: action.payload, groups: []}
+  } else if (action.type === 'GROUPS_LOADING') {
+    return {...prevState, groups_loading: action.payload}
+  } else if (action.type === 'REFRESH_GROUPS') {
+    return {...prevState, groups_refresh_nonce: prevState.groups_refresh_nonce + 1}
   } else if (action.type === 'FETCHED_GROUPS') {
     return {...prevState, groups: action.payload}
   } else if (action.type === 'GROUP_METADATA') {
@@ -84,6 +89,10 @@ function jobsReducer(prevState, action) {
     }
   } else if (action.type === 'CHANGE_JOBS_ORDER') {
     return {...prevState, jobs_order: action.payload, jobs: [], job: null}
+  } else if (action.type === 'JOBS_LOADING') {
+    return {...prevState, jobs_loading: action.payload}
+  } else if (action.type === 'REFRESH_JOBS') {
+    return {...prevState, jobs_refresh_nonce: prevState.jobs_refresh_nonce + 1}
   } else if (action.type === 'FETCHED_JOBS') {
     return {...prevState, jobs: action.payload, job: null}
   } else if (action.type === 'JOBS_METADATA') {
@@ -108,10 +117,14 @@ export default function JobsIndex() {
     groups: [],
     jobs: [],
     job: null,
+    jobs_loading: false,
     jobs_page: 1,
     jobs_page_count: 1,
+    jobs_refresh_nonce: 1,
+    groups_loading: false,
     groups_page: 1,
-    groups_page_count: 1
+    groups_page_count: 1,
+    groups_refresh_nonce: 1
   })
 
   const bucketCaptions = useMemo(() => {
@@ -139,34 +152,46 @@ export default function JobsIndex() {
     }
   }, [])
 
-  useFetchApi({
-    path: `/api/v1/jobs2/${state.bucket}/by_${state.group_type}`,
-    params: {
-      order: state.group_order,
-      page: state.groups_page
+  useFetchApi(
+    {
+      path: `/api/v1/jobs2/${state.bucket}/by_${state.group_type}`,
+      params: {
+        order: state.group_order,
+        page: state.groups_page
+      },
+      loading: useCallback(loading => {
+        dispatch({type: 'GROUPS_LOADING', payload: loading})
+      }, []),
+      meta: useCallback(response => {
+        dispatch({type: 'GROUP_METADATA', payload: response})
+      }, []),
+      success: useCallback(response => {
+        dispatch({type: 'FETCHED_GROUPS', payload: response})
+      }, [])
     },
-    meta: useCallback(response => {
-      dispatch({type: 'GROUP_METADATA', payload: response})
-    }, []),
-    success: useCallback(response => {
-      dispatch({type: 'FETCHED_GROUPS', payload: response})
-    }, [])
-  })
+    [state.groups_refresh_nonce]
+  )
 
-  useFetchApi({
-    path: `/api/v1/jobs2/${state.bucket}`,
-    params: {
-      [state.group_type]: state.group_text,
-      order: state.jobs_order,
-      page: state.jobs_page
+  useFetchApi(
+    {
+      path: `/api/v1/jobs2/${state.bucket}`,
+      params: {
+        [state.group_type]: state.group_text,
+        order: state.jobs_order,
+        page: state.jobs_page
+      },
+      loading: useCallback(loading => {
+        dispatch({type: 'JOBS_LOADING', payload: loading})
+      }, []),
+      meta: useCallback(response => {
+        dispatch({type: 'JOBS_METADATA', payload: response})
+      }, []),
+      success: useCallback(response => {
+        dispatch({type: 'FETCHED_JOBS', payload: response})
+      }, [])
     },
-    meta: useCallback(response => {
-      dispatch({type: 'JOBS_METADATA', payload: response})
-    }, []),
-    success: useCallback(response => {
-      dispatch({type: 'FETCHED_JOBS', payload: response})
-    }, [])
-  })
+    [state.jobs_refresh_nonce]
+  )
 
   return (
     <>
@@ -179,9 +204,12 @@ export default function JobsIndex() {
         jobGroup={state.group_type}
         onChangeGroup={event => dispatch({type: 'CHANGE_GROUP_TYPE', payload: event.target.value})}
       />
-      <Heading level="h2" margin="large 0 small 0">
-        {groupTitles[state.group_type]}
-      </Heading>
+      <SectionRefreshHeader
+        title={groupTitles[state.group_type]}
+        loadingTitle={I18n.t('Loading %{group}', {group: groupTitles[state.group_type]})}
+        loading={state.groups_loading}
+        onRefresh={() => dispatch({type: 'REFRESH_GROUPS'})}
+      />
       <GroupsTable
         type={state.group_type}
         typeCaption={groupCaptions[state.group_type]}
@@ -202,9 +230,12 @@ export default function JobsIndex() {
       ) : null}
       <Flex alignItems="end">
         <Flex.Item size="33%">
-          <Heading level="h2" margin="large 0 small 0">
-            {I18n.t('Jobs')}
-          </Heading>
+          <SectionRefreshHeader
+            title={I18n.t('Jobs')}
+            loadingTitle={I18n.t('Loading jobs...')}
+            loading={state.jobs_loading}
+            onRefresh={() => dispatch({type: 'REFRESH_JOBS'})}
+          />
         </Flex.Item>
         <Flex.Item size="33%" shouldGrow padding="large 0 small 0">
           <SearchBox
