@@ -176,6 +176,7 @@ export default function FilterNav({
         open={isTrayOpen}
         onDismiss={() => setIsTrayOpen(false)}
         size="regular"
+        shouldCloseOnDocumentClick
       >
         <View as="div" padding="medium">
           <Flex>
