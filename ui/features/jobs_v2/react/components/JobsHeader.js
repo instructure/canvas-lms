@@ -25,6 +25,7 @@ import {Flex} from '@instructure/ui-flex'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {ToggleButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
 import {IconPlaySolid, IconPauseSolid} from '@instructure/ui-icons'
 
 const I18n = useI18nScope('jobs_v2')
@@ -59,7 +60,9 @@ export default function JobsHeader({
           </RadioInputGroup>
         </FormFieldGroup>
       </Flex.Item>
-      <Flex.Item margin="0 large"> | </Flex.Item>
+      <Flex.Item margin="0 large">
+        <Text color="secondary"> | </Text>
+      </Flex.Item>
       <Flex.Item>
         <FormFieldGroup
           description={<ScreenReaderContent>{I18n.t('Job grouping')}</ScreenReaderContent>}
@@ -77,7 +80,9 @@ export default function JobsHeader({
           </RadioInputGroup>
         </FormFieldGroup>
       </Flex.Item>
-      <Flex.Item margin="0 large"> | </Flex.Item>
+      <Flex.Item margin="0 large">
+        <Text color="secondary"> | </Text>
+      </Flex.Item>
       <Flex.Item align="end" margin="0 x-small x-small 0">
         <PresentationContent>
           <strong>{I18n.t('Scope:')}</strong>

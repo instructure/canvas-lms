@@ -31,6 +31,7 @@ import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconXSolid} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = useI18nScope('jobs_v2')
 const AUTO_REFRESH_INTERVAL = 5000
@@ -239,7 +240,7 @@ export default function JobsIndex() {
   return (
     <>
       <Heading level="h1" margin="0 0 small 0">
-        {I18n.t('Jobs Control Panel')}
+        <ScreenReaderContent>{I18n.t('Jobs Control Panel')}</ScreenReaderContent>
       </Heading>
       <JobsHeader
         jobBucket={state.bucket}
@@ -327,7 +328,7 @@ export default function JobsIndex() {
       ) : null}
       <Flex alignItems="end">
         <Flex.Item size="33%">
-          <Heading level="h2" margin="large 0 small 0">
+          <Heading level="h2" margin="x-large 0 small 0">
             {I18n.t('Details')}
           </Heading>
         </Flex.Item>
