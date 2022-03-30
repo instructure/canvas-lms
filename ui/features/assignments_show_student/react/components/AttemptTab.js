@@ -19,7 +19,8 @@
 import {Alert} from '@instructure/ui-alerts'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import axios from '@canvas/axios'
-import LazyLoad from '@canvas/lazy-load'
+import LazyLoad, {lazy} from '@canvas/lazy-load'
+
 import {bool, func, string} from 'prop-types'
 import {EXTERNAL_TOOLS_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {ExternalTool} from '@canvas/assignments/graphql/student/ExternalTool'
@@ -48,13 +49,13 @@ import theme from '@instructure/canvas-theme'
 
 const I18n = useI18nScope('assignments_2_attempt_tab')
 
-const ExternalToolSubmission = React.lazy(() => import('./AttemptType/ExternalToolSubmission'))
-const FilePreview = React.lazy(() => import('./AttemptType/FilePreview'))
-const FileUpload = React.lazy(() => import('./AttemptType/FileUpload'))
-const MediaAttempt = React.lazy(() => import('./AttemptType/MediaAttempt'))
-const TextEntry = React.lazy(() => import('./AttemptType/TextEntry'))
-const UrlEntry = React.lazy(() => import('./AttemptType/UrlEntry'))
-const StudentAnnotationAttempt = React.lazy(() => import('./AttemptType/StudentAnnotationAttempt'))
+const ExternalToolSubmission = lazy(() => import('./AttemptType/ExternalToolSubmission'))
+const FilePreview = lazy(() => import('./AttemptType/FilePreview'))
+const FileUpload = lazy(() => import('./AttemptType/FileUpload'))
+const MediaAttempt = lazy(() => import('./AttemptType/MediaAttempt'))
+const TextEntry = lazy(() => import('./AttemptType/TextEntry'))
+const UrlEntry = lazy(() => import('./AttemptType/UrlEntry'))
+const StudentAnnotationAttempt = lazy(() => import('./AttemptType/StudentAnnotationAttempt'))
 
 const iconsByType = {
   media_recording: IconAttachMediaLine,
