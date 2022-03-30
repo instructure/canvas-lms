@@ -35,6 +35,10 @@ export default {
       checked: false,
       onChange: () => {}
     },
+    hideTotal: {
+      checked: false,
+      onChange: () => {}
+    },
     showNotes: {
       checked: true,
       onChange: () => {}

@@ -59,6 +59,7 @@ export function getInitialGridDisplaySettings(settings, colors): GridDisplaySett
     filterColumnsBy,
     filterRowsBy,
     hideAssignmentGroupTotals: settings.hide_assignment_group_totals === 'true',
+    hideTotal: settings.hide_total === 'true',
     selectedPrimaryInfo,
     selectedSecondaryInfo,
     selectedViewOptionsFilters: settings.selected_view_options_filters || [],

@@ -461,6 +461,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.initHideAssignmentGroupTotals(
       this.options.settings.hide_assignment_group_totals === 'true'
     )
+    this.initHideTotal(this.options.settings.hide_total === 'true')
     this.initSubmissionStateMap()
     this.gradebookColumnSizeSettings = this.options.gradebook_column_size_settings
     this.setColumnOrder({
@@ -1916,6 +1917,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       onSelectShowSeparateFirstLastNames: this.toggleShowSeparateFirstLastNames,
       hideAssignmentGroupTotals: this.gridDisplaySettings.hideAssignmentGroupTotals,
       onSelectHideAssignmentGroupTotals: this.toggleHideAssignmentGroupTotals,
+      hideTotal: this.gridDisplaySettings.hideTotal,
+      onSelectHideTotal: this.toggleHideTotal,
       onSelectShowStatusesModal: () => this.setState({isStatusesModalOpen: true}),
       onSelectViewUngradedAsZero: () => {
         confirmViewUngradedAsZero({
@@ -2084,11 +2087,13 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
           viewUngradedAsZero,
           showUnpublishedAssignments,
           showSeparateFirstLastNames,
-          hideAssignmentGroupTotals
+          hideAssignmentGroupTotals,
+          hideTotal
         } = this.gridDisplaySettings
 
         return {
           columnSortSettings: {criterion, direction},
+          hideTotal,
           showNotes: this.isTeacherNotesColumnShown(),
           showSeparateFirstLastNames,
           showUnpublishedAssignments,
@@ -2104,6 +2109,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   handleViewOptionsUpdated = ({
     columnSortSettings: {criterion, direction} = {criterion: undefined, direction: undefined},
     hideAssignmentGroupTotals,
+    hideTotal,
     showNotes,
     showUnpublishedAssignments,
     showSeparateFirstLastNames,
@@ -2133,6 +2139,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     // Finally, the remaining options are saved to the user's settings.
     const {
       hideAssignmentGroupTotals: oldHideAssignmentGroupTotals,
+      hideTotal: oldHideTotal,
       showUnpublishedAssignments: oldShowUnpublished,
       showSeparateFirstLastNames: oldShowSeparateFirstLastNames,
       viewUngradedAsZero: oldViewUngradedAsZero
@@ -2146,10 +2153,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     const colorsChanged = !_.isEqual(this.state.gridColors, colors)
     const hideAssignmentGroupTotalsChanged =
       oldHideAssignmentGroupTotals !== hideAssignmentGroupTotals
+    const hideTotalChanged = oldHideTotal !== hideTotal
 
     if (
       colorsChanged ||
       hideAssignmentGroupTotalsChanged ||
+      hideTotalChanged ||
       showUnpublishedChanged ||
       viewUngradedAsZeroChanged ||
       showSeparateFirstLastNamesChanged
@@ -2159,6 +2168,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         hideAssignmentGroupTotals: hideAssignmentGroupTotalsChanged
           ? hideAssignmentGroupTotals
           : undefined,
+        hideTotal: hideTotalChanged ? hideTotal : undefined,
         showUnpublishedAssignments: showUnpublishedChanged ? showUnpublishedAssignments : undefined,
         showSeparateFirstLastNames: showSeparateFirstLastNamesChanged
           ? showSeparateFirstLastNames
@@ -2198,6 +2208,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   saveUpdatedUserSettings = ({
     colors,
     hideAssignmentGroupTotals,
+    hideTotal,
     showUnpublishedAssignments,
     viewUngradedAsZero,
     showSeparateFirstLastNames
@@ -2205,6 +2216,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.saveSettings({
       colors,
       hideAssignmentGroupTotals,
+      hideTotal,
       showUnpublishedAssignments,
       showSeparateFirstLastNames,
       viewUngradedAsZero
@@ -2221,6 +2233,10 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
       if (hideAssignmentGroupTotals !== undefined) {
         this.gridDisplaySettings.hideAssignmentGroupTotals = hideAssignmentGroupTotals
+      }
+      
+      if (hideTotal !== undefined) {
+        this.gridDisplaySettings.hideTotal = hideTotal
         this.updateAllTotalColumns()
       }
 
@@ -2424,11 +2440,17 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         }
       } else {
         const column = this.gridData.columns.definitions.total_grade
-        if (column) {
+        if (
+          column &&
+          !(this.options.enhanced_gradebook_filters && this.gridDisplaySettings.hideTotal)
+        ) {
           scrollableColumns.push(column)
         }
       }
-      if (this.courseSettings.allowFinalGradeOverride) {
+      if (
+        this.courseSettings.allowFinalGradeOverride &&
+        !(this.options.enhanced_gradebook_filters && this.gridDisplaySettings.hideTotal)
+      ) {
         const column = this.gridData.columns.definitions.total_grade_override
         if (column) {
           scrollableColumns.push(column)
@@ -2812,6 +2834,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   saveSettings = ({
     hideAssignmentGroupTotals = this.gridDisplaySettings.hideAssignmentGroupTotals,
+    hideTotal = this.gridDisplaySettings.hideTotal,
     selectedViewOptionsFilters = this.listSelectedViewOptionsFilters(),
     showConcludedEnrollments = this.getEnrollmentFilters().concluded,
     showInactiveEnrollments = this.getEnrollmentFilters().inactive,
@@ -2831,6 +2854,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         enter_grades_as: this.gridDisplaySettings.enterGradesAs,
         filter_columns_by: underscore(this.gridDisplaySettings.filterColumnsBy),
         hide_assignment_group_totals: hideAssignmentGroupTotals ? 'true' : 'false',
+        hide_total: hideTotal ? 'true' : 'false',
         selected_view_options_filters: selectedViewOptionsFilters,
         show_concluded_enrollments: showConcludedEnrollments ? 'true' : 'false',
         show_inactive_enrollments: showInactiveEnrollments ? 'true' : 'false',
@@ -3730,12 +3754,28 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       this.gridDisplaySettings.hideAssignmentGroupTotals =
         !this.gridDisplaySettings.hideAssignmentGroupTotals
       this.updateColumnsAndRenderViewOptionsMenu()
-      this.renderActionMenu()
     }
     toggleableAction()
     // on success, do nothing since the render happened earlier
     return this.saveSettings({
       hideAssignmentGroupTotals: this.gridDisplaySettings.hideAssignmentGroupTotals
+    }).catch(toggleableAction)
+    // this pattern keeps the ui snappier rather than waiting for ajax call to complete
+  }
+
+  initHideTotal = (hideTotal = false) => {
+    this.gridDisplaySettings.hideTotal = hideTotal
+  }
+
+  toggleHideTotal = () => {
+    const toggleableAction = () => {
+      this.gridDisplaySettings.hideTotal = !this.gridDisplaySettings.hideTotal
+      this.updateColumnsAndRenderViewOptionsMenu()
+    }
+    toggleableAction()
+    // on success, do nothing since the render happened earlier
+    return this.saveSettings({
+      hideTotal: this.gridDisplaySettings.hideTotal
     }).catch(toggleableAction)
     // this pattern keeps the ui snappier rather than waiting for ajax call to complete
   }
