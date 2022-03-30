@@ -24,9 +24,11 @@ import {IconRefreshLine} from '@instructure/ui-icons'
 
 const I18n = useI18nScope('jobs_v2')
 
-export default function RefreshWidget({loading, onRefresh, title}) {
+export default function RefreshWidget({loading, autoRefresh, onRefresh, title}) {
   if (loading) {
     return <Spinner size="x-small" margin="0 0 xx-small xx-small" renderTitle={title} />
+  } else if (autoRefresh) {
+    return null
   } else {
     return (
       <IconButton

@@ -17,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import React, {useCallback, useReducer, useMemo} from 'react'
+import React, {useCallback, useReducer, useEffect, useMemo} from 'react'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import Paginator from '@canvas/instui-bindings/react/Paginator'
 import JobsHeader from './components/JobsHeader'
@@ -33,6 +33,7 @@ import {IconButton} from '@instructure/ui-buttons'
 import {IconXSolid} from '@instructure/ui-icons'
 
 const I18n = useI18nScope('jobs_v2')
+const AUTO_REFRESH_INTERVAL = 5000
 
 function jobsReducer(prevState, action) {
   if (action.type === 'CHANGE_BUCKET') {
@@ -116,6 +117,23 @@ function jobsReducer(prevState, action) {
       jobs_page_count: 1,
       scope: action.payload
     }
+  } else if (action.type === 'TOGGLE_AUTO_REFRESH') {
+    if (prevState.auto_refresh) {
+      return {...prevState, auto_refresh: false}
+    } else {
+      return {
+        ...prevState,
+        auto_refresh: true,
+        groups_refresh_nonce: prevState.groups_refresh_nonce + 1,
+        jobs_refresh_nonce: prevState.jobs_refresh_nonce + 1
+      }
+    }
+  } else if (action.type === 'REFRESH_ALL') {
+    return {
+      ...prevState,
+      groups_refresh_nonce: prevState.groups_refresh_nonce + 1,
+      jobs_refresh_nonce: prevState.jobs_refresh_nonce + 1
+    }
   }
 }
 
@@ -137,7 +155,8 @@ export default function JobsIndex() {
     groups_page: 1,
     groups_page_count: 1,
     groups_refresh_nonce: 1,
-    scope: Object.keys(ENV.jobs_scope_filter)[0]
+    scope: Object.keys(ENV.jobs_scope_filter)[0],
+    auto_refresh: false
   })
 
   const bucketCaptions = useMemo(() => {
@@ -208,6 +227,15 @@ export default function JobsIndex() {
     [state.jobs_refresh_nonce]
   )
 
+  useEffect(() => {
+    const interval = state.auto_refresh
+      ? setInterval(() => dispatch({type: 'REFRESH_ALL'}), AUTO_REFRESH_INTERVAL)
+      : null
+    return () => {
+      if (interval) clearInterval(interval)
+    }
+  }, [state.auto_refresh])
+
   return (
     <>
       <Heading level="h1" margin="0 0 small 0">
@@ -220,12 +248,17 @@ export default function JobsIndex() {
         onChangeGroup={event => dispatch({type: 'CHANGE_GROUP_TYPE', payload: event.target.value})}
         jobScope={state.scope}
         onChangeScope={(event, {id}) => dispatch({type: 'CHANGE_SCOPE', payload: id})}
+        autoRefresh={state.auto_refresh}
+        onChangeAutoRefresh={event =>
+          dispatch({type: 'TOGGLE_AUTO_REFRESH', payload: event.target.value})
+        }
       />
       <SectionRefreshHeader
         title={groupTitles[state.group_type]}
         loadingTitle={I18n.t('Loading %{group}', {group: groupTitles[state.group_type]})}
         loading={state.groups_loading}
         onRefresh={() => dispatch({type: 'REFRESH_GROUPS'})}
+        autoRefresh={state.auto_refresh}
       />
       <GroupsTable
         type={state.group_type}
@@ -252,6 +285,7 @@ export default function JobsIndex() {
             loadingTitle={I18n.t('Loading jobs...')}
             loading={state.jobs_loading}
             onRefresh={() => dispatch({type: 'REFRESH_JOBS'})}
+            autoRefresh={state.auto_refresh}
           />
         </Flex.Item>
         <Flex.Item size="33%" shouldGrow padding="large 0 small 0">

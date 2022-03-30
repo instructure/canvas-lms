@@ -21,7 +21,13 @@ import RefreshWidget from './RefreshWidget'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 
-export default function SectionRefreshHeader({title, loadingTitle, loading, onRefresh}) {
+export default function SectionRefreshHeader({
+  title,
+  loadingTitle,
+  loading,
+  autoRefresh,
+  onRefresh
+}) {
   return (
     <>
       <Flex alignItems="end">
@@ -31,7 +37,12 @@ export default function SectionRefreshHeader({title, loadingTitle, loading, onRe
           </Heading>
         </Flex.Item>
         <Flex.Item padding="large 0 x-small x-small">
-          <RefreshWidget onRefresh={onRefresh} title={loadingTitle} loading={loading} />
+          <RefreshWidget
+            autoRefresh={autoRefresh}
+            onRefresh={onRefresh}
+            title={loadingTitle}
+            loading={loading}
+          />
         </Flex.Item>
       </Flex>
     </>
