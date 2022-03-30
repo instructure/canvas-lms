@@ -3423,6 +3423,7 @@ exports[`renders Note correctly with everything 1`] = `
               <Button
                 as="button"
                 cursor="pointer"
+                data-testid="edit-event-button"
                 display="inline-block"
                 elementRef={[Function]}
                 icon={[Function]}
@@ -3618,6 +3619,7 @@ exports[`renders Note correctly without Course 1`] = `
               <Button
                 as="button"
                 cursor="pointer"
+                data-testid="edit-event-button"
                 display="inline-block"
                 elementRef={[Function]}
                 icon={[Function]}

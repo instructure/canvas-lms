@@ -32,7 +32,7 @@ import {
   IconPeerReviewLine
 } from '@instructure/ui-icons'
 
-import {func, shape, object, arrayOf, number, string} from 'prop-types'
+import {func, shape, object, arrayOf, number, string, bool} from 'prop-types'
 import {dateTimeString} from '../../utilities/dateUtils'
 import formatMessage from '../../format-message'
 
@@ -145,18 +145,20 @@ export default class ToDoItem extends React.Component {
             {this.getInformationRow(this.props.item.date, this.props.item.points)}
           </List>
         </div>
-        <div className="ToDoSidebarItem__Close">
-          <CloseButton
-            variant="icon"
-            size="small"
-            onClick={this.handleClick}
-            buttonRef={elt => {
-              this.buttonRef = elt
-            }}
-          >
-            {formatMessage('Dismiss {itemTitle}', {itemTitle: this.props.item.title})}
-          </CloseButton>
-        </div>
+        {!this.props.isObserving && (
+          <div className="ToDoSidebarItem__Close">
+            <CloseButton
+              variant="icon"
+              size="small"
+              onClick={this.handleClick}
+              buttonRef={elt => {
+                this.buttonRef = elt
+              }}
+            >
+              {formatMessage('Dismiss {itemTitle}', {itemTitle: this.props.item.title})}
+            </CloseButton>
+          </div>
+        )}
       </div>
     )
   }
@@ -173,5 +175,6 @@ ToDoItem.propTypes = {
   }),
   courses: arrayOf(object).isRequired,
   handleDismissClick: func.isRequired,
-  timeZone: string
+  timeZone: string,
+  isObserving: bool
 }

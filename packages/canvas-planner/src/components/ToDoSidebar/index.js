@@ -27,6 +27,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
 import formatMessage from '../../format-message'
+import {observedUserId} from '../../utilities/apiUtils'
 
 import {sidebarLoadInitialItems, sidebarCompleteItem} from '../../actions'
 import ToDoItem from './ToDoItem'
@@ -41,7 +42,8 @@ export class ToDoSidebar extends Component {
     timeZone: string,
     locale: string,
     changeDashboardView: func,
-    forCourse: string
+    forCourse: string,
+    isObserving: bool
   }
 
   static defaultProps = {
@@ -135,6 +137,7 @@ export class ToDoSidebar extends Component {
               handleDismissClick={() => this.handleDismissClick(itemIndex, item)}
               locale={this.props.locale}
               timeZone={this.props.timeZone}
+              isObserving={this.props.isObserving}
             />
           </List.Item>
         ))}
@@ -176,7 +179,8 @@ export class ToDoSidebar extends Component {
 const mapStateToProps = state => ({
   courses: state.courses,
   items: state.sidebar.items,
-  loaded: state.sidebar.loaded
+  loaded: state.sidebar.loaded,
+  isObserving: !!observedUserId(state)
 })
 const mapDispatchToProps = {sidebarLoadInitialItems, sidebarCompleteItem}
 
