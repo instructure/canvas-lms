@@ -38,6 +38,18 @@ describe "Discussion Topic Show" do
       user_session(@teacher)
     end
 
+    context "and when in mobile view" do
+      before do
+        resize_screen_to_mobile_width
+      end
+
+      # change test when VICE-2597 is implemented
+      it "displays mobile header" do
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+        expect(fj("a.mobile-header-title:contains('#{@topic_title}')")).to be_present
+      end
+    end
+
     it "shows the correct number of rubrics in the find rubric option" do
       assignment = @course.assignments.create!(
         name: "Assignment",
