@@ -23,9 +23,10 @@ const localStorageKey = 'dtnpi'
 
 let events
 
-export async function up(options = { throttle: 1000, size: 50 }) {
+export async function up(options = { endpoint: null, throttle: 1000, size: 50 }) {
   const throttle = Math.max(1, Math.min(options.throttle, 1000))
   const size = Math.max(1, options.size)
+  const { endpoint } = options
 
   events = createPersistentArray({
     key: localStorageKey,
@@ -39,7 +40,9 @@ export async function up(options = { throttle: 1000, size: 50 }) {
   // submit events that have been collected so far:
   const collected = [].concat(events)
 
-  await postToBackend(collected)
+  if (endpoint && collected.length) {
+    await postToBackend({ endpoint, events: collected })
+  }
 
   events.splice(0, collected.length)
 }
@@ -56,6 +59,7 @@ export function down() {
 function normalizeEvent(event) {
   return {
     id: event.id,
+    type: 'datepicker_usage',
     locale: window.ENV && window.ENV.LOCALE || null,
     method: event.method,
     parsed: event.parsed,
@@ -66,10 +70,14 @@ function normalizeEvent(event) {
 }
 
 // TODO: submit to an actual backend
-function postToBackend(events): Promise<void> {
-  return new Promise<void>(resolve => {
-    console.log(`[dtnpi] submitting ${events.length} events to backend:`, events)
-
-    resolve()
+function postToBackend({ endpoint, events }): Promise<void> {
+  return fetch(endpoint, {
+    method: 'PUT',
+    mode: 'cors',
+    credentials: 'omit',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(events)
   })
 }
