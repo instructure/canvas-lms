@@ -55,7 +55,12 @@
       <% if report.account_id %>
         <%= before_label :account, "account" %> <%= link_to report.account.try(:name), account_url(report.account_id) %><br />
       <% end %>
-      <%= before_label :category, "category" %> <%= report.category || t(:default_category, 'default') %><br/>
+      <% if report.category %>
+        <%= before_label :category, "category" %> <%= report.category %><br/>
+      <% end %>
+      <% if report.subject %>
+        <%= before_label :subject, "subject" %> <%= report.subject %><br/>
+      <% end %>
       <%= before_label :created_at, "created at" %> <%= report.created_at %><br />
       <% if report.user_id %>
         <%= before_label :user, "user" %> <%= link_to report.user.try(:name), user_url(report.user_id) %><br />
