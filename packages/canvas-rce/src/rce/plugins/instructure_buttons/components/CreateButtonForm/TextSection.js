@@ -34,8 +34,8 @@ const TEXT_POSITIONS = ['middle', 'bottom-third', 'below']
 const getTextSection = () => document.querySelector('#buttons-tray-text-section')
 
 export const TextSection = ({settings, onChange}) => {
-  const [text, setText] = useDebouncedValue(settings.text, text => {
-    if (text.length <= MAX_TOTAL_TEXT_CHARS) onChange({text})
+  const [text, setText] = useDebouncedValue(settings.text, t => {
+    if (t.length <= MAX_TOTAL_TEXT_CHARS) onChange({text: t})
   })
 
   return (
