@@ -2,19 +2,15 @@
 
 set -ex
 
-TEST_FILE=""
+for TEST_FILE in Gemfile.*.lock; do
+  echo "checking $TEST_FILE with snyk"
 
-if test -f "Gemfile.lock"; then
-  TEST_FILE="Gemfile.lock"
-elif test -f "Gemfile.lock.next"; then
-  TEST_FILE="Gemfile.lock.next"
-else
+  npx snyk auth $SNYK_TOKEN
+  npx snyk test --severity-threshold=low --file=$TEST_FILE --org=instructure --project-name=canvas-lms:ruby --packageManager=rubygems || true
+  npx snyk monitor --severity-threshold=low --file=$TEST_FILE --org=instructure --project-name=canvas-lms:ruby --packageManager=rubygems
+done
+
+if [[ -z "$TEST_FILE" ]]; then
   echo "could not find any supported file to check"
   exit 1
 fi
-
-echo "checking $TEST_FILE with snyk"
-
-npx snyk auth $SNYK_TOKEN
-npx snyk test --severity-threshold=low --file=$TEST_FILE --org=instructure --project-name=canvas-lms:ruby --packageManager=rubygems || true
-npx snyk monitor --severity-threshold=low --file=$TEST_FILE --org=instructure --project-name=canvas-lms:ruby --packageManager=rubygems

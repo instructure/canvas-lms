@@ -32,22 +32,19 @@ elsif RUBY_VERSION >= "3.0.0" && RUBY_VERSION < "3.1"
 end
 ruby ">= 2.7.0", "< 3.1"
 
-# force a different lockfile for next rails
-if CANVAS_RAILS >= "6.1"
-  Bundler::SharedHelpers.class_eval do
-    class << self
-      def default_lockfile
-        lockfile = +"#{Bundler.default_gemfile}.lock"
-        lockfile << ".next"
-        Pathname.new(lockfile)
-      end
+# Add the version number to the Gemfile.lock as Gemfile.<version>.lock
+Bundler::SharedHelpers.class_eval do
+  class << self
+    def default_lockfile
+      lockfile = "#{Bundler.default_gemfile}.rails#{CANVAS_RAILS.delete(".")}.lock"
+      Pathname.new(lockfile)
     end
   end
+end
 
-  Bundler::Dsl.class_eval do
-    def to_definition(_lockfile, unlock)
-      @sources << @rubygems_source if @sources.respond_to?(:include?) && !@sources.include?(@rubygems_source)
-      Definition.new(Bundler.default_lockfile, @dependencies, @sources, unlock, @ruby_version)
-    end
+Bundler::Dsl.class_eval do
+  def to_definition(_lockfile, unlock)
+    @sources << @rubygems_source if @sources.respond_to?(:include?) && !@sources.include?(@rubygems_source)
+    Definition.new(Bundler.default_lockfile, @dependencies, @sources, unlock, @ruby_version)
   end
 end

@@ -29,8 +29,7 @@
 /db/*sql
 docker-compose.override.yml
 /exports/
-Gemfile.lock
-Gemfile.lock.next
+Gemfile.*.lock
 /log/*
 !/log/.keep
 !/log/parallel-runtime-rspec.log
