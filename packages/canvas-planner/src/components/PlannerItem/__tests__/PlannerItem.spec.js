@@ -545,11 +545,6 @@ it('disables the checkbox when toggleAPIPending is true', () => {
   expect(wrapper.find('Checkbox').prop('disabled')).toBe(true)
 })
 
-it('renders the checkbox as disabled when isObserving', () => {
-  const wrapper = shallow(<PlannerItem {...defaultProps()} isObserving />)
-  expect(wrapper.find('Checkbox').prop('disabled')).toBe(true)
-})
-
 it('registers itself as animatable', () => {
   const fakeRegister = jest.fn()
   const fakeDeregister = jest.fn()
@@ -657,6 +652,27 @@ it('renders media feedback if available', () => {
   })
   const wrapper = shallow(<PlannerItem {...props} />)
   expect(wrapper).toMatchSnapshot()
+})
+
+describe('with isObserving', () => {
+  it('renders the checkbox as disabled when isObserving', () => {
+    const wrapper = shallow(<PlannerItem {...defaultProps()} isObserving />)
+    expect(wrapper.find('Checkbox').prop('disabled')).toBe(true)
+  })
+
+  it('does not render the edit button when isObserving', () => {
+    const wrapper = shallow(
+      <PlannerItem
+        {...defaultProps({
+          associated_item: 'To Do',
+          completed: false,
+          title: 'I am a to do'
+        })}
+        isObserving
+      />
+    )
+    expect(wrapper.find('[data-testid="edit-event-button"]').exists()).toBeFalsy()
+  })
 })
 
 describe('the "Join" button', () => {

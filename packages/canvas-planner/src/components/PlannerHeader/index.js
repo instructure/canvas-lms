@@ -53,6 +53,7 @@ import theme from './theme'
 import formatMessage from '../../format-message'
 import {notifier} from '../../dynamic-ui'
 import {getFirstLoadedMoment} from '../../utilities/dateUtils'
+import {observedUserId} from '../../utilities/apiUtils'
 
 export class PlannerHeader extends Component {
   static propTypes = {
@@ -74,6 +75,7 @@ export class PlannerHeader extends Component {
     clearUpdateTodo: PropTypes.func.isRequired,
     startLoadingGradesSaga: PropTypes.func.isRequired,
     firstNewActivityDate: momentObj,
+    isObserving: PropTypes.bool,
     days: PropTypes.arrayOf(
       PropTypes.arrayOf(
         PropTypes.oneOfType([
@@ -405,17 +407,19 @@ export class PlannerHeader extends Component {
     return (
       <div className={`${styles.root} PlannerHeader`} data-testid="PlannerHeader">
         {this.renderToday(buttonMargin)}
-        <Button
-          variant="icon"
-          icon={IconPlusLine}
-          margin={buttonMargin}
-          onClick={this.handleToggleTray}
-          ref={b => {
-            this.addNoteBtn = b
-          }}
-        >
-          <ScreenReaderContent>{formatMessage('Add To Do')}</ScreenReaderContent>
-        </Button>
+        {!this.props.isObserving && (
+          <Button
+            variant="icon"
+            icon={IconPlusLine}
+            margin={buttonMargin}
+            onClick={this.handleToggleTray}
+            ref={b => {
+              this.addNoteBtn = b
+            }}
+          >
+            <ScreenReaderContent>{formatMessage('Add To Do')}</ScreenReaderContent>
+          </Button>
+        )}
         <Button
           variant="icon"
           icon={IconGradebookLine}
@@ -444,6 +448,7 @@ export class PlannerHeader extends Component {
               timeZone={this.props.timeZone}
               dismiss={this.props.dismissOpportunity}
               maxHeight={verticalRoom}
+              isObserving={this.props.isObserving}
             />
           </Popover.Content>
         </Popover>
@@ -504,8 +509,20 @@ const mapStateToProps = ({
   days,
   timeZone,
   ui,
-  firstNewActivityDate
-}) => ({opportunities, loading, courses, todo, days, timeZone, ui, firstNewActivityDate})
+  firstNewActivityDate,
+  selectedObservee,
+  currentUser
+}) => ({
+  opportunities,
+  loading,
+  courses,
+  todo,
+  days,
+  timeZone,
+  ui,
+  firstNewActivityDate,
+  isObserving: !!observedUserId({selectedObservee, currentUser})
+})
 const mapDispatchToProps = {
   savePlannerItem,
   deletePlannerItem,

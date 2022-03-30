@@ -116,10 +116,7 @@ it('renders the title as an a tag when given an href prop', () => {
 
 it('renders out the title as a Text when not given an href prop', () => {
   const wrapper = mount(<ToDoItem {...getDefaultProps()} />)
-  const title = wrapper
-    .find('.ToDoSidebarItem__Title')
-    .find('Text')
-    .first()
+  const title = wrapper.find('.ToDoSidebarItem__Title').find('Text').first()
   expect(title.exists()).toBe(true)
   expect(title.text()).toBe('Introduction to Board Games')
 })
@@ -141,4 +138,10 @@ it('calls the handleDismissClick prop when the dismiss X is clicked', () => {
       title: 'Introduction to Board Games'
     })
   )
+})
+
+it('does not render the dismiss button when isObserving', () => {
+  const wrapper = mount(<ToDoItem {...getDefaultProps()} isObserving />)
+  const dismissButton = wrapper.find('.ToDoSidebarItem__Close').find('button')
+  expect(dismissButton.exists()).toBeFalsy()
 })

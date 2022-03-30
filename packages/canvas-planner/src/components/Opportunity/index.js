@@ -22,7 +22,7 @@ import {Button} from '@instructure/ui-buttons'
 import {Pill} from '@instructure/ui-pill'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconXLine} from '@instructure/ui-icons'
-import {string, number, func, object} from 'prop-types'
+import {string, bool, number, func, object} from 'prop-types'
 import {getFullDateAndTime} from '../../utilities/dateUtils'
 import formatMessage from '../../format-message'
 import {animatable} from '../../dynamic-ui'
@@ -42,7 +42,8 @@ export class Opportunity extends Component {
     plannerOverride: object,
     registerAnimatable: func,
     deregisterAnimatable: func,
-    animatableIndex: number
+    animatableIndex: number,
+    isObserving: bool
   }
 
   constructor(props) {
@@ -89,7 +90,7 @@ export class Opportunity extends Component {
     const isDismissed = this.props.plannerOverride && this.props.plannerOverride.dismissed
     return (
       <div className={styles.close}>
-        {isDismissed ? null : (
+        {isDismissed || this.props.isObserving ? null : (
           <Button
             onClick={this.dismiss}
             variant="icon"
