@@ -237,7 +237,7 @@ class FileUpload extends Component {
 
     const flexLineProps = {
       ...(desktop
-        ? {width: '120px', padding: '0 xx-small', height: '300px'}
+        ? {width: '120px', padding: '0 xx-small', height: '310px'}
         : {width: '400px', height: '50px', padding: 'small'}),
       ...(mobileOnly && {width: '100%'})
     }
@@ -295,7 +295,7 @@ class FileUpload extends Component {
               {context.allowChangesToSubmission && (
                 <Flex.Item textAlign="center" as="div" {...flexLineProps}>
                   <div style={lineContainerStyle}>
-                    <span style={textOrStyle}>Or</span>
+                    <span style={textOrStyle}>{I18n.t('or')}</span>
                     <div style={lineStyle}>&nbsp;</div>
                   </div>
                 </Flex.Item>
@@ -417,17 +417,15 @@ class FileUpload extends Component {
     }
 
     return (
-      <View as="div" background="secondary" borderWidth="small none" padding="0 0 xx-large 0">
-        <Flex data-testid="upload-pane" direction="column" width="100%" alignItems="stretch">
-          <Flex.Item overflowY="hidden" padding="large small">
-            {this.renderUploadBox()}
-          </Flex.Item>
+      <Flex data-testid="upload-pane" direction="column" width="100%" alignItems="stretch">
+        <Flex.Item overflowY="hidden" padding="large small">
+          {this.renderUploadBox()}
+        </Flex.Item>
 
-          {files.length > 0 && (
-            <Flex.Item padding="0 x-large">{this.renderUploadedFiles(files)}</Flex.Item>
-          )}
-        </Flex>
-      </View>
+        {files.length > 0 && (
+          <Flex.Item padding="0 x-large x-large">{this.renderUploadedFiles(files)}</Flex.Item>
+        )}
+      </Flex>
     )
   }
 }
