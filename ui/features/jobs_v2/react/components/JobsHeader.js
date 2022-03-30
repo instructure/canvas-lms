@@ -20,9 +20,12 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {SimpleSelect} from '@instructure/ui-simple-select'
+import {ToggleButton} from '@instructure/ui-buttons'
+import {View} from '@instructure/ui-view'
+import {IconPlaySolid, IconPauseSolid} from '@instructure/ui-icons'
 
 const I18n = useI18nScope('jobs_v2')
 
@@ -32,7 +35,9 @@ export default function JobsHeader({
   jobGroup,
   onChangeGroup,
   jobScope,
-  onChangeScope
+  onChangeScope,
+  autoRefresh,
+  onChangeAutoRefresh
 }) {
   return (
     <Flex wrap="wrap">
@@ -73,9 +78,14 @@ export default function JobsHeader({
         </FormFieldGroup>
       </Flex.Item>
       <Flex.Item margin="0 large"> | </Flex.Item>
+      <Flex.Item align="end" margin="0 x-small x-small 0">
+        <PresentationContent>
+          <strong>{I18n.t('Scope:')}</strong>
+        </PresentationContent>
+      </Flex.Item>
       <Flex.Item align="end" shouldGrow>
         <SimpleSelect
-          renderLabel={I18n.t('Scope')}
+          renderLabel={<ScreenReaderContent>{I18n.t('Scope')}</ScreenReaderContent>}
           onChange={onChangeScope}
           value={ENV.jobs_scope_filter[jobScope]}
         >
@@ -87,6 +97,22 @@ export default function JobsHeader({
             )
           })}
         </SimpleSelect>
+      </Flex.Item>
+      <Flex.Item>
+        <View padding="small">
+          <ToggleButton
+            status={autoRefresh ? 'pressed' : 'unpressed'}
+            color={autoRefresh ? 'primary' : 'secondary'}
+            renderIcon={autoRefresh ? IconPauseSolid : IconPlaySolid}
+            screenReaderLabel={
+              autoRefresh ? I18n.t('Pause auto-refresh') : I18n.t('Start auto-refresh')
+            }
+            renderTooltipContent={
+              autoRefresh ? I18n.t('Pause auto-refresh') : I18n.t('Start auto-refresh')
+            }
+            onClick={onChangeAutoRefresh}
+          />
+        </View>
       </Flex.Item>
     </Flex>
   )
