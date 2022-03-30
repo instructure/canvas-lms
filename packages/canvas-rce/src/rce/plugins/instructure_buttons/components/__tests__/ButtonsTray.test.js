@@ -374,6 +374,10 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
       fetchMock.restore()
     })
 
+    it('renders the create view', () => {
+      expect(subject().getByRole('heading', {name: /edit icon/i})).toBeInTheDocument()
+    })
+
     it('loads the standard SVG metadata', async () => {
       const {getByLabelText, getByTestId} = subject()
 
