@@ -8,10 +8,8 @@ unless defined?(Spring)
   require 'rubygems'
   require 'bundler'
 
-  ENV['BUNDLE_GEMFILE'] ||= File.expand_path('../../Gemfile', __FILE__)
-  default_lockfile = Bundler.default_lockfile
-  next_lockfile = default_lockfile.dirname + "Gemfile.lock.next"
-  lockfile_name = [next_lockfile, default_lockfile].find(&:exist?)
+  rails_version = ENV["CANVAS_RAILS"] || "6.0"
+  lockfile_name = Bundler.default_lockfile.dirname + "Gemfile.rails#{rails_version.delete(".")}.lock"
   lockfile = Bundler::LockfileParser.new(lockfile_name.read)
   spring = lockfile.specs.detect { |spec| spec.name == 'spring' }
   if spring
