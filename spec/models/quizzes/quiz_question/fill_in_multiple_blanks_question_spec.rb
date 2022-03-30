@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency "quizzes/quiz_question/base"
-
 describe Quizzes::QuizQuestion::FillInMultipleBlanksQuestion do
   let(:answer1) { { id: 1, blank_id: "blank1", text: "First", weight: 100 } }
   let(:answer2) { { id: 2, blank_id: "blank2", text: "Second", weight: 100 } }

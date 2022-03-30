@@ -71,4 +71,6 @@ File.open("crystalball_map.yml", "w") do |file|
   end
 end
 
-puts "Crystalball Map Created for #{map_body.keys.count} tests!"
+map_files = map_body.keys.map { |spec_file| spec_file.split("[").first.gsub(%r{^"./}, "") }.uniq
+
+puts "Crystalball Map Created for #{map_body.keys.count} tests in #{map_files.count} files"

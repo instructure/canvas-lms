@@ -38,10 +38,15 @@ def createDistribution(nestedStages) {
     "FORCE_FAILURE=${configuration.isForceFailureSelenium() ? '1' : ''}",
     "RERUNS_RETRY=${configuration.getInteger('rspecq-max-requeues')}",
     "RSPEC_PROCESSES=${configuration.getInteger('rspecq-processes')}",
-    "RSPECQ_FILE_SPLIT_THRESHOLD=${configuration.fileSplitThreshold()}",
     "RSPECQ_MAX_REQUEUES=${configuration.getInteger('rspecq-max-requeues')}",
     "RSPECQ_UPDATE_TIMINGS=${env.GERRIT_EVENT_TYPE == 'change-merged' ? '1' : '0'}",
   ]
+
+  if(env.CRYSTALBALL_MAP == '1') {
+    rspecqEnvVars = rspecqEnvVars + ['RSPECQ_FILE_SPLIT_THRESHOLD=9999', 'CRYSTALBALL_MAP=1']
+  } else {
+    rspecqEnvVars = rspecqEnvVars + ["RSPECQ_FILE_SPLIT_THRESHOLD=${configuration.fileSplitThreshold()}"]
+  }
 
   if(env.ENABLE_AXE_SELENIUM == '1') {
     rspecqEnvVars = rspecqEnvVars + ['TEST_PATTERN=^./(spec|gems/plugins/.*/spec_canvas)/selenium']
@@ -63,35 +68,6 @@ def createDistribution(nestedStages) {
       .nodeRequirements(RSPEC_NODE_REQUIREMENTS)
       .timeout(15)
       .queue(nestedStages, this.&runRspecqSuite)
-  }
-}
-
-def createLegacyDistribution(nestedStages) {
-  def setupNodeHook = this.&setupNode
-  def baseEnvVars = [
-    'POSTGRES_PASSWORD=sekret'
-  ]
-
-  // Used only for crystalball map generation
-  def legacyNodeTotal = configuration.getInteger('selenium-ci-node-total')
-  def legacyEnvVars = baseEnvVars + [
-    "CI_NODE_TOTAL=$legacyNodeTotal",
-    'COMPOSE_FILE=docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml',
-    'EXCLUDE_TESTS=.*/(selenium/performance|instfs/selenium)',
-    "FORCE_FAILURE=${configuration.isForceFailureSelenium() ? '1' : ''}",
-    "RERUNS_RETRY=${configuration.getInteger('selenium-rerun-retry')}",
-    "RSPEC_PROCESSES=${configuration.getInteger('selenium-processes')}",
-    'TEST_PATTERN=^./(spec|gems/plugins/.*/spec_canvas)/', // Crystalball map needs to run all specs
-    'CRYSTALBALL_MAP=1'
-  ]
-
-  legacyNodeTotal.times { index ->
-    extendedStage("Legacy Test Set ${(index + 1).toString().padLeft(2, '0')}")
-      .envVars(legacyEnvVars + ["CI_NODE_INDEX=$index"])
-      .hooks([onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('selenium') }])
-      .nodeRequirements(RSPEC_NODE_REQUIREMENTS)
-      .timeout(45)
-      .queue(nestedStages, this.&runLegacySuite)
   }
 }
 
@@ -192,6 +168,7 @@ def runRspecqSuite() {
                                        -e COVERAGE \
                                        -e BUILD_NAME \
                                        -e BUILD_NUMBER \
+                                       -e CRYSTALBALL_MAP \
                                        -e CRYSTAL_BALL_SPECS canvas bash -c \'build/new-jenkins/rspecq-tests.sh\'', label: 'Run RspecQ Tests')
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
     if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
@@ -215,25 +192,6 @@ def runRspecqSuite() {
     cancel_node(SUCCESS_UNSTABLE, "RspecQ node failed!: ${err}")
     /* groovylint-disable-next-line ReturnNullFromCatchBlock */
     return
-  }
-}
-
-def runLegacySuite() {
-  try {
-    sh(script: 'docker-compose exec -T -e RSPEC_PROCESSES -e ENABLE_AXE_SELENIUM -e CRYSTALBALL_MAP canvas bash -c \'build/new-jenkins/rspec-with-retries.sh\'', label: 'Run Tests')
-  } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
-    if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
-      /* groovylint-disable-next-line GStringExpressionWithinString */
-      sh '''#!/bin/bash
-        ids=( $(docker ps -aq --filter "name=canvas_") )
-        for i in "${ids[@]}"
-        do
-          docker exec $i bash -c "cat /usr/src/app/log/cmd_output/*.log"
-        done
-      '''
-    }
-
-    throw e
   }
 }
 

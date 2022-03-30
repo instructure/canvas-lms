@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../lib/canvas/draft_state_validations_spec"
+require_relative "../../lib/canvas/draft_state_validations_examples"
 
 describe Quizzes::Quiz do
   before :once do

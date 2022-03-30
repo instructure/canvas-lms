@@ -19,12 +19,25 @@
 #
 
 require "yaml"
-SPEC_THRESHOLD = 35_000
+
+SPEC_THRESHOLD = 40_000
 
 spec_count = YAML.load_file("crystalball_map.yml")[:version].split[0].to_i
+spec_files_in_map = File.read("crystalball_map.yml").split("\n").grep(/spec\.rb\[\d*\]/).map { |file| file.split("[").first.gsub(%r{^"./}, "") }.uniq
+spec_files_in_code = (Dir.glob("/usr/src/app/spec/**/*spec.rb") + Dir.glob("/usr/src/app/gems/plugins/**/spec_canvas/**/*spec.rb")).uniq.map { |file| file.gsub("/usr/src/app/", "") }
+
+# Remove filtered out specs
+spec_files_in_code.reject! { |file| file.match?("(selenium/performance|instfs/selenium|contracts|force_failure)") }
+
+delta_spec_files = spec_files_in_code - spec_files_in_map
+
+unless delta_spec_files.empty?
+  puts "*#{delta_spec_files.count} Missing Spec Files in crystalball_map.yml*"
+  puts(delta_spec_files.map { |file| " - #{file}" })
+end
 
 if spec_count >= SPEC_THRESHOLD
-  puts "Map Contains #{spec_count} specs"
+  puts "*Map Contains #{spec_count} specs*"
 else
-  raise "Map Only Contains #{spec_count} Specs, but #{SPEC_THRESHOLD} required to push map"
+  raise "*Map Only Contains #{spec_count} Specs, but #{SPEC_THRESHOLD} required to push map*"
 end
