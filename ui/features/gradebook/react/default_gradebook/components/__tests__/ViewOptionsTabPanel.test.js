@@ -38,6 +38,10 @@ describe('ViewOptionsTabPanel', () => {
         checked: false,
         onChange: jest.fn()
       },
+      hideTotal: {
+        checked: false,
+        onChange: jest.fn()
+      },
       showNotes: {
         checked: true,
         onChange: jest.fn()
@@ -223,6 +227,32 @@ describe('ViewOptionsTabPanel', () => {
       })
 
       fireEvent.click(getByRole('checkbox', {name: 'Hide Assignment Group Totals'}))
+      expect(onChange).toHaveBeenCalledWith(true)
+    })
+  })
+
+  describe('.hideTotal', () => {
+    it('is checked if .checked is true', () => {
+      const {getByRole} = renderPanel({
+        hideTotal: {checked: true, onChange: () => {}}
+      })
+      expect(getByRole('checkbox', {name: 'Hide Total and Override Columns'})).toBeChecked()
+    })
+
+    it('is unchecked if .checked is false', () => {
+      const {getByRole} = renderPanel({
+        hideTotal: {allowed: true, checked: false, onChange: () => {}}
+      })
+      expect(getByRole('checkbox', {name: 'Hide Total and Override Columns'})).not.toBeChecked()
+    })
+
+    it('calls .onChange when the user toggles the item', () => {
+      const onChange = jest.fn()
+      const {getByRole} = renderPanel({
+        hideTotal: {allowed: true, checked: false, onChange}
+      })
+
+      fireEvent.click(getByRole('checkbox', {name: 'Hide Total and Override Columns'}))
       expect(onChange).toHaveBeenCalledWith(true)
     })
   })

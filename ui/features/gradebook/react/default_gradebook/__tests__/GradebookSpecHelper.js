@@ -73,6 +73,7 @@ export const defaultGradebookEnv = {
   ],
   has_modules: true,
   hideAssignmentGroupTotals: false,
+  hideTotal: false,
   hideGrid: true,
   latePolicyStatusDisabled: false,
   locale: 'en',

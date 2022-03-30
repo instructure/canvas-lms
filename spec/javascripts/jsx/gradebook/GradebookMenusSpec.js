@@ -38,6 +38,18 @@ QUnit.module('Gradebook#getViewOptionsMenuProps', () => {
     strictEqual(hideAssignmentGroupTotals, false)
   })
 
+  test('hideTotal is true when settings.hide_total is "true"', () => {
+    const settings = {hide_total: 'true'}
+    const {hideTotal} = createGradebook({settings}).getViewOptionsMenuProps()
+    strictEqual(hideTotal, true)
+  })
+
+  test('hideTotal is false when settings.hide_total is "false"', () => {
+    const settings = {hide_total: 'false'}
+    const {hideTotal} = createGradebook({settings}).getViewOptionsMenuProps()
+    strictEqual(hideTotal, false)
+  })
+
   test('showSeparateFirstLastNames is false', () => {
     const {showSeparateFirstLastNames} = createGradebook().getViewOptionsMenuProps()
     strictEqual(showSeparateFirstLastNames, false)

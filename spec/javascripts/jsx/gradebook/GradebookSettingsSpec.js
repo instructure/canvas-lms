@@ -566,6 +566,9 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
     container2 = document.body.appendChild(document.createElement('div'))
     const component = React.createElement(Gradebook, {
       ...defaultGradebookProps,
+      course_settings: {
+        allow_final_grade_override: true
+      },
       allow_view_ungraded_as_zero: true,
       context_id: '100',
       enhanced_gradebook_filters: true,
@@ -668,7 +671,8 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
         'assignment_2302',
         'assignment_2301',
         'assignment_group_2201',
-        'total_grade'
+        'total_grade',
+        'total_grade_override'
       ])
     })
 
@@ -685,7 +689,8 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
           'assignment_2301',
           'assignment_2302',
           'assignment_group_2201',
-          'total_grade'
+          'total_grade',
+          'total_grade_override'
         ])
       }
     })
@@ -774,6 +779,7 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
     QUnit.module('when updating items stored in user settings', () => {
       const updateParams = (overrides = {}) => ({
         hideAssignmentGroupTotals: false,
+        hideTotal: false,
         showUnpublishedAssignments: false,
         showSeparateFirstLastNames: false,
         statusColors: gradebook.state.gridColors,
@@ -852,6 +858,34 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
           } catch {
             ok(gradebook.gridData.columns.scrollable.includes('assignment_group_2201'))
           }
+        })
+      })
+
+      QUnit.module('updating hideTotal', () => {
+        test('hides Total column when hideTotal is set to true', async () => {
+          await gradebook.handleViewOptionsUpdated(updateParams({hideTotal: true}))
+          notOk(gradebook.gridData.columns.scrollable.includes('total'))
+        })
+
+        test('shows Total columns when hideTotal is set to false', async () => {
+          await gradebook.handleViewOptionsUpdated(updateParams({hideTotal: false}))
+          ok(gradebook.gridData.columns.scrollable.includes('total_grade'))
+        })
+
+        test('does not hide Total column if the request fails', async () => {
+          QUnit.expect(1)
+          GradebookApi.saveUserSettings.rejects(new Error('no way'))
+
+          try {
+            await gradebook.handleViewOptionsUpdated(updateParams({hideTotal: true}))
+          } catch {
+            ok(gradebook.gridData.columns.scrollable.includes('total_grade'))
+          }
+        })
+
+        test('hides Override columnn when hideTotal is set to true', async () => {
+          await gradebook.handleViewOptionsUpdated(updateParams({hideTotal: true}))
+          notOk(gradebook.gridData.columns.scrollable.includes('total_grade_override'))
         })
       })
 
@@ -1110,6 +1144,60 @@ QUnit.module('Gradebook#toggleHideAssignmentGroupTotals', hooks => {
 
     deepEqual(gradebook.saveSettings.firstCall.args[0], {
       hideAssignmentGroupTotals: true
+    })
+  })
+})
+
+QUnit.module('Gradebook#toggleHideTotal', hooks => {
+  let gradebook
+
+  hooks.beforeEach(() => {
+    setFixtureHtml($fixtures)
+    gradebook = createGradebook({
+      grid: {
+        getColumns: () => [],
+        updateCell: sinon.stub()
+      }
+    })
+
+    sandbox.stub(gradebook, 'saveSettings').callsFake(() => Promise.resolve())
+  })
+
+  test('toggles hideTotal to true when false', () => {
+    gradebook.gridDisplaySettings.hideTotal = false
+    sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
+    gradebook.toggleHideTotal()
+
+    strictEqual(gradebook.gridDisplaySettings.hideTotal, true)
+  })
+
+  test('toggles hideTotal to false when true', () => {
+    gradebook.gridDisplaySettings.hideTotal = true
+    sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
+    gradebook.toggleHideTotal()
+
+    strictEqual(gradebook.gridDisplaySettings.hideTotal, false)
+  })
+
+  test('calls updateColumnsAndRenderViewOptionsMenu after toggling', () => {
+    gradebook.gridDisplaySettings.hideTotal = true
+    const stubFn = sandbox
+      .stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
+      .callsFake(() => {
+        strictEqual(gradebook.gridDisplaySettings.hideTotal, false)
+      })
+    gradebook.toggleHideTotal()
+    strictEqual(stubFn.callCount, 1)
+  })
+
+  test('calls saveSettings with the new value of the setting', () => {
+    gradebook.gridDisplaySettings.hideTotal = false
+    sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
+
+    gradebook.toggleHideTotal()
+
+    deepEqual(gradebook.saveSettings.firstCall.args[0], {
+      hideTotal: true
     })
   })
 })
