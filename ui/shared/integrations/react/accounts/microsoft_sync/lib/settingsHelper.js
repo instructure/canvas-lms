@@ -16,9 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!account_settings_jsx_bundle'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {pick} from 'lodash'
+
+const I18n = useI18nScope('account_settings_jsx_bundle');
 
 export const SYNC_SETTINGS = [
   'microsoft_sync_enabled',

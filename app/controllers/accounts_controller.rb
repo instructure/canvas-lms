@@ -302,6 +302,7 @@ class AccountsController < ApplicationController
   include Api::V1::Account
   include CustomSidebarLinksHelper
   include SupportHelpers::ControllerHelpers
+  include DefaultDueTimeHelper
 
   INTEGER_REGEX = /\A[+-]?\d+\z/.freeze
   SIS_ASSINGMENT_NAME_LENGTH_DEFAULT = 255
@@ -1041,6 +1042,13 @@ class AccountsController < ApplicationController
           params[:account][:settings][:outgoing_email_default_name] = ""
         end
 
+        emoji_deny_list = params[:account][:settings].try(:delete, :emoji_deny_list)
+        if @account.feature_allowed?(:submission_comment_emojis) &&
+           @account.root_account? &&
+           !@account.site_admin?
+          @account.settings[:emoji_deny_list] = emoji_deny_list
+        end
+
         if @account.grants_right?(@current_user, :manage_site_settings)
           google_docs_domain = params[:account][:settings].try(:delete, :google_docs_domain)
           if @account.feature_enabled?(:google_docs_domain_restriction) &&
@@ -1126,6 +1134,11 @@ class AccountsController < ApplicationController
             # Invalidate the cached k5 settings for all users in the account
             @account.root_account.clear_k5_cache
           end
+        end
+
+        # validate/normalize default due time parameter
+        if (default_due_time = params.dig(:account, :settings, :default_due_time, :value))
+          params[:account][:settings][:default_due_time][:value] = normalize_due_time(default_due_time)
         end
 
         # Set default Dashboard view
@@ -1228,7 +1241,8 @@ class AccountsController < ApplicationController
                  REDIRECT_URI: MicrosoftSync::LoginService::REDIRECT_URI,
                  BASE_URL: MicrosoftSync::LoginService::BASE_URL
                },
-               COURSE_CREATION_SETTINGS: course_creation_settings
+               COURSE_CREATION_SETTINGS: course_creation_settings,
+               EMOJI_DENY_LIST: @account.root_account.settings[:emoji_deny_list]
              })
       js_env(edit_help_links_env, true)
     end
@@ -1749,7 +1763,8 @@ class AccountsController < ApplicationController
                                    :smart_alerts_threshold, :enable_fullstory, :enable_google_analytics,
                                    { enable_as_k5_account: [:value, :locked] }.freeze,
                                    :enable_push_notifications, :teachers_can_create_courses_anywhere,
-                                   :students_can_create_courses_anywhere].freeze
+                                   :students_can_create_courses_anywhere,
+                                   { default_due_time: [:value] }.freeze].freeze
 
   def permitted_account_attributes
     [:name, :turnitin_account_id, :turnitin_shared_secret, :include_crosslisted_courses,

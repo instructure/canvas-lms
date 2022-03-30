@@ -16,10 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import I18n from 'i18n!modelsOutcome'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
 import Backbone from '@canvas/backbone'
 import CalculationMethodContent from '@canvas/grade-summary/backbone/models/CalculationMethodContent'
+
+I18n = useI18nScope('modelsOutcome')
 
 export default class Outcome extends Backbone.Model
   defaults:

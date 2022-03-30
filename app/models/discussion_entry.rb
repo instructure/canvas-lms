@@ -25,6 +25,7 @@ class DiscussionEntry < ActiveRecord::Base
   include SendToStream
   include TextHelper
   include HtmlTextHelper
+  include Api
 
   attr_readonly :discussion_topic_id, :user_id, :parent_id, :is_anonymous_author
   has_many :discussion_entry_drafts, inverse_of: :discussion_entry

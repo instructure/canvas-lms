@@ -396,10 +396,10 @@
     </xs:complexType>
   </xs:element>
 
-  <xs:element name="pace_plans">
+  <xs:element name="course_paces">
     <xs:complexType>
       <xs:sequence minOccurs="0" maxOccurs="unbounded">
-        <xs:element name="pace_plan">
+        <xs:element name="course_pace">
           <xs:complexType>
             <xs:all minOccurs="0">
               <xs:element name="workflow_state" type="xs:string" minOccurs="0"/>

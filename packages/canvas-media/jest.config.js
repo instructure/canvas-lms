@@ -33,5 +33,12 @@ module.exports = {
   setupFilesAfterEnv: ['@testing-library/jest-dom/extend-expect'],
   testEnvironment: 'jest-environment-jsdom-fourteen',
   testMatch: ['**/__tests__/**/?(*.)(spec|test).js'],
-  testPathIgnorePatterns: ['<rootDir>/node_modules', '<rootDir>/lib', '<rootDir>/es']
+  testPathIgnorePatterns: ['<rootDir>/node_modules', '<rootDir>/lib', '<rootDir>/es'],
+  transform: {
+    '\\.jsx?$': ['babel-jest', {
+      // use the CJS config until we're on Jest 27 and can look into loading
+      // ESMs natively; https://jestjs.io/docs/ecmascript-modules
+      configFile: require.resolve('./babel.config.cjs.js')
+    }]
+  }
 }

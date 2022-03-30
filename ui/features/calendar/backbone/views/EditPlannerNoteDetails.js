@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!calendar'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import $ from 'jquery'
 import tz from '@canvas/timezone'
 import htmlEscape from 'html-escape'
@@ -30,6 +30,8 @@ import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView.coffee'
 import '../../fcMomentHandlebarsHelpers'
+
+const I18n = useI18nScope('calendar');
 
 export default class EditPlannerNoteDetails extends ValidatedFormView {
   events = {

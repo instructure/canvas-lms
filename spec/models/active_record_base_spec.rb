@@ -884,7 +884,7 @@ end
 describe ActiveRecord::ConnectionAdapters::ConnectionPool do
   # create a private pool, with the same config as the regular pool, but ensure
   # max_runtime is set
-  if CANVAS_RAILS6_0
+  if Rails.version < "6.1"
     let(:spec) do
       ActiveRecord::ConnectionAdapters::ConnectionSpecification.new(
         "spec",

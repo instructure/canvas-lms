@@ -19,18 +19,26 @@
 
 # NOTE: Indented gems are meant to indicate transient dependencies of parent gems
 
-if CANVAS_RAILS6_0
+def gem_override(name, version)
+  if File.directory?("vendor/#{name}")
+    gem name, path: "vendor/#{name}"
+  else
+    gem name, version
+  end
+end
+
+if CANVAS_RAILS == "6.0"
   gem "rails", "6.0.4.2"
     gem "tzinfo", "1.2.7"
-  gem "switchman", "2.2.2"
+  gem_override "switchman", "2.2.3"
     gem "guardrail", "2.0.1"
-  gem "switchman-inst-jobs", "3.2.10"
+  gem_override "switchman-inst-jobs", "3.2.10"
 else
   gem "rails", "6.1.4.6"
     gem "tzinfo", "2.0.4"
-  gem "switchman", "3.0.8"
+  gem_override "switchman", "3.0.16"
     gem "guardrail", "3.0.0"
-  gem "switchman-inst-jobs", "4.0.6"
+  gem_override "switchman-inst-jobs", "4.0.6"
 end
   gem "irb", "1.4.1"
   gem "open4", "1.3.4", require: false
@@ -60,7 +68,7 @@ gem "bcrypt", "3.1.16"
 gem "browser", "5.1.0", require: false
 gem "builder", "3.2.4"
 gem "business_time", "0.10.0"
-gem "canvas_connect", "0.3.14"
+gem "canvas_connect", "0.3.15"
   gem "adobe_connect", "1.0.10", require: false
 gem "canvas_webex", "0.18.1"
 gem "crocodoc-ruby", "0.0.1", require: false
@@ -88,7 +96,7 @@ gem "inst_statsd", "2.2.0"
   gem "statsd-ruby", "1.4.0", require: false
   gem "aroi", "0.0.7", require: false
   gem "dogstatsd-ruby", "4.8.2"
-gem "inst-jobs", "3.0.9"
+gem_override "inst-jobs", "3.0.9"
   gem "fugit", "1.4.0", require: false
     gem "et-orbi", "1.2.4", require: false
 gem "inst-jobs-autoscaling", "2.1.1"

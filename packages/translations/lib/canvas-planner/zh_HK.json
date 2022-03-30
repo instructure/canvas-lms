@@ -99,6 +99,7 @@
   "error_loading_past_items_2881dbb1": { "message": "載入過去項目時發生錯誤" },
   "exciting_discussion_9f67bd0a": { "message": "振奮人心的討論" },
   "excused_cf8792eb": { "message": "已免除" },
+  "failed_getting_course_list_49846a93": { "message": "取得課程表失敗" },
   "failed_peeking_into_your_future_e95b9306": { "message": "無法窺視您的未來" },
   "failed_peeking_into_your_past_5bec2323": { "message": "無法窺視您的過去" },
   "failed_saving_changes_on_name_1e100ad": {

@@ -47,8 +47,8 @@ module CoursesHomePage
     ".ic-notification button[name='accept']"
   end
 
-  def course_pace_plan_selector
-    ".pace_plans"
+  def course_course_pace_selector
+    ".course_paces"
   end
 
   def course_menu_toggle_selector
@@ -96,8 +96,8 @@ module CoursesHomePage
     f("#content")
   end
 
-  def course_pace_plan_link
-    f(course_pace_plan_selector)
+  def course_course_pace_link
+    f(course_course_pace_selector)
   end
 
   def course_menu_toggle
@@ -127,12 +127,12 @@ module CoursesHomePage
     wait_for(method: nil, timeout: 2) { wizard_box.displayed? }
   end
 
-  def click_pace_plans
-    course_pace_plan_link.click
+  def click_course_paces
+    course_course_pace_link.click
   end
 
-  def pace_plans_nav_exists?
-    element_exists?(course_pace_plan_selector)
+  def course_paces_nav_exists?
+    element_exists?(course_course_pace_selector)
   end
 
   def click_course_menu_toggle

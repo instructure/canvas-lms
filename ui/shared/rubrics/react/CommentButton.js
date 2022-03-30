@@ -19,7 +19,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconFeedbackLine} from '@instructure/ui-icons'
-import I18n from 'i18n!edit_rubricCommentButton'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('edit_rubricCommentButton');
 
 const CommentButton = ({onClick}) => (
   <div>

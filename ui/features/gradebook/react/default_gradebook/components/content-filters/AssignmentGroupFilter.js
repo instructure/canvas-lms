@@ -19,8 +19,12 @@
 import React from 'react'
 import {arrayOf, shape, string} from 'prop-types'
 
-import I18n from 'i18n!gradebook_default_gradebook_components_content_filters_assignment_group_filter'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import ContentFilter from '@canvas/gradebook-content-filters/react/ContentFilter'
+
+const I18n = useI18nScope(
+  'gradebook_default_gradebook_components_content_filters_assignment_group_filter'
+);
 
 const ALL_ITEMS_ID = '0'
 

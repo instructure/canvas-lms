@@ -391,6 +391,28 @@ describe('FindOutcomesView', () => {
     expect(getByTestId('load-more-loading')).toBeInTheDocument()
   })
 
+  it('disables the search bar when the "Add All Outcomes" button is pressed', () => {
+    const {getByPlaceholderText} = render(
+      <FindOutcomesView
+        {...defaultProps({
+          importGroupStatus: IMPORT_PENDING
+        })}
+      />
+    )
+    expect(getByPlaceholderText('Search within State Standards').closest('input')).toBeDisabled()
+  })
+
+  it('enables the search bar after an "Add All Outcomes" import is completed', () => {
+    const {getByPlaceholderText} = render(
+      <FindOutcomesView
+        {...defaultProps({
+          importGroupStatus: IMPORT_COMPLETED
+        })}
+      />
+    )
+    expect(getByPlaceholderText('Search within State Standards').closest('input')).toBeEnabled()
+  })
+
   describe('mobile view', () => {
     const mobileRender = children =>
       render(

@@ -18,11 +18,13 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!custom_help_link'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import CustomHelpLinkPropTypes from './CustomHelpLinkPropTypes'
 import CustomHelpLinkHiddenInputs from './CustomHelpLinkHiddenInputs'
 import CustomHelpLinkAction from './CustomHelpLinkAction'
 import {Pill} from '@instructure/ui-pill'
+
+const I18n = useI18nScope('custom_help_link');
 
 export default class CustomHelpLink extends React.Component {
   static propTypes = {

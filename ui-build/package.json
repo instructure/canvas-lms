@@ -2,7 +2,6 @@
   "imports": {
     "#params": "./params.js",
     "#webpack-ember-handlebars-loader": "./webpack/emberHandlebars.js",
-    "#webpack-i18n-plugin": "./webpack/i18nPlugin.js",
     "#webpack-i18nliner-handlebars-loader": "./webpack/i18nLinerHandlebars.js"
   }
 }

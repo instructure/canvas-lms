@@ -31,7 +31,7 @@ Rails.configuration.to_prepare do
     Sentry.init do |config|
       config.dsn = settings[:dsn]
       config.environment = Canvas.environment
-      config.release = Canvas.revision
+      config.release = "canvas-lms@#{Canvas.semver_revision}"
       config.sample_rate = SentryExtensions::Settings.get("sentry_backend_errors_sample_rate", "1.0").to_f
 
       config.traces_sampler = lambda do |sampling_context|

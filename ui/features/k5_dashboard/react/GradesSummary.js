@@ -30,10 +30,12 @@ import {ProgressBar} from '@instructure/ui-progress'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
-import I18n from 'i18n!grades_summary'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import instFSOptimizedImageUrl from '@canvas/dashboard-card/util/instFSOptimizedImageUrl'
 import k5Theme from '@canvas/k5/react/k5-theme'
 import {DEFAULT_COURSE_COLOR} from '@canvas/k5/react/utils'
+
+const I18n = useI18nScope('grades_summary');
 
 const DEFAULT_SIZE = 100
 

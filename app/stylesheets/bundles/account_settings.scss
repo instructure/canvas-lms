@@ -21,6 +21,7 @@
 @import "pages/shared/external_tools.scss";
 @import "pages/shared/feature_flags";
 @import "components/ic-sortable-list.scss";
+@import "components/emoji";
 
 @include mobile-only {
   table.narrow td {
@@ -39,4 +40,9 @@
 
 .delete_filter_link {
   margin: auto 5px;
+}
+
+.aside {
+  font-size: 0.9em;
+  margin-block-start: 0;
 }

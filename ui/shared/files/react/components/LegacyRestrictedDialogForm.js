@@ -18,13 +18,15 @@
 
 import $ from 'jquery'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!restrict_student_access'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import Folder from '../../backbone/models/Folder'
 import customPropTypes from '../modules/customPropTypes'
 import setUsageRights from '../../util/setUsageRights'
 import updateModelsUsageRights from '../../util/updateModelsUsageRights'
 import '@canvas/datetime'
 import '@canvas/forms/jquery/jquery.instructure_forms'
+
+const I18n = useI18nScope('restrict_student_access');
 
 export default {
   displayName: 'RestrictedDialogForm',

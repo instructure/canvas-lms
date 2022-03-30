@@ -705,6 +705,13 @@ describe CanvadocSessionsController do
         get :show, params: { blob: blob.to_json, hmac: hmac }
       end
 
+      it "gets the user role if not passed as a parameter" do
+        expect_any_instance_of(Canvadoc).to receive(:session_url)
+          .with(hash_including(enrollment_type: "student"))
+
+        get :show, params: { blob: blob.to_json, hmac: hmac }
+      end
+
       context "when the attachment belongs to a non-anonymously-graded assignment" do
         it "enables submission annotations if enable_annotations is true" do
           expect_any_instance_of(Canvadoc).to receive(:session_url)

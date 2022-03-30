@@ -25,7 +25,16 @@ import LoadingIndicator from '@canvas/loading-indicator'
 export default function LazyLoad({children, errorCategory}) {
   return (
     <ErrorBoundary
-      errorComponent={<GenericErrorPage imageUrl={errorShipUrl} errorCategory={errorCategory} />}
+      errorComponent={({error}) => {
+        return (
+          <GenericErrorPage
+            imageUrl={errorShipUrl}
+            errorSubject={error.message}
+            errorCategory={errorCategory}
+            stack={error.stack}
+          />
+        )
+      }}
     >
       <Suspense fallback={<LoadingIndicator />}>{children}</Suspense>
     </ErrorBoundary>

@@ -24,7 +24,7 @@ describe I18n do
     # HINT: if this spec fails, run `rake i18n:generate_js`...
     # it probably means you added a format or a new language
     it "is up-to-date" do
-      skip("Rails 6.0 specific") unless CANVAS_RAILS6_0
+      skip("Rails 6.0 specific") if Rails.version >= "6.1"
 
       file_contents = File.read("public/javascripts/translations/_core_en.js")
       translations = I18n.backend.send(:translations)[:en].slice(*I18nTasks::Utils::CORE_KEYS)

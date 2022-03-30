@@ -103,6 +103,7 @@ def postFn(status) {
         dockerUtils.tagRemote(env.CASSANDRA_IMAGE_TAG, env.CASSANDRA_MERGE_IMAGE)
         dockerUtils.tagRemote(env.DYNAMODB_IMAGE_TAG, env.DYNAMODB_MERGE_IMAGE)
         dockerUtils.tagRemote(env.POSTGRES_IMAGE_TAG, env.POSTGRES_MERGE_IMAGE)
+        dockerUtils.tagRemote(env.KARMA_RUNNER_IMAGE, env.KARMA_MERGE_IMAGE)
       }
 
       if (isStartedByUser()) {
@@ -309,6 +310,7 @@ pipeline {
     CASSANDRA_MERGE_IMAGE = "$CASSANDRA_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-${env.RSPEC_PROCESSES ?: '4'}"
     DYNAMODB_MERGE_IMAGE = "$DYNAMODB_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-${env.RSPEC_PROCESSES ?: '4'}"
     KARMA_RUNNER_IMAGE = "$KARMA_RUNNER_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
+    KARMA_MERGE_IMAGE = "$KARMA_RUNNER_PREFIX:$IMAGE_CACHE_MERGE_SCOPE"
     LINTERS_RUNNER_IMAGE = "$LINTERS_RUNNER_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
     POSTGRES_MERGE_IMAGE = "$POSTGRES_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-${env.RSPEC_PROCESSES ?: '4'}"
 
@@ -337,6 +339,16 @@ pipeline {
           lock(label: 'canvas_build_global_mutex', quantity: 1) {
             timeout(60) {
               node('master') {
+                // For builds like Rails 6.1 prototype, we want to be able to see the build link, but
+                // not have Gerrit vote on it. This isn't currently supported through the Gerrit Trigger
+                // plugin, because the Build Started message always votes and will clear the original
+                // vote. Work around this by disabling the build start message and setting EMULATE_BUILD_START=1
+                // in the Build Parameters section.
+                // https://issues.jenkins.io/browse/JENKINS-28339
+                if (configuration.getBoolean('emulate-build-start', 'false')) {
+                  gerrit.submitReview("", "Build Started ${RUN_DISPLAY_URL}")
+                }
+
                 if (configuration.skipCi()) {
                   currentBuild.result = 'NOT_BUILT'
                   gerrit.submitLintReview('-2', 'Build not executed due to [skip-ci] flag')
@@ -344,6 +356,8 @@ pipeline {
                   return
                 } else if (extendedStage.isAllowStagesFilterUsed() || extendedStage.isIgnoreStageResultsFilterUsed() || extendedStage.isSkipStagesFilterUsed()) {
                   gerrit.submitLintReview('-2', 'One or more build flags causes a subset of the build to be run')
+                } else if (setupStage.hasGemOverrides()) {
+                  gerrit.submitLintReview('-2', 'One or more build flags causes the build to be run against an unmerged gem version override')
                 } else {
                   gerrit.submitLintReview('0')
                 }
@@ -376,7 +390,7 @@ pipeline {
                 buildParameters += string(name: 'PATCHSET_TAG', value: "${env.PATCHSET_TAG}")
                 buildParameters += string(name: 'POSTGRES', value: "${env.POSTGRES}")
                 buildParameters += string(name: 'RUBY', value: "${env.RUBY}")
-                buildParameters += string(name: 'CANVAS_RAILS6_1', value: "${env.CANVAS_RAILS6_1}")
+                buildParameters += string(name: 'CANVAS_RAILS', value: "${env.CANVAS_RAILS}")
 
                 // If modifying any of our Jenkinsfiles set JENKINSFILE_REFSPEC for sub-builds to use Jenkinsfiles in
                 // the gerrit rather than master. Stable branches also need to check out the JENKINSFILE_REFSPEC to prevent
@@ -594,6 +608,7 @@ pipeline {
                       string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                       string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
+                      string(name: 'SKIP_CRYSTALBALL', value: "${env.SKIP_CRYSTALBALL || setupStage.hasGemOverrides()}"),
                       string(name: 'UPSTREAM_TAG', value: "${env.BUILD_TAG}"),
                       string(name: 'UPSTREAM', value: "${env.JOB_NAME}"),
                     ])

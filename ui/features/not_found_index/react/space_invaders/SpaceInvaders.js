@@ -17,13 +17,15 @@
  */
 import coronavirusImage from './coronavirus.png'
 import {EnemySpawner, PowerUpSpawner} from './spawners'
-import I18n from 'i18n!not_found_page_space_invaders'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import ParticleFactory from './explodingParticle'
 import PlayerShip from './playerShip'
 import React from 'react'
 import shipImage from './ship.png'
 import syringeImage from './syringe.png'
 import tpImage from './tp.png'
+
+const I18n = useI18nScope('not_found_page_space_invaders');
 
 const CANVAS_WIDTH = 256
 const CANVAS_HEIGHT = 307

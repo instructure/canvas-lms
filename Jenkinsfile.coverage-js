@@ -29,6 +29,19 @@ def setupNode() {
   distribution.stashBuildScripts()
 }
 
+def getKarmaRunnerImage() {
+  KARMA_RUNNER_PREFIX = configuration.buildRegistryPath('karma-runner')
+
+  if (env.GERRIT_REFSPEC.contains('master')) {
+    IMAGE_CACHE_UNIQUE_SCOPE = "${env.GERRIT_BRANCH}"
+    return "$KARMA_RUNNER_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
+  } else {
+    TAG_SUFFIX = imageTag.suffix()
+    IMAGE_CACHE_UNIQUE_SCOPE = "${imageTagVersion()}-$TAG_SUFFIX"
+    return "$KARMA_RUNNER_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
+  }
+}
+
 pipeline {
   agent none
   options {
@@ -41,10 +54,7 @@ pipeline {
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-js.yml'
     FORCE_FAILURE = configuration.forceFailureJS()
 
-    TAG_SUFFIX = imageTag.suffix()
-    IMAGE_CACHE_UNIQUE_SCOPE = "${imageTagVersion()}-$TAG_SUFFIX"
-    KARMA_RUNNER_PREFIX = configuration.buildRegistryPath('karma-runner')
-    KARMA_RUNNER_IMAGE = "$KARMA_RUNNER_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
+    KARMA_RUNNER_IMAGE = getKarmaRunnerImage()
 
     BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
     COMPOSE_DOCKER_CLI_BUILD = 1

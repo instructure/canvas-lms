@@ -28,7 +28,9 @@ import {View} from '@instructure/ui-view'
 
 import natcompare from '@canvas/util/natcompare'
 
-import I18n from 'i18n!SpeedGraderProvisionalGradeSelector'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('SpeedGraderProvisionalGradeSelector');
 
 const NEW_CUSTOM_GRADE = 'custom'
 

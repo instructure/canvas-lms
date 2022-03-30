@@ -34,7 +34,7 @@ export const AddressBookContainer = props => {
 
   const addressBookRecipientsQuery = useQuery(ADDRESS_BOOK_RECIPIENTS, {
     variables: {
-      ...filterHistory[filterHistory.length - 1],
+      context: filterHistory[filterHistory.length - 1].context,
       search: inputValue,
       userID
     },
@@ -46,7 +46,7 @@ export const AddressBookContainer = props => {
     setIsLoadingMoreData(true)
     addressBookRecipientsQuery.fetchMore({
       variables: {
-        ...filterHistory[filterHistory.length - 1],
+        context: filterHistory[filterHistory.length - 1].context,
         search: inputValue,
         userID,
         afterUser: data?.legacyNode?.recipients?.usersConnection?.pageInfo.endCursor
@@ -99,6 +99,12 @@ export const AddressBookContainer = props => {
     )
   }
 
+  if (props.activeCourseFilter && !filterHistory[filterHistory.length - 1].context) {
+    addFilterHistory({
+      context: props.activeCourseFilter
+    })
+  }
+
   const menuData = useMemo(() => {
     if (loading && !data) {
       return []
@@ -132,17 +138,33 @@ export const AddressBookContainer = props => {
     if (userData.length > 0 && !loading) {
       userData[userData.length - 1].isLast = true
     }
+    if (filterHistory[filterHistory.length - 1]?.subMenuSelection && inputValue === '') {
+      const selection = filterHistory[filterHistory.length - 1]?.subMenuSelection
+      const filteredMenuData = selection.includes('Course')
+        ? {contextData, userData: []}
+        : {userData, contextData: []}
+      return filteredMenuData
+    }
 
-    return [...contextData, ...userData]
-  }, [data, loading])
+    return {contextData, userData}
+  }, [loading, data, filterHistory, inputValue])
 
-  const handleSelect = (item, isCourse, isBackButton) => {
+  const handleSelect = (item, isCourse, isBackButton, isSubmenu) => {
     if (isCourse) {
       addFilterHistory({
         context: item
       })
+    } else if (isSubmenu) {
+      addFilterHistory({
+        context: null,
+        subMenuSelection: item
+      })
     } else if (isBackButton) {
-      removeLastFilterHistory()
+      if (inputValue) {
+        setInputValue('')
+      } else {
+        removeLastFilterHistory()
+      }
     }
   }
 
@@ -153,9 +175,10 @@ export const AddressBookContainer = props => {
       fetchMoreMenuData={fetchMoreMenuData}
       isLoadingMoreMenuData={isLoadingMoreData}
       isLoading={loading}
-      isSubMenu={filterHistory.length > 1}
+      isSubMenu={filterHistory.length > 1 || inputValue !== ''}
       onSelect={handleSelect}
       onTextChange={setInputValue}
+      inputValue={inputValue}
       onUserFilterSelect={props.onUserFilterSelect}
       onSelectedIdsChange={props.onSelectedIdsChange}
       limitTagCount={props.limitTagCount}
@@ -185,7 +208,11 @@ AddressBookContainer.propTypes = {
   /**
    * use State function to set user filter for conversations
    */
-  onUserFilterSelect: PropTypes.func
+  onUserFilterSelect: PropTypes.func,
+  /**
+   * use State function to set current context for addressbook
+   */
+  activeCourseFilter: PropTypes.string
 }
 
 AddressBookContainer.defaultProps = {

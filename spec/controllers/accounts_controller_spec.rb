@@ -261,6 +261,24 @@ describe AccountsController do
       expect(@account.settings[:app_center_access_token]).to eq access_token
     end
 
+    it "updates 'emoji_deny_list'" do
+      account_with_admin_logged_in
+      @account.allow_feature!(:submission_comment_emojis)
+      post(
+        :update,
+        params: {
+          id: @account.id,
+          account: {
+            settings: {
+              emoji_deny_list: "middle_finger,eggplant"
+            }
+          }
+        }
+      )
+      @account.reload
+      expect(@account.settings[:emoji_deny_list]).to eq "middle_finger,eggplant"
+    end
+
     it "updates account with sis_assignment_name_length_input with value less than 255" do
       account_with_admin_logged_in
       @account = @account.sub_accounts.create!
@@ -880,6 +898,42 @@ describe AccountsController do
         post "update", params: { id: @account.id, account: { course_template_id: "sis_course_id:sis_id" } }
         @account.reload
         expect(@account.course_template).to eq template
+      end
+    end
+
+    context "default_due_time" do
+      before :once do
+        account_with_admin
+        @root = @account
+        @subaccount = account_model(parent_account: @account)
+      end
+
+      before do
+        user_session(@admin)
+      end
+
+      it "sets the default_due_time account setting to the normalized value" do
+        post "update", params: { id: @root.id, account: { settings: { default_due_time: { value: "10:00 PM" } } } }
+        expect(@root.reload.default_due_time).to eq({ value: "22:00:00" })
+      end
+
+      it "unsets a root account's default due time with `inherit`" do
+        @root.update settings: { default_due_time: { value: "22:00:00" } }
+        post "update", params: { id: @root.id, account: { settings: { default_due_time: { value: "inherit" } } } }
+        expect(@root.reload.default_due_time[:value]).to be_nil
+      end
+
+      it "subaccount re-inherits the root account's default due time with `inherit`" do
+        @root.update settings: { default_due_time: { value: "22:00:00" } }
+        @subaccount.update settings: { default_due_time: { value: "23:00:00" } }
+        post "update", params: { id: @subaccount.id, account: { settings: { default_due_time: { value: "inherit" } } } }
+        expect(@subaccount.reload.default_due_time).to eq({ value: "22:00:00", inherited: true })
+      end
+
+      it "leaves the setting alone if the parameter is not supplied" do
+        @root.update settings: { default_due_time: { value: "22:00:00" } }
+        post "update", params: { id: @subaccount.id, account: { settings: { restrict_student_future_view: { value: true } } } }
+        expect(@root.reload.default_due_time).to eq({ value: "22:00:00" })
       end
     end
   end

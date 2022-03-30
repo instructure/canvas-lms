@@ -19,9 +19,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Checkbox} from '@instructure/ui-checkbox'
-import I18n from 'i18n!conversations_2'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../../util/utils'
+
+const I18n = useI18nScope('conversations_2');
 
 export const IndividualMessageCheckbox = props => {
   return (

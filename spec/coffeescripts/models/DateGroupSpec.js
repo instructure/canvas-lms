@@ -54,6 +54,14 @@ test("#unlockAt doesn't parse null date", () => {
   equal(model.unlockAt(), null)
 })
 
+test('#unlockAt parses the single_section_unlock_at property when unlock_at is null', () => {
+  const model = new DateGroup({
+    unlock_at: null,
+    single_section_unlock_at: '2013-08-20 11:13:00'
+  })
+  equal(model.unlockAt().constructor, Date)
+})
+
 test('#lockAt parses lock_at to a date', () => {
   const model = new DateGroup({lock_at: '2013-08-20 11:13:00'})
   equal(model.lockAt().constructor, Date)
@@ -62,6 +70,14 @@ test('#lockAt parses lock_at to a date', () => {
 test("#lockAt doesn't parse null date", () => {
   const model = new DateGroup({lock_at: null})
   equal(model.lockAt(), null)
+})
+
+test('#lockAt parses the single_section_lock_at property when lock_at is null', () => {
+  const model = new DateGroup({
+    lock_at: null,
+    single_section_lock_at: '2013-08-20 11:13:00'
+  })
+  equal(model.lockAt().constructor, Date)
 })
 
 test("#alwaysAvailable if both unlock and lock dates aren't set", () => {

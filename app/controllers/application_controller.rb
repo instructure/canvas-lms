@@ -239,7 +239,7 @@ class ApplicationController < ActionController::Base
 
             # these values need to correlate with the backend for Sentry features to work properly
             environment: Canvas.environment,
-            revision: Canvas.revision
+            revision: "canvas-lms@#{Canvas.semver_revision}"
           }
         end
 
@@ -615,6 +615,10 @@ class ApplicationController < ActionController::Base
       params[:controller] != "question_banks"
   end
 
+  def user_url(*opts)
+    opts[0] == @current_user ? user_profile_url(@current_user) : super
+  end
+
   protected
 
   # we track the cost of each request in RequestThrottle in order
@@ -773,10 +777,6 @@ class ApplicationController < ActionController::Base
       reset_session
       redirect_to login_url
     end
-  end
-
-  def user_url(*opts)
-    opts[0] == @current_user ? user_profile_url(@current_user) : super
   end
 
   def tab_enabled?(id, opts = {})
@@ -1413,7 +1413,11 @@ class ApplicationController < ActionController::Base
 
   def set_no_cache_headers
     response.headers["Pragma"] = "no-cache"
-    response.headers["Cache-Control"] = "no-cache, no-store"
+    response.headers["Cache-Control"] = if Setting.get("legacy_cache_control", "false") == "true"
+                                          "no-cache, no-store"
+                                        else
+                                          "no-store"
+                                        end
   end
 
   def set_page_view

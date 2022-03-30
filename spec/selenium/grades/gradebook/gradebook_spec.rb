@@ -49,6 +49,22 @@ describe "Gradebook" do
     expect(f(".slick-header-columns")).not_to include_text(@ungraded_assignment.title)
   end
 
+  it "splits student first and last name when view option is toggled on" do
+    Account.site_admin.enable_feature!(:gradebook_show_first_last_names)
+    @course.root_account.settings[:allow_gradebook_show_first_last_names] = true
+    @course.root_account.save!
+
+    Gradebook.visit(@course)
+    Gradebook.open_gradebook_menu("View")
+    Gradebook.split_student_names_option.click
+
+    expect(f("span[data-testid='first-name-header']").text).to eql("Student First Name")
+    expect(f("span[data-testid='student-column-header']").text).to eql("Student Last Name")
+
+    expect(Gradebook.student_column_cell_element(0, 0)).to include_text(@student_1.last_name)
+    expect(Gradebook.student_column_cell_element(1, 1)).to include_text(@student_1.first_name)
+  end
+
   context "search" do
     it "filters students without delay" do
       Account.site_admin.enable_feature!(:remove_gradebook_student_search_delay)
@@ -412,7 +428,19 @@ describe "Gradebook" do
       grading_cell.click
 
       Gradebook::Cells.edit_grade(student, essay_quiz.assignment, 10)
+      # Re-select element in case it's gone stale
+      grading_cell = Gradebook::Cells.grading_cell(student, essay_quiz.assignment)
       expect(grading_cell).not_to contain_css(".icon-not-graded")
+    end
+  end
+
+  context "export" do
+    it "exports the gradebook and displays a flash message when successfully started" do
+      Gradebook.visit(@course)
+      Gradebook.action_menu.click
+      Gradebook.action_menu_item_selector("export").click
+
+      expect_flash_message :success, "Gradebook export started"
     end
   end
 end

@@ -20,7 +20,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import moment from 'moment'
 import axios from '@canvas/axios'
-import I18n from 'i18n!last_attended'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import tz from '@canvas/timezone'
 
 import {View} from '@instructure/ui-view'
@@ -28,6 +28,8 @@ import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+
+const I18n = useI18nScope('last_attended');
 
 function formatDate(date) {
   return tz.format(date, 'date.formats.medium_with_weekday')

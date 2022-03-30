@@ -177,7 +177,7 @@ module PostgreSQLAdapterExtensions
     [index_name, index_type, index_columns, index_options, algorithm, using]
   end
 
-  if CANVAS_RAILS6_0
+  if Rails.version < "6.1"
     def remove_index(table_name, options = {})
       table = ActiveRecord::ConnectionAdapters::PostgreSQL::Utils.extract_schema_qualified_name(table_name.to_s)
 
@@ -214,7 +214,7 @@ module PostgreSQLAdapterExtensions
     end
   end
 
-  if CANVAS_RAILS6_0
+  if Rails.version < "6.1"
     def index_name_for_remove(table_name, options = {})
       return options[:name] if can_remove_index_by_name?(options)
 
@@ -416,7 +416,7 @@ module ReferenceDefinitionExtensions
     end
 
     if index
-      if CANVAS_RAILS6_0
+      if Rails.version < "6.1"
         table.index(column_names, index_options)
       else
         table.index(column_names, **index_options(table.name))
@@ -445,7 +445,7 @@ module SchemaStatementsExtensions
   end
 end
 
-if CANVAS_RAILS6_0
+if Rails.version < "6.1"
   ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::SchemaCreation.prepend(SchemaCreationExtensions)
 else
   ActiveRecord::ConnectionAdapters::PostgreSQL::SchemaCreation.prepend(SchemaCreationExtensions)

@@ -2296,6 +2296,7 @@ tr:
   are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
     one: "Bu mesajlaşmanın sizdeki kopyasını silmek istediğinize emin misiniz? Bu eylem geri alınamaz."
     other: "Bu mesajlaşmaların sizdeki kopyasını silmek istediğinize emin misiniz? Bu eylem geri alınamaz."
+  are_you_sure_you_want_to_delete_your_copy_of_this__8490c9d4: "Bu mesajın sizdeki kopyasını silmek istediğinize emin misiniz? Bu eylem geri alınamaz."
   are_you_sure_you_want_to_delete_your_reservation_t_5ae87209: "Bu olay için rezervasyonunuzu silmek istediğinize emin misiniz?"
   are_you_sure_you_want_to_disable_sync_to_sisname_f_f24245c1: "Tüm ödevler için %{sisName}ile Senkronize etmeyi devre dışı bırakmak istediğinize emin misiniz?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Bunu yapmak istediğinize emin misiniz? Bu işlem geri alınamaz ve not defterinde var olan notların üzerine yazılır."
@@ -6060,6 +6061,8 @@ tr:
         everyone_tab: Herkes
         groups: Gruplar
       roster_user: 
+        ? " pending_acceptance_explanation"
+        : "Bu kullanıcı henüz ders davetinizi kabul etmedi"
         links: 
           edit_sections: "Bölümleri Düzenle"
           link_to_students: "Öğrencilere Bağlantı Ver"
@@ -7035,6 +7038,10 @@ tr:
       new_quiz: "Yeni Kısa Sınav"
     edit_crumb: Düzenle
     edit_view: 
+      ? " saving"
+      : Kaydediliyor...
+      ? " topic_title"
+      : "Konu Başlığı"
       allow_liking: "Beğenme seçeneği olsun"
       allow_threaded_replies: "Yanıtlara izin ver"
       attachment: "Dosya Eki"
@@ -7995,6 +8002,7 @@ tr:
   event_fe9ba3fe: Olay
   event_start_time_441b491f: "Olay Başlama Zamanı"
   event_title_57a50568: "Olay Başlığı:"
+  event_title_7f1051a6: "Olay Başlığı"
   event_title_course_name_changed_to_37510fbb: "%{course_name} içerisindeki %{event_title} olay şöyle değiştirildi"
   every_665d821e: Her
   everyone_854554dd: Herkes
@@ -8197,6 +8205,7 @@ tr:
   fail_62dbb06a: başarısız
   failed_276786d: Başarısız
   failed_307449e1: "Başarısız:"
+  failed_at_f471dfd3: "Şurada Başarısız oldu"
   failed_creating_user_b706a1c5: "Kullanıcı oluşturmada hata"
   failed_please_report_the_following_error_code_to_y_42248d60: "Başarsız oldu, lütfen şu hata kodunu sistem yöneticinize bildirin: ErrorReport:%{error};"
   failed_to_create_webhook_b766cf5c: "Webhook oluşturma başarısız."
@@ -9635,6 +9644,7 @@ tr:
   handlebars_helpers: 
     time: 
       event: "%{date} %{time}"
+  handler_7912052f: İşleyici
   has_turnitin_score_3e1cacf6: "Turnitin puanı"
   helpDialog: 
     Back: Geri
@@ -10120,6 +10130,7 @@ tr:
     titles: 
       job_handler: "Görev İşleyici"
       last_error: "En Son Hata"
+  jobs_ec5d59d8: Görevler
   join_6cafecca: Katıl
   join_group_group_name_871a5e3f: "%{group_name} grubuna katıl"
   joined_group_group_name_e3802c04: "%{group_name} Grubuna Katıldı"
@@ -10159,6 +10170,7 @@ tr:
     lock_module_until: "Bu tarihe kadar kilitle"
   language_6b3e2c7c: Dil
   last_enrollment_activity_10fe15ba: "Son Derse Kayıt Etkinliği"
+  last_error_a3832668: "En Son Hata"
   last_item_79583712: "Son Öğe:"
   last_login_54565109: "Son oturum açma"
   last_modified_by_ca4bb5e1: "Son Düzenleme"
@@ -10392,6 +10404,8 @@ tr:
   lock_selected_announcements_33740f80: "Seçili Duyuruları Kilitle"
   lock_this_setting_for_sub_accounts_2ae5af17: "Alt hesaplar için bu ayarı kilitle"
   locked_762f138b: Kilitli
+  locked_at_cda02889: Kilitli
+  locked_by_983c07f7: Kilitleyen
   locked_until_unlock_date_498ead5f: "%{unlock_date} tarihine kadar kilitli"
   log_in_5c66644d: "Oturum Aç"
   log_on_url_fc166e4c: "Oturum Açma URL'si"
@@ -10605,6 +10619,7 @@ tr:
       miscellaneous: Çeşitli
       operators: Operatörler
       relationships: İlişkiler
+  max_attempts_ae7b90bc: "Maksimum Giriş Hakkı"
   max_membership_bd0ddc68: max_membership
   max_users_groups_per_appointment_867c505b: "Randevu başına maksimum kullanıcı/grup"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "Bir katılımcının katılabileceği en fazla randevu sayısı"
@@ -11491,6 +11506,10 @@ tr:
         course_starts_next_week: "Dersiniz önümüzdeki hafta başlıyor"
     dialog: 
       title: "Yanıt mesajını gönder"
+    discussion_mention: 
+      email: 
+        html: 
+          link: "Bu mesajlaşmaya katılmak için tıklayınız"
     email: 
       footer: |-
           Canvas'ı kullanarak bir veya daha fazla derse katıldığınız için bu epostayı aldınız. Eposta bildirimlerini değiştirme ya da kapatmak için şuraya gidin:
@@ -12722,6 +12741,7 @@ tr:
   move_outcome_ce497e6c: "Öğrenme Çıktısını Taşı"
   move_outcome_group_cfa1a505: "Öğrenme Çıktı Grubunu Taşı"
   move_this_module_4a262aaf: "Bu Modülü taşı"
+  move_to_1c208ae5: "Şuraya Taşı..."
   move_to_25d7ef11: "Şuraya Taşı"
   move_to_9b91c6e0: "Şuraya Taşı..."
   move_to_dde1a5e1: "Şuraya Taşı..."
@@ -13335,6 +13355,7 @@ tr:
   ordered_by_recent_activity_112d33d5: "Son etkinliklere göre sırala"
   organize_epub_by_content_type_default_is_by_module_6f44ae06: "epub'ı içerik türüne göre düzenle (varsayılan ayar modüle göre düzenleme)."
   organize_your_course_content_c3c7ed03: "Ders içeriklerinizi düzenleyin"
+  original_job_id_d81afbb3: "Orijinal Görev ID"
   originality_report_5d461681: "Orijinallik Raporu"
   other_1c6d9c79: Diğer
   other_carrier_45531207: "Farklı Operatör"
@@ -14156,6 +14177,7 @@ tr:
   previous_page_928fc112: "Önceki Sayfa"
   previous_time_cc96b361: "Önceki (%{time})"
   previous_timestamp_19343a58: "Önceki (%{timestamp})"
+  priority_dd4381ee: Öncelik
   privacy_290109ea: Gizlilik
   private_3883d133: Özel
   product_name: Canvas
@@ -18175,6 +18197,7 @@ tr:
     tab_location_error: "Sekme konumu geçersiz"
     tab_unmanagable_error: "%{css_class} yönetilebilir değil"
   tag_7bb005ff: Etiket
+  tags_2b72a03b: Etiketler
   taiwan_886_9a5b6bbf: "Tayvan (+886)"
   take_a_picture_d582acf1: "Bilgisayardan Fotoğraf Çek"
   take_the_quiz_87214d7e: "Kısa Sınava Başla"

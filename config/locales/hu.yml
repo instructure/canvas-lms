@@ -1631,6 +1631,7 @@ hu:
         restrict_dependent_destroy: 
           has_many: "Egy függő %{record} miatt nem törölhető a rekord"
           has_one: "Egy függő %{record} miatt nem törölhető a rekord"
+  activity_13915493: Tevékenység
   activity_by_category_9c2033d1: "Tevékenységek kategóriánként"
   activity_by_date_878c5b49: "Tevékenységek dátumok szerint"
   add_2nd_review_ea988088: "2. értékelő hozzáadása"
@@ -2115,6 +2116,7 @@ hu:
   are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
     one: "Biztos benne, hogy törli az üzenetváltás másolatát? Ezt a műveletet nem lehet visszavonni."
     other: "Biztos benne, hogy törli az üzenetváltások másolatát? Ezt a műveletet nem lehet visszavonni."
+  are_you_sure_you_want_to_delete_your_copy_of_this__8490c9d4: "Biztos benne, hogy törli az üzenet másolatát? Ezt a műveletet nem lehet visszavonni."
   are_you_sure_you_want_to_delete_your_reservation_t_5ae87209: "Biztos benne, hogy törli a foglalását erre az eseményre?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Biztos benne, hogy ezt szeretné? Ezt a műveletet nem lehet visszavonni és felülírja a létező értékeléseket az osztálynaplóban."
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Biztos benne, hogy el szeretné távolítani ezt az eszközt?"
@@ -5321,6 +5323,8 @@ hu:
         everyone_tab: Mindenki
         groups: Csoportok
       roster_user: 
+        ? " pending_acceptance_explanation"
+        : "Ez a felhasználó még nem fogadta el a kurzusmeghívót"
         links: 
           edit_sections: "Szekciók szerkesztése"
           link_to_students: "Hivatkozás a hallgatókra"
@@ -6194,6 +6198,10 @@ hu:
       student_settings: "Hallgatói beállítások"
     edit_crumb: Szerkesztés
     edit_view: 
+      ? " saving"
+      : Mentés...
+      ? " topic_title"
+      : "Téma címe"
       allow_liking: "Lájkolás engedélyezése"
       allow_threaded_replies: "Engedélyezi a szálakba rendezett válaszokat"
       attachment: Melléklet
@@ -7069,6 +7077,7 @@ hu:
   event_fe9ba3fe: Esemény
   event_start_time_441b491f: "Esemény kezdete"
   event_title_57a50568: "Esemény neve:"
+  event_title_7f1051a6: "Esemény neve"
   event_title_course_name_changed_to_37510fbb: "%{event_title}, %{course_name} módosult"
   every_665d821e: Minden
   everyone_854554dd: Mindenki
@@ -7187,6 +7196,7 @@ hu:
   fail_62dbb06a: hiba
   failed_276786d: Sikertelen
   failed_307449e1: "Sikertelen: "
+  failed_at_f471dfd3: "Sikertelen ennél a pontnál"
   failed_creating_user_b706a1c5: "Felhasználó létrehozása sikertelen"
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "A kurzusszekciók betöltése sikertelen. Frissítse az oldalt."
   failed_please_report_the_following_error_code_to_y_42248d60: "Sikertelen, kérjük, továbbítsa a következő hibakódot a rendszergazdának: ErrorReport:%{error};"
@@ -8207,6 +8217,7 @@ hu:
   groups_view_all_student_groups_39bd1b85: "Csoportok - az összes hallgatói csoport megtekintése"
   guatemala_502_ae25c68f: "Guatemala (+502)"
   haitian_creole_7eb4195b: Haiti
+  handler_7912052f: Kezelő
   haven_t_been_graded_d7dee5bb: "Még nincs értékelve"
   hebrew_88fbf778: Héber
   hello_name_your_outcomes_import_failed_due_to_an_e_385db5d3: |-
@@ -8767,6 +8778,7 @@ hu:
     titles: 
       job_handler: Jobkezelő
       last_error: "Legutóbbi hiba"
+  jobs_ec5d59d8: Jobok
   join_6cafecca: Csatlakozás
   join_course_511e6cb3: "Csatlakozzon a %{course} kurzushoz"
   join_group_group_name_871a5e3f: "Csatlakozás a %{group_name} csoporthoz"
@@ -8813,6 +8825,7 @@ hu:
   language_6b3e2c7c: Nyelv
   last_changed_b544504d: "Utoljára módosítva:"
   last_enrollment_activity_10fe15ba: "Legutóbbi beiratkozási tevékenység"
+  last_error_a3832668: "Legutóbbi hiba"
   last_export_899a04c5: "Utolsó export:"
   last_first_name_95a078f5: "Vezetéknév, keresztnév"
   last_item_79583712: "Legutóbbi elem:"
@@ -9071,6 +9084,8 @@ hu:
   lock_questions_after_answering_5aecef9d: "Kérdések zárolása a válaszadás után"
   lock_this_setting_for_sub_accounts_2ae5af17: "Ezen beállítás zárolása az alfiókok esetén"
   locked_762f138b: Zárolt
+  locked_at_cda02889: "Zárolva ekkor"
+  locked_by_983c07f7: zárolta
   locked_click_to_unlock_50747e11: "Zárolva. Kattintson a zárolás feloldásához."
   locked_content_f4ef2968: "Zárolt Tartalom"
   locked_object_configuration_d1fb1b82: "Zárolt objektum konfiguráció:"
@@ -9270,6 +9285,7 @@ hu:
       miscellaneous: Egyéb
       operators: Műveletek
       relationships: Kapcsolatok
+  max_attempts_ae7b90bc: "Maximális próbálkozások száma"
   max_dd02d615: max
   max_membership_bd0ddc68: max_membership
   max_users_groups_per_appointment_867c505b: "Maximális felhasználók/csoportok megbeszélésenként"
@@ -10136,6 +10152,10 @@ hu:
         course_starts_next_week: "Az Ön kurzusa jövő héten kezdődik"
     dialog: 
       title: "Válasz küldése"
+    discussion_mention: 
+      email: 
+        html: 
+          link: "Kattintson ide az üzenetváltáshoz való csatlakozáshoz"
     email: 
       footer: |-
           Ön azért kapta ezt az e-mailt, mert egy vagy több csoportnak is a tagja a Canvasban. Az e-mail értesítések beállításainak módosításához vagy leállításához látogasson el az alábbi oldalra:
@@ -11171,6 +11191,7 @@ hu:
   move_this_module_4a262aaf: "Modul áthelyezése"
   move_this_page_4a05c813: "Oldal áthelyezése"
   move_this_section_890bee38: "Szekció áthelyezése"
+  move_to_1c208ae5: Mozgatás...
   move_to_25d7ef11: "Áthelyezés ide"
   move_to_9b91c6e0: "Áthelyezés ide:"
   move_to_bottom_d0f71bf0: Legalulra
@@ -11852,6 +11873,7 @@ hu:
   order_301c3ac1: Sorrend
   ordered_by_recent_activity_112d33d5: "Legutóbbi tevékenységek alapján rendezve"
   organize_epub_by_content_type_default_is_by_module_6f44ae06: "epub szervezése tartalomtípus szerint (alapesetben modul alapján)"
+  original_job_id_d81afbb3: "Eredeti Job ID"
   originality_report_5d461681: "Eredetiség Jelentés"
   originality_reports_1e36b935: "Eredetiség Jelentések"
   other_1c6d9c79: Egyéb
@@ -12704,6 +12726,7 @@ hu:
   primary_color_button_b75db628: "Elsődleges szín gomb"
   primary_color_button_disabled_9081ddff: "Elsődleges szín gomb letiltott"
   print_grades_9d5dd50f: "Értékelések nyomtatása"
+  priority_dd4381ee: Prioritás
   privacy_290109ea: Adatvédelem
   proceed_f3d33864: Folytatás
   processing_2fcc9739: Feldolgozás
@@ -16449,6 +16472,7 @@ hu:
   tabs_5605547e: Lapok
   tag_7bb005ff: Címke
   tagalog_74906db7: Tagalog
+  tags_2b72a03b: Címkék
   taiwan_886_9a5b6bbf: "Tajvan (+886)"
   take_a_picture_d582acf1: "Fotó készítése"
   take_the_quiz_87214d7e: "Kvíz kitöltése"

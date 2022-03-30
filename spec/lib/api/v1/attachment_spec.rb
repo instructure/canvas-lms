@@ -284,7 +284,7 @@ describe Api::V1::Attachment do
         it "sets the category on the attachment" do
           expect(InstFS).to receive(:upload_preflight_json).with(
             hash_including(
-              additional_capture_params: { category: "buttons_and_icons" }
+              additional_capture_params: { category: "icon_maker_icons" }
             )
           )
           api_attachment_preflight(context, request, opts)

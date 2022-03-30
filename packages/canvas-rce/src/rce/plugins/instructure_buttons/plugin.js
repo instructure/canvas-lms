@@ -25,11 +25,11 @@ import registerEditToolbar from './registerEditToolbar'
 function getMenuItems() {
   return [
     {
-      text: formatMessage('Create Button and Icon'),
+      text: formatMessage('Create Icon Maker Icon'),
       value: 'instructure_create_button'
     },
     {
-      text: formatMessage('Saved Buttons and Icons'),
+      text: formatMessage('Saved Icon Maker Icons'),
       value: 'instructure_list_buttons'
     }
   ]
@@ -65,7 +65,7 @@ tinymce.create('tinymce.plugins.InstructureButtonsPlugin', {
 
     // Register menu items
     ed.ui.registry.addNestedMenuItem('instructure_buttons', {
-      text: formatMessage('Buttons and Icons'),
+      text: formatMessage('Icon Maker Icons'),
       icon: 'buttons',
       getSubmenuItems: () =>
         getMenuItems().map(item => ({
@@ -81,7 +81,7 @@ tinymce.create('tinymce.plugins.InstructureButtonsPlugin', {
 
     // Register button
     ed.ui.registry.addSplitButton('instructure_buttons', {
-      tooltip: formatMessage('Buttons and Icons'),
+      tooltip: formatMessage('Icon Maker Icons'),
       icon: 'buttons',
       fetch(callback) {
         const items = getMenuItems().map(item => ({
@@ -110,7 +110,7 @@ tinymce.create('tinymce.plugins.InstructureButtonsPlugin', {
     })
 
     // Register context toolbar for editing existing buttons / icons
-    registerEditToolbar(ed, (api) => {
+    registerEditToolbar(ed, api => {
       if (!api.isDisabled()) {
         handleOptionSelected(ed, 'instructure_edit_button')
       }

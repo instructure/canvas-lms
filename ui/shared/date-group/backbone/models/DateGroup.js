@@ -17,8 +17,10 @@
  */
 
 import Backbone from '@canvas/backbone'
-import I18n from 'i18n!models_DateGroup'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import tz from '@canvas/timezone'
+
+const I18n = useI18nScope('models_DateGroup');
 
 export default class DateGroup extends Backbone.Model {
   dueAt() {
@@ -31,7 +33,7 @@ export default class DateGroup extends Backbone.Model {
   }
 
   unlockAt() {
-    const unlockAt = this.get('unlock_at')
+    const unlockAt = this.get('unlock_at') || this.get('single_section_unlock_at')
     if (unlockAt) {
       return tz.parse(unlockAt)
     } else {
@@ -40,7 +42,7 @@ export default class DateGroup extends Backbone.Model {
   }
 
   lockAt() {
-    const lockAt = this.get('lock_at')
+    const lockAt = this.get('lock_at') || this.get('single_section_lock_at')
     if (lockAt) {
       return tz.parse(lockAt)
     } else {

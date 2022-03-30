@@ -23,7 +23,9 @@ import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {TextArea} from '@instructure/ui-text-area'
 import {View} from '@instructure/ui-view'
-import I18n from 'i18n!CommentLibrary'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('CommentLibrary');
 
 const CommentEditView = ({comment, id, updateComment, onClose}) => {
   const textAreaRef = useRef(null)

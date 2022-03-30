@@ -17,9 +17,11 @@
  */
 
 import {chunk} from 'lodash'
-import I18n from 'i18n!gradebook'
+import { useScope as useI18nScope } from '@canvas/i18n';
 
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+
+const I18n = useI18nScope('gradebook');
 
 const submissionsParams = {
   exclude_response_fields: ['preview_url'],

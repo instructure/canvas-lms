@@ -164,7 +164,7 @@ module CanvasRails
       Canvas::Plugins::DefaultPlugins.apply_all
       ActiveSupport::JSON::Encoding.escape_html_entities_in_json = true
 
-      if CANVAS_RAILS6_0
+      if Rails.version < "6.1"
         # On rails 6.1, this comes from switchman; on rails 6.0 canvas provides it
         require_relative "#{__dir__}/../app/models/unsharded_record.rb"
         Switchman::UnshardedRecord = UnshardedRecord
@@ -182,7 +182,7 @@ module CanvasRails
             return super(conn_params)
             # we _shouldn't_ be catching a NoDatabaseError, but that's what Rails raises
             # for an error where the database name is in the message (i.e. a hostname lookup failure)
-            # CANVAS_RAILS6_0 rails 6.1 switches from PG::Error to ActiveRecord::ConnectionNotEstablished
+            # CANVAS_RAILS="6.0" rails 6.1 switches from PG::Error to ActiveRecord::ConnectionNotEstablished
             # for any other error
           rescue ::PG::Error, ::ActiveRecord::NoDatabaseError, ::ActiveRecord::ConnectionNotEstablished
             raise if index == hosts.length - 1
@@ -238,10 +238,32 @@ module CanvasRails
     Autoextend.hook(:"ActiveRecord::ConnectionAdapters::PostgreSQLAdapter",
                     PostgreSQLEarlyExtensions,
                     method: :prepend)
-
     Autoextend.hook(:"ActiveRecord::ConnectionAdapters::PostgreSQL::OID::TypeMapInitializer",
                     TypeMapInitializerExtensions,
                     method: :prepend)
+
+    module RailsCacheShim
+      def delete(key, options = nil)
+        r1 = super(key, (options || {}).merge(use_new_rails: Rails.version >= "6.1")) # prefer rails new if on old rails and vice versa
+        r2 = super(key, (options || {}).merge(use_new_rails: Rails.version < "6.1"))
+        r1 || r2
+      end
+
+      private
+
+      def normalize_key(key, options)
+        result = super
+        if options&.key?(:use_new_rails) ? options[:use_new_rails] : Rails.version >= "6.1"
+          result = "rails61:#{result}"
+        end
+        result
+      end
+    end
+
+    Autoextend.hook(:"ActiveSupport::Cache::Store",
+                    RailsCacheShim,
+                    method: :prepend)
+
     module PatchThorWarning
       # active_model_serializers should be passing `type: :boolean` here:
       # https://github.com/rails-api/active_model_serializers/blob/v0.9.0.alpha1/lib/active_model/serializer/generators/serializer/scaffold_controller_generator.rb#L10
@@ -327,7 +349,12 @@ module CanvasRails
         # do not remove this conditional until the asset build no longer
         # needs the rails app for anything.
 
+        # Do it early with the wrong cache for things super early in boot
         DynamicSettingsInitializer.bootstrap!
+        # Do it at the end when the autoloader is set up correctly
+        config.to_prepare do
+          DynamicSettingsInitializer.bootstrap!
+        end
       end
     end
 

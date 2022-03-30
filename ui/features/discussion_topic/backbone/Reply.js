@@ -17,7 +17,7 @@
 
 import Backbone from '@canvas/backbone'
 import _ from 'underscore'
-import I18n from 'i18n!discussions.reply'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import $ from 'jquery'
 import Entry from './models/Entry.coffee'
 import htmlEscape from 'html-escape'
@@ -27,6 +27,8 @@ import stripTags from 'strip-tags'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import {send} from '@canvas/rce/RceCommandShim'
 import '@canvas/forms/jquery/jquery.instructure_forms'
+
+const I18n = useI18nScope('discussions.reply');
 
 RichContentEditor.preloadRemoteModule()
 

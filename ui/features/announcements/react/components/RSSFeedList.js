@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!announcements_v2'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import React from 'react'
 import {func, arrayOf, bool} from 'prop-types'
 import {connect} from 'react-redux'
@@ -34,6 +34,8 @@ import propTypes from '../propTypes'
 import select from 'obj-select'
 
 import {Link} from '@instructure/ui-link'
+
+const I18n = useI18nScope('announcements_v2');
 
 export default class RSSFeedList extends React.Component {
   static propTypes = {

@@ -24,12 +24,14 @@ import VeriCiteSettings from '../../VeriCiteSettings.coffee'
 import DateGroup from '@canvas/date-group/backbone/models/DateGroup'
 import AssignmentOverrideCollection from '../collections/AssignmentOverrideCollection.coffee'
 import DateGroupCollection from '@canvas/date-group/backbone/collections/DateGroupCollection.coffee'
-import I18n from 'i18n!models_Assignment'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import GradingPeriodsHelper from '@canvas/grading/GradingPeriodsHelper'
 import tz from '@canvas/timezone'
 import numberHelper from '@canvas/i18n/numberHelper'
 import PandaPubPoller from '@canvas/panda-pub-poller'
 import { matchingToolUrls } from './LtiAssignmentHelpers'
+
+I18n = useI18nScope('models_Assignment')
 
 canManage = () ->
   ENV.PERMISSIONS?.manage
@@ -488,10 +490,13 @@ export default class Assignment extends Model
     @isQuizLTIAssignment() && @newQuizzesAssignmentBuildButtonEnabled()
 
   defaultDates: =>
+    singleSection = @singleSection()
     group = new DateGroup
       due_at:    @get("due_at")
       unlock_at: @get("unlock_at")
       lock_at:   @get("lock_at")
+      single_section_unlock_at: singleSection?.unlockAt
+      single_section_lock_at: singleSection?.lockAt
 
   multipleDueDates: =>
     count = @get("all_dates_count")
@@ -519,6 +524,14 @@ export default class Assignment extends Model
     groups = @get("all_dates")
     models = (groups and groups.models) or []
     result = _.map models, (group) -> group.toJSON()
+
+  singleSection: =>
+    allDates = @allDates()
+    if allDates and allDates.length == 1
+      for section in allDates
+        return section
+    else
+      return null
 
   singleSectionDueDate: =>
     if !@multipleDueDates() && !@dueAt()

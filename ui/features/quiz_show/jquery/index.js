@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!quizzes.show'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -27,16 +27,18 @@ import Quiz from '@canvas/quizzes/backbone/models/Quiz'
 import PublishButtonView from '@canvas/publish-button-view'
 import QuizLogAuditingEventDumper from '@canvas/quiz-log-auditing/jquery/dump_events'
 import CyoeStats from '@canvas/conditional-release-stats/react/index'
-import '@canvas/datetime' /* dateString, time_field, datetime_field */
+import '@canvas/datetime'/* dateString, time_field, datetime_field */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/rails-flash-notifications'
-import '@canvas/jquery/jquery.instructure_misc_plugins' /* ifExists, confirmDelete */
+import '@canvas/jquery/jquery.instructure_misc_plugins'/* ifExists, confirmDelete */
 import '@canvas/jquery/jquery.disableWhileLoading'
-import '@canvas/message-students-dialog/jquery/message_students' /* messageStudents */
+import '@canvas/message-students-dialog/jquery/message_students'/* messageStudents */
 import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExternalTools'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
+
+const I18n = useI18nScope('quizzes.show');
 
 $(document).ready(function() {
   if (ENV.QUIZ_SUBMISSION_EVENTS_URL) {

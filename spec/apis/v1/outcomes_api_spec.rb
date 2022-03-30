@@ -592,7 +592,7 @@ describe "Outcomes API", type: :request do
 
           method_to_int = {
             "decaying_average" => { good: 67, bad: 125 },
-            "n_mastery" => { good: 4, bad: 29 },
+            "n_mastery" => { good: 7, bad: 11 },
             "highest" => { good: nil, bad: 4 },
             "latest" => { good: nil, bad: 79 },
           }

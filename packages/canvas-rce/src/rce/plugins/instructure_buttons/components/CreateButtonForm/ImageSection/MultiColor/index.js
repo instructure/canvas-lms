@@ -23,7 +23,7 @@ import {actions} from '../../../../reducers/imageSection'
 
 import {convertFileToBase64} from '../../../../svg/utils'
 
-const MultiColor = ({dispatch}) => {
+const MultiColor = ({dispatch, onMount}) => {
   const onSelect = svg => {
     dispatch({...actions.START_LOADING})
     dispatch({...actions.SET_IMAGE_NAME, payload: svg.label})
@@ -39,7 +39,7 @@ const MultiColor = ({dispatch}) => {
     })
   }
 
-  return <SVGList type={TYPE.Multicolor} onSelect={onSelect} />
+  return <SVGList type={TYPE.Multicolor} onSelect={onSelect} onMount={onMount} />
 }
 
 export default MultiColor

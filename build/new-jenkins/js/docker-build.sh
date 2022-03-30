@@ -7,7 +7,7 @@ CRYSTALBALL_MAP=${CRYSTALBALL_MAP:-0}
 
 echo "CRYSTALBALL_MAP VALUE ${CRYSTALBALL_MAP}"
 
-export CACHE_VERSION="2020-02-02.1"
+export CACHE_VERSION="2022-03-24.1"
 
 source ./build/new-jenkins/docker-build-helpers.sh
 

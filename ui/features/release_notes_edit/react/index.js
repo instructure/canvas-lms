@@ -22,10 +22,12 @@ import {Button} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import useFetchApi from '@canvas/use-fetch-api-hook'
-import I18n from 'i18n!release_notes'
+import { useScope as useI18nScope } from '@canvas/i18n';
 
 import NotesTable from './NotesTable'
 import CreateEditModal from './CreateEditModal'
+
+const I18n = useI18nScope('release_notes');
 
 function notesReducer(prevState, action) {
   if (action.type === 'FETCH_LOADING') {

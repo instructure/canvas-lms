@@ -16,7 +16,9 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import {Model} from '@canvas/backbone'
-import I18n from 'i18n!publishableModuleItem'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('publishableModuleItem');
 
 // A slightly terrible class that branches the urls and json data for the
 // different module types
@@ -95,7 +97,8 @@ export default class PublishableModuleItem extends Model {
   }
 
   branch(key) {
-    return (this[key][this.get('module_type')] || this[key].generic).call(this)
+    const moduleType = this.get('module_type') === 'lti-quiz' ? 'quiz' : this.get('module_type')
+    return (this[key][moduleType] || this[key].generic).call(this)
   }
 
   url() {

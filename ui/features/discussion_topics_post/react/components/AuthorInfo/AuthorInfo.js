@@ -18,7 +18,7 @@
 
 import {AnonymousAvatar} from '@canvas/discussions/react/components/AnonymousAvatar/AnonymousAvatar'
 import {AnonymousUser} from '../../../graphql/AnonymousUser'
-import I18n from 'i18n!discussion_posts'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import PropTypes from 'prop-types'
 import React, {useContext, useMemo} from 'react'
 import {getDisplayName, isAnonymous, resolveAuthorRoles, responsiveQuerySizes} from '../../utils'
@@ -34,6 +34,8 @@ import {Responsive} from '@instructure/ui-responsive'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
+
+const I18n = useI18nScope('discussion_posts');
 
 export const AuthorInfo = props => {
   const {searchTerm, filter} = useContext(SearchContext)

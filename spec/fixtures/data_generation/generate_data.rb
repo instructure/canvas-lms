@@ -387,13 +387,13 @@ def generate_course_with_dated_assignments
   puts "Teacher ID is #{@teacher.id}"
 end
 
-def generate_pace_plan_course
-  puts "Generate a pace plan course with module and assignments"
+def generate_course_pace_course
+  puts "Generate a course pace course with module and assignments"
   course_with_teacher_enrolled
   course_with_students_enrolled
 
-  @root_account.enable_feature!(:pace_plans)
-  @course.update(enable_pace_plans: true)
+  @root_account.enable_feature!(:course_paces)
+  @course.update(enable_course_paces: true)
 
   module1 = create_module(@course)
   assignment1 = create_assignment(@course, "Assignment 1")
@@ -435,8 +435,8 @@ def create_all_the_available_data
   generate_course_with_outcome_rubric
   @course_name = save_course_name + " (course with assignment groups)"
   generate_course_assignment_groups
-  @course_name = save_course_name + " (pace plan course)"
-  generate_pace_plan_course
+  @course_name = save_course_name + " (course pace course)"
+  generate_course_pace_course
 end
 # rubocop:enable Specs/ScopeHelperModules
 
@@ -447,7 +447,7 @@ option_parser = OptionParser.new do |opts|
   opts.on("-a", "--all_data", "Create all the available data with defaults")
   opts.on("-b", "--basic_course", "Course with teacher and students")
   opts.on("-c", "--course_name=COURSENAME", "Course Name")
-  opts.on("-e", "--pace_plan", "Place Plan Course")
+  opts.on("-e", "--course_pace", "Course Pacing Course")
   opts.on("-d", "--dated_assignments", "Course with Dated Assignments")
   opts.on("-g", "--assignment_groups", "Course with Assignments in assignment groups")
   opts.on("-i", "--account_id=ACCOUNTID", "Id Number of the root account")
@@ -515,8 +515,8 @@ options.each_key do |key|
     generate_course_and_submissions
   when :sections
     generate_sections
-  when :pace_plan
-    generate_pace_plan_course
+  when :course_pace
+    generate_course_pace_course
   else raise "should never get here -- BIG FAIL"
   end
 end

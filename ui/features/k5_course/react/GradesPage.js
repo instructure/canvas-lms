@@ -17,7 +17,7 @@
  */
 
 import React, {useState, useCallback, useEffect, useRef} from 'react'
-import I18n from 'i18n!course_grades_page'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import PropTypes from 'prop-types'
 
 import {Tabs} from '@instructure/ui-tabs'
@@ -31,6 +31,8 @@ import GradesEmptyPage from './GradesEmptyPage'
 import GradeDetails from './GradeDetails'
 import IndividualStudentMastery from '@canvas/grade-summary'
 import {outcomeProficiencyShape} from '@canvas/grade-summary/react/IndividualStudentMastery/shapes'
+
+const I18n = useI18nScope('course_grades_page');
 
 export const GradesPage = ({
   courseId,

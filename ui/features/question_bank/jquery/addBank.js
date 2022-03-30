@@ -16,16 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!add_bank'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import $ from 'jquery'
-import '@canvas/jquery/jquery.ajaxJSON' /* ajaxJSON */
-import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, getFormData, formErrors */
+import '@canvas/jquery/jquery.ajaxJSON'/* ajaxJSON */
+import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit, getFormData, formErrors */
 import 'jqueryui/dialog'
-import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
-import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf, .dim */
-import '@canvas/keycodes' /* keycodes */
-import '@canvas/loading-image' /* loadingImage */
-import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
+import '@canvas/jquery/jquery.instructure_misc_helpers'/* replaceTags */
+import '@canvas/jquery/jquery.instructure_misc_plugins'/* confirmDelete, showIf, .dim */
+import '@canvas/keycodes'/* keycodes */
+import '@canvas/loading-image'/* loadingImage */
+import '@canvas/util/templateData'
+const I18n = useI18nScope('add_bank');
+/* fillTemplateData, getTemplateData */
 
 export default function addBank(bank) {
   const current_question_bank_id = $('#bank_urls .current_question_bank_id').text()

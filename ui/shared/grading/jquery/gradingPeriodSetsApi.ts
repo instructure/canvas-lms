@@ -21,10 +21,12 @@ import axios from '@canvas/axios'
 
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 // @ts-ignore
-import I18n from 'i18n!gradingPeriodSetsApi'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import DateHelper from '@canvas/datetime/dateHelper'
 import NaiveRequestDispatch from '@canvas/network/NaiveRequestDispatch/index'
 import gradingPeriodsApi from './gradingPeriodsApi'
+
+const I18n = useI18nScope('gradingPeriodSetsApi');
 
 const listUrl = () => ENV.GRADING_PERIOD_SETS_URL
 

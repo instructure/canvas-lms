@@ -41,9 +41,9 @@ group :test do
   gem "once-ler", "2.0.0"
   gem "sauce_whisk", "0.2.2"
 
-  gem "selenium-webdriver", "3.142.7", require: false
+  gem "selenium-webdriver", "~> 4.1.0", require: false
     gem "childprocess", "3.0.0", require: false
-  gem "webdrivers", "4.2.0", require: false
+  gem "webdrivers", "5.0.0", require: false
   gem "testrailtagging", "0.3.8.7", require: false
 
   gem "webmock", "3.8.2", require: false
@@ -57,7 +57,7 @@ group :test do
     gem "pact-support", "1.16.8", require: false
   gem "pact-messages", "0.2.0"
   gem "pact_broker-client", "1.40.0"
-  if CANVAS_RAILS6_0
+  if CANVAS_RAILS == "6.0"
     gem "database_cleaner", "~> 1.5", ">= 1.5.3"
   else
     gem "database_cleaner", "~> 2.0"
@@ -73,7 +73,7 @@ group :test do
   gem "axe-core-selenium", "~> 4.1.0", require: false
   gem "axe-core-rspec", "~> 4.1.0", require: false
   gem "axe-core-api", "~> 4.1.0", require: false
-  gem "stormbreaker", "0.0.5", require: false
+  gem "stormbreaker", "0.0.8", require: false
 
   # performance tools for instrumenting rspec tests
   gem "stackprof"

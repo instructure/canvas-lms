@@ -85,6 +85,7 @@ class AssignmentsController < ApplicationController
         }
 
         set_default_tool_env!(@context, hash)
+        append_default_due_time_js_env(@context, hash)
 
         js_env(hash)
 
@@ -166,6 +167,8 @@ class AssignmentsController < ApplicationController
     js_env({
              ASSIGNMENT_ID: params[:id],
              CONFETTI_ENABLED: @domain_root_account&.feature_enabled?(:confetti_for_assignments),
+             EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
+             EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list],
              COURSE_ID: @context.id,
              ISOBSERVER: @context_enrollment&.observer?,
              PREREQS: assignment_prereqs,
@@ -349,6 +352,8 @@ class AssignmentsController < ApplicationController
                  ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session),
                  SIMILARITY_PLEDGE: @similarity_pledge,
                  CONFETTI_ENABLED: @domain_root_account&.feature_enabled?(:confetti_for_assignments),
+                 EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
+                 EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list],
                  USER_ASSET_STRING: @current_user&.asset_string,
                })
 
@@ -745,6 +750,7 @@ class AssignmentsController < ApplicationController
       end
 
       set_default_tool_env!(@context, hash)
+      append_default_due_time_js_env(@context, hash)
 
       hash[:ANONYMOUS_GRADING_ENABLED] = @context.feature_enabled?(:anonymous_marking)
       hash[:MODERATED_GRADING_ENABLED] = @context.feature_enabled?(:moderated_grading)

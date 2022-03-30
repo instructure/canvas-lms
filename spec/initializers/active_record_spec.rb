@@ -403,6 +403,10 @@ module ActiveRecord
       it "substitutes 'FOR NO KEY UPDATE' if specified" do
         expect(scope.lock(:no_key_update).lock_value).to eq "FOR NO KEY UPDATE"
       end
+
+      it "substitutes 'FOR NO KEY UPDATE SKIP LOCKED' if specified" do
+        expect(scope.lock(:no_key_update_skip_locked).lock_value).to eq "FOR NO KEY UPDATE SKIP LOCKED"
+      end
     end
 
     describe "union" do
@@ -487,6 +491,30 @@ module ActiveRecord
         let(:base_s2) { @shard2.activate { User.where(id: [user_s1, user_s2]) } }
 
         include_examples "query creation sharding"
+      end
+    end
+
+    describe "touch_all_skip_locked" do
+      before :once do
+        @course1 = Course.create!(name: "course 1")
+        @course2 = Course.create!(name: "course 2")
+        @relation = Course.where(id: [@course1.id, @course2.id])
+      end
+
+      it "uses 'SKIP LOCKED' lock" do
+        Timecop.freeze do
+          now = Time.now.utc
+          expect(@relation).to receive(:update_all_locked_in_order).with(updated_at: now, lock_type: :no_key_update_skip_locked)
+          @relation.touch_all_skip_locked
+        end
+      end
+
+      it "updates the updated_at timestamp on provided relation" do
+        Timecop.freeze do
+          @relation.touch_all_skip_locked
+          expect(@course1.reload.updated_at).to eq Time.now.utc
+          expect(@course2.reload.updated_at).to eq Time.now.utc
+        end
       end
     end
   end
@@ -734,7 +762,7 @@ describe ActiveRecord::Migration::CommandRecorder do
                                       [:add_index, [:accounts, :id, { if_not_exists: true }]],
                                       [:add_foreign_key, [:enrollments, :users, { if_not_exists: true }]],
                                       [:add_column, [:courses, :id, :integer, { limit: 8, if_not_exists: true }], nil],
-                                      (if CANVAS_RAILS6_0
+                                      (if Rails.version < "6.1"
                                          [:remove_index, [:accounts, { algorithm: :concurrently, column: :course_template_id, if_exists: true }]]
                                        else
                                          [:remove_index, [:accounts, :course_template_id, { algorithm: :concurrently, if_exists: true }], nil]

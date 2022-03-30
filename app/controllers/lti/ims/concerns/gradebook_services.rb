@@ -56,7 +56,7 @@ module Lti::IMS::Concerns
       end
 
       def verify_user_in_context
-        return if context.user_is_student? user
+        return if context.user_is_student?(user, include_fake_student: true)
 
         render_error("User not found in course or is not a student", :unprocessable_entity)
       end

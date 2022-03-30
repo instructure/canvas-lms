@@ -17,14 +17,25 @@
  */
 
 const webpack = require('webpack')
+const path = require('path')
 
 module.exports = {
   module: {
     rules: [
+      // this has been broken for a while and babel needs to be reconfigured for
+      // it without depending on @instructure/ui-babel-preset
       {
-        test: /\.js?$/,
-        use: ['babel-loader'],
-        exclude: /node_modules/
+        test: /\.jsx?$/,
+        use: [{
+          loader: 'babel-loader',
+          options: {
+            configFile: false,
+          }
+        }],
+        include: [
+          path.resolve(__dirname, 'src'),
+          path.resolve(__dirname, 'demo'),
+        ],
       },
       {
         test: /\.(woff(2)?|otf|ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,

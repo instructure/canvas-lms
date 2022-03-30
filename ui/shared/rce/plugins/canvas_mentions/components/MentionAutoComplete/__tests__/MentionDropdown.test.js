@@ -180,13 +180,13 @@ describe('Mention Dropdown', () => {
       // This number is always double menu count as two menus exist in the same dom
       expect(getAllByTestId('mention-dropdown-item').length).toBe(20)
 
-      expect(onFocusedUserChangeMock.mock.calls.length).toBe(2)
+      expect(onFocusedUserChangeMock.mock.calls.length).toBe(1)
 
       const menuItems = getAllByTestId('mention-dropdown-item')
       fireEvent.click(menuItems[3].querySelector('li'))
 
-      // Expect 2 re-renders per click totalling 4
-      expect(onFocusedUserChangeMock.mock.calls.length).toBe(4)
+      // Expect 1 re-renders per click totalling 2
+      expect(onFocusedUserChangeMock.mock.calls.length).toBe(2)
     })
   })
 

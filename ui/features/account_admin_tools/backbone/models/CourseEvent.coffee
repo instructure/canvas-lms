@@ -17,7 +17,9 @@
 
 import _ from 'underscore'
 import Backbone from '@canvas/backbone'
-import I18n from 'i18n!course_logging'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
+I18n = useI18nScope('course_logging')
 
 export default class CourseEvent extends Backbone.Model
   present: ->

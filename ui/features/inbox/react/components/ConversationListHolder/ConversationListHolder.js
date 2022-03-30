@@ -18,12 +18,13 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Flex} from '@instructure/ui-flex'
-import I18n from 'i18n!conversations_2'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import PropTypes from 'prop-types'
 import React, {useEffect, useState, useContext} from 'react'
 import InboxEmpty from '../../../svg/inbox-empty.svg'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../../util/utils'
+import {ConversationContext} from '../../../util/constants'
 import {Text} from '@instructure/ui-text'
 import {useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
@@ -31,10 +32,13 @@ import {View} from '@instructure/ui-view'
 import {ConversationListItem} from './ConversationListItem'
 import {UPDATE_CONVERSATION_PARTICIPANTS} from '../../../graphql/Mutations'
 
+const I18n = useI18nScope('conversations_2');
+
 export const ConversationListHolder = ({...props}) => {
   const [selectedMessages, setSelectedMessages] = useState([])
   const [rangeClickStart, setRangeClickStart] = useState()
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+  const {setMultiselect} = useContext(ConversationContext)
 
   const provideConversationsForOnSelect = conversationIds => {
     const matchedConversations = props.conversations
@@ -73,7 +77,7 @@ export const ConversationListHolder = ({...props}) => {
   }
 
   // Key handler for MessageListItems
-  const handleItemSelection = async (e, _id, conversation, multiple) => {
+  const handleItemSelection = (e, _id, conversation, multiple) => {
     // Prevents selecting text when shift clicking to select range
     if (e.shiftKey) {
       window.document.getSelection().removeAllRanges()
@@ -89,8 +93,20 @@ export const ConversationListHolder = ({...props}) => {
     } else {
       // Single Select
       setRangeClickStart(_id)
-      setSelectedMessages([_id])
-      provideConversationsForOnSelect([_id])
+      if (selectedMessages.includes(_id) && e.target.id.includes('Checkbox')) {
+        removeFromSelectedConversations(_id)
+        return
+      }
+
+      setMultiselect(e.target.id.includes('Checkbox'))
+
+      if (e.target.id.includes('Checkbox')) {
+        setSelectedMessages([...selectedMessages, _id])
+        provideConversationsForOnSelect([...selectedMessages, _id])
+      } else {
+        setSelectedMessages([_id])
+        provideConversationsForOnSelect([_id])
+      }
     }
   }
 

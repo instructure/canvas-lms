@@ -15,7 +15,7 @@ RUN apt-get update \
 RUN npm install -g npm@latest && npm cache clean --force
 
 # do this first so yarn install can be cached if package.json has not changed
-COPY --chown=docker:docker package.json yarn.lock babel.config.js /usr/src/app/
+COPY --chown=docker:docker package.json yarn.lock /usr/src/app/
 COPY --chown=docker:docker packages/ /usr/src/app/packages/
 COPY --chown=docker:docker script/install_hooks /usr/src/app/script/
 COPY --chown=docker:docker script/fix_inst_esm.js /usr/src/app/script/fix_inst_esm.js

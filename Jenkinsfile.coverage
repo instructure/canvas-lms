@@ -68,7 +68,6 @@ pipeline {
     RSPECQ_UPDATE_TIMINGS = "${env.GERRIT_EVENT_TYPE == 'change-merged' ? '1' : '0'}"
     ENABLE_AXE_SELENIUM = "${env.ENABLE_AXE_SELENIUM}"
     POSTGRES_PASSWORD = 'sekret'
-    SELENIUM_VERSION = '3.141.59-20210929'
     RSPECQ_REDIS_URL = redisUrl()
     PATCHSET_TAG = getPatchsetTag()
     CANVAS_ZEITWERK = '1'
@@ -103,18 +102,18 @@ pipeline {
                 projectName: env.JOB_NAME,
                 selector: specific(env.BUILD_NUMBER),
               )
-  
+
               withEnv(['COMPOSE_FILE=docker-compose.new-jenkins.yml']) {
                 sh """
                   docker-compose run -v \$(pwd)/\$LOCAL_WORKDIR/tmp/coverage/:/tmp/coverage \
                   --name coverage-collator canvas bash -c \
                   "bundle install; bundle exec rake coverage:report['/tmp/coverage/canvas__*/**']"
                 """
-       
+
                 sh 'docker cp coverage-collator:/usr/src/app/coverage/ coverage'
-      
+
                 archiveArtifacts allowEmptyArchive: true, artifacts: 'coverage/**'
-      
+
                 publishHTML target: [
                   allowMissing: false,
                   alwaysLinkToLastBuild: false,
@@ -123,7 +122,7 @@ pipeline {
                   reportFiles: 'index.html',
                   reportName: 'Ruby Coverage Report'
                 ]
-      
+
                 uploadCoverage([
                   uploadSource: '/coverage',
                   uploadDest: env.COVERAGE_LOCATION

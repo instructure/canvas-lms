@@ -111,6 +111,9 @@
     "message": "Foro de discusión emocionante"
   },
   "excused_cf8792eb": { "message": "Justificado" },
+  "failed_getting_course_list_49846a93": {
+    "message": "Falló la obtención de la lista de cursos"
+  },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "Error al echar un vistazo a su futuro"
   },

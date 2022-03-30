@@ -21,7 +21,9 @@
  * data-tooltip=""
  */
 
-import I18n from 'i18n!dateformat'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('dateformat');
 
 const accessibleDateFormat = () => {
   return I18n.t('YYYY-MM-DD hh:mm')

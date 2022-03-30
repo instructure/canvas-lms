@@ -206,6 +206,10 @@ module ImprovedOutcomeManagementPage
     rating_delete_buttons[index.nil? ? rating_delete_buttons.length - 1 : index]
   end
 
+  def confirm_delete_individual_rating_button
+    fj("button:contains('Confirm')")
+  end
+
   def calculation_int_input
     f("input[data-testid='calculation-int-input']")
   end
@@ -349,5 +353,6 @@ module ImprovedOutcomeManagementPage
 
   def delete_nth_individual_outcome_rating(index = nil)
     nth_individual_rating_delete_button(index).click
+    confirm_delete_individual_rating_button.click
   end
 end

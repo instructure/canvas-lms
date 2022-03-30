@@ -399,7 +399,13 @@ class StreamItem < ActiveRecord::Base
       Shard.current.database_server.unguard do
         StreamItem.vacuum
         StreamItemInstance.vacuum
-        ActiveRecord::Base.connection_pool.current_pool.disconnect! unless Rails.env.test?
+        unless Rails.env.test?
+          if Rails.version < "6.1"
+            ActiveRecord::Base.connection_pool.current_pool.disconnect!
+          else
+            ActiveRecord::Base.connection_pool.disconnect!
+          end
+        end
       end
     end
 

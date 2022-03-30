@@ -48,6 +48,10 @@ module Gradebook
     fj('[role="menuitemcheckbox"]:contains("Notes")')
   end
 
+  def self.split_student_names_option
+    fj('[role="menuitemcheckbox"]:contains("Split Student Names")')
+  end
+
   def self.save_button
     fj('button span:contains("Save")')
   end

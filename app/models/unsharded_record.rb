@@ -18,9 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# TODO: CANVAS_RAILS6_0 remove this whole class since we will always get it from switchman
+# TODO: CANVAS_RAILS="6.0" remove this whole class since we will always get it from switchman
 class UnshardedRecord < ::ActiveRecord::Base
   self.abstract_class = true
 
-  self.shard_category = :unsharded
+  # This line is conditional just so if it is eager-loaded nothing breaks
+  self.shard_category = :unsharded if Rails.version < "6.1"
 end

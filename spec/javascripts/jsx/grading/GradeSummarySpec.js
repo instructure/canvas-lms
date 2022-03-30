@@ -19,12 +19,14 @@
 import _ from 'lodash'
 
 import $ from 'jquery'
-import I18n from 'i18n!gradingGradeSummary'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import fakeENV from 'helpers/fakeENV'
 import numberHelper from '@canvas/i18n/numberHelper'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import GradeSummary from 'ui/features/grade_summary/jquery/index.js'
 import {createCourseGradesWithGradingPeriods} from '../gradebook/GradeCalculatorSpecHelper'
+
+const I18n = useI18nScope('gradingGradeSummary');
 
 const $fixtures = $('#fixtures')
 
@@ -387,7 +389,7 @@ QUnit.module('GradeSummary.calculateTotals', suiteHooks => {
   })
 
   test('localizes displayed grade', () => {
-    sandbox.stub(I18n, 'n').returns('1,234')
+    sandbox.stub(I18n.constructor.prototype, 'n').returns('1,234')
     GradeSummary.calculateTotals(createExampleGrades(), 'current', 'percent')
     const $teaser = $fixtures.find('.student_assignment.final_grade .score_teaser')
     ok($teaser.text().includes('1,234'), 'includes internationalized score')
@@ -569,7 +571,7 @@ QUnit.module('GradeSummary.formatPercentGrade')
 
 test('returns an internationalized number value', () => {
   sandbox
-    .stub(I18n, 'n')
+    .stub(I18n.constructor.prototype, 'n')
     .withArgs(1234)
     .returns('1,234%')
   equal(GradeSummary.formatPercentGrade(1234), '1,234%')
@@ -578,7 +580,7 @@ test('returns an internationalized number value', () => {
 QUnit.module('GradeSummary.calculateGrade')
 
 test('returns an internationalized percentage when given a score and nonzero points possible', () => {
-  sandbox.stub(I18n, 'n').callsFake(number => `${number}%`)
+  sandbox.stub(I18n.constructor.prototype, 'n').callsFake(number => `${number}%`)
   equal(GradeSummary.calculateGrade(97, 100), '97%')
   equal(I18n.n.getCall(0).args[1].percentage, true)
 })

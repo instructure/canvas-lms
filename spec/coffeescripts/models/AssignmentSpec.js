@@ -1183,6 +1183,69 @@ test('returns false when anonymousInstructorAnnotations is false', () => {
   strictEqual(assignment.toView().anonymousInstructorAnnotations, false)
 })
 
+QUnit.module('Assignment#singleSection', {
+  setup() {
+    fakeENV.setup()
+  },
+  teardown() {
+    fakeENV.teardown()
+  }
+})
+
+test('returns null when all_dates is null', () => {
+  const assignment = new Assignment({})
+  sandbox.stub(assignment, 'allDates').returns(null)
+  equal(assignment.singleSection(), null)
+})
+
+test('returns null when there are multiple all_dates records', () => {
+  const date = new Date('2022-02-15T11:13:00')
+  const assignment = new Assignment({
+    all_dates: [
+      {
+        lock_at: date,
+        unlock_at: date,
+        due_at: null,
+        title: 'Section A'
+      },
+      {
+        lock_at: date,
+        unlock_at: date,
+        due_at: null,
+        title: 'Section B'
+      },
+      {
+        lock_at: date,
+        unlock_at: date,
+        due_at: null,
+        title: 'Section C'
+      }
+    ]
+  })
+  equal(assignment.singleSection(), null)
+})
+
+test('returns null when there are no records in all_dates', () => {
+  const assignment = new Assignment({
+    all_dates: []
+  })
+  equal(assignment.singleSection(), null)
+})
+
+test('returns the first element in all_dates when the length is 1', () => {
+  const assignment = new Assignment({
+    all_dates: [
+      {
+        lock_at: new Date('2022-02-15T11:13:00'),
+        unlock_at: new Date('2022-02-16T11:13:00'),
+        due_at: new Date('2022-02-17T11:13:00'),
+        title: 'Section A'
+      }
+    ]
+  })
+  deepEqual(assignment.singleSection(), assignment.allDates()[0])
+})
+
 QUnit.module('Assignment#canDuplicate')
 
 test('returns true if record can be duplicated', () => {

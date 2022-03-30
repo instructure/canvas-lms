@@ -295,8 +295,8 @@ describe('ProficiencyCalculation', () => {
           />
         )
         const parameter = getByLabelText('Parameter')
-        fireEvent.input(parameter, {target: {value: '7'}})
-        expect(getByText('Must be between 1 and 5')).not.toBeNull()
+        fireEvent.input(parameter, {target: {value: '13'}})
+        expect(getByText('Must be between 1 and 10')).not.toBeNull()
       })
 
       it('includes error when int too low', () => {
@@ -307,7 +307,7 @@ describe('ProficiencyCalculation', () => {
         )
         const parameter = getByLabelText('Parameter')
         fireEvent.input(parameter, {target: {value: '0'}})
-        expect(getByText('Must be between 1 and 5')).not.toBeNull()
+        expect(getByText('Must be between 1 and 10')).not.toBeNull()
       })
 
       it('renders the confirmation modal only when int is valid', async () => {
@@ -318,8 +318,8 @@ describe('ProficiencyCalculation', () => {
           />
         )
         const parameter = getByLabelText('Parameter')
-        fireEvent.input(parameter, {target: {value: '6'}})
-        fireEvent.input(parameter, {target: {value: '9'}})
+        fireEvent.input(parameter, {target: {value: '11'}})
+        fireEvent.input(parameter, {target: {value: '16'}})
         fireEvent.click(getByText('Save Mastery Calculation'))
         expect(queryByText('Save')).not.toBeInTheDocument()
         fireEvent.input(parameter, {target: {value: '3'}})

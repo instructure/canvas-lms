@@ -77,6 +77,19 @@ describe Types::DiscussionEntryType do
     expect(discussion_sub_entry_type.resolve("isolatedEntryId")).to eq sub_entry.root_entry_id.to_s
   end
 
+  it "converts anchor tag to video tag" do
+    discussion_for_translating_tags = DiscussionTopic.create!(
+      title: "Welcome whoever you are",
+      message: "anonymous discussion",
+      context: @course,
+      user: @teacher
+    )
+
+    entry_to_translate = discussion_for_translating_tags.discussion_entries.create!(message: '<span>this is the first part</span><a id="media_comment_m-4RLD5qHyQwnnjQbTsHhDfFFKNQwuTdJE" class="instructure_inline_media_comment video_comment" href="/media_objects/m-4RLD5qHyQwnnjQbTsHhDfFFKNQwuTdJE">this is a media comment</a><span>this is the last part</span>', user: @teacher, editor: @teacher)
+    type = GraphQLTypeTester.new(entry_to_translate, current_user: @teacher)
+    expect(type.resolve("message")).to eq "<span>this is the first part</span><div><video preload=\"none\" class=\"instructure_inline_media_comment\" data-media_comment_id=\"m-4RLD5qHyQwnnjQbTsHhDfFFKNQwuTdJE\" data-media_comment_type=\"video\" controls=\"controls\" poster=\"/media_objects/m-4RLD5qHyQwnnjQbTsHhDfFFKNQwuTdJE/thumbnail?height=448&amp;type=3&amp;width=550\" src=\"/courses/#{@course.id}/media_download?entryId=m-4RLD5qHyQwnnjQbTsHhDfFFKNQwuTdJE&amp;media_type=video&amp;redirect=1\" data-alt=\"\"></video></div><span>this is the last part</span>"
+  end
+
   describe "quoted entry" do
     before do
       allow(Account.site_admin).to receive(:feature_enabled?).with(:isolated_view).and_return(true)
@@ -124,6 +137,24 @@ describe Types::DiscussionEntryType do
       @anon_designer_discussion_entry = @anon_discussion.discussion_entries.create!(message: "I designed this course!", user: @designer, editor: @designer)
       @anon_designer_discussion_entry_type = GraphQLTypeTester.new(@anon_designer_discussion_entry, current_user: @teacher)
 
+      @custom_teacher = user_factory(name: "custom teacher")
+      teacher_role_custom = custom_teacher_role("CustomTeacherRole", account: @course.account)
+      course_with_user("TeacherEnrollment", course: @course, user: @custom_teacher, active_all: true, role: teacher_role_custom)
+      @anon_custom_teacher_discussion_entry = @anon_discussion.discussion_entries.create!(message: "Hello!", user: @custom_teacher, editor: @custom_teacher)
+      @anon_custom_teacher_discussion_entry_type = GraphQLTypeTester.new(@anon_custom_teacher_discussion_entry, current_user: @custom_teacher)
+
+      @custom_ta = user_factory(name: "custom ta")
+      ta_role_custom = custom_ta_role("CustomTARole", account: @course.account)
+      course_with_user("TaEnrollment", course: @course, user: @custom_ta, active_all: true, role: ta_role_custom)
+      @anon_custom_ta_discussion_entry = @anon_discussion.discussion_entries.create!(message: "Hello!", user: @custom_ta, editor: @custom_ta)
+      @anon_custom_ta_discussion_entry_type = GraphQLTypeTester.new(@anon_custom_ta_discussion_entry, current_user: @custom_ta)
+
+      @custom_designer = user_factory(name: "custom designer")
+      designer_role_custom = custom_designer_role("CustomDesignerRole", account: @course.account)
+      course_with_user("DesignerEnrollment", course: @course, user: @custom_designer, active_all: true, role: designer_role_custom)
+      @anon_custom_designer_discussion_entry = @anon_discussion.discussion_entries.create!(message: "Hello!", user: @custom_designer, editor: @custom_designer)
+      @anon_custom_designer_discussion_entry_type = GraphQLTypeTester.new(@anon_custom_designer_discussion_entry, current_user: @custom_designer)
+
       @partial_anon_student_discussion_entry_exposed = @partially_anon_discussion.discussion_entries.create!(message: "Why, hello there!", user: @student, editor: @student, is_anonymous_author: false)
       @partial_anon_student_discussion_entry_exposed_type = GraphQLTypeTester.new(@partial_anon_student_discussion_entry_exposed, current_user: @teacher)
 
@@ -135,12 +166,24 @@ describe Types::DiscussionEntryType do
       expect(@anon_teacher_discussion_entry_type.resolve("author { shortName }")).to eq @teacher.short_name
     end
 
+    it "returns the author of custom teacher post" do
+      expect(@anon_custom_teacher_discussion_entry_type.resolve("author { shortName }")).to eq @custom_teacher.short_name
+    end
+
     it "returns the author of ta post" do
       expect(@anon_ta_discussion_entry_type.resolve("author { shortName }")).to eq @ta.short_name
     end
 
+    it "returns the author of custom TA post" do
+      expect(@anon_custom_ta_discussion_entry_type.resolve("author { shortName }")).to eq @custom_ta.short_name
+    end
+
     it "returns the author of designer post" do
       expect(@anon_designer_discussion_entry_type.resolve("author { shortName }")).to eq @designer.short_name
+    end
+
+    it "returns the author of custom designer post" do
+      expect(@anon_custom_designer_discussion_entry_type.resolve("author { shortName }")).to eq @custom_designer.short_name
     end
 
     it "does not return the author of student anonymous entry" do
@@ -161,27 +204,27 @@ describe Types::DiscussionEntryType do
     end
 
     it "returns the teacher author if a course id is provided" do
-      expect(@anon_teacher_discussion_entry_type.resolve("author(courseId: #{@course.id}) { shortName }")).to eq @teacher.short_name
+      expect(@anon_teacher_discussion_entry_type.resolve("author(courseId: \"#{@course.id}\") { shortName }")).to eq @teacher.short_name
     end
 
     it "returns the teacher editor if a course id is provided" do
-      expect(@anon_teacher_discussion_entry_type.resolve("editor(courseId: #{@course.id}) { shortName }")).to eq @teacher.short_name
+      expect(@anon_teacher_discussion_entry_type.resolve("editor(courseId: \"#{@course.id}\") { shortName }")).to eq @teacher.short_name
     end
 
     it "returns the designer author if a course id is provided" do
-      expect(@anon_designer_discussion_entry_type.resolve("author(courseId: #{@course.id}) { shortName }")).to eq @designer.short_name
+      expect(@anon_designer_discussion_entry_type.resolve("author(courseId: \"#{@course.id}\") { shortName }")).to eq @designer.short_name
     end
 
     it "returns the designer editor if a course id is provided" do
-      expect(@anon_designer_discussion_entry_type.resolve("editor(courseId: #{@course.id}) { shortName }")).to eq @designer.short_name
+      expect(@anon_designer_discussion_entry_type.resolve("editor(courseId: \"#{@course.id}\") { shortName }")).to eq @designer.short_name
     end
 
     it "does not return the student author if a course id is provided" do
-      expect(@anon_student_discussion_entry_type.resolve("author(courseId: #{@course.id}) { shortName }")).to eq nil
+      expect(@anon_student_discussion_entry_type.resolve("author(courseId: \"#{@course.id}\") { shortName }")).to eq nil
     end
 
     it "does not return the student editor if a course id is provided" do
-      expect(@anon_student_discussion_entry_type.resolve("editor(courseId: #{@course.id}) { shortName }")).to eq nil
+      expect(@anon_student_discussion_entry_type.resolve("editor(courseId: \"#{@course.id}\") { shortName }")).to eq nil
     end
 
     describe "quoted reply" do
@@ -221,11 +264,11 @@ describe Types::DiscussionEntryType do
     context "partial anonymity" do
       context "when is_anonymous_author is set to true" do
         it "does not return author" do
-          expect(@partial_anon_student_discussion_entry_not_exposed_type.resolve("author(courseId: #{@course.id}) { shortName }")).to eq nil
+          expect(@partial_anon_student_discussion_entry_not_exposed_type.resolve("author(courseId: \"#{@course.id}\") { shortName }")).to eq nil
         end
 
         it "does not return editor" do
-          expect(@partial_anon_student_discussion_entry_not_exposed_type.resolve("editor(courseId: #{@course.id}) { shortName }")).to eq nil
+          expect(@partial_anon_student_discussion_entry_not_exposed_type.resolve("editor(courseId: \"#{@course.id}\") { shortName }")).to eq nil
         end
 
         it "returns anonymous_author" do
@@ -234,12 +277,16 @@ describe Types::DiscussionEntryType do
       end
 
       context "when is_anonymous_author is set to false" do
+        it "returns author when shard id is present" do
+          expect(@partial_anon_student_discussion_entry_exposed_type.resolve("author(courseId: \"#{Shard.current.id}~#{@course.id}\") { shortName }")).to eq @student.short_name
+        end
+
         it "returns author" do
-          expect(@partial_anon_student_discussion_entry_exposed_type.resolve("author(courseId: #{@course.id}) { shortName }")).to eq @student.short_name
+          expect(@partial_anon_student_discussion_entry_exposed_type.resolve("author(courseId: \"#{@course.id}\") { shortName }")).to eq @student.short_name
         end
 
         it "returns editor" do
-          expect(@partial_anon_student_discussion_entry_exposed_type.resolve("editor(courseId: #{@course.id}) { shortName }")).to eq @student.short_name
+          expect(@partial_anon_student_discussion_entry_exposed_type.resolve("editor(courseId: \"#{@course.id}\") { shortName }")).to eq @student.short_name
         end
 
         it "does not return anonymous_author" do

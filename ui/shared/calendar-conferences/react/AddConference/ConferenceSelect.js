@@ -22,8 +22,10 @@ import {Img} from '@instructure/ui-img'
 import {Select} from '@instructure/ui-select'
 import {Text} from '@instructure/ui-text'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
-import I18n from 'i18n!conferences'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import webConferenceType from '../proptypes/webConferenceType'
+
+const I18n = useI18nScope('conferences');
 
 function iconFor(conferenceType) {
   const icon = conferenceType?.lti_settings?.icon_url

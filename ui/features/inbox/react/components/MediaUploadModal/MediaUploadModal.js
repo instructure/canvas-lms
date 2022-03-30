@@ -24,7 +24,9 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Tabs} from '@instructure/ui-tabs'
-import I18n from 'i18n!conversations_2'
+import { useScope as useI18nScope } from '@canvas/i18n';
+
+const I18n = useI18nScope('conversations_2');
 
 const translations = {
   ARIA_VIDEO_LABEL: () => I18n.t('Video Player'),

@@ -423,6 +423,7 @@ describe DiscussionTopicsController do
     end
 
     context 'with the "react_discussions_post" FF enabled' do
+      render_views
       subject { get "show", params: { course_id: course.id, id: discussion.id } }
 
       let!(:discussion) do
@@ -474,15 +475,15 @@ describe DiscussionTopicsController do
           discussion.save
 
           subject
-          expect(response.to_a.to_s).to match(/.+enrollment.+\.rss/)
-          expect(response.to_a.to_s).to include("Discussion Podcast Feed")
+          expect(response.body).to match(/.+enrollment.+\.rss/)
+          expect(response.body).to include("Discussion Podcast Feed")
         end
       end
 
       it "adds Discussion Atom Feed to header" do
         subject
-        expect(response.to_a.to_s).to match(/.+enrollment.+\.atom/)
-        expect(response.to_a.to_s).to include("Discussion Atom Feed")
+        expect(response.body).to match(/.+enrollment.+\.atom/)
+        expect(response.body).to include("Discussion Atom Feed")
       end
     end
 

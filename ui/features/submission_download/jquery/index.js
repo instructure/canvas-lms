@@ -17,12 +17,14 @@
  */
 
 import INST from 'browser-sniffer'
-import I18n from 'i18n!submissions'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jqueryui/dialog'
 import 'jqueryui/progressbar'
+
+const I18n = useI18nScope('submissions');
 
 const MAX_RETRIES = 3
 

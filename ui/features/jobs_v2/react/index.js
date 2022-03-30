@@ -16,60 +16,139 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!jobs_v2'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useCallback, useReducer, useMemo} from 'react'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import JobsHeader from './components/JobsHeader'
 import JobsTable from './components/JobsTable'
+import GroupsTable from './components/GroupsTable'
+import JobDetails from './components/JobDetails'
+import {Heading} from '@instructure/ui-heading'
+
+const I18n = useI18nScope('jobs_v2')
 
 function jobsReducer(prevState, action) {
-  if (action.type === 'FETCH_SUCCESS') {
-    return {...prevState, jobs: action.payload}
-  } else if (action.type === 'CHANGE_FLAVOR') {
-    return {...prevState, flavor: action.payload}
+  if (action.type === 'CHANGE_BUCKET') {
+    return {...prevState, bucket: action.payload, groups: [], jobs: [], job: null, group_text: ''}
+  } else if (action.type === 'CHANGE_GROUP_TYPE') {
+    return {...prevState, group_type: action.payload, groups: [], jobs: [], job: null}
+  } else if (action.type === 'CHANGE_GROUP_ORDER') {
+    return {...prevState, group_order: action.payload, groups: []}
+  } else if (action.type === 'FETCHED_GROUPS') {
+    return {...prevState, groups: action.payload}
+  } else if (action.type === 'CHANGE_GROUP_TEXT') {
+    if (prevState.group_text !== action.payload) {
+      return {...prevState, group_text: action.payload, jobs: [], job: null}
+    } else {
+      // clicking the same tag again will toggle the filter off
+      return {...prevState, group_text: '', jobs: [], job: null}
+    }
+  } else if (action.type === 'CHANGE_JOBS_ORDER') {
+    return {...prevState, jobs_order: action.payload, jobs: [], job: null}
+  } else if (action.type === 'FETCHED_JOBS') {
+    return {...prevState, jobs: action.payload, job: null}
+  } else if (action.type === 'SELECT_JOB') {
+    return {...prevState, job: action.payload}
   }
 }
 
 export default function JobsIndex() {
   const [state, dispatch] = useReducer(jobsReducer, {
-    flavor: 'running',
-    jobs: []
+    bucket: 'running',
+    group_text: '',
+    group_type: 'tag',
+    group_order: 'info',
+    jobs_order: 'info',
+    groups: [],
+    jobs: [],
+    job: null
   })
 
-  const captions = useMemo(() => {
+  const bucketCaptions = useMemo(() => {
     return {
+      queued: I18n.t('Queued jobs'),
       running: I18n.t('Running jobs'),
-      current: I18n.t('Current jobs'),
       future: I18n.t('Future jobs'),
       failed: I18n.t('Failed jobs')
     }
   }, [])
 
-  const jobKey = useCallback(() => {
-    return state.flavor === 'running' ? 'running' : 'jobs'
-  }, [state.flavor])
+  const groupCaptions = useMemo(() => {
+    return {
+      tag: I18n.t('Tag'),
+      strand: I18n.t('Strand'),
+      singleton: I18n.t('Singleton')
+    }
+  }, [])
+
+  const groupTitles = useMemo(() => {
+    return {
+      tag: I18n.t('Tags'),
+      strand: I18n.t('Strands'),
+      singleton: I18n.t('Singletons')
+    }
+  }, [])
 
   useFetchApi({
-    path: '/jobs',
+    path: `/api/v1/jobs2/${state.bucket}/by_${state.group_type}`,
     params: {
-      flavor: state.flavor === 'running' ? 'current' : state.flavor,
-      only: jobKey()
+      order: state.group_order
     },
-    success: useCallback(
-      response => {
-        dispatch({type: 'FETCH_SUCCESS', payload: response[jobKey()]})
-      },
-      [jobKey]
-    )
+    success: useCallback(response => {
+      dispatch({type: 'FETCHED_GROUPS', payload: response})
+    }, [])
+  })
+
+  useFetchApi({
+    path: `/api/v1/jobs2/${state.bucket}`,
+    params: {
+      [state.group_type]: state.group_text,
+      order: state.jobs_order
+    },
+    success: useCallback(response => {
+      dispatch({type: 'FETCHED_JOBS', payload: response})
+    }, [])
   })
 
   return (
     <>
+      <Heading level="h1" margin="0 0 small 0">
+        {I18n.t('Jobs Control Panel')}
+      </Heading>
       <JobsHeader
-        jobFlavor={state.flavor}
-        onChange={event => dispatch({type: 'CHANGE_FLAVOR', payload: event.target.value})}
+        jobBucket={state.bucket}
+        onChangeBucket={event => dispatch({type: 'CHANGE_BUCKET', payload: event.target.value})}
+        jobGroup={state.group_type}
+        onChangeGroup={event => dispatch({type: 'CHANGE_GROUP_TYPE', payload: event.target.value})}
       />
-      <JobsTable jobs={state.jobs} caption={captions[state.flavor]} />
+      <Heading level="h2" margin="large 0 small 0">
+        {groupTitles[state.group_type]}
+      </Heading>
+      <GroupsTable
+        type={state.group_type}
+        typeCaption={groupCaptions[state.group_type]}
+        groups={state.groups}
+        bucket={state.bucket}
+        caption={bucketCaptions[state.bucket]}
+        sortColumn={state.group_order}
+        onClickGroup={text => dispatch({type: 'CHANGE_GROUP_TEXT', payload: text})}
+        onClickHeader={col => dispatch({type: 'CHANGE_GROUP_ORDER', payload: col})}
+      />
+      <Heading level="h2" margin="large 0 small 0">
+        {I18n.t('Jobs')}
+      </Heading>
+      <JobsTable
+        bucket={state.bucket}
+        jobs={state.jobs}
+        caption={bucketCaptions[state.bucket]}
+        sortColumn={state.jobs_order}
+        onClickJob={job => dispatch({type: 'SELECT_JOB', payload: job})}
+        onClickHeader={col => dispatch({type: 'CHANGE_JOBS_ORDER', payload: col})}
+      />
+      <Heading level="h2" margin="large 0 small 0">
+        {I18n.t('Details')}
+      </Heading>
+      <JobDetails job={state.job} />
     </>
   )
 }

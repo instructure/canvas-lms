@@ -256,39 +256,39 @@ describe "course settings" do
       expect(home_page_announcement_limit).not_to be_disabled
     end
 
-    describe "pace plans setting" do
-      describe "when the pace plans feature flag is enabled" do
+    describe "course paces setting" do
+      describe "when the course paces feature flag is enabled" do
         before do
-          @account.enable_feature!(:pace_plans)
+          @account.enable_feature!(:course_paces)
         end
 
-        it "displays the pace plans setting (and if checked, the caution text)" do
+        it "displays the course paces setting (and if checked, the caution text)" do
           get "/courses/#{@course.id}/settings"
 
-          expect(element_exists?(".pace-plans-row")).to be_truthy
+          expect(element_exists?(".course-paces-row")).to be_truthy
 
-          caution_text = "Pace Plans is in active development."
-          pace_plans_checkbox = f("#course_enable_pace_plans")
+          caution_text = "Course Pacing is in active development."
+          course_paces_checkbox = f("#course_enable_course_paces")
 
-          pace_plans_checkbox.click
+          course_paces_checkbox.click
           wait_for_ajaximations
-          expect(f(".pace-plans-row")).to include_text caution_text
+          expect(f(".course-paces-row")).to include_text caution_text
 
-          pace_plans_checkbox.click
+          course_paces_checkbox.click
           wait_for_ajaximations
-          expect(f(".pace-plans-row")).not_to include_text caution_text
+          expect(f(".course-paces-row")).not_to include_text caution_text
         end
       end
 
-      describe "when the pace plans feature flag is disabled" do
+      describe "when the course paces feature flag is disabled" do
         before do
-          @account.disable_feature!(:pace_plans)
+          @account.disable_feature!(:course_paces)
         end
 
-        it "does not display the pace plans setting" do
+        it "does not display the course paces setting" do
           get "/courses/#{@course.id}/settings"
 
-          expect(element_exists?(".pace-plans-row")).to be_falsey
+          expect(element_exists?(".course-paces-row")).to be_falsey
         end
       end
     end

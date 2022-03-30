@@ -18,12 +18,14 @@
 
 import React, {useState, useCallback, useRef} from 'react'
 import PropTypes from 'prop-types'
-import I18n from 'i18n!conferences'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import ConferenceButton from './ConferenceButton'
 import AddLtiConferenceDialog from './AddLtiConferenceDialog'
 import webConferenceType from '../proptypes/webConferenceType'
+
+const I18n = useI18nScope('conferences');
 
 const AddConference = ({
   context,

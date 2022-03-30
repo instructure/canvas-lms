@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!student_groups'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import _ from 'underscore'
 import $ from 'jquery'
 import React from 'react'
@@ -25,6 +25,8 @@ import BackboneState from './mixins/BackboneState'
 import PaginatedUserCheckList from './PaginatedUserCheckList'
 import InfiniteScroll from './mixins/InfiniteScroll'
 import '@canvas/forms/jquery/jquery.instructure_forms'
+
+const I18n = useI18nScope('student_groups');
 
 const ManageGroupDialog = createReactClass({
   displayName: 'ManageGroupDialog',

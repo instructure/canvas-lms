@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!external_tools'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
@@ -26,6 +26,8 @@ import ConfigurationFormXml from './ConfigurationFormXml'
 import ConfigurationFormLti13 from './ConfigurationFormLti13'
 import ConfigurationFormLti2 from './ConfigurationFormLti2'
 import ConfigurationTypeSelector from './ConfigurationTypeSelector'
+
+const I18n = useI18nScope('external_tools');
 
 export default class ConfigurationForm extends React.Component {
   static propTypes = {

@@ -19,7 +19,7 @@
 import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
 import {array, func, instanceOf} from 'prop-types'
-import I18n from 'i18n!ImportOutcomesModal'
+import { useScope as useI18nScope } from '@canvas/i18n';
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {FileDrop} from '@instructure/ui-file-drop'
 import {Billboard} from '@instructure/ui-billboard'
@@ -28,6 +28,8 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import SVGWrapper from '@canvas/svg-wrapper'
+
+const I18n = useI18nScope('ImportOutcomesModal');
 
 export function showImportOutcomesModal(props) {
   const parent = document.createElement('div')

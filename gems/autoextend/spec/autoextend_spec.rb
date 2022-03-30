@@ -27,7 +27,7 @@ ActiveSupport::Dependencies.hook!
 
 require "autoextend"
 
-# CANVAS_RAILS6_1 this pattern will need reworking in a rails >= 7.0 world
+# CANVAS_RAILS="6.1" this pattern will need reworking in a rails >= 7.0 world
 if ENV["WITH_ZEITWERK"]
   require "zeitwerk"
   require "rails"
