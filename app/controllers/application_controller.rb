@@ -52,6 +52,7 @@ class ApplicationController < ActionController::Base
   prepend_before_action :activate_authlogic
 
   around_action :set_locale
+  around_action :set_timezone
   around_action :enable_request_cache
   around_action :batch_statsd
   around_action :compute_http_cost
@@ -113,6 +114,10 @@ class ApplicationController < ActionController::Base
         Delayed::Batch.serial_batch(batch_opts || {}, &action)
       end
     end
+  end
+
+  def supported_timezones
+    ActiveSupport::TimeZone.all.map { |tz| tz.tzinfo.name }
   end
 
   add_crumb(proc do
@@ -265,8 +270,14 @@ class ApplicationController < ActionController::Base
         @js_env[:IS_LARGE_ROSTER] = true if !@js_env[:IS_LARGE_ROSTER] && @context.respond_to?(:large_roster?) && @context.large_roster?
         @js_env[:context_asset_string] = @context.try(:asset_string) unless @js_env[:context_asset_string]
         @js_env[:ping_url] = polymorphic_url([:api_v1, @context, :ping]) if @context.is_a?(Course)
-        @js_env[:TIMEZONE] = Time.zone.tzinfo.identifier unless @js_env[:TIMEZONE]
-        @js_env[:CONTEXT_TIMEZONE] = @context.time_zone.tzinfo.identifier if !@js_env[:CONTEXT_TIMEZONE] && @context.respond_to?(:time_zone) && @context.time_zone.present?
+        if params[:session_timezone].present? && supported_timezones.include?(params[:session_timezone])
+          timezone = context_timezone = params[:session_timezone]
+        else
+          timezone = Time.zone.tzinfo.identifier unless @js_env[:TIMEZONE]
+          context_timezone = @context.time_zone.tzinfo.identifier if !@js_env[:CONTEXT_TIMEZONE] && @context.respond_to?(:time_zone) && @context.time_zone.present?
+        end
+        @js_env[:TIMEZONE] = timezone
+        @js_env[:CONTEXT_TIMEZONE] = context_timezone
         unless @js_env[:LOCALES]
           I18n.set_locale_with_localizer
           @js_env[:LOCALES] = I18n.fallbacks[I18n.locale].map(&:to_s)
@@ -645,6 +656,7 @@ class ApplicationController < ActionController::Base
         # as global state on I18n (cleanup failure), we don't want it to
         # explode trying to access a non-existant request.
         context_hash[:session_locale] = session[:locale]
+        context_hash[:session_timezone] = session[:timezone]
         context_hash[:accept_language] = request.headers["Accept-Language"]
       else
         logger.warn("[I18N] localizer executed from context-less controller")
@@ -659,6 +671,11 @@ class ApplicationController < ActionController::Base
     yield if block_given?
   ensure
     I18n.localizer = nil
+  end
+
+  def set_timezone
+    store_session_timezone
+    yield if block_given?
   end
 
   def enable_request_cache(&block)
@@ -703,6 +720,12 @@ class ApplicationController < ActionController::Base
 
     supported_locales = I18n.available_locales.map(&:to_s)
     session[:locale] = locale if supported_locales.include? locale
+  end
+
+  def store_session_timezone
+    return unless (timezone = params[:session_timezone])
+
+    session[:timezone] = timezone if supported_timezones.include? params[:session_timezone]
   end
 
   def init_body_classes

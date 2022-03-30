@@ -221,6 +221,50 @@ RSpec.describe ApplicationController do
         end
       end
 
+      context "session_timezone url param is given" do
+        before do
+          allow(controller).to receive(:params).and_return({ session_timezone: "America/New_York" })
+        end
+
+        it "sets the timezone from the url" do
+          Time.use_zone("Mountain Time (US & Canada)") do
+            controller.instance_variable_set(:@context, double(time_zone: Time.zone, asset_string: "", class_name: nil))
+            controller.js_env({})
+            expect(controller.js_env[:TIMEZONE]).to eq "America/New_York"
+          end
+        end
+
+        it "sets the contextual timezone from the url" do
+          Time.use_zone("Mountain Time (US & Canada)") do
+            controller.instance_variable_set(:@context, double(time_zone: Time.zone, asset_string: "", class_name: nil))
+            controller.js_env({})
+            expect(controller.js_env[:CONTEXT_TIMEZONE]).to eq "America/New_York"
+          end
+        end
+
+        context "session_timezone is not valid" do
+          before do
+            allow(controller).to receive(:params).and_return({ session_timezone: "ChawnZone" })
+          end
+
+          it "sets the contextual timezone from the context" do
+            Time.use_zone("Mountain Time (US & Canada)") do
+              controller.instance_variable_set(:@context, double(time_zone: Time.zone, asset_string: "", class_name: nil))
+              controller.js_env({})
+              expect(controller.js_env[:CONTEXT_TIMEZONE]).to eq "America/Denver"
+            end
+          end
+
+          it "sets the timezone from the context" do
+            Time.use_zone("Mountain Time (US & Canada)") do
+              controller.instance_variable_set(:@context, double(time_zone: Time.zone, asset_string: "", class_name: nil))
+              controller.js_env({})
+              expect(controller.js_env[:TIMEZONE]).to eq "America/Denver"
+            end
+          end
+        end
+      end
+
       it "allows multiple items" do
         controller.js_env A: "a", B: "b"
         expect(controller.js_env[:A]).to eq "a"
