@@ -135,7 +135,7 @@ pipeline {
 
             extendedStage("${RUN_MIGRATIONS_STAGE} (Waiting for Dependencies)").obeysAllowStages(false).waitsFor(RUN_MIGRATIONS_STAGE, 'Builder').queue(rootStages) { stageConfig, buildConfig ->
               def nestedStages = [:]
-              rspecStage.createLegacyDistribution(nestedStages)
+              rspecStage.createDistribution(nestedStages)
 
               parallel(nestedStages)
             }
@@ -176,22 +176,25 @@ pipeline {
         def message = "<$env.BUILD_URL/testReport|Latest Crystalball Map Generated> - <${getResultsHTMLUrl()}|Map>\n"
         try {
           def mapSpecInfo = sh(script: """
-              docker-compose run --rm \
+            docker-compose run --rm \
               -v \$(pwd)/\$LOCAL_WORKDIR/crystalball_map.yml/:/usr/src/app/crystalball_map.yml \
               -v \$(pwd)/\$LOCAL_WORKDIR/build:/usr/src/app/build \
+              -v \$(pwd)/\$LOCAL_WORKDIR/gems/plugins/:/usr/src/app/gems/plugins \
+              -v \$(pwd)/\$LOCAL_WORKDIR/spec:/usr/src/app/spec \
               web bash -c 'ruby build/new-jenkins/crystalball_map_smoke_test.rb'
-            """, returnStdout: true)
+            """
+          , returnStdout: true)
           message = message + "\n" + mapSpecInfo
           // Only alert and push to s3 on periodic jobs, not ones resulting from manual tests
           if (env.CRYSTALBALL_MAP_PUSH_TO_S3 == '1' && env.GERRIT_EVENT_TYPE != 'comment-added') {
             sh 'aws s3 cp crystalball_map.yml s3://instructure-canvas-ci/'
           }
         } catch(e) {
-          message = message + "\n" + 'Map Invalid!'
+          message = message + "\nMap Invalid!"
         } finally {
+          echo message
           slackSend channel: '#crystalball-noisy', message: message
         }
-
       }
     }
     cleanup {

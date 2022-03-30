@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../api_spec_helper"
-require_relative "../locked_spec"
+require_relative "../locked_examples"
 
 describe "Pages API", type: :request do
   include Api::V1::User

@@ -18,7 +18,7 @@
 #
 
 require_relative "../../api_spec_helper"
-require_relative "../../locked_spec"
+require_relative "../../locked_examples"
 
 describe Quizzes::QuizGroupsController, type: :request do
   before :once do

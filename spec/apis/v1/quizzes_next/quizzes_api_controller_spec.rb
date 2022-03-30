@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 require_relative "../../api_spec_helper"
-require_relative "../../locked_spec"
+require_relative "../../locked_examples"
 require_relative "../../../file_upload_helper"
 
 describe QuizzesNext::QuizzesApiController, type: :request do
