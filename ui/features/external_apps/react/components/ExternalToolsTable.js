@@ -147,7 +147,7 @@ export default class ExternalToolsTable extends React.Component {
                         'There is a 2 app limit for placement within the RCE toolbar.'
                       )}
                       placement="top"
-                      on={['click', 'focus']}
+                      on={['hover', 'focus']}
                     >
                       <IconButton
                         renderIcon={IconQuestionLine}
@@ -155,6 +155,7 @@ export default class ExternalToolsTable extends React.Component {
                         withBorder={false}
                         screenReaderLabel={I18n.t('Help')}
                         size="small"
+                        margin="none none none xx-small"
                       />
                     </Tooltip>
                   </th>
