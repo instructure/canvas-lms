@@ -139,6 +139,13 @@ Rails.configuration.after_initialize do
     end
   end
 
+  Delayed::Periodic.cron "Delayed::Job::Failed.cleanup_old_jobs", "0 * * * *" do
+    cutoff = Setting.get("failed_jobs_retain_for", 6.months.to_s).to_i
+    if cutoff > 0
+      with_each_shard_by_database(Delayed::Job::Failed, :cleanup_old_jobs, cutoff.seconds.ago)
+    end
+  end
+
   # Process at 5:30 am local time
   Delayed::Periodic.cron "Alerts::DelayedAlertSender.process", "30 5 * * *", priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(Alerts::DelayedAlertSender, :process, local_offset: true)
