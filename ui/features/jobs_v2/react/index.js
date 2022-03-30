@@ -96,7 +96,8 @@ function jobsReducer(prevState, action) {
   } else if (action.type === 'REFRESH_JOBS') {
     return {...prevState, jobs_refresh_nonce: prevState.jobs_refresh_nonce + 1}
   } else if (action.type === 'FETCHED_JOBS') {
-    return {...prevState, jobs: action.payload, job: null}
+    const job = action.payload.find(j => j.id === prevState.job?.id) || prevState.job
+    return {...prevState, jobs: action.payload, job}
   } else if (action.type === 'JOBS_METADATA') {
     if (action.payload.link) {
       const last = parseInt(action.payload.link.last.page, 10)
