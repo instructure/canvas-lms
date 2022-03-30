@@ -31,8 +31,9 @@ describe "course copy" do
   end
 
   def wait_for_migration_to_complete
-    completed_status = fj("div.progressStatus:contains('Completed')")
-    keep_trying_until(5) { completed_status.displayed? == true }
+    keep_trying_for_attempt_times(attempts: 10, sleep_interval: 1) do
+      disable_implicit_wait { f("div.progressStatus").text == "Completed" }
+    end
   end
 
   it "copies the course" do
@@ -55,9 +56,6 @@ describe "course copy" do
     expect(@new_course.default_view).to eq @course.default_view
     expect(@new_course.wiki_pages.count).to eq 1
   end
-
-  # TODO: reimplement per CNVS-29604, but make sure we're testing at the right level
-  it "should copy the course with different settings"
 
   it "sets the course name and code correctly" do
     course_with_admin_logged_in
