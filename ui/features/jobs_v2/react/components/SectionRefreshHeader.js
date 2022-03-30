@@ -32,7 +32,7 @@ export default function SectionRefreshHeader({
     <>
       <Flex alignItems="end">
         <Flex.Item>
-          <Heading level="h2" margin="large 0 small 0">
+          <Heading level="h2" margin="x-large 0 small 0">
             {title}
           </Heading>
         </Flex.Item>

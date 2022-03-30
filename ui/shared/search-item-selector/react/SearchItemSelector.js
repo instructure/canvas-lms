@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState, useEffect, useCallback} from 'react'
-import {func, string, object, number, shape, instanceOf} from 'prop-types'
+import {func, string, object, number, node, shape, instanceOf} from 'prop-types'
 
 import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
 import useDebouncedSearchTerm from './hooks/useDebouncedSearchTerm'
@@ -29,7 +29,7 @@ const MINIMUM_SEARCH_LENGTH = 2
 SearchItemSelector.propTypes = {
   onItemSelected: func, // expects each item to have the 'name' property
   itemSearchFunction: func,
-  renderLabel: string,
+  renderLabel: node,
   contextId: string,
   renderOption: func,
   additionalParams: object,

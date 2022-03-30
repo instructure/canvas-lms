@@ -25,15 +25,20 @@ import {IconCopyLine} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
 import {Tooltip} from '@instructure/ui-tooltip'
+import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {InfoColumn, InfoColumnHeader} from './InfoColumn'
 import SortColumnHeader from './SortColumnHeader'
 
 const I18n = useI18nScope('jobs_v2')
 
-function copyToClipboardTruncatedValue(value, subheading) {
+function copyToClipboardTruncatedValue(value) {
   const copyToClipboardAction = () => {
     navigator.clipboard.writeText(value)
+  }
+
+  if (!value) {
+    return <Text color="secondary">-</Text>
   }
 
   return (
@@ -41,7 +46,6 @@ function copyToClipboardTruncatedValue(value, subheading) {
       <Flex>
         <Flex.Item shouldGrow shouldShrink>
           <TruncateText>
-            {subheading ? <strong>{subheading}: </strong> : ''}
             <Tooltip renderTip={value}>{value}</Tooltip>
           </TruncateText>
         </Flex.Item>
@@ -71,8 +75,8 @@ export default function JobsTable({bucket, jobs, caption, sortColumn, onClickJob
           </Table.RowHeader>
           <Table.Cell>{copyToClipboardTruncatedValue(job.tag)}</Table.Cell>
           <Table.Cell>
-            {copyToClipboardTruncatedValue(job.strand || '-', I18n.t('Strand'))}
-            {copyToClipboardTruncatedValue(job.singleton || '-', I18n.t('Singleton'))}
+            {copyToClipboardTruncatedValue(job.strand)}
+            {copyToClipboardTruncatedValue(job.singleton)}
           </Table.Cell>
           <Table.Cell>
             {job.attempts} / {job.max_attempts}
