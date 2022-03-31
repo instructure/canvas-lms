@@ -4103,7 +4103,7 @@ function renderPostGradesMenu() {
   )
 
   function onHideGrades() {
-    EG.postPolicies.showHideAssignmentGradesTray({submissionsMap})
+    EG.postPolicies.showHideAssignmentGradesTray({submissionsMap, submissions})
   }
 
   function onPostGrades() {
