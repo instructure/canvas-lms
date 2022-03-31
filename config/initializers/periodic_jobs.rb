@@ -49,12 +49,13 @@ class PeriodicJobs
     run_at
   end
 
-  def self.with_each_shard_by_database_in_region(klass, method, *args, jitter: nil, local_offset: false)
+  def self.with_each_shard_by_database_in_region(klass, method, *args, jitter: nil, local_offset: false, shard_category_or_connection_class: nil)
     callback = -> { Canvas::Errors.capture_exception(:periodic_job, $ERROR_INFO) }
     Shard.with_each_shard(Shard.in_current_region, exception: callback) do
-      strand = "#{klass}.#{method}:#{Shard.current.database_server.id}"
+      current_shard = Shard.current(shard_category_or_connection_class)
+      strand = "#{klass}.#{method}:#{current_shard.database_server.id}"
       # TODO: allow this to work with redis jobs
-      next if Delayed::Job == Delayed::Backend::ActiveRecord::Job && Delayed::Job.where(strand: strand, shard_id: Shard.current.id, locked_by: nil).exists?
+      next if Delayed::Job == Delayed::Backend::ActiveRecord::Job && Delayed::Job.where(strand: strand, shard_id: current_shard.id, locked_by: nil).exists?
 
       dj_params = {
         strand: strand,
@@ -66,12 +67,20 @@ class PeriodicJobs
   end
 end
 
+def with_each_job_cluster(klass, method, *args, jitter: nil, local_offset: false)
+  DatabaseServer.send_in_each_region(PeriodicJobs,
+                                     :with_each_shard_by_database_in_region,
+                                     {
+                                       singleton: "periodic:region: #{klass}.#{method}",
+                                     }, klass, method, *args, jitter: jitter, local_offset: local_offset, shard_category_or_connection_class: Rails.version < "6.1" ? :delayed_jobs : Delayed::Backend::ActiveRecord::AbstractJob)
+end
+
 def with_each_shard_by_database(klass, method, *args, jitter: nil, local_offset: false)
   DatabaseServer.send_in_each_region(PeriodicJobs,
                                      :with_each_shard_by_database_in_region,
                                      {
                                        singleton: "periodic:region: #{klass}.#{method}",
-                                     }, klass, method, *args, jitter: jitter, local_offset: local_offset)
+                                     }, klass, method, *args, jitter: jitter, local_offset: local_offset, shard_category_or_connection_class: Rails.version < "6.1" ? :primary : ActiveRecord::Base)
 end
 
 Rails.configuration.after_initialize do
@@ -142,7 +151,7 @@ Rails.configuration.after_initialize do
   Delayed::Periodic.cron "Delayed::Job::Failed.cleanup_old_jobs", "0 * * * *" do
     cutoff = Setting.get("failed_jobs_retain_for", 6.months.to_s).to_i
     if cutoff > 0
-      with_each_shard_by_database(Delayed::Job::Failed, :cleanup_old_jobs, cutoff.seconds.ago)
+      with_each_job_cluster(Delayed::Job::Failed, :cleanup_old_jobs, cutoff.seconds.ago)
     end
   end
 
