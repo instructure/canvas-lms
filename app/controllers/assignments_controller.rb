@@ -80,7 +80,8 @@ class AssignmentsController < ApplicationController
           FLAGS: {
             newquizzes_on_quiz_page: @context.root_account.feature_enabled?(:newquizzes_on_quiz_page),
             new_quizzes_modules_support: Account.site_admin.feature_enabled?(:new_quizzes_modules_support),
-            new_quizzes_skip_to_build_module_button: Account.site_admin.feature_enabled?(:new_quizzes_skip_to_build_module_button)
+            new_quizzes_skip_to_build_module_button: Account.site_admin.feature_enabled?(:new_quizzes_skip_to_build_module_button),
+            updated_mastery_connect_icon: Account.site_admin.feature_enabled?(:updated_mastery_connect_icon)
           }
         }
 
@@ -724,9 +725,7 @@ class AssignmentsController < ApplicationController
         SIS_NAME: AssignmentUtil.post_to_sis_friendly_name(@context),
         VALID_DATE_RANGE: CourseDateRange.new(@context),
         NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED:
-          Account.site_admin.feature_enabled?(:new_quizzes_assignment_build_button),
-        NEW_MASTERY_CONNECT_ICON_ENABLED:
-          Account.site_admin.feature_enabled?(:updated_mastery_connect_icon),
+          Account.site_admin.feature_enabled?(:new_quizzes_assignment_build_button)
       }
 
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment])) unless @assignment.new_record?
