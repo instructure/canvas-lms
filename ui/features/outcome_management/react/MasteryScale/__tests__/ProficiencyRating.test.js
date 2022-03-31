@@ -21,24 +21,42 @@ import {mount, shallow} from 'enzyme'
 import {render, fireEvent} from '@testing-library/react'
 import ProficiencyRating from '../ProficiencyRating'
 
-const defaultProps = (props = {}) => ({
-  color: '00ff00',
-  description: 'Stellar',
-  disableDelete: false,
-  mastery: false,
-  canManage: false,
-  onColorChange: () => {},
-  onDelete: () => {},
-  onDescriptionChange: () => {},
-  onFocusChange: () => {},
-  onMasteryChange: () => {},
-  onPointsChange: () => {},
-  points: '10.0',
-  position: 1,
-  ...props
-})
-
 describe('ProficiencyRating', () => {
+  let onDeleteMock
+  let onFocusChangeMock
+  let onMasteryChangeMock
+  let onDescriptionChangeMock
+  let onPointsChangeMock
+
+  const defaultProps = (props = {}) => ({
+    color: '00ff00',
+    description: 'Stellar',
+    disableDelete: false,
+    mastery: false,
+    canManage: false,
+    onColorChange: () => {},
+    onDelete: onDeleteMock,
+    onDescriptionChange: onDescriptionChangeMock,
+    onFocusChange: onFocusChangeMock,
+    onMasteryChange: onMasteryChangeMock,
+    onPointsChange: onPointsChangeMock,
+    points: '10.0',
+    position: 1,
+    ...props
+  })
+
+  beforeEach(() => {
+    onDeleteMock = jest.fn()
+    onFocusChangeMock = jest.fn()
+    onMasteryChangeMock = jest.fn()
+    onDescriptionChangeMock = jest.fn()
+    onPointsChangeMock = jest.fn()
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
   describe('can not manage', () => {
     it('renders the ProficiencyRating component', () => {
       const wrapper = shallow(<ProficiencyRating {...defaultProps()} />)
@@ -67,12 +85,9 @@ describe('ProficiencyRating', () => {
     })
 
     it('clicking mastery checkbox does not trigger change', () => {
-      const onMasteryChange = jest.fn()
-      const wrapper = mount(
-        <ProficiencyRating {...defaultProps({onMasteryChange, mastery: true})} />
-      )
+      const wrapper = mount(<ProficiencyRating {...defaultProps({mastery: true})} />)
       wrapper.find('RadioInput').find('input').simulate('change')
-      expect(onMasteryChange).not.toHaveBeenCalled()
+      expect(onMasteryChangeMock).not.toHaveBeenCalled()
     })
 
     it('does not render TextInput', () => {
@@ -112,12 +127,9 @@ describe('ProficiencyRating', () => {
     })
 
     it('clicking mastery checkbox triggers change', () => {
-      const onMasteryChange = jest.fn()
-      const wrapper = mount(
-        <ProficiencyRating {...defaultProps({onMasteryChange, canManage: true})} />
-      )
+      const wrapper = mount(<ProficiencyRating {...defaultProps({canManage: true})} />)
       wrapper.find('RadioInput').find('input').simulate('change')
-      expect(onMasteryChange).toHaveBeenCalledTimes(1)
+      expect(onMasteryChangeMock).toHaveBeenCalledTimes(1)
     })
 
     it('includes the rating description', () => {
@@ -127,12 +139,9 @@ describe('ProficiencyRating', () => {
     })
 
     it('changing description triggers change', () => {
-      const onDescriptionChange = jest.fn()
-      const wrapper = mount(
-        <ProficiencyRating {...defaultProps({onDescriptionChange, canManage: true})} />
-      )
+      const wrapper = mount(<ProficiencyRating {...defaultProps({canManage: true})} />)
       wrapper.find('TextInput').at(0).find('input').simulate('change')
-      expect(onDescriptionChange).toHaveBeenCalledTimes(1)
+      expect(onDescriptionChangeMock).toHaveBeenCalledTimes(1)
     })
 
     it('includes the points', () => {
@@ -142,30 +151,22 @@ describe('ProficiencyRating', () => {
     })
 
     it('changing points triggers change', () => {
-      const onPointsChange = jest.fn()
-      const wrapper = mount(
-        <ProficiencyRating {...defaultProps({onPointsChange, canManage: true})} />
-      )
+      const wrapper = mount(<ProficiencyRating {...defaultProps({canManage: true})} />)
       wrapper.find('TextInput').at(1).find('input').simulate('change')
-      expect(onPointsChange).toHaveBeenCalledTimes(1)
+      expect(onPointsChangeMock).toHaveBeenCalledTimes(1)
     })
 
     it('calls onDelete prop when click on delete and confirm in the confirmation modal', () => {
-      const onDelete = jest.fn()
-      const {getByText} = render(
-        <ProficiencyRating {...defaultProps({onDelete, canManage: true})} />
-      )
+      const {getByText} = render(<ProficiencyRating {...defaultProps({canManage: true})} />)
       fireEvent.click(getByText('Delete mastery level 1'))
       fireEvent.click(getByText('Confirm'))
-      expect(onDelete).toHaveBeenCalledTimes(1)
+      expect(onDeleteMock).toHaveBeenCalledTimes(1)
     })
 
     it('clicking disabled delete button does not show delete modal', () => {
-      const onDelete = jest.fn()
       const {queryByText} = render(
         <ProficiencyRating
           {...defaultProps({
-            onDelete,
             disableDelete: true,
             canManage: true
           })}
@@ -178,6 +179,13 @@ describe('ProficiencyRating', () => {
     it('shows color input', () => {
       const {getByText} = render(<ProficiencyRating {...defaultProps({canManage: true})} />)
       expect(getByText('Change color for mastery level 1')).toBeInTheDocument()
+    })
+
+    it('calls onFocusChange prop when current input looses focus', () => {
+      const wrapper = mount(<ProficiencyRating {...defaultProps({canManage: true})} />)
+      wrapper.find('TextInput').at(0).find('input').simulate('blur')
+      wrapper.find('TextInput').at(1).find('input').simulate('blur')
+      expect(onFocusChangeMock).toHaveBeenCalledTimes(2)
     })
 
     describe('when individualOutcome is true', () => {
