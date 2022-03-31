@@ -45,7 +45,15 @@ const masteryPointsShape = PropTypes.shape({
   error: PropTypes.string
 })
 
-const Ratings = ({ratings, masteryPoints, onChangeRatings, onChangeMasteryPoints, canManage}) => {
+const Ratings = ({
+  ratings,
+  masteryPoints,
+  onChangeRatings,
+  onChangeMasteryPoints,
+  canManage,
+  masteryInputRef,
+  clearRatingsFocus
+}) => {
   const {isMobileView} = useCanvasContext()
   const addRow = () => {
     let points = 0.0
@@ -59,8 +67,7 @@ const Ratings = ({ratings, masteryPoints, onChangeRatings, onChangeMasteryPoints
       points = 0.0
     }
     // when a rating is added, set the focusField value to the new rating's description field
-    ratings = clearFocusFields(ratings)
-    onChangeRatings([...ratings, createRating('', points, 'description', false)])
+    onChangeRatings([...clearFocusFields(), createRating('', points, 'description', false)])
   }
 
   const clearFocusFields = () => ratings.map(r => ({...r, focusField: null}))
@@ -138,6 +145,7 @@ const Ratings = ({ratings, masteryPoints, onChangeRatings, onChangeMasteryPoints
             onChange={handleMasteryPointsChange}
             defaultValue={I18n.n(masteryPoints.value)}
             width={isMobileView ? '3rem' : '4rem'}
+            inputRef={masteryInputRef}
           />
         </div>
       </Flex.Item>
@@ -242,7 +250,7 @@ const Ratings = ({ratings, masteryPoints, onChangeRatings, onChangeMasteryPoints
             disableDelete={ratings.length === 1}
             onDelete={() => handleDelete(index)}
             onDescriptionChange={value => onRatingFieldChange('description', value, index)}
-            onFocusChange={() => onChangeRatings(clearFocusFields())}
+            onFocusChange={clearRatingsFocus}
             onMasteryChange={() => onRatingFieldChange('mastery', true, index)}
             onPointsChange={value => onRatingFieldChange('points', value, index)}
             focusField={focusField}
@@ -265,12 +273,16 @@ Ratings.propTypes = {
   masteryPoints: masteryPointsShape.isRequired,
   canManage: PropTypes.bool,
   onChangeRatings: PropTypes.func,
-  onChangeMasteryPoints: PropTypes.func
+  onChangeMasteryPoints: PropTypes.func,
+  masteryInputRef: PropTypes.func,
+  clearRatingsFocus: PropTypes.func
 }
 
 Ratings.defaultProps = {
   onChangeRatings: () => {},
   onChangeMasteryPoints: () => {},
+  clearRatingsFocus: () => {},
+  masteryInputRef: () => {},
   ratings: [],
   masteryPoints: {
     value: null,

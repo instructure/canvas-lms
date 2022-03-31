@@ -132,32 +132,28 @@ describe('OutcomeEditModal', () => {
     expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
   })
 
-  it('shows error message below Name field if no name and disables Save button', () => {
+  it('shows error message below Name field if no name', () => {
     const {getByText, getByLabelText} = renderWithProvider()
     fireEvent.change(getByLabelText('Name'), {target: {value: ''}})
-    expect(getByText('Save').closest('button')).toHaveAttribute('disabled')
     expect(getByText('Cannot be blank')).toBeInTheDocument()
   })
 
-  it('shows error message below Name field if name includes only spaces and disables Save button', () => {
+  it('shows error message below Name field if name includes only spaces', () => {
     const {getByText, getByLabelText} = renderWithProvider()
     fireEvent.change(getByLabelText('Name'), {target: {value: '  '}})
-    expect(getByText('Save').closest('button')).toHaveAttribute('disabled')
     expect(getByText('Cannot be blank')).toBeInTheDocument()
   })
 
-  it('shows error message below Name field if name > 255 characters and disables Save button', () => {
+  it('shows error message below Name field if name > 255 characters', () => {
     const {getByText, getByLabelText} = renderWithProvider()
     fireEvent.change(getByLabelText('Name'), {target: {value: 'a'.repeat(256)}})
     expect(getByText('Must be 255 characters or less')).toBeInTheDocument()
-    expect(getByText('Save').closest('button')).toHaveAttribute('disabled')
   })
 
-  it('shows error message below displayName field if displayName > 255 characters and disables Save button', () => {
+  it('shows error message below displayName field if displayName > 255 characters', () => {
     const {getByText, getByLabelText} = renderWithProvider()
     fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'a'.repeat(256)}})
     expect(getByText('Must be 255 characters or less')).toBeInTheDocument()
-    expect(getByText('Save').closest('button')).toHaveAttribute('disabled')
   })
 
   it('Shows forms elements when editing in same context', () => {
@@ -177,6 +173,29 @@ describe('OutcomeEditModal', () => {
     expect(queryByTestId('description-input')).not.toBeInTheDocument()
     expect(getByTestId('friendly-description-input')).toBeInTheDocument()
     expect(getByTestId('readonly-description')).toBeInTheDocument()
+  })
+
+  it('does not submit form if error in form and click on Save button', () => {
+    const {getByText, getByLabelText} = renderWithProvider()
+    fireEvent.change(getByLabelText('Name'), {target: {value: 'a'.repeat(256)}})
+    expect(getByText('Must be 255 characters or less')).toBeInTheDocument()
+    fireEvent.click(getByText('Save'))
+    expect(onCloseHandlerMock).not.toHaveBeenCalled()
+  })
+
+  it('sets focus on first field with error if multiple errors in form and click on Save button', () => {
+    const {getByText, getByLabelText, queryAllByText} = renderWithProvider()
+    const name = getByLabelText('Name')
+    const friendlyName = getByLabelText('Friendly Name')
+    const friendlyDescription = getByLabelText('Friendly description (for parent/student display)')
+    fireEvent.change(name, {target: {value: 'a'.repeat(256)}})
+    fireEvent.change(friendlyName, {target: {value: 'b'.repeat(256)}})
+    fireEvent.change(friendlyDescription, {target: {value: 'c'.repeat(256)}})
+    expect(queryAllByText('Must be 255 characters or less').length).toBe(3)
+    fireEvent.click(getByText('Save'))
+    expect(friendlyDescription).not.toBe(document.activeElement)
+    expect(friendlyName).not.toBe(document.activeElement)
+    expect(name).toBe(document.activeElement)
   })
 
   describe('updates the outcome', () => {
@@ -454,6 +473,44 @@ describe('OutcomeEditModal', () => {
           }
         })
         expect(getByTestId('outcome-edit-modal-horizontal-divider')).toBeInTheDocument()
+      })
+
+      it('sets focus on rating description if error in both description and points and click on Save button', () => {
+        const {getByText, getByLabelText} = renderWithProvider({
+          env: {
+            contextType: 'Account',
+            contextId: '1',
+            individualOutcomeRatingAndCalculationFF: true
+          }
+        })
+        const ratingDescription = getByLabelText('Change description for mastery level 2')
+        fireEvent.change(ratingDescription, {target: {value: ''}})
+        const ratingPoints = getByLabelText('Change points for mastery level 2')
+        fireEvent.change(ratingPoints, {target: {value: '-1'}})
+        expect(getByText('Missing required description')).toBeInTheDocument()
+        expect(getByText('Negative points')).toBeInTheDocument()
+        fireEvent.click(getByText('Save'))
+        expect(ratingPoints).not.toBe(document.activeElement)
+        expect(ratingDescription).toBe(document.activeElement)
+      })
+
+      it('sets focus on mastery points if error in mastery points and calculation method and click on Save button', () => {
+        const {getByText, getByLabelText} = renderWithProvider({
+          env: {
+            contextType: 'Account',
+            contextId: '1',
+            individualOutcomeRatingAndCalculationFF: true
+          }
+        })
+        const masteryPoints = getByLabelText('Change mastery points')
+        fireEvent.change(masteryPoints, {target: {value: '-1'}})
+        const calcInt = getByLabelText('Proficiency Calculation')
+        fireEvent.change(calcInt, {target: {value: '999'}})
+        expect(getByText('Negative points')).toBeInTheDocument()
+        expect(getByText('Must be between 1 and 99')).not.toBeNull()
+        fireEvent.click(getByText('Save'))
+        expect(calcInt).not.toBe(document.activeElement)
+        expect(masteryPoints).toBe(document.activeElement)
       })
     })
 

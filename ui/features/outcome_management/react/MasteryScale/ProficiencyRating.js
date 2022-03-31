@@ -240,6 +240,7 @@ class ProficiencyRating extends React.Component {
                   {I18n.t(`Change points for mastery level %{position}`, {position})}
                 </ScreenReaderContent>
               }
+              onBlur={this.handleBlur}
               onChange={this.handlePointChange}
               defaultValue={I18n.n(points)}
               width={isMobileView ? (individualOutcome ? '3rem' : '7rem') : '4rem'}
