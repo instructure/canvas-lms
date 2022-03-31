@@ -341,7 +341,7 @@ QUnit.module('Gradebook > Students', suiteHooks => {
     })
 
     test('builds rows when filtering with search', () => {
-      gradebook.userFilterTerm = 'searching'
+      gradebook.filteredStudentIds = [1101]
       sinon.spy(gradebook, 'buildRows')
       gradebook.gotChunkOfStudents(studentData)
       strictEqual(gradebook.buildRows.callCount, 1)

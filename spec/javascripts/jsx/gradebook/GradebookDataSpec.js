@@ -460,7 +460,6 @@ QUnit.module('Gradebook Assignment Student Visibility', moduleHooks => {
 
   QUnit.module('#visibleStudentsThatCanSeeAssinment', hooks => {
     hooks.beforeEach(() => {
-      gradebook.options.gradebook_assignment_search_and_redesign = true
       gradebook.gotChunkOfStudents(allStudents)
       gradebook.courseContent.students.setStudentIds(['1101', '1102'])
     })
