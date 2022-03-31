@@ -277,6 +277,8 @@ module Importers
 
       item.generate_quiz_data if hash[:available] || item.published?
 
+      item.points_possible = hash[:points_possible] if hash.key?(:points_possible) && migration.quizzes_next_migration?
+
       if hash[:available]
         item.workflow_state = "available"
         item.published_at = Time.now
