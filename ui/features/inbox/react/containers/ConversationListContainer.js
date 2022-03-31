@@ -23,7 +23,7 @@ import {ConversationListHolder} from '../components/ConversationListHolder/Conve
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Mask} from '@instructure/ui-overlays'
 import PropTypes from 'prop-types'
-import React, {useContext, useEffect, useState} from 'react'
+import React, {useContext} from 'react'
 import {Spinner} from '@instructure/ui-spinner'
 import {useQuery, useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
@@ -32,7 +32,6 @@ const I18n = useI18nScope('conversations_2')
 
 const ConversationListContainer = ({course, scope, onSelectConversation, userFilter}) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
-  const [submissionComments, setSubmissionComments] = useState([])
   const userID = ENV.current_user_id?.toString()
 
   const [starChangeConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
@@ -77,30 +76,6 @@ const ConversationListContainer = ({course, scope, onSelectConversation, userFil
     skip: !scopeIsSubmissionComments
   })
 
-  useEffect(() => {
-    if (
-      scopeIsSubmissionComments &&
-      submissionCommentsQuery.data &&
-      !submissionCommentsQuery.loading
-    ) {
-      const groupedSubmissionComments = {}
-      const submissionComments =
-        submissionCommentsQuery.data.legacyNode.submissionCommentsConnection.nodes
-
-      submissionComments.forEach(submissionComment => {
-        const key = submissionComment.submissionId + '-' + submissionComment.attempt
-
-        if (!groupedSubmissionComments[key]) {
-          groupedSubmissionComments[key] = []
-        }
-
-        groupedSubmissionComments[key].push(submissionComment)
-      })
-
-      setSubmissionComments(Object.entries(groupedSubmissionComments).map(e => e[1]))
-    }
-  }, [scopeIsSubmissionComments, submissionCommentsQuery.data, submissionCommentsQuery.loading])
-
   if (conversationsQuery.loading || submissionCommentsQuery.loading) {
     return (
       <View as="div" style={{position: 'relative'}} height="100%">
@@ -120,7 +95,7 @@ const ConversationListContainer = ({course, scope, onSelectConversation, userFil
       conversations={
         !scopeIsSubmissionComments
           ? conversationsQuery.data?.legacyNode?.conversationsConnection?.nodes
-          : submissionComments
+          : submissionCommentsQuery.data?.legacyNode?.viewableSubmissionsConnection?.nodes
       }
       onOpen={() => {}}
       onSelect={onSelectConversation}

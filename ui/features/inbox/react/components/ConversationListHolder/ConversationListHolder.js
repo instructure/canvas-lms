@@ -41,9 +41,12 @@ export const ConversationListHolder = ({...props}) => {
   const {setMultiselect} = useContext(ConversationContext)
 
   const provideConversationsForOnSelect = conversationIds => {
-    const matchedConversations = props.conversations
-      ?.filter(c => conversationIds.includes(c._id))
-      .map(c => c.conversation)
+    let matchedConversations = props.conversations?.filter(c => conversationIds.includes(c._id))
+
+    matchedConversations = props.isSubmissionComments
+      ? []
+      : matchedConversations.map(c => c.conversation)
+
     props.onSelect(matchedConversations)
   }
 
@@ -177,25 +180,17 @@ export const ConversationListHolder = ({...props}) => {
       {props.conversations?.map(conversation => {
         return (
           <ConversationListItem
-            id={props.isSubmissionComments ? conversation[0].submissionId : conversation._id}
+            id={conversation._id}
             conversation={props.isSubmissionComments ? undefined : conversation.conversation}
             submissionComments={props.isSubmissionComments ? conversation : undefined}
-            isStarred={props.isSubmissionComments ? false : conversation.label === 'starred'}
-            isSelected={
-              props.isSubmissionComments
-                ? selectedMessages.includes(conversation[0].submissionId)
-                : selectedMessages.includes(conversation._id)
-            }
-            isUnread={
-              props.isSubmissionComments
-                ? !conversation[0].read
-                : conversation.workflowState === 'unread'
-            }
+            isStarred={conversation?.label === 'starred'}
+            isSelected={selectedMessages.includes(conversation._id)}
+            isUnread={conversation?.workflowState === 'unread'}
             onOpen={props.onOpen}
             onRemoveFromSelectedConversations={removeFromSelectedConversations}
             onSelect={handleItemSelection}
             onStar={props.isSubmissionComments ? () => {} : props.onStar}
-            key={props.isSubmissionComments ? conversation[0].submissionId : conversation._id}
+            key={conversation._id}
             readStateChangeConversationParticipants={
               props.isSubmissionComments ? () => {} : readStateChangeConversationParticipants
             }

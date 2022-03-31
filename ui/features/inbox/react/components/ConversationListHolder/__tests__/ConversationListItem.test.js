@@ -27,6 +27,15 @@ jest.mock('../../../../util/utils', () => ({
   responsiveQuerySizes: jest.fn()
 }))
 
+const submissionsCommentsMock = () => {
+  return {
+    _id: 1,
+    commentsConnection: {
+      nodes: [SubmissionComment.mock(), SubmissionComment.mock(), SubmissionComment.mock()]
+    }
+  }
+}
+
 describe('ConversationListItem', () => {
   const createProps = overrides => {
     return {
@@ -215,12 +224,7 @@ describe('ConversationListItem', () => {
     it('renders subject', () => {
       const props = createProps({
         conversation: undefined,
-        submissionComments: [
-          SubmissionComment.mock(),
-          SubmissionComment.mock(),
-          SubmissionComment.mock(),
-          SubmissionComment.mock()
-        ]
+        submissionComments: submissionsCommentsMock()
       })
       const {getByText} = render(<ConversationListItem {...props} />)
 
@@ -230,12 +234,7 @@ describe('ConversationListItem', () => {
     it('renders create date', () => {
       const props = createProps({
         conversation: undefined,
-        submissionComments: [
-          SubmissionComment.mock(),
-          SubmissionComment.mock(),
-          SubmissionComment.mock(),
-          SubmissionComment.mock()
-        ]
+        submissionComments: submissionsCommentsMock()
       })
       const {getByText} = render(<ConversationListItem {...props} />)
 
@@ -245,12 +244,7 @@ describe('ConversationListItem', () => {
     it('renders author', () => {
       const props = createProps({
         conversation: undefined,
-        submissionComments: [
-          SubmissionComment.mock(),
-          SubmissionComment.mock(),
-          SubmissionComment.mock(),
-          SubmissionComment.mock()
-        ]
+        submissionComments: submissionsCommentsMock()
       })
       const {getByText} = render(<ConversationListItem {...props} />)
 
@@ -260,12 +254,7 @@ describe('ConversationListItem', () => {
     it('renders comment', () => {
       const props = createProps({
         conversation: undefined,
-        submissionComments: [
-          SubmissionComment.mock(),
-          SubmissionComment.mock(),
-          SubmissionComment.mock(),
-          SubmissionComment.mock()
-        ]
+        submissionComments: submissionsCommentsMock()
       })
       const {getByText} = render(<ConversationListItem {...props} />)
 

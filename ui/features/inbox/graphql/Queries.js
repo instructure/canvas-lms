@@ -180,6 +180,28 @@ export const SUBMISSION_COMMENTS_QUERY = gql`
       ... on User {
         _id
         id
+        viewableSubmissionsConnection {
+          nodes {
+            _id
+            commentsConnection {
+              nodes {
+                ...SubmissionComment
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  ${SubmissionComment.fragment}
+`
+
+export const SUBMISSION_COMMENTS_QUERY_OLD = gql`
+  query SubmissionCommentsQuery($userID: ID!) {
+    legacyNode(_id: $userID, type: User) {
+      ... on User {
+        _id
+        id
         submissionCommentsConnection {
           nodes {
             ...SubmissionComment
