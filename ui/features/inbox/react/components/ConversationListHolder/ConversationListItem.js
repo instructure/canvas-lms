@@ -126,7 +126,7 @@ export const ConversationListItem = ({...props}) => {
             <TruncateText>
               <b>
                 {isSubmissionComments
-                  ? props.submissionComments[0].author.name
+                  ? props.submissionComments.commentsConnection.nodes[0].author.name
                   : props.conversation.conversationMessagesConnection.nodes[0].author.name}
               </b>
               {participantsStr}
@@ -231,7 +231,7 @@ export const ConversationListItem = ({...props}) => {
                   <Text color="brand" size={responsiveProps.date.size}>
                     {formatDate(
                       isSubmissionComments
-                        ? props.submissionComments[0].createdAt
+                        ? props.submissionComments.commentsConnection.nodes[0].createdAt
                         : props.conversation.conversationMessagesConnection.nodes[0]?.createdAt
                     )}
                   </Text>
@@ -240,7 +240,7 @@ export const ConversationListItem = ({...props}) => {
                   <Badge
                     count={
                       isSubmissionComments
-                        ? props.submissionComments.length
+                        ? props.submissionComments.commentsConnection.nodes?.length
                         : props.conversation.conversationMessagesConnection.nodes?.length
                     }
                     countUntil={99}
@@ -288,9 +288,9 @@ export const ConversationListItem = ({...props}) => {
                   <Text weight="normal" size={responsiveProps.subject.size}>
                     <TruncateText>
                       {isSubmissionComments
-                        ? props.submissionComments[0].course.contextName +
+                        ? props.submissionComments.commentsConnection.nodes[0].course.contextName +
                           ' - ' +
-                          props.submissionComments[0].assignment.name
+                          props.submissionComments.commentsConnection.nodes[0].assignment.name
                         : props.conversation.subject}
                     </TruncateText>
                   </Text>
@@ -304,7 +304,7 @@ export const ConversationListItem = ({...props}) => {
                   <Text color="secondary" size={responsiveProps.message.size}>
                     <TruncateText>
                       {isSubmissionComments
-                        ? props.submissionComments[0].comment
+                        ? props.submissionComments.commentsConnection.nodes[0].comment
                         : props.conversation.conversationMessagesConnection?.nodes[0]?.body}
                     </TruncateText>
                   </Text>
@@ -404,7 +404,7 @@ export const conversationProp = PropTypes.shape({
 
 ConversationListItem.propTypes = {
   conversation: conversationProp,
-  submissionComments: PropTypes.arrayOf(PropTypes.object),
+  submissionComments: PropTypes.object,
   id: PropTypes.string,
   isSelected: PropTypes.bool,
   isStarred: PropTypes.bool,
