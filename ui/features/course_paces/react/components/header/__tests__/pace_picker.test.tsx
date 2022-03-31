@@ -101,6 +101,12 @@ describe('PacePicker', () => {
     expect(picker.value).toBe('Henry Dorsett Case')
   })
 
+  it('displays a message when there are no enrolled students', () => {
+    const {getByRole} = render(<PacePicker {...defaultProps} enrollments={[]} />)
+    const heading = getByRole('heading', {name: 'Course Pace'})
+    expect(heading).toBeInTheDocument()
+  })
+
   describe('warning modal', () => {
     it('is displayed if context changes with unpublished changes', () => {
       const {getByText, getByLabelText} = render(<PacePicker {...defaultProps} changeCount={1} />)
