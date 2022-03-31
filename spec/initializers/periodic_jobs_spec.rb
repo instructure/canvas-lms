@@ -47,6 +47,20 @@ describe "PeriodicJobs" do
       expect(Delayed::Job.count > 0).to eq(true)
       expect(Delayed::Job.last.run_at > Time.zone.now).to eq(true)
     end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "inserts jobs with the appropriate strands for all shards" do
+        PeriodicJobs.new.send(:with_each_shard_by_database, FakeJob, :some_method_to_run)
+        expect(Delayed::Job.where(tag: "FakeJob.some_method_to_run").count).to eq 3
+      end
+
+      it "inserts jobs with the appropriate strands for job clusters" do
+        PeriodicJobs.new.send(:with_each_job_cluster, FakeJob, :some_method_to_run)
+        expect(Delayed::Job.where(tag: "FakeJob.some_method_to_run").count).to eq 1
+      end
+    end
   end
 
   describe ".compute_run_at" do
