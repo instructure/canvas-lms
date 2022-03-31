@@ -195,20 +195,3 @@ export const SUBMISSION_COMMENTS_QUERY = gql`
   }
   ${SubmissionComment.fragment}
 `
-
-export const SUBMISSION_COMMENTS_QUERY_OLD = gql`
-  query SubmissionCommentsQuery($userID: ID!) {
-    legacyNode(_id: $userID, type: User) {
-      ... on User {
-        _id
-        id
-        submissionCommentsConnection {
-          nodes {
-            ...SubmissionComment
-          }
-        }
-      }
-    }
-  }
-  ${SubmissionComment.fragment}
-`
