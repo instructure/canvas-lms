@@ -1092,16 +1092,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       return true
     }
 
-    if (this.options.gradebook_assignment_search_and_redesign) {
-      return this.filteredStudentIds?.includes(student.id)
-    }
-
-    const propertiesToMatch = ['name', 'login_id', 'short_name', 'sortable_name', 'sis_user_id']
-    const pattern = new RegExp(this.userFilterTerm || '', 'i')
-    return _.some(propertiesToMatch, function (prop) {
-      let ref1
-      return (ref1 = student[prop]) != null ? ref1.match(pattern) : undefined
-    })
+    return this.filteredStudentIds?.includes(student.id)
   }
 
   filterAssignments = (assignments: Assignment[]) => {
@@ -2364,56 +2355,37 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   renderStudentSearchFilter = (students: Student[]) => {
-    if (this.options.gradebook_assignment_search_and_redesign) {
-      const props = {
-        id: 'student-names-filter',
-        disabled: students.length === 0 || !this._gridHasRendered(),
-        label: I18n.t('Student Names'),
-        customMatcher: this.studentSearchMatcher,
-        onChange: this.onFilterToStudents,
-        options: students.map(student => ({id: student.id, text: student.displayName})),
-        placeholder: I18n.t('Search Students')
-      }
-
-      const mountPoint = document.getElementById('gradebook-student-search')
-      renderComponent(MultiSelectSearchInput, mountPoint, props)
-    } else {
-      if (!this.userFilter) {
-        const opts: any = {el: '#search-filter-container input'}
-        if (this.options.remove_gradebook_student_search_delay_enabled) {
-          opts.onInputDelay = 0
-        }
-
-        this.userFilter = new InputFilterView(opts)
-        this.userFilter.on('input', this.onUserFilterInputStudents)
-      }
-
-      const disabled =
-        !this.contentLoadStates.studentsLoaded || !this.contentLoadStates.submissionsLoaded
-      this.userFilter.el.disabled = disabled
-      this.userFilter.el.setAttribute('aria-disabled', disabled)
+    const props = {
+      id: 'student-names-filter',
+      disabled: students.length === 0 || !this._gridHasRendered(),
+      label: I18n.t('Student Names'),
+      customMatcher: this.studentSearchMatcher,
+      onChange: this.onFilterToStudents,
+      options: students.map(student => ({id: student.id, text: student.displayName})),
+      placeholder: I18n.t('Search Students')
     }
+
+    const mountPoint = document.getElementById('gradebook-student-search')
+    renderComponent(MultiSelectSearchInput, mountPoint, props)
   }
 
   renderAssignmentSearchFilter = (assignmentsById: AssignmentMap) => {
-    if (this.options.gradebook_assignment_search_and_redesign) {
-      const assignments = Object.values(assignmentsById)
-      const props = {
-        id: 'assignments-filter',
-        disabled: assignments.length === 0 || !this._gridHasRendered(),
-        label: I18n.t('Assignment Names'),
-        customMatcher: this.assignmentSearchMatcher,
-        onChange: this.onFilterToAssignments,
-        options: assignments.map((assignment: Assignment) => ({
-          id: assignment.id,
-          text: assignment.name
-        })),
-        placeholder: I18n.t('Search Assignments')
-      }
-
-      const mountPoint = document.getElementById('gradebook-assignment-search')
-      renderComponent(MultiSelectSearchInput, mountPoint, props)
+    const assignments = Object.values(assignmentsById)
+    const props = {
+      id: 'assignments-filter',
+      disabled: assignments.length === 0 || !this._gridHasRendered(),
+      label: I18n.t('Assignment Names'),
+      customMatcher: this.assignmentSearchMatcher,
+      onChange: this.onFilterToAssignments,
+      options: assignments.map((assignment: Assignment) => ({
+        id: assignment.id,
+        text: assignment.name
+      })),
+      placeholder: I18n.t('Search Assignments')
     }
+
+    const mountPoint = document.getElementById('gradebook-assignment-search')
+    renderComponent(MultiSelectSearchInput, mountPoint, props)
   }
 
   setVisibleGridColumns = () => {
@@ -3983,11 +3955,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   isFilteringRowsBySearchTerm = () => {
-    if (this.options.gradebook_assignment_search_and_redesign) {
-      return this.filteredStudentIds != null && this.filteredStudentIds.length > 0
-    }
-
-    return this.userFilterTerm != null && this.userFilterTerm !== ''
+    return this.filteredStudentIds != null && this.filteredStudentIds.length > 0
   }
 
   setCurrentGradingPeriod = () => {

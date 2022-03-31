@@ -861,20 +861,6 @@ describe GradebooksController do
         user_session(@teacher)
       end
 
-      describe "gradebook_assignment_search_and_redesign" do
-        it "sets gradebook_assignment_search_and_redesign in js_env as true if enabled" do
-          Account.site_admin.enable_feature!(:gradebook_assignment_search_and_redesign)
-          get :show, params: { course_id: @course.id }
-          expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:gradebook_assignment_search_and_redesign]).to eq(true)
-        end
-
-        it "sets gradebook_assignment_search_and_redesign in js_env as false if disabled" do
-          Account.site_admin.disable_feature!(:gradebook_assignment_search_and_redesign)
-          get :show, params: { course_id: @course.id }
-          expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:gradebook_assignment_search_and_redesign]).to eq(false)
-        end
-      end
-
       describe "course_settings" do
         let(:course_settings) { gradebook_options.fetch(:course_settings) }
 

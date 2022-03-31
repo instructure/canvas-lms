@@ -59,7 +59,6 @@ export type GradebookOptions = {
   export_gradebook_csv_url: string
   filterNavNode: HTMLElement
   grade_calc_ignore_unposted_anonymous_enabled: boolean
-  gradebook_assignment_search_and_redesign: boolean
   gradebook_column_order_settings_url: string
   gradebook_column_order_settings: ColumnOrderSettings
   gradebook_column_size_settings_url: string

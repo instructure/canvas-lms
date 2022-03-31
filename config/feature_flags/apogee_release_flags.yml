@@ -105,12 +105,6 @@ remove_gradebook_student_search_delay:
   applies_to: SiteAdmin
   display_name: Remove Delay for Gradebook Student Search
   description: If set, removes the delay that normally occurs when searching for students.
-gradebook_assignment_search_and_redesign:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Gradebook Assignment Search And Redesign
-  description: Search assignments in Gradebook and new design for assignment
-    and student search
 message_observers_of_students_who:
   state: hidden
   applies_to: SiteAdmin

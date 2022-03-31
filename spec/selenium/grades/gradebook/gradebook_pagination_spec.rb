@@ -37,7 +37,8 @@ describe "Gradebook" do
   def test_n_students(n)
     create_users_in_course @course, n
     Gradebook.visit(@course)
-    f(".gradebook_filter input").send_keys n
+    f("#gradebook-student-search input").send_keys "user #{n}"
+    f("#gradebook-student-search input").send_keys(:return)
     expect(ff(".student-name")).to have_size 1
     expect(f(".student-name")).to include_text "user #{n}"
   end
