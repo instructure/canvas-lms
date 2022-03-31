@@ -101,6 +101,9 @@
     "arrows_464a3e54": {
         "message": "Pere"
     },
+    "art_icon_8e1daad": {
+        "message": "Toi Tohu"
+    },
     "aspect_ratio_will_be_preserved_cb5fdfb8": {
         "message": "E tiaki i Hau aronga"
     },
@@ -205,6 +208,9 @@
     },
     "clear_2084585f": {
         "message": "Ūkui"
+    },
+    "clear_image_3213fe62": {
+        "message": "Maamaa whakaahua"
     },
     "clear_selected_file_82388e50": {
         "message": "Whakawātea kōnae kua tīpakohia"
@@ -313,6 +319,9 @@
     },
     "creative_commons_license_725584ae": {
         "message": "Auaha ngā Raihana Noa:"
+    },
+    "crop_image_41bf940c": {
+        "message": "Whakatipu whakaahua"
     },
     "crop_image_807ebb08": {
         "message": "Tapahi Whakaahua"
@@ -476,6 +485,12 @@
     "embedded_content_aaeb4d3d": {
         "message": "ihirangi tāmau"
     },
+    "engineering_icon_f8f3cf43": {
+        "message": "Hangarau Tohu"
+    },
+    "english_icon_25bfe845": {
+        "message": "Ingarihi Tohu"
+    },
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "Pātō ki iti ake i te 3 pūāhua hei rapu"
     },
@@ -520,6 +535,12 @@
     },
     "extra_small_9ae33252": {
         "message": "Tāpiri iti"
+    },
+    "extracurricular_icon_67c8ca42": {
+        "message": "Extracurricular Tohu"
+    },
+    "failed_getting_course_list_49846a93": {
+        "message": "I rahua whiwhi akoranga rārangi"
     },
     "failed_peeking_into_your_future_e95b9306": {
         "message": "I rahua te titiro ana ā tōna wā"
@@ -650,6 +671,9 @@
     "heading_4_b2e74be7": {
         "message": "Pane 4"
     },
+    "health_icon_8d292eb5": {
+        "message": "Hauora Tohu"
+    },
     "height_69b03e15": {
         "message": "Teitei"
     },
@@ -676,6 +700,9 @@
     },
     "i_hold_the_copyright_71ee91b1": {
         "message": "Mau ahau te manatārua"
+    },
+    "icon_color_b86dd6d6": {
+        "message": "Tohu Tae"
     },
     "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
         "message": "Ki te kore koe e tīpako ngā mōtika whakamahi ināianei, kaore e whakaputaina tēnei kōnae i muri o ''te tukuake."
@@ -743,6 +770,12 @@
     "language_arts_35b79a8b": {
         "message": "Toi Reo"
     },
+    "language_arts_icon_a798b0f8": {
+        "message": "Reo Toi Tohu"
+    },
+    "languages_icon_9d20539": {
+        "message": "Nga reo Tohu"
+    },
     "large_9c5e80e7": {
         "message": "Nui"
     },
@@ -751,6 +784,9 @@
     },
     "left_to_right_e9b4fd06": {
         "message": "Māui - ki te -Matau"
+    },
+    "library_icon_ae1e54cf": {
+        "message": "Whare Pukapuka Tohu"
     },
     "link_7262adec": {
         "message": "Hono"
@@ -821,6 +857,9 @@
     "math_ede93050": {
         "message": "Pāngarau"
     },
+    "math_icon_ad4e9d03": {
+        "message": "Math Tohu"
+    },
     "media_af190855": {
         "message": "Pāpāho"
     },
@@ -847,6 +886,9 @@
     },
     "multi_color_image_63d7372f": {
         "message": "Whakapakoko nui ngā Tae"
+    },
+    "music_icon_4db5c972": {
+        "message": "Puoro Tohu"
     },
     "must_be_at_least_percentage_22e373b6": {
         "message": "Me iti ake i te { percentage }%"
@@ -998,6 +1040,12 @@
     "percentage_must_be_a_number_8033c341": {
         "message": "Pai hēneti me nama anake"
     },
+    "performing_arts_icon_f3497486": {
+        "message": "Performing Arts Tohu"
+    },
+    "physical_education_icon_d7dffd3e": {
+        "message": "Tinana Mātauranga Tohu"
+    },
     "pixels_52ece7d1": {
         "message": "Ngā Pika"
     },
@@ -1063,6 +1111,9 @@
     },
     "relationships_6602af70": {
         "message": "Ngā whanaungatanga"
+    },
+    "religion_icon_246e0be1": {
+        "message": "Whakapono Tohu"
     },
     "reminder_date_4564d12d": {
         "message": "Maumahara: { date }"
@@ -1483,5 +1534,11 @@
     },
     "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
         "message": "Kua hoki koe ki to Hei - Mahi tino tuatahi!"
+    },
+    "zoom_in_image_bb97d4f": {
+        "message": "Topa mai whakaahua"
+    },
+    "zoom_out_image_d0a0a2ec": {
+        "message": "Topa ki waho whakaahua"
     }
 }
