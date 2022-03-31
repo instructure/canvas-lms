@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('media_capture_strings');
+const I18n = useI18nScope('media_capture_strings')
 
 const MediaCaptureStrings = {
   ARIA_VIDEO_LABEL: I18n.t('Video Player'),

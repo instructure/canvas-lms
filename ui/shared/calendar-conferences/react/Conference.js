@@ -27,11 +27,11 @@ import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import sanitizeHtml from 'sanitize-html-with-tinymce'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import webConference from './proptypes/webConference'
 import webConferenceType from './proptypes/webConferenceType'
 
-const I18n = useI18nScope('conferences');
+const I18n = useI18nScope('conferences')
 
 // we use this to consolidate the import of tinymce into our environment
 // (as recommended by jsx/shared/sanitizeHTML)

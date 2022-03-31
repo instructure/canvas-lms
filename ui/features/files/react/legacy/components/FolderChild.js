@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import ReactDOM from 'react-dom'
 import BackboneMixin from '@canvas/files/react/mixins/BackboneMixin'
 import Folder from '@canvas/files/backbone/models/Folder'
@@ -24,7 +24,7 @@ import FocusStore from '../modules/FocusStore'
 import classnames from 'classnames'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('react_files');
+const I18n = useI18nScope('react_files')
 
 export default {
   displayName: 'FolderChild',

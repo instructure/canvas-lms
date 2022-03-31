@@ -17,13 +17,13 @@
  */
 
 import INST from 'browser-sniffer'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
 import '@canvas/jquery/jquery.ajaxJSON' // ajaxJSON, defaultAjaxError
 import '@canvas/rails-flash-notifications' // flashError
 
-const I18n = useI18nScope('ajax_errors');
+const I18n = useI18nScope('ajax_errors')
 
 INST.errorCount = 0
 window.onerror = function(msg, url, line, column, errorObj) {

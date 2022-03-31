@@ -23,10 +23,10 @@ import {IconButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 
-const I18n = useI18nScope('gradebook');
+const I18n = useI18nScope('gradebook')
 
 export default class StudentColumnHeader extends React.Component {
   static propTypes = {

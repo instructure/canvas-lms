@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import InvertedTable from './inverted_table'
 import K from '../../../constants'
 import Legend from './legend'
@@ -25,7 +25,7 @@ import React from 'react'
 import {Link} from 'react-router-dom'
 import Table from './table'
 
-const I18n = useI18nScope('quiz_log_auditing.table_view');
+const I18n = useI18nScope('quiz_log_auditing.table_view')
 
 class AnswerMatrix extends React.Component {
   state = {

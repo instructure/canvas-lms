@@ -21,12 +21,12 @@ import PropTypes from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {Tray} from '@instructure/ui-tray'
 import {IconXSolid} from '@instructure/ui-icons'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import StudentRangesView from './student-ranges-view'
 import StudentDetailsView from './student-details-view'
 import {assignmentShape, selectedPathShape} from '../shapes/index'
 
-const I18n = useI18nScope('cyoe_assignment_sidebar_breakdown_details');
+const I18n = useI18nScope('cyoe_assignment_sidebar_breakdown_details')
 
 const {array, object, func, bool} = PropTypes
 

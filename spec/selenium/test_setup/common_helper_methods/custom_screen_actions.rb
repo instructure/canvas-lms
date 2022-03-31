@@ -34,6 +34,10 @@ module CustomScreenActions
     driver.manage.window.resize_to(1200, 600)
   end
 
+  def resize_screen_to_mobile_width
+    driver.manage.window.resize_to(767, 800)
+  end
+
   def close_extra_windows
     while driver.window_handles.size > 1
       driver.switch_to.window(driver.window_handles.last)

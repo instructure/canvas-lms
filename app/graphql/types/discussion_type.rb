@@ -18,22 +18,22 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class DiscussionFilterType < Types::BaseEnum
-  graphql_name "DiscussionFilterType"
-  description "Search types that can be associated with discussions"
-  value "all"
-  value "unread"
-  value "drafts"
-  value "deleted"
-end
-
-class DiscussionSortOrderType < Types::BaseEnum
-  graphql_name "DiscussionSortOrderType"
-  value "asc", value: :asc
-  value "desc", value: :desc
-end
-
 module Types
+  class DiscussionFilterType < Types::BaseEnum
+    graphql_name "DiscussionFilterType"
+    description "Search types that can be associated with discussions"
+    value "all"
+    value "unread"
+    value "drafts"
+    value "deleted"
+  end
+
+  class DiscussionSortOrderType < Types::BaseEnum
+    graphql_name "DiscussionSortOrderType"
+    value "asc", value: :asc
+    value "desc", value: :desc
+  end
+
   class DiscussionType < ApplicationObjectType
     graphql_name "Discussion"
 
@@ -110,8 +110,8 @@ module Types
 
     field :discussion_entries_connection, Types::DiscussionEntryType.connection_type, null: true do
       argument :search_term, String, required: false
-      argument :filter, DiscussionFilterType, required: false
-      argument :sort_order, DiscussionSortOrderType, required: false
+      argument :filter, Types::DiscussionFilterType, required: false
+      argument :sort_order, Types::DiscussionSortOrderType, required: false
       argument :root_entries, Boolean, required: false
     end
     def discussion_entries_connection(**args)
@@ -247,8 +247,8 @@ module Types
     field :entries_total_pages, Integer, null: true do
       argument :per_page, Integer, required: true
       argument :search_term, String, required: false
-      argument :filter, DiscussionFilterType, required: false
-      argument :sort_order, DiscussionSortOrderType, required: false
+      argument :filter, Types::DiscussionFilterType, required: false
+      argument :sort_order, Types::DiscussionSortOrderType, required: false
       argument :root_entries, Boolean, required: false
     end
     def entries_total_pages(**args)
@@ -258,8 +258,8 @@ module Types
     field :root_entries_total_pages, Integer, null: true do
       argument :per_page, Integer, required: true
       argument :search_term, String, required: false
-      argument :filter, DiscussionFilterType, required: false
-      argument :sort_order, DiscussionSortOrderType, required: false
+      argument :filter, Types::DiscussionFilterType, required: false
+      argument :sort_order, Types::DiscussionSortOrderType, required: false
     end
     def root_entries_total_pages(**args)
       args[:root_entries] = true
@@ -275,7 +275,7 @@ module Types
 
     field :search_entry_count, Integer, null: true do
       argument :search_term, String, required: false
-      argument :filter, DiscussionFilterType, required: false
+      argument :filter, Types::DiscussionFilterType, required: false
     end
     def search_entry_count(**args)
       get_entries(args).then(&:count)

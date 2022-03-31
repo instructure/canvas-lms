@@ -63,11 +63,9 @@ module Lti::Messages
     end
 
     def add_resource_link_request_claims!
-      resource_link = assignment_resource_link
-      assignment = line_item_for_assignment&.assignment
       @message.resource_link.id = launch_resource_link_id
-      @message.resource_link.description = resource_link && assignment&.description
-      @message.resource_link.title = resource_link && assignment&.title
+      @message.resource_link.description = @assignment&.description
+      @message.resource_link.title = @assignment&.title
     end
 
     def add_lti1p1_claims!
@@ -85,21 +83,20 @@ module Lti::Messages
       @assignment && launch_resource_link_id != @assignment.lti_resource_link_id
     end
 
+    # whenever possible, use the correct resource link id whether that comes from
+    # the associated assignment or from the request parameters. fall back to the
+    # context rlid only if needed
     def launch_resource_link_id
-      assignment_resource_link&.resource_link_uuid || context_resource_link_id
+      resource_link&.resource_link_uuid || Lti::Asset.opaque_identifier_for(@context)
     end
 
     def unexpanded_custom_parameters
       # Add in link-specific custom params (e.g. created by deep linking)
-      super.merge!(resource_link_for_custom_parameters&.custom || {})
+      super.merge!(resource_link&.custom || {})
     end
 
-    def resource_link_for_custom_parameters
-      assignment_resource_link || @opts[:resource_link_for_custom_params]
-    end
-
-    def context_resource_link_id
-      Lti::Asset.opaque_identifier_for(@context)
+    def resource_link
+      assignment_resource_link || @opts[:resource_link]
     end
 
     def assignment_resource_link

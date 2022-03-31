@@ -17,7 +17,7 @@
  */
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {number, oneOf, string} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {LoadingIndicator, isAudio, sizeMediaPlayer} from '@instructure/canvas-media'
 import {MediaPlayer} from '@instructure/ui-media-player'
 import {Alert} from '@instructure/ui-alerts'
@@ -25,7 +25,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 
-const I18n = useI18nScope('CanvasMediaPlayer');
+const I18n = useI18nScope('CanvasMediaPlayer')
 
 const byBitrate = (a, b) => parseInt(a.bitrate, 10) - parseInt(b.bitrate, 10)
 

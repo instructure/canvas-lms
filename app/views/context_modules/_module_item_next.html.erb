@@ -24,6 +24,7 @@
   editable ||= false
   can_direct_share = can_do(@context, @current_user, :read_as_admin)
   criterion = completion_criteria && completion_criteria.find{|c| c[:id] == module_item.id}
+  new_mastery_connect_icon = @context.root_account.feature_enabled?(:updated_mastery_connect_icon)
 
   @module_item_image_tags ||= {
     'indent' => "<i class='icon-arrow-right'></i>".html_safe,
@@ -95,8 +96,13 @@
         <i class="icon-quiz"></i>
         <i class="icon-quiz icon-Solid"></i>
         <i class="icon-link"></i>
-        <img id="mc_icon" src="/images/icons/<%= module_item && module_item.published? ? 'mc_icon_pub.svg' : 'mc_icon_unpub.svg' %>"
-             alt="<%= t('Mastery Connect') %>" style="display: none; width: 1rem; height: 1rem;"/>
+        <% if new_mastery_connect_icon %>
+          <img id="mc_icon" src="/images/icons/<%= module_item && module_item.published? ? 'mc-assignment-pub.svg' : 'mc-assignment-unpub.svg.svg' %>"
+              alt="<%= t('Mastery Connect') %>" style="display: none; width: 1rem; height: 1rem;"/>
+        <% else %>
+          <img id="mc_icon" src="/images/icons/<%= module_item && module_item.published? ? 'mc_icon_pub.svg' : 'mc_icon_unpub.svg' %>"
+              alt="<%= t('Mastery Connect') %>" style="display: none; width: 1rem; height: 1rem;"/>
+         <% end %>
       </span>
     </span>
 

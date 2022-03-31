@@ -18,10 +18,10 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 
-const I18n = useI18nScope('SwitchEditorControl');
+const I18n = useI18nScope('SwitchEditorControl')
 
 class SwitchEditorControl extends React.Component {
   static displayName = 'SwitchEditor'

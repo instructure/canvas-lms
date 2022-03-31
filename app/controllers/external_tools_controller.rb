@@ -111,7 +111,8 @@ class ExternalToolsController < ApplicationController
   #        "selection_width": 500,
   #        "selection_height": 500,
   #        "icon_url": "...",
-  #        "not_selectable": false
+  #        "not_selectable": false,
+  #        "deployment_id": null
   #      },
   #      { ...  }
   #     ]
@@ -155,7 +156,7 @@ class ExternalToolsController < ApplicationController
     end
 
     placement = placement_from_params
-    add_crumb(@context.name, named_context_url(@context, :context_url))
+    add_crumb(@tool.name)
     @lti_launch = lti_launch(
       tool: @tool,
       selection_type: placement,
@@ -310,6 +311,7 @@ class ExternalToolsController < ApplicationController
   # @response_field selection_height The pixel height of the iFrame that the tool will be rendered in
   # @response_field icon_url The url for the tool icon
   # @response_field not_selectable whether the tool is not selectable from assignment and modules
+  # @response_field deployment_id The unique identifier for the deployment of the tool
   #
   # @example_response
   #      {
@@ -382,7 +384,7 @@ class ExternalToolsController < ApplicationController
       placement = placement_from_params
       return unless find_tool(params[:id], placement)
 
-      add_crumb(@context.name, named_context_url(@context, :context_url))
+      add_crumb(@tool.name)
 
       @return_url = named_context_url(@context, :context_external_content_success_url, "external_tool_redirect", { include_host: true })
       @redirect_return = true
@@ -441,7 +443,6 @@ class ExternalToolsController < ApplicationController
   end
 
   def resource_selection
-    add_crumb(@context.name, named_context_url(@context, :context_url))
     placement = params[:placement] || params[:launch_type]
     selection_type = placement || "resource_selection"
     selection_type = "editor_button" if params[:editor]
@@ -526,7 +527,7 @@ class ExternalToolsController < ApplicationController
 
   # Get resource link from `resource_link_lookup_id` or `resource_link_lookup_uuid`
   # query param, and ensure the tool matches the resource link.
-  # Used for link-level custom params, but may in the future be used to
+  # Used for link-level custom params, and to
   # determine resource_link_id to send to tool.
   def lookup_resource_link(tool)
     return nil unless resource_link_lookup_uuid
@@ -582,7 +583,7 @@ class ExternalToolsController < ApplicationController
                   return_url: @return_url,
                   expander: expander,
                   opts: opts.merge(
-                    resource_link_for_custom_params: lookup_resource_link(tool)
+                    resource_link: lookup_resource_link(tool)
                   )
                 )
 

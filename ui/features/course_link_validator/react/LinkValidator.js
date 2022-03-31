@@ -19,12 +19,12 @@
 import $ from 'jquery'
 import '@canvas/rails-flash-notifications'
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import ValidatorResults from './ValidatorResults'
 import {number} from 'prop-types'
 import {Confetti} from '@canvas/confetti'
 
-const I18n = useI18nScope('link_validator');
+const I18n = useI18nScope('link_validator')
 
 class LinkValidator extends React.Component {
   state = {

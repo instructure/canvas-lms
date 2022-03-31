@@ -17,12 +17,12 @@
 
 import $ from 'jquery'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('external_content.success');
+const I18n = useI18nScope('external_content.success')
 
 const ExternalContentSuccess = {}
 

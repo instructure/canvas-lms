@@ -362,6 +362,42 @@ describe('useFetchApi', () => {
     expect(error.mock.calls[0][0].response.status).toBe(401)
   })
 
+  describe('additionalDependencies', () => {
+    it('fetches again if additionalDependencies change', async () => {
+      const path = '/api/v1/blah'
+      const response = {key: 'value'}
+      fetchMock.mock(`path:${path}`, response, {repeat: 2})
+      const success = jest.fn()
+      const error = jest.fn()
+      const {rerender} = renderHook(({nonce}) => useFetchApi({success, error, path}, [nonce]), {
+        initialProps: {nonce: 'foo'}
+      })
+      await fetchMock.flush(true)
+      rerender({nonce: 'baz'})
+      await fetchMock.flush(true)
+      expect(fetchMock.done()).toBe(true)
+      expect(success).toHaveBeenCalledTimes(2)
+      expect(error).not.toHaveBeenCalled()
+    })
+
+    it('does not fetch again if additionalDependencies do not change', async () => {
+      const path = '/api/v1/blah'
+      const response = {key: 'value'}
+      fetchMock.mock(`path:${path}`, response, {repeat: 1})
+      const success = jest.fn()
+      const error = jest.fn()
+      const {rerender} = renderHook(({nonce}) => useFetchApi({success, error, path}, [nonce]), {
+        initialProps: {nonce: 'foo'}
+      })
+      await fetchMock.flush(true)
+      rerender({nonce: 'foo'})
+      await fetchMock.flush(true)
+      expect(fetchMock.done()).toBe(true)
+      expect(success).toHaveBeenCalledTimes(1)
+      expect(error).not.toHaveBeenCalled()
+    })
+  })
+
   describe('fetchAllPages', () => {
     it('fetches multiple pages if fetchAllPages is true', async () => {
       const path = '/api'

@@ -69,11 +69,19 @@ export interface Module {
 export type PaceContextTypes = 'Course' | 'Section' | 'Enrollment'
 export type WorkflowStates = 'unpublished' | 'active' | 'deleted'
 export type ProgressStates = 'queued' | 'running' | 'completed' | 'failed'
+export type ContextTypes = 'user' | 'course' | 'term' | 'hypothetical'
+export type OptionalDate = string | null | undefined
+export interface PaceDuration {
+  weeks: number
+  days: number
+}
 
 export interface CoursePace {
   readonly id?: string
-  readonly start_date?: string
-  readonly end_date?: string
+  readonly start_date: string
+  readonly start_date_context: ContextTypes
+  readonly end_date: OptionalDate
+  readonly end_date_context: ContextTypes
   readonly workflow_state: WorkflowStates
   readonly modules: Module[]
   readonly exclude_weekends: boolean

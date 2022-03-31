@@ -25,7 +25,7 @@
 // settings on their own personal eportfolio, they can't
 // affect anyone else
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -48,7 +48,7 @@ import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jqueryui/progressbar'
 import 'jqueryui/sortable'
 
-const I18n = useI18nScope('eportfolio');
+const I18n = useI18nScope('eportfolio')
 
 // optimization so user isn't waiting on RCS to
 // respond when they hit edit

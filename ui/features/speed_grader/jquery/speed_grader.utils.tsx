@@ -20,10 +20,10 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 // @ts-ignore
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import htmlEscape from 'html-escape'
 
-const I18n = useI18nScope('speed_grader_helpers');
+const I18n = useI18nScope('speed_grader_helpers')
 
 export const SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT = 'speed_grader_comment_textarea_mount_point'
 export const SPEED_GRADER_SUBMISSION_COMMENTS_DOWNLOAD_MOUNT_POINT =

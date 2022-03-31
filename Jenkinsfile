@@ -450,7 +450,7 @@ pipeline {
                   extendedStage('Generate Crystalball Prediction')
                     .hooks(buildSummaryReportHooks.call())
                     .obeysAllowStages(false)
-                    .required(!configuration.isChangeMerged())
+                    .required(!configuration.isChangeMerged() && env.GERRIT_REFSPEC != "refs/heads/master")
                     .timeout(2)
                     .execute {
                       try {
@@ -470,7 +470,17 @@ pipeline {
                         archiveArtifacts allowEmptyArchive: true, artifacts: 'tmp/crystalball_map_version.txt'
                       /* groovylint-disable-next-line CatchException */
                       } catch (Exception e) {
-                        // don't fail build for this
+                        // default to full run of specs
+                        sh 'echo -n "." > tmp/crystalball_spec_list.txt'
+                        sh 'echo -n "broken map, defaulting to run all tests" > tmp/crystalball_map_version.txt'
+
+                        archiveArtifacts allowEmptyArchive: true, artifacts: 'tmp/crystalball_spec_list.txt, tmp/crystalball_map_version.txt'
+
+                        slackSend(
+                          channel: '#crystalball-noisy',
+                          color: 'danger',
+                          message: "${env.JOB_NAME} <${getSummaryUrl()}|#${env.BUILD_NUMBER}>\n\nFailed to generate prediction!"
+                        )
                       }
                     }
 
@@ -479,28 +489,6 @@ pipeline {
 
                     extendedStage('Consumer Smoke Test').hooks(buildSummaryReportHooks.call()).queue(stages) {
                       sh 'build/new-jenkins/consumer-smoke-test.sh'
-                    }
-
-                    extendedStage('Zeitwerk Check').hooks(buildSummaryReportHooks.call()).queue(stages) {
-                      withEnv([
-                          'COMPOSE_FILE=docker-compose.new-jenkins.yml',
-                          'CANVAS_ZEITWERK=1'
-                      ]) {
-                        // the purpose of this stage is to ensure any new code introduce to canvas or any
-                        // autoloaded/eager-loaded dependencies conforms to our zeitwerk config
-                        // so we can start using zeitwerk as our code loader.
-                        //
-                        // the generally expected file structure can be found here: https://github.com/fxn/zeitwerk#file-structure
-                        sh '''
-                          echo "HEY HUMAN!"
-                          echo "**********"
-                          echo "Are you debugging a build failure here?"
-                          echo "see general zeitwerk rules, it may help: https://github.com/fxn/zeitwerk#file-structure"
-                          echo "**********"
-                          echo "HEY HUMAN!"
-                          docker-compose -p "zeitwerk-check" run --rm canvas bash -c "./bin/rails zeitwerk:check"
-                        '''
-                      }
                     }
 
                     extendedStage(JS_BUILD_IMAGE_STAGE)
@@ -552,7 +540,7 @@ pipeline {
                   extendedStage('Linters')
                     .hooks([onNodeReleasing: lintersStage.tearDownNode()])
                     .nodeRequirements(label: 'canvas-docker', podTemplate: lintersStage.nodeRequirementsTemplate())
-                    .required(!configuration.isChangeMerged() && env.GERRIT_PATCHSET_REVISION != '0')
+                    .required(!configuration.isChangeMerged() && env.GERRIT_CHANGE_ID != '0')
                     .execute {
                       def nestedStages = [:]
 
@@ -584,6 +572,11 @@ pipeline {
                       string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                     ])
+
+                  // Trigger Crystalball map build if spec files were added or removed, will not vote on builds.
+                  if (configuration.isChangeMerged() && filesChangedStage.hasNewDeletedSpecFiles(buildConfig)) {
+                    build(wait: false, job: 'Canvas/helpers/crystalball-map')
+                  }
 
                   extendedStage('Flakey Spec Catcher')
                     .hooks(buildSummaryReportHooks.call())

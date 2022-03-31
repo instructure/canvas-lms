@@ -192,8 +192,7 @@ const RCELoader = {
       instRecordDisabled: ENV.RICH_CONTENT_INST_RECORD_TAB_DISABLED,
       maxInitRenderedRCEs: tinyMCEInitOptions.maxInitRenderedRCEs,
       highContrastCSS: window.ENV?.url_for_high_contrast_tinymce_editor_css,
-      use_rce_buttons_and_icons: shouldUseFeature(Feature.ButtonsAndIcons, window.ENV),
-      use_rce_a11y_checker_notifications: !!window.ENV?.use_rce_a11y_checker_notifications
+      use_rce_buttons_and_icons: shouldUseFeature(Feature.ButtonsAndIcons, window.ENV)
     }
   }
 }

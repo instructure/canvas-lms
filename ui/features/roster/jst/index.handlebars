@@ -10,13 +10,14 @@
   </div>
   {{/if}}
   <div id="tab-0" class="roster-tab tab-panel ui-tabs-panel form-inline" style="min-height: 800px;">
+    <span id="search_input_container"></span>
     <input
-    type="text"
-    name="search_term"
-    data-view="inputFilter"
-    placeholder='{{#t "search_people"}}Search people{{/t}}'
-    aria-label='{{#t "filter_field_description"}}Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input.{{/t}}'
-    >
+      type="hidden"
+      name="search_term"
+      data-view="inputFilter"
+      placeholder='{{#t "search_people"}}Search people{{/t}}'
+      aria-label='{{#t "filter_field_description"}}Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input.{{/t}}'
+      >
 
     <select
       name="enrollment_role_id"

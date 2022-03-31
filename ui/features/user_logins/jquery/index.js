@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import SuspendedIcon from '../react/SuspendedIcon'
@@ -28,7 +28,7 @@ import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/jquery/jquery.instructure_misc_plugins'/* confirmDelete, showIf */
 import '@canvas/util/templateData'
 
-const I18n = useI18nScope('user_logins');
+const I18n = useI18nScope('user_logins')
 
 const savedSSOIcons = {}
 

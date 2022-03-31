@@ -274,8 +274,7 @@ class RCEWrapper extends React.Component {
     instRecordDisabled: PropTypes.bool,
     highContrastCSS: PropTypes.arrayOf(PropTypes.string),
     maxInitRenderedRCEs: PropTypes.number,
-    use_rce_buttons_and_icons: PropTypes.bool,
-    use_rce_a11y_checker_notifications: PropTypes.bool
+    use_rce_buttons_and_icons: PropTypes.bool
   }
 
   static defaultProps = {
@@ -370,18 +369,17 @@ class RCEWrapper extends React.Component {
   }
 
   getCanvasUrl() {
-    if(!this.canvasUrl)
-      this.canvasUrl = getCanvasUrl(this.props.trayProps);
+    if (!this.canvasUrl) this.canvasUrl = getCanvasUrl(this.props.trayProps)
 
     return this.canvasUrl.then(url => {
-        if(!url) {
-          console.warn(
-            'Could not determine Canvas base URL.',
-            'Content will be referenced by relative URL.'
-          );
-        }
-        return url;
-      });
+      if (!url) {
+        console.warn(
+          'Could not determine Canvas base URL.',
+          'Content will be referenced by relative URL.'
+        )
+      }
+      return url
+    })
   }
 
   // getCode and setCode naming comes from tinyMCE
@@ -612,8 +610,7 @@ class RCEWrapper extends React.Component {
 
   insertMathEquation(tex) {
     const editor = this.mceInstance()
-    return this.getCanvasUrl().then(domain =>
-      contentInsertion.insertEquation(editor, tex, domain));
+    return this.getCanvasUrl().then(domain => contentInsertion.insertEquation(editor, tex, domain))
   }
 
   removePlaceholders(name) {
@@ -882,7 +879,7 @@ class RCEWrapper extends React.Component {
         }
 
         const popups = document.querySelectorAll('[data-mce-component]')
-        for(const popup of popups) {
+        for (const popup of popups) {
           if (popup.contains(document.activeElement)) {
             // one of our popups has focus
             return
@@ -944,10 +941,12 @@ class RCEWrapper extends React.Component {
     if (event.code === 'F9' && event.altKey) {
       event.preventDefault()
       event.stopPropagation()
+      this.setFocusAbilityForHeader(true);
       focusFirstMenuButton(this._elementRef.current)
     } else if (event.code === 'F10' && event.altKey) {
       event.preventDefault()
       event.stopPropagation()
+      this.setFocusAbilityForHeader(true);
       focusToolbar(this._elementRef.current)
     } else if ((event.code === 'F8' || event.code === 'Digit0') && event.altKey) {
       event.preventDefault()
@@ -1011,6 +1010,19 @@ class RCEWrapper extends React.Component {
       tinyapp.setAttribute('role', 'document')
       tinyapp.setAttribute('tabIndex', '-1')
     }
+
+    // Adds a focusout event listener for handling screen reader navigation focus
+    const header = this._elementRef.current.querySelector('.tox-editor-header')
+    if (header) {
+      header.addEventListener('focusout', e => {
+        const leavingHeader = !header.contains(e.relatedTarget)
+        if (leavingHeader) {
+          this.setFocusAbilityForHeader(false)
+        }
+      });
+    }
+    this.setFocusAbilityForHeader(false)
+
     // Probably should do this in tinymce.scss, but we only want it in new rce
     textarea.style.resize = 'none'
     editor.on('ExecCommand', this._forceCloseFloatingToolbar)
@@ -1020,9 +1032,7 @@ class RCEWrapper extends React.Component {
     // document. We need this so that click events get captured properly by instui
     // focus-trapping components, so they properly ignore trapping focus on click.
     editor.on('click', () => window.top.document.body.click(), true)
-    if (this.props.use_rce_a11y_checker_notifications) {
-      editor.on('Cut Paste Change input Undo Redo', debounce(this.handleInputChange, 1000))
-    }
+    editor.on('Cut Paste Change input Undo Redo', debounce(this.handleInputChange, 1000))
     this.announceContextToolbars(editor)
 
     if (this.isAutoSaving) {
@@ -1035,6 +1045,13 @@ class RCEWrapper extends React.Component {
     // readonly should have been handled via the init property passed
     // to <Editor>, but it's not.
     editor.mode.set(this.props.readOnly ? 'readonly' : 'design')
+
+    // Not using iframe_aria_text because compatibility issues.
+    // Not using iframe_attrs because library overwriting.
+    if (this.iframe) {
+      this.iframe.setAttribute('title', formatMessage(
+        'Rich Text Area. Press ALT+0 for Rich Content Editor shortcuts.'))
+    }
 
     this.props.onInitted?.(editor)
   }
@@ -1343,9 +1360,6 @@ class RCEWrapper extends React.Component {
   }
 
   checkAccessibility = () => {
-    if (!this.props.use_rce_a11y_checker_notifications) {
-      return
-    }
     const editor = this.mceInstance()
     editor.execCommand(
       'checkAccessibility',
@@ -1380,6 +1394,14 @@ class RCEWrapper extends React.Component {
       this._showOnFocusButton.focus()
     } else {
       this._showOnFocusButton?.focus()
+    }
+  }
+
+  setFocusAbilityForHeader = (focusable) => {
+    // Sets aria-hidden to prevent screen readers focus in RCE menus and toolbar
+    const header = this._elementRef.current.querySelector('.tox-editor-header')
+    if (header) {
+      header.setAttribute('aria-hidden', focusable ? 'false' : 'true')
     }
   }
 
@@ -1833,7 +1855,6 @@ class RCEWrapper extends React.Component {
           onKBShortcutModalOpen={this.openKBShortcutModal}
           onA11yChecker={this.onA11yChecker}
           onFullscreen={this.handleClickFullscreen}
-          use_rce_a11y_checker_notifications={this.props.use_rce_a11y_checker_notifications}
           a11yBadgeColor={this.theme.canvasBadgeBackgroundColor}
           a11yErrorsCount={this.state.a11yErrorsCount}
         />

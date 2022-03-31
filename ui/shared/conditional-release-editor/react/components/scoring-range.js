@@ -26,10 +26,10 @@ import ScoreInput from './score-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import AssignmentSet from './assignment-set'
 import * as actions from '../actions'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {transformScore, getScoringRangeSplitWarning} from '../score-helpers'
 
-const I18n = useI18nScope('conditional_release');
+const I18n = useI18nScope('conditional_release')
 
 const {object, func, bool} = PropTypes
 

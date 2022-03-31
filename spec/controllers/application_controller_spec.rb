@@ -221,6 +221,50 @@ RSpec.describe ApplicationController do
         end
       end
 
+      context "session_timezone url param is given" do
+        before do
+          allow(controller).to receive(:params).and_return({ session_timezone: "America/New_York" })
+        end
+
+        it "sets the timezone from the url" do
+          Time.use_zone("Mountain Time (US & Canada)") do
+            controller.instance_variable_set(:@context, double(time_zone: Time.zone, asset_string: "", class_name: nil))
+            controller.js_env({})
+            expect(controller.js_env[:TIMEZONE]).to eq "America/New_York"
+          end
+        end
+
+        it "sets the contextual timezone from the url" do
+          Time.use_zone("Mountain Time (US & Canada)") do
+            controller.instance_variable_set(:@context, double(time_zone: Time.zone, asset_string: "", class_name: nil))
+            controller.js_env({})
+            expect(controller.js_env[:CONTEXT_TIMEZONE]).to eq "America/New_York"
+          end
+        end
+
+        context "session_timezone is not valid" do
+          before do
+            allow(controller).to receive(:params).and_return({ session_timezone: "ChawnZone" })
+          end
+
+          it "sets the contextual timezone from the context" do
+            Time.use_zone("Mountain Time (US & Canada)") do
+              controller.instance_variable_set(:@context, double(time_zone: Time.zone, asset_string: "", class_name: nil))
+              controller.js_env({})
+              expect(controller.js_env[:CONTEXT_TIMEZONE]).to eq "America/Denver"
+            end
+          end
+
+          it "sets the timezone from the context" do
+            Time.use_zone("Mountain Time (US & Canada)") do
+              controller.instance_variable_set(:@context, double(time_zone: Time.zone, asset_string: "", class_name: nil))
+              controller.js_env({})
+              expect(controller.js_env[:TIMEZONE]).to eq "America/Denver"
+            end
+          end
+        end
+      end
+
       it "allows multiple items" do
         controller.js_env A: "a", B: "b"
         expect(controller.js_env[:A]).to eq "a"
@@ -2196,9 +2240,10 @@ RSpec.describe ApplicationController do
 
   describe "k5_user? helper" do
     before :once do
-      course_with_teacher active_all: true
+      @k5_account = Account.create!(parent_account_id: Account.default)
+      course_with_teacher(active_all: true, account: @k5_account)
       @student1 = student_in_course(context: @course).user
-      toggle_k5_setting(@course.account)
+      toggle_k5_setting(@k5_account)
     end
 
     before do
@@ -2246,7 +2291,7 @@ RSpec.describe ApplicationController do
     end
 
     it "returns true if enrolled in a subaccount of a k5 account" do
-      sub = Account.create!(parent_account_id: @course.account)
+      sub = Account.create!(parent_account_id: @k5_account)
       course_factory(account: sub)
       student_in_course(active_all: true)
       @controller.instance_variable_set(:@current_user, @student)
@@ -2259,10 +2304,7 @@ RSpec.describe ApplicationController do
     end
 
     it "returns false if not associated with a k5 account" do
-      @course.account.settings[:enable_as_k5_account] = { value: false }
-      @course.account.save!
-      @course.root_account.settings[:k5_accounts] = []
-      @course.root_account.save!
+      toggle_k5_setting(@k5_account, false)
       expect(@controller.send(:k5_user?)).to be_falsey
     end
 
@@ -2275,7 +2317,7 @@ RSpec.describe ApplicationController do
     end
 
     it "returns true for an admin without enrollments" do
-      account_admin_user(account: @account)
+      account_admin_user(account: @k5_account)
       user_session(@admin)
       @controller.instance_variable_set(:@current_user, @admin)
       expect(@controller.send(:k5_user?)).to eq true
@@ -2286,7 +2328,7 @@ RSpec.describe ApplicationController do
       @teacher.save!
       user_session(@teacher)
       @controller.instance_variable_set(:@current_user, @teacher)
-      expect(@controller.send(:k5_user?, false)).to be_truthy
+      expect(@controller.send(:k5_user?, { check_disabled: false })).to be_truthy
     end
 
     it "returns true even if a student has opted-out of the k5 dashboard" do
@@ -2298,6 +2340,13 @@ RSpec.describe ApplicationController do
     it "returns false if no current user" do
       @controller.instance_variable_set(:@current_user, nil)
       expect(@controller.send(:k5_user?)).to be_falsey
+    end
+
+    it "returns correct value for another user if provided" do
+      course_with_student(active_all: true) # not in @k5_account subaccount
+      expect(@controller.send(:k5_user?, { user: @user })).to be_falsey
+      @controller.instance_variable_set(:@current_user, @user)
+      expect(@controller.send(:k5_user?, { user: @student1 })).to be_truthy
     end
 
     context "with sharding" do
@@ -2326,7 +2375,7 @@ RSpec.describe ApplicationController do
       end
 
       it "returns true for a user with k5 enrollments on a subaccount of another shard" do
-        toggle_k5_setting(@course.account, false)
+        toggle_k5_setting(@k5_account, false)
         @shard2.activate do
           subaccount = Account.default.sub_accounts.create!
           toggle_k5_setting(subaccount)
@@ -2341,7 +2390,7 @@ RSpec.describe ApplicationController do
       it "returns true for an admin with an AccountUser on another shard" do
         admin = User.create!
         @shard2.activate do
-          account_admin_user(user: admin)
+          account_admin_user(user: admin, account: @k5_account)
           user_session(admin)
           @controller.instance_variable_set(:@current_user, admin)
           expect(@controller.send(:k5_user?)).to eq true
@@ -2349,7 +2398,7 @@ RSpec.describe ApplicationController do
       end
 
       it "returns false for users on multiple shards with no k5 enrollments" do
-        toggle_k5_setting(@course.account, false)
+        toggle_k5_setting(@k5_account, false)
         @shard2.activate do
           expect(@controller.send(:k5_user?)).to be_falsey
         end

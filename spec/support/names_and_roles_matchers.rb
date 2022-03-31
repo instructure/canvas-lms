@@ -39,6 +39,13 @@ module Lti::IMS::NamesAndRolesMatchers
   end
 
   def map_course_enrollment_role(enrollment)
+    if enrollment.type == "StudentViewEnrollment"
+      return [
+        "http://purl.imsglobal.org/vocab/lis/v2/membership#Learner",
+        "http://purl.imsglobal.org/vocab/lti/system/person#TestUser"
+      ]
+    end
+
     case enrollment.role.base_role_type
     when "TeacherEnrollment"
       ["http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor"]

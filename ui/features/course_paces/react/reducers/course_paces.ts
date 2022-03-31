@@ -28,6 +28,7 @@ import {
   CoursePacesState,
   CoursePace,
   PaceContextTypes,
+  PaceDuration,
   StoreState,
   CoursePaceItem,
   CoursePaceItemDueDates,
@@ -35,7 +36,8 @@ import {
   Sections,
   Enrollments,
   Section,
-  Module
+  Module,
+  OptionalDate
 } from '../types'
 import {BlackoutDate, Course} from '../shared/types'
 import {Constants as UIConstants, SetSelectedPaceType} from '../actions/ui'
@@ -85,7 +87,7 @@ export const getPublishingError = (state: StoreState): string | undefined => {
   if (!progress || progress.workflow_state !== 'failed') return undefined
   return progress.message
 }
-export const getEndDate = (state: StoreState): string | undefined => state.coursePace.end_date
+export const getEndDate = (state: StoreState): OptionalDate => state.coursePace.end_date
 export const isStudentPace = (state: StoreState) => state.coursePace.context_type === 'Enrollment'
 export const getIsPaceCompressed = (state: StoreState): boolean =>
   !!state.coursePace.compressed_due_dates
@@ -255,37 +257,58 @@ export const getProjectedEndDate = createDeepEqualSelector(
   }
 )
 
-export const getPaceDays = createDeepEqualSelector(
+/**
+ * These 3 functions support the original projected_dates.tsx
+ * which is not used but is being kept around as a reference
+ * for when start and end date editing returns
+ *
+ * Computing pace duration is now in getPaceDuration
+ */
+// export const getPaceDays = createDeepEqualSelector(
+//   getCoursePace,
+//   getExcludeWeekends,
+//   getBlackoutDates,
+//   getProjectedEndDate,
+//   (
+//     coursePace: CoursePace,
+//     excludeWeekends: boolean,
+//     blackoutDates: BlackoutDate[],
+//     projectedEndDate?: string
+//   ): number => {
+//     if (!coursePace.start_date) return 0
+
+//     const endDate = projectedEndDate || coursePace.end_date || coursePace.start_date
+//     return DateHelpers.daysBetween(coursePace.start_date, endDate, excludeWeekends, blackoutDates)
+//   }
+// )
+
+// export const getWeekLength = createSelector(
+//   getExcludeWeekends,
+//   (excludeWeekends: boolean): number => {
+//     return excludeWeekends ? 5 : 7
+//   }
+// )
+
+// export const getPaceWeeks = createSelector(
+//   getPaceDays,
+//   getWeekLength,
+//   (paceDays: number, weekLength: number): number => {
+//     return Math.floor(paceDays / weekLength)
+//   }
+// )
+
+// returns the weeks and days in calendar time
+// between the pace's start and end dates
+export const getPaceDuration = createSelector(
   getCoursePace,
-  getExcludeWeekends,
-  getBlackoutDates,
   getProjectedEndDate,
-  (
-    coursePace: CoursePace,
-    excludeWeekends: boolean,
-    blackoutDates: BlackoutDate[],
-    projectedEndDate?: string
-  ): number => {
-    if (!coursePace.start_date) return 0
-
-    const endDate = coursePace.end_date || projectedEndDate || coursePace.start_date
-    return DateHelpers.daysBetween(coursePace.start_date, endDate, excludeWeekends, blackoutDates)
-  }
-)
-
-export const getPaceWeeks = createSelector(
-  getPaceDays,
-  getExcludeWeekends,
-  (paceDays: number, excludeWeekends: boolean): number => {
-    const weekLength = excludeWeekends ? 5 : 7
-    return Math.floor(paceDays / weekLength)
-  }
-)
-
-export const getWeekLength = createSelector(
-  getExcludeWeekends,
-  (excludeWeekends: boolean): number => {
-    return excludeWeekends ? 5 : 7
+  (coursePace: CoursePace, projectedEndDate?: string): PaceDuration => {
+    let planDays = 0
+    if (coursePace.start_date) {
+      const endDate = projectedEndDate || coursePace.end_date || coursePace.start_date
+      planDays = DateHelpers.rawDaysBetweenInclusive(coursePace.start_date, endDate)
+    }
+    return {weeks: Math.floor(planDays / 7), days: planDays % 7}
   }
 )
 

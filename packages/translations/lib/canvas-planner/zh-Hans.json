@@ -97,6 +97,7 @@
   "error_loading_past_items_2881dbb1": { "message": "加载过去的项目时出错" },
   "exciting_discussion_9f67bd0a": { "message": "精彩的讨论" },
   "excused_cf8792eb": { "message": "已请假" },
+  "failed_getting_course_list_49846a93": { "message": "获取课程列表失败" },
   "failed_peeking_into_your_future_e95b9306": { "message": "无法查看未来" },
   "failed_peeking_into_your_past_5bec2323": { "message": "无法查看过去" },
   "failed_saving_changes_on_name_1e100ad": {

@@ -17,12 +17,12 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import PropTypes from 'prop-types'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 
-const I18n = useI18nScope('a2_AccessibleTipContent');
+const I18n = useI18nScope('a2_AccessibleTipContent')
 
 export default function AccessibleTipContent(props) {
   const {attempt, gradingType, grade, originalGrade, pointsDeducted, pointsPossible} = props
@@ -37,8 +37,12 @@ export default function AccessibleTipContent(props) {
         })
       })}
       {I18n.t(
-        {one: 'Late Penalty: minus 1 Point', other: 'Late Penalty: minus %{count} Points'},
-        {count: pointsDeducted}
+        {
+          one: 'Late Penalty: minus 1 Point',
+          other: 'Late Penalty: minus %{count} Points',
+          zero: 'Late Penalty: None'
+        },
+        {count: pointsDeducted || 0}
       )}
       {I18n.t('Grade: %{grade}', {
         grade: GradeFormatHelper.formatGrade(grade, {

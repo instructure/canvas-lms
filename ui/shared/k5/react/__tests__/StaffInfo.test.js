@@ -151,14 +151,11 @@ describe('StaffInfo', () => {
         )
       })
 
-      it.skip('clears inputs after a successful send', async () => {
+      it('clears inputs after a successful send', async () => {
         fetchMock.post(CONVERSATIONS_URL, 200)
         const wrapper = await openModal()
         fireEvent.change(wrapper.getByLabelText('Message'), {target: {value: 'hello'}})
         fireEvent.click(wrapper.getByText('Send'))
-        await waitFor(() =>
-          expect(wrapper.queryByText('Message Mrs. Thompson')).not.toBeInTheDocument()
-        )
         fireEvent.click(wrapper.getByText('Send a message to Mrs. Thompson'))
         await waitFor(() => {
           expect(wrapper.getByLabelText('Message').closest('textarea').value).toBe('')

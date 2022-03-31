@@ -19,9 +19,9 @@
 import React from 'react'
 import {object, func, number} from 'prop-types'
 import classNames from 'classnames'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('cyoe_assignment_sidebar_student_range_itme');
+const I18n = useI18nScope('cyoe_assignment_sidebar_student_range_itme')
 
 export default class StudentRangeItem extends React.Component {
   static propTypes = {

@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import {getByText} from '@testing-library/dom'
-import CourseImagePicker from 'ui/features/course_settings/react/components/CourseImagePicker.js'
+import CourseImagePicker from 'ui/features/course_settings/react/components/CourseImagePicker'
 
 const wrapper = document.getElementById('fixtures')
 const reset_env = window.ENV
@@ -45,7 +45,8 @@ QUnit.module('CourseImagePicker Component', {
   }
 })
 
-test('calls the handleFileUpload prop when drop occurs', function() {
+test('calls the handleFileUpload prop when drop occurs', function (assert) {
+  const done = assert.async()
   let called = false
   const handleFileUploadFunc = () => {
     called = true
@@ -59,11 +60,14 @@ test('calls the handleFileUpload prop when drop occurs', function() {
       files: [{type: 'image/jpg', name: 'image.jpg', size: 10}]
     }
   })
-
-  ok(called, 'handleFileUpload was called')
+  // there's some async activity in there
+  window.setTimeout(() => {
+    ok(called, 'handleFileUpload was called')
+    done()
+  }, 0)
 })
 
-test('Unsplash tab can be selected', function() {
+test('Unsplash tab can be selected', function () {
   window.ENV.use_unsplash_image_search = true
   const component = this.renderComponent({courseId: '101'})
   const imageSearchTab = getByText(wrapper, 'Unsplash')

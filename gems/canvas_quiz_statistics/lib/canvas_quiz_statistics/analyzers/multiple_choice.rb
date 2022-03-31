@@ -71,11 +71,7 @@ module CanvasQuizStatistics::Analyzers
           user_ids: [],
           user_names: []
         }
-
-        if answer[:text].blank? && answer[:html].present?
-          stats[:text] = CanvasQuizStatistics::Util.strip_tags(answer[:html])
-        end
-
+        stats[:text] = answer[:html] if answer[:text].blank? && answer[:html].present?
         answer_stats.merge!(stats)
       end
 

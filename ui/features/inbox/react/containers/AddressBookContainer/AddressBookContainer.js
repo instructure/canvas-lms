@@ -18,7 +18,7 @@
 
 import PropTypes from 'prop-types'
 import React, {useMemo, useState} from 'react'
-import {AddressBook} from '../../components/AddressBook/AddressBook'
+import {AddressBook, USER_TYPE, CONTEXT_TYPE} from '../../components/AddressBook/AddressBook'
 import {ADDRESS_BOOK_RECIPIENTS} from '../../../graphql/Queries'
 import {useQuery} from 'react-apollo'
 
@@ -34,7 +34,7 @@ export const AddressBookContainer = props => {
 
   const addressBookRecipientsQuery = useQuery(ADDRESS_BOOK_RECIPIENTS, {
     variables: {
-      context: filterHistory[filterHistory.length - 1].context,
+      context: filterHistory[filterHistory.length - 1]?.context?.contextID,
       search: inputValue,
       userID
     },
@@ -46,7 +46,7 @@ export const AddressBookContainer = props => {
     setIsLoadingMoreData(true)
     addressBookRecipientsQuery.fetchMore({
       variables: {
-        context: filterHistory[filterHistory.length - 1].context,
+        context: filterHistory[filterHistory.length - 1]?.context?.contextID,
         search: inputValue,
         userID,
         afterUser: data?.legacyNode?.recipients?.usersConnection?.pageInfo.endCursor
@@ -75,9 +75,9 @@ export const AddressBookContainer = props => {
   }
 
   const addFilterHistory = chosenFilter => {
-    const newFilterHistor = filterHistory
-    newFilterHistor.push(chosenFilter)
-    setFilterHistory([...newFilterHistor])
+    const newFilterHistory = filterHistory
+    newFilterHistory.push(chosenFilter)
+    setFilterHistory([...newFilterHistory])
   }
 
   const removeLastFilterHistory = () => {
@@ -99,9 +99,12 @@ export const AddressBookContainer = props => {
     )
   }
 
-  if (props.activeCourseFilter && !filterHistory[filterHistory.length - 1].context) {
+  if (props.activeCourseFilter && !filterHistory[filterHistory.length - 1]?.context) {
     addFilterHistory({
-      context: props.activeCourseFilter
+      context: {
+        contextID: props.activeCourseFilter.contextID,
+        contextName: props.activeCourseFilter.contextName
+      }
     })
   }
 
@@ -116,7 +119,8 @@ export const AddressBookContainer = props => {
     contextData = data?.legacyNode?.recipients?.contextsConnection?.nodes.map(c => {
       return {
         id: c.id,
-        name: c.name
+        name: c.name,
+        itemType: CONTEXT_TYPE
       }
     })
 
@@ -125,7 +129,8 @@ export const AddressBookContainer = props => {
         _id: u._id,
         id: u.id,
         name: u.name,
-        commonCoursesInfo: getCommonCoursesInformation(u.commonCoursesConnection)
+        commonCoursesInfo: getCommonCoursesInformation(u.commonCoursesConnection),
+        itemType: USER_TYPE
       }
     })
 
@@ -149,15 +154,15 @@ export const AddressBookContainer = props => {
     return {contextData, userData}
   }, [loading, data, filterHistory, inputValue])
 
-  const handleSelect = (item, isCourse, isBackButton, isSubmenu) => {
-    if (isCourse) {
+  const handleSelect = (item, isContext, isBackButton, isSubmenu) => {
+    if (isContext) {
       addFilterHistory({
-        context: item
+        context: {contextID: item.id, contextName: item.name}
       })
     } else if (isSubmenu) {
       addFilterHistory({
         context: null,
-        subMenuSelection: item
+        subMenuSelection: item.id
       })
     } else if (isBackButton) {
       if (inputValue) {
@@ -184,6 +189,8 @@ export const AddressBookContainer = props => {
       limitTagCount={props.limitTagCount}
       width={props.width}
       open={props.open}
+      hasSelectAllFilterOption={props.hasSelectAllFilterOption}
+      currentFilter={filterHistory[filterHistory.length - 1]}
     />
   )
 }
@@ -194,7 +201,7 @@ AddressBookContainer.propTypes = {
    */
   onSelectedIdsChange: PropTypes.func,
   /**
-   * Number that liits selected item count
+   * Number that limits selected item count
    */
   limitTagCount: PropTypes.number,
   /**
@@ -210,13 +217,18 @@ AddressBookContainer.propTypes = {
    */
   onUserFilterSelect: PropTypes.func,
   /**
-   * use State function to set current context for addressbook
+   * object that contains the current course filter information for the compose modal
    */
-  activeCourseFilter: PropTypes.string
+  activeCourseFilter: PropTypes.object,
+  /**
+   * bool which determines if "select all" in a context menu appears
+   */
+  hasSelectAllFilterOption: PropTypes.bool
 }
 
 AddressBookContainer.defaultProps = {
-  onSelectedIdsChange: () => {}
+  onSelectedIdsChange: () => {},
+  hasSelectAllFilterOption: false
 }
 
 export default AddressBookContainer

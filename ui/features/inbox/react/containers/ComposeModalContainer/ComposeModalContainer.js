@@ -21,7 +21,7 @@ import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
 import {ComposeActionButtons} from '../../components/ComposeActionButtons/ComposeActionButtons'
 import {Conversation} from '../../../graphql/Conversation'
 import HeaderInputs from './HeaderInputs'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Modal} from '@instructure/ui-modal'
 import ModalBody from './ModalBody'
 import ModalHeader from './ModalHeader'
@@ -34,7 +34,7 @@ import {uploadFiles} from '@canvas/upload-file'
 import UploadMedia from '@instructure/canvas-media'
 import {MediaCaptureStrings, SelectStrings, UploadMediaStrings} from '../../../util/constants'
 
-const I18n = useI18nScope('conversations_2');
+const I18n = useI18nScope('conversations_2')
 
 const ComposeModalContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -133,8 +133,8 @@ const ComposeModalContainer = props => {
     setSendIndividualMessages(prev => !prev)
   }
 
-  const onContextSelect = id => {
-    setSelectedContext(id)
+  const onContextSelect = context => {
+    setSelectedContext({contextID: context.contextID, contextName: context.contextName})
   }
 
   const onSelectedIdsChange = ids => {
@@ -184,7 +184,7 @@ const ComposeModalContainer = props => {
           attachmentIds: attachments.map(a => a.id),
           body,
           userNote,
-          contextCode: selectedContext,
+          contextCode: selectedContext?.contextID,
           recipients: selectedIds.map(rec => rec?._id || rec.id),
           subject,
           groupConversation: !sendIndividualMessages,

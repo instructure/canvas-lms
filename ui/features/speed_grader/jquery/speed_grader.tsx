@@ -74,7 +74,7 @@ import round from 'round'
 import _ from 'underscore'
 import INST from 'browser-sniffer'
 // @ts-ignore
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import natcompare from '@canvas/util/natcompare'
 import qs from 'qs'
 import tz from '@canvas/timezone'
@@ -103,14 +103,14 @@ import vericiteInfoTemplate from '../jst/_vericiteInfo.handlebars'
 // @ts-ignore
 import vericiteScoreTemplate from '@canvas/grading/jst/_vericiteScore.handlebars'
 import 'jqueryui/draggable'
-import '@canvas/jquery/jquery.ajaxJSON'/* getJSON, ajaxJSON */
-import '@canvas/forms/jquery/jquery.instructure_forms'/* ajaxJSONFiles */
-import '@canvas/doc-previews'/* loadDocPreview */
-import '@canvas/datetime'/* datetimeString */
+import '@canvas/jquery/jquery.ajaxJSON' /* getJSON, ajaxJSON */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* ajaxJSONFiles */
+import '@canvas/doc-previews' /* loadDocPreview */
+import '@canvas/datetime' /* datetimeString */
 import 'jqueryui/dialog'
 import 'jqueryui/menu'
-import '@canvas/jquery/jquery.instructure_misc_helpers'/* replaceTags */
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* confirmDelete, showIf, hasScrollbar */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf, hasScrollbar */
 import '@canvas/keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
@@ -123,7 +123,7 @@ import 'jquery-selectmenu'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import '@canvas/util/jquery/fixDialogButtons'
 
-const I18n = useI18nScope('speed_grader');
+const I18n = useI18nScope('speed_grader')
 
 const {Alert} = Alerts as any
 
@@ -354,19 +354,32 @@ function mergeStudentsAndSubmission() {
     window.jsonData.submissionsMap[submission[anonymizableUserId]] = submission
   })
 
+  jsonData.studentsWithSubmissions = jsonData.studentsWithSubmissions.reduce(
+    (students, student, index) => {
+      const submission = jsonData.submissionsMap[student[anonymizableId]]
+      // Hide students that don't have a submission object. This is legacy support
+      // for when we used to not create submission objects for assigned concluded students.
+      // For all new assignments, every assigned student (regardless of concluded/inactive
+      // status) should have a submission object.
+      if (submission) {
+        student.enrollments = jsonData.studentEnrollmentMap[student[anonymizableId]]
+        student.section_ids = Object.keys(jsonData.studentSectionIdsMap[student[anonymizableId]])
+        student.submission = submission
+        student.submission_state = SpeedgraderHelpers.submissionState(student, ENV.grading_role)
+        student.index = index
+        students.push(student)
+      }
+
+      return students
+    },
+    []
+  )
+
   // need to presort by anonymous_id for anonymous assignments so that the index property can be consistent
   if (isAnonymous)
     window.jsonData.studentsWithSubmissions.sort((a, b) =>
-      a.anonymous_id > b.anonymous_id ? 1 : -1
+      a.anonymous_name_position > b.anonymous_name_position ? 1 : -1
     )
-
-  window.jsonData.studentsWithSubmissions.forEach((student, index) => {
-    student.enrollments = window.jsonData.studentEnrollmentMap[student[anonymizableId]]
-    student.section_ids = Object.keys(window.jsonData.studentSectionIdsMap[student[anonymizableId]])
-    student.submission = window.jsonData.submissionsMap[student[anonymizableId]]
-    student.submission_state = SpeedgraderHelpers.submissionState(student, ENV.grading_role)
-    student.index = index
-  })
 
   // handle showing students only in a certain section.
   if (!window.jsonData.GROUP_GRADING_MODE) {
@@ -797,7 +810,7 @@ function initCommentBox() {
     }
 
     const formatComment = function (current_comment) {
-      return current_comment.replace(/<p><\/p>/g, '\n\n').replace(/<br>/g, '\n');
+      return current_comment.replace(/<p><\/p>/g, '\n\n').replace(/<br>/g, '\n')
     }
 
     $('.speech_recognition_link').click(() => {
@@ -2128,7 +2141,12 @@ EG = {
   },
 
   updateWordCount(wordCount) {
-    if (ENV.FEATURES?.word_count_in_speed_grader) {
+    if (
+      ENV.FEATURES?.word_count_in_speed_grader &&
+      !['basic_lti_launch', 'external_tool'].includes(
+        this.currentStudent.submission.submission_type
+      )
+    ) {
       // xsslint safeString.method toLocaleString
       // xsslint safeString.method t
       const wordCountHTML = wordCount
@@ -2602,18 +2620,18 @@ EG = {
     $grded_so_far.text(
       I18n.t('portion_graded', '%{x}/%{y}', {
         x: I18n.n(gradedStudents.length),
-        y: I18n.n(window.jsonData.context.students.length)
+        y: I18n.n(window.jsonData.studentsWithSubmissions.length)
       })
     )
   },
 
   totalStudentCount() {
     if (sectionToShow) {
-      return _.filter(window.jsonData.context.students, student =>
+      return _.filter(jsonData.studentsWithSubmissions, student =>
         _.includes(student.section_ids, sectionToShow)
       ).length
     } else {
-      return window.jsonData.context.students.length
+      return jsonData.studentsWithSubmissions.length
     }
   },
 
@@ -3661,7 +3679,7 @@ EG = {
         snapshot =>
           snapshot &&
           $.map(
-            window.jsonData.context.students,
+            jsonData.studentsWithSubmissions,
             student => snapshot === student && student.name
           )[0]
       )

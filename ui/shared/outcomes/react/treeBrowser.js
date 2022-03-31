@@ -19,7 +19,7 @@
 import {useEffect, useMemo, useState} from 'react'
 import {uniqBy} from 'lodash'
 import {useApolloClient, useQuery} from 'react-apollo'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {CHILD_GROUPS_QUERY, groupFields} from '../graphql/Management'
 import {FIND_GROUPS_QUERY} from '../graphql/Outcomes'
@@ -28,7 +28,7 @@ import useGroupCreate from './hooks/useGroupCreate'
 import useCanvasContext from './hooks/useCanvasContext'
 import {gql} from '@canvas/apollo'
 
-const I18n = useI18nScope('OutcomeManagement');
+const I18n = useI18nScope('OutcomeManagement')
 
 const structFromGroup = g => ({
   id: g._id,

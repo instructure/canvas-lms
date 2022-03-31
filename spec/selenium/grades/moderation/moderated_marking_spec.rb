@@ -215,7 +215,7 @@ describe "Moderated Marking" do
     it "shows student names in row headers", priority: "1" do
       # expect student names to be shown
       student_names = ModeratePage.student_table_row_headers.map(&:text)
-      expect(student_names).to eql [@student1.name, @student2.name]
+      expect(student_names).to match_array [@student1.name, @student2.name]
     end
 
     it "anonymizes students if anonymous grading is enabled", priority: "1" do
@@ -225,13 +225,13 @@ describe "Moderated Marking" do
 
       # expect student names to be replaced with anonymous stand ins
       student_names = ModeratePage.student_table_row_headers.map(&:text)
-      expect(student_names).to eql ["Student 1", "Student 2"]
+      expect(student_names).to match_array ["Student 1", "Student 2"]
     end
 
     it "shows grader names in table headers", priority: "1" do
       # expect teacher names to be shown
       grader_names = ModeratePage.student_table_headers.map(&:text)
-      expect(grader_names).to eql [@teacher2.name, @teacher3.name]
+      expect(grader_names).to match_array [@teacher2.name, @teacher3.name]
     end
 
     it "anonymizes graders if grader names visible to final grader is false", priority: "1" do
@@ -241,7 +241,7 @@ describe "Moderated Marking" do
 
       # expect teacher names to be replaced with anonymous stand ins
       grader_names = ModeratePage.student_table_headers.map(&:text)
-      expect(grader_names).to eql ["Grader 1", "Grader 2"]
+      expect(grader_names).to match_array ["Grader 1", "Grader 2"]
     end
 
     context "when a custom grade is entered" do

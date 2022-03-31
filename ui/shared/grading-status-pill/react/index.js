@@ -19,9 +19,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {Pill} from '@instructure/ui-pill'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('gradingStatusPill');
+const I18n = useI18nScope('gradingStatusPill')
 
 function forEachNode(nodeList, fn) {
   for (let i = 0; i < nodeList.length; i += 1) {
@@ -40,7 +40,7 @@ export default {
     })
 
     forEachNode(lateMountPoints, mountPoint => {
-      ReactDOM.render(<Pill color="danger">{I18n.t('late')}</Pill>, mountPoint)
+      ReactDOM.render(<Pill color="warning">{I18n.t('late')}</Pill>, mountPoint)
     })
 
     forEachNode(excusedMountPoints, mountPoint => {

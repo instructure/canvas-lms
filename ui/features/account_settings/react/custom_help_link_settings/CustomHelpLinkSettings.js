@@ -19,7 +19,7 @@
 import '@canvas/rails-flash-notifications'
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import CustomHelpLinkIcons from './CustomHelpLinkIcons'
 import CustomHelpLink from './CustomHelpLink'
@@ -27,7 +27,7 @@ import CustomHelpLinkForm from './CustomHelpLinkForm'
 import CustomHelpLinkMenu from './CustomHelpLinkMenu'
 import CustomHelpLinkPropTypes from './CustomHelpLinkPropTypes'
 
-const I18n = useI18nScope('custom_help_link');
+const I18n = useI18nScope('custom_help_link')
 
 export default class CustomHelpLinkSettings extends React.Component {
   static propTypes = {

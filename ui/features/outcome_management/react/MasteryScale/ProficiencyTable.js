@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconPlusLine} from '@instructure/ui-icons'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import ProficiencyRating from './ProficiencyRating'
 import uuid from 'uuid/v1'
@@ -32,7 +32,7 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
 import ConfirmMasteryModal from '../ConfirmMasteryModal'
 
-const I18n = useI18nScope('ProficiencyTable');
+const I18n = useI18nScope('ProficiencyTable')
 
 const ADD_DEFAULT_COLOR = 'EF4437'
 

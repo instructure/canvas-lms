@@ -64,14 +64,16 @@ class UnreadCommentCountLoader < GraphQL::Batch::Loader
   end
 end
 
-class SubmissionRubricAssessmentFilterInputType < Types::BaseInputObject
-  graphql_name "SubmissionRubricAssessmentFilterInput"
+module Types
+  class SubmissionRubricAssessmentFilterInputType < Types::BaseInputObject
+    graphql_name "SubmissionRubricAssessmentFilterInput"
 
-  argument :for_attempt, Integer, <<~MD, required: false, default_value: nil
-    What submission attempt the rubric assessment should be returned for. If not
-    specified, it will return the rubric assessment for the current submisssion
-    or submission history.
-  MD
+    argument :for_attempt, Integer, <<~MD, required: false, default_value: nil
+      What submission attempt the rubric assessment should be returned for. If not
+      specified, it will return the rubric assessment for the current submisssion
+      or submission history.
+    MD
+  end
 end
 
 module Interfaces::SubmissionInterface
@@ -285,7 +287,7 @@ module Interfaces::SubmissionInterface
   end
 
   field :rubric_assessments_connection, Types::RubricAssessmentType.connection_type, null: true do
-    argument :filter, SubmissionRubricAssessmentFilterInputType, required: false, default_value: {}
+    argument :filter, Types::SubmissionRubricAssessmentFilterInputType, required: false, default_value: {}
   end
   def rubric_assessments_connection(filter:)
     filter = filter.to_h

@@ -17,7 +17,7 @@
  */
 
 import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
-import TotalGradeOverrideCellFormatter from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/formatters/TotalGradeOverrideCellFormatter.js'
+import TotalGradeOverrideCellFormatter from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/formatters/TotalGradeOverrideCellFormatter'
 
 /* eslint-disable qunit/no-identical-names */
 QUnit.module('GradebookGrid TotalGradeOverrideCellFormatter', suiteHooks => {

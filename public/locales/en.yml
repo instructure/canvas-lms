@@ -222,7 +222,6 @@ en:
   access_token_created_or_regenerated_4ce9ed1f: Access Token Created or Regenerated
   access_tokens_can_be_used_to_allow_other_applicati_16c4a3ab: Access tokens can be used to allow other applications to make API calls on your behalf. You can also generate access tokens and *use the Canvas Open API* to come up with your own integrations.
   access_your_courses_and_groups_using_any_ios_or_an_cdb6ad63: Access your courses and groups using any iOS or Android mobile device and find more information in the Help menu.
-  accessibility_checker_notifications_da5a49e6: Accessibility Checker Notifications
   accordion_section_1_7888782d: Accordion Section 1
   accordion_section_2_e1812997: Accordion Section 2
   accordion_section_3_96861901: Accordion Section 3
@@ -1733,8 +1732,10 @@ en:
   all_groups_cea25817: All Groups
   all_grouptitle_outcomes_dcc565d1: All %{groupTitle} Outcomes
   all_image_types_allowed_9c65004d: All Image Types Allowed
+  all_in_e5ddaee0: All in
   all_items_a49b66c7: All Items
   all_items_marked_processed_have_been_saved_by_canv_7045295a: All items marked "processed" have been saved by Canvas.
+  all_jobs_1d82f9d6: All Jobs
   all_media_types_allowed_3c0cdce7: All Media Types Allowed
   all_modules_20c9a1c8: All Modules
   all_my_files_a0213441: All My Files
@@ -2806,7 +2807,6 @@ en:
       links:
         add_rubric: Rubric
     edit_view:
-      assignment_name: Assignment Name
       buttons:
         build: Build
         save: Save
@@ -3430,7 +3430,7 @@ en:
   beta_cb5f307e: Beta
   beta_lti_launch_c200ffdf: 'Beta LTI Launch:'
   beta_url_3c7b88ec: 'Beta URL:'
-  between_1_and_5_f2a74bcf: Between 1 and 5
+  between_1_and_10_7118bf2d: Between 1 and 10
   between_1_and_99_d421a4c0: Between 1% and 99%
   big_blue_button_conference:
     create_time: Create Time
@@ -4143,6 +4143,7 @@ en:
   changed_item_1d16a85f: Changed Item
   changes_will_still_apply_if_you_leave_this_page_935cedc6: Changes will still apply if you leave this page.
   changes_you_made_may_not_be_saved_4e8db973: Changes you made may not be saved.
+  changing_course_pacing_days_may_modify_due_dates_9009aecd: Changing course pacing days may modify due dates.
   changing_section_dates_may_override_course_and_ter_6634950e: Changing section dates may override course and term availability settings and placement in the Courses page and Dashboard. Please confirm term and course dates before modifying section dates.
   changing_the_late_policy_will_affect_previously_gr_49071db7: Changing the late policy will affect previously graded submissions.
   changing_the_tenant_will_delete_existing_groups_f86c48dc: Changing the tenant will delete existing groups.
@@ -4202,6 +4203,8 @@ en:
   classic_view_33f29576: Classic View
   clear_2084585f: Clear
   clear_all_da755751: Clear all
+  clear_job_selection_6ad1ff95: Clear job selection
+  clear_search_900e9c97: Clear search
   clear_search_field_75f595c7: Clear search field
   clear_selected_file_82388e50: Clear selected file
   clear_user_cache_ef079f7f: Clear User Cache
@@ -4350,7 +4353,10 @@ en:
       collaboration_name: "%{course_or_group_name} Collaboration"
       descriptions:
         etherpad: "EtherPad is an open source project that lets you quickly set up shared documents.  It's fast enough that you can see what others are typing as they're typing it. On the other hand, \"pads\" aren't protected by a password so anyone with a link to them can edit them. EtherPad is better suited than Google Docs if you want to support anonymity and/or allowing people without Google accounts to participate.  \n  \n**Warning**: be sure you are familiar with [EtherPad's deletion policy](%{etherpad_deletion_policy_url}) to ensure your work is preserved."
-        google_docs: "Google Docs is a great place to collaborate on a group project.  It's like Microsoft Word, but lets you work together with others on the same file at the same time without having to email it around.  \n  \n**Warning**: you (and all your collaborators) will need a Google account in order to participate in any Google Docs collaborations."
+        google_docs: |-
+          **Warning:** you (and all your collaborators) will need accounts from the supported web tool in order to participate in any collaborations.
+                   Free online web tools are an excellent place for students to work on group projects or papers, take shared notes, etc.
+                   Teachers or students can set up group collaborations.
       labels:
         collaboration_type: 'Collaborate using:'
         description: 'Description:'
@@ -4367,18 +4373,16 @@ en:
         Teacher *or* students can set up group collaborations.
       description_student: |-
         **What do we mean by collaborations?**  We're talking about web-based tools for
-        working together on a shared document.  You can use resources like
-        [Google Docs](%{google_url})
-        to work collaboratively on tasks like group papers or note-taking.  This page is
-        an easy place to keep track of those collaborations, and also to set them
-        up without having to swap emails.
+                working together on a shared document.
+                You can use online web tools to work collaboratively on tasks like group papers or note-taking.  This page is
+                an easy place to keep track of those collaborations, and also to set them
+                up without having to swap emails.
       description_teacher: |-
-        **What do we mean by collaborations?**  We're talking about web-based tools that most
-        likely your students are already familiar with.  Students can use resources like
-        [Google Docs](%{google_url})
-        to work collaboratively on tasks like group papers or note-taking.  This page gives them
-        (and you) an easy place to keep track of those collaborations, and also to set them
-        up without having to swap emails.
+        **What do we mean by collaborations?** We're talking
+                about web-based tools that students are already familiar with. Students can use
+                online web tools to work collaboratively on tasks like group papers or note-taking.
+                This page gives teachers and students an easy place to keep track of those
+                collaborations, and also to set them up without having to swap emails.
       how_to_start_a_new_collaboration: To find out more about a particular type of collaboration, click "Start a New Collaboration" and then choose that type in the dropdown list.
       links:
         new: Start a new collaboration
@@ -6132,7 +6136,6 @@ en:
         everyone_tab: Everyone
         groups: Groups
       roster_user:
-        " pending_acceptance_explanation": This user has not yet accepted the invitation to the course
         links:
           edit_sections: Edit Sections
           link_to_students: Link to Students
@@ -6140,6 +6143,7 @@ en:
           resend_invitation: Resend Invitation
           user_details: User Details
         manage_user: Manage %{name}
+        pending_acceptance_explanation: This user has not yet accepted the invitation to the course
         pending_acceptance_of_invitation: pending
       roster_users:
         canvas_user_id: Canvas User ID
@@ -6901,6 +6905,12 @@ en:
   designers_remove_39f50ec9: Designers - remove
   details_98a31b68: Details
   details_a6f427c3: 'Details:'
+  determined_by_course_end_date_5e3ffb4f: Determined by course end date
+  determined_by_course_pace_45063fa8: Determined by course pace
+  determined_by_course_start_date_fc1a8ecf: Determined by course start date
+  determined_by_section_end_date_3cda3832: Determined by section end date
+  determined_by_section_stat_date_35dc5e7f: Determined by section stat date
+  determined_by_today_s_date_87330acf: Determined by today's date
   determines_visibility_and_management_of_rubrics_li_9b974d71: Determines visibility and management of Rubrics link in Account Navigation.
   determines_visibility_and_management_of_sis_import_bf386823: Determines visibility and management of SIS Import link in Account Navigation.
   determines_visibility_and_management_of_the_outcom_aace9659: Determines visibility and management of the Outcomes link in Account Navigation.
@@ -7063,8 +7073,6 @@ en:
     discussion_podcast_feed_title: Discussion Podcast Feed
     edit_crumb: Edit
     edit_view:
-      " saving": Saving...
-      " topic_title": Topic Title
       allow_liking: Allow liking
       allow_threaded_replies: Allow threaded replies
       attachment: Attachment
@@ -7079,6 +7087,7 @@ en:
       points_possible: Points Possible
       post_at: Post At
       save: Save
+      saving: Saving...
       sort_by_likes: Sort by likes
       topic_title: Topic Title
       until: Until
@@ -7409,7 +7418,7 @@ en:
   due_date_oldest_to_newest_73e62815: Due Date - Oldest to Newest
   due_date_set_1c6364db: Due Date Set
   due_dates_520a6c08: Due Dates
-  due_dates_are_being_compressed_based_on_your_start_917df12d: Due Dates are being compressed based on your start and end dates
+  due_dates_are_being_compressed_based_on_your_start_c6db279e: Due Dates are being compressed based on your start and end dates.
   due_dates_changed_exceptions_ddb028: 'Due Dates changed exceptions:'
   due_dates_duedatecount_bbc24d65: Due Dates (%{dueDateCount})
   due_datetime_f5a81b81: 'Due: %{dateTime}'
@@ -7712,6 +7721,7 @@ en:
   enter_a_what_if_score_668c91a3: Enter a What-If score.
   enter_a_workflow_state_to_narrow_results_162903af: Enter a workflow state to narrow results
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: Enter "{{ACCOUNT_DOMAIN}}" to substitute the user's root account domain
+  enter_an_id_or_an_original_job_id_d81ad1c7: Enter an id or an original_job_id
   enter_and_distribute_grades_c1216df: Enter and distribute grades
   enter_at_least_count_characters_1c7a0b36: Enter at least %{count} characters
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: Enter "{{CANVAS_USER_ID}}" to substitute the user's unique Canvas ID
@@ -8055,13 +8065,13 @@ en:
     format: "%{attribute} %{message}"
     index:
       all_categories: "- All Categories -"
-      default_category: default
       labels:
         account: account
         category: category
         comments: comments
         created_at: created at
         request_context_id: request context id
+        subject: subject
         url: url
         user: user
       message_contains: Message contains
@@ -8436,6 +8446,7 @@ en:
   filled_5d8c39e: Filled
   filter_9df28e5b: 'Filter:'
   filter_assignment_category_63acaed4: Filter Assignment Category
+  filter_bucket_jobs_by_group_9bd1668c: Filter %{bucket} jobs by %{group}
   filter_by_2f4368a8: Filter by
   filter_by_date_c076a845: Filter by date
   filter_by_ip_address_40965f66: Filter by IP address
@@ -9726,6 +9737,7 @@ en:
   if_one_or_all_permissions_are_disabled_user_can_st_f83271b3: If one or all permissions are disabled, user can still view and download files into a zip file.
   if_provided_this_name_will_be_used_in_preference_t_4079100a: If provided, this name will be used in preference to the course's actual name on the dashboard and in notifications.
   if_set_allows_submission_status_to_be_changed_from_156f57f: If set, allows submission status to be changed from inside of Speedgrader
+  if_set_displays_updated_mastery_connect_icon_b6a93002: If set, displays updated mastery connect icon
   if_set_removes_the_delay_that_normally_occurs_when_f0a6f530: If set, removes the delay that normally occurs when searching for students.
   if_set_the_grade_calculator_will_ignore_unposted_a_2f4abd00: If set, the grade calculator will ignore unposted anonymous assignments when calculating totals.
   if_set_the_gradebook_will_chunk_out_loading_of_ass_20a1e443: If set, the Gradebook will chunk out loading of assignments, loading those for the selected grading period first.
@@ -9933,6 +9945,7 @@ en:
   individual_view_d60b9132: Individual View…
   indonesia_62_4c35bd62: Indonesia (+62)
   indonesian_5f6accd6: Indonesian
+  info_2f75aa74: info
   info_8f47054a: Info
   info_panel_displayed_51d481cc: Info panel displayed
   info_panel_hidden_bf7c3b7b: Info panel hidden
@@ -10127,6 +10140,7 @@ en:
   job_category_f8e4dfe7: Job category
   job_details_b33137dc: Job details
   job_grouping_f652413e: Job grouping
+  job_lookup_1d980054: Job lookup
   jobs:
     columns:
       attempt: attempt
@@ -10298,6 +10312,7 @@ en:
   late_penalty_minus_count_points_810572fe:
     one: 'Late Penalty: minus 1 Point'
     other: 'Late Penalty: minus %{count} Points'
+    zero: 'Late Penalty: None'
   late_percent_b91d01b3: 'Late: %{percent}'
   late_policies_42bac80: Late Policies
   late_policies_fd5dced6: Late policies
@@ -10612,11 +10627,13 @@ en:
   loading_grades_for_coursename_26784c2d: Loading grades for %{courseName}
   loading_grading_periods_c635d96: Loading grading periods...
   loading_grading_periods_for_coursename_bbe46919: Loading grading periods for %{courseName}
+  loading_group_f1647ebb: Loading %{group}
   loading_grouptitle_dba362d2: Loading %{groupTitle}.
   loading_homeroom_course_name_9f63923d: Loading Homeroom Course Name
   loading_important_date_2d3a29ce: Loading Important Date
   loading_important_date_details_1b2d2b85: Loading Important Date Details
   loading_important_info_217bf805: Loading important info
+  loading_jobs_12f0609d: Loading jobs...
   loading_last_attended_date_5a42463: Loading last attended date
   loading_latest_announcement_link_f1746190: Loading latest announcement link
   loading_learning_outcome_groups_599d259c: Loading learning outcome groups
@@ -12861,7 +12878,7 @@ en:
   must_be_a_number_f6e09df7: must be a number
   must_be_a_valid_number_59f0069: Must be a valid number
   must_be_after_start_date_95e251a3: must be after start date
-  must_be_between_1_and_5_3b42aca1: must be between 1 and 5
+  must_be_between_1_and_10_e99eb0d1: must be between 1 and 10
   must_be_between_1_and_99_589b827d: must be between 1 and 99
   must_be_between_availability_dates_ceaca984: must be between availability dates
   must_be_between_lower_and_upper_1f501b2a: Must be between %{lower} and %{upper}
@@ -13252,6 +13269,7 @@ en:
   not_reviewed_c38d9e97: Not reviewed
   not_selected_57866888: not selected
   not_signed_47acf472: Not Signed
+  not_specified_24a60319: Not Specified
   not_starred_98931190: not starred
   not_starred_no_subject_click_to_star_adfefe93: '''Not starred "(No Subject)", Click to star.'
   not_starred_no_subject_click_to_star_dc91380: Not starred "(No Subject)", Click to star.
@@ -14028,6 +14046,7 @@ en:
   paste_zoom_into_calendar_events_announcements_disc_d873358e: Paste Zoom into Calendar Events, Announcements, Discussions, and anywhere you use the Rich Content Editor (RCE).
   path_4f9abf12: Path
   pause_12af3bb4: Pause
+  pause_auto_refresh_9bd773ca: Pause auto-refresh
   pdf_4e842f10: pdf
   pdf_d8236d9a: PDF
   peer_review_assignment_7d314c59: Peer Review Assignment
@@ -16359,6 +16378,7 @@ en:
   reestablish_your_world_b4bd6dff: Reestablish your world
   reference_code_3e8355dd: Reference Code
   reference_code_is_required_c32c757f: Reference code is required
+  refresh_8a04b019: Refresh
   regardless_of_whether_this_permission_is_enabled_o_a16e31b5: Regardless of whether this permission is enabled or disabled, users will still be able to manage events in their personal calendar.
   regenerate_3e4679f8: Regenerate
   regenerate_epub_395c8e56: Regenerate ePub
@@ -16560,6 +16580,7 @@ en:
   reports_1b9ab7a7: Reports
   reports_account_settings_78f5336a: Reports (Account Settings)
   reports_course_f09b7d9e: Reports (Course)
+  reqired_end_date_a7deac41: Reqired end date
   request_id_1499afb0: Request ID
   request_successfully_sent_note_that_applying_score_ee8665b6: Request successfully sent. Note that applying scores may take a while and changes will not appear until you reload the page.
   request_that_docviewer_use_cloudfront_for_serving__b569aca9: Request that DocViewer use CloudFront for serving pdf assets.
@@ -16883,6 +16904,8 @@ en:
   scheduling_5a3327e7: Scheduling
   scheduling_sync_3f4a7cac: Scheduling sync
   school_of_rock_4b7b1fd0: School of Rock
+  scope_9729c11e: 'Scope:'
+  scope_c59afc8a: Scope
   score_change_notifications_6b94f27f: Score change notifications
   score_does_not_include_groups_because_they_have_no_80d12f42:
     one: Score does not include %{groups} because it has no points possible
@@ -17042,6 +17065,7 @@ en:
   search_form_fcaa38f7: Search Form
   search_grading_periods_e947a3e9: Search grading periods...
   search_groups_or_people_6c15d6ad: Search Groups or People
+  search_people_402e622c: Search people
   search_people_44f36cd2: Search people...
   search_people_4782671a: Search People
   search_people_as_you_type_in_this_field_the_list_o_5755e8ad: Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input.
@@ -17882,7 +17906,6 @@ en:
   short_name_ad9bf84f: short name
   should_be_self_evident_the_canvas_id_of_the_report_44378262: should be self-evident, the canvas ID of the reporting user
   show_76c0ed1c: Show
-  show_accessibility_checker_notifications_while_edi_a7cb6449: Show accessibility checker notifications while editing.
   show_account_navigation_menu_d97270a9: Show Account Navigation Menu
   show_account_setting_to_allow_viewing_and_exportin_8f51281f: Show account setting to allow viewing and exporting of student first and last names in separate columns in the gradebook.
   show_admin_navigation_menu_92fb579f: Show Admin Navigation Menu
@@ -18230,6 +18253,7 @@ en:
   start_a_conversation_with_your_instructor_in_the_c_50c9b8d5: Start a conversation with your instructor in the Canvas Inbox.
   start_a_new_subject_7271b3ec: Start a new subject
   start_assignment_d56256d3: Start Assignment
+  start_auto_refresh_e2feafb2: Start auto-refresh
   start_date_e937be8a: Start Date
   start_date_end_date_d809dd93: "%{start_date} - %{end_date}"
   start_date_from_20503757: 'Start Date From:'
@@ -18289,6 +18313,7 @@ en:
   storage_used_in_mb_c75fbd9c: storage used in MB
   store_and_share_course_assets_82a9967c: Store and share course assets
   strand_955969b1: Strand
+  strand_singleton_2d7d7be7: Strand / Singleton
   strands_b086013b: Strands
   stream_items_api:
     assessment_request_title: Peer Review for %{title}
@@ -18395,6 +18420,7 @@ en:
   students_can_only_participate_in_the_course_betwee_6f8595aa: Students can only participate in the course between these dates
   students_can_see_originality_score_797fe634: Students can see originality score
   students_cannot_view_quiz_responses_after_course_c_88e929ed: Students cannot view quiz responses after course concludes
+  students_have_already_submitted_homework_on_this_a_7eb5cb6e: Students have already submitted homework on this assignment, so plagiarism platform settings cannot be changed.
   students_have_either_already_taken_or_started_taki_a076336: Students have either already taken or started taking this quiz, so be careful about editing it. If you change any quiz questions in a significant way, you may want to consider regrading students who took the old version of the quiz.
   students_have_the_option_to_reply_anonymously_some_503cdf6c: Students have the option to reply anonymously. Some names and profile pictures may be hidden.
   students_must_complete_all_of_these_requirements_15fa97f7: Students must complete all of these requirements
@@ -18814,6 +18840,7 @@ en:
   tas_add_ccec2573: TAs - add
   tas_remove_16a99b22: TAs - remove
   tea_provisional_graders_d4f19c26: TEA Provisional Graders
+  tea_quiz_submission_answers_b8b90be3: TEA Quiz Submission Answers
   teacher_5a73b637: Teacher
   teacher_count_teachers_a92f7199: "%{teacher_count} teachers"
   teacher_dashboard_custom_report_6d20bef2: Teacher Dashboard Custom Report
@@ -20278,6 +20305,7 @@ en:
   updated_after_3a81825c: Updated After
   updated_at_ab9f625d: updated_at
   updated_group_group_name_727b1d98: Updated Group %{group_name}
+  updated_mastery_connect_icon_70b6a9b9: Updated Mastery Connect Icon
   updates_to_json_api_auth_error_http_code_and_json__5936d452: Updates to JSON API auth error HTTP code and JSON status field
   updating_6edbab78: Updating
   updating_discussion_failed_aadb2d35: Updating discussion failed

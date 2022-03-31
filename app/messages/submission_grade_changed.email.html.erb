@@ -1,5 +1,9 @@
 <% define_content :link do %>
-  <%= course_assignment_submission_url(asset.assignment.context, asset.assignment, asset.user_id) %>
+  <% if asset.assignment.context.feature_enabled?(:assignments_2_student) %>
+    <%= course_assignment_url(asset.assignment.context, asset.assignment) %>
+  <% else %>
+    <%= course_assignment_submission_url(asset.assignment.context, asset.assignment, asset.user_id) %>
+  <% end %>
 <% end %>
 
 <% define_content :subject do %>

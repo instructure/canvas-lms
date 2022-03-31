@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {bool, element, func, shape, string} from 'prop-types'
+import {arrayOf, bool, element, func, shape, string} from 'prop-types'
 import CanvasFiles from './CanvasFiles/index'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {USER_GROUPS_QUERY} from '@canvas/assignments/graphql/student/Queries'
@@ -24,7 +24,7 @@ import {Flex} from '@instructure/ui-flex'
 import GenericErrorPage from '@canvas/generic-error-page'
 import {IconFolderLine, IconLtiLine} from '@instructure/ui-icons'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Img} from '@instructure/ui-img'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {useQuery} from 'react-apollo'
@@ -41,7 +41,7 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
 
-const I18n = useI18nScope('assignments_2_MoreOptions');
+const I18n = useI18nScope('assignments_2_MoreOptions')
 
 // An "abstract" component that renders a button allowing the user to upload a
 // file via an interface supplied by the caller.
@@ -179,7 +179,7 @@ BaseUploadTool.propTypes = {
 
 const iconDimensions = {height: '24px', width: '24px'}
 
-function CanvasFileChooser({courseID, onFileSelect, userID}) {
+function CanvasFileChooser({allowedExtensions, courseID, onFileSelect, userID}) {
   const [selectedCanvasFileID, setSelectedCanvasFileId] = useState(null)
 
   const {loading, error, data} = useQuery(USER_GROUPS_QUERY, {
@@ -201,6 +201,7 @@ function CanvasFileChooser({courseID, onFileSelect, userID}) {
     const userGroups = data.legacyNode
     contents = (
       <CanvasFiles
+        allowedExtensions={allowedExtensions}
         courseID={courseID}
         handleCanvasFileSelect={fileID => {
           setSelectedCanvasFileId(fileID)
@@ -293,7 +294,14 @@ function WebcamPhotoUpload({onPhotoTaken}) {
   )
 }
 
-function MoreOptions({breakpoints, courseID, handleCanvasFiles, handleWebcamPhotoUpload, userID}) {
+function MoreOptions({
+  allowedExtensions,
+  breakpoints,
+  courseID,
+  handleCanvasFiles,
+  handleWebcamPhotoUpload,
+  userID
+}) {
   if (handleCanvasFiles == null && handleWebcamPhotoUpload == null) {
     return null
   }
@@ -309,7 +317,12 @@ function MoreOptions({breakpoints, courseID, handleCanvasFiles, handleWebcamPhot
       )}
       {handleCanvasFiles && (
         <Flex.Item margin={itemMargin} overflowY="visible">
-          <CanvasFileChooser courseID={courseID} userID={userID} onFileSelect={handleCanvasFiles} />
+          <CanvasFileChooser
+            allowedExtensions={allowedExtensions}
+            courseID={courseID}
+            userID={userID}
+            onFileSelect={handleCanvasFiles}
+          />
         </Flex.Item>
       )}
     </Flex>
@@ -317,6 +330,7 @@ function MoreOptions({breakpoints, courseID, handleCanvasFiles, handleWebcamPhot
 }
 
 MoreOptions.propTypes = {
+  allowedExtensions: arrayOf(string),
   breakpoints: breakpointsShape,
   courseID: string.isRequired,
   handleCanvasFiles: func,

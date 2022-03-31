@@ -17,9 +17,9 @@
 
 import $ from 'jquery'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('outcomes.user_outcome_results');
+const I18n = useI18nScope('outcomes.user_outcome_results')
 
 $(document).ready(() => {
   const showAllArtifacts = $('#show_all_artifacts_link')

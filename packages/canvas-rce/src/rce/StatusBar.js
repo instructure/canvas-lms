@@ -53,7 +53,6 @@ StatusBar.propTypes = {
   onKBShortcutModalOpen: func.isRequired,
   onA11yChecker: func.isRequired,
   onFullscreen: func.isRequired,
-  use_rce_a11y_checker_notifications: bool,
   preferredHtmlEditor: oneOf([PRETTY_HTML_EDITOR_VIEW, RAW_HTML_EDITOR_VIEW]),
   readOnly: bool,
   a11yBadgeColor: string,
@@ -188,7 +187,7 @@ export default function StatusBar(props) {
         <IconA11yLine />
       </IconButton>
     )
-    if (!props.use_rce_a11y_checker_notifications || props.a11yErrorsCount <= 0) {
+    if (props.a11yErrorsCount <= 0) {
       return button
     }
     return (
@@ -307,11 +306,7 @@ export default function StatusBar(props) {
               props.onChangeView(isHtmlView() ? WYSIWYG_VIEW : getHtmlEditorView(event))
             }}
             onKeyUp={event => {
-              if (
-                props.editorView === WYSIWYG_VIEW &&
-                event.shiftKey &&
-                event.keyCode === 79
-              ) {
+              if (props.editorView === WYSIWYG_VIEW && event.shiftKey && event.keyCode === 79) {
                 const html_view =
                   preferredHtmlEditor() === RAW_HTML_EDITOR_VIEW
                     ? PRETTY_HTML_EDITOR_VIEW

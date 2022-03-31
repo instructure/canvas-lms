@@ -1252,6 +1252,14 @@ describe PlannerController do
         get :index, params: { observed_user_id: @student.to_param, context_codes: [@course.asset_string] }
         assert_unauthorized
       end
+
+      it "allows an observer to query their student's items in a concluded course" do
+        @course.update!(settings: @course.settings.merge(restrict_student_past_view: true))
+        @course.enrollment_term.set_overrides(@course.account, "StudentEnrollment" => { end_at: 1.month.ago })
+
+        get :index, params: { observed_user_id: @student.to_param, context_codes: [@course.asset_string] }
+        expect(response).to be_successful
+      end
     end
   end
 end

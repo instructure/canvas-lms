@@ -18,10 +18,10 @@
 
 import {arrayOf, func, shape, string} from 'prop-types'
 import {FormField} from '@instructure/ui-form-field'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 
-const I18n = useI18nScope('assignment');
+const I18n = useI18nScope('assignment')
 
 function renderGroup(group) {
   return (

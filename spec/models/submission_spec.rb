@@ -4900,6 +4900,20 @@ describe Submission do
       expect(pg.source_provisional_grade).to be_nil
     end
 
+    it "computes provisional grade grade if not given" do
+      @submission.find_or_create_provisional_grade!(@teacher)
+      @submission.find_or_create_provisional_grade!(
+        @teacher,
+        score: 15.0
+      )
+
+      expect(@submission.provisional_grades.length).to be 1
+
+      pg = @submission.provisional_grades.first
+
+      expect(pg.grade).to eql "15"
+    end
+
     it "does not update grade or score if not given" do
       @submission.find_or_create_provisional_grade!(@teacher, grade: "20", score: 12.0)
 

@@ -150,10 +150,16 @@
             id="assignment_turnitin_enabled"
             name="turnitin_enabled"
             aria-controls="advanced_turnitin_settings_link"
-            disabled=submissionTypesFrozen}}
+            disabled=isPlagiarismPlatformLocked}}
             {{#t "label.turnitin_enabled"}}Enable Turnitin Submissions{{/t}}
           </label>
-
+          {{#if isPlagiarismPlatformLocked}}
+            <div class="plagiarism_locked_explanation alert assignment-edit-group-alert">
+              {{#t}}
+                Students have already submitted homework on this assignment, so plagiarism platform settings cannot be changed.
+              {{/t}}
+            </div>
+          {{/if}}
           <div class="nested">
             <a href="#" id="advanced_turnitin_settings_link" aria-expanded="{{turnitinEnabled}}"
               style="{{hiddenUnless turnitinEnabled}}">
@@ -168,9 +174,16 @@
             id="assignment_vericite_enabled"
             name="vericite_enabled"
             aria-controls="advanced_turnitin_settings_link"
-            disabled=submissionTypesFrozen}}
+            disabled=isPlagiarismPlatformLocked}}
             {{#t "label.vericite_enabled"}}Enable VeriCite Submissions{{/t}}
           </label>
+          {{#if isPlagiarismPlatformLocked}}
+            <div class="plagiarism_locked_explanation alert assignment-edit-plagiarism-alert">
+              {{#t}}
+                Students have already submitted homework on this assignment, so plagiarism platform settings cannot be changed.
+              {{/t}}
+            </div>
+          {{/if}}
           <div class="nested">
             <a href="#" id="advanced_turnitin_settings_link" aria-expanded="{{vericiteEnabled}}"
               style="{{hiddenUnless vericiteEnabled}}">
@@ -234,8 +247,14 @@
             <label class="ic-Label" for="assignment_external_tool_tag_attributes_url">
               {{#t}}Enter or find an External Tool URL{{/t}}
             </label>
+
             <input type="hidden" id="assignment_external_tool_tag_attributes_custom_params"
               name="external_tool_tag_attributes[custom_params]" value="{{externalToolCustomParamsStringified}}" />
+            <input type="hidden" id="assignment_external_tool_tag_attributes_iframe_width"
+              name="external_tool_tag_attributes[link_settings][selection_width]" value="{{externalToolIframeWidth}}" />
+            <input type="hidden" id="assignment_external_tool_tag_attributes_iframe_height"
+              name="external_tool_tag_attributes[link_settings][selection_height]" value="{{externalToolIframeHeight}}" />
+
             <div class="ic-Input-group">
               <div class="ic-Input-group__add-on" aria-hidden="true">
                 <i class="icon-link"></i>

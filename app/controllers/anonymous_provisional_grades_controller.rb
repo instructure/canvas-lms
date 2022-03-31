@@ -38,7 +38,7 @@ class AnonymousProvisionalGradesController < ProvisionalGradesBaseController
   #       { "needs_provisional_grade": false }
   #
   def status
-    @student = @context.submissions.find_by!(anonymous_id: params.fetch(:anonymous_id)).user
+    @student = @assignment.submissions.find_by!(anonymous_id: params.fetch(:anonymous_id)).user
     super
   end
 end

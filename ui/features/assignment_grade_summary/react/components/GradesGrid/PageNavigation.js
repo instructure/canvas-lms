@@ -19,9 +19,9 @@
 import React, {Component} from 'react'
 import {func, number} from 'prop-types'
 import {Pagination} from '@instructure/ui-pagination'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('assignment_grade_summary');
+const I18n = useI18nScope('assignment_grade_summary')
 
 export default class PageNavigation extends Component {
   static propTypes = {

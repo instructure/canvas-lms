@@ -18,7 +18,7 @@
 
 import {ComposeInputWrapper} from '../../components/ComposeInputWrapper/ComposeInputWrapper'
 import {CourseSelect} from '../../components/CourseSelect/CourseSelect'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {IndividualMessageCheckbox} from '../../components/IndividualMessageCheckbox/IndividualMessageCheckbox'
 import {FacultyJournalCheckBox} from '../../components/FacultyJournalCheckbox/FacultyJournalCheckbox'
 import PropTypes from 'prop-types'
@@ -32,7 +32,7 @@ import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {AddressBookContainer} from '../AddressBookContainer/AddressBookContainer'
 
-const I18n = useI18nScope('conversations_2');
+const I18n = useI18nScope('conversations_2')
 
 const HeaderInputs = props => {
   let moreCourses
@@ -73,7 +73,9 @@ const HeaderInputs = props => {
 
   const canAddUserNote = useMemo(() => {
     let canAddFacultyNote = false
-    const selectedCourseID = props.activeCourseFilter ? props.activeCourseFilter.split('_')[1] : ''
+    const selectedCourseID = props.activeCourseFilter?.contextID
+      ? props.activeCourseFilter?.contextID.split('_')[1]
+      : ''
 
     if (
       props.activeCourseFilter &&
@@ -117,7 +119,7 @@ const HeaderInputs = props => {
                   groups: props.courses?.favoriteGroupsConnection.nodes
                 }}
                 onCourseFilterSelect={props.onContextSelect}
-                activeCourseFilter={props.activeCourseFilter}
+                activeCourseFilterID={props.activeCourseFilter?.contextID}
               />
             )
           }
@@ -139,6 +141,7 @@ const HeaderInputs = props => {
                   props.onSelectedIdsChange(ids)
                 }}
                 activeCourseFilter={props.activeCourseFilter}
+                hasSelectAllFilterOption
               />
             }
             shouldGrow
@@ -211,7 +214,7 @@ HeaderInputs.propTypes = {
   sendIndividualMessages: PropTypes.bool,
   subject: PropTypes.string,
   mediaAttachmentTitle: PropTypes.string,
-  activeCourseFilter: PropTypes.string,
+  activeCourseFilter: PropTypes.object,
   onRemoveMediaComment: PropTypes.func,
   selectedRecipients: PropTypes.array,
   setUserNote: PropTypes.func,

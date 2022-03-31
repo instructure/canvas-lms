@@ -66,63 +66,63 @@ export default function DimensionsInput(props) {
   const message = getMessage(dimensionsState, minWidth, minHeight, minPercentage)
 
   return (
-    <>
-      <Flex direction="column">
-        <Flex.Item padding="small">
-          <RadioInputGroup
-            data-testid="dimension-type"
-            name="dimension-type"
-            description={formatMessage('Dimension type')}
-            onChange={handleDimensionTypeChange}
-            value={dimensionsState.usePercentageUnits ? 'percentage' : 'pixels'}
-          >
-            <RadioInput label={formatMessage('Pixels')} value="pixels" />
-            <RadioInput label={formatMessage('Percentage')} value="percentage" />
-          </RadioInputGroup>
-        </Flex.Item>
-      </Flex>
-      <FormFieldGroup
-        description={<ScreenReaderContent>{formatMessage('Dimensions')}</ScreenReaderContent>}
-        messages={[message]}
-      >
-        <Flex alignItems="start" direction="row" data-testid="input-number-container">
-          {dimensionsState.usePercentageUnits ? (
-            <>
-              <Flex.Item shouldShrink shouldGrow>
-                <DimensionInput
-                  dimensionState={dimensionsState.percentageState}
-                  label={formatMessage('Percentage')}
-                />
-              </Flex.Item>
+    <Flex direction="column">
+      <Flex.Item padding="small">
+        <RadioInputGroup
+          data-testid="dimension-type"
+          name="dimension-type"
+          description={formatMessage('Dimension Type')}
+          onChange={handleDimensionTypeChange}
+          value={dimensionsState.usePercentageUnits ? 'percentage' : 'pixels'}
+        >
+          <RadioInput label={formatMessage('Pixels')} value="pixels" />
+          <RadioInput label={formatMessage('Percentage')} value="percentage" />
+        </RadioInputGroup>
+      </Flex.Item>
+      <Flex.Item padding="small">
+        <FormFieldGroup
+          description={<ScreenReaderContent>{formatMessage('Dimensions')}</ScreenReaderContent>}
+          messages={[message]}
+        >
+          <Flex alignItems="start" direction="row" data-testid="input-number-container">
+            {dimensionsState.usePercentageUnits ? (
+              <>
+                <Flex.Item shouldShrink shouldGrow>
+                  <DimensionInput
+                    dimensionState={dimensionsState.percentageState}
+                    label={formatMessage('Percentage')}
+                  />
+                </Flex.Item>
 
-              <Flex.Item padding="x-small small">%</Flex.Item>
-            </>
-          ) : (
-            <>
-              <Flex.Item shrink>
-                <DimensionInput
-                  dimensionState={dimensionsState.widthState}
-                  label={formatMessage('Width')}
-                  minValue={minWidth}
-                />
-              </Flex.Item>
+                <Flex.Item padding="x-small small">%</Flex.Item>
+              </>
+            ) : (
+              <>
+                <Flex.Item shrink>
+                  <DimensionInput
+                    dimensionState={dimensionsState.widthState}
+                    label={formatMessage('Width')}
+                    minValue={minWidth}
+                  />
+                </Flex.Item>
 
-              <Flex.Item padding="x-small small">
-                <IconLockLine />
-              </Flex.Item>
+                <Flex.Item padding="x-small small">
+                  <IconLockLine />
+                </Flex.Item>
 
-              <Flex.Item shrink>
-                <DimensionInput
-                  dimensionState={dimensionsState.heightState}
-                  label={formatMessage('Height')}
-                  minValue={minHeight}
-                />
-              </Flex.Item>
-            </>
-          )}
-        </Flex>
-      </FormFieldGroup>
-    </>
+                <Flex.Item shrink>
+                  <DimensionInput
+                    dimensionState={dimensionsState.heightState}
+                    label={formatMessage('Height')}
+                    minValue={minHeight}
+                  />
+                </Flex.Item>
+              </>
+            )}
+          </Flex>
+        </FormFieldGroup>
+      </Flex.Item>
+    </Flex>
   )
 }
 

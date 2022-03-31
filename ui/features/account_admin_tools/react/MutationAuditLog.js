@@ -17,7 +17,7 @@
 
 import {ApolloProvider, Query, gql, createClient} from '@canvas/apollo'
 import React, {useState} from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import tz from '@canvas/timezone'
 import {Button} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'
@@ -28,7 +28,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {Grid} from '@instructure/ui-grid'
 
-const I18n = useI18nScope('mutationActivity');
+const I18n = useI18nScope('mutationActivity')
 
 function formatDate(date) {
   return tz.format(date, 'date.formats.medium_with_weekday')

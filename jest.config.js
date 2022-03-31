@@ -44,7 +44,8 @@ module.exports = {
       {
         suiteName: 'Jest Tests',
         outputDirectory: process.env.TEST_RESULT_OUTPUT_DIR || './coverage-js/junit-reports',
-        outputName: 'jest.xml'
+        outputName: 'jest.xml',
+        addFileAttribute: 'true'
       }
     ]
   ],
@@ -58,10 +59,20 @@ module.exports = {
 
   coverageDirectory: '<rootDir>/coverage-jest/',
 
+  // skip flaky timeout tests from coverage until they can be addressed
+  // Related JIRA tickets for the skipped coverage tests;
+  // k5_dashboard: LS-2243
+  collectCoverageFrom: [
+    '**/__tests__/**/?(*.)(spec|test).[jt]s?(x)',
+    '!<rootDir>/ui/features/k5_dashboard/react/__tests__/k5DashboardPlanner.test.js'
+  ],
+
   moduleFileExtensions: [...defaults.moduleFileExtensions, 'coffee', 'handlebars'],
   restoreMocks: true,
 
   testEnvironment: 'jest-environment-jsdom-fourteen',
+
+  testSequencer: '<rootDir>/jest/test-sequencer.js',
 
   transform: {
     '\\.coffee$': '<rootDir>/jest/coffeeTransformer.js',

@@ -52,6 +52,7 @@ class ApplicationController < ActionController::Base
   prepend_before_action :activate_authlogic
 
   around_action :set_locale
+  around_action :set_timezone
   around_action :enable_request_cache
   around_action :batch_statsd
   around_action :compute_http_cost
@@ -113,6 +114,10 @@ class ApplicationController < ActionController::Base
         Delayed::Batch.serial_batch(batch_opts || {}, &action)
       end
     end
+  end
+
+  def supported_timezones
+    ActiveSupport::TimeZone.all.map { |tz| tz.tzinfo.name }
   end
 
   add_crumb(proc do
@@ -208,7 +213,6 @@ class ApplicationController < ActionController::Base
           files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
           DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account&.global_id,
           k12: k12?,
-          use_rce_a11y_checker_notifications: @context.try(:feature_enabled?, :rce_a11y_checker_notifications),
           help_link_name: help_link_name,
           help_link_icon: help_link_icon,
           use_high_contrast: @current_user&.prefers_high_contrast?,
@@ -270,8 +274,14 @@ class ApplicationController < ActionController::Base
         @js_env[:IS_LARGE_ROSTER] = true if !@js_env[:IS_LARGE_ROSTER] && @context.respond_to?(:large_roster?) && @context.large_roster?
         @js_env[:context_asset_string] = @context.try(:asset_string) unless @js_env[:context_asset_string]
         @js_env[:ping_url] = polymorphic_url([:api_v1, @context, :ping]) if @context.is_a?(Course)
-        @js_env[:TIMEZONE] = Time.zone.tzinfo.identifier unless @js_env[:TIMEZONE]
-        @js_env[:CONTEXT_TIMEZONE] = @context.time_zone.tzinfo.identifier if !@js_env[:CONTEXT_TIMEZONE] && @context.respond_to?(:time_zone) && @context.time_zone.present?
+        if params[:session_timezone].present? && supported_timezones.include?(params[:session_timezone])
+          timezone = context_timezone = params[:session_timezone]
+        else
+          timezone = Time.zone.tzinfo.identifier unless @js_env[:TIMEZONE]
+          context_timezone = @context.time_zone.tzinfo.identifier if !@js_env[:CONTEXT_TIMEZONE] && @context.respond_to?(:time_zone) && @context.time_zone.present?
+        end
+        @js_env[:TIMEZONE] = timezone
+        @js_env[:CONTEXT_TIMEZONE] = context_timezone
         unless @js_env[:LOCALES]
           I18n.set_locale_with_localizer
           @js_env[:LOCALES] = I18n.fallbacks[I18n.locale].map(&:to_s)
@@ -650,6 +660,7 @@ class ApplicationController < ActionController::Base
         # as global state on I18n (cleanup failure), we don't want it to
         # explode trying to access a non-existant request.
         context_hash[:session_locale] = session[:locale]
+        context_hash[:session_timezone] = session[:timezone]
         context_hash[:accept_language] = request.headers["Accept-Language"]
       else
         logger.warn("[I18N] localizer executed from context-less controller")
@@ -664,6 +675,11 @@ class ApplicationController < ActionController::Base
     yield if block_given?
   ensure
     I18n.localizer = nil
+  end
+
+  def set_timezone
+    store_session_timezone
+    yield if block_given?
   end
 
   def enable_request_cache(&block)
@@ -708,6 +724,12 @@ class ApplicationController < ActionController::Base
 
     supported_locales = I18n.available_locales.map(&:to_s)
     session[:locale] = locale if supported_locales.include? locale
+  end
+
+  def store_session_timezone
+    return unless (timezone = params[:session_timezone])
+
+    session[:timezone] = timezone if supported_timezones.include? params[:session_timezone]
   end
 
   def init_body_classes
@@ -1963,7 +1985,7 @@ class ApplicationController < ActionController::Base
                       return_url: @return_url,
                       expander: variable_expander,
                       opts: opts.merge(
-                        resource_link_for_custom_params: @tag.associated_asset_lti_resource_link
+                        resource_link: @tag.associated_asset_lti_resource_link
                       )
                     )
                   else
@@ -2939,11 +2961,11 @@ class ApplicationController < ActionController::Base
   end
   helper_method :should_show_migration_limitation_message
 
-  def uncached_k5_user?
-    if @current_user
+  def uncached_k5_user?(user = @current_user)
+    if user
       # Collect global ids of all accounts in current region with k5 enabled
       global_k5_account_ids = []
-      Account.shard(@current_user.in_region_associated_shards).root_accounts.active.non_shadow
+      Account.shard(user.in_region_associated_shards).root_accounts.active.non_shadow
              .where("settings LIKE '%k5_accounts:\n- %'").select(:settings).each do |account|
         account.settings[:k5_accounts]&.each do |k5_account_id|
           global_k5_account_ids << Shard.global_id_for(k5_account_id, account.shard)
@@ -2953,11 +2975,11 @@ class ApplicationController < ActionController::Base
 
       # See if the user has associations with any k5-enabled accounts on each shard
       k5_associations = Shard.partition_by_shard(global_k5_account_ids) do |k5_account_ids|
-        enrolled_course_ids = @current_user.enrollments.shard(Shard.current).new_or_active_by_date.select(:course_id)
+        enrolled_course_ids = user.enrollments.shard(Shard.current).new_or_active_by_date.select(:course_id)
         enrolled_account_ids = Course.where(id: enrolled_course_ids).distinct.pluck(:account_id)
         break true if (enrolled_account_ids & k5_account_ids).any?
 
-        enrolled_account_ids += @current_user.account_users.shard(Shard.current).active.pluck(:account_id)
+        enrolled_account_ids += user.account_users.shard(Shard.current).active.pluck(:account_id)
         break true if (enrolled_account_ids & k5_account_ids).any?
 
         enrolled_account_chain_ids = Account.multi_account_chain_ids(enrolled_account_ids)
@@ -2976,17 +2998,17 @@ class ApplicationController < ActionController::Base
     can_disable && @current_user.elementary_dashboard_disabled?
   end
 
-  def k5_user?(check_disabled = true)
-    RequestCache.cache("k5_user", @current_user, @domain_root_account, check_disabled, @current_user&.elementary_dashboard_disabled?) do
-      if @current_user
+  def k5_user?(check_disabled: true, user: @current_user)
+    RequestCache.cache("k5_user", user, @current_user, @domain_root_account, check_disabled, @current_user&.elementary_dashboard_disabled?) do
+      if user
         next false if check_disabled && k5_disabled?
 
         # This key is also invalidated when the k5 setting is toggled at the account level or when enrollments change
-        Rails.cache.fetch_with_batched_keys("k5_user", batch_object: @current_user, batched_keys: %i[k5_user enrollments account_users], expires_in: 12.hours) do
-          uncached_k5_user?
+        Rails.cache.fetch_with_batched_keys("k5_user", batch_object: user, batched_keys: %i[k5_user enrollments account_users], expires_in: 12.hours) do
+          uncached_k5_user?(user)
         end
       else
-        uncached_k5_user?
+        uncached_k5_user?(user)
       end
     end
   end

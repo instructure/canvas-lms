@@ -19,7 +19,7 @@
 
 class JobsV2Controller < ApplicationController
   BUCKETS = %w[queued running future failed].freeze
-  SEARCH_LIMIT = 50
+  SEARCH_LIMIT = 100
 
   before_action :require_view_jobs
   before_action :require_bucket, only: %i[grouped_info list search]
@@ -35,7 +35,16 @@ class JobsV2Controller < ApplicationController
       format.html do
         @page_title = t("Jobs Control Panel v2")
 
+        css_bundle :jobs_v2
         js_bundle :jobs_v2
+        js_env(
+          jobs_scope_filter: {
+            jobs_server: @domain_root_account.shard.delayed_jobs_shard&.database_server_id || t("All Jobs"),
+            cluster: @domain_root_account.shard&.database_server_id,
+            shard: @domain_root_account.shard.name,
+            account: @domain_root_account.name,
+          }.compact
+        )
 
         render html: "", layout: true
       end
@@ -64,6 +73,9 @@ class JobsV2Controller < ApplicationController
             .where.not(@group => nil)
             .group(@group)
             .order(grouped_order_clause(@group))
+
+    # This seems silly, but it forces postgres to use the available indicies.
+    scope = scope.where("locked_by IS NULL OR locked_by IS NOT NULL") if @group == :singleton
 
     tag_info = Api.paginate(scope, self, api_v1_jobs_grouped_info_url)
     now = Delayed::Job.db_time_now
@@ -103,6 +115,9 @@ class JobsV2Controller < ApplicationController
     %i[tag strand singleton account_id shard_id].each do |filter_param|
       scope = scope.where(filter_param => params[filter_param]) if params[filter_param].present?
     end
+
+    # This seems silly, but it forces postgres to use the available indicies.
+    scope = scope.where("locked_by IS NULL OR locked_by IS NOT NULL") if params[:singleton].present?
     scope = scope.order(list_order_clause)
 
     jobs = Api.paginate(scope, self, api_v1_jobs_list_url)
@@ -123,7 +138,7 @@ class JobsV2Controller < ApplicationController
   #   Search term
   #
   # @example_request
-  #     curl https://<canvas>/jobs2/running/by_tag/search?term=foo \
+  #     curl https://<canvas>/api/v1/jobs2/running/by_tag/search?term=foo \
   #          -H 'Authorization: Bearer <token>'
   #
   # @example_response
@@ -135,11 +150,37 @@ class JobsV2Controller < ApplicationController
     result = jobs_scope
              .where(ActiveRecord::Base.wildcard(@group, term))
              .group(@group)
-             .order(count_id: :DESC)
+             .order({ count_id: :DESC }, @group)
              .limit(SEARCH_LIMIT)
              .count(:id)
 
     render json: result
+  end
+
+  # @{not an}API Lookup job by id or original_job_id
+  #
+  # Searches all job buckets including queued, running, future, and failed.
+  # for failed jobs, it will find by original_job_id or id, in that order
+  # of preference. theoretically two jobs could be returned if a failed job's
+  # id matches a different failed job's original_job_id, but in production
+  # original job ids are much greater than failed job ids so overlap is rare.
+  #
+  # an additional +bucket+ will be returned indicating whether the job is
+  # running, queued, future, or failed
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/jobs2/123 \
+  #          -H 'Authorization: Bearer <token>'
+  def lookup
+    id = params[:id]
+    raise ActionController::BadRequest unless id.present?
+
+    jobs = Delayed::Job.where(id: id).to_a
+    jobs.concat Delayed::Job::Failed.where(id: id).or(
+      Delayed::Job::Failed.where(original_job_id: id)
+    ).order(:id).to_a
+
+    render json: jobs.map { |job| job_json(job) }
   end
 
   protected
@@ -159,11 +200,22 @@ class JobsV2Controller < ApplicationController
   end
 
   def jobs_scope
-    case @bucket
-    when "queued" then queued_scope
-    when "running" then Delayed::Job.running
-    when "future" then Delayed::Job.future
-    when "failed" then Delayed::Job::Failed
+    scope = case @bucket
+            when "queued" then queued_scope
+            when "running" then Delayed::Job.running
+            when "future" then Delayed::Job.future
+            when "failed" then Delayed::Job::Failed
+            end
+
+    case params[:scope]
+    when "cluster"
+      database_server_id = @domain_root_account.shard.database_server_id
+      shard_ids = Shard.where(database_server_id: database_server_id).pluck(:id)
+
+      scope.where(shard_id: shard_ids)
+    when "shard" then scope.where(shard_id: @domain_root_account.shard)
+    when "account" then scope.where(account_id: @domain_root_account)
+    else scope
     end
   end
 
@@ -171,11 +223,28 @@ class JobsV2Controller < ApplicationController
     { :count => row.count, group => row[group], :info => grouped_info_data(row, base_time: base_time) }
   end
 
-  def job_json(job, base_time:)
+  def job_json(job, base_time: nil)
     job_fields = %w[id tag strand singleton shard_id max_concurrent priority attempts max_attempts locked_by run_at locked_at handler]
-    job_fields += %w[failed_at original_job_id last_error] if @bucket == "failed"
+    job_fields += %w[failed_at original_job_id last_error] if job.is_a?(Delayed::Job::Failed)
     json = api_json(job, @current_user, nil, only: job_fields)
-    json.merge("info" => list_info_data(job, base_time: base_time))
+    if @bucket && base_time
+      json["info"] = list_info_data(job, base_time: base_time)
+    else
+      json["bucket"] = infer_bucket(job)
+    end
+    json
+  end
+
+  def infer_bucket(job)
+    if job.is_a?(Delayed::Job::Failed)
+      "failed"
+    elsif job.locked_at && job.locked_by != ::Delayed::Backend::Base::ON_HOLD_LOCKED_BY
+      "running"
+    elsif job.run_at <= Time.zone.now
+      "queued"
+    else
+      "future"
+    end
   end
 
   def grouped_order_clause(group_type)
@@ -225,7 +294,9 @@ class JobsV2Controller < ApplicationController
 
   def list_order_clause
     case params[:order]
-    when "tag", "strand", "singleton"
+    when "strand_singleton"
+      "LOWER(strand) ASC, LOWER(singleton) ASC"
+    when "tag"
       "LOWER(#{params[:order]})"
     when "id"
       { id: :DESC }

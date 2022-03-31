@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState, useCallback} from 'react'
 
 import {Button} from '@instructure/ui-buttons'
@@ -28,7 +28,7 @@ import {View} from '@instructure/ui-view'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
-const I18n = useI18nScope('assignments_bulk_edit');
+const I18n = useI18nScope('assignments_bulk_edit')
 
 function BulkEditDateSelect({selectDateRange}) {
   const [startDate, setStartDate] = useState(null)

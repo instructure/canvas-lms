@@ -336,6 +336,8 @@ class WikiPagesApiController < ApplicationController
         render json: @page.errors, status: update_params.is_a?(Symbol) ? update_params : :bad_request
       end
     end
+  rescue Api::Html::UnparsableContentError => e
+    rescue_unparsable_content(e)
   end
 
   # @API Show page
@@ -411,6 +413,8 @@ class WikiPagesApiController < ApplicationController
         render json: @page.errors, status: update_params.is_a?(Symbol) ? update_params : :bad_request
       end
     end
+  rescue Api::Html::UnparsableContentError => e
+    rescue_unparsable_content(e)
   end
 
   # @API Delete page
@@ -713,5 +717,13 @@ class WikiPagesApiController < ApplicationController
     @page.set_as_front_page! if !@wiki.has_front_page? && @page.is_front_page? && !@page.deleted?
 
     true
+  end
+
+  private
+
+  def rescue_unparsable_content(error)
+    @page.errors.add(:body, error.message) if @page.present?
+
+    render json: @page&.errors || {}, status: :bad_request
   end
 end

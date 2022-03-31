@@ -138,12 +138,13 @@ function confirm_command {
 }
 
 function docker_compose_up {
-  if is_mutagen; then
+  if ! is_running_on_jenkins; then
     start_spinner "Starting mutagen containers..."
     _canvas_lms_track_with_log mutagen-compose up --no-start web
     _canvas_lms_track_with_log mutagen-compose run -u root --rm web chown docker:docker /usr/src/app
     stop_spinner
   fi
+
   start_spinner "Starting docker containers..."
   _canvas_lms_track_with_log $DOCKER_COMMAND up -d web
   stop_spinner
@@ -197,10 +198,6 @@ function rebuild_docker_images {
       _canvas_lms_track_with_log $DOCKER_COMMAND build --pull
     fi
   stop_spinner
-}
-
-function is_mutagen {
-  [ -f ".mutagen" ]
 }
 
 function is_docker {

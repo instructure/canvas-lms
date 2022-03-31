@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 
 import {Heading} from '@instructure/ui-heading'
@@ -27,7 +27,7 @@ import {IconEditLine, IconCoursesLine} from '@instructure/ui-icons'
 
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 
-const I18n = useI18nScope('important_info');
+const I18n = useI18nScope('important_info')
 
 export const ImportantInfoShape = {
   courseId: PropTypes.string.isRequired,

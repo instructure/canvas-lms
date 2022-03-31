@@ -1,0 +1,39 @@
+<%
+# Copyright (C) 2011 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+<!DOCTYPE html>
+<html>
+    <%-
+    css_bundle(:instructure_eportfolio) if @eportfolio_view === true
+    css_bundle(:new_user_tutorials) if tutorials_enabled?
+    js_bundle(:navigation_header) unless @headers == false
+
+    provide :head, include_common_stylesheets
+    js_env notices: flash_notices()
+
+    body_classes << 'Underline-All-Links__enabled' if @current_user && @current_user.feature_enabled?(:underline_all_links)
+
+    -%>
+    <%= render :partial => "layouts/head" %>
+    <body class="<%= (body_classes).uniq.join(" ") %>">
+        <div id="content" class="ic-Layout-contentMain" role="main">
+            <%= yield %>
+        </div>
+        <div id='aria_alerts' class='hide-text affix' role="alert" aria-live="assertive"></div>
+        <%= render :partial => 'layouts/foot', :locals => { :include_common_bundle => true } %>
+    </body>
+</html>

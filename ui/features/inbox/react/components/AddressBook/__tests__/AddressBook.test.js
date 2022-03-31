@@ -17,19 +17,38 @@
  */
 import React from 'react'
 import {fireEvent, render, screen} from '@testing-library/react'
-import {AddressBook, COURSE_TYPE, BACK_BUTTON_TYPE} from '../AddressBook'
+import {AddressBook, USER_TYPE, CONTEXT_TYPE, BACK_BUTTON_TYPE} from '../AddressBook'
 
 const demoData = {
   contextData: [
-    {id: 'course_11', name: 'Test 101'},
-    {id: 'course_12', name: 'History 101'},
-    {id: 'course_13', name: 'English 101'}
+    {id: 'course_11', name: 'Test 101', itemType: CONTEXT_TYPE},
+    {id: 'course_12', name: 'History 101', itemType: CONTEXT_TYPE},
+    {id: 'course_13', name: 'English 101', itemType: CONTEXT_TYPE}
   ],
   userData: [
-    {id: '1', name: 'Rob Orton', full_name: 'Rob Orton', pronouns: null},
-    {id: '2', name: 'Matthew Lemon', full_name: 'Matthew Lemon', pronouns: null},
-    {id: '3', name: 'Drake Harper', full_name: 'Drake Harpert', pronouns: null},
-    {id: '4', name: 'Davis Hyer', full_name: 'Davis Hyer', pronouns: null, isLast: true}
+    {id: '1', name: 'Rob Orton', full_name: 'Rob Orton', pronouns: null, itemType: USER_TYPE},
+    {
+      id: '2',
+      name: 'Matthew Lemon',
+      full_name: 'Matthew Lemon',
+      pronouns: null,
+      itemType: USER_TYPE
+    },
+    {
+      id: '3',
+      name: 'Drake Harper',
+      full_name: 'Drake Harpert',
+      pronouns: null,
+      itemType: USER_TYPE
+    },
+    {
+      id: '4',
+      name: 'Davis Hyer',
+      full_name: 'Davis Hyer',
+      pronouns: null,
+      isLast: true,
+      itemType: USER_TYPE
+    }
   ]
 }
 
@@ -117,7 +136,7 @@ describe('Address Book Component', () => {
       const popover = await screen.findByTestId('address-book-popover')
       const items = popover.querySelectorAll('li')
       fireEvent.mouseDown(items[0])
-      expect(onSelectSpy.mock.calls[0][0]).toBe('subMenuCourse')
+      expect(onSelectSpy.mock.calls[0][0].id).toBe('subMenuCourse')
     })
 
     it('Should select item when navigating down and enter key is pressed', async () => {
@@ -128,7 +147,7 @@ describe('Address Book Component', () => {
       fireEvent.keyDown(input, {key: 'ArrowDown', keyCode: 40})
       fireEvent.keyDown(input, {key: 'Enter', keyCode: 13})
       expect(onSelectSpy.mock.calls.length).toBe(1)
-      expect(onSelectSpy.mock.calls[0][0]).toBe('subMenuStudents')
+      expect(onSelectSpy.mock.calls[0][0].id).toBe('subMenuStudents')
     })
 
     it('Should select item when navigating up and enter key is pressed', () => {
@@ -140,7 +159,7 @@ describe('Address Book Component', () => {
       fireEvent.keyDown(input, {key: 'ArrowUp', keyCode: 38})
       fireEvent.keyDown(input, {key: 'Enter', keyCode: 13})
       expect(onSelectSpy.mock.calls.length).toBe(1)
-      expect(onSelectSpy.mock.calls[0][0]).toBe('subMenuCourse')
+      expect(onSelectSpy.mock.calls[0][0].id).toBe('subMenuCourse')
     })
 
     it('Should render loading bar below rendered menu items when loading more menu data', async () => {
@@ -269,7 +288,7 @@ describe('Address Book Component', () => {
       const items = popover.querySelectorAll('li')
       fireEvent.mouseDown(items[1])
       expect(onSelectSpy.mock.calls.length).toBe(1)
-      expect(onSelectSpy.mock.calls[0][0].includes(COURSE_TYPE)).toBe(true)
+      expect(onSelectSpy.mock.calls[0][0].itemType).toBe(CONTEXT_TYPE)
     })
 
     it('Should call back for back click', async () => {
@@ -279,7 +298,7 @@ describe('Address Book Component', () => {
       const items = popover.querySelectorAll('li')
       fireEvent.mouseDown(items[0])
       expect(onSelectSpy.mock.calls.length).toBe(1)
-      expect(onSelectSpy.mock.calls[0][0].includes(BACK_BUTTON_TYPE)).toBe(true)
+      expect(onSelectSpy.mock.calls[0][0].itemType).toBe(BACK_BUTTON_TYPE)
     })
   })
   describe('Intersection Observer', () => {

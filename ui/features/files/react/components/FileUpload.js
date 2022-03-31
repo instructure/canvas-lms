@@ -19,7 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Billboard} from '@instructure/ui-billboard'
 import {Text} from '@instructure/ui-text'
 import {FileDrop} from '@instructure/ui-file-drop'
@@ -29,7 +29,7 @@ import Folder from '@canvas/files/backbone/models/Folder'
 import '@canvas/rails-flash-notifications'
 import CurrentUploads from '@canvas/files/react/components/CurrentUploads'
 
-const I18n = useI18nScope('upload_drop_zone');
+const I18n = useI18nScope('upload_drop_zone')
 
 class FileUpload extends React.Component {
   static displayName = 'FileUpload'

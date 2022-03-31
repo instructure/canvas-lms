@@ -17,7 +17,7 @@
  */
 
 import {Link} from '@instructure/ui-link'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React, {useState} from 'react'
 import {Text} from '@instructure/ui-text'
@@ -26,7 +26,7 @@ import {View} from '@instructure/ui-view'
 
 import {PARTICIPANT_EXPANSION_THRESHOLD} from '../../../util/constants'
 
-const I18n = useI18nScope('conversations_2');
+const I18n = useI18nScope('conversations_2')
 
 export const MessageDetailParticipants = ({...props}) => {
   const [participantsExpanded, setParticipantsExpanded] = useState(false)

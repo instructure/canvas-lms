@@ -17,7 +17,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {View} from '@canvas/backbone'
 import GroupModal from '@canvas/group-modal'
@@ -27,7 +27,7 @@ import groupHasSubmissions from '../../groupHasSubmissions'
 import '@canvas/rails-flash-notifications'
 import '@canvas/context-cards/react/StudentContextCardTrigger'
 
-const I18n = useI18nScope('GroupDetailView');
+const I18n = useI18nScope('GroupDetailView')
 
 export default class GroupDetailView extends View {
   static initClass() {

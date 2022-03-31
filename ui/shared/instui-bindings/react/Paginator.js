@@ -18,11 +18,11 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Pagination} from '@instructure/ui-pagination'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-const I18n = useI18nScope('paginator');
+const I18n = useI18nScope('paginator')
 
 const Paginator = ({loadPage, page, pageCount, ...paginationProps}) => {
   if (pageCount <= 1) {

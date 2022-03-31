@@ -22,9 +22,9 @@ import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import {IconQuestionLine} from '@instructure/ui-icons'
 import {Modal} from '@instructure/ui-modal'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('outcomesCriterionInfo');
+const I18n = useI18nScope('outcomesCriterionInfo')
 
 const spiel = () =>
   I18n.t(`

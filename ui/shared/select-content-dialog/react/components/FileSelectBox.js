@@ -19,13 +19,13 @@
 import _ from 'underscore'
 import React from 'react'
 import {string} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import FileStore from '../../stores/FileStore'
 import FolderStore from '../../stores/FolderStore'
 import natcompare from '@canvas/util/natcompare'
 import splitAssetString from '@canvas/util/splitAssetString'
 
-const I18n = useI18nScope('context_modulesFileSelectBox');
+const I18n = useI18nScope('context_modulesFileSelectBox')
 
 export default class FileSelectBox extends React.Component {
   static propTypes = {

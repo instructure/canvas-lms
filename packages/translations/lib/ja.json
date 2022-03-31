@@ -92,6 +92,9 @@
     "apply_781a2546": {
         "message": "適用"
     },
+    "apply_changes_to_all_instances_of_this_icon_maker__2642f466": {
+        "message": "コース内のこのアイコンメーカーのアイコンのすべてのインスタンスに変更を適用する"
+    },
     "apps_54d24a47": {
         "message": "アプリ"
     },
@@ -176,8 +179,17 @@
     "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
         "message": "以下は、学生が自分のスケジュールを見る方法の一例です。"
     },
+    "black_4cb01371": {
+        "message": "黒"
+    },
+    "blue_daf8fea9": {
+        "message": "ブルー"
+    },
     "bottom_third_5f5fec1d": {
         "message": "下から3番目"
+    },
+    "brick_f2656265": {
+        "message": "ブロック"
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
@@ -317,6 +329,12 @@
     "course_to_do_bcbbab54": {
         "message": "{ course } タスク"
     },
+    "create_icon_110d6463": {
+        "message": "アイコンを作成する"
+    },
+    "create_icon_maker_icon_c716bffe": {
+        "message": "アイコンメーカーのアイコンを作成する"
+    },
     "creative_commons_license_725584ae": {
         "message": "クリエイティブ コモンズ ライセンス:"
     },
@@ -331,6 +349,9 @@
     },
     "custom_6979cd81": {
         "message": "カスタム"
+    },
+    "cyan_c1d5f68a": {
+        "message": "シアン"
     },
     "date_added_ed5ad465": {
         "message": "追加された日付"
@@ -355,6 +376,9 @@
     },
     "decrease_indent_de6343ab": {
         "message": "インデントを戻す"
+    },
+    "deep_purple_bb3e2907": {
+        "message": "ディープパープル"
     },
     "default_bulleted_unordered_list_47079da8": {
         "message": "デフォルトの箇条書きの番号無しリスト"
@@ -641,6 +665,12 @@
     "greek_65c5b3f7": {
         "message": "ギリシャ文字"
     },
+    "green_15af4778": {
+        "message": "グリーン"
+    },
+    "grey_a55dceff": {
+        "message": "グレー"
+    },
     "group_documents_8bfd6ae6": {
         "message": "グループドキュメント"
     },
@@ -704,6 +734,21 @@
     "icon_color_b86dd6d6": {
         "message": "アイコンカラー"
     },
+    "icon_maker_icons_cc560f7e": {
+        "message": "アイコンメーカーのアイコン"
+    },
+    "icon_outline_e978dc0c": {
+        "message": "アイコンの輪郭"
+    },
+    "icon_outline_size_33f39b86": {
+        "message": "アイコンの輪郭サイズ"
+    },
+    "icon_shape_30b61e7": {
+        "message": "アイコンの形状"
+    },
+    "icon_size_9353edea": {
+        "message": "アイコンのサイズ"
+    },
     "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
         "message": "今すぐ使用権を選択しないと、このファイルはアップロード後に公開されません。"
     },
@@ -724,6 +769,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "インデント"
+    },
+    "indigo_2035fc55": {
+        "message": "インディゴ"
     },
     "insert_593145ef": {
         "message": "挿入"
@@ -787,6 +835,9 @@
     },
     "library_icon_ae1e54cf": {
         "message": "ライブラリーのアイコン"
+    },
+    "light_blue_5374f600": {
+        "message": "ライトブルー"
     },
     "link_7262adec": {
         "message": "リンク"
@@ -854,6 +905,9 @@
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "ここに何もないようです"
     },
+    "magenta_4a65993c": {
+        "message": "マジェンタ"
+    },
     "math_ede93050": {
         "message": "数学"
     },
@@ -904,6 +958,9 @@
     },
     "name_1aed4a1b": {
         "message": "名前"
+    },
+    "name_color_ceec76ff": {
+        "message": "{ name } ({ color })"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "メニューまたはツールバーを移動する"
@@ -986,6 +1043,9 @@
     "octagon_e48be9f": {
         "message": "八角形"
     },
+    "olive_6a3e4d6b": {
+        "message": "オリーブ"
+    },
     "only_most_recent_grading_period_shown_f1ad6458": {
         "message": "*最新の採点期間のみが表示されます。"
     },
@@ -1003,6 +1063,9 @@
     },
     "optional_add_course_ef0d70fc": {
         "message": "オプション：コースの追加"
+    },
+    "orange_81386a62": {
+        "message": "オレンジ"
     },
     "ordered_and_unordered_lists_cfadfc38": {
         "message": "番号付きリストと番号無しリスト"
@@ -1045,6 +1108,9 @@
     },
     "physical_education_icon_d7dffd3e": {
         "message": "体育のアイコン"
+    },
+    "pink_68ad45cb": {
+        "message": "ピンク"
     },
     "pixels_52ece7d1": {
         "message": "ピクセル"
@@ -1091,6 +1157,12 @@
     "published_when_302d8e23": {
         "message": "公開済み:{ when }"
     },
+    "pumpkin_904428d5": {
+        "message": "かぼちゃ"
+    },
+    "purple_7678a9fc": {
+        "message": "パープル"
+    },
     "quiz_e0dcce8f": {
         "message": "クイズ"
     },
@@ -1105,6 +1177,9 @@
     },
     "record_upload_media_5fdce166": {
         "message": "メディアの記録/アップロード"
+    },
+    "red_8258edf3": {
+        "message": "レッド"
     },
     "redo_363c58b7": {
         "message": "やり直し"
@@ -1141,6 +1216,9 @@
     },
     "save_11a80ec3": {
         "message": "保存"
+    },
+    "saved_icon_maker_icons_df86e2a1": {
+        "message": "保存したアイコンメーカーのアイコン"
     },
     "schedule_preview_3bcda153": {
         "message": "スケジュールプレビュー"
@@ -1192,6 +1270,9 @@
     },
     "single_color_image_4e5d4dbc": {
         "message": "単色画像"
+    },
+    "single_color_image_color_95fa9a87": {
+        "message": "単色画像の色"
     },
     "size_b30e1077": {
         "message": "サイズ"
@@ -1247,6 +1328,9 @@
     "starttime_to_endtime_d7cc249d": {
         "message": "{ startTime } - { endTime }"
     },
+    "steel_blue_14296f08": {
+        "message": "スチールブルー"
+    },
     "styles_2aa721ef": {
         "message": "スタイル"
     },
@@ -1282,6 +1366,9 @@
     },
     "task_16b0ef38": {
         "message": "タスク"
+    },
+    "teal_f729a294": {
+        "message": "ティール"
     },
     "text_7f4593da": {
         "message": "テキスト"
@@ -1501,6 +1588,9 @@
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "週間スケジュールのナビゲーション"
+    },
+    "white_87fa64fd": {
+        "message": "ホワイト"
     },
     "width_492fec76": {
         "message": "幅"

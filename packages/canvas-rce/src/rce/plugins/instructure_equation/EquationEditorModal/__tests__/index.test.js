@@ -19,13 +19,13 @@
 import React from 'react'
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import EquationEditorModal from '../index'
-import {convertLatexToMathMl} from '../../mathlive'
 import mathml from '../mathml'
 
-function defaultProps() {
+const defaultProps = () => {
   return {
     editor: {},
     label: '',
+    onEquationSubmit: () => {},
     onModalDismiss: () => {},
     onModalClose: () => {},
     title: '',
@@ -33,21 +33,27 @@ function defaultProps() {
   }
 }
 
-function renderModal(overrideProps = {}) {
+const renderModal = (overrideProps = {}) => {
   const props = defaultProps()
   return render(<EquationEditorModal {...props} {...overrideProps} />)
 }
 
-jest.mock('../../mathlive', () => ({
-  convertLatexToMarkup: jest.fn().mockReturnValue('<p>Markup content</p>'),
-  convertLatexToMathMl: jest.fn()
-}))
+const basicEditor = () => document.body.querySelector('math-field')
+
+const advancedPreview = () => screen.getByTestId('mathml-preview-element')
+
+const toggleMode = () => {
+  fireEvent.click(screen.getByLabelText('Directly Edit LaTeX'))
+}
+
+const editInAdvancedMode = text => {
+  const textarea = document.body.querySelector('textarea')
+  fireEvent.change(textarea, {target: {value: text}})
+}
 
 jest.mock('../mathml', () => ({
   processNewMathInElem: jest.fn()
 }))
-
-convertLatexToMathMl.mockReturnValue('<p>MathML content</p>')
 
 describe('EquationEditorModal', () => {
   let editor, mockFn
@@ -98,9 +104,8 @@ describe('EquationEditorModal', () => {
   describe('loadExistingFormula()', () => {
     it('selected content is latex', async () => {
       renderModal({editor})
-      const mathField = document.body.querySelector('math-field')
       await waitFor(() => {
-        const value = mathField.getValue()
+        const value = basicEditor().getValue()
         expect(value).toEqual('latexcontent')
       })
     })
@@ -108,9 +113,8 @@ describe('EquationEditorModal', () => {
     it('selected content is an image', async () => {
       editor.selection.getContent = () => 'non-latex-content'
       renderModal({editor})
-      const mathField = document.body.querySelector('math-field')
       await waitFor(() => {
-        const value = mathField.getValue()
+        const value = basicEditor().getValue()
         expect(value).toEqual('\\sqrt{x}')
       })
     })
@@ -140,9 +144,8 @@ describe('EquationEditorModal', () => {
           startOffset: 0
         })
         renderModal({editor})
-        const mathField = document.body.querySelector('math-field')
         await waitFor(() => {
-          const value = mathField.getValue()
+          const value = basicEditor().getValue()
           expect(value).toEqual('')
         })
       })
@@ -156,9 +159,8 @@ describe('EquationEditorModal', () => {
           startOffset: 0
         })
         renderModal({editor})
-        const mathField = document.body.querySelector('math-field')
         await waitFor(() => {
-          const value = mathField.getValue()
+          const value = basicEditor().getValue()
           expect(value).toEqual('')
         })
       })
@@ -173,9 +175,8 @@ describe('EquationEditorModal', () => {
         })
         editor.selection.setRng = jest.fn()
         renderModal({editor})
-        const mathField = document.body.querySelector('math-field')
         await waitFor(() => {
-          const value = mathField.getValue()
+          const value = basicEditor().getValue()
           expect(editor.selection.setRng).toHaveBeenCalled()
           expect(value).toEqual('(text)\\\\')
         })
@@ -185,43 +186,38 @@ describe('EquationEditorModal', () => {
 
   it('uses editor on modal submit', () => {
     renderModal({editor, onEquationSubmit: mockFn})
-    const mathField = document.body.querySelector('math-field')
-    mathField.setValue('hello')
+    basicEditor().setValue('hello')
     fireEvent.click(screen.getByText('Done'))
     expect(mockFn).toHaveBeenCalledWith('hello')
   })
 
   it('not uses editor on modal submit with empty value', () => {
     renderModal({editor})
-    const mathField = document.body.querySelector('math-field')
-    mathField.setValue('')
+    basicEditor().setValue('')
     fireEvent.click(screen.getByText('Done'))
     expect(mockFn).not.toHaveBeenCalled()
   })
 
   it('uses editor on modal submit on advanced input', () => {
     renderModal({editor, onEquationSubmit: mockFn})
-    fireEvent.click(screen.getByLabelText('Directly Edit LaTeX'))
-    const textarea = document.body.querySelector('textarea')
-    fireEvent.change(textarea, {target: {value: 'hello'}})
+    toggleMode()
+    editInAdvancedMode('hello')
     fireEvent.click(screen.getByText('Done'))
     expect(mockFn).toHaveBeenCalledWith('hello')
   })
 
   it('not uses editor on modal submit with empty value on advanced input', () => {
     renderModal({editor})
-    fireEvent.click(screen.getByLabelText('Directly Edit LaTeX'))
-    const textarea = document.body.querySelector('textarea')
-    fireEvent.change(textarea, {target: {value: ''}})
+    toggleMode()
+    editInAdvancedMode('')
     fireEvent.click(screen.getByText('Done'))
     expect(mockFn).not.toHaveBeenCalled()
   })
 
   it('preserves content from initial to advanced field', () => {
     renderModal({editor})
-    const mathField = document.body.querySelector('math-field')
-    mathField.setValue('hello')
-    fireEvent.click(screen.getByLabelText('Directly Edit LaTeX'))
+    basicEditor().setValue('hello')
+    toggleMode()
     const textarea = document.body.querySelector('textarea')
     const newValue = textarea.value
     expect(newValue).toEqual('hello')
@@ -229,75 +225,85 @@ describe('EquationEditorModal', () => {
 
   it('preserves content from advanced to initial field', () => {
     renderModal({editor})
-    const toggle = screen.getByLabelText('Directly Edit LaTeX')
-    fireEvent.click(toggle)
-    const textarea = document.body.querySelector('textarea')
-    fireEvent.change(textarea, {target: {value: 'hello'}})
-    fireEvent.click(toggle)
-    const mathField = document.body.querySelector('math-field')
-    const newValue = mathField.getValue()
+    toggleMode()
+    editInAdvancedMode('hello')
+    toggleMode()
+    const newValue = basicEditor().getValue()
     expect(newValue).toEqual('hello')
   })
 
-  describe('renders preview on advanced view when', () => {
+  describe('correctly renders advanced preview when', () => {
+    let actualDebounceRate
+    const testDebounceRate = 100
+
+    beforeAll(() => {
+      actualDebounceRate = EquationEditorModal.debounceRate
+      EquationEditorModal.debounceRate = testDebounceRate
+    })
+
+    afterAll(() => {
+      EquationEditorModal.debounceRate = actualDebounceRate
+    })
+
     it('recovering last formula', async () => {
       renderModal({editor})
-      const mathField = document.body.querySelector('math-field')
       await waitFor(() => {
-        const value = mathField.getValue()
+        const value = basicEditor().getValue()
         expect(value).toEqual('latexcontent')
       })
-      fireEvent.click(screen.getByLabelText('Directly Edit LaTeX'))
+      toggleMode()
       await waitFor(() => {
-        expect(convertLatexToMathMl).toHaveBeenCalledWith('latexcontent')
         expect(mathml.processNewMathInElem.mock.calls[0][0]).toMatchInlineSnapshot(`
           <span
             data-testid="mathml-preview-element"
           >
-            <math>
-              <p>
-                MathML content
-              </p>
-            </math>
+            \\(latexcontent\\)
           </span>
         `)
       })
     })
 
-    it('updates formula', () => {
+    it('updating formula', async () => {
       renderModal({editor})
-      fireEvent.click(screen.getByLabelText('Directly Edit LaTeX'))
-      const textarea = document.body.querySelector('textarea')
-      fireEvent.change(textarea, {target: {value: 'hello'}})
-      expect(convertLatexToMathMl).toHaveBeenCalledWith('hello')
-      expect(mathml.processNewMathInElem.mock.calls[0][0]).toMatchInlineSnapshot(`
-        <span
-          data-testid="mathml-preview-element"
-        >
-          <math>
-            <p>
-              MathML content
-            </p>
-          </math>
-        </span>
-      `)
+      toggleMode()
+      editInAdvancedMode('hello')
+      await waitFor(() => {
+        expect(mathml.processNewMathInElem.mock.calls[0][0]).toMatchInlineSnapshot(`
+          <span
+            data-testid="mathml-preview-element"
+          >
+            \\(hello\\)
+          </span>
+        `)
+      })
     })
 
-    it('updates formula with empty string', async () => {
-      convertLatexToMathMl.mockReturnValue('')
+    it('deleting formula in advanced edtior', async () => {
       renderModal({editor})
-      const mathField = document.body.querySelector('math-field')
       await waitFor(() => {
-        const value = mathField.getValue()
+        const value = basicEditor().getValue()
         expect(value).toEqual('latexcontent')
       })
-      fireEvent.click(screen.getByLabelText('Directly Edit LaTeX'))
-      const textarea = document.body.querySelector('textarea')
-      fireEvent.change(textarea, {target: {value: ''}})
+      toggleMode()
+      editInAdvancedMode('')
       await waitFor(() => {
-        expect(convertLatexToMathMl).toHaveBeenCalledWith('')
-        const previewElement = screen.getByTestId('mathml-preview-element')
-        expect(previewElement.innerHTML).toEqual('')
+        expect(advancedPreview().innerHTML).toEqual('')
+      })
+    })
+
+    it('deleting formula in basic editor', async () => {
+      renderModal({editor})
+      toggleMode()
+      editInAdvancedMode('updated in advanced mode')
+      toggleMode()
+      await waitFor(() => {
+        const value = basicEditor().getValue()
+        expect(value).toEqual('updated in advanced mode')
+      })
+      basicEditor().setValue('')
+      toggleMode()
+      await waitFor(() => {
+        expect(advancedPreview().innerHTML).toEqual('')
       })
     })
   })
