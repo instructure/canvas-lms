@@ -322,24 +322,6 @@ module Types
       submissions
     end
 
-    field :submission_comments_connection, Types::SubmissionCommentType.connection_type, null: true
-    def submission_comments_connection
-      return unless object == current_user
-
-      submission_comments = []
-      stream_item_instances = current_user.visible_stream_item_instances(only_active_courses: true)
-
-      Shard.partition_by_shard(stream_item_instances, ->(sii) { sii.stream_item_id }) do |shard_stream_items|
-        submission_ids = StreamItem.where(id: shard_stream_items.map(&:stream_item_id),
-                                          asset_type: "Submission")
-                                   .select("asset_id")
-        submission_comments += SubmissionComment.preload(submission: { assignment: :context })
-                                                .where(submission_id: submission_ids)
-      end
-
-      submission_comments
-    end
-
     field :comment_bank_items_connection, Types::CommentBankItemType.connection_type, null: true do
       argument :query, String, <<~MD, required: false
         Only include comments that match the query string.
