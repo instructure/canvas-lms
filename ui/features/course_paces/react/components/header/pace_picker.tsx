@@ -24,6 +24,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {IconArrowOpenDownSolid, IconArrowOpenUpSolid} from '@instructure/ui-icons'
+import {Heading} from '@instructure/ui-heading'
 import {Menu} from '@instructure/ui-menu'
 import {TextInput} from '@instructure/ui-text-input'
 import {TruncateText} from '@instructure/ui-truncate-text'
@@ -131,6 +132,14 @@ export const PacePicker: React.FC<ComponentProps> = ({
       width={PICKER_WIDTH}
     />
   )
+
+  if (enrollments.length === 0) {
+    return (
+      <Heading level="h2" margin="0 x-large 0 0">
+        {I18n.t('Course Pace')}
+      </Heading>
+    )
+  }
 
   return (
     <ApplyTheme
