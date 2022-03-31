@@ -189,6 +189,7 @@ const locale = {
   "edit_existing_button_icon_3d0277bd": {
     "message": "Edit Existing Button / Icon"
   },
+  "edit_icon_2c6b0e91": { "message": "Edit Icon" },
   "edit_link_7f53bebb": { "message": "Edit Link" },
   "editor_statusbar_26ac81fc": { "message": "Editor Statusbar" },
   "embed_828fac4a": { "message": "Embed" },
