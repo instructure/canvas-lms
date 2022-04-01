@@ -62,7 +62,10 @@ class PeriodicJobs
         priority: 40
       }
       dj_params[:run_at] = compute_run_at(jitter: jitter, local_offset: local_offset)
-      klass.delay(**dj_params).__send__(method, *args)
+
+      current_shard.activate do
+        klass.delay(**dj_params).__send__(method, *args)
+      end
     end
   end
 end
