@@ -49,4 +49,12 @@ describe('App', () => {
     renderConnected(<App {...defaultProps} />)
     expect(pollForPublishStatus).toHaveBeenCalled()
   })
+
+  it('renders one screenreader-only h1', () => {
+    const {getByRole} = renderConnected(<App {...defaultProps} />)
+    // should only be one h1 in the whole app
+    const heading = getByRole('heading', {level: 1})
+    expect(heading).toBeInTheDocument()
+    expect(heading).toHaveTextContent('Course Pacing')
+  })
 })

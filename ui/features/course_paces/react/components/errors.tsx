@@ -22,7 +22,6 @@ import {coursePaceActions} from '../actions/course_paces'
 import {connect} from 'react-redux'
 import React, {createRef, ReactNode, RefObject} from 'react'
 import {ExpandableErrorAlert} from '@canvas/alerts/react/ExpandableErrorAlert'
-// @ts-ignore: TS doesn't understand i18n scoped imports
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'

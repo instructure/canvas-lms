@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {connect} from 'react-redux'
-// @ts-ignore: TS doesn't understand i18n scoped imports
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {Button} from '@instructure/ui-buttons'

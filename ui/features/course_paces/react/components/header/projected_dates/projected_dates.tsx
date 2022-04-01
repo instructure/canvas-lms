@@ -19,7 +19,6 @@
 import React, {useCallback, useEffect} from 'react'
 import {connect} from 'react-redux'
 import moment from 'moment-timezone'
-// @ts-ignore: TS doesn't understand i18n scoped imports
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {Checkbox} from '@instructure/ui-checkbox'

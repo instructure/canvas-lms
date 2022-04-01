@@ -32,7 +32,6 @@ import Header from './components/header/header'
 import {ResponsiveSizes, StoreState} from './types'
 import {getLoadingMessage, getShowLoadingOverlay} from './reducers/ui'
 import UnpublishedChangesTrayContents from './components/unpublished_changes_tray_contents'
-// @ts-ignore: TS doesn't understand i18n scoped imports
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {getSummarizedChanges} from './reducers/course_paces'
 import {coursePaceActions} from './actions/course_paces'

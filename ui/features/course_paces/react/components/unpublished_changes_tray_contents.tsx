@@ -21,7 +21,6 @@ import {CloseButton} from '@instructure/ui-buttons'
 import {List} from '@instructure/ui-list'
 import {Text} from '@instructure/ui-text'
 import React from 'react'
-// @ts-ignore: TS doesn't understand i18n scoped imports
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {SummarizedChange} from '../utils/change_tracking'
 

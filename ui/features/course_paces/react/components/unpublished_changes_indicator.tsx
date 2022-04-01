@@ -18,7 +18,6 @@
 
 import React, {useEffect} from 'react'
 import {CondensedButton} from '@instructure/ui-buttons'
-// @ts-ignore: TS doesn't understand i18n scoped imports
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {getCoursePace, getPacePublishing, getUnpublishedChangeCount} from '../reducers/course_paces'
 import {StoreState} from '../types'
