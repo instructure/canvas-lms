@@ -82,6 +82,12 @@ describe CoursePaceHardEndDateCompressor do
           compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items)
           expect(compressed.pluck(:duration)).to eq([1, 1, 2])
         end
+
+        it "considers the end date the previous Friday if it falls on the weekend" do
+          @course.update(conclude_at: "2022-01-02") # Sunday
+          compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items)
+          expect(compressed.pluck(:duration)).to eq([1, 1, 2])
+        end
       end
     end
 
