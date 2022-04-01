@@ -19,7 +19,6 @@
 import {Action} from 'redux'
 import {ThunkAction} from 'redux-thunk'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-// @ts-ignore: TS doesn't understand i18n scoped imports
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {

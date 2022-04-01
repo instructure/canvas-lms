@@ -17,7 +17,6 @@
  */
 
 import React, {useEffect, useRef, useState} from 'react'
-// @ts-ignore: TS doesn't understand i18n scoped imports
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {ApplyTheme} from '@instructure/ui-themeable'

@@ -18,8 +18,12 @@
 
 import React from 'react'
 import {connect} from 'react-redux'
+import {useScope as useI18nScope} from '@canvas/i18n'
+
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Heading} from '@instructure/ui-heading'
 
 import PacePicker from './pace_picker'
 import ProjectedDates from './projected_dates/projected_dates_2'
@@ -27,6 +31,8 @@ import Settings from './settings/settings'
 import UnpublishedChangesIndicator from '../unpublished_changes_indicator'
 import {getSelectedContextId, getSelectedContextType} from '../../reducers/ui'
 import {StoreState} from '../../types'
+
+const I18n = useI18nScope('course_paces_header')
 
 const {Item: FlexItem} = Flex as any
 
@@ -43,6 +49,9 @@ export type HeaderProps = PassedProps & StoreProps
 
 const Header = (props: HeaderProps) => (
   <View as="div">
+    <ScreenReaderContent>
+      <Heading as="h1">{I18n.t('Course Pacing')}</Heading>
+    </ScreenReaderContent>
     <View as="div" borderWidth="0 0 small 0" margin="0 0 medium" padding="0 0 small">
       <Flex as="section" alignItems="end" wrapItems>
         <FlexItem margin="0 0 small">

@@ -29,6 +29,7 @@ class CoursePacesController < ApplicationController
   include K5Mode
 
   def index
+    add_crumb(t("Course Pacing"))
     @course_pace = @context.course_paces.primary.first
 
     if @course_pace.nil?

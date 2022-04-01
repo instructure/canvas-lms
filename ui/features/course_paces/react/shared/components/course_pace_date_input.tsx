@@ -31,7 +31,6 @@ import CanvasDateInput, {
 } from '@canvas/datetime/react/components/DateInput'
 import {BlackoutDate, InputInteraction} from '../types'
 import {coursePaceTimezone, weekendIntegers} from '../api/backend_serializer'
-// @ts-ignore: TS doesn't understand i18n scoped imports
 import {useScope as useI18nScope} from '@canvas/i18n'
 import * as DateHelpers from '../../utils/date_stuff/date_helpers'
 

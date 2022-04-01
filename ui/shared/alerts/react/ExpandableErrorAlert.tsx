@@ -18,7 +18,6 @@
 
 import React, {RefObject, useCallback, useEffect, useRef, useState} from 'react'
 import {Alert, AlertProps} from '@instructure/ui-alerts'
-// @ts-ignore: TS doesn't understand i18n scoped imports
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {ToggleDetails} from '@instructure/ui-toggle-details'

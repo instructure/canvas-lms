@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-// @ts-ignore: TS doesn't understand i18n scoped imports
 import {useScope as useI18nScope} from '@canvas/i18n'
 import moment from 'moment-timezone'
 import {connect} from 'react-redux'
