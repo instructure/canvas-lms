@@ -65,7 +65,15 @@ function copyToClipboardTruncatedValue(value) {
   )
 }
 
-export default function JobsTable({bucket, jobs, caption, sortColumn, onClickJob, onClickHeader}) {
+export default function JobsTable({
+  bucket,
+  jobs,
+  caption,
+  sortColumn,
+  onClickJob,
+  onClickHeader,
+  timeZone
+}) {
   const renderJobRow = useCallback(
     job => {
       return (
@@ -83,12 +91,12 @@ export default function JobsTable({bucket, jobs, caption, sortColumn, onClickJob
           </Table.Cell>
           <Table.Cell>{job.priority}</Table.Cell>
           <Table.Cell>
-            <InfoColumn bucket={bucket} info={job.info} />
+            <InfoColumn timeZone={timeZone} bucket={bucket} info={job.info} />
           </Table.Cell>
         </Table.Row>
       )
     },
-    [bucket, onClickJob]
+    [bucket, onClickJob, timeZone]
   )
 
   const renderColHeader = useCallback(
@@ -137,7 +145,7 @@ export default function JobsTable({bucket, jobs, caption, sortColumn, onClickJob
                 {renderColHeader('strand_singleton', I18n.t('Strand / Singleton'))}
                 {renderColHeader('attempt', I18n.t('Attempt'), {sortable: false, width: '5rem'})}
                 {renderColHeader('priority', I18n.t('Priority'), {sortable: false, width: '5rem'})}
-                {renderColHeader('info', <InfoColumnHeader bucket={bucket} />, {width: '10rem'})}
+                {renderColHeader('info', <InfoColumnHeader bucket={bucket} />, {width: '11rem'})}
               </Table.Row>
             </Table.Head>
             <Table.Body>

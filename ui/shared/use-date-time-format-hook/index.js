@@ -86,6 +86,11 @@ const optionsList = {
     // MMM D
     month: 'short',
     day: 'numeric'
+  },
+  'date.formats.full_compact': {
+    // M/D/YY, H:M a
+    dateStyle: 'short',
+    timeStyle: 'short'
   }
 }
 
