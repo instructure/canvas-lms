@@ -149,6 +149,9 @@
   "the_material_is_licensed_under_creative_commons_3242cb5e": {
     "message": "مطلب تحت مجوز کریتیو کامنز است"
   },
+  "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
+    "message": "این معادله را نمی توان در نمای اصلی ارائه داد."
+  },
   "title_ee03d132": { "message": "عنوان" },
   "unpublished_dfd8801": { "message": "منتشر نشده" },
   "upload_file_fd2361b8": { "message": "بارگذاری فایل" },

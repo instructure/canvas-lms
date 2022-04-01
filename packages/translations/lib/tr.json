@@ -647,6 +647,9 @@
     "the_material_is_licensed_under_creative_commons_3242cb5e": {
         "message": "Bu malzeme Creative Commons a göre lisanslı"
     },
+    "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
+        "message": "Bu denklem Temel Görünümde işlenemez."
+    },
     "time_2b5aac58": {
         "message": "Süre"
     },

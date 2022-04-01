@@ -92,6 +92,9 @@
     "apply_781a2546": {
         "message": "Tono"
     },
+    "apply_changes_to_all_instances_of_this_icon_maker__2642f466": {
+        "message": "Tonoa huringa ki nga ahuatanga katoa o tenei Ata Kaihanga Ata i te Akoranga"
+    },
     "apps_54d24a47": {
         "message": "Tono"
     },
@@ -176,8 +179,17 @@
     "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
         "message": "Kai raro he tauira pehea ai ngā ākonga e kite i tā rātou pūwhakarite"
     },
+    "black_4cb01371": {
+        "message": "Pango"
+    },
+    "blue_daf8fea9": {
+        "message": "Kikorangi"
+    },
     "bottom_third_5f5fec1d": {
         "message": "Raro Tuatoru"
+    },
+    "brick_f2656265": {
+        "message": "Pereki"
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
@@ -317,6 +329,12 @@
     "course_to_do_bcbbab54": {
         "message": "{ course } HEI MAHI"
     },
+    "create_icon_110d6463": {
+        "message": "Waihanga Tohu"
+    },
+    "create_icon_maker_icon_c716bffe": {
+        "message": "Waihangahia Tohu Kaihanga Tohu"
+    },
     "creative_commons_license_725584ae": {
         "message": "Auaha ngā Raihana Noa:"
     },
@@ -331,6 +349,9 @@
     },
     "custom_6979cd81": {
         "message": "Tikanga"
+    },
+    "cyan_c1d5f68a": {
+        "message": "Kawariki"
     },
     "date_added_ed5ad465": {
         "message": "Rā kua tāpiritia"
@@ -355,6 +376,9 @@
     },
     "decrease_indent_de6343ab": {
         "message": "Whakaiti nuku"
+    },
+    "deep_purple_bb3e2907": {
+        "message": "Hohonu Waiporoporo"
     },
     "default_bulleted_unordered_list_47079da8": {
         "message": "Taunoa whakanuia rārangi kore"
@@ -382,9 +406,6 @@
     },
     "diamond_b8dfe7ae": {
         "message": "Taimana"
-    },
-    "dimension_type_55c83e4e": {
-        "message": "Inenga momo"
     },
     "dimensions_45ddb7b7": {
         "message": "Ngā āhuatanga"
@@ -641,6 +662,12 @@
     "greek_65c5b3f7": {
         "message": "Kariki"
     },
+    "green_15af4778": {
+        "message": "Kākāriki"
+    },
+    "grey_a55dceff": {
+        "message": "Kerei"
+    },
     "group_documents_8bfd6ae6": {
         "message": "Ngā Pukapuka roopu"
     },
@@ -704,6 +731,21 @@
     "icon_color_b86dd6d6": {
         "message": "Tohu Tae"
     },
+    "icon_maker_icons_cc560f7e": {
+        "message": "Tohu Kaihanga Ata"
+    },
+    "icon_outline_e978dc0c": {
+        "message": "Tohu Whakahuahua"
+    },
+    "icon_outline_size_33f39b86": {
+        "message": "Tohu Rahi Whakahuahua"
+    },
+    "icon_shape_30b61e7": {
+        "message": "Tohu Hanga"
+    },
+    "icon_size_9353edea": {
+        "message": "Tohu Rahi"
+    },
     "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
         "message": "Ki te kore koe e tīpako ngā mōtika whakamahi ināianei, kaore e whakaputaina tēnei kōnae i muri o ''te tukuake."
     },
@@ -724,6 +766,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "Whakapiki nuku"
+    },
+    "indigo_2035fc55": {
+        "message": "Indigo"
     },
     "insert_593145ef": {
         "message": "Whakauru"
@@ -787,6 +832,9 @@
     },
     "library_icon_ae1e54cf": {
         "message": "Whare Pukapuka Tohu"
+    },
+    "light_blue_5374f600": {
+        "message": "Puru marama"
     },
     "link_7262adec": {
         "message": "Hono"
@@ -854,6 +902,9 @@
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Titiro rite kaore tētahi i kōnei"
     },
+    "magenta_4a65993c": {
+        "message": "Āhua waiporoporo"
+    },
     "math_ede93050": {
         "message": "Pāngarau"
     },
@@ -904,6 +955,9 @@
     },
     "name_1aed4a1b": {
         "message": "Ingoa"
+    },
+    "name_color_ceec76ff": {
+        "message": "{ name } ({ color })"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Whakatere i roto i te tahua paeutauta rānei"
@@ -986,6 +1040,9 @@
     "octagon_e48be9f": {
         "message": "Tapawaru"
     },
+    "olive_6a3e4d6b": {
+        "message": "Ōriwa"
+    },
     "only_most_recent_grading_period_shown_f1ad6458": {
         "message": "* Ko te wā poto noa kua whakāturia."
     },
@@ -1003,6 +1060,9 @@
     },
     "optional_add_course_ef0d70fc": {
         "message": "Kāre Herea: Tāpiri akoranga"
+    },
+    "orange_81386a62": {
+        "message": "Ārani"
     },
     "ordered_and_unordered_lists_cfadfc38": {
         "message": "Rārangi kua rārangitia me te kore rārangi"
@@ -1045,6 +1105,9 @@
     },
     "physical_education_icon_d7dffd3e": {
         "message": "Tinana Mātauranga Tohu"
+    },
+    "pink_68ad45cb": {
+        "message": "Māwhero"
     },
     "pixels_52ece7d1": {
         "message": "Ngā Pika"
@@ -1091,6 +1154,12 @@
     "published_when_302d8e23": {
         "message": "Whakaputaina: { when }"
     },
+    "pumpkin_904428d5": {
+        "message": "Paukena"
+    },
+    "purple_7678a9fc": {
+        "message": "Waiporoporo"
+    },
     "quiz_e0dcce8f": {
         "message": "Quiz"
     },
@@ -1105,6 +1174,9 @@
     },
     "record_upload_media_5fdce166": {
         "message": "Tāhopu/Kaweake Pāpāho"
+    },
+    "red_8258edf3": {
+        "message": "Whero"
     },
     "redo_363c58b7": {
         "message": "Mahi anō"
@@ -1141,6 +1213,9 @@
     },
     "save_11a80ec3": {
         "message": "Tiaki"
+    },
+    "saved_icon_maker_icons_df86e2a1": {
+        "message": "Kua tiakina Tohu Kaihanga Tohu"
     },
     "schedule_preview_3bcda153": {
         "message": "Pūwhakarite Arokite"
@@ -1192,6 +1267,9 @@
     },
     "single_color_image_4e5d4dbc": {
         "message": "Whakapakoko kotahi te Tae"
+    },
+    "single_color_image_color_95fa9a87": {
+        "message": "Takakau Tae Whakaahua Tae"
     },
     "size_b30e1077": {
         "message": "Rahi"
@@ -1247,6 +1325,9 @@
     "starttime_to_endtime_d7cc249d": {
         "message": "{ startTime } ki te { endTime }"
     },
+    "steel_blue_14296f08": {
+        "message": "Te rino Kahurangi"
+    },
     "styles_2aa721ef": {
         "message": "Ngā Kāhua"
     },
@@ -1282,6 +1363,9 @@
     },
     "task_16b0ef38": {
         "message": "Mahi"
+    },
+    "teal_f729a294": {
+        "message": "Tira"
     },
     "text_7f4593da": {
         "message": "Kuputuhi"
@@ -1501,6 +1585,9 @@
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "Ia wiki pūwhakarite whakaterenga"
+    },
+    "white_87fa64fd": {
+        "message": "Ma"
     },
     "width_492fec76": {
         "message": "Te whānuitanga"
