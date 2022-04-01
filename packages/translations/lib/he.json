@@ -668,6 +668,9 @@
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "אין נקודות המשויכות לפריט זה"
     },
+    "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
+        "message": "נוסחה זו לא ניתנת להצגה בתצוגה בסיסית"
+    },
     "time_2b5aac58": {
         "message": "זמן "
     },

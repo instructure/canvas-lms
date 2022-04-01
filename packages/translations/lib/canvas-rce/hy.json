@@ -130,6 +130,9 @@
   "the_material_is_licensed_under_creative_commons_3242cb5e": {
     "message": "Նյութը արտոնագրված է  Creative Commons կողմից"
   },
+  "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
+    "message": "Այս հավասարումը հնարավոր չէ ցուցադրել Հիմնական տեսքով:"
+  },
   "title_ee03d132": { "message": "Վերնագիր" },
   "unpublished_dfd8801": { "message": "չհրապարակված" },
   "upload_file_fd2361b8": { "message": "Բեռնել ֆայլը " },

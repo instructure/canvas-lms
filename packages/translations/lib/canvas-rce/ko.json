@@ -85,6 +85,9 @@
   "star_8d156e09": { "message": "별표 표시" },
   "submit_a3cc6859": { "message": "제출" },
   "syllabus_f191f65b": { "message": "요강" },
+  "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
+    "message": "이 수식은 기본 뷰에 렌더링할 수 없습니다."
+  },
   "title_ee03d132": { "message": "제목" },
   "upload_file_fd2361b8": { "message": "파일 업로드" },
   "uploading_19e8a4e7": { "message": "업로드 중" },
