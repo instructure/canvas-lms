@@ -2805,6 +2805,13 @@ describe CoursesController do
         expect(response.body).to include "Cannot have a blueprint course with students"
       end
 
+      it "does not allow a course with observers to be set as a master course" do
+        observer_in_course
+        put "update", params: { id: @course.id, course: { blueprint: "1" } }, format: "json"
+        expect(response.status).to eq 400
+        expect(response.body).to include "Cannot have a blueprint course with observers"
+      end
+
       it "does not allow a minion course to be set as a master course" do
         c1 = @course
         c2 = course_factory

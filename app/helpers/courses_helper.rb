@@ -146,6 +146,8 @@ module CoursesHelper
       I18n.t("Course is already associated with a blueprint")
     elsif course.student_enrollments.not_fake.exists?
       I18n.t("Cannot have a blueprint course with students")
+    elsif course.observer_enrollments.exists?
+      I18n.t("Cannot have a blueprint course with observers")
     else
       nil
     end
