@@ -33,11 +33,13 @@ describe('Collection reducer', () => {
 
   describe('REQUEST_PAGE', () => {
     const action = {
-      type: actions.REQUEST_PAGE
+      type: actions.REQUEST_PAGE,
+      cancel() {}
     }
 
-    it('sets the loading flag', () => {
+    it('sets the loading flag and cancel function', () => {
       assert.strictEqual(collection(state, action).isLoading, true)
+      assert.strictEqual(typeof collection(state, action).cancel, 'function')
     })
 
     it('preserves existing state', () => {

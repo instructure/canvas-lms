@@ -409,7 +409,7 @@ describe('RCE Plugins > Filter', () => {
       })
     })
 
-    it('is readonly while content is loading', () => {
+    it('is not readonly while content is loading', () => {
       renderComponent({
         userContextType: 'course',
         contentType: 'course_files',
@@ -418,10 +418,10 @@ describe('RCE Plugins > Filter', () => {
         searchString: 'abc'
       })
       const searchInput = component.getByPlaceholderText('Search')
-      expect(searchInput.hasAttribute('readonly')).toBe(true)
+      expect(searchInput.hasAttribute('readonly')).toBe(false)
 
       const clearBtn = component.getByText('Clear').closest('button')
-      expect(clearBtn.hasAttribute('disabled')).toBe(true)
+      expect(clearBtn.hasAttribute('disabled')).toBe(false)
     })
 
     it('shows the search message when not loading', () => {

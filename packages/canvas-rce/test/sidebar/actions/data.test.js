@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 import assert from 'assert'
 import * as actions from '../../../src/sidebar/actions/data'
 import RceApiSource from '../../../src/rcs/api'
@@ -142,15 +141,21 @@ describe('Sidebar data actions', () => {
       store.dispatch(actions.fetchNextPage(collectionKey))
       sinon.assert.calledWith(store.spy, {
         type: actions.REQUEST_PAGE,
+        cancel: sinon.match.func,
         key: collectionKey
       })
     })
 
-    it('skips fetching next page if collection is already loading', () => {
-      const store = spiedStore(setupState({}, {isLoading: true}))
+    it('cancels previous fetch if collection is already loading', () => {
+      const cancel = sinon.spy()
+      const store = spiedStore(setupState({}, {isLoading: true, cancel}))
       store.dispatch(actions.fetchNextPage(collectionKey))
-      sinon.assert.neverCalledWith(store.spy, {
+
+      sinon.assert.called(cancel)
+
+      sinon.assert.calledWith(store.spy, {
         type: actions.REQUEST_PAGE,
+        cancel: sinon.match.func,
         key: collectionKey
       })
     })
@@ -162,6 +167,7 @@ describe('Sidebar data actions', () => {
       store.dispatch(actions.fetchInitialPage(collectionKey))
       sinon.assert.calledWith(store.spy, {
         type: actions.REQUEST_INITIAL_PAGE,
+        cancel: sinon.match.func,
         key: collectionKey,
         searchString
       })
@@ -172,6 +178,7 @@ describe('Sidebar data actions', () => {
       store.dispatch(actions.fetchInitialPage(collectionKey))
       sinon.assert.neverCalledWith(store.spy, {
         type: actions.REQUEST_INITIAL_PAGE,
+        cancel: sinon.match.func,
         key: collectionKey,
         searchString
       })
@@ -184,11 +191,16 @@ describe('Sidebar data actions', () => {
       sinon.assert.calledWith(source.fetchPage, 'uriFor/bookmark')
     })
 
-    it('fetching initial page if collection is already loading', () => {
-      const store = spiedStore(setupState({}, {isLoading: true}))
+    it('cancels previous fetch if collection is already loading', () => {
+      const cancel = sinon.spy()
+      const store = spiedStore(setupState({}, {isLoading: true, cancel}))
       store.dispatch(actions.fetchInitialPage(collectionKey))
-      sinon.assert.neverCalledWith(store.spy, {
+
+      sinon.assert.called(cancel)
+
+      sinon.assert.calledWith(store.spy, {
         type: actions.REQUEST_INITIAL_PAGE,
+        cancel: sinon.match.func,
         key: collectionKey,
         searchString
       })
