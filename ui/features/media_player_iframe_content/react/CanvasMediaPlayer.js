@@ -212,6 +212,20 @@ export default function CanvasMediaPlayer(props) {
     )
   }
 
+  function getAriaLabel() {
+    if (!props.aria_label) return
+
+    // video
+    if (props.type === 'video') {
+      return I18n.t('Video player for %{label}', {label: props.aria_label})
+    }
+
+    // audio
+    if (props.type === 'audio') {
+      return I18n.t('Audio player for %{label}', {label: props.aria_label})
+    }
+  }
+
   return (
     <div ref={containerRef} data-tracks={JSON.stringify(media_tracks)}>
       {media_sources.length ? (
@@ -223,6 +237,7 @@ export default function CanvasMediaPlayer(props) {
           onLoadedMetadata={handleLoadedMetadata}
           captionPosition="bottom"
           autoShowCaption={auto_cc_track}
+          label={getAriaLabel()}
         />
       ) : (
         renderNoPlayer()
@@ -262,12 +277,14 @@ CanvasMediaPlayer.propTypes = {
   media_tracks: MediaPlayer.propTypes.tracks,
   type: oneOf(['audio', 'video']),
   MAX_RETRY_ATTEMPTS: number,
-  SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS: number
+  SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS: number,
+  aria_label: string
 }
 
 CanvasMediaPlayer.defaultProps = {
   media_sources: [],
   type: 'video',
   MAX_RETRY_ATTEMPTS: DEFAULT_MAX_RETRY_ATTEMPTS,
-  SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS: DEFAULT_SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS
+  SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS: DEFAULT_SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS,
+  aria_label: ''
 }
