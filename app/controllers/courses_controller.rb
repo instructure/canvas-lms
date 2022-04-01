@@ -105,13 +105,18 @@ require "securerandom"
 #           "type": "integer"
 #         },
 #         "name": {
-#           "description": "the full name of the course",
+#           "description": "the full name of the course. If the requesting user has set a nickname for the course, the nickname will be shown here.",
 #           "example": "InstructureCon 2012",
 #           "type": "string"
 #         },
 #         "course_code": {
 #           "description": "the course code",
 #           "example": "INSTCON12",
+#           "type": "string"
+#         },
+#         "original_name": {
+#           "description": "the actual course name. This field is returned only if the requesting user has set a nickname for the course.",
+#           "example": "InstructureCon-2012-01",
 #           "type": "string"
 #         },
 #         "workflow_state": {
@@ -2047,7 +2052,7 @@ class CoursesController < ApplicationController
   #
   # Accepts the same include[] parameters as the list action plus:
   #
-  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"public_description"|"total_scores"|"current_grading_period_scores"|"term"|"account"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"passback_status"|"favorites"|"teachers"|"observed_users"|"all_courses"|"permissions"|"observed_users"|"course_image"|"concluded"]
+  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"public_description"|"total_scores"|"current_grading_period_scores"|"term"|"account"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"passback_status"|"favorites"|"teachers"|"observed_users"|"all_courses"|"permissions"|"course_image"|"concluded"]
   #   - "all_courses": Also search recently deleted courses.
   #   - "permissions": Include permissions the current user has
   #     for the course.
