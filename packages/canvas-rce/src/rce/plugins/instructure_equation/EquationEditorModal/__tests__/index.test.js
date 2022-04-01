@@ -40,15 +40,18 @@ const renderModal = (overrideProps = {}) => {
 
 const basicEditor = () => document.body.querySelector('math-field')
 
+const advancedEditor = () => document.body.querySelector('textarea')
+
 const advancedPreview = () => screen.getByTestId('mathml-preview-element')
 
-const toggleMode = () => {
-  fireEvent.click(screen.getByLabelText('Directly Edit LaTeX'))
-}
+const toggle = () => screen.getByTestId('advanced-toggle')
+
+const tooltip = () => screen.queryByText('This equation cannot be rendered in Basic View.')
+
+const toggleMode = () => fireEvent.click(toggle())
 
 const editInAdvancedMode = text => {
-  const textarea = document.body.querySelector('textarea')
-  fireEvent.change(textarea, {target: {value: text}})
+  fireEvent.change(advancedEditor(), {target: {value: text}})
 }
 
 jest.mock('../mathml', () => ({
@@ -101,25 +104,56 @@ describe('EquationEditorModal', () => {
     jest.clearAllMocks()
   })
 
-  describe('loadExistingFormula()', () => {
-    it('selected content is latex', async () => {
-      renderModal({editor})
-      await waitFor(() => {
-        const value = basicEditor().getValue()
-        expect(value).toEqual('latexcontent')
+  describe('loadExistingFormula', () => {
+    describe('when the selected content is latex', () => {
+      it('loads a basic formula in the basic editor', async () => {
+        renderModal({editor})
+        await waitFor(() => {
+          const value = basicEditor().getValue()
+          expect(value).toEqual('latexcontent')
+        })
+      })
+
+      it('loads an advanced formula in the advanced editor', async () => {
+        editor.selection.getContent = () => '\\(\\displaystyle\\)'
+        renderModal({editor})
+        await waitFor(() => {
+          expect(toggle()).toBeChecked()
+          const value = advancedEditor().value
+          expect(value).toEqual('\\displaystyle')
+        })
       })
     })
 
-    it('selected content is an image', async () => {
-      editor.selection.getContent = () => 'non-latex-content'
-      renderModal({editor})
-      await waitFor(() => {
-        const value = basicEditor().getValue()
-        expect(value).toEqual('\\sqrt{x}')
+    describe('when the selected content is an image', () => {
+      it('loads a basic formula in the basic editor', async () => {
+        editor.selection.getContent = () => 'non-latex-content'
+        renderModal({editor})
+        await waitFor(() => {
+          const value = basicEditor().getValue()
+          expect(value).toEqual('\\sqrt{x}')
+        })
+      })
+
+      it('loads an advanced formula in the advanced editor', async () => {
+        editor.selection.getContent = () => 'non-latex-content'
+        editor.selection.getNode = () => ({
+          tagName: 'IMG',
+          classList: {
+            contains: str => str === 'equation_image'
+          },
+          src: 'http://canvas.docker/equation_images/%255Cdisplaystyle%2520x'
+        })
+        renderModal({editor})
+        await waitFor(() => {
+          expect(toggle()).toBeChecked()
+          const value = advancedEditor().value
+          expect(value).toEqual('\\displaystyle x')
+        })
       })
     })
 
-    describe('selected content is range', () => {
+    describe('when the selected content is a range', () => {
       beforeEach(() => {
         editor.selection.getContent = () => 'non-latex-content'
         editor.selection.getNode = () => ({
@@ -165,20 +199,40 @@ describe('EquationEditorModal', () => {
         })
       })
 
-      it('formula text', async () => {
-        editor.selection.getRng = () => ({
-          startContainer: {
-            wholeText: 'hello',
-            nodeValue: '\\\\\\((text)\\\\\\)'
-          },
-          startOffset: 5
+      describe('with formula text', () => {
+        it('loads a basic formula in the basic editor', async () => {
+          editor.selection.getRng = () => ({
+            startContainer: {
+              wholeText: 'hello',
+              nodeValue: '\\(\\sqrt{x}\\)'
+            },
+            startOffset: 5
+          })
+          editor.selection.setRng = jest.fn()
+          renderModal({editor})
+          await waitFor(() => {
+            const value = basicEditor().getValue()
+            expect(editor.selection.setRng).toHaveBeenCalled()
+            expect(value).toEqual('\\sqrt{x}')
+          })
         })
-        editor.selection.setRng = jest.fn()
-        renderModal({editor})
-        await waitFor(() => {
-          const value = basicEditor().getValue()
-          expect(editor.selection.setRng).toHaveBeenCalled()
-          expect(value).toEqual('(text)\\\\')
+
+        it('loads an advanced formula in the advanced editor', async () => {
+          editor.selection.getRng = () => ({
+            startContainer: {
+              wholeText: 'hello',
+              nodeValue: '\\(\\displaystyle x\\)'
+            },
+            startOffset: 5
+          })
+          editor.selection.setRng = jest.fn()
+          renderModal({editor})
+          await waitFor(() => {
+            expect(editor.selection.setRng).toHaveBeenCalled()
+            expect(toggle()).toBeChecked()
+            const value = advancedEditor().value
+            expect(value).toEqual('\\displaystyle x')
+          })
         })
       })
     })
@@ -304,6 +358,66 @@ describe('EquationEditorModal', () => {
       toggleMode()
       await waitFor(() => {
         expect(advancedPreview().innerHTML).toEqual('')
+      })
+    })
+  })
+
+  describe('should disable basic mode when', () => {
+    it('user enters an advanced command in basic mode', async () => {
+      renderModal({editor})
+
+      // Need to trigger the event listener on the <math-field>.
+      // Testing library built in features don't allow us to do
+      // this on their own.
+      const event = new Event('input')
+      Object.defineProperty(event, 'target', {
+        get: () => {return {value: '\\displaystyle x'}}
+      })
+
+      basicEditor().dispatchEvent(event)
+      await waitFor(() => {
+        expect(toggle()).toBeChecked()
+        expect(toggle()).toBeDisabled()
+      })
+    })
+
+    it('user enters an advanced only command in the advanced editor', async () => {
+      renderModal({editor})
+      toggleMode()
+      editInAdvancedMode('\\displaystyle x')
+      await waitFor(() => {
+        expect(toggle()).toBeDisabled()
+      })
+    })
+  })
+
+  describe('toggle toolip', () => {
+    it('exists when basic mode is disabled', async () => {
+      renderModal({editor})
+      toggleMode()
+      editInAdvancedMode('\\displaystyle x')
+      await waitFor(() => {
+        expect(tooltip()).toBeInTheDocument()
+        expect(tooltip()).not.toBeVisible()
+      })
+    })
+
+    it('does not exist when basic mode is not disabled', async () => {
+      renderModal({editor})
+      basicEditor().setValue('\\sqrt{x}')
+      await waitFor(() => {
+        expect(tooltip()).not.toBeInTheDocument()
+      })
+    })
+
+    it('renders on hover', async () => {
+      renderModal({editor})
+      toggleMode()
+      editInAdvancedMode('\\displaystyle x')
+      fireEvent.focus(toggle())
+      await waitFor(() => {
+        expect(tooltip()).toBeInTheDocument()
+        expect(tooltip()).toBeVisible()
       })
     })
   })
