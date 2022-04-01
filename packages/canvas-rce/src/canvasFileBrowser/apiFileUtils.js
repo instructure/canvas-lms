@@ -15,16 +15,6 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import axios from 'axios'
-import {
-  IconDocumentLine as IconDocumentLineSvg,
-  IconMsExcelLine as IconMsExcelLineSvg,
-  IconMsPptLine as IconMsPptLineSvg,
-  IconMsWordLine as IconMsWordLineSvg,
-  IconPdfLine as IconPdfLineSvg,
-  IconVideoLine as IconVideoLineSvg,
-  IconAudioLine as IconAudioLineSvg
-} from '@instructure/ui-icons/es/svg'
-import {isVideo, isAudio} from '../rce/plugins/shared/fileTypeUtils'
 
 const stringIds = {Accept: 'application/json+canvas-string-ids'}
 
@@ -61,32 +51,4 @@ export function uploadFile(file, folderId, onSuccess, onFailure) {
     )
     .then(response => onFileUploadInfoReceived(file, response.data, onSuccess, onFailure))
     .catch(response => onFailure(response))
-}
-
-// I wanted to put this in packages/canvas-rce/src/rce/plugins/shared/fileTypeUtils.js
-// with getIconFromType on which it's based, but it gets imported when running mocha
-// tests, and that blows up on the import of the svg icons.
-// Moving the import and the function here gets around that problem.
-// When the INSTUI TreeBrowser supports per-item icons, we can remove this
-export function getSVGIconFromType(type) {
-  if (isVideo(type)) {
-    return IconVideoLineSvg.src
-  } else if (isAudio(type)) {
-    return IconAudioLineSvg.src
-  }
-  switch (type) {
-    case 'application/msword':
-    case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-      return IconMsWordLineSvg.src
-    case 'application/vnd.ms-powerpoint':
-    case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
-      return IconMsPptLineSvg.src
-    case 'application/pdf':
-      return IconPdfLineSvg.src
-    case 'application/vnd.ms-excel':
-    case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-      return IconMsExcelLineSvg.src
-    default:
-      return IconDocumentLineSvg.src
-  }
 }
