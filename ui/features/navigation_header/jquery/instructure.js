@@ -26,13 +26,13 @@ import RichContentEditor from '@canvas/rce/RichContentEditor'
 import './instructure_helper'
 import 'jqueryui/draggable'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/doc-previews'/* loadDocPreview */
+import '@canvas/doc-previews' /* loadDocPreview */
 import {trackEvent} from '@canvas/google-analytics'
-import '@canvas/datetime'/* datetimeString, dateString, fudgeDateForProfileTimezone */
-import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit, fillFormData, formErrors */
+import '@canvas/datetime' /* datetimeString, dateString, fudgeDateForProfileTimezone */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
 import 'jqueryui/dialog'
-import '@canvas/jquery/jquery.instructure_misc_helpers'/* replaceTags, youTubeID */
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* ifExists, .dim, confirmDelete, showIf, fillWindowWithMe */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags, youTubeID */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* ifExists, .dim, confirmDelete, showIf, fillWindowWithMe */
 import '@canvas/keycodes'
 import '@canvas/loading-image'
 import '@canvas/rails-flash-notifications'
@@ -40,7 +40,7 @@ import '@canvas/util/templateData'
 import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/media-comments/jquery/mediaCommentThumbnail'
 import 'date'
-import 'jquery-tinypubsub'/* /\.publish\(/ */
+import 'jquery-tinypubsub' /* /\.publish\(/ */
 import 'jqueryui/resizable'
 import 'jqueryui/sortable'
 import 'jqueryui/tabs'
@@ -121,32 +121,11 @@ export function enhanceUserContent() {
     return
   }
 
-  const $content = $('#content')
   $('.user_content:not(.enhanced):visible').addClass('unenhanced')
   $('.user_content.unenhanced:visible')
     .each(function () {
       const $this = $(this)
       $this.find('img').each((i, img) => {
-        const handleWidth = () => {
-          const maxw = Math.min($content.width(), $this.width(), $(img).width() || img.naturalWidth)
-          if (maxw > 0) {
-            $(img).css(
-              'maxWidth',
-              Math.min($content.width(), $this.width(), $(img).width() || img.naturalWidth)
-            )
-          }
-        }
-        if (
-          (typeof img.style.width !== 'string' || !img.style.width.endsWith('%')) &&
-          !img.classList.contains('equation_image')
-        ) {
-          if (img.naturalWidth === 0) {
-            img.addEventListener('load', handleWidth)
-          } else {
-            handleWidth()
-          }
-        }
-
         // if the image file is unpublished it's replaced with the lock image
         // and canvas adds hidden=1 to the URL.
         // we also need to strip the alt text
