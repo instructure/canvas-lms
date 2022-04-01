@@ -31,7 +31,7 @@ const buttonContainerStyle = {
   paddingRight: '5px'
 }
 
-export default function EquationEditorToolbar(props) {
+function EquationEditorToolbar(props) {
   const [selectedTab, setSelectedTab] = useState('Basic')
 
   const handleTabChange = (event, {index}) => {
@@ -74,3 +74,6 @@ export default function EquationEditorToolbar(props) {
 EquationEditorToolbar.propTypes = {
   executeCommand: PropTypes.func.isRequired
 }
+
+const MemoizedEquationEditorToolbar = React.memo(EquationEditorToolbar)
+export default MemoizedEquationEditorToolbar
