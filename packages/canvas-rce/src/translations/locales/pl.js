@@ -165,7 +165,6 @@ const locale = {
   "describe_the_video_2fe8f46a": { "message": "(opisz wideo)" },
   "details_98a31b68": { "message": "Szczegóły" },
   "diamond_b8dfe7ae": { "message": "Diament" },
-  "dimension_type_55c83e4e": { "message": "Typ wymiaru" },
   "dimensions_45ddb7b7": { "message": "Wymiary" },
   "directionality_26ae9e08": { "message": "Kierunkowość" },
   "directly_edit_latex_b7e9235b": { "message": "Edytuj bezpośrednio w LaTeX" },

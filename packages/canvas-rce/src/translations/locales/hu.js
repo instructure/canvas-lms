@@ -376,6 +376,9 @@ const locale = {
   "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
     "message": "Az anyag kivételt képez- pl. tisztességes felhasználás, árajánlási jog vagy mások a vonatkozó szerzői jogi törvények alapján"
   },
+  "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
+    "message": "Ezt az egyenletet nem lehet megjeleníteni alapnézetben."
+  },
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Bár a videója a megfelelő címmel jelenik majd meg a böngészőben, az adatbázisban nem sikerült frissíteni."
   },

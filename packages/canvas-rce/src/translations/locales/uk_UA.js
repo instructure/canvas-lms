@@ -186,6 +186,9 @@ const locale = {
   "the_material_is_licensed_under_creative_commons_3242cb5e": {
     "message": "Матеріал опубліковано під ліцензією Creative Commons"
   },
+  "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
+    "message": "Це рівняння не можна перетворити у базовому режимі перегляду"
+  },
   "title_ee03d132": { "message": "Назва" },
   "unpublished_dfd8801": { "message": "Неопублікований" },
   "upload_media_ce31135a": { "message": "Завантажити медіа контент" },

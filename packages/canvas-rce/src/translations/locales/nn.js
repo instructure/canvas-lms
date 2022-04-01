@@ -150,7 +150,6 @@ const locale = {
   "describe_the_video_2fe8f46a": { "message": "(Skildre videoen)" },
   "details_98a31b68": { "message": "Detaljar" },
   "diamond_b8dfe7ae": { "message": "Diamant" },
-  "dimension_type_55c83e4e": { "message": "Dimensjonstype" },
   "dimensions_45ddb7b7": { "message": "Dimensjonar" },
   "directionality_26ae9e08": { "message": "Retningsgivande" },
   "directly_edit_latex_b7e9235b": { "message": "Rediger LaTeX direkte" },
@@ -434,6 +433,9 @@ const locale = {
   },
   "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
     "message": "I den pene HTML-editoren kan du ikkje redigere med tastatur. Trykk Shift-O for å opne den reine HTML-editoren."
+  },
+  "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
+    "message": "Kan ikkje gje att som grunnleggande vising."
   },
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Sjølv om videoen din har rett tittel i nettlesaren, er den ikkje oppdatert i databasen."

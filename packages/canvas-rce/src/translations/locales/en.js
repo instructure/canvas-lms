@@ -162,7 +162,7 @@ const locale = {
   "describe_the_video_2fe8f46a": { "message": "(Describe the video)" },
   "details_98a31b68": { "message": "Details" },
   "diamond_b8dfe7ae": { "message": "Diamond" },
-  "dimension_type_55c83e4e": { "message": "Dimension type" },
+  "dimension_type_f5fa9170": { "message": "Dimension Type" },
   "dimensions_45ddb7b7": { "message": "Dimensions" },
   "directionality_26ae9e08": { "message": "Directionality" },
   "directly_edit_latex_b7e9235b": { "message": "Directly Edit LaTeX" },
@@ -495,6 +495,9 @@ const locale = {
   },
   "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
     "message": "The pretty html editor is not keyboard accessible. Press Shift O to open the raw html editor."
+  },
+  "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
+    "message": "This equation cannot be rendered in Basic View."
   },
   "though_your_video_will_have_the_correct_title_in_t_90e427f3": {
     "message": "Though your video will have the correct title in the browser, we failed to update it in the database."
