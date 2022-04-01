@@ -147,7 +147,6 @@ const locale = {
   "describe_the_video_2fe8f46a": { "message": "（描述影片）" },
   "details_98a31b68": { "message": "詳細資料" },
   "diamond_b8dfe7ae": { "message": "鑽石形" },
-  "dimension_type_55c83e4e": { "message": "尺寸類型" },
   "dimensions_45ddb7b7": { "message": "尺寸" },
   "directionality_26ae9e08": { "message": "方向" },
   "directly_edit_latex_b7e9235b": { "message": "直接編輯 LaTeX" },

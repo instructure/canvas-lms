@@ -152,7 +152,6 @@ const locale = {
   "describe_the_video_2fe8f46a": { "message": "(Dekri videyo a)" },
   "details_98a31b68": { "message": "Detay" },
   "diamond_b8dfe7ae": { "message": "Dyaman" },
-  "dimension_type_55c83e4e": { "message": "Tip Dimansyon" },
   "dimensions_45ddb7b7": { "message": "Dimansyon" },
   "directionality_26ae9e08": { "message": "Direksyonalite" },
   "directly_edit_latex_b7e9235b": { "message": "Chanje LaTex Dirèkteman" },

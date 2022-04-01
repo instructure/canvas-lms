@@ -169,7 +169,6 @@ const locale = {
   "describe_the_video_2fe8f46a": { "message": "（ビデオを説明する）" },
   "details_98a31b68": { "message": "詳細" },
   "diamond_b8dfe7ae": { "message": "ダイヤモンド" },
-  "dimension_type_55c83e4e": { "message": "サイズタイプ" },
   "dimensions_45ddb7b7": { "message": "寸法" },
   "directionality_26ae9e08": { "message": "方向性" },
   "directly_edit_latex_b7e9235b": { "message": "ディレクトリ編集 LaTeX" },

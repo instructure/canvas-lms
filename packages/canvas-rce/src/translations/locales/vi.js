@@ -167,7 +167,6 @@ const locale = {
   "describe_the_video_2fe8f46a": { "message": "(Mô tả video)" },
   "details_98a31b68": { "message": "Chi Tiết" },
   "diamond_b8dfe7ae": { "message": "Hình Thoi" },
-  "dimension_type_55c83e4e": { "message": "Loại kích thước" },
   "dimensions_45ddb7b7": { "message": "Kích Thước" },
   "directionality_26ae9e08": { "message": "Định Hướng" },
   "directly_edit_latex_b7e9235b": { "message": "Chỉnh Sửa LaTeX Trực Tiếp" },

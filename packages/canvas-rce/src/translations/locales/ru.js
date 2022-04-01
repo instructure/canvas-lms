@@ -173,7 +173,6 @@ const locale = {
   "describe_the_video_2fe8f46a": { "message": "(опишите видео)" },
   "details_98a31b68": { "message": "Подробные сведения" },
   "diamond_b8dfe7ae": { "message": "Ромб" },
-  "dimension_type_55c83e4e": { "message": "Тип измерения" },
   "dimensions_45ddb7b7": { "message": "Размеры" },
   "directionality_26ae9e08": { "message": "Направленность" },
   "directly_edit_latex_b7e9235b": {
