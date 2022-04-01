@@ -20,6 +20,9 @@ hu:
       add_assignment_group: "Feladatcsoport hozzáadása"
   AssignmentGroupListItemView: 
     never_drop_rule: "Sose dobja el ezt: %{assignment_name}"
+    rules_text: 
+      one: "1 szabály"
+      other: "%{count}szabály"
     toggle_message: "feladat láthatóságának ki vagy bekapcsolása"
   AssignmentKeyBindingsMixin: 
     keyboard_add_item: "Feladat hozzáadása a kiválasztott csoporthoz"
@@ -77,6 +80,9 @@ hu:
     file_retrieval_error: "A fájl lekérése sikertelen"
     getting_file: "Fájl lekérése..."
     invalid_file_retrieval: "Probléma adódott az eszköz által küldött fájl lekérése közben."
+    processing_submission: "A Canvas jelenleg feldolgozza beküldését. Nyugodtan elnavigálhat erről az oldalról, és e-mailben értesítjük, ha a beadványt nem sikerül feldolgozni."
+  ExternalToolDialog: 
+    embed_from_external_tool: "Tartalom beágyazása külső eszközről"
   ExternalToolsPlugin: 
     more_external_tools: "További külső eszközök"
   GroupDetailView: 
@@ -142,22 +148,43 @@ hu:
     track_uploaded_successfully: "A hangfájl feltöltése sikeres, kérjük, frissítse a böngészőjét."
     upload: Feltöltés
     uploading: Feltöltés...
+  _2d4c0d31: "..."
   _5a374287: "..."
   _at_the_bottom__4360f2b4: "-- A lap alján --"
   _b4455c8b: "%"
+  _count_points_23dc93e0: 
+    one: "-1 pont"
+    other: "-%{count} pont"
+  _e59b5cb1: —
   a_and_b_cannot_be_used_together_77ee6a2a: "Az {a} és {b} nem használható együtt"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Egy számítási érték nem kerül használatra ezzel a számítási módszerrel"
+  a_canvas_security_token_was_just_generated_for_you_efeeac68: "Egy Canvas biztonsági tokent generáltunk a fiókjához. Ha felhasználói tokent kért, nincs szükség további teendőkre. Ha nem kért tokent, vagy szeretné kezelni a Canvas hozzáférési tokenjeit, itt megteheti:"
+  a_comma_delimited_list_of_external_tools_urls_to_i_ffe707f2: "A Drop Box Submission Count oszlopban feltüntetendő külső eszközök URL-címeinek vesszővel tagolt listája"
+  a_comma_delimited_list_of_user_ids_to_report_on_49e05a7: "A jelentéshez szükséges user_id-k vesszővel tagolt listája"
+  a_comma_delimited_string_containing_account_wide_a_b23cd19a: "Vesszővel tagolt karakterlánc, amely azon fiókszintű assignment_name értékeit tartalmazza, amelyeket ki kíván zárni"
+  a_comma_delimited_string_containing_course_code_an_18261012: "Vesszővel tagolt karakterlánc, amely kizárandó  course_code és assignment_name párokat tartalmazza"
+  a_few_seconds_ago_e43118d: "pár másodperce"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "Már létezik %{itemName} nevű fájl ebben a mappában."
+  a_file_named_name_already_exists_do_you_want_to_re_6536980: "Egy \"%{name}\" nevű fájl már létezik ezen a helyen. Le szeretné cserélni a létező fájlt?"
+  a_file_named_name_already_exists_in_this_folder_do_e39de0b2: "Egy \"%{name}\" nevű elem már létezik ebben a mappában. Le szeretné cserélni a létező fájlt?"
   a_front_page_is_required_fd57b80: "Kezdőlapot kötelező megadni"
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "Teljes méretű logó, ami a Canvas vezérlőpult jobb oldalsávján jelenik meg. Ideális mérete 360 x 140 képpont. Elfogadott formátumok: svg, png, jpeg, gif"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Egy praktikus kulcs/érték gyűjtemény, rengeteg érdekes környezeti információval a jelentést küldő felhasználónak"
+  a_json_url_is_required_please_supply_one_ed03101c: "Json URL szükséges, kérjük, adjon meg egyet!"
+  a_locked_file_named_name_already_exists_in_this_fo_33ca9a0c: "A \"%{name}\" nevű zárolt fájl már létezik ebben a mappában. Adjon meg egy új nevet!"
+  a_locked_file_named_name_already_exists_please_ent_3b2e65a: "Már létezik a \"%{name}\" nevű zárolt fájl. Adjon meg egy új nevet!"
+  a_locked_item_named_name_already_exists_in_this_lo_ab03ee39: "Egy \"%{name}\" nevű zárolt elem már létezik ezen a helyen. Adjon meg egy új nevet!"
   a_message_is_required_129e1814: "Az üzenet megadása kötelező"
+  a_microsoft_365_group_must_have_owners_and_no_user_96f91864: "A Microsoft 365 csoportnak rendelkeznie kell tulajdonosokkal, és a Canvas tanfolyam oktatóinak megfelelő felhasználók nem találhatók a Microsoft oldalán. Ha nemrég hozzáadott és eltávolított kurzustulajdonosokat, az újraszinkronizálás megoldhatja a problémát."
   a_name_for_this_set_is_required_222bad23: "A név megadása kötelező"
   a_name_is_required_b5df38a9: "A név megadása kötelező"
   a_new_assignment_has_been_created_for_your_course__12b72639: "Az új feladat létre lett hozva a  %{course_name} nevű kurzusában."
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "Egy partner azonosító szükséges az Akadémiai Teljesítményértékelés használatához"
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "Egy partner kulcs szükséges az Akadémiai Teljesítményértékelés használatához"
   a_problem_occurred_adding_reviewers_57b083d9: "Probléma lépett fel az értékelők hozzáadásakor."
+  a_process_is_already_in_progress_f4495f5e: "Egy folyamat már végrehajtás alatt áll."
+  a_redirect_uri_is_required_please_supply_one_471908db: "A redirect_uri megadása szükséges, kérjük, adjon meg egyet!"
+  a_role_name_is_required_47efd33: "A szerepnév megadása kötelező"
   a_section_is_required_64103992: "Egy szekció megadása kötelező"
   a_student_has_just_turned_in_a_late_submission_for_23f0ba9e: "Egy hallgató éppen beadott késve egy %{assignment_name} feladatot a %{course_name} kurzusban"
   a_student_has_just_turned_in_a_re_submission_for_a_9e9a17: "Egy hallgató éppen újra beadott egy %{assignment_title} feladatot a %{course_name} kurzusban"
@@ -165,12 +192,17 @@ hu:
   a_student_just_turned_in_their_anonymous_assignmen_15c4c644: "Egy hallgató éppen beadta a névtelen feladatát: %{assignment_title}"
   a_student_just_turned_in_their_anonymous_assignmen_1a0e1c47: "Egy hallgató éppen (újra) beadta a névtelen feladatát: %{assignment_title}"
   a_student_just_turned_in_their_anonymous_assignmen_75cc5465: "Egy hallgató éppen beadta (késve) a névtelen feladatát: %{assignment_name}"
+  a_suffix_cannot_be_longer_than_255_characters_plea_2f2fefd5: "Az utótag nem lehet hosszabb, mint 255 karakter. Kérjük, használjon rövidebb utótagot, és próbálja újra!"
+  a_suffix_cannot_have_any_tabs_or_spaces_please_rem_47db763e: "Az utótag nem tartalmazhat tabulátorokat vagy szóközöket. Kérjük, távolítsa el őket, és próbálja újra!"
+  a_sync_is_currently_running_please_wait_for_curren_55ccf501: "Egy szinkronizálás jelenleg fut. Kérjük, várja meg, amíg az aktuális szinkronizálás befejeződik, mielőtt másikat kezdene."
   a_table_containing_the_name_of_the_grading_scheme__8e6d32f8: "Az osztályzási rendszer nevét és a szerkesztésükre és törlésükre szolgáló gombokat tartalmazó táblázat."
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "Válaszokat és a hallgatók válaszaiból készült statisztikákat tartalmazó táblázat."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Az osztályzási rendszer adatait tartalmazó táblázat. Minden sor tartalmaz egy nevet, egy maximum százalékot, és egy minimum százalékot. Ezen kívül minden sor tartalmaz egy gombot, ami új sor hozzáadására szolgál a jelenlegi sor alá, valamint a jelenlegi sor törlésére szolgáló gombot."
+  a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "Az osztályozási séma adatait tartalmazó táblázat. Az első az osztályozási séma neve, valamint a séma szerkesztésére és törlésére szolgáló gombok. Minden sor tartalmaz egy nevet, egy maximális százalékot és egy minimális százalékot. Ezenkívül minden sor tartalmaz egy gombot az új sor hozzáadásához, és egy gombot az aktuális sor törléséhez."
   a_z_243c3301: A–Z
   a_z_29d8e67c: A–Z
   about_this_service_b10bc808: "A szolgáltatásról"
+  above_max_rating_64b29915: "Maximum érték felett"
   academic_benchmark: 
     plugin_settings: 
       api_url_description: "(pl. %{url})"
@@ -182,7 +214,12 @@ hu:
         common_core_guid: "Közös mag GUID (opcionális)"
         partner_id: Partnerazonosító
         partner_key: "Partner kulcs"
+  acalanes_union_high_grade_report_ae9bce11: "Acalanes Union High Grade Report"
   accept_2fdd362e: Elfogad
+  accept_course_invitation_b4c04fbb: "Kurzusmeghívó elfogadása"
+  accept_course_invitation_to_participate_in_this_as_b8342676: "Kurzusmeghívó elfogadása a feladatban való részvételhez"
+  accept_grades_4d56a3dd: "Értékelések elfogadása"
+  accept_grades_by_gradername_7a98b969: " %{graderName}által adott értékelések elfogadása"
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "elfogadható formátumok: hex, rgba, rgb, hsl"
   accepted_formats_svg_png_jpg_gif_f793e4bc: "Elfogadható formátumok: svg, png, jpg, gif"
   accepted_user_role_type_course_course_2ce91589: "Elfogadva: %{user}, %{role_type}, kurzus, %{course}"
