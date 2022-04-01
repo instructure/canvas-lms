@@ -38,16 +38,12 @@ describe "Discussion Topic Show" do
       user_session(@teacher)
     end
 
-    context "and when in mobile view" do
-      before do
-        resize_screen_to_mobile_width
-      end
-
-      # change test when VICE-2597 is implemented
-      it "displays mobile header" do
-        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
-        expect(fj("a.mobile-header-title:contains('#{@topic_title}')")).to be_present
-      end
+    it "removes canvas headers when embedded within mobile apps" do
+      resize_screen_to_mobile_width
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}?embed=true"
+      expect(f("body")).not_to contain_jqcss("header#mobile-header")
+      expect(f("body")).not_to contain_jqcss("header#header")
+      expect(f("input[placeholder='Search entries or author...']")).to be_present
     end
 
     it "shows the correct number of rubrics in the find rubric option" do
