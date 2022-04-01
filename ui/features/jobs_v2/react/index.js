@@ -32,6 +32,8 @@ import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconXSolid} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import tz from '@canvas/timezone'
+import moment from 'moment-timezone'
 
 const I18n = useI18nScope('jobs_v2')
 const AUTO_REFRESH_INTERVAL = 5000
@@ -136,6 +138,29 @@ function jobsReducer(prevState, action) {
       groups_refresh_nonce: prevState.groups_refresh_nonce + 1,
       jobs_refresh_nonce: prevState.jobs_refresh_nonce + 1
     }
+  } else if (action.type === 'CHANGE_DATE_OPTIONS') {
+    if (
+      action.payload.start_date !== prevState.start_date ||
+      action.payload.end_date !== prevState.end_date
+    ) {
+      return {
+        ...prevState,
+        start_date: action.payload.start_date,
+        end_date: action.payload.end_date,
+        time_zone: action.payload.time_zone,
+        groups: [],
+        jobs: [],
+        groups_page: 1,
+        jobs_page: 1,
+        groups_page_count: 1,
+        jobs_page_count: 1
+      }
+    } else {
+      return {
+        ...prevState,
+        time_zone: action.payload.time_zone
+      }
+    }
   }
 }
 
@@ -158,7 +183,10 @@ export default function JobsIndex() {
     groups_page_count: 1,
     groups_refresh_nonce: 1,
     scope: Object.keys(ENV.jobs_scope_filter)[0],
-    auto_refresh: false
+    auto_refresh: false,
+    start_date: null,
+    end_date: null,
+    time_zone: ENV?.TIMEZONE || 'UTC'
   })
 
   const bucketCaptions = useMemo(() => {
@@ -186,13 +214,28 @@ export default function JobsIndex() {
     }
   }, [])
 
+  const convertTimestamp = useCallback(
+    timestamp => {
+      if (!timestamp) return ''
+
+      // convert from the profile timezone
+      const plainDate = tz.format(timestamp, '%F %T')
+
+      // interpret in the selected timezone
+      return moment.tz(plainDate, state.time_zone).toISOString()
+    },
+    [state.time_zone]
+  )
+
   useFetchApi(
     {
       path: `/api/v1/jobs2/${state.bucket}/by_${state.group_type}`,
       params: {
         order: state.group_order,
         page: state.groups_page,
-        scope: state.scope
+        scope: state.scope,
+        start_date: convertTimestamp(state.start_date),
+        end_date: convertTimestamp(state.end_date)
       },
       loading: useCallback(loading => {
         dispatch({type: 'GROUPS_LOADING', payload: loading})
@@ -214,7 +257,9 @@ export default function JobsIndex() {
         [state.group_type]: state.group_text,
         order: state.jobs_order,
         page: state.jobs_page,
-        scope: state.scope
+        scope: state.scope,
+        start_date: convertTimestamp(state.start_date),
+        end_date: convertTimestamp(state.end_date)
       },
       loading: useCallback(loading => {
         dispatch({type: 'JOBS_LOADING', payload: loading})
@@ -254,6 +299,10 @@ export default function JobsIndex() {
         onChangeAutoRefresh={event =>
           dispatch({type: 'TOGGLE_AUTO_REFRESH', payload: event.target.value})
         }
+        startDate={state.start_date}
+        endDate={state.end_date}
+        timeZone={state.time_zone}
+        onChangeDateOptions={opts => dispatch({type: 'CHANGE_DATE_OPTIONS', payload: opts})}
       />
       <SectionRefreshHeader
         title={groupTitles[state.group_type]}
@@ -271,6 +320,7 @@ export default function JobsIndex() {
         sortColumn={state.group_order}
         onClickGroup={text => dispatch({type: 'CHANGE_GROUP_TEXT', payload: text})}
         onClickHeader={col => dispatch({type: 'CHANGE_GROUP_ORDER', payload: col})}
+        timeZone={state.time_zone}
       />
       {state.groups_page_count > 1 ? (
         <Paginator
@@ -318,6 +368,7 @@ export default function JobsIndex() {
         sortColumn={state.jobs_order}
         onClickJob={job => dispatch({type: 'SELECT_JOB', payload: job})}
         onClickHeader={col => dispatch({type: 'CHANGE_JOBS_ORDER', payload: col})}
+        timeZone={state.time_zone}
       />
       {state.jobs_page_count > 1 ? (
         <Paginator
@@ -352,7 +403,7 @@ export default function JobsIndex() {
           />
         </Flex.Item>
       </Flex>
-      <JobDetails job={state.job} />
+      <JobDetails job={state.job} timeZone={state.time_zone} />
     </>
   )
 }

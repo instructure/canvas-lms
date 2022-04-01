@@ -17,16 +17,22 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import React from 'react'
+import React, {useState} from 'react'
+import DateOptionsModal from './DateOptionsModal'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import {ToggleButton} from '@instructure/ui-buttons'
-import {View} from '@instructure/ui-view'
+import {ToggleButton, IconButton} from '@instructure/ui-buttons'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {Text} from '@instructure/ui-text'
-import {IconPlaySolid, IconPauseSolid} from '@instructure/ui-icons'
+import {
+  IconPlaySolid,
+  IconPauseSolid,
+  IconCalendarClockLine,
+  IconCalendarClockSolid
+} from '@instructure/ui-icons'
 
 const I18n = useI18nScope('jobs_v2')
 
@@ -38,8 +44,14 @@ export default function JobsHeader({
   jobScope,
   onChangeScope,
   autoRefresh,
-  onChangeAutoRefresh
+  onChangeAutoRefresh,
+  startDate,
+  endDate,
+  timeZone,
+  onChangeDateOptions
 }) {
+  const [dateModalOpen, setDateModalOpen] = useState(false)
+
   return (
     <Flex wrap="wrap">
       <Flex.Item>
@@ -60,7 +72,7 @@ export default function JobsHeader({
           </RadioInputGroup>
         </FormFieldGroup>
       </Flex.Item>
-      <Flex.Item margin="0 large">
+      <Flex.Item margin="0 medium">
         <Text color="secondary"> | </Text>
       </Flex.Item>
       <Flex.Item>
@@ -80,7 +92,7 @@ export default function JobsHeader({
           </RadioInputGroup>
         </FormFieldGroup>
       </Flex.Item>
-      <Flex.Item margin="0 large">
+      <Flex.Item margin="0 medium">
         <Text color="secondary"> | </Text>
       </Flex.Item>
       <Flex.Item align="end" margin="0 x-small x-small 0">
@@ -103,21 +115,48 @@ export default function JobsHeader({
           })}
         </SimpleSelect>
       </Flex.Item>
+      <Flex.Item margin="0 xx-small">
+        <Tooltip
+          renderTip={
+            startDate || endDate ? I18n.t('Date filter is in effect') : I18n.t('Date/Time options')
+          }
+          on={['hover', 'focus']}
+        >
+          <IconButton
+            withBorder={false}
+            withBackground={false}
+            screenReaderLabel={I18n.t('Date/Time options')}
+            onClick={() => setDateModalOpen(true)}
+          >
+            {startDate || endDate ? (
+              <IconCalendarClockSolid color="alert" />
+            ) : (
+              <IconCalendarClockLine />
+            )}
+          </IconButton>
+        </Tooltip>
+        <DateOptionsModal
+          open={dateModalOpen}
+          startDate={startDate}
+          endDate={endDate}
+          timeZone={timeZone}
+          onSave={onChangeDateOptions}
+          onClose={() => setDateModalOpen(false)}
+        />
+      </Flex.Item>
       <Flex.Item>
-        <View padding="small">
-          <ToggleButton
-            status={autoRefresh ? 'pressed' : 'unpressed'}
-            color={autoRefresh ? 'primary' : 'secondary'}
-            renderIcon={autoRefresh ? IconPauseSolid : IconPlaySolid}
-            screenReaderLabel={
-              autoRefresh ? I18n.t('Pause auto-refresh') : I18n.t('Start auto-refresh')
-            }
-            renderTooltipContent={
-              autoRefresh ? I18n.t('Pause auto-refresh') : I18n.t('Start auto-refresh')
-            }
-            onClick={onChangeAutoRefresh}
-          />
-        </View>
+        <ToggleButton
+          status={autoRefresh ? 'pressed' : 'unpressed'}
+          color={autoRefresh ? 'primary' : 'secondary'}
+          renderIcon={autoRefresh ? IconPauseSolid : IconPlaySolid}
+          screenReaderLabel={
+            autoRefresh ? I18n.t('Pause auto-refresh') : I18n.t('Start auto-refresh')
+          }
+          renderTooltipContent={
+            autoRefresh ? I18n.t('Pause auto-refresh') : I18n.t('Start auto-refresh')
+          }
+          onClick={onChangeAutoRefresh}
+        />
       </Flex.Item>
     </Flex>
   )

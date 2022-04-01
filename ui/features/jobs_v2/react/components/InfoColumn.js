@@ -19,6 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import React, {useMemo, useCallback} from 'react'
+import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
 const I18n = useI18nScope('jobs_v2')
 
@@ -56,10 +57,8 @@ export function InfoColumnHeader({bucket}) {
   return <Text>{columnTitles[bucket]}</Text>
 }
 
-export function InfoColumn({bucket, info}) {
-  const formatDate = useCallback(date_str => {
-    return I18n.l('date.formats.date_at_time', date_str)
-  }, [])
+export function InfoColumn({bucket, info, timeZone}) {
+  const formatDate = useDateTimeFormat('date.formats.full_compact', timeZone)
 
   const formatSeconds = useCallback(seconds => {
     let format

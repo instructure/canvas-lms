@@ -390,6 +390,16 @@ describe "Jobs V2 API", type: :request do
         end
       end
 
+      it "filters by start_date" do
+        start_date = 6.hours.from_now.iso8601
+        json = api_call(:get, "/api/v1/jobs2/future/by_tag?start_date=#{start_date}",
+                        { controller: "jobs_v2", action: "grouped_info", format: "json", bucket: "future", group: "tag", start_date: start_date },
+                        {}, {}, expected_status: 200)
+        expect(json.size).to eq 1
+        expect(json[0]["tag"]).to eq "Kernel.p"
+        expect(json[0]["count"]).to eq 1
+      end
+
       it "lists future jobs" do
         json = api_call(:get, "/api/v1/jobs2/future",
                         { controller: "jobs_v2", action: "list", format: "json", bucket: "future" })
@@ -447,6 +457,16 @@ describe "Jobs V2 API", type: :request do
         expect(Time.zone.parse(json[0]["info"])).to be_within(1.minute).of(1.hour.ago)
         expect(json[1]["tag"]).to eq "Kernel.raise"
         expect(Time.zone.parse(json[1]["info"])).to be_within(1.minute).of(1.day.ago)
+      end
+
+      it "filters by end_date" do
+        end_date = 6.hours.ago.iso8601
+        json = api_call(:get, "/api/v1/jobs2/failed?end_date=#{end_date}",
+                        { controller: "jobs_v2", action: "list", format: "json", bucket: "failed", end_date: end_date },
+                        {}, {}, expected_status: 200)
+        expect(json.size).to eq 1
+        expect(json[0]["tag"]).to eq "Kernel.raise"
+        expect(Time.zone.parse(json[0]["info"])).to be_within(1.minute).of(1.day.ago)
       end
 
       it "searches failed tags" do
