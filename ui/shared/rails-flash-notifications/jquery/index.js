@@ -21,7 +21,7 @@ import NotificationsHelper from './helper'
 
 const helper = new NotificationsHelper()
 
-function initFlashContainer() {
+export function initFlashContainer() {
   helper.initHolder()
   helper.initScreenreaderHolder()
 }
@@ -82,9 +82,7 @@ $.screenReaderFlashError = content => helper.createScreenreaderNode(content, fal
 $.screenReaderFlashMessageExclusive = (content, polite = false) =>
   helper.createScreenreaderNodeExclusive(content, polite)
 
-$.initFlashContainer = () => initFlashContainer()
-
-function renderServerNotifications() {
+export function renderServerNotifications() {
   if (typeof ENV !== 'undefined' && ENV && ENV.notices) {
     ENV.notices.forEach(notice => {
       const timeout = notice.content instanceof Object && notice.content.timeout
@@ -97,8 +95,5 @@ function renderServerNotifications() {
 function createScreenreaderNodeWithDelay(content, closable = true) {
   setTimeout(() => helper.createScreenreaderNode(content, closable), 100)
 }
-
-$(initFlashContainer)
-$(() => setTimeout(renderServerNotifications, 100))
 
 export default $

@@ -44,7 +44,6 @@ import 'jquery-tinypubsub' /* /\.publish\(/ */
 import 'jqueryui/resizable'
 import 'jqueryui/sortable'
 import 'jqueryui/tabs'
-import '../../../boot/initializers/trackGoogleAnalyticsEventsOnClick'
 
 const I18n = useI18nScope('instructure_js')
 
@@ -116,13 +115,15 @@ function buildUrl(url) {
   }
 }
 
-export function enhanceUserContent() {
+export function enhanceUserContent(visibilityMod) {
   if (ENV.SKIP_ENHANCING_USER_CONTENT) {
     return
   }
 
-  $('.user_content:not(.enhanced):visible').addClass('unenhanced')
-  $('.user_content.unenhanced:visible')
+  const $content = $('#content')
+  const visibilityQueryMod = visibilityMod === enhanceUserContent.ANY_VISIBILITY ? '' : ':visible'
+  $(`.user_content:not(.enhanced)${visibilityQueryMod}`).addClass('unenhanced')
+  $(`.user_content.unenhanced${visibilityQueryMod}`)
     .each(function () {
       const $this = $(this)
       $this.find('img').each((i, img) => {
@@ -307,6 +308,10 @@ export function enhanceUserContent() {
     })
 }
 
+// we need an override control for jest since ":visible" jQuery modifier will
+// always say false there
+enhanceUserContent.ANY_VISIBILITY = {}
+
 export function formatTimeAgoTitle(date) {
   const fudgedDate = $.fudgeDateForProfileTimezone(date)
   return fudgedDate.toString('MMM d, yyyy h:mmtt')
@@ -342,7 +347,7 @@ export function formatTimeAgoDate(date) {
   }
 }
 
-$(function () {
+function retriggerEarlyClicks() {
   // handle all of the click events that were triggered before the dom was ready (and thus weren't handled by jquery listeners)
   if (window._earlyClick) {
     // unset the onclick handler we were using to capture the events
@@ -360,6 +365,9 @@ $(function () {
       }, 1)
     }
   }
+}
+
+function ellipsifyBreadcrumbs() {
   // this next block of code adds the ellipsis on the breadcrumb if it overflows one line
   const $breadcrumbs = $('#breadcrumbs')
   if ($breadcrumbs.length) {
@@ -390,7 +398,13 @@ $(function () {
     $(window).resize(resizeBreadcrumb)
     // end breadcrumb ellipsis
   }
+}
+
+function bindKeyboardShortcutsHelpPanel() {
   KeyboardNavDialog.prototype.bindOpenKeys.call({$el: $('#keyboard_navigation')})
+}
+
+function warnAboutRolesBeingSwitched() {
   $('#switched_role_type').ifExists(function () {
     const context_class = $(this).attr('class')
     const $img = $('<img/>')
@@ -441,6 +455,9 @@ $(function () {
       .find('a')
       .prepend($img)
   })
+}
+
+function expandQuotedTextWhenClicked() {
   $('a.show_quoted_text_link').live('click', function (event) {
     const $text = $(this).parents('.quoted_text_holder').children('.quoted_text')
     if ($text.length > 0) {
@@ -449,6 +466,9 @@ $(function () {
       $(this).hide()
     }
   })
+}
+
+function previewEquellaContentWhenClicked() {
   $('a.equella_content_link').live('click', function (event) {
     event.preventDefault()
     let $dialog = $('#equella_preview_dialog')
@@ -488,6 +508,9 @@ $(function () {
     $dialog.dialog('close').dialog('open')
     $dialog.find('iframe').attr('src', $(this).attr('href'))
   })
+}
+
+function openDialogsWhenClicked() {
   // Adds a way to automatically open dialogs by just giving them the .dialog_opener class.
   // Uses the aria-controls attribute to specify id of dialog to open because that is already
   // a best practice accessibility-wise (as a side note you should also add "role=button").
@@ -521,6 +544,9 @@ $(function () {
       $dialog.dialog('open')
     })
   })
+}
+
+function previewFilesWhenClicked() {
   $('a.file_preview_link, a.scribd_file_preview_link').live('click', function (event) {
     if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) {
       // if any modifier keys are pressed, do the browser default thing
@@ -585,6 +611,7 @@ $(function () {
       }
     )
   })
+
   $('a.preview_in_overlay').live('click', event => {
     let target = null
     if (event.target.href) {
@@ -611,6 +638,9 @@ $(function () {
         })
     }
   })
+}
+
+function enhanceUserContentWhenAsked() {
   // publishing the 'userContent/change' will run enhanceUserContent at most once every 50ms
   let enhanceUserContentTimeout
   $.subscribe('userContent/change', () => {
@@ -618,18 +648,17 @@ $(function () {
     enhanceUserContentTimeout = setTimeout(enhanceUserContent, 50)
   })
   $(document).bind('user_content_change', enhanceUserContent)
+}
+
+function enhanceUserContentRepeatedly() {
   $(() => {
     setInterval(enhanceUserContent, 15000)
     setTimeout(enhanceUserContent, 15)
   })
-  $('.zone_cached_datetime').each(function () {
-    if ($(this).attr('title')) {
-      const datetime = tz.parse($(this).attr('title'))
-      if (datetime) {
-        $(this).text($.datetimeString(datetime))
-      }
-    }
-  })
+}
+
+// app/views/discussion_topics/_entry.html.erb
+function showDiscussionTopicSubMessagesWhenClicked() {
   $('.show_sub_messages_link').click(function (event) {
     event.preventDefault()
     $(this)
@@ -638,34 +667,10 @@ $(function () {
       .removeClass('toggled_communication_sub_message')
     $(this).parents('.communication_sub_message').remove()
   })
-  $('.show_comments_link').click(function (event) {
-    event.preventDefault()
-    $(this).closest('ul').find('li').show()
-    $(this).closest('li').remove()
-  })
-  $('.communication_message .message_short .read_more_link').click(function (event) {
-    event.preventDefault()
-    $(this)
-      .parents('.communication_message')
-      .find('.message_short')
-      .hide()
-      .end()
-      .find('.message')
-      .show()
-  })
-  $('.communication_message .close_notification_link').live('click', function (event) {
-    event.preventDefault()
-    const $message = $(this).parents('.communication_message')
-    $message.confirmDelete({
-      url: $(this).attr('rel'),
-      noMessage: true,
-      success() {
-        $(this).slideUp(function () {
-          $(this).remove()
-        })
-      }
-    })
-  })
+}
+
+// app/views/discussion_topics/_entry.html.erb
+function addDiscussionTopicEntryWhenClicked() {
   $('.communication_message .add_entry_link').click(function (event) {
     event.preventDefault()
     const $message = $(this).parents('.communication_message')
@@ -680,6 +685,9 @@ $(function () {
     $(document).triggerHandler('richTextStart', $('#' + id))
     $response.find('textarea:first').focus().select()
   })
+}
+
+function showAndHideRCEWhenAsked() {
   $(document)
     .bind('richTextStart', (event, $editor) => {
       if (!$editor || $editor.length === 0) {
@@ -701,64 +709,9 @@ $(function () {
       }
       RichContentEditor.destroyRCE($editor)
     })
-  $(
-    '.communication_message .content .links .show_users_link,.communication_message .header .show_users_link'
-  ).click(function (event) {
-    event.preventDefault()
-    $(this).parents('.communication_message').find('.content .users_list').slideToggle()
-  })
-  $('.communication_message .delete_message_link').click(function (event) {
-    event.preventDefault()
-    $(this)
-      .parents('.communication_message')
-      .confirmDelete({
-        noMessage: true,
-        url: $(this).attr('href'),
-        success() {
-          $(this).slideUp()
-        }
-      })
-  })
-  $('.communication_sub_message .add_conversation_message_form').formSubmit({
-    beforeSubmit(_data) {
-      $(this).find('button').attr('disabled', true)
-      $(this).find('.submit_button').text(I18n.t('status.posting_message', 'Posting Message...'))
-      $(this).loadingImage()
-    },
-    success(data) {
-      $(this).loadingImage('remove')
-      // message is the message div containing this form, and conversation the
-      // owning conversation. we make a copy of this div before filling it out
-      // so that we can use it for the next message (if any)
-      const $message = $(this).parents('.communication_sub_message')
-      const $conversation = $message.parents('.communication_message')
-      // fill out this message, display the new info, and remove the form
-      const message_data = data.messages[0]
-      $message.fillTemplateData({
-        data: {
-          post_date: $.datetimeString(message_data.created_at),
-          message: message_data.body
-        },
-        htmlValues: ['message']
-      })
-      $message.find('.message').show()
-      $(this).remove()
-      // turn the "add message" button back on
-      $conversation.find('.reply_message').show()
-      // notify the user and any other watchers in the document
-      $.flashMessage('Message Sent!')
-      $(document).triggerHandler('user_content_change')
-      if (window.location.pathname === '/') {
-        trackEvent('dashboard_comment', 'create')
-      }
-    },
-    error(data) {
-      $(this).loadingImage('remove')
-      $(this).find('button').attr('disabled', false)
-      $(this).find('.submit_button').text('Post Failed, Try Again')
-      $(this).formErrors(data)
-    }
-  })
+}
+
+function doThingsWhenDiscussionTopicSubMessageIsPosted() {
   $('.communication_sub_message .add_sub_message_form').formSubmit({
     beforeSubmit(_data) {
       $(this).find('button').attr('disabled', true)
@@ -822,6 +775,9 @@ $(function () {
       $(this).formErrors(data)
     }
   })
+}
+
+function cancelDiscussionTopicSubMessageWhenClicked() {
   $('.communication_sub_message form .cancel_button').click(function () {
     const $form = $(this).parents('.communication_sub_message')
     const $message = $(this).parents('.communication_message')
@@ -829,6 +785,10 @@ $(function () {
     $form.remove()
     $message.find('.reply_message').show()
   })
+}
+
+function highlightDiscussionTopicMessagesOnHover() {
+
   $('.communication_message,.communication_sub_message')
     .bind('focusin mouseenter', function () {
       $(this).addClass('communication_message_hover')
@@ -836,148 +796,9 @@ $(function () {
     .bind('focusout mouseleave', function () {
       $(this).removeClass('communication_message_hover')
     })
-  $('.communication_sub_message .more_options_reply_link').click(function (event) {
-    event.preventDefault()
-    const $form = $(this).parents('form')
-    let params = null
-    if ($form.hasClass('submission_comment_form')) {
-      params = {comment: $form.find('textarea:visible:first').val() || ''}
-    } else {
-      params = {message: $form.find('textarea:visible:first').val() || ''}
-    }
-    window.location.href = $(this).attr('href') + '?message=' + encodeURIComponent(params.message)
-  })
-  $('.communication_message.new_activity_message').ifExists(function () {
-    this.find('.message_type img').click(function () {
-      const $this = $(this),
-        c = $.trim($this.attr('class'))
-      $this.parents('.message_type').find('img').removeClass('selected')
-      $this
-        .addClass('selected')
-        .parents('.new_activity_message')
-        .find('.message_type_text')
-        .text($this.attr('title'))
-        .end()
-        .find('.activity_form')
-        .hide()
-        .end()
-        .find('textarea, :text')
-        .val('')
-        .end()
-        .find('.' + c + '_form')
-        .show()
-        .find('.context_select')
-        .change()
-    })
-    this.find('.context_select')
-      .change(function () {
-        const $this = $(this),
-          thisVal = $this.val(),
-          $message = $this.parents('.communication_message'),
-          $form = $message.find('form')
-        $form.attr('action', $message.find('.' + thisVal + '_form_url').attr('href'))
-        $form.data('context_name', this.options[this.selectedIndex].text)
-        $form.data('context_code', thisVal)
-        $message
-          .find('.roster_list')
-          .hide()
-          .find(':checkbox')
-          .each(function () {
-            $(this).attr('checked', false)
-          })
-        $message.find('.' + thisVal + '_roster_list').show()
-      })
-      .triggerHandler('change')
-    this.find('.cancel_button').click(function (_event) {
-      $(this).parents('.communication_message').hide().prev('.new_activity_message').show()
-    })
-    this.find('.new_activity_message_link').click(function (event) {
-      event.preventDefault()
-      $(this)
-        .parents('.communication_message')
-        .hide()
-        .next('.new_activity_message')
-        .find('.message_type img.selected')
-        .click()
-        .end()
-        .show()
-        .find(':text:visible:first')
-        .focus()
-        .select()
-    })
-    this.find('form.message_form').formSubmit({
-      beforeSubmit(_data) {
-        $('button').attr('disabled', true)
-        $('button.submit_button').text(I18n.t('status.posting_message', 'Posting Message...'))
-      },
-      success(data) {
-        $('button').attr('disabled', false)
-        $('button.submit_button').text('Post Message')
-        const context_code = $(this).data('context_code') || ''
-        const context_name = $(this).data('context_name') || ''
-        if ($(this).hasClass('discussion_topic_form')) {
-          const topic = data.discussion_topic
-          topic.context_code = context_name
-          topic.user_name = $('#identity .user_name').text()
-          topic.post_date = $.datetimeString(topic.created_at)
-          topic.topic_id = topic.id
-          const $template = $(this).parents('.communication_message').find('.template')
-          const $message = $template.find('.communication_message').clone(true)
-          $message
-            .find('.header .title,.behavior_content .less_important a')
-            .attr('href', $template.find('.' + context_code + '_topic_url').attr('href'))
-          $message
-            .find('.add_entry_link')
-            .attr('href', $template.find('.' + context_code + '_topics_url').attr('href'))
-          $message
-            .find('.user_name')
-            .attr('href', $template.find('.' + context_code + '_user_url').attr('href'))
-          $message
-            .find('.topic_assignment_link,.topic_assignment_url')
-            .attr('href', $template.find('.' + context_code + '_assignment_url').attr('href'))
-          $message
-            .find('.attachment_name,.topic_attachment_url')
-            .attr('href', $template.find('.' + context_code + '_attachment_url').attr('href'))
-          const entry = {discussion_topic_id: topic.id}
-          $message.fillTemplateData({
-            data: topic,
-            hrefValues: ['topic_id', 'user_id', 'assignment_id', 'attachment_id'],
-            avoid: '.subcontent'
-          })
-          $message.find('.subcontent').fillTemplateData({
-            data: entry,
-            hrefValues: ['topic_id', 'user_id']
-          })
-          $message
-            .find('.subcontent form')
-            .attr('action', $template.find('.' + context_code + '_entries_url').attr('href'))
-          $message.fillFormData(entry, {object_name: 'discussion_entry'})
-          $(this).parents('.communication_message').after($message.hide())
-          $message.slideDown()
-          $(this).parents('.communication_message').slideUp()
-          $(this).parents('.communication_message').prev('.new_activity_message').slideDown()
-        } else if ($(this).hasClass('announcement_form')) {
-          // do nothing
-        } else {
-          window.location.reload()
-        }
-      },
-      error(data) {
-        $('button').attr('disabled', false)
-        $('button.submit_button').text(
-          I18n.t('errors.posting_message_failed', 'Post Failed, Try Again')
-        )
-        $(this).formErrors(data)
-      }
-    })
-  })
-  $('#topic_list .show_all_messages_link')
-    .show()
-    .click(function (event) {
-      event.preventDefault()
-      $('#topic_list .topic_message').show()
-      $(this).hide()
-    })
+}
+
+function makeDatesPretty() {
   // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
   // vvvvvvvvvvvvvvvvv BEGIN stuf form making pretty dates vvvvvvvvvvvvvvvvvv
   // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
@@ -1006,64 +827,23 @@ $(function () {
   // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   // ^^^^^^^^^^^^^^^^^^ END stuff for making pretty dates ^^^^^^^^^^^^^^^^^^^
   // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  const sequence_url = $('#sequence_footer .sequence_details_url').filter(':last').attr('href')
-  if (sequence_url) {
-    $.ajaxJSON(sequence_url, 'GET', {}, data => {
-      const $sequence_footer = $('#sequence_footer')
-      if (data.current_item) {
-        $('#sequence_details .current').fillTemplateData({data: data.current_item.content_tag})
-        $.each({previous: '.prev', next: '.next'}, (label, cssClass) => {
-          const $link = $sequence_footer.find(cssClass)
-          if (data[label + '_item'] || data[label + '_module']) {
-            const tag =
-              (data[label + '_item'] && data[label + '_item'].content_tag) ||
-              (data[label + '_module'] && data[label + '_module'].context_module)
-            if (!data[label + '_item']) {
-              tag.title = tag.title || tag.name
-              if (tag.workflow_state === 'unpublished') {
-                tag.title += ' (' + I18n.t('draft', 'Draft') + ')'
-              }
-              tag.text =
-                label === 'previous'
-                  ? I18n.t('buttons.previous_module', 'Previous Module')
-                  : I18n.t('buttons.next_module', 'Next Module')
-              $link.addClass('module_button')
-            }
-            $link.fillTemplateData({data: tag})
-            if (data[label + '_item']) {
-              $link.attr(
-                'href',
-                $.replaceTags($sequence_footer.find('.module_item_url').attr('href'), 'id', tag.id)
-              )
-            } else {
-              $link.attr(
-                'href',
-                $.replaceTags($sequence_footer.find('.module_url').attr('href'), 'id', tag.id) +
-                  '/items/' +
-                  (label === 'previous' ? 'last' : 'first')
-              )
-            }
-          } else {
-            $link.hide()
-          }
-        })
-        $sequence_footer.show()
-        $(window).resize() // this will be helpful for things like $.fn.fillWindowWithMe so that it knows the dimensions of the page have changed.
-      }
-    })
-  } else {
-    const sf = $('#sequence_footer')
-    if (sf.length) {
-      const el = $(sf[0])
-      import('@canvas/module-sequence-footer').then(() => {
-        el.moduleSequenceFooter({
-          courseID: el.attr('data-course-id'),
-          assetType: el.attr('data-asset-type'),
-          assetID: el.attr('data-asset-id')
-        })
+}
+
+function doThingsToModuleSequenceFooter() {
+  const sf = $('#sequence_footer')
+  if (sf.length) {
+    const el = $(sf[0])
+    import('@canvas/module-sequence-footer').then(() => {
+      el.moduleSequenceFooter({
+        courseID: el.attr('data-course-id'),
+        assetType: el.attr('data-asset-type'),
+        assetID: el.attr('data-asset-id')
       })
-    }
+    })
   }
+}
+
+function showHideRemoveThingsToRightSideMoreLinksWhenClicked() {
   // this is for things like the to-do, recent items and upcoming, it
   // happend a lot so rather than duplicating it everywhere I stuck it here
   $('#right-side').delegate('.more_link', 'click', function (event) {
@@ -1080,6 +860,9 @@ $(function () {
     }
     return false
   })
+}
+
+function confirmAndDeleteRightSideTodoItemsWhenClicked() {
   $('#right-side').on('click', '.disable-todo-item-link', function (event) {
     event.preventDefault()
     const $item = $(this).parents('li, div.topic_message').last()
@@ -1107,6 +890,9 @@ $(function () {
     }
     remove(url)
   })
+}
+
+function makeAllExternalLinksExternalLinks() {
   // in 100ms (to give time for everything else to load), find all the external links and add give them
   // the external link look and behavior (force them to open in a new tab)
   setTimeout(function () {
@@ -1143,4 +929,28 @@ $(function () {
       }
     }
   }, 100)
-})
+}
+
+export default function enhanceTheEntireUniverse() {
+  retriggerEarlyClicks()
+  ellipsifyBreadcrumbs()
+  bindKeyboardShortcutsHelpPanel()
+  warnAboutRolesBeingSwitched()
+  expandQuotedTextWhenClicked()
+  previewEquellaContentWhenClicked()
+  openDialogsWhenClicked()
+  previewFilesWhenClicked()
+  enhanceUserContentWhenAsked()
+  enhanceUserContentRepeatedly()
+  showDiscussionTopicSubMessagesWhenClicked()
+  addDiscussionTopicEntryWhenClicked()
+  showAndHideRCEWhenAsked()
+  doThingsWhenDiscussionTopicSubMessageIsPosted()
+  cancelDiscussionTopicSubMessageWhenClicked()
+  highlightDiscussionTopicMessagesOnHover()
+  makeDatesPretty()
+  doThingsToModuleSequenceFooter()
+  showHideRemoveThingsToRightSideMoreLinksWhenClicked()
+  confirmAndDeleteRightSideTodoItemsWhenClicked()
+  makeAllExternalLinksExternalLinks()
+}

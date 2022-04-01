@@ -75,6 +75,8 @@ function afterDocumentReady() {
     advanceReadiness('deferredBundles')
   })
 
+  loadNewUserTutorials()
+
   // LS-1662: there are math equations on the page that
   // we don't see, so remain invisible and aren't
   // typeset my MathJax. Let's trick Canvas into knowing
@@ -132,12 +134,6 @@ function afterDocumentReady() {
     subtree: true
   })
 }
-
-// This is because most pages use this and by having it all in it's own chunk it makes webpack
-// split out a ton of stuff (like @instructure/ui-view) into multiple chunks because its chunking
-// algorithm decides that because that chunk would either be too small or it would cause more than
-// our maxAsyncRequests it should concat it into mutlple parents.
-require.include('./features/navigation_header')
 
 if (!window.bundles) window.bundles = []
 
@@ -221,16 +217,18 @@ $('body').on(
   })
 )
 
-if (
-  window.ENV.NEW_USER_TUTORIALS &&
-  window.ENV.NEW_USER_TUTORIALS.is_enabled &&
-  window.ENV.context_asset_string &&
-  splitAssetString(window.ENV.context_asset_string)[0] === 'courses'
-) {
-  // eslint-disable-next-line promise/catch-or-return
-  import('./features/new_user_tutorial/index').then(({default: initializeNewUserTutorials}) => {
-    initializeNewUserTutorials()
-  })
+function loadNewUserTutorials() {
+  if (
+    window.ENV.NEW_USER_TUTORIALS &&
+    window.ENV.NEW_USER_TUTORIALS.is_enabled &&
+    window.ENV.context_asset_string &&
+    splitAssetString(window.ENV.context_asset_string)[0] === 'courses'
+  ) {
+    // eslint-disable-next-line promise/catch-or-return
+    import('./features/new_user_tutorial/index').then(({default: initializeNewUserTutorials}) => {
+      initializeNewUserTutorials()
+    })
+  }
 }
 
 ;(window.requestIdleCallback || window.setTimeout)(() => {

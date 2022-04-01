@@ -21,6 +21,7 @@ import Backbone from '@canvas/backbone'
 import CourseSearchResultsView from 'ui/features/account_admin_tools/backbone/views/CourseSearchResultsView.js'
 import CourseRestore from 'ui/features/account_admin_tools/backbone/models/CourseRestore.js'
 import assertions from 'helpers/assertions'
+import { initFlashContainer } from '@canvas/rails-flash-notifications'
 
 const errorMessageJSON = {
   status: 'not_found',
@@ -95,7 +96,7 @@ test('options to restore a course and its details should be displayed when a del
 })
 
 test('show screenreader text when course not found', function() {
-  $.initFlashContainer()
+  initFlashContainer()
   this.courseRestore.clear({silent: true})
   this.courseRestore.set(errorMessageJSON)
   this.courseSearchResultsView.resultsFound()
@@ -107,7 +108,7 @@ test('show screenreader text when course not found', function() {
 })
 
 test('show screenreader text on finding deleted course', function() {
-  $.initFlashContainer()
+  initFlashContainer()
   this.courseRestore.set(courseJSON)
   this.courseSearchResultsView.resultsFound()
   ok(
@@ -118,7 +119,7 @@ test('show screenreader text on finding deleted course', function() {
 })
 
 test('show screenreader text on finding non-deleted course', function() {
-  $.initFlashContainer()
+  initFlashContainer()
   this.courseRestore.set({
     ...courseJSON,
     workflow_state: 'active'

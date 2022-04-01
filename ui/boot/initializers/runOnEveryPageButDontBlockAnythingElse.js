@@ -28,7 +28,6 @@ import preventDefault from 'prevent-default'
 // modules that do their own thing on every page that simply need to be required
 import '@canvas/media-comments'
 import './activateReminderControls'
-import '../../features/navigation_header/jquery/instructure'
 import './ujsLinks'
 import './expandAdminLinkMenusOnClick'
 import './activateElementToggler'
@@ -38,13 +37,7 @@ import './ping'
 import './markBrokenImages'
 import './activateLtiThumbnailLauncher'
 import './sanitizeCSSOverflow'
-
-// show and hide the courses vertical menu when the user clicks the hamburger button
-// This now lives in the courses package for usage elsewhere, but it sometimes needs
-// to work in places that don't load the courses bundle.
-import {initialize} from '@canvas/courses/jquery/toggleCourseNav'
-
-initialize()
+import './trackGoogleAnalyticsEventsOnClick'
 
 if (ENV.page_view_update_url) import('./trackPageViews')
 
