@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import '../index'
+import { initFlashContainer } from '../index'
 
 describe('FlashNotifications', () => {
   let holder = null
@@ -26,7 +26,7 @@ describe('FlashNotifications', () => {
     document.body.appendChild(holder)
     const flashHtml = "<div id='flash_message_holder'/><div id='flash_screenreader_holder'/>"
     holder.innerHTML = flashHtml
-    $.initFlashContainer()
+    initFlashContainer()
   })
   afterEach(() => {
     holder.remove()

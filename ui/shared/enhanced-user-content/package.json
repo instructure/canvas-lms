@@ -1,0 +1,8 @@
+{
+  "name": "@canvas/enhanced-user-content",
+  "main": "./jquery/index.js",
+  "description": "authentic spaghetti",
+  "version": "1.0.0",
+  "private": true,
+  "authors": ["Ahmad Amireh <ahmad@instructure.com>"]
+}
