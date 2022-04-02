@@ -374,16 +374,7 @@
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "出現問題；我不知道應該展示什麼內容。"
   },
-  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-    "message": "出現了問題，請檢查您的連線然後重試。"
-  },
   "something_went_wrong_d238c551": { "message": "似乎出問題了" },
-  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-    "message": "出現問題，請重新整理頁面後再試一次。"
-  },
-  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-    "message": "上傳出現問題，請檢查您的連線，然後再試一次。"
-  },
   "sort_by_e75f9e3e": { "message": "排序依據" },
   "square_511eb3b3": { "message": "正方形" },
   "square_unordered_list_b15ce93b": { "message": "方形無序清單" },
@@ -450,9 +441,6 @@
   "upload_media_ce31135a": { "message": "上傳媒體" },
   "upload_record_media_e4207d72": { "message": "上傳/錄製媒體" },
   "uploading_19e8a4e7": { "message": "正在上傳" },
-  "uploading_closed_captions_subtitles_failed_bc093f3": {
-    "message": "上傳隱藏圖片說明/字幕失敗。"
-  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "大寫字母有序清單"
   },

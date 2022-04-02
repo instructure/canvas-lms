@@ -456,16 +456,7 @@
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Alguna cosa no ha anat bé i no sé què puc mostrar-te."
   },
-  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-    "message": "Alguna cosa no ha anat bé; reviseu la connexió i torneu-ho a provar."
-  },
   "something_went_wrong_d238c551": { "message": "Alguna cosa no ha anat bé" },
-  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-    "message": "Alguna cosa no ha anat bé; torneu a provar-ho després d''actualitzar la pàgina"
-  },
-  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-    "message": "Alguna cosa no ha anat bé en fer la penjada; reviseu la connexió i torneu a provar-ho."
-  },
   "sort_by_e75f9e3e": { "message": "Ordena per" },
   "square_511eb3b3": { "message": "Quadrat" },
   "square_unordered_list_b15ce93b": {
@@ -538,9 +529,6 @@
     "message": "Penja o enregistra l''element multimèdia"
   },
   "uploading_19e8a4e7": { "message": "S''està penjant" },
-  "uploading_closed_captions_subtitles_failed_bc093f3": {
-    "message": "No s’han pogut penjar les llegendes ni els subtítols tancats."
-  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "llista ordenada alfabèticament en majúscules"
   },

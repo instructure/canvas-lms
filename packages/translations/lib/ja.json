@@ -1289,17 +1289,8 @@
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "何かがうまくいきませんでした。何を見せればいいのかわかりません。"
     },
-    "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-        "message": "エラーが発生しました。接続を確認して、もう一度お試しください。"
-    },
     "something_went_wrong_d238c551": {
         "message": "なにかが失敗しました"
-    },
-    "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-        "message": "問題が発生しました。ページを最新に更新してからもう一度お試しください"
-    },
-    "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-        "message": "アップロード中に問題が発生しました。接続をチェックして、もう一度お試しください。"
     },
     "sort_by_e75f9e3e": {
         "message": "分類する"
@@ -1495,9 +1486,6 @@
     },
     "uploading_19e8a4e7": {
         "message": "アップロードしています"
-    },
-    "uploading_closed_captions_subtitles_failed_bc093f3": {
-        "message": "クローズドキャプション/サブタイトルのアップロードに失敗。"
     },
     "uppercase_alphabetic_ordered_list_3f5aa6b2": {
         "message": "大文字のアルファベット順リスト"

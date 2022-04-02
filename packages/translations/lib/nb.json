@@ -1289,17 +1289,8 @@
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Noe gikk galt og jeg vet ikke hva jeg skal vise deg."
     },
-    "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-        "message": "Noe gikk galt, sjekk forbindelsen din og forsøk igjen."
-    },
     "something_went_wrong_d238c551": {
         "message": "Noe gikk galt"
-    },
-    "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-        "message": "Noe gikk galt, prøv igjen etter å ha oppdatert siden"
-    },
-    "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-        "message": "Noe gikk galt under opplasting, sjekk forbindelsen din og forsøk igjen."
     },
     "sort_by_e75f9e3e": {
         "message": "Sortert på"
@@ -1495,9 +1486,6 @@
     },
     "uploading_19e8a4e7": {
         "message": "Laster opp"
-    },
-    "uploading_closed_captions_subtitles_failed_bc093f3": {
-        "message": "Opplasting at teksting/underteksting mislyktes."
     },
     "uppercase_alphabetic_ordered_list_3f5aa6b2": {
         "message": "stor bokstav alfabetisert organisert liste"

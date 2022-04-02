@@ -432,16 +432,7 @@
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Algo deu errado e não sei o que mostrar."
   },
-  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-    "message": "Algo deu errado, verifique sua conexão e tente novamente."
-  },
   "something_went_wrong_d238c551": { "message": "Algo deu errado" },
-  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-    "message": "Algo deu errado, tente novamente após atualizar a página"
-  },
-  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-    "message": "Algo deu errado ao carregar, verifique sua conexão e tente novamente."
-  },
   "sort_by_e75f9e3e": { "message": "Ordenar por" },
   "square_511eb3b3": { "message": "Quadrado" },
   "square_unordered_list_b15ce93b": {
@@ -512,9 +503,6 @@
   "upload_media_ce31135a": { "message": "Fazer Upload de Mídia" },
   "upload_record_media_e4207d72": { "message": "Carregar/Gravar mídia" },
   "uploading_19e8a4e7": { "message": "Carregando" },
-  "uploading_closed_captions_subtitles_failed_bc093f3": {
-    "message": "Falha ao enviar closed captions/legendas."
-  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "Lista ordenada alfabeticamente e letras maiúsculas"
   },

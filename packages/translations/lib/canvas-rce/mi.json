@@ -432,16 +432,7 @@
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "I raruraru tētahi mea me taku kore e mōhio he aha te mea hei whakātu ki a koe."
   },
-  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-    "message": "I raruraru tētahi mea, tīpakotia tō hononga ka ngana anō."
-  },
   "something_went_wrong_d238c551": { "message": "I raruraru tētahi mea" },
-  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-    "message": "I raruraru tētahi mea, ngana anō i muri o te whakahoutanga i te whārangi"
-  },
-  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-    "message": "I raruraru tētahi mea i te wā o te tukuake, tīpakotia tō hononga ka ngana anō."
-  },
   "sort_by_e75f9e3e": { "message": "Wehewehe e" },
   "square_511eb3b3": { "message": "Tapawha" },
   "square_unordered_list_b15ce93b": { "message": "Tapawhā rārangi kore" },
@@ -510,9 +501,6 @@
   "upload_media_ce31135a": { "message": "Tukuatu pāpāho" },
   "upload_record_media_e4207d72": { "message": "Tukuatu/Tāhopu Pāpāpho" },
   "uploading_19e8a4e7": { "message": "E tikiake ana" },
-  "uploading_closed_captions_subtitles_failed_bc093f3": {
-    "message": "Kaweake katia Ngā Tapanga/Ngā Tuhinga i rahua."
-  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "Wakapū teitei rārangi kua rārangitia"
   },

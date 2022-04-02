@@ -1289,17 +1289,8 @@
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Un problème est survenu et je n''ai rien à vous montrer."
     },
-    "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-        "message": "Un problème est survenu. Vérifiez l’état de votre connexion, puis réessayez."
-    },
     "something_went_wrong_d238c551": {
         "message": "Un problème est survenu"
-    },
-    "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-        "message": "Quelque chose s’est mal passé, réessayez après avoir réactualisé la page"
-    },
-    "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-        "message": "L’envoi a rencontré un problème, vérifiez l’état de votre connexion, puis réessayez."
     },
     "sort_by_e75f9e3e": {
         "message": "Trier par"
@@ -1495,9 +1486,6 @@
     },
     "uploading_19e8a4e7": {
         "message": "En cours d’importation"
-    },
-    "uploading_closed_captions_subtitles_failed_bc093f3": {
-        "message": "Échec de l’envoi des sous-titres"
     },
     "uppercase_alphabetic_ordered_list_3f5aa6b2": {
         "message": "liste alphabétique ordonnée en majuscules"

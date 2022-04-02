@@ -1289,17 +1289,8 @@
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Something went wrong and I don''t know what to show you."
     },
-    "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-        "message": "Something went wrong, check your connection and try again."
-    },
     "something_went_wrong_d238c551": {
         "message": "Something went wrong"
-    },
-    "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-        "message": "Something went wrong, try again after refreshing the page"
-    },
-    "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-        "message": "Something went wrong uploading, check your connection and try again."
     },
     "sort_by_e75f9e3e": {
         "message": "Sort By"
@@ -1495,9 +1486,6 @@
     },
     "uploading_19e8a4e7": {
         "message": "Uploading"
-    },
-    "uploading_closed_captions_subtitles_failed_bc093f3": {
-        "message": "Uploading closed captions/subtitles failed."
     },
     "uppercase_alphabetic_ordered_list_3f5aa6b2": {
         "message": "uppercase alphabetic ordered list"

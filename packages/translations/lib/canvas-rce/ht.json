@@ -400,16 +400,7 @@
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Gen yon bagay ki pase mal ni mwen pa konnen kisa pou m montre w."
   },
-  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-    "message": "Yon bagay pase mal, verifye koneksyon ou epi eseye ankò."
-  },
   "something_went_wrong_d238c551": { "message": "Gen yon bagay ki pase mal" },
-  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-    "message": "Gen yon bagay ki mal fèt, eseye ankò aprè w fin aktyalize paj la"
-  },
-  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-    "message": "Gen yon bagay ki mal fèt pandan transfè a, verifye koneksyon entènèt ou a epi eseye ankò."
-  },
   "sort_by_e75f9e3e": { "message": "Triye Pa" },
   "square_511eb3b3": { "message": "Kare" },
   "square_unordered_list_b15ce93b": { "message": "lis kare non òdone" },
@@ -476,9 +467,6 @@
   "upload_media_ce31135a": { "message": "Transfè Medya" },
   "upload_record_media_e4207d72": { "message": "Transfè/Anrejistre Medya" },
   "uploading_19e8a4e7": { "message": "Chajman" },
-  "uploading_closed_captions_subtitles_failed_bc093f3": {
-    "message": "Transfè soutit la echwe."
-  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "lis alfabetik an majiskil"
   },
