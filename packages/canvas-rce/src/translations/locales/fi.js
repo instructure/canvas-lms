@@ -453,16 +453,7 @@ const locale = {
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Jotakin meni pieleen enkä tiedä, mitä näyttää sinulle,"
   },
-  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-    "message": "Jotakin meni pieleen, tarkista yhteytesi ja yritä uudelleen."
-  },
   "something_went_wrong_d238c551": { "message": "Jotakin meni pieleen." },
-  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-    "message": "Jotakin meni pieleen, yritä uudelleen sivun päivittämisen jälkeen"
-  },
-  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-    "message": "Jotakin meni pieleen latauksen suhteen, tarkista yhteytesi ja yritä uudelleen."
-  },
   "sort_by_e75f9e3e": { "message": "Lajitteluperuste" },
   "square_511eb3b3": { "message": "Neliö" },
   "square_unordered_list_b15ce93b": {
@@ -531,9 +522,6 @@ const locale = {
   "upload_media_ce31135a": { "message": "Lataa mediaa" },
   "upload_record_media_e4207d72": { "message": "Lataa/Tallennusväline" },
   "uploading_19e8a4e7": { "message": "Ladataan" },
-  "uploading_closed_captions_subtitles_failed_bc093f3": {
-    "message": "Suljettujen tekstitysten lataus epäonnistui."
-  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "aakkosellinen järjestetty isojen kirjainten lista"
   },

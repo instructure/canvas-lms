@@ -341,16 +341,7 @@ const locale = {
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Hiba történt! Nem tudom, mit mutassak."
   },
-  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-    "message": "Hiba lépett fel, kérjük ellenőrizze a kapcsolatát, és próbálja újra!"
-  },
   "something_went_wrong_d238c551": { "message": "Hiba történt!" },
-  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-    "message": "Hiba történt! Próbálja újra oldalfrissítés után."
-  },
-  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-    "message": "Hiba történt a feltöltés közben! Ellenőrizze a kapcsolatát és próbálja újra."
-  },
   "sort_by_e75f9e3e": { "message": "Rendezés alapja" },
   "square_unordered_list_b15ce93b": {
     "message": "rendezetlen lista négyzetekkel"

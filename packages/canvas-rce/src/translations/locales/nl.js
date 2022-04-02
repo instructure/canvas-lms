@@ -463,16 +463,7 @@ const locale = {
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Er is iets misgegaan en ik weet niet wat ik je moet laten zien."
   },
-  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-    "message": "Er is iets misgegaan. Controleer je verbinding en probeer het opnieuw."
-  },
   "something_went_wrong_d238c551": { "message": "Er is iets misgegaan" },
-  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-    "message": "Er is iets misgegaan. Vernieuw de pagina en probeer het opnieuw."
-  },
-  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-    "message": "Er is iets misgegaan met uploaden. Controleer je verbinding en probeer het opnieuw."
-  },
   "sort_by_e75f9e3e": { "message": "Sorteren op" },
   "square_511eb3b3": { "message": "Vierkant" },
   "square_unordered_list_b15ce93b": {
@@ -545,9 +536,6 @@ const locale = {
   "upload_media_ce31135a": { "message": "Media uploaden" },
   "upload_record_media_e4207d72": { "message": "Media uploaden/opnemen" },
   "uploading_19e8a4e7": { "message": "Bezig met uploaden" },
-  "uploading_closed_captions_subtitles_failed_bc093f3": {
-    "message": "Uploaden van bijschriften/ondertiteling is mislukt."
-  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "geordende lijst op hoofdletters alfabet"
   },
