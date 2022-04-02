@@ -432,16 +432,7 @@ const locale = {
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Eitthvað mistókst og ég veit ekki hvað ég á að sýna þér."
   },
-  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-    "message": "Eitthvað fór úrskeiðis, athugaðu tenginguna og reyndu aftur."
-  },
   "something_went_wrong_d238c551": { "message": "Eitthvað mistókst" },
-  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-    "message": "Eitthvað fór úrskeiðis, endurglæddu síðuna og reyndu aftur"
-  },
-  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-    "message": "Eitthvað fór úrskeiðis við upphleðslu, athugaðu tenginguna þína og reyndu aftur."
-  },
   "sort_by_e75f9e3e": { "message": "Raða eftir" },
   "square_511eb3b3": { "message": "Ferningur" },
   "square_unordered_list_b15ce93b": {
@@ -512,9 +503,6 @@ const locale = {
     "message": "Hlaða/taka upp margmiðlunarefni"
   },
   "uploading_19e8a4e7": { "message": "Hleður upp" },
-  "uploading_closed_captions_subtitles_failed_bc093f3": {
-    "message": "Upphleðsla textaþýðingar mistókst."
-  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "hástafa bókstafa raðaður listi"
   },

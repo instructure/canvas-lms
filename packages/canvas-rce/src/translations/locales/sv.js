@@ -453,16 +453,7 @@ const locale = {
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Något gick fel och jag vet inte vad jag ska visa dig."
   },
-  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-    "message": "Något gick fel. Kontrollera din anslutning och försök igen."
-  },
   "something_went_wrong_d238c551": { "message": "Något gick fel" },
-  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-    "message": "Något gick fel. Uppdatera sidan och försök igen."
-  },
-  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-    "message": "Något gick fel under uppladdningen. Kontrollera din anslutning och försök igen."
-  },
   "sort_by_e75f9e3e": { "message": "Sortera efter" },
   "square_511eb3b3": { "message": "Kvadrat" },
   "square_unordered_list_b15ce93b": {
@@ -533,9 +524,6 @@ const locale = {
   "upload_media_ce31135a": { "message": "Ladda upp media" },
   "upload_record_media_e4207d72": { "message": "Ladda upp/spela in media" },
   "uploading_19e8a4e7": { "message": "Laddar upp" },
-  "uploading_closed_captions_subtitles_failed_bc093f3": {
-    "message": "Det gick inte att ladda upp undertexter."
-  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "markera alfabetisk ordnad lista med versaler"
   },

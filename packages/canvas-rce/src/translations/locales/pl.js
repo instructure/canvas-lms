@@ -447,16 +447,7 @@ const locale = {
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Wystąpił błąd i nie wiadomo, co wyświetlić."
   },
-  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-    "message": "Wystąpił problem, sprawdź połączenie i spróbuj ponownie."
-  },
   "something_went_wrong_d238c551": { "message": "Coś poszło nie tak" },
-  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-    "message": "Wystąpił problem, spróbuj ponownie po odświeżeniu strony"
-  },
-  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-    "message": "Wystąpił problem podczas przesyłania, sprawdź połączenia i spróbuj ponownie."
-  },
   "sort_by_e75f9e3e": { "message": "Sortuj wg" },
   "square_511eb3b3": { "message": "Kwadrat" },
   "square_unordered_list_b15ce93b": {
@@ -529,9 +520,6 @@ const locale = {
     "message": "Przekaż/zapisz pliki multimedialne"
   },
   "uploading_19e8a4e7": { "message": "Przekazywanie" },
-  "uploading_closed_captions_subtitles_failed_bc093f3": {
-    "message": "Przesyłanie napisów/napisów dla niesłyszących nie powiodło się."
-  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "uporządkowana lista alfabetyczna, duże litery"
   },

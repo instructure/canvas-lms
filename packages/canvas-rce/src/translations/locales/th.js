@@ -435,16 +435,7 @@ const locale = {
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "มีบางอย่างผิดพลาดและเราไม่รู้ว่าจะแสดงอะไรให้กับคุณ"
   },
-  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-    "message": "มีบางอย่างผิดพลาด กรุณาตรวจสอบการเชื่อมต่อและลองใหม่อีกครั้ง"
-  },
   "something_went_wrong_d238c551": { "message": "มีบางอย่างผิดปกติ" },
-  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-    "message": "มีบางอย่างผิดพลาด ลองใหม่อีกครั้งหลังจากรีเฟรชหน้าเพจ"
-  },
-  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-    "message": "มีบางอย่างผิดพลาดในการอัพโหลด กรุณาตรวจสอบการเชื่อมต่อและลองใหม่อีกครั้ง"
-  },
   "sort_by_e75f9e3e": { "message": "จัดเรียงจาก" },
   "square_511eb3b3": { "message": "จัตุรัส" },
   "square_unordered_list_b15ce93b": {
@@ -513,9 +504,6 @@ const locale = {
   "upload_media_ce31135a": { "message": "อัพโหลดสื่อ" },
   "upload_record_media_e4207d72": { "message": "อัพโหลด/บันทึกสื่อ" },
   "uploading_19e8a4e7": { "message": "กำลังอัพโหลด" },
-  "uploading_closed_captions_subtitles_failed_bc093f3": {
-    "message": "อัพโหลดคำบรรยายแบบซ่อนได้ล้มเหลว"
-  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "รายการจัดลำดับอักษรตัวพิมพ์ใหญ่"
   },

@@ -213,6 +213,9 @@ const locale = {
   "extra_large_b6cdf1ff": { "message": "Extra Large" },
   "extra_small_9ae33252": { "message": "Extra Small" },
   "extracurricular_icon_67c8ca42": { "message": "Extracurricular Icon" },
+  "file_storage_quota_exceeded_b7846cd1": {
+    "message": "File storage quota exceeded"
+  },
   "file_url_c12b64be": { "message": "File URL" },
   "filename_file_icon_602eb5de": { "message": "{ filename } file icon" },
   "filename_image_preview_6cef8f26": {
@@ -312,6 +315,9 @@ const locale = {
   "load_more_results_460f49a9": { "message": "Load more results" },
   "loading_25990131": { "message": "Loading..." },
   "loading_bde52856": { "message": "Loading" },
+  "loading_closed_captions_subtitles_failed_95ceef47": {
+    "message": "loading closed captions/subtitles failed."
+  },
   "loading_failed_b3524381": { "message": "Loading failed..." },
   "loading_failed_e6a9d8ef": { "message": "Loading failed." },
   "loading_folders_d8b5869e": { "message": "Loading folders" },
@@ -448,16 +454,10 @@ const locale = {
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Something went wrong and I don''t know what to show you."
   },
-  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-    "message": "Something went wrong, check your connection and try again."
+  "something_went_wrong_check_your_connection_reload__c7868286": {
+    "message": "Something went wrong. Check your connection, reload the page, and try again."
   },
   "something_went_wrong_d238c551": { "message": "Something went wrong" },
-  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-    "message": "Something went wrong, try again after refreshing the page"
-  },
-  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-    "message": "Something went wrong uploading, check your connection and try again."
-  },
   "sort_by_e75f9e3e": { "message": "Sort By" },
   "square_511eb3b3": { "message": "Square" },
   "square_unordered_list_b15ce93b": { "message": "square unordered list" },
@@ -529,9 +529,6 @@ const locale = {
   "upload_media_ce31135a": { "message": "Upload Media" },
   "upload_record_media_e4207d72": { "message": "Upload/Record Media" },
   "uploading_19e8a4e7": { "message": "Uploading" },
-  "uploading_closed_captions_subtitles_failed_bc093f3": {
-    "message": "Uploading closed captions/subtitles failed."
-  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "uppercase alphabetic ordered list"
   },

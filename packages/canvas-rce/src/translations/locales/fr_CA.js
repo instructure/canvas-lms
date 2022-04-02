@@ -467,16 +467,7 @@ const locale = {
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Une erreur est survenue et je ne sais pas quoi vous montrer."
   },
-  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-    "message": "Un problème est survenu, vérifiez votre connexion et réessayez."
-  },
   "something_went_wrong_d238c551": { "message": "Une erreur est survenue" },
-  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-    "message": "Une erreur est survenue, réessayez après avoir rafraîchi la page"
-  },
-  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-    "message": "Un problème est survenu lors du téléversement, vérifiez votre connexion et réessayez."
-  },
   "sort_by_e75f9e3e": { "message": "Trier par" },
   "square_511eb3b3": { "message": "Carré" },
   "square_unordered_list_b15ce93b": { "message": "liste carrée non triée" },
@@ -551,9 +542,6 @@ const locale = {
     "message": "Téléverser/enregistrer un support média"
   },
   "uploading_19e8a4e7": { "message": "Téléversement" },
-  "uploading_closed_captions_subtitles_failed_bc093f3": {
-    "message": "Le téléversement des sous-titres/légendes a échoué."
-  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "liste alphabétique en majuscules"
   },
