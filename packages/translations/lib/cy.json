@@ -1289,17 +1289,8 @@
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Aeth rhywbeth o''i le a dydw i ddim yn gwybod beth i''w ddangos i chi."
     },
-    "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-        "message": "Aeth rhywbeth o''i le, edrychwch ar eich cysylltiad â''r a rhoi cynnig arall arni."
-    },
     "something_went_wrong_d238c551": {
         "message": "Aeth rhywbeth o’i le"
-    },
-    "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-        "message": "Aeth rhywbeth o’i le, rhowch gynnig arall arni ar ôl adnewyddu''r dudalen"
-    },
-    "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-        "message": "Aeth rhywbeth o’i le wrth lwytho i fyny, gwiriwch eich cysylltiad a rhowch gynnig arall arni."
     },
     "sort_by_e75f9e3e": {
         "message": "Trefnu yn ôl"
@@ -1495,9 +1486,6 @@
     },
     "uploading_19e8a4e7": {
         "message": "Llwytho i fyny"
-    },
-    "uploading_closed_captions_subtitles_failed_bc093f3": {
-        "message": "Llwytho capsiynau caeedig/isdeitlau i fyny wedi methu."
     },
     "uppercase_alphabetic_ordered_list_3f5aa6b2": {
         "message": "rhestr mewn trefn, mewn priflythrennau, yn nhrefn yr wyddor"

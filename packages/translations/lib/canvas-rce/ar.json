@@ -408,16 +408,7 @@
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "حدثت مشكلة ولا أعلم ماذا أعرض لك."
   },
-  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-    "message": "حدث خطأ ما، تفقد الاتصال الخاص بك وأعد المحاولة مجددًا."
-  },
   "something_went_wrong_d238c551": { "message": "حدث خطأ ما" },
-  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-    "message": "حدث خطأ ما، حاول مجدداً بعد تحديث الصفحة"
-  },
-  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-    "message": "حدث خطأ ما في التحميل، تحقق من الاتصال ثم حاول مجدداً."
-  },
   "sort_by_e75f9e3e": { "message": "الفزر حسب" },
   "square_511eb3b3": { "message": "مربع" },
   "square_unordered_list_b15ce93b": { "message": "قائمة مربعة غير مرتبة" },
@@ -484,9 +475,6 @@
   "upload_media_ce31135a": { "message": "تحميل الوسائط" },
   "upload_record_media_e4207d72": { "message": "تحميل/تسجيل الوسائط" },
   "uploading_19e8a4e7": { "message": "جارٍ التحميل" },
-  "uploading_closed_captions_subtitles_failed_bc093f3": {
-    "message": "تعذر تحميل التسميات التوضيحية/العناوين الفرعية."
-  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "قائمة أبجدية مرتبة بأحرف كبيرة"
   },

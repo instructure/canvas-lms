@@ -374,16 +374,7 @@
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "出错了，我不知道该给您看些什么。"
   },
-  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-    "message": "遇到一些问题，请检查连接并重试。"
-  },
   "something_went_wrong_d238c551": { "message": "出了些问题" },
-  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-    "message": "出现错误，请刷新页面后重试"
-  },
-  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-    "message": "上传时出了些问题，请检查您的连接并重试。"
-  },
   "sort_by_e75f9e3e": { "message": "排序" },
   "square_511eb3b3": { "message": "方形" },
   "square_unordered_list_b15ce93b": { "message": "方形无序列表" },
@@ -450,9 +441,6 @@
   "upload_media_ce31135a": { "message": "上传媒体" },
   "upload_record_media_e4207d72": { "message": "上传/录制媒体" },
   "uploading_19e8a4e7": { "message": "正在上传" },
-  "uploading_closed_captions_subtitles_failed_bc093f3": {
-    "message": "无法上传已关闭的字幕/副标题。"
-  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "大写字母有序列表"
   },

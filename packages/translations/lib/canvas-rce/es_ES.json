@@ -442,16 +442,7 @@
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Algo ha salido mal y no sé qué mostrar."
   },
-  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-    "message": "Algo ha salido mal; verifique su conexión y vuelva a intentarlo."
-  },
   "something_went_wrong_d238c551": { "message": "Ha habido un error." },
-  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-    "message": "Algo ha salido mal; inténtelo de nuevo después de actualizar la página"
-  },
-  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-    "message": "Algo ha salido mal durante la carga; compruebe su conexión e inténtelo de nuevo."
-  },
   "sort_by_e75f9e3e": { "message": "Ordenar por" },
   "square_511eb3b3": { "message": "Cuadrado" },
   "square_unordered_list_b15ce93b": { "message": "lista cuadrada no ordenada" },
@@ -518,9 +509,6 @@
   "upload_media_ce31135a": { "message": "Cargar multimedia" },
   "upload_record_media_e4207d72": { "message": "Cargar/grabar multimedia" },
   "uploading_19e8a4e7": { "message": "Cargando" },
-  "uploading_closed_captions_subtitles_failed_bc093f3": {
-    "message": "Error al cargar los subtítulos/subtítulos ocultos."
-  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "lista ordenada alfabéticamente en mayúsculas"
   },

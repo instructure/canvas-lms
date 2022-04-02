@@ -1289,17 +1289,8 @@
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Etwas ist schiefgelaufen und ich weiß nicht, was ich anzeigen soll."
     },
-    "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-        "message": "Etwas ist schiefgegangen. Überprüfen Sie Ihre Verbindung und versuchen Sie es erneut."
-    },
     "something_went_wrong_d238c551": {
         "message": "Etwas ging schief."
-    },
-    "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-        "message": "Etwas ging schief. Versuchen Sie es erneut nach dem Aktualisieren der Seite."
-    },
-    "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-        "message": "Etwas ging beim Hochladen schief. Überprüfen Sie Ihre Verbindung und versuchen Sie es erneut."
     },
     "sort_by_e75f9e3e": {
         "message": "Sortieren nach"
@@ -1495,9 +1486,6 @@
     },
     "uploading_19e8a4e7": {
         "message": "Wird hochgeladen"
-    },
-    "uploading_closed_captions_subtitles_failed_bc093f3": {
-        "message": "Das Hochladen der Untertitel ist fehlgeschlagen."
     },
     "uppercase_alphabetic_ordered_list_3f5aa6b2": {
         "message": "Alphabetisch geordnete Liste in Großbuchstaben"

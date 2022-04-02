@@ -436,16 +436,7 @@
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Prišlo je do težav in ne vem, kaj vam naj prikažem."
   },
-  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-    "message": "Prišlo je do težave; preverite svojo povezavo in poskusite znova."
-  },
   "something_went_wrong_d238c551": { "message": "Prišlo je do težav" },
-  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-    "message": "Prišlo je do težav; osvežite stran in poskusite znova."
-  },
-  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-    "message": "Pri nalaganju je prišlo do težav; preverite svojo povezavo in poskusite znova."
-  },
   "sort_by_e75f9e3e": { "message": "Razvrsti po" },
   "square_511eb3b3": { "message": "Kvadrat" },
   "square_unordered_list_b15ce93b": {
@@ -518,9 +509,6 @@
   "upload_media_ce31135a": { "message": "Naloži medije" },
   "upload_record_media_e4207d72": { "message": "Naloži/posnemi medij" },
   "uploading_19e8a4e7": { "message": "Nalaganje" },
-  "uploading_closed_captions_subtitles_failed_bc093f3": {
-    "message": "Nalaganje razširjenih podnapisov/podnapisov ni uspelo."
-  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "abecedno urejeni seznam z velikimi začetnicami"
   },

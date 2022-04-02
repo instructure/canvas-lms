@@ -430,16 +430,7 @@
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Đã xảy ra vấn đề và tôi không biết phải hiển thị gì cho bạn."
   },
-  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-    "message": "Đã xảy ra vấn đề, hãy kiểm tra kết nối của bạn rồi thử lại."
-  },
   "something_went_wrong_d238c551": { "message": "Đã xảy ra vấn đề" },
-  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-    "message": "Đã xảy ra vấn đề, hãy làm mới trang rồi thử lại"
-  },
-  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-    "message": "Đã xảy ra vấn đề khi tải lên, hãy kiểm tra kết nối của bạn rồi thử lại."
-  },
   "sort_by_e75f9e3e": { "message": "Sắp Xếp Theo" },
   "square_511eb3b3": { "message": "Vuông" },
   "square_unordered_list_b15ce93b": {
@@ -512,9 +503,6 @@
     "message": "Tải Lên/Ghi Nội Dung Phương Tiện"
   },
   "uploading_19e8a4e7": { "message": "Đang Tải Lên" },
-  "uploading_closed_captions_subtitles_failed_bc093f3": {
-    "message": "Tải lên phụ đề thất bại."
-  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "danh sách theo thứ tự bảng chữ cái viết hoa"
   },

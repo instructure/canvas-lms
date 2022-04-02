@@ -1289,17 +1289,8 @@
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Der gik noget galt, og jeg ved ikke, hvad jeg skal vise dig."
     },
-    "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-        "message": "Der gik noget galt, kontrollér din forbindelse og prøv igen."
-    },
     "something_went_wrong_d238c551": {
         "message": "Noget gik galt"
-    },
-    "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-        "message": "Der gik noget galt, opdater siden og prøv igen"
-    },
-    "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-        "message": "Der gik noget galt med uploaden, kontrollér din forbindelse og prøv igen."
     },
     "sort_by_e75f9e3e": {
         "message": "Sorter efter"
@@ -1495,9 +1486,6 @@
     },
     "uploading_19e8a4e7": {
         "message": "Uploader"
-    },
-    "uploading_closed_captions_subtitles_failed_bc093f3": {
-        "message": "Upload af undertekster mislykkedes."
     },
     "uppercase_alphabetic_ordered_list_3f5aa6b2": {
         "message": "store bogstaver alfabetisk sorteret liste"
