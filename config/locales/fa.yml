@@ -129,6 +129,7 @@ fa:
       error: "یک خطا رخ داده است. لطفا صفحه را تازه سازی کنید و دوباره تلاش کنید."
       unexpectedDeleteError: "اشکالی رخ داده است. در حال حاضر امکان حذف نیست."
       updateSuccess: "بهنگام سازی با موفقیت انجام شد"
+      userDeleteError: "گروه نتیجه شامل یک یا چند نتیجه است که در حال حاضر با محتوا مطابق هستند."
     length_error: "باید 255 نویسه یا کمتر باشد"
   OutcomeView: 
     length_error: "باید 255 نویسه یا کمتر باشد"
@@ -165,13 +166,19 @@ fa:
   _count_points_23dc93e0: 
     one: "-1 امتیاز"
     other: "-%{count} امتیاز"
+  _e59b5cb1: —
   a_and_b_cannot_be_used_together_77ee6a2a: "{a} و {b} نمی توانند با هم استفاده شوند."
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "مقدار محاسبه با این روش محاسبه استفاده نمی شود."
+  a_few_seconds_ago_e43118d: "-"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "یک فایل با عنوان %{itemName} در این پوشه موجود است."
+  a_file_named_name_already_exists_do_you_want_to_re_6536980: "یک فایل با عنوان \"%{name}\" از قبل موجود است. می خواهید با فایل موجود جایگزین شود؟"
+  a_file_named_name_already_exists_in_this_folder_do_e39de0b2: "یک فایل با عنوان \"%{name}\" از قبل موجود است. می خواهید با فایل موجود جایگزین شود؟"
   a_front_page_is_required_fd57b80: "صفحه اول مورد نیاز است"
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "یک نماد با اندازه کامل که در نوار کناری سمت راست در داشبورد کانواس ظاهر می شود. اندازه ایده آل 140 × 360 است. قالب های قابل قبول: svg، png، jpeg، gif"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "نسخه برداری آسان و کاربردی کلید/مقدار دسته ای از اطلاعات جالب زیست محیطی مربوط به کاربر گزارش دهنده"
   a_json_url_is_required_please_supply_one_ed03101c: "یک نشانه اینترنتی json مورد نیاز است، لطفا یکی ارائه کنید."
+  a_locked_file_named_name_already_exists_in_this_fo_33ca9a0c: "یک مورد قفل شده به نام \"%{name}\" در حال حاضر در این مکان وجود دارد. لطفا یک نام جدید وارد کنید."
+  a_locked_file_named_name_already_exists_please_ent_3b2e65a: "یک مورد قفل شده به نام \"%{name}\" در حال حاضر در این مکان وجود دارد. لطفا یک نام جدید وارد کنید."
   a_locked_item_named_name_already_exists_in_this_lo_ab03ee39: "یک مورد قفل شده به نام \"%{name}در حال حاضر در این مکان وجود دارد. لطفا یک نام جدید وارد کنید."
   a_message_is_required_129e1814: "یک پیام لازم است"
   a_name_for_this_set_is_required_222bad23: "یک نام برای این مجموعه لازم است"
@@ -180,8 +187,10 @@ fa:
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "یک شناسه شریک برای استفاده از معیارهای علمی لازم است."
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "یک شناسه شریک برای استفاده از معیارهای علمی لازم است."
   a_problem_occurred_adding_reviewers_57b083d9: "در هنگام افزودن بازبینی کننده ها، اشکالی رخ داد."
+  a_process_is_already_in_progress_f4495f5e: "یک فرایند از قبل در حال انجام است."
   a_public_privacy_level_will_send_the_launching_use_63bdbfaa: "یک سطح حریم خصوصی عمومی اطلاعات شناسایی کاربر راه اندازی کننده را به ارائه دهنده ابزار ارسال می کند. تنظیم این گزینه روی خصوصیات ممکن است بر ابزارهایی که به آن اطلاعات بستگی دارند تأثیر منفی بگذارد."
   a_redirect_uri_is_required_please_supply_one_471908db: "یک redirect_uri لازم است، لطفا یکی ارائه کنید."
+  a_role_name_is_required_47efd33: "نام نقش لازم است"
   a_section_is_required_64103992: "یک بخش لازم است"
   a_sis_integration_is_not_configured_and_the_enable_3c560d89: "یکپارچه سازی سامانه اطلاعات دانشجو پیکربندی نشده است و ویژگی تنظیمات فعالسازی سامانه جدید اطلاعات دانشجو فعال نیست."
   a_student_has_just_turned_in_a_late_submission_for_23f0ba9e: "یک دانشجو هم اکنون یک مورد ارسالی با تأخیر برای %{assignment_name} در درس %{course_name} تحویل داده است."
@@ -190,6 +199,9 @@ fa:
   a_student_just_turned_in_their_anonymous_assignmen_15c4c644: "یک دانشجو هم اکنون تکلیف ناشناس خود %{assignment_title} را تحویل داد."
   a_student_just_turned_in_their_anonymous_assignmen_1a0e1c47: "یک دانشجو هم اکنون تکلیف ناشناس خود %{assignment_title} را (دوباره) تحویل داد."
   a_student_just_turned_in_their_anonymous_assignmen_75cc5465: "یک دانشجو هم اکنون تکلیف (دارای تأخیر) ناشناس خود %{assignment_name} را تحویل داد."
+  a_suffix_cannot_be_longer_than_255_characters_plea_2f2fefd5: "پسوند نمیتواند بیشتر از 255 کاراکتر باشد. لطفا با یک پسوند کوتاه تر مجددا امتحان نمایید."
+  a_suffix_cannot_have_any_tabs_or_spaces_please_rem_47db763e: "یک پسوند نمیتواند شامل فضای خالی یا فاصله باشد، لطفا فاصله ها را پاک کرده و مجددا امتحان کنید."
+  a_sync_is_currently_running_please_wait_for_curren_55ccf501: "یک همگام سازی درحال اجرا است. لطفا قبل از شروع همگام سازی جدید تا پایان همگام سازی فعلی صبر کنید."
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: "یک جدول که حاوی نام طرح نمره گذاری و نمادهای ویرایش و حذف طرح است."
   a_table_containing_the_name_of_the_grading_scheme__8e6d32f8: "یک جدول حاوی نام طرح نمره گذاری و دکمه هایی برای ویرایش یا حذف طرح."
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "یک جدول حاوی پاسخ ها و آمار مختصر در ارتباط با گزینه های پاسخ دانشجو."
@@ -198,6 +210,7 @@ fa:
   a_z_243c3301: A–Z
   a_z_29d8e67c: "A - Z"
   about_this_service_b10bc808: "درباره این خدمت"
+  above_max_rating_64b29915: "امتیاز بیش از حد مجاز"
   academic_benchmark: 
     api_error: "قادر به بهنگام سازی استانداردها برای مرجع %{auth} نیست."
     bad_ab_file: "فایل معیار علمی فراهم شده یک خطا دارد."
@@ -23109,13 +23122,17 @@ fa:
   you_will_not_be_able_to_preview_your_changes_f7b868fb: "قادر نخواهید بود تغییرات را پیش نمایش دهید"
   your_answer_8dad6ea4: "پاسخ شما:"
   your_browser_does_not_meet_the_minimum_requirement_2fa7c11f: "مرورگر شما با حداقل الزامات مربوط به کانواس مطابقت ندارد. لطفا برای مشاهده فهرست کامل مرورگرهای پشتیبانی شده، از *انجمن کانواس* بازدید نمایید."
+  your_comment_is_not_posted_12677035: "نظر شما ارسال نشده است"
   your_comment_was_auto_saved_as_a_draft_c49d3510: "نظر شما به عنوان پیش نویس به طور خودکار ذخیره شد."
   your_content_has_been_exported_bbb57764: "محتوای شما صادر شده است."
   your_course_db806851: "درس شما"
   your_custom_theme_has_been_successfully_applied_eaa0fc82: "زمینه سفارشی شما با موفقیت اعمال شده است."
+  your_email_address_844297ea: "نشانی پست الکترونیکی شما"
   your_email_address_f881e583: "نشانی پست الکترونیکی شما"
   your_email_b5364bee: "پست الکترونیکی شما"
   your_file_is_being_uploaded_to_gradebook_and_you_c_70e80fc7: "فایل شما در حال بارگذاری در دفتر نمره است، و می توانید در هر زمان از این صفحه خارج شوید. اگر یک فایل CSV بزرگ دارید، بهنگام سازی تغییرات شما ممکن است چند دقیقه طول بکشد. برای جلوگیری از رونویسی هر گونه داده، لطفا قبل از ایجاد تغییرات دیگر تأیید کنید که بارگذاری انجام شده است و دفتر نمره درست می باشد."
+  your_groups_are_being_created_50156e34: "گروه های شما در حال ایجاد هستند."
+  your_homeroom_is_currently_unpublished_93c14f4f: "کلاس درس شما در حال حاضر منتشر نشده است."
   your_instructor_has_released_grade_changes_and_new_218d61bb: |-
       استاد شما تغییرات نمره و نظرات  جدبد برای %{title}، %{course} را منتشر کرد.
       
@@ -23127,6 +23144,7 @@ fa:
       %{url}
   your_message_has_been_sent_thank_you_e0284316: "پیام شما ارسال شده است. از شما سپاسگزاریم!"
   your_message_was_sent_977f6583: "پیام شما ارسال شد!"
+  your_modules_will_appear_here_after_they_re_assemb_bfd5abe8: "ماژول های شما پس از اجماع در اینجا ظاهر می شوند."
   your_name_7665e1d8: "نام شما"
   your_outcomes_were_successfully_imported_c5de884: "نتایج شما با موفقیت وارد شد."
   your_password_has_been_changed_df0e72aa: "رمزعبور شما تغییر یافته است."
@@ -23146,6 +23164,7 @@ fa:
     engine: 
       plugin_name: Zendesk
   zero_activity_title: "فعالیت صفر"
+  zip_26961da: زیپ
   zip_argument_error: "بارگذاری یک فایل zip. نیازمند یک پوشه است که در آن بارگذاری شود."
   zip_file_description: "افزونه انتقال برای باز کردن آرشیوهای zip. در درس، گروه، یا فایل های کاربر"
   zip_file_display: "وارد کردن فایل"
@@ -23166,3 +23185,5 @@ fa:
     upload: "بارگذاری آن"
     zip_options: "گزینه های فایل Zip"
   zip_no_folder_error: "پوشه موردنظر را نمی توان در این درس پیدا کرد."
+  zoom_f3e54d69: بزرگنمایی
+  zoom_tutorial_tray_5dcb7fc: "سینی خودآموز بزرگنمایی"
