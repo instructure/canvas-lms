@@ -16,13 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
 import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 import {responsiveQuerySizes} from '../../../../util/utils'
 import {MessageDetailItem} from '../MessageDetailItem'
-
-const I18n = useI18nScope('conversations_2')
 
 jest.mock('../../../../util/utils', () => ({
   ...jest.requireActual('../../../../util/utils'),
@@ -69,18 +66,7 @@ describe('MessageDetailItem', () => {
     expect(getByText(', Billy Harris')).toBeInTheDocument()
     expect(getByText('This is the body text for the message.')).toBeInTheDocument()
     expect(getByText('Fake Course 1')).toBeInTheDocument()
-
-    const dateOptions = {
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric'
-    }
-
-    const createdAt = Intl.DateTimeFormat(I18n.currentLocale(), dateOptions).format(
-      new Date(defaultProps.conversationMessage.createdAt)
-    )
-    expect(getByText(createdAt)).toBeInTheDocument()
+    expect(getByText('Apr 20, 2021 at 2:31pm')).toBeInTheDocument()
   })
 
   it('shows attachment links if they exist', () => {

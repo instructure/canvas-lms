@@ -17,6 +17,7 @@
  */
 
 import {Avatar} from '@instructure/ui-avatar'
+import DateHelper from '@canvas/datetime/dateHelper'
 import {Flex} from '@instructure/ui-flex'
 import {MessageDetailActions} from '../MessageDetailActions/MessageDetailActions'
 import {MessageDetailMediaAttachment} from '../MessageDetailMediaAttachment/MessageDetailMediaAttachment'
@@ -29,21 +30,9 @@ import {IconPaperclipLine} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {List} from '@instructure/ui-list'
 import {Text} from '@instructure/ui-text'
-import {useScope as useI18nScope} from '@canvas/i18n'
-
-const I18n = useI18nScope('conversations_2')
 
 export const MessageDetailItem = ({...props}) => {
-  const dateOptions = {
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric'
-  }
-
-  const createdAt = Intl.DateTimeFormat(I18n.currentLocale(), dateOptions).format(
-    new Date(props.conversationMessage.createdAt)
-  )
+  const createdAt = DateHelper.formatDatetimeForDisplay(props.conversationMessage.createdAt)
 
   return (
     <Responsive

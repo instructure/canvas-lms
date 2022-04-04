@@ -20,6 +20,7 @@ import {Badge} from '@instructure/ui-badge'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {ConversationContext} from '../../../util/constants'
+import DateHelper from '@canvas/datetime/dateHelper'
 import {Focusable} from '@instructure/ui-focusable'
 import {Grid} from '@instructure/ui-grid'
 import {
@@ -137,11 +138,6 @@ export const ConversationListItem = ({...props}) => {
     )
   }
 
-  const formatDate = rawDate => {
-    const date = new Date(rawDate)
-    return date.toDateString()
-  }
-
   return (
     <Responsive
       match="media"
@@ -229,7 +225,7 @@ export const ConversationListItem = ({...props}) => {
                 </Grid.Col>
                 <Grid.Col>
                   <Text color="brand" size={responsiveProps.date.size}>
-                    {formatDate(
+                    {DateHelper.formatDateForDisplay(
                       isSubmissionComments
                         ? props.submissionComments.commentsConnection.nodes[0].createdAt
                         : props.conversation.conversationMessagesConnection.nodes[0]?.createdAt

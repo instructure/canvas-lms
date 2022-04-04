@@ -238,7 +238,7 @@ describe('ConversationListItem', () => {
       })
       const {getByText} = render(<ConversationListItem {...props} />)
 
-      expect(getByText('Tue Feb 15 2022')).toBeTruthy()
+      expect(getByText('Feb 15, 2022')).toBeTruthy()
     })
 
     it('renders author', () => {
