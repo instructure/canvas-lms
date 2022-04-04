@@ -97,9 +97,9 @@ enhanced_gradebook_filters:
     wrapper: <a href="https://community.canvaslms.com/t5/Gradebook-Filters/gh-p/Gradebook-Filters">\1</a>
     enhanced_gradebook_filters_description:
       This feature provides enhanced filtering options in the Canvas gradebook. When
-       this flag is enabled, early access to ongoing improvements will be displayed 
-       automatically with every release. For full details, please see the *Gradebook 
-       Filters User Group* in the Canvas Community.
+      this flag is enabled, early access to ongoing improvements will be displayed
+      automatically with every release. For full details, please see the *Gradebook
+      Filters User Group* in the Canvas Community.
 remove_gradebook_student_search_delay:
   state: hidden
   applies_to: SiteAdmin
@@ -115,7 +115,7 @@ apply_score_to_ungraded:
   state: hidden
   applies_to: Account
   display_name: Apply Score to Ungraded
-  description: Allows instructors to apply scores to ungraded submissions en masse from assignment 
+  description: Allows instructors to apply scores to ungraded submissions en masse from assignment
     group and Total column menus in the Gradebook.
   environments:
     development:
@@ -150,3 +150,9 @@ updated_mastery_connect_icon:
       state: on # enable for local development
     test:
       state: on # enable for the deployed 'test' environment
+visibility_feedback_student_grades_page:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Improve Feedback on Students Grade Page
+  description: Students will be able to more easily recognize when
+    feedback has been provided by an instructor/grader ...
