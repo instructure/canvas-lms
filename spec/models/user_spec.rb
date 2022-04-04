@@ -1024,16 +1024,124 @@ describe User do
 
   describe "can_masquerade?" do
     it "allows self" do
-      @user = user_with_pseudonym(username: "nobody1@example.com")
-      expect(@user.can_masquerade?(@user, Account.default)).to be_truthy
+      user = user_with_pseudonym(username: "nobody1@example.com")
+      expect(user.can_masquerade?(user, Account.default)).to be_truthy
     end
 
     it "does not allow other users" do
-      @user1 = user_with_pseudonym(username: "nobody1@example.com")
-      @user2 = user_with_pseudonym(username: "nobody2@example.com")
+      user1 = user_with_pseudonym(username: "nobody1@example.com")
+      user2 = user_with_pseudonym(username: "nobody2@example.com")
 
-      expect(@user1.can_masquerade?(@user2, Account.default)).to be_falsey
-      expect(@user2.can_masquerade?(@user1, Account.default)).to be_falsey
+      expect(user1.can_masquerade?(user2, Account.default)).to be_falsey
+      expect(user2.can_masquerade?(user1, Account.default)).to be_falsey
+    end
+
+    context "when course admin role masquerade permission check feature preview is enabled" do
+      before(:once) do
+        @account = Account.default
+        @account.enable_feature!(:course_admin_role_masquerade_permission_check)
+      end
+
+      it "calls #includes_subset_of_course_admin_permissions? if self is a course admin user" do
+        allow_any_instance_of(User).to receive(:includes_subset_of_course_admin_permissions?).and_return(true)
+        course_admin = user_with_pseudonym(username: "nobody@example.com")
+        course_with_user("TeacherEnrollment", user: course_admin)
+        admin = user_with_pseudonym(username: "nobody2@example.com")
+        @account.account_users.create!(user: admin)
+        expect_any_instance_of(User).to receive(:includes_subset_of_course_admin_permissions?).once
+        course_admin.can_masquerade?(admin, @account)
+      end
+
+      it "does not call #includes_subset_of_course_admin_permissions? if self is an account user" do
+        allow_any_instance_of(User).to receive(:includes_subset_of_course_admin_permissions?).and_return(true)
+        admin = user_with_pseudonym(username: "nobody@example.com")
+        admin2 = user_with_pseudonym(username: "nobody2@example.com")
+        @account.account_users.create!(user: admin)
+        @account.account_users.create!(user: admin2)
+        expect_any_instance_of(User).not_to receive(:includes_subset_of_course_admin_permissions?)
+        admin.can_masquerade?(admin2, @account)
+      end
+
+      it "does not allow restricted admins to become course admins with elevated permissions" do
+        user = user_with_pseudonym(username: "nobody1@example.com")
+        course_admin = course_with_user("TeacherEnrollment").user
+        restricted_admin = user_with_pseudonym(username: "nobody2@example.com")
+        role = custom_account_role("Restricted", account: @account)
+        account_admin_user_with_role_changes(
+          user: restricted_admin,
+          role: role,
+          role_changes: { become_user: true, view_all_grades: false }
+        )
+        expect(user.can_masquerade?(restricted_admin, @account)).to be_truthy
+        expect(course_admin.can_masquerade?(restricted_admin, @account)).to be_falsey
+      end
+
+      describe "all_course_admin_type_permissions_for" do
+        let(:user) { user_factory }
+        let(:role1) { custom_teacher_role("Custom Teacher Role", account: @account) }
+        let(:role2) { custom_designer_role("Custom Designer Role", account: @account) }
+
+        it "includes granted permissions from multiple course admin type roles" do
+          course_with_user("TeacherEnrollment", user: user)
+          course_with_user("TeacherEnrollment", user: user, role: role1)
+          course_with_user("DesignerEnrollment", user: user, role: role2)
+
+          permissions = User.all_course_admin_type_permissions_for(user)
+          # Teacher roles
+          expect(permissions[:view_all_grades].count).to eq 2
+          expect(permissions[:read_sis].count).to eq 2
+          # Teacher + Designer roles
+          expect(permissions[:manage_wiki_create].count).to eq 3
+          expect(permissions[:manage_wiki_delete].count).to eq 3
+        end
+
+        it "excludes non course admin type roles" do
+          course_with_user("StudentEnrollment", user: user)
+
+          permissions = User.all_course_admin_type_permissions_for(user)
+          expect(permissions.values.all?(&:empty?)).to be_truthy
+        end
+
+        it "returns an initialized permission hash even if no enrollments are present" do
+          permissions = User.all_course_admin_type_permissions_for(user)
+
+          expect(permissions.values.all?(&:empty?)).to be_truthy
+        end
+      end
+
+      describe "#includes_subset_of_course_admin_permissions?" do
+        let(:masquerader) { User.new }
+        let(:masqueradee) { User.new }
+
+        it "returns true if masqueradee is the masquerader" do
+          expect(masqueradee.includes_subset_of_course_admin_permissions?(masqueradee, nil)).to be_truthy
+        end
+
+        it "returns false if the account is not a root account" do
+          account = double(root_account?: false)
+          expect(masqueradee.includes_subset_of_course_admin_permissions?(masquerader, account)).to be_falsey
+        end
+
+        it "is true when all permissions for current user are subsets of target user" do
+          account = double(root_account?: true)
+          masquerader_permissions = { become_user: [true], view_all_grades: [true] }
+          masqueradee_permissions = { view_all_grades: [true] }
+          allow(AccountUser).to receive(:all_permissions_for).and_return(masquerader_permissions)
+          allow(User).to receive(:all_course_admin_type_permissions_for).and_return(masqueradee_permissions)
+
+          expect(masqueradee.includes_subset_of_course_admin_permissions?(masquerader, account)).to be_truthy
+        end
+
+        it "is false when any permission for current user is not a subset of target user" do
+          account = double(root_account?: true)
+          masquerader_permissions = { become_user: [true], view_all_grades: [] }
+          masqueradee_permissions = { view_all_grades: [true] }
+          allow(AccountUser).to receive(:all_permissions_for).and_return(masquerader_permissions)
+          allow(User).to receive(:all_course_admin_type_permissions_for).and_return(masqueradee_permissions)
+
+          expect(masqueradee.includes_subset_of_course_admin_permissions?(masquerader, account)).to be_falsey
+        end
+      end
     end
 
     it "allows site and account admins" do
