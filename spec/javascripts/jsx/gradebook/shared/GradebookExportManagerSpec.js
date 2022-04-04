@@ -18,7 +18,7 @@
 
 import moxios from 'moxios'
 
-import GradebookExportManager from 'ui/features/gradebook/react/shared/GradebookExportManager.js'
+import GradebookExportManager from 'ui/features/gradebook/react/shared/GradebookExportManager'
 
 const currentUserId = 42
 const exportingUrl = 'http://exportingUrl'
@@ -165,7 +165,8 @@ test('sets show_student_first_last_name setting if requested', function () {
   }
 
   const getAssignmentOrder = () => []
-  return this.subject.startExport(undefined, getAssignmentOrder, true).then(() => {
+  const getStudentOrder = () => []
+  return this.subject.startExport(undefined, getAssignmentOrder, true, getStudentOrder).then(() => {
     const postData = JSON.parse(moxios.requests.mostRecent().config.data)
     propEqual(postData.show_student_first_last_name, true)
   })
@@ -178,10 +179,13 @@ test('does not set show_student_first_last_name setting by default', function ()
   }
 
   const getAssignmentOrder = () => []
-  return this.subject.startExport(undefined, getAssignmentOrder).then(() => {
-    const postData = JSON.parse(moxios.requests.mostRecent().config.data)
-    propEqual(postData.show_student_first_last_name, false)
-  })
+  const getStudentOrder = () => []
+  return this.subject
+    .startExport(undefined, getAssignmentOrder, false, getStudentOrder)
+    .then(() => {
+      const postData = JSON.parse(moxios.requests.mostRecent().config.data)
+      propEqual(postData.show_student_first_last_name, false)
+    })
 })
 
 test('includes assignment_order if getAssignmentOrder returns some assignments', function () {
@@ -191,10 +195,13 @@ test('includes assignment_order if getAssignmentOrder returns some assignments',
   }
 
   const getAssignmentOrder = () => ['1', '2', '3']
-  return this.subject.startExport(undefined, getAssignmentOrder).then(() => {
-    const postData = JSON.parse(moxios.requests.mostRecent().config.data)
-    propEqual(postData.assignment_order, ['1', '2', '3'])
-  })
+  const getStudentOrder = () => []
+  return this.subject
+    .startExport(undefined, getAssignmentOrder, false, getStudentOrder)
+    .then(() => {
+      const postData = JSON.parse(moxios.requests.mostRecent().config.data)
+      propEqual(postData.assignment_order, ['1', '2', '3'])
+    })
 })
 
 test('does not include assignment_order if getAssignmentOrder returns no assignments', function () {
@@ -204,10 +211,13 @@ test('does not include assignment_order if getAssignmentOrder returns no assignm
   }
 
   const getAssignmentOrder = () => []
-  return this.subject.startExport(undefined, getAssignmentOrder).then(() => {
-    const postData = JSON.parse(moxios.requests.mostRecent().config.data)
-    equal(postData.assignment_order, undefined)
-  })
+  const getStudentOrder = () => []
+  return this.subject
+    .startExport(undefined, getAssignmentOrder, false, getStudentOrder)
+    .then(() => {
+      const postData = JSON.parse(moxios.requests.mostRecent().config.data)
+      equal(postData.assignment_order, undefined)
+    })
 })
 
 test('returns a rejected promise if the manager has no exportingUrl set', function () {
@@ -215,7 +225,12 @@ test('returns a rejected promise if the manager has no exportingUrl set', functi
   this.subject.exportingUrl = undefined
 
   return this.subject
-    .startExport(undefined, () => [])
+    .startExport(
+      undefined,
+      () => [],
+      false,
+      () => []
+    )
     .catch(reason => {
       equal(reason, 'No way to export gradebooks provided!')
     })
@@ -225,7 +240,12 @@ test('returns a rejected promise if the manager already has an export going', fu
   this.subject = new GradebookExportManager(exportingUrl, currentUserId, workingExport)
 
   return this.subject
-    .startExport(undefined, () => [])
+    .startExport(
+      undefined,
+      () => [],
+      false,
+      () => []
+    )
     .catch(reason => {
       equal(reason, 'An export is already in progress.')
     })
@@ -243,7 +263,12 @@ test('sets a new existing export and returns a fulfilled promise', function () {
   }
 
   return this.subject
-    .startExport(undefined, () => [])
+    .startExport(
+      undefined,
+      () => [],
+      false,
+      () => []
+    )
     .then(() => {
       deepEqual(this.subject.export, expectedExport)
     })
@@ -254,7 +279,12 @@ test('clears any new export and returns a rejected promise if no monitoring is p
   this.subject = new GradebookExportManager(exportingUrl, currentUserId)
 
   return this.subject
-    .startExport(undefined, () => [])
+    .startExport(
+      undefined,
+      () => [],
+      false,
+      () => []
+    )
     .catch(reason => {
       equal(reason, 'No way to monitor gradebook exports provided!')
       equal(this.subject.export, undefined)
@@ -275,7 +305,12 @@ test('starts polling for progress and returns a rejected promise on progress fai
   })
 
   return this.subject
-    .startExport(undefined, () => [])
+    .startExport(
+      undefined,
+      () => [],
+      false,
+      () => []
+    )
     .catch(reason => {
       equal(reason, 'Error exporting gradebook: Arbitrary failure')
     })
@@ -295,7 +330,12 @@ test('starts polling for progress and returns a rejected promise on unknown prog
   })
 
   return this.subject
-    .startExport(undefined, () => [])
+    .startExport(
+      undefined,
+      () => [],
+      false,
+      () => []
+    )
     .catch(reason => {
       equal(reason, 'Error exporting gradebook: Pattern buffer degradation')
     })
@@ -323,7 +363,12 @@ test('starts polling for progress and returns a fulfilled promise on progress co
   })
 
   return this.subject
-    .startExport(undefined, () => [])
+    .startExport(
+      undefined,
+      () => [],
+      false,
+      () => {}
+    )
     .then(resolution => {
       equal(this.subject.export, undefined)
 

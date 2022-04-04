@@ -2021,6 +2021,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         publishToSisUrl: this.options.publish_to_sis_url
       },
       gradingPeriodId: this.state.gradingPeriodId,
+      getStudentOrder: this.getStudentOrder,
       getAssignmentOrder: this.getAssignmentOrder
     }
     const progressData = this.options.gradebook_csv_progress

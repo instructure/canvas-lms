@@ -119,7 +119,13 @@ class GradebookExportManager {
     }, this.pollingInterval)
   }
 
-  startExport(gradingPeriodId, getAssignmentOrder, showStudentFirstLastName = false) {
+  startExport(
+    gradingPeriodId,
+    getAssignmentOrder,
+    showStudentFirstLastName = false,
+    getStudentOrder,
+    currentView = false
+  ) {
     if (!this.exportingUrl) {
       return Promise.reject(I18n.t('No way to export gradebooks provided!'))
     }
@@ -130,7 +136,9 @@ class GradebookExportManager {
     }
 
     const params = {
-      grading_period_id: gradingPeriodId
+      grading_period_id: gradingPeriodId,
+      show_student_first_last_name: showStudentFirstLastName,
+      current_view: currentView
     }
 
     const assignmentOrder = getAssignmentOrder()
@@ -138,7 +146,10 @@ class GradebookExportManager {
       params.assignment_order = assignmentOrder
     }
 
-    params.show_student_first_last_name = showStudentFirstLastName
+    const studentOrder = getStudentOrder()
+    if (studentOrder && studentOrder.length > 0) {
+      params.student_order = studentOrder.map(Number)
+    }
 
     return axios.post(this.exportingUrl, params).then(response => {
       this.export = {

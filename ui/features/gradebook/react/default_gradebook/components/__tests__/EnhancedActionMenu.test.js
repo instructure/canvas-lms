@@ -36,6 +36,7 @@ const getPromise = (type, object = defaultResult) => {
 
 const workingMenuProps = () => ({
   getAssignmentOrder() {},
+  getStudentOrder() {},
   gradebookIsEditable: true,
   contextAllowsGradebookUploads: true,
   gradebookImportUrl: 'http://gradebookImportUrl',
@@ -130,11 +131,20 @@ describe('EnhancedActionMenu', () => {
       expect(specificMenuItem).toHaveTextContent('Import')
     })
 
-    it('renders the New Export menu item', async () => {
+    it('renders the Export Current Gradebook View menu item', async () => {
       component = renderComponent(props)
       clickOnDropdown('Export')
       const specificMenuItem = component.getByRole('menuitem', {
-        name: 'New Export'
+        name: 'Export Current Gradebook View'
+      })
+      expect(specificMenuItem).toBeInTheDocument()
+    })
+
+    it('renders the Export Entire Gradebook menu item', async () => {
+      component = renderComponent(props)
+      clickOnDropdown('Export')
+      const specificMenuItem = component.getByRole('menuitem', {
+        name: 'Export Entire Gradebook'
       })
       expect(specificMenuItem).toBeInTheDocument()
     })
@@ -148,7 +158,7 @@ describe('EnhancedActionMenu', () => {
       expect(specificMenuItem).toBeInTheDocument()
     })
 
-    it('updates the New Export date when export success', async () => {
+    it('updates the Previous Export date when export success', async () => {
       const exportResult = getPromise('resolved', {
         ...defaultResult,
         updatedAt: '2021-05-12T13:00:00Z'
@@ -157,12 +167,12 @@ describe('EnhancedActionMenu', () => {
       startExport.mockReturnValue(exportResult)
       component = renderComponent(props)
       clickOnDropdown('Export')
-      selectDropdownOption('New Export')
+      selectDropdownOption('Export Entire Gradebook')
       await waitFor(() => {
         clickOnDropdown('Export')
       })
       const specificMenuItem = component.getByRole('menuitem', {
-        name: 'New Export (May 12, 2021 at 1pm)'
+        name: 'Previous Export (May 12, 2021 at 1pm)'
       })
       expect(specificMenuItem).toBeInTheDocument()
     })
@@ -219,7 +229,7 @@ describe('EnhancedActionMenu', () => {
       startExport.mockReturnValue(exportResult)
       const spy = jest.spyOn(window.$, 'flashMessage').mockReturnValue(true)
       act(() => {
-        selectDropdownOption('New Export')
+        selectDropdownOption('Export Current Gradebook View')
       })
       await waitFor(() => {
         expect(spy).toHaveBeenCalled()
@@ -227,17 +237,19 @@ describe('EnhancedActionMenu', () => {
       })
     })
 
-    it('changes the "Export" menu item to indicate the export is in progress', async () => {
+    it('changes the "Export Current Gradebook View" and "Export Entire Gradebook" menu items to indicate the export is in progress', async () => {
       const exportResult = getPromise('resolved')
       startExport.mockReturnValue(exportResult)
       act(() => {
-        selectDropdownOption('New Export')
+        selectDropdownOption('Export Current Gradebook View')
       })
       clickOnDropdown('Export')
-      const specificMenuItem = component.getByRole('menuitem', {name: /Export in progress/})
+      const specificMenuItems = component.getAllByRole('menuitem', {name: /Export in progress/})
       await waitFor(() => {
-        expect(specificMenuItem).toBeInTheDocument()
-        expect(specificMenuItem).toHaveAttribute('aria-disabled', 'true')
+        expect(specificMenuItems[0]).toBeInTheDocument()
+        expect(specificMenuItems[1]).toBeInTheDocument()
+        expect(specificMenuItems[0]).toHaveAttribute('aria-disabled', 'true')
+        expect(specificMenuItems[1]).toHaveAttribute('aria-disabled', 'true')
       })
     })
 
@@ -245,7 +257,7 @@ describe('EnhancedActionMenu', () => {
       const exportResult = getPromise('resolved')
       startExport.mockReturnValue(exportResult)
       act(() => {
-        selectDropdownOption('New Export')
+        selectDropdownOption('Export Current Gradebook View')
       })
       await waitFor(() => {
         expect(startExport).toHaveBeenCalled()
@@ -256,7 +268,7 @@ describe('EnhancedActionMenu', () => {
       const exportResult = getPromise('resolved')
       startExport.mockReturnValue(exportResult)
       act(() => {
-        selectDropdownOption('New Export')
+        selectDropdownOption('Export Current Gradebook View')
       })
       await waitFor(() => {
         expect(startExport.mock.calls[0][0]).toEqual('1234')
@@ -267,7 +279,7 @@ describe('EnhancedActionMenu', () => {
       const exportResult = getPromise('resolved')
       startExport.mockReturnValue(exportResult)
       act(() => {
-        selectDropdownOption('New Export')
+        selectDropdownOption('Export Current Gradebook View')
       })
       await waitFor(() => {
         expect(startExport.mock.calls[0][2]).toEqual(true)
@@ -278,25 +290,43 @@ describe('EnhancedActionMenu', () => {
       const exportResult = getPromise('resolved')
       startExport.mockReturnValue(exportResult)
       act(() => {
-        selectDropdownOption('New Export')
+        selectDropdownOption('Export Current Gradebook View')
       })
       await waitFor(() => expect(window.location.href).toEqual(defaultResult.attachmentUrl))
     })
 
-    it('on success, re-enables the "New Export" menu item', async () => {
+    it('on success, re-enables the "Export Entire Gradebook" menu item', async () => {
       const exportResult = getPromise('resolved')
       startExport.mockReturnValue(exportResult)
       act(() => {
-        selectDropdownOption('New Export')
+        selectDropdownOption('Export Entire Gradebook')
       })
       await waitFor(() => {
         clickOnDropdown('Export')
       })
       const specificMenuItem = document
-        .querySelector('[data-menu-id="previous-export"]')
+        .querySelector('[data-menu-id="export-all"]')
         .closest('[role="menuitem"]')
       await waitFor(() => {
-        expect(specificMenuItem).toHaveTextContent('New Export')
+        expect(specificMenuItem).toHaveTextContent('Export Entire Gradebook')
+        expect(specificMenuItem).not.toHaveAttribute('aria-disabled', 'true')
+      })
+    })
+
+    it('on success, re-enables the "Export Current Gradebook View" menu item', async () => {
+      const exportResult = getPromise('resolved')
+      startExport.mockReturnValue(exportResult)
+      act(() => {
+        selectDropdownOption('Export Current Gradebook View')
+      })
+      await waitFor(() => {
+        clickOnDropdown('Export')
+      })
+      const specificMenuItem = document
+        .querySelector('[data-menu-id="export"]')
+        .closest('[role="menuitem"]')
+      await waitFor(() => {
+        expect(specificMenuItem).toHaveTextContent('Export Current Gradebook View')
         expect(specificMenuItem).not.toHaveAttribute('aria-disabled', 'true')
       })
     })
@@ -306,7 +336,7 @@ describe('EnhancedActionMenu', () => {
       const exportResult = getPromise('rejected')
       startExport.mockReturnValue(exportResult)
       act(() => {
-        selectDropdownOption('New Export')
+        selectDropdownOption('Export Current Gradebook View')
       })
       await waitFor(() => {
         expect(spy).toHaveBeenCalled()
@@ -316,21 +346,26 @@ describe('EnhancedActionMenu', () => {
       })
     })
 
-    it('on failure, renables the "New Export" menu item', async () => {
+    it('on failure, renables the "Export Current Gradebook View" and "Export Entire Gradebook" menu items', async () => {
       const exportResult = getPromise('rejected')
       startExport.mockReturnValue(exportResult)
       act(() => {
-        selectDropdownOption('New Export')
+        selectDropdownOption('Export Current Gradebook View')
       })
       await waitFor(() => {
         clickOnDropdown('Export')
       })
-      const specificMenuItem = document
+      const exportMenuItem = document
         .querySelector('[data-menu-id="export"]')
         .closest('[role="menuitem"]')
+      const exportAllMenuItem = document
+        .querySelector('[data-menu-id="export-all"]')
+        .closest('[role="menuitem"]')
       await waitFor(() => {
-        expect(specificMenuItem).toHaveTextContent('New Export')
-        expect(specificMenuItem).not.toHaveAttribute('aria-disabled', 'true')
+        expect(exportMenuItem).toHaveTextContent('Export Current Gradebook View')
+        expect(exportMenuItem).not.toHaveAttribute('aria-disabled', 'true')
+        expect(exportAllMenuItem).toHaveTextContent('Export Entire Gradebook')
+        expect(exportAllMenuItem).not.toHaveAttribute('aria-disabled', 'true')
       })
     })
   })

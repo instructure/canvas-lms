@@ -90,7 +90,11 @@ class GradebookExporter
     end
 
     # remove duplicate enrollments for students enrolled in multiple sections
-    student_enrollments = student_enrollments.uniq(&:user_id)
+    student_enrollments = if @options[:current_view]
+                            student_enrollments.select { |s| @options[:student_order].include?(s[:user_id]) }.uniq(&:user_id)
+                          else
+                            student_enrollments.uniq(&:user_id)
+                          end
 
     # TODO: Stop using the grade calculator and instead use the scores table entirely.
     # This cannot be done until we are storing points values in the scores table, which
@@ -105,8 +109,12 @@ class GradebookExporter
 
     submissions = {}
     calc.submissions.each { |s| submissions[[s.user_id, s.assignment_id]] = s }
+    assignments = if @options[:current_view]
+                    calc.gradable_assignments.select { |a| @options[:assignment_order].include?(a[:id]) }
+                  else
+                    calc.gradable_assignments
+                  end
 
-    assignments = select_in_grading_period(calc.gradable_assignments).to_a
     Assignment.preload_unposted_anonymous_submissions(assignments)
 
     ActiveRecord::Associations.preload(assignments, :assignment_group)
@@ -390,6 +398,7 @@ class GradebookExporter
   end
 
   def show_totals?
+    return false if !@options[:current_view] && @course.grading_periods?
     return true unless @course.grading_periods?
     return true if @options[:grading_period_id].try(:to_i) != 0
 

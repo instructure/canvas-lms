@@ -558,55 +558,62 @@ describe GradebookExporter do
 
       describe "with grading periods" do
         describe "assignments in the selected grading period are exported" do
-          before do
-            @csv = exporter(grading_period_id: @last_period.id).to_csv
-            @rows = CSV.parse(@csv, headers: true)
-            @headers = @rows.headers
+          describe "export entire gradebook" do
+            before do
+              @csv = exporter(grading_period_id: @last_period.id).to_csv
+              @rows = CSV.parse(@csv, headers: true)
+              @headers = @rows.headers
+            end
+
+            it "exports assignments from all grading periods" do
+              expect(@headers).to include @no_due_date_assignment.title_with_id,
+                                          @current_assignment.title_with_id,
+                                          @past_assignment.title_with_id,
+                                          @future_assignment.title_with_id
+            end
+
+            it "does not export totals columns" do
+              expect(@headers).to_not include "Final Score (#{@last_period.title})"
+            end
           end
 
-          it "exports selected grading period's assignments" do
-            expect(@headers).to include @no_due_date_assignment.title_with_id,
-                                        @current_assignment.title_with_id
-            final_grade = @rows[1]["Final Score (#{@last_period.title})"].try(:to_f)
-            expect(final_grade).to eq 20
-          end
+          describe "export current gradebook view" do
+            before do
+              exporter_options = {
+                grading_period_id: @last_period.id,
+                current_view: true,
+                assignment_order: @course.assignments.pluck(:id),
+                student_order: @course.student_enrollments.pluck(:user_id)
+              }
+              @csv = exporter(exporter_options).to_csv
+              @rows = CSV.parse(@csv, headers: true)
+              @headers = @rows.headers
+            end
 
-          it "exports assignments without due dates if exporting last grading period" do
-            expect(@headers).to include @current_assignment.title_with_id,
-                                        @no_due_date_assignment.title_with_id
-            final_grade = @rows[1]["Final Score (#{@last_period.title})"].try(:to_f)
-            expect(final_grade).to eq 20
-          end
+            it "exports filtered grading period's assignments with totals columns" do
+              expect(@headers).to include @no_due_date_assignment.title_with_id,
+                                          @current_assignment.title_with_id
+              final_grade = @rows[1]["Final Score (#{@last_period.title})"].try(:to_f)
+              expect(final_grade).to eq 20
+            end
 
-          it "does not export assignments without due date" do
-            @grading_period_id = @first_period.id
-            @csv = exporter(grading_period_id: @grading_period_id).to_csv
-            @rows = CSV.parse(@csv, headers: true)
-            @headers = @rows.headers
+            it "exports all visible assignments in the gradebook" do
+              exporter_options = {
+                grading_period_id: @first_period.id,
+                current_view: true,
+                assignment_order: [@no_due_date_assignment.id, @future_assignment.id],
+                student_order: @course.student_enrollments.pluck(:user_id).map(&:to_s)
+              }
+              @csv = exporter(exporter_options).to_csv
+              @rows = CSV.parse(@csv, headers: true)
+              @headers = @rows.headers
 
-            expect(@headers).to_not include @no_due_date_assignment.title_with_id
-          end
+              expect(@headers).to include @no_due_date_assignment.title_with_id,
+                                          @future_assignment.title_with_id
 
-          it "does not export assignments in other grading periods" do
-            expect(@headers).to_not include @past_assignment.title_with_id,
-                                            @future_assignment.title_with_id
-          end
-
-          it "does not export future assignments" do
-            expect(@headers).to_not include @future_assignment.title_with_id
-          end
-
-          it "exports the entire gradebook when grading_period_id is 0" do
-            @grading_period_id = 0
-            @csv = exporter(grading_period_id: @grading_period_id).to_csv
-            @rows = CSV.parse(@csv, headers: true)
-            @headers = @rows.headers
-
-            expect(@headers).to include @past_assignment.title_with_id,
-                                        @current_assignment.title_with_id,
-                                        @future_assignment.title_with_id,
-                                        @no_due_date_assignment.title_with_id
-            expect(@headers).not_to include "Final Score"
+              expect(@headers).to_not include @current_assignment.title_with_id,
+                                              @past_assignment.title_with_id
+            end
           end
         end
       end
@@ -694,7 +701,13 @@ describe GradebookExporter do
       end
 
       let(:exporter) do
-        GradebookExporter.new(@course, @teacher, { grading_period_id: @last_grading_period.id })
+        exporter_options = {
+          grading_period_id: @last_grading_period.id,
+          current_view: true,
+          assignment_order: @course.assignments.pluck(:id),
+          student_order: @course.student_enrollments.pluck(:user_id).map(&:to_s)
+        }
+        GradebookExporter.new(@course, @teacher, exporter_options)
       end
       let(:exported_headers) { CSV.parse(exporter.to_csv, headers: true).headers }
 
@@ -863,7 +876,15 @@ describe GradebookExporter do
           start_date: 1.week.ago, end_date: 1.week.from_now, title: "test period"
         )
       end
-      let(:exporter) { GradebookExporter.new(@course, @teacher, { grading_period_id: grading_period.id }) }
+      let(:exporter) do
+        exporter_options = {
+          grading_period_id: grading_period.id,
+          current_view: true,
+          assignment_order: @course.assignments.pluck(:id),
+          student_order: @course.student_enrollments.pluck(:user_id)
+        }
+        GradebookExporter.new(@course, @teacher, exporter_options)
+      end
 
       before do
         allow(exporter).to receive(:enrollments_for_csv).and_return([enrollment])
