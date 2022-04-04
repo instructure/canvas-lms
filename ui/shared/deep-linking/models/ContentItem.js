@@ -33,7 +33,12 @@ export default class ContentItem {
   }
 
   linkThumbnail() {
-    return this.imageTag(this.thumbnail)
+    if (typeof this.thumbnail === 'object') {
+      const {url, width, height} = this.thumbnail
+      return this.imageTag(url, width, height)
+    } else {
+      return this.imageTag(this.thumbnail)
+    }
   }
 
   iframeTag() {
