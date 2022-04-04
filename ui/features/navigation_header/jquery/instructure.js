@@ -111,7 +111,7 @@ const JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE = '.dialog, .draggable, .resizable, .s
 function buildUrl(url) {
   try {
     return new URL(url)
-  } catch {
+  } catch (e) {
     // Don't raise an error
   }
 }
