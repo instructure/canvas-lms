@@ -314,6 +314,18 @@ describe "conversations new" do
         Account.default.enable_feature! :react_inbox
       end
 
+      context "when user_id url param exists" do
+        it "properly opens and closes the compose modal" do
+          site_admin_logged_in
+          get "/conversations?embed=true&&user_name=#{@s1.name}&&user_id=#{@s1.id}"
+          expect(fj("h2:contains('Compose Message')")).to be_present
+          fj("button:contains('Close')").click
+          wait_for_ajaximations
+          expect(f("body")).not_to contain_jqcss("h2:contains('Compose Message')")
+          expect(f("button[data-testid='compose']")).to be_present
+        end
+      end
+
       context "shows correct address book items" do
         before do
           user_session(@teacher)

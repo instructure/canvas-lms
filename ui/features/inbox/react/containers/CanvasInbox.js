@@ -56,6 +56,7 @@ const CanvasInbox = () => {
   const [multiselect, setMultiselect] = useState(false)
   const [messageOpenEvent, setMessageOpenEvent] = useState(false)
   const userID = ENV.current_user_id?.toString()
+  const [urlUserRecipientId, setUrlUserRecepientId] = useState() // eslint-disable-line no-unused-vars
 
   const setFilterStateToCurrentWindowHash = () => {
     const validFilters = ['inbox', 'unread', 'starred', 'sent', 'archived', 'submission_comments']
@@ -73,9 +74,20 @@ const CanvasInbox = () => {
     if (isValidFilter) setScope(filterType)
   }
 
+  const setComposeModalRecepientToUrlUser = () => {
+    const urlData = new URLSearchParams(window.location.search)
+    const userIdFromUrlData = urlData.get('user_id')
+    if (userIdFromUrlData) {
+      setUrlUserRecepientId(userIdFromUrlData)
+      setComposeModal(true)
+    }
+  }
+
   // Get initial filter settings and set listener
+  // also get initial recepient settings if it exists in the url
   useEffect(() => {
     setFilterStateToCurrentWindowHash()
+    setComposeModalRecepientToUrlUser()
     window.addEventListener('hashchange', setFilterStateToCurrentWindowHash)
   }, [])
 
