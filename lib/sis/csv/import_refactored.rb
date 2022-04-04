@@ -259,6 +259,8 @@ module SIS
           parallel_importer.start
           { fullpath: file.path, file: att.display_name }
         end
+        raise "Empty file" if File.stat(csv[:fullpath]).size == 0
+
         count = importer_object.process(csv, parallel_importer.index, parallel_importer.batch_size)
         parallel_importer.complete(rows_processed: count)
         # just update progress on completion - the parallel jobs should be short enough
