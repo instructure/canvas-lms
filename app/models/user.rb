@@ -1336,8 +1336,47 @@ class User < ActiveRecord::Base
     return true if fake_student? && courses.any? { |c| c.grants_right?(masquerader, :use_student_view) }
     return false unless
         account.grants_right?(masquerader, nil, :become_user) && SisPseudonym.for(self, account, type: :implicit, require_sis: false)
+    # self is not an account user
+    if account.root_account.feature_enabled?(:course_admin_role_masquerade_permission_check) && account_users.empty?
+      return includes_subset_of_course_admin_permissions?(masquerader, account)
+    end
 
     has_subset_of_account_permissions?(masquerader, account)
+  end
+
+  def self.all_course_admin_type_permissions_for(user)
+    enrollments = user.enrollments.active.of_admin_type
+    result = {}
+
+    RoleOverride.permissions.each_key do |permission|
+      # initialize all permissions
+      result[permission] ||= []
+
+      enrollments.find_each do |enrollment|
+        # if available, iterate and set permissions that are enabled
+        # through the user's active course admin enrollments
+        enrollment.has_permission_to?(permission) == false ? next : result[permission] << true
+      end
+    end
+    result
+  end
+
+  def includes_subset_of_course_admin_permissions?(user, account)
+    return true if user == self
+    return false unless account.root_account?
+
+    Rails.cache.fetch(["includes_subset_of_course_admin_permissions", self, user, account].cache_key, expires_in: 60.minutes) do
+      current_permissions = AccountUser.all_permissions_for(user, account)
+      sought_permissions = User.all_course_admin_type_permissions_for(self)
+      sought_permissions.all? do |(permission, sought_permission)|
+        next true unless sought_permission.present?
+
+        current_permission = current_permissions[permission]
+        return false if current_permission.empty?
+
+        true
+      end
+    end
   end
 
   def has_subset_of_account_permissions?(user, account)
