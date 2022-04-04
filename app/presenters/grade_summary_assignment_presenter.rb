@@ -71,6 +71,10 @@ class GradeSummaryAssignmentPresenter
     assignment.grading_type == "gpa_scale"
   end
 
+  def points_graded?
+    assignment.grading_type == "points"
+  end
+
   def is_letter_graded_or_gpa_scaled?
     is_letter_graded? || is_gpa_scaled?
   end

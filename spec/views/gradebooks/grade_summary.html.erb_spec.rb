@@ -556,4 +556,62 @@ describe "/gradebooks/grade_summary" do
       end
     end
   end
+
+  describe "display out of value" do
+    let(:course) { Course.create! }
+    let(:student) { course.enroll_student(User.create!, active_all: true).user }
+    let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
+
+    before do
+      view_context(course, student)
+      assign(:presenter, GradeSummaryPresenter.new(course, student, nil))
+    end
+
+    context "when visibility feedback feature is enabled" do
+      before do
+        Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+      end
+
+      it "out of value is shown in the score column" do
+        render "gradebooks/grade_summary"
+        expect(response).not_to have_tag("#grades_summary th.possible")
+      end
+
+      it "renders \"out of\" with new format" do
+        assignment1 = course.assignments.create!(points_possible: 10)
+        assignment1.submit_homework student, submission_type: "online_text_entry", body: "hey"
+        assignment1.grade_student(student, score: 10, grader: teacher)
+
+        render "gradebooks/grade_summary"
+        expect(response).to match(%r{10\s+</span>\s+<span>/ 10</span>})
+      end
+
+      it "renders letter for letter graded" do
+        assignment1 = course.assignments.create!(grading_type: "letter_grade", points_possible: 10)
+        assignment1.submit_homework student, submission_type: "online_text_entry", body: "hey 1"
+        assignment1.grade_student(student, grade: "A", grader: teacher)
+
+        render "gradebooks/grade_summary"
+        expect(response).to match(%r{<span class="score_value">\s+10 \(A\)\s+</span>}mi)
+      end
+
+      it "renders percentage for \"percent\" grade" do
+        assignment1 = course.assignments.create!(grading_type: "percent", points_possible: 10)
+        assignment1.submit_homework student, submission_type: "online_text_entry", body: "hey 2"
+        assignment1.grade_student(student, grade: "90%", grader: teacher)
+
+        render "gradebooks/grade_summary"
+        expect(response).to match(%r{</span>\s+90%\s+</span>}mi)
+      end
+    end
+
+    context "when visibility feedback feature is disabled" do
+      it "out of value is shown in the 'out of' column" do
+        Account.site_admin.disable_feature!(:visibility_feedback_student_grades_page)
+        course.assignments.create!
+        render "gradebooks/grade_summary"
+        expect(response).to have_tag("#grades_summary th.possible")
+      end
+    end
+  end
 end
