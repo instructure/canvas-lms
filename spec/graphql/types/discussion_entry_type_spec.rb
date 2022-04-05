@@ -77,17 +77,22 @@ describe Types::DiscussionEntryType do
     expect(discussion_sub_entry_type.resolve("isolatedEntryId")).to eq sub_entry.root_entry_id.to_s
   end
 
-  it "converts anchor tag to video tag" do
-    discussion_for_translating_tags = DiscussionTopic.create!(
-      title: "Welcome whoever you are",
-      message: "anonymous discussion",
-      context: @course,
-      user: @teacher
-    )
+  describe "converts anchor tag to video tag" do
+    it "uses api_user_content for the message" do
+      discussion_for_translating_tags = DiscussionTopic.create!(
+        title: "Welcome whoever you are",
+        message: "anonymous discussion",
+        context: @course,
+        user: @teacher
+      )
 
-    entry_to_translate = discussion_for_translating_tags.discussion_entries.create!(message: '<span>this is the first part</span><a id="media_comment_m-4RLD5qHyQwnnjQbTsHhDfFFKNQwuTdJE" class="instructure_inline_media_comment video_comment" href="/media_objects/m-4RLD5qHyQwnnjQbTsHhDfFFKNQwuTdJE">this is a media comment</a><span>this is the last part</span>', user: @teacher, editor: @teacher)
-    type = GraphQLTypeTester.new(entry_to_translate, current_user: @teacher)
-    expect(type.resolve("message")).to eq "<span>this is the first part</span><div><video preload=\"none\" class=\"instructure_inline_media_comment\" data-media_comment_id=\"m-4RLD5qHyQwnnjQbTsHhDfFFKNQwuTdJE\" data-media_comment_type=\"video\" controls=\"controls\" poster=\"/media_objects/m-4RLD5qHyQwnnjQbTsHhDfFFKNQwuTdJE/thumbnail?height=448&amp;type=3&amp;width=550\" src=\"/courses/#{@course.id}/media_download?entryId=m-4RLD5qHyQwnnjQbTsHhDfFFKNQwuTdJE&amp;media_type=video&amp;redirect=1\" data-alt=\"\"></video></div><span>this is the last part</span>"
+      entry_to_translate = discussion_for_translating_tags.discussion_entries.create!(message: %(Hi <img src="/courses/#{@course.id}/files/12/download"<h1>Content</h1>), user: @teacher, editor: @teacher)
+      type = GraphQLTypeTester.new(entry_to_translate, current_user: @teacher)
+
+      expect(
+        type.resolve("message", request: ActionDispatch::TestRequest.create)
+      ).to include "/courses/#{@course.id}/files/12/download"
+    end
   end
 
   describe "quoted entry" do
