@@ -39,7 +39,7 @@
       <% if @user_data[:can_edit_name] %>
         <h2 class="hide-if-editing"><%= @user_data[:short_name] %> <% if @user_data[:pronouns] %><i>(<%= @user_data[:pronouns] %>)</i><% end %></h2>
         <label class="show-if-editing ic-Label"><%= t('name', 'Name') %>:
-          <input aria-label="<%= t 'Name' %>" id="name_input" class="ic-Input" type="text" name="user[short_name]" value="<%= @user_data[:short_name] %>" required>
+          <input id="name_input" class="ic-Input" type="text" name="user[short_name]" value="<%= @user_data[:short_name] %>" required>
         </label>
         <%# even if @domain_root_account.settings[:can_add_pronouns] is false, we still want to let someone that has pronouns set to see this so they can unset them  %>
         <% if @user.pronouns || @domain_root_account.settings[:can_add_pronouns] %>
@@ -54,7 +54,7 @@
           <span class="hide-if-editing"><%= @user_data[:title] %></span>
           <%# Do not convert these to inferred-key translations, "title" is most often used in canvas for things like document titles, but personal titles can be translated differently in some languages. %>
           <label class="show-if-editing ic-Label"><%= t('title', 'Title') %>:
-            <input aria-label="<%= t('title', 'Title') %>" class="ic-Input" type="text" name="user_profile[title]" value="<%= @user_data[:title] %>">
+            <input class="ic-Input" type="text" name="user_profile[title]" value="<%= @user_data[:title] %>">
           </label>
         </p>
       <% else %>
