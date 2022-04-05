@@ -49,6 +49,11 @@ const editor = {
   insertContent: jest.fn()
 }
 
+const setIconColor = hex => {
+  const input = screen.getByRole('textbox', {name: /icon color color picker/i})
+  fireEvent.input(input, {target: {value: hex}})
+}
+
 describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
   const defaults = {
     editor,
@@ -90,7 +95,23 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
     await waitFor(() => expect(onUnmount).toHaveBeenCalled())
   })
 
-  describe('when the close button is focused', () => {
+  describe('when the user has not created a valid icon', () => {
+    beforeEach(() => {
+      render(<ButtonsTray {...defaults} />)
+      userEvent.click(screen.getByRole('button', {name: /apply/i}))
+    })
+
+    it('does not fire off the icon upload callback', () => {
+      expect(startButtonsAndIconsUpload).not.toHaveBeenCalled()
+    })
+
+    it('shows an error message', () => {
+      const alertMessage = screen.getByText(/one of the following styles/i)
+      expect(alertMessage).toBeInTheDocument()
+    })
+  })
+
+  describe('focus management', () => {
     let focusedElement, originalFocus
 
     beforeAll(() => {
@@ -105,33 +126,29 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
 
     afterEach(() => (window.HTMLElement.prototype.focus = originalFocus))
 
-    describe('and the user does a forward tab', () => {
-      const event = {key: 'Tab', keyCode: 9}
+    describe('when the close button is focused', () => {
+      describe('and the user does a forward tab', () => {
+        const event = {key: 'Tab', keyCode: 9}
 
-      it('moves focus to the "name" input', async () => {
-        const {findByTestId} = render(<ButtonsTray {...defaults} />)
-
-        const closeButton = await findByTestId('icon-maker-close-button')
-        const expectedElement = await findByTestId('button-name')
-
-        fireEvent.keyDown(closeButton, event)
-
-        expect(focusedElement).toEqual(expectedElement)
+        it('moves focus to the "name" input', async () => {
+          const {findByTestId} = render(<ButtonsTray {...defaults} />)
+          const closeButton = await findByTestId('icon-maker-close-button')
+          const expectedElement = await findByTestId('button-name')
+          fireEvent.keyDown(closeButton, event)
+          expect(focusedElement).toEqual(expectedElement)
+        })
       })
-    })
 
-    describe('and the user does a reverse tab', () => {
-      const event = {key: 'Tab', keyCode: 9, shiftKey: true}
+      describe('and the user does a reverse tab', () => {
+        const event = {key: 'Tab', keyCode: 9, shiftKey: true}
 
-      it('moves focus to the apply button', async () => {
-        const {findByTestId} = render(<ButtonsTray {...defaults} />)
-
-        const closeButton = await findByTestId('icon-maker-close-button')
-        const expectedElement = await findByTestId('create-icon-button')
-
-        fireEvent.keyDown(closeButton, event)
-
-        expect(focusedElement).toEqual(expectedElement)
+        it('moves focus to the apply button', async () => {
+          const {findByTestId} = render(<ButtonsTray {...defaults} />)
+          const closeButton = await findByTestId('icon-maker-close-button')
+          const expectedElement = await findByTestId('create-icon-button')
+          fireEvent.keyDown(closeButton, event)
+          expect(focusedElement).toEqual(expectedElement)
+        })
       })
     })
   })
@@ -140,6 +157,7 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
     it('with correct content', async () => {
       render(<ButtonsTray {...defaults} />)
 
+      setIconColor('#000000')
       userEvent.click(screen.getByRole('button', {name: /apply/i}))
       let firstCall
       await waitFor(() => {
@@ -160,7 +178,7 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
               xmlns="http://www.w3.org/2000/svg"
             >
               <metadata>
-                {"type":"image/svg+xml-icon-maker-icons","alt":"","shape":"square","size":"small","color":null,"outlineColor":null,"outlineSize":"small","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"middle","encodedImage":"","encodedImageType":"","encodedImageName":"","x":"50%","y":"50%","translateX":-54,"translateY":-54,"width":108,"height":108,"transform":"translate(-54,-54)"}
+                {"type":"image/svg+xml-icon-maker-icons","alt":"","shape":"square","size":"small","color":"#000000","outlineColor":null,"outlineSize":"small","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"middle","encodedImage":"","encodedImageType":"","encodedImageName":"","x":"50%","y":"50%","translateX":-54,"translateY":-54,"width":108,"height":108,"transform":"translate(-54,-54)"}
               </metadata>
               <svg
                 fill="none"
@@ -170,7 +188,7 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
                 x="0"
               >
                 <g
-                  fill="none"
+                  fill="#000000"
                 >
                   <clippath
                     id="clip-path-for-embed"
@@ -210,6 +228,8 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
     it('with overwrite if "replace all" is checked', async () => {
       const {getByTestId, getByRole} = render(<ButtonsTray {...defaults} editing />)
 
+      setIconColor('#000000')
+
       act(() => {
         getByTestId('cb-replace-all').click()
       })
@@ -230,6 +250,7 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
     render(<ButtonsTray {...defaults} />)
 
     fireEvent.change(document.querySelector('#button-alt-text'), {target: {value: 'banana'}})
+    setIconColor('#000000')
     userEvent.click(screen.getByRole('button', {name: /apply/i}))
     await waitFor(() => expect(editor.insertContent).toHaveBeenCalled())
     expect(editor.insertContent.mock.calls[0]).toMatchInlineSnapshot(`
@@ -244,6 +265,7 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
   it('writes the content to the editor without alt attribute', async () => {
     render(<ButtonsTray {...defaults} />)
 
+    setIconColor('#000000')
     userEvent.click(screen.getByRole('button', {name: /apply/i}))
     await waitFor(() => expect(editor.insertContent).toHaveBeenCalled())
     expect(editor.insertContent.mock.calls[0]).toMatchInlineSnapshot(`
@@ -280,6 +302,7 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
   it('disables footer while submiting', async () => {
     render(<ButtonsTray {...defaults} />)
 
+    setIconColor('#000000')
     const button = screen.getByRole('button', {name: /apply/i})
     userEvent.click(button)
 

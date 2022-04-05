@@ -22,6 +22,7 @@ import {CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
+import {Alert} from '@instructure/ui-alerts'
 import {Preview} from './CreateButtonForm/Preview'
 import {CreateButtonForm} from './CreateButtonForm'
 import {Footer} from './CreateButtonForm/Footer'
@@ -32,10 +33,26 @@ import {FixedContentTray} from '../../shared/FixedContentTray'
 import {useStoreProps} from '../../shared/StoreContext'
 import formatMessage from '../../../../format-message'
 import buildDownloadUrl from '../../shared/buildDownloadUrl'
+import {validIcon} from '../utils/iconValidation'
 
-function renderHeader(title, settings, setIsOpen, onKeyDown) {
+const INVALID_MESSAGE = formatMessage(
+  'One of the following styles must be added to save an icon: Icon Color, Outline Size, Icon Text, or Image'
+)
+
+function renderHeader(title, settings, setIsOpen, onKeyDown, isInvalid, onAlertDismissal) {
   return (
     <View as="div" background="primary">
+      {isInvalid && (
+        <Alert
+          variant="error"
+          margin="small"
+          timeout={10000}
+          onDismiss={onAlertDismissal}
+          renderCloseButtonLabel="Close"
+        >
+          {INVALID_MESSAGE}
+        </Alert>
+      )}
       <Flex direction="column">
         <Flex.Item padding="medium medium small">
           <Flex direction="row">
@@ -96,6 +113,7 @@ export function ButtonsTray({editor, onUnmount, editing, rcsConfig}) {
   const nameRef = useRef()
   const applyRef = useRef()
 
+  const [isInvalid, setIsInvalid] = useState(false)
   const [isOpen, setIsOpen] = useState(true)
   const [replaceAll, setReplaceAll] = useState(false)
 
@@ -117,8 +135,29 @@ export function ButtonsTray({editor, onUnmount, editing, rcsConfig}) {
     setReplaceAll(false)
   }, [settings.name])
 
+  useEffect(() => {
+    if (validIcon(settings)) {
+      setIsInvalid(false)
+      setStatus(statuses.IDLE)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    settings.color,
+    settings.textColor,
+    settings.text,
+    settings.encodedImage,
+    settings.outlineColor,
+    settings.outlineSize
+  ])
+
   const handleSubmit = ({replaceFile = false}) => {
     setStatus(statuses.LOADING)
+
+    if (!validIcon(settings)) {
+      setIsInvalid(true)
+      setStatus(statuses.ERROR)
+      return
+    }
 
     const svg = buildSvg(settings, {isPreview: false})
     buildStylesheet()
@@ -163,13 +202,17 @@ export function ButtonsTray({editor, onUnmount, editing, rcsConfig}) {
     setStatus(settingsStatus)
   }, [settingsStatus])
 
+  const handleAlertDismissal = () => setIsInvalid(false)
+
   return (
     <FixedContentTray
       title={title}
       isOpen={isOpen}
       onDismiss={onClose}
       onUnmount={onUnmount}
-      renderHeader={() => renderHeader(title, settings, setIsOpen, onKeyDown)}
+      renderHeader={() =>
+        renderHeader(title, settings, setIsOpen, onKeyDown, isInvalid, handleAlertDismissal)
+      }
       renderBody={() =>
         renderBody(settings, dispatch, editor, editing, !replaceAll, nameRef, rcsConfig)
       }
