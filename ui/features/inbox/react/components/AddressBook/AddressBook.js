@@ -59,6 +59,7 @@ export const AddressBook = ({
   onSelect,
   onTextChange,
   onSelectedIdsChange,
+  selectedRecipients,
   isSubMenu,
   isLoading,
   limitTagCount,
@@ -190,6 +191,13 @@ export const AddressBook = ({
   useEffect(() => {
     onSelectedIdsChange(selectedMenuItems)
   }, [onSelectedIdsChange, selectedMenuItems])
+
+  // set initial recipients from props
+  useEffect(() => {
+    if (selectedRecipients?.length >= 1) {
+      setSelectedMenuItems(selectedRecipients)
+    }
+  }, [selectedRecipients])
 
   // Creates an observer on the last scroll item to fetch more data when it becomes visible
   useEffect(() => {
@@ -578,7 +586,8 @@ AddressBook.defaultProps = {
   menuData: {},
   onTextChange: () => {},
   onSelect: () => {},
-  onSelectedIdsChange: () => {}
+  onSelectedIdsChange: () => {},
+  selectedRecipients: []
 }
 
 AddressBook.propTypes = {
@@ -598,6 +607,10 @@ AddressBook.propTypes = {
    * Callback which provides an array of selected items
    */
   onSelectedIdsChange: PropTypes.func,
+  /**
+   *
+   */
+  selectedRecipients: PropTypes.array,
   /**
    * Boolean for if subMenu back button should render
    */

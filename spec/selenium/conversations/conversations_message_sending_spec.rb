@@ -314,15 +314,22 @@ describe "conversations new" do
         Account.default.enable_feature! :react_inbox
       end
 
-      context "when user_id url param exists" do
-        it "properly opens and closes the compose modal" do
+      context "when user_id and user_name url params exist" do
+        it "properly sends a message based on url params" do
           site_admin_logged_in
           get "/conversations?embed=true&&user_name=#{@s1.name}&&user_id=#{@s1.id}"
           expect(fj("h2:contains('Compose Message')")).to be_present
-          fj("button:contains('Close')").click
+          expect(fj("span[data-testid='address-book-tag'] button:contains(#{@s1.name})")).to be_present
+          f("textarea[data-testid='message-body']").send_keys "confirm if you get this!"
+          fj("button:contains('Send')").click
           wait_for_ajaximations
-          expect(f("body")).not_to contain_jqcss("h2:contains('Compose Message')")
-          expect(f("button[data-testid='compose']")).to be_present
+          cm = ConversationMessage.last
+          expect(cm.conversation_message_participants.pluck(:user_id)).to eq [@s1.id, @admin.id]
+          expect(cm.body).to eq "confirm if you get this!"
+
+          f("button[data-testid='compose']").click
+          wait_for_ajaximations
+          expect(f("body")).not_to contain_jqcss("span[data-testid='address-book-tag'] button:contains(#{@s1.name})")
         end
       end
 

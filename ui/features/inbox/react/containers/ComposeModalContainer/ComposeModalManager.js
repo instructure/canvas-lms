@@ -227,6 +227,8 @@ const ComposeModalManager = props => {
       pastConversation={replyConversationQuery?.data?.legacyNode}
       sendingMessage={sendingMessage}
       setSendingMessage={setSendingMessage}
+      onSelectedIdsChange={props.onSelectedIdsChange}
+      selectedIds={props.selectedIds}
     />
   )
 }
@@ -239,7 +241,9 @@ ComposeModalManager.propTypes = {
   isForward: PropTypes.bool,
   onDismiss: PropTypes.func,
   open: PropTypes.bool,
-  conversationsQueryOption: PropTypes.object
+  conversationsQueryOption: PropTypes.object,
+  onSelectedIdsChange: PropTypes.func,
+  selectedIds: PropTypes.array
 }
 
 export default ComposeModalManager
