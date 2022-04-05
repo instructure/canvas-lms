@@ -40,6 +40,8 @@ function setupWindowEnv() {
     start_at: '2021-02-10T00:00:00-07:00',
     end_at: '2021-07-10T00:00:00-07:00'
   }
+  window.ENV.TIMEZONE = 'America/Halifax'
+  window.ENV.CONTEXT_TIMEZONE = 'America/Denver'
 }
 
 function renderComponent(wrapper, overrides = {}) {
@@ -298,6 +300,36 @@ describe('CourseAvailabilityOptions', () => {
         course_restrict_enrollments_to_course_dates: 'true'
       })
       expect(getByText(warningText)).toBeInTheDocument()
+    })
+  })
+
+  describe('shows local and course time', () => {
+    it('shows local and course time for the start date', () => {
+      const {getByLabelText, getByText} = renderComponent(wrapper, {
+        course_restrict_enrollments_to_course_dates: 'true'
+      })
+      const startDate = getByLabelText('Start')
+      const year = moment().year()
+      fireEvent.change(startDate, {target: {value: `Mar 1, ${year} 10:00am`}})
+      pressKey(startDate, {key: 'Enter'})
+      expect(document.getElementById('course_start_at').value).toBe(`${year}-03-01T10:00:00.000Z`)
+      expect(getByText(`Local: Mar 1, ${year} 10:00am`)).toBeInTheDocument()
+      expect(getByText(`Course: Mar 1, ${year} 7:00am`)).toBeInTheDocument()
+    })
+
+    it('shows local and course time for the end date', () => {
+      const {getByLabelText, getByText} = renderComponent(wrapper, {
+        course_restrict_enrollments_to_course_dates: 'true'
+      })
+      const endDate = getByLabelText('End')
+      const year = moment().year()
+      fireEvent.change(endDate, {target: {value: `Apr 5, ${year} 10:00am`}})
+      pressKey(endDate, {key: 'Enter'})
+      expect(document.getElementById('course_conclude_at').value).toBe(
+        `${year}-04-05T10:00:00.000Z`
+      )
+      expect(getByText(`Local: Apr 5, ${year} 10:00am`)).toBeInTheDocument()
+      expect(getByText(`Course: Apr 5, ${year} 7:00am`)).toBeInTheDocument()
     })
   })
 })
