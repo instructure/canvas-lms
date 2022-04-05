@@ -48,7 +48,7 @@ module CoursesHomePage
   end
 
   def course_course_pace_selector
-    ".course_paces"
+    "#course_paces_link"
   end
 
   def course_menu_toggle_selector

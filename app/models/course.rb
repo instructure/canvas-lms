@@ -2943,7 +2943,6 @@ class Course < ActiveRecord::Base
   TAB_COLLABORATIONS_NEW = 17
   TAB_RUBRICS = 18
   TAB_SCHEDULE = 19
-  TAB_COURSE_PACES = 20
 
   CANVAS_K6_TAB_IDS = [TAB_HOME, TAB_ANNOUNCEMENTS, TAB_GRADES, TAB_MODULES].freeze
   COURSE_SUBJECT_TAB_IDS = [TAB_HOME, TAB_SCHEDULE, TAB_MODULES, TAB_GRADES, TAB_GROUPS].freeze
@@ -3103,30 +3102,17 @@ class Course < ActiveRecord::Base
   def uncached_tabs_available(user, opts)
     # make sure t() is called before we switch to the secondary, in case we update the user's selected locale in the process
     course_subject_tabs = elementary_subject_course? && opts[:course_subject_tabs]
-    course_paces_allowed = false
     default_tabs = if elementary_homeroom_course?
                      Course.default_homeroom_tabs
                    elsif course_subject_tabs
                      Course.course_subject_tabs
                    elsif elementary_subject_course?
-                     course_paces_allowed = true
                      Course.elementary_course_nav_tabs
                    else
-                     course_paces_allowed = true
                      Course.default_tabs
                    end
     # can't manage people in template courses
     default_tabs.delete_if { |t| t[:id] == TAB_PEOPLE } if template?
-    # only show course paces if enabled
-    if course_paces_allowed && account.feature_enabled?(:course_paces) && enable_course_paces
-      default_tabs.insert(default_tabs.index { |t| t[:id] == TAB_MODULES } + 1, {
-                            id: TAB_COURSE_PACES,
-                            label: t("#tabs.course_paces", "Course Pacing"),
-                            css_class: "course_paces",
-                            href: :course_course_paces_path,
-                            visibility: "admins"
-                          })
-    end
     opts[:include_external] = false if elementary_homeroom_course?
 
     GuardRail.activate(:secondary) do
@@ -3241,7 +3227,7 @@ class Course < ActiveRecord::Base
 
       # remove tabs that the user doesn't have access to
       unless opts[:for_reordering]
-        delete_unless.call([TAB_HOME, TAB_ANNOUNCEMENTS, TAB_PAGES, TAB_OUTCOMES, TAB_CONFERENCES, TAB_COLLABORATIONS, TAB_MODULES, TAB_COURSE_PACES], :read, :manage_content)
+        delete_unless.call([TAB_HOME, TAB_ANNOUNCEMENTS, TAB_PAGES, TAB_OUTCOMES, TAB_CONFERENCES, TAB_COLLABORATIONS, TAB_MODULES], :read, :manage_content)
 
         member_only_tabs = tabs.select { |t| t[:visibility] == "members" }
         tabs -= member_only_tabs if member_only_tabs.present? && !check_for_permission.call(:participate_as_student, :read_as_admin)
