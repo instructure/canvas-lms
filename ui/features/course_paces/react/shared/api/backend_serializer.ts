@@ -34,3 +34,12 @@ moment.tz.setDefault(coursePaceTimezone)
 export const saturdayWeekdayInteger = moment('2018-01-06').weekday()
 export const sundayWeekdayInteger = moment('2018-01-07').weekday()
 export const weekendIntegers = [sundayWeekdayInteger, saturdayWeekdayInteger]
+
+export const coursePaceDateFormatter = (locale = ENV.LOCALE) =>
+  new Intl.DateTimeFormat(locale, {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    timeZone: coursePaceTimezone
+  }).format

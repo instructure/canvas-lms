@@ -16,11 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import {connect} from 'react-redux'
 import moment from 'moment-timezone'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {Flex} from '@instructure/ui-flex'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
@@ -35,7 +34,7 @@ import {
   getPaceDuration,
   getPlannedEndDate
 } from '../../../reducers/course_paces'
-import {coursePaceTimezone} from '../../../shared/api/backend_serializer'
+import {coursePaceTimezone, coursePaceDateFormatter} from '../../../shared/api/backend_serializer'
 
 const {Item: FlexItem} = Flex as any
 const I18n = useI18nScope('course_paces_projected_dates')
@@ -82,7 +81,8 @@ export const ProjectedDates: React.FC<StoreProps> = ({
   uncompressDates,
   compression
 }) => {
-  const formatDate = useDateTimeFormat('date.formats.long', coursePaceTimezone, ENV.LOCALE)
+  const [dateFormatter] = useState(coursePaceDateFormatter)
+
   const enrollmentType = coursePace.context_type === 'Enrollment'
   const startDateValue = coursePace.start_date
   const startHelpText = START_DATE_CAPTIONS[coursePace.start_date_context]
@@ -114,7 +114,7 @@ export const ProjectedDates: React.FC<StoreProps> = ({
         </View>
         <View data-testid="coursepace-date-text" as="div" margin="small 0 x-small 0">
           {dateValue ? (
-            formatDate(moment.tz(dateValue, coursePaceTimezone).toISOString(true))
+            dateFormatter(moment.tz(dateValue, coursePaceTimezone).toDate())
           ) : (
             <Text>
               {DASH} {I18n.t('Not Specified')} {DASH}

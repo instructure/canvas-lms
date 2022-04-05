@@ -49,7 +49,7 @@ const BlackoutDatesModal: React.FC<PassedProps> = ({open, blackoutDates, onCance
   }, [updatedBlackoutDates, onSave])
 
   return (
-    <Modal open={open} onDismiss={onCancel} label={I18n.t('Blackout Dates')}>
+    <Modal open={open} onDismiss={onCancel} label={I18n.t('Blackout Dates')} size="auto">
       <Modal.Header>
         <CloseButton placement="end" offset="medium" variant="icon" onClick={onCancel}>
           Close

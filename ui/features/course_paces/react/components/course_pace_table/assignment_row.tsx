@@ -38,7 +38,7 @@ import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 
-import {coursePaceTimezone} from '../../shared/api/backend_serializer'
+import {coursePaceDateFormatter} from '../../shared/api/backend_serializer'
 import {CoursePaceItem, CoursePace, StoreState} from '../../types'
 import {BlackoutDate} from '../../shared/types'
 import {
@@ -96,7 +96,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
 
   private debouncedCommitChanges: any
 
-  private dateFormatter: Intl.DateTimeFormat
+  private dateFormatter: any
 
   /* Component lifecycle */
 
@@ -106,13 +106,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
       leading: false,
       trailing: true
     })
-    this.dateFormatter = new Intl.DateTimeFormat(ENV.LOCALE, {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      timeZone: coursePaceTimezone
-    })
+    this.dateFormatter = coursePaceDateFormatter()
   }
 
   shouldComponentUpdate(nextProps: ComponentProps, nextState: LocalState) {
@@ -279,7 +273,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
     // change the date format and you'll probably have to change
     // the column width in AssignmentRow
     const due = moment(this.props.dueDate)
-    return this.dateFormatter.format(due.toDate())
+    return this.dateFormatter(due.toDate())
   }
 
   renderTitle() {

@@ -43,8 +43,8 @@ describe('BlackoutDates', () => {
     expect(blackoutTable.querySelectorAll('tr').length).toBe(2)
     const newBlackoutDatesRow = blackoutTable.querySelectorAll('tr')[1]
     expect(within(newBlackoutDatesRow).getByText('Spring break')).toBeInTheDocument()
-    expect(within(newBlackoutDatesRow).getByText('03/21/2022')).toBeInTheDocument()
-    expect(within(newBlackoutDatesRow).getByText('03/25/2022')).toBeInTheDocument()
+    expect(within(newBlackoutDatesRow).getByText('Mon, Mar 21, 2022')).toBeInTheDocument()
+    expect(within(newBlackoutDatesRow).getByText('Fri, Mar 25, 2022')).toBeInTheDocument()
   })
 
   it('shows "No blackout dates" if there are none', () => {

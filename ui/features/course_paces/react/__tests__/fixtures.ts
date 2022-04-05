@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import moment from 'moment'
+import moment from 'moment-timezone'
 import {keyBy} from 'lodash'
 
 import {BlackoutDate, BlackoutDateState, SyncState, Course} from '../shared/types'
@@ -37,6 +37,7 @@ import {
 
 window.ENV.TIMEZONE = 'America/Denver'
 window.ENV.CONTEXT_TIMEZONE = 'America/Denver'
+moment.tz.setDefault('America/Denver')
 
 export const COURSE: Course = {
   id: '30',
