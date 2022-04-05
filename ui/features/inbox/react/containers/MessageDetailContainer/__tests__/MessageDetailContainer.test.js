@@ -118,8 +118,8 @@ describe('MessageDetailContainer', () => {
 
       const replyButtons = await container.findAllByTestId('message-reply')
       fireEvent.click(replyButtons[1])
-      expect(mockOnReply).toHaveBeenCalledWith(
-        mockConversation.conversationMessagesConnection.nodes[1]
+      expect(mockOnReply.mock.calls[0][0]._id).toBe(
+        mockConversation.conversationMessagesConnection.nodes[1]._id
       )
     })
 
@@ -131,8 +131,8 @@ describe('MessageDetailContainer', () => {
       const moreOptionsButtons = await container.findAllByTestId('message-more-options')
       fireEvent.click(moreOptionsButtons[1])
       fireEvent.click(container.getByText('Reply All'))
-      expect(mockOnReplyAll).toHaveBeenCalledWith(
-        mockConversation.conversationMessagesConnection.nodes[1]
+      expect(mockOnReplyAll.mock.calls[0][0]._id).toBe(
+        mockConversation.conversationMessagesConnection.nodes[1]._id
       )
     })
   })

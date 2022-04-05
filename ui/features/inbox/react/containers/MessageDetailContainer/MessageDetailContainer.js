@@ -25,10 +25,11 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {MessageDetailHeader} from '../../components/MessageDetailHeader/MessageDetailHeader'
 import {MessageDetailItem} from '../../components/MessageDetailItem/MessageDetailItem'
 import PropTypes from 'prop-types'
-import React, {useContext, useEffect, useState} from 'react'
+import React, {useContext, useEffect, useState, useMemo} from 'react'
 import {Spinner} from '@instructure/ui-spinner'
 import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
+import {inboxMessagesWrapper} from '../../../util/utils'
 
 const I18n = useI18nScope('conversations_2')
 
@@ -77,20 +78,26 @@ export const MessageDetailContainer = props => {
     }
   })
 
-  const {loading, error, data} = useQuery(CONVERSATION_MESSAGES_QUERY, {
+  const conversationMessagesQuery = useQuery(CONVERSATION_MESSAGES_QUERY, {
     variables
   })
 
   // Intial focus on message when loaded
   useEffect(() => {
-    if (!loading && messageOpenEvent && messageRef) {
+    if (!conversationMessagesQuery.loading && messageOpenEvent && messageRef) {
       // Focus
       messageRef?.focus()
       setMessageOpenEvent(false)
     }
-  }, [loading, messageRef, messageOpenEvent, setMessageOpenEvent])
+  }, [conversationMessagesQuery.loading, messageRef, messageOpenEvent, setMessageOpenEvent])
 
-  if (loading) {
+  const inboxMessageData = useMemo(() => {
+    const data = conversationMessagesQuery.data?.legacyNode
+
+    return inboxMessagesWrapper(data, false)
+  }, [conversationMessagesQuery.data])
+
+  if (conversationMessagesQuery.loading) {
     return (
       <View as="div" textAlign="center" margin="large none">
         <Spinner renderTitle={() => I18n.t('Loading Conversation Messages')} variant="inverse" />
@@ -98,7 +105,7 @@ export const MessageDetailContainer = props => {
     )
   }
 
-  if (error) {
+  if (conversationMessagesQuery.error) {
     setOnFailure(I18n.t('Failed to load conversation messages.'))
     return
   }
@@ -112,11 +119,11 @@ export const MessageDetailContainer = props => {
         onReplyAll={props.onReplyAll}
         onDelete={() => props.onDelete([props.conversation._id])}
       />
-      {data?.legacyNode?.conversationMessagesConnection.nodes.map(message => (
+      {inboxMessageData.inboxMessages.map(message => (
         <View as="div" borderWidth="small none none none" padding="small" key={message.id}>
           <MessageDetailItem
             conversationMessage={message}
-            contextName={data?.legacyNode?.contextName}
+            contextName={inboxMessageData?.contextName}
             onReply={() => props.onReply(message)}
             onReplyAll={() => props.onReplyAll(message)}
             onDelete={() => handleDeleteConversationMessage(message._id)}
