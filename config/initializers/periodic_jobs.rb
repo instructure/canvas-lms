@@ -152,7 +152,7 @@ Rails.configuration.after_initialize do
   end
 
   Delayed::Periodic.cron "Delayed::Job::Failed.cleanup_old_jobs", "0 * * * *" do
-    cutoff = Setting.get("failed_jobs_retain_for", 6.months.to_s).to_i
+    cutoff = Setting.get("failed_jobs_retain_for", 3.months.to_s).to_i
     if cutoff > 0
       with_each_job_cluster(Delayed::Job::Failed, :cleanup_old_jobs, cutoff.seconds.ago)
     end
