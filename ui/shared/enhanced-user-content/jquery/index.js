@@ -23,6 +23,9 @@ import tz from '@canvas/timezone'
 import htmlEscape from 'html-escape'
 import preventDefault from 'prevent-default'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
+import ReactDOM from 'react-dom'
+import React from 'react'
+import {Link} from '@instructure/ui-link'
 import './instructure_helper'
 import 'jqueryui/draggable'
 import '@canvas/jquery/jquery.ajaxJSON'
@@ -115,6 +118,28 @@ function buildUrl(url) {
   }
 }
 
+// Rendering a temporary Link element so we can copy its classnames to anchors with images inside,
+// since '@instructure/ui-link' doesn't provide a way to use its CSS themed classes directly.
+function handleAnchorsWithImage() {
+  const temp = document.createElement('div')
+  const tempLinkComponent = React.createElement(
+    Link,
+    {
+      elementRef: e => {
+        $('.user_content a:has(img)').each(function () {
+          $(this).addClass(e.className)
+          // Sets display inline block, since in Firefox anchor tags doesn't wrap the image size
+          // when they are focused causing UI discrepancies.
+          $(this).css('display', 'inline-block')
+        })
+      }
+    },
+    // Children prop is required
+    React.createElement('img')
+  )
+  ReactDOM.render(tempLinkComponent, temp)
+}
+
 export function enhanceUserContent(visibilityMod) {
   if (ENV.SKIP_ENHANCING_USER_CONTENT) {
     return
@@ -197,6 +222,8 @@ export function enhanceUserContent(visibilityMod) {
         .append('<span class="screenreader-only">&nbsp;(' + $.raw(externalLink) + ')</span>')
     })
     .end()
+
+  handleAnchorsWithImage()
 
   $('a.instructure_file_link, a.instructure_scribd_file').each(function () {
     const $link = $(this)
