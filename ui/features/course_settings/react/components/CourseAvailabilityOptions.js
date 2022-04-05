@@ -29,6 +29,8 @@ import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent, AccessibleContent} from '@instructure/ui-a11y-content'
 import {IconWarningSolid} from '@instructure/ui-icons'
+import {changeTimezone} from '@canvas/datetime/changeTimezone'
+import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('CourseAvailabilityOptions')
 
@@ -68,10 +70,20 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
     getFormValue(FORM_IDS.RESTRICT_PAST) === 'true'
   )
 
+  const startDateInputValue =
+    selectedApplicabilityValue === 'course' ? startDate : TERM_DATES.START_DATE
+  const endDateInputValue = selectedApplicabilityValue === 'course' ? endDate : TERM_DATES.END_DATE
+
   const datesInteraction = () =>
     canManage && selectedApplicabilityValue === 'course' ? 'enabled' : 'disabled'
 
   const formatDate = date => tz.format(date, 'date.formats.full')
+
+  const parseDate = (date, tz) => {
+    const dateObj = new Date(date)
+    const parsedDate = changeTimezone(dateObj, {originTZ: tz, desiredTZ: ENV.TIMEZONE})
+    return formatDate(parsedDate)
+  }
 
   const participationExplanationText = () => {
     return selectedApplicabilityValue === 'term'
@@ -147,15 +159,29 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
                 formatDate={formatDate}
                 interaction={datesInteraction()}
                 width="16rem"
-                selectedDate={
-                  selectedApplicabilityValue === 'course' ? startDate : TERM_DATES.START_DATE
-                }
+                selectedDate={startDateInputValue}
                 onSelectedDateChange={value => {
                   const start = moment(value).toISOString()
                   setFormValue(FORM_IDS.START_DATE, start)
                   setStartDate(start)
                 }}
               />
+              {startDateInputValue && (
+                <>
+                  <View as="div" margin="x-small none xx-small small">
+                    <Text size="x-small" weight="light">{`${I18n.t('Local')}: ${parseDate(
+                      startDateInputValue,
+                      ENV.TIMEZONE
+                    )}`}</Text>
+                  </View>
+                  <View as="div" margin="none none none small">
+                    <Text size="x-small" weight="light">{`${I18n.t('Course')}: ${parseDate(
+                      startDateInputValue,
+                      ENV.CONTEXT_TIMEZONE
+                    )}`}</Text>
+                  </View>
+                </>
+              )}
             </Flex.Item>
             <Flex.Item padding="xx-small">
               <ScreenReaderContent>{I18n.t('Course End Date')}</ScreenReaderContent>
@@ -164,15 +190,29 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
                 formatDate={formatDate}
                 interaction={datesInteraction()}
                 width="16rem"
-                selectedDate={
-                  selectedApplicabilityValue === 'course' ? endDate : TERM_DATES.END_DATE
-                }
+                selectedDate={endDateInputValue}
                 onSelectedDateChange={value => {
                   const end = moment(value).toISOString()
                   setFormValue(FORM_IDS.END_DATE, end)
                   setEndDate(end)
                 }}
               />
+              {endDateInputValue && (
+                <>
+                  <View as="div" margin="x-small none xx-small small">
+                    <Text size="x-small" weight="light">{`${I18n.t('Local')}: ${parseDate(
+                      endDateInputValue,
+                      ENV.TIMEZONE
+                    )}`}</Text>
+                  </View>
+                  <View as="div" margin="none none xx-small small">
+                    <Text size="x-small" weight="light">{`${I18n.t('Course')}: ${parseDate(
+                      endDateInputValue,
+                      ENV.CONTEXT_TIMEZONE
+                    )}`}</Text>
+                  </View>
+                </>
+              )}
             </Flex.Item>
           </Flex>
           {tz.isMidnight(endDate) && selectedApplicabilityValue === 'course' && (
