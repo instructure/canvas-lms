@@ -311,15 +311,13 @@ describe('ComposeModalContainer', () => {
     it('should include past messages', async () => {
       const component = setup(jest.fn(), jest.fn(), true, false, false, {
         _id: '1',
-        conversationMessagesConnection: {
-          nodes: [
-            {
-              author: {
-                _id: '1337'
-              }
+        messages: [
+          {
+            author: {
+              _id: '1337'
             }
-          ]
-        }
+          }
+        ]
       })
 
       expect(await component.findByTestId('past-messages')).toBeInTheDocument()
@@ -329,15 +327,13 @@ describe('ComposeModalContainer', () => {
       const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
       const component = setup(jest.fn(), mockedSetOnSuccess, true, false, false, {
         _id: '1',
-        conversationMessagesConnection: {
-          nodes: [
-            {
-              author: {
-                _id: '1337'
-              }
+        messages: [
+          {
+            author: {
+              _id: '1337'
             }
-          ]
-        }
+          }
+        ]
       })
 
       // Set body
@@ -357,23 +353,21 @@ describe('ComposeModalContainer', () => {
       const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
       const component = setup(jest.fn(), mockedSetOnSuccess, false, true, false, {
         _id: '1',
-        conversationMessagesConnection: {
-          nodes: [
-            {
-              author: {
+        messages: [
+          {
+            author: {
+              _id: '1337'
+            },
+            recipients: [
+              {
                 _id: '1337'
               },
-              recipients: [
-                {
-                  _id: '1337'
-                },
-                {
-                  _id: '1338'
-                }
-              ]
-            }
-          ]
-        }
+              {
+                _id: '1338'
+              }
+            ]
+          }
+        ]
       })
 
       // Set body
@@ -393,23 +387,22 @@ describe('ComposeModalContainer', () => {
       const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
       const component = setup(jest.fn(), mockedSetOnSuccess, false, false, true, {
         _id: '1',
-        conversationMessagesConnection: {
-          nodes: [
-            {
-              author: {
+
+        messages: [
+          {
+            author: {
+              _id: '1337'
+            },
+            recipients: [
+              {
                 _id: '1337'
               },
-              recipients: [
-                {
-                  _id: '1337'
-                },
-                {
-                  _id: '1338'
-                }
-              ]
-            }
-          ]
-        }
+              {
+                _id: '1338'
+              }
+            ]
+          }
+        ]
       })
 
       // Set body

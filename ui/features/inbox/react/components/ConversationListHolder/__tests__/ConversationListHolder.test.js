@@ -26,137 +26,122 @@ const props = {
     {
       _id: '1',
       workflowState: 'unread',
-      conversation: {
-        subject: 'This is the subject line',
-        conversationParticipantsConnection: {
-          nodes: [
-            {user: {name: 'Bob Barker'}},
-            {user: {name: 'Sally Ford'}},
-            {user: {name: 'Russel Franks'}}
-          ]
+      subject: 'This is the subject line',
+      lastMessageCreatedAt: 'November 5, 2020 at 2:25pm',
+      lastMessageContent: 'This is the body text for the message.',
+      participantString: 'Bob Barker, Sally Ford, Russel Franks',
+      messages: [
+        {
+          author: {name: 'Bob Barker'},
+          conversationParticipantsConnection: {
+            nodes: [
+              [
+                {user: {name: 'Bob Barker'}},
+                {user: {name: 'Sally Ford'}},
+                {user: {name: 'Russel Franks'}}
+              ]
+            ]
+          },
+          createdAt: 'November 5, 2020 at 2:25pm',
+          body: 'This is the body text for the message.'
         },
-        conversationMessagesConnection: {
-          nodes: [
-            {
-              author: {name: 'Bob Barker'},
-              conversationParticipantsConnection: {
-                nodes: [
-                  [
-                    {user: {name: 'Bob Barker'}},
-                    {user: {name: 'Sally Ford'}},
-                    {user: {name: 'Russel Franks'}}
-                  ]
-                ]
-              },
-              createdAt: 'November 5, 2020 at 2:25pm',
-              body: 'This is the body text for the message.'
-            },
-            {
-              author: {name: 'Sally Ford'},
-              conversationParticipantsConnection: {
-                nodes: [
-                  {user: {name: 'Sally Ford'}},
-                  {user: {name: 'Bob Barker'}},
-                  {user: {name: 'Russel Franks'}}
-                ]
-              },
-              createdAt: 'November 4, 2020 at 2:25pm',
-              body: 'This is the body text for the message.'
-            }
-          ]
+        {
+          author: {name: 'Sally Ford'},
+          conversationParticipantsConnection: {
+            nodes: [
+              {user: {name: 'Sally Ford'}},
+              {user: {name: 'Bob Barker'}},
+              {user: {name: 'Russel Franks'}}
+            ]
+          },
+          createdAt: 'November 4, 2020 at 2:25pm',
+          body: 'This is the body text for the message.'
         }
-      }
+      ],
+      participants: [
+        {user: {name: 'Bob Barker'}},
+        {user: {name: 'Sally Ford'}},
+        {user: {name: 'Russel Franks'}}
+      ]
     },
     {
       _id: '2',
       workflowState: 'read',
-      conversation: {
-        subject: 'This is a different subject line',
-        conversationParticipantsConnection: {
-          nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
-        },
-        conversationMessagesConnection: {
-          nodes: [
-            {
-              author: {name: 'Todd Martin'},
-              conversationParticipantsConnection: {
-                nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
-              },
-              createdAt: 'November 3, 2020 at 8:58am',
-              body: 'This conversation has a much longer body which should be too long to completely display.'
-            }
-          ]
+      subject: 'This is a different subject line',
+      lastMessageCreatedAt: 'November 3, 2020 at 8:58am',
+      lastMessageContent:
+        'This conversation has a much longer body which should be too long to completely display.',
+      participantString: 'Todd Martin, Jim Thompson',
+      messages: [
+        {
+          author: {name: 'Todd Martin'},
+          conversationParticipantsConnection: {
+            nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
+          },
+          createdAt: 'November 3, 2020 at 8:58am',
+          body: 'This conversation has a much longer body which should be too long to completely display.'
         }
-      }
+      ],
+      participants: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
     },
     {
       _id: '3',
       workflowState: 'unread',
-      conversation: {
-        subject: 'This is a different subject line also',
-        conversationParticipantsConnection: {
-          nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
-        },
-        starred: true,
-        conversationMessagesConnection: {
-          nodes: [
-            {
-              author: {name: 'Todd Martin'},
-              conversationParticipantsConnection: {
-                nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
-              },
-              createdAt: 'November 3, 2020 at 8:58am',
-              body: 'This conversation has a much longer body which should be too long to completely display.'
-            }
-          ]
+      subject: 'This is a different subject line also',
+      lastMessageCreatedAt: 'November 3, 2020 at 8:58am',
+      lastMessageContent: 'This is the body text for the message.',
+      participantString: 'Todd Martin, Jim Thompson',
+      messages: [
+        {
+          author: {name: 'Todd Martin'},
+          conversationParticipantsConnection: {
+            nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
+          },
+          createdAt: 'November 3, 2020 at 8:58am',
+          body: 'This conversation has a much longer body which should be too long to completely display.'
         }
-      }
+      ],
+      participants: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
     },
     {
       _id: '4',
       workflowState: 'unread',
-      conversation: {
-        subject: 'This is a different subject line also',
-        conversationParticipantsConnection: {
-          nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
-        },
-        starred: true,
-        conversationMessagesConnection: {
-          nodes: [
-            {
-              author: {name: 'Todd Martin'},
-              conversationParticipantsConnection: {
-                nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
-              },
-              createdAt: 'November 3, 2020 at 8:58am',
-              body: 'This conversation has a much longer body which should be too long to completely display.'
-            }
-          ]
+      subject: 'This is a different subject line also',
+      lastMessageCreatedAt: 'November 3, 2020 at 8:58am',
+      lastMessageContent:
+        'This conversation has a much longer body which should be too long to completely display.',
+      participantString: 'Todd Martin, Jim Thompson',
+      messages: [
+        {
+          author: {name: 'Todd Martin'},
+          conversationParticipantsConnection: {
+            nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
+          },
+          createdAt: 'November 3, 2020 at 8:58am',
+          body: 'This conversation has a much longer body which should be too long to completely display.'
         }
-      }
+      ],
+      participants: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
     },
     {
       _id: '5',
       workflowState: 'unread',
-      conversation: {
-        subject: 'This is a different subject line also',
-        conversationParticipantsConnection: {
-          nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
-        },
-        starred: true,
-        conversationMessagesConnection: {
-          nodes: [
-            {
-              author: {name: 'Todd Martin'},
-              conversationParticipantsConnection: {
-                nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
-              },
-              createdAt: 'November 3, 2020 at 8:58am',
-              body: 'This conversation has a much longer body which should be too long to completely display.'
-            }
-          ]
+      subject: 'This is a different subject line also',
+      lastMessageCreatedAt: 'November 3, 2020 at 8:58am',
+      lastMessageContent:
+        'This conversation has a much longer body which should be too long to completely display.',
+      participantString: 'Todd Martin, Jim Thompson',
+      messages: [
+        {
+          author: {name: 'Todd Martin'},
+          conversationParticipantsConnection: {
+            nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
+          },
+          createdAt: 'November 3, 2020 at 8:58am',
+          body: 'This conversation has a much longer body which should be too long to completely display.'
         }
-      }
+      ],
+      participants: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
     }
   ]
 }
@@ -211,7 +196,7 @@ describe('ConversationListHolder', () => {
     const {getAllByText} = render(<ConversationListHolder {...props} onSelect={onSelect} />)
     const conversation = getAllByText('This is a different subject line')
     fireEvent.click(conversation[0])
-    const expectedConversation = props.conversations[1].conversation
+    const expectedConversation = props.conversations[1]
     expect(onSelect).toHaveBeenCalledWith([expectedConversation])
   })
 

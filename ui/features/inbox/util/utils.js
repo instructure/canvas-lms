@@ -29,3 +29,76 @@ export const responsiveQuerySizes = ({mobile = false, tablet = false, desktop = 
   }
   return querySizes
 }
+
+// Takes in data from either a SUBMISSION_COMMENTS_QUERY or CONVERSATIONS_QUERY
+// Outputs an inbox conversation wrapper
+export const inboxConversationsWrapper = (data, isSubmissionComments = false) => {
+  const inboxConversations = []
+  if (data) {
+    data.forEach(conversation => {
+      const inboxConversation = {}
+      if (isSubmissionComments) {
+        inboxConversation._id = conversation._id
+        inboxConversation.subject =
+          conversation.commentsConnection.nodes[0].course.contextName +
+          ' - ' +
+          conversation.commentsConnection.nodes[0].assignment.name
+        inboxConversation.lastMessageCreatedAt = conversation.commentsConnection.nodes[0].createdAt
+        inboxConversation.lastMessageContent = conversation.commentsConnection.nodes[0].comment
+        inboxConversation.participantString = getParticipantsString(
+          conversation.commentsConnection.nodes,
+          isSubmissionComments
+        )
+        inboxConversation.messages = conversation.commentsConnection.nodes
+      } else {
+        inboxConversation._id = conversation.conversation._id
+        inboxConversation.subject = conversation.conversation.subject
+        inboxConversation.lastMessageCreatedAt =
+          conversation.conversation.conversationMessagesConnection.nodes[0].createdAt
+        inboxConversation.lastMessageContent =
+          conversation.conversation.conversationMessagesConnection.nodes[0].body
+        inboxConversation.workflowState = conversation.workflowState
+        inboxConversation.label = conversation.label
+        inboxConversation.messages = conversation.conversation.conversationMessagesConnection.nodes
+        inboxConversation.participants =
+          conversation.conversation.conversationParticipantsConnection.nodes
+        inboxConversation.participantString = getParticipantsString(
+          inboxConversation.participants,
+          isSubmissionComments,
+          inboxConversation.messages[inboxConversation.messages.length - 1].author.name
+        )
+      }
+      inboxConversations.push(inboxConversation)
+    })
+  }
+  return inboxConversations
+}
+
+const getSubmissionCommentsParticipantString = messages => {
+  const uniqueParticipants = []
+  messages.forEach(message => {
+    if (!uniqueParticipants.some(x => x._id === message.author._id)) {
+      uniqueParticipants.push({_id: message.author._id, authorName: message.author.name})
+    }
+  })
+  const uniqueParticipantNames = uniqueParticipants.map(participant => participant.authorName)
+  return uniqueParticipantNames.join(', ')
+}
+const getConversationParticipantString = (participants, conversationOwnerName) => {
+  const participantString = participants
+    .filter(p => p.user.name !== conversationOwnerName)
+    .reduce((prev, curr) => {
+      return prev + ', ' + curr.user.name
+    }, '')
+  return conversationOwnerName + participantString
+}
+
+const getParticipantsString = (
+  participants,
+  isSubmissionComments,
+  conversationOwnerName = null
+) => {
+  return isSubmissionComments
+    ? getSubmissionCommentsParticipantString(participants)
+    : getConversationParticipantString(participants, conversationOwnerName)
+}

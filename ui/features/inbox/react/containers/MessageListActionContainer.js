@@ -44,9 +44,7 @@ const MessageListActionContainer = props => {
     const selectedStates =
       props.selectedConversations
         .map(cp =>
-          cp.conversationParticipantsConnection?.nodes?.find(
-            participant => participant.user._id === ENV.current_user?.id
-          )
+          cp.participants?.find(participant => participant.user._id === ENV.current_user?.id)
         )
         .map(node => node?.workflowState) || []
     return selectedStates
@@ -160,10 +158,10 @@ const MessageListActionContainer = props => {
 
   const firstConversation =
     props.selectedConversations.length > 0 ? props.selectedConversations[0] : {}
-  const myConversationParticipant =
-    firstConversation?.conversationParticipantsConnection?.nodes.find(
-      node => node.user._id === ENV.current_user_id
-    )
+
+  const myConversationParticipant = firstConversation?.participants?.find(
+    node => node.user._id === ENV.current_user_id
+  )
   const firstConversationIsStarred = myConversationParticipant?.label === 'starred'
 
   const [starConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {

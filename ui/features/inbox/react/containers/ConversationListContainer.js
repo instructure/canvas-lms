@@ -23,10 +23,11 @@ import {ConversationListHolder} from '../components/ConversationListHolder/Conve
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Mask} from '@instructure/ui-overlays'
 import PropTypes from 'prop-types'
-import React, {useContext} from 'react'
+import React, {useContext, useMemo} from 'react'
 import {Spinner} from '@instructure/ui-spinner'
 import {useQuery, useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
+import {inboxConversationsWrapper} from '../../util/utils'
 
 const I18n = useI18nScope('conversations_2')
 
@@ -76,6 +77,13 @@ const ConversationListContainer = ({course, scope, onSelectConversation, userFil
     skip: !scopeIsSubmissionComments
   })
 
+  const inboxItemData = useMemo(() => {
+    const data = scopeIsSubmissionComments
+      ? submissionCommentsQuery.data?.legacyNode?.viewableSubmissionsConnection?.nodes
+      : conversationsQuery.data?.legacyNode?.conversationsConnection?.nodes
+    return inboxConversationsWrapper(data, scopeIsSubmissionComments)
+  }, [conversationsQuery.data, scopeIsSubmissionComments, submissionCommentsQuery.data])
+
   if (conversationsQuery.loading || submissionCommentsQuery.loading) {
     return (
       <View as="div" style={{position: 'relative'}} height="100%">
@@ -92,11 +100,7 @@ const ConversationListContainer = ({course, scope, onSelectConversation, userFil
 
   return (
     <ConversationListHolder
-      conversations={
-        !scopeIsSubmissionComments
-          ? conversationsQuery.data?.legacyNode?.conversationsConnection?.nodes
-          : submissionCommentsQuery.data?.legacyNode?.viewableSubmissionsConnection?.nodes
-      }
+      conversations={inboxItemData}
       onOpen={() => {}}
       onSelect={onSelectConversation}
       onStar={handleStar}
