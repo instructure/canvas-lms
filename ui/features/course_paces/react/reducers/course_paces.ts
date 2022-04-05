@@ -102,10 +102,10 @@ export const getSettingChanges = createDeepEqualSelector(
   getExcludeWeekends,
   getHardEndDates,
   getOriginalPace,
-  getBlackoutDates,
-  getOriginalBlackoutDates,
   getEndDate,
-  (excludeWeekends, hardEndDates, originalPace, blackoutDates, originalBlackoutDates, endDate) => {
+  getOriginalBlackoutDates,
+  getBlackoutDates,
+  (excludeWeekends, hardEndDates, originalPace, endDate, originalBlackoutDates, blackoutDates) => {
     const changes: Change[] = []
 
     if (excludeWeekends !== originalPace.exclude_weekends)
@@ -115,12 +115,9 @@ export const getSettingChanges = createDeepEqualSelector(
         newValue: excludeWeekends
       })
 
-    if (!deepEqual(blackoutDates, originalBlackoutDates)) {
-      changes.push({
-        id: 'blackout_dates',
-        oldValue: originalBlackoutDates,
-        newValue: blackoutDates
-      })
+    const blackoutChanges = getBlackoutDateChanges(originalBlackoutDates, blackoutDates)
+    if (blackoutChanges.length) {
+      changes.splice(0, 0, ...blackoutChanges)
     }
 
     // we want to validate that if hardEndDates is true that the endDate is a valid date
@@ -144,6 +141,54 @@ export const getSettingChanges = createDeepEqualSelector(
     return changes
   }
 )
+
+function getBlackoutDateChanges(
+  originalBlackoutDates: BlackoutDate[],
+  blackoutDates: BlackoutDate[]
+): Change[] {
+  const changes: Change[] = []
+
+  if (deepEqual(originalBlackoutDates, blackoutDates)) return changes
+
+  // if I don't find the new one in the orig, it was added
+  if (originalBlackoutDates.length) {
+    blackoutDates.forEach(bod => {
+      const targetId: string = (bod.id || bod.temp_id) as string
+      if (
+        originalBlackoutDates.findIndex(elem => {
+          return (elem.id || elem.temp_id) === targetId
+        }) < 0
+      ) {
+        changes.push({
+          id: 'blackout_date',
+          oldValue: null,
+          newValue: bod
+        })
+      }
+    })
+
+    // if I don't find the orig one in new, it was deleted
+    originalBlackoutDates.forEach(bod => {
+      const targetId = (bod.id || bod.temp_id) as string
+      let index
+      if (
+        (index =
+          blackoutDates.findIndex(elem => {
+            return (elem.id || elem.temp_id) === targetId
+          }) < 0)
+      ) {
+        changes.push({
+          id: 'blackout_date',
+          oldValue: bod,
+          newValue: blackoutDates[index]
+        })
+      }
+    })
+
+    // todo: it exists in both => it was edited (if/when the UI supports it)
+  }
+  return changes
+}
 
 export const getCoursePaceItemChanges = createDeepEqualSelector(
   getCoursePaceItems,

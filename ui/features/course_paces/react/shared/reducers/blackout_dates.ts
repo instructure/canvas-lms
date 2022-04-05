@@ -21,7 +21,7 @@ import {BlackoutDate, SyncState, BlackoutDateState} from '../types'
 import {Constants, BlackoutDatesAction} from '../actions/blackout_dates'
 import {getInitialBlackoutDates} from '../../reducers/original'
 
-export const getBlackoutDates = (state: CoursePageStoreState) => {
+export const getBlackoutDates = (state: CoursePageStoreState): BlackoutDate[] => {
   return state.blackoutDates.blackoutDates
 }
 
