@@ -36,8 +36,11 @@ shared_examples_for "k5 homeroom announcements" do
     announcement1.update!(posted_at: 15.days.ago)
 
     get "/"
+    wait_for_ajaximations
 
-    expect(no_recent_announcements).to be_displayed
+    keep_trying_for_attempt_times(attempts: 5, sleep_interval: 0.5) do
+      expect(no_recent_announcements).to be_displayed
+    end
 
     click_previous_announcement_button(0)
 
