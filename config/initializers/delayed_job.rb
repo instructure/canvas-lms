@@ -32,9 +32,8 @@ Delayed::Backend::Base.class_eval do
     account.resolved_root_account_id
   end
 
-  def to_log_format
-    logged_attributes = %i[tag strand singleton priority attempts created_at max_attempts source account_id]
-    log_hash = attributes.with_indifferent_access.slice(*logged_attributes)
+  def log_format_context
+    log_hash = {}
     log_hash[:shard_id] = current_shard&.id
     log_hash[:jobs_cluster] = "NONE"
     if current_shard.respond_to?(:delayed_jobs_shard_id)
@@ -42,7 +41,19 @@ Delayed::Backend::Base.class_eval do
     end
     log_hash[:db_cluster] = current_shard&.database_server&.id
     log_hash[:root_account_id] = Shard.global_id_for(root_account_id)
-    log_hash.with_indifferent_access.to_json
+    log_hash
+  end
+
+  def to_detailed_log_format
+    logged_attributes = %i[tag strand singleton priority attempts created_at max_attempts source account_id]
+    log_hash = attributes.with_indifferent_access.slice(*logged_attributes)
+    log_hash.merge(log_format_context).with_indifferent_access.to_json
+  end
+
+  def to_short_log_format
+    logged_attributes = %i[account_id]
+    log_hash = attributes.with_indifferent_access.slice(*logged_attributes)
+    log_hash.merge(log_format_context).with_indifferent_access.to_json
   end
 end
 
@@ -61,7 +72,8 @@ Delayed::Backend::ActiveRecord::Job.include(Delayed::Backend::DefaultJobAccount)
 
 Delayed::Settings.default_job_options        = -> { { current_shard: Shard.current } }
 Delayed::Settings.fetch_batch_size           = -> { Setting.get("jobs_get_next_batch_size", "5").to_i }
-Delayed::Settings.job_detailed_log_format    = ->(job) { job.to_log_format }
+Delayed::Settings.job_detailed_log_format    = ->(job) { job.to_detailed_log_format }
+Delayed::Settings.job_short_log_format       = ->(job) { job.to_short_log_format }
 Delayed::Settings.max_attempts               = 1
 Delayed::Settings.num_strands                = ->(strand_name) { Setting.get("#{strand_name}_num_strands", nil) }
 Delayed::Settings.pool_procname_suffix       = " (#{Canvas.revision})" if Canvas.revision
