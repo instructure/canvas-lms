@@ -22,17 +22,18 @@ import {PACE_ITEM_1, PACE_ITEM_2} from '../../__tests__/fixtures'
 const EXCLUDE_WEEKENDS = {id: 'exclude_weekends', oldValue: false, newValue: true}
 const END_DATE = {id: 'end_date', oldValue: '2021-09-01', newValue: '2021-11-01'}
 const REQUIRE_COMPLETION = {id: 'require_completion', oldValue: false, newValue: true}
-const BLACKOUT_DATES = {
-  id: 'blackout_dates',
-  oldValue: [
-    {id: '1', event_title: 'one'},
-    {id: '2', event_title: 'two'}
-  ],
-  newValue: [
-    {id: '1', event_title: 'two'},
-    {temp_id: '_foo', event_title: 'new one'}
-  ]
-}
+const BLACKOUT_DATES = [
+  {
+    id: 'blackout_date',
+    oldValue: {id: '1', event_title: 'one'},
+    newValue: null
+  },
+  {
+    id: 'blackout_date',
+    oldValue: null,
+    newValue: {temp_id: '_foo', event_title: 'new one'}
+  }
+]
 
 describe('summarizeSettingChanges', () => {
   it('formats known setting changes correctly', () => {
@@ -59,8 +60,15 @@ describe('summarizeSettingChanges', () => {
   })
 
   it('includes blackout date changes', () => {
-    const changes = summarizeSettingChanges([BLACKOUT_DATES])
-    expect(changes[0]).toMatchObject({id: 'blackout_dates', summary: 'Blackout dates changed'})
+    const changes = summarizeSettingChanges(BLACKOUT_DATES)
+    expect(changes[0]).toMatchObject({
+      id: 'blackout_date',
+      summary: 'Blackout date one was deleted.'
+    })
+    expect(changes[1]).toMatchObject({
+      id: 'blackout_date',
+      summary: 'Blackout date new one was added.'
+    })
   })
 })
 

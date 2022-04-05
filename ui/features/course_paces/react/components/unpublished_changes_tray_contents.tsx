@@ -18,16 +18,50 @@
 
 import {View} from '@instructure/ui-view'
 import {CloseButton} from '@instructure/ui-buttons'
-import {List} from '@instructure/ui-list'
+// import {List} from '@instructure/ui-list'
 import {Text} from '@instructure/ui-text'
-import React from 'react'
+import React, {useEffect} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {SummarizedChange} from '../utils/change_tracking'
 
 const I18n = useI18nScope('unpublished_changes_tray_contents')
 
+// the INSTUI <List as="ol"> has a bug where the item numbering
+// is not in a hanging indent, so when list items wrap they
+// wrap all the way under the number, which does not look correct.
+// This styles a vanilla html OL until INSTUI fixes their bug.
+function styleList() {
+  if (document.getElementById('course_pace_changes_list_style')) return
+  const styl = document.createElement('style')
+  styl.id = 'course_pace_changes_list_style'
+  styl.textContent = `
+  ol.course_pace_changes {
+    margin: 0 0 1.5rem;
+    padding: 0;
+    counter-reset: item;
+  }
+
+  ol.course_pace_changes>li {
+    margin: 0 0 .5rem 2rem;
+    text-indent: -2rem;
+    list-style-type: none;
+    counter-increment: item;
+  }
+
+  ol.course_pace_changes>li::before {
+    display: inline-block;
+    width: 1.5rem;
+    margin-inline-end: 0.5rem;
+    font-weight: bold;
+    text-align: right;
+    content: counter(item) ".";
+  }
+  `
+  document.head.appendChild(styl)
+}
+
 // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-const {Item} = List as any
+// const {Item} = List as any
 
 export type UnpublishedChangesTrayProps = {
   changes?: SummarizedChange[]
@@ -38,6 +72,10 @@ const UnpublishedChangesTrayContents = ({
   changes = [],
   handleTrayDismiss
 }: UnpublishedChangesTrayProps) => {
+  useEffect(() => {
+    styleList()
+  }, [])
+
   return (
     <View as="div" width="20rem" margin="0 auto large" padding="small">
       <CloseButton
@@ -51,9 +89,9 @@ const UnpublishedChangesTrayContents = ({
           <Text weight="bold">{I18n.t('Unpublished Changes')}</Text>
         </h4>
       </View>
-      <List margin="none" as="ol" itemSpacing="small">
-        {changes.map(c => c.summary && <Item key={c.id}>{c.summary}</Item>)}
-      </List>
+      <ol className="course_pace_changes">
+        {changes.map(c => c.summary && <li key={c.id}>{c.summary}</li>)}
+      </ol>
     </View>
   )
 }
