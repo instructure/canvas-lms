@@ -11,6 +11,8 @@ LOG="$(pwd)/log/docker_dev_update.log"
 DOCKER='true'
 OS="$(uname)"
 SCRIPT_NAME=$0
+DOCKER_COMMAND="docker-compose"
+CANVAS_SKIP_DOCKER_USERMOD='true'
 
 usage () {
   echo "usage:"
@@ -26,9 +28,11 @@ die () {
 }
 
 _canvas_lms_opt_in_telemetry "$SCRIPT_NAME" "$LOG"
-DOCKER_COMMAND="mutagen-compose"
-CANVAS_SKIP_DOCKER_USERMOD='true'
-print_mutagen_intro
+if installed mutagen; then
+  print_mutagen_intro
+  DOCKER_COMMAND="mutagen-compose"
+  IS_MUTAGEN=true
+fi
 
 while :; do
   case $1 in
@@ -84,7 +88,7 @@ fi
 if [ -f "docker-compose.override.yml" ]; then
   echo "docker-compose.override.yml exists, skipping copy of default configuration"
 else
-  copy_mutagen_override
+  setup_docker_compose_override
 fi
 
 if [[ -n "$UPDATE_CODE" ]] || [[ -n "$REBUILD_DOCKER" ]] && [[ "$(docker-compose top | wc -l)" -gt 0 ]]; then
