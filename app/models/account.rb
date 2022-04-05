@@ -998,10 +998,11 @@ class Account < ActiveRecord::Base
 
   def self.account_chain_ids(starting_account_id)
     block = lambda do |_name|
+      original_shard = Shard.current
       Shard.shard_for(starting_account_id).activate do
         id_chain = []
         if starting_account_id.is_a?(Account)
-          id_chain << starting_account_id.id
+          id_chain << Shard.relative_id_for(starting_account_id.id, Shard.current, original_shard)
           starting_account_id = starting_account_id.parent_account_id
         end
 
@@ -1015,7 +1016,7 @@ class Account < ActiveRecord::Base
               )
               SELECT id FROM t
             SQL
-            id_chain.concat(ids.map(&:to_i))
+            id_chain.concat(ids.map { |id| Shard.relative_id_for(id, Shard.current, original_shard) })
           end
         end
         id_chain
@@ -1026,21 +1027,17 @@ class Account < ActiveRecord::Base
   end
 
   def self.multi_account_chain_ids(starting_account_ids)
-    if connection.adapter_name == "PostgreSQL"
-      original_shard = Shard.current
-      Shard.partition_by_shard(starting_account_ids) do |sliced_acc_ids|
-        ids = Account.connection.select_values(<<~SQL.squish)
-          WITH RECURSIVE t AS (
-            SELECT * FROM #{Account.quoted_table_name} WHERE id IN (#{sliced_acc_ids.join(", ")})
-            UNION
-            SELECT accounts.* FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.id=t.parent_account_id
-          )
-          SELECT id FROM t
-        SQL
-        ids.map { |id| Shard.relative_id_for(id, Shard.current, original_shard) }
-      end
-    else
-      account_chain(starting_account_id).map(&:id)
+    original_shard = Shard.current
+    Shard.partition_by_shard(starting_account_ids) do |sliced_acc_ids|
+      ids = Account.connection.select_values(sanitize_sql(<<~SQL.squish))
+        WITH RECURSIVE t AS (
+          SELECT * FROM #{Account.quoted_table_name} WHERE id IN (#{sliced_acc_ids.join(", ")})
+          UNION
+          SELECT accounts.* FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.id=t.parent_account_id
+        )
+        SELECT id FROM t
+      SQL
+      ids.map { |id| Shard.relative_id_for(id, Shard.current, original_shard) }
     end
   end
 
