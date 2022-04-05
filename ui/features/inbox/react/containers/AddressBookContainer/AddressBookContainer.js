@@ -49,7 +49,8 @@ export const AddressBookContainer = props => {
         context: filterHistory[filterHistory.length - 1]?.context?.contextID,
         search: inputValue,
         userID,
-        afterUser: data?.legacyNode?.recipients?.usersConnection?.pageInfo.endCursor
+        afterUser: data?.legacyNode?.recipients?.usersConnection?.pageInfo.endCursor,
+        afterContext: data?.legacyNode?.recipients?.contextsConnection?.pageInfo.endCursor
       },
       updateQuery: (previousResult, {fetchMoreResult}) => {
         setIsLoadingMoreData(false)
@@ -57,7 +58,14 @@ export const AddressBookContainer = props => {
           legacyNode: {
             ...previousResult.legacyNode,
             recipients: {
-              contextsConnection: fetchMoreResult.legacyNode?.recipients?.contextsConnection,
+              contextsConnection: {
+                nodes: [
+                  ...previousResult.legacyNode?.recipients?.contextsConnection?.nodes,
+                  ...fetchMoreResult.legacyNode?.recipients?.contextsConnection?.nodes
+                ],
+                pageInfo: fetchMoreResult.legacyNode?.recipients?.contextsConnection?.pageInfo,
+                __typename: 'MessageableContextConnection'
+              },
               usersConnection: {
                 nodes: [
                   ...previousResult.legacyNode?.recipients?.usersConnection?.nodes,
@@ -143,6 +151,11 @@ export const AddressBookContainer = props => {
     if (userData.length > 0 && !loading) {
       userData[userData.length - 1].isLast = true
     }
+
+    if (contextData.length > 0 && !loading) {
+      contextData[contextData.length - 1].isLast = true
+    }
+
     if (filterHistory[filterHistory.length - 1]?.subMenuSelection && inputValue === '') {
       const selection = filterHistory[filterHistory.length - 1]?.subMenuSelection
       const filteredMenuData = selection.includes('Course')
@@ -176,7 +189,10 @@ export const AddressBookContainer = props => {
   return (
     <AddressBook
       menuData={menuData}
-      hasMoreMenuData={data?.legacyNode?.recipients?.usersConnection?.pageInfo?.hasNextPage}
+      hasMoreMenuData={
+        data?.legacyNode?.recipients?.usersConnection?.pageInfo?.hasNextPage ||
+        data?.legacyNode?.recipients?.contextsConnection?.pageInfo?.hasNextPage
+      }
       fetchMoreMenuData={fetchMoreMenuData}
       isLoadingMoreMenuData={isLoadingMoreData}
       isLoading={loading}
