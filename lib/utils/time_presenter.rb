@@ -42,7 +42,7 @@ module Utils
     private
 
     def formatted_result
-      I18n.l(time, format: format)
+      I18n.l(time, format: format)&.strip
     end
 
     def get_range_time(raw)
