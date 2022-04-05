@@ -2144,6 +2144,12 @@ describe Account do
     end
 
     describe "account_chain_ids" do
+      let(:account1) { Account.default.sub_accounts.create! }
+
+      before do
+        account1
+      end
+
       it "caches" do
         expect(Account.connection).to receive(:select_values).once.and_call_original
         2.times { Account.account_chain_ids(Account.default.id) }
@@ -2156,11 +2162,32 @@ describe Account do
       end
 
       it "updates if the account chain changes" do
-        account1 = Account.default.sub_accounts.create!
         account2 = Account.default.sub_accounts.create!
         expect(Account.account_chain_ids(account2.id)).to eq [account2.id, Account.default.id]
         account2.update_attribute(:parent_account, account1)
         expect(Account.account_chain_ids(account2.id)).to eq [account2.id, account1.id, Account.default.id]
+      end
+
+      def expect_id_chain_for_account(account, id_chain)
+        # frd disable caching for testing, so that calls with either
+        # Account or id still exercise all logic
+        allow(Account).to receive(:cache_key_for_id).and_return(nil)
+        expect(Account.account_chain_ids(account.id)).to eq id_chain
+        expect(Account.account_chain_ids(account)).to eq id_chain
+      end
+
+      it "returns local ids" do
+        expect_id_chain_for_account(account1, [account1.id, Account.default.id])
+      end
+
+      context "on another shard" do
+        specs_require_sharding
+
+        it "returns correct global ids" do
+          @shard1.activate do
+            expect_id_chain_for_account(account1, [account1.global_id, Account.default.global_id])
+          end
+        end
       end
     end
   end
