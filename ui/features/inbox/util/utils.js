@@ -74,6 +74,33 @@ export const inboxConversationsWrapper = (data, isSubmissionComments = false) =>
   return inboxConversations
 }
 
+// Takes in data from the CONVERSATION_MESSAGES_QUERY
+// Outputs an an object that contains an array of wrapped inboxMessages and the contextName
+export const inboxMessagesWrapper = (data, isSubmissionComments = false) => {
+  const inboxMessages = []
+  let contextName = ''
+  if (data) {
+    data.conversationMessagesConnection.nodes.forEach(message => {
+      const inboxMessage = {}
+      if (isSubmissionComments) {
+      } else {
+        inboxMessage.id = message.id
+        inboxMessage._id = message._id
+        inboxMessage.contextName = message.contextName
+        inboxMessage.createdAt = message.createdAt
+        inboxMessage.author = message.author
+        inboxMessage.recipients = message.recipients
+        inboxMessage.body = message.body
+        inboxMessage.attachmentsConnection = message.attachmentsConnection
+        inboxMessage.mediaComment = message.mediaComment
+        contextName = data?.contextName
+      }
+      inboxMessages.push(inboxMessage)
+    })
+  }
+  return {inboxMessages, contextName}
+}
+
 const getSubmissionCommentsParticipantString = messages => {
   const uniqueParticipants = []
   messages.forEach(message => {
