@@ -56,6 +56,12 @@ module Utils
         expect(presenter.as_string).to match(/\d+:\d{2}[ap]m$/)
       end
 
+      it "does not have leading or trailing spaces" do
+        presenter = TimePresenter.new(time)
+        result = presenter.as_string
+        expect(result).to eq result.strip
+      end
+
       it "trims the minutes for an on-the-hour time" do
         presenter = TimePresenter.new(time)
         expect(presenter.as_string).to match(/\d+[ap]m$/)

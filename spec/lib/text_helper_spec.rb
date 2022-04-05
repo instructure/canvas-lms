@@ -56,8 +56,8 @@ describe TextHelper do
       time = Time.zone.now
       mountain = th.time_string(time, nil, ActiveSupport::TimeZone["America/Denver"])
       central = th.time_string(time, nil, ActiveSupport::TimeZone["America/Chicago"])
-      expect(mountain).to eq " 6:21am"
-      expect(central).to eq " 7:21am"
+      expect(mountain).to eq "6:21am"
+      expect(central).to eq "7:21am"
     end
   end
 

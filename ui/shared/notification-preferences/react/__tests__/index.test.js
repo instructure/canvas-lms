@@ -47,11 +47,11 @@ describe('Notification Preferences', () => {
   it('renders notification times with a close button', () => {
     window.ENV = {
       NOTIFICATION_PREFERENCES_OPTIONS: {
-        daily_notification_time: ' 6pm',
+        daily_notification_time: '6pm',
         weekly_notification_range: {
           weekday: 'Saturday',
-          start_time: ' 7pm',
-          end_time: ' 9pm'
+          start_time: '7pm',
+          end_time: '9pm'
         }
       }
     }
@@ -61,7 +61,7 @@ describe('Notification Preferences', () => {
     const notification_times = getByTestId('notification_times')
     expect(notification_times).not.toBeNull()
     expect(notification_times.textContent).toEqual(
-      'Daily notifications will be delivered around  6pm. Weekly notifications will be delivered Saturday between  7pm and  9pm.Close'
+      'Daily notifications will be delivered around 6pm. Weekly notifications will be delivered Saturday between 7pm and 9pm.Close'
     )
   })
 
@@ -70,7 +70,7 @@ describe('Notification Preferences', () => {
       NOTIFICATION_PREFERENCES_OPTIONS: {
         send_scores_in_emails_text: null,
         allowed_push_categories: [],
-        daily_notification_time: ' 6pm'
+        daily_notification_time: '6pm'
       }
     }
 
@@ -88,7 +88,7 @@ describe('Notification Preferences', () => {
         allowed_push_categories: [],
         weekly_notification_range: {
           weekday: 'Saturday',
-          start_time: ' 7pm',
+          start_time: '7pm',
           end_time: '9pm'
         }
       }

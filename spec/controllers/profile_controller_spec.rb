@@ -379,7 +379,7 @@ describe ProfileController do
         Timecop.freeze(Time.zone.local(2021, 9, 22, 1, 0, 0)) do
           get "communication"
 
-          expect(assigns[:js_env][:NOTIFICATION_PREFERENCES_OPTIONS][:daily_notification_time]).to eq(" 6pm")
+          expect(assigns[:js_env][:NOTIFICATION_PREFERENCES_OPTIONS][:daily_notification_time]).to eq("6pm")
         end
       end
     end
