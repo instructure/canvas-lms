@@ -43,13 +43,10 @@ export const ConversationListHolder = ({...props}) => {
   const provideConversationsForOnSelect = conversationIds => {
     let matchedConversations = props.conversations?.filter(c => conversationIds.includes(c._id))
 
-    matchedConversations = props.isSubmissionComments
-      ? []
-      : matchedConversations.map(c => c.conversation)
+    matchedConversations = props.isSubmissionComments ? [] : matchedConversations
 
     props.onSelect(matchedConversations)
   }
-
   /*
    * When conversations change, we need to re-provide the selectedConversations (CanvasInbox).
    * That way, other components have the latest state of the selected the conversations.
@@ -80,7 +77,7 @@ export const ConversationListHolder = ({...props}) => {
   }
 
   // Key handler for MessageListItems
-  const handleItemSelection = (e, _id, conversation, multiple) => {
+  const handleItemSelection = (e, _id, multiple) => {
     // Prevents selecting text when shift clicking to select range
     if (e.shiftKey) {
       window.document.getSelection().removeAllRanges()
@@ -181,19 +178,19 @@ export const ConversationListHolder = ({...props}) => {
         return (
           <ConversationListItem
             id={conversation._id}
-            conversation={props.isSubmissionComments ? undefined : conversation.conversation}
-            submissionComments={props.isSubmissionComments ? conversation : undefined}
+            conversation={conversation}
             isStarred={conversation?.label === 'starred'}
             isSelected={selectedMessages.includes(conversation._id)}
             isUnread={conversation?.workflowState === 'unread'}
             onOpen={props.onOpen}
             onRemoveFromSelectedConversations={removeFromSelectedConversations}
             onSelect={handleItemSelection}
-            onStar={props.isSubmissionComments ? () => {} : props.onStar}
+            onStar={props.onStar}
             key={conversation._id}
             readStateChangeConversationParticipants={
               props.isSubmissionComments ? () => {} : readStateChangeConversationParticipants
             }
+            isSubmissionComments={props.isSubmissionComments}
           />
         )
       })}
