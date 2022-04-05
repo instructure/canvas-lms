@@ -36,6 +36,8 @@ import * as DateHelpers from '../../utils/date_stuff/date_helpers'
 
 const I18n = useI18nScope('course_pace_date_input')
 
+const {Item: FlexItem} = Flex as any
+
 export type CoursePacesDateInputProps = {
   readonly id?: string
   readonly dateValue?: string
@@ -91,9 +93,18 @@ const CoursePaceDateInput = ({
   endDate
 }: CoursePacesDateInputProps) => {
   const [customErrors, setCustomErrors] = useState<string[]>([])
-  const formatDate = useDateTimeFormat('date.formats.long', coursePaceTimezone, ENV.LOCALE)
+  const formatDateReadonly = useDateTimeFormat(
+    'date.formats.medium_with_weekday',
+    coursePaceTimezone,
+    ENV.LOCALE
+  )
+  const formatDateForEdit = useDateTimeFormat(
+    'date.formats.compact',
+    coursePaceTimezone,
+    ENV.LOCALE
+  )
 
-  const calculateErrors = (date: Moment | undefined): string[] => {
+  const calculateErrors = (date?: Moment): string[] => {
     const errors: string[] = []
 
     if (!date && permitEmpty) return errors
@@ -137,7 +148,7 @@ const CoursePaceDateInput = ({
           {helpText && <ScreenReaderContent>{helpText}</ScreenReaderContent>}
         </View>
         <Flex data-testid="coursepace-date-text" as="div" height="2.25rem" alignItems="center">
-          {formatDate(moment.tz(dateValue, coursePaceTimezone).toISOString(true))}
+          {formatDateReadonly(moment.tz(dateValue, coursePaceTimezone).toISOString(true))}
         </Flex>
         {helpText && (
           <div style={{whiteSpace: 'nowrap', marginTop: '.75rem'}}>
@@ -153,12 +164,12 @@ const CoursePaceDateInput = ({
   }
 
   const messages = (customErrors?.length ? customErrors : calculateErrors()).map(e => ({
-    type: 'error',
+    type: 'error' as const,
     text: (
       <Flex>
-        <Flex.Item margin="0 x-small 0 0" align="start">
+        <FlexItem margin="0 x-small 0 0" align="start">
           <IconWarningLine />
-        </Flex.Item>
+        </FlexItem>
         <span style={{whiteSpace: 'nowrap'}}>{e}</span>
       </Flex>
     )
@@ -168,9 +179,9 @@ const CoursePaceDateInput = ({
       type: message.type === 'warning' ? 'hint' : message.type,
       text: (
         <Flex>
-          <Flex.Item margin="0 x-small 0 0" align="start">
+          <FlexItem margin="0 x-small 0 0" align="start">
             <IconWarningLine color={message.type} />
-          </Flex.Item>
+          </FlexItem>
           <Text color={message.type}>{message.text}</Text>
         </Flex>
       )
@@ -191,7 +202,7 @@ const CoursePaceDateInput = ({
           dataTestid="course-pace-date"
           renderLabel={dateInputLabel}
           timezone={coursePaceTimezone}
-          formatDate={formatDate}
+          formatDate={formatDateForEdit}
           onSelectedDateChange={handleDateChange}
           selectedDate={dateValue}
           dateIsDisabled={d => !!calculateErrors(d).length}

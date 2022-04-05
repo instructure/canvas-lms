@@ -24,6 +24,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {BlackoutDate} from '../types'
+import {coursePaceDateFormatter} from '../api/backend_serializer'
 
 const I18n = useI18nScope('course_paces_blackout_dates_table')
 
@@ -43,11 +44,13 @@ type ComponentProps = PassedProps
 interface LocalState {}
 
 export class BlackoutDatesTable extends React.Component<ComponentProps, LocalState> {
+  private dateFormatter: any
   /* Lifecycle */
 
   constructor(props: ComponentProps) {
     super(props)
     this.state = {}
+    this.dateFormatter = coursePaceDateFormatter()
   }
 
   /* Helpers */
@@ -93,8 +96,8 @@ export class BlackoutDatesTable extends React.Component<ComponentProps, LocalSta
     return dates.map(bd => (
       <Row key={`blackout-date-${bd.id}`}>
         <Cell>{bd.event_title}</Cell>
-        <Cell>{bd.start_date.format('L')}</Cell>
-        <Cell>{bd.end_date.format('L')}</Cell>
+        <Cell>{this.dateFormatter(bd.start_date.toDate())}</Cell>
+        <Cell>{this.dateFormatter(bd.end_date.toDate())}</Cell>
         <Cell textAlign="end">{this.renderTrash(bd)}</Cell>
       </Row>
     ))

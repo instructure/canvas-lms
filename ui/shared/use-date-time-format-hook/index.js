@@ -91,6 +91,12 @@ const optionsList = {
     // M/D/YY, H:M a
     dateStyle: 'short',
     timeStyle: 'short'
+  },
+  'date.formats.compact': {
+    // MM/DD/YYYY
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric'
   }
 }
 
