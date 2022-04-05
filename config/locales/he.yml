@@ -18495,6 +18495,11 @@ he:
   the_app_was_updated_successfully_3d71cd1b: "האפליקציה עודכנה בהצלחה"
   the_canvas_saml_entity_id_is_metadata_url_and_the__af7349ab: "מזהה ישות ה SAML של קנבס הנו %{metadata_url}, וספק השירות של מילון הנתונים זמין בכתובת הזו."
   the_course_link_validator_searches_through_course__76f0bc63: "מאמת תקינות הקישורים של הקורס מבצע חיפוש בתוכן הקורס ומאתר כל קישור לא תקין או לא מגיב. יש לשים לב שיתכנו קישורים שאינם מגיבים לשרתים שלנו אך הם פועלים בצורה תקינה עבור התלמידים. "
+  the_download_process_has_started_this_can_take_awh_7e616db1: |-
+      תהליך הייצוא החל
+      ויכול להמשך זמן מה לקורסים גדולים. *ניתן לעזוב דף זה*
+      ותוכלו לקבל הודעת דוא"ל כאשר
+      הייצוא מסתיים.
   the_error_stack_trace_if_there_is_one_b7e008a1: "דוח התחקות אחר שגיאה, אם קיימת כזו"
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "לשונית הקבצים הנה מקום לשתף שקופיות שיעור, מסמכי דוגמאות, עזרה בלימוד -- כל דבר אשר תלמידיך היו רוצים להוריד. העלאה ואירגון הקבצים בקנבס הנם פשוטים. נראה לך כיצד."
   the_following_fields_are_invalid_fields_b3565800: "השדות הבאים אינם חוקיים: %{fields}"
