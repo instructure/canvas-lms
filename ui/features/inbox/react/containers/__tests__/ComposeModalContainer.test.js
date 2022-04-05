@@ -83,7 +83,8 @@ describe('ComposeModalContainer', () => {
     isReply,
     isReplyAll,
     isForward,
-    conversation
+    conversation,
+    selectedIds = []
   ) => {
     return render(
       <ApolloProvider client={mswClient}>
@@ -95,6 +96,8 @@ describe('ComposeModalContainer', () => {
             isReplyAll={isReplyAll}
             isForward={isForward}
             conversation={conversation}
+            onSelectedIdsChange={jest.fn()}
+            selectedIds={selectedIds}
           />
         </AlertManagerContext.Provider>
       </ApolloProvider>

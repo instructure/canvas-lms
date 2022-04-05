@@ -56,7 +56,8 @@ const CanvasInbox = () => {
   const [multiselect, setMultiselect] = useState(false)
   const [messageOpenEvent, setMessageOpenEvent] = useState(false)
   const userID = ENV.current_user_id?.toString()
-  const [urlUserRecipientId, setUrlUserRecepientId] = useState() // eslint-disable-line no-unused-vars
+  const [urlUserRecipient, setUrlUserRecepient] = useState()
+  const [selectedIds, setSelectedIds] = useState([])
 
   const setFilterStateToCurrentWindowHash = () => {
     const validFilters = ['inbox', 'unread', 'starred', 'sent', 'archived', 'submission_comments']
@@ -74,11 +75,17 @@ const CanvasInbox = () => {
     if (isValidFilter) setScope(filterType)
   }
 
-  const setComposeModalRecepientToUrlUser = () => {
+  const setUrlUserRecepientFromUrlParam = () => {
     const urlData = new URLSearchParams(window.location.search)
     const userIdFromUrlData = urlData.get('user_id')
-    if (userIdFromUrlData) {
-      setUrlUserRecepientId(userIdFromUrlData)
+    const userNameFromUrlData = urlData.get('user_name')
+    if (userIdFromUrlData && userNameFromUrlData) {
+      setUrlUserRecepient({
+        _id: userIdFromUrlData,
+        name: userNameFromUrlData,
+        commonCoursesInfo: [],
+        itemType: 'user'
+      })
       setComposeModal(true)
     }
   }
@@ -87,15 +94,30 @@ const CanvasInbox = () => {
   // also get initial recepient settings if it exists in the url
   useEffect(() => {
     setFilterStateToCurrentWindowHash()
-    setComposeModalRecepientToUrlUser()
+    setUrlUserRecepientFromUrlParam()
     window.addEventListener('hashchange', setFilterStateToCurrentWindowHash)
   }, [])
+
+  // pre-populate recepients if urlUserRecipientId exists
+  useEffect(() => {
+    if (urlUserRecipient) {
+      setSelectedIds([urlUserRecipient])
+    }
+  }, [urlUserRecipient])
 
   // Keep the url updated
   useEffect(() => {
     const courseHash = courseFilter ? `&course=${courseFilter}` : ''
     window.location.hash = `#filter=type=${scope}${courseHash}`
   }, [courseFilter, scope])
+
+  // upon compose modal close, disregard url recipient going forward
+  useEffect(() => {
+    if (urlUserRecipient && !composeModal) {
+      setUrlUserRecepient(null)
+      setSelectedIds([])
+    }
+  }, [composeModal, urlUserRecipient])
 
   const conversationContext = {
     multiselect,
@@ -109,6 +131,10 @@ const CanvasInbox = () => {
     setDeleteDisabled(conversations.length === 0)
     setArchiveDisabled(conversations.length === 0)
     setSelectedConversationMessage(null)
+  }
+
+  const onSelectedIdsChange = ids => {
+    setSelectedIds(ids)
   }
 
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -377,6 +403,8 @@ const CanvasInbox = () => {
               }}
               open={composeModal}
               conversationsQueryOption={conversationsQueryOption}
+              onSelectedIdsChange={onSelectedIdsChange}
+              selectedIds={selectedIds}
             />
           </ConversationContext.Provider>
         </div>

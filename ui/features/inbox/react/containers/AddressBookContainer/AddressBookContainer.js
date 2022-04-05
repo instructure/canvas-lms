@@ -202,6 +202,7 @@ export const AddressBookContainer = props => {
       inputValue={inputValue}
       onUserFilterSelect={props.onUserFilterSelect}
       onSelectedIdsChange={props.onSelectedIdsChange}
+      selectedRecipients={props.selectedRecipients}
       limitTagCount={props.limitTagCount}
       width={props.width}
       open={props.open}
@@ -216,6 +217,10 @@ AddressBookContainer.propTypes = {
    * Callback which provides an array of selected items
    */
   onSelectedIdsChange: PropTypes.func,
+  /**
+   * An array of selected recepient objects
+   */
+  selectedRecipients: PropTypes.array,
   /**
    * Number that limits selected item count
    */
