@@ -42,22 +42,20 @@ describe "course pace page" do
     user_session @teacher
   end
 
-  context "course pace not enabled" do
-    it "does not include Course Pacing navigation element when disabled" do
-      disable_course_paces_in_course
-      visit_course(@course)
-
-      expect(course_paces_nav_exists?).to be_falsey
-    end
-  end
-
-  context "course paces in course navigation" do
-    it "navigates to the course paces page when Course Pacing is clicked" do
-      visit_course(@course)
+  context "course paces modules button" do
+    it "navigates to the course paces page when clicked" do
+      get "/courses/#{@course.id}/modules"
 
       click_course_paces
 
       expect(driver.current_url).to include("/courses/#{@course.id}/course_paces")
+    end
+
+    it "is not shown when disabled" do
+      disable_course_paces_in_course
+      get "/courses/#{@course.id}/modules"
+
+      expect(course_paces_nav_exists?).to be_falsey
     end
   end
 
