@@ -1370,7 +1370,7 @@ module UpdateAndDeleteWithJoins
   def update_all(updates, *args)
     db = Shard.current(klass.send(Rails.version < "6.1" ? :shard_category : :connection_classes)).database_server
     if joins_values.empty?
-      if ::GuardRail.environment == db.guard_rail_environment
+      if Rails.version < "6.1" && ::GuardRail.environment == db.guard_rail_environment
         return super
       else
         Shard.current.database_server.unguard { return super }
@@ -1410,7 +1410,7 @@ module UpdateAndDeleteWithJoins
     end
     where_sql = collector.value
     sql.concat("WHERE " + where_sql)
-    if ::GuardRail.environment == db.guard_rail_environment
+    if Rails.version < "6.1" && ::GuardRail.environment == db.guard_rail_environment
       connection.update(sql, "#{name} Update")
     else
       Shard.current.database_server.unguard { connection.update(sql, "#{name} Update") }
