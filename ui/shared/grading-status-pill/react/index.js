@@ -40,7 +40,7 @@ export default {
     })
 
     forEachNode(lateMountPoints, mountPoint => {
-      ReactDOM.render(<Pill color="warning">{I18n.t('late')}</Pill>, mountPoint)
+      ReactDOM.render(<Pill color="info">{I18n.t('late')}</Pill>, mountPoint)
     })
 
     forEachNode(excusedMountPoints, mountPoint => {
