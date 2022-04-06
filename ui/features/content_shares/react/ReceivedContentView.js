@@ -22,6 +22,8 @@ import CanvasLazyTray from '@canvas/trays/react/LazyTray'
 import ContentHeading from './ContentHeading'
 import ReceivedTable from './ReceivedTable'
 import PreviewModal from './PreviewModal'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import useFetchApi from '@canvas/use-fetch-api-hook'
@@ -155,6 +157,9 @@ export default function ReceivedContentView() {
 
   return (
     <>
+      <ScreenReaderContent>
+        <Heading level="h1">{I18n.t('Shared Content')}</Heading>
+      </ScreenReaderContent>
       <ContentHeading
         svgUrl="/images/gift.svg"
         heading={I18n.t('Received Content')}
