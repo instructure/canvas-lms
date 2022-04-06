@@ -34,7 +34,7 @@ export default function SubmissionStatusPill(props) {
     )
   } else if (props.submissionStatus === 'late') {
     return (
-      <Pill data-test-id="late-pill" color="warning">
+      <Pill data-test-id="late-pill" color="info">
         {I18n.t('Late')}
       </Pill>
     )
