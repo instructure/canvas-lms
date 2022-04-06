@@ -23,16 +23,18 @@ import {MessageDetailActions} from '../MessageDetailActions/MessageDetailActions
 import {MessageDetailMediaAttachment} from '../MessageDetailMediaAttachment/MessageDetailMediaAttachment'
 import {MessageDetailParticipants} from '../MessageDetailParticipants/MessageDetailParticipants'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, {useContext} from 'react'
 import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../../util/utils'
 import {IconPaperclipLine} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {List} from '@instructure/ui-list'
 import {Text} from '@instructure/ui-text'
+import {ConversationContext} from '../../../util/constants'
 
 export const MessageDetailItem = ({...props}) => {
   const createdAt = DateHelper.formatDatetimeForDisplay(props.conversationMessage.createdAt)
+  const {isSubmissionCommentsType} = useContext(ConversationContext)
 
   return (
     <Responsive
@@ -92,13 +94,15 @@ export const MessageDetailItem = ({...props}) => {
                 </Flex.Item>
               </Flex>
             </Flex.Item>
-            <Flex.Item textAlign="end">
-              <MessageDetailActions
-                onReply={props.onReply}
-                onReplyAll={props.onReplyAll}
-                onDelete={props.onDelete}
-              />
-            </Flex.Item>
+            {!isSubmissionCommentsType && (
+              <Flex.Item textAlign="end">
+                <MessageDetailActions
+                  onReply={props.onReply}
+                  onReplyAll={props.onReplyAll}
+                  onDelete={props.onDelete}
+                />
+              </Flex.Item>
+            )}
           </Flex>
           <Text size={responsiveProps.messageBody}>{props.conversationMessage.body}</Text>
           {props.conversationMessage.attachmentsConnection?.nodes?.length > 0 && (
