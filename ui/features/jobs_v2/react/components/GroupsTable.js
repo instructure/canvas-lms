@@ -58,8 +58,8 @@ export default function GroupsTable({
     <div>
       <Responsive
         query={{
-          small: {maxWidth: '60rem'},
-          large: {minWidth: '60rem'}
+          small: {maxWidth: '719px'},
+          large: {minWidth: '720px'}
         }}
         props={{
           small: {layout: 'stacked'},
