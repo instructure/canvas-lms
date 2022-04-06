@@ -63,14 +63,11 @@ describe('MessageDetailContainer', () => {
     // eslint-disable-next-line no-undef
     fetchMock.enableMocks()
   })
-
-  const mockConversation = Conversation.mock()
   const setup = overrideProps => {
     return render(
       <ApolloProvider client={mswClient}>
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
           <MessageDetailContainer
-            conversation={mockConversation}
             onReply={jest.fn()}
             onReplyAll={jest.fn()}
             onDelete={jest.fn()}
@@ -81,59 +78,81 @@ describe('MessageDetailContainer', () => {
     )
   }
 
-  describe('rendering', () => {
-    it('should render', () => {
-      const container = setup()
-      expect(container).toBeTruthy()
+  describe('conversation messages', () => {
+    const mockConversation = Conversation.mock()
+    describe('rendering', () => {
+      it('should render', () => {
+        const container = setup({conversation: mockConversation})
+        expect(container).toBeTruthy()
+      })
+
+      it('should render conversation information correctly', async () => {
+        const container = setup({conversation: mockConversation})
+        expect(container.getByText('Loading Conversation Messages')).toBeInTheDocument()
+        await waitForApolloLoading()
+
+        expect(await container.findByTestId('message-detail-header-desktop')).toBeInTheDocument()
+        expect(
+          await container.findByText(mockConversation.conversationMessagesConnection.nodes[1].body)
+        ).toBeInTheDocument()
+      })
     })
 
-    it('should render conversation information correctly', async () => {
-      const container = setup()
-      expect(container.getByText('Loading Conversation Messages')).toBeInTheDocument()
-      await waitForApolloLoading()
+    describe('function inputs', () => {
+      it('should delete with correct conversation ID', async () => {
+        const mockConvoDelete = jest.fn()
+        const container = setup({onDelete: mockConvoDelete, conversation: mockConversation})
+        await waitForApolloLoading()
 
-      expect(await container.findByTestId('message-detail-header-desktop')).toBeInTheDocument()
-      expect(
-        await container.findByText(mockConversation.conversationMessagesConnection.nodes[1].body)
-      ).toBeInTheDocument()
+        const moreOptionsButton = await container.findByTestId('more-options')
+        fireEvent.click(moreOptionsButton)
+        fireEvent.click(container.getByText('Delete'))
+        expect(mockConvoDelete).toHaveBeenCalledWith([mockConversation._id])
+      })
+
+      it('should reply with correct message', async () => {
+        const mockOnReply = jest.fn()
+        const container = setup({onReply: mockOnReply, conversation: mockConversation})
+        await waitForApolloLoading()
+
+        const replyButtons = await container.findAllByTestId('message-reply')
+        fireEvent.click(replyButtons[1])
+        expect(mockOnReply.mock.calls[0][0]._id).toBe(
+          mockConversation.conversationMessagesConnection.nodes[1]._id
+        )
+      })
+
+      it('should reply all with correct message', async () => {
+        const mockOnReplyAll = jest.fn()
+        const container = setup({onReplyAll: mockOnReplyAll, conversation: mockConversation})
+        await waitForApolloLoading()
+
+        const moreOptionsButtons = await container.findAllByTestId('message-more-options')
+        fireEvent.click(moreOptionsButtons[1])
+        fireEvent.click(container.getByText('Reply All'))
+        expect(mockOnReplyAll.mock.calls[0][0]._id).toBe(
+          mockConversation.conversationMessagesConnection.nodes[1]._id
+        )
+      })
     })
   })
 
-  describe('function inputs', () => {
-    it('should delete with correct conversation ID', async () => {
-      const mockConvoDelete = jest.fn()
-      const container = setup({onDelete: mockConvoDelete})
-      await waitForApolloLoading()
+  describe('submission comments', () => {
+    const mockSubmissionComment = {subject: 'mySubject', _id: '1'}
+    describe('rendering', () => {
+      it('should render', () => {
+        const container = setup({scope: 'submission_comments', conversation: mockSubmissionComment})
+        expect(container).toBeTruthy()
+      })
 
-      const moreOptionsButton = await container.findByTestId('more-options')
-      fireEvent.click(moreOptionsButton)
-      fireEvent.click(container.getByText('Delete'))
-      expect(mockConvoDelete).toHaveBeenCalledWith([mockConversation._id])
-    })
+      it('should render conversation information correctly', async () => {
+        const container = setup({scope: 'submission_comments', conversation: mockSubmissionComment})
+        expect(container.getByText('Loading Conversation Messages')).toBeInTheDocument()
+        await waitForApolloLoading()
 
-    it('should reply with correct message', async () => {
-      const mockOnReply = jest.fn()
-      const container = setup({onReply: mockOnReply})
-      await waitForApolloLoading()
-
-      const replyButtons = await container.findAllByTestId('message-reply')
-      fireEvent.click(replyButtons[1])
-      expect(mockOnReply.mock.calls[0][0]._id).toBe(
-        mockConversation.conversationMessagesConnection.nodes[1]._id
-      )
-    })
-
-    it('should reply all with correct message', async () => {
-      const mockOnReplyAll = jest.fn()
-      const container = setup({onReplyAll: mockOnReplyAll})
-      await waitForApolloLoading()
-
-      const moreOptionsButtons = await container.findAllByTestId('message-more-options')
-      fireEvent.click(moreOptionsButtons[1])
-      fireEvent.click(container.getByText('Reply All'))
-      expect(mockOnReplyAll.mock.calls[0][0]._id).toBe(
-        mockConversation.conversationMessagesConnection.nodes[1]._id
-      )
+        expect(await container.findByTestId('message-detail-header-desktop')).toBeInTheDocument()
+        expect(await container.findByText('my student comment')).toBeInTheDocument()
+      })
     })
   })
 })
