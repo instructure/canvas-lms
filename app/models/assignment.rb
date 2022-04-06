@@ -3781,7 +3781,10 @@ class Assignment < ActiveRecord::Base
     GradingPeriod.active.joins(:grading_period_group)
                  .where(close_date: look_back.minutes.ago(now)..now)
                  .where(grading_period_groups: { root_account: eligible_root_accounts }).find_each do |gp|
-      gp.delay(singleton: "disable_post_to_sis_on_grading_period_#{gp.global_id}").disable_post_to_sis
+      gp.delay(
+        singleton: "disable_post_to_sis_on_grading_period_#{gp.global_id}",
+        n_strand: ["Assignment#disable_post_to_sis_if_grading_period_closed", Shard.global_id_for(gp.root_account_id)]
+      ).disable_post_to_sis
     end
   end
 
