@@ -22,9 +22,11 @@ import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconPlusLine} from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {View} from '@instructure/ui-view'
+import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import {createRating} from '@canvas/outcomes/react/hooks/useRatings'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import ProficiencyRating from '../MasteryScale/ProficiencyRating'
@@ -220,50 +222,140 @@ const Ratings = ({
     </Flex>
   )
 
+  const renderRatingDescription = (description, position) => (
+    <Text>
+      <ScreenReaderContent>
+        {I18n.t(`Description for mastery level %{position}: %{description}`, {
+          position,
+          description
+        })}
+      </ScreenReaderContent>
+
+      <PresentationContent>{description}</PresentationContent>
+    </Text>
+  )
+
+  const renderRatingsPoints = (points, position) => (
+    <div className={isMobileView ? '' : 'points'}>
+      <View margin={isMobileView ? '0' : '0 0 0 small'}>
+        <ScreenReaderContent>
+          {I18n.t(`Points for mastery level %{position}: %{points}`, {
+            position,
+            points
+          })}
+        </ScreenReaderContent>
+
+        <PresentationContent>
+          {I18n.n(points)}
+
+          <div className="pointsDescription view-only">{I18n.t('points')}</div>
+        </PresentationContent>
+      </View>
+    </div>
+  )
+
+  const renderRatingsTable = () => (
+    <Flex width={isMobileView ? '100%' : '65%'} padding="x-small 0">
+      <Table caption="Ratings table" layout="fixed" data-testid="outcome-management-ratings-table">
+        <Table.Head>
+          <Table.Row theme={{borderColor: 'white'}}>
+            <Table.ColHeader id="rating" theme={{padding: '0.5rem 0rem'}}>
+              <div aria-hidden="true" className="header">
+                {I18n.t('Proficiency Rating')}
+              </div>
+            </Table.ColHeader>
+            {!isMobileView && (
+              <Table.ColHeader id="points" textAlign="end" theme={{padding: '0.5rem 0rem'}}>
+                <div aria-hidden="true" className="header">
+                  {I18n.t('Points')}
+                </div>
+              </Table.ColHeader>
+            )}
+          </Table.Row>
+        </Table.Head>
+        {ratings.map(({description, points}, index) => (
+          <Table.Body>
+            <Table.Row theme={{borderColor: 'white'}}>
+              <Table.Cell theme={{padding: '0.5rem 0rem'}}>
+                {renderRatingDescription(description, index + 1)}
+              </Table.Cell>
+              {!isMobileView && (
+                <Table.Cell textAlign="end" theme={{padding: '0.5rem 1.25rem'}}>
+                  {renderRatingsPoints(points, index + 1)}
+                </Table.Cell>
+              )}
+            </Table.Row>
+            {isMobileView && (
+              <Table.Row theme={{borderColor: 'white', padding: '0rem 0rem'}}>
+                <Table.Cell theme={{padding: '0.5rem 0rem'}}>
+                  {renderRatingsPoints(points, index + 1)}
+                </Table.Cell>
+              </Table.Row>
+            )}
+          </Table.Body>
+        ))}
+      </Table>
+    </Flex>
+  )
+
   return (
     <>
       <Flex
         width="100%"
-        padding={isMobileView ? '0 0 small 0' : '0 small small 0'}
-        margin="medium none none"
+        padding={isMobileView ? '0 0 small 0' : canManage ? '0 small small 0' : '0'}
+        margin={canManage ? 'medium none none' : 'small none none'}
+        direction={canManage ? 'row' : 'column'}
         data-testid="outcome-management-ratings"
       >
-        <Flex.Item size={isMobileView ? '75%' : canManage ? '80%' : '60%'}>
-          <div aria-hidden="true" className="header">
-            {I18n.t('Proficiency Rating')}
-          </div>
-        </Flex.Item>
-        {!isMobileView && (
-          <Flex.Item size="10%">
-            <div aria-hidden="true" className="header">
-              {I18n.t('Points')}
-            </div>
-          </Flex.Item>
+        {canManage ? (
+          <>
+            <Flex.Item size={isMobileView ? '75%' : canManage ? '80%' : '60%'}>
+              <div aria-hidden="true" className="header">
+                {I18n.t('Proficiency Rating')}
+              </div>
+            </Flex.Item>
+            {!isMobileView && (
+              <Flex.Item size="10%">
+                <div aria-hidden="true" className="header">
+                  {I18n.t('Points')}
+                </div>
+              </Flex.Item>
+            )}
+          </>
+        ) : (
+          <>
+            {renderRatingsTable()}
+            {renderDisplayMasteryPoints()}
+          </>
         )}
       </Flex>
-      {ratings.map(
-        ({key, description, descriptionError, pointsError, points, focusField}, index) => (
-          <ProficiencyRating
-            key={key}
-            description={description}
-            descriptionError={descriptionError}
-            disableDelete={ratings.length === 1}
-            onDelete={() => handleDelete(index)}
-            onDescriptionChange={value => onRatingFieldChange('description', value, index)}
-            onFocusChange={clearRatingsFocus}
-            onMasteryChange={() => onRatingFieldChange('mastery', true, index)}
-            onPointsChange={value => onRatingFieldChange('points', value, index)}
-            focusField={focusField}
-            points={points?.toString()}
-            pointsError={pointsError}
-            isMobileView={isMobileView}
-            position={index + 1}
-            canManage={canManage}
-            individualOutcome
-          />
-        )
+      {canManage && (
+        <>
+          {ratings.map(
+            ({key, description, descriptionError, pointsError, points, focusField}, index) => (
+              <ProficiencyRating
+                key={key}
+                description={description}
+                descriptionError={descriptionError}
+                disableDelete={ratings.length === 1}
+                onDelete={() => handleDelete(index)}
+                onDescriptionChange={value => onRatingFieldChange('description', value, index)}
+                onFocusChange={clearRatingsFocus}
+                onMasteryChange={() => onRatingFieldChange('mastery', true, index)}
+                onPointsChange={value => onRatingFieldChange('points', value, index)}
+                focusField={focusField}
+                points={points?.toString()}
+                pointsError={pointsError}
+                isMobileView={isMobileView}
+                position={index + 1}
+                canManage={canManage}
+                individualOutcome
+              />
+            )
+          )}
+          {renderEditMasteryPoints()}
+        </>
       )}
-      {canManage ? renderEditMasteryPoints() : renderDisplayMasteryPoints()}
     </>
   )
 }
