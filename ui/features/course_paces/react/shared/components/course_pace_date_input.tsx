@@ -107,7 +107,7 @@ const CoursePaceDateInput = ({
   const calculateErrors = (date?: Moment): string[] => {
     const errors: string[] = []
 
-    if (!date && permitEmpty) return errors
+    if (!date && !dateValue && permitEmpty) return errors
 
     if (!date) {
       date = moment(dateValue)
@@ -132,7 +132,10 @@ const CoursePaceDateInput = ({
   const handleDateChange = (date: MomentInput) => {
     const parsedDate = moment(date)
 
-    if (parsedDate.isValid()) {
+    if (!date && permitEmpty) {
+      setCustomErrors([])
+      onDateChange('')
+    } else if (parsedDate.isValid()) {
       onDateChange(parsedDate.toISOString(true).split('T')[0])
       setCustomErrors([])
     } else {
@@ -151,11 +154,9 @@ const CoursePaceDateInput = ({
           {formatDateReadonly(moment.tz(dateValue, coursePaceTimezone).toISOString(true))}
         </Flex>
         {helpText && (
-          <div style={{whiteSpace: 'nowrap', marginTop: '.75rem'}}>
+          <div style={{marginTop: '.75rem'}}>
             <PresentationContent>
-              <Text fontStyle="italic">
-                <span style={{whiteSpace: 'nowrap'}}>{helpText}</span>
-              </Text>
+              <Text fontStyle="italic">{helpText}</Text>
             </PresentationContent>
           </div>
         )}
@@ -170,7 +171,7 @@ const CoursePaceDateInput = ({
         <FlexItem margin="0 x-small 0 0" align="start">
           <IconWarningLine />
         </FlexItem>
-        <span style={{whiteSpace: 'nowrap'}}>{e}</span>
+        <FlexItem>{e}</FlexItem>
       </Flex>
     )
   }))
@@ -209,6 +210,7 @@ const CoursePaceDateInput = ({
           width={width}
           messages={messages}
           interaction={interaction}
+          withRunningValue
         />
         {messages.length === 0 && helpText && (
           <div style={{whiteSpace: 'nowrap', marginTop: '.5rem'}}>
