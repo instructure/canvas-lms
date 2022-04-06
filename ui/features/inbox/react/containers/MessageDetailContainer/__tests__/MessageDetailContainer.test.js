@@ -170,6 +170,24 @@ describe('MessageDetailContainer', () => {
         expect(await container.findByTestId('message-detail-header-desktop')).toBeInTheDocument()
         expect(await container.findByText('my student comment')).toBeInTheDocument()
       })
+
+      it('should not render reply option', async () => {
+        const container = setup({
+          isSubmissionCommentsType: true,
+          conversation: mockSubmissionComment
+        })
+        await waitForApolloLoading()
+        expect(container.queryByTestId('message-reply')).not.toBeInTheDocument()
+      })
+
+      it('should not render more options', async () => {
+        const container = setup({
+          isSubmissionCommentsType: true,
+          conversation: mockSubmissionComment
+        })
+        await waitForApolloLoading()
+        expect(container.queryByTestId('message-more-options')).not.toBeInTheDocument()
+      })
     })
   })
 })
