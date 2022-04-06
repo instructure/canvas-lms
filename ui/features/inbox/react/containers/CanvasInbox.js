@@ -54,6 +54,7 @@ const CanvasInbox = () => {
   const [isForward, setIsForward] = useState(false)
   const [displayUnarchiveButton, setDisplayUnarchiveButton] = useState(false)
   const [multiselect, setMultiselect] = useState(false)
+  const [isSubmissionCommentsType, setIsSubmissionCommentsType] = useState(false)
   const [messageOpenEvent, setMessageOpenEvent] = useState(false)
   const userID = ENV.current_user_id?.toString()
   const [urlUserRecipient, setUrlUserRecepient] = useState()
@@ -119,11 +120,18 @@ const CanvasInbox = () => {
     }
   }, [composeModal, urlUserRecipient])
 
+  // Keep the contextUpdated
+  useEffect(() => {
+    setIsSubmissionCommentsType(scope === 'submission_comments')
+  }, [scope])
+
   const conversationContext = {
     multiselect,
     setMultiselect,
     messageOpenEvent,
-    setMessageOpenEvent
+    setMessageOpenEvent,
+    isSubmissionCommentsType,
+    setIsSubmissionCommentsType
   }
 
   const updateSelectedConversations = conversations => {

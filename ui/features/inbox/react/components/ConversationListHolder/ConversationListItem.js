@@ -44,9 +44,7 @@ const I18n = useI18nScope('conversations_2')
 
 export const ConversationListItem = ({...props}) => {
   const [isHovering, setIsHovering] = useState(false)
-  const {setMessageOpenEvent} = useContext(ConversationContext)
-
-  const isSubmissionComments = props.isSubmissionComments
+  const {setMessageOpenEvent, isSubmissionCommentsType} = useContext(ConversationContext)
 
   const handleConversationClick = e => {
     e.nativeEvent.stopImmediatePropagation()
@@ -262,7 +260,7 @@ export const ConversationListItem = ({...props}) => {
                   </Text>
                 </Grid.Col>
                 <Grid.Col width="auto">
-                  {!isSubmissionComments && (
+                  {!isSubmissionCommentsType && (
                     <View textAlign="center" as="div" width={30} height={30} margin="0 small 0 0">
                       <Focusable>
                         {({focused}) => {
@@ -345,6 +343,5 @@ ConversationListItem.propTypes = {
   onOpen: PropTypes.func,
   onSelect: PropTypes.func,
   onStar: PropTypes.func,
-  readStateChangeConversationParticipants: PropTypes.func,
-  isSubmissionComments: PropTypes.bool
+  readStateChangeConversationParticipants: PropTypes.func
 }

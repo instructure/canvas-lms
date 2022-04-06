@@ -35,7 +35,8 @@ const I18n = useI18nScope('conversations_2')
 
 export const MessageDetailContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
-  const {setMessageOpenEvent, messageOpenEvent} = useContext(ConversationContext)
+  const {setMessageOpenEvent, messageOpenEvent, isSubmissionCommentsType} =
+    useContext(ConversationContext)
   const [messageRef, setMessageRef] = useState()
   const variables = {
     conversationID: props.conversation._id
@@ -77,16 +78,15 @@ export const MessageDetailContainer = props => {
       setOnFailure(I18n.t('There was an unexpected error deleting the conversation message'))
     }
   })
-  const scopeIsSubmissionComments = props?.scope === 'submission_comments'
 
   const conversationMessagesQuery = useQuery(CONVERSATION_MESSAGES_QUERY, {
     variables,
-    skip: scopeIsSubmissionComments
+    skip: isSubmissionCommentsType
   })
 
   const submissionCommentsQuery = useQuery(SUBMISSION_COMMENTS_QUERY, {
     variables: {submissionID: props.conversation._id},
-    skip: !scopeIsSubmissionComments
+    skip: !isSubmissionCommentsType
   })
 
   // Intial focus on message when loaded
@@ -99,12 +99,12 @@ export const MessageDetailContainer = props => {
   }, [conversationMessagesQuery.loading, messageRef, messageOpenEvent, setMessageOpenEvent])
 
   const inboxMessageData = useMemo(() => {
-    const data = scopeIsSubmissionComments
+    const data = isSubmissionCommentsType
       ? submissionCommentsQuery.data?.legacyNode
       : conversationMessagesQuery.data?.legacyNode
 
-    return inboxMessagesWrapper(data, scopeIsSubmissionComments)
-  }, [conversationMessagesQuery.data, scopeIsSubmissionComments, submissionCommentsQuery.data])
+    return inboxMessagesWrapper(data, isSubmissionCommentsType)
+  }, [conversationMessagesQuery.data, isSubmissionCommentsType, submissionCommentsQuery.data])
 
   if (conversationMessagesQuery?.loading || submissionCommentsQuery?.loading) {
     return (
@@ -125,21 +125,21 @@ export const MessageDetailContainer = props => {
         focusRef={setMessageRef}
         text={props.conversation.subject}
         onReply={
-          scopeIsSubmissionComments
+          isSubmissionCommentsType
             ? () => {
                 setOnFailure(I18n.t('comment reply is not enabled'))
               }
             : props.onReply
         }
         onReplyAll={
-          scopeIsSubmissionComments
+          isSubmissionCommentsType
             ? () => {
                 setOnFailure(I18n.t('comment reply all is not enabled'))
               }
             : props.onReplyAll
         }
         onDelete={
-          scopeIsSubmissionComments
+          isSubmissionCommentsType
             ? () => {
                 setOnFailure(I18n.t('comment delete is not enabled'))
               }
@@ -152,21 +152,21 @@ export const MessageDetailContainer = props => {
             conversationMessage={message}
             contextName={inboxMessageData?.contextName}
             onReply={
-              scopeIsSubmissionComments
+              isSubmissionCommentsType
                 ? () => {
                     setOnFailure(I18n.t('comment reply is not enabled'))
                   }
                 : () => props.onReply(message)
             }
             onReplyAll={
-              scopeIsSubmissionComments
+              isSubmissionCommentsType
                 ? () => {
                     setOnFailure(I18n.t('comment reply all is not enabled'))
                   }
                 : () => props.onReplyAll(message)
             }
             onDelete={
-              scopeIsSubmissionComments
+              isSubmissionCommentsType
                 ? () => {
                     setOnFailure(I18n.t('comment delete is not enabled'))
                   }
@@ -183,6 +183,5 @@ MessageDetailContainer.propTypes = {
   conversation: Conversation.shape,
   onReply: PropTypes.func,
   onReplyAll: PropTypes.func,
-  onDelete: PropTypes.func,
-  scope: PropTypes.string
+  onDelete: PropTypes.func
 }

@@ -17,6 +17,7 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {ConversationContext} from '../../util/constants'
 import {CONVERSATIONS_QUERY, VIEWABLE_SUBMISSIONS_QUERY} from '../../graphql/Queries'
 import {UPDATE_CONVERSATION_PARTICIPANTS} from '../../graphql/Mutations'
 import {ConversationListHolder} from '../components/ConversationListHolder/ConversationListHolder'
@@ -33,6 +34,8 @@ const I18n = useI18nScope('conversations_2')
 
 const ConversationListContainer = ({course, scope, onSelectConversation, userFilter}) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+  const {isSubmissionCommentsType} = useContext(ConversationContext)
+
   const userID = ENV.current_user_id?.toString()
 
   const [starChangeConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
@@ -64,25 +67,23 @@ const ConversationListContainer = ({course, scope, onSelectConversation, userFil
     })
   }
 
-  const scopeIsSubmissionComments = scope === 'submission_comments'
-
   const conversationsQuery = useQuery(CONVERSATIONS_QUERY, {
     variables: {userID, scope, filter: [userFilter, course]},
     fetchPolicy: 'cache-and-network',
-    skip: scopeIsSubmissionComments
+    skip: isSubmissionCommentsType
   })
 
   const submissionCommentsQuery = useQuery(VIEWABLE_SUBMISSIONS_QUERY, {
     variables: {userID},
-    skip: !scopeIsSubmissionComments
+    skip: !isSubmissionCommentsType
   })
 
   const inboxItemData = useMemo(() => {
-    const data = scopeIsSubmissionComments
+    const data = isSubmissionCommentsType
       ? submissionCommentsQuery.data?.legacyNode?.viewableSubmissionsConnection?.nodes
       : conversationsQuery.data?.legacyNode?.conversationsConnection?.nodes
-    return inboxConversationsWrapper(data, scopeIsSubmissionComments)
-  }, [conversationsQuery.data, scopeIsSubmissionComments, submissionCommentsQuery.data])
+    return inboxConversationsWrapper(data, isSubmissionCommentsType)
+  }, [conversationsQuery.data, isSubmissionCommentsType, submissionCommentsQuery.data])
 
   if (conversationsQuery.loading || submissionCommentsQuery.loading) {
     return (
@@ -104,7 +105,6 @@ const ConversationListContainer = ({course, scope, onSelectConversation, userFil
       onOpen={() => {}}
       onSelect={onSelectConversation}
       onStar={handleStar}
-      isSubmissionComments={scopeIsSubmissionComments}
     />
   )
 }

@@ -19,6 +19,7 @@
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import {MessageActionButtons} from '../MessageActionButtons'
+import {ConversationContext} from '../../../../util/constants'
 
 const createProps = overrides => {
   return {
@@ -113,8 +114,12 @@ describe('MessageActionButtons', () => {
   })
 
   it('renders only the reply button when it is a submission comment', () => {
-    const props = createProps({isSubmissionComment: true})
-    const {queryByTestId} = render(<MessageActionButtons {...props} />)
+    const props = createProps()
+    const {queryByTestId} = render(
+      <ConversationContext.Provider value={{isSubmissionCommentsType: true}}>
+        <MessageActionButtons {...props} />
+      </ConversationContext.Provider>
+    )
 
     expect(queryByTestId('reply')).toBeInTheDocument()
     expect(queryByTestId('compose')).toBe(null)

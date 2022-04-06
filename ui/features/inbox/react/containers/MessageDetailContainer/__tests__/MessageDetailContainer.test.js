@@ -27,6 +27,7 @@ import React from 'react'
 import waitForApolloLoading from '../../../../util/waitForApolloLoading'
 import {responsiveQuerySizes} from '../../../../util/utils'
 import {render, fireEvent} from '@testing-library/react'
+import {ConversationContext} from '../../../../util/constants'
 
 jest.mock('../../../../util/utils', () => ({
   ...jest.requireActual('../../../../util/utils'),
@@ -63,31 +64,41 @@ describe('MessageDetailContainer', () => {
     // eslint-disable-next-line no-undef
     fetchMock.enableMocks()
   })
-  const setup = overrideProps => {
-    return render(
+
+  const setup = ({
+    conversation = Conversation.mock(),
+    isSubmissionCommentsType = false,
+    onReply = jest.fn(),
+    onReplyAll = jest.fn(),
+    onDelete = jest.fn(),
+    overrideProps = {}
+  } = {}) =>
+    render(
       <ApolloProvider client={mswClient}>
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
-          <MessageDetailContainer
-            onReply={jest.fn()}
-            onReplyAll={jest.fn()}
-            onDelete={jest.fn()}
-            {...overrideProps}
-          />
+          <ConversationContext.Provider value={{isSubmissionCommentsType}}>
+            <MessageDetailContainer
+              conversation={conversation}
+              onReply={onReply}
+              onReplyAll={onReplyAll}
+              onDelete={onDelete}
+              {...overrideProps}
+            />
+          </ConversationContext.Provider>
         </AlertManagerContext.Provider>
       </ApolloProvider>
     )
-  }
 
   describe('conversation messages', () => {
     const mockConversation = Conversation.mock()
     describe('rendering', () => {
       it('should render', () => {
-        const container = setup({conversation: mockConversation})
+        const container = setup()
         expect(container).toBeTruthy()
       })
 
       it('should render conversation information correctly', async () => {
-        const container = setup({conversation: mockConversation})
+        const container = setup()
         expect(container.getByText('Loading Conversation Messages')).toBeInTheDocument()
         await waitForApolloLoading()
 
@@ -101,7 +112,7 @@ describe('MessageDetailContainer', () => {
     describe('function inputs', () => {
       it('should delete with correct conversation ID', async () => {
         const mockConvoDelete = jest.fn()
-        const container = setup({onDelete: mockConvoDelete, conversation: mockConversation})
+        const container = setup({onDelete: mockConvoDelete})
         await waitForApolloLoading()
 
         const moreOptionsButton = await container.findByTestId('more-options')
@@ -112,7 +123,7 @@ describe('MessageDetailContainer', () => {
 
       it('should reply with correct message', async () => {
         const mockOnReply = jest.fn()
-        const container = setup({onReply: mockOnReply, conversation: mockConversation})
+        const container = setup({onReply: mockOnReply})
         await waitForApolloLoading()
 
         const replyButtons = await container.findAllByTestId('message-reply')
@@ -124,7 +135,7 @@ describe('MessageDetailContainer', () => {
 
       it('should reply all with correct message', async () => {
         const mockOnReplyAll = jest.fn()
-        const container = setup({onReplyAll: mockOnReplyAll, conversation: mockConversation})
+        const container = setup({onReplyAll: mockOnReplyAll})
         await waitForApolloLoading()
 
         const moreOptionsButtons = await container.findAllByTestId('message-more-options')
@@ -141,12 +152,18 @@ describe('MessageDetailContainer', () => {
     const mockSubmissionComment = {subject: 'mySubject', _id: '1'}
     describe('rendering', () => {
       it('should render', () => {
-        const container = setup({scope: 'submission_comments', conversation: mockSubmissionComment})
+        const container = setup({
+          isSubmissionCommentsType: true,
+          conversation: mockSubmissionComment
+        })
         expect(container).toBeTruthy()
       })
 
       it('should render conversation information correctly', async () => {
-        const container = setup({scope: 'submission_comments', conversation: mockSubmissionComment})
+        const container = setup({
+          isSubmissionCommentsType: true,
+          conversation: mockSubmissionComment
+        })
         expect(container.getByText('Loading Conversation Messages')).toBeInTheDocument()
         await waitForApolloLoading()
 
