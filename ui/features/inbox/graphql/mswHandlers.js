@@ -178,6 +178,41 @@ export const handlers = [
     return res(ctx.data({legacyNode: Conversation.mock()}))
   }),
 
+  graphql.query('GetSubmissionComments', (req, res, ctx) => {
+    const data = {
+      legacyNode: {
+        _id: '1',
+        id: 'VXNlci06',
+        commentsConnection: {
+          nodes: [
+            {
+              _id: '1',
+              id: 'U3VibWlzc2lvbkNvbW1lbnQtMQ==',
+              submissionId: '3',
+              createdAt: '2022-04-04T12:19:38-06:00',
+              attempt: 0,
+              author: User.mock(),
+              assignment: {
+                id: 'QXNzaWdubWVudC0x',
+                _id: '1',
+                name: 'test assignment',
+                __typename: 'Assignment'
+              },
+              comment: 'my student comment',
+              course: Course.mock(),
+              read: true,
+              __typename: 'SubmissionComment'
+            }
+          ],
+          __typename: 'SubmissionCommentConnection'
+        },
+        __typename: 'Submission'
+      }
+    }
+
+    return res(ctx.data(data))
+  }),
+
   graphql.query('GetUserCourses', (req, res, ctx) => {
     const data = {
       legacyNode: {

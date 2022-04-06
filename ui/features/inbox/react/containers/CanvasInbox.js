@@ -349,6 +349,7 @@ const CanvasInbox = () => {
                               onReply({conversationMessage, replyAll: true})
                             }
                             onDelete={handleDelete}
+                            scope={scope}
                           />
                         </>
                       ) : (

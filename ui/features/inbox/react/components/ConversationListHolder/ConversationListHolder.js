@@ -41,10 +41,7 @@ export const ConversationListHolder = ({...props}) => {
   const {setMultiselect} = useContext(ConversationContext)
 
   const provideConversationsForOnSelect = conversationIds => {
-    let matchedConversations = props.conversations?.filter(c => conversationIds.includes(c._id))
-
-    matchedConversations = props.isSubmissionComments ? [] : matchedConversations
-
+    const matchedConversations = props.conversations?.filter(c => conversationIds.includes(c._id))
     props.onSelect(matchedConversations)
   }
   /*

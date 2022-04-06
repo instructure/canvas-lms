@@ -30,7 +30,7 @@ export const responsiveQuerySizes = ({mobile = false, tablet = false, desktop = 
   return querySizes
 }
 
-// Takes in data from either a SUBMISSION_COMMENTS_QUERY or CONVERSATIONS_QUERY
+// Takes in data from either a VIEWABLE_SUBMISSIONS_QUERY or CONVERSATIONS_QUERY
 // Outputs an inbox conversation wrapper
 export const inboxConversationsWrapper = (data, isSubmissionComments = false) => {
   const inboxConversations = []
@@ -38,34 +38,35 @@ export const inboxConversationsWrapper = (data, isSubmissionComments = false) =>
     data.forEach(conversation => {
       const inboxConversation = {}
       if (isSubmissionComments) {
-        inboxConversation._id = conversation._id
+        inboxConversation._id = conversation?._id
         inboxConversation.subject =
           conversation.commentsConnection.nodes[0].course.contextName +
           ' - ' +
           conversation.commentsConnection.nodes[0].assignment.name
-        inboxConversation.lastMessageCreatedAt = conversation.commentsConnection.nodes[0].createdAt
-        inboxConversation.lastMessageContent = conversation.commentsConnection.nodes[0].comment
+        inboxConversation.lastMessageCreatedAt = conversation?.commentsConnection.nodes[0].createdAt
+        inboxConversation.lastMessageContent = conversation?.commentsConnection.nodes[0].comment
         inboxConversation.participantString = getParticipantsString(
-          conversation.commentsConnection.nodes,
+          conversation?.commentsConnection.nodes,
           isSubmissionComments
         )
-        inboxConversation.messages = conversation.commentsConnection.nodes
+        inboxConversation.messages = conversation?.commentsConnection.nodes
       } else {
-        inboxConversation._id = conversation.conversation._id
-        inboxConversation.subject = conversation.conversation.subject
+        inboxConversation._id = conversation?.conversation?._id
+        inboxConversation.subject = conversation?.conversation?.subject
         inboxConversation.lastMessageCreatedAt =
-          conversation.conversation.conversationMessagesConnection.nodes[0].createdAt
+          conversation?.conversation.conversationMessagesConnection.nodes[0].createdAt
         inboxConversation.lastMessageContent =
-          conversation.conversation.conversationMessagesConnection.nodes[0].body
-        inboxConversation.workflowState = conversation.workflowState
-        inboxConversation.label = conversation.label
-        inboxConversation.messages = conversation.conversation.conversationMessagesConnection.nodes
+          conversation?.conversation.conversationMessagesConnection.nodes[0].body
+        inboxConversation.workflowState = conversation?.workflowState
+        inboxConversation.label = conversation?.label
+        inboxConversation.messages =
+          conversation?.conversation?.conversationMessagesConnection.nodes
         inboxConversation.participants =
           conversation.conversation.conversationParticipantsConnection.nodes
         inboxConversation.participantString = getParticipantsString(
-          inboxConversation.participants,
+          inboxConversation?.participants,
           isSubmissionComments,
-          inboxConversation.messages[inboxConversation.messages.length - 1].author.name
+          inboxConversation?.messages[inboxConversation.messages.length - 1].author.name
         )
       }
       inboxConversations.push(inboxConversation)
@@ -74,25 +75,38 @@ export const inboxConversationsWrapper = (data, isSubmissionComments = false) =>
   return inboxConversations
 }
 
-// Takes in data from the CONVERSATION_MESSAGES_QUERY
+// Takes in data from the CONVERSATION_MESSAGES_QUERY or SUBMISSION_COMMENTS_QUERY
 // Outputs an an object that contains an array of wrapped inboxMessages and the contextName
 export const inboxMessagesWrapper = (data, isSubmissionComments = false) => {
   const inboxMessages = []
   let contextName = ''
   if (data) {
-    data.conversationMessagesConnection.nodes.forEach(message => {
+    const messages = isSubmissionComments
+      ? data?.commentsConnection?.nodes
+      : data?.conversationMessagesConnection?.nodes
+    messages.forEach(message => {
       const inboxMessage = {}
       if (isSubmissionComments) {
+        inboxMessage.id = message?.id
+        inboxMessage._id = message?._id
+        inboxMessage.contextName = message?.contextName
+        inboxMessage.createdAt = message?.createdAt
+        inboxMessage.author = message?.author
+        inboxMessage.recipients = []
+        inboxMessage.body = message?.comment
+        inboxMessage.attachmentsConnection = null
+        inboxMessage.mediaComment = null
+        contextName = message?.course?.contextName
       } else {
-        inboxMessage.id = message.id
-        inboxMessage._id = message._id
-        inboxMessage.contextName = message.contextName
-        inboxMessage.createdAt = message.createdAt
-        inboxMessage.author = message.author
-        inboxMessage.recipients = message.recipients
-        inboxMessage.body = message.body
-        inboxMessage.attachmentsConnection = message.attachmentsConnection
-        inboxMessage.mediaComment = message.mediaComment
+        inboxMessage.id = message?.id
+        inboxMessage._id = message?._id
+        inboxMessage.contextName = message?.contextName
+        inboxMessage.createdAt = message?.createdAt
+        inboxMessage.author = message?.author
+        inboxMessage.recipients = message?.recipients
+        inboxMessage.body = message?.body
+        inboxMessage.attachmentsConnection = message?.attachmentsConnection
+        inboxMessage.mediaComment = message?.mediaComment
         contextName = data?.contextName
       }
       inboxMessages.push(inboxMessage)

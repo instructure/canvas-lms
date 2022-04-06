@@ -17,7 +17,7 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {CONVERSATIONS_QUERY, SUBMISSION_COMMENTS_QUERY} from '../../graphql/Queries'
+import {CONVERSATIONS_QUERY, VIEWABLE_SUBMISSIONS_QUERY} from '../../graphql/Queries'
 import {UPDATE_CONVERSATION_PARTICIPANTS} from '../../graphql/Mutations'
 import {ConversationListHolder} from '../components/ConversationListHolder/ConversationListHolder'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -72,7 +72,7 @@ const ConversationListContainer = ({course, scope, onSelectConversation, userFil
     skip: scopeIsSubmissionComments
   })
 
-  const submissionCommentsQuery = useQuery(SUBMISSION_COMMENTS_QUERY, {
+  const submissionCommentsQuery = useQuery(VIEWABLE_SUBMISSIONS_QUERY, {
     variables: {userID},
     skip: !scopeIsSubmissionComments
   })

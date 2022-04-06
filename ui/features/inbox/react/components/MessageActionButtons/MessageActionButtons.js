@@ -102,7 +102,7 @@ export const MessageActionButtons = props => {
         tip={I18n.t('Reply')}
         icon={IconReplyLine}
         onClick={props.reply}
-        disabled={props.replyDisabled}
+        disabled
         testid="reply"
       />
     )
