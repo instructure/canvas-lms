@@ -24,33 +24,41 @@ describe OutcomesFeaturesHelper do
   before :once do
     @account = Account.default
     @context = @course = @account.courses.create!
-    outcome_model(context: @course)
+    @global_outcome = outcome_model(global: true, title: "Global outcome")
+    @account_outcome = outcome_model(context: @account)
+    @course_outcome = outcome_model(context: @course)
   end
 
-  describe "#individual_outcome_rating_and_calculation_enabled?" do
+  describe "#account_level_mastery_scales_enabled?" do
     before do
-      @context.root_account.enable_feature!(:improved_outcomes_management)
-      @context.root_account.enable_feature!(:individual_outcome_rating_and_calculation)
-      @context.root_account.disable_feature!(:account_level_mastery_scales)
-    end
-
-    it "is true when IOM and IORCM are enabled and ALMS is disabled" do
-      expect(individual_outcome_rating_and_calculation_enabled?(@outcome.context)).to eq true
-    end
-
-    it "is false when improved outcomes management (IOM) is disabled" do
-      @context.root_account.disable_feature!(:improved_outcomes_management)
-      expect(individual_outcome_rating_and_calculation_enabled?(@outcome.context)).to eq false
-    end
-
-    it "is false when individual outcome rating and calculation (IORCM) is disabled" do
-      @context.root_account.disable_feature!(:individual_outcome_rating_and_calculation)
-      expect(individual_outcome_rating_and_calculation_enabled?(@outcome.context)).to eq false
-    end
-
-    it "is false when account level mastery scales (ALMS) is enabled" do
       @context.root_account.enable_feature!(:account_level_mastery_scales)
-      expect(individual_outcome_rating_and_calculation_enabled?(@outcome.context)).to eq false
+    end
+
+    it "returns true when account_level_mastery_scales FF is enabled" do
+      expect(account_level_mastery_scales_enabled?(@course_outcome.context)).to eq true
+    end
+
+    it "returns false when account_level_mastery_scales FF is disabled" do
+      @context.root_account.disable_feature!(:account_level_mastery_scales)
+      expect(account_level_mastery_scales_enabled?(@course_outcome.context)).to eq false
+    end
+
+    it "works properly when arg is course outcome" do
+      expect(account_level_mastery_scales_enabled?(@course_outcome.context)).to eq true
+      @context.root_account.disable_feature!(:account_level_mastery_scales)
+      expect(account_level_mastery_scales_enabled?(@course_outcome.context)).to eq false
+    end
+
+    it "works properly when arg is account outcome" do
+      expect(account_level_mastery_scales_enabled?(@account_outcome.context)).to eq true
+      @context.root_account.disable_feature!(:account_level_mastery_scales)
+      expect(account_level_mastery_scales_enabled?(@account_outcome.context)).to eq false
+    end
+
+    it "works properly when arg is global outcome" do
+      expect(account_level_mastery_scales_enabled?(@global_outcome.context)).to eq nil
+      @context.root_account.disable_feature!(:account_level_mastery_scales)
+      expect(account_level_mastery_scales_enabled?(@global_outcome.context)).to eq nil
     end
   end
 end

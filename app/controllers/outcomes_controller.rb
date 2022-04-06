@@ -61,7 +61,7 @@ class OutcomesController < ApplicationController
     set_tutorial_js_env
     mastery_scales_js_env
     proficiency_roles_js_env
-    individual_outcome_rating_and_calculation_js_env
+    improved_outcomes_management_js_env
   end
 
   def show

@@ -50,7 +50,7 @@ describe('CreateOutcomeModal', () => {
       contextType = 'Account',
       contextId = '1',
       friendlyDescriptionFF = true,
-      individualOutcomeRatingAndCalculationFF = false,
+      accountLevelMasteryScalesFF = true,
       mocks = accountMocks({childGroupsCount: 0}),
       isMobileView = false,
       renderer = rtlRender,
@@ -64,7 +64,7 @@ describe('CreateOutcomeModal', () => {
             contextType,
             contextId,
             friendlyDescriptionFF,
-            individualOutcomeRatingAndCalculationFF,
+            accountLevelMasteryScalesFF,
             isMobileView,
             treeBrowserRootGroupId
           }
@@ -473,11 +473,11 @@ describe('CreateOutcomeModal', () => {
         })
       })
 
-      describe('Invidiual Outcome Proficiency and Calculation Feature Flag', () => {
-        describe('when feature flag enabled', () => {
+      describe('Account Level Mastery Scales Feature Flag', () => {
+        describe('when feature flag disabled', () => {
           it('displays Calculation Method selection form', async () => {
             const {getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
-              individualOutcomeRatingAndCalculationFF: true
+              accountLevelMasteryScalesFF: false
             })
             await act(async () => jest.runOnlyPendingTimers())
             expect(getByLabelText('Calculation Method')).toBeInTheDocument()
@@ -485,7 +485,7 @@ describe('CreateOutcomeModal', () => {
 
           it('displays Proficiency Ratings selection form', async () => {
             const {getByTestId} = render(<CreateOutcomeModal {...defaultProps()} />, {
-              individualOutcomeRatingAndCalculationFF: true
+              accountLevelMasteryScalesFF: false
             })
             await act(async () => jest.runOnlyPendingTimers())
             expect(getByTestId('outcome-management-ratings')).toBeInTheDocument()
@@ -496,7 +496,7 @@ describe('CreateOutcomeModal', () => {
             const {getByText, getByLabelText, getByDisplayValue} = render(
               <CreateOutcomeModal {...defaultProps()} />,
               {
-                individualOutcomeRatingAndCalculationFF: true,
+                accountLevelMasteryScalesFF: false,
                 mocks: [
                   ...smallOutcomeTree(),
                   createLearningOutcomeMock({
@@ -531,7 +531,7 @@ describe('CreateOutcomeModal', () => {
 
           it('displays horizontal divider between ratings and calculation method which is hidden from screen readers', async () => {
             const {getByTestId} = render(<CreateOutcomeModal {...defaultProps()} />, {
-              individualOutcomeRatingAndCalculationFF: true
+              accountLevelMasteryScalesFF: false
             })
             await act(async () => jest.runOnlyPendingTimers())
             expect(getByTestId('outcome-create-modal-horizontal-divider')).toBeInTheDocument()
@@ -539,7 +539,7 @@ describe('CreateOutcomeModal', () => {
 
           it('sets focus on rating description if error in both description and points and click on Create button', () => {
             const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
-              individualOutcomeRatingAndCalculationFF: true
+              accountLevelMasteryScalesFF: false
             })
             fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
             const ratingDescription = getByLabelText('Change description for mastery level 2')
@@ -555,7 +555,7 @@ describe('CreateOutcomeModal', () => {
 
           it('sets focus on mastery points if error in mastery points and calculation method and click on Create button', () => {
             const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
-              individualOutcomeRatingAndCalculationFF: true
+              accountLevelMasteryScalesFF: false
             })
             fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
             const masteryPoints = getByLabelText('Change mastery points')
@@ -570,7 +570,7 @@ describe('CreateOutcomeModal', () => {
           })
         })
 
-        describe('when feature flag disabled', () => {
+        describe('when feature flag enabled', () => {
           it('does not display Calculation Method selection form', async () => {
             const {queryByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />)
             await act(async () => jest.runOnlyPendingTimers())

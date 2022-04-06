@@ -121,7 +121,7 @@ describe Mutations::UpdateLearningOutcome do
     expect(result["vendorGuid"]).to eq "vg--1"
   end
 
-  context "individual ratings and calculation method feature flag enabled" do
+  context "account_level_mastery_scales feature flag disabled" do
     def expect_result(rating_vars, calculation_method, calculation_int, mastery_points, ratings)
       result = execute_with_input "#{variables},#{rating_vars}"
       expect(result["errors"]).to be_nil
@@ -144,8 +144,6 @@ describe Mutations::UpdateLearningOutcome do
     end
 
     before do
-      @domain_root_account.enable_feature!(:individual_outcome_rating_and_calculation)
-      @domain_root_account.enable_feature!(:improved_outcomes_management)
       @domain_root_account.disable_feature!(:account_level_mastery_scales)
     end
 
@@ -260,16 +258,7 @@ describe Mutations::UpdateLearningOutcome do
       expect_error(result, "can't be blank")
     end
 
-    it "raises error when data includes individual ratings with IORC FF disabled" do
-      @course.root_account.disable_feature!(:individual_outcome_rating_and_calculation)
-      @course.root_account.disable_feature!(:account_level_mastery_scales)
-
-      result = execute_with_input "#{variables},#{rating_variables}"
-      expect_error(result, "individual ratings data input with invidual_outcome_rating_and_calculation FF disabled")
-    end
-
-    it "raises error when data includes individual ratings with both IORC and ALMS FFs enabled" do
-      @course.root_account.enable_feature!(:individual_outcome_rating_and_calculation)
+    it "raises error when data includes individual ratings with account_level_mastery_scales FF enabled" do
       @course.root_account.enable_feature!(:account_level_mastery_scales)
 
       result = execute_with_input "#{variables},#{rating_variables}"

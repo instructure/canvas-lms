@@ -56,7 +56,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
   const [description, setDescription, descriptionChanged] = useInput(outcome.description || '')
   const [friendlyDescription, friendlyDescriptionChangeHandler, friendlyDescriptionChanged] =
     useInput(outcome.friendlyDescription?.description || '')
-  const {contextType, contextId, friendlyDescriptionFF, individualOutcomeRatingAndCalculationFF} =
+  const {contextType, contextId, friendlyDescriptionFF, accountLevelMasteryScalesFF} =
     useCanvasContext()
   const {
     ratings,
@@ -145,7 +145,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
         if (displayName && displayNameChanged) input.displayName = displayName
         // description can be null/empty. no need to check if it is available only if it has changed
         if (descriptionChanged) input.description = description
-        if (individualOutcomeRatingAndCalculationFF) {
+        if (!accountLevelMasteryScalesFF) {
           if (proficiencyCalculationMethodChanged || proficiencyCalculationIntChanged) {
             input.calculationMethod = proficiencyCalculationMethod
             input.calculationInt = calculationInt
@@ -289,7 +289,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
               />
             </View>
           )}
-          {individualOutcomeRatingAndCalculationFF && (
+          {!accountLevelMasteryScalesFF && (
             <View as="div" padding="small 0 0">
               <Ratings
                 ratings={ratings}

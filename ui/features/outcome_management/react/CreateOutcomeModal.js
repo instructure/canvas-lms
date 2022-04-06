@@ -55,13 +55,8 @@ import Ratings from './Management/Ratings'
 const I18n = useI18nScope('OutcomeManagement')
 
 const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId}) => {
-  const {
-    contextType,
-    contextId,
-    friendlyDescriptionFF,
-    isMobileView,
-    individualOutcomeRatingAndCalculationFF
-  } = useCanvasContext()
+  const {contextType, contextId, friendlyDescriptionFF, isMobileView, accountLevelMasteryScalesFF} =
+    useCanvasContext()
   const [title, titleChangeHandler] = useInput()
   const [displayName, displayNameChangeHandler] = useInput()
   const [friendlyDescription, friendlyDescriptionChangeHandler] = useInput()
@@ -157,7 +152,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
           displayName,
           description
         }
-        if (individualOutcomeRatingAndCalculationFF) {
+        if (!accountLevelMasteryScalesFF) {
           input.calculationMethod = proficiencyCalculation.calculationMethod
           input.calculationInt = proficiencyCalculation.calculationInt
           const {masteryPoints: inputMasteryPoints, ratings: inputRatings} =
@@ -286,7 +281,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
               />
             </View>
           )}
-          {individualOutcomeRatingAndCalculationFF && (
+          {!accountLevelMasteryScalesFF && (
             <View as="div" padding="small 0 0">
               <Ratings
                 ratings={ratings}

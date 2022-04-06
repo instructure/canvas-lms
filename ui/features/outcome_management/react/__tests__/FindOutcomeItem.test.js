@@ -52,18 +52,14 @@ describe('FindOutcomeItem', () => {
 
   const render = (
     children,
-    {
-      friendlyDescriptionFF = true,
-      individualOutcomeRatingAndCalculationFF = false,
-      renderer = rtlRender
-    } = {}
+    {friendlyDescriptionFF = true, accountLevelMasteryScalesFF = true, renderer = rtlRender} = {}
   ) => {
     return renderer(
       <OutcomesContext.Provider
         value={{
           env: {
             friendlyDescriptionFF,
-            individualOutcomeRatingAndCalculationFF
+            accountLevelMasteryScalesFF
           }
         }}
       >
@@ -202,17 +198,17 @@ describe('FindOutcomeItem', () => {
     expect(queryByText('test friendly description')).not.toBeInTheDocument()
   })
 
-  describe('individual outcome rating and calculation FF', () => {
-    describe('when feature flag enabled', () => {
+  describe('account level mastery scales FF', () => {
+    describe('when feature flag disabled', () => {
       it('enables caret button even if no description', () => {
         const {queryByTestId} = render(<FindOutcomeItem {...defaultProps({description: null})} />, {
-          individualOutcomeRatingAndCalculationFF: true
+          accountLevelMasteryScalesFF: false
         })
         expect(queryByTestId('icon-arrow-right').closest('button')).toBeEnabled()
       })
     })
 
-    describe('when feature flag disabled', () => {
+    describe('when feature flag enabled', () => {
       it('disables caret button if no description', () => {
         const {queryByTestId} = render(<FindOutcomeItem {...defaultProps({description: null})} />)
         expect(queryByTestId('icon-arrow-right').closest('button')).toBeDisabled()

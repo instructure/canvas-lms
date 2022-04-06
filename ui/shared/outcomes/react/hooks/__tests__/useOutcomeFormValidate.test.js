@@ -137,12 +137,12 @@ describe('useOutcomeFormValidate', () => {
     expect(result.current.fieldWithError).toBe('friendly_description')
   })
 
-  it('validates ratings, mastery points and calculation method for errors if individual ratings and calculation FF is enabled', () => {
+  it('validates ratings, mastery points and calculation method for errors if account level mastery scales FF is disabled', () => {
     const wrapper = ({children}) => (
       <OutcomesContext.Provider
         value={{
           env: {
-            individualOutcomeRatingAndCalculationFF: true
+            accountLevelMasteryScalesFF: false
           }
         }}
       >
@@ -183,7 +183,7 @@ describe('useOutcomeFormValidate', () => {
       <OutcomesContext.Provider
         value={{
           env: {
-            individualOutcomeRatingAndCalculationFF: true
+            accountLevelMasteryScalesFF: false
           }
         }}
       >
