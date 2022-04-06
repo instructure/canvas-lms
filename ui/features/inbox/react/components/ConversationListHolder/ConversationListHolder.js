@@ -38,7 +38,7 @@ export const ConversationListHolder = ({...props}) => {
   const [selectedMessages, setSelectedMessages] = useState([])
   const [rangeClickStart, setRangeClickStart] = useState()
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
-  const {setMultiselect} = useContext(ConversationContext)
+  const {setMultiselect, isSubmissionCommentsType} = useContext(ConversationContext)
 
   const provideConversationsForOnSelect = conversationIds => {
     const matchedConversations = props.conversations?.filter(c => conversationIds.includes(c._id))
@@ -185,9 +185,8 @@ export const ConversationListHolder = ({...props}) => {
             onStar={props.onStar}
             key={conversation._id}
             readStateChangeConversationParticipants={
-              props.isSubmissionComments ? () => {} : readStateChangeConversationParticipants
+              isSubmissionCommentsType ? () => {} : readStateChangeConversationParticipants
             }
-            isSubmissionComments={props.isSubmissionComments}
           />
         )
       })}
@@ -227,13 +226,11 @@ ConversationListHolder.propTypes = {
   id: PropTypes.string,
   onOpen: PropTypes.func,
   onSelect: PropTypes.func,
-  onStar: PropTypes.func,
-  isSubmissionComments: PropTypes.bool
+  onStar: PropTypes.func
 }
 
 ConversationListHolder.defaultProps = {
   onOpen: () => {},
   onSelect: () => {},
-  onStar: () => {},
-  isSubmissionComments: false
+  onStar: () => {}
 }

@@ -410,7 +410,6 @@ const MessageListActionContainer = props => {
               padding={responsiveProps.messageActionButtons.padding}
             >
               <MessageActionButtons
-                isSubmissionComment={props.activeMailbox === 'submission_comments'}
                 archive={props.displayUnarchiveButton ? undefined : handleArchive}
                 unarchive={props.displayUnarchiveButton ? handleUnarchive : undefined}
                 archiveDisabled={props.archiveDisabled || props.activeMailbox === 'sent'}

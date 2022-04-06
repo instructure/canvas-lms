@@ -87,6 +87,8 @@ const conversationContextDefaultValues = {
   multiselect: false,
   setMultiselect: () => {},
   messageOpenEvent: false,
-  setMessageOpenEvent: () => {}
+  setMessageOpenEvent: () => {},
+  isSubmissionCommentsType: false,
+  setIsSubmissionCommentsType: () => {}
 }
 export const ConversationContext = React.createContext(conversationContextDefaultValues)

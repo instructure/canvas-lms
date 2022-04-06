@@ -17,8 +17,8 @@
  */
 
 import PropTypes from 'prop-types'
-import React from 'react'
-
+import React, {useContext} from 'react'
+import {ConversationContext} from '../../../util/constants'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {
@@ -96,7 +96,8 @@ const ActionButton = props => (
 )
 
 export const MessageActionButtons = props => {
-  if (props.isSubmissionComment) {
+  const {isSubmissionCommentsType} = useContext(ConversationContext)
+  if (isSubmissionCommentsType) {
     return (
       <ActionButton
         tip={I18n.t('Reply')}
@@ -156,7 +157,6 @@ export const MessageActionButtons = props => {
 }
 
 MessageActionButtons.propTypes = {
-  isSubmissionComment: PropTypes.bool,
   replyDisabled: PropTypes.bool,
   archiveDisabled: PropTypes.bool,
   deleteDisabled: PropTypes.bool,
