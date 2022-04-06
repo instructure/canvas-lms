@@ -20,7 +20,9 @@
 
 library 'canvas-builds-library'
 loadLocalLibrary('local-lib', 'build/new-jenkins/library')
-final static RUN_MIGRATIONS_STAGE = 'Run Migrations'
+
+@groovy.transform.Field
+def rspecqNodeTotal = 50
 
 // if the build never starts or gets into a node block, then we
 // can never load a file. and a very noisy/confusing error is thrown.
@@ -51,8 +53,50 @@ def getResultsHTMLUrl() {
   return "${env.BUILD_URL}/artifact/crystalball_map.yml"
 }
 
+def postFn() {
+  copyArtifacts(
+    filter: 'tmp/crystalball/**',
+    optional: false,
+    projectName: env.JOB_NAME,
+    selector: specific(env.BUILD_NUMBER),
+  )
+
+  sh """
+    docker-compose run -v \$(pwd)/\$LOCAL_WORKDIR/tmp/crystalball/:/tmp/crystalball \
+    -v \$(pwd)/\$LOCAL_WORKDIR/build:/usr/src/app/build \
+    --name crystalball-parser \
+    canvas bash -c 'ruby build/new-jenkins/crystalball_merge_coverage.rb /tmp/crystalball/'
+  """
+
+  sh 'docker cp crystalball-parser:/usr/src/app/crystalball_map.yml .'
+  archiveArtifacts allowEmptyArchive: true, artifacts: 'crystalball_map.yml'
+
+  def message = "<$env.BUILD_URL/testReport|Latest Crystalball Map Generated> - <${getResultsHTMLUrl()}|Map>\n"
+  try {
+    def mapSpecInfo = sh(script: """
+      docker-compose run --rm \
+        -v \$(pwd)/\$LOCAL_WORKDIR/crystalball_map.yml/:/usr/src/app/crystalball_map.yml \
+        -v \$(pwd)/\$LOCAL_WORKDIR/build:/usr/src/app/build \
+        -v \$(pwd)/\$LOCAL_WORKDIR/gems/plugins/:/usr/src/app/gems/plugins \
+        -v \$(pwd)/\$LOCAL_WORKDIR/spec:/usr/src/app/spec \
+        canvas bash -c 'ruby build/new-jenkins/crystalball_map_smoke_test.rb'
+      """
+    , returnStdout: true)
+    message = message + "\n" + mapSpecInfo
+    // Only alert and push to s3 on periodic jobs, not ones resulting from manual tests
+    if (env.CRYSTALBALL_MAP_PUSH_TO_S3 == '1' && env.GERRIT_EVENT_TYPE != 'comment-added') {
+      sh 'aws s3 cp crystalball_map.yml s3://instructure-canvas-ci/'
+    }
+  } catch(e) {
+    message = message + "\nMap Invalid!"
+  } finally {
+    echo message
+    slackSend channel: '#crystalball-noisy', message: message
+  }
+}
+
 pipeline {
-  agent { label 'canvas-docker' }
+  agent none
   options {
     ansiColor('xterm')
     timestamps()
@@ -60,6 +104,14 @@ pipeline {
 
   environment {
     BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
+    COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml'
+    RERUNS_RETRY = "${configuration.getInteger('rspecq-max-requeues')}"
+    RSPECQ_FILE_SPLIT_THRESHOLD = '9999'
+    RSPECQ_MAX_REQUEUES = "${configuration.getInteger('rspecq-max-requeues')}"
+    RSPEC_PROCESSES = 6
+    TEST_PATTERN = '^./(spec|gems/plugins/.*/spec_canvas)/'
+    EXCLUDE_TESTS = '.*/(selenium/performance|instfs/selenium|contracts)'
+    POSTGRES_PASSWORD = 'sekret'
     POSTGRES = configuration.postgres()
     RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
     // e.g. canvas-lms:01.123456.78-postgres-12-ruby-2.6
@@ -78,7 +130,6 @@ pipeline {
     WEBPACK_CACHE_PREFIX = configuration.buildRegistryPath('webpack-cache')
 
     IMAGE_CACHE_MERGE_SCOPE = configuration.gerritBranchSanitized()
-    RSPEC_PROCESSES = 6
 
     CASSANDRA_IMAGE_TAG = "$CASSANDRA_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
     DYNAMODB_IMAGE_TAG = "$DYNAMODB_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
@@ -87,122 +138,103 @@ pipeline {
   }
 
   stages {
-    stage('Pre-Setup') {
-      steps {
-        cleanAndSetup()
-      }
-    }
-
-    stage('Crystalball Map') {
+    stage('Environment') {
       steps {
         script {
+          def rspecNodeRequirements = [label: 'canvas-docker']
+
           def postBuildHandler = [
             onStageEnded: { stageName, stageConfig, result ->
+              ignoreBuildNeverStartedError {
+                node('master') {
+                  buildSummaryReport.publishReport('Build Summary Report', stageConfig.status())
+                }
+              }
+
               buildSummaryReport.addFailureRun('Main Build', currentBuild)
+            },
+            onNodeReleasing: {
+              postFn()
             }
           ]
 
-          distribution.stashBuildScripts()
-          extendedStage('Root').hooks(postBuildHandler).obeysAllowStages(false).reportTimings(false).execute {
-            def rootStages = [:]
+          def postStageHandler = [
+            onStageEnded: { stageName, stageConfig, result ->
+              buildSummaryReport.setStageTimings(stageName, stageConfig.timingValues())
+            }
+          ]
 
-            extendedStage('Builder').nodeRequirements(label: 'canvas-docker', podTemplate: null).obeysAllowStages(false).reportTimings(false).queue(rootStages) {
-              extendedStage('Setup')
-                .hooks(buildSummaryReportHooks.call())
-                .obeysAllowStages(false)
-                .timeout(2)
-                .execute { setupStage() }
-
-              extendedStage('Build Docker Image (Pre-Merge)')
-                .hooks(buildSummaryReportHooks.call())
-                .obeysAllowStages(false)
-                .required(configuration.isChangeMerged())
-                .timeout(20)
-                .execute(buildDockerImageStage.&premergeCacheImage)
-
-              extendedStage('Build Docker Image')
-                .hooks(buildSummaryReportHooks.call())
-                .obeysAllowStages(false)
-                .timeout(20)
-                .execute(buildDockerImageStage.&patchsetImage)
-
-              extendedStage(RUN_MIGRATIONS_STAGE)
-                .hooks(buildSummaryReportHooks.call())
-                .obeysAllowStages(false)
-                .timeout(10)
-                .execute { runMigrationsStage() }
+          extendedStage('Root').hooks(postBuildHandler).obeysAllowStages(false).timeout(60).reportTimings(false).nodeRequirements(rspecNodeRequirements).execute {
+            stage('Clean and Setup') {
+              cleanAndSetup()
+              setupStage()
+              distribution.stashBuildScripts()
             }
 
-            extendedStage("${RUN_MIGRATIONS_STAGE} (Waiting for Dependencies)").obeysAllowStages(false).waitsFor(RUN_MIGRATIONS_STAGE, 'Builder').queue(rootStages) { stageConfig, buildConfig ->
-              def nestedStages = [:]
-              rspecStage.createDistribution(nestedStages)
+            extendedStage('Build Docker Image')
+              .hooks(buildSummaryReportHooks.call())
+              .obeysAllowStages(false)
+              .timeout(20)
+              .execute(buildDockerImageStage.&patchsetImage)
 
-              parallel(nestedStages)
-            }
+            extendedStage('Run Migrations')
+              .hooks(buildSummaryReportHooks.call())
+              .obeysAllowStages(false)
+              .timeout(10)
+              .execute { runMigrationsStage() }
 
-            parallel(rootStages)
-          }
-        }
-      }
-    }
-  }
+            extendedStage('Parallel Run Tests').obeysAllowStages(false).execute { stageConfig, buildConfig ->
+              def rspecqStages = [:]
 
-  post {
-    always {
-      script {
-        ignoreBuildNeverStartedError {
-          node('master') {
-            buildSummaryReport.publishReport('Build Summary Report', currentBuild.getResult() == 'SUCCESS' ? 'SUCCESS' : 'FAILURE')
-          }
-        }
+              extendedStage('RSpecQ Reporter').timeout(30).queue(rspecqStages) {
+                try {
+                  sh(script: "docker run -e SENTRY_DSN -e RSPECQ_REDIS_URL -t $PATCHSET_TAG bundle exec rspecq \
+                    --build=${JOB_NAME}_build${BUILD_NUMBER} \
+                    --queue-wait-timeout 120 \
+                    --redis-url $RSPECQ_REDIS_URL \
+                    --report", label: 'Reporter')
+                } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
+                  if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
+                    /* groovylint-disable-next-line GStringExpressionWithinString, SpaceInsideParentheses */
+                    sh '''#!/bin/bash
+                      ids=($(docker ps -aq --filter "name=canvas_"))
+                      for i in "${ids[@]}"
+                        do
+                          docker exec $i bash -c "cat /usr/src/app/log/cmd_output/*.log"
+                      done
+                    '''
+                  }
+                  throw e
+                }
+              }
 
-        copyArtifacts(
-          filter: 'tmp/crystalball/**',
-          optional: false,
-          projectName: env.JOB_NAME,
-          selector: specific(env.BUILD_NUMBER),
-        )
+              extendedStage('RSpecQ Set 00')
+                  .envVars(['CI_NODE_INDEX=0',
+                      "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}",
+                      "CRYSTALBALL_MAP=1"])
+                  .hooks(postStageHandler + [onNodeAcquired: { sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers') }, onNodeReleasing: { rspecStage.tearDownNode('rspec') }])
+                  .timeout(30)
+                  .queue(rspecqStages) {
+                    rspecStage.runRspecqSuite()
+                  }
 
-        sh """
-          docker-compose run -v \$(pwd)/\$LOCAL_WORKDIR/tmp/crystalball/:/tmp/crystalball \
-          -v \$(pwd)/\$LOCAL_WORKDIR/build:/usr/src/app/build \
-          --name crystalball-parser \
-          web bash -c 'ruby build/new-jenkins/crystalball_merge_coverage.rb /tmp/crystalball/'
-        """
+              for (int i = 1; i < rspecqNodeTotal; i++) {
+                def index = i
+                extendedStage("RSpecQ Set ${(index).toString().padLeft(2, '0')}")
+                  .envVars(["CI_NODE_INDEX=$index",
+                      "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}",
+                      "CRYSTALBALL_MAP=1"])
+                  .hooks(postStageHandler + [onNodeAcquired: { rspecStage.setupNode() }, onNodeReleasing: { rspecStage.tearDownNode('rspec') }])
+                  .nodeRequirements(rspecNodeRequirements)
+                  .timeout(30)
+                  .queue(rspecqStages) { rspecStage.runRspecqSuite() }
+              }
 
-        sh 'docker cp crystalball-parser:/usr/src/app/crystalball_map.yml .'
-        archiveArtifacts allowEmptyArchive: true, artifacts: 'crystalball_map.yml'
-
-        def message = "<$env.BUILD_URL/testReport|Latest Crystalball Map Generated> - <${getResultsHTMLUrl()}|Map>\n"
-        try {
-          def mapSpecInfo = sh(script: """
-            docker-compose run --rm \
-              -v \$(pwd)/\$LOCAL_WORKDIR/crystalball_map.yml/:/usr/src/app/crystalball_map.yml \
-              -v \$(pwd)/\$LOCAL_WORKDIR/build:/usr/src/app/build \
-              -v \$(pwd)/\$LOCAL_WORKDIR/gems/plugins/:/usr/src/app/gems/plugins \
-              -v \$(pwd)/\$LOCAL_WORKDIR/spec:/usr/src/app/spec \
-              web bash -c 'ruby build/new-jenkins/crystalball_map_smoke_test.rb'
-            """
-          , returnStdout: true)
-          message = message + "\n" + mapSpecInfo
-          // Only alert and push to s3 on periodic jobs, not ones resulting from manual tests
-          if (env.CRYSTALBALL_MAP_PUSH_TO_S3 == '1' && env.GERRIT_EVENT_TYPE != 'comment-added') {
-            sh 'aws s3 cp crystalball_map.yml s3://instructure-canvas-ci/'
-          }
-        } catch(e) {
-          message = message + "\nMap Invalid!"
-        } finally {
-          echo message
-          slackSend channel: '#crystalball-noisy', message: message
-        }
-      }
-    }
-    cleanup {
-      script {
-        ignoreBuildNeverStartedError {
-          libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
-        }
-      }
-    }
-  }
-}
+              parallel(rspecqStages)
+            } //rspecQ
+          }//root
+        }//script
+      }//steps
+    }//stage environment
+  }//stages
+}//pipeline
