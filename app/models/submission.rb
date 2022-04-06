@@ -87,7 +87,7 @@ class Submission < ActiveRecord::Base
   belongs_to :user
   alias_method :student, :user
   belongs_to :grader, class_name: "User"
-  belongs_to :grading_period
+  belongs_to :grading_period, inverse_of: :submissions
   belongs_to :group
   belongs_to :media_object
   belongs_to :root_account, class_name: "Account"
