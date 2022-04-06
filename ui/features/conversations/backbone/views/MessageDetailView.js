@@ -34,11 +34,17 @@ export default class MessageDetailView extends View {
   static initClass() {
     this.prototype.events = {
       'click .message-detail-actions .reply-btn': 'onReply',
+      'keydown .message-detail-actions .reply-btn': 'onReply',
       'click .message-detail-actions .reply-all-btn': 'onReplyAll',
+      'keydown .message-detail-actions .reply-all-btn': 'onReplyAll',
       'click .message-detail-actions .delete-btn': 'onDelete',
+      'keydown .message-detail-actions .delete-btn': 'onDelete',
       'click .message-detail-actions .forward-btn': 'onForward',
+      'keydown .message-detail-actions .forward-btn': 'onForward',
       'click .message-detail-actions .archive-btn': 'onArchive',
+      'keydown .message-detail-actions .archive-btn': 'onArchive',
       'click .message-detail-actions .star-toggle-btn': 'onStarToggle',
+      'keydown .message-detail-actions .star-toggle-btn': 'onStarToggle',
       modelChange: 'onModelChange',
       'changed:starred': 'render'
     }
@@ -75,7 +81,10 @@ export default class MessageDetailView extends View {
         const childView = new MessageItemView({model: message}).render()
         $template.find('.message-content').append(childView.$el)
         ReactDOM.render(
-          <Avatar name={message.attributes.author.name} src={message.attributes.author.avatar_url} />,
+          <Avatar
+            name={message.attributes.author.name}
+            src={message.attributes.author.avatar_url}
+          />,
           $template.find(`#${message.attributes.avatarContainerId}`)[0]
         )
         this.listenTo(childView, 'reply', () =>
@@ -146,27 +155,42 @@ export default class MessageDetailView extends View {
   }
 
   onStarToggle(e) {
+    if (e.keyCode !== 13 && e.keyCode !== 32 && e.keyCode !== undefined) {
+      return
+    }
     e.preventDefault()
     this.$el.find('.message-detail-kyle-menu').focus()
     return this.trigger('star-toggle')
   }
 
   onReply(e) {
+    if (e.keyCode !== 13 && e.keyCode !== 32 && e.keyCode !== undefined) {
+      return
+    }
     e.preventDefault()
     return this.trigger('reply', null, '.message-detail-actions .reply-btn')
   }
 
   onReplyAll(e) {
+    if (e.keyCode !== 13 && e.keyCode !== 32 && e.keyCode !== undefined) {
+      return
+    }
     e.preventDefault()
     return this.trigger('reply-all', null, '.message-detail-actions .al-trigger')
   }
 
   onForward(e) {
+    if (e.keyCode !== 13 && e.keyCode !== 32 && e.keyCode !== undefined) {
+      return
+    }
     e.preventDefault()
     return this.trigger('forward', null, '.message-detail-actions .al-trigger')
   }
 
   onDelete(e) {
+    if (e.keyCode !== 13 && e.keyCode !== 32 && e.keyCode !== undefined) {
+      return
+    }
     e.preventDefault()
     return this.trigger(
       'delete',
@@ -176,6 +200,9 @@ export default class MessageDetailView extends View {
   }
 
   onArchive(e) {
+    if (e.keyCode !== 13 && e.keyCode !== 32 && e.keyCode !== undefined) {
+      return
+    }
     e.preventDefault()
     return this.trigger(
       'archive',
