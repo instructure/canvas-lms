@@ -45,7 +45,6 @@ module Mutations
 
       return {} unless ratings_input.count.positive? && context
 
-      raise GraphQL::ExecutionError, I18n.t("individual ratings data input with invidual_outcome_rating_and_calculation FF disabled") unless context.root_account.feature_enabled?(:individual_outcome_rating_and_calculation)
       raise GraphQL::ExecutionError, I18n.t("individual ratings data input with acount_level_mastery_scale FF enabled") if context.root_account.feature_enabled?(:account_level_mastery_scales)
 
       updated_ratings_attrs = {}

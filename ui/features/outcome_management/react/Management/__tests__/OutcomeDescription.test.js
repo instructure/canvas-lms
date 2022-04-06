@@ -45,15 +45,11 @@ describe('OutcomeDescription', () => {
 
   const render = (
     children,
-    {
-      friendlyDescriptionFF = false,
-      individualOutcomeRatingAndCalculationFF = false,
-      isStudent = false
-    } = {}
+    {friendlyDescriptionFF = false, accountLevelMasteryScalesFF = true, isStudent = false} = {}
   ) => {
     return rtlRender(
       <OutcomesContext.Provider
-        value={{env: {friendlyDescriptionFF, individualOutcomeRatingAndCalculationFF, isStudent}}}
+        value={{env: {friendlyDescriptionFF, accountLevelMasteryScalesFF, isStudent}}}
       >
         {children}
       </OutcomesContext.Provider>
@@ -166,13 +162,13 @@ describe('OutcomeDescription', () => {
     })
   })
 
-  describe('individual outcome rating and calculation FF', () => {
-    describe('when feature flag enabled', () => {
+  describe('account level mastery scales FF', () => {
+    describe('when feature flag disabled', () => {
       it('renders ratings when description prop not provided/null and expanded', () => {
         const {queryByTestId} = render(
           <OutcomeDescription {...defaultProps({description: null, truncated: false})} />,
           {
-            individualOutcomeRatingAndCalculationFF: true
+            accountLevelMasteryScalesFF: false
           }
         )
         expect(queryByTestId(ratingsTestId)).toBeInTheDocument()
@@ -180,20 +176,20 @@ describe('OutcomeDescription', () => {
 
       it('displays calculation method if description expanded', () => {
         const {getByText} = render(<OutcomeDescription {...defaultProps({truncated: false})} />, {
-          individualOutcomeRatingAndCalculationFF: true
+          accountLevelMasteryScalesFF: false
         })
         expect(getByText('Proficiency Calculation:')).toBeInTheDocument()
       })
 
       it('hides calculation method if description truncated', () => {
         const {queryByText} = render(<OutcomeDescription {...defaultProps()} />, {
-          individualOutcomeRatingAndCalculationFF: true
+          accountLevelMasteryScalesFF: false
         })
         expect(queryByText('Proficiency Calculation:')).not.toBeInTheDocument()
       })
     })
 
-    describe('when feature flag disabled', () => {
+    describe('when feature flag enabled', () => {
       it('hides calculation method', () => {
         const {queryByText} = render(<OutcomeDescription {...defaultProps({truncated: false})} />)
         expect(queryByText('Proficiency Calculation:')).not.toBeInTheDocument()

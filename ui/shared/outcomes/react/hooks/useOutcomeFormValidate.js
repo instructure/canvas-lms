@@ -21,14 +21,14 @@ import useInputFocus from './useInputFocus'
 import useCanvasContext from './useCanvasContext'
 
 const useOutcomeFormValidate = ({focusOnRatingsError, clearRatingsFocus}) => {
-  const {friendlyDescriptionFF, individualOutcomeRatingAndCalculationFF} = useCanvasContext()
+  const {friendlyDescriptionFF, accountLevelMasteryScalesFF} = useCanvasContext()
   const [focusOnErrorField, setFocusOnErrorField] = useState(false)
   const [fieldWithError, setFieldWithError] = useState(null)
   const fields = ['title', 'display_name']
   if (friendlyDescriptionFF) {
     fields.push('friendly_description')
   }
-  if (individualOutcomeRatingAndCalculationFF) {
+  if (!accountLevelMasteryScalesFF) {
     fields.push('mastery_points', 'individual_calculation_method')
   }
   const {inputElRefs, setInputElRef} = useInputFocus(fields)
@@ -50,7 +50,7 @@ const useOutcomeFormValidate = ({focusOnRatingsError, clearRatingsFocus}) => {
     typeof clearRatingsFocus === 'function' && clearRatingsFocus()
 
     // validate form fields in reverse order to focus on first field with error
-    if (individualOutcomeRatingAndCalculationFF) {
+    if (!accountLevelMasteryScalesFF) {
       if (proficiencyCalculationError) errField = 'individual_calculation_method'
       if (masteryPointsError) errField = 'mastery_points'
       if (ratingsError) errField = 'individual_ratings'

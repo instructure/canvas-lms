@@ -437,13 +437,13 @@ describe "outcome gradebook" do
         end
       end
 
-      context "with individual outcome rating and calculation method" do
+      context "Account Level Mastery Scales" do
         before(:once) do
           outcome_criterion = LearningOutcome.default_rubric_criterion
           outcome_criterion[:ratings][1][:points] = 4
           outcome_criterion[:mastery_points] = 4
 
-          outcome = LearningOutcome.create!(context: @course, title: "Outcome with IORCM", rubric_criterion: outcome_criterion)
+          outcome = LearningOutcome.create!(context: @course, title: "Outcome with individual ratings", rubric_criterion: outcome_criterion)
 
           proficiency = OutcomeProficiency.new(context: @course)
           proficiency.replace_ratings(OutcomeProficiency.default_ratings)
@@ -463,10 +463,9 @@ describe "outcome gradebook" do
           result(@student_1, alignment, 3)
         end
 
-        it "Displays mastery achieved if IORCM is disabled" do
+        it "Displays mastery achieved if Account Level Mastery Scales FF is enabled" do
           Account.default.set_feature_flag!("account_level_mastery_scales", "on")
           Account.default.set_feature_flag!("improved_outcomes_management", "on")
-          Account.default.set_feature_flag!("individual_outcome_rating_and_calculation", "off")
 
           get "/courses/#{@course.id}/gradebook"
           select_learning_mastery
@@ -475,10 +474,9 @@ describe "outcome gradebook" do
           expect(selected_values_colors).to contain_exactly("#0B874B")
         end
 
-        it "Displays mastery not achieved if IORCM is enabled" do
+        it "Displays mastery not achieved if Account Level Mastery Scales FF is disabled" do
           Account.default.set_feature_flag!("account_level_mastery_scales", "off")
           Account.default.set_feature_flag!("improved_outcomes_management", "on")
-          Account.default.set_feature_flag!("individual_outcome_rating_and_calculation", "on")
 
           get "/courses/#{@course.id}/gradebook"
           select_learning_mastery

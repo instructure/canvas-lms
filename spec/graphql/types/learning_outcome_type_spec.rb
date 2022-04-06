@@ -37,14 +37,9 @@ describe Types::LearningOutcomeType do
     outcome_type_raw
   end
 
-  context "with IOM and IORC enabled and ALMS disabled" do
-    before(:once) do
-      @domain_root_account.enable_feature! :improved_outcomes_management
-      @domain_root_account.enable_feature! :individual_outcome_rating_and_calculation
+  context "Account Level Mastery Scales Feature Flag" do
+    it "returns outcome with individual ratings and calculation method if FF disabled" do
       @domain_root_account.disable_feature! :account_level_mastery_scales
-    end
-
-    it "returns outcome with ratings and calculation" do
       expect(outcome_type.resolve("_id")).to eq @outcome.id.to_s
       expect(outcome_type.resolve("contextId")).to eq @outcome.context_id.to_s
       expect(outcome_type.resolve("contextType")).to eq @outcome.context_type
@@ -64,31 +59,15 @@ describe Types::LearningOutcomeType do
 
       expect(outcome_type.resolve("canEdit")).to eq true
     end
-  end
 
-  context "with any other combination of FF" do
-    def set_feature_flag_by_bit(feature_flag, bit_value)
-      @domain_root_account.set_feature_flag!(feature_flag, bit_value == 1 ? Feature::STATE_ON : Feature::STATE_OFF)
-    end
+    it "returns outcome without individual ratings and calculation method if FF enabled" do
+      @domain_root_account.enable_feature! :account_level_mastery_scales
 
-    (0..7).each do |mask|
-      next if mask == 6
-
-      ff_iom = (mask >> 2) & 1
-      ff_iorc = (mask >> 1) & 1
-      ff_alms = mask & 1
-
-      it "returns no ratings and calculation (IOM: #{ff_iom}, IORC: #{ff_iorc}, ALMS: #{ff_alms})" do
-        set_feature_flag_by_bit :improved_outcomes_management, ff_iom
-        set_feature_flag_by_bit :individual_outcome_rating_and_calculation, ff_iorc
-        set_feature_flag_by_bit :account_level_mastery_scales, ff_alms
-
-        expect(outcome_type.resolve("calculationMethod")).to be_nil
-        expect(outcome_type.resolve("calculationInt")).to be_nil
-        expect(outcome_type.resolve("pointsPossible")).to be_nil
-        expect(outcome_type.resolve("masteryPoints")).to be_nil
-        expect(outcome_type.resolve("ratings { points }")).to be_nil
-      end
+      expect(outcome_type.resolve("calculationMethod")).to be_nil
+      expect(outcome_type.resolve("calculationInt")).to be_nil
+      expect(outcome_type.resolve("pointsPossible")).to be_nil
+      expect(outcome_type.resolve("masteryPoints")).to be_nil
+      expect(outcome_type.resolve("ratings { points }")).to be_nil
     end
   end
 

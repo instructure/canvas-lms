@@ -31,7 +31,7 @@ const render = (
     contextId = '2',
     contextType = 'Account',
     friendlyDescriptionFF = true,
-    individualOutcomeRatingAndCalculationFF = false,
+    accountLevelMasteryScalesFF = true,
     renderer = rtlRender
   } = {}
 ) => {
@@ -44,7 +44,7 @@ const render = (
           contextId,
           contextType,
           friendlyDescriptionFF,
-          individualOutcomeRatingAndCalculationFF
+          accountLevelMasteryScalesFF
         }
       }}
     >
@@ -139,9 +139,9 @@ describe('ManageOutcomeItem', () => {
     )
   })
 
-  it('displays enabled caret button if no description but individualOutcomeRatingAndCalculationFF on', () => {
+  it('displays enabled caret button if no description and accountLevelMasteryScales is disabled', () => {
     const {queryByTestId} = render(<ManageOutcomeItem {...defaultProps({description: null})} />, {
-      individualOutcomeRatingAndCalculationFF: true
+      accountLevelMasteryScalesFF: false
     })
     expect(queryByTestId('icon-arrow-right').closest('button')).toBeEnabled()
   })
@@ -218,20 +218,20 @@ describe('ManageOutcomeItem', () => {
     })
   })
 
-  describe('individual outcome rating and calculation FF', () => {
-    describe('when feature flag enabled', () => {
+  describe('account level mastery scales FF', () => {
+    describe('when feature flag disabled', () => {
       it('enables caret button even if no description', () => {
         const {queryByTestId} = render(
           <ManageOutcomeItem {...defaultProps({description: null})} />,
           {
-            individualOutcomeRatingAndCalculationFF: true
+            accountLevelMasteryScalesFF: false
           }
         )
         expect(queryByTestId('icon-arrow-right').closest('button')).toBeEnabled()
       })
     })
 
-    describe('when feature flag disabled', () => {
+    describe('when feature flag enabled', () => {
       it('disables caret button and changes cursor to "not-allowed" if no description', () => {
         const {queryByTestId} = render(<ManageOutcomeItem {...defaultProps({description: null})} />)
         expect(queryByTestId('icon-arrow-right').closest('button')).toBeDisabled()

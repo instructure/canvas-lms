@@ -72,7 +72,7 @@ describe('OutcomeEditModal', () => {
       contextType: 'Account',
       contextId: '1',
       friendlyDescriptionFF: true,
-      individualOutcomeRatingAndCalculationFF: false
+      accountLevelMasteryScalesFF: true
     },
     mockOverrides = []
   } = {}) => {
@@ -347,14 +347,14 @@ describe('OutcomeEditModal', () => {
     })
   })
 
-  describe('Individual Outcome Proficiency and Calculation Feature Flag', () => {
-    describe('when feature flag enabled', () => {
+  describe('account level mastery scales FF', () => {
+    describe('when feature flag disabled', () => {
       it('displays calculation method selection form if outcome is created in same context', async () => {
         const {getByLabelText} = renderWithProvider({
           env: {
             contextType: 'Account',
             contextId: '1',
-            individualOutcomeRatingAndCalculationFF: true
+            accountLevelMasteryScalesFF: false
           }
         })
         expect(getByLabelText('Calculation Method')).toBeInTheDocument()
@@ -365,7 +365,7 @@ describe('OutcomeEditModal', () => {
           env: {
             contextType: 'Course',
             contextId: '2',
-            individualOutcomeRatingAndCalculationFF: true
+            accountLevelMasteryScalesFF: false
           }
         })
         expect(getByTestId('read-only-calculation-method')).toBeInTheDocument()
@@ -376,7 +376,7 @@ describe('OutcomeEditModal', () => {
           env: {
             contextType: 'Account',
             contextId: '1',
-            individualOutcomeRatingAndCalculationFF: true
+            accountLevelMasteryScalesFF: false
           }
         })
         expect(getByTestId('outcome-management-ratings')).toBeInTheDocument()
@@ -388,7 +388,7 @@ describe('OutcomeEditModal', () => {
           env: {
             contextType: 'Course',
             contextId: '2',
-            individualOutcomeRatingAndCalculationFF: true
+            accountLevelMasteryScalesFF: false
           }
         })
         expect(getByTestId('outcome-management-ratings')).toBeInTheDocument()
@@ -407,7 +407,7 @@ describe('OutcomeEditModal', () => {
           env: {
             contextType: 'Account',
             contextId: '1',
-            individualOutcomeRatingAndCalculationFF: true
+            accountLevelMasteryScalesFF: false
           },
           mockOverrides: mocks
         })
@@ -442,7 +442,7 @@ describe('OutcomeEditModal', () => {
           env: {
             contextType: 'Account',
             contextId: '1',
-            individualOutcomeRatingAndCalculationFF: true
+            accountLevelMasteryScalesFF: false
           },
           mockOverrides: mocks
         })
@@ -469,7 +469,7 @@ describe('OutcomeEditModal', () => {
           env: {
             contextType: 'Account',
             contextId: '1',
-            individualOutcomeRatingAndCalculationFF: true
+            accountLevelMasteryScalesFF: false
           }
         })
         expect(getByTestId('outcome-edit-modal-horizontal-divider')).toBeInTheDocument()
@@ -480,7 +480,7 @@ describe('OutcomeEditModal', () => {
           env: {
             contextType: 'Account',
             contextId: '1',
-            individualOutcomeRatingAndCalculationFF: true
+            accountLevelMasteryScalesFF: false
           }
         })
         const ratingDescription = getByLabelText('Change description for mastery level 2')
@@ -499,7 +499,7 @@ describe('OutcomeEditModal', () => {
           env: {
             contextType: 'Account',
             contextId: '1',
-            individualOutcomeRatingAndCalculationFF: true
+            accountLevelMasteryScalesFF: false
           }
         })
         const masteryPoints = getByLabelText('Change mastery points')
@@ -514,7 +514,7 @@ describe('OutcomeEditModal', () => {
       })
     })
 
-    describe('when feature flag disabled', () => {
+    describe('when feature flag enabled', () => {
       it('does not display Calculation Method selection form', async () => {
         const {queryByLabelText} = renderWithProvider()
         expect(queryByLabelText('Calculation Method')).not.toBeInTheDocument()

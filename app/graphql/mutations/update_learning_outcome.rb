@@ -31,7 +31,7 @@ class Mutations::UpdateLearningOutcome < Mutations::BaseLearningOutcomeMutation
 
     outcome_input = attrs(input, record.context)
 
-    if individual_outcome_rating_and_calculation_enabled?(record.context)
+    unless account_level_mastery_scales_enabled?(record.context)
       update_rubric_criterion(record, outcome_input)
       outcome_input.delete(:rubric_criterion)
     end
