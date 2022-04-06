@@ -45,6 +45,7 @@ interface LocalState {}
 
 export class BlackoutDatesTable extends React.Component<ComponentProps, LocalState> {
   private dateFormatter: any
+
   /* Lifecycle */
 
   constructor(props: ComponentProps) {
