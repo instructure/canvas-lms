@@ -100,7 +100,7 @@ const ApplyScoreToUngradedModal: React.FC<Props> = ({assignmentGroup, onApply, o
           <TextInput
             display="inline-block"
             renderAfterInput={I18n.t('%')}
-            renderLabel={I18n.t('Grade for ungraded submissions')}
+            renderLabel={I18n.t('Grade for ungraded artifacts')}
             onChange={(event, value) => {
               setPercent(value)
             }}
