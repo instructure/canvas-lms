@@ -185,6 +185,7 @@ const ObserverOptions = ({
           onOptionSelected={(_e, id) => {
             handleOptionSelected(id)
           }}
+          selectedOptionId={selectedUser?.id}
           renderBeforeInput={selectAvatar}
           shouldNotWrap
         >
