@@ -68,11 +68,6 @@ outcomes_friendly_description:
   display_name: Outcomes Friendly Description
   description: Allows users to add a friendly description to outcomes for student and parent view
     in the Student Learning Mastery Gradebook.
-individual_outcome_rating_and_calculation:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Individual Outcome Rating and Calculation Method Options
-  description: Allows setting criterion ratings and calculation method options for individual outcomes.
 outcome_service_results_to_canvas:
   state: hidden
   applies_to: Course
