@@ -2148,6 +2148,7 @@ describe DiscussionTopicsController do
   describe "Metrics" do
     before do
       allow(InstStatsd::Statsd).to receive(:increment)
+      allow(InstStatsd::Statsd).to receive(:count)
     end
 
     it "increment discussion_topic.created" do
@@ -2263,6 +2264,24 @@ describe DiscussionTopicsController do
       user_session @teacher
       post "create", params: topic_params(@course), format: :json
       expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.created.group")
+    end
+
+    it "count discussion_topic.visit.entries.legacy" do
+      @course.disable_feature! :react_discussions_post
+
+      course_topic
+      user_session @teacher
+      get "show", params: { course_id: @course.id, id: @topic.id }
+      expect(InstStatsd::Statsd).to have_received(:count).with("discussion_topic.visit.entries.legacy", 0).at_least(:once)
+    end
+
+    it "does not count discussion_topic.visit.entries.legacy with unauthorized visit" do
+      @course.disable_feature! :react_discussions_post
+
+      course_topic
+      get "show", params: { course_id: @course.id, id: @topic.id }
+      assert_unauthorized
+      expect(InstStatsd::Statsd).not_to have_received(:count).with("discussion_topic.visit.entries.legacy", 0)
     end
   end
 end
