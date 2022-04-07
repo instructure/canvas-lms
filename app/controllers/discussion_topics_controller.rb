@@ -1253,10 +1253,6 @@ class DiscussionTopicsController < ApplicationController
   def process_discussion_topic_runner(is_new:)
     @errors = {}
 
-    if is_new
-      InstStatsd::Statsd.increment("discussion_topic.created")
-    end
-
     anonymous_discussions_disabled = !(Account.site_admin.feature_enabled?(:discussion_anonymity) && @context.feature_enabled?(:react_discussions_post))
     if is_new && anonymous_discussions_disabled
       params[:anonymous_state] = nil
@@ -1396,6 +1392,11 @@ class DiscussionTopicsController < ApplicationController
 
         include_usage_rights = @context.root_account.feature_enabled?(:usage_rights_discussion_topics) &&
                                @context.try(:usage_rights_required?)
+
+        if is_new
+          InstStatsd::Statsd.increment("discussion_topic.created")
+        end
+
         if @context.is_a?(Course)
           render json: discussion_topic_api_json(@topic,
                                                  @context,

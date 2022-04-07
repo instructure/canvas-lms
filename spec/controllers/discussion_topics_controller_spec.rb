@@ -2157,6 +2157,13 @@ describe DiscussionTopicsController do
       expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_topic.created").at_least(:once)
     end
 
+    it "does not increment discussion_topic.created when topic is not successfully created" do
+      user_session @observer
+      post "create", params: topic_params(@course), format: :json
+      expect(response).to have_http_status :unauthorized
+      expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.created")
+    end
+
     it "increment discussion_topic.visit.redesign" do
       @course.enable_feature! :react_discussions_post
 
