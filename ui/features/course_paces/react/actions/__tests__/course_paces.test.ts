@@ -32,10 +32,10 @@ import {
 } from '../../__tests__/fixtures'
 import {SyncState} from '../../shared/types'
 
-const CREATE_API = `/api/v1/courses/${COURSE.id}/course_paces`
-const UPDATE_API = `/api/v1/courses/${COURSE.id}/course_paces/${PRIMARY_PACE.id}`
+const CREATE_API = `/api/v1/courses/${COURSE.id}/course_pacing`
+const UPDATE_API = `/api/v1/courses/${COURSE.id}/course_pacing/${PRIMARY_PACE.id}`
 const PROGRESS_API = `/api/v1/progress/${PROGRESS_RUNNING.id}`
-const COMPRESS_API = `/api/v1/courses/${COURSE.id}/course_paces/compress_dates`
+const COMPRESS_API = `/api/v1/courses/${COURSE.id}/course_pacing/compress_dates`
 
 const dispatch = jest.fn()
 

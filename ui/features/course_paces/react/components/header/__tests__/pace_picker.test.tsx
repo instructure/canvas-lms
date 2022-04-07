@@ -48,12 +48,12 @@ describe('PacePicker', () => {
   it('renders a drop-down with all pace types represented', () => {
     const {getByLabelText} = render(<PacePicker {...defaultProps} />)
 
-    const picker = getByLabelText('Course Paces') as HTMLInputElement
+    const picker = getByLabelText('Course Pacing') as HTMLInputElement
     expect(picker).toBeInTheDocument()
-    expect(picker.value).toBe('Course Pace')
+    expect(picker.value).toBe('Course')
 
     act(() => picker.click())
-    expect(screen.getByRole('menuitem', {name: 'Course Pace'})).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', {name: 'Course'})).toBeInTheDocument()
 
     // Commented out since we're not implementing this feature yet
     // const sections = screen.getByRole('button', {name: 'Sections'})
@@ -75,10 +75,10 @@ describe('PacePicker', () => {
 
   it('sets the selected context when an option is clicked', () => {
     const {getByLabelText} = render(<PacePicker {...defaultProps} />)
-    const picker = getByLabelText('Course Paces') as HTMLInputElement
+    const picker = getByLabelText('Course Pacing') as HTMLInputElement
 
     act(() => picker.click())
-    act(() => screen.getByRole('menuitem', {name: 'Course Pace'}).click())
+    act(() => screen.getByRole('menuitem', {name: 'Course'}).click())
     expect(selectPaceContextFn).toHaveBeenCalledWith('Course', COURSE.id)
 
     // Commented out since we're not implementing this feature yet
@@ -101,20 +101,20 @@ describe('PacePicker', () => {
         selectedContextId={ENROLLMENT_1.id}
       />
     )
-    const picker = getByLabelText('Course Paces') as HTMLInputElement
+    const picker = getByLabelText('Course Pacing') as HTMLInputElement
     expect(picker.value).toBe('Henry Dorsett Case')
   })
 
   it('displays a message when there are no enrolled students', () => {
     const {getByRole} = render(<PacePicker {...defaultProps} enrollments={[]} />)
-    const heading = getByRole('heading', {name: 'Course Pace'})
+    const heading = getByRole('heading', {name: 'Course Pacing'})
     expect(heading).toBeInTheDocument()
   })
 
   describe('warning modal', () => {
     it('is displayed if context changes with unpublished changes', () => {
       const {getByText, getByLabelText} = render(<PacePicker {...defaultProps} changeCount={1} />)
-      const picker = getByLabelText('Course Paces') as HTMLInputElement
+      const picker = getByLabelText('Course Pacing') as HTMLInputElement
 
       act(() => picker.click())
       act(() => screen.getByRole('button', {name: 'Students'}).click())
@@ -126,19 +126,19 @@ describe('PacePicker', () => {
       const {getByDisplayValue, getByText, getByLabelText} = render(
         <PacePicker {...defaultProps} changeCount={1} />
       )
-      const picker = getByLabelText('Course Paces') as HTMLInputElement
+      const picker = getByLabelText('Course Pacing') as HTMLInputElement
 
       act(() => picker.click())
       act(() => screen.getByRole('button', {name: 'Students'}).click())
       act(() => screen.getByRole('menuitem', {name: 'Molly Millions'}).click())
       const cancelBtn = getByText('Keep Editing').closest('button')
       act(() => cancelBtn?.click())
-      expect(getByDisplayValue('Course Pace')).toBeInTheDocument()
+      expect(getByDisplayValue('Course')).toBeInTheDocument()
     })
 
     it('cancels context change on "Keep Editing"', () => {
       const {getByText, getByLabelText} = render(<PacePicker {...defaultProps} changeCount={1} />)
-      const picker = getByLabelText('Course Paces') as HTMLInputElement
+      const picker = getByLabelText('Course Pacing') as HTMLInputElement
 
       act(() => picker.click())
       act(() => screen.getByRole('button', {name: 'Students'}).click())
@@ -150,7 +150,7 @@ describe('PacePicker', () => {
 
     it('changes context change on "Discard Changes"', () => {
       const {getByText, getByLabelText} = render(<PacePicker {...defaultProps} changeCount={1} />)
-      const picker = getByLabelText('Course Paces') as HTMLInputElement
+      const picker = getByLabelText('Course Pacing') as HTMLInputElement
 
       act(() => picker.click())
       act(() => screen.getByRole('button', {name: 'Students'}).click())

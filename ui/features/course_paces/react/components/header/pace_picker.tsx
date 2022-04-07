@@ -83,7 +83,7 @@ export const PacePicker: React.FC<ComponentProps> = ({
   const [pendingContext, setPendingContext] = useState('')
   const hasChanges = changeCount > 0
 
-  let selectedContextName = I18n.t('Course Pace')
+  let selectedContextName = I18n.t('Course')
   if (selectedContextType === 'Section') {
     selectedContextName = sections.find(({id}) => id === selectedContextId)?.name
   }
@@ -139,7 +139,7 @@ export const PacePicker: React.FC<ComponentProps> = ({
 
   const trigger: JSX.Element = (
     <TextInput
-      renderLabel={I18n.t('Course Paces')}
+      renderLabel={I18n.t('Course Pacing')}
       renderAfterInput={
         open ? <IconArrowOpenUpSolid inline={false} /> : <IconArrowOpenDownSolid inline={false} />
       }
@@ -155,7 +155,7 @@ export const PacePicker: React.FC<ComponentProps> = ({
   if (enrollments.length === 0) {
     return (
       <Heading level="h2" margin="0 x-large 0 0">
-        {I18n.t('Course Pace')}
+        {I18n.t('Course Pacing')}
       </Heading>
     )
   }
@@ -177,7 +177,7 @@ export const PacePicker: React.FC<ComponentProps> = ({
         onToggle={setOpen}
         onSelect={handleSelect}
       >
-        {renderOption(createContextKey('Course', course.id), I18n.t('Course Pace'))}
+        {renderOption(createContextKey('Course', course.id), I18n.t('Course'))}
         {/* Commenting out since we're not implementing sections yet */}
         {/* <Menu id="course-pace-menu" label={I18n.t('Sections')}> */}
         {/*  {sections.map(s => */}

@@ -456,7 +456,7 @@ CanvasRails::Application.routes.draw do
     end
 
     get "blackout_dates" => "blackout_dates#index"
-    get "course_paces" => "course_paces#index"
+    get "course_pacing" => "course_paces#index"
 
     post "collapse_all_modules" => "context_modules#toggle_collapse_all"
     resources :content_exports, only: %i[create index destroy show]
@@ -2387,12 +2387,12 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :course_paces) do
-      post "courses/:course_id/course_paces", action: :create
-      get "courses/:course_id/course_paces/new", action: :new
-      get "courses/:course_id/course_paces/:id", action: :api_show
-      put "courses/:course_id/course_paces/:id", action: :update
-      post "courses/:course_id/course_paces/:id/publish", action: :publish
-      post "courses/:course_id/course_paces/compress_dates", action: :compress_dates
+      post "courses/:course_id/course_pacing", action: :create
+      get "courses/:course_id/course_pacing/new", action: :new
+      get "courses/:course_id/course_pacing/:id", action: :api_show
+      put "courses/:course_id/course_pacing/:id", action: :update
+      post "courses/:course_id/course_pacing/:id/publish", action: :publish
+      post "courses/:course_id/course_pacing/compress_dates", action: :compress_dates
     end
 
     scope(controller: :blackout_dates) do
