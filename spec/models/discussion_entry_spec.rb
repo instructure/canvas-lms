@@ -104,6 +104,10 @@ describe DiscussionEntry do
       course_with_teacher(active_all: true)
     end
 
+    before do
+      allow(InstStatsd::Statsd).to receive(:increment)
+    end
+
     let(:student) { student_in_course(active_all: true).user }
     let(:mentioned_student) { student_in_course(active_all: true).user }
 
@@ -113,6 +117,7 @@ describe DiscussionEntry do
       expect { entry.save! }.to change { entry.mentions.count }.from(0).to(1)
       expect(entry.mentions.take.user_id).to eq mentioned_student.id
       expect(entry.mentioned_users.count).to eq 1
+      expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_entry.created").at_least(:once)
     end
 
     describe "edits to an entry" do
