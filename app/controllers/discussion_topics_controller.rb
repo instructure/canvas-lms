@@ -763,6 +763,9 @@ class DiscussionTopicsController < ApplicationController
                  Base64.encode64("#{@current_user.uuid}vyfW=;[p-0?:{P_\=HUpgraqe;njalkhpvoiulkimmaqewg")
              })
 
+      unless @locked
+        InstStatsd::Statsd.increment("discussion_topic.visit.redesign")
+      end
       js_bundle :discussion_topics_post
       css_bundle :discussions_index, :learning_outcomes
       render html: "", layout: params[:embed] == "true" ? "mobile_embed" : true

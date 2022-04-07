@@ -52,6 +52,24 @@ describe DiscussionTopicsController do
     @entry = @topic.discussion_entries.create(message: "some message", user: @user)
   end
 
+  def topic_params(course, opts = {})
+    {
+      course_id: course.id,
+      title: "Topic Title",
+      is_announcement: false,
+      discussion_type: "side_comment",
+      require_initial_post: true,
+      podcast_has_student_posts: false,
+      delayed_post_at: "",
+      locked: true,
+      lock_at: "",
+      message: "Message",
+      delay_posting: false,
+      threaded: false,
+      specific_sections: "all"
+    }.merge(opts)
+  end
+
   describe "GET 'index'" do
     it "requires authorization" do
       get "index", params: { course_id: @course.id }
@@ -1384,24 +1402,6 @@ describe DiscussionTopicsController do
       allow(controller).to receive_messages(form_authenticity_token: "abc", form_authenticity_param: "abc")
     end
 
-    def topic_params(course, opts = {})
-      {
-        course_id: course.id,
-        title: "Topic Title",
-        is_announcement: false,
-        discussion_type: "side_comment",
-        require_initial_post: true,
-        podcast_has_student_posts: false,
-        delayed_post_at: "",
-        locked: true,
-        lock_at: "",
-        message: "Message",
-        delay_posting: false,
-        threaded: false,
-        specific_sections: "all"
-      }.merge(opts)
-    end
-
     def group_topic_params(group, opts = {})
       params = topic_params(group, opts)
       params[:group_id] = group.id
@@ -1576,19 +1576,6 @@ describe DiscussionTopicsController do
         expect(response).to have_http_status :bad_request
         expect(DiscussionTopic.count).to eq 0
         expect(DiscussionTopicSectionVisibility.count).to eq 0
-      end
-    end
-
-    describe "metrics" do
-      before do
-        allow(InstStatsd::Statsd).to receive(:increment)
-      end
-
-      it "increment discussion_topic.created" do
-        user_session @teacher
-        post "create", params: topic_params(@course), format: :json
-        expect(response).to be_successful
-        expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_topic.created").at_least(:once)
       end
     end
 
@@ -2155,6 +2142,37 @@ describe DiscussionTopicsController do
       expect(response).to be_successful
       topics.each(&:reload)
       expect(topics.map(&:position)).to eq [2, 1, 3]
+    end
+  end
+
+  describe "Metrics" do
+    before do
+      allow(InstStatsd::Statsd).to receive(:increment)
+    end
+
+    it "increment discussion_topic.created" do
+      user_session @teacher
+      post "create", params: topic_params(@course), format: :json
+      expect(response).to be_successful
+      expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_topic.created").at_least(:once)
+    end
+
+    it "increment discussion_topic.visit.redesign" do
+      @course.enable_feature! :react_discussions_post
+
+      course_topic
+      user_session @teacher
+      get "show", params: { course_id: @course.id, id: @topic.id }
+      expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_topic.visit.redesign").at_least(:once)
+    end
+
+    it "does not increment discussion_topic.visit.redesign with unauthorized visit" do
+      @course.enable_feature! :react_discussions_post
+
+      course_topic
+      get "show", params: { course_id: @course.id, id: @topic.id }
+      assert_unauthorized
+      expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.visit.redesign")
     end
   end
 end
