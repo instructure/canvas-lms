@@ -51,7 +51,8 @@ export default class EquationEditorModal extends Component {
     mountNode: PropTypes.string
   }
 
-  static boundaryRegex = /\\\((.+?)\\\)/g
+  // used for inline latex delimited like: \( ... \) OR $$ ... $$
+  static boundaryRegex = /\\\((.+?)\\\)|\$\$(.+?)\$\$/g
   static debounceRate = 1000
 
   static defaultProps = {
@@ -153,11 +154,15 @@ export default class EquationEditorModal extends Component {
   }
 
   selectionIsLatex(selection) {
-    return selection.startsWith('\\(') && selection.endsWith('\\)')
+    return (
+      (selection.startsWith('\\(') && selection.endsWith('\\)')) ||
+      (selection.startsWith('$$') && selection.endsWith('$$'))
+    )
   }
 
   selectionToLatex(selection) {
-    return selection.substr(2, selection.length - 4)
+    const sansDelimiters = selection.substr(2, selection.length - 4)
+    return sansDelimiters.replace(/&nbsp;/g, '').trim()
   }
 
   // ********* //
@@ -287,7 +292,7 @@ export default class EquationEditorModal extends Component {
   renderToggle = () => {
     const lockToggle = this.state.advanced && this.advancedModeOnly(this.state.workingFormula)
 
-    const defaultToggle =
+    const defaultToggle = (
       <Checkbox
         onChange={this.toggleAdvanced}
         checked={this.state.advanced}
@@ -296,14 +301,16 @@ export default class EquationEditorModal extends Component {
         disabled={lockToggle}
         data-testid="advanced-toggle"
       />
+    )
 
-    const tooltipToggle =
+    const tooltipToggle = (
       <Tooltip
         renderTip={formatMessage('This equation cannot be rendered in Basic View.')}
         on={['hover', 'focus']}
       >
         {defaultToggle}
       </Tooltip>
+    )
 
     return lockToggle ? tooltipToggle : defaultToggle
   }
@@ -397,9 +404,7 @@ export default class EquationEditorModal extends Component {
 
             <div className={css(styles.latexToggle)}>
               <Flex>
-                <Flex.Item>
-                  {this.renderToggle()}
-                </Flex.Item>
+                <Flex.Item>{this.renderToggle()}</Flex.Item>
               </Flex>
             </div>
 
