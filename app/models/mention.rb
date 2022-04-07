@@ -25,6 +25,7 @@ class Mention < ApplicationRecord
   belongs_to :root_account, class_name: "Account"
   has_one :discussion_topic, through: :discussion_entry
   delegate :context, to: :discussion_entry
+  after_create :log_created_mention_metrics
 
   has_a_broadcast_policy
 
@@ -45,5 +46,9 @@ class Mention < ApplicationRecord
     else
       I18n.t("Message not included, login to view the message.")
     end
+  end
+
+  def log_created_mention_metrics
+    InstStatsd::Statsd.increment("discussion_mention.created")
   end
 end
