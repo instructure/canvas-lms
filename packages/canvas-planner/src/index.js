@@ -33,7 +33,8 @@ import {
   loadThisWeekItems,
   startLoadingAllOpportunities,
   toggleMissingItems,
-  reloadWithObservee
+  reloadWithObservee,
+  getInitialOpportunities
 } from './actions'
 import {registerScrollEvents} from './utilities/scrollUtils'
 import {initialize as initializeAlerts} from './utilities/alertUtils'
@@ -259,7 +260,11 @@ export function createPlannerApp() {
       createPlannerApp.scrollEventsRegistered = true
     }
 
-    store.dispatch(getPlannerItems(moment.tz(initializedOptions.env.timeZone).startOf('day')))
+    store
+      .dispatch(getPlannerItems(moment.tz(initializedOptions.env.timeZone).startOf('day')))
+      .then(() => {
+        store.dispatch(getInitialOpportunities())
+      })
   } else {
     store
       .dispatch(getWeeklyPlannerItems(moment.tz(initializedOptions.env.timeZone).startOf('day')))
