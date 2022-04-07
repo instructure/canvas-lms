@@ -67,6 +67,10 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
     result.to_h.with_indifferent_access
   end
 
+  before do
+    allow(InstStatsd::Statsd).to receive(:increment)
+  end
+
   it "updates the read state" do
     expect(@discussion_entry.read?(@discussion_entry.user)).to be true
     result = run_mutation({ id: @discussion_entry.id, read: false })
@@ -125,6 +129,7 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
     ).to eq "other"
     @discussion_entry.reload
     expect(@discussion_entry.report_type?(@discussion_entry.user)).to eq "other"
+    expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_entry_participant.report.created")
   end
 
   describe "forcedReadState attribute mutations" do
