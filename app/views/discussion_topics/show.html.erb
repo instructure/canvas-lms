@@ -295,9 +295,11 @@
                 <label for="onlyUnread" aria-hidden="true"><%= t('unread', 'Unread') %></label>
 
                 <% if can_do(@context, @current_user, :moderate_forum) %>
-                  <span class="screenreader-only" id="showDeletedAccessibleLabel"><%= t("Show deleted replies") %></span>
                   <input type="checkbox" id="showDeleted" aria-labelledby="showDeletedAccessibleLabel"/>
-                  <label for="showDeleted" aria-hidden="true" title="Show deleted replies"><i class="icon-eye"></i></label>
+                  <label for="showDeleted">
+                    <i class="icon-eye" title="<%= t("Show deleted replies") %>"></i>
+                    <span class="screenreader-only" id="showDeletedAccessibleLabel"><%= t("Show deleted replies") %></span>
+                  </label>
                 <% end %>
 
                 &nbsp; &nbsp;
