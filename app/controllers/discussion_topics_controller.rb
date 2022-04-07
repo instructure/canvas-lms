@@ -1395,6 +1395,10 @@ class DiscussionTopicsController < ApplicationController
 
         if is_new
           InstStatsd::Statsd.increment("discussion_topic.created")
+
+          if params[:anonymous_state] == "partial_anonymity"
+            InstStatsd::Statsd.increment("discussion_topic.created.partial_anonymity")
+          end
         end
 
         if @context.is_a?(Course)
