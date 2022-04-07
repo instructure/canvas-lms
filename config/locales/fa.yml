@@ -12564,18 +12564,27 @@ fa:
   manage_enrollment_status_create_groups_and_add_use_3c91de1b: "از این صفحه، وضعیت ثبت نام را مدیریت کنید، گروه ها را ایجاد کنید و کاربران را بیفزایید."
   manage_grading_schemes_in_context_name_e3678273: "مدیریت طرح های نمره گذاری در %{context_name}"
   manage_group_group_name_ac8578c6: "مدیریت گروه %{group_name}"
+  manage_groups_4b962fa9: "مدیریت گروه ها"
+  manage_groups_4c3a2a9f: "مدیریت گروه ها"
+  manage_home_4fc3480b: "مدیریت خانه"
+  manage_home_for_coursename_5e5c7661: "مدیریت خانه برای %{courseName}"
   manage_item_name_6118d4b0: "مدیریت %{item_name}"
+  manage_lti_8fcdc6ba: "مدیریت LTI"
   manage_module_name_dfe16816: "مدیریت %{module_name}"
   manage_name_7f55f792: "مدیریت %{name}"
   manage_options_for_name_83278ad0: "مدیریت گزینه‌ها برای %{name}"
   manage_pages_4d2adeb6: "مدیریت صفحات"
   manage_profile_pictures_40c958ce: "مدیریت عکس های رخ نما"
+  manage_release_notes_9a51bba0: "مدیریت انتشار یادداشت ها"
   manage_rubrics_5d274f6a: "مدیریت دستورالعمل های ارزیابی"
   manage_snapshots_1dc4b79d: "مدیریت تصاویر لحظه ای"
   manage_snapshots_modal_b0517bb6: "مدیریت کیفیت تصاویر لحظه‌ای"
+  manage_subject_coursecontext_2328e1ff: "مدیریت موضوع: %{courseContext}"
+  manage_subject_f9835769: "مدیریت موضوع"
   manage_update_23de23a1: "مدیریت بهنگام سازی"
   manage_update_for_toolname_f8e3b2fb: "مدیریت بهنگام سازی برای %{toolName}"
   manage_usage_rights_c5a8c216: "مدیریت حقوق استفاده"
+  manage_user_settings_827ab12d: "مدیریت تنظیمات کاربر"
   manage_your_course_details_664c335f: "مدیریت جزئیات درس خود"
   manual_8c2665de: راهنما
   manual_configuration_b586fe54: "پیکربندی دستی"
@@ -12584,20 +12593,31 @@ fa:
   manually_mark_posts_as_read_afa5d035: "علامتگذاری دستی ارسال ها به عنوان خوانده شده"
   manually_post_grades_18248306: "ارسال نمرات بصورت دستی"
   mark_all_as_read_8f3bdf57: "علامتگذاری همه به عنوان خوانده شده"
+  mark_all_as_read_a995ffbe: "همه را به عنوان خوانده شده علامت بزن"
+  mark_all_as_unread_10e7f0fe: "علامت گذاری همه به عنوان خوانده نشده"
   mark_all_as_unread_a435be3d: "علامتگذاری همه به عنوان خوانده نشده"
   mark_as_done_6fa48d2f: "علامتگذاری به عنوان انجام شده"
   mark_as_done_779556d7: "علامتگذاری به عنوان انجام شده"
   mark_as_read_47ec83dd: "علامتگذاری به عنوان خوانده شده"
   mark_as_read_e7de2ce3: "علامت گذاری به عنوان خوانده شده"
+  mark_as_safe_c01fea35: "علامت گذاری به عنوان ایمن"
+  mark_as_spam_9c613d87: "علامت گذاری به عنوان هرزنامه"
   mark_as_unread_4a413c41: "علامت گذاری به عنوان خوانده نشده"
   mark_as_unread_4ded3977: "علامتگذاری به عنوان خوانده نشده"
   mark_done_9d81bcd9: "علامتگذاری به عنوان انجام شده"
+  mark_thread_as_read_41c1bcb3: "علامت گذاری موضوع به عنوان خوانده شده"
+  mark_thread_as_unread_bc3d7a4: "علامت گذاری موضوع به عنوان خوانده نشده"
+  marked_as_safe_f7f953df: "به عنوان امن علامت گذاری شده است"
+  marked_as_spam_ab87846d: "به عنوان هرزنامه علامت گذاری شده است"
   marked_done_9fd646f: "به عنوان انجام شده علامت گذاری شد"
+  marked_incomplete_1bfc7235: "به عنوان ناقص علامت گذاری شد"
   masquerade_as_name_8bb004c5: "ورود به عنوان %{name}"
   master_lock_590266b6: "قفل اصلی"
   mastered_34d4c857: مسلط
   mastery_7ec348b5: تسلط
   mastery_at_cf0c477b: "تسلط در"
+  mastery_calculation_5fd5f5fe: "تسلط در محاسبات"
+  mastery_levels_7d4ee512: "سطوح تسلط"
   mastery_n_mastery_points_precision_2_str_points_e0ed1b3b: "تسلط:  %{n_mastery_points_precision_2_str} امتیاز"
   mastery_path_processing_f4471152: "پردازش مسیر تسلط"
   mastery_paths_breakdown_6e0b5fce: "از کار افتادن مسیرهای تسلط"
@@ -12617,9 +12637,12 @@ fa:
       operators: عملگرها
       relationships: روابط
   max_attempts_ae7b90bc: "حداکثر تلاش ها"
+  max_concurrent_a6f135c: "حداکثر همزمان"
   max_dd02d615: بیشینه
   max_membership_bd0ddc68: حداکثر_عضویت
+  max_run_time_6022a5f1: "حداکثر زمان اجرا"
   max_users_groups_per_appointment_867c505b: "حداکثر تعداد کاربر/گروه در هر قرار ملاقات"
+  max_wait_time_dc158bf1: "حداکثر زمان انتظار"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "حداکثر تعداد قرارهای ملاقات که یک شرکت کننده می تواند حضور یابد"
   maximum_number_of_communication_channels_reached_70c4d2f9: "به حداکثر تعداد کانلهای ارتباطی رسیده است"
   media_af190855: رسانه
@@ -12698,6 +12721,7 @@ fa:
   media_has_been_queued_for_conversion_please_try_ag_74343bbd: "رسانه برای تبدیل در صف انتظار مانده است، لطفا کمی بعد دوباره تلاش کنید."
   media_objects: 
     media_objects_not_configured: "اشیاء رسانه ای پیکربندی نشده اند"
+  media_objects_c2fa37cd: "اشیاء رسانه ای"
   media_over_time_d9332e25: "رسانه در طول زمان"
   media_recording_77cddc52: "ضبط رسانه ای"
   media_recording_submission_b7fd1491: "ارسال ضبط رسانه"
@@ -12705,6 +12729,7 @@ fa:
   media_submission_464829f0: "مورد ارسالی رسانه"
   median_ed291842: میانه
   median_score_4657e907: "میانه: %{score}"
+  medium_light_skin_tone_6c4a27fb: "رنگ پوست متوسط تا روشن"
   meets_expectations_bb179565: "مطابق با انتظارات"
   meets_mastery_754e1c06: "با تسلط مطابقت دارد"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} عضو از حداکثر %{max_membership}"
@@ -12717,6 +12742,8 @@ fa:
     customize: "سفارشی کردن"
     managed_accounts: "حساب های مدیریت شده"
     my_courses: "درس های من"
+  menu_39cb0e8e: منو
+  menu_options_9b6b0b5c: "گزینه های منو"
   message: 
     default_subject: "هشدار کانواس"
   message_5c38209d: پیام
@@ -12725,7 +12752,10 @@ fa:
   message_actions_for_conversation_subject_fdb54c88: "عملکردهای پیام برای گفتگو %{subject}"
   message_actions_for_text_27eead86: "عملکردهای پیام برای %{text}"
   message_body_1f782712: "متن پیام"
+  message_for_name_648f5765: "پیام برای %{name}"
+  message_form_9658d1ef: "فرم پیام"
   message_groups_who_1ba736f: "ارسال پیام برای گروه هایی که..."
+  message_name_3b100614: "پیام %{name}"
   message_sent_5e328899: "پیام ارسال شد!"
   message_sent_9ff3a79d: "پیام ارسال شد!"
   message_sent_f4cba0c: "پیام ارسال شد."
@@ -14254,6 +14284,10 @@ fa:
         html: 
           subject: "ایجاد گزارش انجام نشد"
         subject: "ایجاد گزارش انجام نشد"
+    reported_reply: 
+      email: 
+        html: 
+          link: "برای مشاهده گفتگو کلیک کنید"
     rubric_assessment_submission_reminder: 
       email: 
         body: "به شما یادآوری شده که ارزیابی کنید: %{rubric}، %{context}:"
@@ -14525,9 +14559,11 @@ fa:
     one: "پیام ها حذف شد!"
     other: "پیام ها حذف شد!"
   messages_sent_b851d0dd: "پیام ها ارسال شدند"
+  method_c2a4e17a: روش
   mexico_52_60d635c7: "مکزیک (+52)"
   mgp_grade_export_d29b471f: "صدور نمره MGP"
   mic_a7f3d311: میکروفون
+  microsoft_sync_8bddc8a2: " همگام سازی مایکروسافت"
   migrate_67c9f753: انتقال
   migrate_quiz_5d0f777: "انتقال آزمون"
   migration: 
@@ -14961,8 +14997,10 @@ fa:
   name_badfe525: نام
   name_count_users_ccc93c3d: "%{name} (%{count} کاربر)"
   name_current_score_b3198dfa: "نمره فعلی %{name}"
+  name_e790ff1f: اسم...
   name_ea82c4df: "\"%{name}\""
   name_error_fee4236: "خطای نام"
+  name_final_grade_460da69d: "%{name} نمره نهایی"
   name_final_score_2dce3ff8: "نمره نهایی %{name}"
   name_grading_period_id_c9c8b6ae: "شناسه دوره نمره گذاری %{name}"
   name_has_been_successfully_installed_but_has_not_y_c3148b96: "*name* با موفقیت نصب شده است اما هنوز فعال نشده است."
@@ -14974,9 +15012,12 @@ fa:
   name_is_too_long_must_be_under_length_characters_b8dad44c: "نام طولانی است. باید کمتر از %{length} نویسه باشد"
   name_is_unlocked_click_to_lock_b8b9a2c8: "قفل %{name} باز شده است. برای قفل کردن کلیک کنید."
   name_lti_tool_b61eb0af: "%{name} (ابزار  LTl )"
+  name_mark_as_read_cc9e5fd6: "%{name} به عنوان خوانده شده علامت بزن"
+  name_mark_as_unread_abd650da: "%{name} به عنوان خوانده نشده علامت گذاری کن"
   name_name_913c785b: "اسم: %{name}"
   name_only_5f56718e: "فقط نام"
   name_options_bc5c95ce: "گزینه‌‌های %{name}"
+  name_override_grade_14a9cb73: "%{name} جایگزین کردن نمره"
   name_override_score_7f6a5216: "%{name} جایگزین کردن نمره"
   name_quiz_15f55961: "%{name} (آزمون)"
   name_unposted_current_score_e98e95fd: "%{name} نمره فعلی ارسال نشده"
@@ -15005,6 +15046,7 @@ fa:
   never_df100b49: هرگز
   new_13daf639: جدید
   new_account_role_6e5c4964: "نقش حساب جدید"
+  new_analytics_f6147886: "تحلیل جدید"
   new_annotations_66932016: "یادآوری های جدید"
   new_announcement_23af4598: "اطلاعیه جدید"
   new_announcement_title_30ba7c1b: "اطلاعیه جدید : %{title}"
@@ -15015,6 +15057,7 @@ fa:
   new_assignment_2a984756: "تکلیف جدید"
   new_assignment_for_course_name_f71dd337: "تکلیف جدید برای  %{course_name}"
   new_attempt_57eae3d9: "تلاش جدید"
+  new_bd30f253: جدید
   new_canvas_message_from_user_name_94cc720: "پیام کانواس جدید از طرف %{user_name}"
   new_comment_by_author_name_for_assignment_title_us_19f3c2a5: "نظر جدید از %{author_name} برای %{assignment_title}، %{user_name}، %{course_name}."
   new_comment_discussion_topic_by_user_name_666ccfa: "نظر جدید: %{discussion_topic} توسط %{user_name}"
@@ -15038,7 +15081,9 @@ fa:
   new_gradebook_plagiarism_indicator_8dd22971: "شاخص سرقت ادبی دفتر نمره‌ی جدید"
   new_group_category_66be9cbd: "رده جدید گروه"
   new_group_set_7241a581: "مجموعه گروه جدید"
+  new_mention_ad04b872: "ذکر جدید"
   new_module_4e9287e4: "ماژول جدید"
+  new_note_5f05cb20: "یادداشت جدید"
   new_outcome_7fba8c7d: "نتیجه جدید"
   new_outcome_group_af59f145: "گروه جدید نتیجه"
   new_question_9107c469: "پرسش جدید"
@@ -15051,6 +15096,7 @@ fa:
   new_quizzes_submission_history_d81b477b: "تاریخچه ارسال آزمون‌های جدید"
   new_rating_canceled_eed3c4ff: "رتبه‌بندی جدید لغو شد"
   new_rating_created_54125331: "رتبه بندی جدید ایجاد شد"
+  new_release_note_37ec0ea7: "انتشار یادداشت جدید"
   new_sis_integrations: "این ویژگی برای مؤسسات دارای یکپارچگی کانواس سامانه اطلاعات دانشجویی اعمال می‌شود. هر مشتری که در حال حاضر از راه حل بازگشت به عقب نمره‌گذاری در کانواس یا محصولات همراه استفاده می‌کند، باید این ویژگی را برای گردش های کاری پیشرفته اعتبارسنجی داده‌های تکلیف، فعال کند. این ویژگی بعد از فعالسازی، تنظیمات جدید یکپارچگی سامانه اطلاعات دانشجویی را برای همگام‌سازی سامانه (بازگشت به عقب نمره در سطح تکلیف) در تنظیمات حساب نمایش می‌دهد. گزینه ارسال برای سامانه اطلاعات دانشجویی با این تنظیمات جدید ترکیب شده است و به طور پیش‌فرض فعال می‌شود."
   new_slack_api_key_453d04d: "کلید Api ضعیف جدید"
   new_topic_for_course_3d98222a: "موضوع جدید برای %{course}"
@@ -15059,6 +15105,7 @@ fa:
   new_user_s_name_909b6267: "نام کاربر جدید"
   new_user_tutorial_cdd3a446: "خودآموز کاربر جدید"
   new_zealand_64_f126cf2e: "نیوزیلند (+64)"
+  newest_first_87672763: "جدیدترین اول"
   newest_oldest_d768cf1a: "جدیدترین - قدیمی‌ترین"
   next_40e12421: بعدی
   next_announcements_page_3956eb11: "صفحه بعدی اطلاعیه ها"
@@ -15073,6 +15120,7 @@ fa:
   next_month_749b1778: "ماه بعد"
   next_month_b55a387c: "ماه بعدی"
   next_page_d2a39853: "صفحه بعد"
+  next_run_at_635de64a: "در اجرای بعدی"
   next_steps_ce0f0d0c: "مراحل بعدی"
   next_student_b62869f4: "دانشجوی بعدی"
   nickname_1e6da3ad: "نام مستعار"
@@ -15104,10 +15152,12 @@ fa:
   no_due_date_6e6a23c1: "(تاریخ مهلت موجود نیست)"
   no_e16d9132: خیر
   no_email_8585ad7e: "نامه الکترونیکی موجود نیست"
+  no_errors_1ac47724: "بدون خطا"
   no_existing_user_provided_for_login_with_sis_id_us_6bcde71f: "هیچ کاربر موجود با شناسه سامانه اطلاعات دانشجوی %{user_id} برای ورود ارائه نشده است."
   no_exports_to_display_7f1b630b: "هیچ صدوری برای نمایش وجود ندارد"
   no_file_submitted_a879fa53: "فایلی ارسال نشده است."
   no_final_grade_selected_3595c9c: "هیچ نمره نهایی انتخاب نشده"
+  no_first_name_4b772708: "<No first name>"
   no_grade_3fa326c: "نمره موجود نیست"
   no_grade_assigned_90e531f5: "هیچ نمره ای تخصیص داده نشده."
   no_grade_for_assignment_97c9bc75: "نمره ای برای%{assignment} وجود ندارد"
@@ -15123,7 +15173,9 @@ fa:
   no_grading_schemes_to_display_8b0e92e7: "هیچ طرح نمره گذاری برای نمایش موجود نیست"
   no_items_found_870b2d0d: "موردی یافت نشد"
   no_items_in_module_21f111a2: "هیچ موردی در ماژول موجود نیست"
+  no_job_selected_d6c5e6f4: "هیچ کاری انتخاب نشده است"
   no_label_date_ff3a372f: "تاریخ موجود نیست %{label} "
+  no_last_name_62c3e5e2: "<No last name>"
   no_marks_5e7d2b59: "نمره موجود نیست"
   no_matching_users_found_83889c10: "هیج کاربر نظیر یافت نشد."
   no_migration_file: "برای انتقال محتوا، فایل لازم است."
@@ -15177,6 +15229,7 @@ fa:
   not_all_sections_will_be_assigned_this_item_4e2b8eaa: "این مورد به برخی بخش ها تخصیص داده نخواهد شد."
   not_all_settings_options_are_available_at_the_suba_20efaa98: "همه گزینه های تنظیمات در سطح زیر حساب ، از جمله برگه اعلان ها در دسترس نیست."
   not_anonymously_graded_87574f91: "به طور ناشناس نمره‌گذاری نشده است"
+  not_assessed_2b87bfd0: "ارزیابی نشده است"
   not_available_487d3648: "در دسترس نیست"
   not_available_assignment_is_anonymous_94e77edf: "در دسترس نیست؛ تکلیف ناشناس است"
   not_available_at_the_subaccount_level_3fc74ab: "در سطح زیر حساب موجود نیست."
@@ -15194,7 +15247,10 @@ fa:
   not_installed_37a21a76: "نصب نشده"
   not_mastered_5c2f9968: "مسلط نیست"
   not_published_73f7079: "منتشر نشده"
+  not_reviewed_c38d9e97: "بررسی نشده است"
+  not_selected_57866888: "انتخاب نشده"
   not_signed_47acf472: "امضا نشده"
+  not_starred_98931190: "ستاره دار نیست"
   not_starred_no_subject_click_to_star_adfefe93: "ستاره‌دار نیست \"(بدون موضوع)\"، برای ستاره‌دار کردن کلیک کنید."
   not_starred_no_subject_click_to_star_dc91380: "ستاره‌دار نیست \"(بدون موضوع)\"، برای ستاره‌دار کردن کلیک کنید."
   not_starred_subject_click_to_star_4ea6eb64: "ستاره‌دار نیست \"%{subject}\"، برای ستاره‌دار کردن کلیک کنید."
@@ -15262,6 +15318,7 @@ fa:
     calendar_description: "موردهای جدید و تغییر یافته در تقویم درسی شما"
     calendar_display: تقویم
     categories: 
+      account_notification: "اطلاعیه  حساب"
       all_submissions: "همه موردهای ارسالی"
       announcement: اطلاعیه
       appointment_availability: "در دسترس بودن قرار ملاقات"
@@ -15305,9 +15362,9 @@ fa:
         * محتوای تکلیف
     course_content_display: "محتوای درس"
     discussion_description: "موضوع جدید بحث در درس شما"
-    discussion_display: بحث
+    discussion_display: "موضوع جدید"
     discussion_post_description: "ارسال بحث جدید در موضوعی که در آن مشترک نشده اید"
-    discussion_post_display: "ارسال مربوط به بحث"
+    discussion_post_display: "پاسخ جدید"
     due_date_description: "تغییر تاریخ مهلت تکلیف"
     due_date_display: "تاریخ مهلت"
     files_description: "فایل جدید به درس شما افزوده شد"
@@ -15344,6 +15401,7 @@ fa:
     missing_description_description: "برای اطلاعیه های %{category}"
     missing_display_display: "برای اطلاعیه های %{category}"
     names: 
+      account_notification: "اطلاعیه  حساب"
       account_user_notification: "اطلاعیه حساب کاربری"
       account_user_registration: "ثبت نام کاربر حساب"
       added_to_conversation: "به گفتگو افزوده شد"
@@ -15479,6 +15537,7 @@ fa:
   notifications_cbfa7704: "اطلاعیه ها"
   notifications_search_results_80a0b06f: "نتایج جستجوی اطلاعیه‌ها"
   notifications_view_f9a60770: "اطلاعیه - مشاهده "
+  notify_immediately_d1749c07: "فورا اطلاع دهید"
   notify_users_this_quiz_has_changed_c5b05995: "به کاربران اطلاع داده شود که این آزمون تغییر یافته است"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "حالا که درس شما راه اندازی شده و در دسترس است، احتمالا به این فهرست بازبینی دیگر نیاز ندارید. اما آن را در دسترس نگه می داریم تا اگر بعدا خواستید چیز جدیدی را انتخاب کنید، یا در هنگام اعمال تغییر در محتوای درس خود به قدری راهنمایی بیشتر نیاز داشتید، بتوانید به آن مراجعه کنید."
   num_messages_c1949bbc: 
