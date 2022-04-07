@@ -2164,6 +2164,24 @@ describe DiscussionTopicsController do
       expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.created")
     end
 
+    it "increment discussion_topic.created.partial_anonymity" do
+      Account.site_admin.enable_feature! :react_discussions_post
+      Account.site_admin.enable_feature! :discussion_anonymity
+      user_session @teacher
+      post "create", params: topic_params(@course, { anonymous_state: "partial_anonymity" }), format: :json
+      expect(response).to be_successful
+      expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_topic.created.partial_anonymity").at_least(:once)
+    end
+
+    it "does not increment discussion_topic.created.partial_anonymity if topic can not be partially anonymous" do
+      Account.site_admin.enable_feature! :react_discussions_post
+      Account.site_admin.disable_feature! :discussion_anonymity
+      user_session @teacher
+      post "create", params: topic_params(@course, { anonymous_state: "partial_anonymity" }), format: :json
+      expect(response).to be_successful
+      expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.created.partial_anonymity")
+    end
+
     it "increment discussion_topic.visit.redesign" do
       @course.enable_feature! :react_discussions_post
 
