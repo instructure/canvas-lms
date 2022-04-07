@@ -82,12 +82,11 @@
     </a>
   {{/if}}
   {{#if canRate}}
-    <a class="discussion-rate-action entry-control"
-       role="checkbox"
+    <button class="discussion-rate-action entry-control"
        data-event="toggleLike"
-       href="#">
-      <i class="icon-like" aria-label="{{#t "like_entry"}}Like entry{{/t}}"></i>
-    </a>
+       aria-label="{{#t "like_entry"}}Like entry{{/t}}">
+      <i class="icon-like"></i>
+    </button>
   {{/if}}
   <span class="discussion-rating"></span>
 </div>
