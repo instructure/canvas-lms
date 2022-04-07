@@ -900,6 +900,7 @@ class DiscussionTopicsController < ApplicationController
 
             unless @locked
               InstStatsd::Statsd.increment("discussion_topic.visit.legacy")
+              InstStatsd::Statsd.count("discussion_topic.visit.entries.legacy", @topic.discussion_entries.count)
             end
 
             render stream: can_stream_template?
