@@ -330,7 +330,7 @@ class WikiPage < ActiveRecord::Base
     return true if wiki.grants_right?(user, session, :update)
 
     roles = effective_roles
-    return false if context.completed?
+    return false if context.try(:completed?)
     # teachers implies all course admins (teachers, TAs, etc)
     return true if roles.include?("teachers") && context.respond_to?(:admins) && context.admins.include?(user)
 
