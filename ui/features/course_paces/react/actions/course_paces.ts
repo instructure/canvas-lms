@@ -157,7 +157,7 @@ const thunkActions = {
               )
             )
             dispatch(uiActions.clearCategoryError('checkPublishStatus'))
-            if (TERMINAL_PROGRESS_STATUSES.includes(updatedProgress.workflow_state)) {
+            if (updatedProgress.workflow_state === 'completed') {
               showFlashAlert({
                 message: I18n.t('Finished publishing pace'),
                 err: null,
@@ -165,6 +165,15 @@ const thunkActions = {
                 srOnly: true
               })
               dispatch(coursePaceActions.coursePaceSaved(getState().coursePace))
+            } else if (updatedProgress.workflow_state === 'failed') {
+              showFlashAlert({
+                message: I18n.t('Failed publishing pace'),
+                err: null,
+                type: 'error',
+                srOnly: true
+              })
+              dispatch(uiActions.setCategoryError('publish'))
+              console.log(`Error publishing pace: ${updatedProgress.message}`) // eslint-disable-line no-console
             } else {
               setTimeout(pollingLoop, PUBLISH_STATUS_POLLING_MS)
             }
