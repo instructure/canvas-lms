@@ -57,7 +57,7 @@ export const waitForActionCompletion = (actionInProgress: () => boolean, waitTim
 
 export const update = (coursePace: CoursePace, extraSaveParams = {}) =>
   doFetchApi<{course_pace: CoursePace; progress: Progress}>({
-    path: `/api/v1/courses/${coursePace.course_id}/course_paces/${coursePace.id}`,
+    path: `/api/v1/courses/${coursePace.course_id}/course_pacing/${coursePace.id}`,
     method: 'PUT',
     body: {
       ...extraSaveParams,
@@ -67,7 +67,7 @@ export const update = (coursePace: CoursePace, extraSaveParams = {}) =>
 
 export const create = (coursePace: CoursePace, extraSaveParams = {}) =>
   doFetchApi<{course_pace: CoursePace; progress: Progress}>({
-    path: `/api/v1/courses/${coursePace.course_id}/course_paces`,
+    path: `/api/v1/courses/${coursePace.course_id}/course_pacing`,
     method: 'POST',
     body: {
       ...extraSaveParams,
@@ -86,7 +86,7 @@ export const getPublishProgress = (progressId: string) =>
 
 export const resetToLastPublished = (contextType: PaceContextTypes, contextId: string) =>
   doFetchApi<{course_pace: CoursePace}>({
-    path: `/api/v1/course_paces/reset_to_last_published`,
+    path: `/api/v1/course_pacing/reset_to_last_published`,
     method: 'POST',
     body: {
       context_type: contextType,
@@ -95,43 +95,43 @@ export const resetToLastPublished = (contextType: PaceContextTypes, contextId: s
   }).then(({json}) => json?.course_pace)
 
 export const load = (coursePaceId: string) =>
-  doFetchApi<CoursePace>({path: `/api/v1/course_paces/${coursePaceId}`}).then(({json}) => json)
+  doFetchApi<CoursePace>({path: `/api/v1/course_pacing/${coursePaceId}`}).then(({json}) => json)
 
 export const getNewCoursePaceFor = (
   courseId: string,
   context: PaceContextTypes,
   contextId: string
 ) => {
-  let url = `/api/v1/courses/${courseId}/course_paces/new`
+  let url = `/api/v1/courses/${courseId}/course_pacing/new`
   if (context === 'Section') {
-    url = `/api/v1/courses/${courseId}/course_paces/new?course_section_id=${contextId}`
+    url = `/api/v1/courses/${courseId}/course_pacing/new?course_section_id=${contextId}`
   } else if (context === 'Enrollment') {
-    url = `/api/v1/courses/${courseId}/course_paces/new?enrollment_id=${contextId}`
+    url = `/api/v1/courses/${courseId}/course_pacing/new?enrollment_id=${contextId}`
   }
   return doFetchApi<{course_pace: CoursePace}>({path: url}).then(({json}) => json?.course_pace)
 }
 
 export const republishAllPacesForCourse = (courseId: string) =>
   doFetchApi({
-    path: `/api/v1/courses/${courseId}/course_paces/republish_all`,
+    path: `/api/v1/courses/${courseId}/course_pacing/republish_all`,
     method: 'POST'
   }).then(({json}) => json)
 
 export const republishAllPaces = () =>
   doFetchApi({
-    path: `/api/v1/course_paces/republish_all_paces`,
+    path: `/api/v1/course_pacing/republish_all_paces`,
     method: 'POST'
   }).then(({json}) => json)
 
 export const relinkToParentPace = (paceId: string) =>
   doFetchApi<{course_pace: CoursePace}>({
-    path: `/api/v1/course_paces/${paceId}/relink_to_parent_pace`,
+    path: `/api/v1/course_pacing/${paceId}/relink_to_parent_pace`,
     method: 'POST'
   }).then(({json}) => json?.course_pace)
 
 export const compress = (coursePace: CoursePace, extraSaveParams = {}) =>
   doFetchApi<{course_pace: CoursePace; progress: Progress}>({
-    path: `/api/v1/courses/${coursePace.course_id}/course_paces/compress_dates`,
+    path: `/api/v1/courses/${coursePace.course_id}/course_pacing/compress_dates`,
     method: 'POST',
     body: {
       ...extraSaveParams,

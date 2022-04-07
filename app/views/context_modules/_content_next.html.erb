@@ -58,7 +58,7 @@
         <% end %>
       <% end %>
       <% if @context.account.feature_enabled?(:course_paces) && @context.enable_course_paces && @context.grants_right?(@current_user, session, :manage_content) %>
-        <a class="btn" id="course_paces_link" href="<%= course_course_paces_path(@context) %>"><%= t("Course Pacing") %></a>
+        <a class="btn" id="course_paces_link" href="<%= course_course_pacing_path(@context) %>"><%= t("Course Pacing") %></a>
       <% end %>
       <% if @can_edit %>
         <button class="btn btn-primary add_module_link">

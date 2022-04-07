@@ -333,7 +333,7 @@ module CoursePacesPageObject
 
   #----------------------- Actions & Methods -------------------------
   def visit_course_paces_page
-    get "/courses/#{@course.id}/course_paces"
+    get "/courses/#{@course.id}/course_pacing"
   end
 
   #----------------------- Click Items -------------------------------
