@@ -106,6 +106,24 @@ describe('EquationEditorModal', () => {
 
   describe('loadExistingFormula', () => {
     describe('when the selected content is latex', () => {
+      it('loads fromulas from displaystyle latex', async () => {
+        editor.selection.getContent = () => '$$\\sqrt{x}$$'
+        renderModal({editor})
+        await waitFor(() => {
+          const value = basicEditor().getValue()
+          expect(value).toEqual('\\sqrt{x}')
+        })
+      })
+
+      it('removes &nbsp; and whitespace from latex', async () => {
+        editor.selection.getContent = () => '\\(&nbsp;&nbsp; \\sqrt{x} &nbsp;&nbsp;\\)'
+        renderModal({editor})
+        await waitFor(() => {
+          const value = basicEditor().getValue()
+          expect(value).toEqual('\\sqrt{x}')
+        })
+      })
+
       it('loads a basic formula in the basic editor', async () => {
         renderModal({editor})
         await waitFor(() => {
@@ -200,6 +218,40 @@ describe('EquationEditorModal', () => {
       })
 
       describe('with formula text', () => {
+        it('loads fromulas from displaystyle latex', async () => {
+          editor.selection.getRng = () => ({
+            startContainer: {
+              wholeText: 'hello',
+              nodeValue: '$$\\sqrt{x}$$'
+            },
+            startOffset: 5
+          })
+          editor.selection.setRng = jest.fn()
+          renderModal({editor})
+          await waitFor(() => {
+            const value = basicEditor().getValue()
+            expect(editor.selection.setRng).toHaveBeenCalled()
+            expect(value).toEqual('\\sqrt{x}')
+          })
+        })
+
+        it('removes &nbsp; and whitespace from latex', async () => {
+          editor.selection.getRng = () => ({
+            startContainer: {
+              wholeText: 'hello',
+              nodeValue: '\\(&nbsp; &nbsp; \\sqrt{x} &nbsp; &nbsp;\\)'
+            },
+            startOffset: 5
+          })
+          editor.selection.setRng = jest.fn()
+          renderModal({editor})
+          await waitFor(() => {
+            const value = basicEditor().getValue()
+            expect(editor.selection.setRng).toHaveBeenCalled()
+            expect(value).toEqual('\\sqrt{x}')
+          })
+        })
+
         it('loads a basic formula in the basic editor', async () => {
           editor.selection.getRng = () => ({
             startContainer: {
@@ -371,7 +423,9 @@ describe('EquationEditorModal', () => {
       // this on their own.
       const event = new Event('input')
       Object.defineProperty(event, 'target', {
-        get: () => {return {value: '\\displaystyle x'}}
+        get: () => {
+          return {value: '\\displaystyle x'}
+        }
       })
 
       basicEditor().dispatchEvent(event)
