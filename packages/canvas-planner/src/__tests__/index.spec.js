@@ -131,6 +131,15 @@ describe('with mock api', () => {
       expect(document.querySelector('.PlannerApp')).toBeTruthy()
       expect(document.querySelector('.PlannerHeader')).toBeTruthy()
     })
+
+    it('dispatches getPlannerItems and getInitialOpportunities', async () => {
+      const originalDispatch = store.dispatch
+      store.dispatch = jest.fn().mockImplementationOnce(() => Promise.resolve())
+      loadPlannerDashboard()
+      await findByTestId(document.body, 'PlannerHeader')
+      expect(store.dispatch).toHaveBeenCalledTimes(2)
+      store.dispatch = originalDispatch
+    })
   })
 
   describe('renderToDoSidebar', () => {

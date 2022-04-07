@@ -77,7 +77,8 @@ function defaultProps(options) {
       pastNextUrl: null,
       seekingNewActivity: false,
       loadingGrades: false,
-      gradesLoaded: false
+      gradesLoaded: false,
+      loadingOpportunities: false
     },
     ui: {
       naiAboveScreen: false
@@ -145,12 +146,21 @@ it('sends focus back to the add new item button', () => {
   expect(mockCancel).toHaveBeenCalled()
 })
 
-it('calls getInitialOpportunities when component is mounted', () => {
-  const tempProps = defaultProps()
-  const mockDispatch = jest.fn()
-  tempProps.getInitialOpportunities = mockDispatch
-  mount(<PlannerHeader {...tempProps} />)
-  expect(tempProps.getInitialOpportunities).toHaveBeenCalled()
+describe('when component is mounted', () => {
+  it("calls getNextOpportunities if all opportunities haven't been loaded", () => {
+    const tempProps = defaultProps()
+    tempProps.getNextOpportunities = jest.fn()
+    tempProps.loading.allOpportunitiesLoaded = false
+    mount(<PlannerHeader {...tempProps} />)
+    expect(tempProps.getNextOpportunities).toHaveBeenCalled()
+  })
+
+  it("doesn't call getNextOpportunities if all opportunities have already been loaded", () => {
+    const tempProps = defaultProps()
+    tempProps.getNextOpportunities = jest.fn()
+    mount(<PlannerHeader {...tempProps} />)
+    expect(tempProps.getNextOpportunities).not.toHaveBeenCalled()
+  })
 })
 
 it('toggles aria-hidden on the ariaHideElement when opening the opportunities popover', () => {

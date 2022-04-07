@@ -40,7 +40,6 @@ import {
   cancelEditingPlannerItem,
   openEditingPlannerItem,
   getNextOpportunities,
-  getInitialOpportunities,
   dismissOpportunity,
   clearUpdateTodo,
   startLoadingGradesSaga,
@@ -69,7 +68,6 @@ export class PlannerHeader extends Component {
     locale: PropTypes.string.isRequired,
     timeZone: PropTypes.string.isRequired,
     opportunities: PropTypes.shape(opportunityShape).isRequired,
-    getInitialOpportunities: PropTypes.func.isRequired,
     getNextOpportunities: PropTypes.func.isRequired,
     dismissOpportunity: PropTypes.func.isRequired,
     clearUpdateTodo: PropTypes.func.isRequired,
@@ -137,8 +135,14 @@ export class PlannerHeader extends Component {
     }
   }
 
+  loadNextOpportunitiesIfNeeded(props) {
+    if (!props.loading.allOpportunitiesLoaded && !props.loading.loadingOpportunities) {
+      props.getNextOpportunities()
+    }
+  }
+
   componentDidMount() {
-    this.props.getInitialOpportunities()
+    this.loadNextOpportunitiesIfNeeded(this.props)
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -146,9 +150,7 @@ export class PlannerHeader extends Component {
       nextProps.opportunities
     )
 
-    if (!nextProps.loading.allOpportunitiesLoaded && !nextProps.loading.loadingOpportunities) {
-      nextProps.getNextOpportunities()
-    }
+    this.loadNextOpportunitiesIfNeeded(nextProps)
 
     if (this.props.todo.updateTodoItem !== nextProps.todo.updateTodoItem) {
       this.setUpdateItemTray(!!nextProps.todo.updateTodoItem)
@@ -528,7 +530,6 @@ const mapDispatchToProps = {
   deletePlannerItem,
   cancelEditingPlannerItem,
   openEditingPlannerItem,
-  getInitialOpportunities,
   getNextOpportunities,
   dismissOpportunity,
   clearUpdateTodo,
