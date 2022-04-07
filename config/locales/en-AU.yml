@@ -2097,6 +2097,7 @@ en-AU:
       have bounced
   adds_additional_information_and_filtering_for_feat_3e55a058: "Adds additional information and filtering for feature flags"
   adds_an_account_course_setting_for_a_default_due_t_9903738a: "Adds an account/course setting for a default due time for new assignments"
+  adds_an_emoji_picker_that_allows_students_and_teac_cf517b1b: "Adds an emoji picker that allows students and teachers to add emojis to their submission comments."
   adds_analytics_link_on_the_user_settings_menu_3a048816: "Adds analytics link on the user settings menu."
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Adds analytics to a student’s context card."
   adds_comment_bank_for_assignment_comments_within_s_1b69dc2: "Adds comment bank for assignment comments within speedgrader"
@@ -2238,8 +2239,10 @@ en-AU:
   all_groups_cea25817: "All Groups"
   all_grouptitle_outcomes_dcc565d1: "All %{groupTitle} Outcomes"
   all_image_types_allowed_9c65004d: "All Image Types Allowed"
+  all_in_e5ddaee0: "All in"
   all_items_a49b66c7: "All Items"
   all_items_marked_processed_have_been_saved_by_canv_7045295a: "All items marked \"processed\" have been saved by Canvas."
+  all_jobs_1d82f9d6: "All Jobs"
   all_media_types_allowed_3c0cdce7: "All Media Types Allowed"
   all_modules_20c9a1c8: "All Modules"
   all_my_files_a0213441: "All My Files"
@@ -3201,6 +3204,7 @@ en-AU:
     file_import_fail: "Could not import file \"%{file_path}\""
   angel_display: "ANGEL Learning"
   angel_file_description: "Angel export .zip format"
+  animals_nature_8bc03431: "Animals & Nature"
   annotated_document_submission_d9ff236a: "Annotated Document submission"
   annotated_document_submissions_88704968: "Annotated document submissions"
   annotated_document_submissions_require_an_annotate_3c40fabe: "Annotated Document submissions require an annotated_document_id to submit"
@@ -4825,6 +4829,7 @@ en-AU:
       A new, simpler, more user friendly file browsing interface.  If you turn this on at the course level,
       then all of the users in that course will see the new interface.  To get it to show up when someone
       goes to the personal files page for a user ('/files') then you need to turn it on for the account they are a member of.
+  between_1_and_10_7118bf2d: "Between 1 and 10"
   between_1_and_5_f2a74bcf: "Between 1 and 5"
   between_1_and_99_d421a4c0: "Between 1% and 99%"
   between_2_and_5_c34f5152: "Between 2 and 5"
@@ -4838,6 +4843,7 @@ en-AU:
   blank_38df4238: blank
   blocked_by_running_migration_d8a57cb7: "Blocked by running migration"
   blocked_domain_name_b5b93150: "Blocked Domain Name"
+  blocked_emojis_9fbaca3a: "Blocked Emojis"
   blue_daf8fea9: Blue
   blueprint_5cca2ef: Blueprint
   blueprint_course_associations_72c9609: "Blueprint Course Associations"
@@ -5809,6 +5815,7 @@ en-AU:
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "Changes will still apply if you leave this page."
   changes_you_made_may_not_be_saved_4e8db973: "Changes you made may not be saved."
   changing_course_dates_may_override_term_availabili_d92b10de: "Changing course dates may override term availability settings and placement in the Courses page and Dashboard. Please confirm term dates before modifying course dates."
+  changing_course_pacing_days_may_modify_due_dates_9009aecd: "Changing course pacing days may modify due dates."
   changing_section_dates_may_override_course_and_ter_6634950e: "Changing section dates may override course and term availability settings and placement in the Courses page and Dashboard. Please confirm term and course dates before modifying section dates."
   changing_the_late_policy_will_affect_previously_gr_49071db7: "Changing the late policy will affect previously graded submissions."
   changing_the_tenant_will_delete_existing_groups_f86c48dc: "Changing the tenant will delete existing groups."
@@ -5868,6 +5875,7 @@ en-AU:
     one: "Choose up to 1 subject calendar"
     other: "Choose up to %{count} subject calendars"
   choose_usage_rights_33683854: "Choose usage rights..."
+  choose_your_default_skin_tone_f09bf0bd: "Choose your default skin tone"
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' is not a valid colour."
   chosencolor_is_not_a_valid_color_enter_a_valid_hex_9e2c7c42: "'%{chosenColor}' is not a valid colour. Enter a valid hexcode before saving."
   clark_county_gradebook_c5ea74bb: "Clark County Gradebook"
@@ -5878,6 +5886,8 @@ en-AU:
   classic_view_33f29576: "Classic View"
   clear_2084585f: Clear
   clear_all_da755751: "Clear all"
+  clear_job_selection_6ad1ff95: "Clear job selection"
+  clear_search_900e9c97: "Clear search"
   clear_search_field_75f595c7: "Clear search field"
   clear_selected_file_82388e50: "Clear selected file"
   clear_user_cache_ef079f7f: "Clear User Cache"
@@ -6067,9 +6077,9 @@ en-AU:
               
             **Warning**: be sure you are familiar with [EtherPad's deletion policy](%{etherpad_deletion_policy_url}) to ensure your work is preserved.
         google_docs: |-
-            Google Docs is a great place to collaborate on a group project.  It's like Microsoft Word, but lets you work together with others on the same file at the same time without having to email it around.  
-              
-            **Warning**: you (and all your collaborators) will need a Google account in order to participate in any Google Docs collaborations.
+            **Warning:** you (and all your collaborators) will need accounts from the supported web tool in order to participate in any collaborations.
+                     Free online web tools are an excellent place for students to work on group projects or papers, take shared notes, etc.
+                     Teachers or students can set up group collaborations.
       labels: 
         collaboration_type: "Collaborate using:"
         description: "Description:"
@@ -6086,18 +6096,16 @@ en-AU:
           Teacher *or* students can set up group collaborations.
       description_student: |-
           **What do we mean by collaborations?**  We're talking about web-based tools for
-          working together on a shared document.  You can use resources like
-          [Google Docs](%{google_url})
-          to work collaboratively on tasks like group papers or note-taking.  This page is
-          an easy place to keep track of those collaborations and also to set them
-          up without having to swap emails.
+                  working together on a shared document.
+                  You can use online web tools to work collaboratively on tasks like group papers or note-taking.  This page is
+                  an easy place to keep track of those collaborations, and also to set them
+                  up without having to swap emails.
       description_teacher: |-
-          **What do we mean by collaborations?**  We're talking about web-based tools that most
-          likely your students are already familiar with.  Students can use resources like
-          [Google Docs](%{google_url})
-          to work collaboratively on tasks like group papers or note-taking.  This page gives them
-          (and you) an easy place to keep track of those collaborations and also to set them
-          up without having to swap emails.
+          **What do we mean by collaborations?** We're talking
+                  about web-based tools that students are already familiar with. Students can use
+                  online web tools to work collaboratively on tasks like group papers or note-taking.
+                  This page gives teachers and students an easy place to keep track of those
+                  collaborations, and also to set them up without having to swap emails.
       google: 
         drive: 
           upgrade: 
@@ -9006,6 +9014,7 @@ en-AU:
   daily_notifications_will_be_delivered_around_day_t_a2b49202: "Daily notifications will be delivered around %{day_time}. Weekly notifications will be delivered %{weekday} between %{start_time} and %{end_time}."
   daily_summary_cf43f37c: "Daily summary"
   danish_c18cdac8: Danish
+  dark_skin_tone_6c9e7c7c: "Dark Skin Tone"
   dashboard: 
     announcements_collapse: 
       one: "Collapse %{count} announcements"
@@ -9229,6 +9238,7 @@ en-AU:
   default_question_name: Question
   default_question_text: "Question text"
   default_sis_sync_for_assignments_quizzes_grade_dis_3b2b4878: "Default SIS Sync for assignments, quizzes, grade discussion"
+  default_skin_tone_f378d31c: "Default Skin Tone"
   default_template_f2a759ed: "Default Template"
   default_templates_are_used_as_starting_points_for__f06f9e33: "Default templates are used as starting points for new themes and cannot be deleted."
   default_to_modules_for_the_course_home_page_d6a951a7: "Default to modules for the course home page"
@@ -9449,6 +9459,12 @@ en-AU:
   designers_remove_3e590bff: "Designers - Remove"
   details_98a31b68: Details
   details_a6f427c3: "Details:"
+  determined_by_course_end_date_5e3ffb4f: "Determined by course end date"
+  determined_by_course_pace_45063fa8: "Determined by course pace"
+  determined_by_course_start_date_fc1a8ecf: "Determined by course start date"
+  determined_by_section_end_date_3cda3832: "Determined by section end date"
+  determined_by_section_stat_date_35dc5e7f: "Determined by section stat date"
+  determined_by_today_s_date_87330acf: "Determined by today's date"
   determines_visibility_and_management_of_outcomes_i_6f390b57: "Determines visibility and management of Outcomes in Account Navigation."
   determines_visibility_and_management_of_outcomes_i_e3ab94dc: "Determines visibility and management of Outcomes in Account Navigation. Allows user to create, edit, and delete outcomes and outcome groups at the account and course levels."
   determines_visibility_and_management_of_outcomes_t_79ca45b: |-
@@ -10186,6 +10202,7 @@ en-AU:
     no_due_date: "due: No Due Date"
   due_dates_520a6c08: "Due Dates"
   due_dates_are_being_compressed_based_on_your_start_917df12d: "Due Dates are being compressed based on your start and end dates"
+  due_dates_are_being_compressed_based_on_your_start_c6db279e: "Due Dates are being compressed based on your start and end dates."
   due_dates_changed_exceptions_ddb028: "Due Dates changed exceptions:"
   due_dates_duedatecount_bbc24d65: "Due Dates (%{dueDateCount})"
   due_datetime_f5a81b81: "Due: %{dateTime}"
@@ -10460,6 +10477,9 @@ en-AU:
   embedded_release_notes_72d79b9b: "Embedded Release Notes"
   ember_modules_description: "Modules rewritten in Ember. Uses the native drag and drop API to allow dragging from external locations."
   embry_riddle_student_activity_tracking_8020dd95: "Embry Riddle Student Activity Tracking"
+  emoji_categories_a08744ae: "Emoji categories"
+  emoji_picker_5bb954f9: "Emoji picker"
+  emojis_in_submission_comments_72720afc: "Emojis in Submission Comments"
   empty_stub_for_testing_only_37aad38: "Empty stub (for testing only)"
   enable_6f5d1328: Enable
   enable_ability_to_alter_the_final_grade_for_the_en_e120f72d: "Enable ability to alter the final grade for the entire course without changing scores for assignments."
@@ -10681,6 +10701,7 @@ en-AU:
   enter_a_what_if_score_668c91a3: "Enter a What-If score."
   enter_a_workflow_state_to_narrow_results_162903af: "Enter a workflow state to narrow results"
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "Enter \"{{ACCOUNT_DOMAIN}}\" to substitute the user's root account domain."
+  enter_an_id_or_an_original_job_id_d81ad1c7: "Enter an id or an original_job_id"
   enter_and_distribute_grades_c1216df: "Enter and distribute grades"
   enter_at_least_count_characters_1c7a0b36: "Enter at least %{count} characters"
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "Enter \"{{CANVAS_USER_ID}}\" to substitute the user's unique Canvas ID."
@@ -11072,6 +11093,7 @@ en-AU:
         comments: comments
         created_at: "created at"
         request_context_id: "request context id"
+        subject: subject
         url: url
         user: user
       message_contains: "Message contains"
@@ -11693,6 +11715,7 @@ en-AU:
   filter_9df28e5b: "Filter:"
   filter_announcements_by_unread_495eeeb3: "filter announcements by unread"
   filter_assignment_category_63acaed4: "Filter Assignment Category"
+  filter_bucket_jobs_by_group_9bd1668c: "Filter %{bucket} jobs by %{group}"
   filter_by_2f4368a8: "Filter by"
   filter_by_date_c076a845: "Filter by date"
   filter_by_ip_address_40965f66: "Filter by IP address"
@@ -11785,6 +11808,7 @@ en-AU:
   first_two_students_and_others_count_others_bb0a212a: "%{first_two_students}, and %{others_count} others"
   fix_missing_policy_grade_change_records_c404507c: "Fix Missing Policy Grade Change Records"
   flagged_as_possible_spam_ebbc4683: "Flagged as possible spam"
+  flags_ce30e8e3: Flags
   flags_new_eportfolio_content_matching_specific_key_a66af560: "Flags new ePortfolio content matching specific keywords as possible spam, and allows administrators to either confirm flagged ePortfolios or mark them as safe."
   flags_tab_updates_c4c209f1: "Flags tab updates"
   flash_6afbf65a: Flash
@@ -11814,6 +11838,7 @@ en-AU:
     no_deleting_folders_with_content: "Can't delete a folder with content"
     no_deleting_root: "Can't delete the root folder"
     only_one_folder: "Can't set folder path and folder id"
+  food_drink_b0ea7e7b: "Food & Drink"
   for: for
   for_974cbb84: For
   for_all_devices_1f603968: "For All Devices"
@@ -11853,6 +11878,7 @@ en-AU:
   france_c25bfeae: France
   french_33881544: French
   french_canada_c3d92fa6: "French (Canada)"
+  frequently_used_21a3eb8e: "Frequently Used"
   friendly_description_57f7fdde: "Friendly Description"
   friendly_description_for_parent_student_display_e608ecf3: "Friendly description (for parent/student display)"
   friendly_name_601153fb: "Friendly Name"
@@ -13904,6 +13930,7 @@ en-AU:
       If RCE Enhancements are also enabled,
       the RCE will auto-save your work as you go
   if_set_allows_submission_status_to_be_changed_from_156f57f: "If set, allows submission status to be changed from inside of Speedgrader"
+  if_set_displays_updated_mastery_connect_icon_b6a93002: "If set, displays updated mastery connect icon"
   if_set_removes_the_delay_that_normally_occurs_when_f0a6f530: "If set, removes the delay that normally occurs when searching for students."
   if_set_removes_the_missing_status_from_submissions_43fba750: "If set, removes the missing status from submissions when graded"
   if_set_the_grade_calculator_will_ignore_unposted_a_2f4abd00: "If set, the grade calculator will ignore unposted anonymous assignments when calculating totals."
@@ -14253,6 +14280,7 @@ en-AU:
       start_a_group: "Start a group"
     styleguide: 
       manage: Manage
+  info_2f75aa74: info
   info_8f47054a: Info
   info_panel_displayed_51d481cc: "Info panel displayed"
   info_panel_hidden_bf7c3b7b: "Info panel hidden"
@@ -14567,6 +14595,7 @@ en-AU:
   job_details_b33137dc: "Job details"
   job_flavor_51a18505: "Job flavour"
   job_grouping_f652413e: "Job grouping"
+  job_lookup_1d980054: "Job lookup"
   jobs: 
     columns: 
       attempt: attempt
@@ -14754,6 +14783,7 @@ en-AU:
   late_penalty_minus_count_points_810572fe: 
     one: "Late Penalty: minus 1 Point"
     other: "Late Penalty: minus %{count} Points"
+    zero: "Late Penalty: None"
   late_penalty_pointsdeducted_7033a095: "Late Penalty: %{pointsDeducted}"
   late_penalty_pointsdeducted_dac023ff: "Late Penalty: *%{pointsDeducted}*"
   late_percent_b91d01b3: "Late: %{percent}"
@@ -14968,6 +14998,7 @@ en-AU:
   light_blue_5374f600: "Light Blue"
   light_green_c1cd020d: "Light Green"
   light_pink_e1214d62: "Light Pink"
+  light_skin_tone_28ab2db1: "Light Skin Tone"
   like_count_count_9467dc82: "Like count: %{count}"
   like_post_dbf48764: "Like post"
   like_post_from_author_79b874f1: "Like post from %{author}"
@@ -15115,6 +15146,7 @@ en-AU:
   loading_grades_for_coursename_26784c2d: "Loading grades for %{courseName}"
   loading_grading_periods_c635d96: "Loading grading periods..."
   loading_grading_periods_for_coursename_bbe46919: "Loading grading periods for %{courseName}"
+  loading_group_f1647ebb: "Loading %{group}"
   loading_grouptitle_dba362d2: "Loading %{groupTitle}."
   loading_homeroom_announcement_content_1654f8c7: "Loading Homeroom Announcement Content"
   loading_homeroom_announcement_title_34338f6d: "Loading Homeroom Announcement Title"
@@ -15122,6 +15154,7 @@ en-AU:
   loading_important_date_2d3a29ce: "Loading Important Date"
   loading_important_date_details_1b2d2b85: "Loading Important Date Details"
   loading_important_info_217bf805: "Loading important info"
+  loading_jobs_12f0609d: "Loading jobs..."
   loading_last_attended_date_5a42463: "Loading last attended date"
   loading_latest_announcement_link_f1746190: "Loading latest announcement link"
   loading_learning_outcome_groups_599d259c: "Loading learning outcome groups"
@@ -15641,6 +15674,9 @@ en-AU:
   media_submission_464829f0: "Media Submission"
   median_ed291842: Median
   median_score_4657e907: "Median: %{score}"
+  medium_dark_skin_tone_5134edbc: "Medium-Dark Skin Tone"
+  medium_light_skin_tone_6c4a27fb: "Medium-Light Skin Tone"
+  medium_skin_tone_8608d74e: "Medium Skin Tone"
   meets_expectations_bb179565: "Meets Expectations"
   meets_mastery_754e1c06: "Meets Mastery"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} members out of maximum of %{max_membership}"
@@ -17976,6 +18012,7 @@ en-AU:
   must_be_a_number_f6e09df7: "must be a number"
   must_be_a_valid_number_59f0069: "Must be a valid number"
   must_be_after_start_date_95e251a3: "must be after start date"
+  must_be_between_1_and_10_e99eb0d1: "must be between 1 and 10"
   must_be_between_1_and_5_3b42aca1: "must be between 1 and 5"
   must_be_between_1_and_99_589b827d: "must be between 1 and 99"
   must_be_between_availability_dates_ceaca984: "must be between availability dates"
@@ -18296,6 +18333,7 @@ en-AU:
   no_due_date_6e6a23c1: "(no due date)"
   no_e16d9132: "No"
   no_email_8585ad7e: "No Email"
+  no_emoji_found_4db2f53c: "No Emoji Found"
   no_end_date_2608075c: "No End Date"
   no_errors_1ac47724: "No errors"
   no_evidence_75853352: "No Evidence"
@@ -18436,6 +18474,7 @@ en-AU:
   not_reviewed_c38d9e97: "Not reviewed"
   not_selected_57866888: "not selected"
   not_signed_47acf472: "Not Signed"
+  not_specified_24a60319: "Not Specified"
   not_starred_98931190: "not starred"
   not_starred_no_subject_click_to_star_adfefe93: "'Not starred \"(No Subject)\". Click to star."
   not_starred_no_subject_click_to_star_dc91380: "Not starred \"(No Subject)\". Click to star."
@@ -18861,6 +18900,7 @@ en-AU:
       remember_auth: "Remember Authorisation"
   oauth_2_eb9d97: "OAuth 2"
   object_type_e4f3bbeb: "Object Type"
+  objects_589fdc11: Objects
   observe_student_mastery_a1f01a: "Observe student mastery"
   observees: 
     being_observed: "Students Being Observed"
@@ -18982,6 +19022,7 @@ en-AU:
   open_complete_incomplete_menu_cfe2033b: "Open Complete/Incomplete menu"
   open_conversation_a6590865: "Open Conversation"
   open_discussion_title_for_comments_6baa3fa: "Open discussion %{title} for comments"
+  open_emoji_menu_1df0eb0b: "Open emoji menu"
   open_event_menu_e9a21e39: "Open event menu"
   open_event_menu_for_783510e3: "Open event menu for"
   open_for_comments_1810648: "Open for comments"
@@ -19443,6 +19484,7 @@ en-AU:
   path_4f9abf12: Path
   pathtype_93f80de1: "%{pathType}"
   pause_12af3bb4: Pause
+  pause_auto_refresh_9bd773ca: "Pause auto-refresh"
   paypal: 
     exception: "We're sorry, an error has occurred, please try again later."
   pdf_4e842f10: pdf
@@ -19470,6 +19512,7 @@ en-AU:
   people_account_course_305043bb: "People (Account/Course)"
   people_account_course_97b2bbb6: "People (Account, Course)"
   people_b4ebb13c: People
+  people_body_3ce556e3: "People & Body"
   people_course_ddd9a66: "People (Course)"
   people_groups_tab_b245a614: "People (Groups tab)"
   people_options_cfb419a6: "People Options"
@@ -19518,6 +19561,7 @@ en-AU:
   philippines_63_a4f62138: "Philippines (+63)"
   pick_a_destination_we_ll_send_you_errors_fa0cb0e0: "Pick a destination; we'll send you errors."
   pick_a_name_to_save_this_theme_as_9773cb1a: "Pick a name to save this theme as."
+  pick_an_emoji_942adfc4: "Pick an emoji..."
   pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: "Pick an endpoint; we'll post your error reports there."
   pick_the_date_and_time_for_the_following_conferenc_e9f91edd: "Pick the date and time for the following conference setting:"
   pin_cdbc9f8f: Pin
@@ -22458,6 +22502,7 @@ en-AU:
   reestablish_your_world_b4bd6dff: "Re-establish your world"
   reference_code_3e8355dd: "Reference Code"
   reference_code_is_required_c32c757f: "Reference code is required"
+  refresh_8a04b019: Refresh
   refreshes_the_section_of_the_ui_on_the_course_sett_a45af9bb: "Refreshes the section of the UI on the course settings page controlling course availability options."
   regardless_of_whether_this_permission_is_enabled_o_437ee269: "Regardless of whether this permission is enabled or disabled, the user will still be able to manage events on their personal calendar."
   regardless_of_whether_this_permission_is_enabled_o_a16e31b5: "Regardless of whether this permission is enabled or disabled, users will still be able to manage events in their personal calendar."
@@ -22564,6 +22609,7 @@ en-AU:
   remove_due_dates_and_assignment_availability_dates_608cd97b: "Remove due dates and assignment availability dates."
   remove_edf2b8a7: (Remove)
   remove_email_address_b1820820: "Remove email address"
+  remove_emoji_emojiname_cb388de9: "Remove emoji \"%{emojiName}\""
   remove_empty_attachment_b2aea632: "remove empty attachment"
   remove_f47dc62a: Remove
   remove_file_cbf3f40f: "Remove file"
@@ -22699,6 +22745,7 @@ en-AU:
   reports_1b9ab7a7: Reports
   reports_account_settings_78f5336a: "Reports (Account Settings)"
   reports_course_f09b7d9e: "Reports (Course)"
+  reqired_end_date_a7deac41: "Required end date"
   request_id_1499afb0: "Request ID"
   request_successfully_sent_note_that_applying_score_ee8665b6: "Request successfully sent. Note that applying scores may take a while and changes will not appear until you reload the page."
   request_that_docviewer_use_cloudfront_for_serving__b569aca9: "Request that DocViewer use CloudFront for serving pdf assets."
@@ -23135,6 +23182,8 @@ en-AU:
   scheduling_5a3327e7: Scheduling
   scheduling_sync_3f4a7cac: "Scheduling sync"
   school_of_rock_4b7b1fd0: "School of Rock"
+  scope_9729c11e: "Scope:"
+  scope_c59afc8a: Scope
   score_68107950: "%{score}%"
   score_change_notifications_6b94f27f: "Score change notifications"
   score_does_not_include_groups_because_they_have_no_80d12f42: 
@@ -23326,6 +23375,7 @@ en-AU:
   search_form_fcaa38f7: "Search Form"
   search_grading_periods_e947a3e9: "Search grading periods..."
   search_groups_or_people_6c15d6ad: "Search Groups or People"
+  search_people_402e622c: "Search people"
   search_people_44f36cd2: "Search people..."
   search_people_4782671a: "Search People"
   search_people_as_you_type_in_this_field_the_list_o_5755e8ad: "Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input."
@@ -23587,6 +23637,7 @@ en-AU:
   selected_content_is_not_an_lti_link_11780d96: "Selected content is not an LTI link."
   selected_course_course_a581f834: "Selected course %{course}"
   selected_de3a8019: selected
+  selected_emojis_will_not_be_available_in_the_emoji_412d8776: "Selected emojis will not be available in the \"Emoji Picker\" for students or instructors."
   selected_external_tool_tool_bae095ba: "Selected external tool %{tool}"
   selected_filename_7552a8c0: "selected %{filename}"
   selected_grade_942f40ba: "Selected Grade"
@@ -24807,6 +24858,7 @@ en-AU:
     android_banner_price: FREE
     android_banner_title: "Canvas by Instructure"
     android_banner_view_button: VIEW
+  smileys_emotion_edc2beac: "Smileys & Emotion"
   sms_f0ddceeb: sms
   sms_is_only_used_for_multi_factor_authentication_i_73a11abc: "SMS is only used for Multi-Factor Authentication (if enabled for your account)."
   snapshots_6e1806b4: Snapshots
@@ -25010,6 +25062,7 @@ en-AU:
   start_a_new_course_1f5f2266: "Start a new course"
   start_a_new_subject_7271b3ec: "Start a new subject"
   start_assignment_d56256d3: "Start Assignment"
+  start_auto_refresh_e2feafb2: "Start auto-refresh"
   start_date_c41cb23a: "Start Date:"
   start_date_e937be8a: "Start Date"
   start_date_end_date_d809dd93: "%{start_date} - %{end_date}"
@@ -25083,6 +25136,7 @@ en-AU:
   storage_used_in_mb_c75fbd9c: "storage used in MB"
   store_and_share_course_assets_82a9967c: "Store and share course assets"
   strand_955969b1: Strand
+  strand_singleton_2d7d7be7: "Strand / Singleton"
   strands_b086013b: Strands
   stream_items_api: 
     assessment_request_title: "Peer Review for %{title}"
@@ -25215,6 +25269,7 @@ en-AU:
   students_can_only_participate_in_the_course_betwee_6f8595aa: "Students can only participate in the course between these dates"
   students_can_see_originality_score_797fe634: "Students can see originality score"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Students cannot view quiz responses after course concludes"
+  students_have_already_submitted_homework_on_this_a_7eb5cb6e: "Students have already submitted homework on this assignment, so plagiarism platform settings cannot be changed."
   students_have_either_already_taken_or_started_taki_a076336: "Students have either already taken or started taking this quiz, so be careful about editing it. If you change any quiz questions in a significant way, you may want to consider regrading students who took the old version of the quiz."
   students_have_the_option_to_reply_anonymously_some_503cdf6c: "Students have the option to reply anonymously. Some names and profile pictures may be hidden."
   students_must_complete_all_of_these_requirements_15fa97f7: "Students must complete all of these requirements."
@@ -25616,6 +25671,7 @@ en-AU:
   syllabus_tab_enabled_62aebc2e: syllabus_tab_enabled
   syllabus_tutorial_tray_97e8ef82: "Syllabus Tutorial Tray"
   syllabus_visibility_options_a81ef419: "Syllabus Visibility Options"
+  symbols_35065d67: Symbols
   sync_68e5c167: Sync
   sync_and_provision_microsoft_teams_with_your_canva_a8018b6c: "Sync and Provision Microsoft Teams with your Canvas Course"
   sync_auto_scheduled_by_enrollment_changes_bd96ff7f: "Sync auto-scheduled by enrolment changes"
@@ -25723,6 +25779,7 @@ en-AU:
   tas_remove_11059e14: "TAs - Remove"
   tas_remove_16a99b22: "TAs - remove"
   tea_provisional_graders_d4f19c26: "TEA Provisional Graders"
+  tea_quiz_submission_answers_b8b90be3: "TEA Quiz Submission Answers"
   teacher_5a73b637: Teacher
   teacher_count_teachers_a92f7199: "%{teacher_count} teachers"
   teacher_dashboard_custom_report_6d20bef2: "Teacher Dashboard Custom Report"
@@ -26465,6 +26522,7 @@ en-AU:
   this_image_has_been_reported_9360e581: "This image has been reported."
   this_image_is_currently_unavailable_25c68857: "This image is currently unavailable"
   this_influences_the_user_interface_for_setting_due_12b7e7c0: "This influences the user interface for setting due dates. It does not change when any existing assignment is due."
+  this_influences_the_user_interface_for_setting_due_be0f0273: "This influences the user interface for setting due dates. It does not change the time due for any existing assignments."
   this_integration_is_not_enabled_please_enable_it_t_b9e8a997: "This integration is not enabled. Please enable it to interact with settings."
   this_is_a_blueprint_course_5e7b47fe: "This is a blueprint course"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "This is a comma separated list of URL's to trust. Trusting any URL's in this list will bypass the CSRF token when logging in to Canvas."
@@ -27558,6 +27616,7 @@ en-AU:
   traditional_gradebook_d7ad59c6: "Traditional Gradebook…"
   traditional_gradebook_d90461dc: "Traditional Gradebook"
   transferred_student_enrollments_90dc27d3: "Transferred Student Enrolments"
+  travel_places_f461329c: "Travel & Places"
   treat_ungraded_as_0_d38c2b41: "Treat Ungraded as 0"
   tree_browser: 
     folder_tree_instructions: "Use the up and down arrow keys to navigate through the tree. Press right to expand folders, left to collapse, and enter to choose the selected item."
@@ -27951,6 +28010,7 @@ en-AU:
   updated_current_grade_to_be_empty_c2ce1d13: "Updated current grade to be empty"
   updated_current_grade_to_currentgrade_bfe2ea14: "Updated current grade to %{currentGrade}"
   updated_group_group_name_727b1d98: "Updated Group %{group_name}"
+  updated_mastery_connect_icon_70b6a9b9: "Updated Mastery Connect Icon"
   updated_math_equation_display_583671a8: "Updated maths equation display"
   updated_math_equation_handling_b84509d1: "Updated maths equation handling"
   updated_permissions_page_f2e91060: "Updated Permissions Page"
