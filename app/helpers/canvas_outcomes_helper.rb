@@ -19,20 +19,35 @@
 #
 
 module CanvasOutcomesHelper
-  def get_lmgb_results_jwt(context, assignment_ids, assignment_type)
-    return if assignment_ids.blank? || assignment_type.blank?
+  def get_lmgb_results(course, assignment_ids, assignment_type)
+    return if assignment_ids.blank? || assignment_type.blank? || !course.feature_enabled?(:outcome_service_results_to_canvas)
+
+    params = {
+      associated_asset_id_list: assignment_ids,
+      associated_asset_type: assignment_type
+    }
 
     domain, jwt = extract_domain_jwt(
-      context.root_account,
+      course.root_account,
       "lmgb_results.show",
-      {
-        associated_asset_id_list: assignment_ids,
-        associated_asset_type: assignment_type
-      }
+      params
     )
     return if domain.nil? || jwt.nil?
 
-    jwt
+    protocol = ENV.fetch("OUTCOMES_SERVICE_PROTOCOL", Rails.env.production? ? "https" : "http")
+    response = CanvasHttp.get(
+      build_request_url(protocol, domain, "api/authoritative_results", params),
+      {
+        "Authorization" => jwt
+      }
+    )
+
+    if /^2/.match?(response.code.to_s)
+      json = JSON.parse(response.body)
+      json["results"]
+    else
+      raise "Error retrieving results from Outcomes Service: #{response.body}"
+    end
   end
 
   def set_outcomes_alignment_js_env(artifact, context, props)
@@ -68,10 +83,10 @@ module CanvasOutcomesHelper
     settings = account.settings.dig(:provision, "outcomes") || {}
     domain = nil
     jwt = nil
-    if settings.key?(:consumer_key) && settings.key?(:jwt_secret) && settings.key?(:domain)
+    if settings.key?(:consumer_key) && settings.key?(:jwt_secret) && settings.key?(domain_key)
       consumer_key = settings[:consumer_key]
       jwt_secret = settings[:jwt_secret]
-      domain = settings[:domain]
+      domain = settings[domain_key]
       payload = {
         host: domain,
         consumer_key: consumer_key,
@@ -83,6 +98,24 @@ module CanvasOutcomesHelper
     end
 
     [domain, jwt]
+  end
+
+  def domain_key
+    # test_cluster? and test_cluster_name are true and not nil for nonprod environments,
+    # like beta or test
+    if ApplicationController.test_cluster?
+      "#{ApplicationController.test_cluster_name}_domain".to_sym
+    else
+      :domain
+    end
+  end
+
+  def build_request_url(protocol, domain, endpoint, params)
+    url = "#{protocol}://#{domain}/#{endpoint}"
+    if params.present?
+      url += "?" + params.to_query
+    end
+    url
   end
 
   private
