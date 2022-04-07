@@ -2174,5 +2174,23 @@ describe DiscussionTopicsController do
       assert_unauthorized
       expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.visit.redesign")
     end
+
+    it "increment discussion_topic.visit.legacy" do
+      @course.disable_feature! :react_discussions_post
+
+      course_topic
+      user_session @teacher
+      get "show", params: { course_id: @course.id, id: @topic.id }
+      expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_topic.visit.legacy").at_least(:once)
+    end
+
+    it "does not increment discussion_topic.visit.legacy with unauthorized visit" do
+      @course.disable_feature! :react_discussions_post
+
+      course_topic
+      get "show", params: { course_id: @course.id, id: @topic.id }
+      assert_unauthorized
+      expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.visit.legacy")
+    end
   end
 end

@@ -898,6 +898,10 @@ class DiscussionTopicsController < ApplicationController
             js_bundle :discussion_topic
             css_bundle :tinymce, :discussions, :learning_outcomes
 
+            unless @locked
+              InstStatsd::Statsd.increment("discussion_topic.visit.legacy")
+            end
+
             render stream: can_stream_template?
           end
         end
