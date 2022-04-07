@@ -22,7 +22,8 @@ import {connect} from 'react-redux'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {ApplyTheme} from '@instructure/ui-themeable'
-import {IconArrowOpenDownSolid, IconArrowOpenUpSolid} from '@instructure/ui-icons'
+import {IconArrowOpenDownSolid, IconArrowOpenUpSolid, IconUserLine} from '@instructure/ui-icons'
+import {Avatar} from '@instructure/ui-avatar'
 import {Heading} from '@instructure/ui-heading'
 import {Menu} from '@instructure/ui-menu'
 import {TextInput} from '@instructure/ui-text-input'
@@ -109,7 +110,7 @@ export const PacePicker: React.FC<ComponentProps> = ({
     }
   }
 
-  const renderOption = (contextKey: string, label: string, key?: string) => (
+  const renderOption = (contextKey: string, label: string, key?: string): JSX.Element => (
     <Item value={contextKey} defaultSelected={contextKey === selectedContextKey} key={key}>
       <View as="div" width={PICKER_WIDTH}>
         <TruncateText>{label}</TruncateText>
@@ -117,7 +118,26 @@ export const PacePicker: React.FC<ComponentProps> = ({
     </Item>
   )
 
-  const trigger = (
+  const renderStudentOption = (enrollment: Enrollment): JSX.Element => {
+    const contextKey = createContextKey('Enrollment', enrollment.id)
+    const key = `student-${enrollment.id}`
+    return (
+      <Item value={contextKey} defaultSelected={contextKey === selectedContextKey} key={key}>
+        <View as="div" width={PICKER_WIDTH}>
+          {enrollment.avatar_url ? (
+            <Avatar name={enrollment.full_name} src={enrollment.avatar_url} size="xx-small" />
+          ) : (
+            <IconUserLine />
+          )}
+          <View as="div" display="inline-block" margin="0 0 0 small">
+            <TruncateText>{enrollment.full_name}</TruncateText>
+          </View>
+        </View>
+      </Item>
+    )
+  }
+
+  const trigger: JSX.Element = (
     <TextInput
       renderLabel={I18n.t('Course Paces')}
       renderAfterInput={
@@ -165,9 +185,7 @@ export const PacePicker: React.FC<ComponentProps> = ({
         {/*  )} */}
         {/* </Menu> */}
         <Menu id="course-pace-student-menu" label={I18n.t('Students')}>
-          {enrollments.map(e =>
-            renderOption(createContextKey('Enrollment', e.id), e.full_name, `student-${e.id}`)
-          )}
+          {enrollments.map(e => renderStudentOption(e))}
         </Menu>
       </Menu>
       <UnpublishedWarningModal

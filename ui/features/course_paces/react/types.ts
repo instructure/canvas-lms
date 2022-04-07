@@ -28,6 +28,7 @@ export interface Enrollment {
   readonly sortable_name: string
   readonly start_at?: string
   readonly completed_course_pace_at?: string
+  readonly avatar_url?: string
 }
 
 export interface Enrollments {

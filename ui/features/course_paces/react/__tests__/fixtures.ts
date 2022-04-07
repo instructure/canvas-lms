@@ -79,7 +79,8 @@ export const ENROLLMENT_2: Enrollment = {
   full_name: 'Molly Millions',
   sortable_name: 'Millions, Molly',
   start_at: undefined,
-  completed_course_pace_at: undefined
+  completed_course_pace_at: undefined,
+  avatar_url: 'molly_avatar'
 }
 
 export const ENROLLMENTS: Enrollments = keyBy([ENROLLMENT_1, ENROLLMENT_2], 'id')

@@ -65,8 +65,12 @@ describe('PacePicker', () => {
     const students = screen.getByRole('button', {name: 'Students'})
     expect(students).toBeInTheDocument()
     act(() => students.click())
-    expect(screen.getByRole('menuitem', {name: 'Henry Dorsett Case'})).toBeInTheDocument()
-    expect(screen.getByRole('menuitem', {name: 'Molly Millions'})).toBeInTheDocument()
+    const henry = screen.getByRole('menuitem', {name: 'Henry Dorsett Case'})
+    expect(henry).toBeInTheDocument()
+    expect(henry.querySelector('svg[name="IconUser"]')).toBeInTheDocument()
+    const molly = screen.getByRole('menuitem', {name: 'Molly Millions'})
+    expect(molly).toBeInTheDocument()
+    expect(molly.querySelector('img[src="molly_avatar"]')).toBeInTheDocument()
   })
 
   it('sets the selected context when an option is clicked', () => {
