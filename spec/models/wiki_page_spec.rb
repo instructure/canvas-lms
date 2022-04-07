@@ -333,6 +333,40 @@ describe WikiPage do
         end
       end
     end
+
+    context "when the context is a Group" do
+      subject { page.can_edit_page?(current_user) }
+
+      let(:current_user) { nil }
+      let(:teacher) { course.teachers.first }
+      let(:group) { group_model(context: course) }
+
+      let(:course) do
+        course_with_teacher(active_all: true)
+        @course
+      end
+
+      let(:page) do
+        group.wiki_pages.create(
+          title: "A Page",
+          workflow_state: "published"
+        )
+      end
+
+      context "when the current user is a teacher in the group's course" do
+        let(:current_user) { teacher }
+
+        it { is_expected.to eq true }
+      end
+
+      context "when the current user is a concluded teacher" do
+        before { course.teacher_enrollments.find_by(user: teacher).conclude }
+
+        let(:current_user) { teacher }
+
+        it { is_expected.to eq false }
+      end
+    end
   end
 
   context "initialize_wiki_page" do
