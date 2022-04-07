@@ -183,7 +183,8 @@ class CoursePacesController < ApplicationController
         section_id: enrollment.course_section_id,
         full_name: enrollment.user.name,
         sortable_name: enrollment.user.sortable_name,
-        start_at: enrollment.start_at
+        start_at: enrollment.start_at,
+        avatar_url: User.find_by(id: enrollment.user_id).avatar_image_url
       }
     end
     json.index_by { |h| h[:id] }
