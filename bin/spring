@@ -7,10 +7,10 @@
 unless defined?(Spring)
   require 'rubygems'
   require 'bundler'
-  require_relative '../config/canvas_rails_switcher'
 
   ENV['BUNDLE_GEMFILE'] ||= File.expand_path('../../Gemfile', __FILE__)
-  lockfile_name = Bundler.default_lockfile.dirname + "Gemfile.rails#{CANVAS_RAILS.delete(".")}.lock"
+  rails_version = ENV["CANVAS_RAILS"] || "6.0"
+  lockfile_name = Bundler.default_lockfile.dirname + "Gemfile.rails#{rails_version.delete(".")}.lock"
   lockfile = Bundler::LockfileParser.new(lockfile_name.read)
   spring = lockfile.specs.detect { |spec| spec.name == 'spring' }
   if spring
