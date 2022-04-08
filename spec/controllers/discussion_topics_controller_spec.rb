@@ -2250,6 +2250,24 @@ describe DiscussionTopicsController do
       expect(InstStatsd::Statsd).not_to have_received(:count).with("discussion_topic.visit.entries.redesign", 0)
     end
 
+    it "count discussion_topic.visit.pages.redesign" do
+      @course.enable_feature! :react_discussions_post
+
+      course_topic
+      user_session @teacher
+      get "show", params: { course_id: @course.id, id: @topic.id }
+      expect(InstStatsd::Statsd).to have_received(:count).with("discussion_topic.visit.pages.redesign", 0).at_least(:once)
+    end
+
+    it "does not count discussion_topic.visit.pages.redesign with unauthorized visit" do
+      @course.enable_feature! :react_discussions_post
+
+      course_topic
+      get "show", params: { course_id: @course.id, id: @topic.id }
+      assert_unauthorized
+      expect(InstStatsd::Statsd).not_to have_received(:count).with("discussion_topic.visit.pages.redesign", 0)
+    end
+
     it "increment discussion_topic.visit.legacy" do
       @course.disable_feature! :react_discussions_post
 
