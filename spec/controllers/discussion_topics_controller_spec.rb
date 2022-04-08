@@ -81,6 +81,13 @@ describe DiscussionTopicsController do
     }
   end
 
+  def group_topic_params(group, opts = {})
+    params = topic_params(group, opts)
+    params[:group_id] = group.id
+    params.delete(:course_id)
+    params
+  end
+
   describe "GET 'index'" do
     it "requires authorization" do
       get "index", params: { course_id: @course.id }
@@ -1413,13 +1420,6 @@ describe DiscussionTopicsController do
       allow(controller).to receive_messages(form_authenticity_token: "abc", form_authenticity_param: "abc")
     end
 
-    def group_topic_params(group, opts = {})
-      params = topic_params(group, opts)
-      params[:group_id] = group.id
-      params.delete(:course_id)
-      params
-    end
-
     describe "create_announcements_unlocked preference" do
       before do
         @teacher.create_announcements_unlocked(false)
@@ -2247,6 +2247,22 @@ describe DiscussionTopicsController do
       get "show", params: { course_id: @course.id, id: @topic.id }
       assert_unauthorized
       expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.visit.legacy")
+    end
+
+    it "increment discussion_topic.created.group" do
+      user_session @teacher
+      @group_category = @course.group_categories.create(name: "gc")
+      @group = @course.groups.create!(group_category: @group_category)
+
+      post "create", params: group_topic_params(@group), format: :json
+      expect(response).to be_successful
+      expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_topic.created.group").at_least(:once)
+    end
+
+    it "does not increment discussion_topic.created.group when topic is not successfully created" do
+      user_session @teacher
+      post "create", params: topic_params(@course), format: :json
+      expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.created.group")
     end
   end
 end
