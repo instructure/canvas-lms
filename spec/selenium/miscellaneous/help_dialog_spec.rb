@@ -202,7 +202,7 @@ describe "help dialog" do
       expect_new_page_load { form.submit }
       f("#global_nav_help_link").click
       wait_for_ajaximations
-      expect(fxpath("//*[*/a[contains(text(),'NEW LINK')]]//*[text() = 'NEW']")).to include_text("NEW")
+      expect(fj('div#help_tray li:contains("NEW LINK")')).to include_text("NEW subtext")
     end
   end
 
