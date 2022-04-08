@@ -266,6 +266,12 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Свернуть, чтобы скрыть { types }"
     },
+    "color_picker_6b359edf": {
+        "message": "Селектор цвета"
+    },
+    "color_picker_colorname_selected_ad4cf400": {
+        "message": "Селектор цвета (выбрано { colorName })"
+    },
     "computer_1d7dfa6f": {
         "message": "Компьютер"
     },
@@ -481,6 +487,9 @@
     },
     "edit_existing_button_icon_3d0277bd": {
         "message": "Редактировать существующую кнопку / значок"
+    },
+    "edit_icon_2c6b0e91": {
+        "message": "Редактировать значок"
     },
     "edit_link_7f53bebb": {
         "message": "Редактировать ссылку"
@@ -914,6 +923,9 @@
     "media_af190855": {
         "message": "Мультимедиа"
     },
+    "media_file_is_processing_please_try_again_later_58a6d49": {
+        "message": "Выполняется обработка файла мультимедиа. Попробуйте еще раз позже."
+    },
     "medium_5a8e9ead": {
         "message": "Средний"
     },
@@ -1204,6 +1216,9 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Редактор форматированного текста"
+    },
+    "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+        "message": "Область форматированного текста. Нажмите ALT+0 для отображения клавиш быстрого доступа редактора форматированного содержимого."
     },
     "right_to_left_9cfb092a": {
         "message": "Справа налево"

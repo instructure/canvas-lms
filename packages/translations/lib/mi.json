@@ -266,6 +266,12 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Hinga ki te hunga { types }"
     },
+    "color_picker_6b359edf": {
+        "message": "Kaiwhiri Tae"
+    },
+    "color_picker_colorname_selected_ad4cf400": {
+        "message": "Kaikōwhiri Tae ({ colorName } kua tohua)"
+    },
     "computer_1d7dfa6f": {
         "message": "Rorohiko"
     },
@@ -481,6 +487,9 @@
     },
     "edit_existing_button_icon_3d0277bd": {
         "message": "Whakatika Pātene e Ora ana / Ata"
+    },
+    "edit_icon_2c6b0e91": {
+        "message": "Whakatika Ata"
     },
     "edit_link_7f53bebb": {
         "message": "Whakatika hononga"
@@ -914,6 +923,9 @@
     "media_af190855": {
         "message": "Pāpāho"
     },
+    "media_file_is_processing_please_try_again_later_58a6d49": {
+        "message": "Kei te tukatuka te konae pāpāho. Tēnā koa ngana anō i muri mai."
+    },
     "medium_5a8e9ead": {
         "message": "Kauwaka"
     },
@@ -1204,6 +1216,9 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Ētita Ihirangi Whai Rawa"
+    },
+    "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+        "message": "Horahanga Kupu Taunaki. Pēhia te ALT+0 mo Taonga Ihirangi Etita pokatata."
     },
     "right_to_left_9cfb092a": {
         "message": "Matau - ki te - Māui"

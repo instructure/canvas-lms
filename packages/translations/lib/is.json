@@ -266,6 +266,12 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Fella saman til að fela { types }"
     },
+    "color_picker_6b359edf": {
+        "message": "Litaval"
+    },
+    "color_picker_colorname_selected_ad4cf400": {
+        "message": "Litaval ({ colorName } valið)"
+    },
     "computer_1d7dfa6f": {
         "message": "Tölva"
     },
@@ -481,6 +487,9 @@
     },
     "edit_existing_button_icon_3d0277bd": {
         "message": "Breyta núverandi hnapp / tákni"
+    },
+    "edit_icon_2c6b0e91": {
+        "message": "Breyta tákni"
     },
     "edit_link_7f53bebb": {
         "message": "Breyta tengli"
@@ -914,6 +923,9 @@
     "media_af190855": {
         "message": "Miðill"
     },
+    "media_file_is_processing_please_try_again_later_58a6d49": {
+        "message": "Miðilsskrá er í vinnslu. Vinsamlegast reyndu aftur seinna."
+    },
     "medium_5a8e9ead": {
         "message": "Meðal"
     },
@@ -1204,6 +1216,9 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Rich Content ritill"
+    },
+    "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+        "message": "Svæði með miklum texta. Ýttu á ALT+0 fyrir flýtilykla Rich Content ritils."
     },
     "right_to_left_9cfb092a": {
         "message": "Hægri til vinstri"

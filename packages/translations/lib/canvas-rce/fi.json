@@ -102,6 +102,10 @@
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Piilota kutistamalla { types }"
   },
+  "color_picker_6b359edf": { "message": "Värivalitsin" },
+  "color_picker_colorname_selected_ad4cf400": {
+    "message": "Värivalitsin ({ colorName } valittu)"
+  },
   "computer_1d7dfa6f": { "message": "Tietokone" },
   "content_1440204b": { "message": "Sisältö" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -178,6 +182,7 @@
   "edit_existing_button_icon_3d0277bd": {
     "message": "Muokkaa olemassa olevaa painiketta/kuvaketta"
   },
+  "edit_icon_2c6b0e91": { "message": "Muokkaa kuvaketta" },
   "edit_link_7f53bebb": { "message": "Muokkaa linkkiä" },
   "editor_statusbar_26ac81fc": { "message": "Editorin tilapalkki" },
   "embed_828fac4a": { "message": "Upota" },
@@ -309,6 +314,9 @@
   "magenta_4a65993c": { "message": "Magenta" },
   "math_icon_ad4e9d03": { "message": "Matematiikan kuvake" },
   "media_af190855": { "message": "Tietoväline" },
+  "media_file_is_processing_please_try_again_later_58a6d49": {
+    "message": "Yritä myöhemmin uudelleen. Yritä myöhemmin uudelleen."
+  },
   "medium_5a8e9ead": { "message": "Tietoväline" },
   "middle_27dc1d5": { "message": "Kohtalainen" },
   "misc_3b692ea7": { "message": "Sekalainen" },
@@ -401,6 +409,9 @@
     "message": "Palautetetaanko automaattinen tallennus?"
   },
   "rich_content_editor_2708ef21": { "message": "Rikas sisältöeditori" },
+  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+    "message": "Monipuolisen tekstieditorin sisältökenttä Paina ALT+0, jos haluat nähdä tekstimuotoilueditorin pikakuvakkeita."
+  },
   "right_to_left_9cfb092a": { "message": "Oikealta-Vasemmalle" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Harmi, mutta Pretty-tekstieditoria ei voi käyttää näppäimistöltä. Käytä HTML-tekstieditoria täällä."

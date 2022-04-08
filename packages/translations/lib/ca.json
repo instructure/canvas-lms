@@ -266,6 +266,12 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Contrau per amagar { types }"
     },
+    "color_picker_6b359edf": {
+        "message": "Selector de color"
+    },
+    "color_picker_colorname_selected_ad4cf400": {
+        "message": "Selector de color (s’ha seleccionat el color { colorName })"
+    },
     "computer_1d7dfa6f": {
         "message": "Ordinador"
     },
@@ -481,6 +487,9 @@
     },
     "edit_existing_button_icon_3d0277bd": {
         "message": "Edita el botó i la icona actuals"
+    },
+    "edit_icon_2c6b0e91": {
+        "message": "Edita la icona"
     },
     "edit_link_7f53bebb": {
         "message": "Edita l''enllaç"
@@ -914,6 +923,9 @@
     "media_af190855": {
         "message": "Element multimèdia"
     },
+    "media_file_is_processing_please_try_again_later_58a6d49": {
+        "message": "S’està processant el fitxer multimèdia. Torneu a provar-ho més endavant."
+    },
     "medium_5a8e9ead": {
         "message": "Mitjà"
     },
@@ -1204,6 +1216,9 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Editor de contingut enriquit"
+    },
+    "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+        "message": "Àrea de text enriquit. Premeu ALT+0 per accedir a les dreceres de l’editor de contingut enriquit."
     },
     "right_to_left_9cfb092a": {
         "message": "Dreta a esquerra"

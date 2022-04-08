@@ -198,7 +198,7 @@
         "message": "カレンダー:"
     },
     "calendar_event_89aadc1c": {
-        "message": "予定表のイベント"
+        "message": "カレンダーのイベント"
     },
     "cancel_caeb1e68": {
         "message": "キャンセル"
@@ -265,6 +265,12 @@
     },
     "collapse_to_hide_types_1ab46d2e": {
         "message": "{ types } を非表示にするには破損する"
+    },
+    "color_picker_6b359edf": {
+        "message": "色を選択"
+    },
+    "color_picker_colorname_selected_ad4cf400": {
+        "message": "色を選択（{ colorName }が現在選択されている）"
     },
     "computer_1d7dfa6f": {
         "message": "コンピュータ"
@@ -482,6 +488,9 @@
     "edit_existing_button_icon_3d0277bd": {
         "message": "既存のボタン/アイコンの編集"
     },
+    "edit_icon_2c6b0e91": {
+        "message": "アイコンを編集する"
+    },
     "edit_link_7f53bebb": {
         "message": "リンクの編集"
     },
@@ -522,7 +531,7 @@
         "message": "方程式エディタ"
     },
     "error_loading_grades_e0b38f4d": {
-        "message": "成績の読み込み中にエラー"
+        "message": "評定の読み込み中にエラー"
     },
     "error_loading_items_5218438e": {
         "message": "アイテムの読み込み中にエラーが発生しました"
@@ -633,7 +642,7 @@
         "message": "全画面"
     },
     "fun_quiz_47ab0b0": {
-        "message": "楽しいクイズ"
+        "message": "楽しい小テスト"
     },
     "generating_preview_45b53be0": {
         "message": "プレビュー中..."
@@ -651,13 +660,13 @@
         "message": "採点済み"
     },
     "grades_a61eba0a": {
-        "message": "成績"
+        "message": "評定"
     },
     "grades_are_loading_c899652d": {
-        "message": "成績読み込み中です"
+        "message": "評定読み込み中です"
     },
     "grades_loaded_5056277c": {
-        "message": "成績が読み込まれました"
+        "message": "評定が読み込まれました"
     },
     "greek_65c5b3f7": {
         "message": "ギリシャ文字"
@@ -879,7 +888,7 @@
         "message": "フォルダを読み込み中..."
     },
     "loading_grades_c842c887": {
-        "message": "成績読み込み中"
+        "message": "評定読み込み中"
     },
     "loading_past_items_ca499e75": {
         "message": "過去のアイテムを読み込む"
@@ -913,6 +922,9 @@
     },
     "media_af190855": {
         "message": "メディア"
+    },
+    "media_file_is_processing_please_try_again_later_58a6d49": {
+        "message": "メディアファイルは処理中です。後ほどもう一度やり直してください。"
     },
     "medium_5a8e9ead": {
         "message": "中"
@@ -951,7 +963,7 @@
         "message": "マイ ファイル"
     },
     "my_grades_98834476": {
-        "message": "私の成績"
+        "message": "私の評定"
     },
     "name_1aed4a1b": {
         "message": "名前"
@@ -990,7 +1002,7 @@
         "message": "ファイルが選択されていません"
     },
     "no_grade_3b4d7f3e": {
-        "message": "成績なし"
+        "message": "評定なし"
     },
     "no_preview_is_available_for_this_file_f940114a": {
         "message": "このファイルでは、プレビューは利用できません。"
@@ -1161,10 +1173,10 @@
         "message": "パープル"
     },
     "quiz_e0dcce8f": {
-        "message": "クイズ"
+        "message": "小テスト"
     },
     "quizzes_7e598f57": {
-        "message": "クイズ"
+        "message": "小テスト"
     },
     "raw_html_editor_e3993e41": {
         "message": "無変換の HTML エディタ"
@@ -1204,6 +1216,9 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "リッチ コンテンツ エディタ"
+    },
+    "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+        "message": "リッチテキストエリアリッチコンテンツエディターのショートカットは、ALT+0を押してください。"
     },
     "right_to_left_9cfb092a": {
         "message": "右から左"
@@ -1260,7 +1275,7 @@
         "message": "リンクオプションを表示する"
     },
     "show_my_grades_ebd08684": {
-        "message": "私の成績を表示"
+        "message": "私の評定を表示"
     },
     "show_video_options_6ed3721a": {
         "message": "ビデオオプションを表示する"
@@ -1326,7 +1341,7 @@
         "message": "提出"
     },
     "submitted_318fad53": {
-        "message": "タスクの成績を送信"
+        "message": "タスクの評定を送信"
     },
     "subscript_59744f96": {
         "message": "下付き"

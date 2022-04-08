@@ -266,6 +266,12 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Fèmen pou kache { types }"
     },
+    "color_picker_6b359edf": {
+        "message": "Seleksyonè Koulè"
+    },
+    "color_picker_colorname_selected_ad4cf400": {
+        "message": "Seleksyonè Koulè ({ colorName } seleksyone)"
+    },
     "computer_1d7dfa6f": {
         "message": "Òdinatè"
     },
@@ -481,6 +487,9 @@
     },
     "edit_existing_button_icon_3d0277bd": {
         "message": "Chanje kòn / Bouton ki egziste yo"
+    },
+    "edit_icon_2c6b0e91": {
+        "message": "Chanje Ikòn"
     },
     "edit_link_7f53bebb": {
         "message": "Chanje Lyen"
@@ -914,6 +923,9 @@
     "media_af190855": {
         "message": "Medya"
     },
+    "media_file_is_processing_please_try_again_later_58a6d49": {
+        "message": "Fichye miltimedya an tretman. Tanpri eseye ankò."
+    },
     "medium_5a8e9ead": {
         "message": "Mwayen"
     },
@@ -1204,6 +1216,9 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Editè Kontni Rich"
+    },
+    "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+        "message": "Zòn Teks Rich Peze  ALT+0 pou rakousi Editè Kontni Rich."
     },
     "right_to_left_9cfb092a": {
         "message": "De Dwat a Goch"

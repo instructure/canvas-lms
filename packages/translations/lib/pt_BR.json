@@ -266,6 +266,12 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Recolher para ocultar { types }"
     },
+    "color_picker_6b359edf": {
+        "message": "Selecionador de Cores"
+    },
+    "color_picker_colorname_selected_ad4cf400": {
+        "message": "Seletor de cores ({ colorName } selecionado)"
+    },
     "computer_1d7dfa6f": {
         "message": "Computador"
     },
@@ -481,6 +487,9 @@
     },
     "edit_existing_button_icon_3d0277bd": {
         "message": "Editar botão/ícone existente"
+    },
+    "edit_icon_2c6b0e91": {
+        "message": "Editar ícone"
     },
     "edit_link_7f53bebb": {
         "message": "Editar link"
@@ -914,6 +923,9 @@
     "media_af190855": {
         "message": "Mídia"
     },
+    "media_file_is_processing_please_try_again_later_58a6d49": {
+        "message": "O arquivo de mídia está sendo processado. Por favor, tente novamente mais tarde."
+    },
     "medium_5a8e9ead": {
         "message": "Média"
     },
@@ -1204,6 +1216,9 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Editor de conteúdo avançado"
+    },
+    "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+        "message": "Área de conteúdo enriquecido. Pressione ALT+0 para atalhos do Rich Content Editor."
     },
     "right_to_left_9cfb092a": {
         "message": "Direita à esquerda"

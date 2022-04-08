@@ -94,6 +94,10 @@
   "closed_captions_subtitles_e6aaa016": { "message": "คำบรรยายแบบซ่อนได้" },
   "collaborations_5c56c15f": { "message": "การประสานความร่วมมือ" },
   "collapse_to_hide_types_1ab46d2e": { "message": "ย่อเพื่อซ่อน { types }" },
+  "color_picker_6b359edf": { "message": "ระบบเลือกสี " },
+  "color_picker_colorname_selected_ad4cf400": {
+    "message": "ระบบเลือกสี ({ colorName } ที่เลือก)"
+  },
   "computer_1d7dfa6f": { "message": "คอมพิวเตอร์" },
   "content_1440204b": { "message": "ข้อมูล" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -166,6 +170,7 @@
   "edit_existing_button_icon_3d0277bd": {
     "message": "แก้ไขปุ่ม/ไอคอนในปัจจุบัน"
   },
+  "edit_icon_2c6b0e91": { "message": "ไอคอนแก้ไข" },
   "edit_link_7f53bebb": { "message": "แก้ไขลิงค์" },
   "editor_statusbar_26ac81fc": { "message": "แถบสถานะโปรแกรมแก้ไข" },
   "embed_828fac4a": { "message": "ผนวก" },
@@ -291,6 +296,9 @@
   "magenta_4a65993c": { "message": "ม่วงอมแดง" },
   "math_icon_ad4e9d03": { "message": "ไอคอนคณิตศาสตร์" },
   "media_af190855": { "message": "มีเดีย" },
+  "media_file_is_processing_please_try_again_later_58a6d49": {
+    "message": "ไฟล์มีเดียกำลังประมวลผล กรุณาลองใหม่อีกครั้งในภายหลัง"
+  },
   "medium_5a8e9ead": { "message": "ปานกลาง" },
   "middle_27dc1d5": { "message": "ตรงกลาง" },
   "misc_3b692ea7": { "message": "เบ็ดเตล็ด" },
@@ -383,6 +391,9 @@
     "message": "กู้คืนที่บันทึกอัตโนมัติหรือไม่"
   },
   "rich_content_editor_2708ef21": { "message": "Rich Content Editor" },
+  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+    "message": "พื้นที่ Rich Text กด ALT+0 สำหรับชอร์ตคัท Rich Content Editor"
+  },
   "right_to_left_9cfb092a": { "message": "ขวาไปซ้าย" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "น่าเสียดาย HTML Editor ที่สวยงามไม่สามารถใช้งานผ่านแป้นพิมพ์ ใช้งาน HTML Editor แบบไม่ปรุงแต่งที่นี่"
