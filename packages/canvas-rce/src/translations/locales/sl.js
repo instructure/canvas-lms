@@ -127,6 +127,10 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Strni za skrivanje { types }"
   },
+  "color_picker_6b359edf": { "message": "Orodje za izbiranje barv" },
+  "color_picker_colorname_selected_ad4cf400": {
+    "message": "Izbirnik barv ({ colorName } izbranih)"
+  },
   "computer_1d7dfa6f": { "message": "Računalnik" },
   "content_1440204b": { "message": "Vsebina" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -201,6 +205,7 @@ const locale = {
   "edit_existing_button_icon_3d0277bd": {
     "message": "Uredi obstoječi gumb/ikono"
   },
+  "edit_icon_2c6b0e91": { "message": "Uredi ikono" },
   "edit_link_7f53bebb": { "message": "Uredi povezavo" },
   "editor_statusbar_26ac81fc": { "message": "Vrstica stanja urejevalnika" },
   "embed_828fac4a": { "message": "Vdelaj" },
@@ -328,6 +333,9 @@ const locale = {
   "magenta_4a65993c": { "message": "Magenta" },
   "math_icon_ad4e9d03": { "message": "Ikona matematike" },
   "media_af190855": { "message": "Mediji" },
+  "media_file_is_processing_please_try_again_later_58a6d49": {
+    "message": "Predstavnostna datoteka je v obdelavi. Poskusite znova pozneje."
+  },
   "medium_5a8e9ead": { "message": "Srednja" },
   "middle_27dc1d5": { "message": "Sredina" },
   "misc_3b692ea7": { "message": "Razno" },
@@ -424,6 +432,9 @@ const locale = {
     "message": "Obnovim samodejno shranjeno vsebino?"
   },
   "rich_content_editor_2708ef21": { "message": "Urejevalnik" },
+  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+    "message": "Območje besedila Pritisnite ALT+0 za bližnjico do urejevalnika."
+  },
   "right_to_left_9cfb092a": { "message": "Od desne proti levi" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Žal urejevalnik Pretty HTML Editor ni dostopen s tipkovnico. Tukaj lahko dostopate do surovega urejevalnika HTML."

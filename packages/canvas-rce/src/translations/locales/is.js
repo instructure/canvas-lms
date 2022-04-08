@@ -118,6 +118,10 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Fella saman til að fela { types }"
   },
+  "color_picker_6b359edf": { "message": "Litaval" },
+  "color_picker_colorname_selected_ad4cf400": {
+    "message": "Litaval ({ colorName } valið)"
+  },
   "computer_1d7dfa6f": { "message": "Tölva" },
   "content_1440204b": { "message": "Efni" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -188,6 +192,7 @@ const locale = {
   "edit_existing_button_icon_3d0277bd": {
     "message": "Breyta núverandi hnapp / tákni"
   },
+  "edit_icon_2c6b0e91": { "message": "Breyta tákni" },
   "edit_link_7f53bebb": { "message": "Breyta tengli" },
   "editor_statusbar_26ac81fc": { "message": "Stöðuslá ritils" },
   "embed_828fac4a": { "message": "Fella inn" },
@@ -313,6 +318,9 @@ const locale = {
   "magenta_4a65993c": { "message": "Blárauður" },
   "math_icon_ad4e9d03": { "message": "Stærðfræði tákn" },
   "media_af190855": { "message": "Miðill" },
+  "media_file_is_processing_please_try_again_later_58a6d49": {
+    "message": "Miðilsskrá er í vinnslu. Vinsamlegast reyndu aftur seinna."
+  },
   "medium_5a8e9ead": { "message": "Meðal" },
   "middle_27dc1d5": { "message": "Miðja" },
   "misc_3b692ea7": { "message": "Ýmislegt" },
@@ -403,6 +411,9 @@ const locale = {
   "resize_ec83d538": { "message": "Breyta stærð" },
   "restore_auto_save_deccd84b": { "message": "Endurheimta sjálfvirka vistun?" },
   "rich_content_editor_2708ef21": { "message": "Rich Content ritill" },
+  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+    "message": "Svæði með miklum texta. Ýttu á ALT+0 fyrir flýtilykla Rich Content ritils."
+  },
   "right_to_left_9cfb092a": { "message": "Hægri til vinstri" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Því miður er ekki hægt að nota lyklaborð með pretty HTML ritlinum. Aðgangur að hráa HTML ritlinum hér."

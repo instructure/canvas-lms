@@ -119,6 +119,10 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Kliknij, aby ukryć { types }"
   },
+  "color_picker_6b359edf": { "message": "Narzędzie wyboru kolorów" },
+  "color_picker_colorname_selected_ad4cf400": {
+    "message": "Narzędzie wyboru kolorów (wybrano { colorName })"
+  },
   "computer_1d7dfa6f": { "message": "Komputer" },
   "content_1440204b": { "message": "Zawartość" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -191,6 +195,7 @@ const locale = {
   "edit_existing_button_icon_3d0277bd": {
     "message": "Edytuj istniejący przycisk / ikonę"
   },
+  "edit_icon_2c6b0e91": { "message": "Ikona edycji" },
   "edit_link_7f53bebb": { "message": "Edytuj łącze" },
   "editor_statusbar_26ac81fc": { "message": "Pasek stanu edytora" },
   "embed_828fac4a": { "message": "Osadź" },
@@ -318,6 +323,9 @@ const locale = {
   "magenta_4a65993c": { "message": "Amarantowy" },
   "math_icon_ad4e9d03": { "message": "Ikona matematyki" },
   "media_af190855": { "message": "Multimedia" },
+  "media_file_is_processing_please_try_again_later_58a6d49": {
+    "message": "Trwa przetwarzanie pliku multimediów. Spróbuj ponownie później."
+  },
   "medium_5a8e9ead": { "message": "Średni" },
   "middle_27dc1d5": { "message": "Środkowy" },
   "misc_3b692ea7": { "message": "Różne" },
@@ -415,6 +423,9 @@ const locale = {
   },
   "rich_content_editor_2708ef21": {
     "message": "Edytor wzbogaconej zawartości"
+  },
+  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+    "message": "Obszar tekstu sformatowanego Naciśnij ALT+0, aby wyświetlić skróty edytora tekstu sformatowanego."
   },
   "right_to_left_9cfb092a": { "message": "Prawa-lewa" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {

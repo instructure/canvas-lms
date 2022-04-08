@@ -113,6 +113,10 @@ const locale = {
   "closed_captions_subtitles_e6aaa016": { "message": "Untertitel" },
   "collaborations_5c56c15f": { "message": "Collaborations" },
   "collapse_to_hide_types_1ab46d2e": { "message": "{ types } ausblenden" },
+  "color_picker_6b359edf": { "message": "Farbwähler" },
+  "color_picker_colorname_selected_ad4cf400": {
+    "message": "Farbwähler ({ colorName } ausgewählt)"
+  },
   "computer_1d7dfa6f": { "message": "Computer" },
   "content_1440204b": { "message": "Content" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -187,6 +191,7 @@ const locale = {
   "edit_existing_button_icon_3d0277bd": {
     "message": "Vorhandene/s Schaltfläche/Symbol bearbeiten"
   },
+  "edit_icon_2c6b0e91": { "message": "Symbol für Bearbeiten" },
   "edit_link_7f53bebb": { "message": "Link bearbeiten" },
   "editor_statusbar_26ac81fc": { "message": "Editor-Statusleiste" },
   "embed_828fac4a": { "message": "Einbetten" },
@@ -316,6 +321,9 @@ const locale = {
   "magenta_4a65993c": { "message": "Magenta" },
   "math_icon_ad4e9d03": { "message": "Symbol „Mathematik“" },
   "media_af190855": { "message": "Medien" },
+  "media_file_is_processing_please_try_again_later_58a6d49": {
+    "message": "Mediendatei wird verarbeitet. Versuchen Sie es später noch einmal."
+  },
   "medium_5a8e9ead": { "message": "Medium" },
   "middle_27dc1d5": { "message": "Mitte" },
   "misc_3b692ea7": { "message": "Sonstige" },
@@ -412,6 +420,9 @@ const locale = {
     "message": "Automatisches Speichern wiederherstellen"
   },
   "rich_content_editor_2708ef21": { "message": "Rich-Content-Editor" },
+  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+    "message": "Rich-Text-Bereich. Drücken Sie <Alt>+0, um Tastaturkürzel im Rich-Content-Editor anzuzeigen."
+  },
   "right_to_left_9cfb092a": { "message": "Von rechts nach links" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Leider ist der Pretty HTML-Editor nicht über die Tastatur zugänglich. Den Editor für reines HTML finden Sie hier."

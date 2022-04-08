@@ -121,6 +121,10 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Crebachu i guddio { types }"
   },
+  "color_picker_6b359edf": { "message": "Dewisydd Lliw" },
+  "color_picker_colorname_selected_ad4cf400": {
+    "message": "Dewisydd Lliw ({ colorName } wedi’i ddewis)"
+  },
   "computer_1d7dfa6f": { "message": "Cyfrifiadur" },
   "content_1440204b": { "message": "Cynnwys" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -195,6 +199,7 @@ const locale = {
   "edit_existing_button_icon_3d0277bd": {
     "message": "Golygu Botwm / Eicon Cyfredol"
   },
+  "edit_icon_2c6b0e91": { "message": "Golygu Eicon" },
   "edit_link_7f53bebb": { "message": "Golygu Dolen" },
   "editor_statusbar_26ac81fc": { "message": "Bar Statws Golygydd" },
   "embed_828fac4a": { "message": "Plannu" },
@@ -326,6 +331,9 @@ const locale = {
   "magenta_4a65993c": { "message": "Magenta" },
   "math_icon_ad4e9d03": { "message": "Eicon Mathemateg" },
   "media_af190855": { "message": "Cyfryngau" },
+  "media_file_is_processing_please_try_again_later_58a6d49": {
+    "message": "Ffeil cyfryngau’n cael ei phrosesu Rhowch gynnig arall arni rywbryd eto."
+  },
   "medium_5a8e9ead": { "message": "Cyfrwng" },
   "middle_27dc1d5": { "message": "Canol" },
   "misc_3b692ea7": { "message": "Amrywiol" },
@@ -418,6 +426,9 @@ const locale = {
   "resize_ec83d538": { "message": "Ailfeintio" },
   "restore_auto_save_deccd84b": { "message": "Adfer cadw’n awtomatig?" },
   "rich_content_editor_2708ef21": { "message": "Golygydd Cynnwys Cyfoethog" },
+  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+    "message": "Ardal Testun Cyfoethog. Pwyswch ALT+0 ar gyfer bysellau cyflym y Golygydd Cynnwys Cyfoethog."
+  },
   "right_to_left_9cfb092a": { "message": "De i’r Chwith" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Yn anffodus, dydy’r golygydd HTML hardd ddim ar gael drwy fysellfwrdd.  Cael mynediad at y golygydd HTML crai yma."

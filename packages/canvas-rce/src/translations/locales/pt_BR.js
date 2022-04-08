@@ -121,6 +121,10 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Recolher para ocultar { types }"
   },
+  "color_picker_6b359edf": { "message": "Selecionador de Cores" },
+  "color_picker_colorname_selected_ad4cf400": {
+    "message": "Seletor de cores ({ colorName } selecionado)"
+  },
   "computer_1d7dfa6f": { "message": "Computador" },
   "content_1440204b": { "message": "Conteúdo" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -195,6 +199,7 @@ const locale = {
   "edit_existing_button_icon_3d0277bd": {
     "message": "Editar botão/ícone existente"
   },
+  "edit_icon_2c6b0e91": { "message": "Editar ícone" },
   "edit_link_7f53bebb": { "message": "Editar link" },
   "editor_statusbar_26ac81fc": { "message": "Barra de status do Editor" },
   "embed_828fac4a": { "message": "Incorporar" },
@@ -326,6 +331,9 @@ const locale = {
   "magenta_4a65993c": { "message": "Magenta" },
   "math_icon_ad4e9d03": { "message": "Ícone de matemática" },
   "media_af190855": { "message": "Mídia" },
+  "media_file_is_processing_please_try_again_later_58a6d49": {
+    "message": "O arquivo de mídia está sendo processado. Por favor, tente novamente mais tarde."
+  },
   "medium_5a8e9ead": { "message": "Média" },
   "middle_27dc1d5": { "message": "Meio" },
   "misc_3b692ea7": { "message": "Diversos" },
@@ -420,6 +428,9 @@ const locale = {
     "message": "Restaurar salvamento automático?"
   },
   "rich_content_editor_2708ef21": { "message": "Editor de conteúdo avançado" },
+  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+    "message": "Área de conteúdo enriquecido. Pressione ALT+0 para atalhos do Rich Content Editor."
+  },
   "right_to_left_9cfb092a": { "message": "Direita à esquerda" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Infelizmente, o lindo editor de HTML não é acessível por teclado. Acesse o editor de HTML bruto aqui."

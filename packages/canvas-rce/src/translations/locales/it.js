@@ -127,6 +127,10 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Riduci per nascondere { types }"
   },
+  "color_picker_6b359edf": { "message": "Selettore colori" },
+  "color_picker_colorname_selected_ad4cf400": {
+    "message": "Selettore colori ({ colorName } selezionato/i)"
+  },
   "computer_1d7dfa6f": { "message": "Computer" },
   "content_1440204b": { "message": "Contenuto" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -201,6 +205,7 @@ const locale = {
   "edit_existing_button_icon_3d0277bd": {
     "message": "Modifica pulsante/icona esistente"
   },
+  "edit_icon_2c6b0e91": { "message": "Icona di modifica" },
   "edit_link_7f53bebb": { "message": "Modifica collegamento" },
   "editor_statusbar_26ac81fc": { "message": "Barra di stato dell’editor" },
   "embed_828fac4a": { "message": "Incorpora" },
@@ -336,6 +341,9 @@ const locale = {
   "magenta_4a65993c": { "message": "Magenta" },
   "math_icon_ad4e9d03": { "message": "Icona Matematica" },
   "media_af190855": { "message": "Elementi multimediali" },
+  "media_file_is_processing_please_try_again_later_58a6d49": {
+    "message": "File multimediale in elaborazione. Riprova in seguito."
+  },
   "medium_5a8e9ead": { "message": "Medio" },
   "middle_27dc1d5": { "message": "Centro" },
   "misc_3b692ea7": { "message": "Varie" },
@@ -430,6 +438,9 @@ const locale = {
     "message": "Ripristinare salvataggio automatico?"
   },
   "rich_content_editor_2708ef21": { "message": "Editor di contenuti avanzati" },
+  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+    "message": "Area di testo RTF. Premere ALT+0 per scorciatoie di Editor di contenuti avanzati."
+  },
   "right_to_left_9cfb092a": { "message": "Da destra a sinistra" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Purtroppo l’editor HTML sicuro non è accessibile dalla tastiera. Accedi qui a editor HTML non elaborato."

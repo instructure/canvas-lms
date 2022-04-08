@@ -126,6 +126,10 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Hinga ki te hunga { types }"
   },
+  "color_picker_6b359edf": { "message": "Kaiwhiri Tae" },
+  "color_picker_colorname_selected_ad4cf400": {
+    "message": "Kaikōwhiri Tae ({ colorName } kua tohua)"
+  },
   "computer_1d7dfa6f": { "message": "Rorohiko" },
   "content_1440204b": { "message": "Ihirangi" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -198,6 +202,7 @@ const locale = {
   "edit_existing_button_icon_3d0277bd": {
     "message": "Whakatika Pātene e Ora ana / Ata"
   },
+  "edit_icon_2c6b0e91": { "message": "Whakatika Ata" },
   "edit_link_7f53bebb": { "message": "Whakatika hononga" },
   "editor_statusbar_26ac81fc": { "message": "Editor Pae tūnga" },
   "embed_828fac4a": { "message": "Whakauru" },
@@ -329,6 +334,9 @@ const locale = {
   "magenta_4a65993c": { "message": "Āhua waiporoporo" },
   "math_icon_ad4e9d03": { "message": "Math Tohu" },
   "media_af190855": { "message": "Pāpāho" },
+  "media_file_is_processing_please_try_again_later_58a6d49": {
+    "message": "Kei te tukatuka te konae pāpāho. Tēnā koa ngana anō i muri mai."
+  },
   "medium_5a8e9ead": { "message": "Kauwaka" },
   "middle_27dc1d5": { "message": "Waenganui" },
   "misc_3b692ea7": { "message": "Misc" },
@@ -417,6 +425,9 @@ const locale = {
   "resize_ec83d538": { "message": "Rahi anō" },
   "restore_auto_save_deccd84b": { "message": "Whakaora tiaki aunoa?" },
   "rich_content_editor_2708ef21": { "message": "Ētita Ihirangi Whai Rawa" },
+  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+    "message": "Horahanga Kupu Taunaki. Pēhia te ALT+0 mo Taonga Ihirangi Etita pokatata."
+  },
   "right_to_left_9cfb092a": { "message": "Matau - ki te - Māui" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "E pouri ana te ataahua HTML kaore i te papa patopato whakauru. Whakauru te mata HTML editor ataahua i konei."

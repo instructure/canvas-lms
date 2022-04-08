@@ -127,6 +127,10 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Réduisez pour masquer { types }"
   },
+  "color_picker_6b359edf": { "message": "Nuancier" },
+  "color_picker_colorname_selected_ad4cf400": {
+    "message": "Nuancier ({ colorName } sélectionné)"
+  },
   "computer_1d7dfa6f": { "message": "Ordinateur" },
   "content_1440204b": { "message": "Contenu" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -203,6 +207,7 @@ const locale = {
   "edit_existing_button_icon_3d0277bd": {
     "message": "Modifier une icône ou un bouton existant"
   },
+  "edit_icon_2c6b0e91": { "message": "Icône d''édition" },
   "edit_link_7f53bebb": { "message": "Modifier lien" },
   "editor_statusbar_26ac81fc": { "message": "Barre d''état de l''éditeur" },
   "embed_828fac4a": { "message": "Intégrer" },
@@ -340,6 +345,9 @@ const locale = {
   "magenta_4a65993c": { "message": "Magenta" },
   "math_icon_ad4e9d03": { "message": "Icône maths" },
   "media_af190855": { "message": "Média" },
+  "media_file_is_processing_please_try_again_later_58a6d49": {
+    "message": "Le fichier multimédia est en cours de traitement. Veuillez réessayer plus tard."
+  },
   "medium_5a8e9ead": { "message": "Moyen" },
   "middle_27dc1d5": { "message": "Milieu" },
   "misc_3b692ea7": { "message": "Divers" },
@@ -434,6 +442,9 @@ const locale = {
     "message": "Restaurer l’enregistrement auto ?"
   },
   "rich_content_editor_2708ef21": { "message": "Éditeur de texte enrichi" },
+  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+    "message": "Zone de texte enrichi Appuyez sur ALT+0 pour obtenir les raccourcis de l''éditeur de contenu enrichi."
+  },
   "right_to_left_9cfb092a": { "message": "De droite à gauche" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "L’éditeur HTML embelli n’est malheureusement pas accessible au clavier. Accédez à l’éditeur HTML brut ici."
