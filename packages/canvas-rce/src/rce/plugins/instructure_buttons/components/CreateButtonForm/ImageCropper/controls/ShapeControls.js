@@ -37,7 +37,7 @@ const SHAPE_OPTIONS = [
 
 export const ShapeControls = ({shape, onChange}) => {
   return (
-    <Flex.Item margin="0 small 0 0">
+    <Flex.Item margin="0 medium 0 0">
       <SimpleSelect
         isInline
         assistiveText={formatMessage('Select crop shape')}

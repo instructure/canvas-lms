@@ -28,8 +28,8 @@ import {Controls} from './controls'
 import {convertFileToBase64} from '../../../svg/utils'
 import {createCroppedImageSvg} from './imageCropUtils'
 
-const handleSubmit = (onSubmit, {image, shape, scaleRatio}) =>
-  createCroppedImageSvg({imageSrc: image, shape, scaleRatio})
+const handleSubmit = (onSubmit, settings) =>
+  createCroppedImageSvg(settings)
     .then(generatedSvg =>
       convertFileToBase64(new Blob([generatedSvg.outerHTML], {type: 'image/svg+xml'}))
     )

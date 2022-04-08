@@ -86,6 +86,7 @@
     "@instructure/ui-media-player": "7",
     "@instructure/ui-modal": "7",
     "@instructure/ui-motion": "7",
+    "@instructure/ui-number-input": "^7",
     "@instructure/ui-overlays": "7",
     "@instructure/ui-pagination": "7",
     "@instructure/ui-popover": "7",

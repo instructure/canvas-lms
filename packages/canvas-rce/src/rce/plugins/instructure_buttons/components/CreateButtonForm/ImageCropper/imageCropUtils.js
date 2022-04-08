@@ -22,8 +22,9 @@ import {createSvgElement} from './svg/utils'
 
 const CLIP_PATH_ID = 'clip-path-for-cropped-image'
 
-export async function createCroppedImageSvg({imageSrc, shape, scaleRatio}) {
-  const {imageWidth, imageHeight} = await fetchImageMetadata(imageSrc)
+export async function createCroppedImageSvg(settings) {
+  const {image, shape} = settings
+  const {imageWidth, imageHeight} = await fetchImageMetadata(image)
 
   const squareDimension = imageHeight
   const rootElement = createSvgElement('svg', {
@@ -36,9 +37,8 @@ export async function createCroppedImageSvg({imageSrc, shape, scaleRatio}) {
   const mainGroup = createMainSvgGroup({
     imageWidth,
     imageHeight,
-    imageSrc,
     squareDimension,
-    scaleRatio
+    settings
   })
 
   rootElement.appendChild(defs)
@@ -67,21 +67,21 @@ const createDefsElement = ({shape, squareDimension}) => {
   return defs
 }
 
-const createMainSvgGroup = ({imageWidth, imageHeight, imageSrc, squareDimension, scaleRatio}) => {
+const createMainSvgGroup = ({imageWidth, imageHeight, squareDimension, settings}) => {
   const mainGroup = createSvgElement('g', {
     'clip-path': `url(#${CLIP_PATH_ID})`
   })
   const imageElement = createSvgElement('image', {
     width: imageWidth,
     height: imageHeight,
-    href: imageSrc
+    href: settings.image
   })
   setTransformAttribute({
     imageElement,
     imageWidth,
     imageHeight,
     squareDimension,
-    scaleRatio: scaleRatio || 1.0
+    settings
   })
   mainGroup.appendChild(imageElement)
   return mainGroup
@@ -92,12 +92,19 @@ export const setTransformAttribute = ({
   imageWidth,
   imageHeight,
   squareDimension,
-  scaleRatio
+  settings
 }) => {
-  const x = round(-((scaleRatio * imageWidth) / 2) + squareDimension / 2, 2)
-  const y = round(-((scaleRatio * imageHeight) / 2) + squareDimension / 2, 2)
+  const {rotation = 0, scaleRatio = 1.0} = settings
+  const horizontalCenter = (scaleRatio * imageWidth) / 2
+  const verticalCenter = (scaleRatio * imageHeight) / 2
+  const x = round(-horizontalCenter + squareDimension / 2, 2)
+  const y = round(-verticalCenter + squareDimension / 2, 2)
   let value = `translate(${x}, ${y})`
-  if (scaleRatio > 1.0) {
+  if (rotation !== 0) {
+    // Rotates image using its center as pivot
+    value += ` rotate(${rotation}, ${horizontalCenter}, ${verticalCenter})`
+  }
+  if (scaleRatio !== 1.0) {
     value += ` scale(${scaleRatio})`
   }
   imageElement.setAttribute('transform', value)

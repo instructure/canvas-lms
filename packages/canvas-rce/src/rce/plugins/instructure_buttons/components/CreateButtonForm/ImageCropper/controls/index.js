@@ -20,14 +20,19 @@ import React from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {actions} from '../../../../reducers/imageCropper'
 import {ZoomControls} from './ZoomControls'
+import {RotationControls} from './RotationControls'
 import {ShapeControls} from './ShapeControls'
 
 export const Controls = ({settings, dispatch}) => {
   return (
-    <Flex direction="row" margin="x-small">
+    <Flex direction="row" margin="x-small" alignItems="start">
       <ShapeControls
         shape={settings.shape}
         onChange={shape => dispatch({type: actions.SET_SHAPE, payload: shape})}
+      />
+      <RotationControls
+        rotation={settings.rotation}
+        onChange={rotation => dispatch({type: actions.SET_ROTATION, payload: rotation})}
       />
       <ZoomControls
         scaleRatio={settings.scaleRatio}
