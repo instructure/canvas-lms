@@ -100,7 +100,7 @@ QUnit.module('Gradebook > DataLoader > StudentIdsLoader', suiteHooks => {
         strictEqual(requests.length, 0)
       })
 
-      test('stores the loaded student ids in the gradebook', async () => {
+      QUnit.skip('stores the loaded student ids in the gradebook', async () => {
         await loadStudentIds()
         const loadedStudentIds = gradebook.courseContent.students.listStudentIds()
         deepEqual(loadedStudentIds, exampleData.studentIds)
