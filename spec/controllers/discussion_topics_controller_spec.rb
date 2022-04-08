@@ -2283,5 +2283,23 @@ describe DiscussionTopicsController do
       assert_unauthorized
       expect(InstStatsd::Statsd).not_to have_received(:count).with("discussion_topic.visit.entries.legacy", 0)
     end
+
+    it "count discussion_topic.visit.pages.legacy" do
+      @course.disable_feature! :react_discussions_post
+
+      course_topic
+      user_session @teacher
+      get "show", params: { course_id: @course.id, id: @topic.id }
+      expect(InstStatsd::Statsd).to have_received(:count).with("discussion_topic.visit.pages.legacy", 0).at_least(:once)
+    end
+
+    it "does not count discussion_topic.visit.pages.legacy with unauthorized visit" do
+      @course.disable_feature! :react_discussions_post
+
+      course_topic
+      get "show", params: { course_id: @course.id, id: @topic.id }
+      assert_unauthorized
+      expect(InstStatsd::Statsd).not_to have_received(:count).with("discussion_topic.visit.pages.legacy", 0)
+    end
   end
 end
