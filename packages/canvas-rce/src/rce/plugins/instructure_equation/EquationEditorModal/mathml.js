@@ -149,6 +149,11 @@ const mathml = {
         return true
       }
     }
+
+    if (ENV?.FEATURES?.new_equation_editor) {
+      return elem?.getAttribute('data-testid') === 'mathml-preview-element'
+    }
+
     const mathElements = elem.getElementsByTagName('math')
     for (let i = 0; i < mathElements.length; i++) {
       const $el = $(mathElements[i])
@@ -206,8 +211,12 @@ const mathml = {
     return !!window.MathJax?.Hub
   },
 
+  shouldProcess(elem) {
+    return this.isMathInElement(elem) && !this.isMathJaxIgnored(elem)
+  },
+
   processNewMathInElem(elem) {
-    if (this.isMathInElement(elem) && !this.isMathJaxIgnored(elem)) {
+    if (this.shouldProcess(elem)) {
       if (this.isMathJaxLoaded()) {
         this.reloadElement(elem)
       } else {
