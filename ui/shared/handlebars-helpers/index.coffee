@@ -132,6 +132,10 @@ Handlebars.registerHelper name, fn for name, fn of {
   datetimeFormatted : (datetime) ->
     $.datetimeString(datetime)
 
+  datetimeFormattedWithTz: (datetime) ->
+    date = tz.parse(datetime)
+    tz.format(date, 'date.formats.full')
+
   # Strips the time information from the datetime and accounts for the user's
   # timezone preference. expects: anything tz() can handle
   dateString : (datetime) ->
