@@ -266,6 +266,12 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Piilota kutistamalla { types }"
     },
+    "color_picker_6b359edf": {
+        "message": "Värivalitsin"
+    },
+    "color_picker_colorname_selected_ad4cf400": {
+        "message": "Värivalitsin ({ colorName } valittu)"
+    },
     "computer_1d7dfa6f": {
         "message": "Tietokone"
     },
@@ -481,6 +487,9 @@
     },
     "edit_existing_button_icon_3d0277bd": {
         "message": "Muokkaa olemassa olevaa painiketta/kuvaketta"
+    },
+    "edit_icon_2c6b0e91": {
+        "message": "Muokkaa kuvaketta"
     },
     "edit_link_7f53bebb": {
         "message": "Muokkaa linkkiä"
@@ -914,6 +923,9 @@
     "media_af190855": {
         "message": "Tietoväline"
     },
+    "media_file_is_processing_please_try_again_later_58a6d49": {
+        "message": "Yritä myöhemmin uudelleen. Yritä myöhemmin uudelleen."
+    },
     "medium_5a8e9ead": {
         "message": "Tietoväline"
     },
@@ -1204,6 +1216,9 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Rikas sisältöeditori"
+    },
+    "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+        "message": "Monipuolisen tekstieditorin sisältökenttä Paina ALT+0, jos haluat nähdä tekstimuotoilueditorin pikakuvakkeita."
     },
     "right_to_left_9cfb092a": {
         "message": "Oikealta-Vasemmalle"

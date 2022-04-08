@@ -177,7 +177,7 @@
         "message": "Debajo"
     },
     "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
-        "message": "A continuación se muestra un ejemplo de cómo verán los alumnos su cronograma."
+        "message": "A continuación se muestra un ejemplo de cómo verán los estudiantes su cronograma."
     },
     "black_4cb01371": {
         "message": "Negro"
@@ -265,6 +265,12 @@
     },
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Colapsar para ocultar { types }"
+    },
+    "color_picker_6b359edf": {
+        "message": "Selector de color"
+    },
+    "color_picker_colorname_selected_ad4cf400": {
+        "message": "Selector de color ({ colorName } seleccionado)"
     },
     "computer_1d7dfa6f": {
         "message": "Ordenador"
@@ -481,6 +487,9 @@
     },
     "edit_existing_button_icon_3d0277bd": {
         "message": "Editar Botón Existente/Icono"
+    },
+    "edit_icon_2c6b0e91": {
+        "message": "Icono de editar"
     },
     "edit_link_7f53bebb": {
         "message": "Editar enlace"
@@ -914,6 +923,9 @@
     "media_af190855": {
         "message": "Contenido multimedia"
     },
+    "media_file_is_processing_please_try_again_later_58a6d49": {
+        "message": "Archivo multimedia en proceso. Inténtalo de nuevo más tarde."
+    },
     "medium_5a8e9ead": {
         "message": "Regular"
     },
@@ -1204,6 +1216,9 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Editor de contenido enriquecido"
+    },
+    "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+        "message": "Área del texto enriquecido. Pulsa Alt+0 para ver los atajos del teclado del editor de contenido enriquecido."
     },
     "right_to_left_9cfb092a": {
         "message": "Derecha a izquierda"

@@ -266,6 +266,12 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Colapsar para ocultar { types }"
     },
+    "color_picker_6b359edf": {
+        "message": "Selector de color"
+    },
+    "color_picker_colorname_selected_ad4cf400": {
+        "message": "Selector de color ({ colorName } seleccionado)"
+    },
     "computer_1d7dfa6f": {
         "message": "Computadora"
     },
@@ -481,6 +487,9 @@
     },
     "edit_existing_button_icon_3d0277bd": {
         "message": "Editar botón / ícono existente"
+    },
+    "edit_icon_2c6b0e91": {
+        "message": "Editar ícono"
     },
     "edit_link_7f53bebb": {
         "message": "Editar enlace"
@@ -914,6 +923,9 @@
     "media_af190855": {
         "message": "Multimedia"
     },
+    "media_file_is_processing_please_try_again_later_58a6d49": {
+        "message": "El archivo multimedia se está procesando. Inténtelo de nuevo más tarde."
+    },
     "medium_5a8e9ead": {
         "message": "Regular"
     },
@@ -1204,6 +1216,9 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Editor de Contenido Enriquecido"
+    },
+    "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+        "message": "Área del texto enriquecido. Presione ALT+0 para acceder a los atajos del Editor de contenido enriquecido."
     },
     "right_to_left_9cfb092a": {
         "message": "Derecha a izquierda"

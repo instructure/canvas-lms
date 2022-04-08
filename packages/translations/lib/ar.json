@@ -266,6 +266,12 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "الطي لإخفاء { types }"
     },
+    "color_picker_6b359edf": {
+        "message": "أداة انتقاء اللون"
+    },
+    "color_picker_colorname_selected_ad4cf400": {
+        "message": "أداة انتقاء اللون (تم تحديد { colorName })"
+    },
     "computer_1d7dfa6f": {
         "message": "الكمبيوتر"
     },
@@ -481,6 +487,9 @@
     },
     "edit_existing_button_icon_3d0277bd": {
         "message": "تحرير الزر الحالي / الأيقونة الحالية"
+    },
+    "edit_icon_2c6b0e91": {
+        "message": "تحرير الأيقونة"
     },
     "edit_link_7f53bebb": {
         "message": "تحرير الارتباط"
@@ -914,6 +923,9 @@
     "media_af190855": {
         "message": "الوسائط"
     },
+    "media_file_is_processing_please_try_again_later_58a6d49": {
+        "message": "جارٍ معالجة ملف الوسائط. الرجاء إعادة المحاولة لاحقًا."
+    },
     "medium_5a8e9ead": {
         "message": "متوسط"
     },
@@ -1204,6 +1216,9 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "محرر محتوى"
+    },
+    "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+        "message": "مساحة النص المنسق اضغط على ALT+0 لاختصارات محرر المحتوى المنسق."
     },
     "right_to_left_9cfb092a": {
         "message": "من اليمين إلى اليسار"

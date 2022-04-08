@@ -266,6 +266,12 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Minimera för att dölja { types }"
     },
+    "color_picker_6b359edf": {
+        "message": "Färgväljaren"
+    },
+    "color_picker_colorname_selected_ad4cf400": {
+        "message": "Färgväljaren ({ colorName } valda)"
+    },
     "computer_1d7dfa6f": {
         "message": "Dator"
     },
@@ -481,6 +487,9 @@
     },
     "edit_existing_button_icon_3d0277bd": {
         "message": "Redigera befintlig knapp/ikon"
+    },
+    "edit_icon_2c6b0e91": {
+        "message": "Redigera ikon"
     },
     "edit_link_7f53bebb": {
         "message": "Redigera länk"
@@ -914,6 +923,9 @@
     "media_af190855": {
         "message": "Media"
     },
+    "media_file_is_processing_please_try_again_later_58a6d49": {
+        "message": "Mediefilen behandlas. Försök igen senare."
+    },
     "medium_5a8e9ead": {
         "message": "Medium"
     },
@@ -1204,6 +1216,9 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Redigerare för formaterat innehåll"
+    },
+    "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+        "message": "RTF-område. Tryck ned ALT+0 för att visa genvägar i innehållsredigeraren."
     },
     "right_to_left_9cfb092a": {
         "message": "Höger-till-vänster"

@@ -266,6 +266,12 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Thu gọn để ẩn { types }"
     },
+    "color_picker_6b359edf": {
+        "message": "Trình Chọn Màu"
+    },
+    "color_picker_colorname_selected_ad4cf400": {
+        "message": "Trình Chọn Màu (đã chọn { colorName })"
+    },
     "computer_1d7dfa6f": {
         "message": "Máy Tính"
     },
@@ -481,6 +487,9 @@
     },
     "edit_existing_button_icon_3d0277bd": {
         "message": "Chỉnh Sửa Nút / Biểu Tượng Thoát "
+    },
+    "edit_icon_2c6b0e91": {
+        "message": "Biểu Tượng Chỉnh Sửa"
     },
     "edit_link_7f53bebb": {
         "message": "Chỉnh Sửa Liên Kết"
@@ -914,6 +923,9 @@
     "media_af190855": {
         "message": "Phương Tiện"
     },
+    "media_file_is_processing_please_try_again_later_58a6d49": {
+        "message": "Tập tin phương tiện đang xử lý. Vui lòng thử lại sau."
+    },
     "medium_5a8e9ead": {
         "message": "Trung bình"
     },
@@ -1204,6 +1216,9 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Trình Chỉnh Sửa Nội Dung Phong Phú"
+    },
+    "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+        "message": "Khu Vực Văn Bản Phong Phú. Nhấn ALT+0 để dùng các phím tắt của Trình Chỉnh Sửa Nội Dung Phong Phú."
     },
     "right_to_left_9cfb092a": {
         "message": "Phải Sang Trái"
