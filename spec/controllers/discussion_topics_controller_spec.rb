@@ -70,6 +70,17 @@ describe DiscussionTopicsController do
     }.merge(opts)
   end
 
+  def assignment_params(course, opts = {})
+    course.require_assignment_group
+    {
+      assignment: {
+        points_possible: 1,
+        grading_type: "points",
+        assignment_group_id: @course.assignment_groups.first.id,
+      }.merge(opts)
+    }
+  end
+
   describe "GET 'index'" do
     it "requires authorization" do
       get "index", params: { course_id: @course.id }
@@ -1409,17 +1420,6 @@ describe DiscussionTopicsController do
       params
     end
 
-    def assignment_params(course, opts = {})
-      course.require_assignment_group
-      {
-        assignment: {
-          points_possible: 1,
-          grading_type: "points",
-          assignment_group_id: @course.assignment_groups.first.id,
-        }.merge(opts)
-      }
-    end
-
     describe "create_announcements_unlocked preference" do
       before do
         @teacher.create_announcements_unlocked(false)
@@ -2198,6 +2198,19 @@ describe DiscussionTopicsController do
       post "create", params: topic_params(@course, { anonymous_state: "full_anonymity" }), format: :json
       expect(response).to be_successful
       expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.created.full_anonymity")
+    end
+
+    it "increment discussion_topic.created.graded" do
+      user_session @teacher
+      obj_params = topic_params(@course).merge(assignment_params(@course))
+      post "create", params: obj_params, format: :json
+      expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_topic.created.graded").at_least(:once)
+    end
+
+    it "does not increment discussion_topic.created.graded for non graded topics" do
+      user_session @teacher
+      post "create", params: topic_params(@course), format: :json
+      expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.created.graded")
     end
 
     it "increment discussion_topic.visit.redesign" do
