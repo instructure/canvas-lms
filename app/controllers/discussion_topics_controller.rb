@@ -1404,6 +1404,9 @@ class DiscussionTopicsController < ApplicationController
             InstStatsd::Statsd.increment("discussion_topic.created.full_anonymity")
           end
 
+          if params[:assignment]
+            InstStatsd::Statsd.increment("discussion_topic.created.graded")
+          end
         end
 
         if @context.is_a?(Course)
