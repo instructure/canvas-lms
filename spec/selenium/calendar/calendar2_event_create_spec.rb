@@ -248,6 +248,31 @@ describe "calendar2" do
         @event.reload
         expect(@event.all_day).to eq true
       end
+
+      it "can create timed events in calendar" do
+        @date = Time.zone.now.beginning_of_day
+        start_time = "6:30am"
+        end_time = "6:30pm"
+        new_date = @date
+        new_date = if new_date.to_date.mday == "15"
+                     new_date.change({ day: 20 })
+                   else
+                     new_date.change({ day: 15 })
+                   end
+        get "/calendar2"
+        find_middle_day.click
+        replace_content(f("input#calendar_event_title"), "Timed Event")
+        replace_content(f("input#calendar_event_date"), format_date_for_view(new_date, :short))
+        replace_content(f("input[type=text][name= 'start_time']"), start_time)
+        replace_content(f("input[type=text][name= 'end_time']"), end_time)
+        f("button[type=submit]").click
+        wait_for_ajaximations
+        refresh_page
+        f(".fc-content .fc-title").click
+        event_content = fj(".event-details-content:visible")
+        expect(event_content.find_element(:css, ".event-details-timestring").text)
+          .to eq "#{format_date_for_view(new_date, "%b %d")}, #{start_time} - #{end_time}"
+      end
     end
   end
 
