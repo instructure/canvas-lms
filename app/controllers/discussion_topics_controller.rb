@@ -766,6 +766,7 @@ class DiscussionTopicsController < ApplicationController
       unless @locked
         InstStatsd::Statsd.increment("discussion_topic.visit.redesign")
         InstStatsd::Statsd.count("discussion_topic.visit.entries.redesign", @topic.discussion_entries.count)
+        InstStatsd::Statsd.count("discussion_topic.visit.pages.redesign", (@topic.discussion_entries.count / 20).ceil)
       end
 
       js_bundle :discussion_topics_post
