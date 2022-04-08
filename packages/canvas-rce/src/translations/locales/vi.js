@@ -119,6 +119,10 @@ const locale = {
   "closed_captions_subtitles_e6aaa016": { "message": "Phụ Đề" },
   "collaborations_5c56c15f": { "message": "Cộng Tác" },
   "collapse_to_hide_types_1ab46d2e": { "message": "Thu gọn để ẩn { types }" },
+  "color_picker_6b359edf": { "message": "Trình Chọn Màu" },
+  "color_picker_colorname_selected_ad4cf400": {
+    "message": "Trình Chọn Màu (đã chọn { colorName })"
+  },
   "computer_1d7dfa6f": { "message": "Máy Tính" },
   "content_1440204b": { "message": "Nội Dung" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -193,6 +197,7 @@ const locale = {
   "edit_existing_button_icon_3d0277bd": {
     "message": "Chỉnh Sửa Nút / Biểu Tượng Thoát "
   },
+  "edit_icon_2c6b0e91": { "message": "Biểu Tượng Chỉnh Sửa" },
   "edit_link_7f53bebb": { "message": "Chỉnh Sửa Liên Kết" },
   "editor_statusbar_26ac81fc": {
     "message": "Thanh Trạng Thái Trình Chỉnh Sửa"
@@ -326,6 +331,9 @@ const locale = {
   "magenta_4a65993c": { "message": "Hồng Sẫm" },
   "math_icon_ad4e9d03": { "message": "Biểu Tượng Toán" },
   "media_af190855": { "message": "Phương Tiện" },
+  "media_file_is_processing_please_try_again_later_58a6d49": {
+    "message": "Tập tin phương tiện đang xử lý. Vui lòng thử lại sau."
+  },
   "medium_5a8e9ead": { "message": "Trung bình" },
   "middle_27dc1d5": { "message": "Giữa" },
   "misc_3b692ea7": { "message": "Hỗn hợp" },
@@ -419,6 +427,9 @@ const locale = {
   "restore_auto_save_deccd84b": { "message": "Khôi phục tự động lưu?" },
   "rich_content_editor_2708ef21": {
     "message": "Trình Chỉnh Sửa Nội Dung Phong Phú"
+  },
+  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+    "message": "Khu Vực Văn Bản Phong Phú. Nhấn ALT+0 để dùng các phím tắt của Trình Chỉnh Sửa Nội Dung Phong Phú."
   },
   "right_to_left_9cfb092a": { "message": "Phải Sang Trái" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {

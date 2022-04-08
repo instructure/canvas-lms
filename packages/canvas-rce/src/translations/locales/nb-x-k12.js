@@ -115,6 +115,10 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Kollaps for å skjule { types }"
   },
+  "color_picker_6b359edf": { "message": "Fargevelger" },
+  "color_picker_colorname_selected_ad4cf400": {
+    "message": "Fargevelger ({ colorName } valgt)"
+  },
   "computer_1d7dfa6f": { "message": "Datamaskin" },
   "content_1440204b": { "message": "Innhold" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -187,6 +191,7 @@ const locale = {
   "edit_existing_button_icon_3d0277bd": {
     "message": "Rediger eksisterende knapp/ikon"
   },
+  "edit_icon_2c6b0e91": { "message": "Rediger ikon" },
   "edit_link_7f53bebb": { "message": "Rediger lenke" },
   "editor_statusbar_26ac81fc": { "message": "Redigering Statusbar" },
   "embed_828fac4a": { "message": "Innebygd" },
@@ -314,6 +319,9 @@ const locale = {
   "magenta_4a65993c": { "message": "Magenta" },
   "math_icon_ad4e9d03": { "message": "Matte-ikon" },
   "media_af190855": { "message": "Medie" },
+  "media_file_is_processing_please_try_again_later_58a6d49": {
+    "message": "Mediefilen behandles. Prøv igjen senere."
+  },
   "medium_5a8e9ead": { "message": "Medium" },
   "middle_27dc1d5": { "message": "Midten" },
   "misc_3b692ea7": { "message": "Diverse" },
@@ -406,6 +414,9 @@ const locale = {
     "message": "Gjenopprette automatisk lagring?"
   },
   "rich_content_editor_2708ef21": { "message": "Rich teksteditor" },
+  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+    "message": "Rikt tekstområde Trykk Alt+0 for Rich teksteditor-snarveier."
+  },
   "right_to_left_9cfb092a": { "message": "Høyre-til-venstre" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Dessverre er Elegante HTML-redigering ikke tilgjengelig med tastaturet. Få tilgang til rå HTML-redigering her."

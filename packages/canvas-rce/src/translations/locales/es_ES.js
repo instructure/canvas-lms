@@ -127,6 +127,10 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Colapsar para ocultar { types }"
   },
+  "color_picker_6b359edf": { "message": "Selector de color" },
+  "color_picker_colorname_selected_ad4cf400": {
+    "message": "Selector de color ({ colorName } seleccionado)"
+  },
   "computer_1d7dfa6f": { "message": "Ordenador" },
   "content_1440204b": { "message": "Contenido" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -205,6 +209,7 @@ const locale = {
   "edit_existing_button_icon_3d0277bd": {
     "message": "Editar Botón Existente/Icono"
   },
+  "edit_icon_2c6b0e91": { "message": "Icono de editar" },
   "edit_link_7f53bebb": { "message": "Editar enlace" },
   "editor_statusbar_26ac81fc": { "message": "Barra de estado del editor" },
   "embed_828fac4a": { "message": "Insertar" },
@@ -336,6 +341,9 @@ const locale = {
   "magenta_4a65993c": { "message": "Magenta" },
   "math_icon_ad4e9d03": { "message": "Icono matemáticas" },
   "media_af190855": { "message": "Contenido multimedia" },
+  "media_file_is_processing_please_try_again_later_58a6d49": {
+    "message": "Archivo multimedia en proceso. Inténtalo de nuevo más tarde."
+  },
   "medium_5a8e9ead": { "message": "Regular" },
   "middle_27dc1d5": { "message": "El medio" },
   "misc_3b692ea7": { "message": "Varios" },
@@ -431,6 +439,9 @@ const locale = {
   },
   "rich_content_editor_2708ef21": {
     "message": "Editor de contenido enriquecido"
+  },
+  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+    "message": "Área del texto enriquecido. Pulsa Alt+0 para ver los atajos del teclado del editor de contenido enriquecido."
   },
   "right_to_left_9cfb092a": { "message": "Derecha a izquierda" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {

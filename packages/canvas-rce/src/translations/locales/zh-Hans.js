@@ -105,6 +105,10 @@ const locale = {
   "closed_captions_subtitles_e6aaa016": { "message": "关闭了字幕/说明" },
   "collaborations_5c56c15f": { "message": "协作" },
   "collapse_to_hide_types_1ab46d2e": { "message": "折叠以隐藏 { types }" },
+  "color_picker_6b359edf": { "message": "颜色选取器" },
+  "color_picker_colorname_selected_ad4cf400": {
+    "message": "颜色选取器（已选择 { colorName }）"
+  },
   "computer_1d7dfa6f": { "message": "计算机" },
   "content_1440204b": { "message": "内容" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -173,6 +177,7 @@ const locale = {
   "edit_c5fbea07": { "message": "编辑" },
   "edit_equation_f5279959": { "message": "编辑等式" },
   "edit_existing_button_icon_3d0277bd": { "message": "编辑现有按钮/图标" },
+  "edit_icon_2c6b0e91": { "message": "编辑图标" },
   "edit_link_7f53bebb": { "message": "编辑链接" },
   "editor_statusbar_26ac81fc": { "message": "编辑器状态栏" },
   "embed_828fac4a": { "message": "嵌入" },
@@ -284,6 +289,9 @@ const locale = {
   "magenta_4a65993c": { "message": "品红色" },
   "math_icon_ad4e9d03": { "message": "数学图标" },
   "media_af190855": { "message": "媒体" },
+  "media_file_is_processing_please_try_again_later_58a6d49": {
+    "message": "媒体文件正在处理中。请稍后再试。"
+  },
   "medium_5a8e9ead": { "message": "中等" },
   "middle_27dc1d5": { "message": "中间" },
   "misc_3b692ea7": { "message": "其他" },
@@ -366,6 +374,9 @@ const locale = {
   "resize_ec83d538": { "message": "调整大小" },
   "restore_auto_save_deccd84b": { "message": "是否恢复自动保存？" },
   "rich_content_editor_2708ef21": { "message": "富内容编辑器" },
+  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+    "message": "富文本区域。按 ALT+0 获取富内容编辑器快捷方式。"
+  },
   "right_to_left_9cfb092a": { "message": "从右至左" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "很抱歉，无法通过键盘访问精美 HTML 编辑器。在此处访问原始 HTML 编辑器"

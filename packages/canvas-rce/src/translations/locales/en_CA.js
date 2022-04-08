@@ -112,6 +112,10 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Collapse to hide { types }"
   },
+  "color_picker_6b359edf": { "message": "Color Picker" },
+  "color_picker_colorname_selected_ad4cf400": {
+    "message": "Color Picker ({ colorName } selected)"
+  },
   "computer_1d7dfa6f": { "message": "Computer" },
   "content_1440204b": { "message": "Content" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -184,6 +188,7 @@ const locale = {
   "edit_existing_button_icon_3d0277bd": {
     "message": "Edit Existing Button / Icon"
   },
+  "edit_icon_2c6b0e91": { "message": "Edit Icon" },
   "edit_link_7f53bebb": { "message": "Edit Link" },
   "editor_statusbar_26ac81fc": { "message": "Editor Statusbar" },
   "embed_828fac4a": { "message": "Embed" },
@@ -309,6 +314,9 @@ const locale = {
   "magenta_4a65993c": { "message": "Magenta" },
   "math_icon_ad4e9d03": { "message": "Math Icon" },
   "media_af190855": { "message": "Media" },
+  "media_file_is_processing_please_try_again_later_58a6d49": {
+    "message": "Media file is processing. Please try again later."
+  },
   "medium_5a8e9ead": { "message": "Medium" },
   "middle_27dc1d5": { "message": "Middle" },
   "misc_3b692ea7": { "message": "Misc" },
@@ -399,6 +407,9 @@ const locale = {
   "resize_ec83d538": { "message": "Resize" },
   "restore_auto_save_deccd84b": { "message": "Restore auto-save?" },
   "rich_content_editor_2708ef21": { "message": "Rich Content Editor" },
+  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+    "message": "Rich Text Area. Press ALT+0 for Rich Content Editor shortcuts."
+  },
   "right_to_left_9cfb092a": { "message": "Right-to-Left" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Sadly, the pretty HTML editor is not keyboard accessible. Access the raw HTML editor here."
