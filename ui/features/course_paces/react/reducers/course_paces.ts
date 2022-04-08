@@ -210,7 +210,7 @@ export const getCoursePaceItemChanges = createDeepEqualSelector(
   }
 )
 
-export const getUnpublishedChangeCount = createSelector(
+export const getUnpublishedChangeCount = createDeepEqualSelector(
   getSettingChanges,
   getCoursePaceItemChanges,
   (settingChanges, coursePaceItemChanges) => settingChanges.length + coursePaceItemChanges.length

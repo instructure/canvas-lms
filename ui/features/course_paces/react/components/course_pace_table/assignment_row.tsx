@@ -42,7 +42,6 @@ import {CoursePaceItem, CoursePace, StoreState} from '../../types'
 import {BlackoutDate} from '../../shared/types'
 import {
   getCoursePace,
-  getDueDate,
   getExcludeWeekends,
   getCoursePaceItemPosition,
   isStudentPace
@@ -63,11 +62,11 @@ interface PassedProps {
   readonly hover: boolean
   readonly isStacked: boolean
   readonly coursePaceItem: CoursePaceItem
+  readonly dueDate: string | moment.Moment
 }
 
 interface StoreProps {
   readonly coursePace: CoursePace
-  readonly dueDate: string
   readonly excludeWeekends: boolean
   readonly coursePaceItemPosition: number
   readonly blackoutDates: BlackoutDate[]
@@ -283,7 +282,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
           <Text weight="bold">
             <a
               href={this.props.coursePaceItem.assignment_link}
-              style={{color: 'inherit', wordBreak: 'break-word'}}
+              style={{color: 'inherit', overflowWrap: 'anywhere'}}
             >
               {this.props.coursePaceItem.assignment_title}
             </a>
@@ -326,7 +325,9 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
           {(this.props.showProjections || this.props.datesVisible) && (
             <Cell textAlign="center">
               <View data-testid="assignment-due-date" margin={labelMargin}>
-                <span style={{whiteSpace: 'nowrap'}}>{this.renderDate()}</span>
+                <span style={{whiteSpace: this.props.isStacked ? 'normal' : 'nowrap'}}>
+                  {this.renderDate()}
+                </span>
               </View>
             </Cell>
           )}
@@ -344,7 +345,6 @@ const mapStateToProps = (state: StoreState, props: PassedProps): StoreProps => {
 
   return {
     coursePace,
-    dueDate: getDueDate(state, props),
     excludeWeekends: getExcludeWeekends(state),
     coursePaceItemPosition: getCoursePaceItemPosition(state, props),
     blackoutDates: getBlackoutDates(state),
