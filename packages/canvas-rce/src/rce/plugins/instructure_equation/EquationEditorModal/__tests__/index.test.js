@@ -54,14 +54,27 @@ const editInAdvancedMode = text => {
   fireEvent.change(advancedEditor(), {target: {value: text}})
 }
 
-jest.mock('../mathml', () => ({
-  processNewMathInElem: jest.fn()
-}))
+jest.mock('../mathml', () => {
+  const originalModule = jest.requireActual('../mathml').default
+
+  return {
+    ...originalModule,
+    processNewMathInElem: jest.fn()
+  }
+})
 
 describe('EquationEditorModal', () => {
-  let editor, mockFn
+  let editor, mockFn, oldENV
 
   beforeAll(() => {
+    oldENV = window.ENV
+
+    window.ENV = {
+      FEATURES: {
+        new_equation_editor: true
+      }
+    }
+
     HTMLElement.prototype.getValue = jest.fn().mockImplementation(function () {
       if (this.tagName === 'MATH-FIELD') {
         return this.innerHTML
@@ -102,6 +115,10 @@ describe('EquationEditorModal', () => {
 
   afterEach(() => {
     jest.clearAllMocks()
+  })
+
+  afterAll(() => {
+    window.ENV = oldENV
   })
 
   describe('loadExistingFormula', () => {
@@ -486,5 +503,11 @@ describe('EquationEditorModal', () => {
     renderModal({onModalDismiss: mockFn})
     fireEvent.click(screen.getByText('Close'))
     expect(mockFn).toHaveBeenCalled()
+  })
+
+  it('advanced preview is marked as MathJax should process', () => {
+    renderModal()
+    const shouldProcess = mathml.shouldProcess(advancedPreview())
+    expect(shouldProcess).toBe(true)
   })
 })
