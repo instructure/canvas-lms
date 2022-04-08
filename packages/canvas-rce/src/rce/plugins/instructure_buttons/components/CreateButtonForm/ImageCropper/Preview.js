@@ -37,13 +37,22 @@ function replaceSvg(svg, node) {
 
 export const Preview = ({settings, dispatch}) => {
   const shapeRef = useRef(null)
-  const {image, shape, scaleRatio} = settings
+  const {image, shape, rotation, scaleRatio} = settings
   const [tempScaleRatio, onWheelCallback] = useMouseWheel(scaleRatio, dispatch)
 
   useEffect(() => {
     const svg = buildSvg(shape)
     replaceSvg(svg, shapeRef.current)
   })
+
+  let transformValue = ''
+  if (rotation && rotation % 360 !== 0) {
+    transformValue += `rotate(${rotation}deg)`
+  }
+  if (tempScaleRatio !== 1.0) {
+    const scale = `scale(${tempScaleRatio})`
+    transformValue += transformValue ? ' ' + scale : scale
+  }
 
   return (
     <div
@@ -68,7 +77,7 @@ export const Preview = ({settings, dispatch}) => {
           width: '100%',
           objectFit: 'contain',
           textAlign: 'center',
-          transform: `scale(${tempScaleRatio})`
+          transform: transformValue
         }}
       />
       <div
