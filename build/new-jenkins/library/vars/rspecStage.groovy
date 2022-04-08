@@ -157,7 +157,7 @@ def tearDownNode(prefix) {
 
 def runRspecqSuite() {
   try {
-    if (env.AUTO_CANCELLED.split(',').contains("${env.CI_NODE_INDEX}")) {
+    if (env.AUTO_CANCELLED && env.AUTO_CANCELLED.split(',').contains("${env.CI_NODE_INDEX}")) {
       cancel_node(SUCCESS_NOT_BUILT, 'Node cancelled!')
       return
     }
@@ -169,6 +169,7 @@ def runRspecqSuite() {
                                        -e BUILD_NAME \
                                        -e BUILD_NUMBER \
                                        -e CRYSTALBALL_MAP \
+                                       -e CI_NODE_INDEX \
                                        -e CRYSTAL_BALL_SPECS canvas bash -c \'build/new-jenkins/rspecq-tests.sh\'', label: 'Run RspecQ Tests')
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
     if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {

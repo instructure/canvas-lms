@@ -244,7 +244,7 @@ pipeline {
                     .envVars(['CI_NODE_INDEX=0',
                         "CRYSTAL_BALL_SPECS=${env.CRYSTALBALL_SPEC}",
                         "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}"])
-                    .hooks(postStageHandler + [onNodeAcquired: { rspecStage.setupNode() }, onNodeReleasing: { rspecStage.tearDownNode('rspec') }])
+                    .hooks(postStageHandler + [onNodeReleasing: { rspecStage.tearDownNode('rspec') }])
                     .timeout(30)
                     .queue(rspecqStages) { rspecStage.runRspecqSuite() }
 
