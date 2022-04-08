@@ -1407,6 +1407,10 @@ class DiscussionTopicsController < ApplicationController
           if params[:assignment]
             InstStatsd::Statsd.increment("discussion_topic.created.graded")
           end
+
+          if @context.is_a?(Group)
+            InstStatsd::Statsd.increment("discussion_topic.created.group")
+          end
         end
 
         if @context.is_a?(Course)
