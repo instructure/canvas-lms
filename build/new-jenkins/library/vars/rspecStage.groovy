@@ -98,7 +98,7 @@ def setupNode() {
 }
 
 def tearDownNode(prefix) {
-  if (env.AUTO_CANCELLED.split(',').contains("${env.CI_NODE_INDEX}")) {
+  if (env.AUTO_CANCELLED?.split(',')?.contains("${env.CI_NODE_INDEX}")) {
     cancel_node(SUCCESS_NOT_BUILT, 'Node cancelled!')
     return
   }
@@ -157,7 +157,7 @@ def tearDownNode(prefix) {
 
 def runRspecqSuite() {
   try {
-    if (env.AUTO_CANCELLED && env.AUTO_CANCELLED.split(',').contains("${env.CI_NODE_INDEX}")) {
+    if (env.AUTO_CANCELLED?.split(',')?.contains("${env.CI_NODE_INDEX}")) {
       cancel_node(SUCCESS_NOT_BUILT, 'Node cancelled!')
       return
     }
