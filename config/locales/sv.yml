@@ -61,7 +61,7 @@ sv:
     grade_pass_fail_screenreader: "Omdöme: %{grade}"
     grade_percent: "%{grade}%"
     grade_percent_screenreader: "Omdöme: %{grade}%"
-    incomplete: "Ej fullständig"
+    incomplete: "Inte färdig"
   CollectionView: 
     no_items: "Inga objekt."
   CreateAssignmentView: 
@@ -12839,7 +12839,7 @@ sv:
     out_of_points_possible: "utav %{assignment.points_possible}"
   grading_cell: 
     grade_complete: Färdig
-    grade_incomplete: "Ej fullständig"
+    grade_incomplete: "Inte färdig"
     grade_ungraded: "Ej bedömd"
     out_of: "(utav %{points})"
     out_of_nil: "Inga möjliga poäng"
