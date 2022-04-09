@@ -85,4 +85,24 @@ describe TermsController do
     @term.reload
     expect(@term).to be_deleted
   end
+
+  context "course paces" do
+    before do
+      account_model
+      course_model(account: @account)
+      account_admin_user(account: @account)
+      @course.account.enable_feature!(:course_paces)
+      @course.restrict_enrollments_to_course_dates = false
+      @course.enable_course_paces = true
+      @course.save!
+      @course_pace = course_pace_model(course: @course)
+    end
+
+    it "republishes course paces when the term is updated" do
+      user_session(@user)
+
+      put "update", params: { account_id: @account.id, id: @account.default_enrollment_term.id, enrollment_term: { start_at: 1.day.from_now } }
+      expect(Progress.find_by(context: @course_pace)).to be_queued
+    end
+  end
 end

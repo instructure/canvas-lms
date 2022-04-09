@@ -2985,6 +2985,34 @@ describe CoursesController do
       # if the sync job runs, we'll know because restrict_enrollments_to_course_dates will be synced as true
       expect(subject.reload.restrict_enrollments_to_course_dates).to be_falsey
     end
+
+    context "course paces" do
+      before do
+        @course.account.enable_feature!(:course_paces)
+        @course.enable_course_paces = true
+        @course.restrict_enrollments_to_course_dates = true
+        @course.save!
+        @course_pace = course_pace_model(course: @course)
+      end
+
+      it "republishes course paces when dates have changed" do
+        user_session(@teacher)
+        put "update", params: { id: @course.id, course: { start_at: 1.day.from_now } }
+        expect(Progress.find_by(context: @course_pace)).to be_queued
+        Progress.destroy_all
+        put "update", params: { id: @course.id, course: { conclude_at: 1.year.from_now } }
+        expect(Progress.find_by(context: @course_pace)).to be_queued
+        Progress.destroy_all
+        put "update", params: { id: @course.id, course: { restrict_enrollments_to_course_dates: false } }
+        expect(Progress.find_by(context: @course_pace)).to be_queued
+      end
+
+      it "does not republish course paces when dates have not changed" do
+        user_session(@teacher)
+        put "update", params: { id: @course.id, course: { name: "course paces" } }
+        expect(Progress.find_by(context: @course_pace)).to be_nil
+      end
+    end
   end
 
   describe "POST 'unconclude'" do
