@@ -1527,6 +1527,7 @@ class CoursesController < ApplicationController
                MSFT_SYNC_CAN_BYPASS_COOLDOWN: Account.site_admin.account_users_for(@current_user).present?,
                MSFT_SYNC_MAX_ENROLLMENT_MEMBERS: MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS,
                MSFT_SYNC_MAX_ENROLLMENT_OWNERS: MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_OWNERS,
+               COURSE_PACES_ENABLED: @context.enable_course_paces?
              })
 
       set_tutorial_js_env
@@ -3139,6 +3140,11 @@ class CoursesController < ApplicationController
       end
 
       changes = changed_settings(@course.changes, @course.settings, old_settings)
+
+      # Republish course paces if the course dates have been changed
+      if @course.account.feature_enabled?(:course_paces) && (changes.keys & %w[start_at conclude_at restrict_enrollments_to_course_dates]).present?
+        @course.course_paces.find_each(&:create_publish_progress)
+      end
 
       # RUBY 3.0 - **{} can go away, because data won't implicitly convert to kwargs
       @course.delay_if_production(priority: Delayed::LOW_PRIORITY).touch_content_if_public_visibility_changed(changes, **{})

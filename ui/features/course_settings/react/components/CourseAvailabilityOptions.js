@@ -150,6 +150,14 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
           dangerouslySetInnerHTML={{__html: participationExplanationText()}}
         />
 
+        {ENV.COURSE_PACES_ENABLED && (
+          <Text size="small" weight="light">
+            {I18n.t(
+              'Changing the course participation will republish all course pacing with any new dates.'
+            )}
+          </Text>
+        )}
+
         <>
           <Flex direction="column" display="inline-flex">
             <Flex.Item padding="xx-small">

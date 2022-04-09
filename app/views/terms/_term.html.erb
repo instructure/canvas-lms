@@ -113,6 +113,9 @@
       <td class="edit_term edit_term_buttons">
         <button class="btn button-secondary cancel_button" type="button"><%= t '#buttons.cancel', "Cancel" %></button>
         <button class="btn btn-primary submit_button" type="button"><%= term ? t('buttons.update', "Update Term") : t('buttons.add', "Add Term") %></button>
+        <% if term && term.root_account.feature_enabled?(:course_paces) %>
+          <div><%= t("Changing the course participation will republish all course pacing with any new dates using term participation.") %></div>
+        <% end %>
       </td>
     </tr>
     </table>
