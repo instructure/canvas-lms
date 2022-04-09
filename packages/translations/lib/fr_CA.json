@@ -266,6 +266,12 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Réduire pour masquer { types }"
     },
+    "color_picker_6b359edf": {
+        "message": "Sélecteur de couleur"
+    },
+    "color_picker_colorname_selected_ad4cf400": {
+        "message": "Sélecteur de couleur ({ colorName } sélectionné)"
+    },
     "computer_1d7dfa6f": {
         "message": "Ordinateur"
     },
@@ -481,6 +487,9 @@
     },
     "edit_existing_button_icon_3d0277bd": {
         "message": "Modifier le bouton/icône existant"
+    },
+    "edit_icon_2c6b0e91": {
+        "message": "Modifier l’icône"
     },
     "edit_link_7f53bebb": {
         "message": "Modifier le lien"
@@ -914,6 +923,9 @@
     "media_af190855": {
         "message": "Support média"
     },
+    "media_file_is_processing_please_try_again_later_58a6d49": {
+        "message": "Le fichier multimédia est en cours de traitement. Veuillez essayer de nouveau plus tard."
+    },
     "medium_5a8e9ead": {
         "message": "Moyen"
     },
@@ -1204,6 +1216,9 @@
     },
     "rich_content_editor_2708ef21": {
         "message": "Éditeur de texte enrichi"
+    },
+    "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+        "message": "Zone de texte enrichi. Appuyez sur ALT+0 pour les raccourcis de l’éditeur de texte enrichi."
     },
     "right_to_left_9cfb092a": {
         "message": "Droite-à-gauche"
