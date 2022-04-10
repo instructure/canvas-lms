@@ -1698,6 +1698,7 @@ describe "Users API", type: :request do
                         })
         user = User.find(json["id"])
         json.delete("avatar_url")
+        json.delete("avatar_state")
         expect(json).to eq({
                              "name" => "Tobias Funke",
                              "sortable_name" => "Funke, Tobias",
@@ -1908,6 +1909,21 @@ describe "Users API", type: :request do
                         })
         user = User.find(json["id"])
         expect(user.avatar_image_source).to eql to_set["type"]
+        expect(user.avatar_state).to eql :locked
+      end
+
+      it "is able to set avatar state manually by an admin" do
+        @student.avatar_state = "approved"
+        @student.save!
+
+        json = api_call(:put, @path, @path_options, {
+                          user: {
+                            avatar: {
+                              state: "locked"
+                            }
+                          }
+                        })
+        user = User.find(json["id"])
         expect(user.avatar_state).to eql :locked
       end
 
