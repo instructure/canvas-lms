@@ -186,7 +186,7 @@ describe "help dialog" do
       expect_new_page_load { form.submit }
       f("#global_nav_help_link").click
       wait_for_ajaximations
-      expect(fxpath("//span[img[@alt = 'Cheerful panda holding a map']]//span[contains(text(),'FEATURED LINK')]")).to include_text("FEATURED LINK")
+      expect(fxpath("//span[img[@data-testid = 'cheerful-panda-svg']]//span[contains(text(),'FEATURED LINK')]")).to include_text("FEATURED LINK")
     end
 
     it "has a New Link in the tray" do
