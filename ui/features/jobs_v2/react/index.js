@@ -17,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import React, {useCallback, useReducer, useEffect, useMemo} from 'react'
+import React, {useCallback, useReducer, useEffect, useMemo, useRef} from 'react'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import Paginator from '@canvas/instui-bindings/react/Paginator'
 import JobsHeader from './components/JobsHeader'
@@ -41,6 +41,9 @@ const AUTO_REFRESH_INTERVAL = 5000
 
 export default function JobsIndex() {
   const [state, dispatch] = useReducer(jobsReducer, initialState())
+
+  const jobListRef = useRef()
+  const jobDetailsRef = useRef()
 
   const bucketCaptions = useMemo(() => {
     return {
@@ -171,7 +174,10 @@ export default function JobsIndex() {
         bucket={state.bucket}
         caption={bucketCaptions[state.bucket]}
         sortColumn={state.group_order}
-        onClickGroup={text => dispatch({type: 'CHANGE_GROUP_TEXT', payload: text})}
+        onClickGroup={text => {
+          jobListRef.current?.scrollIntoView()
+          dispatch({type: 'CHANGE_GROUP_TEXT', payload: text})
+        }}
         onClickHeader={col => dispatch({type: 'CHANGE_GROUP_ORDER', payload: col})}
         timeZone={state.time_zone}
       />
@@ -183,7 +189,7 @@ export default function JobsIndex() {
           margin="small"
         />
       ) : null}
-      <Flex alignItems="end">
+      <Flex alignItems="end" elementRef={el => (jobListRef.current = el)}>
         <Flex.Item size="33%">
           <SectionRefreshHeader
             title={I18n.t('Jobs')}
@@ -219,7 +225,10 @@ export default function JobsIndex() {
         jobs={state.jobs}
         caption={bucketCaptions[state.bucket]}
         sortColumn={state.jobs_order}
-        onClickJob={job => dispatch({type: 'SELECT_JOB', payload: job})}
+        onClickJob={job => {
+          jobDetailsRef.current?.scrollIntoView()
+          dispatch({type: 'SELECT_JOB', payload: job})
+        }}
         onClickHeader={col => dispatch({type: 'CHANGE_JOBS_ORDER', payload: col})}
         timeZone={state.time_zone}
       />
@@ -231,7 +240,7 @@ export default function JobsIndex() {
           margin="small"
         />
       ) : null}
-      <Flex alignItems="end">
+      <Flex alignItems="end" elementRef={el => (jobDetailsRef.current = el)}>
         <Flex.Item size="33%">
           <Heading level="h2" margin="x-large 0 small 0">
             {I18n.t('Details')}
