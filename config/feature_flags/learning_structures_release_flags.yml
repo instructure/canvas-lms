@@ -28,10 +28,13 @@ auto_show_cc:
 course_paces:
   state: hidden
   display_name: 'Course Pacing'
-  description: Course Pacing adds support for rolling enrollments to Canvas;
-    allowing magical distribution of due dates for students with different
-    start dates based on an instructor's defined pace. Learn more and give
-    feedback by joining the Course Pacing User Group.
+  description:
+    wrapper: <a href="https://community.canvaslms.com/t5/Course-Pacing-Feature-Preview/gh-p/course_pacing">\1</a>
+    course_paces_description: |-
+      Course Pacing adds support for rolling enrollments to Canvas;
+      allowing magical distribution of due dates for students with different
+      start dates based on an instructor's defined pace. Learn more and give
+      feedback by joining the *Course Pacing User Group*.
   applies_to: Account
   beta: true
 course_paces_blackout_dates:
