@@ -96,7 +96,8 @@ describe('MessageDetailItem', () => {
       contextName: 'Fake Course 1',
       onReply: jest.fn(),
       onReplyAll: jest.fn(),
-      onDelete: jest.fn()
+      onDelete: jest.fn(),
+      onForward: jest.fn()
     }
 
     const {getByTestId, getByText} = render(<MessageDetailItem {...props} />)
@@ -113,6 +114,10 @@ describe('MessageDetailItem', () => {
     fireEvent.click(moreOptionsButton)
     fireEvent.click(getByText('Delete'))
     expect(props.onDelete).toHaveBeenCalled()
+
+    fireEvent.click(moreOptionsButton)
+    fireEvent.click(getByText('Forward'))
+    expect(props.onForward).toHaveBeenCalled()
   })
 
   describe('Responsive', () => {

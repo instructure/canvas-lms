@@ -124,6 +124,7 @@ export const MessageDetailContainer = props => {
       <MessageDetailHeader
         focusRef={setMessageRef}
         text={props.conversation.subject}
+        onForward={props.onForward}
         onReply={
           isSubmissionCommentsType
             ? () => {
@@ -172,6 +173,7 @@ export const MessageDetailContainer = props => {
                   }
                 : () => handleDeleteConversationMessage(message._id)
             }
+            onForward={() => props.onForward(message)}
           />
         </View>
       ))}
@@ -183,5 +185,6 @@ MessageDetailContainer.propTypes = {
   conversation: Conversation.shape,
   onReply: PropTypes.func,
   onReplyAll: PropTypes.func,
-  onDelete: PropTypes.func
+  onDelete: PropTypes.func,
+  onForward: PropTypes.func
 }

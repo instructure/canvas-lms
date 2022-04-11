@@ -241,7 +241,8 @@ const CanvasInbox = () => {
     setComposeModal(true)
   }
 
-  const onForward = () => {
+  const onForward = ({conversationMessage = null} = {}) => {
+    setSelectedConversationMessage(conversationMessage)
     setIsForward(true)
     setComposeModal(true)
   }
@@ -383,6 +384,7 @@ const CanvasInbox = () => {
                               onReply({conversationMessage, replyAll: true})
                             }
                             onDelete={handleDelete}
+                            onForward={conversationMessage => onForward({conversationMessage})}
                             scope={scope}
                           />
                         </>
