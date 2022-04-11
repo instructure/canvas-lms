@@ -54,6 +54,13 @@ describe('Integrations', () => {
     it('informs the user no integrations are available', () => {
       expect(render(<Integrations />).getByText('No integrations available')).toBeInTheDocument()
     })
+
+    it("doesn't fetch from the API", () => {
+      act(() => {
+        render(<Integrations />)
+      })
+      expect(useFetchApi).not.toHaveBeenCalled()
+    })
   })
 
   describe('Microsoft Sync', () => {
