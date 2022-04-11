@@ -1617,7 +1617,7 @@ sv-x-k12:
     - nov
     - dec
     formats:
-      date_at_time: "%b % -d vid  %k.%M"
+      date_at_time: "%b %-d vid %k.%M"
       default: "%Y-%m-%d"
       full: "%-d %b %Y %k.%M"
       full_with_weekday: "%a den %-d %b %Y %k.%M"
