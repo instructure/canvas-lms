@@ -102,6 +102,18 @@ describe('MessageDetailHeader', () => {
 
       expect(props.onDelete).toHaveBeenCalled()
     })
+
+    it('sends the selected option to the onForward callback function', () => {
+      props.onForward = jest.fn()
+      const {getByRole, getByText} = render(<MessageDetailHeader {...props} />)
+      const moreOptionsButton = getByRole(
+        (role, element) => role === 'button' && element.textContent === 'More options'
+      )
+      fireEvent.click(moreOptionsButton)
+      fireEvent.click(getByText('Forward'))
+
+      expect(props.onForward).toHaveBeenCalled()
+    })
   })
 
   describe('Responsive', () => {

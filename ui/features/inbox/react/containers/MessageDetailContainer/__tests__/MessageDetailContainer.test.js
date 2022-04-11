@@ -71,6 +71,7 @@ describe('MessageDetailContainer', () => {
     onReply = jest.fn(),
     onReplyAll = jest.fn(),
     onDelete = jest.fn(),
+    onForward = jest.fn(),
     overrideProps = {}
   } = {}) =>
     render(
@@ -82,6 +83,7 @@ describe('MessageDetailContainer', () => {
               onReply={onReply}
               onReplyAll={onReplyAll}
               onDelete={onDelete}
+              onForward={onForward}
               {...overrideProps}
             />
           </ConversationContext.Provider>
@@ -129,6 +131,19 @@ describe('MessageDetailContainer', () => {
         const replyButtons = await container.findAllByTestId('message-reply')
         fireEvent.click(replyButtons[1])
         expect(mockOnReply.mock.calls[0][0]._id).toBe(
+          mockConversation.conversationMessagesConnection.nodes[1]._id
+        )
+      })
+
+      it('should forward with correct message', async () => {
+        const mockOnForward = jest.fn()
+        const container = setup({onForward: mockOnForward})
+        await waitForApolloLoading()
+
+        const moreOptionsButtons = await container.findAllByTestId('message-more-options')
+        fireEvent.click(moreOptionsButtons[1])
+        fireEvent.click(container.getByText('Forward'))
+        expect(mockOnForward.mock.calls[0][0]._id).toBe(
           mockConversation.conversationMessagesConnection.nodes[1]._id
         )
       })

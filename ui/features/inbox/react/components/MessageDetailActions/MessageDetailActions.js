@@ -62,7 +62,9 @@ export const MessageDetailActions = ({...props}) => {
         <Menu.Item value="reply-all" onSelect={props.onReplyAll}>
           {I18n.t('Reply All')}
         </Menu.Item>
-        <Menu.Item value="forward">{I18n.t('Forward')}</Menu.Item>
+        <Menu.Item value="forward" onSelect={props.onForward}>
+          {I18n.t('Forward')}
+        </Menu.Item>
         <Menu.Item value="delete" onSelect={props.onDelete} data-testid="message-delete">
           {I18n.t('Delete')}
         </Menu.Item>
@@ -74,5 +76,6 @@ export const MessageDetailActions = ({...props}) => {
 MessageDetailActions.propTypes = {
   onReply: PropTypes.func,
   onReplyAll: PropTypes.func,
-  onDelete: PropTypes.func
+  onDelete: PropTypes.func,
+  onForward: PropTypes.func
 }

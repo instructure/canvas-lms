@@ -100,6 +100,7 @@ export const MessageDetailItem = ({...props}) => {
                   onReply={props.onReply}
                   onReplyAll={props.onReplyAll}
                   onDelete={props.onDelete}
+                  onForward={props.onForward}
                 />
               </Flex.Item>
             )}
@@ -133,7 +134,8 @@ MessageDetailItem.propTypes = {
   contextName: PropTypes.string,
   onReply: PropTypes.func,
   onReplyAll: PropTypes.func,
-  onDelete: PropTypes.func
+  onDelete: PropTypes.func,
+  onForward: PropTypes.func
 }
 
 MessageDetailItem.defaultProps = {

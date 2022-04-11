@@ -97,7 +97,9 @@ export const MessageDetailHeader = ({...props}) => {
                 <Menu.Item value="reply-all" onSelect={() => props.onReplyAll()}>
                   {I18n.t('Reply All')}
                 </Menu.Item>
-                <Menu.Item value="forward">{I18n.t('Forward')}</Menu.Item>
+                <Menu.Item value="forward" onSelect={props.onForward}>
+                  {I18n.t('Forward')}
+                </Menu.Item>
                 <Menu.Item value="star">{I18n.t('Star')}</Menu.Item>
                 <Menu.Item value="delete" onSelect={props.onDelete}>
                   {I18n.t('Delete')}
@@ -117,7 +119,8 @@ MessageDetailHeader.propTypes = {
   onReply: PropTypes.func,
   onReplyAll: PropTypes.func,
   onDelete: PropTypes.func,
-  focusRef: PropTypes.any
+  focusRef: PropTypes.any,
+  onForward: PropTypes.func
 }
 
 MessageDetailHeader.defaultProps = {
