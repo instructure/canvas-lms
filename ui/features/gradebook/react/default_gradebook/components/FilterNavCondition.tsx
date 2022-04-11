@@ -17,7 +17,6 @@
  */
 
 import React, {useRef} from 'react'
-// @ts-ignore
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {SimpleSelect} from '@instructure/ui-simple-select'

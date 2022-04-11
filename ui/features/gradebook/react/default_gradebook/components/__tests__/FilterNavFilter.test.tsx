@@ -41,12 +41,13 @@ const defaultFilter: Filter = {
       type: 'section',
       value: undefined
     }
-  ],
-  is_applied: true
+  ]
 }
 
 const defaultProps: FilterNavFilterProps = {
   filter: defaultFilter,
+  applyConditions: () => ({}),
+  isApplied: false,
   onChange: () => {},
   onDelete: () => {},
   modules: [

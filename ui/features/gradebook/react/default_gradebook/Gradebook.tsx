@@ -41,7 +41,7 @@ import type {
   Course,
   CourseContent,
   EffectiveDueDateAssignmentUserMap,
-  Filter,
+  FilterCondition,
   FilteredContentInfo,
   FlashAlertType,
   GradebookOptions,
@@ -146,24 +146,23 @@ import {
   compareAssignmentDueDates,
   confirmViewUngradedAsZero,
   ensureAssignmentVisibility,
+  findConditionValuesOfType,
   forEachSubmission,
+  getAssignmentColumnId,
+  getAssignmentGroupColumnId,
   getAssignmentGroupPointsPossible,
   getCourseFeaturesFromOptions,
   getCourseFromOptions,
+  getCustomColumnId,
+  getDefaultSettingKeyForColumnType,
   getGradeAsPercent,
   getStudentGradeForColumn,
+  hiddenStudentIdsForAssignment,
   htmlDecode,
   isAdmin,
   onGridKeyDown,
   renderComponent,
-  hiddenStudentIdsForAssignment,
-  getDefaultSettingKeyForColumnType,
-  sectionList,
-  getCustomColumnId,
-  getAssignmentColumnId,
-  getAssignmentGroupColumnId,
-  findAllAppliedFilterValuesOfType,
-  getAllAppliedFilterValues
+  sectionList
 } from './Gradebook.utils'
 import {
   compareAssignmentPointsPossible,
@@ -204,11 +203,11 @@ export function Portal({node, children}) {
 }
 
 type GradebookProps = {
+  appliedFilterConditions: FilterCondition[]
   applyScoreToUngradedModalNode: HTMLElement
   colors: StatusColors
   dispatch: RequestDispatch
   filterNavNode: HTMLElement
-  filters: Filter[]
   flashAlerts: FlashAlertType[]
   flashMessageContainer: HTMLElement
   gradebookEnv: any
@@ -1140,9 +1139,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       return this.getAssignmentGroupToShow() === assignment.assignment_group_id
     }
 
-    const assignmentGroupIds = findAllAppliedFilterValuesOfType(
+    const assignmentGroupIds = findConditionValuesOfType(
       'assignment-group',
-      this.props.filters
+      this.props.appliedFilterConditions
     )
     return (
       assignmentGroupIds.length === 0 || assignmentGroupIds.includes(assignment.assignment_group_id)
@@ -1168,12 +1167,15 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       )
     }
 
-    const moduleIds = findAllAppliedFilterValuesOfType('module', this.props.filters)
+    const moduleIds = findConditionValuesOfType('module', this.props.appliedFilterConditions)
     return moduleIds.length === 0 || intersection(assignment.module_ids, moduleIds).length > 0
   }
 
   filterAssignmentsBySubmissions = (assignment: Assignment) => {
-    const submissionFilters = findAllAppliedFilterValuesOfType('submissions', this.props.filters)
+    const submissionFilters = findConditionValuesOfType(
+      'submissions',
+      this.props.appliedFilterConditions
+    )
 
     if (submissionFilters.length === 0) {
       return true
@@ -1198,7 +1200,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   filterAssignmentByStartDate = (assignment: Assignment) => {
-    const date = findAllAppliedFilterValuesOfType('start-date', this.props.filters)[0]
+    const date = findConditionValuesOfType('start-date', this.props.appliedFilterConditions)[0]
     if (!date) {
       return true
     }
@@ -1209,7 +1211,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   filterAssignmentByEndDate = (assignment: Assignment) => {
-    const date = findAllAppliedFilterValuesOfType('end-date', this.props.filters)[0]
+    const date = findConditionValuesOfType('end-date', this.props.appliedFilterConditions)[0]
     if (!date) {
       return true
     }
@@ -1954,7 +1956,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       if (matches) {
         if (
           assignmentGroupId === undefined ||
-          this.assignments[parseInt(matches[1])]?.assignment_group_id === assignmentGroupId
+          this.assignments[parseInt(matches[1], 10)]?.assignment_group_id === assignmentGroupId
         ) {
           const assignmentId = matches[1]
           acc.push(assignmentId)
@@ -4747,11 +4749,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
 
     const didAppliedFilterValuesChange =
-      getAllAppliedFilterValues(prevProps.filters).join(',') !==
-      getAllAppliedFilterValues(this.props.filters).join(',')
+      prevProps.appliedFilterConditions.map(c => c.value).join(',') !==
+      this.props.appliedFilterConditions.map(c => c.value).join(',')
     if (didAppliedFilterValuesChange) {
-      const prevSectionIds = findAllAppliedFilterValuesOfType('section', prevProps.filters)
-      const sectionIds = findAllAppliedFilterValuesOfType('section', this.props.filters)
+      const prevSectionIds = findConditionValuesOfType('section', prevProps.appliedFilterConditions)
+      const sectionIds = findConditionValuesOfType('section', this.props.appliedFilterConditions)
       if (prevSectionIds[0] !== sectionIds[0]) {
         if (sectionIds.length === 0) {
           this.updateCurrentSection(null)
@@ -4760,11 +4762,14 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         }
       }
 
-      const prevStudentGroupIds = findAllAppliedFilterValuesOfType(
+      const prevStudentGroupIds = findConditionValuesOfType(
         'student-group',
-        prevProps.filters
+        prevProps.appliedFilterConditions
       )
-      const studentGroupIds = findAllAppliedFilterValuesOfType('student-group', this.props.filters)
+      const studentGroupIds = findConditionValuesOfType(
+        'student-group',
+        this.props.appliedFilterConditions
+      )
       if (prevStudentGroupIds[0] !== studentGroupIds[0]) {
         if (studentGroupIds.length === 0 || !studentGroupIds[0]) {
           this.updateCurrentStudentGroup(null)
@@ -4773,13 +4778,13 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         }
       }
 
-      const prevGradingPeriodId = findAllAppliedFilterValuesOfType(
+      const prevGradingPeriodId = findConditionValuesOfType(
         'grading-period',
-        prevProps.filters
+        prevProps.appliedFilterConditions
       )[0]
-      const gradingPeriodId = findAllAppliedFilterValuesOfType(
+      const gradingPeriodId = findConditionValuesOfType(
         'grading-period',
-        this.props.filters
+        this.props.appliedFilterConditions
       )[0]
       if (prevGradingPeriodId !== gradingPeriodId) {
         if (!gradingPeriodId) {
