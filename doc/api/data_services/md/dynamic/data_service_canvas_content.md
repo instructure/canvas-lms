@@ -32,7 +32,11 @@ Content
     "context_type": "Course",
     "context_uuid": "Uc69p8GCYLMYWQJqkyzQGqg1kNMXbmnRl8qdCJge",
     "import_quizzes_next": false,
-    "lti_context_id": "694d2e30346f6a94ad20cea11ce78d19bd849c9c"
+    "lti_context_id": "694d2e30346f6a94ad20cea11ce78d19bd849c9c",
+    "source_course_lti_id": "38ab9de0f0bc8e8e0889432275420de08f0d8380",
+    "destination_course_lti_id": "694d2e30346f6a94ad20cea11ce78d19bd849c9c",
+    "migration_type": "course_copy_importer",
+    "domain": "oxana.instructure.com"
   }
 }
 ```
@@ -50,6 +54,10 @@ Content
 | **context_uuid** | The uuid of the context associated with the content migration. |
 | **import_quizzes_next** | Indicates whether the user requested that the quizzes in the content migration be created in Quizzes.Next (true) or in native Canvas (false). |
 | **lti_context_id** | The lti context id of the context associated with the content migration. |
+| **source_course_lti_id** | The lti context id of the the source course, if applicable. |
+| **destination_course_lti_id** | Alias for lti_context_id. |
+| **migration_type** | The migration type. Examples include: academic_benchmark_importer, angel_exporter, blackboard_exporter, canvas_cartridge_importer, common_cartridge_importer, course_copy_importer, d2l_exporter, master_course_import, moodle_converter, qti_converter, webct_scraper, zip_file_importer, context_external_tool_1234. |
+| **domain** | The default hostname for the Canvas root account. |
 
 
 
