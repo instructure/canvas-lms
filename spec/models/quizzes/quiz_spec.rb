@@ -1383,6 +1383,25 @@ describe Quizzes::Quiz do
       end
     end
 
+    context "time_limit" do
+      it "does not save an invalid time_limit" do
+        quiz = @course.quizzes.create! title: "test quiz"
+        quiz.time_limit = -60
+        expect(quiz.save).to be_falsey
+        expect(quiz.errors["time_limit"]).to be_present
+      end
+
+      it "does not validate time_limit if not changed" do
+        quiz = @course.quizzes.build title: "test quiz", time_limit: -60
+        quiz.workflow_state = "created"
+        expect(quiz.save(validate: false)).to be_truthy  # save without validation
+        quiz.reload
+        expect(quiz.save).to be_truthy
+        expect(quiz.errors).to be_blank
+        expect(quiz.time_limit).to eq(-60)
+      end
+    end
+
     context "workflow_state" do
       it "won't validate unpublishing a quiz if there are already submissions" do
         quiz = @course.quizzes.build title: "test quiz"
