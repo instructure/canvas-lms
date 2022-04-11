@@ -83,18 +83,20 @@ class JobsV2Controller < ApplicationController
   #   when +bucket+ is "failed", +failed_at+ will be considered instead.
   #
   def grouped_info
-    scope = jobs_scope
-            .select("count(*) AS count, #{@group}, #{grouped_info_select}")
-            .where.not(@group => nil)
-            .group(@group)
-            .order(grouped_order_clause(@group))
+    GuardRail.activate(:secondary) do
+      scope = jobs_scope
+              .select("count(*) AS count, #{@group}, #{grouped_info_select}")
+              .where.not(@group => nil)
+              .group(@group)
+              .order(grouped_order_clause(@group))
 
-    # This seems silly, but it forces postgres to use the available indicies.
-    scope = scope.where("locked_by IS NULL OR locked_by IS NOT NULL") if @group == :singleton
+      # This seems silly, but it forces postgres to use the available indicies.
+      scope = scope.where("locked_by IS NULL OR locked_by IS NOT NULL") if @group == :singleton
 
-    tag_info = Api.paginate(scope, self, api_v1_jobs_grouped_info_url)
-    now = Delayed::Job.db_time_now
-    render json: tag_info.map { |row| grouped_info_json(row, @group, base_time: now) }
+      tag_info = Api.paginate(scope, self, api_v1_jobs_grouped_info_url)
+      now = Delayed::Job.db_time_now
+      render json: tag_info.map { |row| grouped_info_json(row, @group, base_time: now) }
+    end
   end
 
   # @{not an}API List jobs
@@ -139,20 +141,22 @@ class JobsV2Controller < ApplicationController
   #   when +bucket+ is "failed", +failed_at+ will be considered instead.
   #
   def list
-    scope = jobs_scope
+    GuardRail.activate(:secondary) do
+      scope = jobs_scope
 
-    %i[tag strand singleton account_id shard_id].each do |filter_param|
-      scope = scope.where(filter_param => params[filter_param]) if params[filter_param].present?
+      %i[tag strand singleton account_id shard_id].each do |filter_param|
+        scope = scope.where(filter_param => params[filter_param]) if params[filter_param].present?
+      end
+
+      # This seems silly, but it forces postgres to use the available indicies.
+      scope = scope.where("locked_by IS NULL OR locked_by IS NOT NULL") if params[:singleton].present?
+      scope = scope.order(list_order_clause)
+
+      jobs = Api.paginate(scope, self, api_v1_jobs_list_url)
+
+      now = Delayed::Job.db_time_now
+      render json: jobs.map { |job| job_json(job, base_time: now) }
     end
-
-    # This seems silly, but it forces postgres to use the available indicies.
-    scope = scope.where("locked_by IS NULL OR locked_by IS NOT NULL") if params[:singleton].present?
-    scope = scope.order(list_order_clause)
-
-    jobs = Api.paginate(scope, self, api_v1_jobs_list_url)
-
-    now = Delayed::Job.db_time_now
-    render json: jobs.map { |job| job_json(job, base_time: now) }
   end
 
   # @{not an}API Find tags or strands via text search
@@ -173,17 +177,19 @@ class JobsV2Controller < ApplicationController
   # @example_response
   #   { "foobar": 3, "foobaz": 1 }
   def search
-    term = params[:term]
-    raise ActionController::BadRequest unless term.present?
+    GuardRail.activate(:secondary) do
+      term = params[:term]
+      raise ActionController::BadRequest unless term.present?
 
-    result = jobs_scope
-             .where(ActiveRecord::Base.wildcard(@group, term))
-             .group(@group)
-             .order({ count_id: :DESC }, @group)
-             .limit(SEARCH_LIMIT)
-             .count(:id)
+      result = jobs_scope
+               .where(ActiveRecord::Base.wildcard(@group, term))
+               .group(@group)
+               .order({ count_id: :DESC }, @group)
+               .limit(SEARCH_LIMIT)
+               .count(:id)
 
-    render json: result
+      render json: result
+    end
   end
 
   # @{not an}API Lookup job by id or original_job_id
@@ -201,15 +207,17 @@ class JobsV2Controller < ApplicationController
   #     curl https://<canvas>/api/v1/jobs2/123 \
   #          -H 'Authorization: Bearer <token>'
   def lookup
-    id = params[:id]
-    raise ActionController::BadRequest unless id.present?
+    GuardRail.activate(:secondary) do
+      id = params[:id]
+      raise ActionController::BadRequest unless id.present?
 
-    jobs = Delayed::Job.where(id: id).to_a
-    jobs.concat Delayed::Job::Failed.where(id: id).or(
-      Delayed::Job::Failed.where(original_job_id: id)
-    ).order(:id).to_a
+      jobs = Delayed::Job.where(id: id).to_a
+      jobs.concat Delayed::Job::Failed.where(id: id).or(
+        Delayed::Job::Failed.where(original_job_id: id)
+      ).order(:id).to_a
 
-    render json: jobs.map { |job| job_json(job) }
+      render json: jobs.map { |job| job_json(job) }
+    end
   end
 
   protected
