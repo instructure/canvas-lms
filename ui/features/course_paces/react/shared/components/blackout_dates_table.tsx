@@ -22,6 +22,7 @@ import {IconButton} from '@instructure/ui-buttons'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
+import {TruncateText} from '@instructure/ui-truncate-text'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {BlackoutDate} from '../types'
 import {coursePaceDateFormatter} from '../api/backend_serializer'
@@ -96,7 +97,9 @@ export class BlackoutDatesTable extends React.Component<ComponentProps, LocalSta
     }
     return dates.map(bd => (
       <Row key={`blackout-date-${bd.id}`}>
-        <Cell>{bd.event_title}</Cell>
+        <Cell>
+          <TruncateText maxLines="auto">{bd.event_title}</TruncateText>
+        </Cell>
         <Cell>{this.dateFormatter(bd.start_date.toDate())}</Cell>
         <Cell>{this.dateFormatter(bd.end_date.toDate())}</Cell>
         <Cell textAlign="end">{this.renderTrash(bd)}</Cell>
@@ -121,14 +124,15 @@ export class BlackoutDatesTable extends React.Component<ComponentProps, LocalSta
 
   render() {
     return (
-      <Table caption="Blackout Dates" data-testid="blackout_dates_table">
+      <Table caption="Blackout Dates" layout="fixed" data-testid="blackout_dates_table">
         <Head>
           <Row>
-            <ColHeader id="blackout-dates-title">Event Title</ColHeader>
-            <ColHeader id="blackout-dates-start-date">Start Date</ColHeader>
-            <ColHeader id="blackout-dates-end-date">End Date</ColHeader>
+            <ColHeader id="blackout-dates-title">{I18n.t('Event Title')}</ColHeader>
+            <ColHeader id="blackout-dates-start-date">{I18n.t('Start Date')}</ColHeader>
+            <ColHeader id="blackout-dates-end-date">{I18n.t('End Date')}</ColHeader>
+
             <ColHeader id="blackout-dates-actions" width="4rem">
-              <ScreenReaderContent>Actions</ScreenReaderContent>
+              <ScreenReaderContent>{I18n.t('Actions')}</ScreenReaderContent>
             </ColHeader>
           </Row>
         </Head>

@@ -165,8 +165,8 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
   render() {
     return (
       <div data-testid="new_blackout_dates_form">
-        <Flex alignItems="start" justifyItems="space-between" wrap="wrap" margin="0 0 large">
-          <FlexItem>
+        <Flex alignItems="end" justifyItems="start" wrap="wrap">
+          <FlexItem margin="0 small small 0">
             <TextInput
               renderLabel="Event Title"
               placeholder="e.g., Winter Break"
@@ -178,33 +178,37 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
             />
           </FlexItem>
           <FlexItem>
-            <CanvasDateInput
-              key={`start-${this.state.key}`}
-              renderLabel={I18n.t('Start Date')}
-              timezone={coursePaceTimezone}
-              formatDate={formatDate}
-              onSelectedDateChange={this.onChangeStartDate}
-              onBlur={this.onBlurDate}
-              selectedDate={this.state.startDate}
-              width="140px"
-              messages={this.state.startMessages}
-              withRunningValue
-            />
+            <Flex alignItems="end" justifyItems="space-between" wrap="wrap">
+              <FlexItem margin="0 small small 0">
+                <CanvasDateInput
+                  key={`start-${this.state.key}`}
+                  renderLabel={I18n.t('Start Date')}
+                  timezone={coursePaceTimezone}
+                  formatDate={formatDate}
+                  onSelectedDateChange={this.onChangeStartDate}
+                  onBlur={this.onBlurDate}
+                  selectedDate={this.state.startDate}
+                  width="140px"
+                  messages={this.state.startMessages}
+                  withRunningValue
+                />
+              </FlexItem>
+              <FlexItem margin="0 small small 0">
+                <CanvasDateInput
+                  key={`end-${this.state.key}`}
+                  renderLabel={I18n.t('End Date')}
+                  timezone={coursePaceTimezone}
+                  formatDate={formatDate}
+                  onSelectedDateChange={this.onChangeEndDate}
+                  onBlur={this.onBlurDate}
+                  width="140px"
+                  messages={this.state.endMessages}
+                  withRunningValue
+                />
+              </FlexItem>
+            </Flex>
           </FlexItem>
-          <FlexItem>
-            <CanvasDateInput
-              key={`end-${this.state.key}`}
-              renderLabel={I18n.t('End Date')}
-              timezone={coursePaceTimezone}
-              formatDate={formatDate}
-              onSelectedDateChange={this.onChangeEndDate}
-              onBlur={this.onBlurDate}
-              width="140px"
-              messages={this.state.endMessages}
-              withRunningValue
-            />
-          </FlexItem>
-          <div style={{marginTop: 'calc(1.75rem + 2px)'}}>
+          <FlexItem margin="0 0 small">
             <Tooltip
               renderTip={this.disabledAdd() && NewBlackoutDatesForm.missingInput}
               on={this.disabledAdd() ? ['hover', 'focus', 'click'] : []}
@@ -218,7 +222,7 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
                 Add
               </Button>
             </Tooltip>
-          </div>
+          </FlexItem>
         </Flex>
       </div>
     )
