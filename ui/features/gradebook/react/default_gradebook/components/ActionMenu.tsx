@@ -26,7 +26,6 @@ import GradebookExportManager from '../../shared/GradebookExportManager'
 import PostGradesApp from '../../SISGradePassback/PostGradesApp'
 import tz from '@canvas/timezone'
 import DateHelper from '@canvas/datetime/dateHelper'
-// @ts-ignore
 import {useScope as useI18nScope} from '@canvas/i18n'
 import '@canvas/rails-flash-notifications'
 

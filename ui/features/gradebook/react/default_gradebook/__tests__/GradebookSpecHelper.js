@@ -92,6 +92,7 @@ export const defaultGradebookEnv = {
 }
 
 export const defaultGradebookProps = {
+  appliedFilterConditions: [],
   filters: [],
   isFiltersLoading: false,
   onFiltersChange: () => {},

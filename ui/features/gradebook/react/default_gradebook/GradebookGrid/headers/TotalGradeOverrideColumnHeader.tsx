@@ -20,7 +20,6 @@ import React, {PureComponent} from 'react'
 import {View} from '@instructure/ui-view'
 import {Grid} from '@instructure/ui-grid'
 import {Text} from '@instructure/ui-text'
-
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('gradebook')

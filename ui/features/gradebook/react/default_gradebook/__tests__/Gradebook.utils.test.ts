@@ -26,8 +26,8 @@ import {
   getCustomColumnId,
   getAssignmentColumnId,
   getAssignmentGroupColumnId,
-  findAllAppliedFilterValuesOfType,
-  getAllAppliedFilterValues
+  findConditionValuesOfType,
+  doFilterConditionsMatch
 } from '../Gradebook.utils'
 import {isDefaultSortOrder, localeSort} from '../Gradebook.sorting'
 import {createGradebook} from './GradebookSpecHelper'
@@ -273,12 +273,11 @@ describe('getAssignmentGroupColumnId', () => {
   })
 })
 
-describe('findAllAppliedFilterValuesOfType', () => {
+describe('findConditionValuesOfType', () => {
   const filters: Filter[] = [
     {
       id: '1',
       name: 'Filter 1',
-      is_applied: true,
       conditions: [
         {id: '1', type: 'module', value: '1', created_at: ''},
         {id: '2', type: 'assignment-group', value: '2', created_at: ''},
@@ -290,7 +289,6 @@ describe('findAllAppliedFilterValuesOfType', () => {
     {
       id: '2',
       name: 'Filter 2',
-      is_applied: false,
       conditions: [
         {id: '1', type: 'module', value: '4', created_at: ''},
         {id: '2', type: 'assignment-group', value: '5', created_at: ''},
@@ -300,21 +298,22 @@ describe('findAllAppliedFilterValuesOfType', () => {
     }
   ]
 
-  it('only returns applied filters', () => {
-    expect(findAllAppliedFilterValuesOfType('module', filters)).toStrictEqual(['1', '3'])
+  it('returns module condition values', () => {
+    expect(findConditionValuesOfType('module', filters[0].conditions)).toStrictEqual(['1', '3'])
   })
 
-  it('only returns selected type', () => {
-    expect(findAllAppliedFilterValuesOfType('assignment-group', filters)).toStrictEqual(['2', '7'])
+  it('returns assignment-group condition values', () => {
+    expect(findConditionValuesOfType('assignment-group', filters[1].conditions)).toStrictEqual([
+      '5'
+    ])
   })
 })
 
-describe('getAllAppliedFilterValues', () => {
+describe('doFilterConditionsMatch', () => {
   const filters: Filter[] = [
     {
       id: '1',
       name: 'Filter 1',
-      is_applied: true,
       conditions: [
         {id: '1', type: 'module', value: '1', created_at: ''},
         {id: '2', type: 'assignment-group', value: '2', created_at: ''},
@@ -326,7 +325,16 @@ describe('getAllAppliedFilterValues', () => {
     {
       id: '2',
       name: 'Filter 2',
-      is_applied: false,
+      conditions: [
+        {id: '1', type: 'module', value: '4', created_at: ''},
+        {id: '2', type: 'assignment-group', value: '5', created_at: ''},
+        {id: '3', type: 'module', value: '6', created_at: ''}
+      ],
+      created_at: '2019-01-01T00:00:01Z'
+    },
+    {
+      id: '3',
+      name: 'Filter 3',
       conditions: [
         {id: '1', type: 'module', value: '4', created_at: ''},
         {id: '2', type: 'assignment-group', value: '5', created_at: ''},
@@ -336,7 +344,15 @@ describe('getAllAppliedFilterValues', () => {
     }
   ]
 
-  it('returns only applied filter values', () => {
-    expect(getAllAppliedFilterValues(filters)).toStrictEqual(['1', '2', '7', '3'])
+  it('returns false if filter conditions are different', () => {
+    expect(doFilterConditionsMatch(filters[0].conditions, filters[1].conditions)).toStrictEqual(
+      false
+    )
+  })
+
+  it('returns true if filter conditions are the same', () => {
+    expect(doFilterConditionsMatch(filters[1].conditions, filters[2].conditions)).toStrictEqual(
+      true
+    )
   })
 })

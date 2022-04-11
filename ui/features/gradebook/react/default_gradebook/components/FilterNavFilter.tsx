@@ -18,7 +18,6 @@
 
 import React, {useState, useRef, useEffect} from 'react'
 import uuid from 'uuid'
-// @ts-ignore
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {Button, IconButton} from '@instructure/ui-buttons'
@@ -51,9 +50,11 @@ const I18n = useI18nScope('gradebook')
 const {Item} = Flex as any
 
 export type FilterNavFilterProps = {
+  applyConditions: (conditions: PartialFilter['conditions']) => void
   assignmentGroups: AssignmentGroup[]
   filter: PartialFilter | Filter
   gradingPeriods: GradingPeriod[]
+  isApplied: boolean
   modules: Module[]
   onChange: any
   onDelete: any
@@ -62,12 +63,14 @@ export type FilterNavFilterProps = {
 }
 
 export default function FilterNavFilter({
-  filter,
-  onDelete,
-  onChange,
-  modules,
-  gradingPeriods,
+  applyConditions,
   assignmentGroups,
+  filter,
+  gradingPeriods,
+  isApplied,
+  modules,
+  onChange,
+  onDelete,
   sections,
   studentGroupCategories
 }: FilterNavFilterProps) {
@@ -127,10 +130,7 @@ export default function FilterNavFilter({
   }
 
   const toggleApply = () => {
-    onChange({
-      ...filter,
-      is_applied: !filter.is_applied
-    })
+    applyConditions(isApplied ? [] : filter.conditions)
   }
 
   return (
@@ -229,8 +229,8 @@ export default function FilterNavFilter({
           <Flex>
             <Item>
               <Checkbox
-                checked={filter.is_applied}
-                label={filter.id ? I18n.t('Apply filter') : I18n.t('Apply conditions')}
+                checked={isApplied}
+                label={I18n.t('Apply conditions')}
                 labelPlacement="start"
                 onChange={toggleApply}
                 size="small"

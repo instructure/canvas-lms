@@ -20,7 +20,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import assignmentHelper from '../shared/helpers/assignmentHelper'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
-// @ts-ignore
 import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'lodash'
 import htmlEscape from 'html-escape'
@@ -191,18 +190,15 @@ export function getAssignmentGroupColumnId(assignmentGroupId: string) {
   return `assignment_group_${assignmentGroupId}`
 }
 
-export function findAllAppliedFilterValuesOfType(type: FilterConditionType, filters: Filter[]) {
-  return filters
-    .filter(f => f.is_applied)
-    .flatMap(f => f.conditions.filter(c => c.type === type && c.value))
-    .map(c => c.value)
-}
-
-export function getAllAppliedFilterValues(filters: Filter[]) {
-  return filters
-    .filter(f => f.is_applied)
-    .flatMap(f => f.conditions.filter(c => c.value))
-    .map(c => c.value)
+export function findConditionValuesOfType(
+  type: FilterConditionType,
+  appliedConditions: FilterCondition[]
+) {
+  return appliedConditions.reduce(
+    (values: string[], condition: FilterCondition) =>
+      condition.type === type && condition.value ? values.concat(condition.value) : values,
+    []
+  )
 }
 
 // Extra normalization; comes from jsonb payload
@@ -222,7 +218,6 @@ export const deserializeFilter = (json: GradebookFilterApiResponse): Filter => {
     id: filter.id,
     name: String(filter.name),
     conditions,
-    is_applied: !!filter.payload.is_applied,
     created_at: String(filter.created_at)
   }
 }
@@ -231,7 +226,6 @@ export const serializeFilter = (filter: PartialFilter): GradebookFilterApiReques
   return {
     name: filter.name,
     payload: {
-      is_applied: filter.is_applied,
       conditions: filter.conditions
     }
   }
@@ -300,4 +294,19 @@ export const getLabelForFilterCondition = (
 
   // unrecognized types should have been filtered out by deserializeFilter
   throw new Error('invalid condition type')
+}
+
+export function doFilterConditionsMatch(
+  conditions1: FilterCondition[],
+  conditions2: FilterCondition[]
+) {
+  const conditionsWithValues1 = conditions1.filter(c => c.value)
+  const conditionsWithValues2 = conditions2.filter(c => c.value)
+  return (
+    conditionsWithValues1.length > 0 &&
+    conditionsWithValues1.length === conditionsWithValues2.length &&
+    conditionsWithValues1.every(c1 =>
+      conditionsWithValues2.some(c2 => c2.type === c1.type && c2.value === c1.value)
+    )
+  )
 }

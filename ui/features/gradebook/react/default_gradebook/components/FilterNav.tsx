@@ -20,9 +20,7 @@ import React, {useState} from 'react'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import uuid from 'uuid'
-// @ts-ignore
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {Tooltip} from '@instructure/ui-tooltip'
 import {IconFilterSolid, IconFilterLine} from '@instructure/ui-icons'
 import {TextInput} from '@instructure/ui-text-input'
 import {View, ContextView} from '@instructure/ui-view'
@@ -37,11 +35,10 @@ import type {
   Filter,
   GradingPeriod,
   Module,
-  PartialFilter,
   Section,
   StudentGroupCategoryMap
 } from '../gradebook.d'
-import {getLabelForFilterCondition} from '../Gradebook.utils'
+import {getLabelForFilterCondition, doFilterConditionsMatch} from '../Gradebook.utils'
 import useStore from '../stores/index'
 
 const I18n = useI18nScope('gradebook')
@@ -56,20 +53,6 @@ export type FilterNavProps = {
   studentGroupCategories: StudentGroupCategoryMap
 }
 
-const newFilter = (): PartialFilter => ({
-  name: '',
-  conditions: [
-    {
-      id: uuid(),
-      type: undefined,
-      value: undefined,
-      created_at: new Date().toISOString()
-    }
-  ],
-  is_applied: false,
-  created_at: new Date().toISOString()
-})
-
 export default function FilterNav({
   assignmentGroups,
   gradingPeriods,
@@ -78,74 +61,47 @@ export default function FilterNav({
   studentGroupCategories
 }: FilterNavProps) {
   const [isTrayOpen, setIsTrayOpen] = useState(false)
+  const [stagedFilterName, setStagedFilterName] = useState('')
   const filters = useStore(state => state.filters)
-  const stagedFilter = useStore(state => state.stagedFilter)
+  const stagedFilterConditions = useStore(state => state.stagedFilterConditions)
   const saveStagedFilter = useStore(state => state.saveStagedFilter)
   const updateFilter = useStore(state => state.updateFilter)
   const deleteFilter = useStore(state => state.deleteFilter)
+  const applyConditions = useStore(state => state.applyConditions)
+  const appliedFilterConditions = useStore(state => state.appliedFilterConditions)
+  const updateStagedFilter = useStore(state => state.updateStagedFilter)
+  const deleteStagedFilter = useStore(state => state.deleteStagedFilter)
 
-  const filterComponents = filters
-    .filter(f => f.is_applied)
-    .map(filter => {
-      const tooltip = filter.conditions
-        .filter(c => c.value)
-        .map(condition => {
-          const label = getLabelForFilterCondition(
-            condition,
-            assignmentGroups,
-            gradingPeriods,
-            modules,
-            sections,
-            studentGroupCategories
-          )
-          return <div key={`filter-${filter.id}-condition-${condition.id}}`}>{label}</div>
-        })
-
+  const filterComponents = appliedFilterConditions
+    .filter(c => c.value)
+    .map(condition => {
+      const label = getLabelForFilterCondition(
+        condition,
+        assignmentGroups,
+        gradingPeriods,
+        modules,
+        sections,
+        studentGroupCategories
+      )
       return (
-        <Tooltip key={filter.id} renderTip={tooltip} placement="top" on={['hover', 'focus']}>
-          <Tag
-            data-testid={`filter-tag-${filter.id}`}
-            text={
-              <AccessibleContent alt={I18n.t('Remove filter')}>{filter.name}</AccessibleContent>
-            }
-            dismissible
-            onClick={() => updateFilter({...filter, is_applied: false})}
-            margin="0 xx-small 0 0"
-          />
-        </Tooltip>
+        <Tag
+          data-testid="staged-filter-condition-tag"
+          key={`staged-condition-${condition.id}`}
+          text={<AccessibleContent alt={I18n.t('Remove condition')}>{label}</AccessibleContent>}
+          dismissible
+          onClick={() =>
+            useStore.setState({
+              appliedFilterConditions: appliedFilterConditions.filter(c => c.id !== condition.id)
+            })
+          }
+          margin="0 xx-small 0 0"
+        />
       )
     })
 
-  if (stagedFilter && stagedFilter.is_applied) {
-    stagedFilter.conditions
-      .filter(c => c.value)
-      .forEach(condition => {
-        const label = getLabelForFilterCondition(
-          condition,
-          assignmentGroups,
-          gradingPeriods,
-          modules,
-          sections,
-          studentGroupCategories
-        )
-        filterComponents.push(
-          <Tag
-            data-testid="staged-filter-condition-tag"
-            key={`staged-condition-${condition.id}`}
-            text={<AccessibleContent alt={I18n.t('Remove condition')}>{label}</AccessibleContent>}
-            dismissible
-            onClick={() =>
-              useStore.setState({
-                stagedFilter: {
-                  ...stagedFilter,
-                  conditions: stagedFilter.conditions.filter(c => c.id !== condition.id)
-                }
-              })
-            }
-            margin="0 xx-small 0 0"
-          />
-        )
-      })
+  const handleSaveStagedFilter = async () => {
+    await saveStagedFilter(stagedFilterName)
+    setStagedFilterName('')
   }
 
   return (
@@ -195,7 +151,7 @@ export default function FilterNav({
             </FlexItem>
           </Flex>
 
-          {filters.length === 0 && !stagedFilter && (
+          {filters.length === 0 && !stagedFilterConditions.length && (
             <Flex as="div" margin="small">
               <FlexItem display="inline-block" width="100px" height="128px">
                 <img
@@ -226,10 +182,12 @@ export default function FilterNav({
             <FilterNavFilter
               assignmentGroups={assignmentGroups}
               filter={filter}
+              isApplied={doFilterConditionsMatch(appliedFilterConditions, filter.conditions)}
               gradingPeriods={gradingPeriods}
               key={filter.id}
               modules={modules}
-              onChange={(f: Filter) => updateFilter(f)}
+              onChange={updateFilter}
+              applyConditions={applyConditions}
               onDelete={() => deleteFilter(filter)}
               sections={sections}
               studentGroupCategories={studentGroupCategories}
@@ -242,16 +200,25 @@ export default function FilterNav({
             padding="small none none none"
             borderWidth="small none none none"
           >
-            {stagedFilter ? (
+            {stagedFilterConditions.length > 0 ? (
               <>
                 <FilterNavFilter
                   assignmentGroups={assignmentGroups}
-                  filter={stagedFilter}
+                  filter={{
+                    name: '',
+                    conditions: stagedFilterConditions,
+                    created_at: new Date().toISOString()
+                  }}
+                  isApplied={doFilterConditionsMatch(
+                    appliedFilterConditions,
+                    stagedFilterConditions
+                  )}
                   gradingPeriods={gradingPeriods}
                   key="staged"
                   modules={modules}
-                  onChange={(f: PartialFilter) => useStore.setState({stagedFilter: f})}
-                  onDelete={() => useStore.setState({stagedFilter: null})}
+                  applyConditions={applyConditions}
+                  onChange={(filter: Filter) => updateStagedFilter(filter.conditions)}
+                  onDelete={deleteStagedFilter}
                   sections={sections}
                   studentGroupCategories={studentGroupCategories}
                 />
@@ -262,14 +229,9 @@ export default function FilterNav({
                         width="100%"
                         renderLabel={I18n.t('Save these conditions as a filter')}
                         placeholder={I18n.t('Give this filter a name')}
-                        value={stagedFilter.name}
+                        value={stagedFilterName}
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                          useStore.setState({
-                            stagedFilter: {
-                              ...stagedFilter,
-                              name: event.target.value
-                            }
-                          })
+                          setStagedFilterName(event.target.value)
                         }
                       />
                     </FlexItem>
@@ -278,8 +240,8 @@ export default function FilterNav({
                         color="secondary"
                         data-testid="save-filter-button"
                         margin="small 0 0 0"
-                        onClick={saveStagedFilter}
-                        interaction={stagedFilter.name.trim().length > 0 ? 'enabled' : 'disabled'}
+                        onClick={handleSaveStagedFilter}
+                        interaction={stagedFilterName.trim().length > 0 ? 'enabled' : 'disabled'}
                       >
                         {I18n.t('Save')}
                       </Button>
@@ -291,7 +253,18 @@ export default function FilterNav({
               <Button
                 renderIcon={IconFilterLine}
                 color="secondary"
-                onClick={() => useStore.setState({stagedFilter: newFilter()})}
+                onClick={() =>
+                  useStore.setState({
+                    stagedFilterConditions: [
+                      {
+                        id: uuid(),
+                        type: undefined,
+                        value: undefined,
+                        created_at: new Date().toISOString()
+                      }
+                    ]
+                  })
+                }
                 margin="small 0 0 0"
                 data-testid="new-filter-button"
               >
