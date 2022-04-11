@@ -4363,9 +4363,9 @@ es:
       buttons: 
         update_syllabus: "Actualizar el programa del curso"
       headers: 
-        date: Fecha
+        date: "Fecha de entrega"
         details: Detalles
-        due: "Fecha de entrega"
+        due: "Hora de entrega"
       instructions: 
         syllabus: |-
             La página del plan de estudio muestra una vista de tabla del programa del curso y lo básico
