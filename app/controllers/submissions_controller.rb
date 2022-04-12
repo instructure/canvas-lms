@@ -226,7 +226,7 @@ class SubmissionsController < SubmissionsBaseController
 
     submit_at = params.dig(:submission, :submitted_at)
     user_sub = @assignment.submissions.find_by(user: user_id)
-    return if (user_id || submit_at) && !authorized_action(user_sub, @current_user, :grade)
+    return if (user_id || submit_at) && (!user_sub || !authorized_action(user_sub, @current_user, :grade))
 
     if @assignment.locked_for?(@submission_user) && !@assignment.grants_right?(@current_user, :update)
       flash[:notice] = t("errors.can_not_submit_locked_assignment", "You can't submit an assignment when it is locked")
