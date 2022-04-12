@@ -984,8 +984,12 @@ module Canvas::LiveEvents
   def self.get_master_template_created_data(master_template)
     {
       master_template_id: master_template.id,
-      master_course_id: master_template.course_id,
-      root_account_id: master_template.root_account_id
+      account_id: master_template.course.account.global_id,
+      account_uuid: master_template.course.account.uuid,
+      blueprint_course_id: master_template.course.global_id,
+      blueprint_course_uuid: master_template.course.uuid,
+      blueprint_course_title: master_template.course.name,
+      blueprint_course_workflow_state: master_template.course.workflow_state
     }
   end
 
@@ -996,8 +1000,11 @@ module Canvas::LiveEvents
   def self.master_migration_completed_data(master_migration)
     {
       master_migration_id: master_migration.id,
-      master_template_id: master_migration.master_template_id,
-      root_account_id: master_migration.root_account_id
+      master_template_id: master_migration.master_template.id,
+      account_id: master_migration.master_template.course.account.global_id,
+      account_uuid: master_migration.master_template.course.account.uuid,
+      blueprint_course_uuid: master_migration.master_template.course.uuid,
+      blueprint_course_id: master_migration.master_template.course.global_id
     }
   end
 
