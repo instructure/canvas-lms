@@ -20,6 +20,7 @@ import React from 'react'
 import moment from 'moment-timezone'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
+import {Responsive} from '@instructure/ui-responsive'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {TextInput} from '@instructure/ui-text-input'
 import CanvasDateInput, {
@@ -62,6 +63,8 @@ interface LocalState {
 class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
   private static missingInput = I18n.t('You must provide required fields before adding')
 
+  private titleInputRef: HTMLInputElement | undefined
+
   constructor(props: PassedProps) {
     super(props)
     this.state = {
@@ -73,6 +76,7 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
       endMessages: [],
       key: 1
     }
+    this.titleInputRef = undefined
   }
 
   addBlackoutDate = () => {
@@ -103,15 +107,15 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
     }
   }
 
-  onBlurEventTitle = (e: React.FormEvent<HTMLInputElement>) => {
-    if (e.currentTarget.value.trim().length === 0) {
+  validateTitle = () => {
+    if (this.titleInputRef?.value.trim().length === 0) {
       this.setState({
         titleMessages: [{type: 'error' as const, text: I18n.t('Title required')}]
       })
     }
   }
 
-  validateDates = () => {
+  validateDates = (): void => {
     this.setState((state, _props) => {
       let startMessages: CanvasDateInputMessageType[] = []
       let endMessages: CanvasDateInputMessageType[] = []
@@ -139,6 +143,11 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
     })
   }
 
+  validateEverything = (): void => {
+    this.validateDates()
+    this.validateTitle()
+  }
+
   onChangeStartDate = (date: Date | null) => {
     this.setState({startDate: date ? date.toISOString() : ''}, () => this.validateDates())
   }
@@ -164,67 +173,91 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
 
   render() {
     return (
-      <div data-testid="new_blackout_dates_form">
-        <Flex alignItems="end" justifyItems="start" wrap="wrap">
-          <FlexItem margin="0 small small 0">
-            <TextInput
-              renderLabel="Event Title"
-              placeholder="e.g., Winter Break"
-              width="180px"
-              value={this.state.eventTitle}
-              onChange={this.onChangeEventTitle}
-              onBlur={this.onBlurEventTitle}
-              messages={this.state.titleMessages}
-            />
-          </FlexItem>
-          <FlexItem>
-            <Flex alignItems="end" justifyItems="space-between" wrap="wrap">
-              <FlexItem margin="0 small small 0">
-                <CanvasDateInput
-                  key={`start-${this.state.key}`}
-                  renderLabel={I18n.t('Start Date')}
-                  timezone={coursePaceTimezone}
-                  formatDate={formatDate}
-                  onSelectedDateChange={this.onChangeStartDate}
-                  onBlur={this.onBlurDate}
-                  selectedDate={this.state.startDate}
-                  width="140px"
-                  messages={this.state.startMessages}
-                  withRunningValue
-                />
-              </FlexItem>
-              <FlexItem margin="0 small small 0">
-                <CanvasDateInput
-                  key={`end-${this.state.key}`}
-                  renderLabel={I18n.t('End Date')}
-                  timezone={coursePaceTimezone}
-                  formatDate={formatDate}
-                  onSelectedDateChange={this.onChangeEndDate}
-                  onBlur={this.onBlurDate}
-                  width="140px"
-                  messages={this.state.endMessages}
-                  withRunningValue
-                />
-              </FlexItem>
-            </Flex>
-          </FlexItem>
-          <FlexItem margin="0 0 small">
-            <Tooltip
-              renderTip={this.disabledAdd() && NewBlackoutDatesForm.missingInput}
-              on={this.disabledAdd() ? ['hover', 'focus', 'click'] : []}
-            >
-              <Button
-                color="primary"
-                onClick={() => {
-                  !this.disabledAdd() && this.addBlackoutDate()
-                }}
-              >
-                Add
-              </Button>
-            </Tooltip>
-          </FlexItem>
-        </Flex>
-      </div>
+      <Responsive
+        match="media"
+        query={{
+          smallest: {maxWidth: '432px'},
+          smaller: {maxWidth: '576px'},
+          small: {maxWidth: '635px'},
+          large: {minWidth: '635px'}
+        }}
+        render={(_props, matches) => {
+          let addBtnMarginTop = '0'
+          if (
+            !matches.includes('smallest') &&
+            (matches.includes('smaller') || matches.includes('large'))
+          ) {
+            addBtnMarginTop = 'calc(1.75rem + 2px)'
+          }
+          return (
+            <div data-testid="new_blackout_dates_form">
+              <Flex alignItems="start" justifyItems="start" wrap="wrap">
+                <FlexItem margin="0 small small 0">
+                  <TextInput
+                    inputRef={el => (this.titleInputRef = el)}
+                    renderLabel="Event Title"
+                    placeholder="e.g., Winter Break"
+                    width="180px"
+                    value={this.state.eventTitle}
+                    onChange={this.onChangeEventTitle}
+                    onBlur={this.validateTitle}
+                    messages={this.state.titleMessages}
+                  />
+                </FlexItem>
+                <FlexItem>
+                  <Flex alignItems="start" justifyItems="space-between" wrap="wrap">
+                    <FlexItem margin="0 small small 0">
+                      <CanvasDateInput
+                        key={`start-${this.state.key}`}
+                        renderLabel={I18n.t('Start Date')}
+                        timezone={coursePaceTimezone}
+                        formatDate={formatDate}
+                        onSelectedDateChange={this.onChangeStartDate}
+                        onBlur={this.onBlurDate}
+                        selectedDate={this.state.startDate}
+                        width="140px"
+                        messages={this.state.startMessages}
+                        withRunningValue
+                      />
+                    </FlexItem>
+                    <FlexItem margin="0 small small 0">
+                      <CanvasDateInput
+                        key={`end-${this.state.key}`}
+                        renderLabel={I18n.t('End Date')}
+                        timezone={coursePaceTimezone}
+                        formatDate={formatDate}
+                        onSelectedDateChange={this.onChangeEndDate}
+                        onBlur={this.onBlurDate}
+                        width="140px"
+                        messages={this.state.endMessages}
+                        withRunningValue
+                      />
+                    </FlexItem>
+                  </Flex>
+                </FlexItem>
+                <FlexItem margin="0 0 small">
+                  <div style={{marginTop: addBtnMarginTop}}>
+                    <Tooltip
+                      renderTip={this.disabledAdd() && NewBlackoutDatesForm.missingInput}
+                      on={this.disabledAdd() ? ['hover', 'focus', 'click'] : []}
+                    >
+                      <Button
+                        color="primary"
+                        onClick={() => {
+                          !this.disabledAdd() && this.addBlackoutDate()
+                        }}
+                        onFocus={this.validateEverything}
+                      >
+                        Add
+                      </Button>
+                    </Tooltip>
+                  </div>
+                </FlexItem>
+              </Flex>
+            </div>
+          )
+        }}
+      />
     )
   }
 }

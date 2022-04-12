@@ -108,4 +108,18 @@ describe('BlackoutDatesModal', () => {
 
     expect(getByText('End date cannot be before start date')).toBeInTheDocument()
   })
+
+  it('shows title and start date errors when fields are empty and Add button gets focus', () => {
+    const {getByRole, getByText, queryByText} = render(
+      <NewBlackoutDatesForm addBlackoutDate={addBlackoutDate} />
+    )
+    expect(queryByText('Title required')).not.toBeInTheDocument()
+    expect(queryByText('Date required')).not.toBeInTheDocument()
+
+    const addBtn = getByRole('button', {name: 'Add'})
+    act(() => addBtn.focus())
+
+    expect(getByText('Title required')).toBeInTheDocument()
+    expect(getByText('Date required')).toBeInTheDocument()
+  })
 })
