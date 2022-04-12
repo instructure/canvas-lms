@@ -2058,8 +2058,12 @@ describe Canvas::LiveEvents do
       it "triggers an master_template_created live event" do
         expect_event("master_template_created", {
                        master_template_id: @master_template.id.to_s,
-                       master_course_id: @master_template.course_id.to_s,
-                       root_account_id: @master_template.root_account_id.to_s
+                       account_id: @master_template.course.account.global_id.to_s,
+                       account_uuid: @master_template.course.account.uuid.to_s,
+                       blueprint_course_id: @master_template.course.global_id.to_s,
+                       blueprint_course_uuid: @master_template.course.uuid.to_s,
+                       blueprint_course_title: @master_template.course.name.to_s,
+                       blueprint_course_workflow_state: @master_template.course.workflow_state.to_s
                      }).once
         Canvas::LiveEvents.master_template_created(@master_template)
       end
@@ -2076,9 +2080,12 @@ describe Canvas::LiveEvents do
     context "completed" do
       it "triggers an master_migration_completed live event" do
         expect_event("master_migration_completed", {
-                       master_template_id: @master_template.id.to_s,
                        master_migration_id: @master_migration.id.to_s,
-                       root_account_id: @master_migration.root_account_id.to_s
+                       master_template_id: @master_template.id.to_s,
+                       account_id: @master_migration.master_template.course.account.global_id.to_s,
+                       account_uuid: @master_migration.master_template.course.account.uuid.to_s,
+                       blueprint_course_uuid: @master_migration.master_template.course.uuid.to_s,
+                       blueprint_course_id: @master_migration.master_template.course.global_id.to_s
                      }).once
         Canvas::LiveEvents.master_migration_completed(@master_migration)
       end
