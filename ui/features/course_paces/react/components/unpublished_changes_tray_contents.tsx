@@ -18,7 +18,6 @@
 
 import {View} from '@instructure/ui-view'
 import {CloseButton} from '@instructure/ui-buttons'
-// import {List} from '@instructure/ui-list'
 import {Text} from '@instructure/ui-text'
 import React, {useEffect} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -90,7 +89,14 @@ const UnpublishedChangesTrayContents = ({
         </h4>
       </View>
       <ol className="course_pace_changes">
-        {changes.map(c => c.summary && <li key={c.id}>{c.summary}</li>)}
+        {changes.map(
+          c =>
+            c.summary && (
+              <li key={c.id} style={{overflowWrap: 'break-word'}}>
+                {c.summary}
+              </li>
+            )
+        )}
       </ol>
     </View>
   )
