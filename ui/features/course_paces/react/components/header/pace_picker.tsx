@@ -32,14 +32,14 @@ import {View} from '@instructure/ui-view'
 
 import UnpublishedWarningModal from './unpublished_warning_modal'
 
-import {StoreState, Enrollment, Section, PaceContextTypes} from '../../types'
+import {StoreState, Enrollment, Section, PaceContextTypes, ResponsiveSizes} from '../../types'
 import {Course} from '../../shared/types'
 import {getUnpublishedChangeCount} from '../../reducers/course_paces'
 import {getSortedEnrollments} from '../../reducers/enrollments'
 import {getSortedSections} from '../../reducers/sections'
 import {getCourse} from '../../reducers/course'
 import {actions} from '../../actions/ui'
-import {getSelectedContextId, getSelectedContextType} from '../../reducers/ui'
+import {getSelectedContextId, getSelectedContextType, getResponsiveSize} from '../../reducers/ui'
 
 const I18n = useI18nScope('course_paces_pace_picker')
 
@@ -55,6 +55,7 @@ interface StoreProps {
   readonly selectedContextId: string
   readonly selectedContextType: PaceContextTypes
   readonly changeCount: number
+  readonly responsiveSize: ResponsiveSizes
 }
 
 interface DispatchProps {
@@ -77,7 +78,8 @@ export const PacePicker: React.FC<ComponentProps> = ({
   sections,
   selectedContextType,
   selectedContextId,
-  setSelectedPaceContext
+  setSelectedPaceContext,
+  responsiveSize
 }) => {
   const [open, setOpen] = useState(false)
   const [pendingContext, setPendingContext] = useState('')
@@ -102,11 +104,12 @@ export const PacePicker: React.FC<ComponentProps> = ({
     }
   }
 
-  const handleSelect = (_, value: string) => {
+  const handleSelect = (_, value: string | string[]) => {
+    const option = Array.isArray(value) ? value[0] : value
     if (hasChanges) {
-      setPendingContext(value)
+      setPendingContext(option)
     } else {
-      setSelectedPaceContext(...parseContextKey(value))
+      setSelectedPaceContext(...parseContextKey(option))
     }
   }
 
@@ -134,6 +137,15 @@ export const PacePicker: React.FC<ComponentProps> = ({
           </View>
         </View>
       </Item>
+    )
+  }
+
+  const renderSubMenu = (options: JSX.Element[], elementId: string, label: string) => {
+    const SubMenu = responsiveSize === 'small' ? Menu.Group : Menu
+    return (
+      <SubMenu id={elementId} label={label}>
+        {options}
+      </SubMenu>
     )
   }
 
@@ -184,9 +196,11 @@ export const PacePicker: React.FC<ComponentProps> = ({
         {/*    renderOption(createContextKey('Section', s.id), s.name, `section-${s.id}`) */}
         {/*  )} */}
         {/* </Menu> */}
-        <Menu id="course-pace-student-menu" label={I18n.t('Students')}>
-          {enrollments.map(e => renderStudentOption(e))}
-        </Menu>
+        {renderSubMenu(
+          enrollments.map(e => renderStudentOption(e)),
+          'course-pace-student-menu',
+          I18n.t('Students')
+        )}
       </Menu>
       <UnpublishedWarningModal
         open={!!pendingContext}
@@ -208,7 +222,8 @@ const mapStateToProps = (state: StoreState) => ({
   sections: getSortedSections(state),
   selectedContextId: getSelectedContextId(state),
   selectedContextType: getSelectedContextType(state),
-  changeCount: getUnpublishedChangeCount(state)
+  changeCount: getUnpublishedChangeCount(state),
+  responsiveSize: getResponsiveSize(state)
 })
 
 export default connect(mapStateToProps, {
