@@ -20,7 +20,6 @@
   course_home ||= false
   js_env({
     :COLLAPSED_MODULES => @collapsed_modules,
-    :CAN_MANAGE_MODULES => @can_edit,
     :IS_STUDENT => can_do(@context, @current_user, :participate_as_student),
     :COURSE_ID => @context.id,
     :NO_MODULE_PROGRESSIONS => @context.large_roster,
@@ -60,7 +59,7 @@
       <% if @context.account.feature_enabled?(:course_paces) && @context.enable_course_paces && @context.grants_any_right?(@current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS) %>
         <a class="btn" id="course_paces_link" href="<%= course_course_pacing_path(@context) %>"><%= t("Course Pacing") %></a>
       <% end %>
-      <% if @can_edit %>
+      <% if @can_add %>
         <button class="btn btn-primary add_module_link">
           <i class="icon-plus" role="presentation"></i>
           <span class="screenreader-only">Add</span>
@@ -105,12 +104,12 @@
   <div
     id="context_modules"
     aria-label="<%= t('headings.course_modules', %{Course Modules}) %>"
-    class="ig-list <%= 'editable' if @can_edit %>"
+    class="ig-list <%= 'editable' if @can_add || @can_edit %>"
   >
     <% cache(@modules_cache_key) do %>
-      <% preload_modules_content(@modules, @can_edit) %>
+      <% preload_modules_content(@modules) %>
       <% @modules.each do |m| %>
-        <%= render :partial => 'context_modules/context_module_next', :object => m, :as => :context_module, :locals => { :editable => @can_edit } %>
+        <%= render :partial => 'context_modules/context_module_next', :object => m, :as => :context_module %>
       <% end %>
     <% end %>
   </div>
@@ -118,9 +117,9 @@
 </div>
 
 <%= render :partial => 'context_modules/context_module_next', :object => nil, :as => :context_module %>
-<%= render :partial => 'context_modules/module_item_next', :object => nil, :as => :module_item, :locals => { :editable => @can_edit } %>
+<%= render :partial => 'context_modules/module_item_next', :object => nil, :as => :module_item %>
 
-<% if @can_edit %>
+<% if @can_add || @can_edit %>
   <%= render :partial => "context_modules/add_context_module_form" %>
 
   <div id="add_module_prerequisite_dialog" style="display: none;">

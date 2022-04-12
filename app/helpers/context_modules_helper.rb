@@ -35,10 +35,10 @@ module ContextModulesHelper
     WikiPage: I18n.t("Page")
   }.freeze
 
-  def cache_if_module(context_module, editable, is_student, can_view_unpublished, user, context, &block)
+  def cache_if_module(context_module, viewable, is_student, can_view_unpublished, user, context, &block)
     if context_module
       visible_assignments = user ? user.assignment_and_quiz_visibilities(context) : []
-      cache_key_items = ["context_module_render_21_", context_module.cache_key, editable, is_student, can_view_unpublished,
+      cache_key_items = ["context_module_render_22_", context_module.cache_key, viewable, is_student, can_view_unpublished,
                          true, Time.zone, Digest::MD5.hexdigest([visible_assignments, @section_visibility].join("/"))]
       cache_key = cache_key_items.join("/")
       cache_key = add_menu_tools_to_cache_key(cache_key)
@@ -108,9 +108,9 @@ module ContextModulesHelper
     item.content.can_unpublish?
   end
 
-  def preload_modules_content(modules, can_edit)
+  def preload_modules_content(modules)
     ActiveRecord::Associations::Preloader.new.preload(modules, content_tags: :content)
-    preload_can_unpublish(@context, modules) if can_edit
+    preload_can_unpublish(@context, modules) if @can_view
   end
 
   def process_module_data(mod, is_student = false, current_user = nil, session = nil)
