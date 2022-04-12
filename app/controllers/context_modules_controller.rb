@@ -66,7 +66,10 @@ class ContextModulesController < ApplicationController
       @section_visibility = @context.course_section_visibility(@current_user)
       @combined_active_quizzes = combined_active_quizzes
 
+      @can_view = @context.grants_any_right?(@current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+      @can_add = @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_add)
       @can_edit = @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_edit)
+      @can_delete = @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_delete)
       @can_view_grades = can_do(@context, @current_user, :view_all_grades)
       @is_student = @context.grants_right?(@current_user, session, :participate_as_student)
       @can_view_unpublished = @context.grants_right?(@current_user, session, :read_as_admin)

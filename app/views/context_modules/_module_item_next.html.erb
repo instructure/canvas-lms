@@ -21,7 +21,6 @@
   module_item ||= module_item_next
   item_data ||= { published_status: 'unpublished' }
   completion_criteria ||= nil
-  editable ||= false
   can_direct_share = can_do(@context, @current_user, :read_as_admin)
   criterion = completion_criteria && completion_criteria.find{|c| c[:id] == module_item.id}
   new_mastery_connect_icon = Account.site_admin.feature_enabled?(:updated_mastery_connect_icon)
@@ -75,7 +74,7 @@
       </a>
     <% end %>
 
-    <% if editable || module_item.nil? %>
+    <% if @can_edit || module_item.nil? %>
     <div aria-hidden="true" class="ig-handle">
       <span
         class="draggable-handle move_item_link"
@@ -137,8 +136,8 @@
           <span class="requirement" style="display: none;">&nbsp;</span>
           <span class="completion_requirement" style="display: none;">&nbsp;</span>
           <span class="position" style="display: none;"><%= module_item && module_item.position %></span>
-          <span class="url" style="display: none;"><%= module_item.try(:url) if editable %></span>
-          <span class="new_tab" style="display: none;"><%= module_item.try(:new_tab) ? '1' : '0' if editable %></span>
+          <span class="url" style="display: none;"><%= module_item.try(:url) if @can_view %></span>
+          <span class="new_tab" style="display: none;"><%= module_item.try(:new_tab) ? '1' : '0' if @can_view %></span>
         </span>
       </div>
 
@@ -215,12 +214,12 @@
         <div class="mc_objectives ig-details__item"></div>
       </div>
     </div>
-    <% if !editable %>
+    <% if !@can_view %>
       <div class="module-item-status-icon"></div> <%# going to set this in JS-land, not here %>
     <% end %>
-    <% if editable || module_item.nil? || can_direct_share && module_item.direct_shareable? %>
+    <% if @can_view || module_item.nil? || can_direct_share && module_item.direct_shareable? %>
       <div class="ig-admin">
-        <% if editable || module_item.nil? %>
+        <% if @can_view || module_item.nil? %>
           <span
             data-module-item-id="<%= module_item && module_item.id %>"
             data-module-type="<%= module_item && module_item.content_type_class %>"
@@ -257,14 +256,8 @@
           </a>
 
           <ul class="al-options">
-            <% if editable || module_item.nil? %>
-              <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="outdent_item_link" title="<%= t('Decrease indent') %>"><%= @module_item_image_tags['outdent'] %> <%= t('Decrease indent') %></a></li>
-              <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="indent_item_link" title="<%= t('Increase indent') %>"><%= @module_item_image_tags['indent'] %> <%= t('Increase indent') %></a></li>
+            <% if @can_edit || module_item.nil? %>
               <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="edit_item_link edit_link" title="<%= t('Edit item details') %>"><%= @module_item_image_tags['edit'] %> <%= t('Edit') %></a></li>
-              <% if module_item && module_item.quiz_lti && module_item_new_quizzes_build_button_enabled? %>
-                <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>?build=true" title="<%= t('Build quiz') %>"><%= @module_item_image_tags['quiz'] %> <%= t('Build') %></a></li>
-              <%end%>
-              <li class="dupe-option" role="presentation"><a href="/api/v1<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>/duplicate" class="duplicate_item_link" title="<%= t('Duplicate Item') %>"><%= @module_item_image_tags['duplicate'] %> <%= t('Duplicate') %></a></li>
               <li role="presentation">
                 <a href="#<%= module_item ? module_item.id : "{{ id }}" %>"
                   aria-label="<%= t('Move this item') %>"
@@ -272,6 +265,16 @@
                   title="<%= t('Move this item') %>"
                 ><%= t("Move to...") %></a>
               </li>
+              <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="outdent_item_link" title="<%= t('Decrease indent') %>"><%= @module_item_image_tags['outdent'] %> <%= t('Decrease indent') %></a></li>
+              <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="indent_item_link" title="<%= t('Increase indent') %>"><%= @module_item_image_tags['indent'] %> <%= t('Increase indent') %></a></li>
+            <%end%>
+            <% if @can_add || module_item.nil? %>
+              <% if module_item && module_item.quiz_lti && module_item_new_quizzes_build_button_enabled? %>
+                <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>?build=true" title="<%= t('Build quiz') %>"><%= @module_item_image_tags['quiz'] %> <%= t('Build') %></a></li>
+              <%end%>
+              <li class="dupe-option" role="presentation"><a href="/api/v1<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>/duplicate" class="duplicate_item_link" title="<%= t('Duplicate Item') %>"><%= @module_item_image_tags['duplicate'] %> <%= t('Duplicate') %></a></li>
+            <%end%>
+            <% if @can_delete || module_item.nil? %>
               <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="delete_item_link delete_link" title="<%= t('Remove this item from the module') %>"><i class="icon-trash"></i> <%= t('Remove') %></a></li>
             <% end %>
             <% if can_direct_share && (!module_item || module_item.direct_shareable?) %>
@@ -298,7 +301,7 @@
                 </a>
               </li>
             <% end %>
-            <% if editable || module_item.nil? %>
+            <% if @can_view || module_item.nil? %>
               <% menu_type_to_class.each do |menu_type, content_class| %>
                 <% if !module_item || module_item.content.is_a?(content_class) %>
                   <%

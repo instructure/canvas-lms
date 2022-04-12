@@ -20,7 +20,7 @@
   hide_footer = true
   prerequisites = []
 
-  if editable
+  if viewable
     hide_footer = context_module && context_module.prerequisites && !context_module.prerequisites.empty?
     prerequisites = (context_module.prerequisites || []) if context_module
   else
