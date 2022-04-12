@@ -349,6 +349,12 @@ pipeline {
                   gerrit.submitReview("", "Build Started ${RUN_DISPLAY_URL}")
                 }
 
+                // Skip builds for patchsets uploaded by svc.cloudjenkins, these are usually translation updates.
+                if (env.GERRIT_PATCHSET_UPLOADER_EMAIL == 'svc.cloudjenkins@instructure.com' && !configuration.isChangeMerged()) {
+                  currentBuild.result = 'ABORTED'
+                  error('No pre-merge builds for Service Cloud Jenkins user.')
+                }
+
                 if (configuration.skipCi()) {
                   currentBuild.result = 'NOT_BUILT'
                   gerrit.submitLintReview('-2', 'Build not executed due to [skip-ci] flag')
@@ -483,6 +489,14 @@ pipeline {
                         )
                       }
                     }
+
+                  extendedStage('Locales Only Changes')
+                    .hooks(buildSummaryReportHooks.call())
+                    .obeysAllowStages(false)
+                    .required(env.GERRIT_PROJECT == 'canvas-lms' && sh(script: "${WORKSPACE}/build/new-jenkins/locales-changes.sh", returnStatus: true) == 0)
+                    .execute {
+                        gerrit.submitLintReview('-2', 'This commit contains only changes to config/locales/, this could be a bad sign!')
+                      }
 
                   extendedStage('Parallel Run Tests').obeysAllowStages(false).execute { stageConfig, buildConfig ->
                     def stages = [:]
