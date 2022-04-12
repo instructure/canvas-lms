@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import _ from 'underscore'
+
 export const responsiveQuerySizes = ({mobile = false, tablet = false, desktop = false} = {}) => {
   const querySizes = {}
   if (mobile) {
@@ -78,7 +80,7 @@ export const inboxConversationsWrapper = (data, isSubmissionComments = false) =>
 // Takes in data from the CONVERSATION_MESSAGES_QUERY or SUBMISSION_COMMENTS_QUERY
 // Outputs an an object that contains an array of wrapped inboxMessages and the contextName
 export const inboxMessagesWrapper = (data, isSubmissionComments = false) => {
-  const inboxMessages = []
+  let inboxMessages = []
   let contextName = ''
   if (data) {
     const messages = isSubmissionComments
@@ -111,6 +113,7 @@ export const inboxMessagesWrapper = (data, isSubmissionComments = false) => {
       }
       inboxMessages.push(inboxMessage)
     })
+    inboxMessages = _.sortBy(inboxMessages, 'createdAt').reverse()
   }
   return {inboxMessages, contextName}
 }

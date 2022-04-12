@@ -19,6 +19,7 @@
 import {Conversation} from './Conversation'
 import {ConversationMessage} from './ConversationMessage'
 import {ConversationParticipant} from './ConversationParticipant'
+import {SubmissionComment} from './SubmissionComment'
 import {Course} from './Course'
 import {Enrollment} from './Enrollment'
 import {graphql} from 'msw'
@@ -482,7 +483,17 @@ export const handlers = [
         __typename: 'AddConversationMessagePayload'
       }
     }
+    return res(ctx.data(data))
+  }),
 
+  graphql.mutation('CreateSubmissionComment', (req, res, ctx) => {
+    const data = {
+      createSubmissionComment: {
+        submissionComment: SubmissionComment.mock({comment: req.variables.body}),
+        errors: null,
+        __typename: 'CreateSubmissionCommentPayload'
+      }
+    }
     return res(ctx.data(data))
   }),
 
