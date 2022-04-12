@@ -65,13 +65,9 @@ describe('K5Dashboard Schedule Section', () => {
       <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
     )
     expect(await findByText('Assignment 15')).toBeInTheDocument()
-    // The new weekly planner doesn't display the PlannerEmptyState.
-    // This will get addressed one way or another with LS-2042
-    // expect(await findByText("Looks like there isn't anything here")).toBeInTheDocument()
-    // expect(await findByText('Nothing More To Do')).toBeInTheDocument()
   })
-  // Skipping for flakiness. See https://instructure.atlassian.net/browse/LS-2243.
-  it.skip('displays a list of missing assignments if there are any', async () => {
+
+  it('displays a list of missing assignments if there are any', async () => {
     const {findByRole, getByRole, getByText} = render(
       <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
     )
