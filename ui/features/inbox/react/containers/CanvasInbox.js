@@ -235,6 +235,7 @@ const CanvasInbox = () => {
   })
 
   const onReply = ({conversationMessage = null, replyAll = false} = {}) => {
+    conversationMessage = isSubmissionCommentsType ? {} : conversationMessage
     setSelectedConversationMessage(conversationMessage)
     setIsReplyAll(replyAll)
     setIsReply(!replyAll)

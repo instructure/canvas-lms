@@ -125,54 +125,18 @@ export const MessageDetailContainer = props => {
         focusRef={setMessageRef}
         text={props.conversation.subject}
         onForward={props.onForward}
-        onReply={
-          isSubmissionCommentsType
-            ? () => {
-                setOnFailure(I18n.t('comment reply is not enabled'))
-              }
-            : props.onReply
-        }
-        onReplyAll={
-          isSubmissionCommentsType
-            ? () => {
-                setOnFailure(I18n.t('comment reply all is not enabled'))
-              }
-            : props.onReplyAll
-        }
-        onDelete={
-          isSubmissionCommentsType
-            ? () => {
-                setOnFailure(I18n.t('comment delete is not enabled'))
-              }
-            : () => props.onDelete([props.conversation._id])
-        }
+        onReply={props.onReply}
+        onReplyAll={props.onReplyAll}
+        onDelete={() => props.onDelete([props.conversation._id])}
       />
       {inboxMessageData?.inboxMessages.map(message => (
         <View as="div" borderWidth="small none none none" padding="small" key={message.id}>
           <MessageDetailItem
             conversationMessage={message}
             contextName={inboxMessageData?.contextName}
-            onReply={
-              isSubmissionCommentsType
-                ? () => {
-                    setOnFailure(I18n.t('comment reply is not enabled'))
-                  }
-                : () => props.onReply(message)
-            }
-            onReplyAll={
-              isSubmissionCommentsType
-                ? () => {
-                    setOnFailure(I18n.t('comment reply all is not enabled'))
-                  }
-                : () => props.onReplyAll(message)
-            }
-            onDelete={
-              isSubmissionCommentsType
-                ? () => {
-                    setOnFailure(I18n.t('comment delete is not enabled'))
-                  }
-                : () => handleDeleteConversationMessage(message._id)
-            }
+            onReply={() => props.onReply(message)}
+            onReplyAll={() => props.onReplyAll(message)}
+            onDelete={() => handleDeleteConversationMessage(message._id)}
             onForward={() => props.onForward(message)}
           />
         </View>

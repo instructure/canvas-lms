@@ -19,6 +19,7 @@
 import {Conversation} from './Conversation'
 import {ConversationMessage} from './ConversationMessage'
 import {ConversationParticipant} from './ConversationParticipant'
+import {SubmissionComment} from './SubmissionComment'
 import {Error} from '../../../shared/graphql/Error'
 import gql from 'graphql-tag'
 
@@ -150,4 +151,19 @@ export const DELETE_CONVERSATION_MESSAGES = gql`
       }
     }
   }
+`
+
+export const CREATE_SUBMISSION_COMMENT = gql`
+  mutation CreateSubmissionComment($submissionId: ID!, $body: String!) {
+    createSubmissionComment(input: {submissionId: $submissionId, comment: $body}) {
+      submissionComment {
+        ...SubmissionComment
+      }
+      errors {
+        ...Error
+      }
+    }
+  }
+  ${Error.fragment}
+  ${SubmissionComment.fragment}
 `

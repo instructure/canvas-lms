@@ -34,12 +34,13 @@ const ModalHeader = props => (
       onClick={props.onDismiss}
       screenReaderLabel={I18n.t('Close')}
     />
-    <Heading>{I18n.t('Compose Message')}</Heading>
+    <Heading>{props?.headerTitle ? props.headerTitle : I18n.t('Compose Message')}</Heading>
   </Modal.Header>
 )
 
 ModalHeader.propTypes = {
-  onDismiss: PropTypes.func
+  onDismiss: PropTypes.func,
+  headerTitle: PropTypes.string
 }
 
 export default ModalHeader

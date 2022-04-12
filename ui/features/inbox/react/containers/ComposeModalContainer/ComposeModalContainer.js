@@ -32,7 +32,12 @@ import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../../util/utils'
 import {uploadFiles} from '@canvas/upload-file'
 import UploadMedia from '@instructure/canvas-media'
-import {MediaCaptureStrings, SelectStrings, UploadMediaStrings} from '../../../util/constants'
+import {
+  MediaCaptureStrings,
+  SelectStrings,
+  UploadMediaStrings,
+  ConversationContext
+} from '../../../util/constants'
 
 const I18n = useI18nScope('conversations_2')
 
@@ -50,6 +55,7 @@ const ComposeModalContainer = props => {
   const [mediaUploadOpen, setMediaUploadOpen] = useState(false)
   const [uploadingMediaFile, setUploadingMediaFile] = useState(false)
   const [mediaUploadFile, setMediaUploadFile] = useState(null)
+  const {isSubmissionCommentsType} = useContext(ConversationContext)
 
   const onMediaUploadComplete = (err, data) => {
     if (err) {
@@ -146,7 +152,13 @@ const ComposeModalContainer = props => {
   }
 
   const sendMessage = async () => {
-    if (props.isReply) {
+    if (isSubmissionCommentsType) {
+      await props.createSubmissionComment({
+        variables: {
+          body
+        }
+      })
+    } else if (props.isReply) {
       await props.addConversationMessage({
         variables: {
           attachmentIds: attachments.map(a => a.id),
@@ -230,7 +242,10 @@ const ComposeModalContainer = props => {
             onExited={resetState}
             data-testid={responsiveProps.dataTestId}
           >
-            <ModalHeader onDismiss={props.onDismiss} />
+            <ModalHeader
+              onDismiss={props.onDismiss}
+              headerTitle={props?.submissionCommentsHeader}
+            />
             <ModalBody
               attachments={[...attachments, ...attachmentsToUpload]}
               bodyMessages={bodyMessages}
@@ -239,27 +254,30 @@ const ComposeModalContainer = props => {
               removeAttachment={removeAttachment}
               replaceAttachment={replaceAttachment}
             >
-              <HeaderInputs
-                activeCourseFilter={selectedContext}
-                setUserNote={setUserNote}
-                contextName={props.pastConversation?.contextName}
-                courses={props.courses}
-                selectedRecipients={props.selectedIds}
-                isReply={props.isReply}
-                isForward={props.isForward}
-                onContextSelect={onContextSelect}
-                onSelectedIdsChange={props.onSelectedIdsChange}
-                onUserNoteChange={onUserNoteChange}
-                onSendIndividualMessagesChange={onSendIndividualMessagesChange}
-                onSubjectChange={onSubjectChange}
-                userNote={userNote}
-                sendIndividualMessages={sendIndividualMessages}
-                subject={
-                  props.isReply || props.isForward ? props.pastConversation?.subject : subject
-                }
-                mediaAttachmentTitle={mediaUploadFile?.uploadedFile.name}
-                onRemoveMediaComment={onRemoveMedia}
-              />
+              {isSubmissionCommentsType ? null : (
+                <HeaderInputs
+                  activeCourseFilter={selectedContext}
+                  setUserNote={setUserNote}
+                  contextName={props.pastConversation?.contextName}
+                  courses={props.courses}
+                  selectedRecipients={props.selectedIds}
+                  isReply={props.isReply}
+                  isForward={props.isForward}
+                  onContextSelect={onContextSelect}
+                  onSelectedIdsChange={props.onSelectedIdsChange}
+                  onUserNoteChange={onUserNoteChange}
+                  onSendIndividualMessagesChange={onSendIndividualMessagesChange}
+                  onSubjectChange={onSubjectChange}
+                  userNote={userNote}
+                  sendIndividualMessages={sendIndividualMessages}
+                  subject={
+                    props.isReply || props.isForward ? props.pastConversation?.subject : subject
+                  }
+                  mediaAttachmentTitle={mediaUploadFile?.uploadedFile.name}
+                  onRemoveMediaComment={onRemoveMedia}
+                  data-testid="compose-modal-inputs"
+                />
+              )}
             </ModalBody>
             <Modal.Footer>
               <ComposeActionButtons
@@ -322,6 +340,7 @@ export default ComposeModalContainer
 
 ComposeModalContainer.propTypes = {
   addConversationMessage: PropTypes.func,
+  createSubmissionComment: PropTypes.func,
   courses: PropTypes.object,
   createConversation: PropTypes.func,
   isReply: PropTypes.bool,
@@ -332,5 +351,6 @@ ComposeModalContainer.propTypes = {
   sendingMessage: PropTypes.bool,
   setSendingMessage: PropTypes.func,
   onSelectedIdsChange: PropTypes.func,
-  selectedIds: PropTypes.array
+  selectedIds: PropTypes.array,
+  submissionCommentsHeader: PropTypes.string
 }

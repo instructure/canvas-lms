@@ -16,7 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ADD_CONVERSATION_MESSAGE, CREATE_CONVERSATION} from '../../../graphql/Mutations'
+import {
+  ADD_CONVERSATION_MESSAGE,
+  CREATE_CONVERSATION,
+  CREATE_SUBMISSION_COMMENT
+} from '../../../graphql/Mutations'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import ComposeModalContainer from './ComposeModalContainer'
 import {Conversation} from '../../../graphql/Conversation'
@@ -31,12 +35,14 @@ import ModalSpinner from './ModalSpinner'
 import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
 import {useMutation, useQuery} from 'react-apollo'
+import {ConversationContext} from '../../../util/constants'
 
 const I18n = useI18nScope('conversations_2')
 
 const ComposeModalManager = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [sendingMessage, setSendingMessage] = useState(false)
+  const {isSubmissionCommentsType} = useContext(ConversationContext)
 
   const coursesQuery = useQuery(COURSES_QUERY, {
     variables: {
@@ -46,6 +52,8 @@ const ComposeModalManager = props => {
   })
 
   const getParticipants = () => {
+    if (isSubmissionCommentsType) return
+
     const lastAuthorId = props.conversationMessage
       ? props.conversationMessage?.author._id.toString()
       : props.conversation?.messages[0].author._id.toString()
@@ -66,7 +74,7 @@ const ComposeModalManager = props => {
       participants: getParticipants(),
       ...(props.conversationMessage && {createdBefore: props.conversationMessage.createdAt})
     },
-    skip: !(props.isReply || props.isReplyAll || props.isForward)
+    skip: !(props.isReply || props.isReplyAll || props.isForward) || isSubmissionCommentsType
   })
 
   const updateConversationsCache = (cache, result) => {
@@ -151,6 +159,7 @@ const ComposeModalManager = props => {
   }
 
   const updateCache = (cache, result) => {
+    if (isSubmissionCommentsType) return
     if (props.isReply || props.isReplyAll || props.isForward) {
       if (result.data.addConversationMessage.errors) {
         setOnFailure(I18n.t('Error occurred while adding message to conversation'))
@@ -188,6 +197,12 @@ const ComposeModalManager = props => {
     onError: () => onConversationCreateComplete(false)
   })
 
+  const [createSubmissionComment] = useMutation(CREATE_SUBMISSION_COMMENT, {
+    update: updateCache,
+    onCompleted: data => onConversationCreateComplete(!data.createSubmissionComment.errors),
+    onError: () => onConversationCreateComplete(false)
+  })
+
   if (!props.open) {
     return null
   }
@@ -218,6 +233,14 @@ const ComposeModalManager = props => {
           }
         })
       }}
+      createSubmissionComment={data => {
+        createSubmissionComment({
+          variables: {
+            ...data.variables,
+            submissionId: props?.conversation?._id
+          }
+        })
+      }}
       courses={coursesQuery?.data?.legacyNode}
       createConversation={createConversation}
       isReply={props.isReply || props.isReplyAll}
@@ -229,6 +252,7 @@ const ComposeModalManager = props => {
       setSendingMessage={setSendingMessage}
       onSelectedIdsChange={props.onSelectedIdsChange}
       selectedIds={props.selectedIds}
+      submissionCommentsHeader={isSubmissionCommentsType ? props?.conversation?.subject : null}
     />
   )
 }
