@@ -60,9 +60,7 @@ describe('ObserverOptions', () => {
 
     const student4 = props.observedUsersList[1]
     expect(getByText(student4.name)).toBeInTheDocument()
-    expect(
-      getByText(student4.name).parentElement.querySelector(`svg[name="IconUser"]`)
-    ).toBeInTheDocument()
+    expect(getByText('S4')).toBeInTheDocument()
   })
 
   it('allows searching the select', async () => {
