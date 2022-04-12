@@ -50,7 +50,7 @@ module CC
         path = File.join(folder_names, file.display_name)
         @added_attachments[file.id] = path
         migration_id = create_key(file)
-        if file_or_folder_restricted?(file) || file.usage_rights || file.display_name != file.unencoded_filename || file.category == Attachment::BUTTONS_AND_ICONS
+        if file_or_folder_restricted?(file) || file.usage_rights || file.display_name != file.unencoded_filename || file.category == Attachment::ICON_MAKER_ICONS
           files_with_metadata[:files] << [file, migration_id]
         end
         @resources.resource(

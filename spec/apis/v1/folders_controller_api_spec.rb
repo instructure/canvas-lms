@@ -224,33 +224,33 @@ describe "Folders API", type: :request do
     end
   end
 
-  describe "#buttons_and_icons_folder" do
-    it "creates a buttons and icons folder for the course" do
+  describe "#icon_maker_folder" do
+    it "creates an icon maker folder for the course" do
       expect do
         api_call(
           :get,
-          "/api/v1/courses/#{@course.id}/folders/buttons_and_icons",
-          @folders_path_options.merge(action: "buttons_and_icons_folder", course_id: @course.id.to_param).except(:id),
+          "/api/v1/courses/#{@course.id}/folders/icon_maker",
+          @folders_path_options.merge(action: "icon_maker_folder", course_id: @course.id.to_param).except(:id),
           {}
         )
       end.to change {
-        @course.folders.where(unique_type: Folder::BUTTONS_AND_ICONS_UNIQUE_TYPE).count
+        @course.folders.where(unique_type: Folder::ICON_MAKER_UNIQUE_TYPE).count
       }.from(0).to(1)
     end
 
-    it "returns the existing buttons and icons folder for the course" do
-      existing_folder = Folder.buttons_and_icons_folder(@course)
+    it "returns the existing icon maker folder for the course" do
+      existing_folder = Folder.icon_maker_folder(@course)
 
       json = api_call(
         :get,
-        "/api/v1/courses/#{@course.id}/folders/buttons_and_icons",
-        @folders_path_options.merge(action: "buttons_and_icons_folder", course_id: @course.id.to_param).except(:id),
+        "/api/v1/courses/#{@course.id}/folders/icon_maker",
+        @folders_path_options.merge(action: "icon_maker_folder", course_id: @course.id.to_param).except(:id),
         {}
       )
 
       aggregate_failures do
         expect(json["id"]).to eq existing_folder.id
-        expect(@course.folders.where(unique_type: Folder::BUTTONS_AND_ICONS_UNIQUE_TYPE).count).to be 1
+        expect(@course.folders.where(unique_type: Folder::ICON_MAKER_UNIQUE_TYPE).count).to be 1
       end
     end
   end

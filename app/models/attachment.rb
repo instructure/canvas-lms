@@ -45,9 +45,9 @@ class Attachment < ActiveRecord::Base
 
   CLONING_ERROR_TYPE = "attachment_clone_url"
 
-  BUTTONS_AND_ICONS = "icon_maker_icons"
+  ICON_MAKER_ICONS = "icon_maker_icons"
   UNCATEGORIZED = "uncategorized"
-  VALID_CATEGORIES = [BUTTONS_AND_ICONS, UNCATEGORIZED].freeze
+  VALID_CATEGORIES = [ICON_MAKER_ICONS, UNCATEGORIZED].freeze
 
   include HasContentTags
   include ContextModuleItem

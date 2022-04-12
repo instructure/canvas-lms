@@ -32,7 +32,7 @@ describe Attachment do
       subject { attachment_model category: category }
 
       context "with a valid category" do
-        let(:category) { Attachment::BUTTONS_AND_ICONS }
+        let(:category) { Attachment::ICON_MAKER_ICONS }
 
         it "does not raise a validation error" do
           expect { subject }.not_to raise_error
@@ -408,7 +408,7 @@ describe Attachment do
     describe "uncategorized" do
       subject { Attachment.uncategorized }
 
-      let!(:button_and_icon) { attachment_model(category: Attachment::BUTTONS_AND_ICONS) }
+      let!(:button_and_icon) { attachment_model(category: Attachment::ICON_MAKER_ICONS) }
       let!(:uncategorized) { attachment_model }
 
       it { is_expected.to include uncategorized }
@@ -418,10 +418,10 @@ describe Attachment do
     describe "for_category" do
       subject { Attachment.for_category(category) }
 
-      let_once(:button_and_icon) { attachment_model(category: Attachment::BUTTONS_AND_ICONS) }
+      let_once(:button_and_icon) { attachment_model(category: Attachment::ICON_MAKER_ICONS) }
       let_once(:uncategorized) { attachment_model }
 
-      let(:category) { Attachment::BUTTONS_AND_ICONS }
+      let(:category) { Attachment::ICON_MAKER_ICONS }
 
       before do
         button_and_icon
