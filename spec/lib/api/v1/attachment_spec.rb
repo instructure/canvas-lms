@@ -261,7 +261,7 @@ describe Api::V1::Attachment do
       before { api_attachment_preflight(context, request, opts) }
 
       let(:params) do
-        super().merge(category: Attachment::BUTTONS_AND_ICONS)
+        super().merge(category: Attachment::ICON_MAKER_ICONS)
       end
 
       it "sets the category on the attachment" do
@@ -271,7 +271,7 @@ describe Api::V1::Attachment do
 
     context "with InstFS enabled" do
       let(:params) do
-        super().merge(category: Attachment::BUTTONS_AND_ICONS)
+        super().merge(category: Attachment::ICON_MAKER_ICONS)
       end
 
       before do

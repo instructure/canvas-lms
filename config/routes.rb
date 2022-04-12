@@ -1031,7 +1031,7 @@ CanvasRails::Application.routes.draw do
       post "courses/:course_id/folders", controller: :folders, action: :create
       get "courses/:course_id/folders/by_path/*full_path", controller: :folders, action: :resolve_path
       get "courses/:course_id/folders/by_path", controller: :folders, action: :resolve_path
-      get "courses/:course_id/folders/buttons_and_icons", controller: :folders, action: :buttons_and_icons_folder
+      get "courses/:course_id/folders/icon_maker", controller: :folders, action: :icon_maker_folder
       get "courses/:course_id/folders/media", controller: :folders, action: :media_folder
       get "courses/:course_id/folders/:id", controller: :folders, action: :show, as: "course_folder"
       get "media_objects", controller: "media_objects", action: :index, as: :media_objects
