@@ -122,6 +122,38 @@ module Lti
           get canvas_id_endpoint, params: { id: id }, headers: request_headers
           expect(response).to be_unauthorized
         end
+
+        context "with sharding" do
+          specs_require_sharding
+
+          let(:user) do
+            @shard1.activate do
+              user_factory
+            end
+          end
+          let(:student) do
+            course_with_student(active_all: true, course: course, user: user)
+            @student.update(lti_context_id: SecureRandom.uuid)
+            @student
+          end
+          let(:canvas_id_endpoint) { "/api/lti/users/#{student.global_id}" }
+
+          it "grants access for cross-shard users" do
+            get canvas_id_endpoint, params: { id: student.global_id }, headers: request_headers
+            parsed_body = JSON.parse(response.body)
+            expect(parsed_body).to eq(
+              {
+                "id" => student.global_id,
+                "created_at" => student.created_at.iso8601,
+                "name" => student.name,
+                "sortable_name" => student.sortable_name,
+                "short_name" => student.short_name,
+                "lti_id" => student.lti_context_id,
+                "email" => student.email
+              }
+            )
+          end
+        end
       end
 
       context "account" do

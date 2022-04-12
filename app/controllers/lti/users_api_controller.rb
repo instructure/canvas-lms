@@ -96,12 +96,10 @@ module Lti
 
     def user_in_context
       tool_proxy_assignments = AssignmentConfigurationToolLookup.by_tool_proxy_scope(tool_proxy).select(:assignment_id)
-      user_visible_to_proxy = user.enrollments
-                                  .joins(course: :assignments)
-                                  .where(assignments: { id: tool_proxy_assignments })
-                                  .where.not(courses: { workflow_state: "deleted" })
-                                  .where.not(assignments: { workflow_state: "deleted" })
-                                  .exists?
+      user_visible_to_proxy = Enrollment.joins(course: :assignments)
+                                        .where(user: user, assignments: { id: tool_proxy_assignments })
+                                        .merge(Course.active).merge(Assignment.active)
+                                        .exists?
       render_unauthorized_action unless user_visible_to_proxy
     end
   end

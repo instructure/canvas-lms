@@ -819,7 +819,7 @@ class Course < ActiveRecord::Base
       .or(where(id: query))
   }
   scope :needs_account, ->(account, limit) { where(account_id: nil, root_account_id: account).limit(limit) }
-  scope :active, -> { where("courses.workflow_state<>'deleted'") }
+  scope :active, -> { where.not(workflow_state: "deleted") }
   scope :least_recently_updated, ->(limit) { order(:updated_at).limit(limit) }
 
   scope :manageable_by_user, lambda { |*args|
