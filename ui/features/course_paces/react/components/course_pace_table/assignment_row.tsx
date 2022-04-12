@@ -35,7 +35,6 @@ import {NumberInput} from '@instructure/ui-number-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
-import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 
 import {coursePaceDateFormatter} from '../../shared/api/backend_serializer'
@@ -282,19 +281,22 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
         <View margin="0 x-small 0 0">{this.renderAssignmentIcon()}</View>
         <div>
           <Text weight="bold">
-            <a href={this.props.coursePaceItem.assignment_link} style={{color: 'inherit'}}>
-              <TruncateText>{this.props.coursePaceItem.assignment_title}</TruncateText>
+            <a
+              href={this.props.coursePaceItem.assignment_link}
+              style={{color: 'inherit', wordBreak: 'break-word'}}
+            >
+              {this.props.coursePaceItem.assignment_title}
             </a>
           </Text>
           {typeof this.props.coursePaceItem.points_possible === 'number' && (
-            <span className="course-paces-assignment-row-points-possible">
+            <div className="course-paces-assignment-row-points-possible">
               <Text size="x-small">
                 {I18n.t(
                   {one: '1 pt', other: '%{count} pts'},
                   {count: this.props.coursePaceItem.points_possible}
                 )}
               </Text>
-            </span>
+            </div>
           )}
         </div>
       </Flex>
@@ -324,7 +326,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
           {(this.props.showProjections || this.props.datesVisible) && (
             <Cell textAlign="center">
               <View data-testid="assignment-due-date" margin={labelMargin}>
-                {this.renderDate()}
+                <span style={{whiteSpace: 'nowrap'}}>{this.renderDate()}</span>
               </View>
             </Cell>
           )}

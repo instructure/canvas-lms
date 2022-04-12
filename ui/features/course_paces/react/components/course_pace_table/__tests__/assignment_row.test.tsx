@@ -66,12 +66,9 @@ describe('AssignmentRow', () => {
   })
 
   it('renders the assignment title as a link to the assignment', () => {
-    const {getByText} = renderConnected(<AssignmentRow {...defaultProps} />)
+    const {getByRole} = renderConnected(<AssignmentRow {...defaultProps} />)
 
-    // Implementation detail bleeds in here; but the `TruncateText` means that the title isn't directly in the `a`
-    expect(
-      getByText(defaultProps.coursePaceItem.assignment_title)?.parentNode?.parentNode
-    ).toHaveAttribute('href', defaultProps.coursePaceItem.assignment_link)
+    getByRole('link', {name: defaultProps.coursePaceItem.assignment_title})
   })
 
   it('renders an input that updates the duration for that module item', () => {

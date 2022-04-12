@@ -22,7 +22,6 @@ import {IconButton} from '@instructure/ui-buttons'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
-import {TruncateText} from '@instructure/ui-truncate-text'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {BlackoutDate} from '../types'
 import {coursePaceDateFormatter} from '../api/backend_serializer'
@@ -98,7 +97,7 @@ export class BlackoutDatesTable extends React.Component<ComponentProps, LocalSta
     return dates.map(bd => (
       <Row key={`blackout-date-${bd.id}`}>
         <Cell>
-          <TruncateText maxLines="auto">{bd.event_title}</TruncateText>
+          <div style={{overflowWrap: 'break-word'}}>{bd.event_title}</div>
         </Cell>
         <Cell>{this.dateFormatter(bd.start_date.toDate())}</Cell>
         <Cell>{this.dateFormatter(bd.end_date.toDate())}</Cell>
