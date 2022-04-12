@@ -216,7 +216,7 @@ export const getUnpublishedChangeCount = createSelector(
   (settingChanges, coursePaceItemChanges) => settingChanges.length + coursePaceItemChanges.length
 )
 
-export const getSummarizedChanges = createSelector(
+export const getSummarizedChanges = createDeepEqualSelector(
   getSettingChanges,
   getCoursePaceItemChanges,
   summarizeChanges
