@@ -2618,6 +2618,7 @@ CanvasRails::Application.routes.draw do
     end
 
     # LTI Access Tokens (Site Admin only)
+    get "lti_2_token", controller: "lti/token", action: :lti_2_token, as: :lti_2_token_site_admin
     get "advantage_token", controller: "lti/token", action: :advantage_access_token, as: :lti_advantage_token_site_admin
   end
 

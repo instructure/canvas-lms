@@ -23,7 +23,7 @@ class Lti::TokenController < ApplicationController
   include SupportHelpers::ControllerHelpers
 
   before_action :require_site_admin
-  before_action :verify_1_3_tool
+  before_action :verify_1_3_tool, except: :lti_2_token
 
   # site-admin-only action to get an LTI 1.3 Access Token for any ContextExternalTool
   # specified by `tool_id`, or for any DeveloperKey specified by `client_id`.
@@ -39,6 +39,17 @@ class Lti::TokenController < ApplicationController
       request.protocol
     )
     render json: provider.generate_token
+  end
+
+  def lti_2_token
+    unless tool_proxy
+      return render json: {
+        status: :bad_request,
+        errors: [{ message: "Unable to find tool for given parameters" }]
+      }, status: :bad_request
+    end
+    token = Lti::OAuth2::AccessToken.create_jwt(aud: request.host, sub: tool_proxy.guid)
+    render json: token.to_s
   end
 
   private
@@ -58,5 +69,13 @@ class Lti::TokenController < ApplicationController
              else
                ContextExternalTool.find(params.require(:tool_id)).developer_key
              end
+  end
+
+  def tool_proxy
+    @tool_proxy ||= if params[:basic_launch_lti2_id]
+                      Lti::MessageHandler.find(params.require(:basic_launch_lti2_id)).tool_proxy
+                    else
+                      Lti::ToolProxy.find params.require(:tool_proxy_id)
+                    end
   end
 end
