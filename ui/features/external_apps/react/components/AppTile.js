@@ -85,7 +85,7 @@ export default class extends React.Component {
         onClick={this.handleClick}
         onKeyDown={this.handleKeyDown}
       >
-        <div id={appId}>
+        <div id={appId} className={this.state.isHidingDetails ? '' : 'showing-details'}>
           {this.installedRibbon()}
 
           <img
