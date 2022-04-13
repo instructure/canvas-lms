@@ -18,10 +18,10 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
-import React, {useCallback} from 'react'
+import React, {useCallback, useState} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Responsive} from '@instructure/ui-responsive'
-import {IconCopyLine} from '@instructure/ui-icons'
+import {IconCopyLine, IconXSolid, IconCheckDarkSolid} from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -32,10 +32,25 @@ import SortColumnHeader from './SortColumnHeader'
 
 const I18n = useI18nScope('jobs_v2')
 
-function copyToClipboardTruncatedValue(value, onClick) {
-  const copyToClipboardAction = () => {
-    navigator.clipboard.writeText(value)
-  }
+function CopyToClipboardTruncatedValue({value, onClick}) {
+  const [feedback, setFeedback] = useState(null)
+
+  const copyToClipboardAction = useCallback(() => {
+    return navigator.clipboard.writeText(value).then(
+      () => setFeedback(true),
+      () => setFeedback(false)
+    )
+  }, [setFeedback, value])
+
+  const handleBlur = useCallback(() => {
+    setFeedback(null)
+  }, [setFeedback])
+
+  const renderFeedbackIcon = useCallback(() => {
+    if (feedback === true) return <IconCheckDarkSolid color="success" />
+    else if (feedback === false) return <IconXSolid color="error" />
+    else return <IconCopyLine />
+  }, [feedback])
 
   if (!value) {
     return <Text color="secondary">-</Text>
@@ -57,8 +72,9 @@ function copyToClipboardTruncatedValue(value, onClick) {
               size="small"
               onClick={copyToClipboardAction}
               screenReaderLabel={I18n.t('Copy')}
+              onBlur={handleBlur}
             >
-              <IconCopyLine />
+              {renderFeedbackIcon()}
             </IconButton>
           </div>
         </Flex.Item>
@@ -85,13 +101,20 @@ export default function JobsTable({
             <Link onClick={() => onClickJob(job)}>{job.id}</Link>
           </Table.RowHeader>
           <Table.Cell>
-            {copyToClipboardTruncatedValue(job.tag, tag => onClickFilter('tag', tag))}
+            <CopyToClipboardTruncatedValue
+              value={job.tag}
+              onClick={tag => onClickFilter('tag', tag)}
+            />
           </Table.Cell>
           <Table.Cell>
-            {copyToClipboardTruncatedValue(job.strand, strand => onClickFilter('strand', strand))}
-            {copyToClipboardTruncatedValue(job.singleton, singleton =>
-              onClickFilter('singleton', singleton)
-            )}
+            <CopyToClipboardTruncatedValue
+              value={job.strand}
+              onClick={strand => onClickFilter('strand', strand)}
+            />
+            <CopyToClipboardTruncatedValue
+              value={job.singleton}
+              onClick={singleton => onClickFilter('singleton', singleton)}
+            />
           </Table.Cell>
           <Table.Cell>
             {job.attempts} / {job.max_attempts}
