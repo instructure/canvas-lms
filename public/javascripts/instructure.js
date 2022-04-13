@@ -51,7 +51,6 @@ import 'compiled/badge_counts'
 
   $.trackEvent('Route', location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/');
 
-
   var JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE = '.dialog, .draggable, .resizable, .sortable, .tabs';
   export function enhanceUserContent() {
     var $content = $("#content");
@@ -446,7 +445,6 @@ import 'compiled/badge_counts'
       clearTimeout(enhanceUserContentTimeout);
       enhanceUserContentTimeout = setTimeout(enhanceUserContent, 50);
     });
-
 
     $(document).bind('user_content_change', enhanceUserContent);
     $(function () {

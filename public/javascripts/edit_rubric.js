@@ -458,14 +458,11 @@ import 'compiled/jquery/fixDialogButtons'
       $rubric.find('.rubric_title .title').focus();
     }
   };
-  rubricEditing.sizeRatings = _.debounce(rubricEditing.originalSizeRatings, 10);
 
   var round = function(number, precision) {
     precision = Math.pow(10, precision || 0).toFixed(precision < 0 ? -precision : 0);
     return Math.round(number * precision) / precision;
   }
-
-
 
   rubricEditing.init = function() {
     var limitToOneRubric = !$("#rubrics").hasClass('raw_listing');
