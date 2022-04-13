@@ -59,6 +59,7 @@ class Mutations::UpdateDiscussionEntryParticipant < Mutations::BaseMutation
     end
 
     unless input[:report_type].nil?
+      InstStatsd::Statsd.increment("discussion_entry_participant.report.created")
       discussion_entry.change_report_type(input[:report_type], current_user)
     end
 
