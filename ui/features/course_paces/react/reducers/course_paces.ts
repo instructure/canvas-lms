@@ -142,7 +142,7 @@ export const getSettingChanges = createDeepEqualSelector(
   }
 )
 
-function getBlackoutDateChanges(
+export function getBlackoutDateChanges(
   originalBlackoutDates: BlackoutDate[],
   blackoutDates: BlackoutDate[]
 ): Change[] {
@@ -151,7 +151,7 @@ function getBlackoutDateChanges(
   if (deepEqual(originalBlackoutDates, blackoutDates)) return changes
 
   // if I don't find the new one in the orig, it was added
-  if (originalBlackoutDates.length) {
+  if (blackoutDates.length) {
     blackoutDates.forEach(bod => {
       const targetId: string = (bod.id || bod.temp_id) as string
       if (
@@ -166,21 +166,21 @@ function getBlackoutDateChanges(
         })
       }
     })
+  }
 
+  if (originalBlackoutDates.length) {
     // if I don't find the orig one in new, it was deleted
     originalBlackoutDates.forEach(bod => {
       const targetId = (bod.id || bod.temp_id) as string
-      let index
       if (
-        (index =
-          blackoutDates.findIndex(elem => {
-            return (elem.id || elem.temp_id) === targetId
-          }) < 0)
+        blackoutDates.findIndex(elem => {
+          return (elem.id || elem.temp_id) === targetId
+        }) < 0
       ) {
         changes.push({
           id: 'blackout_date',
           oldValue: bod,
-          newValue: blackoutDates[index]
+          newValue: null
         })
       }
     })
