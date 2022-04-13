@@ -67,7 +67,7 @@ describe('PacePicker', () => {
     act(() => students.click())
     const henry = screen.getByRole('menuitem', {name: 'Henry Dorsett Case'})
     expect(henry).toBeInTheDocument()
-    expect(henry.querySelector('svg[name="IconUser"]')).toBeInTheDocument()
+    expect(henry.querySelector('span[name="Henry Dorsett Case"]')).toBeInTheDocument()
     const molly = screen.getByRole('menuitem', {name: 'Molly Millions'})
     expect(molly).toBeInTheDocument()
     expect(molly.querySelector('img[src="molly_avatar"]')).toBeInTheDocument()

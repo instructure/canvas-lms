@@ -22,7 +22,7 @@ import {connect} from 'react-redux'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {ApplyTheme} from '@instructure/ui-themeable'
-import {IconArrowOpenDownSolid, IconArrowOpenUpSolid, IconUserLine} from '@instructure/ui-icons'
+import {IconArrowOpenDownSolid, IconArrowOpenUpSolid} from '@instructure/ui-icons'
 import {Avatar} from '@instructure/ui-avatar'
 import {Heading} from '@instructure/ui-heading'
 import {Menu} from '@instructure/ui-menu'
@@ -127,11 +127,7 @@ export const PacePicker: React.FC<ComponentProps> = ({
     return (
       <Item value={contextKey} defaultSelected={contextKey === selectedContextKey} key={key}>
         <View as="div" width={PICKER_WIDTH}>
-          {enrollment.avatar_url ? (
-            <Avatar name={enrollment.full_name} src={enrollment.avatar_url} size="xx-small" />
-          ) : (
-            <IconUserLine />
-          )}
+          <Avatar name={enrollment.full_name} src={enrollment.avatar_url} size="xx-small" />
           <View as="div" display="inline-block" margin="0 0 0 small">
             <TruncateText>{enrollment.full_name}</TruncateText>
           </View>
