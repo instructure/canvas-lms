@@ -996,6 +996,21 @@ module Canvas::LiveEvents
     }
   end
 
+  def self.blueprint_subscription_created(blueprint_subscription)
+    post_event_stringified("blueprint_subscription_created", blueprint_subscription_created_data(blueprint_subscription))
+  end
+
+  def self.blueprint_subscription_created_data(blueprint_subscription)
+    {
+      master_template_account_uuid: blueprint_subscription.master_template.course.account.uuid,
+      master_template_id: blueprint_subscription.master_template_id,
+      master_course_uuid: blueprint_subscription.master_template.course.uuid,
+      child_subscription_id: blueprint_subscription.id,
+      child_course_uuid: blueprint_subscription.child_course.uuid,
+      child_course_account_uuid: blueprint_subscription.child_course.account.uuid
+    }
+  end
+
   def self.heartbeat
     data = {
       environment: Canvas.environment,
