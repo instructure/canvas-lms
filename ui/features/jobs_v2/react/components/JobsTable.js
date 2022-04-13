@@ -32,7 +32,7 @@ import SortColumnHeader from './SortColumnHeader'
 
 const I18n = useI18nScope('jobs_v2')
 
-function copyToClipboardTruncatedValue(value) {
+function copyToClipboardTruncatedValue(value, onClick) {
   const copyToClipboardAction = () => {
     navigator.clipboard.writeText(value)
   }
@@ -45,9 +45,11 @@ function copyToClipboardTruncatedValue(value) {
     <div className="copy-button-container">
       <Flex>
         <Flex.Item shouldGrow shouldShrink>
-          <TruncateText>
-            <Tooltip renderTip={value}>{value}</Tooltip>
-          </TruncateText>
+          <Tooltip renderTip={value}>
+            <Link onClick={() => onClick(value)}>
+              <TruncateText>{value}</TruncateText>
+            </Link>
+          </Tooltip>
         </Flex.Item>
         <Flex.Item>
           <div className="copy-button-container-cell">
@@ -72,6 +74,7 @@ export default function JobsTable({
   sortColumn,
   onClickJob,
   onClickHeader,
+  onClickFilter,
   timeZone
 }) {
   const renderJobRow = useCallback(
@@ -81,10 +84,14 @@ export default function JobsTable({
           <Table.RowHeader>
             <Link onClick={() => onClickJob(job)}>{job.id}</Link>
           </Table.RowHeader>
-          <Table.Cell>{copyToClipboardTruncatedValue(job.tag)}</Table.Cell>
           <Table.Cell>
-            {copyToClipboardTruncatedValue(job.strand)}
-            {copyToClipboardTruncatedValue(job.singleton)}
+            {copyToClipboardTruncatedValue(job.tag, tag => onClickFilter('tag', tag))}
+          </Table.Cell>
+          <Table.Cell>
+            {copyToClipboardTruncatedValue(job.strand, strand => onClickFilter('strand', strand))}
+            {copyToClipboardTruncatedValue(job.singleton, singleton =>
+              onClickFilter('singleton', singleton)
+            )}
           </Table.Cell>
           <Table.Cell>
             {job.attempts} / {job.max_attempts}
@@ -96,7 +103,7 @@ export default function JobsTable({
         </Table.Row>
       )
     },
-    [bucket, onClickJob, timeZone]
+    [bucket, onClickFilter, onClickJob, timeZone]
   )
 
   const renderColHeader = useCallback(
