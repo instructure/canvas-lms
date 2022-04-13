@@ -720,7 +720,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
       tags = tag_association.where(migration_id: migration_ids).preload(:content).to_a
       restricted_ids = find_restricted_ids(tags)
       tags.each do |tag|
-        next if tag.content_type == "AssignmentGroup" # these are noise, since they're touched with each assignment
+        next if %w[AssignmentGroup ContentTag].include?(tag.content_type) # these are noise, since they're touched with each assignment
 
         changes << changed_asset_json(tag.content, action, restricted_ids.include?(tag.migration_id),
                                       tag.migration_id, exceptions)
