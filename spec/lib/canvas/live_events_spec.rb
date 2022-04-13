@@ -2019,6 +2019,30 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe "master template child subscription" do
+    before do
+      @course = course_model
+      @child_course = course_model
+      @master_template = MasterCourses::MasterTemplate.create!(course: @course)
+      @child_subscription =
+        MasterCourses::ChildSubscription.create!(master_template: @master_template, child_course: @child_course)
+    end
+
+    context "created" do
+      it "triggers an blueprint_subscription_created live event" do
+        expect_event("blueprint_subscription_created", {
+                       master_template_account_uuid: @master_template.course.account.uuid,
+                       master_template_id: @master_template.id.to_s,
+                       master_course_uuid: @course.uuid,
+                       child_subscription_id: @child_subscription.id.to_s,
+                       child_course_uuid: @child_course.uuid,
+                       child_course_account_uuid: @child_course.account.uuid
+                     }).once
+        Canvas::LiveEvents.blueprint_subscription_created(@child_subscription)
+      end
+    end
+  end
+
   describe "heartbeat" do
     context "when database region is not set (local/open source)" do
       it "sets region to not_configured" do

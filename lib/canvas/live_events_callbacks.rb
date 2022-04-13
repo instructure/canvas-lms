@@ -91,6 +91,8 @@ module Canvas::LiveEventsCallbacks
       Canvas::LiveEvents.outcome_friendly_description_created(obj)
     when MasterCourses::MasterTemplate
       Canvas::LiveEvents.master_template_created(obj)
+    when MasterCourses::ChildSubscription
+      Canvas::LiveEvents.blueprint_subscription_created(obj)
     end
   end
 
