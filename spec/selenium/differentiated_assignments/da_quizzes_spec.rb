@@ -49,14 +49,14 @@ describe "interaction with differentiated quizzes" do
         expect(f("#assignment-quizzes")).to include_text(@da_quiz.title)
       end
 
-      it "shows quizzes with a graded submission" do
+      it "does not show unassigned quizzes with a graded submission" do
         @teacher = User.create!
         @course.enroll_teacher(@teacher)
         @da_quiz.assignment.grade_student(@student, grade: 10, grader: @teacher)
         get "/courses/#{@course.id}/assignments"
-        expect(f("#assignment_group_undated")).to include_text(@da_quiz.title)
+        expect(f(".ig-empty-msg")).to include_text("No Assignment Groups found")
         get "/courses/#{@course.id}/quizzes"
-        expect(f("#assignment-quizzes")).to include_text(@da_quiz.title)
+        expect(f(".ig-empty-msg")).to include_text("No quizzes available")
       end
     end
 
@@ -74,12 +74,13 @@ describe "interaction with differentiated quizzes" do
         expect(driver.current_url).to match %r{/courses/\d+/quizzes/#{@da_quiz.id}}
       end
 
-      it "shows the quiz page with a graded submission" do
+      it "does not show the quiz page for an unassigned quiz with a graded submission" do
         @teacher = User.create!
         @course.enroll_teacher(@teacher)
         @da_quiz.assignment.grade_student(@student, grade: 10, grader: @teacher)
         get "/courses/#{@course.id}/quizzes/#{@da_quiz.id}"
-        expect(driver.current_url).to match %r{/courses/\d+/quizzes/#{@da_quiz.id}}
+        expect(f("#flash_message_holder")).to include_text("You do not have access to the requested quiz.")
+        expect(driver.current_url).to match %r{/courses/\d+/quizzes}
       end
 
       it "shows previous submissions on inaccessible quizzes" do
@@ -117,12 +118,12 @@ describe "interaction with differentiated quizzes" do
         expect(f("#assignments")).to include_text(@da_quiz.title)
       end
 
-      it "shows a quiz with a grade" do
+      it "does not show an unassigned quiz with a grade" do
         @teacher = User.create!
         @course.enroll_teacher(@teacher)
         @da_quiz.assignment.grade_student(@student, grade: 10, grader: @teacher)
         get "/courses/#{@course.id}/grades"
-        expect(f("#assignments")).to include_text(@da_quiz.title)
+        expect(f("#assignments")).not_to include_text(@da_quiz.title)
       end
 
       it "does not show an inaccessible quiz" do
@@ -157,14 +158,14 @@ describe "interaction with differentiated quizzes" do
         expect(f("#assignment-quizzes")).to include_text(@da_quiz.title)
       end
 
-      it "shows quizzes with a graded submission" do
+      it "does not show unassigned quizzes with a graded submission" do
         @teacher = User.create!
         @course.enroll_teacher(@teacher)
         @da_quiz.assignment.grade_student(@student, grade: 10, grader: @teacher)
         get "/courses/#{@course.id}/assignments"
-        expect(f("#assignment_group_undated")).to include_text(@da_quiz.title)
+        expect(f(".ig-empty-msg")).to include_text("No Assignment Groups found")
         get "/courses/#{@course.id}/quizzes"
-        expect(f("#assignment-quizzes")).to include_text(@da_quiz.title)
+        expect(f(".ig-empty-msg")).to include_text("No quizzes available")
       end
     end
 
@@ -182,12 +183,13 @@ describe "interaction with differentiated quizzes" do
         expect(driver.current_url).to match %r{/courses/\d+/quizzes/#{@da_quiz.id}}
       end
 
-      it "shows the quiz page with a graded submission" do
+      it "does not show the quiz page for an unassigned quiz with a graded submission" do
         @teacher = User.create!
         @course.enroll_teacher(@teacher)
         @da_quiz.assignment.grade_student(@student, grade: 10, grader: @teacher)
         get "/courses/#{@course.id}/quizzes/#{@da_quiz.id}"
-        expect(driver.current_url).to match %r{/courses/\d+/quizzes/#{@da_quiz.id}}
+        expect(f("#flash_message_holder")).to include_text("You do not have access to the requested quiz.")
+        expect(driver.current_url).to match %r{/courses/\d+/quizzes}
       end
 
       it "shows previous submissions on inaccessible quizzes" do
@@ -214,12 +216,12 @@ describe "interaction with differentiated quizzes" do
         expect(f("#assignments")).to include_text(@da_quiz.title)
       end
 
-      it "shows a quiz with a graded submission" do
+      it "does not show an unassigned quiz with a graded submission" do
         @teacher = User.create!
         @course.enroll_teacher(@teacher)
         @da_quiz.assignment.grade_student(@student, grade: 10, grader: @teacher)
         get "/courses/#{@course.id}/grades"
-        expect(f("#assignments")).to include_text(@da_quiz.title)
+        expect(f("#assignments")).not_to include_text(@da_quiz.title)
       end
 
       it "does not show an inaccessible quiz" do

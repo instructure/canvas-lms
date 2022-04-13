@@ -2047,7 +2047,7 @@ describe "Submissions API", type: :request do
           expect(json.size).to eq 0
         end
 
-        it "returns the submissons if the student is not in the overriden section but has a graded submission" do
+        it "does not return the submissons if the student is not in the overriden section and has a graded submission" do
           Score.where(enrollment_id: @student.enrollments).each(&:destroy_permanently!)
           @student.enrollments.each(&:destroy_permanently!)
           student_in_section(@section2, user: @student)
@@ -2055,8 +2055,7 @@ describe "Submissions API", type: :request do
 
           json = call_to_for_students(as_student: true)
 
-          expect(json.size).to eq 1
-          json.each { |submission| expect(submission["user_id"]).to eq @student.id }
+          expect(json.size).to eq 0
         end
       end
     end
@@ -2076,7 +2075,7 @@ describe "Submissions API", type: :request do
           json.each { |submission| expect(submission["user_id"]).to eq @student.id }
         end
 
-        it "does not return the submissons if the observed student is not in the overriden section and has a submission with no grade" do
+        it "does not return the submissons if the observed student is not in the overridden section and has a submission with no grade" do
           Score.where(enrollment_id: @student.enrollments).each(&:destroy_permanently!)
           @student.enrollments.each(&:destroy_permanently!)
           student_in_section(@section2, user: @student)
@@ -2087,7 +2086,7 @@ describe "Submissions API", type: :request do
           expect(json.size).to eq 0
         end
 
-        it "returns the submissons if the observed student is not in the overriden section but has a graded submission" do
+        it "does not return the submissons if the observed student is not in the overridden section and has a graded submission" do
           Score.where(enrollment_id: @student.enrollments).each(&:destroy_permanently!)
           @student.enrollments.each(&:destroy_permanently!)
           student_in_section(@section2, user: @student)
@@ -2095,8 +2094,7 @@ describe "Submissions API", type: :request do
 
           json = call_to_for_students(as_observer: true)
 
-          expect(json.size).to eq 1
-          json.each { |submission| expect(submission["user_id"]).to eq @student.id }
+          expect(json.size).to eq 0
         end
       end
     end
@@ -2309,11 +2307,11 @@ describe "Submissions API", type: :request do
                              { include: %w[submission_comments rubric_assessment] }, {}, expected_status: 401)
           end
 
-          it "returns the submission if it is graded" do
+          it "does not return the submission, even if it is graded" do
             @assignment.grade_student(@student, grade: 5, grader: @teacher)
             json = call_to_submissions_show(as_student: true)
 
-            expect(json["assignment_id"]).not_to be_nil
+            expect(json["assignment_id"]).to be_nil
           end
 
           it "returns assignment_visible false" do

@@ -3054,6 +3054,30 @@ describe Assignment do
         it "does not return students outside the class" do
           expect(@assignment.students_with_visibility.include?(@student3)).to be_falsey
         end
+
+        it "does not return students that were graded then deactivated in the assigned section, and are active in another section" do
+          @course.enroll_student(
+            @student1,
+            section: @section2,
+            allow_multiple_enrollments: true,
+            enrollment_state: "active"
+          )
+          @assignment.grade_student(@student1, score: 10, grader: @teacher)
+          @course.enrollments.find_by(user: @student1, course_section: @section1).deactivate
+          expect(@assignment.students_with_visibility).not_to include @student1
+        end
+
+        it "does not return students that submitted then were deactivated in the assigned section, and are active in another section" do
+          @course.enroll_student(
+            @student1,
+            section: @section2,
+            allow_multiple_enrollments: true,
+            enrollment_state: "active"
+          )
+          @assignment.submit_homework(@student1, submission_type: "online_url", url: "http://example.com")
+          @course.enrollments.find_by(user: @student1, course_section: @section1).deactivate
+          expect(@assignment.students_with_visibility).not_to include @student1
+        end
       end
 
       context "permissions" do
