@@ -229,6 +229,12 @@ export default function JobsIndex() {
           jobDetailsRef.current?.scrollIntoView()
           dispatch({type: 'SELECT_JOB', payload: job})
         }}
+        onClickFilter={(groupType, groupText) => {
+          if (groupType !== state.group_type) {
+            dispatch({type: 'CHANGE_GROUP_TYPE', payload: groupType})
+          }
+          dispatch({type: 'CHANGE_GROUP_TEXT', payload: groupText})
+        }}
         onClickHeader={col => dispatch({type: 'CHANGE_JOBS_ORDER', payload: col})}
         timeZone={state.time_zone}
       />

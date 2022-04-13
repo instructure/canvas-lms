@@ -123,7 +123,7 @@ describe('JobsIndex', () => {
     )
   })
 
-  it('filters the job list', async () => {
+  it('filters the job list via the groups table', async () => {
     const {getByText} = render(<JobsIndex />)
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('fake_job_list_group_value'))
@@ -132,6 +132,47 @@ describe('JobsIndex', () => {
       expect.objectContaining({
         path: '/api/v1/jobs2/running',
         params: expect.objectContaining({tag: 'fake_job_list_group_value'})
+      })
+    )
+  })
+
+  it('filters by clicking a tag in the jobs list', async () => {
+    const {getByRole} = render(<JobsIndex />)
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByRole('button', {name: 'fake_job_list_tag_value'}))
+    expect(window.location.search).toMatch(/group_text=fake_job_list_tag_value/)
+    expect(doFetchApi).toHaveBeenCalledWith(
+      expect.objectContaining({
+        path: '/api/v1/jobs2/running',
+        params: expect.objectContaining({tag: 'fake_job_list_tag_value'})
+      })
+    )
+  })
+
+  it('filters by clicking a strand in the jobs list', async () => {
+    const {getByRole} = render(<JobsIndex />)
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByRole('button', {name: 'fake_job_list_strand_value'}))
+    expect(window.location.search).toMatch(/group_type=strand/)
+    expect(window.location.search).toMatch(/group_text=fake_job_list_strand_value/)
+    expect(doFetchApi).toHaveBeenCalledWith(
+      expect.objectContaining({
+        path: '/api/v1/jobs2/running',
+        params: expect.objectContaining({strand: 'fake_job_list_strand_value'})
+      })
+    )
+  })
+
+  it('filters by clicking a singleton in the jobs list', async () => {
+    const {getByRole} = render(<JobsIndex />)
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByRole('button', {name: 'fake_job_list_singleton_value'}))
+    expect(window.location.search).toMatch(/group_type=singleton/)
+    expect(window.location.search).toMatch(/group_text=fake_job_list_singleton_value/)
+    expect(doFetchApi).toHaveBeenCalledWith(
+      expect.objectContaining({
+        path: '/api/v1/jobs2/running',
+        params: expect.objectContaining({singleton: 'fake_job_list_singleton_value'})
       })
     )
   })
