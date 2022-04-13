@@ -2096,6 +2096,7 @@ zh-Hans:
       通知的电子邮件地址
   adds_additional_information_and_filtering_for_feat_3e55a058: 添加更多信息并筛选功能标记
   adds_an_account_course_setting_for_a_default_due_t_9903738a: 添加帐户/课程的新作业默认截止时间设置
+  adds_an_emoji_picker_that_allows_students_and_teac_cf517b1b: 添加表情符号选择器以允许学生和老师在其提交项评论中添加表情符号。
   adds_analytics_link_on_the_user_settings_menu_3a048816: 在用户设置菜单上添加分析链接。
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: 将分析添加到学生的背景卡中。
   adds_comment_bank_for_assignment_comments_within_s_1b69dc2: "在 Speedgrader 中添加用于作业评论的评论库"
@@ -2237,8 +2238,10 @@ zh-Hans:
   all_groups_cea25817: 所有组
   all_grouptitle_outcomes_dcc565d1: "所有 %{groupTitle} 结果"
   all_image_types_allowed_9c65004d: 允许所有图像类型
+  all_in_e5ddaee0: 全部加入
   all_items_a49b66c7: 所有项目
   all_items_marked_processed_have_been_saved_by_canv_7045295a: "Canvas 已保存所有标记为“已处理”的项目。"
+  all_jobs_1d82f9d6: 所有作业
   all_media_types_allowed_3c0cdce7: 允许所有媒体类型
   all_modules_20c9a1c8: 所有模块
   all_my_files_a0213441: 我的所有文档
@@ -3199,6 +3202,7 @@ zh-Hans:
     file_import_fail: "无法导入文件“%{file_path}”"
   angel_display: "ANGEL 学习"
   angel_file_description: "Angel 导出 .zip 格式"
+  animals_nature_8bc03431: 动物和自然
   annotated_document_submission_d9ff236a: 带注释的文档提交项
   annotated_document_submissions_88704968: 注释文档提交项
   annotated_document_submissions_require_an_annotate_3c40fabe: 带注释的文档提交项要求提供annotated_document_id进行提交
@@ -4813,6 +4817,7 @@ zh-Hans:
       一个更为简单和用户友好的全新文件浏览界面。如果您在课程级别启用此界面，
       该课程中的所有用户将看到这一新界面。要在某人
       进入某位用户的个人文件页面 ('/files') 时显示该界面，您需要针对他们所属的帐户启用该界面。
+  between_1_and_10_7118bf2d: "1 和 10 之间"
   between_1_and_5_f2a74bcf: "1 和 5 之间"
   between_1_and_99_d421a4c0: "在 1% 和 99% 之间"
   between_2_and_5_c34f5152: "在 2 和 5 之间"
@@ -4826,6 +4831,7 @@ zh-Hans:
   blank_38df4238: 空白
   blocked_by_running_migration_d8a57cb7: 多个迁移进行中，排队等候
   blocked_domain_name_b5b93150: 锁定的域名
+  blocked_emojis_9fbaca3a: 被屏蔽的表情符号
   blue_daf8fea9: 蓝色
   blueprint_5cca2ef: 模板
   blueprint_course_associations_72c9609: 模板课程关联
@@ -5795,6 +5801,7 @@ zh-Hans:
   changes_will_still_apply_if_you_leave_this_page_935cedc6: 如果您离开这个页面，更改将仍然适用。
   changes_you_made_may_not_be_saved_4e8db973: 您做出的变更可能无法保存。
   changing_course_dates_may_override_term_availabili_d92b10de: 更改课程日期可能覆盖学期和可用性设置以及在课程页和仪表板的位置在修改课程日期前，请确认学期日期。
+  changing_course_pacing_days_may_modify_due_dates_9009aecd: 更改课程进度天数可能会修改截止日期。
   changing_section_dates_may_override_course_and_ter_6634950e: 更改班次日期可能覆盖课程和和可用性设置以及在课程页和仪表板的位置在修改班次日期前，请确认学期和课程日期。
   changing_the_late_policy_will_affect_previously_gr_49071db7: 更改延迟策略将影响以前评分的提交项。
   changing_the_tenant_will_delete_existing_groups_f86c48dc: 更改租户将会删除现有小组。
@@ -5854,6 +5861,7 @@ zh-Hans:
     one: "选择最多 %{count} 个主题日历"
     other: "选择最多 %{count} 个主题日历"
   choose_usage_rights_33683854: 选择使用权限...
+  choose_your_default_skin_tone_f09bf0bd: 选择默认肤色
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' 不是有效的颜色。"
   chosencolor_is_not_a_valid_color_enter_a_valid_hex_9e2c7c42: "'%{chosenColor}' 不是有效的颜色。输入有效的十六进制代码，然后再保存。"
   clark_county_gradebook_c5ea74bb: 克拉克县评分册
@@ -5864,6 +5872,8 @@ zh-Hans:
   classic_view_33f29576: 经典视图
   clear_2084585f: 清除
   clear_all_da755751: 清除全部
+  clear_job_selection_6ad1ff95: 清除作业选择
+  clear_search_900e9c97: 清除搜索
   clear_search_field_75f595c7: 清除搜索字段
   clear_selected_file_82388e50: 清除所选文件
   clear_user_cache_ef079f7f: 清除用户缓存
@@ -6052,9 +6062,9 @@ zh-Hans:
               
             **警告**：请务必熟悉 [EtherPad 的删除政策](%{etherpad_deletion_policy_url})，以确保保留您的工作结果。
         google_docs: |-
-            谷歌文档是协作处理组项目的极佳方式。它与 Microsoft Word 类似，但可以让您同时与他人合作处理同一文件，而无需发送电子邮件。  
-              
-            **警告**: 您（及您的协作人员）必须具有 Google 帐户才可参与任何谷歌文档协作。
+            **警告：**您（以及您的所有协作者）需要具有来自受支持的 web 工具的帐户才能加入任何协作。
+                     免费在线 web 工具是学生开展小组项目或论文、记录共享笔记等的有效位置。
+                     老师或学生可以设置小组协作。
       labels: 
         collaboration_type: "协作时使用:"
         description: "描述:"
@@ -6070,19 +6080,17 @@ zh-Hans:
           [Google Docs](%{google_url})之类的的免费网站工具为学生提供了一个最佳方式，以完成小组作业或论文，分享笔记等。
           教师*或*学生可以设置小组协作。
       description_student: |-
-          **什么是我们所指的协作？**我们所指的就是
-          在共享文档中一起工作的网络工具。 您可以使用资源如
-          [Google Docs](%{google_url})
-          来协作工作，如小组论文或记录笔记。
-          此页面可以轻松跟踪这些协作，并且可设置
-          为无需互换电子邮箱地址。
+          **我们所说的协作是什么意思？**我们说的是用于共同处理共享文档的
+                  基于 web 的工具。
+                  您可以使用在线 web 工具协作开展任务，例如小组论文或做笔记。本页
+                  有助于轻松跟踪这些协作以及设置协作，
+                  而无需通过电子邮件进行交流。
       description_teacher: |-
-          **什么是我们所指的协作？**我们所指的就是
-          您的学生已熟悉的网络工具。 学生可以使用资源如
-          [Google Docs](%{google_url})
-          来协作功课，如小组论文或记录笔记。 此页面让他们
-          (和您) 可以轻松跟踪这些协作，并且可设置
-          为无需互换电子邮箱地址。
+          **我们所说的协作是什么意思？**我们说的是
+                  学生已经熟悉的基于 web 的工具。学生可以使用
+                  在线 web 工具协作开展任务，例如小组论文或做笔记。
+                  本页有助于老师和学生轻松跟踪这些协作以及设置协作，
+                  而无需通过电子邮件进行交流。
       google: 
         drive: 
           upgrade: 
@@ -8977,6 +8985,7 @@ zh-Hans:
   daily_notifications_will_be_delivered_around_day_t_a2b49202: "每日通知将在大约 %{day_time} 送达。每周通知将在%{weekday} 的 %{start_time} 至 %{end_time} 时间段送达。"
   daily_summary_cf43f37c: 每日摘要
   danish_c18cdac8: 丹麦语
+  dark_skin_tone_6c9e7c7c: 深色肤色
   dashboard: 
     announcements_collapse: 
       one: "折叠 %{count} 个通告"
@@ -9200,6 +9209,7 @@ zh-Hans:
   default_question_name: 问题
   default_question_text: 问题文本
   default_sis_sync_for_assignments_quizzes_grade_dis_3b2b4878: "作业、测验和评分讨论的默认 SIS Sync"
+  default_skin_tone_f378d31c: 默认肤色
   default_template_f2a759ed: 默认样板
   default_templates_are_used_as_starting_points_for__f06f9e33: 默认样板被用作新主题的起点，而且不能被删除。
   default_to_modules_for_the_course_home_page_d6a951a7: 默认为课程主页模块
@@ -9420,6 +9430,12 @@ zh-Hans:
   designers_remove_3e590bff: "设计员 - 删除"
   details_98a31b68: 详细信息、细节
   details_a6f427c3: 详细信息：
+  determined_by_course_end_date_5e3ffb4f: 由课程结束日期决定
+  determined_by_course_pace_45063fa8: 由课程进度决定
+  determined_by_course_start_date_fc1a8ecf: 由课程开始日期决定
+  determined_by_section_end_date_3cda3832: 由班次结束日期决定
+  determined_by_section_stat_date_35dc5e7f: 由班次开始日期决定
+  determined_by_today_s_date_87330acf: 由今天的日期决定
   determines_visibility_and_management_of_outcomes_i_6f390b57: 确定“帐户导航”中的结果的可见性和管理。
   determines_visibility_and_management_of_outcomes_i_e3ab94dc: 确定“帐户导航”中的结果的可见性和管理。允许用户在帐户和课程级别创建、编辑和删除结果和结果组。
   determines_visibility_and_management_of_outcomes_t_79ca45b: |-
@@ -10155,6 +10171,7 @@ zh-Hans:
     no_due_date: "截止时间: 无截止时间"
   due_dates_520a6c08: 截止日期
   due_dates_are_being_compressed_based_on_your_start_917df12d: 截止日期正根据您的开始和结束日期压缩。
+  due_dates_are_being_compressed_based_on_your_start_c6db279e: 截止日期正基于您的开始日期和结束日期压缩。
   due_dates_changed_exceptions_ddb028: 截止日期更改异常：
   due_dates_duedatecount_bbc24d65: "截止日期 (%{dueDateCount})"
   due_datetime_f5a81b81: "到期：%{dateTime}"
@@ -10429,6 +10446,9 @@ zh-Hans:
   embedded_release_notes_72d79b9b: 嵌入式发行说明
   ember_modules_description: "单元已在 Ember 中重新编写。使用本机拖放 API 可从外部位置进行拖动。"
   embry_riddle_student_activity_tracking_8020dd95: "Embry Riddle 学生活动记录"
+  emoji_categories_a08744ae: 表情符号类别
+  emoji_picker_5bb954f9: 表情符号选择器
+  emojis_in_submission_comments_72720afc: 提交项评论中的表情符号
   empty_stub_for_testing_only_37aad38: "空存根 (只用于测试)"
   enable_6f5d1328: 启用
   enable_ability_to_alter_the_final_grade_for_the_en_e120f72d: 启用在不更改作业分数的情况下更改整个课程最终评分的功能。
@@ -10650,6 +10670,7 @@ zh-Hans:
   enter_a_what_if_score_668c91a3: 输入假设分数。
   enter_a_workflow_state_to_narrow_results_162903af: 输入工作流状态以缩小结果范围
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "输入 \"{{ACCOUNT_DOMAIN}}\" 来代替用户的母帐户域名"
+  enter_an_id_or_an_original_job_id_d81ad1c7: "输入 id 或 original_job_id"
   enter_and_distribute_grades_c1216df: 输入和发布评分
   enter_at_least_count_characters_1c7a0b36: "输入至少%{count}个字符"
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "输入\"{{CANVAS_USER_ID}}\" 来代替用户独特的Canvas ID"
@@ -11041,6 +11062,7 @@ zh-Hans:
         comments: 评论
         created_at: 创建时间
         request_context_id: "请求上下文 ID"
+        subject: 主题
         url: URL
         user: 用户
       message_contains: 消息包含
@@ -11662,6 +11684,7 @@ zh-Hans:
   filter_9df28e5b: 筛选条件：
   filter_announcements_by_unread_495eeeb3: 按未读过滤公告
   filter_assignment_category_63acaed4: 过滤作业类别
+  filter_bucket_jobs_by_group_9bd1668c: "按 %{group} 筛选 %{bucket} 作业"
   filter_by_2f4368a8: 筛选条件
   filter_by_date_c076a845: 按日期筛选
   filter_by_ip_address_40965f66: "通过 IP 地址过滤"
@@ -11754,6 +11777,7 @@ zh-Hans:
   first_two_students_and_others_count_others_bb0a212a: "%{first_two_students}，和另外的%{others_count}"
   fix_missing_policy_grade_change_records_c404507c: 修复缺少策略评分更改记录
   flagged_as_possible_spam_ebbc4683: 标记为潜在垃圾邮件
+  flags_ce30e8e3: 标记
   flags_new_eportfolio_content_matching_specific_key_a66af560: 将匹配特定关键词的新ePortfolio内容标记为潜在垃圾邮件，以便管理员确认已标记的ePortfolio或标注为安全内容。
   flags_tab_updates_c4c209f1: 标记标签更新
   flash_6afbf65a: Flash
@@ -11783,6 +11807,7 @@ zh-Hans:
     no_deleting_folders_with_content: 无法删除包含内容的文件夹
     no_deleting_root: 无法删除母文件夹
     only_one_folder: "无法设置文件夹的路径和 ID"
+  food_drink_b0ea7e7b: 食物和饮料
   for: 针对
   for_974cbb84: 共计
   for_all_devices_1f603968: 针对所有设备
@@ -11822,6 +11847,7 @@ zh-Hans:
   france_c25bfeae: 法国
   french_33881544: 法语
   french_canada_c3d92fa6: 法语(加拿大)
+  frequently_used_21a3eb8e: 常用
   friendly_description_57f7fdde: 友好描述
   friendly_description_for_parent_student_display_e608ecf3: 友好描述（用于家长/学生显示）
   friendly_name_601153fb: 友好名称
@@ -13860,6 +13886,7 @@ zh-Hans:
       如果也启用 RCE 增强，
       RCE 将在您离开时自动保存您的工作
   if_set_allows_submission_status_to_be_changed_from_156f57f: "如果设置，则允许在 Speedgrader 中更改提交状态"
+  if_set_displays_updated_mastery_connect_icon_b6a93002: 如果设置，则显示更新的掌握程度连接图标
   if_set_removes_the_delay_that_normally_occurs_when_f0a6f530: 如果已设置，请移除在搜索学生时通常会遇到的延迟。
   if_set_removes_the_missing_status_from_submissions_43fba750: 如果设置，在评分时从提交项移除缺失状态
   if_set_the_grade_calculator_will_ignore_unposted_a_2f4abd00: 如果设置，评分计算器在计算总分时将忽略取消发布的匿名作业。
@@ -14208,6 +14235,7 @@ zh-Hans:
       start_a_group: 启动小组
     styleguide: 
       manage: 管理
+  info_2f75aa74: 信息
   info_8f47054a: 信息
   info_panel_displayed_51d481cc: 信息面板显示
   info_panel_hidden_bf7c3b7b: 信息面板隐藏
@@ -14502,6 +14530,7 @@ zh-Hans:
   job_details_b33137dc: 作业详情
   job_flavor_51a18505: 作业偏好
   job_grouping_f652413e: 作业分组
+  job_lookup_1d980054: 作业查找
   jobs: 
     columns: 
       attempt: 已尝试次数
@@ -14687,8 +14716,9 @@ zh-Hans:
   late_penalty_817fff4e: 迟交罚分：
   late_penalty_9c312b22: 迟交罚分
   late_penalty_minus_count_points_810572fe: 
-    one: "逾期处罚：扣 %{count} 分"
+    one: "逾期处罚：扣 1 分"
     other: "逾期处罚：扣 %{count} 分"
+    zero: 迟交罚分：无
   late_penalty_pointsdeducted_7033a095: "迟交罚分：%{pointsDeducted}"
   late_penalty_pointsdeducted_dac023ff: "迟交罚分：*%{pointsDeducted}*"
   late_percent_b91d01b3: "延迟：%{percent}"
@@ -14903,6 +14933,7 @@ zh-Hans:
   light_blue_5374f600: 浅蓝色
   light_green_c1cd020d: 浅绿色
   light_pink_e1214d62: 浅粉红色
+  light_skin_tone_28ab2db1: 浅色肤色
   like_count_count_9467dc82: "喜欢次数：%{count}"
   like_post_dbf48764: 喜欢帖子
   like_post_from_author_79b874f1: "喜欢来自 %{author} 的帖子"
@@ -15050,6 +15081,7 @@ zh-Hans:
   loading_grades_for_coursename_26784c2d: "正在加载 %{courseName} 的评分"
   loading_grading_periods_c635d96: 正在加载评分周期...
   loading_grading_periods_for_coursename_bbe46919: "正在加载 %{courseName} 的评分周期"
+  loading_group_f1647ebb: "正在加载 %{group}"
   loading_grouptitle_dba362d2: "正在加载 %{groupTitle}。"
   loading_homeroom_announcement_content_1654f8c7: 正在加载指导教室公告内容
   loading_homeroom_announcement_title_34338f6d: 正在加载指导教室公告标题
@@ -15057,6 +15089,7 @@ zh-Hans:
   loading_important_date_2d3a29ce: 正在加载重要日期
   loading_important_date_details_1b2d2b85: 正在加载重要日期详情
   loading_important_info_217bf805: 正在加载重要信息
+  loading_jobs_12f0609d: 正在加载作业...
   loading_last_attended_date_5a42463: 正在加载上次出勤日期
   loading_latest_announcement_link_f1746190: 正在加载最新公告链接
   loading_learning_outcome_groups_599d259c: 加载学习结果组
@@ -15576,6 +15609,9 @@ zh-Hans:
   media_submission_464829f0: 媒体提交
   median_ed291842: 中位数
   median_score_4657e907: "中位数：%{score}"
+  medium_dark_skin_tone_5134edbc: 中度深色肤色
+  medium_light_skin_tone_6c4a27fb: 中度浅色肤色
+  medium_skin_tone_8608d74e: 中度肤色
   meets_expectations_bb179565: 达到预期
   meets_mastery_754e1c06: 达到掌握
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "最多 %{max_membership} 中的 %{member_count} 个成员"
@@ -17910,6 +17946,7 @@ zh-Hans:
   must_be_a_number_f6e09df7: 必须是数字
   must_be_a_valid_number_59f0069: 必须是有效数字
   must_be_after_start_date_95e251a3: 必须在开始日期后
+  must_be_between_1_and_10_e99eb0d1: "必须介于 1 至 10 之间"
   must_be_between_1_and_5_3b42aca1: "必须介于 1 至 5 之间"
   must_be_between_1_and_99_589b827d: "必须介于 1 至 99 之间"
   must_be_between_availability_dates_ceaca984: 必须在可用日期之间
@@ -18230,6 +18267,7 @@ zh-Hans:
   no_due_date_6e6a23c1: （无到期日期）
   no_e16d9132: 否
   no_email_8585ad7e: 无电子邮件
+  no_emoji_found_4db2f53c: 找不到表情符号
   no_end_date_2608075c: 无截止日期
   no_errors_1ac47724: 无错误
   no_evidence_75853352: 无证据
@@ -18370,6 +18408,7 @@ zh-Hans:
   not_reviewed_c38d9e97: 未评估
   not_selected_57866888: 未选择
   not_signed_47acf472: 未签名
+  not_specified_24a60319: 未指定
   not_starred_98931190: 未标星
   not_starred_no_subject_click_to_star_adfefe93: "'没有标示”(无主题)“，点击星号。"
   not_starred_no_subject_click_to_star_dc91380: 没有标示”(无主题)“，点击星号。
@@ -18795,6 +18834,7 @@ zh-Hans:
       remember_auth: 记住授权
   oauth_2_eb9d97: "OAuth 2"
   object_type_e4f3bbeb: 对象类型
+  objects_589fdc11: 对象
   observe_student_mastery_a1f01a: 观察学生掌握程度
   observees: 
     being_observed: 被观察的学生
@@ -18916,6 +18956,7 @@ zh-Hans:
   open_complete_incomplete_menu_cfe2033b: 打开Complete/Incomplete(完成/未完成)菜单
   open_conversation_a6590865: 打开对话
   open_discussion_title_for_comments_6baa3fa: "打开评论的讨论%{title}"
+  open_emoji_menu_1df0eb0b: 打开表情符号菜单
   open_event_menu_e9a21e39: 打开事件菜单
   open_event_menu_for_783510e3: 打开事件菜单
   open_for_comments_1810648: 开放评论
@@ -19371,6 +19412,7 @@ zh-Hans:
   path_4f9abf12: 路径
   pathtype_93f80de1: "%{pathType}"
   pause_12af3bb4: 暂停
+  pause_auto_refresh_9bd773ca: 暂停自动刷新
   paypal: 
     exception: 抱歉，出现错误，请稍后重试。
   pdf_4e842f10: pdf
@@ -19398,6 +19440,7 @@ zh-Hans:
   people_account_course_305043bb: 人员（帐户/课程）
   people_account_course_97b2bbb6: "人员（帐户 (Account)、课程 (Course)）"
   people_b4ebb13c: 人员
+  people_body_3ce556e3: 人物和身体
   people_course_ddd9a66: 人员（课程）
   people_groups_tab_b245a614: 人员（组标签）
   people_options_cfb419a6: 人员选项
@@ -19446,6 +19489,7 @@ zh-Hans:
   philippines_63_a4f62138: 菲律宾(+63)
   pick_a_destination_we_ll_send_you_errors_fa0cb0e0: 选择一个目的地，我们会告诉您误差。
   pick_a_name_to_save_this_theme_as_9773cb1a: 选择一个名字以保存这个主题为
+  pick_an_emoji_942adfc4: 选择表情符号...
   pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: 选择一个终端，我们将在那发布您的错误报告。
   pick_the_date_and_time_for_the_following_conferenc_e9f91edd: 为以下会议的设置选择日期和时间：
   pin_cdbc9f8f: 置顶
@@ -22378,6 +22422,7 @@ zh-Hans:
   reestablish_your_world_b4bd6dff: 重新建立您的世界
   reference_code_3e8355dd: 参考代码
   reference_code_is_required_c32c757f: 参考代码是必需的
+  refresh_8a04b019: 刷新
   refreshes_the_section_of_the_ui_on_the_course_sett_a45af9bb: "刷新控制课程可用性选项的课程设置页面上的 UI 部分。"
   regardless_of_whether_this_permission_is_enabled_o_437ee269: 无论是启用还是禁用此权限，用户仍可以管理其个人日历上的事件。
   regardless_of_whether_this_permission_is_enabled_o_a16e31b5: 无论是启用还是禁用此权限，用户仍可以管理其个人日历中的事件。
@@ -22484,6 +22529,7 @@ zh-Hans:
   remove_due_dates_and_assignment_availability_dates_608cd97b: 删除截止日期和作业可用性日期。
   remove_edf2b8a7: （删除）
   remove_email_address_b1820820: 删除电子邮件地址
+  remove_emoji_emojiname_cb388de9: "移除表情符号“%{emojiName}”"
   remove_empty_attachment_b2aea632: 删除空白的附件
   remove_f47dc62a: 删除
   remove_file_cbf3f40f: 删除文件
@@ -22617,6 +22663,7 @@ zh-Hans:
   reports_1b9ab7a7: 报告
   reports_account_settings_78f5336a: 报告（帐户设置）
   reports_course_f09b7d9e: 报告（课程）
+  reqired_end_date_a7deac41: 必须填写结束日期
   request_id_1499afb0: "请求 ID"
   request_successfully_sent_note_that_applying_score_ee8665b6: 已成功发送请求。请注意，应用分数可能需要等待片刻，并且重新加载页面后才会显示更改。
   request_that_docviewer_use_cloudfront_for_serving__b569aca9: "请求 DocViewer 使用 CloudFront 提供 pdf 资源。"
@@ -23053,6 +23100,8 @@ zh-Hans:
   scheduling_5a3327e7: 日程安排
   scheduling_sync_3f4a7cac: 正在预定同步
   school_of_rock_4b7b1fd0: 摇滚教室
+  scope_9729c11e: 范围：
+  scope_c59afc8a: 范围
   score_68107950: "%{score}%"
   score_change_notifications_6b94f27f: 分数更改通知
   score_does_not_include_groups_because_they_have_no_80d12f42: 
@@ -23244,6 +23293,7 @@ zh-Hans:
   search_form_fcaa38f7: 搜索窗体
   search_grading_periods_e947a3e9: 搜索评分周期
   search_groups_or_people_6c15d6ad: 搜索组或人员
+  search_people_402e622c: 搜索人员
   search_people_44f36cd2: 搜索人员...
   search_people_4782671a: 搜索人们
   search_people_as_you_type_in_this_field_the_list_o_5755e8ad: 搜索人们。按照您在此字段中键入的内容，人员名单将被自动过滤到仅包括那些与您的输入匹配的名字。
@@ -23504,6 +23554,7 @@ zh-Hans:
   selected_content_is_not_an_lti_link_11780d96: "选定的内容不是 LTI 链接。"
   selected_course_course_a581f834: "已选课程%{course}"
   selected_de3a8019: 已选择
+  selected_emojis_will_not_be_available_in_the_emoji_412d8776: 所选表情符号将在学生或讲师的“表情符号选择器”中不可用。
   selected_external_tool_tool_bae095ba: "已选择外部工具%{tool}"
   selected_filename_7552a8c0: "已选择%{filename}"
   selected_grade_942f40ba: 已选择评分
@@ -24709,6 +24760,7 @@ zh-Hans:
     android_banner_price: 免费
     android_banner_title: "Canvas 由 Instructure 提供"
     android_banner_view_button: 查看
+  smileys_emotion_edc2beac: 笑脸和情绪
   sms_f0ddceeb: 短信
   sms_is_only_used_for_multi_factor_authentication_i_73a11abc: "SMS 仅适用于多重身份验证（对帐户启用的情况下）。"
   snapshots_6e1806b4: 快照
@@ -24912,6 +24964,7 @@ zh-Hans:
   start_a_new_course_1f5f2266: 开始新课程
   start_a_new_subject_7271b3ec: 开始新主题
   start_assignment_d56256d3: 开始任务
+  start_auto_refresh_e2feafb2: 开始自动刷新
   start_date_c41cb23a: 开始日期：
   start_date_e937be8a: 开始日期
   start_date_end_date_d809dd93: "%{start_date} - %{end_date}"
@@ -24985,6 +25038,7 @@ zh-Hans:
   storage_used_in_mb_c75fbd9c: 以MB为单位使用存储
   store_and_share_course_assets_82a9967c: 存储和共享课程资源
   strand_955969b1: 股
+  strand_singleton_2d7d7be7: 串/单例
   strands_b086013b: 串
   stream_items_api: 
     assessment_request_title: "%{title} 的同伴审阅"
@@ -25117,6 +25171,7 @@ zh-Hans:
   students_can_only_participate_in_the_course_betwee_6f8595aa: 学生仅可以在这些日期期间参加课程
   students_can_see_originality_score_797fe634: 学生可以查看原创性得分
   students_cannot_view_quiz_responses_after_course_c_88e929ed: 课程结束后，学生无法查看测验的回应
+  students_have_already_submitted_homework_on_this_a_7eb5cb6e: 学生已经提交该作业的家庭作业，因此无法更改抄袭检测平台设置。
   students_have_either_already_taken_or_started_taki_a076336: 学生们已经进行或开始进行这个测验，所以要小心编辑。如果您以一个显著的方式改变任何的测验问题，您可能要考虑重新评改使用旧版测验的学生成绩。
   students_have_the_option_to_reply_anonymously_some_503cdf6c: 学生可以选择匿名回复。部分姓名和头像可能被隐藏。
   students_must_complete_all_of_these_requirements_15fa97f7: 学生必须完成所有这些要求
@@ -25512,6 +25567,7 @@ zh-Hans:
   syllabus_tab_enabled_62aebc2e: syllabus_tab_enabled
   syllabus_tutorial_tray_97e8ef82: 课程大纲教程托盘
   syllabus_visibility_options_a81ef419: 课程表可见性选项
+  symbols_35065d67: 符号
   sync_68e5c167: 同步
   sync_and_provision_microsoft_teams_with_your_canva_a8018b6c: "同步并向 Microsoft Teams 提供 Canvas 课程"
   sync_auto_scheduled_by_enrollment_changes_bd96ff7f: 按登记变更自动定时同步
@@ -25619,6 +25675,7 @@ zh-Hans:
   tas_remove_11059e14: "助教 - 删除"
   tas_remove_16a99b22: "助教 - 移除"
   tea_provisional_graders_d4f19c26: "TEA 临时评分员"
+  tea_quiz_submission_answers_b8b90be3: "TEA 测验提交项回答"
   teacher_5a73b637: 教师、老师
   teacher_count_teachers_a92f7199: "%{teacher_count} 位教师"
   teacher_dashboard_custom_report_6d20bef2: 教师控制面板自定义报告
@@ -26358,6 +26415,7 @@ zh-Hans:
   this_image_has_been_reported_9360e581: 此图像已报告。
   this_image_is_currently_unavailable_25c68857: 该图像目前不可用
   this_influences_the_user_interface_for_setting_due_12b7e7c0: 这影响用户设置截止日期的界面。不改变任何现有作业的截止日期。
+  this_influences_the_user_interface_for_setting_due_be0f0273: 这影响用户设置截止日期的界面。这不影响任何现有作业的截止时间。
   this_integration_is_not_enabled_please_enable_it_t_b9e8a997: 未启用集成。请启用以便与设置互动。
   this_is_a_blueprint_course_5e7b47fe: 这是一个蓝图课程
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "这是一个受信任 URL的逗号分隔列表。登录 Canvas 时，信任此列表中的任何 URL 将绕过 CSRF 令牌。"
@@ -27450,6 +27508,7 @@ zh-Hans:
   traditional_gradebook_d7ad59c6: 传统评分册...
   traditional_gradebook_d90461dc: 传统评分册
   transferred_student_enrollments_90dc27d3: 转移的学生注册
+  travel_places_f461329c: 旅行和地点
   treat_ungraded_as_0_d38c2b41: 把无评分的作业处理为0分
   tree_browser: 
     folder_tree_instructions: 使用上下箭头键在树中导航。按右箭头键展开文件夹，按左箭头键折叠文件夹，进入可选择选定项。
@@ -27840,6 +27899,7 @@ zh-Hans:
   updated_current_grade_to_be_empty_c2ce1d13: 已将当前评分更新为空
   updated_current_grade_to_currentgrade_bfe2ea14: "当前评分已更新至%{currentGrade}"
   updated_group_group_name_727b1d98: "已更新组 %{group_name}"
+  updated_mastery_connect_icon_70b6a9b9: 更新的掌握程度连接图标
   updated_math_equation_display_583671a8: 更新的数学等式显示
   updated_math_equation_handling_b84509d1: 更新的数学等式处理
   updated_permissions_page_f2e91060: 更新的权限页面

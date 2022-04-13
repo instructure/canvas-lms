@@ -19,11 +19,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import assignmentShape from '../shapes/assignment-shape'
 
-const I18n = useI18nScope('choose_mastery_path');
+const I18n = useI18nScope('choose_mastery_path')
 
 const {bool} = PropTypes
 

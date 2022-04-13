@@ -25,7 +25,7 @@ import ReactModal from '@canvas/react-modal'
 import {Button} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import CourseNicknameEdit from './CourseNicknameEdit'
 import classnames from 'classnames'
 import {isRTL} from '@canvas/i18n/rtlHelper'
@@ -34,7 +34,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {IconWarningSolid} from '@instructure/ui-icons'
 import {showFlashError, showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('calendar_color_picker');
+const I18n = useI18nScope('calendar_color_picker')
 
 export const PREDEFINED_COLORS = [
   {

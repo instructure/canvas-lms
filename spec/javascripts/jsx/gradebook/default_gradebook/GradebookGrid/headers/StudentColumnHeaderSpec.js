@@ -19,8 +19,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import StudentColumnHeader from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/StudentColumnHeader.js'
-import studentRowHeaderConstants from 'ui/features/gradebook/react/default_gradebook/constants/studentRowHeaderConstants.js'
+import StudentColumnHeader from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/StudentColumnHeader'
+import studentRowHeaderConstants from 'ui/features/gradebook/react/default_gradebook/constants/studentRowHeaderConstants'
 import {blurElement, getMenuContent, getMenuItem} from './ColumnHeaderSpecHelpers'
 
 /* eslint-disable qunit/no-identical-names */

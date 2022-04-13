@@ -22,7 +22,7 @@ import AssignmentToggleDetails from '../AssignmentToggleDetails'
 import AvailabilityDates from '@canvas/assignments/react/AvailabilityDates'
 import ContentTabs from './ContentTabs'
 import Header from './Header'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import MarkAsDoneButton from './MarkAsDoneButton'
 import LoadingIndicator from '@canvas/loading-indicator'
 import MissingPrereqs from './MissingPrereqs'
@@ -38,7 +38,7 @@ import {View} from '@instructure/ui-view'
 import UnpublishedModule from '../UnpublishedModule'
 import VisualOnFocusMessage from './VisualOnFocusMessage'
 
-const I18n = useI18nScope('assignments_2_student_content');
+const I18n = useI18nScope('assignments_2_student_content')
 
 const LoggedOutTabs = lazy(() => import('./LoggedOutTabs'))
 

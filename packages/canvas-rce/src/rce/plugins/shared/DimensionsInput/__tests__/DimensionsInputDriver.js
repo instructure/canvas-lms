@@ -33,8 +33,8 @@ export default class DimensionsInputDriver {
   }
 
   constructor($parent) {
-    this.$typeSelector = $parent.firstChild
-    this.$dimensionsInput = $parent.lastChild
+    this.$typeSelector = $parent.firstChild.firstChild
+    this.$dimensionsInput = $parent.firstChild.lastChild
   }
 
   get width() {
@@ -63,12 +63,10 @@ export default class DimensionsInputDriver {
   }
 
   get messageTexts() {
-    const messagesId = this.$dimensionsInput.getAttribute('aria-describedby')
-    if (messagesId == null) {
-      return []
-    }
-
-    return [...this.$dimensionsInput.querySelectorAll(`#${messagesId} > *`)].map($message =>
+    const messageContainer = this.$dimensionsInput.querySelector(
+      'fieldset legend span:last-child span:first-child'
+    )
+    return [...messageContainer.querySelectorAll('span')].map($message =>
       $message.textContent.trim()
     )
   }

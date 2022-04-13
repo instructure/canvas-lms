@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useRef, useState} from 'react'
 import {Modal} from '@instructure/ui-modal'
 import {CloseButton, Button} from '@instructure/ui-buttons'
@@ -28,7 +28,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('add_student_modal');
+const I18n = useI18nScope('add_student_modal')
 
 const AddStudentModal = ({open, handleClose, currentUserId, onStudentPaired}) => {
   const pairingCodeInputRef = useRef(null)

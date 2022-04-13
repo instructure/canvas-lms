@@ -22,13 +22,13 @@
  */
 /* eslint-disable jsx-a11y/anchor-is-valid */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import store from '../lib/AppCenterStore'
 import $ from 'jquery'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('external_tools');
+const I18n = useI18nScope('external_tools')
 
 export default class AppFilters extends React.Component {
   state = store.getState()

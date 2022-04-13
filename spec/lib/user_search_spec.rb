@@ -118,6 +118,14 @@ describe UserSearch do
             it { is_expected.not_to include("Rose Tyler") }
           end
 
+          describe "FooEnrollment names" do
+            let(:users) { UserSearch.for_user_in_context("Tyler", course, user, nil, enrollment_type: "StudentEnrollment").to_a }
+
+            it { is_expected.to include("Rose Tyler") }
+            it { is_expected.to include("Tyler Pickett") }
+            it { is_expected.not_to include("Tyler Teacher") }
+          end
+
           describe "with the broader role parameter" do
             let(:users) { UserSearch.for_user_in_context("Tyler", course, student, nil, enrollment_role: "ObserverEnrollment").to_a }
 
@@ -168,10 +176,10 @@ describe UserSearch do
               StudentEnrollment.create!(user: newstudent, course: course, workflow_state: "active")
             end
 
-            it { should include("Rose Tyler") }
-            it { should include("Tyler Pickett") }
-            it { should include("Tyler Student") }
-            it { should_not include("Tyler Teacher") }
+            it { is_expected.to include("Rose Tyler") }
+            it { is_expected.to include("Tyler Pickett") }
+            it { is_expected.to include("Tyler Student") }
+            it { is_expected.not_to include("Tyler Teacher") }
           end
         end
 
@@ -479,7 +487,7 @@ describe UserSearch do
       course = Course.create!
       student = User.create!
       bad_scope = -> { UserSearch.scope_for(course, student, enrollment_type: "all") }
-      expect(bad_scope).to raise_error(ArgumentError, "Invalid Enrollment Type")
+      expect(bad_scope).to raise_error(RequestError, "Invalid enrollment type: all")
     end
 
     it "doesn't explode with group context" do

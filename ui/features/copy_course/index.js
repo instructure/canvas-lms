@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import ready from '@instructure/ready'
 import DateShiftView from '@canvas/content-migrations/backbone/views/DateShiftView.coffee'
@@ -28,7 +28,7 @@ import template from '@canvas/day-substitution/jst/DaySubstitutionCollection.han
 import ContentMigration from '@canvas/content-migrations/backbone/models/ContentMigration.coffee'
 import '@canvas/datetime'
 
-const I18n = useI18nScope('content_migrations');
+const I18n = useI18nScope('content_migrations')
 
 ready(() => {
   $(document).ready(() => $('.datetime_field').datetime_field({addHiddenInput: true}))

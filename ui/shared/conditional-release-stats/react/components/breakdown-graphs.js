@@ -19,11 +19,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Spinner} from '@instructure/ui-spinner'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {transformScore} from '@canvas/conditional-release-score'
 import BarGraph from './breakdown-graph-bar'
 
-const I18n = useI18nScope('cyoe_assignment_sidebar_breakdown_graphs');
+const I18n = useI18nScope('cyoe_assignment_sidebar_breakdown_graphs')
 
 const {object, array, func, number, bool} = PropTypes
 

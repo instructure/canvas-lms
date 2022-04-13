@@ -22,12 +22,12 @@ import PropTypes from 'prop-types'
 import OverrideStudentStore from './OverrideStudentStore'
 import Override from '@canvas/assignments/backbone/models/AssignmentOverride.coffee'
 import TokenInput, {Option as ComboboxOption} from 'react-tokeninput'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import SearchHelpers from '@canvas/util/searchHelpers'
 import DisabledTokenInput from './DisabledTokenInput'
 
-const I18n = useI18nScope('DueDateTokenWrapper');
+const I18n = useI18nScope('DueDateTokenWrapper')
 
 const DueDateWrapperConsts = {
   MINIMUM_SEARCH_LENGTH: 3,

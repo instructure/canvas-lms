@@ -18,13 +18,13 @@
 
 import React from 'react'
 import {bool, func, string} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import EditableRichText from './Editables/EditableRichText'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 
-const I18n = useI18nScope('assignments_2');
+const I18n = useI18nScope('assignments_2')
 
 const descriptionPlaceholder = I18n.t('Description')
 

@@ -17,11 +17,11 @@
  */
 
 import INST from 'browser-sniffer'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
 
-const I18n = useI18nScope('instructure');
+const I18n = useI18nScope('instructure')
 
 // Return the first value which passes a truth test
 $.detect = function(collection, callback) {

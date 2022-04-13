@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React, {useMemo} from 'react'
 
@@ -38,7 +38,7 @@ import {IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 
-const I18n = useI18nScope('discussion_posts');
+const I18n = useI18nScope('discussion_posts')
 
 // Reason: <Menu> in v6 of InstUI requires a ref to bind too or errors
 // are produced by the menu causing the page to scroll all over the place

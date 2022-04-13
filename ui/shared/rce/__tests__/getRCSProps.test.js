@@ -86,12 +86,20 @@ describe('getRCSProps', () => {
       context_asset_string: 'course_1',
       RICH_CONTENT_CAN_UPLOAD_FILES: true,
       RICH_CONTENT_FILES_TAB_DISABLED: false,
-      active_brand_config_json_url: 'http://the.theme.here/'
+      active_brand_config_json_url: 'http://the.theme.here/',
+      DEEP_LINKING_POST_MESSAGE_ORIGIN: 'https://canvas.instructure.com',
+      FEATURES: {
+        buttons_and_icons_cropper: true
+      }
     }
     expect(getRCSProps()).toMatchObject({
       canUploadFiles: true,
       filesTabDisabled: false,
-      themeUrl: 'http://the.theme.here/'
+      themeUrl: 'http://the.theme.here/',
+      canvasUrl: 'https://canvas.instructure.com',
+      features: {
+        buttons_and_icons_cropper: true
+      }
     })
   })
 

@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
 import 'jquery.cookie'
 
-const I18n = useI18nScope('shared.flash_notices');
+const I18n = useI18nScope('shared.flash_notices')
 
 function updateAriaLive({polite} = {polite: false}) {
   if (this.screenreaderHolderReady()) {

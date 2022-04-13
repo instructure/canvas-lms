@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
 import {View} from '@canvas/backbone'
 import Spinner from 'spin.js'
@@ -25,7 +25,7 @@ import SearchView from './SearchView'
 import 'bootstrap-dropdown'
 import 'bootstrap-select'
 
-const I18n = useI18nScope('conversations');
+const I18n = useI18nScope('conversations')
 
 export default class InboxHeaderView extends View {
   static initClass() {

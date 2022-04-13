@@ -17,13 +17,13 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import tz from '@canvas/timezone'
 import {render} from '@testing-library/react'
 import {mockAssignment, mockOverride} from '../../../test-utils'
 import EveryoneElse from '../EveryoneElse'
 
-const I18n = useI18nScope('assignments_2');
+const I18n = useI18nScope('assignments_2')
 
 const aDueAt = '2018-11-27T13:00-0500'
 const aUnlockAt = '2018-11-26T13:00-0500'

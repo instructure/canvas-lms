@@ -63,7 +63,7 @@ function renderHeader(title, settings, setIsOpen, onKeyDown) {
   )
 }
 
-function renderBody(settings, dispatch, editor, editing, allowNameChange, nameRef) {
+function renderBody(settings, dispatch, editor, editing, allowNameChange, nameRef, rcsConfig) {
   return (
     <CreateButtonForm
       settings={settings}
@@ -72,6 +72,7 @@ function renderBody(settings, dispatch, editor, editing, allowNameChange, nameRe
       editing={editing}
       allowNameChange={allowNameChange}
       nameRef={nameRef}
+      rcsConfig={rcsConfig}
     />
   )
 }
@@ -98,7 +99,7 @@ export function ButtonsTray({editor, onUnmount, editing, rcsConfig}) {
   const [isOpen, setIsOpen] = useState(true)
   const [replaceAll, setReplaceAll] = useState(false)
 
-  const title = formatMessage('Create Icon')
+  const title = editing ? formatMessage('Edit Icon') : formatMessage('Create Icon')
 
   const [settings, settingsStatus, dispatch] = useSvgSettings(editor, editing, rcsConfig)
   const [status, setStatus] = useState(statuses.IDLE)
@@ -169,7 +170,9 @@ export function ButtonsTray({editor, onUnmount, editing, rcsConfig}) {
       onDismiss={onClose}
       onUnmount={onUnmount}
       renderHeader={() => renderHeader(title, settings, setIsOpen, onKeyDown)}
-      renderBody={() => renderBody(settings, dispatch, editor, editing, !replaceAll, nameRef)}
+      renderBody={() =>
+        renderBody(settings, dispatch, editor, editing, !replaceAll, nameRef, rcsConfig)
+      }
       renderFooter={() =>
         renderFooter(status, onClose, handleSubmit, editing, replaceAll, setReplaceAll, applyRef)
       }

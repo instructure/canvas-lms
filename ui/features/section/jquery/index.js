@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/datetime'/* time_field, datetime_field */
@@ -33,7 +33,7 @@ import enrollmentTemplate from '../jst/enrollment.handlebars'
 import sectionEnrollmentPresenter from '../sectionEnrollmentPresenter'
 import '@canvas/context-cards/react/StudentContextCardTrigger'
 
-const I18n = useI18nScope('section');
+const I18n = useI18nScope('section')
 
 $(document).ready(function() {
   const section_id = window.location.pathname.split('/')[4],

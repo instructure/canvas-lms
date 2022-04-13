@@ -18,7 +18,7 @@
 
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {
   LOGGED_OUT_STUDENT_VIEW_QUERY,
   STUDENT_VIEW_QUERY
@@ -31,7 +31,7 @@ import StudentContent from './StudentContent'
 import SubmissionHistoriesQuery from './SubmissionHistoriesQuery'
 import {transformRubricData} from '../helpers/RubricHelpers'
 
-const I18n = useI18nScope('assignments_2_initial_query');
+const I18n = useI18nScope('assignments_2_initial_query')
 
 function getAssignmentEnvVariables() {
   const baseUrl = `${window.location.origin}/${ENV.context_asset_string.split('_')[0]}s/${

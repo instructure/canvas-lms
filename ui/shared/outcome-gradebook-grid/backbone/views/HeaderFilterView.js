@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@canvas/backbone'
 import 'jquery-kyle-menu'
 import template from '../../jst/header_filter.handlebars'
 
-const I18n = useI18nScope('gradebookHeaderFilterView');
+const I18n = useI18nScope('gradebookHeaderFilterView')
 
 class HeaderFilterView extends View {
   onClick(e) {

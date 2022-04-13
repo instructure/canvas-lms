@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {bool, func} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {Avatar} from '@instructure/ui-avatar'
@@ -31,7 +31,7 @@ import TextHelper from '@canvas/util/TextHelper.coffee'
 import CommentPropTypes from '../propTypes/CommentPropTypes'
 import SubmissionCommentUpdateForm from './SubmissionCommentUpdateForm'
 
-const I18n = useI18nScope('gradebook');
+const I18n = useI18nScope('gradebook')
 
 function submissionCommentDate(date) {
   return DateHelper.formatDatetimeForDisplay(date, 'short')

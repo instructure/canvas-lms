@@ -27,10 +27,13 @@ describe "conversations new" do
     conversation_setup
     @s1 = user_factory(name: "first student")
     @s2 = user_factory(name: "second student")
-    [@s1, @s2].each { |s| @course.enroll_student(s).update_attribute(:workflow_state, "active") }
+    @s3 = user_factory(name: "third student")
+    [@s1, @s2, @s3].each { |s| @course.enroll_student(s).update_attribute(:workflow_state, "active") }
     cat = @course.group_categories.create(name: "the groups")
     @group = cat.groups.create(name: "the group", context: @course)
     @group.users = [@s1, @s2]
+    @t2 =  user_factory(name: "second teacher", active_user: true)
+    @course.enroll_teacher(@t2)
   end
 
   describe "message sending" do
@@ -302,6 +305,143 @@ describe "conversations new" do
             assert_result_names(false, [@t1_name, @t2_name])
             assert_result_names(true, [@s1.name, @s2.name])
           end
+        end
+      end
+    end
+
+    context "when react_inbox feature flag is on", ignore_js_errors: true do
+      before do
+        Account.default.enable_feature! :react_inbox
+      end
+
+      context "shows correct address book items" do
+        before do
+          user_session(@teacher)
+          conversations
+
+          # Open compose modal
+          f("button[data-testid='compose']").click
+
+          # select the only course option
+          f("input[placeholder='Select Course']").click
+          f("li[role='none']").click
+
+          # Open address book
+          ff("input[aria-label='Address Book']")[1].click
+        end
+
+        it "correctly shows course options", priority: "1" do
+          # back, all in course, Teachers, Students, Student Groups
+          expect(ff("div[data-testid='address-book-item']").count).to eq(5)
+          expect(fj("div[data-testid='address-book-item']:contains('All in #{@course.name}')")).to be_present
+        end
+
+        it "correctly shows Teachers option", priority: "1" do
+          fj("div[data-testid='address-book-item']:contains('Teachers')").click
+          wait_for_ajaximations
+          # back, all in Teachers, @Teacher name, @t2 name
+          expect(ff("div[data-testid='address-book-item']").count).to eq(4)
+          expect(fj("div[data-testid='address-book-item']:contains('All in Teachers')")).to be_present
+        end
+
+        it "correctly shows students option", priority: "1" do
+          fj("div[data-testid='address-book-item']:contains('Students')").click
+          wait_for_ajaximations
+          # back, all in Students, @s1 name, @s2 name, @s3 name
+          expect(ff("div[data-testid='address-book-item']").count).to eq(5)
+          expect(fj("div[data-testid='address-book-item']:contains('All in Students')")).to be_present
+        end
+
+        # There is no option to send a message to all groups
+        it "correctly shows student groups option", priority: "1" do
+          fj("div[data-testid='address-book-item']:contains('Student Groups')").click
+          wait_for_ajaximations
+
+          # back, @group name
+          expect(ff("div[data-testid='address-book-item']").count).to eq(2)
+        end
+
+        it "correctly shows student group option", priority: "1" do
+          fj("div[data-testid='address-book-item']:contains('Student Groups')").click
+          wait_for_ajaximations
+          fj("div[data-testid='address-book-item']:contains('#{@group.name}')").click
+          wait_for_ajaximations
+
+          # Back, all in the group, @s1, @s2
+          expect(ff("div[data-testid='address-book-item']").count).to eq(4)
+          expect(fj("div[data-testid='address-book-item']:contains('All in #{@group.name}')")).to be_present
+        end
+      end
+
+      context "correctly sends messages to contexts" do
+        before do
+          user_session(@teacher)
+          conversations
+
+          # Open compose modal
+          f("button[data-testid='compose']").click
+
+          # select the only course option
+          f("input[placeholder='Select Course']").click
+          f("li[role='none']").click
+
+          # Open address book
+          ff("input[aria-label='Address Book']")[1].click
+        end
+
+        it "correctly sends message to the entire course", priority: "1" do
+          fj("div[data-testid='address-book-item']:contains('All in #{@course.name}')").click
+          expect(fj("span[data-testid='address-book-tag']:contains('All in #{@course.name}')")).to be_present
+
+          f("textarea[data-testid='message-body']").send_keys "hallo!"
+          fj("button:contains('Send')").click
+          wait_for_ajaximations
+
+          expect(@s2.conversations.last.conversation.conversation_participants.collect(&:user_id).sort).to eq([@teacher, @t2, @s1, @s2, @s3].collect(&:id).sort)
+        end
+
+        it "correctly sends message to all teachers", priority: "1" do
+          fj("div[data-testid='address-book-item']:contains('Teachers')").click
+          wait_for_ajaximations
+
+          fj("div[data-testid='address-book-item']:contains('All in Teachers')").click
+          expect(fj("span[data-testid='address-book-tag']:contains('All in Teachers')")).to be_present
+
+          f("textarea[data-testid='message-body']").send_keys "hallo!"
+          fj("button:contains('Send')").click
+          wait_for_ajaximations
+
+          expect(@t2.conversations.last.conversation.conversation_participants.collect(&:user_id).sort).to eq([@teacher, @t2].collect(&:id).sort)
+        end
+
+        it "correctly sends message to all students", priority: "1" do
+          fj("div[data-testid='address-book-item']:contains('Students')").click
+          wait_for_ajaximations
+
+          fj("div[data-testid='address-book-item']:contains('All in Students')").click
+          expect(fj("span[data-testid='address-book-tag']:contains('All in Students')")).to be_present
+
+          f("textarea[data-testid='message-body']").send_keys "hallo!"
+          fj("button:contains('Send')").click
+          wait_for_ajaximations
+
+          expect(@s2.conversations.last.conversation.conversation_participants.collect(&:user_id).sort).to eq([@teacher, @s1, @s2, @s3].collect(&:id).sort)
+        end
+
+        it "correctly sends message to the entire student group", priority: "1" do
+          fj("div[data-testid='address-book-item']:contains('Student Groups')").click
+          wait_for_ajaximations
+          fj("div[data-testid='address-book-item']:contains('#{@group.name}')").click
+          wait_for_ajaximations
+          fj("div[data-testid='address-book-item']:contains('All in #{@group.name}')").click
+
+          expect(fj("span[data-testid='address-book-tag']:contains('All in #{@group.name}')")).to be_present
+
+          f("textarea[data-testid='message-body']").send_keys "hallo!"
+          fj("button:contains('Send')").click
+          wait_for_ajaximations
+
+          expect(@s2.conversations.last.conversation.conversation_participants.collect(&:user_id).sort).to eq([@teacher, @s1, @s2].collect(&:id).sort)
         end
       end
     end

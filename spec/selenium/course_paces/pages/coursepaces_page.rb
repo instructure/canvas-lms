@@ -70,15 +70,15 @@ module CoursePacesPageObject
   end
 
   def number_of_assignments_selector
-    "[data-testid='number-of-assignments'] i"
+    "[data-testid='number-of-assignments']"
   end
 
   def number_of_weeks_selector
-    "[data-testid='number-of-weeks'] i"
+    "[data-testid='number-of-weeks']"
   end
 
   def course_pace_end_date_selector
-    "[data-testid='coursepace-date-text']"
+    "[data-testid='coursepace-end-date']"
   end
 
   def course_pace_menu_selector
@@ -98,7 +98,7 @@ module CoursePacesPageObject
   end
 
   def course_pace_start_date_selector
-    "[data-testid='course-pace-date']"
+    "[data-testid='coursepace-start-date']"
   end
 
   def course_pace_table_module_selector

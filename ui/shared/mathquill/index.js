@@ -32,11 +32,11 @@
  *     http://www.gnu.org/licenses/lgpl.html
  * Project Website: http://mathquill.com
  */
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
 
-const I18n = useI18nScope('mathquill');
+const I18n = useI18nScope('mathquill')
 
 var undefined,
   _, //temp variable of prototypes

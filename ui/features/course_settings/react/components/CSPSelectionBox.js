@@ -17,7 +17,7 @@
  */
 
 import React, {Component} from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {bool, func, shape, string} from 'prop-types'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Spinner} from '@instructure/ui-spinner'
@@ -25,7 +25,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('course_settings');
+const I18n = useI18nScope('course_settings')
 
 export default class CSPSelectionBox extends Component {
   static propTypes = {

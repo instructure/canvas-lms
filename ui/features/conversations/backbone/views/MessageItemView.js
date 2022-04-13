@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
 import tz from '@canvas/timezone'
@@ -23,7 +23,7 @@ import {View} from '@canvas/backbone'
 import template from '../../jst/messageItem.handlebars'
 import '@canvas/avatar/jst/_avatar.handlebars'
 
-const I18n = useI18nScope('conversations');
+const I18n = useI18nScope('conversations')
 
 export default class MessageItemView extends View {
   static initClass() {

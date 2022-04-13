@@ -21,7 +21,7 @@ import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import EmojiPicker from '../EmojiPicker'
 
-describe('EmojiPicker', () => {
+describe.skip('EmojiPicker', () => {
   let insertEmoji
   let originalENV
 

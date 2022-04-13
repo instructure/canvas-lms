@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
 import React from 'react'
@@ -39,7 +39,7 @@ import actions from '@canvas/blueprint-courses/react/actions'
 import propTypes from '@canvas/blueprint-courses/react/propTypes'
 import FocusManager from '../focusManager'
 
-const I18n = useI18nScope('BlueprintAssociations');
+const I18n = useI18nScope('BlueprintAssociations')
 
 const {string, arrayOf, func, bool} = PropTypes
 

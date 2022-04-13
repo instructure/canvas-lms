@@ -1476,6 +1476,8 @@ CanvasRails::Application.routes.draw do
 
       get "users/:id/graded_submissions", controller: "users", action: "user_graded_submissions", as: :user_submissions
 
+      get "users/:id/show_k5_dashboard", controller: "users", action: "show_k5_dashboard"
+
       post "users/:id/clear_cache", action: :clear_cache, as: "clear_cache"
 
       scope(controller: :user_observees) do
@@ -2434,7 +2436,8 @@ CanvasRails::Application.routes.draw do
     scope(controller: :jobs_v2) do
       get "jobs2/:bucket/by_:group/search", action: :search
       get "jobs2/:bucket/by_:group", action: :grouped_info, as: :jobs_grouped_info
-      get "jobs2/:bucket", action: :list, as: :jobs_list
+      get "jobs2/:bucket", action: :list, as: :jobs_list, constraints: { bucket: /running|queued|future|failed/ }
+      get "jobs2/:id", action: :lookup, constraints: { id: /\d+/ }
     end
   end
 

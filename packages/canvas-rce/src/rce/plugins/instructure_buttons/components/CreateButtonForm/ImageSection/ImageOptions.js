@@ -81,7 +81,7 @@ function renderImageActionButtons(
   )
 }
 
-export const ImageOptions = ({state, dispatch}) => {
+export const ImageOptions = ({state, dispatch, rcsConfig}) => {
   const [isImageActionFocused, setIsImageActionFocused] = useState(false)
   const imageActionRef = useCallback(
     el => {
@@ -111,6 +111,7 @@ export const ImageOptions = ({state, dispatch}) => {
             ref={imageActionRef}
             onFocus={() => setIsImageActionFocused(true)}
             onBlur={() => setIsImageActionFocused(false)}
+            rcsConfig={rcsConfig}
           />
         )}
         {openCropModal && (
@@ -132,5 +133,6 @@ ImageOptions.propTypes = {
     mode: PropTypes.string.isRequired,
     loading: PropTypes.bool.isRequired
   }).isRequired,
-  dispatch: PropTypes.func.isRequired
+  dispatch: PropTypes.func.isRequired,
+  rcsConfig: PropTypes.object.isRequired
 }

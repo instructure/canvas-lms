@@ -20,11 +20,11 @@ import React from 'react'
 import update from 'immutability-helper'
 import GradingStandard from './gradingStandard'
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 
-const I18n = useI18nScope('external_toolsgradingStandardCollection');
+const I18n = useI18nScope('external_toolsgradingStandardCollection')
 
 class GradingStandardCollection extends React.Component {
   state = {standards: null}

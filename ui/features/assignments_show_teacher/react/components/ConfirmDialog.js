@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {bool, func, string, shape} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
@@ -27,7 +27,7 @@ import {Mask} from '@instructure/ui-overlays'
 import {Modal} from '@instructure/ui-modal'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('assignments_2');
+const I18n = useI18nScope('assignments_2')
 
 export default class ConfirmDialog extends React.Component {
   static propTypes = {

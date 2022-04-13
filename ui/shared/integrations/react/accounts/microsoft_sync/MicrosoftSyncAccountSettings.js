@@ -22,7 +22,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconInfoLine, IconUploadLine} from '@instructure/ui-icons'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {Table} from '@instructure/ui-table'
 import LoginAttributeSelector from './components/LoginAttributeSelector'
@@ -35,7 +35,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import LoginAttributeSuffixInput from './components/LoginAttributeSuffixInput'
 import ActiveDirectoryLookupAttributeSelector from './components/ActiveDirectoryLookupAttributeSelector'
 
-const I18n = useI18nScope('account_settings_jsx_bundle');
+const I18n = useI18nScope('account_settings_jsx_bundle')
 
 export default function MicrosoftSyncAccountSettings() {
   const [state, dispatch] = useSettings()

@@ -33,7 +33,7 @@ def call() {
     _rebase('master', COMMIT_HISTORY)
   }
 
-  if (!env.JOB_NAME.endsWith('Jenkinsfile') && git.changedFiles(CHANGED_FILES, 'origin/master')) {
+  if (env.ALLOW_JENKINSFILE_CHANGES != "1" && git.changedFiles(CHANGED_FILES, 'origin/master')) {
     error 'Jenkinsfile has been updated. Please retrigger your patchset for the latest updates.'
   }
 }

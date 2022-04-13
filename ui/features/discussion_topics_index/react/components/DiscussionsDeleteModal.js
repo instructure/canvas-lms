@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
 import {Button} from '@instructure/ui-buttons'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {bool, func, number} from 'prop-types'
 
-const I18n = useI18nScope('discussions_v2');
+const I18n = useI18nScope('discussions_v2')
 
 export default class DiscussionDeleteModal extends Component {
   static propTypes = {

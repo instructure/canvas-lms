@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {useCallback, useState} from 'react'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {originalDateField, extractFetchErrorMessage} from '../utils'
 
-const I18n = useI18nScope('assignments_bulk_edit_use_save_assignment');
+const I18n = useI18nScope('assignments_bulk_edit_use_save_assignment')
 
 const DATE_FIELDS = ['due_at', 'lock_at', 'unlock_at']
 

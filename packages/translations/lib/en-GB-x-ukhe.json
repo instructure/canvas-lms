@@ -92,6 +92,9 @@
     "apply_781a2546": {
         "message": "Apply"
     },
+    "apply_changes_to_all_instances_of_this_icon_maker__2642f466": {
+        "message": "Apply changes to all instances of this Icon Maker Icon in the Course"
+    },
     "apps_54d24a47": {
         "message": "Apps"
     },
@@ -100,6 +103,9 @@
     },
     "arrows_464a3e54": {
         "message": "Arrows"
+    },
+    "art_icon_8e1daad": {
+        "message": "Art Icon"
     },
     "aspect_ratio_will_be_preserved_cb5fdfb8": {
         "message": "Aspect ratio will be preserved"
@@ -173,8 +179,17 @@
     "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
         "message": "Below is an example of how students will see their schedule"
     },
+    "black_4cb01371": {
+        "message": "Black"
+    },
+    "blue_daf8fea9": {
+        "message": "Blue"
+    },
     "bottom_third_5f5fec1d": {
         "message": "Bottom Third"
+    },
+    "brick_f2656265": {
+        "message": "Brick"
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
@@ -205,6 +220,9 @@
     },
     "clear_2084585f": {
         "message": "Clear"
+    },
+    "clear_image_3213fe62": {
+        "message": "Clear image"
     },
     "clear_selected_file_82388e50": {
         "message": "Clear selected file"
@@ -311,8 +329,17 @@
     "course_to_do_bcbbab54": {
         "message": "{ course } TO DO"
     },
+    "create_icon_110d6463": {
+        "message": "Create Icon"
+    },
+    "create_icon_maker_icon_c716bffe": {
+        "message": "Create Icon Maker Icon"
+    },
     "creative_commons_license_725584ae": {
         "message": "Creative Commons Licence:"
+    },
+    "crop_image_41bf940c": {
+        "message": "Crop image"
     },
     "crop_image_807ebb08": {
         "message": "Crop Image"
@@ -322,6 +349,9 @@
     },
     "custom_6979cd81": {
         "message": "Custom"
+    },
+    "cyan_c1d5f68a": {
+        "message": "Cyan"
     },
     "date_added_ed5ad465": {
         "message": "Date added"
@@ -346,6 +376,9 @@
     },
     "decrease_indent_de6343ab": {
         "message": "Decrease indent"
+    },
+    "deep_purple_bb3e2907": {
+        "message": "Deep purple"
     },
     "default_bulleted_unordered_list_47079da8": {
         "message": "default bulleted unordered list"
@@ -476,6 +509,12 @@
     "embedded_content_aaeb4d3d": {
         "message": "embedded content"
     },
+    "engineering_icon_f8f3cf43": {
+        "message": "Engineering Icon"
+    },
+    "english_icon_25bfe845": {
+        "message": "English Icon"
+    },
     "enter_at_least_3_characters_to_search_4f037ee0": {
         "message": "Enter at least 3 characters to search"
     },
@@ -520,6 +559,12 @@
     },
     "extra_small_9ae33252": {
         "message": "Extra Small"
+    },
+    "extracurricular_icon_67c8ca42": {
+        "message": "Extracurricular Icon"
+    },
+    "failed_getting_course_list_49846a93": {
+        "message": "Failed getting module list"
     },
     "failed_peeking_into_your_future_e95b9306": {
         "message": "Failed peeking into your future"
@@ -620,6 +665,12 @@
     "greek_65c5b3f7": {
         "message": "Greek"
     },
+    "green_15af4778": {
+        "message": "Green"
+    },
+    "grey_a55dceff": {
+        "message": "Grey"
+    },
     "group_documents_8bfd6ae6": {
         "message": "Group Documents"
     },
@@ -650,6 +701,9 @@
     "heading_4_b2e74be7": {
         "message": "Heading 4"
     },
+    "health_icon_8d292eb5": {
+        "message": "Health Icon"
+    },
     "height_69b03e15": {
         "message": "Height"
     },
@@ -677,6 +731,24 @@
     "i_hold_the_copyright_71ee91b1": {
         "message": "I hold the copyright"
     },
+    "icon_color_b86dd6d6": {
+        "message": "Icon Colour"
+    },
+    "icon_maker_icons_cc560f7e": {
+        "message": "Icon Maker Icons"
+    },
+    "icon_outline_e978dc0c": {
+        "message": "Icon Outline"
+    },
+    "icon_outline_size_33f39b86": {
+        "message": "Icon Outline Size"
+    },
+    "icon_shape_30b61e7": {
+        "message": "Icon Shape"
+    },
+    "icon_size_9353edea": {
+        "message": "Icon Size"
+    },
     "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
         "message": "If you do not select usage rights now, this file will be unpublished after it''s uploaded."
     },
@@ -697,6 +769,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "Increase indent"
+    },
+    "indigo_2035fc55": {
+        "message": "Indigo"
     },
     "insert_593145ef": {
         "message": "Insert"
@@ -743,6 +818,12 @@
     "language_arts_35b79a8b": {
         "message": "Language Arts"
     },
+    "language_arts_icon_a798b0f8": {
+        "message": "Language Arts Icon"
+    },
+    "languages_icon_9d20539": {
+        "message": "Languages Icon"
+    },
     "large_9c5e80e7": {
         "message": "Large"
     },
@@ -751,6 +832,12 @@
     },
     "left_to_right_e9b4fd06": {
         "message": "Left-to-Right"
+    },
+    "library_icon_ae1e54cf": {
+        "message": "Library Icon"
+    },
+    "light_blue_5374f600": {
+        "message": "Light blue"
     },
     "link_7262adec": {
         "message": "Link"
@@ -818,8 +905,14 @@
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Looks like there isn''t anything here"
     },
+    "magenta_4a65993c": {
+        "message": "Magenta"
+    },
     "math_ede93050": {
         "message": "Maths"
+    },
+    "math_icon_ad4e9d03": {
+        "message": "Math Icon"
     },
     "media_af190855": {
         "message": "Media"
@@ -848,6 +941,9 @@
     "multi_color_image_63d7372f": {
         "message": "Multi Colour Image"
     },
+    "music_icon_4db5c972": {
+        "message": "Music Icon"
+    },
     "must_be_at_least_percentage_22e373b6": {
         "message": "Must be at least { percentage }%"
     },
@@ -862,6 +958,9 @@
     },
     "name_1aed4a1b": {
         "message": "Name"
+    },
+    "name_color_ceec76ff": {
+        "message": "{ name } ({ color })"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Navigate through the menu or toolbar"
@@ -944,6 +1043,9 @@
     "octagon_e48be9f": {
         "message": "Octagon"
     },
+    "olive_6a3e4d6b": {
+        "message": "Olive"
+    },
     "only_most_recent_grading_period_shown_f1ad6458": {
         "message": "*Only most recent grading period shown."
     },
@@ -961,6 +1063,9 @@
     },
     "optional_add_course_ef0d70fc": {
         "message": "Optional: Add module"
+    },
+    "orange_81386a62": {
+        "message": "Orange"
     },
     "ordered_and_unordered_lists_cfadfc38": {
         "message": "Ordered and Unordered Lists"
@@ -997,6 +1102,15 @@
     },
     "percentage_must_be_a_number_8033c341": {
         "message": "Percentage must be a number"
+    },
+    "performing_arts_icon_f3497486": {
+        "message": "Performing Arts Icon"
+    },
+    "physical_education_icon_d7dffd3e": {
+        "message": "Physical Education Icon"
+    },
+    "pink_68ad45cb": {
+        "message": "Pink"
     },
     "pixels_52ece7d1": {
         "message": "Pixels"
@@ -1043,6 +1157,12 @@
     "published_when_302d8e23": {
         "message": "Published: { when }"
     },
+    "pumpkin_904428d5": {
+        "message": "Pumpkin"
+    },
+    "purple_7678a9fc": {
+        "message": "Purple"
+    },
     "quiz_e0dcce8f": {
         "message": "Quiz"
     },
@@ -1058,11 +1178,17 @@
     "record_upload_media_5fdce166": {
         "message": "Record/upload media"
     },
+    "red_8258edf3": {
+        "message": "Red"
+    },
     "redo_363c58b7": {
         "message": "Re-do"
     },
     "relationships_6602af70": {
         "message": "Relationships"
+    },
+    "religion_icon_246e0be1": {
+        "message": "Religion Icon"
     },
     "reminder_date_4564d12d": {
         "message": "Reminder: { date }"
@@ -1090,6 +1216,9 @@
     },
     "save_11a80ec3": {
         "message": "Save"
+    },
+    "saved_icon_maker_icons_df86e2a1": {
+        "message": "Saved Icon Maker Icons"
     },
     "schedule_preview_3bcda153": {
         "message": "Schedule Preview"
@@ -1141,6 +1270,9 @@
     },
     "single_color_image_4e5d4dbc": {
         "message": "Single Colour Image"
+    },
+    "single_color_image_color_95fa9a87": {
+        "message": "Single Color Image Color"
     },
     "size_b30e1077": {
         "message": "Size"
@@ -1196,6 +1328,9 @@
     "starttime_to_endtime_d7cc249d": {
         "message": "{ startTime } to { endTime }"
     },
+    "steel_blue_14296f08": {
+        "message": "Steel Blue"
+    },
     "styles_2aa721ef": {
         "message": "Styles"
     },
@@ -1231,6 +1366,9 @@
     },
     "task_16b0ef38": {
         "message": "Task"
+    },
+    "teal_f729a294": {
+        "message": "Teal"
     },
     "text_7f4593da": {
         "message": "Text"
@@ -1451,6 +1589,9 @@
     "weekly_schedule_navigation_6b042645": {
         "message": "Weekly schedule navigation"
     },
+    "white_87fa64fd": {
+        "message": "White"
+    },
     "width_492fec76": {
         "message": "Width"
     },
@@ -1483,5 +1624,11 @@
     },
     "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
         "message": "You''ve scrolled back to your very first to-do!"
+    },
+    "zoom_in_image_bb97d4f": {
+        "message": "Zoom in image"
+    },
+    "zoom_out_image_d0a0a2ec": {
+        "message": "Zoom out image"
     }
 }

@@ -25,7 +25,7 @@ import {IconArrowOpenDownLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import {Menu} from '@instructure/ui-menu'
 
-const ModeSelect = forwardRef(({dispatch, onFocus, onBlur}, ref) => {
+const ModeSelect = forwardRef(({dispatch, onFocus, onBlur, rcsConfig}, ref) => {
   const menuFor = mode => (
     <Menu.Item
       key={mode.type}
@@ -39,7 +39,7 @@ const ModeSelect = forwardRef(({dispatch, onFocus, onBlur}, ref) => {
     </Menu.Item>
   )
 
-  const showNonIconImages = !!ENV.FEATURES.buttons_and_icons_cropper
+  const showNonIconImages = !!rcsConfig?.features?.buttons_and_icons_cropper
 
   return (
     <Menu

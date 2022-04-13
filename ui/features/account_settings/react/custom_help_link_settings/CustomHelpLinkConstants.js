@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('custom_help_link');
+const I18n = useI18nScope('custom_help_link')
 
 const USER_TYPES = [
   {value: 'user', label: I18n.t('Everyone')},

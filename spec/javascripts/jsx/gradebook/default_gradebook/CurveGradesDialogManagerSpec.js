@@ -20,10 +20,10 @@ import $ from 'jquery'
 import CurveGradesDialog from '@canvas/grading/jquery/CurveGradesDialog.coffee'
 import AsyncComponents from 'ui/features/gradebook/react/default_gradebook/AsyncComponents'
 import CurveGradesDialogManager from 'ui/features/gradebook/react/default_gradebook/CurveGradesDialogManager'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('gradebook');
+const I18n = useI18nScope('gradebook')
 
 const {createCurveGradesAction} = CurveGradesDialogManager
 

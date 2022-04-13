@@ -237,4 +237,20 @@ describe BrandConfig do
     # with and without running `rake canvas:compile_assets`
     # See the following migration file for more info: "#{BrandableCSS::MIGRATION_NAME.underscore}_predeploy.rb"
   end
+
+  context "with sharding" do
+    specs_require_sharding
+    it "supports cross-shard parents" do
+      parent = BrandConfig.create!(variables: { "ic-brand-primary" => "#321" })
+      child = nil
+      @shard1.activate do
+        child = BrandConfig.create!(variables: { "ic-global-nav-bgd" => "#123" }, parent_md5: "#{parent.shard.id}~#{parent.md5}")
+        # When the child shard is active
+        expect(child.reload.parent).to eq(parent)
+        child.reload
+      end
+      # When the parent shard is active
+      expect(child.parent).to eq(parent)
+    end
+  end
 end

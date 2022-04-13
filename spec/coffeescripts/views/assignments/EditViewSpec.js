@@ -1379,6 +1379,31 @@ test('it attaches assignment external tools component', function () {
   equal(view.$assignmentExternalTools.children().size(), 1)
 })
 
+test('receives iframe dimensions via Deep Linking response', async () => {
+  // context:
+  //   a deep linking response for the assignment_selection placement is processed in
+  //   ui/shared/select-content-dialog/jquery/select_content_dialog.js
+  //
+  //   the $('#select_context_content_dialog .add_item_button') block submits an Object mocked below
+  const data = {
+    'item[assignment_id]': '',
+    'item[custom_params]': '',
+    'item[type]': 'context_external_tool',
+    'item[id]': 1,
+    'item[url]': 'https://foo.bar/internal_link/klIknZO7sE',
+    'item[new_tab]': '0',
+    'item[iframe][width]': '111',
+    'item[iframe][height]': '222'
+  }
+  const view = editView()
+
+  // when selectContentDialog.submit is triggered the handleAssignmentSelectionSubmit function is called
+  view.handleAssignmentSelectionSubmit(data)
+
+  equal(view.$('#assignment_external_tool_tag_attributes_iframe_width')?.val(), '111')
+  equal(view.$('#assignment_external_tool_tag_attributes_iframe_height')?.val(), '222')
+})
+
 QUnit.module('EditView: Quizzes 2', {
   setup() {
     fakeENV.setup({

@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
 import tz from '@canvas/timezone'
 import React from 'react'
@@ -36,7 +36,7 @@ import CalendarConferenceWidget from '@canvas/calendar-conferences/react/Calenda
 import filterConferenceTypes from '@canvas/calendar-conferences/filterConferenceTypes'
 import getConferenceType from '@canvas/calendar-conferences/getConferenceType'
 
-const I18n = useI18nScope('calendar');
+const I18n = useI18nScope('calendar')
 
 export default class EditCalendarEventDetails {
   constructor(selector, event, contextChangeCB, closeCB) {
@@ -145,13 +145,13 @@ export default class EditCalendarEventDetails {
     if (date) {
       const start_time = this.$form.find('input[name=start_time]').data('date')
       let start_at = date.toString('yyyy-MM-dd')
-      if (start_time) start_at += this.event.allDay ? ' 00:00' : start_time.toString(' HH:mm')
+      if (start_time) start_at += start_time.toString(' HH:mm')
 
       data.start_at = tz.parse(start_at)
 
       const end_time = this.$form.find('input[name=end_time]').data('date')
       let end_at = date.toString('yyyy-MM-dd')
-      if (end_time) end_at += this.event.allDay ? ' 00:00' : end_time.toString(' HH:mm')
+      if (end_time) end_at += end_time.toString(' HH:mm')
       data.end_at = tz.parse(end_at)
     }
 
@@ -312,8 +312,10 @@ export default class EditCalendarEventDetails {
       $end.val(date === null ? '' : timeFormatter(date))
     })
 
-    $start.data('instance').setTime(this.event.allDay ? null : start)
-    $end.data('instance').setTime(this.event.allDay ? null : end)
+    if (this.event.allDay) {
+      $start.val('')
+      $end.val('')
+    }
 
     // couple start and end times so that end time will never precede start
     return coupleTimeFields($start, $end, $date)

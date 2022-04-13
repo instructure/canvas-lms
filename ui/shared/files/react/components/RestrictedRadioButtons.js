@@ -19,14 +19,14 @@
 import _ from 'underscore'
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import customPropTypes from '../modules/customPropTypes'
 import Folder from '../../backbone/models/Folder'
 import '@canvas/datetime'
 import accessibleDateFormat from '@canvas/datetime/accessibleDateFormat'
 
-const I18n = useI18nScope('restrict_student_access');
+const I18n = useI18nScope('restrict_student_access')
 
 class RestrictedRadioButtons extends React.Component {
   static propTypes = {

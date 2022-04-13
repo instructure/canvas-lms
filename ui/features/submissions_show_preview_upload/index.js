@@ -17,12 +17,12 @@
 
 import $ from 'jquery'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import swfobject from 'swfobject'
 import 'jqueryui/dialog'
 import '@canvas/doc-previews'
 
-const I18n = useI18nScope('submissions.show_preview');
+const I18n = useI18nScope('submissions.show_preview')
 
 $(document).ready(() => {
   $('a.flash').click(function () {

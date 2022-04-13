@@ -33,7 +33,7 @@ class BrandConfigsController < ApplicationController
     css_bundle :brand_config_index
     js_bundle :brand_configs
 
-    base_brand_config = @account.parent_account.try(:effective_brand_config)
+    base_brand_config = @account.first_parent_brand_config || BrandConfig.new
     base_brand_config ||= BrandConfig.k12_config if k12?
 
     js_env brandConfigStuff: {
@@ -106,8 +106,17 @@ class BrandConfigsController < ApplicationController
   # @returns {BrandConfig, Progress}
   def create
     params[:brand_config] ||= {}
+    parent_md5 = nil
+    parent_bc = @account.first_parent_brand_config
+    if parent_bc
+      parent_md5 = if parent_bc.shard == Switchman::Shard.current
+                     parent_bc.md5
+                   else
+                     "#{parent_bc.shard.id}~#{parent_bc.md5}"
+                   end
+    end
     opts = {
-      parent_md5: @account.first_parent_brand_config.try(:md5),
+      parent_md5: parent_md5,
       variables: process_variables(params[:brand_config][:variables])
     }
     BrandConfig::OVERRIDE_TYPES.each do |override|
@@ -133,12 +142,11 @@ class BrandConfigsController < ApplicationController
   #
   # @argument brand_config_md5 [String]
   #   If set, will activate this specific brand config as the active one in the session.
-  #   If the empty string ('') is passed, will use nothing for this session
-  #   (so the user will see the canvas default theme).
+  #   If the empty string ('') is passed, will use the parent theme for this session.
   def save_to_user_session
     old_md5 = session.delete(:brand_config_md5)
     session[:brand_config_md5] = if params[:brand_config_md5] == ""
-                                   false
+                                   @account.first_parent_brand_config&.md5 || false
                                  elsif params[:brand_config_md5]
                                    BrandConfig.find(params[:brand_config_md5]).md5
                                  end

@@ -16,9 +16,9 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Ember from 'ember'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('sr_gradebook');
+const I18n = useI18nScope('sr_gradebook')
 
 const SelectionButtonsView = Ember.View.extend({
   templateName: 'content_selection/selection_buttons',

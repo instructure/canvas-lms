@@ -17,7 +17,7 @@
  */
 
 import 'jqueryui/dialog'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
@@ -34,7 +34,7 @@ import '@canvas/loading-image'
 import 'date' // Date.parse
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 
-const I18n = useI18nScope('account_settings');
+const I18n = useI18nScope('account_settings')
 
 let reportsTabHasLoaded = false
 

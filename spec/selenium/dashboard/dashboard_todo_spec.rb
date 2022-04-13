@@ -112,7 +112,8 @@ describe "dashboard" do
       user_session(@observer)
     end
 
-    it "renders classic todos for observers, even with planner enabled" do
+    it "renders classic todos for observers with observer_picker flag off" do
+      Account.site_admin.disable_feature!(:observer_picker)
       get "/"
       wait_for_ajaximations
 

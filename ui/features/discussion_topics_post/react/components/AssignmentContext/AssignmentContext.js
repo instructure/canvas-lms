@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import React from 'react'
 import {responsiveQuerySizes} from '../../utils/index'
@@ -25,7 +25,7 @@ import {Responsive} from '@instructure/ui-responsive'
 import PropTypes from 'prop-types'
 import {DueDatesForParticipantList} from '../DueDatesForParticipantList/DueDatesForParticipantList'
 
-const I18n = useI18nScope('discussion_posts');
+const I18n = useI18nScope('discussion_posts')
 
 export function AssignmentContext({...props}) {
   let groupDisplayText = null

@@ -17,9 +17,9 @@
  */
 
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('external_tools');
+const I18n = useI18nScope('external_tools')
 
 export default function toolConfigurationError(error, clientId) {
   $.flashError(errorMessage(error, clientId))

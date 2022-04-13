@@ -19,14 +19,14 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {View} from '@instructure/ui-view'
 
 import {GradingPeriodShape} from '@canvas/k5/react/utils'
 
-const I18n = useI18nScope('dashboard_grading_period_select');
+const I18n = useI18nScope('dashboard_grading_period_select')
 
 export const ALL_PERIODS_OPTION = 'all'
 

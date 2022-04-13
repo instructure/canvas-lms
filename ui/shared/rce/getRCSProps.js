@@ -45,6 +45,10 @@ export default function getRCSProps() {
     host: ENV.RICH_CONTENT_APP_HOST,
     jwt: ENV.JWT,
     refreshToken: refreshToken(ENV.JWT),
-    themeUrl: ENV.active_brand_config_json_url
+    themeUrl: ENV.active_brand_config_json_url,
+    canvasUrl: ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN,
+    features: {
+      buttons_and_icons_cropper: ENV.FEATURES?.buttons_and_icons_cropper
+    }
   }
 }

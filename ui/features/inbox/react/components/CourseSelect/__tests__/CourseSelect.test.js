@@ -81,7 +81,7 @@ describe('CourseSelect', () => {
     const select = getByTestId('course-select')
     fireEvent.click(select)
     fireEvent.click(getByText('Potions'))
-    expect(mockCourseFilterSet).toHaveBeenCalledWith('course_3')
+    expect(mockCourseFilterSet.mock.calls[0][0].contextID).toBe('course_3')
   })
 
   it('filters the options when typing', () => {
@@ -128,7 +128,7 @@ describe('CourseSelect', () => {
       expect(select.value).toBe('')
       // assert filter id is updated to null for network request
       expect(filterMock.mock.calls.length).toBe(1)
-      expect(filterMock.mock.calls[0][0]).toBe(null)
+      expect(filterMock.mock.calls[0][0].contextID).toBe(null)
     })
   })
 })

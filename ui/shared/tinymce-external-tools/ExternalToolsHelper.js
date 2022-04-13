@@ -16,10 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
-import $ from 'jquery'
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('ExternalToolsPlugin');
+const I18n = useI18nScope('ExternalToolsPlugin')
 
 // setting ENV.MAX_MRU_LTI_TOOLS can make it easier to test
 const MAX_MRU_LTI_TOOLS = ENV.MAX_MRU_LTI_TOOLS || 5
@@ -76,17 +75,8 @@ export default {
       ed.editorContainer.querySelector(`.tox-tbtn--select[aria-label="${label}"]`)
     )
     const button = ed.$(ed.editorContainer.querySelector(`.tox-tbtn[aria-label="${label}"]`))
-    if (window.localStorage?.getItem('ltimru')) {
-      menubutton.attr('aria-hidden', 'false')
-      button.attr('aria-hidden', 'true')
-      menubutton.show()
-      button.hide()
-    } else {
-      menubutton.attr('aria-hidden', 'true')
-      button.attr('aria-hidden', 'false')
-      menubutton.hide()
-      button.show()
-    }
+    menubutton.attr('aria-hidden', 'false')
+    button.attr('aria-hidden', 'true')
   },
 
   updateMRUList(toolId) {

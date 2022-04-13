@@ -18,7 +18,7 @@
 
 import _ from 'lodash'
 import React, {useEffect, useState} from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
@@ -32,7 +32,7 @@ import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
-const I18n = useI18nScope('groups');
+const I18n = useI18nScope('groups')
 
 GroupCategoryMessageAllUnassignedModal.propTypes = {
   groupCategory: shape({name: string.isRequired}),

@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 
-const I18n = useI18nScope('student_groups');
+const I18n = useI18nScope('student_groups')
 
 export default function Filter(props) {
   return (

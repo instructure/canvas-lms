@@ -30,9 +30,9 @@
 //     errors = $form.data 'errors'
 import $ from 'jquery'
 import _ from 'underscore'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('validate');
+const I18n = useI18nScope('validate')
 
 export default $.fn.validate = function() {
   const errors = {}

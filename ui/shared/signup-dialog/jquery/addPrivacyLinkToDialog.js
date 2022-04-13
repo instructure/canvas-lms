@@ -16,9 +16,9 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('site');
+const I18n = useI18nScope('site')
 
 export default function addPrivacyLinkToDialog($dialog) {
   if (!(ENV.ACCOUNT && ENV.ACCOUNT.privacy_policy_url)) return

@@ -88,14 +88,6 @@ function print_missing_dependencies {
 function display_next_steps {
   message "You're good to go! Next steps:"
 
-  # shellcheck disable=SC2016
-  [[ $OS == 'Darwin' ]] && (! is_mutagen) && echo '
-  First, run:
-
-    eval "$(dinghy env)"
-
-  This will set up environment variables for docker to work with the dinghy VM.'
-
   [[ $OS == 'Linux' ]] && echo '
   I have added your user to the docker group so you can run docker commands
   without sudo. Note that this has security implications:
@@ -120,7 +112,7 @@ function display_next_steps {
       echo ':docker-compose/selenium.override.yml' >> .env
 
     build the selenium container
-      ${DOCKER_COMMAND} build selenium-hub
+      ${DOCKER_COMMAND} up -d selenium-hub
 
     run selenium
       ${DOCKER_COMMAND} run --rm web bundle exec rspec spec/selenium

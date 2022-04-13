@@ -18,7 +18,7 @@
 
 import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {View} from '@instructure/ui-view'
@@ -27,7 +27,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {GradingPeriodShape} from '@canvas/k5/react/utils'
 import LoadingWrapper from '@canvas/k5/react/LoadingWrapper'
 
-const I18n = useI18nScope('course_grading_period_select');
+const I18n = useI18nScope('course_grading_period_select')
 
 const GradingPeriodSelect = ({
   loadingGradingPeriods,

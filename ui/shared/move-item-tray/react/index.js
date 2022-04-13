@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import axios from '@canvas/axios'
 import React from 'react'
 import {string, func, arrayOf} from 'prop-types'
@@ -29,7 +29,7 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {itemShape, moveOptionsType} from './propTypes'
 import MoveSelect from './MoveSelect'
 
-const I18n = useI18nScope('move_item_tray');
+const I18n = useI18nScope('move_item_tray')
 
 export default class MoveItemTray extends React.Component {
   static propTypes = {

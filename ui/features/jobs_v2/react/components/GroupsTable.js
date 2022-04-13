@@ -71,7 +71,7 @@ export default function GroupsTable({
               <Table.Row>
                 {renderColHeader('group', '', typeCaption)}
                 {renderColHeader('count', '6em', I18n.t('Count'))}
-                {renderColHeader('info', '10em', <GroupedInfoColumnHeader bucket={bucket} />)}
+                {renderColHeader('info', '11em', <GroupedInfoColumnHeader bucket={bucket} />)}
               </Table.Row>
             </Table.Head>
             <Table.Body>

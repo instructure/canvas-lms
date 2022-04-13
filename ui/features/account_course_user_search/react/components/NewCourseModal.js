@@ -24,14 +24,14 @@ import {FormFieldGroup} from '@instructure/ui-form-field'
 import {TextInput} from '@instructure/ui-text-input'
 import {propType as termsPropType} from '../store/TermsStore'
 import SearchableSelect from './SearchableSelect'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import CoursesStore from '../store/CoursesStore'
 import AccountsTreeStore from '../store/AccountsTreeStore'
 import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import preventDefault from 'prevent-default'
 import {flatten} from 'lodash'
 
-const I18n = useI18nScope('account_course_user_search');
+const I18n = useI18nScope('account_course_user_search')
 
 const nonBreakingSpace = '\u00a0'
 const renderAccountOptions = (accounts = [], depth = 0) =>

@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
 
-const I18n = useI18nScope('add_peopleApiError');
+const I18n = useI18nScope('add_peopleApiError')
 
 class ApiError extends React.Component {
   static propTypes = {

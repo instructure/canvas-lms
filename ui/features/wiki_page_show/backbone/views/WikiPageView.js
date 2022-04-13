@@ -27,7 +27,7 @@ import StickyHeaderMixin from '@canvas/wiki/backbone/views/StickyHeaderMixin.cof
 import WikiPageDeleteDialog from '@canvas/wiki/backbone/views/WikiPageDeleteDialog'
 import WikiPageReloadView from '@canvas/wiki/backbone/views/WikiPageReloadView'
 import PublishButtonView from '@canvas/publish-button-view'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import htmlEscape from 'html-escape'
 import {publish} from 'jquery-tinypubsub'
 import '@canvas/modules/jquery/prerequisites_lookup'
@@ -35,7 +35,7 @@ import '../../jquery/content_locks'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 
-const I18n = useI18nScope('pages');
+const I18n = useI18nScope('pages')
 
 export default class WikiPageView extends Backbone.View {
   static initClass() {

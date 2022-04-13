@@ -24,7 +24,7 @@ import round from 'round'
 import userSettings from '@canvas/user-settings'
 import fetchAllPages from '../helpers/xhr/fetch_all_pages'
 import parseLinkHeader from '../helpers/xhr/parse_link_header'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import Ember from 'ember'
 import _ from 'underscore'
 import tz from '@canvas/timezone'
@@ -44,7 +44,7 @@ import 'jquery-tinypubsub'
 
 import '../components/ic_submission_download_dialog_component'
 
-const I18n = useI18nScope('sr_gradebook');
+const I18n = useI18nScope('sr_gradebook')
 
 const {get, set, setProperties} = Ember
 

@@ -20,12 +20,12 @@ import _ from 'underscore'
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
 import Folder from '@canvas/files/backbone/models/Folder'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('upload_drop_zone');
+const I18n = useI18nScope('upload_drop_zone')
 
 class UploadDropZone extends React.Component {
   static displayName = 'UploadDropZone'

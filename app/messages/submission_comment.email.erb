@@ -1,5 +1,9 @@
 <% define_content :link do %>
-  <%= polymorphic_url([asset.submission.assignment.context, asset.submission.assignment, :submission], id: asset.submission.user) %>
+  <% if asset.submission.assignment.context.feature_enabled?(:assignments_2_student) %>
+    <%= polymorphic_url([asset.submission.assignment.context, asset.submission.assignment]) %>
+  <% else %>
+    <%= polymorphic_url([asset.submission.assignment.context, asset.submission.assignment, :submission], id: asset.submission.user) %>
+  <% end %>
 <% end %>
 
 <% define_content :subject do %>

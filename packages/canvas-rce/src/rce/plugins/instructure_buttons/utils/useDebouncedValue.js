@@ -19,8 +19,17 @@
 import React, {useState} from 'react'
 import {debounce} from '@instructure/debounce'
 
-export default function useDebouncedValue(initialValue, onChange) {
-  const [immediateValue, setImmediateValue] = useState(initialValue)
+export default function useDebouncedValue(currentValue, onChange) {
+  const [immediateValue, setImmediateValue] = useState(currentValue)
+
+  // The hook may have initially been called with currentValue
+  // being set to an empty value.
+  //
+  // If so we need to make sure to re-set the immediate value
+  // once a truthy value is given
+  if (!immediateValue && !!currentValue) {
+    setImmediateValue(currentValue)
+  }
 
   const handleValueChange = event => {
     const {value} = event.target
@@ -28,11 +37,18 @@ export default function useDebouncedValue(initialValue, onChange) {
     // Immediately set local state for low-latency feedback
     setImmediateValue(value)
 
-    // Debounce the call to set state that may cause many
-    // re-renders down the component tree
-    debounce(val => {
-      onChange(val)
-    })(value)
+    if (!value) {
+      // The user may have done ctrl+a, backspace.
+      // Clear the value immediately to allow this
+      // action to clear the input
+      onChange(value)
+    } else {
+      // Debounce the call to set state that may cause many
+      // re-renders down the component tree
+      debounce(val => {
+        onChange(val)
+      }, 500)(value)
+    }
   }
 
   return [immediateValue, handleValueChange, setImmediateValue]

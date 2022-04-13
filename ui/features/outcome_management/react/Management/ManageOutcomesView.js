@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
@@ -33,7 +33,7 @@ import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import SVGWrapper from '@canvas/svg-wrapper'
 import {ratingsShape} from './shapes'
 
-const I18n = useI18nScope('OutcomeManagement');
+const I18n = useI18nScope('OutcomeManagement')
 
 const ManageOutcomesView = ({
   outcomeGroup,

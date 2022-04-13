@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Breadcrumb} from '@instructure/ui-breadcrumb'
 import {Button} from '@instructure/ui-buttons'
 import {Grid} from '@instructure/ui-grid'
@@ -38,7 +38,7 @@ import AppointmentGroupList from './AppointmentGroupList'
 import ContextSelector from './ContextSelector'
 import TimeBlockSelector from './TimeBlockSelector'
 
-const I18n = useI18nScope('appointment_groups');
+const I18n = useI18nScope('appointment_groups')
 
 const parseFormValues = data => ({
   description: data.description,

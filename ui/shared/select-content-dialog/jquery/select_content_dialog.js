@@ -17,7 +17,7 @@
  */
 
 import INST from 'browser-sniffer'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -48,7 +48,7 @@ import '@canvas/loading-image'
 import '@canvas/util/templateData'
 import processMultipleContentItems from '@canvas/deep-linking/processors/processMultipleContentItems'
 
-const I18n = useI18nScope('select_content_dialog');
+const I18n = useI18nScope('select_content_dialog')
 
 const SelectContentDialog = {}
 

@@ -26,7 +26,7 @@ import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import {getOptimisticResponse} from './utils'
 import {HIGHLIGHT_TIMEOUT, SearchContext} from './utils/constants'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {IsolatedViewContainer} from './containers/IsolatedViewContainer/IsolatedViewContainer'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
@@ -34,7 +34,7 @@ import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState} from 'react'
 import {useMutation, useQuery} from 'react-apollo'
 
-const I18n = useI18nScope('discussion_topics_post');
+const I18n = useI18nScope('discussion_topics_post')
 
 const DiscussionTopicManager = props => {
   const [searchTerm, setSearchTerm] = useState('')

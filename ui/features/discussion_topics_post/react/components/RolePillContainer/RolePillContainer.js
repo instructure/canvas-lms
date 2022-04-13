@@ -18,14 +18,14 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {Pill} from '@instructure/ui-pill'
 import {InlineList} from '@instructure/ui-list'
 import {responsiveQuerySizes} from '../../utils'
 import {Responsive} from '@instructure/ui-responsive'
 
-const I18n = useI18nScope('discussion_posts');
+const I18n = useI18nScope('discussion_posts')
 
 const ROLE_HIERARCHY = ['Author', 'TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment']
 

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import axios from '@canvas/axios'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -26,7 +26,7 @@ import {Menu} from '@instructure/ui-menu'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconMoreLine} from '@instructure/ui-icons'
 
-const I18n = useI18nScope('dashboard');
+const I18n = useI18nScope('dashboard')
 
 export default class DashboardOptionsMenu extends React.Component {
   static propTypes = {

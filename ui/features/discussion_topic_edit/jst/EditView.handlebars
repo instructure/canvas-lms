@@ -38,7 +38,7 @@
         <label for="discussion-title">
           {{#t "topic_title"}}Topic Title{{/t}}
         </label>
-        <input type="text" id="discussion-title" name="title" placeholder="{{#t " topic_title"}}Topic Title{{/t}}"
+        <input type="text" id="discussion-title" name="title" placeholder="{{#t "topic_title"}}Topic Title{{/t}}"
           value="{{title}}" maxlength="254" class="input-block-level">
         {{/if}}
       </div>
@@ -375,11 +375,11 @@
     {{#t}}Cancel{{/t}}
   </button>
   {{#if canPublish}}
-  <button type="button" data-text-while-loading="{{#t " saving"}}Saving...{{/t}}"
+  <button type="button" data-text-while-loading="{{#t "saving"}}Saving...{{/t}}"
     class="btn btn-default save_and_publish">
     {{#t "buttons.save_and_publish"}}Save & Publish{{/t}}
   </button>
   {{/if}}
-  <button type="submit" data-text-while-loading="{{#t " saving"}}Saving...{{/t}}" class="btn btn-primary">{{#t
+  <button type="submit" data-text-while-loading="{{#t "saving"}}Saving...{{/t}}" class="btn btn-primary">{{#t
     "save"}}Save{{/t}}</button>
 </div>

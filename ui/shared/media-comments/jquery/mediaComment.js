@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 // mediaComment.coffee
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
 import pubsub from 'jquery-tinypubsub'
 import mejs from '@canvas/mediaelement'
@@ -25,7 +25,7 @@ import $ from 'jquery'
 import htmlEscape from 'html-escape'
 import sanitizeUrl from 'sanitize-url'
 
-const I18n = useI18nScope('jquery_media_comments');
+const I18n = useI18nScope('jquery_media_comments')
 
 // #
 // a module for some of the transformation functions pulled out of the middle

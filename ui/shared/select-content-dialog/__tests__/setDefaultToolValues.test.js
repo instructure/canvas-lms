@@ -41,7 +41,9 @@ describe('setDefaultToolValues', () => {
     document.body.innerHTML =
       '<input id="assignment_external_tool_tag_attributes_content_type" type="hidden"/>' +
       '<input id="assignment_external_tool_tag_attributes_content_id" type="hidden"/>' +
-      '<input id="assignment_external_tool_tag_attributes_url" type="hidden"/>'
+      '<input id="assignment_external_tool_tag_attributes_url" type="hidden"/>' +
+      '<input id="assignment_external_tool_tag_attributes_iframe_height" type="hidden" value="888"/>' +
+      '<input id="assignment_external_tool_tag_attributes_iframe_width" type="hidden" value="999"/>'
 
     window.postMessage = jest.fn()
 
@@ -82,6 +84,18 @@ describe('setDefaultToolValues', () => {
   it('sets the tool URL', () => {
     expect(document.querySelector('#assignment_external_tool_tag_attributes_url').value).toEqual(
       url
+    )
+  })
+
+  it('sets the iframe width', () => {
+    expect(document.querySelector('#assignment_external_tool_tag_attributes_iframe_width').value).toEqual(
+      ''
+    )
+  })
+
+  it('sets the iframe height', () => {
+    expect(document.querySelector('#assignment_external_tool_tag_attributes_iframe_height').value).toEqual(
+      ''
     )
   })
 })

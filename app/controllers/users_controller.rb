@@ -503,7 +503,7 @@ class UsersController < ApplicationController
     # Reload user settings so we don't get a stale value for K5_USER when switching dashboards
     @current_user.reload
     k5_disabled = k5_disabled?
-    k5_user = k5_user?(false)
+    k5_user = k5_user?(check_disabled: false)
     js_env({ K5_USER: k5_user && !k5_disabled }, true)
 
     # things needed on both k5 and classic dashboards
@@ -2734,6 +2734,27 @@ class UsersController < ApplicationController
     if user && authorized_action(@domain_root_account, @current_user, :manage_site_settings)
       user.destroy
       render json: { status: "ok" }
+    end
+  end
+
+  # @API Get whether user sees Canvas for Elementary dashboard
+  #
+  # Returns a boolean indicating whether the user sees the Canvas for Elementary dashboard.
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/users/self/show_k5_dashboard \
+  #     -X GET \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @returns boolean
+  def show_k5_dashboard
+    user = api_find(User, params[:id])
+    if user
+      if user.grants_right?(@current_user, session, :read) || @current_user.observer_enrollments.active.where(associated_user: user).shard(@current_user.in_region_associated_shards).exists?
+        render json: { k5_user: k5_user?(user: user) }
+      else
+        render_unauthorized_action
+      end
     end
   end
 

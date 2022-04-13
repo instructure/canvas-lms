@@ -17,11 +17,11 @@
 
 import $ from 'jquery'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 
-const I18n = useI18nScope('context.undelete_index');
+const I18n = useI18nScope('context.undelete_index')
 
 $(document).ready(() =>
   $('.restore_link').click(function(event) {

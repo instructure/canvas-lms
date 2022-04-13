@@ -51,6 +51,9 @@ const locale = {
   "announcement_list_da155734": { "message": "Ilmoitusluettelo" },
   "announcements_a4b8ed4a": { "message": "Ilmoitukset" },
   "apply_781a2546": { "message": "Käytä" },
+  "apply_changes_to_all_instances_of_this_icon_maker__2642f466": {
+    "message": "Käytä muutoksia kaikkiin kurssin kuvakkeen tekijän kuvakkeen esiintymiin"
+  },
   "apps_54d24a47": { "message": "Sovellukset" },
   "arrows_464a3e54": { "message": "Nuolet" },
   "art_icon_8e1daad": { "message": "Taide-kuvake" },
@@ -73,7 +76,10 @@ const locale = {
   "available_folders_694d0436": { "message": "Saatavissa olevat kansiot" },
   "basic_554cdc0a": { "message": "Perus" },
   "below_81d4dceb": { "message": "Alle" },
+  "black_4cb01371": { "message": "Musta" },
+  "blue_daf8fea9": { "message": "Sininen" },
   "bottom_third_5f5fec1d": { "message": "Alakolmannes" },
+  "brick_f2656265": { "message": "Tiili" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Peruuta" },
   "choose_caption_file_9c45bc4e": { "message": "Muokkaa tekstitystiedostoa" },
@@ -138,6 +144,10 @@ const locale = {
   "course_links_b56959b9": { "message": "Kurssin linkit" },
   "course_media_ec759ad": { "message": "Kurssimedia" },
   "course_navigation_dd035109": { "message": "Kurssin navigointi" },
+  "create_icon_110d6463": { "message": "Luo kuvake" },
+  "create_icon_maker_icon_c716bffe": {
+    "message": "Luo kuvakkeen tekijän kuvake"
+  },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons -lisenssi:"
   },
@@ -145,9 +155,11 @@ const locale = {
   "crop_image_807ebb08": { "message": "Rajaa kuva" },
   "current_image_f16c249c": { "message": "Nykyinen kuva" },
   "custom_6979cd81": { "message": "Mukauta" },
+  "cyan_c1d5f68a": { "message": "Syaani" },
   "date_added_ed5ad465": { "message": "Lisäyspäivämäärä" },
   "decorative_image_3c28aa7d": { "message": "Koristeellinen kuva" },
   "decrease_indent_de6343ab": { "message": "Pienennä sisennystä" },
+  "deep_purple_bb3e2907": { "message": "Tumman violetti" },
   "default_bulleted_unordered_list_47079da8": {
     "message": "luetelmakohdista koostuva järjestämätön oletuslista"
   },
@@ -247,6 +259,8 @@ const locale = {
   },
   "grades_a61eba0a": { "message": "Arvosanat" },
   "greek_65c5b3f7": { "message": "kreikka" },
+  "green_15af4778": { "message": "Vihreä" },
+  "grey_a55dceff": { "message": "Harmaa" },
   "group_documents_8bfd6ae6": { "message": "Ryhmän asiakirjat" },
   "group_files_4324f3df": { "message": "Ryhmän tiedostot" },
   "group_files_82e5dcdb": { "message": "Ryhmän tiedostot" },
@@ -272,6 +286,11 @@ const locale = {
   },
   "i_hold_the_copyright_71ee91b1": { "message": "Minulla on tekijäoikeus" },
   "icon_color_b86dd6d6": { "message": "Kuvakkeen väri" },
+  "icon_maker_icons_cc560f7e": { "message": "Kuvakkeen tekijän kuvakkeet" },
+  "icon_outline_e978dc0c": { "message": "Kuvakkeen ääriviiva" },
+  "icon_outline_size_33f39b86": { "message": "Kuvakkeen ääriviivan koko" },
+  "icon_shape_30b61e7": { "message": "Kuvakkeen muoto" },
+  "icon_size_9353edea": { "message": "Kuvakkeen koko" },
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "Jos et valitse käyttöoikeuksia nyt, tiedoston julkaisu peruutetaan latauksen jälkeen."
   },
@@ -281,6 +300,7 @@ const locale = {
   "image_to_crop_3a34487d": { "message": "Rajattava kuva" },
   "images_7ce26570": { "message": "Kuvat" },
   "increase_indent_6d550a4a": { "message": "Suurenna sisennystä" },
+  "indigo_2035fc55": { "message": "Indigo" },
   "insert_593145ef": { "message": "Aseta" },
   "insert_equella_links_49a8dacd": { "message": "Lisää Equella-linkit" },
   "insert_link_6dc23cae": { "message": "Lisää linkki" },
@@ -294,6 +314,7 @@ const locale = {
   "large_9c5e80e7": { "message": "Suuri" },
   "left_to_right_e9b4fd06": { "message": "Vasemmalta-Oikealle" },
   "library_icon_ae1e54cf": { "message": "Kirjaston kuvake" },
+  "light_blue_5374f600": { "message": "Vaaleansininen" },
   "link_7262adec": { "message": "Linkki" },
   "link_options_a16b758b": { "message": "Linkin asetukset" },
   "links_14b70841": { "message": "Linkit" },
@@ -307,6 +328,7 @@ const locale = {
   "loading_please_wait_d276220a": { "message": "Ladataan, odota" },
   "loading_preview_9f077aa1": { "message": "Esikatselua ladataan" },
   "locked_762f138b": { "message": "Lukittu" },
+  "magenta_4a65993c": { "message": "Magenta" },
   "math_icon_ad4e9d03": { "message": "Matematiikan kuvake" },
   "media_af190855": { "message": "Tietoväline" },
   "medium_5a8e9ead": { "message": "Tietoväline" },
@@ -324,6 +346,7 @@ const locale = {
   },
   "my_files_2f621040": { "message": "Omat tiedostot" },
   "name_1aed4a1b": { "message": "Nimi" },
+  "name_color_ceec76ff": { "message": "{ name } ({ color })" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Siirry valikon tai työkalupalkin läpi"
   },
@@ -343,11 +366,13 @@ const locale = {
   "none_3b5e34d2": { "message": "Ei mitään" },
   "none_selected_b93d56d2": { "message": "Ei valintoja" },
   "octagon_e48be9f": { "message": "Kahdeksankulmio" },
+  "olive_6a3e4d6b": { "message": "Oliivi" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Avaa tämä näppäimistön pikakuvakkeiden valintaruutu"
   },
   "open_title_application_fd624fc5": { "message": "Avoin { title }-sovellus" },
   "operators_a2ef9a93": { "message": "Operaattorit" },
+  "orange_81386a62": { "message": "Oranssi" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Järjestetyt ja järjestämättömät listat"
   },
@@ -369,6 +394,7 @@ const locale = {
   "physical_education_icon_d7dffd3e": {
     "message": "Liikuntakasvatuksen kuvake"
   },
+  "pink_68ad45cb": { "message": "Vaaleanpunainen" },
   "pixels_52ece7d1": { "message": "Pikselit" },
   "posted_when_a578f5ab": { "message": "Lähetetty: { when }" },
   "preformatted_d0670862": { "message": "Esimuotoiltu" },
@@ -382,10 +408,13 @@ const locale = {
   },
   "published_c944a23d": { "message": "julkaistu" },
   "published_when_302d8e23": { "message": "Julkaistu: { when }" },
+  "pumpkin_904428d5": { "message": "Kurpitsa" },
+  "purple_7678a9fc": { "message": "Violetti" },
   "quizzes_7e598f57": { "message": "Tietovisat" },
   "raw_html_editor_e3993e41": { "message": "Raaka HTML-muokkausohjelma" },
   "record_7c9448b": { "message": "Nauhoita" },
   "record_upload_media_5fdce166": { "message": "Nauhoita/lataa mediaa" },
+  "red_8258edf3": { "message": "Punainen" },
   "relationships_6602af70": { "message": "Suhteet" },
   "religion_icon_246e0be1": { "message": "Uskonnon kuvake" },
   "remove_link_d1f2f4d0": { "message": "Poista linkki" },
@@ -399,6 +428,9 @@ const locale = {
     "message": "Harmi, mutta Pretty-tekstieditoria ei voi käyttää näppäimistöltä. Käytä HTML-tekstieditoria täällä."
   },
   "save_11a80ec3": { "message": "Tallenna" },
+  "saved_icon_maker_icons_df86e2a1": {
+    "message": "Tallennetut kuvakkeen tekijän kuvakkeet"
+  },
   "search_280d00bd": { "message": "Hae" },
   "search_term_b2d2235": { "message": "Hakutermi" },
   "select_crop_shape_d441feeb": { "message": "Valitse rajauksen muoto" },
@@ -412,6 +444,7 @@ const locale = {
   "show_link_options_545338fd": { "message": "Näytä linkin asetukset" },
   "show_video_options_6ed3721a": { "message": "Näytä videoasetukset" },
   "single_color_image_4e5d4dbc": { "message": "Yksivärinen kuva" },
+  "single_color_image_color_95fa9a87": { "message": "Yksivärinen kuvan väri" },
   "size_b30e1077": { "message": "Koko" },
   "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
     "message": "Tekstitystiedosto on kooltaan suurempi kuin suurin sallittu tiedostokoko { max } kb."
@@ -437,6 +470,7 @@ const locale = {
     "message": "järjestä järjestämätön luettelo"
   },
   "star_8d156e09": { "message": "Tähti" },
+  "steel_blue_14296f08": { "message": "Teräksensininen" },
   "styles_2aa721ef": { "message": "Tyylit" },
   "submit_a3cc6859": { "message": "Lähetä" },
   "subscript_59744f96": { "message": "Alaindeksi" },
@@ -450,6 +484,7 @@ const locale = {
   },
   "syllabus_f191f65b": { "message": "Opinto-ohjelma" },
   "tab_arrows_4cf5abfc": { "message": "TAB/Nuolet" },
+  "teal_f729a294": { "message": "Sinivihreä" },
   "text_7f4593da": { "message": "Teksti" },
   "text_background_color_16e61c3f": { "message": "Tekstin taustaväri" },
   "text_color_acf75eb6": { "message": "Tekstiväri" },
@@ -554,6 +589,7 @@ const locale = {
   "view_title_description_67940918": {
     "message": "Näytä kohteen { title } kuvaus"
   },
+  "white_87fa64fd": { "message": "Valkoinen" },
   "width_492fec76": { "message": "Leveys" },
   "width_and_height_must_be_numbers_110ab2e3": {
     "message": "Leveyden ja korkeuden täytyy olla numeroita"

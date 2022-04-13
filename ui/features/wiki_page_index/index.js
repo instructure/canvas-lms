@@ -18,13 +18,13 @@
 
 import $ from 'jquery'
 import ready from '@instructure/ready'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import WikiPageCollection from './backbone/collections/WikiPageCollection'
 import WikiPageIndexView from './backbone/views/WikiPageIndexView'
 import 'jquery.cookie'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 
-const I18n = useI18nScope('pages');
+const I18n = useI18nScope('pages')
 
 const deleted_page_title = $.cookie('deleted_page_title')
 if (deleted_page_title) {

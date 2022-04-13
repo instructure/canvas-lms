@@ -20,10 +20,10 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {CreateCourseModal} from '@canvas/create-course-modal/react/CreateCourseModal'
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import ready from '@instructure/ready'
 
-const I18n = useI18nScope('course_list');
+const I18n = useI18nScope('course_list')
 
 function success(target) {
   const favorited_tooltip = I18n.t('favorited_tooltip', 'Click to remove from the courses menu.')

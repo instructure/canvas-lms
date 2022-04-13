@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import AdvancedTabPanel from 'ui/features/gradebook/react/default_gradebook/components/AdvancedTabPanel.js'
+import AdvancedTabPanel from 'ui/features/gradebook/react/default_gradebook/components/AdvancedTabPanel'
 
 QUnit.module('GradebookSettingsModal AdvancedTabPanel', suiteHooks => {
   let $container

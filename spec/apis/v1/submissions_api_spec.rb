@@ -5082,6 +5082,16 @@ describe "Submissions API", type: :request do
       @a1 = @course.assignments.create!({ title: "assignment1", grading_type: "percent", points_possible: 10 })
     end
 
+    it "returns an error when grade_data is omitted" do
+      json = api_call(:post,
+                      "/api/v1/courses/#{@course.id}/assignments/#{@a1.id}/submissions/update_grades",
+                      { controller: "submissions_api", action: "bulk_update",
+                        format: "json", course_id: @course.id.to_s,
+                        assignment_id: @a1.id.to_s }, {}, {}, { expected_status: 400 })
+
+      expect(json["error"]).to eq("'grade_data' parameter required")
+    end
+
     it "queues bulk update through courses" do
       grade_data = {
         grade_data: {

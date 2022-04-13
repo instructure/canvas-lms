@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
 import authenticity_token from '@canvas/authenticity-token'
@@ -24,7 +24,7 @@ import 'jqueryui/dialog'
 import 'jquery-scroll-to-visible'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 
-const I18n = useI18nScope('instructure_misc_plugins');
+const I18n = useI18nScope('instructure_misc_plugins')
 
 $.fn.setOptions = function(prompt, options) {
   let result = prompt ? "<option value=''>" + htmlEscape(prompt) + '</option>' : ''

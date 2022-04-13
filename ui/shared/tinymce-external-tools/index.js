@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
 import ExternalToolsHelper from './ExternalToolsHelper'
@@ -24,7 +24,7 @@ import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-const I18n = useI18nScope('ExternalToolsPlugin');
+const I18n = useI18nScope('ExternalToolsPlugin')
 
 const TRANSLATIONS = {
   get more_external_tools() {
@@ -70,7 +70,6 @@ const ExternalToolsPlugin = {
       ed.addCommand(`instructureExternalButton${current_button.id}`, openDialog)
     }
     if (ltiButtons.length) {
-      buildToolsButton(ed, ltiButtons)
       buildFavoriteToolsButtons(ed, ltiButtons)
       buildMRUMenuButton(ed, ltiButtons)
       buildMenubarItem(ed, ltiButtons)
@@ -115,23 +114,6 @@ function buildMenubarItem(ed, ltiButtons) {
       getSubmenuItems: () => getLtiMRUItems(ed, ltiButtons)
     })
   }
-}
-
-// register the Apps toolbar button for when there are no MRU apps
-function buildToolsButton(ed, ltiButtons) {
-  const tooltip = I18n.t('Apps')
-  ed.ui.registry.addButton('lti_tool_dropdown', {
-    onAction: () => {
-      const ev = new CustomEvent('tinyRCE/onExternalTools', {detail: {ltiButtons}})
-      document.dispatchEvent(ev)
-    },
-    icon: 'lti',
-    tooltip,
-    onSetup(_api) {
-      // start off with the right button visible
-      ExternalToolsHelper.showHideButtons(ed)
-    }
-  })
 }
 
 // register the favorite lti tools toolbar buttons

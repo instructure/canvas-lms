@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import natcompare from '@canvas/util/natcompare'
 import numberHelper from '@canvas/i18n/numberHelper'
 import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit */
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
-const I18n = useI18nScope('public_message_students');
+const I18n = useI18nScope('public_message_students')
 /* showIf */
 
 let currentSettings = {}

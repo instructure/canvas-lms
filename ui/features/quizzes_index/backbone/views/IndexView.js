@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import _ from 'underscore'
@@ -31,7 +31,7 @@ import QuizEngineModal from '../../react/QuizEngineModal'
 import {ltiState} from '@canvas/lti/jquery/messages'
 import getCookie from '@instructure/get-cookie'
 
-const I18n = useI18nScope('quizzesIndexView');
+const I18n = useI18nScope('quizzesIndexView')
 
 export default class IndexView extends Backbone.View {
   static initClass() {

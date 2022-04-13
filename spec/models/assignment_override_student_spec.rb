@@ -160,22 +160,26 @@ describe AssignmentOverrideStudent do
       expect(@ao.reload).to be_deleted
     end
 
-    it "deletes overrides for inactive users" do
+    it "does not delete overrides for inactive users" do
       adhoc_override_with_student
       @user.enrollments.each(&:deactivate)
 
-      expect(@override_student).to be_active
-      AssignmentOverrideStudent.clean_up_for_assignment(@assignment)
-      expect(@override_student.reload).to be_deleted
+      expect do
+        AssignmentOverrideStudent.clean_up_for_assignment(@assignment)
+      end.not_to change {
+        @override_student.reload.active?
+      }.from(true)
     end
 
-    it "deletes overrides for conclude/completed users" do
+    it "does not delete overrides for conclude/completed users" do
       adhoc_override_with_student
       @user.enrollments.each(&:conclude)
 
-      expect(@override_student).to be_active
-      AssignmentOverrideStudent.clean_up_for_assignment(@assignment)
-      expect(@override_student.reload).to be_deleted
+      expect do
+        AssignmentOverrideStudent.clean_up_for_assignment(@assignment)
+      end.not_to change {
+        @override_student.reload.active?
+      }.from(true)
     end
 
     it "does not broadcast notifications when processing a cleanup" do

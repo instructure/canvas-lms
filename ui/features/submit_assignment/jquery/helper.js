@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('submit_assignment_helper');
+const I18n = useI18nScope('submit_assignment_helper')
 
 export function recordEulaAgreement(querySelector, checked) {
   const inputs = document.querySelectorAll(querySelector)

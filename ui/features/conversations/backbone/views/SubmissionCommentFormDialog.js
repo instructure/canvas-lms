@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/backbone'
 import DialogBaseView from '@canvas/dialog-base-view'
@@ -25,7 +25,7 @@ import composeTitleBarTemplate from '../../jst/composeTitleBar.handlebars'
 import Message from '../models/Message.coffee'
 import 'jquery.elastic'
 
-const I18n = useI18nScope('conversation_dialog');
+const I18n = useI18nScope('conversation_dialog')
 
 // #
 // reusable message composition dialog

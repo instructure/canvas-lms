@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
 import {string} from 'prop-types'
 
@@ -32,7 +32,7 @@ import propTypes from '../propTypes'
 
 import {Link} from '@instructure/ui-link'
 
-const I18n = useI18nScope('announcements_v2');
+const I18n = useI18nScope('announcements_v2')
 
 export default class ExternalFeedsTray extends Component {
   static propTypes = {

@@ -21,8 +21,8 @@
 describe CoursePaceHardEndDateCompressor do
   before :once do
     course_with_student active_all: true
-    @course.update start_at: "2021-09-01"
-    @course_pace = @course.course_paces.create! workflow_state: "active", end_date: "2021-09-10"
+    @course.update start_at: "2021-09-01", restrict_enrollments_to_course_dates: true
+    @course_pace = @course.course_paces.create! workflow_state: "active", end_date: "2021-09-10", hard_end_dates: true
     @module = @course.context_modules.create!
   end
 
@@ -64,14 +64,15 @@ describe CoursePaceHardEndDateCompressor do
       context "implicit end dates" do
         before :once do
           @course.update(start_at: "2021-12-27")
-          @course_pace.update(end_date: nil, exclude_weekends: true)
+          @course_pace.update(end_date: nil, hard_end_dates: false, exclude_weekends: true)
           @course_pace.course_pace_module_items.each_with_index do |item, index|
             item.update(duration: (index + 1) * 2)
           end
         end
 
         it "supports implicit end dates from the course's term" do
-          @course.enrollment_term.update(end_at: "2021-12-31")
+          @course.update(restrict_enrollments_to_course_dates: false)
+          @course.enrollment_term.update(start_at: "2021-12-27", end_at: "2021-12-31")
           compressed = CoursePaceHardEndDateCompressor.compress(@course_pace, @course_pace.course_pace_module_items)
           expect(compressed.pluck(:duration)).to eq([1, 1, 2])
         end

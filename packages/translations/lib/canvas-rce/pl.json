@@ -28,6 +28,9 @@
   "announcement_list_da155734": { "message": "Lista ogłoszeń" },
   "announcements_a4b8ed4a": { "message": "Ogłoszenia" },
   "apply_781a2546": { "message": "Zastosuj" },
+  "apply_changes_to_all_instances_of_this_icon_maker__2642f466": {
+    "message": "Zastosuj zmiany do wszystkich instancji tej ikony Icon Maker w kursie"
+  },
   "apps_54d24a47": { "message": "Aplikacje" },
   "arrows_464a3e54": { "message": "Strzałki" },
   "art_icon_8e1daad": { "message": "Ikona sztuki" },
@@ -50,7 +53,10 @@
   "available_folders_694d0436": { "message": "Dostępne foldery" },
   "basic_554cdc0a": { "message": "Podstawowy" },
   "below_81d4dceb": { "message": "Poniżej" },
+  "black_4cb01371": { "message": "Czarny" },
+  "blue_daf8fea9": { "message": "Niebieski" },
   "bottom_third_5f5fec1d": { "message": "Trzeci od dołu" },
+  "brick_f2656265": { "message": "Cegła" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Anuluj" },
   "choose_caption_file_9c45bc4e": { "message": "Wybierz plik z napisami" },
@@ -113,6 +119,8 @@
   "course_links_b56959b9": { "message": "Łącza kursu" },
   "course_media_ec759ad": { "message": "Multimedia kursu" },
   "course_navigation_dd035109": { "message": "Nawigowanie po kursie" },
+  "create_icon_110d6463": { "message": "Utwórz ikonę" },
+  "create_icon_maker_icon_c716bffe": { "message": "Utwórz ikonę Icon Maker" },
   "creative_commons_license_725584ae": {
     "message": "Licencja Creative Commons:"
   },
@@ -120,9 +128,11 @@
   "crop_image_807ebb08": { "message": "Przytnij obraz" },
   "current_image_f16c249c": { "message": "Bieżący obraz" },
   "custom_6979cd81": { "message": "Niestandardowe" },
+  "cyan_c1d5f68a": { "message": "Cyjan" },
   "date_added_ed5ad465": { "message": "Data dodania" },
   "decorative_image_3c28aa7d": { "message": "Obraz dekoracyjny" },
   "decrease_indent_de6343ab": { "message": "Zmniejsz wcięcie" },
+  "deep_purple_bb3e2907": { "message": "Głęboki fiolet" },
   "default_bulleted_unordered_list_47079da8": {
     "message": "domyślna nieuporządkowana lista wypunktowana"
   },
@@ -218,6 +228,8 @@
   },
   "grades_a61eba0a": { "message": "Oceny" },
   "greek_65c5b3f7": { "message": "Greckie" },
+  "green_15af4778": { "message": "Zielony" },
+  "grey_a55dceff": { "message": "Szary" },
   "group_documents_8bfd6ae6": { "message": "Grupuj dokumenty" },
   "group_files_4324f3df": { "message": "Pliki grupy" },
   "group_files_82e5dcdb": { "message": "Pliki grupy" },
@@ -241,6 +253,11 @@
   },
   "i_hold_the_copyright_71ee91b1": { "message": "Posiadam prawa autorskie" },
   "icon_color_b86dd6d6": { "message": "Kolor ikony" },
+  "icon_maker_icons_cc560f7e": { "message": "Ikony Icon Maker" },
+  "icon_outline_e978dc0c": { "message": "Kontur ikony" },
+  "icon_outline_size_33f39b86": { "message": "Rozmiar konturu ikony" },
+  "icon_shape_30b61e7": { "message": "Kształt ikony" },
+  "icon_size_9353edea": { "message": "Rozmiar ikony" },
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "Jeśli nie wybierzesz teraz praw do korzystania, po przesłaniu plik nie zostanie opublikowany."
   },
@@ -250,6 +267,7 @@
   "image_to_crop_3a34487d": { "message": "Obraz do przycięcia" },
   "images_7ce26570": { "message": "Zdjęcia" },
   "increase_indent_6d550a4a": { "message": "Zwiększ wcięcie" },
+  "indigo_2035fc55": { "message": "Indygo" },
   "insert_593145ef": { "message": "Wstaw" },
   "insert_equella_links_49a8dacd": { "message": "Wstaw łącza Equella" },
   "insert_link_6dc23cae": { "message": "Umieść Łącze" },
@@ -263,6 +281,7 @@
   "large_9c5e80e7": { "message": "Duży" },
   "left_to_right_e9b4fd06": { "message": "Lewa-prawa" },
   "library_icon_ae1e54cf": { "message": "Ikona biblioteki" },
+  "light_blue_5374f600": { "message": "Jasny niebieski" },
   "link_7262adec": { "message": "Łącze" },
   "link_options_a16b758b": { "message": "Opcje łącza" },
   "links_14b70841": { "message": "Łącza" },
@@ -276,6 +295,7 @@
   "loading_please_wait_d276220a": { "message": "Ładowanie, proszę czekać" },
   "loading_preview_9f077aa1": { "message": "Wczytywanie podglądu" },
   "locked_762f138b": { "message": "Zablokowany" },
+  "magenta_4a65993c": { "message": "Amarantowy" },
   "math_icon_ad4e9d03": { "message": "Ikona matematyki" },
   "media_af190855": { "message": "Multimedia" },
   "medium_5a8e9ead": { "message": "Średni" },
@@ -293,6 +313,7 @@
   },
   "my_files_2f621040": { "message": "Moje pliki" },
   "name_1aed4a1b": { "message": "Nazwa" },
+  "name_color_ceec76ff": { "message": "{ name } ({ color })" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Przejdź w menu lub na pasku narzędzi"
   },
@@ -312,6 +333,7 @@
   "none_3b5e34d2": { "message": "Brak" },
   "none_selected_b93d56d2": { "message": "Nie wybrano żadnego" },
   "octagon_e48be9f": { "message": "Ośmiobok" },
+  "olive_6a3e4d6b": { "message": "Oliwkowy" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Otwórz to okno dialogowe skrótów klawiatury"
   },
@@ -319,6 +341,7 @@
     "message": "Otwórz aplikację { title }"
   },
   "operators_a2ef9a93": { "message": "Operatory" },
+  "orange_81386a62": { "message": "Pomarańczowy" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Listy uporządkowane i nieuporządkowane"
   },
@@ -340,6 +363,7 @@
   "physical_education_icon_d7dffd3e": {
     "message": "Ikona wychowania fizycznego"
   },
+  "pink_68ad45cb": { "message": "Różowy" },
   "pixels_52ece7d1": { "message": "Piksele" },
   "posted_when_a578f5ab": { "message": "Opublikował(a): { when }" },
   "preformatted_d0670862": { "message": "Wstępnie formatowane" },
@@ -353,12 +377,15 @@
   },
   "published_c944a23d": { "message": "opublikowane" },
   "published_when_302d8e23": { "message": "Opublikowane: { when }" },
+  "pumpkin_904428d5": { "message": "Dynia" },
+  "purple_7678a9fc": { "message": "Fioletowy" },
   "quizzes_7e598f57": { "message": "Testy" },
   "raw_html_editor_e3993e41": { "message": "Edytor HTML bez formatowania" },
   "record_7c9448b": { "message": "Nagraj" },
   "record_upload_media_5fdce166": {
     "message": "Utwórz/prześlij pliki multimedialne"
   },
+  "red_8258edf3": { "message": "Czerwony" },
   "relationships_6602af70": { "message": "Powiązania" },
   "religion_icon_246e0be1": { "message": "Ikona religii" },
   "remove_link_d1f2f4d0": { "message": "Usuń łącze" },
@@ -374,6 +401,7 @@
     "message": "Niestety ulepszony edytor HTML nie jest dostępny z poziomu klawiatury. Tutaj możesz uzyskać dostęp do edytor HTML bez formatowania."
   },
   "save_11a80ec3": { "message": "Zapisz" },
+  "saved_icon_maker_icons_df86e2a1": { "message": "Zapisane ikony Icon Maker" },
   "search_280d00bd": { "message": "Wyszukaj" },
   "search_term_b2d2235": { "message": "Wyszukiwany termin" },
   "select_crop_shape_d441feeb": { "message": "Wybierz przycięty fragment" },
@@ -387,6 +415,9 @@
   "show_link_options_545338fd": { "message": "Pokaż opcje łącza" },
   "show_video_options_6ed3721a": { "message": "Pokaż opcje wideo" },
   "single_color_image_4e5d4dbc": { "message": "Obraz jednokolorowy" },
+  "single_color_image_color_95fa9a87": {
+    "message": "Kolor obrazu jednokolorowego"
+  },
   "size_b30e1077": { "message": "Rozmiar" },
   "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
     "message": "Rozmiar pliku z napisami przekracza maksymalną dozwoloną wartość { max } kb."
@@ -412,6 +443,7 @@
     "message": "prostokątna nieuporządkowana lista"
   },
   "star_8d156e09": { "message": "Gwiazdka" },
+  "steel_blue_14296f08": { "message": "Stalowy niebieski" },
   "styles_2aa721ef": { "message": "Style" },
   "submit_a3cc6859": { "message": "Prześlij" },
   "subscript_59744f96": { "message": "Indeks dolny" },
@@ -427,6 +459,7 @@
   },
   "syllabus_f191f65b": { "message": "Program" },
   "tab_arrows_4cf5abfc": { "message": "TAB/klawisze strzałek" },
+  "teal_f729a294": { "message": "Morski" },
   "text_7f4593da": { "message": "Tekst" },
   "text_background_color_16e61c3f": { "message": "Kolor tła tekstu" },
   "text_color_acf75eb6": { "message": "Kolor tekstu" },
@@ -533,6 +566,7 @@
     "message": "Wybierz uprzednio zdefiniowane kolory"
   },
   "view_title_description_67940918": { "message": "Wyświetl opis { title }" },
+  "white_87fa64fd": { "message": "Biały" },
   "width_492fec76": { "message": "Szerokość" },
   "width_and_height_must_be_numbers_110ab2e3": {
     "message": "Szerokość i wysokość muszą być liczbami"

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/datetime'/* datetimeString */
@@ -26,7 +26,7 @@ import '@canvas/keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
 
-const I18n = useI18nScope('question_banks');
+const I18n = useI18nScope('question_banks')
 
 $(document).ready(function() {
   $('.add_bank_link').click(event => {

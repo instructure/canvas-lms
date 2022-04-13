@@ -20,7 +20,7 @@ import {Button, IconButton} from '@instructure/ui-buttons'
 import {ChildTopic} from '../../../graphql/ChildTopic'
 import {Flex} from '@instructure/ui-flex'
 import {GroupsMenu} from '../GroupsMenu/GroupsMenu'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {
   IconArrowDownLine,
   IconArrowUpLine,
@@ -40,7 +40,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import {AnonymousAvatar} from '@canvas/discussions/react/components/AnonymousAvatar/AnonymousAvatar'
 
-const I18n = useI18nScope('discussions_posts');
+const I18n = useI18nScope('discussions_posts')
 
 export const getMenuConfig = props => {
   const options = {

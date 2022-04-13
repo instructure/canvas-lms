@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import _ from 'lodash'
 import $ from 'jquery'
@@ -39,7 +39,7 @@ import parseLinkHeader from 'link-header-parsing/parseLinkHeader'
 import {showFlashSuccess, showFlashError} from '@canvas/alerts/react/FlashAlert'
 import natcompare from '@canvas/util/natcompare'
 
-const I18n = useI18nScope('react_files');
+const I18n = useI18nScope('react_files')
 
 class FileBrowser extends React.Component {
   static propTypes = {

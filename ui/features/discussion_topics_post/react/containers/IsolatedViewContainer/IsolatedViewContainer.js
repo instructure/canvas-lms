@@ -40,7 +40,7 @@ import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import {Flex} from '@instructure/ui-flex'
 import GenericErrorPage from '@canvas/generic-error-page'
 import {Heading} from '@instructure/ui-heading'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {IsolatedThreadsContainer} from '../IsolatedThreadsContainer/IsolatedThreadsContainer'
 import {IsolatedParent} from './IsolatedParent'
 import LoadingIndicator from '@canvas/loading-indicator'
@@ -50,7 +50,7 @@ import {Tray} from '@instructure/ui-tray'
 import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('discussion_topics_post');
+const I18n = useI18nScope('discussion_topics_post')
 
 export const IsolatedViewContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)

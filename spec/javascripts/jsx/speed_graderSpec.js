@@ -1576,6 +1576,7 @@ QUnit.module('SpeedGrader', rootHooks => {
         <div id="multiple_submissions"></div>
         <div id="speed_grader_edit_status_mount_point"></div>
         <div id="speed_grader_edit_status_secondary_mount_point"></div>
+        <div id="submission_word_count"></div>
       </div>`)
       sinon.stub($, 'ajaxJSON')
 
@@ -1618,7 +1619,8 @@ QUnit.module('SpeedGrader', rootHooks => {
                     {
                       attachment: {viewed_at: new Date('Jan 1, 2011').toISOString()}
                     }
-                  ]
+                  ],
+                  word_count: 24
                 }
               }
             ]
@@ -1723,6 +1725,44 @@ QUnit.module('SpeedGrader', rootHooks => {
       const menuOption = $menuContent.querySelectorAll('[role="none"]')[index]
       menuOption.children[0].click()
     }
+
+    QUnit.module('SpeedGrader#shouldParseGrade', hooks => {
+      hooks.afterEach(() => {
+        SpeedGrader.EG.currentStudent.submission.submission_type = 'basic_lti_launch'
+      })
+
+      test('does not show the word count for online text entry submission with feature disabled', () => {
+        ENV.FEATURES.word_count_in_speed_grader = false
+        finishSetup()
+        SpeedGrader.EG.currentStudent.submission.submission_type = 'online_text_entry'
+        SpeedGrader.EG.handleSubmissionSelectionChange()
+        strictEqual(document.getElementById('submission_word_count').children.length, 0)
+      })
+
+      test('does not show the word count for basic lti submission', () => {
+        ENV.FEATURES.word_count_in_speed_grader = true
+        finishSetup()
+        SpeedGrader.EG.handleSubmissionSelectionChange()
+        strictEqual(document.getElementById('submission_word_count').children.length, 0)
+      })
+
+      test('does not show the word count for external tool submission', () => {
+        ENV.FEATURES.word_count_in_speed_grader = true
+        finishSetup()
+        SpeedGrader.EG.currentStudent.submission.submission_type = 'external_tool'
+        SpeedGrader.EG.handleSubmissionSelectionChange()
+        strictEqual(document.getElementById('submission_word_count').children.length, 0)
+      })
+
+      test('shows the word count for online text entry submission', () => {
+        ENV.FEATURES.word_count_in_speed_grader = true
+        finishSetup()
+        SpeedGrader.EG.currentStudent.submission.submission_type = 'online_text_entry'
+        SpeedGrader.EG.handleSubmissionSelectionChange()
+        strictEqual(document.getElementById('submission_word_count').children.length, 1)
+        strictEqual($('#submission_word_count').text(), 'Word Count: 24 words')
+      })
+    })
 
     test('should use submission history lti launch url', () => {
       finishSetup()
@@ -2362,6 +2402,13 @@ QUnit.module('SpeedGrader', rootHooks => {
           ]
         })
 
+        test('filters out students that do not have submissions', () => {
+          window.jsonData.submissions.shift()
+          SpeedGrader.EG.jsonReady()
+          const ids = window.jsonData.studentsWithSubmissions.map(student => student.id)
+          deepEqual(ids, ['1102', '1103', '1104'])
+        })
+
         test('preserves student order (from server) when sorting alphabetically', () => {
           SpeedGrader.EG.jsonReady()
           const ids = window.jsonData.studentsWithSubmissions.map(student => student.id)
@@ -2411,10 +2458,10 @@ QUnit.module('SpeedGrader', rootHooks => {
       })
 
       QUnit.module('when students are anonymous', contextHooks => {
-        const alpha = {anonymous_id: '00000'}
-        const beta = {anonymous_id: '99999'}
-        const gamma = {anonymous_id: 'aaaaa'}
-        const delta = {anonymous_id: 'zzzzz'}
+        const alpha = {anonymous_id: '00000', anonymous_name_position: 1}
+        const beta = {anonymous_id: '99999', anonymous_name_position: 2}
+        const gamma = {anonymous_id: 'aaaaa', anonymous_name_position: 3}
+        const delta = {anonymous_id: 'zzzzz', anonymous_name_position: 4}
 
         contextHooks.beforeEach(() => {
           window.jsonData.anonymize_students = true
@@ -3600,8 +3647,8 @@ QUnit.module('SpeedGrader', rootHooks => {
       const originalJsonData = window.jsonData
       const alphaIdPair = {id: '1'}
       const omegaIdPair = {id: '9'}
-      const alphaAnonymousIdPair = {anonymous_id: '00000'}
-      const omegaAnonymousIdPair = {anonymous_id: 'ZZZZZ'}
+      const alphaAnonymousIdPair = {anonymous_id: '00000', anonymous_name_position: 1}
+      const omegaAnonymousIdPair = {anonymous_id: 'ZZZZZ', anonymous_name_position: 2}
 
       const baseAssignment = {}
       const assignment = {
@@ -3913,8 +3960,8 @@ QUnit.module('SpeedGrader', rootHooks => {
       anonymousHooks.beforeEach(() => {
         assignment = {anonymize_students: true}
         originalJsonData = window.jsonData
-        alpha = {anonymous_id: '00000', anonymous_name: 'Student 1'}
-        omega = {anonymous_id: 'zzzzz', anonymous_name: 'Student 2'}
+        alpha = {anonymous_id: '00000', anonymous_name: 'Student 1', anonymous_name_position: 1}
+        omega = {anonymous_id: 'zzzzz', anonymous_name: 'Student 2', anonymous_name_position: 2}
         alphaStudent = {
           ...alpha,
           submission_history: [],

@@ -20,12 +20,12 @@ import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import '@canvas/rails-flash-notifications'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import {asJson, getPrefetchedXHR, defaultFetchOptions} from '@instructure/js-utils'
 
-const I18n = useI18nScope('moderated_grading');
+const I18n = useI18nScope('moderated_grading')
 
 class AssignmentExternalTools extends React.Component {
   constructor(props) {

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import calcCmd from './calcCmd'
 import htmlEscape from 'html-escape'
@@ -24,7 +24,7 @@ import '@canvas/jquery/jquery.instructure_misc_helpers'/* /\$\.raw/ */
 import '@canvas/jquery/jquery.instructure_misc_plugins'/* showIf */
 import 'jqueryui/sortable'
 
-const I18n = useI18nScope('calculator');
+const I18n = useI18nScope('calculator')
 
 const generateFinds = function($table) {
   const finds = {}

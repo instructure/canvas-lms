@@ -18,11 +18,11 @@
 
 import React from 'react'
 import createReactClass from 'create-react-class'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import FilesUsage from '../legacy/components/FilesUsage'
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
 
-const I18n = useI18nScope('react_files');
+const I18n = useI18nScope('react_files')
 
 FilesUsage.render = function() {
   if (this.state) {

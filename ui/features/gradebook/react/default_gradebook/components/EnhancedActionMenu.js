@@ -32,10 +32,10 @@ import GradebookExportManager from '../../shared/GradebookExportManager'
 import PostGradesApp from '../../SISGradePassback/PostGradesApp'
 import tz from '@canvas/timezone'
 import DateHelper from '@canvas/datetime/dateHelper'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('gradebookActionMenu');
+const I18n = useI18nScope('gradebookActionMenu')
 
 const {arrayOf, bool, func, object, shape, string} = PropTypes
 

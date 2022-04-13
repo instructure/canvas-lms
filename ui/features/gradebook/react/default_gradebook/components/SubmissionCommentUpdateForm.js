@@ -17,10 +17,10 @@
  */
 
 import {func, string} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import SubmissionCommentForm from './SubmissionCommentForm'
 
-const I18n = useI18nScope('gradebook');
+const I18n = useI18nScope('gradebook')
 
 export default class SubmissionCommentUpdateForm extends SubmissionCommentForm {
   static propTypes = {

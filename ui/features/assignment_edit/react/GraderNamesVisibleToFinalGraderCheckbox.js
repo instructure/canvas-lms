@@ -18,9 +18,9 @@
 
 import {bool} from 'prop-types'
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('GraderNamesVisibleToFinalGraderCheckbox');
+const I18n = useI18nScope('GraderNamesVisibleToFinalGraderCheckbox')
 
 export default class GraderNamesVisibleToFinalGraderCheckbox extends React.Component {
   static propTypes = {checked: bool.isRequired}

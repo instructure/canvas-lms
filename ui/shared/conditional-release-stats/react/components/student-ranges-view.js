@@ -22,12 +22,12 @@ import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {View} from '@instructure/ui-view'
 import {IconMiniArrowDownSolid, IconMiniArrowEndSolid} from '@instructure/ui-icons'
 import classNames from 'classnames'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {transformScore} from '@canvas/conditional-release-score'
 import {assignmentShape, studentShape} from '../shapes/index'
 import StudentRange from './student-range'
 
-const I18n = useI18nScope('cyoe_assignment_sidebar_student_ranges_view');
+const I18n = useI18nScope('cyoe_assignment_sidebar_student_ranges_view')
 
 const {array, func, object} = PropTypes
 

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 
 import {Button} from '@instructure/ui-buttons'
@@ -29,7 +29,7 @@ import {string} from 'prop-types'
 import ErrorTextInputForm from './ErrorTextInputForm'
 import ErrorPageHeader from './ErrorPageHeader'
 
-const I18n = useI18nScope('generic_error_page');
+const I18n = useI18nScope('generic_error_page')
 
 /*
  * A component that can be used to render an error page

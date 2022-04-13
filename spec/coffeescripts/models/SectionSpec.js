@@ -17,9 +17,9 @@
  */
 
 import Section from '@canvas/sections/backbone/models/Section.coffee'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('modelsSection');
+const I18n = useI18nScope('modelsSection')
 
 QUnit.module('Section')
 

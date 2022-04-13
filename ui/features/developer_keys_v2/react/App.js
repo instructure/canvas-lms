@@ -22,7 +22,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Tabs} from '@instructure/ui-tabs'
 import {View} from '@instructure/ui-view'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import DeveloperKeysTable from './AdminTable'
@@ -30,7 +30,7 @@ import DeveloperKey from './DeveloperKey'
 import NewKeyModal from './NewKeyModal'
 import DeveloperKeyModalTrigger from './NewKeyTrigger'
 
-const I18n = useI18nScope('react_developer_keys');
+const I18n = useI18nScope('react_developer_keys')
 
 class DeveloperKeysApp extends React.Component {
   state = {

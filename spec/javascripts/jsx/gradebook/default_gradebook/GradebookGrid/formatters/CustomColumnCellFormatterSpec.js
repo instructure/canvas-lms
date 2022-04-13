@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import CustomColumnCellFormatter from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/formatters/CustomColumnCellFormatter.js'
+import CustomColumnCellFormatter from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/formatters/CustomColumnCellFormatter'
 
 QUnit.module('GradebookGrid CustomColumnCellFormatter', hooks => {
   let $fixture

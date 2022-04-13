@@ -29,7 +29,7 @@ import LockIconView from '@canvas/lock-icon'
 import MasterCourseModuleLock from '../backbone/models/MasterCourseModuleLock'
 import ModuleFileDrop from '@canvas/context-module-file-drop'
 import INST from 'browser-sniffer'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import Helper from './context_modules_helper'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
@@ -65,7 +65,7 @@ import mathml from 'mathml'
 import {addDeepLinkingListener} from '@canvas/deep-linking/DeepLinking'
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 
-const I18n = useI18nScope('context_modulespublic');
+const I18n = useI18nScope('context_modulespublic')
 
 function scrollTo($thing, time = 500) {
   if (!$thing || $thing.length === 0) return

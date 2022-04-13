@@ -18,9 +18,9 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('DueDateRemoveRowLink');
+const I18n = useI18nScope('DueDateRemoveRowLink')
 
 class DueDateRemoveRowLink extends React.Component {
   static propTypes = {

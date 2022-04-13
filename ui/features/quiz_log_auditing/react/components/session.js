@@ -19,13 +19,13 @@
 import Actions from '../../actions'
 import Button from './button'
 import Config from '../../config'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import ScreenReaderContent from '@canvas/quiz-legacy-client-apps/react/components/screen_reader_content'
 import {IconRefreshLine} from '@instructure/ui-icons'
 import {Link} from 'react-router-dom'
 
-const I18n = useI18nScope('quiz_log_auditing');
+const I18n = useI18nScope('quiz_log_auditing')
 
 class Session extends React.Component {
   static defaultProps = {

@@ -194,6 +194,33 @@ describe('AddConference', () => {
         postMessage([{type: 'ltiLink'}])
         expect(setConference).not.toHaveBeenCalled()
       })
+
+      it('receives launch settings via Deep Linking response', () => {
+        const setConference = jest.fn()
+        launchLTI({setConference})
+
+        const content_item = {
+          type: 'link',
+          iframe: {
+            src: 'https://foo.bar',
+            width: '111',
+            length: '222'
+          }
+        }
+        postMessage([content_item])
+
+        const conference = {
+          title: 'LTI Tool Conference',
+          description: '',
+          conference_type: 'LtiConference',
+          lti_settings: {
+            type: 'link',
+            tool_id: '1',
+            url: 'https://foo.bar'
+          }
+        }
+        expect(setConference).toHaveBeenCalledWith(conference)
+      })
     })
   })
 

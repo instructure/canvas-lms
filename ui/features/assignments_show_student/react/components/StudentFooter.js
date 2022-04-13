@@ -28,11 +28,11 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import api from '../apis/ContextModuleApi'
 
-const I18n = useI18nScope('assignments_2_file_upload');
+const I18n = useI18nScope('assignments_2_file_upload')
 
 function buildFooterStyle() {
   return {

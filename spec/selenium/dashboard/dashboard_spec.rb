@@ -480,6 +480,10 @@ describe "dashboard" do
     end
 
     context "with observer_picker flag off" do
+      before :once do
+        Account.site_admin.disable_feature!(:observer_picker)
+      end
+
       it "loads all student cards with no picker" do
         get "/"
         expect(card_container).to include_text("Course 1")

@@ -152,17 +152,21 @@ function copy_docker_config {
   confirm_command 'cp docker-compose/config/*.yml config/' || true
 }
 
+function copy_mutagen_override {
+  message "Copying default configuration from docker-compose/mutagen/docker-compose.override.yml to docker-compose.override.yml"
+  cp docker-compose/mutagen/docker-compose.override.yml docker-compose.override.yml
+}
+
 function setup_docker_compose_override {
   message 'Setup override yaml and .env...'
-  if is_mutagen; then
-    message "Copying default configuration from docker-compose/mutagen/docker-compose.override.yml to docker-compose.override.yml"
-    cp docker-compose/mutagen/docker-compose.override.yml docker-compose.override.yml
-  elif [ -f "docker-compose.override.yml" ]; then
-    message "docker-compose.override.yml exists, skipping copy of default configuration"
+  if [ -f "docker-compose.override.yml" ]; then
+    prompt 'docker-compose.override.yml already exists.
+Would you like to copy docker-compose/mutagen/docker-compose.override.yml to docker-compose.override.yml? [y/n]' copy
+    [[ ${copy:-y} == 'n' ]] || copy_mutagen_override
   else
-    message "Copying default configuration from config/docker-compose.override.yml.example to docker-compose.override.yml"
-    cp config/docker-compose.override.yml.example docker-compose.override.yml
+    copy_mutagen_override
   fi
+
   if [ -f ".env" ]; then
     prompt '.env file exists, would you like to reset it to default? [y/n]' confirm
     [[ ${confirm:-n} == 'y' ]] || return 0

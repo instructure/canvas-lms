@@ -17,7 +17,7 @@
  */
 
 /* eslint-disable react/no-this-in-sfc */
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import createReactClass from 'create-react-class'
 import FolderChild from '../legacy/components/FolderChild'
@@ -33,7 +33,7 @@ import preventDefault from 'prevent-default'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import friendlyBytes from '@canvas/files/util/friendlyBytes'
 
-const I18n = useI18nScope('react_files');
+const I18n = useI18nScope('react_files')
 
 FolderChild.isFolder = function () {
   return this.props.model instanceof Folder

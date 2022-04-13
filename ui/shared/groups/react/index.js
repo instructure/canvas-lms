@@ -22,7 +22,7 @@ import React from 'react'
 import createReactClass from 'create-react-class'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Spinner} from '@instructure/ui-spinner'
 import {Button} from '@instructure/ui-buttons'
 import {IconAddLine} from '@instructure/ui-icons'
@@ -37,7 +37,7 @@ import ManageGroupDialog from './ManageGroupDialog'
 import 'jqueryui/dialog'
 import PropTypes from 'prop-types'
 
-const I18n = useI18nScope('student_groups');
+const I18n = useI18nScope('student_groups')
 
 const StudentView = createReactClass({
   displayName: 'StudentView',

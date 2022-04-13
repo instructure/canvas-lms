@@ -18,9 +18,9 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('assignDueDateAddRowButtonments');
+const I18n = useI18nScope('assignDueDateAddRowButtonments')
 
 class DueDateAddRowButton extends React.Component {
   static propTypes = {

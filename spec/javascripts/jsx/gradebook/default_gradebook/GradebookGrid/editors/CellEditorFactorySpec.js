@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import CellEditorFactory from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/CellEditorFactory.js'
-import AssignmentCellEditor from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/index.js'
-import TotalGradeOverrideCellEditor from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/TotalGradeOverrideCellEditor/index.js'
+import CellEditorFactory from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/CellEditorFactory'
+import AssignmentCellEditor from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/index'
+import TotalGradeOverrideCellEditor from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/TotalGradeOverrideCellEditor/index'
 
 QUnit.module('GradebookGrid CellEditorFactory', () => {
   QUnit.module('#getEditor()', () => {

@@ -30,6 +30,9 @@
   "announcement_list_da155734": { "message": "Llista d''anuncis" },
   "announcements_a4b8ed4a": { "message": "Anuncis" },
   "apply_781a2546": { "message": "Aplica" },
+  "apply_changes_to_all_instances_of_this_icon_maker__2642f466": {
+    "message": "Apliqueu els canvis a totes les instàncies d’aquesta icona de l’eina de creació d’icones a l''assignatura"
+  },
   "apps_54d24a47": { "message": "Aplicacions" },
   "arrows_464a3e54": { "message": "Fletxes" },
   "art_icon_8e1daad": { "message": "Icona d''art" },
@@ -52,7 +55,10 @@
   "available_folders_694d0436": { "message": "Carpetes disponibles" },
   "basic_554cdc0a": { "message": "Bàsic" },
   "below_81d4dceb": { "message": "A sota de" },
+  "black_4cb01371": { "message": "Negre" },
+  "blue_daf8fea9": { "message": "Blau" },
   "bottom_third_5f5fec1d": { "message": "Terç inferior" },
+  "brick_f2656265": { "message": "Totxo" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Cancel·la" },
   "choose_caption_file_9c45bc4e": { "message": "Tria un fitxer de subtítols" },
@@ -121,6 +127,10 @@
     "message": "Elements multimèdia de l''assignatura"
   },
   "course_navigation_dd035109": { "message": "Navegació de l''assignatura" },
+  "create_icon_110d6463": { "message": "Crea una icona" },
+  "create_icon_maker_icon_c716bffe": {
+    "message": "Crea una icona de l’eina de creació d’icones"
+  },
   "creative_commons_license_725584ae": {
     "message": "Llicència de Creative Commons:"
   },
@@ -128,9 +138,11 @@
   "crop_image_807ebb08": { "message": "Retalla la imatge" },
   "current_image_f16c249c": { "message": "Imatge actual" },
   "custom_6979cd81": { "message": "Personalitzat" },
+  "cyan_c1d5f68a": { "message": "Cian" },
   "date_added_ed5ad465": { "message": "Data afegida" },
   "decorative_image_3c28aa7d": { "message": "Imatge decorativa" },
   "decrease_indent_de6343ab": { "message": "Redueix la sagnia" },
+  "deep_purple_bb3e2907": { "message": "Porpra fosc" },
   "default_bulleted_unordered_list_47079da8": {
     "message": "llista desordenada amb pics predeterminada"
   },
@@ -228,6 +240,8 @@
   },
   "grades_a61eba0a": { "message": "Notes" },
   "greek_65c5b3f7": { "message": "Grec" },
+  "green_15af4778": { "message": "Verd" },
+  "grey_a55dceff": { "message": "Gris" },
   "group_documents_8bfd6ae6": { "message": "Agrupa els documents" },
   "group_files_4324f3df": { "message": "Fitxers del grup" },
   "group_files_82e5dcdb": { "message": "Fitxers del grup" },
@@ -255,6 +269,13 @@
     "message": "Soc el titular dels drets d''autor"
   },
   "icon_color_b86dd6d6": { "message": "Color de la icona" },
+  "icon_maker_icons_cc560f7e": {
+    "message": "Icones de l’eina de creació d’icones"
+  },
+  "icon_outline_e978dc0c": { "message": "Contorn de la icona" },
+  "icon_outline_size_33f39b86": { "message": "Mida del contorn de la icona" },
+  "icon_shape_30b61e7": { "message": "Forma de la icona" },
+  "icon_size_9353edea": { "message": "Mida de la icona" },
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "Si no seleccioneu els drets d''ús ara, s''anul·larà la publicació d''aquest fitxer un cop s''hagi carregat."
   },
@@ -264,6 +285,7 @@
   "image_to_crop_3a34487d": { "message": "Imatge que cal retallar" },
   "images_7ce26570": { "message": "Imatges" },
   "increase_indent_6d550a4a": { "message": "Augmenta la sagnia" },
+  "indigo_2035fc55": { "message": "Indi" },
   "insert_593145ef": { "message": "Insereix" },
   "insert_equella_links_49a8dacd": { "message": "Insereix enllaços a Equella" },
   "insert_link_6dc23cae": { "message": "Insereix un enllaç" },
@@ -279,6 +301,7 @@
   "large_9c5e80e7": { "message": "Gran" },
   "left_to_right_e9b4fd06": { "message": "Esquerra a dreta" },
   "library_icon_ae1e54cf": { "message": "Icona de biblioteca" },
+  "light_blue_5374f600": { "message": "Blau clar" },
   "link_7262adec": { "message": "Enllaç" },
   "link_options_a16b758b": { "message": "Opcions d''enllaç" },
   "links_14b70841": { "message": "Enllaços" },
@@ -294,6 +317,7 @@
     "message": "S’està carregant la visualització prèvia"
   },
   "locked_762f138b": { "message": "Bloquejat" },
+  "magenta_4a65993c": { "message": "Magenta" },
   "math_icon_ad4e9d03": { "message": "Icona de matemàtiques" },
   "media_af190855": { "message": "Element multimèdia" },
   "medium_5a8e9ead": { "message": "Mitjà" },
@@ -311,6 +335,7 @@
   },
   "my_files_2f621040": { "message": "Els meus fitxers" },
   "name_1aed4a1b": { "message": "Nom" },
+  "name_color_ceec76ff": { "message": "{ name } ({ color })" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navegueu pel menú o per la barra d''eines"
   },
@@ -330,6 +355,7 @@
   "none_3b5e34d2": { "message": "Cap" },
   "none_selected_b93d56d2": { "message": "No se’n ha seleccionat cap" },
   "octagon_e48be9f": { "message": "Octàgon" },
+  "olive_6a3e4d6b": { "message": "Oliva" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Obre aquest quadre de diàleg de dreceres del teclat"
   },
@@ -337,6 +363,7 @@
     "message": "Obre l’aplicació { title }"
   },
   "operators_a2ef9a93": { "message": "Operadors" },
+  "orange_81386a62": { "message": "Taronja" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Llistes ordenades i desordenades"
   },
@@ -358,6 +385,7 @@
     "message": "Icona d''arts interpretatives"
   },
   "physical_education_icon_d7dffd3e": { "message": "Icona d’educació física" },
+  "pink_68ad45cb": { "message": "Rosa" },
   "pixels_52ece7d1": { "message": "Píxels" },
   "posted_when_a578f5ab": { "message": "Publicat: { when }" },
   "preformatted_d0670862": { "message": "Amb format previ" },
@@ -375,6 +403,8 @@
   },
   "published_c944a23d": { "message": "publicat" },
   "published_when_302d8e23": { "message": "Publicat: { when }" },
+  "pumpkin_904428d5": { "message": "Carabassa" },
+  "purple_7678a9fc": { "message": "Porpra" },
   "quizzes_7e598f57": { "message": "Proves" },
   "raw_html_editor_e3993e41": {
     "message": "Editor de dades HTML sense processar"
@@ -383,6 +413,7 @@
   "record_upload_media_5fdce166": {
     "message": "Enregistra o penja l''element multimèdia"
   },
+  "red_8258edf3": { "message": "Vermell" },
   "relationships_6602af70": { "message": "Relacions" },
   "religion_icon_246e0be1": { "message": "Icona de religió" },
   "remove_link_d1f2f4d0": { "message": "Elimina l''enllaç" },
@@ -396,6 +427,9 @@
     "message": "Malauradament, no es pot accedir a l’editor de dades HTML processades amb el teclat. Accediu a l’editor de dades HTML sense processar aquí."
   },
   "save_11a80ec3": { "message": "Desa" },
+  "saved_icon_maker_icons_df86e2a1": {
+    "message": "Icones de l’eina de creació d’icones desades"
+  },
   "search_280d00bd": { "message": "Cerca" },
   "search_term_b2d2235": { "message": "Terme de cerca" },
   "select_crop_shape_d441feeb": {
@@ -411,6 +445,9 @@
   "show_link_options_545338fd": { "message": "Mostra les opcions d''enllaç" },
   "show_video_options_6ed3721a": { "message": "Mostra les opcions de vídeo" },
   "single_color_image_4e5d4dbc": { "message": "Imatge d’un sol color" },
+  "single_color_image_color_95fa9a87": {
+    "message": "Color de la imatge d’un sol color"
+  },
   "size_b30e1077": { "message": "Mida" },
   "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
     "message": "La mida del fitxer de subtítols és superior a la mida màxima de { max } kB permesa per als fitxers."
@@ -436,6 +473,7 @@
     "message": "marca amb un quadrat la llista desordenada"
   },
   "star_8d156e09": { "message": "Marca amb una estrella" },
+  "steel_blue_14296f08": { "message": "Blau acer" },
   "styles_2aa721ef": { "message": "Estils" },
   "submit_a3cc6859": { "message": "Entrega" },
   "subscript_59744f96": { "message": "Subíndex" },
@@ -451,6 +489,7 @@
   },
   "syllabus_f191f65b": { "message": "Temari" },
   "tab_arrows_4cf5abfc": { "message": "TAB/fletxes" },
+  "teal_f729a294": { "message": "Verd blavós" },
   "text_7f4593da": { "message": "Text" },
   "text_background_color_16e61c3f": { "message": "Color de fons del text" },
   "text_color_acf75eb6": { "message": "Color del text" },
@@ -557,6 +596,7 @@
   "view_title_description_67940918": {
     "message": "Mostra la descripció de { title }"
   },
+  "white_87fa64fd": { "message": "Blanc" },
   "width_492fec76": { "message": "Amplada" },
   "width_and_height_must_be_numbers_110ab2e3": {
     "message": "L''amplada i l''altura han de ser números"

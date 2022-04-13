@@ -15,10 +15,10 @@
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
     "build:es": "babel src --out-dir es --ignore '**/__tests__' --quiet",
-    "build:cjs": "JEST_WORKER_ID=true babel src --out-dir lib --ignore '**/__tests__'",
+    "build:cjs": "babel --config-file=./babel.config.cjs.js src --out-dir lib --ignore '**/__tests__'",
     "build": "yarn build:es && yarn build:cjs",
     "build:canvas": "yarn build",
-    "build:dev": "NODE_ENV=development BABEL_ENV=production babel src --out-dir es --ignore '**/__tests__'",
+    "build:dev": "babel src --out-dir es --ignore '**/__tests__'",
     "build:watch": "yarn run build:dev --watch",
     "test": "jest --color --runInBand",
     "test:coverage": "yarn test --coverage",
@@ -44,7 +44,6 @@
     "extends @instructure/browserslist-config-canvas-lms"
   ],
   "dependencies": {
-    "@instructure/babel-plugin-themeable-styles": "7",
     "@instructure/canvas-theme": "7",
     "@instructure/js-utils": "*",
     "@instructure/ui-a11y-content": "7",
@@ -110,8 +109,8 @@
   "devDependencies": {
     "@babel/cli": "^7",
     "@babel/core": "^7",
+    "@instructure/babel-plugin-themeable-styles": "7",
     "@instructure/browserslist-config-canvas-lms": ">=2",
-    "@instructure/ui-babel-preset": "^6",
     "@sheerun/mutationobserver-shim": "^0.3.2",
     "babel-jest": "^26",
     "enzyme": "^3",

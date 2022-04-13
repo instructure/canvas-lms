@@ -21,9 +21,9 @@ import {arrayOf, bool, func, shape, string} from 'prop-types'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {List} from '@instructure/ui-list'
 import {View} from '@instructure/ui-view'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('hide_assignment_grades_tray');
+const I18n = useI18nScope('hide_assignment_grades_tray')
 
 export default function SpecificSections(props) {
   const {checked, disabled, onCheck, sections, sectionSelectionChanged, selectedSectionIds} = props

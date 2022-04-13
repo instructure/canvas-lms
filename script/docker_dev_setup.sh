@@ -5,10 +5,13 @@ source script/common/canvas/build_helpers.sh
 
 trap 'trap_result' ERR EXIT
 trap "printf '\nTerminated\n' && exit 130" SIGINT
+
 LOG="$(pwd)/log/docker_dev_setup.log"
 SCRIPT_NAME="$0 $@"
 OS="$(uname)"
 DOCKER='true'
+DOCKER_COMMAND="mutagen-compose"
+CANVAS_SKIP_DOCKER_USERMOD='true'
 
 _canvas_lms_opt_in_telemetry "$SCRIPT_NAME" "$LOG"
 
@@ -17,43 +20,13 @@ if [[ "$USER" == 'root' ]]; then
   echo "I'll ask for your sudo password if I need it."
   exit 1
 fi
-# remove hidden file if already exists
-rm .mutagen &> /dev/null || true
-
-usage () {
-  echo "usage:"
-  printf "  --mutagen\t\t\t\tUse Mutagen with Docker to setup development environment.\n"
-  printf "  -h|--help\t\t\t\tDisplay usage\n\n"
-}
-
-die() {
-  echo "$*" 1>&2
-  usage
-  exit 1
-}
-
-while :; do
-  case $1 in
-    -h|-\?|--help)
-      usage # Display a usage synopsis.
-      exit
-      ;;
-    --mutagen)
-      touch .mutagen
-      DOCKER_COMMAND="mutagen-compose"
-      CANVAS_SKIP_DOCKER_USERMOD='true'
-      ;;
-    ?*)
-      die 'ERROR: Unknown option: ' "$1" >&2
-      ;;
-    *)
-      break
-  esac
-  shift
-done
 
 print_canvas_intro
 
+if [[ $OS == 'Darwin' ]]; then
+  source script/common/utils/dinghy_proxy_setup.sh
+  dinghy_machine_exists && exit 1
+fi
 
 create_log_file
 init_log_file "Docker Dev Setup"

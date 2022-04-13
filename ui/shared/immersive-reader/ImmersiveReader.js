@@ -20,14 +20,14 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {SVGIcon} from '@instructure/ui-svg-images'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {defaultFetchOptions} from '@instructure/js-utils'
 import {CookiePolicy} from '@microsoft/immersive-reader-sdk'
 import WithBreakpoints from 'with-breakpoints'
 import ContentChunker from './ContentChunker'
 
-const I18n = useI18nScope('ImmersiveReader');
+const I18n = useI18nScope('ImmersiveReader')
 
 /**
  * This comes from https://github.com/microsoft/immersive-reader-sdk/blob/master/assets/icon.svg

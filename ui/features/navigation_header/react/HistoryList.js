@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {bool} from 'prop-types'
 import {Link} from '@instructure/ui-link'
@@ -28,7 +28,7 @@ import {HistoryShape} from './HistoryShape'
 import _ from 'lodash'
 import {formatTimeAgoDate, formatTimeAgoTitle} from '../jquery/instructure'
 
-const I18n = useI18nScope('new_nav');
+const I18n = useI18nScope('new_nav')
 
 HistoryList.propTypes = {
   history: HistoryShape.isRequired,

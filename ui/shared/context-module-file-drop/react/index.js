@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {instanceOf, string} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {getCourseRootFolder, getFolderFiles} from './apiClient'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {FileDrop} from '@instructure/ui-file-drop'
@@ -31,7 +31,7 @@ import FilesystemObject from '@canvas/files/backbone/models/FilesystemObject.cof
 import FileOptionsCollection from '@canvas/files/react/modules/FileOptionsCollection'
 import UploadForm from '@canvas/files/react/components/UploadForm'
 
-const I18n = useI18nScope('modules');
+const I18n = useI18nScope('modules')
 
 export default class ModuleFileDrop extends React.Component {
   static propTypes = {

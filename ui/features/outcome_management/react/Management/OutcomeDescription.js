@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -29,7 +29,7 @@ import {prepareRatings} from '@canvas/outcomes/react/hooks/useRatings'
 import Ratings from './Ratings'
 import {ratingsShape} from './shapes'
 
-const I18n = useI18nScope('OutcomeManagement');
+const I18n = useI18nScope('OutcomeManagement')
 
 const OutcomeDescription = ({
   description,

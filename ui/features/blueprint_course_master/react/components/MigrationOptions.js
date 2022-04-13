@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import select from 'obj-select'
@@ -35,7 +35,7 @@ import actions from '@canvas/blueprint-courses/react/actions'
 import propTypes from '@canvas/blueprint-courses/react/propTypes'
 import MigrationStates from '@canvas/blueprint-courses/react/migrationStates'
 
-const I18n = useI18nScope('blueprint_settingsMigrationOptions');
+const I18n = useI18nScope('blueprint_settingsMigrationOptions')
 
 const MAX_NOTIFICATION_MESSAGE_LENGTH = 140
 const WARNING_MESSAGE_LENGTH = 126

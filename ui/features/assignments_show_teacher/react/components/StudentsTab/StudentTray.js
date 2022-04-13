@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
@@ -42,7 +42,7 @@ import {
 } from '@instructure/ui-icons'
 import MessageStudents from '@canvas/message-students-modal'
 
-const I18n = useI18nScope('assignments_2');
+const I18n = useI18nScope('assignments_2')
 
 /*
  *  CAUTION: The InstUI DateTimeInput component was deprecated in v7.

@@ -22,22 +22,6 @@ import {headerFor, originFromHost} from './rcs/api'
 import getTranslations from './getTranslations'
 import defaultTinymceConfig from './defaultTinymceConfig'
 
-if (process.env.BUILD_LOCALE && process.env.BUILD_LOCALE !== 'en') {
-  try {
-    // In a pretranslated build, this should not result in a network request for a new chunk.
-    // We still tell tinymce about the translations it should use, but those should be included in
-    // the same webpack chunk this file was included in. This approach will result in better
-    // performance and smaller bundle size since it won't have to include all the chunk info
-    // for all the possible locales in the webpack runtime and will be less network roundtrips.
-
-    require(`./rce/translations/locales/${process.env.BUILD_LOCALE}`)
-  } catch (e) {
-    // gracefully proceed if we do not have a language file for this locale
-    // eslint-disable-next-line no-console
-    console.warn(`could not find canvas-rce language: ${process.env.BUILD_LOCALE}`)
-  }
-}
-
 export const defaultConfiguration = defaultTinymceConfig
 
 export function renderIntoDiv(editorEl, props, cb) {

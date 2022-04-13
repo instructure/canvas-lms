@@ -20,10 +20,10 @@ import PropTypes from 'prop-types'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {getUserMedia} from '../util/mediaUtils'
 import {IconVideoCameraOffSolid} from '@instructure/ui-icons'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import Focus from '@canvas/outcomes/react/Focus'
 
-const I18n = useI18nScope('webcam_modal');
+const I18n = useI18nScope('webcam_modal')
 
 const WebcamModal = ({onSelectImage, open, onDismiss}) => {
   const videoRef = useRef(null)

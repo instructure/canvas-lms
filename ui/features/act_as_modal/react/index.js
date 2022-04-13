@@ -20,7 +20,7 @@ import PropTypes from 'prop-types'
 
 import React from 'react'
 import keycode from 'keycode'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -34,7 +34,7 @@ import {Button} from '@instructure/ui-buttons'
 import ActAsMask from './svg/ActAsMask'
 import ActAsPanda from './svg/ActAsPanda'
 
-const I18n = useI18nScope('act_as');
+const I18n = useI18nScope('act_as')
 
 export default class ActAsModal extends React.Component {
   static propTypes = {

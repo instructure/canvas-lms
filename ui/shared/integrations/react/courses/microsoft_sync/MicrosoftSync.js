@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import '@canvas/datetime'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
@@ -26,7 +26,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {InlineList} from '@instructure/ui-list'
 
-const I18n = useI18nScope('course_settings');
+const I18n = useI18nScope('course_settings')
 
 const stateMap = {
   pending: I18n.t('Ready for sync'),

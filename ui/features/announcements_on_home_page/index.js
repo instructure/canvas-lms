@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import axios from '@canvas/axios'
@@ -26,7 +26,7 @@ import {View} from '@instructure/ui-view'
 import AnnouncementRow from '@canvas/announcements/react/components/AnnouncementRow'
 import ready from '@instructure/ready'
 
-const I18n = useI18nScope('announcements_on_home_page');
+const I18n = useI18nScope('announcements_on_home_page')
 
 if (ENV.SHOW_ANNOUNCEMENTS) {
   ready(() => {

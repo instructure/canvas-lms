@@ -5,9 +5,12 @@ The concept of deep links is not specific to LTI and is a simple one: providing 
 In the LTI world, this process involves a teacher launching a tool, selecting some content from the tool, and the tool passing a link to that content back to Canvas for further display. Once another user comes and launches this link, the tool directly displays it. A tool can also return arbitrary content that isn't a link to itself, including files, images, and HTML. These are referred to as Content Items.
 
 This is used for many facets of LTI integration with Canvas, like:
+
 - a teacher selecting content to be displayed in an assignment with external tool submission type
 - a student selecting content to be submitted to an assignment
 - a teacher selecting content to be displayed in a module item
+
+A definitive list of integration spots in Canvas is listed below in the 1.3 section under "Supported Placements and Content".
 
 ## Deep Linking and LTI 1.1
 
@@ -31,7 +34,7 @@ If the return url has an id appended to it, Canvas interprets this as an "edit" 
 
 1. Add message type support for the placement. This should define what content types this placement accepts, if it accepts multiple content items, and other configuration. This is done in the `content_item_selection_request` module, and a good example method is `editor_button_params`.
 
-2. Install a 1.1 tool that uses this placement, and defines the message type for that placement as `ContentItemSelectionRequest`. Customer tools that want to use content-item messages in this placement will need to update their tool configuration in the same way. Launch this tool from that placement and confirm that the form data sent in the launch contains the correct message type, and also the values that you specified in step 1 in the deep linking claim:  `accept_presentation_document_targets`, `accept_media_types`, `auto_create`, `accept_multiple`. It's up to the tool to interpret these properly and make sure that the content passed back to Canvas conforms to these requirements.
+2. Install a 1.1 tool that uses this placement, and defines the message type for that placement as `ContentItemSelectionRequest`. Customer tools that want to use content-item messages in this placement will need to update their tool configuration in the same way. Launch this tool from that placement and confirm that the form data sent in the launch contains the correct message type, and also the values that you specified in step 1 in the deep linking claim: `accept_presentation_document_targets`, `accept_media_types`, `auto_create`, `accept_multiple`. It's up to the tool to interpret these properly and make sure that the content passed back to Canvas conforms to these requirements.
 
 3. If needed, add any backend work to parse the content items returned. This work is done in the `ExternalContentController#success` controller action, and may not need anything added, depending on the placement.
 
@@ -46,6 +49,18 @@ If the return url has an id appended to it, Canvas interprets this as an "edit" 
 ## Deep Linking and LTI 1.3
 
 [1.3 Deep Linking Spec](https://www.imsglobal.org/spec/lti-dl/v2p0)
+
+### Supported Placements and Content
+
+The definitive list of LTI placements that support 1.3 Deep Linking is found in [`Lti::Messages::DeepLinkingRequest`](/lib/lti/messages/deep_linking_request.rb). This config also lists the types of LTI Content Items valid for each placement. How does this config translate to actions in Canvas? Where can I expect to find content items returned from deep linking?
+
+- Module Items that launch LTI tools
+- Assignments that launch LTI tools, whether created in Canvas or by an LTI tool
+- Content in any RCE (Rich Content Editor) that can be an LTI launch link, a normal link, a file, arbitrary HTML, or an image
+- Collaborations that launch LTI tools
+- Homework Submissions that are either files or an LTI launch link
+- Video Conference links in Calendar Events that can be a link or arbitrary HTML
+- Content Migration files that can be used to import Course content
 
 ### Implementation Details
 
@@ -62,13 +77,13 @@ When this process is complete, Canvas now knows about and is displaying the sele
 ### Adding Deep Linking to a New Placement
 
 1. Add message type support for the placement. This should define what content types this placement accepts, if it accepts multiple content items, and other configuration.
-  [example commit](https://gerrit.instructure.com/c/canvas-lms/+/256204)
+   [example commit](https://gerrit.instructure.com/c/canvas-lms/+/256204)
 
 2. Install a tool that uses this placement, and defines the message type for that placement as `LtiDeepLinkingRequest`. Customer tools that want to use deep linking in this placement will need to update their tool configuration in the same way. Launch this tool from that placement and confirm that the `id_token` sent in the launch contains the correct message type, and also the values that you specified in step 1 in the deep linking claim: `accept_types`, `accept_presentation_document_targets`, `accept_media_types`, `auto_create`, `accept_multiple`. It's up to the tool to interpret these properly and make sure that the content passed back to Canvas conforms to these requirements.
 
 3. In the UI for this placement, listen for the deep linking return message, and update the UI based on the content items returned.
-  [example: adding support to homework_submission](https://gerrit.instructure.com/c/canvas-lms/+/190167)
-  [example: adding support to collaborations](https://gerrit.instructure.com/c/canvas-lms/+/256594)
+   [example: adding support to homework_submission](https://gerrit.instructure.com/c/canvas-lms/+/190167)
+   [example: adding support to collaborations](https://gerrit.instructure.com/c/canvas-lms/+/256594)
 
 4. Add this placement to the Developer Key UI's [list of placements](/ui/features/developer_keys_v2/react/ManualConfigurationForm/Placement.js) that can handle deep linking, so that users manually configuring a tool can choose to configure this placement with deep linking. Some placements _only_ accept deep linking messages, and there is a relevant list for that as well.
 

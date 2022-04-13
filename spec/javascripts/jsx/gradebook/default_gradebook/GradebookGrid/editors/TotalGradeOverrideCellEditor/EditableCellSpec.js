@@ -20,7 +20,7 @@ import React from 'react'
 import {mount} from 'enzyme'
 
 import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
-import EditableCell from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/TotalGradeOverrideCellEditor/EditableCell.js'
+import EditableCell from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/TotalGradeOverrideCellEditor/EditableCell'
 
 QUnit.module('GradebookGrid TotalGradeOverrideCellEditor EditableCell', suiteHooks => {
   let $container

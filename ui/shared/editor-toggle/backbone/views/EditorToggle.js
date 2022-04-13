@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import _ from 'underscore'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import preventDefault from 'prevent-default'
@@ -25,7 +25,7 @@ import ReactDOM from 'react-dom'
 import SwitchEditorControl from '../../react/SwitchEditorControl'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 
-const I18n = useI18nScope('EditorToggle');
+const I18n = useI18nScope('EditorToggle')
 
 RichContentEditor.preloadRemoteModule()
 

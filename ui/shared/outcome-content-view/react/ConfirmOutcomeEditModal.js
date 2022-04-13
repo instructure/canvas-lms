@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
 import {func, shape, bool} from 'prop-types'
@@ -24,7 +24,7 @@ import {Button} from '@instructure/ui-buttons'
 
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 
-const I18n = useI18nScope('confirmOutcomeEditModal');
+const I18n = useI18nScope('confirmOutcomeEditModal')
 
 const willUpdateRubrics = ({changed, hasUpdateableRubrics}) => changed && hasUpdateableRubrics
 

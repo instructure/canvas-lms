@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {arrayOf, func} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
 import {Menu} from '@instructure/ui-menu'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -31,7 +31,7 @@ import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import contentShareShape from '@canvas/content-sharing/react/proptypes/contentShare'
 
-const I18n = useI18nScope('content_share');
+const I18n = useI18nScope('content_share')
 
 const friendlyShareNames = {
   assignment: I18n.t('Assignment'),

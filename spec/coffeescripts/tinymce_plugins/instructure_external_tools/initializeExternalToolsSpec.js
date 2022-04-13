@@ -51,12 +51,6 @@ QUnit.module('initializeExternalTools', {
   }
 })
 
-test('adds lti button to the toolbar', function () {
-  const initResult = ExternalToolsPlugin.init(this.fakeEditor, 'some.fake.url', this.INST)
-  equal(initResult, null)
-  ok(this.fakeEditor.ui.registry.addButton.calledWith('lti_tool_dropdown'))
-})
-
 test('adds MRU menu button to the toolbar', function () {
   ExternalToolsPlugin.init(this.fakeEditor, undefined, this.INST)
   ok(this.fakeEditor.ui.registry.addMenuButton.calledWith('lti_mru_button'))

@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
 import DialogBaseView from '@canvas/dialog-base-view'
@@ -26,7 +26,7 @@ import GravatarView from './GravatarView'
 import {completeUpload} from '@canvas/upload-file'
 import template from '../../jst/avatarDialog.handlebars'
 
-const I18n = useI18nScope('profile');
+const I18n = useI18nScope('profile')
 
 export default class AvatarDialogView extends DialogBaseView {
   static initClass() {

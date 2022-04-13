@@ -24,11 +24,11 @@ import {Button} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconPlusLine} from '@instructure/ui-icons'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const I18n = useI18nScope('react_developer_keys');
+const I18n = useI18nScope('react_developer_keys')
 
 export default class DeveloperKeyModalTrigger extends React.Component {
   showCreateDeveloperKey = () => {

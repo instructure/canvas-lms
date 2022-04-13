@@ -18,12 +18,12 @@
 
 import React, {useEffect, useCallback} from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import webConferenceType from '../proptypes/webConferenceType'
 
-const I18n = useI18nScope('conferences');
+const I18n = useI18nScope('conferences')
 
 const LTI_DATA_TYPES = ['link', 'html']
 

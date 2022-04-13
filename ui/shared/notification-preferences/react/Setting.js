@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {arrayOf, func, string} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useEffect, useState} from 'react'
 
 import {Flex} from '@instructure/ui-flex'
@@ -32,7 +32,7 @@ import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 
-const I18n = useI18nScope('notification_preferences');
+const I18n = useI18nScope('notification_preferences')
 
 const preferenceConfigs = {
   immediately: {

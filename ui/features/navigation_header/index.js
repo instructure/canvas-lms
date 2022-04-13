@@ -17,14 +17,14 @@
  */
 
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import Navigation from './react/Navigation'
 import MobileNavigation from './react/MobileNavigation'
 import ready from '@instructure/ready'
 
-const I18n = useI18nScope('common');
+const I18n = useI18nScope('common')
 
 // #
 // Handle user toggling of nav width

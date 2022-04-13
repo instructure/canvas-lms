@@ -163,9 +163,7 @@ describe('ImageOptions', () => {
 
   describe('when the "Upload Image" mode is selected', () => {
     beforeEach(() => {
-      ENV.FEATURES.buttons_and_icons_cropper = true
-
-      const component = subject()
+      const component = subject({rcsConfig: {features: {buttons_and_icons_cropper: true}}})
 
       fireEvent.click(component.getByText('Add Image'))
       fireEvent.click(component.getByText('Upload Image'))
@@ -178,9 +176,7 @@ describe('ImageOptions', () => {
 
   describe('when the "Course Images" mode is selected', () => {
     beforeEach(() => {
-      ENV.FEATURES.buttons_and_icons_cropper = true
-
-      const component = subject()
+      const component = subject({rcsConfig: {features: {buttons_and_icons_cropper: true}}})
 
       fireEvent.click(component.getByText('Add Image'))
       fireEvent.click(component.getByText('Course Images'))

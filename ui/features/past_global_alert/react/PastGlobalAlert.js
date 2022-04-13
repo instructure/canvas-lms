@@ -19,9 +19,9 @@
 import React from 'react'
 import {Alert} from '@instructure/ui-alerts'
 import {Button} from '@instructure/ui-buttons'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('past_global_announcements');
+const I18n = useI18nScope('past_global_announcements')
 
 export default class PastGlobalAlert extends React.Component {
   state = {

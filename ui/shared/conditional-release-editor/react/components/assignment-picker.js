@@ -28,9 +28,9 @@ import {ALL_ID} from '../categories'
 import AssignmentFilter from './assignment-filter'
 import AssignmentList from './assignment-list'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('conditional_release');
+const I18n = useI18nScope('conditional_release')
 
 const {object, string, func} = PropTypes
 

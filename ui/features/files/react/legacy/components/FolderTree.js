@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import BBTreeBrowserView from '../modules/BBTreeBrowserView'
@@ -27,7 +27,7 @@ import filesEnv from '@canvas/files/react/modules/filesEnv'
 import page from 'page'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('folder_tree');
+const I18n = useI18nScope('folder_tree')
 
 export default {
   displayName: 'FolderTree',

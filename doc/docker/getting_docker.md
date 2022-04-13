@@ -13,26 +13,27 @@ up Canvas.
 
 Docker has lots of info getting up and running [here](https://www.docker.com/products/docker). The info below should still get you going though.
 
-## Dinghy on macOS
+## Docker Destkop on macOS
 
 Make sure you have the following installed:
 
-* VirtualBox
-* Dinghy
+* Docker Desktop
+* Mutagen
+* Mutagen-Compose
 
-You'll want to walk through https://github.com/codekitchen/dinghy#install, but
-when you run create, you may want to increase the system resources you give the
-VM, like so:
+### Via Homebrew
 
 ```
-$ dinghy create --memory=8192 --disk=150000 --cpus=4 --provider=virtualbox
+brew install --cask docker
 ```
+Once the install has completed, launch Docker Desktop to finalize the setup.
+Navigate to Docker Desktop preferences → Resources and set the Memory to at least 8GB.
 
-Type `docker ps` in your terminal to make sure your Docker environment
-is happy.
+Now install Mutagen and Mutagen-Compose
 
-Dinghy currently requires OS X Yosemite. Make sure you're using the most recent
-Dinghy release, or else you'll probably have a bad time.
+```
+brew install mutagen-io/mutagen/mutagen mutagen-io/mutagen/mutagen-compose
+```
 
 ## Linux
 
@@ -104,12 +105,8 @@ have root privileges.  Dev responsibly my friends.
 
 ### Install dory (optional)
 
-People using dinghy will have a reverse proxy that allows them to access
-canvas at `http://canvas.docker`.  On Linux and Docker for Mac, you will need
-to run your own reverse proxy (or access your containers via IP/port).
-
 Many people at Instructure are using [dory](https://github.com/FreedomBen/dory)
-for this as it uses the same
+for reverse proxy as it uses the same
 proxy under the hood as dinghy which gives you maximum compatibility.
 Detailed instructions are available at the
 [github page](https://github.com/FreedomBen/dory), but you can
@@ -123,9 +120,7 @@ gem install dory
 
 ## OS X
 
-```
-$ brew install docker-compose
-```
+Docker Compose comes bundled with Docker Desktop. There are no additional steps needed.
 
 ## Linux
 

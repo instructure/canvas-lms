@@ -30,7 +30,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import gradingPeriodSetsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
 import htmlEscape from 'html-escape'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import round from 'round'
 import numberHelper from '@canvas/i18n/numberHelper'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
@@ -41,7 +41,7 @@ import StatusPill from '@canvas/grading-status-pill'
 import SelectMenuGroup from '../react/SelectMenuGroup'
 import {scoreToPercentage} from '@canvas/grading/GradeCalculationHelper'
 
-const I18n = useI18nScope('gradingGradeSummary');
+const I18n = useI18nScope('gradingGradeSummary')
 
 const GradeSummary = {
   getSelectedGradingPeriodId() {

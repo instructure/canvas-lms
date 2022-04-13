@@ -406,9 +406,21 @@ describe "student planner" do
     end
 
     it "allows editing the course of a to-do item", priority: "1" do
-      skip("LS-3035 this flaky spec is only working 65% of the time -- it's the course picker")
       view_todo_item
-      todo_tray_select_course_from_dropdown
+      attempt = 0
+      max_attempts = 3
+      begin
+        attempt += 1
+        todo_tray_select_course_from_dropdown
+      rescue => e
+        if attempt < max_attempts
+          puts "\t Attempt #{attempt} failed! Retrying..."
+          sleep 0.5
+          retry
+        end
+        raise Selenium::WebDriver::Error::ElementNotInteractableError, e.message.to_s
+      end
+
       todo_save_button.click
       @student_to_do.reload
       expect(@student_to_do.course_id).to be nil

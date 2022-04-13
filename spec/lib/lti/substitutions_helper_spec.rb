@@ -190,6 +190,18 @@ module Lti
         roles = subject.all_roles
         expect(roles).not_to include "urn:lti:instrole:ims/lis/Administrator"
       end
+
+      it "properly dedupes roles if there is overlap" do
+        expect(subject).to receive(:course_enrollments).and_return([StudentViewEnrollment.new])
+        allow(user).to receive(:roles).and_return(%w[user student fake_student])
+        roles = subject.all_roles("lti1_3")
+        expect(roles.split(",")).to match_array [
+          "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student",
+          "http://purl.imsglobal.org/vocab/lis/v2/membership#Learner",
+          "http://purl.imsglobal.org/vocab/lis/v2/system/person#User",
+          "http://purl.imsglobal.org/vocab/lti/system/person#TestUser"
+        ]
+      end
     end
 
     describe "#course_enrollments" do

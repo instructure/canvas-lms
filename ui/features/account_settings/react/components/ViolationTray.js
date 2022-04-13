@@ -17,7 +17,7 @@
  */
 
 import React, {useReducer, useCallback} from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
@@ -26,7 +26,7 @@ import {View} from '@instructure/ui-view'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import ViolationTable from './ViolationTable'
 
-const I18n = useI18nScope('csp_violation_tray');
+const I18n = useI18nScope('csp_violation_tray')
 
 const violationsReducer = (state, action) => {
   switch (action.type) {

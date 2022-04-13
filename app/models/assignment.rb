@@ -170,8 +170,8 @@ class Assignment < ActiveRecord::Base
   end
 
   accepts_nested_attributes_for :external_tool_tag, update_only: true, reject_if: proc { |attrs|
-    # only accept the url, content_type, content_id, and new_tab params, the other accessible
-    # params don't apply to an content tag being used as an external_tool_tag
+    # only accept the url, link_settings, content_type, content_id and new_tab params
+    # the other accessible params don't apply to an content tag being used as an external_tool_tag
     content = case attrs["content_type"]
               when "Lti::MessageHandler", "lti/message_handler"
                 Lti::MessageHandler.find(attrs["content_id"].to_i)
@@ -180,7 +180,7 @@ class Assignment < ActiveRecord::Base
               end
     attrs[:content] = content if content
     attrs[:external_data] = JSON.parse(attrs[:external_data]) if attrs["external_data"].present? && attrs[:external_data].is_a?(String)
-    attrs.slice!(:url, :new_tab, :content, :external_data)
+    attrs.slice!(:url, :new_tab, :content, :external_data, :link_settings)
     false
   }
   before_validation do |assignment|
@@ -3809,15 +3809,25 @@ class Assignment < ActiveRecord::Base
   end
 
   def anonymous_student_identities
-    @anonymous_student_identities ||= begin
-      assigned_submissions = all_submissions.active.order(:anonymous_id).order("md5(id::text)")
-      assigned_submissions.pluck(:user_id).each_with_object({}).with_index(1) do |(user_id, identities), student_number|
-        identities[user_id] = I18n.t("Student %{student_number}", { student_number: student_number })
-      end
+    @anonymous_student_identities ||= anonymous_student_identities_query.each_with_object({}).with_index(1) do |(identity, identities), student_number|
+      identities[identity["user_id"]] = {
+        name: I18n.t("Student %{student_number}", { student_number: student_number }),
+        position: student_number
+      }
     end
   end
 
   private
+
+  def anonymous_student_identities_query
+    # COLLATE "C" to force case-sensitive sorting
+    ActiveRecord::Base.connection.select_all(<<~SQL.squish)
+      SELECT user_id
+      FROM #{Submission.quoted_table_name}
+      WHERE assignment_id = #{id} AND workflow_state <> 'deleted'
+      ORDER BY anonymous_id COLLATE "C" ASC, md5(id::text) ASC
+    SQL
+  end
 
   def set_muted
     self.muted = true

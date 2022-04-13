@@ -327,7 +327,6 @@ export function renderToDoSidebar(element) {
     <Provider store={store}>
       <Suspense fallback={loading()}>
         <ToDoSidebar
-          courses={store.getState().courses}
           timeZone={env.TIMEZONE}
           locale={env.MOMENT_LOCALE}
           changeDashboardView={initializedOptions.changeDashboardView}

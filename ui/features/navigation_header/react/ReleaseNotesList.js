@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
@@ -32,7 +32,7 @@ import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import {IconWarningSolid} from '@instructure/ui-icons'
 
-const I18n = useI18nScope('Navigation');
+const I18n = useI18nScope('Navigation')
 
 function persistBadgeDisabled(state) {
   doFetchApi({

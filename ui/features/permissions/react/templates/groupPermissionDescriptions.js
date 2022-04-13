@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('permissions_templates_8');
+const I18n = useI18nScope('permissions_templates_8')
 
 export const GROUP_PERMISSION_DESCRIPTIONS = {
   manage_courses: contextType => {

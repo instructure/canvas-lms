@@ -19,14 +19,14 @@
 import {Button} from '@instructure/ui-buttons'
 import {ChildTopic} from '../../../graphql/ChildTopic'
 import {getGroupDiscussionUrl} from '../../utils'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {IconGroupLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import PropTypes from 'prop-types'
 import React, {useMemo} from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-const I18n = useI18nScope('discussion_posts');
+const I18n = useI18nScope('discussion_posts')
 
 export const GroupsMenu = ({...props}) => {
   const menuItems = useMemo(

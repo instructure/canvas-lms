@@ -18,11 +18,11 @@
 import $ from 'jquery'
 import template from '../jst/ModuleSequenceFooter.handlebars'
 import _ from 'underscore'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import htmlEscape from 'html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
 
-const I18n = useI18nScope('sequence_footer');
+const I18n = useI18nScope('sequence_footer')
 
 // Summary
 //   Creates a new ModuleSequenceFooter so clicking to see the next item in a module

@@ -19,13 +19,13 @@
 import $ from 'jquery'
 import page from 'page'
 import _ from 'underscore'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import filesEnv from '@canvas/files/react/modules/filesEnv'
 import getAllPages from '../util/getAllPages'
 import updateAPIQuerySortParams from '../util/updateAPIQuerySortParams'
 import Folder from '@canvas/files/backbone/models/Folder'
 
-const I18n = useI18nScope('react_files');
+const I18n = useI18nScope('react_files')
 
 const LEADING_SLASH_TILL_BUT_NOT_INCLUDING_NEXT_SLASH = /^\/[^\/]*/
 

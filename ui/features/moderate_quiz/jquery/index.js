@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import timing from './quiz_timing'
 import openModerateStudentDialog from './openModerateStudentDialog'
@@ -30,7 +30,7 @@ import '@canvas/jquery/jquery.instructure_misc_plugins'/* showIf */
 import '@canvas/rails-flash-notifications'
 import '@canvas/util/templateData'/* fillTemplateData */
 import 'date'
-const I18n = useI18nScope('quizzes.moderate');
+const I18n = useI18nScope('quizzes.moderate')
 /* Date.parse */
 
 const DIALOG_WIDTH = 490

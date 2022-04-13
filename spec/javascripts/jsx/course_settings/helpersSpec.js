@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Helpers from 'ui/features/course_settings/react/helpers.js'
+import Helpers from 'ui/features/course_settings/react/helpers'
 
 QUnit.module('Course Settings Helpers')
 
@@ -66,4 +66,80 @@ test('extractInfoFromEvent', () => {
 
   deepEqual(changeResults, expectedChangeResults, 'creates the proper info from change events')
   deepEqual(dragResults, expectedDragResults, 'creates the proper info from drag events')
+})
+
+QUnit.module('resizeImageToFit')
+
+function makeImage(w, h) {
+  return new Promise(resolve => {
+    const canvas = document.createElement('canvas')
+    canvas.width = w
+    canvas.height = h
+    const ctx = canvas.getContext('2d')
+    ctx.strokeStyle = 'black'
+    ctx.strokeRect(0, 0, w, h)
+    canvas.toBlob(blob => {
+      resolve(blob)
+    })
+  })
+}
+
+test('does not resize an image smaller than the requested size', () => {
+  return new Promise(resolve => {
+    /* eslint-disable promise/catch-or-return */
+    makeImage(10, 10).then(imageIn => {
+      Helpers.resizeImageToFit(imageIn, 100, 100).then(imageOut => {
+        const htmlImage = document.createElement('img')
+        document.getElementById('qunit-fixture').appendChild(htmlImage)
+        htmlImage.onload = () => {
+          deepEqual(htmlImage.naturalWidth, 10)
+          deepEqual(htmlImage.naturalHeight, 10)
+          URL.revokeObjectURL(htmlImage.src)
+          resolve()
+        }
+        htmlImage.src = URL.createObjectURL(imageOut)
+      })
+    })
+    /* eslint-enable promise/catch-or-return */
+  })
+})
+
+test('shrinks a tall image to fit requested size', () => {
+  return new Promise(resolve => {
+    /* eslint-disable promise/catch-or-return */
+    makeImage(50, 100).then(imageIn => {
+      Helpers.resizeImageToFit(imageIn, 25, 25).then(imageOut => {
+        const htmlImage = document.createElement('img')
+        document.getElementById('qunit-fixture').appendChild(htmlImage)
+        htmlImage.onload = () => {
+          deepEqual(htmlImage.naturalWidth, 25)
+          deepEqual(htmlImage.naturalHeight, 50)
+          URL.revokeObjectURL(htmlImage.src)
+          resolve()
+        }
+        htmlImage.src = URL.createObjectURL(imageOut)
+      })
+    })
+    /* eslint-enable promise/catch-or-return */
+  })
+})
+
+test('shrinks a wide image to fit requested size', () => {
+  return new Promise(resolve => {
+    /* eslint-disable promise/catch-or-return */
+    makeImage(100, 50).then(imageIn => {
+      Helpers.resizeImageToFit(imageIn, 25, 25).then(imageOut => {
+        const htmlImage = document.createElement('img')
+        document.getElementById('qunit-fixture').appendChild(htmlImage)
+        htmlImage.onload = () => {
+          deepEqual(htmlImage.naturalWidth, 50)
+          deepEqual(htmlImage.naturalHeight, 25)
+          URL.revokeObjectURL(htmlImage.src)
+          resolve()
+        }
+        htmlImage.src = URL.createObjectURL(imageOut)
+      })
+    })
+    /* eslint-enable promise/catch-or-return */
+  })
 })

@@ -18,7 +18,7 @@
 
 import React, {useState, useCallback} from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -35,7 +35,7 @@ import useFetchApi from '@canvas/use-fetch-api-hook'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {createNewCourse, getAccountsFromEnrollments} from './utils'
 
-const I18n = useI18nScope('create_course_modal');
+const I18n = useI18nScope('create_course_modal')
 
 export const CreateCourseModal = ({
   isModalOpen,

@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import 'jqueryui/dialog'
 import ReactDOM from 'react-dom'
 
-const I18n = useI18nScope('media_comment_dialog_manager');
+const I18n = useI18nScope('media_comment_dialog_manager')
 
 /*
  * manages uploader modal dialog

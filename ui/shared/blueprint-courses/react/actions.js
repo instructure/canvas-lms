@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {createActions} from 'redux-actions'
 
 import api from './apiClient'
 import LoadStates from './loadStates'
 import MigrationStates from './migrationStates'
 
-const I18n = useI18nScope('blueprint_settings_actions');
+const I18n = useI18nScope('blueprint_settings_actions')
 
 const types = [
   'LOAD_COURSES_START',

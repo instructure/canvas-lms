@@ -27,7 +27,7 @@ import {Badge} from '@instructure/ui-badge'
 import {Heading} from '@instructure/ui-heading'
 import {Link} from '@instructure/ui-link'
 import {IconChatLine, IconQuestionLine} from '@instructure/ui-icons'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import LatePolicyToolTipContent from './LatePolicyStatusDisplay/LatePolicyToolTipContent'
 import {Popover} from '@instructure/ui-popover'
 import {arrayOf, func} from 'prop-types'
@@ -42,7 +42,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import CommentsTray from './CommentsTray/index'
 
-const I18n = useI18nScope('assignments_2_student_header');
+const I18n = useI18nScope('assignments_2_student_header')
 
 class Header extends React.Component {
   static propTypes = {

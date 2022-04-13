@@ -27,13 +27,14 @@ module SentryExtensions
     class ActiveRecordSubscriber < Sentry::Rails::Tracing::AbstractSubscriber
       SQL_REGEX = /^(\d+::)?(.*)/m.freeze
       EVENT_NAMES = ["sql.active_record"].freeze
+      SPAN_PREFIX = "db."
       EXCLUDED_EVENTS = %w[SCHEMA TRANSACTION].freeze
 
       def self.subscribe!
         subscribe_to_event(EVENT_NAMES) do |event_name, duration, payload|
           next if EXCLUDED_EVENTS.include? payload[:name]
 
-          record_on_current_span(op: event_name, start_timestamp: payload[Sentry::Rails::Tracing::START_TIMESTAMP_NAME], description: payload[:sql], duration: duration) do |span|
+          record_on_current_span(op: SPAN_PREFIX + event_name, start_timestamp: payload[Sentry::Rails::Tracing::START_TIMESTAMP_NAME], description: payload[:sql], duration: duration) do |span|
             begin
               if payload[:sql]
                 # $1 is the Switchman shard prefix (which PgQuery doesn't understand), $2 is the standard SQL statement

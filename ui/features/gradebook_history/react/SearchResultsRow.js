@@ -23,14 +23,14 @@ import '@canvas/datetime'
 import environment from './environment'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import NumberHelper from '@canvas/i18n/numberHelper'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {IconOffLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 
-const I18n = useI18nScope('gradebook_history');
+const I18n = useI18nScope('gradebook_history')
 
 // Unclear on why that tab-index is there but not going to mess with it right now
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */

@@ -26,10 +26,10 @@ import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-con
 import {Tooltip} from '@instructure/ui-tooltip'
 import Tray from './Tray'
 import Suggestions from './Suggestions'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
-const I18n = useI18nScope('CommentLibrary');
+const I18n = useI18nScope('CommentLibrary')
 
 const renderTooltip = () => (
   <Tooltip renderTip={I18n.t('Comment Library (Suggestions Disabled)')} on={['hover']}>

@@ -149,10 +149,20 @@ class DiscussionTopic < ActiveRecord::Base
   def sections_for(user)
     return unless is_section_specific?
 
-    CourseSection.where(id: DiscussionTopicSectionVisibility.active.where(discussion_topic_id: id)
-      .where("EXISTS (?)", Enrollment.active_or_pending.where(user_id: user)
-        .where("enrollments.course_section_id = discussion_topic_section_visibilities.course_section_id"))
-      .select("discussion_topic_section_visibilities.course_section_id"))
+    unlocked_teacher = context.enrollments.active.instructor
+                              .where(limit_privileges_to_course_section: false, user: user)
+
+    if unlocked_teacher.count > 0
+      CourseSection.where(id: DiscussionTopicSectionVisibility.active
+                                                              .where(discussion_topic_id: id)
+                                                              .select("discussion_topic_section_visibilities.course_section_id"))
+    else
+      CourseSection.where(id: DiscussionTopicSectionVisibility.active.where(discussion_topic_id: id)
+                                                              .where("EXISTS (?)", Enrollment.active_or_pending
+                                                                                             .where(user_id: user)
+                                                                                             .where("enrollments.course_section_id = discussion_topic_section_visibilities.course_section_id"))
+                                                              .select("discussion_topic_section_visibilities.course_section_id"))
+    end
   end
 
   def address_book_context_for(user)

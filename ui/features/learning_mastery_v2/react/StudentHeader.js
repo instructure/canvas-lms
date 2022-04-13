@@ -19,13 +19,13 @@ import React from 'react'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {IconArrowOpenDownLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {View} from '@instructure/ui-view'
 import {CELL_HEIGHT, COLUMN_WIDTH} from './constants'
 
-const I18n = useI18nScope('learning_mastery_gradebook');
+const I18n = useI18nScope('learning_mastery_gradebook')
 
 const StudentHeader = () => (
   <View background="secondary" as="div" width={COLUMN_WIDTH}>

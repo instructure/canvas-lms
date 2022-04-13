@@ -46,17 +46,6 @@ describe('initializeExternalTools', () => {
     }
   })
 
-  it('adds Apps button to the toolbar', () => {
-    ExternalToolsPlugin.init(fakeEditor, 'some.fake.url', INST)
-
-    expect(fakeEditor.ui.registry.addButton).toHaveBeenCalledWith('lti_tool_dropdown', {
-      onAction: expect.any(Function),
-      icon: 'lti',
-      tooltip: 'Apps',
-      onSetup: expect.any(Function)
-    })
-  })
-
   it('adds MRU menu button to the toolbar', () => {
     ExternalToolsPlugin.init(fakeEditor, 'some.fake.url', INST)
 

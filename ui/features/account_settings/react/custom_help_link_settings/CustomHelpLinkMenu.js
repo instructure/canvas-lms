@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Menu} from '@instructure/ui-menu'
 import {Button} from '@instructure/ui-buttons'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
@@ -26,7 +26,7 @@ import {IconPlusLine} from '@instructure/ui-icons'
 import CustomHelpLinkPropTypes from './CustomHelpLinkPropTypes'
 import CustomHelpLinkConstants from './CustomHelpLinkConstants'
 
-const I18n = useI18nScope('custom_help_link');
+const I18n = useI18nScope('custom_help_link')
 
 export default class CustomHelpLinkMenu extends React.Component {
   static propTypes = {

@@ -22,6 +22,8 @@ export default function setDefaultToolValues(result, tool) {
   $('#assignment_external_tool_tag_attributes_content_type').val(tool.definition_type)
   $('#assignment_external_tool_tag_attributes_content_id').val(tool.definition_id)
   $('#assignment_external_tool_tag_attributes_url').val(result.url)
+  $('#assignment_external_tool_tag_attributes_iframe_width').val('')
+  $('#assignment_external_tool_tag_attributes_iframe_height').val('')
 
   window.postMessage(
     {

@@ -21,14 +21,14 @@
 // See https://instructure.invisionapp.com/share/24JU28K6TZJ#/screens/318751364
 import React from 'react'
 import {bool, oneOf} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {FormField} from '@instructure/ui-form-field'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {OverrideShape} from '../../assignmentData'
 
-const I18n = useI18nScope('assignments_2');
+const I18n = useI18nScope('assignments_2')
 
 OverrideAssignTo.propTypes = {
   override: OverrideShape.isRequired,

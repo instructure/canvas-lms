@@ -20,9 +20,9 @@ import React from 'react'
 import {bool, func, string} from 'prop-types'
 import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('SpeedGraderSettingsMenu');
+const I18n = useI18nScope('SpeedGraderSettingsMenu')
 
 // We're foregoing the use of InstUI buttons or instructure-icons icons here to be consistent
 // with the look/styling of this button's siblings. When those siblings have been updated to

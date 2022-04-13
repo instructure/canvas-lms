@@ -21,7 +21,6 @@ require_relative "../../common"
 
 module StudentContextTray
   #------------------------------ Selectors -----------------------------
-
   #------------------------------ Elements ------------------------------
   def student_tray_header
     f(".StudentContextTray-Header")
@@ -59,6 +58,7 @@ module StudentContextTray
   end
 
   def todo_tray_select_course_from_dropdown(course_name = "Optional: Add Course")
+    todo_tray_course_selector.click
     click_option("#to-do-item-course-select", course_name)
   end
 end

@@ -22,13 +22,13 @@ import createReactClass from 'create-react-class'
 import page from 'page'
 import FilesApp from '../legacy/components/FilesApp'
 import filesEnv from '@canvas/files/react/modules/filesEnv'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import Breadcrumbs from './Breadcrumbs'
 import FolderTree from './FolderTree'
 import FilesUsage from './FilesUsage'
 import Toolbar from './Toolbar'
 
-const I18n = useI18nScope('react_files');
+const I18n = useI18nScope('react_files')
 
 FilesApp.previewItem = function (item) {
   this.clearSelectedItems(() => {

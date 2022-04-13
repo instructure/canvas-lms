@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
@@ -29,7 +29,7 @@ import {ConnectedChildChangeLog as ChildChangeLog} from './ChildChangeLog'
 import actions from '@canvas/blueprint-courses/react/actions'
 import propTypes from '@canvas/blueprint-courses/react/propTypes'
 
-const I18n = useI18nScope('blueprint_coursesChildContent');
+const I18n = useI18nScope('blueprint_coursesChildContent')
 
 export default class ChildContent extends Component {
   static propTypes = {

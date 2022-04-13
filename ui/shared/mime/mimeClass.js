@@ -15,9 +15,9 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('mimeClass');
+const I18n = useI18nScope('mimeClass')
 
 // this module works together with app/stylesheets/components/_MimeClassIcons.scss
 // so, given the mime-type of a file you can give it a css class name that corresponds to it.

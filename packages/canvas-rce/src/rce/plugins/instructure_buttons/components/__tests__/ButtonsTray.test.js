@@ -63,13 +63,14 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
   }
 
   beforeAll(() => {
-    ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN = 'https://domain.from.env'
-
     global.fetch = jest.fn().mockResolvedValue({
       blob: () => Promise.resolve(new Blob())
     })
 
-    rcs = {getFile: jest.fn(() => Promise.resolve({name: 'Test Button.svg'}))}
+    rcs = {
+      getFile: jest.fn(() => Promise.resolve({name: 'Test Button.svg'})),
+      canvasUrl: 'https://domain.from.env'
+    }
     RceApiSource.mockImplementation(() => rcs)
   })
 
@@ -295,7 +296,14 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
       ed = new FakeEditor()
     })
 
-    const subject = () => render(<ButtonsTray onClose={jest.fn()} editor={ed} />)
+    const subject = () =>
+      render(
+        <ButtonsTray
+          onClose={jest.fn()}
+          editor={ed}
+          rceConfig={{contextType: 'course', contextId: 2}}
+        />
+      )
 
     it('loads the standard SVG metadata', async () => {
       const {getByLabelText, getAllByTestId} = subject()
@@ -323,7 +331,19 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
       ed.setSelectedNode(ed.dom.select('#test-image')[0])
     })
 
-    const subject = () => render(<ButtonsTray onClose={jest.fn()} editing editor={ed} />)
+    const subject = () =>
+      render(
+        <ButtonsTray
+          onClose={jest.fn()}
+          editing
+          editor={ed}
+          rcsConfig={{
+            contextType: 'course',
+            contextId: 2,
+            canvasUrl: 'https://canvas.instructure.com'
+          }}
+        />
+      )
 
     beforeEach(() => {
       fetchMock.mock('*', {
@@ -352,6 +372,10 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
     afterEach(() => {
       jest.restoreAllMocks()
       fetchMock.restore()
+    })
+
+    it('renders the create view', () => {
+      expect(subject().getByRole('heading', {name: /edit icon/i})).toBeInTheDocument()
     })
 
     it('loads the standard SVG metadata', async () => {

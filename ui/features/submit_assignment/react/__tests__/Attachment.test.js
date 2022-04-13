@@ -78,21 +78,4 @@ describe('Attachment', () => {
     expect(getByAltText('Captured Image')).toBeInTheDocument()
     expect(props.setBlob).toHaveBeenCalledWith(mockedBlob)
   })
-
-  it.skip('focuses on Use Webcam button when removing the photo', async () => {
-    // unskip in EVAL-1822
-    const mockedBlob = jest.mock()
-    jest
-      .spyOn(HTMLCanvasElement.prototype, 'toBlob')
-      .mockImplementationOnce(callback => callback(mockedBlob))
-    const props = getProps()
-    const {getByText, getByTestId} = render(<Attachment {...props} />)
-    fireEvent.click(getByText('Use Webcam'))
-    await act(() => mediaUtils.getUserMedia())
-    fireEvent.click(getByText('Take Photo'))
-    fireEvent.click(getByText('Use This Photo'))
-    fireEvent.click(getByTestId('removePhotoButton'))
-    await act(async () => jest.runAllTimers())
-    expect(getByText('Use Webcam').closest('button')).toHaveFocus()
-  })
 })

@@ -26,7 +26,7 @@ import {Focusable, FocusableView} from '@instructure/ui-focusable'
 
 import {Tooltip} from '@instructure/ui-tooltip'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {
   auditEventStudentAnonymityStates,
@@ -36,7 +36,7 @@ import {
 } from '../../AuditTrailHelpers'
 import * as propTypes from './propTypes'
 
-const I18n = useI18nScope('speed_grader');
+const I18n = useI18nScope('speed_grader')
 
 const {OFF, TURNED_OFF} = auditEventStudentAnonymityStates
 

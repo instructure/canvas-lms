@@ -42,6 +42,7 @@ if config[:components].present?
   end
 
   Marginalia::Comment.components = config[:components].map(&:to_sym)
+  Marginalia::Comment.prepend_comment = true
 
   module Marginalia::RakeTask
     def execute(args = nil)

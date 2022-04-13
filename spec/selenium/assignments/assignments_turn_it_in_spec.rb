@@ -102,4 +102,22 @@ describe "assignments turn it in" do
     assignment.reload
     expect(assignment.turnitin_settings).to eq expected_settings
   end
+
+  it "does not allow edits to turnitin settings after submissions have been made" do
+    student = User.create!
+    @course.enroll_student(student).accept
+    assignment = @course.assignments.create!(
+      name: "test assignment",
+      due_at: (Time.now.utc + 2.days),
+      assignment_group: @course.assignment_groups.create!(name: "default"),
+      submission_types: "online_url",
+      points_possible: 10
+    )
+    assignment.submit_homework(student, submission_type: "online_url")
+
+    get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
+
+    expect(f("#assignment_turnitin_enabled")).not_to be_enabled
+    expect(f(".plagiarism_locked_explanation")).to be_displayed
+  end
 end

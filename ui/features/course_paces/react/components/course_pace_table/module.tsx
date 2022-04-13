@@ -24,7 +24,12 @@ import {ApplyTheme} from '@instructure/ui-themeable'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {IconMiniArrowDownLine, IconMiniArrowRightLine, IconWarningLine} from '@instructure/ui-icons'
+import {
+  IconMiniArrowDownLine,
+  IconMiniArrowRightLine,
+  IconWarningLine,
+  IconInfoLine
+} from '@instructure/ui-icons'
 import {Table} from '@instructure/ui-table'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -79,20 +84,32 @@ export const Module: React.FC<PassedProps> = props => {
     if (!props.showProjections && !actuallyExpanded && !datesVisible) return null
     return (
       <ColHeader width={actuallyExpanded ? '9.5em' : '0'} id={`module-${props.module.id}-duration`}>
-        <Flex as="div" alignItems="end" justifyItems="center" padding={headerPadding}>
-          {I18n.t('Due Date')}
+        <Flex
+          as="div"
+          aria-labelledby="due-date-column-title"
+          alignItems="end"
+          justifyItems="center"
+          padding={headerPadding}
+        >
+          <View id="due-date-column-title">{I18n.t('Due Date')} </View>
           {props.isCompressing && (
-            <View data-testid="duedate-tooltip" as="span" margin="0 0 0 x-small">
-              <Tooltip
-                renderTip={I18n.t(
-                  'Due Dates are being compressed based on your start and end dates'
-                )}
-                placement="top"
-                on={['click', 'hover']}
+            <Tooltip
+              renderTip={I18n.t(
+                'Due Dates are being compressed based on your start and end dates.'
+              )}
+              placement="top"
+              on={['click', 'hover', 'focus']}
+            >
+              <View
+                data-testid="duedate-tooltip"
+                as="div"
+                margin="0 0 0 x-small"
+                tabIndex="0"
+                role="button"
               >
                 <IconWarningLine color="error" title={I18n.t('warning')} />
-              </Tooltip>
-            </View>
+              </View>
+            </Tooltip>
           )}
         </Flex>
       </ColHeader>
@@ -164,15 +181,34 @@ export const Module: React.FC<PassedProps> = props => {
                   <ColHeader
                     id={`module-${props.module.id}-days`}
                     width={isStudentPace ? '5rem' : '7.5rem'}
+                    data-testid="pp-duration-columnheader"
                   >
                     <Flex
                       as="div"
+                      aria-labelledby="days-column-title"
                       alignItems="end"
                       justifyItems={isStudentPace ? 'center' : 'start'}
                       padding={headerPadding}
-                      margin={`0 0 0 ${isStudentPace ? '0' : 'xx-small'}`}
+                      margin={`0 0 0 ${
+                        isStudentPace || props.responsiveSize === 'small' ? '0' : 'xx-small'
+                      }`}
                     >
-                      {I18n.t('Days')}
+                      <View id="days-column-title">{I18n.t('Days')}</View>
+                      <Tooltip
+                        renderTip={I18n.t('Changing course pacing days may modify due dates.')}
+                        placement="top"
+                        on={['click', 'hover', 'focus']}
+                      >
+                        <View
+                          data-testid="days-tooltip"
+                          as="div"
+                          margin="0 0 0 x-small"
+                          tabIndex="0"
+                          role="button"
+                        >
+                          <IconInfoLine color="brand" title={I18n.t('info')} />
+                        </View>
+                      </Tooltip>
                     </Flex>
                   </ColHeader>
                   {renderDateColHeader()}

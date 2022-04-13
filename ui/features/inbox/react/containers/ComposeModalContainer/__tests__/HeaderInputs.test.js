@@ -136,7 +136,7 @@ describe('HeaderInputs', () => {
     }
 
     const defaultRecipientProps = () => ({
-      activeCourseFilter: 'course_1',
+      activeCourseFilter: {contextID: 'course_1', contextName: 'course 1'},
       selectedRecipients: [mockedRecipient()]
     })
 
@@ -252,6 +252,7 @@ describe('HeaderInputs', () => {
       {
         _id: '1',
         id: 'TWVzc2FnZWFibGVVc2VyLTQx',
+        itemType: 'user',
         name: 'Frederick Dukes',
         commonCoursesInfo: [
           {

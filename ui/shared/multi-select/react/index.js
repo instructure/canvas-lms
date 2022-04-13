@@ -17,7 +17,7 @@
  */
 
 import React, {useState, useRef, useMemo} from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import keycode from 'keycode'
 import {Select} from '@instructure/ui-select'
 import {Tag} from '@instructure/ui-tag'
@@ -26,7 +26,7 @@ import {matchComponentTypes} from '@instructure/ui-react-utils'
 import {compact, uniqueId} from 'lodash'
 import {Alert} from '@instructure/ui-alerts'
 
-const I18n = useI18nScope('app_shared_components');
+const I18n = useI18nScope('app_shared_components')
 
 const CanvasMultiSelectOption = () => <div />
 

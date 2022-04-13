@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
 import Backbone from '@canvas/backbone'
@@ -37,7 +37,7 @@ import {decodeQueryString} from 'query-string-encoding'
 import ConversationStatusFilter from './react/ConversationStatusFilter'
 import ready from '@instructure/ready'
 
-const I18n = useI18nScope('conversations');
+const I18n = useI18nScope('conversations')
 
 const ConversationsRouter = Backbone.Router.extend({
   routes: {

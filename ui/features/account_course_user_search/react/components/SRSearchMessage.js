@@ -19,9 +19,9 @@
 import React from 'react'
 import {Alert} from '@instructure/ui-alerts'
 import {oneOf, func, array, shape, string} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('account_course_user_search');
+const I18n = useI18nScope('account_course_user_search')
 
 const errorLoadingMessage = I18n.t(
   'There was an error with your query; please try a different search'

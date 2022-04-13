@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
@@ -26,7 +26,7 @@ import store from '../lib/ExternalAppsStore'
 import ConfigurationForm from './ConfigurationForm'
 import Lti2Edit from './Lti2Edit'
 
-const I18n = useI18nScope('external_tools');
+const I18n = useI18nScope('external_tools')
 
 export default class EditExternalToolButton extends React.Component {
   static propTypes = {

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
 import pubsub from 'jquery-tinypubsub'
 import $ from 'jquery'
@@ -28,7 +28,7 @@ import '@canvas/jquery/jquery.instructure_misc_helpers'/* /\$\.h/, /\$\.fileSize
 import '@canvas/jquery/jquery.instructure_misc_plugins'/* .dim, /\.log\(/ */
 import 'jqueryui/progressbar'
 
-const I18n = useI18nScope('media_comments_publicjs');
+const I18n = useI18nScope('media_comments_publicjs')
 
 const getDefaultExport = mod => (mod.default ? mod.default : mod)
 

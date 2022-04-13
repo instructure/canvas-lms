@@ -20,9 +20,9 @@ import React from 'react'
 import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('account_settings_jsx_bundle');
+const I18n = useI18nScope('account_settings_jsx_bundle')
 
 /**
  * @param {Object} props

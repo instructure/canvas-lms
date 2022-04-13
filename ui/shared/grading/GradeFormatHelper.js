@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import round from 'round'
 import numberHelper from '@canvas/i18n/numberHelper'
 import {scoreToPercentage} from './GradeCalculationHelper'
 import {scoreToGrade} from './GradingSchemeHelper'
 
-const I18n = useI18nScope('sharedGradeFormatHelper');
+const I18n = useI18nScope('sharedGradeFormatHelper')
 
 const POINTS = 'points'
 const PERCENT = 'percent'

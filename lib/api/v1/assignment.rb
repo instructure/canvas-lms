@@ -575,9 +575,6 @@ module Api::V1::Assignment
   rescue ActiveRecord::RecordInvalid => e
     assignment.errors.add("invalid_record", e)
     false
-  rescue Lti::AssignmentSubscriptionsHelper::AssignmentSubscriptionError => e
-    assignment.errors.add("plagiarism_tool_subscription", e)
-    false
   end
 
   API_ALLOWED_SUBMISSION_TYPES = [

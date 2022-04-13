@@ -18,7 +18,7 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Flex} from '@instructure/ui-flex'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React, {useEffect, useState, useContext} from 'react'
 import InboxEmpty from '../../../svg/inbox-empty.svg'
@@ -32,7 +32,7 @@ import {View} from '@instructure/ui-view'
 import {ConversationListItem} from './ConversationListItem'
 import {UPDATE_CONVERSATION_PARTICIPANTS} from '../../../graphql/Mutations'
 
-const I18n = useI18nScope('conversations_2');
+const I18n = useI18nScope('conversations_2')
 
 export const ConversationListHolder = ({...props}) => {
   const [selectedMessages, setSelectedMessages] = useState([])

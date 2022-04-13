@@ -18,7 +18,7 @@
 
 import React, {useCallback, useState} from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
@@ -28,7 +28,7 @@ import EmptyTodos from './EmptyTodos'
 
 import Todo, {getBaseDueAt} from './Todo'
 
-const I18n = useI18nScope('todos_page');
+const I18n = useI18nScope('todos_page')
 
 // Sort to-dos based on the assignment's base due date (aka the "Everyone else"
 // override when there are multiple due dates, putting those with no due date last

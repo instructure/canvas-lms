@@ -23,13 +23,13 @@ import ExternalToolDialogModal from './ExternalToolDialog/Modal'
 import ExternalToolDialogTray from './ExternalToolDialog/Tray'
 import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {send} from '@canvas/rce/RceCommandShim'
 import TinyMCEContentItem from '../../TinyMCEContentItem'
 import processEditorContentItems from '@canvas/deep-linking/processors/processEditorContentItems'
 import {Flex} from '@instructure/ui-flex'
 
-const I18n = useI18nScope('ExternalToolDialog');
+const I18n = useI18nScope('ExternalToolDialog')
 
 const EMPTY_BUTTON = {
   height: 300,

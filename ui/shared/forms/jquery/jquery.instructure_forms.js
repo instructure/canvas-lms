@@ -18,7 +18,7 @@
 
 import {send} from '@canvas/rce/RceCommandShim'
 import INST from 'browser-sniffer'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
 import FakeXHR from './FakeXHR'
@@ -32,7 +32,7 @@ import '@canvas/jquery/jquery.instructure_misc_helpers'/* /\$\.uniq/ */
 import '@canvas/rails-flash-notifications'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 
-const I18n = useI18nScope('instructure');
+const I18n = useI18nScope('instructure')
 
 // Intercepts the default form submission process.  Uses the form tag's
 // current action and method attributes to know where to submit to.

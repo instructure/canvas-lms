@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import {bool, func, object} from 'prop-types'
 import {Tabs} from '@instructure/ui-tabs'
@@ -25,7 +25,7 @@ import types from '@canvas/theme-editor/react/PropTypes'
 import ThemeEditorAccordion from './ThemeEditorAccordion'
 import ThemeEditorFileUpload from './ThemeEditorFileUpload'
 
-const I18n = useI18nScope('theme_editor');
+const I18n = useI18nScope('theme_editor')
 
 export default function ThemeEditorSidebar(props) {
   const [selected, setSelected] = useState('tab-panel-edit')

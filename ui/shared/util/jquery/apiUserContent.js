@@ -18,9 +18,9 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import htmlEscape from 'html-escape'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('user_content');
+const I18n = useI18nScope('user_content')
 
 const apiUserContent = {
   /*

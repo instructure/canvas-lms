@@ -22,12 +22,12 @@ import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
 import DateGroup from '@canvas/date-group/backbone/models/DateGroup'
 import AssignmentOverrideCollection from '@canvas/assignments/backbone/collections/AssignmentOverrideCollection.coffee'
 import DateGroupCollection from '@canvas/date-group/backbone/collections/DateGroupCollection.coffee'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import PandaPubPoller from '@canvas/panda-pub-poller'
 
-const I18n = useI18nScope('modelsQuiz');
+const I18n = useI18nScope('modelsQuiz')
 
 export default class Quiz extends Backbone.Model {
   initialize() {

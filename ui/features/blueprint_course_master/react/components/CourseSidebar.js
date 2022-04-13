@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {Component, lazy, Suspense} from 'react'
 import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
@@ -38,7 +38,7 @@ import BlueprintModal from '@canvas/blueprint-courses/react/components/Blueprint
 import {ConnectedMigrationSync as MigrationSync} from './MigrationSync'
 import {ConnectedMigrationOptions as MigrationOptions} from './MigrationOptions'
 
-const I18n = useI18nScope('blueprint_course_sidebar');
+const I18n = useI18nScope('blueprint_course_sidebar')
 
 const BlueprintAssociations = lazy(() => import('./ConnectedBlueprintAssociations'))
 const SyncHistory = lazy(() => import('./ConnectedSyncHistory'))

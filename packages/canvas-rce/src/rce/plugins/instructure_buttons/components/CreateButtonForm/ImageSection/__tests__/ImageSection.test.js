@@ -163,11 +163,12 @@ describe('ImageSection', () => {
     let rendered
 
     beforeEach(() => {
-      ENV.FEATURES.buttons_and_icons_cropper = false
-
       fetchMock.mock('/api/session', '{}')
 
-      rendered = subject({editor: new FakeEditor()})
+      rendered = subject({
+        editor: new FakeEditor(),
+        rcsConfig: {features: {buttons_and_icons_cropper: false}}
+      })
       fireEvent.click(rendered.getByText('Add Image'))
     })
 
@@ -193,11 +194,12 @@ describe('ImageSection', () => {
     let rendered
 
     beforeEach(() => {
-      ENV.FEATURES.buttons_and_icons_cropper = true
-
       fetchMock.mock('/api/session', '{}')
 
-      rendered = subject({editor: new FakeEditor()})
+      rendered = subject({
+        editor: new FakeEditor(),
+        rcsConfig: {features: {buttons_and_icons_cropper: true}}
+      })
 
       fireEvent.click(rendered.getByText('Add Image'))
       fireEvent.click(rendered.getByText('Upload Image'))
@@ -227,9 +229,7 @@ describe('ImageSection', () => {
     let getByTestId, getByText, getByTitle
 
     beforeEach(() => {
-      ENV.FEATURES.buttons_and_icons_cropper = true
-
-      const rendered = subject()
+      const rendered = subject({rcsConfig: {features: {buttons_and_icons_cropper: true}}})
 
       getByTestId = rendered.getByTestId
       getByText = rendered.getByText

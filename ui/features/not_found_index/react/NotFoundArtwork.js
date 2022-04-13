@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 
 import {View} from '@instructure/ui-view'
@@ -25,7 +25,7 @@ import {Text} from '@instructure/ui-text'
 
 import SVGWrapper from '@canvas/svg-wrapper'
 
-const I18n = useI18nScope('not_found_index');
+const I18n = useI18nScope('not_found_index')
 
 const NotFoundArtwork = () => (
   <div className="not_found_page_artwork">

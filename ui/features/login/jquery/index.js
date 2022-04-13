@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
 import signupDialog from '@canvas/signup-dialog'
@@ -25,7 +25,7 @@ import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit, getFormData
 import '@canvas/loading-image'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('pseudonyms.login');
+const I18n = useI18nScope('pseudonyms.login')
 
 $('#coenrollment_link').click(function(event) {
   event.preventDefault()

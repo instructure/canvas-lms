@@ -51,6 +51,9 @@ const locale = {
   "announcement_list_da155734": { "message": "قائمة الإعلانات" },
   "announcements_a4b8ed4a": { "message": "الإعلانات" },
   "apply_781a2546": { "message": "تطبيق" },
+  "apply_changes_to_all_instances_of_this_icon_maker__2642f466": {
+    "message": "تطبيق التغييرات على كافة مثيلات أيقونة صانع الأيقونات هذه في المساق"
+  },
   "apps_54d24a47": { "message": "التطبيق" },
   "arrows_464a3e54": { "message": "الأسهم" },
   "art_icon_8e1daad": { "message": "أيقونة الفنون" },
@@ -71,7 +74,10 @@ const locale = {
   "available_folders_694d0436": { "message": "المجلدات المتاحة" },
   "basic_554cdc0a": { "message": "أساسي" },
   "below_81d4dceb": { "message": "الأسفل" },
+  "black_4cb01371": { "message": "أسود" },
+  "blue_daf8fea9": { "message": "أزرق" },
   "bottom_third_5f5fec1d": { "message": "الثالث من الأسفل" },
+  "brick_f2656265": { "message": "قرميد" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "إلغاء" },
   "choose_caption_file_9c45bc4e": { "message": "اختر ملف تسميات توضيحية" },
@@ -128,14 +134,20 @@ const locale = {
   "course_links_b56959b9": { "message": "روابط المساق" },
   "course_media_ec759ad": { "message": "وسائط المساق" },
   "course_navigation_dd035109": { "message": "التنقل عبر المساق" },
+  "create_icon_110d6463": { "message": "إنشاء أيقونة" },
+  "create_icon_maker_icon_c716bffe": {
+    "message": "إنشاء أيقونة صانع الأيقونات"
+  },
   "creative_commons_license_725584ae": { "message": "ترخيص المشاع الإبداعي:" },
   "crop_image_41bf940c": { "message": "قص الصورة" },
   "crop_image_807ebb08": { "message": "قص صورة" },
   "current_image_f16c249c": { "message": "الصورة الحالية" },
   "custom_6979cd81": { "message": "مخصص" },
+  "cyan_c1d5f68a": { "message": "سماوي" },
   "date_added_ed5ad465": { "message": "تاريخ الإضافة" },
   "decorative_image_3c28aa7d": { "message": "صورة تزيين" },
   "decrease_indent_de6343ab": { "message": "تقليل المسافة البادئة" },
+  "deep_purple_bb3e2907": { "message": "أرجواني داكن" },
   "default_bulleted_unordered_list_47079da8": {
     "message": "قائمة افتراضية غير مرتبة بتعداد نقطي"
   },
@@ -229,6 +241,8 @@ const locale = {
   },
   "grades_a61eba0a": { "message": "الدرجات" },
   "greek_65c5b3f7": { "message": "اليونانية" },
+  "green_15af4778": { "message": "أخضر" },
+  "grey_a55dceff": { "message": "رمادي" },
   "group_documents_8bfd6ae6": { "message": "مستندات المجموعة" },
   "group_files_4324f3df": { "message": "ملفات المجموعة" },
   "group_files_82e5dcdb": { "message": "ملفات المجموعة" },
@@ -252,6 +266,11 @@ const locale = {
   },
   "i_hold_the_copyright_71ee91b1": { "message": "أمتلك حق النشر" },
   "icon_color_b86dd6d6": { "message": "لون الأيقونة" },
+  "icon_maker_icons_cc560f7e": { "message": "أيقونات صانع الأيقونات" },
+  "icon_outline_e978dc0c": { "message": "إطار الأيقونة" },
+  "icon_outline_size_33f39b86": { "message": "حجم إطار الأيقونة" },
+  "icon_shape_30b61e7": { "message": "شكل الأيقونة" },
+  "icon_size_9353edea": { "message": "حجم الأيقونة" },
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "إن لم تحدد الآن حقوق الاستخدام، فسيتم إلغاء نشر هذا الملف بعد تحميله."
   },
@@ -261,6 +280,7 @@ const locale = {
   "image_to_crop_3a34487d": { "message": "الصور المراد قصها" },
   "images_7ce26570": { "message": "الصور" },
   "increase_indent_6d550a4a": { "message": "زيادة المسافة البادئة" },
+  "indigo_2035fc55": { "message": "نيلي" },
   "insert_593145ef": { "message": "إدخال" },
   "insert_equella_links_49a8dacd": { "message": "إدراج ارتباطات Equella" },
   "insert_link_6dc23cae": { "message": "إدراج ارتباط" },
@@ -274,6 +294,7 @@ const locale = {
   "large_9c5e80e7": { "message": "كبير" },
   "left_to_right_e9b4fd06": { "message": "‏‏من اليسار إلى اليمين" },
   "library_icon_ae1e54cf": { "message": "أيقونة المكتبة" },
+  "light_blue_5374f600": { "message": "أزرق فاتح" },
   "link_7262adec": { "message": "ارتباط" },
   "link_options_a16b758b": { "message": "خيارات الارتباط" },
   "links_14b70841": { "message": "الارتباطات" },
@@ -287,6 +308,7 @@ const locale = {
   "loading_please_wait_d276220a": { "message": "جارٍ التحميل، يرجى الانتظار" },
   "loading_preview_9f077aa1": { "message": "جارٍ تحميل المعاينة" },
   "locked_762f138b": { "message": "مؤمّن" },
+  "magenta_4a65993c": { "message": "ماجنتا" },
   "math_icon_ad4e9d03": { "message": "أيقونة الرياضيات" },
   "media_af190855": { "message": "الوسائط" },
   "medium_5a8e9ead": { "message": "متوسط" },
@@ -304,6 +326,7 @@ const locale = {
   },
   "my_files_2f621040": { "message": "ملفاتي" },
   "name_1aed4a1b": { "message": "الاسم" },
+  "name_color_ceec76ff": { "message": "{ name } ({ color })" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "تنقل من خلال القائمة أو شريط الأدوات"
   },
@@ -323,11 +346,13 @@ const locale = {
   "none_3b5e34d2": { "message": "بلا" },
   "none_selected_b93d56d2": { "message": "لم يتم تحديد شيء" },
   "octagon_e48be9f": { "message": "ثماني" },
+  "olive_6a3e4d6b": { "message": "زيتي" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "افتح مربع حوار اختصارات لوحة المفاتيح هذا"
   },
   "open_title_application_fd624fc5": { "message": "فتح تطبيق { title }" },
   "operators_a2ef9a93": { "message": "المشغلون" },
+  "orange_81386a62": { "message": "برتقالي" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "القوائم المرتبة وغير المرتبة"
   },
@@ -347,6 +372,7 @@ const locale = {
   },
   "performing_arts_icon_f3497486": { "message": "أيقونة الفنون التعبيرية" },
   "physical_education_icon_d7dffd3e": { "message": "أيقونة التربية البدنية" },
+  "pink_68ad45cb": { "message": "وردي" },
   "pixels_52ece7d1": { "message": "بكسل" },
   "posted_when_a578f5ab": { "message": "المنشور: { when }" },
   "preformatted_d0670862": { "message": "منسق مسبقًا" },
@@ -360,10 +386,13 @@ const locale = {
   },
   "published_c944a23d": { "message": "تم النشر" },
   "published_when_302d8e23": { "message": "تاريخ النشر: { when }" },
+  "pumpkin_904428d5": { "message": "يقطين" },
+  "purple_7678a9fc": { "message": "أرجواني" },
   "quizzes_7e598f57": { "message": "الاختبارات الموجزة" },
   "raw_html_editor_e3993e41": { "message": "محرر HTML الأولي" },
   "record_7c9448b": { "message": "تسجيل" },
   "record_upload_media_5fdce166": { "message": "تسجيل/تحميل الوسائط" },
+  "red_8258edf3": { "message": "أحمر" },
   "relationships_6602af70": { "message": "العلاقات" },
   "religion_icon_246e0be1": { "message": "أيقونة الدين" },
   "remove_link_d1f2f4d0": { "message": "إزالة الارتباط" },
@@ -375,6 +404,9 @@ const locale = {
     "message": "للأسف، محرر HTML الأنيق لا يمكن الوصول إليه من خلال لوحة المفاتيح. قم بالوصول إلى محرر HTML الأنيق من هنا."
   },
   "save_11a80ec3": { "message": "حفظ" },
+  "saved_icon_maker_icons_df86e2a1": {
+    "message": "تم حفظ أيقونة صانع الأيقونات"
+  },
   "search_280d00bd": { "message": "بحث" },
   "search_term_b2d2235": { "message": "مصطلح البحث" },
   "select_crop_shape_d441feeb": { "message": "حدد قص شكل" },
@@ -388,6 +420,7 @@ const locale = {
   "show_link_options_545338fd": { "message": "إظهار خيارات الارتباطات" },
   "show_video_options_6ed3721a": { "message": "إظهار خيارات الفيديو" },
   "single_color_image_4e5d4dbc": { "message": "صورة بلون واحد" },
+  "single_color_image_color_95fa9a87": { "message": "لون صورة بلون واحد" },
   "size_b30e1077": { "message": "الحجم" },
   "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
     "message": "حجم ملف التسمية التوضيحية يتجاوز الحد الأقصى المسموح به من { max } كيلوبايت."
@@ -411,6 +444,7 @@ const locale = {
   "square_511eb3b3": { "message": "مربع" },
   "square_unordered_list_b15ce93b": { "message": "قائمة مربعة غير مرتبة" },
   "star_8d156e09": { "message": "نجمة" },
+  "steel_blue_14296f08": { "message": "أزرق فولاذي" },
   "styles_2aa721ef": { "message": "الأنماط" },
   "submit_a3cc6859": { "message": "إرسال" },
   "subscript_59744f96": { "message": "منخفض" },
@@ -424,6 +458,7 @@ const locale = {
   },
   "syllabus_f191f65b": { "message": "المناهج" },
   "tab_arrows_4cf5abfc": { "message": "ضغط/أسهم" },
+  "teal_f729a294": { "message": "أزرق مخضر" },
   "text_7f4593da": { "message": "نص" },
   "text_background_color_16e61c3f": { "message": "لون خلفية النص" },
   "text_color_acf75eb6": { "message": "لون النص" },
@@ -524,6 +559,7 @@ const locale = {
     "message": "عرض الألوان المحددة مسبقًا"
   },
   "view_title_description_67940918": { "message": "عرض وصف { title }" },
+  "white_87fa64fd": { "message": "أبيض" },
   "width_492fec76": { "message": "العرض" },
   "width_and_height_must_be_numbers_110ab2e3": {
     "message": "يجب أن يكون العرض والارتفاع أرقاماً"

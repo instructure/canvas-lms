@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {AssignmentSingleAvailabilityWindow} from '../AssignmentSingleAvailabilityWindow/AssignmentSingleAvailabilityWindow'
 import {AssignmentMultipleAvailabilityWindows} from '../AssignmentMultipleAvailabilityWindows/AssignmentMultipleAvailabilityWindows'
@@ -25,7 +25,7 @@ import React, {useState} from 'react'
 import {TrayDisplayer} from '../TrayDisplayer/TrayDisplayer'
 import {DueDateTray} from '../DueDateTray/DueDateTray'
 
-const I18n = useI18nScope('discussion_posts');
+const I18n = useI18nScope('discussion_posts')
 
 export function AssignmentAvailabilityContainer({...props}) {
   const [dueDateTrayOpen, setDueDateTrayOpen] = useState(false)

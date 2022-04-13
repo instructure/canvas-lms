@@ -165,31 +165,6 @@ describe('DiscussionsIsolatedView', () => {
     await waitFor(() => expect(container.queryByTestId('go-to-reply')).toBeNull())
   })
 
-  it('should open isolated view when go to reply button is clicked', async () => {
-    const mocks = [
-      ...getDiscussionQueryMock(),
-      ...getDiscussionQueryMock({searchTerm: 'parent', rootEntries: false}),
-      ...getDiscussionSubentriesQueryMock({
-        includeRelativeEntry: false,
-        last: 5
-      }),
-      ...getDiscussionSubentriesQueryMock({
-        beforeRelativeEntry: false,
-        first: 0,
-        includeRelativeEntry: false
-      })
-    ]
-    const container = setup(mocks)
-    await waitFor(() => expect(container.queryByTestId('isolated-view-container')).toBeNull())
-    fireEvent.change(await container.findByTestId('search-filter'), {
-      target: {value: 'parent'}
-    })
-    const goToReply = await container.findByTestId('go-to-reply')
-    fireEvent.click(goToReply)
-
-    expect(await container.findByTestId('isolated-view-container')).toBeInTheDocument()
-  })
-
   it('should show reply button in isolated view when search term is present', async () => {
     const mocks = [
       ...getDiscussionQueryMock(),

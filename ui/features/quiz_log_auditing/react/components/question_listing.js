@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {Link} from 'react-router-dom'
 import {IconArrowStartLine} from '@instructure/ui-icons'
 
-const I18n = useI18nScope('quiz_log_auditing.navigation');
+const I18n = useI18nScope('quiz_log_auditing.navigation')
 
 class QuestionListing extends React.Component {
   static defaultProps = {

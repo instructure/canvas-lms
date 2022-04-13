@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
@@ -25,7 +25,7 @@ import {Img} from '@instructure/ui-img'
 
 import EmptyDashPandaUrl from '../images/empty-dashboard.svg'
 
-const I18n = useI18nScope('k5_empty_dashboard_state');
+const I18n = useI18nScope('k5_empty_dashboard_state')
 
 const EmptyDashboardState = () => (
   <Flex

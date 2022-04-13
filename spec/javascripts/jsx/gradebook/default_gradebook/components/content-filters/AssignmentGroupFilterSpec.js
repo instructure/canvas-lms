@@ -19,7 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 
-import AssignmentGroupFilter from 'ui/features/gradebook/react/default_gradebook/components/content-filters/AssignmentGroupFilter.js'
+import AssignmentGroupFilter from 'ui/features/gradebook/react/default_gradebook/components/content-filters/AssignmentGroupFilter'
 import ContentFilterDriver from './ContentFilterDriver'
 
 QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () => {
@@ -34,7 +34,10 @@ QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () 
 
       props = {
         disabled: false,
-        assignmentGroups: [{id: '2201', name: 'In-Class'}, {id: '2202', name: 'Homework'}],
+        assignmentGroups: [
+          {id: '2201', name: 'In-Class'},
+          {id: '2202', name: 'Homework'}
+        ],
         onSelect: sinon.stub(),
         selectedAssignmentGroupId: '0'
       }

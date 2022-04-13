@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit */
 import 'jqueryui/progressbar'
 
-const I18n = useI18nScope('content_exports');
+const I18n = useI18nScope('content_exports')
 
 $(document).ready(function(event) {
   let state = 'nothing'

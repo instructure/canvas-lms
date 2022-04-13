@@ -17,7 +17,7 @@
 //
 
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
 import Outcome from '@canvas/outcomes/backbone/models/Outcome.coffee'
 import OutcomeGroup from '@canvas/outcomes/backbone/models/OutcomeGroup.coffee'
@@ -30,7 +30,7 @@ import noOutcomesWarning from '../../jst/noOutcomesWarning.handlebars'
 import DefaultUrlMixin from '@canvas/backbone/DefaultUrlMixin'
 import {subscribe} from 'jquery-tinypubsub'
 
-const I18n = useI18nScope('contentview');
+const I18n = useI18nScope('contentview')
 
 // This view is a wrapper for showing details for outcomes and groups.
 // It uses OutcomeView and OutcomeGroupView to render

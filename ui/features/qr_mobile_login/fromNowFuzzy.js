@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('fromNowFuzzy');
+const I18n = useI18nScope('fromNowFuzzy')
 
 const TIME_UNITS = Object.freeze([
   1000, // msec in a second

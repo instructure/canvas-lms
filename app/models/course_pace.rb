@@ -205,17 +205,42 @@ class CoursePace < ActiveRecord::Base
       end
   end
 
-  def start_date
+  def start_date(with_context: false)
+    valid_date_range = CourseDateRange.new(course)
     student_enrollment = course.student_enrollments.find_by(user_id: user_id) if user_id
 
-    # always put course pace dates in the course time zone
-    Time.at(
-      (
-        student_enrollment&.start_at || course_section&.start_at || course.start_at ||
-          course.enrollment_term&.start_at ||
-          course.created_at
-      ).to_i,
-      in: course.time_zone
-    ).to_date
+    # always put pace plan dates in the course time zone
+    date = student_enrollment&.start_at || course_section&.start_at || valid_date_range.start_at[:date]
+    date = Time.at(date.to_time.to_i, in: course.time_zone).to_date if date
+    today = Time.at(Time.now.to_i, in: course.time_zone).to_date
+
+    if with_context
+      if date
+        context = (student_enrollment && "user") || (course_section&.start_at && "section") || (date && valid_date_range.start_at[:date_context])
+      else
+        date = today
+        context = "hypothetical"
+      end
+      { start_date: date, start_date_context: context }
+    else
+      date || today
+    end
+  end
+
+  def end_date(with_context: false)
+    valid_date_range = CourseDateRange.new(course)
+    date = (hard_end_dates && self[:end_date]) || valid_date_range.end_at[:date]
+    date = Time.at(date.to_time.to_i, in: course.time_zone).to_date if date
+
+    if with_context
+      context = if date
+                  hard_end_dates ? "hard" : valid_date_range.end_at[:date_context]
+                else
+                  "hypothetical"
+                end
+      { end_date: date, end_date_context: context }
+    else
+      date
+    end
   end
 end

@@ -69,6 +69,7 @@ beforeEach(() => {
       resp.data = {
         id: '10',
         display_name: 'bad_luck_brian.png',
+        filename: 'bad_luck_brian.png',
         created_at: '2019-05-14T18:14:05Z',
         updated_at: '2019-08-14T22:26:07Z',
         user: {
@@ -82,6 +83,7 @@ beforeEach(() => {
       resp.data = {
         id: '11',
         display_name: 'www.creedthoughts.gov.www/creedthoughts',
+        filename: 'creedthoughts.png',
         created_at: '2019-05-14T20:00:00Z',
         updated_at: '2019-08-14T22:00:00Z',
         user: {
@@ -168,6 +170,56 @@ describe('MoreOptions', () => {
 
       const fileSelect = await findByTestId('upload-file-modal')
       expect(fileSelect).toContainElement((await findAllByText('dank memes'))[0])
+      expect(fileSelect).toContainElement(
+        (await findAllByText('www.creedthoughts.gov.www/creedthoughts'))[0]
+      )
+    }, 10000)
+
+    it('filters out files with disallowed extensions when allowedExtensions is provided', async () => {
+      const mocks = await createGraphqlMocks()
+      const {findAllByText, findByRole, findByTestId, queryByText} = render(
+        <MockedProvider mocks={mocks}>
+          <MoreOptions
+            assignmentID="1"
+            courseID="1"
+            userID="1"
+            handleCanvasFiles={handleCanvasFiles}
+            allowedExtensions={['doc']}
+          />
+        </MockedProvider>
+      )
+      const canvasFilesButton = await findByRole('button', {name: /Files/})
+      fireEvent.click(canvasFilesButton)
+
+      const myFilesButton = (await findAllByText('my files'))[0]
+      fireEvent.click(myFilesButton)
+
+      const fileSelect = await findByTestId('upload-file-modal')
+      expect(fileSelect).not.toContainElement(
+        queryByText('www.creedthoughts.gov.www/creedthoughts')
+      )
+    }, 10000)
+
+    it('includes files with allowed extensions when allowedExtensions is provided', async () => {
+      const mocks = await createGraphqlMocks()
+      const {findAllByText, findByRole, findByTestId} = render(
+        <MockedProvider mocks={mocks}>
+          <MoreOptions
+            assignmentID="1"
+            courseID="1"
+            userID="1"
+            handleCanvasFiles={handleCanvasFiles}
+            allowedExtensions={['png']}
+          />
+        </MockedProvider>
+      )
+      const canvasFilesButton = await findByRole('button', {name: /Files/})
+      fireEvent.click(canvasFilesButton)
+
+      const myFilesButton = (await findAllByText('my files'))[0]
+      fireEvent.click(myFilesButton)
+
+      const fileSelect = await findByTestId('upload-file-modal')
       expect(fileSelect).toContainElement(
         (await findAllByText('www.creedthoughts.gov.www/creedthoughts'))[0]
       )

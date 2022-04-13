@@ -199,7 +199,7 @@ describe "Importing modules" do
 
     # new items are appended to the end
     expect(mod.reload.content_tags.pluck(:position)).to eq([1, 2, 3, 4])
-    expect(mod.content_tags.pluck(:title)).to eq(%w[cats dogs pigs frogs])
+    expect(mod.content_tags.pluck(:title)).to eq(%w[cats frogs dogs pigs])
   end
 
   it "includes link_settings in lti module items" do
@@ -228,7 +228,7 @@ describe "Importing modules" do
     expect(tag.link_settings).to eq link_settings.stringify_keys
   end
 
-  it "maintains the positions of the manually created module items" do
+  it "moves manually created module items above all synced module items" do
     module_data = {
       migration_id: "M",
       title: "Module 1",
@@ -245,6 +245,8 @@ describe "Importing modules" do
     Importers::ContextModuleImporter.import_from_migration(module_data, @course, migration)
     # manually created item
     mod.content_tags.create!(context: @course, tag_type: "context_module", content_type: "ContextModuleSubHeader", position: 1, title: "dogs", migration_id: nil)
+    mod.content_tags.create!(context: @course, tag_type: "context_module", content_type: "ContextModuleSubHeader", position: 2, title: "birds", migration_id: nil)
+    mod.content_tags.create!(context: @course, tag_type: "context_module", content_type: "ContextModuleSubHeader", position: 3, title: "pigs", migration_id: nil)
 
     new_item = {
       item_migration_id: "ifrogs",
@@ -255,7 +257,7 @@ describe "Importing modules" do
     module_data[:items] << new_item
     Importers::ContextModuleImporter.import_from_migration(module_data, @course, migration)
 
-    expect(mod.reload.content_tags.pluck(:position)).to eq([1, 2, 3])
-    expect(mod.content_tags.pluck(:title)).to eq(%w[dogs cats frogs])
+    expect(mod.reload.content_tags.pluck(:position)).to eq([1, 2, 3, 4, 5])
+    expect(mod.content_tags.pluck(:title)).to eq(%w[dogs birds pigs cats frogs])
   end
 end

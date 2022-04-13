@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import $ from 'jquery'
 import _ from 'underscore'
@@ -28,7 +28,7 @@ import OutcomeCollection from '@canvas/outcomes/backbone/collections/OutcomeColl
 import OutcomeGroupCollection from '../collections/OutcomeGroupCollection.coffee'
 import '@canvas/jquery/jquery.disableWhileLoading'
 
-const I18n = useI18nScope('outcomesFindDirectoryVew');
+const I18n = useI18nScope('outcomesFindDirectoryVew')
 
 // Used in the FindDialog.
 export default class FindDirectoryView extends OutcomesDirectoryView {

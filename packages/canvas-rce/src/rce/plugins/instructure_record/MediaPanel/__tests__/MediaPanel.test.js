@@ -90,6 +90,30 @@ describe('RCE "Media" Plugin > MediaPanel', () => {
     expect(getByText('file2')).toBeInTheDocument()
   })
 
+  describe('when there is a pending media file', () => {
+    let filesObj
+
+    beforeEach(() => {
+      filesObj = makeFiles()
+      filesObj.files.push({
+        id: 3,
+        filename: `3.mp4`,
+        content_type: 'video/mp4',
+        display_name: `pending file`,
+        href: `http://the.net/3`,
+        date: `2019-05-25T13:03:00Z`,
+        media_entry_id: 'maybe'
+      })
+    })
+
+    it.only('shows a "pending" message for the file', () => {
+      const {getByText} = renderComponent(getPanelProps('course', filesObj))
+      expect(getByText('pending file').parentElement.parentElement.outerHTML).toContain(
+        'Media file is processing. Please try again later.'
+      )
+    })
+  })
+
   it('renders load more button if there is more', () => {
     const {getByText} = renderComponent(
       getPanelProps('course', makeFiles({hasMore: true, bookmark: 'next.docs'}))

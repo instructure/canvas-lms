@@ -17,7 +17,7 @@
  */
 
 import INST from 'browser-sniffer'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import Pseudonym from '@canvas/pseudonyms/backbone/models/Pseudonym.coffee'
 import AvatarWidget from '@canvas/avatar-dialog-view'
@@ -32,7 +32,7 @@ import '@canvas/util/templateData'
 import 'jqueryui/sortable'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('profile');
+const I18n = useI18nScope('profile')
 
 const $edit_settings_link = $('.edit_settings_link')
 

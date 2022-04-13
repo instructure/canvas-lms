@@ -38,9 +38,23 @@ class BrandConfig < ActiveRecord::Base
 
   after_save :clear_cache
 
-  belongs_to :parent, class_name: "BrandConfig", foreign_key: "parent_md5"
   has_many :accounts, foreign_key: "brand_config_md5"
   has_many :shared_brand_configs, foreign_key: "brand_config_md5"
+
+  # belongs_to :parent, class_name: "BrandConfig", foreign_key: "parent_md5"
+  def parent
+    return nil unless parent_md5
+
+    BrandConfig.shard(parent_shard).find_by(md5: local_parent_md5)
+  end
+
+  def parent_shard
+    parent_md5.include?("~") ? Shard.lookup(parent_md5.split("~")[0].to_i) : shard
+  end
+
+  def local_parent_md5
+    parent_md5.split("~").last
+  end
 
   def self.for(attrs)
     attrs = attrs.with_indifferent_access.slice(*ATTRS_TO_INCLUDE_IN_MD5)
@@ -65,9 +79,9 @@ class BrandConfig < ActiveRecord::Base
     ["brand_configs", shard_id, md5].cache_key
   end
 
-  def self.find_cached_by_md5(md5)
-    MultiCache.fetch(cache_key_for_md5(Shard.current.id, md5)) do
-      BrandConfig.where(md5: md5).take
+  def self.find_cached_by_md5(shard_id, md5)
+    MultiCache.fetch(cache_key_for_md5(shard_id, md5)) do
+      BrandConfig.shard(Shard.lookup(shard_id)).find_by(md5: md5)
     end
   end
 
@@ -108,9 +122,13 @@ class BrandConfig < ActiveRecord::Base
     @ancestor_configs ||= [self] + (parent && parent.chain_of_ancestor_configs).to_a
   end
 
-  def clone_with_new_parent(new_parent_md5)
+  def clone_with_new_parent(new_parent)
     attrs = attributes.with_indifferent_access.slice(*BrandConfig::ATTRS_TO_INCLUDE_IN_MD5)
-    attrs[:parent_md5] = new_parent_md5
+    attrs[:parent_md5] = if new_parent
+                           new_parent.shard.id == shard.id ? new_parent.md5 : "#{new_parent.shard.id}~#{new_parent.md5}"
+                         else
+                           nil
+                         end
     BrandConfig.for(attrs)
   end
 

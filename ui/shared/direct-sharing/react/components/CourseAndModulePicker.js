@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import React, {useRef} from 'react'
 import {func, string, bool} from 'prop-types'
@@ -24,12 +24,15 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 
-import useManagedCourseSearchApi from '../effects/useManagedCourseSearchApi'
+import SearchItemSelector from '@canvas/search-item-selector/react/SearchItemSelector'
+import useManagedCourseSearchApi, {
+  MINIMUM_SEARCH_LENGTH,
+  isSearchableTerm
+} from '../effects/useManagedCourseSearchApi'
 import useModuleCourseSearchApi from '../effects/useModuleCourseSearchApi'
-import SearchItemSelector from './SearchItemSelector'
 import ModulePositionPicker from './ModulePositionPicker'
 
-const I18n = useI18nScope('course_and_module_picker');
+const I18n = useI18nScope('course_and_module_picker')
 
 CourseAndModulePicker.propTypes = {
   selectedCourseId: string,
@@ -65,6 +68,8 @@ export default function CourseAndModulePicker({
           itemSearchFunction={useManagedCourseSearchApi}
           additionalParams={{include: includeConcluded ? 'concluded' : ''}}
           mountNodeRef={trayRef}
+          minimumSearchLength={MINIMUM_SEARCH_LENGTH}
+          isSearchableTerm={isSearchableTerm}
           renderOption={item => {
             return (
               <View>
@@ -94,6 +99,8 @@ export default function CourseAndModulePicker({
             itemSearchFunction={useModuleCourseSearchApi}
             contextId={selectedCourseId || null}
             mountNodeRef={trayRef}
+            minimumSearchLength={MINIMUM_SEARCH_LENGTH}
+            isSearchableTerm={isSearchableTerm}
             renderOption={item => {
               return (
                 <View>

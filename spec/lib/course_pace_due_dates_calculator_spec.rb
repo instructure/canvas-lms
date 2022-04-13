@@ -21,7 +21,7 @@
 describe CoursePaceDueDatesCalculator do
   before :once do
     course_with_student active_all: true
-    @course.update start_at: "2021-09-01"
+    @course.update start_at: "2021-09-01", restrict_enrollments_to_course_dates: true
     @module = @course.context_modules.create!
     @assignment = @course.assignments.create!
     @tag = @assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"

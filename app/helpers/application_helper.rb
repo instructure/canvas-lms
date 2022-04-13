@@ -776,7 +776,8 @@ module ApplicationHelper
         # to start from a blank slate.
         brand_config =
           if session.key?(:brand_config_md5)
-            BrandConfig.where(md5: session[:brand_config_md5]).first
+            BrandConfig.shard(@domain_root_account.account_chain(include_site_admin: true).pluck(:shard).uniq)
+                       .where(md5: session[:brand_config_md5]).first
           else
             account = brand_config_account(opts)
             if opts[:ignore_parents]

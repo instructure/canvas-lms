@@ -458,6 +458,7 @@ describe "context modules" do
     end
 
     it "publishes a file from the modules page", priority: "1" do
+      skip("LS-3063 -- this one is failing when it tries to find the Published value sometimes")
       @module = @course.context_modules.create!(name: "some module")
       @file = @course.attachments.create!(display_name: "some file", uploaded_data: default_uploaded_data, locked: true)
       @tag = @module.add_item({ id: @file.id, type: "attachment" })

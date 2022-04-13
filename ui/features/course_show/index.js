@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import htmlEscape from 'html-escape'
 import './react/show'
 import '@canvas/jquery/jquery.ajaxJSON'
@@ -27,7 +27,7 @@ import '@canvas/loading-image'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import './jquery/behaviors/openAsDialog'
 
-const I18n = useI18nScope('courses.show');
+const I18n = useI18nScope('courses.show')
 
 $(document).ready(() => {
   const $selfUnenrollmentDialog = $('#self_unenrollment_dialog')

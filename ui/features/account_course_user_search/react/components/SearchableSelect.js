@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState, useEffect} from 'react'
 import {bool, func, node, oneOfType, string} from 'prop-types'
 import {Select} from '@instructure/ui-select'
@@ -24,7 +24,7 @@ import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
 import {uid} from '@instructure/uid'
 
-const I18n = useI18nScope('managed_course_selector');
+const I18n = useI18nScope('managed_course_selector')
 
 const NO_OPTIONS_OPTION_ID = '___noOptionsOption__'
 const liveRegion = () => document.getElementById('flash_screenreader_holder')

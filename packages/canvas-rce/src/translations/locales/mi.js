@@ -52,6 +52,7 @@ const locale = {
   "apply_781a2546": { "message": "Tono" },
   "apps_54d24a47": { "message": "Tono" },
   "arrows_464a3e54": { "message": "Pere" },
+  "art_icon_8e1daad": { "message": "Toi Tohu" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "E tiaki i Hau aronga"
   },
@@ -83,6 +84,7 @@ const locale = {
     "message": "Porohitatia te rārangi kore"
   },
   "clear_2084585f": { "message": "Ūkui" },
+  "clear_image_3213fe62": { "message": "Maamaa whakaahua" },
   "clear_selected_file_82388e50": {
     "message": "Whakawātea kōnae kua tīpakohia"
   },
@@ -140,6 +142,7 @@ const locale = {
   "course_media_ec759ad": { "message": "Akoranga Pāpāho" },
   "course_navigation_dd035109": { "message": "Whakaterenga Akoranga" },
   "creative_commons_license_725584ae": { "message": "Auaha ngā Raihana Noa:" },
+  "crop_image_41bf940c": { "message": "Whakatipu whakaahua" },
   "crop_image_807ebb08": { "message": "Tapahi Whakaahua" },
   "current_image_f16c249c": { "message": "Whakapakoko o Nāianei" },
   "custom_6979cd81": { "message": "Tikanga" },
@@ -191,6 +194,8 @@ const locale = {
   "embed_image_1080badc": { "message": "Tāmau Āhua" },
   "embed_video_a97a64af": { "message": "Whakauru Ataata" },
   "embedded_content_aaeb4d3d": { "message": "ihirangi tāmau" },
+  "engineering_icon_f8f3cf43": { "message": "Hangarau Tohu" },
+  "english_icon_25bfe845": { "message": "Ingarihi Tohu" },
   "enter_at_least_3_characters_to_search_4f037ee0": {
     "message": "Pātō ki iti ake i te 3 pūāhua hei rapu"
   },
@@ -206,6 +211,7 @@ const locale = {
   "external_tools_6e77821": { "message": "Taputapu o waho" },
   "extra_large_b6cdf1ff": { "message": "Nui rawa atu" },
   "extra_small_9ae33252": { "message": "Tāpiri iti" },
+  "extracurricular_icon_67c8ca42": { "message": "Extracurricular Tohu" },
   "file_url_c12b64be": { "message": "Kōnae URL" },
   "filename_file_icon_602eb5de": { "message": "{ filename } kōnae icon" },
   "filename_image_preview_6cef8f26": { "message": "{ filename } āhua arokite" },
@@ -246,6 +252,7 @@ const locale = {
   "heading_2_5b84eed2": { "message": "Pane 2" },
   "heading_3_2c83de44": { "message": "Pane 3" },
   "heading_4_b2e74be7": { "message": "Pane 4" },
+  "health_icon_8d292eb5": { "message": "Hauora Tohu" },
   "height_69b03e15": { "message": "Teitei" },
   "hexagon_d8468e0d": { "message": "Tapaono" },
   "hide_description_bfb5502e": { "message": "Hunga taipitopito" },
@@ -259,6 +266,7 @@ const locale = {
     "message": "Kua whiwhi ahau whakāetanga ki te whakamahi i tēnei kōnae."
   },
   "i_hold_the_copyright_71ee91b1": { "message": "Mau ahau te manatārua" },
+  "icon_color_b86dd6d6": { "message": "Tohu Tae" },
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "Ki te kore koe e tīpako ngā mōtika whakamahi ināianei, kaore e whakaputaina tēnei kōnae i muri o ''te tukuake."
   },
@@ -280,8 +288,11 @@ const locale = {
   "invalid_file_type_881cc9b2": { "message": "Muhu kōnae momo" },
   "invalid_url_cbde79f": { "message": "URL muhu" },
   "keyboard_shortcuts_ed1844bd": { "message": "Pokatata papapātuhi" },
+  "language_arts_icon_a798b0f8": { "message": "Reo Toi Tohu" },
+  "languages_icon_9d20539": { "message": "Nga reo Tohu" },
   "large_9c5e80e7": { "message": "Nui" },
   "left_to_right_e9b4fd06": { "message": "Māui - ki te -Matau" },
+  "library_icon_ae1e54cf": { "message": "Whare Pukapuka Tohu" },
   "link_7262adec": { "message": "Hono" },
   "link_options_a16b758b": { "message": "Hono Kōwhiringa" },
   "links_14b70841": { "message": "Hononga" },
@@ -295,6 +306,7 @@ const locale = {
   "loading_please_wait_d276220a": { "message": "E Uta ana, tēnā koa tatari" },
   "loading_preview_9f077aa1": { "message": "Uta ana arokite" },
   "locked_762f138b": { "message": "Kua rakaina" },
+  "math_icon_ad4e9d03": { "message": "Math Tohu" },
   "media_af190855": { "message": "Pāpāho" },
   "medium_5a8e9ead": { "message": "Kauwaka" },
   "middle_27dc1d5": { "message": "Waenganui" },
@@ -302,6 +314,7 @@ const locale = {
   "miscellaneous_e9818229": { "message": "Momo kē" },
   "modules_c4325335": { "message": "Kōwae" },
   "multi_color_image_63d7372f": { "message": "Whakapakoko nui ngā Tae" },
+  "music_icon_4db5c972": { "message": "Puoro Tohu" },
   "must_be_at_least_percentage_22e373b6": {
     "message": "Me iti ake i te { percentage }%"
   },
@@ -351,6 +364,8 @@ const locale = {
   "percentage_must_be_a_number_8033c341": {
     "message": "Pai hēneti me nama anake"
   },
+  "performing_arts_icon_f3497486": { "message": "Performing Arts Tohu" },
+  "physical_education_icon_d7dffd3e": { "message": "Tinana Mātauranga Tohu" },
   "pixels_52ece7d1": { "message": "Ngā Pika" },
   "posted_when_a578f5ab": { "message": "I Whakairia: { when }" },
   "preformatted_d0670862": { "message": "Tuhinga o mua" },
@@ -369,6 +384,7 @@ const locale = {
   "record_7c9448b": { "message": "Tāhopu" },
   "record_upload_media_5fdce166": { "message": "Tāhopu/Kaweake Pāpāho" },
   "relationships_6602af70": { "message": "Ngā whanaungatanga" },
+  "religion_icon_246e0be1": { "message": "Whakapono Tohu" },
   "remove_link_d1f2f4d0": { "message": "Tango Hononga" },
   "resize_ec83d538": { "message": "Rahi anō" },
   "restore_auto_save_deccd84b": { "message": "Whakaora tiaki aunoa?" },
@@ -544,7 +560,9 @@ const locale = {
   "yes_dde87d5": { "message": "Ae" },
   "you_may_not_upload_an_empty_file_11c31eb2": {
     "message": "Kaore koe e taea te tikiake he kōnae kore"
-  }
+  },
+  "zoom_in_image_bb97d4f": { "message": "Topa mai whakaahua" },
+  "zoom_out_image_d0a0a2ec": { "message": "Topa ki waho whakaahua" }
 }
 
 

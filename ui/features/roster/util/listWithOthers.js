@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import h from 'html-escape'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 
-const I18n = useI18nScope('listWithOthers');
+const I18n = useI18nScope('listWithOthers')
 
 export default function listWithOthers(strings, cutoff = 2) {
   if (strings.length > cutoff) {

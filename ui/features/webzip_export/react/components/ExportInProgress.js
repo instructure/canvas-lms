@@ -19,9 +19,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import ApiProgressBar from '@canvas/progress/react/components/ApiProgressBar'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('webzip_exports');
+const I18n = useI18nScope('webzip_exports')
 
 class ExportInProgress extends React.Component {
   static propTypes = {

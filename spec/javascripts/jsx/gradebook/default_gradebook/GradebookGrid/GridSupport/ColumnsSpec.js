@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import slickgrid from 'slickgrid'
-import GridSupport from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/GridSupport/index.js'
+import GridSupport from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/GridSupport/index'
 import SlickGridSpecHelper from './SlickGridSpecHelper'
 
 const {Editors, Grid} = slickgrid
@@ -116,13 +116,19 @@ QUnit.module('GradebookGrid GridSupport Columns', suiteHooks => {
     test('includes the frozen columns', () => {
       createAndInitialize()
       const columns = gridSupport.columns.getColumns()
-      deepEqual(columns.frozen.map(column => column.id), ['column1', 'column2'])
+      deepEqual(
+        columns.frozen.map(column => column.id),
+        ['column1', 'column2']
+      )
     })
 
     test('includes the scrollable columns', () => {
       createAndInitialize()
       const columns = gridSupport.columns.getColumns()
-      deepEqual(columns.scrollable.map(column => column.id), ['column3', 'column4'])
+      deepEqual(
+        columns.scrollable.map(column => column.id),
+        ['column3', 'column4']
+      )
     })
   })
 
@@ -368,7 +374,10 @@ QUnit.module('GradebookGrid GridSupport Columns', suiteHooks => {
 
     test('updates the widths of multiple columns when the minimum width is surpassed', () => {
       resizeHeader('column4', -100)
-      deepEqual(resizedColumns.map(column => column.id), ['column3', 'column4'])
+      deepEqual(
+        resizedColumns.map(column => column.id),
+        ['column3', 'column4']
+      )
     })
 
     test('does not trigger onColumnsResized when column widths did not change', () => {

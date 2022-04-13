@@ -20,12 +20,12 @@ import React from 'react'
 import update from 'immutability-helper'
 import GradingPeriod from './gradingPeriod'
 import $ from 'jquery'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
 import {camelize} from 'convert-case'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 
-const I18n = useI18nScope('gradinggradingPeriodCollection');
+const I18n = useI18nScope('gradinggradingPeriodCollection')
 
 const periodsAreLoaded = state => state.periods !== null
 

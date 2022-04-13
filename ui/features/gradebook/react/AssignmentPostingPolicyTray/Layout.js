@@ -26,9 +26,9 @@ import {Text} from '@instructure/ui-text'
 import {List} from '@instructure/ui-list'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('assignment_posting_policy_tray');
+const I18n = useI18nScope('assignment_posting_policy_tray')
 
 const MANUAL_POST = 'manual'
 const AUTOMATIC_POST = 'auto'

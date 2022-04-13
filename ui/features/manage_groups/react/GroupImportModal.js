@@ -18,7 +18,7 @@
 
 import * as apiClient from './apiClient'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import ReactDOM from 'react-dom'
 import SVGWrapper from '@canvas/svg-wrapper'
@@ -31,7 +31,7 @@ import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('groups');
+const I18n = useI18nScope('groups')
 
 export default function ImportGroupsModal(props) {
   const [messages, setMessages] = useState([])

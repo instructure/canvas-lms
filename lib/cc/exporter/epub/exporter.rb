@@ -76,7 +76,7 @@ module CC::Exporter::Epub
       @filename_prefix ||= begin
         title = cartridge_json[:title] || ""
         name = CanvasTextHelper.truncate_text(title.path_safe, { max_length: 200, ellipsis: "" })
-        timestamp = Time.zone.now.strftime("%Y-%b-%d_%H-%M-%S")
+        timestamp = Time.zone.now.strftime("%Y-%b-%d_%H-%M-%S-%L")
         "#{name}-#{timestamp}"
       end
     end

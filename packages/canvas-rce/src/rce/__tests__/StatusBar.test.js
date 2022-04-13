@@ -125,29 +125,15 @@ describe('RCE StatusBar', () => {
       expect(onChangeView).toHaveBeenCalledWith(RAW_HTML_EDITOR_VIEW)
     })
 
-    it('a11y checker start with no notifications if flag is disabled', () => {
-      const props = defaultProps({
-        use_rce_a11y_checker_notifications: false
-      })
-      const {getByTitle} = renderStatusBar(props)
+    it('a11y checker start with no notifications', () => {
+      const {getByTitle} = renderStatusBar(defaultProps())
       const a11yButton = getByTitle('Accessibility Checker')
       const sibling = a11yButton.parentElement.children[1]
       expect(sibling.id.includes('Badge')).toBeFalsy()
     })
 
-    it('a11y checker start with no notifications if flag is enabled', () => {
+    it('a11y checker start set a notification count', () => {
       const props = defaultProps({
-        use_rce_a11y_checker_notifications: true
-      })
-      const {getByTitle} = renderStatusBar(props)
-      const a11yButton = getByTitle('Accessibility Checker')
-      const sibling = a11yButton.parentElement.children[1]
-      expect(sibling.id.includes('Badge')).toBeFalsy()
-    })
-
-    it('a11y checker start set a notification count if flag is enabled', () => {
-      const props = defaultProps({
-        use_rce_a11y_checker_notifications: true,
         a11yErrorsCount: 5
       })
       const {rerender, getByTitle} = renderStatusBar(props)
@@ -159,9 +145,8 @@ describe('RCE StatusBar', () => {
       expect(notificationBadge.textContent).toEqual('10')
     })
 
-    it('a11y checker set max notifications count if flag is enabled', () => {
+    it('a11y checker set max notifications count', () => {
       const props = defaultProps({
-        use_rce_a11y_checker_notifications: true,
         a11yErrorsCount: 999
       })
       const {getByTitle} = renderStatusBar(props)

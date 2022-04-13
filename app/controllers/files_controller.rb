@@ -481,6 +481,24 @@ class FilesController < ApplicationController
   #   "user":: the user who uploaded the file or last edited its content
   #   "usage_rights":: copyright and license information for the file (see UsageRights)
   #
+  # @argument replacement_chain_context_type [Optional, String]
+  #   When a user replaces a file during upload, Canvas keeps track of the "replacement chain."
+  #
+  #   Include this parameter if you wish Canvas to follow the replacement chain if the requested
+  #   file was deleted and replaced by another.
+  #
+  #   Must be set to 'course' or 'account'. The "replacement_chain_context_id" parameter must
+  #   also be included.
+  #
+  # @argument replacement_chain_context_id [Optional, Integer]
+  #   When a user replaces a file during upload, Canvas keeps track of the "replacement chain."
+  #
+  #   Include this parameter if you wish Canvas to follow the replacement chain if the requested
+  #   file was deleted and replaced by another.
+  #
+  #   Indicates the context ID Canvas should use when following the "replacement chain." The
+  #   "replacement_chain_context_id" paraamter must also be included.
+  #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/files/<file_id>' \
@@ -492,7 +510,14 @@ class FilesController < ApplicationController
   # @returns File
   def api_show
     get_context
+
     @attachment = @context ? @context.attachments.not_deleted.find_by(id: params[:id]) : Attachment.not_deleted.find_by(id: params[:id])
+
+    if replacement_chain_context
+      replacement = attachment_or_replacement(replacement_chain_context, params[:id])
+      @attachment ||= replacement if replacement&.available?
+    end
+
     unless @attachment
       render json: { errors: [{ message: "The specified resource does not exist." }] }, status: :not_found
       return

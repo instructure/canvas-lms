@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {getFinalGradeOverrides, updateFinalGradeOverride} from '@canvas/grading/FinalGradeOverrideApi'
 import FinalGradeOverrideDatastore from './FinalGradeOverrideDatastore'
 
-const I18n = useI18nScope('gradebook');
+const I18n = useI18nScope('gradebook')
 
 export default class FinalGradeOverrides {
   constructor(gradebook) {

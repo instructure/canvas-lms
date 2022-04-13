@@ -105,6 +105,9 @@
   },
   "exciting_discussion_9f67bd0a": { "message": "Exciting discussion" },
   "excused_cf8792eb": { "message": "Excused" },
+  "failed_getting_course_list_49846a93": {
+    "message": "Failed getting module list"
+  },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "Failed peeking into your future"
   },

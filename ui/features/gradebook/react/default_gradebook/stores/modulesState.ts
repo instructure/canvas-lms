@@ -18,11 +18,11 @@
 
 import {GetState, SetState} from 'zustand'
 // @ts-ignore
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import type {Module} from '../gradebook.d'
 import type {GradebookStore} from './index'
 
-const I18n = useI18nScope('gradebook');
+const I18n = useI18nScope('gradebook')
 
 export type ModulesState = {
   modules: Module[]

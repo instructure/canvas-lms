@@ -107,21 +107,10 @@ describe('ExternalToolsHelper', () => {
       fakeEditor.editorContainer.innerHTML = ''
     })
 
-    it('shows button if there is no MRU', () => {
-      ExternalToolsHelper.showHideButtons(fakeEditor)
-
-      expect(button.getAttribute('aria-hidden')).toEqual('false')
-      expect(button.style.display).toEqual('flex')
-      expect(menuButton.getAttribute('aria-hidden')).toEqual('true')
-      expect(menuButton.style.display).toEqual('none')
-    })
-
     it('shows MRU button if there is an MRU', () => {
       window.localStorage.setItem('ltimru', 'anything')
       ExternalToolsHelper.showHideButtons(fakeEditor)
 
-      expect(button.getAttribute('aria-hidden')).toEqual('true')
-      expect(button.style.display).toEqual('none')
       expect(menuButton.getAttribute('aria-hidden')).toEqual('false')
       expect(menuButton.style.display).toEqual('flex')
     })

@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 
-const I18n = useI18nScope('feature_flags');
+const I18n = useI18nScope('feature_flags')
 
 export function buildTransitions(flag, allowsDefaults) {
   const ret = {}

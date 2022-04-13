@@ -17,10 +17,10 @@
  */
 
 import GradingTypes from './grading-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import numberHelper from '@canvas/i18n/numberHelper'
 
-const I18n = useI18nScope('cyoe_assignment_sidebar_score');
+const I18n = useI18nScope('cyoe_assignment_sidebar_score')
 
 // stack overflow suggests this implementation
 const isNumeric = n => {

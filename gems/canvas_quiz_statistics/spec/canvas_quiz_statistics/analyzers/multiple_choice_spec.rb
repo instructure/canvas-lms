@@ -66,7 +66,7 @@ describe CanvasQuizStatistics::Analyzers::MultipleChoice do
       end
 
       context "when missing" do
-        it "uses a stripped version of :html if present" do
+        it "uses a :html if present" do
           data = question_data.clone
           data[:answers][0].merge!({
                                      html: "<p>Hi.</p>",
@@ -74,7 +74,7 @@ describe CanvasQuizStatistics::Analyzers::MultipleChoice do
                                    })
 
           subject = described_class.new(data)
-          expect(subject.run([])[:answers][0][:text]).to eq("Hi.")
+          expect(subject.run([])[:answers][0][:text]).to eq("<p>Hi.</p>")
         end
 
         it "justs accept how things are, otherwise" do

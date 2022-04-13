@@ -23,13 +23,13 @@ import {Modal} from '@instructure/ui-modal'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {bool, func, shape, string} from 'prop-types'
 import React, {useState} from 'react'
 
 import numberHelper from '@canvas/i18n/numberHelper'
 
-const I18n = useI18nScope('gradebook');
+const I18n = useI18nScope('gradebook')
 
 const APPLY_TO_ALL = 'apply_to_all'
 const APPLY_TO_PAST_DUE = 'apply_to_only_past_due'

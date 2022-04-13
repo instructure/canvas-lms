@@ -92,6 +92,9 @@
     "apply_781a2546": {
         "message": "Applica"
     },
+    "apply_changes_to_all_instances_of_this_icon_maker__2642f466": {
+        "message": "Applica modifiche a tutte le istanze di questo produttore icone nel corso"
+    },
     "apps_54d24a47": {
         "message": "App"
     },
@@ -176,8 +179,17 @@
     "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
         "message": "Di seguito è riportato un esempio di come gli studenti vedranno il loro programma"
     },
+    "black_4cb01371": {
+        "message": "Nero"
+    },
+    "blue_daf8fea9": {
+        "message": "Blu"
+    },
     "bottom_third_5f5fec1d": {
         "message": "Terzo inferiore"
+    },
+    "brick_f2656265": {
+        "message": "Mattone"
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
@@ -317,6 +329,12 @@
     "course_to_do_bcbbab54": {
         "message": "{ course } COSE DA FARE"
     },
+    "create_icon_110d6463": {
+        "message": "Crea icona"
+    },
+    "create_icon_maker_icon_c716bffe": {
+        "message": "Crea icona produttore icone"
+    },
     "creative_commons_license_725584ae": {
         "message": "Licenza Creative Commons:"
     },
@@ -331,6 +349,9 @@
     },
     "custom_6979cd81": {
         "message": "Personalizzato"
+    },
+    "cyan_c1d5f68a": {
+        "message": "Ciano"
     },
     "date_added_ed5ad465": {
         "message": "Data aggiunta"
@@ -355,6 +376,9 @@
     },
     "decrease_indent_de6343ab": {
         "message": "Riduci rientro"
+    },
+    "deep_purple_bb3e2907": {
+        "message": "Viola scuro"
     },
     "default_bulleted_unordered_list_47079da8": {
         "message": "elenco non ordinato puntato predefinito"
@@ -641,6 +665,12 @@
     "greek_65c5b3f7": {
         "message": "Greco"
     },
+    "green_15af4778": {
+        "message": "Verde"
+    },
+    "grey_a55dceff": {
+        "message": "Grigio"
+    },
     "group_documents_8bfd6ae6": {
         "message": "Documenti di gruppo"
     },
@@ -704,6 +734,21 @@
     "icon_color_b86dd6d6": {
         "message": "Icona Colore"
     },
+    "icon_maker_icons_cc560f7e": {
+        "message": "Icone produttore icone"
+    },
+    "icon_outline_e978dc0c": {
+        "message": "Struttura icona"
+    },
+    "icon_outline_size_33f39b86": {
+        "message": "Dimensione struttura icona"
+    },
+    "icon_shape_30b61e7": {
+        "message": "Forma icona"
+    },
+    "icon_size_9353edea": {
+        "message": "Dimensione icona"
+    },
     "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
         "message": "Se non selezioni i diritti di utilizzo ora, questo file sarà in stato \"non pubblicato\" dopo il caricamento."
     },
@@ -724,6 +769,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "Aumenta rientro"
+    },
+    "indigo_2035fc55": {
+        "message": "Indaco"
     },
     "insert_593145ef": {
         "message": "Inserisci"
@@ -787,6 +835,9 @@
     },
     "library_icon_ae1e54cf": {
         "message": "Icona Libreria"
+    },
+    "light_blue_5374f600": {
+        "message": "Blu chiaro"
     },
     "link_7262adec": {
         "message": "Link"
@@ -854,6 +905,9 @@
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Sembra non ci sia nulla qui"
     },
+    "magenta_4a65993c": {
+        "message": "Magenta"
+    },
     "math_ede93050": {
         "message": "Matematica"
     },
@@ -904,6 +958,9 @@
     },
     "name_1aed4a1b": {
         "message": "Nome"
+    },
+    "name_color_ceec76ff": {
+        "message": "{ name } ({ color })"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Naviga attraverso il menu o la barra degli strumenti"
@@ -986,6 +1043,9 @@
     "octagon_e48be9f": {
         "message": "Ottagono"
     },
+    "olive_6a3e4d6b": {
+        "message": "Oliva"
+    },
     "only_most_recent_grading_period_shown_f1ad6458": {
         "message": "*Viene mostrato solo il periodo di valutazione più recente."
     },
@@ -1003,6 +1063,9 @@
     },
     "optional_add_course_ef0d70fc": {
         "message": "Facoltativo: Aggiungi corso"
+    },
+    "orange_81386a62": {
+        "message": "Arancione"
     },
     "ordered_and_unordered_lists_cfadfc38": {
         "message": "Elenchi ordinati e non ordinati"
@@ -1045,6 +1108,9 @@
     },
     "physical_education_icon_d7dffd3e": {
         "message": "Icona Educazione fisica"
+    },
+    "pink_68ad45cb": {
+        "message": "Rosa"
     },
     "pixels_52ece7d1": {
         "message": "Pixel"
@@ -1091,6 +1157,12 @@
     "published_when_302d8e23": {
         "message": "Pubblicato: { when }"
     },
+    "pumpkin_904428d5": {
+        "message": "Zucca"
+    },
+    "purple_7678a9fc": {
+        "message": "Viola"
+    },
     "quiz_e0dcce8f": {
         "message": "Quiz"
     },
@@ -1105,6 +1177,9 @@
     },
     "record_upload_media_5fdce166": {
         "message": "Registra/Carica file multimediali"
+    },
+    "red_8258edf3": {
+        "message": "Rosso"
     },
     "redo_363c58b7": {
         "message": "Ripeti"
@@ -1141,6 +1216,9 @@
     },
     "save_11a80ec3": {
         "message": "Salva"
+    },
+    "saved_icon_maker_icons_df86e2a1": {
+        "message": "Icone produttore icone salvate"
     },
     "schedule_preview_3bcda153": {
         "message": "Anteprima programma"
@@ -1192,6 +1270,9 @@
     },
     "single_color_image_4e5d4dbc": {
         "message": "Immagine monocolore"
+    },
+    "single_color_image_color_95fa9a87": {
+        "message": "Colore immagine monocolore"
     },
     "size_b30e1077": {
         "message": "Dimensioni"
@@ -1247,6 +1328,9 @@
     "starttime_to_endtime_d7cc249d": {
         "message": "{ startTime } a { endTime }"
     },
+    "steel_blue_14296f08": {
+        "message": "Blu acciaio"
+    },
     "styles_2aa721ef": {
         "message": "Stili"
     },
@@ -1282,6 +1366,9 @@
     },
     "task_16b0ef38": {
         "message": "Attività"
+    },
+    "teal_f729a294": {
+        "message": "Verde acqua"
     },
     "text_7f4593da": {
         "message": "Testo"
@@ -1501,6 +1588,9 @@
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "Navigazione programma settimanale"
+    },
+    "white_87fa64fd": {
+        "message": "Bianco"
     },
     "width_492fec76": {
         "message": "Larghezza"

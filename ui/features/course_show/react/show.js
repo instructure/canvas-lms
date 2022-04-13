@@ -21,7 +21,7 @@ import HomePagePromptContainer from '@canvas/course-homepage/react/Prompt'
 import createStore from '@canvas/util/createStore'
 import $ from 'jquery'
 import '@canvas/rails-flash-notifications'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
@@ -30,7 +30,7 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
 import * as apiClient from '@canvas/courses/courseAPIClient'
 
-const I18n = useI18nScope('courses_show');
+const I18n = useI18nScope('courses_show')
 
 const defaultViewStore = createStore({
   selectedDefaultView: ENV.COURSE.default_view,

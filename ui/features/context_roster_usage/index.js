@@ -17,12 +17,12 @@
 
 import $ from 'jquery'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import '@canvas/datetime'
 import '@canvas/util/templateData'
 import 'jquery-pageless'
 
-const I18n = useI18nScope('context.roster_user_usage');
+const I18n = useI18nScope('context.roster_user_usage')
 
 $(() => {
   const url = ENV.context_url

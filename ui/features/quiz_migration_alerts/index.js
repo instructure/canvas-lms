@@ -18,9 +18,9 @@
 import $ from 'jquery'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('quiz_migration_notifications');
+const I18n = useI18nScope('quiz_migration_notifications')
 
 $('.close_migration_notification_link').click(function (event) {
   event.preventDefault()

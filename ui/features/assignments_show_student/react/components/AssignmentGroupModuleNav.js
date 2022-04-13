@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 
 import {Button} from '@instructure/ui-buttons'
@@ -24,7 +24,7 @@ import {Flex} from '@instructure/ui-flex'
 
 import {Link} from '@instructure/ui-link'
 
-const I18n = useI18nScope('assignments_2');
+const I18n = useI18nScope('assignments_2')
 
 const MAX_DISPLAYED_MODULES = 2
 

@@ -19,7 +19,6 @@
 import $ from 'jquery'
 
 import SetDefaultGradeDialog from '@canvas/grading/jquery/SetDefaultGradeDialog.coffee'
-import {waitFor} from '../support/Waiters'
 
 QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
   let assignment
@@ -67,11 +66,7 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
   test('#show text', () => {
     dialog = new SetDefaultGradeDialog({assignment})
     dialog.show()
-    ok(
-      getDialog()
-        .querySelector('#default_grade_description')
-        .innerText.includes('same grade')
-    )
+    ok(getDialog().querySelector('#default_grade_description').innerText.includes('same grade'))
     closeDialog()
   })
 
@@ -120,9 +115,7 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
       const students = [{id: '3'}, {id: '4'}]
       dialog = new SetDefaultGradeDialog({assignment, students, context_id, alert})
       dialog.show()
-      await waitFor(() => getDialog())
       clickSetDefaultGrade()
-      await waitFor(() => !getDialog())
       const {
         firstCall: {
           args: [message]
@@ -143,9 +136,7 @@ QUnit.module('Shared > SetDefaultGradeDialog', suiteHooks => {
       // adjust page size so that we generate two requests
       dialog = new SetDefaultGradeDialog({assignment, students, context_id, page_size: 2, alert})
       dialog.show()
-      await waitFor(() => getDialog())
       clickSetDefaultGrade()
-      await waitFor(() => !getDialog())
       const {
         firstCall: {
           args: [message]

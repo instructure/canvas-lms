@@ -17,7 +17,7 @@
  */
 
 import {getFileThumbnail} from '@canvas/util/fileHelper'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {RemovableItem} from '../RemovableItem/RemovableItem'
@@ -27,7 +27,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 
-const I18n = useI18nScope('conversations_2');
+const I18n = useI18nScope('conversations_2')
 
 export const Attachment = ({...props}) => {
   if (props.attachment.isLoading) {

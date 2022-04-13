@@ -92,6 +92,9 @@
     "apply_781a2546": {
         "message": "ปรับใช้"
     },
+    "apply_changes_to_all_instances_of_this_icon_maker__2642f466": {
+        "message": "ปรับใช้การเปลี่ยนแปลงกับส่วนรายการทั้งหมดของไอคอน Icon Maker (Icon Maker Icon) ในบทเรียน (Course) นี้"
+    },
     "apps_54d24a47": {
         "message": "แอพ"
     },
@@ -176,8 +179,17 @@
     "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
         "message": "ต่อไปนี้เป็นตัวอย่างการแสดงกำหนดเวลาให้กับผู้เรียน"
     },
+    "black_4cb01371": {
+        "message": "ดำ"
+    },
+    "blue_daf8fea9": {
+        "message": "น้ำเงิน"
+    },
     "bottom_third_5f5fec1d": {
         "message": "อันดับที่สามจากด้านล่าง"
+    },
+    "brick_f2656265": {
+        "message": "บริค"
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
@@ -317,6 +329,12 @@
     "course_to_do_bcbbab54": {
         "message": "{ course } สิ่งที่ต้องทำ"
     },
+    "create_icon_110d6463": {
+        "message": "จัดทำไอคอน"
+    },
+    "create_icon_maker_icon_c716bffe": {
+        "message": "จัดทำไอคอน Icon Maker"
+    },
     "creative_commons_license_725584ae": {
         "message": "สิทธิ์ใช้งาน Creative Commons:"
     },
@@ -331,6 +349,9 @@
     },
     "custom_6979cd81": {
         "message": "กำหนดเอง"
+    },
+    "cyan_c1d5f68a": {
+        "message": "ฟ้า"
     },
     "date_added_ed5ad465": {
         "message": "วันที่ที่เพิ่ม"
@@ -355,6 +376,9 @@
     },
     "decrease_indent_de6343ab": {
         "message": "ลดการเยื้อง"
+    },
+    "deep_purple_bb3e2907": {
+        "message": "ม่วงเข้ม"
     },
     "default_bulleted_unordered_list_47079da8": {
         "message": "รายการที่ไม่ได้จัดลำดับแบบมีหัวข้อย่อยเริ่มต้น"
@@ -641,6 +665,12 @@
     "greek_65c5b3f7": {
         "message": "กรีก"
     },
+    "green_15af4778": {
+        "message": "เขียว"
+    },
+    "grey_a55dceff": {
+        "message": "เทา"
+    },
     "group_documents_8bfd6ae6": {
         "message": "เอกสารของกลุ่ม"
     },
@@ -704,6 +734,21 @@
     "icon_color_b86dd6d6": {
         "message": "สีไอคอน"
     },
+    "icon_maker_icons_cc560f7e": {
+        "message": "ไอคอน Icon Maker"
+    },
+    "icon_outline_e978dc0c": {
+        "message": "เค้าโครงไอคอน"
+    },
+    "icon_outline_size_33f39b86": {
+        "message": "ขนาดเค้าโครงไอคอน"
+    },
+    "icon_shape_30b61e7": {
+        "message": "รูปทรงไอคอน"
+    },
+    "icon_size_9353edea": {
+        "message": "ขนาดไอคอน"
+    },
     "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
         "message": "หากคุณไม่เลือกสิทธิ์การใช้งาน ไฟล์นี้จะถูกเลิกเผยแพร่หลังจากอัพโหลดแล้ว"
     },
@@ -724,6 +769,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "เพิ่มการเยื้อง"
+    },
+    "indigo_2035fc55": {
+        "message": "คราม"
     },
     "insert_593145ef": {
         "message": "ใบกัด"
@@ -787,6 +835,9 @@
     },
     "library_icon_ae1e54cf": {
         "message": "ไอคอนห้องสมุด"
+    },
+    "light_blue_5374f600": {
+        "message": "ฟ้า"
     },
     "link_7262adec": {
         "message": "ลิงค์"
@@ -854,6 +905,9 @@
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "ดูเหมือนจะไม่มีอะไรที่นี่"
     },
+    "magenta_4a65993c": {
+        "message": "ม่วงอมแดง"
+    },
     "math_ede93050": {
         "message": "คณิตศาสตร์"
     },
@@ -904,6 +958,9 @@
     },
     "name_1aed4a1b": {
         "message": "ชื่อ"
+    },
+    "name_color_ceec76ff": {
+        "message": "{ name } ({ color })"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "ดูรายการเมนูหรือแถบเครื่องมือ"
@@ -986,6 +1043,9 @@
     "octagon_e48be9f": {
         "message": "แปดเหลี่ยม"
     },
+    "olive_6a3e4d6b": {
+        "message": "โอลีฟ"
+    },
     "only_most_recent_grading_period_shown_f1ad6458": {
         "message": "*เฉพาะระยะเวลาการให้เกรดล่าสุดที่จัดแสดง"
     },
@@ -1003,6 +1063,9 @@
     },
     "optional_add_course_ef0d70fc": {
         "message": "เผื่อเลือก: เพิ่มบทเรียน"
+    },
+    "orange_81386a62": {
+        "message": "ส้ม"
     },
     "ordered_and_unordered_lists_cfadfc38": {
         "message": "รายการที่จัดลำดับและไม่ได้จัดลำดับ"
@@ -1045,6 +1108,9 @@
     },
     "physical_education_icon_d7dffd3e": {
         "message": "ไอคอนพลศึกษา"
+    },
+    "pink_68ad45cb": {
+        "message": "ชมพู"
     },
     "pixels_52ece7d1": {
         "message": "พิกเซล"
@@ -1091,6 +1157,12 @@
     "published_when_302d8e23": {
         "message": "เผยแพร่แล้ว: { when }"
     },
+    "pumpkin_904428d5": {
+        "message": "ฟักทอง"
+    },
+    "purple_7678a9fc": {
+        "message": "ม่วง"
+    },
     "quiz_e0dcce8f": {
         "message": "แบบทดสอบ"
     },
@@ -1105,6 +1177,9 @@
     },
     "record_upload_media_5fdce166": {
         "message": "บันทึก/อัพโหลดสื่อ"
+    },
+    "red_8258edf3": {
+        "message": "แดง"
     },
     "redo_363c58b7": {
         "message": "ทำซ้ำ"
@@ -1141,6 +1216,9 @@
     },
     "save_11a80ec3": {
         "message": "บันทึก"
+    },
+    "saved_icon_maker_icons_df86e2a1": {
+        "message": "ไอคอน Icon Maker ที่บันทึกไว้"
     },
     "schedule_preview_3bcda153": {
         "message": "กำหนดเวลาแสดงตัวอย่าง"
@@ -1192,6 +1270,9 @@
     },
     "single_color_image_4e5d4dbc": {
         "message": "ภาพสีเดียว"
+    },
+    "single_color_image_color_95fa9a87": {
+        "message": "สีเดี่ยวสำหรับภาพสี"
     },
     "size_b30e1077": {
         "message": "ขนาด"
@@ -1247,6 +1328,9 @@
     "starttime_to_endtime_d7cc249d": {
         "message": "{ startTime } ถึง { endTime }"
     },
+    "steel_blue_14296f08": {
+        "message": "สตีลบลู"
+    },
     "styles_2aa721ef": {
         "message": "รูปแบบ"
     },
@@ -1282,6 +1366,9 @@
     },
     "task_16b0ef38": {
         "message": "งาน"
+    },
+    "teal_f729a294": {
+        "message": "ทีล"
     },
     "text_7f4593da": {
         "message": "ข้อความ"
@@ -1501,6 +1588,9 @@
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "การสืบค้นกำหนดเวลาประจำสัปดาห์"
+    },
+    "white_87fa64fd": {
+        "message": "คนผิวขาว"
     },
     "width_492fec76": {
         "message": "ความกว้าง"

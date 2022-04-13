@@ -20,7 +20,7 @@ import React from 'react'
 import {shallow} from 'enzyme'
 import {Text} from '@instructure/ui-text'
 import {IconWarningLine, IconInfoLine} from '@instructure/ui-icons'
-import Message from 'ui/features/gradebook/react/default_gradebook/components/SubmissionStatus/Message.js'
+import Message from 'ui/features/gradebook/react/default_gradebook/components/SubmissionStatus/Message'
 
 QUnit.module('Message', () => {
   QUnit.module('variant warning', () => {

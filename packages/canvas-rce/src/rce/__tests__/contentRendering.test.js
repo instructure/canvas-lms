@@ -229,4 +229,67 @@ describe('contentRendering', () => {
       )
     })
   })
+
+  describe('getMediaId()', () => {
+    let media
+    const subject = () => contentRendering.getMediaId(media)
+
+    describe('when all IDs are present', () => {
+      beforeEach(
+        () =>
+          (media = {
+            media_id: 'media-id',
+            media_entry_id: 'media-entry-id',
+            id: 'id',
+            file_id: 'file-id'
+          })
+      )
+
+      it('returns media-id', () => {
+        expect(subject()).toEqual('media-id')
+      })
+    })
+
+    describe('when media_entry_id, id, and file_id are present', () => {
+      beforeEach(
+        () =>
+          (media = {
+            media_entry_id: 'media-entry-id',
+            id: 'id',
+            file_id: 'file-id'
+          })
+      )
+
+      it('returns media_entry_id', () => {
+        expect(subject()).toEqual('media-entry-id')
+      })
+    })
+
+    describe('when id and file_id are present', () => {
+      beforeEach(
+        () =>
+          (media = {
+            id: 'id',
+            file_id: 'file-id'
+          })
+      )
+
+      it('returns id', () => {
+        expect(subject()).toEqual('id')
+      })
+    })
+
+    describe('when file_id is present', () => {
+      beforeEach(
+        () =>
+          (media = {
+            file_id: 'file-id'
+          })
+      )
+
+      it('returns file_id', () => {
+        expect(subject()).toEqual('file-id')
+      })
+    })
+  })
 })

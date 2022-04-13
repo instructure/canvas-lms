@@ -15,13 +15,13 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'underscore'
 import htmlEscape from 'html-escape'
 import $ from 'jquery'
 import deparam from 'deparam'
 
-const I18n = useI18nScope('mediaCommentThumbnail');
+const I18n = useI18nScope('mediaCommentThumbnail')
 
 const MEDIA_COMMENT_THUMBNAIL_SIZES = {
   normal: {width: 140, height: 100},

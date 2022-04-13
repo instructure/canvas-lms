@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
 import {string, bool, node} from 'prop-types'
 import cx from 'classnames'
@@ -29,7 +29,7 @@ import {IconLock, IconUnlock} from '@canvas/blueprint-courses/react/components/B
 import propTypes from '@canvas/blueprint-courses/react/propTypes'
 import {itemTypeLabels, changeTypeLabels} from '@canvas/blueprint-courses/react/labels'
 
-const I18n = useI18nScope('blueprint_coursesChangeLogRow');
+const I18n = useI18nScope('blueprint_coursesChangeLogRow')
 
 export default class ChangeLogRow extends Component {
   static propTypes = {

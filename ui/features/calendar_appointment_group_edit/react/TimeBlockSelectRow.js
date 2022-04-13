@@ -19,14 +19,14 @@
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {IconXSolid} from '@instructure/ui-icons'
 import coupleTimeFields from '@canvas/calendar/jquery/coupleTimeFields'
 import '@canvas/datetime'
 
-const I18n = useI18nScope('appointment_groups');
+const I18n = useI18nScope('appointment_groups')
 
 const dateToString = (dateObj, format) => {
   if (!dateObj) {

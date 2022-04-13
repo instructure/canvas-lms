@@ -31,6 +31,8 @@ import {
   useIncrementalLoading
 } from '../../../../common/incremental-loading'
 
+const PENDING_MEDIA_ENTRY_ID = 'maybe'
+
 function hasFiles(media) {
   return media.files.length > 0
 }
@@ -45,7 +47,16 @@ function renderLinks(files, handleClick, lastItemRef) {
     if (index === files.length - 1) {
       focusRef = lastItemRef
     }
-    return <Link key={f.id} {...f} onClick={handleClick} focusRef={focusRef} />
+    return (
+      <Link
+        key={f.id}
+        {...f}
+        onClick={handleClick}
+        focusRef={focusRef}
+        disabled={f.media_entry_id === PENDING_MEDIA_ENTRY_ID}
+        disabledMessage={formatMessage('Media file is processing. Please try again later.')}
+      />
+    )
   })
 }
 

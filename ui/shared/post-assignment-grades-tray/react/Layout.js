@@ -24,11 +24,11 @@ import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import FormContent from './FormContent'
 
-const I18n = useI18nScope('post_assignment_grades_tray');
+const I18n = useI18nScope('post_assignment_grades_tray')
 
 export default function Layout({
   assignment: {anonymousGrading, gradesPublished},

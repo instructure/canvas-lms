@@ -18,7 +18,7 @@
 
 import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import numberHelper from '@canvas/i18n/numberHelper'
 import {Button} from '@instructure/ui-buttons'
 import {FormFieldGroup} from '@instructure/ui-form-field'
@@ -35,7 +35,7 @@ import CalculationMethodContent from '@canvas/grade-summary/backbone/models/Calc
 import ConfirmMasteryModal from '../ConfirmMasteryModal'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 
-const I18n = useI18nScope('MasteryScale');
+const I18n = useI18nScope('MasteryScale')
 
 export const defaultProficiencyCalculation = {
   calculationMethod: 'decaying_average',

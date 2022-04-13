@@ -122,6 +122,11 @@ pipeline {
 
           sh 'docker cp stormbreaker-results:/usr/src/app/results.html .'
 
+          withCredentials([usernamePassword(credentialsId: 'INSENG_CANVAS_CI_AWS_ACCESS', usernameVariable: 'INSENG_AWS_ACCESS_KEY_ID', passwordVariable: 'INSENG_AWS_SECRET_ACCESS_KEY')]) {
+            def awsCreds = "AWS_DEFAULT_REGION=us-west-2 AWS_ACCESS_KEY_ID=${INSENG_AWS_ACCESS_KEY_ID} AWS_SECRET_ACCESS_KEY=${INSENG_AWS_SECRET_ACCESS_KEY}"
+            sh "$awsCreds aws s3 cp results.html s3://instructure-canvas-ci/axe_results.html"
+          }
+
           archiveArtifacts allowEmptyArchive: true, artifacts: 'results.html'
         }
 

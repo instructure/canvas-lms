@@ -18,7 +18,7 @@
 
 import {AssignmentOverride} from '../../../graphql/AssignmentOverride'
 import DateHelper from '../../../../../shared/datetime/dateHelper'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {responsiveQuerySizes} from '../../utils'
@@ -28,7 +28,7 @@ import {Responsive} from '@instructure/ui-responsive'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 
-const I18n = useI18nScope('discussion_posts');
+const I18n = useI18nScope('discussion_posts')
 
 export function DueDateTray({...props}) {
   return (

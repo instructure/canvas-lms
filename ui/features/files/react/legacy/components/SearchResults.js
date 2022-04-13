@@ -17,14 +17,14 @@
  */
 
 import _ from 'underscore'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import FilesCollection from '@canvas/files/backbone/collections/FilesCollection'
 import customPropTypes from '@canvas/files/react/modules/customPropTypes'
 import updateAPIQuerySortParams from '../util/updateAPIQuerySortParams'
 import getAllPages from '../util/getAllPages'
 import 'location-origin'
 
-const I18n = useI18nScope('react_files');
+const I18n = useI18nScope('react_files')
 
 export default {
   displayName: 'SearchResults',

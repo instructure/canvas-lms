@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState, useEffect} from 'react'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
@@ -32,7 +32,7 @@ import {View} from '@instructure/ui-view'
 import {fromNow} from '../fromNowFuzzy'
 import {number, bool} from 'prop-types'
 
-const I18n = useI18nScope('QRMobileLogin');
+const I18n = useI18nScope('QRMobileLogin')
 
 const REFRESH_INTERVAL = 1000 * (9 * 60 + 45) // 9 min 45 sec
 const POLL_INTERVAL = 1000 * 5 // 5 sec

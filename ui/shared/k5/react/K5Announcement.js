@@ -17,7 +17,7 @@
  */
 
 import React, {useCallback, useEffect, useState} from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import tz from '@canvas/timezone'
 import PropTypes from 'prop-types'
 
@@ -37,7 +37,7 @@ import LoadingSkeleton from './LoadingSkeleton'
 import EmptyK5Announcement, {K5AddAnnouncementButton} from './EmptyK5Announcement'
 import {transformAnnouncement} from './utils'
 
-const I18n = useI18nScope('k5_announcement');
+const I18n = useI18nScope('k5_announcement')
 
 const ANNOUNCEMENT_LOOKAHEAD_PAGE_SIZE = 2
 

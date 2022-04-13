@@ -17,13 +17,13 @@
  */
 
 import {Button} from '@instructure/ui-buttons'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {IconRssLine} from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {Text} from '@instructure/ui-text'
 
-const I18n = useI18nScope('discussion_posts');
+const I18n = useI18nScope('discussion_posts')
 
 export const PodcastFeed = ({...props}) => {
   return (

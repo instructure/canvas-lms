@@ -789,6 +789,7 @@ describe ExternalToolsController, type: :request do
       "workflow_state" => "public",
       "vendor_help_link" => nil,
       "version" => "1.1",
+      "deployment_id" => et&.deployment_id,
       "resource_selection" => {
         "enabled" => true,
         "text" => "",

@@ -177,14 +177,13 @@ class DueDateCacher
       assignments_by_id = Assignment.find(@assignment_ids).index_by(&:id)
 
       effective_due_dates.to_hash.each do |assignment_id, student_due_dates|
-        students_without_priors = student_due_dates.keys - enrollment_counts.prior_student_ids
         existing_anonymous_ids = existing_anonymous_ids_by_assignment_id[assignment_id]
 
         create_moderation_selections_for_assignment(assignments_by_id[assignment_id], student_due_dates.keys, @user_ids)
 
         quiz_lti = quiz_lti_assignments.include?(assignment_id)
 
-        students_without_priors.each do |student_id|
+        student_due_dates.each_key do |student_id|
           submission_info = student_due_dates[student_id]
           due_date = submission_info[:due_at] ? "'#{submission_info[:due_at].iso8601}'::timestamptz" : "NULL"
           grading_period_id = submission_info[:grading_period_id] || "NULL"
@@ -284,7 +283,7 @@ class DueDateCacher
         # The various workflow states below try to mimic similarly named scopes off of course
         scope = Enrollment.select(
           :user_id,
-          "count(nullif(workflow_state not in ('rejected', 'deleted', 'completed'), false)) as accepted_count",
+          "count(nullif(workflow_state not in ('rejected', 'deleted'), false)) as accepted_count",
           "count(nullif(workflow_state in ('completed'), false)) as prior_count",
           "count(nullif(workflow_state in ('rejected', 'deleted'), false)) as deleted_count"
         )
@@ -294,14 +293,12 @@ class DueDateCacher
         scope = scope.where(user_id: @user_ids) if @user_ids.present?
 
         scope.find_each do |record|
-          if record.accepted_count == 0 && record.deleted_count > 0
-            counts.deleted_student_ids << record.user_id
-          elsif record.accepted_count == 0 && record.prior_count > 0
-            counts.prior_student_ids << record.user_id
-          elsif record.accepted_count > 0
+          counts.prior_student_ids << record.user_id if record.prior_count > 0
+
+          if record.accepted_count > 0
             counts.accepted_student_ids << record.user_id
           else
-            raise "Unknown enrollment state: #{record.accepted_count}, #{record.prior_count}, #{record.deleted_count}"
+            counts.deleted_student_ids << record.user_id
           end
         end
       end

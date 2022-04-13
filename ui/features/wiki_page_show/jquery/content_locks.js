@@ -17,14 +17,14 @@
  */
 
 import INST from 'browser-sniffer'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
 import '@canvas/content-locks/jquery/lock_reason'
 import '@canvas/datetime'/* datetimeString */
 import 'jqueryui/dialog'
 
-const I18n = useI18nScope('content_locks');
+const I18n = useI18nScope('content_locks')
 
 $(document).ready(function() {
   $('.content_lock_icon').live('click', function(event) {

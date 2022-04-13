@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconWarningLine} from '@instructure/ui-icons'
 
-const I18n = useI18nScope('user_name');
+const I18n = useI18nScope('user_name')
 
 export default function SuspendedIcon({login}) {
   const tipText = I18n.t(

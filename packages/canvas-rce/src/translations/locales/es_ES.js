@@ -51,6 +51,9 @@ const locale = {
   "announcement_list_da155734": { "message": "Lista de anuncios" },
   "announcements_a4b8ed4a": { "message": "Anuncios" },
   "apply_781a2546": { "message": "Aplicar" },
+  "apply_changes_to_all_instances_of_this_icon_maker__2642f466": {
+    "message": "Aplicar cambios a todas las instancias de este creador de iconos en el curso"
+  },
   "apps_54d24a47": { "message": "Aplicaciones" },
   "arrows_464a3e54": { "message": "Flechas" },
   "art_icon_8e1daad": { "message": "Icono plástica" },
@@ -73,7 +76,10 @@ const locale = {
   "available_folders_694d0436": { "message": "Carpetas disponibles" },
   "basic_554cdc0a": { "message": "Básico" },
   "below_81d4dceb": { "message": "Debajo" },
+  "black_4cb01371": { "message": "Negro" },
+  "blue_daf8fea9": { "message": "Azul" },
   "bottom_third_5f5fec1d": { "message": "Tercero desde abajo" },
+  "brick_f2656265": { "message": "Ladrillo" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Cancelar" },
   "choose_caption_file_9c45bc4e": {
@@ -144,6 +150,10 @@ const locale = {
   "course_links_b56959b9": { "message": "Enlaces de la asignatura" },
   "course_media_ec759ad": { "message": "Multimedia de la asignatura" },
   "course_navigation_dd035109": { "message": "Navegación de la asignatura" },
+  "create_icon_110d6463": { "message": "Crear icono" },
+  "create_icon_maker_icon_c716bffe": {
+    "message": "Crear iconos del creador de iconos"
+  },
   "creative_commons_license_725584ae": {
     "message": "Licencia Creative Commons:"
   },
@@ -151,9 +161,11 @@ const locale = {
   "crop_image_807ebb08": { "message": "Ajustar la imagen" },
   "current_image_f16c249c": { "message": "Imagen actual" },
   "custom_6979cd81": { "message": "Personalizar" },
+  "cyan_c1d5f68a": { "message": "Turquesa" },
   "date_added_ed5ad465": { "message": "Fecha en la que se añadió" },
   "decorative_image_3c28aa7d": { "message": "Imagen decorativa" },
   "decrease_indent_de6343ab": { "message": "Reducir sangría" },
+  "deep_purple_bb3e2907": { "message": "Morado oscuro" },
   "default_bulleted_unordered_list_47079da8": {
     "message": "lista no ordenada con viñetas predeterminada"
   },
@@ -249,6 +261,8 @@ const locale = {
   },
   "grades_a61eba0a": { "message": "Notas" },
   "greek_65c5b3f7": { "message": "Griego" },
+  "green_15af4778": { "message": "Verde" },
+  "grey_a55dceff": { "message": "Gris" },
   "group_documents_8bfd6ae6": { "message": "Documentos del grupo" },
   "group_files_4324f3df": { "message": "Archivos del grupo" },
   "group_files_82e5dcdb": { "message": "Archivos del grupo" },
@@ -276,6 +290,11 @@ const locale = {
     "message": "Soy el titular de los derechos de autor"
   },
   "icon_color_b86dd6d6": { "message": "Icono color" },
+  "icon_maker_icons_cc560f7e": { "message": "Iconos del creador de iconos" },
+  "icon_outline_e978dc0c": { "message": "Contorno del icono" },
+  "icon_outline_size_33f39b86": { "message": "Tamaño del contorno del icono" },
+  "icon_shape_30b61e7": { "message": "Forma del icono" },
+  "icon_size_9353edea": { "message": "Tamaño del icono" },
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "Si no selecciona los derechos de uso en este momento, se cancelará la publicación de este archivo después de cargarlo."
   },
@@ -285,6 +304,7 @@ const locale = {
   "image_to_crop_3a34487d": { "message": "Imagen a recortar" },
   "images_7ce26570": { "message": "Imágenes" },
   "increase_indent_6d550a4a": { "message": "Aumentar sangría" },
+  "indigo_2035fc55": { "message": "Índigo" },
   "insert_593145ef": { "message": "Insertar" },
   "insert_equella_links_49a8dacd": { "message": "Insertar enlaces de Equella" },
   "insert_link_6dc23cae": { "message": "Insertar enlace" },
@@ -300,6 +320,7 @@ const locale = {
   "large_9c5e80e7": { "message": "Grande" },
   "left_to_right_e9b4fd06": { "message": "Izquierda a derecha" },
   "library_icon_ae1e54cf": { "message": "Icono biblioteca" },
+  "light_blue_5374f600": { "message": "Azul claro" },
   "link_7262adec": { "message": "Enlace" },
   "link_options_a16b758b": { "message": "Opciones de enlace" },
   "links_14b70841": { "message": "Enlaces" },
@@ -313,6 +334,7 @@ const locale = {
   "loading_please_wait_d276220a": { "message": "Cargando, espere" },
   "loading_preview_9f077aa1": { "message": "Cargando vista" },
   "locked_762f138b": { "message": "Bloqueado" },
+  "magenta_4a65993c": { "message": "Magenta" },
   "math_icon_ad4e9d03": { "message": "Icono matemáticas" },
   "media_af190855": { "message": "Contenido multimedia" },
   "medium_5a8e9ead": { "message": "Regular" },
@@ -330,6 +352,7 @@ const locale = {
   },
   "my_files_2f621040": { "message": "Mis archivos" },
   "name_1aed4a1b": { "message": "Nombre" },
+  "name_color_ceec76ff": { "message": "{ name } ({ color })" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navegar por el menú o la barra de herramientas"
   },
@@ -351,6 +374,7 @@ const locale = {
   "none_3b5e34d2": { "message": "Ninguno" },
   "none_selected_b93d56d2": { "message": "Ninguna seleccionada" },
   "octagon_e48be9f": { "message": "Octágono" },
+  "olive_6a3e4d6b": { "message": "Verde oliva" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Abrir esta ventana de diálogo de método abreviado de teclado"
   },
@@ -358,6 +382,7 @@ const locale = {
     "message": "Abrir aplicación { title }"
   },
   "operators_a2ef9a93": { "message": "Operadores" },
+  "orange_81386a62": { "message": "Naranja" },
   "ordered_and_unordered_lists_cfadfc38": {
     "message": "Listas ordenadas y no ordenadas"
   },
@@ -377,6 +402,7 @@ const locale = {
   },
   "performing_arts_icon_f3497486": { "message": "Icono plástica" },
   "physical_education_icon_d7dffd3e": { "message": "Icono educación física" },
+  "pink_68ad45cb": { "message": "Rosa" },
   "pixels_52ece7d1": { "message": "Pixels" },
   "posted_when_a578f5ab": { "message": "Publicado: { when }" },
   "preformatted_d0670862": { "message": "Previamente formateado" },
@@ -390,10 +416,13 @@ const locale = {
   },
   "published_c944a23d": { "message": "publicado" },
   "published_when_302d8e23": { "message": "Publicado: { when }" },
+  "pumpkin_904428d5": { "message": "Calabaza" },
+  "purple_7678a9fc": { "message": "Morado" },
   "quizzes_7e598f57": { "message": "Pruebas" },
   "raw_html_editor_e3993e41": { "message": "Editor HTML puro" },
   "record_7c9448b": { "message": "Grabar" },
   "record_upload_media_5fdce166": { "message": "Grabar/cargar multimedia" },
+  "red_8258edf3": { "message": "Rojo" },
   "relationships_6602af70": { "message": "Relaciones" },
   "religion_icon_246e0be1": { "message": "Icono religión" },
   "remove_link_d1f2f4d0": { "message": "Eliminar enlace" },
@@ -409,6 +438,9 @@ const locale = {
     "message": "Lamentablemente, no se puede acceder al Editor HTML agradable desde el teclado. Acceda al Editor de HTML sin formato aquí."
   },
   "save_11a80ec3": { "message": "Guardar" },
+  "saved_icon_maker_icons_df86e2a1": {
+    "message": "Guardar iconos del creador de iconos"
+  },
   "search_280d00bd": { "message": "Buscar" },
   "search_term_b2d2235": { "message": "Término de búsqueda" },
   "select_crop_shape_d441feeb": { "message": "Seleccione la forma de recorte" },
@@ -422,6 +454,7 @@ const locale = {
   "show_link_options_545338fd": { "message": "Mostrar opciones de enlace" },
   "show_video_options_6ed3721a": { "message": "Mostrar opciones de video" },
   "single_color_image_4e5d4dbc": { "message": "Imagen unicolor" },
+  "single_color_image_color_95fa9a87": { "message": "Imagen unicolor" },
   "size_b30e1077": { "message": "Tamaño" },
   "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
     "message": "El tamaño del archivo es superior al máximo permitido para archivos, que es de { max } kb."
@@ -445,6 +478,7 @@ const locale = {
   "square_511eb3b3": { "message": "Cuadrado" },
   "square_unordered_list_b15ce93b": { "message": "lista cuadrada no ordenada" },
   "star_8d156e09": { "message": "Destacar" },
+  "steel_blue_14296f08": { "message": "Azul acero" },
   "styles_2aa721ef": { "message": "Estilos" },
   "submit_a3cc6859": { "message": "Entregar" },
   "subscript_59744f96": { "message": "Subíndice" },
@@ -458,6 +492,7 @@ const locale = {
   },
   "syllabus_f191f65b": { "message": "Programa de la asignatura" },
   "tab_arrows_4cf5abfc": { "message": "Tabulador/flechas" },
+  "teal_f729a294": { "message": "Verde azulado" },
   "text_7f4593da": { "message": "Texto" },
   "text_background_color_16e61c3f": { "message": "Color del fondo del texto" },
   "text_color_acf75eb6": { "message": "Color del texto" },
@@ -560,6 +595,7 @@ const locale = {
   },
   "view_predefined_colors_92f5db39": { "message": "Ver colores predefinidos" },
   "view_title_description_67940918": { "message": "Ver descripción { title }" },
+  "white_87fa64fd": { "message": "Blanco" },
   "width_492fec76": { "message": "Ancho" },
   "width_and_height_must_be_numbers_110ab2e3": {
     "message": "El ancho y la altura deben ser números"

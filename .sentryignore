@@ -4,8 +4,8 @@
 *
 
 # Re-include this directory
-!public/dist/webpack-*/
-!public/dist/webpack-*/*
+!public/dist/webpack-production/
+!public/dist/webpack-production/*
 
 # Exclude these wherever they appear
 locale/

@@ -33,11 +33,11 @@ import {
 import axios from '@canvas/axios'
 import {uniqBy} from 'lodash'
 import $ from '@canvas/rails-flash-notifications'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import UserLink from './UserLink'
 import AddPeopleApp from '@canvas/add-people'
 
-const I18n = useI18nScope('account_course_user_search');
+const I18n = useI18nScope('account_course_user_search')
 
 export default class CoursesListRow extends React.Component {
   static propTypes = {

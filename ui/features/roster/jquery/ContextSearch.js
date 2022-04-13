@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
 import contextList from '../util/contextList'
@@ -25,7 +25,7 @@ import avatarTemplate from '@canvas/avatar/jst/_avatar.handlebars'
 import _inherits from '@babel/runtime/helpers/esm/inheritsLoose'
 import newless from 'newless'
 
-const I18n = useI18nScope('recipient_input');
+const I18n = useI18nScope('recipient_input')
 
 const TokenInput = newless(_TokenInput)
 

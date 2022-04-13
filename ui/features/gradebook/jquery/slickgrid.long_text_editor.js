@@ -18,9 +18,9 @@
 
 import $ from 'jquery'
 import 'jqueryui/menu'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import htmlEscape from 'html-escape'
-const I18n = useI18nScope('LongTextEditor');
+const I18n = useI18nScope('LongTextEditor')
 /*
  * this is just LongTextEditor from slick.editors.js but with i18n and a
  * stupid dontblur class to cooperate with our gradebook's onGridBlur handler

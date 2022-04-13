@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 
 import {Flex} from '@instructure/ui-flex'
 import {ProgressBar} from '@instructure/ui-progress'
 import {Text} from '@instructure/ui-text'
 
-const I18n = useI18nScope('groups');
+const I18n = useI18nScope('groups')
 
 const GroupCategoryProgress = props => {
   return (

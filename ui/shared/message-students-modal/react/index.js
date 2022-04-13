@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import axios from '@canvas/axios'
 import {Button} from '@instructure/ui-buttons'
 import {TextArea} from '@instructure/ui-text-area'
@@ -27,7 +27,7 @@ import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {FormField} from '@instructure/ui-form-field'
 import {Alert} from '@instructure/ui-alerts'
 
-const I18n = useI18nScope('shared_message_students');
+const I18n = useI18nScope('shared_message_students')
 
 class MessageStudents extends React.Component {
   static propTypes = {

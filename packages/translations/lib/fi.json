@@ -92,6 +92,9 @@
     "apply_781a2546": {
         "message": "Käytä"
     },
+    "apply_changes_to_all_instances_of_this_icon_maker__2642f466": {
+        "message": "Käytä muutoksia kaikkiin kurssin kuvakkeen tekijän kuvakkeen esiintymiin"
+    },
     "apps_54d24a47": {
         "message": "Sovellukset"
     },
@@ -176,8 +179,17 @@
     "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
         "message": "Alla on esimerkki siitä, kuinka opiskelijat näkevät aikataulunsa"
     },
+    "black_4cb01371": {
+        "message": "Musta"
+    },
+    "blue_daf8fea9": {
+        "message": "Sininen"
+    },
     "bottom_third_5f5fec1d": {
         "message": "Alakolmannes"
+    },
+    "brick_f2656265": {
+        "message": "Tiili"
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
@@ -317,6 +329,12 @@
     "course_to_do_bcbbab54": {
         "message": "{ course } TEHTÄVÄ"
     },
+    "create_icon_110d6463": {
+        "message": "Luo kuvake"
+    },
+    "create_icon_maker_icon_c716bffe": {
+        "message": "Luo kuvakkeen tekijän kuvake"
+    },
     "creative_commons_license_725584ae": {
         "message": "Creative Commons -lisenssi:"
     },
@@ -331,6 +349,9 @@
     },
     "custom_6979cd81": {
         "message": "Mukauta"
+    },
+    "cyan_c1d5f68a": {
+        "message": "Syaani"
     },
     "date_added_ed5ad465": {
         "message": "Lisäyspäivämäärä"
@@ -355,6 +376,9 @@
     },
     "decrease_indent_de6343ab": {
         "message": "Pienennä sisennystä"
+    },
+    "deep_purple_bb3e2907": {
+        "message": "Tumman violetti"
     },
     "default_bulleted_unordered_list_47079da8": {
         "message": "luetelmakohdista koostuva järjestämätön oletuslista"
@@ -641,6 +665,12 @@
     "greek_65c5b3f7": {
         "message": "kreikka"
     },
+    "green_15af4778": {
+        "message": "Vihreä"
+    },
+    "grey_a55dceff": {
+        "message": "Harmaa"
+    },
     "group_documents_8bfd6ae6": {
         "message": "Ryhmän asiakirjat"
     },
@@ -704,6 +734,21 @@
     "icon_color_b86dd6d6": {
         "message": "Kuvakkeen väri"
     },
+    "icon_maker_icons_cc560f7e": {
+        "message": "Kuvakkeen tekijän kuvakkeet"
+    },
+    "icon_outline_e978dc0c": {
+        "message": "Kuvakkeen ääriviiva"
+    },
+    "icon_outline_size_33f39b86": {
+        "message": "Kuvakkeen ääriviivan koko"
+    },
+    "icon_shape_30b61e7": {
+        "message": "Kuvakkeen muoto"
+    },
+    "icon_size_9353edea": {
+        "message": "Kuvakkeen koko"
+    },
     "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
         "message": "Jos et valitse käyttöoikeuksia nyt, tiedoston julkaisu peruutetaan latauksen jälkeen."
     },
@@ -724,6 +769,9 @@
     },
     "increase_indent_6d550a4a": {
         "message": "Suurenna sisennystä"
+    },
+    "indigo_2035fc55": {
+        "message": "Indigo"
     },
     "insert_593145ef": {
         "message": "Aseta"
@@ -787,6 +835,9 @@
     },
     "library_icon_ae1e54cf": {
         "message": "Kirjaston kuvake"
+    },
+    "light_blue_5374f600": {
+        "message": "Vaaleansininen"
     },
     "link_7262adec": {
         "message": "Linkki"
@@ -854,6 +905,9 @@
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Näyttää siltä kuin täällä ei olisi mitään"
     },
+    "magenta_4a65993c": {
+        "message": "Magenta"
+    },
     "math_ede93050": {
         "message": "Matematiikka"
     },
@@ -904,6 +958,9 @@
     },
     "name_1aed4a1b": {
         "message": "Nimi"
+    },
+    "name_color_ceec76ff": {
+        "message": "{ name } ({ color })"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Siirry valikon tai työkalupalkin läpi"
@@ -986,6 +1043,9 @@
     "octagon_e48be9f": {
         "message": "Kahdeksankulmio"
     },
+    "olive_6a3e4d6b": {
+        "message": "Oliivi"
+    },
     "only_most_recent_grading_period_shown_f1ad6458": {
         "message": "* Vain viimeisiin arvostelujakso näkyvissä."
     },
@@ -1003,6 +1063,9 @@
     },
     "optional_add_course_ef0d70fc": {
         "message": "Valinnainen: Lisää kurssi"
+    },
+    "orange_81386a62": {
+        "message": "Oranssi"
     },
     "ordered_and_unordered_lists_cfadfc38": {
         "message": "Järjestetyt ja järjestämättömät listat"
@@ -1045,6 +1108,9 @@
     },
     "physical_education_icon_d7dffd3e": {
         "message": "Liikuntakasvatuksen kuvake"
+    },
+    "pink_68ad45cb": {
+        "message": "Vaaleanpunainen"
     },
     "pixels_52ece7d1": {
         "message": "Pikselit"
@@ -1091,6 +1157,12 @@
     "published_when_302d8e23": {
         "message": "Julkaistu: { when }"
     },
+    "pumpkin_904428d5": {
+        "message": "Kurpitsa"
+    },
+    "purple_7678a9fc": {
+        "message": "Violetti"
+    },
     "quiz_e0dcce8f": {
         "message": "Tietovisa"
     },
@@ -1105,6 +1177,9 @@
     },
     "record_upload_media_5fdce166": {
         "message": "Nauhoita/lataa mediaa"
+    },
+    "red_8258edf3": {
+        "message": "Punainen"
     },
     "redo_363c58b7": {
         "message": "Suorita uudelleen"
@@ -1141,6 +1216,9 @@
     },
     "save_11a80ec3": {
         "message": "Tallenna"
+    },
+    "saved_icon_maker_icons_df86e2a1": {
+        "message": "Tallennetut kuvakkeen tekijän kuvakkeet"
     },
     "schedule_preview_3bcda153": {
         "message": "Aikataulun esikatselu"
@@ -1192,6 +1270,9 @@
     },
     "single_color_image_4e5d4dbc": {
         "message": "Yksivärinen kuva"
+    },
+    "single_color_image_color_95fa9a87": {
+        "message": "Yksivärinen kuvan väri"
     },
     "size_b30e1077": {
         "message": "Koko"
@@ -1247,6 +1328,9 @@
     "starttime_to_endtime_d7cc249d": {
         "message": "{ startTime } - { endTime }"
     },
+    "steel_blue_14296f08": {
+        "message": "Teräksensininen"
+    },
     "styles_2aa721ef": {
         "message": "Tyylit"
     },
@@ -1282,6 +1366,9 @@
     },
     "task_16b0ef38": {
         "message": "Tehtävä"
+    },
+    "teal_f729a294": {
+        "message": "Sinivihreä"
     },
     "text_7f4593da": {
         "message": "Teksti"
@@ -1501,6 +1588,9 @@
     },
     "weekly_schedule_navigation_6b042645": {
         "message": "Viikkoaikataulun selaus"
+    },
+    "white_87fa64fd": {
+        "message": "Valkoinen"
     },
     "width_492fec76": {
         "message": "Leveys"

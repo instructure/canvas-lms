@@ -18,7 +18,7 @@
 
 import Calendar from 'ui/features/calendar/jquery/index.js'
 import CalendarEvent from '@canvas/calendar/jquery/CommonEvent/CalendarEvent'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
 import moment from 'moment'
 import tz from '@canvas/timezone'
@@ -30,7 +30,7 @@ import $ from 'jquery'
 import {subscribe} from 'jquery-tinypubsub'
 import fakeENV from 'helpers/fakeENV'
 
-const I18n = useI18nScope('calendar');
+const I18n = useI18nScope('calendar')
 
 QUnit.module('Calendar', {
   setup() {

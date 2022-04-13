@@ -78,6 +78,16 @@ describe WikiPagesApiController, type: :request do
           expect(WikiPage.last.body).to eq "banana"
         end
 
+        context "when the page content is too deeply nested" do
+          before do
+            stub_const("CanvasSanitize::SANITIZE", { parser_options: { max_tree_depth: 1 } })
+          end
+
+          it "responds with bad request" do
+            create_wiki_page(@teacher, { title: "New Page", body: "<div><p>too long</p></div>" }, 400)
+          end
+        end
+
         context "when the user also has manage_wiki_update permission" do
           it "is not published by default" do
             create_wiki_page(@teacher, { title: "New Page" })

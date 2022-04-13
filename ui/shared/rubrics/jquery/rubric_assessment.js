@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'lodash'
 import React from 'react'
@@ -33,7 +33,7 @@ import '@canvas/rails-flash-notifications'
 import Rubric from '../react/Rubric'
 import {fillAssessment, updateAssociationData} from '../react/helpers'
 
-const I18n = useI18nScope('rubric_assessment');
+const I18n = useI18nScope('rubric_assessment')
 
 // TODO: stop managing this in the view and get it out of the global scope submissions/show.html.erb
 /* global rubricAssessment */

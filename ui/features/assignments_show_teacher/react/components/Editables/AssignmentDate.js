@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {bool, func, oneOf, string} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
@@ -28,7 +28,7 @@ import uid from '@instructure/uid'
 import TeacherViewContext from '../TeacherViewContext'
 import EditableDateTime from './EditableDateTime'
 
-const I18n = useI18nScope('assignments_2');
+const I18n = useI18nScope('assignments_2')
 
 const fallbackErrorMessage = I18n.t('Invalid date-time')
 

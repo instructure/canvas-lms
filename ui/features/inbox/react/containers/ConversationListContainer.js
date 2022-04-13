@@ -20,7 +20,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CONVERSATIONS_QUERY, SUBMISSION_COMMENTS_QUERY} from '../../graphql/Queries'
 import {UPDATE_CONVERSATION_PARTICIPANTS} from '../../graphql/Mutations'
 import {ConversationListHolder} from '../components/ConversationListHolder/ConversationListHolder'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {Mask} from '@instructure/ui-overlays'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState} from 'react'
@@ -28,7 +28,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {useQuery, useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 
-const I18n = useI18nScope('conversations_2');
+const I18n = useI18nScope('conversations_2')
 
 const ConversationListContainer = ({course, scope, onSelectConversation, userFilter}) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)

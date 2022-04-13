@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import editApptCalendarEventTemplate from '../jst/editApptCalendarEvent.handlebars'
 
-const I18n = useI18nScope('appt_calendar_event_dialog');
+const I18n = useI18nScope('appt_calendar_event_dialog')
 
 export default class EditApptCalendarEventDialog {
   constructor(event) {

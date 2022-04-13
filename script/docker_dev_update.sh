@@ -4,12 +4,13 @@ set -e
 source script/common/utils/common.sh
 source script/common/canvas/build_helpers.sh
 
-LOG="$(pwd)/log/docker_dev_update.log"
-DOCKER='true'
-SCRIPT_NAME=$0
-
 trap trap_result EXIT
 trap "printf '\nTerminated\n' && exit 130" SIGINT
+
+LOG="$(pwd)/log/docker_dev_update.log"
+DOCKER='true'
+OS="$(uname)"
+SCRIPT_NAME=$0
 
 usage () {
   echo "usage:"
@@ -25,11 +26,9 @@ die () {
 }
 
 _canvas_lms_opt_in_telemetry "$SCRIPT_NAME" "$LOG"
-if is_mutagen; then
-  DOCKER_COMMAND="mutagen-compose"
-  CANVAS_SKIP_DOCKER_USERMOD='true'
-  print_mutagen_intro
-fi
+DOCKER_COMMAND="mutagen-compose"
+CANVAS_SKIP_DOCKER_USERMOD='true'
+print_mutagen_intro
 
 while :; do
   case $1 in
@@ -77,11 +76,15 @@ done
 # check for docker daemon running before anything else
 docker_running || exit 1
 
+if [[ $OS == 'Darwin' ]]; then
+  source script/common/utils/dinghy_proxy_setup.sh
+  dinghy_machine_exists && exit 1
+fi
+
 if [ -f "docker-compose.override.yml" ]; then
   echo "docker-compose.override.yml exists, skipping copy of default configuration"
 else
-  echo "Copying default configuration from config/docker-compose.override.yml.example to docker-compose.override.yml"
-  cp config/docker-compose.override.yml.example docker-compose.override.yml
+  copy_mutagen_override
 fi
 
 if [[ -n "$UPDATE_CODE" ]] || [[ -n "$REBUILD_DOCKER" ]] && [[ "$(docker-compose top | wc -l)" -gt 0 ]]; then

@@ -40,6 +40,7 @@ module Api::V1::ExternalTools
     json["not_selectable"] = tool.not_selectable
     json["version"] = tool.use_1_3? ? "1.3" : "1.1"
     json["developer_key_id"] = tool.developer_key_id if tool.developer_key_id
+    json["deployment_id"] = tool.deployment_id if tool.deployment_id
     extension_types.each do |type|
       next unless json[type]
 

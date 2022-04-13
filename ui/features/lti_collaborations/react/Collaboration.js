@@ -21,11 +21,11 @@ import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import DatetimeDisplay from '@canvas/datetime/react/components/DatetimeDisplay'
 import DeleteConfirmation from './DeleteConfirmation'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import splitAssetString from '@canvas/util/splitAssetString'
 import store from './store'
 
-const I18n = useI18nScope('react_collaborations');
+const I18n = useI18nScope('react_collaborations')
 
 class Collaboration extends React.Component {
   constructor(props) {

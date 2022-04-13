@@ -27,12 +27,12 @@ import {Grid} from '@instructure/ui-grid'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import SearchableSelect from './SearchableSelect'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import preventDefault from 'prevent-default'
 import {propType as termsPropType} from '../store/TermsStore'
 import NewCourseModal from './NewCourseModal'
 
-const I18n = useI18nScope('account_course_user_search');
+const I18n = useI18nScope('account_course_user_search')
 
 function termGroup(term) {
   if (term.start_at && new Date(term.start_at) > new Date()) return 'future'

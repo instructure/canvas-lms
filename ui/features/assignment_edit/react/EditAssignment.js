@@ -20,14 +20,14 @@ import PropTypes from 'prop-types'
 import React, {Suspense} from 'react'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconTrashLine} from '@instructure/ui-icons'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import ErrorBoundary from '@canvas/error-boundary'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import LoadingIndicator from '@canvas/loading-indicator'
 
-const I18n = useI18nScope('assignment');
+const I18n = useI18nScope('assignment')
 
 const FileBrowser = React.lazy(() => import('@canvas/rce/FileBrowser'))
 

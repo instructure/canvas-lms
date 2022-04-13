@@ -39,9 +39,9 @@ describe Lti::Messages::ResourceLinkRequest do
       expect_course_resource_link_id(jws)
     end
 
-    describe "custom parameters" do
-      let(:link_for_params) do
-        Lti::ResourceLink.new(
+    describe "with resource link passed in" do
+      let(:resource_link) do
+        Lti::ResourceLink.create!(
           context_external_tool: tool_override || tool,
           context: course,
           custom: {
@@ -50,9 +50,13 @@ describe Lti::Messages::ResourceLinkRequest do
           }
         )
       end
-      let(:opts) { super().merge(resource_link_for_custom_params: link_for_params) }
+      let(:opts) { super().merge(resource_link: resource_link) }
 
-      context "when link-level custom params are given in resource_link_for_custom_params" do
+      it "uses resource link uuid for rlid claim" do
+        expect(jws.dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "id")).to eq resource_link.resource_link_uuid
+      end
+
+      context "when link-level custom params are given in resource_link" do
         it "merges them in with tool/placement parameters" do
           expect(jws["https://purl.imsglobal.org/spec/lti/claim/custom"]).to eq(
             "link_has_expansion2" => assignment.id,

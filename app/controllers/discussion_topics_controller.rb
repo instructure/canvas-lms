@@ -763,9 +763,15 @@ class DiscussionTopicsController < ApplicationController
                  Base64.encode64("#{@current_user.uuid}vyfW=;[p-0?:{P_\=HUpgraqe;njalkhpvoiulkimmaqewg")
              })
 
+      unless @locked
+        InstStatsd::Statsd.increment("discussion_topic.visit.redesign")
+        InstStatsd::Statsd.count("discussion_topic.visit.entries.redesign", @topic.discussion_entries.count)
+        InstStatsd::Statsd.count("discussion_topic.visit.pages.redesign", (@topic.discussion_entries.count / 20).ceil)
+      end
+
       js_bundle :discussion_topics_post
       css_bundle :discussions_index, :learning_outcomes
-      render html: "", layout: true
+      render html: "", layout: params[:embed] == "true" ? "mobile_embed" : true
       return
     end
 
@@ -894,6 +900,12 @@ class DiscussionTopicsController < ApplicationController
             conditional_release_js_env(@topic.assignment, includes: [:rule])
             js_bundle :discussion_topic
             css_bundle :tinymce, :discussions, :learning_outcomes
+
+            unless @locked
+              InstStatsd::Statsd.increment("discussion_topic.visit.legacy")
+              InstStatsd::Statsd.count("discussion_topic.visit.entries.legacy", @topic.discussion_entries.count)
+              InstStatsd::Statsd.count("discussion_topic.visit.pages.legacy", (@topic.discussion_entries.count / 50).ceil)
+            end
 
             render stream: can_stream_template?
           end
@@ -1246,10 +1258,6 @@ class DiscussionTopicsController < ApplicationController
   def process_discussion_topic_runner(is_new:)
     @errors = {}
 
-    if is_new
-      InstStatsd::Statsd.increment("discussion_topic.created")
-    end
-
     anonymous_discussions_disabled = !(Account.site_admin.feature_enabled?(:discussion_anonymity) && @context.feature_enabled?(:react_discussions_post))
     if is_new && anonymous_discussions_disabled
       params[:anonymous_state] = nil
@@ -1389,6 +1397,27 @@ class DiscussionTopicsController < ApplicationController
 
         include_usage_rights = @context.root_account.feature_enabled?(:usage_rights_discussion_topics) &&
                                @context.try(:usage_rights_required?)
+
+        if is_new
+          InstStatsd::Statsd.increment("discussion_topic.created")
+
+          if params[:anonymous_state] == "partial_anonymity"
+            InstStatsd::Statsd.increment("discussion_topic.created.partial_anonymity")
+          end
+
+          if params[:anonymous_state] == "full_anonymity"
+            InstStatsd::Statsd.increment("discussion_topic.created.full_anonymity")
+          end
+
+          if params[:assignment]
+            InstStatsd::Statsd.increment("discussion_topic.created.graded")
+          end
+
+          if @context.is_a?(Group)
+            InstStatsd::Statsd.increment("discussion_topic.created.group")
+          end
+        end
+
         if @context.is_a?(Course)
           render json: discussion_topic_api_json(@topic,
                                                  @context,

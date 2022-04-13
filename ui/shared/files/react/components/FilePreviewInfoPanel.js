@@ -18,14 +18,14 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import friendlyBytes from '../../util/friendlyBytes'
 import customPropTypes from '../modules/customPropTypes'
 import getFileStatus from '../../util/getFileStatus'
 import mimeClass from '@canvas/mime/mimeClass'
 
-const I18n = useI18nScope('file_preview');
+const I18n = useI18nScope('file_preview')
 
 class FilePreviewInfoPanel extends React.Component {
   static displayName = 'FilePreviewInfoPanel'

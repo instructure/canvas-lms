@@ -17,14 +17,14 @@
  */
 
 import React, {useEffect, useMemo, useRef, useReducer} from 'react'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Select} from '@instructure/ui-select'
 import numberHelper from '@canvas/i18n/numberHelper'
 import {FAILURE, STARTED, SUCCESS} from '../../grades/GradeActions'
 import {arrayOf, bool, func, object, oneOf, shape, string} from 'prop-types'
 
-const I18n = useI18nScope('assignment_grade_summary');
+const I18n = useI18nScope('assignment_grade_summary')
 
 const NO_SELECTION = 'no-selection'
 const NO_SELECTION_LABEL = '–'

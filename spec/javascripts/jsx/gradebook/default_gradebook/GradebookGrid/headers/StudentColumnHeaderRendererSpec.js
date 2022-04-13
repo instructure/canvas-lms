@@ -22,7 +22,7 @@ import {
   setFixtureHtml
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import StudentColumnHeader from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/StudentColumnHeader'
-import StudentColumnHeaderRenderer from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/StudentColumnHeaderRenderer.js'
+import StudentColumnHeaderRenderer from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/StudentColumnHeaderRenderer'
 import StudentLastNameColumnHeader from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/StudentLastNameColumnHeader'
 
 QUnit.module('GradebookGrid StudentLastNameColumnHeaderRenderer', suiteHooks => {

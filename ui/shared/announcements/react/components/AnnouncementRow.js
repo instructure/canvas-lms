@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import {bool, func} from 'prop-types'
 import $ from 'jquery'
@@ -36,7 +36,7 @@ import announcementShape from '../proptypes/announcement'
 import masterCourseDataShape from '@canvas/courses/react/proptypes/masterCourseData'
 import {makeTimestamp} from '@canvas/datetime/react/date-utils'
 
-const I18n = useI18nScope('shared_components');
+const I18n = useI18nScope('shared_components')
 
 export default function AnnouncementRow({
   announcement,

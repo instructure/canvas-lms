@@ -574,6 +574,8 @@ describe "Common Cartridge exporting" do
       stub_request(:get, "http://www.example.com/blah.flv").to_return(body: "", status: 200)
       allow(CC::CCHelper).to receive(:media_object_info).and_return({ asset: { id: 1, status: "2" }, path: "blah.flv" })
       obj = @course.media_objects.create! media_id: "0_deadbeef"
+      obj.attachment = Attachment.create!(context_id: obj.context_id, context_type: obj.context_type, filename: "", content_type: "unknown/unknown")
+      obj.save!
       track = obj.media_tracks.create! kind: "subtitles", locale: "tlh", content: "Hab SoSlI' Quch!"
       page = @course.wiki_pages.create!(title: "wiki", body: "ohai")
       page.body = '<a id="media_comment_0_deadbeef" class="instructure_inline_media_comment video_comment"></a>'

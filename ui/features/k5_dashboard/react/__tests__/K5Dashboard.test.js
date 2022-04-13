@@ -16,42 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import moment from 'moment-timezone'
 import moxios from 'moxios'
 import {act, render, screen, waitFor} from '@testing-library/react'
 import {resetCardCache} from '@canvas/dashboard-card'
 import {resetPlanner} from '@instructure/canvas-planner'
 import fetchMock from 'fetch-mock'
-import {OBSERVER_COOKIE_PREFIX} from '@canvas/observer-picker/ObserverGetObservee'
-import {cloneDeep} from 'lodash'
-import {MOCK_TODOS} from './mocks'
 import {
-  MOCK_ASSIGNMENTS,
-  MOCK_CARDS,
-  MOCK_CARDS_2,
-  MOCK_EVENTS,
-  MOCK_PLANNER_ITEM
-} from '@canvas/k5/react/__tests__/fixtures'
-import {MOCK_OBSERVED_USERS_LIST} from '@canvas/observer-picker/react/__tests__/fixtures'
+  MOCK_TODOS,
+  createPlannerMocks,
+  defaultEnv,
+  defaultK5DashboardProps as defaultProps
+} from './mocks'
+import {MOCK_ASSIGNMENTS, MOCK_CARDS, MOCK_EVENTS} from '@canvas/k5/react/__tests__/fixtures'
+
 import K5Dashboard from '../K5Dashboard'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 
 const ASSIGNMENTS_URL = /\/api\/v1\/calendar_events\?type=assignment&important_dates=true&.*/
-const currentUserId = '1'
-const observedUserCookieName = `${OBSERVER_COOKIE_PREFIX}${currentUserId}`
-const currentUser = {
-  id: currentUserId,
-  display_name: 'Geoffrey Jellineck',
-  name: 'Geoffrey Jellineck',
-  avatar_image_url: 'http://avatar'
-}
-const cardSummary = [
-  {
-    type: 'Conversation',
-    unread_count: 1,
-    count: 3
-  }
-]
 const announcements = [
   {
     id: '20',
@@ -106,26 +87,6 @@ const gradeCourses = [
     homeroom_course: true
   }
 ]
-const opportunities = [
-  {
-    id: '1',
-    course_id: '1',
-    name: 'Assignment 1',
-    points_possible: 23,
-    html_url: '/courses/1/assignments/1',
-    due_at: '2021-01-10T05:59:00Z',
-    submission_types: ['online_quiz']
-  },
-  {
-    id: '2',
-    course_id: '1',
-    name: 'Assignment 2',
-    points_possible: 10,
-    html_url: '/courses/1/assignments/2',
-    due_at: '2021-01-15T05:59:00Z',
-    submission_types: ['online_url']
-  }
-]
 const syllabus = {
   id: '2',
   syllabus_body: "<p>Here's the grading scheme for this class.</p>"
@@ -165,107 +126,17 @@ const staff = [
     ]
   }
 ]
-const defaultEnv = {
-  current_user: currentUser,
-  current_user_id: '1',
-  K5_USER: true,
-  PREFERENCES: {
-    hide_dashcard_color_overlays: false
-  },
-  MOMENT_LOCALE: 'en',
-  TIMEZONE: 'America/Denver'
-}
-const defaultProps = {
-  canDisableElementaryDashboard: false,
-  currentUser,
-  currentUserRoles: ['admin'],
-  createPermission: null,
-  restrictCourseCreation: false,
-  plannerEnabled: false,
-  loadingOpportunities: false,
-  loadAllOpportunities: () => {},
-  timeZone: defaultEnv.TIMEZONE,
-  hideGradesTabForStudents: false,
-  selectedContextCodes: ['course_1', 'course_3'],
-  selectedContextsLimit: 2,
-  canAddObservee: false,
-  observedUsersList: [{id: currentUser.id, name: currentUser.display_name}],
-  openTodosInNewTab: true
-}
-function createPlannerMocks() {
-  moxios.stubRequest(/\/api\/v1\/dashboard\/dashboard_cards$/, {
-    status: 200,
-    response: MOCK_CARDS
-  })
-  moxios.stubRequest(/api\/v1\/planner\/items\?start_date=.*end_date=.*/, {
-    status: 200,
-    headers: {link: 'url; rel="current"'},
-    response: MOCK_PLANNER_ITEM
-  })
-  moxios.stubRequest(/api\/v1\/planner\/items\?start_date=.*per_page=1/, {
-    status: 200,
-    headers: {link: 'url; rel="current"'},
-    response: [
-      {
-        context_name: 'Course2',
-        context_type: 'Course',
-        course_id: '1',
-        html_url: '/courses/2/announcements/12',
-        new_activity: false,
-        plannable: {
-          created_at: '2020-03-16T17:17:17Z',
-          id: '12',
-          title: 'Announcement 12',
-          updated_at: '2020-03-16T17:31:52Z'
-        },
-        plannable_date: moment().subtract(6, 'months').toISOString(),
-        plannable_id: '12',
-        plannable_type: 'announcement',
-        planner_override: null,
-        submissions: {}
-      }
-    ]
-  })
-  moxios.stubRequest(/api\/v1\/planner\/items\?end_date=.*per_page=1/, {
-    status: 200,
-    headers: {link: 'url; rel="current"'},
-    response: [
-      {
-        context_name: 'Course2',
-        context_type: 'Course',
-        course_id: '1',
-        html_url: '/courses/2/discussion_topics/8',
-        new_activity: false,
-        plannable: {
-          created_at: '2022-03-16T17:17:17Z',
-          id: '8',
-          title: 'Discussion 8',
-          updated_at: '2022-03-16T17:31:52Z'
-        },
-        plannable_date: moment().add(6, 'months').toISOString(),
-        plannable_id: '8',
-        plannable_type: 'discussion',
-        planner_override: null,
-        submissions: {}
-      }
-    ]
-  })
-  moxios.stubRequest(/\/api\/v1\/users\/self\/missing_submission.*/, {
-    status: 200,
-    headers: {link: 'url; rel="current"'},
-    response: opportunities
-  })
-}
 beforeAll(() => {
   jest.setTimeout(15000)
 })
+
 afterAll(() => {
   jest.setTimeout(5000)
 })
+
 beforeEach(() => {
   moxios.install()
   createPlannerMocks()
-  fetchMock.get('/api/v1/courses/1/activity_stream/summary', JSON.stringify(cardSummary))
   fetchMock.get(/\/api\/v1\/announcements.*/, announcements)
   fetchMock.get(/\/api\/v1\/users\/self\/courses.*/, JSON.stringify(gradeCourses))
   fetchMock.get(encodeURI('api/v1/courses/2?include[]=syllabus_body'), JSON.stringify(syllabus))
@@ -280,9 +151,9 @@ beforeEach(() => {
     JSON.stringify({status: 'ok'})
   )
   fetchMock.put(/\/api\/v1\/users\/\d+\/colors\.*/, {status: 200, body: []})
-  fetchMock.get(/\/api\/v1\/users\/\d+\/calendar_events\.*/, JSON.stringify([]))
   global.ENV = defaultEnv
 })
+
 afterEach(() => {
   moxios.uninstall()
   fetchMock.restore()
@@ -292,8 +163,8 @@ afterEach(() => {
   sessionStorage.clear()
   window.location.hash = ''
   destroyContainer()
-  document.cookie = `${observedUserCookieName}=`
 })
+
 describe('K-5 Dashboard', () => {
   it('displays a welcome message to the logged-in user', () => {
     const {getByText} = render(<K5Dashboard {...defaultProps} />)
@@ -327,48 +198,7 @@ describe('K-5 Dashboard', () => {
       )
     })
   })
-  describe('Tabs', () => {
-    it('show Homeroom, Schedule, Grades, and Resources options', async () => {
-      const {getByText} = render(<K5Dashboard {...defaultProps} />)
-      await waitFor(() => {
-        ;['Homeroom', 'Schedule', 'Grades', 'Resources'].forEach(label =>
-          expect(getByText(label)).toBeInTheDocument()
-        )
-      })
-    })
 
-    it('default to the Homeroom tab', async () => {
-      const {findByRole} = render(<K5Dashboard {...defaultProps} />)
-      expect(await findByRole('tab', {name: 'Homeroom', selected: true})).toBeInTheDocument()
-    })
-    describe('store current tab ID to URL', () => {
-      afterEach(() => {
-        window.location.hash = ''
-      })
-
-      it('and start at that tab if it is valid', async () => {
-        window.location.hash = '#grades'
-        const {findByRole} = render(<K5Dashboard {...defaultProps} />)
-        expect(await findByRole('tab', {name: 'Grades', selected: true})).toBeInTheDocument()
-      })
-
-      it('and start at the default tab if it is invalid', async () => {
-        window.location.hash = 'tab-not-a-real-tab'
-        const {findByRole} = render(<K5Dashboard {...defaultProps} />)
-        expect(await findByRole('tab', {name: 'Homeroom', selected: true})).toBeInTheDocument()
-      })
-
-      it('and update the current tab as tabs are changed', async () => {
-        const {findByRole, getByRole, queryByRole} = render(<K5Dashboard {...defaultProps} />)
-        const gradesTab = await findByRole('tab', {name: 'Grades'})
-        act(() => gradesTab.click())
-        expect(await findByRole('tab', {name: 'Grades', selected: true})).toBeInTheDocument()
-        act(() => getByRole('tab', {name: 'Resources'}).click())
-        expect(await findByRole('tab', {name: 'Resources', selected: true})).toBeInTheDocument()
-        expect(queryByRole('tab', {name: 'Grades', selected: true})).not.toBeInTheDocument()
-      })
-    })
-  })
   describe('Homeroom Section', () => {
     it('displays "My Subjects" heading', async () => {
       const {findByText} = render(<K5Dashboard {...defaultProps} />)
@@ -490,162 +320,7 @@ describe('K-5 Dashboard', () => {
       })
     })
   })
-  describe('Schedule Section', () => {
-    it('displays the planner with a planned item', async () => {
-      const {findByText} = render(
-        <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
-      )
-      expect(await findByText('Assignment 15')).toBeInTheDocument()
-      // The new weekly planner doesn't display the PlannerEmptyState.
-      // This will get addressed one way or another with LS-2042
-      // expect(await findByText("Looks like there isn't anything here")).toBeInTheDocument()
-      // expect(await findByText('Nothing More To Do')).toBeInTheDocument()
-    })
-    // Skipping for flakiness. See https://instructure.atlassian.net/browse/LS-2243.
-    it.skip('displays a list of missing assignments if there are any', async () => {
-      const {findByRole, getByRole, getByText} = render(
-        <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
-      )
-      const missingAssignments = await findByRole('button', {
-        name: 'Show 2 missing items',
-        timeout: 5000
-      })
-      expect(missingAssignments).toBeInTheDocument()
-      act(() => missingAssignments.click())
-      expect(getByRole('button', {name: 'Hide 2 missing items'})).toBeInTheDocument()
-      expect(getByText('Assignment 1')).toBeInTheDocument()
-      expect(getByText('Assignment 2')).toBeInTheDocument()
-    })
 
-    it('renders the weekly planner header', async () => {
-      const {findByTestId} = render(
-        <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
-      )
-      const planner = await findByTestId('PlannerApp', {timeout: 4000}) // give it some more time
-      expect(planner).toBeInTheDocument()
-      const header = await findByTestId('WeeklyPlannerHeader')
-      expect(header).toBeInTheDocument()
-    })
-
-    it('renders an "jump to navigation" button at the bottom of the schedule tab', async () => {
-      const {findByRole} = render(
-        <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
-      )
-      const jumpToNavButton = await findByRole('button', {name: 'Jump to navigation toolbar'})
-      expect(jumpToNavButton).not.toBeVisible()
-      act(() => jumpToNavButton.focus())
-      expect(jumpToNavButton).toBeVisible()
-      act(() => jumpToNavButton.click())
-      expect(document.activeElement.id).toBe('weekly-header-active-button')
-      expect(jumpToNavButton).not.toBeVisible()
-    })
-
-    it('allows navigating to next/previous weeks if there are plannable items in the future/past', async () => {
-      const {findByRole, getByRole} = render(
-        <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
-      )
-      const todayButton = await findByRole('button', {name: 'Jump to Today'})
-      expect(todayButton).toBeEnabled()
-      const previousButton = getByRole('button', {name: 'View previous week'})
-      await waitFor(() => expect(previousButton).toBeEnabled())
-      const nextButton = getByRole('button', {name: 'View next week'})
-      expect(nextButton).toBeEnabled()
-    })
-
-    it('displays a teacher preview if the user has no student enrollments', async () => {
-      const {findByTestId, getByText} = render(
-        <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled={false} />
-      )
-      expect(await findByTestId('kinder-panda')).toBeInTheDocument()
-      expect(getByText('Schedule Preview')).toBeInTheDocument()
-      expect(
-        getByText('Below is an example of how students will see their schedule')
-      ).toBeInTheDocument()
-      expect(getByText('Math')).toBeInTheDocument()
-      expect(getByText('A wonderful assignment')).toBeInTheDocument()
-      expect(getByText('Social Studies')).toBeInTheDocument()
-      expect(getByText('Exciting discussion')).toBeInTheDocument()
-    })
-
-    it('preloads surrounding weeks only once schedule tab is visible', async done => {
-      const {findByText, getByRole} = render(
-        <K5Dashboard {...defaultProps} currentUserRoles={['user', 'student']} plannerEnabled />
-      )
-      expect(await findByText('Assignment 15')).toBeInTheDocument()
-      expect(moxios.requests.count()).toBe(6)
-      act(() => getByRole('tab', {name: 'Schedule'}).click())
-      moxios.wait(() => {
-        expect(moxios.requests.count()).toBe(8) // 2 more requests for prev and next week preloads
-        done()
-      })
-    })
-
-    it('reloads the planner with correct data when the selected observee is updated', async done => {
-      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=1', {
-        status: 200,
-        response: MOCK_CARDS
-      })
-      const observerPlannerItem = cloneDeep(MOCK_PLANNER_ITEM)
-      observerPlannerItem[0].plannable.title = 'Assignment for Observee'
-      const observedUsersList = [
-        {
-          id: currentUserId,
-          name: 'Self'
-        },
-        {
-          id: '2',
-          name: 'Student 2'
-        }
-      ]
-      const {findByText, findByRole, getByRole, getByText} = render(
-        <K5Dashboard
-          {...defaultProps}
-          defaultTab="tab-schedule"
-          plannerEnabled
-          canAddObservee
-          currentUserRoles={['user', 'observer']}
-          observedUsersList={observedUsersList}
-        />
-      )
-      expect(await findByText('Assignment 15')).toBeInTheDocument()
-      expect(
-        await findByRole('button', {
-          name: 'Show 2 missing items',
-          timeout: 5000
-        })
-      ).toBeInTheDocument()
-      moxios.stubs.reset()
-      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=2', {
-        status: 200,
-        response: MOCK_CARDS_2
-      })
-      moxios.stubRequest(/api\/v1\/planner\/items\?.*observed_user_id=2.*/, {
-        status: 200,
-        headers: {link: 'url; rel="current"'},
-        response: observerPlannerItem
-      })
-      moxios.stubRequest(/\/api\/v1\/users\/self\/missing_submissions\?.*observed_user_id=2.*/, {
-        status: 200,
-        headers: {link: 'url; rel="current"'},
-        response: [opportunities[0]]
-      })
-      const observerSelect = getByRole('combobox', {name: 'Select a student to view'})
-      act(() => observerSelect.click())
-      act(() => getByText('Student 2').click())
-      expect(await findByText('Assignment for Observee')).toBeInTheDocument()
-      expect(
-        await findByRole('button', {
-          name: 'Show 1 missing item',
-          timeout: 10000
-        })
-      ).toBeInTheDocument()
-      moxios.wait(() => {
-        const request = moxios.requests.mostRecent()
-        expect(request.url).toContain('observed_user_id=2')
-        done()
-      })
-    })
-  })
   describe('Grades Section', () => {
     it('does not show the grades tab to students if hideGradesTabForStudents is set', async () => {
       const {queryByRole} = render(
@@ -663,6 +338,7 @@ describe('K-5 Dashboard', () => {
       expect(queryByText('Homeroom Class')).not.toBeInTheDocument()
     })
   })
+
   describe('Resources Section', () => {
     it('displays syllabus content for homeroom under important info section', async () => {
       const {getByText, findByText} = render(
@@ -689,6 +365,7 @@ describe('K-5 Dashboard', () => {
       expect(wrapper.getByText('Teaching Assistant')).toBeInTheDocument()
     })
   })
+
   describe('Todos Section', () => {
     it('displays todo tab to teachers', async () => {
       const {findByRole} = render(<K5Dashboard {...defaultProps} currentUserRoles={['teacher']} />)
@@ -759,164 +436,6 @@ describe('K-5 Dashboard', () => {
     it('loads important dates on the grades tab', async () => {
       const {getByText} = render(<K5Dashboard {...defaultProps} defaultTab="tab-grades" />)
       await waitFor(() => expect(getByText('History Discussion')).toBeInTheDocument())
-    })
-  })
-  describe('Parent Support', () => {
-    beforeEach(() => {
-      document.cookie = `${observedUserCookieName}=4;path=/`
-    })
-    const opportunities2 = [
-      {
-        id: '3',
-        course_id: '23',
-        name: 'A new Assignment',
-        points_possible: 10,
-        html_url: '/courses/23/assignments/3',
-        due_at: '2021-02-15T05:59:00Z',
-        submission_types: ['online_text_entry']
-      }
-    ]
-
-    it('shows picker when user is an observer', () => {
-      const {getByRole} = render(
-        <K5Dashboard
-          {...defaultProps}
-          canAddObservee
-          currentUserRoles={['user', 'observer']}
-          observedUsersList={MOCK_OBSERVED_USERS_LIST}
-        />
-      )
-      const select = getByRole('combobox', {name: 'Select a student to view'})
-      expect(select).toBeInTheDocument()
-      expect(select.value).toBe('Student 4')
-    })
-
-    it('prefetches dashboard cards with the correct url param', async done => {
-      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=4', {
-        status: 200,
-        response: MOCK_CARDS
-      })
-
-      render(
-        <K5Dashboard
-          {...defaultProps}
-          currentUserRoles={['user', 'observer', 'teacher']}
-          canAddObservee
-          observedUsersList={MOCK_OBSERVED_USERS_LIST}
-        />
-      )
-      // let the dashboard execute all its queries and render
-      await waitFor(
-        () => {
-          expect(moxios.requests.mostRecent()).not.toBeNull()
-        },
-        {timeout: 5000}
-      )
-      const preFetchedRequest = moxios.requests.mostRecent()
-      expect(preFetchedRequest.url).toBe('/api/v1/dashboard/dashboard_cards?observed_user_id=4')
-      expect(moxios.requests.count()).toBe(1)
-      done()
-    })
-
-    it('does not make a request if the user has been already requested', async () => {
-      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=4', {
-        status: 200,
-        response: MOCK_CARDS
-      })
-      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=2', {
-        status: 200,
-        response: MOCK_CARDS_2
-      })
-      const {findByText, getByRole, getByText, queryByText} = render(
-        <K5Dashboard
-          {...defaultProps}
-          currentUserRoles={['user', 'observer', 'teacher']}
-          canAddObservee
-          observedUsersList={MOCK_OBSERVED_USERS_LIST}
-        />
-      )
-      expect(await findByText('Economics 101')).toBeInTheDocument()
-      expect(queryByText('Economics 203')).not.toBeInTheDocument()
-      const select = getByRole('combobox', {name: 'Select a student to view'})
-      expect(select.value).toBe('Student 4')
-      expect(moxios.requests.mostRecent().url).toBe(
-        '/api/v1/dashboard/dashboard_cards?observed_user_id=4'
-      )
-      act(() => select.click())
-      act(() => getByText('Student 2').click())
-      expect(await findByText('Economics 203')).toBeInTheDocument()
-      expect(queryByText('Economics 101')).not.toBeInTheDocument()
-      expect(moxios.requests.mostRecent().url).toBe(
-        '/api/v1/dashboard/dashboard_cards?observed_user_id=2'
-      )
-      act(() => select.click())
-      act(() => getByText('Student 4').click())
-      expect(await findByText('Economics 101')).toBeInTheDocument()
-      expect(queryByText('Economics 203')).not.toBeInTheDocument()
-      // Should not fetch student 4's cards again; they've been cached
-      expect(moxios.requests.mostRecent().url).toBe(
-        '/api/v1/dashboard/dashboard_cards?observed_user_id=2'
-      )
-      // 2 total requests - one for student 4, one for student 2
-      expect(moxios.requests.count()).toBe(2)
-    })
-
-    it('shows the observee missing items on dashboard cards', async () => {
-      moxios.stubs.reset()
-      moxios.requests.reset()
-      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=4', {
-        status: 200,
-        response: MOCK_CARDS
-      })
-      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=2', {
-        status: 200,
-        response: MOCK_CARDS_2
-      })
-      moxios.stubRequest(/\/api\/v1\/users\/self\/missing_submissions\?.*observed_user_id=4.*/, {
-        status: 200,
-        headers: {link: 'url; rel="current"'},
-        response: opportunities
-      })
-      moxios.stubRequest(/\/api\/v1\/users\/self\/missing_submissions\?.*observed_user_id=2.*/, {
-        status: 200,
-        headers: {link: 'url; rel="current"'},
-        response: opportunities2
-      })
-      createPlannerMocks()
-
-      const {getByText, findByRole, getByRole} = render(
-        <K5Dashboard
-          {...defaultProps}
-          currentUserRoles={['user', 'observer', 'teacher']}
-          observedUsersList={MOCK_OBSERVED_USERS_LIST}
-          canAddObservee
-          plannerEnabled
-        />
-      )
-      // let the dashboard execute all its queries and render
-      await waitFor(
-        () => {
-          expect(document.querySelectorAll('.ic-DashboardCard').length).toBeGreaterThan(0)
-        },
-        {timeout: 5000}
-      )
-      expect(
-        await findByRole('link', {
-          name: 'View 2 missing items for course Economics 101',
-          timeout: 5000,
-          exact: false
-        })
-      ).toBeInTheDocument()
-      const observerSelect = getByRole('combobox', {name: 'Select a student to view'})
-      act(() => observerSelect.click())
-      act(() => getByText('Student 2').click())
-      expect(
-        await findByRole('link', {
-          name: 'View 1 missing items for course Economics 203',
-          timeout: 5000,
-          exact: false
-        })
-      ).toBeInTheDocument()
     })
   })
 })

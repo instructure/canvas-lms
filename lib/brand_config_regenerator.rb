@@ -59,52 +59,69 @@ class BrandConfigRegenerator
 
   def things_that_need_to_be_regenerated
     @things_that_need_to_be_regenerated ||= begin
-      all_subaccounts = Account.active.select([:id, :brand_config_md5].union(Account::BASIC_COLUMNS_FOR_CALLBACKS)).preload(:brand_config).sub_accounts_recursive(@account.id)
-      # can't do the condition in the query above, because we'd stop going down branches if
-      # an intermediate sub account didn't have a brand config
-      result = all_subaccounts.select(&:brand_config_md5)
-      result.concat(SharedBrandConfig.where(account_id: all_subaccounts).preload(:brand_config))
-      if @account.site_admin?
-        # NOTE: this is only root accounts on the same shard as site admin
-        @account.shard.activate do
-          root_scope = Account.root_accounts.active.non_shadow.where.not(id: @account).preload(:brand_config)
+      result = []
+      # In prod this will take a pretty long time for siteadmin, but we don't expect this to ever be used on siteadmin in prod
+      Shard.with_each_shard(target_shards) do
+        root_scope = Account.root_accounts.active.non_shadow.preload(:brand_config)
+        if Shard.current == @account.shard
+          root_scope = root_scope.where.not(id: @account)
+        end
+        root_scope = filter_root_scope(root_scope)
+        if root_scope
           result.concat(root_scope.where.not(brand_config_md5: nil))
           result.concat(SharedBrandConfig.where(account_id: root_scope).preload(:brand_config))
-
-          sub_scope = Account.active.where(root_account_id: root_scope).preload(:brand_config)
-          result.concat(sub_scope.where.not(brand_config_md5: nil))
-          result.concat(SharedBrandConfig.where(account_id: sub_scope).preload(:brand_config))
         end
+
+        sub_scope = Account.active.where(root_account_id: [root_scope&.pluck(:id), Shard.current == @account.shard ? @account.id : nil].compact.flatten).preload(:brand_config)
+        result.concat(sub_scope.where.not(brand_config_md5: nil))
+        result.concat(SharedBrandConfig.where(account_id: sub_scope).preload(:brand_config))
       end
       result
     end.freeze
   end
 
+  def target_shards
+    if @account.site_admin?
+      Shard.all
+    else
+      [@account.shard]
+    end
+  end
+
+  def filter_root_scope(scope)
+    if @account.site_admin?
+      scope
+    else
+      nil
+    end
+  end
+
   # Returns true if this brand config is not based on anything that needs to be regenerated.
   # This should not be common but can happen in dev/test setups that got into an inconsistent state
   def orphan?(brand_config)
-    things_that_need_to_be_regenerated.none? { |thing| thing.brand_config_md5 == brand_config.parent_md5 }
+    things_that_need_to_be_regenerated.none? { |thing| thing.brand_config_md5 == brand_config.local_parent_md5 }
   end
 
   # If we haven't saved a new copy for a config's parent,
   # we don't know its new parent_md5 yet.
   def ready_to_process?(account_or_shared_brand_config)
     config = account_or_shared_brand_config.brand_config
-    !config.parent || @new_configs.key?(config.parent_md5) || orphan?(config)
+    !config.parent || @new_configs.key?(config.local_parent_md5) || orphan?(config)
   end
 
   def regenerate(thing)
     config = thing.brand_config
     return unless config
 
-    new_parent_md5 = (config.parent_md5 && @new_configs[config.parent_md5].try(:md5)) || @account.brand_config_md5
-    new_config = config.clone_with_new_parent(new_parent_md5)
-    new_config.save_unless_dup!
+    thing.shard.activate do
+      new_config = config.clone_with_new_parent((config.parent_md5 && @new_configs[config.local_parent_md5]) || @account.brand_config)
+      new_config.save_unless_dup!
 
-    job_type = thing.is_a?(SharedBrandConfig) ? :sync_to_s3_and_save_to_shared_brand_config! : :sync_to_s3_and_save_to_account!
-    new_config.send(job_type, @progress, thing)
+      job_type = thing.is_a?(SharedBrandConfig) ? :sync_to_s3_and_save_to_shared_brand_config! : :sync_to_s3_and_save_to_account!
+      new_config.send(job_type, @progress, thing)
 
-    @new_configs[config.md5] = new_config
+      @new_configs[config.md5] = new_config
+    end
   end
 
   def process

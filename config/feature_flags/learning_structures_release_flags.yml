@@ -82,6 +82,11 @@ observer_picker:
   display_name: Filter observer dashboard by student
   description: |-
     When enabled, this flag shows a student picker for observers on the dashboard.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
 calendar_series:
   applies_to: SiteAdmin
   state: hidden

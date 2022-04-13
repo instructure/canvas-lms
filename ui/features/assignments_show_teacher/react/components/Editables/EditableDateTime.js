@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {DateTime} from '@instructure/ui-i18n'
 import {IconButton} from '@instructure/ui-buttons'
@@ -30,7 +30,7 @@ import {Flex} from '@instructure/ui-flex'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 
-const I18n = useI18nScope('assignments_2');
+const I18n = useI18nScope('assignments_2')
 
 /*
  *  CAUTION: The InstUI DateTimeInput component was deprecated in v7.

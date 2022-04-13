@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 
-const I18n = useI18nScope('gradebook_constants');
+const I18n = useI18nScope('gradebook_constants')
 
 export const filterLabels = {
   assignmentGroups: I18n.t('Assignment Groups'),

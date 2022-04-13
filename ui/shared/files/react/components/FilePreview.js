@@ -28,13 +28,13 @@ import preventDefault from 'prevent-default'
 import _ from 'underscore'
 import PropTypes from 'prop-types'
 import customPropTypes from '../modules/customPropTypes'
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import File from '../../backbone/models/File.coffee'
 import FilesystemObject from '../../backbone/models/FilesystemObject.coffee'
 import codeToRemoveLater from '../../jquery/codeToRemoveLater'
 import '@canvas/rails-flash-notifications'
 
-const I18n = useI18nScope('file_preview');
+const I18n = useI18nScope('file_preview')
 
 export default class FilePreview extends React.PureComponent {
   static propTypes = {
@@ -308,11 +308,11 @@ export default class FilePreview extends React.PureComponent {
             </div>
             <div className="ef-file-preview-stretch">
               {this.state.otherItems &&
-                this.state.otherItems.length &&
+                !!this.state.otherItems.length &&
                 this.renderArrowLink('left')}
               {this.renderPreview()}
               {this.state.otherItems &&
-                this.state.otherItems.length &&
+                !!this.state.otherItems.length &&
                 this.renderArrowLink('right')}
               {this.state.showInfoPanel && (
                 <FilePreviewInfoPanel
