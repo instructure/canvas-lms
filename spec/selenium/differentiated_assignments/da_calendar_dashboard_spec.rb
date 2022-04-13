@@ -85,14 +85,13 @@ describe "interaction with differentiated assignments on the dashboard and calen
         expect(f(".fc-month-view")).to include_text(@da_assignment.title)
       end
 
-      it "shows assignments with a graded submission" do
+      it "does not show unassigned assignments with a graded submission" do
         @teacher = User.create!
         @course.enroll_teacher(@teacher)
         @da_assignment.grade_student(@student, grade: 10, grader: @teacher)
         get "/calendar"
-        f("#undated-events-button").click
-        wait_for_ajaximations
-        expect(f("#undated_events_list")).to include_text(@da_assignment.title)
+        # there should be no events for this user to see, thus .fc-event-title should be nil
+        expect(f(".fc-month-view")).not_to include_text(@da_assignment.title)
       end
     end
   end
@@ -157,14 +156,13 @@ describe "interaction with differentiated assignments on the dashboard and calen
         expect(f(".fc-month-view")).to include_text(@da_assignment.title)
       end
 
-      it "shows assignments with a graded submission" do
+      it "does not show unassigned assignments with a graded submission" do
         @teacher = User.create!
         @course.enroll_teacher(@teacher)
         @da_assignment.grade_student(@student, grade: 10, grader: @teacher)
         get "/calendar"
-        f("#undated-events-button").click
-        wait_for_ajaximations
-        expect(f("#undated_events_list")).to include_text(@da_assignment.title)
+        # there should be no events for this user to see, thus .fc-event-month should be nil
+        expect(f(".fc-month-view")).not_to include_text(@da_assignment.title)
       end
     end
   end
