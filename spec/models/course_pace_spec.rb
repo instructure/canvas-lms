@@ -126,6 +126,10 @@ describe CoursePace do
   end
 
   context "publish" do
+    def fancy_midnight_rounded_to_last_second(date)
+      (CanvasTime.fancy_midnight(date.to_datetime).to_time - 1.second).round
+    end
+
     before :once do
       @course_pace.update! end_date: "2021-09-30"
     end
@@ -144,7 +148,7 @@ describe CoursePace do
       expect(AssignmentOverride.count).to eq(2)
       @course.assignments.each do |assignment|
         assignment_override = assignment.assignment_overrides.first
-        expect(assignment_override.due_at).to eq(Date.parse("2021-09-01").in_time_zone(@course.time_zone).end_of_day)
+        expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-01"))
         expect(assignment_override.assignment_override_students.first.user_id).to eq(@student.id)
       end
     end
@@ -156,7 +160,7 @@ describe CoursePace do
         title: "ADHOC Test",
         workflow_state: "active",
         set_type: "ADHOC",
-        due_at: Date.parse("2021-09-05").in_time_zone(@course.time_zone),
+        due_at: fancy_midnight_rounded_to_last_second("2021-09-05"),
         due_at_overridden: true
       )
       assignment_override.assignment_override_students << AssignmentOverrideStudent.new(user_id: @student, no_enrollment: false)
@@ -165,15 +169,44 @@ describe CoursePace do
       @course_pace.update(user_id: @student)
       expect(@assignment.assignment_overrides.count).to eq(1)
       assignment_override = @assignment.assignment_overrides.first
-      expect(assignment_override.due_at).to eq(Date.parse("2021-09-05").in_time_zone(@course.time_zone).end_of_day)
+      expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-05"))
       expect(assignment_override.assignment_override_students.pluck(:user_id)).to eq([@student.id, student2.id])
       expect(@course_pace.publish).to eq(true)
       expect(@assignment.assignment_overrides.count).to eq(2)
-      expect(assignment_override.due_at).to eq(Date.parse("2021-09-05").in_time_zone(@course.time_zone).end_of_day)
+      expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-05"))
       expect(assignment_override.assignment_override_students.pluck(:user_id)).to eq([student2.id])
       assignment_override2 = @assignment.assignment_overrides.second
-      expect(assignment_override2.due_at).to eq(Date.parse("2021-09-01").in_time_zone(@course.time_zone).end_of_day)
+      expect(assignment_override2.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-01"))
       expect(assignment_override2.assignment_override_students.pluck(:user_id)).to eq([@student.id])
+    end
+
+    it "adds the user to an adhoc assignment override if it already exists for that date" do
+      # The due_at times are stored in the databas as UTC times, so we need to convert the timezone to UTC
+      assignment_override = @assignment.assignment_overrides.create!(
+        title: "ADHOC Test",
+        workflow_state: "active",
+        set_type: "ADHOC",
+        due_at: fancy_midnight_rounded_to_last_second("2021-09-01"),
+        due_at_overridden: true
+      )
+      assignment_override.assignment_override_students << AssignmentOverrideStudent.new(user_id: @student, no_enrollment: false)
+      assignment_override2 = @assignment.assignment_overrides.create!(
+        title: "ADHOC Test",
+        workflow_state: "active",
+        set_type: "ADHOC",
+        due_at: fancy_midnight_rounded_to_last_second("2021-09-06"),
+        due_at_overridden: true
+      )
+      student2 = user_model
+      StudentEnrollment.create!(user: student2, course: @course)
+      assignment_override2.assignment_override_students << AssignmentOverrideStudent.new(user_id: student2, no_enrollment: false)
+      expect(@assignment.assignment_overrides.active.count).to eq(2)
+      expect(@course_pace.publish).to eq(true)
+      expect(@assignment.assignment_overrides.active.count).to eq(1)
+      assignment_override = @assignment.assignment_overrides.active.first
+      # We need to round to the last whole second to ensure the due_at is the same
+      expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-01"))
+      expect(assignment_override.assignment_override_students.pluck(:user_id).sort).to eq([@student.id, student2.id])
     end
 
     it "creates assignment overrides for the course pace course section" do
@@ -182,18 +215,18 @@ describe CoursePace do
       expect(@course_pace.publish).to eq(true)
       expect(@assignment.assignment_overrides.count).to eq(1)
       assignment_override = @assignment.assignment_overrides.first
-      expect(assignment_override.due_at).to eq(Date.parse("2021-09-01").in_time_zone(@course.time_zone).end_of_day)
+      expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-01"))
       expect(assignment_override.assignment_override_students.first.user_id).to eq(@student.id)
     end
 
     it "updates overrides that are already present if the days have changed" do
       @course_pace.publish
       assignment_override = @assignment.assignment_overrides.first
-      expect(assignment_override.due_at).to eq(Date.parse("2021-09-01").in_time_zone(@course.time_zone).end_of_day)
+      expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-01"))
       @course_pace_module_item.update duration: 2
       @course_pace.publish
       assignment_override.reload
-      expect(assignment_override.due_at).to eq(Date.parse("2021-09-03").in_time_zone(@course.time_zone).end_of_day)
+      expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-03"))
     end
 
     it "updates user overrides that are already present if the days have changed" do
@@ -204,7 +237,7 @@ describe CoursePace do
       @course_pace.publish
       expect(@assignment.assignment_overrides.active.count).to eq(1)
       assignment_override = @assignment.assignment_overrides.active.first
-      expect(assignment_override.due_at).to eq(Date.parse("2021-09-03").in_time_zone(@course.time_zone).end_of_day)
+      expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-03"))
       expect(assignment_override.assignment_override_students.first.user_id).to eq(@student.id)
     end
 
@@ -216,20 +249,20 @@ describe CoursePace do
       @course_pace.publish
       expect(@assignment.assignment_overrides.active.count).to eq(1)
       assignment_override = @assignment.assignment_overrides.active.first
-      expect(assignment_override.due_at).to eq(Date.parse("2021-09-03").in_time_zone(@course.time_zone).end_of_day)
+      expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-03"))
       expect(assignment_override.assignment_override_students.first.user_id).to eq(@student.id)
     end
 
     it "does not change assignment due date when user course pace is published if an assignment override already exists" do
       @course_pace.publish
       assignment_override = @assignment.assignment_overrides.first
-      expect(assignment_override.due_at).to eq(Date.parse("2021-09-01").in_time_zone(@course.time_zone).end_of_day)
+      expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-01"))
       expect(@assignment.assignment_overrides.active.count).to eq(1)
 
       student_course_pace = @course.course_paces.create!(user: @student, workflow_state: "active")
       student_course_pace.publish
       assignment_override.reload
-      expect(assignment_override.due_at).to eq(Date.parse("2021-09-01").in_time_zone(@course.time_zone).end_of_day)
+      expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-01"))
       expect(@assignment.assignment_overrides.active.count).to eq(1)
     end
 
@@ -246,38 +279,38 @@ describe CoursePace do
       expect(@course_pace.publish).to eq(true)
       expect(@assignment.assignment_overrides.active.count).to eq(1)
       assignment_override = @assignment.assignment_overrides.active.first
-      expect(assignment_override.due_at).to eq(Date.parse("2021-09-01").in_time_zone(@course.time_zone).end_of_day)
+      expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-01"))
       # Publish student specific course pace and verify dates have changed
       student_course_pace = @course.course_paces.create! user: @student, workflow_state: "active"
       @course.student_enrollments.find_by(user: @student).update(start_at: "2021-09-06")
       student_course_pace.course_pace_module_items.create! module_item: @tag
       expect(student_course_pace.publish).to eq(true)
       assignment_override.reload
-      expect(assignment_override.due_at).to eq(Date.parse("2021-09-06").in_time_zone(@course.time_zone).end_of_day)
+      expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-06"))
       # Republish course pace and verify dates have not changed on student specific override
       @course_pace.instance_variable_set(:@student_enrollments, nil)
       expect(@course_pace.publish).to eq(true)
       assignment_override.reload
-      expect(assignment_override.due_at).to eq(Date.parse("2021-09-06").in_time_zone(@course.time_zone).end_of_day)
+      expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-06"))
     end
 
     it "does not change overrides for sections that have course paces if the course pace is published" do
       expect(@course_pace.publish).to eq(true)
       expect(@assignment.assignment_overrides.active.count).to eq(1)
       assignment_override = @assignment.assignment_overrides.active.first
-      expect(assignment_override.due_at).to eq(Date.parse("2021-09-01").in_time_zone(@course.time_zone).end_of_day)
+      expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-01"))
       # Publish course section specific course pace and verify dates have changed
       @course_section.update(start_at: "2021-09-06")
       section_course_pace = @course.course_paces.create! course_section: @course_section, workflow_state: "active"
       section_course_pace.course_pace_module_items.create! module_item: @tag
       expect(section_course_pace.publish).to eq(true)
       assignment_override.reload
-      expect(assignment_override.due_at).to eq(Date.parse("2021-09-06").in_time_zone(@course.time_zone).end_of_day)
+      expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-06"))
       # Republish course pace and verify dates have not changed on student specific override
       @course_pace.instance_variable_set(:@student_enrollments, nil)
       expect(@course_pace.publish).to eq(true)
       assignment_override.reload
-      expect(assignment_override.due_at).to eq(Date.parse("2021-09-06").in_time_zone(@course.time_zone).end_of_day)
+      expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-06"))
     end
 
     it "does not change overrides for students that have course paces if the course section course pace is published" do
@@ -285,19 +318,19 @@ describe CoursePace do
       expect(@course_pace.publish).to eq(true)
       expect(@assignment.assignment_overrides.active.count).to eq(1)
       assignment_override = @assignment.assignment_overrides.active.first
-      expect(assignment_override.due_at).to eq(Date.parse("2021-09-01").in_time_zone(@course.time_zone).end_of_day)
+      expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-01"))
       # Publish student specific course pace and verify dates have changed
       @course.student_enrollments.find_by(user: @student).update(start_at: "2021-09-06")
       student_course_pace = @course.course_paces.create! user: @student, workflow_state: "active"
       student_course_pace.course_pace_module_items.create! module_item: @tag
       expect(student_course_pace.publish).to eq(true)
       assignment_override.reload
-      expect(assignment_override.due_at).to eq(Date.parse("2021-09-06").in_time_zone(@course.time_zone).end_of_day)
+      expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-06"))
       # Republish course pace and verify dates have not changed on student specific override
       @course_pace.instance_variable_set(:@student_enrollments, nil)
       expect(@course_pace.publish).to eq(true)
       assignment_override.reload
-      expect(assignment_override.due_at).to eq(Date.parse("2021-09-06").in_time_zone(@course.time_zone).end_of_day)
+      expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-06"))
     end
   end
 
