@@ -54,6 +54,7 @@ export default class EquationEditorModal extends Component {
 
   // used for inline latex delimited like: \( ... \) OR $$ ... $$
   static boundaryRegex = /\\\((.+?)\\\)|\$\$(.+?)\$\$/g
+
   static debounceRate = 1000
 
   static defaultProps = {
@@ -67,6 +68,7 @@ export default class EquationEditorModal extends Component {
   }
 
   hostPageDisablesShortcuts = null
+
   originalFormula = null
 
   previewElement = React.createRef()
@@ -337,12 +339,21 @@ export default class EquationEditorModal extends Component {
   componentDidMount() {
     this.registerBasicEditorListener()
     this.setPreviewElementContent()
+    this.stubMacros()
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (this.state.workingFormula !== prevState.workingFormula) {
       this.setPreviewElementContent()
     }
+  }
+
+  stubMacros() {
+    // Mathlive's macros exist for a different use case;
+    // we don't intend for our users to utilize them.
+    // This effectively disables all of them to prevent
+    // weird behaviors that users don't expect.
+    this.mathField?.setOptions({macros: {}})
   }
 
   render = () => {
