@@ -129,7 +129,7 @@
     "js-beautify": "1",
     "keycode": "^2",
     "lodash": "^4",
-    "mathlive": "^0.69.8",
+    "mathlive": "^0.77.0",
     "minimatch": "~3.0.4",
     "moment-timezone": "^0.5.13",
     "prop-types": "^15",
