@@ -148,7 +148,7 @@ module Lti::IMS
     #   (EXTENSION field) Date and time that the submission was originally created. Should use ISO8601-formatted date with subsecond precision. This should match the data and time that the original submission happened in Canvas.
     #
     # @argument https://canvas.instructure.com/lti/submission[content_items] [Optional, Array]
-    #   (EXTENSION field) Files that should be included with the submission. Each item should contain `type: file`, a url pointing to the file, a title, and a progress url that Canvas can report to. If present, submission_type will be online_upload.
+    #   (EXTENSION field) Files that should be included with the submission. Each item should contain `type: file`, and a url pointing to the file. It can also contain a title, and an explicit MIME type if needed (otherwise, MIME type will be inferred from the title or url). If any items are present, submission_type will be online_upload.
     #
     # @returns resultUrl [String]
     #   The url to the result that was created.
@@ -175,7 +175,8 @@ module Lti::IMS
     #         {
     #           "type": "file",
     #           "url": "https://instructure.com/test_file.txt",
-    #           "title": "Submission File"
+    #           "title": "Submission File",
+    #           "media_type": "text/plain"
     #         }
     #       ]
     #     }
@@ -225,7 +226,7 @@ module Lti::IMS
       :submission_type,
       :submission_data,
       :submitted_at,
-      content_items: %i[type url title]
+      content_items: %i[type url title media_type]
     ].freeze
     SCORE_SUBMISSION_TYPES = %w[none basic_lti_launch online_text_entry online_url external_tool online_upload].freeze
     DEFAULT_SUBMISSION_TYPE = "external_tool"
@@ -381,6 +382,7 @@ module Lti::IMS
           params: {
             url: item[:url],
             name: item[:title],
+            content_type: item[:media_type]
           }
         )
 

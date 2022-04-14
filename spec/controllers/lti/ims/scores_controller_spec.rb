@@ -467,6 +467,24 @@ module Lti::IMS
                   json[Lti::Result::AGS_EXT_SUBMISSION]["content_items"].first["progress"]
                 expect(progress_url).to include expected_progress_url
               end
+
+              it "calculates content_type from extension" do
+                send_request
+                expect(Attachment.last.content_type).to eq "text/plain"
+              end
+
+              context "with valid explicit media_type" do
+                let(:media_type) { "text/html" }
+
+                before do
+                  content_items.first[:media_type] = media_type
+                end
+
+                it "uses provided content_type" do
+                  send_request
+                  expect(Attachment.last.content_type).to eq media_type
+                end
+              end
             end
 
             context "in local storage mode" do
@@ -498,7 +516,7 @@ module Lti::IMS
               end
 
               # it_behaves_like 'creates a new submission'
-              # See spec/integration/scores_controller_spec.rb
+              # See spec/integration/scores_spec.rb
               # for Instfs, we have to mock a request to the files capture API
               # that doesn't work well in a controller spec for this controller
 
