@@ -84,6 +84,22 @@ apps tray. Used on wiki pages.
 window.parent.postMessage({ subject: "lti.resourceImported" }, "*")
 ```
 
+## lti.hideRightSideWrapper
+
+Tells Canvas to remove the right side nav in the assignments view.
+
+**Required properties:**
+- subject: "lti.hideRightSideWrapper"
+
+```js
+window.parent.postMessage(
+  {
+    subject: "lti.hideRightSideWrapper",
+  },
+  "*"
+)
+```
+
 ## lti.frameResize
 
 Tells Canvas to change the height of the iframe containing the tool.
