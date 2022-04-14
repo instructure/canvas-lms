@@ -25,6 +25,42 @@ module CoursePacesPageObject
     "[data-testid='assignment-due-date']"
   end
 
+  def blackout_dates_add_selector
+    "button:contains('Add')"
+  end
+
+  def blackout_dates_button_selector
+    "button:contains('Manage Blackout Dates')"
+  end
+
+  def blackout_date_delete_selector
+    "button:contains('Delete blackout date')"
+  end
+
+  def blackout_dates_modal_selector
+    "[role='dialog'][aria-label='Blackout Dates']"
+  end
+
+  def blackout_date_start_date_input_selector
+    "[data-testid='blackout-start-date'] input"
+  end
+
+  def blackout_date_end_date_input_selector
+    "[data-testid='blackout-end-date'] input"
+  end
+
+  def blackout_dates_save_selector
+    "button:contains('Save')"
+  end
+
+  def blackout_dates_table_items_selector
+    "[data-testid='blackout_dates_table'] tr"
+  end
+
+  def blackout_date_title_input_selector
+    "input[placeholder='e.g., Winter Break']"
+  end
+
   def cancel_button_selector
     "button:contains('Cancel')"
   end
@@ -187,6 +223,42 @@ module CoursePacesPageObject
     f(assignment_due_date_selector)
   end
 
+  def blackout_dates_add
+    fj(blackout_dates_add_selector)
+  end
+
+  def blackout_dates_button
+    fj(blackout_dates_button_selector)
+  end
+
+  def blackout_date_delete(row_selector)
+    fj(blackout_date_delete_selector, row_selector)
+  end
+
+  def blackout_dates_modal
+    f(blackout_dates_modal_selector)
+  end
+
+  def blackout_date_start_date_input
+    f(blackout_date_start_date_input_selector)
+  end
+
+  def blackout_date_end_date_input
+    f(blackout_date_end_date_input_selector)
+  end
+
+  def blackout_dates_save
+    fj(blackout_dates_save_selector, blackout_dates_modal)
+  end
+
+  def blackout_dates_table_items
+    ff(blackout_dates_table_items_selector)
+  end
+
+  def blackout_date_title_input
+    f(blackout_date_title_input_selector)
+  end
+
   def cancel_button
     fj(cancel_button_selector)
   end
@@ -338,6 +410,18 @@ module CoursePacesPageObject
 
   #----------------------- Click Items -------------------------------
 
+  def click_blackout_dates_add_button
+    blackout_dates_add.click
+  end
+
+  def click_blackout_dates_save_button
+    blackout_dates_save.click
+  end
+
+  def click_blackout_dates_button
+    blackout_dates_button.click
+  end
+
   def click_cancel_button
     cancel_button.click
   end
@@ -417,6 +501,10 @@ module CoursePacesPageObject
 
   def add_start_date(start_date)
     course_pace_start_date.send_keys([:control, "a"], :backspace, format_date_for_view(start_date), :enter)
+  end
+
+  def blackout_dates_modal_exists?
+    element_exists?(blackout_dates_modal_selector)
   end
 
   delegate :text, to: :assignment_due_date, prefix: true

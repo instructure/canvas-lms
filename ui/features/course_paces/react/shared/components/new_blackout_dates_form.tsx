@@ -206,7 +206,7 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
                 </FlexItem>
                 <FlexItem>
                   <Flex alignItems="start" justifyItems="space-between" wrap="wrap">
-                    <FlexItem margin="0 small small 0">
+                    <FlexItem data-testid="blackout-start-date" margin="0 small small 0">
                       <CanvasDateInput
                         key={`start-${this.state.key}`}
                         renderLabel={I18n.t('Start Date')}
@@ -220,7 +220,7 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
                         withRunningValue
                       />
                     </FlexItem>
-                    <FlexItem margin="0 small small 0">
+                    <FlexItem data-testid="blackout-end-date" margin="0 small small 0">
                       <CanvasDateInput
                         key={`end-${this.state.key}`}
                         renderLabel={I18n.t('End Date')}
