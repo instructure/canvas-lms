@@ -43,7 +43,7 @@ describe('MultiColor', () => {
     it('sets the selected image with loading states', async () => {
       const {getByTestId} = subject()
 
-      fireEvent.click(getByTestId('button-icon-art'))
+      fireEvent.click(getByTestId('icon-maker-art'))
 
       expect(dispatch).toHaveBeenNthCalledWith(1, {
         ...actions.START_LOADING
@@ -75,7 +75,7 @@ describe('MultiColor', () => {
     it('converts the selected icon to base64', async () => {
       const {getByTestId} = subject()
 
-      fireEvent.click(getByTestId('button-icon-art'))
+      fireEvent.click(getByTestId('icon-maker-art'))
 
       await waitFor(() => {
         expect(dispatch.mock.calls[2][0].payload).toMatchInlineSnapshot(

@@ -33,12 +33,12 @@ describe('process()', () => {
 
   const subject = (fileOverride = null) => SvgCategoryProcessor.process(fileOverride || file())
 
-  describe('when the file includes button and icon type', () => {
+  describe('when the file includes icon maker type', () => {
     beforeEach(() => {
       fileText = 'something something image/svg+xml-icon-maker-icons'
     })
 
-    it('returns the button and icons category', async () => {
+    it('returns the icon maker category', async () => {
       const category = await subject()
       expect(category).toMatchObject({
         category: 'icon_maker_icons'
@@ -46,9 +46,9 @@ describe('process()', () => {
     })
   })
 
-  describe('when the file does not include button and icon type', () => {
+  describe('when the file does not include Icon Maker icon type', () => {
     beforeEach(() => {
-      fileText = 'something something not buttons and icons'
+      fileText = 'something something not icon maker'
     })
 
     it('returns undefined', async () => {

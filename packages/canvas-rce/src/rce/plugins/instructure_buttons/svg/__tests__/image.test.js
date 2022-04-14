@@ -520,7 +520,7 @@ describe('transformShape()', () => {
       shape = 'default'
     })
 
-    describe('with x-small button size', () => {
+    describe('with x-small icon size', () => {
       beforeEach(() => (size = Size.ExtraSmall))
 
       it('sets the x position', () => {
@@ -548,7 +548,7 @@ describe('transformShape()', () => {
       })
     })
 
-    describe('with small button size', () => {
+    describe('with small icon size', () => {
       beforeEach(() => (size = Size.Small))
 
       it('sets the x position', () => {
@@ -576,7 +576,7 @@ describe('transformShape()', () => {
       })
     })
 
-    describe('with medium button size', () => {
+    describe('with medium icon size', () => {
       beforeEach(() => (size = Size.Medium))
 
       it('sets the x position', () => {
@@ -604,7 +604,7 @@ describe('transformShape()', () => {
       })
     })
 
-    describe('with large button size', () => {
+    describe('with large icon size', () => {
       beforeEach(() => (size = Size.Large))
 
       it('sets the x position', () => {

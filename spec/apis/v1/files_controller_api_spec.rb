@@ -821,16 +821,16 @@ describe "Files API", type: :request do
       end
 
       let(:category) { Attachment::ICON_MAKER_ICONS }
-      let(:button_and_icon) { @a1 }
+      let(:icon_maker) { @a1 }
       let(:uncategorized) { @a2 }
 
       before do
-        button_and_icon.update!(category: category)
+        icon_maker.update!(category: category)
 
         @files_path_options[:category] = category
       end
 
-      it { is_expected.to include button_and_icon }
+      it { is_expected.to include icon_maker }
       it { is_expected.not_to include uncategorized }
     end
 

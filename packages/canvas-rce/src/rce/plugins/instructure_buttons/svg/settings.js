@@ -18,7 +18,7 @@
 
 import {useState, useEffect, useReducer} from 'react'
 import {svgSettings as svgSettingsReducer, defaultState} from '../reducers/svgSettings'
-import {BTN_AND_ICON_ATTRIBUTE, BTN_AND_ICON_DOWNLOAD_URL_ATTR} from '../registerEditToolbar'
+import {ICON_MAKER_ATTRIBUTE, ICON_MAKER_DOWNLOAD_URL_ATTR} from '../registerEditToolbar'
 import RceApiSource from '../../../../rcs/api'
 
 const TYPE = 'image/svg+xml'
@@ -30,7 +30,7 @@ export const statuses = {
 }
 
 const getImageNode = (editor, editing) => {
-  // If the user is creating a button rather then editing, no sense trying
+  // If the user is creating an icon rather then editing, no sense trying
   // to get an existing SVG URL
   if (!editing) return
 
@@ -39,21 +39,21 @@ const getImageNode = (editor, editing) => {
   // No selection made, return
   if (!selectedNode) return
 
-  // The button and icon image is selected. return it
-  if (selectedNode.getAttribute(BTN_AND_ICON_ATTRIBUTE)) return selectedNode
+  // The icon maker image is selected. return it
+  if (selectedNode.getAttribute(ICON_MAKER_ATTRIBUTE)) return selectedNode
 
-  // The button and icon image element is not selected, but it's possible
-  // an element wrapping it is. Look for a button and icon image in the
+  // The icon maker image element is not selected, but it's possible
+  // an element wrapping it is. Look for a icon maker image in the
   // selection's children
-  const buttonAndIcon = selectedNode.querySelector(`img[${BTN_AND_ICON_ATTRIBUTE}="true"]`)
+  const iconMaker = selectedNode.querySelector(`img[${ICON_MAKER_ATTRIBUTE}="true"]`)
 
-  // Still not button and icon found in the selection's children. Return
-  if (!buttonAndIcon) return
+  // Icon maker still not found in the selection's children. Return
+  if (!iconMaker) return
 
-  // Button and icon found in the selections children. Return it and set the
+  // Icon maker found in the selections children. Return it and set the
   // editor's selection to it as well
-  editor.selection.select(buttonAndIcon)
-  return buttonAndIcon
+  editor.selection.select(iconMaker)
+  return iconMaker
 }
 
 export function useSvgSettings(editor, editing, rcsConfig) {
@@ -61,7 +61,7 @@ export function useSvgSettings(editor, editing, rcsConfig) {
   const [status, setStatus] = useState(statuses.IDLE)
 
   const buildFilesUrl = (fileId, host) => {
-    // http://canvas.docker/files/2169/download?download_frd=1&amp;buttons_and_icons=1
+    // http://canvas.docker/files/2169/download?download_frd=1&amp;icon_maker_icon=1
 
     const downloadURL = new URL(`${host}/files/${fileId}/download`)
 
@@ -79,7 +79,7 @@ export function useSvgSettings(editor, editing, rcsConfig) {
     return downloadURL.toString()
   }
 
-  const urlFromNode = getImageNode(editor, editing)?.getAttribute(BTN_AND_ICON_DOWNLOAD_URL_ATTR)
+  const urlFromNode = getImageNode(editor, editing)?.getAttribute(ICON_MAKER_DOWNLOAD_URL_ATTR)
 
   useEffect(() => {
     const fetchSvgSettings = async () => {

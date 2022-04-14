@@ -35,14 +35,14 @@ describe('<Footer />', () => {
 
   afterEach(() => jest.clearAllMocks())
 
-  it('submits the buttons tray', () => {
+  it('submits the icon maker tray', () => {
     const onSubmit = jest.fn()
     render(<Footer {...defaults} onSubmit={onSubmit} />)
     userEvent.click(screen.getByRole('button', {name: /apply/i}))
     expect(onSubmit).toHaveBeenCalled()
   })
 
-  it('closes the buttons tray', () => {
+  it('closes the icon maker tray', () => {
     const onCancel = jest.fn()
     render(<Footer {...defaults} onCancel={onCancel} />)
     userEvent.click(screen.getByRole('button', {name: /cancel/i}))

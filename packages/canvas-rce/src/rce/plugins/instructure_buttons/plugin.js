@@ -19,35 +19,35 @@
 import bridge from '../../../bridge'
 import formatMessage from '../../../format-message'
 import {isOKToLink} from '../../contentInsertionUtils'
-import clickCallback, {CREATE_BUTTON, LIST_BUTTON, EDIT_BUTTON} from './clickCallback'
+import clickCallback, {CREATE_ICON_MAKER, LIST_ICON_MAKER, EDIT_ICON_MAKER} from './clickCallback'
 import registerEditToolbar from './registerEditToolbar'
 
 function getMenuItems() {
   return [
     {
       text: formatMessage('Create Icon Maker Icon'),
-      value: 'instructure_create_button'
+      value: 'instructure_create_icon_maker'
     },
     {
       text: formatMessage('Saved Icon Maker Icons'),
-      value: 'instructure_list_buttons'
+      value: 'instructure_list_icon_maker'
     }
   ]
 }
 
 function handleOptionSelected(ed, value) {
   switch (value) {
-    case 'instructure_create_button':
+    case 'instructure_create_icon_maker':
       ed.focus(true)
-      ed.execCommand('instructureTrayForButtonsPlugin', false, CREATE_BUTTON)
+      ed.execCommand('instructureTrayForIconMakerPlugin', false, CREATE_ICON_MAKER)
       break
-    case 'instructure_list_buttons':
+    case 'instructure_list_icon_maker':
       ed.focus(true)
-      ed.execCommand('instructureTrayForButtonsPlugin', false, LIST_BUTTON)
+      ed.execCommand('instructureTrayForIconMakerPlugin', false, LIST_ICON_MAKER)
       break
-    case 'instructure_edit_button':
+    case 'instructure_edit_icon_maker':
       ed.focus(true)
-      ed.execCommand('instructureTrayForButtonsPlugin', false, EDIT_BUTTON)
+      ed.execCommand('instructureTrayForIconMakerPlugin', false, EDIT_ICON_MAKER)
       break
   }
 }
@@ -55,8 +55,8 @@ function handleOptionSelected(ed, value) {
 tinymce.create('tinymce.plugins.InstructureButtonsPlugin', {
   init(ed) {
     // Register tray control command
-    ed.addCommand('instructureTrayForButtonsPlugin', (_ui, type) => {
-      if (type === LIST_BUTTON) {
+    ed.addCommand('instructureTrayForIconMakerPlugin', (_ui, type) => {
+      if (type === LIST_ICON_MAKER) {
         bridge.showTrayForPlugin(type, ed.id)
       } else {
         clickCallback(ed, document, type)
@@ -93,7 +93,7 @@ tinymce.create('tinymce.plugins.InstructureButtonsPlugin', {
       },
       onAction(api) {
         if (!api.isDisabled()) {
-          handleOptionSelected(ed, 'instructure_create_button')
+          handleOptionSelected(ed, 'instructure_create_icon_maker')
         }
       },
       onItemAction: (_splitButtonApi, value) => handleOptionSelected(ed, value),
@@ -109,10 +109,10 @@ tinymce.create('tinymce.plugins.InstructureButtonsPlugin', {
       }
     })
 
-    // Register context toolbar for editing existing buttons / icons
+    // Register context toolbar for editing existing icon maker icons
     registerEditToolbar(ed, api => {
       if (!api.isDisabled()) {
-        handleOptionSelected(ed, 'instructure_edit_button')
+        handleOptionSelected(ed, 'instructure_edit_icon_maker')
       }
     })
   }

@@ -37,7 +37,7 @@ describe('ModeSelect', () => {
     let getByText
 
     beforeEach(() => {
-      const rendered = subject({rcsConfig: {features: {buttons_and_icons_cropper: true}}})
+      const rendered = subject({rcsConfig: {features: {icon_maker_cropper: true}}})
       getByText = rendered.getByText
       fireEvent.click(getByText('Add Image'))
     })

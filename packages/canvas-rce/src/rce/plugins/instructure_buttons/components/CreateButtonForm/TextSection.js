@@ -31,7 +31,7 @@ import useDebouncedValue from '../../utils/useDebouncedValue'
 const TEXT_SIZES = ['small', 'medium', 'large', 'x-large']
 const TEXT_POSITIONS = ['middle', 'bottom-third', 'below']
 
-const getTextSection = () => document.querySelector('#buttons-tray-text-section')
+const getTextSection = () => document.querySelector('#icons-tray-text-section')
 
 export const TextSection = ({settings, onChange}) => {
   const [text, setText] = useDebouncedValue(settings.text, t => {
@@ -44,11 +44,11 @@ export const TextSection = ({settings, onChange}) => {
         as="section"
         justifyItems="space-between"
         direction="column"
-        id="buttons-tray-text-section"
+        id="icons-tray-text-section"
       >
         <Flex.Item padding="small">
           <TextInput
-            id="button-text"
+            id="icon-text"
             renderLabel={formatMessage('Text')}
             onChange={setText}
             value={text}
@@ -64,7 +64,7 @@ export const TextSection = ({settings, onChange}) => {
         <Flex.Item padding="small">
           <SimpleSelect
             assistiveText={formatMessage('Use arrow keys to select a text size.')}
-            id="button-text-size"
+            id="icon-text-size"
             onChange={(e, option) => onChange({textSize: option.value})}
             renderLabel={formatMessage('Text Size')}
             value={settings.textSize}
@@ -81,7 +81,7 @@ export const TextSection = ({settings, onChange}) => {
           <ColorInput
             color={settings.textColor}
             label={formatMessage('Text Color')}
-            name="button-text-color"
+            name="icon-text-color"
             onChange={textColor => onChange({textColor})}
             popoverMountNode={getTextSection}
             requireColor
@@ -92,7 +92,7 @@ export const TextSection = ({settings, onChange}) => {
           <ColorInput
             color={settings.textBackgroundColor}
             label={formatMessage('Text Background Color')}
-            name="button-text-background-color"
+            name="icon-text-background-color"
             onChange={textBackgroundColor => onChange({textBackgroundColor})}
             popoverMountNode={getTextSection}
           />
@@ -101,7 +101,7 @@ export const TextSection = ({settings, onChange}) => {
         <Flex.Item padding="small">
           <SimpleSelect
             assistiveText={formatMessage('Use arrow keys to select a text position.')}
-            id="button-text-position"
+            id="icon-text-position"
             onChange={(e, option) => onChange({textPosition: option.value})}
             renderLabel={formatMessage('Text Position')}
             value={settings.textPosition}

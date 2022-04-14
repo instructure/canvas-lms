@@ -30,7 +30,7 @@ describe('useSvgSettings()', () => {
   beforeEach(() => {
     ed = new Editor()
     rcs = {
-      getFile: jest.fn(() => Promise.resolve({name: 'Test Button.svg'})),
+      getFile: jest.fn(() => Promise.resolve({name: 'Test Icon.svg'})),
       contextType: 'course',
       contextId: 1,
       canvasUrl: 'https://domain.from.env'
@@ -42,7 +42,7 @@ describe('useSvgSettings()', () => {
 
   const subject = () => renderHook(() => useSvgSettings(ed, editing, rcs)).result
 
-  describe('when a new button is being created (not editing)', () => {
+  describe('when a new icon is being created (not editing)', () => {
     beforeEach(() => {
       editing = false
       global.fetch = jest.fn()
@@ -134,7 +134,7 @@ describe('useSvgSettings()', () => {
     })
   })
 
-  describe('when an existing button is being edited', () => {
+  describe('when an existing icon is being edited', () => {
     let mock
     let body
 
@@ -291,8 +291,8 @@ describe('useSvgSettings()', () => {
         width: 0,
         height: 0,
         imageSettings: null,
-        name: 'Test Button',
-        originalName: 'Test Button',
+        name: 'Test Icon',
+        originalName: 'Test Icon',
         transform: ''
       })
     })
@@ -369,6 +369,7 @@ describe('useSvgSettings()', () => {
           textSize: 'small',
           textColor: '#000000',
           textBackgroundColor: null,
+          imageSettings: null,
           textPosition: 'middle',
           x: 0,
           y: 0,
@@ -376,14 +377,13 @@ describe('useSvgSettings()', () => {
           translateY: 0,
           width: 0,
           height: 0,
-          imageSettings: null,
           transform: ''
         })
       })
     })
   })
 
-  describe('when an existing button is edited while the tray is already open', () => {
+  describe('when an existing icon is edited while the tray is already open', () => {
     beforeEach(() => {
       editing = true
 
@@ -457,7 +457,7 @@ describe('useSvgSettings()', () => {
       rerender()
       await waitForValueToChange(() => result.current)
 
-      expect(result.current[0].name).toEqual('Test Button')
+      expect(result.current[0].name).toEqual('Test Icon')
       expect(result.current[0].shape).toEqual('square')
     })
   })

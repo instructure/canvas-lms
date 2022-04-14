@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import clickCallback from '../clickCallback'
+import clickCallback, {ICONS_TRAY_CONTAINER_ID} from '../clickCallback'
 import ReactDOM from 'react-dom'
 import FakeEditor from '../../shared/__tests__/FakeEditor'
 import {waitFor} from '@testing-library/react'
@@ -33,37 +33,37 @@ describe('clickCallback()', () => {
     beforeEach(() => (document.body.innerHTML = ''))
 
     it('creates the container', async () => {
-      subject('create_buttons_and_icons')
+      subject('create_icon_maker_icon')
 
       await waitFor(() => {
-        expect(document.getElementById('instructure-rce-buttons-tray-container')).toBeTruthy()
+        expect(document.getElementById(ICONS_TRAY_CONTAINER_ID)).toBeTruthy()
       })
     })
 
     it('mounts the component', async () => {
-      subject('create_buttons_and_icons')
+      subject('create_icon_maker_icon')
 
       await waitFor(() => {
-        expect(document.querySelector('[data-testid="button-name"]')).toBeTruthy()
+        expect(document.querySelector('[data-testid="icon-name"]')).toBeTruthy()
       })
     })
   })
 
   describe('when the container exists', () => {
     beforeEach(async () => {
-      subject('edit_buttons_and_icons')
+      subject('edit_icon_maker_icon')
 
       await waitFor(() => {
-        expect(document.querySelector('[data-testid="button-name"]')).toBeTruthy()
+        expect(document.querySelector('[data-testid="icon-name"]')).toBeTruthy()
       })
     })
 
     it('re-mounts the component', async () => {
-      subject('create_buttons_and_icons')
+      subject('create_icon_maker_icon')
 
       await waitFor(() => expect(ReactDOM.unmountComponentAtNode).toHaveBeenCalled())
       await waitFor(() => {
-        expect(document.querySelector('[data-testid="button-name"]')).toBeTruthy()
+        expect(document.querySelector('[data-testid="icon-name"]')).toBeTruthy()
       })
     })
   })

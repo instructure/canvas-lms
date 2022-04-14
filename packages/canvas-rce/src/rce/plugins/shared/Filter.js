@@ -25,7 +25,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {IconButton} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {BUTTONS_AND_ICONS} from '../instructure_buttons/registerEditToolbar'
+import {ICON_MAKER_ICONS} from '../instructure_buttons/registerEditToolbar'
 import {
   IconLinkLine,
   IconFolderLine,
@@ -100,8 +100,8 @@ function renderTypeOptions(contentType, contentSubtype, userContextType) {
     )
   }
 
-  // Buttons and Icons are only stored in course folders.
-  if (contentSubtype !== BUTTONS_AND_ICONS) {
+  // Icon Maker icons are only stored in course folders.
+  if (contentSubtype !== ICON_MAKER_ICONS) {
     options.push(
       <SimpleSelect.Option
         key="user_files"
@@ -231,8 +231,8 @@ export default function Filter(props) {
                   // when flipped to All, the context needs to be user
                   // so we can get media_objects, which are all returned in the user context
                   changed.contentType = 'user_files'
-                } else if (changed.contentSubtype === BUTTONS_AND_ICONS) {
-                  // Buttons and Icons only belong to Courses.
+                } else if (changed.contentSubtype === ICON_MAKER_ICONS) {
+                  // Icon Maker icons only belong to Courses.
                   changed.contentType = 'course_files'
                 }
                 onChange(changed)
@@ -255,9 +255,9 @@ export default function Filter(props) {
                 {formatMessage('Media')}
               </SimpleSelect.Option>
 
-              {props.use_rce_buttons_and_icons && (
+              {props.use_rce_icon_maker && (
                 <SimpleSelect.Option
-                  id="buttons_and_icons"
+                  id="icon_maker_icons"
                   value="icon_maker_icons"
                   renderBeforeLabel={IconImageLine}
                 >
@@ -351,5 +351,10 @@ Filter.propTypes = {
   /**
    * The page context
    */
-  containingContextType: oneOf(['user', 'course', 'group'])
+  containingContextType: oneOf(['user', 'course', 'group']),
+
+  /**
+   * Should include Icon Maker?
+   */
+  use_rce_icon_maker: bool
 }

@@ -28,7 +28,7 @@ export const Size = {
 }
 
 export const DEFAULT_SETTINGS = {
-  // Basic button & icon settings
+  // Basic  icon maker settings
   type: TYPE,
   alt: '',
   shape: 'square',

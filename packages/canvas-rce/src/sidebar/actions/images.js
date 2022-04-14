@@ -17,9 +17,9 @@
  */
 
 import {
-  BUTTONS_AND_ICONS,
-  BTN_AND_ICON_ATTRIBUTE,
-  BTN_AND_ICON_DOWNLOAD_URL_ATTR
+  ICON_MAKER_ICONS,
+  ICON_MAKER_ATTRIBUTE,
+  ICON_MAKER_DOWNLOAD_URL_ATTR
 } from '../../rce/plugins/instructure_buttons/registerEditToolbar'
 
 import buildDownloadUrl from '../../rce/plugins/shared/buildDownloadUrl'
@@ -70,9 +70,9 @@ export function failImagesLoad({error, contextType}) {
 export const applyAttributes = (file, opts) => {
   const augmentedFile = {...file}
 
-  if (opts.category === BUTTONS_AND_ICONS) {
-    augmentedFile[BTN_AND_ICON_ATTRIBUTE] = true
-    augmentedFile[BTN_AND_ICON_DOWNLOAD_URL_ATTR] = buildDownloadUrl(file.download_url)
+  if (opts.category === ICON_MAKER_ICONS) {
+    augmentedFile[ICON_MAKER_ATTRIBUTE] = true
+    augmentedFile[ICON_MAKER_DOWNLOAD_URL_ATTR] = buildDownloadUrl(file.download_url)
   }
 
   return augmentedFile

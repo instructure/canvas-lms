@@ -16,21 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {BUTTONS_AND_ICONS} from '../../instructure_buttons/registerEditToolbar'
+import {ICON_MAKER_ICONS} from '../../instructure_buttons/registerEditToolbar'
 
 export const typeTest = 'image/svg'
 const sliceSize = 400 // bytes
-const buttonIconType = 'image/svg+xml-icon-maker-icons'
+const iconMakerType = 'image/svg+xml-icon-maker-icons'
 
 export async function process(file) {
   try {
     // The first slice of 400 bytes is sufficient to grab
-    // the "type" metadata for button & icon SVGs
+    // the "type" metadata for icon maker SVGs
     const slice = await file.slice(0, sliceSize).text()
 
-    if (slice.includes(buttonIconType)) {
+    if (slice.includes(iconMakerType)) {
       return {
-        category: BUTTONS_AND_ICONS
+        category: ICON_MAKER_ICONS
       }
     }
   } catch {}

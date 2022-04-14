@@ -45,7 +45,7 @@ describe('SingleColor', () => {
     it('sets the selected image with loading states', async () => {
       const {getByTestId} = subject()
 
-      fireEvent.click(getByTestId('button-icon-art'))
+      fireEvent.click(getByTestId('icon-maker-art'))
 
       expect(dispatch).toHaveBeenNthCalledWith(1, {
         ...actions.SET_IMAGE_NAME,

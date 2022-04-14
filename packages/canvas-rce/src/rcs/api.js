@@ -287,8 +287,8 @@ class RceApiSource {
     return this.apiFetch(uri, headerFor(this.jwt))
   }
 
-  fetchButtonsAndIconsFolder({contextId, contextType}) {
-    const uri = this.uriFor('folders/buttons_and_icons', {
+  fetchIconMakerFolder({contextId, contextType}) {
+    const uri = this.uriFor('folders/icon_maker', {
       contextId,
       contextType,
       host: this.host,

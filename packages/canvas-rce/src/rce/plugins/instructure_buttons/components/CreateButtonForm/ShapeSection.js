@@ -32,7 +32,7 @@ export const ShapeSection = ({settings, onChange}) => (
     <Flex.Item padding="small">
       <SimpleSelect
         assistiveText={formatMessage('Use arrow keys to select a shape.')}
-        id="button-shape"
+        id="icon-shape"
         onChange={(e, option) => onChange({shape: option.value})}
         renderLabel={formatMessage('Icon Shape')}
         value={settings.shape}
@@ -48,7 +48,7 @@ export const ShapeSection = ({settings, onChange}) => (
     <Flex.Item padding="small">
       <SimpleSelect
         assistiveText={formatMessage('Use arrow keys to select a size.')}
-        id="button-size"
+        id="icon-size"
         onChange={(e, option) => onChange({size: option.value})}
         renderLabel={formatMessage('Icon Size')}
         value={settings.size}

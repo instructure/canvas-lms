@@ -22,7 +22,7 @@ import {isImageEmbed} from '../shared/ContentSelection'
 import {isOKToLink} from '../../contentInsertionUtils'
 import TrayController from './ImageOptionsTray/TrayController'
 import clickCallback from './clickCallback'
-import {BTN_AND_ICON_ATTRIBUTE} from '../instructure_buttons/registerEditToolbar'
+import {ICON_MAKER_ATTRIBUTE} from '../instructure_buttons/registerEditToolbar'
 
 const COURSE_PLUGIN_KEY = 'course_images'
 const USER_PLUGIN_KEY = 'user_images'
@@ -143,8 +143,8 @@ tinymce.create('tinymce.plugins.InstructureImagePlugin', {
       return (
         !node.classList.contains('equation_image') &&
         isImageEmbed(node) &&
-        // don't show for buttons &  icons
-        !node.getAttribute(BTN_AND_ICON_ATTRIBUTE)
+        // don't show for icon maker
+        !node.getAttribute(ICON_MAKER_ATTRIBUTE)
       )
     }
     const buttonAriaLabel = formatMessage('Show image options')

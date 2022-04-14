@@ -39,7 +39,7 @@ const ModeSelect = forwardRef(({dispatch, onFocus, onBlur, rcsConfig}, ref) => {
     </Menu.Item>
   )
 
-  const showNonIconImages = !!rcsConfig?.features?.buttons_and_icons_cropper
+  const showNonIconImages = !!rcsConfig?.features?.icon_maker_cropper
 
   return (
     <Menu

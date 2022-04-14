@@ -18,14 +18,14 @@
 
 import formatMessage from '../../../format-message'
 
-const BUTTON_ID = 'inst-button-and-icons-edit'
-const TOOLBAR_ID = 'inst-button-and-icons-edit-toolbar'
+export const BUTTON_ID = 'inst-icon-maker-edit'
+export const TOOLBAR_ID = 'inst-icon-maker-edit-toolbar'
 
-export const BTN_AND_ICON_ATTRIBUTE = 'data-inst-icon-maker-icon'
-export const BTN_AND_ICON_DOWNLOAD_URL_ATTR = 'data-download-url'
-export const BUTTONS_AND_ICONS = 'icon_maker_icons'
+export const ICON_MAKER_ATTRIBUTE = 'data-inst-icon-maker-icon'
+export const ICON_MAKER_DOWNLOAD_URL_ATTR = 'data-download-url'
+export const ICON_MAKER_ICONS = 'icon_maker_icons'
 
-export const shouldShowEditButton = node => !!node?.getAttribute(BTN_AND_ICON_ATTRIBUTE)
+export const shouldShowEditButton = node => !!node?.getAttribute(ICON_MAKER_ATTRIBUTE)
 
 export default function registerEditToolbar(editor, onAction) {
   addButton(editor, onAction)
@@ -36,7 +36,7 @@ function addButton(editor, onAction) {
   editor.ui.registry.addButton(BUTTON_ID, {
     onAction,
     text: formatMessage('Edit'),
-    tooltip: formatMessage('Edit Existing Button / Icon')
+    tooltip: formatMessage('Edit Existing Icon Maker Icon')
   })
 }
 
