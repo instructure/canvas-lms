@@ -35,6 +35,10 @@ const fetchWindowSize = {
   subject: 'lti.fetchWindowSize'
 }
 
+const hideRightSideWrapper = {
+  subject: 'lti.hideRightSideWrapper'
+}
+
 const removeUnloadMessage = {
   subject: 'lti.removeUnloadMessage'
 }
@@ -140,6 +144,19 @@ QUnit.module('Messages', suiteHooks => {
     notOk(window.addEventListener.calledOnce)
     await ltiMessageHandler(postMessageEvent(unloadMessage()))
     ok(window.addEventListener.calledOnce)
+  })
+
+  test('hide the right side wrapper', async () => {
+    ltiToolWrapperFixture.append(`
+      <div>
+        <div id="right-side-wrapper">someWrapping</div>
+      </div>
+    `)
+    const moduleWrapper = $('#right-side-wrapper')
+
+    ok(moduleWrapper.is(':visible'))
+    await ltiMessageHandler(postMessageEvent(hideRightSideWrapper))
+    notOk(moduleWrapper.is(':visible'))
   })
 
   test('remove the unload message', async () => {
