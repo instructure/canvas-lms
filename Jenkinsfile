@@ -493,7 +493,7 @@ pipeline {
                   extendedStage('Locales Only Changes')
                     .hooks(buildSummaryReportHooks.call())
                     .obeysAllowStages(false)
-                    .required(env.GERRIT_PROJECT == 'canvas-lms' && sh(script: "${WORKSPACE}/build/new-jenkins/locales-changes.sh", returnStatus: true) == 0)
+                    .required(!configuration.isChangeMerged() && sh(script: "${WORKSPACE}/build/new-jenkins/locales-changes.sh", returnStatus: true) == 0)
                     .execute {
                         gerrit.submitLintReview('-2', 'This commit contains only changes to config/locales/, this could be a bad sign!')
                       }
