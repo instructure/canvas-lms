@@ -77,8 +77,8 @@ export const Header = ({settings, onChange, allowNameChange, nameRef}) => {
     <Flex direction="column" padding="small small 0">
       <Flex.Item padding="small">
         <TextInput
-          id="button-name"
-          data-testid="button-name"
+          id="icon-name"
+          data-testid="icon-name"
           renderLabel={formatMessage('Name')}
           placeholder={formatMessage('untitled')}
           interaction={allowNameChange ? 'enabled' : 'disabled'}
@@ -91,7 +91,7 @@ export const Header = ({settings, onChange, allowNameChange, nameRef}) => {
       </Flex.Item>
       <Flex.Item padding="small">
         <TextArea
-          id="button-alt-text"
+          id="icon-alt-text"
           height="4rem"
           label={textAreaLabel}
           onChange={setAlt}

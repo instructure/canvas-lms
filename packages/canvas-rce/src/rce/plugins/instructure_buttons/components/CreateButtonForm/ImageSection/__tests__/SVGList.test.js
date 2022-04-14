@@ -56,7 +56,7 @@ describe('SVGList', () => {
 
     it('calls the "onSelect" handler with the selected icon', () => {
       const {getByTestId} = subject()
-      fireEvent.click(getByTestId('button-icon-art'))
+      fireEvent.click(getByTestId('icon-maker-art'))
       expect(onSelect).toHaveBeenCalledWith(
         expect.objectContaining({
           label: 'Art Icon'

@@ -39,9 +39,9 @@ describe('Upload data actions', () => {
   const results = {id: 47}
   const file = {url: 'http://canvas.test/files/17/download', thumbnail_url: 'thumbnailurl'}
   const successSource = {
-    fetchButtonsAndIconsFolder() {
+    fetchIconMakerFolder() {
       return Promise.resolve({
-        folders: [{id: 2, name: 'Buttons and Icons', parentId: 1}]
+        folders: [{id: 2, name: 'Icon Maker', parentId: 1}]
       })
     },
 
@@ -202,7 +202,7 @@ describe('Upload data actions', () => {
     })
   })
 
-  describe('uploadToButtonsAndIconsFolder', () => {
+  describe('uploadToIconMakerFolder', () => {
     let baseState, svg, getContextOriginal
 
     beforeEach(() => {
@@ -210,7 +210,7 @@ describe('Upload data actions', () => {
       HTMLCanvasElement.prototype.getContext = () => ({})
 
       baseState = setupState({contextId: 101, contextType: 'course'})
-      svg = {name: 'button.svg', domElement: buildSvg(DEFAULT_SETTINGS)}
+      svg = {name: 'icon.svg', domElement: buildSvg(DEFAULT_SETTINGS)}
     })
 
     afterEach(() => {
@@ -234,7 +234,7 @@ describe('Upload data actions', () => {
         category: 'icon_maker_icons'
       }
 
-      return store.dispatch(actions.uploadToButtonsAndIconsFolder(svg)).then(() => {
+      return store.dispatch(actions.uploadToIconMakerFolder(svg)).then(() => {
         assert.deepEqual(baseState.source.preflightUpload.firstCall.args, [
           fileMetaProps,
           canvasProps
@@ -245,7 +245,7 @@ describe('Upload data actions', () => {
     it('dispatches uploadFRD with the svg domElement', () => {
       const store = spiedStore(baseState)
 
-      return store.dispatch(actions.uploadToButtonsAndIconsFolder(svg)).then(() => {
+      return store.dispatch(actions.uploadToIconMakerFolder(svg)).then(() => {
         assert.deepEqual(baseState.source.uploadFRD.firstCall.args, [
           new File([svg.domElement.outerHTML], svg.name, {type: 'image/svg+xml'}),
           results
@@ -262,15 +262,15 @@ describe('Upload data actions', () => {
       })
 
       it('includes the specified duplicate strategy setting', async () => {
-        await store.dispatch(actions.uploadToButtonsAndIconsFolder(svg, uploadSettings))
+        await store.dispatch(actions.uploadToIconMakerFolder(svg, uploadSettings))
 
         assert.deepEqual(baseState.source.preflightUpload.lastCall.args, [
           {
             file: {
-              name: 'button.svg',
+              name: 'icon.svg',
               type: 'image/svg+xml'
             },
-            name: 'button.svg',
+            name: 'icon.svg',
             parentFolderId: 2
           },
           {
@@ -462,7 +462,7 @@ describe('Upload data actions', () => {
 
       const subject = () => store.dispatch(actions.uploadPreflight('files', fileProps()))
 
-      describe('when the file is a button & icon svg', () => {
+      describe('when the file is an icon maker svg', () => {
         beforeEach(() => {
           fileText = 'something something image/svg+xml-icon-maker-icons'
         })
@@ -480,9 +480,9 @@ describe('Upload data actions', () => {
         })
       })
 
-      describe('when the file is not a button & icon svg', () => {
+      describe('when the file is not an icon maker svg', () => {
         beforeEach(() => {
-          fileText = 'something something not buttons & icons'
+          fileText = 'something something not icon maker'
         })
 
         it('sets the category to undefined', () => {

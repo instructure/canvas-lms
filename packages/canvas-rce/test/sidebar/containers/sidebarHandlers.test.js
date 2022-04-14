@@ -97,14 +97,8 @@ describe('sidebarHandlers', () => {
     testHandler('toggleUploadForm', upload, 'openOrCloseUploadForm')
   })
 
-  it('ties button and icon uploads to store', () => {
-    testHandler(
-      'startButtonsAndIconsUpload',
-      upload,
-      'uploadToButtonsAndIconsFolder',
-      {},
-      undefined
-    )
+  it('ties icon maker uploads to store', () => {
+    testHandler('startIconMakerUpload', upload, 'uploadToIconMakerFolder', {}, undefined)
   })
 
   it('ties media upload to store', () => {

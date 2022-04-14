@@ -28,7 +28,7 @@ import {CreateButtonForm} from './CreateButtonForm'
 import {Footer} from './CreateButtonForm/Footer'
 import {buildStylesheet, buildSvg} from '../svg'
 import {statuses, useSvgSettings} from '../svg/settings'
-import {BTN_AND_ICON_ATTRIBUTE, BTN_AND_ICON_DOWNLOAD_URL_ATTR} from '../registerEditToolbar'
+import {ICON_MAKER_ATTRIBUTE, ICON_MAKER_DOWNLOAD_URL_ATTR} from '../registerEditToolbar'
 import {FixedContentTray} from '../../shared/FixedContentTray'
 import {useStoreProps} from '../../shared/StoreContext'
 import formatMessage from '../../../../format-message'
@@ -163,7 +163,7 @@ export function ButtonsTray({editor, onUnmount, editing, rcsConfig}) {
     buildStylesheet()
       .then(stylesheet => {
         svg.appendChild(stylesheet)
-        return storeProps.startButtonsAndIconsUpload(
+        return storeProps.startIconMakerUpload(
           {
             name: `${settings.name || formatMessage('untitled')}.svg`,
             domElement: svg
@@ -173,12 +173,12 @@ export function ButtonsTray({editor, onUnmount, editing, rcsConfig}) {
           }
         )
       })
-      .then(writeButtonToRCE)
+      .then(writeIconToRCE)
       .then(onClose)
       .catch(() => setStatus(statuses.ERROR))
   }
 
-  const writeButtonToRCE = ({url}) => {
+  const writeIconToRCE = ({url}) => {
     const img = editor.dom.create('img')
 
     img.setAttribute('src', url)
@@ -187,13 +187,13 @@ export function ButtonsTray({editor, onUnmount, editing, rcsConfig}) {
       img.setAttribute('alt', settings.alt)
     }
 
-    // Mark the image as a button and icon.
-    img.setAttribute(BTN_AND_ICON_ATTRIBUTE, true)
+    // Mark the image as an icon maker icon.
+    img.setAttribute(ICON_MAKER_ATTRIBUTE, true)
 
     // URL to fetch the SVG from when loading the Edit tray.
     // We can't use the 'src' because Canvas will re-write the
     // source attribute to a URL that is not cross-origin friendly.
-    img.setAttribute(BTN_AND_ICON_DOWNLOAD_URL_ATTR, buildDownloadUrl(url))
+    img.setAttribute(ICON_MAKER_DOWNLOAD_URL_ATTR, buildDownloadUrl(url))
 
     editor.insertContent(img.outerHTML)
   }

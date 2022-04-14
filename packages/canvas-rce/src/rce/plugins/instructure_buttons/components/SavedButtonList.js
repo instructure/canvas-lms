@@ -21,7 +21,7 @@ import React from 'react'
 import {View} from '@instructure/ui-view'
 import ImageList from '../../instructure_image/Images'
 import {useStoreProps} from '../../shared/StoreContext'
-import {BUTTONS_AND_ICONS} from '../registerEditToolbar'
+import {ICON_MAKER_ICONS} from '../registerEditToolbar'
 
 const SavedButtonList = ({onImageEmbed}) => {
   const storeProps = useStoreProps()
@@ -30,8 +30,8 @@ const SavedButtonList = ({onImageEmbed}) => {
   return (
     <View>
       <ImageList
-        fetchInitialImages={() => storeProps.fetchInitialImages({category: BUTTONS_AND_ICONS})}
-        fetchNextImages={() => storeProps.fetchNextImages({category: BUTTONS_AND_ICONS})}
+        fetchInitialImages={() => storeProps.fetchInitialImages({category: ICON_MAKER_ICONS})}
+        fetchNextImages={() => storeProps.fetchNextImages({category: ICON_MAKER_ICONS})}
         contextType={storeProps.contextType}
         images={{
           [storeProps.contextType]: {

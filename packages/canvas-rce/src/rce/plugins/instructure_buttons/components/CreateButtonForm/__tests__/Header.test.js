@@ -22,19 +22,19 @@ import {DEFAULT_SETTINGS} from '../../../svg/constants'
 import {Header} from '../Header'
 
 describe('<Header />', () => {
-  it('changes the button name', async () => {
+  it('changes the icon name', async () => {
     const onChange = jest.fn()
     render(<Header settings={DEFAULT_SETTINGS} onChange={onChange} />)
-    const input = document.querySelector('#button-name')
-    fireEvent.change(input, {target: {value: 'A b&i name'}})
+    const input = document.querySelector('#icon-name')
+    fireEvent.change(input, {target: {value: 'An IM name'}})
 
-    await waitFor(() => expect(onChange).toHaveBeenCalledWith({name: 'A b&i name'}))
+    await waitFor(() => expect(onChange).toHaveBeenCalledWith({name: 'An IM name'}))
   })
 
-  it('changes the button alt text', async () => {
+  it('changes the icon alt text', async () => {
     const onChange = jest.fn()
     render(<Header settings={DEFAULT_SETTINGS} onChange={onChange} />)
-    const input = document.querySelector('#button-alt-text')
+    const input = document.querySelector('#icon-alt-text')
     fireEvent.change(input, {target: {value: 'A descriptive text'}})
 
     await waitFor(() => expect(onChange).toHaveBeenCalledWith({alt: 'A descriptive text'}))
@@ -45,11 +45,11 @@ describe('<Header />', () => {
 
     const subject = () => render(<Header settings={settings} onChange={() => {}} />)
 
-    beforeEach(() => (settings = {...DEFAULT_SETTINGS, name: 'Button &amp; Icon'}))
+    beforeEach(() => (settings = {...DEFAULT_SETTINGS, name: 'Icon &amp; Maker'}))
 
     it('decodes the html entities', () => {
       const {getByTestId} = subject()
-      expect(getByTestId('button-name').value).toEqual('Button & Icon')
+      expect(getByTestId('icon-name').value).toEqual('Icon & Maker')
     })
   })
 })

@@ -25,14 +25,15 @@ import {ColorInput} from '../../../shared/ColorInput'
 import formatMessage from '../../../../../format-message'
 
 const OUTLINE_SIZES = ['none', 'small', 'medium', 'large']
+export const COLOR_SECTION_ID = 'icons-tray-color-section'
 
-const getColorSection = () => document.querySelector('#buttons-tray-color-section')
+const getColorSection = () => document.querySelector(`#${COLOR_SECTION_ID}`)
 
 export const ColorSection = ({settings, onChange}) => (
   <Flex
     as="section"
     direction="column"
-    id="buttons-tray-color-section"
+    id={COLOR_SECTION_ID}
     justifyItems="space-between"
     padding="0 small"
   >
@@ -40,7 +41,7 @@ export const ColorSection = ({settings, onChange}) => (
       <ColorInput
         color={settings.color}
         label={formatMessage('Icon Color')}
-        name="button-color"
+        name="icon-color"
         onChange={color => onChange({color})}
         popoverMountNode={getColorSection}
       />
@@ -49,7 +50,7 @@ export const ColorSection = ({settings, onChange}) => (
     <Flex.Item padding="small">
       <SimpleSelect
         assistiveText={formatMessage('Use arrow keys to select an outline size.')}
-        id="button-outline-size"
+        id="icon-outline-size"
         onChange={(e, option) => onChange({outlineSize: option.value})}
         renderLabel={formatMessage('Outline Size')}
         value={settings.outlineSize}
@@ -70,7 +71,7 @@ export const ColorSection = ({settings, onChange}) => (
       <ColorInput
         color={settings.outlineColor}
         label={formatMessage('Outline Color')}
-        name="button-outline"
+        name="icon-outline"
         onChange={outlineColor => onChange({outlineColor})}
         popoverMountNode={getColorSection}
         requireColor

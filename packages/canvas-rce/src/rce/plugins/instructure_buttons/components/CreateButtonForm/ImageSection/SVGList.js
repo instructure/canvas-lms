@@ -57,7 +57,7 @@ const SVGList = ({type, onSelect, fillColor, onMount}) => {
       {Object.keys(svgSourceList).map(iconName => (
         <Flex.Item key={iconName} as="div" margin="xx-small xx-small small xx-small" size="4rem">
           <Link
-            data-testid={`button-icon-${iconName}`}
+            data-testid={`icon-maker-${iconName}`}
             draggable={false}
             onClick={() => onSelect(svgSourceList[iconName])}
             title={svgSourceList[iconName].label}

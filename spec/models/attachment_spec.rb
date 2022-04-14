@@ -408,27 +408,27 @@ describe Attachment do
     describe "uncategorized" do
       subject { Attachment.uncategorized }
 
-      let!(:button_and_icon) { attachment_model(category: Attachment::ICON_MAKER_ICONS) }
+      let!(:icon_maker) { attachment_model(category: Attachment::ICON_MAKER_ICONS) }
       let!(:uncategorized) { attachment_model }
 
       it { is_expected.to include uncategorized }
-      it { is_expected.not_to include button_and_icon }
+      it { is_expected.not_to include icon_maker }
     end
 
     describe "for_category" do
       subject { Attachment.for_category(category) }
 
-      let_once(:button_and_icon) { attachment_model(category: Attachment::ICON_MAKER_ICONS) }
+      let_once(:icon_maker) { attachment_model(category: Attachment::ICON_MAKER_ICONS) }
       let_once(:uncategorized) { attachment_model }
 
       let(:category) { Attachment::ICON_MAKER_ICONS }
 
       before do
-        button_and_icon
+        icon_maker
         uncategorized
       end
 
-      it { is_expected.to include button_and_icon }
+      it { is_expected.to include icon_maker }
       it { is_expected.not_to include uncategorized }
     end
 

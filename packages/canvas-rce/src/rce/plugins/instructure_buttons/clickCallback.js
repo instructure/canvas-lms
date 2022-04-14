@@ -22,13 +22,15 @@ import ReactDOM from 'react-dom'
 import bridge from '../../../bridge'
 import {StoreProvider} from '../shared/StoreContext'
 
-export const CREATE_BUTTON = 'create_buttons_and_icons'
-export const LIST_BUTTON = 'list_buttons_and_icons'
-export const EDIT_BUTTON = 'edit_buttons_and_icons'
+export const CREATE_ICON_MAKER = 'create_icon_maker_icon'
+export const LIST_ICON_MAKER = 'list_icon_maker_icons'
+export const EDIT_ICON_MAKER = 'edit_icon_maker_icon'
+
+export const ICONS_TRAY_CONTAINER_ID = 'instructure-rce-icons-tray-container'
 
 export default function (ed, document, type) {
   return import('./components/ButtonsTray').then(({ButtonsTray}) => {
-    let container = document.querySelector('#instructure-rce-buttons-tray-container')
+    let container = document.querySelector(`#${ICONS_TRAY_CONTAINER_ID}`)
     const trayProps = bridge.trayProps.get(ed)
 
     const handleUnmount = () => {
@@ -38,9 +40,9 @@ export default function (ed, document, type) {
 
     if (!container) {
       container = document.createElement('div')
-      container.id = 'instructure-rce-buttons-tray-container'
+      container.id = ICONS_TRAY_CONTAINER_ID
       document.body.appendChild(container)
-    } else if (type == CREATE_BUTTON) {
+    } else if (type === CREATE_ICON_MAKER) {
       // This case indicates we are switching modes (i.e. Editing -> Creating)
       // We unmount the component to clear all state. This also triggers an animation
       // that closes and opens the tray to indicate a mode change to the user
@@ -52,7 +54,7 @@ export default function (ed, document, type) {
         {() => (
           <ButtonsTray
             editor={ed}
-            editing={type === EDIT_BUTTON}
+            editing={type === EDIT_ICON_MAKER}
             onUnmount={handleUnmount}
             rcsConfig={trayProps}
           />

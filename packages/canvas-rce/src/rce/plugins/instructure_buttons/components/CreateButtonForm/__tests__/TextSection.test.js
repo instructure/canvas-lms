@@ -36,23 +36,23 @@ function selectOption(button, option) {
 }
 
 describe('<TextSection />', () => {
-  it('changes the button text', async () => {
+  it('changes the icon text', async () => {
     const onChange = jest.fn()
     render(<TextSection settings={DEFAULT_SETTINGS} onChange={onChange} />)
-    const input = document.querySelector('#button-text')
+    const input = document.querySelector('#icon-text')
     fireEvent.change(input, {target: {value: 'Hello World!'}})
 
     await waitFor(() => expect(onChange).toHaveBeenCalledWith({text: 'Hello World!'}))
   })
 
-  it('changes the button text size', () => {
+  it('changes the icon text size', () => {
     const onChange = jest.fn()
     render(<TextSection settings={{...DEFAULT_SETTINGS}} onChange={onChange} />)
     selectOption(/text size/i, /medium/i)
     expect(onChange).toHaveBeenCalledWith({textSize: 'medium'})
   })
 
-  it('changes the button text color', () => {
+  it('changes the icon text color', () => {
     const onChange = jest.fn()
     render(<TextSection settings={DEFAULT_SETTINGS} onChange={onChange} />)
     const input = screen.getByRole('textbox', {name: /text color/i})
@@ -60,7 +60,7 @@ describe('<TextSection />', () => {
     expect(onChange).toHaveBeenCalledWith({textColor: '#f00'})
   })
 
-  it('changes the button text background color', () => {
+  it('changes the icon text background color', () => {
     const onChange = jest.fn()
     render(<TextSection settings={DEFAULT_SETTINGS} onChange={onChange} />)
     const input = screen.getByRole('textbox', {name: /text background color/i})
@@ -68,7 +68,7 @@ describe('<TextSection />', () => {
     expect(onChange).toHaveBeenCalledWith({textBackgroundColor: '#0f0'})
   })
 
-  it('changes the button text position', () => {
+  it('changes the icon text position', () => {
     const onChange = jest.fn()
     render(<TextSection settings={{...DEFAULT_SETTINGS}} onChange={onChange} />)
     selectOption(/text position/i, /bottom third/i)

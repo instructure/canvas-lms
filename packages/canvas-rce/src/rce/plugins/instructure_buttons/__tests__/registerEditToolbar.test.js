@@ -16,7 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import registerEditToolbar, {shouldShowEditButton} from '../registerEditToolbar'
+import registerEditToolbar, {
+  BUTTON_ID,
+  shouldShowEditButton,
+  TOOLBAR_ID
+} from '../registerEditToolbar'
 
 let editor, onAction
 
@@ -34,30 +38,26 @@ beforeEach(() => {
 
 afterEach(() => jest.restoreAllMocks())
 
-describe ('registerEditToolbar()', () => {
+describe('registerEditToolbar()', () => {
   const subject = () => registerEditToolbar(editor, onAction)
 
   beforeEach(() => subject())
 
   it('adds the edit button', () => {
-    expect(editor.ui.registry.addButton).toHaveBeenCalledWith(
-      'inst-button-and-icons-edit', {
-        onAction,
-        text: "Edit",
-        tooltip: "Edit Existing Button / Icon"
-      }
-    )
+    expect(editor.ui.registry.addButton).toHaveBeenCalledWith(BUTTON_ID, {
+      onAction,
+      text: 'Edit',
+      tooltip: 'Edit Existing Icon Maker Icon'
+    })
   })
 
   it('adds the context toolbar with the button', () => {
-    expect(editor.ui.registry.addContextToolbar).toHaveBeenCalledWith(
-      'inst-button-and-icons-edit-toolbar', {
-        items: 'inst-button-and-icons-edit',
-        position: 'node',
-        scope: 'node',
-        predicate: expect.any(Function)
-      }
-    )
+    expect(editor.ui.registry.addContextToolbar).toHaveBeenCalledWith(TOOLBAR_ID, {
+      items: BUTTON_ID,
+      position: 'node',
+      scope: 'node',
+      predicate: expect.any(Function)
+    })
   })
 })
 
@@ -66,16 +66,16 @@ describe('shouldShowEditButton()', () => {
 
   const subject = () => shouldShowEditButton(node)
 
-  describe('when the node contains the buttons/icons attr', () => {
-    beforeEach(() => node = { getAttribute: () => true })
+  describe('when the node contains the icon maker attr', () => {
+    beforeEach(() => (node = {getAttribute: () => true}))
 
     it('returns true', () => {
       expect(subject()).toEqual(true)
     })
   })
 
-  describe('when the node does not contain the buttons/icons attr', () => {
-    beforeEach(() => node = { getAttribute: () => false })
+  describe('when the node does not contain the icon maker attr', () => {
+    beforeEach(() => (node = {getAttribute: () => false}))
 
     it('returns false', () => {
       expect(subject()).toEqual(false)

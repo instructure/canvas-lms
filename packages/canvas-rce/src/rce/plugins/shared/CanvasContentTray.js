@@ -30,7 +30,7 @@ import formatMessage from '../../../format-message'
 import Filter, {useFilterSettings} from './Filter'
 import {StoreProvider} from './StoreContext'
 import {getTrayHeight} from './trayUtils'
-import {BUTTONS_AND_ICONS} from '../instructure_buttons/registerEditToolbar'
+import {ICON_MAKER_ICONS} from '../instructure_buttons/registerEditToolbar'
 
 /**
  * Returns the translated tray label
@@ -47,7 +47,7 @@ function getTrayLabel(contentType, contentSubtype, contextType) {
   }
 
   switch (contentSubtype) {
-    case BUTTONS_AND_ICONS:
+    case ICON_MAKER_ICONS:
       return formatMessage('Icon Maker Icons')
     case 'images':
       if (contentType === 'course_files') return formatMessage('Course Images')
@@ -186,10 +186,10 @@ const FILTER_SETTINGS_BY_PLUGIN = {
     sortDir: 'desc',
     searchString: ''
   },
-  list_buttons_and_icons: {
+  list_icon_maker_icons: {
     contextType: 'course',
     contentType: 'course_files',
-    contentSubtype: BUTTONS_AND_ICONS,
+    contentSubtype: ICON_MAKER_ICONS,
     sortValue: 'date_added',
     sortDir: 'desc',
     searchString: ''
@@ -425,7 +425,7 @@ export default function CanvasContentTray(props) {
                     )
                   }}
                   isContentLoading={isLoading(contentProps)}
-                  use_rce_buttons_and_icons={props.use_rce_buttons_and_icons}
+                  use_rce_icon_maker={props.use_rce_icon_maker}
                 />
               </Flex.Item>
 

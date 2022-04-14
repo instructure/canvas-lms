@@ -274,7 +274,7 @@ class RCEWrapper extends React.Component {
     instRecordDisabled: PropTypes.bool,
     highContrastCSS: PropTypes.arrayOf(PropTypes.string),
     maxInitRenderedRCEs: PropTypes.number,
-    use_rce_buttons_and_icons: PropTypes.bool
+    use_rce_icon_maker: PropTypes.bool
   }
 
   static defaultProps = {
@@ -1437,7 +1437,7 @@ class RCEWrapper extends React.Component {
 
     if (
       rcsExists &&
-      this.props.use_rce_buttons_and_icons &&
+      this.props.use_rce_icon_maker &&
       this.props.trayProps?.contextType === 'course'
     ) {
       canvasPlugins.push('instructure_buttons')
@@ -1864,7 +1864,7 @@ class RCEWrapper extends React.Component {
             bridge={bridge}
             editor={this}
             onTrayClosing={this.handleContentTrayClosing}
-            use_rce_buttons_and_icons={this.props.use_rce_buttons_and_icons}
+            use_rce_icon_maker={this.props.use_rce_icon_maker}
             {...trayProps}
           />
         )}

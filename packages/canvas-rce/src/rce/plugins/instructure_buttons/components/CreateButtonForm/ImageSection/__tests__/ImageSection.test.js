@@ -182,7 +182,7 @@ describe('ImageSection', () => {
 
       rendered = subject({
         editor: new FakeEditor(),
-        rcsConfig: {features: {buttons_and_icons_cropper: false}}
+        rcsConfig: {features: {icon_maker_cropper: false}}
       })
       fireEvent.click(rendered.getByText('Add Image'))
     })
@@ -214,7 +214,7 @@ describe('ImageSection', () => {
 
     beforeEach(() => {
       const rendered = subject({
-        rcsConfig: {features: {buttons_and_icons_cropper: true}}
+        rcsConfig: {features: {icon_maker_cropper: true}}
       })
 
       getByTestId = rendered.getByTestId
@@ -301,7 +301,7 @@ describe('ImageSection', () => {
       fireEvent.click(getByText('Add Image'))
       fireEvent.click(getByText('Multi Color Image'))
       await waitFor(() => expect(getByTestId('multicolor-svg-list')).toBeInTheDocument())
-      fireEvent.click(getByTestId('button-icon-art'))
+      fireEvent.click(getByTestId('icon-maker-art'))
       await flushPromises()
       const payload = lastPayloadOfActionType(defaultProps.onChange, 'SetImageSettings')
       expect(payload.imageName).toEqual('Art Icon')
@@ -311,7 +311,7 @@ describe('ImageSection', () => {
       fireEvent.click(getByText('Add Image'))
       fireEvent.click(getByText('Single Color Image'))
       await waitFor(() => expect(getByTestId('singlecolor-svg-list')).toBeInTheDocument())
-      fireEvent.click(getByTestId('button-icon-art'))
+      fireEvent.click(getByTestId('icon-maker-art'))
       await flushPromises()
       await waitFor(() => {
         expect(container.querySelector('[name="single-color-image-fill"]')).toBeInTheDocument()
@@ -333,7 +333,7 @@ describe('ImageSection', () => {
 
       rendered = subject({
         editor: new FakeEditor(),
-        rcsConfig: {features: {buttons_and_icons_cropper: true}}
+        rcsConfig: {features: {icon_maker_cropper: true}}
       })
 
       fireEvent.click(rendered.getByText('Add Image'))
@@ -364,7 +364,7 @@ describe('ImageSection', () => {
     let getByTestId, getByText, getByTitle
 
     beforeEach(() => {
-      const rendered = subject({rcsConfig: {features: {buttons_and_icons_cropper: true}}})
+      const rendered = subject({rcsConfig: {features: {icon_maker_cropper: true}}})
 
       getByTestId = rendered.getByTestId
       getByText = rendered.getByText
@@ -494,7 +494,7 @@ describe('ImageSection', () => {
         await waitFor(() => {
           expect(getByTestId('selected-image-preview')).toBeInTheDocument()
         })
-        fireEvent.click(getByTestId('button-icon-art'))
+        fireEvent.click(getByTestId('icon-maker-art'))
       })
 
       it('sets default icon color', async () => {

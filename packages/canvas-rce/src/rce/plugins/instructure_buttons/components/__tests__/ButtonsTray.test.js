@@ -32,8 +32,8 @@ jest.mock('../../utils/useDebouncedValue', () =>
   jest.requireActual('../../utils/__tests__/useMockedDebouncedValue')
 )
 
-const startButtonsAndIconsUpload = jest.fn().mockResolvedValue({url: 'https://uploaded.url'})
-useStoreProps.mockReturnValue({startButtonsAndIconsUpload})
+const startIconMakerUpload = jest.fn().mockResolvedValue({url: 'https://uploaded.url'})
+useStoreProps.mockReturnValue({startIconMakerUpload})
 
 const editor = {
   dom: {
@@ -54,7 +54,7 @@ const setIconColor = hex => {
   fireEvent.input(input, {target: {value: hex}})
 }
 
-describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
+describe('RCE "Icon Maker" Plugin > ButtonsTray', () => {
   const defaults = {
     editor,
     onUnmount: jest.fn(),
@@ -73,7 +73,7 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
     })
 
     rcs = {
-      getFile: jest.fn(() => Promise.resolve({name: 'Test Button.svg'})),
+      getFile: jest.fn(() => Promise.resolve({name: 'Test Icon.svg'})),
       canvasUrl: 'https://domain.from.env'
     }
     RceApiSource.mockImplementation(() => rcs)
@@ -102,7 +102,7 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
     })
 
     it('does not fire off the icon upload callback', () => {
-      expect(startButtonsAndIconsUpload).not.toHaveBeenCalled()
+      expect(startIconMakerUpload).not.toHaveBeenCalled()
     })
 
     it('shows an error message', () => {
@@ -133,7 +133,7 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
         it('moves focus to the "name" input', async () => {
           const {findByTestId} = render(<ButtonsTray {...defaults} />)
           const closeButton = await findByTestId('icon-maker-close-button')
-          const expectedElement = await findByTestId('button-name')
+          const expectedElement = await findByTestId('icon-name')
           fireEvent.keyDown(closeButton, event)
           expect(focusedElement).toEqual(expectedElement)
         })
@@ -161,12 +161,13 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
       userEvent.click(screen.getByRole('button', {name: /apply/i}))
       let firstCall
       await waitFor(() => {
-        const result = startButtonsAndIconsUpload.mock.calls[0]
-        if (startButtonsAndIconsUpload.mock.calls.length <= 0) throw new Error()
-        firstCall = startButtonsAndIconsUpload.mock.calls[0]
+        const result = startIconMakerUpload.mock.calls[0]
+        if (startIconMakerUpload.mock.calls.length <= 0) throw new Error()
+        firstCall = startIconMakerUpload.mock.calls[0]
         expect(result[1].onDuplicate).toBe(false)
       })
 
+      // eslint-disable-next-line jest/no-large-snapshots
       expect(firstCall).toMatchInlineSnapshot(`
         Array [
           Object {
@@ -241,8 +242,8 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
       })
 
       await waitFor(() => {
-        if (startButtonsAndIconsUpload.mock.calls.length <= 0) throw new Error()
-        const result = startButtonsAndIconsUpload.mock.calls[0]
+        if (startIconMakerUpload.mock.calls.length <= 0) throw new Error()
+        const result = startIconMakerUpload.mock.calls[0]
         expect(result[1].onDuplicate).toBe('overwrite')
       })
     })
@@ -251,7 +252,7 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
   it('writes the content to the editor', async () => {
     render(<ButtonsTray {...defaults} />)
 
-    fireEvent.change(document.querySelector('#button-alt-text'), {target: {value: 'banana'}})
+    fireEvent.change(document.querySelector('#icon-alt-text'), {target: {value: 'banana'}})
     setIconColor('#000000')
     userEvent.click(screen.getByRole('button', {name: /apply/i}))
     await waitFor(() => expect(editor.insertContent).toHaveBeenCalled())
@@ -285,19 +286,19 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
 
       act(() => getByTestId('cb-replace-all').click())
 
-      await waitFor(() => expect(getByTestId('button-name')).toBeDisabled())
+      await waitFor(() => expect(getByTestId('icon-name')).toBeDisabled())
     })
 
     it('does not disable the name field when not checked', async () => {
       const {getByTestId} = render(<ButtonsTray {...defaults} editing />)
 
-      await waitFor(() => expect(getByTestId('button-name')).not.toBeDisabled())
+      await waitFor(() => expect(getByTestId('icon-name')).not.toBeDisabled())
     })
 
-    it('does not disable the name field on new buttons', async () => {
+    it('does not disable the name field on new icons', async () => {
       const {getByTestId} = render(<ButtonsTray {...defaults} />)
 
-      await waitFor(() => expect(getByTestId('button-name')).not.toBeDisabled())
+      await waitFor(() => expect(getByTestId('icon-name')).not.toBeDisabled())
     })
   })
 
@@ -314,7 +315,7 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
     })
   })
 
-  describe('when a button is being created', () => {
+  describe('when an icon is being created', () => {
     let ed
 
     beforeEach(() => {
@@ -343,7 +344,7 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
     })
   })
 
-  describe('when a button is being edited', () => {
+  describe('when an icon is being edited', () => {
     let ed
 
     beforeEach(() => {
@@ -407,11 +408,11 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
       const {getByLabelText, getByTestId} = subject()
 
       await waitFor(() => {
-        expect(getByLabelText('Name').value).toEqual('Test Button')
+        expect(getByLabelText('Name').value).toEqual('Test Icon')
         expect(getByLabelText('Icon Shape').value).toEqual('Triangle')
         expect(getByLabelText('Icon Size').value).toEqual('Large')
-        expect(getByTestId('colorPreview-#FF2717')).toBeInTheDocument() // button color
-        expect(getByTestId('colorPreview-#06A3B7')).toBeInTheDocument() // button outline
+        expect(getByTestId('colorPreview-#FF2717')).toBeInTheDocument() // icon color
+        expect(getByTestId('colorPreview-#06A3B7')).toBeInTheDocument() // icon outline
         expect(getByLabelText('Outline Size').value).toEqual('Small')
       })
     })
@@ -440,24 +441,24 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
 
     describe('have no none option when', () => {
       it('they represent outline color', () => {
-        const noneColorOption = getNoneColorOptionFor('button-outline-popover')
+        const noneColorOption = getNoneColorOptionFor('icon-outline-popover')
         expect(noneColorOption).not.toBeInTheDocument()
       })
 
       it('they represent text color', () => {
-        const noneColorOption = getNoneColorOptionFor('button-text-color-popover')
+        const noneColorOption = getNoneColorOptionFor('icon-text-color-popover')
         expect(noneColorOption).not.toBeInTheDocument()
       })
     })
 
     describe('have a none option when', () => {
       it('they represent icon color', () => {
-        const noneColorOption = getNoneColorOptionFor('button-color-popover')
+        const noneColorOption = getNoneColorOptionFor('icon-color-popover')
         expect(noneColorOption).toBeInTheDocument()
       })
 
       it('they represent text background color', () => {
-        const noneColorOption = getNoneColorOptionFor('button-text-background-color-popover')
+        const noneColorOption = getNoneColorOptionFor('icon-text-background-color-popover')
         expect(noneColorOption).toBeInTheDocument()
       })
     })

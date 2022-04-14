@@ -17,22 +17,24 @@
  */
 
 export enum Feature {
-  ButtonsAndIcons
+  IconMaker
 }
 
 export default function shouldUseFeature(feature: Feature, windowEnv: object): boolean {
   switch (feature) {
-    case Feature.ButtonsAndIcons:
-      return shouldUseButtonsAndIcons(windowEnv)
+    case Feature.IconMaker:
+      return shouldUseIconMaker(windowEnv)
     default:
       return false
   }
 }
 
-function shouldUseButtonsAndIcons(windowEnv: object): boolean {
+function shouldUseIconMaker(windowEnv: object): boolean {
   return !!(
     windowEnv.RICH_CONTENT_CAN_UPLOAD_FILES &&
     windowEnv.RICH_CONTENT_CAN_EDIT_FILES &&
+    // This feature was re-named to match the updated name: "Buttons and Icons" => "Icon Maker"
+    // But the feature flag was NOT renamed so it's still "buttons_and_icons_root_account"
     window.ENV?.FEATURES?.buttons_and_icons_root_account
   )
 }

@@ -35,7 +35,7 @@ describe('buildSvg()', () => {
     options = {...DEFAULT_OPTIONS}
   })
 
-  it('builds the button svg', () => {
+  it('builds the icon svg', () => {
     expect(buildSvg(settings)).toMatchInlineSnapshot(`
       <svg
         fill="none"
@@ -79,7 +79,7 @@ describe('buildSvg()', () => {
     `)
   })
 
-  it('builds the button svg when is preview mode', () => {
+  it('builds the icon svg when is preview mode', () => {
     settings = {...settings, color: null}
     options = {...options, isPreview: true}
     expect(buildSvg(settings, options)).toMatchInlineSnapshot(`
@@ -145,7 +145,7 @@ describe('buildSvg()', () => {
     `)
   })
 
-  it('builds the button svg with text', () => {
+  it('builds the icon svg with text', () => {
     settings = {...settings, text: 'Hello World!'}
     expect(buildSvg(settings)).toMatchInlineSnapshot(`
       <svg

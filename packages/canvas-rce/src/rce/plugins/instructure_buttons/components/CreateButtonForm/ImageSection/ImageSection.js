@@ -33,7 +33,8 @@ import {ColorInput} from '../../../../shared/ColorInput'
 import {convertFileToBase64} from '../../../svg/utils'
 import {transformForShape} from '../../../svg/image'
 
-const getImageSection = () => document.querySelector('#buttons-tray-image-section')
+const IMAGE_SECTION_ID = 'icon-maker-tray-image-section'
+const getImageSection = () => document.querySelector(`#${IMAGE_SECTION_ID}`)
 
 const scrollToBottom = () => {
   const section = getImageSection()
@@ -185,12 +186,7 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig}) =
 
   return (
     <Group as="section" defaultExpanded summary={formatMessage('Image')}>
-      <Flex
-        as="section"
-        justifyItems="space-between"
-        direction="column"
-        id="buttons-tray-image-section"
-      >
+      <Flex as="section" justifyItems="space-between" direction="column" id={IMAGE_SECTION_ID}>
         <Flex.Item>
           <Flex direction="column">
             <Flex.Item padding="small 0 0 small">
