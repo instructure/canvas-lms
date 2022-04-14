@@ -32,6 +32,7 @@ const SUBJECT_ALLOW_LIST = [
   'lti.enableScrollEvents',
   'lti.fetchWindowSize',
   'lti.frameResize',
+  'lti.hideRightSideWrapper',
   'lti.removeUnloadMessage',
   'lti.resourceImported',
   'lti.screenReaderAlert',
