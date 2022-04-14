@@ -628,6 +628,30 @@ function setup() {
       }
     })
 
+    if (ENV.visibility_feedback_enabled) {
+      $('.toggle_comments_link').on('click', function (event) {
+        event.preventDefault()
+        const $unreadIcon = $(this).find('.unread_comment_dot')
+
+        if ($unreadIcon.length) {
+          const mark_comments_read_url = $unreadIcon.data('href')
+          $.ajaxJSON(mark_comments_read_url, 'PUT', {}, () => {})
+          $unreadIcon.remove()
+        }
+      })
+
+      $('.toggle_rubric_assessments_link').on('click', function (event) {
+        event.preventDefault()
+        const $unreadIcon = $(this).find('.unread_rubric_dot')
+
+        if ($unreadIcon.length) {
+          const mark_rubric_comments_read_url = $unreadIcon.data('href')
+          $.ajaxJSON(mark_rubric_comments_read_url, 'PUT', {}, () => {})
+          $unreadIcon.remove()
+        }
+      })
+    }
+
     $('.screenreader-toggle').click(function (event) {
       event.preventDefault()
       const ariaControl = $(this).data('aria')

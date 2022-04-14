@@ -25,6 +25,10 @@
 
   hidden_text = t("Instructor has not posted this grade")
 %>
+<%
+  @visibility_feedback_enabled = Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
+  js_env visibility_feedback_enabled: @visibility_feedback_enabled
+%>
 <div id="grade-summary-content" style="display: none;">
   <% provide :right_side do %>
     <div id="student-grades-right-content" style="display: none;">
@@ -131,7 +135,7 @@
         <th scope="col"><%= t('headers.due', "Due") %></th>
         <th scope="col" class="status"><%= t('Status') %></th>
         <th scope="col" class="assignment_score"><%= t('headers.score', "Score") %></th>
-        <% if !Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page) %>
+        <% if !@visibility_feedback_enabled %>
           <th scope="col" class="possible"><%= t('headers.out_of', "Out of") %></th>
         <% end %>
         <th scope="col"><span class="screenreader-only"><%= t('headers.details', "Details") %></span></th>
@@ -155,8 +159,10 @@
         >
 
         <th class="title" scope="row">
-          <% if assignment_presenter.is_unread? %>
-            <div class="unread-grade">&nbsp;</div>
+          <% if !@visibility_feedback_enabled %>
+            <% if assignment_presenter.is_unread? %>
+              <div class="unread-grade">&nbsp;</div>
+            <% end %>
           <% end %>
           <% if assignment_presenter.show_submission_details? %>
             <% if assignment.a2_enabled? && @presenter.student_is_user? %>
@@ -231,7 +237,7 @@
                   <%= assignment_presenter.display_score %>
                 </span>
               <% end %>
-              <% if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page) %>
+              <% if @visibility_feedback_enabled %>
                 <% if assignment_presenter.points_graded? && assignment.points_possible.present? %>
                   <span>/ <%= n(round_if_whole(assignment.points_possible)) %></span>
                 <% end %>
@@ -264,12 +270,12 @@
             </div>
           </div>
         </td>
-        <% if !Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page) %>
+        <% if !@visibility_feedback_enabled %>
           <td class="possible points_possible">
             <%= n(round_if_whole(assignment.points_possible)) %>
           </td>
         <% end %>
-        <td class="details">
+        <td class="details <%= @visibility_feedback_enabled && 'visibility_feedback_ff' %>">
           <% if !assignment.special_class %>
           <a href="#"
               class="toggle_final_grade_info tooltip"
@@ -287,27 +293,6 @@
               <span class="tooltip_text"><%= t("Grade Info") %></span>
             </span>
             <i class="icon-warning standalone-icon"></i>
-          </a>
-          <a href="#"
-            class="toggle_comments_link tooltip"
-            aria-label="<%= t('Read comments') %>"
-            aria-describedby="comment_count_for_assignment_<%= assignment.id %>"
-            <% if assignment_presenter.has_comments? && !assignment_presenter.hide_grade_from_student? %>
-              aria-expanded="false"
-              aria-controls="comments_thread_<%= assignment.id %>"
-              role="button"
-            <% else %>
-              aria-hidden='true'
-              role='presentation'
-              tabindex='-1'
-              style='visibility: hidden;'
-            <% end %>>
-            <span class="tooltip_wrap right">
-              <span class="tooltip_text" id="comment_count_for_assignment_<%= assignment.id %>">
-                <%= t("comment", count: submission&.visible_submission_comments&.size || 0) %>
-              </span>
-            </span>
-            <i class="icon-discussion standalone-icon"></i>
           </a>
           <a href="#"
             class="toggle_score_details_link tooltip"
@@ -338,6 +323,47 @@
               <span class="tooltip_text"><%= t("See rubric results") %></span>
             </span>
             <i class="icon-rubric"></i>
+            <% if @visibility_feedback_enabled %>
+              <% if @current_user.unread_rubric_comments?(submission) %>
+                <div
+                  class="unread_rubric_dot"
+                  data-href="<%= api_v1_course_submission_rubric_comments_mark_read_url(@context.id, assignment.id, submission.user.id) %>">&nbsp;</div>
+              <% end %>
+            <% end %>
+          </a>
+          <a href="#"
+            class="toggle_comments_link tooltip"
+            aria-label="<%= t('Read comments') %>"
+            aria-describedby="comment_count_for_assignment_<%= assignment.id %>"
+            <% if assignment_presenter.has_comments? && !assignment_presenter.hide_grade_from_student? %>
+              aria-expanded="false"
+              aria-controls="comments_thread_<%= assignment.id %>"
+              role="button"
+            <% else %>
+              aria-hidden='true'
+              role='presentation'
+              tabindex='-1'
+              style='visibility: hidden;'
+            <% end %>>
+            <%
+              visible_comments_count = submission&.visible_submission_comments&.size
+            %>
+            <span class="tooltip_wrap right">
+              <span class="tooltip_text" id="comment_count_for_assignment_<%= assignment.id %>">
+                <%= t("comment", count: visible_comments_count || 0) %>
+              </span>
+            </span>
+            <i class="icon-discussion standalone-icon"></i>
+            <% if @visibility_feedback_enabled %>
+              <span class="comment_count">
+                <%= visible_comments_count || "" %>
+              </span>
+              <% if assignment_presenter.is_unread? %>
+                <div
+                  class="unread_comment_dot"
+                  data-href="<%= api_v1_course_submission_mark_read_url(@context.id, assignment.id, submission.user.id) %>">&nbsp;</div>
+              <% end %>
+            <% end %>
           </a>
           <% if assignment_presenter.show_submission_details? %>
             <% if @presenter.turnitin_enabled? || assignment_presenter.originality_report? || assignment_presenter.turnitin %>

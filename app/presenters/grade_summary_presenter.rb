@@ -290,9 +290,7 @@ class GradeSummaryPresenter
 
   def unread_submission_ids
     @unread_submission_ids ||= if student_is_user?
-                                 # remember unread submissions and then mark all as read
                                  subs = submissions.select { |s| s.unread?(@current_user) }
-                                 subs.each { |s| s.change_read_state("read", @current_user) }
                                  subs.map(&:id)
                                else
                                  []
