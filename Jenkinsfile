@@ -306,6 +306,7 @@ pipeline {
     DYNAMODB_IMAGE_TAG = "$DYNAMODB_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
     POSTGRES_IMAGE_TAG = "$POSTGRES_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
     WEBPACK_BUILDER_IMAGE = "$WEBPACK_BUILDER_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
+    WEBPACK_CACHE_IMAGE = "$WEBPACK_CACHE_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
 
     CASSANDRA_MERGE_IMAGE = "$CASSANDRA_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-${env.RSPEC_PROCESSES ?: '4'}"
     DYNAMODB_MERGE_IMAGE = "$DYNAMODB_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-${env.RSPEC_PROCESSES ?: '4'}"
@@ -498,6 +499,19 @@ pipeline {
                         gerrit.submitLintReview('-2', 'This commit contains only changes to config/locales/, this could be a bad sign!')
                       }
 
+                  extendedStage('Webpack ES-Check')
+                    .hooks(buildSummaryReportHooks.call())
+                    .obeysAllowStages(false)
+                    .required(env.GERRIT_CHANGE_ID != '0')
+                    .execute { webpackStage.&runESCheck() }
+
+                  extendedStage('Webpack Bundle Size Check')
+                    .hooks(buildSummaryReportHooks.call())
+                    .obeysAllowStages(false)
+                    .required(configuration.isChangeMerged())
+                    .timeout(20)
+                    .execute { webpackStage.&calcBundleSizes() }
+
                   extendedStage('Parallel Run Tests').obeysAllowStages(false).execute { stageConfig, buildConfig ->
                     def stages = [:]
 
@@ -562,7 +576,6 @@ pipeline {
                       callableWithDelegate(lintersStage.featureFlagStage(nestedStages, buildConfig))()
                       callableWithDelegate(lintersStage.groovyStage(nestedStages, buildConfig))()
                       callableWithDelegate(lintersStage.masterBouncerStage(nestedStages))()
-                      callableWithDelegate(lintersStage.webpackStage(nestedStages))()
                       callableWithDelegate(lintersStage.yarnStage(nestedStages, buildConfig))()
 
                       parallel(nestedStages)

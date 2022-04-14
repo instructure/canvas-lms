@@ -78,15 +78,6 @@ def masterBouncerStage(stages) {
   }
 }
 
-def webpackStage(stages) {
-  { ->
-    callableWithDelegate(queueTestStage())(stages,
-      name: 'webpack',
-      command: './build/new-jenkins/linters/run-gergich-webpack.sh'
-    )
-  }
-}
-
 def featureFlagStage(stages, buildConfig) {
   { ->
     extendedStage('Linters - feature-flag')
