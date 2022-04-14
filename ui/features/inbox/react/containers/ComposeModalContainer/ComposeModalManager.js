@@ -28,7 +28,9 @@ import {ConversationMessage} from '../../../graphql/ConversationMessage'
 import {
   CONVERSATION_MESSAGES_QUERY,
   COURSES_QUERY,
-  REPLY_CONVERSATION_QUERY
+  REPLY_CONVERSATION_QUERY,
+  SUBMISSION_COMMENTS_QUERY,
+  VIEWABLE_SUBMISSIONS_QUERY
 } from '../../../graphql/Queries'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import ModalSpinner from './ModalSpinner'
@@ -158,9 +160,46 @@ const ComposeModalManager = props => {
     }
   }
 
+  const updateSubmissionCommentsCache = (cache, result) => {
+    if (props?.conversation) {
+      const queryToUpdate = {
+        query: SUBMISSION_COMMENTS_QUERY,
+        variables: {
+          submissionID: props.conversation._id
+        }
+      }
+      const data = JSON.parse(JSON.stringify(cache.readQuery(queryToUpdate)))
+
+      data.legacyNode.commentsConnection.nodes.push(
+        result.data.createSubmissionComment.submissionComment
+      )
+      cache.writeQuery({...queryToUpdate, data})
+    }
+
+    const queryToUpdate = {
+      query: VIEWABLE_SUBMISSIONS_QUERY,
+      variables: {
+        userID: ENV.current_user_id?.toString()
+      }
+    }
+    const data = JSON.parse(JSON.stringify(cache.readQuery(queryToUpdate)))
+    const submissionToUpdate = data.legacyNode.viewableSubmissionsConnection.nodes.find(
+      c => c._id === props.conversation._id
+    )
+    submissionToUpdate.commentsConnection.nodes.push(
+      result.data.createSubmissionComment.submissionComment
+    )
+
+    cache.writeQuery({...queryToUpdate, data})
+  }
+
   const updateCache = (cache, result) => {
-    if (isSubmissionCommentsType) return
-    if (props.isReply || props.isReplyAll || props.isForward) {
+    if (isSubmissionCommentsType) {
+      if (result.data.createSubmissionComment.errors) {
+        setOnFailure(I18n.t('Error occurred while creating submission comment'))
+        return
+      }
+    } else if (props.isReply || props.isReplyAll || props.isForward) {
       if (result.data.addConversationMessage.errors) {
         setOnFailure(I18n.t('Error occurred while adding message to conversation'))
         return
@@ -169,10 +208,13 @@ const ComposeModalManager = props => {
       setOnFailure(I18n.t('Error occurred while creating conversation message'))
       return
     }
-
-    updateConversationMessagesCache(cache, result)
-    updateConversationsCache(cache, result)
-    updateReplyConversationsCache(cache, result)
+    if (isSubmissionCommentsType) {
+      updateSubmissionCommentsCache(cache, result)
+    } else {
+      updateConversationMessagesCache(cache, result)
+      updateConversationsCache(cache, result)
+      updateReplyConversationsCache(cache, result)
+    }
   }
 
   const onConversationCreateComplete = success => {
