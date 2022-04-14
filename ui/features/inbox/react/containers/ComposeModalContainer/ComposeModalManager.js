@@ -166,12 +166,13 @@ const ComposeModalManager = props => {
       const queryToUpdate = {
         query: SUBMISSION_COMMENTS_QUERY,
         variables: {
-          submissionID: props.conversation._id
+          submissionID: props.conversation._id,
+          sort: 'desc'
         }
       }
       const data = JSON.parse(JSON.stringify(cache.readQuery(queryToUpdate)))
 
-      data.legacyNode.commentsConnection.nodes.push(
+      data.legacyNode.commentsConnection.nodes.unshift(
         result.data.createSubmissionComment.submissionComment
       )
       cache.writeQuery({...queryToUpdate, data})
@@ -180,14 +181,15 @@ const ComposeModalManager = props => {
     const queryToUpdate = {
       query: VIEWABLE_SUBMISSIONS_QUERY,
       variables: {
-        userID: ENV.current_user_id?.toString()
+        userID: ENV.current_user_id?.toString(),
+        sort: 'desc'
       }
     }
     const data = JSON.parse(JSON.stringify(cache.readQuery(queryToUpdate)))
     const submissionToUpdate = data.legacyNode.viewableSubmissionsConnection.nodes.find(
       c => c._id === props.conversation._id
     )
-    submissionToUpdate.commentsConnection.nodes.push(
+    submissionToUpdate.commentsConnection.nodes.unshift(
       result.data.createSubmissionComment.submissionComment
     )
 

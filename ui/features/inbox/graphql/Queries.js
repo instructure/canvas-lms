@@ -175,7 +175,11 @@ export const REPLY_CONVERSATION_QUERY = gql`
   ${ConversationMessage.fragment}
 `
 export const VIEWABLE_SUBMISSIONS_QUERY = gql`
-  query ViewableSubmissionsQuery($userID: ID!) {
+  query ViewableSubmissionsQuery(
+    $userID: ID!
+    $sort: SubmissionCommentsSortOrderType
+    $allComments: Boolean = true
+  ) {
     legacyNode(_id: $userID, type: User) {
       ... on User {
         _id
@@ -183,7 +187,7 @@ export const VIEWABLE_SUBMISSIONS_QUERY = gql`
         viewableSubmissionsConnection {
           nodes {
             _id
-            commentsConnection {
+            commentsConnection(sortOrder: $sort, filter: {allComments: $allComments}) {
               nodes {
                 ...SubmissionComment
               }
@@ -197,12 +201,16 @@ export const VIEWABLE_SUBMISSIONS_QUERY = gql`
 `
 
 export const SUBMISSION_COMMENTS_QUERY = gql`
-  query GetSubmissionComments($submissionID: ID!) {
+  query GetSubmissionComments(
+    $submissionID: ID!
+    $sort: SubmissionCommentsSortOrderType
+    $allComments: Boolean = true
+  ) {
     legacyNode(_id: $submissionID, type: Submission) {
       ... on Submission {
         _id
         id
-        commentsConnection {
+        commentsConnection(sortOrder: $sort, filter: {allComments: $allComments}) {
           nodes {
             ...SubmissionComment
           }

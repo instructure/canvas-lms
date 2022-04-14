@@ -233,6 +233,20 @@ describe Types::SubmissionType do
       @comment2 = @submission.add_comment(author: @teacher, comment: "test2", attempt: 2)
     end
 
+    it "will allow comments to be sorted in ascending order" do
+      @comment3 = @submission.add_comment(author: @teacher, comment: "test3", attempt: 2)
+      expect(
+        submission_type.resolve("commentsConnection(sortOrder: asc) { nodes { _id }}")
+      ).to eq [@comment2.id.to_s, @comment3.id.to_s]
+    end
+
+    it "will allow comments to be sorted in descending order" do
+      @comment3 = @submission.add_comment(author: @teacher, comment: "test3", attempt: 2)
+      expect(
+        submission_type.resolve("commentsConnection(sortOrder: desc) { nodes { _id }}")
+      ).to eq [@comment3.id.to_s, @comment2.id.to_s]
+    end
+
     it "will only be shown for the current submission attempt by default" do
       expect(
         submission_type.resolve("commentsConnection { nodes { _id }}")
