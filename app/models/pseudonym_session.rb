@@ -123,12 +123,12 @@ class PseudonymSession < Authlogic::Session::Base
       sess = new({ priority_record: nil }, nil)
       if sess.nil?
         Rails.logger.info "[AUTH] Failed to create pseudonym session"
-        return false
+        next false
       end
       sess.priority_record = nil
       if sess.persisting?
         Rails.logger.info "[AUTH] Approved Authlogic session"
-        return sess
+        next sess
       end
       sess.errors.full_messages.each { |msg| Rails.logger.warn "[AUTH] Authlogic Validation Error: #{msg}" }
       Rails.logger.warn "[AUTH] Authlogic Failed Find" if sess.attempted_record.nil?
