@@ -266,6 +266,48 @@ body:not(.responsive_student_grades_page) {
   }
 }
 
+#grades_summary .visibility_feedback_ff {
+  a.toggle_comments_link,
+  a.toggle_rubric_assessments_link {
+    background-color: $ic-color-medium-light;
+    padding: 4px 6px;
+    border: 1px solid $ic-border-color;
+    border-radius: 4px;
+  }
+
+  a.toggle_rubric_assessments_link {
+    padding-right: 2px;
+  }
+
+  a.tooltip {
+    margin-left: 12px;
+  }
+
+  span.comment_count {
+    font-size: 14px;
+  }
+
+  div.unread_comment_dot {
+    background-color: $electric;
+    width: 12px;
+    line-height: 12px;
+    border-radius: 6px;
+    position: absolute;
+    right: -6px;
+    top: -7px;
+  }
+
+  div.unread_rubric_dot {
+    background-color: $electric;
+    width: 12px;
+    line-height: 12px;
+    border-radius: 6px;
+    position: absolute;
+    left: 23px;
+    top: -7px;
+  }
+}
+
 #grades_summary .tooltip {
   position: relative;
   z-index: 10;
