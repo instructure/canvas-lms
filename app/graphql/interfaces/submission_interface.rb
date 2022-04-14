@@ -74,6 +74,12 @@ module Types
       or submission history.
     MD
   end
+
+  class SubmissionCommentsSortOrderType < Types::BaseEnum
+    graphql_name "SubmissionCommentsSortOrderType"
+    value "asc", value: :asc
+    value "desc", value: :desc
+  end
 end
 
 module Interfaces::SubmissionInterface
@@ -136,8 +142,9 @@ module Interfaces::SubmissionInterface
 
   field :comments_connection, Types::SubmissionCommentType.connection_type, null: true do
     argument :filter, Types::SubmissionCommentFilterInputType, required: false, default_value: {}
+    argument :sort_order, Types::SubmissionCommentsSortOrderType, required: false, default_value: nil
   end
-  def comments_connection(filter:)
+  def comments_connection(filter:, sort_order:)
     filter = filter.to_h
     all_comments, for_attempt = filter.values_at(:all_comments, :for_attempt)
 
@@ -150,6 +157,7 @@ module Interfaces::SubmissionInterface
         end
         scope = scope.where(attempt: target_attempt)
       end
+      scope = scope.reorder(created_at: sort_order) if sort_order
       scope
     end
   end

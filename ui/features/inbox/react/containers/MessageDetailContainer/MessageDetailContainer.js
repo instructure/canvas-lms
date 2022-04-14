@@ -85,7 +85,7 @@ export const MessageDetailContainer = props => {
   })
 
   const submissionCommentsQuery = useQuery(SUBMISSION_COMMENTS_QUERY, {
-    variables: {submissionID: props.conversation._id},
+    variables: {submissionID: props.conversation._id, sort: 'desc'},
     skip: !isSubmissionCommentsType
   })
 
