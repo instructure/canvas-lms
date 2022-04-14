@@ -144,13 +144,13 @@ class CoursePace < ActiveRecord::Base
                   no_enrollment: false
                 )
               elsif current_override&.assignment_override_students&.size == 1
-                current_override.update(due_at: due_at.to_s)
+                current_override.update(due_at: due_time.to_s)
               else
                 current_override&.assignment_override_students&.find_by(user_id: user_id)&.destroy
                 assignment.assignment_overrides.create!(
                   set_type: "ADHOC",
                   due_at_overridden: true,
-                  due_at: due_at.to_s,
+                  due_at: due_time.to_s,
                   assignment_override_students: [
                     AssignmentOverrideStudent.new(
                       assignment: assignment,
