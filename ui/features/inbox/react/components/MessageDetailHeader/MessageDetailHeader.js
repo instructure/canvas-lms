@@ -97,7 +97,7 @@ export const MessageDetailHeader = ({...props}) => {
                 <Menu.Item value="reply-all" onSelect={() => props.onReplyAll()}>
                   {I18n.t('Reply All')}
                 </Menu.Item>
-                <Menu.Item value="forward" onSelect={props.onForward}>
+                <Menu.Item value="forward" onSelect={() => props.onForward()}>
                   {I18n.t('Forward')}
                 </Menu.Item>
                 <Menu.Item value="star">{I18n.t('Star')}</Menu.Item>

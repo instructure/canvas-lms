@@ -113,6 +113,7 @@ describe('MessageDetailHeader', () => {
       fireEvent.click(getByText('Forward'))
 
       expect(props.onForward).toHaveBeenCalled()
+      expect(props.onForward.mock.calls[0][0]).toBe(undefined)
     })
   })
 
