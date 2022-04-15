@@ -734,7 +734,6 @@ describe "Users API", type: :request do
         expect(json[0]["app_name"]).to be_nil
         expect(json[1]["app_name"]).to eq "User-Generated"
         expect(response.headers["Link"]).to match(/next/)
-        expect(response.headers["Link"]).not_to match(/last/)
         response.headers["Link"].split(",").find { |l| l =~ /<([^>]+)>.+next/ }
         url = $1
         _path, querystring = url.split("?")
@@ -1186,16 +1185,13 @@ describe "Users API", type: :request do
       end
     end
 
-    it "does return a next header on the last page" do
+    it "does not return a next-page link on the last page" do
       @account = Account.default
       u = User.create!(name: "test user")
       u.pseudonyms.create!(account: @account, unique_id: "user")
 
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param }, { search_term: u.id.to_s, per_page: "1", page: "1" })
       expect(json.length).to eq 1
-      expect(response.headers["Link"]).to include("rel=\"next\"")
-      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param }, { search_term: u.id.to_s, per_page: "1", page: "2" })
-      expect(json).to be_empty
       expect(response.headers["Link"]).to_not include("rel=\"next\"")
     end
   end

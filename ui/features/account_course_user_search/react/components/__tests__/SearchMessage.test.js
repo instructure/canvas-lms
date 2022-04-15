@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,79 +17,89 @@
  */
 
 import React from 'react'
-import {mount} from 'enzyme'
-import SearchMessage from '../SearchMessage'
+import SearchMessage, {LAST_PAGE_UNKNOWN_MARKER} from '../SearchMessage'
+import {render} from '@testing-library/react'
 
-const getProps = () => ({
-  collection: {
-    data: [1, 2, 3],
-    links: {
-      current: {
-        url: 'abc',
-        page: '5'
-      },
-      last: {
-        url: 'abc10',
-        page: '10'
+function defaultProps() {
+  return {
+    collection: {
+      loading: false,
+      data: [1, 2, 3],
+      links: {
+        current: {url: 'abc', page: '5'},
+        last: {url: 'abc10', page: '10'}
       }
-    }
-  },
-  setPage: jest.fn(),
-  noneFoundMessage: 'None Found!',
-  dataType: 'Course'
-})
+    },
+    setPage: jest.fn(),
+    noneFoundMessage: 'None found!'
+  }
+}
 
-let flashElements
-beforeEach(() => {
-  flashElements = document.createElement('div')
-  flashElements.setAttribute('id', 'flash_screenreader_holder')
-  flashElements.setAttribute('role', 'alert')
-  document.body.appendChild(flashElements)
-})
+describe('SearchMessage::', () => {
+  let flashElements
 
-afterEach(() => {
-  document.body.removeChild(flashElements)
-})
-
-it('shows spinner when loading', () => {
-  const props = getProps()
-  props.collection.loading = true
-  const wrapper = mount(<SearchMessage {...props} />)
-  expect(wrapper.find('Spinner').exists()).toBe(true)
-})
-
-describe('Pagination Handling', () => {
-  it('can handle lots of pages', () => {
-    const props = getProps()
-    props.collection.links.last.page = '1000'
-    const wrapper = mount(<SearchMessage {...props} />)
-
-    const buttons2 = wrapper.find('PaginationButton').map(x => x.text())
-    expect(buttons2).toEqual(['1', '4', '5', '6', '7', '8', '1,000'])
-
-    wrapper.find('button[aria-label="Page 1,000"]').simulate('click')
-    wrapper.setProps({}) // Make sure it triggers componentWillReceiveProps
-
-    const buttons = wrapper.find('PaginationButton').map(x => x.text())
-    expect(buttons).toEqual(['1', '4', '5', '6', '7', '8', '1,000'])
+  beforeEach(() => {
+    flashElements = document.createElement('div')
+    flashElements.setAttribute('id', 'flash_screenreader_holder')
+    flashElements.setAttribute('role', 'alert')
+    document.body.appendChild(flashElements)
   })
 
-  it('sets state to lastUnknown if there is no last link', () => {
-    const props = getProps()
-    const wrapper = mount(<SearchMessage {...props} />)
-    delete props.collection.links.last
-    props.collection.links.next = {url: 'next', page: '2'}
-    wrapper.setProps(props)
-    expect(wrapper.instance().isLastPageUnknown()).toBe(true)
+  afterEach(() => {
+    document.body.removeChild(flashElements)
+    flashElements = undefined
   })
 
-  it('sets state to lastUnknown false if there is a last link', () => {
-    const props = getProps()
-    const wrapper = mount(<SearchMessage {...props} />)
-    delete props.collection.links.last
-    props.collection.links.next = {url: 'next', page: '2'}
-    wrapper.setProps(props)
-    wrapper.setProps(getProps())
-    expect(wrapper.instance().isLastPageUnknown()).toBe(false)
+  it('shows a spinner while loading', () => {
+    const props = defaultProps()
+    props.collection.loading = true
+    const {getByTestId} = render(<SearchMessage {...props} />)
+    expect(getByTestId('loading-spinner')).toBeInTheDocument()
+  })
+
+  describe('Pagination', () => {
+    const textContents = elts => elts.map(elt => elt.textContent)
+    const hasUnknownMarker = elts => textContents(elts).includes(LAST_PAGE_UNKNOWN_MARKER)
+
+    it('can handle a lot of pages', () => {
+      const props = defaultProps()
+      props.collection.links.last.page = '1000'
+      const {queryAllByTestId} = render(<SearchMessage {...props} />)
+      expect(textContents(queryAllByTestId('page-button'))).toEqual([
+        '1',
+        '4',
+        '5',
+        '6',
+        '7',
+        '8',
+        '1,000'
+      ])
+    })
+
+    it('renders the "last unknown" marker only if the last page is unknown', () => {
+      const props = defaultProps()
+      const {queryAllByTestId, rerender} = render(<SearchMessage {...props} />)
+      expect(hasUnknownMarker(queryAllByTestId('page-button'))).toBe(false)
+      delete props.collection.links.last
+      rerender(<SearchMessage {...props} />)
+      expect(hasUnknownMarker(queryAllByTestId('page-button'))).toBe(true)
+    })
+
+    it('honors the knownLastPage prop correctly', () => {
+      const props = defaultProps()
+      delete props.collection.links.last
+      const {queryAllByTestId, rerender} = render(<SearchMessage {...props} />)
+      expect(hasUnknownMarker(queryAllByTestId('page-button'))).toBe(true)
+      rerender(<SearchMessage {...props} knownLastPage="15" />)
+      expect(textContents(queryAllByTestId('page-button'))).toEqual([
+        '1',
+        '4',
+        '5',
+        '6',
+        '7',
+        '8',
+        '15'
+      ])
+    })
   })
 })
