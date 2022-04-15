@@ -70,7 +70,7 @@ class CoursesPane extends React.Component {
     this.debouncedApplyFilters = debounce(this.onApplyFilters, SEARCH_DEBOUNCE_TIME)
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     stores.forEach(s => s.addChangeListener(this.refresh))
     const filters = {...defaultFilters, ...this.props.queryParams}
     this.setState({filters, draftFilters: filters})
@@ -85,7 +85,7 @@ class CoursesPane extends React.Component {
     stores.forEach(s => s.removeChangeListener(this.refresh))
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const filters = {...defaultFilters, ...nextProps.queryParams}
     this.setState({filters, draftFilters: filters})
   }
@@ -97,20 +97,20 @@ class CoursesPane extends React.Component {
 
   setPage = page => {
     this.setState(
-      {
-        filters: {...this.state.filters, page},
-        previousCourses: CoursesStore.get(this.state.filters)
-      },
+      oldState => ({
+        filters: {...oldState.filters, page},
+        previousCourses: CoursesStore.get(oldState.filters)
+      }),
       this.fetchCourses
     )
   }
 
   onUpdateFilters = newFilters => {
     this.setState(
-      {
+      oldState => ({
         errors: {},
-        draftFilters: {...this.state.draftFilters, ...newFilters, page: null}
-      },
+        draftFilters: {...oldState.draftFilters, ...newFilters, page: null}
+      }),
       this.debouncedApplyFilters
     )
   }
@@ -126,7 +126,7 @@ class CoursesPane extends React.Component {
         }
       })
     } else {
-      this.setState({filters, errors: {}}, this.fetchCourses)
+      this.setState({knownLastPage: undefined, filters, errors: {}}, this.fetchCourses)
     }
   }
 
@@ -134,14 +134,20 @@ class CoursesPane extends React.Component {
     const {sort, order} = this.state.filters
     const newOrder = column === sort && order === 'asc' ? 'desc' : 'asc'
 
-    const newFilters = {...this.state.filters, sort: column, order: newOrder}
-    this.setState(
-      {filters: newFilters, previousCourses: CoursesStore.get(this.state.filters)},
-      this.fetchCourses
-    )
+    this.setState(oldState => {
+      const newFilters = {...oldState.filters, sort: column, order: newOrder}
+      return {
+        knownLastPage: undefined,
+        filters: newFilters,
+        previousCourses: CoursesStore.get(oldState.filters)
+      }
+    }, this.fetchCourses)
   }
 
   refresh = () => {
+    const courses = CoursesStore.get(this.state.filters)
+    const lastPage = courses?.links?.last?.page
+    if (lastPage && !this.state.knownLastPage) this.setState({knownLastPage: lastPage})
     this.forceUpdate()
   }
 
@@ -195,8 +201,8 @@ class CoursesPane extends React.Component {
         <SearchMessage
           collection={courses}
           setPage={this.setPage}
+          knownLastPage={this.state.knownLastPage}
           noneFoundMessage={I18n.t('No courses found')}
-          dataType="Course"
         />
         {this.state.srMessageDisplayed && (
           <SRSearchMessage collection={courses} dataType="Course" />
