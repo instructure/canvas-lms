@@ -336,7 +336,7 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
         expect(getByLabelText('Icon Shape').value).toEqual('Square')
         expect(getByLabelText('Icon Size').value).toEqual('Small')
         expect(getAllByTestId('colorPreview-none').length).toBeGreaterThan(0)
-        expect(getByLabelText('Icon Outline Size').value).toEqual('Small')
+        expect(getByLabelText('Outline Size').value).toEqual('Small')
       })
     })
   })
@@ -410,7 +410,7 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
         expect(getByLabelText('Icon Size').value).toEqual('Large')
         expect(getByTestId('colorPreview-#FF2717')).toBeInTheDocument() // button color
         expect(getByTestId('colorPreview-#06A3B7')).toBeInTheDocument() // button outline
-        expect(getByLabelText('Icon Outline Size').value).toEqual('Small')
+        expect(getByLabelText('Outline Size').value).toEqual('Small')
       })
     })
 
