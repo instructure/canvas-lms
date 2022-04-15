@@ -26,7 +26,8 @@ const defaultProps = () => ({
   atomFeedUrl: 'www.test.com',
   permissions: {
     create: false,
-    manage_content: false,
+    manage_course_content_edit: false,
+    manage_course_content_delete: false,
     moderate: false
   }
 })
@@ -40,7 +41,8 @@ test('renders the AddExternalFeed component when user has permissions', () => {
   const props = defaultProps()
   props.permissions = {
     create: true,
-    manage_content: false,
+    manage_course_content_edit: false,
+    manage_course_content_delete: false,
     moderate: false
   }
   const tree = shallow(<ExternalFeedsTray {...props} />)
@@ -52,7 +54,8 @@ test('does not render the AddExternalFeed component when user is student', () =>
   const props = defaultProps()
   props.permissions = {
     create: false,
-    manage_content: false,
+    manage_course_content_edit: false,
+    manage_course_content_delete: false,
     moderate: false
   }
   const tree = shallow(<ExternalFeedsTray {...props} />)
@@ -64,7 +67,8 @@ test('does not render the RSSFeedList component when user is student', () => {
   const props = defaultProps()
   props.permissions = {
     create: false,
-    manage_content: false,
+    manage_course_content_edit: false,
+    manage_course_content_delete: false,
     moderate: false
   }
   const tree = shallow(<ExternalFeedsTray {...props} />)

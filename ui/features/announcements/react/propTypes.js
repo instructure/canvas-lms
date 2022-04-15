@@ -22,7 +22,8 @@ const propTypes = {}
 
 propTypes.permissions = shape({
   create: bool.isRequired,
-  manage_content: bool.isRequired,
+  manage_course_content_edit: bool.isRequired,
+  manage_course_content_delete: bool.isRequired,
   moderate: bool.isRequired
 })
 

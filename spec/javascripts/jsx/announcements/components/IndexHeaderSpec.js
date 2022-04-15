@@ -18,8 +18,7 @@
 
 import React from 'react'
 import {shallow, mount} from 'enzyme'
-
-import IndexHeader from 'ui/features/announcements/react/components/IndexHeader.js'
+import IndexHeader from 'ui/features/announcements/react/components/IndexHeader'
 
 function makeProps() {
   return {
@@ -30,7 +29,8 @@ function makeProps() {
     isBusy: false,
     permissions: {
       create: true,
-      manage_content: true,
+      manage_course_content_edit: true,
+      manage_course_content_delete: true,
       moderate: true
     },
     searchAnnouncements: () => {},
@@ -121,7 +121,7 @@ QUnit.module('"Lock Selected Announcements" button', () => {
 
   test('is absent when the user does not have permission to lock announcements', () => {
     const props = makeProps()
-    props.permissions.manage_content = false
+    props.permissions.manage_course_content_edit = false
     const wrapper = shallow(<IndexHeader {...props} />)
     strictEqual(wrapper.find('#lock_announcements').length, 0)
   })
@@ -167,7 +167,7 @@ QUnit.module('"Delete Selected Announcements" button', () => {
 
   test('is absent when the user does not have permission to delete announcements', () => {
     const props = makeProps()
-    props.permissions.manage_content = false
+    props.permissions.manage_course_content_delete = false
     const wrapper = shallow(<IndexHeader {...props} />)
     strictEqual(wrapper.find('#delete_announcements').length, 0)
   })
