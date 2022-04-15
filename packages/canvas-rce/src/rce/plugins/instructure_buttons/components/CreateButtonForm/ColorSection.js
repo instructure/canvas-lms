@@ -47,21 +47,11 @@ export const ColorSection = ({settings, onChange}) => (
     </Flex.Item>
 
     <Flex.Item padding="small">
-      <ColorInput
-        color={settings.outlineColor}
-        label={formatMessage('Icon Outline')}
-        name="button-outline"
-        onChange={outlineColor => onChange({outlineColor})}
-        popoverMountNode={getColorSection}
-      />
-    </Flex.Item>
-
-    <Flex.Item padding="small">
       <SimpleSelect
         assistiveText={formatMessage('Use arrow keys to select an outline size.')}
         id="button-outline-size"
         onChange={(e, option) => onChange({outlineSize: option.value})}
-        renderLabel={formatMessage('Icon Outline Size')}
+        renderLabel={formatMessage('Outline Size')}
         value={settings.outlineSize}
       >
         {OUTLINE_SIZES.map(size => (
@@ -74,6 +64,16 @@ export const ColorSection = ({settings, onChange}) => (
           </SimpleSelect.Option>
         ))}
       </SimpleSelect>
+    </Flex.Item>
+
+    <Flex.Item padding="small">
+      <ColorInput
+        color={settings.outlineColor}
+        label={formatMessage('Outline Color')}
+        name="button-outline"
+        onChange={outlineColor => onChange({outlineColor})}
+        popoverMountNode={getColorSection}
+      />
     </Flex.Item>
   </Flex>
 )
