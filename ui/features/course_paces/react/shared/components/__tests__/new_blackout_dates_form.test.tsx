@@ -41,7 +41,10 @@ describe('BlackoutDatesModal', () => {
     expect(getByRole('textbox', {name: 'Event Title'})).toBeInTheDocument()
     expect(getByRole('combobox', {name: 'Start Date'})).toBeInTheDocument()
     expect(getByRole('combobox', {name: 'End Date'})).toBeInTheDocument()
-    expect(getByRole('button', {name: 'Add'})).toBeInTheDocument()
+    const addBtn = getByRole('button', {name: 'Add'})
+    expect(addBtn).toBeInTheDocument()
+    act(() => addBtn.click())
+    expect(addBlackoutDate).not.toHaveBeenCalled()
   })
 
   it('shows error message for missing event title', () => {
@@ -57,6 +60,8 @@ describe('BlackoutDatesModal', () => {
     act(() => addBtn.focus())
 
     expect(getByText('Title required')).toBeInTheDocument()
+    act(() => addBtn.click())
+    expect(addBlackoutDate).not.toHaveBeenCalled()
   })
 
   it('shows error message for missing start date', () => {
@@ -71,6 +76,8 @@ describe('BlackoutDatesModal', () => {
     act(() => addBtn.focus())
 
     expect(getByText('Date required')).toBeInTheDocument()
+    act(() => addBtn.click())
+    expect(addBlackoutDate).not.toHaveBeenCalled()
   })
 
   it('shows error message for missing start date when end date blurs', () => {
@@ -85,6 +92,8 @@ describe('BlackoutDatesModal', () => {
     act(() => addBtn.focus())
 
     expect(getByText('Date required')).toBeInTheDocument()
+    act(() => addBtn.click())
+    expect(addBlackoutDate).not.toHaveBeenCalled()
   })
 
   it('shows error message when end date is before start date', () => {
@@ -107,6 +116,8 @@ describe('BlackoutDatesModal', () => {
     act(() => addBtn.focus())
 
     expect(getByText('End date cannot be before start date')).toBeInTheDocument()
+    act(() => addBtn.click())
+    expect(addBlackoutDate).not.toHaveBeenCalled()
   })
 
   it('shows title and start date errors when fields are empty and Add button gets focus', () => {
@@ -121,5 +132,25 @@ describe('BlackoutDatesModal', () => {
 
     expect(getByText('Title required')).toBeInTheDocument()
     expect(getByText('Date required')).toBeInTheDocument()
+    act(() => addBtn.click())
+    expect(addBlackoutDate).not.toHaveBeenCalled()
+  })
+
+  it('enables Add when data is provided', () => {
+    const {getByRole} = render(<NewBlackoutDatesForm addBlackoutDate={addBlackoutDate} />)
+    const titleInput = getByRole('textbox', {name: 'Event Title'})
+    const startDateInput = getByRole('combobox', {name: 'Start Date'})
+    const addBtn = getByRole('button', {name: 'Add'})
+    act(() => titleInput.focus())
+    act(() => {
+      fireEvent.change(titleInput, {target: {value: 'blackout title'}})
+    })
+    act(() => startDateInput.focus())
+    act(() => {
+      fireEvent.change(startDateInput, {target: {value: 'April 15, 2022'}})
+    })
+    act(() => addBtn.focus())
+    act(() => addBtn.click())
+    expect(addBlackoutDate).toHaveBeenCalled() // yay!
   })
 })
