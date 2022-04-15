@@ -266,6 +266,12 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Kollaps for å skjule { types }"
     },
+    "color_picker_6b359edf": {
+        "message": "Fargevelger"
+    },
+    "color_picker_colorname_selected_ad4cf400": {
+        "message": "Fargevelger ({ colorName } valgt)"
+    },
     "computer_1d7dfa6f": {
         "message": "Datamaskin"
     },
@@ -407,9 +413,6 @@
     "diamond_b8dfe7ae": {
         "message": "Diamant"
     },
-    "dimension_type_55c83e4e": {
-        "message": "Dimensjonstype"
-    },
     "dimensions_45ddb7b7": {
         "message": "Dimensjoner"
     },
@@ -484,6 +487,9 @@
     },
     "edit_existing_button_icon_3d0277bd": {
         "message": "Rediger eksisterende knapp/ikon"
+    },
+    "edit_icon_2c6b0e91": {
+        "message": "Rediger ikon"
     },
     "edit_link_7f53bebb": {
         "message": "Rediger lenke"
@@ -917,6 +923,9 @@
     "media_af190855": {
         "message": "Medie"
     },
+    "media_file_is_processing_please_try_again_later_58a6d49": {
+        "message": "Mediefilen behandles. Prøv igjen senere."
+    },
     "medium_5a8e9ead": {
         "message": "Medium"
     },
@@ -1208,6 +1217,9 @@
     "rich_content_editor_2708ef21": {
         "message": "Rich teksteditor"
     },
+    "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+        "message": "Rikt tekstområde Trykk Alt+0 for Rich teksteditor-snarveier."
+    },
     "right_to_left_9cfb092a": {
         "message": "Høyre-til-venstre"
     },
@@ -1292,17 +1304,8 @@
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Noe gikk galt og jeg vet ikke hva jeg skal vise deg."
     },
-    "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-        "message": "Noe gikk galt, sjekk forbindelsen din og forsøk igjen."
-    },
     "something_went_wrong_d238c551": {
         "message": "Noe gikk galt"
-    },
-    "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-        "message": "Noe gikk galt, prøv igjen etter å ha oppdatert siden"
-    },
-    "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-        "message": "Noe gikk galt under opplasting, sjekk forbindelsen din og forsøk igjen."
     },
     "sort_by_e75f9e3e": {
         "message": "Sortert på"
@@ -1498,9 +1501,6 @@
     },
     "uploading_19e8a4e7": {
         "message": "Laster opp"
-    },
-    "uploading_closed_captions_subtitles_failed_bc093f3": {
-        "message": "Opplasting at teksting/underteksting mislyktes."
     },
     "uppercase_alphabetic_ordered_list_3f5aa6b2": {
         "message": "stor bokstav alfabetisert organisert liste"

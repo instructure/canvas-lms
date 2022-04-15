@@ -1072,7 +1072,7 @@ test('uses edit url for htmlUrl when managing a quiz_lti assignment and new_quiz
   ENV.PERMISSIONS = {manage: true}
   ENV.FLAGS = {new_quizzes_modules_support: true}
   const json = assignment.toView()
-  equal(json.htmlUrl, 'http://example.com/assignments/1/edit')
+  equal(json.htmlUrl, 'http://example.com/assignments/1/edit?quiz_lti')
   ENV.PERMISSIONS = {}
   ENV.FLAGS = {}
 })

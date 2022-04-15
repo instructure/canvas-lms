@@ -269,7 +269,8 @@ end
 def generate_mastery_path_course
   puts "Generate Course with Mastery Path"
   course_with_enrollments
-  @course.enable_feature!(:conditional_release)
+  @course.conditional_release = true
+  @course.save!
 
   @trigger_assignment = create_assignment(@course, "Mastery Path Main Assignment", 10)
   @set1_assmt1 = create_assignment(@course, "Set 1 Assessment 1", 10)

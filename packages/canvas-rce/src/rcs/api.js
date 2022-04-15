@@ -24,6 +24,7 @@ import formatMessage from '../format-message'
 import alertHandler from '../rce/alertHandler'
 import {RCS_MAX_BODY_SIZE, RCS_REQUEST_SIZE_BUFFER} from '../rce/plugins/shared/Upload/constants'
 import {DEFAULT_FILE_CATEGORY} from '../sidebar/containers/sidebarHandlers'
+import buildError from './buildError'
 
 export function headerFor(jwt) {
   return {Authorization: 'Bearer ' + jwt}
@@ -242,17 +243,7 @@ class RceApiSource {
       maxBytes || RCS_MAX_BODY_SIZE - RCS_REQUEST_SIZE_BUFFER
     ).catch(e => {
       console.error('Failed saving CC', e)
-      const errorMessage =
-        e.name === 'FileSizeError'
-          ? formatMessage('Closed caption file must be less than {maxKb} kb', {
-              maxKb: e.maxBytes / 1000 // bytes to kb
-            })
-          : formatMessage('Uploading closed captions/subtitles failed.')
-
-      this.alertFunc({
-        text: errorMessage,
-        variant: 'error'
-      })
+      this.alertFunc(buildError({message: 'failed to save captions'}, e))
     })
   }
 
@@ -366,15 +357,8 @@ class RceApiSource {
       .then(uploadResults => {
         return this.finalizeUpload(preflightProps, uploadResults)
       })
-      .catch(_e => {
-        this.alertFunc({
-          text: formatMessage(
-            'Something went wrong uploading, check your connection and try again.'
-          ),
-          variant: 'error'
-        })
-
-        // console.error(e) // eslint-disable-line no-console
+      .catch(e => {
+        this.alertFunc(buildError({}, e))
       })
   }
 
@@ -499,10 +483,7 @@ class RceApiSource {
       .then(options.skipParse ? () => {} : res => res.json())
       .catch(throwConnectionError)
       .catch(e => {
-        this.alertFunc({
-          text: formatMessage('Something went wrong, try again after refreshing the page'),
-          variant: 'error'
-        })
+        this.alertFunc(buildError(e))
         throw e
       })
   }
@@ -535,14 +516,13 @@ class RceApiSource {
       .then(checkStatus)
       .then(res => res.json())
       .catch(throwConnectionError)
-      .catch(e => {
-        console.error(e) // eslint-disable-line no-console
-        this.alertFunc({
-          text: formatMessage('Something went wrong, check your connection and try again.'),
-          variant: 'error'
+      .catch(e =>
+        e.response.json().then(body => {
+          console.error(e) // eslint-disable-line no-console
+          this.alertFunc(buildError(body))
+          throw e
         })
-        throw e
-      })
+      )
   }
 
   // @private

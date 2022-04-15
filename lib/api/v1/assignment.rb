@@ -142,6 +142,7 @@ module Api::V1::Assignment
 
     hash = api_json(assignment, user, session, fields)
     hash["secure_params"] = assignment.secure_params if assignment.has_attribute?(:lti_context_id)
+    hash["lti_context_id"] = assignment.lti_context_id if assignment.has_attribute?(:lti_context_id)
     hash["course_id"] = assignment.context_id
     hash["name"] = assignment.title
     hash["submission_types"] = assignment.submission_types_array
@@ -600,7 +601,7 @@ module Api::V1::Assignment
 
     if assignment_params["submission_types"].present? &&
        !assignment_params["submission_types"].all? do |s|
-         return false if s == "wiki_page" && !context.try(:feature_enabled?, :conditional_release)
+         return false if s == "wiki_page" && !context.try(:conditional_release?)
 
          API_ALLOWED_SUBMISSION_TYPES.include?(s) || (s == "default_external_tool" && assignment.unpublished?)
        end

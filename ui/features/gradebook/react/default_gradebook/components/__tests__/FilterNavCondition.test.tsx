@@ -317,5 +317,41 @@ describe('FilterNavCondition', () => {
         })
       )
     })
+
+    it(`does not allow to create two section conditions`, () => {
+      props.conditionsInFilter = [
+        {
+          id: '459',
+          createdAt: '2021-11-02T20:56:23.616Z',
+          type: 'section',
+          value: 'Fri Dec 05 2021 02:00:00 GMT-0500 (Colombia Standard Time)'
+        }
+      ]
+      const {queryByRole} = render(
+        <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
+      )
+      const select = queryByRole('button', {name: 'Condition type'})
+      fireEvent.click(select!)
+      const option = queryByRole('option', {name: 'Section'})
+      expect(option).not.toBeInTheDocument()
+    })
+
+    it(`does not allow to create two student group conditions`, () => {
+      props.conditionsInFilter = [
+        {
+          id: '460',
+          createdAt: '2021-11-02T20:56:23.616Z',
+          type: 'student-group',
+          value: 'Fri Dec 05 2021 02:00:00 GMT-0500 (Colombia Standard Time)'
+        }
+      ]
+      const {queryByRole} = render(
+        <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
+      )
+      const select = queryByRole('button', {name: 'Condition type'})
+      fireEvent.click(select!)
+      const option = queryByRole('option', {name: 'Student Group'})
+      expect(option).not.toBeInTheDocument()
+    })
   })
 })

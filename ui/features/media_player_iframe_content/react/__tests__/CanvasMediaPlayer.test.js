@@ -106,6 +106,32 @@ describe('CanvasMediaPlayer', () => {
       expect(domQueries.getByText(sourceList[1], '2000')).toBeInTheDocument()
       expect(domQueries.getByText(sourceList[2], '3000')).toBeInTheDocument()
     })
+
+    it('adds aria-label for screenreaders when provided in props', () => {
+      const label = 'Video file 1.mp4'
+      const {container} = render(
+        <CanvasMediaPlayer
+          media_id="dummy_media_id"
+          media_sources={[defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]}
+          aria_label={label}
+        />
+      )
+      expect(
+        container.querySelector(`div[aria-label="Video player for ${label}"]`)
+      ).toBeInTheDocument()
+    })
+
+    it('omits aria-label for screenreaders when not provided in props', () => {
+      const {container} = render(
+        <CanvasMediaPlayer
+          media_id="dummy_media_id"
+          media_sources={[defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]}
+        />
+      )
+      const divWithAria = container.querySelectorAll('[aria-label^="Video player for"]')
+      expect(divWithAria.length).toBe(0)
+    })
+
     describe('dealing with media_sources', () => {
       it('handles string-type media_sources', () => {
         // seen for audio files

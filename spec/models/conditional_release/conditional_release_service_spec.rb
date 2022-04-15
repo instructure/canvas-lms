@@ -28,14 +28,16 @@ describe ConditionalRelease::Service do
   context "configuration" do
     it "reports enabled as true when enabled" do
       context = Course.create!
-      context.enable_feature!(:conditional_release)
+      context.conditional_release = true
+      context.save!
       env = described_class.env_for(context)
       expect(env[:CONDITIONAL_RELEASE_SERVICE_ENABLED]).to eq true
     end
 
     it "reports enabled as false if the context is an Account" do
       context = Account.create!
-      context.enable_feature!(:conditional_release)
+      context.settings[:conditional_release] = { value: true }
+      context.save!
       env = described_class.env_for(context)
       expect(env[:CONDITIONAL_RELEASE_SERVICE_ENABLED]).to eq false
     end
@@ -225,14 +227,17 @@ describe ConditionalRelease::Service do
 
     context "releasing content after disabling feature flag" do
       before :once do
-        Account.default.allow_feature!(:conditional_release)
+        account = Account.default
+        account.settings[:conditional_release_enabled] = { value: false, locked: false }
+        account.save!
         course_with_student(active_all: true)
-        @course.enable_feature!(:conditional_release)
+        @course.conditional_release = true
+        @course.save!
         @module = @course.context_modules.create!(workflow_state: "active")
       end
 
       def release_content
-        Feature.definitions["conditional_release"].after_state_change_proc.call(@teacher, @course, "on", "off")
+        ConditionalRelease::Service.release_mastery_paths_content_in_course(@course)
       end
 
       it "releases mastery paths assigned assignments" do

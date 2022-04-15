@@ -382,42 +382,60 @@ QUnit.module('GradebookHeaderMenu#messageStudentsWho', () => {
 
       params = {
         assignment: {
+          grading_type: 'points',
           id: '1',
-          name: 'some assignment'
+          name: 'some assignment',
+          submission_types: 'online_text_entry'
         },
         show_message_students_with_observers_dialog: true,
         students: [
           {
             assignment_1: {
-              score: 1
+              score: 1,
+              redo_request: false,
+              grade: '1'
             },
             id: '100',
             name: 'Adam Jones',
-            sortable_name: 'Jones, Adam'
+            sortable_name: 'Jones, Adam',
+            score: 1,
+            submittedAt: undefined
           },
           {
             assignment_1: {
-              score: 2
+              score: 2,
+              redo_request: false,
+              grade: '2'
             },
             id: '101',
             name: 'Betty Ford',
-            sortable_name: 'Ford, Betty'
+            sortable_name: 'Ford, Betty',
+            score: 2,
+            submittedAt: undefined
           },
           {
             assignment_1: {
-              score: 3
+              score: 3,
+              redo_request: false,
+              grade: '3'
             },
             id: '102',
             name: 'Charlie Xi',
-            sortable_name: 'Xi, Charlie'
+            sortable_name: 'Xi, Charlie',
+            score: 3,
+            submittedAt: undefined
           },
           {
             assignment_1: {
-              score: 4
+              score: 4,
+              redo_request: false,
+              grade: '4'
             },
             id: '103',
             name: 'Dana Smith',
-            sortable_name: 'Smith, Dana'
+            sortable_name: 'Smith, Dana',
+            score: 4,
+            submittedAt: undefined
           }
         ]
       }
@@ -436,35 +454,48 @@ QUnit.module('GradebookHeaderMenu#messageStudentsWho', () => {
       strictEqual(createElementStub.firstCall.args[0], MessageStudentsWithObserversDialog)
 
       const [, elementProps] = createElementStub.firstCall.args
-      deepEqual(elementProps.assignment, {id: '1', name: 'some assignment'})
+      deepEqual(elementProps.assignment, {
+        gradingType: 'points',
+        id: '1',
+        name: 'some assignment',
+        submissionTypes: 'online_text_entry'
+      })
       deepEqual(elementProps.students, [
         {
+          grade: '1',
           id: '100',
           name: 'Adam Jones',
           score: 1,
+          redoRequest: false,
           sortableName: 'Jones, Adam',
-          submitted_at: undefined
+          submittedAt: undefined
         },
         {
+          grade: '2',
           id: '101',
           name: 'Betty Ford',
           score: 2,
+          redoRequest: false,
           sortableName: 'Ford, Betty',
-          submitted_at: undefined
+          submittedAt: undefined
         },
         {
+          grade: '3',
           id: '102',
           name: 'Charlie Xi',
           score: 3,
+          redoRequest: false,
           sortableName: 'Xi, Charlie',
-          submitted_at: undefined
+          submittedAt: undefined
         },
         {
+          grade: '4',
           id: '103',
           name: 'Dana Smith',
           score: 4,
+          redoRequest: false,
           sortableName: 'Smith, Dana',
-          submitted_at: undefined
+          submittedAt: undefined
         }
       ])
     })

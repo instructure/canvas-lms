@@ -155,6 +155,9 @@ const locale = {
   "the_material_is_licensed_under_creative_commons_3242cb5e": {
     "message": "Το υλικό φέρει άδεια Creative Commons"
   },
+  "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
+    "message": "Αυτή η εξίσωση δεν είναι δυνατό να αναπαραχθεί στην Βασική Μορφή"
+  },
   "title_ee03d132": { "message": "Τίτλος" },
   "unpublished_dfd8801": { "message": "μη δημοσιευμένο" },
   "upload_file_fd2361b8": { "message": "Φόρτωση Αρχείου" },

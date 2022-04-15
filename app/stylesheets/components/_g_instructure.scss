@@ -1425,54 +1425,6 @@ html > body .communication_message:hover div.header .under_links {
   opacity: 1;
 }
 
-.new_activity_message {
-  a.textarea {
-    display: block;
-    border-radius: 4px;
-    border: 1px solid #aaa;
-    color: #888;
-    text-decoration: none;
-    cursor: text;
-    background-color: #fff;
-    padding: 2px;
-    width: 94%;
-  }
-  .message_type {
-    img {
-      border-radius: 2px;
-      padding: 0 5px;
-      cursor: pointer;
-      border: 1px solid #fff;
-      &:hover {
-        border-color: #ccc;
-      }
-      &.selected {
-        border-color: #888;
-        background-color: #eee;
-      }
-    }
-  }
-  form {
-    textarea {
-      height: 4.8em;
-      border: 1px solid #aaa;
-      border-radius: 4px;
-      padding: 2px;
-      font-size: 1.1em;
-      font-family: Arial, sans-serif;
-      width: 94%;
-    }
-  }
-}
-
-html > body .new_activity_message a.textarea {
-  width: 97%;
-}
-
-html > body .new_activity_message form textarea {
-  width: 97%;
-}
-
 .notification_list {
   li a {
     padding-#{direction(left)}: 20px;

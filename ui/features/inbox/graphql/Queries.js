@@ -174,13 +174,35 @@ export const REPLY_CONVERSATION_QUERY = gql`
   }
   ${ConversationMessage.fragment}
 `
-export const SUBMISSION_COMMENTS_QUERY = gql`
-  query SubmissionCommentsQuery($userID: ID!) {
+export const VIEWABLE_SUBMISSIONS_QUERY = gql`
+  query ViewableSubmissionsQuery($userID: ID!) {
     legacyNode(_id: $userID, type: User) {
       ... on User {
         _id
         id
-        submissionCommentsConnection {
+        viewableSubmissionsConnection {
+          nodes {
+            _id
+            commentsConnection {
+              nodes {
+                ...SubmissionComment
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  ${SubmissionComment.fragment}
+`
+
+export const SUBMISSION_COMMENTS_QUERY = gql`
+  query GetSubmissionComments($submissionID: ID!) {
+    legacyNode(_id: $submissionID, type: Submission) {
+      ... on Submission {
+        _id
+        id
+        commentsConnection {
           nodes {
             ...SubmissionComment
           }

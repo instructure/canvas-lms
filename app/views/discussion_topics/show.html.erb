@@ -159,7 +159,7 @@
                   <li><a href="#", class="direct-share-copy-to-menu-item"><i class="icon-duplicate" aria-hidden="true"></i> <%= t("Copy To...") %></a></li>
                 <% end %>
 
-                <% if can_do(@context, @current_user, :manage_content) %>
+                <% if can_do(@context, @current_user, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS) %>
                   <%= external_tools_menu_items((@discussion_topic_menu_tools || []), {link_class: "menu_tool_link", settings_key: :discussion_topic_menu, in_list: true, url_params: {:discussion_topics => [@topic.id]}}) %>
                 <% end %>
               </ul>
@@ -295,9 +295,11 @@
                 <label for="onlyUnread" aria-hidden="true"><%= t('unread', 'Unread') %></label>
 
                 <% if can_do(@context, @current_user, :moderate_forum) %>
-                  <span class="screenreader-only" id="showDeletedAccessibleLabel"><%= t("Show deleted replies") %></span>
                   <input type="checkbox" id="showDeleted" aria-labelledby="showDeletedAccessibleLabel"/>
-                  <label for="showDeleted" aria-hidden="true" title="Show deleted replies"><i class="icon-eye"></i></label>
+                  <label for="showDeleted">
+                    <i class="icon-eye" title="<%= t("Show deleted replies") %>"></i>
+                    <span class="screenreader-only" id="showDeletedAccessibleLabel"><%= t("Show deleted replies") %></span>
+                  </label>
                 <% end %>
 
                 &nbsp; &nbsp;

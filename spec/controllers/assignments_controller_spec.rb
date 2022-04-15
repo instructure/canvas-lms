@@ -776,7 +776,8 @@ describe AssignmentsController do
     end
 
     it "redirects to wiki page if assignment is linked to wiki page" do
-      @course.enable_feature!(:conditional_release)
+      @course.conditional_release = true
+      @course.save!
       user_session(@student)
       @assignment.reload.submission_types = "wiki_page"
       @assignment.save!
@@ -786,7 +787,8 @@ describe AssignmentsController do
     end
 
     it "does not redirect to wiki page" do
-      @course.disable_feature!(:conditional_release)
+      @course.conditional_release = false
+      @course.save!
       user_session(@student)
       @assignment.submission_types = "wiki_page"
       @assignment.save!
@@ -924,7 +926,6 @@ describe AssignmentsController do
             aggregate_failures do
               expect(assigns[:js_env][:SUBMISSION_ID]).to eq prior_student.id.to_s
               expect(assigns[:js_env][:enrollment_state]).to eq :invited
-              expect(flash[:notice]).to match(/^Observing Aaaaa.*return to the dashboard\.$/)
             end
           end
 
@@ -942,7 +943,6 @@ describe AssignmentsController do
             aggregate_failures do
               expect(assigns[:js_env][:SUBMISSION_ID]).to eq @student.id.to_s
               expect(assigns[:js_env][:enrollment_state]).to eq :active
-              expect(flash[:notice]).to match(/^Observing Zzzzz.*return to the dashboard\.$/)
             end
           end
 
@@ -966,6 +966,19 @@ describe AssignmentsController do
             get "show", params: { course_id: @course.id, id: @assignment.id }
             expect(flash[:notice]).to match(/^No student is being observed.*return to the dashboard\.$/)
             expect(assigns[:js_env]).not_to have_key(:SUBMISSION_ID)
+          end
+
+          context "when observer_picker is enabled" do
+            before :once do
+              Account.site_admin.enable_feature!(:observer_picker)
+            end
+
+            it "sets js_env variables" do
+              get :show, params: { course_id: @course.id, id: @assignment.id }
+              expect(assigns[:js_env]).to have_key(:OBSERVER_OPTIONS)
+              expect(assigns[:js_env][:OBSERVER_OPTIONS][:OBSERVED_USERS_LIST].is_a?(Array)).to be true
+              expect(assigns[:js_env][:OBSERVER_OPTIONS][:CAN_ADD_OBSERVEE]).to be false
+            end
           end
         end
       end
@@ -2091,7 +2104,8 @@ describe AssignmentsController do
       end
 
       it "to wiki page" do
-        @course.enable_feature!(:conditional_release)
+        @course.conditional_release = true
+        @course.save!
         wiki_page_assignment_model course: @course
         get "edit", params: { course_id: @course.id, id: @page.assignment.id }
         expect(response).to redirect_to controller.edit_course_wiki_page_path(@course, @page)

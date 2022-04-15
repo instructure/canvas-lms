@@ -21,6 +21,7 @@ import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
 import Course from '@canvas/courses/backbone/models/Course.coffee'
 import fakeENV from 'helpers/fakeENV'
+import {saveObservedId} from '@canvas/observer-picker/ObserverGetObservee'
 
 const COURSE_SUBMISSIONS_URL = '/courses/1/submissions'
 
@@ -62,7 +63,7 @@ test('optionProperties', () => {
   strictEqual(collection.course, course, 'assigns course to this.course')
 })
 
-test('(#getGrades) loading grades from the server', function() {
+test('(#getGrades) loading grades from the server', function () {
   ENV.observed_student_ids = []
   ENV.PERMISSIONS.read_grades = true
   let triggeredChangeForAssignmentWithoutSubmission = false
@@ -95,4 +96,57 @@ test('(#getGrades) loading grades from the server', function() {
     triggeredChangeForAssignmentWithoutSubmission,
     'triggers change for assignments without a matching submission grade so the UI can update'
   )
+})
+
+test('(#getObservedUserId) when observing a single student', function () {
+  const expected_user_id = 2012
+  const all_user_ids = [expected_user_id]
+  ENV.observed_student_ids = all_user_ids
+  ENV.FEATURES = {observer_picker: false}
+
+  const actual_user_id = this.collection.getObservedUserId()
+
+  equal(expected_user_id, actual_user_id, 'returns observed user id')
+})
+
+// This tests that we fall back to prior behavior when observer_picker not enabled
+test('(#getObservedUserId) when observing multiple students', function () {
+  const all_user_ids = [123, 456, 789]
+  ENV.observed_student_ids = all_user_ids // should not use any of these since multiple are present
+  ENV.FEATURES = {observer_picker: false}
+
+  const actual_user_id = this.collection.getObservedUserId()
+
+  equal(!!actual_user_id, false, 'returns falsey')
+})
+
+test('(#getObservedUserId) when observing a student with observer_picker enabled', function () {
+  const expected_user_id = 2012
+  const current_user_id = 1999
+  ENV.current_user = {id: current_user_id}
+  ENV.observed_student_ids = [123, 456, 789] // should be ignored
+  ENV.FEATURES = {observer_picker: true}
+  saveObservedId(current_user_id, expected_user_id) // should be used
+
+  const actual_user_id = this.collection.getObservedUserId()
+
+  equal(expected_user_id, actual_user_id, 'returns the selected observed user id')
+})
+
+test('(#getObservedUserId) when not observing a student', function () {
+  ENV.observed_student_ids = []
+  ENV.FEATURES = {observer_picker: false}
+
+  const actual_user_id = this.collection.getObservedUserId()
+
+  equal(!!actual_user_id, false, 'returns falsey')
+})
+
+test('(#getObservedUserId) when not observing a student with observer_picker enabled', function () {
+  ENV.observed_student_ids = []
+  ENV.FEATURES = {observer_picker: true}
+
+  const actual_user_id = this.collection.getObservedUserId()
+
+  equal(!!actual_user_id, false, 'returns falsey')
 })

@@ -24,6 +24,9 @@ import {up as configureDateTimeMomentParser} from './initializers/configureDateT
 import {up as configureDateTime} from './initializers/configureDateTime'
 import {up as enableDTNPI} from './initializers/enableDTNPI'
 import {initSentry} from './initializers/initSentry'
+import {up as renderRailsFlashNotifications} from './initializers/renderRailsFlashNotifications'
+import {up as activateCourseMenuToggler} from './initializers/activateCourseMenuToggler'
+import {up as enhanceUserContent} from './initializers/enhanceUserContent'
 
 try {
   initSentry()
@@ -36,10 +39,18 @@ try {
 // on the page from rails, so this should not cause a new network request.
 moment().locale(ENV.MOMENT_LOCALE)
 
-configureDateTimeMomentParser()
+let runOnceAfterLocaleFiles = () => {
+  configureDateTimeMomentParser()
+  configureDateTime()
+  renderRailsFlashNotifications()
+  activateCourseMenuToggler()
+  enhanceUserContent()
+}
+
 window.addEventListener('canvasReadyStateChange', function({ detail }) {
-  if(detail === 'localeFiles') {
-    configureDateTime()
+  if (detail === 'localeFiles' || window.canvasReadyState === 'complete') {
+    runOnceAfterLocaleFiles()
+    runOnceAfterLocaleFiles = () => {}
   }
 })
 

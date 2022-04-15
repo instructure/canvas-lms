@@ -58,9 +58,8 @@ const FindOutcomeItem = ({
   friendlyDescription
 }) => {
   const [truncated, setTruncated] = useState(true)
-  const {isMobileView, individualOutcomeRatingAndCalculationFF} = useCanvasContext()
-  const shouldShowDescription =
-    description || friendlyDescription || individualOutcomeRatingAndCalculationFF
+  const {isMobileView, accountLevelMasteryScalesFF} = useCanvasContext()
+  const shouldShowDescription = description || friendlyDescription || !accountLevelMasteryScalesFF
   const onClickHandler = () => shouldShowDescription && setTruncated(prevState => !prevState)
   const IconArrowOpenEnd = isMobileView ? IconArrowOpenEndSolid : IconArrowOpenEndLine
   const IconArrowOpenDown = isMobileView ? IconArrowOpenDownSolid : IconArrowOpenDownLine

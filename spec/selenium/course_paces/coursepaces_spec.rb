@@ -42,22 +42,20 @@ describe "course pace page" do
     user_session @teacher
   end
 
-  context "course pace not enabled" do
-    it "does not include Course Pacing navigation element when disabled" do
-      disable_course_paces_in_course
-      visit_course(@course)
-
-      expect(course_paces_nav_exists?).to be_falsey
-    end
-  end
-
-  context "course paces in course navigation" do
-    it "navigates to the course paces page when Course Pacing is clicked" do
-      visit_course(@course)
+  context "course paces modules button" do
+    it "navigates to the course paces page when clicked" do
+      get "/courses/#{@course.id}/modules"
 
       click_course_paces
 
-      expect(driver.current_url).to include("/courses/#{@course.id}/course_paces")
+      expect(driver.current_url).to include("/courses/#{@course.id}/course_pacing")
+    end
+
+    it "is not shown when disabled" do
+      disable_course_paces_in_course
+      get "/courses/#{@course.id}/modules"
+
+      expect(course_paces_nav_exists?).to be_falsey
     end
   end
 
@@ -150,7 +148,7 @@ describe "course pace page" do
     end
   end
 
-  context "Course Pace Menu" do
+  context "Course Pacing Menu" do
     let(:pace_module_title) { "Pace Module" }
     let(:module_assignment_title) { "Module Assignment 1" }
 
@@ -158,10 +156,10 @@ describe "course pace page" do
       create_published_course_pace(pace_module_title, module_assignment_title)
     end
 
-    it "initially shows the Course Pace in course pace menu" do
+    it "initially shows the Course in course pace menu" do
       visit_course_paces_page
 
-      expect(course_pace_menu_value).to eq("Course Pace")
+      expect(course_pace_menu_value).to eq("Course")
     end
 
     it "opens the course pace menu and selects the student view when clicked" do

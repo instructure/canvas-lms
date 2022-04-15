@@ -266,6 +266,12 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Fella saman til að fela { types }"
     },
+    "color_picker_6b359edf": {
+        "message": "Litaval"
+    },
+    "color_picker_colorname_selected_ad4cf400": {
+        "message": "Litaval ({ colorName } valið)"
+    },
     "computer_1d7dfa6f": {
         "message": "Tölva"
     },
@@ -407,9 +413,6 @@
     "diamond_b8dfe7ae": {
         "message": "Demantur"
     },
-    "dimension_type_55c83e4e": {
-        "message": "Víddartegund"
-    },
     "dimensions_45ddb7b7": {
         "message": "Mál"
     },
@@ -484,6 +487,9 @@
     },
     "edit_existing_button_icon_3d0277bd": {
         "message": "Breyta núverandi hnapp / tákni"
+    },
+    "edit_icon_2c6b0e91": {
+        "message": "Breyta tákni"
     },
     "edit_link_7f53bebb": {
         "message": "Breyta tengli"
@@ -917,6 +923,9 @@
     "media_af190855": {
         "message": "Miðill"
     },
+    "media_file_is_processing_please_try_again_later_58a6d49": {
+        "message": "Miðilsskrá er í vinnslu. Vinsamlegast reyndu aftur seinna."
+    },
     "medium_5a8e9ead": {
         "message": "Meðal"
     },
@@ -1208,6 +1217,9 @@
     "rich_content_editor_2708ef21": {
         "message": "Rich Content ritill"
     },
+    "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+        "message": "Svæði með miklum texta. Ýttu á ALT+0 fyrir flýtilykla Rich Content ritils."
+    },
     "right_to_left_9cfb092a": {
         "message": "Hægri til vinstri"
     },
@@ -1292,17 +1304,8 @@
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Eitthvað mistókst og ég veit ekki hvað ég á að sýna þér."
     },
-    "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-        "message": "Eitthvað fór úrskeiðis, athugaðu tenginguna og reyndu aftur."
-    },
     "something_went_wrong_d238c551": {
         "message": "Eitthvað mistókst"
-    },
-    "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-        "message": "Eitthvað fór úrskeiðis, endurglæddu síðuna og reyndu aftur"
-    },
-    "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-        "message": "Eitthvað fór úrskeiðis við upphleðslu, athugaðu tenginguna þína og reyndu aftur."
     },
     "sort_by_e75f9e3e": {
         "message": "Raða eftir"
@@ -1498,9 +1501,6 @@
     },
     "uploading_19e8a4e7": {
         "message": "Hleður upp"
-    },
-    "uploading_closed_captions_subtitles_failed_bc093f3": {
-        "message": "Upphleðsla textaþýðingar mistókst."
     },
     "uppercase_alphabetic_ordered_list_3f5aa6b2": {
         "message": "hástafa bókstafa raðaður listi"

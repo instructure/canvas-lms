@@ -24,6 +24,7 @@ class JobsV2Controller < ApplicationController
   before_action :require_view_jobs
   before_action :require_bucket, only: %i[grouped_info list search]
   before_action :require_group, only: %i[grouped_info search]
+  before_action :set_date_range, only: %i[grouped_info list search]
   before_action :set_site_admin_context, :set_navigation, only: [:index]
 
   def require_view_jobs
@@ -67,19 +68,35 @@ class JobsV2Controller < ApplicationController
   # @argument order [String,"count"|"tag"|"strand"|"group"|"info"]
   #   Sort column. Default is "info". See the +bucket+ argument for a description of this field.
   #   If set to "group", order by the +group+ argument (e.g. "tag" or "strand").
+
+  # @argument scope [Optional,String,"jobs_server"|"cluster"|"shard"|"account"]
+  #   The scope of jobs to consider. By default, all jobs on the jobs server are
+  #   considered. if "cluster", "shard", or "account" is given, jobs will be filtered
+  #   to the unit of that type belonging to the domain root account.
+  #
+  # @argument start_date [Optional,Date]
+  #   Filter to jobs with a +run_at+ greater than or equal to the given timestamp.
+  #   when +bucket+ is "failed", +failed_at+ will be considered instead.
+  #
+  # @argument end_date [Optional,Date]
+  #   Filter to jobs with a +run_at+ less than or equal to the given timestamp.
+  #   when +bucket+ is "failed", +failed_at+ will be considered instead.
+  #
   def grouped_info
-    scope = jobs_scope
-            .select("count(*) AS count, #{@group}, #{grouped_info_select}")
-            .where.not(@group => nil)
-            .group(@group)
-            .order(grouped_order_clause(@group))
+    GuardRail.activate(:secondary) do
+      scope = jobs_scope
+              .select("count(*) AS count, #{@group}, #{grouped_info_select}")
+              .where.not(@group => nil)
+              .group(@group)
+              .order(grouped_order_clause(@group))
 
-    # This seems silly, but it forces postgres to use the available indicies.
-    scope = scope.where("locked_by IS NULL OR locked_by IS NOT NULL") if @group == :singleton
+      # This seems silly, but it forces postgres to use the available indicies.
+      scope = scope.where("locked_by IS NULL OR locked_by IS NOT NULL") if @group == :singleton
 
-    tag_info = Api.paginate(scope, self, api_v1_jobs_grouped_info_url)
-    now = Delayed::Job.db_time_now
-    render json: tag_info.map { |row| grouped_info_json(row, @group, base_time: now) }
+      tag_info = Api.paginate(scope, self, api_v1_jobs_grouped_info_url)
+      now = Delayed::Job.db_time_now
+      render json: tag_info.map { |row| grouped_info_json(row, @group, base_time: now) }
+    end
   end
 
   # @{not an}API List jobs
@@ -109,21 +126,37 @@ class JobsV2Controller < ApplicationController
   #
   # @argument order [String,"tag"|"strand"|"singleton"|"info"]
   #   Sort column. Default is "info". See the +bucket+ argument for a description of this field.
+  #
+  # @argument scope [Optional,String,"jobs_server"|"cluster"|"shard"|"account"]
+  #   The scope of jobs to consider. By default, all jobs on the jobs server are
+  #   considered. if "cluster", "shard", or "account" is given, jobs will be filtered
+  #   to the unit of that type belonging to the domain root account.
+  #
+  # @argument start_date [Optional,Date]
+  #   Filter to jobs with a +run_at+ greater than or equal to the given timestamp.
+  #   when +bucket+ is "failed", +failed_at+ will be considered instead.
+  #
+  # @argument end_date [Optional,Date]
+  #   Filter to jobs with a +run_at+ less than or equal to the given timestamp.
+  #   when +bucket+ is "failed", +failed_at+ will be considered instead.
+  #
   def list
-    scope = jobs_scope
+    GuardRail.activate(:secondary) do
+      scope = jobs_scope
 
-    %i[tag strand singleton account_id shard_id].each do |filter_param|
-      scope = scope.where(filter_param => params[filter_param]) if params[filter_param].present?
+      %i[tag strand singleton account_id shard_id].each do |filter_param|
+        scope = scope.where(filter_param => params[filter_param]) if params[filter_param].present?
+      end
+
+      # This seems silly, but it forces postgres to use the available indicies.
+      scope = scope.where("locked_by IS NULL OR locked_by IS NOT NULL") if params[:singleton].present?
+      scope = scope.order(list_order_clause)
+
+      jobs = Api.paginate(scope, self, api_v1_jobs_list_url)
+
+      now = Delayed::Job.db_time_now
+      render json: jobs.map { |job| job_json(job, base_time: now) }
     end
-
-    # This seems silly, but it forces postgres to use the available indicies.
-    scope = scope.where("locked_by IS NULL OR locked_by IS NOT NULL") if params[:singleton].present?
-    scope = scope.order(list_order_clause)
-
-    jobs = Api.paginate(scope, self, api_v1_jobs_list_url)
-
-    now = Delayed::Job.db_time_now
-    render json: jobs.map { |job| job_json(job, base_time: now) }
   end
 
   # @{not an}API Find tags or strands via text search
@@ -144,17 +177,19 @@ class JobsV2Controller < ApplicationController
   # @example_response
   #   { "foobar": 3, "foobaz": 1 }
   def search
-    term = params[:term]
-    raise ActionController::BadRequest unless term.present?
+    GuardRail.activate(:secondary) do
+      term = params[:term]
+      raise ActionController::BadRequest unless term.present?
 
-    result = jobs_scope
-             .where(ActiveRecord::Base.wildcard(@group, term))
-             .group(@group)
-             .order({ count_id: :DESC }, @group)
-             .limit(SEARCH_LIMIT)
-             .count(:id)
+      result = jobs_scope
+               .where(ActiveRecord::Base.wildcard(@group, term))
+               .group(@group)
+               .order({ count_id: :DESC }, @group)
+               .limit(SEARCH_LIMIT)
+               .count(:id)
 
-    render json: result
+      render json: result
+    end
   end
 
   # @{not an}API Lookup job by id or original_job_id
@@ -172,15 +207,17 @@ class JobsV2Controller < ApplicationController
   #     curl https://<canvas>/api/v1/jobs2/123 \
   #          -H 'Authorization: Bearer <token>'
   def lookup
-    id = params[:id]
-    raise ActionController::BadRequest unless id.present?
+    GuardRail.activate(:secondary) do
+      id = params[:id]
+      raise ActionController::BadRequest unless id.present?
 
-    jobs = Delayed::Job.where(id: id).to_a
-    jobs.concat Delayed::Job::Failed.where(id: id).or(
-      Delayed::Job::Failed.where(original_job_id: id)
-    ).order(:id).to_a
+      jobs = Delayed::Job.where(id: id).to_a
+      jobs.concat Delayed::Job::Failed.where(id: id).or(
+        Delayed::Job::Failed.where(original_job_id: id)
+      ).order(:id).to_a
 
-    render json: jobs.map { |job| job_json(job) }
+      render json: jobs.map { |job| job_json(job) }
+    end
   end
 
   protected
@@ -206,6 +243,19 @@ class JobsV2Controller < ApplicationController
             when "future" then Delayed::Job.future
             when "failed" then Delayed::Job::Failed
             end
+
+    if @start_date || @end_date
+      date_column = case @bucket
+                    when "failed"
+                      "failed_at"
+                    when "running"
+                      "locked_at"
+                    else
+                      "run_at"
+                    end
+      scope = scope.where("#{date_column}>=?", @start_date) if @start_date
+      scope = scope.where("#{date_column}<=?", @end_date) if @end_date
+    end
 
     case params[:scope]
     when "cluster"
@@ -307,6 +357,11 @@ class JobsV2Controller < ApplicationController
       when "failed" then { failed_at: :DESC }
       end
     end
+  end
+
+  def set_date_range
+    @start_date = Time.zone.parse(params[:start_date]) if Api::ISO8601_REGEX.match?(params[:start_date])
+    @end_date = Time.zone.parse(params[:end_date]) if Api::ISO8601_REGEX.match?(params[:end_date])
   end
 
   def set_navigation

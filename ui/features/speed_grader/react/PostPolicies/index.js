@@ -70,7 +70,7 @@ export default class PostPolicies {
     }
   }
 
-  showHideAssignmentGradesTray({submissionsMap}) {
+  showHideAssignmentGradesTray({submissionsMap, submissions = []}) {
     let onHidden
 
     if (this._assignment.anonymousGrading) {
@@ -89,7 +89,12 @@ export default class PostPolicies {
       assignment: this._assignment,
       containerName: this._containerName,
       onHidden,
-      sections: this._sections
+      sections: this._sections,
+      submissions: submissions.map(submission => ({
+        postedAt: submission.posted_at,
+        score: submission.score,
+        workflowState: submission.workflow_state
+      }))
     })
   }
 

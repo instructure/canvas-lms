@@ -23,7 +23,7 @@ const demoData = {
   contextData: [
     {id: 'course_11', name: 'Test 101', itemType: CONTEXT_TYPE},
     {id: 'course_12', name: 'History 101', itemType: CONTEXT_TYPE},
-    {id: 'course_13', name: 'English 101', itemType: CONTEXT_TYPE}
+    {id: 'course_13', name: 'English 101', itemType: CONTEXT_TYPE, isLast: true}
   ],
   userData: [
     {id: '1', name: 'Rob Orton', full_name: 'Rob Orton', pronouns: null, itemType: USER_TYPE},
@@ -289,6 +289,17 @@ describe('Address Book Component', () => {
       fireEvent.mouseDown(items[1])
       expect(onSelectSpy.mock.calls.length).toBe(1)
       expect(onSelectSpy.mock.calls[0][0].itemType).toBe(CONTEXT_TYPE)
+    })
+
+    it('Should set isLast for CONTEXT_TYPE', async () => {
+      const onSelectSpy = jest.fn()
+      setup({...defaultProps, open: true, onSelect: onSelectSpy, isSubMenu: true})
+      const popover = await screen.findByTestId('address-book-popover')
+      const items = popover.querySelectorAll('li')
+      fireEvent.mouseDown(items[3])
+      expect(onSelectSpy.mock.calls.length).toBe(1)
+      expect(onSelectSpy.mock.calls[0][0].itemType).toBe(CONTEXT_TYPE)
+      expect(onSelectSpy.mock.calls[0][0].isLast).toBe(true)
     })
 
     it('Should call back for back click', async () => {

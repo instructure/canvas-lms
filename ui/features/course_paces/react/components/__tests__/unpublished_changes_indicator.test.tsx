@@ -98,8 +98,8 @@ describe('UnpublishedChangesIndicator', () => {
     ).toThrow()
   })
 
-  it('displays a spinner indicating ongoing publishing when pacePublishing is true', () => {
-    const {getAllByText} = render(<UnpublishedChangesIndicator {...defaultProps} pacePublishing />)
+  it('displays a spinner indicating ongoing publishing when isSyncing is true', () => {
+    const {getAllByText} = render(<UnpublishedChangesIndicator {...defaultProps} isSyncing />)
     expect(getAllByText('Publishing pace...')[0]).toBeInTheDocument()
   })
 

@@ -20,6 +20,8 @@ If you would rather do things manually, read on! And be sure to check the [Troub
 
 ## Recommendations
 
+We recommend using [Mutagen](https://mutagen.io/documentation/synchronization) and Mutagen-Compose for file synchronization. The steps listed below assume you are using Mutagen-Compose. If you are not, replace each `mutagen-compose` with `docker-compose`.
+
 By default `docker-compose` will look at 2 files
 - docker-compose.yml
 - docker-compose.override.yml
@@ -29,8 +31,17 @@ the `./script/docker_dev_setup.sh` (as well as the `./script/docker_dev_update.s
 one into the root directory for docker-compose to use.
 The `docker-compose.override.yml` file is ignored by git in the `.gitignore` file, so you must provide one or run the
 setup script before running docker-compose.
+
+### macOS and Linux with Mutagen
+
+You may manually copy the `docker-compose/mutagen/docker-compose.override.yml` to `docker-compose.override.yml` with the following
+command: `cp docker-compose/mutagen/docker-compose.override.yml docker-compose.override.yml`.
+
+### Linux no Mutagen
+
 You may manually copy the `config/docker-compose.override.yml.example` to `docker-compose.override.yml` with the following
 command: `cp config/docker-compose.override.yml.example docker-compose.override.yml`.
+
 Keep in mind copying this manually will overwrite any existing `docker-compose.override.yml` file, whereas the setup
 script will not overwrite an existing configuration.
 If you need more than what the default override provides you should use a `.env` file to set your `COMPOSE_FILE` environment variable.
@@ -76,7 +87,7 @@ Now you're ready to build all of the containers. This will take a while as a lot
 First let's get our Mutagen sidecar running.
 
 ```bash
-mutagen-compose build
+mutagen-compose build --pull
 mutagen-compose up --no-start web
 ```
 
@@ -96,7 +107,7 @@ open http://canvas.docker/
 
 ## Normal Usage
 
-Normally you can just start everything with `mutagen-compose up -d`, and
+Normally you can just start everything with `mutagen-compose up -d` and
 access Canvas at http://canvas.docker/
 
 After pulling new code, you'll want to update all your local gems, rebuild your
@@ -109,7 +120,6 @@ all be done with one command:
 
 Changes you're making are not showing up? See the Caveats section below.
 
-##
 
 ### With an IDE
 Canvas supports [ruby-debug-ide](https://github.com/ruby-debug/ruby-debug-ide) to establish

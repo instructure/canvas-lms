@@ -39,7 +39,12 @@ module BrandConfigHelpers
   private
 
   def brand_config_chain(include_self:)
-    chain = account_chain(include_site_admin: true).dup
+    # It would be surprising to legacy consortia to have theme settings inherit
+    # even though that would be the more correct behavior given the general
+    # conecept of account chains, so explicitly tack site admin onto the chain
+    # so we always inherit from siteadmin even if we don't want consortia parents
+    chain = account_chain(include_federated_parent: !root_account.primary_settings_root_account?).dup
+    chain << Account.site_admin unless chain.include?(Account.site_admin)
     chain.shift unless include_self
     chain
   end

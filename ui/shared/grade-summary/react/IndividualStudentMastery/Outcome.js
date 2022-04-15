@@ -102,7 +102,7 @@ class Outcome extends React.Component {
         alignItems={verticalLayout ? 'stretch' : null}
         data-selenium="outcome"
       >
-        <Flex.Item grow as="div">
+        <Flex.Item shrink as="div">
           <Text size="medium">
             <Flex>
               <Flex.Item>

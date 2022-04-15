@@ -309,7 +309,7 @@ class Course < ActiveRecord::Base
                         link_text: -> { t("Import Status") },
                         link_target: ->(course) { "/courses/#{course.to_param}/content_migrations" },
                         should_show: lambda { |course, user|
-                          course.grants_right?(user, :manage_content)
+                          course.grants_any_right?(user, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
                         }
 
   has_a_broadcast_policy
@@ -1907,10 +1907,16 @@ class Course < ActiveRecord::Base
     completed? || soft_concluded?(enrollment_type)
   end
 
-  def account_chain(include_site_admin: false)
+  def account_chain(include_site_admin: false, include_federated_parent: false)
     @account_chain ||= Account.account_chain(account_id).freeze
+
+    # This implicitly includes add_federated_parent_to_chain
     if include_site_admin
       return @account_chain_with_site_admin ||= Account.add_site_admin_to_chain!(@account_chain.dup).freeze
+    end
+
+    if include_federated_parent
+      return @account_chain_with_federated_parent ||= Account.add_federated_parent_to_chain!(@account_chain.dup).freeze
     end
 
     @account_chain
@@ -2943,7 +2949,6 @@ class Course < ActiveRecord::Base
   TAB_COLLABORATIONS_NEW = 17
   TAB_RUBRICS = 18
   TAB_SCHEDULE = 19
-  TAB_COURSE_PACES = 20
 
   CANVAS_K6_TAB_IDS = [TAB_HOME, TAB_ANNOUNCEMENTS, TAB_GRADES, TAB_MODULES].freeze
   COURSE_SUBJECT_TAB_IDS = [TAB_HOME, TAB_SCHEDULE, TAB_MODULES, TAB_GRADES, TAB_GROUPS].freeze
@@ -3103,30 +3108,17 @@ class Course < ActiveRecord::Base
   def uncached_tabs_available(user, opts)
     # make sure t() is called before we switch to the secondary, in case we update the user's selected locale in the process
     course_subject_tabs = elementary_subject_course? && opts[:course_subject_tabs]
-    course_paces_allowed = false
     default_tabs = if elementary_homeroom_course?
                      Course.default_homeroom_tabs
                    elsif course_subject_tabs
                      Course.course_subject_tabs
                    elsif elementary_subject_course?
-                     course_paces_allowed = true
                      Course.elementary_course_nav_tabs
                    else
-                     course_paces_allowed = true
                      Course.default_tabs
                    end
     # can't manage people in template courses
     default_tabs.delete_if { |t| t[:id] == TAB_PEOPLE } if template?
-    # only show course paces if enabled
-    if course_paces_allowed && account.feature_enabled?(:course_paces) && enable_course_paces
-      default_tabs.insert(default_tabs.index { |t| t[:id] == TAB_MODULES } + 1, {
-                            id: TAB_COURSE_PACES,
-                            label: t("#tabs.course_paces", "Course Pacing"),
-                            css_class: "course_paces",
-                            href: :course_course_paces_path,
-                            visibility: "admins"
-                          })
-    end
     opts[:include_external] = false if elementary_homeroom_course?
 
     GuardRail.activate(:secondary) do
@@ -3241,13 +3233,13 @@ class Course < ActiveRecord::Base
 
       # remove tabs that the user doesn't have access to
       unless opts[:for_reordering]
-        delete_unless.call([TAB_HOME, TAB_ANNOUNCEMENTS, TAB_PAGES, TAB_OUTCOMES, TAB_CONFERENCES, TAB_COLLABORATIONS, TAB_MODULES, TAB_COURSE_PACES], :read, :manage_content)
+        delete_unless.call([TAB_HOME, TAB_ANNOUNCEMENTS, TAB_PAGES, TAB_OUTCOMES, TAB_CONFERENCES, TAB_COLLABORATIONS, TAB_MODULES], :read, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
 
         member_only_tabs = tabs.select { |t| t[:visibility] == "members" }
         tabs -= member_only_tabs if member_only_tabs.present? && !check_for_permission.call(:participate_as_student, :read_as_admin)
 
-        delete_unless.call([TAB_ASSIGNMENTS, TAB_QUIZZES], :read, :manage_content, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
-        delete_unless.call([TAB_SYLLABUS], :read, :read_syllabus, :manage_content, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+        delete_unless.call([TAB_ASSIGNMENTS, TAB_QUIZZES], :read, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+        delete_unless.call([TAB_SYLLABUS], :read, :read_syllabus, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
 
         admin_only_tabs = tabs.select { |t| t[:visibility] == "admins" }
         tabs -= admin_only_tabs if admin_only_tabs.present? && !check_for_permission.call(:read_as_admin)
@@ -3266,18 +3258,18 @@ class Course < ActiveRecord::Base
         delete_unless.call([TAB_FILES], :read, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
 
         if item_banks_tab &&
-           !check_for_permission.call(:manage_content, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+           !check_for_permission.call(:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
           tabs.reject! { |tab| tab[:id] == item_banks_tab[:id] }
         end
         # remove outcomes tab for logged-out users or non-students
         outcome_tab = tabs.detect { |t| t[:id] == TAB_OUTCOMES }
-        tabs.delete(outcome_tab) if outcome_tab && (!user || !check_for_permission.call(:manage_content, :participate_as_student, :read_as_admin))
+        tabs.delete(outcome_tab) if outcome_tab && (!user || !check_for_permission.call(:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS, :participate_as_student, :read_as_admin))
 
         # remove hidden tabs from students
         additional_checks = {
-          TAB_ASSIGNMENTS => [:manage_content, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS],
-          TAB_SYLLABUS => [:manage_content, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS],
-          TAB_QUIZZES => [:manage_content, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS],
+          TAB_ASSIGNMENTS => [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS],
+          TAB_SYLLABUS => [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS],
+          TAB_QUIZZES => [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS],
           TAB_GRADES => [:view_all_grades, :manage_grades],
           TAB_PEOPLE => [:manage_students, :manage_admin_users],
           TAB_FILES => RoleOverride::GRANULAR_FILE_PERMISSIONS,
@@ -3292,7 +3284,7 @@ class Course < ActiveRecord::Base
           # tab shouldn't be shown to non-admins
           (t[:hidden] || t[:hidden_unused]) &&
             # not an admin user
-            (!user || !check_for_permission.call(:manage_content, :read_as_admin)) &&
+            (!user || !check_for_permission.call(:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS, :read_as_admin)) &&
             # can't do any of the additional things required
             (!additional_checks[t[:id]] || !check_for_permission.call(*additional_checks[t[:id]]))
         end
@@ -3431,6 +3423,7 @@ class Course < ActiveRecord::Base
   add_setting :alt_name
 
   add_setting :default_due_time, inherited: true
+  add_setting :conditional_release, default: false, boolean: true, inherited: true
 
   def elementary_enabled?
     account.enable_as_k5_account?

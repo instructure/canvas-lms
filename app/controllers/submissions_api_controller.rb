@@ -200,6 +200,11 @@
 #               "unread"
 #             ]
 #           }
+#         },
+#         "redo_request" : {
+#           "description": "This indicates whether the submission has been reassigned by the instructor.",
+#           "example": "true",
+#           "type": "boolean"
 #         }
 #       }
 #     }
@@ -237,6 +242,7 @@ class SubmissionsApiController < ApplicationController
   # @response_field grade The grade for the submission, translated into the assignment grading scheme (so a letter grade, for example).
   # @response_field grade_matches_current_submission A boolean flag which is false if the student has re-submitted since the submission was last graded.
   # @response_field preview_url Link to the URL in canvas where the submission can be previewed. This will require the user to log in.
+  # @response_field redo_request If the submission was reassigned
   # @response_field url If the submission was made as a URL.
   # @response_field late Whether the submission was made after the applicable due date.
   # @response_field assignment_visible Whether this assignment is visible to the user who submitted the assignment.

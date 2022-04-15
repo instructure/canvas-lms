@@ -39,7 +39,7 @@ module Importers
     end
 
     def self.process_migration(data, migration)
-      migration.context.feature_enabled?(:conditional_release) # preload it so we don't try to do it inside a page transaction
+      migration.context.conditional_release? # preload it so we don't try to do it inside a page transaction
       if migration.for_master_course_import? # make a tag if it doesn't exist
         migration.context.wiki.load_tag_for_master_course_import!(migration.child_subscription_id)
       end
@@ -242,7 +242,7 @@ module Importers
         allow_save = false
       end
       if allow_save && hash[:migration_id]
-        if hash[:assignment].present? && context.feature_enabled?(:conditional_release)
+        if hash[:assignment].present? && context.conditional_release?
           hash[:assignment][:title] ||= item.title
           item.assignment = Importers::AssignmentImporter.import_from_migration(
             hash[:assignment], context, migration

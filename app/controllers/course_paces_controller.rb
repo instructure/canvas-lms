@@ -20,6 +20,7 @@
 class CoursePacesController < ApplicationController
   before_action :load_context
   before_action :load_course
+  before_action :load_blackout_dates, only: %i[index]
   before_action :require_feature_flag
   before_action :authorize_action
   before_action :load_course_pace, only: %i[api_show publish update]
@@ -27,8 +28,10 @@ class CoursePacesController < ApplicationController
   include Api::V1::Course
   include Api::V1::Progress
   include K5Mode
+  include GranularPermissionEnforcement
 
   def index
+    add_crumb(t("Course Pacing"))
     @course_pace = @context.course_paces.primary.first
 
     if @course_pace.nil?
@@ -54,7 +57,7 @@ class CoursePacesController < ApplicationController
     end
 
     js_env({
-             BLACKOUT_DATES: [],
+             BLACKOUT_DATES: @blackout_dates.as_json(include_root: false),
              COURSE: course_json(@context, @current_user, session, [], nil),
              ENROLLMENTS: enrollments_json(@context),
              SECTIONS: sections_json(@context),
@@ -167,6 +170,22 @@ class CoursePacesController < ApplicationController
 
   private
 
+  def authorize_action
+    enforce_granular_permissions(
+      @course,
+      overrides: [:manage_content],
+      actions: {
+        index: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
+        api_show: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
+        new: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
+        publish: [:manage_course_content_edit],
+        create: [:manage_course_content_add],
+        update: [:manage_course_content_edit],
+        compress_dates: [:manage_course_content_edit]
+      }
+    )
+  end
+
   def latest_progress
     progress = Progress.order(created_at: :desc).find_by(context: @course_pace, tag: "course_pace_publish")
     progress&.workflow_state == "completed" ? nil : progress
@@ -181,7 +200,8 @@ class CoursePacesController < ApplicationController
         section_id: enrollment.course_section_id,
         full_name: enrollment.user.name,
         sortable_name: enrollment.user.sortable_name,
-        start_at: enrollment.start_at
+        start_at: enrollment.start_at,
+        avatar_url: User.find_by(id: enrollment.user_id).avatar_image_url
       }
     end
     json.index_by { |h| h[:id] }
@@ -198,10 +218,6 @@ class CoursePacesController < ApplicationController
       }
     end
     json.index_by { |h| h[:id] }
-  end
-
-  def authorize_action
-    authorized_action(@course, @current_user, :manage_content)
   end
 
   def require_feature_flag
@@ -224,6 +240,10 @@ class CoursePacesController < ApplicationController
 
   def load_course
     @course = @context.respond_to?(:course) ? @context.course : @context
+  end
+
+  def load_blackout_dates
+    @blackout_dates = @context.respond_to?(:blackout_dates) ? @context.blackout_dates : []
   end
 
   def update_params

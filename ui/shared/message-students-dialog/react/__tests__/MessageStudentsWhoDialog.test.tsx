@@ -32,55 +32,79 @@ const students: Student[] = [
   {
     id: '100',
     name: 'Betty Ford',
-    sortableName: 'Ford, Betty'
+    grade: undefined,
+    redoRequest: false,
+    sortableName: 'Ford, Betty',
+    score: undefined,
+    submittedAt: undefined
   },
   {
     id: '101',
     name: 'Adam Jones',
-    sortableName: 'Jones, Adam'
+    grade: undefined,
+    redoRequest: false,
+    sortableName: 'Jones, Adam',
+    score: undefined,
+    submittedAt: undefined
   },
   {
     id: '102',
     name: 'Charlie Xi',
-    sortableName: 'Xi, Charlie'
+    grade: undefined,
+    redoRequest: false,
+    sortableName: 'Xi, Charlie',
+    score: undefined,
+    submittedAt: undefined
   },
   {
     id: '103',
     name: 'Dana Smith',
-    sortableName: 'Smith, Dana'
+    grade: undefined,
+    redoRequest: false,
+    sortableName: 'Smith, Dana',
+    score: undefined,
+    submittedAt: undefined
   }
 ]
 
 const scoredAssignment: Assignment = {
+  allowedAttempts: 3,
   courseId: '1',
+  dueDate: new Date(),
   gradingType: 'points',
   id: '100',
   name: 'A pointed assignment',
-  nonDigitalSubmission: false
+  submissionTypes: ['online_text_entry']
 }
 
 const ungradedAssignment: Assignment = {
+  allowedAttempts: 1,
   courseId: '1',
   gradingType: 'not_graded',
+  dueDate: null,
   id: '200',
   name: 'A pointless assignment',
-  nonDigitalSubmission: false
+  submissionTypes: ['online_text_entry']
 }
 
 const passFailAssignment: Assignment = {
+  allowedAttempts: -1,
   courseId: '1',
+  dueDate: null,
   gradingType: 'pass_fail',
   id: '300',
   name: 'A pass-fail assignment',
-  nonDigitalSubmission: false
+  submissionTypes: ['online_text_entry']
 }
 
 const unsubmittableAssignment: Assignment = {
+  allowedAttempts: 3,
   courseId: '1',
+  dueDate: new Date(),
   gradingType: 'no_submission',
   id: '400',
   name: 'An unsubmittable assignment',
-  nonDigitalSubmission: true
+  submissionTypes: ['on_paper']
 }
 
 function makeProps(overrides: object = {}): ComponentProps {
@@ -244,6 +268,8 @@ describe('MessageStudentsWhoDialog', () => {
       const button = await findByLabelText(/For students who/)
       fireEvent.click(button)
       const criteriaLabels = getAllByRole('option').map(option => option.textContent)
+      expect(criteriaLabels).toContain('Have not yet submitted')
+      expect(criteriaLabels).toContain('Have not been graded')
       expect(criteriaLabels).toContain('Scored more than')
       expect(criteriaLabels).toContain('Scored less than')
       expect(criteriaLabels).not.toContain('Marked incomplete')
@@ -260,6 +286,8 @@ describe('MessageStudentsWhoDialog', () => {
       const button = await findByLabelText(/For students who/)
       fireEvent.click(button)
       const criteriaLabels = getAllByRole('option').map(option => option.textContent)
+      expect(criteriaLabels).toContain('Have not yet submitted')
+      expect(criteriaLabels).toContain('Have not been graded')
       expect(criteriaLabels).toContain('Marked incomplete')
       expect(criteriaLabels).not.toContain('Scored more than')
       expect(criteriaLabels).not.toContain('Scored less than')
@@ -308,6 +336,62 @@ describe('MessageStudentsWhoDialog', () => {
       const criteriaLabels = getAllByRole('option').map(option => option.textContent)
       expect(criteriaLabels).not.toContain('Have not yet submitted')
     })
+
+    it('includes "Reassigned" if the assignment has a due date and allows more than one attempt', async () => {
+      const mocks = await makeMocks()
+
+      const {getAllByRole, findByLabelText} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <MessageStudentsWhoDialog {...makeProps()} />
+        </MockedProvider>
+      )
+      const button = await findByLabelText(/For students who/)
+      fireEvent.click(button)
+      const criteriaLabels = getAllByRole('option').map(option => option.textContent)
+      expect(criteriaLabels).toContain('Reassigned')
+    })
+
+    it('does not include "Reassigned" if the assignment does not have a due date', async () => {
+      const mocks = await makeMocks()
+
+      const {getAllByRole, findByLabelText} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <MessageStudentsWhoDialog {...makeProps({assignment: passFailAssignment})} />
+        </MockedProvider>
+      )
+      const button = await findByLabelText(/For students who/)
+      fireEvent.click(button)
+      const criteriaLabels = getAllByRole('option').map(option => option.textContent)
+      expect(criteriaLabels).not.toContain('Reassigned')
+    })
+
+    it('does not include "Reassigned" if the assignment does not allow more than one submission', async () => {
+      const mocks = await makeMocks()
+
+      const {getAllByRole, findByLabelText} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <MessageStudentsWhoDialog {...makeProps({assignment: ungradedAssignment})} />
+        </MockedProvider>
+      )
+      const button = await findByLabelText(/For students who/)
+      fireEvent.click(button)
+      const criteriaLabels = getAllByRole('option').map(option => option.textContent)
+      expect(criteriaLabels).not.toContain('Reassigned')
+    })
+
+    it('does not include "Reassigned" if the assignment is on paper', async () => {
+      const mocks = await makeMocks()
+
+      const {getAllByRole, findByLabelText} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <MessageStudentsWhoDialog {...makeProps({assignment: unsubmittableAssignment})} />
+        </MockedProvider>
+      )
+      const button = await findByLabelText(/For students who/)
+      fireEvent.click(button)
+      const criteriaLabels = getAllByRole('option').map(option => option.textContent)
+      expect(criteriaLabels).not.toContain('Reassigned')
+    })
   })
 
   describe('cutoff input', () => {
@@ -336,6 +420,204 @@ describe('MessageStudentsWhoDialog', () => {
       fireEvent.click(selector)
       fireEvent.click(getByRole('option', {name: 'Reassigned'}))
       expect(queryByLabelText('Enter score cutoff')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('selected criteria', () => {
+    it('updates the student and observer checkbox counts', async () => {
+      students[0].grade = '8'
+      students[1].grade = '10'
+      const mocks = await makeMocks()
+
+      const {findByRole, getByLabelText, getByText} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <MessageStudentsWhoDialog {...makeProps()} />
+        </MockedProvider>
+      )
+      expect(await findByRole('checkbox', {name: /Students/})).toHaveAccessibleName('4 Students')
+      expect(await findByRole('checkbox', {name: /Observers/})).toHaveAccessibleName('2 Observers')
+
+      const button = getByLabelText(/For students who/)
+      fireEvent.click(button)
+      fireEvent.click(getByText(/Have not been graded/))
+
+      expect(await findByRole('checkbox', {name: /Students/})).toHaveAccessibleName('2 Students')
+      expect(await findByRole('checkbox', {name: /Observers/})).toHaveAccessibleName('0 Observers')
+    })
+
+    it('"Have not yet submitted" displays students who have no submitted next to their observers', async () => {
+      const mocks = await makeMocks()
+      students[2].submittedAt = new Date()
+      students[3].submittedAt = new Date()
+      const {getAllByRole, getByRole, findByLabelText, getByText} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <MessageStudentsWhoDialog {...makeProps()} />
+        </MockedProvider>
+      )
+
+      const button = await findByLabelText(/For students who/)
+      fireEvent.click(button)
+      fireEvent.click(getByText(/Have not yet submitted/))
+
+      fireEvent.click(getByRole('button', {name: 'Show all recipients'}))
+      expect(getByRole('table')).toBeInTheDocument()
+
+      const tableRows = getAllByRole('row') as HTMLTableRowElement[]
+      const studentCells = tableRows.map(row => row.cells[0])
+      const observerCells = tableRows.map(row => row.cells[1])
+      // first cell will be the header
+      expect(studentCells).toHaveLength(3)
+      expect(studentCells[0]).toHaveTextContent('Students')
+      expect(studentCells[1]).toHaveTextContent('Betty Ford')
+      expect(observerCells[1]).toHaveTextContent('Observer0')
+      expect(studentCells[2]).toHaveTextContent('Adam Jones')
+      expect(observerCells[2]).toHaveTextContent('Observer1')
+    })
+
+    it('"Have not been graded" displays students who do not have a grade', async () => {
+      const mocks = await makeMocks()
+      students[0].grade = '8'
+      students[1].grade = '10'
+      const {getAllByRole, getByRole, findByLabelText, getByText} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <MessageStudentsWhoDialog {...makeProps()} />
+        </MockedProvider>
+      )
+
+      const button = await findByLabelText(/For students who/)
+      fireEvent.click(button)
+      fireEvent.click(getByText(/Have not been graded/))
+
+      fireEvent.click(getByRole('button', {name: 'Show all recipients'}))
+      expect(getByRole('table')).toBeInTheDocument()
+
+      const tableRows = getAllByRole('row') as HTMLTableRowElement[]
+      const studentCells = tableRows.map(row => row.cells[0])
+      // first cell will be the header
+      expect(studentCells).toHaveLength(3)
+      expect(studentCells[0]).toHaveTextContent('Students')
+      expect(studentCells[1]).toHaveTextContent('Dana Smith')
+      expect(studentCells[2]).toHaveTextContent('Charlie Xi')
+    })
+
+    it('"Scored more than" displays students who have scored higher than the score inputted', async () => {
+      const mocks = await makeMocks()
+      students[0].score = 10
+      students[1].score = 6
+      students[2].score = 4
+      students[3].score = 0
+      const {getAllByRole, getByRole, getByLabelText, getByText, findByLabelText} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <MessageStudentsWhoDialog {...makeProps()} />
+        </MockedProvider>
+      )
+
+      const button = await findByLabelText(/For students who/)
+      fireEvent.click(button)
+      fireEvent.click(getByText(/Scored more than/))
+      fireEvent.change(getByLabelText('Enter score cutoff'), {target: {value: '5'}})
+
+      fireEvent.click(getByRole('button', {name: 'Show all recipients'}))
+      expect(getByRole('table')).toBeInTheDocument()
+
+      const tableRows = getAllByRole('row') as HTMLTableRowElement[]
+      const studentCells = tableRows.map(row => row.cells[0])
+      const observerCells = tableRows.map(row => row.cells[1])
+      // first cell will be the header
+      expect(studentCells).toHaveLength(3)
+      expect(studentCells[0]).toHaveTextContent('Students')
+      expect(studentCells[1]).toHaveTextContent('Betty Ford')
+      expect(observerCells[1]).toHaveTextContent('Observer0')
+      expect(studentCells[2]).toHaveTextContent('Adam Jones')
+      expect(observerCells[2]).toHaveTextContent('Observer1')
+    })
+
+    it('"Scored less than" displays students who have scored lower than the score inputted', async () => {
+      const mocks = await makeMocks()
+      students[0].score = 10
+      students[1].score = 6
+      students[2].score = 4
+      students[3].score = 0
+      const {getAllByRole, getByRole, findByLabelText, getByLabelText, getByText} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <MessageStudentsWhoDialog {...makeProps()} />
+        </MockedProvider>
+      )
+
+      const button = await findByLabelText(/For students who/)
+      fireEvent.click(button)
+      fireEvent.click(getByText(/Scored less than/))
+      fireEvent.change(getByLabelText('Enter score cutoff'), {target: {value: '5'}})
+
+      fireEvent.click(getByRole('button', {name: 'Show all recipients'}))
+      expect(getByRole('table')).toBeInTheDocument()
+
+      const tableRows = getAllByRole('row') as HTMLTableRowElement[]
+      const studentCells = tableRows.map(row => row.cells[0])
+      // first cell will be the header
+      expect(studentCells).toHaveLength(3)
+      expect(studentCells[0]).toHaveTextContent('Students')
+      expect(studentCells[1]).toHaveTextContent('Dana Smith')
+      expect(studentCells[2]).toHaveTextContent('Charlie Xi')
+    })
+
+    it('"Reassigned" displays students who have been asked to resubmit to the assignment', async () => {
+      const mocks = await makeMocks()
+      students[0].redoRequest = true
+      students[1].redoRequest = true
+      const {getAllByRole, getByRole, getByText, findByLabelText} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <MessageStudentsWhoDialog {...makeProps()} />
+        </MockedProvider>
+      )
+
+      const button = await findByLabelText(/For students who/)
+      fireEvent.click(button)
+      fireEvent.click(getByText(/Reassigned/))
+
+      fireEvent.click(getByRole('button', {name: 'Show all recipients'}))
+      expect(getByRole('table')).toBeInTheDocument()
+
+      const tableRows = getAllByRole('row') as HTMLTableRowElement[]
+      const studentCells = tableRows.map(row => row.cells[0])
+      const observerCells = tableRows.map(row => row.cells[1])
+      // first cell will be the header
+      expect(studentCells).toHaveLength(3)
+      expect(studentCells[0]).toHaveTextContent('Students')
+      expect(studentCells[1]).toHaveTextContent('Betty Ford')
+      expect(observerCells[1]).toHaveTextContent('Observer0')
+      expect(studentCells[2]).toHaveTextContent('Adam Jones')
+      expect(observerCells[2]).toHaveTextContent('Observer1')
+    })
+
+    it('"Marked incomplete" displays students who have been marked as "incomplete" on a pass/fail assignment', async () => {
+      const mocks = await makeMocks()
+      students[0].grade = 'incomplete'
+      students[1].grade = 'incomplete'
+      const {getAllByRole, getByRole, findByLabelText, getByText} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <MessageStudentsWhoDialog {...makeProps({assignment: passFailAssignment})} />
+        </MockedProvider>
+      )
+
+      const button = await findByLabelText(/For students who/)
+      fireEvent.click(button)
+      fireEvent.click(getByText(/Marked incomplete/))
+
+      fireEvent.click(getByRole('button', {name: 'Show all recipients'}))
+      expect(getByRole('table')).toBeInTheDocument()
+
+      const tableRows = getAllByRole('row') as HTMLTableRowElement[]
+      const studentCells = tableRows.map(row => row.cells[0])
+      const observerCells = tableRows.map(row => row.cells[1])
+      // first cell will be the header
+      expect(studentCells).toHaveLength(3)
+      expect(studentCells[0]).toHaveTextContent('Students')
+      expect(studentCells[0]).toHaveTextContent('Students')
+      expect(studentCells[1]).toHaveTextContent('Betty Ford')
+      expect(observerCells[1]).toHaveTextContent('Observer0')
+      expect(studentCells[2]).toHaveTextContent('Adam Jones')
+      expect(observerCells[2]).toHaveTextContent('Observer1')
     })
   })
 })

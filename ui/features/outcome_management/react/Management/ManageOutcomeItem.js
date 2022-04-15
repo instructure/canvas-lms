@@ -54,7 +54,7 @@ const ManageOutcomeItem = ({
     contextType,
     contextId,
     friendlyDescriptionFF,
-    individualOutcomeRatingAndCalculationFF,
+    accountLevelMasteryScalesFF,
     canManage,
     isAdmin,
     isCourse
@@ -71,8 +71,7 @@ const ManageOutcomeItem = ({
     friendlyDescriptionFF ||
     (outcomeContextType === contextType && outcomeContextId === contextId) ||
     allowAdminEdit
-  const shouldShowDescription =
-    description || friendlyDescription || individualOutcomeRatingAndCalculationFF
+  const shouldShowDescription = description || friendlyDescription || !accountLevelMasteryScalesFF
 
   if (!title) return null
 

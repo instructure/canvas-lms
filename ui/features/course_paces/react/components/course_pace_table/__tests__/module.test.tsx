@@ -30,7 +30,7 @@ const defaultProps = {
   coursePace: PRIMARY_PACE,
   responsiveSize: 'large' as const,
   showProjections: true,
-  isCompressing: false
+  compression: 0
 }
 
 describe('Module', () => {
@@ -78,7 +78,7 @@ describe('Module', () => {
   })
 
   it('includes the compressed dates warning tooltip if compressing', () => {
-    const {getByRole} = renderConnected(<Module {...defaultProps} isCompressing />)
+    const {getByRole} = renderConnected(<Module {...defaultProps} compression={1000} />)
     expect(
       getByRole('tooltip', {
         name: 'Due Dates are being compressed based on your start and end dates.'

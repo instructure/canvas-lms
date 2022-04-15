@@ -21,110 +21,107 @@ import {SHAPE_CONTAINER_LENGTH} from '../constants'
 import {createSvgElement} from './utils'
 import {Shape} from '../../../../svg/shape'
 
-export function buildShapeMask({shape}) {
+export function buildShapeMask({shape, size}) {
+  const dimensionSize = size || SHAPE_CONTAINER_LENGTH
   switch (shape) {
     case Shape.Square:
-      return buildSquare()
+      return buildSquare(dimensionSize)
     case Shape.Circle:
-      return buildCircle()
+      return buildCircle(dimensionSize)
     case Shape.Triangle:
-      return buildTriangle()
+      return buildTriangle(dimensionSize)
     case Shape.Diamond:
-      return buildDiamond()
+      return buildDiamond(dimensionSize)
     case Shape.Pentagon:
-      return buildPentagon()
+      return buildPentagon(dimensionSize)
     case Shape.Hexagon:
-      return buildHexagon()
+      return buildHexagon(dimensionSize)
     case Shape.Octagon:
-      return buildOctagon()
+      return buildOctagon(dimensionSize)
     case Shape.Star:
-      return buildStar()
+      return buildStar(dimensionSize)
     default:
       throw new Error(`Invalid shape: ${shape}`)
   }
 }
 
-function buildSquare() {
+function buildSquare(dimensionSize) {
   return createSvgElement('rect', {
     x: 0,
     y: 0,
-    width: SHAPE_CONTAINER_LENGTH,
-    height: SHAPE_CONTAINER_LENGTH,
+    width: dimensionSize,
+    height: dimensionSize,
     fill: 'black'
   })
 }
 
-function buildCircle() {
+function buildCircle(dimensionSize) {
   return createSvgElement('circle', {
-    cx: SHAPE_CONTAINER_LENGTH / 2,
-    cy: SHAPE_CONTAINER_LENGTH / 2,
-    r: SHAPE_CONTAINER_LENGTH / 2,
+    cx: dimensionSize / 2,
+    cy: dimensionSize / 2,
+    r: dimensionSize / 2,
     fill: 'black'
   })
 }
 
-function buildTriangle() {
+function buildTriangle(dimensionSize) {
   return createSvgElement('path', {
-    d: `M${SHAPE_CONTAINER_LENGTH / 2} 0L${SHAPE_CONTAINER_LENGTH} ${SHAPE_CONTAINER_LENGTH}H0L${
-      SHAPE_CONTAINER_LENGTH / 2
-    } 0Z`
+    d: `M${dimensionSize / 2} 0L${dimensionSize} ${dimensionSize}H0L${dimensionSize / 2} 0Z`
   })
 }
 
-function buildDiamond() {
+function buildDiamond(dimensionSize) {
   return createSvgElement('path', {
-    d: `M${SHAPE_CONTAINER_LENGTH / 2} 0L${SHAPE_CONTAINER_LENGTH} ${SHAPE_CONTAINER_LENGTH / 2}L${
-      SHAPE_CONTAINER_LENGTH / 2
-    } ${SHAPE_CONTAINER_LENGTH}L0 ${SHAPE_CONTAINER_LENGTH / 2}L${SHAPE_CONTAINER_LENGTH / 2} 0Z`
+    d: `M${dimensionSize / 2} 0L${dimensionSize} ${dimensionSize / 2}L${
+      dimensionSize / 2
+    } ${dimensionSize}L0 ${dimensionSize / 2}L${dimensionSize / 2} 0Z`
   })
 }
 
-function buildPentagon() {
-  const half = round(SHAPE_CONTAINER_LENGTH / 2, 2)
-  const alpha = round(0.3906 * SHAPE_CONTAINER_LENGTH, 2)
-  const beta = round(0.3433 * SHAPE_CONTAINER_LENGTH, 2)
+function buildPentagon(dimensionSize) {
+  const half = round(dimensionSize / 2, 2)
+  const alpha = round(0.3906 * dimensionSize, 2)
+  const beta = round(0.3433 * dimensionSize, 2)
 
   return createSvgElement('path', {
-    d: `M${half} 0L${SHAPE_CONTAINER_LENGTH} ${alpha}L${half + beta} ${SHAPE_CONTAINER_LENGTH}H${
+    d: `M${half} 0L${dimensionSize} ${alpha}L${half + beta} ${dimensionSize}H${
       half - beta
     }L0 ${alpha}L${half} 0L${half} 0Z`
   })
 }
 
-function buildHexagon() {
-  const leg = round(0.2895 * SHAPE_CONTAINER_LENGTH, 2)
+function buildHexagon(dimensionSize) {
+  const leg = round(0.2895 * dimensionSize, 2)
   return createSvgElement('path', {
-    d: `M${SHAPE_CONTAINER_LENGTH - leg} 0L${SHAPE_CONTAINER_LENGTH} ${
-      SHAPE_CONTAINER_LENGTH / 2
-    }L${SHAPE_CONTAINER_LENGTH - leg} ${SHAPE_CONTAINER_LENGTH}H${leg}L0 ${
-      SHAPE_CONTAINER_LENGTH / 2
-    }L${leg} 0H${SHAPE_CONTAINER_LENGTH - leg}Z`
+    d: `M${dimensionSize - leg} 0L${dimensionSize} ${dimensionSize / 2}L${
+      dimensionSize - leg
+    } ${dimensionSize}H${leg}L0 ${dimensionSize / 2}L${leg} 0H${dimensionSize - leg}Z`
   })
 }
 
-function buildOctagon() {
-  const leg = round(0.2895 * SHAPE_CONTAINER_LENGTH, 2)
-  const side = round(SHAPE_CONTAINER_LENGTH - 2 * leg, 2)
+function buildOctagon(dimensionSize) {
+  const leg = round(0.2895 * dimensionSize, 2)
+  const side = round(dimensionSize - 2 * leg, 2)
   return createSvgElement('path', {
-    d: `M0 ${leg}L${leg} 0H${leg + side}L${SHAPE_CONTAINER_LENGTH} ${leg}V${leg + side}L${
+    d: `M0 ${leg}L${leg} 0H${leg + side}L${dimensionSize} ${leg}V${leg + side}L${
       leg + side
-    } ${SHAPE_CONTAINER_LENGTH}H${leg}L0 ${leg + side}V${leg}Z`
+    } ${dimensionSize}H${leg}L0 ${leg + side}V${leg}Z`
   })
 }
 
-function buildStar() {
-  const half = round(SHAPE_CONTAINER_LENGTH / 2, 2)
-  const alpha = round(0.1143 * SHAPE_CONTAINER_LENGTH, 2)
-  const beta = round(0.3906 * SHAPE_CONTAINER_LENGTH, 2)
-  const gamma = round(0.1779 * SHAPE_CONTAINER_LENGTH, 2)
-  const delta = round(0.6042 * SHAPE_CONTAINER_LENGTH, 2)
-  const zeta = round(0.3433 * SHAPE_CONTAINER_LENGTH, 2)
-  const eta = round(0.7344 * SHAPE_CONTAINER_LENGTH, 2)
+function buildStar(dimensionSize) {
+  const half = round(dimensionSize / 2, 2)
+  const alpha = round(0.1143 * dimensionSize, 2)
+  const beta = round(0.3906 * dimensionSize, 2)
+  const gamma = round(0.1779 * dimensionSize, 2)
+  const delta = round(0.6042 * dimensionSize, 2)
+  const zeta = round(0.3433 * dimensionSize, 2)
+  const eta = round(0.7344 * dimensionSize, 2)
 
   return createSvgElement('path', {
-    d: `M${half} 0L${half + alpha} ${beta}H${SHAPE_CONTAINER_LENGTH}L${half + gamma} ${delta}L${
+    d: `M${half} 0L${half + alpha} ${beta}H${dimensionSize}L${half + gamma} ${delta}L${
       half + zeta
-    } ${SHAPE_CONTAINER_LENGTH}L${half} ${eta}L${half - zeta} ${SHAPE_CONTAINER_LENGTH}L${
+    } ${dimensionSize}L${half} ${eta}L${half - zeta} ${dimensionSize}L${
       half - gamma
     } ${delta}L0 ${beta}H${half - alpha}L${half} 0Z`
   })

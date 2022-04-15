@@ -113,6 +113,10 @@ const locale = {
   },
   "collaborations_5c56c15f": { "message": "الأعمال الجماعية" },
   "collapse_to_hide_types_1ab46d2e": { "message": "الطي لإخفاء { types }" },
+  "color_picker_6b359edf": { "message": "أداة انتقاء اللون" },
+  "color_picker_colorname_selected_ad4cf400": {
+    "message": "أداة انتقاء اللون (تم تحديد { colorName })"
+  },
   "computer_1d7dfa6f": { "message": "الكمبيوتر" },
   "content_1440204b": { "message": "المحتوى" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -159,7 +163,6 @@ const locale = {
   "describe_the_video_2fe8f46a": { "message": "(وصف الفيديو)" },
   "details_98a31b68": { "message": "التفاصيل" },
   "diamond_b8dfe7ae": { "message": "معيّن" },
-  "dimension_type_55c83e4e": { "message": "نوع البعد" },
   "dimensions_45ddb7b7": { "message": "الأبعاد" },
   "directionality_26ae9e08": { "message": "الاتجاهية" },
   "directly_edit_latex_b7e9235b": { "message": "تحرير LaTeX مباشرةً" },
@@ -188,6 +191,7 @@ const locale = {
   "edit_existing_button_icon_3d0277bd": {
     "message": "تحرير الزر الحالي / الأيقونة الحالية"
   },
+  "edit_icon_2c6b0e91": { "message": "تحرير الأيقونة" },
   "edit_link_7f53bebb": { "message": "تحرير الارتباط" },
   "editor_statusbar_26ac81fc": { "message": "شريط حالة المحرر" },
   "embed_828fac4a": { "message": "تضمين" },
@@ -311,6 +315,9 @@ const locale = {
   "magenta_4a65993c": { "message": "ماجنتا" },
   "math_icon_ad4e9d03": { "message": "أيقونة الرياضيات" },
   "media_af190855": { "message": "الوسائط" },
+  "media_file_is_processing_please_try_again_later_58a6d49": {
+    "message": "جارٍ معالجة ملف الوسائط. الرجاء إعادة المحاولة لاحقًا."
+  },
   "medium_5a8e9ead": { "message": "متوسط" },
   "middle_27dc1d5": { "message": "الأوسط" },
   "misc_3b692ea7": { "message": "متنوع" },
@@ -399,6 +406,9 @@ const locale = {
   "resize_ec83d538": { "message": "تغيير الحجم" },
   "restore_auto_save_deccd84b": { "message": "استعادة الحفظ التلقائي؟" },
   "rich_content_editor_2708ef21": { "message": "محرر محتوى" },
+  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+    "message": "مساحة النص المنسق اضغط على ALT+0 لاختصارات محرر المحتوى المنسق."
+  },
   "right_to_left_9cfb092a": { "message": "من اليمين إلى اليسار" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "للأسف، محرر HTML الأنيق لا يمكن الوصول إليه من خلال لوحة المفاتيح. قم بالوصول إلى محرر HTML الأنيق من هنا."
@@ -430,16 +440,7 @@ const locale = {
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "حدثت مشكلة ولا أعلم ماذا أعرض لك."
   },
-  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-    "message": "حدث خطأ ما، تفقد الاتصال الخاص بك وأعد المحاولة مجددًا."
-  },
   "something_went_wrong_d238c551": { "message": "حدث خطأ ما" },
-  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-    "message": "حدث خطأ ما، حاول مجدداً بعد تحديث الصفحة"
-  },
-  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-    "message": "حدث خطأ ما في التحميل، تحقق من الاتصال ثم حاول مجدداً."
-  },
   "sort_by_e75f9e3e": { "message": "الفزر حسب" },
   "square_511eb3b3": { "message": "مربع" },
   "square_unordered_list_b15ce93b": { "message": "قائمة مربعة غير مرتبة" },
@@ -506,9 +507,6 @@ const locale = {
   "upload_media_ce31135a": { "message": "تحميل الوسائط" },
   "upload_record_media_e4207d72": { "message": "تحميل/تسجيل الوسائط" },
   "uploading_19e8a4e7": { "message": "جارٍ التحميل" },
-  "uploading_closed_captions_subtitles_failed_bc093f3": {
-    "message": "تعذر تحميل التسميات التوضيحية/العناوين الفرعية."
-  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "قائمة أبجدية مرتبة بأحرف كبيرة"
   },

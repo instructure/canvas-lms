@@ -16,18 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import DateHelper from '@canvas/datetime/dateHelper'
 import React from 'react'
 import {render} from '@testing-library/react'
 import {PastMessages} from '../PastMessages'
-import {useScope as useI18nScope} from '@canvas/i18n'
-
-const I18n = useI18nScope('conversations_2')
-const dateOptions = {
-  month: 'short',
-  day: 'numeric',
-  hour: 'numeric',
-  minute: 'numeric'
-}
 
 describe('PastMessages', () => {
   it('renders past messages', () => {
@@ -81,9 +73,7 @@ describe('PastMessages', () => {
     const {getAllByText, getByText} = render(<PastMessages {...props} />)
 
     props.messages.forEach(message => {
-      const expectedDate = Intl.DateTimeFormat(I18n.currentLocale(), dateOptions).format(
-        new Date(message.createdAt)
-      )
+      const expectedDate = DateHelper.formatDatetimeForDiscussions(message.createdAt)
 
       expect(getAllByText(message.author.name).length > 0).toBe(true)
       expect(getByText(message.body)).toBeInTheDocument()

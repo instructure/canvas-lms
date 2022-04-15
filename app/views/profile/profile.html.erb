@@ -482,8 +482,8 @@ TEXT
           <th scope="col"><%= t('headers.application_abbrev', "App") %></th>
           <th scope="col"><%= t('headers.purpose', "Purpose") %></th>
           <th scope="col"><%= t('headers.dates', "Dates") %></th>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
+          <th scope="col"><%= t('headers.action', "Details") %></th>
+          <th scope="col"><%= t('headers.remove', "Remove") %></th>
         </tr>
       </thead>
       <tbody>
@@ -572,7 +572,6 @@ TEXT
               <%= f.text_field :permanent_expires_at,
                                class: "expires_field datetime_field",
                                style: "width: 120px;",
-                               "aria-labelledby" => "token_expires_at_accessible_label",
                                "aria-describedby" => "leave_blank_for_no_expiration",
                                "data-tooltip" => "{\"position\":\"top\",\"force_position\":\"true\"}",
                                title: accessible_date_format %>

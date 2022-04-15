@@ -131,8 +131,6 @@ describe Mutations::CreateLearningOutcome do
   end
 
   it "creates a learning outcome with individual ratings and calculation method" do
-    @domain_root_account.enable_feature!(:individual_outcome_rating_and_calculation)
-    @domain_root_account.enable_feature!(:improved_outcomes_management)
     @domain_root_account.disable_feature!(:account_level_mastery_scales)
 
     calculation_method = default_rating_variables[:calculation_method]
@@ -221,16 +219,7 @@ describe Mutations::CreateLearningOutcome do
       expect_error(result, "Argument 'groupId' on InputObject 'CreateLearningOutcomeInput' is required.")
     end
 
-    it "raises error when data includes individual ratings with IORC FF disabled" do
-      @course.root_account.disable_feature!(:individual_outcome_rating_and_calculation)
-      @course.root_account.disable_feature!(:account_level_mastery_scales)
-
-      result = execute_with_input "#{variables},#{rating_variables}"
-      expect_error(result, "individual ratings data input with invidual_outcome_rating_and_calculation FF disabled")
-    end
-
-    it "raises error when data includes individual ratings with both IORC and ALMS FFs enabled" do
-      @course.root_account.enable_feature!(:individual_outcome_rating_and_calculation)
+    it "raises error when data includes individual ratings with account_level_mastery_scales FF enabled" do
       @course.root_account.enable_feature!(:account_level_mastery_scales)
 
       result = execute_with_input "#{variables},#{rating_variables}"

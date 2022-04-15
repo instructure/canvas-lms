@@ -31,71 +31,66 @@ import MicrosoftSyncButton from './microsoft_sync/MicrosoftSyncButton'
 const I18n = useI18nScope('course_settings')
 
 const Integrations = () => {
+  const anyIntegrationsAvailable = ENV.MSFT_SYNC_ENABLED
+  if (!anyIntegrationsAvailable) {
+    return (
+      <Flex justifyItems="space-around">
+        <Flex.Item margin="medium 0 0 0">
+          <Text size="x-large" color="secondary" weight="bold">
+            {I18n.t('No integrations available')}
+          </Text>
+        </Flex.Item>
+      </Flex>
+    )
+  }
+
   const [msGroup, msEnabled, msLoading, msError, msToggleEnabled, setMSError, setMSGroup] =
     useMicrosoftSettings(ENV.COURSE_ID)
 
   const [msExpanded, setMSExpanded] = useState(!!msError)
   const [msInfo, setMSInfo] = useState()
-  const anyIntegrationsAvailable = ENV.MSFT_SYNC_ENABLED
 
   return (
     <>
       <h2>{I18n.t('Integrations')}</h2>
-      {anyIntegrationsAvailable ? (
-        <>
-          <View
-            as="div"
-            borderWidth="none none small none"
-            borderColor="primary"
-            padding="none small"
-          >
-            <Flex justifyItems="space-between">
-              <Flex.Item>
-                <Text size="large">{I18n.t('Feature')}</Text>
-              </Flex.Item>
-              <Flex.Item>
-                <Text size="large">{I18n.t('State')}</Text>
-              </Flex.Item>
-            </Flex>
-          </View>
-          <IntegrationRow
-            name={I18n.t('Microsoft Sync')}
-            available={ENV.MSFT_SYNC_ENABLED}
-            enabled={msEnabled}
-            loading={msLoading}
-            onChange={() => {
-              if (!msEnabled) {
-                setMSExpanded(true)
-              }
-              msToggleEnabled()
-            }}
-            error={msError}
-            info={msInfo}
-            expanded={msExpanded}
-            onToggle={() => setMSExpanded(expanded => !expanded)}
-          >
-            <MicrosoftSync group={msGroup} loading={msLoading}>
-              <MicrosoftSyncButton
-                courseId={ENV.COURSE_ID}
-                enabled={msEnabled}
-                group={msGroup}
-                error={msError}
-                onError={setMSError}
-                onInfo={setMSInfo}
-                onSuccess={setMSGroup}
-              />
-            </MicrosoftSync>
-          </IntegrationRow>
-        </>
-      ) : (
-        <Flex justifyItems="space-around">
-          <Flex.Item margin="medium 0 0 0">
-            <Text size="x-large" color="secondary" weight="bold">
-              {I18n.t('No integrations available')}
-            </Text>
+      <View as="div" borderWidth="none none small none" borderColor="primary" padding="none small">
+        <Flex justifyItems="space-between">
+          <Flex.Item>
+            <Text size="large">{I18n.t('Feature')}</Text>
+          </Flex.Item>
+          <Flex.Item>
+            <Text size="large">{I18n.t('State')}</Text>
           </Flex.Item>
         </Flex>
-      )}
+      </View>
+      <IntegrationRow
+        name={I18n.t('Microsoft Sync')}
+        available={ENV.MSFT_SYNC_ENABLED}
+        enabled={msEnabled}
+        loading={msLoading}
+        onChange={() => {
+          if (!msEnabled) {
+            setMSExpanded(true)
+          }
+          msToggleEnabled()
+        }}
+        error={msError}
+        info={msInfo}
+        expanded={msExpanded}
+        onToggle={() => setMSExpanded(expanded => !expanded)}
+      >
+        <MicrosoftSync group={msGroup} loading={msLoading}>
+          <MicrosoftSyncButton
+            courseId={ENV.COURSE_ID}
+            enabled={msEnabled}
+            group={msGroup}
+            error={msError}
+            onError={setMSError}
+            onInfo={setMSInfo}
+            onSuccess={setMSGroup}
+          />
+        </MicrosoftSync>
+      </IntegrationRow>
     </>
   )
 }

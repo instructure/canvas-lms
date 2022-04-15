@@ -31,7 +31,7 @@ import {
   IconCalendarReservedLine
 } from '@instructure/ui-icons'
 import {ApplyTheme} from '@instructure/ui-themeable'
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Menu} from '@instructure/ui-menu'
@@ -61,6 +61,7 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import ImportantDates from './ImportantDates'
 import ObserverOptions, {ObservedUsersListShape} from '@canvas/observer-picker'
 import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
+import {fetchShowK5Dashboard} from '@canvas/observer-picker/react/utils'
 
 const I18n = useI18nScope('k5_dashboard')
 
@@ -147,7 +148,8 @@ export const K5Dashboard = ({
   observedUsersList,
   canAddObservee,
   openTodosInNewTab,
-  loadingOpportunities
+  loadingOpportunities,
+  observerPickerEnabled
 }) => {
   const initialObservedId = observedUsersList.find(o => o.id === savedObservedId(currentUser.id))
     ? savedObservedId(currentUser.id)
@@ -193,11 +195,27 @@ export const K5Dashboard = ({
     }
   }
 
+  const updateDashboardForObserverCallback = id => {
+    setCardDashboardLoader(null)
+    setCardsSettled(false)
+    setObservedUserId(id)
+  }
+
   const handleChangeObservedUser = id => {
     if (id !== observedUserId) {
-      setCardDashboardLoader(null)
-      setCardsSettled(false)
-      setObservedUserId(id)
+      if (observerPickerEnabled) {
+        fetchShowK5Dashboard(id)
+          .then(isK5User => {
+            if (isK5User) {
+              updateDashboardForObserverCallback(id)
+            } else {
+              window.location.reload()
+            }
+          })
+          .catch(err => showFlashError(I18n.t('Unable to switch students'))(err))
+      } else {
+        updateDashboardForObserverCallback(id)
+      }
     }
   }
 
@@ -208,7 +226,6 @@ export const K5Dashboard = ({
       dcl.loadCardDashboard(loadCardDashboardCallBack, observerMode ? observedUserId : undefined)
       setCardDashboardLoader(dcl)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [observedUserId, observerMode])
 
   useFetchApi({
@@ -428,7 +445,8 @@ K5Dashboard.propTypes = {
   selectedContextsLimit: PropTypes.number.isRequired,
   observedUsersList: ObservedUsersListShape.isRequired,
   canAddObservee: PropTypes.bool.isRequired,
-  openTodosInNewTab: PropTypes.bool.isRequired
+  openTodosInNewTab: PropTypes.bool.isRequired,
+  observerPickerEnabled: PropTypes.bool.isRequired
 }
 
 const WrappedK5Dashboard = connect(mapStateToProps)(responsiviser()(K5Dashboard))

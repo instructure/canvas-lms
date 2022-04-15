@@ -27,6 +27,7 @@ import React from 'react'
 import waitForApolloLoading from '../../../../util/waitForApolloLoading'
 import {responsiveQuerySizes} from '../../../../util/utils'
 import {render, fireEvent} from '@testing-library/react'
+import {ConversationContext} from '../../../../util/constants'
 
 jest.mock('../../../../util/utils', () => ({
   ...jest.requireActual('../../../../util/utils'),
@@ -64,76 +65,144 @@ describe('MessageDetailContainer', () => {
     fetchMock.enableMocks()
   })
 
-  const mockConversation = Conversation.mock()
-  const setup = overrideProps => {
-    return render(
+  const setup = ({
+    conversation = Conversation.mock(),
+    isSubmissionCommentsType = false,
+    onReply = jest.fn(),
+    onReplyAll = jest.fn(),
+    onDelete = jest.fn(),
+    onForward = jest.fn(),
+    overrideProps = {}
+  } = {}) =>
+    render(
       <ApolloProvider client={mswClient}>
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
-          <MessageDetailContainer
-            conversation={mockConversation}
-            onReply={jest.fn()}
-            onReplyAll={jest.fn()}
-            onDelete={jest.fn()}
-            {...overrideProps}
-          />
+          <ConversationContext.Provider value={{isSubmissionCommentsType}}>
+            <MessageDetailContainer
+              conversation={conversation}
+              onReply={onReply}
+              onReplyAll={onReplyAll}
+              onDelete={onDelete}
+              onForward={onForward}
+              {...overrideProps}
+            />
+          </ConversationContext.Provider>
         </AlertManagerContext.Provider>
       </ApolloProvider>
     )
-  }
 
-  describe('rendering', () => {
-    it('should render', () => {
-      const container = setup()
-      expect(container).toBeTruthy()
+  describe('conversation messages', () => {
+    const mockConversation = Conversation.mock()
+    describe('rendering', () => {
+      it('should render', () => {
+        const container = setup()
+        expect(container).toBeTruthy()
+      })
+
+      it('should render conversation information correctly', async () => {
+        const container = setup()
+        expect(container.getByText('Loading Conversation Messages')).toBeInTheDocument()
+        await waitForApolloLoading()
+
+        expect(await container.findByTestId('message-detail-header-desktop')).toBeInTheDocument()
+        expect(
+          await container.findByText(mockConversation.conversationMessagesConnection.nodes[1].body)
+        ).toBeInTheDocument()
+      })
     })
 
-    it('should render conversation information correctly', async () => {
-      const container = setup()
-      expect(container.getByText('Loading Conversation Messages')).toBeInTheDocument()
-      await waitForApolloLoading()
+    describe('function inputs', () => {
+      it('should delete with correct conversation ID', async () => {
+        const mockConvoDelete = jest.fn()
+        const container = setup({onDelete: mockConvoDelete})
+        await waitForApolloLoading()
 
-      expect(await container.findByTestId('message-detail-header-desktop')).toBeInTheDocument()
-      expect(
-        await container.findByText(mockConversation.conversationMessagesConnection.nodes[1].body)
-      ).toBeInTheDocument()
+        const moreOptionsButton = await container.findByTestId('more-options')
+        fireEvent.click(moreOptionsButton)
+        fireEvent.click(container.getByText('Delete'))
+        expect(mockConvoDelete).toHaveBeenCalledWith([mockConversation._id])
+      })
+
+      it('should reply with correct message', async () => {
+        const mockOnReply = jest.fn()
+        const container = setup({onReply: mockOnReply})
+        await waitForApolloLoading()
+
+        const replyButtons = await container.findAllByTestId('message-reply')
+        fireEvent.click(replyButtons[1])
+        expect(mockOnReply.mock.calls[0][0]._id).toBe(
+          mockConversation.conversationMessagesConnection.nodes[1]._id
+        )
+      })
+
+      it('should forward with correct message', async () => {
+        const mockOnForward = jest.fn()
+        const container = setup({onForward: mockOnForward})
+        await waitForApolloLoading()
+
+        const moreOptionsButtons = await container.findAllByTestId('message-more-options')
+        fireEvent.click(moreOptionsButtons[1])
+        fireEvent.click(container.getByText('Forward'))
+        expect(mockOnForward.mock.calls[0][0]._id).toBe(
+          mockConversation.conversationMessagesConnection.nodes[1]._id
+        )
+      })
+
+      it('should reply all with correct message', async () => {
+        const mockOnReplyAll = jest.fn()
+        const container = setup({onReplyAll: mockOnReplyAll})
+        await waitForApolloLoading()
+
+        const moreOptionsButtons = await container.findAllByTestId('message-more-options')
+        fireEvent.click(moreOptionsButtons[1])
+        fireEvent.click(container.getByText('Reply All'))
+        expect(mockOnReplyAll.mock.calls[0][0]._id).toBe(
+          mockConversation.conversationMessagesConnection.nodes[1]._id
+        )
+      })
     })
   })
 
-  describe('function inputs', () => {
-    it('should delete with correct conversation ID', async () => {
-      const mockConvoDelete = jest.fn()
-      const container = setup({onDelete: mockConvoDelete})
-      await waitForApolloLoading()
+  describe('submission comments', () => {
+    const mockSubmissionComment = {subject: 'mySubject', _id: '1'}
+    describe('rendering', () => {
+      it('should render', () => {
+        const container = setup({
+          isSubmissionCommentsType: true,
+          conversation: mockSubmissionComment
+        })
+        expect(container).toBeTruthy()
+      })
 
-      const moreOptionsButton = await container.findByTestId('more-options')
-      fireEvent.click(moreOptionsButton)
-      fireEvent.click(container.getByText('Delete'))
-      expect(mockConvoDelete).toHaveBeenCalledWith([mockConversation._id])
-    })
+      it('should render conversation information correctly', async () => {
+        const container = setup({
+          isSubmissionCommentsType: true,
+          conversation: mockSubmissionComment
+        })
+        expect(container.getByText('Loading Conversation Messages')).toBeInTheDocument()
+        await waitForApolloLoading()
 
-    it('should reply with correct message', async () => {
-      const mockOnReply = jest.fn()
-      const container = setup({onReply: mockOnReply})
-      await waitForApolloLoading()
+        expect(await container.findByTestId('message-detail-header-desktop')).toBeInTheDocument()
+        expect(await container.findByText('my student comment')).toBeInTheDocument()
+      })
 
-      const replyButtons = await container.findAllByTestId('message-reply')
-      fireEvent.click(replyButtons[1])
-      expect(mockOnReply).toHaveBeenCalledWith(
-        mockConversation.conversationMessagesConnection.nodes[1]
-      )
-    })
+      it('should not render reply option', async () => {
+        const container = setup({
+          isSubmissionCommentsType: true,
+          conversation: mockSubmissionComment
+        })
+        await waitForApolloLoading()
+        expect(container.queryByTestId('message-reply')).not.toBeInTheDocument()
+      })
 
-    it('should reply all with correct message', async () => {
-      const mockOnReplyAll = jest.fn()
-      const container = setup({onReplyAll: mockOnReplyAll})
-      await waitForApolloLoading()
-
-      const moreOptionsButtons = await container.findAllByTestId('message-more-options')
-      fireEvent.click(moreOptionsButtons[1])
-      fireEvent.click(container.getByText('Reply All'))
-      expect(mockOnReplyAll).toHaveBeenCalledWith(
-        mockConversation.conversationMessagesConnection.nodes[1]
-      )
+      it('should not render more options', async () => {
+        const container = setup({
+          isSubmissionCommentsType: true,
+          conversation: mockSubmissionComment
+        })
+        await waitForApolloLoading()
+        expect(container.queryByTestId('message-more-options')).not.toBeInTheDocument()
+      })
     })
   })
 })

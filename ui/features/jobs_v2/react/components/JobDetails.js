@@ -24,11 +24,14 @@ import {Text} from '@instructure/ui-text'
 import {Modal} from '@instructure/ui-modal'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
+import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
 const I18n = useI18nScope('jobs_v2')
 
-export default function JobDetails({job}) {
+export default function JobDetails({job, timeZone}) {
   const [openModal, setOpenModal] = useState('')
+
+  const formatDate = useDateTimeFormat('date.formats.full_compact', timeZone)
 
   const renderRow = useCallback(
     (title, attr, timestamp) => {
@@ -36,14 +39,12 @@ export default function JobDetails({job}) {
         return (
           <Table.Row>
             <Table.RowHeader>{title}</Table.RowHeader>
-            <Table.Cell>
-              {job[attr] && timestamp ? I18n.l('date.formats.date_at_time', job[attr]) : job[attr]}
-            </Table.Cell>
+            <Table.Cell>{job[attr] && timestamp ? formatDate(job[attr]) : job[attr]}</Table.Cell>
           </Table.Row>
         )
       }
     },
-    [job]
+    [formatDate, job]
   )
 
   const renderModalRow = useCallback(

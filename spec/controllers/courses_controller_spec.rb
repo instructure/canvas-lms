@@ -1909,6 +1909,49 @@ describe CoursesController do
         expect(assigns[:js_env][:COURSE][:latest_announcement][:title]).to eq "Hello students"
       end
     end
+
+    context "when logged in as an observer with multiple student associations" do
+      before do
+        @student2 = User.create!
+        @course.enroll_user(@student2, "StudentEnrollment", enrollment_state: "active")
+
+        @observer = User.create!
+        @course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @student.id)
+        @course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @student2.id)
+        user_session(@observer)
+      end
+
+      it "sets context_enrollment using first enrollment" do
+        get :show, params: { id: @course.id }
+        enrollment = assigns[:context_enrollment]
+        expect(enrollment.is_a?(ObserverEnrollment)).to be true
+        expect(enrollment.user_id).to eq @observer.id
+        expect(enrollment.associated_user_id).to eq @student.id
+      end
+
+      context "when observer_picker and a2 observer view is enabled" do
+        before do
+          Account.site_admin.enable_feature!(:observer_picker)
+          Setting.set("assignments_2_observer_view", "true")
+        end
+
+        it "sets context_enrollment using selected observed user" do
+          cookies["#{ObserverEnrollmentsHelper::OBSERVER_COOKIE_PREFIX}#{@observer.id}"] = @student2.id
+          get :show, params: { id: @course.id }
+          enrollment = assigns[:context_enrollment]
+          expect(enrollment.is_a?(ObserverEnrollment)).to be true
+          expect(enrollment.user_id).to eq @observer.id
+          expect(enrollment.associated_user_id).to eq @student2.id
+        end
+
+        it "sets js_env variables" do
+          get :show, params: { id: @course.id }
+          expect(assigns[:js_env]).to have_key(:OBSERVER_OPTIONS)
+          expect(assigns[:js_env][:OBSERVER_OPTIONS][:OBSERVED_USERS_LIST].is_a?(Array)).to be true
+          expect(assigns[:js_env][:OBSERVER_OPTIONS][:CAN_ADD_OBSERVEE]).to be false
+        end
+      end
+    end
   end
 
   describe "POST 'unenroll_user'" do
@@ -2602,8 +2645,27 @@ describe CoursesController do
     end
 
     it "lets admins without course edit rights update only the syllabus body" do
+      @course.root_account.disable_feature!(:granular_permissions_manage_course_content)
       role = custom_account_role("grade viewer", account: Account.default)
       account_admin_user_with_role_changes(role: role, role_changes: { manage_content: true })
+      user_session(@user)
+
+      name = "some name"
+      body = "some body"
+      put "update", params: { id: @course.id, course: { name: name, syllabus_body: body } }
+
+      @course.reload
+      expect(@course.name).to_not eq name
+      expect(@course.syllabus_body).to eq body
+    end
+
+    it "lets admins without course edit rights update only the syllabus body (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_course_content)
+      role = custom_account_role("grade viewer", account: Account.default)
+      account_admin_user_with_role_changes(
+        role: role,
+        role_changes: { manage_course_content_edit: true }
+      )
       user_session(@user)
 
       name = "some name"
@@ -2805,6 +2867,13 @@ describe CoursesController do
         expect(response.body).to include "Cannot have a blueprint course with students"
       end
 
+      it "does not allow a course with observers to be set as a master course" do
+        observer_in_course
+        put "update", params: { id: @course.id, course: { blueprint: "1" } }, format: "json"
+        expect(response.status).to eq 400
+        expect(response.body).to include "Cannot have a blueprint course with observers"
+      end
+
       it "does not allow a minion course to be set as a master course" do
         c1 = @course
         c2 = course_factory
@@ -2915,6 +2984,34 @@ describe CoursesController do
 
       # if the sync job runs, we'll know because restrict_enrollments_to_course_dates will be synced as true
       expect(subject.reload.restrict_enrollments_to_course_dates).to be_falsey
+    end
+
+    context "course paces" do
+      before do
+        @course.account.enable_feature!(:course_paces)
+        @course.enable_course_paces = true
+        @course.restrict_enrollments_to_course_dates = true
+        @course.save!
+        @course_pace = course_pace_model(course: @course)
+      end
+
+      it "republishes course paces when dates have changed" do
+        user_session(@teacher)
+        put "update", params: { id: @course.id, course: { start_at: 1.day.from_now } }
+        expect(Progress.find_by(context: @course_pace)).to be_queued
+        Progress.destroy_all
+        put "update", params: { id: @course.id, course: { conclude_at: 1.year.from_now } }
+        expect(Progress.find_by(context: @course_pace)).to be_queued
+        Progress.destroy_all
+        put "update", params: { id: @course.id, course: { restrict_enrollments_to_course_dates: false } }
+        expect(Progress.find_by(context: @course_pace)).to be_queued
+      end
+
+      it "does not republish course paces when dates have not changed" do
+        user_session(@teacher)
+        put "update", params: { id: @course.id, course: { name: "course paces" } }
+        expect(Progress.find_by(context: @course_pace)).to be_nil
+      end
     end
   end
 

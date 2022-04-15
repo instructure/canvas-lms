@@ -125,6 +125,10 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Свернуть, чтобы скрыть { types }"
   },
+  "color_picker_6b359edf": { "message": "Селектор цвета" },
+  "color_picker_colorname_selected_ad4cf400": {
+    "message": "Селектор цвета (выбрано { colorName })"
+  },
   "computer_1d7dfa6f": { "message": "Компьютер" },
   "content_1440204b": { "message": "Содержимое" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -173,7 +177,6 @@ const locale = {
   "describe_the_video_2fe8f46a": { "message": "(опишите видео)" },
   "details_98a31b68": { "message": "Подробные сведения" },
   "diamond_b8dfe7ae": { "message": "Ромб" },
-  "dimension_type_55c83e4e": { "message": "Тип измерения" },
   "dimensions_45ddb7b7": { "message": "Размеры" },
   "directionality_26ae9e08": { "message": "Направленность" },
   "directly_edit_latex_b7e9235b": {
@@ -202,6 +205,7 @@ const locale = {
   "edit_existing_button_icon_3d0277bd": {
     "message": "Редактировать существующую кнопку / значок"
   },
+  "edit_icon_2c6b0e91": { "message": "Редактировать значок" },
   "edit_link_7f53bebb": { "message": "Редактировать ссылку" },
   "editor_statusbar_26ac81fc": { "message": "Панель состояния редактора" },
   "embed_828fac4a": { "message": "Вставить" },
@@ -341,6 +345,9 @@ const locale = {
   "magenta_4a65993c": { "message": "Пурпурный" },
   "math_icon_ad4e9d03": { "message": "Значок математики" },
   "media_af190855": { "message": "Мультимедиа" },
+  "media_file_is_processing_please_try_again_later_58a6d49": {
+    "message": "Выполняется обработка файла мультимедиа. Попробуйте еще раз позже."
+  },
   "medium_5a8e9ead": { "message": "Средний" },
   "middle_27dc1d5": { "message": "Середина" },
   "misc_3b692ea7": { "message": "Различное" },
@@ -441,6 +448,9 @@ const locale = {
   "rich_content_editor_2708ef21": {
     "message": "Редактор форматированного текста"
   },
+  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+    "message": "Область форматированного текста. Нажмите ALT+0 для отображения клавиш быстрого доступа редактора форматированного содержимого."
+  },
   "right_to_left_9cfb092a": { "message": "Справа налево" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "К сожалению, возможность доступа к редактору Pretty HTML с клавиатуры отсутствует. Обратитесь к редактору Raw HTML здесь."
@@ -472,16 +482,7 @@ const locale = {
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Что-то пошло не так, и я не знаю, что вам показать."
   },
-  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-    "message": "Что-то пошло не так, проверьте подключение и попробуйте еще раз."
-  },
   "something_went_wrong_d238c551": { "message": "Что-то пошло не так" },
-  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-    "message": "Что-то пошло не так, обновите страницу и попробуйте еще раз"
-  },
-  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-    "message": "Что пошло не так при загрузке, проверьте подключение и попробуйте еще раз."
-  },
   "sort_by_e75f9e3e": { "message": "Сортировать по" },
   "square_511eb3b3": { "message": "Квадрат" },
   "square_unordered_list_b15ce93b": {
@@ -554,9 +555,6 @@ const locale = {
   "upload_media_ce31135a": { "message": "Загрузить медиа" },
   "upload_record_media_e4207d72": { "message": "Загрузить/записать медиа" },
   "uploading_19e8a4e7": { "message": "Загрузка" },
-  "uploading_closed_captions_subtitles_failed_bc093f3": {
-    "message": "Загрузить закрытые надписи/субтитры не удалось."
-  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "упорядоченный алфавитный список в верхнем регистре"
   },

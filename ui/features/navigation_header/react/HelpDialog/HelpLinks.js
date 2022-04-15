@@ -66,15 +66,15 @@ export default function HelpLinks({links, hasLoaded, onClick}) {
               <List.Item key={`link-${link.id}`}>
                 <Flex justifyItems="space-between" alignItems="center">
                   <Flex.Item size={has_new_tag ? '80%' : '100%'}>
-                    <Link
-                      isWithinText={false}
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener"
+                    <span
+                      role="presentation"
                       onClick={handleClick(link)}
+                      onKeyPress={handleClick(link)}
                     >
-                      {link.text}
-                    </Link>
+                      <Link isWithinText={false} href={link.url} target="_blank" rel="noopener">
+                        {link.text}
+                      </Link>
+                    </span>
                     {has_new_tag && <ScreenReaderContent>{I18n.t('New')}</ScreenReaderContent>}
                     {link.subtext && (
                       <Text as="div" size="small">

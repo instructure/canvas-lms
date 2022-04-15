@@ -19,7 +19,6 @@
 import React, {useCallback, useEffect} from 'react'
 import {connect} from 'react-redux'
 import moment from 'moment-timezone'
-// @ts-ignore: TS doesn't understand i18n scoped imports
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -62,7 +61,7 @@ type DispatchProps = {
   readonly setEndDate: typeof actions.setEndDate
   compressDates: typeof actions.compressDates
   uncompressDates: typeof actions.uncompressDates
-  readonly toggleHardEndDates: typeof actions.toggleHardEndDates
+  readonly onToggleHardEndDates: typeof actions.onToggleHardEndDates
 }
 
 type ComponentProps = StoreProps & DispatchProps
@@ -82,7 +81,7 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
   setEndDate,
   compressDates,
   uncompressDates,
-  toggleHardEndDates,
+  onToggleHardEndDates,
   showProjections,
   blackoutDates,
   weekendsDisabled
@@ -231,7 +230,7 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
               checked={coursePace.hard_end_dates}
               disabled={pacePublishing}
               onChange={() => {
-                toggleHardEndDates()
+                onToggleHardEndDates()
               }}
             />
           </Flex.Item>
@@ -297,5 +296,5 @@ export default connect(mapStateToProps, {
   setEndDate: actions.setEndDate,
   compressDates: actions.compressDates,
   uncompressDates: actions.uncompressDates,
-  toggleHardEndDates: actions.toggleHardEndDates
+  onToggleHardEndDates: actions.onToggleHardEndDates
 })(ProjectedDates)

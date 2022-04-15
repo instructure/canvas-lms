@@ -105,6 +105,10 @@ const locale = {
   "closed_captions_subtitles_e6aaa016": { "message": "关闭了字幕/说明" },
   "collaborations_5c56c15f": { "message": "协作" },
   "collapse_to_hide_types_1ab46d2e": { "message": "折叠以隐藏 { types }" },
+  "color_picker_6b359edf": { "message": "颜色选取器" },
+  "color_picker_colorname_selected_ad4cf400": {
+    "message": "颜色选取器（已选择 { colorName }）"
+  },
   "computer_1d7dfa6f": { "message": "计算机" },
   "content_1440204b": { "message": "内容" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -149,7 +153,6 @@ const locale = {
   "describe_the_video_2fe8f46a": { "message": "（视频说明）" },
   "details_98a31b68": { "message": "详情" },
   "diamond_b8dfe7ae": { "message": "菱形" },
-  "dimension_type_55c83e4e": { "message": "维度类型" },
   "dimensions_45ddb7b7": { "message": "尺寸" },
   "directionality_26ae9e08": { "message": "方向" },
   "directly_edit_latex_b7e9235b": { "message": "直接编辑 LaTeX" },
@@ -174,6 +177,7 @@ const locale = {
   "edit_c5fbea07": { "message": "编辑" },
   "edit_equation_f5279959": { "message": "编辑等式" },
   "edit_existing_button_icon_3d0277bd": { "message": "编辑现有按钮/图标" },
+  "edit_icon_2c6b0e91": { "message": "编辑图标" },
   "edit_link_7f53bebb": { "message": "编辑链接" },
   "editor_statusbar_26ac81fc": { "message": "编辑器状态栏" },
   "embed_828fac4a": { "message": "嵌入" },
@@ -285,6 +289,9 @@ const locale = {
   "magenta_4a65993c": { "message": "品红色" },
   "math_icon_ad4e9d03": { "message": "数学图标" },
   "media_af190855": { "message": "媒体" },
+  "media_file_is_processing_please_try_again_later_58a6d49": {
+    "message": "媒体文件正在处理中。请稍后再试。"
+  },
   "medium_5a8e9ead": { "message": "中等" },
   "middle_27dc1d5": { "message": "中间" },
   "misc_3b692ea7": { "message": "其他" },
@@ -367,6 +374,9 @@ const locale = {
   "resize_ec83d538": { "message": "调整大小" },
   "restore_auto_save_deccd84b": { "message": "是否恢复自动保存？" },
   "rich_content_editor_2708ef21": { "message": "富内容编辑器" },
+  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+    "message": "富文本区域。按 ALT+0 获取富内容编辑器快捷方式。"
+  },
   "right_to_left_9cfb092a": { "message": "从右至左" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "很抱歉，无法通过键盘访问精美 HTML 编辑器。在此处访问原始 HTML 编辑器"
@@ -396,16 +406,7 @@ const locale = {
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "出错了，我不知道该给您看些什么。"
   },
-  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-    "message": "遇到一些问题，请检查连接并重试。"
-  },
   "something_went_wrong_d238c551": { "message": "出了些问题" },
-  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-    "message": "出现错误，请刷新页面后重试"
-  },
-  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-    "message": "上传时出了些问题，请检查您的连接并重试。"
-  },
   "sort_by_e75f9e3e": { "message": "排序" },
   "square_511eb3b3": { "message": "方形" },
   "square_unordered_list_b15ce93b": { "message": "方形无序列表" },
@@ -472,9 +473,6 @@ const locale = {
   "upload_media_ce31135a": { "message": "上传媒体" },
   "upload_record_media_e4207d72": { "message": "上传/录制媒体" },
   "uploading_19e8a4e7": { "message": "正在上传" },
-  "uploading_closed_captions_subtitles_failed_bc093f3": {
-    "message": "无法上传已关闭的字幕/副标题。"
-  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "大写字母有序列表"
   },

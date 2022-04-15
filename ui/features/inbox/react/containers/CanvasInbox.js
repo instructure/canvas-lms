@@ -54,8 +54,11 @@ const CanvasInbox = () => {
   const [isForward, setIsForward] = useState(false)
   const [displayUnarchiveButton, setDisplayUnarchiveButton] = useState(false)
   const [multiselect, setMultiselect] = useState(false)
+  const [isSubmissionCommentsType, setIsSubmissionCommentsType] = useState(false)
   const [messageOpenEvent, setMessageOpenEvent] = useState(false)
   const userID = ENV.current_user_id?.toString()
+  const [urlUserRecipient, setUrlUserRecepient] = useState()
+  const [selectedIds, setSelectedIds] = useState([])
 
   const setFilterStateToCurrentWindowHash = () => {
     const validFilters = ['inbox', 'unread', 'starred', 'sent', 'archived', 'submission_comments']
@@ -73,11 +76,35 @@ const CanvasInbox = () => {
     if (isValidFilter) setScope(filterType)
   }
 
+  const setUrlUserRecepientFromUrlParam = () => {
+    const urlData = new URLSearchParams(window.location.search)
+    const userIdFromUrlData = urlData.get('user_id')
+    const userNameFromUrlData = urlData.get('user_name')
+    if (userIdFromUrlData && userNameFromUrlData) {
+      setUrlUserRecepient({
+        _id: userIdFromUrlData,
+        name: userNameFromUrlData,
+        commonCoursesInfo: [],
+        itemType: 'user'
+      })
+      setComposeModal(true)
+    }
+  }
+
   // Get initial filter settings and set listener
+  // also get initial recepient settings if it exists in the url
   useEffect(() => {
     setFilterStateToCurrentWindowHash()
+    setUrlUserRecepientFromUrlParam()
     window.addEventListener('hashchange', setFilterStateToCurrentWindowHash)
   }, [])
+
+  // pre-populate recepients if urlUserRecipientId exists
+  useEffect(() => {
+    if (urlUserRecipient) {
+      setSelectedIds([urlUserRecipient])
+    }
+  }, [urlUserRecipient])
 
   // Keep the url updated
   useEffect(() => {
@@ -85,11 +112,26 @@ const CanvasInbox = () => {
     window.location.hash = `#filter=type=${scope}${courseHash}`
   }, [courseFilter, scope])
 
+  // upon compose modal close, disregard url recipient going forward
+  useEffect(() => {
+    if (urlUserRecipient && !composeModal) {
+      setUrlUserRecepient(null)
+      setSelectedIds([])
+    }
+  }, [composeModal, urlUserRecipient])
+
+  // Keep the contextUpdated
+  useEffect(() => {
+    setIsSubmissionCommentsType(scope === 'submission_comments')
+  }, [scope])
+
   const conversationContext = {
     multiselect,
     setMultiselect,
     messageOpenEvent,
-    setMessageOpenEvent
+    setMessageOpenEvent,
+    isSubmissionCommentsType,
+    setIsSubmissionCommentsType
   }
 
   const updateSelectedConversations = conversations => {
@@ -97,6 +139,10 @@ const CanvasInbox = () => {
     setDeleteDisabled(conversations.length === 0)
     setArchiveDisabled(conversations.length === 0)
     setSelectedConversationMessage(null)
+  }
+
+  const onSelectedIdsChange = ids => {
+    setSelectedIds(ids)
   }
 
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -195,7 +241,8 @@ const CanvasInbox = () => {
     setComposeModal(true)
   }
 
-  const onForward = () => {
+  const onForward = ({conversationMessage = null} = {}) => {
+    setSelectedConversationMessage(conversationMessage)
     setIsForward(true)
     setComposeModal(true)
   }
@@ -207,7 +254,7 @@ const CanvasInbox = () => {
       setDisplayUnarchiveButton(false)
     } else {
       setDisplayUnarchiveButton(
-        selectedConversations[0].conversationParticipantsConnection?.nodes?.some(cp => {
+        selectedConversations[0].participants?.some(cp => {
           return cp.user._id === userID && cp.workflowState === 'archived'
         })
       )
@@ -229,144 +276,146 @@ const CanvasInbox = () => {
         }
       }}
       render={(responsiveProps, matches) => (
-        <div className="canvas-inbox-container">
-          <ConversationContext.Provider value={conversationContext}>
-            <Flex height="100vh" as="div" direction="column">
-              {(matches.includes('desktop') ||
-                (matches.includes('mobile') && !selectedConversations.length) ||
-                multiselect) && (
-                <Flex.Item
-                  data-testid={
-                    matches.includes('desktop')
-                      ? 'desktop-message-action-header'
-                      : 'mobile-message-action-header'
-                  }
-                >
-                  <MessageListActionContainer
-                    activeMailbox={scope}
-                    activeCourseFilter={courseFilter}
-                    onSelectMailbox={newScope => {
-                      setSelectedConversations([])
-                      setScope(newScope)
-                    }}
-                    onCourseFilterSelect={course => {
-                      setSelectedConversations([])
-                      setCourseFilter(course)
-                    }}
-                    onUserFilterSelect={userIDFilter => {
-                      setUserFilter(userIDFilter)
-                    }}
-                    selectedConversations={selectedConversations}
-                    onCompose={() => setComposeModal(true)}
-                    onReply={() => onReply()}
-                    onReplyAll={() => onReply({replyAll: true})}
-                    onForward={() => onForward()}
-                    deleteDisabled={deleteDisabled}
-                    deleteToggler={setDeleteDisabled}
-                    archiveDisabled={archiveDisabled}
-                    archiveToggler={setArchiveDisabled}
-                    onConversationRemove={removeFromSelectedConversations}
-                    displayUnarchiveButton={displayUnarchiveButton}
-                    conversationsQueryOptions={conversationsQueryOption}
-                    onDelete={handleDelete}
-                  />
-                </Flex.Item>
-              )}
-              <Flex.Item shouldGrow shouldShrink>
-                <Flex height="100%" as="div" align="center" justifyItems="center">
-                  {(matches.includes('desktop') ||
-                    (matches.includes('mobile') && !selectedConversations.length) ||
-                    multiselect) && (
-                    <Flex.Item width={responsiveProps.conversationListWidth} height="100%">
-                      <ConversationListContainer
-                        course={courseFilter}
-                        userFilter={userFilter}
-                        scope={scope}
-                        onSelectConversation={updateSelectedConversations}
-                      />
-                    </Flex.Item>
-                  )}
-                  {(matches.includes('desktop') ||
-                    (matches.includes('mobile') &&
-                      selectedConversations.length > 0 &&
-                      !multiselect)) && (
-                    <Flex.Item
-                      shouldGrow
-                      shouldShrink
-                      height="100%"
-                      overflowY="auto"
-                      margin={responsiveProps.messageDetailMargin}
-                    >
-                      {selectedConversations.length > 0 ? (
-                        <>
-                          {matches.includes('mobile') && (
-                            <View as="div" borderWidth="none none small none">
-                              <Flex>
-                                <Flex.Item shouldGrow border>
-                                  <CondensedButton
-                                    data-testid="message-detail-back-button"
-                                    renderIcon={<IconArrowOpenStartLine size="x-small" />}
-                                    onClick={() => {
-                                      setSelectedConversations([])
-                                    }}
-                                  >
-                                    <Text>{I18n.t('Back')}</Text>
-                                  </CondensedButton>
-                                </Flex.Item>
-                                <Flex.Item>
-                                  <IconButton
-                                    shape="rectangle"
-                                    screenReaderLabel="Delete tag"
-                                    margin="small"
-                                    withBorder={false}
-                                    withBackground={false}
-                                    onClick={() => {
-                                      setSelectedConversations([])
-                                    }}
-                                  >
-                                    <IconXSolid />
-                                  </IconButton>
-                                </Flex.Item>
-                              </Flex>
-                            </View>
-                          )}
-                          <MessageDetailContainer
-                            conversation={selectedConversations[0]}
-                            onReply={conversationMessage => onReply({conversationMessage})}
-                            onReplyAll={conversationMessage =>
-                              onReply({conversationMessage, replyAll: true})
-                            }
-                            onDelete={handleDelete}
-                          />
-                        </>
-                      ) : (
-                        <View padding="small">
-                          <NoSelectedConversation />
-                        </View>
-                      )}
-                    </Flex.Item>
-                  )}
-                </Flex>
+        <ConversationContext.Provider value={conversationContext}>
+          <Flex height="100vh" as="div" direction="column">
+            {(matches.includes('desktop') ||
+              (matches.includes('mobile') && !selectedConversations.length) ||
+              multiselect) && (
+              <Flex.Item
+                data-testid={
+                  matches.includes('desktop')
+                    ? 'desktop-message-action-header'
+                    : 'mobile-message-action-header'
+                }
+              >
+                <MessageListActionContainer
+                  activeMailbox={scope}
+                  activeCourseFilter={courseFilter}
+                  onSelectMailbox={newScope => {
+                    setSelectedConversations([])
+                    setScope(newScope)
+                  }}
+                  onCourseFilterSelect={course => {
+                    setSelectedConversations([])
+                    setCourseFilter(course)
+                  }}
+                  onUserFilterSelect={userIDFilter => {
+                    setUserFilter(userIDFilter)
+                  }}
+                  selectedConversations={selectedConversations}
+                  onCompose={() => setComposeModal(true)}
+                  onReply={() => onReply()}
+                  onReplyAll={() => onReply({replyAll: true})}
+                  onForward={() => onForward()}
+                  deleteDisabled={deleteDisabled}
+                  deleteToggler={setDeleteDisabled}
+                  archiveDisabled={archiveDisabled}
+                  archiveToggler={setArchiveDisabled}
+                  onConversationRemove={removeFromSelectedConversations}
+                  displayUnarchiveButton={displayUnarchiveButton}
+                  conversationsQueryOptions={conversationsQueryOption}
+                  onDelete={handleDelete}
+                />
               </Flex.Item>
-            </Flex>
-            <ComposeModalManager
-              conversation={selectedConversations[0]}
-              conversationMessage={selectedConversationMessage}
-              isReply={isReply}
-              isReplyAll={isReplyAll}
-              isForward={isForward}
-              onDismiss={() => {
-                setComposeModal(false)
-                setIsReply(false)
-                setIsReplyAll(false)
-                setIsForward(false)
-                setSelectedConversationMessage(null)
-              }}
-              open={composeModal}
-              conversationsQueryOption={conversationsQueryOption}
-            />
-          </ConversationContext.Provider>
-        </div>
+            )}
+            <Flex.Item shouldGrow shouldShrink>
+              <Flex height="100%" as="div" align="center" justifyItems="center">
+                {(matches.includes('desktop') ||
+                  (matches.includes('mobile') && !selectedConversations.length) ||
+                  multiselect) && (
+                  <Flex.Item width={responsiveProps.conversationListWidth} height="100%">
+                    <ConversationListContainer
+                      course={courseFilter}
+                      userFilter={userFilter}
+                      scope={scope}
+                      onSelectConversation={updateSelectedConversations}
+                    />
+                  </Flex.Item>
+                )}
+                {(matches.includes('desktop') ||
+                  (matches.includes('mobile') &&
+                    selectedConversations.length > 0 &&
+                    !multiselect)) && (
+                  <Flex.Item
+                    shouldGrow
+                    shouldShrink
+                    height="100%"
+                    overflowY="auto"
+                    margin={responsiveProps.messageDetailMargin}
+                  >
+                    {selectedConversations.length > 0 ? (
+                      <>
+                        {matches.includes('mobile') && (
+                          <View as="div" borderWidth="none none small none">
+                            <Flex>
+                              <Flex.Item shouldGrow border>
+                                <CondensedButton
+                                  data-testid="message-detail-back-button"
+                                  renderIcon={<IconArrowOpenStartLine size="x-small" />}
+                                  onClick={() => {
+                                    setSelectedConversations([])
+                                  }}
+                                >
+                                  <Text>{I18n.t('Back')}</Text>
+                                </CondensedButton>
+                              </Flex.Item>
+                              <Flex.Item>
+                                <IconButton
+                                  shape="rectangle"
+                                  screenReaderLabel="Delete tag"
+                                  margin="small"
+                                  withBorder={false}
+                                  withBackground={false}
+                                  onClick={() => {
+                                    setSelectedConversations([])
+                                  }}
+                                >
+                                  <IconXSolid />
+                                </IconButton>
+                              </Flex.Item>
+                            </Flex>
+                          </View>
+                        )}
+                        <MessageDetailContainer
+                          conversation={selectedConversations[0]}
+                          onReply={conversationMessage => onReply({conversationMessage})}
+                          onReplyAll={conversationMessage =>
+                            onReply({conversationMessage, replyAll: true})
+                          }
+                          onDelete={handleDelete}
+                          onForward={conversationMessage => onForward({conversationMessage})}
+                          scope={scope}
+                        />
+                      </>
+                    ) : (
+                      <View padding="small">
+                        <NoSelectedConversation />
+                      </View>
+                    )}
+                  </Flex.Item>
+                )}
+              </Flex>
+            </Flex.Item>
+          </Flex>
+          <ComposeModalManager
+            conversation={selectedConversations[0]}
+            conversationMessage={selectedConversationMessage}
+            isReply={isReply}
+            isReplyAll={isReplyAll}
+            isForward={isForward}
+            onDismiss={() => {
+              setComposeModal(false)
+              setIsReply(false)
+              setIsReplyAll(false)
+              setIsForward(false)
+              setSelectedConversationMessage(null)
+            }}
+            open={composeModal}
+            conversationsQueryOption={conversationsQueryOption}
+            onSelectedIdsChange={onSelectedIdsChange}
+            selectedIds={selectedIds}
+          />
+        </ConversationContext.Provider>
       )}
     />
   )

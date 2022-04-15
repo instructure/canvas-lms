@@ -18,7 +18,7 @@
 
 import useFetchApi from '@canvas/use-fetch-api-hook'
 
-export default function useModuleCourseSearchApi(fetchApiOpts) {
+export default function useModuleCourseSearchApi(fetchApiOpts = {}) {
   const courseId = fetchApiOpts?.params?.contextId
   if (courseId) delete fetchApiOpts.params.contextId
   useFetchApi({

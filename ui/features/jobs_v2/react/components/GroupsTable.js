@@ -34,7 +34,8 @@ export default function GroupsTable({
   caption,
   sortColumn,
   onClickGroup,
-  onClickHeader
+  onClickHeader,
+  timeZone
 }) {
   const renderColHeader = useCallback(
     (attr, width, content) => {
@@ -57,8 +58,8 @@ export default function GroupsTable({
     <div>
       <Responsive
         query={{
-          small: {maxWidth: '60rem'},
-          large: {minWidth: '60rem'}
+          small: {maxWidth: '719px'},
+          large: {minWidth: '720px'}
         }}
         props={{
           small: {layout: 'stacked'},
@@ -84,7 +85,7 @@ export default function GroupsTable({
                     </Table.Cell>
                     <Table.Cell>{group.count}</Table.Cell>
                     <Table.Cell>
-                      <InfoColumn bucket={bucket} info={group.info} />
+                      <InfoColumn timeZone={timeZone} bucket={bucket} info={group.info} />
                     </Table.Cell>
                   </Table.Row>
                 )

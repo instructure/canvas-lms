@@ -273,10 +273,11 @@ class EntryView extends Backbone.View
   toggleLike: (e) ->
     e.preventDefault()
     @model.toggleLike()
+    
 
   renderRating: =>
     @$rateLink.toggleClass('discussion-rate-action--checked', !!@model.get('rating'))
-    @$rateLink.attr('aria-checked', if @model.get('rating') then 'true' else 'false')
+    @$rateLink.attr('aria-label', if @model.get('rating') then I18n.t('Unlike this Entry') else I18n.t('Like this Entry'))
 
   renderRatingSum: =>
     @$ratingSum.text(@model.ratingString())

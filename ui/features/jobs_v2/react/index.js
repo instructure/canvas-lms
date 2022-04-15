@@ -17,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import React, {useCallback, useReducer, useEffect, useMemo} from 'react'
+import React, {useCallback, useReducer, useEffect, useMemo, useRef} from 'react'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import Paginator from '@canvas/instui-bindings/react/Paginator'
 import JobsHeader from './components/JobsHeader'
@@ -27,139 +27,23 @@ import JobDetails from './components/JobDetails'
 import SearchBox from './components/SearchBox'
 import JobLookup from './components/JobLookup'
 import SectionRefreshHeader from './components/SectionRefreshHeader'
+import {jobsReducer, initialState} from './reducer'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconXSolid} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import tz from '@canvas/timezone'
+import moment from 'moment-timezone'
 
 const I18n = useI18nScope('jobs_v2')
 const AUTO_REFRESH_INTERVAL = 5000
 
-function jobsReducer(prevState, action) {
-  if (action.type === 'CHANGE_BUCKET') {
-    return {
-      ...prevState,
-      bucket: action.payload,
-      groups: [],
-      jobs: [],
-      job: null,
-      groups_page: 1,
-      jobs_page: 1,
-      groups_page_count: 1,
-      jobs_page_count: 1
-    }
-  } else if (action.type === 'CHANGE_GROUP_TYPE') {
-    return {
-      ...prevState,
-      group_type: action.payload,
-      groups: [],
-      jobs: [],
-      job: null,
-      groups_page: 1,
-      jobs_page: 1,
-      groups_page_count: 1,
-      jobs_page_count: 1
-    }
-  } else if (action.type === 'CHANGE_GROUP_ORDER') {
-    return {...prevState, group_order: action.payload, groups: []}
-  } else if (action.type === 'GROUPS_LOADING') {
-    return {...prevState, groups_loading: action.payload}
-  } else if (action.type === 'REFRESH_GROUPS') {
-    return {...prevState, groups_refresh_nonce: prevState.groups_refresh_nonce + 1}
-  } else if (action.type === 'FETCHED_GROUPS') {
-    return {...prevState, groups: action.payload}
-  } else if (action.type === 'GROUP_METADATA') {
-    if (action.payload.link) {
-      const last = parseInt(action.payload.link.last.page, 10)
-      return {...prevState, groups_page_count: last}
-    }
-  } else if (action.type === 'CHANGE_GROUPS_PAGE') {
-    return {...prevState, groups_page: action.payload}
-  } else if (action.type === 'CHANGE_GROUP_TEXT') {
-    if (prevState.group_text !== action.payload) {
-      return {
-        ...prevState,
-        group_text: action.payload,
-        jobs: [],
-        job: null,
-        jobs_page: 1,
-        jobs_page_count: 1
-      }
-    } else {
-      return prevState
-    }
-  } else if (action.type === 'CHANGE_JOBS_ORDER') {
-    return {...prevState, jobs_order: action.payload, jobs: [], job: null}
-  } else if (action.type === 'JOBS_LOADING') {
-    return {...prevState, jobs_loading: action.payload}
-  } else if (action.type === 'REFRESH_JOBS') {
-    return {...prevState, jobs_refresh_nonce: prevState.jobs_refresh_nonce + 1}
-  } else if (action.type === 'FETCHED_JOBS') {
-    const job = action.payload.find(j => j.id === prevState.job?.id) || prevState.job
-    return {...prevState, jobs: action.payload, job}
-  } else if (action.type === 'JOBS_METADATA') {
-    if (action.payload.link) {
-      const last = parseInt(action.payload.link.last.page, 10)
-      return {...prevState, jobs_page_count: last}
-    }
-  } else if (action.type === 'CHANGE_JOBS_PAGE') {
-    return {...prevState, jobs_page: action.payload}
-  } else if (action.type === 'SELECT_JOB') {
-    return {...prevState, job: action.payload}
-  } else if (action.type === 'CHANGE_SCOPE') {
-    return {
-      ...prevState,
-      groups: [],
-      jobs: [],
-      job: null,
-      groups_page: 1,
-      jobs_page: 1,
-      groups_page_count: 1,
-      jobs_page_count: 1,
-      scope: action.payload
-    }
-  } else if (action.type === 'TOGGLE_AUTO_REFRESH') {
-    if (prevState.auto_refresh) {
-      return {...prevState, auto_refresh: false}
-    } else {
-      return {
-        ...prevState,
-        auto_refresh: true,
-        groups_refresh_nonce: prevState.groups_refresh_nonce + 1,
-        jobs_refresh_nonce: prevState.jobs_refresh_nonce + 1
-      }
-    }
-  } else if (action.type === 'REFRESH_ALL') {
-    return {
-      ...prevState,
-      groups_refresh_nonce: prevState.groups_refresh_nonce + 1,
-      jobs_refresh_nonce: prevState.jobs_refresh_nonce + 1
-    }
-  }
-}
-
 export default function JobsIndex() {
-  const [state, dispatch] = useReducer(jobsReducer, {
-    bucket: 'running',
-    group_text: '',
-    group_type: 'tag',
-    group_order: 'info',
-    jobs_order: 'info',
-    groups: [],
-    jobs: [],
-    job: null,
-    jobs_loading: false,
-    jobs_page: 1,
-    jobs_page_count: 1,
-    jobs_refresh_nonce: 1,
-    groups_loading: false,
-    groups_page: 1,
-    groups_page_count: 1,
-    groups_refresh_nonce: 1,
-    scope: Object.keys(ENV.jobs_scope_filter)[0],
-    auto_refresh: false
-  })
+  const [state, dispatch] = useReducer(jobsReducer, initialState())
+
+  const jobListRef = useRef()
+  const jobDetailsRef = useRef()
 
   const bucketCaptions = useMemo(() => {
     return {
@@ -186,13 +70,28 @@ export default function JobsIndex() {
     }
   }, [])
 
+  const convertTimestamp = useCallback(
+    timestamp => {
+      if (!timestamp) return ''
+
+      // convert from the profile timezone
+      const plainDate = tz.format(timestamp, '%F %T')
+
+      // interpret in the selected timezone
+      return moment.tz(plainDate, state.time_zone).toISOString()
+    },
+    [state.time_zone]
+  )
+
   useFetchApi(
     {
       path: `/api/v1/jobs2/${state.bucket}/by_${state.group_type}`,
       params: {
         order: state.group_order,
         page: state.groups_page,
-        scope: state.scope
+        scope: state.scope,
+        start_date: convertTimestamp(state.start_date),
+        end_date: convertTimestamp(state.end_date)
       },
       loading: useCallback(loading => {
         dispatch({type: 'GROUPS_LOADING', payload: loading})
@@ -214,7 +113,9 @@ export default function JobsIndex() {
         [state.group_type]: state.group_text,
         order: state.jobs_order,
         page: state.jobs_page,
-        scope: state.scope
+        scope: state.scope,
+        start_date: convertTimestamp(state.start_date),
+        end_date: convertTimestamp(state.end_date)
       },
       loading: useCallback(loading => {
         dispatch({type: 'JOBS_LOADING', payload: loading})
@@ -254,6 +155,10 @@ export default function JobsIndex() {
         onChangeAutoRefresh={event =>
           dispatch({type: 'TOGGLE_AUTO_REFRESH', payload: event.target.value})
         }
+        startDate={state.start_date}
+        endDate={state.end_date}
+        timeZone={state.time_zone}
+        onChangeDateOptions={opts => dispatch({type: 'CHANGE_DATE_OPTIONS', payload: opts})}
       />
       <SectionRefreshHeader
         title={groupTitles[state.group_type]}
@@ -269,8 +174,12 @@ export default function JobsIndex() {
         bucket={state.bucket}
         caption={bucketCaptions[state.bucket]}
         sortColumn={state.group_order}
-        onClickGroup={text => dispatch({type: 'CHANGE_GROUP_TEXT', payload: text})}
+        onClickGroup={text => {
+          jobListRef.current?.scrollIntoView()
+          dispatch({type: 'CHANGE_GROUP_TEXT', payload: text})
+        }}
         onClickHeader={col => dispatch({type: 'CHANGE_GROUP_ORDER', payload: col})}
+        timeZone={state.time_zone}
       />
       {state.groups_page_count > 1 ? (
         <Paginator
@@ -280,7 +189,7 @@ export default function JobsIndex() {
           margin="small"
         />
       ) : null}
-      <Flex alignItems="end">
+      <Flex alignItems="end" elementRef={el => (jobListRef.current = el)}>
         <Flex.Item size="33%">
           <SectionRefreshHeader
             title={I18n.t('Jobs')}
@@ -316,8 +225,12 @@ export default function JobsIndex() {
         jobs={state.jobs}
         caption={bucketCaptions[state.bucket]}
         sortColumn={state.jobs_order}
-        onClickJob={job => dispatch({type: 'SELECT_JOB', payload: job})}
+        onClickJob={job => {
+          jobDetailsRef.current?.scrollIntoView()
+          dispatch({type: 'SELECT_JOB', payload: job})
+        }}
         onClickHeader={col => dispatch({type: 'CHANGE_JOBS_ORDER', payload: col})}
+        timeZone={state.time_zone}
       />
       {state.jobs_page_count > 1 ? (
         <Paginator
@@ -327,7 +240,7 @@ export default function JobsIndex() {
           margin="small"
         />
       ) : null}
-      <Flex alignItems="end">
+      <Flex alignItems="end" elementRef={el => (jobDetailsRef.current = el)}>
         <Flex.Item size="33%">
           <Heading level="h2" margin="x-large 0 small 0">
             {I18n.t('Details')}
@@ -352,7 +265,7 @@ export default function JobsIndex() {
           />
         </Flex.Item>
       </Flex>
-      <JobDetails job={state.job} />
+      <JobDetails job={state.job} timeZone={state.time_zone} />
     </>
   )
 }

@@ -14,7 +14,7 @@ There are two components to local development:
 
 ### Kinesis Stream
 
-To enabled Live Events, you need to configure the plugin in the /plugins
+To enable Live Events, you need to configure the plugin in the /plugins
 interface. If using the docker-compose dev setup, there is a "fake
 kinesis" available in docker-compose/kinesis.override.yml available for
 use. Once it's up, make sure you have the `aws` cli installed, and run

@@ -148,6 +148,58 @@ describe ContextModulesController do
         expect(controller.js_env[:DEFAULT_POST_TO_SIS]).to eq false
       end
     end
+
+    context "tool definitions for placements" do
+      subject { get "index", params: { course_id: @course.id } }
+
+      let(:tool) do
+        t = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
+        t.module_index_menu = { enabled: true, message_type: "LtiResourceLinkRequest" }
+        t.module_index_menu_modal = { enabled: true, message_type: "LtiDeepLinkingRequest" }
+        t.save!
+        t
+      end
+      let(:tool_definitions) { controller.js_env[:MODULE_TOOLS] }
+
+      before do
+        user_session(@teacher)
+        tool
+        subject
+      end
+
+      context "when commons favorites FF is off" do
+        it "ignores tray placement tools" do
+          expect(tool_definitions[:module_index_menu]).to eq []
+        end
+      end
+
+      context "when commons favorites FF is on" do
+        before :once do
+          @course.root_account.enable_feature! :commons_favorites
+        end
+
+        it "sends tray placement tool definitions" do
+          expect(tool_definitions[:module_index_menu].first[:id]).to eq tool.id
+        end
+      end
+
+      it "sends modal placement tool definitions" do
+        expect(tool_definitions[:module_index_menu_modal].first[:definition_id]).to eq tool.id
+      end
+
+      context "when tool does not have placement configured" do
+        let(:tool) do
+          t = super()
+          t.module_index_menu_modal = nil
+          t.save
+          t
+        end
+
+        it "is ignored" do
+          expect(tool_definitions[:module_index_menu_modal]).to eq []
+        end
+      end
+    end
   end
 
   describe "PUT 'update'" do

@@ -121,6 +121,10 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Inklappen om te verbergen { types }"
   },
+  "color_picker_6b359edf": { "message": "Kleurenkiezer" },
+  "color_picker_colorname_selected_ad4cf400": {
+    "message": "Kleurenkiezer ({ colorName } geselecteerd)"
+  },
   "computer_1d7dfa6f": { "message": "Computer" },
   "content_1440204b": { "message": "Inhoud" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -169,7 +173,6 @@ const locale = {
   "describe_the_video_2fe8f46a": { "message": "(beschrijf de video)" },
   "details_98a31b68": { "message": "Details" },
   "diamond_b8dfe7ae": { "message": "Diamant" },
-  "dimension_type_55c83e4e": { "message": "Afmetingstype" },
   "dimensions_45ddb7b7": { "message": "Afmetingen" },
   "directionality_26ae9e08": { "message": "richting" },
   "directly_edit_latex_b7e9235b": { "message": "LaTeX rechtstreeks bewerken" },
@@ -196,6 +199,7 @@ const locale = {
   "edit_existing_button_icon_3d0277bd": {
     "message": "Bestaande knop/pictogram bewerken"
   },
+  "edit_icon_2c6b0e91": { "message": "Pictogram Bewerken" },
   "edit_link_7f53bebb": { "message": "Link bewerken" },
   "editor_statusbar_26ac81fc": { "message": "Statusbalk van editor" },
   "embed_828fac4a": { "message": "Insluiten" },
@@ -335,6 +339,9 @@ const locale = {
   "magenta_4a65993c": { "message": "Magenta" },
   "math_icon_ad4e9d03": { "message": "Wiskundepictogram" },
   "media_af190855": { "message": "Media" },
+  "media_file_is_processing_please_try_again_later_58a6d49": {
+    "message": "Verwerken van mediabestand. Probeer het later opnieuw."
+  },
   "medium_5a8e9ead": { "message": "Medium" },
   "middle_27dc1d5": { "message": "Midden" },
   "misc_3b692ea7": { "message": "Diversen" },
@@ -431,6 +438,9 @@ const locale = {
     "message": "Automatisch opslaan herstellen?"
   },
   "rich_content_editor_2708ef21": { "message": "Rich Content Editor" },
+  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+    "message": "Rich Text-gebied. Druk op ALT+0 voor Rich Content Editor-sneltoetsen."
+  },
   "right_to_left_9cfb092a": { "message": "Rechts-links" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Jammer genoeg is de pretty HTML-editor niet toetsenbordtoegankelijk. Open de raw HTML-editor hier."
@@ -464,16 +474,7 @@ const locale = {
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Er is iets misgegaan en ik weet niet wat ik je moet laten zien."
   },
-  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-    "message": "Er is iets misgegaan. Controleer je verbinding en probeer het opnieuw."
-  },
   "something_went_wrong_d238c551": { "message": "Er is iets misgegaan" },
-  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-    "message": "Er is iets misgegaan. Vernieuw de pagina en probeer het opnieuw."
-  },
-  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-    "message": "Er is iets misgegaan met uploaden. Controleer je verbinding en probeer het opnieuw."
-  },
   "sort_by_e75f9e3e": { "message": "Sorteren op" },
   "square_511eb3b3": { "message": "Vierkant" },
   "square_unordered_list_b15ce93b": {
@@ -546,9 +547,6 @@ const locale = {
   "upload_media_ce31135a": { "message": "Media uploaden" },
   "upload_record_media_e4207d72": { "message": "Media uploaden/opnemen" },
   "uploading_19e8a4e7": { "message": "Bezig met uploaden" },
-  "uploading_closed_captions_subtitles_failed_bc093f3": {
-    "message": "Uploaden van bijschriften/ondertiteling is mislukt."
-  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "geordende lijst op hoofdletters alfabet"
   },

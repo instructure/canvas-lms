@@ -201,7 +201,6 @@ export default function Filter(props) {
         <IconButton
           screenReaderLabel={formatMessage('Clear')}
           onClick={handleClear}
-          interaction={isContentLoading ? 'disabled' : 'enabled'}
           withBorder={false}
           withBackground={false}
           size="small"
@@ -306,7 +305,6 @@ export default function Filter(props) {
               doSearch(pendingSearchString)
             }
           }}
-          interaction={isContentLoading ? 'readonly' : 'enabled'}
         />
       </View>
     </View>

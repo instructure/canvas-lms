@@ -48,6 +48,12 @@ module Utils
         expect(presenter.as_string).to eq("Jan 1 at 12pm")
       end
 
+      it "does not include an extra space in the returned time" do
+        time = Time.zone.parse("Tue, 14 Dec 2021 13:32:00 UTC +00:00")
+        presenter = DatetimeRangePresenter.new(time)
+        expect(presenter.as_string).to eq("Dec 14, 2021 at 1:32pm")
+      end
+
       describe "with shortened midnight" do
         around do |example|
           Timecop.freeze(Time.zone.local(2014, 10, 1, 9, 30), &example)
@@ -84,14 +90,14 @@ module Utils
         datetime = Time.zone.parse("#{Time.zone.now.year}-01-01 12:00:00")
         end_datetime = datetime.advance(hours: 1)
         presenter = DatetimeRangePresenter.new(datetime, end_datetime)
-        expect(presenter.as_string).to eq("Jan 1 from 12pm to  1pm")
+        expect(presenter.as_string).to eq("Jan 1 from 12pm to 1pm")
       end
 
       it "includes the year if the current year isn't the same" do
         Timecop.travel(Time.utc(2014, 10, 1, 9, 30)) do
           nextyear = Time.zone.now.advance(years: 1)
           presenter = DatetimeRangePresenter.new(nextyear)
-          expect(presenter.as_string).to eq("Oct 1, 2015 at  9:30am")
+          expect(presenter.as_string).to eq("Oct 1, 2015 at 9:30am")
         end
       end
 
@@ -99,8 +105,8 @@ module Utils
         datetime = Time.zone.parse("#{Time.zone.now.year}-01-01 12:00:00")
         mountain_presenter = overridden_presenter(datetime, "America/Denver")
         central_presenter = overridden_presenter(datetime, "America/Chicago")
-        expect(mountain_presenter.as_string).to eq("Jan 1 at  5am")
-        expect(central_presenter.as_string).to eq("Jan 1 at  6am")
+        expect(mountain_presenter.as_string).to eq("Jan 1 at 5am")
+        expect(central_presenter.as_string).to eq("Jan 1 at 6am")
       end
 
       it "uses the default timezone if none provided" do
@@ -108,7 +114,7 @@ module Utils
         pre_zone = Time.zone
         Time.zone = "Mountain Time (US & Canada)"
         nilzone_presenter = DatetimeRangePresenter.new(datetime, nil, :event, nil)
-        expect(nilzone_presenter.as_string).to eq("Jan 1 at  5am")
+        expect(nilzone_presenter.as_string).to eq("Jan 1 at 5am")
       ensure
         Time.zone = pre_zone
       end
@@ -122,7 +128,7 @@ module Utils
           alaskan_presenter = DatetimeRangePresenter.new(datetime)
           mountain_presenter = overridden_presenter(datetime, "America/Denver")
           expect(alaskan_presenter.as_string).to eq("Sep 30 at 11:30pm")
-          expect(mountain_presenter.as_string).to eq("Oct 1 at  1:30am")
+          expect(mountain_presenter.as_string).to eq("Oct 1 at 1:30am")
         end
       ensure
         Time.zone = pre_zone

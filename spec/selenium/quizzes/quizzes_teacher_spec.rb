@@ -305,6 +305,7 @@ describe "quizzes" do
     it "should mark dropdown questions as answered", priority: "2"
 
     it "gives a student extra time if the time limit is extended", priority: "2" do
+      skip "Failing Crystalball DEMO-212"
       @context = @course
       bank = @course.assessment_question_banks.create!(title: "Test Bank")
       q = quiz_model

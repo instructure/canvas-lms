@@ -56,7 +56,7 @@
     "message": "以下は、学生が自分のスケジュールを見る方法の一例です。"
   },
   "calendar_a8563bb2": { "message": "カレンダー:" },
-  "calendar_event_89aadc1c": { "message": "予定表のイベント" },
+  "calendar_event_89aadc1c": { "message": "カレンダーのイベント" },
   "canvas_planner_98ed106": { "message": "Canvas プランナー" },
   "close_d634289d": { "message": "閉じる" },
   "close_opportunity_center_popup_9907d981": {
@@ -97,7 +97,7 @@
   "due_date_124fdd99": { "message": "期限：{ date }" },
   "edit_c5fbea07": { "message": "編集" },
   "edit_title_72e5a21e": { "message": "{ title }を編集する" },
-  "error_loading_grades_e0b38f4d": { "message": "成績の読み込み中にエラー" },
+  "error_loading_grades_e0b38f4d": { "message": "評定の読み込み中にエラー" },
   "error_loading_items_5218438e": {
     "message": "アイテムの読み込み中にエラーが発生しました"
   },
@@ -137,13 +137,13 @@
   },
   "failed_to_save_to_do_ddc7503b": { "message": "タスクの保存に失敗しました" },
   "feedback_6dcc1991": { "message": "フィードバック" },
-  "fun_quiz_47ab0b0": { "message": "楽しいクイズ" },
+  "fun_quiz_47ab0b0": { "message": "楽しい小テスト" },
   "go_to_card_view_dashboard_9d03970e": {
     "message": "カードビューダッシュボードに進みます。"
   },
   "graded_25cd3fcd": { "message": "採点済み" },
-  "grades_are_loading_c899652d": { "message": "成績読み込み中です" },
-  "grades_loaded_5056277c": { "message": "成績が読み込まれました" },
+  "grades_are_loading_c899652d": { "message": "評定読み込み中です" },
+  "grades_loaded_5056277c": { "message": "評定が読み込まれました" },
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } 完了した{ items, plural,\n     =1 {項目}\n  other {項目}\n}"
   },
@@ -167,7 +167,7 @@
   },
   "loading_25990131": { "message": "読み込み中・・・" },
   "loading_725811ca": { "message": "読み込み中" },
-  "loading_grades_c842c887": { "message": "成績読み込み中" },
+  "loading_grades_c842c887": { "message": "評定読み込み中" },
   "loading_past_items_ca499e75": { "message": "過去のアイテムを読み込む" },
   "loading_planner_items_947a813d": {
     "message": "プランナーアイテムをもっと読み込む"
@@ -181,7 +181,7 @@
   "missing_items_for_title_516511f8": {
     "message": "{ title }に不足しているアイテム"
   },
-  "my_grades_98834476": { "message": "私の成績" },
+  "my_grades_98834476": { "message": "私の評定" },
   "new_13daf639": { "message": "新規作成" },
   "new_activity_8b84847d": { "message": "新規アクティビティ" },
   "new_activity_for_title_14c9c3af": {
@@ -190,7 +190,7 @@
   "new_opportunities_7d349c4d": { "message": "新しい機会" },
   "next_month_749b1778": { "message": "翌月" },
   "no_due_dates_assigned_e8f5bac8": { "message": "期日指定なし" },
-  "no_grade_3b4d7f3e": { "message": "成績なし" },
+  "no_grade_3b4d7f3e": { "message": "評定なし" },
   "nothing_due_this_week_d45c9ef9": { "message": "今週期限のものなし" },
   "nothing_for_now_e3e3ce2a": { "message": "今のところ何もなし" },
   "nothing_here_needs_attention_c4eaded6": {
@@ -222,7 +222,7 @@
   "points_points_63e59cce": { "message": "{ points } 点" },
   "previous_month_bb1e3c84": { "message": "前月" },
   "pts_699bd9aa": { "message": "ポイント" },
-  "quiz_e0dcce8f": { "message": "クイズ" },
+  "quiz_e0dcce8f": { "message": "小テスト" },
   "redo_363c58b7": { "message": "やり直し" },
   "reminder_date_4564d12d": { "message": "リマインダ（お知らせ）：{ date }" },
   "replies_4a8577c8": { "message": "返信" },
@@ -236,7 +236,7 @@
     "message": "新しいアクティビティで前の項目までスクロールします。"
   },
   "show_all_ae37d610": { "message": "すべて表示する" },
-  "show_my_grades_ebd08684": { "message": "私の成績を表示" },
+  "show_my_grades_ebd08684": { "message": "私の評定を表示" },
   "social_studies_13fa30c7": { "message": "社会科" },
   "startdate_to_enddate_d245175b": { "message": "{ startDate } - { endDate }" },
   "startdatetime_enddatetime_20abc10e": {
@@ -246,7 +246,7 @@
     "message": "{ startDateTime } - { endTime }"
   },
   "starttime_to_endtime_d7cc249d": { "message": "{ startTime } - { endTime }" },
-  "submitted_318fad53": { "message": "タスクの成績を送信" },
+  "submitted_318fad53": { "message": "タスクの評定を送信" },
   "success_to_do_created_e34ed395": { "message": "成功：タスクが作成" },
   "task_16b0ef38": { "message": "タスク" },
   "the_best_assignment_15e98be1": { "message": "最高の課題" },

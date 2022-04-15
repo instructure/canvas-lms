@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,23 +16,55 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import {enhanceUserContent} from 'ui/features/navigation_header/jquery/instructure.js'
-import fakeENV from 'helpers/fakeENV'
+import enhanceEverything, {enhanceUserContent} from '../'
+import stubEnv from '@canvas/stub-env'
+import sinon from 'sinon'
 
-QUnit.module('Enhance User Content', hooks => {
-  let elem
+describe('enhanceUserContent()', () => {
+  const subject = bodyHTML => {
+    document.body.innerHTML = bodyHTML
+    enhanceUserContent()
+    return document.body
+  }
 
-  hooks.beforeEach(() => {
+  describe('when the link has an href and matches a file path', () => {
+    const bodyHTML =
+      '<a class="instructure_file_link instructure_scribd_file" href="/courses/1/files/1">file</a>'
+
+    it('enhance the link', () => {
+      expect(subject(bodyHTML).querySelector('.instructure_file_holder')).toBeInTheDocument()
+    })
+  })
+
+  describe('when the link has no href attribute', () => {
+    const bodyHTML = '<a class="instructure_file_link instructure_scribd_file">file</a>'
+
+    it('does not enhance the link', () => {
+      expect(subject(bodyHTML).querySelector('.instructure_file_holder')).not.toBeInTheDocument()
+    })
+  })
+})
+
+describe('enhanceUserContent:media', () => {
+  const env = stubEnv({})
+  let elem, sandbox
+
+  beforeEach(() => {
     elem = document.createElement('div')
+    sandbox = sinon.createSandbox({
+      // properties: ['clock', 'mock', 'server', 'spy', 'stub'],
+      useFakeServer: false,
+      useFakeTimers: false
+    })
     document.body.appendChild(elem)
   })
 
-  hooks.afterEach(() => {
+  afterEach(() => {
+    sandbox.restore()
     document.body.removeChild(elem)
   })
 
-  test('youtube preview gets alt text from link data-preview-alt', () => {
+  it('youtube preview gets alt text from link data-preview-alt', () => {
     const alt = 'test alt string'
     elem.innerHTML = `
       <div class="user_content">
@@ -42,8 +74,8 @@ QUnit.module('Enhance User Content', hooks => {
       </div>
     `
     sandbox.stub($, 'youTubeID').returns(47)
-    enhanceUserContent()
-    equal(elem.querySelector('.media_comment_thumbnail').alt, alt)
+    enhanceUserContent(enhanceUserContent.ANY_VISIBILITY)
+    expect(elem.querySelector('.media_comment_thumbnail').alt).toEqual(alt)
   })
 
   test('youtube preview ignores missing alt', () => {
@@ -55,8 +87,8 @@ QUnit.module('Enhance User Content', hooks => {
       </div>
     `
     sandbox.stub($, 'youTubeID').returns(47)
-    enhanceUserContent()
-    ok(elem.querySelector('.media_comment_thumbnail').outerHTML.match('alt=""'))
+    enhanceUserContent(enhanceUserContent.ANY_VISIBILITY)
+    expect(elem.querySelector('.media_comment_thumbnail').alt).toEqual('')
   })
 
   test("enhance '.instructure_inline_media_comment' in questions", () => {
@@ -69,14 +101,13 @@ QUnit.module('Enhance User Content', hooks => {
         </a>
       </div>
     `
-    enhanceUserContent()
-    equal(mediaCommentThumbnailSpy.thisValues[0].length, 1) // for .instructure_inline_media_comment
-    equal(mediaCommentThumbnailSpy.thisValues[1].length, 1) // for .instructure_video_link
-    $.fn.mediaCommentThumbnail.restore()
+    enhanceUserContent(enhanceUserContent.ANY_VISIBILITY)
+    expect(mediaCommentThumbnailSpy.thisValues[0].length).toEqual(1) // for .instructure_inline_media_comment
+    expect(mediaCommentThumbnailSpy.thisValues[1].length).toEqual(1) // for .instructure_video_link
   })
 
   test('does not enhance content if ENV.SKIP_ENHANCING_USER_CONTENT is set to true', () => {
-    fakeENV.setup({SKIP_ENHANCING_USER_CONTENT: true})
+    env.SKIP_ENHANCING_USER_CONTENT = true
 
     const mediaCommentThumbnailSpy = sandbox.spy($.fn, 'mediaCommentThumbnail')
     elem.innerHTML = `
@@ -87,9 +118,7 @@ QUnit.module('Enhance User Content', hooks => {
         </a>
       </div>
     `
-    enhanceUserContent()
-    strictEqual(mediaCommentThumbnailSpy.callCount, 0)
-
-    fakeENV.teardown()
+    enhanceUserContent(enhanceUserContent.ANY_VISIBILITY)
+    expect(mediaCommentThumbnailSpy.callCount).toEqual(0)
   })
 })

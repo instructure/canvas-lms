@@ -41,6 +41,7 @@ import {useMutation} from 'react-apollo'
 import OutcomesRceField from '../shared/OutcomesRceField'
 import ProficiencyCalculation from '../MasteryCalculation/ProficiencyCalculation'
 import useRatings from '@canvas/outcomes/react/hooks/useRatings'
+import useOutcomeFormValidate from '@canvas/outcomes/react/hooks/useOutcomeFormValidate'
 import {processRatingsAndMastery} from '@canvas/outcomes/react/helpers/ratingsHelpers'
 import Ratings from './Ratings'
 import {outcomeEditShape} from './shapes'
@@ -55,19 +56,31 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
   const [description, setDescription, descriptionChanged] = useInput(outcome.description || '')
   const [friendlyDescription, friendlyDescriptionChangeHandler, friendlyDescriptionChanged] =
     useInput(outcome.friendlyDescription?.description || '')
-  const {contextType, contextId, friendlyDescriptionFF, individualOutcomeRatingAndCalculationFF} =
+  const {contextType, contextId, friendlyDescriptionFF, accountLevelMasteryScalesFF} =
     useCanvasContext()
   const {
     ratings,
     masteryPoints,
     setRatings,
     setMasteryPoints,
-    hasError: proficiencyRatingsError,
-    hasChanged: proficiencyRatingsChanged
+    hasChanged: proficiencyRatingsChanged,
+    ratingsError,
+    masteryPointsError,
+    clearRatingsFocus,
+    focusOnRatingsError
   } = useRatings({
     initialRatings: outcome.ratings,
     initialMasteryPoints: outcome.masteryPoints
   })
+  const {
+    validateForm,
+    focusOnError,
+    setTitleRef,
+    setDisplayNameRef,
+    setFriendlyDescriptionRef,
+    setMasteryPointsRef,
+    setCalcIntRef
+  } = useOutcomeFormValidate({focusOnRatingsError, clearRatingsFocus})
   const [updateLearningOutcomeMutation] = useMutation(UPDATE_LEARNING_OUTCOME)
   const [setOutcomeFriendlyDescription] = useMutation(SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION)
   let attributesEditable = {
@@ -107,13 +120,17 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
     })
   }
 
-  const formValid =
-    !invalidTitle &&
-    !invalidDisplayName &&
-    friendlyDescriptionMessages.length === 0 &&
-    (individualOutcomeRatingAndCalculationFF
-      ? !proficiencyCalculationError && !proficiencyRatingsError
-      : true)
+  const onSaveHandler = () =>
+    validateForm({
+      proficiencyCalculationError,
+      masteryPointsError,
+      ratingsError,
+      friendlyDescriptionError: friendlyDescriptionMessages.length > 0,
+      displayNameError: invalidDisplayName,
+      titleError: invalidTitle
+    })
+      ? onUpdateOutcomeHandler()
+      : focusOnError()
 
   const updateProficiencyCalculation = (calculationMethodKey, calcInt) => {
     setProficiencyCalculationMethod(calculationMethodKey)
@@ -128,7 +145,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
         if (displayName && displayNameChanged) input.displayName = displayName
         // description can be null/empty. no need to check if it is available only if it has changed
         if (descriptionChanged) input.description = description
-        if (individualOutcomeRatingAndCalculationFF) {
+        if (!accountLevelMasteryScalesFF) {
           if (proficiencyCalculationMethodChanged || proficiencyCalculationIntChanged) {
             input.calculationMethod = proficiencyCalculationMethod
             input.calculationInt = calculationInt
@@ -207,6 +224,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
                   renderLabel={I18n.t('Name')}
                   onChange={titleChangeHandler}
                   data-testid="name-input"
+                  inputRef={setTitleRef}
                 />
               ) : (
                 <View as="div">
@@ -227,6 +245,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
                   renderLabel={I18n.t('Friendly Name')}
                   onChange={displayNameChangeHandler}
                   data-testid="display-name-input"
+                  inputRef={setDisplayNameRef}
                 />
               ) : (
                 <View as="div">
@@ -266,10 +285,11 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
                 onChange={friendlyDescriptionChangeHandler}
                 messages={friendlyDescriptionMessages}
                 data-testid="friendly-description-input"
+                textareaRef={setFriendlyDescriptionRef}
               />
             </View>
           )}
-          {individualOutcomeRatingAndCalculationFF && (
+          {!accountLevelMasteryScalesFF && (
             <View as="div" padding="small 0 0">
               <Ratings
                 ratings={ratings}
@@ -277,6 +297,8 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
                 onChangeMasteryPoints={setMasteryPoints}
                 onChangeRatings={setRatings}
                 canManage={!!attributesEditable.individualRatings}
+                masteryInputRef={setMasteryPointsRef}
+                clearRatingsFocus={clearRatingsFocus}
               />
               <View as="div" minHeight={attributesEditable.calculationMethod ? '14rem' : '5rem'}>
                 {attributesEditable.calculationMethod && (
@@ -296,6 +318,7 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
                   canManage={!!attributesEditable.calculationMethod}
                   update={updateProficiencyCalculation}
                   setError={setProficiencyCalculationError}
+                  calcIntInputRef={setCalcIntRef}
                 />
               </View>
             </View>
@@ -309,8 +332,8 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler, onEditLearningOutcom
             type="button"
             color="primary"
             margin="0 x-small 0 0"
-            interaction={formValid ? 'enabled' : 'disabled'}
-            onClick={onUpdateOutcomeHandler}
+            interaction="enabled"
+            onClick={onSaveHandler}
           >
             {I18n.t('Save')}
           </Button>

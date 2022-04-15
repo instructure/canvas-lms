@@ -96,6 +96,13 @@ module Lti::Messages
         document_targets: %w[iframe window].freeze,
         media_types: %w[application/vnd.ims.lti.v1.ltilink].freeze
       }.freeze,
+      "module_menu_modal" => {
+        accept_multiple: true,
+        accept_types: %w[ltiResourceLink].freeze,
+        auto_create: true,
+        document_targets: %w[iframe window].freeze,
+        media_types: %w[application/vnd.ims.lti.v1.ltilink].freeze
+      }.freeze,
       "submission_type_selection" => {
         accept_multiple: false,
         accept_types: %w[ltiResourceLink].freeze,
@@ -105,7 +112,7 @@ module Lti::Messages
       }.freeze
     }.freeze
 
-    MODAL_PLACEMENTS = %w[editor_button assignment_selection link_selection migration_selection course_assignments_menu module_index_menu_modal].freeze
+    MODAL_PLACEMENTS = %w[editor_button assignment_selection link_selection migration_selection course_assignments_menu module_index_menu_modal module_menu_modal].freeze
 
     def initialize(tool:, context:, user:, expander:, return_url:, opts: {})
       super

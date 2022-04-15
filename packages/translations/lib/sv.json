@@ -266,6 +266,12 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Minimera för att dölja { types }"
     },
+    "color_picker_6b359edf": {
+        "message": "Färgväljaren"
+    },
+    "color_picker_colorname_selected_ad4cf400": {
+        "message": "Färgväljaren ({ colorName } valda)"
+    },
     "computer_1d7dfa6f": {
         "message": "Dator"
     },
@@ -407,9 +413,6 @@
     "diamond_b8dfe7ae": {
         "message": "Diamant"
     },
-    "dimension_type_55c83e4e": {
-        "message": "Dimensionstyp"
-    },
     "dimensions_45ddb7b7": {
         "message": "Dimensioner"
     },
@@ -484,6 +487,9 @@
     },
     "edit_existing_button_icon_3d0277bd": {
         "message": "Redigera befintlig knapp/ikon"
+    },
+    "edit_icon_2c6b0e91": {
+        "message": "Redigera ikon"
     },
     "edit_link_7f53bebb": {
         "message": "Redigera länk"
@@ -917,6 +923,9 @@
     "media_af190855": {
         "message": "Media"
     },
+    "media_file_is_processing_please_try_again_later_58a6d49": {
+        "message": "Mediefilen behandlas. Försök igen senare."
+    },
     "medium_5a8e9ead": {
         "message": "Medium"
     },
@@ -1208,6 +1217,9 @@
     "rich_content_editor_2708ef21": {
         "message": "Redigerare för formaterat innehåll"
     },
+    "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+        "message": "RTF-område. Tryck ned ALT+0 för att visa genvägar i innehållsredigeraren."
+    },
     "right_to_left_9cfb092a": {
         "message": "Höger-till-vänster"
     },
@@ -1292,17 +1304,8 @@
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Något gick fel och jag vet inte vad jag ska visa dig."
     },
-    "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-        "message": "Något gick fel. Kontrollera din anslutning och försök igen."
-    },
     "something_went_wrong_d238c551": {
         "message": "Något gick fel"
-    },
-    "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-        "message": "Något gick fel. Uppdatera sidan och försök igen."
-    },
-    "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-        "message": "Något gick fel under uppladdningen. Kontrollera din anslutning och försök igen."
     },
     "sort_by_e75f9e3e": {
         "message": "Sortera efter"
@@ -1498,9 +1501,6 @@
     },
     "uploading_19e8a4e7": {
         "message": "Laddar upp"
-    },
-    "uploading_closed_captions_subtitles_failed_bc093f3": {
-        "message": "Det gick inte att ladda upp undertexter."
     },
     "uppercase_alphabetic_ordered_list_3f5aa6b2": {
         "message": "markera alfabetisk ordnad lista med versaler"

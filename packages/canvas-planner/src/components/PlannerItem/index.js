@@ -386,7 +386,7 @@ export class PlannerItem_raw extends Component {
         </div>
       )
     }
-    if (this.props.associated_item === 'To Do') {
+    if (this.props.associated_item === 'To Do' && !this.props.isObserving) {
       return (
         <div className={styles.editButton}>
           <ApplyTheme
@@ -396,7 +396,12 @@ export class PlannerItem_raw extends Component {
               }
             }}
           >
-            <Button variant="icon" icon={IconEditLine} onClick={this.toDoLinkClick}>
+            <Button
+              data-testid="edit-event-button"
+              variant="icon"
+              icon={IconEditLine}
+              onClick={this.toDoLinkClick}
+            >
               <ScreenReaderContent>{formatMessage('Edit')}</ScreenReaderContent>
             </Button>
           </ApplyTheme>

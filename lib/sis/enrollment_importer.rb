@@ -247,8 +247,8 @@ module SIS
             next
           end
 
-          if type == "StudentEnrollment" && MasterCourses::MasterTemplate.is_master_course?(@course)
-            message = "Student enrollment for \"#{enrollment_info.user_id}\" not allowed in blueprint course \"#{@course.sis_course_id}\""
+          if %w[StudentEnrollment ObserverEnrollment].include?(type) && MasterCourses::MasterTemplate.is_master_course?(@course)
+            message = "#{type == "StudentEnrollment" ? "Student" : "Observer"} enrollment for \"#{enrollment_info.user_id}\" not allowed in blueprint course \"#{@course.sis_course_id}\""
             @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
             next
           end

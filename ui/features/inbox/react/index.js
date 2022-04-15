@@ -30,6 +30,8 @@ export const CanvasInboxApp = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    document.querySelector('body').classList.add('full-width')
+    document.querySelector('div.ic-Layout-contentMain').classList.remove('ic-Layout-contentMain')
     const setupApolloClient = async () => {
       if (ENV.apollo_caching) {
         const cache = await createPersistentCache(ENV.conversation_cache_key)

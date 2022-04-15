@@ -534,6 +534,25 @@ class FilesController < ApplicationController
     end
   end
 
+  # @API Translate file reference
+  # Get information about a file from a course copy file reference
+  #
+  # @example_request
+  #
+  #   curl https://<canvas>/api/v1/courses/1/files/file_ref/i567b573b77fab13a1a39937c24ae88f2 \
+  #        -H 'Authorization: Bearer <token>'
+  #
+  # @returns File
+  def file_ref
+    get_context
+
+    @attachment = @context.attachments.not_deleted.find_by(migration_id: params[:migration_id])
+    raise ActiveRecord::RecordNotFound unless @attachment
+    return unless authorized_action(@attachment, @current_user, :read)
+
+    render json: attachment_json(@attachment, @current_user, session, params)
+  end
+
   def show
     GuardRail.activate(:secondary) do
       params[:id] ||= params[:file_id]

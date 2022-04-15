@@ -122,28 +122,28 @@ describe ApplicationHelper do
     describe "#context_sensitive_datetime_title" do
       it "produces a string showing the local time and the course time" do
         context = double(time_zone: ActiveSupport::TimeZone["America/Denver"])
-        expect(context_sensitive_datetime_title(Time.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Local: Mar 13 at  1:12am<br>Course: Mar 13 at  3:12am\""
+        expect(context_sensitive_datetime_title(Time.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Local: Mar 13 at 1:12am<br>Course: Mar 13 at 3:12am\""
       end
 
       it "only prints the text if just_text option passed" do
         context = double(time_zone: ActiveSupport::TimeZone["America/Denver"])
-        expect(context_sensitive_datetime_title(Time.now, context, just_text: true)).to eq "Local: Mar 13 at  1:12am<br>Course: Mar 13 at  3:12am"
+        expect(context_sensitive_datetime_title(Time.now, context, just_text: true)).to eq "Local: Mar 13 at 1:12am<br>Course: Mar 13 at 3:12am"
       end
 
       it "uses the simple title if theres no timezone difference" do
         context = double(time_zone: ActiveSupport::TimeZone["America/Anchorage"])
-        expect(context_sensitive_datetime_title(Time.now, context, just_text: true)).to eq "Mar 13 at  1:12am"
-        expect(context_sensitive_datetime_title(Time.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Mar 13 at  1:12am\""
+        expect(context_sensitive_datetime_title(Time.now, context, just_text: true)).to eq "Mar 13 at 1:12am"
+        expect(context_sensitive_datetime_title(Time.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Mar 13 at 1:12am\""
       end
 
       it "uses the simple title for nil context" do
-        expect(context_sensitive_datetime_title(Time.now, nil, just_text: true)).to eq "Mar 13 at  1:12am"
+        expect(context_sensitive_datetime_title(Time.now, nil, just_text: true)).to eq "Mar 13 at 1:12am"
       end
 
       it "crosses date boundaries appropriately" do
         Timecop.freeze(Time.utc(2013, 3, 13, 7, 12)) do
           context = double(time_zone: ActiveSupport::TimeZone["America/Denver"])
-          expect(context_sensitive_datetime_title(Time.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Local: Mar 12 at 11:12pm<br>Course: Mar 13 at  1:12am\""
+          expect(context_sensitive_datetime_title(Time.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Local: Mar 12 at 11:12pm<br>Course: Mar 13 at 1:12am\""
         end
       end
     end
@@ -153,23 +153,23 @@ describe ApplicationHelper do
 
       it "spits out a friendly time tag" do
         tag = friendly_datetime(Time.now)
-        expect(tag).to eq "<time data-html-tooltip-title=\"Mar 13 at  1:12am\" data-tooltip=\"top\">Mar 13 at  1:12am</time>"
+        expect(tag).to eq "<time data-html-tooltip-title=\"Mar 13 at 1:12am\" data-tooltip=\"top\">Mar 13 at 1:12am</time>"
       end
 
       it "builds a whole time tag with a useful title showing the timezone offset if theres a context" do
         tag = friendly_datetime(Time.now, context: context)
         expect(tag).to match(%r{^<time.*</time>$})
         expect(tag).to match(/data-html-tooltip-title=/)
-        expect(tag).to match(/Local: Mar 13 at  1:12am/)
-        expect(tag).to match(/Course: Mar 13 at  3:12am/)
+        expect(tag).to match(/Local: Mar 13 at 1:12am/)
+        expect(tag).to match(/Course: Mar 13 at 3:12am/)
       end
 
       it "can produce an alternate tag type" do
         tag = friendly_datetime(Time.now, context: context, tag_type: :span)
         expect(tag).to match(%r{^<span.*</span>$})
         expect(tag).to match(/data-html-tooltip-title=/)
-        expect(tag).to match(/Local: Mar 13 at  1:12am/)
-        expect(tag).to match(/Course: Mar 13 at  3:12am/)
+        expect(tag).to match(/Local: Mar 13 at 1:12am/)
+        expect(tag).to match(/Course: Mar 13 at 3:12am/)
       end
 
       it "produces no tooltip for a nil datetime" do
@@ -1303,19 +1303,6 @@ describe ApplicationHelper do
         expect(mastery_scale[:outcome_proficiency]).to eq @proficiency.as_json
         expect(mastery_scale[:outcome_calculation_method]).to eq @calculation_method.as_json
       end
-
-      it "includes improved outcomes management FF" do
-        helper.mastery_scales_js_env
-        expect(js_env[:IMPROVED_OUTCOMES_MANAGEMENT]).to be(false)
-      end
-
-      context "when improved_outcomes_management enabled" do
-        it "includes improved outcomes management FF" do
-          @course.root_account.enable_feature! :improved_outcomes_management
-          helper.mastery_scales_js_env
-          expect(js_env[:IMPROVED_OUTCOMES_MANAGEMENT]).to be(true)
-        end
-      end
     end
   end
 
@@ -1404,7 +1391,7 @@ describe ApplicationHelper do
     end
   end
 
-  describe "individual_outcome_rating_and_calculation_js_env" do
+  describe "improved_outcomes_management_js_env" do
     before(:once) do
       course_model
       @context = @course
@@ -1417,52 +1404,21 @@ describe ApplicationHelper do
       allow(helper).to receive(:js_env) { |env| js_env.merge!(env) }
     end
 
-    context "when individual_outcome_rating_and_calculation FF is disabled" do
-      before(:once) do
-        @course.root_account.disable_feature! :individual_outcome_rating_and_calculation
-      end
-
-      it "does not include in js_env individual outcome rating and calculation key" do
-        helper.individual_outcome_rating_and_calculation_js_env
-        expect(js_env).not_to have_key :INDIVIDUAL_OUTCOME_RATING_AND_CALCULATION
-      end
-
-      it "does not include in js_env improved outcomes management key" do
-        helper.individual_outcome_rating_and_calculation_js_env
-        expect(js_env).not_to have_key :IMPROVED_OUTCOMES_MANAGEMENT
+    context "when improved_outcomes_management FF is enabled" do
+      it "sets improved_outcomes_management key in js_env to true" do
+        @course.root_account.enable_feature! :improved_outcomes_management
+        helper.improved_outcomes_management_js_env
+        expect(js_env).to have_key :IMPROVED_OUTCOMES_MANAGEMENT
+        expect(js_env[:IMPROVED_OUTCOMES_MANAGEMENT]).to be(true)
       end
     end
 
-    context "when individual_outcome_rating_and_calculation FF is enabled" do
-      before(:once) do
-        @course.root_account.enable_feature! :individual_outcome_rating_and_calculation
-      end
-
-      context "when account_level_mastery_scales FF is disabled" do
-        before(:once) do
-          @course.root_account.disable_feature! :account_level_mastery_scales
-        end
-
-        it "includes in js_env individual outcome rating and calculation key" do
-          helper.individual_outcome_rating_and_calculation_js_env
-          expect(js_env).to have_key :INDIVIDUAL_OUTCOME_RATING_AND_CALCULATION
-        end
-
-        it "includes in js_env improved outcomes management key" do
-          helper.individual_outcome_rating_and_calculation_js_env
-          expect(js_env).to have_key :IMPROVED_OUTCOMES_MANAGEMENT
-        end
-      end
-
-      context "when account_level_mastery_scales FF is enabled" do
-        before(:once) do
-          @course.root_account.enable_feature! :account_level_mastery_scales
-        end
-
-        it "does not include in js_env individual outcome rating and calculation key" do
-          helper.individual_outcome_rating_and_calculation_js_env
-          expect(js_env).not_to have_key :INDIVIDUAL_OUTCOME_RATING_AND_CALCULATION
-        end
+    context "when improved_outcomes_management FF is disabled" do
+      it "sets improved_outcomes_management key in js_env to false" do
+        @course.root_account.disable_feature! :improved_outcomes_management
+        helper.improved_outcomes_management_js_env
+        expect(js_env).to have_key :IMPROVED_OUTCOMES_MANAGEMENT
+        expect(js_env[:IMPROVED_OUTCOMES_MANAGEMENT]).to be(false)
       end
     end
   end

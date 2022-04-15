@@ -118,6 +118,12 @@ export const ImageOptions = ({state, dispatch, rcsConfig}) => {
           <ImageCropperModal
             open={openCropModal}
             onClose={() => setOpenCropModal(false)}
+            onSubmit={generatedImage =>
+              dispatch({
+                type: actions.SET_IMAGE.type,
+                payload: generatedImage
+              })
+            }
             image={image}
           />
         )}

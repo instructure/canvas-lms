@@ -55,7 +55,8 @@ const CalculationIntInput = ({
   updateCalculationInt,
   calculationMethod,
   calculationInt,
-  individualOutcomeDisplay
+  individualOutcomeDisplay,
+  calcIntInputRef
 }) => {
   const handleChange = (_event, data) => {
     if (data === '') {
@@ -103,6 +104,7 @@ const CalculationIntInput = ({
             textAlign="center"
             width="3rem"
             data-testid="calculation-int-input"
+            inputRef={calcIntInputRef}
           />
         </View>
         <View as="div" padding="none none none x-small">
@@ -189,7 +191,8 @@ const Form = ({
   currentMethod,
   updateCalculationMethod,
   setCalculationInt,
-  individualOutcomeForm
+  individualOutcomeForm,
+  calcIntInputRef
 }) => (
   <FormFieldGroup
     description={
@@ -221,6 +224,7 @@ const Form = ({
         calculationMethod={currentMethod}
         updateCalculationInt={setCalculationInt}
         individualOutcomeDisplay={individualOutcomeForm}
+        calcIntInputRef={calcIntInputRef}
       />
     )}
   </FormFieldGroup>
@@ -266,7 +270,8 @@ const ProficiencyCalculation = ({
   onNotifyPendingChanges,
   masteryPoints,
   individualOutcome,
-  setError
+  setError,
+  calcIntInputRef
 }) => {
   const {contextType} = useCanvasContext()
   const {calculationMethod: initialMethodKey, calculationInt: initialInt} = method
@@ -379,6 +384,7 @@ const ProficiencyCalculation = ({
               updateCalculationMethod={updateCalculationMethod}
               setCalculationInt={updateCalculationInt}
               individualOutcomeForm={individualOutcomeEdit}
+              calcIntInputRef={calcIntInputRef}
             />
           ) : (
             <Display
@@ -440,13 +446,15 @@ ProficiencyCalculation.propTypes = {
   updateError: PropTypes.string,
   masteryPoints: PropTypes.number,
   individualOutcome: PropTypes.oneOf(['display', 'edit']),
-  setError: PropTypes.func
+  setError: PropTypes.func,
+  calcIntInputRef: PropTypes.func
 }
 
 ProficiencyCalculation.defaultProps = {
   method: defaultProficiencyCalculation,
   updateError: null,
-  update: () => {}
+  update: () => {},
+  calcIntInputRef: () => {}
 }
 
 export default ProficiencyCalculation

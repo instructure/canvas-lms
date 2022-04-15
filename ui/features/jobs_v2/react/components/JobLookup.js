@@ -47,7 +47,7 @@ export default function JobLookup({setSelectedItem, manualSelection}) {
       placeholder={I18n.t('Enter an id or an original_job_id')}
       itemSearchFunction={useJobLookupApi}
       manualSelection={manualSelection}
-      isSearchableTerm={term => term.length > 0 && term.match(/^\d+$/)}
+      isSearchableTerm={term => term.length > 0 && term.match(/^\d+$/)?.length > 0}
       renderOption={item => {
         return (
           <View>

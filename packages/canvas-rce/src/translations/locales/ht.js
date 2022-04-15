@@ -108,6 +108,10 @@ const locale = {
   "closed_captions_subtitles_e6aaa016": { "message": "CC/Soutit" },
   "collaborations_5c56c15f": { "message": "Kolaborasyon" },
   "collapse_to_hide_types_1ab46d2e": { "message": "Fèmen pou kache { types }" },
+  "color_picker_6b359edf": { "message": "Seleksyonè Koulè" },
+  "color_picker_colorname_selected_ad4cf400": {
+    "message": "Seleksyonè Koulè ({ colorName } seleksyone)"
+  },
   "computer_1d7dfa6f": { "message": "Òdinatè" },
   "content_1440204b": { "message": "Kontni" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -152,7 +156,6 @@ const locale = {
   "describe_the_video_2fe8f46a": { "message": "(Dekri videyo a)" },
   "details_98a31b68": { "message": "Detay" },
   "diamond_b8dfe7ae": { "message": "Dyaman" },
-  "dimension_type_55c83e4e": { "message": "Tip Dimansyon" },
   "dimensions_45ddb7b7": { "message": "Dimansyon" },
   "directionality_26ae9e08": { "message": "Direksyonalite" },
   "directly_edit_latex_b7e9235b": { "message": "Chanje LaTex Dirèkteman" },
@@ -179,6 +182,7 @@ const locale = {
   "edit_existing_button_icon_3d0277bd": {
     "message": "Chanje kòn / Bouton ki egziste yo"
   },
+  "edit_icon_2c6b0e91": { "message": "Chanje Ikòn" },
   "edit_link_7f53bebb": { "message": "Chanje Lyen" },
   "editor_statusbar_26ac81fc": { "message": "Editè Ba Estati" },
   "embed_828fac4a": { "message": "Entegre" },
@@ -300,6 +304,9 @@ const locale = {
   "magenta_4a65993c": { "message": "Magenta" },
   "math_icon_ad4e9d03": { "message": "Ikòn Matematik" },
   "media_af190855": { "message": "Medya" },
+  "media_file_is_processing_please_try_again_later_58a6d49": {
+    "message": "Fichye miltimedya an tretman. Tanpri eseye ankò."
+  },
   "medium_5a8e9ead": { "message": "Mwayen" },
   "middle_27dc1d5": { "message": "Mitan" },
   "misc_3b692ea7": { "message": "Divès" },
@@ -392,6 +399,9 @@ const locale = {
     "message": "Restore anrejistreman otomatik?"
   },
   "rich_content_editor_2708ef21": { "message": "Editè Kontni Rich" },
+  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+    "message": "Zòn Teks Rich Peze  ALT+0 pou rakousi Editè Kontni Rich."
+  },
   "right_to_left_9cfb092a": { "message": "De Dwat a Goch" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Malerezman, bèl editè HTML la pa aksesib sou klavye. Gen aksè a bèl editè HTML la la a."
@@ -421,16 +431,7 @@ const locale = {
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Gen yon bagay ki pase mal ni mwen pa konnen kisa pou m montre w."
   },
-  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-    "message": "Yon bagay pase mal, verifye koneksyon ou epi eseye ankò."
-  },
   "something_went_wrong_d238c551": { "message": "Gen yon bagay ki pase mal" },
-  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-    "message": "Gen yon bagay ki mal fèt, eseye ankò aprè w fin aktyalize paj la"
-  },
-  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-    "message": "Gen yon bagay ki mal fèt pandan transfè a, verifye koneksyon entènèt ou a epi eseye ankò."
-  },
   "sort_by_e75f9e3e": { "message": "Triye Pa" },
   "square_511eb3b3": { "message": "Kare" },
   "square_unordered_list_b15ce93b": { "message": "lis kare non òdone" },
@@ -497,9 +498,6 @@ const locale = {
   "upload_media_ce31135a": { "message": "Transfè Medya" },
   "upload_record_media_e4207d72": { "message": "Transfè/Anrejistre Medya" },
   "uploading_19e8a4e7": { "message": "Chajman" },
-  "uploading_closed_captions_subtitles_failed_bc093f3": {
-    "message": "Transfè soutit la echwe."
-  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "lis alfabetik an majiskil"
   },

@@ -119,6 +119,10 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Kliknij, aby ukryć { types }"
   },
+  "color_picker_6b359edf": { "message": "Narzędzie wyboru kolorów" },
+  "color_picker_colorname_selected_ad4cf400": {
+    "message": "Narzędzie wyboru kolorów (wybrano { colorName })"
+  },
   "computer_1d7dfa6f": { "message": "Komputer" },
   "content_1440204b": { "message": "Zawartość" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -165,7 +169,6 @@ const locale = {
   "describe_the_video_2fe8f46a": { "message": "(opisz wideo)" },
   "details_98a31b68": { "message": "Szczegóły" },
   "diamond_b8dfe7ae": { "message": "Diament" },
-  "dimension_type_55c83e4e": { "message": "Typ wymiaru" },
   "dimensions_45ddb7b7": { "message": "Wymiary" },
   "directionality_26ae9e08": { "message": "Kierunkowość" },
   "directly_edit_latex_b7e9235b": { "message": "Edytuj bezpośrednio w LaTeX" },
@@ -192,6 +195,7 @@ const locale = {
   "edit_existing_button_icon_3d0277bd": {
     "message": "Edytuj istniejący przycisk / ikonę"
   },
+  "edit_icon_2c6b0e91": { "message": "Ikona edycji" },
   "edit_link_7f53bebb": { "message": "Edytuj łącze" },
   "editor_statusbar_26ac81fc": { "message": "Pasek stanu edytora" },
   "embed_828fac4a": { "message": "Osadź" },
@@ -319,6 +323,9 @@ const locale = {
   "magenta_4a65993c": { "message": "Amarantowy" },
   "math_icon_ad4e9d03": { "message": "Ikona matematyki" },
   "media_af190855": { "message": "Multimedia" },
+  "media_file_is_processing_please_try_again_later_58a6d49": {
+    "message": "Trwa przetwarzanie pliku multimediów. Spróbuj ponownie później."
+  },
   "medium_5a8e9ead": { "message": "Średni" },
   "middle_27dc1d5": { "message": "Środkowy" },
   "misc_3b692ea7": { "message": "Różne" },
@@ -417,6 +424,9 @@ const locale = {
   "rich_content_editor_2708ef21": {
     "message": "Edytor wzbogaconej zawartości"
   },
+  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+    "message": "Obszar tekstu sformatowanego Naciśnij ALT+0, aby wyświetlić skróty edytora tekstu sformatowanego."
+  },
   "right_to_left_9cfb092a": { "message": "Prawa-lewa" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Niestety ulepszony edytor HTML nie jest dostępny z poziomu klawiatury. Tutaj możesz uzyskać dostęp do edytor HTML bez formatowania."
@@ -448,16 +458,7 @@ const locale = {
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Wystąpił błąd i nie wiadomo, co wyświetlić."
   },
-  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-    "message": "Wystąpił problem, sprawdź połączenie i spróbuj ponownie."
-  },
   "something_went_wrong_d238c551": { "message": "Coś poszło nie tak" },
-  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-    "message": "Wystąpił problem, spróbuj ponownie po odświeżeniu strony"
-  },
-  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-    "message": "Wystąpił problem podczas przesyłania, sprawdź połączenia i spróbuj ponownie."
-  },
   "sort_by_e75f9e3e": { "message": "Sortuj wg" },
   "square_511eb3b3": { "message": "Kwadrat" },
   "square_unordered_list_b15ce93b": {
@@ -530,9 +531,6 @@ const locale = {
     "message": "Przekaż/zapisz pliki multimedialne"
   },
   "uploading_19e8a4e7": { "message": "Przekazywanie" },
-  "uploading_closed_captions_subtitles_failed_bc093f3": {
-    "message": "Przesyłanie napisów/napisów dla niesłyszących nie powiodło się."
-  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "uporządkowana lista alfabetyczna, duże litery"
   },

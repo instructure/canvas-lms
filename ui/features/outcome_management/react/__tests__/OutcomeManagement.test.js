@@ -149,9 +149,8 @@ describe('OutcomeManagement', () => {
       expect(getByText('Calculation')).toBeInTheDocument()
     })
 
-    it('renders only Manage tab when Individual Outcome Rating and Calculation FF is enabled', async () => {
-      delete window.ENV.ACCOUNT_LEVEL_MASTERY_SCALES
-      window.ENV.INDIVIDUAL_OUTCOME_RATING_AND_CALCULATION = true
+    it('renders only Manage tab when Account Level Mastery Scales FF is disabled', async () => {
+      window.ENV.ACCOUNT_LEVEL_MASTERY_SCALES = false
       const {getByText, queryByText} = render(
         <MockedProvider cache={cache} mocks={[...outcomeGroupsMocks]}>
           <OutcomeManagement />

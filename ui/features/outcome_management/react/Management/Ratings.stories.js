@@ -60,10 +60,10 @@ export const WithErrors = Template.bind({})
 WithErrors.args = {
   initialRatings: [
     createRating('Exceeds Mastery', 4, '127A1B'),
-    createRating('Mastery', 3, '00AC18', true),
+    createRating('Mastery', 3, '0B874B', true),
     createRating('', 2, 'FAB901'),
     createRating('Below Mastery', 1, 'FD5D10'),
-    createRating('Well Below Mastery', 0, 'EE0612')
+    createRating('Well Below Mastery', 0, 'E0061F')
   ]
 }
 

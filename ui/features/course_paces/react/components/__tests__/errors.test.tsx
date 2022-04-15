@@ -21,7 +21,7 @@ import {act, render} from '@testing-library/react'
 import React from 'react'
 import userEvent from '@testing-library/user-event'
 
-const publishPace = jest.fn()
+const syncUnpublishedChanges = jest.fn()
 afterEach(jest.clearAllMocks)
 
 describe('Errors', () => {
@@ -32,7 +32,7 @@ describe('Errors', () => {
       darkMode: 'E_THEME_TOO_DARK: Theme too dark, user could trip and fall'
     },
     responsiveSize: 'large',
-    publishPace
+    syncUnpublishedChanges
   }
 
   it('renders nothing when there are no errors', () => {
@@ -57,6 +57,6 @@ describe('Errors', () => {
     const {getByRole} = render(<Errors {...defaultProps} />)
 
     act(() => userEvent.click(getByRole('button', {name: 'Retry'})))
-    expect(publishPace).toHaveBeenCalled()
+    expect(syncUnpublishedChanges).toHaveBeenCalled()
   })
 })

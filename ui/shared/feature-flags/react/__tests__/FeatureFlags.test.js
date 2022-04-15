@@ -80,5 +80,113 @@ describe('feature_flags::FeatureFlags', () => {
         expect(queryByText('Course')).not.toBeInTheDocument()
       })
     })
+
+    it('performs search when search input length is 3 characters or more', async () => {
+      const {findByPlaceholderText, getAllByTestId} = render(<FeatureFlags />)
+      const searchField = await findByPlaceholderText('Search')
+      const allFeatureFlagsCount = getAllByTestId('ff-table-row').length
+      fireEvent.change(searchField, {target: {value: 'Fe'}})
+      await waitFor(() => {
+        expect(getAllByTestId('ff-table-row')).toHaveLength(allFeatureFlagsCount)
+      })
+      fireEvent.change(searchField, {target: {value: 'Feature 4'}})
+      await waitFor(() => {
+        expect(getAllByTestId('ff-table-row')).toHaveLength(1)
+      })
+    })
+
+    it('displays all feature flags when user clears search input', async () => {
+      const {findByPlaceholderText, getAllByTestId} = render(<FeatureFlags />)
+      const searchField = await findByPlaceholderText('Search')
+      const allFeatureFlagsCount = getAllByTestId('ff-table-row').length
+      fireEvent.change(searchField, {target: {value: 'Feature 4'}})
+      await waitFor(() => {
+        expect(getAllByTestId('ff-table-row')).toHaveLength(1)
+      })
+      fireEvent.change(searchField, {target: {value: ''}})
+      await waitFor(() => {
+        expect(getAllByTestId('ff-table-row')).toHaveLength(allFeatureFlagsCount)
+      })
+    })
+  })
+
+  describe('filter by state', () => {
+    it('should render All as default', async () => {
+      const {getByLabelText, getAllByTestId} = render(<FeatureFlags />)
+      await waitFor(() => {
+        expect(getByLabelText('Filter by')).toBeInTheDocument()
+      })
+      expect(getByLabelText('Filter by').closest('input').value).toEqual('All')
+      await waitFor(() => {
+        expect(getAllByTestId('ff-table-row')).toHaveLength(5)
+      })
+    })
+
+    it('filters rows to show enabled', async () => {
+      const {getByText, getAllByTestId, getByLabelText} = render(<FeatureFlags />)
+      await waitFor(() => {
+        expect(getByLabelText('Filter by')).toBeInTheDocument()
+      })
+      fireEvent.click(getByLabelText('Filter by'))
+      fireEvent.click(getByText('Enabled'))
+      await waitFor(() => {
+        expect(getAllByTestId('ff-table-row')).toHaveLength(3)
+      })
+    })
+
+    it('filters rows to show disabled', async () => {
+      const {getByText, getAllByTestId, getByLabelText} = render(<FeatureFlags />)
+      await waitFor(() => {
+        expect(getByLabelText('Filter by')).toBeInTheDocument()
+      })
+      fireEvent.click(getByLabelText('Filter by'))
+      fireEvent.click(getByText('Disabled'))
+      await waitFor(() => {
+        expect(getAllByTestId('ff-table-row')).toHaveLength(2)
+      })
+    })
+  })
+
+  it('filters when search and state filter are used', async () => {
+    const {getByText, getAllByTestId, getByLabelText, findByPlaceholderText} = render(
+      <FeatureFlags />
+    )
+    await waitFor(() => {
+      expect(getByLabelText('Filter by')).toBeInTheDocument()
+    })
+    fireEvent.click(getByLabelText('Filter by'))
+    fireEvent.click(getByText('Disabled'))
+    const searchField = await findByPlaceholderText('Search')
+    fireEvent.change(searchField, {target: {value: 'Feature 1'}})
+    await waitFor(() => {
+      expect(getAllByTestId('ff-table-row')).toHaveLength(1)
+    })
+    fireEvent.change(searchField, {target: {value: 'Feature 4'}})
+    await waitFor(() => {
+      expect(getAllByTestId('ff-table-row')).toHaveLength(1)
+    })
+  })
+
+  describe('clear', () => {
+    it('clears search input & resets state filter to all', async () => {
+      const {getByLabelText, getByText, findByPlaceholderText, getAllByTestId} = render(
+        <FeatureFlags />
+      )
+      await waitFor(() => {
+        expect(getByLabelText('Filter by')).toBeInTheDocument()
+      })
+      const allFeatureFlagsCount = getAllByTestId('ff-table-row').length
+      fireEvent.click(getByLabelText('Filter by'))
+      fireEvent.click(getByText('Disabled'))
+      const searchField = await findByPlaceholderText('Search')
+      fireEvent.change(searchField, {target: {value: 'Feature 1'}})
+      await waitFor(() => {
+        expect(getAllByTestId('ff-table-row')).toHaveLength(1)
+      })
+      fireEvent.click(getByText('Clear'))
+      await waitFor(() => {
+        expect(getAllByTestId('ff-table-row')).toHaveLength(allFeatureFlagsCount)
+      })
+    })
   })
 })

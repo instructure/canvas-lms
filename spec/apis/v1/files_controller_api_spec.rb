@@ -19,7 +19,7 @@
 #
 
 require_relative "../api_spec_helper"
-require_relative "../locked_spec"
+require_relative "../locked_examples"
 
 RSpec.configure do |config|
   config.include ApplicationHelper
@@ -1295,6 +1295,35 @@ describe "Files API", type: :request do
                                             "license" => "cc_by_sa",
                                             "license_name" => "CC Attribution Share Alike"
                                           })
+    end
+  end
+
+  describe "#file_ref" do
+    before :once do
+      attachment_model(context: @course, filename: "hello.txt")
+      @mig_id = "i567b573b77fab13a1a39937c24ae88f2"
+      @attachment.update migration_id: @mig_id
+    end
+
+    it "finds a file by migration_id" do
+      json = api_call(:get, "/api/v1/courses/#{@course.to_param}/files/file_ref/#{@mig_id}",
+                      controller: "files", action: "file_ref", format: "json", course_id: @course.to_param,
+                      migration_id: @mig_id)
+      expect(json["id"]).to eq @attachment.id
+      expect(json["display_name"]).to eq @attachment.display_name
+    end
+
+    it "requires permissions" do
+      user_factory
+      api_call(:get, "/api/v1/courses/#{@course.to_param}/files/file_ref/#{@mig_id}",
+               { controller: "files", action: "file_ref", format: "json", course_id: @course.to_param,
+                 migration_id: @mig_id }, {}, {}, { expected_status: 401 })
+    end
+
+    it "404s if given a bad migration id" do
+      api_call(:get, "/api/v1/courses/#{@course.to_param}/files/file_ref/lolcats",
+               { controller: "files", action: "file_ref", format: "json", course_id: @course.to_param,
+                 migration_id: "lolcats" }, {}, {}, { expected_status: 404 })
     end
   end
 

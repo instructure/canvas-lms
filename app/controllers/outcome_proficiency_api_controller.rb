@@ -97,7 +97,7 @@ class OutcomeProficiencyApiController < ApplicationController
   #        -F 'ratings[][mastery]=false' \
   #        -F 'ratings[][description]=Mastery' \
   #        -F 'ratings[][points]=3' \
-  #        -F 'ratings[][color]=00AC18' \
+  #        -F 'ratings[][color]=0B874B' \
   #        -F 'ratings[][mastery]=true' \
   #        -F 'ratings[][description]=Near Mastery' \
   #        -F 'ratings[][points]=2' \
@@ -109,7 +109,7 @@ class OutcomeProficiencyApiController < ApplicationController
   #        -F 'ratings[][mastery]=false' \
   #        -F 'ratings[][description]=Well Below Mastery' \
   #        -F 'ratings[][points]=0' \
-  #        -F 'ratings[][color]=EE0612' \
+  #        -F 'ratings[][color]=E0061F' \
   #        -F 'ratings[][mastery]=false' \
   #        -H "Authorization: Bearer <token>"
   #

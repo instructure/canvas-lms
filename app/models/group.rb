@@ -69,6 +69,11 @@ class Group < ActiveRecord::Base
   has_many :usage_rights, as: :context, inverse_of: :context, class_name: "UsageRights", dependent: :destroy
   belongs_to :avatar_attachment, class_name: "Attachment"
   belongs_to :leader, class_name: "User"
+  has_many :lti_resource_links,
+           as: :context,
+           inverse_of: :context,
+           class_name: "Lti::ResourceLink",
+           dependent: :destroy
 
   before_validation :ensure_defaults
   before_save :maintain_category_attribute
@@ -495,6 +500,9 @@ class Group < ActiveRecord::Base
     can :participate and
       can :manage_calendar and
       can :manage_content and
+      can :manage_course_content_add and
+      can :manage_course_content_edit and
+      can :manage_course_content_delete and
       can :manage_files_add and
       can :manage_files_edit and
       can :manage_files_delete and
@@ -559,12 +567,14 @@ class Group < ActiveRecord::Base
       end
       can :create and can :create_collaborations and can :delete and can :manage and
         can :manage_admin_users and can :allow_course_admin_actions and can :manage_calendar and
-        can :manage_content and can :manage_files_add and can :manage_files_edit and
-        can :manage_files_delete and can :manage_students and can :manage_wiki_create and
-        can :manage_wiki_delete and can :manage_wiki_update and can :moderate_forum and
-        can :post_to_forum and can :create_forum and can :read and can :read_forum and
-        can :read_announcements and can :read_roster and can :send_messages and
-        can :send_messages_all and can :update and can :view_unpublished_items
+        can :manage_content and can :manage_course_content_add and
+        can :manage_course_content_edit and can :manage_course_content_delete and
+        can :manage_files_add and can :manage_files_edit and can :manage_files_delete and
+        can :manage_students and can :manage_wiki_create and can :manage_wiki_delete and
+        can :manage_wiki_update and can :moderate_forum and can :post_to_forum and
+        can :create_forum and can :read and can :read_forum and can :read_announcements and
+        can :read_roster and can :send_messages and can :send_messages_all and can :update and
+        can :view_unpublished_items
 
       ##################### End legacy permission block ##########################
 
@@ -581,12 +591,13 @@ class Group < ActiveRecord::Base
       end
       can :read and can :update and can :create_collaborations and can :manage and
         can :manage_admin_users and can :allow_course_admin_actions and can :manage_calendar and
-        can :manage_content and can :manage_files_add and can :manage_files_edit and
-        can :manage_files_delete and can :manage_students and can :manage_wiki_create and
-        can :manage_wiki_delete and can :manage_wiki_update and can :moderate_forum and
-        can :post_to_forum and can :create_forum and can :read_forum and
-        can :read_announcements and can :read_roster and can :send_messages and
-        can :send_messages_all and can :view_unpublished_items
+        can :manage_content and can :manage_course_content_add and
+        can :manage_course_content_edit and can :manage_course_content_delete and
+        can :manage_files_add and can :manage_files_edit and can :manage_files_delete and
+        can :manage_students and can :manage_wiki_create and can :manage_wiki_delete and
+        can :manage_wiki_update and can :moderate_forum and can :post_to_forum and
+        can :create_forum and can :read_forum and can :read_announcements and can :read_roster and
+        can :send_messages and can :send_messages_all and can :view_unpublished_items
 
       given do |user, session|
         context.root_account.feature_enabled?(:granular_permissions_manage_groups) &&
@@ -610,7 +621,20 @@ class Group < ActiveRecord::Base
       given { |user| user && (self.group_category.try(:allows_multiple_memberships?) || allow_self_signup?(user)) }
       can :leave
 
-      given { |user, session| grants_right?(user, session, :manage_content) && context && context.grants_right?(user, session, :create_conferences) }
+      #################### Begin legacy permission block #########################
+      given do |user, session|
+        !context.root_account.feature_enabled?(:granular_permissions_manage_course_content) &&
+          grants_right?(user, session, :manage_content) && context &&
+          context.grants_right?(user, session, :create_conferences)
+      end
+      can :create_conferences
+      ##################### End legacy permission block ##########################
+
+      given do |user, session|
+        context.root_account.feature_enabled?(:granular_permissions_manage_course_content) &&
+          grants_right?(user, session, :manage_course_content_add) && context &&
+          context.grants_right?(user, session, :create_conferences)
+      end
       can :create_conferences
 
       given { |user, session| context&.grants_right?(user, session, :read_as_admin) }
@@ -792,6 +816,10 @@ class Group < ActiveRecord::Base
     !!context.try(:grading_periods?)
   end
 
+  def conditional_release?
+    !!context.try(:conditional_release?)
+  end
+
   def serialize_permissions(permissions_hash, user, session)
     permissions_hash.merge(
       create_discussion_topic: DiscussionTopic.context_allows_user_to_create?(self, user, session),
@@ -803,11 +831,19 @@ class Group < ActiveRecord::Base
     content_exports.where(user_id: user)
   end
 
-  def account_chain(include_site_admin: false)
-    @account_chain ||= Account.account_chain(account_id)
-    result = @account_chain.dup
-    Account.add_site_admin_to_chain!(result) if include_site_admin
-    result
+  def account_chain(include_site_admin: false, include_federated_parent: false)
+    @account_chain ||= Account.account_chain(account_id).freeze
+
+    # This implicitly includes add_federated_parent_to_chain
+    if include_site_admin
+      return @account_chain_with_site_admin ||= Account.add_site_admin_to_chain!(@account_chain.dup).freeze
+    end
+
+    if include_federated_parent
+      return @account_chain_with_federated_parent ||= Account.add_federated_parent_to_chain!(@account_chain.dup).freeze
+    end
+
+    @account_chain
   end
 
   def sortable_name

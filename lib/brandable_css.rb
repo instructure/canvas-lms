@@ -172,7 +172,7 @@ module BrandableCSS
         ["ic-brand-button--secondary-bgd", "darken", 5],
         ["ic-brand-button--secondary-bgd", "darken", 15],
         ["ic-brand-font-color-dark", "lighten", 15],
-        ["ic-brand-font-color-dark", "lighten", 30],
+        ["ic-brand-font-color-dark", "lighten", 28],
         ["ic-link-color", "darken", 10],
         ["ic-link-color", "lighten", 10],
       ].each_with_object({}) do |(variable_name, darken_or_lighten, percent), memo|

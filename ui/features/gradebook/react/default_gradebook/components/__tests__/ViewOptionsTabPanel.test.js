@@ -34,6 +34,10 @@ describe('ViewOptionsTabPanel', () => {
         modulesEnabled: true,
         onChange: jest.fn()
       },
+      hideAssignmentGroupTotals: {
+        checked: false,
+        onChange: jest.fn()
+      },
       showNotes: {
         checked: true,
         onChange: jest.fn()
@@ -194,6 +198,32 @@ describe('ViewOptionsTabPanel', () => {
         viewUngradedAsZero: {allowed: false, checked: true, onChange: () => {}}
       })
       expect(queryByRole('checkbox', {name: 'View ungraded as 0'})).not.toBeInTheDocument()
+    })
+  })
+
+  describe('.hideAssignmentGroupTotals', () => {
+    it('is checked if .checked is true', () => {
+      const {getByRole} = renderPanel({
+        hideAssignmentGroupTotals: {checked: true, onChange: () => {}}
+      })
+      expect(getByRole('checkbox', {name: 'Hide Assignment Group Totals'})).toBeChecked()
+    })
+
+    it('is unchecked if .checked is false', () => {
+      const {getByRole} = renderPanel({
+        hideAssignmentGroupTotals: {allowed: true, checked: false, onChange: () => {}}
+      })
+      expect(getByRole('checkbox', {name: 'Hide Assignment Group Totals'})).not.toBeChecked()
+    })
+
+    it('calls .onChange when the user toggles the item', () => {
+      const onChange = jest.fn()
+      const {getByRole} = renderPanel({
+        hideAssignmentGroupTotals: {allowed: true, checked: false, onChange}
+      })
+
+      fireEvent.click(getByRole('checkbox', {name: 'Hide Assignment Group Totals'}))
+      expect(onChange).toHaveBeenCalledWith(true)
     })
   })
 

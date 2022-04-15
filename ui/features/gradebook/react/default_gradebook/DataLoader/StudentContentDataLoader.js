@@ -42,6 +42,7 @@ const submissionsParams = {
     'missing',
     'points_deducted',
     'posted_at',
+    'redo_request',
     'score',
     'seconds_late',
     'submission_type',

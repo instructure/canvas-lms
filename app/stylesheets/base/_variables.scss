@@ -202,7 +202,7 @@ $ic-font-color-dark:      var(--ic-brand-font-color-dark);
 @if $use_high_contrast { $ic-font-color-dark: $ic-color-dark; }
 $ic-font-color--subdued:  var(--ic-brand-font-color-dark-lightened-15);
 @if $use_high_contrast { $ic-font-color--subdued:  $ic-color-medium-darker; }
-$ic-hint-text:            var(--ic-brand-font-color-dark-lightened-30);
+$ic-hint-text:            var(--ic-brand-font-color-dark-lightened-28);
 @if $use_high_contrast { $ic-hint-text: $ic-color-medium; }
 
 // textColor is a deprecated Bootstrap 2 variable. Please use $ic-font-color-dark!
@@ -216,7 +216,7 @@ $ic-icon-link-color-hover: var(--ic-brand-font-color-dark-lightened-15);
 $ic-icon-link-color-hover: $ic-font-color-dark;
 }
 
-$ic-icon-link-color:       var(--ic-brand-font-color-dark-lightened-30);
+$ic-icon-link-color:       var(--ic-brand-font-color-dark-lightened-28);
 @if $use_high_contrast {
 $ic-icon-link-color:       lighten($ic-font-color-dark, 12%);
 }

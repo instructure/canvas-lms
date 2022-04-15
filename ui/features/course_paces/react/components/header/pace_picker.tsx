@@ -19,11 +19,12 @@
 import React, {useState} from 'react'
 import keycode from 'keycode'
 import {connect} from 'react-redux'
-// @ts-ignore: TS doesn't understand i18n scoped imports
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {IconArrowOpenDownSolid, IconArrowOpenUpSolid} from '@instructure/ui-icons'
+import {Avatar} from '@instructure/ui-avatar'
+import {Heading} from '@instructure/ui-heading'
 import {Menu} from '@instructure/ui-menu'
 import {TextInput} from '@instructure/ui-text-input'
 import {TruncateText} from '@instructure/ui-truncate-text'
@@ -31,14 +32,14 @@ import {View} from '@instructure/ui-view'
 
 import UnpublishedWarningModal from './unpublished_warning_modal'
 
-import {StoreState, Enrollment, Section, PaceContextTypes} from '../../types'
+import {StoreState, Enrollment, Section, PaceContextTypes, ResponsiveSizes} from '../../types'
 import {Course} from '../../shared/types'
 import {getUnpublishedChangeCount} from '../../reducers/course_paces'
 import {getSortedEnrollments} from '../../reducers/enrollments'
 import {getSortedSections} from '../../reducers/sections'
 import {getCourse} from '../../reducers/course'
 import {actions} from '../../actions/ui'
-import {getSelectedContextId, getSelectedContextType} from '../../reducers/ui'
+import {getSelectedContextId, getSelectedContextType, getResponsiveSize} from '../../reducers/ui'
 
 const I18n = useI18nScope('course_paces_pace_picker')
 
@@ -54,6 +55,7 @@ interface StoreProps {
   readonly selectedContextId: string
   readonly selectedContextType: PaceContextTypes
   readonly changeCount: number
+  readonly responsiveSize: ResponsiveSizes
 }
 
 interface DispatchProps {
@@ -76,13 +78,14 @@ export const PacePicker: React.FC<ComponentProps> = ({
   sections,
   selectedContextType,
   selectedContextId,
-  setSelectedPaceContext
+  setSelectedPaceContext,
+  responsiveSize
 }) => {
   const [open, setOpen] = useState(false)
   const [pendingContext, setPendingContext] = useState('')
   const hasChanges = changeCount > 0
 
-  let selectedContextName = I18n.t('Course Pace')
+  let selectedContextName = I18n.t('Course')
   if (selectedContextType === 'Section') {
     selectedContextName = sections.find(({id}) => id === selectedContextId)?.name
   }
@@ -101,15 +104,16 @@ export const PacePicker: React.FC<ComponentProps> = ({
     }
   }
 
-  const handleSelect = (_, value: string) => {
+  const handleSelect = (_, value: string | string[]) => {
+    const option = Array.isArray(value) ? value[0] : value
     if (hasChanges) {
-      setPendingContext(value)
+      setPendingContext(option)
     } else {
-      setSelectedPaceContext(...parseContextKey(value))
+      setSelectedPaceContext(...parseContextKey(option))
     }
   }
 
-  const renderOption = (contextKey: string, label: string, key?: string) => (
+  const renderOption = (contextKey: string, label: string, key?: string): JSX.Element => (
     <Item value={contextKey} defaultSelected={contextKey === selectedContextKey} key={key}>
       <View as="div" width={PICKER_WIDTH}>
         <TruncateText>{label}</TruncateText>
@@ -117,9 +121,33 @@ export const PacePicker: React.FC<ComponentProps> = ({
     </Item>
   )
 
-  const trigger = (
+  const renderStudentOption = (enrollment: Enrollment): JSX.Element => {
+    const contextKey = createContextKey('Enrollment', enrollment.id)
+    const key = `student-${enrollment.id}`
+    return (
+      <Item value={contextKey} defaultSelected={contextKey === selectedContextKey} key={key}>
+        <View as="div" width={PICKER_WIDTH}>
+          <Avatar name={enrollment.full_name} src={enrollment.avatar_url} size="xx-small" />
+          <View as="div" display="inline-block" margin="0 0 0 small">
+            <TruncateText>{enrollment.full_name}</TruncateText>
+          </View>
+        </View>
+      </Item>
+    )
+  }
+
+  const renderSubMenu = (options: JSX.Element[], elementId: string, label: string) => {
+    const SubMenu = responsiveSize === 'small' ? Menu.Group : Menu
+    return (
+      <SubMenu id={elementId} label={label}>
+        {options}
+      </SubMenu>
+    )
+  }
+
+  const trigger: JSX.Element = (
     <TextInput
-      renderLabel={I18n.t('Course Paces')}
+      renderLabel={I18n.t('Course Pacing')}
       renderAfterInput={
         open ? <IconArrowOpenUpSolid inline={false} /> : <IconArrowOpenDownSolid inline={false} />
       }
@@ -131,6 +159,14 @@ export const PacePicker: React.FC<ComponentProps> = ({
       width={PICKER_WIDTH}
     />
   )
+
+  if (enrollments.length === 0) {
+    return (
+      <Heading level="h2" margin="0 x-large 0 0">
+        {I18n.t('Course Pacing')}
+      </Heading>
+    )
+  }
 
   return (
     <ApplyTheme
@@ -149,18 +185,18 @@ export const PacePicker: React.FC<ComponentProps> = ({
         onToggle={setOpen}
         onSelect={handleSelect}
       >
-        {renderOption(createContextKey('Course', course.id), I18n.t('Course Pace'))}
+        {renderOption(createContextKey('Course', course.id), I18n.t('Course'))}
         {/* Commenting out since we're not implementing sections yet */}
         {/* <Menu id="course-pace-menu" label={I18n.t('Sections')}> */}
         {/*  {sections.map(s => */}
         {/*    renderOption(createContextKey('Section', s.id), s.name, `section-${s.id}`) */}
         {/*  )} */}
         {/* </Menu> */}
-        <Menu id="course-pace-student-menu" label={I18n.t('Students')}>
-          {enrollments.map(e =>
-            renderOption(createContextKey('Enrollment', e.id), e.full_name, `student-${e.id}`)
-          )}
-        </Menu>
+        {renderSubMenu(
+          enrollments.map(e => renderStudentOption(e)),
+          'course-pace-student-menu',
+          I18n.t('Students')
+        )}
       </Menu>
       <UnpublishedWarningModal
         open={!!pendingContext}
@@ -182,7 +218,8 @@ const mapStateToProps = (state: StoreState) => ({
   sections: getSortedSections(state),
   selectedContextId: getSelectedContextId(state),
   selectedContextType: getSelectedContextType(state),
-  changeCount: getUnpublishedChangeCount(state)
+  changeCount: getUnpublishedChangeCount(state),
+  responsiveSize: getResponsiveSize(state)
 })
 
 export default connect(mapStateToProps, {

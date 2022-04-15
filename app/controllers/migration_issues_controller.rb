@@ -94,9 +94,11 @@
 #
 class MigrationIssuesController < ApplicationController
   include Api::V1::ContentMigration
+  include GranularPermissionEnforcement
 
   before_action :require_context
   before_action :require_content_migration
+  before_action :authorize_action
 
   # @API List migration issues
   #
@@ -158,8 +160,19 @@ class MigrationIssuesController < ApplicationController
 
   protected
 
+  def authorize_action
+    enforce_granular_permissions(
+      @context,
+      overrides: [:manage_content],
+      actions: {
+        index: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
+        show: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
+        update: [:manage_course_content_edit]
+      }
+    )
+  end
+
   def require_content_migration
     @content_migration = @context.content_migrations.find(params[:content_migration_id])
-    authorized_action(@context, @current_user, :manage_content)
   end
 end

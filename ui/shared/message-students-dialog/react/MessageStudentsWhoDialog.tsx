@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useContext} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import React, {useState, useContext, useEffect} from 'react'
 
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -66,16 +66,22 @@ const {Body: TableBody, Cell, ColHeader, Head: TableHead, Row} = Table as any
 
 export type Student = {
   id: string
+  grade?: string
   name: string
+  redoRequest?: boolean
+  score?: number
   sortableName: string
+  submittedAt?: Date
 }
 
 export type Assignment = {
+  allowedAttempts: number
   courseId: string
+  dueDate: Date | null
   gradingType: string
   id: string
   name: string
-  nonDigitalSubmission: boolean
+  submissionTypes: string[]
 }
 
 export type Props = {
@@ -96,10 +102,18 @@ type FilterCriterion = {
 const isScored = (assignment: Assignment) =>
   ['points', 'percent', 'letter_grade', 'gpa_scale'].includes(assignment.gradingType)
 
+const isReassignable = (assignment: Assignment) =>
+  (assignment.allowedAttempts == -1 || assignment.allowedAttempts > 1) &&
+  assignment.dueDate != null &&
+  !assignment.submissionTypes.includes(
+    'on_paper' || 'external_tool' || 'none' || 'discussion_topic' || 'online_quiz'
+  )
+
 const filterCriteria: FilterCriterion[] = [
   {
     requiresCutoff: false,
-    shouldShow: assignment => !assignment.nonDigitalSubmission,
+    shouldShow: assignment =>
+      !['on_paper', 'none', 'not_graded', ''].includes(assignment.submissionTypes[0]),
     title: I18n.t('Have not yet submitted'),
     value: 'unsubmitted'
   },
@@ -129,7 +143,7 @@ const filterCriteria: FilterCriterion[] = [
   },
   {
     requiresCutoff: false,
-    shouldShow: () => true,
+    shouldShow: isReassignable,
     title: I18n.t('Reassigned'),
     value: 'reassigned'
   }
@@ -156,6 +170,49 @@ const FakeTag = ({text, selected = false}) => {
   )
 
   return <Tag text={contents} />
+}
+
+function observerCount(students, observers) {
+  return students.reduce((acc, student) => acc + (observers[student.id]?.length || 0), 0)
+}
+
+function filterStudents(criterion, students, cutoff) {
+  const newfilteredStudents: Student[] = []
+  for (const student of students) {
+    switch (criterion?.value) {
+      case 'unsubmitted':
+        if (!student.submittedAt) {
+          newfilteredStudents.push(student)
+        }
+        break
+      case 'ungraded':
+        if (!student.grade) {
+          newfilteredStudents.push(student)
+        }
+        break
+      case 'scored_more_than':
+        if (parseInt(student.score) > cutoff) {
+          newfilteredStudents.push(student)
+        }
+        break
+      case 'scored_less_than':
+        if (parseInt(student.score) < cutoff) {
+          newfilteredStudents.push(student)
+        }
+        break
+      case 'marked_incomplete':
+        if (student.grade == 'incomplete') {
+          newfilteredStudents.push(student)
+        }
+        break
+      case 'reassigned':
+        if (student.redoRequest) {
+          newfilteredStudents.push(student)
+        }
+        break
+    }
+  }
+  return newfilteredStudents
 }
 
 const MessageStudentsWhoDialog: React.FC<Props> = ({
@@ -197,17 +254,35 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
   const [cutoff, setCutoff] = useState(0.0)
   const [attachments, setAttachments] = useState([])
   const [pendingUploads, setPendingUploads] = useState([])
+  const sortedStudents = [...students].sort((a, b) => a.sortableName.localeCompare(b.sortableName))
+  const [filteredStudents, setFilteredStudents] = useState(
+    filterStudents(availableCriteria[0], sortedStudents, cutoff)
+  )
+  const [observersDisplayed, setObserversDisplayed] = useState(0.0)
+
+  useEffect(() => {
+    if (!loading && data) {
+      setObserversDisplayed(
+        observerCount(
+          filterStudents(selectedCriterion, sortedStudents, cutoff),
+          observersByStudentID
+        )
+      )
+    }
+  }, [loading, data, selectedCriterion, sortedStudents, cutoff, observersByStudentID])
 
   if (loading) {
     return <LoadingIndicator />
   }
 
-  const sortedStudents = [...students].sort((a, b) => a.sortableName.localeCompare(b.sortableName))
-
   const handleCriterionSelected = (_e, {value}) => {
     const newCriterion = filterCriteria.find(criterion => criterion.value === value)
     if (newCriterion != null) {
       setSelectedCriterion(newCriterion)
+      setFilteredStudents(filterStudents(newCriterion, sortedStudents, cutoff))
+      setObserversDisplayed(
+        observerCount(filterStudents(newCriterion, sortedStudents, cutoff), observersByStudentID)
+      )
     }
   }
 
@@ -276,6 +351,9 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
                   value={cutoff}
                   onChange={(_e, value) => {
                     setCutoff(value)
+                    if (value !== '') {
+                      setFilteredStudents(filterStudents(selectedCriterion, sortedStudents, value))
+                    }
                   }}
                   showArrows={false}
                   renderLabel={
@@ -296,7 +374,7 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
                 defaultChecked
                 label={
                   <Text weight="bold">
-                    {I18n.t('%{studentCount} Students', {studentCount: students.length})}
+                    {I18n.t('%{studentCount} Students', {studentCount: filteredStudents.length})}
                   </Text>
                 }
               />
@@ -306,7 +384,7 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
                 label={
                   <Text weight="bold">
                     {I18n.t('%{observerCount} Observers', {
-                      observerCount: observerEnrollments.length
+                      observerCount: observersDisplayed
                     })}
                   </Text>
                 }
@@ -332,7 +410,7 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
                 </Row>
               </TableHead>
               <TableBody>
-                {sortedStudents.map(student => (
+                {filteredStudents.map(student => (
                   <Row key={student.id}>
                     <Cell>
                       <FakeTag text={student.name} selected />

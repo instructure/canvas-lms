@@ -262,6 +262,29 @@ module Crystalball
       end
     end
   end
+
+  class MapGenerator
+    def start!
+      self.map = nil
+      configuration.reset_map_storage!
+      map_storage.clear!
+      map_storage.dump(map.metadata.to_h)
+
+      strategies.reverse.each(&:after_start)
+      self.started = true
+    end
+
+    class Configuration
+      def generate_unique_map_filename
+        "log/results/crystalball_results/#{SecureRandom.uuid}_#{ENV.fetch("PARALLEL_INDEX", "0")}_map.yml"
+      end
+
+      def reset_map_storage!
+        self.map_storage_path = generate_unique_map_filename
+        @map_storage = MapStorage::YAMLStorage.new(map_storage_path)
+      end
+    end
+  end
 end
 
 require "crystalball/rspec/runner/configuration"

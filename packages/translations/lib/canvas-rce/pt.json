@@ -102,6 +102,10 @@
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Recolher para ocultar { types }"
   },
+  "color_picker_6b359edf": { "message": "Seletor de cores" },
+  "color_picker_colorname_selected_ad4cf400": {
+    "message": "Seletor de Cores ({ colorName } selecionado)"
+  },
   "computer_1d7dfa6f": { "message": "Computador" },
   "content_1440204b": { "message": "Conteúdo" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -150,7 +154,6 @@
   "describe_the_video_2fe8f46a": { "message": "(Descreva o vídeo)" },
   "details_98a31b68": { "message": "Detalhes" },
   "diamond_b8dfe7ae": { "message": "Diamante" },
-  "dimension_type_55c83e4e": { "message": "Tipo de dimensão" },
   "dimensions_45ddb7b7": { "message": "Dimensões" },
   "directionality_26ae9e08": { "message": "Direcionalidade" },
   "directly_edit_latex_b7e9235b": { "message": "Editar diretamente LaTeX" },
@@ -177,6 +180,7 @@
   "edit_existing_button_icon_3d0277bd": {
     "message": "Editar Botão / Ícone Existente"
   },
+  "edit_icon_2c6b0e91": { "message": "Editar Ícone" },
   "edit_link_7f53bebb": { "message": "Editar ligação" },
   "editor_statusbar_26ac81fc": { "message": "Barra de estado do editor" },
   "embed_828fac4a": { "message": "Incluído" },
@@ -310,6 +314,9 @@
   "magenta_4a65993c": { "message": "Magenta" },
   "math_icon_ad4e9d03": { "message": "Ícone Matemática" },
   "media_af190855": { "message": "Mídia" },
+  "media_file_is_processing_please_try_again_later_58a6d49": {
+    "message": "O ficheiro multimédia está a ser processado. É favor, tentar novamente mais tarde."
+  },
   "medium_5a8e9ead": { "message": "Médio" },
   "middle_27dc1d5": { "message": "Médio" },
   "misc_3b692ea7": { "message": "Diversos" },
@@ -402,6 +409,9 @@
   "resize_ec83d538": { "message": "Redimensionar" },
   "restore_auto_save_deccd84b": { "message": "Restaurar o auto-salvamento?" },
   "rich_content_editor_2708ef21": { "message": "Editor de conteúdo avançado" },
+  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+    "message": "Área de Rich Text. Prima ALT+0 para obter atalhos do Editor de Conteúdo Rico."
+  },
   "right_to_left_9cfb092a": { "message": "Direita para a esquerda" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Infelizmente, o editor de HTML bonito não está acessível através do teclado. Aceda aqui ao editor de HTML em bruto."
@@ -433,16 +443,7 @@
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Algo deu errado e eu não sei o que mostrar."
   },
-  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-    "message": "Algo correu mal, verifique a sua ligação e tente novamente."
-  },
   "something_went_wrong_d238c551": { "message": "Algo deu errado" },
-  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-    "message": "Ocorreu um erro. Tente novamente depois de atualizar a página"
-  },
-  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-    "message": "Ocorreu um erro ao fazer o carregamento, verifique sua conexão e tente novamente."
-  },
   "sort_by_e75f9e3e": { "message": "Classificar por" },
   "square_511eb3b3": { "message": "Quadrado" },
   "square_unordered_list_b15ce93b": { "message": "lista desordenada quadrada" },
@@ -511,9 +512,6 @@
   "upload_media_ce31135a": { "message": "Carregar Multimédia" },
   "upload_record_media_e4207d72": { "message": "Carregar/Gravar Mídia" },
   "uploading_19e8a4e7": { "message": "A realizar carregamento" },
-  "uploading_closed_captions_subtitles_failed_bc093f3": {
-    "message": "O carregamento de legendas/subtítulos fechados falhou."
-  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "lista ordenada por ordem alfabética maiúscula"
   },

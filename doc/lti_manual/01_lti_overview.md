@@ -1,23 +1,24 @@
 # LTI Overview
 
 LTI stands for Learning Tools Interoperability and is a standard developed by IMS Global for interfacing between different learning tools. This provides a way for all LMSs and other EdTech products to speak the same language. Helpful links:
+
 - [What is LTI and how it can improve your learning ecosystem | Moodle](https://moodle.com/news/what-is-lti-and-how-it-can-improve-your-learning-ecosystem/)
 - [Learning Tools Interoperability Homepage | IMS Global Learning Consortium](https://www.imsglobal.org/activity/learning-tools-interoperability)
 
 ## Glossary of Core Concepts
 
 - **Tool:** The main unit of LTI work, a singular piece of software that performs a task associated with the LMS. Examples include:
-	- submitting homework using Google Drive
-	- viewing a page of a textbook embedded in an assignment
-	- creating a meeting in a calendar event with Microsoft Teams
+  - submitting homework using Google Drive
+  - viewing a page of a textbook embedded in an assignment
+  - creating a meeting in a calendar event with Microsoft Teams
 - **Tool Consumer/Platform:** an LMS like Canvas, who consumes external content from tools. "Tool Consumer" is from earlier iterations of the standard, and has since been simplified to "Platform".
 - **Tool Provider:** External content that provides a tool. From earlier iterations of the standard, and is now discouraged in favor of "Tool".
 - **Launch:** The act of loading a tool, usually within an iframe set in a Canvas page. The main way of interacting with LTI tools. Data in this case is flowing from Canvas to the LTI tool, in the form of an HTTP POST request.
-- **Placement:** The place in the Canvas UI where an LTI link should be displayed. For example, the `course_navigation` placement indicates to Canvas that a link to the tool should be placed in the course navigation.
+- **Placement:** The place in the Canvas UI where an LTI link should be displayed. For example, the `course_navigation` placement indicates to Canvas that a link to the tool should be placed in the course navigation. Note that although this concept never officially appears in the LTI spec, many if not all platforms that implement LTI have some sort of configuration for allowing the tool to be displayed in different places. For more information, see [the Placements page](./14_placements.md)
 
 ## Intro to Spec Versions
 
-Canvas and IMS have historically worked hand-in-hand to develop new features and flesh out the core specifications of the LTI standard.  This standard has gone through a few versions, all of which Canvas supports and implements in different ways. This is a main source of confusion when working on LTI in Canvas, since these versions are disparate and implemented very differently. In addition, some of these versions are now deprecated, and Canvas supports them only for backwards compatibility. Here is an overview of each of them:
+Canvas and IMS have historically worked hand-in-hand to develop new features and flesh out the core specifications of the LTI standard. This standard has gone through a few versions, all of which Canvas supports and implements in different ways. This is a main source of confusion when working on LTI in Canvas, since these versions are disparate and implemented very differently. In addition, some of these versions are now deprecated, and Canvas supports them only for backwards compatibility. Here is an overview of each of them:
 
 ### LTI 1.1
 
@@ -68,9 +69,9 @@ The advent of LTI 1.3 in 2019 promised all the same functionality as previous ve
 #### Version-Specific Concepts
 
 - **Deployment**: Commonly called an "installation" in Canvas LTI, the scope of contexts under which a tool is made available. For example, a tool can be deployed:
-	- in a single course
-	- in a root account, making it available to the whole institution
-	- in Site Admin, making it available to all Canvas customers
+  - in a single course
+  - in a root account, making it available to the whole institution
+  - in Site Admin, making it available to all Canvas customers
 - **Link**: A reference to a Tool stored by a Platform, usually a URL that points to the Tool. Not just an HTML link, though, since other metadata can be included like files, images, or HTML.
 - **Resource**: An item of content delivered by a tool, that's usually linked to something like assignment. A Link to a Resource is called, you guessed it, a Resource Link. Launching a tool using a Resource Link is the main form of interaction with a Tool.
 - **Message**: One of the two main integrations between Platform and Tool. A Message comes from a user and their actions within their browser, such as clicking on an embedded link for an LTI Resource. This action initiates an OpenID login, which results in the platform passing the Message (a JWT) to the tool.
@@ -83,4 +84,3 @@ More information about these are found in the spec [here](http://www.imsglobal.o
 Rather than making a clean break in implementation as we did with LTI 2.0, the team decided to piggy-back on as much existing LTI 1.1 code as we could to quickly reach feature parity.
 
 This worked very well in general, although some code may feel initially confusing without knowing it serves LTI 1.1 and LTI 1.3. More details on the LTI launch code can be found [here](./03_lti_launches).
-

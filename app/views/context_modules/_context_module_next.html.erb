@@ -20,7 +20,7 @@
   context_module_next ||= nil
   context_module ||= context_module_next
   module_data = context_module ? process_module_data(context_module, @is_student, @current_user, @session) : { published_status: 'unpublished' }
-  editable ||= can_do(@context, @current_user, :manage_content)
+  editable ||= can_do(@context, @current_user, :manage_content, :manage_course_content_edit)
   can_direct_share = can_do(@context, @current_user, :read_as_admin)
   workflow_state = context_module && context_module.workflow_state
   @modules ||= []
@@ -199,7 +199,8 @@
           <% end %>
           <% if editable %>
             <%= external_tools_menu_items(@menu_tools[:module_menu], {link_class: "menu_tool_link", settings_key: :module_menu, in_list: true, url_params: {:modules => [context_module ? context_module.id : "{{ id }}"]}}) %>
-            <%= external_tools_menu_items(@module_group_tools, {link_class: "menu_tray_tool_link", settings_key: :module_group_menu, in_list: true}) %>
+            <%= external_tools_menu_items(@menu_tools[:module_group_menu], {link_class: "menu_tray_tool_link", settings_key: :module_group_menu, in_list: true}) %>
+            <%= external_tools_menu_items(@menu_tools[:module_menu_modal], {link_class: "menu_tray_tool_link", settings_key: :module_menu_modal, in_list: true}) %>
           <% end %>
         </ul>
       <% end %>

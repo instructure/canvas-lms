@@ -45,12 +45,90 @@ const filesFor = (folder, overrides, bookmark) => ({
       type: 'image/jpeg',
       name: 'its-working-its-working.jpg',
       url: 'http://canvas.docker/files/172/download?download_frd=1',
-      embed: {
-        type: 'image'
-      },
+      embed: {type: 'image'},
       folderId: folder.id,
       thumbnailUrl:
         'http://canvas.docker/images/thumbnails/172/KEI31pWCjvr1yK3xOT0pwLUGnzxTQ0HEVjiCKqhQ',
+      ...overrides
+    },
+    {
+      id: 173,
+      uuid: 'BEI31pWCjvr1yK3xOT0pwLUGnzxTQ0HEVjiCKqhQ',
+      type: 'image/jpeg',
+      name: 'no-thumbnail.jpg',
+      url: 'http://canvas.docker/files/173/download?download_frd=1',
+      embed: {type: 'image'},
+      folderId: folder.id,
+      ...overrides
+    },
+    {
+      id: 174,
+      uuid: 'CEI31pWCjvr1yK3xOT0pwLUGnzxTQ0HEVjiCKqhQ',
+      type: 'application/msword',
+      name: 'doc.docx',
+      url: 'http://canvas.docker/files/174/download?download_frd=1',
+      embed: {type: 'file'},
+      folderId: folder.id,
+      ...overrides
+    },
+    {
+      id: 175,
+      uuid: 'DEI31pWCjvr1yK3xOT0pwLUGnzxTQ0HEVjiCKqhQ',
+      type: 'application/vnd.ms-powerpoint',
+      name: 'slides.pptx',
+      url: 'http://canvas.docker/files/175/download?download_frd=1',
+      embed: {type: 'file'},
+      folderId: folder.id,
+      ...overrides
+    },
+    {
+      id: 176,
+      uuid: 'EEI31pWCjvr1yK3xOT0pwLUGnzxTQ0HEVjiCKqhQ',
+      type: 'application/pdf',
+      name: 'pdf.pdf',
+      url: 'http://canvas.docker/files/176/download?download_frd=1',
+      embed: {type: 'file'},
+      folderId: folder.id,
+      ...overrides
+    },
+    {
+      id: 177,
+      uuid: 'FEI31pWCjvr1yK3xOT0pwLUGnzxTQ0HEVjiCKqhQ',
+      type: 'application/vnd.ms-excel',
+      name: 'spreadsheet.xlsx',
+      url: 'http://canvas.docker/files/177/download?download_frd=1',
+      embed: {type: 'file'},
+      folderId: folder.id,
+      ...overrides
+    },
+    {
+      id: 178,
+      uuid: 'GEI31pWCjvr1yK3xOT0pwLUGnzxTQ0HEVjiCKqhQ',
+      type: 'application/x-yaml',
+      name: 'docker-compose.override.yml',
+      url: 'http://canvas.docker/files/178/download?download_frd=1',
+      embed: {type: 'file'},
+      folderId: folder.id,
+      ...overrides
+    },
+    {
+      id: 179,
+      uuid: 'HEI31pWCjvr1yK3xOT0pwLUGnzxTQ0HEVjiCKqhQ',
+      type: 'video/mp4',
+      name: 'vid.mov',
+      url: 'http://canvas.docker/files/179/download?download_frd=1',
+      embed: {type: 'video'},
+      folderId: folder.id,
+      ...overrides
+    },
+    {
+      id: 180,
+      uuid: 'IEI31pWCjvr1yK3xOT0pwLUGnzxTQ0HEVjiCKqhQ',
+      type: 'audio/mp4',
+      name: 'sound.mp4',
+      url: 'http://canvas.docker/files/180/download?download_frd=1',
+      embed: {type: 'audio'},
+      folderId: folder.id,
       ...overrides
     }
   ],
@@ -75,7 +153,7 @@ export const apiSource = () => ({
       if (!folderId) return
 
       const filesFolder = folderFor({type: 'course', id: 1}).folders[0]
-      responseData = filesFor(filesFolder, {folderId: parseInt(folderId)})
+      responseData = filesFor(filesFolder, {folderId: parseInt(folderId, 10)})
     }
 
     onSuccess(responseData)

@@ -80,8 +80,7 @@ class AssignmentsController < ApplicationController
           FLAGS: {
             newquizzes_on_quiz_page: @context.root_account.feature_enabled?(:newquizzes_on_quiz_page),
             new_quizzes_modules_support: Account.site_admin.feature_enabled?(:new_quizzes_modules_support),
-            new_quizzes_skip_to_build_module_button: Account.site_admin.feature_enabled?(:new_quizzes_skip_to_build_module_button),
-            updated_mastery_connect_icon: Account.site_admin.feature_enabled?(:updated_mastery_connect_icon)
+            new_quizzes_skip_to_build_module_button: Account.site_admin.feature_enabled?(:new_quizzes_skip_to_build_module_button)
           }
         }
 
@@ -232,17 +231,20 @@ class AssignmentsController < ApplicationController
         log_asset_access(@assignment, "assignments", @assignment.assignment_group)
 
         if render_a2_student_view?
+          if Account.site_admin.feature_enabled?(:observer_picker) && Setting.get("assignments_2_observer_view", "false") == "true"
+            js_env({ OBSERVER_OPTIONS: {
+                     OBSERVED_USERS_LIST: observed_users(@current_user, session, @context.id),
+                     CAN_ADD_OBSERVEE: @current_user
+                                       .profile
+                                       .tabs_available(@current_user, root_account: @domain_root_account)
+                                       .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
+                   } })
+          end
+
           student_to_view, active_enrollment = a2_active_student_and_enrollment
           if student_to_view.present?
             js_env({ enrollment_state: active_enrollment&.state_based_on_date })
             rce_js_env
-
-            # Initially we will not have any visual indicator of which
-            # student is observed so we will announce it in a flash notice.
-            unless student_to_view == @current_user
-              flash[:notice] = t "Observing %{student_name}. To select a different student, return to the dashboard.",
-                                 student_name: student_to_view.name
-            end
 
             render_a2_student_view(student: student_to_view)
             return
@@ -286,7 +288,7 @@ class AssignmentsController < ApplicationController
         elsif @assignment.discussion_topic? &&
               @assignment.discussion_topic.grants_right?(@current_user, session, :read)
           return redirect_to named_context_url(@context, :context_discussion_topic_url, @assignment.discussion_topic.id)
-        elsif @context.feature_enabled?(:conditional_release) && @assignment.wiki_page? &&
+        elsif @context.conditional_release? && @assignment.wiki_page? &&
               @assignment.wiki_page.grants_right?(@current_user, session, :read)
           return redirect_to named_context_url(@context, :context_wiki_page_url, @assignment.wiki_page.id)
         elsif @assignment.submission_types == "external_tool" && @assignment.external_tool_tag && @unlocked
@@ -553,7 +555,7 @@ class AssignmentsController < ApplicationController
     @course_home_sub_navigation_tools =
       ContextExternalTool.all_tools_for(@context, placements: :course_home_sub_navigation,
                                                   root_account: @domain_root_account, current_user: @current_user).to_a
-    unless @context.grants_right?(@current_user, session, :manage_content)
+    unless @context.grants_any_right?(@current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
       @course_home_sub_navigation_tools.reject! { |tool| tool.course_home_sub_navigation(:visibility) == "admins" }
     end
 
@@ -645,7 +647,7 @@ class AssignmentsController < ApplicationController
 
     if params[:submission_types] == "discussion_topic"
       redirect_to new_polymorphic_url([@context, :discussion_topic], index_edit_params)
-    elsif @context.feature_enabled?(:conditional_release) && params[:submission_types] == "wiki_page"
+    elsif @context.conditional_release? && params[:submission_types] == "wiki_page"
       redirect_to new_polymorphic_url([@context, :wiki_page], index_edit_params)
     else
       @assignment.quiz_lti! if params.key?(:quiz_lti)
@@ -675,7 +677,7 @@ class AssignmentsController < ApplicationController
         return redirect_to edit_course_quiz_url(@context, @assignment.quiz, index_edit_params)
       elsif @assignment.submission_types == "discussion_topic" && @assignment.discussion_topic
         return redirect_to edit_polymorphic_url([@context, @assignment.discussion_topic], index_edit_params)
-      elsif @context.feature_enabled?(:conditional_release) &&
+      elsif @context.conditional_release? &&
             @assignment.submission_types == "wiki_page" && @assignment.wiki_page
         return redirect_to edit_polymorphic_url([@context, @assignment.wiki_page], index_edit_params)
       end
@@ -725,7 +727,9 @@ class AssignmentsController < ApplicationController
         SIS_NAME: AssignmentUtil.post_to_sis_friendly_name(@context),
         VALID_DATE_RANGE: CourseDateRange.new(@context),
         NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED:
-          Account.site_admin.feature_enabled?(:new_quizzes_assignment_build_button)
+          Account.site_admin.feature_enabled?(:new_quizzes_assignment_build_button),
+        NEW_MASTERY_CONNECT_ICON_ENABLED:
+          Account.site_admin.feature_enabled?(:updated_mastery_connect_icon),
       }
 
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment])) unless @assignment.new_record?

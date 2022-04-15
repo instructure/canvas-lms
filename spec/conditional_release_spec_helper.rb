@@ -77,7 +77,8 @@ module ConditionalRelease
       ]
       @rule = course.conditional_release_rules.create!(trigger_assignment: @trigger_assmt, scoring_ranges: ranges)
 
-      course.enable_feature!(:conditional_release)
+      course.conditional_release = true
+      course.save!
     end
   end
 end

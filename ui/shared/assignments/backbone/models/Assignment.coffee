@@ -463,7 +463,7 @@ export default class Assignment extends Model
 
   htmlUrl: =>
     if @isQuizLTIAssignment() && canManage() && ENV.FLAGS && ENV.FLAGS.new_quizzes_modules_support
-      return @htmlEditUrl()
+      return "#{@htmlEditUrl()}?quiz_lti"
     else
       return @get 'html_url'
 
@@ -501,7 +501,7 @@ export default class Assignment extends Model
     return ENV.NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED
 
   newMasteryConnectIconEnabled: =>
-    return ENV.FLAGS && ENV.FLAGS.updated_mastery_connect_icon
+    return ENV.NEW_MASTERY_CONNECT_ICON_ENABLED
 
   showBuildButton: =>
     @isQuizLTIAssignment() && @newQuizzesAssignmentBuildButtonEnabled()
@@ -631,8 +631,7 @@ export default class Assignment extends Model
       'showBuildButton', 'showGradersAnonymousToGradersCheckbox', 'singleSectionDueDate',
       'submissionType', 'submissionTypeSelectionTools', 'submissionTypesFrozen', 
       'turnitinAvailable', 'turnitinEnabled', 'unlockAt', 'vericiteAvailable',
-      'vericiteEnabled', 'importantDates', 'externalToolIframeWidth', 'externalToolIframeHeight',
-      'newMasteryConnectIconEnabled'
+      'vericiteEnabled', 'importantDates', 'externalToolIframeWidth', 'externalToolIframeHeight'
     ]
 
     hash =
