@@ -62,7 +62,7 @@ export const MessageDetailParticipants = ({...props}) => {
               {participantStr}
               {uniqueMessageRecipients.length > PARTICIPANT_EXPANSION_THRESHOLD && (
                 <Link
-                  margin="0 0 0 x-small"
+                  margin="x-small"
                   data-testid="expand-participants-button"
                   onClick={() => {
                     setParticipantsExpanded(!participantsExpanded)
