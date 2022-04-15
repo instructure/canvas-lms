@@ -20,7 +20,7 @@ import * as uploadFileModule from '@canvas/upload-file'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider} from 'react-apollo'
 import ComposeModalManager from '../ComposeModalContainer/ComposeModalManager'
-import {fireEvent, render, waitFor, screen} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import waitForApolloLoading from '../../../util/waitForApolloLoading'
 import {handlers} from '../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../shared/msw/mswClient'
@@ -217,22 +217,6 @@ describe('ComposeModalContainer', () => {
       expect(await queryByText('All Courses')).not.toBeInTheDocument()
       await waitForApolloLoading()
     })
-
-    // Skipped until Flakiness is addressed
-    it.skip('displays the selected course', async () => {
-      const component = setup()
-
-      let select = await component.findByTestId('course-select')
-      fireEvent.click(select)
-
-      const selectOptions = await component.findAllByText('Fighting Magneto 101')
-      expect(selectOptions.length).toBeGreaterThan(0)
-
-      fireEvent.click(selectOptions[0])
-      select = await component.findByTestId('course-select')
-
-      expect(select.getAttribute('value')).toBe('Fighting Magneto 101')
-    })
   })
 
   describe('Create Conversation', () => {
@@ -248,50 +232,6 @@ describe('ComposeModalContainer', () => {
       // Set body
       const bodyInput = component.getByTestId('message-body')
       fireEvent.change(bodyInput, {target: {value: 'Potato'}})
-
-      // Hit send
-      const button = component.getByTestId('send-button')
-      fireEvent.click(button)
-
-      await waitFor(() => expect(mockedSetOnSuccess).toHaveBeenCalled())
-    })
-
-    it.skip('allows created conversations to be added to faculty journal', async () => {
-      window.ENV.CONVERSATIONS = {
-        ATTACHMENTS_FOLDER_ID: 1,
-        NOTES_ENABLED: true,
-        CAN_ADD_NOTES_FOR_ACCOUNT: true,
-        CAN_ADD_NOTES_FOR_COURSES: {1: true}
-      }
-      const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
-      const component = setup({setOnSuccess: mockedSetOnSuccess})
-      await waitForApolloLoading()
-
-      // Set course
-      const select = await component.findByTestId('course-select')
-      fireEvent.click(select)
-      const selectOptions = await component.findAllByText('Fighting Magneto 101')
-      fireEvent.click(selectOptions[0])
-
-      // Set recipient
-      const input = await component.findByTestId('address-book-input')
-      fireEvent.change(input, {target: {value: 'Fred'}})
-      const items = await screen.findAllByTestId('address-book-item')
-      fireEvent.mouseDown(items[0])
-
-      // set as faculty journal entry
-      await waitFor(() => component.getByTestId('faculty-message-checkbox'))
-      const checkbox = await component.getByTestId('faculty-message-checkbox')
-      fireEvent.click(checkbox)
-      expect(checkbox.checked).toBe(true)
-
-      // Set subject
-      const subjectInput = await component.findByTestId('subject-input')
-      fireEvent.change(subjectInput, {target: {value: 'Journalized Message'}})
-
-      // Set body
-      const bodyInput = component.getByTestId('message-body')
-      fireEvent.change(bodyInput, {target: {value: 'This is a journalized message'}})
 
       // Hit send
       const button = component.getByTestId('send-button')
