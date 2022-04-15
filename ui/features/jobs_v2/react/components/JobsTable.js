@@ -18,40 +18,20 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
-import React, {useCallback, useState} from 'react'
+import React, {useCallback} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Responsive} from '@instructure/ui-responsive'
-import {IconCopyLine, IconXSolid, IconCheckDarkSolid} from '@instructure/ui-icons'
-import {IconButton} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {InfoColumn, InfoColumnHeader} from './InfoColumn'
 import SortColumnHeader from './SortColumnHeader'
+import CopyToClipboardButton from '@canvas/copy-to-clipboard-button'
 
 const I18n = useI18nScope('jobs_v2')
 
 function CopyToClipboardTruncatedValue({value, onClick}) {
-  const [feedback, setFeedback] = useState(null)
-
-  const copyToClipboardAction = useCallback(() => {
-    return navigator.clipboard.writeText(value).then(
-      () => setFeedback(true),
-      () => setFeedback(false)
-    )
-  }, [setFeedback, value])
-
-  const handleBlur = useCallback(() => {
-    setFeedback(null)
-  }, [setFeedback])
-
-  const renderFeedbackIcon = useCallback(() => {
-    if (feedback === true) return <IconCheckDarkSolid color="success" />
-    else if (feedback === false) return <IconXSolid color="error" />
-    else return <IconCopyLine />
-  }, [feedback])
-
   if (!value) {
     return <Text color="secondary">-</Text>
   }
@@ -68,14 +48,7 @@ function CopyToClipboardTruncatedValue({value, onClick}) {
         </Flex.Item>
         <Flex.Item>
           <div className="copy-button-container-cell">
-            <IconButton
-              size="small"
-              onClick={copyToClipboardAction}
-              screenReaderLabel={I18n.t('Copy')}
-              onBlur={handleBlur}
-            >
-              {renderFeedbackIcon()}
-            </IconButton>
+            <CopyToClipboardButton value={value} />
           </div>
         </Flex.Item>
       </Flex>
