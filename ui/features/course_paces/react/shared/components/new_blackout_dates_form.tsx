@@ -166,7 +166,11 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
   }
 
   disabledAdd = () => {
-    return this.state.eventTitle.trim().length < 1 || !(this.state.startDate || this.state.endDate)
+    return (
+      this.state.eventTitle.trim().length < 1 ||
+      !(this.state.startDate || this.state.endDate) ||
+      !!(this.state.startDate && this.state.endDate && this.state.endDate < this.state.startDate)
+    )
   }
 
   /* Renderers */
