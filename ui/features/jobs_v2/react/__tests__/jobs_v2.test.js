@@ -181,7 +181,8 @@ describe('JobsIndex', () => {
     const {getByText} = render(<JobsIndex />)
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('3606'))
-    expect(getByText('fake_job_list_locked_by_value')).toBeInTheDocument()
+    expect(getByText('job010001039065:12438')).toBeInTheDocument()
+    expect(getByText('10.1.39.65')).toBeInTheDocument()
     expect(getByText('4/2/22, 7:02 AM')).toBeInTheDocument()
   })
 
@@ -207,7 +208,8 @@ describe('JobsIndex', () => {
     })
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByRole('option', {name: /3606/}))
-    expect(getByText('fake_job_list_locked_by_value')).toBeInTheDocument()
+    expect(getByText('job010001039065:12438')).toBeInTheDocument()
+    expect(getByText('10.1.39.65')).toBeInTheDocument()
     expect(getByText('4/2/22, 7:02 AM')).toBeInTheDocument()
   })
 
