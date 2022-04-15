@@ -57,20 +57,22 @@ export const MessageDetailParticipants = ({...props}) => {
           <Text weight="bold" size={props.participantsSize}>
             {props.conversationMessage.author.name}
           </Text>
-          <Text size={props.participantsSize}>
-            {participantStr}
-            {uniqueMessageRecipients.length > PARTICIPANT_EXPANSION_THRESHOLD && (
-              <Link
-                margin="0 0 0 x-small"
-                data-testid="expand-participants-button"
-                onClick={() => {
-                  setParticipantsExpanded(!participantsExpanded)
-                }}
-              >
-                {participantExpansionButtonText}
-              </Link>
-            )}
-          </Text>
+          {!participantsToShow.length ? null : (
+            <Text size={props.participantsSize} data-testid="participant-list">
+              {participantStr}
+              {uniqueMessageRecipients.length > PARTICIPANT_EXPANSION_THRESHOLD && (
+                <Link
+                  margin="0 0 0 x-small"
+                  data-testid="expand-participants-button"
+                  onClick={() => {
+                    setParticipantsExpanded(!participantsExpanded)
+                  }}
+                >
+                  {participantExpansionButtonText}
+                </Link>
+              )}
+            </Text>
+          )}
         </View>
       </Flex.Item>
     </Flex>
