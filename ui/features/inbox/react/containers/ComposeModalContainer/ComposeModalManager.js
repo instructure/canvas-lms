@@ -221,7 +221,7 @@ const ComposeModalManager = props => {
     setSendingMessage(false)
 
     if (success) {
-      setOnSuccess(I18n.t('Message sent successfully'))
+      setOnSuccess(I18n.t('Message sent!'), false)
     } else {
       setOnFailure(I18n.t('Error creating conversation'))
     }

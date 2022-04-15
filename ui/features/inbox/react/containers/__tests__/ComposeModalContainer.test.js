@@ -28,6 +28,7 @@ import {mswServer} from '../../../../../shared/msw/mswServer'
 import React from 'react'
 import {responsiveQuerySizes} from '../../../util/utils'
 import {ConversationContext} from '../../../util/constants'
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 jest.mock('../../../util/utils', () => ({
   ...jest.requireActual('../../../util/utils'),
@@ -221,6 +222,8 @@ describe('ComposeModalContainer', () => {
 
   describe('Create Conversation', () => {
     it('allows creating conversations', async () => {
+      const I18n = useI18nScope('conversations_2')
+
       const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
 
       const component = setup({setOnSuccess: mockedSetOnSuccess})
@@ -237,7 +240,9 @@ describe('ComposeModalContainer', () => {
       const button = component.getByTestId('send-button')
       fireEvent.click(button)
 
-      await waitFor(() => expect(mockedSetOnSuccess).toHaveBeenCalled())
+      await waitFor(() =>
+        expect(mockedSetOnSuccess).toHaveBeenCalledWith(I18n.t('Message sent!'), false)
+      )
     })
   })
 
