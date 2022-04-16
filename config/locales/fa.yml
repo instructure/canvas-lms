@@ -2213,7 +2213,9 @@ fa:
   allows_the_duplicating_of_modules_in_canvas_2e15b444: "امکان تکرار ماژول ها در کانواس"
   allows_the_duplication_of_calendar_events_7bb0d6c5: "امکان دوتا کردن رویدادهای تقویم"
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "امکان زمان بندی رویدادهای تکرار شونده تقویم را فراهم می کند"
+  allows_user_to_access_a_user_s_settings_menu_and_u_235d8fd8: "به کاربر اجازه می دهد تا به منوی تنظیمات کاربر و جزئیات کاربر دسترسی داشته باشد."
   allows_user_to_access_and_edit_the_admin_settings__b3390b66: "به کاربر امکان دسترسی و ویرایش تنظیمات مدیر درموارد رایج را می دهد. به کاربر امکان می دهد گروه ها را ایجاد و مدیریت کند. به کاربر اجازه می دهد تا منابع مشترک در حساب را مدیریت کند."
+  allows_user_to_access_gradebook_history_9d599681: "به کاربر امکان دسترسی به تاریخچه دفتر نمره را می دهد."
   allows_user_to_access_speedgrader_from_an_assignme_3b908f7: "به کاربر اجازه می‌دهد تا از طریق یک تکلیف به نمره گذاری سریع  دسترسی پیدا کند."
   allows_user_to_access_the_announcements_link_in_co_b0ef1a10: |-
       به کاربر اجازه می دهد تا به پیوند اعلانات در پیمایش دوره دسترسی پیدا کند.
@@ -2251,6 +2253,12 @@ fa:
       به کاربر اجازه می‌دهد گروه‌های تکلیف را در یک درس اضافه کند.
       به کاربر اجازه می‌دهد تا وزن گروه تکلیف را در یک درس فعال و ویرایش کند.
   allows_user_to_add_new_assignments_to_a_module_51ae198c: "به کاربر اجازه می‌دهد تکالیف جدید را به ماژول اضافه کند."
+  allows_user_to_add_new_courses_to_an_account_bcb32ad2: "به کاربر اجازه می دهد دوره های آموزشی جدیدی را به یک حساب اضافه کند."
+  allows_user_to_add_new_question_banks_to_a_course__9731f87d: "به کاربر اجازه می دهد تا بانک سوالات جدید را به یک درس یا حساب اضافه کند."
+  allows_user_to_add_new_question_banks_to_a_course_a18a410a: "به کاربر اجازه می دهد تا بانک سوالات جدید را به یک درس اضافه کند."
+  allows_user_to_add_observers_to_a_course_ca1a678b: "به کاربر امکان می دهد ناظران را به یک درس اضافه کند."
+  allows_user_to_add_page_to_student_to_do_list_7085a054: "به کاربر اجازه می دهد صفحه ای را به لیست کارهای دانشجو اضافه کند."
+  allows_user_to_add_quizzes_in_a_course_80916c02: "به کاربر اجازه می دهد تا آزمون ها را در یک درس اضافه کند."
   allows_user_to_add_remove_other_teachers_course_de_702821d4: |-
       به کاربر اجازه می‌دهد سایر استادان، طراحان درس یا دستیاران آموزشی را اضافه یا حذف کند.
       به کاربر اجازه می‌دهد تا بیننده‌ها را به درس اضافه یا حذف کند.
@@ -2273,10 +2281,24 @@ fa:
       به کاربر اجازه می دهد تا به منوی تنظیمات و اطلاعات کاربر دسترسی پیدا کند.
       به کاربر اجازه می دهد بخش یا نقش دانشجو را ویرایش کند.
       به کاربر اجازه می دهد دعوت نامه های درس دوباره ارسال کند.
+  allows_user_to_add_students_to_a_course_aa642fa6: "به کاربر اجازه می دهد تا دانش آموزان را به یک درس اضافه کند."
   allows_user_to_add_students_to_a_course_from_the_a_3b752dd2: "به کاربر اجازه می‎دهد از صفحه درس‌های حساب، دانشجویان را به یک درس اضافه کند."
+  allows_user_to_add_students_to_course_groups_969f968: "به کاربر اجازه می دهد تا دانش آموزان را به گروه های درسی اضافه کند."
   allows_user_to_add_teachers_course_designers_or_ta_a7fdaceb: "به کاربر اجازه می‌دهد از صفحه درس‌های حساب، استادان، طراحان درس یا دستیاران آموزشی را به درس‌های اضافه کند. "
+  allows_user_to_add_teachers_to_a_course_37b9594c: "به کاربر اجازه می دهد معلمان را به یک درس اضافه کند."
+  allows_user_to_add_teachers_to_a_course_from_the_a_afbe4c3d: "به کاربر اجازه می دهد معلمان را از صفحه حساب کاربری درس ها به درس اضافه کند."
+  allows_user_to_add_users_to_a_course_group_aa0df439: "به کاربر اجازه می دهد تا کاربران را به گروه درس اضافه کند."
+  allows_user_to_add_users_to_an_account_or_course_g_f2a3a2b8: "به کاربر اجازه می دهد تا کاربران را به یک حساب کاربری یا گروه درسی اضافه کند."
+  allows_user_to_assign_a_student_group_leader_in_a__6851d646: "به کاربر اجازه می دهد تا یک رهبر گروه دانشجویی را در به یک درس اختصاص دهد."
+  allows_user_to_assign_a_student_group_leader_in_an_73e12cb6: "به کاربر اجازه می دهد تا یک رهبر گروه دانشجویی را در یک حساب کاربری یا درس اختصاص دهد."
+  allows_user_to_change_start_and_end_dates_for_cour_f437cee1: "به کاربر اجازه می دهد تا تاریخ شروع و پایان بخش های درس را تغییر دهد."
+  allows_user_to_change_the_template_being_used_by_a_eab509a3: "به کاربر اجازه می دهد تا الگوی استفاده شده توسط یک حساب را تغییر دهد."
   allows_user_to_configure_alerts_in_course_settings_40a81b1d: "به کاربر اجازه می دهد تا هشدارها را در تنظیمات درس پیکربندی کند. هشدارها به ندرت مورد استفاده قرار می گیرند و برای ارسال هشدار به دانشجویان، اساتید یا مدیران برای محرک‌های خاص (به عنوان مثال، بدون تعامل دانشجو / استاد به مدت 7 روز) طراحی شده اند . آن‌ها هر روز بررسی می شوند و تا زمانی رفع مشکل، اطلاعیه‌ها برای دانشجو و / یا استاد ارسال می شود."
   allows_user_to_configure_alerts_in_course_settings_806397b5: "به کاربر اجازه می دهد تا هشدارها را در تنظیمات درس پیکربندی کند. هشدارها به ندرت مورد استفاده قرار می گیرند و برای ارسال هشدار به دانشجویان، اساتید یا مدیران برای محرک‌های خاص (به عنوان مثال، بدون تعامل دانشجو / استاد به مدت 7 روز) طراحی شده اند . آن‌ها هر روز بررسی می شوند و تا زمانی رفع مشکل، اطلاعیه‌ها برای دانشجو  و / یا استاد ارسال می شود."
+  allows_user_to_configure_alerts_in_course_settings_c6b938ab: "به کاربر اجازه می دهد تا هشدارها را در تنظیمات درس پیکربندی کند."
+  allows_user_to_copy_individual_course_items_to_ano_46ba40d6: "به کاربر این امکان را می‌دهد که آیتم‌های درسی را در درس دیگری کپی کند."
+  allows_user_to_create_account_or_course_groups_1d5c4aaf: "به کاربر اجازه می دهد تا حساب کاربری یا گروه های درس را ایجاد کند."
+  allows_user_to_create_accounts_for_new_users_e4ec27c3: "به کاربر اجازه می دهد تا برای کاربران جدید حساب ایجاد کند."
   allows_user_to_create_accounts_for_new_users_with__37a233d7: |-
       به کاربر اجازه می دهد با دکمه افزودن افراد در سطح  حساب برای کاربران جدید حساب ایجاد کند.
       به کاربر اجازه می دهد تا کاربران را در یک حساب حذف و ادغام کند.
@@ -2285,6 +2307,7 @@ fa:
   allows_user_to_create_and_modify_grading_schemes_e4433a19: "به کاربر اجازه می دهد تا طرح های نمره‌گذاری را ایجاد و اصلاح کند."
   allows_user_to_create_collaborations_allows_user_t_96f8c3be: "به کاربر اجازه می دهد تا همکاری ایجاد کند. به کاربر اجازه می دهد کنفرانس های ایجاد شده خود را مشاهده ، ویرایش و حذف کند."
   allows_user_to_create_collaborations_allows_user_t_eff2a175: "به کاربر اجازه می دهد تا همکاری‌هایی را ایجاد کند. به کاربر اجازه می‌دهد تا همکاری‌های ایجاد شده خود را مشاهده، ویرایش و حذف کند."
+  allows_user_to_create_collaborations_b4f214bf: "به کاربر اجازه می دهد تا همکاری ایجاد کند."
   allows_user_to_create_developer_keys_for_accounts_76bedd2b: "به کاربر اجازه می دهد تا کلیدهای توسعه دهنده برای حساب ها ایجاد کند."
   allows_user_to_create_edit_and_delete_account_grou_abc8c12: "به کاربر اجازه می دهد گروه های حساب ایجاد ، ویرایش و حذف کند."
   allows_user_to_create_edit_and_delete_course_group_36097d72: "به کاربر امکان می دهد گروه‌های درسی را ایجاد، ویرایش و حذف کند. به کاربر اجازه می دهد گروه‌های درسی ایجاد شده توسط دانشجویان را ایجاد، ویرایش و حذف کند."
