@@ -25,7 +25,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {IconButton} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {ICON_MAKER_ICONS} from '../instructure_buttons/registerEditToolbar'
+import {ICON_MAKER_ICONS} from '../instructure_icon_maker/registerEditToolbar'
 import {
   IconLinkLine,
   IconFolderLine,

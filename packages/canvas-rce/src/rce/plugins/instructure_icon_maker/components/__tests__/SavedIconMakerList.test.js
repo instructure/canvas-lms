@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import SavedButtonList from '../SavedButtonList'
+import SavedIconMakerList from '../SavedIconMakerList'
 
 jest.mock('../../../shared/StoreContext', () => {
   return {
@@ -90,9 +90,9 @@ jest.mock('../../../shared/StoreContext', () => {
   }
 })
 
-describe('SavedButtonList()', () => {
+describe('SavedIconMakerList()', () => {
   let props
-  const subject = () => render(<SavedButtonList {...props} />)
+  const subject = () => render(<SavedIconMakerList {...props} />)
 
   beforeEach(() => {
     props = {

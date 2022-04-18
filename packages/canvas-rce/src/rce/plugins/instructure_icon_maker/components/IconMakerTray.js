@@ -23,9 +23,9 @@ import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Alert} from '@instructure/ui-alerts'
-import {Preview} from './CreateButtonForm/Preview'
-import {CreateButtonForm} from './CreateButtonForm'
-import {Footer} from './CreateButtonForm/Footer'
+import {Preview} from './CreateIconMakerForm/Preview'
+import {CreateIconMakerForm} from './CreateIconMakerForm'
+import {Footer} from './CreateIconMakerForm/Footer'
 import {buildStylesheet, buildSvg} from '../svg'
 import {statuses, useSvgSettings} from '../svg/settings'
 import {ICON_MAKER_ATTRIBUTE, ICON_MAKER_DOWNLOAD_URL_ATTR} from '../registerEditToolbar'
@@ -82,7 +82,7 @@ function renderHeader(title, settings, setIsOpen, onKeyDown, isInvalid, onAlertD
 
 function renderBody(settings, dispatch, editor, editing, allowNameChange, nameRef, rcsConfig) {
   return (
-    <CreateButtonForm
+    <CreateIconMakerForm
       settings={settings}
       dispatch={dispatch}
       editor={editor}
@@ -109,7 +109,7 @@ function renderFooter(status, onClose, handleSubmit, editing, replaceAll, setRep
     </View>
   )
 }
-export function ButtonsTray({editor, onUnmount, editing, rcsConfig}) {
+export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
   const nameRef = useRef()
   const applyRef = useRef()
 
@@ -225,14 +225,14 @@ export function ButtonsTray({editor, onUnmount, editing, rcsConfig}) {
   )
 }
 
-ButtonsTray.propTypes = {
+IconMakerTray.propTypes = {
   editor: PropTypes.object.isRequired,
   onUnmount: PropTypes.func,
   editing: PropTypes.bool,
   rcsConfig: PropTypes.object.isRequired
 }
 
-ButtonsTray.defaultProps = {
+IconMakerTray.defaultProps = {
   onUnmount: () => {},
   editing: false
 }

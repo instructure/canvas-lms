@@ -1440,7 +1440,7 @@ class RCEWrapper extends React.Component {
       this.props.use_rce_icon_maker &&
       this.props.trayProps?.contextType === 'course'
     ) {
-      canvasPlugins.push('instructure_buttons')
+      canvasPlugins.push('instructure_icon_maker')
     }
 
     const possibleNewMenubarItems = this.props.editorOptions.menu
@@ -1504,7 +1504,7 @@ class RCEWrapper extends React.Component {
           insert: {
             title: formatMessage('Insert'),
             items:
-              'instructure_links instructure_image instructure_media instructure_document instructure_buttons | instructure_equation inserttable instructure_media_embed | hr'
+              'instructure_links instructure_image instructure_media instructure_document instructure_icon_maker | instructure_equation inserttable instructure_media_embed | hr'
           },
           tools: {title: formatMessage('Tools'), items: 'wordcount lti_tools_menuitem'},
           view: {title: formatMessage('View'), items: 'fullscreen instructure_html_view'}
@@ -1537,7 +1537,7 @@ class RCEWrapper extends React.Component {
               'instructure_image',
               'instructure_record',
               'instructure_documents',
-              'instructure_buttons'
+              'instructure_icon_maker'
             ]
           },
           {

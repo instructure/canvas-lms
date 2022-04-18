@@ -29,7 +29,7 @@ export const EDIT_ICON_MAKER = 'edit_icon_maker_icon'
 export const ICONS_TRAY_CONTAINER_ID = 'instructure-rce-icons-tray-container'
 
 export default function (ed, document, type) {
-  return import('./components/ButtonsTray').then(({ButtonsTray}) => {
+  return import('./components/IconMakerTray').then(({IconMakerTray}) => {
     let container = document.querySelector(`#${ICONS_TRAY_CONTAINER_ID}`)
     const trayProps = bridge.trayProps.get(ed)
 
@@ -52,7 +52,7 @@ export default function (ed, document, type) {
     ReactDOM.render(
       <StoreProvider {...trayProps}>
         {() => (
-          <ButtonsTray
+          <IconMakerTray
             editor={ed}
             editing={type === EDIT_ICON_MAKER}
             onUnmount={handleUnmount}

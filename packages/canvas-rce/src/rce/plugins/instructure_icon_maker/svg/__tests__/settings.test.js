@@ -151,7 +151,7 @@ describe('useSvgSettings()', () => {
       //
       // NOTE: 'name' is no longer a valid property in embedded metadata
       // But we're leaving it here to test what happens with pre-existing
-      // B&I that have it
+      // Icon Maker icons that have it
       //
       body = `
         <svg height="100" width="100">
@@ -283,6 +283,7 @@ describe('useSvgSettings()', () => {
         textSize: 'medium',
         textColor: '#009606',
         textBackgroundColor: '#06A3B7',
+        imageSettings: null,
         textPosition: 'middle',
         x: 0,
         y: 0,
@@ -290,7 +291,6 @@ describe('useSvgSettings()', () => {
         translateY: 0,
         width: 0,
         height: 0,
-        imageSettings: null,
         name: 'Test Icon',
         originalName: 'Test Icon',
         transform: ''

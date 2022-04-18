@@ -25,7 +25,7 @@ import {fileEmbed} from '../../common/mimeClass'
 import {isPreviewable} from '../../rce/plugins/shared/Previewable'
 import {isImage, isAudioOrVideo} from '../../rce/plugins/shared/fileTypeUtils'
 import {fixupFileUrl} from '../../common/fileUrl'
-import {ICON_MAKER_ICONS} from '../../rce/plugins/instructure_buttons/registerEditToolbar'
+import {ICON_MAKER_ICONS} from '../../rce/plugins/instructure_icon_maker/registerEditToolbar'
 import * as CategoryProcessor from '../../rce/plugins/shared/Upload/CategoryProcessor'
 
 export const COMPLETE_FILE_UPLOAD = 'COMPLETE_FILE_UPLOAD'
