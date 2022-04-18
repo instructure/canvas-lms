@@ -16209,6 +16209,8 @@ fa:
   page_not_found_2b0d05f5: "صفحه موجود نیست"
   page_page_59070cd8: "صفحه %{page}"
   page_pagenum_20dbfeb8: "صفحه %{pageNum}"
+  page_title_ascending_b5df950c: "عنوان صفحه: صعودی"
+  page_title_descending_70c1483d: "عنوان صفحه: نزولی"
   page_views: 
     browsers: 
       unrecognized: "مرورگر ناشناس"
@@ -16220,6 +16222,7 @@ fa:
         time: زمان
         url: "نشانی اینترنتی"
         user_agent: "نماینده کاربر"
+  page_views_csv_9835a9f9: "بازدید از صفحه csv"
   page_views_eb64cf53: "نماهای صفحه"
   page_views_only_312b7577: "فقط نماهای صفحه"
   pages: 
@@ -16249,12 +16252,16 @@ fa:
           
           این تغییرات رونویسی شوند؟
       unsaved_changes: "ذخیره سازی تغییرات را لغو کرده اید. می خواهید بدون ذخیره سازی این تغییرات ادامه دهید؟ "
+  pages_24806328: صفحات
   pages_add_edit_delete_4c690ec6: "صفحات - افزودن / ویرایش / حذف"
+  pages_create_7c48801a: "صفحات - ایجاد کنید"
+  pages_delete_c98c1c66: "صفحات - حذف کنید"
   pages_e5414c2c: "صفحه ها"
   pages_front_page_9ce5188: "صفحه آغازین صفحه ها"
   pages_index_menu_f391bf04: "منوی فهرست صفحات"
   pages_settings_968392a3: "تنظیمات صفحه ها"
   pages_tutorial_tray_169464a9: "سینی خودآموز صفحه ها"
+  pages_update_6bbb5599: "صفحات - به روز رسانی"
   paginated_collection: 
     no_items: "هیچ موردی یافت نشد."
   paginated_list: 
@@ -16262,7 +16269,10 @@ fa:
     view_more_link: "مشاهده بیشتر"
   paginated_view: 
     loading_more_results: "در حال بارگذاری نتایج بیشتر"
+  pair_4d942a74: جفت
   pair_with_observer_b1541895: "با بیننده هم گروه شوید"
+  pair_with_student_6f76e69a: "جفت شدن با دانشجو"
+  pairing_code_1ddbd699: "کد جفت شدن"
   pairing_code_bde979a7: "رمز جفتی"
   pakistan_92_da28c36: "پاکستان (+92)"
   panama_507_831fbc99: "پاناما (+507)"
@@ -16270,12 +16280,19 @@ fa:
   paper_view_7405eeab: "نمای مقاله"
   paraguay_181a5029: پاراگوئه
   paraguay_595_ca58b83a: "پاراگوئه (+595)"
+  parameter_91ed199: پارامتر
   parameters_a13374ec: پارامترها
+  parent_assignment_is_not_selected_9efb4ac1: "تکلیف والدین انتخاب نشده است"
+  parent_group_not_found_in_this_context_3312dd78: "گروه والدین در این زمینه یافت نشد"
   parent_of_a_canvas_user_afba1624: "والدین یک کاربر کانواس"
   parent_references_not_found_prior_to_this_row_miss_31723438: "منابع منشاء پیش از این سطر یافت نشد: %{missing}"
   parent_signup_b7c6bf0a: "ثبت نام والدین"
   parents_sign_up_here_f0aa8f4f: "والدین اینجا ثبت نام کنند"
   partially_anonymous_483a892d: "تا حدودی ناشناس"
+  partially_enabled_and_locked_9a39d38a: "تا حدی فعال و قفل شده است"
+  partially_enabled_cd506819: "تا حدی فعال است"
+  participantcount_less_8d258f6: "%{participantCount} کمتر"
+  participantcount_more_50363e55: "%{participantCount} بیشتر"
   participation_af2598: مشارکت
   participations_1823832d: "مشارکت ها"
   pass_2a8c4f07: قبول
@@ -16290,8 +16307,11 @@ fa:
   pause_12af3bb4: مکث
   paypal: 
     exception: "متأسفانه خطایی رخ داده است، لطفا بعدا دوباره امتحان کنید."
+  pdf_4e842f10: pdf
   pdf_d8236d9a: PDF
   peer_review_assignment_7d314c59: "بازبینی گروهی تکلیف"
+  peer_review_due_dueattext_20987412: "به دلیل بررسی همتایان %{dueAtText}"
+  peer_review_due_eb63af38: "به دلیل بررسی همتایان"
   peer_review_for_assignment_ce72fc52: "بازبینی گروهی برای  %{assignment}"
   peer_reviewed_assignments_are_not_yet_handled_in_t_5eef60fb: "بازبینی گروهی تکالیف در روند تکالیف جدید هنوز انجام نشده است. به صفحه ایجاد تکلیف قدیمی می‌روید؟ "
   peer_reviewed_graded_discussion_b339df5b: "بحث نمره‌گذاری شده با بازبینی گروهی"
@@ -16300,11 +16320,14 @@ fa:
       delete_reminder_failed: "حذف انجام نشد"
   peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "بازبینی های گروهی را نمی توان برای تکلیف های نظارت شده فعال کرد"
   peer_reviews_e3a55964: "بازبینی های گروهی"
+  peer_service_6b4828b9: "خدمات همتا"
+  peer_services_102357e3: "خدمات همتا"
   pending_3e506a5b: "در انتظار"
   pending_message_2d9a8796: "در انتظار: %{message}"
   people_account_30bbffec: "افراد (حساب)"
   people_account_course_305043bb: "افراد (حساب/درس)"
   people_b4ebb13c: افراد
+  people_body_3ce556e3: "مردم و بدن"
   people_course_ddd9a66: "افراد (درس)"
   people_groups_tab_b245a614: "افراد (برگه گروه ها)"
   people_options_cfb419a6: "گزینه های افراد"
@@ -16312,6 +16335,8 @@ fa:
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "افراد این نام را در بحث ها، پیام ها و نظرها خواهند دید."
   percent_448ea947: درصد
   percent_complete_3a7edc20: "%{percent} تکمیل شده"
+  percent_complete_a7f6d403: "درصد تکمیل شد"
+  percent_complete_e46b6148: "%{percent} درصد کامل"
   percent_of_respondents_selecting_this_answer_4c2ce4ee: "درصد پاسخ دهنده هایی که این پاسخ را انتخاب می کنند"
   percent_of_students_scored_score_53d2c4d5: "%{percent} از دانشجویان نمره %{score} را کسب کرده اند"
   percent_of_students_scoring_1239d948: "درصد دانشجویانی که نمره کسب کرده اند"
@@ -16335,6 +16360,7 @@ fa:
   philippines_63_a4f62138: "فیلیپین (+63)"
   pick_a_destination_we_ll_send_you_errors_fa0cb0e0: "یک مقصد انتخاب کنید، خطاها را برای شما ارسال خواهیم کرد"
   pick_a_name_to_save_this_theme_as_9773cb1a: "یک نام انتخاب کنید برای ذخیره سازی این زمینه به عنوان"
+  pick_an_emoji_942adfc4: "یک ایموجی انتخاب کنید..."
   pick_an_endpoint_we_ll_post_your_error_reports_the_71610f47: "یک نقطه پایانی انتخاب کنید، گزارش های خطای شما را به آنجا ارسال خواهیم کرد"
   pick_the_date_and_time_for_the_following_conferenc_e9f91edd: "تاریخ و زمان را برای تنظیمات کنفرانس زیر انتخاب کنید:"
   pin_cdbc9f8f: الصاق
