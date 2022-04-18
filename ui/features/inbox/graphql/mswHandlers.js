@@ -459,16 +459,29 @@ export const handlers = [
   }),
 
   graphql.mutation('CreateConversation', (req, res, ctx) => {
-    const data = {
-      createConversation: {
-        conversations: [
-          {
-            ...ConversationParticipant.mock(),
-            conversation: Conversation.mock({subject: req.variables.subject})
-          }
-        ],
-        errors: null,
+    let data
+    if (!req.variables.recipients || !req.variables.recipients.length) {
+      data = {
+        createConversation: null,
+        errors: {
+          attribute: 'message',
+          message: 'Invalid recipients',
+          __typename: 'ValidationError'
+        },
         __typename: 'CreateConversationPayload'
+      }
+    } else {
+      data = {
+        createConversation: {
+          conversations: [
+            {
+              ...ConversationParticipant.mock(),
+              conversation: Conversation.mock({subject: req.variables.subject})
+            }
+          ],
+          errors: null,
+          __typename: 'CreateConversationPayload'
+        }
       }
     }
 

@@ -45,6 +45,7 @@ const ComposeModalManager = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [sendingMessage, setSendingMessage] = useState(false)
   const {isSubmissionCommentsType} = useContext(ConversationContext)
+  const [modalError, setModalError] = useState(null)
 
   const coursesQuery = useQuery(COURSES_QUERY, {
     variables: {
@@ -194,18 +195,12 @@ const ComposeModalManager = props => {
   }
 
   const updateCache = (cache, result) => {
-    if (isSubmissionCommentsType) {
-      if (result.data.createSubmissionComment.errors) {
-        setOnFailure(I18n.t('Error occurred while creating submission comment'))
-        return
-      }
-    } else if (props.isReply || props.isReplyAll || props.isForward) {
-      if (result.data.addConversationMessage.errors) {
-        setOnFailure(I18n.t('Error occurred while adding message to conversation'))
-        return
-      }
-    } else if (result.data.createConversation.errors) {
-      setOnFailure(I18n.t('Error occurred while creating conversation message'))
+    const submissionFail = result?.data?.createSubmissionComment?.errors
+    const addConversationFail = result?.data?.addConversationMessage?.errors
+    const createConversationFail = result?.data?.createConversation?.errors
+    if (submissionFail || addConversationFail || createConversationFail) {
+      // Error messages get set in the onConversationCreateComplete function
+      // This just prevents a cacheUpdate when there is an error
       return
     }
     if (isSubmissionCommentsType) {
@@ -221,9 +216,20 @@ const ComposeModalManager = props => {
     setSendingMessage(false)
 
     if (success) {
+      props.onDismiss()
       setOnSuccess(I18n.t('Message sent!'), false)
     } else {
-      setOnFailure(I18n.t('Error creating conversation'))
+      if (isSubmissionCommentsType) {
+        setModalError(I18n.t('Error creating Submission Comment'))
+      } else if (props.isReply || props.isReplyAll || props.isForward) {
+        setModalError(I18n.t('Error occurred while adding message to conversation'))
+      } else {
+        setModalError(I18n.t('Error occurred while creating conversation message'))
+      }
+
+      setTimeout(() => {
+        setModalError(null)
+      }, 2500)
     }
   }
 
@@ -295,6 +301,7 @@ const ComposeModalManager = props => {
       onSelectedIdsChange={props.onSelectedIdsChange}
       selectedIds={props.selectedIds}
       submissionCommentsHeader={isSubmissionCommentsType ? props?.conversation?.subject : null}
+      modalError={modalError}
     />
   )
 }
