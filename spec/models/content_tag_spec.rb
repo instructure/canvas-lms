@@ -914,6 +914,9 @@ describe ContentTag do
   describe "#update_course_pace_module_items" do
     before do
       course_factory
+      @course.account.enable_feature!(:course_paces)
+      @course.enable_course_paces = true
+      @course.save!
       @context_module = @course.context_modules.create!
       @assignment = @course.assignments.create!
       @course_pace = @course.course_paces.create!

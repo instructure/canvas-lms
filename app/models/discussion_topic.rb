@@ -333,7 +333,10 @@ class DiscussionTopic < ActiveRecord::Base
     return if deleted?
 
     if !assignment_id && @old_assignment_id
-      context_module_tags.each(&:confirm_valid_module_requirements)
+      context_module_tags.find_each do |cmt|
+        cmt.confirm_valid_module_requirements
+        cmt.update_course_pace_module_items
+      end
     end
     if @old_assignment_id
       Assignment.where(id: @old_assignment_id, context_id: context_id, context_type: context_type, submission_types: "discussion_topic").update_all(workflow_state: "deleted", updated_at: Time.now.utc)
@@ -359,9 +362,11 @@ class DiscussionTopic < ActiveRecord::Base
     # make sure that if the topic has a new assignment (either by going from
     # ungraded to graded, or from one assignment to another; we ignore the
     # transition from graded to ungraded) we acknowledge that the users that
-    # have posted have contributed to the topic
+    # have posted have contributed to the topic and that course paces are up
+    # to date
     if assignment_id && saved_change_to_assignment_id?
       recalculate_context_module_actions!
+      context_module_tags.find_each(&:update_course_pace_module_items)
     end
   end
   protected :update_assignment
