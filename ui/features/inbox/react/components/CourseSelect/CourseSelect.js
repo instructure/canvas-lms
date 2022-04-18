@@ -23,6 +23,7 @@ import React from 'react'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Select} from '@instructure/ui-select'
+import {CloseButton} from '@instructure/ui-buttons'
 
 const I18n = useI18nScope('conversations_2')
 
@@ -210,6 +211,8 @@ export class CourseSelect extends React.Component {
   }
 
   handleShowOptions = () => {
+    if (this.state.inputValue !== '') return
+
     this.setState({
       isShowingOptions: true
     })
@@ -259,6 +262,16 @@ export class CourseSelect extends React.Component {
     })
   }
 
+  handleReset = () => {
+    this.props.onCourseFilterSelect({contextID: null, contextName: null})
+    this.setState({
+      inputValue: '',
+      isShowingOptions: false,
+      highlightedOptionId: null,
+      selectedOptionId: null
+    })
+  }
+
   render() {
     const {inputValue, isShowingOptions} = this.state
     return (
@@ -278,6 +291,16 @@ export class CourseSelect extends React.Component {
         onRequestHideOptions={this.handleHideOptions}
         onRequestHighlightOption={this.handleHighlightOption}
         onRequestSelectOption={this.handleSelectOption}
+        renderAfterInput={
+          inputValue !== '' ? (
+            <CloseButton
+              offset="small"
+              data-testid="delete-course-button"
+              screenReaderLabel={I18n.t('Clear Course Selection')}
+              onClick={this.handleReset}
+            />
+          ) : null
+        }
         data-testid="course-select"
       >
         {this.renderGroups()}
