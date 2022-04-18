@@ -29,6 +29,7 @@ import ready from '@instructure/ready'
 ready(() => {
   const lockManager = new LockManager()
   lockManager.init({itemType: 'quiz', page: 'show'})
+  renderCoursePacingNotice()
 
   inputMethods.setWidths()
   $('.answer input[type=text]').each(function () {
@@ -56,6 +57,22 @@ ready(() => {
     courseID: ENV.COURSE_ID,
     assetType: 'Quiz',
     assetID: ENV.QUIZ.id,
-    location
+    location: window.location
   })
 })
+
+function renderCoursePacingNotice() {
+  const $mountPoint = document.getElementById('course_paces_due_date_notice')
+
+  if ($mountPoint) {
+    import('@canvas/due-dates/react/CoursePacingNotice')
+      .then(CoursePacingNoticeModule => {
+        const renderNotice = CoursePacingNoticeModule.renderCoursePacingNotice
+        renderNotice($mountPoint, ENV.COURSE_ID)
+      })
+      .catch(ex => {
+        // eslint-disable-next-line no-console
+        console.warn('Falied loading CoursePacingNotice', ex)
+      })
+  }
+}
