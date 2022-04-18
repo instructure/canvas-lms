@@ -22,8 +22,6 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React, {useEffect, useState, useContext} from 'react'
 import InboxEmpty from '../../../svg/inbox-empty.svg'
-import {Responsive} from '@instructure/ui-responsive'
-import {responsiveQuerySizes} from '../../../util/utils'
 import {ConversationContext} from '../../../util/constants'
 import {Text} from '@instructure/ui-text'
 import {useMutation} from 'react-apollo'
@@ -191,31 +189,21 @@ export const ConversationListHolder = ({...props}) => {
         )
       })}
       {props.conversations?.length === 0 && (
-        <Responsive
-          match="media"
-          query={responsiveQuerySizes({mobile: true, desktop: true})}
-          render={(responsiveProps, matches) => {
-            if (matches.includes('mobile')) {
-              return (
-                <Flex
-                  textAlign="center"
-                  direction="column"
-                  margin="large 0 0 0"
-                  data-testid="conversation-list-no-messages"
-                >
-                  <Flex.Item shouldGrow shouldShrink>
-                    <img src={InboxEmpty} alt="No messages Panda" />
-                  </Flex.Item>
-                  <Flex.Item>
-                    <Text color="primary" size="small" weight="bold">
-                      {I18n.t('No Conversations Selected')}
-                    </Text>
-                  </Flex.Item>
-                </Flex>
-              )
-            }
-          }}
-        />
+        <Flex
+          textAlign="center"
+          direction="column"
+          margin="large 0 0 0"
+          data-testid="conversation-list-no-messages"
+        >
+          <Flex.Item shouldGrow shouldShrink>
+            <img src={InboxEmpty} alt="No messages Panda" />
+          </Flex.Item>
+          <Flex.Item>
+            <Text color="primary" size="small" weight="bold">
+              {I18n.t('No Conversations to Show')}
+            </Text>
+          </Flex.Item>
+        </Flex>
       )}
     </View>
   )
