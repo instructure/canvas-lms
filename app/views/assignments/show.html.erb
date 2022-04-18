@@ -182,6 +182,10 @@
       </fieldset>
     </form>
 
+    <% if @context.enable_course_paces? %>
+      <div id="course_paces_due_date_notice"></div>
+    <% end %>
+
     <table class="ic-Table assignment_dates">
       <thead>
         <tr>
