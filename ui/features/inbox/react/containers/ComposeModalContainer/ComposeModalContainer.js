@@ -200,8 +200,6 @@ const ComposeModalContainer = props => {
         }
       })
     }
-
-    props.onDismiss()
   }
 
   const resetState = () => {
@@ -253,6 +251,7 @@ const ComposeModalContainer = props => {
               pastMessages={props.pastConversation?.conversationMessagesConnection.nodes}
               removeAttachment={removeAttachment}
               replaceAttachment={replaceAttachment}
+              modalError={props.modalError}
             >
               {isSubmissionCommentsType ? null : (
                 <HeaderInputs
@@ -352,5 +351,6 @@ ComposeModalContainer.propTypes = {
   setSendingMessage: PropTypes.func,
   onSelectedIdsChange: PropTypes.func,
   selectedIds: PropTypes.array,
-  submissionCommentsHeader: PropTypes.string
+  submissionCommentsHeader: PropTypes.string,
+  modalError: PropTypes.string
 }

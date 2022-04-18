@@ -86,7 +86,7 @@ describe('ComposeModalContainer', () => {
     isReplyAll,
     isForward,
     conversation,
-    selectedIds = [],
+    selectedIds = ['1'],
     isSubmissionCommentsType = false
   } = {}) =>
     render(
@@ -243,6 +243,23 @@ describe('ComposeModalContainer', () => {
       await waitFor(() =>
         expect(mockedSetOnSuccess).toHaveBeenCalledWith(I18n.t('Message sent!'), false)
       )
+    })
+
+    it('does not close modal when an error occurs', async () => {
+      const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
+
+      const component = setup({setOnSuccess: mockedSetOnSuccess, selectedIds: []})
+
+      // Set body
+      const bodyInput = await component.findByTestId('message-body')
+      fireEvent.change(bodyInput, {target: {value: 'Potato'}})
+
+      // Hit send
+      const button = component.getByTestId('send-button')
+      fireEvent.click(button)
+
+      expect(mockedSetOnSuccess).not.toHaveBeenCalled()
+      expect(await component.findByTestId('compose-modal-desktop')).toBeInTheDocument()
     })
   })
 
