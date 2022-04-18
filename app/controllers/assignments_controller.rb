@@ -82,7 +82,8 @@ class AssignmentsController < ApplicationController
             new_quizzes_modules_support: Account.site_admin.feature_enabled?(:new_quizzes_modules_support),
             new_quizzes_skip_to_build_module_button: Account.site_admin.feature_enabled?(:new_quizzes_skip_to_build_module_button),
             updated_mastery_connect_icon: Account.site_admin.feature_enabled?(:updated_mastery_connect_icon)
-          }
+          },
+          IN_PACED_COURSE: @context.try(:enable_course_paces?)
         }
 
         set_default_tool_env!(@context, hash)
