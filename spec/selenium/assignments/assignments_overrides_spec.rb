@@ -216,6 +216,7 @@ describe "assignment groups" do
         assignment = create_assignment!
         get "/courses/#{@course.id}/assignments/#{assignment.id}"
         expect(AssignmentPage.course_pacing_notice).to be_displayed
+        expect(f("#content")).not_to contain_css("table.assignment_dates")
       end
 
       it "shows the course pacing notice if in a paced course on edit page" do
