@@ -237,19 +237,19 @@
 
 <% if @context.enable_course_paces? %>
   <div id="course_paces_due_date_notice"></div>
+<% else %>
+  <table class="ic-Table assignment_dates">
+    <thead>
+      <tr>
+        <th scope="col"><%= t(:due, 'Due') %></th>
+        <th scope="col"><%= t(:for, 'For') %></th>
+        <th scope="col"><%= t(:available_from, 'Available from') %></th>
+        <th scope="col"><%= t(:until, 'Until') %></th>
+      </tr>
+    </thead>
+
+    <%= render 'shared/override_list', :assignment => @quiz,
+      :user => @current_user %>
+
+  </table>
 <% end %>
-
-<table class="ic-Table assignment_dates">
-  <thead>
-    <tr>
-      <th scope="col"><%= t(:due, 'Due') %></th>
-      <th scope="col"><%= t(:for, 'For') %></th>
-      <th scope="col"><%= t(:available_from, 'Available from') %></th>
-      <th scope="col"><%= t(:until, 'Until') %></th>
-    </tr>
-  </thead>
-
-  <%= render 'shared/override_list', :assignment => @quiz,
-    :user => @current_user %>
-
-</table>

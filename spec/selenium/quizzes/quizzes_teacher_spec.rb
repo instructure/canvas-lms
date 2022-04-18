@@ -446,6 +446,7 @@ describe "quizzes" do
         create_quiz_with_due_date
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
         expect(f("[data-testid='CoursePacingNotice']")).to be_displayed
+        expect(f("#content")).not_to contain_css("table.assignment_dates")
       end
     end
   end
