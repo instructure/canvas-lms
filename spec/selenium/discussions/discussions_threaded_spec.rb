@@ -364,10 +364,6 @@ describe "threaded discussions" do
     end
 
     context "replies reporting" do
-      before :once do
-        Account.site_admin.enable_feature! :discussions_reporting
-      end
-
       it "lets users report replies" do
         @topic.discussion_entries.create!(
           user: @student,

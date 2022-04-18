@@ -380,7 +380,6 @@ const IsolatedThreadContainer = props => {
                             : null
                         }
                         onReport={
-                          ENV?.student_reporting_enabled &&
                           props.discussionTopic.permissions?.studentReporting
                             ? () => {
                                 setShowReportModal(true)

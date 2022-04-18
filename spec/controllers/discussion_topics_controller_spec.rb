@@ -298,7 +298,6 @@ describe DiscussionTopicsController do
 
     it "sets discussions reporting and anonymity when their flags are enabled" do
       Account.site_admin.enable_feature! :react_discussions_post
-      Account.site_admin.enable_feature! :discussions_reporting
       Account.site_admin.enable_feature! :discussion_anonymity
 
       user_session(@teacher)

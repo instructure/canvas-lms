@@ -424,7 +424,7 @@ class DiscussionTopicsController < ApplicationController
             read_as_admin: @context.grants_right?(@current_user, session, :read_as_admin),
           },
           discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),
-          student_reporting_enabled: Account.site_admin.feature_enabled?(:discussions_reporting),
+          student_reporting_enabled: @context.feature_enabled?(:react_discussions_post),
           discussion_anonymity_enabled: @context.feature_enabled?(:react_discussions_post) && Account.site_admin.feature_enabled?(:discussion_anonymity),
           discussion_topic_index_menu_tools: (if @domain_root_account&.feature_enabled?(:commons_favorites)
                                                 external_tools_display_hashes(:discussion_topic_index_menu)
@@ -749,7 +749,6 @@ class DiscussionTopicsController < ApplicationController
                rce_mentions_in_discussions: Account.site_admin.feature_enabled?(:rce_mentions_in_discussions) && !@topic.anonymous?,
                isolated_view: Account.site_admin.feature_enabled?(:isolated_view),
                draft_discussions: Account.site_admin.feature_enabled?(:draft_discussions),
-               student_reporting_enabled: Account.site_admin.feature_enabled?(:discussions_reporting),
                discussion_anonymity_enabled: @context.feature_enabled?(:react_discussions_post) && Account.site_admin.feature_enabled?(:discussion_anonymity),
                inline_grading_enabled: Account.site_admin.feature_enabled?(:discussions_inline_grading),
                should_show_deeply_nested_alert: @current_user&.should_show_deeply_nested_alert?,
