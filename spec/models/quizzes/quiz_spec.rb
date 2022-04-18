@@ -264,6 +264,34 @@ describe Quizzes::Quiz do
         expect(Submission.count).to eq(0)
       end
     end
+
+    context "with course paces" do
+      before do
+        create_quiz_with_submission(quiz_type: "assignment")
+        @course.root_account.enable_feature!(:course_paces)
+        @course.enable_course_paces = true
+        @course.save!
+        @course_pace = course_pace_model(course: @course)
+        @module = @course.context_modules.create!(name: "some module")
+        @tag = @module.add_item(type: "quiz", id: @quiz.id)
+        @module.save!
+        @quiz.reload
+        # Reset progresses to verify progresses are added during tests
+        Progress.destroy_all
+      end
+
+      it "runs update_course_pace_module_items on content tags when an assignment is created" do
+        expect(Progress.last).to be_nil
+        @quiz.update(assignment: @course.assignments.create!)
+        expect(Progress.last.context).to eq(@course_pace)
+      end
+
+      it "runs update_course_pace_module_items on content tags when an assignment is removed" do
+        expect(Progress.last).to be_nil
+        @quiz.update(quiz_type: "practice_quiz")
+        expect(Progress.last.context).to eq(@course_pace)
+      end
+    end
   end
 
   it_behaves_like "Canvas::DraftStateValidations"
