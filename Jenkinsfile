@@ -627,8 +627,8 @@ pipeline {
               }
             }
           }
-        } //script
-      } //steps
-    } //environment
-  } //stages
-} //pipeline
+        } // script
+      } // steps
+    } // environment
+  } // stages
+} // pipeline
