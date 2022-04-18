@@ -19,6 +19,7 @@
 
 require_relative "../common"
 require_relative "../helpers/assignment_overrides"
+require_relative "./page_objects/assignment_page"
 
 describe "assignment groups" do
   include AssignmentOverridesSeleniumHelper
@@ -203,6 +204,25 @@ describe "assignment groups" do
       tooltip = fj(".vdd_tooltip_content:visible")
       expect(tooltip).to include_text "New Section"
       expect(tooltip).to include_text "Everyone else"
+    end
+
+    context "in a paced course" do
+      before do
+        @course.enable_course_paces = true
+        @course.save!
+      end
+
+      it "shows the course pacing notice if in a paced course on show page" do
+        assignment = create_assignment!
+        get "/courses/#{@course.id}/assignments/#{assignment.id}"
+        expect(AssignmentPage.course_pacing_notice).to be_displayed
+      end
+
+      it "shows the course pacing notice if in a paced course on edit page" do
+        assignment = create_assignment!
+        get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
+        expect(AssignmentPage.course_pacing_notice).to be_displayed
+      end
     end
   end
 

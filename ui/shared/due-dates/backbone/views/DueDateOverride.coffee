@@ -24,6 +24,7 @@ import DateValidator from '@canvas/datetime/DateValidator'
 import ValidatedMixin from '@canvas/forms/backbone/views/ValidatedMixin.coffee'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import DueDates from '../../react/DueDates'
+import CoursePacingNotice from '../../react/CoursePacingNotice'
 import StudentGroupStore from '../../react/StudentGroupStore'
 import GradingPeriodsAPI from '@canvas/grading/jquery/gradingPeriodsApi'
 import tz from '@canvas/timezone'
@@ -43,21 +44,25 @@ export default class DueDateOverrideView extends Backbone.View
     div = @$el[0]
     return unless div
 
-    DueDatesElement = React.createElement(DueDates, {
-      overrides: @model.overrides.models,
-      syncWithBackbone: @setNewOverridesCollection,
-      sections: @model.sections.models,
-      defaultSectionId: @model.defaultDueDateSectionId,
-      selectedGroupSetId: @model.assignment.get("group_category_id"),
-      gradingPeriods: @gradingPeriods,
-      hasGradingPeriods: @hasGradingPeriods,
-      isOnlyVisibleToOverrides: @model.assignment.isOnlyVisibleToOverrides(),
-      dueAt: tz.parse(@model.assignment.get("due_at")),
-      dueDatesReadonly: @options.dueDatesReadonly,
-      availabilityDatesReadonly: @options.availabilityDatesReadonly,
-      importantDates: @model.assignment.get("important_dates"),
-      defaultDueTime: ENV.DEFAULT_DUE_TIME
-    })
+    DueDatesElement =
+    if @options && @options.inPacedCourse
+      React.createElement(CoursePacingNotice, {courseId: @options.courseId})
+    else
+      React.createElement(DueDates, {
+        overrides: @model.overrides.models,
+        syncWithBackbone: @setNewOverridesCollection,
+        sections: @model.sections.models,
+        defaultSectionId: @model.defaultDueDateSectionId,
+        selectedGroupSetId: @model.assignment.get("group_category_id"),
+        gradingPeriods: @gradingPeriods,
+        hasGradingPeriods: @hasGradingPeriods,
+        isOnlyVisibleToOverrides: @model.assignment.isOnlyVisibleToOverrides(),
+        dueAt: tz.parse(@model.assignment.get("due_at")),
+        dueDatesReadonly: @options.dueDatesReadonly,
+        availabilityDatesReadonly: @options.availabilityDatesReadonly,
+        importantDates: @model.assignment.get("important_dates"),
+        defaultDueTime: ENV.DEFAULT_DUE_TIME
+      })
     ReactDOM.render(DueDatesElement, div)
 
   gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods)

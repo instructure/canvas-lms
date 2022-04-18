@@ -83,7 +83,9 @@ ready(() => {
         views: {},
         postToSIS: assignment.postToSIS(),
         dueDatesReadonly: !!lockedItems.due_dates,
-        availabilityDatesReadonly: !!lockedItems.availability_dates
+        availabilityDatesReadonly: !!lockedItems.availability_dates,
+        inPacedCourse: assignment.inPacedCourse(),
+        courseId: assignment.courseID()
       })
     },
     lockedItems: assignment.id ? lockedItems : {} // if no id, creating a new assignment
