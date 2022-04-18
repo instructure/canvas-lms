@@ -21,7 +21,11 @@ module Services
   class LiveEventsSubscriptionService
     class << self
       def available?
-        settings.present?
+        settings.present? && settings["app-host"].present?
+      end
+
+      def disabled?
+        settings&.[]("disabled")
       end
 
       def tool_proxy_subscription(tool_proxy, subscription_id)

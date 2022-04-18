@@ -42,6 +42,10 @@ describe Lti::DataServicesController do
     allow(CanvasSecurity::ServicesJwt).to receive(:encryption_secret).and_return("setecastronomy92" * 2)
     allow(CanvasSecurity::ServicesJwt).to receive(:signing_secret).and_return("donttell" * 10)
     allow(HTTParty).to receive(:send).and_return(double(body: subscription, code: 200))
+    allow(DynamicSettings).to receive(:find).and_call_original
+    allow(DynamicSettings).to receive(:find)
+      .with("live-events-subscription-service", default_ttl: 5.minutes)
+      .and_return({ "app-host" => "http://live-event-service" })
 
     root_account.lti_context_id = SecureRandom.uuid
     root_account.save
