@@ -19,6 +19,7 @@
 
 require_relative "../helpers/discussions_common"
 require_relative "../common"
+require_relative "pages/discussion_page"
 
 describe "discussions" do
   include_context "in-process server selenium tests"
@@ -365,6 +366,20 @@ describe "discussions" do
 
           get url
           expect(element_exists?("#usage_rights_control i.icon-files-copyright")).to eq(true)
+        end
+      end
+
+      context "in paced course" do
+        let(:topic) { assignment_topic }
+
+        before do
+          course.enable_course_paces = true
+          course.save!
+        end
+
+        it "shows the course pacing notice on a graded discussion" do
+          get url
+          expect(Discussion.course_pacing_notice).to be_displayed
         end
       end
     end
