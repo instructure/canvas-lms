@@ -904,7 +904,7 @@ describe CalendarEvent do
 
     context "bulk updating" do
       before :once do
-        course_with_teacher
+        course_with_teacher(active_all: true)
       end
 
       it "validates child events" do

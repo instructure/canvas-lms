@@ -489,6 +489,91 @@ describe CourseSection, "moving to new course" do
         expect(@other_section.grants_right?(@ta, :read)).to be_truthy
       end
     end
+
+    context ":manage_calendar" do
+      before :once do
+        @course1 = course_factory(active_all: true)
+        @section1 = @course1.default_section
+        @section2 = @course1.course_sections.create!
+        @user = user_factory(active_all: true)
+      end
+
+      it "returns true for teachers, designers, and tas by default" do
+        @course1.enroll_teacher(@user, enrollment_state: :active)
+        expect(@section1.grants_right?(@user, :manage_calendar)).to be_truthy
+        expect(@section2.grants_right?(@user, :manage_calendar)).to be_truthy
+        @user.enrollments.destroy_all
+
+        @course1.enroll_designer(@user, enrollment_state: :active)
+        expect(@section1.grants_right?(@user, :manage_calendar)).to be_truthy
+        expect(@section2.grants_right?(@user, :manage_calendar)).to be_truthy
+        @user.enrollments.destroy_all
+
+        @course1.enroll_ta(@user, enrollment_state: :active)
+        expect(@section1.grants_right?(@user, :manage_calendar)).to be_truthy
+        expect(@section2.grants_right?(@user, :manage_calendar)).to be_truthy
+      end
+
+      it "returns false for students and observers by default" do
+        @course1.enroll_student(@user, enrollment_state: :active)
+        expect(@section1.grants_right?(@user, :manage_calendar)).to be_falsey
+        expect(@section2.grants_right?(@user, :manage_calendar)).to be_falsey
+        @user.enrollments.destroy_all
+
+        @course1.enroll_user(@user, "ObserverEnrollment", enrollment_state: :active)
+        expect(@section1.grants_right?(@user, :manage_calendar)).to be_falsey
+        expect(@section2.grants_right?(@user, :manage_calendar)).to be_falsey
+      end
+
+      it "returns false for teacher if RoleOverride disables :manage_calendar" do
+        RoleOverride.create!(context: Account.default, permission: "manage_calendar", role: teacher_role, enabled: false)
+        @course1.enroll_teacher(@user, enrollment_state: :active)
+        expect(@section1.grants_right?(@user, :manage_calendar)).to be_falsey
+        expect(@section2.grants_right?(@user, :manage_calendar)).to be_falsey
+      end
+
+      it "returns true if user has any role where :manage_calendar is enabled" do
+        RoleOverride.create!(context: Account.default, permission: "manage_calendar", role: ta_role, enabled: false)
+        @course1.enroll_teacher(@user, enrollment_state: :active)
+        @course1.enroll_ta(@user, enrollment_state: :active)
+        expect(@section1.grants_right?(@user, :manage_calendar)).to be_truthy
+        expect(@section2.grants_right?(@user, :manage_calendar)).to be_truthy
+      end
+
+      it "returns appropriate permission for custom role" do
+        limited_teacher_role = custom_teacher_role("Limited teacher", account: Account.default)
+        RoleOverride.create!(context: Account.default, permission: "manage_calendar", role: limited_teacher_role, enabled: false)
+        @course1.enroll_teacher(@user, role: limited_teacher_role, enrollment_state: :active)
+        expect(@section1.grants_right?(@user, :manage_calendar)).to be_falsey
+        expect(@section2.grants_right?(@user, :manage_calendar)).to be_falsey
+      end
+
+      it "returns true for all sections if enrolled in one and not section_limited" do
+        @course1.enroll_teacher(@user, enrollment_state: :active, section: @section2)
+        expect(@section1.grants_right?(@user, :manage_calendar)).to be_truthy
+        expect(@section2.grants_right?(@user, :manage_calendar)).to be_truthy
+      end
+
+      it "returns false for limited section if only enrolled in one and section_limited" do
+        @course1.enroll_teacher(@user, enrollment_state: :active, section: @section2)
+        @user.enrollments.update_all(limit_privileges_to_course_section: true)
+        expect(@section1.grants_right?(@user, :manage_calendar)).to be_falsey
+        expect(@section2.grants_right?(@user, :manage_calendar)).to be_truthy
+      end
+
+      it "returns false for a teacher in another course" do
+        course2 = course_factory(active_all: true)
+        course2.enroll_teacher(@user, enrollment_state: :active)
+        expect(@section1.grants_right?(@user, :manage_calendar)).to be_falsey
+        expect(@section2.grants_right?(@user, :manage_calendar)).to be_falsey
+      end
+
+      it "returns false if teacher enrollment is concluded" do
+        @course1.enroll_teacher(@user, enrollment_state: :completed)
+        expect(@section1.grants_right?(@user, :manage_calendar)).to be_falsey
+        expect(@section2.grants_right?(@user, :manage_calendar)).to be_falsey
+      end
+    end
   end
 
   context "enrollment state invalidation" do
