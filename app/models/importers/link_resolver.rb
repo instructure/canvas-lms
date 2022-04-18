@@ -105,7 +105,7 @@ module Importers
         if file_id
           rest = link[:rest].presence || "/preview"
 
-          # Button and Icon files should not have the course
+          # Icon Maker files should not have the course
           # context prepended to the URL. This prevents
           # redirects to non cross-origin friendly urls
           # during a file fetch

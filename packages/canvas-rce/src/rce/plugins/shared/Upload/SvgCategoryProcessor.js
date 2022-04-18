@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ICON_MAKER_ICONS} from '../../instructure_buttons/registerEditToolbar'
+import {ICON_MAKER_ICONS} from '../../instructure_icon_maker/registerEditToolbar'
 
 export const typeTest = 'image/svg'
 const sliceSize = 400 // bytes

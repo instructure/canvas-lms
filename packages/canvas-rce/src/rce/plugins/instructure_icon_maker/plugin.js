@@ -52,7 +52,7 @@ function handleOptionSelected(ed, value) {
   }
 }
 
-tinymce.create('tinymce.plugins.InstructureButtonsPlugin', {
+tinymce.create('tinymce.plugins.InstructureIconMakerPlugin', {
   init(ed) {
     // Register tray control command
     ed.addCommand('instructureTrayForIconMakerPlugin', (_ui, type) => {
@@ -64,7 +64,7 @@ tinymce.create('tinymce.plugins.InstructureButtonsPlugin', {
     })
 
     // Register menu items
-    ed.ui.registry.addNestedMenuItem('instructure_buttons', {
+    ed.ui.registry.addNestedMenuItem('instructure_icon_maker', {
       text: formatMessage('Icon Maker Icons'),
       icon: 'buttons',
       getSubmenuItems: () =>
@@ -80,7 +80,7 @@ tinymce.create('tinymce.plugins.InstructureButtonsPlugin', {
     })
 
     // Register button
-    ed.ui.registry.addSplitButton('instructure_buttons', {
+    ed.ui.registry.addSplitButton('instructure_icon_maker', {
       tooltip: formatMessage('Icon Maker Icons'),
       icon: 'buttons',
       fetch(callback) {
@@ -119,4 +119,4 @@ tinymce.create('tinymce.plugins.InstructureButtonsPlugin', {
 })
 
 // Register plugin
-tinymce.PluginManager.add('instructure_buttons', tinymce.plugins.InstructureButtonsPlugin)
+tinymce.PluginManager.add('instructure_icon_maker', tinymce.plugins.InstructureIconMakerPlugin)

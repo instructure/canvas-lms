@@ -16,15 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React from 'react'
 import {render, fireEvent, screen, waitFor, act, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
-import {ButtonsTray} from '../ButtonsTray'
+import {IconMakerTray} from '../IconMakerTray'
 import {useStoreProps} from '../../../shared/StoreContext'
 import FakeEditor from '../../../shared/__tests__/FakeEditor'
 import RceApiSource from '../../../../../rcs/api'
-import useDebouncedValue from '../../utils/useDebouncedValue'
 
 jest.mock('../../../../../rcs/api')
 jest.mock('../../../shared/StoreContext')
@@ -54,7 +53,7 @@ const setIconColor = hex => {
   fireEvent.input(input, {target: {value: hex}})
 }
 
-describe('RCE "Icon Maker" Plugin > ButtonsTray', () => {
+describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
   const defaults = {
     editor,
     onUnmount: jest.fn(),
@@ -64,7 +63,7 @@ describe('RCE "Icon Maker" Plugin > ButtonsTray', () => {
   let rcs
 
   const renderComponent = componentProps => {
-    return render(<ButtonsTray {...componentProps} />)
+    return render(<IconMakerTray {...componentProps} />)
   }
 
   beforeAll(() => {
@@ -97,7 +96,7 @@ describe('RCE "Icon Maker" Plugin > ButtonsTray', () => {
 
   describe('when the user has not created a valid icon', () => {
     beforeEach(() => {
-      render(<ButtonsTray {...defaults} />)
+      render(<IconMakerTray {...defaults} />)
       userEvent.click(screen.getByRole('button', {name: /apply/i}))
     })
 
@@ -131,7 +130,7 @@ describe('RCE "Icon Maker" Plugin > ButtonsTray', () => {
         const event = {key: 'Tab', keyCode: 9}
 
         it('moves focus to the "name" input', async () => {
-          const {findByTestId} = render(<ButtonsTray {...defaults} />)
+          const {findByTestId} = render(<IconMakerTray {...defaults} />)
           const closeButton = await findByTestId('icon-maker-close-button')
           const expectedElement = await findByTestId('icon-name')
           fireEvent.keyDown(closeButton, event)
@@ -143,7 +142,7 @@ describe('RCE "Icon Maker" Plugin > ButtonsTray', () => {
         const event = {key: 'Tab', keyCode: 9, shiftKey: true}
 
         it('moves focus to the apply button', async () => {
-          const {findByTestId} = render(<ButtonsTray {...defaults} />)
+          const {findByTestId} = render(<IconMakerTray {...defaults} />)
           const closeButton = await findByTestId('icon-maker-close-button')
           const expectedElement = await findByTestId('create-icon-button')
           fireEvent.keyDown(closeButton, event)
@@ -155,7 +154,7 @@ describe('RCE "Icon Maker" Plugin > ButtonsTray', () => {
 
   describe('uploads the svg', () => {
     it('with correct content', async () => {
-      render(<ButtonsTray {...defaults} />)
+      render(<IconMakerTray {...defaults} />)
 
       setIconColor('#000000')
       userEvent.click(screen.getByRole('button', {name: /apply/i}))
@@ -229,7 +228,7 @@ describe('RCE "Icon Maker" Plugin > ButtonsTray', () => {
     })
 
     it('with overwrite if "replace all" is checked', async () => {
-      const {getByTestId, getByRole} = render(<ButtonsTray {...defaults} editing />)
+      const {getByTestId, getByRole} = render(<IconMakerTray {...defaults} editing />)
 
       setIconColor('#000000')
 
@@ -250,7 +249,7 @@ describe('RCE "Icon Maker" Plugin > ButtonsTray', () => {
   })
 
   it('writes the content to the editor', async () => {
-    render(<ButtonsTray {...defaults} />)
+    render(<IconMakerTray {...defaults} />)
 
     fireEvent.change(document.querySelector('#icon-alt-text'), {target: {value: 'banana'}})
     setIconColor('#000000')
@@ -266,7 +265,7 @@ describe('RCE "Icon Maker" Plugin > ButtonsTray', () => {
   })
 
   it('writes the content to the editor without alt attribute', async () => {
-    render(<ButtonsTray {...defaults} />)
+    render(<IconMakerTray {...defaults} />)
 
     setIconColor('#000000')
     userEvent.click(screen.getByRole('button', {name: /apply/i}))
@@ -282,7 +281,7 @@ describe('RCE "Icon Maker" Plugin > ButtonsTray', () => {
 
   describe('the "replace all instances" checkbox', () => {
     it('disables the name field when checked', async () => {
-      const {getByTestId} = render(<ButtonsTray {...defaults} editing />)
+      const {getByTestId} = render(<IconMakerTray {...defaults} editing />)
 
       act(() => getByTestId('cb-replace-all').click())
 
@@ -290,20 +289,20 @@ describe('RCE "Icon Maker" Plugin > ButtonsTray', () => {
     })
 
     it('does not disable the name field when not checked', async () => {
-      const {getByTestId} = render(<ButtonsTray {...defaults} editing />)
+      const {getByTestId} = render(<IconMakerTray {...defaults} editing />)
 
       await waitFor(() => expect(getByTestId('icon-name')).not.toBeDisabled())
     })
 
     it('does not disable the name field on new icons', async () => {
-      const {getByTestId} = render(<ButtonsTray {...defaults} />)
+      const {getByTestId} = render(<IconMakerTray {...defaults} />)
 
       await waitFor(() => expect(getByTestId('icon-name')).not.toBeDisabled())
     })
   })
 
   it('disables footer while submiting', async () => {
-    render(<ButtonsTray {...defaults} />)
+    render(<IconMakerTray {...defaults} />)
 
     setIconColor('#000000')
     const button = screen.getByRole('button', {name: /apply/i})
@@ -324,7 +323,7 @@ describe('RCE "Icon Maker" Plugin > ButtonsTray', () => {
 
     const subject = () =>
       render(
-        <ButtonsTray
+        <IconMakerTray
           onClose={jest.fn()}
           editor={ed}
           rceConfig={{contextType: 'course', contextId: 2}}
@@ -359,7 +358,7 @@ describe('RCE "Icon Maker" Plugin > ButtonsTray', () => {
 
     const subject = () =>
       render(
-        <ButtonsTray
+        <IconMakerTray
           onClose={jest.fn()}
           editing
           editor={ed}

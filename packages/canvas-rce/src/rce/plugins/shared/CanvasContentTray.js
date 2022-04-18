@@ -30,7 +30,7 @@ import formatMessage from '../../../format-message'
 import Filter, {useFilterSettings} from './Filter'
 import {StoreProvider} from './StoreContext'
 import {getTrayHeight} from './trayUtils'
-import {ICON_MAKER_ICONS} from '../instructure_buttons/registerEditToolbar'
+import {ICON_MAKER_ICONS} from '../instructure_icon_maker/registerEditToolbar'
 
 /**
  * Returns the translated tray label
@@ -67,7 +67,9 @@ function getTrayLabel(contentType, contentSubtype, contextType) {
 }
 
 const thePanels = {
-  icon_maker_icons: React.lazy(() => import('../instructure_buttons/components/SavedButtonList')),
+  icon_maker_icons: React.lazy(() =>
+    import('../instructure_icon_maker/components/SavedIconMakerList')
+  ),
   links: React.lazy(() => import('../instructure_links/components/LinksPanel')),
   images: React.lazy(() => import('../instructure_image/Images')),
   documents: React.lazy(() => import('../instructure_documents/components/DocumentsPanel')),

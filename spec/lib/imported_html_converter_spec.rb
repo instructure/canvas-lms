@@ -54,7 +54,7 @@ describe ImportedHtmlConverter do
       let(:course) { @course }
       let(:migration_id) { "migration-id-123" }
 
-      context "and a data-download-url attribute references a button and icon" do
+      context "and a data-download-url attribute references an icon maker icon" do
         let(:test_string) do
           %(<img src="$CANVAS_COURSE_REFERENCE$/file_ref/#{migration_id}/download?download_frd=1" alt="" data-inst-icon-maker-icon="true" data-download-url="$CANVAS_COURSE_REFERENCE$/file_ref/#{migration_id}/download?download_frd=1&icon_maker_icon=1">)
         end

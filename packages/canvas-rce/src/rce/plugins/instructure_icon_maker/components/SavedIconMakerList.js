@@ -23,7 +23,7 @@ import ImageList from '../../instructure_image/Images'
 import {useStoreProps} from '../../shared/StoreContext'
 import {ICON_MAKER_ICONS} from '../registerEditToolbar'
 
-const SavedButtonList = ({onImageEmbed}) => {
+const SavedIconMakerList = ({onImageEmbed}) => {
   const storeProps = useStoreProps()
   const {files, bookmark, isLoading, hasMore} = storeProps.images[storeProps.contextType]
 
@@ -51,4 +51,4 @@ const SavedButtonList = ({onImageEmbed}) => {
   )
 }
 
-export default SavedButtonList
+export default SavedIconMakerList

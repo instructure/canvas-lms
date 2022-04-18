@@ -24,7 +24,7 @@ import {ColorSection} from './ColorSection'
 import {TextSection} from './TextSection'
 import {ImageSection} from './ImageSection'
 
-export const CreateButtonForm = ({
+export const CreateIconMakerForm = ({
   settings,
   dispatch,
   editor,
