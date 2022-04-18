@@ -642,4 +642,16 @@ describe Quizzes::QuizSerializer do
       expect(@serializer.as_json[:quiz][:important_dates]).to be true
     end
   end
+
+  describe "enabled_course_paces" do
+    it "when enabled, quiz is 'in_paced_course'" do
+      @context.enable_course_paces = true
+      expect(@serializer.as_json[:quiz][:in_paced_course]).to be true
+    end
+
+    it "when disabled, quiz is not 'in_paced_course'" do
+      @context.enable_course_paces = false
+      expect(@serializer.as_json[:quiz][:in_paced_course]).to be false
+    end
+  end
 end

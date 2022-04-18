@@ -429,5 +429,24 @@ describe "quizzes" do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take"
       expect(f("#content")).not_to contain_css("#take_quiz_link")
     end
+
+    context "in a paced course" do
+      before do
+        @course_paces_enabled = @course.enable_course_paces?
+        @course.enable_course_paces = true
+        @course.save!
+      end
+
+      after do
+        @course.enable_course_paces = @course_pacing_enabled
+        @course.save!
+      end
+
+      it "shows the course pacing notice" do
+        create_quiz_with_due_date
+        get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+        expect(f("[data-testid='CoursePacingNotice']")).to be_displayed
+      end
+    end
   end
 end

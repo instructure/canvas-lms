@@ -41,7 +41,8 @@ module Quizzes
                :quiz_submissions_zip_url, :preview_url, :quiz_submission_versions_html_url,
                :assignment_id, :one_time_results, :only_visible_to_overrides,
                :assignment_group_id, :show_correct_answers_last_attempt, :version_number,
-               :has_access_code, :post_to_sis, :anonymous_submissions, :migration_id
+               :has_access_code, :post_to_sis, :anonymous_submissions, :migration_id,
+               :in_paced_course
 
     def_delegators :@controller,
                    # :api_v1_course_assignment_group_url,
@@ -399,6 +400,10 @@ module Quizzes
 
     def timer_autosubmit_disabled
       quiz.timer_autosubmit_disabled?
+    end
+
+    def in_paced_course
+      context.try(:enable_course_paces)
     end
   end
 end
