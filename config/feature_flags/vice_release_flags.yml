@@ -46,15 +46,6 @@ discussions_inline_grading:
     Allows a grader to grade discussions as they read
   applies_to: SiteAdmin
 
-discussions_reporting:
-  state: hidden
-  beta: true
-  display_name: Discussions Redesign - Reporting
-  description: |-
-    This feature flag enables Discussions Reporting inside the new
-    Discussions Redesign work.
-  applies_to: SiteAdmin
-
 discussion_anonymity:
   state: hidden
   beta: false

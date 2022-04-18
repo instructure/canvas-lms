@@ -382,7 +382,6 @@ export const DiscussionThreadContainer = props => {
                           }
                           goToTopic={props.goToTopic}
                           onReport={
-                            ENV?.student_reporting_enabled &&
                             props.discussionTopic.permissions?.studentReporting
                               ? () => {
                                   setShowReportModal(true)

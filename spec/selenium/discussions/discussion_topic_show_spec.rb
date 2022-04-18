@@ -103,7 +103,6 @@ describe "Discussion Topic Show" do
 
     it "Displays when all features are turned on" do
       Account.site_admin.enable_feature! :react_discussions_post
-      Account.site_admin.enable_feature! :discussions_reporting
       Account.site_admin.enable_feature! :discussion_anonymity
 
       gc = @course.account.group_categories.create(name: "Group Category")

@@ -563,7 +563,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def broadcast_report_notification(report_type)
-    return unless Account.site_admin.feature_enabled?(:discussions_reporting)
+    return unless context.feature_enabled?(:react_discussions_post)
 
     to_list = context.instructors_in_charge_of(user_id)
 
