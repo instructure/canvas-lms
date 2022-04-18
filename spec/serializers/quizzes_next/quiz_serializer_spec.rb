@@ -184,6 +184,20 @@ describe QuizzesNext::QuizSerializer do
     end
   end
 
+  describe "enabled_course_paces" do
+    it "when enabled, quiz is 'in_paced_course'" do
+      context.enable_course_paces = true
+      result = quiz_serializer.as_json
+      expect(result[:in_paced_course]).to eq(true)
+    end
+
+    it "when disabled, quiz is not 'in_paced_course'" do
+      context.enable_course_paces = false
+      result = quiz_serializer.as_json
+      expect(result[:in_paced_course]).to eq(false)
+    end
+  end
+
   describe "permissions" do
     it "serializes permissions" do
       expect(subject[:permissions]).to include({
