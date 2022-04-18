@@ -23,6 +23,9 @@ describe CoursePace do
   before :once do
     course_with_student active_all: true
     @course.update start_at: "2021-09-01", restrict_enrollments_to_course_dates: true, time_zone: "America/Denver"
+    @course.root_account.enable_feature!(:course_paces)
+    @course.enable_course_paces = true
+    @course.save!
     @module = @course.context_modules.create!
     @assignment = @course.assignments.create!
     @course_section = @course.course_sections.first

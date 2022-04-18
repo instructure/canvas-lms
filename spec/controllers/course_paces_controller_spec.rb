@@ -41,6 +41,9 @@ describe CoursePacesController, type: :controller do
   before :once do
     course_with_teacher(active_all: true)
     @course.update(start_at: "2021-09-30", restrict_enrollments_to_course_dates: true)
+    @course.root_account.enable_feature!(:course_paces)
+    @course.enable_course_paces = true
+    @course.save!
     student_in_course(active_all: true)
     course_pace_model(course: @course)
     @student_enrollment = @student.enrollments.first
