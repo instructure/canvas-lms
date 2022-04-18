@@ -38,6 +38,11 @@ module Lti
 
     def create_subscription
       Rails.logger.info { "in: PlagiarismSubscriptionsHelper::create_subscription, tool_proxy_id: #{tool_proxy.id}" }
+      if Services::LiveEventsSubscriptionService.disabled?
+        Rails.logger.info { "Live Event Subscription Service disabled.  No subscription created." }
+        return
+      end
+
       if Services::LiveEventsSubscriptionService.available?
         subscription = plagiarism_subscription(tool_proxy, product_family)
         result = Services::LiveEventsSubscriptionService.create_tool_proxy_subscription(tool_proxy, subscription)
@@ -77,7 +82,7 @@ module Lti
       elsif submission_event_service.endpoint.blank?
         I18n.t("Plagiarism review tool submission event service is missing endpoint")
       else
-        I18n.t("Plagiarism review tool error")
+        I18n.t("Plagiarism review tool live event subscription error")
       end
     end
 
