@@ -68,5 +68,20 @@ describe Setting do
       Setting.set("my_new_setting", time)
       expect(Setting.get("my_new_setting", "1")).to eq time.to_s
     end
+
+    it "sets the secret flag on create" do
+      Setting.set("new_nonsecret_setting", "value")
+      expect(Setting.find_by(name: "new_nonsecret_setting").secret).to be_falsey
+
+      Setting.set("new_secret_setting", "value", secret: true)
+      expect(Setting.find_by(name: "new_secret_setting").secret).to be_truthy
+    end
+
+    it "changes the secret flag when modifying" do
+      Setting.set("new_nonsecret_setting", "value")
+      Setting.set("new_nonsecret_setting", "secret_value", secret: true)
+
+      expect(Setting.find_by(name: "new_nonsecret_setting").secret).to be_truthy
+    end
   end
 end
