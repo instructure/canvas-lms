@@ -207,6 +207,10 @@ export const handlers = [
           ],
           __typename: 'SubmissionCommentConnection'
         },
+        user: {
+          _id: '75',
+          __typename: 'User'
+        },
         __typename: 'Submission'
       }
     }

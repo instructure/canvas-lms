@@ -83,6 +83,7 @@ export const inboxConversationsWrapper = (data, isSubmissionComments = false) =>
 export const inboxMessagesWrapper = (data, isSubmissionComments = false) => {
   const inboxMessages = []
   let contextName = ''
+  const submissionCommentURL = `/courses/${data?.commentsConnection?.nodes[0]?.course._id}/assignments/${data?.commentsConnection?.nodes[0]?.assignment._id}/submissions/${data?.user?._id}`
   if (data) {
     const messages = isSubmissionComments
       ? data?.commentsConnection?.nodes
@@ -115,7 +116,7 @@ export const inboxMessagesWrapper = (data, isSubmissionComments = false) => {
       inboxMessages.push(inboxMessage)
     })
   }
-  return {inboxMessages, contextName}
+  return {inboxMessages, contextName, submissionCommentURL}
 }
 
 const getSubmissionCommentsParticipantString = messages => {

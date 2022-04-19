@@ -28,6 +28,7 @@ import {responsiveQuerySizes} from '../../../util/utils'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {ConversationContext} from '../../../util/constants'
+import {Link} from '@instructure/ui-link'
 
 const I18n = useI18nScope('conversations_2')
 
@@ -59,7 +60,16 @@ export const MessageDetailHeader = ({...props}) => {
               as={responsiveProps.as}
               data-testid={responsiveProps.datatestId}
             >
-              {props.text}
+              {isSubmissionCommentsType && props.submissionCommentURL ? (
+                <Link
+                  href={props.submissionCommentURL}
+                  data-testid="submission-comment-header-line"
+                >
+                  {props.text}
+                </Link>
+              ) : (
+                props.text
+              )}
             </Heading>
           </Flex.Item>
           <Flex.Item>
@@ -120,7 +130,8 @@ MessageDetailHeader.propTypes = {
   onReplyAll: PropTypes.func,
   onDelete: PropTypes.func,
   focusRef: PropTypes.any,
-  onForward: PropTypes.func
+  onForward: PropTypes.func,
+  submissionCommentURL: PropTypes.string
 }
 
 MessageDetailHeader.defaultProps = {
