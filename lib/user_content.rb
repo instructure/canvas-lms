@@ -27,7 +27,7 @@ module UserContent
     current_host = nil,
     use_updated_math_rendering = true
   )
-    html = Nokogiri::HTML5.fragment(str)
+    html = Nokogiri::HTML5.fragment(str, nil, CanvasSanitize::SANITIZE[:parser_options])
     find_user_content(html) do |obj, uc|
       uuid = SecureRandom.uuid
       child = Nokogiri::XML::Node.new("iframe", html)
