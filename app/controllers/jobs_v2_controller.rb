@@ -38,12 +38,15 @@ class JobsV2Controller < ApplicationController
 
         css_bundle :jobs_v2
         js_bundle :jobs_v2
+
+        jobs_server = @domain_root_account.shard.delayed_jobs_shard&.database_server_id
+        cluster = @domain_root_account.shard&.database_server_id
         js_env(
           jobs_scope_filter: {
-            jobs_server: @domain_root_account.shard.delayed_jobs_shard&.database_server_id || t("All Jobs"),
-            cluster: @domain_root_account.shard&.database_server_id,
-            shard: @domain_root_account.shard.name,
-            account: @domain_root_account.name,
+            jobs_server: (jobs_server && t("Server: %{server}", server: jobs_server)) || t("All Jobs"),
+            cluster: cluster && t("Cluster: %{cluster}", cluster: cluster),
+            shard: t("Shard: %{shard}", shard: @domain_root_account.shard.name),
+            account: t("Account: %{account}", account: @domain_root_account.name)
           }.compact
         )
 
