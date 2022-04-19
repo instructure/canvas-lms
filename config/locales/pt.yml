@@ -28333,7 +28333,7 @@ pt:
   user_successfully_re_activated_b897e35b: "O utilizador foi reativado"
   user_successfully_removed_a366ca5f: "Utilizador removido com sucesso."
   user_vaildation_issues_panel_66b66945: "Painel de problemas de validação do utilizador"
-  user_with_genitive_settings_b39e02ba: "%{user_with_genitive} Definições"
+  user_with_genitive_settings_b39e02ba: "Definições %{user_with_genitive}"
   usercount_respondents_1521244: "%{userCount} inquiridos"
   usercount_users_found_8c07f1f2: "%{userCount} utilizadores encontrados."
   userinfo_d21114ef: "Informação de utilizador"
