@@ -824,7 +824,11 @@ class CoursesController < ApplicationController
       params_for_create = course_params
 
       if params_for_create.key?(:syllabus_body)
-        params_for_create[:syllabus_body] = process_incoming_html_content(params_for_create[:syllabus_body])
+        begin
+          params_for_create[:syllabus_body] = process_incoming_html_content(params_for_create[:syllabus_body])
+        rescue Api::Html::UnparsableContentError => e
+          return render json: { errors: { unparsable_content: e.message } }, status: :bad_request
+        end
       end
 
       if (sub_account_id = params[:course].delete(:account_id)) && sub_account_id.to_i != @account.id
@@ -2941,7 +2945,11 @@ class CoursesController < ApplicationController
         params_for_update = params_for_update.slice(:syllabus_body)
       end
       if params_for_update.key?(:syllabus_body)
-        params_for_update[:syllabus_body] = process_incoming_html_content(params_for_update[:syllabus_body])
+        begin
+          params_for_update[:syllabus_body] = process_incoming_html_content(params_for_update[:syllabus_body])
+        rescue Api::Html::UnparsableContentError => e
+          @course.errors.add(:unparsable_content, e.message)
+        end
       end
       unless @course.grants_right?(@current_user, :manage_course_visibility)
         params_for_update.delete(:indexed)
