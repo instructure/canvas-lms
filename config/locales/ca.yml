@@ -22479,7 +22479,7 @@ ca:
   user_successfully_re_activated_b897e35b: "L'usuari s'ha reactivat correctament."
   user_successfully_removed_a366ca5f: "L'usuari s'ha suprimit correctament."
   user_vaildation_issues_panel_66b66945: "Subfinestra de problemes amb la validació de l'usuari"
-  user_with_genitive_settings_b39e02ba: "Configuració de l’%{user_with_genitive}"
+  user_with_genitive_settings_b39e02ba: "Configuració %{user_with_genitive}"
   userinfo_d21114ef: "Informació de l'usuari"
   username_47bb5bbe: "Nom d’usuari"
   username_could_not_be_found_6c3e8383: "No s'ha trobat el nom d'usuari"
