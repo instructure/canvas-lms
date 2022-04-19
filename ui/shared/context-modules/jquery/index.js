@@ -278,7 +278,9 @@ window.modules = (function () {
                   points: I18n.n(info.points_possible)
                 })
               }
-              if (info.todo_date != null) {
+              if (ENV.IN_PACED_COURSE && !ENV.IS_STUDENT) {
+                $context_module_item.find('.due_date_display').remove()
+              } else if (info.todo_date != null) {
                 data.due_date_display = $.dateString(info.todo_date)
               } else if (info.due_date != null) {
                 if (info.past_due != null) {
