@@ -430,6 +430,30 @@ describe "context modules" do
         expect(f(".due_date_display").text).not_to be_blank
         expect(f(".due_date_display").text).not_to eq "Multiple Due Dates"
       end
+
+      context "in a paced course" do
+        before do
+          @course.enable_course_paces = true
+          @course.save!
+        end
+
+        after do
+          @course.enable_course_paces = false
+        end
+
+        it "does not show due dates" do
+          modules = create_modules(1, true)
+          modules[0].add_item({ id: @assignment.id, type: "assignment", title: "An Assignment" })
+
+          @assignment.due_at = 3.days.from_now
+          @assignment.save!
+
+          get "/courses/#{@course.id}/modules"
+
+          expect(fj(".context_module:contains('An Assignment')")).to be_displayed
+          expect(f(".context_module")).not_to contain_css(".due_date_display")
+        end
+      end
     end
 
     it "shows a vdd tooltip summary for assignments with multiple due dates" do
