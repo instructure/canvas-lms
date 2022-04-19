@@ -167,6 +167,8 @@ class SubmissionsController < SubmissionsBaseController
   #   set to "online_url", otherwise the submission [url] parameter will be
   #   ignored.
   #
+  #   "basic_lti_launch" requires the assignment submission_type "online" or "external_tool"
+  #
   # @argument submission[body] [String]
   #   Submit the assignment as an HTML document snippet. Note this HTML snippet
   #   will be sanitized using the same ruleset as a submission made from the
