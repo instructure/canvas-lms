@@ -28282,7 +28282,7 @@ pt-BR:
   user_successfully_re_activated_b897e35b: "Usuário reativado com sucesso"
   user_successfully_removed_a366ca5f: "Usuário removido com sucesso."
   user_vaildation_issues_panel_66b66945: "Painel de problemas de validação do usuário"
-  user_with_genitive_settings_b39e02ba: "%{user_with_genitive} Configurações"
+  user_with_genitive_settings_b39e02ba: "Configurações %{user_with_genitive}"
   usercount_respondents_1521244: "%{userCount} respondentes"
   usercount_users_found_8c07f1f2: "%{userCount} usuários encontrados."
   userinfo_d21114ef: "Informações do usuário"
