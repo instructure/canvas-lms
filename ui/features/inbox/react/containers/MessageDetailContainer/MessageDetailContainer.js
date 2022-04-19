@@ -128,6 +128,7 @@ export const MessageDetailContainer = props => {
         onReply={props.onReply}
         onReplyAll={props.onReplyAll}
         onDelete={() => props.onDelete([props.conversation._id])}
+        submissionCommentURL={inboxMessageData?.submissionCommentURL}
       />
       {inboxMessageData?.inboxMessages.map(message => (
         <View as="div" borderWidth="small none none none" padding="small" key={message.id}>

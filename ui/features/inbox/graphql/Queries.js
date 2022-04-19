@@ -215,6 +215,9 @@ export const SUBMISSION_COMMENTS_QUERY = gql`
             ...SubmissionComment
           }
         }
+        user {
+          _id
+        }
       }
     }
   }
