@@ -28296,7 +28296,7 @@ fr:
   user_successfully_re_activated_b897e35b: "L’utilisateur a bien été réactivé"
   user_successfully_removed_a366ca5f: "Retrait de l'utilisateur réussi."
   user_vaildation_issues_panel_66b66945: "Panneau de problèmes de validation des utilisateurs"
-  user_with_genitive_settings_b39e02ba: "%{user_with_genitive} Paramètres"
+  user_with_genitive_settings_b39e02ba: "Paramètres %{user_with_genitive}"
   usercount_respondents_1521244: "%{userCount} répondants"
   usercount_users_found_8c07f1f2: "%{userCount} utilisateurs trouvés."
   userinfo_d21114ef: "Infos Utilisateur"
