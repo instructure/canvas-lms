@@ -224,6 +224,14 @@ describe "assignment groups" do
         get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
         expect(AssignmentPage.course_pacing_notice).to be_displayed
       end
+
+      it "does not show availability or due dates on index page" do
+        assignment = create_assignment!
+        get "/courses/#{@course.id}/assignments"
+        expect(fj(".assignment-list:contains('#{assignment.title}')")).to be_displayed
+        expect(f(".assignment-list")).not_to contain_css('[data-view="date-available"]')
+        expect(f(".assignment-list")).not_to contain_css('[data-view="date-due"]')
+      end
     end
   end
 
@@ -240,6 +248,20 @@ describe "assignment groups" do
       get "/courses/#{@course.id}/assignments/#{assign.id}"
       wait_for_ajaximations
       expect(f(".student-assignment-overview")).to include_text "Available"
+    end
+
+    context "in a paces course" do
+      before do
+        @course.enable_course_paces = true
+        @course.save!
+        @assignment = create_assignment!
+      end
+
+      it "shows due date on the index page" do
+        get "/courses/#{@course.id}/assignments"
+        expect(fj(".assignment-list:contains('#{@assignment.title}')")).to be_displayed
+        expect(f(".assignment-list")).to contain_css('[data-view="date-due"]')
+      end
     end
   end
 end
