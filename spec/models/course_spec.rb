@@ -2984,6 +2984,38 @@ describe Course do
             expect(syllabus_tab[:label]).to eq("Important Info")
           end
 
+          it "does not include manually-hidden external tools" do
+            @course.context_external_tools.create!(
+              url: "http://example.com/1",
+              consumer_key: "key",
+              shared_secret: "abcd",
+              name: "visible tool",
+              course_navigation: {
+                text: "visible tool",
+                url: "http://example.com/1",
+                default: false
+              }
+            )
+            hidden_tool = @course.context_external_tools.create!(
+              url: "http://example.com/2",
+              consumer_key: "key",
+              shared_secret: "abcd",
+              name: "hidden tool",
+              course_navigation: {
+                text: "hidden tool",
+                url: "http://example.com/2",
+                default: false
+              }
+            )
+
+            @course.tab_configuration = [{ "id" => hidden_tool.asset_string, "hidden" => true }]
+            @course.save!
+
+            tabs = @course.tabs_available(@user, include_external: true).pluck(:label)
+            expect(tabs).to be_include("visible tool")
+            expect(tabs).not_to be_include("hidden tool")
+          end
+
           context "with course_subject_tabs option" do
             it "returns subject tabs only by default" do
               length = Course.course_subject_tabs.length

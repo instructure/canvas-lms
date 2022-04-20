@@ -3244,7 +3244,11 @@ class Course < ActiveRecord::Base
         admin_only_tabs = tabs.select { |t| t[:visibility] == "admins" }
         tabs -= admin_only_tabs if admin_only_tabs.present? && !check_for_permission.call(:read_as_admin)
 
-        hidden_external_tabs = tabs.select { |t| t[:hidden] && t[:external] }
+        hidden_external_tabs = tabs.select do |t|
+          next false unless t[:external]
+
+          t[:hidden] || (elementary_subject_course? && !course_subject_tabs && tab_hidden?(t[:id]))
+        end
         tabs -= hidden_external_tabs if hidden_external_tabs.present? && !(opts[:api] && check_for_permission.call(:read_as_admin))
 
         delete_unless.call([TAB_GRADES], :read_grades, :view_all_grades, :manage_grades)
