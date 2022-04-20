@@ -143,7 +143,7 @@ export default class DeveloperKeyModal extends React.Component {
         const {developer_key, tool_configuration} = data
         developer_key.tool_configuration = tool_configuration.settings
         dispatch(actions.listDeveloperKeysReplace(developer_key))
-        $.flashMessage(I18n.t('Save successful.'))
+        this.props.handleSuccessfulSave()
         this.closeModal()
       })
       .catch(errors => {
@@ -260,7 +260,7 @@ export default class DeveloperKeyModal extends React.Component {
           open={developerKeyModalOpen}
           onDismiss={this.closeModal}
           size="fullscreen"
-          label={editing ? I18n.t('Create developer key') : I18n.t('Edit developer key')}
+          label={editing ? I18n.t('Create Developer Key') : I18n.t('Edit Developer Key')}
           shouldCloseOnDocumentClick={false}
         >
           <Modal.Header>
@@ -274,7 +274,11 @@ export default class DeveloperKeyModal extends React.Component {
           <Modal.Body>
             {this.isSaving ? (
               <View as="div" textAlign="center">
-                <Spinner renderTitle={I18n.t('Creating Key')} margin="0 0 0 medium" />
+                <Spinner
+                  renderTitle={editing ? I18n.t('Saving Key') : I18n.t('Creating Key')}
+                  margin="0 0 0 medium"
+                  aria-live="polite"
+                />
               </View>
             ) : (
               <NewKeyForm
@@ -338,7 +342,8 @@ DeveloperKeyModal.propTypes = {
     listDeveloperKeyScopesSet: PropTypes.func.isRequired,
     saveLtiToolConfiguration: PropTypes.func.isRequired,
     resetLtiState: PropTypes.func.isRequired,
-    updateLtiKey: PropTypes.func.isRequired
+    updateLtiKey: PropTypes.func.isRequired,
+    listDeveloperKeysReplace: PropTypes.func.isRequired
   }).isRequired,
   createOrEditDeveloperKeyState: PropTypes.shape({
     isLtiKey: PropTypes.bool.isRequired,
@@ -355,5 +360,6 @@ DeveloperKeyModal.propTypes = {
       contextId: PropTypes.string.isRequired
     })
   }).isRequired,
-  selectedScopes: PropTypes.arrayOf(PropTypes.string).isRequired
+  selectedScopes: PropTypes.arrayOf(PropTypes.string).isRequired,
+  handleSuccessfulSave: PropTypes.func.isRequired,
 }
