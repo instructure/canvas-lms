@@ -49,10 +49,18 @@ export function Expansion({...props}) {
           data-testid="expand-button"
           interaction={props.isReadOnly ? 'disabled' : 'enabled'}
         >
-          <ScreenReaderContent>
+          <ScreenReaderContent
+            data-testid={
+              props.isExpanded ? 'reply-expansion-btn-collapse' : 'reply-expansion-btn-expand'
+            }
+          >
             {props.isExpanded
-              ? I18n.t('Collapse discussion thread')
-              : I18n.t('Expand discussion thread')}
+              ? I18n.t('Collapse discussion thread from %{author}', {
+                  author: props.authorName
+                })
+              : I18n.t('Expand discussion thread from %{author}', {
+                  author: props.authorName
+                })}
           </ScreenReaderContent>
           <Text
             weight="bold"
@@ -84,6 +92,10 @@ Expansion.propTypes = {
    * Key consumed by ThreadingToolbar's InlineList
    */
   delimiterKey: PropTypes.string.isRequired,
+  /**
+   * Name of author of the post being replied to
+   */
+  authorName: PropTypes.string,
   /**
    * Disable/Enable for the button
    */

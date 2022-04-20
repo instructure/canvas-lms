@@ -243,6 +243,7 @@ export const DiscussionThreadContainer = props => {
       <ThreadingToolbar.Expansion
         key={`expand-${props.discussionEntry._id}`}
         delimiterKey={`expand-delimiter-${props.discussionEntry._id}`}
+        authorName={getDisplayName(props.discussionEntry)}
         expandText={
           <ReplyInfo
             replyCount={props.discussionEntry.rootEntryParticipantCounts?.repliesCount}
@@ -357,6 +358,7 @@ export const DiscussionThreadContainer = props => {
                       filter !== 'drafts' && !props.discussionEntry.deleted ? (
                         <ThreadActions
                           id={props.discussionEntry._id}
+                          authorName={getDisplayName(props.discussionEntry)}
                           isUnread={!props.discussionEntry.entryParticipant?.read}
                           onToggleUnread={toggleUnread}
                           onDelete={props.discussionEntry.permissions?.delete ? onDelete : null}
