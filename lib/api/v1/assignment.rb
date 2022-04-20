@@ -521,7 +521,6 @@ module Api::V1::Assignment
     return :forbidden unless grading_periods_allow_submittable_create?(assignment, assignment_params)
 
     prepared_create = prepare_assignment_create_or_update(assignment, assignment_params, user, context)
-
     return false unless prepared_create[:valid]
 
     response = :created
@@ -936,8 +935,14 @@ module Api::V1::Assignment
       old_assignment.id = assignment.id
     end
 
+    invalid = { valid: false }
+
     if assignment_params[:secure_params] && assignment.new_record?
       secure_params = Canvas::Security.decode_jwt assignment_params[:secure_params]
+      if Assignment.find_by(lti_context_id: secure_params[:lti_assignment_id])
+        assignment.errors.add("assignment[lti_context_id]", I18n.t("lti_context_id should be unique"), attribute: "lti_context_id")
+        return invalid
+      end
       assignment.lti_context_id = secure_params[:lti_assignment_id]
     end
 
@@ -949,6 +954,7 @@ module Api::V1::Assignment
       assignment.errors.add("assignment[allowed_extensions]", I18n.t("Value too long, allowed length is %{length}", length: Assignment.maximum_string_length))
       return invalid
     end
+
     return invalid unless update_parameters_valid?(assignment, assignment_params, user, overrides)
 
     updated_assignment = update_from_params(assignment, assignment_params, user, context)
