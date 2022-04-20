@@ -133,18 +133,10 @@ class StudentEnrollment < Enrollment
   end
 
   def republish_course_pace_if_needed
-    return unless saved_change_to_id? || saved_change_to_start_at?
+    return unless saved_change_to_id? || saved_change_to_start_at? || (saved_change_to_workflow_state? && workflow_state == "invited")
     return unless course.enable_course_paces?
 
     course_pace = course.course_paces.published.for_user(user).take || course.course_paces.published.primary.take
-    return unless course_pace
-
-    course_pace
-      .delay(
-        run_at: Setting.get("course_pace_enrollment_update_republish_interval", "300").to_i.seconds.from_now,
-        singleton: "course_pace_republish:#{course_pace.global_course_id}:#{course_pace.global_user_id}",
-        on_conflict: :overwrite
-      )
-      .publish
+    course_pace&.create_publish_progress
   end
 end
