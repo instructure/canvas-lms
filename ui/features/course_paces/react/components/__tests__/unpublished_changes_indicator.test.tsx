@@ -103,8 +103,10 @@ describe('UnpublishedChangesIndicator', () => {
     expect(getAllByText('Publishing pace...')[0]).toBeInTheDocument()
   })
 
-  it('renders nothing if the pace has not yet been published', () => {
-    const {queryByText} = render(<UnpublishedChangesIndicator {...defaultProps} newPace />)
-    expect(queryByText('All changes published')).not.toBeInTheDocument()
+  it('renders new pace message if pace has not yet been published', () => {
+    const {getByText} = render(
+      <UnpublishedChangesIndicator {...defaultProps} changeCount={0} newPace />
+    )
+    expect(getByText('Pace is new and unpublished')).toBeInTheDocument()
   })
 })
