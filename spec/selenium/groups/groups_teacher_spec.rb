@@ -426,7 +426,15 @@ describe "new groups" do
       click_add_group_set
       f("#new_category_name").send_keys("Test Group Set")
       f("#split_groups").click
+
       expect(f(".auto-group-leader-controls")).to be_displayed
+      expect(f("input[value='FIRST']")).not_to be_enabled
+      expect(f("input[value='RANDOM']")).not_to be_enabled
+
+      checkbox = f("input[type='checkbox'][name='enable_auto_leader']")
+      checkbox.click
+      expect(f("input[value='FIRST']")).to be_enabled
+      expect(f("input[value='RANDOM']")).to be_enabled
 
       replace_content(fj('.input-micro[name="create_group_count"]'), 2)
       save_group_set
