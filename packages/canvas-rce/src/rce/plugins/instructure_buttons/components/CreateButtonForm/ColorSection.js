@@ -73,6 +73,7 @@ export const ColorSection = ({settings, onChange}) => (
         name="button-outline"
         onChange={outlineColor => onChange({outlineColor})}
         popoverMountNode={getColorSection}
+        requireColor
       />
     </Flex.Item>
   </Flex>

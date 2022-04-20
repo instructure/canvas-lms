@@ -20,22 +20,20 @@ export const hasBackgroundColor = settings => {
   return !!settings.color
 }
 
-export const hasVisibleText = settings => {
-  return !!settings.textColor && settings.text.length > 0
+export const hasText = settings => {
+  return settings.text.length > 0
 }
 
 export const hasImage = settings => {
   return settings.encodedImage.length > 0
 }
 
-export const hasVisibleOutline = settings => {
-  return !!settings.outlineColor && settings.outlineSize !== 'none'
+export const hasOutline = settings => {
+  return settings.outlineSize !== 'none'
 }
 
 export const validIcon = settings => {
-  return [hasBackgroundColor, hasVisibleText, hasImage, hasVisibleOutline].some(func =>
-    func(settings)
-  )
+  return [hasBackgroundColor, hasText, hasImage, hasOutline].some(func => func(settings))
 }
 
 export default validIcon

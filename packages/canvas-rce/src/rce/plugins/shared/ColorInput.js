@@ -59,7 +59,8 @@ export const ColorInput = ({
   onChange,
   popoverMountNode,
   width = '11rem',
-  readonly = false
+  readonly = false,
+  requireColor = false
 }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [inputValue, setInputValue] = useState(color)
@@ -88,6 +89,19 @@ export const ColorInput = ({
     }
   }
 
+  const colorPreviews = NAMED_COLORS.map(c => (
+    <ColorPreview
+      key={`${name}-${c?.color}`}
+      color={c?.color}
+      name={c?.name}
+      disabled={!isOpen}
+      onSelect={() => {
+        handleColorChange(c?.color)
+        setIsOpen(false)
+      }}
+    />
+  ))
+
   function renderPopover() {
     return (
       <Popover
@@ -105,6 +119,7 @@ export const ColorInput = ({
             withBackground={false}
             withBorder={false}
             interaction="enabled"
+            data-testid={`${name}-popover-trigger`}
           >
             {isOpen ? <IconArrowOpenUpLine /> : <IconArrowOpenDownLine />}
           </IconButton>
@@ -116,23 +131,13 @@ export const ColorInput = ({
         <Flex
           alignItems="center"
           as="div"
-          justifyItems="center"
+          justifyItems={requireColor ? 'start' : 'center'}
           padding="x-large x-small small"
           width="175px"
           wrapItems
+          data-testid={`${name}-popover`}
         >
-          {NAMED_COLORS.map(c => (
-            <ColorPreview
-              key={`${name}-${c?.color}`}
-              color={c?.color}
-              name={c?.name}
-              disabled={!isOpen}
-              onSelect={() => {
-                handleColorChange(c?.color)
-                setIsOpen(false)
-              }}
-            />
-          ))}
+          {requireColor ? colorPreviews.slice(0, -1) : colorPreviews}
         </Flex>
       </Popover>
     )
@@ -151,7 +156,7 @@ export const ColorInput = ({
         onChange={(e, value) => handleColorChange(value)}
         placeholder={formatMessage('None')}
         renderBeforeInput={<ColorPreview color={color} disabled margin="0" />}
-        renderAfterInput={<span aria-label={pickerLabel}>{renderPopover(colorName)}</span>}
+        renderAfterInput={<span aria-label={pickerLabel}>{renderPopover()}</span>}
         renderLabel={label}
         shouldNotWrap
         value={inputValue || ''}
