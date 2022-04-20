@@ -39,9 +39,11 @@ export function svgSourceFor(type) {
 const SVGList = ({type, onSelect, fillColor, onMount}) => {
   const svgSourceList = svgSourceFor(type)
 
+  // Only execute this once
   useEffect(() => {
     if (onMount) onMount()
-  }, [onMount])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <Flex
