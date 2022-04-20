@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import {render, fireEvent, screen, waitFor, act} from '@testing-library/react'
+import {render, fireEvent, screen, waitFor, act, within} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import fetchMock from 'fetch-mock'
 import {ButtonsTray} from '../ButtonsTray'
@@ -178,7 +178,7 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
               xmlns="http://www.w3.org/2000/svg"
             >
               <metadata>
-                {"type":"image/svg+xml-icon-maker-icons","alt":"","shape":"square","size":"small","color":"#000000","outlineColor":null,"outlineSize":"small","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"middle","encodedImage":"","encodedImageType":"","encodedImageName":"","x":"50%","y":"50%","translateX":-54,"translateY":-54,"width":108,"height":108,"transform":"translate(-54,-54)"}
+                {"type":"image/svg+xml-icon-maker-icons","alt":"","shape":"square","size":"small","color":"#000000","outlineColor":"#000000","outlineSize":"none","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"middle","encodedImage":"","encodedImageType":"","encodedImageName":"","x":"50%","y":"50%","translateX":-54,"translateY":-54,"width":108,"height":108,"transform":"translate(-54,-54)"}
               </metadata>
               <svg
                 fill="none"
@@ -189,6 +189,8 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
               >
                 <g
                   fill="#000000"
+                  stroke="#000000"
+                  stroke-width="0"
                 >
                   <clippath
                     id="clip-path-for-embed"
@@ -312,7 +314,7 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
     })
   })
 
-  describe('what a button is being created', () => {
+  describe('when a button is being created', () => {
     let ed
 
     beforeEach(() => {
@@ -336,7 +338,7 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
         expect(getByLabelText('Icon Shape').value).toEqual('Square')
         expect(getByLabelText('Icon Size').value).toEqual('Small')
         expect(getAllByTestId('colorPreview-none').length).toBeGreaterThan(0)
-        expect(getByLabelText('Outline Size').value).toEqual('Small')
+        expect(getByLabelText('Outline Size').value).toEqual('None')
       })
     })
   })
@@ -423,6 +425,40 @@ describe('RCE "Buttons and Icons" Plugin > ButtonsTray', () => {
         expect(getByTestId('colorPreview-#009606')).toBeInTheDocument() // text color
         expect(getByTestId('colorPreview-#E71F63')).toBeInTheDocument() // text background color
         expect(getByLabelText('Text Position').value).toEqual('Middle')
+      })
+    })
+  })
+
+  describe('color inputs', () => {
+    const getNoneColorOptionFor = popoverTestId => {
+      const {getByTestId} = renderComponent()
+      const dropdownArrow = getByTestId(`${popoverTestId}-trigger`)
+      userEvent.click(dropdownArrow)
+      const popover = getByTestId(popoverTestId)
+      return within(popover).queryByRole('button', {name: /none/i})
+    }
+
+    describe('have no none option when', () => {
+      it('they represent outline color', () => {
+        const noneColorOption = getNoneColorOptionFor('button-outline-popover')
+        expect(noneColorOption).not.toBeInTheDocument()
+      })
+
+      it('they represent text color', () => {
+        const noneColorOption = getNoneColorOptionFor('button-text-color-popover')
+        expect(noneColorOption).not.toBeInTheDocument()
+      })
+    })
+
+    describe('have a none option when', () => {
+      it('they represent icon color', () => {
+        const noneColorOption = getNoneColorOptionFor('button-color-popover')
+        expect(noneColorOption).toBeInTheDocument()
+      })
+
+      it('they represent text background color', () => {
+        const noneColorOption = getNoneColorOptionFor('button-text-background-color-popover')
+        expect(noneColorOption).toBeInTheDocument()
       })
     })
   })

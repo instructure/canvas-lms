@@ -28,7 +28,7 @@ describe('buildMetadata() / parseMetadata()', () => {
     const metadata = buildMetadata(settings)
     expect(metadata).toMatchInlineSnapshot(`
       <metadata>
-        {"type":"image/svg+xml-icon-maker-icons","alt":"","shape":"triangle","size":"small","color":"#f0f","outlineColor":null,"outlineSize":"small","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"middle","encodedImage":"","encodedImageType":"","encodedImageName":"","x":0,"y":0,"translateX":0,"translateY":0,"width":0,"height":0,"transform":""}
+        {"type":"image/svg+xml-icon-maker-icons","alt":"","shape":"triangle","size":"small","color":"#f0f","outlineColor":"#000000","outlineSize":"none","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"middle","encodedImage":"","encodedImageType":"","encodedImageName":"","x":0,"y":0,"translateX":0,"translateY":0,"width":0,"height":0,"transform":""}
       </metadata>
     `)
 
