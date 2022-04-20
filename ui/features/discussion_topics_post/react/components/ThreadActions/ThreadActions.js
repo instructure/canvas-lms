@@ -71,7 +71,9 @@ export const ThreadActions = props => {
             trigger={
               <IconButton
                 size="small"
-                screenReaderLabel={I18n.t('Manage Discussion')}
+                screenReaderLabel={I18n.t('Manage Discussion by %{author}', {
+                  author: props.authorName
+                })}
                 renderIcon={IconMoreLine}
                 withBackground={false}
                 withBorder={false}
@@ -232,6 +234,7 @@ const renderMenuItem = (
 }
 
 ThreadActions.propTypes = {
+  authorName: PropTypes.string,
   id: PropTypes.string.isRequired,
   onMarkAllAsUnread: PropTypes.func,
   onMarkAllAsRead: PropTypes.func,
