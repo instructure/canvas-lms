@@ -24,16 +24,17 @@ import {actions} from '../../../../../reducers/imageSection'
 import svg from '../svg'
 
 describe('SingleColor', () => {
-  let dispatch, data
+  let dispatch, data, onLoaded
 
   beforeEach(() => {
     dispatch = jest.fn()
     data = {iconColor: '#FF00FF'}
+    onLoaded = jest.fn()
   })
 
   afterEach(() => jest.clearAllMocks())
 
-  const subject = () => render(<SingleColor dispatch={dispatch} data={data} />)
+  const subject = () => render(<SingleColor dispatch={dispatch} data={data} onLoaded={onLoaded} />)
 
   it('renders the single-color SVG list', () => {
     const {getByTestId} = subject()
@@ -61,5 +62,10 @@ describe('SingleColor', () => {
         payload: false
       })
     })
+  })
+
+  it('calls "onLoaded" when mounting', () => {
+    subject()
+    expect(onLoaded).toHaveBeenCalled()
   })
 })

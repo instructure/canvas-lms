@@ -23,13 +23,16 @@ import MultiColor from '../index'
 import {actions} from '../../../../../reducers/imageSection'
 
 describe('MultiColor', () => {
-  let dispatch
+  let dispatch, onLoaded
 
-  beforeEach(() => (dispatch = jest.fn()))
+  beforeEach(() => {
+    dispatch = jest.fn()
+    onLoaded = jest.fn()
+  })
 
   afterEach(() => jest.clearAllMocks())
 
-  const subject = () => render(<MultiColor dispatch={dispatch} />)
+  const subject = () => render(<MultiColor dispatch={dispatch} onLoaded={onLoaded} />)
 
   it('renders the multi-color SVG list', () => {
     const {getByTestId} = subject()
@@ -80,5 +83,10 @@ describe('MultiColor', () => {
         )
       })
     })
+  })
+
+  it('calls "onLoaded" when mounting', () => {
+    subject()
+    expect(onLoaded).toHaveBeenCalled()
   })
 })
