@@ -29,8 +29,17 @@ import DeveloperKeysTable from './AdminTable'
 import DeveloperKey from './DeveloperKey'
 import NewKeyModal from './NewKeyModal'
 import DeveloperKeyModalTrigger from './NewKeyTrigger'
+import {showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('react_developer_keys')
+/**
+ * @see {@link DeveloperKeysApp.developerKeySaveSuccessfulHandler}
+ * @description
+ * How long to wait after closing NewKeyModal to show any developer key alerts.
+ * This value might be able to be decreased, but two seconds is a pretty
+ * safe gap.
+ */
+const ALERT_WAIT_TIME = 2000
 
 class DeveloperKeysApp extends React.Component {
   state = {
@@ -131,6 +140,22 @@ class DeveloperKeysApp extends React.Component {
     this.setState({selectedTab: id})
   }
 
+  /**
+   * Due to some annoying accessibility issues related to modal focus
+   * returning and screenreader issues, we have to use a setTimeout here
+   * to make sure either alert gets read out properly. Without a setTimeout,
+   * the alert shows up, but because the Modal returns focus back to the element
+   * that opened it, the screenreader starts and then immediately stops reading
+   * the alert, instead reading out the description of the edit developer key
+   * button. If you can find a better solution, please remove this hacky
+   * workaround and do it.
+   * @todo Find a better way to avoid modal-focus-screenreader-bulldozing so
+   * this isn't necessary.
+   */
+  developerKeySaveSuccessfulHandler() {
+    setTimeout(showFlashSuccess(I18n.t('Save successful.')), ALERT_WAIT_TIME)
+  }
+
   render() {
     const {
       applicationState: {
@@ -176,6 +201,7 @@ class DeveloperKeysApp extends React.Component {
               availableScopesPending={listDeveloperKeyScopes.listDeveloperKeyScopesPending}
               selectedScopes={listDeveloperKeyScopes.selectedScopes}
               ctx={ctx}
+              handleSuccessfulSave={this.developerKeySaveSuccessfulHandler}
             />
             <DeveloperKeysTable
               ref={this.setMainTableRef}
