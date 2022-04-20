@@ -228,8 +228,7 @@ describe('Should load <AddressBookContainer> normally', () => {
       items = await screen.findAllByTestId('address-book-item')
       fireEvent.mouseDown(items[1])
 
-      // Loads once when initially loading the page, and then a second time when a user is selected
-      expect(onSelectedIdsChangeMock.mock.calls.length).toBe(2)
+      expect(onSelectedIdsChangeMock.mock.calls.length).toBe(1)
       expect(onSelectedIdsChangeMock.mock.calls[0][0][0].name).toEqual('Frederick Dukes')
     })
   })

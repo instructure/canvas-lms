@@ -17,7 +17,7 @@
  */
 
 import PropTypes from 'prop-types'
-import React, {useMemo, useState} from 'react'
+import React, {useMemo, useState, useEffect} from 'react'
 import {AddressBook, USER_TYPE, CONTEXT_TYPE} from '../../components/AddressBook/AddressBook'
 import {ADDRESS_BOOK_RECIPIENTS} from '../../../graphql/Queries'
 import {useQuery} from 'react-apollo'
@@ -41,6 +41,20 @@ export const AddressBookContainer = props => {
     notifyOnNetworkStatusChange: true
   })
   const {loading, data} = addressBookRecipientsQuery
+
+  useEffect(() => {
+    if (
+      props.activeCourseFilter?.contextID === null &&
+      props.activeCourseFilter?.contextName === null
+    ) {
+      setInputValue('')
+      setFilterHistory([
+        {
+          context: null
+        }
+      ])
+    }
+  }, [props.activeCourseFilter])
 
   const fetchMoreMenuData = () => {
     setIsLoadingMoreData(true)
@@ -107,14 +121,17 @@ export const AddressBookContainer = props => {
     )
   }
 
-  if (props.activeCourseFilter && !filterHistory[filterHistory.length - 1]?.context) {
-    addFilterHistory({
-      context: {
-        contextID: props.activeCourseFilter.contextID,
-        contextName: props.activeCourseFilter.contextName
-      }
-    })
-  }
+  useEffect(() => {
+    if (props.activeCourseFilter && !filterHistory[filterHistory.length - 1]?.context) {
+      addFilterHistory({
+        context: {
+          contextID: props.activeCourseFilter.contextID,
+          contextName: props.activeCourseFilter.contextName
+        }
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.activeCourseFilter])
 
   const menuData = useMemo(() => {
     if (loading && !data) {
@@ -208,6 +225,7 @@ export const AddressBookContainer = props => {
       open={props.open}
       hasSelectAllFilterOption={props.hasSelectAllFilterOption}
       currentFilter={filterHistory[filterHistory.length - 1]}
+      activeCourseFilter={props.activeCourseFilter}
     />
   )
 }
