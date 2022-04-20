@@ -2033,6 +2033,22 @@ describe AssignmentsApiController, type: :request do
       expect(a.lti_context_id).to eq(lti_assignment_id)
     end
 
+    it "does not allow creating an assignment with the same lti_context_id" do
+      lti_assignment_id = SecureRandom.uuid
+      jwt = Canvas::Security.create_jwt(lti_assignment_id: lti_assignment_id)
+
+      api_create_assignment_in_course(@course, { "description" => "description",
+                                                 "secure_params" => jwt })
+      expect(response.code).to eq "201"
+
+      api_create_assignment_in_course(@course, { "description" => "description",
+                                                 "secure_params" => jwt })
+      json = JSON.parse response.body
+      expect(json["errors"]).to_not be_nil
+      expect(json["errors"]&.keys).to eq ["assignment[lti_context_id]"]
+      expect(json["errors"]["assignment[lti_context_id]"].first["message"]).to eq("lti_context_id should be unique")
+    end
+
     context "set the configuration LTI 1 tool if provided" do
       let(:tool) { @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret") }
       let(:a) { Assignment.last }
