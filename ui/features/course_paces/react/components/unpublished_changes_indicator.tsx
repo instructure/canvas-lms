@@ -19,7 +19,7 @@
 import React, {useEffect} from 'react'
 import {CondensedButton} from '@instructure/ui-buttons'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {getCoursePace, getPacePublishing, getUnpublishedChangeCount} from '../reducers/course_paces'
+import {getPacePublishing, getUnpublishedChangeCount} from '../reducers/course_paces'
 import {getBlackoutDatesSyncing} from '../shared/reducers/blackout_dates'
 import {StoreState} from '../types'
 import {connect} from 'react-redux'
@@ -40,11 +40,14 @@ type StateProps = {
   readonly publishError?: string
 }
 
-export type UnpublishedChangesIndicatorProps = StateProps & {
+type PassedProps = {
   onClick?: () => void
   onUnpublishedNavigation?: (e: BeforeUnloadEvent) => void
   margin?: any // type from CondensedButtonProps; passed through
+  readonly newProps: boolean
 }
+
+export type UnpublishedChangesIndicatorProps = StateProps & PassedProps
 
 const text = (changeCount: number) => {
   if (changeCount < 0) throw Error(`changeCount cannot be negative (${changeCount})`)
@@ -82,13 +85,11 @@ export const UnpublishedChangesIndicator = ({
   const hasChanges = changeCount > 0
 
   useEffect(() => {
-    if (hasChanges) {
+    if (hasChanges || newPace) {
       window.addEventListener('beforeunload', onUnpublishedNavigation)
       return () => window.removeEventListener('beforeunload', onUnpublishedNavigation)
     }
-  }, [hasChanges, onUnpublishedNavigation])
-
-  if (newPace) return null
+  }, [hasChanges, newPace, onUnpublishedNavigation])
 
   if (publishError !== undefined) {
     return (
@@ -116,6 +117,14 @@ export const UnpublishedChangesIndicator = ({
     )
   }
 
+  if (newPace && changeCount === 0) {
+    return (
+      <View margin={margin}>
+        <Text>{I18n.t('Pace is new and unpublished')}</Text>
+      </View>
+    )
+  }
+
   return changeCount ? (
     <CondensedButton data-testid="publish-status-button" onClick={onClick} margin={margin}>
       {text(changeCount)}
@@ -132,7 +141,6 @@ const mapStateToProps = (state: StoreState) => ({
   blackoutDatesSyncing: getBlackoutDatesSyncing(state),
   pacePublishing: getPacePublishing(state),
   isSyncing: getSyncing(state),
-  newPace: !getCoursePace(state)?.id,
   publishError: getCategoryError(state, ['publish', 'blackout_dates'])
 })
 
