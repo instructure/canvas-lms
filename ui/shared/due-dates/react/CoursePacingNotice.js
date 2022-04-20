@@ -32,7 +32,9 @@ const CoursePacingNotice = props => {
         <View as="div" margin="0 0 small 0">
           {I18n.t('This course is using Course Pacing. Go to Course Pacing to manage due dates.')}
         </View>
-        <Link href={`/courses/${props.courseId}/course_pacing`}>{I18n.t('Course Pacing')}</Link>
+        {props.courseId && (
+          <Link href={`/courses/${props.courseId}/course_pacing`}>{I18n.t('Course Pacing')}</Link>
+        )}
       </Alert>
     </View>
   )

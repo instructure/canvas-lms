@@ -114,7 +114,6 @@ class ContextModulesController < ApplicationController
         module_file_details = load_module_file_details
       end
       js_env course_id: @context.id,
-             IN_PACED_COURSE: @context.try(:enable_course_paces?),
              CONTEXT_URL_ROOT: polymorphic_path([@context]),
              FILES_CONTEXTS: [{ asset_string: @context.asset_string }],
              MODULE_FILE_DETAILS: module_file_details,
