@@ -228,8 +228,9 @@ class ApplicationController < ActionController::Base
             collapse_global_nav: @current_user&.collapse_global_nav?,
             release_notes_badge_disabled: @current_user&.release_notes_badge_disabled?,
           },
-          FULL_STORY_ENABLED: fullstory_enabled_for_session?(session),
+          FULL_STORY_ENABLED: fullstory_enabled_for_session?(session)
         }
+        @js_env[:IN_PACED_COURSE] = @context.enable_course_paces? if @context.try(:enable_course_paces?)
 
         unless SentryExtensions::Settings.settings.blank?
           @js_env[:SENTRY_FRONTEND] = {

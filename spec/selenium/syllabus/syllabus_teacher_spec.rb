@@ -85,6 +85,23 @@ describe "course syllabus" do
       expect(page_main_content).to contain_css(syllabus_container_css)
       expect(page_main_content).to contain_css(mini_calendar_css)
     end
+
+    context "in a paced course" do
+      before do
+        @course1.enable_course_paces = true
+        @course1.save!
+      end
+
+      after do
+        @course1.enable_course_paces = false
+        @course1.save!
+      end
+
+      it "shows the couse pacing notice instead of the course summary table" do
+        visit_syllabus_page(@course1.id)
+        expect(course_pacing_notice).to be_displayed
+      end
+    end
   end
 
   context "in a public course" do

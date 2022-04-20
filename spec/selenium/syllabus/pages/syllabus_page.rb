@@ -46,6 +46,10 @@ module CourseSyllabusPage
     "div.mini_month .next_month_link"
   end
 
+  def course_pacing_notice_selector
+    "[data-testid='CoursePacingNotice']"
+  end
+
   #------------------------------ Elements ------------------------------
   def edit_syllabus_button
     f("a.edit_syllabus_link")
@@ -89,6 +93,10 @@ module CourseSyllabusPage
 
   def mini_calendar_first_day_of_month_label
     f(mini_calendar_first_day_of_month_label_selector)
+  end
+
+  def course_pacing_notice
+    f(course_pacing_notice_selector)
   end
 
   #------------------------------ Actions -------------------------------

@@ -22,12 +22,14 @@ require_relative "../helpers/public_courses_context"
 require_relative "../helpers/files_common"
 require_relative "../helpers/wiki_and_tiny_common"
 require_relative "../rcs/pages/rce_next_page"
+require_relative "./pages/syllabus_page"
 
 describe "course syllabus" do
   include_context "in-process server selenium tests"
   include FilesCommon
   include WikiAndTinyCommon
   include RCENextPage
+  include CourseSyllabusPage
 
   def add_assignment(title, points)
     # assignment data
@@ -110,6 +112,20 @@ describe "course syllabus" do
     it "displays course syllabus", priority: "1" do
       get "/courses/#{public_course.id}/assignments/syllabus"
       expect(f("#course_syllabus")).to be_displayed
+    end
+  end
+
+  context "as a student in a paced course" do
+    before do
+      course_with_student_logged_in
+      @course.enable_course_paces = true
+      @course.save!
+    end
+
+    it "shows the course summary and not the paced course notice" do
+      get "/courses/#{@course.id}/assignments/syllabus"
+      expect(f("table#syllabus")).to be_displayed
+      expect(f("#syllabusContainer")).not_to contain_css(course_pacing_notice_selector)
     end
   end
 end
