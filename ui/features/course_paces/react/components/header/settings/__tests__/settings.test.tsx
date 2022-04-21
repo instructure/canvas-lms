@@ -66,8 +66,8 @@ describe('Settings', () => {
 
     act(() => settingsButton.click())
 
-    expect(screen.getByRole('checkbox', {name: 'Skip Weekends'})).toBeInTheDocument()
-    expect(screen.getByRole('button', {name: 'Manage Blackout Dates'})).toBeInTheDocument()
+    expect(screen.getByRole('menuitemcheckbox', {name: 'Skip Weekends'})).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', {name: 'Manage Blackout Dates'})).toBeInTheDocument()
   })
 
   it('toggles the associated setting when the checkboxes are clicked', () => {
@@ -75,7 +75,7 @@ describe('Settings', () => {
     const settingsButton = getByRole('button', {name: 'Modify Settings'})
     act(() => settingsButton.click())
 
-    const skipWeekendsToggle = screen.getByRole('checkbox', {name: 'Skip Weekends'})
+    const skipWeekendsToggle = screen.getByRole('menuitemcheckbox', {name: 'Skip Weekends'})
     expect(skipWeekendsToggle).not.toBeDisabled()
     act(() => skipWeekendsToggle.click())
     expect(toggleExcludeWeekends).toHaveBeenCalled()
@@ -86,10 +86,10 @@ describe('Settings', () => {
     const settingsButton = getByRole('button', {name: 'Modify Settings'})
     act(() => settingsButton.click())
 
-    const skipWeekendsToggle = screen.getByRole('checkbox', {name: 'Skip Weekends'})
-    expect(skipWeekendsToggle).toBeDisabled()
-    const blackoutDatesBtn = screen.getByRole('button', {name: 'Manage Blackout Dates'})
-    expect(blackoutDatesBtn).toBeDisabled()
+    const skipWeekendsToggle = screen.getByRole('menuitemcheckbox', {name: 'Skip Weekends'})
+    expect(skipWeekendsToggle).toHaveAttribute('aria-disabled', 'true')
+    const blackoutDatesBtn = screen.getByRole('menuitem', {name: 'Manage Blackout Dates'})
+    expect(blackoutDatesBtn).toHaveAttribute('aria-disabled', 'true')
   })
 
   it('shows and hides the blackout dates modal correctly', () => {
@@ -97,14 +97,14 @@ describe('Settings', () => {
     const settingsButton = getByRole('button', {name: 'Modify Settings'})
     act(() => settingsButton.click())
 
-    act(() => screen.getByRole('button', {name: 'Manage Blackout Dates'}).click())
+    act(() => screen.getByRole('menuitem', {name: 'Manage Blackout Dates'}).click())
     expect(screen.getByRole('heading', {name: 'Blackout Dates'})).toBeInTheDocument()
     const cancelButton = screen.getByRole('button', {name: 'Cancel'})
     expect(cancelButton).toBeInTheDocument()
 
     act(() => cancelButton.click())
     expect(screen.queryByRole('heading', {name: 'Blackout Dates'})).not.toBeInTheDocument()
-    expect(screen.queryByRole('checkbox', {name: 'Skip Weekends'})).not.toBeInTheDocument()
+    expect(screen.queryByRole('menuitemcheckbox', {name: 'Skip Weekends'})).not.toBeInTheDocument()
   })
 
   it('saves blackout dates from modal correctly', () => {
@@ -112,14 +112,14 @@ describe('Settings', () => {
     const settingsButton = getByRole('button', {name: 'Modify Settings'})
     act(() => settingsButton.click())
 
-    act(() => screen.getByRole('button', {name: 'Manage Blackout Dates'}).click())
+    act(() => screen.getByRole('menuitem', {name: 'Manage Blackout Dates'}).click())
     expect(screen.getByRole('heading', {name: 'Blackout Dates'})).toBeInTheDocument()
     const saveButton = screen.getByRole('button', {name: 'Save'})
     expect(saveButton).toBeInTheDocument()
 
     act(() => saveButton.click())
     expect(screen.queryByRole('heading', {name: 'Blackout Dates'})).not.toBeInTheDocument()
-    expect(screen.queryByRole('checkbox', {name: 'Skip Weekends'})).not.toBeInTheDocument()
+    expect(screen.queryByRole('menuitemcheckbox', {name: 'Skip Weekends'})).not.toBeInTheDocument()
     expect(updateBlackoutDates).toHaveBeenCalledWith(defaultProps.blackoutDates)
   })
 })
