@@ -51,6 +51,7 @@ export type GridDisplaySettings = {
   enterGradesAs: string
   filterColumnsBy: {assignmentGroupId: null; contextModuleId: null; gradingPeriodId: null}
   filterRowsBy: {sectionId: null; studentGroupId: null}
+  hideTotal: boolean
   selectedPrimaryInfo: string
   selectedSecondaryInfo: string
   selectedViewOptionsFilters: string[]
