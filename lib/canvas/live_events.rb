@@ -222,6 +222,10 @@ module Canvas::LiveEvents
   end
 
   def self.get_assignment_data(assignment)
+    created_on_blueprint_sync =
+      MasterCourses::ChildSubscription.is_child_course?(assignment.context) &&
+      assignment.migration_id&.start_with?(MasterCourses::MIGRATION_ID_PREFIX)
+
     event = {
       assignment_id: assignment.global_id,
       context_id: assignment.global_context_id,
@@ -240,7 +244,8 @@ module Canvas::LiveEvents
       lti_assignment_description: LiveEvents.truncate(assignment.description),
       lti_resource_link_id: assignment.lti_resource_link_id,
       lti_resource_link_id_duplicated_from: assignment.duplicate_of&.lti_resource_link_id,
-      submission_types: assignment.submission_types
+      submission_types: assignment.submission_types,
+      created_on_blueprint_sync: created_on_blueprint_sync || false
     }
     actl = assignment.assignment_configuration_tool_lookups.take
     domain = assignment.root_account&.domain(ApplicationController.test_cluster_name)
