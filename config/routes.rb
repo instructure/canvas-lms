@@ -333,6 +333,7 @@ CanvasRails::Application.routes.draw do
 
       get "lti/resource/:resource_link_id", controller: "lti/message",
                                             action: "resource", as: :resource_link_id
+      post "deep_linking_response", controller: "lti/ims/deep_linking", action: :deep_linking_response
     end
 
     resources :grading_standards, only: %i[index create update destroy]

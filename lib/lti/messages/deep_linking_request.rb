@@ -127,7 +127,9 @@ module Lti::Messages
     private
 
     def add_deep_linking_request_claims!
-      @message.deep_linking_settings.deep_link_return_url = return_url
+      lti_assignment_id = Lti::Security.decoded_lti_assignment_id(@expander.controller&.params&.[]("secure_params"))
+      assignment = Assignment.find_by(lti_context_id: lti_assignment_id)
+      @message.deep_linking_settings.deep_link_return_url = assignment ? assignment_return_url(assignment) : return_url
       @message.deep_linking_settings.accept_types = DEEP_LINKING_DETAILS.dig(placement, :accept_types)
       @message.deep_linking_settings.accept_presentation_document_targets = DEEP_LINKING_DETAILS.dig(placement, :document_targets)
       @message.deep_linking_settings.accept_media_types = DEEP_LINKING_DETAILS.dig(placement, :media_types).join(",")
@@ -142,12 +144,23 @@ module Lti::Messages
     def return_url
       @expander.controller.polymorphic_url(
         [@context, :deep_linking_response],
-        {
-          modal: MODAL_PLACEMENTS.include?(placement),
-          placement: placement,
-          context_module_id: @opts[:context_module_id]
-        }.compact
+        deep_link_params
       )
+    end
+
+    def assignment_return_url(assignment)
+      @expander.controller.course_assignment_deep_linking_response_url(
+        @context.id,
+        deep_link_params.merge(assignment_id: assignment.id)
+      )
+    end
+
+    def deep_link_params
+      {
+        modal: MODAL_PLACEMENTS.include?(placement),
+        placement: placement,
+        context_module_id: @opts[:context_module_id]
+      }.compact
     end
   end
 end

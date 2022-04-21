@@ -89,27 +89,27 @@ module Lti::IMS::Concerns
       true
     end
 
-    def create_assignment!(content_item)
+    def create_update_assignment!(content_item, assignment_id = nil)
       Assignment.transaction do
-        assignment =
-          @context.assignments.create!(
-            {
-              submission_types: "external_tool",
-              title: content_item[:title],
-              description: content_item[:text],
-              points_possible: content_item.dig(:lineItem, :scoreMaximum),
-              unlock_at: content_item.dig(:available, :startDateTime),
-              lock_at: content_item.dig(:available, :endDateTime),
-              due_at: content_item.dig(:submission, :endDateTime),
-              workflow_state: "unpublished",
-              external_tool_tag_attributes: {
-                content_type: "ContextExternalTool",
-                content_id: tool.id,
-                new_tab: 0,
-                url: content_item[:url]
-              }
+        assignment = @context.assignments.active.find_by(id: assignment_id) if assignment_id
+        assignment ||= @context.assignments.new(workflow_state: "unpublished")
+        assignment.update!(
+          {
+            submission_types: "external_tool",
+            title: content_item[:title],
+            description: content_item[:text],
+            points_possible: content_item.dig(:lineItem, :scoreMaximum),
+            unlock_at: content_item.dig(:available, :startDateTime),
+            lock_at: content_item.dig(:available, :endDateTime),
+            due_at: content_item.dig(:submission, :endDateTime),
+            external_tool_tag_attributes: {
+              content_type: "ContextExternalTool",
+              content_id: tool.id,
+              new_tab: 0,
+              url: content_item[:url]
             }
-          )
+          }
+        )
 
         # make sure custom launch dimensions get to the ContentTag for launch from assignment
         assignment.external_tool_tag.update!(link_settings: launch_dimensions(content_item))
