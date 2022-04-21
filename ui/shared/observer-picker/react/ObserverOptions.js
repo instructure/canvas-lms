@@ -198,7 +198,7 @@ const ObserverOptions = ({
     )
   } else if (observedUsers.length === 1 && observedUsers[0].id !== currentUser.id) {
     return (
-      <View as="div" margin={margin}>
+      <View as="div" margin={margin} textAlign="end">
         <AccessibleContent
           alt={I18n.t('You are observing %{observedUser}', {observedUser: observedUsers[0].name})}
         >
