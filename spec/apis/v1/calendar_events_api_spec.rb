@@ -2939,6 +2939,18 @@ describe CalendarEventsApiController, type: :request do
       expect(cal.events[1].description).to eq nil
     end
 
+    it "omits DTEND for all day events" do
+      # assignments due at 23:59 are treated as all day events
+      due_at = Time.utc(2022, 4, 27, 23, 59)
+      @course.assignments.create(title: "i am all day", due_at: due_at)
+      get "/feeds/calendars/#{@user.feed_code}.ics"
+      expect(response).to be_successful
+      cal = Icalendar::Calendar.parse(response.body.dup).first
+      all_day_event = (cal.events.select { |e| e.summary.include? "i am all day" }).first
+      expect(all_day_event.dtstart).to eq(due_at.to_date)
+      expect(all_day_event.dtend).to be_nil
+    end
+
     it "renders unauthorized feed for bad code" do
       get "/feeds/calendars/user_garbage.ics"
       expect(response).to render_template("shared/unauthorized_feed")
