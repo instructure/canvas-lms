@@ -909,43 +909,6 @@ test('saves settings with the new filter setting', function () {
   )
 })
 
-test('saves settings after updating the filter setting', function () {
-  this.gradebook.updateCurrentModule('1')
-
-  const settingUpdateCallId = this.gradebook.setFilterColumnsBySetting.getCall(0).callId
-  const settingSaveCallId = $.ajaxJSON.getCall(0).callId
-
-  ok(
-    settingUpdateCallId < settingSaveCallId,
-    'settings were saved on the backend after being updated on the front end'
-  )
-})
-
-test('sets assignment warnings after updating the filter setting', function () {
-  this.gradebook.updateCurrentModule('1')
-
-  const settingUpdateCallId = this.gradebook.setFilterColumnsBySetting.getCall(0).callId
-  const updateFilteredContentInfoCallId = this.gradebook.updateFilteredContentInfo.getCall(0).callId
-
-  ok(
-    settingUpdateCallId < updateFilteredContentInfoCallId,
-    'grading was reset after setting was updated'
-  )
-})
-
-test('updates columns and menus after setting assignment warnings', function () {
-  this.gradebook.updateCurrentModule('1')
-
-  const updateFilteredContentInfoCallId = this.gradebook.updateFilteredContentInfo.getCall(0).callId
-  const updateColumnsAndMenusCallId =
-    this.gradebook.updateColumnsAndRenderViewOptionsMenu.getCall(0).callId
-
-  ok(
-    updateFilteredContentInfoCallId < updateColumnsAndMenusCallId,
-    'columns and menus were updated after setting assignment warnings'
-  )
-})
-
 test('has no effect when the module has not changed', function () {
   this.gradebook.updateCurrentModule('2')
   strictEqual($.ajaxJSON.callCount, 0, 'saveSettings was not called')
@@ -1002,43 +965,6 @@ test('saves settings with the new filter setting', function () {
   strictEqual(
     $.ajaxJSON.getCall(0).args[2].gradebook_settings.filter_columns_by.assignment_group_id,
     '1'
-  )
-})
-
-test('saves settings after updating the filter setting', function () {
-  this.gradebook.updateCurrentAssignmentGroup('1')
-
-  const settingUpdateCallId = this.gradebook.setFilterColumnsBySetting.getCall(0).callId
-  const settingSaveCallId = $.ajaxJSON.getCall(0).callId
-
-  ok(
-    settingUpdateCallId < settingSaveCallId,
-    'settings were saved on the backend after being updated on the front end'
-  )
-})
-
-test('sets assignment warnings after updating the filter setting', function () {
-  this.gradebook.updateCurrentAssignmentGroup('1')
-
-  const settingUpdateCallId = this.gradebook.setFilterColumnsBySetting.getCall(0).callId
-  const updateFilteredContentInfoCallId = this.gradebook.updateFilteredContentInfo.getCall(0).callId
-
-  ok(
-    settingUpdateCallId < updateFilteredContentInfoCallId,
-    'grading was reset after setting was updated'
-  )
-})
-
-test('updates columns and menus after setting assignment warnings', function () {
-  this.gradebook.updateCurrentAssignmentGroup('1')
-
-  const updateFilteredContentInfoCallId = this.gradebook.updateFilteredContentInfo.getCall(0).callId
-  const updateColumnsAndMenusCallId =
-    this.gradebook.updateColumnsAndRenderViewOptionsMenu.getCall(0).callId
-
-  ok(
-    updateFilteredContentInfoCallId < updateColumnsAndMenusCallId,
-    'columns and menus were updated after setting assignment warnings'
   )
 })
 

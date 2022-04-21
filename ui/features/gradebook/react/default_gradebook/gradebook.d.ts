@@ -30,6 +30,7 @@ export type GradebookSettings = {
   show_unpublished_assignments: string
   show_concluded_enrollments: string
   show_inactive_enrollments: string
+  hide_assignment_group_totals: string
   hide_total: string
 }
 
@@ -324,6 +325,11 @@ export type FilterCondition = {
   value?: string
   created_at: string
 }
+
+export type SubmissionFilterConditionValue =
+  | 'has-ungraded-submissions'
+  | 'has-submissions'
+  | undefined
 
 export type Filter = {
   id: string

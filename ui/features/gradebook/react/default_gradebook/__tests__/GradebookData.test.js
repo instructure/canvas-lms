@@ -52,7 +52,6 @@ describe('GradebookData', () => {
     expect(wrapper.find(Gradebook).exists()).toBeTruthy()
     expect(wrapper.prop('isFiltersLoading')).toStrictEqual(false)
     expect(wrapper.prop('isModulesLoading')).toStrictEqual(false)
-    expect(wrapper.prop('filters')).toStrictEqual([])
     expect(wrapper.prop('modules')).toStrictEqual([])
     expect(wrapper.prop('dispatch')).toBeInstanceOf(RequestDispatch)
     expect(wrapper.prop('performanceControls')).toBeInstanceOf(PerformanceControls)
