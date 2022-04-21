@@ -148,6 +148,10 @@ module BasicLTI
         @lti_request&.at_css("imsx_POXBody > replaceResultRequest > submissionDetails > prioritizeNonToolGrade").present?
       end
 
+      def needs_additional_review?
+        @lti_request&.at_css("imsx_POXBody > replaceResultRequest > submissionDetails > needsAdditionalReview").present?
+      end
+
       def user_enrollment_active?(assignment, user)
         assignment.context.student_enrollments.where(user_id: user).active_or_pending_by_date.any?
       end

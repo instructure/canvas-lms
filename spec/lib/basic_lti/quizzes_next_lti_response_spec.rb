@@ -320,6 +320,21 @@ describe BasicLTI::QuizzesNextLtiResponse do
         expect(assignment.submissions.not_placeholder.where(user_id: @user.id).first.versions.count).to be(2)
       end
 
+      context "when the tool indicates further review is needed" do
+        before do
+          xml.at_css("imsx_POXBody > replaceResultRequest").add_child(
+            "<submissionDetails><needsAdditionalReview/></submissionDetails>"
+          )
+        end
+
+        it "sets the workflow state of the submission to 'pending_review'" do
+          BasicLTI::BasicOutcomes.process_request(tool, xml)
+
+          submission = assignment.submissions.where(user_id: @user.id).first
+          expect(submission.workflow_state).to eq Submission.workflow_states.pending_review
+        end
+      end
+
       context "with previous versions" do
         let(:launch_urls) do
           [

@@ -1431,6 +1431,20 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  def infered_workflow_state
+    infered_state = workflow_state
+
+    # New Quizzes returned a partial grade, but manual review is needed from a human
+    return workflow_state if workflow_state == Submission.workflow_states.pending_review && graded_by_new_quizzes?
+
+    infered_state = Submission.workflow_states.submitted if unsubmitted? && submitted_at
+    infered_state = Submission.workflow_states.unsubmitted if submitted? && !has_submission?
+    infered_state = Submission.workflow_states.graded if grade && score && grade_matches_current_submission
+    infered_state = Submission.workflow_states.pending_review if submission_type == "online_quiz" && quiz_submission.try(:latest_submitted_attempt).try(:pending_review?)
+
+    infered_state
+  end
+
   def infer_values
     if assignment
       if assignment.association(:context).loaded?
@@ -1442,10 +1456,7 @@ class Submission < ActiveRecord::Base
 
     self.submitted_at ||= Time.now if has_submission?
     quiz_submission.reload if quiz_submission_id
-    self.workflow_state = "submitted" if unsubmitted? && self.submitted_at
-    self.workflow_state = "unsubmitted" if submitted? && !has_submission?
-    self.workflow_state = "graded" if grade && score && grade_matches_current_submission
-    self.workflow_state = "pending_review" if submission_type == "online_quiz" && quiz_submission.try(:latest_submitted_attempt).try(:pending_review?)
+    self.workflow_state = infered_workflow_state
     if (workflow_state_changed? && graded?) || late_policy_status_changed?
       self.graded_at = Time.now
     end
@@ -2865,6 +2876,10 @@ class Submission < ActiveRecord::Base
   end
 
   private
+
+  def graded_by_new_quizzes?
+    cached_quiz_lti && autograded?
+  end
 
   def set_late_policy_attributes
     self.seconds_late_override = nil unless late_policy_status == "late"
