@@ -30,6 +30,7 @@ export type GradebookSettings = {
   show_unpublished_assignments: string
   show_concluded_enrollments: string
   show_inactive_enrollments: string
+  hide_total: string
 }
 
 export type GradebookOptions = {
