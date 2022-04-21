@@ -19,6 +19,7 @@
 import {shallow, mount} from 'enzyme'
 import React from 'react'
 import moment from 'moment-timezone'
+import {Alert} from '@instructure/ui-alerts'
 import {ToDoSidebar} from '../index'
 
 const defaultProps = {
@@ -175,4 +176,11 @@ it('can handles no items', () => {
   // suppress Show All button and display "Nothing for now" instead of list
   const wrapper = shallow(<ToDoSidebar {...defaultProps} changeDashboardView={null} />)
   expect(wrapper).toMatchSnapshot()
+})
+
+it('renders an error message when loading fails', () => {
+  const error = 'Request failed with status code 404'
+  const wrapper = mount(<ToDoSidebar {...defaultProps} loadingError={error} />)
+
+  expect(wrapper.text()).toContain('Failure loading the To Do list')
 })
