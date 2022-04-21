@@ -21,12 +21,10 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import moment from 'moment-timezone'
 import {connect} from 'react-redux'
 
-import {CondensedButton, IconButton} from '@instructure/ui-buttons'
-import {Checkbox} from '@instructure/ui-checkbox'
+import {IconButton} from '@instructure/ui-buttons'
 import {IconSettingsLine} from '@instructure/ui-icons'
-import {Popover} from '@instructure/ui-popover'
-import {View} from '@instructure/ui-view'
 import {uid} from '@instructure/uid'
+import {Menu} from '@instructure/ui-menu'
 
 import BlackoutDatesModal from '../../../shared/components/blackout_dates_modal'
 import {StoreState, CoursePace} from '../../../types'
@@ -40,6 +38,8 @@ import {getBlackoutDates} from '../../../shared/reducers/blackout_dates'
 import {getSyncing} from '../../../reducers/ui'
 
 const I18n = useI18nScope('course_paces_settings')
+
+const {Item: MenuItem} = Menu as any
 
 interface StoreProps {
   readonly blackoutDates: BlackoutDate[]
@@ -131,45 +131,44 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
             onCancel={this.closeBlackoutDatesModal}
           />
         )}
-        <Popover
-          on="click"
-          renderTrigger={
+        <Menu
+          trigger={
             <IconButton screenReaderLabel={I18n.t('Modify Settings')} margin={this.props.margin}>
               <IconSettingsLine />
             </IconButton>
           }
           placement="bottom start"
-          isShowingContent={this.state.showSettingsPopover}
-          onShowContent={() => this.setState({showSettingsPopover: true})}
-          onHideContent={() => this.setState({showSettingsPopover: false})}
+          show={this.state.showSettingsPopover}
+          onToggle={newState =>
+            this.setState({
+              showSettingsPopover: newState
+            })
+          }
+          shouldHideOnSelect={false}
           withArrow={false}
         >
-          <View as="div" padding="small">
-            <View as="div">
-              <Checkbox
-                data-testid="skip-weekends-toggle"
-                label={I18n.t('Skip Weekends')}
-                checked={this.props.excludeWeekends}
-                disabled={this.props.isSyncing}
-                onChange={() => this.props.toggleExcludeWeekends()}
-              />
-            </View>
-            {ENV.FEATURES.course_paces_blackout_dates && (
-              <View as="div">
-                <CondensedButton
-                  interaction={this.props.isSyncing ? 'disabled' : 'enabled'}
-                  onClick={() => {
-                    this.setState({showSettingsPopover: false})
-                    this.showBlackoutDatesModal()
-                  }}
-                  margin="small 0 0"
-                >
-                  {I18n.t('Manage Blackout Dates')}
-                </CondensedButton>
-              </View>
-            )}
-          </View>
-        </Popover>
+          <MenuItem
+            type="checkbox"
+            selected={this.props.excludeWeekends}
+            onSelect={this.props.toggleExcludeWeekends}
+            disabled={this.props.isSyncing}
+            data-testid="skip-weekends-toggle"
+          >
+            {I18n.t('Skip Weekends')}
+          </MenuItem>
+          {ENV.FEATURES.course_paces_blackout_dates && (
+            <MenuItem
+              type="button"
+              onSelect={() => {
+                this.setState({showSettingsPopover: false})
+                this.showBlackoutDatesModal()
+              }}
+              disabled={this.props.isSyncing}
+            >
+              {I18n.t('Manage Blackout Dates')}
+            </MenuItem>
+          )}
+        </Menu>
       </div>
     )
   }

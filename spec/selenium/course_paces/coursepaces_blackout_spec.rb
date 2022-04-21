@@ -46,7 +46,7 @@ describe "course pace page" do
     it "renders the blackout dates modal when link clicked" do
       visit_course_paces_page
       click_settings_button
-      click_blackout_dates_button
+      click_manage_blackout_dates
 
       expect(blackout_dates_modal).to be_displayed
     end
@@ -54,7 +54,7 @@ describe "course pace page" do
     it "adds blackout date with range of dates" do
       visit_course_paces_page
       click_settings_button
-      click_blackout_dates_button
+      click_manage_blackout_dates
 
       blackout_date_title_input.send_keys("Easter Break")
       blackout_date_start_date_input.send_keys("2022-04-15")
@@ -70,7 +70,7 @@ describe "course pace page" do
     it "adds blackout date with one date" do
       visit_course_paces_page
       click_settings_button
-      click_blackout_dates_button
+      click_manage_blackout_dates
 
       blackout_date_title_input.send_keys("Easter Break")
       blackout_date_start_date_input.send_keys("2022-04-15")
@@ -84,7 +84,7 @@ describe "course pace page" do
     it "deletes a just-added blackout date" do
       visit_course_paces_page
       click_settings_button
-      click_blackout_dates_button
+      click_manage_blackout_dates
 
       blackout_date_title_input.send_keys("Easter Break")
       blackout_date_start_date_input.send_keys("2022-04-15")
@@ -98,7 +98,7 @@ describe "course pace page" do
       create_published_course_pace("Pace Module", "Assignment 1")
       visit_course_paces_page
       click_settings_button
-      click_blackout_dates_button
+      click_manage_blackout_dates
 
       blackout_date_title_input.send_keys("Easter Break")
       blackout_date_start_date_input.send_keys("2022-04-15")

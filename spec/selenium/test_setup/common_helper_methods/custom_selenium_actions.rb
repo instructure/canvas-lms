@@ -235,7 +235,10 @@ module CustomSeleniumActions
   end
 
   def is_checked(css_selector)
-    !!fj(css_selector)[:checked]
+    node = fj(css_selector)
+    # 'checked' attribute is a boolean whereas 'aria-checked' is a
+    # string representing the value of a boolean
+    !!node[:checked] || node["aria-checked"] == "true"
   end
 
   def get_value(selector)
