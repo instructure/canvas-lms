@@ -27,10 +27,11 @@ module BasicLTI
       excused points_deducted grading_period_id late missing url
     ].freeze
 
-    def initialize(assignment, user, prioritize_non_tool_grade: false)
+    def initialize(assignment, user, prioritize_non_tool_grade: false, needs_additional_review: false)
       @assignment = assignment
       @user = user
       @prioritize_non_tool_grade = prioritize_non_tool_grade
+      @needs_additional_review = needs_additional_review
     end
 
     def active?
@@ -143,6 +144,7 @@ module BasicLTI
         submission.grade_matches_current_submission = true
         submission.grader_id = grader_id
         submission.posted_at = submission.submitted_at unless submission.posted? || @assignment.post_manually?
+        submission.workflow_state = Submission.workflow_states.pending_review if @needs_additional_review
       end
       clear_cache
       # We always want to update the launch_url to match what new quizzes is laying down.

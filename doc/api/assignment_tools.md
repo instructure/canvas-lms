@@ -485,3 +485,43 @@ be preserved.
   </imsx_POXBody>
 </imsx_POXEnvelopeRequest>
 ```
+
+### Submission Needs Additional Review
+
+If an external tool wants to tell canvas that grading isn't final and additional review is needed by the instructor, it
+can augment the POX sent with the needs additional review grade tag.
+
+Simply add a node called `needsAdditionalReview` to the `submissionDetails` node. The tag expects no data, just its
+presence is all that is required for Canvas.  If included, the Canvas gradebook will signal to the teacher additional
+grading action is needed.
+
+```xml
+<?xml version = "1.0" encoding = "UTF-8"?>
+<imsx_POXEnvelopeRequest xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
+  <imsx_POXHeader>
+    <imsx_POXRequestHeaderInfo>
+      <imsx_version>V1.0</imsx_version>
+      <imsx_messageIdentifier>999999123</imsx_messageIdentifier>
+    </imsx_POXRequestHeaderInfo>
+  </imsx_POXHeader>
+  <imsx_POXBody>
+    <replaceResultRequest>
+      <submissionDetails>
+        <!-- Added element -->
+        <needsAdditionalReview/>
+      </submissionDetails>
+      <resultRecord>
+        <sourcedGUID>
+          <sourcedId>3124567</sourcedId>
+        </sourcedGUID>
+        <result>
+          <resultScore>
+            <language>en</language>
+            <textString>0.92</textString>
+          </resultScore>
+        </result>
+      </resultRecord>
+    </replaceResultRequest>
+  </imsx_POXBody>
+</imsx_POXEnvelopeRequest>
+```

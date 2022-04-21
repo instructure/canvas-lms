@@ -430,6 +430,18 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
       subject.commit_history("http://url", "80", -1)
     end
 
+    context "when needs_additional_review is true" do
+      subject do
+        BasicLTI::QuizzesNextVersionedSubmission.new(assignment, @user, needs_additional_review: true)
+      end
+
+      it "sets the submission's workflow_state to 'pending_review'" do
+        assignment.grade_student(@user, grader: @teacher, score: 1337)
+        subject.commit_history("http://url", "80", -1)
+        expect(submission.reload.workflow_state).to eq(Submission.workflow_states.pending_review)
+      end
+    end
+
     context "with prioritizeNonToolGrade details" do
       let(:quiz_next_versioned_submission) { BasicLTI::QuizzesNextVersionedSubmission.new(assignment, @user, prioritize_non_tool_grade: true) }
 
