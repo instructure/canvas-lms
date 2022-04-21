@@ -493,5 +493,29 @@ describe "Jobs V2 API", type: :request do
         expect(item["bucket"]).to eq "failed"
       end
     end
+
+    describe "manage" do
+      before :once do
+        2.times { ::Kernel.delay(n_strand: "foobar").p }
+      end
+
+      it "updates max_concurrent and priority" do
+        json = api_call(:put, "/api/v1/jobs2/manage",
+                        { controller: "jobs_v2", action: "manage", format: "json" },
+                        { strand: "foobar", max_concurrent: 11, priority: 23 })
+        expect(json["count"]).to eq 2
+        expect(Delayed::Job.where(strand: "foobar").pluck(:max_concurrent)).to eq([11, 11])
+        expect(Delayed::Job.where(strand: "foobar").pluck(:priority)).to eq([23, 23])
+      end
+
+      it "requires manage_jobs permission" do
+        account_admin_user_with_role_changes(account: Account.site_admin,
+                                             role_changes: { view_jobs: true, manage_jobs: false })
+        api_call(:put, "/api/v1/jobs2/manage",
+                 { controller: "jobs_v2", action: "manage", format: "json" },
+                 { strand: "foobar", max_concurrent: 11, priority: 23 },
+                 {}, { expected_status: 401 })
+      end
+    end
   end
 end

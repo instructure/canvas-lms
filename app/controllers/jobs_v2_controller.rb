@@ -21,7 +21,9 @@ class JobsV2Controller < ApplicationController
   BUCKETS = %w[queued running future failed].freeze
   SEARCH_LIMIT = 100
 
-  before_action :require_view_jobs
+  before_action :require_view_jobs, except: %i[manage]
+  before_action :require_manage_jobs, only: %i[manage]
+
   before_action :require_bucket, only: %i[grouped_info list search]
   before_action :require_group, only: %i[grouped_info search]
   before_action :set_date_range, only: %i[grouped_info list search]
@@ -29,6 +31,10 @@ class JobsV2Controller < ApplicationController
 
   def require_view_jobs
     require_site_admin_with_permission(:view_jobs)
+  end
+
+  def require_manage_jobs
+    require_site_admin_with_permission(:manage_jobs)
   end
 
   def index
@@ -221,6 +227,35 @@ class JobsV2Controller < ApplicationController
 
       render json: jobs.map { |job| job_json(job) }
     end
+  end
+
+  # @{not an}API Manage a strand
+  #
+  # @argument strand [Required,String]
+  #   The name of the strand to manage
+  #
+  # @argument max_concurrent [Integer]
+  #   The new maximum concurrency for the strand
+  #
+  # @argument priority [Integer]
+  #   The new priority value to set
+  #
+  def manage
+    strand = params[:strand].presence
+    return render json: { message: "missing strand" }, status: :bad_request unless strand
+
+    update_args = {}
+
+    if params[:max_concurrent].present?
+      update_args[:max_concurrent] = params[:max_concurrent].to_i
+    end
+
+    if params[:priority].present?
+      update_args[:priority] = params[:priority].to_i
+    end
+
+    count = Delayed::Job.where(strand: strand).update_all(update_args)
+    render json: { status: "OK", count: count }
   end
 
   protected
