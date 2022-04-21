@@ -39,7 +39,8 @@ import type {
   StudentGroup,
   StudentGroupCategory,
   StudentGroupCategoryMap,
-  Submission
+  Submission,
+  SubmissionFilterConditionValue
 } from './gradebook.d'
 import filterConditionTypes from './constants/filterConditionTypes'
 
@@ -199,6 +200,15 @@ export function findConditionValuesOfType(
       condition.type === type && condition.value ? values.concat(condition.value) : values,
     []
   )
+}
+
+export function findSubmissionConditionValue(appliedConditions: FilterCondition[]) {
+  const conditions = findConditionValuesOfType('submissions', appliedConditions)
+  return (
+    conditions.length && ['has-ungraded-submissions', 'has-submissions'].includes(conditions[0])
+      ? conditions[0]
+      : undefined
+  ) as SubmissionFilterConditionValue
 }
 
 // Extra normalization; comes from jsonb payload

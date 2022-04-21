@@ -66,7 +66,8 @@ export default function GradebookData(props) {
           )
         })
         .catch(error => {
-          throw new Error('Failed to load filters', error)
+          // eslint-disable-next-line no-console
+          console.error(error)
         })
     }
     if (props.gradebookEnv.has_modules) {
