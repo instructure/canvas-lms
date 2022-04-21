@@ -30,6 +30,7 @@ RSpec.shared_context "lti_advantage_shared_examples" do
     controller = double("controller")
     allow(controller).to receive(:request).and_return(request)
     allow(controller).to receive(:polymorphic_url).and_return(deep_linking_return_url)
+    allow(controller).to receive(:params)
     controller
   end
   # All this setup just so we can stub out controller.*_url methods

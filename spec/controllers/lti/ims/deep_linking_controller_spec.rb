@@ -839,6 +839,26 @@ module Lti
               end
             end
 
+            context "when on the edit assignment page" do
+              let(:assignment) { assignment_model(course: course, workflow_state: "published") }
+              let(:params) { super().merge({ placement: "assignment_selection", assignment_id: assignment.id }) }
+              let(:content_items) do
+                [
+                  { type: "ltiResourceLink", url: launch_url, title: "Item 1", lineItem: { scoreMaximum: 4 } }
+                ]
+              end
+
+              it "does not create a new assignment" do
+                assignment
+                expect { subject }.not_to change { course.assignments.count }
+              end
+
+              it "leaves assignment in same workflow_state it was in" do
+                subject
+                expect(course.assignments.last.workflow_state).to eq("published")
+              end
+            end
+
             context "when creating a single item in an existing module" do
               let(:context_module) { course.context_modules.create!(name: "Test Module") }
               let(:params) { super().merge({ context_module_id: context_module.id, placement: "link_selection" }) }
