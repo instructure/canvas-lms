@@ -896,6 +896,72 @@ describe Canvas::LiveEvents do
       Canvas::LiveEvents.assignment_created(@assignment)
     end
 
+    context "when the assignment is created as part of a blueprint sync" do
+      before do
+        course = course_model
+        master_template = MasterCourses::MasterTemplate.create!(course: course)
+        child_course = course_model
+        MasterCourses::ChildSubscription.create!(master_template: master_template, child_course: child_course)
+        @assignment = child_course.assignments.create!(assignment_valid_attributes
+          .merge({ migration_id: "mastercourse_1_1_bd72ce9cf355d1b2cc467b2156842281" }))
+      end
+
+      it "has the created_on_blueprint_sync field set as true" do
+        expect_event("assignment_created",
+                     hash_including({
+                                      assignment_id: @assignment.global_id.to_s,
+                                      created_on_blueprint_sync: true
+                                    }))
+        Canvas::LiveEvents.assignment_created(@assignment)
+      end
+    end
+
+    context "when the assignment is manually created in a blueprint child course" do
+      before do
+        master_template = MasterCourses::MasterTemplate.create!(course: course_model)
+        child_course = course_model
+        MasterCourses::ChildSubscription.create!(master_template: master_template, child_course: child_course)
+        @assignment = child_course.assignments.create!(assignment_valid_attributes)
+      end
+
+      it "has created_on_blueprint_sync set as false" do
+        expect_event("assignment_created",
+                     hash_including({
+                                      assignment_id: @assignment.global_id.to_s,
+                                      created_on_blueprint_sync: false
+                                    }))
+        Canvas::LiveEvents.assignment_created(@assignment)
+      end
+    end
+
+    context "when the assignment is manually created in a blueprint course" do
+      before do
+        course = course_model
+        MasterCourses::MasterTemplate.create!(course: course)
+        @assignment = course.assignments.create!(assignment_valid_attributes)
+      end
+
+      it "has created_on_blueprint_sync set as false" do
+        expect_event("assignment_created",
+                     hash_including({
+                                      assignment_id: @assignment.global_id.to_s,
+                                      created_on_blueprint_sync: false
+                                    }))
+        Canvas::LiveEvents.assignment_created(@assignment)
+      end
+    end
+
+    context "when the assignment is created in a non-blueprint course" do
+      it "has created_on_blueprint_sync set as false" do
+        expect_event("assignment_created",
+                     hash_including({
+                                      assignment_id: @assignment.global_id.to_s,
+                                      created_on_blueprint_sync: false
+                                    }))
+        Canvas::LiveEvents.assignment_created(@assignment)
+      end
+    end
+
     context "with assignment configuration tool lookup" do
       include_context "lti2_spec_helper"
       let(:product_family) do
