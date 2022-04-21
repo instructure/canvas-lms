@@ -71,6 +71,18 @@ const loaded = handleActions(
   false
 )
 
+const loadingError = handleActions(
+  {
+    CLEAR_SIDEBAR: () => null,
+    SIDEBAR_ITEMS_LOADING: () => null,
+    SIDEBAR_ITEMS_LOADING_FAILED: (state, action) => {
+      const error = action.payload.message || action.payload
+      return error
+    }
+  },
+  null
+)
+
 const range = handleActions(
   {
     SIDEBAR_ITEMS_LOADING: (state, action) => {
@@ -87,7 +99,8 @@ const combinedReducer = combineReducers({
   loading,
   nextUrl,
   loaded,
-  range
+  range,
+  loadingError
 })
 
 function sortItems(items) {

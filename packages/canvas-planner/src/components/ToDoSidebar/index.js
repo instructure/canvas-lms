@@ -26,6 +26,8 @@ import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
+import {IconWarningLine} from '@instructure/ui-icons'
+import {Flex} from '@instructure/ui-flex'
 import formatMessage from '../../format-message'
 import {observedUserId} from '../../utilities/apiUtils'
 
@@ -43,7 +45,8 @@ export class ToDoSidebar extends Component {
     locale: string,
     changeDashboardView: func,
     forCourse: string,
-    isObserving: bool
+    isObserving: bool,
+    loadingError: string
   }
 
   static defaultProps = {
@@ -146,13 +149,28 @@ export class ToDoSidebar extends Component {
   }
 
   render() {
-    if (!this.props.loaded) {
+    if (!this.props.loaded && !this.props.loadingError) {
       return (
         <div data-testid="ToDoSidebar">
           <h2 className="todo-list-header">{formatMessage('To Do')}</h2>
           <View as="div" textAlign="center">
             <Spinner renderTitle={() => formatMessage('To Do Items Loading')} size="small" />
           </View>
+        </div>
+      )
+    }
+    if (this.props.loadingError) {
+      return (
+        <div data-testid="ToDoSidebar">
+          <h2 className="todo-list-header">{formatMessage('To Do')}</h2>
+          <Flex justifyItems="start">
+            <Flex.Item>
+              <IconWarningLine color="error" />
+            </Flex.Item>
+            <Flex.Item margin="xx-small none none xx-small">
+              <Text color="danger">{formatMessage('Failure loading the To Do list')}</Text>
+            </Flex.Item>
+          </Flex>
         </div>
       )
     }
@@ -180,7 +198,8 @@ const mapStateToProps = state => ({
   courses: state.courses,
   items: state.sidebar.items,
   loaded: state.sidebar.loaded,
-  isObserving: !!observedUserId(state)
+  isObserving: !!observedUserId(state),
+  loadingError: state.sidebar.loadingError
 })
 const mapDispatchToProps = {sidebarLoadInitialItems, sidebarCompleteItem}
 
