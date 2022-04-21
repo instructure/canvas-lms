@@ -7682,6 +7682,79 @@ describe Assignment do
     # rubocop:enable Performance/InefficientHashSearch
   end
 
+  describe "#ensure_points_possible!" do
+    subject do
+      assignment.ensure_points_possible!
+      assignment.points_possible
+    end
+
+    let(:grading_type) { "points" }
+    let(:points_possible) { nil }
+
+    let(:assignment) do
+      Assignment.create!(
+        course: @course,
+        name: "Subject",
+        points_possible: points_possible,
+        grading_type: grading_type
+      )
+    end
+
+    context "when 'points_possible' already is present" do
+      let(:points_possible) { 15.2 }
+
+      it "does not modify the points possible" do
+        expect(subject).to eq points_possible
+      end
+    end
+
+    context "when 'points_possible' is blank" do
+      shared_examples_for "pointed assignments" do
+        it { is_expected.to eq 0.0 }
+      end
+
+      shared_examples_for "exports of non-pointed assignments" do
+        it { is_expected.to be_nil }
+      end
+
+      context "and 'grading_type' is 'points'" do
+        let(:grading_type) { "points" }
+
+        it_behaves_like "pointed assignments"
+      end
+
+      context "and 'grading_type' is 'percent'" do
+        let(:grading_type) { "percent" }
+
+        it_behaves_like "pointed assignments"
+      end
+
+      context "and 'grading_type' is 'letter_grade'" do
+        let(:grading_type) { "letter_grade" }
+
+        it_behaves_like "pointed assignments"
+      end
+
+      context "and 'grading_type' is 'gpa_scale'" do
+        let(:grading_type) { "gpa_scale" }
+
+        it_behaves_like "pointed assignments"
+      end
+
+      context "and 'grading_type' is 'pass_fail'" do
+        let(:grading_type) { "pass_fail" }
+
+        it_behaves_like "exports of non-pointed assignments"
+      end
+
+      context "and 'grading_type' is 'not_graded'" do
+        let(:grading_type) { "not_graded" }
+
+        it_behaves_like "exports of non-pointed assignments"
+      end
+    end
+  end
+
   describe "#a2_enabled?" do
     before do
       allow(@course).to receive(:feature_enabled?) { false }

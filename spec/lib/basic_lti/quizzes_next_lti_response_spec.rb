@@ -128,6 +128,45 @@ describe BasicLTI::QuizzesNextLtiResponse do
         )
       end
 
+      context "when the assignment has nil points_possible" do
+        subject { BasicLTI::BasicOutcomes.process_request(tool, xml) }
+
+        let(:grading_type) { raise "set in examples" }
+
+        before { assignment.update!(points_possible: nil, grading_type: grading_type) }
+
+        context "and the grading_type requires points" do
+          let(:grading_type) { Assignment::GRADING_TYPES.points }
+
+          it "sets the assignment points_possible to the default" do
+            expect { subject }.to change { assignment.reload.points_possible }
+              .from(nil).to(Assignment::DEFAULT_POINTS_POSSIBLE)
+          end
+
+          it "sets code_major to 'success'" do
+            expect(subject.code_major).to eq "success"
+          end
+
+          it "sets the submission grade to zero" do
+            subject
+            submission = assignment.submissions.where(user_id: @user.id).first
+            expect(submission.grade).to eq "0"
+          end
+        end
+
+        context "and the grading type does not require points" do
+          let(:grading_type) { Assignment::GRADING_TYPES.not_graded }
+
+          it "sets code major to 'failure'" do
+            expect(subject.code_major).to eq "failure"
+          end
+
+          it "sets the failure description" do
+            expect(subject.description).to eq "Assignment has no points possible."
+          end
+        end
+      end
+
       it "shows complete when it receives a grade > 0" do
         request = BasicLTI::BasicOutcomes.process_request(tool, xml)
 
@@ -152,21 +191,14 @@ describe BasicLTI::QuizzesNextLtiResponse do
       end
     end
 
-    it "rejects a grade for an assignment with no points possible" do
-      xml.css("resultData").remove
-      assignment.points_possible = nil
-      assignment.save!
-      request = BasicLTI::BasicOutcomes.process_request(tool, xml)
-
-      expect(request.code_major).to eq "failure"
-      expect(request.body).to eq "<replaceResultResponse />"
-      expect(request.description).to eq "Assignment has no points possible."
-    end
-
     it "doesn't explode when an assignment with no points possible receives a grade for an existing submission" do
       xml.css("resultData").remove
-      assignment.points_possible = nil
-      assignment.save!
+
+      assignment.update!(
+        points_possible: nil,
+        grading_type: Assignment::GRADING_TYPES.not_graded
+      )
+
       BasicLTI::BasicOutcomes.process_request(tool, xml)
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
 
