@@ -29,8 +29,8 @@ module CoursePacesPageObject
     "button:contains('Add')"
   end
 
-  def blackout_dates_button_selector
-    "button:contains('Manage Blackout Dates')"
+  def blackout_dates_span_selector
+    "[role='menuitem'] span:contains('Manage Blackout Dates')"
   end
 
   def blackout_date_delete_selector
@@ -182,7 +182,7 @@ module CoursePacesPageObject
   end
 
   def skip_weekends_checkbox_xpath_selector
-    "//label[..//input[@data-testid = 'skip-weekends-toggle']]"
+    "//span[@data-testid = 'skip-weekends-toggle']"
   end
 
   def skip_weekends_checkbox_selector
@@ -227,8 +227,8 @@ module CoursePacesPageObject
     fj(blackout_dates_add_selector)
   end
 
-  def blackout_dates_button
-    fj(blackout_dates_button_selector)
+  def blackout_dates_span
+    fj(blackout_dates_span_selector)
   end
 
   def blackout_date_delete(row_selector)
@@ -418,8 +418,8 @@ module CoursePacesPageObject
     blackout_dates_save.click
   end
 
-  def click_blackout_dates_button
-    blackout_dates_button.click
+  def click_manage_blackout_dates
+    blackout_dates_span.click
   end
 
   def click_cancel_button
