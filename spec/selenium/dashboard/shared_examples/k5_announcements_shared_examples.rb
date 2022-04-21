@@ -42,10 +42,11 @@ shared_examples_for "k5 homeroom announcements" do
       expect(no_recent_announcements).to be_displayed
     end
 
-    click_previous_announcement_button(0)
-
-    expect(announcement_title(announcement_heading1)).to be_displayed
-    expect(announcement_content_text(announcement_content1)).to be_displayed
+    keep_trying_for_attempt_times(attempts: 5, sleep_interval: 0.5) do
+      click_previous_announcement_button(0)
+      expect(announcement_title(announcement_heading1)).to be_displayed
+      expect(announcement_content_text(announcement_content1)).to be_displayed
+    end
   end
 
   context "k5 single homeroom" do
@@ -210,15 +211,23 @@ shared_examples_for "k5 homeroom announcements with multiple homerooms" do |cont
   it "shows previous announcements when previous button clicked" do
     get "/"
 
-    click_previous_announcement_button(0)
-    click_previous_announcement_button(1)
-    expect(announcement_title(homeroom1_stale_announcement_title)).to be_displayed
-    expect(announcement_title(homeroom2_stale_announcement_title)).to be_displayed
+    keep_trying_for_attempt_times(attempts: 10, sleep_interval: 0.5) do
+      expect(announcement_title(homeroom1_current_announcement_title)).to be_displayed
+    end
 
-    click_next_announcement_button(0)
-    click_next_announcement_button(1)
-    expect(announcement_title(homeroom1_current_announcement_title)).to be_displayed
-    expect(announcement_title(homeroom2_current_announcement_title)).to be_displayed
+    keep_trying_for_attempt_times(attempts: 5, sleep_interval: 0.5) do
+      click_previous_announcement_button(0)
+      click_previous_announcement_button(1)
+      expect(announcement_title(homeroom1_stale_announcement_title)).to be_displayed
+      expect(announcement_title(homeroom2_stale_announcement_title)).to be_displayed
+    end
+
+    keep_trying_for_attempt_times(attempts: 5, sleep_interval: 0.5) do
+      click_next_announcement_button(0)
+      click_next_announcement_button(1)
+      expect(announcement_title(homeroom1_current_announcement_title)).to be_displayed
+      expect(announcement_title(homeroom2_current_announcement_title)).to be_displayed
+    end
   end
 end
 
