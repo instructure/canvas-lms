@@ -25,6 +25,9 @@ module BasicLTI
     # this is an override of parent method
     def handle_replace_result(tool, assignment, user)
       self.body = "<replaceResultResponse />"
+
+      assignment.ensure_points_possible!
+
       return true unless valid_request?(assignment)
 
       quiz_lti_submission = QuizzesNextVersionedSubmission.new(assignment, user, prioritize_non_tool_grade: prioritize_non_tool_grade?)
@@ -146,8 +149,15 @@ module BasicLTI
     end
 
     def valid_points_possible?(assignment)
-      return true if assignment.grading_type == "pass_fail" || assignment.points_possible.present?
+      # Any time an assignment has points_possible, we can handle
+      # submiting a score to it
+      return true if assignment.points_possible.present?
 
+      # Additinally, we can handle interpreting the score for the tool
+      # as a pass/fail score
+      return true if assignment.grading_type == "pass_fail"
+
+      # We don't know how to give a score for the assignment's combination of grading_type and points_possible
       report_failure(:no_points_possible, I18n.t("lib.basic_lti.no_points_possible", "Assignment has no points possible."))
       false
     end

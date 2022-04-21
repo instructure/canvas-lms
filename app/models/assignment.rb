@@ -42,7 +42,25 @@ class Assignment < ActiveRecord::Base
 
   self.ignored_columns = %i[context_code]
 
-  ALLOWED_GRADING_TYPES = %w[points percent letter_grade gpa_scale pass_fail not_graded].freeze
+  GRADING_TYPES = OpenStruct.new(
+    {
+      points: "points",
+      percent: "percent",
+      letter_grade: "letter_grade",
+      gpa_scale: "gpa_scale",
+      pass_fail: "pass_fail",
+      not_graded: "not_graded"
+    }
+  )
+
+  ALLOWED_GRADING_TYPES = GRADING_TYPES.to_h.values.freeze
+  POINTED_GRADING_TYPES = [
+    GRADING_TYPES.points,
+    GRADING_TYPES.percent,
+    GRADING_TYPES.letter_grade,
+    GRADING_TYPES.gpa_scale
+  ].freeze
+
   OFFLINE_SUBMISSION_TYPES = %i[on_paper external_tool none not_graded wiki_page].freeze
   SUBMITTABLE_TYPES = %w[online_quiz discussion_topic wiki_page].freeze
   LTI_EULA_SERVICE = "vnd.Canvas.Eula"
@@ -60,6 +78,8 @@ class Assignment < ActiveRecord::Base
     graders_anonymous_to_graders
     anonymous_instructor_annotations
   ].freeze
+
+  DEFAULT_POINTS_POSSIBLE = 0
 
   attr_accessor :previous_id, :copying, :user_submitted, :grade_posting_in_progress, :unposted_anonymous_submissions
   attr_reader :assignment_changed, :posting_params_for_notifications
@@ -350,6 +370,13 @@ class Assignment < ActiveRecord::Base
     return false if external_tool_tag.present? && !quiz_lti?
 
     true
+  end
+
+  def ensure_points_possible!
+    return if points_possible.present?
+    return unless grading_type_requires_points?
+
+    update!(points_possible: DEFAULT_POINTS_POSSIBLE)
   end
 
   def self.clean_up_duplicating_assignments
@@ -1494,7 +1521,7 @@ class Assignment < ActiveRecord::Base
 
     parsed_grade = interpret_grade(grade, prefer_points_over_scheme: prefer_points_over_scheme)
     case self.grading_type
-    when "points", "percent", "letter_grade", "gpa_scale"
+    when *POINTED_GRADING_TYPES
       score = parsed_grade
     when "pass_fail"
       # only allow full points or no points for pass_fail assignments
@@ -3821,6 +3848,10 @@ class Assignment < ActiveRecord::Base
   end
 
   private
+
+  def grading_type_requires_points?
+    POINTED_GRADING_TYPES.include? grading_type
+  end
 
   def set_muted
     self.muted = true
