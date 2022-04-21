@@ -42,6 +42,7 @@
 
 require "rubygems"
 require "active_support"
+require "ostruct"
 
 module Workflow
   class Specification
@@ -122,6 +123,10 @@ module Workflow
   module WorkflowClassMethods
     def self.extended(klass)
       klass.send(:class_attribute, :workflow_spec) unless klass.method_defined?(:workflow_spec)
+    end
+
+    def workflow_states
+      @workflow_states ||= OpenStruct.new(workflow_spec.states.transform_values { |val| val.name.to_s })
     end
 
     def workflow(&specification)
