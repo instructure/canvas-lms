@@ -2240,6 +2240,27 @@ describe DiscussionTopicsController do
       expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.created.graded")
     end
 
+    describe "assignment multiple due dates" do
+      describe "should increment" do
+        it "discussion_topic.created.multiple_due_dates" do
+          user_session @teacher
+          obj_params = topic_params(@course).merge(assignment_params(@course))
+          obj_params[:assignment][:assignment_overrides] = [{ "due_at" => "2022-04-23T05:59:59.000Z", "due_at_overridden" => false, "lock_at" => "2022-04-24T05:59:59.000Z", "lock_at_overridden" => false, "unlock_at" => "2022-04-21T06:00:00.000Z", "unlock_at_overridden" => false, "rowKey" => "0", "course_section_id" => "2", "title" => "Section 1", "all_day" => false, "all_day_date" => nil, "persisted" => false },
+                                                            { "due_at" => "2022-04-30T05:59:59.000Z", "due_at_overridden" => false, "lock_at" => "2022-05-01T05:59:59.000Z", "lock_at_overridden" => false, "unlock_at" => "2022-04-28T06:00:00.000Z", "unlock_at_overridden" => false, "rowKey" => "1", "course_section_id" => "3", "title" => "Section 2", "all_day" => false, "all_day_date" => nil, "persisted" => false }]
+          post "create", params: obj_params, format: :json
+          expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_topic.created.multiple_due_dates").at_least(:once)
+        end
+      end
+
+      describe "should not increment" do
+        it "discussion_topic.created.multiple_due_dates" do
+          user_session @teacher
+          post "create", params: topic_params(@course), format: :json
+          expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.created.multiple_due_dates")
+        end
+      end
+    end
+
     it "increment discussion_topic.visit.redesign" do
       @course.enable_feature! :react_discussions_post
 
