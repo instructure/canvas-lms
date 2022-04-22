@@ -457,6 +457,9 @@ class DiscussionTopicsController < ApplicationController
 
         render html: "", layout: true
       end
+
+      InstStatsd::Statsd.increment("discussion_topic.index.visit")
+
       format.json do
         log_api_asset_access(["topics", @context], "topics", "other")
         if @context.grants_right?(@current_user, session, :moderate_forum)

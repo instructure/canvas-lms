@@ -306,6 +306,19 @@ describe DiscussionTopicsController do
       expect(assigns[:js_env][:discussion_anonymity_enabled]).to be(true)
       expect(assigns[:js_env][:FEATURE_FLAGS_URL]).to eq("/courses/#{@course.id}/settings#tab-features")
     end
+
+    describe "Metrics for the index page" do
+      before do
+        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:count)
+      end
+
+      it "count discussion_topic.index.visit" do
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
+        expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_topic.index.visit").at_least(:once)
+      end
+    end
   end
 
   describe "GET 'show'" do
