@@ -318,6 +318,12 @@ describe DiscussionTopicsController do
         get "index", params: { course_id: @course.id }
         expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_topic.index.visit").at_least(:once)
       end
+
+      it "count number of pinned discussions discussion_topic.index.pinned" do
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
+        expect(InstStatsd::Statsd).to have_received(:count).with("discussion_topic.index.visit.pinned", 0).at_least(:once)
+      end
     end
   end
 
