@@ -130,10 +130,11 @@ the tool's containing iframe.
 - subject: "lti.fetchWindowSize"
 
 Returning postMessage includes the following properties:
-- subject: "lti.fetchWindowSize"
+- subject: "lti.fetchWindowSize.response"
 - height: height of the iframe
 - width: width of the iframe
-- offset: jquery.offset() of the iframe's wrapper
+- footer: height of the "#fixed_bottom" HTML element or 0 if not found
+- offset: [jquery.offset()](https://api.jquery.com/offset/) of the iframe's wrapper
 - scrollY: the number of px that the iframe is scrolled vertically
 
 ```js
