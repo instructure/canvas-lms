@@ -1401,6 +1401,10 @@ class DiscussionTopicsController < ApplicationController
         if is_new
           InstStatsd::Statsd.increment("discussion_topic.created")
 
+          if params[:podcast_enabled] == "1"
+            InstStatsd::Statsd.increment("discussion_topic.created.podcast_feed_enabled")
+          end
+
           if params[:anonymous_state] == "partial_anonymity"
             InstStatsd::Statsd.increment("discussion_topic.created.partial_anonymity")
           end
