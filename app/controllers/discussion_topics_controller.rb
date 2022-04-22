@@ -1423,6 +1423,10 @@ class DiscussionTopicsController < ApplicationController
           if @context.is_a?(Group)
             InstStatsd::Statsd.increment("discussion_topic.created.group")
           end
+
+          if request.params[:assignment] && request.params[:assignment][:assignment_overrides] && request.params[:assignment][:assignment_overrides].length > 1
+            InstStatsd::Statsd.increment("discussion_topic.created.multiple_due_dates")
+          end
         end
 
         if @context.is_a?(Course)
