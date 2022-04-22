@@ -2241,6 +2241,22 @@ describe DiscussionTopicsController do
       expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.created.allow_liking_enabled")
     end
 
+    it "increment discussion_topic.created.attachment" do
+      user_session @teacher
+      data = fixture_file_upload("docs/txt.txt", "text/plain", true)
+      attachment_model context: @course, uploaded_data: data, folder: Folder.unfiled_folder(@course)
+      post "create", params: topic_params(@course, { attachment: data }), format: :json
+      expect(response).to be_successful
+      expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_topic.created.attachment").at_least(:once)
+    end
+
+    it "does not increment discussion_topic.created.attachment" do
+      user_session @teacher
+      post "create", params: topic_params(@course, {}), format: :json
+      expect(response).to be_successful
+      expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.created.attachment")
+    end
+
     it "increment discussion_topic.created.graded" do
       user_session @teacher
       obj_params = topic_params(@course).merge(assignment_params(@course))
