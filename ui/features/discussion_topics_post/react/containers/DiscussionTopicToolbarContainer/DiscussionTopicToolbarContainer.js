@@ -21,6 +21,7 @@ import {DiscussionPostToolbar} from '../../components/DiscussionPostToolbar/Disc
 import React, {useContext, useEffect, useState} from 'react'
 import {SEARCH_TERM_DEBOUNCE_DELAY, SearchContext} from '../../utils/constants'
 import {View} from '@instructure/ui-view'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 export const DiscussionTopicToolbarContainer = props => {
   const {searchTerm, filter, sort, setSearchTerm, setFilter, setSort} = useContext(SearchContext)
@@ -62,6 +63,9 @@ export const DiscussionTopicToolbarContainer = props => {
 
   return (
     <View as="div" padding="0 0 medium 0" background="primary">
+      <ScreenReaderContent>
+        <h1>{props.discussionTopic.title}</h1>
+      </ScreenReaderContent>
       <DiscussionPostToolbar
         childTopics={getGroupsMenuTopics()}
         selectedView={filter}
