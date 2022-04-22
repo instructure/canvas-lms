@@ -355,6 +355,7 @@ class DiscussionTopicsController < ApplicationController
       scope = scope.active.where("delayed_post_at IS NULL OR delayed_post_at<?", Time.now.utc)
     end
 
+    @topics = []
     if @context.is_a?(Group) || request.format.json?
       @topics = Api.paginate(scope, self, topic_pagination_url)
       if params[:exclude_context_module_locked_topics]
@@ -459,6 +460,7 @@ class DiscussionTopicsController < ApplicationController
       end
 
       InstStatsd::Statsd.increment("discussion_topic.index.visit")
+      InstStatsd::Statsd.count("discussion_topic.index.visit.pinned", @topics&.select { |dt| dt.pinned }&.count)
 
       format.json do
         log_api_asset_access(["topics", @context], "topics", "other")
