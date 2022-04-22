@@ -20,13 +20,16 @@ import PropTypes from 'prop-types'
 import React from 'react'
 
 import {Flex} from '@instructure/ui-flex'
+import {Text} from '@instructure/ui-text'
 
 export const ComposeInputWrapper = props => {
   return (
-    <Flex width="100%">
-      <Flex.Item size="4em" padding="xx-small">
-        {props.title}
-      </Flex.Item>
+    <Flex width="100%" direction="column">
+      {props.title && (
+        <Flex.Item padding="none none none xx-small">
+          <Text weight="bold">{props.title}</Text>
+        </Flex.Item>
+      )}
       <Flex.Item shouldGrow shouldShrink padding="xx-small">
         {props.input}
       </Flex.Item>
