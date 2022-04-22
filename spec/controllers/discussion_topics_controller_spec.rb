@@ -2227,6 +2227,20 @@ describe DiscussionTopicsController do
       expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.created.podcast_feed_enabled")
     end
 
+    it "increment discussion_topic.created.allow_liking_enabled" do
+      user_session @teacher
+      post "create", params: topic_params(@course, { allow_rating: 1 }), format: :json
+      expect(response).to be_successful
+      expect(InstStatsd::Statsd).to have_received(:increment).with("discussion_topic.created.allow_liking_enabled").at_least(:once)
+    end
+
+    it "does not increment discussion_topic.created.allow_liking_enabled" do
+      user_session @teacher
+      post "create", params: topic_params(@course, { allow_rating: 0 }), format: :json
+      expect(response).to be_successful
+      expect(InstStatsd::Statsd).not_to have_received(:increment).with("discussion_topic.created.allow_liking_enabled")
+    end
+
     it "increment discussion_topic.created.graded" do
       user_session @teacher
       obj_params = topic_params(@course).merge(assignment_params(@course))
