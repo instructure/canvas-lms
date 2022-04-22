@@ -106,7 +106,7 @@ describe('RCE "Media" Plugin > MediaPanel', () => {
       })
     })
 
-    it.only('shows a "pending" message for the file', () => {
+    it('shows a "pending" message for the file', () => {
       const {getByText} = renderComponent(getPanelProps('course', filesObj))
       expect(getByText('pending file').parentElement.parentElement.outerHTML).toContain(
         'Media file is processing. Please try again later.'
