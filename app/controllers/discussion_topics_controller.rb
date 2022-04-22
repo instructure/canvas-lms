@@ -1417,6 +1417,10 @@ class DiscussionTopicsController < ApplicationController
             InstStatsd::Statsd.increment("discussion_topic.created.attachment")
           end
 
+          if !params[:delayed_post_at]&.empty? || !params[:lock_at]&.empty?
+            InstStatsd::Statsd.increment("discussion_topic.created.scheduled")
+          end
+
           if params[:anonymous_state] == "partial_anonymity"
             InstStatsd::Statsd.increment("discussion_topic.created.partial_anonymity")
           end
