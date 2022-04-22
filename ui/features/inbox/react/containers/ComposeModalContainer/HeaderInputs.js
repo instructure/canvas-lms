@@ -133,6 +133,19 @@ const HeaderInputs = props => {
           }
         />
       </Flex.Item>
+      {!props.isReply && !props.isForward && (
+        <Flex.Item padding="none none small none">
+          <ComposeInputWrapper
+            shouldGrow
+            input={
+              <IndividualMessageCheckbox
+                onChange={props.onSendIndividualMessagesChange}
+                checked={props.sendIndividualMessages}
+              />
+            }
+          />
+        </Flex.Item>
+      )}
       {!props.isReply && (
         <Flex.Item>
           <ComposeInputWrapper
@@ -163,19 +176,6 @@ const HeaderInputs = props => {
             shouldGrow
             input={
               <FacultyJournalCheckBox onChange={props.onUserNoteChange} checked={props.userNote} />
-            }
-          />
-        </Flex.Item>
-      )}
-      {!props.isReply && !props.isForward && (
-        <Flex.Item>
-          <ComposeInputWrapper
-            shouldGrow
-            input={
-              <IndividualMessageCheckbox
-                onChange={props.onSendIndividualMessagesChange}
-                checked={props.sendIndividualMessages}
-              />
             }
           />
         </Flex.Item>

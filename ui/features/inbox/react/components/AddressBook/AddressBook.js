@@ -193,7 +193,7 @@ export const AddressBook = ({
     if (selectedMenuItems.filter(x => !selectedRecipients.includes(x)).length > 0) {
       onSelectedIdsChange(selectedMenuItems)
     }
-  }, [onSelectedIdsChange, selectedMenuItems])
+  }, [onSelectedIdsChange, selectedMenuItems, selectedRecipients])
 
   // set initial recipients from props
   useEffect(() => {
@@ -512,6 +512,9 @@ export const AddressBook = ({
               }}
               renderTrigger={
                 <TextInput
+                  placeholder={
+                    selectedMenuItems.length === 0 ? I18n.t('Insert or Select Names') : null
+                  }
                   renderLabel={
                     <ScreenReaderContent>{I18n.t('Address Book Input')}</ScreenReaderContent>
                   }
@@ -587,6 +590,7 @@ export const AddressBook = ({
                 }
               }}
               disabled={isLimitReached}
+              margin="none none none xx-small"
             >
               <IconAddressBookLine />
             </IconButton>

@@ -39,7 +39,7 @@ export const SubjectInput = ({value, onChange, onBlur, onFocus}) => {
         <TextInput
           data-testid="subject-input"
           renderLabel={<ScreenReaderContent>{I18n.t('Subject')}</ScreenReaderContent>}
-          placeholder={I18n.t('No Subject')}
+          placeholder={I18n.t('Insert Subject')}
           value={value}
           width="100%"
           onChange={onChange}
