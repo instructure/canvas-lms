@@ -461,6 +461,7 @@ class DiscussionTopicsController < ApplicationController
 
       InstStatsd::Statsd.increment("discussion_topic.index.visit")
       InstStatsd::Statsd.count("discussion_topic.index.visit.pinned", @topics&.select { |dt| dt.pinned }&.count)
+      InstStatsd::Statsd.count("discussion_topic.index.visit.discussions", @topics&.length)
 
       format.json do
         log_api_asset_access(["topics", @context], "topics", "other")
