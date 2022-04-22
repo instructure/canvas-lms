@@ -208,31 +208,28 @@ class CoursePace < ActiveRecord::Base
   end
 
   def start_date(with_context: false)
-    Time.use_zone(course.time_zone) do
-      valid_date_range = CourseDateRange.new(course)
-      student_enrollment = course.student_enrollments.find_by(user_id: user_id) if user_id
+    valid_date_range = CourseDateRange.new(course)
+    student_enrollment = course.student_enrollments.find_by(user_id: user_id) if user_id
 
-      # always put pace plan dates in the course time zone
-      date = student_enrollment&.effective_start_at || course_section&.start_at || valid_date_range.start_at[:date]
-      date&.to_date
-      today = Date.today
+    date = student_enrollment&.effective_start_at || course_section&.start_at || valid_date_range.start_at[:date]
+    today = Date.today
 
-      if with_context
-        if date
-          context = (student_enrollment && "user") || (course_section&.start_at && "section") || (date && valid_date_range.start_at[:date_context])
-        else
-          date = today
-          context = "hypothetical"
-        end
-        { start_date: date, start_date_context: context }
+    # always put pace plan dates in the course time zone
+    if with_context
+      if date
+        context = (student_enrollment && "user") || (course_section&.start_at && "section") || (date && valid_date_range.start_at[:date_context])
       else
-        date || today
+        date = today
+        context = "hypothetical"
       end
+      { start_date: date.in_time_zone(course.time_zone), start_date_context: context }
+    else
+      (date || today).in_time_zone(course.time_zone)
     end
   end
 
   def end_date
-    Time.use_zone(course.time_zone) { self[:end_date] }
+    self[:end_date]&.in_time_zone(course.time_zone)
   end
 
   def effective_end_date(with_context: false)
@@ -259,9 +256,9 @@ class CoursePace < ActiveRecord::Base
                 else
                   "hypothetical"
                 end
-      { end_date: date, end_date_context: context }
+      { end_date: date&.in_time_zone(course.time_zone), end_date_context: context }
     else
-      date
+      date&.in_time_zone(course.time_zone)
     end
   end
 end
