@@ -41,7 +41,6 @@ describe "discussion assignments" do
 
   context "when discussion anonymity is allowed" do
     before :once do
-      Account.site_admin.enable_feature! :discussion_anonymity
       @course.enable_feature! :react_discussions_post
     end
 

@@ -392,10 +392,6 @@ describe "threaded discussions" do
     end
 
     context "fully anonymous discussions" do
-      before :once do
-        Account.site_admin.enable_feature! :discussion_anonymity
-      end
-
       it "only shows students as anonymous" do
         designer = designer_in_course(course: @course, name: "Designer", active_all: true).user
         ta = ta_in_course(course: @course, name: "TA", active_all: true).user

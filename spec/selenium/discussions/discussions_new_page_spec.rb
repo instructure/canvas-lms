@@ -164,49 +164,43 @@ describe "discussions" do
         end
       end
 
-      context "when discussion_anonymity feature_flag is on" do
-        before :once do
-          Account.site_admin.enable_feature! :discussion_anonymity
+      context "when react_discussions_post feature_flag is on" do
+        before do
+          course.enable_feature! :react_discussions_post
         end
 
-        context "when react_discussions_post feature_flag is on" do
-          before do
-            course.enable_feature! :react_discussions_post
-          end
-
-          it "allows creating anonymous discussions" do
-            get url
-            replace_content(f("input[name=title]"), "my anonymous title")
-            f("input[value='full_anonymity']").click
-            expect_new_page_load { submit_form(".form-actions") }
-            expect(DiscussionTopic.last.anonymous_state).to eq "full_anonymity"
-            expect(f("span[data-testid='anon-conversation']").text).to(
-              eq("This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members.")
-            )
-            expect(f("span[data-testid='author_name']").text).to eq teacher.short_name
-          end
-
-          it "disallows full_anonymity along with graded" do
-            get url
-            replace_content(f("input[name=title]"), "my anonymous title")
-            f("input[value='full_anonymity']").click
-            f("input[id='use_for_grading']").click
-            submit_form(".form-actions")
-            expect(
-              fj("div.error_text:contains('You are not allowed to create an anonymous graded discussion')")
-            ).to be_present
-          end
+        it "allows creating anonymous discussions" do
+          get url
+          replace_content(f("input[name=title]"), "my anonymous title")
+          f("input[value='full_anonymity']").click
+          expect_new_page_load { submit_form(".form-actions") }
+          expect(DiscussionTopic.last.anonymous_state).to eq "full_anonymity"
+          expect(f("span[data-testid='anon-conversation']").text).to(
+            eq("This is an anonymous Discussion. Though student names and profile pictures will be hidden, your name and profile picture will be visible to all course members.")
+          )
+          expect(f("span[data-testid='author_name']").text).to eq teacher.short_name
         end
 
-        context "when react_discussions_post feature_flag is off" do
-          before do
-            course.disable_feature! :react_discussions_post
-          end
+        it "disallows full_anonymity along with graded" do
+          get url
+          replace_content(f("input[name=title]"), "my anonymous title")
+          f("input[value='full_anonymity']").click
+          f("input[id='use_for_grading']").click
+          submit_form(".form-actions")
+          expect(
+            fj("div.error_text:contains('You are not allowed to create an anonymous graded discussion')")
+          ).to be_present
+        end
+      end
 
-          it "does not show anonymous discussion options" do
-            get url
-            expect(f("body")).not_to contain_jqcss "input[value='full_anonymity']"
-          end
+      context "when react_discussions_post feature_flag is off" do
+        before do
+          course.disable_feature! :react_discussions_post
+        end
+
+        it "does not show anonymous discussion options" do
+          get url
+          expect(f("body")).not_to contain_jqcss "input[value='full_anonymity']"
         end
       end
     end
@@ -220,8 +214,6 @@ describe "discussions" do
 
       context "when all discussion anonymity feature flags are ON" do
         before do
-          Account.site_admin.enable_feature! :discussion_anonymity
-          Account.site_admin.enable_feature! :partial_anonymity
           course.enable_feature! :react_discussions_post
         end
 

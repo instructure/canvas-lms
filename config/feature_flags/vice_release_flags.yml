@@ -46,26 +46,6 @@ discussions_inline_grading:
     Allows a grader to grade discussions as they read
   applies_to: SiteAdmin
 
-discussion_anonymity:
-  state: hidden
-  beta: false
-  display_name: Discussions/Announcements Redesign - Anonymity
-  description:
-    This feature allows Teachers to create anonymous discussions
-    and allows teachers to enable a course level setting for students
-    to create anonymous discussions
-  applies_to: SiteAdmin
-
-partial_anonymity:
-  state: hidden
-  beta: false
-  display_name: Discussions/Announcements Redesign - Partial Anonymity
-  description:
-    This feature allows Teachers to create partially anonymous discussions.
-    Partially anonymous discussions allow students the choice to respond
-    to a discussion topic anonymously or not.
-  applies_to: SiteAdmin
-
 isolated_view:
   state: hidden
   display_name: Discussions Redesign - Isolated View

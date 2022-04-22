@@ -65,7 +65,6 @@ const editView = function (opts = {}, discussOpts = {}) {
     lockedItems: opts.lockedItems || {},
     isEditing: false,
     anonymousState: ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.anonymous_state,
-    anonymous_discussion_enabled: ENV.ANONYMOUS_DISCUSSIONS,
     react_discussions_post: ENV.REACT_DISCUSSIONS_POST,
     allow_student_anonymous_discussion_topics: ENV.allow_student_anonymous_discussion_topics,
     context_is_not_group: ENV.context_is_not_group
@@ -309,7 +308,6 @@ test('does not save todo date if discussion is graded', function () {
 })
 
 test('does not renders anonymous section if is a group discussion', function () {
-  ENV.ANONYMOUS_DISCUSSIONS = true
   ENV.REACT_DISCUSSIONS_POST = true
   ENV.context_is_not_group = false
   const view = this.editView({
@@ -319,7 +317,6 @@ test('does not renders anonymous section if is a group discussion', function () 
 })
 
 test('renders anonymous section if able to moderate', function () {
-  ENV.ANONYMOUS_DISCUSSIONS = true
   ENV.REACT_DISCUSSIONS_POST = true
   ENV.context_is_not_group = true
   const view = this.editView({
@@ -329,7 +326,6 @@ test('renders anonymous section if able to moderate', function () {
 })
 
 test('renders anonymous section if student can create', function () {
-  ENV.ANONYMOUS_DISCUSSIONS = true
   ENV.REACT_DISCUSSIONS_POST = true
   ENV.context_is_not_group = true
   ENV.allow_student_anonymous_discussion_topics = true
@@ -338,7 +334,6 @@ test('renders anonymous section if student can create', function () {
 })
 
 test('renders anonymous section with anonymous discussions off checked', function () {
-  ENV.ANONYMOUS_DISCUSSIONS = true
   ENV.REACT_DISCUSSIONS_POST = true
   ENV.context_is_not_group = true
   ENV.DISCUSSION_TOPIC = {ATTRIBUTES: {anonymous_state: null}}
@@ -349,7 +344,6 @@ test('renders anonymous section with anonymous discussions off checked', functio
 })
 
 test('renders anonymous section with full_anonymity checked', function () {
-  ENV.ANONYMOUS_DISCUSSIONS = true
   ENV.REACT_DISCUSSIONS_POST = true
   ENV.context_is_not_group = true
   ENV.DISCUSSION_TOPIC = {ATTRIBUTES: {anonymous_state: 'full_anonymity'}}
