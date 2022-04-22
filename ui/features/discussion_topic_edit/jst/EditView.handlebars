@@ -38,7 +38,7 @@
         <label for="discussion-title">
           {{#t "topic_title"}}Topic Title{{/t}}
         </label>
-        <input type="text" id="discussion-title" name="title" placeholder="{{#t "topic_title"}}Topic Title{{/t}}"
+        <input type="text" id="discussion-title" name="title" placeholder="{{#t " topic_title"}}Topic Title{{/t}}"
           value="{{title}}" maxlength="254" class="input-block-level">
         {{/if}}
       </div>
@@ -117,7 +117,6 @@
             </label></div>
           {{/unless}}
           {{#if react_discussions_post}}
-          {{#if anonymous_discussion_enabled}}
           {{#if context_is_not_group}}
           {{#ifAny canModerate allow_student_anonymous_discussion_topics}}
           <h4 id="anonymous_section_header">Anonymous Discussion</h4>
@@ -127,13 +126,11 @@
                 isEditing}}disabled{{/if}} />
               {{#t}}Off: student names and profile pictures will be visible to other members of this course{{/t}}
             </label>
-            {{#if partially_anonymous_discussions}}
             <label class="radio" style="display: block;">
               <input type="radio" name="anonymous_state" value="partial_anonymity" {{checkedIf
                 anonymousState "partial_anonymity" }} {{#if isEditing}}disabled{{/if}} />
               {{#t}}Partial: students can choose to reveal their name and profile picture{{/t}}
             </label>
-            {{/if}}
             <label class="radio" style="display: block;">
               <input type="radio" name="anonymous_state" value="full_anonymity" {{checkedIf
                 anonymousState "full_anonymity" }} {{#if isEditing}}disabled{{/if}} />
@@ -144,7 +141,6 @@
           <div id="sections_anonymous_post_selector" style="display: none"></div>
           {{/if}}
           {{/ifAny}}
-          {{/if}}
           {{/if}}
           {{/if}}
           {{/if}}
@@ -375,11 +371,11 @@
     {{#t}}Cancel{{/t}}
   </button>
   {{#if canPublish}}
-  <button type="button" data-text-while-loading="{{#t "saving"}}Saving...{{/t}}"
+  <button type="button" data-text-while-loading="{{#t " saving"}}Saving...{{/t}}"
     class="btn btn-default save_and_publish">
     {{#t "buttons.save_and_publish"}}Save & Publish{{/t}}
   </button>
   {{/if}}
-  <button type="submit" data-text-while-loading="{{#t "saving"}}Saving...{{/t}}" class="btn btn-primary">{{#t
+  <button type="submit" data-text-while-loading="{{#t " saving"}}Saving...{{/t}}" class="btn btn-primary">{{#t
     "save"}}Save{{/t}}</button>
 </div>

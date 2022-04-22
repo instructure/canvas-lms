@@ -122,8 +122,6 @@ ready(() => {
     homeroomCourse: window.ENV.K5_HOMEROOM_COURSE,
     isEditing: model.id,
     anonymousState: ENV.DISCUSSION_TOPIC.ATTRIBUTES.anonymous_state,
-    anonymous_discussion_enabled: ENV.ANONYMOUS_DISCUSSIONS,
-    partially_anonymous_discussions: ENV.PARTIAL_ANONYMITY,
     react_discussions_post: ENV.REACT_DISCUSSIONS_POST,
     allow_student_anonymous_discussion_topics: ENV.allow_student_anonymous_discussion_topics,
     context_is_not_group: ENV.context_is_not_group,
