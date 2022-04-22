@@ -303,7 +303,7 @@ describe CoursePace do
       assignment_override = @assignment.assignment_overrides.active.first
       expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-01"))
       # Publish course section specific course pace and verify dates have changed
-      @course_section.update(start_at: "2021-09-06")
+      @course_section.update(start_at: Date.parse("2021-09-06").in_time_zone(@course.time_zone))
       section_course_pace = @course.course_paces.create! course_section: @course_section, workflow_state: "active"
       section_course_pace.course_pace_module_items.create! module_item: @tag
       expect(section_course_pace.publish).to eq(true)
