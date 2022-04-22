@@ -1408,6 +1408,10 @@ class DiscussionTopicsController < ApplicationController
             InstStatsd::Statsd.increment("discussion_topic.created.podcast_feed_enabled")
           end
 
+          if params[:allow_rating] == "1"
+            InstStatsd::Statsd.increment("discussion_topic.created.allow_liking_enabled")
+          end
+
           if params[:anonymous_state] == "partial_anonymity"
             InstStatsd::Statsd.increment("discussion_topic.created.partial_anonymity")
           end
