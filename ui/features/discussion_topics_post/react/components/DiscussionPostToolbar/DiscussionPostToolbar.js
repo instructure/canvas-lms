@@ -102,7 +102,8 @@ export const DiscussionPostToolbar = props => {
             shouldGrow: true,
             shouldShrink: true,
             width: null
-          }
+          },
+          padding: 'xx-small'
         },
         desktop: {
           direction: 'row',
@@ -116,7 +117,8 @@ export const DiscussionPostToolbar = props => {
             shouldGrow: false,
             shouldShrink: false,
             width: '120px'
-          }
+          },
+          padding: '0'
         }
       }}
       render={responsiveProps => (
@@ -129,18 +131,16 @@ export const DiscussionPostToolbar = props => {
                   <Flex.Item
                     data-testid="groups-menu-button"
                     margin="0 small 0 0"
-                    overflowY="hidden"
-                    overflowX="hidden"
+                    padding={responsiveProps.padding}
                   >
                     <GroupsMenu width="10px" childTopics={props.childTopics} />
                   </Flex.Item>
                 )}
                 {/* Search */}
                 <Flex.Item
-                  overflowY="hidden"
-                  overflowX="hidden"
                   shouldGrow={responsiveProps.search.shouldGrow}
                   shouldShrink={responsiveProps.search.shouldShrink}
+                  padding={responsiveProps.padding}
                 >
                   <TextInput
                     data-testid="search-filter"
@@ -168,8 +168,7 @@ export const DiscussionPostToolbar = props => {
                 {/* Filter */}
                 <Flex.Item
                   margin="0 small 0 0"
-                  overflowY="hidden"
-                  overflowX="hidden"
+                  padding={responsiveProps.padding}
                   shouldGrow={responsiveProps.filter.shouldGrow}
                   shouldShrink={responsiveProps.filter.shouldShrink}
                 >
@@ -189,7 +188,7 @@ export const DiscussionPostToolbar = props => {
                   </SimpleSelect>
                 </Flex.Item>
                 {/* Sort */}
-                <Flex.Item overflowY="hidden" overflowX="hidden">
+                <Flex.Item padding={responsiveProps.padding}>
                   <Tooltip
                     renderTip={
                       props.sortDirection === 'desc'
