@@ -1598,6 +1598,7 @@ fi:
   add_account_admins_99c03c9e: "Lisää tilin pääkäyttäjiä"
   add_additional_comments_ec34a62f: "Kirjoita lisäkommentteja"
   add_alert_b2729c99: "Lisää hälytys"
+  add_all_other_course_content_97c552b2: "Lisää kaikki muu kurssin sisältö"
   add_all_outcomes_6a12d08e: "Lisää kaikki osaamistulokset"
   add_an_assignment_fb73942e: "Lisää tehtävä"
   add_an_attachment_b2e9092f: "Lisää liite"
@@ -1614,6 +1615,7 @@ fi:
   add_attribute_6d6d4a65: "Lisää määrite"
   add_bank: 
     default_name: "Ei nimeä"
+  add_blackout_dates_ui_to_course_pacing_requires_co_1b675701: "Lisää katkospäivämäärien UI kurssin tahditukseen. Vaatii, että course_paces on käytössä."
   add_cc_subtitle_a9ef4a66: "Lisää tekstitys"
   add_collaboration_da9665ac: "Lisää yhteistyö"
   add_comment_3205529f: "Lisää kommentti"
@@ -1654,6 +1656,7 @@ fi:
   add_grading_period_6f774dc3: "Lisää arvosanojen antojakso"
   add_grading_scheme_81e23c05: " Lisää arviointiasteikko"
   add_grading_scheme_to_admin_grade_reports_23eb8c6e: "Lisää arviointiasteikko pääkäyttäjän arvosanaraportteihin."
+  add_granularity_to_permissions_around_managing_all_129149da: "Lisää karkeus käyttöoikeuksiin kaiken muun kurssisisällön hallintaan liittyen"
   add_granularity_to_permissions_around_managing_cou_1ee88f6: "Lisää karkeus käyttöoikeuksiin kurssien hallintaan, esim. Lisää/Muokkaa/Poista"
   add_granularity_to_permissions_around_managing_cou_2244c94a: "Lisää karkeus käyttöoikeuksiin kurssitiedostojen hallintaan liittyen"
   add_granularity_to_permissions_around_managing_cou_4a5bc486: "Lisää karkeus käyttöoikeuksiin kurssin osien hallintaan liittyen"
@@ -3954,6 +3957,7 @@ fi:
   audio_1c89b0c8: ääni
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "Laitteesi tai sovelluksesi ei tue äänisisältöä."
   audio_dd489fcc: Ääni
+  audio_player_for_label_dd9a6819: "Äänisoitin kohteelle %{label}"
   australia_61_eb9bb701: "Australia (+61)"
   austria_43_7bc58b34: "Itävalta (+43)"
   auth_failure_in_connecting_to_google_drive_a20aad43: "Todennusvirhe yhteyden muodostamisessa Google Driveen."
@@ -4165,6 +4169,9 @@ fi:
   bigeasy_locale: fi_FI
   blackboard: 
     no_manifest: "Tässä Blackboard .zipissä ei ole imsmanifest.xml-tiedostoa juurihakemistossa."
+  blackout_date_title_was_added_ec8bf15e: "Blackout-päivämäärä %{title} lisättiin."
+  blackout_date_title_was_deleted_e8cc238b: "Blackout-päivämäärä %{title} poistettiin."
+  blackout_date_title_was_edited_31752bc9: "Blackout-päivämäärää %{title} muokattiin."
   blackout_dates_4a140a72: Pimennyspäivät
   blank_38df4238: Tyhjä
   blocked_by_running_migration_d8a57cb7: "Estetty käynnissä olevan siirron vuoksi"
@@ -4856,6 +4863,7 @@ fi:
   cannot_delete_an_override_with_a_due_date_within_a_fa94ca3b: "Ei voida poistaa korvausta, jonka määräpäivä on suljetulla arvosanojen antojaksolla"
   cannot_give_outcomes_extra_credit_696208f0: "Ei voida antaa osaamistuloksista extrapisteitä"
   cannot_grade_at_this_time_489744b0: "Arviointi ei onnistu tällä hetkellä"
+  cannot_have_a_blueprint_course_with_observers_d00b3deb: "Blueprint-kursseilla ei voi olla havainnoijia"
   cannot_have_a_blueprint_course_with_students_248e3e76: "Blueprint-kursseilla ei voi olla opiskelijoita"
   cannot_import_a_root_group_d4654def: "ei voida tuoda juuriryhmää"
   cannot_import_to_other_courses_af885742: "Ei voida tuoda muihin muihin kursseihin."
@@ -5035,6 +5043,8 @@ fi:
   changing_course_dates_may_override_term_availabili_d92b10de: "Kurssin päivämäärien vaihtaminen saattaa muuttaa lukukauden saatavilla olon asetuksia ja paikkaa Kurssit-sivulla ja koontinäytöllä. Vahvista lukukauden päivämäärät ennen kuin muokkaat kurssin päivämääriä."
   changing_course_pacing_days_may_modify_due_dates_9009aecd: "Kurssin tahdistuksen muuttaminen saattaa muokata määräpäiviä."
   changing_section_dates_may_override_course_and_ter_6634950e: "Osioiden päivämäärien vaihtaminen saattaa muuttaa kurssin ja lukukauden saatavilla olon asetuksia ja paikkaa Kurssit-sivulla ja koontinäytöllä. Vahvista lukukauden ja kurssin päivämäärät ennen kuin muokkaat osion päivämääriä."
+  changing_the_course_participation_will_republish_a_1cc05b7: "Kurssin osallistumisen muuttaminen julkaisee uudelleen kaiken kurssin tahdituksen ja kaikki uudet päivämäärät, joissa käytetään jakson osallistumista."
+  changing_the_course_participation_will_republish_a_5715b0d5: "Kurssin osallistumisen muuttaminen julkaisee uudelleen kaiken kurssin tahdituksen ja kaikki uudet päivämäärät."
   changing_the_late_policy_will_affect_previously_gr_49071db7: "Myöhässä olevia tehtäväpalautuksia koskevan käytännön muuttaminen vaikuttaa aikaisemmin arvioituihin tehtäväpalautuksiin."
   changing_the_tenant_will_delete_existing_groups_f86c48dc: "Alivuokralaisen muuttaminen voi tuhota edellisiä ryhmiä-"
   chars_written_max_character_length_len_fec9bd18: "%{chars} kirjoitettu, merkkien maksimipituus %{len}"
@@ -5042,6 +5052,7 @@ fi:
   chat_2153c6b7: Chat
   chcp_student_activity_report_5611dd39: "CHCP-opiskelijan aktiviteettiraportti"
   check_back_later_c4234dbc: "Palaa takaisin myöhemmin"
+  check_permissions_when_masquerading_as_course_admi_ded7106c: "Tarkista käyttöoikeudet, kun naamioidutaan kurssin pääkäyttäjinä"
   check_services_to_enable_8877c451: "Ota palvelut käyttöön valitsemalla ne"
   check_submission_file_type_b3dbf3fd: "Tarkista lähetystiedoston tyyppi uudelleen"
   check_to_add_a_user_for_loginid_6cd25597: "Ruksaa valintaruutu lisätäksesi käyttäjä kohteeseen %{loginid}"
@@ -5460,6 +5471,7 @@ fi:
     contingency_30_minute_quickstart: "https://community.canvaslms.com/t5/Contingency-Planning/Set-Up-Your-Canvas-Course-in-30-minutes-or-Less/ba-p/258437"
     contingency_covid: "https://community.canvaslms.com/t5/Contingency-Planning/gh-p/contingency"
     contingency_web_conferencing: "https://community.canvaslms.com/t5/Contingency-Planning/Web-Conferencing-Resources/ba-p/262674"
+    course_pacing: "https://community.canvaslms.com/t5/Course-Pacing-Feature-Preview/gh-p/course_pacing"
     guides_by_product: "https://community.canvaslms.com/t5/Guides/ct-p/guides"
     guides_home: "https://community.canvaslms.com/t5/Canvas/ct-p/canvas"
     idea_conversations: "https://community.canvaslms.com/t5/Idea-Conversations/idb-p/ideas"
@@ -6731,7 +6743,10 @@ fi:
   course_concluded_unable_to_send_messages_b99b6b6d: "Kurssi suoritettu loppuun, viestien lähettäminen ei onnistu"
   course_conferences_3d914c96: "Kurssin verkkotapaamiset"
   course_content_a92eca20: Kurssisisältö
+  course_content_add_355fab78: "Kurssisisältö - lisää"
   course_content_add_edit_delete_ea877eca: "Kurssin sisältö - lisää/muokkaa/poista"
+  course_content_delete_b6e7cfd9: "Kurssisisältö - poista"
+  course_content_edit_7a3effc3: "Kurssisisältö - muokkaa"
   course_content_view_5f68a57: "Kurssin sisältö - tarkastele"
   course_copy_argument_error: "Kurssin kopiointi vaatii lähdekurssia eli kopioitavaa kurssia."
   course_copy_description: "Siirron lisäosa Canvas-kurssien kopiointia varten"
@@ -6912,8 +6927,14 @@ fi:
   course_pace_4dfc7ef3: "Kurssin toteutustahtisuunnitelma"
   course_pace_plan_c79cbffc: "Kurssin sivusuunnitelma"
   course_paces_4396b508: "Kurssin toteutustahtisuunnitelmat"
+  course_paces_description: |-
+      Kurssin tahditus lisää ilmoittautumisten tukea Canvasiin;
+      minkä ansiosta määräpäivät opiskelijoille, joilla on eri
+      aloituspäivät, voidaan jakaa erinomaisesti opettajan määrittämällä tahdilla. Lue lisää ja anna
+      palautetta liittymällä *kurssin tahdituksen käyttäjäryhmään*.
   course_pacing_40c14b61: "Kurssin tahdistus"
   course_pacing_adds_support_for_rolling_enrollments_3331cbaa: "Kurssin tahdistus lisää ilmoittautumisten tukea Canvasiin; minkä ansiosta määräpäivät opiskelijoille, joilla on eri aloituspäivät, voidaan jakaa erinomaisesti opettajan määrittämällä tahdilla. Lue lisää ja anna palautetta liittymällä kurssin tahdistuksen käyttäjäryhmään."
+  course_pacing_blackout_dates_1dfc8b61: "Kurssin tahdituksen blackout-päivämäärät"
   course_pacing_is_in_active_development_348e33cf: "Kurssin tahdistus on aktiivisessa kehityksessä."
   course_pages_449f1dd4: "Kurssin sivut"
   course_participation_and_access_settings_7a3d6297: "Kurssin osallistumisen ja käyttöoikeuden asetukset"
@@ -7250,6 +7271,7 @@ fi:
         blueprint_course: Blueprint-kurssi
         card_image: "Kuva kortissa"
         conclude_at: Päättyy
+        conditional_release: Hallintapolut
         course_code: "Kurssin koodi"
         course_color: Väri
         course_description: Kuvaus
@@ -7859,6 +7881,7 @@ fi:
   date_created_createdat_265a0dfa: "luontipäivä: %{createdAt}"
   date_ee500367: Päivämäärä
   date_error_7b38f8ff: Päivämäärävirhe
+  date_filter_is_in_effect_4363df73: "Päivämääräsuodatin on toiminnassa"
   date_is_after_course_end_date_94a2f4e3: "Päivämäärä on kurssin päättymispäivän jälkeen"
   date_is_after_the_course_end_date_95bf9b6a: "Päivämäärä on kurssin päättymispäivän jälkeen"
   date_is_after_the_specified_end_date_ae34a72f: "Päivämäärä on määritetyn päättymispäivän jälkeen"
@@ -7872,6 +7895,9 @@ fi:
   date_modified_e1c8ac8f: Muokkauspäivä
   date_modified_modifiedat_b839cc8b: "muokkauspäivä: %{modifiedAt}"
   date_of_most_recent_bounce_b23d0119: "Viimeisimmän toimittamattoman viestin palautuksen päivämäärä"
+  date_required_a74e077c: "Tarvitaan päivänä"
+  date_time_options_7abcdea7: "Pvm/ajan asetukset"
+  date_time_options_b501e73b: "Pvm/ajan asetukset"
   datepicker: 
     errors: 
       not_a_date: "Tämä ei ole päivämäärä!"
@@ -7965,6 +7991,7 @@ fi:
   delete_a6efa79d: Poista
   delete_account_name_96aee330: "Poista %{account_name}"
   delete_alignment_f33c97d5: "Poista kohdistus"
+  delete_all_other_course_content_721e0ae3: "Poista kaikki muu kurssin sisältö"
   delete_announcement_title_756a9d1f: "Poista ilmoitus %{title}"
   delete_assignment_5d3f3f15: "Poista tehtävä"
   delete_assignment_group_7c3b01c4: "Poista tehtäväryhmä"
@@ -8221,9 +8248,7 @@ fi:
   disabling_the_assignments_and_quizzes_delete_permi_ad890eb3: "Tehtävien ja testien poistaminen käytöstä - poista-rkäyttöoikeus (jos käytössä) korvaa ubriikit- lisää/muokkaa/poista oikeudet -valinnan, mikä estää käyttäjää luomasta rubriikkeja yksittäisestä tehtävästä."
   disabling_the_assignments_and_quizzes_edit_permiss_529f9360: "Tehtävien ja testien poistaminen käytöstä - poista- käyttöoikeus (jos käytössä) korvaa rubriikit- lisää/muokkaa/poista oikeudet -valinnan, mikä estää käyttäjää luomasta rubriikkeja yksittäisestä tehtävästä."
   disabling_the_elementary_theme_will_change_the_fon_d7f31a3b: "Elementary-teeman poistaminen käytöstä vaihtaa fonttia Canvas-liittymässä kaikille kurssisi käyttäjille."
-  disabling_the_mastery_paths_feature_will_release_c_4b96c86d: |-
-      Kun hallintapolun ominaisuus poistetaan käytöstä, tämä vapauttaa konfiguroidut tehtävät ja sisällön kaikille opiskelijoille.
-                        Jos ominaisuus otetaan uudelleen käyttöön, nämä tehtävät pitää konfiguroida uudelleen hallintapolkuun.
+  disabling_the_mastery_paths_feature_will_release_c_4b96c86d: "Hallintapolkujen ominaisuuden käytöstä poistaminen vapauttaa tehtävät ja sisällön kaikille opiskelijoille. Jos ominaisuus otetaan uudelleen käyttöön, nämä tehtävät täytyy konfiguroida hallintapoluille uudelleen."
   disabling_this_permission_will_override_if_enabled_59c2b5c9: "Tämän käyttöoikeuden poistaminen käytöstä korvaa Arviointitaulukot - lisää/muokkaa/poista oikeudet -valinnan (jos se on käytössä) , ja estää käyttäjää luomasta tai muokkaamasta arviointitaulukkoja yksittäisestä tehtävästä käsin."
   disabling_this_permission_will_override_if_enabled_6481b015: "Tämän käyttöoikeuden poistaminen käytöstä korvaa (jos käytössä) Rubriikit - lisää/muokkaa/poista-oikeudet  ja estää käyttäjää luomasta tai muokkaamasta rubriikkeja yksittäisestä tehtävästä. Jos Oppimisen tulokset  - lisää/muokkaa/poista​ ovat kuitenkin käytössä, käyttäjä voi yhä lisätä rubriikkeja tulosten kautta (Hallitse Rubriikkeja -painike)."
   disabling_this_permission_will_override_if_enabled_7f2a87cc: "Tämän käyttöoikeuden poistaminen käytöstä korvaa (jos käytössä) Rubriikit - lisää/muokkaa/poista-oikeudet  ja estää käyttäjää luomasta tai muokkaamasta rubriikkeja yksittäisestä tehtävästä. Jos Oppimisen tulokset  - lisää/muokkaa/poista​ ovat kuitenkin käytössä, käyttäjä voi yhä lisätä rubriikkeja tulosten kautta (Hallitse Rubriikkeja -painike)."
@@ -8718,6 +8743,7 @@ fi:
   ecollege_file_description: Ecollege
   ecollege_name: Ecollege-muunnin
   edit_account_name_for_account_name_ae3633e8: "Muokkaa tilin nimeä kohteelle %{account_name}"
+  edit_all_other_course_content_c8dd98d3: "Muokkaa kaikkea muuta kurssin sisältöä"
   edit_and_delete_their_own_posts_f4f7cc6: "Muokkaa ja poista omia keskusteluviestejä"
   edit_and_delete_their_own_replies_e5b9d793: "Muokkaa ja poista omia vastauksia"
   edit_announcement_title_cce0b4e: "Muokkaa ilmoitusta %{title}"
@@ -8929,6 +8955,7 @@ fi:
   enable_gradebook_list_students_by_sortable_name: "Luetteloi opiskelijat lajiteltavien nimien mukaan Arvosanakirjassa. Lajiteltavat nimet ovat oletuksena muodossa \"Sukunimi, Etunimi\" ja tämä voidaan vaihtaa asetuksissa."
   enable_gravatar_8a865b41: "Ota Gravatar käyttöön"
   enable_i18n_features_in_outcomes_exports_64bcf82b: "Ota i18n-ominaisuudet käyttöön tulosten viennissä"
+  enable_individual_learning_paths_for_students_base_5236d3bb: "Ota yksilöllisiä oppimispolkuja käyttöön opiskelijoille arvioinnin tulosten perusteella"
   enable_migrating_item_banks_to_new_quizzes_during__af6ca020: "Ota migraation kohteet käyttöön luomalla uusia kyselyitä kurssin tuonnin tai kopioinnin aikana."
   enable_moderated_grading_bacd20d8: "Ota moderoitu arviointi käyttöön."
   enable_new_sis_integration_settings_ab6780a4: "Ota käyttöön uudet SIS-integraatioasetukset"
@@ -9917,6 +9944,7 @@ fi:
   filter_e3398407: Suodatin
   filter_features_388eafd8: "Suodata ominaisuudet"
   filter_ip_addresses_2f296bd2: "Suodata IP-osoitteen mukaan"
+  filter_jobs_by_date_202eb267: "Suodata työtehtävät päivämäärän perusteella"
   filter_messages_by_course_21a53fc4: "Suodata viestit kurssin perusteella"
   filter_observer_dashboard_by_student_5705ff33: "Suodattimen havainnoitsijan suodatin päällikkö poist"
   filter_recent_user_accesses_by_term_30812659: "Suodattimen äskettäinen käyttäjä käyttää lukukauden jälkeen."
@@ -10176,6 +10204,7 @@ fi:
   grade_for_missing_submissions_56f91c83: "Arvosana puuttuville tehtäväpalautuksille"
   grade_for_name_b9df168a: "Arvosana kohteelle: %{name}"
   grade_for_studentname_d124b199: "Arvosana kohteelle %{studentName}"
+  grade_for_ungraded_artifacts_d0b6fb57: "Arvosana arvostelemattomille artifakteille"
   grade_for_ungraded_submissions_59f72299: "Arvosana arvostelemattomille tehtäväpalautuksille"
   grade_grade_7e52dd1c: "Arvosana: %{grade}"
   grade_high_to_low_1cea0381: "Arvosana - korkeasta alhaiseen"
@@ -10711,6 +10740,7 @@ fi:
   granular_permissions_for_add_remove_admin_roles_fr_9a06a75d: "Karkeat käyttöoikeudet Lisää-/poista-järjestelmäkäyttäjän rooleille kurssilta"
   granular_permissions_for_add_remove_roles_from_cou_b0a34301: "Karkeat käyttöoikeudet Lisää/poista -rooleille kurssilta"
   granular_permissions_for_assignments_and_quizzes_6b3bddc6: "Karkeat käyttöoikeudet tehtäviin ja testeihin"
+  granular_permissions_for_managing_course_content_91375668: "Karkeat käyttöoikeudet kurssisisällön hallintaan"
   granular_permissions_for_managing_course_files_1ed7f019: "Karkeat käyttöoikeudet kurssitiedostojen hallintaan"
   granular_permissions_for_managing_course_sections_da4b04b: "Karkeat käyttöoikeudet kurssin osien hallintaan"
   granular_permissions_for_managing_courses_a71be71d: "Karkeat käyttöoikeudet kurssin hallintaan"
@@ -10876,6 +10906,7 @@ fi:
       heading_current_groups: "Nykyiset ryhmät"
       heading_previous_groups: "Edelliset ryhmät"
       no_groups: "Ei ryhmiä"
+      no_groupsheading: Ryhmät
     manage: 
       add_unassigned_menu: 
         add_unassigned_student: "Lisää kohdistamaton opiskelija"
@@ -11206,6 +11237,7 @@ fi:
   hide_all_artifacts_d654fbd5: "Piilota kaikki arvioinnin kohteet"
   hide_all_details_61d7ebb: "Piilota kaikki tiedot"
   hide_all_recipients_1ca02da6: "Piilota kaikki vastaanottajat"
+  hide_assignment_group_totals_f4fb8660: "Piilota tehtäväryhmän kokonaisuudet"
   hide_correct_answers_at_2421b0aa: "Piilota oikeat vastaukset"
   hide_correct_answers_at_b1a59408: "Piilota oikeat vastaukset"
   hide_course_sections_for_course_name_bd1911af: "Piilota kurssin osiot kurssilta %{name}"
@@ -12487,6 +12519,7 @@ fi:
   like_count_count_9467dc82: "Tykkäysten määrä: %{count}"
   like_post_dbf48764: Tykkäyslähetys
   like_post_from_author_79b874f1: "Tykkää lähetyksestä kohteelta %{author}"
+  like_this_entry_60da41a5: "Tykkää tästä merkinnästä"
   limit_assignment_names_lengths_max_255_5ee9ebb5: "Rajoita tehtävän nimen pituutta (maks. 255)"
   limit_course_participation_to_term_or_custom_cours_67797a86: "Rajoitetaanko kurssin osallistuminen jaksoon tai mukautettuihin kurssipäiviin?"
   limit_each_time_slot_to_input_value_user_s_47461538: "Rajoita jokaisen tapaamisajan osallistujamäärä %{input_value} henkilöön. "
@@ -12662,6 +12695,7 @@ fi:
   loading_total_grade_for_coursename_b6eff3b6: "Ladataan kokonaisarvosanaa kohteelle %{courseName}"
   loading_unsynced_changes_1b52f725: "Ladataan synkronoimattomia muutoksia..."
   loading_unsynced_changes_b5d7b202: "Ladataan synkronoimattomia muutoksia"
+  local_4ee321b1: Paikallinen
   location_e17bd402: Sijainti
   lock_at_time_3c8a044e: "Lukitaan: %{time}"
   lock_c341af13: Lukitse
@@ -12881,6 +12915,7 @@ fi:
   manage_add_edit_delete_18963dbc: "Hallitse (lisää/muokkaa/poista) "
   manage_add_edit_delete_course_files_162c1a65: "Hallitse (lisää/muokkaa/poista) kurssitiedostoja"
   manage_add_edit_delete_pages_5c73f2fb: "Hallitse sivuja - lisää/muokkaa/poista"
+  manage_all_other_course_content_d77de830: "Hallitse kaikkea muuta kurssin sisältöä"
   manage_app_list_994cc26c: "Hallitse sovellusluetteloa"
   manage_assignment_31a132fb: "Hallitse tehtävää"
   manage_assignments_and_quizzes_170ccaf4: "Hallitse tehtäviä ja testejä"
@@ -12893,7 +12928,9 @@ fi:
       delete_avatar: "Haluatko varmasti poistaa tämän käyttäjän profiilikuvan?"
       lock_avatar: "Tämän kuvan lukitseminen hyväksyy toiminnon ja estää käyttäjää päivittämästä kuvaa.  Jatketaanko?"
   manage_b88f7150: Hallitse
+  manage_blackout_dates_1f67216a: "Hallitse Blackout-päivämääriä"
   manage_comment_library_48f2d123: "Hallitse kommenttikirjastoa"
+  manage_course_content_fc5de138: "Hallitse kurssisisältöä"
   manage_course_files_57e07038: "Hallitse kurssitiedostoja"
   manage_course_sections_f482d1b3: "Hallitse kurssin osioita"
   manage_course_templates_66c00052: "Hallitse kurssimalleja"
@@ -14889,6 +14926,7 @@ fi:
   module_last_to_first_8cdb7a8e: "Moduuli - Viimeisestä ensimmäiseen"
   module_locked_f6a7ea9d: "Moduuli lukittu"
   module_menu_3201af4e: Moduuli-valikko
+  module_menu_modal_6b20c03: "Moduulivalikko (modaali)"
   module_module_name_was_successfully_deleted_fc9e9d47: "Moduulin %{module_name} poisto onnistui."
   module_name_1127ebdb: "Moduulin nimi"
   module_navigation_97043417: "Moduulin navigointi"
@@ -15291,6 +15329,7 @@ fi:
   no_associated_terms_13bacefc: "Ei liitettyjä kausia"
   no_attachments_found_for_the_following_ids_ids_49c9192f: "Liitteitä ei löytynyt seuraaville tunnuksille: %{ids}"
   no_attributes_locked_611c5cc: "ei lukittuja määritteitä"
+  no_blackout_dates_1297ec22: "Ei blackout-päiviä"
   no_broken_links_found_38d951e3: "Ei löytynyt rikkoutuneita linkkejä"
   no_cancel_installation_db8d12d7: "En halua, peruuta asennus"
   no_child_topic_found_b706d56a: "ala-aihetta ei löytynyt"
@@ -17199,6 +17238,7 @@ fi:
           projektia](%{documentation_url}) voit luoda tunnisteen täältä.
       google_drive_description: "Kun annat meille valtuuden nähdä Google Drive -asemasi, voit lähettää tehtäviä suoraan Google Drivesta sekä luoda ja jakaa asiakirjoja luokkatovereidesi kanssa."
       headers: 
+        action: Lisätiedot
         application_abbrev: Sovellus
         dates: Päivämäärät
         delicious_login: Delicious-kirjautuminen
@@ -17213,6 +17253,7 @@ fi:
         other_services: "Muut palvelut"
         purpose: Tarkoitus
         registered_services: "Rekisteröidyt palvelut"
+        remove: Poista
         share_skype_id: "Jaa Skype-tunnuksesi"
         twitter_access: Twitter-käyttöoikeus
         ways_to_log_in: Sisäänkirjautumistavat
@@ -19531,6 +19572,7 @@ fi:
   saving_associations_989bd4da: "Liitoksia tallennetaan"
   saving_associations_complete_e4b9634d: "Liitosten tallennus valmis"
   saving_associations_started_8ac85360: "Liitosten tallennus aloitettu"
+  saving_blackout_dates_be03e6ee: "Blackout-päivämääriä tallennetaan..."
   saving_d55dd90e: Tallennetaan...
   saving_dates_2472a539: "Päivämääriä tallennetaan"
   saving_draft_c97afab3: "Tallenna luonnos"
@@ -19861,6 +19903,7 @@ fi:
   select_a_predefined_color_c77ab2f5: "Valitse esimääritelty väri."
   select_a_provisional_grade_7106e3d5: "Valitse alustava arvosana"
   select_a_student_to_view_281d17b9: "Valitse tarkasteltava opiskelija"
+  select_a_student_to_view_the_page_will_refresh_aut_eaa5d00c: "Valitse tarkasteltava opiskelija. Sivu pävittyy automaattisesti."
   select_all_assignments_bd07b919: "Valitse kaikki tehtävät"
   select_all_count_courses_4fc63811: 
     one: "Valitse (%{count}) kurssi"
@@ -21958,6 +22001,11 @@ fi:
   the_default_report_only_includes_course_section_da_729092f0: "Oletusraportit sisältävät kurssin/osion päivämäärät vain, jos ilmoittautumisrajoitukset ovat käytössä"
   the_discussion_entry_was_successfully_created_7cddf67b: "Keskustelumerkinnän luonti onnistui."
   the_discussion_topic_was_successfully_deleted_d8b93b70: "Keskustelun aiheen poistaminen onnistui."
+  the_download_process_has_started_this_can_take_a_w_cef4bb75: |-
+      Lataus on käynnistetty. Tämä
+                voi kestää jonkin aikaa suurilla kursseilla. Voit lähteä
+                sivulta ja saat sähköpostiviestin, kun lataus
+                on valmis.
   the_download_process_has_started_this_can_take_awh_7e616db1: |-
       Lataus on käynnistetty. Tämä
                 voi kestää jonkin aikaa suurilla kursseilla. Voit lähteä
@@ -22261,6 +22309,7 @@ fi:
   there_was_an_error_retrieving_the_course_image_d7ea094d: "Kurssin kuvan noutamisessa tapahtui virhe"
   there_was_an_error_saving_the_assignment_dates_d31903ab: "Tehtävän päivämäärien tallennuksessa tapahtui virhe."
   there_was_an_error_saving_the_changes_to_the_cours_ed2b1d24: "Muutosten tallentamisessa kurssille ilmeni virhe"
+  there_was_an_error_saving_your_blackout_dates_1efee334: "Blackout-päivämäärien tallennuksessa tapahtui virhe"
   there_was_an_error_saving_your_changes_bfaf3d79: "Muutosten tallennuksessa tapahtui virhe."
   there_was_an_error_setting_usage_rights_53739e1d: "Käyttöoikeuksien määrityksessä ilmeni virhe."
   there_was_an_error_starting_the_save_assignment_da_22ffb6a8: "Tehtävien päivämäärien työn tallennuksen aloittamisessa tapahtui virhe"
@@ -22477,6 +22526,7 @@ fi:
   this_may_take_a_bit_48fe4235: "Tämä saattaa kestää hetken..."
   this_may_take_a_bit_c061d0f6: "tämä saattaa kestää hetken..."
   this_may_take_a_few_minutes_e2df06d6: "Tämä saattaa kestää muutaman minuutin."
+  this_may_take_a_while_d07790f2: "Tämä saattaa kestää hetken..."
   this_message_includes_media_comments_to_listen_or__5fc98641: "Tämä viesti sisältää mediakommentteja. Voit kuunnella tai vastata napsauttamalla tätä linkkiä: %{link}."
   this_message_includes_media_comments_to_listen_or__75ea03a1: "Tämä viesti sisältää mediakommentteja. Voit kuunnella tai vastata napsauttamalla tätä linkkiä:"
   this_message_includes_media_comments_to_listen_or__df72d662: "Tämä viesti sisältää mediakommentteja. Voit kuunnella tai vastata napsauttamalla tätä linkkiä: %{link}.  Kun sallittu, jos sinun täytyy lisätä liite, kirjaudu sisään Canvasiin ja vastaa siellä tehtäväpalautukseen."
@@ -22854,6 +22904,7 @@ fi:
   title_is_unlocked_click_to_lock_6a20cfcb: "%{title} ei ole enää lukittu. Lukitse napsauttamalla."
   title_no_due_date_bbbd3b53: "%{title}: Ei määräpäivää"
   title_outcomes_7adbd9cc: "%{title} Osaamistulokset"
+  title_required_3ff5969: "Otsikko on pakollinen"
   title_separator: ": "
   title_tray_ec9f7488: "%{title} tietopaneeli"
   title_was_successfully_created_f2a07c56: "\"%{title}\" luonti onnistui."
@@ -23643,6 +23694,7 @@ fi:
   unable_to_send_messages_to_users_in_context_name_7d6997b6: "Ei pystytty lähettämään viestejä käyttäjille %{context_name}"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: "Oletusarvosanan määrittäminen ei onnistunut, koska tämän tehtävän määräpäivä on suljetulla arvosanojen antojaksolla vähintään yhdelle opiskelijalle."
   unable_to_set_up_drag_and_drop_for_modules_4d339f1d: "Vedä ja pudota -moduuleiden määrittäminen ei onnistunut"
+  unable_to_switch_students_b901bc4b: "Opiskelijoiden vaihtaminen ei onnistu"
   unable_to_toggle_placement_833db6ff: "Sijoituksen vaihto ei onnistu"
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "Tiedoston siirto tallennuspalveluun epäonnistui. Palvelu saattaa olla alhaalla tai sinun täytyy ehkä kirjautua uudelleen Canvasiin."
   unable_to_update_microsoft_teams_sync_settings_ple_64255854: "Nykyisten Microsoft Teams Sync -asetusten päivitys ei onnistunut. Yritä uudelleen. Jos ongelma jatkuu, ota yhteyttä tukeen."
@@ -23722,6 +23774,7 @@ fi:
   unknown_user_url_82196ba7: "Tuntemattoman käyttäjän URL"
   unlike_post_1b20a02c: "Älä tykkää lähetyksestä"
   unlike_post_from_author_5e2c13c5: "Toisin kuin lähetys kohteesta %{author}"
+  unlike_this_entry_f22e8d45: "Älä tykkää tästä merkinnästä"
   unlimited_attempts_81a37d4: "Rajoittamattomasti yrityksiä"
   unlimited_ff19e96d: Rajoittamaton
   unlock_at_bb930b34: "Poista lukitus päivänä"
@@ -24414,6 +24467,7 @@ fi:
   users_with_no_enrollments_5dddce33: "Käyttäjät, joilla ei ole ilmoittautumisia"
   users_with_this_permission_may_be_able_to_use_the__84394072: "Käyttäjät, joilla on tämä lupa, saattavat pystyä käyttämään Toimi ominaisuutena tilin asetusten hallintaa, arvosanojen tarkastelemiseen ja säätelyyn, käyttäjätietojen käyttöön, jne.Tämän käyttöoikeuden avulla alitileille nimetyt järjestelmäkäyttäjät voivat myös käyttää asetuksia ja tietoja heidän alitilejensä ulkopuolelle."
   uses_the_new_scheduler_and_its_functionality_b07e9b14: "Käyttää uutta aikatauluttajaa ja sen toiminnollisuutta"
+  utc_e44049af: UTC
   validate: 
     is_required: "Tämä kenttä vaaditaan"
   validate_links_in_content_b1630fba: "Vahvista linkit sisällössä"
@@ -24440,6 +24494,7 @@ fi:
   video_conferencing_tools_enable_face_to_face_conne_144420a5: "Videokonferenssityökalu mahdollistaa yhteyden kasvoista kasvoihin opettajien ja oppilaiden välillä."
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Laitteesi tai sovelluksesi ei tue videosisältöä."
   video_player_b371005: Videosoitin
+  video_player_for_label_6a5fdb03: "Videonauhuri kohteelle %{label}"
   vietnam_84_e50a2a44: "Vietnam (+84)"
   vietnamese_e7a76583: vietnam
   view_all_e13bf0a6: "Näytä kaikki"
@@ -24497,6 +24552,7 @@ fi:
   view_the_discussion_link_c4dbdef: "Näytä keskustelu: %{link}."
   view_the_reply_in_the_discussion_4c698ff9: "Tarkastele vastausta keskustelussa:"
   view_this_message_in_conversations_5a16bc9f: "Tarkastele tätä Viesteissä."
+  view_timestamps_in_time_zone_9b699a8b: "Näytä aikaleimat aikavyöhykkeessä"
   view_toolname_placements_4a5724d1: "Näytä %{toolName} sijoitukset"
   view_ungraded_as_0_1a9631a1: "Näytä arvosanaton arvolla 0"
   view_ungraded_as_0_a9e87a54: "Näytä arvosanaton arvolla 0."
@@ -24664,6 +24720,7 @@ fi:
       Kun tämä on käytössä, painikkeiden ja kuvakkeiden rajaustoiminto, kurssikuvien
       lähde ja latauslivan lähde kytkeytyvät päälle.
   when_hiding_grades_for_anonymous_assignments_grade_1b0ef682: "Kun nimettömien tehtävien arvosanat piilotetaan, piilotetaan ne kaikilta kurssilla olevilta. Nimettömyys otetaan uudelleen käyttöön."
+  when_masquerading_as_course_admin_roles_teacher_ta_e3e3c0a9: "Kun naamioidutaan kurssin pääkäyttäjän rooleissa (opettaja-/apuopettaja-/suunnittelijapohjainen rooli), Canvas varmistaa, että naamioituvala opiskelijalla on kaikki samat (tai enemmän) käyttöoikeuksia kuin kohdekäyttäjällä."
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Kun osallistujat menevät kurssille, on tämä sivu se, jonka he näkevät ensimmäisenä.  Voit määrittää sen näyttämään viimeaikaiset kurssitapahtumat, listan kurssin moduuleista, opinto-ohjelman tai itse laatimasi mukautetun sivun.  Oletusasetuksena on kurssin viimeaikaisten tapahtumien listaus."
   when_people_visit_your_course_this_is_the_first_pa_5093ec45: |-
       Kun henkilöt käyvät kurssisivustollasi, tämä on sivu, jonka he näkevät ensimmäiseksi.
@@ -25086,6 +25143,7 @@ fi:
   you_must_provide_a_date_with_a_time_ec369ff4: "Sinun täytyy antaa päivämäärä ja aika."
   you_must_provide_a_tenant_and_login_attribute_to_e_684cc13b: "Sinun täytyy antaa vuokralaisen ja sisäänkirjautumisen määrite käyttöön otetulle Microsoft Teams -synkronisaatiolle"
   you_must_provide_a_value_or_unselect_the_option_3b28b754: "Sinun täytyy antaa arvo tai poistaa valinta vaihtoehdosta."
+  you_must_provide_required_fields_before_adding_6717073d: "Sinun on annettava vaaditut kentät ennen lisäämistä"
   you_must_provide_targetgroupid_or_targetcontextid__dd2bf92: "Sinun täytyy toimittaa targetGroupId tai targetContextId ja targetContextType"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Sinun täytyy valita kurssi, josta kopioidaan sisältöä"
   you_must_select_a_folder_to_upload_your_migration__ac7bc7c0: "Sinun täytyy valita kansio, johon lataat siirtosi"
