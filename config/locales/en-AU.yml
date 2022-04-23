@@ -1657,7 +1657,7 @@ en-AU:
       import_failed_message: "There was an error importing your SIS data."
       import_failed_with_messages_message: "The import failed with these messages:"
       import_log_title: "Import Progress Log"
-      import_started_message: "The import process has started! This can take awhile if there is a lot to import. You can leave the page and come back."
+      import_started_message: "The import process has started! This can take a while if there is a lot to import. You can leave the page and come back."
       import_type_label: "Import type"
       imported_message: "All SIS data was successfully imported."
       imported_with_messages_message: "The SIS data was imported but with these messages:"
@@ -1914,6 +1914,7 @@ en-AU:
   add_account_admins_99c03c9e: "Add Account Admins"
   add_additional_comments_ec34a62f: "Add Additional Comments"
   add_alert_b2729c99: "Add Alert"
+  add_all_other_course_content_97c552b2: "Add all other course content"
   add_all_outcomes_6a12d08e: "Add All Outcomes"
   add_an_assignment_fb73942e: "Add an assignment"
   add_an_attachment_b2e9092f: "Add an attachment"
@@ -1930,6 +1931,7 @@ en-AU:
   add_attribute_6d6d4a65: "Add Attribute"
   add_bank: 
     default_name: "No Name"
+  add_blackout_dates_ui_to_course_pacing_requires_co_1b675701: "Add blackout dates UI to course pacing. Requires course_paces enabled."
   add_cc_subtitle_a9ef4a66: "Add CC/Subtitle"
   add_collaboration_da9665ac: "Add Collaboration"
   add_comment_3205529f: "Add Comment"
@@ -1970,6 +1972,7 @@ en-AU:
   add_grading_period_6f774dc3: "Add Grading Period"
   add_grading_scheme_81e23c05: " Add grading scheme"
   add_grading_scheme_to_admin_grade_reports_23eb8c6e: "Add Grading Scheme to Admin Grade Reports"
+  add_granularity_to_permissions_around_managing_all_129149da: "Add granularity to permissions around managing all other course content"
   add_granularity_to_permissions_around_managing_cou_1ee88f6: "Add granularity to permissions around managing courses, i.e., Add / Edit / Delete"
   add_granularity_to_permissions_around_managing_cou_2244c94a: "Add granularity to permissions around managing course files"
   add_granularity_to_permissions_around_managing_cou_4a5bc486: "Add granularity to permissions around managing course sections"
@@ -4571,6 +4574,7 @@ en-AU:
   audio_1c89b0c8: audio
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "Audio content is not supported by your device or app."
   audio_dd489fcc: Audio
+  audio_player_for_label_dd9a6819: "Audio player for %{label}"
   australia_61_eb9bb701: "Australia (+61)"
   australia_e8d44bf8: Australia
   austria_43_7bc58b34: "Austria (+43)"
@@ -4839,6 +4843,9 @@ en-AU:
     recording_setting_enabled_description: "Enable recording for this conference."
   blackboard: 
     no_manifest: "This Blackboard .zip has no imsmanifest.xml file in the root directory."
+  blackout_date_title_was_added_ec8bf15e: "Blackout date %{title} was added."
+  blackout_date_title_was_deleted_e8cc238b: "Blackout date %{title} was deleted."
+  blackout_date_title_was_edited_31752bc9: "Blackout date %{title} was edited."
   blackout_dates_4a140a72: "Blackout Dates"
   blank_38df4238: blank
   blocked_by_running_migration_d8a57cb7: "Blocked by running migration"
@@ -5625,6 +5632,7 @@ en-AU:
   cannot_delete_an_override_with_a_due_date_within_a_fa94ca3b: "Cannot delete an override with a due date within a closed grading period"
   cannot_give_outcomes_extra_credit_696208f0: "Cannot give outcomes extra credit"
   cannot_grade_at_this_time_489744b0: "Cannot grade at this time"
+  cannot_have_a_blueprint_course_with_observers_d00b3deb: "Cannot have a blueprint course with observers"
   cannot_have_a_blueprint_course_with_students_248e3e76: "Cannot have a blueprint course with students"
   cannot_import_a_root_group_d4654def: "cannot import a root group"
   cannot_import_to_other_courses_af885742: "Cannot import to other courses"
@@ -5817,6 +5825,8 @@ en-AU:
   changing_course_dates_may_override_term_availabili_d92b10de: "Changing course dates may override term availability settings and placement in the Courses page and Dashboard. Please confirm term dates before modifying course dates."
   changing_course_pacing_days_may_modify_due_dates_9009aecd: "Changing course pacing days may modify due dates."
   changing_section_dates_may_override_course_and_ter_6634950e: "Changing section dates may override course and term availability settings and placement in the Courses page and Dashboard. Please confirm term and course dates before modifying section dates."
+  changing_the_course_participation_will_republish_a_1cc05b7: "Changing the course participation will republish all course pacing with any new dates using term participation."
+  changing_the_course_participation_will_republish_a_5715b0d5: "Changing the course participation will republish all course pacing with any new dates."
   changing_the_late_policy_will_affect_previously_gr_49071db7: "Changing the late policy will affect previously graded submissions."
   changing_the_tenant_will_delete_existing_groups_f86c48dc: "Changing the tenant will delete existing groups."
   changing_your_policy_now_will_affect_previously_gr_62063898: "Changing your policy now will affect previously graded submissions."
@@ -5826,6 +5836,7 @@ en-AU:
   chcp_student_activity_report_5611dd39: "CHCP Student Activity Report"
   check_back_in_a_little_while_17756399: "Check back in a little while."
   check_back_later_c4234dbc: "Check back later"
+  check_permissions_when_masquerading_as_course_admi_ded7106c: "Check permissions when Masquerading as Course Admins"
   check_services_to_enable_8877c451: "Check Services to enable"
   check_submission_file_type_b3dbf3fd: "Check Submission File Type"
   check_this_box_to_add_posts_with_specific_phrase_i_d473aeeb: "Check this box to add posts with a specific phrase in the title using text box below"
@@ -6296,6 +6307,7 @@ en-AU:
     contingency_30_minute_quickstart: "https://community.canvaslms.com/t5/Contingency-Planning/Set-Up-Your-Canvas-Course-in-30-minutes-or-Less/ba-p/258437"
     contingency_covid: "https://community.canvaslms.com/t5/Contingency-Planning/gh-p/contingency"
     contingency_web_conferencing: "https://community.canvaslms.com/t5/Contingency-Planning/Web-Conferencing-Resources/ba-p/262674"
+    course_pacing: "https://community.canvaslms.com/t5/Course-Pacing-Feature-Preview/gh-p/course_pacing"
     guides_by_product: "https://community.canvaslms.com/t5/Guides/ct-p/guides"
     guides_home: "https://community.canvaslms.com/t5/Canvas/ct-p/canvas"
     idea_conversations: "https://community.canvaslms.com/t5/Idea-Conversations/idb-p/ideas"
@@ -6584,7 +6596,7 @@ en-AU:
         download_qti: "QTI Export from %{date}: *Click here to download*"
         download_user_export: "User Data Export from %{date}: *Click here to download*"
       message: 
-        export_started: "The export process has started. This can take awhile for large courses. *You can leave the page* and you'll get an email when the export is complete."
+        export_started: "The export process has started. This can take a while for large courses. *You can leave the page* and you'll get an email when the export is complete."
       no_submissions: "You currently have no submissions to export."
       user_data_exports: "Download Submissions"
     labels: 
@@ -7808,9 +7820,12 @@ en-AU:
   course_concluded_unable_to_send_messages_b99b6b6d: "Course concluded, unable to send messages"
   course_conferences_3d914c96: "Course Conferences"
   course_content_a92eca20: "Course Content"
+  course_content_add_355fab78: "Course Content - add"
   course_content_add_edit_delete_ea877eca: "Course Content - add / edit / delete"
+  course_content_delete_b6e7cfd9: "Course Content - delete"
   course_content_download_from_3c8c6c01: "Course Content Download from"
   course_content_downloads_6cb31802: "Course Content Downloads"
+  course_content_edit_7a3effc3: "Course Content - edit"
   course_content_view_5f68a57: "Course Content - view"
   course_copy_argument_error: "A course copy requires a source course."
   course_copy_description: "Migration plugin for copying canvas courses"
@@ -7999,8 +8014,14 @@ en-AU:
   course_pace_4dfc7ef3: "Course Pace"
   course_pace_plan_c79cbffc: "Course Pace Plan"
   course_paces_4396b508: "Course Paces"
+  course_paces_description: |-
+      Course Pacing adds support for rolling enrolments to Canvas;
+      allowing magical distribution of due dates for students with different
+      start dates based on an instructor's defined pace. Learn more and give
+      feedback by joining the *Course Pacing User Group*.
   course_pacing_40c14b61: "Course Pacing"
   course_pacing_adds_support_for_rolling_enrollments_3331cbaa: "Course Pacing adds support for rolling enrolments to Canvas; allowing magical distribution of due dates for students with different start dates based on an instructor's defined pace. Learn more and give feedback by joining the Course Pacing User Group."
+  course_pacing_blackout_dates_1dfc8b61: "Course pacing blackout dates"
   course_pacing_is_in_active_development_348e33cf: "Course Pacing is in active development."
   course_pages_449f1dd4: "Course Pages"
   course_participation_and_access_settings_7a3d6297: "Course Participation and Access Settings"
@@ -8456,6 +8477,7 @@ en-AU:
         blueprint_course: "Blueprint Course"
         card_image: "Card Image"
         conclude_at: Ends
+        conditional_release: "Mastery Paths"
         course_code: "Course Code"
         course_color: Colour
         course_description: Description
@@ -9142,6 +9164,7 @@ en-AU:
   date_created_createdat_265a0dfa: "date created: %{createdAt}"
   date_ee500367: Date
   date_error_7b38f8ff: "Date Error"
+  date_filter_is_in_effect_4363df73: "Date filter is in effect"
   date_is_after_course_end_date_94a2f4e3: "Date is after course end date"
   date_is_after_the_course_end_date_95bf9b6a: "Date is after the course end date"
   date_is_after_the_specified_end_date_ae34a72f: "Date is after the specified end date"
@@ -9155,6 +9178,9 @@ en-AU:
   date_modified_e1c8ac8f: "Date Modified"
   date_modified_modifiedat_b839cc8b: "date modified: %{modifiedAt}"
   date_of_most_recent_bounce_b23d0119: "Date of most recent bounce"
+  date_required_a74e077c: "Date required"
+  date_time_options_7abcdea7: "Date/Time Options"
+  date_time_options_b501e73b: "Date/Time options"
   datepicker: 
     errors: 
       not_a_date: "That's not a date!"
@@ -9252,6 +9278,7 @@ en-AU:
   delete_a6efa79d: Delete
   delete_account_name_96aee330: "Delete %{account_name}"
   delete_alignment_f33c97d5: "Delete alignment"
+  delete_all_other_course_content_721e0ae3: "Delete all other course content"
   delete_announcement_title_756a9d1f: "Delete announcement %{title}"
   delete_assignment_5d3f3f15: "delete assignment"
   delete_assignment_group_7c3b01c4: Delete
@@ -9619,9 +9646,7 @@ en-AU:
   disabling_the_assignments_and_quizzes_delete_permi_ad890eb3: "Disabling the Assignments and Quizzes - delete permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from deleting rubrics for an individual assignment."
   disabling_the_assignments_and_quizzes_edit_permiss_529f9360: "Disabling the Assignments and Quizzes - edit permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing users from editing rubrics from an individual assignment."
   disabling_the_elementary_theme_will_change_the_fon_d7f31a3b: "Disabling the Elementary Theme will change the font in the Canvas interface for all users in your course."
-  disabling_the_mastery_paths_feature_will_release_c_4b96c86d: |-
-      Disabling the Mastery Paths feature will release configured assignments and content to all students.
-                        If the feature is re-enabled, these assignments will need to be configured for Mastery Paths again.
+  disabling_the_mastery_paths_feature_will_release_c_4b96c86d: "Disabling the Mastery Paths feature will release configured assignments and content to all students. If the feature is re-enabled, these assignments will need to be configured for Mastery Paths again."
   disabling_this_permission_will_override_if_enabled_59c2b5c9: "Disabling this permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from creating or editing rubrics from an individual assignment."
   disabling_this_permission_will_override_if_enabled_6481b015: "Disabling this permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from creating or editing rubrics from an individual assignment. However, if Learning Outcomes - add / edit / delete is enabled, user can still add rubrics via Outcomes (Manage Rubrics button)."
   disabling_this_permission_will_override_if_enabled_7f2a87cc: "Disabling this permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from creating or editing rubrics from an individual assignment. However, if Learning Outcomes - add / edit / delete is enabled, user can still add rubrics via user can still add rubrics via Outcomes (Manage Rubrics button)."
@@ -10270,6 +10295,7 @@ en-AU:
   ecuador_593_dfcc235a: "Ecuador (+593)"
   ecuador_811f2a77: Ecuador
   edit_account_name_for_account_name_ae3633e8: "Edit Account Name for %{account_name}"
+  edit_all_other_course_content_c8dd98d3: "Edit all other course content"
   edit_and_delete_their_own_posts_f4f7cc6: "Edit and delete their own posts"
   edit_and_delete_their_own_replies_e5b9d793: "Edit and delete their own replies"
   edit_announcement_title_cce0b4e: "Edit announcement %{title}"
@@ -10502,6 +10528,7 @@ en-AU:
   enable_gradezilla_name_is_only_a_placeholder_as_it_34afd9f1: "Enable Gradezilla (name is only a placeholder as it will replace Gradebook in the future)."
   enable_gravatar_8a865b41: "Enable Gravatar"
   enable_i18n_features_in_outcomes_exports_64bcf82b: "Enable i18n features in outcomes exports"
+  enable_individual_learning_paths_for_students_base_5236d3bb: "Enable individual learning paths for students based on assessment"
   enable_migrating_item_banks_to_new_quizzes_during__af6ca020: "Enable migrating item banks to New Quizzes during course import/copy"
   enable_moderated_grading_bacd20d8: "Enable moderated grading."
   enable_moderated_grading_only_relevant_if_the_anon_1dcdc47b: "Enable moderated grading. Only relevant if the Anonymous Moderated Marking flag is enabled."
@@ -11730,6 +11757,7 @@ en-AU:
   filter_e3398407: Filter
   filter_features_388eafd8: "Filter Features"
   filter_ip_addresses_2f296bd2: "Filter IP Addresses"
+  filter_jobs_by_date_202eb267: "Filter jobs by date"
   filter_messages_by_course_21a53fc4: "Filter messages by course"
   filter_observer_dashboard_by_student_5705ff33: "Filter observer dashboard by student"
   filter_recent_user_accesses_by_term_30812659: "Filter recent user accesses by term."
@@ -12014,6 +12042,7 @@ en-AU:
   grade_for_missing_submissions_56f91c83: "Grade for missing submissions"
   grade_for_name_b9df168a: "Grade for: %{name}"
   grade_for_studentname_d124b199: "Grade for %{studentName}"
+  grade_for_ungraded_artifacts_d0b6fb57: "Grade for ungraded artefacts"
   grade_for_ungraded_submissions_59f72299: "Grade for ungraded submissions"
   grade_grade_7e52dd1c: "Grade: %{grade}"
   grade_high_to_low_1cea0381: "Grade - High to Low"
@@ -12923,6 +12952,7 @@ en-AU:
   granular_permissions_for_add_remove_admin_roles_fr_9a06a75d: "Granular permissions for Add/Remove admin roles from Course"
   granular_permissions_for_add_remove_roles_from_cou_b0a34301: "Granular permissions for Add/Remove roles from Course"
   granular_permissions_for_assignments_and_quizzes_6b3bddc6: "Granular permissions for assignments and quizzes"
+  granular_permissions_for_managing_course_content_91375668: "Granular permissions for managing course content"
   granular_permissions_for_managing_course_files_1ed7f019: "Granular permissions for managing course files"
   granular_permissions_for_managing_course_sections_da4b04b: "Granular permissions for managing course sections"
   granular_permissions_for_managing_courses_a71be71d: "Granular permissions for managing courses"
@@ -13216,6 +13246,7 @@ en-AU:
       heading_current_groups: "Current Groups"
       heading_previous_groups: "Previous Groups"
       no_groups: "No Groups"
+      no_groupsheading: Groups
     loading: "loading group roster..."
     manage: 
       add_unassigned_menu: 
@@ -13602,6 +13633,7 @@ en-AU:
   hide_all_artifacts_d654fbd5: "Hide All Artifacts"
   hide_all_details_61d7ebb: "Hide All Details"
   hide_all_recipients_1ca02da6: "Hide all recipients"
+  hide_assignment_group_totals_f4fb8660: "Hide Assignment Group Totals"
   hide_correct_answers_at_2421b0aa: "Hide Correct Answers at"
   hide_correct_answers_at_b1a59408: "Hide Correct Answers At"
   hide_course_sections_for_course_name_bd1911af: "Hide course sections for course %{name}"
@@ -15002,6 +15034,7 @@ en-AU:
   like_count_count_9467dc82: "Like count: %{count}"
   like_post_dbf48764: "Like post"
   like_post_from_author_79b874f1: "Like post from %{author}"
+  like_this_entry_60da41a5: "Like this Entry"
   limit_assignment_names_lengths_max_255_5ee9ebb5: "Limit assignment names lengths (max 255)"
   limit_course_participation_to_term_or_custom_cours_67797a86: "Limit course participation to term or custom course dates?"
   limit_each_time_slot_to_input_value_user_s_47461538: "Limit each time slot to %{input_value} user(s). "
@@ -15190,6 +15223,7 @@ en-AU:
   loading_unsynced_changes_1b52f725: "Loading unsynced changes..."
   loading_unsynced_changes_b5d7b202: "Loading Unsynced Changes"
   loading_unsynched_changes_688434f2: "Loading Unsynched Changes"
+  local_4ee321b1: Local
   locales: 
     en-AU: "English (Australia)"
   location_e17bd402: Location
@@ -15444,6 +15478,7 @@ en-AU:
   manage_add_edit_delete_18963dbc: "Manage (add / edit / delete) "
   manage_add_edit_delete_course_files_162c1a65: "Manage (add / edit / delete) course files"
   manage_add_edit_delete_pages_5c73f2fb: "Manage (add / edit / delete) pages"
+  manage_all_other_course_content_d77de830: "Manage all other course content"
   manage_announcement_with_title_title_f2ce92de: "Manage announcement with title %{title}"
   manage_app_list_994cc26c: "Manage App List"
   manage_assignment_31a132fb: "Manage Assignment"
@@ -15457,7 +15492,9 @@ en-AU:
       delete_avatar: "Are you sure you want to delete this user's profile pic?"
       lock_avatar: "Locking this picture will approve it and prevent the user from updating it.  Continue?"
   manage_b88f7150: Manage
+  manage_blackout_dates_1f67216a: "Manage Blackout Dates"
   manage_comment_library_48f2d123: "Manage Comment Library"
+  manage_course_content_fc5de138: "Manage Course Content"
   manage_course_files_57e07038: "Manage Course Files"
   manage_course_sections_f482d1b3: "Manage Course Sections"
   manage_course_templates_66c00052: "Manage Course Templates"
@@ -17743,6 +17780,7 @@ en-AU:
   module_last_to_first_8cdb7a8e: "Module - Last to First"
   module_locked_f6a7ea9d: "Module Locked"
   module_menu_3201af4e: "Module Menu"
+  module_menu_modal_6b20c03: "Module Menu (Modal)"
   module_module_name_was_successfully_deleted_fc9e9d47: "Module %{module_name} was successfully deleted."
   module_name_1127ebdb: "Module Name"
   module_navigation_97043417: "Module Navigation"
@@ -18308,6 +18346,7 @@ en-AU:
   no_associated_terms_13bacefc: "No Associated Terms"
   no_attachments_found_for_the_following_ids_ids_49c9192f: "No attachments found for the following ids: %{ids}"
   no_attributes_locked_611c5cc: "no attributes locked"
+  no_blackout_dates_1297ec22: "No blackout dates"
   no_broken_links_found_38d951e3: "No broken links found"
   no_cancel_installation_db8d12d7: "No, Cancel Installation"
   no_child_topic_found_b706d56a: "no child topic found"
@@ -20408,6 +20447,7 @@ en-AU:
       google_docs_description: "Once you authorize us to see your Google Docs you'll be able to submit your assignments directly from Google Docs, and create and share documents with members of your classes."
       google_drive_description: "Once you authorise us to see your Google Drive you'll be able to submit your assignments directly from Google Drive, and create and share documents with members of your classes."
       headers: 
+        action: Details
         application_abbrev: App
         dates: Dates
         delicious_login: "Delicious Login"
@@ -20423,6 +20463,7 @@ en-AU:
         other_services: "Other Services"
         purpose: Purpose
         registered_services: "Registered Services"
+        remove: Remove
         share_skype_id: "Share your Skype ID"
         twitter_access: "Twitter Access"
         users_profile: "%{user}'s Settings"
@@ -23163,6 +23204,7 @@ en-AU:
   saving_associations_989bd4da: "Saving Associations"
   saving_associations_complete_e4b9634d: "Saving associations complete"
   saving_associations_started_8ac85360: "Saving associations started"
+  saving_blackout_dates_be03e6ee: "Saving blackout dates..."
   saving_d55dd90e: Saving...
   saving_dates_2472a539: "Saving Dates"
   saving_draft_c97afab3: "Saving Draft"
@@ -23528,6 +23570,7 @@ en-AU:
   select_a_predefined_color_c77ab2f5: "Select a predefined colour."
   select_a_provisional_grade_7106e3d5: "Select a provisional grade"
   select_a_student_to_view_281d17b9: "Select a student to view"
+  select_a_student_to_view_the_page_will_refresh_aut_eaa5d00c: "Select a student to view. The page will refresh automatically."
   select_all_assignments_bd07b919: "Select all assignments"
   select_all_count_9ad54aa1: "Select All (%{count})"
   select_all_count_courses_4fc63811: 
@@ -26001,6 +26044,11 @@ en-AU:
   the_default_report_only_includes_course_section_da_729092f0: "The default report only includes Course/Section dates if Enrolment restrictions are enabled"
   the_discussion_entry_was_successfully_created_7cddf67b: "The discussion entry was successfully created."
   the_discussion_topic_was_successfully_deleted_d8b93b70: "The discussion topic was successfully deleted."
+  the_download_process_has_started_this_can_take_a_w_cef4bb75: |-
+      The download process has started. This
+                can take a while for large courses. You can leave the
+                page and you'll get a notification when the download
+                is complete.
   the_download_process_has_started_this_can_take_awh_7e616db1: |-
       The download process has started. This
                 can take awhile for large courses. You can leave the
@@ -26327,6 +26375,7 @@ en-AU:
   there_was_an_error_saving_the_assignment_dates_d31903ab: "There was an error saving the assignment dates."
   there_was_an_error_saving_the_changes_to_the_cours_ed2b1d24: "There was an error saving the changes to the course."
   there_was_an_error_saving_the_note_please_try_agai_f2f2cd38: "There was an error saving the note. Please try again."
+  there_was_an_error_saving_your_blackout_dates_1efee334: "There was an error saving your blackout dates"
   there_was_an_error_saving_your_changes_bfaf3d79: "There was an error saving your changes."
   there_was_an_error_setting_usage_rights_53739e1d: "There was an error setting usage rights."
   there_was_an_error_starting_the_save_assignment_da_22ffb6a8: "There was an error starting the save assignment dates job"
@@ -26571,6 +26620,7 @@ en-AU:
   this_may_take_a_bit_48fe4235: "This may take a bit..."
   this_may_take_a_bit_c061d0f6: "this may take a bit..."
   this_may_take_a_few_minutes_e2df06d6: "This may take a few minutes."
+  this_may_take_a_while_d07790f2: "This may take a while..."
   this_message_includes_media_comments_to_listen_or__5fc98641: "This message includes media comments. To listen or reply, click this link: %{link}."
   this_message_includes_media_comments_to_listen_or__75ea03a1: "This message includes media comments. To listen or reply, click the link below:"
   this_message_includes_media_comments_to_listen_or__df72d662: "This message includes media comments. To listen or reply, click this link: %{link}.  When allowed, if you need to include an attachment, please log in to Canvas and reply to the submission."
@@ -26964,6 +27014,7 @@ en-AU:
   title_is_unlocked_click_to_lock_6a20cfcb: "%{title} is unlocked. Click to lock."
   title_no_due_date_bbbd3b53: "%{title}: No Due Date"
   title_outcomes_7adbd9cc: "%{title} Outcomes"
+  title_required_3ff5969: "Title required"
   title_separator: ": "
   title_tray_ec9f7488: "%{title} tray"
   title_was_successfully_created_f2a07c56: "\"%{title}\" was successfully created."
@@ -27795,6 +27846,7 @@ en-AU:
   unable_to_send_messages_to_users_in_context_name_7d6997b6: "Unable to send messages to users in %{context_name}"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: "Unable to set default mark because this assignment is due in a closed grading period for at least one student"
   unable_to_set_up_drag_and_drop_for_modules_4d339f1d: "Unable to set up drag and drop for modules"
+  unable_to_switch_students_b901bc4b: "Unable to switch students"
   unable_to_toggle_placement_833db6ff: "Unable to toggle placement"
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "Unable to transmit file to the storage service. The service may be down or you may need to re-login to Canvas."
   unable_to_update_microsoft_teams_sync_settings_ple_64255854: "Unable to update Microsoft Teams Sync settings. Please try again. If the issue persists, please contact support."
@@ -27879,6 +27931,7 @@ en-AU:
   unknown_user_url_82196ba7: "Unknown User URL"
   unlike_post_1b20a02c: "Unlike post"
   unlike_post_from_author_5e2c13c5: "Unlike post from %{author}"
+  unlike_this_entry_f22e8d45: "Unlike this Entry"
   unlimited_attempts_81a37d4: "Unlimited Attempts"
   unlimited_ff19e96d: Unlimited
   unlock_562bc4cb: Unlock
@@ -28679,6 +28732,7 @@ en-AU:
   users_with_no_enrollments_5dddce33: "Users with no enrolments"
   users_with_this_permission_may_be_able_to_use_the__84394072: "Users with this permission may be able to use the Act as feature to manage account settings, view and adjust grades, access user information, etc. This permission also allows admins designated to a sub-account to access settings and information outside of their sub-account."
   uses_the_new_scheduler_and_its_functionality_b07e9b14: "Uses the new scheduler and its functionality"
+  utc_e44049af: UTC
   validate: 
     is_required: "This field is required"
   validate_links_in_content_b1630fba: "Validate Links in Content"
@@ -28705,6 +28759,7 @@ en-AU:
   video_conferencing_tools_enable_face_to_face_conne_144420a5: "Video conferencing tools enable face-to-face connection between teachers and students."
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Video content is not supported by your device or app."
   video_player_b371005: "Video Player"
+  video_player_for_label_6a5fdb03: "Video player for %{label}"
   vietnam_84_e50a2a44: "Vietnam (+84)"
   vietnamese_e7a76583: Vietnamese
   view_all_e13bf0a6: "View All"
@@ -28772,6 +28827,7 @@ en-AU:
   view_the_discussion_link_c4dbdef: "View the discussion: %{link}."
   view_the_reply_in_the_discussion_4c698ff9: "View the reply in the discussion:"
   view_this_message_in_conversations_5a16bc9f: "View this message in Conversations"
+  view_timestamps_in_time_zone_9b699a8b: "View timestamps in time zone"
   view_toolname_placements_4a5724d1: "View %{toolName} Placements"
   view_ungraded_as_0_1a9631a1: "View Ungraded as 0"
   view_ungraded_as_0_a9e87a54: "View ungraded as 0"
@@ -28955,6 +29011,7 @@ en-AU:
       When enabled, turns on the Button & Icons image cropper, course images
       source, and upload image source.
   when_hiding_grades_for_anonymous_assignments_grade_1b0ef682: "When hiding grades for anonymous assignments, grades will be hidden for everyone in the course. Anonymity will be re-applied."
+  when_masquerading_as_course_admin_roles_teacher_ta_e3e3c0a9: "When masquerading as Course Admin Roles (Teacher/TA/Designer base role), Canvas will ensure the masquerading user has all of the same (or more) permissions as the target user."
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "When people visit the course, this is the page they'll see.  You can set it to show an activity stream, the list of course modules, a syllabus, or a custom page you write yourself.  The default is the course activity stream."
   when_people_visit_your_course_this_is_the_first_pa_5093ec45: |-
       When people visit your course, this is the first page they'll see.
@@ -29425,6 +29482,7 @@ en-AU:
   you_must_provide_a_date_with_a_time_ec369ff4: "You must provide a date with a time."
   you_must_provide_a_tenant_and_login_attribute_to_e_684cc13b: "You must provide a tenant and login attribute to enabled Microsoft Teams sync"
   you_must_provide_a_value_or_unselect_the_option_3b28b754: "You must provide a value or unselect the option."
+  you_must_provide_required_fields_before_adding_6717073d: "You must provide required fields before adding"
   you_must_provide_targetgroupid_or_targetcontextid__dd2bf92: "You must provide targetGroupId or targetContextId and targetContextType"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "You must select a course to copy content from"
   you_must_select_a_folder_to_upload_your_migration__ac7bc7c0: "You must select a folder to upload your migration to"
