@@ -1656,7 +1656,7 @@ ja:
       import_failed_message: "SIS データ読み込み中にエラーがありました。"
       import_failed_with_messages_message: 次のメッセージのインポートに失敗しました：
       import_log_title: インポートの進捗ログ
-      import_started_message: インポートの処理を開始します!インポートするデータが多い場合、処理に時間がかかる場合があります。しばらく他のページに移動していても構いません。
+      import_started_message: インポートプロセスが開始しました！インポートするデータが多い場合には、しばらく時間がかかることがあります。一旦ページを閉じて、戻ってくることができます。
       import_type_label: インポートのタイプ
       imported_message: "すべての SIS データが正常にインポートされました。"
       imported_with_messages_message: "SIS データはインポートされましたが、以下のメッセージが発行されました。"
@@ -1913,6 +1913,7 @@ ja:
   add_account_admins_99c03c9e: アカウント管理者の追加
   add_additional_comments_ec34a62f: 追加のコメントを追加
   add_alert_b2729c99: アラートの追加
+  add_all_other_course_content_97c552b2: 他のすべてのコースコンテンツを追加する
   add_all_outcomes_6a12d08e: すべてのアウトカムを追加する
   add_an_assignment_fb73942e: 課題の追加
   add_an_attachment_b2e9092f: 添付ファイルの追加
@@ -1929,6 +1930,7 @@ ja:
   add_attribute_6d6d4a65: 属性を追加
   add_bank: 
     default_name: 名称がありません
+  add_blackout_dates_ui_to_course_pacing_requires_co_1b675701: コースのペーシングにブラックアウトの日付UIを追加します。course_pacesを有効化する必要があります。
   add_cc_subtitle_a9ef4a66: "CC /字幕を追加"
   add_collaboration_da9665ac: コラボレーションの追加
   add_comment_3205529f: コメントを追加
@@ -1969,6 +1971,7 @@ ja:
   add_grading_period_6f774dc3: 採点期間を追加
   add_grading_scheme_81e23c05: 採点スキームを追加
   add_grading_scheme_to_admin_grade_reports_23eb8c6e: 管理者成績レポートに採点スキームを追加
+  add_granularity_to_permissions_around_managing_all_129149da: 他のすべてのコースコンテンツの管理に関する権限に粒度を追加する
   add_granularity_to_permissions_around_managing_cou_1ee88f6: コースの管理に関する権限に粒度を追加します。つまり、追加/編集/削除
   add_granularity_to_permissions_around_managing_cou_2244c94a: コースファイルの管理に関する権限をさらに詳細にする
   add_granularity_to_permissions_around_managing_cou_4a5bc486: コースセクションの管理に関する権限に粒度を追加する
@@ -4561,6 +4564,7 @@ ja:
   audio_1c89b0c8: オーディオ
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: オーディオコンテンツは、デバイス、またはアプリでサポートされていません。
   audio_dd489fcc: オーディオ
+  audio_player_for_label_dd9a6819: "%{label}のオーディオプレーヤー"
   australia_61_eb9bb701: "オーストラリア (+61)"
   australia_e8d44bf8: オーストラリア
   austria_43_7bc58b34: "オーストリア (+43)"
@@ -4831,6 +4835,9 @@ ja:
     recording_setting_enabled_description: この会議は録音可能です
   blackboard: 
     no_manifest: "この Blackboard .zip のルート ディレクトリには imsmanifest.xml ファイルがありません。"
+  blackout_date_title_was_added_ec8bf15e: "ブラックアウト日%{title}が追加されました。"
+  blackout_date_title_was_deleted_e8cc238b: "ブラックアウト日%{title}が削除されました。"
+  blackout_date_title_was_edited_31752bc9: "ブラックアウト日%{title}が編集されました。"
   blackout_dates_4a140a72: ブラックアウト日
   blank_38df4238: ブランク
   blocked_by_running_migration_d8a57cb7: 移行の実行でブロックされました
@@ -5618,6 +5625,7 @@ ja:
   cannot_delete_an_override_with_a_due_date_within_a_fa94ca3b: 締め切り日のある上書きを終了した採点期間内で削除することはできません
   cannot_give_outcomes_extra_credit_696208f0: アウトカムに余分なクレジットを与えることはできません
   cannot_grade_at_this_time_489744b0: 現在採点できません
+  cannot_have_a_blueprint_course_with_observers_d00b3deb: オブザーバーとブループリントコースを持つことはできません
   cannot_have_a_blueprint_course_with_students_248e3e76: 受講者とブループリントコースを持つことはできません
   cannot_import_a_root_group_d4654def: ルートグループをインポートできません
   cannot_import_to_other_courses_af885742: 他のコースにインポートできません
@@ -5810,6 +5818,8 @@ ja:
   changing_course_dates_may_override_term_availabili_d92b10de: コースの日付を変更すると、コースのページやダッシュボード内で有効期間の設定や設置が上書きされることがあります。コースの日付を変更する前には、期間の日付を確認してください。
   changing_course_pacing_days_may_modify_due_dates_9009aecd: コースペーシングの日数を変更すると、期日が変更される場合があります。
   changing_section_dates_may_override_course_and_ter_6634950e: セクションの日付を変更すると、コースのページやダッシュボード内でコースや期間の利用可能性の設定や配置が上書きされることがあります。セクションの日付を変更する前には、期間とコースの日付を確認してください。
+  changing_the_course_participation_will_republish_a_1cc05b7: コース参加を変更すると、すべてのコースのペーシングが、期間参加を使って新しい日付で再公開されます。
+  changing_the_course_participation_will_republish_a_5715b0d5: コース参加を変更すると、すべてのコースのペーシングが、新しい日付で再公開されます。
   changing_the_late_policy_will_affect_previously_gr_49071db7: 今、遅延ポリシーを変更すると、以前に採点した提出に影響を与えます。
   changing_the_tenant_will_delete_existing_groups_f86c48dc: テナントを変更すると、既存のグループが削除されます。
   changing_your_policy_now_will_affect_previously_gr_62063898: 今、あなたのポリシーを変更すると、以前に採点した提出に影響を与えます。
@@ -5819,6 +5829,7 @@ ja:
   chcp_student_activity_report_5611dd39: "CHCP 受講者アクティビティレポート"
   check_back_in_a_little_while_17756399: 後でもう一度チェックしてください。
   check_back_later_c4234dbc: 後で戻って確認
+  check_permissions_when_masquerading_as_course_admi_ded7106c: コース管理者マスカレード時の権限の確認
   check_services_to_enable_8877c451: 有効にするサービスを確認してください
   check_submission_file_type_b3dbf3fd: 提出ファイルのタイプをチェックする
   check_this_box_to_add_posts_with_specific_phrase_i_d473aeeb: 下のテキストボックスを使用してタイトルに特定のフレーズのある投稿を追加するには、このチェックボックスをオンにします
@@ -6285,6 +6296,7 @@ ja:
     contingency_30_minute_quickstart: "https://community.canvaslms.com/t5/Contingency-Planning/Set-Up-Your-Canvas-Course-in-30-minutes-or-Less/ba-p/258437"
     contingency_covid: "https://community.canvaslms.com/t5/Contingency-Planning/gh-p/contingency"
     contingency_web_conferencing: "https://community.canvaslms.com/t5/Contingency-Planning/Web-Conferencing-Resources/ba-p/262674"
+    course_pacing: "https://community.canvaslms.com/t5/Course-Pacing-Feature-Preview/gh-p/course_pacing"
     guides_by_product: "https://community.canvaslms.com/t5/Guides/ct-p/guides"
     guides_home: "https://community.canvaslms.com/t5/Canvas/ct-p/canvas"
     idea_conversations: "https://community.canvaslms.com/t5/Idea-Conversations/idb-p/ideas"
@@ -6569,7 +6581,7 @@ ja:
         download_qti: "%{date} 以降の QTI をエクスポート: *ここをクリックしてダウンロード*"
         download_user_export: "%{date} からのユーザ データ エクスポート: *ダウンロードするにはここをクリックします*"
       message: 
-        export_started: エクスポートの処理が開始されました。大きいコースの場合は時間がかかります。*他のページに移動して構いません*。エクスポートが完了すると電子メールが送信されます。
+        export_started: エクスポートプロセスが開始しました。大規模なコースではしばらく時間がかかります。エクスポートが完了すると、メールが届きますので、*ページから離れることができます。*
       no_submissions: 現在、エクスポートする提出物はありません。
       user_data_exports: 提出物のダウンロード
     labels: 
@@ -7792,9 +7804,12 @@ ja:
   course_concluded_unable_to_send_messages_b99b6b6d: コースは終了しています、メッセージを送信できません
   course_conferences_3d914c96: コースの会議
   course_content_a92eca20: コースの内容
+  course_content_add_355fab78: "コースコンテンツ - 追加"
   course_content_add_edit_delete_ea877eca: "コース内容 - 追加/編集/削除"
+  course_content_delete_b6e7cfd9: "コースコンテンツ - 削除"
   course_content_download_from_3c8c6c01: コースコンテンツダウンロード元
   course_content_downloads_6cb31802: コースの内容のダウンロード
+  course_content_edit_7a3effc3: "コースコンテンツ - 編集"
   course_content_view_5f68a57: "コース内容 - 表示"
   course_copy_argument_error: コースのコピーには、コピー元のコースが必要です。
   course_copy_description: "Canvas コースのコピーのための移行プラグイン"
@@ -7983,8 +7998,14 @@ ja:
   course_pace_4dfc7ef3: コースペース
   course_pace_plan_c79cbffc: コースペース計画
   course_paces_4396b508: コースペース
+  course_paces_description: |-
+      コースペーシングは、Canvas にローリング登録のサポートを追加します。
+      講師が定義するペースに基づいて、異なる開始日の学生に魔法
+      のように期日を分配することができます。*コースペースのユーザーグループ*
+      に参加して、詳細を知り、フィードバックを行ってください。
   course_pacing_40c14b61: コースペーシング
   course_pacing_adds_support_for_rolling_enrollments_3331cbaa: "コースペーシングは、Canvas にローリング登録のサポートを追加します。講師が定義するペースに基づいて、異なる開始日の学生に魔法のように期日を分配することができます。コースペースのユーザーグループに参加して、詳細を知り、フィードバックを行ってください。"
+  course_pacing_blackout_dates_1dfc8b61: コースペーシングのブラックアウト日
   course_pacing_is_in_active_development_348e33cf: コースペースは現在アクティブに開発中です。
   course_pages_449f1dd4: コースページ
   course_participation_and_access_settings_7a3d6297: コースへの参加とアクセス設定
@@ -8440,6 +8461,7 @@ ja:
         blueprint_course: 青写真コース
         card_image: カード画像
         conclude_at: 終了日時
+        conditional_release: 熟達の過程
         course_code: "コース コード"
         course_color: カラー
         course_description: 説明
@@ -9122,6 +9144,7 @@ ja:
   date_created_createdat_265a0dfa: "作成日：%{createdAt}"
   date_ee500367: 日付
   date_error_7b38f8ff: 日付エラー
+  date_filter_is_in_effect_4363df73: フィルターが有効な日
   date_is_after_course_end_date_94a2f4e3: 日付がコース終了日以降
   date_is_after_the_course_end_date_95bf9b6a: 日付がコース終了日以降
   date_is_after_the_specified_end_date_ae34a72f: 日付が指定終了日以降
@@ -9135,6 +9158,9 @@ ja:
   date_modified_e1c8ac8f: 変更日
   date_modified_modifiedat_b839cc8b: "修正日：%{modifiedAt}"
   date_of_most_recent_bounce_b23d0119: 一番最近のバウンス日
+  date_required_a74e077c: 日付は必須
+  date_time_options_7abcdea7: 日付/時間オプション
+  date_time_options_b501e73b: 日付/時刻オプション
   datepicker: 
     errors: 
       not_a_date: それは日付けではありません!
@@ -9232,6 +9258,7 @@ ja:
   delete_a6efa79d: 削除
   delete_account_name_96aee330: "削除%{account_name}"
   delete_alignment_f33c97d5: 配置を削除
+  delete_all_other_course_content_721e0ae3: 他のすべてのコースコンテンツを削除する
   delete_announcement_title_756a9d1f: "アナウンスを削除する%{title}"
   delete_assignment_5d3f3f15: 課題を削除
   delete_assignment_group_7c3b01c4: 課題グループの削除
@@ -9599,9 +9626,7 @@ ja:
   disabling_the_assignments_and_quizzes_delete_permi_ad890eb3: "[課題と小テスト - 削除]の権限を無効にすると、ルーブリック - 追加/編集/削除の権限が無効になり（有効な場合）、ユーザーによる個々の課題用のルーブリックの削除を禁止します。"
   disabling_the_assignments_and_quizzes_edit_permiss_529f9360: "[課題と小テスト - 編集]の権限を無効にすると、この権限を無効にすると、ルーブリック - 追加/編集/削除の権限が無効になり（有効な場合）、ユーザーによる個々の課題からのルーブリックの編集を禁止します。"
   disabling_the_elementary_theme_will_change_the_fon_d7f31a3b: 初級用のテーマを無効にすると、コースのすべてのユーザーのCanvasインターフェイスのフォントが変更されます。
-  disabling_the_mastery_paths_feature_will_release_c_4b96c86d: |-
-      熟達パス機能を無効にすると、すべての受講者に構成済みの課題とコンテンツがリリースされます。
-                        この機能を再度有効にした場合は、これらの課題を熟達パス用に再度構成する必要があります。
+  disabling_the_mastery_paths_feature_will_release_c_4b96c86d: 熟達の過程機能を無効にすると、設定された課題とコンテンツがすべての受講生に公開されます。この機能を再度有効にする場合、これらの課題は再度熟達の過程に設定する必要があります。
   disabling_this_permission_will_override_if_enabled_59c2b5c9: "この権限を無効にすると、ルーブリック - 追加/編集/削除の権限が無効になり（有効な場合）、個々の課題からのルーブリックの作成や編集を禁止します。"
   disabling_this_permission_will_override_if_enabled_6481b015: "この権限を無効にすると、ルーブリック - 追加/編集/削除の権限が無効になり（有効な場合）、個々の課題からのルーブリックの作成や編集を禁止します。ただし、学習成果 - 追加/編集/削除が有効になっている場合でも、ユーザーは成果（ルーブリックの管理ボタン）を介してルーブリックを追加できます。"
   disabling_this_permission_will_override_if_enabled_7f2a87cc: "この権限を無効にすると、ルーブリック - 追加/編集/削除の権限が無効になり（有効な場合）、個々の課題からのルーブリックの作成や編集を禁止します。ただし、学習成果 - 追加/編集/削除が有効になっている場合でも、ユーザーは成果（ルーブリックの管理ボタン）を介してルーブリックを追加できます。"
@@ -10248,6 +10273,7 @@ ja:
   ecuador_593_dfcc235a: "エクアドル (+593)"
   ecuador_811f2a77: エクアドル
   edit_account_name_for_account_name_ae3633e8: "編集するアカウント名%{account_name}"
+  edit_all_other_course_content_c8dd98d3: 他のすべてのコースコンテンツを編集する
   edit_and_delete_their_own_posts_f4f7cc6: 自分の投稿を編集または削除
   edit_and_delete_their_own_replies_e5b9d793: 自分の返信内容を編集・削除する
   edit_announcement_title_cce0b4e: "アナウンスを編集%{title}"
@@ -10480,6 +10506,7 @@ ja:
   enable_gradezilla_name_is_only_a_placeholder_as_it_34afd9f1: "Gradezillaを有効にする（名前は、今後 Gradebook を置き換えるためのプレースホルダ用としてのみです）。"
   enable_gravatar_8a865b41: "Gravatar を有効にする"
   enable_i18n_features_in_outcomes_exports_64bcf82b: "結果のエクスポートで i18n 機能を有効にする"
+  enable_individual_learning_paths_for_students_base_5236d3bb: 評価に基づいて、受講生の個々の学習の過程を有効にする
   enable_migrating_item_banks_to_new_quizzes_during__af6ca020: コースのインポート/コピー中にアイテムバンクを新しい小テストに移行できるようにする
   enable_moderated_grading_bacd20d8: 修正された採点を有効にします。
   enable_moderated_grading_only_relevant_if_the_anon_1dcdc47b: 修正された採点を有効にします。匿名で修正するマーキングフラグが有効な場合のみ関連します。
@@ -11709,6 +11736,7 @@ ja:
   filter_e3398407: フィルタ
   filter_features_388eafd8: フィルタ機能
   filter_ip_addresses_2f296bd2: IPアドレスをフィルターにかける
+  filter_jobs_by_date_202eb267: 日付でジョブで絞り込む
   filter_messages_by_course_21a53fc4: コースでメッセージをフィルタ
   filter_observer_dashboard_by_student_5705ff33: オブザーバーダッシュボードを受講者でフィルタリング
   filter_recent_user_accesses_by_term_30812659: 最近のユーザアクセスを期間ごとにフィルタリング
@@ -11993,6 +12021,7 @@ ja:
   grade_for_missing_submissions_56f91c83: 提出物がない場合の評定
   grade_for_name_b9df168a: "評定：%{name}"
   grade_for_studentname_d124b199: "評定：%{studentName}"
+  grade_for_ungraded_artifacts_d0b6fb57: 未採点の成果物の評定
   grade_for_ungraded_submissions_59f72299: 未採点の投稿の評定
   grade_grade_7e52dd1c: "評定：%{grade}"
   grade_high_to_low_1cea0381: "グレード - 高〜低"
@@ -12897,6 +12926,7 @@ ja:
   granular_permissions_for_add_remove_admin_roles_fr_9a06a75d: コースから管理者の役割を追加/削除するためのきめ細かい権限
   granular_permissions_for_add_remove_roles_from_cou_b0a34301: コースからのロールを追加/削除するためのきめ細かい権限
   granular_permissions_for_assignments_and_quizzes_6b3bddc6: 課題や小テストの細分された権限
+  granular_permissions_for_managing_course_content_91375668: コースコンテンツを管理するための粒度の細かい権限
   granular_permissions_for_managing_course_files_1ed7f019: コースファイルを管理するための詳細な権限
   granular_permissions_for_managing_course_sections_da4b04b: コースセクションを管理するための詳細な権限
   granular_permissions_for_managing_courses_a71be71d: コースを管理するためのきめ細かい権限
@@ -13186,6 +13216,7 @@ ja:
       heading_current_groups: 現在のグループ
       heading_previous_groups: 前のグループ
       no_groups: グループなし
+      no_groupsheading: グループ
     loading: グループ名簿を読み込んでいます...
     manage: 
       add_unassigned_menu: 
@@ -13572,6 +13603,7 @@ ja:
   hide_all_artifacts_d654fbd5: 成果物をすべて非表示
   hide_all_details_61d7ebb: 詳細をすべて非表示
   hide_all_recipients_1ca02da6: すべての受取人を非標示にする
+  hide_assignment_group_totals_f4fb8660: 課題グループの集計を非表示にする
   hide_correct_answers_at_2421b0aa: 正解を非表示にする
   hide_correct_answers_at_b1a59408: 正解を非表示にする
   hide_course_sections_for_course_name_bd1911af: "コース用コースセクションを非表示にする%{name}"
@@ -14953,6 +14985,7 @@ ja:
   like_count_count_9467dc82: "計上のように：%{count}"
   like_post_dbf48764: 投稿のように
   like_post_from_author_79b874f1: "%{author}からの投稿のように"
+  like_this_entry_60da41a5: この入力にいいね！する
   limit_assignment_names_lengths_max_255_5ee9ebb5: 課題の長さを制限する（最大255）
   limit_course_participation_to_term_or_custom_cours_67797a86: コースへの参加を学期またはカスタムコースの日付に限定しますか？
   limit_each_time_slot_to_input_value_user_s_47461538: "各タイムスロットを%{input_value}ユーザーに制限する。"
@@ -15141,6 +15174,7 @@ ja:
   loading_unsynced_changes_1b52f725: 非同期の変更を読み込んでいます...
   loading_unsynced_changes_b5d7b202: 同期されていない変更を読み込み中
   loading_unsynched_changes_688434f2: 同期されていない変更の読み込み
+  local_4ee321b1: ローカル
   locales: 
     ja: 日本語
   location_e17bd402: 場所
@@ -15395,6 +15429,7 @@ ja:
   manage_add_edit_delete_18963dbc: "管理（追加/編集/削除） "
   manage_add_edit_delete_course_files_162c1a65: "コース ファイルの管理 (追加 / 編集 / 削除)"
   manage_add_edit_delete_pages_5c73f2fb: "ページ管理 (追加 / 編集 / 削除)"
+  manage_all_other_course_content_d77de830: 他のすべてのコースコンテンツを管理する
   manage_announcement_with_title_title_f2ce92de: "この件名の通知の管理%{title}"
   manage_app_list_994cc26c: アプリリストを管理する
   manage_assignment_31a132fb: 課題の管理
@@ -15408,7 +15443,9 @@ ja:
       delete_avatar: このユーザのプロフィール画像を削除してもよろしいですか?
       lock_avatar: この画像をロックすると画像が承認され、このユーザは画像を更新できなくなります。続行しますか?
   manage_b88f7150: 管理
+  manage_blackout_dates_1f67216a: ブラックアウトの日付を管理する
   manage_comment_library_48f2d123: コメントライブラリの管理
+  manage_course_content_fc5de138: コースコンテンツを管理する
   manage_course_files_57e07038: コースファイルを管理
   manage_course_sections_f482d1b3: コースセクションを管理
   manage_course_templates_66c00052: コーステンプレートの管理
@@ -17693,6 +17730,7 @@ ja:
   module_last_to_first_8cdb7a8e: "モジュール - 最後から最後まで"
   module_locked_f6a7ea9d: モジュールはロックされています
   module_menu_3201af4e: モジュールメニュー
+  module_menu_modal_6b20c03: モジュールメニュー（モーダル）
   module_module_name_was_successfully_deleted_fc9e9d47: "モジュールアイテム%{module_name} は正常に削除されました"
   module_name_1127ebdb: モジュール名
   module_navigation_97043417: モジュールネビゲーション
@@ -18258,6 +18296,7 @@ ja:
   no_associated_terms_13bacefc: 関連する期間がありません
   no_attachments_found_for_the_following_ids_ids_49c9192f: "以下の id の添付は見つかりません%{ids}"
   no_attributes_locked_611c5cc: 属性がロックされていません
+  no_blackout_dates_1297ec22: ブラックアウト日付なし
   no_broken_links_found_38d951e3: 壊れたリンクは見つかりません
   no_cancel_installation_db8d12d7: いいえ、インストールをキャンセルします
   no_child_topic_found_b706d56a: 子トピックが見つかりません
@@ -20351,6 +20390,7 @@ ja:
       google_docs_description: "当システムに対して、ご自分の Google ドキュメントを表示する権限を承認すると、Google ドキュメントから課題を直接提出したり、作成した文書をクラスのメンバーと共有したりできるようになります。"
       google_drive_description: "Google ドライブへのアクセスを許可すると、Google ドライブから直接課題を提出できるようになります。また、クラスのメンバーと共同で文書を作成したり、文書を共有したりできます。"
       headers: 
+        action: 詳細
         application_abbrev: アプリ
         dates: 日付
         delicious_login: "Delicious へのログイン"
@@ -20366,6 +20406,7 @@ ja:
         other_services: 他のサービス
         purpose: 目的
         registered_services: 登録済みサービス
+        remove: 削除
         share_skype_id: "Skype ID を共有"
         twitter_access: "Twitter へのアクセス"
         users_profile: "%{user} のプロフィール"
@@ -23099,6 +23140,7 @@ ja:
   saving_associations_989bd4da: 関連付けを保存
   saving_associations_complete_e4b9634d: 関連付けの保存が完了
   saving_associations_started_8ac85360: 関連付けの保存が開始
+  saving_blackout_dates_be03e6ee: ブラックアウトの日付を保存中・・・
   saving_d55dd90e: 保存しています...
   saving_dates_2472a539: 日付を保存中
   saving_draft_c97afab3: ドラフトの保存中
@@ -23463,6 +23505,7 @@ ja:
   select_a_predefined_color_c77ab2f5: 所定の色を選択。
   select_a_provisional_grade_7106e3d5: 暫定的な評定を選択する
   select_a_student_to_view_281d17b9: 表示する生徒を選択
+  select_a_student_to_view_the_page_will_refresh_aut_eaa5d00c: 表示する受講生を選択する。ページは自動的に更新されます。
   select_all_assignments_bd07b919: すべての課題を選択する
   select_all_count_9ad54aa1: "すべてを選択する (%{count})"
   select_all_count_courses_4fc63811: 
@@ -25923,6 +25966,11 @@ ja:
   the_default_report_only_includes_course_section_da_729092f0: デフォルトのレポートでは、受講者数の制限が有効な場合、コース/セクションの日付のみが含まれます。
   the_discussion_entry_was_successfully_created_7cddf67b: ディスカッションエントリが正常に作成されました。
   the_discussion_topic_was_successfully_deleted_d8b93b70: ディスカッショントピックは正常に削除されました。
+  the_download_process_has_started_this_can_take_a_w_cef4bb75: |-
+      ダウンロードプロセスが開始しました。大規模なコース
+                では、これにはしばらく時間がかかります。ページを
+                離れても、ダウンロード完了時に通知が
+                届きます。
   the_download_process_has_started_this_can_take_awh_7e616db1: |-
       ダウンロードプロセスが開始さしました。これは
                 大規模なコースではしばらく時間がかかります。
@@ -26246,6 +26294,7 @@ ja:
   there_was_an_error_saving_the_assignment_dates_d31903ab: 課題日付の保存中にエラーが発生しました。
   there_was_an_error_saving_the_changes_to_the_cours_ed2b1d24: コースへの変更を保存中にエラーが発生しました
   there_was_an_error_saving_the_note_please_try_agai_f2f2cd38: メモを保存中にエラーが発生しました。もう一度やり直してください。
+  there_was_an_error_saving_your_blackout_dates_1efee334: ブラックアウトの日付を保存中にエラーが発生しました
   there_was_an_error_saving_your_changes_bfaf3d79: 変更を保存中にエラーが発生しました。
   there_was_an_error_setting_usage_rights_53739e1d: 使用権を設定する際にエラーが発生しました。
   there_was_an_error_starting_the_save_assignment_da_22ffb6a8: 課題の日付の保存ジョブの開始時にエラーが発生しました
@@ -26490,6 +26539,7 @@ ja:
   this_may_take_a_bit_48fe4235: 少し時間がかかります...
   this_may_take_a_bit_c061d0f6: 少し時間がかかる場合があります。
   this_may_take_a_few_minutes_e2df06d6: これには2～3分かかります。
+  this_may_take_a_while_d07790f2: 少し時間がかかります...
   this_message_includes_media_comments_to_listen_or__5fc98641: "このメッセージにはメディア コメントが含まれています。再生または返信するには、下のリンクをクリックしてください: %{link}"
   this_message_includes_media_comments_to_listen_or__75ea03a1: このメッセージには、メディアのコメントが含まれます。聞くか返信するには、このリンクをクリックしてください：
   this_message_includes_media_comments_to_listen_or__df72d662: "このメッセージには、メディアのコメントが含まれます。聞くか返信するには、このリンクをクリックしてください：%{link}.  許可されている際には、添付ファイルを含める必要がある場合には、Canvas にログインして提出物に返信してください。"
@@ -26883,6 +26933,7 @@ ja:
   title_is_unlocked_click_to_lock_6a20cfcb: "%{title}ロック解除されています。クリックしてロックする。"
   title_no_due_date_bbbd3b53: "%{title}:締切日なし"
   title_outcomes_7adbd9cc: "%{title}アウトカム"
+  title_required_3ff5969: タイトルが必要です
   title_separator: ": "
   title_tray_ec9f7488: "%{title}トレイ"
   title_was_successfully_created_f2a07c56: "\"%{title}\" は正常に作成されました。"
@@ -27714,6 +27765,7 @@ ja:
   unable_to_send_messages_to_users_in_context_name_7d6997b6: "%{context_name}のユーザーにメッセージを送信できません"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: この課題は、少なくとも1人の受講者の終了後の採点期間に終了する予定であるため、デフォルトの評定を設定することができません
   unable_to_set_up_drag_and_drop_for_modules_4d339f1d: モジュールのドラッグアンドドロップを設定できません
+  unable_to_switch_students_b901bc4b: 受講生を切り替えられません
   unable_to_toggle_placement_833db6ff: 配置を切り替えることができません
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "ストレージサービスにファイルを送信できません。サービスが停止しているか、Canvas に再度ログインする必要があるかもしれません。"
   unable_to_update_microsoft_teams_sync_settings_ple_64255854: "Microsoft Teams Sync設定を読み込めません。再度試してください。問題が解決しない場合は、サポートに連絡してください。"
@@ -27798,6 +27850,7 @@ ja:
   unknown_user_url_82196ba7: "不明なユーザの URL"
   unlike_post_1b20a02c: 投稿とは異なる
   unlike_post_from_author_5e2c13c5: "%{author} からの投稿とは異なります"
+  unlike_this_entry_f22e8d45: この入力へのいいね！取り消す
   unlimited_attempts_81a37d4: 試行回数の制限なし
   unlimited_ff19e96d: 無制限
   unlock_562bc4cb: ロック解除する
@@ -28596,6 +28649,7 @@ ja:
   users_with_no_enrollments_5dddce33: 登録のないユーザ
   users_with_this_permission_may_be_able_to_use_the__84394072: この権限を持つユーザーは、アカウント設定の管理、評定の表示と調整、ユーザー情報へのアクセスを行う機能として権限を利用できます。この権限はまた、サブアカウントに指定された管理者が、サブアカウント外の設定や情報にアクセスすることもできるようにします。
   uses_the_new_scheduler_and_its_functionality_b07e9b14: 新しいスケジューラーとその機能を使う
+  utc_e44049af: UTC
   validate: 
     is_required: このフィールドは必須項目です
   validate_links_in_content_b1630fba: コンテンツでリンクを有効にする
@@ -28622,6 +28676,7 @@ ja:
   video_conferencing_tools_enable_face_to_face_conne_144420a5: ビデオ会議ツールは、教員と受講者間における直接顔を合わせたつながりを可能にします。
   video_content_is_not_supported_by_your_device_or_a_25214f57: ビデオコンテンツは、デバイス、またはアプリでサポートされていません。
   video_player_b371005: ビデオプレーヤー
+  video_player_for_label_6a5fdb03: "%{label}のビデオプレーヤー"
   vietnam_84_e50a2a44: ベトナム（+84）
   vietnamese_e7a76583: ベトナム語
   view_all_e13bf0a6: すべてを表示する
@@ -28689,6 +28744,7 @@ ja:
   view_the_discussion_link_c4dbdef: "ディスカッションを表示：%{link}。"
   view_the_reply_in_the_discussion_4c698ff9: ディスカッションの返信を見る。
   view_this_message_in_conversations_5a16bc9f: このメッセージを会話に表示
+  view_timestamps_in_time_zone_9b699a8b: タイムスタンプをタイムゾーンで表示
   view_toolname_placements_4a5724d1: "%{toolName}プレースメントを閲覧"
   view_ungraded_as_0_1a9631a1: "未採点分は 0 として表示する"
   view_ungraded_as_0_a9e87a54: "未採点分は 0 として表示する"
@@ -28867,6 +28923,7 @@ ja:
       有効にすると、ボタンとアイコンのイメージクロッパー、コースのイメージ
       ソース、アップロードイメージソースをオンにします。
   when_hiding_grades_for_anonymous_assignments_grade_1b0ef682: 匿名の課題の評定を非表示にすると、評定は、コースの人すべてに非表示になります。匿名は再適用されます。
+  when_masquerading_as_course_admin_roles_teacher_ta_e3e3c0a9: コース管理者ロール（教員/TA/デザイナーのベースロール）としてマスカレードする場合、Canvasはマスカレードしたユーザーがターゲットユーザとー同じ（かそれ以上の）権限を持っていることを確認します。
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "メンバーがコースにアクセスすると、このページが表示されます。アクティビティ ストリーム、コース モジュールのリスト、シラバス、その他のカスタム ページを表示するように設定できます。デフォルトでは、コースのアクティビティ ストリームが表示されます。"
   when_people_visit_your_course_this_is_the_first_pa_5093ec45: |-
       ユーザーがあなたのコースにアクセスするとき、これが最初に表示されるページになります。
@@ -29327,6 +29384,7 @@ ja:
   you_must_provide_a_date_with_a_time_ec369ff4: 日時を指定する必要があります。
   you_must_provide_a_tenant_and_login_attribute_to_e_684cc13b: "Microsoft Teamsの同期を有​​効にするには、テナントとログイン属性を指定する必要があります"
   you_must_provide_a_value_or_unselect_the_option_3b28b754: 値を指定するか、オプションの選択を解除する必要があります。
+  you_must_provide_required_fields_before_adding_6717073d: 追加する前に、必須フィールドに記入する必要があります
   you_must_provide_targetgroupid_or_targetcontextid__dd2bf92: targetGroupIdまたはtargetContextIdおよびtargetContextTypeを提供しなければなりません
   you_must_select_a_course_to_copy_content_from_e7bd9e09: コンテンツをコピーするには、コピー元のコースを選択する必要があります
   you_must_select_a_folder_to_upload_your_migration__ac7bc7c0: 移動するものをアップロードするフォルダを選んでください
