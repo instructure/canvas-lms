@@ -62,7 +62,7 @@
       <% if @context.grants_right? @current_user, :read_email_addresses %>
         <tr>
           <th><%= before_label('default_email', 'Default Email') %></th>
-          <td class="email"><%=h @user.email %></td>
+          <td style="word-break: break-all"><%=h @user.email %></td>
         </tr>
       <% end %>
       <tr>
