@@ -103,6 +103,15 @@ jest.mock('../../../../../../../bridge', () => {
   }
 })
 
+jest.mock('../../ImageCropper/imageCropUtils', () => {
+  return {
+    createCroppedImageSvg: () =>
+      Promise.resolve({
+        outerHTML: '<svg />'
+      })
+  }
+})
+
 describe('ImageSection', () => {
   let scrollIntoView
   const defaultProps = {
@@ -193,6 +202,126 @@ describe('ImageSection', () => {
     it('renders a "None Selected" message', () => {
       const {getByText} = subject()
       expect(getByText('None Selected')).toBeInTheDocument()
+    })
+  })
+
+  describe('calls onChange passing metadata when state prop changes', () => {
+    let getByTestId, getByText, getByTitle, container
+
+    const flushPromises = () => new Promise(setImmediate)
+    const lastPayloadOfActionType = (mockFn, type) =>
+      mockFn.mock.calls.reverse().find(call => call[0].type === type)[0].payload
+
+    beforeEach(() => {
+      const rendered = subject({
+        rcsConfig: {features: {buttons_and_icons_cropper: true}}
+      })
+
+      getByTestId = rendered.getByTestId
+      getByText = rendered.getByText
+      getByTitle = rendered.getByTitle
+      container = rendered.container
+    })
+
+    describe('using course images', () => {
+      let originalFileReader
+
+      beforeAll(() => {
+        fetchMock.mock('http://canvas.docker/files/722/download?download_frd=1', {})
+        originalFileReader = FileReader
+        Object.defineProperty(global, 'FileReader', {
+          writable: true,
+          value: jest.fn().mockImplementation(() => ({
+            set onload(value) {
+              // Used when FileReader for converting to Blob
+              value()
+            },
+            readAsDataURL() {
+              // Used to fetch url
+              this.onloadend && this.onloadend()
+            },
+            result: 'data:image/png;base64,asdfasdfjksdf=='
+          }))
+        })
+      })
+
+      afterAll(() => {
+        fetchMock.restore('http://canvas.docker/files/722/download?download_frd=1')
+        Object.defineProperty(global, 'FileReader', {
+          writable: true,
+          value: originalFileReader
+        })
+      })
+
+      it('when select mode', async () => {
+        fireEvent.click(getByText('Add Image'))
+        fireEvent.click(getByText('Course Images'))
+        await flushPromises()
+        const payload = lastPayloadOfActionType(defaultProps.onChange, 'SetImageSettings')
+        expect(payload.mode).toEqual('Course')
+      })
+
+      it('when select image', async () => {
+        fireEvent.click(getByText('Add Image'))
+        fireEvent.click(getByText('Course Images'))
+        await flushPromises()
+        fireEvent.click(getByTitle('Click to embed image_one.png'))
+        await flushPromises()
+        const payload = lastPayloadOfActionType(defaultProps.onChange, 'SetImageSettings')
+        expect(payload.image).toEqual('data:image/png;base64,asdfasdfjksdf==')
+        expect(payload.imageName).toEqual('grid.png')
+      })
+
+      it('when crop image ', async () => {
+        fireEvent.click(getByText('Add Image'))
+        fireEvent.click(getByText('Course Images'))
+        fireEvent.click(getByTitle('Click to embed image_one.png'))
+        await flushPromises()
+        fireEvent.click(getByText(/crop image/i))
+        await flushPromises()
+        // Zooms in just to change cropper settings
+        fireEvent.click(
+          document.querySelector(
+            '[data-cid="Modal"] [data-cid="ModalBody"] [direction="row"] span:last-child button'
+          )
+        )
+        fireEvent.click(document.querySelector('[data-cid="Modal"] [type="submit"]'))
+        await flushPromises()
+        const payload = lastPayloadOfActionType(defaultProps.onChange, 'SetImageSettings')
+        expect(payload.cropperSettings).toEqual({
+          image: 'data:image/png;base64,asdfasdfjksdf==',
+          shape: 'square',
+          rotation: 0,
+          scaleRatio: 1.1
+        })
+      })
+    })
+
+    it('when select multi color images', async () => {
+      fireEvent.click(getByText('Add Image'))
+      fireEvent.click(getByText('Multi Color Image'))
+      await waitFor(() => expect(getByTestId('multicolor-svg-list')).toBeInTheDocument())
+      fireEvent.click(getByTestId('button-icon-art'))
+      await flushPromises()
+      const payload = lastPayloadOfActionType(defaultProps.onChange, 'SetImageSettings')
+      expect(payload.imageName).toEqual('Art Icon')
+    })
+
+    it('when select single color images', async () => {
+      fireEvent.click(getByText('Add Image'))
+      fireEvent.click(getByText('Single Color Image'))
+      await waitFor(() => expect(getByTestId('singlecolor-svg-list')).toBeInTheDocument())
+      fireEvent.click(getByTestId('button-icon-art'))
+      await flushPromises()
+      await waitFor(() => {
+        expect(container.querySelector('[name="single-color-image-fill"]')).toBeInTheDocument()
+      })
+      fireEvent.change(container.querySelector('[name="single-color-image-fill"]'), {
+        target: {value: '#00FF00'}
+      })
+      await flushPromises()
+      const payload = lastPayloadOfActionType(defaultProps.onChange, 'SetImageSettings')
+      expect(payload.iconFillColor).toEqual('#00FF00')
     })
   })
 

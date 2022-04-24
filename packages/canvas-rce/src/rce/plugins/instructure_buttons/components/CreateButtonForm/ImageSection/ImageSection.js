@@ -42,6 +42,11 @@ const scrollToBottom = () => {
   }
 }
 
+const filterSectionStateMetadata = state => {
+  const {mode, image, imageName, icon, iconFillColor, cropperSettings} = state
+  return {mode, image, imageName, icon, iconFillColor, cropperSettings}
+}
+
 export const ImageSection = ({settings, onChange, editing, editor, rcsConfig}) => {
   const [state, dispatch] = useReducer(reducer, initialState)
   const Upload = React.lazy(() => import('./Upload'))
@@ -59,6 +64,8 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig}) =
     [modes.singleColorImages.type]: SingleColor,
     [modes.multiColorImages.type]: MultiColor
   }
+
+  const metadata = filterSectionStateMetadata(state)
 
   useEffect(() => {
     const transform = transformForShape(settings.shape, settings.size)
@@ -149,6 +156,29 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig}) =
       })
     }
   }, [state.icon, state.iconFillColor])
+
+  useEffect(() => {
+    if (
+      settings.imageSettings &&
+      JSON.stringify(settings.imageSettings) !== JSON.stringify(filterSectionStateMetadata(state))
+    ) {
+      dispatch({
+        type: actions.UPDATE_SETTINGS.type,
+        payload: settings.imageSettings
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings.imageSettings])
+
+  useEffect(() => {
+    if (JSON.stringify(metadata) !== JSON.stringify(settings.imageSettings)) {
+      onChange({
+        type: svgActions.SET_IMAGE_SETTINGS,
+        payload: metadata
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, Object.values(metadata))
 
   const modeIsAllowed = !!allowedModes[state.mode]
   const ImageSelector = allowedModes[state.mode]

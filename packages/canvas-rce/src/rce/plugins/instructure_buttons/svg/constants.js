@@ -51,7 +51,8 @@ export const DEFAULT_SETTINGS = {
   translateY: 0,
   width: 0,
   height: 0,
-  transform: ''
+  transform: '',
+  imageSettings: null
 }
 
 export const DEFAULT_OPTIONS = {

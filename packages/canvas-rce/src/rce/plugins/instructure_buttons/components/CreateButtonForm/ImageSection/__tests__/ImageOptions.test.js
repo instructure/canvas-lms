@@ -161,7 +161,7 @@ describe('ImageOptions', () => {
         expect(screen.getByText('Crop Image')).toBeInTheDocument()
       })
 
-      it('opens crop modal and sets state', async () => {
+      it('opens crop modal and sets state image', async () => {
         fireEvent.click(getByText(/crop image/i))
 
         await waitFor(() => {
@@ -170,9 +170,30 @@ describe('ImageOptions', () => {
 
         fireEvent.click(document.querySelector('[data-cid="Modal"] [type="submit"]'))
         await waitFor(() => {
-          expect(dispatchFn).toHaveBeenCalledWith({
+          expect(dispatchFn.mock.calls[0][0]).toEqual({
             type: 'SetImage',
             payload: 'data:image/svg+xml;base64,bnVsbA=='
+          })
+        })
+      })
+
+      it('opens crop modal and sets state cropper settings', async () => {
+        fireEvent.click(getByText(/crop image/i))
+
+        await waitFor(() => {
+          expect(document.querySelector('[data-cid="Modal"] [type="submit"]')).toBeInTheDocument()
+        })
+
+        fireEvent.click(document.querySelector('[data-cid="Modal"] [type="submit"]'))
+        await waitFor(() => {
+          expect(dispatchFn.mock.calls[1][0]).toEqual({
+            type: 'SetCropperSettings',
+            payload: {
+              image: 'data:image/png;base64,asdfasdfjksdf==',
+              rotation: 0,
+              scaleRatio: 1,
+              shape: 'square'
+            }
           })
         })
       })

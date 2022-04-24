@@ -30,6 +30,7 @@ import {Text} from '@instructure/ui-text'
 import {ImageCropperModal} from '../ImageCropper'
 import ModeSelect from './ModeSelect'
 import PropTypes from 'prop-types'
+import {ImageCropperSettingsPropTypes} from '../ImageCropper/propTypes'
 
 function renderImagePreview({image, loading}) {
   return (
@@ -118,13 +119,18 @@ export const ImageOptions = ({state, dispatch, rcsConfig}) => {
           <ImageCropperModal
             open={openCropModal}
             onClose={() => setOpenCropModal(false)}
-            onSubmit={generatedImage =>
+            onSubmit={(settings, generatedImage) => {
               dispatch({
                 type: actions.SET_IMAGE.type,
                 payload: generatedImage
               })
-            }
+              dispatch({
+                type: actions.SET_CROPPER_SETTINGS.type,
+                payload: settings
+              })
+            }}
             image={image}
+            cropSettings={state.cropperSettings}
           />
         )}
       </Flex.Item>
@@ -137,7 +143,8 @@ ImageOptions.propTypes = {
     image: PropTypes.string.isRequired,
     imageName: PropTypes.string.isRequired,
     mode: PropTypes.string.isRequired,
-    loading: PropTypes.bool.isRequired
+    loading: PropTypes.bool.isRequired,
+    cropperSettings: ImageCropperSettingsPropTypes
   }).isRequired,
   dispatch: PropTypes.func.isRequired,
   rcsConfig: PropTypes.object.isRequired

@@ -56,7 +56,15 @@ describe('ImageCropperModal', () => {
     const button = screen.getByRole('button', {name: /save/i})
     userEvent.click(button)
     await waitFor(() => {
-      expect(onSubmit).toHaveBeenCalledWith('data:image/svg+xml;base64,bnVsbA==')
+      expect(onSubmit).toHaveBeenCalledWith(
+        {
+          image: 'data:image/png;base64,asdfasdfjksdf==',
+          rotation: 0,
+          scaleRatio: 1,
+          shape: 'square'
+        },
+        'data:image/svg+xml;base64,bnVsbA=='
+      )
     })
   })
 })

@@ -26,7 +26,8 @@ export const initialState = {
   iconFillColor: '#000000',
   collectionOpen: false,
   loading: false,
-  error: undefined
+  error: undefined,
+  cropperSettings: null
 }
 
 export const actions = {
@@ -39,7 +40,9 @@ export const actions = {
   SET_IMAGE_COLLECTION_OPEN: {type: 'SetImageCollectionOpen'},
   START_LOADING: {type: 'StartLoading'},
   STOP_LOADING: {type: 'StopLoading'},
-  CLEAR_MODE: {type: 'ClearMode'}
+  CLEAR_MODE: {type: 'ClearMode'},
+  UPDATE_SETTINGS: {type: 'UpdateSettings'},
+  SET_CROPPER_SETTINGS: {type: 'SetCropperSettings'}
 }
 
 export const modes = {
@@ -79,6 +82,10 @@ const imageSection = (state, action) => {
       return {...state, mode: modes.multiColorImages.type}
     case modes.courseImages.type:
       return {...state, mode: modes.courseImages.type}
+    case actions.UPDATE_SETTINGS.type:
+      return {...state, ...action.payload}
+    case actions.SET_CROPPER_SETTINGS.type:
+      return {...state, cropperSettings: action.payload}
     default:
       throw Error('Unknown action for image selection reducer')
   }

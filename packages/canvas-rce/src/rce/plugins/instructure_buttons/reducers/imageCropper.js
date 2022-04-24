@@ -24,7 +24,8 @@ export const actions = {
   SET_IMAGE: 'SetImage',
   SET_SHAPE: 'SetShape',
   SET_ROTATION: 'SetRotation',
-  SET_SCALE_RATIO: 'SetScaleRatio'
+  SET_SCALE_RATIO: 'SetScaleRatio',
+  UPDATE_SETTINGS: 'UpdateSettings'
 }
 
 export const cropperSettingsReducer = (state, action) => {
@@ -37,7 +38,9 @@ export const cropperSettingsReducer = (state, action) => {
       return {...state, rotation: action.payload}
     case actions.SET_SCALE_RATIO:
       return {...state, scaleRatio: action.payload}
+    case actions.UPDATE_SETTINGS:
+      return {...state, ...action.payload}
     default:
-      return {...state, ...action}
+      throw Error('Unknown action for image cropper reducer')
   }
 }
