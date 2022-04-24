@@ -27,19 +27,24 @@ import {Preview} from './Preview'
 import {Controls} from './controls'
 import {convertFileToBase64} from '../../../svg/utils'
 import {createCroppedImageSvg} from './imageCropUtils'
+import {ImageCropperSettingsPropTypes} from './propTypes'
 
 const handleSubmit = (onSubmit, settings) =>
   createCroppedImageSvg(settings)
     .then(generatedSvg =>
       convertFileToBase64(new Blob([generatedSvg.outerHTML], {type: 'image/svg+xml'}))
     )
-    .then(base64Image => onSubmit(base64Image))
+    .then(base64Image => onSubmit(settings, base64Image))
 
-export const ImageCropperModal = ({open, onClose, onSubmit, image}) => {
+export const ImageCropperModal = ({open, onClose, onSubmit, image, cropSettings}) => {
   const [settings, dispatch] = useReducer(cropperSettingsReducer, defaultState)
   useEffect(() => {
     dispatch({type: actions.SET_IMAGE, payload: image})
   }, [image])
+
+  useEffect(() => {
+    cropSettings && dispatch({type: actions.UPDATE_SETTINGS, payload: cropSettings})
+  }, [cropSettings])
 
   return (
     <Modal size="large" open={open} onDismiss={onClose} shouldCloseOnDocumentClick={false}>
@@ -78,6 +83,7 @@ export const ImageCropperModal = ({open, onClose, onSubmit, image}) => {
 
 ImageCropperModal.propTypes = {
   image: PropTypes.string.isRequired,
+  cropSettings: ImageCropperSettingsPropTypes,
   open: PropTypes.bool,
   onClose: PropTypes.func,
   onSubmit: PropTypes.func
@@ -85,6 +91,7 @@ ImageCropperModal.propTypes = {
 
 ImageCropperModal.defaultProps = {
   open: false,
+  cropSettings: null,
   onClose: () => {},
   onSubmit: () => {}
 }

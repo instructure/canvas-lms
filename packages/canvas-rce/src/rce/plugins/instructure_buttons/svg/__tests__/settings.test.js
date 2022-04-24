@@ -75,6 +75,7 @@ describe('useSvgSettings()', () => {
         translateY: 0,
         width: 0,
         height: 0,
+        imageSettings: null,
         transform: ''
       })
     })
@@ -126,6 +127,7 @@ describe('useSvgSettings()', () => {
           translateY: 0,
           width: 0,
           height: 0,
+          imageSettings: null,
           transform: ''
         })
       })
@@ -288,6 +290,7 @@ describe('useSvgSettings()', () => {
         translateY: 0,
         width: 0,
         height: 0,
+        imageSettings: null,
         name: 'Test Button',
         originalName: 'Test Button',
         transform: ''
@@ -340,6 +343,7 @@ describe('useSvgSettings()', () => {
           translateY: 0,
           width: 0,
           height: 0,
+          imageSettings: null,
           transform: ''
         })
       })
@@ -372,6 +376,7 @@ describe('useSvgSettings()', () => {
           translateY: 0,
           width: 0,
           height: 0,
+          imageSettings: null,
           transform: ''
         })
       })
