@@ -28,7 +28,12 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {StoreState} from '../types'
 import {getAutoSaving, getShowLoadingOverlay, getSyncing} from '../reducers/ui'
 import {coursePaceActions} from '../actions/course_paces'
-import {getPacePublishing, getUnpublishedChangeCount, isStudentPace} from '../reducers/course_paces'
+import {
+  getCoursePace,
+  getPacePublishing,
+  getUnpublishedChangeCount,
+  isStudentPace
+} from '../reducers/course_paces'
 import {getBlackoutDatesSyncing, getBlackoutDatesUnsynced} from '../shared/reducers/blackout_dates'
 
 const I18n = useI18nScope('course_paces_footer')
@@ -41,6 +46,7 @@ interface StoreProps {
   readonly blackoutDatesUnsynced: boolean
   readonly showLoadingOverlay: boolean
   readonly studentPace: boolean
+  readonly newPace: boolean
   readonly unpublishedChanges: boolean
 }
 
@@ -60,6 +66,7 @@ export const Footer: React.FC<ComponentProps> = ({
   onResetPace,
   showLoadingOverlay,
   studentPace,
+  newPace,
   unpublishedChanges
 }) => {
   const handlePublish = useCallback(() => {
@@ -68,7 +75,9 @@ export const Footer: React.FC<ComponentProps> = ({
 
   if (studentPace) return null
 
-  const disabled = autoSaving || isSyncing || showLoadingOverlay || !unpublishedChanges
+  const cancelDisabled = autoSaving || isSyncing || showLoadingOverlay || !unpublishedChanges
+  const pubDisabled = !newPace && cancelDisabled
+
   // This wrapper div attempts to roughly match the dimensions of the publish button
   let publishLabel = I18n.t('Publish')
   if (pacePublishing || isSyncing) {
@@ -92,19 +101,28 @@ export const Footer: React.FC<ComponentProps> = ({
   } else if (showLoadingOverlay) {
     cancelTip = I18n.t('You cannot cancel while loading the pace')
     pubTip = I18n.t('You cannot publish while loading the pace')
+  } else if (newPace) {
+    cancelTip = I18n.t('There are no pending changes to cancel')
   } else {
     cancelTip = I18n.t('There are no pending changes to cancel')
     pubTip = I18n.t('There are no pending changes to publish')
   }
   return (
     <Flex as="section" justifyItems="end">
-      <Tooltip renderTip={disabled && cancelTip} on={disabled ? ['hover', 'focus'] : []}>
-        <Button color="secondary" margin="0 small 0" onClick={() => disabled || onResetPace()}>
+      <Tooltip
+        renderTip={cancelDisabled && cancelTip}
+        on={cancelDisabled ? ['hover', 'focus'] : []}
+      >
+        <Button
+          color="secondary"
+          margin="0 small 0"
+          onClick={() => cancelDisabled || onResetPace()}
+        >
           {I18n.t('Cancel')}
         </Button>
       </Tooltip>
-      <Tooltip renderTip={disabled && pubTip} on={disabled ? ['hover', 'focus'] : []}>
-        <Button color="primary" onClick={() => disabled || handlePublish()}>
+      <Tooltip renderTip={pubDisabled && pubTip} on={pubDisabled ? ['hover', 'focus'] : []}>
+        <Button color="primary" onClick={() => pubDisabled || handlePublish()}>
           {publishLabel}
         </Button>
       </Tooltip>
@@ -121,6 +139,7 @@ const mapStateToProps = (state: StoreState): StoreProps => {
     blackoutDatesUnsynced: getBlackoutDatesUnsynced(state),
     showLoadingOverlay: getShowLoadingOverlay(state),
     studentPace: isStudentPace(state),
+    newPace: !getCoursePace(state)?.id,
     unpublishedChanges: getUnpublishedChangeCount(state) !== 0
   }
 }

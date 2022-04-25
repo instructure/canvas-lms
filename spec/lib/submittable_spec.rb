@@ -55,6 +55,44 @@ shared_examples_for "submittable" do
       ].sort
     end
   end
+
+  describe "#update_assignment" do
+    context "with course paces" do
+      before do
+        @course = course_factory(active_course: true)
+        @item_without_assignment = submittable_without_assignment
+        @item_with_assignment, @assignment = submittable_and_assignment
+
+        @course.root_account.enable_feature!(:course_paces)
+        @course.enable_course_paces = true
+        @course.save!
+        @course_pace = course_pace_model(course: @course)
+        @module = @course.context_modules.create!(name: "some module")
+        @module.add_item(type: @item_without_assignment.model_name.param_key, id: @item_without_assignment.id)
+        @module.add_item(type: @item_with_assignment.model_name.param_key, id: @item_with_assignment.id)
+        @module.save!
+        # #update_assignment is only called if conditional_release is enabled
+        if submittable_class == WikiPage
+          @course.conditional_release = true
+          @course.save!
+        end
+        # Reset progresses to verify progresses are added during tests
+        Progress.destroy_all
+      end
+
+      it "runs update_course_pace_module_items on content tags when an assignment is created" do
+        expect(Progress.last).to be_nil
+        @item_without_assignment.update(assignment: @course.assignments.create!)
+        expect(Progress.last.context).to eq(@course_pace)
+      end
+
+      it "runs update_course_pace_module_items on content tags when an assignment is removed" do
+        expect(Progress.last).to be_nil
+        @item_with_assignment.update(assignment: nil)
+        expect(Progress.last.context).to eq(@course_pace)
+      end
+    end
+  end
 end
 
 describe DiscussionTopic do

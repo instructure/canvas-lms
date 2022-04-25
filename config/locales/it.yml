@@ -1776,6 +1776,7 @@ it:
   add_account_admins_99c03c9e: "Aggiungi amministratori account"
   add_additional_comments_ec34a62f: "Aggiungi commenti aggiuntivi"
   add_alert_b2729c99: "Aggiungi avviso"
+  add_all_other_course_content_97c552b2: "Aggiungi tutti gli altri contenuti del corso"
   add_all_outcomes_6a12d08e: "Aggiungi tutti i risultati"
   add_an_assignment_fb73942e: "Aggiungi un compito"
   add_an_attachment_b2e9092f: "Aggiungi un allegato"
@@ -1792,6 +1793,7 @@ it:
   add_attribute_6d6d4a65: "Aggiungi attributo"
   add_bank: 
     default_name: "Nessun nome"
+  add_blackout_dates_ui_to_course_pacing_requires_co_1b675701: "Aggiungere IU date blackout al ritmo corso. Richiede l’attivazione di course_paces."
   add_cc_subtitle_a9ef4a66: "Aggiungi CC/sottotitolo"
   add_collaboration_da9665ac: "Aggiungi collaborazione"
   add_comment_3205529f: "Aggiungi commento"
@@ -1832,6 +1834,7 @@ it:
   add_grading_period_6f774dc3: "Aggiungi periodo di valutazione"
   add_grading_scheme_81e23c05: " Aggiungi schema di valutazione"
   add_grading_scheme_to_admin_grade_reports_23eb8c6e: "Aggiungi uno schema di valutazione ai report dei voti admin"
+  add_granularity_to_permissions_around_managing_all_129149da: "Aggiungi granularità alle autorizzazioni relative alla gestione di tutti gli altri contenuti del corso"
   add_granularity_to_permissions_around_managing_cou_1ee88f6: "Aggiungi granularità ad autorizzazioni relative a gestione corsi ad es. Aggiungi/Modifica/Elimina"
   add_granularity_to_permissions_around_managing_cou_2244c94a: "Aggiungi granularità alle autorizzazioni relative alla gestione dei file del corso"
   add_granularity_to_permissions_around_managing_cou_4a5bc486: "Aggiunge granularità alle autorizzazioni relative alla gestione delle sezioni del corso"
@@ -4248,6 +4251,7 @@ it:
   audio_1c89b0c8: audio
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "Il contenuto audio non è supportato dal dispositivo o dall'app."
   audio_dd489fcc: Audio
+  audio_player_for_label_dd9a6819: "Riproduttore audio di %{label}"
   australia_61_eb9bb701: "Australia (+61)"
   austria_43_7bc58b34: "Austria (+43)"
   auth_failure_in_connecting_to_google_drive_a20aad43: "Errore di autenticazione durante il collegamento a Google Drive."
@@ -4501,6 +4505,9 @@ it:
   bigeasy_locale: it_IT
   blackboard: 
     no_manifest: "Questo file Blackboard .zip non contiene alcun file imsmanifest.xml nella directory radice."
+  blackout_date_title_was_added_ec8bf15e: "%{title} data blackout aggiunta."
+  blackout_date_title_was_deleted_e8cc238b: "%{title} data blackout eliminata."
+  blackout_date_title_was_edited_31752bc9: "%{title} data blackout modificata."
   blackout_dates_4a140a72: "Date blackout"
   blank_38df4238: vuoto
   blocked_by_running_migration_d8a57cb7: "Bloccato dalla migrazione in esecuzione"
@@ -5233,6 +5240,7 @@ it:
   cannot_delete_an_override_with_a_due_date_within_a_fa94ca3b: "Impossibile eliminare un override con una data di scadenza entro un periodo di valutazione chiuso"
   cannot_give_outcomes_extra_credit_696208f0: "Impossibile assegnare credito extra per esiti"
   cannot_grade_at_this_time_489744b0: "Impossibile assegnare un voto in questo momento"
+  cannot_have_a_blueprint_course_with_observers_d00b3deb: "Impossibile tenere un modello di corso di base con gli osservatori"
   cannot_have_a_blueprint_course_with_students_248e3e76: "Impossibile tenere un modello di corso di base con gli studenti"
   cannot_import_a_root_group_d4654def: "Impossibile importare gruppo principale"
   cannot_import_to_other_courses_af885742: "Impossibile importare altri corsi"
@@ -5421,6 +5429,8 @@ it:
   changing_course_dates_may_override_term_availabili_d92b10de: "La modifica delle date del corso può sostituire le impostazioni della disponibilità dei termini e il posizionamento nella pagina e nella  dashboard dei corsi. Confermare le date di termine prima di modificare le date del corso."
   changing_course_pacing_days_may_modify_due_dates_9009aecd: "La modifica dei giorni di ritmo corso può modificare le date di scadenza."
   changing_section_dates_may_override_course_and_ter_6634950e: "La modifica delle date della sezione può sostituire le impostazioni della disponibilità dei termini e del corso e il posizionamento nella pagina e nella dashboard dei corsi. Confermare le date di termine e del corso prima di modificare le date della sezione."
+  changing_the_course_participation_will_republish_a_1cc05b7: "La modifica della partecipazione al corso ripubblicherà tutti i ritmi del corso con qualsiasi nuova data usando la partecipazione trimestrale."
+  changing_the_course_participation_will_republish_a_5715b0d5: "La modifica della partecipazione al corso ripubblicherà tutti i ritmi del corso con qualsiasi nuova data."
   changing_the_late_policy_will_affect_previously_gr_49071db7: "La modifica delle norme sui ritardi influirà sulle consegne precedentemente valutate."
   changing_the_tenant_will_delete_existing_groups_f86c48dc: "La modifica del tenant eliminerà i gruppi esistenti."
   changing_your_policy_now_will_affect_previously_gr_62063898: "La modifica della norma influirà sulle consegne valutate in precedenza."
@@ -5430,6 +5440,7 @@ it:
   chcp_student_activity_report_5611dd39: "Report attività studenti CHCP"
   check_back_in_a_little_while_17756399: "Ricontrolla a breve."
   check_back_later_c4234dbc: "Controlla più tardi"
+  check_permissions_when_masquerading_as_course_admi_ded7106c: "Controlla autorizzazioni quando si esegue il mascheramento come amministratori corso"
   check_services_to_enable_8877c451: "Verifica servizi da abilitare"
   check_submission_file_type_b3dbf3fd: "Controlla il tipo di file di invio"
   check_this_box_to_add_posts_with_specific_phrase_i_d473aeeb: "Seleziona questa casella per aggiungere post con una frase specifica nel titolo utilizzando la casella di testo sotto"
@@ -5864,6 +5875,7 @@ it:
     contingency_30_minute_quickstart: "https://community.canvaslms.com/t5/Contingency-Planning/Set-Up-Your-Canvas-Course-in-30-minutes-or-Less/ba-p/258437"
     contingency_covid: "https://community.canvaslms.com/t5/Contingency-Planning/gh-p/contingency"
     contingency_web_conferencing: "https://community.canvaslms.com/t5/Contingency-Planning/Web-Conferencing-Resources/ba-p/262674"
+    course_pacing: "https://community.canvaslms.com/t5/Course-Pacing-Feature-Preview/gh-p/course_pacing"
     guides_by_product: "https://community.canvaslms.com/t5/Guides/ct-p/guides"
     guides_home: "https://community.canvaslms.com/t5/Canvas/ct-p/canvas"
     idea_conversations: "https://community.canvaslms.com/t5/Idea-Conversations/idb-p/ideas"
@@ -6134,7 +6146,7 @@ it:
         download_qti: "Esportazione QTI da %{date}: *Fai clic qui per eseguire il download*"
         download_user_export: "Esportazione dati utente da %{date}: *Fai clic qui per eseguire il download*"
       message: 
-        export_started: "Il processo di esportazione è iniziato. Può richiedere del tempo per i corsi di grandi dimensioni. *Puoi lasciare la pagina* e riceverai una email al termine dell'esportazione."
+        export_started: "Il processo di esportazione è iniziato. Questa operazione può richiedere del tempo per i corsi di grandi dimensioni. *Puoi uscire dalla pagina* e riceverai un’e-mail al termine dell'esportazione."
       no_submissions: "Attualmente non hai consegne da esportare."
       user_data_exports: "Scarica consegne"
     labels: 
@@ -7228,7 +7240,10 @@ it:
   course_concluded_unable_to_send_messages_b99b6b6d: "Corso concluso, impossibile inviare il messaggi"
   course_conferences_3d914c96: "Conferenze corso"
   course_content_a92eca20: "Contenuto corso"
+  course_content_add_355fab78: "Contenuti corso - aggiungere"
   course_content_add_edit_delete_ea877eca: "Contenuto corso - aggiungi/modifica/elimina"
+  course_content_delete_b6e7cfd9: "Contenuti corso - eliminare"
+  course_content_edit_7a3effc3: "Contenuti corso - modificare"
   course_content_view_5f68a57: "Contenuto corso - visualizza"
   course_copy_argument_error: "Un copia del corso richiede un corso di origine."
   course_copy_description: "Plug-in di migrazione per la copia dei corsi Canvas"
@@ -7410,8 +7425,14 @@ it:
   course_pace_4dfc7ef3: "Velocità corso"
   course_pace_plan_c79cbffc: "Programma di velocità corso"
   course_paces_4396b508: "Velocità corso"
+  course_paces_description: |-
+      Il Ritmo corso aggiunge supporto per le iscrizioni graduali a Canvas,
+      consentendo una distribuzione meravigliosa delle date di scadenza per gli studenti con
+      date di inizio diverse in base alla velocità definita da un istruttore. Scopri ulteriori informazioni e fornisci
+      un feedback unendoti al *gruppo di utenti per il ritmo del corso*.
   course_pacing_40c14b61: "Ritmo corso"
   course_pacing_adds_support_for_rolling_enrollments_3331cbaa: "Il Ritmo corso aggiunge supporto per le iscrizioni graduali a Canvas, consentendo una distribuzione meravigliosa delle date di scadenza per gli studenti con date di inizio diverse in base alla velocità definita da un istruttore. Scopri ulteriori informazioni e fornisci un feedback unendoti al gruppo di utenti per il ritmo del corso."
+  course_pacing_blackout_dates_1dfc8b61: "Date blackout per il ritmo del corso"
   course_pacing_is_in_active_development_348e33cf: "Il ritmo del corso è in fase di sviluppo attivo."
   course_pages_449f1dd4: "Pagine corso"
   course_participation_and_access_settings_7a3d6297: "Impostazioni di partecipazione e accesso al corso"
@@ -7770,6 +7791,7 @@ it:
         blueprint_course: "Modello di corso di base"
         card_image: "Immagine scheda"
         conclude_at: Termina
+        conditional_release: "Percorsi di acquisizione della padronanza"
         course_code: "Codice corso"
         course_color: Colore
         course_description: Descrizione
@@ -8386,6 +8408,7 @@ it:
   date_created_createdat_265a0dfa: "data creazione: %{createdAt}"
   date_ee500367: Data
   date_error_7b38f8ff: "Errore data"
+  date_filter_is_in_effect_4363df73: "Il filtro date è in vigore"
   date_is_after_course_end_date_94a2f4e3: "La data è successiva a data di fine corso"
   date_is_after_the_course_end_date_95bf9b6a: "La data è successiva alla data di fine corso"
   date_is_after_the_specified_end_date_ae34a72f: "La data è successiva alla data finale specificata"
@@ -8399,6 +8422,9 @@ it:
   date_modified_e1c8ac8f: "Data di modifica"
   date_modified_modifiedat_b839cc8b: "data modificato: %{modifiedAt}"
   date_of_most_recent_bounce_b23d0119: "Data del più recente messaggio non recapitato"
+  date_required_a74e077c: "Data richiesta"
+  date_time_options_7abcdea7: "Opzioni data/ora"
+  date_time_options_b501e73b: "Opzioni data/ora"
   datepicker: 
     errors: 
       not_a_date: "Non è una data."
@@ -8495,6 +8521,7 @@ it:
   delete_a6efa79d: Elimina
   delete_account_name_96aee330: "Elimina %{account_name}"
   delete_alignment_f33c97d5: "Elimina allineamento"
+  delete_all_other_course_content_721e0ae3: "Elimina tutti gli altri contenuti del corso"
   delete_announcement_title_756a9d1f: "Elimina annuncio %{title}"
   delete_assignment_5d3f3f15: "elimina assegnazione"
   delete_assignment_group_7c3b01c4: "Elimina gruppo di compiti"
@@ -8844,9 +8871,7 @@ it:
   disabling_the_assignments_and_quizzes_delete_permi_ad890eb3: "La disattivazione dell’autorizzazione Compiti e quiz - Elimina sovrascriverà (se attivata) l'autorizzazione Rubriche - Aggiungi/Modifica/Elimina, impedendo all'utente di eliminare rubriche per un"
   disabling_the_assignments_and_quizzes_edit_permiss_529f9360: "La disattivazione dell’autorizzazione Compiti e quiz - Modifica sovrascriverà (se attivata) l'autorizzazione Rubriche - Aggiungi/Modifica/Elimina, impedendo all'utente di modificare le rubriche da un singolo compito."
   disabling_the_elementary_theme_will_change_the_fon_d7f31a3b: "La disabilitazione del tema elementare cambierà il font nell’interfaccia Canvas per tutti gli utenti nel corso."
-  disabling_the_mastery_paths_feature_will_release_c_4b96c86d: |-
-      La disabilitazione della funzione Percorsi di acquisizione padronanza rilascerà i compiti configurati e il contenuto a tutti gli studenti.
-                        Se la funzione viene riabilitata, questi compiti dovranno essere riconfigurati per Percorsi di acquisizione della padronanza.
+  disabling_the_mastery_paths_feature_will_release_c_4b96c86d: "La disattivazione della funzione Percorso di acquisizione della padronanza rilascerà i compiti configurati e i contenuti a tutti gli studenti. Se la funzione viene riabilitata, questi compiti dovranno essere riconfigurati per i Percorso di acquisizione della padronanza."
   disabling_this_permission_will_override_if_enabled_59c2b5c9: "La disattivazione di questa autorizzazione sovrascriverà (se attivata) l'autorizzazione Rubriche - Aggiungi/Modifica/Elimina, impedendo all'utente di creare o modificare rubriche da un"
   disabling_this_permission_will_override_if_enabled_6481b015: "La disattivazione di questa autorizzazione sovrascriverà (se attivata) l'autorizzazione Rubriche - Aggiungi/Modifica/Elimina, impedendo all'utente di creare o modificare rubriche da un"
   disabling_this_permission_will_override_if_enabled_7f2a87cc: "La disattivazione di questa autorizzazione sovrascriverà (se attivata) l'autorizzazione Rubriche - Aggiungi/Modifica/Elimina, impedendo all'utente di creare o modificare rubriche da un singolo compito. Tuttavia, se l’opzione Risultati apprendimento - Aggiungi/Modifica/Elimina è abilitata, l’utente può ancora aggiungere rubriche attraverso Risultati (pulsante Gestisci rubriche)."
@@ -9422,6 +9447,7 @@ it:
   ecollege_name: "Convertitore Ecollege"
   ecuador_593_dfcc235a: "Ecuador (+593)"
   edit_account_name_for_account_name_ae3633e8: "Modifica nome account per %{account_name}"
+  edit_all_other_course_content_c8dd98d3: "Modifica tutti gli altri contenuti del corso"
   edit_and_delete_their_own_posts_f4f7cc6: "Modifica ed elimina i loro post"
   edit_and_delete_their_own_replies_e5b9d793: "Modifica ed elimina le loro risposte"
   edit_announcement_title_cce0b4e: "Modifica annuncio %{title}"
@@ -9641,6 +9667,7 @@ it:
   enable_gradebook_list_students_by_sortable_name: "Elenca gli studenti in base ai nomi ordinabili nel registro dei voti. Il valore predefinito del nome ordinabile è \"Cognome, Nome\" e può essere modificato nelle impostazioni."
   enable_gravatar_8a865b41: "Attiva Gravatar"
   enable_i18n_features_in_outcomes_exports_64bcf82b: "Attiva le caratteristiche i18n nelle esportazioni dei risultati"
+  enable_individual_learning_paths_for_students_base_5236d3bb: "Abilita i percorsi di apprendimento individuali per gli studenti in base alle valutazioni"
   enable_migrating_item_banks_to_new_quizzes_during__af6ca020: "Abilita la migrazione delle banche di elementi a Nuovi Quiz durante l'importazione/la copia del corso"
   enable_moderated_grading_bacd20d8: "Abilitare valutazione moderata."
   enable_moderated_grading_only_relevant_if_the_anon_1dcdc47b: "Abilitare valutazione moderata. Rilevante solo se il contrassegno Valutazione anonima moderata è abilitato."
@@ -10689,6 +10716,7 @@ it:
   filter_e3398407: Filtra
   filter_features_388eafd8: "Filtra funzionalità"
   filter_ip_addresses_2f296bd2: "Filtra indirizzi IP"
+  filter_jobs_by_date_202eb267: "Filtra lavori per data"
   filter_messages_by_course_21a53fc4: "Filtra messaggi per corso"
   filter_observer_dashboard_by_student_5705ff33: "Filtra dashboard osservatore per studente"
   filter_recent_user_accesses_by_term_30812659: "Filtra accessi utente recenti per termine."
@@ -10957,6 +10985,7 @@ it:
   grade_for_missing_submissions_56f91c83: "Voto per consegne mancanti"
   grade_for_name_b9df168a: "Valuta per: %{name}"
   grade_for_studentname_d124b199: "Voto per %{studentName}"
+  grade_for_ungraded_artifacts_d0b6fb57: "Assegna voto per elementi non valutati"
   grade_for_ungraded_submissions_59f72299: "Voto per consegne non valutate"
   grade_grade_7e52dd1c: "Voto: %{grade}"
   grade_high_to_low_1cea0381: "Voto - da alto a basso"
@@ -11526,6 +11555,7 @@ it:
   granular_permissions_for_add_remove_admin_roles_fr_9a06a75d: "Autorizzazioni granulari per aggiungi/rimuovi ruoli amministratore dal corso"
   granular_permissions_for_add_remove_roles_from_cou_b0a34301: "Autorizzazioni granulari per Aggiungi/Rimuovi ruoli da corso"
   granular_permissions_for_assignments_and_quizzes_6b3bddc6: "Autorizzazioni granulari per compiti e quiz"
+  granular_permissions_for_managing_course_content_91375668: "Autorizzazioni granulari per gestire i contenuto del corso"
   granular_permissions_for_managing_course_files_1ed7f019: "Autorizzazioni granulari per gestire i file del corso"
   granular_permissions_for_managing_course_sections_da4b04b: "Autorizzazioni granulari per la gestione delle sezioni del corso"
   granular_permissions_for_managing_courses_a71be71d: "Autorizzazioni granulari per gestioni corsi"
@@ -11696,6 +11726,7 @@ it:
       heading_current_groups: "Gruppi correnti"
       heading_previous_groups: "Gruppi precedenti"
       no_groups: "Nessun gruppo"
+      no_groupsheading: Gruppi
     manage: 
       add_unassigned_menu: 
         add_unassigned_student: "Aggiungi studente non assegnato"
@@ -12053,6 +12084,7 @@ it:
   hide_all_artifacts_d654fbd5: "Nascondi tutti gli elementi"
   hide_all_details_61d7ebb: "Nascondi tutti i dettagli"
   hide_all_recipients_1ca02da6: "Nascondi tutti i destinatari"
+  hide_assignment_group_totals_f4fb8660: "Nascondi totali gruppo di compiti"
   hide_correct_answers_at_2421b0aa: "Nascondi risposte corrette in"
   hide_correct_answers_at_b1a59408: "Nascondi risposte corrette in"
   hide_course_sections_for_course_name_bd1911af: "Nascondi sezioni corso per il corso %{name}"
@@ -13360,6 +13392,7 @@ it:
   like_count_count_9467dc82: "Conteggio Mi piace: %{count}"
   like_post_dbf48764: "Metti Mi piace al post"
   like_post_from_author_79b874f1: "Post Mi piace da %{author}"
+  like_this_entry_60da41a5: "Come questa voce"
   limit_assignment_names_lengths_max_255_5ee9ebb5: "Limita lunghezza nomi compiti (max 255)"
   limit_course_participation_to_term_or_custom_cours_67797a86: "Limitare la partecipazione al corso alle date del trimestre o del corso personalizzato?"
   limit_each_time_slot_to_input_value_user_s_47461538: "Limita ciascuna fascia oraria a %{input_value} utente/i. "
@@ -13542,6 +13575,7 @@ it:
   loading_total_grade_for_coursename_b6eff3b6: "Caricamento voto totale per %{courseName}"
   loading_unsynced_changes_1b52f725: "Caricamento modifiche non sincronizzate in corso..."
   loading_unsynced_changes_b5d7b202: "Caricamento modifiche non sincronizzate"
+  local_4ee321b1: Locale
   locales: 
     it: Italiano
   location_e17bd402: Posizione
@@ -13764,6 +13798,7 @@ it:
   manage_add_edit_delete_18963dbc: "Gestisci (Aggiungi/Modifica/Elimina) "
   manage_add_edit_delete_course_files_162c1a65: "Gestisci (aggiungi/modifica/elimina) file del corso"
   manage_add_edit_delete_pages_5c73f2fb: "Gestisci (aggiungi/modifica/elimina) pagine"
+  manage_all_other_course_content_d77de830: "Gestisci tutti gli altri contenuti del corso"
   manage_announcement_with_title_title_f2ce92de: "Gestisci annuncio con titolo %{title}"
   manage_app_list_994cc26c: "Gestisci elenco app"
   manage_assignment_31a132fb: "Gestisci compito"
@@ -13777,7 +13812,9 @@ it:
       delete_avatar: "Vuoi eliminare l'immagine del profilo di questo utente?"
       lock_avatar: "Il blocco dell'immagine impedirà all'utente di aggiornarla.  Continuare?"
   manage_b88f7150: Gestisci
+  manage_blackout_dates_1f67216a: "Gestisci date blackout"
   manage_comment_library_48f2d123: "Gestisci libreria commenti"
+  manage_course_content_fc5de138: "Gestisci contenuto del corso"
   manage_course_files_57e07038: "Gestisci file corso"
   manage_course_sections_f482d1b3: "Gestisci sezioni corso"
   manage_course_templates_66c00052: "Gestisci modelli di corso"
@@ -15873,6 +15910,7 @@ it:
   module_last_to_first_8cdb7a8e: "Modulo - Dall'ultimo al primo"
   module_locked_f6a7ea9d: "Modulo bloccato"
   module_menu_3201af4e: "Menu Modulo"
+  module_menu_modal_6b20c03: "Menu moduli (modale)"
   module_module_name_was_successfully_deleted_fc9e9d47: "Il modulo %{module_name} è stato eliminato correttamente."
   module_name_1127ebdb: "Nome modulo"
   module_navigation_97043417: "Navigazione modulo"
@@ -16299,6 +16337,7 @@ it:
   no_associated_terms_13bacefc: "Nessun trimestre associato"
   no_attachments_found_for_the_following_ids_ids_49c9192f: "Nessun allegato trovato per i seguenti ID: %{ids}"
   no_attributes_locked_611c5cc: "nessun attributo bloccato"
+  no_blackout_dates_1297ec22: "Nessuna data blackout"
   no_broken_links_found_38d951e3: "Nessun collegamento interrotto trovato"
   no_cancel_installation_db8d12d7: "No, annulla l'installazione"
   no_child_topic_found_b706d56a: "nessun argomento secondario trovato"
@@ -18280,6 +18319,7 @@ it:
           limitato](%{documentation_url}) puoi generare i token da qui.
       google_drive_description: "Dopo averci autorizzati a visualizzare il tuo Google Drive, potrai inviare i tuoi compiti direttamente da Google Drive nonché creare documenti e condividerli con i membri della tua classe."
       headers: 
+        action: Dettagli
         application_abbrev: App
         dates: Date
         delicious_login: "Accesso Delicious"
@@ -18294,6 +18334,7 @@ it:
         other_services: "Altri servizi"
         purpose: Scopo
         registered_services: "Servizi registrati"
+        remove: Rimuovi
         share_skype_id: "Condividi il tuo ID Skype"
         twitter_access: "Accesso a Twitter"
         ways_to_log_in: "Modalità di accesso"
@@ -20693,6 +20734,7 @@ it:
   saving_associations_989bd4da: "Salvataggio associazioni"
   saving_associations_complete_e4b9634d: "Salvataggio associazioni completato"
   saving_associations_started_8ac85360: "Salvataggio associazioni avviato"
+  saving_blackout_dates_be03e6ee: "Salvataggio date blackout in corso..."
   saving_d55dd90e: "Salvataggio in corso..."
   saving_dates_2472a539: "Salvataggio date"
   saving_draft_c97afab3: "Salvataggio bozza"
@@ -21037,6 +21079,7 @@ it:
   select_a_predefined_color_c77ab2f5: "Seleziona un colore predefinito."
   select_a_provisional_grade_7106e3d5: "Seleziona un voto provvisorio"
   select_a_student_to_view_281d17b9: "Seleziona uno studente da visualizzare"
+  select_a_student_to_view_the_page_will_refresh_aut_eaa5d00c: "Seleziona uno studente da visualizzare. La pagina si aggiornerà automaticamente."
   select_all_assignments_bd07b919: "Seleziona tutti i compiti"
   select_all_count_courses_4fc63811: 
     one: "Seleziona (%{count}) corso"
@@ -23242,6 +23285,11 @@ it:
   the_default_report_only_includes_course_section_da_729092f0: "Il report predefinito include solo le date di corso/sezione se sono abilitati i limiti di iscrizione"
   the_discussion_entry_was_successfully_created_7cddf67b: "L’elemento di discussione è stato creato correttamente."
   the_discussion_topic_was_successfully_deleted_d8b93b70: "L’argomento di discussione è stato eliminato correttamente."
+  the_download_process_has_started_this_can_take_a_w_cef4bb75: |-
+      Il processo di download è iniziato. Questa operazione
+                può richiedere del tempo per i corsi di grandi dimensioni. Puoi uscire dalla
+                pagina e riceverai una notifica al termine
+                del download.
   the_download_process_has_started_this_can_take_awh_7e616db1: |-
       Il processo di download è iniziato. Questa operazione
                 può richiedere del tempo per i corsi di grandi dimensioni. Puoi lasciare la
@@ -23553,6 +23601,7 @@ it:
   there_was_an_error_retrieving_the_course_image_d7ea094d: "Si è verificato un errore durante il recupero dell'immagine del corso"
   there_was_an_error_saving_the_assignment_dates_d31903ab: "Si è verificato un errore durante il salvataggio delle date del compito."
   there_was_an_error_saving_the_changes_to_the_cours_ed2b1d24: "Si è verificato un errore durante il salvataggio delle modifiche al corso"
+  there_was_an_error_saving_your_blackout_dates_1efee334: "Si è verificato un errore di salvataggio delle date blackout"
   there_was_an_error_saving_your_changes_bfaf3d79: "Si è verificato un errore di salvataggio delle modifiche."
   there_was_an_error_setting_usage_rights_53739e1d: "Si è verificato un errore durante l'impostazione dei diritti di utilizzo."
   there_was_an_error_starting_the_save_assignment_da_22ffb6a8: "Si è verificato un errore di avvio del lavoro di salvataggio date compito"
@@ -23791,6 +23840,7 @@ it:
   this_may_take_a_bit_48fe4235: "Il processo potrebbe richiedere un po' di tempo..."
   this_may_take_a_bit_c061d0f6: "il processo potrebbe richiedere un po' di tempo..."
   this_may_take_a_few_minutes_e2df06d6: "Questa operazione potrebbe richiedere alcuni minuti."
+  this_may_take_a_while_d07790f2: "Il processo potrebbe richiedere un po' di tempo..."
   this_message_includes_media_comments_to_listen_or__5fc98641: "Questo messaggio include commenti multimediali. Per ascoltare o rispondere, fai clic su questo link: %{link}."
   this_message_includes_media_comments_to_listen_or__75ea03a1: "Questo messaggio include commenti multimediali. Per ascoltare o rispondere, fai clic sul link sotto:"
   this_message_includes_media_comments_to_listen_or__df72d662: "Questo messaggio include commenti multimediali. Per ascoltare o rispondere, fai clic su questo link: %{link}.  Quando consentito, se è necessario includere un allegato, accedi a Canvas e rispondi alla consegna."
@@ -24180,6 +24230,7 @@ it:
   title_is_unlocked_click_to_lock_6a20cfcb: "%{title} è sbloccato. Fai clic per bloccare."
   title_no_due_date_bbbd3b53: "%{title}: Nessuna data di scadenza"
   title_outcomes_7adbd9cc: "Risultati %{title}"
+  title_required_3ff5969: "Titolo obbligatorio"
   title_separator: ": "
   title_tray_ec9f7488: "%{title} barra delle applicazioni"
   title_was_successfully_created_f2a07c56: "\"%{title}\" creato correttamente."
@@ -25000,6 +25051,7 @@ it:
   unable_to_send_messages_to_users_in_context_name_7d6997b6: "Impossibile inviare il messaggio agli utenti in %{context_name}"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: "Impossibile impostare il voto predefinito perché questo compito è in scadenza in un periodo di valutazione chiuso per almeno uno studente"
   unable_to_set_up_drag_and_drop_for_modules_4d339f1d: "Impossibile impostare la selezione e il trascinamento per i moduli"
+  unable_to_switch_students_b901bc4b: "Impossibile cambiare studenti"
   unable_to_toggle_placement_833db6ff: "Impossibile cambiare posizione"
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "Impossibile trasmettere il file al servizio di archiviazione. Il servizio potrebbe essere inattivo o potrebbe essere necessario effettuare nuovamente l'accesso a Canvas."
   unable_to_update_microsoft_teams_sync_settings_ple_64255854: "Impossibile aggiornare impostazioni sincronizzazione Microsoft Teams. Riprova. Se il problemi persiste, contatta l'assistenza."
@@ -25080,6 +25132,7 @@ it:
   unknown_user_url_82196ba7: "URL utente sconosciuto"
   unlike_post_1b20a02c: "Rimuovi Mi piace da un post"
   unlike_post_from_author_5e2c13c5: "Post Non mi piace da %{author}"
+  unlike_this_entry_f22e8d45: "Diversamente da questa voce"
   unlimited_attempts_81a37d4: "Tentativi illimitati"
   unlimited_ff19e96d: "Senza limiti"
   unlock_at_bb930b34: "Sblocca il"
@@ -25793,6 +25846,7 @@ it:
   users_with_no_enrollments_5dddce33: "Utenti senza iscrizioni"
   users_with_this_permission_may_be_able_to_use_the__84394072: "Gli utenti con questa autorizzazione possono essere in grado di utilizzare la funzione Agisci come per gestire le impostazioni account, visualizzare e regolare i voti, accedere alle informazioni utente, ecc. Questa autorizzazione consente anche agli amministratori designati ad un sub-account di accedere alle impostazioni e alle informazioni all’esterno del loro sub-account."
   uses_the_new_scheduler_and_its_functionality_b07e9b14: "Utilizza il nuovo utilità di pianificazione e le sue funzionalità"
+  utc_e44049af: UTC
   validate: 
     is_required: "Questo campo è obbligatorio"
   validate_links_in_content_b1630fba: "Convalida link nel contenuto"
@@ -25819,6 +25873,7 @@ it:
   video_conferencing_tools_enable_face_to_face_conne_144420a5: "Gli strumenti di videoconferenza abilitano la connessione faccia a faccia tra gli insegnanti e gli studenti."
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Il contenuto del video non è supportato dal tuo dispositivo o dalla tua app."
   video_player_b371005: "Lettore video"
+  video_player_for_label_6a5fdb03: "Riproduttore video per %{label}"
   vietnam_84_e50a2a44: "Vietnam (+84)"
   vietnamese_e7a76583: Vietnamita
   view_all_e13bf0a6: "Visualizza tutto"
@@ -25880,6 +25935,7 @@ it:
   view_the_discussion_link_c4dbdef: "Visualizza la discussione: %{link}."
   view_the_reply_in_the_discussion_4c698ff9: "Visualizza la risposta nella discussione:"
   view_this_message_in_conversations_5a16bc9f: "Visualizza questo messaggio nelle conversazioni"
+  view_timestamps_in_time_zone_9b699a8b: "Visualizza indicazione di data e ora nel fuso orario"
   view_toolname_placements_4a5724d1: "Visualizza posizionamenti %{toolName}"
   view_ungraded_as_0_1a9631a1: "Visualizza non valutato come 0"
   view_ungraded_as_0_a9e87a54: "Visualizza non valutato come 0"
@@ -26053,6 +26109,7 @@ it:
       Quando abilitato, attiva i pulsanti e le icone per ritaglio immagine, origine immagini
       corso e carica origine immagine.
   when_hiding_grades_for_anonymous_assignments_grade_1b0ef682: "Quando si nascondono i voti per compiti anonimi, i voti risulteranno nascosti a tutti i partecipanti al corso. L’anonimato sarà riapplicato."
+  when_masquerading_as_course_admin_roles_teacher_ta_e3e3c0a9: "Quando si esegue il mascheramento con i ruoli di amministratore del corso (ruoli base di insegnante/assistente/progettista), Canvas garantirà all’utente che esegue il mascheramento di avere tutte le stesse autorizzazioni (o di più) dell’utente target."
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Quando le persone visitano il corso, vedranno questa pagina.  Puoi impostarla in modo da mostrare un flusso di attività, l'elenco dei moduli dei corsi, un piano di studio o una pagina personalizzata scritta da te.  L'impostazione predefinita è il flusso di attività del corso."
   when_people_visit_your_course_this_is_the_first_pa_5093ec45: |-
       Quando le persone visitano il tuo corso, vedranno questa pagina.
@@ -26494,6 +26551,7 @@ it:
   you_must_provide_a_date_with_a_time_ec369ff4: "È necessario fornire data e ora."
   you_must_provide_a_tenant_and_login_attribute_to_e_684cc13b: "Devi fornire un tenant e un attributo di accesso alla sincronizzazione Microsoft Teams abilitata"
   you_must_provide_a_value_or_unselect_the_option_3b28b754: "Devi fornire un valore o deselezionare l'opzione."
+  you_must_provide_required_fields_before_adding_6717073d: "Devi fornire i campi obbligatori prima dell’aggiunta"
   you_must_provide_targetgroupid_or_targetcontextid__dd2bf92: "Devi fornire targetGroupId o targetContextId e targetContextType"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Devi selezionare un corso da cui copiare il contenuto"
   you_must_select_a_folder_to_upload_your_migration__ac7bc7c0: "Devi selezionare una cartella in cui caricare la migrazione"

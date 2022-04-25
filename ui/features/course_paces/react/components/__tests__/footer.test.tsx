@@ -78,6 +78,14 @@ describe('Footer', () => {
     expect(getByText('You cannot publish while loading the pace')).toBeInTheDocument()
   })
 
+  it('shows cannot cancel when a new pace', () => {
+    const {getByText, queryByText} = render(
+      <Footer {...defaultProps} unpublishedChanges={false} newPace />
+    )
+    expect(getByText('There are no pending changes to cancel')).toBeInTheDocument()
+    expect(queryByText('You cannot publish while loading the pace')).not.toBeInTheDocument()
+  })
+
   it('renders a loading spinner inside the publish button when publishing is ongoing', () => {
     const {getByRole} = render(<Footer {...defaultProps} pacePublishing isSyncing />)
 
