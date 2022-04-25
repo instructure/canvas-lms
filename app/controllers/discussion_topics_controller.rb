@@ -755,7 +755,6 @@ class DiscussionTopicsController < ApplicationController
                isolated_view: Account.site_admin.feature_enabled?(:isolated_view),
                draft_discussions: Account.site_admin.feature_enabled?(:draft_discussions),
                discussion_anonymity_enabled: @context.feature_enabled?(:react_discussions_post),
-               inline_grading_enabled: Account.site_admin.feature_enabled?(:discussions_inline_grading),
                should_show_deeply_nested_alert: @current_user&.should_show_deeply_nested_alert?,
                # GRADED_RUBRICS_URL must be within DISCUSSION to avoid page error
                DISCUSSION: {
