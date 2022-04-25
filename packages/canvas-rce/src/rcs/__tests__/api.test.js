@@ -53,7 +53,7 @@ describe('fetchImages()', () => {
 
   beforeEach(() => {
     apiSource.hasSession = true
-    fetchMock.mock(/\/api\/documents*/, '[]')
+    fetchMock.mock(/\/api\/documents*/, '{"files": []}')
   })
 
   describe('with "category" set', () => {
@@ -64,7 +64,7 @@ describe('fetchImages()', () => {
   })
 
   it('sends the category', async () => {
-    subject()
+    await subject()
     expect(
       fetchMock.called(
         '/api/documents?contextType=course&contextId=undefined&content_types=image&sort=undefined&order=undefined&category=uncategorized'
@@ -80,11 +80,11 @@ describe('fetchFilesForFolder()', () => {
 
   beforeEach(() => {
     apiProps = {host: 'test.com', jwt: 'asd.asdf.asdf', filesUrl: '/api/files'}
-    fetchMock.mock('/api/files', '[]')
+    fetchMock.mock('/api/files', '{"files": []}')
   })
 
-  it('includes the "uncategorized" category in the request', () => {
-    subject()
+  it('includes the "uncategorized" category in the request', async () => {
+    await subject()
     expect(apiSource.fetchPage).toHaveBeenCalledWith('/api/files?&category=uncategorized', 'theJWT')
   })
 })
@@ -108,11 +108,11 @@ describe('fetchMedia', () => {
     }
 
     apiSource.apiFetch = jest.fn()
-    fetchMock.mock('/api/documents', '[]')
+    fetchMock.mock('/api/documents', '{"files": []}')
   })
 
-  it('fetches media documents', () => {
-    subject()
+  it('fetches media documents', async () => {
+    await subject()
     expect(apiSource.apiFetch).toHaveBeenCalledWith(
       'http://test.com/api/documents?contextType=course&contextId=1&content_types=video,audio&sort=name&order=asc',
       {Authorization: 'Bearer theJWT'}
