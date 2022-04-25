@@ -31,6 +31,7 @@ import formatMessage from '../../../../format-message'
 
 import MemoizedEquationEditorToolbar from '../EquationEditorToolbar'
 import {containsAdvancedSyntax} from './advancedOnlySyntax'
+import advancedPreference from './advancedPreference'
 
 import {css} from 'aphrodite'
 import mathml from './mathml'
@@ -179,6 +180,9 @@ export default class EquationEditorModal extends Component {
   }
 
   handleEntered = () => {
+    if (advancedPreference.isSet()) {
+      this.toggleAdvanced()
+    }
     this.loadExistingFormula()
   }
 
@@ -244,6 +248,11 @@ export default class EquationEditorModal extends Component {
     this.setPreviewElementContent()
   }
 
+  toggleAndUpdatePreference = () => {
+    this.toggleAdvanced()
+    advancedPreference.isSet() ? advancedPreference.clear() : advancedPreference.set()
+  }
+
   registerBasicEditorListener = () => {
     const basicEditor = document.querySelector('math-field')
     basicEditor.addEventListener('input', e => {
@@ -294,7 +303,7 @@ export default class EquationEditorModal extends Component {
 
     const defaultToggle = (
       <Checkbox
-        onChange={this.toggleAdvanced}
+        onChange={this.toggleAndUpdatePreference}
         checked={this.state.advanced}
         label={formatMessage('Directly Edit LaTeX')}
         variant="toggle"

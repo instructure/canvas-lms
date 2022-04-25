@@ -20,6 +20,7 @@ import React from 'react'
 import {fireEvent, render, screen, waitFor} from '@testing-library/react'
 import EquationEditorModal from '../index'
 import mathml from '../mathml'
+import advancedPreference from '../advancedPreference'
 
 const defaultProps = () => {
   return {
@@ -60,6 +61,14 @@ jest.mock('../mathml', () => {
   return {
     ...originalModule,
     processNewMathInElem: jest.fn()
+  }
+})
+
+jest.mock('../advancedPreference', () => {
+  return {
+    isSet: jest.fn(),
+    set: jest.fn(),
+    clear: jest.fn()
   }
 })
 
@@ -509,5 +518,29 @@ describe('EquationEditorModal', () => {
     renderModal()
     const shouldProcess = mathml.shouldProcess(advancedPreview())
     expect(shouldProcess).toBe(true)
+  })
+
+  describe('advanced mode flag', () => {
+    it('forces the editor to open in advanced mode when set', async () => {
+      advancedPreference.isSet.mockReturnValueOnce(true)
+      renderModal({editor})
+      await waitFor(() => {
+        expect(toggle()).toBeChecked()
+      })
+    })
+
+    it('is cleared when the user toggles from advanced to basic mode', () => {
+      advancedPreference.isSet.mockReturnValueOnce(true)
+      renderModal({editor})
+      toggleMode()
+      expect(advancedPreference.clear).toHaveBeenCalled()
+    })
+
+    it('is set when the user toggles from basic to advanced mode', () => {
+      advancedPreference.isSet.mockReturnValueOnce(false)
+      renderModal({editor})
+      toggleMode()
+      expect(advancedPreference.set).toHaveBeenCalled()
+    })
   })
 })
