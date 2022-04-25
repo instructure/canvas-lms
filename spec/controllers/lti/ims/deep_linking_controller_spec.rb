@@ -804,6 +804,10 @@ module Lti
             end
 
             context "when on the new assignment page" do
+              before do
+                course.root_account.enable_feature! :lti_assignment_page_line_items
+              end
+
               let(:params) { super().merge({ placement: "assignment_selection" }) }
               let(:content_items) do
                 [
@@ -811,6 +815,14 @@ module Lti
                   { type: "ltiResourceLink", url: launch_url, title: "Item 2", lineItem: { scoreMaximum: 4 } },
                   { type: "ltiResourceLink", url: launch_url, title: "Item 3", lineItem: { scoreMaximum: 4 } }
                 ]
+              end
+
+              context "when assignment edit page feature flag is disabled" do
+                before do
+                  course.root_account.disable_feature! :lti_assignment_page_line_items
+                end
+
+                it_behaves_like "does nothing"
               end
 
               it "does not create a new module" do
