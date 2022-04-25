@@ -94,7 +94,7 @@ This value does not apply to learning outcome groups.</td>
 <td>calculation_method</td>
 <td>text</td>
 <td></td>
-<td>Must be one of "decaying_average", "n_mastery", "highest", "latest" or blank.
+<td>Must be one of "decaying_average", "n_mastery", "highest", "latest", "average" or blank.
 This field must be blank for learning outcome groups. If not provided and this
 is a learning outcome, then the calculation method defaults to "decaying_average".</td>
 </tr>
@@ -104,7 +104,7 @@ is a learning outcome, then the calculation method defaults to "decaying_average
 <td></td>
 <td>Valid values depend on the "calculation_method". For "decaying_average", the value must
 be between 1 and 99, inclusive. For "n_mastery", the value must be between 1 and 10, inclusive.
-For "highest" and "latest", this field must be blank.</td>
+For "highest", "latest" and "average", this field must be blank.</td>
 </tr>
 <tr>
 <td>parent_guids</td>

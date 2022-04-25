@@ -74,6 +74,10 @@ class RollupScore
     when "highest"
       highest_set = score_sets.max_by { |set| set[:score] }
       { score: highest_set[:score].round(PRECISION), results: [highest_set[:result]] }
+    when "average"
+      return nil if @outcome_results.empty?
+
+      average_set
     end
   end
 
@@ -111,5 +115,11 @@ class RollupScore
     older_avg_weighted = (tmp_scores.sum / tmp_scores.length) * (0.01 * (100 - weight))
     decaying_avg_score = (latest_weighted + older_avg_weighted).round(PRECISION)
     { score: decaying_avg_score, results: tmp_score_sets.pluck(:result).push(latest[:result]) }
+  end
+
+  def average_set
+    tmp_scores = score_sets.pluck(:score)
+    average_score = (tmp_scores.sum.to_f / tmp_scores.size).round(PRECISION)
+    { score: average_score, results: score_sets.pluck(:result) }
   end
 end

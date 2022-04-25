@@ -91,6 +91,13 @@ describe OutcomeCalculationMethod, type: :model do
         it { is_expected.to allow_value(nil).for(:calculation_int) }
         it { is_expected.not_to allow_values(1, 10, 100).for(:calculation_int) }
       end
+
+      context "average" do
+        let(:calculation_method) { "average" }
+
+        it { is_expected.to allow_value(nil).for(:calculation_int) }
+        it { is_expected.not_to allow_values(1, 10, 100).for(:calculation_int) }
+      end
     end
   end
 

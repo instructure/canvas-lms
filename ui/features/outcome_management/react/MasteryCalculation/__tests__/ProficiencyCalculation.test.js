@@ -235,6 +235,22 @@ describe('ProficiencyCalculation', () => {
       })
     })
 
+    describe('average', () => {
+      it('calls update with the correct arguments', () => {
+        const update = jest.fn()
+        const {getByDisplayValue, getByText} = render(
+          <ProficiencyCalculation {...makeProps({update})} />
+        )
+        const method = getByDisplayValue('Decaying Average')
+        fireEvent.click(method)
+        const newMethod = getByText('Average')
+        fireEvent.click(newMethod)
+        fireEvent.click(getByText('Save Mastery Calculation'))
+        fireEvent.click(getByText('Save'))
+        expect(update).toHaveBeenCalledWith('average', null)
+      })
+    })
+
     describe('decaying_average', () => {
       it('includes error when int invalid', () => {
         const {getByLabelText, getByText} = render(<ProficiencyCalculation {...makeProps()} />)
