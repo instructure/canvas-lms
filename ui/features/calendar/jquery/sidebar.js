@@ -20,6 +20,7 @@ import $ from 'jquery'
 import _ from 'underscore'
 import React from 'react'
 import ReactDOM from 'react-dom'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import ColorPicker from '@canvas/color-picker'
 import userSettings from '@canvas/user-settings'
 import contextListTemplate from '../jst/contextList.handlebars'
@@ -27,6 +28,9 @@ import forceScreenreaderToReparse from 'force-screenreader-to-reparse'
 import 'jquery-kyle-menu'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import 'jquery-tinypubsub'
+import 'jqueryui/tooltip'
+
+const I18n = useI18nScope('calendar_sidebar')
 
 class VisibleContextManager {
   constructor(contexts, selectedContexts, $holder) {
@@ -39,7 +43,17 @@ class VisibleContextManager {
       }
     })()
 
-    const availableContexts = contexts.map(c => c.asset_string)
+    if (!this.disabledContexts) {
+      const disabledContexts = contexts
+        .filter(c => c.course_pacing_enabled && !(c.can_make_reservation || c.user_is_observer))
+        .map(dC => dC.asset_string)
+      this.disabledContexts = disabledContexts
+    }
+
+    const availableContexts = contexts
+      .filter(ctx => !this.disabledContexts?.includes(ctx.asset_string))
+      .map(c => c.asset_string)
+
     if (fragmentData.show) {
       this.contexts = fragmentData.show.split(',')
     }
@@ -54,6 +68,7 @@ class VisibleContextManager {
     this.contexts = this.contexts.slice(0, ENV.CALENDAR.VISIBLE_CONTEXTS_LIMIT)
 
     this.notify()
+    this.disableContexts()
 
     $.subscribe('Calendar/saveVisibleContextListAndClear', this.saveAndClear)
     $.subscribe('Calendar/restoreVisibleContextList', this.restoreList)
@@ -119,6 +134,27 @@ class VisibleContextManager {
 
     return userSettings.set('checked_calendar_codes', this.contexts)
   }
+
+  disableContexts = () => {
+    this.$holder.find('.context_list_context').each((i, li) => {
+      const $li = $(li)
+      const disabled = this.disabledContexts.includes($li.data('context'))
+      if (disabled) {
+        const label = document.createElement('label')
+        label.style.display = 'block'
+        label.innerHTML = I18n.t('Due dates managed by Course Pacing.')
+        $li[0].appendChild(label)
+        $li.toggleClass('disabled-context', disabled)
+        $li.attr('title', I18n.t('Course calendar view disabled.'))
+        $li.on('click keyclick', false)
+        $li.children().attr('tabindex', -1)
+        $($li).tooltip({
+          position: {my: 'left bottom', at: 'left top'},
+          tooltipClass: 'center bottom vertical'
+        })
+      }
+    })
+  }
 }
 
 function setupCalendarFeedsWithSpecialAccessibilityConsiderationsForNVDA() {
@@ -163,20 +199,18 @@ export default function sidebar(contexts, selectedContexts, dataSource) {
 
   const visibleContexts = new VisibleContextManager(contexts, selectedContexts, $holder)
 
-  $holder.on('click keyclick', '.context-list-toggle-box', function(event) {
+  $holder.on('click keyclick', '.context-list-toggle-box', function (event) {
     const parent = $(this).closest('.context_list_context')
     visibleContexts.toggle($(parent).data('context'))
   })
 
-  $holder.on('click keyclick', '.ContextList__MoreBtn', function(event) {
+  $holder.on('click keyclick', '.ContextList__MoreBtn', function (event) {
     const positions = {
       top: $(this).offset().top - $(window).scrollTop(),
       left: $(this).offset().left - $(window).scrollLeft()
     }
 
-    const assetString = $(this)
-      .closest('li')
-      .data('context')
+    const assetString = $(this).closest('li').data('context')
 
     // ensures previously picked color clears
     ReactDOM.unmountComponentAtNode($('#color_picker_holder')[0])
@@ -209,8 +243,6 @@ export default function sidebar(contexts, selectedContexts, dataSource) {
 
   $skipLink.on('click', e => {
     e.preventDefault()
-    $('#content')
-      .attr('tabindex', -1)
-      .focus()
+    $('#content').attr('tabindex', -1).focus()
   })
 }
