@@ -23,6 +23,8 @@ require "csv"
 module AccountReports::ReportHelper
   include ::Api
 
+  class DatabaseReplicationError < StandardError; end
+
   def parse_utc_string(datetime)
     if datetime.is_a? String
       Time.use_zone("UTC") { Time.zone.parse(datetime) }
@@ -439,9 +441,10 @@ module AccountReports::ReportHelper
     # secondary db when it is caught up.
     replica = if AccountReport.wait_for_replication(start: xlog_location, timeout: 120, use_report: true)
                 :report
-              else
-                AccountReport.wait_for_replication(start: xlog_location)
+              elsif AccountReport.wait_for_replication(start: xlog_location, timeout: 30.minutes)
                 :secondary
+              else
+                raise DatabaseReplicationError, "Replica failed to catch up in the allotted time"
               end
     files ? compile_parallel_zip_report(files, replica: replica) : write_report_from_rows(headers, replica: replica)
     GuardRail.activate(:primary) { @account_report.delete_account_report_rows }
