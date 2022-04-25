@@ -29,7 +29,6 @@ import EditView from 'ui/features/discussion_topic_edit/backbone/views/EditView.
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
-import RichContentEditor from '@canvas/rce/RichContentEditor'
 import 'helpers/jquery.simulate'
 
 const currentOrigin = window.location.origin
@@ -123,23 +122,6 @@ test('it should be accessible', function (assert) {
 test('renders', function () {
   const view = this.editView()
   ok(view)
-})
-
-// EditView.loadNewEditor is stubbed since I can't figure out how
-// to cope with the async RCE initialization in QUnit
-//
-QUnit.skip('tells RCE to manage the parent', function () {
-  const lne = sandbox.stub(RichContentEditor, 'loadNewEditor')
-  const view = this.editView()
-  view.loadNewEditor()
-  ok(lne.firstCall.args[1].manageParent, 'manageParent flag should be set')
-})
-
-QUnit.skip('does not tell RCE to manage the parent of locked content', function () {
-  const lne = sandbox.stub(RichContentEditor, 'loadNewEditor')
-  const view = this.editView({lockedItems: {content: true}})
-  view.loadNewEditor()
-  strictEqual(lne.callCount, 0, 'RCE not called')
 })
 
 test('shows error message on assignment point change with submissions', function () {
