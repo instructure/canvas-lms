@@ -51,10 +51,14 @@ module LtiOutbound
       hash["lis_result_sourcedid"] = assignment.source_id if user.learner?
       hash["lis_outcome_service_url"] = outcome_service_url
       hash["ext_ims_lis_basic_outcome_url"] = legacy_outcome_service_url
+
+      # Basic outcomes extensions
       hash["ext_outcome_data_values_accepted"] = assignment.return_types.join(",")
       hash["ext_outcome_result_total_score_accepted"] = true
       hash["ext_outcome_submission_submitted_at_accepted"] = true
       hash["ext_outcome_submission_needs_additional_review_accepted"] = true
+      hash["ext_outcome_submission_prioritize_non_tool_grade_accepted"] = true
+
       hash["ext_outcomes_tool_placement_url"] = lti_turnitin_outcomes_placement_url
 
       add_assignment_substitutions!
