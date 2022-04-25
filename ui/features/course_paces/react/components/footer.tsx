@@ -29,9 +29,9 @@ import {StoreState} from '../types'
 import {getAutoSaving, getShowLoadingOverlay, getSyncing} from '../reducers/ui'
 import {coursePaceActions} from '../actions/course_paces'
 import {
-  getCoursePace,
   getPacePublishing,
   getUnpublishedChangeCount,
+  isNewPace,
   isStudentPace
 } from '../reducers/course_paces'
 import {getBlackoutDatesSyncing, getBlackoutDatesUnsynced} from '../shared/reducers/blackout_dates'
@@ -139,7 +139,7 @@ const mapStateToProps = (state: StoreState): StoreProps => {
     blackoutDatesUnsynced: getBlackoutDatesUnsynced(state),
     showLoadingOverlay: getShowLoadingOverlay(state),
     studentPace: isStudentPace(state),
-    newPace: !getCoursePace(state)?.id,
+    newPace: isNewPace(state),
     unpublishedChanges: getUnpublishedChangeCount(state) !== 0
   }
 }

@@ -31,7 +31,7 @@ import ProjectedDates from './projected_dates/projected_dates_2'
 import Settings from './settings/settings'
 import UnpublishedChangesIndicator from '../unpublished_changes_indicator'
 import {getSelectedContextId, getSelectedContextType} from '../../reducers/ui'
-import {getCoursePace} from '../../reducers/course_paces'
+import {isNewPace} from '../../reducers/course_paces'
 import {StoreState} from '../../types'
 
 const I18n = useI18nScope('course_paces_header')
@@ -95,7 +95,7 @@ const mapStateToProps = (state: StoreState) => {
   return {
     context_type: getSelectedContextType(state),
     context_id: getSelectedContextId(state),
-    newPace: !getCoursePace(state)?.id
+    newPace: isNewPace(state)
   }
 }
 export default connect(mapStateToProps)(Header)
