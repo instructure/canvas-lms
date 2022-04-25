@@ -45,7 +45,7 @@ function EquationEditorToolbar(props) {
       renderTitle={section.name}
       isSelected={selectedTab === section.name}
     >
-      {section.commands.map(({displayName, command, advancedCommand}) => {
+      {section.commands.map(({displayName, command, advancedCommand, label}) => {
         const name = displayName || command
         const icon = <MathIcon command={command} />
 
@@ -56,7 +56,9 @@ function EquationEditorToolbar(props) {
         return (
           <div style={buttonContainerStyle} key={name}>
             <Button onClick={() => props.executeCommand(command, advancedCommand)} icon={icon}>
-              <ScreenReaderContent>LaTeX: {name}</ScreenReaderContent>
+              <ScreenReaderContent>
+                {label}, LaTeX: {name}
+              </ScreenReaderContent>
             </Button>
           </div>
         )

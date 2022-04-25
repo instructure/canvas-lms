@@ -343,6 +343,7 @@ export default class EquationEditorModal extends Component {
         open
         mountNode={mountNode}
         transition="fade"
+        shouldCloseOnDocumentClick={false}
       >
         <Modal.Header>
           <CloseButton
