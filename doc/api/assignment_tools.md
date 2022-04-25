@@ -468,8 +468,10 @@ be preserved.
   </imsx_POXHeader>
   <imsx_POXBody>
     <replaceResultRequest>
-      <!-- Added element -->
-      <prioritizeNonToolGrade/>
+      <submissionDetails>
+        <!-- Added element -->
+        <prioritizeNonToolGrade/>
+      </submissionDetails>
       <resultRecord>
         <sourcedGUID>
           <sourcedId>3124567</sourcedId>
