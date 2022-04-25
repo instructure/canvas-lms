@@ -122,6 +122,13 @@
       background-color: #e6e7e9 !important;
     }
   }
+  .disabled-context {
+    cursor: not-allowed !important;
+  }
+  .disabled-context * {
+    cursor: not-allowed !important;
+    pointer-events: none;
+  }
   .context-list-add {
     position: absolute;
     #{direction(right)}: 5px;
