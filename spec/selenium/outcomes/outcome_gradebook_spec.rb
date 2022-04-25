@@ -69,6 +69,10 @@ describe "outcome gradebook" do
       ff(".outcome-gradebook-container .headerRow_1 .outcome-score").map(&:text)
     end
 
+    def nth_mastery_score(index)
+      ff(".outcome-gradebook-container .viewport_1 .outcome-score")[index].text
+    end
+
     def selected_values_colors
       ff(".outcome-gradebook-container .headerRow_1 .outcome-result").map do |r|
         CanvasColor::Color.parse(
@@ -245,6 +249,58 @@ describe "outcome gradebook" do
           # should remain on second section, with mean
           means = selected_values
           expect(means).to contain_exactly("2", "3")
+        end
+
+        context "outcome with average calculation method" do
+          before(:once) do
+            @outcome3 = outcome_model(context: @course, title: "outcome3", calculation_method: "latest")
+            @outcome3.save!
+            align2 = @outcome3.align(@second_assignment, @course)
+            align3 = @outcome3.align(@third_assignment, @course)
+            result(@student_1, align2, 4)
+            result(@student_1, align3, 1)
+            # below is needed to avoid test flakiness
+            @course.enrollments.find_by(user_id: @student_2.id).deactivate
+            @course.enrollments.find_by(user_id: @student_3.id).deactivate
+            LearningOutcomeResult.find_by(learning_outcome_id: @outcome1.id).destroy
+            LearningOutcomeResult.find_by(learning_outcome_id: @outcome2.id).destroy
+            @outcome1.destroy
+            @outcome2.destroy
+          end
+
+          it "calculates properly mastery score using average method" do
+            @outcome3.calculation_method = "average"
+            @outcome3.save!
+
+            get "/courses/#{@course.id}/gradebook"
+            select_learning_mastery
+            wait_for_ajax_requests
+
+            # student's mastery score for outcome 3 calculated with "average" method
+            student_mastery_score = nth_mastery_score(0)
+            expect(student_mastery_score).to eq("2.5")
+          end
+
+          it "recalculates properly outcome score using average method" do
+            get "/courses/#{@course.id}/gradebook"
+            select_learning_mastery
+            wait_for_ajax_requests
+
+            # student's mastery score for outcome3 calculated with "latest" method
+            student_mastery_score = nth_mastery_score(0)
+            expect(student_mastery_score).to eq("1")
+
+            # change calculation method to average
+            @outcome3.calculation_method = "average"
+            @outcome3.save!
+
+            # refresh page
+            refresh_page
+
+            # student's mastery score for outcome3 calculated with "average" method
+            student_mastery_score = nth_mastery_score(0)
+            expect(student_mastery_score).to eq("2.5")
+          end
         end
 
         context "inactive/concluded LMGB filters" do
