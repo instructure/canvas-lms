@@ -91,6 +91,7 @@ export const getEndDate = (state: StoreState): OptionalDate => state.coursePace.
 export const getOriginalEndDate = (state: StoreState): OptionalDate =>
   state.original.coursePace.end_date
 export const isStudentPace = (state: StoreState) => state.coursePace.context_type === 'Enrollment'
+export const isNewPace = (state: StoreState) => !(state.coursePace.id || isStudentPace(state)) // for now, there are no "new" student paces
 export const getIsPaceCompressed = (state: StoreState): boolean =>
   !!state.coursePace.compressed_due_dates
 export const getPaceCompressedDates = (state: StoreState): CoursePaceItemDueDates | undefined =>

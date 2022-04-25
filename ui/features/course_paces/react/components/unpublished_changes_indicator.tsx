@@ -36,7 +36,6 @@ type StateProps = {
   readonly blackoutDatesSyncing: boolean
   readonly pacePublishing: boolean
   readonly isSyncing: boolean
-  readonly newPace: boolean
   readonly publishError?: string
 }
 
@@ -44,7 +43,7 @@ type PassedProps = {
   onClick?: () => void
   onUnpublishedNavigation?: (e: BeforeUnloadEvent) => void
   margin?: any // type from CondensedButtonProps; passed through
-  readonly newProps: boolean
+  readonly newPace: boolean
 }
 
 export type UnpublishedChangesIndicatorProps = StateProps & PassedProps
