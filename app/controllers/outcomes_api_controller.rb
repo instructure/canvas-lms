@@ -85,7 +85,8 @@
 #               "decaying_average",
 #               "n_mastery",
 #               "latest",
-#               "highest"
+#               "highest",
+#               "average"
 #             ]
 #           }
 #         },
@@ -218,7 +219,7 @@ class OutcomesApiController < ApplicationController
   #   The points corresponding to a new rating level for the embedded rubric
   #   criterion.
   #
-  # @argument calculation_method [String, "decaying_average"|"n_mastery"|"latest"|"highest"]
+  # @argument calculation_method [String, "decaying_average"|"n_mastery"|"latest"|"highest"|"average"]
   #   The new calculation method.
   #
   # @argument calculation_int [Integer]

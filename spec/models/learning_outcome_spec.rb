@@ -23,6 +23,8 @@ describe LearningOutcome do
     @outcome.errors[prop].map(&:to_s)
   end
 
+  let(:calc_method_no_int) { %w[highest latest average] }
+
   context "validations" do
     describe "lengths" do
       it { is_expected.to validate_length_of(:description).is_at_most(described_class.maximum_text_length) }
@@ -552,10 +554,11 @@ describe LearningOutcome do
         "n_mastery" => { default: 5, testval: nil, altmeth: "highest" },
         "highest" => { default: nil, testval: 4, altmeth: "n_mastery" },
         "latest" => { default: nil, testval: 72, altmeth: "decaying_average" },
+        "average" => { default: nil, testval: 3, altmeth: "n_mastery" },
       }
 
       method_to_int.each do |method, set|
-        it "sets calculation_int to #{set[:default]} if the calculation_method is changed to #{method} and calculation_int isn't set" do
+        it "sets calculation_int to #{set[:default].nil? ? "nil" : set[:default]} if the calculation_method is changed to #{method} and calculation_int isn't set" do
           @outcome.calculation_method = set[:altmeth]
           @outcome.calculation_int = set[:testval]
           @outcome.save!
@@ -684,6 +687,7 @@ describe LearningOutcome do
           n_mastery
           highest
           latest
+          average
         ]
 
         calc_method.each do |method|
@@ -699,7 +703,7 @@ describe LearningOutcome do
             expect(@outcome).not_to be_valid
             expect(@outcome).to have(1).error
             expect(@outcome).to have(1).error_on(:calculation_int)
-            if %w[highest latest].include?(method)
+            if calc_method_no_int.include?(method)
               expect(outcome_errors(:calculation_int).first).to include(unused_value_error)
             else
               expect(outcome_errors(:calculation_int).first).to include(invalid_value_error)
@@ -713,7 +717,7 @@ describe LearningOutcome do
             expect(@outcome).not_to be_valid
             expect(@outcome).to have(1).error
             expect(@outcome).to have(1).error_on(:calculation_int)
-            if %w[highest latest].include?(method)
+            if calc_method_no_int.include?(method)
               expect(outcome_errors(:calculation_int).first).to include(unused_value_error)
             else
               expect(outcome_errors(:calculation_int).first).to include(invalid_value_error)
@@ -878,6 +882,7 @@ describe LearningOutcome do
           "n_mastery" => 4,
           "highest" => nil,
           "latest" => nil,
+          "average" => nil,
         }
 
         method_to_int.each do |method, int|
@@ -893,7 +898,7 @@ describe LearningOutcome do
             @outcome.save
             expect(@outcome).to have(1).error_on(:calculation_int)
             expect(@outcome).to have(1).errors
-            if %w[highest latest].include? method
+            if calc_method_no_int.include? method
               expect(outcome_errors(:calculation_int).first).to include("A calculation value is not used with this calculation method")
             else
               expect(outcome_errors(:calculation_int).first).to include("not a valid value for this calculation method")
@@ -938,6 +943,15 @@ describe LearningOutcome do
           calculation_method: "latest"
         )
         expect(@outcome.calculation_method).to eql("latest")
+        expect(@outcome.calculation_int).to be_nil
+      end
+
+      it "defaults calculation_int to nil for average" do
+        @outcome = LearningOutcome.create!(
+          title: "outcome",
+          calculation_method: "average"
+        )
+        expect(@outcome.calculation_method).to eql("average")
         expect(@outcome.calculation_int).to be_nil
       end
 

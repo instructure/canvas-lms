@@ -146,6 +146,8 @@ describe "Outcomes API", type: :request do
     outcomes.map { |o| outcome_json(o) }
   end
 
+  let(:calc_method_no_int) { %w[highest latest average] }
+
   context "account outcomes" do
     before :once do
       user_with_pseudonym(active_all: true)
@@ -595,6 +597,7 @@ describe "Outcomes API", type: :request do
             "n_mastery" => { good: 7, bad: 11 },
             "highest" => { good: nil, bad: 4 },
             "latest" => { good: nil, bad: 79 },
+            "average" => { good: nil, bad: 59 },
           }
 
           method_to_int.each do |method, int|
@@ -687,6 +690,7 @@ describe "Outcomes API", type: :request do
             "n_mastery" => 4,
             "highest" => nil,
             "latest" => nil,
+            "average" => nil,
           }
           norm_error_message = "not a valid value for this calculation method"
           no_calc_int_error_message = "A calculation value is not used with this calculation method"
@@ -722,7 +726,7 @@ describe "Outcomes API", type: :request do
               expect(json["errors"]["calculation_int"]).not_to be_nil
               # make sure there's no errors except on calculation_method
               expect(json["errors"].except("calculation_int")).to be_empty
-              if %w[highest latest].include?(method)
+              if calc_method_no_int.include?(method)
                 expect(json["errors"]["calculation_int"][0]["message"]).to include(no_calc_int_error_message)
               else
                 expect(json["errors"]["calculation_int"][0]["message"]).to include(norm_error_message)
