@@ -469,9 +469,13 @@ describe('Upload data actions', () => {
 
         it('sets the category to "icon_maker_icons"', () => {
           subject().then(() => {
-            sinon.assert.calledWith(successStore.preflightUpload, {
-              category: 'icon_maker_icons'
-            })
+            sinon.assert.calledWith(
+              successSource.preflightUpload,
+              sinon.match.object,
+              sinon.match({
+                category: 'icon_maker_icons'
+              })
+            )
           })
         })
       })
@@ -483,9 +487,13 @@ describe('Upload data actions', () => {
 
         it('sets the category to undefined', () => {
           subject().then(() => {
-            sinon.assert.calledWith(successStore.preflightUpload, {
-              category: undefined
-            })
+            sinon.assert.calledWith(
+              successSource.preflightUpload,
+              sinon.match.object,
+              sinon.match({
+                category: undefined
+              })
+            )
           })
         })
       })
@@ -509,9 +517,11 @@ describe('Upload data actions', () => {
 
       it('sets the category to undefined', () => {
         subject().then(() => {
-          sinon.assert.calledWith(successStore.preflightUpload, {
-            category: undefined
-          })
+          sinon.assert.calledWith(
+            successSource.preflightUpload,
+            sinon.match.object,
+            sinon.match({category: undefined})
+          )
         })
       })
     })
