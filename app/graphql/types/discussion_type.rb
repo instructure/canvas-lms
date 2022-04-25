@@ -227,7 +227,28 @@ module Types
 
     field :course_sections, [Types::SectionType], null: false
     def course_sections
-      load_association(:course_sections)
+      course = nil
+      if object.context.is_a?(Course)
+        course = object.context
+      end
+
+      if object.context.is_a?(Group) && object.context.context.is_a?(Course)
+        course = object.context.context
+      end
+
+      load_association(:course_sections).then do |course_sections|
+        if course.nil?
+          course_sections
+        else
+          Loaders::CourseRoleLoader.for(course_id: course.id, role_types: nil, built_in_only: nil).load(current_user).then do |roles|
+            if roles&.include?("TeacherEnrollment") || roles&.include?("TaEnrollment") || roles&.include?("DesignerEnrollment")
+              course_sections
+            else
+              course_sections.joins(:student_enrollments).where(enrollments: { user_id: current_user.id })
+            end
+          end
+        end
+      end
     end
 
     field :can_unpublish, Boolean, null: false
