@@ -67,6 +67,12 @@ lti_deep_linking_line_items:
   description: |-
     If enabled, creates assignments from LineItems in deep link messages.
   applies_to: RootAccount
+lti_assignment_page_line_items:
+  state: hidden
+  display_name: LTI Deep Linking Line Items on Assignment edit page
+  description: |-
+    If enabled, creates assignments from LineItems in deep link messages on the assignment edit page.
+  applies_to: RootAccount
 api_auth_error_updates:
   state: hidden
   display_name: Updates to JSON API auth error HTTP code and JSON status field
