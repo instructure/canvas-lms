@@ -46,13 +46,13 @@ describe Quizzes::QuizRegrader::Regrader do
 
   let(:quiz_regrade) { double(id: 1, quiz: quiz) }
 
+  let(:quiz_regrader) { Quizzes::QuizRegrader::Regrader.new(quiz: quiz) }
+
   before do
     allow(quiz).to receive(:current_regrade).and_return quiz_regrade
     allow(Quizzes::QuizQuestion).to receive(:where).with(quiz_id: quiz.id).and_return questions
     allow(Quizzes::QuizSubmission).to receive(:where).with(quiz_id: quiz.id).and_return submissions
   end
-
-  let(:quiz_regrader) { Quizzes::QuizRegrader::Regrader.new(quiz: quiz) }
 
   describe "#initialize" do
     it "saves the quiz passed" do
@@ -85,14 +85,24 @@ describe Quizzes::QuizRegrader::Regrader do
   end
 
   describe "#submissions" do
-    it "skips submissions that are in progress" do
+    it "skips submissions that are not completed and not untaken" do
       questions << double(id: 5, question_data: { regrade_option: "no_regrade" })
 
-      uncompleted_submission = double(id: 5, completed?: false)
+      uncompleted_submission = double(id: 5, completed?: false, untaken?: false)
       submissions << uncompleted_submission
 
       expect(quiz_regrader.submissions.length).to eq 4
       expect(quiz_regrader.submissions.detect { |s| s.id == 5 }).to be_nil
+    end
+
+    it "skips submissions that are in progress except untaken" do
+      questions << double(id: 5, question_data: { regrade_option: "no_regrade" })
+
+      uncompleted_submission = double(id: 5, completed?: false, untaken?: true)
+      submissions << uncompleted_submission
+
+      expect(quiz_regrader.submissions.length).to eq 5
+      expect(quiz_regrader.submissions.detect { |s| s.id == 5 }).to_not be_nil
     end
   end
 
