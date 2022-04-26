@@ -327,10 +327,10 @@ class AuthenticationProvider < ActiveRecord::Base
       end
     end
     if pseudonym.changed? && !pseudonym.save
-      Rails.logger.warn("Unable to save federated pseudonym: #{pseudonym.errors}")
+      Rails.logger.warn("Unable to save federated pseudonym: #{pseudonym.errors.to_hash}")
     end
     if user.changed? && !user.save
-      Rails.logger.warn("Unable to save federated user: #{user.errors}")
+      Rails.logger.warn("Unable to save federated user: #{user.errors.to_hash}")
     end
   end
 
