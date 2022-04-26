@@ -71,6 +71,8 @@ export function DiscussionDetails({...props}) {
                 <AssignmentAvailabilityContainer
                   assignment={props.discussionTopic?.assignment}
                   isAdmin={props.discussionTopic.permissions.readAsAdmin}
+                  inPacedCourse={props.inPacedCourse}
+                  courseId={props.courseId}
                 />
               </Flex.Item>
               <Flex.Item padding="xx-small" shouldShrink align="end" overflowY="hidden">
@@ -100,7 +102,9 @@ export function DiscussionDetails({...props}) {
 }
 
 DiscussionDetails.propTypes = {
-  discussionTopic: PropTypes.object
+  discussionTopic: PropTypes.object,
+  inPacedCourse: PropTypes.bool,
+  courseId: PropTypes.string
 }
 
 export default DiscussionDetails

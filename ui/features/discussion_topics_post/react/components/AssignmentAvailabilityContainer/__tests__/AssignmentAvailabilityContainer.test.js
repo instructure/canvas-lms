@@ -22,7 +22,7 @@ import {Assignment} from '../../../../graphql/Assignment'
 import {responsiveQuerySizes} from '../../../utils/index'
 
 import React from 'react'
-import {fireEvent, render} from '@testing-library/react'
+import {act, fireEvent, render} from '@testing-library/react'
 
 jest.mock('../../../utils')
 
@@ -172,6 +172,45 @@ describe('AssignmentAvailabilityContainer', () => {
       fireEvent.click(dueDateTrayButton)
       expect(getByText('Due Mar 31, 2021')).toBeTruthy()
       expect(queryByTestId('due_date_tray_header_for')).toBeNull()
+    })
+  })
+  describe('in a paced course', () => {
+    it('always uses the multiple due dates UI even with 1 due dat', async () => {
+      const {findByTestId, getByRole} = render(
+        <AssignmentAvailabilityContainer
+          assignment={Assignment.mock({assignmentOverrides: {nodes: []}})}
+          isAdmin
+          inPacedCourse
+          courseId="17"
+        />
+      )
+      act(() => {
+        getByRole('button', {name: 'Show Due Dates (1)'}).click()
+      })
+
+      expect(await findByTestId('CoursePacingNotice')).toBeInTheDocument()
+      const pacingLink = getByRole('link', {name: 'Course Pacing'})
+      expect(pacingLink).toBeInTheDocument()
+      expect(pacingLink.href).toMatch(/\/courses\/17\/course_pacing/)
+    })
+
+    it('shows the course pacing notice', async () => {
+      const {findByTestId, getByRole} = render(
+        <AssignmentAvailabilityContainer
+          assignment={Assignment.mock({assignmentOverrides: {nodes: mockOverrides}})}
+          isAdmin
+          inPacedCourse
+          courseId="17"
+        />
+      )
+      act(() => {
+        getByRole('button', {name: 'Show Due Dates (4)'}).click()
+      })
+
+      expect(await findByTestId('CoursePacingNotice')).toBeInTheDocument()
+      const pacingLink = getByRole('link', {name: 'Course Pacing'})
+      expect(pacingLink).toBeInTheDocument()
+      expect(pacingLink.href).toMatch(/\/courses\/17\/course_pacing/)
     })
   })
 })
