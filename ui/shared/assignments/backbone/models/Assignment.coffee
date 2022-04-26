@@ -502,9 +502,6 @@ export default class Assignment extends Model
   newQuizzesAssignmentBuildButtonEnabled: =>
     return ENV.NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED
 
-  newMasteryConnectIconEnabled: =>
-    return ENV.FLAGS && ENV.FLAGS.updated_mastery_connect_icon
-
   showBuildButton: =>
     @isQuizLTIAssignment() && @newQuizzesAssignmentBuildButtonEnabled()
 
@@ -633,8 +630,7 @@ export default class Assignment extends Model
       'showBuildButton', 'showGradersAnonymousToGradersCheckbox', 'singleSectionDueDate',
       'submissionType', 'submissionTypeSelectionTools', 'submissionTypesFrozen',
       'turnitinAvailable', 'turnitinEnabled', 'unlockAt', 'vericiteAvailable',
-      'vericiteEnabled', 'importantDates', 'externalToolIframeWidth', 'externalToolIframeHeight',
-      'newMasteryConnectIconEnabled'
+      'vericiteEnabled', 'importantDates', 'externalToolIframeWidth', 'externalToolIframeHeight'
     ]
 
     hash =
