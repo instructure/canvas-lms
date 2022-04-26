@@ -3542,7 +3542,7 @@ fr-CA:
   assignment_assignment_submission_plain_text_view_b217d372: "Affichage de texte brut pour envoi de tâche %{assignment}"
   assignment_bulk_editing_37248ca4: "Édition en bloc des tâches"
   assignment_bulk_editing_phase_2_fde6f7d3: "Édition en bloc des tâches- phase 2"
-  assignment_comments_e43ed898: "Commentaires sur le tâche"
+  assignment_comments_e43ed898: "Commentaires sur la tâche"
   assignment_configuration_4153cb88: "Configuration des tâches"
   assignment_context_has_been_graded_for_name_af51759a: "%{assignment}, %{context} a été noté pour %{name}."
   assignment_created_assignment_name_course_name_324a5639: "Tâche créé - %{assignment_name}, %{course_name}"
@@ -3829,7 +3829,7 @@ fr-CA:
     grade_assignment: 
       buttons: 
         upload_files: "Téléverser des fichiers"
-      graded_count: "%{graded_count} *sur* %{total} envois notées"
+      graded_count: "%{graded_count} *sur* %{total} envois notés"
       links: 
         download_submissions: "Télécharger les envois"
         peer_reviews: "Révisions par les pairs"
@@ -8630,18 +8630,18 @@ fr-CA:
       - sam
     abbr_month_names: 
       - ~
-      - Jan
-      - Fév
-      - Mar
-      - Avr
-      - Mai
-      - Jun
-      - Jul
-      - Aou
-      - Sep
-      - Oct
-      - Nov
-      - Déc
+      - jan
+      - fév
+      - mar
+      - avr
+      - mai
+      - jun
+      - jul
+      - aou
+      - sept.
+      - oct
+      - nov
+      - déc
     datepicker: 
       column_headings: 
         - dim
@@ -9676,7 +9676,7 @@ fr-CA:
   due_at_5e18eeac: "Dû à :"
   due_at_time_fa41cf6c: "Dû à : %{time}"
   due_available_and_until_dates_f90713da: "Dates d’échéance, disponible, et jusqu'à"
-  due_by_c263dc10: "À rendre pour le"
+  due_by_c263dc10: "À rendre à"
   due_date_2c6e4cfb: "Dû %{date}"
   due_date_6a281fe3: "Échéance : %{date}"
   due_date_822625d8: "Date d’échéance"
@@ -17078,7 +17078,7 @@ fr-CA:
   no_conferencing_options_enabled_fc00e371: "Aucune option de conférence activée"
   no_content_5dbc9acf: "Pas de contenu"
   no_content_has_been_added_f36bab43: "* Aucun contenu n’a été ajouté"
-  no_content_has_been_shared_with_you_667fde6c: "Aucun contenu.n’a été partagé avec vous."
+  no_content_has_been_shared_with_you_667fde6c: "Aucun contenu n’a été partagé avec vous."
   no_content_not_visible_to_students_905f8996: "Aucun contenu. Non visible pour les étudiants."
   no_content_not_visible_to_students_b59f4867: "Aucun contenu. Non visible pour les étudiants"
   no_context_found_for_the_following_context_code_co_a2f6a1a7: "Aucun contexte trouvé pour le code de contexte suivant : %{context_code}"
@@ -18934,7 +18934,7 @@ fr-CA:
   posted_455862b9: Publié
   posted_at_4cfce2c3: "%{posted_at}"
   posted_on_date_12ef08e5: "Publié le %{date}"
-  posted_on_e1010e1e: "Publié sur :"
+  posted_on_e1010e1e: "Publié le :"
   posted_to_student_861beec9: "Publié aux étudiants"
   posting_grades_cd7cd758: "Publication des notes"
   posting_grades_is_not_allowed_because_grades_have__229d9c9e: "Publier les notes n'est pas autorisé, car les notes n’ont pas été relâchées pour cette tâche."
@@ -20635,7 +20635,7 @@ fr-CA:
   quizzes_b1e4b6cb: questionnaires
   quizzes_index: 
     headers: 
-      assignment_quizzes: "Questionnaires de la tâche"
+      assignment_quizzes: Questionnaires
       practice_quizzes: "Questionnaires d'entraînement"
       surveys: Enquêtes
     toggle_message: "afficher/masquer le questionnaire"
@@ -22606,7 +22606,7 @@ fr-CA:
       delete_criterion_row: "Supprimer la ligne des critères"
       description: 
         custom_comments_area: "Cette zone est utilisée par l’évaluateur pour ajouter des commentaires associés aux critères."
-      full_marks: "Notes maximum"
+      full_marks: "Note maximale"
       icons: 
         add_new_rating_after: "Ajouter une nouvelle catégorie de note après la note actuelle"
         additional_comments: "Commentaires supplémentaires"
@@ -22663,7 +22663,7 @@ fr-CA:
     rubric_summary_criterion: 
       defaults: 
         description: "Description du critère"
-      full_marks: "Notes maximum"
+      full_marks: "Note maximale"
       labels: 
         long_description: "Description longue"
       links: 
@@ -24935,7 +24935,7 @@ fr-CA:
       one: "il y a 1 minute"
       other: "il y a %{count} minutes"
     due_date: "%{date} à %{time}"
-    event: "%{date} sur %{time}"
+    event: "%{date} à %{time}"
     formats: 
       default: "%a, %d %b %Y %H:%M:%S %z"
       long: "%B %d, %Y %H:%M"
@@ -26974,7 +26974,7 @@ fr-CA:
       weekly_message: 
         one: "Cette installation de Canvas est uniquement à des fins de test et se réinitialise toutes les semaines."
         other: "Cette installation de Canvas est uniquement à des fins de test et se réinitialise toutes les %{count} semaines."
-  was_locked_at_date_acf1c576: "Était verrouillé à %{date}"
+  was_locked_at_date_acf1c576: "A été verrouillé le %{date}"
   watermark_c93fae0d: Filigrane
   watermark_opacity_ce3d3097: "Opacité du filigrane"
   watermarks_other_images_e970fc6a: "Filigrane & autres images"

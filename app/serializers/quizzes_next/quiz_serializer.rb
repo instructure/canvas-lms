@@ -31,7 +31,8 @@ module QuizzesNext
                :course_id, :original_course_id, :original_assignment_id,
                :workflow_state, :original_assignment_name, :original_quiz_id,
                :require_lockdown_browser, :require_lockdown_browser_for_results,
-               :require_lockdown_browser_monitor, :lockdown_browser_monitor_data, :access_code
+               :require_lockdown_browser_monitor, :lockdown_browser_monitor_data, :access_code,
+               :in_paced_course
 
     def_delegators :@controller
 
@@ -105,6 +106,10 @@ module QuizzesNext
 
     def access_code
       object.settings&.dig("lockdown_browser", "access_code")
+    end
+
+    def in_paced_course
+      context.try(:enable_course_paces)
     end
   end
 end

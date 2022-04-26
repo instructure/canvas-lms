@@ -77,5 +77,9 @@ class AssignmentPage
     def allowed_attempts_count
       fj("div.control-group:contains('Allowed Attempts')")
     end
+
+    def course_pacing_notice
+      f("[data-testid='CoursePacingNotice']")
+    end
   end
 end
