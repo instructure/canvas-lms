@@ -22,6 +22,7 @@ import {AssignmentSingleAvailabilityWindow} from '../AssignmentSingleAvailabilit
 import {AssignmentMultipleAvailabilityWindows} from '../AssignmentMultipleAvailabilityWindows/AssignmentMultipleAvailabilityWindows'
 import PropTypes from 'prop-types'
 import React, {useState} from 'react'
+import CoursePacingNotice from '@canvas/due-dates/react/CoursePacingNotice'
 import {TrayDisplayer} from '../TrayDisplayer/TrayDisplayer'
 import {DueDateTray} from '../DueDateTray/DueDateTray'
 
@@ -59,7 +60,7 @@ export function AssignmentAvailabilityContainer({...props}) {
 
   return (
     <>
-      {props.isAdmin && assignmentOverrides.length > 1 ? (
+      {props.inPacedCourse || (props.isAdmin && assignmentOverrides.length > 1) ? (
         <AssignmentMultipleAvailabilityWindows
           assignmentOverrides={assignmentOverrides}
           onSetDueDateTrayOpen={setDueDateTrayOpen}
@@ -78,7 +79,11 @@ export function AssignmentAvailabilityContainer({...props}) {
         trayTitle="Due Dates"
         isTrayOpen={dueDateTrayOpen}
         trayComponent={
-          <DueDateTray assignmentOverrides={assignmentOverrides} isAdmin={props.isAdmin} />
+          props.inPacedCourse ? (
+            <CoursePacingNotice courseId={props.courseId} />
+          ) : (
+            <DueDateTray assignmentOverrides={assignmentOverrides} isAdmin={props.isAdmin} />
+          )
         }
       />
     </>
@@ -87,5 +92,7 @@ export function AssignmentAvailabilityContainer({...props}) {
 
 AssignmentAvailabilityContainer.propTypes = {
   assignment: PropTypes.object,
-  isAdmin: PropTypes.bool
+  isAdmin: PropTypes.bool,
+  inPacedCourse: PropTypes.bool,
+  courseId: PropTypes.string
 }
