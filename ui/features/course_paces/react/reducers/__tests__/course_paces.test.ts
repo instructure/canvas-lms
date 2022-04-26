@@ -18,7 +18,7 @@
 
 import moment from 'moment-timezone'
 import {BlackoutDate} from '../../shared/types'
-import {getBlackoutDateChanges} from '../course_paces'
+import {getBlackoutDateChanges, isNewPace} from '../course_paces'
 
 const newbod1: BlackoutDate = {
   temp_id: 'tmp1',
@@ -58,6 +58,29 @@ describe('course_paces reducer', () => {
       // deleted
       expect(changes[1].oldValue).toBe(oldbod2)
       expect(changes[1].newValue).toBeNull()
+    })
+  })
+
+  describe('isNewPace', () => {
+    it('is new if it has no id and is not a student pace', () => {
+      // @ts-ignore
+      expect(isNewPace({coursePace: {id: undefined, context_type: 'Course'}})).toBe(true)
+    })
+
+    it('is not new if it has an id', () => {
+      // @ts-ignore
+      expect(isNewPace({coursePace: {id: '1'}})).toBe(false)
+    })
+
+    it('is not new if it is a student pace', () => {
+      // because we don't have student paces in the db yet
+      // the api always returns an unsaved pace with no id
+      // but we need it for the start_date to show the user's
+      // assignment due dates in their pace
+      expect(
+        // @ts-ignore
+        isNewPace({coursePace: {id: undefined, context_type: 'Enrollment'}})
+      ).toBe(false)
     })
   })
 })
