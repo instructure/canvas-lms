@@ -254,7 +254,13 @@ class JobsV2Controller < ApplicationController
       update_args[:priority] = params[:priority].to_i
     end
 
-    count = Delayed::Job.where(strand: strand).update_all(update_args)
+    count = nil
+    Delayed::Job.transaction do
+      Delayed::Job.advisory_lock(strand)
+      count = Delayed::Job.where(strand: strand).update_all(update_args)
+      # TODO: revisit this after DE-1158
+      unleash_more_jobs(strand, update_args[:max_concurrent]) if update_args[:max_concurrent]
+    end
     render json: { status: "OK", count: count }
   end
 
@@ -405,5 +411,12 @@ class JobsV2Controller < ApplicationController
   def set_navigation
     set_active_tab "jobs_v2"
     add_crumb t("#crumbs.jobs_v2", "Jobs v2")
+  end
+
+  def unleash_more_jobs(strand, new_parallelism)
+    needed_jobs = new_parallelism - Delayed::Job.where(strand: strand, next_in_strand: true).count
+    if needed_jobs > 0
+      Delayed::Job.where(strand: strand, next_in_strand: false, locked_by: nil, singleton: nil).order(:id).limit(needed_jobs).update_all(next_in_strand: true)
+    end
   end
 end
