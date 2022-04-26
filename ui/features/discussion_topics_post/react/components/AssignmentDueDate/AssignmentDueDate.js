@@ -54,18 +54,20 @@ export function AssignmentDueDate({...props}) {
       render={(responsiveProps, matches) => {
         if (matches.includes('tablet') && props.dueDate) {
           return (
-            <CondensedButton
-              data-testid="mobile-due-date-tray-expansion"
-              onClick={() => {
-                props.onSetDueDateTrayOpen(true)
-              }}
-            >
-              <Text weight="normal" size={responsiveProps.textSize}>
-                {I18n.t('Due %{date}', {
-                  date: DateHelper.formatDateForDisplay(props.dueDate, 'short')
-                })}
-              </Text>
-            </CondensedButton>
+            <span className="discussions-show-due-dates">
+              <CondensedButton
+                data-testid="mobile-due-date-tray-expansion"
+                onClick={() => {
+                  props.onSetDueDateTrayOpen(true)
+                }}
+              >
+                <Text weight="normal" size={responsiveProps.textSize}>
+                  {I18n.t('Due %{date}', {
+                    date: DateHelper.formatDateForDisplay(props.dueDate, 'short')
+                  })}
+                </Text>
+              </CondensedButton>
+            </span>
           )
         }
 

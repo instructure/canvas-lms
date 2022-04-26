@@ -42,34 +42,36 @@ export function Expansion({...props}) {
         }
       }}
       render={responsiveProps => (
-        <CondensedButton
-          onClick={props.onClick}
-          withBackground={false}
-          color="primary"
-          data-testid="expand-button"
-          interaction={props.isReadOnly ? 'disabled' : 'enabled'}
-        >
-          <ScreenReaderContent
-            data-testid={
-              props.isExpanded ? 'reply-expansion-btn-collapse' : 'reply-expansion-btn-expand'
-            }
+        <span className="discussion-expand-btn">
+          <CondensedButton
+            onClick={props.onClick}
+            withBackground={false}
+            color="primary"
+            data-testid="expand-button"
+            interaction={props.isReadOnly ? 'disabled' : 'enabled'}
           >
-            {props.isExpanded
-              ? I18n.t('Collapse discussion thread from %{author}', {
-                  author: props.authorName
-                })
-              : I18n.t('Expand discussion thread from %{author}', {
-                  author: props.authorName
-                })}
-          </ScreenReaderContent>
-          <Text
-            weight="bold"
-            size={responsiveProps.textSize}
-            data-testid={`text-${responsiveProps.textSize}`}
-          >
-            {props.expandText}
-          </Text>
-        </CondensedButton>
+            <ScreenReaderContent
+              data-testid={
+                props.isExpanded ? 'reply-expansion-btn-collapse' : 'reply-expansion-btn-expand'
+              }
+            >
+              {props.isExpanded
+                ? I18n.t('Collapse discussion thread from %{author}', {
+                    author: props.authorName
+                  })
+                : I18n.t('Expand discussion thread from %{author}', {
+                    author: props.authorName
+                  })}
+            </ScreenReaderContent>
+            <Text
+              weight="bold"
+              size={responsiveProps.textSize}
+              data-testid={`text-${responsiveProps.textSize}`}
+            >
+              {props.expandText}
+            </Text>
+          </CondensedButton>
+        </span>
       )}
     />
   )

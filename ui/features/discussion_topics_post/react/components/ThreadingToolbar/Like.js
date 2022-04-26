@@ -45,46 +45,48 @@ export function Like({...props}) {
         }
       }}
       render={responsiveProps => (
-        <CondensedButton
-          onClick={props.onClick}
-          withBackground={false}
-          color="primary"
-          data-testid="like-button"
-          interaction={props.interaction}
-          margin={responsiveProps.itemSpacing}
-        >
-          <Flex>
-            <Flex.Item>
-              {props.isLiked ? (
-                <>
-                  <IconLikeSolid data-testid="liked-icon" size="x-small" />
-                  <ScreenReaderContent>
-                    {I18n.t('Unlike post from %{author}', {author: props.authorName})}
-                  </ScreenReaderContent>
-                </>
-              ) : (
-                <>
-                  <IconLikeLine data-testid="not-liked-icon" size="x-small" />
-                  <ScreenReaderContent>
-                    {I18n.t('Like post from %{author}', {author: props.authorName})}
-                  </ScreenReaderContent>
-                </>
-              )}
-            </Flex.Item>
-            {props.likeCount > 0 && (
-              <Flex.Item padding="0 0 0 xx-small">
-                <PresentationContent>
-                  <Text weight="bold" data-testid="like-count" size={responsiveProps.textSize}>
-                    {props.likeCount}
-                  </Text>
-                </PresentationContent>
-                <ScreenReaderContent>
-                  {I18n.t('Like count: %{count}', {count: props.likeCount})}
-                </ScreenReaderContent>
+        <span className="discussion-like-btn">
+          <CondensedButton
+            onClick={props.onClick}
+            withBackground={false}
+            color="primary"
+            data-testid="like-button"
+            interaction={props.interaction}
+            margin={responsiveProps.itemSpacing}
+          >
+            <Flex>
+              <Flex.Item>
+                {props.isLiked ? (
+                  <>
+                    <IconLikeSolid data-testid="liked-icon" size="x-small" />
+                    <ScreenReaderContent>
+                      {I18n.t('Unlike post from %{author}', {author: props.authorName})}
+                    </ScreenReaderContent>
+                  </>
+                ) : (
+                  <>
+                    <IconLikeLine data-testid="not-liked-icon" size="x-small" />
+                    <ScreenReaderContent>
+                      {I18n.t('Like post from %{author}', {author: props.authorName})}
+                    </ScreenReaderContent>
+                  </>
+                )}
               </Flex.Item>
-            )}
-          </Flex>
-        </CondensedButton>
+              {props.likeCount > 0 && (
+                <Flex.Item padding="0 0 0 xx-small">
+                  <PresentationContent>
+                    <Text weight="bold" data-testid="like-count" size={responsiveProps.textSize}>
+                      {props.likeCount}
+                    </Text>
+                  </PresentationContent>
+                  <ScreenReaderContent>
+                    {I18n.t('Like count: %{count}', {count: props.likeCount})}
+                  </ScreenReaderContent>
+                </Flex.Item>
+              )}
+            </Flex>
+          </CondensedButton>
+        </span>
       )}
     />
   )

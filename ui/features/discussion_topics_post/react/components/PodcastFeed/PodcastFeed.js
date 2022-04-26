@@ -27,17 +27,19 @@ const I18n = useI18nScope('discussion_posts')
 
 export const PodcastFeed = ({...props}) => {
   return (
-    <Button
-      color="secondary"
-      display={props.responsiveProps?.display}
-      renderIcon={IconRssLine}
-      href={props.linkUrl}
-      data-testid="post-rssfeed"
-    >
-      <Text weight="bold" size={props.responsiveProps?.textSize}>
-        {I18n.t('Topic: Podcast Feed')}
-      </Text>
-    </Button>
+    <span className="discussion-podcast-feed">
+      <Button
+        color="secondary"
+        display={props.responsiveProps?.display}
+        renderIcon={IconRssLine}
+        href={props.linkUrl}
+        data-testid="post-rssfeed"
+      >
+        <Text weight="bold" size={props.responsiveProps?.textSize}>
+          {I18n.t('Topic: Podcast Feed')}
+        </Text>
+      </Button>
+    </span>
   )
 }
 

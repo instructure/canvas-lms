@@ -41,20 +41,22 @@ export function BackButton({onClick, ...props}) {
         }
       }}
       render={responsiveProps => (
-        <Button
-          onClick={onClick}
-          withBorder={false}
-          withBackground={false}
-          color="primary"
-          renderIcon={<IconArrowStartLine />}
-          theme={{borderWidth: '0'}}
-          data-testid="back-button"
-          {...props}
-        >
-          <Text weight="bold" size={responsiveProps.textSize}>
-            {I18n.t('Back')}
-          </Text>
-        </Button>
+        <span className="discussions-back-button">
+          <Button
+            onClick={onClick}
+            withBorder={false}
+            withBackground={false}
+            color="primary"
+            renderIcon={<IconArrowStartLine />}
+            theme={{borderWidth: '0'}}
+            data-testid="back-button"
+            {...props}
+          >
+            <Text weight="bold" size={responsiveProps.textSize}>
+              {I18n.t('Back')}
+            </Text>
+          </Button>
+        </span>
       )}
     />
   )

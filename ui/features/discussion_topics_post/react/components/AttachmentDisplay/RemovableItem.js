@@ -41,38 +41,40 @@ export const RemovableItem = ({onRemove, screenReaderLabel, childrenAriaLabel, c
       match="media"
       query={responsiveQuerySizes({mobile: true, desktop: true, tablet: true})}
       render={(_responsiveProps, matches) => (
-        <View display="inline-block">
-          <View
-            display="inline-block"
-            onMouseEnter={handleInteraction}
-            onMouseLeave={handleExit}
-            onFocus={handleInteraction}
-            onBlur={handleExit}
-            tabIndex="0"
-            role="button"
-            aria-label={childrenAriaLabel}
-            data-testid="removable-item"
-          >
-            {children}
+        <span className="discussions-attach-item">
+          <View display="inline-block">
+            <View
+              display="inline-block"
+              onMouseEnter={handleInteraction}
+              onMouseLeave={handleExit}
+              onFocus={handleInteraction}
+              onBlur={handleExit}
+              tabIndex="0"
+              role="button"
+              aria-label={childrenAriaLabel}
+              data-testid="removable-item"
+            >
+              {children}
+            </View>
+            {(showRemove || ['mobile', 'tablet'].some(device => matches.includes(device))) && (
+              <div style={{display: 'inline-block', margin: '0 0.25rem'}}>
+                <IconButton
+                  size="small"
+                  shape="circle"
+                  screenReaderLabel={screenReaderLabel}
+                  onClick={onRemove}
+                  onMouseEnter={handleInteraction}
+                  onMouseLeave={handleExit}
+                  onFocus={handleInteraction}
+                  onBlur={handleExit}
+                  data-testid="remove-button"
+                >
+                  <IconXSolid />
+                </IconButton>
+              </div>
+            )}
           </View>
-          {(showRemove || ['mobile', 'tablet'].some(device => matches.includes(device))) && (
-            <div style={{display: 'inline-block', margin: '0 0.25rem'}}>
-              <IconButton
-                size="small"
-                shape="circle"
-                screenReaderLabel={screenReaderLabel}
-                onClick={onRemove}
-                onMouseEnter={handleInteraction}
-                onMouseLeave={handleExit}
-                onFocus={handleInteraction}
-                onBlur={handleExit}
-                data-testid="remove-button"
-              >
-                <IconXSolid />
-              </IconButton>
-            </div>
-          )}
-        </View>
+        </span>
       )}
     />
   )

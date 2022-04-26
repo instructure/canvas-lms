@@ -25,14 +25,16 @@ const I18n = useI18nScope('discussion_posts')
 
 export function CollapseReplies({...props}) {
   return (
-    <CondensedButton
-      onClick={props.onClick}
-      withBackground={false}
-      color="primary"
-      data-testid="collapse-replies"
-    >
-      {I18n.t('Collapse replies')}
-    </CondensedButton>
+    <span className="discussions-collapse-btn">
+      <CondensedButton
+        onClick={props.onClick}
+        withBackground={false}
+        color="primary"
+        data-testid="collapse-replies"
+      >
+        {I18n.t('Collapse replies')}
+      </CondensedButton>
+    </span>
   )
 }
 

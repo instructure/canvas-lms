@@ -98,22 +98,26 @@ export const ReportReply = props => {
         )}
       </Modal.Body>
       <Modal.Footer>
-        <Button
-          data-testid="report-reply-cancel-modal-button"
-          onClick={onClose}
-          margin="0 x-small 0 0"
-          interaction={!props.isLoading ? 'enabled' : 'disabled'}
-        >
-          {I18n.t('Cancel')}
-        </Button>
-        <Button
-          data-testid="report-reply-submit-button"
-          color="danger"
-          onClick={() => props.onSubmit(selectedReportType)}
-          interaction={selectedReportType && !props.isLoading ? 'enabled' : 'disabled'}
-        >
-          {I18n.t('Submit')}
-        </Button>
+        <span className="discussions-report-cancel">
+          <Button
+            data-testid="report-reply-cancel-modal-button"
+            onClick={onClose}
+            margin="0 x-small 0 0"
+            interaction={!props.isLoading ? 'enabled' : 'disabled'}
+          >
+            {I18n.t('Cancel')}
+          </Button>
+        </span>
+        <span className="discussions-report-submit">
+          <Button
+            data-testid="report-reply-submit-button"
+            color="danger"
+            onClick={() => props.onSubmit(selectedReportType)}
+            interaction={selectedReportType && !props.isLoading ? 'enabled' : 'disabled'}
+          >
+            {I18n.t('Submit')}
+          </Button>
+        </span>
       </Modal.Footer>
     </Modal>
   )

@@ -40,58 +40,60 @@ export const AnonymousResponseSelector = props => {
   const replyAsOption = () => {
     if (props.discussionAnonymousState === 'partial_anonymity') {
       return (
-        <Select
-          inputValue={selectedOption}
-          isShowingOptions={showOptions}
-          onRequestShowOptions={() => {
-            setShowOptions(true)
-          }}
-          onRequestHideOptions={() => {
-            setShowOptions(false)
-          }}
-          onRequestSelectOption={(event, {id}) => {
-            setShowOptions(false)
-            setSelectedOption(id)
-            props.setAnonymousAuthorState(id === 'Anonymous')
-          }}
-          onBlur={() => {
-            setHighlightedOption(null)
-          }}
-          onRequestHighlightOption={(event, {id}) => {
-            setHighlightedOption(id)
-          }}
-          renderLabel={
-            <Text size="small" weight="light">
-              {I18n.t('Replying as')}
-            </Text>
-          }
-        >
-          <Select.Option
-            id="Anonymous"
-            key="Anonymous"
-            renderBeforeLabel={<AnonymousAvatar size="small" seedString={CURRENT_USER} />}
-            isHighlighted={highlightedOption === 'Anonymous'}
-          >
-            <Text>{I18n.t('Anonymous')}</Text>
-          </Select.Option>
-          <Select.Option
-            id={props.username}
-            key={props.username}
-            isHighlighted={highlightedOption === props.username}
-            renderBeforeLabel={
-              <Avatar
-                size="xx-small"
-                src={props.avatarUrl === DEFAULT_AVATAR_URL ? null : props.avatarUrl}
-                name={props.username}
-                color="licorice"
-                hasInverseColor
-                margin="0 small 0 0"
-              />
+        <span className="discussions-anon-response-selector">
+          <Select
+            inputValue={selectedOption}
+            isShowingOptions={showOptions}
+            onRequestShowOptions={() => {
+              setShowOptions(true)
+            }}
+            onRequestHideOptions={() => {
+              setShowOptions(false)
+            }}
+            onRequestSelectOption={(event, {id}) => {
+              setShowOptions(false)
+              setSelectedOption(id)
+              props.setAnonymousAuthorState(id === 'Anonymous')
+            }}
+            onBlur={() => {
+              setHighlightedOption(null)
+            }}
+            onRequestHighlightOption={(event, {id}) => {
+              setHighlightedOption(id)
+            }}
+            renderLabel={
+              <Text size="small" weight="light">
+                {I18n.t('Replying as')}
+              </Text>
             }
           >
-            <Text>{props.username}</Text>
-          </Select.Option>
-        </Select>
+            <Select.Option
+              id="Anonymous"
+              key="Anonymous"
+              renderBeforeLabel={<AnonymousAvatar size="small" seedString={CURRENT_USER} />}
+              isHighlighted={highlightedOption === 'Anonymous'}
+            >
+              <Text>{I18n.t('Anonymous')}</Text>
+            </Select.Option>
+            <Select.Option
+              id={props.username}
+              key={props.username}
+              isHighlighted={highlightedOption === props.username}
+              renderBeforeLabel={
+                <Avatar
+                  size="xx-small"
+                  src={props.avatarUrl === DEFAULT_AVATAR_URL ? null : props.avatarUrl}
+                  name={props.username}
+                  color="licorice"
+                  hasInverseColor
+                  margin="0 small 0 0"
+                />
+              }
+            >
+              <Text>{props.username}</Text>
+            </Select.Option>
+          </Select>
+        </span>
       )
     }
     return (

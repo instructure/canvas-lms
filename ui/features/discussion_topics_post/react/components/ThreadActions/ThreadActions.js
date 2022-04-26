@@ -69,16 +69,18 @@ export const ThreadActions = props => {
             placement="bottom"
             key={`threadActionMenu-${props.id}`}
             trigger={
-              <IconButton
-                size="small"
-                screenReaderLabel={I18n.t('Manage Discussion by %{author}', {
-                  author: props.authorName
-                })}
-                renderIcon={IconMoreLine}
-                withBackground={false}
-                withBorder={false}
-                data-testid="thread-actions-menu"
-              />
+              <span className="discussion-thread-action-button">
+                <IconButton
+                  size="small"
+                  screenReaderLabel={I18n.t('Manage Discussion by %{author}', {
+                    author: props.authorName
+                  })}
+                  renderIcon={IconMoreLine}
+                  withBackground={false}
+                  withBorder={false}
+                  data-testid="thread-actions-menu"
+                />
+              </span>
             }
           >
             {menuItems}
@@ -221,14 +223,16 @@ const renderMenuItem = (
       data-testid={key}
       disabled={disabled}
     >
-      <Text color={color}>
-        <Flex>
-          <Flex.Item>{icon}</Flex.Item>
-          <Flex.Item padding="0 0 0 xx-small">
-            <Text>{label}</Text>
-          </Flex.Item>
-        </Flex>
-      </Text>
+      <span className={`discussion-thread-menuitem-${key}`}>
+        <Text color={color}>
+          <Flex>
+            <Flex.Item>{icon}</Flex.Item>
+            <Flex.Item padding="0 0 0 xx-small">
+              <Text>{label}</Text>
+            </Flex.Item>
+          </Flex>
+        </Text>
+      </span>
     </Menu.Item>
   )
 }
