@@ -211,7 +211,8 @@ class CoursePace < ActiveRecord::Base
     valid_date_range = CourseDateRange.new(course)
     student_enrollment = course.student_enrollments.find_by(user_id: user_id) if user_id
 
-    date = student_enrollment&.effective_start_at || course_section&.start_at || valid_date_range.start_at[:date]
+    enrollment_start_date = student_enrollment&.start_at || [student_enrollment&.effective_start_at, student_enrollment&.created_at].compact.max
+    date = enrollment_start_date || course_section&.start_at || valid_date_range.start_at[:date]
     today = Date.today
 
     # always put pace plan dates in the course time zone
