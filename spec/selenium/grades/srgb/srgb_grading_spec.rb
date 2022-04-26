@@ -33,6 +33,7 @@ describe "Screenreader Gradebook grading" do
     enroll_teacher_and_students
     assignment_1
     assignment_2
+    assignment_2.update!(due_at: 2.days.ago, submission_types: "online_text_entry")
     assignment_3
     assignment_4
     student_submission
@@ -69,6 +70,24 @@ describe "Screenreader Gradebook grading" do
       srgb_page.tab_out_of_input(srgb_page.main_grade_input)
 
       expect(srgb_page.main_grade_input).to have_value("8")
+    end
+
+    it "displays a flash message when an invalid grade is given and preserves the missing tag", priority: "1" do
+      srgb_page.select_assignment(assignment_2)
+      srgb_page.grade_srgb_assignment(srgb_page.main_grade_input, "Invalid Grade")
+      srgb_page.tab_out_of_input(srgb_page.main_grade_input)
+
+      expect(f(".missing-pill")).to be_displayed
+      expect_flash_message :error, "Invalid Grade"
+    end
+
+    it "does not grade student when tabing over the grade input without editing", priority: "1" do
+      srgb_page.select_assignment(assignment_2)
+      srgb_page.main_grade_input.click
+      srgb_page.tab_out_of_input(srgb_page.main_grade_input)
+
+      expect(f(".missing-pill")).to be_displayed
+      expect(srgb_page.main_grade_input).to have_value("-")
     end
 
     it "displays correct points for graded by Percent", prority: "1" do
