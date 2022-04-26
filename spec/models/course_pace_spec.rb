@@ -34,6 +34,7 @@ describe CoursePace do
     @course_pace_module_item = @course_pace.course_pace_module_items.create! module_item: @tag
     @unpublished_assignment = @course.assignments.create! workflow_state: "unpublished"
     @unpublished_tag = @unpublished_assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module", workflow_state: "unpublished"
+    @student_enrollment = @course.student_enrollments.find_by(user_id: @student.id)
   end
 
   context "associations" do
@@ -135,6 +136,7 @@ describe CoursePace do
 
     before :once do
       @course_pace.update! end_date: "2021-09-30"
+      @student_enrollment.update(start_at: @course_pace.start_date)
     end
 
     it "creates an override for students" do
@@ -156,9 +158,33 @@ describe CoursePace do
       end
     end
 
+    it "creates assignment overrides based on the enrollment start_at" do
+      @student_enrollment.update(start_at: "2021-09-10")
+      expect(AssignmentOverride.count).to eq(0)
+      expect(@course_pace.publish).to eq(true)
+      expect(AssignmentOverride.count).to eq(2)
+      @course.assignments.each do |assignment|
+        assignment_override = assignment.assignment_overrides.first
+        expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-10"))
+        expect(assignment_override.assignment_override_students.first.user_id).to eq(@student.id)
+      end
+    end
+
+    it "creates assignment overrides based on the enrollment created_at when start_at is nil" do
+      @student_enrollment.reload.update!(start_at: nil, created_at: "2021-09-17")
+      expect(AssignmentOverride.count).to eq(0)
+      expect(@course_pace.publish).to eq(true)
+      expect(AssignmentOverride.count).to eq(2)
+      @course.assignments.each do |assignment|
+        assignment_override = assignment.assignment_overrides.first
+        expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-17"))
+        expect(assignment_override.assignment_override_students.first.user_id).to eq(@student.id)
+      end
+    end
+
     it "removes the user from an adhoc assignment override if it includes other students" do
       student2 = user_model
-      StudentEnrollment.create!(user: student2, course: @course)
+      StudentEnrollment.create!(user: student2, course: @course, start_at: @course_pace.start_date)
       assignment_override = @assignment.assignment_overrides.create(
         title: "ADHOC Test",
         workflow_state: "active",
@@ -201,7 +227,7 @@ describe CoursePace do
         due_at_overridden: true
       )
       student2 = user_model
-      StudentEnrollment.create!(user: student2, course: @course)
+      StudentEnrollment.create!(user: student2, course: @course, start_at: @course_pace.start_date)
       assignment_override2.assignment_override_students << AssignmentOverrideStudent.new(user_id: student2, no_enrollment: false)
       expect(@assignment.assignment_overrides.active.count).to eq(2)
       expect(@course_pace.publish).to eq(true)
@@ -298,12 +324,13 @@ describe CoursePace do
     end
 
     it "does not change overrides for sections that have course paces if the course pace is published" do
+      @student_enrollment.reload.update(start_at: nil, created_at: Time.at(0))
       expect(@course_pace.publish).to eq(true)
       expect(@assignment.assignment_overrides.active.count).to eq(1)
       assignment_override = @assignment.assignment_overrides.active.first
       expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-01"))
       # Publish course section specific course pace and verify dates have changed
-      @course_section.update(start_at: Date.parse("2021-09-06").in_time_zone(@course.time_zone))
+      @course_section.update(start_at: Date.parse("2021-09-06").in_time_zone(@course.time_zone), restrict_enrollments_to_section_dates: true)
       section_course_pace = @course.course_paces.create! course_section: @course_section, workflow_state: "active"
       section_course_pace.course_pace_module_items.create! module_item: @tag
       expect(section_course_pace.publish).to eq(true)
