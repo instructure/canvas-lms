@@ -133,7 +133,9 @@ export const DiscussionPostToolbar = props => {
                     margin="0 small 0 0"
                     padding={responsiveProps.padding}
                   >
-                    <GroupsMenu width="10px" childTopics={props.childTopics} />
+                    <span className="discussions-post-toolbar-groupsMenu">
+                      <GroupsMenu width="10px" childTopics={props.childTopics} />
+                    </span>
                   </Flex.Item>
                 )}
                 {/* Search */}
@@ -142,23 +144,25 @@ export const DiscussionPostToolbar = props => {
                   shouldShrink={responsiveProps.search.shouldShrink}
                   padding={responsiveProps.padding}
                 >
-                  <TextInput
-                    data-testid="search-filter"
-                    onChange={event => {
-                      props.onSearchChange(event.target.value)
-                    }}
-                    renderLabel={
-                      <ScreenReaderContent>
-                        {I18n.t('Search entries or author')}
-                      </ScreenReaderContent>
-                    }
-                    value={props.searchTerm}
-                    renderBeforeInput={<IconSearchLine display="block" />}
-                    renderAfterInput={clearButton}
-                    placeholder={I18n.t('Search entries or author...')}
-                    shouldNotWrap
-                    width={responsiveProps.search.width}
-                  />
+                  <span className="discussions-search-filter">
+                    <TextInput
+                      data-testid="search-filter"
+                      onChange={event => {
+                        props.onSearchChange(event.target.value)
+                      }}
+                      renderLabel={
+                        <ScreenReaderContent>
+                          {I18n.t('Search entries or author')}
+                        </ScreenReaderContent>
+                      }
+                      value={props.searchTerm}
+                      renderBeforeInput={<IconSearchLine display="block" />}
+                      renderAfterInput={clearButton}
+                      placeholder={I18n.t('Search entries or author...')}
+                      shouldNotWrap
+                      width={responsiveProps.search.width}
+                    />
+                  </span>
                 </Flex.Item>
               </Flex>
             </Flex.Item>
@@ -172,20 +176,28 @@ export const DiscussionPostToolbar = props => {
                   shouldGrow={responsiveProps.filter.shouldGrow}
                   shouldShrink={responsiveProps.filter.shouldShrink}
                 >
-                  <SimpleSelect
-                    renderLabel={<ScreenReaderContent>{I18n.t('Filter by')}</ScreenReaderContent>}
-                    defaultValue={props.selectedView}
-                    onChange={props.onViewFilter}
-                    width={responsiveProps.filter.width}
-                  >
-                    <SimpleSelect.Group renderLabel={I18n.t('View')}>
-                      {Object.entries(getMenuConfig(props)).map(([viewOption, viewOptionLabel]) => (
-                        <SimpleSelect.Option id={viewOption} key={viewOption} value={viewOption}>
-                          {viewOptionLabel.call()}
-                        </SimpleSelect.Option>
-                      ))}
-                    </SimpleSelect.Group>
-                  </SimpleSelect>
+                  <span className="discussions-filter-by-menu">
+                    <SimpleSelect
+                      renderLabel={<ScreenReaderContent>{I18n.t('Filter by')}</ScreenReaderContent>}
+                      defaultValue={props.selectedView}
+                      onChange={props.onViewFilter}
+                      width={responsiveProps.filter.width}
+                    >
+                      <SimpleSelect.Group renderLabel={I18n.t('View')}>
+                        {Object.entries(getMenuConfig(props)).map(
+                          ([viewOption, viewOptionLabel]) => (
+                            <SimpleSelect.Option
+                              id={viewOption}
+                              key={viewOption}
+                              value={viewOption}
+                            >
+                              {viewOptionLabel.call()}
+                            </SimpleSelect.Option>
+                          )
+                        )}
+                      </SimpleSelect.Group>
+                    </SimpleSelect>
+                  </span>
                 </Flex.Item>
                 {/* Sort */}
                 <Flex.Item padding={responsiveProps.padding}>
@@ -198,24 +210,26 @@ export const DiscussionPostToolbar = props => {
                     width="78px"
                     data-testid="sortButtonTooltip"
                   >
-                    <Button
-                      onClick={props.onSortClick}
-                      renderIcon={
-                        props.sortDirection === 'desc' ? (
-                          <IconArrowDownLine data-testid="DownArrow" />
-                        ) : (
-                          <IconArrowUpLine data-testid="UpArrow" />
-                        )
-                      }
-                      data-testid="sortButton"
-                    >
-                      {I18n.t('Sort')}
-                      <ScreenReaderContent>
-                        {props.sortDirection === 'asc'
-                          ? I18n.t('Sorted by Ascending')
-                          : I18n.t('Sorted by Descending')}
-                      </ScreenReaderContent>
-                    </Button>
+                    <span className="discussions-sort-button">
+                      <Button
+                        onClick={props.onSortClick}
+                        renderIcon={
+                          props.sortDirection === 'desc' ? (
+                            <IconArrowDownLine data-testid="DownArrow" />
+                          ) : (
+                            <IconArrowUpLine data-testid="UpArrow" />
+                          )
+                        }
+                        data-testid="sortButton"
+                      >
+                        {I18n.t('Sort')}
+                        <ScreenReaderContent>
+                          {props.sortDirection === 'asc'
+                            ? I18n.t('Sorted by Ascending')
+                            : I18n.t('Sorted by Descending')}
+                        </ScreenReaderContent>
+                      </Button>
+                    </span>
                   </Tooltip>
                 </Flex.Item>
                 {props.discussionAnonymousState && ENV.current_user_roles?.includes('student') && (

@@ -46,9 +46,11 @@ export const GroupsMenu = ({...props}) => {
     <Menu
       placement="bottom"
       trigger={
-        <Button renderIcon={IconGroupLine} data-testid="groups-menu-btn" type="button">
-          <ScreenReaderContent>{I18n.t('Group discussions')}</ScreenReaderContent>
-        </Button>
+        <span className="discussions-group-discussion-btn">
+          <Button renderIcon={IconGroupLine} data-testid="groups-menu-btn" type="button">
+            <ScreenReaderContent>{I18n.t('Group discussions')}</ScreenReaderContent>
+          </Button>
+        </span>
       }
     >
       {menuItems}
