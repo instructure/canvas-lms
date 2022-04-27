@@ -225,18 +225,6 @@ describe('DiscussionFullPage', () => {
       expect(await container.findByText('This is a Reply asc')).toBeInTheDocument()
     })
 
-    it.skip('hides discussion topic when search term is present', async () => {
-      const mocks = [...getDiscussionQueryMock(), ...getDiscussionQueryMock({searchTerm: 'aa'})]
-      const container = setup(mocks)
-      expect(await container.findByTestId('discussion-topic-container')).toBeInTheDocument()
-      fireEvent.change(container.getByTestId('search-filter'), {
-        target: {value: 'aa'}
-      })
-      await waitFor(() =>
-        expect(container.queryByTestId('discussion-topic-container')).not.toBeInTheDocument()
-      )
-    })
-
     it('hides discussion topic when unread is selected', async () => {
       const mocks = [
         ...getDiscussionQueryMock(),
