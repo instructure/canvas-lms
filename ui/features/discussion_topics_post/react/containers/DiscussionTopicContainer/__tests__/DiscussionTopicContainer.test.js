@@ -265,7 +265,10 @@ describe('DiscussionTopicContainer', () => {
           addRubric: false,
           openForComments: false,
           closeForComments: false,
-          manageContent: false
+          manageContent: false,
+          manageCourseContentAdd: false,
+          manageCourseContentEdit: false,
+          manageCourseContentDelete: false
         })
       })
     })

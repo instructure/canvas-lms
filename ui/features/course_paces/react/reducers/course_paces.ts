@@ -21,6 +21,7 @@ import {deepEqual} from '@instructure/ui-utils'
 import moment from 'moment-timezone'
 
 import {Constants as CoursePaceConstants, CoursePaceAction} from '../actions/course_paces'
+import {CoursePaceItemAction} from '../actions/course_pace_items'
 import coursePaceItemsReducer from './course_pace_items'
 import * as DateHelpers from '../utils/date_stuff/date_helpers'
 import * as PaceDueDatesCalculator from '../utils/date_stuff/pace_due_dates_calculator'
@@ -44,15 +45,15 @@ import {Constants as UIConstants, SetSelectedPaceType} from '../actions/ui'
 import {getCourse} from './course'
 import {getEnrollments} from './enrollments'
 import {getSections} from './sections'
+import {getInitialCoursePace, getOriginalBlackoutDates, getOriginalPace} from './original'
 import {getBlackoutDates} from '../shared/reducers/blackout_dates'
 import {Change, summarizeChanges} from '../utils/change_tracking'
 
 const initialProgress = window.ENV.COURSE_PACE_PROGRESS
 
 export const initialState: CoursePacesState = ({
-  ...window.ENV.COURSE_PACE,
+  ...getInitialCoursePace(),
   course: window.ENV.COURSE,
-  originalPace: window.ENV.COURSE_PACE,
   publishingProgress: initialProgress
 } || {}) as CoursePacesState
 
@@ -71,7 +72,6 @@ const getModuleItems = (modules: Module[]) =>
 const createDeepEqualSelector = createSelectorCreator(defaultMemoize, deepEqual)
 
 export const getExcludeWeekends = (state: StoreState): boolean => state.coursePace.exclude_weekends
-export const getOriginalPace = (state: StoreState) => state.coursePace.originalPace
 export const getCoursePace = (state: StoreState): CoursePacesState => state.coursePace
 export const getCoursePaceModules = (state: StoreState) => state.coursePace.modules
 export const getCoursePaceType = (state: StoreState): PaceContextTypes =>
@@ -88,7 +88,10 @@ export const getPublishingError = (state: StoreState): string | undefined => {
   return progress.message
 }
 export const getEndDate = (state: StoreState): OptionalDate => state.coursePace.end_date
+export const getOriginalEndDate = (state: StoreState): OptionalDate =>
+  state.original.coursePace.end_date
 export const isStudentPace = (state: StoreState) => state.coursePace.context_type === 'Enrollment'
+export const isNewPace = (state: StoreState) => !(state.coursePace.id || isStudentPace(state)) // for now, there are no "new" student paces
 export const getIsPaceCompressed = (state: StoreState): boolean =>
   !!state.coursePace.compressed_due_dates
 export const getPaceCompressedDates = (state: StoreState): CoursePaceItemDueDates | undefined =>
@@ -101,7 +104,9 @@ export const getSettingChanges = createDeepEqualSelector(
   getHardEndDates,
   getOriginalPace,
   getEndDate,
-  (excludeWeekends, hardEndDates, originalPace, endDate) => {
+  getOriginalBlackoutDates,
+  getBlackoutDates,
+  (excludeWeekends, hardEndDates, originalPace, endDate, originalBlackoutDates, blackoutDates) => {
     const changes: Change[] = []
 
     if (excludeWeekends !== originalPace.exclude_weekends)
@@ -110,6 +115,11 @@ export const getSettingChanges = createDeepEqualSelector(
         oldValue: originalPace.exclude_weekends,
         newValue: excludeWeekends
       })
+
+    const blackoutChanges = getBlackoutDateChanges(originalBlackoutDates, blackoutDates)
+    if (blackoutChanges.length) {
+      changes.splice(0, 0, ...blackoutChanges)
+    }
 
     // we want to validate that if hardEndDates is true that the endDate is a valid date
     if (
@@ -132,6 +142,54 @@ export const getSettingChanges = createDeepEqualSelector(
     return changes
   }
 )
+
+export function getBlackoutDateChanges(
+  originalBlackoutDates: BlackoutDate[],
+  blackoutDates: BlackoutDate[]
+): Change[] {
+  const changes: Change[] = []
+
+  if (deepEqual(originalBlackoutDates, blackoutDates)) return changes
+
+  // if I don't find the new one in the orig, it was added
+  if (blackoutDates.length) {
+    blackoutDates.forEach(bod => {
+      const targetId: string = (bod.id || bod.temp_id) as string
+      if (
+        originalBlackoutDates.findIndex(elem => {
+          return (elem.id || elem.temp_id) === targetId
+        }) < 0
+      ) {
+        changes.push({
+          id: 'blackout_date',
+          oldValue: null,
+          newValue: bod
+        })
+      }
+    })
+  }
+
+  if (originalBlackoutDates.length) {
+    // if I don't find the orig one in new, it was deleted
+    originalBlackoutDates.forEach(bod => {
+      const targetId = (bod.id || bod.temp_id) as string
+      if (
+        blackoutDates.findIndex(elem => {
+          return (elem.id || elem.temp_id) === targetId
+        }) < 0
+      ) {
+        changes.push({
+          id: 'blackout_date',
+          oldValue: bod,
+          newValue: null
+        })
+      }
+    })
+
+    // todo: it exists in both => it was edited (if/when the UI supports it)
+  }
+  return changes
+}
 
 export const getCoursePaceItemChanges = createDeepEqualSelector(
   getCoursePaceItems,
@@ -159,7 +217,7 @@ export const getUnpublishedChangeCount = createSelector(
   (settingChanges, coursePaceItemChanges) => settingChanges.length + coursePaceItemChanges.length
 )
 
-export const getSummarizedChanges = createSelector(
+export const getSummarizedChanges = createDeepEqualSelector(
   getSettingChanges,
   getCoursePaceItemChanges,
   summarizeChanges
@@ -257,6 +315,15 @@ export const getProjectedEndDate = createDeepEqualSelector(
   }
 )
 
+// return the due date of the last module item
+export const getPlannedEndDate = createDeepEqualSelector(
+  getCoursePaceItems,
+  getDueDates,
+  (items: CoursePaceItem[], dueDates: CoursePaceItemDueDates): OptionalDate => {
+    return items.length ? dueDates[items[items.length - 1].module_item_id] : undefined
+  }
+)
+
 /**
  * These 3 functions support the original projected_dates.tsx
  * which is not used but is being kept around as a reference
@@ -303,11 +370,13 @@ export const getPaceDuration = createSelector(
   getCoursePace,
   getProjectedEndDate,
   (coursePace: CoursePace, projectedEndDate?: string): PaceDuration => {
-    let planDays = 0
-    if (coursePace.start_date) {
-      const endDate = projectedEndDate || coursePace.end_date || coursePace.start_date
-      planDays = DateHelpers.rawDaysBetweenInclusive(coursePace.start_date, endDate)
-    }
+    if (!coursePace.start_date) return {weeks: 0, days: 0}
+
+    const paceStart = moment(coursePace.start_date).endOf('day')
+    const paceEnd = moment(coursePace.end_date).endOf('day')
+    const projectedEnd = moment(projectedEndDate).endOf('day')
+    const endDate = projectedEnd.isAfter(paceEnd) ? paceEnd : projectedEnd
+    const planDays = DateHelpers.rawDaysBetweenInclusive(paceStart, endDate)
     return {weeks: Math.floor(planDays / 7), days: planDays % 7}
   }
 )
@@ -334,17 +403,16 @@ export const getActivePaceContext = createSelector(
   }
 )
 
-export const getIsCompressing = createSelector(
+// return ms between projectedEndDate and the pace end_date
+// if > 0, we are compressing
+// need this rather than a boolean so the value changes and will
+// trigger a rerender to update due dates.
+export const getCompression = createSelector(
   getCoursePace,
-  getHardEndDates,
   getProjectedEndDate,
-  (
-    coursePace: CoursePacesState,
-    hardEndDates: boolean,
-    projectedEndDate: string | undefined
-  ): boolean => {
-    const realEnd = hardEndDates ? coursePace.end_date : ENV.VALID_DATE_RANGE.end_at.date
-    return !!projectedEndDate && projectedEndDate > realEnd
+  (coursePace: CoursePacesState, projectedEndDate: string | undefined): number => {
+    if (!projectedEndDate || !coursePace.end_date) return 0
+    return moment(projectedEndDate).endOf('day').diff(moment(coursePace.end_date).endOf('day'))
   }
 )
 
@@ -355,7 +423,7 @@ export default (
   action: CoursePaceAction | SetSelectedPaceType
 ): CoursePacesState => {
   switch (action.type) {
-    case CoursePaceConstants.SET_COURSE_PACE:
+    case CoursePaceConstants.SAVE_COURSE_PACE:
       return {...state, ...action.payload}
     case CoursePaceConstants.SET_START_DATE:
       return {...state, start_date: DateHelpers.formatDate(action.payload)}
@@ -373,7 +441,7 @@ export default (
         published_at: action.payload.published_at
       }
     case UIConstants.SET_SELECTED_PACE_CONTEXT:
-      return {...action.payload.newSelectedPace, originalPace: action.payload.newSelectedPace}
+      return {...action.payload.newSelectedPace}
     case CoursePaceConstants.TOGGLE_EXCLUDE_WEEKENDS:
       if (state.exclude_weekends) {
         return {...state, exclude_weekends: false}
@@ -384,7 +452,7 @@ export default (
       if (state.hard_end_dates) {
         return {...state, hard_end_dates: false, end_date: ''}
       } else {
-        let endDate = state.originalPace.end_date
+        let endDate = action.payload as OptionalDate
         if (!endDate) {
           if (state.course.end_at) {
             endDate = state.course.end_at
@@ -397,8 +465,7 @@ export default (
 
     case CoursePaceConstants.RESET_PACE:
       return {
-        ...state.originalPace,
-        originalPace: state.originalPace,
+        ...(action.payload as CoursePace),
         updated_at: new Date().toISOString() // kicks react into re-rendering the assignment_rows
       }
     case CoursePaceConstants.SET_PROGRESS:
@@ -411,6 +478,9 @@ export default (
     case CoursePaceConstants.UNCOMPRESS_DATES:
       return {...state, compressed_due_dates: undefined}
     default:
-      return {...state, modules: coursePaceItemsReducer(state.modules, action)}
+      return {
+        ...state,
+        modules: coursePaceItemsReducer(state.modules, action as CoursePaceItemAction)
+      }
   }
 }

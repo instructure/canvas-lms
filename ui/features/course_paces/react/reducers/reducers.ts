@@ -24,6 +24,7 @@ import {courseReducer} from './course'
 import {sectionsReducer} from './sections'
 import {enrollmentsReducer} from './enrollments'
 import {blackoutDatesReducer} from '../shared/reducers/blackout_dates'
+import {originalReducer} from './original'
 import uiReducer from './ui'
 
 export default combineReducers<StoreState>({
@@ -32,5 +33,6 @@ export default combineReducers<StoreState>({
   sections: sectionsReducer,
   ui: uiReducer,
   course: courseReducer,
-  blackoutDates: blackoutDatesReducer
+  blackoutDates: blackoutDatesReducer,
+  original: originalReducer
 })

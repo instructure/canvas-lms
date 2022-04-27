@@ -21,21 +21,21 @@ import React from 'react'
 import Module from './module'
 import {CoursePace, ResponsiveSizes, StoreState} from '../../types'
 import {connect} from 'react-redux'
-import {getCoursePace, getIsCompressing} from '../../reducers/course_paces'
+import {getCoursePace, getCompression} from '../../reducers/course_paces'
 import {getResponsiveSize, getShowProjections} from '../../reducers/ui'
 
 interface StoreProps {
   readonly coursePace: CoursePace
   readonly responsiveSize: ResponsiveSizes
   readonly showProjections: boolean
-  readonly isCompressing: boolean
+  readonly compression: number
 }
 
 export const CoursePaceTable: React.FC<StoreProps> = ({
   coursePace,
   responsiveSize,
   showProjections,
-  isCompressing
+  compression
 }) => (
   <>
     {coursePace.modules.map((module, index) => (
@@ -46,7 +46,7 @@ export const CoursePaceTable: React.FC<StoreProps> = ({
         coursePace={coursePace}
         responsiveSize={responsiveSize}
         showProjections={showProjections}
-        isCompressing={isCompressing}
+        compression={compression}
       />
     ))}
   </>
@@ -57,7 +57,7 @@ const mapStateToProps = (state: StoreState) => {
     coursePace: getCoursePace(state),
     responsiveSize: getResponsiveSize(state),
     showProjections: getShowProjections(state),
-    isCompressing: getIsCompressing(state)
+    compression: getCompression(state)
   }
 }
 

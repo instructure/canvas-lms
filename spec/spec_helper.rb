@@ -52,6 +52,7 @@ if ENV["CRYSTALBALL_MAP"] == "1"
   Crystalball::MapGenerator.start! do |config|
     config.register Crystalball::MapGenerator::CoverageStrategy.new
     config.map_storage_path = "log/results/crystalball_results/#{SecureRandom.uuid}_#{ENV.fetch("PARALLEL_INDEX", "0")}_map.yml"
+    config.dump_threshold = 50_000
   end
 
   module Crystalball

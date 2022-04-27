@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {connect} from 'react-redux'
-// @ts-ignore: TS doesn't understand i18n scoped imports
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {debounce, pick} from 'lodash'
 import moment from 'moment-timezone'
@@ -36,10 +35,9 @@ import {NumberInput} from '@instructure/ui-number-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
-import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 
-import {coursePaceTimezone} from '../../shared/api/backend_serializer'
+import {coursePaceDateFormatter} from '../../shared/api/backend_serializer'
 import {CoursePaceItem, CoursePace, StoreState} from '../../types'
 import {BlackoutDate} from '../../shared/types'
 import {
@@ -47,12 +45,11 @@ import {
   getDueDate,
   getExcludeWeekends,
   getCoursePaceItemPosition,
-  getPacePublishing,
   isStudentPace
 } from '../../reducers/course_paces'
 import {actions} from '../../actions/course_pace_items'
 import * as DateHelpers from '../../utils/date_stuff/date_helpers'
-import {getShowProjections} from '../../reducers/ui'
+import {getShowProjections, getSyncing} from '../../reducers/ui'
 import {getBlackoutDates} from '../../shared/reducers/blackout_dates'
 
 const I18n = useI18nScope('course_paces_assignment_row')
@@ -74,7 +71,7 @@ interface StoreProps {
   readonly excludeWeekends: boolean
   readonly coursePaceItemPosition: number
   readonly blackoutDates: BlackoutDate[]
-  readonly pacePublishing: boolean
+  readonly isSyncing: boolean
   readonly showProjections: boolean
   readonly isStudentPace: boolean
 }
@@ -98,7 +95,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
 
   private debouncedCommitChanges: any
 
-  private dateFormatter: Intl.DateTimeFormat
+  private dateFormatter: any
 
   /* Component lifecycle */
 
@@ -108,13 +105,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
       leading: false,
       trailing: true
     })
-    this.dateFormatter = new Intl.DateTimeFormat(ENV.LOCALE, {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      timeZone: coursePaceTimezone
-    })
+    this.dateFormatter = coursePaceDateFormatter()
   }
 
   shouldComponentUpdate(nextProps: ComponentProps, nextState: LocalState) {
@@ -126,7 +117,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
       nextProps.coursePace.context_type !== this.props.coursePace.context_type ||
       (nextProps.coursePace.context_type === this.props.coursePace.context_type &&
         nextProps.coursePace.context_id !== this.props.coursePace.context_id) ||
-      nextProps.pacePublishing !== this.props.pacePublishing ||
+      nextProps.isSyncing !== this.props.isSyncing ||
       nextProps.showProjections !== this.props.showProjections ||
       nextProps.datesVisible !== this.props.datesVisible
     )
@@ -170,6 +161,8 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
   }
 
   onDecrementOrIncrement = (_e: React.FormEvent<HTMLInputElement>, direction: number) => {
+    // it's either this error or a typescript typing error using the function version of setState
+    // eslint-disable-next-line react/no-access-state-in-setstate
     const newValue = (this.parsePositiveNumber(this.state.duration) || 0) + direction
     if (newValue < 0) return
     this.setState({duration: newValue.toString()})
@@ -257,7 +250,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
 
     return (
       <NumberInput
-        interaction={this.props.pacePublishing ? 'disabled' : 'enabled'}
+        interaction={this.props.isSyncing ? 'disabled' : 'enabled'}
         renderLabel={
           <ScreenReaderContent>
             Duration for module {this.props.coursePaceItem.assignment_title}
@@ -278,7 +271,8 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
   renderDate = () => {
     // change the date format and you'll probably have to change
     // the column width in AssignmentRow
-    return this.dateFormatter.format(new Date(this.props.dueDate))
+    const due = moment(this.props.dueDate)
+    return this.dateFormatter(due.toDate())
   }
 
   renderTitle() {
@@ -287,19 +281,22 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
         <View margin="0 x-small 0 0">{this.renderAssignmentIcon()}</View>
         <div>
           <Text weight="bold">
-            <a href={this.props.coursePaceItem.assignment_link} style={{color: 'inherit'}}>
-              <TruncateText>{this.props.coursePaceItem.assignment_title}</TruncateText>
+            <a
+              href={this.props.coursePaceItem.assignment_link}
+              style={{color: 'inherit', wordBreak: 'break-word'}}
+            >
+              {this.props.coursePaceItem.assignment_title}
             </a>
           </Text>
           {typeof this.props.coursePaceItem.points_possible === 'number' && (
-            <span className="course-paces-assignment-row-points-possible">
+            <div className="course-paces-assignment-row-points-possible">
               <Text size="x-small">
                 {I18n.t(
                   {one: '1 pt', other: '%{count} pts'},
                   {count: this.props.coursePaceItem.points_possible}
                 )}
               </Text>
-            </span>
+            </div>
           )}
         </div>
       </Flex>
@@ -329,7 +326,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
           {(this.props.showProjections || this.props.datesVisible) && (
             <Cell textAlign="center">
               <View data-testid="assignment-due-date" margin={labelMargin}>
-                {this.renderDate()}
+                <span style={{whiteSpace: 'nowrap'}}>{this.renderDate()}</span>
               </View>
             </Cell>
           )}
@@ -351,7 +348,7 @@ const mapStateToProps = (state: StoreState, props: PassedProps): StoreProps => {
     excludeWeekends: getExcludeWeekends(state),
     coursePaceItemPosition: getCoursePaceItemPosition(state, props),
     blackoutDates: getBlackoutDates(state),
-    pacePublishing: getPacePublishing(state),
+    isSyncing: getSyncing(state),
     showProjections: getShowProjections(state),
     isStudentPace: isStudentPace(state)
   }

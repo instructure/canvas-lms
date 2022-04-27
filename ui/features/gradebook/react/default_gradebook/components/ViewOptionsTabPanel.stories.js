@@ -31,6 +31,10 @@ export default {
       modulesEnabled: true,
       onChange: () => {}
     },
+    hideAssignmentGroupTotals: {
+      checked: false,
+      onChange: () => {}
+    },
     showNotes: {
       checked: true,
       onChange: () => {}

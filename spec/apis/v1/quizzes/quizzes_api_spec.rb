@@ -19,7 +19,7 @@
 #
 
 require_relative "../../api_spec_helper"
-require_relative "../../locked_spec"
+require_relative "../../locked_examples"
 require_relative "../../../file_upload_helper"
 
 describe Quizzes::QuizzesApiController, type: :request do

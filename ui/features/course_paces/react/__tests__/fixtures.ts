@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import moment from 'moment-timezone'
 import {keyBy} from 'lodash'
 
-import {BlackoutDate, Course} from '../shared/types'
+import {BlackoutDate, BlackoutDateState, SyncState, Course} from '../shared/types'
 import {
   Enrollment,
   Enrollments,
@@ -30,13 +31,13 @@ import {
   Section,
   Sections,
   SectionsState,
-  UIState
+  UIState,
+  OriginalState
 } from '../types'
-
-export const BLACKOUT_DATES: BlackoutDate[] = []
 
 window.ENV.TIMEZONE = 'America/Denver'
 window.ENV.CONTEXT_TIMEZONE = 'America/Denver'
+moment.tz.setDefault('America/Denver')
 
 export const COURSE: Course = {
   id: '30',
@@ -45,6 +46,21 @@ export const COURSE: Course = {
   start_at: '2021-09-01T00:00:00-06:00',
   end_at: '2021-12-31T00:00:00-07:00',
   time_zone: window.ENV.CONTEXT_TIMEZONE
+}
+
+export const BLACKOUT_DATES: BlackoutDate[] = [
+  {
+    id: '30',
+    course_id: COURSE.id,
+    event_title: 'Spring break',
+    start_date: moment('2022-03-21'),
+    end_date: moment('2022-03-25')
+  }
+]
+
+export const DEFAULT_BLACKOUT_DATE_STATE = {
+  syncing: SyncState.SYNCED,
+  blackoutDates: BLACKOUT_DATES
 }
 
 export const ENROLLMENT_1: Enrollment = {
@@ -64,7 +80,8 @@ export const ENROLLMENT_2: Enrollment = {
   full_name: 'Molly Millions',
   sortable_name: 'Millions, Molly',
   start_at: undefined,
-  completed_course_pace_at: undefined
+  completed_course_pace_at: undefined,
+  avatar_url: 'molly_avatar'
 }
 
 export const ENROLLMENTS: Enrollments = keyBy([ENROLLMENT_1, ENROLLMENT_2], 'id')
@@ -226,13 +243,15 @@ export interface DefaultStoreState {
   readonly sections?: SectionsState
   readonly ui?: UIState
   readonly course?: Course
-  readonly blackoutDates?: BlackoutDate[]
+  readonly blackoutDates: BlackoutDateState
+  readonly original: OriginalState
 }
 
 export const DEFAULT_STORE_STATE: DefaultStoreState = {
-  blackoutDates: BLACKOUT_DATES,
+  blackoutDates: DEFAULT_BLACKOUT_DATE_STATE,
   course: COURSE,
   enrollments: ENROLLMENTS,
-  coursePace: {...PRIMARY_PACE, originalPace: PRIMARY_PACE},
-  sections: SECTIONS
+  coursePace: {...PRIMARY_PACE},
+  sections: SECTIONS,
+  original: {coursePace: PRIMARY_PACE, blackoutDates: BLACKOUT_DATES}
 }

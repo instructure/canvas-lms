@@ -29,6 +29,9 @@ export function initSentry() {
     const errorsSampleRate = parseFloat(sentrySettings.errors_sample_rate) || 0.0
     const tracesSampleRate = parseFloat(sentrySettings.traces_sample_rate) || 0.0
     const integrations: Integration[] = []
+    const denyUrls = sentrySettings.url_deny_pattern
+      ? [new RegExp(sentrySettings.url_deny_pattern)]
+      : undefined
 
     if (ENV.FULL_STORY_ENABLED) {
       integrations.push(
@@ -43,6 +46,7 @@ export function initSentry() {
       environment: sentrySettings.environment,
       release: sentrySettings.revision,
 
+      denyUrls,
       integrations,
 
       sampleRate: errorsSampleRate,

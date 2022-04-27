@@ -36,6 +36,16 @@ class CoursePaceHardEndDateCompressor
 
     start_date_of_item_group = start_date || enrollment&.start_at || course_pace.start_date
     end_date = course_pace.end_date || course_pace.course.end_at&.to_date || course_pace.course.enrollment_term&.end_at&.to_date
+    # when due dates run over and the end date is on a weekend, the adjustment to due dates
+    # is off by a day. Pull the end_date back to the previous friday.
+    if end_date && course_pace.exclude_weekends
+      wday = end_date.wday
+      if wday == 0 # sunday
+        end_date -= 2.days
+      elsif wday == 6 # saturday
+        end_date -= 1.day
+      end
+    end
     due_dates = CoursePaceDueDatesCalculator.new(course_pace).get_due_dates(items, enrollment, start_date: start_date_of_item_group)
 
     if compress_items_after

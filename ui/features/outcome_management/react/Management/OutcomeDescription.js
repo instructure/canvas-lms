@@ -40,8 +40,7 @@ const OutcomeDescription = ({
   masteryPoints,
   ratings
 }) => {
-  const {friendlyDescriptionFF, isStudent, individualOutcomeRatingAndCalculationFF} =
-    useCanvasContext()
+  const {friendlyDescriptionFF, isStudent, accountLevelMasteryScalesFF} = useCanvasContext()
   const shouldShowFriendlyDescription = friendlyDescriptionFF && friendlyDescription
   let fullDescription = description
   let truncatedDescription = stripHtmlTags(fullDescription || '')
@@ -56,7 +55,7 @@ const OutcomeDescription = ({
     !isStudent &&
     truncatedDescription !== friendlyDescription
 
-  if (!description && !friendlyDescription && !individualOutcomeRatingAndCalculationFF) return null
+  if (!description && !friendlyDescription && accountLevelMasteryScalesFF) return null
 
   return (
     <View>
@@ -114,7 +113,7 @@ const OutcomeDescription = ({
         </View>
       )}
 
-      {!truncated && individualOutcomeRatingAndCalculationFF && (
+      {!truncated && !accountLevelMasteryScalesFF && (
         <View>
           <Ratings
             ratings={prepareRatings(ratings)}

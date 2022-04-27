@@ -266,6 +266,12 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Contrau per amagar { types }"
     },
+    "color_picker_6b359edf": {
+        "message": "Selector de color"
+    },
+    "color_picker_colorname_selected_ad4cf400": {
+        "message": "Selector de color (s’ha seleccionat el color { colorName })"
+    },
     "computer_1d7dfa6f": {
         "message": "Ordinador"
     },
@@ -407,9 +413,6 @@
     "diamond_b8dfe7ae": {
         "message": "Diamant"
     },
-    "dimension_type_55c83e4e": {
-        "message": "Tipus de dimensió"
-    },
     "dimensions_45ddb7b7": {
         "message": "Mides"
     },
@@ -484,6 +487,9 @@
     },
     "edit_existing_button_icon_3d0277bd": {
         "message": "Edita el botó i la icona actuals"
+    },
+    "edit_icon_2c6b0e91": {
+        "message": "Edita la icona"
     },
     "edit_link_7f53bebb": {
         "message": "Edita l''enllaç"
@@ -917,6 +923,9 @@
     "media_af190855": {
         "message": "Element multimèdia"
     },
+    "media_file_is_processing_please_try_again_later_58a6d49": {
+        "message": "S’està processant el fitxer multimèdia. Torneu a provar-ho més endavant."
+    },
     "medium_5a8e9ead": {
         "message": "Mitjà"
     },
@@ -1208,6 +1217,9 @@
     "rich_content_editor_2708ef21": {
         "message": "Editor de contingut enriquit"
     },
+    "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+        "message": "Àrea de text enriquit. Premeu ALT+0 per accedir a les dreceres de l’editor de contingut enriquit."
+    },
     "right_to_left_9cfb092a": {
         "message": "Dreta a esquerra"
     },
@@ -1292,17 +1304,8 @@
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Alguna cosa no ha anat bé i no sé què puc mostrar-te."
     },
-    "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-        "message": "Alguna cosa no ha anat bé; reviseu la connexió i torneu-ho a provar."
-    },
     "something_went_wrong_d238c551": {
         "message": "Alguna cosa no ha anat bé"
-    },
-    "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-        "message": "Alguna cosa no ha anat bé; torneu a provar-ho després d''actualitzar la pàgina"
-    },
-    "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-        "message": "Alguna cosa no ha anat bé en fer la penjada; reviseu la connexió i torneu a provar-ho."
     },
     "sort_by_e75f9e3e": {
         "message": "Ordena per"
@@ -1498,9 +1501,6 @@
     },
     "uploading_19e8a4e7": {
         "message": "S''està penjant"
-    },
-    "uploading_closed_captions_subtitles_failed_bc093f3": {
-        "message": "No s’han pogut penjar les llegendes ni els subtítols tancats."
     },
     "uppercase_alphabetic_ordered_list_3f5aa6b2": {
         "message": "llista ordenada alfabèticament en majúscules"

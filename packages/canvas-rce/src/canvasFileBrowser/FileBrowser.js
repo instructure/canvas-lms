@@ -17,24 +17,14 @@
 import React from 'react'
 import formatMessage from '../format-message'
 import _ from 'lodash'
-import $ from 'jquery'
-import axios from 'axios'
 import minimatch from 'minimatch'
 import {TreeBrowser} from '@instructure/ui-tree-browser'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
-import {Button} from '@instructure/ui-buttons'
-import {Mask} from '@instructure/ui-overlays'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {
-  IconOpenFolderSolid,
-  IconFolderSolid,
-  IconUploadSolid,
-  IconImageSolid
-} from '@instructure/ui-icons'
+import {IconOpenFolderSolid, IconFolderSolid, IconImageLine} from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
-import {uploadFile, getSVGIconFromType} from './apiFileUtils'
-import {showFlashSuccess, showFlashError} from './FlashAlert'
+import {getIconFromType, isImage} from '../rce/plugins/shared/fileTypeUtils'
+import {showFlashError} from './FlashAlert'
 import natcompare from './natcompare'
 
 class FileBrowser extends React.Component {
@@ -47,7 +37,7 @@ class FileBrowser extends React.Component {
     onLoading: PropTypes.func.isRequired,
     context: PropTypes.shape({
       type: PropTypes.string.isRequired,
-      id: PropTypes.number.isRequired
+      id: PropTypes.string.isRequired
     }).isRequired
   }
 
@@ -63,12 +53,11 @@ class FileBrowser extends React.Component {
       collections: {0: {id: 0, collections: []}},
       items: {},
       openFolders: [],
-      uploadFolder: null,
-      uploading: false,
       loadingCount: 0
     }
 
     this.source = props.source
+    this.updatePropsWithThumbnailOrIcon = this.updatePropsWithThumbnailOrIcon.bind(this)
   }
 
   componentDidMount() {
@@ -281,16 +270,22 @@ class FileBrowser extends React.Component {
     return folder
   }
 
-  // TreeBrowser doesn't support per-item customized icons,
-  // but it does permit per-item thumbnails. Cook up an
-  // SVG data URL for the thumbnail.  This can go away
-  // when TreeBrowser is better.
-  getThumbnail(file) {
-    if (file.thumbnailUrl) {
-      return file.thumbnailUrl
+  updatePropsWithThumbnailOrIcon(props) {
+    const {id} = props
+    const file = this.state.items[id].api
+
+    let thumbnail, itemIcon
+    if (isImage(file.type)) {
+      if (file.thumbnailUrl) {
+        thumbnail = file.thumbnailUrl
+      } else {
+        itemIcon = IconImageLine
+      }
+    } else {
+      itemIcon = getIconFromType(file.type)
     }
-    const svgicon = getSVGIconFromType(file.type)
-    return `data:image/svg+xml;utf8,${svgicon}`
+
+    return {...props, thumbnail, itemIcon}
   }
 
   formatFileInfo(apiFile, opts = {}) {
@@ -300,7 +295,6 @@ class FileBrowser extends React.Component {
       api: apiFile,
       id: apiFile.id,
       name: apiFile.name,
-      thumbnail: this.getThumbnail(apiFile),
       src: `${context}/files/${apiFile.id}/preview${
         context.includes('user') ? `?verifier=${apiFile.uuid}` : ''
       }`,
@@ -354,8 +348,6 @@ class FileBrowser extends React.Component {
   }
 
   onFileClick = file => {
-    const folder = this.findFolderForFile(file)
-    this.setState({uploadFolder: folder && folder.id})
     this.props.selectFile(this.state.items[file.id])
   }
 
@@ -397,8 +389,8 @@ class FileBrowser extends React.Component {
             expanded={this.state.openFolders}
             collectionIconExpanded={IconOpenFolderSolid}
             collectionIcon={IconFolderSolid}
-            itemIcon={IconImageSolid}
             selectionType="single"
+            getItemProps={this.updatePropsWithThumbnailOrIcon}
           />
           {this.renderLoading()}
         </div>

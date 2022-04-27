@@ -86,6 +86,15 @@ describe('toHtmlString', () => {
     )
   })
 
+  describe('when a thumbnail with width and height is present', () => {
+    const overrides = {thumbnail: {width: 123, height: 456, url: 'https://www.test.com/thumb'}}
+    it('creates a link with a thumbnail with width and height', () => {
+      expect(linkContentItem(overrides).toHtmlString()).toEqual(
+        '<a href="https://www.test.com" title="Title" target="_blank"><img src="https://www.test.com/thumb" alt="some text" width="123" height="456"></a>'
+      )
+    })
+  })
+
   describe('when a thumbnail is not present', () => {
     const overrides = {thumbnail: undefined}
     it('creates an anchor tag with the correct values', () => {

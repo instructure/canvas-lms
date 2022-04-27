@@ -219,7 +219,7 @@ class ContextModulesApiController < ApplicationController
   end
 
   def duplicate
-    if authorized_action(@context, @current_user, :manage_content)
+    if authorized_action(@context, @current_user, [:manage_content, :manage_course_content_add])
       old_module = @context.modules_visible_to(@current_user).find(params[:module_id])
       return render json: { error: "unable to find module to duplicate" }, status: :bad_request unless old_module
       return render json: { error: "cannot duplicate this module" }, status: :bad_request unless old_module.can_be_duplicated?
@@ -269,7 +269,7 @@ class ContextModulesApiController < ApplicationController
   #      "completed": [1, 2]
   #    }
   def batch_update
-    if authorized_action(@context, @current_user, :manage_content)
+    if authorized_action(@context, @current_user, [:manage_content, :manage_course_content_edit])
       event = params[:event]
       return render(json: { message: "need to specify event" }, status: :bad_request) unless event.present?
       return render(json: { message: "invalid event" }, status: :bad_request) unless %w[publish unpublish delete].include? event

@@ -112,7 +112,9 @@ ready(() => {
         model: dueDateList,
         views: {},
         dueDatesReadonly: !!lockedItems.due_dates,
-        availabilityDatesReadonly: !!lockedItems.availability_dates
+        availabilityDatesReadonly: !!lockedItems.availability_dates,
+        inPacedCourse: model.get('in_paced_course'),
+        courseId: assignment.courseID()
       })
     },
     lockedItems: model.id ? lockedItems : {}, // if no id, creating a new discussion

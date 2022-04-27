@@ -19,12 +19,20 @@
 import {Action} from 'redux'
 import {ThunkAction} from 'redux-thunk'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-// @ts-ignore: TS doesn't understand i18n scoped imports
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-import {CoursePaceItemDueDates, CoursePace, PaceContextTypes, Progress, StoreState} from '../types'
+import {
+  CoursePaceItemDueDates,
+  CoursePace,
+  PaceContextTypes,
+  Progress,
+  StoreState,
+  OptionalDate
+} from '../types'
 import {createAction, ActionsUnion} from '../shared/types'
 import {actions as uiActions} from './ui'
+import {actions as blackoutDateActions} from '../shared/actions/blackout_dates'
+import {getBlackoutDatesUnsynced} from '../shared/reducers/blackout_dates'
 import * as Api from '../api/course_pace_api'
 
 const I18n = useI18nScope('course_paces_actions')
@@ -37,7 +45,8 @@ export enum Constants {
   SET_START_DATE = 'COURSE_PACE/SET_START_DATE',
   PUBLISH_PACE = 'COURSE_PACE/PUBLISH_PACE',
   TOGGLE_EXCLUDE_WEEKENDS = 'COURSE_PACE/TOGGLE_EXCLUDE_WEEKENDS',
-  SET_COURSE_PACE = 'COURSE_PACE/SET_COURSE_PACE',
+  SAVE_COURSE_PACE = 'COURSE_PACE/SAVE',
+  COURSE_PACE_SAVED = 'COURSE_PACE/SAVED',
   PACE_CREATED = 'COURSE_PACE/PACE_CREATED',
   TOGGLE_HARD_END_DATES = 'COURSE_PACE/TOGGLE_HARD_END_DATES',
   RESET_PACE = 'COURSE_PACE/RESET_PACE',
@@ -53,8 +62,7 @@ type LoadingAfterAction = (pace: CoursePace) => any
 type SetEndDate = {type: Constants.SET_END_DATE; payload: string}
 
 const regularActions = {
-  setCoursePace: (pace: CoursePace) =>
-    createAction(Constants.SET_COURSE_PACE, {...pace, originalPace: pace}),
+  saveCoursePace: (pace: CoursePace) => createAction(Constants.SAVE_COURSE_PACE, pace),
   setStartDate: (date: string) => createAction(Constants.SET_START_DATE, date),
   setEndDate: (date: string): SetEndDate => createAction(Constants.SET_END_DATE, date),
   setCompressedItemDates: (compressedItemDates: CoursePaceItemDueDates) =>
@@ -62,30 +70,75 @@ const regularActions = {
   uncompressDates: () => createAction(Constants.UNCOMPRESS_DATES),
   paceCreated: (pace: CoursePace) => createAction(Constants.PACE_CREATED, pace),
   toggleExcludeWeekends: () => createAction(Constants.TOGGLE_EXCLUDE_WEEKENDS),
-  toggleHardEndDates: () => createAction(Constants.TOGGLE_HARD_END_DATES),
-  resetPace: () => createAction(Constants.RESET_PACE),
-  setProgress: (progress?: Progress) => createAction(Constants.SET_PROGRESS, progress)
+  toggleHardEndDates: (original_end_date: OptionalDate) =>
+    createAction(Constants.TOGGLE_HARD_END_DATES, original_end_date),
+  resetPace: (originalPace: CoursePace) => createAction(Constants.RESET_PACE, originalPace),
+  setProgress: (progress?: Progress) => createAction(Constants.SET_PROGRESS, progress),
+  coursePaceSaved: (coursePace: CoursePace) => createAction(Constants.COURSE_PACE_SAVED, coursePace)
 }
 
 const thunkActions = {
+  onToggleHardEndDates: (): ThunkAction<void, StoreState, void, Action> => {
+    return (dispatch, getState) => {
+      const originalEndDate = getState().original.coursePace.end_date
+      return dispatch(regularActions.toggleHardEndDates(originalEndDate))
+    }
+  },
+  onResetPace: (): ThunkAction<void, StoreState, void, Action> => {
+    return (dispatch, getState) => {
+      dispatch(blackoutDateActions.resetBlackoutDates())
+      const originalPace = getState().original.coursePace
+      return dispatch(regularActions.resetPace(originalPace))
+    }
+  },
   publishPace: (): ThunkAction<Promise<void>, StoreState, void, Action> => {
     return (dispatch, getState) => {
-      dispatch(uiActions.showLoadingOverlay(I18n.t('Starting publish...')))
+      dispatch(uiActions.startSyncing())
       dispatch(uiActions.clearCategoryError('publish'))
 
       return Api.publish(getState().coursePace)
         .then(responseBody => {
           if (!responseBody) throw new Error(I18n.t('Response body was empty'))
           const {course_pace: updatedPace, progress} = responseBody
-          dispatch(coursePaceActions.setCoursePace(updatedPace))
+          dispatch(coursePaceActions.saveCoursePace(updatedPace))
           dispatch(coursePaceActions.setProgress(progress))
           dispatch(coursePaceActions.pollForPublishStatus())
-          dispatch(uiActions.hideLoadingOverlay())
+          dispatch(uiActions.syncingCompleted())
         })
         .catch(error => {
-          dispatch(uiActions.hideLoadingOverlay())
           dispatch(uiActions.setCategoryError('publish', error?.toString()))
+          dispatch(uiActions.syncingCompleted())
         })
+    }
+  },
+  // TODO: when blackout dates are changed we have to possibly publish changes
+  // to the pace in the UI + save all existing paces
+  publishPaceAndSaveAll: (): ThunkAction<Promise<void>, StoreState, void, Action> => {
+    return (dispatch, _getState) => {
+      return dispatch(coursePaceActions.publishPace())
+    }
+  },
+  // I have no idea how to declare the return type of this function
+  // an error message said: ThunkDispatch<StoreState, void, Action>
+  // but that just moved the error
+  syncUnpublishedChanges: () => {
+    return (dispatch, getState) => {
+      dispatch(uiActions.clearCategoryError('publish'))
+
+      if (ENV.FEATURES.course_paces_blackout_dates && getBlackoutDatesUnsynced(getState())) {
+        dispatch(uiActions.startSyncing())
+        return dispatch(blackoutDateActions.syncBlackoutDates())
+          .then(() => {
+            return dispatch(coursePaceActions.publishPaceAndSaveAll()).then(() => {
+              dispatch(uiActions.syncingCompleted())
+            })
+          })
+          .catch(() => {
+            dispatch(uiActions.syncingCompleted())
+          })
+      } else {
+        return dispatch(coursePaceActions.publishPace())
+      }
     }
   },
   pollForPublishStatus: (): ThunkAction<void, StoreState, void, Action> => {
@@ -104,13 +157,23 @@ const thunkActions = {
               )
             )
             dispatch(uiActions.clearCategoryError('checkPublishStatus'))
-            if (TERMINAL_PROGRESS_STATUSES.includes(updatedProgress.workflow_state)) {
+            if (updatedProgress.workflow_state === 'completed') {
               showFlashAlert({
                 message: I18n.t('Finished publishing pace'),
                 err: null,
                 type: 'success',
                 srOnly: true
               })
+              dispatch(coursePaceActions.coursePaceSaved(getState().coursePace))
+            } else if (updatedProgress.workflow_state === 'failed') {
+              showFlashAlert({
+                message: I18n.t('Failed publishing pace'),
+                err: null,
+                type: 'error',
+                srOnly: true
+              })
+              dispatch(uiActions.setCategoryError('publish'))
+              console.log(`Error publishing pace: ${updatedProgress.message}`) // eslint-disable-line no-console
             } else {
               setTimeout(pollingLoop, PUBLISH_STATUS_POLLING_MS)
             }
@@ -135,7 +198,7 @@ const thunkActions = {
       return Api.resetToLastPublished(contextType, contextId)
         .then(coursePace => {
           if (!coursePace) throw new Error(I18n.t('Response body was empty'))
-          dispatch(coursePaceActions.setCoursePace(coursePace))
+          dispatch(coursePaceActions.saveCoursePace(coursePace))
           dispatch(uiActions.hideLoadingOverlay())
         })
         .catch(error => {
@@ -148,7 +211,7 @@ const thunkActions = {
   loadLatestPaceByContext: (
     contextType: PaceContextTypes,
     contextId: string,
-    afterAction: LoadingAfterAction = coursePaceActions.setCoursePace
+    afterAction: LoadingAfterAction = coursePaceActions.saveCoursePace
   ): ThunkAction<void, StoreState, void, Action> => {
     return async (dispatch, getState) => {
       dispatch(uiActions.showLoadingOverlay(I18n.t('Loading...')))
@@ -182,7 +245,7 @@ const thunkActions = {
       return Api.relinkToParentPace(coursePaceId)
         .then(coursePace => {
           if (!coursePace) throw new Error(I18n.t('Response body was empty'))
-          dispatch(coursePaceActions.setCoursePace(coursePace))
+          dispatch(coursePaceActions.saveCoursePace(coursePace))
           dispatch(uiActions.hideLoadingOverlay())
         })
         .catch(error => {

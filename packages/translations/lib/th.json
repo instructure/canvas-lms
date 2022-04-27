@@ -266,6 +266,12 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "ย่อเพื่อซ่อน { types }"
     },
+    "color_picker_6b359edf": {
+        "message": "ระบบเลือกสี "
+    },
+    "color_picker_colorname_selected_ad4cf400": {
+        "message": "ระบบเลือกสี ({ colorName } ที่เลือก)"
+    },
     "computer_1d7dfa6f": {
         "message": "คอมพิวเตอร์"
     },
@@ -407,9 +413,6 @@
     "diamond_b8dfe7ae": {
         "message": "เพชร"
     },
-    "dimension_type_55c83e4e": {
-        "message": "ประเภทขนาด"
-    },
     "dimensions_45ddb7b7": {
         "message": "ขนาด"
     },
@@ -484,6 +487,9 @@
     },
     "edit_existing_button_icon_3d0277bd": {
         "message": "แก้ไขปุ่ม/ไอคอนในปัจจุบัน"
+    },
+    "edit_icon_2c6b0e91": {
+        "message": "ไอคอนแก้ไข"
     },
     "edit_link_7f53bebb": {
         "message": "แก้ไขลิงค์"
@@ -917,6 +923,9 @@
     "media_af190855": {
         "message": "มีเดีย"
     },
+    "media_file_is_processing_please_try_again_later_58a6d49": {
+        "message": "ไฟล์มีเดียกำลังประมวลผล กรุณาลองใหม่อีกครั้งในภายหลัง"
+    },
     "medium_5a8e9ead": {
         "message": "ปานกลาง"
     },
@@ -1208,6 +1217,9 @@
     "rich_content_editor_2708ef21": {
         "message": "Rich Content Editor"
     },
+    "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+        "message": "พื้นที่ Rich Text กด ALT+0 สำหรับชอร์ตคัท Rich Content Editor"
+    },
     "right_to_left_9cfb092a": {
         "message": "ขวาไปซ้าย"
     },
@@ -1292,17 +1304,8 @@
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "มีบางอย่างผิดพลาดและเราไม่รู้ว่าจะแสดงอะไรให้กับคุณ"
     },
-    "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-        "message": "มีบางอย่างผิดพลาด กรุณาตรวจสอบการเชื่อมต่อและลองใหม่อีกครั้ง"
-    },
     "something_went_wrong_d238c551": {
         "message": "มีบางอย่างผิดปกติ"
-    },
-    "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-        "message": "มีบางอย่างผิดพลาด ลองใหม่อีกครั้งหลังจากรีเฟรชหน้าเพจ"
-    },
-    "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-        "message": "มีบางอย่างผิดพลาดในการอัพโหลด กรุณาตรวจสอบการเชื่อมต่อและลองใหม่อีกครั้ง"
     },
     "sort_by_e75f9e3e": {
         "message": "จัดเรียงจาก"
@@ -1498,9 +1501,6 @@
     },
     "uploading_19e8a4e7": {
         "message": "กำลังอัพโหลด"
-    },
-    "uploading_closed_captions_subtitles_failed_bc093f3": {
-        "message": "อัพโหลดคำบรรยายแบบซ่อนได้ล้มเหลว"
     },
     "uppercase_alphabetic_ordered_list_3f5aa6b2": {
         "message": "รายการจัดลำดับอักษรตัวพิมพ์ใหญ่"

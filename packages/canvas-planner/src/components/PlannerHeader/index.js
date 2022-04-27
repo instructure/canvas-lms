@@ -40,7 +40,6 @@ import {
   cancelEditingPlannerItem,
   openEditingPlannerItem,
   getNextOpportunities,
-  getInitialOpportunities,
   dismissOpportunity,
   clearUpdateTodo,
   startLoadingGradesSaga,
@@ -53,6 +52,7 @@ import theme from './theme'
 import formatMessage from '../../format-message'
 import {notifier} from '../../dynamic-ui'
 import {getFirstLoadedMoment} from '../../utilities/dateUtils'
+import {observedUserId} from '../../utilities/apiUtils'
 
 export class PlannerHeader extends Component {
   static propTypes = {
@@ -68,12 +68,12 @@ export class PlannerHeader extends Component {
     locale: PropTypes.string.isRequired,
     timeZone: PropTypes.string.isRequired,
     opportunities: PropTypes.shape(opportunityShape).isRequired,
-    getInitialOpportunities: PropTypes.func.isRequired,
     getNextOpportunities: PropTypes.func.isRequired,
     dismissOpportunity: PropTypes.func.isRequired,
     clearUpdateTodo: PropTypes.func.isRequired,
     startLoadingGradesSaga: PropTypes.func.isRequired,
     firstNewActivityDate: momentObj,
+    isObserving: PropTypes.bool,
     days: PropTypes.arrayOf(
       PropTypes.arrayOf(
         PropTypes.oneOfType([
@@ -135,8 +135,14 @@ export class PlannerHeader extends Component {
     }
   }
 
+  loadNextOpportunitiesIfNeeded(props) {
+    if (!props.loading.allOpportunitiesLoaded && !props.loading.loadingOpportunities) {
+      props.getNextOpportunities()
+    }
+  }
+
   componentDidMount() {
-    this.props.getInitialOpportunities()
+    this.loadNextOpportunitiesIfNeeded(this.props)
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -144,9 +150,7 @@ export class PlannerHeader extends Component {
       nextProps.opportunities
     )
 
-    if (!nextProps.loading.allOpportunitiesLoaded && !nextProps.loading.loadingOpportunities) {
-      nextProps.getNextOpportunities()
-    }
+    this.loadNextOpportunitiesIfNeeded(nextProps)
 
     if (this.props.todo.updateTodoItem !== nextProps.todo.updateTodoItem) {
       this.setUpdateItemTray(!!nextProps.todo.updateTodoItem)
@@ -405,17 +409,19 @@ export class PlannerHeader extends Component {
     return (
       <div className={`${styles.root} PlannerHeader`} data-testid="PlannerHeader">
         {this.renderToday(buttonMargin)}
-        <Button
-          variant="icon"
-          icon={IconPlusLine}
-          margin={buttonMargin}
-          onClick={this.handleToggleTray}
-          ref={b => {
-            this.addNoteBtn = b
-          }}
-        >
-          <ScreenReaderContent>{formatMessage('Add To Do')}</ScreenReaderContent>
-        </Button>
+        {!this.props.isObserving && (
+          <Button
+            variant="icon"
+            icon={IconPlusLine}
+            margin={buttonMargin}
+            onClick={this.handleToggleTray}
+            ref={b => {
+              this.addNoteBtn = b
+            }}
+          >
+            <ScreenReaderContent>{formatMessage('Add To Do')}</ScreenReaderContent>
+          </Button>
+        )}
         <Button
           variant="icon"
           icon={IconGradebookLine}
@@ -444,6 +450,7 @@ export class PlannerHeader extends Component {
               timeZone={this.props.timeZone}
               dismiss={this.props.dismissOpportunity}
               maxHeight={verticalRoom}
+              isObserving={this.props.isObserving}
             />
           </Popover.Content>
         </Popover>
@@ -504,14 +511,25 @@ const mapStateToProps = ({
   days,
   timeZone,
   ui,
-  firstNewActivityDate
-}) => ({opportunities, loading, courses, todo, days, timeZone, ui, firstNewActivityDate})
+  firstNewActivityDate,
+  selectedObservee,
+  currentUser
+}) => ({
+  opportunities,
+  loading,
+  courses,
+  todo,
+  days,
+  timeZone,
+  ui,
+  firstNewActivityDate,
+  isObserving: !!observedUserId({selectedObservee, currentUser})
+})
 const mapDispatchToProps = {
   savePlannerItem,
   deletePlannerItem,
   cancelEditingPlannerItem,
   openEditingPlannerItem,
-  getInitialOpportunities,
   getNextOpportunities,
   dismissOpportunity,
   clearUpdateTodo,

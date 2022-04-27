@@ -65,10 +65,14 @@ module DataFixup::MoveFeatureFlagsToSettings
                  context.feature_flags.where(feature: feature_flag_name.to_s).take
                end
     override_value = nil
+    locked = true
     if override
       case override.state
       when "allowed"
         # no op
+      when "allowed_on"
+        override_value = true
+        locked = false
       when "on"
         override_value = true
       when "off"
@@ -81,7 +85,7 @@ module DataFixup::MoveFeatureFlagsToSettings
 
     unless override_value.nil?
       if context.is_a?(Account)
-        context.settings[setting_name] = inherited ? { locked: true, value: override_value } : override_value
+        context.settings[setting_name] = inherited ? { locked: locked, value: override_value } : override_value
       else
         context.settings_frd[setting_name] = override_value
       end

@@ -15,23 +15,23 @@
     <ul class="message-detail-actions unstyled">
       {{#unless cannot_reply}}
       <li>
-        <a href="#"
-           class="icon-reply-2 reply-btn Button Button--icon-action"
+        <button
+           class="reply-btn Button Button--icon-action"
            title="{{#t "reply"}}Reply{{/t}}"
            data-tooltip>
+           <i class="icon-reply-2"></i>
           {{#if subject}}
             <span class="screenreader-only">{{#t}}Reply to conversation {{subject}}{{/t}}</span>
           {{else}}
             <span class="screenreader-only">{{#t}}Reply to conversation{{/t}}</span>
           {{/if}}
-        </a>
+        </button>
       </li>
       {{/unless}}
       {{#unless for_submission}}
       <li>
         <div class="inline-block" role="application">
-          <a href="#"
-             role="button"
+          <button
              data-kyle-menu-options='{"appendMenuTo": "body"}'
              class="al-trigger Button Button--icon-action message-detail-kyle-menu"
              title="{{#t "more_options"}}More options{{/t}}"
@@ -43,11 +43,11 @@
             {{else}}
               <span class="screenreader-only">{{#t}}Message actions for conversation{{/t}}</span>
             {{/if}}
-          </a>
+          </button>
           <ul class="al-options message-header-menu">
             {{#unless cannot_reply}}
               <li>
-                <a href="#" class="reply-all-btn">{{#t "reply_all"}}Reply all{{/t}}</a>
+                <a class="reply-all-btn">{{#t "reply_all"}}Reply all{{/t}}</a>
               </li>
             {{/unless}}
             <li>
@@ -55,13 +55,13 @@
             </li>
             {{#if canArchive}}
               <li>
-                <a href="#" class="archive-btn">{{archiveToggleMessage}}</a>
+                <a class="archive-btn">{{archiveToggleMessage}}</a>
               </li>
             {{/if}}
-            <li><a href="#" class="star-toggle-btn">{{starToggleMessage}}</a></li>
+            <li><a class="star-toggle-btn">{{starToggleMessage}}</a></li>
 
             <li>
-              <a href="#" class="delete-btn">{{#t "delete"}}Delete{{/t}}</a>
+              <a class="delete-btn">{{#t "delete"}}Delete{{/t}}</a>
             </li>
           </ul>
         </div>

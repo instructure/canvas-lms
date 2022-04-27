@@ -121,6 +121,10 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Crebachu i guddio { types }"
   },
+  "color_picker_6b359edf": { "message": "Dewisydd Lliw" },
+  "color_picker_colorname_selected_ad4cf400": {
+    "message": "Dewisydd Lliw ({ colorName } wedi’i ddewis)"
+  },
   "computer_1d7dfa6f": { "message": "Cyfrifiadur" },
   "content_1440204b": { "message": "Cynnwys" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -169,7 +173,6 @@ const locale = {
   "describe_the_video_2fe8f46a": { "message": "(Disgrifiwch y fideo)" },
   "details_98a31b68": { "message": "Manylion" },
   "diamond_b8dfe7ae": { "message": "Diemwnt" },
-  "dimension_type_55c83e4e": { "message": "Math o ddimensiwn" },
   "dimensions_45ddb7b7": { "message": "Dimensiynau" },
   "directionality_26ae9e08": { "message": "Cyfeirioldeb" },
   "directly_edit_latex_b7e9235b": { "message": "Golygu LaTeX yn Uniongyrchol" },
@@ -196,6 +199,7 @@ const locale = {
   "edit_existing_button_icon_3d0277bd": {
     "message": "Golygu Botwm / Eicon Cyfredol"
   },
+  "edit_icon_2c6b0e91": { "message": "Golygu Eicon" },
   "edit_link_7f53bebb": { "message": "Golygu Dolen" },
   "editor_statusbar_26ac81fc": { "message": "Bar Statws Golygydd" },
   "embed_828fac4a": { "message": "Plannu" },
@@ -327,6 +331,9 @@ const locale = {
   "magenta_4a65993c": { "message": "Magenta" },
   "math_icon_ad4e9d03": { "message": "Eicon Mathemateg" },
   "media_af190855": { "message": "Cyfryngau" },
+  "media_file_is_processing_please_try_again_later_58a6d49": {
+    "message": "Ffeil cyfryngau’n cael ei phrosesu Rhowch gynnig arall arni rywbryd eto."
+  },
   "medium_5a8e9ead": { "message": "Cyfrwng" },
   "middle_27dc1d5": { "message": "Canol" },
   "misc_3b692ea7": { "message": "Amrywiol" },
@@ -419,6 +426,9 @@ const locale = {
   "resize_ec83d538": { "message": "Ailfeintio" },
   "restore_auto_save_deccd84b": { "message": "Adfer cadw’n awtomatig?" },
   "rich_content_editor_2708ef21": { "message": "Golygydd Cynnwys Cyfoethog" },
+  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+    "message": "Ardal Testun Cyfoethog. Pwyswch ALT+0 ar gyfer bysellau cyflym y Golygydd Cynnwys Cyfoethog."
+  },
   "right_to_left_9cfb092a": { "message": "De i’r Chwith" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Yn anffodus, dydy’r golygydd HTML hardd ddim ar gael drwy fysellfwrdd.  Cael mynediad at y golygydd HTML crai yma."
@@ -450,16 +460,7 @@ const locale = {
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Aeth rhywbeth o''i le a dydw i ddim yn gwybod beth i''w ddangos i chi."
   },
-  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-    "message": "Aeth rhywbeth o''i le, edrychwch ar eich cysylltiad â''r a rhoi cynnig arall arni."
-  },
   "something_went_wrong_d238c551": { "message": "Aeth rhywbeth o’i le" },
-  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-    "message": "Aeth rhywbeth o’i le, rhowch gynnig arall arni ar ôl adnewyddu''r dudalen"
-  },
-  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-    "message": "Aeth rhywbeth o’i le wrth lwytho i fyny, gwiriwch eich cysylltiad a rhowch gynnig arall arni."
-  },
   "sort_by_e75f9e3e": { "message": "Trefnu yn ôl" },
   "square_511eb3b3": { "message": "Sgwâr" },
   "square_unordered_list_b15ce93b": {
@@ -532,9 +533,6 @@ const locale = {
     "message": "Llwytho i Fyny/Recordio Cyfryngau"
   },
   "uploading_19e8a4e7": { "message": "Llwytho i fyny" },
-  "uploading_closed_captions_subtitles_failed_bc093f3": {
-    "message": "Llwytho capsiynau caeedig/isdeitlau i fyny wedi methu."
-  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "rhestr mewn trefn, mewn priflythrennau, yn nhrefn yr wyddor"
   },

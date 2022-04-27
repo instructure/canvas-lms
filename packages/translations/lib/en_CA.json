@@ -266,6 +266,12 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Collapse to hide { types }"
     },
+    "color_picker_6b359edf": {
+        "message": "Color Picker"
+    },
+    "color_picker_colorname_selected_ad4cf400": {
+        "message": "Color Picker ({ colorName } selected)"
+    },
     "computer_1d7dfa6f": {
         "message": "Computer"
     },
@@ -407,9 +413,6 @@
     "diamond_b8dfe7ae": {
         "message": "Diamond"
     },
-    "dimension_type_55c83e4e": {
-        "message": "Dimension type"
-    },
     "dimensions_45ddb7b7": {
         "message": "Dimensions"
     },
@@ -484,6 +487,9 @@
     },
     "edit_existing_button_icon_3d0277bd": {
         "message": "Edit Existing Button / Icon"
+    },
+    "edit_icon_2c6b0e91": {
+        "message": "Edit Icon"
     },
     "edit_link_7f53bebb": {
         "message": "Edit Link"
@@ -917,6 +923,9 @@
     "media_af190855": {
         "message": "Media"
     },
+    "media_file_is_processing_please_try_again_later_58a6d49": {
+        "message": "Media file is processing. Please try again later."
+    },
     "medium_5a8e9ead": {
         "message": "Medium"
     },
@@ -1208,6 +1217,9 @@
     "rich_content_editor_2708ef21": {
         "message": "Rich Content Editor"
     },
+    "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+        "message": "Rich Text Area. Press ALT+0 for Rich Content Editor shortcuts."
+    },
     "right_to_left_9cfb092a": {
         "message": "Right-to-Left"
     },
@@ -1292,17 +1304,8 @@
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Something went wrong and I don''t know what to show you."
     },
-    "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-        "message": "Something went wrong, check your connection and try again."
-    },
     "something_went_wrong_d238c551": {
         "message": "Something went wrong"
-    },
-    "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-        "message": "Something went wrong, try again after refreshing the page"
-    },
-    "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-        "message": "Something went wrong uploading, check your connection and try again."
     },
     "sort_by_e75f9e3e": {
         "message": "Sort By"
@@ -1498,9 +1501,6 @@
     },
     "uploading_19e8a4e7": {
         "message": "Uploading"
-    },
-    "uploading_closed_captions_subtitles_failed_bc093f3": {
-        "message": "Uploading closed captions/subtitles failed."
     },
     "uppercase_alphabetic_ordered_list_3f5aa6b2": {
         "message": "uppercase alphabetic ordered list"

@@ -266,6 +266,12 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Piilota kutistamalla { types }"
     },
+    "color_picker_6b359edf": {
+        "message": "Värivalitsin"
+    },
+    "color_picker_colorname_selected_ad4cf400": {
+        "message": "Värivalitsin ({ colorName } valittu)"
+    },
     "computer_1d7dfa6f": {
         "message": "Tietokone"
     },
@@ -407,9 +413,6 @@
     "diamond_b8dfe7ae": {
         "message": "Diamond"
     },
-    "dimension_type_55c83e4e": {
-        "message": "Ulottuvuuden tyyppi"
-    },
     "dimensions_45ddb7b7": {
         "message": "Mitat"
     },
@@ -484,6 +487,9 @@
     },
     "edit_existing_button_icon_3d0277bd": {
         "message": "Muokkaa olemassa olevaa painiketta/kuvaketta"
+    },
+    "edit_icon_2c6b0e91": {
+        "message": "Muokkaa kuvaketta"
     },
     "edit_link_7f53bebb": {
         "message": "Muokkaa linkkiä"
@@ -917,6 +923,9 @@
     "media_af190855": {
         "message": "Tietoväline"
     },
+    "media_file_is_processing_please_try_again_later_58a6d49": {
+        "message": "Yritä myöhemmin uudelleen. Yritä myöhemmin uudelleen."
+    },
     "medium_5a8e9ead": {
         "message": "Tietoväline"
     },
@@ -1208,6 +1217,9 @@
     "rich_content_editor_2708ef21": {
         "message": "Rikas sisältöeditori"
     },
+    "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+        "message": "Monipuolisen tekstieditorin sisältökenttä Paina ALT+0, jos haluat nähdä tekstimuotoilueditorin pikakuvakkeita."
+    },
     "right_to_left_9cfb092a": {
         "message": "Oikealta-Vasemmalle"
     },
@@ -1292,17 +1304,8 @@
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Jotakin meni pieleen enkä tiedä, mitä näyttää sinulle,"
     },
-    "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-        "message": "Jotakin meni pieleen, tarkista yhteytesi ja yritä uudelleen."
-    },
     "something_went_wrong_d238c551": {
         "message": "Jotakin meni pieleen."
-    },
-    "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-        "message": "Jotakin meni pieleen, yritä uudelleen sivun päivittämisen jälkeen"
-    },
-    "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-        "message": "Jotakin meni pieleen latauksen suhteen, tarkista yhteytesi ja yritä uudelleen."
     },
     "sort_by_e75f9e3e": {
         "message": "Lajitteluperuste"
@@ -1498,9 +1501,6 @@
     },
     "uploading_19e8a4e7": {
         "message": "Ladataan"
-    },
-    "uploading_closed_captions_subtitles_failed_bc093f3": {
-        "message": "Suljettujen tekstitysten lataus epäonnistui."
     },
     "uppercase_alphabetic_ordered_list_3f5aa6b2": {
         "message": "aakkosellinen järjestetty isojen kirjainten lista"

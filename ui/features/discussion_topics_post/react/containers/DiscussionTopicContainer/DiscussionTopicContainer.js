@@ -401,7 +401,12 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                                     ? () => onToggleLocked(true)
                                     : null
                                 }
-                                canManageContent={props.discussionTopic.permissions?.manageContent}
+                                canManageContent={
+                                  props.discussionTopic.permissions?.manageContent ||
+                                  props.discussionTopic.permissions?.manageCourseContentAdd ||
+                                  props.discussionTopic.permissions?.manageCourseContentEdit ||
+                                  props.discussionTopic.permissions?.manageCourseContentDelete
+                                }
                                 discussionTopicId={props.discussionTopic._id}
                               />
                             }

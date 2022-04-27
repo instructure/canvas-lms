@@ -21,12 +21,12 @@ export const REQUEST_PAGE = 'REQUEST_PAGE'
 export const RECEIVE_PAGE = 'RECEIVE_PAGE'
 export const FAIL_PAGE = 'FAIL_PAGE'
 
-export function requestInitialPage(key, searchString) {
-  return {type: REQUEST_INITIAL_PAGE, key, searchString}
+export function requestInitialPage(key, cancel, searchString) {
+  return {type: REQUEST_INITIAL_PAGE, key, cancel, searchString}
 }
 
-export function requestPage(key) {
-  return {type: REQUEST_PAGE, key}
+export function requestPage(key, cancel) {
+  return {type: REQUEST_PAGE, key, cancel}
 }
 
 export function receivePage(key, page) {
@@ -41,14 +41,29 @@ export function failPage(key, error) {
 // dispatches the start of the load, requests a page for the collection from
 // the source, then dispatches the loaded page to the store on success or
 // clears the load on failure
-export function fetchPage(key) {
+export function fetchPage(key, isInitial, searchString) {
   return (dispatch, getState) => {
+    let isCancelled = false
+    const cancel = () => (isCancelled = true)
+
+    if (isInitial) {
+      dispatch(requestInitialPage(key, cancel, searchString))
+    } else {
+      dispatch(requestPage(key, cancel))
+    }
+
     const state = getState()
     const {source} = state
     return source
       .fetchLinks(key, state)
-      .then(page => dispatch(receivePage(key, page)))
-      .catch(error => dispatch(failPage(key, error)))
+      .then(page => {
+        if (isCancelled) return
+        dispatch(receivePage(key, page))
+      })
+      .catch(error => {
+        if (isCancelled) return
+        dispatch(failPage(key, error))
+      })
   }
 }
 
@@ -56,9 +71,9 @@ export function fetchNextPage(key) {
   return (dispatch, getState) => {
     const state = getState()
     const collection = state.collections[key]
-    if (collection && !collection.isLoading) {
-      dispatch(requestPage(key))
-      return dispatch(fetchPage(key))
+    if (collection) {
+      if (collection.cancel) collection.cancel()
+      return dispatch(fetchPage(key, false))
     }
   }
 }
@@ -67,13 +82,13 @@ export function fetchInitialPage(key) {
   return (dispatch, getState) => {
     const state = getState()
     const collection = state.collections[key]
+
     if (
       collection &&
-      !collection.isLoading &&
       (collection.links.length === 0 || collection.searchString !== state.searchString)
     ) {
-      dispatch(requestInitialPage(key, state.searchString))
-      return dispatch(fetchPage(key))
+      if (collection.cancel) collection.cancel()
+      return dispatch(fetchPage(key, true, state.searchString))
     }
   }
 }

@@ -278,7 +278,9 @@ window.modules = (function () {
                   points: I18n.n(info.points_possible)
                 })
               }
-              if (info.todo_date != null) {
+              if (ENV.IN_PACED_COURSE && !ENV.IS_STUDENT) {
+                $context_module_item.find('.due_date_display').remove()
+              } else if (info.todo_date != null) {
                 data.due_date_display = $.dateString(info.todo_date)
               } else if (info.due_date != null) {
                 if (info.past_due != null) {
@@ -2651,7 +2653,13 @@ $(document).ready(function () {
     )
   }
 
-  function setExternalToolModal(tool, launchType, returnFocusTo, isOpen) {
+  function setExternalToolModal({
+    tool,
+    launchType,
+    returnFocusTo,
+    isOpen = true,
+    contextModuleId = null
+  }) {
     if (isOpen) {
       addDeepLinkingListener(() => {
         window.location.reload()
@@ -2659,7 +2667,7 @@ $(document).ready(function () {
     }
 
     const handleDismiss = () => {
-      setExternalToolModal(tool, launchType, returnFocusTo, false)
+      setExternalToolModal({tool, launchType, returnFocusTo, contextModuleId, isOpen: false})
       returnFocusTo.focus()
     }
 
@@ -2672,6 +2680,7 @@ $(document).ready(function () {
         contextId={parseInt(ENV.COURSE_ID, 10)}
         title={tool.name}
         onRequestClose={handleDismiss}
+        contextModuleId={contextModuleId}
       />,
       $('#external-tool-mount-point')[0]
     )
@@ -2686,14 +2695,29 @@ $(document).ready(function () {
       ev.preventDefault()
     }
     const launchType = ev.target.dataset.toolLaunchType
+    // modal placements use ExternalToolModalLauncher which expects a tool in the launch_definition format
+    const idAttribute = launchType.includes('modal') ? 'definition_id' : 'id'
+    const tool = findToolFromEvent(ENV.MODULE_TOOLS[launchType], idAttribute, ev)
+
+    const currentModule = $(ev.target).parents('.context_module')
+    const currentModuleId =
+      currentModule.length > 0 && currentModule.attr('id').substring('context_module_'.length)
 
     if (launchType === 'module_index_menu_modal') {
-      const tool = findToolFromEvent(ENV.MODULE_MENU_TOOLS, 'definition_id', ev)
-      setExternalToolModal(tool, launchType, $('.al-trigger')[0], true)
+      setExternalToolModal({tool, launchType, returnFocusTo: $('.al-trigger')[0]})
       return
     }
 
-    const tool = findToolFromEvent(ENV.MODULE_TRAY_TOOLS[launchType], 'id', ev)
+    if (launchType === 'module_menu_modal') {
+      setExternalToolModal({
+        tool,
+        launchType,
+        returnFocusTo: $('.al-trigger')[0],
+        contextModuleId: currentModuleId
+      })
+      return
+    }
+
     const moduleData = []
     if (launchType == 'module_index_menu') {
       // include all modules
@@ -2703,10 +2727,9 @@ $(document).ready(function () {
       })
     } else if (launchType == 'module_group_menu') {
       // just include the one module whose menu we're on
-      const module = $(ev.target).parents('.context_module')
       moduleData.push({
-        id: module.attr('id').substring('context_module_'.length),
-        name: module.find('.name').attr('title')
+        id: currentModuleId,
+        name: currentModule.find('.name').attr('title')
       })
     }
     setExternalToolTray(tool, moduleData, launchType == 'module_index_menu', $('.al-trigger')[0])

@@ -281,6 +281,10 @@ $discussion-dark-text: $ic-color-dark;
 
 .discussion-rate-action {
   margin-#{direction(left)}: 12px;
+  background: none;
+  border: none;
+  font: inherit;
+  cursor: pointer;
 }
 
 .discussion-rate-action--checked {

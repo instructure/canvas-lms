@@ -21,6 +21,14 @@ import {fireEvent, render, screen, waitFor, act} from '@testing-library/react'
 import {ImageOptions} from '../ImageOptions'
 import {actions} from '../../../../reducers/imageSection'
 
+jest.mock('../../ImageCropper/imageCropUtils', () => ({
+  createCroppedImageSvg: jest.fn(() =>
+    Promise.resolve({
+      outerHTML: null
+    })
+  )
+}))
+
 describe('ImageOptions', () => {
   const dispatchFn = jest.fn()
   const defaultProps = {
@@ -33,6 +41,12 @@ describe('ImageOptions', () => {
     },
     dispatch: dispatchFn
   }
+
+  beforeAll(() => {
+    global.fetch = jest.fn().mockResolvedValue({
+      blob: () => Promise.resolve(new Blob(['somedata'], {type: 'image/svg+xml'}))
+    })
+  })
 
   const subject = overrides => render(<ImageOptions {...{...defaultProps, ...overrides}} />)
 
@@ -145,6 +159,22 @@ describe('ImageOptions', () => {
         fireEvent.click(getByText(/crop image/i))
 
         expect(screen.getByText('Crop Image')).toBeInTheDocument()
+      })
+
+      it('opens crop modal and sets state', async () => {
+        fireEvent.click(getByText(/crop image/i))
+
+        await waitFor(() => {
+          expect(document.querySelector('[data-cid="Modal"] [type="submit"]')).toBeInTheDocument()
+        })
+
+        fireEvent.click(document.querySelector('[data-cid="Modal"] [type="submit"]'))
+        await waitFor(() => {
+          expect(dispatchFn).toHaveBeenCalledWith({
+            type: 'SetImage',
+            payload: 'data:image/svg+xml;base64,bnVsbA=='
+          })
+        })
       })
     })
 

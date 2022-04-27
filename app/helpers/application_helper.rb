@@ -1438,8 +1438,6 @@ module ApplicationHelper
     if @domain_root_account.feature_enabled?(:account_level_mastery_scales)
       js_env(
         ACCOUNT_LEVEL_MASTERY_SCALES: true,
-        IMPROVED_OUTCOMES_MANAGEMENT:
-          @domain_root_account.feature_enabled?(:improved_outcomes_management),
         MASTERY_SCALE: {
           outcome_proficiency: @context.resolved_outcome_proficiency&.as_json,
           outcome_calculation_method: @context.resolved_outcome_calculation_method&.as_json
@@ -1454,14 +1452,10 @@ module ApplicationHelper
       !@current_user.fake_student? && !@current_user.used_feature?(:cc_prefs) && !k5_student
   end
 
-  def individual_outcome_rating_and_calculation_js_env
-    if @domain_root_account.feature_enabled?(:individual_outcome_rating_and_calculation) && !@domain_root_account.feature_enabled?(:account_level_mastery_scales)
-      js_env(
-        INDIVIDUAL_OUTCOME_RATING_AND_CALCULATION: true,
-        IMPROVED_OUTCOMES_MANAGEMENT:
-          @domain_root_account.feature_enabled?(:improved_outcomes_management)
-      )
-    end
+  def improved_outcomes_management_js_env
+    js_env(
+      IMPROVED_OUTCOMES_MANAGEMENT: @domain_root_account.feature_enabled?(:improved_outcomes_management)
+    )
   end
 
   def append_default_due_time_js_env(context, hash)

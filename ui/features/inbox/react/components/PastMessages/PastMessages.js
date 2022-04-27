@@ -17,21 +17,13 @@
  */
 
 import {ConversationMessage} from '../../../graphql/ConversationMessage'
+import DateHelper from '@canvas/datetime/dateHelper'
 import PropTypes from 'prop-types'
 import React from 'react'
 
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {useScope as useI18nScope} from '@canvas/i18n'
-
-const I18n = useI18nScope('conversations_2')
-const dateOptions = {
-  month: 'short',
-  day: 'numeric',
-  hour: 'numeric',
-  minute: 'numeric'
-}
 
 const PastMessage = props => (
   <View as="div" borderWidth="small none none none">
@@ -42,11 +34,7 @@ const PastMessage = props => (
             <Text>{props.author.name}</Text>
           </Flex.Item>
           <Flex.Item>
-            <Text weight="light">
-              {Intl.DateTimeFormat(I18n.currentLocale(), dateOptions).format(
-                new Date(props.createdAt)
-              )}
-            </Text>
+            <Text weight="light">{DateHelper.formatDatetimeForDisplay(props.createdAt)}</Text>
           </Flex.Item>
         </Flex>
       </Flex.Item>

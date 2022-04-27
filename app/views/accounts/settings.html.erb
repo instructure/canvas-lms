@@ -136,7 +136,7 @@
                     <td>
                         <%= ddt.select :value, options_for_select(default_due_time_options(@account), default_due_time_key(@account)) %>
                         <p class="aside">
-                          <%= t("This influences the user interface for setting due dates. It does not change when any existing assignment is due.") %>
+                          <%= t("This influences the user interface for setting due dates. It does not change the time due for any existing assignments.") %>
                         </p>
                     </td>
                   </tr>
@@ -296,6 +296,24 @@
                   <tr>
                     <td colspan="2"><%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
                       <%= r.label :value, :en => "Disable comments on announcements" %>
+                    </td>
+                  </tr>
+                  <% unless disabled %>
+                    <tr>
+                      <td colspan="2" class="sub_checkbox">
+                        <%= r.check_box :locked, :checked => hash[:locked] %>
+                        <%= r.label :locked, :en => "Lock this setting for sub-accounts and courses" %>
+                      </td>
+                    </tr>
+                  <% end %>
+                <% end %>
+
+                <%= settings.fields_for :conditional_release do |r| %>
+                  <% hash = @account.conditional_release %>
+                  <% disabled = hash[:locked] && hash[:inherited] %>
+                  <tr>
+                    <td colspan="2"><%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
+                      <%= r.label :value, t("Mastery Paths") %>
                     </td>
                   </tr>
                   <% unless disabled %>

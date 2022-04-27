@@ -710,6 +710,7 @@ describe ExternalToolsController, type: :request do
     et.module_index_menu = { url: "http://www.example.com/ims/lti/resource", text: "modules index menu", display_type: "full_width", visibility: "admins" }
     et.module_index_menu_modal = { url: "http://www.example.com/ims/lti/resource", text: "modules index menu (modal)", display_type: "full_width", visibility: "admins" }
     et.module_group_menu = { url: "http://www.example.com/ims/lti/resource", text: "modules group menu", display_type: "full_width", visibility: "admins" }
+    et.module_menu_modal = { url: "http://www.example.com/ims/lti/resource", text: "modules menu (modal)", display_type: "full_width", visibility: "admins" }
     et.quiz_menu = { url: "http://www.example.com/ims/lti/resource", text: "quiz menu", display_type: "full_width", visibility: "admins" }
     et.quiz_index_menu = { url: "http://www.example.com/ims/lti/resource", text: "quiz index menu", display_type: "full_width", visibility: "admins" }
     et.submission_type_selection = { url: "http://www.example.com/ims/lti/resource", text: "submission type selection", display_type: "full_width", visibility: "admins" }
@@ -1047,6 +1048,16 @@ describe ExternalToolsController, type: :request do
         "enabled" => true,
         "text" => "modules index menu (modal)",
         "label" => "modules index menu (modal)",
+        "url" => "http://www.example.com/ims/lti/resource",
+        "visibility" => "admins",
+        "display_type" => "full_width",
+        "selection_height" => 400,
+        "selection_width" => 800,
+      },
+      "module_menu_modal" => {
+        "enabled" => true,
+        "text" => "modules menu (modal)",
+        "label" => "modules menu (modal)",
         "url" => "http://www.example.com/ims/lti/resource",
         "visibility" => "admins",
         "display_type" => "full_width",

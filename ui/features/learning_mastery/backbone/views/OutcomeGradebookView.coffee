@@ -42,13 +42,13 @@ Dictionary =
     color : '#127A1B'
     label : I18n.t('Exceeds Mastery')
   mastery:
-    color : if ENV.use_high_contrast then '#127A1B' else '#00AC18'
+    color : if ENV.use_high_contrast then '#127A1B' else '#0B874B'
     label : I18n.t('Meets Mastery')
   nearMastery:
     color : if ENV.use_high_contrast then '#C23C0D' else '#FC5E13'
     label : I18n.t('Near Mastery')
   remedial:
-    color : '#EE0612'
+    color : '#E0061F'
     label : I18n.t('Well Below Mastery')
 
 export default class OutcomeGradebookView extends View

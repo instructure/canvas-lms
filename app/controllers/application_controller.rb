@@ -228,8 +228,9 @@ class ApplicationController < ActionController::Base
             collapse_global_nav: @current_user&.collapse_global_nav?,
             release_notes_badge_disabled: @current_user&.release_notes_badge_disabled?,
           },
-          FULL_STORY_ENABLED: fullstory_enabled_for_session?(session),
+          FULL_STORY_ENABLED: fullstory_enabled_for_session?(session)
         }
+        @js_env[:IN_PACED_COURSE] = @context.enable_course_paces? if @context.try(:enable_course_paces?)
 
         unless SentryExtensions::Settings.settings.blank?
           @js_env[:SENTRY_FRONTEND] = {
@@ -240,6 +241,7 @@ class ApplicationController < ActionController::Base
 
             errors_sample_rate: Setting.get("sentry_frontend_errors_sample_rate", "0.0"),
             traces_sample_rate: Setting.get("sentry_frontend_traces_sample_rate", "0.0"),
+            url_deny_pattern: Setting.get("sentry_frontend_url_deny_pattern", ""), # regexp
 
             # these values need to correlate with the backend for Sentry features to work properly
             environment: Canvas.environment,
@@ -309,7 +311,7 @@ class ApplicationController < ActionController::Base
   # so altogether we can get them faster the vast majority of the time
   JS_ENV_SITE_ADMIN_FEATURES = %i[
     featured_help_links feature_flag_filters conferencing_in_planner word_count_in_speed_grader observer_picker
-    lti_platform_storage scale_equation_images new_equation_editor buttons_and_icons_cropper
+    lti_platform_storage scale_equation_images new_equation_editor buttons_and_icons_cropper course_paces_blackout_dates
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours files_dnd usage_rights_discussion_topics
@@ -1875,6 +1877,7 @@ class ApplicationController < ActionController::Base
                      Account.site_admin.feature_enabled?(:new_quizzes_modules_support) &&
                      @context.grants_right?(@current_user, :manage) &&
                      tag.quiz_lti
+      url_params[:quiz_lti] = true if use_edit_url
       redirect_symbol = use_edit_url ? :edit_context_assignment_url : :context_assignment_url
       redirect_to named_context_url(context, redirect_symbol, tag.content_id, url_params)
     elsif tag.content_type == "WikiPage"
@@ -2961,7 +2964,7 @@ class ApplicationController < ActionController::Base
   end
   helper_method :should_show_migration_limitation_message
 
-  def uncached_k5_user?(user = @current_user)
+  def uncached_k5_user?(user, course_ids: nil)
     if user
       # Collect global ids of all accounts in current region with k5 enabled
       global_k5_account_ids = []
@@ -2973,17 +2976,29 @@ class ApplicationController < ActionController::Base
       end
       return false if global_k5_account_ids.blank?
 
+      provided_global_account_ids = course_ids.present? ? Course.where(id: course_ids).distinct.pluck(:account_id).map { |account_id| Shard.global_id_for(account_id) } : []
+
       # See if the user has associations with any k5-enabled accounts on each shard
       k5_associations = Shard.partition_by_shard(global_k5_account_ids) do |k5_account_ids|
-        enrolled_course_ids = user.enrollments.shard(Shard.current).new_or_active_by_date.select(:course_id)
-        enrolled_account_ids = Course.where(id: enrolled_course_ids).distinct.pluck(:account_id)
-        break true if (enrolled_account_ids & k5_account_ids).any?
+        if course_ids.present?
+          # Use only provided course_ids' account ids if passed
+          provided_account_ids = provided_global_account_ids.select { |account_id| Shard.shard_for(account_id) == Shard.current }.map { |global_id| Shard.local_id_for(global_id)[0] }
+          break true if (provided_account_ids & k5_account_ids).any?
 
-        enrolled_account_ids += user.account_users.shard(Shard.current).active.pluck(:account_id)
-        break true if (enrolled_account_ids & k5_account_ids).any?
+          provided_account_chain_ids = Account.multi_account_chain_ids(provided_account_ids)
+          break true if (provided_account_chain_ids & k5_account_ids).any?
+        else
+          # If course_ids isn't passed, check all their enrollments and account_users
+          enrolled_course_ids = user.enrollments.shard(Shard.current).new_or_active_by_date.select(:course_id)
+          enrolled_account_ids = Course.where(id: enrolled_course_ids).distinct.pluck(:account_id)
+          break true if (enrolled_account_ids & k5_account_ids).any?
 
-        enrolled_account_chain_ids = Account.multi_account_chain_ids(enrolled_account_ids)
-        break true if (enrolled_account_chain_ids & k5_account_ids).any?
+          enrolled_account_ids += user.account_users.shard(Shard.current).active.pluck(:account_id)
+          break true if (enrolled_account_ids & k5_account_ids).any?
+
+          enrolled_account_chain_ids = Account.multi_account_chain_ids(enrolled_account_ids)
+          break true if (enrolled_account_chain_ids & k5_account_ids).any?
+        end
       end
       k5_associations == true
     else
@@ -2995,20 +3010,27 @@ class ApplicationController < ActionController::Base
   def k5_disabled?
     # Only admins and teachers can opt-out of being considered a k5 user
     can_disable = @current_user.roles(@domain_root_account).any? { |role| %w[admin teacher].include?(role) }
-    can_disable && @current_user.elementary_dashboard_disabled?
+    manually_disabled = can_disable && @current_user.elementary_dashboard_disabled?
+    disabled_for_observer = @current_user.roles(@domain_root_account).include?("observer") &&
+                            Account.site_admin.feature_enabled?(:observer_picker) &&
+                            @selected_observed_user.present? &&
+                            @selected_observed_user != @current_user &&
+                            !k5_user?(user: @selected_observed_user, check_disabled: false)
+    manually_disabled || disabled_for_observer
   end
 
-  def k5_user?(check_disabled: true, user: @current_user)
-    RequestCache.cache("k5_user", user, @current_user, @domain_root_account, check_disabled, @current_user&.elementary_dashboard_disabled?) do
+  # When course_ids is provided, use only those course ids to determine k5 status
+  def k5_user?(user: @current_user, course_ids: nil, check_disabled: true)
+    RequestCache.cache("k5_user", user, @current_user, @domain_root_account, @selected_observed_user, check_disabled, @current_user&.elementary_dashboard_disabled?) do
       if user
         next false if check_disabled && k5_disabled?
 
         # This key is also invalidated when the k5 setting is toggled at the account level or when enrollments change
-        Rails.cache.fetch_with_batched_keys("k5_user", batch_object: user, batched_keys: %i[k5_user enrollments account_users], expires_in: 12.hours) do
-          uncached_k5_user?(user)
+        Rails.cache.fetch_with_batched_keys(["k5_user", course_ids].cache_key, batch_object: user, batched_keys: %i[k5_user enrollments account_users], expires_in: 12.hours) do
+          uncached_k5_user?(user, course_ids: course_ids)
         end
       else
-        uncached_k5_user?(user)
+        uncached_k5_user?(user, course_ids: course_ids)
       end
     end
   end

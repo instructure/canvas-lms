@@ -83,6 +83,33 @@ module Types
       ).load(:manage_content)
     end
 
+    field :manage_course_content_add, Boolean, null: true
+    def manage_course_content_add
+      Loaders::PermissionsLoader.for(
+        object[:discussion_topic].context,
+        current_user: current_user,
+        session: session
+      ).load(:manage_course_content_add)
+    end
+
+    field :manage_course_content_edit, Boolean, null: true
+    def manage_course_content_edit
+      Loaders::PermissionsLoader.for(
+        object[:discussion_topic].context,
+        current_user: current_user,
+        session: session
+      ).load(:manage_course_content_edit)
+    end
+
+    field :manage_course_content_delete, Boolean, null: true
+    def manage_course_content_delete
+      Loaders::PermissionsLoader.for(
+        object[:discussion_topic].context,
+        current_user: current_user,
+        session: session
+      ).load(:manage_course_content_delete)
+    end
+
     field :rate, Boolean, null: true
     def rate
       object[:loader].load(:rate)

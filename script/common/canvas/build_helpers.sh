@@ -78,6 +78,7 @@ permissions so we can run migrations."
   fi
 
   start_spinner "Checking for existing db..."
+  _canvas_lms_track_with_log $DOCKER_COMMAND up -d web
   if database_exists; then
     stop_spinner
     message \
@@ -160,11 +161,14 @@ function copy_mutagen_override {
 function setup_docker_compose_override {
   message 'Setup override yaml and .env...'
   if [ -f "docker-compose.override.yml" ]; then
-    prompt 'docker-compose.override.yml already exists.
-Would you like to copy docker-compose/mutagen/docker-compose.override.yml to docker-compose.override.yml? [y/n]' copy
-    [[ ${copy:-y} == 'n' ]] || copy_mutagen_override
+    message "docker-compose.override.yml already exists, skipping copy of default configuration!"
   else
-    copy_mutagen_override
+    if [ "${IS_MUTAGEN:-false}" = true ]; then
+      copy_mutagen_override
+    else
+      message "Copying default configuration from config/docker-compose.override.yml.example to docker-compose.override.yml"
+      cp config/docker-compose.override.yml.example docker-compose.override.yml
+    fi
   fi
 
   if [ -f ".env" ]; then

@@ -105,13 +105,18 @@ require "securerandom"
 #           "type": "integer"
 #         },
 #         "name": {
-#           "description": "the full name of the course",
+#           "description": "the full name of the course. If the requesting user has set a nickname for the course, the nickname will be shown here.",
 #           "example": "InstructureCon 2012",
 #           "type": "string"
 #         },
 #         "course_code": {
 #           "description": "the course code",
 #           "example": "INSTCON12",
+#           "type": "string"
+#         },
+#         "original_name": {
+#           "description": "the actual course name. This field is returned only if the requesting user has set a nickname for the course.",
+#           "example": "InstructureCon-2012-01",
 #           "type": "string"
 #         },
 #         "workflow_state": {
@@ -1437,7 +1442,8 @@ class CoursesController < ApplicationController
   #     "lock_all_announcements": true,
   #     "usage_rights_required": false,
   #     "homeroom_course": false,
-  #     "default_due_time": "23:59:59"
+  #     "default_due_time": "23:59:59",
+  #     "conditional_release": false
   #   }
   def api_settings
     get_context
@@ -1522,6 +1528,7 @@ class CoursesController < ApplicationController
                MSFT_SYNC_CAN_BYPASS_COOLDOWN: Account.site_admin.account_users_for(@current_user).present?,
                MSFT_SYNC_MAX_ENROLLMENT_MEMBERS: MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS,
                MSFT_SYNC_MAX_ENROLLMENT_OWNERS: MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_OWNERS,
+               COURSE_PACES_ENABLED: @context.enable_course_paces?
              })
 
       set_tutorial_js_env
@@ -1642,6 +1649,9 @@ class CoursesController < ApplicationController
   #   when setting a due date for an assignment. It does not change when any existing assignment is due. It should be
   #   given in 24-hour HH:MM:SS format. The default is "23:59:59". Use "inherit" to inherit the account setting.
   #
+  # @argument conditional_release [Boolean]
+  #   Enable or disable individual learning paths for students based on assessment
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id>/settings \
   #     -X PUT \
@@ -1684,9 +1694,13 @@ class CoursesController < ApplicationController
       :homeroom_course_id,
       :course_color,
       :friendly_name,
-      :enable_course_paces
+      :enable_course_paces,
+      :conditional_release
     )
     changes = changed_settings(@course.changes, @course.settings, old_settings)
+
+    conditional_release_after_change_hook if changes[:conditional_release]&.last == false
+
     @course.delay_if_production(priority: Delayed::LOW_PRIORITY)
            .touch_content_if_public_visibility_changed(changes)
 
@@ -2047,7 +2061,7 @@ class CoursesController < ApplicationController
   #
   # Accepts the same include[] parameters as the list action plus:
   #
-  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"public_description"|"total_scores"|"current_grading_period_scores"|"term"|"account"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"passback_status"|"favorites"|"teachers"|"observed_users"|"all_courses"|"permissions"|"observed_users"|"course_image"|"concluded"]
+  # @argument include[] [String, "needs_grading_count"|"syllabus_body"|"public_description"|"total_scores"|"current_grading_period_scores"|"term"|"account"|"course_progress"|"sections"|"storage_quota_used_mb"|"total_students"|"passback_status"|"favorites"|"teachers"|"observed_users"|"all_courses"|"permissions"|"course_image"|"concluded"]
   #   - "all_courses": Also search recently deleted courses.
   #   - "permissions": Include permissions the current user has
   #     for the course.
@@ -2096,6 +2110,7 @@ class CoursesController < ApplicationController
       end
 
       @context = api_find(Course.active, params[:id])
+
       assign_localizer
       if request.xhr?
         if authorized_action(@context, @current_user, [:read, :read_as_admin])
@@ -2105,7 +2120,22 @@ class CoursesController < ApplicationController
       end
 
       if @context && @current_user
-        @context_enrollment = @context.enrollments.where(user_id: @current_user).except(:preload).first
+        if Account.site_admin.feature_enabled?(:observer_picker) && Setting.get("assignments_2_observer_view", "false") == "true"
+          observed_users(@current_user, session, @context.id) # sets @selected_observed_user
+          @context_enrollment = @context.enrollments
+                                        .where(user_id: @current_user, associated_user_id: @selected_observed_user)
+                                        .first
+          js_env({ OBSERVER_OPTIONS: {
+                   OBSERVED_USERS_LIST: observed_users(@current_user, session, @context.id),
+                   CAN_ADD_OBSERVEE: @current_user
+                                     .profile
+                                     .tabs_available(@current_user, root_account: @domain_root_account)
+                                     .any? { |t| t[:id] == UserProfile::TAB_OBSERVEES }
+                 } })
+        else
+          @context_enrollment = @context.enrollments.where(user_id: @current_user).first
+        end
+
         if @context_enrollment
           @context_membership = @context_enrollment # for AUA
           @context_enrollment.course = @context
@@ -2247,7 +2277,7 @@ class CoursesController < ApplicationController
         @course_home_sub_navigation_tools =
           ContextExternalTool.all_tools_for(@context, placements: :course_home_sub_navigation,
                                                       root_account: @domain_root_account, current_user: @current_user).to_a
-        unless @context.grants_right?(@current_user, session, :manage_content)
+        unless @context.grants_any_right?(@current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
           @course_home_sub_navigation_tools.reject! { |tool| tool.course_home_sub_navigation(:visibility) == "admins" }
         end
 
@@ -2278,7 +2308,7 @@ class CoursesController < ApplicationController
             end_date = start_date + 28.days
             scope = Announcement.where(context_type: "Course", context_id: @context.id, workflow_state: "active")
                                 .ordered_between(start_date, end_date)
-            unless @context.grants_any_right?(@current_user, session, :read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS, :manage_content)
+            unless @context.grants_any_right?(@current_user, session, :read_as_admin, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
               scope = scope.visible_to_student_sections(@current_user)
             end
             latest_announcement = scope.limit(1).first
@@ -2860,6 +2890,9 @@ class CoursesController < ApplicationController
   #   enabled for the sub-account. Otherwise, Course Pacing are always disabled.
   #     Note: Course Pacing is in active development.
   #
+  # @argument course[conditional_release] [Boolean]
+  #   Enable or disable individual learning paths for students based on assessment
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id> \
   #     -X PUT \
@@ -2902,11 +2935,12 @@ class CoursesController < ApplicationController
       return
     end
 
-    if authorized_action(@course, @current_user, [:update, :manage_content])
+    if authorized_action(@course, @current_user, %i[update manage_content manage_course_content_edit])
       return render_update_success if params[:for_reload]
 
       unless @course.grants_right?(@current_user, :update)
-        params_for_update = params_for_update.slice(:syllabus_body) # let users with :manage_content only update the body
+        # let users with :manage_couse_content_edit only update the body
+        params_for_update = params_for_update.slice(:syllabus_body)
       end
       if params_for_update.key?(:syllabus_body)
         params_for_update[:syllabus_body] = process_incoming_html_content(params_for_update[:syllabus_body])
@@ -3117,6 +3151,12 @@ class CoursesController < ApplicationController
       end
 
       changes = changed_settings(@course.changes, @course.settings, old_settings)
+
+      # Republish course paces if the course dates have been changed
+      if @course.account.feature_enabled?(:course_paces) && (changes.keys & %w[start_at conclude_at restrict_enrollments_to_course_dates]).present?
+        @course.course_paces.find_each(&:create_publish_progress)
+      end
+      disable_conditional_release if changes[:conditional_release]&.last == false
 
       # RUBY 3.0 - **{} can go away, because data won't implicitly convert to kwargs
       @course.delay_if_production(priority: Delayed::LOW_PRIORITY).touch_content_if_public_visibility_changed(changes, **{})
@@ -3634,7 +3674,7 @@ class CoursesController < ApplicationController
 
   def link_validation
     get_context
-    return unless authorized_action(@context, @current_user, :manage_content)
+    return unless authorized_action(@context, @current_user, [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS])
 
     if (progress = CourseLinkValidator.current_progress(@context))
       render json: progress_json(progress, @current_user, session)
@@ -3665,14 +3705,14 @@ class CoursesController < ApplicationController
 
   def start_link_validation
     get_context
-    return unless authorized_action(@context, @current_user, :manage_content)
+    return unless authorized_action(@context, @current_user, [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS])
 
     CourseLinkValidator.queue_course(@context)
     render json: { success: true }
   end
 
   def link_validator
-    return unless authorized_action(@context, @current_user, :manage_content)
+    return unless authorized_action(@context, @current_user, [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS])
     # render view
   end
 
@@ -3927,7 +3967,13 @@ class CoursesController < ApplicationController
       :locale, :integration_id, :hide_final_grades, :hide_distribution_graphs, :hide_sections_on_course_users_page, :lock_all_announcements, :public_syllabus,
       :quiz_engine_selected, :public_syllabus_to_auth, :course_format, :time_zone, :organize_epub_by_content_type, :enable_offline_web_export,
       :show_announcements_on_home_page, :home_page_announcement_limit, :allow_final_grade_override, :filter_speed_grader_by_student_group, :homeroom_course,
-      :template, :course_color, :homeroom_course_id, :sync_enrollments_from_homeroom, :friendly_name, :enable_course_paces, :default_due_time
+      :template, :course_color, :homeroom_course_id, :sync_enrollments_from_homeroom, :friendly_name, :enable_course_paces, :default_due_time, :conditional_release
     )
+  end
+
+  def disable_conditional_release
+    ConditionalRelease::Service.delay_if_production(priority: Delayed::LOW_PRIORITY,
+                                                    n_strand: ["conditional_release_unassignment", @course.global_root_account_id])
+                               .release_mastery_paths_content_in_course(@course)
   end
 end

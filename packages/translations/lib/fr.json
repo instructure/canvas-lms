@@ -266,6 +266,12 @@
     "collapse_to_hide_types_1ab46d2e": {
         "message": "Réduisez pour masquer { types }"
     },
+    "color_picker_6b359edf": {
+        "message": "Nuancier"
+    },
+    "color_picker_colorname_selected_ad4cf400": {
+        "message": "Nuancier ({ colorName } sélectionné)"
+    },
     "computer_1d7dfa6f": {
         "message": "Ordinateur"
     },
@@ -407,9 +413,6 @@
     "diamond_b8dfe7ae": {
         "message": "Diamant"
     },
-    "dimension_type_55c83e4e": {
-        "message": "Type de dimension"
-    },
     "dimensions_45ddb7b7": {
         "message": "Dimensions"
     },
@@ -484,6 +487,9 @@
     },
     "edit_existing_button_icon_3d0277bd": {
         "message": "Modifier une icône ou un bouton existant"
+    },
+    "edit_icon_2c6b0e91": {
+        "message": "Icône d''édition"
     },
     "edit_link_7f53bebb": {
         "message": "Modifier lien"
@@ -917,6 +923,9 @@
     "media_af190855": {
         "message": "Média"
     },
+    "media_file_is_processing_please_try_again_later_58a6d49": {
+        "message": "Le fichier multimédia est en cours de traitement. Veuillez réessayer plus tard."
+    },
     "medium_5a8e9ead": {
         "message": "Moyen"
     },
@@ -1208,6 +1217,9 @@
     "rich_content_editor_2708ef21": {
         "message": "Éditeur de texte enrichi"
     },
+    "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+        "message": "Zone de texte enrichi Appuyez sur ALT+0 pour obtenir les raccourcis de l''éditeur de contenu enrichi."
+    },
     "right_to_left_9cfb092a": {
         "message": "De droite à gauche"
     },
@@ -1292,17 +1304,8 @@
     "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
         "message": "Un problème est survenu et je n''ai rien à vous montrer."
     },
-    "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-        "message": "Un problème est survenu. Vérifiez l’état de votre connexion, puis réessayez."
-    },
     "something_went_wrong_d238c551": {
         "message": "Un problème est survenu"
-    },
-    "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-        "message": "Quelque chose s’est mal passé, réessayez après avoir réactualisé la page"
-    },
-    "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-        "message": "L’envoi a rencontré un problème, vérifiez l’état de votre connexion, puis réessayez."
     },
     "sort_by_e75f9e3e": {
         "message": "Trier par"
@@ -1498,9 +1501,6 @@
     },
     "uploading_19e8a4e7": {
         "message": "En cours d’importation"
-    },
-    "uploading_closed_captions_subtitles_failed_bc093f3": {
-        "message": "Échec de l’envoi des sous-titres"
     },
     "uppercase_alphabetic_ordered_list_3f5aa6b2": {
         "message": "liste alphabétique ordonnée en majuscules"

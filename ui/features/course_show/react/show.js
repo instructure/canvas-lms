@@ -18,7 +18,13 @@
 
 import CourseHomeDialog from '@canvas/course-homepage/react/Dialog'
 import HomePagePromptContainer from '@canvas/course-homepage/react/Prompt'
+import ObserverOptions from '@canvas/observer-picker'
+import {
+  getHandleChangeObservedUser,
+  autoFocusObserverPicker
+} from '@canvas/observer-picker/util/pageReloadHelper'
 import createStore from '@canvas/util/createStore'
+import {View} from '@instructure/ui-view'
 import $ from 'jquery'
 import '@canvas/rails-flash-notifications'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -153,5 +159,23 @@ $(() => {
   const todo_container = document.querySelector('.todo-list')
   if (todo_container) {
     addToDoSidebar(todo_container)
+  }
+
+  const observerPickerContainer = document.getElementById('observer-picker-mountpoint')
+  if (observerPickerContainer && ENV.OBSERVER_OPTIONS?.OBSERVED_USERS_LIST) {
+    ReactDOM.render(
+      <View as="div" maxWidth="12em">
+        <ObserverOptions
+          autoFocus={autoFocusObserverPicker()}
+          canAddObservee={!!ENV.OBSERVER_OPTIONS?.CAN_ADD_OBSERVEE}
+          currentUserRoles={ENV.current_user_roles}
+          currentUser={ENV.current_user}
+          handleChangeObservedUser={getHandleChangeObservedUser()}
+          observedUsersList={ENV.OBSERVER_OPTIONS.OBSERVED_USERS_LIST}
+          renderLabel={I18n.t('Select a student to view. The page will refresh automatically.')}
+        />
+      </View>,
+      observerPickerContainer
+    )
   }
 })

@@ -24,6 +24,10 @@
 
 <% css_bundle :course_list %>
 
+<span class="screenreader-only">
+  <h1><%= t(:no_groupsheading, "Groups") %></h1>
+</span>
+
   <h2><%= t :heading_current_groups, 'Current Groups' %></h2>
   <% if @current_groups.empty? %>
     <%= t(:no_groups, "No Groups") %>

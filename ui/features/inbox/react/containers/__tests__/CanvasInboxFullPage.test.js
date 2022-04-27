@@ -178,16 +178,28 @@ describe('CanvasInbox Full Page', () => {
               conversationsConnection: {
                 nodes: [
                   {
-                    ...ConversationParticipant.mock(),
-                    conversation: Conversation.mock()
+                    ...ConversationParticipant.mock({
+                      _id: '256',
+                      id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU2',
+                      workflowState: 'unread'
+                    }),
+                    conversation: Conversation.mock({
+                      _id: '197',
+                      id: 'Q29udmVyc2F0aW9uLTE5Mz==',
+                      subject: 'This is an inbox conversation'
+                    })
                   },
                   {
                     ...ConversationParticipant.mock({
-                      _id: '257',
-                      id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU4',
+                      _id: '258',
+                      id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU6',
                       workflowState: 'unread'
                     }),
-                    conversation: Conversation.mock()
+                    conversation: Conversation.mock({
+                      _id: '1',
+                      id: 'Q29udmVyc2F0aW9uLTE5Nw==',
+                      subject: 'This is an inbox conversation'
+                    })
                   }
                 ],
                 __typename: 'ConversationParticipantConnection'

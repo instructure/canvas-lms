@@ -20,12 +20,22 @@ import moment from 'moment-timezone'
 
 export interface BlackoutDate {
   readonly id?: number | string
-  readonly temp_id?: string
+  temp_id?: string
   readonly course_id?: number | string
   readonly event_title: string
   start_date: moment.Moment
   end_date: moment.Moment
   readonly admin_level?: boolean
+}
+
+export enum SyncState {
+  SYNCED, // up to date
+  SYNCING, // actively syncing
+  UNSYNCED // there are pending changes
+}
+export interface BlackoutDateState {
+  syncing: SyncState
+  blackoutDates: BlackoutDate[]
 }
 
 export type CourseExternalToolStatus = 'OFF' | 'ON' | 'HIDE'

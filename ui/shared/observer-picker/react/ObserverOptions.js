@@ -22,7 +22,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent, AccessibleContent} from '@instructure/ui-a11y-content'
-import {IconUserLine, IconAddLine} from '@instructure/ui-icons'
+import {IconAddLine} from '@instructure/ui-icons'
 import {Avatar} from '@instructure/ui-avatar'
 import {Text} from '@instructure/ui-text'
 
@@ -42,7 +42,9 @@ const ObserverOptions = ({
   handleChangeObservedUser,
   margin,
   canAddObservee,
-  currentUserRoles
+  currentUserRoles,
+  autoFocus,
+  renderLabel
 }) => {
   const [observedUsers, setObservedUsers] = useState(() =>
     parseObservedUsersList(observedUsersList)
@@ -109,15 +111,10 @@ const ObserverOptions = ({
   }
 
   const userAvatar = user => {
-    /* don't show the default Canvas avatar */
-    return user?.avatarUrl && !user.avatarUrl.includes('avatar-50.png') ? (
-      /* hack to shrink the avatar - should be able to use size="xx-small" on inst-ui 7.9.0 */
-      <span style={{fontSize: '0.5rem', verticalAlign: 'middle'}}>
-        <Avatar name={user.name} src={user.avatarUrl} size="auto" />
-      </span>
-    ) : (
-      <IconUserLine />
-    )
+    if (!user) return
+    const avatarUrl =
+      user.avatarUrl && !user.avatarUrl.includes('avatar-50.png') ? user.avatarUrl : undefined
+    return <Avatar name={user.name} src={avatarUrl} size="xx-small" margin="auto 0" />
   }
 
   const selectAvatar = userAvatar(selectedUser)
@@ -170,16 +167,20 @@ const ObserverOptions = ({
     return (
       <View as="div" margin={margin}>
         <CanvasAsyncSelect
+          autoFocus={!!autoFocus}
           data-testid="observed-student-dropdown"
           inputValue={selectSearchValue}
           renderLabel={
-            <ScreenReaderContent>{I18n.t('Select a student to view')}</ScreenReaderContent>
+            <ScreenReaderContent>
+              {renderLabel || I18n.t('Select a student to view')}
+            </ScreenReaderContent>
           }
           noOptionsLabel={I18n.t('No Results')}
           onInputChange={e => setSelectSearchValue(e.target.value)}
           onOptionSelected={(_e, id) => {
             handleOptionSelected(id)
           }}
+          selectedOptionId={selectedUser?.id}
           renderBeforeInput={selectAvatar}
           shouldNotWrap
         >
@@ -234,7 +235,9 @@ ObserverOptions.propTypes = {
   handleChangeObservedUser: PropTypes.func.isRequired,
   margin: PropTypes.string,
   canAddObservee: PropTypes.bool.isRequired,
-  currentUserRoles: PropTypes.arrayOf(PropTypes.string).isRequired
+  currentUserRoles: PropTypes.arrayOf(PropTypes.string).isRequired,
+  autoFocus: PropTypes.bool,
+  renderLabel: PropTypes.string
 }
 
 export default ObserverOptions

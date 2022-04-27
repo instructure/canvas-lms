@@ -25,6 +25,12 @@ import moxios from 'moxios'
 import {opportunities, defaultK5DashboardProps as defaultProps, defaultEnv} from './mocks'
 import {resetCardCache} from '@canvas/dashboard-card'
 import {MOCK_CARDS, MOCK_CARDS_2} from '@canvas/k5/react/__tests__/fixtures'
+import {fetchShowK5Dashboard} from '@canvas/observer-picker/react/utils'
+
+jest.mock('@canvas/observer-picker/react/utils', () => ({
+  ...jest.requireActual('@canvas/observer-picker/react/utils'),
+  fetchShowK5Dashboard: jest.fn()
+}))
 
 const currentUserId = defaultProps.currentUser.id
 const observedUserCookieName = `${OBSERVER_COOKIE_PREFIX}${currentUserId}`
@@ -34,12 +40,15 @@ describe('K5Dashboard Parent Support', () => {
     document.cookie = `${observedUserCookieName}=4;path=/`
     moxios.install()
     global.ENV = defaultEnv
+    fetchShowK5Dashboard.mockImplementation(() => Promise.resolve(true))
   })
+
   afterEach(() => {
     moxios.uninstall()
     global.ENV = {}
     resetCardCache()
   })
+
   const opportunities2 = [
     {
       id: '3',
@@ -192,5 +201,70 @@ describe('K5Dashboard Parent Support', () => {
         exact: false
       })
     ).toBeInTheDocument()
+  })
+
+  describe('switching to classic student', () => {
+    let originalLocation
+    let reloadMock
+
+    beforeAll(() => {
+      originalLocation = window.location
+      reloadMock = jest.fn()
+      Object.defineProperty(window, 'location', {
+        configurable: true,
+        value: {...window.location, reload: reloadMock}
+      })
+    })
+
+    afterAll(() => {
+      Object.defineProperty(window, 'location', {
+        configurable: true,
+        value: originalLocation
+      })
+    })
+
+    beforeEach(() => {
+      fetchShowK5Dashboard.mockImplementationOnce(() => Promise.resolve(false))
+      reloadMock.mockClear()
+    })
+
+    it('reloads the page if observer_picker is on', async () => {
+      const {findByRole, getByText} = render(
+        <K5Dashboard
+          {...defaultProps}
+          currentUserRoles={['user', 'observer', 'teacher']}
+          observedUsersList={MOCK_OBSERVED_USERS_LIST}
+          canAddObservee
+          plannerEnabled
+        />
+      )
+      const select = await findByRole('combobox', {name: 'Select a student to view'})
+      act(() => select.click())
+      act(() => getByText('Student 2').click())
+      await waitFor(() => expect(reloadMock).toHaveBeenCalled())
+    })
+
+    it('does not reload the page if observer_picker is off', async () => {
+      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=2', {
+        status: 200,
+        response: MOCK_CARDS_2
+      })
+
+      const {findByRole, getByText, findByText} = render(
+        <K5Dashboard
+          {...defaultProps}
+          currentUserRoles={['user', 'observer', 'teacher']}
+          observedUsersList={MOCK_OBSERVED_USERS_LIST}
+          canAddObservee
+          plannerEnabled
+          observerPickerEnabled={false}
+        />
+      )
+      const select = await findByRole('combobox', {name: 'Select a student to view'})
+      act(() => select.click())
+      act(() => getByText('Student 2').click())
+      expect(await findByText('Economics 203')).toBeInTheDocument()
+      expect(reloadMock).not.toHaveBeenCalled()
+    })
   })
 })

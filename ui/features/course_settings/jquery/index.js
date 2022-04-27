@@ -23,17 +23,17 @@ import {tabIdFromElement} from './course_settings_helper'
 import tz from '@canvas/timezone'
 import forceScreenReaderToReparse from 'force-screenreader-to-reparse'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/datetime'/* datetimeString, date_field */
-import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit, fillFormData, getFormData, formErrors */
+import '@canvas/datetime' /* datetimeString, date_field */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* confirmDelete, fragmentChange, showIf */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, fragmentChange, showIf */
 import '@canvas/keycodes'
 import '@canvas/loading-image'
 import '@canvas/rails-flash-notifications'
-import '@canvas/util/templateData'/* fillTemplateData, getTemplateData */
-import '@canvas/link-enrollment'/* global link_enrollment */
-import 'jquery-tinypubsub'/* /\.publish/ */
+import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
+import '@canvas/link-enrollment' /* global link_enrollment */
+import 'jquery-tinypubsub' /* /\.publish/ */
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import 'jqueryui/autocomplete'
 import 'jqueryui/sortable'
@@ -622,6 +622,10 @@ $(document).ready(function () {
       $('#course_paces_caution_text').toggleClass('shown', this.checked)
     })
     .trigger('change')
+
+  $('#course_conditional_release').change(function () {
+    $('#conditional_release_caution_text').toggleClass('shown', !this.checked)
+  })
 
   window.addEventListener('popstate', () => {
     const openTab = window.location.hash

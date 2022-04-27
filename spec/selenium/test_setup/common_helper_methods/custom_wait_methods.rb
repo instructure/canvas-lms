@@ -216,6 +216,22 @@ module CustomWaitMethods
     end or CallStackUtils.raise(frd_error)
   end
 
+  def keep_trying_for_attempt_times(attempts: 3, sleep_interval: 0.5)
+    attempt = 0
+    max_attempts = attempts
+    begin
+      attempt += 1
+      yield
+    rescue => e
+      if attempt < max_attempts
+        puts "\t Attempt #{attempt} failed! Retrying..."
+        sleep sleep_interval
+        retry
+      end
+      raise Selenium::WebDriver::Error::ElementNotInteractableError, e.message.to_s
+    end
+  end
+
   # pass in an Element pointing to the textarea that is tinified.
   def wait_for_tiny(element)
     # TODO: Better to wait for an event from tiny?

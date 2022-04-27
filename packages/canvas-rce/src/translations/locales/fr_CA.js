@@ -125,6 +125,10 @@ const locale = {
   "collapse_to_hide_types_1ab46d2e": {
     "message": "Réduire pour masquer { types }"
   },
+  "color_picker_6b359edf": { "message": "Sélecteur de couleur" },
+  "color_picker_colorname_selected_ad4cf400": {
+    "message": "Sélecteur de couleur ({ colorName } sélectionné)"
+  },
   "computer_1d7dfa6f": { "message": "Ordinateur" },
   "content_1440204b": { "message": "Contenu" },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
@@ -173,7 +177,6 @@ const locale = {
   "describe_the_video_2fe8f46a": { "message": "(Décrire la vidéo)" },
   "details_98a31b68": { "message": "Détails" },
   "diamond_b8dfe7ae": { "message": "Diamant" },
-  "dimension_type_55c83e4e": { "message": "Type de dimension" },
   "dimensions_45ddb7b7": { "message": "Dimensions" },
   "directionality_26ae9e08": { "message": "Directionnalité" },
   "directly_edit_latex_b7e9235b": { "message": "Éditer directement LaTeX" },
@@ -200,6 +203,7 @@ const locale = {
   "edit_existing_button_icon_3d0277bd": {
     "message": "Modifier le bouton/icône existant"
   },
+  "edit_icon_2c6b0e91": { "message": "Modifier l’icône" },
   "edit_link_7f53bebb": { "message": "Modifier le lien" },
   "editor_statusbar_26ac81fc": { "message": "Barre d''état de l''éditeur" },
   "embed_828fac4a": { "message": "Intégrer" },
@@ -339,6 +343,9 @@ const locale = {
   "magenta_4a65993c": { "message": "Magenta" },
   "math_icon_ad4e9d03": { "message": "Icône Mathématique" },
   "media_af190855": { "message": "Support média" },
+  "media_file_is_processing_please_try_again_later_58a6d49": {
+    "message": "Le fichier multimédia est en cours de traitement. Veuillez essayer de nouveau plus tard."
+  },
   "medium_5a8e9ead": { "message": "Moyen" },
   "middle_27dc1d5": { "message": "Milieu" },
   "misc_3b692ea7": { "message": "Divers" },
@@ -433,6 +440,9 @@ const locale = {
     "message": "Restaurer l''enregistrement automatique?"
   },
   "rich_content_editor_2708ef21": { "message": "Éditeur de texte enrichi" },
+  "rich_text_area_press_alt_0_for_rich_content_editor_9d23437f": {
+    "message": "Zone de texte enrichi. Appuyez sur ALT+0 pour les raccourcis de l’éditeur de texte enrichi."
+  },
   "right_to_left_9cfb092a": { "message": "Droite-à-gauche" },
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Malheureusement, l’éditeur Pretty HTML n’est pas accessible au clavier. Accédez à l’éditeur HTML brut ici."
@@ -468,16 +478,7 @@ const locale = {
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
     "message": "Une erreur est survenue et je ne sais pas quoi vous montrer."
   },
-  "something_went_wrong_check_your_connection_and_try_2a7b2d13": {
-    "message": "Un problème est survenu, vérifiez votre connexion et réessayez."
-  },
   "something_went_wrong_d238c551": { "message": "Une erreur est survenue" },
-  "something_went_wrong_try_again_after_refreshing_th_e094eb8d": {
-    "message": "Une erreur est survenue, réessayez après avoir rafraîchi la page"
-  },
-  "something_went_wrong_uploading_check_your_connecti_aa201f15": {
-    "message": "Un problème est survenu lors du téléversement, vérifiez votre connexion et réessayez."
-  },
   "sort_by_e75f9e3e": { "message": "Trier par" },
   "square_511eb3b3": { "message": "Carré" },
   "square_unordered_list_b15ce93b": { "message": "liste carrée non triée" },
@@ -552,9 +553,6 @@ const locale = {
     "message": "Téléverser/enregistrer un support média"
   },
   "uploading_19e8a4e7": { "message": "Téléversement" },
-  "uploading_closed_captions_subtitles_failed_bc093f3": {
-    "message": "Le téléversement des sous-titres/légendes a échoué."
-  },
   "uppercase_alphabetic_ordered_list_3f5aa6b2": {
     "message": "liste alphabétique en majuscules"
   },

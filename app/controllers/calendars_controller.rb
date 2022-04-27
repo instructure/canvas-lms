@@ -74,11 +74,13 @@ class CalendarsController < ApplicationController
         assignment_groups: context.respond_to?("assignments") ? context.assignment_groups.active.pluck(:id, :name).map { |id, name| { id: id, name: name } } : [],
         can_create_appointment_groups: ag_permission,
         can_make_reservation: context.grants_right?(@current_user, :participate_as_student),
-        can_update_todo_date: context.grants_right?(@current_user, session, :manage_content),
+        can_update_todo_date: context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_edit),
         can_update_discussion_topic: context.grants_right?(@current_user, session, :moderate_forum),
         can_update_wiki_page: context.grants_right?(@current_user, session, :update),
         concluded: (context.is_a? Course) ? context.concluded? : false,
-        k5_course: context.is_a?(Course) && context.elementary_enabled?
+        k5_course: context.is_a?(Course) && context.elementary_enabled?,
+        course_pacing_enabled: context.is_a?(Course) && @domain_root_account.feature_enabled?(:course_paces) && context.enable_course_paces,
+        user_is_observer: context.is_a?(Course) && context.enrollments.where(user_id: @current_user).first&.observer?
       }
       if context.respond_to?("course_sections")
         info[:course_sections] = context.course_sections.active.pluck(:id, :name).map do |id, name|

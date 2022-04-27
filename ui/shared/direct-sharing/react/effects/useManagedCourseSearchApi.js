@@ -33,12 +33,9 @@ export function isSearchableTerm(value) {
   }
 }
 
-export default function useManagedCourseSearchApi(fetchApiOpts = {}, includeConcluded = false) {
+export default function useManagedCourseSearchApi(fetchApiOpts = {}) {
   if (!fetchApiOpts.params) {
     fetchApiOpts.params = {}
-  }
-  if (includeConcluded) {
-    fetchApiOpts.params.include = 'concluded'
   }
 
   const searchTerm = fetchApiOpts.params.term || ''

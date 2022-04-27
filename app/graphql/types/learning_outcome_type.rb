@@ -20,6 +20,8 @@
 
 module Types
   class LearningOutcomeType < ApplicationObjectType
+    include OutcomesFeaturesHelper
+
     class AssessedLoader < GraphQL::Batch::Loader
       def perform(outcomes)
         assessed_ids = LearningOutcomeResult.active.where(learning_outcome_id: outcomes).distinct.pluck(:learning_outcome_id)
@@ -65,27 +67,27 @@ module Types
 
     field :calculation_method, String, null: true
     def calculation_method
-      outcome.calculation_method if individual_outcome_rating_and_calculation_enabled?
+      outcome.calculation_method unless account_level_mastery_scales_enabled?(outcome.context)
     end
 
     field :calculation_int, Integer, null: true
     def calculation_int
-      outcome.calculation_int if individual_outcome_rating_and_calculation_enabled?
+      outcome.calculation_int unless account_level_mastery_scales_enabled?(outcome.context)
     end
 
     field :mastery_points, Float, null: true
     def mastery_points
-      outcome.mastery_points if individual_outcome_rating_and_calculation_enabled?
+      outcome.mastery_points unless account_level_mastery_scales_enabled?(outcome.context)
     end
 
     field :points_possible, Float, null: true
     def points_possible
-      outcome.points_possible if individual_outcome_rating_and_calculation_enabled?
+      outcome.points_possible unless account_level_mastery_scales_enabled?(outcome.context)
     end
 
     field :ratings, [Types::ProficiencyRatingType], null: true
     def ratings
-      outcome.rubric_criterion[:ratings] if individual_outcome_rating_and_calculation_enabled?
+      outcome.rubric_criterion[:ratings] unless account_level_mastery_scales_enabled?(outcome.context)
     end
 
     field :can_edit, Boolean, null: false
@@ -128,12 +130,6 @@ module Types
 
     def outcome_context_promise
       Loaders::AssociationLoader.for(LearningOutcome, :context).load(outcome)
-    end
-
-    def individual_outcome_rating_and_calculation_enabled?
-      @individual_outcome_rating_and_calculation_enabled ||= domain_root_account.feature_enabled?(:individual_outcome_rating_and_calculation) &&
-                                                             domain_root_account.feature_enabled?(:improved_outcomes_management) &&
-                                                             !domain_root_account.feature_enabled?(:account_level_mastery_scales)
     end
   end
 end

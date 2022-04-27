@@ -42,7 +42,7 @@ HEREDOC
 </header>
 
 <div id="no_collaborations_message" style="<%= hidden unless @collaborations.empty? %>">
-  <% if can_do(@context, @current_user, :manage_content) %>
+  <% if can_do(@context, @current_user, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS) %>
     <p>
       <%= mt :description_teacher,
         "**What do we mean by collaborations?** We're talking

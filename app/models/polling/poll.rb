@@ -36,12 +36,39 @@ module Polling
       given { |user| TeacherEnrollment.active.where(user_id: user).exists? }
       can :create
 
+      #################### Begin legacy permission block #########################
       given do |user, http_session|
-        poll_sessions.shard(self).preload(:course).any? do |session|
-          session.course.grants_right?(user, http_session, :manage_content)
-        end
+        !user&.account&.feature_enabled?(:granular_permissions_manage_course_content) &&
+          poll_sessions.shard(self).preload(:course).any? do |session|
+            session.course.grants_right?(user, http_session, :manage_content)
+          end
       end
       can :update and can :read and can :delete and can :submit
+      ##################### End legacy permission block ##########################
+
+      given do |user, http_session|
+        user&.account&.feature_enabled?(:granular_permissions_manage_course_content) &&
+          poll_sessions.shard(self).preload(:course).any? do |session|
+            session.course.grants_right?(user, http_session, :manage_course_content_add)
+          end
+      end
+      can :read and can :submit
+
+      given do |user, http_session|
+        user&.account&.feature_enabled?(:granular_permissions_manage_course_content) &&
+          poll_sessions.shard(self).preload(:course).any? do |session|
+            session.course.grants_right?(user, http_session, :manage_course_content_edit)
+          end
+      end
+      can :read and can :update
+
+      given do |user, http_session|
+        user&.account&.feature_enabled?(:granular_permissions_manage_course_content) &&
+          poll_sessions.shard(self).preload(:course).any? do |session|
+            session.course.grants_right?(user, http_session, :manage_course_content_delete)
+          end
+      end
+      can :read and can :delete
 
       given do |user|
         can_read = false

@@ -80,7 +80,6 @@ test('Does not date restrict individual student overrides', () => {
 
   sandbox.stub(StudentGroupStore, 'fetchComplete').returns(true)
   sandbox.stub(StudentGroupStore, 'groupsFilteredForSelectedSet').returns([])
-  const errorBoxSpy = sandbox.spy($.fn, 'errorBox')
   const view = new DueDateOverrideView()
   const errs = view.validateGroupOverrides(data, {})
   strictEqual(errs.invalidGroupOverride, undefined)
@@ -88,7 +87,10 @@ test('Does not date restrict individual student overrides', () => {
 
 QUnit.module('DueDateOverride#validateDatetimes', () => {
   test('skips overrides whose row key has already been validated', () => {
-    const overrides = [{rowKey: '1', student_ids: [1]}, {rowKey: '1', student_ids: [1]}]
+    const overrides = [
+      {rowKey: '1', student_ids: [1]},
+      {rowKey: '1', student_ids: [1]}
+    ]
     const data = {assignment_overrides: overrides}
 
     const validateSpy = sinon.spy(DateValidator.prototype, 'validateDatetimes')
@@ -143,6 +145,15 @@ QUnit.module('DueDateOverride#validateDatetimes', () => {
 
       const errors = view.validateDatetimes(data, {})
       strictEqual(errors.due_at.message, 'Due date cannot be after course end')
+    })
+  })
+
+  QUnit.module('with course pacing', () => {
+    test('shows notice when in a paced course', () => {
+      const view = new DueDateOverrideView({inPacedCourse: true})
+      view.render()
+      const el = view.$el
+      ok(el[0].querySelector('[data-testid="CoursePacingNotice"]'))
     })
   })
 })

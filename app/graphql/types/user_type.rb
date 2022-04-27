@@ -302,22 +302,24 @@ module Types
       end
     end
 
-    field :submission_comments_connection, Types::SubmissionCommentType.connection_type, null: true
-    def submission_comments_connection
+    field :viewable_submissions_connection, Types::SubmissionType.connection_type, null: true do
+      description "All submissions with comments that the current_user is able to view"
+    end
+    def viewable_submissions_connection
       return unless object == current_user
 
-      submission_comments = []
-      stream_item_instances = current_user.visible_stream_item_instances(only_active_courses: true)
+      submissions = []
 
-      Shard.partition_by_shard(stream_item_instances, ->(sii) { sii.stream_item_id }) do |shard_stream_items|
-        submission_ids = StreamItem.where(id: shard_stream_items.map(&:stream_item_id),
-                                          asset_type: "Submission")
-                                   .select("asset_id")
-        submission_comments += SubmissionComment.preload(submission: { assignment: :context })
-                                                .where(submission_id: submission_ids)
+      ssi_scope = current_user.visible_stream_item_instances(only_active_courses: true)
+      ssi_scope = ssi_scope.eager_load(:stream_item).where("stream_items.asset_type=?", "Submission")
+      ssi_scope = ssi_scope.joins("INNER JOIN #{Submission.quoted_table_name} ON submissions.id=asset_id")
+      ssi_scope = ssi_scope.where("submissions.workflow_state <> 'deleted' AND submissions.submission_comments_count>0")
+
+      Shard.partition_by_shard(ssi_scope, ->(sii) { sii.stream_item_id }) do |shard_stream_items|
+        submission_ids = StreamItem.where(id: shard_stream_items.map(&:stream_item_id)).pluck(:asset_id)
+        submissions += Submission.where(id: submission_ids)
       end
-
-      submission_comments
+      submissions
     end
 
     field :comment_bank_items_connection, Types::CommentBankItemType.connection_type, null: true do

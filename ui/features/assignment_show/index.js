@@ -44,6 +44,7 @@ const I18n = useI18nScope('assignment')
 ready(() => {
   const lockManager = new LockManager()
   lockManager.init({itemType: 'assignment', page: 'show'})
+  renderCoursePacingNotice()
 })
 
 let studentGroupSelectionRequestTrackers = []
@@ -108,6 +109,22 @@ function renderStudentGroupFilter() {
       />,
       $mountPoint
     )
+  }
+}
+
+function renderCoursePacingNotice() {
+  const $mountPoint = document.getElementById('course_paces_due_date_notice')
+
+  if ($mountPoint) {
+    import('@canvas/due-dates/react/CoursePacingNotice')
+      .then(CoursePacingNoticeModule => {
+        const renderNotice = CoursePacingNoticeModule.renderCoursePacingNotice
+        renderNotice($mountPoint, ENV.COURSE_ID)
+      })
+      .catch(ex => {
+        // eslint-disable-next-line no-console
+        console.error('Falied loading CoursePacingNotice', ex)
+      })
   }
 }
 

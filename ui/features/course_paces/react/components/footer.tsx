@@ -16,9 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useCallback} from 'react'
 import {connect} from 'react-redux'
-// @ts-ignore: TS doesn't understand i18n scoped imports
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {Button} from '@instructure/ui-buttons'
@@ -27,23 +26,33 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Tooltip} from '@instructure/ui-tooltip'
 
 import {StoreState} from '../types'
-import {getAutoSaving, getShowLoadingOverlay} from '../reducers/ui'
+import {getAutoSaving, getShowLoadingOverlay, getSyncing} from '../reducers/ui'
 import {coursePaceActions} from '../actions/course_paces'
-import {getPacePublishing, getUnpublishedChangeCount, isStudentPace} from '../reducers/course_paces'
+import {
+  getPacePublishing,
+  getUnpublishedChangeCount,
+  isNewPace,
+  isStudentPace
+} from '../reducers/course_paces'
+import {getBlackoutDatesSyncing, getBlackoutDatesUnsynced} from '../shared/reducers/blackout_dates'
 
 const I18n = useI18nScope('course_paces_footer')
 
 interface StoreProps {
   readonly autoSaving: boolean
   readonly pacePublishing: boolean
+  readonly blackoutDatesSyncing: boolean
+  readonly isSyncing: boolean
+  readonly blackoutDatesUnsynced: boolean
   readonly showLoadingOverlay: boolean
   readonly studentPace: boolean
+  readonly newPace: boolean
   readonly unpublishedChanges: boolean
 }
 
 interface DispatchProps {
-  publishPace: typeof coursePaceActions.publishPace
-  resetPace: typeof coursePaceActions.resetPace
+  onResetPace: typeof coursePaceActions.onResetPace
+  syncUnpublishedChanges: typeof coursePaceActions.syncUnpublishedChanges
 }
 
 type ComponentProps = StoreProps & DispatchProps
@@ -51,43 +60,69 @@ type ComponentProps = StoreProps & DispatchProps
 export const Footer: React.FC<ComponentProps> = ({
   autoSaving,
   pacePublishing,
-  publishPace,
-  resetPace,
+  blackoutDatesSyncing,
+  isSyncing,
+  syncUnpublishedChanges,
+  onResetPace,
   showLoadingOverlay,
   studentPace,
+  newPace,
   unpublishedChanges
 }) => {
+  const handlePublish = useCallback(() => {
+    syncUnpublishedChanges()
+  }, [syncUnpublishedChanges])
+
   if (studentPace) return null
 
-  const disabled = autoSaving || pacePublishing || showLoadingOverlay || !unpublishedChanges
+  const cancelDisabled = autoSaving || isSyncing || showLoadingOverlay || !unpublishedChanges
+  const pubDisabled = !newPace && cancelDisabled
+
   // This wrapper div attempts to roughly match the dimensions of the publish button
-  const publishLabel = pacePublishing ? (
-    <div style={{display: 'inline-block', margin: '-0.5rem 0.9rem'}}>
-      <Spinner size="x-small" renderTitle={I18n.t('Publishing pace...')} />
-    </div>
-  ) : (
-    I18n.t('Publish')
-  )
+  let publishLabel = I18n.t('Publish')
+  if (pacePublishing || isSyncing) {
+    publishLabel = (
+      <div style={{display: 'inline-block', margin: '-0.5rem 0.9rem'}}>
+        <Spinner size="x-small" renderTitle={I18n.t('Publishing pace...')} />
+      </div>
+    )
+  } else if (blackoutDatesSyncing) {
+    publishLabel = (
+      <div style={{display: 'inline-block', margin: '-0.5rem 0.9rem'}}>
+        <Spinner size="x-small" renderTitle={I18n.t('Saving blackout dates...')} />
+      </div>
+    )
+  }
+
   let cancelTip, pubTip
-  if (autoSaving || pacePublishing) {
+  if (autoSaving || isSyncing) {
     cancelTip = I18n.t('You cannot cancel while publishing')
     pubTip = I18n.t('You cannot publish while publishing')
   } else if (showLoadingOverlay) {
     cancelTip = I18n.t('You cannot cancel while loading the pace')
     pubTip = I18n.t('You cannot publish while loading the pace')
+  } else if (newPace) {
+    cancelTip = I18n.t('There are no pending changes to cancel')
   } else {
     cancelTip = I18n.t('There are no pending changes to cancel')
     pubTip = I18n.t('There are no pending changes to publish')
   }
   return (
     <Flex as="section" justifyItems="end">
-      <Tooltip renderTip={disabled && cancelTip} on={disabled ? ['hover', 'focus'] : []}>
-        <Button color="secondary" margin="0 small 0" onClick={() => disabled || resetPace()}>
+      <Tooltip
+        renderTip={cancelDisabled && cancelTip}
+        on={cancelDisabled ? ['hover', 'focus'] : []}
+      >
+        <Button
+          color="secondary"
+          margin="0 small 0"
+          onClick={() => cancelDisabled || onResetPace()}
+        >
           {I18n.t('Cancel')}
         </Button>
       </Tooltip>
-      <Tooltip renderTip={disabled && pubTip} on={disabled ? ['hover', 'focus'] : []}>
-        <Button color="primary" onClick={() => disabled || publishPace()}>
+      <Tooltip renderTip={pubDisabled && pubTip} on={pubDisabled ? ['hover', 'focus'] : []}>
+        <Button color="primary" onClick={() => pubDisabled || handlePublish()}>
           {publishLabel}
         </Button>
       </Tooltip>
@@ -99,13 +134,17 @@ const mapStateToProps = (state: StoreState): StoreProps => {
   return {
     autoSaving: getAutoSaving(state),
     pacePublishing: getPacePublishing(state),
+    blackoutDatesSyncing: getBlackoutDatesSyncing(state),
+    isSyncing: getSyncing(state),
+    blackoutDatesUnsynced: getBlackoutDatesUnsynced(state),
     showLoadingOverlay: getShowLoadingOverlay(state),
     studentPace: isStudentPace(state),
+    newPace: isNewPace(state),
     unpublishedChanges: getUnpublishedChangeCount(state) !== 0
   }
 }
 
 export default connect(mapStateToProps, {
-  publishPace: coursePaceActions.publishPace,
-  resetPace: coursePaceActions.resetPace
+  onResetPace: coursePaceActions.onResetPace,
+  syncUnpublishedChanges: coursePaceActions.syncUnpublishedChanges
 })(Footer)

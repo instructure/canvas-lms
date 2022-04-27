@@ -269,6 +269,9 @@ class AccountReportsController < ApplicationController
   #   A few example parameters have been provided below. Note that the example
   #   parameters provided below may not be valid for every report.
   #
+  # @argument parameters[skip_message] [Boolean] If true, no message will be sent
+  #   to the user upon completion of the report.
+  #
   # @argument parameters[course_id] [Integer] The id of the course to report on.
   #   Note: this parameter has been listed to serve as an example and may not be
   #   valid for every report.

@@ -360,8 +360,31 @@ class ContextModule < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| context.grants_right?(user, session, :manage_content) }
+    #################### Begin legacy permission block #########################
+    given do |user, session|
+      user && !context.root_account.feature_enabled?(:granular_permissions_manage_course_content) &&
+        context.grants_right?(user, session, :manage_content)
+    end
     can :read and can :create and can :update and can :delete and can :read_as_admin
+    ##################### End legacy permission block ##########################
+
+    given do |user, session|
+      user && context.root_account.feature_enabled?(:granular_permissions_manage_course_content) &&
+        context.grants_right?(user, session, :manage_course_content_add)
+    end
+    can :read and can :read_as_admin and can :create
+
+    given do |user, session|
+      user && context.root_account.feature_enabled?(:granular_permissions_manage_course_content) &&
+        context.grants_right?(user, session, :manage_course_content_edit)
+    end
+    can :read and can :read_as_admin and can :update
+
+    given do |user, session|
+      user && context.root_account.feature_enabled?(:granular_permissions_manage_course_content) &&
+        context.grants_right?(user, session, :manage_course_content_delete)
+    end
+    can :read and can :read_as_admin and can :delete
 
     given { |user, session| context.grants_right?(user, session, :read_as_admin) }
     can :read and can :read_as_admin

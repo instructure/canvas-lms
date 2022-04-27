@@ -2006,7 +2006,7 @@ class Submission < ActiveRecord::Base
       return unless graded? && posted?
       # use request caches to handle n+1's when updating a lot of submissions in the same course in one request
       return unless RequestCache.cache("conditional_release_feature_enabled", course_id) do
-        course.feature_enabled?(:conditional_release)
+        course.conditional_release?
       end
 
       if ConditionalRelease::Rule.is_trigger_assignment?(assignment)
@@ -2547,6 +2547,11 @@ class Submission < ActiveRecord::Base
     return unless saved_change_to_score?
     return if autograded? # Submission changed by LTI Tool, it will set result score directly
 
+    unless lti_result
+      assignment.line_items.first&.results&.create!(
+        submission: self, user: user, created_at: Time.zone.now, updated_at: Time.zone.now
+      )
+    end
     Lti::Result.update_score_for_submission(self, score)
   end
 

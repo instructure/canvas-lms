@@ -92,7 +92,7 @@ class DueDateCacher
     opts = {
       assignments: [assignment.id],
       inst_jobs_opts: {
-        strand: "cached_due_date:calculator:Course:Assignments:#{assignment.context.global_id}",
+        singleton: "cached_due_date:calculator:Assignment:#{assignment.global_id}:UpdateGrades:#{update_grades ? 1 : 0}",
         max_attempts: 10
       },
       update_grades: update_grades,
@@ -107,7 +107,8 @@ class DueDateCacher
     Rails.logger.debug "DDC.recompute_course(#{course.inspect}, #{assignments.inspect}, #{inst_jobs_opts.inspect}) - #{original_caller}"
     course = Course.find(course) unless course.is_a?(Course)
     inst_jobs_opts[:max_attempts] ||= 10
-    inst_jobs_opts[:singleton] ||= "cached_due_date:calculator:Course:#{course.global_id}" if assignments.nil? && !inst_jobs_opts[:strand]
+    inst_jobs_opts[:singleton] ||= "cached_due_date:calculator:Course:#{course.global_id}:UpdateGrades:#{update_grades ? 1 : 0}" if assignments.nil?
+    inst_jobs_opts[:strand] ||= "cached_due_date:calculator:Course:#{course.global_id}"
 
     assignments_to_recompute = assignments || Assignment.active.where(context: course).pluck(:id)
     return if assignments_to_recompute.empty?
@@ -124,15 +125,16 @@ class DueDateCacher
   def self.recompute_users_for_course(user_ids, course, assignments = nil, inst_jobs_opts = {})
     user_ids = Array(user_ids)
     course = Course.find(course) unless course.is_a?(Course)
+    update_grades = inst_jobs_opts.delete(:update_grades) || false
     inst_jobs_opts[:max_attempts] ||= 10
+    inst_jobs_opts[:strand] ||= "cached_due_date:calculator:Course:#{course.global_id}"
     if assignments.nil?
-      inst_jobs_opts[:singleton] ||= "cached_due_date:calculator:Users:#{course.global_id}:#{Digest::SHA256.hexdigest(user_ids.sort.join(":"))}"
+      inst_jobs_opts[:singleton] ||= "cached_due_date:calculator:Course:#{course.global_id}:Users:#{Digest::SHA256.hexdigest(user_ids.sort.join(":"))}:UpdateGrades:#{update_grades ? 1 : 0}"
     end
     assignments ||= Assignment.active.where(context: course).pluck(:id)
     return if assignments.empty?
 
     current_caller = caller(1..1).first
-    update_grades = inst_jobs_opts.delete(:update_grades) || false
     executing_user = inst_jobs_opts.delete(:executing_user) || current_executing_user
     due_date_cacher = new(course, assignments, user_ids, update_grades: update_grades, original_caller: current_caller, executing_user: executing_user)
 

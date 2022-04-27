@@ -39,7 +39,7 @@ const defaultProps = {
   excludeWeekends: false,
   coursePaceItem: PRIMARY_PACE.modules[0].items[0],
   coursePaceItemPosition: 0,
-  pacePublishing: false,
+  isSyncing: false,
   blackoutDates: BLACKOUT_DATES,
   autosaving: false,
   disabledDaysOfWeek: [],
@@ -66,12 +66,9 @@ describe('AssignmentRow', () => {
   })
 
   it('renders the assignment title as a link to the assignment', () => {
-    const {getByText} = renderConnected(<AssignmentRow {...defaultProps} />)
+    const {getByRole} = renderConnected(<AssignmentRow {...defaultProps} />)
 
-    // Implementation detail bleeds in here; but the `TruncateText` means that the title isn't directly in the `a`
-    expect(
-      getByText(defaultProps.coursePaceItem.assignment_title)?.parentNode?.parentNode
-    ).toHaveAttribute('href', defaultProps.coursePaceItem.assignment_link)
+    getByRole('link', {name: defaultProps.coursePaceItem.assignment_title})
   })
 
   it('renders an input that updates the duration for that module item', () => {
@@ -118,7 +115,7 @@ describe('AssignmentRow', () => {
   })
 
   it('disables duration inputs while publishing', () => {
-    const {getByRole} = renderConnected(<AssignmentRow {...defaultProps} pacePublishing />)
+    const {getByRole} = renderConnected(<AssignmentRow {...defaultProps} isSyncing />)
     const daysInput = getByRole('textbox', {
       name: 'Duration for module Basic encryption/decryption'
     })

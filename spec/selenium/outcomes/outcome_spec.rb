@@ -364,9 +364,10 @@ describe "outcomes" do
         end
       end
 
-      describe "with individual_ratings_and_calculation_method enabled" do
+      describe "with account_level_mastery_scales disabled" do
         before do
-          enable_improved_outcomes_management_with_individual_ratings(Account.default)
+          enable_improved_outcomes_management(Account.default)
+          disable_account_level_mastery_scales(Account.default)
         end
 
         it "creates an outcome with default ratings and calculation method" do

@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// @ts-ignore: TS doesn't understand i18n scoped imports
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {ReactNode, useRef, useState} from 'react'
 import moment, {Moment} from 'moment-timezone'
@@ -74,6 +73,11 @@ export type CanvasDateInputProps = {
    */
   onSelectedDateChange: (date: Date | null) => void
   /**
+   * focus and blur event handlers
+   */
+  onBlur?: (event: React.FormEvent<HTMLInputElement>) => void
+  onFocus?: (event: React.FormEvent<HTMLInputElement>) => void
+  /**
    * Passed along to `DateInput`. Specifies if interaction with the input is enabled, disabled, or read-only. Read-only
    * prevents interactions, but is styled as if it were enabled.
    */
@@ -127,6 +131,8 @@ export default function CanvasDateInput({
   timezone = ENV?.TIMEZONE || Intl.DateTimeFormat().resolvedOptions().timeZone,
   formatDate,
   onSelectedDateChange,
+  onBlur,
+  onFocus,
   interaction = 'enabled',
   locale: specifiedLocale,
   placement = 'bottom center',
@@ -247,7 +253,7 @@ export default function CanvasDateInput({
     setInputDetails({method: 'pick', value: date})
   }
 
-  function handleBlur() {
+  function handleBlur(event) {
     const errorsExist = internalMessages.filter(m => m.type === 'error').length > 0
     const inputEmpty = inputValue.trim().length === 0
     const newDate = errorsExist || inputEmpty ? null : renderedMoment.toDate()
@@ -285,11 +291,12 @@ export default function CanvasDateInput({
         value: inputValue.trim()
       })
     }
+    onBlur?.(event)
   }
 
   function handleKey(e: KeyboardEvent) {
     if (e.key === 'Enter') {
-      handleBlur()
+      handleBlur(e)
     }
   }
 
@@ -380,6 +387,7 @@ export default function CanvasDateInput({
       messages={messages.concat(internalMessages)}
       isShowingCalendar={isShowingCalendar}
       onBlur={handleBlur}
+      onFocus={onFocus}
       onRequestShowCalendar={handleShowCalendar}
       onRequestHideCalendar={handleHideCalendar}
       onRequestSelectNextDay={() => modifySelectedMoment(1, 'day')}

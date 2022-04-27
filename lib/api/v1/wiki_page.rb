@@ -28,7 +28,7 @@ module Api::V1::WikiPage
 
   def wiki_page_json(wiki_page, current_user, session, include_body = true, opts = {})
     opts = opts.reverse_merge(include_assignment: true, assignment_opts: {})
-    opts.delete(:include_assignment) unless wiki_page.context.try(:feature_enabled?, :conditional_release)
+    opts.delete(:include_assignment) unless wiki_page.context.try(:conditional_release?)
 
     hash = api_json(wiki_page, current_user, session, only: WIKI_PAGE_JSON_ATTRS)
     hash["page_id"] = wiki_page.id || 0 # for new page js_env; otherwise Backbone will try to POST instead of PUT

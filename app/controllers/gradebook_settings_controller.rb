@@ -50,6 +50,7 @@ class GradebookSettingsController < ApplicationController
         selected_view_options_filters: []
       },
       :enter_grades_as,
+      :hide_assignment_group_totals,
       :show_concluded_enrollments,
       :show_inactive_enrollments,
       :show_unpublished_assignments,

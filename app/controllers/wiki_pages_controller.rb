@@ -106,7 +106,7 @@ class WikiPagesController < ApplicationController
       end
 
       if authorized_action(@page, @current_user, :read) &&
-         (!@context.feature_enabled?(:conditional_release) || enforce_assignment_visible(@page))
+         (!@context.conditional_release? || enforce_assignment_visible(@page))
         add_crumb(@page.title)
         log_asset_access(@page, "wiki", @wiki)
         wiki_pages_js_env(@context)
@@ -137,7 +137,7 @@ class WikiPagesController < ApplicationController
 
   def revisions
     if @page.grants_right?(@current_user, session, :read_revisions)
-      if !@context.feature_enabled?(:conditional_release) || enforce_assignment_visible(@page)
+      if !@context.conditional_release? || enforce_assignment_visible(@page)
         add_crumb(@page.title, polymorphic_url([@context, @page]))
         add_crumb(t("#crumbs.revisions", "Revisions"))
 
@@ -167,7 +167,7 @@ class WikiPagesController < ApplicationController
       wiki_page_menu_tools: external_tools_display_hashes(:wiki_page_menu),
       wiki_index_menu_tools: wiki_index_menu_tools,
       DISPLAY_SHOW_ALL_LINK: tab_enabled?(context.class::TAB_PAGES, { no_render: true }) && !@k5_details_view,
-      CAN_SET_TODO_DATE: context.grants_right?(@current_user, session, :manage_content)
+      CAN_SET_TODO_DATE: context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_edit)
     }
     js_env(@wiki_pages_env)
     @wiki_pages_env

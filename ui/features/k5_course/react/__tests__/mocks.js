@@ -117,6 +117,7 @@ export const MOCK_ASSIGNMENT_GROUPS = [
         html_url: 'http://localhost/wwii-report',
         due_at: '2020-04-18T05:59:59Z',
         points_possible: 10.0,
+        submission_types: ['online_text_entry'],
         grading_type: 'points',
         submission: {
           score: 9.5,
@@ -151,6 +152,7 @@ export const MOCK_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS = [
         html_url: 'http://localhost:3000/courses/30/assignments/9',
         due_at: '2021-10-25T05:59:59Z',
         points_possible: 10,
+        submission_types: ['online_text_entry'],
         grading_type: 'points',
         position: 5,
         name: 'Assignment 3',

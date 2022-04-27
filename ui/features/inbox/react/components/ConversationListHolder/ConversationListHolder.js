@@ -38,15 +38,12 @@ export const ConversationListHolder = ({...props}) => {
   const [selectedMessages, setSelectedMessages] = useState([])
   const [rangeClickStart, setRangeClickStart] = useState()
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
-  const {setMultiselect} = useContext(ConversationContext)
+  const {setMultiselect, isSubmissionCommentsType} = useContext(ConversationContext)
 
   const provideConversationsForOnSelect = conversationIds => {
-    const matchedConversations = props.conversations
-      ?.filter(c => conversationIds.includes(c._id))
-      .map(c => c.conversation)
+    const matchedConversations = props.conversations?.filter(c => conversationIds.includes(c._id))
     props.onSelect(matchedConversations)
   }
-
   /*
    * When conversations change, we need to re-provide the selectedConversations (CanvasInbox).
    * That way, other components have the latest state of the selected the conversations.
@@ -77,7 +74,7 @@ export const ConversationListHolder = ({...props}) => {
   }
 
   // Key handler for MessageListItems
-  const handleItemSelection = (e, _id, conversation, multiple) => {
+  const handleItemSelection = (e, _id, multiple) => {
     // Prevents selecting text when shift clicking to select range
     if (e.shiftKey) {
       window.document.getSelection().removeAllRanges()
@@ -177,27 +174,18 @@ export const ConversationListHolder = ({...props}) => {
       {props.conversations?.map(conversation => {
         return (
           <ConversationListItem
-            id={props.isSubmissionComments ? conversation[0].submissionId : conversation._id}
-            conversation={props.isSubmissionComments ? undefined : conversation.conversation}
-            submissionComments={props.isSubmissionComments ? conversation : undefined}
-            isStarred={props.isSubmissionComments ? false : conversation.label === 'starred'}
-            isSelected={
-              props.isSubmissionComments
-                ? selectedMessages.includes(conversation[0].submissionId)
-                : selectedMessages.includes(conversation._id)
-            }
-            isUnread={
-              props.isSubmissionComments
-                ? !conversation[0].read
-                : conversation.workflowState === 'unread'
-            }
+            id={conversation._id}
+            conversation={conversation}
+            isStarred={conversation?.label === 'starred'}
+            isSelected={selectedMessages.includes(conversation._id)}
+            isUnread={conversation?.workflowState === 'unread'}
             onOpen={props.onOpen}
             onRemoveFromSelectedConversations={removeFromSelectedConversations}
             onSelect={handleItemSelection}
-            onStar={props.isSubmissionComments ? () => {} : props.onStar}
-            key={props.isSubmissionComments ? conversation[0].submissionId : conversation._id}
+            onStar={props.onStar}
+            key={conversation._id}
             readStateChangeConversationParticipants={
-              props.isSubmissionComments ? () => {} : readStateChangeConversationParticipants
+              isSubmissionCommentsType ? () => {} : readStateChangeConversationParticipants
             }
           />
         )
@@ -238,13 +226,11 @@ ConversationListHolder.propTypes = {
   id: PropTypes.string,
   onOpen: PropTypes.func,
   onSelect: PropTypes.func,
-  onStar: PropTypes.func,
-  isSubmissionComments: PropTypes.bool
+  onStar: PropTypes.func
 }
 
 ConversationListHolder.defaultProps = {
   onOpen: () => {},
   onSelect: () => {},
-  onStar: () => {},
-  isSubmissionComments: false
+  onStar: () => {}
 }

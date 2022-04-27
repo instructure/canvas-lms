@@ -62,6 +62,10 @@ class Discussion
       fj("li:contains('Copy To...')")
     end
 
+    def course_pacing_notice
+      f("[data-testid='CoursePacingNotice']")
+    end
+
     # ---------------------- Actions ----------------------
     def visit(course, discussion)
       get("/courses/#{course.id}/discussion_topics/#{discussion.id}")

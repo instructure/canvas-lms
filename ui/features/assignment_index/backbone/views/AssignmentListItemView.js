@@ -354,8 +354,11 @@ export default AssignmentListItemView = (function () {
       data.canDuplicate = this.canDuplicate()
       data.is_locked = this.model.isRestrictedByMasterCourse()
       data.showAvailability =
-        this.model.multipleDueDates() || !this.model.defaultDates().available()
-      data.showDueDate = this.model.multipleDueDates() || this.model.singleSectionDueDate()
+        !(this.model.inPacedCourse() && this.canManage()) &&
+        (this.model.multipleDueDates() || !this.model.defaultDates().available())
+      data.showDueDate =
+        !(this.model.inPacedCourse() && this.canManage()) &&
+        (this.model.multipleDueDates() || this.model.singleSectionDueDate())
 
       data.cyoe = CyoeHelper.getItemData(
         data.id,
@@ -480,7 +483,8 @@ export default AssignmentListItemView = (function () {
       if (!this.canDelete()) {
         return
       }
-      if (!confirm(this.messages.confirm)) {
+      // eslint-disable-next-line no-alert
+      if (!window.confirm(this.messages.confirm)) {
         return this.$el.find('a[id*=manage_link]').focus()
       }
       if (this.previousAssignmentInGroup() != null) {

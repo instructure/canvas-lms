@@ -331,9 +331,7 @@ module ImprovedOutcomeManagementPage
     drilldown_outcome_groups.find { |group| group.text.split("\n")[0] == text }
   end
 
-  def enable_improved_outcomes_management_with_individual_ratings(account)
-    account.enable_feature!(:improved_outcomes_management)
-    account.enable_feature!(:individual_outcome_rating_and_calculation)
+  def disable_account_level_mastery_scales(account)
     account.disable_feature!(:account_level_mastery_scales)
   end
 

@@ -17,7 +17,6 @@
  */
 
 import React, {useEffect, useRef, useState} from 'react'
-// @ts-ignore: TS doesn't understand i18n scoped imports
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {ApplyTheme} from '@instructure/ui-themeable'
@@ -49,7 +48,7 @@ interface PassedProps {
   readonly coursePace: CoursePace
   readonly responsiveSize: ResponsiveSizes
   readonly showProjections: boolean
-  readonly isCompressing: boolean
+  readonly compression: number
 }
 
 export const Module: React.FC<PassedProps> = props => {
@@ -83,7 +82,7 @@ export const Module: React.FC<PassedProps> = props => {
   const renderDateColHeader = () => {
     if (!props.showProjections && !actuallyExpanded && !datesVisible) return null
     return (
-      <ColHeader width={actuallyExpanded ? '9.5em' : '0'} id={`module-${props.module.id}-duration`}>
+      <ColHeader width={actuallyExpanded ? 'auto' : '0'} id={`module-${props.module.id}-duration`}>
         <Flex
           as="div"
           aria-labelledby="due-date-column-title"
@@ -91,8 +90,8 @@ export const Module: React.FC<PassedProps> = props => {
           justifyItems="center"
           padding={headerPadding}
         >
-          <View id="due-date-column-title">{I18n.t('Due Date')} </View>
-          {props.isCompressing && (
+          <View id="due-date-column-title">{I18n.t('Due Date')}</View>
+          {props.compression > 0 && (
             <Tooltip
               renderTip={I18n.t(
                 'Due Dates are being compressed based on your start and end dates.'
@@ -121,7 +120,7 @@ export const Module: React.FC<PassedProps> = props => {
     // status changes or the course pace changes. This is necessary because the AssignmentRow maintains the duration in local state,
     // and applying updates with componentWillReceiveProps makes it buggy (because the Redux updates can be slow, causing changes to
     // get reverted as you type).
-    const key = `${item.id}|${item.module_item_id}|${props.coursePace.hard_end_dates}|${props.coursePace.updated_at}`
+    const key = `${item.id}|${item.module_item_id}|${props.compression}|${props.coursePace.updated_at}`
     return (
       <AssignmentRow
         key={key}
@@ -169,18 +168,17 @@ export const Module: React.FC<PassedProps> = props => {
           <View as="div" borderWidth="0 small">
             <Table
               caption={`${props.index}. ${props.module.name}`}
-              layout={props.responsiveSize === 'small' ? 'stacked' : 'fixed'}
+              layout={props.responsiveSize === 'small' ? 'stacked' : 'auto'}
             >
               <Head>
                 <Row>
-                  <ColHeader id={`module-${props.module.id}-assignments`}>
-                    <Flex as="div" alignItems="end" padding={headerPadding}>
+                  <ColHeader id={`module-${props.module.id}-assignments`} width="100%">
+                    <View as="div" padding={headerPadding}>
                       {I18n.t('Assignments')}
-                    </Flex>
+                    </View>
                   </ColHeader>
                   <ColHeader
                     id={`module-${props.module.id}-days`}
-                    width={isStudentPace ? '5rem' : '7.5rem'}
                     data-testid="pp-duration-columnheader"
                   >
                     <Flex
@@ -212,11 +210,7 @@ export const Module: React.FC<PassedProps> = props => {
                     </Flex>
                   </ColHeader>
                   {renderDateColHeader()}
-                  <ColHeader
-                    id={`module-${props.module.id}-status`}
-                    width="5rem"
-                    textAlign="center"
-                  >
+                  <ColHeader id={`module-${props.module.id}-status`} textAlign="center">
                     <Flex as="div" alignItems="end" justifyItems="center" padding={headerPadding}>
                       {I18n.t('Status')}
                     </Flex>

@@ -32,7 +32,7 @@ export default function FeaturedHelpLink({featuredLink, handleClick}) {
   if (featuredLink && window.ENV.FEATURES.featured_help_links) {
     return (
       <View textAlign="center" display="block">
-        <Img alt={I18n.t('Cheerful panda holding a map')} src={PandaMapSVGURL} margin="small 0" />
+        <Img data-testid="cheerful-panda-svg" src={PandaMapSVGURL} margin="small 0" />
         {featuredLink.feature_headline && (
           <Heading level="h3">{featuredLink.feature_headline}</Heading>
         )}

@@ -34,6 +34,7 @@ describe MediaObjectsController do
 
     it "creates a MediaObject if necessary on request" do
       # this test is purposely run with no user logged in to make sure it works in public courses
+      allow_any_instance_of(MediaObject).to receive(:context).and_return(course_factory)
 
       missing_media_id = "0_12345678"
       expect(MediaObject.by_media_id(missing_media_id)).to be_empty

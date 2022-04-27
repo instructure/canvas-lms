@@ -19,6 +19,7 @@
 
 require_relative "../common"
 require_relative "../helpers/assignment_overrides"
+require_relative "./page_objects/assignment_page"
 
 describe "assignment groups" do
   include AssignmentOverridesSeleniumHelper
@@ -204,6 +205,34 @@ describe "assignment groups" do
       expect(tooltip).to include_text "New Section"
       expect(tooltip).to include_text "Everyone else"
     end
+
+    context "in a paced course" do
+      before do
+        @course.enable_course_paces = true
+        @course.save!
+      end
+
+      it "shows the course pacing notice if in a paced course on show page" do
+        assignment = create_assignment!
+        get "/courses/#{@course.id}/assignments/#{assignment.id}"
+        expect(AssignmentPage.course_pacing_notice).to be_displayed
+        expect(f("#content")).not_to contain_css("table.assignment_dates")
+      end
+
+      it "shows the course pacing notice if in a paced course on edit page" do
+        assignment = create_assignment!
+        get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
+        expect(AssignmentPage.course_pacing_notice).to be_displayed
+      end
+
+      it "does not show availability or due dates on index page" do
+        assignment = create_assignment!
+        get "/courses/#{@course.id}/assignments"
+        expect(fj(".assignment-list:contains('#{assignment.title}')")).to be_displayed
+        expect(f(".assignment-list")).not_to contain_css('[data-view="date-available"]')
+        expect(f(".assignment-list")).not_to contain_css('[data-view="date-due"]')
+      end
+    end
   end
 
   context "as a student" do
@@ -219,6 +248,20 @@ describe "assignment groups" do
       get "/courses/#{@course.id}/assignments/#{assign.id}"
       wait_for_ajaximations
       expect(f(".student-assignment-overview")).to include_text "Available"
+    end
+
+    context "in a paces course" do
+      before do
+        @course.enable_course_paces = true
+        @course.save!
+        @assignment = create_assignment!
+      end
+
+      it "shows due date on the index page" do
+        get "/courses/#{@course.id}/assignments"
+        expect(fj(".assignment-list:contains('#{@assignment.title}')")).to be_displayed
+        expect(f(".assignment-list")).to contain_css('[data-view="date-due"]')
+      end
     end
   end
 end

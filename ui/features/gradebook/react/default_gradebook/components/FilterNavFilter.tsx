@@ -44,6 +44,7 @@ import type {
   Section,
   StudentGroupCategoryMap
 } from '../gradebook.d'
+import filterConditionTypes from '../constants/filterConditionTypes'
 
 const I18n = useI18nScope('gradebook')
 
@@ -112,6 +113,10 @@ export default function FilterNavFilter({
     })
   }
   const onChangeCondition = condition => {
+    const otherConditions = filter.conditions.filter(c => c.id !== condition.id)
+    if (otherConditions.find(c => c.type === condition.type)) {
+      throw new Error('condition type already exists')
+    }
     onChange({
       ...filter,
       conditions: filter.conditions
@@ -207,15 +212,17 @@ export default function FilterNavFilter({
       ))}
       <Flex justifyItems="space-between">
         <Item>
-          <Button
-            color="primary"
-            onClick={onAddCondition}
-            renderIcon={IconAddLine}
-            size="small"
-            withBackground={false}
-          >
-            {I18n.t('Add Condition')}
-          </Button>
+          {filter.conditions.length < filterConditionTypes.length && (
+            <Button
+              color="primary"
+              onClick={onAddCondition}
+              renderIcon={IconAddLine}
+              size="small"
+              withBackground={false}
+            >
+              {I18n.t('Add Condition')}
+            </Button>
+          )}
         </Item>
 
         <Item>

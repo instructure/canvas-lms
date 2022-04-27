@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, waitFor, fireEvent} from '@testing-library/react'
+import {render, waitFor, fireEvent, within, screen} from '@testing-library/react'
 import FileBrowser from '../FileBrowser'
 import {apiSource} from './filesHelpers'
 
@@ -26,13 +26,12 @@ jest.mock('../natcompare', () => ({strings: a => a}))
 const defaultProps = overrides => ({
   allowedUpload: true,
   selectFile: jest.fn(),
-  contentTypes: [],
   useContextAssets: false,
   searchString: '',
   onLoading: jest.fn(),
   context: {
     type: 'course',
-    id: 1
+    id: '1'
   },
   contentTypes: ['**'],
   source: apiSource(),
@@ -93,7 +92,7 @@ describe('FileBrowser', () => {
         expect(folder).toBeInTheDocument()
       })
 
-      it('fetches and renders the context root folder', async () => {
+      it('fetches course folder files', async () => {
         const {getByText} = subject(props)
         const folder = await waitFor(() => getByText('Course files'))
         fireEvent.click(folder)
@@ -109,6 +108,71 @@ describe('FileBrowser', () => {
         const file = await waitFor(() => getByText('its-working-its-working.jpg'))
         expect(file).toBeInTheDocument()
       })
+    })
+  })
+
+  describe('file icon', () => {
+    const getIconFor = async filename => {
+      return waitFor(() => {
+        const folderButton = screen.getByRole('button', {name: filename})
+        return within(folderButton).getAllByRole('presentation', {hidden: true})[0].outerHTML
+      })
+    }
+
+    beforeEach(async () => {
+      const {getByText} = subject(defaultProps())
+      const folder = await waitFor(() => getByText('My files'))
+      fireEvent.click(folder)
+    })
+
+    it('is an img thumbnail if the file is an image and has a thumbnailUrl', async () => {
+      const icon = await waitFor(() => {
+        const folderButton = screen.getByRole('button', {name: 'its-working-its-working.jpg'})
+        return within(folderButton).getByRole('img')
+      })
+      expect(icon.src).toEqual(
+        'http://canvas.docker/images/thumbnails/172/KEI31pWCjvr1yK3xOT0pwLUGnzxTQ0HEVjiCKqhQ'
+      )
+    })
+
+    it('is an Image icon if the file is an image without a thumbnailUrl', async () => {
+      const icon = await getIconFor('no-thumbnail.jpg')
+      expect(icon).toMatch(/IconImage/)
+    })
+
+    it('is an MsWord icon if the file is a document', async () => {
+      const icon = await getIconFor('doc.docx')
+      expect(icon).toMatch(/IconMsWord/)
+    })
+
+    it('is an MsPpt icon if the file is a slide deck', async () => {
+      const icon = await getIconFor('slides.pptx')
+      expect(icon).toMatch(/IconMsPpt/)
+    })
+
+    it('is a Pdf icon if the file is a pdf', async () => {
+      const icon = await getIconFor('pdf.pdf')
+      expect(icon).toMatch(/IconPdf/)
+    })
+
+    it('is a MsExcel icon if the file is a spreadsheet', async () => {
+      const icon = await getIconFor('spreadsheet.xlsx')
+      expect(icon).toMatch(/IconMsExcel/)
+    })
+
+    it('is a Video icon if the file is a video', async () => {
+      const icon = await getIconFor('vid.mov')
+      expect(icon).toMatch(/IconVideo/)
+    })
+
+    it('is an Audio icon if the file is audio', async () => {
+      const icon = await getIconFor('sound.mp4')
+      expect(icon).toMatch(/IconAudio/)
+    })
+
+    it('is a Document icon if the file does not fit in the other categories', async () => {
+      const icon = await getIconFor('docker-compose.override.yml')
+      expect(icon).toMatch(/IconDocument/)
     })
   })
 })

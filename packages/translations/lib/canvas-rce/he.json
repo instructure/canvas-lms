@@ -131,6 +131,9 @@
   "the_material_is_licensed_under_creative_commons_3242cb5e": {
     "message": "זכויות היוצרים של החומר במסגרת כללי נחלת הכלל - Creative Commons"
   },
+  "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
+    "message": "נוסחה זו לא ניתנת להצגה בתצוגה בסיסית"
+  },
   "title_ee03d132": { "message": "כותרת" },
   "unpublished_dfd8801": { "message": "לא פורסם" },
   "upload_file_fd2361b8": { "message": "העלאת קובץ" },

@@ -57,6 +57,9 @@
           </button>
         <% end %>
       <% end %>
+      <% if @context.account.feature_enabled?(:course_paces) && @context.enable_course_paces && @context.grants_any_right?(@current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS) %>
+        <a class="btn" id="course_paces_link" href="<%= course_course_pacing_path(@context) %>"><%= t("Course Pacing") %></a>
+      <% end %>
       <% if @can_edit %>
         <button class="btn btn-primary add_module_link">
           <i class="icon-plus" role="presentation"></i>
@@ -64,7 +67,7 @@
           <%= t('#context_modules.buttons.add_module', 'Module') %>
         </button>
       <% end %>
-      <% if @module_index_tools.present? || @module_menu_tools.present? %>
+      <% if @menu_tools[:module_index_menu].present? || @menu_tools[:module_index_menu_modal].present? %>
         <div class="inline-block module_index_tools">
           <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
             <i class="icon-more" aria-hidden="true"></i>
@@ -72,8 +75,8 @@
           </a>
 
           <ul id="toolbar-1" class="al-options" role="menu" aria-hidden="true" aria-expanded="false">
-            <%= external_tools_menu_items(@module_index_tools, {link_class: "menu_tray_tool_link", settings_key: :module_index_menu, in_list: true}) %>
-            <%= external_tools_menu_items(@module_menu_tools, {link_class: "menu_tray_tool_link", settings_key: :module_index_menu_modal, in_list: true}) %>
+            <%= external_tools_menu_items(@menu_tools[:module_index_menu], {link_class: "menu_tray_tool_link", settings_key: :module_index_menu, in_list: true}) %>
+            <%= external_tools_menu_items(@menu_tools[:module_index_menu_modal], {link_class: "menu_tray_tool_link", settings_key: :module_index_menu_modal, in_list: true}) %>
           </ul>
         </div>
       <% end %>
@@ -149,8 +152,7 @@
         <tr>
           <td><label for="content_tag_indent_select"><%= before_label('indent', %{Indent}) %></label></td>
           <td>
-            <label class="screenreader-only" for="content_tag_indent_select"><%= t('Select indentation') %></label>
-            <select name="content_tag[indent]" id="content_tag_indent_select">
+            <select name="content_tag[indent]" id="content_tag_indent_select"">
               <% 0.upto(3) do |i| %>
                 <option value="<%= i %>"><%= t('indent.n', { :zero => %{Don't Indent}, :one => %{Indent 1 Level}, :other => %{Indent %{count} Levels} }, :count => i) %></option>
               <% end %>

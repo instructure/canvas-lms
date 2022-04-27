@@ -20,6 +20,7 @@ import {Badge} from '@instructure/ui-badge'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {ConversationContext} from '../../../util/constants'
+import DateHelper from '@canvas/datetime/dateHelper'
 import {Focusable} from '@instructure/ui-focusable'
 import {Grid} from '@instructure/ui-grid'
 import {
@@ -43,9 +44,7 @@ const I18n = useI18nScope('conversations_2')
 
 export const ConversationListItem = ({...props}) => {
   const [isHovering, setIsHovering] = useState(false)
-  const {setMessageOpenEvent} = useContext(ConversationContext)
-
-  const isSubmissionComments = props.submissionComments && !props.conversation
+  const {setMessageOpenEvent, isSubmissionCommentsType} = useContext(ConversationContext)
 
   const handleConversationClick = e => {
     e.nativeEvent.stopImmediatePropagation()
@@ -58,19 +57,9 @@ export const ConversationListItem = ({...props}) => {
     }
 
     if (e.metaKey || e.ctrlKey || e.shiftKey) {
-      props.onSelect(
-        e,
-        props.id,
-        isSubmissionComments ? props.submissionComments : props.conversation,
-        true
-      )
+      props.onSelect(e, props.id, true)
     } else {
-      props.onSelect(
-        e,
-        props.id,
-        isSubmissionComments ? props.submissionComments : props.conversation,
-        false
-      )
+      props.onSelect(e, props.id, false)
       props.onOpen()
     }
   }
@@ -88,16 +77,7 @@ export const ConversationListItem = ({...props}) => {
   }
 
   const formatParticipants = () => {
-    const participantsStr = isSubmissionComments
-      ? ''
-      : props.conversation.conversationParticipantsConnection.nodes
-          .filter(
-            p =>
-              p.user.name !== props.conversation.conversationMessagesConnection.nodes[0].author.name
-          )
-          .reduce((prev, curr) => {
-            return prev + ', ' + curr.user.name
-          }, '')
+    const participantsStr = props.conversation.participantString
 
     return (
       <Responsive
@@ -123,23 +103,11 @@ export const ConversationListItem = ({...props}) => {
             size={responsiveProps.participants.size}
             data-testid={responsiveProps.datatestid}
           >
-            <TruncateText>
-              <b>
-                {isSubmissionComments
-                  ? props.submissionComments[0].author.name
-                  : props.conversation.conversationMessagesConnection.nodes[0].author.name}
-              </b>
-              {participantsStr}
-            </TruncateText>
+            <TruncateText>{participantsStr}</TruncateText>
           </Text>
         )}
       />
     )
-  }
-
-  const formatDate = rawDate => {
-    const date = new Date(rawDate)
-    return date.toDateString()
   }
 
   return (
@@ -229,20 +197,12 @@ export const ConversationListItem = ({...props}) => {
                 </Grid.Col>
                 <Grid.Col>
                   <Text color="brand" size={responsiveProps.date.size}>
-                    {formatDate(
-                      isSubmissionComments
-                        ? props.submissionComments[0].createdAt
-                        : props.conversation.conversationMessagesConnection.nodes[0]?.createdAt
-                    )}
+                    {DateHelper.formatDateForDisplay(props.conversation.lastMessageCreatedAt)}
                   </Text>
                 </Grid.Col>
                 <Grid.Col width="auto">
                   <Badge
-                    count={
-                      isSubmissionComments
-                        ? props.submissionComments.length
-                        : props.conversation.conversationMessagesConnection.nodes?.length
-                    }
+                    count={props.conversation.messages.length}
                     countUntil={99}
                     standalone
                     theme={{
@@ -286,13 +246,7 @@ export const ConversationListItem = ({...props}) => {
                 </Grid.Col>
                 <Grid.Col>
                   <Text weight="normal" size={responsiveProps.subject.size}>
-                    <TruncateText>
-                      {isSubmissionComments
-                        ? props.submissionComments[0].course.contextName +
-                          ' - ' +
-                          props.submissionComments[0].assignment.name
-                        : props.conversation.subject}
-                    </TruncateText>
+                    <TruncateText>{props.conversation.subject}</TruncateText>
                   </Text>
                 </Grid.Col>
               </Grid.Row>
@@ -302,15 +256,11 @@ export const ConversationListItem = ({...props}) => {
                 </Grid.Col>
                 <Grid.Col>
                   <Text color="secondary" size={responsiveProps.message.size}>
-                    <TruncateText>
-                      {isSubmissionComments
-                        ? props.submissionComments[0].comment
-                        : props.conversation.conversationMessagesConnection?.nodes[0]?.body}
-                    </TruncateText>
+                    <TruncateText>{props.conversation.lastMessageContent}</TruncateText>
                   </Text>
                 </Grid.Col>
                 <Grid.Col width="auto">
-                  {!isSubmissionComments && (
+                  {!isSubmissionCommentsType && (
                     <View textAlign="center" as="div" width={30} height={30} margin="0 small 0 0">
                       <Focusable>
                         {({focused}) => {
@@ -383,28 +333,9 @@ export const ConversationListItem = ({...props}) => {
   )
 }
 
-const participantProp = PropTypes.shape({name: PropTypes.string})
-
-const conversationMessageProp = PropTypes.shape({
-  author: participantProp,
-  participants: PropTypes.arrayOf(participantProp),
-  created_at: PropTypes.string,
-  body: PropTypes.string
-})
-
-export const conversationProp = PropTypes.shape({
-  id: PropTypes.string,
-  _id: PropTypes.string,
-  subject: PropTypes.string,
-  participants: PropTypes.arrayOf(participantProp),
-  conversationMessages: PropTypes.arrayOf(conversationMessageProp),
-  conversationMessagesConnection: PropTypes.object,
-  conversationParticipantsConnection: PropTypes.object
-})
-
 ConversationListItem.propTypes = {
-  conversation: conversationProp,
-  submissionComments: PropTypes.arrayOf(PropTypes.object),
+  conversation: PropTypes.object,
+  submissionComments: PropTypes.object,
   id: PropTypes.string,
   isSelected: PropTypes.bool,
   isStarred: PropTypes.bool,

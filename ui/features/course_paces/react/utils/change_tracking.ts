@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// @ts-ignore: TS doesn't understand i18n scoped imports
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {CoursePaceItem} from '../types'
+import {BlackoutDate} from '../shared/types'
 
 const I18n = useI18nScope('course_paces_change_tracking')
 
@@ -72,6 +72,19 @@ const formatDateSettingChange = (change: Change<string>, descriptiveName: string
     I18n.l('date.formats.long', change.newValue),
     change.oldValue && I18n.l('date.formats.long', change.oldValue)
   )
+
+const formatBlackoutDateSettingChange = (change: Change<BlackoutDate>): string => {
+  if (change.newValue && !change.oldValue) {
+    return I18n.t('Blackout date %{title} was added.', {title: change.newValue.event_title})
+  } else if (!change.newValue && change.oldValue) {
+    return I18n.t('Blackout date %{title} was deleted.', {title: change.oldValue.event_title})
+  } else if (change.newValue && change.oldValue) {
+    return I18n.t('Blackout date %{title} was edited.', {title: change.oldValue.event_title})
+  } else {
+    // something went awry
+    return ''
+  }
+}
 
 const formatUnknownSettingChange = (change: Change, descriptiveName: string = change.id) =>
   localizeChangeDescription(
@@ -132,11 +145,16 @@ export const summarizeSettingChanges = (settingChanges: Change[]): SummarizedCha
           summary = formatDateSettingChange(change as Change<string>, 'End Date')
         }
         break
+      case 'blackout_date':
+        summary = formatBlackoutDateSettingChange(change as Change<BlackoutDate>)
+        break
       default:
         summary = formatUnknownSettingChange(change)
     }
 
-    if (summary) summarizedChanges.push({id: change.id, summary})
+    if (summary) {
+      summarizedChanges.push({id: change.id, summary})
+    }
   }
 
   return summarizedChanges

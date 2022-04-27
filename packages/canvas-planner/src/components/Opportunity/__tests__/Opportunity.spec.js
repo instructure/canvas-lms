@@ -98,3 +98,9 @@ it('renders no close icon if dismissed', () => {
   const wrapper = mount(<Opportunity {...props} />)
   expect(wrapper.find('button').length).toEqual(0)
 })
+
+it('renders no close icon if user is observing a student', () => {
+  const props = defaultProps({isObserving: true})
+  const wrapper = mount(<Opportunity {...props} />)
+  expect(wrapper.find('button').length).toEqual(0)
+})

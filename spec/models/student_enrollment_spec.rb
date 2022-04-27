@@ -162,7 +162,7 @@ describe StudentEnrollment do
 
     it "does nothing if course paces aren't turned on" do
       @enrollment.update start_at: 1.day.from_now
-      expect(Delayed::Job.where(singleton: "course_pace_republish:#{@course.global_id}:")).not_to exist
+      expect(Delayed::Job.where(singleton: "course_pace_publish:#{@course_pace.id}")).not_to exist
     end
 
     context "with course paces enabled" do
@@ -173,13 +173,20 @@ describe StudentEnrollment do
 
       it "queues an update for a new student enrollment" do
         student_in_course(active_all: true, user: user_with_pseudonym)
-        expect(Delayed::Job.where(singleton: "course_pace_republish:#{@course.global_id}:")).to exist
+        expect(Delayed::Job.where(singleton: "course_pace_publish:#{@course_pace.id}")).to exist
+      end
+
+      it "queues an update for a student enrollment that goes from deleted to invited" do
+        @enrollment.destroy
+        expect(Delayed::Job.where(singleton: "course_pace_publish:#{@course_pace.id}")).not_to exist
+        @enrollment.update(workflow_state: "invited")
+        expect(Delayed::Job.where(singleton: "course_pace_publish:#{@course_pace.id}")).to exist
       end
 
       it "doesn't queue an update if the course pace isn't published" do
         @course_pace.update workflow_state: "unpublished"
         student_in_course(active_all: true, user: user_with_pseudonym)
-        expect(Delayed::Job.where(singleton: "course_pace_republish:#{@course.global_id}:")).not_to exist
+        expect(Delayed::Job.where(singleton: "course_pace_publish:#{@course_pace.id}")).not_to exist
       end
 
       it "publishes a student course pace (alone) if it exists" do
@@ -187,24 +194,24 @@ describe StudentEnrollment do
         student_course_pace.publish
         @enrollment.start_at = 2.days.from_now
         @enrollment.save!
-        expect(Delayed::Job.where(singleton: "course_pace_republish:#{@course.global_id}:")).not_to exist
-        expect(Delayed::Job.where(singleton: "course_pace_republish:#{@course.global_id}:#{@enrollment.global_user_id}")).to exist
+        expect(Delayed::Job.where(singleton: "course_pace_publish:#{@course_pace.id}")).not_to exist
+        expect(Delayed::Job.where(singleton: "course_pace_publish:#{student_course_pace.id}")).to exist
       end
 
       it "doesn't queue an update for irrelevant changes" do
         @enrollment.last_attended_at = 1.day.ago
         @enrollment.save!
-        expect(Delayed::Job.where(singleton: "course_pace_republish:#{@course.global_id}:")).not_to exist
+        expect(Delayed::Job.where(singleton: "course_pace_publish:#{@course_pace.id}")).not_to exist
       end
 
       it "queues only one update when multiple enrollments are created" do
         3.times { student_in_course(active_all: true, user: user_with_pseudonym) }
-        expect(Delayed::Job.where("singleton LIKE 'course_pace_republish:%'").count).to eq 1
+        expect(Delayed::Job.where("singleton LIKE 'course_pace_publish:%'").count).to eq 1
       end
 
       it "doesn't queue an update for non-student-enrollment creation" do
         ta_in_course(active_all: true, user: user_with_pseudonym)
-        expect(Delayed::Job.where(singleton: "course_pace_republish:#{@course.global_id}:")).not_to exist
+        expect(Delayed::Job.where(singleton: "course_pace_publish:#{@course_pace.id}")).not_to exist
       end
     end
   end

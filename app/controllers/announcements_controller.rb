@@ -39,7 +39,12 @@ class AnnouncementsController < ApplicationController
       can_create = @context.announcements.temp_record.grants_right?(@current_user, session, :create)
       js_env permissions: {
         create: can_create,
-        manage_content: @context.grants_right?(@current_user, session, :manage_content),
+        manage_content: @context.grants_any_right?(
+          @current_user,
+          session,
+          :manage_content,
+          *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
+        ),
         moderate: can_create
       }
       js_env is_showing_announcements: true

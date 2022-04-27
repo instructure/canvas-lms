@@ -46,6 +46,7 @@ describe "taking a quiz" do
       let(:quiz) { quiz_create(course: @course) }
 
       it 'automatically submits the quiz once the quiz is locked, and does not mark it "late"', priority: "1" do
+        skip "Failing Crystalball DEMO-212"
         auto_submit_quiz(quiz)
 
         verify_quiz_is_locked

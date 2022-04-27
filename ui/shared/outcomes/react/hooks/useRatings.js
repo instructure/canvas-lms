@@ -21,7 +21,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import uuid from 'uuid/v1'
 import useBoolean from './useBoolean'
 
-const I18n = useI18nScope('ProficiencyTable')
+const I18n = useI18nScope('useRatings')
 
 const floatRegex = /^[+-]?\d+(\.\d+)?$/
 
@@ -123,6 +123,16 @@ const useRatings = ({initialRatings, initialMasteryPoints}) => {
     )
   }, [ratingsWithValidations, masteryPointsWithValidations])
 
+  const ratingsError = useMemo(
+    () => ratingsWithValidations.some(r => r.pointsError || r.descriptionError),
+    [ratingsWithValidations]
+  )
+
+  const masteryPointsError = useMemo(
+    () => Boolean(masteryPointsWithValidations.error),
+    [masteryPointsWithValidations]
+  )
+
   const changeRatings = useCallback(
     value => {
       if (!hasChanged) setHasChanged()
@@ -139,13 +149,36 @@ const useRatings = ({initialRatings, initialMasteryPoints}) => {
     [hasChanged, setHasChanged]
   )
 
+  const prepareFocusClear = ratingsArr => ratingsArr.map(r => ({...r, focusField: null}))
+
+  const clearRatingsFocus = useCallback(() => setRatings(prepareFocusClear(ratings)), [ratings])
+
+  const focusOnRatingsError = useCallback(() => {
+    const updatedRatings = prepareFocusClear(ratings)
+
+    for (let i = 0; i < updatedRatings.length; i++) {
+      if (ratingsWithValidations[i].descriptionError) {
+        updatedRatings[i].focusField = 'description'
+      } else if (ratingsWithValidations[i].pointsError) {
+        updatedRatings[i].focusField = 'points'
+      }
+      if (updatedRatings[i].focusField) break
+    }
+
+    setRatings(updatedRatings)
+  }, [ratings, ratingsWithValidations])
+
   return {
     ratings: ratingsWithValidations,
     masteryPoints: masteryPointsWithValidations,
     setRatings: changeRatings,
     setMasteryPoints: changeMasteryPoints,
     hasError,
-    hasChanged
+    hasChanged,
+    ratingsError,
+    masteryPointsError,
+    clearRatingsFocus,
+    focusOnRatingsError
   }
 }
 

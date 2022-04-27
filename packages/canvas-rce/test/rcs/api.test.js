@@ -48,6 +48,7 @@ describe('sources/api', () => {
 
   afterEach(() => {
     fetchMock.restore()
+    alertFuncSpy.resetHistory()
   })
 
   describe('initializeCollection', () => {
@@ -453,6 +454,10 @@ describe('sources/api', () => {
     const fileProps = {}
     const apiProps = {}
 
+    afterEach(() => {
+      fetchMock.restore
+    })
+
     it('includes "onDuplicate"', () => {
       fetchMock.mock(uri, '{}')
 
@@ -528,6 +533,29 @@ describe('sources/api', () => {
       fetchMock.mock(uri, 500)
       return apiSource.preflightUpload(fileProps, apiProps).catch(e => {
         assert(e)
+      })
+    })
+
+    describe('when the file storage quota is exceeded', () => {
+      beforeEach(() => {
+        const error = new Error('file size exceeds quota')
+        error.response = {json: async () => ({message: 'file size exceeds quota'})}
+
+        fetchMock.mock(uri, {throws: error}, {overwriteRoutes: true})
+      })
+
+      it('gives a "quota" error if quota is full', () => {
+        try {
+          return apiSource
+            .preflightUpload(fileProps, apiProps)
+            .then(() => {
+              sinon.assert.calledWith(alertFuncSpy, {
+                text: 'File storage quota exceeded',
+                variant: 'error'
+              })
+            })
+            .catch(e => {})
+        } catch (e) {} // This will re-throw so we just catch it here/
       })
     })
   })

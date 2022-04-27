@@ -410,6 +410,9 @@
     "the_material_is_licensed_under_creative_commons_3242cb5e": {
         "message": "Το υλικό φέρει άδεια Creative Commons"
     },
+    "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
+        "message": "Αυτή η εξίσωση δεν είναι δυνατό να αναπαραχθεί στην Βασική Μορφή"
+    },
     "time_2b5aac58": {
         "message": "Χρόνος"
     },

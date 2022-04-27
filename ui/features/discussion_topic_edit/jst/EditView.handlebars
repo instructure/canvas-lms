@@ -164,8 +164,8 @@
           <div><label id="discussion_topic_delay_post_container" style="{{hiddenUnless delayed_post_at}}"
               class="checkbox short-label">
               {{#t "post_at"}}Post At{{/t}}
-              <input type="text" class="datetime_field input-medium" name="delayed_post_at" {{! TODO: what would be the
-                best way to get this formatted right? }} value="{{datetimeFormatted delayed_post_at}}"
+              <input type="text" class="datetime_field input-medium" name="delayed_post_at"
+                value="{{datetimeFormattedWithTz delayed_post_at}}"
                 aria-labelledby="discussion_topic_delay_post_accessible_label"
                 data-tooltip='{"position":"top","force_position":"true"}' title="{{accessibleDateFormat}}" />
             </label></div>

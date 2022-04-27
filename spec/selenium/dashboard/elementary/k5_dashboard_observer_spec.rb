@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../../common"
+require_relative "../pages/dashboard_page"
 require_relative "../pages/k5_dashboard_page"
 require_relative "../pages/k5_dashboard_common_page"
 require_relative "../pages/k5_grades_tab_page"
@@ -32,6 +33,7 @@ require_relative "../../../helpers/observer_enrollments_helper_spec"
 
 describe "observer k5 dashboard" do
   include_context "in-process server selenium tests"
+  include DashboardPage
   include K5DashboardPageObject
   include K5DashboardCommonPageObject
   include K5Common
@@ -197,6 +199,21 @@ describe "observer k5 dashboard" do
       click_observed_student_option("My2 Student")
 
       expect(element_value_for_attr(observed_student_dropdown, "value")).to eq("My2 Student")
+    end
+
+    it "switches to the classic dashboard when selecting a non-k5 student" do
+      Account.site_admin.enable_feature!(:observer_picker)
+
+      @course2 = course_factory(active_all: true)
+      @student2 = user_factory(active_all: true, name: "Classic Student")
+      @course2.enroll_student(@student2)
+      @course2.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @student2, enrollment_state: :active)
+
+      get "/"
+      expect(homeroom_tab).to be_displayed # k5 dashboard only
+      toggle_k5_setting(@account, false)
+      click_observed_student_option("Classic Student")
+      expect(todo_list_header).to be_displayed # classic dashboard only
     end
   end
 

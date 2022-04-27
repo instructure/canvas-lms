@@ -1217,4 +1217,19 @@ describe SIS::CSV::EnrollmentImporter do
     expect(@student.enrollments.size).to eq 0
     expect(importer.errors.map(&:last)).to eq ["Student enrollment for \"dee\" not allowed in blueprint course \"blue\""]
   end
+
+  it "does not enroll observers in blueprint courses" do
+    course_factory(account: @account, sis_source_id: "blue")
+    @teacher = user_with_managed_pseudonym(account: @account, sis_user_id: "daba")
+    @observer = user_with_managed_pseudonym(account: @account, sis_user_id: "dee")
+    MasterCourses::MasterTemplate.set_as_master_course(@course)
+    importer = process_csv_data(
+      "course_id,user_id,role,section_id,status,associated_user_id",
+      "blue,daba,teacher,,active,",
+      "blue,dee,observer,,active,"
+    )
+    expect(@teacher.enrollments.size).to eq 1
+    expect(@observer.enrollments.size).to eq 0
+    expect(importer.errors.map(&:last)).to eq ["Observer enrollment for \"dee\" not allowed in blueprint course \"blue\""]
+  end
 end

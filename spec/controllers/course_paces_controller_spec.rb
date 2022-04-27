@@ -41,6 +41,9 @@ describe CoursePacesController, type: :controller do
   before :once do
     course_with_teacher(active_all: true)
     @course.update(start_at: "2021-09-30", restrict_enrollments_to_course_dates: true)
+    @course.root_account.enable_feature!(:course_paces)
+    @course.enable_course_paces = true
+    @course.save!
     student_in_course(active_all: true)
     course_pace_model(course: @course)
     @student_enrollment = @student.enrollments.first
@@ -61,6 +64,11 @@ describe CoursePacesController, type: :controller do
     end
 
     @course.enable_course_paces = true
+    @course.blackout_dates = [BlackoutDate.new({
+                                                 event_title: "blackout dates 1",
+                                                 start_date: "2021-10-03",
+                                                 end_date: "2021-10-03"
+                                               })]
     @course.save!
     @course.account.enable_feature!(:course_paces)
 
@@ -90,7 +98,7 @@ describe CoursePacesController, type: :controller do
   end
 
   describe "GET #index" do
-    it "populates js_env with course, enrollment, sections, and course_pace details" do
+    it "populates js_env with course, enrollment, sections, blackout_dates, and course_pace details" do
       @section = @course.course_sections.first
       @student_enrollment = @course.enrollments.find_by(user_id: @student.id)
       @progress = @course_pace.create_publish_progress
@@ -99,7 +107,7 @@ describe CoursePacesController, type: :controller do
       expect(response).to be_successful
       expect(assigns[:js_bundles].flatten).to include(:course_paces)
       js_env = controller.js_env
-      expect(js_env[:BLACKOUT_DATES]).to eq([])
+      expect(js_env[:BLACKOUT_DATES]).to eq(@course.blackout_dates.as_json(include_root: false))
       expect(js_env[:COURSE]).to match(hash_including({
                                                         id: @course.id,
                                                         name: @course.name,

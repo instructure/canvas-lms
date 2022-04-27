@@ -44,11 +44,12 @@
   [role='cell'] {
     overflow: hidden;
     transition: height 500ms ease, width 500ms ease, opacity 500ms ease;
-    white-space: nowrap;
-
     &:nth-child(3):not(:last-child) {
       opacity: 0;
     }
+  }
+  & th {
+    white-space: nowrap;
   }
 
   & [role='cell'] {

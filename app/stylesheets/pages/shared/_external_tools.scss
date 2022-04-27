@@ -150,10 +150,13 @@ $app_height: 143px;
           height: 20px;
           #{direction(right)}: 0;
           z-index: 100;
-          color: #adadad;
+          color: #757575;
           text-align: direction(right);
           padding-#{direction(right)}: 5px;
           font-size: 0.9em;
+        }
+        .showing-details .installed-ribbon {
+          color: #909090;
         }
         .banner_image {
           width: $app_width - 40;

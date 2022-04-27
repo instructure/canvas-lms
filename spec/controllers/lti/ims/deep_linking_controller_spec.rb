@@ -68,7 +68,7 @@ module Lti
           end
         end
 
-        context "create resource links" do
+        context "when only creating resource links" do
           let(:launch_url) { "http://tool.url/launch" }
           let(:content_items) do
             [
@@ -89,21 +89,48 @@ module Lti
             tool
           end
 
-          it "create a resource link into the account context" do
-            subject
+          shared_examples_for "creates resource links in context" do
+            let(:context) { raise "set in examples " }
 
-            expect(account.lti_resource_links.size).to eq 1
-            expect(account.lti_resource_links.first.current_external_tool(account)).to eq tool
-            expect(account.lti_resource_links.first.context).to eq account
+            before do
+              subject
+            end
+
+            it "creates a resource link in the context" do
+              expect(context.lti_resource_links.size).to eq 1
+              expect(context.lti_resource_links.first.current_external_tool(context)).to eq tool
+              expect(context.lti_resource_links.first.context).to eq context
+            end
+
+            it "sends resource link uuid in content item response" do
+              expect(controller.content_items.first["lookup_uuid"]).to eq context.lti_resource_links.first.lookup_uuid
+            end
           end
 
-          it "add the lookup_uuid to the to the content item" do
-            subject
+          context "when context is an account" do
+            let(:params) { { JWT: deep_linking_jwt, account_id: account.id } }
 
-            content_items = controller.content_items
-            lti_resource_links = account.lti_resource_links
+            it_behaves_like "creates resource links in context" do
+              let(:context) { account }
+            end
+          end
 
-            expect(content_items.first["lookup_uuid"]).to eq lti_resource_links.first.lookup_uuid
+          context "when context is a course" do
+            let(:course) { course_model(account: account) }
+            let(:params) { { JWT: deep_linking_jwt, course_id: course.id } }
+
+            it_behaves_like "creates resource links in context" do
+              let(:context) { course }
+            end
+          end
+
+          context "when context is a group" do
+            let(:group) { group_model(context: course_model(account: account)) }
+            let(:params) { { JWT: deep_linking_jwt, group_id: group.id } }
+
+            it_behaves_like "creates resource links in context" do
+              let(:context) { group }
+            end
           end
         end
 
@@ -366,24 +393,21 @@ module Lti
                   [{ type: "ltiResourceLink", url: launch_url, title: "Item 1", custom_params: { "a" => "b" } }]
                 end
 
-                it "doesn't create a resource link" do
-                  # The resource links for these are rather created when the module item is created
-                  expect { subject }.not_to change { course.lti_resource_links.count }
+                it "creates a resource link" do
+                  expect { subject }.to change { course.lti_resource_links.count }.by 1
                 end
 
-                it "doesn't create a module item" do
-                  expect { subject }.not_to change { context_module.content_tags.count }
+                it "creates a module item" do
+                  expect { subject }.to change { context_module.content_tags.count }.by 1
                 end
 
-                it "doesn't ask to reload page" do
+                it "asks to reload page" do
                   subject
-                  expect(assigns.dig(:js_env, :deep_link_response, :reloadpage)).to be false
+                  expect(assigns.dig(:js_env, :deep_link_response, :reloadpage)).to be true
                 end
 
-                context "with line item" do
-                  let(:content_items) do
-                    [{ type: "ltiResourceLink", url: launch_url, title: "Item 1", lineItem: { scoreMaximum: 5 } }]
-                  end
+                context "when placement is link_selection" do
+                  let(:params) { super().merge({ placement: :link_selection }) }
 
                   it "doesn't create a resource link" do
                     # The resource links for these are rather created when the module item is created
@@ -397,6 +421,26 @@ module Lti
                   it "doesn't ask to reload page" do
                     subject
                     expect(assigns.dig(:js_env, :deep_link_response, :reloadpage)).to be false
+                  end
+
+                  context "with line item" do
+                    let(:content_items) do
+                      [{ type: "ltiResourceLink", url: launch_url, title: "Item 1", lineItem: { scoreMaximum: 5 } }]
+                    end
+
+                    it "doesn't create a resource link" do
+                      # The resource links for these are rather created when the module item is created
+                      expect { subject }.not_to change { course.lti_resource_links.count }
+                    end
+
+                    it "doesn't create a module item" do
+                      expect { subject }.not_to change { context_module.content_tags.count }
+                    end
+
+                    it "doesn't ask to reload page" do
+                      subject
+                      expect(assigns.dig(:js_env, :deep_link_response, :reloadpage)).to be false
+                    end
                   end
                 end
               end
@@ -760,6 +804,10 @@ module Lti
             end
 
             context "when on the new assignment page" do
+              before do
+                course.root_account.enable_feature! :lti_assignment_page_line_items
+              end
+
               let(:params) { super().merge({ placement: "assignment_selection" }) }
               let(:content_items) do
                 [
@@ -767,6 +815,14 @@ module Lti
                   { type: "ltiResourceLink", url: launch_url, title: "Item 2", lineItem: { scoreMaximum: 4 } },
                   { type: "ltiResourceLink", url: launch_url, title: "Item 3", lineItem: { scoreMaximum: 4 } }
                 ]
+              end
+
+              context "when assignment edit page feature flag is disabled" do
+                before do
+                  course.root_account.disable_feature! :lti_assignment_page_line_items
+                end
+
+                it_behaves_like "does nothing"
               end
 
               it "does not create a new module" do

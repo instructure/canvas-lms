@@ -610,4 +610,11 @@ describe Types::CourseType do
       expect(result).to eq @course.asset_string
     end
   end
+
+  describe "AllowFinalGradeOverride" do
+    it "returns the final grade override policy" do
+      result = course_type.resolve("allowFinalGradeOverride")
+      expect(result).to eq @course.allow_final_grade_override
+    end
+  end
 end

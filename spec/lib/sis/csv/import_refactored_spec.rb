@@ -78,6 +78,34 @@ describe SIS::CSV::ImportRefactored do
     expect(importer.errors.first.last).to eq "Malformed CSV"
   end
 
+  it "errors when the file is downloaded empty" do
+    lines = [
+      "user_id,login_id,first_name,last_name,email,status",
+      "U001,user1,User,One,user1@example.com,active"
+    ]
+
+    allow_any_instance_of(ParallelImporter).to receive(:attachment) do |parallel_importer|
+      attachment = Attachment.find(parallel_importer.attachment_id)
+      file = attachment.open
+      allow(attachment).to receive(:open) do |_attachment|
+        File.truncate(file.path, 0)
+        file
+      end
+      attachment
+    end
+
+    # we need to trigger the delayed processing threshold
+    Setting.set("sis_batch_parallelism_count_threshold", "0")
+
+    importer = process_csv_data(*lines)
+
+    friendly_error_message = importer.errors.first.last
+    matches = /\(Error report (?<error report id>\d+)\)/.match(friendly_error_message)
+    error_report = ErrorReport.find(matches["error report id"])
+    exception_message = error_report.data["exception_message"]
+    expect(exception_message).to match "Empty file"
+  end
+
   it "works for a mass import" do
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",

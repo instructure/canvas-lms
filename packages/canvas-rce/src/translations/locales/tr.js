@@ -207,6 +207,9 @@ const locale = {
   "the_material_is_licensed_under_creative_commons_3242cb5e": {
     "message": "Bu malzeme Creative Commons a göre lisanslı"
   },
+  "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
+    "message": "Bu denklem Temel Görünümde işlenemez."
+  },
   "title_ee03d132": { "message": "Başlık" },
   "to_be_posted_when_d24bf7dc": { "message": "Gönderileceği zaman: { when }" },
   "totalresults_results_found_numdisplayed_results_cu_a0a44975": {

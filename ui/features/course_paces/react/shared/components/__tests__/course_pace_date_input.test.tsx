@@ -58,7 +58,7 @@ describe('CoursePacesDateSelector', () => {
     const helpText = queryAllByText(/help text/)
     expect(startDateInput).toBeInTheDocument()
     expect(helpText.length).toBeTruthy()
-    expect(startDateInput.value).toBe('September 1, 2021')
+    expect(startDateInput.value).toBe('9/1/2021')
 
     fireEvent.change(startDateInput, {target: {value: 'September 3, 2021'}})
     fireEvent.blur(startDateInput)
@@ -70,7 +70,7 @@ describe('CoursePacesDateSelector', () => {
       <CoursePaceDateInput {...defaultProps} interaction="readonly" />
     )
     expect(getByText('The Label')).toBeInTheDocument()
-    expect(getByText('September 1, 2021')).toBeInTheDocument()
+    expect(getByText('Wed, Sep 1, 2021')).toBeInTheDocument()
     expect(queryByRole('combobox')).not.toBeInTheDocument()
   })
 

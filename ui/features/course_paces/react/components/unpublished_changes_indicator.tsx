@@ -18,12 +18,12 @@
 
 import React, {useEffect} from 'react'
 import {CondensedButton} from '@instructure/ui-buttons'
-// @ts-ignore: TS doesn't understand i18n scoped imports
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {getCoursePace, getPacePublishing, getUnpublishedChangeCount} from '../reducers/course_paces'
+import {getPacePublishing, getUnpublishedChangeCount} from '../reducers/course_paces'
+import {getBlackoutDatesSyncing} from '../shared/reducers/blackout_dates'
 import {StoreState} from '../types'
 import {connect} from 'react-redux'
-import {getCategoryError} from '../reducers/ui'
+import {getCategoryError, getSyncing} from '../reducers/ui'
 import {Spinner} from '@instructure/ui-spinner'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
@@ -32,17 +32,21 @@ import {View} from '@instructure/ui-view'
 const I18n = useI18nScope('unpublished_changes_button_props')
 
 type StateProps = {
-  changeCount: number
-  pacePublishing: boolean
-  newPace: boolean
-  publishError?: string
+  readonly changeCount: number
+  readonly blackoutDatesSyncing: boolean
+  readonly pacePublishing: boolean
+  readonly isSyncing: boolean
+  readonly publishError?: string
 }
 
-export type UnpublishedChangesIndicatorProps = StateProps & {
+type PassedProps = {
   onClick?: () => void
   onUnpublishedNavigation?: (e: BeforeUnloadEvent) => void
   margin?: any // type from CondensedButtonProps; passed through
+  readonly newPace: boolean
 }
+
+export type UnpublishedChangesIndicatorProps = StateProps & PassedProps
 
 const text = (changeCount: number) => {
   if (changeCount < 0) throw Error(`changeCount cannot be negative (${changeCount})`)
@@ -71,20 +75,20 @@ export const UnpublishedChangesIndicator = ({
   margin,
   newPace,
   onClick,
+  blackoutDatesSyncing,
   pacePublishing,
+  isSyncing,
   publishError,
   onUnpublishedNavigation = triggerBrowserWarning
 }: UnpublishedChangesIndicatorProps) => {
   const hasChanges = changeCount > 0
 
   useEffect(() => {
-    if (hasChanges) {
+    if (hasChanges || newPace) {
       window.addEventListener('beforeunload', onUnpublishedNavigation)
       return () => window.removeEventListener('beforeunload', onUnpublishedNavigation)
     }
-  }, [hasChanges, onUnpublishedNavigation])
-
-  if (newPace) return null
+  }, [hasChanges, newPace, onUnpublishedNavigation])
 
   if (publishError !== undefined) {
     return (
@@ -94,13 +98,28 @@ export const UnpublishedChangesIndicator = ({
     )
   }
 
-  if (pacePublishing) {
+  let publishingMessage
+  if (pacePublishing || isSyncing) {
+    publishingMessage = I18n.t('Publishing pace...')
+  } else if (blackoutDatesSyncing) {
+    publishingMessage = I18n.t('Saving blackout dates...')
+  }
+
+  if (isSyncing) {
     return (
       <View>
         <Spinner size="x-small" margin="0 x-small 0" renderTitle={I18n.t('Publishing pace...')} />
         <PresentationContent>
-          <Text>{I18n.t('Publishing pace...')}</Text>
+          <Text>{publishingMessage}</Text>
         </PresentationContent>
+      </View>
+    )
+  }
+
+  if (newPace && changeCount === 0) {
+    return (
+      <View margin={margin}>
+        <Text>{I18n.t('Pace is new and unpublished')}</Text>
       </View>
     )
   }
@@ -118,9 +137,10 @@ export const UnpublishedChangesIndicator = ({
 
 const mapStateToProps = (state: StoreState) => ({
   changeCount: getUnpublishedChangeCount(state),
+  blackoutDatesSyncing: getBlackoutDatesSyncing(state),
   pacePublishing: getPacePublishing(state),
-  newPace: !getCoursePace(state)?.id,
-  publishError: getCategoryError(state, 'publish')
+  isSyncing: getSyncing(state),
+  publishError: getCategoryError(state, ['publish', 'blackout_dates'])
 })
 
 export default connect(mapStateToProps)(UnpublishedChangesIndicator)

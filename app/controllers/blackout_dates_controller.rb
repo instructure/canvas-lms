@@ -63,6 +63,7 @@ class BlackoutDatesController < ApplicationController
   before_action :require_feature_flag
   before_action :authorize_action
   before_action :load_blackout_date, only: %i[show edit update destroy]
+  include GranularPermissionEnforcement
 
   # @API List blackout dates
   # Returns the list of blackout dates for the current context.
@@ -147,10 +148,56 @@ class BlackoutDatesController < ApplicationController
     head :no_content
   end
 
+  # @API Update a list of Blackout Dates
+  # Create, update, and delete blackout dates to sync the db with the incoming data.
+  #
+  # @argument blackout_dates: [blackout_date, ...]
+  #   An object containing the array of BlackoutDates we want to exist after this operation.
+  #   For array entries, if it has an id it will be updated, if not created, and if
+  #   an existing BlackoutDate id is missing from the array, it will be deleted.
+  #
+  # @returns BlackoutDate[]
+  #   The result (which should match the input with maybe some different IDs).
+  #
+  def bulk_update
+    incoming_blackout_dates = params.permit(blackout_dates: %i[id start_date end_date event_title])[:blackout_dates]
+    @blackout_dates = @context.blackout_dates
+
+    delete_these = @blackout_dates.pluck(:id) - incoming_blackout_dates.pluck(:id).map(&:to_i)
+    create_these = incoming_blackout_dates.select { |d| d[:id].nil? }
+    update_these = incoming_blackout_dates.select { |d| d[:id].present? }
+
+    BlackoutDate.transaction do
+      @context.blackout_dates.where(id: delete_these).destroy_all
+
+      update_these.each do |upd_d|
+        @context.blackout_dates.find(upd_d[:id]).update!(upd_d)
+      end
+
+      create_these.each do |new_d|
+        @context.blackout_dates.create!(new_d)
+      end
+    end
+    @blackout_dates.reload
+    render json: @blackout_dates.as_json(include_root: false)
+  end
+
   private
 
   def authorize_action
-    authorized_action(@context, @current_user, :manage_content)
+    enforce_granular_permissions(
+      @context,
+      overrides: [:manage_content],
+      actions: {
+        index: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
+        show: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
+        new: RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS,
+        create: [:manage_course_content_add],
+        update: [:manage_course_content_edit],
+        bulk_update: [:manage_course_content_edit],
+        destroy: [:manage_course_content_delete]
+      }
+    )
   end
 
   def require_feature_flag

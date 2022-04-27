@@ -25,8 +25,17 @@ import formatMessage from '../../../../../../format-message'
 import {cropperSettingsReducer, actions, defaultState} from '../../../reducers/imageCropper'
 import {Preview} from './Preview'
 import {Controls} from './controls'
+import {convertFileToBase64} from '../../../svg/utils'
+import {createCroppedImageSvg} from './imageCropUtils'
 
-export const ImageCropperModal = ({open, onClose, image}) => {
+const handleSubmit = (onSubmit, {image, shape, scaleRatio}) =>
+  createCroppedImageSvg({imageSrc: image, shape, scaleRatio})
+    .then(generatedSvg =>
+      convertFileToBase64(new Blob([generatedSvg.outerHTML], {type: 'image/svg+xml'}))
+    )
+    .then(base64Image => onSubmit(base64Image))
+
+export const ImageCropperModal = ({open, onClose, onSubmit, image}) => {
   const [settings, dispatch] = useReducer(cropperSettingsReducer, defaultState)
   useEffect(() => {
     dispatch({type: actions.SET_IMAGE, payload: image})
@@ -52,7 +61,14 @@ export const ImageCropperModal = ({open, onClose, image}) => {
         <Button onClick={onClose} margin="0 x-small 0 0">
           {formatMessage('Cancel')}
         </Button>
-        <Button color="primary" type="submit">
+        <Button
+          color="primary"
+          type="submit"
+          onClick={e => {
+            e.preventDefault()
+            handleSubmit(onSubmit, settings).then(onClose).catch(onClose)
+          }}
+        >
           {formatMessage('Save')}
         </Button>
       </Modal.Footer>
@@ -61,7 +77,14 @@ export const ImageCropperModal = ({open, onClose, image}) => {
 }
 
 ImageCropperModal.propTypes = {
+  image: PropTypes.string.isRequired,
   open: PropTypes.bool,
   onClose: PropTypes.func,
-  image: PropTypes.string
+  onSubmit: PropTypes.func
+}
+
+ImageCropperModal.defaultProps = {
+  open: false,
+  onClose: () => {},
+  onSubmit: () => {}
 }

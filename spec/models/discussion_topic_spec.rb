@@ -2829,4 +2829,41 @@ describe DiscussionTopic do
       end
     end
   end
+
+  describe "#update_assignment" do
+    context "with course paces" do
+      before do
+        discussion_topic_model(context: @course)
+        @course.root_account.enable_feature!(:course_paces)
+        @course.enable_course_paces = true
+        @course.save!
+        @course_pace = course_pace_model(course: @course)
+        @module = @course.context_modules.create!(name: "some module")
+        @tag = @module.add_item(type: "discussion_topic", id: @topic.id)
+        @module.save!
+        @topic.reload
+        # Reset progresses to verify progresses are added during tests
+        Progress.destroy_all
+      end
+
+      it "runs update_course_pace_module_items on content tags when an assignment is created" do
+        expect(Progress.last).to be_nil
+        @topic.assignment = @course.assignments.create!(title: "some assignment")
+        @topic.save!
+        expect(Progress.last.context).to eq(@course_pace)
+      end
+
+      it "runs update_course_pace_module_items on content tags when an assignment is removed" do
+        expect(Progress.last).to be_nil
+        @topic.assignment = @course.assignments.create!(title: "some assignment")
+        @topic.save!
+        expect(Progress.last.context).to eq(@course_pace)
+        Progress.last.destroy
+        @topic.old_assignment_id = @topic.assignment_id
+        @topic.assignment_id = nil
+        @topic.save!
+        expect(Progress.last.context).to eq(@course_pace)
+      end
+    end
+  end
 end

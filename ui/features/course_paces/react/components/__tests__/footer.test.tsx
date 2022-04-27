@@ -21,14 +21,15 @@ import {act, render, within} from '@testing-library/react'
 
 import {Footer} from '../footer'
 
-const publishPace = jest.fn()
-const resetPace = jest.fn()
+const syncUnpublishedChanges = jest.fn()
+const onResetPace = jest.fn()
 
 const defaultProps = {
   autoSaving: false,
   pacePublishing: false,
-  publishPace,
-  resetPace,
+  isSyncing: false,
+  syncUnpublishedChanges,
+  onResetPace,
   showLoadingOverlay: false,
   studentPace: false,
   unpublishedChanges: true
@@ -45,12 +46,12 @@ describe('Footer', () => {
     const cancelButton = getByRole('button', {name: 'Cancel'})
     expect(cancelButton).toBeInTheDocument()
     act(() => cancelButton.click())
-    expect(resetPace).toHaveBeenCalled()
+    expect(onResetPace).toHaveBeenCalled()
 
     const publishButton = getByRole('button', {name: 'Publish'})
     expect(publishButton).toBeInTheDocument()
     act(() => publishButton.click())
-    expect(publishPace).toHaveBeenCalled()
+    expect(syncUnpublishedChanges).toHaveBeenCalled()
   })
 
   it('shows cannot cancel and publish tooltip when there are no unpublished changes', () => {
@@ -60,7 +61,7 @@ describe('Footer', () => {
   })
 
   it('shows cannot cancel and publish tooltip while publishing', () => {
-    const {getByText} = render(<Footer {...defaultProps} pacePublishing />)
+    const {getByText} = render(<Footer {...defaultProps} pacePublishing isSyncing />)
     expect(getByText('You cannot cancel while publishing')).toBeInTheDocument()
     expect(getByText('You cannot publish while publishing')).toBeInTheDocument()
   })
@@ -77,8 +78,16 @@ describe('Footer', () => {
     expect(getByText('You cannot publish while loading the pace')).toBeInTheDocument()
   })
 
+  it('shows cannot cancel when a new pace', () => {
+    const {getByText, queryByText} = render(
+      <Footer {...defaultProps} unpublishedChanges={false} newPace />
+    )
+    expect(getByText('There are no pending changes to cancel')).toBeInTheDocument()
+    expect(queryByText('You cannot publish while loading the pace')).not.toBeInTheDocument()
+  })
+
   it('renders a loading spinner inside the publish button when publishing is ongoing', () => {
-    const {getByRole} = render(<Footer {...defaultProps} pacePublishing />)
+    const {getByRole} = render(<Footer {...defaultProps} pacePublishing isSyncing />)
 
     const publishButton = getByRole('button', {name: 'Publishing pace...'})
     expect(publishButton).toBeInTheDocument()

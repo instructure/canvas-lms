@@ -26,7 +26,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {HistoryShape} from './HistoryShape'
 import _ from 'lodash'
-import {formatTimeAgoDate, formatTimeAgoTitle} from '../jquery/instructure'
+import {formatTimeAgoDate, formatTimeAgoTitle} from '@canvas/enhanced-user-content'
 
 const I18n = useI18nScope('new_nav')
 

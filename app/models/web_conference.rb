@@ -466,10 +466,42 @@ class WebConference < ActiveRecord::Base
     given { |user, session| user && user.id == user_id && context.grants_right?(user, session, :create_conferences) }
     can :initiate and can :close
 
-    given { |user, session| context.grants_all_rights?(user, session, :manage_content, :create_conferences) }
+    #################### Begin legacy permission block #########################
+    given do |user, session|
+      user && !context.root_account.feature_enabled?(:granular_permissions_manage_course_content) &&
+        context.grants_all_rights?(user, session, :manage_content, :create_conferences)
+    end
     can :read and can :join and can :initiate and can :delete and can :close and can :manage_recordings
 
-    given { |user, session| context.grants_all_rights?(user, session, :manage_content, :create_conferences) && !finished? }
+    given do |user, session|
+      user && !context.root_account.feature_enabled?(:granular_permissions_manage_course_content) &&
+        !finished? && context.grants_all_rights?(user, session, :manage_content, :create_conferences)
+    end
+    can :update
+    ##################### End legacy permission block ##########################
+
+    given do |user, session|
+      user && context.root_account.feature_enabled?(:granular_permissions_manage_course_content) &&
+        context.grants_all_rights?(user, session, :manage_course_content_add, :create_conferences)
+    end
+    can :read and can :join and can :initiate
+
+    given do |user, session|
+      user && context.root_account.feature_enabled?(:granular_permissions_manage_course_content) &&
+        context.grants_all_rights?(user, session, :manage_course_content_delete, :create_conferences)
+    end
+    can :read and can :join and can :delete and can :close
+
+    given do |user, session|
+      user && context.root_account.feature_enabled?(:granular_permissions_manage_course_content) &&
+        context.grants_all_rights?(user, session, :manage_course_content_edit, :create_conferences)
+    end
+    can :read and can :join and can :manage_recordings
+
+    given do |user, session|
+      user && context.root_account.feature_enabled?(:granular_permissions_manage_course_content) &&
+        !finished? && context.grants_all_rights?(user, session, :manage_course_content_edit, :create_conferences)
+    end
     can :update
   end
 

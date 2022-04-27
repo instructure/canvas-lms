@@ -20,7 +20,7 @@ import {REQUEST_INITIAL_PAGE, REQUEST_PAGE, RECEIVE_PAGE, FAIL_PAGE} from '../ac
 
 // manages the state for a specific collection. assumes the action is intended
 // for this collection (see collections.js)
-export default function(state = {}, action) {
+export default function (state = {}, action) {
   switch (action.type) {
     case REQUEST_INITIAL_PAGE:
       return {
@@ -28,13 +28,15 @@ export default function(state = {}, action) {
         links: [],
         bookmark: null,
         isLoading: true,
+        cancel: action.cancel,
         hasMore: true,
         searchString: action.searchString
       }
     case REQUEST_PAGE:
       return {
         ...state,
-        isLoading: true
+        isLoading: true,
+        cancel: action.cancel
       }
 
     case RECEIVE_PAGE:
@@ -44,12 +46,14 @@ export default function(state = {}, action) {
         links: state.links.concat(action.links),
         bookmark: action.bookmark,
         isLoading: false,
+        cancel: null,
         hasMore: !!action.bookmark
       }
 
     case FAIL_PAGE: {
       const overrides = {
         isLoading: false,
+        cancel: null,
         error: action.error
       }
       if (state.links.length === 0) {

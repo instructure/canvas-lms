@@ -17,6 +17,7 @@
 
 import INST from 'browser-sniffer'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import ready from '@instructure/ready'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/forms/jquery/jquery.instructure_forms'
@@ -30,33 +31,31 @@ import 'jquery-scroll-to-visible/jquery.scrollTo'
 
 I18n = useI18nScope('user_lists')
 
-$user_lists_processed_person_template = $("#user_lists_processed_person_template").removeAttr("id").detach()
-$user_list_no_valid_users = $("#user_list_no_valid_users")
-$user_list_with_errors = $("#user_list_with_errors")
-$user_lists_processed_people = $("#user_lists_processed_people")
-$user_list_duplicates_found = $("#user_list_duplicates_found")
-$form = $("#enroll_users_form")
-$enrollment_blank = $("#enrollment_blank").removeAttr("id").hide()
-user_lists_path = $("#user_lists_path").attr("href")
-
 UL = INST.UserLists =
   init: ->
+    UL.$form = $("#enroll_users_form")
+    UL.$enrollment_blank = $("#enrollment_blank").removeAttr("id").hide()
+    UL.$user_lists_processed_person_template = $("#user_lists_processed_person_template").removeAttr("id").detach()
+    UL.$user_list_no_valid_users = $('#user_list_no_valid_users')
+    UL.$user_list_with_errors = $('#user_list_with_errors')
+    UL.$user_list_duplicates_found = $('#user_list_duplicates_found')
     UL.showTextarea()
 
-    $form.find(".cancel_button").click(->
+    UL.$form.find(".cancel_button").click ->
       $(".add_users_link").show()
-      $form.hide()
-    ).end().find(".go_back_button").click(UL.showTextarea).end().find(".verify_syntax_button").click((e) ->
+      UL.$form.hide()
+    UL.$form.find(".go_back_button").click(UL.showTextarea)
+    UL.$form.find(".verify_syntax_button").click (e) ->
       e.preventDefault()
       UL.showProcessing()
-      $.ajaxJSON user_lists_path, "POST", $form.getFormData(), UL.showResults
-    ).end().submit (event) ->
+      $.ajaxJSON $("#user_lists_path").attr("href"), "POST", UL.$form.getFormData(), UL.showResults
+    UL.$form.submit (event) ->
       event.preventDefault()
       event.stopPropagation()
-      $form.find(".add_users_button").text(I18n.t("adding_users", "Adding Users...")).attr "disabled", true
-      $.ajaxJSON $form.attr("action"), "POST", $form.getFormData(), UL.success, UL.failure
+      UL.$form.find(".add_users_button").text(I18n.t("adding_users", "Adding Users...")).attr "disabled", true
+      $.ajaxJSON UL.$form.attr("action"), "POST", UL.$form.getFormData(), UL.success, UL.failure
 
-    $form.find("#enrollment_type").change(->
+    UL.$form.find("#enrollment_type").change(->
       $("#limit_privileges_to_course_section_holder").showIf $(this).find(':selected').data("isAdmin")?
     ).change()
 
@@ -79,7 +78,7 @@ UL = INST.UserLists =
               UL.updateCounts()
 
   success: (enrollments) ->
-    $form.find(".user_list").val ""
+    UL.$form.find(".user_list").val ""
     UL.showTextarea()
     return false  if not enrollments or not enrollments.length
     already_existed = 0
@@ -106,33 +105,34 @@ UL = INST.UserLists =
     $.flashError I18n.t("users_adding_failed", "Failed to enroll users")
 
   showTextarea: ->
-    $form.find(".add_users_button, .go_back_button, #user_list_parsed").hide()
-    $form.find(".verify_syntax_button, .cancel_button, #user_list_textarea_container").show().removeAttr "disabled"
-    $form.find(".verify_syntax_button").attr("disabled", false).text I18n.t("buttons.continue", "Continue...")
-    $user_list = $form.find(".user_list").removeAttr('disabled').loadingImage('remove').focus()
+    UL.$form.find(".add_users_button, .go_back_button, #user_list_parsed").hide()
+    UL.$form.find(".verify_syntax_button, .cancel_button, #user_list_textarea_container").show().removeAttr "disabled"
+    UL.$form.find(".verify_syntax_button").attr("disabled", false).text I18n.t("buttons.continue", "Continue...")
+    $user_list = UL.$form.find(".user_list").removeAttr('disabled').loadingImage('remove').focus()
     $user_list.select() if $user_list.is(':visible') # .select() blows up in IE9 + jQuery 1.7.2 on invisible elements
 
   showProcessing: ->
-    $form.find(".verify_syntax_button").attr("disabled", true).text I18n.t("messages.processing", "Processing...")
-    $form.find(".user_list").attr("disabled", true).loadingImage()
+    UL.$form.find(".verify_syntax_button").attr("disabled", true).text I18n.t("messages.processing", "Processing...")
+    UL.$form.find(".user_list").attr("disabled", true).loadingImage()
 
   showResults: (userList) ->
-    $form.find(".add_users_button, .go_back_button, #user_list_parsed").show()
-    $form.find(".add_users_button").attr("disabled", false).focus().text I18n.t("add_n_users",
+    $user_lists_processed_people = $('#user_lists_processed_people')
+    UL.$form.find(".add_users_button, .go_back_button, #user_list_parsed").show()
+    UL.$form.find(".add_users_button").attr("disabled", false).focus().text I18n.t("add_n_users",
       one: "OK Looks Good, Add This 1 User"
       other: "OK Looks Good, Add These %{count} Users"
     ,
       count: userList.users.length
     )
-    $form.find(".verify_syntax_button, .cancel_button, #user_list_textarea_container").hide()
-    $form.find(".user_list").removeAttr("disabled").loadingImage "remove"
+    UL.$form.find(".verify_syntax_button, .cancel_button, #user_list_textarea_container").hide()
+    UL.$form.find(".user_list").removeAttr("disabled").loadingImage "remove"
     $user_lists_processed_people.html("").show()
     if not userList or not userList.users or not userList.users.length
-      $user_list_no_valid_users.appendTo $user_lists_processed_people
-      $form.find(".add_users_button").hide()
+      UL.$user_list_no_valid_users.appendTo $user_lists_processed_people
+      UL.$form.find(".add_users_button").hide()
     else
       if userList.errored_users and userList.errored_users.length
-        $user_list_with_errors.appendTo($user_lists_processed_people).find(".message_content").text I18n.t("user_parsing_errors",
+        UL.$user_list_with_errors.appendTo($user_lists_processed_people).find(".message_content").text I18n.t("user_parsing_errors",
           one: "There was 1 error parsing that list of users."
           other: "There were %{count} errors parsing that list of users."
         ,
@@ -144,14 +144,14 @@ UL = INST.UserLists =
           count: userList.users.length
         )
       if userList.duplicates and userList.duplicates.length
-        $user_list_duplicates_found.appendTo($user_lists_processed_people).find(".message_content").text I18n.t("duplicate_users",
+        UL.$user_list_duplicates_found.appendTo($user_lists_processed_people).find(".message_content").text I18n.t("duplicate_users",
           one: "1 duplicate user found, duplicates have been removed."
           other: "%{count} duplicate user found, duplicates have been removed."
         ,
           count: userList.duplicates.length
         )
       $.each userList.users, ->
-        userDiv = $user_lists_processed_person_template.clone(true).fillTemplateData(data: this).appendTo($user_lists_processed_people)
+        userDiv = UL.$user_lists_processed_person_template.clone(true).fillTemplateData(data: this).appendTo($user_lists_processed_people)
         userDiv.addClass("existing-user").attr "title", I18n.t("titles.existing_user", "Existing user")  if @user_id
         userDiv.show()
 
@@ -180,7 +180,7 @@ UL = INST.UserLists =
     already_existed = true
     unless $("#enrollment_" + enrollment.id).length
       already_existed = false
-      $enrollment = $enrollment_blank.clone(true).fillTemplateData(
+      $enrollment = UL.$enrollment_blank.clone(true).fillTemplateData(
         textValues: [ "name", "membership_type", "email", "enrollment_id" ]
         id: "enrollment_" + enrollment.id
         hrefValues: [ "id", "user_id", "pseudonym_id", "communication_channel_id" ]
@@ -199,5 +199,6 @@ UL = INST.UserLists =
     UL.updateCounts()
     if already_existed then 1 else 0
 
-$ UL.init
+ready -> $(UL.init)
+
 export default UL

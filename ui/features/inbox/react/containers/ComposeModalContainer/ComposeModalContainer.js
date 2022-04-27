@@ -47,7 +47,6 @@ const ComposeModalContainer = props => {
   const [sendIndividualMessages, setSendIndividualMessages] = useState(false)
   const [userNote, setUserNote] = useState(false)
   const [selectedContext, setSelectedContext] = useState()
-  const [selectedIds, setSelectedIds] = useState([])
   const [mediaUploadOpen, setMediaUploadOpen] = useState(false)
   const [uploadingMediaFile, setUploadingMediaFile] = useState(false)
   const [mediaUploadFile, setMediaUploadFile] = useState(null)
@@ -137,10 +136,6 @@ const ComposeModalContainer = props => {
     setSelectedContext({contextID: context.contextID, contextName: context.contextName})
   }
 
-  const onSelectedIdsChange = ids => {
-    setSelectedIds(ids)
-  }
-
   const validMessageFields = () => {
     // TODO: validate recipients
     if (!body) {
@@ -172,7 +167,7 @@ const ComposeModalContainer = props => {
           includedMessages: props.pastConversation?.conversationMessagesConnection.nodes.map(
             c => c._id
           ),
-          recipients: selectedIds.map(rec => rec?._id || rec.id),
+          recipients: props.selectedIds.map(rec => rec?._id || rec.id),
           mediaCommentId: mediaUploadFile?.mediaObject?.media_object?.media_id,
           mediaCommentType: mediaUploadFile?.mediaObject?.media_object?.media_type,
           contextCode: ENV.CONVERSATIONS.ACCOUNT_CONTEXT_CODE
@@ -185,7 +180,7 @@ const ComposeModalContainer = props => {
           body,
           userNote,
           contextCode: selectedContext?.contextID,
-          recipients: selectedIds.map(rec => rec?._id || rec.id),
+          recipients: props.selectedIds.map(rec => rec?._id || rec.id),
           subject,
           groupConversation: !sendIndividualMessages,
           mediaCommentId: mediaUploadFile?.mediaObject?.media_object?.media_id,
@@ -203,7 +198,7 @@ const ComposeModalContainer = props => {
     setBody(null)
     setBodyMessages([])
     setSelectedContext(null)
-    setSelectedIds([])
+    props.onSelectedIdsChange([])
     props.setSendingMessage(false)
     setSubject(null)
     setSendIndividualMessages(false)
@@ -249,11 +244,11 @@ const ComposeModalContainer = props => {
                 setUserNote={setUserNote}
                 contextName={props.pastConversation?.contextName}
                 courses={props.courses}
-                selectedRecipients={selectedIds}
+                selectedRecipients={props.selectedIds}
                 isReply={props.isReply}
                 isForward={props.isForward}
                 onContextSelect={onContextSelect}
-                onSelectedIdsChange={onSelectedIdsChange}
+                onSelectedIdsChange={props.onSelectedIdsChange}
                 onUserNoteChange={onUserNoteChange}
                 onSendIndividualMessagesChange={onSendIndividualMessagesChange}
                 onSubjectChange={onSubjectChange}
@@ -335,5 +330,7 @@ ComposeModalContainer.propTypes = {
   open: PropTypes.bool,
   pastConversation: Conversation.shape,
   sendingMessage: PropTypes.bool,
-  setSendingMessage: PropTypes.func
+  setSendingMessage: PropTypes.func,
+  onSelectedIdsChange: PropTypes.func,
+  selectedIds: PropTypes.array
 }

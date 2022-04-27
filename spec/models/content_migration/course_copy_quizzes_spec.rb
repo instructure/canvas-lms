@@ -1124,7 +1124,9 @@ describe ContentMigration do
       end
 
       it "copies only noop overrides" do
-        Account.default.enable_feature!(:conditional_release)
+        account = Account.default
+        account.settings[:conditional_release] = { value: true }
+        account.save!
         due_at = 1.hour.from_now.round
         assignment_override_model(quiz: @quiz_plain, set_type: "Noop", set_id: 1, title: "Tag 3")
         assignment_override_model(quiz: @quiz_assigned, set_type: "Noop", set_id: 1, title: "Tag 4", due_at: due_at)

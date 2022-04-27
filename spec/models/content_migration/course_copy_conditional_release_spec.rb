@@ -26,7 +26,8 @@ describe ContentMigration do
 
     before :once do
       setup_course_with_native_conditional_release(course: @copy_from)
-      @copy_to.enable_feature!(:conditional_release)
+      @copy_to.conditional_release = true
+      @copy_to.save!
     end
 
     def migrated_assignments(*original_assignments)

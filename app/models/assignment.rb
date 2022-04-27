@@ -1042,7 +1042,7 @@ class Assignment < ActiveRecord::Base
       topic.message = description
       save_submittable(topic)
       self.discussion_topic = topic
-    elsif context.feature_enabled?(:conditional_release) &&
+    elsif context.conditional_release? &&
           self.submission_types == "wiki_page" && @saved_by != :wiki_page
       page = wiki_page || context.wiki_pages.build(user: @updating_user)
       save_submittable(page)
@@ -1722,7 +1722,7 @@ class Assignment < ActiveRecord::Base
   def each_submission_type
     if block_given?
       submittable_types = %i[discussion_topic quiz]
-      submittable_types << :wiki_page if context.try(:feature_enabled?, :conditional_release)
+      submittable_types << :wiki_page if context.try(:conditional_release?)
       submittable_types.each do |asg_type|
         submittable = send(asg_type)
         yield submittable, Assignment.get_submission_type(asg_type), asg_type
@@ -3809,7 +3809,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def anonymous_student_identities
-    @anonymous_student_identities ||= anonymous_student_identities_query.each_with_object({}).with_index(1) do |(identity, identities), student_number|
+    @anonymous_student_identities ||= all_submissions.active.order(Arel.sql('anonymous_id COLLATE "C" ASC')).order("md5(id::text) ASC").each_with_object({}).with_index(1) do |(identity, identities), student_number|
       identities[identity["user_id"]] = {
         name: I18n.t("Student %{student_number}", { student_number: student_number }),
         position: student_number
@@ -3818,16 +3818,6 @@ class Assignment < ActiveRecord::Base
   end
 
   private
-
-  def anonymous_student_identities_query
-    # COLLATE "C" to force case-sensitive sorting
-    ActiveRecord::Base.connection.select_all(<<~SQL.squish)
-      SELECT user_id
-      FROM #{Submission.quoted_table_name}
-      WHERE assignment_id = #{id} AND workflow_state <> 'deleted'
-      ORDER BY anonymous_id COLLATE "C" ASC, md5(id::text) ASC
-    SQL
-  end
 
   def set_muted
     self.muted = true

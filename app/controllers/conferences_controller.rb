@@ -177,7 +177,7 @@ class ConferencesController < ApplicationController
     return unless @current_user
 
     log_api_asset_access(["conferences", @context], "conferences", "other")
-    conferences = if @context.grants_right?(@current_user, :manage_content)
+    conferences = if @context.grants_any_right?(@current_user, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
                     @context.web_conferences.active
                   else
                     @current_user.web_conferences.active.shard(@context.shard).where(context_type: @context.class.to_s, context_id: @context.id)

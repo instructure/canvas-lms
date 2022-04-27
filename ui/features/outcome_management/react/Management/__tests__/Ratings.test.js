@@ -175,4 +175,17 @@ describe('Ratings', () => {
       })
     })
   })
+
+  describe('Ratings table', () => {
+    const ratingsTableTestId = 'outcome-management-ratings-table'
+    it('renders the ratings table if canManage is false', () => {
+      const {getByTestId} = render(<Ratings {...defaultProps({canManage: false})} />)
+      expect(getByTestId(ratingsTableTestId)).toBeInTheDocument()
+    })
+
+    it('does not render the ratings table if canManage is true', () => {
+      const {queryByTestId} = render(<Ratings {...defaultProps()} />)
+      expect(queryByTestId(ratingsTableTestId)).not.toBeInTheDocument()
+    })
+  })
 })

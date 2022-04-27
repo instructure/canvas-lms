@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../../lib/canvas/draft_state_validations_spec"
+require_relative "../../lib/canvas/draft_state_validations_examples"
 
 describe Quizzes::Quiz do
   before :once do
@@ -262,6 +262,34 @@ describe Quizzes::Quiz do
         expect(@quiz.quiz_submissions.first.submission).to be_nil
         expect(@quiz.assignment).to be_nil
         expect(Submission.count).to eq(0)
+      end
+    end
+
+    context "with course paces" do
+      before do
+        create_quiz_with_submission(quiz_type: "assignment")
+        @course.root_account.enable_feature!(:course_paces)
+        @course.enable_course_paces = true
+        @course.save!
+        @course_pace = course_pace_model(course: @course)
+        @module = @course.context_modules.create!(name: "some module")
+        @tag = @module.add_item(type: "quiz", id: @quiz.id)
+        @module.save!
+        @quiz.reload
+        # Reset progresses to verify progresses are added during tests
+        Progress.destroy_all
+      end
+
+      it "runs update_course_pace_module_items on content tags when an assignment is created" do
+        expect(Progress.last).to be_nil
+        @quiz.update(assignment: @course.assignments.create!)
+        expect(Progress.last.context).to eq(@course_pace)
+      end
+
+      it "runs update_course_pace_module_items on content tags when an assignment is removed" do
+        expect(Progress.last).to be_nil
+        @quiz.update(quiz_type: "practice_quiz")
+        expect(Progress.last.context).to eq(@course_pace)
       end
     end
   end

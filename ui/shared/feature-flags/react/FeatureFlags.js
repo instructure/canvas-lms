@@ -23,12 +23,15 @@ import {groupBy, debounce} from 'lodash'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
+import {SimpleSelect} from '@instructure/ui-simple-select'
 import {IconSearchLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
+import {Button} from '@instructure/ui-buttons'
 
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import FeatureFlagTable from './FeatureFlagTable'
+import * as flagUtils from './util'
 
 const I18n = useI18nScope('feature_flags')
 
@@ -37,7 +40,9 @@ const SEARCH_DELAY = 350
 export default function FeatureFlags({hiddenFlags, disableDefaults}) {
   const [isLoading, setLoading] = useState(false)
   const [features, setFeatures] = useState([])
+  const [searchInput, setSearchInput] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
+  const [stateFilter, setStateFilter] = useState('all')
 
   useFetchApi({
     success: setFeatures,
@@ -50,11 +55,31 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
     }
   })
 
+  const matchesName = name => {
+    return name.toLowerCase().includes(searchQuery.toLowerCase())
+  }
+
+  const filterableStateOf = x => (x.state === 'hidden' ? 'off' : x.state)
+  function matchesState(flag) {
+    if (stateFilter === 'all') {
+      return true
+    }
+    const transitions = flagUtils.buildTransitions(
+      flag,
+      flagUtils.doesAllowDefaults(flag, disableDefaults)
+    )
+    if (stateFilter === 'enabled') {
+      return [transitions.enabled, 'allowed_on'].includes(filterableStateOf(flag))
+    } else {
+      return [transitions.disabled, 'allowed'].includes(filterableStateOf(flag))
+    }
+  }
+
+  const matchesFilters = x => matchesName(x.display_name) && matchesState(x.feature_flag)
+
   const groupedFeatures = groupBy(
     features.filter(
-      feat =>
-        (!hiddenFlags || !hiddenFlags.includes(feat.feature)) &&
-        feat.display_name.toLowerCase().includes(searchQuery.toLowerCase())
+      feat => (!hiddenFlags || !hiddenFlags.includes(feat.feature)) && matchesFilters(feat)
     ),
     'applies_to'
   )
@@ -63,6 +88,7 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
       groupedFeatures.RootAccount || []
     )
   }
+
   const categories = [
     {
       id: 'SiteAdmin',
@@ -82,10 +108,27 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
     }
   ]
 
-  const handleQueryChange = debounce(setSearchQuery, SEARCH_DELAY, {
+  const updateSearchQuery = debounce(setSearchQuery, SEARCH_DELAY, {
     leading: false,
     trailing: true
   })
+
+  const acceptSearchInput = (_e, val) => {
+    setSearchInput(val)
+    if (val !== searchInput && val.length > 2) {
+      updateSearchQuery(val)
+    } else if (val.length === 0) {
+      updateSearchQuery('')
+    }
+  }
+
+  const updateStateFilter = (_e, val) => setStateFilter(val.value)
+
+  const clearFilters = () => {
+    setSearchQuery('')
+    setSearchInput('')
+    setStateFilter('all')
+  }
 
   return (
     <View as="div">
@@ -93,18 +136,43 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
         <Spinner renderTitle={I18n.t('Loading feature options')} />
       ) : (
         <>
-          <View as="div" margin="0 0 medium">
-            <Flex.Item>
+          <Flex justifyItems="start">
+            <Flex.Item padding="small">
+              <SimpleSelect
+                assistiveText={I18n.t('Use arrow keys to navigate options.')}
+                renderLabel={<ScreenReaderContent>{I18n.t('Filter by')}</ScreenReaderContent>}
+                onChange={updateStateFilter}
+                width="10rem"
+                value={stateFilter}
+              >
+                <SimpleSelect.Option id="All" value="all">
+                  {I18n.t('All')}
+                </SimpleSelect.Option>
+                <SimpleSelect.Option id="Enabled" value="enabled">
+                  {I18n.t('Enabled')}
+                </SimpleSelect.Option>
+                <SimpleSelect.Option id="Disabled" value="disabled">
+                  {I18n.t('Disabled')}
+                </SimpleSelect.Option>
+              </SimpleSelect>
+            </Flex.Item>
+            <Flex.Item padding="small">
               <TextInput
                 renderLabel={<ScreenReaderContent>{I18n.t('Search Features')}</ScreenReaderContent>}
                 placeholder={I18n.t('Search')}
-                display="inline-block"
                 type="search"
-                onChange={(_e, val) => handleQueryChange(val)}
-                renderBeforeInput={<IconSearchLine display="block" />}
+                value={searchInput}
+                onChange={acceptSearchInput}
+                renderBeforeInput={<IconSearchLine inline={false} />}
+                display="inline-block"
               />
             </Flex.Item>
-          </View>
+            <Flex.Item padding="small">
+              <Button color="primary" onClick={clearFilters}>
+                {I18n.t('Clear')}
+              </Button>
+            </Flex.Item>
+          </Flex>
 
           {categories.map(cat => {
             if (!groupedFeatures[cat.id]?.length) {
@@ -116,6 +184,7 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
                 title={cat.title}
                 rows={groupedFeatures[cat.id]}
                 disableDefaults={disableDefaults}
+                filterByState={stateFilter}
               />
             )
           })}

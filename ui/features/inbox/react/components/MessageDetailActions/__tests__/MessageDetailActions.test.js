@@ -25,7 +25,8 @@ describe('MessageDetailItem', () => {
     const props = {
       onReply: jest.fn(),
       onReplyAll: jest.fn(),
-      onDelete: jest.fn()
+      onDelete: jest.fn(),
+      onForward: jest.fn()
     }
     const {getByRole, getByText} = render(<MessageDetailActions {...props} />)
 
@@ -45,5 +46,9 @@ describe('MessageDetailItem', () => {
     fireEvent.click(moreOptionsButton)
     fireEvent.click(getByText('Delete'))
     expect(props.onDelete).toHaveBeenCalled()
+
+    fireEvent.click(moreOptionsButton)
+    fireEvent.click(getByText('Forward'))
+    expect(props.onForward).toHaveBeenCalled()
   })
 })

@@ -22,8 +22,7 @@ require_relative "../graphql_spec_helper"
 
 RSpec.shared_examples "DiscussionType" do
   let(:discussion_type) { GraphQLTypeTester.new(discussion, current_user: @teacher) }
-
-  let(:permissions) do
+  let(:default_permissions) do
     [
       {
         value: "attach",
@@ -60,10 +59,6 @@ RSpec.shared_examples "DiscussionType" do
       {
         value: "studentReporting",
         allowed: ->(_user) { discussion.course.student_reporting? }
-      },
-      {
-        value: "manageContent",
-        allowed: ->(user) { discussion.context.grants_right?(user, :manage_content) }
       },
       {
         value: "readReplies",
@@ -131,6 +126,37 @@ RSpec.shared_examples "DiscussionType" do
         allowed: ->(user) { discussion.context.grants_right?(user, :read_as_admin) }
       }
     ]
+  end
+  let(:manage_course_content_permissions) do
+    [
+      {
+        value: "manageCourseContentAdd",
+        allowed: ->(user) { discussion.context.grants_right?(user, :manage_course_content_add) }
+      },
+      {
+        value: "manageCourseContentEdit",
+        allowed: ->(user) { discussion.context.grants_right?(user, :manage_course_content_edit) }
+      },
+      {
+        value: "manageCourseContentDelete",
+        allowed: ->(user) { discussion.context.grants_right?(user, :manage_course_content_delete) }
+      }
+    ]
+  end
+  let(:manage_content_permission) do
+    [
+      {
+        value: "manageContent",
+        allowed: ->(user) { discussion.context.grants_right?(user, :manage_content) }
+      }
+    ]
+  end
+  let(:permissions) do
+    if Account.default.feature_enabled?(:granular_permissions_manage_course_content)
+      default_permissions.concat(manage_course_content_permissions)
+    else
+      default_permissions.concat(manage_content_permission)
+    end
   end
 
   it "works" do
@@ -509,10 +535,10 @@ RSpec.shared_examples "DiscussionType" do
     end
 
     it "only counts entries that match the search term" do
-      entryCount = discussion_type.resolve('searchEntryCount(filter: all, searchTerm: "boo")')
+      entry_count = discussion_type.resolve('searchEntryCount(filter: all, searchTerm: "boo")')
       result = discussion_type.resolve('discussionEntriesConnection(searchTerm:"boo") { nodes { message } }')
       expect(result.count).to be 1
-      expect(entryCount).to be 1
+      expect(entry_count).to be 1
     end
   end
 
@@ -545,6 +571,19 @@ RSpec.shared_examples "DiscussionType" do
   end
 
   it "returns the current user permissions" do
+    Account.default.disable_feature!(:granular_permissions_manage_course_content)
+    student_in_course(active_all: true)
+    type_with_student = GraphQLTypeTester.new(discussion, current_user: @student)
+
+    permissions.each do |permission|
+      expect(discussion_type.resolve("permissions { #{permission[:value]} }")).to eq permission[:allowed].call(@teacher)
+
+      expect(type_with_student.resolve("permissions { #{permission[:value]} }")).to eq permission[:allowed].call(@student)
+    end
+  end
+
+  it "returns the current user permissions (granular permissions)" do
+    Account.default.enable_feature!(:granular_permissions_manage_course_content)
     student_in_course(active_all: true)
     type_with_student = GraphQLTypeTester.new(discussion, current_user: @student)
 

@@ -62,26 +62,30 @@ describe('useManagedCourseSearchApi', () => {
     ])
   })
 
-  it('passes "include" query param if "includeConcluded" is truthy', async () => {
+  it('passes "enforce_manage_grant_filter" query param on the the xhr call', async () => {
     setupManagedCoursesResponse()
-    renderHook(() => useManagedCourseSearchApi({params: {term: 'game'}}, true))
+    renderHook(() =>
+      useManagedCourseSearchApi({
+        params: {term: 'game', enforce_manage_grant_filter: true}
+      })
+    )
     await fetchMock.flush(true)
     expect(fetchMock.lastCall()[0]).toBe(
-      '/users/self/manageable_courses?term=game&include=concluded'
+      '/users/self/manageable_courses?term=game&enforce_manage_grant_filter=true'
     )
   })
 
-  it('does not pass an "include" query param if "includeConcluded" is falsy', async () => {
+  it('does not pass an "include" query param in abscence of that param', async () => {
     setupManagedCoursesResponse()
-    renderHook(() => useManagedCourseSearchApi({params: {term: 'game'}}, false))
+    renderHook(() => useManagedCourseSearchApi({params: {term: 'game'}}))
     await fetchMock.flush(true)
     expect(fetchMock.lastCall()[0]).toBe('/users/self/manageable_courses?term=game')
   })
 
   it('passes "include" query param properly in addition to existing params', async () => {
-    const params = {term: 'Course'}
+    const params = {term: 'Course', include: 'concluded'}
     setupManagedCoursesResponse()
-    renderHook(() => useManagedCourseSearchApi({params}, true))
+    renderHook(() => useManagedCourseSearchApi({params}))
     await fetchMock.flush(true)
     expect(fetchMock.lastCall()[0]).toBe(
       '/users/self/manageable_courses?term=Course&include=concluded'
@@ -89,7 +93,7 @@ describe('useManagedCourseSearchApi', () => {
   })
 
   describe('when user is a teacher', () => {
-    it('maks network request when search term is not included', async () => {
+    it('makes network request when search term is not included', async () => {
       setupManagedCoursesResponse()
       renderHook(useManagedCourseSearchApi)
       await fetchMock.flush(true)

@@ -19,6 +19,7 @@ import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 import {MessageDetailHeader} from '../MessageDetailHeader'
 import {responsiveQuerySizes} from '../../../../util/utils'
+import {ConversationContext} from '../../../../util/constants'
 
 jest.mock('../../../../util/utils', () => ({
   ...jest.requireActual('../../../../util/utils'),
@@ -48,6 +49,17 @@ describe('MessageDetailHeader', () => {
     const props = {text: 'Message Header Text'}
     const {getByText} = render(<MessageDetailHeader {...props} />)
     expect(getByText('Message Header Text')).toBeInTheDocument()
+  })
+
+  it('does not render the more options menu when in submission comments scope', () => {
+    const props = {text: 'Message Header Text'}
+    const {getByText, queryByTestId} = render(
+      <ConversationContext.Provider value={{isSubmissionCommentsType: true}}>
+        <MessageDetailHeader {...props} />
+      </ConversationContext.Provider>
+    )
+    expect(getByText('Message Header Text')).toBeInTheDocument()
+    expect(queryByTestId('message-more-options')).not.toBeInTheDocument()
   })
 
   describe('sends the selected option to the provided callback function', () => {
@@ -89,6 +101,18 @@ describe('MessageDetailHeader', () => {
       fireEvent.click(getByText('Delete'))
 
       expect(props.onDelete).toHaveBeenCalled()
+    })
+
+    it('sends the selected option to the onForward callback function', () => {
+      props.onForward = jest.fn()
+      const {getByRole, getByText} = render(<MessageDetailHeader {...props} />)
+      const moreOptionsButton = getByRole(
+        (role, element) => role === 'button' && element.textContent === 'More options'
+      )
+      fireEvent.click(moreOptionsButton)
+      fireEvent.click(getByText('Forward'))
+
+      expect(props.onForward).toHaveBeenCalled()
     })
   })
 
