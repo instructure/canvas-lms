@@ -71,6 +71,12 @@ describe('media utilities', () => {
       expect(sz.width).toEqual('400px')
       expect(sz.height).toEqual('800px')
     })
+    it('applies original video dimensions if container is null or undefined', () => {
+      const sz = sizeMediaPlayer({videoWidth: 250, videoHeight: 500}, 'video', null)
+      expect(sz.width).toEqual('250px')
+      expect(sz.height).toEqual('500px')
+    })
+
     it('constrains the height to be within the container', () => {
       const sz = sizeMediaPlayer(
         {videoWidth: 800, videoHeight: 500},
