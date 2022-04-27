@@ -7182,6 +7182,14 @@ describe Assignment do
       a.allowed_extensions = [".DOC", " .XLS", " .TXT"]
       expect(a.allowed_extensions).to eq %w[doc xls txt]
     end
+
+    it "must not allow allowed_extensions longer than the maximum length" do
+      a = Assignment.new(assignment_valid_attributes.merge({
+                                                             course: @course,
+                                                             allowed_extensions: ["docx", "pdf"] * 20
+                                                           }))
+      expect { a.save! }.to raise_error(ActiveRecord::RecordInvalid)
+    end
   end
 
   describe "generating comments from files" do
