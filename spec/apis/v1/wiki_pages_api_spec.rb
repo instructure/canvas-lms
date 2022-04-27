@@ -52,7 +52,7 @@ describe WikiPagesApiController, type: :request do
           format: "json",
           course_id: @course.id.to_s,
         }
-        path[:url] = "new-page" if @http_verb == :put
+        path[:url_or_id] = "new-page" if @http_verb == :put
         params = { wiki_page: wiki_params }
         api_call_as_user(user, @http_verb, @url, path, params, {}, { expected_status: expected_status })
       end
@@ -181,7 +181,7 @@ describe WikiPagesApiController, type: :request do
         action: "destroy",
         format: "json",
         course_id: @course.id.to_s,
-        url: @page.url,
+        url_or_id: @page.url,
       }
       api_call_as_user(user, :delete, url, path, {}, {}, { expected_status: expected_status })
     end
@@ -218,7 +218,7 @@ describe WikiPagesApiController, type: :request do
         action: "show",
         format: "json",
         course_id: @course.id.to_s,
-        url: @page.url,
+        url_or_id: @page.url,
       }
       api_call_as_user(user, :get, url, path, {}, {}, { expected_status: expected_status })
     end
@@ -260,7 +260,7 @@ describe WikiPagesApiController, type: :request do
                          action: "duplicate",
                          format: "json",
                          course_id: @course.id.to_s,
-                         url: @page.url },
+                         url_or_id: @page.url },
                        {},
                        {},
                        { expected_status: 401 })
@@ -273,7 +273,7 @@ describe WikiPagesApiController, type: :request do
                                 action: "duplicate",
                                 format: "json",
                                 course_id: @course.id.to_s,
-                                url: @page.url },
+                                url_or_id: @page.url },
                               {},
                               {},
                               { expected_status: 200 })
@@ -288,7 +288,7 @@ describe WikiPagesApiController, type: :request do
                                 action: "duplicate",
                                 format: "json",
                                 course_id: @course.id.to_s,
-                                url: @page.url },
+                                url_or_id: @page.url },
                               {},
                               {},
                               { expected_status: 200 })
