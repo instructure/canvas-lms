@@ -1421,18 +1421,18 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  def infered_workflow_state
-    infered_state = workflow_state
+  def inferred_workflow_state
+    inferred_state = workflow_state
 
     # New Quizzes returned a partial grade, but manual review is needed from a human
     return workflow_state if workflow_state == Submission.workflow_states.pending_review && graded_by_new_quizzes?
 
-    infered_state = Submission.workflow_states.submitted if unsubmitted? && submitted_at
-    infered_state = Submission.workflow_states.unsubmitted if submitted? && !has_submission?
-    infered_state = Submission.workflow_states.graded if grade && score && grade_matches_current_submission
-    infered_state = Submission.workflow_states.pending_review if submission_type == "online_quiz" && quiz_submission.try(:latest_submitted_attempt).try(:pending_review?)
+    inferred_state = Submission.workflow_states.submitted if unsubmitted? && submitted_at
+    inferred_state = Submission.workflow_states.unsubmitted if submitted? && !has_submission?
+    inferred_state = Submission.workflow_states.graded if grade && score && grade_matches_current_submission
+    inferred_state = Submission.workflow_states.pending_review if submission_type == "online_quiz" && quiz_submission.try(:latest_submitted_attempt).try(:pending_review?)
 
-    infered_state
+    inferred_state
   end
 
   def infer_values
@@ -1446,7 +1446,7 @@ class Submission < ActiveRecord::Base
 
     self.submitted_at ||= Time.now if has_submission?
     quiz_submission.reload if quiz_submission_id
-    self.workflow_state = infered_workflow_state
+    self.workflow_state = inferred_workflow_state
     if (workflow_state_changed? && graded?) || late_policy_status_changed?
       self.graded_at = Time.now
     end
