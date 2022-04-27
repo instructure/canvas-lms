@@ -128,9 +128,6 @@ function handleAnchorsWithImage() {
       elementRef: e => {
         $('.user_content a:has(img)').each(function () {
           $(this).addClass(e.className)
-          // Sets display inline block, since in Firefox anchor tags doesn't wrap the image size
-          // when they are focused causing UI discrepancies.
-          $(this).css('display', 'inline-block')
         })
       }
     },
@@ -815,7 +812,6 @@ function cancelDiscussionTopicSubMessageWhenClicked() {
 }
 
 function highlightDiscussionTopicMessagesOnHover() {
-
   $('.communication_message,.communication_sub_message')
     .bind('focusin mouseenter', function () {
       $(this).addClass('communication_message_hover')
