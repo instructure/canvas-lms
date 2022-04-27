@@ -33,11 +33,11 @@ import {responsiveQuerySizes} from '../../../util/utils'
 import {uploadFiles} from '@canvas/upload-file'
 import UploadMedia from '@instructure/canvas-media'
 import {
-  MediaCaptureStrings,
-  SelectStrings,
   UploadMediaStrings,
-  ConversationContext
-} from '../../../util/constants'
+  MediaCaptureStrings,
+  SelectStrings
+} from '@canvas/upload-media-translations'
+import {ConversationContext} from '../../../util/constants'
 
 const I18n = useI18nScope('conversations_2')
 
@@ -330,11 +330,7 @@ const ComposeModalContainer = props => {
         onDismiss={() => setMediaUploadOpen(false)}
         open={mediaUploadOpen}
         tabs={{embed: false, record: true, upload: true}}
-        uploadMediaTranslations={{
-          UploadMediaStrings: UploadMediaStrings(),
-          MediaCaptureStrings: MediaCaptureStrings(),
-          SelectStrings: SelectStrings()
-        }}
+        uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings, SelectStrings}}
         liveRegion={() => document.getElementById('flash_screenreader_holder')}
         languages={Object.keys(closedCaptionLanguages).map(key => {
           return {id: key, label: closedCaptionLanguages[key]}

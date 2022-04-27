@@ -72,7 +72,7 @@ function addUploaderFileCompleteEventListeners(uploader, context, file, done, on
           : 'video',
       context_code: mediaServerMediaObject.contextCode,
       title: file.name,
-      user_entered_title: file.name
+      user_entered_title: file.userEnteredTitle || file.name
     }
 
     try {

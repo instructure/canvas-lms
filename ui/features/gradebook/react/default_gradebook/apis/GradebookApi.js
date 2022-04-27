@@ -90,7 +90,7 @@ function updateGradebookFilter(courseId, filter) {
   })
 }
 
-function sendMesssageStudentsWho(recipientsIds, subject, body, contextCode) {
+function sendMessageStudentsWho(recipientsIds, subject, body, contextCode, mediaFile) {
   const params = {
     recipients: recipientsIds,
     subject,
@@ -100,6 +100,12 @@ function sendMesssageStudentsWho(recipientsIds, subject, body, contextCode) {
     group_conversation: true,
     bulk_message: true
   }
+
+  if (mediaFile) {
+    params.media_comment_id = mediaFile.id
+    params.media_comment_type = mediaFile.type
+  }
+
   return axios.post('/api/v1/conversations', params)
 }
 
@@ -113,5 +119,5 @@ export default {
   updateGradebookFilter,
   updateSubmission,
   updateTeacherNotesColumn,
-  sendMesssageStudentsWho
+  sendMessageStudentsWho
 }

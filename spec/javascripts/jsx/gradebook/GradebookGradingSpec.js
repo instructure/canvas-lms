@@ -1268,7 +1268,7 @@ QUnit.module('Gradebook#toggleViewUngradedAsZero', hooks => {
   })
 })
 
-QUnit.module('Gradebook#sendMesssageStudentsWho', hooks => {
+QUnit.module('Gradebook#sendMessageStudentsWho', hooks => {
   let gradebook
   let apiRequestStub
 
@@ -1307,7 +1307,7 @@ QUnit.module('Gradebook#sendMesssageStudentsWho', hooks => {
     sandbox.stub(FlashAlert, 'showFlashSuccess')
     sandbox.stub(FlashAlert, 'showFlashError')
 
-    apiRequestStub = sinon.stub(GradebookApi, 'sendMesssageStudentsWho').resolves()
+    apiRequestStub = sinon.stub(GradebookApi, 'sendMessageStudentsWho').resolves()
   })
 
   hooks.afterEach(() => {
@@ -1316,8 +1316,8 @@ QUnit.module('Gradebook#sendMesssageStudentsWho', hooks => {
     FlashAlert.showFlashError.restore()
   })
 
-  test('sends the messages via Gradebook.sendMesssageStudentsWho', async () => {
-    await gradebook.sendMesssageStudentsWho({
+  test('sends the messages via Gradebook.sendMessageStudentsWho', async () => {
+    await gradebook.sendMessageStudentsWho({
       recipientsIds,
       subject,
       body
@@ -1327,7 +1327,7 @@ QUnit.module('Gradebook#sendMesssageStudentsWho', hooks => {
   })
 
   test('includes recipientsIds as the first parameter', async () => {
-    await gradebook.sendMesssageStudentsWho({
+    await gradebook.sendMessageStudentsWho({
       recipientsIds,
       subject,
       body
@@ -1337,7 +1337,7 @@ QUnit.module('Gradebook#sendMesssageStudentsWho', hooks => {
   })
 
   test('includes subject as the second parameter', async () => {
-    await gradebook.sendMesssageStudentsWho({
+    await gradebook.sendMessageStudentsWho({
       recipientsIds,
       subject,
       body
@@ -1347,7 +1347,7 @@ QUnit.module('Gradebook#sendMesssageStudentsWho', hooks => {
   })
 
   test('includes body as the third parameter', async () => {
-    await gradebook.sendMesssageStudentsWho({
+    await gradebook.sendMessageStudentsWho({
       recipientsIds,
       subject,
       body
@@ -1358,7 +1358,7 @@ QUnit.module('Gradebook#sendMesssageStudentsWho', hooks => {
 
   test('shows a success flash alert when the process succeeds', async () => {
     const message = 'Message sent successfully'
-    await gradebook.sendMesssageStudentsWho({
+    await gradebook.sendMessageStudentsWho({
       recipientsIds,
       subject,
       body
@@ -1370,7 +1370,7 @@ QUnit.module('Gradebook#sendMesssageStudentsWho', hooks => {
     let errorThrown = false
     apiRequestStub.rejects(new Error(':-/'))
     try {
-      await gradebook.sendMesssageStudentsWho({
+      await gradebook.sendMessageStudentsWho({
         recipientsIds,
         subject,
         body

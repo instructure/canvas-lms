@@ -18,7 +18,7 @@
 
 import axios from '@canvas/axios'
 
-export function sendMesssageStudentsWho({recipientLids, subject, body, contextCode}) {
+export function sendMessageStudentsWho({recipientLids, subject, body, contextCode}) {
   const apiParams = {
     recipients: recipientLids,
     subject,

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useCallback, useEffect, useRef, useState} from 'react'
-import {number, oneOf, string} from 'prop-types'
+import {bool, number, oneOf, string} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {LoadingIndicator, isAudio, sizeMediaPlayer} from '@instructure/canvas-media'
 import {MediaPlayer} from '@instructure/ui-media-player'
@@ -104,17 +104,23 @@ export default function CanvasMediaPlayer(props) {
       const playerParent = containerRef.current
         ? containerRef.current.parentElement
         : window.frameElement
-      setPlayerSize(player, props.type, boundingBox(), window.frameElement || playerParent)
+      setPlayerSize(
+        player,
+        props.type,
+        boundingBox(),
+        window.frameElement || playerParent,
+        props.resizeContainer
+      )
     },
-    [props.type]
+    [props.resizeContainer, props.type]
   )
 
   const handlePlayerSize = useCallback(
     _event => {
       const player = window.document.body.querySelector('video')
-      setPlayerSize(player, props.type, boundingBox(), null)
+      setPlayerSize(player, props.type, boundingBox(), null, props.resizeContainer)
     },
-    [props.type]
+    [props.type, props.resizeContainer]
   )
 
   const fetchSources = useCallback(
@@ -227,9 +233,14 @@ export default function CanvasMediaPlayer(props) {
   }
 
   return (
-    <div ref={containerRef} data-tracks={JSON.stringify(media_tracks)}>
+    <div
+      style={{height: props.fluidHeight ? '100%' : 'auto'}}
+      ref={containerRef}
+      data-tracks={JSON.stringify(media_tracks)}
+    >
       {media_sources.length ? (
         <MediaPlayer
+          fluidHeight={props.fluidHeight}
           ref={mediaPlayerRef}
           sources={media_sources}
           tracks={props.media_tracks}
@@ -246,7 +257,7 @@ export default function CanvasMediaPlayer(props) {
   )
 }
 
-export function setPlayerSize(player, type, boundingBox, playerContainer) {
+export function setPlayerSize(player, type, boundingBox, playerContainer, resizeContainer = true) {
   const {width, height} = sizeMediaPlayer(player, type, boundingBox)
   player.style.width = width
   player.style.height = height
@@ -254,7 +265,7 @@ export function setPlayerSize(player, type, boundingBox, playerContainer) {
   player.classList.add(isAudio(type) ? 'audio-player' : 'video-player')
 
   // videos that are wide-and-short portrait need to shrink the parent
-  if (playerContainer && player.videoWidth > player.videoHeight) {
+  if (resizeContainer && playerContainer && player.videoWidth > player.videoHeight) {
     playerContainer.style.width = width
     playerContainer.style.height = height
 
@@ -271,10 +282,22 @@ export function setPlayerSize(player, type, boundingBox, playerContainer) {
   }
 }
 
+export function formatTracksForMediaPlayer(tracks) {
+  return tracks.map(track => ({
+    id: track.id,
+    src: `/media_objects/${track.media_object_id}/media_tracks/${track.id}`,
+    label: track.locale,
+    type: track.kind,
+    language: track.locale
+  }))
+}
+
 CanvasMediaPlayer.propTypes = {
+  fluidHeight: bool,
   media_id: string.isRequired,
   media_sources: MediaPlayer.propTypes.sources,
   media_tracks: MediaPlayer.propTypes.tracks,
+  resizeContainer: bool,
   type: oneOf(['audio', 'video']),
   MAX_RETRY_ATTEMPTS: number,
   SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS: number,
@@ -282,7 +305,9 @@ CanvasMediaPlayer.propTypes = {
 }
 
 CanvasMediaPlayer.defaultProps = {
+  fluidHeight: false,
   media_sources: [],
+  resizeContainer: true,
   type: 'video',
   MAX_RETRY_ATTEMPTS: DEFAULT_MAX_RETRY_ATTEMPTS,
   SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS: DEFAULT_SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS,

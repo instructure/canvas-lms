@@ -98,7 +98,8 @@ function mockContext(children) {
   )
 }
 
-describe('CommentsTrayBody', () => {
+// To be unskipped in EVAL-2477
+describe.skip('CommentsTrayBody', () => {
   beforeAll(() => {
     $('body').append('<div role="alert" id=flash_screenreader_holder />')
   })

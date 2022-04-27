@@ -153,6 +153,7 @@ export default class UploadMedia extends React.Component {
   uploadFile(file) {
     this.setState({uploading: true}, () => {
       this.props.onStartUpload && this.props.onStartUpload(file)
+      file.userEnteredTitle = file.title
       saveMediaRecording(
         file,
         this.props.rcsConfig,
@@ -171,15 +172,16 @@ export default class UploadMedia extends React.Component {
       this.props.onUploadComplete && this.props.onUploadComplete(err, data)
     } else {
       try {
+        let captions
         if (this.state.selectedPanel === PANELS.COMPUTER && this.state.subtitles.length > 0) {
-          await saveClosedCaptions(
+          captions = await saveClosedCaptions(
             data.mediaObject.media_object.media_id,
             this.state.subtitles,
             this.props.rcsConfig,
             RCS_MAX_BODY_SIZE - RCS_REQUEST_SIZE_BUFFER
           )
         }
-        this.props.onUploadComplete && this.props.onUploadComplete(null, data)
+        this.props.onUploadComplete && this.props.onUploadComplete(null, data, captions?.data)
       } catch (ex) {
         this.props.onUploadComplete && this.props.onUploadComplete(ex, null)
       }
