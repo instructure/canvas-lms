@@ -176,7 +176,9 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         settingKey: 'grade'
       },
 
-      submissionsLoaded: true
+      submissionsLoaded: true,
+
+      userId: '123'
     }
   })
 

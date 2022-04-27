@@ -35,7 +35,7 @@ import LoadingIndicator from '@canvas/loading-indicator'
 import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {submissionCommentAttachmentsUpload} from '@canvas/upload-file'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
-import {UploadMediaStrings, MediaCaptureStrings} from '../../helpers/UploadMediaTranslations'
+import {UploadMediaStrings, MediaCaptureStrings} from '@canvas/upload-media-translations'
 import {EmojiPicker, EmojiQuickPicker} from '@canvas/emoji'
 
 const I18n = useI18nScope('assignments_2')

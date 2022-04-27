@@ -17,6 +17,7 @@
  */
 
 export {AttachmentDisplay} from './react/components/AttachmentDisplay/AttachmentDisplay'
+export {MediaAttachment} from './react/components/MediaAttachment/MediaAttachment'
 export {AttachmentUploadSpinner} from './react/components/AttachmentUploadSpinner/AttachmentUploadSpinner'
 export {FileAttachmentUpload} from './react/components/FileAttachmentUpload/FileAttachmentUpload'
 export {addAttachmentsFn, removeAttachmentFn} from './util/attachments'

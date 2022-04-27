@@ -115,6 +115,7 @@ function makeProps(overrides: object = {}): ComponentProps {
     onClose: () => {},
     onSend: () => {},
     messageAttachmentUploadFolderId: '1',
+    userId: '345',
     ...overrides
   }
 }
@@ -226,8 +227,8 @@ describe.skip('MessageStudentsWhoDialog', () => {
     expect(observerCells[0]).toHaveTextContent('Observers')
     expect(observerCells[1]).toHaveTextContent('Observer0')
     expect(observerCells[2]).toHaveTextContent('Observer1')
-    expect(observerCells[3]).toBeNull
-    expect(observerCells[4]).toBeNull
+    expect(observerCells[3]).toBeNull()
+    expect(observerCells[4]).toBeNull()
   })
 
   it('shows observers in the same cell sorted by the sortable name when observing the same student', async () => {
@@ -248,9 +249,9 @@ describe.skip('MessageStudentsWhoDialog', () => {
     expect(observerCells).toHaveLength(5)
     expect(observerCells[0]).toHaveTextContent('Observers')
     expect(observerCells[1]).toHaveTextContent('Observer0Observer1')
-    expect(observerCells[2]).toBeNull
-    expect(observerCells[3]).toBeNull
-    expect(observerCells[4]).toBeNull
+    expect(observerCells[2]).toBeNull()
+    expect(observerCells[3]).toBeNull()
+    expect(observerCells[4]).toBeNull()
   })
 
   it('includes the total number of students in the checkbox label', async () => {
@@ -740,9 +741,9 @@ describe.skip('MessageStudentsWhoDialog', () => {
     it('sets the students checkbox as disabled when the students list is empty', async () => {
       const mocks = await makeMocks()
 
-      const {findByRole, getByRole} = render(
+      const {findByRole} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
-          <MessageStudentsWhoDialog {...makeProps({students:[]})} />
+          <MessageStudentsWhoDialog {...makeProps({students: []})} />
         </MockedProvider>
       )
 
@@ -1121,7 +1122,9 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const sendButton = await findByRole('button', {name: 'Send'})
       fireEvent.click(sendButton)
 
-      expect(onSend).toHaveBeenCalledWith(expect.objectContaining({recipientsIds: ["101", "102", "103"]}))
+      expect(onSend).toHaveBeenCalledWith(
+        expect.objectContaining({recipientsIds: ['101', '102', '103']})
+      )
       expect(onClose).toHaveBeenCalled()
     })
 
@@ -1153,7 +1156,9 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const sendButton = await findByRole('button', {name: 'Send'})
       fireEvent.click(sendButton)
 
-      const observerIds = mocks[0].result.data.course.enrollmentsConnection.nodes.map(node => node.user._id)
+      const observerIds = mocks[0].result.data.course.enrollmentsConnection.nodes.map(
+        node => node.user._id
+      )
       expect(onSend).toHaveBeenCalledWith(expect.objectContaining({recipientsIds: observerIds}))
       expect(onClose).toHaveBeenCalled()
     })

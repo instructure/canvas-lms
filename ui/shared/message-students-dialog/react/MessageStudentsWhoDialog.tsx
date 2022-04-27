@@ -18,13 +18,26 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState, useContext, useEffect} from 'react'
-import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {IconArrowOpenDownLine, IconArrowOpenUpLine} from '@instructure/ui-icons'
+import {
+  IconArrowOpenDownLine,
+  IconArrowOpenUpLine,
+  IconAttachMediaLine
+} from '@instructure/ui-icons'
+import UploadMedia from '@instructure/canvas-media'
+import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
+import {formatTracksForMediaPlayer} from '@canvas/canvas-media-player'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {Link} from '@instructure/ui-link'
 import LoadingIndicator from '@canvas/loading-indicator'
+import {
+  UploadMediaStrings,
+  MediaCaptureStrings,
+  SelectStrings
+} from '@canvas/upload-media-translations'
 import {Modal} from '@instructure/ui-modal'
 import {NumberInput} from '@instructure/ui-number-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -45,6 +58,7 @@ import {
   FileAttachmentUpload,
   AttachmentUploadSpinner,
   AttachmentDisplay,
+  MediaAttachment,
   addAttachmentsFn,
   removeAttachmentFn
 } from '@canvas/message-attachments'
@@ -83,6 +97,27 @@ export type Props = {
   students: Student[]
   onSend: (args: SendArgs) => void
   messageAttachmentUploadFolderId: string
+  userId: string
+}
+
+type MediaFile = {
+  id: string
+  type: string
+}
+
+type MediaTrack = {
+  id: string
+  src: string
+  label: string
+  type: string
+  language: string
+}
+
+type MediaUploadFile = {
+  media_id: string
+  title: string
+  media_type: string
+  media_tracks?: MediaTrack[]
 }
 
 type FilterCriterion = {
@@ -96,6 +131,7 @@ type SendArgs = {
   recipientsIds: number[]
   subject: string
   body: string
+  mediaFile?: MediaFile
 }
 
 const isScored = (assignment: Assignment) =>
@@ -167,12 +203,12 @@ function filterStudents(criterion, students, cutoff) {
         }
         break
       case 'scored_more_than':
-        if (parseInt(student.score) > cutoff) {
+        if (parseInt(student.score, 10) > cutoff) {
           newfilteredStudents.push(student)
         }
         break
       case 'scored_less_than':
-        if (parseInt(student.score) < cutoff) {
+        if (parseInt(student.score, 10) < cutoff) {
           newfilteredStudents.push(student)
         }
         break
@@ -196,7 +232,8 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
   onClose,
   students,
   onSend,
-  messageAttachmentUploadFolderId
+  messageAttachmentUploadFolderId,
+  userId
 }) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [open, setOpen] = useState(true)
@@ -204,8 +241,8 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
   const [subject, setSubject] = useState('')
   const [message, setMessage] = useState('')
 
-  const initializeSelectedObservers = (students) =>
-    students.reduce((map, student) => {
+  const initializeSelectedObservers = studentCollection =>
+    studentCollection.reduce((map, student) => {
       map[student.id] = []
       return map
     }, {})
@@ -218,7 +255,10 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
   const [isCheckedObserversCheckbox, setIsCheckedObserversCheckbox] = useState(false)
   const [isDisabledStudentsCheckbox, setIsDisabledStudentsCheckbox] = useState(false)
   const [isDisabledObserversCheckbox, setIsDisabledObserversCheckbox] = useState(false)
-
+  const [mediaUploadOpen, setMediaUploadOpen] = useState<boolean>(false)
+  const [mediaUploadFile, setMediaUploadFile] = useState<null | MediaUploadFile>(null)
+  const [mediaPreviewURL, setMediaPreviewURL] = useState<null | string>(null)
+  const [mediaTitle, setMediaTitle] = useState<string>('')
   const close = () => setOpen(false)
 
   const {loading, data} = useQuery(OBSERVER_ENROLLMENTS_QUERY, {
@@ -259,7 +299,9 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
     )
     setIsIndeterminateStudentsCheckbox(partialStudentSelection)
     setIsDisabledStudentsCheckbox(filteredStudents.length === 0)
-    setIsCheckedStudentsCheckbox(filteredStudents.length > 0 && selectedStudents.length === filteredStudents.length)
+    setIsCheckedStudentsCheckbox(
+      filteredStudents.length > 0 && selectedStudents.length === filteredStudents.length
+    )
   }, [selectedStudents, filteredStudents])
 
   useEffect(() => {
@@ -274,7 +316,9 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
     )
     setIsIndeterminateObserversCheckbox(partialObserverSelection)
     setIsDisabledObserversCheckbox(observerCountValue === 0)
-    setIsCheckedObserversCheckbox(observerCountValue > 0 && selectedObserverCount === observerCountValue)
+    setIsCheckedObserversCheckbox(
+      observerCountValue > 0 && selectedObserverCount === observerCountValue
+    )
   }, [filteredStudents, observersByStudentID, selectedObservers])
 
   useEffect(() => {
@@ -302,6 +346,14 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
     }
   }, [loading, data, selectedCriterion, sortedStudents, cutoff, observersByStudentID])
 
+  useEffect(() => {
+    return () => {
+      if (mediaPreviewURL) {
+        URL.revokeObjectURL(mediaPreviewURL)
+      }
+    }
+  }, [mediaPreviewURL])
+
   if (loading) {
     return <LoadingIndicator />
   }
@@ -323,13 +375,25 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
       // which then calls onSend() when pendingUploads are complete.
       setSending(true)
     } else {
-      const recipientsIds = [...selectedStudents, ...Object.values(selectedObservers).flat()]
-      const uniqueRecipientsIds = [...new Set(recipientsIds)]
-      const args = {
+      const recipientsIds = [
+        ...selectedStudents,
+        ...Object.values(selectedObservers).flat()
+      ] as number[]
+      const uniqueRecipientsIds: number[] = [...new Set(recipientsIds)]
+
+      const args: SendArgs = {
         recipientsIds: uniqueRecipientsIds,
         subject,
         body: message
       }
+
+      if (mediaUploadFile) {
+        args.mediaFile = {
+          id: mediaUploadFile.media_id,
+          type: mediaUploadFile.media_type
+        }
+      }
+
       onSend(args)
       onClose()
     }
@@ -346,6 +410,30 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
   const onReplaceAttachment = (id, e) => {
     onDeleteAttachment(id)
     onAddAttachment(e)
+  }
+  const onRemoveMediaComment = () => {
+    if (mediaPreviewURL) {
+      URL.revokeObjectURL(mediaPreviewURL)
+      setMediaPreviewURL(null)
+    }
+    setMediaUploadFile(null)
+  }
+
+  const onMediaUploadStart = file => {
+    setMediaTitle(file.title)
+  }
+
+  const onMediaUploadComplete = (err, mediaData, captionData) => {
+    if (err) {
+      setOnFailure(I18n.t('There was an error uploading the media.'))
+    } else {
+      const file = mediaData.mediaObject.media_object
+      if (captionData && file) {
+        file.media_tracks = formatTracksForMediaPlayer(captionData)
+      }
+      setMediaUploadFile(file)
+      setMediaPreviewURL(URL.createObjectURL(mediaData.uploadedFile))
+    }
   }
 
   const toggleSelection = (id: string, array: Array<string>) => {
@@ -547,25 +635,58 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
           <br />
           <TextArea
             data-testid="message-input"
-            isRequired={true}
+            isRequired
             height="200px"
             label={I18n.t('Message')}
             placeholder={I18n.t('Type your message here…')}
             value={message}
             onChange={e => setMessage(e.target.value)}
           />
-          <AttachmentDisplay
-            attachments={[...attachments, ...pendingUploads]}
-            onDeleteItem={onDeleteAttachment}
-            onReplaceItem={onReplaceAttachment}
-          />
+
+          <Flex alignItems="start">
+            {mediaUploadFile && mediaPreviewURL && (
+              <Item>
+                <MediaAttachment
+                  file={{
+                    mediaID: mediaUploadFile.media_id,
+                    src: mediaPreviewURL,
+                    title: mediaTitle || mediaUploadFile.title,
+                    type: mediaUploadFile.media_type,
+                    mediaTracks: mediaUploadFile.media_tracks
+                  }}
+                  onRemoveMediaComment={onRemoveMediaComment}
+                />
+              </Item>
+            )}
+
+            <Item shouldShrink>
+              <AttachmentDisplay
+                attachments={[...attachments, ...pendingUploads]}
+                onDeleteItem={onDeleteAttachment}
+                onReplaceItem={onReplaceAttachment}
+              />
+            </Item>
+          </Flex>
         </ModalBody>
 
         <ModalFooter>
           <Flex justifyItems="space-between" width="100%">
             <Item>
               <FileAttachmentUpload onAddItem={onAddAttachment} />
+
+              <Tooltip renderTip={I18n.t('Record an audio or video comment')} placement="top">
+                <IconButton
+                  screenReaderLabel={I18n.t('Record an audio or video comment')}
+                  onClick={() => setMediaUploadOpen(true)}
+                  margin="xx-small"
+                  data-testid="media-upload"
+                  interaction={mediaUploadFile ? 'disabled' : 'enabled'}
+                >
+                  <IconAttachMediaLine />
+                </IconButton>
+              </Tooltip>
             </Item>
+
             <Item>
               <Flex>
                 <Item>
@@ -574,7 +695,11 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
                   </Button>
                 </Item>
                 <Item margin="0 0 0 x-small">
-                  <Button interaction={isFormDataValid ? 'enabled' : 'disabled'} color="primary" onClick={handleSendButton}>
+                  <Button
+                    interaction={isFormDataValid ? 'enabled' : 'disabled'}
+                    color="primary"
+                    onClick={handleSendButton}
+                  >
                     {I18n.t('Send')}
                   </Button>
                 </Item>
@@ -587,6 +712,22 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
         sendMessage={onSend}
         isMessageSending={sending}
         pendingUploads={pendingUploads}
+      />
+      <UploadMedia
+        key={mediaUploadFile?.media_id}
+        onStartUpload={onMediaUploadStart}
+        onUploadComplete={onMediaUploadComplete}
+        onDismiss={() => setMediaUploadOpen(false)}
+        open={mediaUploadOpen}
+        tabs={{embed: false, record: true, upload: true}}
+        uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings, SelectStrings}}
+        liveRegion={() => document.getElementById('flash_screenreader_holder')}
+        languages={Object.keys(closedCaptionLanguages).map(key => ({
+          id: key,
+          label: closedCaptionLanguages[key]
+        }))}
+        rcsConfig={{contextId: userId, contextType: 'user'}}
+        disableSubmitWhileUploading
       />
     </>
   )

@@ -127,7 +127,8 @@ type Props = {
   showUnpostedMenuItem: any
   sortBySetting: any
   submissionsLoaded: boolean
-  onSendMesssageStudentsWho: any
+  onSendMessageStudentsWho: any
+  userId: string
 }
 
 type State = {
@@ -233,7 +234,8 @@ export default class AssignmentColumnHeader extends ColumnHeader<Props, State> {
     showMessageStudentsWithObserversDialog: bool.isRequired,
     showUnpostedMenuItem: bool.isRequired,
     messageAttachmentUploadFolderId: string.isRequired,
-    onSendMesssageStudentsWho: func.isRequired
+    onSendMessageStudentsWho: func.isRequired,
+    userId: string.isRequired
   }
 
   static defaultProps = {
@@ -313,7 +315,7 @@ export default class AssignmentColumnHeader extends ColumnHeader<Props, State> {
   }
 
   handleSendMessageStudentsWho = args => {
-    this.props.onSendMesssageStudentsWho(args)
+    this.props.onSendMessageStudentsWho(args)
   }
 
   showMessageStudentsWhoDialog = async () => {
@@ -341,7 +343,8 @@ export default class AssignmentColumnHeader extends ColumnHeader<Props, State> {
             this.focusAtEnd()
           },
           onSend: this.handleSendMessageStudentsWho,
-          messageAttachmentUploadFolderId: this.props.messageAttachmentUploadFolderId
+          messageAttachmentUploadFolderId: this.props.messageAttachmentUploadFolderId,
+          userId: this.props.userId
         }
         ReactDOM.render(
           <ApolloProvider client={createClient()}>

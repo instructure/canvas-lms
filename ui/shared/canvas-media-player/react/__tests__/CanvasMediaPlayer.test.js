@@ -23,7 +23,11 @@
 import React from 'react'
 import {render, waitFor, fireEvent, act} from '@testing-library/react'
 import {queries as domQueries} from '@testing-library/dom'
-import CanvasMediaPlayer, {setPlayerSize, getAutoTrack} from '../CanvasMediaPlayer'
+import CanvasMediaPlayer, {
+  setPlayerSize,
+  getAutoTrack,
+  formatTracksForMediaPlayer
+} from '../CanvasMediaPlayer'
 import {uniqueId} from 'lodash'
 
 const defaultMediaObject = (overrides = {}) => ({
@@ -431,6 +435,19 @@ describe('CanvasMediaPlayer', () => {
       }
     }
 
+    it('does not resize the container when passed resizeContainer = false', () => {
+      const container = document.createElement('div')
+      container.style.height = '300px'
+      container.style.width = '500px'
+      const player = makePlayer(1000, 500)
+      setPlayerSize(player, 'audio/*', {width: 400, height: 200}, container, false)
+      expect(player.classList.add).toHaveBeenCalledWith('audio-player')
+      expect(player.style.width).toBe('320px')
+      expect(player.style.height).toBe('14.25rem')
+      expect(container.style.width).toBe('500px')
+      expect(container.style.height).toBe('300px')
+    })
+
     it('when the media is audio', () => {
       const container = document.createElement('div')
       const player = makePlayer(1000, 500)
@@ -600,6 +617,20 @@ describe('CanvasMediaPlayer', () => {
       ]
       const found = getAutoTrack(tracks)
       expect(found).toBeUndefined()
+    })
+  })
+
+  describe('formatTracksForMediaPlayer', () => {
+    it('returns an object with id, src, label, type, and language', () => {
+      const rawTracks = [{id: '456', media_object_id: '123', locale: 'en', kind: 'subtitles'}]
+      const track = formatTracksForMediaPlayer(rawTracks)[0]
+      expect(track).toEqual({
+        id: '456',
+        src: '/media_objects/123/media_tracks/456',
+        label: 'en',
+        type: 'subtitles',
+        language: 'en'
+      })
     })
   })
 })

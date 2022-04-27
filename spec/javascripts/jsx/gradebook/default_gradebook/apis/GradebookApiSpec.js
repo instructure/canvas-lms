@@ -237,19 +237,19 @@ QUnit.module('GradebookApi.updateSubmission', hooks => {
     }))
 })
 
-QUnit.module('GradebookApi.sendMesssageStudentsWho', hooks => {
+QUnit.module('GradebookApi.sendMessageStudentsWho', hooks => {
   const recipientsIds = [1, 2, 3, 4]
   const subject = 'foo'
   const body = 'bar'
   const contextCode = '1'
-  const sendMesssageStudentsWhoUrl = `/api/v1/conversations`
+  const sendMessageStudentsWhoUrl = `/api/v1/conversations`
   const data = {}
   let server
 
   hooks.beforeEach(() => {
     server = sinon.fakeServer.create({respondImmediately: true})
     const responseBody = JSON.stringify(data)
-    server.respondWith('POST', sendMesssageStudentsWhoUrl, [
+    server.respondWith('POST', sendMessageStudentsWhoUrl, [
       200,
       {'Content-Type': 'application/json'},
       responseBody
@@ -262,18 +262,18 @@ QUnit.module('GradebookApi.sendMesssageStudentsWho', hooks => {
 
   function getRequest() {
     // filter requests to eliminate spec pollution from unrelated specs
-    return _.find(server.requests, request => request.url.includes(sendMesssageStudentsWhoUrl))
+    return _.find(server.requests, request => request.url.includes(sendMessageStudentsWhoUrl))
   }
 
   test('sends a post request to the "conversations" url', () =>
-    GradebookApi.sendMesssageStudentsWho(recipientsIds, subject, body, contextCode).then(() => {
+    GradebookApi.sendMessageStudentsWho(recipientsIds, subject, body, contextCode).then(() => {
       const request = getRequest()
       strictEqual(request.method, 'POST')
-      strictEqual(request.url, sendMesssageStudentsWhoUrl)
+      strictEqual(request.url, sendMessageStudentsWhoUrl)
     }))
 
   test('sends async for mode parameter', () =>
-    GradebookApi.sendMesssageStudentsWho(recipientsIds, subject, body, contextCode)
+    GradebookApi.sendMessageStudentsWho(recipientsIds, subject, body, contextCode)
       .then(() => {})
       .then(() => {
         const bodyData = JSON.parse(getRequest().requestBody)
@@ -281,14 +281,31 @@ QUnit.module('GradebookApi.sendMesssageStudentsWho', hooks => {
       }))
 
   test('sends true for group_conversation parameter', () =>
-    GradebookApi.sendMesssageStudentsWho(recipientsIds, subject, body, contextCode).then(() => {
+    GradebookApi.sendMessageStudentsWho(recipientsIds, subject, body, contextCode).then(() => {
       const bodyData = JSON.parse(getRequest().requestBody)
       deepEqual(bodyData.group_conversation, true)
     }))
 
   test('sends true for bulk_message parameter', () =>
-    GradebookApi.sendMesssageStudentsWho(recipientsIds, subject, body, contextCode).then(() => {
+    GradebookApi.sendMessageStudentsWho(recipientsIds, subject, body, contextCode).then(() => {
       const bodyData = JSON.parse(getRequest().requestBody)
       deepEqual(bodyData.bulk_message, true)
+    }))
+
+  test('includes media comment params if passed a media file', () =>
+    GradebookApi.sendMessageStudentsWho(recipientsIds, subject, body, contextCode, {
+      id: '123',
+      type: 'video'
+    }).then(() => {
+      const bodyData = JSON.parse(getRequest().requestBody)
+      strictEqual(bodyData.media_comment_id, '123')
+      strictEqual(bodyData.media_comment_type, 'video')
+    }))
+
+  test('does not include media comment params if not passed a media file', () =>
+    GradebookApi.sendMessageStudentsWho(recipientsIds, subject, body, contextCode).then(() => {
+      const bodyData = JSON.parse(getRequest().requestBody)
+      notOk(Object.keys(bodyData).includes('media_comment_id'))
+      notOk(Object.keys(bodyData).includes('media_comment_type'))
     }))
 })

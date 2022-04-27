@@ -878,10 +878,10 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       const contextCode = '1'
 
       buildGradebook()
-      sinon.stub(gradebook, 'sendMesssageStudentsWho')
+      sinon.stub(gradebook, 'sendMessageStudentsWho')
       render()
-      component.props.onSendMesssageStudentsWho(recipientsIds, subject, body, contextCode)
-      strictEqual(gradebook.sendMesssageStudentsWho.callCount, 1)
+      component.props.onSendMessageStudentsWho(recipientsIds, subject, body, contextCode)
+      strictEqual(gradebook.sendMessageStudentsWho.callCount, 1)
     })
   })
 

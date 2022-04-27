@@ -114,6 +114,52 @@ describe('saveMediaRecording', () => {
     )
   })
 
+  it('uploads with the user entered title, if one is provided', () => {
+    moxios.stubRequest('http://host:port/api/v1/services/kaltura_session?include_upload_config=1', {
+      status: 200,
+      response: mediaServerSession()
+    })
+    moxios.stubRequest('/api/v1/media_objects', {
+      status: 200,
+      response: {data: 'media object data'}
+    })
+
+    return saveMediaRecording(
+      {name: 'hi', userEnteredTitle: 'my awesome video'},
+      rcsConfig,
+      () => {},
+      () => {}
+    ).then(async uploader => {
+      uploader.dispatchEvent('K5.complete', {stuff: 'datatatatatatatat'}, uploader)
+      await new Promise(setTimeout)
+      const {data} = moxios.requests.mostRecent().config
+      expect(JSON.parse(data).user_entered_title).toEqual('my awesome video')
+    })
+  })
+
+  it('uploads with the file name if no user entered title is provided', () => {
+    moxios.stubRequest('http://host:port/api/v1/services/kaltura_session?include_upload_config=1', {
+      status: 200,
+      response: mediaServerSession()
+    })
+    moxios.stubRequest('/api/v1/media_objects', {
+      status: 200,
+      response: {data: 'media object data'}
+    })
+
+    return saveMediaRecording(
+      {name: 'hi'},
+      rcsConfig,
+      () => {},
+      () => {}
+    ).then(async uploader => {
+      uploader.dispatchEvent('K5.complete', {stuff: 'datatatatatatatat'}, uploader)
+      await new Promise(setTimeout)
+      const {data} = moxios.requests.mostRecent().config
+      expect(JSON.parse(data).user_entered_title).toEqual('hi')
+    })
+  })
+
   it('k5.complete calls done with canvasMediaObject data if succeeds', () => {
     moxios.stubRequest('http://host:port/api/v1/services/kaltura_session?include_upload_config=1', {
       status: 200,

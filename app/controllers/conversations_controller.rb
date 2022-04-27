@@ -352,7 +352,7 @@ class ConversationsController < ApplicationController
   #   uploaded to the sender's "conversation attachments" folder.
   #
   # @argument media_comment_id [String]
-  #   Media comment id of an audio of video file to be associated with this
+  #   Media comment id of an audio or video file to be associated with this
   #   message.
   #
   # @argument media_comment_type [String, "audio"|"video"]

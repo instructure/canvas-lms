@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {parse} from 'url'
 import ready from '@instructure/ready'
-import CanvasMediaPlayer from './react/CanvasMediaPlayer'
+import CanvasMediaPlayer from '@canvas/canvas-media-player'
 import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
 
 ready(() => {
