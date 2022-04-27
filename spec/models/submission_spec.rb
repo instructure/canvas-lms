@@ -49,7 +49,7 @@ describe Submission do
   it { is_expected.to delegate_method(:auditable?).to(:assignment).with_prefix(true) }
   it { is_expected.to delegate_method(:can_be_moderated_grader?).to(:assignment).with_prefix(true) }
 
-  describe "infered values" do
+  describe "inferred values" do
     subject do
       submission.infer_values
       submission.workflow_state
