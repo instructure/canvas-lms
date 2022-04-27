@@ -16,9 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useEffect, useRef, useState} from 'react'
-import {connect} from 'react-redux'
-import moment from 'moment-timezone'
+import React, {useEffect, useRef, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {ApplyTheme} from '@instructure/ui-themeable'
@@ -36,18 +34,9 @@ import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 
-import {getDueDates} from '../../reducers/course_paces'
-import {getBlackoutDates} from '../../shared/reducers/blackout_dates'
-import {BlackoutDate} from '../../shared/types'
 import AssignmentRow from './assignment_row'
 import BlackoutDateRow from './blackout_date_row'
-import {
-  Module as IModule,
-  CoursePaceItemDueDates,
-  CoursePace,
-  ResponsiveSizes,
-  StoreState
-} from '../../types'
+import {ModuleWithDueDates, CoursePace, ResponsiveSizes} from '../../types'
 
 const I18n = useI18nScope('course_paces_module')
 
@@ -56,19 +45,14 @@ const {Body, ColHeader, Head, Row} = Table as any
 
 interface PassedProps {
   readonly index: number
-  readonly module: IModule
+  readonly module: ModuleWithDueDates
   readonly coursePace: CoursePace
   readonly responsiveSize: ResponsiveSizes
   readonly showProjections: boolean
   readonly compression: number
 }
 
-interface StoreProps {
-  readonly blackoutDates: BlackoutDate[]
-  readonly dueDates: CoursePaceItemDueDates
-}
-
-type ComponentProps = PassedProps & StoreProps
+type ComponentProps = PassedProps
 
 export const Module: React.FC<ComponentProps> = props => {
   const [actuallyExpanded, setActuallyExpanded] = useState(props.showProjections)
@@ -98,34 +82,6 @@ export const Module: React.FC<ComponentProps> = props => {
       </Flex>
     )
   }
-
-  const mergeAssignmentsAndBlackoutDates = useCallback(() => {
-    const assignmentDueDates: CoursePaceItemDueDates = props.dueDates
-    const assignmentsWithDueDate = props.module.items.map(item => {
-      const item_due = assignmentDueDates[item.module_item_id]
-      const due_at = item_due ? moment(item_due).endOf('day') : undefined
-      return {...item, date: due_at, type: 'assignment'}
-    })
-    const blackoutDates = props.blackoutDates.map(bd => ({
-      ...bd,
-      date: bd.start_date,
-      type: 'blackout_date'
-    }))
-
-    const merged = assignmentsWithDueDate.concat(blackoutDates as Array<any>)
-    merged.sort((a, b) => {
-      if ('position' in a && 'position' in b) {
-        return a.position - b.position
-      }
-      if (!a.date && !!b.date) return -1
-      if (!!a.date && !b.date) return 1
-      if (!a.date && !b.date) return 0
-      if (a.date.isBefore(b.date)) return -1
-      if (a.date.isAfter(b.date)) return 1
-      return 0
-    })
-    return merged
-  }, [props.dueDates, props.blackoutDates, props.module.items])
 
   const renderDateColHeader = () => {
     if (!props.showProjections && !actuallyExpanded && !datesVisible) return null
@@ -187,7 +143,7 @@ export const Module: React.FC<ComponentProps> = props => {
   }
 
   const renderRows = () => {
-    const rowData = mergeAssignmentsAndBlackoutDates()
+    const rowData = props.module.items
     return rowData.map(rd => {
       if (rd.type === 'assignment') {
         return renderAssignmentRow(rd)
@@ -291,11 +247,4 @@ export const Module: React.FC<ComponentProps> = props => {
   )
 }
 
-const mapStateToProps = (state: StoreState): StoreProps => {
-  return {
-    blackoutDates: getBlackoutDates(state),
-    dueDates: getDueDates(state)
-  }
-}
-
-export default connect(mapStateToProps)(Module)
+export default Module

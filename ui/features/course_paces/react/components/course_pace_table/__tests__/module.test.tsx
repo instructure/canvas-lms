@@ -18,24 +18,32 @@
 
 import React from 'react'
 import {act, getByText} from '@testing-library/react'
+import moment from 'moment'
 
-import {BLACKOUT_DATES, PACE_MODULE_1, PRIMARY_PACE} from '../../../__tests__/fixtures'
+import {PACE_MODULE_1, PRIMARY_PACE} from '../../../__tests__/fixtures'
 import {renderConnected} from '../../../__tests__/utils'
 
 import {Module} from '../module'
+import {ModuleWithDueDates, CoursePaceItemWithDate} from '../../../types'
+
+const dueDates = ['2022-03-18T00:00:00-06:00', '2022-03-22T00:00:00-06:00']
+const module1: ModuleWithDueDates = {...(PACE_MODULE_1 as unknown as ModuleWithDueDates)}
+module1.items = module1.items.map(
+  (item, index) =>
+    ({
+      ...item,
+      type: 'assignment' as const,
+      date: moment(dueDates[index])
+    } as CoursePaceItemWithDate)
+)
 
 const defaultProps = {
   index: 1,
-  module: PACE_MODULE_1,
+  module: module1,
   coursePace: PRIMARY_PACE,
   responsiveSize: 'large' as const,
   showProjections: true,
-  compression: 0,
-  blackoutDates: [],
-  dueDates: {
-    [PACE_MODULE_1.items[0].module_item_id]: '2022-03-18T00:00:00-06:00',
-    [PACE_MODULE_1.items[1].module_item_id]: '2022-03-22T00:00:00-06:00'
-  }
+  compression: 0
 }
 
 describe('Module', () => {
@@ -102,37 +110,39 @@ describe('Module', () => {
 
   it('merges assignments and blackout dates in the table', () => {
     // the blackout dates fall between these 2 due dates
-    const dueDates = {
-      [defaultProps.module.items[0].module_item_id]: '2022-03-18T00:00:00-06:00',
-      [defaultProps.module.items[1].module_item_id]: '2022-03-29T00:00:00-06:00'
-    }
+    const module2 = {...module1, items: [...module1.items]}
+    module2.items.splice(1, 0, {
+      type: 'blackout_date' as const,
+      date: moment('2022-03-20T00:00:00-06:00'),
+      event_title: 'black me out',
+      start_date: moment('2022-03-21T00:00:00-06:00'),
+      end_date: moment('2022-03-22T00:00:00-06:00')
+    })
 
-    const {getAllByRole} = renderConnected(
-      <Module {...defaultProps} blackoutDates={BLACKOUT_DATES} dueDates={dueDates} />
-    )
+    const {getAllByRole} = renderConnected(<Module {...defaultProps} module={module2} />)
 
     const rows = getAllByRole('row')
     expect(rows.length).toEqual(4)
     expect(getByText(rows[1], 'Fri, Mar 18, 2022')).toBeInTheDocument()
     expect(getByText(rows[2], 'Mon, Mar 21, 2022')).toBeInTheDocument()
-    expect(getByText(rows[2], 'Fri, Mar 25, 2022')).toBeInTheDocument()
-    expect(getByText(rows[3], 'Tue, Mar 29, 2022')).toBeInTheDocument()
+    expect(getByText(rows[2], 'Tue, Mar 22, 2022')).toBeInTheDocument()
+    expect(getByText(rows[3], 'Tue, Mar 22, 2022')).toBeInTheDocument()
   })
 
   it('In stacked format, blackout dates do not include the status entry', () => {
-    const dueDates = {
-      [defaultProps.module.items[0].module_item_id]: '2022-03-18T00:00:00-06:00',
-      [defaultProps.module.items[1].module_item_id]: '2022-03-29T00:00:00-06:00'
-    }
+    const module2 = {...module1, items: [...module1.items]}
+    module2.items.splice(1, 0, {
+      type: 'blackout_date' as const,
+      date: moment('2022-03-20T00:00:00-06:00'),
+      event_title: 'black me out',
+      start_date: moment('2022-03-21T00:00:00-06:00'),
+      end_date: moment('2022-03-22T00:00:00-06:00')
+    })
+
     const {queryAllByRole} = renderConnected(
-      <Module
-        {...defaultProps}
-        responsiveSize="small"
-        showProjections
-        blackoutDates={BLACKOUT_DATES}
-        dueDates={dueDates}
-      />
+      <Module {...defaultProps} module={module2} responsiveSize="small" showProjections />
     )
+    expect(queryAllByRole('row').length).toEqual(3)
     expect(queryAllByRole('cell', {name: /Status/}).length).toEqual(2)
   })
 })
