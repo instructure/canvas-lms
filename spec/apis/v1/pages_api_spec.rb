@@ -40,7 +40,7 @@ describe "Pages API", type: :request do
       api_call(
         :get,
         "/api/v1/courses/#{@course.id}/pages/#{locked_item.url}",
-        { controller: "wiki_pages_api", action: "show", format: "json", course_id: @course.id.to_s, url: locked_item.url }
+        { controller: "wiki_pages_api", action: "show", format: "json", course_id: @course.id.to_s, url_or_id: locked_item.url }
       )
     end
 
@@ -248,7 +248,7 @@ describe "Pages API", type: :request do
             api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{page.url}",
                      { controller: "wiki_pages_api", action: "update",
                        format: "json", course_id: @course.to_param,
-                       url: page.url },
+                       url_or_id: page.url },
                      { wiki_page: { student_todo_at: todo_date_2, student_planner_checkbox: "1" } })
 
             page.reload
@@ -260,7 +260,7 @@ describe "Pages API", type: :request do
             api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{page.url}",
                      { controller: "wiki_pages_api", action: "update",
                        format: "json", course_id: @course.to_param,
-                       url: page.url },
+                       url_or_id: page.url },
                      { wiki_page: { student_planner_checkbox: false } })
             page.reload
             expect(page.todo_date).to eq nil
@@ -272,7 +272,7 @@ describe "Pages API", type: :request do
             api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{page.url}",
                      { controller: "wiki_pages_api", action: "update",
                        format: "json", course_id: @course.to_param,
-                       url: page.url },
+                       url_or_id: page.url },
                      { wiki_page: {} })
             page.reload
             expect(page.todo_date).to eq now
@@ -292,7 +292,7 @@ describe "Pages API", type: :request do
       it "retrieves page content and attributes", priority: "1" do
         @hidden_page.publish
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
-                        controller: "wiki_pages_api", action: "show", format: "json", course_id: @course.id.to_s, url: @hidden_page.url)
+                        controller: "wiki_pages_api", action: "show", format: "json", course_id: @course.id.to_s, url_or_id: @hidden_page.url)
         expected = { "hide_from_students" => false,
                      "editing_roles" => "teachers",
                      "last_edited_by" => user_display_json(@teacher, @course).stringify_keys!,
@@ -376,7 +376,7 @@ describe "Pages API", type: :request do
       it "lists revisions of a page" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@vpage.url}/revisions",
                         controller: "wiki_pages_api", action: "revisions", format: "json",
-                        course_id: @course.to_param, url: @vpage.url)
+                        course_id: @course.to_param, url_or_id: @vpage.url)
         expect(json).to eq [
           {
             "revision_id" => 3,
@@ -401,7 +401,7 @@ describe "Pages API", type: :request do
       it "summarizes the latest revision" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@vpage.url}/revisions/latest?summary=true",
                         controller: "wiki_pages_api", action: "show_revision", format: "json",
-                        course_id: @course.to_param, url: @vpage.url, summary: "true")
+                        course_id: @course.to_param, url_or_id: @vpage.url, summary: "true")
         expect(json).to eq({
                              "revision_id" => 3,
                              "latest" => true,
@@ -413,17 +413,17 @@ describe "Pages API", type: :request do
       it "paginates the revision list" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@vpage.url}/revisions?per_page=2",
                         controller: "wiki_pages_api", action: "revisions", format: "json",
-                        course_id: @course.to_param, url: @vpage.url, per_page: "2")
+                        course_id: @course.to_param, url_or_id: @vpage.url, per_page: "2")
         expect(json.size).to eq 2
         json += api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@vpage.url}/revisions?per_page=2&page=2",
                          controller: "wiki_pages_api", action: "revisions", format: "json",
-                         course_id: @course.to_param, url: @vpage.url, per_page: "2", page: "2")
+                         course_id: @course.to_param, url_or_id: @vpage.url, per_page: "2", page: "2")
         expect(json.map { |r| r["revision_id"] }).to eq [3, 2, 1]
       end
 
       it "retrieves an old revision" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@vpage.url}/revisions/1",
-                        controller: "wiki_pages_api", action: "show_revision", format: "json", course_id: @course.id.to_s, url: @vpage.url, revision_id: "1")
+                        controller: "wiki_pages_api", action: "show_revision", format: "json", course_id: @course.id.to_s, url_or_id: @vpage.url, revision_id: "1")
         expect(json).to eq({
                              "body" => "draft",
                              "title" => "version test page",
@@ -436,7 +436,7 @@ describe "Pages API", type: :request do
 
       it "retrieves the latest revision" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@vpage.url}/revisions/latest",
-                        controller: "wiki_pages_api", action: "show_revision", format: "json", course_id: @course.id.to_s, url: @vpage.url)
+                        controller: "wiki_pages_api", action: "show_revision", format: "json", course_id: @course.id.to_s, url_or_id: @vpage.url)
         expect(json).to eq({
                              "body" => "revised by ta",
                              "title" => "version test page",
@@ -451,7 +451,7 @@ describe "Pages API", type: :request do
       it "reverts to a prior revision" do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/pages/#{@vpage.url}/revisions/2",
                         controller: "wiki_pages_api", action: "revert", format: "json", course_id: @course.to_param,
-                        url: @vpage.url, revision_id: "2")
+                        url_or_id: @vpage.url, revision_id: "2")
         expect(json["body"]).to eq "published by teacher"
         expect(json["revision_id"]).to eq 4
         expect(@vpage.reload.body).to eq "published by teacher"
@@ -465,7 +465,7 @@ describe "Pages API", type: :request do
         @vpage.save! # rev 4
         api_call(:post, "/api/v1/courses/#{@course.id}/pages/#{@vpage.url}/revisions/3",
                  controller: "wiki_pages_api", action: "revert", format: "json", course_id: @course.to_param,
-                 url: @vpage.url, revision_id: "3")
+                 url_or_id: @vpage.url, revision_id: "3")
         @vpage.reload
 
         expect(@vpage.editing_roles).to eq "teachers,students,public"
@@ -477,13 +477,13 @@ describe "Pages API", type: :request do
       it "show should 404 when given a bad revision number" do
         api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@vpage.url}/revisions/99",
                  { controller: "wiki_pages_api", action: "show_revision", format: "json", course_id: @course.id.to_s,
-                   url: @vpage.url, revision_id: "99" }, {}, {}, { expected_status: 404 })
+                   url_or_id: @vpage.url, revision_id: "99" }, {}, {}, { expected_status: 404 })
       end
 
       it "revert should 404 when given a bad revision number" do
         api_call(:post, "/api/v1/courses/#{@course.id}/pages/#{@vpage.url}/revisions/99",
                  { controller: "wiki_pages_api", action: "revert", format: "json", course_id: @course.id.to_s,
-                   url: @vpage.url, revision_id: "99" }, {}, {}, { expected_status: 404 })
+                   url_or_id: @vpage.url, revision_id: "99" }, {}, {}, { expected_status: 404 })
       end
     end
 
@@ -673,7 +673,7 @@ describe "Pages API", type: :request do
       it "updates page content and attributes", priority: "1" do
         api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
                  { controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param,
-                   url: @hidden_page.url },
+                   url_or_id: @hidden_page.url },
                  { wiki_page: { title: "No Longer Hidden Page",
                                 body: "Information wants to be free" } })
         @hidden_page.reload
@@ -700,7 +700,7 @@ describe "Pages API", type: :request do
       it "does not crash updating front page if the wiki_page param is not available with student planner enabled" do
         api_call(:put, "/api/v1/courses/#{@course.id}/front_page",
                  { controller: "wiki_pages_api", action: "update_front_page", format: "json", course_id: @course.to_param,
-                   url: @hidden_page.url },
+                   url_or_id: @hidden_page.url },
                  {}, {},
                  { expected_status: 200 })
       end
@@ -711,7 +711,7 @@ describe "Pages API", type: :request do
 
         json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
                         { controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param,
-                          url: @hidden_page.url },
+                          url_or_id: @hidden_page.url },
                         { wiki_page: { title: "No Longer Hidden Page",
                                        body: "Information wants to be free", front_page: true, published: true } })
         no_longer_hidden_page = @hidden_page
@@ -733,7 +733,7 @@ describe "Pages API", type: :request do
 
         json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{front_page.url}",
                         { controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param,
-                          url: front_page.url },
+                          url_or_id: front_page.url },
                         { wiki_page: { title: "No Longer Front Page", body: "Information wants to be free", front_page: false } })
 
         front_page.reload
@@ -760,7 +760,7 @@ describe "Pages API", type: :request do
 
         api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{other_page.url}",
                  { controller: "wiki_pages_api", action: "update", format: "json",
-                   course_id: @course.to_param, url: other_page.url },
+                   course_id: @course.to_param, url_or_id: other_page.url },
                  { wiki_page:                    { title: "Another Page", body: "Another page body", front_page: false } })
 
         # the front page url should remain unchanged
@@ -773,7 +773,7 @@ describe "Pages API", type: :request do
 
         api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{page.url}",
                  { controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param,
-                   url: page.url },
+                   url_or_id: page.url },
                  { wiki_page: { url: "noooo" } })
 
         page.reload
@@ -787,7 +787,7 @@ describe "Pages API", type: :request do
       it "does not set hidden page as front page" do
         api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
                  { controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param,
-                   url: @hidden_page.url },
+                   url_or_id: @hidden_page.url },
                  { wiki_page: { title: "Actually Still Hidden Page",
                                 body: "Information wants to be free", front_page: true } }, {},
                  { expected_status: 400 })
@@ -806,7 +806,7 @@ describe "Pages API", type: :request do
         context "with draft state" do
           it "accepts published" do
             json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@test_page.url}",
-                            { controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param, url: @test_page.url },
+                            { controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param, url_or_id: @test_page.url },
                             { wiki_page: { "published" => "false" } })
             expect(json["published"]).to be_falsey
             expect(json["hide_from_students"]).to be_truthy
@@ -817,7 +817,7 @@ describe "Pages API", type: :request do
 
           it "ignores hide_from_students" do
             json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@test_page.url}",
-                            { controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param, url: @test_page.url },
+                            { controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param, url_or_id: @test_page.url },
                             { wiki_page: { "hide_from_students" => "true" } })
             expect(json["published"]).to be_truthy
             expect(json["hide_from_students"]).to be_falsey
@@ -839,7 +839,7 @@ describe "Pages API", type: :request do
 
         it "publishes a page with published=true" do
           json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@unpublished_page.url}",
-                          { controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param, url: @unpublished_page.url },
+                          { controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param, url_or_id: @unpublished_page.url },
                           { wiki_page: { "published" => "true" } })
           expect(json["published"]).to be_truthy
           expect(@unpublished_page.reload).to be_active
@@ -847,7 +847,7 @@ describe "Pages API", type: :request do
 
         it "does not publish a page otherwise" do
           json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@unpublished_page.url}",
-                          { controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param, url: @unpublished_page.url })
+                          { controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param, url_or_id: @unpublished_page.url })
           expect(json["published"]).to be_falsey
           expect(@unpublished_page.reload).to be_unpublished
         end
@@ -856,7 +856,7 @@ describe "Pages API", type: :request do
       it "unpublishes a page" do
         json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}?wiki_page[published]=false",
                         controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param,
-                        url: @hidden_page.url, wiki_page: { "published" => "false" })
+                        url_or_id: @hidden_page.url, wiki_page: { "published" => "false" })
         expect(json["published"]).to be_falsey
         expect(@hidden_page.reload).to be_unpublished
       end
@@ -864,7 +864,7 @@ describe "Pages API", type: :request do
       it "sanitizes page content" do
         api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
                  { controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param,
-                   url: @hidden_page.url },
+                   url_or_id: @hidden_page.url },
                  { wiki_page: { body: "<p>lolcats</p><script>alert('what')</script>" } })
         @hidden_page.reload
         expect(@hidden_page.body).to eq "<p>lolcats</p>"
@@ -875,7 +875,7 @@ describe "Pages API", type: :request do
 
         api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
                  { controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param,
-                   url: @hidden_page.url },
+                   url_or_id: @hidden_page.url },
                  { wiki_page: { body: "content to process" } })
         @hidden_page.reload
         expect(@hidden_page.body).to eq "processed content"
@@ -884,7 +884,7 @@ describe "Pages API", type: :request do
       it "does not allow invalid editing_roles" do
         api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
                  { controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param,
-                   url: @hidden_page.url },
+                   url_or_id: @hidden_page.url },
                  { wiki_page: { editing_roles: "teachers, chimpanzees, students" } },
                  {}, { expected_status: 400 })
       end
@@ -892,7 +892,7 @@ describe "Pages API", type: :request do
       it "creates a page if the page doesn't exist", priority: "1" do
         api_call(:put, "/api/v1/courses/#{@course.id}/pages/nonexistent-url",
                  { controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param,
-                   url: "nonexistent-url" },
+                   url_or_id: "nonexistent-url" },
                  { wiki_page: { body: "Nonexistent page content" } })
         page = @wiki.wiki_pages.where(url: "nonexistent-url").first!
         expect(page).not_to be_nil
@@ -915,10 +915,10 @@ describe "Pages API", type: :request do
         it "notifies iff the notify_of_update flag is set" do
           api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@front_page.url}?wiki_page[body]=updated+front+page",
                    controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param,
-                   url: @front_page.url, wiki_page: { "body" => "updated front page" })
+                   url_or_id: @front_page.url, wiki_page: { "body" => "updated front page" })
           api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}?wiki_page[body]=updated+hidden+page&wiki_page[notify_of_update]=true",
                    controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param,
-                   url: @notify_page.url, wiki_page: { "body" => "updated hidden page", "notify_of_update" => "true" })
+                   url_or_id: @notify_page.url, wiki_page: { "body" => "updated hidden page", "notify_of_update" => "true" })
           expect(@teacher.messages.map(&:context_id)).to eq [@notify_page.id]
         end
       end
@@ -933,7 +933,7 @@ describe "Pages API", type: :request do
           wiki_page_assignment_model(wiki_page: @hidden_page)
           json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
                           { controller: "wiki_pages_api", action: "update", format: "json",
-                            course_id: @course.to_param, url: @hidden_page.url },
+                            course_id: @course.to_param, url_or_id: @hidden_page.url },
                           { wiki_page: { title: "Changin' the Title",
                                          assignment: { only_visible_to_overrides: true } } })
           page = @course.wiki_pages.where(url: json["url"]).first!
@@ -945,7 +945,7 @@ describe "Pages API", type: :request do
           wiki_page_assignment_model(wiki_page: @hidden_page)
           api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
                    { controller: "wiki_pages_api", action: "update", format: "json",
-                     course_id: @course.to_param, url: @hidden_page.url },
+                     course_id: @course.to_param, url_or_id: @hidden_page.url },
                    { wiki_page: { assignment: { set_assignment: false } } })
           @hidden_page.reload
           expect(@hidden_page.assignment).to be_nil
@@ -956,7 +956,7 @@ describe "Pages API", type: :request do
           # Restore it
           api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
                    { controller: "wiki_pages_api", action: "update", format: "json",
-                     course_id: @course.to_param, url: @hidden_page.url },
+                     course_id: @course.to_param, url_or_id: @hidden_page.url },
                    { wiki_page: { assignment: { set_assignment: true } } })
           @hidden_page.reload
           expect(@hidden_page.assignment).not_to be_nil
@@ -970,7 +970,7 @@ describe "Pages API", type: :request do
         wiki_page_assignment_model(wiki_page: @hidden_page)
         json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
                         { controller: "wiki_pages_api", action: "update", format: "json",
-                          course_id: @course.to_param, url: @hidden_page.url },
+                          course_id: @course.to_param, url_or_id: @hidden_page.url },
                         { wiki_page: { title: "Can't Change It",
                                        assignment: { only_visible_to_overrides: true } } })
         page = @course.wiki_pages.where(url: json["url"]).first!
@@ -982,7 +982,7 @@ describe "Pages API", type: :request do
         wiki_page_assignment_model(wiki_page: @hidden_page)
         api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
                  { controller: "wiki_pages_api", action: "update", format: "json",
-                   course_id: @course.to_param, url: @hidden_page.url },
+                   course_id: @course.to_param, url_or_id: @hidden_page.url },
                  { wiki_page: { assignment: { set_assignment: false } } })
         @hidden_page.reload
         expect(@hidden_page.assignment).not_to be_nil
@@ -995,7 +995,7 @@ describe "Pages API", type: :request do
       it "deletes a page", priority: "1" do
         api_call(:delete, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
                  { controller: "wiki_pages_api", action: "destroy", format: "json", course_id: @course.to_param,
-                   url: @hidden_page.url })
+                   url_or_id: @hidden_page.url })
         expect(@hidden_page.reload).to be_deleted
       end
 
@@ -1004,7 +1004,7 @@ describe "Pages API", type: :request do
         page.set_as_front_page!
 
         api_call(:delete, "/api/v1/courses/#{@course.id}/pages/#{page.url}",
-                 { controller: "wiki_pages_api", action: "destroy", format: "json", course_id: @course.to_param, url: page.url },
+                 { controller: "wiki_pages_api", action: "destroy", format: "json", course_id: @course.to_param, url_or_id: page.url },
                  {}, {}, { expected_status: 400 })
 
         page.reload
@@ -1057,7 +1057,7 @@ describe "Pages API", type: :request do
 
       it "shows" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@unpublished_page.url}",
-                        controller: "wiki_pages_api", action: "show", format: "json", course_id: @course.id.to_s, url: @unpublished_page.url)
+                        controller: "wiki_pages_api", action: "show", format: "json", course_id: @course.id.to_s, url_or_id: @unpublished_page.url)
         expect(json["title"]).to eq @unpublished_page.title
       end
     end
@@ -1082,7 +1082,7 @@ describe "Pages API", type: :request do
       api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{page.url}",
                { controller: "wiki_pages_api", action: "update",
                  format: "json", course_id: @course.to_param,
-                 url: page.url },
+                 url_or_id: page.url },
                { wiki_page: { student_planner_checkbox: "0" } })
       expect(response).to be_unauthorized
       page.reload
@@ -1106,7 +1106,7 @@ describe "Pages API", type: :request do
 
     it "refuses to show a hidden page" do
       api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@hidden_page.url}",
-               { controller: "wiki_pages_api", action: "show", format: "json", course_id: @course.id.to_s, url: @hidden_page.url },
+               { controller: "wiki_pages_api", action: "show", format: "json", course_id: @course.id.to_s, url_or_id: @hidden_page.url },
                {}, {}, { expected_status: 401 })
     end
 
@@ -1132,7 +1132,7 @@ describe "Pages API", type: :request do
                {}, {}, { expected_status: 401 })
 
       api_call(:get, "/api/v1/courses/#{other_course.id}/pages/front-page",
-               { controller: "wiki_pages_api", action: "show", format: "json", course_id: other_course.id.to_s, url: "front-page" },
+               { controller: "wiki_pages_api", action: "show", format: "json", course_id: other_course.id.to_s, url_or_id: "front-page" },
                {}, {}, { expected_status: 401 })
     end
 
@@ -1151,7 +1151,7 @@ describe "Pages API", type: :request do
       expect(json).not_to be_empty
 
       api_call(:get, "/api/v1/courses/#{other_course.id}/pages/front-page",
-               { controller: "wiki_pages_api", action: "show", format: "json", course_id: other_course.id.to_s, url: "front-page" })
+               { controller: "wiki_pages_api", action: "show", format: "json", course_id: other_course.id.to_s, url_or_id: "front-page" })
     end
 
     describe "module progression" do
@@ -1170,7 +1170,7 @@ describe "Pages API", type: :request do
 
       it "fulfills requirements with view on an unlocked page" do
         api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@front_page.url}",
-                 { controller: "wiki_pages_api", action: "show", format: "json", course_id: @course.id.to_s, url: @front_page.url })
+                 { controller: "wiki_pages_api", action: "show", format: "json", course_id: @course.id.to_s, url_or_id: @front_page.url })
         expect(@mod.evaluate_for(@user).requirements_met).to include({ id: @tag.id, type: "must_view" })
       end
 
@@ -1178,7 +1178,7 @@ describe "Pages API", type: :request do
         @mod.unlock_at = 1.year.from_now
         @mod.save!
         api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@front_page.url}",
-                 { controller: "wiki_pages_api", action: "show", format: "json", course_id: @course.id.to_s, url: @front_page.url })
+                 { controller: "wiki_pages_api", action: "show", format: "json", course_id: @course.id.to_s, url_or_id: @front_page.url })
         expect(@mod.evaluate_for(@user).requirements_met).not_to include({ id: @tag.id, type: "must_view" })
       end
     end
@@ -1186,7 +1186,7 @@ describe "Pages API", type: :request do
     it "does not allow editing a page" do
       api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@front_page.url}",
                { controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param,
-                 url: @front_page.url },
+                 url_or_id: @front_page.url },
                { publish: false, wiki_page: { body: "!!!!" } }, {}, { expected_status: 401 })
       expect(@front_page.reload.body).not_to eq "!!!!"
     end
@@ -1201,7 +1201,7 @@ describe "Pages API", type: :request do
       it "allows editing the body" do
         api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@editable_page.url}",
                  { controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param,
-                   url: @editable_page.url },
+                   url_or_id: @editable_page.url },
                  { wiki_page: { body: "?!?!" } })
         @editable_page.reload
         expect(@editable_page).to be_active
@@ -1213,22 +1213,22 @@ describe "Pages API", type: :request do
       it "does not allow editing attributes (with draft state)" do
         api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@editable_page.url}",
                  { controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param,
-                   url: @editable_page.url },
+                   url_or_id: @editable_page.url },
                  { wiki_page: { published: false } },
                  {}, { expected_status: 401 })
         api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@editable_page.url}",
                  { controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param,
-                   url: @editable_page.url },
+                   url_or_id: @editable_page.url },
                  { wiki_page: { title: "Broken Links" } },
                  {}, { expected_status: 401 })
         api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@editable_page.url}",
                  { controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param,
-                   url: @editable_page.url },
+                   url_or_id: @editable_page.url },
                  { wiki_page: { editing_roles: "teachers" } },
                  {}, { expected_status: 401 })
         api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@editable_page.url}",
                  { controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param,
-                   url: @editable_page.url },
+                   url_or_id: @editable_page.url },
                  { wiki_page: { editing_roles: "teachers,students,public" } },
                  {}, { expected_status: 401 })
 
@@ -1248,7 +1248,7 @@ describe "Pages API", type: :request do
 
         api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@editable_page.url}",
                  { controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.id.to_s,
-                   url: @editable_page.url }, { wiki_page: { body: "edited by student" } })
+                   url_or_id: @editable_page.url }, { wiki_page: { body: "edited by student" } })
         expect(mod.evaluate_for(@user).workflow_state).to eq "completed"
       end
 
@@ -1261,7 +1261,7 @@ describe "Pages API", type: :request do
       it "does not allow deleting pages" do
         api_call(:delete, "/api/v1/courses/#{@course.id}/pages/#{@editable_page.url}",
                  { controller: "wiki_pages_api", action: "destroy", format: "json", course_id: @course.to_param,
-                   url: @editable_page.url }, {}, {}, { expected_status: 401 })
+                   url_or_id: @editable_page.url }, {}, {}, { expected_status: 401 })
       end
     end
 
@@ -1287,7 +1287,7 @@ describe "Pages API", type: :request do
 
       it "does not show" do
         api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@unpublished_page.url}",
-                 { controller: "wiki_pages_api", action: "show", format: "json", course_id: @course.id.to_s, url: @unpublished_page.url },
+                 { controller: "wiki_pages_api", action: "show", format: "json", course_id: @course.id.to_s, url_or_id: @unpublished_page.url },
                  {}, {}, { expected_status: 401 })
       end
 
@@ -1295,7 +1295,7 @@ describe "Pages API", type: :request do
         @course.is_public = true
         @course.save!
         api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@unpublished_page.url}",
-                 { controller: "wiki_pages_api", action: "show", format: "json", course_id: @course.id.to_s, url: @unpublished_page.url },
+                 { controller: "wiki_pages_api", action: "show", format: "json", course_id: @course.id.to_s, url_or_id: @unpublished_page.url },
                  {}, {}, { expected_status: 401 })
       end
     end
@@ -1317,26 +1317,26 @@ describe "Pages API", type: :request do
       it "refuses to list revisions" do
         api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@vpage.url}/revisions",
                  { controller: "wiki_pages_api", action: "revisions", format: "json",
-                   course_id: @course.to_param, url: @vpage.url }, {}, {},
+                   course_id: @course.to_param, url_or_id: @vpage.url }, {}, {},
                  { expected_status: 401 })
       end
 
       it "refuses to retrieve a revision" do
         api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@vpage.url}/revisions/3",
                  { controller: "wiki_pages_api", action: "show_revision", format: "json", course_id: @course.id.to_s,
-                   url: @vpage.url, revision_id: "3" }, {}, {}, { expected_status: 401 })
+                   url_or_id: @vpage.url, revision_id: "3" }, {}, {}, { expected_status: 401 })
       end
 
       it "refuses to revert a page" do
         api_call(:post, "/api/v1/courses/#{@course.id}/pages/#{@vpage.url}/revisions/2",
                  { controller: "wiki_pages_api", action: "revert", format: "json", course_id: @course.to_param,
-                   url: @vpage.url, revision_id: "2" }, {}, {}, { expected_status: 401 })
+                   url_or_id: @vpage.url, revision_id: "2" }, {}, {}, { expected_status: 401 })
       end
 
       it "describes the latest version" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@vpage.url}/revisions/latest",
                         controller: "wiki_pages_api", action: "show_revision", format: "json",
-                        course_id: @course.to_param, url: @vpage.url)
+                        course_id: @course.to_param, url_or_id: @vpage.url)
         expect(json["revision_id"]).to eq 3
       end
 
@@ -1350,28 +1350,28 @@ describe "Pages API", type: :request do
         it "lists revisions" do
           json = api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@vpage.url}/revisions",
                           controller: "wiki_pages_api", action: "revisions", format: "json",
-                          course_id: @course.to_param, url: @vpage.url)
+                          course_id: @course.to_param, url_or_id: @vpage.url)
           expect(json.map { |r| r["revision_id"] }).to eq [4, 3, 2, 1]
         end
 
         it "retrieves an old revision" do
           json = api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@vpage.url}/revisions/3",
                           controller: "wiki_pages_api", action: "show_revision", format: "json", course_id: @course.id.to_s,
-                          url: @vpage.url, revision_id: "3")
+                          url_or_id: @vpage.url, revision_id: "3")
           expect(json["body"]).to eq "now visible to students"
         end
 
         it "retrieves a (formerly) hidden revision" do
           json = api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@vpage.url}/revisions/2",
                           controller: "wiki_pages_api", action: "show_revision", format: "json", course_id: @course.id.to_s,
-                          url: @vpage.url, revision_id: "2")
+                          url_or_id: @vpage.url, revision_id: "2")
           expect(json["body"]).to eq "published but hidden"
         end
 
         it "retrieves a (formerly) unpublished revision" do
           json = api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@vpage.url}/revisions/1",
                           controller: "wiki_pages_api", action: "show_revision", format: "json", course_id: @course.id.to_s,
-                          url: @vpage.url, revision_id: "1")
+                          url_or_id: @vpage.url, revision_id: "1")
           expect(json["body"]).to eq "draft"
         end
 
@@ -1382,13 +1382,13 @@ describe "Pages API", type: :request do
           mod.save!
           api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@vpage.url}/revisions/3",
                    { controller: "wiki_pages_api", action: "show_revision", format: "json", course_id: @course.id.to_s,
-                     url: @vpage.url, revision_id: "3" }, {}, {}, { expected_status: 401 })
+                     url_or_id: @vpage.url, revision_id: "3" }, {}, {}, { expected_status: 401 })
         end
 
         it "does not revert page content" do
           api_call(:post, "/api/v1/courses/#{@course.id}/pages/#{@vpage.url}/revisions/2",
                    { controller: "wiki_pages_api", action: "revert", format: "json", course_id: @course.to_param,
-                     url: @vpage.url, revision_id: "2" }, {}, {}, { expected_status: 401 })
+                     url_or_id: @vpage.url, revision_id: "2" }, {}, {}, { expected_status: 401 })
         end
       end
 
@@ -1401,7 +1401,7 @@ describe "Pages API", type: :request do
         it "reverts page content" do
           api_call(:post, "/api/v1/courses/#{@course.id}/pages/#{@vpage.url}/revisions/2",
                    controller: "wiki_pages_api", action: "revert", format: "json", course_id: @course.to_param,
-                   url: @vpage.url, revision_id: "2")
+                   url_or_id: @vpage.url, revision_id: "2")
           @vpage.reload
           expect(@vpage.body).to eq "published but hidden"
         end
@@ -1424,7 +1424,7 @@ describe "Pages API", type: :request do
     it "retrieves page content from a group wiki" do
       testpage = @group.wiki_pages.last
       json = api_call(:get, "/api/v1/groups/#{@group.id}/pages/#{testpage.url}",
-                      { controller: "wiki_pages_api", action: "show", format: "json", group_id: @group.to_param, url: testpage.url })
+                      { controller: "wiki_pages_api", action: "show", format: "json", group_id: @group.to_param, url_or_id: testpage.url })
       expect(json["body"]).to eq testpage.body
     end
 
@@ -1438,7 +1438,7 @@ describe "Pages API", type: :request do
     it "updates a group wiki page" do
       testpage = @group.wiki_pages.first
       api_call(:put, "/api/v1/groups/#{@group.id}/pages/#{testpage.url}?wiki_page[body]=lolcats",
-               { controller: "wiki_pages_api", action: "update", format: "json", group_id: @group.to_param, url: testpage.url, wiki_page: { "body" => "lolcats" } })
+               { controller: "wiki_pages_api", action: "update", format: "json", group_id: @group.to_param, url_or_id: testpage.url, wiki_page: { "body" => "lolcats" } })
       expect(testpage.reload.body).to eq "lolcats"
     end
 
@@ -1446,7 +1446,7 @@ describe "Pages API", type: :request do
       count = @group.wiki_pages.not_deleted.size
       testpage = @group.wiki_pages.last
       api_call(:delete, "/api/v1/groups/#{@group.id}/pages/#{testpage.url}",
-               { controller: "wiki_pages_api", action: "destroy", format: "json", group_id: @group.to_param, url: testpage.url })
+               { controller: "wiki_pages_api", action: "destroy", format: "json", group_id: @group.to_param, url_or_id: testpage.url })
       expect(@group.reload.wiki_pages.not_deleted.size).to eq count - 1
     end
 
@@ -1460,35 +1460,35 @@ describe "Pages API", type: :request do
       it "lists revisions for a page" do
         json = api_call(:get, "/api/v1/groups/#{@group.id}/pages/#{@vpage.url}/revisions",
                         controller: "wiki_pages_api", action: "revisions", format: "json",
-                        group_id: @group.to_param, url: @vpage.url)
+                        group_id: @group.to_param, url_or_id: @vpage.url)
         expect(json.map { |v| v["revision_id"] }).to eq [2, 1]
       end
 
       it "retrieves an old revision of a page" do
         json = api_call(:get, "/api/v1/groups/#{@group.id}/pages/#{@vpage.url}/revisions/1",
                         controller: "wiki_pages_api", action: "show_revision", format: "json",
-                        group_id: @group.to_param, url: @vpage.url, revision_id: "1")
+                        group_id: @group.to_param, url_or_id: @vpage.url, revision_id: "1")
         expect(json["body"]).to eq "old version"
       end
 
       it "retrieves the latest version of a page" do
         json = api_call(:get, "/api/v1/groups/#{@group.id}/pages/#{@vpage.url}/revisions/latest",
                         controller: "wiki_pages_api", action: "show_revision", format: "json",
-                        group_id: @group.to_param, url: @vpage.url)
+                        group_id: @group.to_param, url_or_id: @vpage.url)
         expect(json["body"]).to eq "new version"
       end
 
       it "reverts to an old version of a page" do
         api_call(:post, "/api/v1/groups/#{@group.id}/pages/#{@vpage.url}/revisions/1",
                  { controller: "wiki_pages_api", action: "revert", format: "json", group_id: @group.to_param,
-                   url: @vpage.url, revision_id: "1" })
+                   url_or_id: @vpage.url, revision_id: "1" })
         expect(@vpage.reload.body).to eq "old version"
       end
 
       it "summarizes the latest version" do
         json = api_call(:get, "/api/v1/groups/#{@group.id}/pages/#{@vpage.url}/revisions/latest?summary=1",
                         controller: "wiki_pages_api", action: "show_revision", format: "json",
-                        group_id: @group.to_param, url: @vpage.url, summary: "1")
+                        group_id: @group.to_param, url_or_id: @vpage.url, summary: "1")
         expect(json["revision_id"]).to eq 2
         expect(json["body"]).to be_nil
       end
@@ -1519,31 +1519,31 @@ describe "Pages API", type: :request do
     def get_show(page)
       raw_api_call(:get, api_v1_course_wiki_page_path(@course.id, page.url, format: :json),
                    controller: "wiki_pages_api", action: "show", format: :json,
-                   course_id: @course.id, url: page.url)
+                   course_id: @course.id, url_or_id: page.url)
     end
 
     def put_update(page)
       raw_api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{page.url}.json",
                    { controller: "wiki_pages_api", action: "update", format: :json,
-                     course_id: @course.id, url: page.url }, { wiki_page: {} })
+                     course_id: @course.id, url_or_id: page.url }, { wiki_page: {} })
     end
 
     def get_revisions(page)
       raw_api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{page.url}/revisions.json",
                    controller: "wiki_pages_api", action: "revisions", format: :json,
-                   course_id: @course.id, url: page.url)
+                   course_id: @course.id, url_or_id: page.url)
     end
 
     def get_show_revision(page)
       raw_api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{page.url}/revisions/latest.json",
                    controller: "wiki_pages_api", action: "show_revision", format: :json,
-                   course_id: @course.id, url: page.url)
+                   course_id: @course.id, url_or_id: page.url)
     end
 
     def post_revert(page)
       raw_api_call(:post, "/api/v1/courses/#{@course.id}/pages/#{page.url}/revisions/1.json",
                    controller: "wiki_pages_api", action: "revert", format: :json,
-                   course_id: @course.id, url: page.url, revision_id: 1)
+                   course_id: @course.id, url_or_id: page.url, revision_id: 1)
     end
 
     let(:calls) { %i[get_show put_update get_revisions get_show_revision post_revert] }

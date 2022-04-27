@@ -28,6 +28,11 @@
 #       "id": "Page",
 #       "description": "",
 #       "properties": {
+#         "page_id": {
+#           "description": "the ID of the page",
+#           "example": 1,
+#           "type": "integer"
+#         },
 #         "url": {
 #           "description": "the unique locator for the page",
 #           "example": "my-page-title",
@@ -135,6 +140,15 @@
 #         }
 #       }
 #     }
+#
+# __Note on page identifiers__
+#
+# Most Pages API endpoints accept identification of the Page as either a URL
+# or an ID. In ambiguous cases, the URL takes precedence.
+#
+# For example, if you have a page whose ID is 7 and another whose ID is 8 and whose URL is "7",
+# the endpoint `/api/v1/courses/:course_id/pages/7` will refer to the latter (ID 8).
+# To explicitly request by ID, you can use the form `/api/v1/courses/:course_id/pages/page_id:7`.
 #
 class WikiPagesApiController < ApplicationController
   before_action :require_context
@@ -320,8 +334,8 @@ class WikiPagesApiController < ApplicationController
   #
   # @returns Page
   def create
-    initial_params = params.permit(:url)
-    initial_params.merge!(params[:wiki_page] ? params[:wiki_page].permit(:url, :title) : {})
+    initial_params = params.permit(:url_or_id)
+    initial_params.merge!(params[:wiki_page] ? params[:wiki_page].permit(:url_or_id, :title) : {})
 
     @wiki = @context.wiki
     @page = @wiki.build_wiki_page(@current_user, initial_params)
@@ -346,7 +360,7 @@ class WikiPagesApiController < ApplicationController
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
-  #          https://<canvas>/api/v1/courses/123/pages/my-page-url
+  #          https://<canvas>/api/v1/courses/123/pages/the-page-identifier
   #
   # @returns Page
   def show
@@ -387,10 +401,15 @@ class WikiPagesApiController < ApplicationController
   #
   # @example_request
   #     curl -X PUT -H 'Authorization: Bearer <token>' \
-  #     https://<canvas>/api/v1/courses/123/pages/the-page-url \
+  #     https://<canvas>/api/v1/courses/123/pages/the-page-identifier \
   #     -d 'wiki_page[body]=Updated+body+text'
   #
   # @returns Page
+  #
+  # NOTE: You cannot specify the ID when creating a page. If you pass a numeric value
+  # as the page identifier and that does not represent a page ID that already
+  # exists, it will be interpreted as a URL.
+  #
   def update
     perform_update = false
     if @page.new_record?
@@ -423,7 +442,7 @@ class WikiPagesApiController < ApplicationController
   #
   # @example_request
   #     curl -X DELETE -H 'Authorization: Bearer <token>' \
-  #     https://<canvas>/api/v1/courses/123/pages/the-page-url
+  #     https://<canvas>/api/v1/courses/123/pages/the-page-identifier
   #
   # @returns Page
   def destroy
@@ -447,7 +466,7 @@ class WikiPagesApiController < ApplicationController
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
-  #     https://<canvas>/api/v1/courses/123/pages/the-page-url/revisions
+  #     https://<canvas>/api/v1/courses/123/pages/the-page-identifier/revisions
   #
   # @returns [PageRevision]
   def revisions
@@ -469,11 +488,11 @@ class WikiPagesApiController < ApplicationController
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
-  #     https://<canvas>/api/v1/courses/123/pages/the-page-url/revisions/latest
+  #     https://<canvas>/api/v1/courses/123/pages/the-page-identifier/revisions/latest
   #
   # @example_request
   #     curl -H 'Authorization: Bearer <token>' \
-  #     https://<canvas>/api/v1/courses/123/pages/the-page-url/revisions/4
+  #     https://<canvas>/api/v1/courses/123/pages/the-page-identifier/revisions/4
   #
   # @returns PageRevision
   def show_revision
@@ -526,7 +545,7 @@ class WikiPagesApiController < ApplicationController
   #
   # @example_request
   #    curl -X POST -H 'Authorization: Bearer <token>' \
-  #    https://<canvas>/api/v1/courses/123/pages/the-page-url/revisions/6
+  #    https://<canvas>/api/v1/courses/123/pages/the-page-identifier/revisions/6
   #
   # @returns PageRevision
   def revert
@@ -556,7 +575,7 @@ class WikiPagesApiController < ApplicationController
       @wiki = @context.wiki
 
       # attempt to find an existing page
-      @url = params[:url]
+      @url = params[:url_or_id]
       @page = if is_front_page_action?
                 @wiki.front_page
               else
