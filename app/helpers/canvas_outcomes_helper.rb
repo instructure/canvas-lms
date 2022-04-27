@@ -19,13 +19,14 @@
 #
 
 module CanvasOutcomesHelper
-  def get_lmgb_results(course, assignment_ids, assignment_type, outcome_ids)
-    return if assignment_ids.blank? || assignment_type.blank? || outcome_ids.blank? || !course.feature_enabled?(:outcome_service_results_to_canvas)
+  def get_lmgb_results(course, assignment_ids, assignment_type, outcome_ids, user_uuids)
+    return if assignment_ids.blank? || assignment_type.blank? || outcome_ids.blank? || user_uuids.blank? || !course.feature_enabled?(:outcome_service_results_to_canvas)
 
     params = {
       associated_asset_id_list: assignment_ids,
       associated_asset_type: assignment_type,
-      external_outcome_id_list: outcome_ids
+      external_outcome_id_list: outcome_ids,
+      user_uuid_list: user_uuids
     }
 
     domain, jwt = extract_domain_jwt(
