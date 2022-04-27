@@ -751,7 +751,7 @@ class DiscussionTopicsController < ApplicationController
                discussion_topic_id: params[:id],
                manual_mark_as_read: @current_user&.manual_mark_as_read?,
                discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),
-               rce_mentions_in_discussions: Account.site_admin.feature_enabled?(:rce_mentions_in_discussions) && !@topic.anonymous?,
+               rce_mentions_in_discussions: @context.feature_enabled?(:react_discussions_post) && !@topic.anonymous?,
                isolated_view: Account.site_admin.feature_enabled?(:isolated_view),
                draft_discussions: Account.site_admin.feature_enabled?(:draft_discussions),
                discussion_anonymity_enabled: @context.feature_enabled?(:react_discussions_post),

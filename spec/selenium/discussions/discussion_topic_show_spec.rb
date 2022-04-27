@@ -156,13 +156,6 @@ describe "Discussion Topic Show" do
         wait_for_ajaximations
         expect(fj("span:contains('child reply number 1')")).to be_present
       end
-    end
-
-    context "when the mentions feature flag is turned on" do
-      before :once do
-        Account.site_admin.enable_feature! :rce_mentions_in_discussions
-        Account.site_admin.enable_feature! :isolated_view
-      end
 
       it "can mention users in the reply" do
         student_in_course(course: @course, name: "Jeff", active_all: true).user

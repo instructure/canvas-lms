@@ -507,28 +507,15 @@ describe DiscussionTopicsController do
         user_session(user)
       end
 
-      context 'and "rce_mentions_in_discussions" enabled' do
-        before { Account.site_admin.enable_feature! :rce_mentions_in_discussions }
-
-        it 'sets "rce_mentions_in_discussions" to true in the JS ENV' do
-          subject
-          expect(assigns.dig(:js_env, :rce_mentions_in_discussions)).to be true
-        end
-
-        context "topic is anonymous" do
-          it 'sets "rce_mentions_in_discussions" to false in the JS ENV' do
-            DiscussionTopic.where(id: discussion.id).update_all(anonymous_state: "full_anonymity")
-            discussion.reload
-            subject
-            expect(assigns.dig(:js_env, :rce_mentions_in_discussions)).to be false
-          end
-        end
+      it 'sets "rce_mentions_in_discussions" to true in the JS ENV' do
+        subject
+        expect(assigns.dig(:js_env, :rce_mentions_in_discussions)).to be true
       end
 
-      context 'and "rce_mentions_in_discussions" disabled' do
-        before { Account.site_admin.disable_feature! :rce_mentions_in_discussions }
-
+      context "topic is anonymous" do
         it 'sets "rce_mentions_in_discussions" to false in the JS ENV' do
+          DiscussionTopic.where(id: discussion.id).update_all(anonymous_state: "full_anonymity")
+          discussion.reload
           subject
           expect(assigns.dig(:js_env, :rce_mentions_in_discussions)).to be false
         end
