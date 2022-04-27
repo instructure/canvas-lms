@@ -46,7 +46,11 @@ module BasicLTI
       grade, score = @assignment.compute_grade_and_score(grade, nil)
       # if score is not changed, stop creating a new version
       return true if attempt.present? &&
-                     score_equal?(score, grade, launch_url)
+                     score_equal?(score, grade, launch_url) &&
+                     # Don't return without creating a new version
+                     # if a grader just completed manually scoring
+                     # all quiz items that required additional review
+                     !additional_review_complete?(submission)
 
       save_submission!(launch_url, grade, score, grader_id)
       true
@@ -76,6 +80,25 @@ module BasicLTI
     end
 
     private
+
+    def workflow_state_for(submission_record)
+      # Quizzes indicated the quiz session contains items that are not auto-
+      # gradable. Set workflow state to pending_review to indicate manual
+      # grading is needed
+      return Submission.workflow_states.pending_review if @needs_additional_review
+
+      # The submission previously was in a pending_review state, but all
+      # items that required manual grading have been scored. Set workflow_state
+      # to submitted and let the Submission#inferred_workflow_state method handle
+      # selecting the correct state
+      return Submission.workflow_states.submitted if additional_review_complete?(submission_record)
+
+      submission_record.workflow_state
+    end
+
+    def additional_review_complete?(submission_record)
+      !@needs_additional_review && submission_record.pending_review?
+    end
 
     def score_equal?(score2, grade2, launch_url)
       # equal for float type
@@ -144,7 +167,7 @@ module BasicLTI
         submission.grade_matches_current_submission = true
         submission.grader_id = grader_id
         submission.posted_at = submission.submitted_at unless submission.posted? || @assignment.post_manually?
-        submission.workflow_state = Submission.workflow_states.pending_review if @needs_additional_review
+        submission.workflow_state = workflow_state_for(submission)
       end
       clear_cache
       # We always want to update the launch_url to match what new quizzes is laying down.
