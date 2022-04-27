@@ -334,7 +334,6 @@ class MediaObject < ActiveRecord::Base
 
   def ensure_attachment
     return if attachment_id
-    return if Attachment.where(media_entry_id: media_id).first
     return unless %w[Account Course Group User].include?(context_type)
 
     sources = media_sources
