@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import moment from 'moment'
 import {BlackoutDateState, BlackoutDate, Course} from './shared/types'
 
 /* Model types */
@@ -65,6 +66,21 @@ export interface Module {
   readonly name: string
   readonly position: number
   readonly items: CoursePaceItem[]
+}
+
+interface ItemDueDate {
+  date: moment.Moment
+  type: 'assignment' | 'blackout_date'
+}
+
+// after module items are merged with their due dates and blackout dates
+export type CoursePaceItemWithDate = ItemDueDate & (CoursePaceItem | BlackoutDate)
+
+export interface ModuleWithDueDates {
+  readonly id: string
+  readonly name: string
+  readonly position: number
+  items: CoursePaceItemWithDate[]
 }
 
 export type PaceContextTypes = 'Course' | 'Section' | 'Enrollment'
