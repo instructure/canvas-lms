@@ -90,7 +90,11 @@ export default function JobsTable({
             />
           </Table.Cell>
           <Table.Cell>
-            {job.attempts} / {job.max_attempts}
+            {job.locked_by === 'on hold' ? (
+              <Text color="alert">{I18n.t('hold')}</Text>
+            ) : (
+              `${job.attempts} / ${job.max_attempts}`
+            )}
           </Table.Cell>
           <Table.Cell>{job.priority}</Table.Cell>
           <Table.Cell>
