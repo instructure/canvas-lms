@@ -148,6 +148,11 @@ class GradebookImporter
       @progress.workflow_state = "failed"
       @progress.save
       return
+    rescue RangeError
+      @progress.message = "RangeError: index out of range"
+      @progress.workflow_state = "failed"
+      @progress.save
+      return
     end
 
     @missing_assignments = []
