@@ -173,6 +173,7 @@ class Assignment < ActiveRecord::Base
   validate :moderation_setting_ok?
   validate :assignment_name_length_ok?, unless: :deleted?
   validate :annotatable_and_group_exclusivity_ok?
+  validate :allowed_extensions_length_ok?
   validates :lti_context_id, presence: true, uniqueness: true
   validates :grader_count, numericality: true
   validates :allowed_attempts, numericality: { greater_than: 0 }, unless: proc { |a| a.allowed_attempts == -1 }, allow_nil: true
@@ -554,7 +555,6 @@ class Assignment < ActiveRecord::Base
 
   validates :title, presence: { if: :title_changed? }
   validates :description, length: { maximum: maximum_long_text_length, allow_blank: true }
-  validates :allowed_extensions, length: { maximum: maximum_long_text_length, allow_blank: true }
   validate :frozen_atts_not_altered, if: :frozen?, on: :update
   validates :grading_type, inclusion: { in: ALLOWED_GRADING_TYPES }
 
@@ -3983,6 +3983,12 @@ class Assignment < ActiveRecord::Base
       errors.add(:final_grader, "must be enrolled in selected section")
     elsif course.participating_instructors.where(id: final_grader_id).empty?
       errors.add(:final_grader, "must be an instructor in this course")
+    end
+  end
+
+  def allowed_extensions_length_ok?
+    if allowed_extensions.present? && allowed_extensions.to_yaml.length > Assignment.maximum_string_length
+      errors.add(:allowed_extensions, I18n.t("Value too long, allowed length is %{length}", length: Assignment.maximum_string_length))
     end
   end
 
