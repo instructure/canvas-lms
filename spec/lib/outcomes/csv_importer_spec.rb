@@ -415,7 +415,7 @@ describe Outcomes::CSVImporter do
     end
 
     it "if a validation fails" do
-      methods = '["decaying_average", "n_mastery", "highest", "latest"]'
+      methods = '["decaying_average", "n_mastery", "highest", "latest", "average"]'
       expect_import_error(
         [
           headers,
