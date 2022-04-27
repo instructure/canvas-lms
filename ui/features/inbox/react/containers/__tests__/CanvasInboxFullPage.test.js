@@ -136,20 +136,6 @@ describe('CanvasInbox Full Page', () => {
       expect(await container.findByText('testing 123')).toBeInTheDocument()
     })
 
-    // TODO: will be fixed with VICE-2077
-    it.skip('should change the read state of a conversation', async () => {
-      const container = setup()
-      const conversation = await container.findByTestId('conversationListItem-Checkbox')
-      fireEvent.click(conversation)
-      await container.findByText('Watch out for that Magneto guy')
-      expect(container.queryByTestId('unread-badge')).toBeTruthy()
-      const settings = await container.findByTestId('settings')
-      fireEvent.click(settings)
-      const markAsReadButton = await container.findByText('Mark as read')
-      fireEvent.click(markAsReadButton)
-      expect(container.queryByTestId('unread-badge')).toBeFalsy()
-    })
-
     it('Successfully star selected conversation', async () => {
       const {findAllByTestId, findByTestId, getByText} = setup()
 
