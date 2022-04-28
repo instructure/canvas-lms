@@ -161,9 +161,11 @@ const HeaderInputs = props => {
                 onSelectedIdsChange={ids => {
                   props.onSelectedIdsChange(ids)
                 }}
+                onInputValueChange={props.onAddressBookInputValueChange}
                 activeCourseFilter={props.activeCourseFilter}
                 hasSelectAllFilterOption
                 selectedRecipients={props.selectedRecipients}
+                addressBookMessages={props.addressBookMessages}
               />
             }
             shouldGrow
@@ -219,6 +221,7 @@ HeaderInputs.propTypes = {
   onUserNoteChange: PropTypes.func,
   onSendIndividualMessagesChange: PropTypes.func,
   onSubjectChange: PropTypes.func,
+  onAddressBookInputValueChange: PropTypes.func,
   userNote: PropTypes.bool,
   sendIndividualMessages: PropTypes.bool,
   subject: PropTypes.string,
@@ -230,7 +233,8 @@ HeaderInputs.propTypes = {
   /**
    * Bool to control open/closed state of the AddressBookContainer menu for testing
    */
-  addressBookContainerOpen: PropTypes.bool
+  addressBookContainerOpen: PropTypes.bool,
+  addressBookMessages: PropTypes.array
 }
 
 export default HeaderInputs
