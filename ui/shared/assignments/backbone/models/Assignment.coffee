@@ -502,9 +502,6 @@ export default class Assignment extends Model
   newQuizzesAssignmentBuildButtonEnabled: =>
     return ENV.NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED
 
-  newMasteryConnectIconEnabled: =>
-    return ENV.NEW_MASTERY_CONNECT_ICON_ENABLED
-
   showBuildButton: =>
     @isQuizLTIAssignment() && @newQuizzesAssignmentBuildButtonEnabled()
 
