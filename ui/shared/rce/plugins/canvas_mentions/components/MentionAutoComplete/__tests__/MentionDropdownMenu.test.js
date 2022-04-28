@@ -31,6 +31,16 @@ const MentionMockUsers = [
   }
 ]
 
+const mockCoordinates = {
+  height: 258,
+  left: 312,
+  right: 530,
+  top: 250,
+  width: 218,
+  x: 312,
+  y: 25
+}
+
 const tinyMCE = {
   activeEditor: {
     getParam: () => 'LTR'
@@ -38,7 +48,13 @@ const tinyMCE = {
 }
 
 const setup = props => {
-  return render(<MentionDropdownMenu mentionOptions={MentionMockUsers} {...props} />)
+  return render(
+    <MentionDropdownMenu
+      mentionOptions={MentionMockUsers}
+      coordiantes={mockCoordinates}
+      {...props}
+    />
+  )
 }
 
 describe('MentionDropdownMenu tests', () => {
