@@ -35,17 +35,19 @@ export const AttachmentButton = props => {
       screenReaderLabel={I18n.t('Remove Attachment')}
       childrenAriaLabel={I18n.t(`Replace filename.png button`)}
     >
-      <Link
-        renderIcon={<IconPaperclipLine size="small" />}
-        href={props.attachment?.url}
-        isWithinText={false}
-      >
-        <Text weight="bold">
-          {props.attachment?.displayName?.length > TRUNCATE_TO
-            ? props.attachment?.displayName?.slice(0, TRUNCATE_TO)?.concat('...')
-            : props.attachment?.displayName}
-        </Text>
-      </Link>
+      <span className="discussions-attach-button">
+        <Link
+          renderIcon={<IconPaperclipLine size="small" />}
+          href={props.attachment?.url}
+          isWithinText={false}
+        >
+          <Text weight="bold">
+            {props.attachment?.displayName?.length > TRUNCATE_TO
+              ? props.attachment?.displayName?.slice(0, TRUNCATE_TO)?.concat('...')
+              : props.attachment?.displayName}
+          </Text>
+        </Link>
+      </span>
     </RemovableItem>
   )
 }

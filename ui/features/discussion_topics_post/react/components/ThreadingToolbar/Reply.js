@@ -48,27 +48,29 @@ export function Reply({...props}) {
         }
       }}
       render={responsiveProps => (
-        <CondensedButton
-          onClick={props.onClick}
-          withBackground={props.withBackground}
-          color="primary"
-          data-testid="threading-toolbar-reply"
-          interaction={props.isReadOnly ? 'disabled' : 'enabled'}
-          margin={responsiveProps.itemSpacing}
-        >
-          <AccessibleContent
-            alt={I18n.t('Reply to post from %{author}', {author: props.authorName})}
+        <span className="discussion-reply-btn">
+          <CondensedButton
+            onClick={props.onClick}
+            withBackground={props.withBackground}
+            color="primary"
+            data-testid="threading-toolbar-reply"
+            interaction={props.isReadOnly ? 'disabled' : 'enabled'}
+            margin={responsiveProps.itemSpacing}
           >
-            <Text weight="bold" size={responsiveProps.textSize}>
-              {props.hasDraftEntry && (
-                <View margin="0 small 0 0">
-                  <IconEditLine size="x-small" />
-                </View>
-              )}
-              {replyButtonText}
-            </Text>
-          </AccessibleContent>
-        </CondensedButton>
+            <AccessibleContent
+              alt={I18n.t('Reply to post from %{author}', {author: props.authorName})}
+            >
+              <Text weight="bold" size={responsiveProps.textSize}>
+                {props.hasDraftEntry && (
+                  <View margin="0 small 0 0">
+                    <IconEditLine size="x-small" />
+                  </View>
+                )}
+                {replyButtonText}
+              </Text>
+            </AccessibleContent>
+          </CondensedButton>
+        </span>
       )}
     />
   )

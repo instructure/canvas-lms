@@ -70,13 +70,13 @@ describe "Gradebook" do
       Account.site_admin.enable_feature!(:remove_gradebook_student_search_delay)
       Gradebook.visit(@course)
       expect(Gradebook.fetch_student_names.size).to eq(@all_students.size)
-      f(".gradebook_filter input").send_keys @course.students[0].name
+      f("#gradebook-student-search input").send_keys @course.students[0].name
+      f("#gradebook-student-search input").send_keys(:return)
       expect(Gradebook.fetch_student_names).to match_array [@course.students[0].name]
     end
 
     context "redesign" do
       before do
-        Account.site_admin.enable_feature!(:gradebook_assignment_search_and_redesign)
         Gradebook.visit(@course)
       end
 

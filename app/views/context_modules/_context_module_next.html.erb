@@ -20,16 +20,15 @@
   context_module_next ||= nil
   context_module ||= context_module_next
   module_data = context_module ? process_module_data(context_module, @is_student, @current_user, @session) : { published_status: 'unpublished' }
-  editable ||= can_do(@context, @current_user, :manage_content, :manage_course_content_edit)
   can_direct_share = can_do(@context, @current_user, :read_as_admin)
   workflow_state = context_module && context_module.workflow_state
   @modules ||= []
 %>
 
-<% cache_if_module(context_module, editable, @is_student, @can_view_unpublished, @current_user, @context) do %>
+<% cache_if_module(context_module, @can_view, @is_student, @can_view_unpublished, @current_user, @context) do %>
 <div
   class="item-group-condensed context_module
-    <%= 'editable_context_module' if editable %>
+    <%= 'editable_context_module' if @can_add %>
     <%= 'has_requirements' if context_module && context_module.completion_requirements.present? %>
     "
     aria-label="<%= context_module ? context_module.name : "" %>"
@@ -44,7 +43,7 @@
     <span
       class="sortable-handle reorder_module_link"
       title="<%= t('reorder_modules', %{Drag to reorder modules}) %>"
-      style="<%= hidden unless @modules.length > 1 && editable %>"
+      style="<%= hidden unless @modules.length > 1 && @can_edit %>"
     >
       <i aria-hidden="true" class="icon-drag-handle"></i>
     </span>
@@ -76,7 +75,7 @@
       <span class="name ellipsis"><%= context_module.try_rescue(:name) || nbsp %></span>
     </span>
 
-    <%= render :partial => "context_modules/prerequisites_message", :locals => {:editable => editable, :context_module => context_module} %>
+    <%= render :partial => "context_modules/prerequisites_message", :locals => {:viewable => @can_view, :context_module => context_module} %>
 
     <div class="requirements_message">
       <% if context_module && context_module.completion_requirements.present? %>
@@ -91,7 +90,7 @@
     </div>
 
     <div class="ig-header-admin">
-      <% unless editable %>
+      <% unless @can_view %>
         <% if context_module %>
           <div class="completion_status">
             <i class="icon-check complete_icon"
@@ -117,7 +116,7 @@
         <% end %>
       <% end %>
 
-      <% if editable %>
+      <% if @can_edit%>
         <span
           data-module-type="module"
           data-id="<%= context_module && context_module.id %>"
@@ -131,7 +130,9 @@
         >
           <i class="icon-<%= module_data[:published_status] %>" alt="<%= module_data[:published_status] == 'published' ? t('published') : t('unpublished') %>"></i>
         </span>
+      <% end %>
 
+      <% if @can_add %>
         <button
           aria-label="<%= t('Add Content to %{module_name}', {module_name: context_module ? context_module.name : 'module'}) %>"
           rel="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/items"
@@ -139,12 +140,12 @@
         </button>
       <% end %>
 
-      <% if editable || can_direct_share %>
+      <% if @can_view || can_direct_share %>
         <button class="Button--icon-action al-trigger" aria-label="<%= t('Manage %{module_name}', {module_name: context_module ? context_module.name : 'module'})  %>">
           <i class="icon-more" aria-hidden="true"></i>
         </button>
         <ul class="al-options">
-          <% if editable %>
+          <% if @can_edit %>
             <li role="presentation">
               <a
                 href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>"
@@ -163,12 +164,16 @@
                 class="move_module_link icon-updown"
                 title="<%= t('Move this module') %>"><%= t('Move Module...') %></a>
             </li>
+          <% end %>
+          <% if @can_delete %>
             <li role="presentation">
               <a
                 href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>"
                 class="delete_module_link icon-trash"
                 title="<%= t('links.title.delete_module', %{Delete this module}) %>"><%= t('links.text.delete_module', %{Delete}) %></a>
             </li>
+          <% end %>
+          <% if @can_add %>
             <li role="presentation" class="duplicate_module_menu_item">
               <a
                 href="/api/v1<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/duplicate"
@@ -197,7 +202,7 @@
               </a>
             </li>
           <% end %>
-          <% if editable %>
+          <% if @can_view %>
             <%= external_tools_menu_items(@menu_tools[:module_menu], {link_class: "menu_tool_link", settings_key: :module_menu, in_list: true, url_params: {:modules => [context_module ? context_module.id : "{{ id }}"]}}) %>
             <%= external_tools_menu_items(@menu_tools[:module_group_menu], {link_class: "menu_tray_tool_link", settings_key: :module_group_menu, in_list: true}) %>
             <%= external_tools_menu_items(@menu_tools[:module_menu_modal], {link_class: "menu_tray_tool_link", settings_key: :module_menu_modal, in_list: true}) %>
@@ -214,7 +219,7 @@
   </div>
 
   <div class="content" id="context_module_content_<%= context_module && context_module.id %>">
-    <ul class="ig-list items context_module_items <%= 'manageable' if editable %>">
+    <ul class="ig-list items context_module_items <%= 'manageable' if @can_view %>">
       <% if context_module && module_data[:items] %>
         <% module_data[:items].each do |item| %>
           <%
@@ -222,7 +227,7 @@
             locals = {
               :completion_criteria => context_module.completion_requirements,
               :item_data => item_data,
-              :editable => editable,
+              :viewable => @can_view,
             }
           %>
           <%= render :partial => 'context_modules/module_item_next', :object => item, :as => :module_item, :locals => locals %>
@@ -232,7 +237,7 @@
         <% end %>
       <% end %>
     </ul>
-    <% if !context_module || editable && module_data[:items]&.empty? %>
+    <% if !context_module || @can_view && module_data[:items]&.empty? %>
       <div class='module_dnd' data-context-module-id="<%= context_module&.id %>"></div>
     <% end %>
 

@@ -104,6 +104,28 @@ describe BasicLTI::BasicOutcomes do
     expect(request.error_code).to eq error_code
   end
 
+  describe BasicLTI::BasicOutcomes::LtiResponse do
+    subject { lti_response.needs_additional_review? }
+
+    let(:lti_response) { BasicLTI::BasicOutcomes::LtiResponse.new(xml) }
+
+    describe "#needs_additional_review?" do
+      context "when the needsAdditionalReview element is present" do
+        before do
+          xml.at_css("imsx_POXBody > replaceResultRequest").add_child(
+            "<submissionDetails><needsAdditionalReview/></submissionDetails>"
+          )
+        end
+
+        it { is_expected.to eq true }
+      end
+
+      context "when the needsAdditionalReview element is absent" do
+        it { is_expected.to eq false }
+      end
+    end
+  end
+
   context "Exceptions" do
     it "BasicLTI::BasicOutcomes::Unauthorized should have 401 status" do
       raise BasicLTI::BasicOutcomes::Unauthorized, "Invalid signature"

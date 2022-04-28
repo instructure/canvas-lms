@@ -284,6 +284,80 @@ describe('OutcomeManagement', () => {
     })
   }
 
+  const courseOnlyTests = () => {
+    beforeEach(() => {
+      window.ENV.IMPROVED_OUTCOMES_MANAGEMENT = true
+      window.ENV.OUTCOME_ALIGNMENT_SUMMARY = true
+      window.ENV.PERMISSIONS.manage_outcomes = true
+    })
+
+    describe('Outcome Alignment Summary Tab', () => {
+      describe('when Improved Outcomes Management FF is enabled', () => {
+        it('renders Aligments tab if Alignment Summary FF is enabled and user has permissions', async () => {
+          const {getByText} = render(
+            <MockedProvider cache={cache} mocks={[...outcomeGroupsMocks]}>
+              <OutcomeManagement />
+            </MockedProvider>
+          )
+          await act(async () => jest.runAllTimers())
+          expect(getByText('Alignments')).toBeInTheDocument()
+        })
+
+        it('does not render Aligments tab if Alignment Summary FF is enabled but user does not have permissions', async () => {
+          window.ENV.PERMISSIONS.manage_outcomes = false
+          const {queryByText} = render(
+            <MockedProvider cache={cache} mocks={[...outcomeGroupsMocks]}>
+              <OutcomeManagement />
+            </MockedProvider>
+          )
+          await act(async () => jest.runAllTimers())
+          expect(queryByText('Alignments')).not.toBeInTheDocument()
+        })
+
+        it('does not render Alignments tab if Alignment Summary FF is disabled even if user has permissions', async () => {
+          window.ENV.OUTCOME_ALIGNMENT_SUMMARY = false
+          const {queryByText} = render(
+            <MockedProvider cache={cache} mocks={[...outcomeGroupsMocks]}>
+              <OutcomeManagement />
+            </MockedProvider>
+          )
+          await act(async () => jest.runAllTimers())
+          expect(queryByText('Alignments')).not.toBeInTheDocument()
+        })
+      })
+
+      describe('when Improved Outcomes Management FF is disabled', () => {
+        it('does not render Aligments tab', async () => {
+          window.ENV.IMPROVED_OUTCOMES_MANAGEMENT = false
+          const {queryByText} = render(
+            <MockedProvider cache={cache} mocks={[...outcomeGroupsMocks]}>
+              <OutcomeManagement />
+            </MockedProvider>
+          )
+          await act(async () => jest.runAllTimers())
+          expect(queryByText('Alignments')).not.toBeInTheDocument()
+        })
+      })
+    })
+  }
+
+  const accountOnlyTests = () => {
+    describe('Outcome Alignment Summary', () => {
+      it('does not render Aligments Summary tab in account context', async () => {
+        window.ENV.IMPROVED_OUTCOMES_MANAGEMENT = true
+        window.ENV.OUTCOME_ALIGNMENT_SUMMARY = true
+        window.ENV.PERMISSIONS.manage_outcomes = true
+        const {queryByText} = render(
+          <MockedProvider cache={cache} mocks={[...outcomeGroupsMocks]}>
+            <OutcomeManagement />
+          </MockedProvider>
+        )
+        await act(async () => jest.runAllTimers())
+        expect(queryByText('Alignments')).not.toBeInTheDocument()
+      })
+    })
+  }
+
   describe('account', () => {
     beforeEach(() => {
       window.ENV = {
@@ -301,6 +375,7 @@ describe('OutcomeManagement', () => {
     })
 
     sharedExamples()
+    accountOnlyTests()
   })
 
   describe('course', () => {
@@ -320,6 +395,7 @@ describe('OutcomeManagement', () => {
     })
 
     sharedExamples()
+    courseOnlyTests()
   })
 
   it.skip('renders ManagementHeader with lhsGroupId if selected a group in lhs', async () => {

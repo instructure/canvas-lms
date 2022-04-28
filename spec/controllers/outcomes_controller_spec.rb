@@ -133,6 +133,22 @@ describe OutcomesController do
         expect(assigns[:js_env][:OUTCOMES_FRIENDLY_DESCRIPTION]).to eq false
       end
     end
+
+    context "outcome_alignment_summary" do
+      it "returns true if outcome_alignment_summary feature flag is enabled" do
+        @account.root_account.enable_feature!(:outcome_alignment_summary)
+        user_session(@admin)
+        get "index", params: { account_id: @account.id }
+        expect(assigns[:js_env][:OUTCOME_ALIGNMENT_SUMMARY]).to eq true
+      end
+
+      it "returns false if outcome_alignment_summary feature flag is disabled" do
+        @account.root_account.disable_feature!(:outcome_alignment_summary)
+        user_session(@admin)
+        get "index", params: { account_id: @account.id }
+        expect(assigns[:js_env][:OUTCOME_ALIGNMENT_SUMMARY]).to eq false
+      end
+    end
   end
 
   describe "GET 'show'" do

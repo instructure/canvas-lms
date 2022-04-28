@@ -45,18 +45,20 @@ export function DueDatesForParticipantList({...props}) {
                 .join(', ')}
         </Text>
         {isExpandable && (
-          <Text size={props.textSize}>
-            {isExpanded ? ' ' : '... '}
-            <Link onClick={() => setIsExpanded(!isExpanded)}>
-              {isExpanded
-                ? I18n.t('%{count} less', {
-                    count: props.assignmentOverride.set.students.length - TRUNCATE_TO
-                  })
-                : I18n.t('%{count} more', {
-                    count: props.assignmentOverride.set.students.length - TRUNCATE_TO
-                  })}
-            </Link>
-          </Text>
+          <span className="discussions-due-dates-expand">
+            <Text size={props.textSize}>
+              {isExpanded ? ' ' : '... '}
+              <Link onClick={() => setIsExpanded(!isExpanded)}>
+                {isExpanded
+                  ? I18n.t('%{count} less', {
+                      count: props.assignmentOverride.set.students.length - TRUNCATE_TO
+                    })
+                  : I18n.t('%{count} more', {
+                      count: props.assignmentOverride.set.students.length - TRUNCATE_TO
+                    })}
+              </Link>
+            </Text>
+          </span>
         )}
       </>
     )

@@ -104,10 +104,8 @@ $ic-bg-light-success:       #E8F6E9;
 @if $use_high_contrast { $ic-bg-light-success: #E8F2E9; }
 $ic-bg-light-success-text:  #008A13;
 @if $use_high_contrast { $ic-bg-light-success-text: $ic-color-success; }
-$ic-bg-light-alert:         #FBEDE7;
-@if $use_high_contrast { $ic-bg-light-alert: #F9ECE8; }
-$ic-bg-light-alert-text:    #D14604;
-@if $use_high_contrast { $ic-bg-light-alert-text: $ic-color-alert; }
+$ic-bg-light-alert:         #F9ECE8;
+$ic-bg-light-alert-text:    #C23C0D;
 $ic-bg-light-danger:        #FCE8E7;
 @if $use_high_contrast { $ic-bg-light-danger: #FBE8E8; }
 $ic-bg-light-danger-text:   #E0061F;

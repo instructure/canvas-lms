@@ -172,7 +172,12 @@ class CourseSection < ActiveRecord::Base
     given { |user| course.account_membership_allows(user, :read_roster) }
     can :read
 
-    given { |user, session| course.grants_right?(user, session, :manage_calendar) }
+    given do |user|
+      if user
+        enrollments = user.enrollments.active_by_date.where(course: course)
+        enrollments.where(limit_privileges_to_course_section: false).or(enrollments.where(course_section: self)).any? { |e| e.has_permission_to?(:manage_calendar) }
+      end
+    end
     can :manage_calendar
 
     given do |user, session|

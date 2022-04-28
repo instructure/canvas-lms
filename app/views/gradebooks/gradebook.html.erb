@@ -79,20 +79,6 @@
           <span data-component="EnhancedActionMenu"></span>
         <% end %>
 
-        <% unless Account.site_admin.feature_enabled?(:gradebook_assignment_search_and_redesign) %>
-          <div class="gradebook-filter-container gradebook_filter" id="search-filter-container">
-            <% placeholder = t('Search…') %>
-            <input
-              type="text"
-              class="search-query"
-              placeholder="<%= placeholder %>"
-              aria-label="<%= placeholder %>"
-              aria-disabled="true"
-              disabled
-            >
-          </div>
-        <% end %>
-
         <div class="gradebook_menu">
           <span id="gradebook-settings-modal-button-container"></span>
           <span data-component="GradebookSettingsModal"></span>
@@ -100,12 +86,10 @@
       </div>
     </div>
     <div id="gradebook_app"></div>
-    <% if Account.site_admin.feature_enabled?(:gradebook_assignment_search_and_redesign) %>
-      <div style="display: flex;">
-        <div id="gradebook-student-search" style="flex: 1;padding-right: 12px;"></div>
-        <div id="gradebook-assignment-search" style="flex: 1;"></div>
-      </div>
-    <% end %>
+    <div style="display: flex;">
+      <div id="gradebook-student-search" style="flex: 1;padding-right: 12px;"></div>
+      <div id="gradebook-assignment-search" style="flex: 1;"></div>
+    </div>
     <div id="gradebook-filter-nav"></div>
     <div id="gradebook-grid-wrapper" class="use-css-transitions-for-show-hide" style="display:none;">
       <div id="gradebook_grid"></div>

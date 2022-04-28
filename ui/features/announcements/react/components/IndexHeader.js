@@ -152,7 +152,7 @@ export default class IndexHeader extends Component {
               />
             </Flex.Item>
             <Flex.Item margin="0 0 0 small">
-              {this.props.permissions.manage_content &&
+              {this.props.permissions.manage_course_content_edit &&
                 !this.props.announcementsLocked &&
                 (this.props.isToggleLocking ? (
                   <Button
@@ -181,7 +181,7 @@ export default class IndexHeader extends Component {
                     </ScreenReaderContent>
                   </Button>
                 ))}
-              {this.props.permissions.manage_content && (
+              {this.props.permissions.manage_course_content_delete && (
                 <Button
                   disabled={this.props.isBusy || this.props.selectedCount === 0}
                   size="medium"

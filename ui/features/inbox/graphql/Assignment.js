@@ -36,6 +36,7 @@ export const Assignment = {
   mock: ({id = 'gfhrgsjaksa==', _id = '9', name = 'This is an Assignment'} = {}) => ({
     id,
     _id,
-    name
+    name,
+    __typename: 'Assignment'
   })
 }

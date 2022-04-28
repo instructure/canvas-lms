@@ -19,6 +19,7 @@
 import {Conversation} from './Conversation'
 import {ConversationMessage} from './ConversationMessage'
 import {ConversationParticipant} from './ConversationParticipant'
+import {SubmissionComment} from './SubmissionComment'
 import {Course} from './Course'
 import {Enrollment} from './Enrollment'
 import {graphql} from 'msw'
@@ -205,6 +206,10 @@ export const handlers = [
             }
           ],
           __typename: 'SubmissionCommentConnection'
+        },
+        user: {
+          _id: '75',
+          __typename: 'User'
         },
         __typename: 'Submission'
       }
@@ -458,16 +463,29 @@ export const handlers = [
   }),
 
   graphql.mutation('CreateConversation', (req, res, ctx) => {
-    const data = {
-      createConversation: {
-        conversations: [
-          {
-            ...ConversationParticipant.mock(),
-            conversation: Conversation.mock({subject: req.variables.subject})
-          }
-        ],
-        errors: null,
+    let data
+    if (!req.variables.recipients || !req.variables.recipients.length) {
+      data = {
+        createConversation: null,
+        errors: {
+          attribute: 'message',
+          message: 'Invalid recipients',
+          __typename: 'ValidationError'
+        },
         __typename: 'CreateConversationPayload'
+      }
+    } else {
+      data = {
+        createConversation: {
+          conversations: [
+            {
+              ...ConversationParticipant.mock(),
+              conversation: Conversation.mock({subject: req.variables.subject})
+            }
+          ],
+          errors: null,
+          __typename: 'CreateConversationPayload'
+        }
       }
     }
 
@@ -482,7 +500,17 @@ export const handlers = [
         __typename: 'AddConversationMessagePayload'
       }
     }
+    return res(ctx.data(data))
+  }),
 
+  graphql.mutation('CreateSubmissionComment', (req, res, ctx) => {
+    const data = {
+      createSubmissionComment: {
+        submissionComment: SubmissionComment.mock({comment: req.variables.body}),
+        errors: null,
+        __typename: 'CreateSubmissionCommentPayload'
+      }
+    }
     return res(ctx.data(data))
   }),
 

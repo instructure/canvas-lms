@@ -29,7 +29,6 @@ import EditView from 'ui/features/discussion_topic_edit/backbone/views/EditView.
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
-import RichContentEditor from '@canvas/rce/RichContentEditor'
 import 'helpers/jquery.simulate'
 
 const currentOrigin = window.location.origin
@@ -65,7 +64,6 @@ const editView = function (opts = {}, discussOpts = {}) {
     lockedItems: opts.lockedItems || {},
     isEditing: false,
     anonymousState: ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.anonymous_state,
-    anonymous_discussion_enabled: ENV.ANONYMOUS_DISCUSSIONS,
     react_discussions_post: ENV.REACT_DISCUSSIONS_POST,
     allow_student_anonymous_discussion_topics: ENV.allow_student_anonymous_discussion_topics,
     context_is_not_group: ENV.context_is_not_group
@@ -124,23 +122,6 @@ test('it should be accessible', function (assert) {
 test('renders', function () {
   const view = this.editView()
   ok(view)
-})
-
-// EditView.loadNewEditor is stubbed since I can't figure out how
-// to cope with the async RCE initialization in QUnit
-//
-QUnit.skip('tells RCE to manage the parent', function () {
-  const lne = sandbox.stub(RichContentEditor, 'loadNewEditor')
-  const view = this.editView()
-  view.loadNewEditor()
-  ok(lne.firstCall.args[1].manageParent, 'manageParent flag should be set')
-})
-
-QUnit.skip('does not tell RCE to manage the parent of locked content', function () {
-  const lne = sandbox.stub(RichContentEditor, 'loadNewEditor')
-  const view = this.editView({lockedItems: {content: true}})
-  view.loadNewEditor()
-  strictEqual(lne.callCount, 0, 'RCE not called')
 })
 
 test('shows error message on assignment point change with submissions', function () {
@@ -309,7 +290,6 @@ test('does not save todo date if discussion is graded', function () {
 })
 
 test('does not renders anonymous section if is a group discussion', function () {
-  ENV.ANONYMOUS_DISCUSSIONS = true
   ENV.REACT_DISCUSSIONS_POST = true
   ENV.context_is_not_group = false
   const view = this.editView({
@@ -319,7 +299,6 @@ test('does not renders anonymous section if is a group discussion', function () 
 })
 
 test('renders anonymous section if able to moderate', function () {
-  ENV.ANONYMOUS_DISCUSSIONS = true
   ENV.REACT_DISCUSSIONS_POST = true
   ENV.context_is_not_group = true
   const view = this.editView({
@@ -329,7 +308,6 @@ test('renders anonymous section if able to moderate', function () {
 })
 
 test('renders anonymous section if student can create', function () {
-  ENV.ANONYMOUS_DISCUSSIONS = true
   ENV.REACT_DISCUSSIONS_POST = true
   ENV.context_is_not_group = true
   ENV.allow_student_anonymous_discussion_topics = true
@@ -338,7 +316,6 @@ test('renders anonymous section if student can create', function () {
 })
 
 test('renders anonymous section with anonymous discussions off checked', function () {
-  ENV.ANONYMOUS_DISCUSSIONS = true
   ENV.REACT_DISCUSSIONS_POST = true
   ENV.context_is_not_group = true
   ENV.DISCUSSION_TOPIC = {ATTRIBUTES: {anonymous_state: null}}
@@ -349,7 +326,6 @@ test('renders anonymous section with anonymous discussions off checked', functio
 })
 
 test('renders anonymous section with full_anonymity checked', function () {
-  ENV.ANONYMOUS_DISCUSSIONS = true
   ENV.REACT_DISCUSSIONS_POST = true
   ENV.context_is_not_group = true
   ENV.DISCUSSION_TOPIC = {ATTRIBUTES: {anonymous_state: 'full_anonymity'}}

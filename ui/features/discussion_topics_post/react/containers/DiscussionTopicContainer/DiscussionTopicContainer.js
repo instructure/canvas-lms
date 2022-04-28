@@ -432,27 +432,29 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                                   padding="small none none"
                                   display={responsiveProps.replyButton.display}
                                 >
-                                  <Button
-                                    display={responsiveProps.replyButton.display}
-                                    color="primary"
-                                    onClick={() => {
-                                      setExpandedReply(!expandedReply)
-                                    }}
-                                    data-testid="discussion-topic-reply"
-                                  >
-                                    {findRootEntryDraftMessage() ? (
-                                      <Text weight="bold" size={responsiveProps.textSize}>
-                                        <View as="span" margin="0 small 0 0">
-                                          <IconEditLine size="x-small" />
-                                        </View>
-                                        {I18n.t('Continue draft')}
-                                      </Text>
-                                    ) : (
-                                      <Text weight="bold" size={responsiveProps.textSize}>
-                                        {I18n.t('Reply')}
-                                      </Text>
-                                    )}
-                                  </Button>
+                                  <span className="discussion-topic-reply-button">
+                                    <Button
+                                      display={responsiveProps.replyButton.display}
+                                      color="primary"
+                                      onClick={() => {
+                                        setExpandedReply(!expandedReply)
+                                      }}
+                                      data-testid="discussion-topic-reply"
+                                    >
+                                      {findRootEntryDraftMessage() ? (
+                                        <Text weight="bold" size={responsiveProps.textSize}>
+                                          <View as="span" margin="0 small 0 0">
+                                            <IconEditLine size="x-small" />
+                                          </View>
+                                          {I18n.t('Continue draft')}
+                                        </Text>
+                                      ) : (
+                                        <Text weight="bold" size={responsiveProps.textSize}>
+                                          {I18n.t('Reply')}
+                                        </Text>
+                                      )}
+                                    </Button>
+                                  </span>
                                 </View>
                                 {podcast_url?.href && (
                                   <View

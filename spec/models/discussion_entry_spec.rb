@@ -268,7 +268,7 @@ describe DiscussionEntry do
     end
 
     it "sends notification to teacher when a reply is reported" do
-      allow(Account.site_admin).to receive(:feature_enabled?).with(:discussions_reporting).and_return(true)
+      @course.enable_feature!(:react_discussions_post)
       topic = @course.discussion_topics.create!(user: @teacher, message: "This is an important announcement")
       topic.subscribe(@student)
       entry = topic.discussion_entries.create!(user: @teacher, message: "Oh, and another thing...")

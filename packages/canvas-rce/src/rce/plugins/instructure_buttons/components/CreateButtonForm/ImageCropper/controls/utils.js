@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {MAX_SCALE_RATIO, MIN_SCALE_RATIO} from '../constants'
+import round from 'round'
+import {BUTTON_ROTATION_DEGREES, MAX_SCALE_RATIO, MIN_SCALE_RATIO} from '../constants'
 
 export const calculateScaleRatio = scaleRatio => {
   if (scaleRatio > MAX_SCALE_RATIO) {
@@ -24,5 +25,19 @@ export const calculateScaleRatio = scaleRatio => {
   } else if (scaleRatio < MIN_SCALE_RATIO) {
     return MIN_SCALE_RATIO
   }
-  return scaleRatio
+  return round(scaleRatio, 3)
+}
+
+export const calculateRotation = rotationAngle => {
+  const simplifiedRotationAngle = round(rotationAngle % 360, 2)
+  if (Math.abs(rotationAngle) >= 360) {
+    return simplifiedRotationAngle
+  }
+  return rotationAngle
+}
+
+export const getNearestRectAngle = (rotationAngle, shouldRotateToLeft) => {
+  return shouldRotateToLeft
+    ? Math.ceil(rotationAngle / BUTTON_ROTATION_DEGREES) * 90
+    : Math.floor(rotationAngle / BUTTON_ROTATION_DEGREES) * 90
 }

@@ -91,7 +91,7 @@
       <% if @quiz_presenter.one_question_at_a_time? %>
         <% if @quiz_presenter.previous_question_viewable? %>
           <% previous_question_button_title = t('buttons.previous', "Previous") %>
-          <button type="submit" class="Button submit_button previous-question" data-action="<%= @quiz_presenter.previous_question_form_action(session, @current_user) %>" disabled>
+          <button type="submit" class="Button submit_button previous-question" data-action="<%= @quiz_presenter.previous_question_form_action(session, @current_user) %>" aria-label="<%= t("Previous Question") %>" disabled>
             <i class="icon-mini-arrow-left"></i>
             <%= previous_question_button_title %>
           </button>
@@ -101,7 +101,7 @@
           <% next_question_button_title = t('buttons.next', "Next") %>
           <%= hidden_field_tag :last_question_id, @quiz_presenter.current_question[:id] %>
 
-          <button type="submit" class="Button submit_button  next-question" data-action="<%= @quiz_presenter.next_question_form_action(session, @current_user) %>" disabled>
+          <button type="submit" class="Button submit_button  next-question" data-action="<%= @quiz_presenter.next_question_form_action(session, @current_user) %>" aria-label="<%= t("Next Question") %>" disabled>
             <%= next_question_button_title %>
             <i class="icon-mini-arrow-right"></i>
           </button>

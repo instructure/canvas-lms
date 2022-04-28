@@ -81,9 +81,10 @@ export const TextSection = ({settings, onChange}) => {
           <ColorInput
             color={settings.textColor}
             label={formatMessage('Text Color')}
-            id="button-text-color"
+            name="button-text-color"
             onChange={textColor => onChange({textColor})}
             popoverMountNode={getTextSection}
+            requireColor
           />
         </Flex.Item>
 
@@ -91,7 +92,7 @@ export const TextSection = ({settings, onChange}) => {
           <ColorInput
             color={settings.textBackgroundColor}
             label={formatMessage('Text Background Color')}
-            id="button-text-background-color"
+            name="button-text-background-color"
             onChange={textBackgroundColor => onChange({textBackgroundColor})}
             popoverMountNode={getTextSection}
           />

@@ -22,7 +22,7 @@ import PropTypes from 'prop-types'
 import SVGList, {TYPE} from '../SVGList'
 import {actions} from '../../../../reducers/imageSection'
 
-const SingleColor = ({data, dispatch, onMount}) => {
+const SingleColor = ({data, dispatch, onLoaded}) => {
   const {iconFillColor} = data
   const onSelect = svg => {
     dispatch({...actions.SET_IMAGE_NAME, payload: svg.label})
@@ -35,7 +35,7 @@ const SingleColor = ({data, dispatch, onMount}) => {
       type={TYPE.Singlecolor}
       onSelect={onSelect}
       fillColor={iconFillColor}
-      onMount={onMount}
+      onMount={onLoaded}
     />
   )
 }
@@ -43,18 +43,18 @@ const SingleColor = ({data, dispatch, onMount}) => {
 SingleColor.propTypes = {
   dispatch: PropTypes.func,
   data: PropTypes.shape({
-    fillColor: PropTypes.string.isRequired
+    iconFillColor: PropTypes.string.isRequired
   }),
-  onMount: PropTypes.func
+  onLoaded: PropTypes.func
 }
 
 SingleColor.defaultProps = {
   dispatch: () => {},
   data: {
     // Black color in color selector component
-    fillColor: '#000000'
+    iconFillColor: '#000000'
   },
-  onMount: () => {}
+  onLoaded: () => {}
 }
 
 export default SingleColor

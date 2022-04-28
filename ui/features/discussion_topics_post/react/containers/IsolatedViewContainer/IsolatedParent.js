@@ -224,7 +224,6 @@ export const IsolatedParent = props => {
                           })
                         }
                         onReport={
-                          ENV?.student_reporting_enabled &&
                           props.discussionTopic.permissions?.studentReporting
                             ? () => {
                                 setShowReportModal(true)

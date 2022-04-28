@@ -110,7 +110,7 @@ export const DiscussionEdit = props => {
       data-testid="DiscussionEdit-container"
     >
       {props.quotedEntry?.previewMessage && (
-        <>
+        <span className="discussions-include-reply">
           <View as="div" margin="0 0 small 0">
             <Checkbox
               label={I18n.t('Include quoted reply in message')}
@@ -123,7 +123,7 @@ export const DiscussionEdit = props => {
             />
           </View>
           <ReplyPreview {...props.quotedEntry} />
-        </>
+        </span>
       )}
       {props.discussionAnonymousState && props.canReplyAnonymously && !props.isEdit && (
         <AnonymousResponseSelector
@@ -134,7 +134,7 @@ export const DiscussionEdit = props => {
         />
       )}
       <View display="block">
-        <span>
+        <span className="discussions-editor">
           <CanvasRce
             textareaId={textAreaId.current}
             onFocus={() => {}}
@@ -186,43 +186,47 @@ export const DiscussionEdit = props => {
                 padding={responsiveProps.marginCancel}
                 key="cancelButton"
               >
-                <Button
-                  onClick={() => {
-                    if (props.onCancel) {
-                      props.onCancel()
-                    }
-                  }}
-                  display={responsiveProps.display}
-                  color="secondary"
-                  data-testid="DiscussionEdit-cancel"
-                  key="rce-cancel-button"
-                >
-                  <Text size="medium">{I18n.t('Cancel')}</Text>
-                </Button>
+                <span className="discussions-editor-cancel">
+                  <Button
+                    onClick={() => {
+                      if (props.onCancel) {
+                        props.onCancel()
+                      }
+                    }}
+                    display={responsiveProps.display}
+                    color="secondary"
+                    data-testid="DiscussionEdit-cancel"
+                    key="rce-cancel-button"
+                  >
+                    <Text size="medium">{I18n.t('Cancel')}</Text>
+                  </Button>
+                </span>
               </View>,
               <View
                 as={responsiveProps.viewAs}
                 padding={responsiveProps.marginReply}
                 key="replyButton"
               >
-                <Button
-                  onClick={() => {
-                    if (props.onSubmit) {
-                      props.onSubmit(
-                        rceContent,
-                        includeReplyPreview,
-                        attachment?._id,
-                        anonymousAuthorState
-                      )
-                    }
-                  }}
-                  display={responsiveProps.display}
-                  color="primary"
-                  data-testid="DiscussionEdit-submit"
-                  key="rce-reply-button"
-                >
-                  <Text size="medium">{props.isEdit ? I18n.t('Save') : I18n.t('Reply')}</Text>
-                </Button>
+                <span className="discussions-editor-submit">
+                  <Button
+                    onClick={() => {
+                      if (props.onSubmit) {
+                        props.onSubmit(
+                          rceContent,
+                          includeReplyPreview,
+                          attachment?._id,
+                          anonymousAuthorState
+                        )
+                      }
+                    }}
+                    display={responsiveProps.display}
+                    color="primary"
+                    data-testid="DiscussionEdit-submit"
+                    key="rce-reply-button"
+                  >
+                    <Text size="medium">{props.isEdit ? I18n.t('Save') : I18n.t('Reply')}</Text>
+                  </Button>
+                </span>
               </View>
             ]
             return matches.includes('mobile') ? (

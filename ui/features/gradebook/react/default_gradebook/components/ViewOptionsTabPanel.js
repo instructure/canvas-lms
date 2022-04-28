@@ -76,6 +76,7 @@ function renderCheckbox(setting, label, key) {
 export default function ViewOptionsTabPanel({
   columnSort,
   hideAssignmentGroupTotals,
+  hideTotal,
   showNotes,
   showUnpublishedAssignments,
   showSeparateFirstLastNames,
@@ -137,6 +138,7 @@ export default function ViewOptionsTabPanel({
               I18n.t('Hide Assignment Group Totals'),
               'hideAssignmentGroupTotals'
             )}
+            {renderCheckbox(hideTotal, I18n.t('Hide Total and Override Columns'), 'hideTotal')}
             {viewUngradedAsZero.allowed &&
               renderCheckbox(
                 viewUngradedAsZero,
@@ -167,6 +169,10 @@ ViewOptionsTabPanel.propTypes = {
     onChange: func.isRequired
   }).isRequired,
   hideAssignmentGroupTotals: shape({
+    checked: bool.isRequired,
+    onChange: func.isRequired
+  }).isRequired,
+  hideTotal: shape({
     checked: bool.isRequired,
     onChange: func.isRequired
   }).isRequired,

@@ -52,7 +52,6 @@ describe "discussions" do
 
       before do
         Account.site_admin.enable_feature! :react_discussions_post
-        Account.site_admin.enable_feature! :discussion_anonymity
         user_session(teacher)
       end
 

@@ -338,39 +338,6 @@ describe "MessageableUser::Calculator" do
         it "includes the group if the enrollment is active" do
           expect(@calculator.uncached_fully_visible_group_ids).to include(@group.id)
         end
-
-        context "concluded enrollment" do
-          before do
-            # specifically, the workflow_state assignment below was accidentally a comparison
-            # https://github.com/instructure/canvas-lms/commit/c106826889469f8faa08847d4002c6b5d074fa13
-            skip "VICE-2235: specs broken since inception"
-            @enrollment.workflow_state = "completed"
-            @enrollment.save!
-          end
-
-          it "includes the group if the course is still active" do
-            expect(@calculator.uncached_fully_visible_group_ids).to include(@group.id)
-          end
-
-          it "includes the group if the course was recently concluded" do
-            @course.start_at = 2.days.ago
-            @course.conclude_at = 1.day.ago
-            @course.save!
-            expect(@calculator.uncached_fully_visible_group_ids).to include(@group.id)
-          end
-
-          it "does not include the group if the course concluding was not recent" do
-            @course.start_at = 46.days.ago
-            @course.conclude_at = 45.days.ago
-            @course.save!
-            expect(@calculator.uncached_fully_visible_group_ids).not_to include(@group.id)
-          end
-
-          it "includes the group regardless of course concluding if the user's in the group" do
-            @group.add_user(@viewing_user)
-            expect(@calculator.uncached_fully_visible_group_ids).to include(@group.id)
-          end
-        end
       end
 
       context "group in section visible course" do

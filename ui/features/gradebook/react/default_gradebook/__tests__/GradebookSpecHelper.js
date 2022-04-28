@@ -73,6 +73,7 @@ export const defaultGradebookEnv = {
   ],
   has_modules: true,
   hideAssignmentGroupTotals: false,
+  hideTotal: false,
   hideGrid: true,
   latePolicyStatusDisabled: false,
   locale: 'en',
@@ -91,6 +92,7 @@ export const defaultGradebookEnv = {
 }
 
 export const defaultGradebookProps = {
+  appliedFilterConditions: [],
   filters: [],
   isFiltersLoading: false,
   onFiltersChange: () => {},

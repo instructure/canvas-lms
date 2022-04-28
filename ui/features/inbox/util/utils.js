@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import _ from 'underscore'
 
 export const responsiveQuerySizes = ({mobile = false, tablet = false, desktop = false} = {}) => {
   const querySizes = {}
@@ -33,18 +34,19 @@ export const responsiveQuerySizes = ({mobile = false, tablet = false, desktop = 
 // Takes in data from either a VIEWABLE_SUBMISSIONS_QUERY or CONVERSATIONS_QUERY
 // Outputs an inbox conversation wrapper
 export const inboxConversationsWrapper = (data, isSubmissionComments = false) => {
-  const inboxConversations = []
+  let inboxConversations = []
   if (data) {
     data.forEach(conversation => {
       const inboxConversation = {}
       if (isSubmissionComments) {
+        const newestSubmissionComment = conversation?.commentsConnection?.nodes[0]
         inboxConversation._id = conversation?._id
         inboxConversation.subject =
-          conversation.commentsConnection.nodes[0].course.contextName +
+          newestSubmissionComment?.course.contextName +
           ' - ' +
-          conversation.commentsConnection.nodes[0].assignment.name
-        inboxConversation.lastMessageCreatedAt = conversation?.commentsConnection.nodes[0].createdAt
-        inboxConversation.lastMessageContent = conversation?.commentsConnection.nodes[0].comment
+          newestSubmissionComment?.assignment.name
+        inboxConversation.lastMessageCreatedAt = newestSubmissionComment?.createdAt
+        inboxConversation.lastMessageContent = newestSubmissionComment?.comment
         inboxConversation.participantString = getParticipantsString(
           conversation?.commentsConnection.nodes,
           isSubmissionComments
@@ -71,6 +73,7 @@ export const inboxConversationsWrapper = (data, isSubmissionComments = false) =>
       }
       inboxConversations.push(inboxConversation)
     })
+    inboxConversations = _.sortBy(inboxConversations, 'lastMessageCreatedAt').reverse()
   }
   return inboxConversations
 }
@@ -80,6 +83,7 @@ export const inboxConversationsWrapper = (data, isSubmissionComments = false) =>
 export const inboxMessagesWrapper = (data, isSubmissionComments = false) => {
   const inboxMessages = []
   let contextName = ''
+  const submissionCommentURL = `/courses/${data?.commentsConnection?.nodes[0]?.course._id}/assignments/${data?.commentsConnection?.nodes[0]?.assignment._id}/submissions/${data?.user?._id}`
   if (data) {
     const messages = isSubmissionComments
       ? data?.commentsConnection?.nodes
@@ -112,7 +116,7 @@ export const inboxMessagesWrapper = (data, isSubmissionComments = false) => {
       inboxMessages.push(inboxMessage)
     })
   }
-  return {inboxMessages, contextName}
+  return {inboxMessages, contextName, submissionCommentURL}
 }
 
 const getSubmissionCommentsParticipantString = messages => {

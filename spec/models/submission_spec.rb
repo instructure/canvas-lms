@@ -49,6 +49,70 @@ describe Submission do
   it { is_expected.to delegate_method(:auditable?).to(:assignment).with_prefix(true) }
   it { is_expected.to delegate_method(:can_be_moderated_grader?).to(:assignment).with_prefix(true) }
 
+  describe "infered values" do
+    subject do
+      submission.infer_values
+      submission.workflow_state
+    end
+
+    let(:student) { @student }
+    let(:assignment) { @assignment }
+
+    describe "workflow_state" do
+      context "when current state is unsubmitted and submitted_at is present" do
+        before do
+          submission.workflow_state = Submission.workflow_states.unsubmitted
+          submission.submission_type = "online_text_entry"
+          submission.submitted_at = Time.zone.now
+        end
+
+        it { is_expected.to eq Submission.workflow_states.submitted }
+      end
+
+      context "when current state is submitted and has_submission is false" do
+        before do
+          submission.workflow_state = Submission.workflow_states.submitted
+        end
+
+        it { is_expected.to eq Submission.workflow_states.unsubmitted }
+      end
+
+      context "when grade and score are present and grade matches current submission" do
+        before do
+          submission.submission_type = "online_text_entry"
+          submission.submitted_at = Time.zone.now
+          submission.grade = "5"
+          submission.score = 5
+
+          allow(submission).to receive(:grade_matches_current_submission).and_return(true)
+        end
+
+        it { is_expected.to eq Submission.workflow_states.graded }
+      end
+
+      context "when submission_type is online_quiz and latest submission is pending review" do
+        before do
+          submission.workflow_state = Submission.workflow_states.pending_review
+          submission.submission_type = "online_quiz"
+
+          allow(submission).to receive(:quiz_submission).and_return(double("QuizSubmission", "pending_review?" => true))
+        end
+
+        it { is_expected.to eq Submission.workflow_states.pending_review }
+      end
+
+      context "when workflow state is pending_review and submission was graded by quizzes" do
+        before do
+          submission.workflow_state = Submission.workflow_states.pending_review
+          submission.grader_id = -1
+          submission.cached_quiz_lti = true
+        end
+
+        it { is_expected.to eq Submission.workflow_states.pending_review }
+      end
+    end
+  end
+
   describe "#anonymous_id" do
     subject { submission.anonymous_id }
 

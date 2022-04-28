@@ -45,7 +45,7 @@ describe('Preview', () => {
       <img
         alt="Image to crop"
         src="https://www.fillmurray.com/640/480"
-        style="position: absolute; top: 0px; left: 0px; height: 100%; width: 100%; object-fit: contain; text-align: center; transform: scale(1);"
+        style="position: absolute; top: 0px; left: 0px; height: 100%; width: 100%; object-fit: contain; text-align: center;"
       />
     `)
     })
@@ -53,6 +53,28 @@ describe('Preview', () => {
     it('the crop shape container', () => {
       const {container} = render(<Preview settings={settings} dispatch={dispatch} />)
       expect(container.querySelector('#cropShapeContainer')).toBeInTheDocument()
+    })
+
+    it('with rotate transform', () => {
+      settings.rotation = 90
+      const {container} = render(<Preview settings={settings} dispatch={dispatch} />)
+      expect(container.querySelector('img').style).toHaveProperty('transform', 'rotate(90deg)')
+    })
+
+    it('with scale transform', () => {
+      settings.scaleRatio = 1.6
+      const {container} = render(<Preview settings={settings} dispatch={dispatch} />)
+      expect(container.querySelector('img').style).toHaveProperty('transform', 'scale(1.6)')
+    })
+
+    it('with rotate and scale transform', () => {
+      settings.rotation = 90
+      settings.scaleRatio = 1.6
+      const {container} = render(<Preview settings={settings} dispatch={dispatch} />)
+      expect(container.querySelector('img').style).toHaveProperty(
+        'transform',
+        'rotate(90deg) scale(1.6)'
+      )
     })
   })
 

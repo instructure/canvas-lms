@@ -123,6 +123,9 @@ en:
     flash:
       error: An error occurred. Please refresh the page and try again.
       updateSuccess: Update successful
+  PageViews:
+    browsers:
+      unrecognized: Unrecognized Browser
   ResendInvitationsView:
     error_sending_invitations: Error sending invitation. Please try again.
     invitations_re_sent: Invitations sent successfully
@@ -1706,6 +1709,7 @@ en:
   alerts_add_edit_delete_d71091c6: Alerts - add / edit / delete
   alerts_must_be_configured_for_the_institution_aler_43bbacb1: Alerts must be configured for the institution. Alerts are a seldom-used feature designed to send an alert to students, teachers or admins for specific triggers (e.g., no student-teacher interaction for 7 days). They are checked every day, and notifications will be sent to the student and/or the teacher until the triggering problem is resolved.
   align_outcomes_to_this_page_7d055196: Align outcomes to this page
+  alignments_de5f20d8: Alignments
   all_4321c3a1: All
   all_account_types_e83c1516: All Account Types
   all_accounts_3bafc860: All Accounts
@@ -1805,7 +1809,6 @@ en:
   allowed_domains_ee7868c8: Allowed Domains
   allowed_for_subaccounts_courses_default_off_da598c11: Allowed for subaccounts/courses, default off
   allowed_for_subaccounts_courses_default_on_e485ec7f: Allowed for subaccounts/courses, default on
-  allows_a_grader_to_grade_discussions_as_they_read_e5af3b34: Allows a grader to grade discussions as they read
   allows_admin_user_to_view_account_statistics_341f00d9: Allows admin user to view account statistics.
   allows_admins_to_view_a_log_containing_information_128dc85f: |-
     Allows admins to view a log containing information about all recently run
@@ -2423,7 +2426,6 @@ en:
   apply_781a2546: Apply
   apply_conditions_9e941010: Apply conditions
   apply_date_range_selection_cc4351ed: Apply date range selection
-  apply_filter_7e4f6113: Apply filter
   apply_filters_note_clicking_this_button_will_cause_753f04: 'Apply filters. Note: clicking this button will cause the page to reload.'
   apply_missing_status_cd98e1d3: Apply missing status
   apply_score_1edd7cda: Apply Score
@@ -2431,6 +2433,7 @@ en:
   apply_settings_10409ad9: Apply Settings
   apply_theme_7af08387: Apply theme
   apply_to_92f70c8c: 'Apply to:'
+  applying_changes_976b8b1e: Applying changes
   applying_new_styles_to_subaccounts_e8aeeef2: Applying new styles to subaccounts
   applying_please_be_patient_f7b5f244: Applying, please be patient
   applying_score_to_ungraded_7311df9a: Applying Score to Ungraded
@@ -3442,6 +3445,7 @@ en:
     recording_setting_enabled_description: Enable recording for this conference
   blackboard:
     no_manifest: This Blackboard .zip has no imsmanifest.xml file in the root directory.
+  blackout_date_5fc44c2b: Blackout Date
   blackout_date_title_was_added_ec8bf15e: Blackout date %{title} was added.
   blackout_date_title_was_deleted_e8cc238b: Blackout date %{title} was deleted.
   blackout_date_title_was_edited_31752bc9: Blackout date %{title} was edited.
@@ -4125,6 +4129,7 @@ en:
   ccp_zero_activity_73d094c3: CCP Zero Activity
   cell_number_is_invalid_bd6faee0: Cell Number is invalid!
   cell_number_is_required_2edcee60: Cell Number is required
+  central_value_in_a_set_of_results_calculated_by_di_19a8c48a: Central value in a set of results. Calculated by dividing the sum of all item scores by the number of scores.
   certificate_fingerprint_b376df90: Certificate Fingerprint
   change_applied_89d1aa5a: Change Applied
   change_beginning_date_to_39dbd06e: Change beginning date to
@@ -4213,6 +4218,7 @@ en:
   classic_view_33f29576: Classic View
   clear_2084585f: Clear
   clear_all_da755751: Clear all
+  clear_course_selection_b0762ae2: Clear Course Selection
   clear_job_selection_6ad1ff95: Clear job selection
   clear_search_900e9c97: Clear search
   clear_search_field_75f595c7: Clear search field
@@ -4303,6 +4309,7 @@ en:
   close_warning_d61daf2c: Close warning
   closed_for_comments_e395b42f: Closed for Comments
   closes_5c6b4367: 'Closes:'
+  cluster_cluster_b57fe99a: 'Cluster: %{cluster}'
   code_93e9abbb: code
   code_is_case_sensitive_d8175cad: Code is case sensitive.
   cog_icon_69bdffd5: Cog icon
@@ -4420,7 +4427,7 @@ en:
   collapse_all_50275533: Collapse All
   collapse_all_modules_e092807c: Collapse All Modules
   collapse_description_for_outcome_title_bcd9b8c9: Collapse description for outcome %{title}
-  collapse_discussion_thread_52bab65a: Collapse discussion thread
+  collapse_discussion_thread_from_author_34f9cd18: Collapse discussion thread from %{author}
   collapse_list_of_group_members_for_groupname_d6c66fa0: Collapse list of group members for %{groupName}
   collapse_replies_ef4fc36b: Collapse replies
   collapse_subdiscussion_89af1f5c: Collapse Subdiscussion
@@ -4441,14 +4448,11 @@ en:
   comment_added_33ab70d9: Comment added
   comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: 'Comment by replying to this message, or join the conversation using this link: %{link}. When allowed, if you need to include an attachment, please log in to Canvas and reply to the discussion.'
   comment_by_replying_to_this_message_or_join_the_co_886bc612: 'Comment by replying to this message, or join the conversation using this link: %{link}.When allowed, if you need to include an attachment, please log in to Canvas and reply to the announcement.'
-  comment_delete_is_not_enabled_d6a48fa6: comment delete is not enabled
   comment_destroyed_5cfc922d: Comment destroyed
   comment_failed_to_post_please_try_again_later_e2d19a0a: Comment failed to post! Please try again later.
   comment_input_box_b8c7e58b: Comment input box
   comment_library_84735835: Comment Library
   comment_library_suggestions_disabled_ae04eb77: Comment Library (Suggestions Disabled)
-  comment_reply_all_is_not_enabled_57bf2e02: comment reply all is not enabled
-  comment_reply_is_not_enabled_7804c17b: comment reply is not enabled
   comment_submitted_d9934b: Comment submitted!
   comment_suggestions_554a0dc6: Comment suggestions
   comment_updated_2cd56fe2: Comment updated
@@ -5720,6 +5724,7 @@ en:
   course_audit_log_77407457: Course Audit log
   course_calendar_7d3cba7b: Course Calendar
   course_calendar_add_edit_delete_636be6ba: Course Calendar - add / edit / delete
+  course_calendar_view_disabled_d77e1a6b: Course calendar view disabled.
   course_cannot_be_deleted_ee11256c: Course cannot be deleted
   course_canvas_id_9e36b24c: Course Canvas ID
   course_card_color_region_for_course_c356a69c: Course card color region for %{course}
@@ -7054,7 +7059,6 @@ en:
   discussion_entry_ids_must_have_at_least_one_id_c08c014d: Discussion entry ids must have at least one id
   discussion_filter_5d68de61: Discussion Filter
   discussion_group_category_locked: Group categories cannot be set directly on a discussion assignment, but should be set on the discussion instead
-  discussion_inline_grading_4631a62e: Discussion Inline Grading
   discussion_mention_c70cb87a: Discussion Mention
   discussion_post_count_report_2da4c6c: Discussion Post Count Report
   discussion_posts_c998c9ad: Discussion Posts
@@ -7096,6 +7100,8 @@ en:
     discussion_podcast_feed_title: Discussion Podcast Feed
     edit_crumb: Edit
     edit_view:
+      " saving": Saving...
+      " topic_title": Topic Title
       allow_liking: Allow liking
       allow_threaded_replies: Allow threaded replies
       attachment: Attachment
@@ -7110,7 +7116,6 @@ en:
       points_possible: Points Possible
       post_at: Post At
       save: Save
-      saving: Saving...
       sort_by_likes: Sort by likes
       topic_title: Topic Title
       until: Until
@@ -7278,15 +7283,12 @@ en:
           discussions are perfect for keeping in-depth or long-term discussions
           organized, while Focused discussions are best suited for short-lived exchanges.
   discussions_announcements_redesign_901c5528: Discussions/Announcements Redesign
-  discussions_announcements_redesign_anonymity_bbe1e4a2: Discussions/Announcements Redesign - Anonymity
-  discussions_announcements_redesign_partial_anonymi_86f14c2f: Discussions/Announcements Redesign - Partial Anonymity
   discussions_create_94dff604: Discussions - create
   discussions_index_menu_42591bc9: Discussions Index Menu
   discussions_menu_f18eb4a2: Discussions Menu
   discussions_moderate_d1e69c7e: Discussions - moderate
   discussions_post_62f64091: Discussions - post
   discussions_redesign_isolated_view_78626c74: Discussions Redesign - Isolated View
-  discussions_redesign_reporting_f4abcc37: Discussions Redesign - Reporting
   discussions_tutorial_tray_4ef79bcc: Discussions Tutorial Tray
   discussions_view_c6818792: Discussions - view
   discussions_with_groups_cannot_be_section_specific_1146d29: Discussions with groups cannot be section-specific
@@ -7444,6 +7446,7 @@ en:
   due_dates_are_being_compressed_based_on_your_start_c6db279e: Due Dates are being compressed based on your start and end dates.
   due_dates_changed_exceptions_ddb028: 'Due Dates changed exceptions:'
   due_dates_duedatecount_bbc24d65: Due Dates (%{dueDateCount})
+  due_dates_managed_by_course_pacing_5917e44e: Due dates managed by Course Pacing.
   due_datetime_f5a81b81: 'Due: %{dateTime}'
   due_due_today_4dfe420a: "%{due} due today"
   due_dueat_ef67f6f4: 'Due: %{dueAt}'
@@ -8033,9 +8036,9 @@ en:
   error_associating_assignment_assignment_name_with__d92e9acf: Error associating assignment "%{assignment_name}" with an LTI tool.
   error_canceling_draft_ec3dbdc9: Error canceling draft
   error_creating_comment_cbbfc0f0: Error creating comment
-  error_creating_conversation_1d814618: Error creating conversation
   error_creating_new_course_9d3903bc: Error creating new course
   error_creating_new_subject_89f16abe: Error creating new subject
+  error_creating_submission_comment_a5374fcf: Error creating Submission Comment
   error_deleting_comment_87ca3d06: Error deleting comment
   error_deleting_file_551dc16e: Error deleting %{file}
   error_deleting_name_reason_11f9d399: 'Error deleting %{name}: %{reason}'
@@ -8184,7 +8187,7 @@ en:
   expand_collapse_lang_73edc33c: Expand/collapse %{lang}
   expand_collapse_title_outcome_group_student_meets__46ffef48: Expand/collapse %{title} Outcome Group, student meets mastery of %{mastery_count} of %{count} outcomes
   expand_description_for_outcome_title_abc8f30: Expand description for outcome %{title}
-  expand_discussion_thread_fcbb2bcc: Expand discussion thread
+  expand_discussion_thread_from_author_829cfae1: Expand discussion thread from %{author}
   expand_global_navigation_2c28d5d4: Expand global navigation
   expand_list_of_group_members_for_groupname_9ce9d2f7: Expand list of group members for %{groupName}
   expand_permission_b45bf097: Expand %{permission}
@@ -8334,6 +8337,7 @@ en:
   failed_to_update_domain_lookup_b2437cf7: Failed to update domain lookup
   failed_to_update_permission_33c493f: Failed to update permission
   failed_to_update_role_name_8c7b0119: Failed to update role name
+  failed_to_update_strand_8d1c82d: Failed to update strand
   failed_to_validate_cas_ticket_error_31aa4c63: 'Failed to validate CAS ticket: %{error}'
   fair_38e62237: Fair
   fair_score_554e2558: Fair Score
@@ -8788,7 +8792,6 @@ en:
   gradebook_1620a0aa: Gradebook
   gradebook_5fd8ef0: Gradebook…
   gradebook_and_speedgrader_will_be_inaccessible_if__eda88bc3: Gradebook and SpeedGrader will be inaccessible if both Grades - edit and Grades - view all grades are disabled.
-  gradebook_assignment_search_and_redesign_409c5b21: Gradebook Assignment Search And Redesign
   gradebook_context_name_9dbae5bc: Gradebook - %{context_name}
   gradebook_csv_export_assignment_order_matches_the__9044f08e: Gradebook CSV Export Assignment Order Matches the Gradebook Grid
   gradebook_csvs:
@@ -9539,6 +9542,7 @@ en:
   hide_score_total_for_assessment_results_d0ef117f: Hide score total for assessment results
   hide_sidebar_2b5b3776: Hide Sidebar
   hide_sub_accounts_for_account_name_a6de98bd: Hide Sub-Accounts for %{account_name}
+  hide_total_and_override_columns_6fde3e25: Hide Total and Override Columns
   hides_certain_students_and_sections_in_the_lmgb_if_47097d94: Hides certain students and sections in the LMGB if the teacher only has access to a particular section
   hiding_grades_82691e44: Hiding grades
   hiding_grades_is_not_allowed_because_grades_have_n_55e83813: Hiding grades is not allowed because grades have not been released for this assignment.
@@ -9739,6 +9743,7 @@ en:
     English.
   if_enabled_common_cartridge_importers_will_convert_9bffff09: If enabled, Common Cartridge importers will convert HTML files into Pages
   if_enabled_creates_assignments_from_lineitems_in_d_90089a84: If enabled, creates assignments from LineItems in deep link messages.
+  if_enabled_creates_assignments_from_lineitems_in_d_eebd3e13: If enabled, creates assignments from LineItems in deep link messages on the assignment edit page.
   if_enabled_graphql_queries_will_not_require_users__46a8b655: |-
     If enabled, GraphQL queries will not require
     users to be signed in or use an access token.
@@ -9898,6 +9903,7 @@ en:
   importing_outcomes_e62a0375: importing outcomes
   importing_the_same_course_content_more_than_once_w_8b28b2c6: Importing the same course content more than once will overwrite any existing content in the course.
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: Improve discoverability of drag and drop in Files
+  improve_feedback_on_students_grade_page_ce2c8658: Improve Feedback on Students Grade Page
   improved_interface_with_ongoing_updates_7316bdef: Improved interface with ongoing updates
   improved_new_quizzes_support_with_modules_includin_3c9cdfab: Improved New Quizzes support with Modules including creating New Quizzes from Modules
   improved_outcomes_management_4692f886: Improved Outcomes Management
@@ -9990,8 +9996,10 @@ en:
   insert_below_row_55ed6f34: insert below %{row}
   insert_comment_from_library_57cddc75: Insert Comment from Library
   insert_here_ccdb022e: insert here
+  insert_or_select_names_a780902c: Insert or Select Names
   insert_row_below_name_a5b3bd41: Insert row below %{name}
   insert_row_in_edit_mode_5976f269: Insert row in edit mode
+  insert_subject_9f0d8e49: Insert Subject
   instaccess_tokens_b13a8390: InstAccess tokens
   install_c54fad9b: Install
   installed_7b284a91: Installed
@@ -10140,6 +10148,7 @@ en:
   it_took_too_long_to_login_please_try_again_c1ed2e28: It took too long to login. Please try again
   italian_bd3c792d: Italian
   italy_39_cfad867a: Italy (+39)
+  item_5bd51103: Item
   item_banks_1db48044: Item Banks
   item_banks_manage_account_e8040580: Item Banks - manage account
   item_cannot_be_duplicated_cebf3109: Item cannot be duplicated
@@ -10848,6 +10857,7 @@ en:
   lti_advantage_services_c1746cb4: LTI Advantage Services
   lti_deep_linking_for_module_index_menu_881feeee: LTI Deep Linking for Module Index Menu
   lti_deep_linking_line_items_5e0079f7: LTI Deep Linking Line Items
+  lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: LTI Deep Linking Line Items on Assignment edit page
   lti_delete_ee5f1bef: LTI - delete
   lti_edit_83a27850: LTI - edit
   lti_key_14ad02b1: LTI Key
@@ -10911,6 +10921,7 @@ en:
   manage_course_templates_66c00052: Manage Course Templates
   manage_courses_abe8335f: Manage Courses
   manage_create_edit_delete_groups_f9046ee3: Manage (create / edit / delete) groups
+  manage_discussion_by_author_ac2b9c9e: Manage Discussion by %{author}
   manage_discussion_c1dd8f4e: Manage Discussion
   manage_edit_assignments_and_quizzes_572f3589: Manage / edit assignments and quizzes
   manage_grading_schemes_in_context_name_e3678273: Manage grading schemes in %{context_name}
@@ -10931,6 +10942,7 @@ en:
   manage_sftp_users_75ac1968: Manage SFTP users
   manage_snapshots_1dc4b79d: Manage Snapshots
   manage_snapshots_modal_b0517bb6: Manage Snapshots Modal
+  manage_strand_strand_21998a5d: Manage strand "%{strand}"
   manage_students_for_the_course_3b1bc4f0: Manage students for the course
   manage_subject_coursecontext_2328e1ff: 'Manage Subject: %{courseContext}'
   manage_subject_f9835769: Manage Subject
@@ -11007,6 +11019,7 @@ en:
   max_concurrent_a6f135c: Max Concurrent
   max_dd02d615: max
   max_membership_bd0ddc68: max_membership
+  max_n_strand_parallelism_77f80979: Max n_strand parallelism
   max_run_time_6022a5f1: Max run time
   max_users_groups_per_appointment_867c505b: Max users/groups per appointment
   max_wait_time_dc158bf1: Max wait time
@@ -11097,7 +11110,6 @@ en:
   message_sent_5e328899: Message Sent!
   message_sent_9ff3a79d: Message sent!
   message_sent_f4cba0c: Message sent.
-  message_sent_successfully_7cc86ad3: Message sent successfully
   message_signing_b65abadf: Message Signing
   message_student_f12b37a6: Message Student
   message_students_37ba5dd5: Message students
@@ -12568,9 +12580,36 @@ en:
         body: 'Canvas Alert - Quiz Submitted: %{quiz}, %{user_name}'
     submission_posted:
       email:
+        body: Your instructor has released grade changes and new comments for %{title}. These changes are now viewable.
+        excused: This assignment has been excused.
+        graded_date: 'graded: %{date}'
         html:
           body: Your instructor has released grade changes and new comments for %{title}. These changes are now viewable.
+          excused: This assignment has been excused.
+          graded_date: 'graded: %{date}'
           link: You can view it here
+          no_date_set: No Date Set
+          not_applicable: N/A
+          score: 'score: %{score} out of %{total}'
+          score_pending_review: score pending review by the teacher
+        link_message: 'You can view it here: %{link}.'
+        no_date_set: No Date Set
+        not_applicable: N/A
+        score: 'score: %{score} out of %{total}'
+        score_pending_review: score pending review by the teacher
+      sms:
+        body: Your instructor has released grade changes and new comments for %{title}, %{course}.
+        graded_date: 'graded: %{date}'
+        link_message: More info at %{link}.
+        no_date_set: No Date Set
+        not_applicable: N/A
+        score: 'score: %{score} out of %{total}'
+      summary:
+        graded_date: 'graded: %{date}'
+        no_date_set: No Date Set
+        not_applicable: N/A
+        score: 'score: %{score} out of %{total}'
+        score_pending_review: score pending review by the teacher
     submissions_posted:
       email:
         html:
@@ -13130,6 +13169,7 @@ en:
   next_module_item_9bb8a222: Next Module/Item
   next_month_b55a387c: Next month
   next_page_d2a39853: Next Page
+  next_question_f37bac25: Next Question
   next_run_at_635de64a: Next run at
   next_steps_ce0f0d0c: Next Steps
   next_student_b62869f4: Next student
@@ -13163,10 +13203,12 @@ en:
   no_content_not_visible_to_students_b59f4867: No content. Not visible to students
   no_context_found_for_the_following_context_code_co_a2f6a1a7: 'No context found for the following context code: %{context_code}'
   no_conversations_selected_ebcd9226: No Conversations Selected
+  no_conversations_to_show_9ecbac62: No Conversations to Show
   no_courses_favorited_4e69fd63: No courses favorited
   no_courses_found_12d68a74: No courses found
   no_courses_to_display_700f94c4: No courses to display
   no_date_bfeb2df7: No Date
+  no_date_set_25edf0c1: No Date Set
   no_description_c2554c25: No Description
   no_details_1ee29870: No details
   no_directory_is_selected_please_select_a_directory_46ded46: No directory is selected, please select a directory before clicking 'move'
@@ -13806,6 +13848,7 @@ en:
   out_of_pointspossible_3fb5ee20: Out of %{pointsPossible}
   out_of_pointspossible_c163105a: out of %{pointsPossible}
   out_of_pointspossible_pts_b2b73373: Out of %{pointsPossible} pts
+  outcome_alignment_summary_tab_431f4253: Outcome Alignment Summary Tab
   outcome_alignment_to_non_scoring_content_3efa45fb: Outcome alignment to non-scoring content
   outcome_da397d20: Outcome
   outcome_details_ce254e89: Outcome Details
@@ -13955,6 +13998,7 @@ en:
   own_copyright_cc59db55: Own Copyright
   owner_email_236d1b2: Owner Email
   owner_email_4d02f795: 'Owner Email:'
+  pace_is_new_and_unpublished_9aa68306: Pace is new and unpublished
   package_error: 'Error identifying package type: %{error}'
   package_export_from_d6e2b073: Package export from
   page_50c4823d: Page
@@ -13975,12 +14019,7 @@ en:
     download_filename: Pageviews For %{user}
     table:
       headers:
-        date: Date
-        participated: Participated
-        time: Time
         url: URL
-        user_agent: User Agent
-  page_views_csv_9835a9f9: page views csv
   page_views_eb64cf53: Page Views
   page_views_only_312b7577: Page Views Only
   page_views_service_is_temporarily_unavailable_2eb4818: Page Views service is temporarily unavailable
@@ -14738,6 +14777,7 @@ en:
   previous_module_item_a9e57348: Previous Module Item
   previous_month_7adf1380: Previous month
   previous_page_928fc112: Previous Page
+  previous_question_162c4048: Previous Question
   previous_snapshots_d8cd4820: Previous Snapshots
   previous_student_46275eae: Previous student
   primary_brand_color_db79b428: Primary Brand Color
@@ -15035,6 +15075,7 @@ en:
   provider_icon_5064fa6e: Provider icon
   provides_a_button_which_navigates_straight_to_the__ec46e3b7: Provides a button which navigates straight to the Build screen in the kebab menu for New Quizzes items on the Modules page, Assignments page, and Quizzes page.
   provides_a_flag_on_the_devloper_key_to_support_inc_4a1ce85a: Provides a flag on the Devloper Key to support Include Parameters on API requests
+  provides_a_list_of_alignments_for_each_outcome_in__685afc60: Provides a list of alignments for each outcome in a course.
   provision_a_catalog_account_8cea67f6: Provision a Catalog Account
   provision_a_quiz_next_service_c7c6bd87: Provision a Quiz.Next Service
   provisional_grade_created_13f5c392: Provisional grade created
@@ -15470,6 +15511,7 @@ en:
         invalid_hide_results: Hide results is not valid
         invalid_ip_filter: IP filter is not valid
         invalid_quiz_type: Quiz type is not valid
+        invalid_time_limit: Time Limit is not valid
       question_name_counter: Question %{question_number}
       types:
         quiz: Quiz
@@ -16292,7 +16334,6 @@ en:
   rce_contents_replace_description: Enable RCE full text replace from LTI's
   rce_contents_replace_display_name: RCE Contents Replace
   rce_icon_maker_2114f87: RCE Icon Maker
-  rce_mentions_in_discussions_82cd11e3: RCE Mentions in Discussions
   rce_s_new_and_improved_equation_editor_dialog_380653be: RCE's new and improved equation editor dialog
   re_activate_user_f7d77c9a: Re-activate User
   re_reported_b9671073: Re-Reported
@@ -16508,7 +16549,6 @@ en:
   remove_file_cbf3f40f: Remove file
   remove_filename_87f3781e: remove %{filename}
   remove_filename_dab5c02e: Remove %{filename}
-  remove_filter_6f7204e2: Remove filter
   remove_grading_scheme_title_d3942a08: Remove Grading Scheme %{title}
   remove_group_5d2f2f2d: Remove Group
   remove_group_981d6a02: Remove Group?
@@ -16570,6 +16610,7 @@ en:
   reply_389d6fb9: Reply
   reply_all_80298bee: Reply all
   reply_all_b864cd0e: Reply All
+  reply_from_author_a2806c77: Reply from %{author}
   reply_from_name: "%{name} via Canvas Notifications"
   reply_to_comment_72d96728: Reply to Comment
   reply_to_conversation_f1aa0d4: Reply to conversation
@@ -16726,6 +16767,7 @@ en:
       manage_global_outcomes: Manage global learning outcomes
       manage_grades: Edit grades
       manage_interaction_alerts: Manage alerts
+      manage_internal_settings: Manage environment-wide internal settings
       manage_links: Manage role and trust links
       manage_outcomes: Manage learning outcomes
       manage_proficiency_calculations: Manage outcome proficiency calculations
@@ -17069,12 +17111,10 @@ en:
       join_course: Join this Course
       next: Next
       previous: Previous
-  search_23a88d5c: Search…
   search_280d00bd: Search
   search_a28cbc02: Search…
   search_announcements_by_title_407a998e: Search announcements by title
   search_assignments_8c3c21bb: Search Assignments
-  search_assignments_in_gradebook_and_new_design_for_8f966bcc: Search assignments in Gradebook and new design for assignment and student search
   search_by_99d1ba5f: Search by
   search_by_student_name_26536097: Search by student name
   search_by_title_or_author_273a8f49: Search by title or author...
@@ -17424,6 +17464,7 @@ en:
     prev_module_desc: 'Previous Module: *module*'
     prev_module_item_desc: 'Previous: *item*'
   serbian_7187f1f2: Serbian
+  server_server_3ac5f38f: 'Server: %{server}'
   service_c3d74594: 'Service:'
   service_cloud_ticketing_connector_889e1b7b: Service Cloud Ticketing Connector
   services_api:
@@ -17502,6 +17543,7 @@ en:
   sftp_user_has_been_created_it_can_take_up_to_four__efebf982: SFTP user has been created. It can take up to four hours for this user to start working.
   sftp_user_management_19868cb3: SFTP User Management
   shard_5d340495: Shard
+  shard_shard_95c57736: 'Shard: %{shard}'
   share_important_information_about_your_course_with_dceacbf9: |-
     Share important information about your course with all users.
           Use announcements to remind students of important dates and tasks,
@@ -18106,6 +18148,7 @@ en:
   slack_notifications_3a0288e6: Slack Notifications
   slovak_69f48e1b: Slovak
   slovenian_30ae5208: Slovenian
+  smaller_numbers_mean_higher_priority_c69f4d0a: Smaller numbers mean higher priority
   smart_alerts_44db622e: Smart alerts
   smart_assignment_alerts_abc2224: Smart Assignment Alerts
   smileys_emotion_edc2beac: Smileys & Emotion
@@ -18475,6 +18518,7 @@ en:
     other: Students who haven't taken the survey (%{count})
     zero: Student who haven't taken the survey
   students_will_automatically_receive_full_credit_on_cc61df39: students will automatically receive full credit once they take the survey
+  students_will_be_able_to_more_easily_recognize_whe_f012275a: Students will be able to more easily recognize when feedback has been provided by an instructor/grader ...
   students_will_be_able_to_see_that_the_grades_for_t_5421a866: Students will be able to see that the grades for this assignment are hidden.
   students_with_no_submissions_title: Students with no submissions
   students_without_assessments_eb100e60: Students without assessments
@@ -19381,6 +19425,7 @@ en:
   this_course_has_too_many_teachers_or_other_owner_t_ae499dc: This course has too many teachers or other owner-type enrollments to be synced. Microsoft 365 allows a maximum of %{max_allowed} owners in a Team.
   this_course_hasn_t_started_yet_you_will_not_be_abl_c828c423: This course hasn’t started yet. You will not be able to participate in this course until %{date}.
   this_course_is_claimed_and_ready_but_you_ll_need_t_25b95a0a: This course is claimed and ready, but you'll need to finish the registration process before you can publish the course.  You should have received an email from Canvas with a link to finish the process.  Be sure to check your spam box.
+  this_course_is_using_course_pacing_go_to_course_pa_4de4cc38: This course is using Course Pacing. Go to Course Pacing to manage due dates.
   this_course_is_visible_only_to_teachers_until_it_i_ce972f0: This course is visible only to teachers until it is published.
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: This criterion is linked to a Learning Outcome
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: This element is a more accessible alternative to drag & drop reordering. Press Enter or Space to move this question.
@@ -19393,13 +19438,8 @@ en:
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: This ePortfolio has been identified as spam. It is currently only visible to administrators and the author. If you're sure this content is not spam, you can mark it as safe.
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: This feature affects existing data for all courses in the account.
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: This feature affects existing data for an entire account.
-  this_feature_allows_teachers_to_create_anonymous_d_ea364dca: This feature allows Teachers to create anonymous discussions and allows teachers to enable a course level setting for students to create anonymous discussions
-  this_feature_allows_teachers_to_create_partially_a_46665db6: This feature allows Teachers to create partially anonymous discussions. Partially anonymous discussions allow students the choice to respond to a discussion topic anonymously or not.
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: This feature can't be enabled while autodetection of field separators is enabled
   this_feature_can_t_be_enabled_while_semicolons_are_2e0adb54: This feature can't be enabled while semicolons are forced to be field separators
-  this_feature_flag_enables_discussions_reporting_in_ad613bb9: |-
-    This feature flag enables Discussions Reporting inside the new
-    Discussions Redesign work.
   this_feature_flag_enables_isolated_view_inside_the_3db3f6f2: |-
     This feature flag enables Isolated View inside the new
     Discussions Redesign work.
@@ -19438,6 +19478,7 @@ en:
   this_is_a_media_comment_click_here_to_view_c297bf62: This is a media comment, *click here to view*.
   this_is_a_message_from_canvas_administration_dbd63778: This is a message from *Canvas Administration*
   this_is_a_message_from_name_ec0cdfac: This is a message from *%{name}*
+  this_is_a_new_course_pace_and_all_changes_are_unpu_78532778: This is a new course pace and all changes are unpublished. Publish to save any changes and create the pace.
   this_is_a_preview_of_the_draft_version_of_the_quiz_910a02e0: This is a preview of the draft version of the quiz
   this_is_a_preview_of_the_published_version_of_the__70e0c8: This is a preview of the published version of the quiz
   this_is_a_report_of_all_students_enrolled_in_a_cou_d0137d3c: |-
@@ -21077,7 +21118,6 @@ en:
     events in the student planner
   when_enabled_this_flag_shows_a_student_picker_for__5353b8e2: When enabled, this flag shows a student picker for observers on the dashboard.
   when_enabled_this_setting_automatically_opens_teac_f93c16f0: When enabled, this setting automatically opens teacher to-do items in a new tab.
-  when_enabled_turns_on_mention_functionality_in_cou_ae490b21: When enabled, turns on "@mention" functionality in course discussions.
   when_enabled_turns_on_the_button_icons_image_cropp_abbc3d8b: |-
     When enabled, turns on the Button & Icons image cropper, course images
     source, and upload image source.
@@ -21524,15 +21564,6 @@ en:
   your_groups_are_being_created_50156e34: Your groups are being created.
   your_homeroom_is_currently_unpublished_93c14f4f: Your homeroom is currently unpublished.
   your_instructor_has_not_posted_the_grade_while_you_c5cd731c: Your instructor has not posted the grade. While your instructor has not posted the grade, grade and comment information is unavailable.
-  your_instructor_has_released_grade_changes_and_new_218d61bb: |-
-    Your instructor has released grade changes and new comments for %{title}, %{course}.
-
-    More info at %{url}
-  your_instructor_has_released_grade_changes_and_new_ffe458c8: |-
-    Your instructor has released grade changes and new comments for %{title}. These changes are now viewable.
-
-    Your can view it here:
-    %{url}
   your_media_has_been_uploaded_and_will_appear_here__8546af57: Your media has been uploaded and will appear here after processing.
   your_message_has_been_sent_thank_you_e0284316: Your message has been sent. Thank you!
   your_message_was_sent_977f6583: Your message was sent!

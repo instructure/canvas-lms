@@ -32,10 +32,15 @@ describe('createCroppedImageSvg()', () => {
     }
   })
 
+  const subject = (otherSettings = {}) =>
+    createCroppedImageSvg({
+      image: 'data:image/png;base64,asdfasdfjksdf==',
+      shape: Shape.Square,
+      ...otherSettings
+    })
+
   it('builds a <svg />', async () => {
-    const imageSrc = 'data:image/png;base64,asdfasdfjksdf=='
-    const shape = Shape.Square
-    const svg = await createCroppedImageSvg({imageSrc, shape})
+    const svg = await subject()
     expect(svg).toMatchInlineSnapshot(`
       <svg
         height="100"
@@ -69,12 +74,44 @@ describe('createCroppedImageSvg()', () => {
     `)
   })
 
+  it('builds a <svg /> with all transform params', async () => {
+    const svg = await subject({scaleRatio: 1.7, rotation: 90})
+    expect(svg).toMatchInlineSnapshot(`
+      <svg
+        height="100"
+        width="100"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          <clippath
+            id="clip-path-for-cropped-image"
+          >
+            <rect
+              fill="black"
+              height="100"
+              width="100"
+              x="0"
+              y="0"
+            />
+          </clippath>
+        </defs>
+        <g
+          clip-path="url(#clip-path-for-cropped-image)"
+        >
+          <image
+            height="100"
+            href="data:image/png;base64,asdfasdfjksdf=="
+            transform="translate(-120, -35) rotate(90, 170, 85) scale(1.7)"
+            width="200"
+          />
+        </g>
+      </svg>
+    `)
+  })
+
   describe('builds a <svg /> with scaleRatio', () => {
     it('1.0', async () => {
-      const imageSrc = 'data:image/png;base64,asdfasdfjksdf=='
-      const shape = Shape.Square
-      const scaleRatio = 1.0
-      const svg = await createCroppedImageSvg({imageSrc, shape, scaleRatio})
+      const svg = await subject({scaleRatio: 1.0})
       expect(svg).toMatchInlineSnapshot(`
         <svg
           height="100"
@@ -109,10 +146,7 @@ describe('createCroppedImageSvg()', () => {
     })
 
     it('1.5', async () => {
-      const imageSrc = 'data:image/png;base64,asdfasdfjksdf=='
-      const shape = Shape.Square
-      const scaleRatio = 1.5
-      const svg = await createCroppedImageSvg({imageSrc, shape, scaleRatio})
+      const svg = await subject({scaleRatio: 1.5})
       expect(svg).toMatchInlineSnapshot(`
         <svg
           height="100"
@@ -147,10 +181,7 @@ describe('createCroppedImageSvg()', () => {
     })
 
     it('2.0', async () => {
-      const imageSrc = 'data:image/png;base64,asdfasdfjksdf=='
-      const shape = Shape.Square
-      const scaleRatio = 2.0
-      const svg = await createCroppedImageSvg({imageSrc, shape, scaleRatio})
+      const svg = await subject({scaleRatio: 2.0})
       expect(svg).toMatchInlineSnapshot(`
         <svg
           height="100"
@@ -177,6 +208,113 @@ describe('createCroppedImageSvg()', () => {
               height="100"
               href="data:image/png;base64,asdfasdfjksdf=="
               transform="translate(-150, -50) scale(2)"
+              width="200"
+            />
+          </g>
+        </svg>
+      `)
+    })
+  })
+
+  describe('builds a <svg /> with rotation', () => {
+    it('90º', async () => {
+      const svg = await subject({rotation: 90})
+      expect(svg).toMatchInlineSnapshot(`
+        <svg
+          height="100"
+          width="100"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <clippath
+              id="clip-path-for-cropped-image"
+            >
+              <rect
+                fill="black"
+                height="100"
+                width="100"
+                x="0"
+                y="0"
+              />
+            </clippath>
+          </defs>
+          <g
+            clip-path="url(#clip-path-for-cropped-image)"
+          >
+            <image
+              height="100"
+              href="data:image/png;base64,asdfasdfjksdf=="
+              transform="translate(-50, 0) rotate(90, 100, 50)"
+              width="200"
+            />
+          </g>
+        </svg>
+      `)
+    })
+
+    it('180º', async () => {
+      const svg = await subject({rotation: 180})
+      expect(svg).toMatchInlineSnapshot(`
+        <svg
+          height="100"
+          width="100"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <clippath
+              id="clip-path-for-cropped-image"
+            >
+              <rect
+                fill="black"
+                height="100"
+                width="100"
+                x="0"
+                y="0"
+              />
+            </clippath>
+          </defs>
+          <g
+            clip-path="url(#clip-path-for-cropped-image)"
+          >
+            <image
+              height="100"
+              href="data:image/png;base64,asdfasdfjksdf=="
+              transform="translate(-50, 0) rotate(180, 100, 50)"
+              width="200"
+            />
+          </g>
+        </svg>
+      `)
+    })
+
+    it('-90º', async () => {
+      const svg = await subject({rotation: -90})
+      expect(svg).toMatchInlineSnapshot(`
+        <svg
+          height="100"
+          width="100"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <clippath
+              id="clip-path-for-cropped-image"
+            >
+              <rect
+                fill="black"
+                height="100"
+                width="100"
+                x="0"
+                y="0"
+              />
+            </clippath>
+          </defs>
+          <g
+            clip-path="url(#clip-path-for-cropped-image)"
+          >
+            <image
+              height="100"
+              href="data:image/png;base64,asdfasdfjksdf=="
+              transform="translate(-50, 0) rotate(-90, 100, 50)"
               width="200"
             />
           </g>

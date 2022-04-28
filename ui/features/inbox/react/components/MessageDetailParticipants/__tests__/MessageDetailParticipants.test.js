@@ -36,6 +36,17 @@ describe('MessageDetailParticipants', () => {
     expect(getByText('Tom Thompson')).toBeInTheDocument()
     expect(getByText(', Billy Harris')).toBeInTheDocument()
   })
+  it('renders without trailing comma if there are no participants', () => {
+    const participantList = []
+    const props = {
+      conversationMessage: {
+        author: {name: 'Tom Thompson'},
+        recipients: participantList
+      }
+    }
+    const container = render(<MessageDetailParticipants {...props} />)
+    expect(container.queryByTestId('participant-list')).not.toBeInTheDocument()
+  })
 
   it('renders with limited list until expanded', () => {
     const participantList = [

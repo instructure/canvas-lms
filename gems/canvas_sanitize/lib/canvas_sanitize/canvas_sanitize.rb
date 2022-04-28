@@ -70,6 +70,7 @@ module CanvasSanitize # :nodoc:
 
     # The default is Nokogiri::Gumbo::DEFAULT_MAX_TREE_DEPTH = 400
     # Quiz Submissions often contain many layers of nested tables
+    # User content (in pages or syllabus, for example) can also contain deeply-nested content
     parser_options: {
       max_tree_depth: 10_000,
     }.freeze,

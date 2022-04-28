@@ -2063,22 +2063,6 @@ describe UsersController do
         expect(response).to be_successful
         expect(assigns[:enrollments].sort_by(&:id)).to eq [@enrollment, @e2]
       end
-
-      it "includes enrollments from all shards for trusted account admins" do
-        skip "granting read permissions to trusted accounts"
-        course_with_teacher(active_all: 1)
-        @shard1.activate do
-          account = Account.create!
-          course = account.courses.create!
-          @e2 = course.enroll_teacher(@teacher)
-        end
-        account_admin_user
-        user_session(@user)
-
-        get "show", params: { id: @teacher.id }
-        expect(response).to be_successful
-        expect(assigns[:enrollments].sort_by(&:id)).to eq [@enrollment, @e2]
-      end
     end
 
     context "rendering page views" do

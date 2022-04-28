@@ -819,7 +819,7 @@ class Course < ActiveRecord::Base
       .or(where(id: query))
   }
   scope :needs_account, ->(account, limit) { where(account_id: nil, root_account_id: account).limit(limit) }
-  scope :active, -> { where("courses.workflow_state<>'deleted'") }
+  scope :active, -> { where.not(workflow_state: "deleted") }
   scope :least_recently_updated, ->(limit) { order(:updated_at).limit(limit) }
 
   scope :manageable_by_user, lambda { |*args|
@@ -3093,7 +3093,7 @@ class Course < ActiveRecord::Base
 
   def external_tool_tabs(opts, user)
     tools = context_external_tools.active.having_setting("course_navigation")
-    tools += ContextExternalTool.active.having_setting("course_navigation").where(context_type: "Account", context_id: account_chain_ids).to_a
+    tools += ContextExternalTool.shard(shard).active.having_setting("course_navigation").where(context_type: "Account", context_id: account_chain_ids).to_a
     tools = tools.select { |t| t.permission_given?(:course_navigation, user, self) && t.feature_flag_enabled?(self) }
     Lti::ExternalToolTab.new(self, :course_navigation, tools, opts[:language]).tabs
   end
@@ -3244,7 +3244,11 @@ class Course < ActiveRecord::Base
         admin_only_tabs = tabs.select { |t| t[:visibility] == "admins" }
         tabs -= admin_only_tabs if admin_only_tabs.present? && !check_for_permission.call(:read_as_admin)
 
-        hidden_external_tabs = tabs.select { |t| t[:hidden] && t[:external] }
+        hidden_external_tabs = tabs.select do |t|
+          next false unless t[:external]
+
+          t[:hidden] || (elementary_subject_course? && !course_subject_tabs && tab_hidden?(t[:id]))
+        end
         tabs -= hidden_external_tabs if hidden_external_tabs.present? && !(opts[:api] && check_for_permission.call(:read_as_admin))
 
         delete_unless.call([TAB_GRADES], :read_grades, :view_all_grades, :manage_grades)

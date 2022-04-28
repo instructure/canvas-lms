@@ -26,9 +26,15 @@ import {AttachmentDisplay} from '@canvas/message-attachments'
 import {Flex} from '@instructure/ui-flex'
 import {Modal} from '@instructure/ui-modal'
 import {View} from '@instructure/ui-view'
+import {Alert} from '@instructure/ui-alerts'
 
 const ModalBody = props => (
   <Modal.Body padding="none">
+    {props.modalError && (
+      <Alert margin="small" variant="error" timeout={2500}>
+        {props.modalError}
+      </Alert>
+    )}
     <Flex direction="column" width="100%" height="100%">
       {props.children}
       <View borderWidth="small none none none" padding="x-small">
@@ -60,7 +66,8 @@ ModalBody.propTypes = {
   onBodyChange: PropTypes.func,
   pastMessages: PropTypes.arrayOf(ConversationMessage.shape),
   removeAttachment: PropTypes.func,
-  replaceAttachment: PropTypes.func
+  replaceAttachment: PropTypes.func,
+  modalError: PropTypes.string
 }
 
 export default ModalBody

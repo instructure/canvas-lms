@@ -104,6 +104,7 @@ jest.mock('../../../../../../../bridge', () => {
 })
 
 describe('ImageSection', () => {
+  let scrollIntoView
   const defaultProps = {
     settings: {size: Size.Small},
     editing: false,
@@ -112,6 +113,11 @@ describe('ImageSection', () => {
   }
 
   const subject = overrides => render(<ImageSection {...{...defaultProps, ...overrides}} />)
+
+  beforeEach(() => {
+    scrollIntoView = jest.fn()
+    window.HTMLElement.prototype.scrollIntoView = scrollIntoView
+  })
 
   afterEach(() => jest.clearAllMocks())
 
@@ -243,6 +249,10 @@ describe('ImageSection', () => {
       expect(getByTestId('instructure_links-ImagesPanel')).toBeInTheDocument()
     })
 
+    it('scrolls the component into view smoothly 😎', async () => {
+      await waitFor(() => expect(scrollIntoView).toHaveBeenCalledWith({behavior: 'smooth'}))
+    })
+
     describe('and an image is clicked', () => {
       let originalFileReader
       const flushPromises = () => new Promise(setImmediate)
@@ -315,15 +325,18 @@ describe('ImageSection', () => {
     it('renders the course images component', async () => {
       await waitFor(() => expect(getByTestId('multicolor-svg-list')).toBeInTheDocument())
     })
+
+    it('scrolls the component into view smoothly 😎', async () => {
+      await waitFor(() => expect(scrollIntoView).toHaveBeenCalledWith({behavior: 'smooth'}))
+    })
   })
 
   describe('when the "Single Color Image" mode is selected', () => {
-    let spyFn, getByTestId, getByText, container, scrollIntoView
+    let spyFn, getByTestId, getByText, container
 
     beforeAll(() => {
       spyFn = jest.spyOn(svg.art, 'source')
       scrollIntoView = jest.fn()
-      window.HTMLElement.prototype.scrollIntoView = scrollIntoView
     })
 
     beforeEach(() => {

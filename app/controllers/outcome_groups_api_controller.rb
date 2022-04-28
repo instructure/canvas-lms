@@ -455,7 +455,7 @@ class OutcomeGroupsApiController < ApplicationController
   # @argument ratings[][points] [Integer]
   #   The points corresponding to a rating level for the embedded rubric criterion.
   #
-  # @argument calculation_method [String, "decaying_average"|"n_mastery"|"latest"|"highest"]
+  # @argument calculation_method [String, "decaying_average"|"n_mastery"|"latest"|"highest"|"average"]
   #   The new calculation method.  Defaults to "decaying_average"
   #
   # @argument calculation_int [Integer]

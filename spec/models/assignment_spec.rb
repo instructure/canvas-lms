@@ -7682,6 +7682,79 @@ describe Assignment do
     # rubocop:enable Performance/InefficientHashSearch
   end
 
+  describe "#ensure_points_possible!" do
+    subject do
+      assignment.ensure_points_possible!
+      assignment.points_possible
+    end
+
+    let(:grading_type) { "points" }
+    let(:points_possible) { nil }
+
+    let(:assignment) do
+      Assignment.create!(
+        course: @course,
+        name: "Subject",
+        points_possible: points_possible,
+        grading_type: grading_type
+      )
+    end
+
+    context "when 'points_possible' already is present" do
+      let(:points_possible) { 15.2 }
+
+      it "does not modify the points possible" do
+        expect(subject).to eq points_possible
+      end
+    end
+
+    context "when 'points_possible' is blank" do
+      shared_examples_for "pointed assignments" do
+        it { is_expected.to eq 0.0 }
+      end
+
+      shared_examples_for "exports of non-pointed assignments" do
+        it { is_expected.to be_nil }
+      end
+
+      context "and 'grading_type' is 'points'" do
+        let(:grading_type) { "points" }
+
+        it_behaves_like "pointed assignments"
+      end
+
+      context "and 'grading_type' is 'percent'" do
+        let(:grading_type) { "percent" }
+
+        it_behaves_like "pointed assignments"
+      end
+
+      context "and 'grading_type' is 'letter_grade'" do
+        let(:grading_type) { "letter_grade" }
+
+        it_behaves_like "pointed assignments"
+      end
+
+      context "and 'grading_type' is 'gpa_scale'" do
+        let(:grading_type) { "gpa_scale" }
+
+        it_behaves_like "pointed assignments"
+      end
+
+      context "and 'grading_type' is 'pass_fail'" do
+        let(:grading_type) { "pass_fail" }
+
+        it_behaves_like "exports of non-pointed assignments"
+      end
+
+      context "and 'grading_type' is 'not_graded'" do
+        let(:grading_type) { "not_graded" }
+
+        it_behaves_like "exports of non-pointed assignments"
+      end
+    end
+  end
+
   describe "#a2_enabled?" do
     before do
       allow(@course).to receive(:feature_enabled?) { false }
@@ -10021,6 +10094,7 @@ describe Assignment do
     let_once(:account) { Account.create!(root_account_id: nil) }
     let_once(:grading_period_group) do
       group = account.grading_period_groups.create!
+      group.enrollment_terms << course.enrollment_term
 
       now = Time.zone.now
       group.grading_periods.create!(
@@ -10047,7 +10121,10 @@ describe Assignment do
     let_once(:previously_closed_grading_period) { grading_period_group.grading_periods.first }
     let_once(:newly_closed_grading_period) { grading_period_group.grading_periods.second }
     let_once(:open_grading_period) { grading_period_group.grading_periods.third }
-    let_once(:course) { Course.create!(account: account) }
+    let_once(:course) do
+      course_with_student(active_all: true, account: account)
+      @course
+    end
 
     let(:assignment) { course.assignments.create!(post_to_sis: true) }
 
@@ -10060,12 +10137,31 @@ describe Assignment do
       end
 
       context "when an assignment is marked as due in a newly-closed grading period" do
-        it "sets post_to_sis to false for an assignment due within the newly-closed grading period" do
+        it "sets post_to_sis to false for an assignment due within the newly-closed grading period, whose course is using the grading period" do
           assignment.update!(due_at: 1.minute.after(newly_closed_grading_period.start_date))
-          expect do
-            Assignment.disable_post_to_sis_if_grading_period_closed
-            run_jobs
-          end.to change { assignment.reload.post_to_sis }.from(true).to(false)
+          aggregate_failures do
+            expect(GradingPeriod.for(course)).to include newly_closed_grading_period
+            expect do
+              Assignment.disable_post_to_sis_if_grading_period_closed
+              run_jobs
+            end.to change { assignment.reload.post_to_sis }.from(true).to(false)
+          end
+        end
+
+        it "does not set post_to_sis to false for an assignment due within the newly-closed grading period, whose course is NOT using the grading period" do
+          second_term = account.enrollment_terms.create!(name: "Term 2")
+          second_course = Course.create!(account: account, enrollment_term: second_term)
+          second_assignment = second_course.assignments.create!(
+            post_to_sis: true,
+            due_at: 1.minute.after(newly_closed_grading_period.start_date)
+          )
+          aggregate_failures do
+            expect(GradingPeriod.for(second_course)).to be_empty
+            expect do
+              Assignment.disable_post_to_sis_if_grading_period_closed
+              run_jobs
+            end.not_to change { second_assignment.reload.post_to_sis }.from(true)
+          end
         end
 
         it "sets updated_at for affected assignments" do
@@ -10092,7 +10188,7 @@ describe Assignment do
           end.not_to change { assignment.reload.post_to_sis }
         end
 
-        it "does not updated assignments due within the relevant timeframe that belong to an unaffected grading period" do
+        it "does not update assignments due within the relevant timeframe that belong to another root account" do
           alternate_root_account = Account.create!(root_account: nil)
           grading_period_group = alternate_root_account.grading_period_groups.create!
           now = Time.zone.now
@@ -10128,6 +10224,7 @@ describe Assignment do
 
         it "sets post_to_sis to false if at least one section has a due date in the closed grading period" do
           course_section = course.course_sections.create!(name: "section")
+          course.enroll_student(User.create!, active_all: true, section: course_section)
           assignment.update!(due_at: 1.week.after(newly_closed_grading_period.end_date))
           assignment.assignment_overrides.create!(
             due_at: 10.minutes.before(newly_closed_grading_period.end_date),

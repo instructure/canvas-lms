@@ -45,22 +45,14 @@ describe('QuizEngineModal', () => {
   it('submit is disabled without a selected choice', () => {
     const handleDismiss = jest.fn()
     const {getByText} = render(<QuizEngineModal setOpen onDismiss={handleDismiss} />)
-    expect(
-      getByText('Submit')
-        .closest('button')
-        .getAttribute('disabled')
-    ).toBeDefined()
+    expect(getByText('Submit').closest('button').getAttribute('disabled')).toBeDefined()
   })
 
   it('submit is enabled with a selected choice', () => {
     const handleDismiss = jest.fn()
     const {getByText} = render(<QuizEngineModal setOpen onDismiss={handleDismiss} />)
     fireEvent.click(getByText('Classic Quizzes'))
-    expect(
-      getByText('Submit')
-        .closest('button')
-        .getAttribute('disabled')
-    ).toBeNull()
+    expect(getByText('Submit').closest('button').getAttribute('disabled')).toBeNull()
   })
 
   it('submits to new quizzes without saving', () => {
@@ -93,7 +85,7 @@ describe('QuizEngineModal', () => {
     global.window.location = {href: 'http://localhost'}
     const {getByText} = render(<QuizEngineModal setOpen onDismiss={handleDismiss} />)
     fireEvent.click(getByText('New Quizzes'))
-    fireEvent.click(getByText('Remember my choice for this course'))
+    fireEvent.change(getByText('Remember my choice for this course'))
     fireEvent.click(getByText('Submit').closest('button'))
     expect(window.location.href).toBe('http://localhost/assignments?quiz_lti')
     global.window.location = windLoc
@@ -104,7 +96,7 @@ describe('QuizEngineModal', () => {
     window.HTMLFormElement.prototype.submit = jest.fn()
     const {getByText} = render(<QuizEngineModal setOpen onDismiss={handleDismiss} />)
     fireEvent.click(getByText('Classic Quizzes'))
-    fireEvent.click(getByText('Remember my choice for this course'))
+    fireEvent.change(getByText('Remember my choice for this course'))
     fireEvent.click(getByText('Submit').closest('button'))
     expect(window.HTMLFormElement.prototype.submit).toHaveBeenCalled()
     const form = document.querySelector(`[method="post"][action="${ENV.URLS.new_quiz_url}"]`)

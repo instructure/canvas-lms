@@ -73,3 +73,8 @@ outcome_service_results_to_canvas:
   applies_to: Course
   display_name: Outcome Service Results to Canvas Reporting
   description: Allows result data stored in the Outcomes Service to display in Canvas reporting (LMGB, sLMGB and outcome related admin reporting).
+outcome_alignment_summary:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Outcome Alignment Summary Tab
+  description: Provides a list of alignments for each outcome in a course.

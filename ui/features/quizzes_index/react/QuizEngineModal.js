@@ -21,6 +21,7 @@ import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import {Checkbox} from '@instructure/ui-checkbox'
 import {Link} from '@instructure/ui-link'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {Text} from '@instructure/ui-text'
@@ -159,16 +160,11 @@ function QuizEngineModal({setOpen, onDismiss}) {
         {newDesc}
       </RadioInputGroup>
       <hr />
-      <p>
-        <input
-          name="persistSelection"
-          type="checkbox"
-          defaultChecked={checked}
-          onChange={checkboxChange}
-          style={{marginRight: '0.25rem', height: '1.5rem', width: '1.5rem'}}
-        />
-        <label htmlFor="persistSelection">{I18n.t(`Remember my choice for this course`)}</label>
-      </p>
+      <Checkbox
+        label={I18n.t('Remember my choice for this course')}
+        checked={checked}
+        onChange={checkboxChange}
+      />
     </CanvasModal>
   )
 }

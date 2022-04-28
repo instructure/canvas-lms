@@ -39,17 +39,6 @@ QUnit.module('GroupCategoryCreateView', {
   }
 })
 
-QUnit.skip('toggling auto group leader enables and disables accompanying controls', function() {
-  $('.auto-group-leader-toggle').click()
-  view.$autoGroupLeaderControls.find('label.radio').each(function() {
-    equal($(this).css('opacity'), '1', 'opacity is 1')
-  })
-  $('.auto-group-leader-toggle').click()
-  view.$autoGroupLeaderControls.find('label.radio').each(function() {
-    equal($(this).css('opacity'), '0.5', 'opacity is .5')
-  })
-})
-
 test('auto group leader controls are hidden if we arent splitting groups automatically', () => {
   // Split by number of groups
   view.$autoGroupSplitControl.prop('checked', true)

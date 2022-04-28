@@ -22,6 +22,8 @@ import {asAxios, getPrefetchedXHR} from '@instructure/js-utils'
 import {transformApiToInternalItem, findNextLink, buildURL} from '../utilities/apiUtils'
 import {identifiableThunk} from '../utilities/redux-identifiable-thunk'
 import {getCourseList, gotCourseList} from './loading-actions'
+import formatMessage from '../format-message'
+import {alert} from '../utilities/alertUtils'
 
 export const {
   sidebarItemsLoading,
@@ -81,7 +83,10 @@ export const sidebarLoadNextItems = identifiableThunk(() => (dispatch, getState)
       .then(response => {
         return handleSidebarLoadingResponse(response, dispatch, getState)
       })
-      .catch(response => dispatch(sidebarItemsLoadingFailed(response)))
+      .catch(response => {
+        alert(formatMessage('Failed getting To Do list'), true)
+        dispatch(sidebarItemsLoadingFailed(response))
+      })
   }
 })
 
@@ -111,6 +116,7 @@ export const sidebarLoadInitialItems = (currentMoment, course_id) => (dispatch, 
       })
     })
     .catch(response => {
+      alert(formatMessage('Failed getting To Do list'), true)
       dispatch(sidebarItemsLoadingFailed(response))
     })
 }

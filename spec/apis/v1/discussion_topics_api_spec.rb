@@ -431,7 +431,6 @@ describe DiscussionTopicsController, type: :request do
 
   context "anonymous discussions" do
     before do
-      Account.site_admin.enable_feature! :discussion_anonymity
       Account.site_admin.enable_feature! :react_discussions_post
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics",
                { controller: "discussion_topics", action: "create", format: "json",
@@ -460,7 +459,6 @@ describe DiscussionTopicsController, type: :request do
 
     context "student permissions" do
       before do
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:discussion_anonymity).and_return(true)
         allow(Account.site_admin).to receive(:feature_enabled?).with(:react_discussions_post).and_return(true)
       end
 

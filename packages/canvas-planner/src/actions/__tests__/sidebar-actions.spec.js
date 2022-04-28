@@ -19,14 +19,20 @@
 import moxios from 'moxios'
 import moment from 'moment-timezone'
 import MockDate from 'mockdate'
-
 import {moxiosRespond} from 'jest-moxios-utils'
+import {initialize} from '../../utilities/alertUtils'
+
 import * as Actions from '../sidebar-actions'
 
 jest.mock('../../utilities/apiUtils', () => ({
   ...jest.requireActual('../../utilities/apiUtils'),
   transformApiToInternalItem: jest.fn(item => `transformed-${item.uniqueId}`)
 }))
+
+beforeAll(() => {
+  const alertSpy = jest.fn()
+  initialize({visualErrorCallback: alertSpy})
+})
 
 beforeEach(() => {
   moxios.install()

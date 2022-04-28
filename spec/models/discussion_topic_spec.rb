@@ -1852,7 +1852,7 @@ describe DiscussionTopic do
     it "is unread by default" do
       expect(@topic.read?(@student)).to be_falsey
       expect(@topic.unread_count(@student)).to eq 0
-      skip("check_read_state_scopes user: @student") # TODO: Fix
+      check_read_state_scopes user: @student
     end
 
     it "allows being marked unread" do
