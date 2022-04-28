@@ -18,14 +18,28 @@
 
 import React, {useCallback, useState} from 'react'
 import {IconCheckDarkSolid, IconCopyLine, IconXSolid} from '@instructure/ui-icons'
-import {IconButton} from '@instructure/ui-buttons'
-import PropTypes from 'prop-types'
+import {IconButton, IconButtonProps} from '@instructure/ui-buttons'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 const I18n = useI18nScope('copy-to-clipboard-button')
 
-export default function CopyToClipboardButton({value, screenReaderLabel}) {
-  const [feedback, setFeedback] = useState(null)
+export type CopyToClipboardButtonProps = {
+  value: string
+  screenReaderLabel: string
+  tooltipText?: string
+  buttonProps?: Partial<IconButtonProps>
+  tooltip?: boolean
+}
+
+export default function CopyToClipboardButton({
+  value,
+  screenReaderLabel,
+  tooltipText,
+  buttonProps,
+  tooltip
+}: CopyToClipboardButtonProps) {
+  const [feedback, setFeedback] = useState<boolean | null>(null)
 
   const temporarilySetFeedback = useCallback(
     success => {
@@ -48,18 +62,30 @@ export default function CopyToClipboardButton({value, screenReaderLabel}) {
     else return <IconCopyLine />
   }, [feedback])
 
-  return (
-    <IconButton size="small" onClick={copyToClipboardAction} screenReaderLabel={screenReaderLabel}>
+  // Clipboard API is not available at insecure origins, so just render nothing
+  if (!navigator.clipboard) return null
+
+  const button = (
+    <IconButton
+      size="small"
+      screenReaderLabel={screenReaderLabel}
+      {...buttonProps}
+      onClick={copyToClipboardAction}
+    >
       {renderFeedbackIcon()}
     </IconButton>
   )
-}
 
-CopyToClipboardButton.propTypes = {
-  value: PropTypes.string,
-  screenReaderLabel: PropTypes.string
+  return tooltip && tooltipText ? (
+    <Tooltip renderTip={tooltipText} on={['hover', 'focus']}>
+      {button}
+    </Tooltip>
+  ) : (
+    button
+  )
 }
 
 CopyToClipboardButton.defaultProps = {
-  screenReaderLabel: I18n.t('Copy')
+  screenReaderLabel: I18n.t('Copy'),
+  tooltipText: I18n.t('Copy')
 }
