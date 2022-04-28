@@ -973,7 +973,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 .emoji-picker-container {
   position: absolute;
   bottom: 0px;
-  #{direction(right)}: 0px;
+  #{direction(right)}: 10px;
 }
 
 figure {
