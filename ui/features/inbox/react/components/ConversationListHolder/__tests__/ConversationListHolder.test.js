@@ -201,11 +201,11 @@ describe('ConversationListHolder', () => {
   })
 
   it('should be able to open conversations', () => {
-    const onOpenMock = jest.fn()
-    const {getAllByText} = render(<ConversationListHolder onOpen={onOpenMock} {...props} />)
+    const onSelectMock = jest.fn()
+    const {getAllByText} = render(<ConversationListHolder onSelect={onSelectMock} {...props} />)
     const conversation = getAllByText('This is a different subject line')
     fireEvent.click(conversation[0])
-    expect(onOpenMock).toHaveBeenCalled()
+    expect(onSelectMock).toHaveBeenCalled()
   })
 
   it('should be able to select multiple conversations using cmd key', () => {

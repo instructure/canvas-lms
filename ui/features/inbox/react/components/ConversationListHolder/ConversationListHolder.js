@@ -20,7 +20,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Flex} from '@instructure/ui-flex'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
-import React, {useEffect, useState, useContext} from 'react'
+import React, {useEffect, useState, useContext, useMemo} from 'react'
 import InboxEmpty from '../../../svg/inbox-empty.svg'
 import {ConversationContext} from '../../../util/constants'
 import {Text} from '@instructure/ui-text'
@@ -167,27 +167,46 @@ export const ConversationListHolder = ({...props}) => {
     }
   })
 
+  const conversationItems = useMemo(() => {
+    return props.conversations?.map(conversation => {
+      return (
+        <ConversationListItem
+          id={conversation._id}
+          conversation={conversation}
+          isStarred={conversation?.label === 'starred'}
+          isSelected={selectedMessages.includes(conversation._id)}
+          isUnread={conversation?.workflowState === 'unread'}
+          onSelect={handleItemSelection}
+          onStar={props.onStar}
+          key={conversation._id}
+          readStateChangeConversationParticipants={
+            isSubmissionCommentsType ? () => {} : readStateChangeConversationParticipants
+          }
+          textSize={props.textSize}
+          datatestid={props.datatestid}
+        />
+      )
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    isSubmissionCommentsType,
+    props.conversations,
+    props.datatestid,
+    props.onStar,
+    props.textSize,
+    selectedMessages
+  ])
+
   return (
-    <View as="div" height="100%" overflowX="hidden" overflowY="auto" borderWidth="small">
-      {props.conversations?.map(conversation => {
-        return (
-          <ConversationListItem
-            id={conversation._id}
-            conversation={conversation}
-            isStarred={conversation?.label === 'starred'}
-            isSelected={selectedMessages.includes(conversation._id)}
-            isUnread={conversation?.workflowState === 'unread'}
-            onOpen={props.onOpen}
-            onRemoveFromSelectedConversations={removeFromSelectedConversations}
-            onSelect={handleItemSelection}
-            onStar={props.onStar}
-            key={conversation._id}
-            readStateChangeConversationParticipants={
-              isSubmissionCommentsType ? () => {} : readStateChangeConversationParticipants
-            }
-          />
-        )
-      })}
+    <View
+      as="div"
+      height="100%"
+      overflowX="hidden"
+      overflowY="auto"
+      borderWidth="small"
+      data-testid={props.datatestid}
+    >
+      {conversationItems}
       {props.conversations?.length === 0 && (
         <Flex
           textAlign="center"
@@ -212,13 +231,13 @@ export const ConversationListHolder = ({...props}) => {
 ConversationListHolder.propTypes = {
   conversations: PropTypes.arrayOf(PropTypes.object),
   id: PropTypes.string,
-  onOpen: PropTypes.func,
   onSelect: PropTypes.func,
-  onStar: PropTypes.func
+  onStar: PropTypes.func,
+  textSize: PropTypes.string,
+  datatestid: PropTypes.string
 }
 
 ConversationListHolder.defaultProps = {
-  onOpen: () => {},
   onSelect: () => {},
   onStar: () => {}
 }
