@@ -484,4 +484,43 @@ describe('ComposeModalContainer', () => {
       })
     })
   })
+
+  it('validates recipients', async () => {
+    const mockConversation = {
+      _id: '1',
+      messages: [
+        {
+          author: {
+            _id: '1337'
+          },
+          recipients: [
+            {
+              _id: '1337'
+            },
+            {
+              _id: '1338'
+            }
+          ]
+        }
+      ]
+    }
+    const component = setup({conversation: mockConversation, isForward: true})
+
+    // Wait for modal to load
+    await component.findByTestId('message-body')
+
+    // Hit send
+    const button = component.getByTestId('send-button')
+    fireEvent.click(button)
+
+    expect(component.findByText('You must choose a recipient')).toBeTruthy()
+
+    // Write something...
+    fireEvent.change(component.getByTestId('address-book-input'), {target: {value: 'potato'}})
+
+    // Hit send
+    fireEvent.click(button)
+
+    expect(component.findByText('Invalid recipient')).toBeTruthy()
+  })
 })

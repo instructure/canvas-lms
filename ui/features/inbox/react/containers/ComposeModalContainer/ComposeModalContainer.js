@@ -48,7 +48,9 @@ const ComposeModalContainer = props => {
   const [attachmentsToUpload, setAttachmentsToUpload] = useState([])
   const [subject, setSubject] = useState('')
   const [body, setBody] = useState('')
+  const [addressBookInputValue, setAddressBookInputValue] = useState('')
   const [bodyMessages, setBodyMessages] = useState([])
+  const [addressBookMessages, setAddressBookMessages] = useState([])
   const [sendIndividualMessages, setSendIndividualMessages] = useState(false)
   const [userNote, setUserNote] = useState(false)
   const [selectedContext, setSelectedContext] = useState()
@@ -143,12 +145,31 @@ const ComposeModalContainer = props => {
   }
 
   const validMessageFields = () => {
-    // TODO: validate recipients
+    let isValid = true
     if (!body) {
       setBodyMessages([{text: I18n.t('Message body is required'), type: 'error'}])
-      return false
+      isValid = false
     }
-    return true
+
+    if (!isSubmissionCommentsType && !props.isReply) {
+      if (addressBookInputValue !== '') {
+        setAddressBookMessages([{text: I18n.t('Invalid recipient'), type: 'error'}])
+        isValid = false
+      } else if (props.selectedIds.length === 0) {
+        setAddressBookMessages([{text: I18n.t('You must choose a recipient'), type: 'error'}])
+        isValid = false
+      }
+    }
+
+    return isValid
+  }
+
+  const onSelectedIdsChange = selectedIds => {
+    if (selectedIds.length > 0 && addressBookMessages.length > 0) {
+      setAddressBookMessages([])
+    }
+
+    props.onSelectedIdsChange(selectedIds)
   }
 
   const sendMessage = async () => {
@@ -207,6 +228,7 @@ const ComposeModalContainer = props => {
     setAttachmentsToUpload([])
     setBody(null)
     setBodyMessages([])
+    setAddressBookMessages([])
     setSelectedContext(null)
     props.onSelectedIdsChange([])
     props.setSendingMessage(false)
@@ -263,10 +285,11 @@ const ComposeModalContainer = props => {
                   isReply={props.isReply}
                   isForward={props.isForward}
                   onContextSelect={onContextSelect}
-                  onSelectedIdsChange={props.onSelectedIdsChange}
+                  onSelectedIdsChange={onSelectedIdsChange}
                   onUserNoteChange={onUserNoteChange}
                   onSendIndividualMessagesChange={onSendIndividualMessagesChange}
                   onSubjectChange={onSubjectChange}
+                  onAddressBookInputValueChange={setAddressBookInputValue}
                   userNote={userNote}
                   sendIndividualMessages={sendIndividualMessages}
                   subject={
@@ -274,6 +297,7 @@ const ComposeModalContainer = props => {
                   }
                   mediaAttachmentTitle={mediaUploadFile?.uploadedFile.name}
                   onRemoveMediaComment={onRemoveMedia}
+                  addressBookMessages={addressBookMessages}
                   data-testid="compose-modal-inputs"
                 />
               )}
