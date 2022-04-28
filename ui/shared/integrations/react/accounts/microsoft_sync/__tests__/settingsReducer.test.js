@@ -338,7 +338,8 @@ describe('settingsReducer', () => {
       it('disables the UI while trying to update or toggle sync', () => {
         for (const type of [reducerActions.updateSettings, reducerActions.toggleSync]) {
           const {uiEnabled} = settingsReducer(cloneDefaultState(), {
-            type
+            type,
+            dispatch: dispatchMock
           })
 
           expect(uiEnabled).toBeFalsy()

@@ -110,7 +110,8 @@ describe('EditCalendarEventDetails', () => {
           id: 1,
           name: 'Foo',
           conference_type: 'type1',
-          lti_settings: {a: 1, b: 2, c: 3}
+          lti_settings: {a: 1, b: 2, c: 3},
+          title: 'Bar'
         }
         view.event.save = jest.fn(params => {
           ;[

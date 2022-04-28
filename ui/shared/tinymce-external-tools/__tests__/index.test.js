@@ -29,7 +29,13 @@ describe('initializeExternalTools', () => {
       ]
     }
 
+    ENV = {
+      context_asset_string: 'course_1'
+    }
+
     fakeEditor = {
+      id: '1',
+      focus: jest.fn(),
       getContent() {},
       selection: {
         getContent() {}
