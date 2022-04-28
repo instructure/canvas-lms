@@ -234,7 +234,7 @@ describe CoursePacesController, type: :controller do
     it "updates the CoursePace" do
       put :update, params: { course_id: @course.id, id: @course_pace.id, course_pace: valid_update_params }
       expect(response).to be_successful
-      expect(@course_pace.reload.end_date.to_s).to eq(valid_update_params[:end_date])
+      expect(@course_pace.reload.end_date.to_date.to_s).to eq(valid_update_params[:end_date])
       expect(@course_pace.workflow_state).to eq(valid_update_params[:workflow_state])
       expect(
         @course_pace.course_pace_module_items.joins(:module_item).find_by(content_tags: { content_id: @a1.id }).duration
@@ -272,7 +272,7 @@ describe CoursePacesController, type: :controller do
       response_body = JSON.parse(response.body)
       expect(response_body["course_pace"]["id"]).to eq(course_pace.id)
 
-      expect(course_pace.end_date.to_s).to eq(valid_update_params[:end_date])
+      expect(course_pace.end_date.to_date.to_s).to eq(valid_update_params[:end_date])
       expect(course_pace.workflow_state).to eq(valid_update_params[:workflow_state])
       expect(
         course_pace.course_pace_module_items.joins(:module_item).find_by(content_tags: { content_id: @a1.id }).duration
