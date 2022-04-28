@@ -188,7 +188,8 @@ export default class AttemptTab extends Component {
     this.setState(
       {
         filesToUpload: files.map((file, i) => {
-          const name = file.name || file.title || file.url
+          // "text" is filename in LTI Content Item
+          const name = file.name || file.text || file.url
           const _id = `${i}-${file.url || file.name}`
 
           // As we receive progress events for this upload, we'll update the
@@ -250,11 +251,12 @@ export default class AttemptTab extends Component {
 
       let promise
       if (file.url) {
+        // LTI content item
         promise = uploadFile(
           uploadUrl,
           {
             url: file.url,
-            name: file.title,
+            name: file.text,
             content_type: file.mediaType,
             submit_assignment: false
           },
