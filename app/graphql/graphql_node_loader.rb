@@ -92,6 +92,10 @@ module GraphQLNodeLoader
       end
     when "GradingPeriod"
       Loaders::IDLoader.for(GradingPeriod).load(id).then(check_read_permission)
+    when "InternalSetting"
+      return nil unless Account.site_admin.grants_right?(ctx[:current_user], ctx[:session], :manage_internal_settings)
+
+      Loaders::UnshardedIDLoader.for(Setting).load(id)
     when "MediaObject"
       Loaders::MediaObjectLoader.load(id)
     when "Module"

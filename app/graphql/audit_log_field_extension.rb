@@ -139,7 +139,11 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
       # DiscussionEntryDrafts are not objects that need audit logs, they are
       # only allowed to be created by the user, and they have timestamps, so
       # skip audit logs for this mutation.
-      next if mutation == Mutations::CreateDiscussionEntryDraft
+      #
+      # Also skip audit logs for internal setting mutations, which can only
+      # be executed by siteadmins.
+      next if [Mutations::CreateDiscussionEntryDraft, Mutations::CreateInternalSetting,
+               Mutations::UpdateInternalSetting, Mutations::DeleteInternalSetting].include? mutation
 
       logger = Logger.new(mutation, context, arguments)
 
