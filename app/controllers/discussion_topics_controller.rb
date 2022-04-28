@@ -355,6 +355,7 @@ class DiscussionTopicsController < ApplicationController
       scope = scope.active.where("delayed_post_at IS NULL OR delayed_post_at<?", Time.now.utc)
     end
 
+    @topics = []
     if @context.is_a?(Group) || request.format.json?
       @topics = Api.paginate(scope, self, topic_pagination_url)
       if params[:exclude_context_module_locked_topics]
@@ -457,6 +458,12 @@ class DiscussionTopicsController < ApplicationController
 
         render html: "", layout: true
       end
+
+      InstStatsd::Statsd.increment("discussion_topic.index.visit")
+      InstStatsd::Statsd.count("discussion_topic.index.visit.pinned", @topics&.select { |dt| dt.pinned }&.count)
+      InstStatsd::Statsd.count("discussion_topic.index.visit.discussions", @topics&.length)
+      InstStatsd::Statsd.count("discussion_topic.index.visit.closed_for_comments", @topics&.select { |dt| dt.locked }&.count)
+
       format.json do
         log_api_asset_access(["topics", @context], "topics", "other")
         if @context.grants_right?(@current_user, session, :moderate_forum)
@@ -1402,6 +1409,22 @@ class DiscussionTopicsController < ApplicationController
         if is_new
           InstStatsd::Statsd.increment("discussion_topic.created")
 
+          if params[:podcast_enabled] == "1"
+            InstStatsd::Statsd.increment("discussion_topic.created.podcast_feed_enabled")
+          end
+
+          if params[:allow_rating] == "1"
+            InstStatsd::Statsd.increment("discussion_topic.created.allow_liking_enabled")
+          end
+
+          if params[:attachment]
+            InstStatsd::Statsd.increment("discussion_topic.created.attachment")
+          end
+
+          if !params[:delayed_post_at]&.empty? || !params[:lock_at]&.empty?
+            InstStatsd::Statsd.increment("discussion_topic.created.scheduled")
+          end
+
           if params[:anonymous_state] == "partial_anonymity"
             InstStatsd::Statsd.increment("discussion_topic.created.partial_anonymity")
           end
@@ -1416,6 +1439,10 @@ class DiscussionTopicsController < ApplicationController
 
           if @context.is_a?(Group)
             InstStatsd::Statsd.increment("discussion_topic.created.group")
+          end
+
+          if request.params[:assignment] && request.params[:assignment][:assignment_overrides] && request.params[:assignment][:assignment_overrides].length > 1
+            InstStatsd::Statsd.increment("discussion_topic.created.multiple_due_dates")
           end
         end
 
