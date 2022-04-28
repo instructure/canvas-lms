@@ -22,7 +22,7 @@ import {handlers} from '../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../shared/msw/mswServer'
 import React from 'react'
-import {render, fireEvent, waitFor} from '@testing-library/react'
+import {render, fireEvent, waitFor, screen} from '@testing-library/react'
 import waitForApolloLoading from '../../../util/waitForApolloLoading'
 import {responsiveQuerySizes} from '../../../util/utils'
 
@@ -146,6 +146,38 @@ describe('ConversationListContainer', () => {
       )
 
       expect(mock.mock.calls.length).toBe(4)
+    })
+  })
+
+  describe('responsiveness', () => {
+    describe('tablet', () => {
+      beforeEach(() => {
+        responsiveQuerySizes.mockImplementation(() => ({
+          tablet: {maxWidth: '67'}
+        }))
+      })
+
+      it('should emit correct test id for tablet', async () => {
+        const component = setup()
+        expect(component.container).toBeTruthy()
+        const listItem = await component.findByTestId('list-items-tablet')
+        expect(listItem).toBeTruthy()
+      })
+    })
+
+    describe('desktop', () => {
+      beforeEach(() => {
+        responsiveQuerySizes.mockImplementation(() => ({
+          desktop: {minWidth: '768'}
+        }))
+      })
+
+      it('should emit correct test id for desktop', async () => {
+        const component = setup()
+        expect(component.container).toBeTruthy()
+        const listItem = await screen.findByTestId('list-items-desktop')
+        expect(listItem).toBeTruthy()
+      })
     })
   })
 })

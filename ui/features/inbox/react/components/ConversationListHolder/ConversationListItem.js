@@ -31,8 +31,6 @@ import {
 } from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
-import {Responsive} from '@instructure/ui-responsive'
-import {responsiveQuerySizes} from '../../../util/utils'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
@@ -60,7 +58,6 @@ export const ConversationListItem = ({...props}) => {
       props.onSelect(e, props.id, true)
     } else {
       props.onSelect(e, props.id, false)
-      props.onOpen()
     }
   }
 
@@ -76,260 +73,194 @@ export const ConversationListItem = ({...props}) => {
     props.onStar(!props.isStarred, props.conversation._id)
   }
 
-  const formatParticipants = () => {
-    const participantsStr = props.conversation.participantString
-
-    return (
-      <Responsive
-        match="media"
-        query={responsiveQuerySizes({tablet: true, desktop: true})}
-        props={{
-          tablet: {
-            participants: {
-              size: 'x-small'
-            },
-            datatestid: 'list-item-tablet'
-          },
-          desktop: {
-            participants: {
-              size: 'small'
-            },
-            datatestid: 'list-item-desktop'
-          }
-        }}
-        render={responsiveProps => (
-          <Text
-            weight="bold"
-            size={responsiveProps.participants.size}
-            data-testid={responsiveProps.datatestid}
-          >
-            <TruncateText>{participantsStr}</TruncateText>
-          </Text>
-        )}
-      />
-    )
-  }
-
   return (
-    <Responsive
-      match="media"
-      query={responsiveQuerySizes({tablet: true, desktop: true})}
-      props={{
-        tablet: {
-          participants: {
-            size: 'x-small'
-          },
-          date: {
-            size: 'x-small'
-          },
-          subject: {
-            size: 'x-small'
-          },
-          message: {
-            size: 'x-small'
-          }
-        },
-        desktop: {
-          participants: {
-            size: 'small'
-          },
-          date: {
-            size: 'small'
-          },
-          subject: {
-            size: 'small'
-          },
-          message: {
-            size: 'small'
-          }
-        }
+    <div
+      style={{
+        // TODO: Move these styles to a stylesheet once we are moved to the app/ directory
+        boxShadow: isHovering && 'inset -4px 0px 0px rgb(0, 142, 226)',
+        backgroundColor: props.isSelected && 'rgb(229,242,248)'
       }}
-      render={responsiveProps => (
-        <div
-          style={{
-            // TODO: Move these styles to a stylesheet once we are moved to the app/ directory
-            boxShadow: isHovering && 'inset -4px 0px 0px rgb(0, 142, 226)',
-            backgroundColor: props.isSelected && 'rgb(229,242,248)'
+    >
+      <View
+        data-testid="conversation"
+        as="div"
+        borderWidth="none none small none"
+        padding="small x-small"
+      >
+        <Grid
+          data-testid="conversationListItem-Item"
+          vAlign="middle"
+          colSpacing="none"
+          rowSpacing="none"
+          onMouseEnter={() => {
+            setIsHovering(true)
           }}
+          onMouseLeave={() => {
+            setIsHovering(false)
+          }}
+          onClick={handleConversationClick}
         >
-          <View
-            data-testid="conversation"
-            as="div"
-            borderWidth="none none small none"
-            padding="small x-small"
-          >
-            <Grid
-              data-testid="conversationListItem-Item"
-              vAlign="middle"
-              colSpacing="none"
-              rowSpacing="none"
-              onMouseEnter={() => {
-                setIsHovering(true)
-              }}
-              onMouseLeave={() => {
-                setIsHovering(false)
-              }}
-              onClick={handleConversationClick}
-            >
-              <Grid.Row>
-                <Grid.Col width="auto">
-                  <View
-                    textAlign="center"
-                    as="div"
-                    width={30}
-                    height={30}
-                    padding="xx-small"
-                    margin="0 small 0 0"
-                  >
-                    <Checkbox
-                      data-testid="conversationListItem-Checkbox"
-                      label={
-                        <ScreenReaderContent>
-                          {props.isSelected ? I18n.t('selected') : I18n.t('not selected')}
-                        </ScreenReaderContent>
+          <Grid.Row>
+            <Grid.Col width="auto">
+              <View
+                textAlign="center"
+                as="div"
+                width={30}
+                height={30}
+                padding="xx-small"
+                margin="0 small 0 0"
+              >
+                <Checkbox
+                  data-testid="conversationListItem-Checkbox"
+                  label={
+                    <ScreenReaderContent>
+                      {props.isSelected ? I18n.t('selected') : I18n.t('not selected')}
+                    </ScreenReaderContent>
+                  }
+                  checked={props.isSelected}
+                  onChange={e => {
+                    e.stopPropagation()
+                  }}
+                />
+              </View>
+            </Grid.Col>
+            <Grid.Col>
+              <Text color="brand" size={props.textSize}>
+                {DateHelper.formatDateForDisplay(props.conversation.lastMessageCreatedAt)}
+              </Text>
+            </Grid.Col>
+            <Grid.Col width="auto">
+              <Badge
+                count={props.conversation.messages.length}
+                countUntil={99}
+                standalone
+                theme={{
+                  colorPrimary: colors.backgroundDarkest,
+                  borderRadius: '0.25rem',
+                  fontSize: '0.8125rem',
+                  fontWeight: '700'
+                }}
+              />
+            </Grid.Col>
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Col width="auto">
+              <View textAlign="center" as="div" width={30} height={30} margin="0 small 0 0">
+                <IconButton
+                  color="primary"
+                  data-testid={props.isUnread ? 'unread-badge' : 'read-badge'}
+                  margin="x-small"
+                  onClick={() =>
+                    props.readStateChangeConversationParticipants({
+                      variables: {
+                        conversationIds: [props.conversation._id],
+                        workflowState: props.isUnread ? 'read' : 'unread'
                       }
-                      checked={props.isSelected}
-                      onChange={e => {
-                        e.stopPropagation()
-                      }}
-                    />
-                  </View>
-                </Grid.Col>
-                <Grid.Col>
-                  <Text color="brand" size={responsiveProps.date.size}>
-                    {DateHelper.formatDateForDisplay(props.conversation.lastMessageCreatedAt)}
-                  </Text>
-                </Grid.Col>
-                <Grid.Col width="auto">
-                  <Badge
-                    count={props.conversation.messages.length}
-                    countUntil={99}
-                    standalone
-                    theme={{
-                      colorPrimary: colors.backgroundDarkest,
-                      borderRadius: '0.25rem',
-                      fontSize: '0.8125rem',
-                      fontWeight: '700'
-                    }}
-                  />
-                </Grid.Col>
-              </Grid.Row>
-              <Grid.Row>
-                <Grid.Col width="auto">
-                  <View textAlign="center" as="div" width={30} height={30} margin="0 small 0 0">
-                    <IconButton
-                      color="primary"
-                      data-testid={props.isUnread ? 'unread-badge' : 'read-badge'}
-                      margin="x-small"
-                      onClick={() =>
-                        props.readStateChangeConversationParticipants({
-                          variables: {
-                            conversationIds: [props.conversation._id],
-                            workflowState: props.isUnread ? 'read' : 'unread'
-                          }
-                        })
-                      }
-                      screenReaderLabel={props.isUnread ? I18n.t('Unread') : I18n.t('Read')}
-                      size="small"
-                      withBackground={false}
-                      withBorder={false}
-                    >
-                      {props.isUnread ? <IconEmptySolid /> : <IconEmptyLine />}
-                    </IconButton>
-                  </View>
-                </Grid.Col>
-                <Grid.Col>{formatParticipants()}</Grid.Col>
-              </Grid.Row>
-              <Grid.Row>
-                <Grid.Col width="auto">
-                  <View textAlign="center" as="div" width={30} height={30} margin="0 small 0 0" />
-                </Grid.Col>
-                <Grid.Col>
-                  <Text weight="normal" size={responsiveProps.subject.size}>
-                    <TruncateText>{props.conversation.subject}</TruncateText>
-                  </Text>
-                </Grid.Col>
-              </Grid.Row>
-              <Grid.Row>
-                <Grid.Col width="auto">
-                  <View textAlign="center" as="div" width={30} height={30} margin="0 small 0 0" />
-                </Grid.Col>
-                <Grid.Col>
-                  <Text color="secondary" size={responsiveProps.message.size}>
-                    <TruncateText>{props.conversation.lastMessageContent}</TruncateText>
-                  </Text>
-                </Grid.Col>
-                <Grid.Col width="auto">
-                  {!isSubmissionCommentsType && (
-                    <View textAlign="center" as="div" width={30} height={30} margin="0 small 0 0">
-                      <Focusable>
-                        {({focused}) => {
-                          return (
-                            <div>
-                              {focused || isHovering || props.isStarred ? (
-                                <IconButton
-                                  size="small"
-                                  withBackground={false}
-                                  withBorder={false}
-                                  renderIcon={props.isStarred ? IconStarSolid : IconStarLightLine}
-                                  screenReaderLabel={
-                                    props.isStarred ? I18n.t('starred') : I18n.t('not starred')
-                                  }
-                                  onClick={handleConversationStarClick}
-                                  data-testid="visible-star"
-                                />
-                              ) : (
-                                <ScreenReaderContent>
-                                  <IconButton
-                                    size="small"
-                                    withBackground={false}
-                                    withBorder={false}
-                                    renderIcon={props.isStarred ? IconStarSolid : IconStarLightLine}
-                                    screenReaderLabel={
-                                      props.isStarred ? I18n.t('starred') : I18n.t('not starred')
-                                    }
-                                    onClick={handleConversationStarClick}
-                                  />
-                                </ScreenReaderContent>
-                              )}
-                            </div>
-                          )
-                        }}
-                      </Focusable>
-                    </View>
-                  )}
-                </Grid.Col>
-              </Grid.Row>
-              <Grid.Row>
-                <Grid.Col>
+                    })
+                  }
+                  screenReaderLabel={props.isUnread ? I18n.t('Unread') : I18n.t('Read')}
+                  size="small"
+                  withBackground={false}
+                  withBorder={false}
+                >
+                  {props.isUnread ? <IconEmptySolid /> : <IconEmptyLine />}
+                </IconButton>
+              </View>
+            </Grid.Col>
+            <Grid.Col>
+              <Text weight="bold" size={props.textSize}>
+                <TruncateText>{props.conversation.participantString}</TruncateText>
+              </Text>
+            </Grid.Col>
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Col width="auto">
+              <View textAlign="center" as="div" width={30} height={30} margin="0 small 0 0" />
+            </Grid.Col>
+            <Grid.Col>
+              <Text weight="normal" size={props.textSize}>
+                <TruncateText>{props.conversation.subject}</TruncateText>
+              </Text>
+            </Grid.Col>
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Col width="auto">
+              <View textAlign="center" as="div" width={30} height={30} margin="0 small 0 0" />
+            </Grid.Col>
+            <Grid.Col>
+              <Text color="secondary" size={props.textSize}>
+                <TruncateText>{props.conversation.lastMessageContent}</TruncateText>
+              </Text>
+            </Grid.Col>
+            <Grid.Col width="auto">
+              {!isSubmissionCommentsType && (
+                <View textAlign="center" as="div" width={30} height={30} margin="0 small 0 0">
                   <Focusable>
                     {({focused}) => {
-                      return focused ? (
-                        <Button
-                          display="block"
-                          textAlign="center"
-                          size="small"
-                          onClick={e => {
-                            setMessageOpenEvent(true) // Required to redirect focus into message
-                            handleConversationClick(e)
-                          }}
-                        >
-                          {I18n.t('Open Conversation')}
-                        </Button>
-                      ) : (
-                        <ScreenReaderContent tabIndex="0">
-                          {I18n.t('Open Conversation')}
-                        </ScreenReaderContent>
+                      return (
+                        <div>
+                          {focused || isHovering || props.isStarred ? (
+                            <IconButton
+                              size="small"
+                              withBackground={false}
+                              withBorder={false}
+                              renderIcon={props.isStarred ? IconStarSolid : IconStarLightLine}
+                              screenReaderLabel={
+                                props.isStarred ? I18n.t('starred') : I18n.t('not starred')
+                              }
+                              onClick={handleConversationStarClick}
+                              data-testid="visible-star"
+                            />
+                          ) : (
+                            <ScreenReaderContent>
+                              <IconButton
+                                size="small"
+                                withBackground={false}
+                                withBorder={false}
+                                renderIcon={props.isStarred ? IconStarSolid : IconStarLightLine}
+                                screenReaderLabel={
+                                  props.isStarred ? I18n.t('starred') : I18n.t('not starred')
+                                }
+                                onClick={handleConversationStarClick}
+                              />
+                            </ScreenReaderContent>
+                          )}
+                        </div>
                       )
                     }}
                   </Focusable>
-                </Grid.Col>
-              </Grid.Row>
-            </Grid>
-          </View>
-        </div>
-      )}
-    />
+                </View>
+              )}
+            </Grid.Col>
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Col>
+              <Focusable>
+                {({focused}) => {
+                  return focused ? (
+                    <Button
+                      display="block"
+                      textAlign="center"
+                      size="small"
+                      onClick={e => {
+                        setMessageOpenEvent(true) // Required to redirect focus into message
+                        handleConversationClick(e)
+                      }}
+                    >
+                      {I18n.t('Open Conversation')}
+                    </Button>
+                  ) : (
+                    <ScreenReaderContent tabIndex="0">
+                      {I18n.t('Open Conversation')}
+                    </ScreenReaderContent>
+                  )
+                }}
+              </Focusable>
+            </Grid.Col>
+          </Grid.Row>
+        </Grid>
+      </View>
+    </div>
   )
 }
 
@@ -340,8 +271,8 @@ ConversationListItem.propTypes = {
   isSelected: PropTypes.bool,
   isStarred: PropTypes.bool,
   isUnread: PropTypes.bool,
-  onOpen: PropTypes.func,
   onSelect: PropTypes.func,
   onStar: PropTypes.func,
-  readStateChangeConversationParticipants: PropTypes.func
+  readStateChangeConversationParticipants: PropTypes.func,
+  textSize: PropTypes.string
 }

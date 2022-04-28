@@ -28,7 +28,8 @@ import React, {useContext, useMemo} from 'react'
 import {Spinner} from '@instructure/ui-spinner'
 import {useQuery, useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
-import {inboxConversationsWrapper} from '../../util/utils'
+import {inboxConversationsWrapper, responsiveQuerySizes} from '../../util/utils'
+import {Responsive} from '@instructure/ui-responsive'
 
 const I18n = useI18nScope('conversations_2')
 
@@ -100,11 +101,28 @@ const ConversationListContainer = ({course, scope, onSelectConversation, userFil
   }
 
   return (
-    <ConversationListHolder
-      conversations={inboxItemData}
-      onOpen={() => {}}
-      onSelect={onSelectConversation}
-      onStar={handleStar}
+    <Responsive
+      match="media"
+      query={responsiveQuerySizes({tablet: true, desktop: true})}
+      props={{
+        tablet: {
+          textSize: 'x-small',
+          datatestid: 'list-items-tablet'
+        },
+        desktop: {
+          textSize: 'small',
+          datatestid: 'list-items-desktop'
+        }
+      }}
+      render={responsiveProps => (
+        <ConversationListHolder
+          conversations={inboxItemData}
+          onSelect={onSelectConversation}
+          onStar={handleStar}
+          textSize={responsiveProps.textSize}
+          datatestid={responsiveProps.datatestid}
+        />
+      )}
     />
   )
 }
