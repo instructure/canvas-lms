@@ -99,6 +99,12 @@ with a deep linking message type for certain placements. The specific details of
 The IMS LTI Deep Linking specification <a href="https://www.imsglobal.org/spec/lti-dl/v2p0#content-item-types">defines several content items types</a> that a tool may return to the platform via Deep linking. Canvas supports all of these
 content item types and their respective required properties with additional support for the optional properties listed here:
 
+### File
+Full support for require properties.
+
+Support for the following optional properties:
+- text (should be filename)
+
 ### Link
 Full support for required properties.
 
