@@ -134,14 +134,14 @@ class CoursePaceHardEndDateCompressor
   def self.round_durations(durations, plan_length)
     # First, just round up or down based on the breakpoint
     rounded_durations = durations.map do |duration|
-      next Duration.new(duration, "NONE", 0) if duration == 0
+      next PaceDuration.new(duration, "NONE", 0) if duration == 0
 
       remainder = duration % 1
 
       if remainder >= ROUNDING_BREAKPOINT
-        Duration.new(duration.ceil, "UP", remainder)
+        PaceDuration.new(duration.ceil, "UP", remainder)
       else
-        Duration.new(duration.floor, "DOWN", remainder)
+        PaceDuration.new(duration.floor, "DOWN", remainder)
       end
     end
 
@@ -215,7 +215,7 @@ class CoursePaceHardEndDateCompressor
   end
 end
 
-Duration = Struct.new(:duration, :rounding_direction, :remainder) do
+PaceDuration = Struct.new(:duration, :rounding_direction, :remainder) do
   def rounded_up?
     rounding_direction == "UP"
   end
