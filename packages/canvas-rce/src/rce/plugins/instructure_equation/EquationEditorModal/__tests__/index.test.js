@@ -163,6 +163,8 @@ describe('EquationEditorModal', () => {
         renderModal({editor})
         await waitFor(() => {
           expect(toggle()).toBeChecked()
+        })
+        await waitFor(() => {
           const value = advancedEditor().value
           expect(value).toEqual('\\displaystyle')
         })
@@ -191,6 +193,8 @@ describe('EquationEditorModal', () => {
         renderModal({editor})
         await waitFor(() => {
           expect(toggle()).toBeChecked()
+        })
+        await waitFor(() => {
           const value = advancedEditor().value
           expect(value).toEqual('\\displaystyle x')
         })
@@ -307,7 +311,11 @@ describe('EquationEditorModal', () => {
           renderModal({editor})
           await waitFor(() => {
             expect(editor.selection.setRng).toHaveBeenCalled()
+          })
+          await waitFor(() => {
             expect(toggle()).toBeChecked()
+          })
+          await waitFor(() => {
             const value = advancedEditor().value
             expect(value).toEqual('\\displaystyle x')
           })
