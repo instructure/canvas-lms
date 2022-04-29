@@ -20,7 +20,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Flex} from '@instructure/ui-flex'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
-import React, {useEffect, useState, useContext, useMemo} from 'react'
+import React, {useEffect, useState, useContext} from 'react'
 import InboxEmpty from '../../../svg/inbox-empty.svg'
 import {ConversationContext} from '../../../util/constants'
 import {Text} from '@instructure/ui-text'
@@ -50,25 +50,25 @@ export const ConversationListHolder = ({...props}) => {
   useEffect(() => {
     provideConversationsForOnSelect(selectedMessages)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.conversations])
+  }, [props.conversations, selectedMessages])
 
   // Toggle function for adding/removing IDs from state
   const updatedSelectedItems = _id => {
-    const updatedSelectedMessage = selectedMessages
-    if (selectedMessages.includes(_id)) {
-      const index = updatedSelectedMessage.indexOf(_id)
-      updatedSelectedMessage.splice(index, 1)
-    } else {
-      updatedSelectedMessage.push(_id)
-    }
-    setSelectedMessages([...updatedSelectedMessage])
-    provideConversationsForOnSelect([...updatedSelectedMessage])
+    setSelectedMessages(prevState => {
+      const updatedSelectedMessage = [...prevState]
+      if (prevState.includes(_id)) {
+        const index = updatedSelectedMessage.indexOf(_id)
+        updatedSelectedMessage.splice(index, 1)
+      } else {
+        updatedSelectedMessage.push(_id)
+      }
+      return updatedSelectedMessage
+    })
   }
 
   const removeFromSelectedConversations = _id => {
     const updatedSelectedMessage = selectedMessages.filter(id => id !== _id)
     setSelectedMessages([...updatedSelectedMessage])
-    provideConversationsForOnSelect([...updatedSelectedMessage])
   }
 
   // Key handler for MessageListItems
@@ -77,7 +77,6 @@ export const ConversationListHolder = ({...props}) => {
     if (e.shiftKey) {
       window.document.getSelection().removeAllRanges()
     }
-
     if (e.shiftKey && rangeClickStart && multiple) {
       // Range Click
       rangeSelect(_id)
@@ -96,11 +95,9 @@ export const ConversationListHolder = ({...props}) => {
       setMultiselect(e.target.id.includes('Checkbox'))
 
       if (e.target.id.includes('Checkbox')) {
-        setSelectedMessages([...selectedMessages, _id])
-        provideConversationsForOnSelect([...selectedMessages, _id])
+        setSelectedMessages(prevSelectedMessages => [...prevSelectedMessages, _id])
       } else {
         setSelectedMessages([_id])
-        provideConversationsForOnSelect([_id])
       }
     }
   }
@@ -143,7 +140,6 @@ export const ConversationListHolder = ({...props}) => {
       }
     })
     setSelectedMessages([...updatedSelectedMessage])
-    provideConversationsForOnSelect([...updatedSelectedMessage])
   }
 
   const [readStateChangeConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
@@ -167,36 +163,6 @@ export const ConversationListHolder = ({...props}) => {
     }
   })
 
-  const conversationItems = useMemo(() => {
-    return props.conversations?.map(conversation => {
-      return (
-        <ConversationListItem
-          id={conversation._id}
-          conversation={conversation}
-          isStarred={conversation?.label === 'starred'}
-          isSelected={selectedMessages.includes(conversation._id)}
-          isUnread={conversation?.workflowState === 'unread'}
-          onSelect={handleItemSelection}
-          onStar={props.onStar}
-          key={conversation._id}
-          readStateChangeConversationParticipants={
-            isSubmissionCommentsType ? () => {} : readStateChangeConversationParticipants
-          }
-          textSize={props.textSize}
-          datatestid={props.datatestid}
-        />
-      )
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    isSubmissionCommentsType,
-    props.conversations,
-    props.datatestid,
-    props.onStar,
-    props.textSize,
-    selectedMessages
-  ])
-
   return (
     <View
       as="div"
@@ -206,7 +172,24 @@ export const ConversationListHolder = ({...props}) => {
       borderWidth="small"
       data-testid={props.datatestid}
     >
-      {conversationItems}
+      {props.conversations?.map(conversation => {
+        return (
+          <ConversationListItem
+            id={conversation._id}
+            conversation={conversation}
+            isStarred={conversation?.label === 'starred'}
+            isSelected={selectedMessages.includes(conversation._id)}
+            isUnread={conversation?.workflowState === 'unread'}
+            onSelect={handleItemSelection}
+            onStar={props.onStar}
+            key={conversation._id}
+            readStateChangeConversationParticipants={
+              isSubmissionCommentsType ? () => {} : readStateChangeConversationParticipants
+            }
+            textSize={props.textSize}
+          />
+        )
+      })}
       {props.conversations?.length === 0 && (
         <Flex
           textAlign="center"

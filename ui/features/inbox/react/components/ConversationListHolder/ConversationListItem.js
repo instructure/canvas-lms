@@ -30,7 +30,7 @@ import {
   IconEmptySolid
 } from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
-import React, {useContext, useState} from 'react'
+import React, {useContext, useState, useMemo} from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
@@ -73,146 +73,134 @@ export const ConversationListItem = ({...props}) => {
     props.onStar(!props.isStarred, props.conversation._id)
   }
 
-  return (
-    <div
-      style={{
-        // TODO: Move these styles to a stylesheet once we are moved to the app/ directory
-        boxShadow: isHovering && 'inset -4px 0px 0px rgb(0, 142, 226)',
-        backgroundColor: props.isSelected && 'rgb(229,242,248)'
-      }}
-    >
-      <View
-        data-testid="conversation"
-        as="div"
-        borderWidth="none none small none"
-        padding="small x-small"
+  return useMemo(() => {
+    return (
+      <div
+        style={{
+          // TODO: Move these styles to a stylesheet once we are moved to the app/ directory
+          boxShadow: isHovering && 'inset -4px 0px 0px rgb(0, 142, 226)',
+          backgroundColor: props.isSelected && 'rgb(229,242,248)'
+        }}
       >
-        <Grid
-          data-testid="conversationListItem-Item"
-          vAlign="middle"
-          colSpacing="none"
-          rowSpacing="none"
-          onMouseEnter={() => {
-            setIsHovering(true)
-          }}
-          onMouseLeave={() => {
-            setIsHovering(false)
-          }}
-          onClick={handleConversationClick}
+        <View
+          data-testid="conversation"
+          as="div"
+          borderWidth="none none small none"
+          padding="small x-small"
         >
-          <Grid.Row>
-            <Grid.Col width="auto">
-              <View
-                textAlign="center"
-                as="div"
-                width={30}
-                height={30}
-                padding="xx-small"
-                margin="0 small 0 0"
-              >
-                <Checkbox
-                  data-testid="conversationListItem-Checkbox"
-                  label={
-                    <ScreenReaderContent>
-                      {props.isSelected ? I18n.t('selected') : I18n.t('not selected')}
-                    </ScreenReaderContent>
-                  }
-                  checked={props.isSelected}
-                  onChange={e => {
-                    e.stopPropagation()
+          <Grid
+            data-testid="conversationListItem-Item"
+            vAlign="middle"
+            colSpacing="none"
+            rowSpacing="none"
+            onMouseEnter={() => {
+              setIsHovering(true)
+            }}
+            onMouseLeave={() => {
+              setIsHovering(false)
+            }}
+            onClick={handleConversationClick}
+          >
+            <Grid.Row>
+              <Grid.Col width="auto">
+                <View
+                  textAlign="center"
+                  as="div"
+                  width={30}
+                  height={30}
+                  padding="xx-small"
+                  margin="0 small 0 0"
+                >
+                  <Checkbox
+                    data-testid="conversationListItem-Checkbox"
+                    label={
+                      <ScreenReaderContent>
+                        {props.isSelected ? I18n.t('selected') : I18n.t('not selected')}
+                      </ScreenReaderContent>
+                    }
+                    checked={props.isSelected}
+                    onChange={e => {
+                      e.stopPropagation()
+                    }}
+                  />
+                </View>
+              </Grid.Col>
+              <Grid.Col>
+                <Text color="brand" size={props.textSize}>
+                  {DateHelper.formatDateForDisplay(props.conversation.lastMessageCreatedAt)}
+                </Text>
+              </Grid.Col>
+              <Grid.Col width="auto">
+                <Badge
+                  count={props.conversation.messages.length}
+                  countUntil={99}
+                  standalone
+                  theme={{
+                    colorPrimary: colors.backgroundDarkest,
+                    borderRadius: '0.25rem',
+                    fontSize: '0.8125rem',
+                    fontWeight: '700'
                   }}
                 />
-              </View>
-            </Grid.Col>
-            <Grid.Col>
-              <Text color="brand" size={props.textSize}>
-                {DateHelper.formatDateForDisplay(props.conversation.lastMessageCreatedAt)}
-              </Text>
-            </Grid.Col>
-            <Grid.Col width="auto">
-              <Badge
-                count={props.conversation.messages.length}
-                countUntil={99}
-                standalone
-                theme={{
-                  colorPrimary: colors.backgroundDarkest,
-                  borderRadius: '0.25rem',
-                  fontSize: '0.8125rem',
-                  fontWeight: '700'
-                }}
-              />
-            </Grid.Col>
-          </Grid.Row>
-          <Grid.Row>
-            <Grid.Col width="auto">
-              <View textAlign="center" as="div" width={30} height={30} margin="0 small 0 0">
-                <IconButton
-                  color="primary"
-                  data-testid={props.isUnread ? 'unread-badge' : 'read-badge'}
-                  margin="x-small"
-                  onClick={() =>
-                    props.readStateChangeConversationParticipants({
-                      variables: {
-                        conversationIds: [props.conversation._id],
-                        workflowState: props.isUnread ? 'read' : 'unread'
-                      }
-                    })
-                  }
-                  screenReaderLabel={props.isUnread ? I18n.t('Unread') : I18n.t('Read')}
-                  size="small"
-                  withBackground={false}
-                  withBorder={false}
-                >
-                  {props.isUnread ? <IconEmptySolid /> : <IconEmptyLine />}
-                </IconButton>
-              </View>
-            </Grid.Col>
-            <Grid.Col>
-              <Text weight="bold" size={props.textSize}>
-                <TruncateText>{props.conversation.participantString}</TruncateText>
-              </Text>
-            </Grid.Col>
-          </Grid.Row>
-          <Grid.Row>
-            <Grid.Col width="auto">
-              <View textAlign="center" as="div" width={30} height={30} margin="0 small 0 0" />
-            </Grid.Col>
-            <Grid.Col>
-              <Text weight="normal" size={props.textSize}>
-                <TruncateText>{props.conversation.subject}</TruncateText>
-              </Text>
-            </Grid.Col>
-          </Grid.Row>
-          <Grid.Row>
-            <Grid.Col width="auto">
-              <View textAlign="center" as="div" width={30} height={30} margin="0 small 0 0" />
-            </Grid.Col>
-            <Grid.Col>
-              <Text color="secondary" size={props.textSize}>
-                <TruncateText>{props.conversation.lastMessageContent}</TruncateText>
-              </Text>
-            </Grid.Col>
-            <Grid.Col width="auto">
-              {!isSubmissionCommentsType && (
+              </Grid.Col>
+            </Grid.Row>
+            <Grid.Row>
+              <Grid.Col width="auto">
                 <View textAlign="center" as="div" width={30} height={30} margin="0 small 0 0">
-                  <Focusable>
-                    {({focused}) => {
-                      return (
-                        <div>
-                          {focused || isHovering || props.isStarred ? (
-                            <IconButton
-                              size="small"
-                              withBackground={false}
-                              withBorder={false}
-                              renderIcon={props.isStarred ? IconStarSolid : IconStarLightLine}
-                              screenReaderLabel={
-                                props.isStarred ? I18n.t('starred') : I18n.t('not starred')
-                              }
-                              onClick={handleConversationStarClick}
-                              data-testid="visible-star"
-                            />
-                          ) : (
-                            <ScreenReaderContent>
+                  <IconButton
+                    color="primary"
+                    data-testid={props.isUnread ? 'unread-badge' : 'read-badge'}
+                    margin="x-small"
+                    onClick={() =>
+                      props.readStateChangeConversationParticipants({
+                        variables: {
+                          conversationIds: [props.conversation._id],
+                          workflowState: props.isUnread ? 'read' : 'unread'
+                        }
+                      })
+                    }
+                    screenReaderLabel={props.isUnread ? I18n.t('Unread') : I18n.t('Read')}
+                    size="small"
+                    withBackground={false}
+                    withBorder={false}
+                  >
+                    {props.isUnread ? <IconEmptySolid /> : <IconEmptyLine />}
+                  </IconButton>
+                </View>
+              </Grid.Col>
+              <Grid.Col>
+                <Text weight="bold" size={props.textSize}>
+                  <TruncateText>{props.conversation.participantString}</TruncateText>
+                </Text>
+              </Grid.Col>
+            </Grid.Row>
+            <Grid.Row>
+              <Grid.Col width="auto">
+                <View textAlign="center" as="div" width={30} height={30} margin="0 small 0 0" />
+              </Grid.Col>
+              <Grid.Col>
+                <Text weight="normal" size={props.textSize}>
+                  <TruncateText>{props.conversation.subject}</TruncateText>
+                </Text>
+              </Grid.Col>
+            </Grid.Row>
+            <Grid.Row>
+              <Grid.Col width="auto">
+                <View textAlign="center" as="div" width={30} height={30} margin="0 small 0 0" />
+              </Grid.Col>
+              <Grid.Col>
+                <Text color="secondary" size={props.textSize}>
+                  <TruncateText>{props.conversation.lastMessageContent}</TruncateText>
+                </Text>
+              </Grid.Col>
+              <Grid.Col width="auto">
+                {!isSubmissionCommentsType && (
+                  <View textAlign="center" as="div" width={30} height={30} margin="0 small 0 0">
+                    <Focusable>
+                      {({focused}) => {
+                        return (
+                          <div>
+                            {focused || isHovering || props.isStarred ? (
                               <IconButton
                                 size="small"
                                 withBackground={false}
@@ -222,51 +210,73 @@ export const ConversationListItem = ({...props}) => {
                                   props.isStarred ? I18n.t('starred') : I18n.t('not starred')
                                 }
                                 onClick={handleConversationStarClick}
+                                data-testid="visible-star"
                               />
-                            </ScreenReaderContent>
-                          )}
-                        </div>
-                      )
-                    }}
-                  </Focusable>
-                </View>
-              )}
-            </Grid.Col>
-          </Grid.Row>
-          <Grid.Row>
-            <Grid.Col>
-              <Focusable>
-                {({focused}) => {
-                  return focused ? (
-                    <Button
-                      display="block"
-                      textAlign="center"
-                      size="small"
-                      onClick={e => {
-                        setMessageOpenEvent(true) // Required to redirect focus into message
-                        handleConversationClick(e)
+                            ) : (
+                              <ScreenReaderContent>
+                                <IconButton
+                                  size="small"
+                                  withBackground={false}
+                                  withBorder={false}
+                                  renderIcon={props.isStarred ? IconStarSolid : IconStarLightLine}
+                                  screenReaderLabel={
+                                    props.isStarred ? I18n.t('starred') : I18n.t('not starred')
+                                  }
+                                  onClick={handleConversationStarClick}
+                                />
+                              </ScreenReaderContent>
+                            )}
+                          </div>
+                        )
                       }}
-                    >
-                      {I18n.t('Open Conversation')}
-                    </Button>
-                  ) : (
-                    <ScreenReaderContent tabIndex="0">
-                      {I18n.t('Open Conversation')}
-                    </ScreenReaderContent>
-                  )
-                }}
-              </Focusable>
-            </Grid.Col>
-          </Grid.Row>
-        </Grid>
-      </View>
-    </div>
-  )
+                    </Focusable>
+                  </View>
+                )}
+              </Grid.Col>
+            </Grid.Row>
+            <Grid.Row>
+              <Grid.Col>
+                <Focusable>
+                  {({focused}) => {
+                    return focused ? (
+                      <Button
+                        display="block"
+                        textAlign="center"
+                        size="small"
+                        onClick={e => {
+                          setMessageOpenEvent(true) // Required to redirect focus into message
+                          handleConversationClick(e)
+                        }}
+                      >
+                        {I18n.t('Open Conversation')}
+                      </Button>
+                    ) : (
+                      <ScreenReaderContent tabIndex="0">
+                        {I18n.t('Open Conversation')}
+                      </ScreenReaderContent>
+                    )
+                  }}
+                </Focusable>
+              </Grid.Col>
+            </Grid.Row>
+          </Grid>
+        </View>
+      </div>
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    props.isSelected,
+    isHovering,
+    props.isStarred,
+    props.textSize,
+    props.isUnread,
+    isSubmissionCommentsType,
+    props.conversation
+  ])
 }
 
 ConversationListItem.propTypes = {
   conversation: PropTypes.object,
-  submissionComments: PropTypes.object,
   id: PropTypes.string,
   isSelected: PropTypes.bool,
   isStarred: PropTypes.bool,

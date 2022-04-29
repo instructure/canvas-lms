@@ -127,6 +127,13 @@ describe('ConversationListContainer', () => {
   })
 
   describe('Selected Conversations', () => {
+    beforeEach(() => {
+      window.document.getSelection = () => {
+        return {
+          removeAllRanges: () => {}
+        }
+      }
+    })
     it('should track when conversations are clicked', async () => {
       const mock = jest.fn()
       const conversationList = await setup({
@@ -145,7 +152,41 @@ describe('ConversationListContainer', () => {
         })
       )
 
-      expect(mock.mock.calls.length).toBe(4)
+      expect(mock.mock.calls.length).toBe(3)
+    })
+
+    it('should be able to select range of conversations ASC', async () => {
+      const mock = jest.fn()
+      const conversationList = await setup({
+        onSelectConversation: mock,
+        scope: 'multipleConversations'
+      })
+      await waitForApolloLoading()
+
+      const conversations = await conversationList.findAllByTestId('conversationListItem-Item')
+      fireEvent.click(conversations[0])
+      fireEvent.click(conversations[2], {
+        shiftKey: true
+      })
+      const checkboxes = await conversationList.findAllByTestId('conversationListItem-Checkbox')
+      expect(checkboxes.filter(c => c.checked === true).length).toBe(3)
+    })
+
+    it('should be able to select range of conversations DESC', async () => {
+      const mock = jest.fn()
+      const conversationList = await setup({
+        onSelectConversation: mock,
+        scope: 'multipleConversations'
+      })
+      await waitForApolloLoading()
+
+      const conversations = await conversationList.findAllByTestId('conversationListItem-Item')
+      fireEvent.click(conversations[2])
+      fireEvent.click(conversations[0], {
+        shiftKey: true
+      })
+      const checkboxes = await conversationList.findAllByTestId('conversationListItem-Checkbox')
+      expect(checkboxes.filter(c => c.checked === true).length).toBe(3)
     })
   })
 
