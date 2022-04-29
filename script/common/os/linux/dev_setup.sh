@@ -16,6 +16,7 @@ if installed mutagen || [ "${IS_MUTAGEN:-false}" = true ]; then
   print_mutagen_intro
   dependencies+=',mutagen 0.13.0,mutagen-compose'
   DOCKER_COMMAND="mutagen-compose"
+  IS_MUTAGEN=true
 fi
 
 set_service_util
