@@ -236,28 +236,6 @@ describe('ConversationListHolder', () => {
     expect(checkboxes.filter(c => c.checked === true).length).toBe(3)
   })
 
-  it('should be able to select range of conversations ASC', () => {
-    const {getAllByTestId} = render(<ConversationListHolder {...props} />)
-    const conversations = getAllByTestId('conversationListItem-Item')
-    fireEvent.click(conversations[0])
-    fireEvent.click(conversations[3], {
-      shiftKey: true
-    })
-    const checkboxes = getAllByTestId('conversationListItem-Checkbox')
-    expect(checkboxes.filter(c => c.checked === true).length).toBe(4)
-  })
-
-  it('should be able to select range of conversations DESC', () => {
-    const {getAllByTestId} = render(<ConversationListHolder {...props} />)
-    const conversations = getAllByTestId('conversationListItem-Item')
-    fireEvent.click(conversations[3])
-    fireEvent.click(conversations[1], {
-      shiftKey: true
-    })
-    const checkboxes = getAllByTestId('conversationListItem-Checkbox')
-    expect(checkboxes.filter(c => c.checked === true).length).toBe(3)
-  })
-
   it('should unselect multi select when conversation opened', () => {
     const {getAllByTestId} = render(<ConversationListHolder {...props} />)
     const conversations = getAllByTestId('conversationListItem-Item')
