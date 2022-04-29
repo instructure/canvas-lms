@@ -1828,7 +1828,7 @@ class RoleOverride < ActiveRecord::Base
       account_root_id = account.root_account_id&.nonzero? ? account.root_account_id : account.id
 
       # skip loading from site admin if the role is not from site admin
-      Shard.partition_by_shard(account.account_chain(include_federated_parent: !account.root_account.primary_settings_root_account?, include_site_admin: role_context == Account.site_admin)) do |shard_accounts|
+      Shard.partition_by_shard(account.account_chain(include_federated_parent: true, include_site_admin: role_context == Account.site_admin)) do |shard_accounts|
         uniq_root_account_ids = shard_accounts.map { |sa| sa.root_account_id&.nonzero? ? sa.root_account_id : sa.id }.uniq
         uniq_root_account_ids -= [account_root_id] if Shard.current == account.shard
         all_roles = roles + Role.where(
@@ -1836,13 +1836,15 @@ class RoleOverride < ActiveRecord::Base
           root_account_id: uniq_root_account_ids,
           base_role_type: roles.select(&:built_in?).map(&:base_role_type)
         )
-        id_map = all_roles.map do |r|
-          if !r.built_in? || r.root_account_id == account_root_id
-            [r.global_id, r.global_id]
-          else
+        id_map = all_roles.flat_map do |r|
+          ret = [[r.global_id, r.global_id]]
+          # If and only if we are supposed to inherit permissions cross root account, match up the built-in roles
+          # since the ids won't match between root accounts
+          if r.built_in? && r.root_account_id != account_root_id && !account.root_account.primary_settings_root_account?
             # These will all be built-in role copies
-            [r.global_id, roles.detect { |local| local.built_in? && local.base_role_type == r.base_role_type }.global_id]
+            ret << [r.global_id, roles.detect { |local| local.built_in? && local.base_role_type == r.base_role_type }.global_id]
           end
+          ret
         end.to_h
 
         RoleOverride.where(role: all_roles, account: shard_accounts).find_each do |ro|
