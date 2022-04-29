@@ -24,6 +24,9 @@
 module Lti
   module Security
     def self.signed_post_params(params, url, key, secret, disable_lti_post_only = false)
+      # Signature is based on base string (POST&url&encodedparams) and secret
+      # (no oauth token, so the HMAC secret is "secret&", where secret is the
+      # shared_secret of the tool). See LTI 1.1 spec (section 4.2, OAuth Message Signing)
       if disable_lti_post_only
         signed_post_params_frd(params, url, key, secret)
       else
@@ -36,6 +39,8 @@ module Lti
     def self.signed_post_params_frd(params, url, key, secret)
       message = ::IMS::LTI::Models::Messages::Message.generate(params.merge({ oauth_consumer_key: key }))
       message.launch_url = url
+      # signed_post_params in IMS::LTI gem handles changing line endings to
+      # CRLF to make compliant with browser
       signed_parameters = message.signed_post_params(secret).stringify_keys
 
       Lti::Logging.lti_1_launch_generated(message.message_authenticator.base_string)
@@ -76,7 +81,11 @@ module Lti
       end
       options = { scheme: "body" }
 
-      request = consumer.create_signed_request(:post, path, nil, options, params.stringify_keys)
+      params = params.stringify_keys
+      # Browsers convert newlines to CRLF, to we need to do it ourselves before signature
+      # generation to make the signature match
+      params = ::IMS::LTI::Models::Messages::Message.convert_param_values_to_crlf_endings(params)
+      request = consumer.create_signed_request(:post, path, nil, options, params)
       # the request is made by a html form in the user's browser, so we
       # want to revert the escapage and return the hash of post parameters ready
       # for embedding in a html view

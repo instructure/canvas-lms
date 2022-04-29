@@ -127,6 +127,9 @@ module Lti
         message.launch_url = Addressable::URI.escape(message.launch_url)
         { jwt: message.to_jwt(private_key: private_key, originating_domain: request.host, algorithm: :HS256) }
       else
+        # Signature is based on base string (POST&url&encodedparams) and secret
+        # (no oauth token, so the HMAC secret is "secret&", where secret is the
+        # shared_secret of the tool proxy). See LTI 2 spec and LTI 1.1 spec (section 4.2)
         message.oauth_callback = "about:blank"
         message.signed_post_params(private_key)
       end

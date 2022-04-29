@@ -65,6 +65,16 @@ describe Lti::Security do
           oauth_version%3D1.0
         ].join)
       end
+
+      it "converts newlines to CRLFs in the base string" do
+        expect(Lti::Logging).to receive(:lti_1_launch_generated) do |line|
+          expect(line).to match(/abc%250D%250Axyz/i)
+        end
+        Lti::Security.signed_post_params(
+          params.merge(custom_b: "abc\nxyz"), "http://example.com/",
+          consumer_key, consumer_secret, true
+        )
+      end
     end
 
     context "#decoded_lti_assignment_id" do
@@ -221,6 +231,16 @@ describe Lti::Security do
         oauth_timestamp%3D#{timestamp}%26oauth_timestamp%3D#{timestamp}%26
         oauth_version%3D1.0%26oauth_version%3D1.0
       ].join)
+    end
+
+    it "converts newlines to CRLFs in the base string" do
+      expect(Lti::Logging).to receive(:lti_1_launch_generated) do |line|
+        expect(line).to match(/abc%250D%250Axyz/i)
+      end
+      Lti::Security.signed_post_params(
+        params.merge(custom_b: "abc\nxyz"), "http://example.com/",
+        consumer_key, consumer_secret
+      )
     end
   end
 end

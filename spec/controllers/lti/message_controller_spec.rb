@@ -448,22 +448,52 @@ module Lti
           end
         end
 
-        it "returns the signed params" do
-          tool_proxy.raw_data["enabled_capability"] += enabled_capability
-          tool_proxy.save!
-          get "basic_lti_launch_request", params: { account_id: account.id, message_handler_id: message_handler.id,
-                                                    params: { tool_launch_context: "my_custom_context" } }
-          expect(response.code).to eq "200"
+        context "oauth signing" do
+          before do
+            tool_proxy.raw_data["enabled_capability"] += enabled_capability
+            tool_proxy.save!
+          end
 
-          lti_launch = assigns[:lti_launch]
-          expect(lti_launch.resource_url).to eq "https://www.samplelaunch.com/blti"
-          params = lti_launch.params.with_indifferent_access
-          expect(params[:oauth_consumer_key]).to eq tool_proxy.guid
-          expect(params[:context_id]).not_to be_empty
-          expect(params[:resource_link_id]).not_to be_empty
-          expect(params[:tool_consumer_instance_guid]).not_to be_empty
-          expect(params[:launch_presentation_document_target]).to eq "iframe"
-          expect(params[:oauth_signature]).not_to be_empty
+          let(:get_params) do
+            {
+              account_id: account.id, message_handler_id: message_handler.id,
+              params: { tool_launch_context: "my_custom_context" }
+            }
+          end
+
+          it "returns the signed params" do
+            get "basic_lti_launch_request", params: get_params
+            expect(response.code).to eq "200"
+
+            lti_launch = assigns[:lti_launch]
+            expect(lti_launch.resource_url).to eq "https://www.samplelaunch.com/blti"
+            params = lti_launch.params.with_indifferent_access
+            expect(params[:oauth_consumer_key]).to eq tool_proxy.guid
+            expect(params[:context_id]).not_to be_empty
+            expect(params[:resource_link_id]).not_to be_empty
+            expect(params[:tool_consumer_instance_guid]).not_to be_empty
+            expect(params[:launch_presentation_document_target]).to eq "iframe"
+            expect(params[:oauth_signature]).not_to be_empty
+          end
+
+          it "converts to CRLF endpoints in params for oauth base string generation" do
+            orig_new = ::IMS::LTI::Models::Messages::BasicLTILaunchRequest.method(:new)
+            message = nil
+            expect(::IMS::LTI::Models::Messages::BasicLTILaunchRequest).to receive(:new) do |*args|
+              message = orig_new.call(*args)
+            end
+
+            ToolSetting.create(tool_proxy: tool_proxy, context_id: nil,
+                               context_type: nil, resource_link_id: nil,
+                               custom: { "somenewlines" => "abc\nxyz" })
+
+            get "basic_lti_launch_request", params: get_params
+            base_string = message.message_authenticator.base_string
+            expect(CGI.unescape(base_string.split("&").last)).to match(/abc%0D%0Axyz/i)
+            # Also converts to CRLFs in params for form (although it isn't
+            # really necessary since the browser will do it too)
+            expect(assigns[:lti_launch].params[:custom_somenewlines]).to eq("abc\r\nxyz")
+          end
         end
 
         it "launches gracefully if it can not find the content_tag for the given module_item_id" do
