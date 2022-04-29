@@ -148,6 +148,7 @@ class GradeSummaryAssignmentPresenter
     classes << "assignment_graded" if graded?
     classes << special_class
     classes << "excused" if excused?
+    classes << "extended" if extended?
     classes.join(" ")
   end
 
@@ -161,6 +162,10 @@ class GradeSummaryAssignmentPresenter
 
   def excused?
     submission.try(:excused?)
+  end
+
+  def extended?
+    submission.try(:extended?)
   end
 
   def deduction_present?

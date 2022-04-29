@@ -3479,6 +3479,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       late: false,
       missing: false,
       excused: false,
+      late_policy_status: null,
       seconds_late: 0
     }
     const submission = this.getSubmission(studentId, assignmentId) || fakeSubmission

@@ -599,13 +599,13 @@
     {
       "warning_type": "Mass Assignment",
       "warning_code": 70,
-      "fingerprint": "58ed5eb1b2c3a696a4c3d567b80b70a85f2feb5dadd4a202465778353c843211",
+      "fingerprint": "5976651f66acf7863fe628cb40ae2a2ebb217d3319177e8609b0f2168f91582d",
       "check_name": "MassAssignment",
       "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
       "file": "app/controllers/gradebook_settings_controller.rb",
-      "line": 65,
+      "line": 69,
       "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
-      "code": "params.require(:gradebook_settings).permit({ :filter_columns_by => ([:context_module_id, :grading_period_id, :assignment_group_id]), :filter_rows_by => ([:section_id, :student_group_id]), :selected_view_options_filters => ([]) }, :enter_grades_as, :show_concluded_enrollments, :show_inactive_enrollments, :show_unpublished_assignments, :student_column_display_as, :student_column_secondary_info, :sort_rows_by_column_id, :sort_rows_by_setting_key, :sort_rows_by_direction, :view_ungraded_as_zero, :colors => ([:late, :missing, :resubmitted, :dropped, :excused])).permit!",
+      "code": "params.require(:gradebook_settings).permit({ :filter_columns_by => ([:context_module_id, :grading_period_id, :assignment_group_id, :submissions]), :filter_rows_by => ([:section_id, :student_group_id]), :selected_view_options_filters => ([]) }, :enter_grades_as, :hide_assignment_group_totals, :hide_total, :show_concluded_enrollments, :show_inactive_enrollments, :show_unpublished_assignments, :show_separate_first_last_names, :student_column_display_as, :student_column_secondary_info, :sort_rows_by_column_id, :sort_rows_by_setting_key, :sort_rows_by_direction, :view_ungraded_as_zero, :colors => ([:late, :missing, :resubmitted, :dropped, :excused, :extended])).permit!",
       "render_path": null,
       "location": {
         "type": "method",
@@ -1658,6 +1658,6 @@
       "note": ""
     }
   ],
-  "updated": "2022-02-16 09:17:28 -0600",
-  "brakeman_version": "5.2.1"
+  "updated": "2022-05-19 11:52:58 -0600",
+  "brakeman_version": "5.2.3"
 }

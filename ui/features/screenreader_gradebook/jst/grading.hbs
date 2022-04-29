@@ -27,6 +27,13 @@
                   </ul>
                 </span>
               {{/if}}
+              {{#if selectedSubmission.extended}}
+                <span class="extended-pill">
+                  <ul class="pill pill-align error" />
+                    <li class="error"><strong>{{#t}}extended{{/t}}</strong></li>
+                  </ul>
+                </span>
+              {{/if}}
             </label>
           </div>
           {{

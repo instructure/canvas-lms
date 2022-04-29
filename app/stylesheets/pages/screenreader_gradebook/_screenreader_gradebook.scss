@@ -119,7 +119,7 @@ select.grading_box.pass_fail {
   width: inherit;
 }
 
-span.late-pill, span.missing-pill {
+span.late-pill, span.missing-pill, span.extended-pill {
   padding-#{direction(left)}: 12px;
   text-transform: uppercase;
 }
