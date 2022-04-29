@@ -232,14 +232,7 @@ function calculateGroupGrade(group, allSubmissions, opts) {
   if (!opts.includeUngraded) {
     relevantSubmissionData = _.filter(
       submissionData,
-
-      submission => {
-        const assignment = assignments[submission.submission.assignment_id]
-        return (
-          submission.submitted &&
-          (assignment?.submission_types.includes('online_quiz') || !submission.pending_review)
-        )
-      }
+      submission => submission.submitted && !submission.pending_review
     )
   }
 
