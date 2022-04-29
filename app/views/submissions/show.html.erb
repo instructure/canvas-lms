@@ -208,6 +208,8 @@
             <span class="submission-late-pill"></span>
           <% elsif @submission.missing? %>
             <span class="submission-missing-pill"></span>
+          <% elsif @submission.extended? %>
+            <span class="submission-extended-pill"></span>
           <% end %>
           <% if @assignment.allowed_attempts&.> 0 %>
             <div class="submission-details-header__attempts_info">
