@@ -21,14 +21,7 @@ import {ThunkAction} from 'redux-thunk'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-import {
-  CoursePaceItemDueDates,
-  CoursePace,
-  PaceContextTypes,
-  Progress,
-  StoreState,
-  OptionalDate
-} from '../types'
+import {CoursePaceItemDueDates, CoursePace, PaceContextTypes, Progress, StoreState} from '../types'
 import {createAction, ActionsUnion} from '../shared/types'
 import {actions as uiActions} from './ui'
 import {actions as blackoutDateActions} from '../shared/actions/blackout_dates'
@@ -49,7 +42,6 @@ export enum Constants {
   SAVE_COURSE_PACE = 'COURSE_PACE/SAVE',
   COURSE_PACE_SAVED = 'COURSE_PACE/SAVED',
   PACE_CREATED = 'COURSE_PACE/PACE_CREATED',
-  TOGGLE_HARD_END_DATES = 'COURSE_PACE/TOGGLE_HARD_END_DATES',
   RESET_PACE = 'COURSE_PACE/RESET_PACE',
   SET_PROGRESS = 'COURSE_PACE/SET_PROGRESS',
   SET_COMPRESSED_ITEM_DATES = 'COURSE_PACE/SET_COMPRESSED_ITEM_DATES',
@@ -59,32 +51,21 @@ export enum Constants {
 /* Action creators */
 
 type LoadingAfterAction = (pace: CoursePace) => any
-// Without this, we lose the ReturnType through our mapped ActionsUnion (because of setPaceDays), and the type just becomes any.
-type SetEndDate = {type: Constants.SET_END_DATE; payload: string}
 
 const regularActions = {
   saveCoursePace: (pace: CoursePace) => createAction(Constants.SAVE_COURSE_PACE, pace),
   setStartDate: (date: string) => createAction(Constants.SET_START_DATE, date),
-  setEndDate: (date: string): SetEndDate => createAction(Constants.SET_END_DATE, date),
   setCompressedItemDates: (compressedItemDates: CoursePaceItemDueDates) =>
     createAction(Constants.SET_COMPRESSED_ITEM_DATES, compressedItemDates),
   uncompressDates: () => createAction(Constants.UNCOMPRESS_DATES),
   paceCreated: (pace: CoursePace) => createAction(Constants.PACE_CREATED, pace),
   toggleExcludeWeekends: () => createAction(Constants.TOGGLE_EXCLUDE_WEEKENDS),
-  toggleHardEndDates: (original_end_date: OptionalDate) =>
-    createAction(Constants.TOGGLE_HARD_END_DATES, original_end_date),
   resetPace: (originalPace: CoursePace) => createAction(Constants.RESET_PACE, originalPace),
   setProgress: (progress?: Progress) => createAction(Constants.SET_PROGRESS, progress),
   coursePaceSaved: (coursePace: CoursePace) => createAction(Constants.COURSE_PACE_SAVED, coursePace)
 }
 
 const thunkActions = {
-  onToggleHardEndDates: (): ThunkAction<void, StoreState, void, Action> => {
-    return (dispatch, getState) => {
-      const originalEndDate = getState().original.coursePace.end_date
-      return dispatch(regularActions.toggleHardEndDates(originalEndDate))
-    }
-  },
   onResetPace: (): ThunkAction<void, StoreState, void, Action> => {
     return (dispatch, getState) => {
       dispatch(blackoutDateActions.resetBlackoutDates())

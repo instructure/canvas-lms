@@ -76,7 +76,6 @@ export const getCoursePace = (state: StoreState): CoursePacesState => state.cour
 export const getCoursePaceModules = (state: StoreState) => state.coursePace.modules
 export const getCoursePaceType = (state: StoreState): PaceContextTypes =>
   state.coursePace.context_type
-export const getHardEndDates = (state: StoreState): boolean => state.coursePace.hard_end_dates
 export const getPacePublishing = (state: StoreState): boolean => {
   const progress = state.coursePace.publishingProgress
   if (!progress) return false
@@ -87,7 +86,6 @@ export const getPublishingError = (state: StoreState): string | undefined => {
   if (!progress || progress.workflow_state !== 'failed') return undefined
   return progress.message
 }
-export const getEndDate = (state: StoreState): OptionalDate => state.coursePace.end_date
 export const getOriginalEndDate = (state: StoreState): OptionalDate =>
   state.original.coursePace.end_date
 export const isStudentPace = (state: StoreState) => state.coursePace.context_type === 'Enrollment'
@@ -101,12 +99,10 @@ export const getCoursePaceItems = createSelector(getCoursePaceModules, getModule
 
 export const getSettingChanges = createDeepEqualSelector(
   getExcludeWeekends,
-  getHardEndDates,
   getOriginalPace,
-  getEndDate,
   getOriginalBlackoutDates,
   getBlackoutDates,
-  (excludeWeekends, hardEndDates, originalPace, endDate, originalBlackoutDates, blackoutDates) => {
+  (excludeWeekends, originalPace, originalBlackoutDates, blackoutDates) => {
     const changes: Change[] = []
 
     if (excludeWeekends !== originalPace.exclude_weekends)
@@ -120,24 +116,6 @@ export const getSettingChanges = createDeepEqualSelector(
     if (blackoutChanges.length) {
       changes.splice(0, 0, ...blackoutChanges)
     }
-
-    // we want to validate that if hardEndDates is true that the endDate is a valid date
-    if (
-      hardEndDates !== originalPace.hard_end_dates &&
-      (!hardEndDates || (hardEndDates && endDate))
-    )
-      changes.push({
-        id: 'hard_end_dates',
-        oldValue: originalPace.hard_end_dates,
-        newValue: hardEndDates
-      })
-
-    if (endDate && endDate !== originalPace.end_date)
-      changes.push({
-        id: 'end_date',
-        oldValue: originalPace.end_date,
-        newValue: endDate
-      })
 
     return changes
   }
@@ -558,21 +536,6 @@ export default (
       } else {
         return {...state, exclude_weekends: true}
       }
-    case CoursePaceConstants.TOGGLE_HARD_END_DATES:
-      if (state.hard_end_dates) {
-        return {...state, hard_end_dates: false, end_date: ''}
-      } else {
-        let endDate = action.payload as OptionalDate
-        if (!endDate) {
-          if (state.course.end_at) {
-            endDate = state.course.end_at
-          } else {
-            endDate = moment(state.start_date).add(30, 'd').format('YYYY-MM-DD')
-          }
-        }
-        return {...state, hard_end_dates: true, end_date: endDate}
-      }
-
     case CoursePaceConstants.RESET_PACE:
       return {
         ...(action.payload as CoursePace),
