@@ -171,7 +171,6 @@ export const PRIMARY_PACE: CoursePace = {
   end_date_context: 'course',
   workflow_state: 'active',
   exclude_weekends: true,
-  hard_end_dates: true,
   modules: [PACE_MODULE_1, PACE_MODULE_2],
   // @ts-ignore
   course: undefined,
@@ -192,7 +191,6 @@ export const SECTION_PACE: CoursePace = {
   end_date_context: 'course',
   workflow_state: 'active',
   exclude_weekends: false,
-  hard_end_dates: true,
   modules: [PACE_MODULE_1, PACE_MODULE_2],
   // @ts-ignore
   course: undefined,
@@ -213,7 +211,6 @@ export const STUDENT_PACE: CoursePace = {
   end_date_context: 'course',
   workflow_state: 'active',
   exclude_weekends: true,
-  hard_end_dates: true,
   modules: [PACE_MODULE_1, PACE_MODULE_2],
   // @ts-ignore
   course: undefined,

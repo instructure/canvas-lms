@@ -120,8 +120,8 @@ export const Module: React.FC<ComponentProps> = props => {
   }
 
   const renderAssignmentRow = item => {
-    // Scoping the key to the state of hard_end_dates and the coursePace id ensures a full re-render of the row if either the hard_end_date
-    // status changes or the course pace changes. This is necessary because the AssignmentRow maintains the duration in local state,
+    // Scoping the key this way guarantees a new AssignmentRow is rendered when date that impacts it changes
+    // This is necessary because the AssignmentRow maintains the duration in local state,
     // and applying updates with componentWillReceiveProps makes it buggy (because the Redux updates can be slow, causing changes to
     // get reverted as you type).
     const key = `${props.module.moduleKey}-${item.id}|${item.module_item_id}|${props.compression}|${props.coursePace.updated_at}`

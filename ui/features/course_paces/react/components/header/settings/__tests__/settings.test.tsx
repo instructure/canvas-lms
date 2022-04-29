@@ -27,8 +27,6 @@ import {Settings} from '../settings'
 const loadLatestPaceByContext = jest.fn()
 const showLoadingOverlay = jest.fn()
 const toggleExcludeWeekends = jest.fn()
-const toggleHardEndDates = jest.fn()
-const setEndDate = jest.fn()
 const updateBlackoutDates = jest.fn()
 
 const defaultProps = {
@@ -41,8 +39,6 @@ const defaultProps = {
   loadLatestPaceByContext,
   showLoadingOverlay,
   toggleExcludeWeekends,
-  toggleHardEndDates,
-  setEndDate,
   updateBlackoutDates
 }
 

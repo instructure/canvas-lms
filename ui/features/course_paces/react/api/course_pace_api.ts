@@ -111,18 +111,6 @@ export const getNewCoursePaceFor = (
   return doFetchApi<{course_pace: CoursePace}>({path: url}).then(({json}) => json?.course_pace)
 }
 
-export const republishAllPacesForCourse = (courseId: string) =>
-  doFetchApi({
-    path: `/api/v1/courses/${courseId}/course_pacing/republish_all`,
-    method: 'POST'
-  }).then(({json}) => json)
-
-export const republishAllPaces = () =>
-  doFetchApi({
-    path: `/api/v1/course_pacing/republish_all_paces`,
-    method: 'POST'
-  }).then(({json}) => json)
-
 export const relinkToParentPace = (paceId: string) =>
   doFetchApi<{course_pace: CoursePace}>({
     path: `/api/v1/course_pacing/${paceId}/relink_to_parent_pace`,
@@ -164,7 +152,6 @@ interface PublishApiFormattedCoursePace extends CompressApiFormattedCoursePace {
   readonly workflow_state: WorkflowStates
   readonly context_type: PaceContextTypes
   readonly context_id: string
-  readonly hard_end_dates: boolean
 }
 
 const transformCoursePaceForApi = (
@@ -196,7 +183,6 @@ const transformCoursePaceForApi = (
         exclude_weekends: coursePace.exclude_weekends,
         context_type: coursePace.context_type,
         context_id: coursePace.context_id,
-        hard_end_dates: !!coursePace.hard_end_dates,
         course_pace_module_items_attributes: coursePaceItems
       }
 }

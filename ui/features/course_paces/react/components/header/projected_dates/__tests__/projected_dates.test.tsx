@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,246 +17,125 @@
  */
 
 import React from 'react'
-import {act} from '@testing-library/react'
+import {within} from '@testing-library/dom'
 import {renderConnected} from '../../../../__tests__/utils'
-import {COURSE, PRIMARY_PACE} from '../../../../__tests__/fixtures'
+import {PRIMARY_PACE, STUDENT_PACE} from '../../../../__tests__/fixtures'
 
 import {ProjectedDates} from '../projected_dates'
 
 const defaultProps = {
-  coursePace: PRIMARY_PACE,
+  coursePace: PRIMARY_PACE, // 2021-09-01 -> 2021-12-15
   assignments: 5,
-  pacePublishing: false,
-  paceWeeks: 8,
+  paceDuration: {weeks: 2, days: 3},
   projectedEndDate: '2021-12-01',
   blackoutDates: [],
   weekendsDisabled: false,
+  compression: 0,
   setStartDate: () => {},
   compressDates: jest.fn(),
-  uncompressDates: jest.fn(),
-  onToggleHardEndDates: jest.fn(),
-  showProjections: true
+  uncompressDates: jest.fn()
 }
-
-beforeEach(() => {
-  window.ENV.VALID_DATE_RANGE = {
-    end_at: {date: COURSE.end_at, date_context: 'course'},
-    start_at: {date: COURSE.start_at, date_context: 'course'}
-  }
-})
 
 afterEach(() => {
   jest.clearAllMocks()
 })
 
 describe('ProjectedDates', () => {
-  it('shows nothing when projections are hidden', () => {
-    const {queryByRole} = renderConnected(
-      <ProjectedDates {...defaultProps} showProjections={false} />
-    )
-    expect(queryByRole('combobox')).not.toBeInTheDocument()
+  it('shows course start and end date when given', () => {
+    const {getByText} = renderConnected(<ProjectedDates {...defaultProps} />)
+
+    expect(getByText('Start Date')).toBeInTheDocument()
+    expect(getByText('Determined by course start date')).toBeInTheDocument()
+    expect(getByText('End Date')).toBeInTheDocument()
+    expect(getByText('Determined by course end date')).toBeInTheDocument()
+    expect(getByText(/\d+ assignments/)).toBeInTheDocument()
+    expect(getByText(/\d+ weeks/)).toBeInTheDocument()
+    expect(getByText('Dates shown in course time zone')).toBeInTheDocument()
   })
 
-  // it('shows projected start and end date when projections are shown', () => {
-  //   const {getByRole} = renderConnected(<ProjectedDates {...defaultProps} />)
-  //   const startDateInput = getByRole('combobox', {
-  //     name: /^Start Date/
-  //   }) as HTMLInputElement
-  //   const endDateInput = getByRole('combobox', {
-  //     name: /^End Date/
-  //   }) as HTMLInputElement
-  //   const specifiedEndDateCheckbox = getByRole('checkbox', {
-  //     name: 'Require Completion by Specified End Date'
-  //   })
-  //   expect(startDateInput).toBeInTheDocument()
-  //   expect(startDateInput.value).toBe('September 1, 2021')
-  //   expect(endDateInput).toBeInTheDocument()
-  //   expect(endDateInput.value).toBe('December 15, 2021')
-  //   expect(specifiedEndDateCheckbox).toBeInTheDocument()
-  //   expect(specifiedEndDateCheckbox.checked).toBeTruthy()
-  // })
+  it('shows term start and end date when given', () => {
+    const cpace = {...defaultProps.coursePace, start_date_context: 'term', end_date_context: 'term'}
+    const {getByText} = renderConnected(<ProjectedDates {...defaultProps} coursePace={cpace} />)
 
-  // it('shows the number of assignments and weeks in the pace when projections are shown', () => {
-  //   const {getByText} = renderConnected(<ProjectedDates {...defaultProps} />)
-  //   expect(getByText('5 assignments')).toBeInTheDocument()
-  //   expect(getByText('8 weeks')).toBeInTheDocument()
-  // })
+    expect(getByText('Start Date')).toBeInTheDocument()
+    expect(getByText('Determined by course start date')).toBeInTheDocument()
+    expect(getByText('End Date')).toBeInTheDocument()
+    expect(getByText('Determined by course end date')).toBeInTheDocument()
+    expect(getByText(/\d+ assignments/)).toBeInTheDocument()
+    expect(getByText(/\d+ weeks/)).toBeInTheDocument()
+    expect(getByText('Dates shown in course time zone')).toBeInTheDocument()
+  })
 
-  // describe('start date messages', () => {
-  //   it('shows normal help text', () => {
-  //     const {getAllByText} = renderConnected(<ProjectedDates {...defaultProps} />)
-  //     expect(getAllByText('Hypothetical student enrollment date').length).toBeTruthy()
-  //   })
+  it('shows student enrollment dates when given', () => {
+    const {getByText} = renderConnected(
+      <ProjectedDates {...defaultProps} coursePace={STUDENT_PACE} />
+    )
 
-  //   it('shows error if start date is before course start date', () => {
-  //     const pace = {...defaultProps.coursePace, start_date: '2021-08-01'}
-  //     const {getByText} = renderConnected(<ProjectedDates {...defaultProps} coursePace={pace} />)
-  //     expect(getByText('Date is before the course start date')).toBeInTheDocument()
-  //   })
+    expect(getByText('Start Date')).toBeInTheDocument()
+    expect(getByText('Student enrollment date')).toBeInTheDocument()
+    expect(getByText('End Date')).toBeInTheDocument()
+    expect(getByText('Determined by course pace')).toBeInTheDocument()
+    expect(getByText(/2 weeks 3 days/)).toBeInTheDocument()
+    expect(getByText(/\d+ weeks/)).toBeInTheDocument()
+    expect(getByText('Dates shown in course time zone')).toBeInTheDocument()
+  })
 
-  //   it('shows error if start date is after specified end date', () => {
-  //     const pace = {...defaultProps.coursePace, start_date: '2021-12-16'}
-  //     const {getByText} = renderConnected(<ProjectedDates {...defaultProps} coursePace={pace} />)
-  //     expect(getByText('Date is after the specified end date')).toBeInTheDocument()
-  //   })
+  // this can't happen any more
+  it('shows no dates for a course with no start and end dates', () => {
+    const cpace = {...defaultProps.coursePace, start_date: null, end_date: null}
+    const {queryByText} = renderConnected(<ProjectedDates {...defaultProps} coursePace={cpace} />)
 
-  //   it('copes with no course start date', () => {
-  //     window.ENV.VALID_DATE_RANGE = {
-  //       end_at: {date: null, date_context: 'course'},
-  //       start_at: {date: null, date_context: 'course'}
-  //     }
-  //     const pace = {...defaultProps.coursePace, hard_end_dates: false}
-  //     const {getAllByText} = renderConnected(
-  //       <ProjectedDates {...defaultProps} coursePace={pace} projectedEndDate="2022-01-02" />
-  //     )
-  //     expect(getAllByText('Hypothetical student enrollment date').length).toBeTruthy()
-  //   })
-  // })
+    expect(queryByText('Start Date')).not.toBeInTheDocument()
+    expect(queryByText('End Date')).not.toBeInTheDocument()
+    expect(queryByText(/2 weeks 3 days/)).toBeInTheDocument()
+    expect(queryByText(/\d+ weeks/)).toBeInTheDocument()
+    expect(queryByText('Dates shown in course time zone')).toBeInTheDocument()
+  })
 
-  // describe('end date messages', () => {
-  //   it('shows course end date text', () => {
-  //     const pace = {
-  //       ...defaultProps.coursePace,
-  //       hard_end_dates: false,
-  //       start_sate: '2022-01-03',
-  //       end_date: undefined
-  //     }
-  //     const {getAllByText, getByTestId} = renderConnected(
-  //       <ProjectedDates {...defaultProps} coursePace={pace} />
-  //     )
-  //     expect(getAllByText('Required by course end date').length).toBeTruthy()
-  //     // expect the course end date
-  //     expect(getByTestId('coursepace-date-text').textContent).toStrictEqual('December 31, 2021')
-  //   })
+  it("shows not specified end if start date is all that's given", () => {
+    const cpace = {...defaultProps.coursePace, end_date: null}
 
-  //   it('shows term end date text', () => {
-  //     window.ENV.VALID_DATE_RANGE = {
-  //       end_at: {date: COURSE.end_at, date_context: 'term'},
-  //       start_at: {date: COURSE.start_at, date_context: 'term'}
-  //     }
-  //     const pace = {
-  //       ...defaultProps.coursePace,
-  //       hard_end_dates: false,
-  //       start_sate: '2022-01-03',
-  //       end_date: undefined
-  //     }
-  //     const {getAllByText, getByTestId} = renderConnected(
-  //       <ProjectedDates {...defaultProps} coursePace={pace} />
-  //     )
-  //     expect(getAllByText('Required by term end date').length).toBeTruthy()
-  //     // expect the term end date
-  //     expect(getByTestId('coursepace-date-text').textContent).toStrictEqual('December 31, 2021')
-  //   })
+    const {getByTestId, getByText} = renderConnected(
+      <ProjectedDates {...defaultProps} coursePace={cpace} />
+    )
 
-  //   it('shows specified end date input', () => {
-  //     const {getAllByText, getByDisplayValue} = renderConnected(
-  //       <ProjectedDates {...defaultProps} />
-  //     )
-  //     expect(getAllByText('Required by specified end date').length).toBeTruthy()
-  //     // expect the specified pace end date
-  //     expect(getByDisplayValue('December 15, 2021')).toBeInTheDocument()
-  //   })
+    expect(getByText('Start Date')).toBeInTheDocument()
+    expect(getByText('End Date')).toBeInTheDocument()
+    const end = getByTestId('coursepace-end-date')
+    expect(within(end).getByText(/Not Specified/)).toBeInTheDocument()
+    expect(getByText(/2 weeks 3 days/)).toBeInTheDocument()
+    expect(getByText(/\d+ weeks/)).toBeInTheDocument()
+    expect(getByText('Dates shown in course time zone')).toBeInTheDocument()
+  })
 
-  //   it('shows error if end date is before start date', () => {
-  //     const pace = {...defaultProps.coursePace, start_date: '2021-08-01', end_date: '2021-07-31'}
-  //     const {getByText} = renderConnected(<ProjectedDates {...defaultProps} coursePace={pace} />)
-  //     expect(getByText('Date is before student enrollment date')).toBeInTheDocument()
-  //   })
+  it('captions the end date to match the start', () => {
+    const cpace = {...defaultProps.coursePace, end_date: null, end_date_context: 'term'}
 
-  //   it('shows error if end date is after course end date', () => {
-  //     const d = new Date(ENV.VALID_DATE_RANGE.end_at.date)
-  //     d.setDate(d.getDate() + 1)
-  //     const pace = {...defaultProps.coursePace, end_date: d.toISOString()}
-  //     const {getByText} = renderConnected(<ProjectedDates {...defaultProps} coursePace={pace} />)
-  //     expect(getByText('Date is after the course end date')).toBeInTheDocument()
-  //   })
+    const {getByTestId, getByText} = renderConnected(
+      <ProjectedDates {...defaultProps} coursePace={cpace} />
+    )
 
-  //   it('shows open-ended pace text', () => {
-  //     window.ENV.VALID_DATE_RANGE = {
-  //       end_at: {date: null, date_context: 'course'},
-  //       start_at: {date: null, date_context: 'course'}
-  //     }
-  //     const pace = {
-  //       ...defaultProps.coursePace,
-  //       hard_end_dates: false,
-  //       start_date: '2022-01-03',
-  //       end_date: undefined
-  //     }
-  //     const {getAllByText, getByTestId} = renderConnected(
-  //       <ProjectedDates {...defaultProps} coursePace={pace} />
-  //     )
-  //     expect(getAllByText('Hypothetical end date').length).toBeTruthy()
-  //     // expect projectedEndDate in this case
-  //     expect(getByTestId('coursepace-date-text').textContent).toStrictEqual('December 1, 2021')
-  //   })
-  // })
+    expect(getByText('Start Date')).toBeInTheDocument()
+    expect(getByText('End Date')).toBeInTheDocument()
+    const end = getByTestId('coursepace-end-date')
+    expect(within(end).getByText(/Not Specified/)).toBeInTheDocument()
+    expect(within(end).getByText('Determined by course end date')).toBeInTheDocument()
+    expect(getByText(/\d+ assignments/)).toBeInTheDocument()
+    expect(getByText(/\d+ weeks/)).toBeInTheDocument()
+    expect(getByText('Dates shown in course time zone')).toBeInTheDocument()
+  })
 
-  // describe('date compression', () => {
-  //   it('calls uncompressDates when start date allows enough days', () => {
-  //     renderConnected(<ProjectedDates {...defaultProps} />)
+  it('compresses dates if projectedEndDate is after pace end_date', () => {
+    renderConnected(
+      <ProjectedDates {...defaultProps} projectedEndDate="2021-12-17" compression={1000} />
+    )
+    expect(defaultProps.compressDates).toHaveBeenCalled()
+    expect(defaultProps.uncompressDates).not.toHaveBeenCalled()
+  })
 
-  //     expect(defaultProps.uncompressDates).toHaveBeenCalled()
-  //     expect(defaultProps.compressDates).not.toHaveBeenCalled()
-  //   })
-
-  //   it('calls compressDates if start date does not allow enough days before the specified end date', () => {
-  //     const pp = {...defaultProps.coursePace}
-  //     pp.end_date = '2021-09-05'
-  //     renderConnected(<ProjectedDates {...defaultProps} coursePace={pp} />)
-
-  //     expect(defaultProps.uncompressDates).not.toHaveBeenCalled()
-  //     expect(defaultProps.compressDates).toHaveBeenCalled()
-  //   })
-
-  //   it('calls compressDates if start date does not allow enough days before the course end date', () => {
-  //     // the course ends on 2021-12-31
-  //     const pp = {...defaultProps.coursePace}
-  //     pp.hard_end_dates = false
-  //     pp.end_date = undefined
-  //     const ped = '2022-01-01'
-  //     renderConnected(<ProjectedDates {...defaultProps} coursePace={pp} projectedEndDate={ped} />)
-
-  //     expect(defaultProps.uncompressDates).not.toHaveBeenCalled()
-  //     expect(defaultProps.compressDates).toHaveBeenCalled()
-  //   })
-
-  //   it('calls compressDates when switching from course to student pace and squshing is necessary', () => {
-  //     // the course ends on 2021-12-31
-  //     const pp = {...defaultProps.pacePace}
-  //     pp.hard_end_dates = false
-  //     pp.end_date = undefined
-  //     const ped = '2022-01-01'
-  //     const {rerender} = renderConnected(
-  //       <ProjectedDates {...defaultProps} pacePace={pp} projectedEndDate={ped} />
-  //     )
-
-  //     expect(defaultProps.compressDates).toHaveBeenCalledTimes(1)
-
-  //     pp.context_id = '1'
-  //     pp.context_type = 'Enrollment'
-  //     rerender(<ProjectedDates {...defaultProps} pacePace={pp} projectedEndDate={ped} />)
-
-  //     expect(defaultProps.compressDates).toHaveBeenCalledTimes(2)
-  //   })
-  // })
-
-  // describe('specified end date checkbox', () => {
-  //   it('toggles the setting when clicked', () => {
-  //     const {getByRole} = renderConnected(<ProjectedDates {...defaultProps} />)
-  //     const hardEndDatesToggle = getByRole('checkbox', {
-  //       name: 'Require Completion by Specified End Date'
-  //     })
-  //     expect(hardEndDatesToggle).not.toBeDisabled()
-  //     act(() => hardEndDatesToggle.click())
-  //     expect(defaultProps.onToggleHardEndDates).toHaveBeenCalled()
-  //   })
-
-  //   it('is disabled while the pace is publishing', () => {
-  //     const {getByRole} = renderConnected(<ProjectedDates {...defaultProps} pacePublishing />)
-  //     const hardEndDatesToggle = getByRole('checkbox', {
-  //       name: 'Require Completion by Specified End Date'
-  //     })
-  //     expect(hardEndDatesToggle).toBeDisabled()
-  //   })
-  // })
+  it('uncompresses dates of projectedEndDate is before pace end_date', () => {
+    renderConnected(<ProjectedDates {...defaultProps} />)
+    expect(defaultProps.compressDates).not.toHaveBeenCalled()
+    expect(defaultProps.uncompressDates).toHaveBeenCalled()
+  })
 })

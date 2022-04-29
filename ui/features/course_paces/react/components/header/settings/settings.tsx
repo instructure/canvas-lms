@@ -52,7 +52,6 @@ interface StoreProps {
 
 interface DispatchProps {
   readonly loadLatestPaceByContext: typeof coursePaceActions.loadLatestPaceByContext
-  readonly setEndDate: typeof coursePaceActions.setEndDate
   readonly showLoadingOverlay: typeof uiActions.showLoadingOverlay
   readonly toggleExcludeWeekends: typeof coursePaceActions.toggleExcludeWeekends
   readonly updateBlackoutDates: typeof blackoutDateActions.updateBlackoutDates
@@ -183,7 +182,6 @@ const mapStateToProps = (state: StoreState): StoreProps => {
 
 export default connect(mapStateToProps, {
   loadLatestPaceByContext: coursePaceActions.loadLatestPaceByContext,
-  setEndDate: coursePaceActions.setEndDate,
   showLoadingOverlay: uiActions.showLoadingOverlay,
   toggleExcludeWeekends: coursePaceActions.toggleExcludeWeekends,
   updateBlackoutDates: blackoutDateActions.updateBlackoutDates
