@@ -54,7 +54,7 @@ class ActiveRecord::Base
 
       if transaction_index
         # we wrap a transaction around controller actions, so try to see if this call came from that
-        if wrap_index && (transaction_index..wrap_index).all? { |i| stacktrace[i].match?(/transaction|synchronize/) }
+        if wrap_index && (transaction_index..wrap_index).all? { |i| stacktrace[i].match?(/transaction|synchronize|unguard/) }
           false
         else
           # check if this is being run through an after_transaction_commit since the last transaction
