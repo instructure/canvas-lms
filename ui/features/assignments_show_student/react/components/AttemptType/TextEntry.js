@@ -99,7 +99,7 @@ export default class TextEntry extends React.Component {
       this._lastSavedContent = body
 
       if (this.props.focusOnInit) {
-        this._rceRef.current.focus()
+        this._rceRef?.current?.focus()
       }
     }
   }
