@@ -158,8 +158,6 @@ class Account < ActiveRecord::Base
 
   after_create :create_default_objects
 
-  after_save :log_changes_to_app_center_access_token
-
   serialize :settings, Hash
   include TimeZoneHelper
 
@@ -2289,20 +2287,6 @@ class Account < ActiveRecord::Base
     return nil if owning_account.course_template_id == 0
 
     owning_account.course_template
-  end
-
-  def log_changes_to_app_center_access_token
-    # Hopefully temporary change to debug how/why token is getting reset
-    was_settings, now_settings = saved_change_to_attribute(:settings)
-    was_token = was_settings.respond_to?(:[]) && was_settings[:app_center_access_token]
-    now_token = now_settings.respond_to?(:[]) && now_settings[:app_center_access_token]
-    if was_token != now_token
-      sentry_notifier = CanvasErrors.send(:registry)[:sentry_notification]
-      if sentry_notifier
-        data = { account_id: global_id, was_set: !!was_token.presence, now_set: !!now_token.presence }
-        sentry_notifier.call("Account's app_center_access_token changed", data, :warn)
-      end
-    end
   end
 
   def student_reporting?
