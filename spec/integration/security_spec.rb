@@ -682,12 +682,12 @@ describe "security" do
       end
 
       it "view_jobs" do
-        get "/jobs"
+        get "/jobs_v2"
         expect(response).to be_redirect
 
         add_permission :view_jobs
 
-        get "/jobs"
+        get "/jobs_v2"
         expect(response).to be_successful
       end
     end

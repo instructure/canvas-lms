@@ -52,7 +52,7 @@ describe "site admin jobs ui" do
   end
 
   def load_jobs_page
-    get "/jobs"
+    get "/jobs_v1"
     # wait for it
     f("#jobs-grid .slick-cell")
   end
@@ -88,7 +88,7 @@ describe "site admin jobs ui" do
   context "search" do
     it "only actions the individual job when it has been searched for" do
       job = Delayed::Job.list_jobs(:current, 1).first
-      get "/jobs?flavor=id&q=#{job.id}"
+      get "/jobs_v1?flavor=id&q=#{job.id}"
       expect(f("#jobs-grid .slick-cell")).to be
       f("#hold-jobs").click
       wait_for_ajax_requests

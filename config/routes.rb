@@ -948,7 +948,10 @@ CanvasRails::Application.routes.draw do
 
   # Routes for course exports
   get "xsd/:version.xsd" => "content_exports#xml_schema"
-  resources :jobs, only: [:index, :show] do
+
+  get "/jobs", to: "jobs_v2#redirect", as: "jobs"
+
+  resources :jobs_v1, controller: :jobs, only: [:index, :show] do
     collection do
       post "batch_update"
     end
