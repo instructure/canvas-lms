@@ -1786,7 +1786,6 @@ class Account < ActiveRecord::Base
   TAB_JOBS = 15
   TAB_DEVELOPER_KEYS = 16
   TAB_RELEASE_NOTES = 17
-  TAB_JOBS_V2 = 18
 
   def external_tool_tabs(opts, user)
     tools = ContextExternalTool.active.find_all_for(self, :account_navigation)
@@ -1805,7 +1804,6 @@ class Account < ActiveRecord::Base
       tabs << { id: TAB_PLUGINS, label: t("#account.tab_plugins", "Plugins"), css_class: "plugins", href: :plugins_path, no_args: true } if root_account? && grants_right?(user, :manage_site_settings)
       tabs << { id: TAB_RELEASE_NOTES, label: t("Release Notes"), css_class: "release_notes", href: :account_release_notes_manage_path } if root_account? && ReleaseNote.enabled? && grants_right?(user, :manage_release_notes)
       tabs << { id: TAB_JOBS, label: t("#account.tab_jobs", "Jobs"), css_class: "jobs", href: :jobs_path, no_args: true } if root_account? && grants_right?(user, :view_jobs)
-      tabs << { id: TAB_JOBS_V2, label: t("#account.tab_jobs_v2", "Jobs v2"), css_class: "jobs_v2", href: :jobs_v2_index_path, no_args: true } if root_account? && grants_right?(user, :view_jobs) && feature_enabled?(:jobs_v2)
     else
       tabs << { id: TAB_COURSES, label: t("#account.tab_courses", "Courses"), css_class: "courses", href: :account_path } if user && grants_right?(user, :read_course_list)
       tabs << { id: TAB_USERS, label: t("People"), css_class: "users", href: :account_users_path } if user && grants_right?(user, :read_roster)
