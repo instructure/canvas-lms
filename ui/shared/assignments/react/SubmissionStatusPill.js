@@ -38,6 +38,12 @@ export default function SubmissionStatusPill(props) {
         {I18n.t('Late')}
       </Pill>
     )
+  } else if (props.submissionStatus === 'extended') {
+    return (
+      <Pill data-test-id="extended-pill" color="info">
+        {I18n.t('Extended')}
+      </Pill>
+    )
   } else {
     return null
   }

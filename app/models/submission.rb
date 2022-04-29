@@ -137,7 +137,7 @@ class Submission < ActiveRecord::Base
   validates :points_deducted, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validates :seconds_late_override, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validates :extra_attempts, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
-  validates :late_policy_status, inclusion: %w[none missing late], allow_nil: true
+  validates :late_policy_status, inclusion: %w[none missing late extended], allow_nil: true
   validates :cached_tardiness, inclusion: ["missing", "late"], allow_nil: true
   validate :ensure_grader_can_grade
   validate :extra_attempts_can_only_be_set_on_online_uploads
@@ -186,7 +186,9 @@ class Submission < ActiveRecord::Base
     joins(:assignment)
       .where(<<~SQL.squish)
         /* excused submissions cannot be missing */
-        excused IS NOT TRUE AND NOT (
+        excused IS NOT TRUE
+        AND (late_policy_status IS DISTINCT FROM 'extended')
+        AND NOT (
           /* teacher said it's missing, 'nuff said. */
           /* we're doing a double 'NOT' here to avoid 'ORs' that could slow down the query */
           late_policy_status IS DISTINCT FROM 'missing' AND NOT
@@ -213,28 +215,29 @@ class Submission < ActiveRecord::Base
   }
 
   scope :late, lambda {
-    left_joins(:quiz_submission)
-      .where("
-      submissions.excused IS NOT TRUE AND (
+    left_joins(:quiz_submission).where(<<~SQL.squish)
+      submissions.excused IS NOT TRUE
+      AND (
         submissions.late_policy_status = 'late' OR
         (submissions.late_policy_status IS NULL AND submissions.submitted_at >= submissions.cached_due_date +
            CASE submissions.submission_type WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END
            AND (submissions.quiz_submission_id IS NULL OR quiz_submissions.workflow_state = 'complete'))
       )
-    ")
+    SQL
   }
 
   scope :not_late, lambda {
-    left_joins(:quiz_submission)
-      .where("
-      submissions.excused IS TRUE OR (
+    left_joins(:quiz_submission).where(<<~SQL.squish)
+      submissions.excused IS TRUE
+      OR (late_policy_status IS NOT DISTINCT FROM 'extended')
+      OR (
         submissions.late_policy_status is distinct from 'late' AND
         (submissions.submitted_at IS NULL OR submissions.cached_due_date IS NULL OR
           submissions.submitted_at < submissions.cached_due_date +
             CASE submissions.submission_type WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END
           OR quiz_submissions.workflow_state <> 'complete')
       )
-    ")
+    SQL
   }
 
   GradedAtBookmarker = BookmarkedCollection::SimpleBookmarker.new(Submission, :graded_at)
@@ -1561,7 +1564,7 @@ class Submission < ActiveRecord::Base
   def late_policy_status_manually_applied?
     cleared_late = late_policy_status_was == "late" && ["none", nil].include?(late_policy_status)
     cleared_none = late_policy_status_was == "none" && late_policy_status.nil?
-    late_policy_status == "missing" || late_policy_status == "late" || cleared_late || cleared_none
+    late_policy_status == "missing" || late_policy_status == "late" || late_policy_status == "extended" || cleared_late || cleared_none
   end
   private :late_policy_status_manually_applied?
 
@@ -2415,6 +2418,14 @@ class Submission < ActiveRecord::Base
       cached_quiz_lti? || assignment.expects_submission?
     end
     alias_method :missing, :missing?
+
+    def extended?
+      return false if excused?
+      return late_policy_status == "extended" if late_policy_status.present?
+
+      false
+    end
+    alias_method :extended, :extended?
 
     def graded?
       excused || (!!score && workflow_state == "graded")

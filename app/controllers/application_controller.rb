@@ -318,6 +318,7 @@ class ApplicationController < ActionController::Base
     product_tours files_dnd usage_rights_discussion_topics
     granular_permissions_manage_users create_course_subaccount_picker
     lti_deep_linking_module_index_menu_modal lti_multiple_assignment_deep_linking buttons_and_icons_root_account
+    extended_submission_state
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes

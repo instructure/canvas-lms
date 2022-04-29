@@ -89,7 +89,8 @@ export default class SubmissionTray extends React.Component {
     colors: shape({
       late: string.isRequired,
       missing: string.isRequired,
-      excused: string.isRequired
+      excused: string.isRequired,
+      extended: string.isRequired
     }).isRequired,
     onClose: func.isRequired,
     onGradeSubmission: func.isRequired,
@@ -114,6 +115,7 @@ export default class SubmissionTray extends React.Component {
       gradedAt: string.isRequired,
       late: bool.isRequired,
       missing: bool.isRequired,
+      extended: bool.isRequired,
       pointsDeducted: number,
       postedAt: string.isRequired,
       secondsLate: number.isRequired,

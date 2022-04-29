@@ -3,16 +3,11 @@
     {{#if ../showSubmissionStatus}}
       {{#t "submitted"}}<label>Submitted:</label> {{submittedAt}}{{/t}}
     {{/if}}
-    {{#if late}}
-      <span class="submission-late-pill"></span>
-    {{else}}
-      {{#if missing}}
-        <span class="submission-missing-pill"></span>
-      {{else}}
-        {{#if excused}}
-          <span class="submission-excused-pill"></span>
-        {{/if}}
-      {{/if}}
+    {{#if late_policy_status}}
+      <span class="submission-status-pill submission-{{late_policy_status}}-pill"></span>
+    {{/if}}
+    {{#if excused}}
+      <span class="submission-status-pill submission-excused-pill"></span>
     {{/if}}
   {{/each}}
 {{else}}

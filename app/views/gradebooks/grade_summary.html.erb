@@ -188,6 +188,8 @@
             <span class="submission-missing-pill"></span>
           <% elsif assignment_presenter.late? %>
             <span class="submission-late-pill"></span>
+          <% elsif assignment_presenter.extended? %>
+            <span class="submission-extended-pill"></span>
           <% end %>
         </td>
 

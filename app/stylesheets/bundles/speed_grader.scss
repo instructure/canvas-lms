@@ -411,9 +411,16 @@ $icon-size: 1.4rem;
     font-size: 1.2em;
     display: none;
   }
+
+  .submission-status-pill {
+    display: none;
+  }
+
   .submission-late-pill,
   .submission-missing-pill,
-  .submission-excused-pill {
+  .submission-excused-pill,
+  .submission-extended-pill {
+    display: inline;
     font-size: 1rem;
     padding-left: 10px;
     padding-right: 10px;
