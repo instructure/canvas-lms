@@ -45,20 +45,24 @@
   <% if @discussion_presenter.show_all_dates? %>
     <div class="row-fluid">
       <div class="span12 hidden due_date_wrapper">
-        <table class="discussion-topic-due-dates">
-          <thead>
-            <tr>
-              <th scope="col"><%= t(:due, 'Due') %></th>
-              <th scope="col"><%= t(:for, 'For') %></th>
-              <th scope="col"><%= t(:available_from, 'Available from') %></th>
-              <th scope="col"><%= t(:until, 'Until') %></th>
-            </tr>
-          </thead>
+        <% if @context.try(:enable_course_paces?) %>
+          <div id="course_paces_due_date_notice">PACING!</div>
+        <% else %>
+          <table class="discussion-topic-due-dates">
+            <thead>
+              <tr>
+                <th scope="col"><%= t(:due, 'Due') %></th>
+                <th scope="col"><%= t(:for, 'For') %></th>
+                <th scope="col"><%= t(:available_from, 'Available from') %></th>
+                <th scope="col"><%= t(:until, 'Until') %></th>
+              </tr>
+            </thead>
 
-          <%= render 'shared/override_list', :assignment => @assignment,
-            :user => @current_user %>
+            <%= render 'shared/override_list', :assignment => @assignment,
+              :user => @current_user %>
 
-        </table>
+          </table>
+        <% end %>
       </div>
     </div>
   <% end %>

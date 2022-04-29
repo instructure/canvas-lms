@@ -304,7 +304,11 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                           shouldGrow
                           margin={responsiveProps.discussionDetails.margin}
                         >
-                          <DiscussionDetails discussionTopic={props.discussionTopic} />
+                          <DiscussionDetails
+                            discussionTopic={props.discussionTopic}
+                            inPacedCourse={ENV.IN_PACED_COURSE}
+                            courseId={ENV.course_id}
+                          />
                           {props.discussionTopic.assignment?.assessmentRequestsForCurrentUser?.map(
                             assessmentRequest => (
                               <PeerReview

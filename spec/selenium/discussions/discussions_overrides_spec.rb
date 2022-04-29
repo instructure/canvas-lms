@@ -75,6 +75,22 @@ describe "discussions overrides" do
         expect(rows[0].text).to eq "Dec 17, 2016 10am New Section Dec 14, 2016 10am Dec 18, 2016 10am"
         expect(rows[1].text).to eq "Dec 16, 2016 10am Everyone Else No Start Date No End Date"
       end
+
+      it "shows course pace notice in the tray in a course with pacing on" do
+        @course.enable_course_paces = true
+        @course.save!
+        get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
+        fj("button:contains('Show Due Dates (2)')").click
+        expect(f('[data-testid="CoursePacingNotice"]')).to be_displayed
+      end
+    end
+
+    it "shows course pace notice when expanding grades in a course with pacing on" do
+      @course.enable_course_paces = true
+      @course.save!
+      get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
+      fj("a:contains('Show Due Dates')").click
+      expect(f('[data-testid="CoursePacingNotice"]')).to be_displayed
     end
 
     it "toggles between due dates", priority: "2" do
