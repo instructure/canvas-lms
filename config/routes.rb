@@ -1393,9 +1393,6 @@ CanvasRails::Application.routes.draw do
                                                                                 as: "#{context}_dismiss_update_tool_proxy"
         put "#{context}s/:#{context}_id/tool_proxies/:tool_proxy_id/update", action: :accept_update,
                                                                              as: "#{context}_accept_update_tool_proxy"
-
-        get "#{context}s/:#{context}_id/tool_proxies/:tool_proxy_id/recreate_subscriptions", action: :recreate_subscriptions,
-                                                                                             as: "#{context}_recreate_subscriptions_tool_proxy"
       end
     end
 
