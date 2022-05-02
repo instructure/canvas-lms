@@ -122,7 +122,7 @@ module DiscussionsCommon
     wait_for_ajaximations
     menu_item = fj("#{li_selector} #{menu_item_selector}")
     expect(menu_item).to be_displayed
-    menu_item.click
+    force_click("#{li_selector} #{menu_item_selector}")
   end
 
   def click_topic_option(topic_selector, menu_item_selector)
