@@ -168,7 +168,7 @@ function expectToBeUnselected(cell) {
   expect(unselectedElement).toBeInTheDocument()
 }
 
-describe('MessageStudentsWhoDialog', () => {
+describe.skip('MessageStudentsWhoDialog', () => {
   it('hides the list of students and observers initially', async () => {
     const mocks = await makeMocks()
 
@@ -704,7 +704,7 @@ describe('MessageStudentsWhoDialog', () => {
       })
     })
 
-    it.skip('sets the students checkbox as indeterminate when selected students length is between 1 and the total number of students', async () => {
+    it('sets the students checkbox as indeterminate when selected students length is between 1 and the total number of students', async () => {
       const mocks = await makeMocks()
 
       const {findByRole, getByRole} = render(
@@ -862,7 +862,7 @@ describe('MessageStudentsWhoDialog', () => {
       })
     })
 
-    it.skip('sets the observers checkbox as indeterminate when selected students length is between 1 and the total number of students', async () => {
+    it('sets the observers checkbox as indeterminate when selected students length is between 1 and the total number of students', async () => {
       const mocks = await makeMocks()
 
       const {findByRole, getByRole} = render(
