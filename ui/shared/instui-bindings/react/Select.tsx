@@ -42,8 +42,7 @@
 ---
 */
 
-import React from 'react'
-import {func, node, string, oneOfType} from 'prop-types'
+import React, {ReactElement, ChangeEvent} from 'react'
 import {compact, castArray, isEqual} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Select} from '@instructure/ui-select'
@@ -51,49 +50,56 @@ import {Alert} from '@instructure/ui-alerts'
 import {matchComponentTypes} from '@instructure/ui-react-utils'
 
 const I18n = useI18nScope('app_shared_components')
+const {Option: SelectOption, Group: SelectGroup} = Select as any
 
 const noOptionsOptionId = '_noOptionsOption'
+
+type Props = {
+  value: string
+  id: string
+  label?: ReactElement | string
+  onChange: (event: ChangeEvent, value: string) => void
+  children: ReactElement | ReactElement[]
+  noOptionsLabel?: string
+}
+
+type State = {
+  inputValue: string
+  isShowingOptions: boolean
+  highlightedOptionId: string | null
+  selectedOptionId: string
+  announcement: string | null
+}
+
+type OptionProps = {
+  id: string
+  value: string
+}
+
+type GroupProps = {
+  label: string
+}
 
 // CanvasSelectOption and CanvasSelectGroup are components our client can create thru CanvasSelect
 // to pass us our options. They are never rendered themselves, but get transformed into INSTUI's
 // Select.Option and Select.Group on rendering CanvasSelect. See renderChildren below.
-function CanvasSelectOption() {
+function CanvasSelectOption({id, value}: OptionProps): ReactElement {
   return <div />
 }
-CanvasSelectOption.propTypes = {
-  id: string.isRequired, // eslint-disable-line react/no-unused-prop-types
-  value: string.isRequired // eslint-disable-line react/no-unused-prop-types
-}
 
-function CanvasSelectGroup() {
+function CanvasSelectGroup({label}: GroupProps): ReactElement {
   return <div />
 }
-CanvasSelectGroup.propTypes = {
-  label: string.isRequired // eslint-disable-line react/no-unused-prop-types
-}
 
-export default class CanvasSelect extends React.Component {
+export default class CanvasSelect extends React.Component<Props, State> {
   static Option = CanvasSelectOption
 
   static Group = CanvasSelectGroup
 
-  static propTypes = {
-    id: string,
-    label: oneOfType([node, func]).isRequired,
-    value: string,
-    onChange: func.isRequired,
-    children: node,
-    noOptionsLabel: string // unselectable option to display when there are no options
-  }
-
-  static defaultProps = {
-    noOptionsLabel: '---'
-  }
-
   constructor(props) {
     super(props)
 
-    const option = this.getOptionByFieldValue('value', props.value)
+    const option: ReactElement | null = this.getOptionByFieldValue('value', props.value)
 
     this.state = {
       inputValue: option ? option.props.children : '',
@@ -115,8 +121,8 @@ export default class CanvasSelect extends React.Component {
     }
   }
 
-  render() {
-    const {id, label, value, onChange, children, noOptionsLabel, ...otherProps} = this.props
+  render(): ReactElement {
+    const {id, label, value, onChange, children, noOptionsLabel = '---', ...otherProps} = this.props
 
     return (
       <>
@@ -146,7 +152,7 @@ export default class CanvasSelect extends React.Component {
     )
   }
 
-  renderChildren(children) {
+  renderChildren(children: ReactElement | ReactElement[]): any {
     if (!Array.isArray(children)) {
       // children is 1 child
       if (matchComponentTypes(children, [CanvasSelectOption])) {
@@ -159,7 +165,7 @@ export default class CanvasSelect extends React.Component {
     }
 
     const opts = children
-      .map(child => {
+      .map((child: ReactElement | ReactElement[]) => {
         if (Array.isArray(child)) {
           return this.renderChildren(child)
         } else if (matchComponentTypes(child, [CanvasSelectOption])) {
@@ -179,10 +185,10 @@ export default class CanvasSelect extends React.Component {
 
   backupKey = 0
 
-  renderOption(option) {
+  renderOption(option: ReactElement): ReactElement {
     const {id, children, ...optionProps} = option.props
     return (
-      <Select.Option
+      <SelectOption
         id={id}
         key={option.key || id || ++this.backupKey}
         isHighlighted={id === this.state.highlightedOptionId}
@@ -190,44 +196,44 @@ export default class CanvasSelect extends React.Component {
         {...optionProps}
       >
         {children}
-      </Select.Option>
+      </SelectOption>
     )
   }
 
-  renderGroup(group) {
+  renderGroup(group: ReactElement): ReactElement {
     const {id, label, ...otherProps} = group.props
     const children = compact(castArray(group.props.children))
     return (
-      <Select.Group
+      <SelectGroup
         data-testid={`Group:${label}`}
         renderLabel={() => label}
         key={group.key || id || ++this.backupKey}
         {...otherProps}
       >
         {children.map(c => this.renderOption(c))}
-      </Select.Group>
+      </SelectGroup>
     )
   }
 
-  renderNoOptionsOption() {
+  renderNoOptionsOption(): ReactElement {
     return (
-      <Select.Option id={noOptionsOptionId} isHighlighted={false} isSelected={false}>
+      <SelectOption id={noOptionsOptionId} isHighlighted={false} isSelected={false}>
         {this.props.noOptionsLabel}
-      </Select.Option>
+      </SelectOption>
     )
   }
 
-  handleBlur = _event => {
+  handleBlur = (_event: ChangeEvent): void => {
     this.setState({highlightedOptionId: null})
   }
 
-  handleShowOptions = () => {
+  handleShowOptions = (): void => {
     this.setState({
       isShowingOptions: true
     })
   }
 
-  handleHideOptions = _event => {
+  handleHideOptions = (_event: ChangeEvent): void => {
     this.setState(state => {
       const text = this.getOptionLabelById(state.selectedOptionId)
       return {
@@ -245,7 +251,7 @@ export default class CanvasSelect extends React.Component {
   // by the time handleHighlightOption is called we miss the transition,
   // this.state still has the previous value as of the last render
   // which is what we need. This is why we use this version of setState.
-  handleHighlightOption = (event, {id}) => {
+  handleHighlightOption = (event: ChangeEvent, {id}): void => {
     if (id === noOptionsOptionId) return
 
     const text = this.getOptionLabelById(id)
@@ -259,7 +265,7 @@ export default class CanvasSelect extends React.Component {
   }
   /* eslint-enable react/no-access-state-in-setstate */
 
-  handleSelectOption = (event, {id}) => {
+  handleSelectOption = (event: ChangeEvent, {id}): void => {
     if (id === noOptionsOptionId) {
       this.setState({
         isShowingOptions: false,
@@ -276,22 +282,26 @@ export default class CanvasSelect extends React.Component {
       })
       const option = this.getOptionByFieldValue('id', id)
       if (prevSelection !== id) {
-        this.props.onChange(event, option.props.value)
+        this.props.onChange(event, option?.props.value)
       }
     }
   }
 
-  getOptionLabelById(oid) {
+  getOptionLabelById(oid: string): string {
     const option = this.getOptionByFieldValue('id', oid)
     return option ? option.props.children : ''
   }
 
-  getOptionByFieldValue(field, value, options = castArray(this.props.children)) {
+  getOptionByFieldValue(
+    field: string,
+    value: string,
+    options = castArray<ReactElement>(this.props.children)
+  ): ReactElement | null {
     if (!this.props.children) return null
 
-    let foundOpt = null
+    let foundOpt: ReactElement | null = null
     for (let i = 0; i < options.length; ++i) {
-      const o = options[i]
+      const o: ReactElement = options[i]
       if (Array.isArray(o)) {
         foundOpt = this.getOptionByFieldValue(field, value, o)
       } else if (matchComponentTypes(o, [CanvasSelectOption])) {

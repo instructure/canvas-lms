@@ -95,3 +95,9 @@ declare module '@instructure/ui-text' {
     tag?: string
   }
 }
+
+declare module '@instructure/ui-select' {
+  export interface SelectProps {
+    renderLabel?: string
+  }
+}
