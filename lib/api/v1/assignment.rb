@@ -126,7 +126,8 @@ module Api::V1::Assignment
       exclude_response_fields: [],
       include_planner_override: false,
       include_can_edit: false,
-      include_webhook_info: false
+      include_webhook_info: false,
+      include_assessment_requests: false
     )
 
     if opts[:override_dates] && !assignment.new_record?
@@ -278,6 +279,16 @@ module Api::V1::Assignment
 
     if assignment.allowed_extensions.present?
       hash["allowed_extensions"] = assignment.allowed_extensions
+    end
+
+    if opts[:include_assessment_requests]
+      if user.assigned_assessments.any?
+        submission = assignment.submission_for_student(user)
+        assessment_requests = user.assigned_assessments.where(assessor_asset: submission)
+        hash["assessment_requests"] = assessment_requests.map { |assessment_request| assessment_request_json(assessment_request, anonymous_peer_reviews: assignment.anonymous_peer_reviews?) }
+      else
+        hash["assessment_requests"] = []
+      end
     end
 
     unless opts[:exclude_response_fields].include?("rubric")
@@ -1152,5 +1163,17 @@ module Api::V1::Assignment
 
     settings[:lockdown_browser] = ldb_settings
     assignment.settings = settings
+  end
+
+  def assessment_request_json(assessment_request, anonymous_peer_reviews: false)
+    fields = %i[workflow_state]
+    api_json(assessment_request, @current_user, session, only: fields).tap do |json|
+      if anonymous_peer_reviews
+        json[:anonymous_id] = assessment_request.asset.anonymous_id
+      else
+        json[:user_id] = assessment_request.user.id
+        json[:user_name] = assessment_request.user.name
+      end
+    end
   end
 end
