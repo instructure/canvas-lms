@@ -126,6 +126,9 @@
             "name": "GroupSet"
           },
           {
+            "name": "InternalSetting"
+          },
+          {
             "name": "LearningOutcome"
           },
           {
@@ -315,6 +318,9 @@
             "name": "GroupSet"
           },
           {
+            "name": "InternalSetting"
+          },
+          {
             "name": "LearningOutcome"
           },
           {
@@ -475,6 +481,9 @@
           },
           {
             "name": "GroupMembership"
+          },
+          {
+            "name": "InternalSetting"
           },
           {
             "name": "LearningOutcome"

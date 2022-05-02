@@ -119,6 +119,7 @@
     "crypto-js": "^4.1.1",
     "d3": "3.5.17",
     "emoji-mart": "^3.0.1",
+    "export-from-json": "^1.6.0",
     "final-form": "^4.20.2",
     "formdata-polyfill": "^3.0.9",
     "fullcalendar": "https://github.com/instructure/fullcalendar.git#1108dd1c991a029ec6fd7de3337737ec5295ba97",
