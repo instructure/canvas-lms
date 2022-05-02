@@ -324,7 +324,7 @@ describe "conversations new" do
           fj("button:contains('Send')").click
           wait_for_ajaximations
           cm = ConversationMessage.last
-          expect(cm.conversation_message_participants.pluck(:user_id)).to eq [@s1.id, @admin.id]
+          expect(cm.conversation_message_participants.pluck(:user_id)).to match_array [@s1.id, @admin.id]
           expect(cm.body).to eq "confirm if you get this!"
 
           f("button[data-testid='compose']").click
