@@ -165,20 +165,6 @@ describe('DiscussionsIsolatedView', () => {
     await waitFor(() => expect(container.queryByTestId('go-to-reply')).toBeNull())
   })
 
-  it('should show reply button in isolated view when search term is present', async () => {
-    const mocks = [
-      ...getDiscussionQueryMock(),
-      ...getDiscussionQueryMock({searchTerm: 'parent', rootEntries: false})
-    ]
-    const container = setup(mocks)
-    fireEvent.change(await container.findByTestId('search-filter'), {
-      target: {value: 'parent'}
-    })
-    const goToReply = await container.findByTestId('go-to-reply')
-    fireEvent.click(goToReply)
-    await waitFor(() => expect(container.queryByTestId('threading-toolbar-reply')).toBeNull())
-  })
-
   it('should clear input when button is pressed', async () => {
     const mocks = [
       ...getDiscussionQueryMock(),
