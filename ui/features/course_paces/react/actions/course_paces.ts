@@ -34,6 +34,7 @@ import {actions as uiActions} from './ui'
 import {actions as blackoutDateActions} from '../shared/actions/blackout_dates'
 import {getBlackoutDatesUnsynced} from '../shared/reducers/blackout_dates'
 import * as Api from '../api/course_pace_api'
+import {transformBlackoutDatesForApi} from '../api/blackout_dates_api'
 
 const I18n = useI18nScope('course_paces_actions')
 
@@ -260,7 +261,10 @@ const thunkActions = {
       dispatch(uiActions.showLoadingOverlay(I18n.t('Compressing...')))
       dispatch(uiActions.clearCategoryError('compress'))
 
-      return Api.compress(getState().coursePace)
+      const state = getState()
+      return Api.compress(state.coursePace, {
+        blackout_dates: transformBlackoutDatesForApi(state.blackoutDates.blackoutDates)
+      })
         .then(responseBody => {
           if (!responseBody) throw new Error(I18n.t('Response body was empty'))
           const compressedItemDates = responseBody

@@ -27,7 +27,7 @@ module CoursePacesDateHelpers
       end
     end
 
-    def previously_enabled_day(start_date, exclude_weekends, blackout_dates)
+    def previous_enabled_day(start_date, exclude_weekends, blackout_dates)
       BusinessTime::Config.with(business_time_config(exclude_weekends, blackout_dates)) do
         Time.previous_business_day(start_date)
       end

@@ -124,7 +124,7 @@ export const Module: React.FC<ComponentProps> = props => {
     // status changes or the course pace changes. This is necessary because the AssignmentRow maintains the duration in local state,
     // and applying updates with componentWillReceiveProps makes it buggy (because the Redux updates can be slow, causing changes to
     // get reverted as you type).
-    const key = `${item.id}|${item.module_item_id}|${props.compression}|${props.coursePace.updated_at}`
+    const key = `${props.module.moduleKey}-${item.id}|${item.module_item_id}|${props.compression}|${props.coursePace.updated_at}`
     return (
       <AssignmentRow
         key={key}
@@ -138,12 +138,12 @@ export const Module: React.FC<ComponentProps> = props => {
   }
 
   const renderBlackoutDateRow = item => {
-    const key = `blackoutdate-${item.id}`
+    const key = `blackoutdate-${props.module.moduleKey}-${item.id || item.temp_id}`
     return <BlackoutDateRow key={key} blackoutDate={item} isStacked={isTableStacked} />
   }
 
   const renderRows = () => {
-    const rowData = props.module.items
+    const rowData = props.module.itemsWithDates
     return rowData.map(rd => {
       if (rd.type === 'assignment') {
         return renderAssignmentRow(rd)
