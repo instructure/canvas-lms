@@ -433,6 +433,20 @@ describe "conversations new" do
           expect(@t2.conversations.last.conversation.conversation_participants.collect(&:user_id).sort).to eq([@teacher, @t2].collect(&:id).sort)
         end
 
+        it "correctly wipes address book after cancelling compose", priority: "1" do
+          fj("div[data-testid='address-book-item']:contains('Teachers')").click
+          wait_for_ajaximations
+
+          fj("div[data-testid='address-book-item']:contains('All in Teachers')").click
+          expect(fj("span[data-testid='address-book-tag']:contains('All in Teachers')")).to be_present
+
+          fj("button:contains('Cancel')").click
+          wait_for_ajaximations
+
+          f("button[data-testid='compose']").click
+          expect(f("body")).not_to contain_jqcss("div[data-testid='address-book-item']:contains('All in Teachers')")
+        end
+
         it "correctly sends message to all students", priority: "1" do
           fj("div[data-testid='address-book-item']:contains('Students')").click
           wait_for_ajaximations

@@ -410,6 +410,7 @@ const CanvasInbox = () => {
               setIsReplyAll(false)
               setIsForward(false)
               setSelectedConversationMessage(null)
+              setSelectedIds([])
             }}
             open={composeModal}
             conversationsQueryOption={conversationsQueryOption}
