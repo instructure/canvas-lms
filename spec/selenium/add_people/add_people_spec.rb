@@ -131,9 +131,7 @@ describe "add_people" do
       expect(INSTUI_Select_options("#peoplesearch_select_role").map(&:text)).not_to include "Student"
     end
 
-    # CNVS-34781
     it "has a working checkbox after cancelling and reopening" do
-      skip("fragile after upgrading modal to inst-ui 5")
       get "/courses/#{@course.id}/users"
 
       # open the dialog
