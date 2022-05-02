@@ -156,3 +156,9 @@ visibility_feedback_student_grades_page:
   display_name: Improve Feedback on Students Grade Page
   description: Students will be able to more easily recognize when
     feedback has been provided by an instructor/grader ...
+peer_reviews_for_a2:
+  state: hidden
+  applies_to: Course
+  display_name: Peer Review Support in Assignment Enhancements
+  description: Students will be able to provide feedback on another student's assignment submission
+    using the enhanced assignment view
