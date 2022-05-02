@@ -138,21 +138,21 @@ describe CoursePaceHardEndDateCompressor do
   describe ".shift_durations_down" do
     context "all days over can be absorbed by last item" do
       it "decreases last item duration by the number of days over" do
-        rounded = CoursePaceHardEndDateCompressor.shift_durations_down([Duration.new(5), Duration.new(5), Duration.new(5)], 3)
+        rounded = CoursePaceHardEndDateCompressor.shift_durations_down([PaceDuration.new(5), PaceDuration.new(5), PaceDuration.new(5)], 3)
         expect(rounded.map(&:duration)).to eq([5, 5, 2])
       end
     end
 
     context "number of days over is greater than last item duration" do
       it "decreases last and subsequent item durations" do
-        rounded = CoursePaceHardEndDateCompressor.shift_durations_down([Duration.new(1), Duration.new(1), Duration.new(1)], 2)
+        rounded = CoursePaceHardEndDateCompressor.shift_durations_down([PaceDuration.new(1), PaceDuration.new(1), PaceDuration.new(1)], 2)
         expect(rounded.map(&:duration)).to eq([1, 0, 0])
       end
     end
 
     context "number of days over is greater than the sum of durations" do
       it "decreases all durations to 0" do
-        rounded = CoursePaceHardEndDateCompressor.shift_durations_down([Duration.new(1), Duration.new(1), Duration.new(1)], 5)
+        rounded = CoursePaceHardEndDateCompressor.shift_durations_down([PaceDuration.new(1), PaceDuration.new(1), PaceDuration.new(1)], 5)
         expect(rounded.map(&:duration)).to eq([0, 0, 0])
       end
     end
