@@ -126,6 +126,14 @@ module Types
       )
     end
 
+    field :alignments, [Types::OutcomeAlignmentType], null: true do
+      argument :context_id, ID, required: true
+      argument :context_type, String, required: true
+    end
+    def alignments(context_id:, context_type:)
+      Loaders::OutcomeAlignmentLoader.for(context_id, context_type).load(outcome)
+    end
+
     private
 
     def outcome_context_promise

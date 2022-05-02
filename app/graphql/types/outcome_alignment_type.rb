@@ -18,12 +18,24 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module OutcomesFeaturesHelper
-  def account_level_mastery_scales_enabled?(context)
-    context&.root_account&.feature_enabled?(:account_level_mastery_scales)
-  end
+module Types
+  class OutcomeAlignmentType < ApplicationObjectType
+    graphql_name "OutcomeAlignmentType"
 
-  def outcome_alignment_summary_enabled?(context)
-    context&.root_account&.feature_enabled?(:outcome_alignment_summary)
+    implements GraphQL::Types::Relay::Node
+    implements Interfaces::TimestampInterface
+    implements Interfaces::LegacyIDInterface
+
+    global_id_field :id
+
+    field :id, ID, null: false
+    field :title, String, null: false
+    field :content_id, ID, null: false
+    field :content_type, String, null: false
+    field :context_id, ID, null: false
+    field :context_type, String, null: false
+    field :learning_outcome_id, ID, null: false
+    field :workflow_state, String, null: false
+    field :url, String, null: false
   end
 end
