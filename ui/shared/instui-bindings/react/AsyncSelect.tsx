@@ -17,79 +17,73 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import React, {useState, useRef} from 'react'
-import {bool, func, string} from 'prop-types'
+import React, {useState, useRef, ReactElement, ReactNode, ChangeEvent} from 'react'
 import {Alert} from '@instructure/ui-alerts'
 import {Select} from '@instructure/ui-select'
 import {Spinner} from '@instructure/ui-spinner'
 
-const I18n = useI18nScope('canvas_async_search_select')
+const I18n = useI18nScope('canvas_async_search_selesct')
 
 const noOptionsId = '~~empty-option~~'
 
-CanvasAsyncSelect.Option = Select.Option
+const {Option} = Select as any
+const {propTypes: selectPropTypes} = Select as any
 
-CanvasAsyncSelect.propTypes = {
-  ...Select.propTypes,
-  inputValue: string,
-  isLoading: bool,
-  selectedOptionId: string,
-  noOptionsLabel: string,
-  noOptionsValue: string, // value for selected option when no or invalid selection
-  onOptionSelected: func, // (event, optionId | null) => {}
-  onInputChange: func, // (event, value) => {}
-  onBlur: func,
-  onFocus: func
+CanvasAsyncSelect.Option = Option
+
+type Props = {
+  inputValue?: string
+  isLoading: boolean
+  selectedOptionId?: string
+  noOptionsLabel: string
+  noOptionsValue?: string
+  renderLabel?: string
+  onOptionSelected: (event, optionId: string) => void
+  onInputChange: (event, value) => void
+  onBlur?: (event) => void
+  onFocus: (event) => void
+  children?: ReactElement | ReactElement[]
+  options?: any[]
+  [key: string]: any
 }
 
-// NOTE:
-// If the inputValue prop is not specified, this component will control the inputValue
-// of <Select> itself. If it is specified, it is the caller's responsibility to manage
-// its value in response to input changes!
-
-CanvasAsyncSelect.defaultProps = {
-  isLoading: false,
-  noOptionsLabel: '---',
-  noOptionsValue: '',
-  onOptionSelected: Function.prototype,
-  onInputChange: Function.prototype,
-  onBlur: Function.prototype,
-  onFocus: Function.prototype
+CanvasAsyncSelect.propTypes = {
+  ...selectPropTypes
 }
 
 export default function CanvasAsyncSelect({
-  options,
+  options = [],
   inputValue,
-  isLoading,
+  isLoading = false,
   selectedOptionId,
-  noOptionsLabel,
-  noOptionsValue,
-  onOptionSelected,
-  onInputChange,
-  onFocus,
-  onBlur,
-  children,
+  noOptionsLabel = '---',
+  noOptionsValue = '',
+  onOptionSelected = () => {},
+  onInputChange = () => {},
+  onFocus = () => {},
+  onBlur = () => {},
+  children = [],
   ...selectProps
-}) {
+}: Props): ReactElement {
   const previousLoadingRef = useRef(isLoading)
   const previousLoading = previousLoadingRef.current
   const previousSelectedOptionIdRef = useRef(selectedOptionId)
 
   const [isShowingOptions, setIsShowingOptions] = useState(false)
   const [highlightedOptionId, setHighlightedOptionId] = useState(null)
-  const [announcement, setAnnouncement] = useState('')
+  const [announcement, setAnnouncement] = useState<ReactNode>('')
   const [hasFocus, setHasFocus] = useState(false)
   const [managedInputValue, setManagedInputValue] = useState('')
 
-  function findOptionById(id) {
+  function findOptionById(id: string): ReactElement {
     let option
-    React.Children.forEach(children, c => {
-      if (c.props.id === id) option = c
+    React.Children.forEach(children, (c: ReactElement) => {
+      if (c?.props.id === id) option = c
     })
     return option
   }
 
-  function renderOption(option) {
+  function renderOption(option: ReactElement): ReactElement {
     const {id, renderBeforeLabel, ...optionProps} = option.props
     const props = {
       isHighlighted: id === highlightedOptionId,
@@ -102,33 +96,27 @@ export default function CanvasAsyncSelect({
       typeof optionChildren === 'function' ? optionChildren(props) : optionChildren
 
     return (
-      <Select.Option
-        key={id}
-        id={id}
-        {...optionProps}
-        {...props}
-        renderBeforeLabel={renderBeforeText}
-      >
+      <Option key={id} id={id} {...optionProps} {...props} renderBeforeLabel={renderBeforeText}>
         {renderChildren}
-      </Select.Option>
+      </Option>
     )
   }
 
-  function renderOptions() {
+  function renderOptions(): ReactElement | ReactElement[] {
     if (isLoading) {
       return (
-        <Select.Option id={noOptionsId}>
+        <Option id={noOptionsId}>
           <Spinner renderTitle={I18n.t('Loading options...')} size="x-small" />
-        </Select.Option>
+        </Option>
       )
     } else if (React.Children.count(children) === 0) {
-      return <Select.Option id={noOptionsId}>{noOptionsLabel}</Select.Option>
+      return <Option id={noOptionsId}>{noOptionsLabel}</Option>
     } else {
       return React.Children.map(children, renderOption)
     }
   }
 
-  function handleInputChange(ev) {
+  function handleInputChange(ev: ChangeEvent<HTMLInputElement>): void {
     // user typing in the input negates the selection
     const newValue = ev.target.value
     if (typeof inputValue === 'undefined') setManagedInputValue(newValue)
@@ -136,16 +124,16 @@ export default function CanvasAsyncSelect({
     onInputChange(ev, newValue)
   }
 
-  function handleShowOptions() {
+  function handleShowOptions(): void {
     setIsShowingOptions(true)
   }
 
-  function handleHideOptions() {
+  function handleHideOptions(): void {
     setIsShowingOptions(false)
     setAnnouncement(I18n.t('List Collapsed'))
   }
 
-  function handleHighlightOption(ev, {id}) {
+  function handleHighlightOption(ev: ChangeEvent, {id}): void {
     const option = findOptionById(id)
     if (option) {
       setHighlightedOptionId(id)
@@ -153,7 +141,7 @@ export default function CanvasAsyncSelect({
     }
   }
 
-  function handleSelectOption(ev, {id}) {
+  function handleSelectOption(ev: ChangeEvent, {id}): void {
     const selectedOption = findOptionById(id)
     const selectedText = selectedOption?.props.children
     if (!selectedOption) return
@@ -169,12 +157,12 @@ export default function CanvasAsyncSelect({
     }
   }
 
-  function handleFocus(ev) {
+  function handleFocus(ev: ChangeEvent): void {
     setHasFocus(true)
     onFocus(ev)
   }
 
-  function handleBlur(ev) {
+  function handleBlur(ev: ChangeEvent): void {
     setHasFocus(false)
     setHighlightedOptionId(null)
     // if we're managing our own input value and all our possible options just

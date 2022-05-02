@@ -17,8 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import React from 'react'
-import {string, node, func, oneOfType} from 'prop-types'
+import React, {ReactElement} from 'react'
 
 import {CloseButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
@@ -32,59 +31,50 @@ import errorShipUrl from '@canvas/images/ErrorShip.svg'
 
 const I18n = useI18nScope('canvas_modal')
 
-CanvasModal.propTypes = {
-  ...Modal.propTypes,
-  children: node.isRequired,
-  footer: oneOfType([node, func]), // render prop. usually to render the buttons for the footer.
-  padding: View.propTypes.padding,
+const {Item: FlexItem} = Flex as any
 
-  title: string, // specify this if the header text should be different than the modal's label
-
+type Props = {
+  children: ReactElement | ReactElement[]
+  footer: ReactElement | null | (() => ReactElement) // render prop. usually to render the buttons for the footer.
+  padding?: string
+  title: string | null // specify this if the header text should be different than the modal's label
   // Optional props to pass to the GenericErrorPage in ErrorBoundary
-  errorSubject: string,
-  errorCategory: string,
-  errorImageUrl: string,
-
-  closeButtonSize: string
-}
-
-CanvasModal.defaultProps = {
-  padding: 'small',
-  errorImageUrl: errorShipUrl,
-  footer: null,
-  title: null,
-  closeButtonSize: 'small'
+  errorSubject?: string
+  errorCategory?: string
+  errorImageUrl?: string
+  closeButtonSize: 'small' | 'medium' | 'large' | undefined
+  [key: string]: any
 }
 
 export default function CanvasModal({
-  padding,
+  padding = 'small',
   errorSubject,
   errorCategory,
-  errorImageUrl,
+  errorImageUrl = errorShipUrl,
   label,
-  title,
+  title = null,
   onDismiss,
   children,
-  footer,
+  footer = null,
   closeButtonSize,
   ...otherModalProps
-}) {
+}: Props): ReactElement {
   if (title == null) title = label
 
   return (
     <Modal label={label} onDismiss={onDismiss} {...otherModalProps}>
       <Modal.Header>
         <Flex>
-          <Flex.Item grow>
+          <FlexItem grow>
             <Heading>{title}</Heading>
-          </Flex.Item>
-          <Flex.Item>
+          </FlexItem>
+          <FlexItem>
             <CloseButton
               onClick={onDismiss}
               size={closeButtonSize}
               screenReaderLabel={I18n.t('Close')}
             />
-          </Flex.Item>
+          </FlexItem>
         </Flex>
       </Modal.Header>
       <Modal.Body padding={padding}>

@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {string} from 'prop-types'
+import React, {ReactElement} from 'react'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -56,7 +55,19 @@ import Modal from '../shared/components/InstuiModal'
 
 ---
 */
-function getLiveRegion() {
+
+type Props = {
+  label: string
+  // InstUI has marked closeButtonLabel as deprecated, but we still allow it.
+  // if you just want the default of `I18n.t('Close')` don't pass anything,
+  // but if you want something different pass closeButtonLabel="something different"
+  closeButtonLabel?: string
+  onDismiss: () => void
+  children: ReactElement | ReactElement[]
+  [key: string]: any
+}
+
+function getLiveRegion(): HTMLElement | null {
   return document.getElementById('flash_screenreader_holder')
 }
 
@@ -66,7 +77,7 @@ export default function CanvasInstUIModal({
   onDismiss,
   children,
   ...otherPropsToPassOnToModal
-}) {
+}: Props): ReactElement {
   return (
     <Modal
       liveRegion={getLiveRegion}
@@ -89,16 +100,4 @@ export default function CanvasInstUIModal({
   )
 }
 
-['Header', 'Body', 'Footer'].forEach(prop => (CanvasInstUIModal[prop] = Modal[prop]))
-
-CanvasInstUIModal.propTypes = {
-  ...Modal.propTypes,
-  // InstUI has marked closeButtonLabel as deprecated, but we still allow it.
-  // if you just want the default of `I18n.t('Close')` don't pass anything,
-  // but if you want something different pass closeButtonLabel="something different"
-  closeButtonLabel: string
-}
-
-CanvasInstUIModal.defaultProps = {
-  closeButtonLabel: undefined
-}
+;['Header', 'Body', 'Footer'].forEach(prop => (CanvasInstUIModal[prop] = Modal[prop]))
