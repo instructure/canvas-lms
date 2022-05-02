@@ -75,9 +75,20 @@ export const InternalSettingsTable = (props: InternalSettingsTableProps) => {
   const sortedRows = useMemo(
     () =>
       [...props.internalSettings].sort((a, b) => {
-        if (a[sort.sortBy] < b[sort.sortBy]) {
+        let [aVal, bVal] = [a[sort.sortBy], b[sort.sortBy]] as (string | null | undefined)[]
+
+        if (aVal === null || aVal === undefined) {
           return sort.ascending ? -1 : 1
-        } else if (a[sort.sortBy] > b[sort.sortBy]) {
+        } else if (bVal === null || bVal === undefined) {
+          return sort.ascending ? 1 : -1
+        }
+
+        aVal = aVal.toLocaleLowerCase(window.navigator.language)
+        bVal = bVal.toLocaleLowerCase(window.navigator.language)
+
+        if (aVal < bVal) {
+          return sort.ascending ? -1 : 1
+        } else if (aVal > bVal) {
           return sort.ascending ? 1 : -1
         }
 
