@@ -149,6 +149,10 @@ Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
 
   LiveEvents.set_context(job.live_events_context)
 
+  Sentry.set_tags({
+                    jobs_cluster: job.current_shard.delayed_jobs_shard&.id
+                  })
+
   HostUrl.reset_cache!
   old_root_account = Attachment.current_root_account
   Attachment.current_root_account = job.account
