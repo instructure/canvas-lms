@@ -416,6 +416,116 @@ export const getCompression = createSelector(
   }
 )
 
+// sort module items by position or date
+// (blackout date type items don't have a position)
+function compareModuleItemOrder(a, b) {
+  if ('position' in a && 'position' in b) {
+    return a.position - b.position
+  }
+  if (!a.date && !!b.date) return -1
+  if (!!a.date && !b.date) return 1
+  if (!a.date && !b.date) return 0
+  if (a.date.isBefore(b.date)) return -1
+  if (a.date.isAfter(b.date)) return 1
+  return 0
+}
+
+// merge due dates into the module items,
+// then add blackout dates,
+// then sort so ordered for display
+export const mergeAssignmentsAndBlackoutDates = (
+  coursePace: CoursePace,
+  dueDates: CoursePaceItemDueDates,
+  blackoutDates: BlackoutDate[]
+) => {
+  // throw out any blackout dates before or after the pace start and end
+  // then strip down blackout dates and assign "start_date" to "date"
+  // for merging with assignment due dates
+  const paceStart = moment(coursePace.start_date)
+  const dueDateKeys = Object.keys(dueDates)
+  let veryLastDueDate = moment('3000-01-01T00:00:00Z')
+  if (dueDateKeys.length) {
+    veryLastDueDate = moment(dueDates[dueDateKeys[dueDateKeys.length - 1]])
+  }
+  const paceEnd = coursePace.end_date ? moment(coursePace.end_date) : veryLastDueDate
+  const boDates: Array<any> = blackoutDates
+    .filter(bd => {
+      if (bd.end_date.isBefore(paceStart)) return false
+      if (bd.start_date.isAfter(paceEnd)) return false
+      return true
+    })
+    // because due dates will never fall w/in a blackout period
+    // we can just deal with one end or the other when sorting into place.
+    // I chose blackout's start_date
+    .map(bd => ({
+      ...bd,
+      date: bd.start_date,
+      type: 'blackout_date'
+    }))
+
+  // merge due dates into module items
+  const modules = coursePace.modules
+  const modulesWithDueDates = modules.reduce(
+    (runningValue: Array<any>, module: Module): Array<any> => {
+      const assignmentDueDates: CoursePaceItemDueDates = dueDates
+
+      const assignmentsWithDueDate = module.items.map(item => {
+        const item_due = assignmentDueDates[item.module_item_id]
+        const due_at = item_due ? moment(item_due).endOf('day') : undefined
+        return {...item, date: due_at, type: 'assignment'}
+      })
+
+      runningValue.push({
+        ...module,
+        itemsWithDates: assignmentsWithDueDate,
+        moduleKey: `${module.id}-${Date.now()}`
+      })
+      return runningValue
+    },
+    []
+  )
+
+  // merge the blackout dates into each module's items
+  const modulesWithBlackoutDates = modulesWithDueDates.reduce(
+    (runningValue: Array<any>, module: any, index: number): Array<any> => {
+      const items = module.itemsWithDates
+
+      if (index === modulesWithDueDates.length - 1) {
+        // the last module gets the rest of the blackout dates
+        module.itemsWithDates.splice(module.itemsWithDates.length, 0, ...boDates)
+        module.itemsWithDates.sort(compareModuleItemOrder)
+      } else if (items.length) {
+        // find the blackout dates that occur before or during
+        // the item due dates
+        const lastDueDate = items[items.length - 1].date
+        let firstBoDateAfterModule = boDates.length
+        for (let i = 0; i < boDates.length; ++i) {
+          if (boDates[i].date.isAfter(lastDueDate)) {
+            firstBoDateAfterModule = i
+            break
+          }
+        }
+        // merge those blackout dates into the module items
+        // and remove them from the working list of blackout dates
+        const boDatesWithinModule = boDates.slice(0, firstBoDateAfterModule)
+        boDates.splice(0, firstBoDateAfterModule)
+        module.itemsWithDates.splice(module.itemsWithDates.length, 0, ...boDatesWithinModule)
+        module.itemsWithDates.sort(compareModuleItemOrder)
+      }
+      return runningValue.concat(module)
+    },
+    []
+  )
+  return modulesWithBlackoutDates
+}
+
+export const getModulesWithItemsMergedWithDueDatesAndBlackoutDates = createDeepEqualSelector(
+  getCoursePace,
+  getDueDates,
+  getBlackoutDates,
+  mergeAssignmentsAndBlackoutDates
+)
+
 /* Reducers */
 
 export default (

@@ -213,6 +213,13 @@ describe('Course paces actions', () => {
       // compress() POSTs a flattened and stripped-down version of the course pace
       expect(fetchMock.calls()[0][1]?.body).toEqual(
         JSON.stringify({
+          blackout_dates: [
+            {
+              event_title: 'Spring break',
+              start_date: '2022-03-21T00:00:00.000-06:00',
+              end_date: '2022-03-25T00:00:00.000-06:00'
+            }
+          ],
           course_pace: {
             start_date: updatedPace.start_date,
             end_date: updatedPace.end_date,

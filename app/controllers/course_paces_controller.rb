@@ -147,6 +147,14 @@ class CoursePacesController < ApplicationController
 
   def compress_dates
     @course_pace = @course.course_paces.new(create_params)
+    if params[:blackout_dates]
+      # keep the param.permit values in sync with BlackoutDatesController#blackout_date_params
+      # Note: we can replace blackout_dates on the course because the course never gets saved
+      # while doing the compressing
+      blackout_dates_params = params[:blackout_dates].map { |param| param.permit(:start_date, :end_date, :event_title) }
+      @course.blackout_dates.build(blackout_dates_params)
+    end
+
     unless @course_pace.valid?
       return render json: { success: false, errors: @course_pace.errors.full_messages }, status: :unprocessable_entity
     end

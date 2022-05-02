@@ -34,18 +34,17 @@ class CoursePaceHardEndDateCompressor
     return if compress_items_after && compress_items_after >= items.length - 1
     return items if items.empty?
 
+    blackout_dates = course_pace.course.blackout_dates
     start_date_of_item_group = start_date || enrollment&.start_at || course_pace.start_date
     end_date = course_pace.end_date || course_pace.course.end_at&.to_date || course_pace.course.enrollment_term&.end_at&.to_date
-    # when due dates run over and the end date is on a weekend, the adjustment to due dates
-    # is off by a day. Pull the end_date back to the previous friday.
-    if end_date && course_pace.exclude_weekends
-      wday = end_date.wday
-      if wday == 0 # sunday
-        end_date -= 2.days
-      elsif wday == 6 # saturday
-        end_date -= 1.day
-      end
+
+    unless CoursePacesDateHelpers.day_is_enabled?(start_date_of_item_group, course_pace.exclude_weekends, blackout_dates)
+      start_date_of_item_group = CoursePacesDateHelpers.first_enabled_day(start_date_of_item_group, course_pace.exclude_weekends, blackout_dates)
     end
+    unless end_date.nil? || CoursePacesDateHelpers.day_is_enabled?(end_date, course_pace.exclude_weekends, blackout_dates)
+      end_date = CoursePacesDateHelpers.previous_enabled_day(end_date, course_pace.exclude_weekends, blackout_dates)
+    end
+
     due_dates = CoursePaceDueDatesCalculator.new(course_pace).get_due_dates(items, enrollment, start_date: start_date_of_item_group)
 
     if compress_items_after
@@ -55,7 +54,7 @@ class CoursePaceHardEndDateCompressor
         due_dates[starting_item.id],
         1,
         course_pace.exclude_weekends,
-        course_pace.course.blackout_dates
+        blackout_dates
       )
       items = items[compress_items_after + 1..]
     end
@@ -65,7 +64,7 @@ class CoursePaceHardEndDateCompressor
       start_date_of_item_group,
       end_date,
       course_pace.exclude_weekends,
-      blackout_dates: course_pace.course.blackout_dates
+      blackout_dates: blackout_dates
     )
 
     # If the course pace hasn't been committed yet we are grouping the items by their module_item_id since the item.id is
@@ -81,7 +80,7 @@ class CoursePaceHardEndDateCompressor
       start_date_of_item_group,
       start_date_of_item_group > final_item_due_date ? start_date_of_item_group : final_item_due_date,
       course_pace.exclude_weekends,
-      blackout_dates: course_pace.course.blackout_dates
+      blackout_dates: blackout_dates
     )
 
     # This is the percentage that we should modify the plan by, so it hits our specified end date
@@ -104,7 +103,7 @@ class CoursePaceHardEndDateCompressor
         new_due_dates[key],
         course_pace.exclude_weekends,
         inclusive_end: false,
-        blackout_dates: course_pace.course.blackout_dates
+        blackout_dates: blackout_dates
       )
       adjusted_durations = shift_durations_down(rounded_durations, days_over)
       items = update_item_durations(items, adjusted_durations, save)

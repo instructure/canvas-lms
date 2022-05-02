@@ -32,9 +32,7 @@ export const sync = (blackoutDates: BlackoutDate[], course_id: string | number) 
     path,
     method: 'PUT',
     body: {
-      blackout_dates: blackoutDates.map(
-        (bd: BlackoutDate): ApiFormattedBlackoutDate => transformBlackoutDateForApi(bd)
-      )
+      blackout_dates: transformBlackoutDatesForApi(blackoutDates)
     }
   })
     .then(result => {
@@ -64,6 +62,14 @@ function transformBlackoutDateForApi(blackoutDate: BlackoutDate): ApiFormattedBl
     end_date: DateHelpers.formatDate(blackoutDate.end_date)
   }
   return formattedBlackoutDate
+}
+
+export function transformBlackoutDatesForApi(
+  blackoutDates: BlackoutDate[]
+): ApiFormattedBlackoutDate[] {
+  return blackoutDates.map(
+    (bd: BlackoutDate): ApiFormattedBlackoutDate => transformBlackoutDateForApi(bd)
+  )
 }
 
 function transformBlackoutDateFromApi(response: ApiFormattedBlackoutDate): BlackoutDate {

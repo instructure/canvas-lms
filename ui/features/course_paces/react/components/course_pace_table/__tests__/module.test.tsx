@@ -28,7 +28,7 @@ import {ModuleWithDueDates, CoursePaceItemWithDate} from '../../../types'
 
 const dueDates = ['2022-03-18T00:00:00-06:00', '2022-03-22T00:00:00-06:00']
 const module1: ModuleWithDueDates = {...(PACE_MODULE_1 as unknown as ModuleWithDueDates)}
-module1.items = module1.items.map(
+module1.itemsWithDates = module1.items.map(
   (item, index) =>
     ({
       ...item,
@@ -108,30 +108,13 @@ describe('Module', () => {
     ).toBeInTheDocument()
   })
 
-  it('merges assignments and blackout dates in the table', () => {
-    // the blackout dates fall between these 2 due dates
-    const module2 = {...module1, items: [...module1.items]}
-    module2.items.splice(1, 0, {
-      type: 'blackout_date' as const,
-      date: moment('2022-03-20T00:00:00-06:00'),
-      event_title: 'black me out',
-      start_date: moment('2022-03-21T00:00:00-06:00'),
-      end_date: moment('2022-03-22T00:00:00-06:00')
-    })
-
-    const {getAllByRole} = renderConnected(<Module {...defaultProps} module={module2} />)
-
-    const rows = getAllByRole('row')
-    expect(rows.length).toEqual(4)
-    expect(getByText(rows[1], 'Fri, Mar 18, 2022')).toBeInTheDocument()
-    expect(getByText(rows[2], 'Mon, Mar 21, 2022')).toBeInTheDocument()
-    expect(getByText(rows[2], 'Tue, Mar 22, 2022')).toBeInTheDocument()
-    expect(getByText(rows[3], 'Tue, Mar 22, 2022')).toBeInTheDocument()
-  })
-
   it('In stacked format, blackout dates do not include the status entry', () => {
-    const module2 = {...module1, items: [...module1.items]}
-    module2.items.splice(1, 0, {
+    const module2 = {
+      ...module1,
+      items: [...module1.items],
+      itemsWithDates: [...module1.itemsWithDates]
+    }
+    module2.itemsWithDates.splice(1, 0, {
       type: 'blackout_date' as const,
       date: moment('2022-03-20T00:00:00-06:00'),
       event_title: 'black me out',

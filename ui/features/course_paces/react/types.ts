@@ -76,11 +76,9 @@ interface ItemDueDate {
 // after module items are merged with their due dates and blackout dates
 export type CoursePaceItemWithDate = ItemDueDate & (CoursePaceItem | BlackoutDate)
 
-export interface ModuleWithDueDates {
-  readonly id: string
-  readonly name: string
-  readonly position: number
-  items: CoursePaceItemWithDate[]
+export interface ModuleWithDueDates extends Module {
+  moduleKey: string
+  itemsWithDates: CoursePaceItemWithDate[]
 }
 
 export type PaceContextTypes = 'Course' | 'Section' | 'Enrollment'
