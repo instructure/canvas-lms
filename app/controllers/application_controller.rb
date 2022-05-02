@@ -2747,7 +2747,8 @@ class ApplicationController < ActionController::Base
                      "assignments",
                      "discussion_topic",
                      (permissions[:manage] || current_user_has_been_observer_in_this_course) && "all_dates",
-                     permissions[:manage] && "module_ids"
+                     permissions[:manage] && "module_ids",
+                     peer_reviews_for_a2_enabled? && "assessment_requests"
                    ].reject(&:blank?),
                    exclude_response_fields: ["description", "rubric"],
                    exclude_assignment_submission_types: ["wiki_page"],
@@ -2925,6 +2926,11 @@ class ApplicationController < ActionController::Base
 
   def recaptcha_enabled?
     DynamicSettings.find(tree: :private)["recaptcha_server_key"].present? && @domain_root_account.self_registration_captcha?
+  end
+
+  def peer_reviews_for_a2_enabled?
+    current_user_is_student = @context.respond_to?(:user_is_student?) && @context.user_is_student?(@current_user)
+    current_user_is_student && @context.respond_to?(:feature_enabled?) && @context.feature_enabled?(:peer_reviews_for_a2)
   end
 
   # Show Student View button on the following controller/action pages, as long as defined tabs are not hidden

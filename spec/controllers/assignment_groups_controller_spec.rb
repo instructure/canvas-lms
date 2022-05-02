@@ -452,6 +452,99 @@ describe AssignmentGroupsController do
         end
       end
     end
+
+    context "passing include_param assessment_requests", type: :request do
+      before(:once) do
+        course_with_teacher(active_all: true)
+        @student1 = student_in_course(course: @course, active_enrollment: true).user
+        @student2 = student_in_course(course: @course, active_enrollment: true).user
+
+        @assignment = @course.assignments.create!(name: "Assignment 1", peer_reviews: true)
+
+        @assessment_request = AssessmentRequest.create!(
+          asset: @assignment.submission_for_student(@student2),
+          user: @student2,
+          assessor: @student1,
+          assessor_asset: @assignment.submission_for_student(@student1)
+        )
+      end
+
+      let(:json) do
+        api_call_as_user(
+          @student1,
+          :get,
+          "/api/v1/courses/#{@course.id}/assignment_groups?include[]=assignments&include[]=assessment_requests",
+          {
+            controller: "assignment_groups",
+            action: "index",
+            format: "json",
+            course_id: @course.id,
+            include: ["assignments", "assessment_requests"]
+          }
+        )
+      end
+
+      context "peer_reviews_for_a2 FF disabled" do
+        before(:once) do
+          @course.disable_feature! :peer_reviews_for_a2
+        end
+
+        it "does not include assessment_requests when the current user is a teacher" do
+          json = api_call_as_user(@teacher, :get,
+                                  "/api/v1/courses/#{@course.id}/assignment_groups?include[]=assignments&include[]=assessment_requests", {
+                                    controller: "assignment_groups",
+                                    action: "index",
+                                    format: "json",
+                                    course_id: @course.id,
+                                    include: ["assignments", "assessment_requests"]
+                                  })
+          expect(json[0]["assignments"][0]["assessment_requests"]).not_to be_present
+        end
+
+        it "does not include assessment_requests when the current user is a student" do
+          expect(json[0]["assignments"][0]["assessment_requests"]).not_to be_present
+        end
+      end
+
+      context "peer_reviews_for_a2 FF enabled" do
+        before(:once) do
+          @course.enable_feature! :peer_reviews_for_a2
+        end
+
+        it "does not include assessment_requests when the current user is a teacher" do
+          json = api_call_as_user(@teacher, :get,
+                                  "/api/v1/courses/#{@course.id}/assignment_groups?include[]=assignments&include[]=assessment_requests", {
+                                    controller: "assignment_groups",
+                                    action: "index",
+                                    format: "json",
+                                    course_id: @course.id,
+                                    include: ["assignments", "assessment_requests"]
+                                  })
+          expect(json[0]["assignments"][0]["assessment_requests"]).not_to be_present
+        end
+
+        it "includes assessment_requests when the current user is a student" do
+          expect(json[0]["assignments"][0]["assessment_requests"]).to be_present
+        end
+
+        it "includes workflow_state, anonymous_id when the assignment has anonymous_peer_reviews enabled" do
+          @assignment.update_attribute(:anonymous_peer_reviews, true)
+
+          assessment_request = json[0]["assignments"][0]["assessment_requests"][0]
+          expect(assessment_request["workflow_state"]).to eq @assessment_request.workflow_state
+          expect(assessment_request["anonymous_id"]).to eq @assessment_request.asset.anonymous_id
+        end
+
+        it "includes workflow_state, user_id, user_name when the assignment has anonymous_peer_reviews disabled" do
+          @assignment.update_attribute(:anonymous_peer_reviews, false)
+
+          assessment_request = json[0]["assignments"][0]["assessment_requests"][0]
+          expect(assessment_request["workflow_state"]).to eq @assessment_request.workflow_state
+          expect(assessment_request["user_id"]).to eq @assessment_request.user.id
+          expect(assessment_request["user_name"]).to eq @assessment_request.user.name
+        end
+      end
+    end
   end
 
   describe "POST 'reorder'" do

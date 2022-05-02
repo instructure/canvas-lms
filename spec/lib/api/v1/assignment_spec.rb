@@ -157,6 +157,50 @@ describe "Api::V1::Assignment" do
       end
     end
 
+    context "include_assessment_requests" do
+      before do
+        @assignment = assignment_model
+        @assignment.update_attribute(:peer_reviews, true)
+
+        @student1 = @assignment.course.enroll_student(User.create!, enrollment_state: "active").user
+        @student2 = @assignment.course.enroll_student(User.create!, enrollment_state: "active").user
+
+        @assessment_request = AssessmentRequest.create!(
+          asset: @assignment.submission_for_student(@student2),
+          user: @student2,
+          assessor: @student1,
+          assessor_asset: @assignment.submission_for_student(@student1)
+        )
+      end
+
+      it "includes assessment_requests list when the flag is enabled" do
+        json = api.assignment_json(@assignment, @student1, session, { include_assessment_requests: false })
+        expect(json["assessment_requests"]).not_to be_present
+      end
+
+      it "excludes assessment_requests list when the flag is disabled" do
+        json = api.assignment_json(@assignment, @student1, session, { include_assessment_requests: true })
+        expect(json["assessment_requests"]).to be_present
+      end
+
+      it "includes workflow_state, user_id, user_name when anonymous_peer_reviews is false" do
+        @assignment.update_attribute(:anonymous_peer_reviews, false)
+        json = api.assignment_json(@assignment, @student1, session, { include_assessment_requests: true })
+        assessment_request = json["assessment_requests"][0]
+        expect(assessment_request["workflow_state"]).to eq @assessment_request.workflow_state
+        expect(assessment_request["user_id"]).to eq @assessment_request.user.id
+        expect(assessment_request["user_name"]).to eq @assessment_request.user.name
+      end
+
+      it "includes workflow_state, anonymous_id when anonymous_peer_reviews is true" do
+        @assignment.update_attribute(:anonymous_peer_reviews, true)
+        json = api.assignment_json(@assignment, @student1, session, { include_assessment_requests: true })
+        assessment_request = json["assessment_requests"][0]
+        expect(assessment_request["workflow_state"]).to eq @assessment_request.workflow_state
+        expect(assessment_request["anonymous_id"]).to eq @assessment_request.asset.anonymous_id
+      end
+    end
+
     context "for a quiz" do
       before do
         @assignment = assignment_model
