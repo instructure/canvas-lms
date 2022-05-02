@@ -286,27 +286,6 @@ describe "student groups" do
           end
         end
       end
-
-      it "add/remove plurality to the word 'student' if one student", priority: "2" do
-        skip("KNO-183")
-        fln("Manage").click
-        wait_for_ajaximations
-
-        # add the first student that isn't the current student
-        second_student_checkbox = ffj(".checkbox:visible")[1]
-        second_student_checkbox.click
-        wait_for_animations
-
-        f("button.confirm-dialog-confirm-btn").click
-
-        # expect plural of the word 'student'
-        expect(f(".student-group-students")).to include_text("students")
-
-        # leave the group
-        f(".student-group-join a").click
-
-        expect(f(".student-group-students")).to include_text("1 student")
-      end
     end
   end
 end
