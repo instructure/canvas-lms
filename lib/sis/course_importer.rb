@@ -187,6 +187,11 @@ module SIS
 
           update_enrollments = !course.new_record? && !(course.changes.keys & %w[workflow_state name course_code]).empty?
 
+          # republish course paces if necessary
+          if !course.new_record? && course.account.feature_enabled?(:course_paces) && (course.changes.keys & %w[start_at conclude_at restrict_enrollments_to_course_dates]).present?
+            course.course_paces.find_each(&:create_publish_progress)
+          end
+
           if course_format
             course_format = nil if course_format == "not_set"
             if course_format != course.course_format
