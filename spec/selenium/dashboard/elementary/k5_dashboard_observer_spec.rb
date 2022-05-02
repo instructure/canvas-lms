@@ -166,6 +166,7 @@ describe "observer k5 dashboard" do
     end
 
     it "shows the observers name first if observer is also a student" do
+      skip("LS-3152: failing about half the time - showing the student not the observer")
       course_with_student(
         active_all: true,
         user: @observer,
@@ -250,6 +251,7 @@ describe "observer k5 dashboard" do
     end
 
     it "shows the observers name first if observer is also a student" do
+      skip("LS-3152: failing about half the time - showing the student not the observer")
       course_with_student(
         active_all: true,
         user: @observer,
