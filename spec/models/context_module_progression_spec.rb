@@ -421,4 +421,32 @@ describe ContextModuleProgression do
       expect(progression.collapsed?).to be_falsey
     end
   end
+
+  describe "live events" do
+    before do
+      @progression = @module.evaluate_for(@user)
+    end
+
+    it "sends live event when requirements_met is updated" do
+      expect(Canvas::LiveEvents).to receive(:course_progress).once
+      @progression.requirements_met = ["yay"]
+      @progression.save!
+    end
+
+    it "does not trigger live event when requirement_met isn't changed" do
+      expect(Canvas::LiveEvents).not_to receive(:course_progress)
+      @progression.workflow_state = "completed"
+      @progression.save!
+    end
+
+    it "does not trigger live event if requirements_met gets smaller" do
+      @progression.requirements_met = %w[yay woohoo]
+      @progression.save!
+
+      expect(Canvas::LiveEvents).not_to receive(:course_progress)
+      @progression.workflow_state = "completed"
+      @progression.requirements_met = ["woohoo"]
+      @progression.save!
+    end
+  end
 end
