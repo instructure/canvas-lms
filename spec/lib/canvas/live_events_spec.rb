@@ -1533,6 +1533,7 @@ describe Canvas::LiveEvents do
       context_module_progression = context_module.context_module_progressions.create!(user_id: user.id)
       context_module_progression.workflow_state = "completed"
       context_module_progression.completed_at = Time.now
+      context_module_progression.requirements_met = ["all of them"]
 
       allow(Rails.env).to receive(:production?).and_return(true)
 
