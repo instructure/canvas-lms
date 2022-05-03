@@ -878,16 +878,12 @@ class ContextModule < ActiveRecord::Base
     progression = nil
     shard.activate do
       GuardRail.activate(:primary) do
-        progression = context_module_progressions.where(user_id: user).first
-        if !progression && context.enrollments.except(:preload).where(user_id: user).exists? # check if we should even be creating a progression for this user
-          self.class.unique_constraint_retry do |retry_count|
-            progression = context_module_progressions.where(user_id: user).first if retry_count > 0
-            progression ||= context_module_progressions.create!(user: user)
-          end
+        if context.enrollments.except(:preload).where(user_id: user).exists?
+          progression = ContextModuleProgression.create_and_ignore_on_duplicate(user: user, context_module: self)
+          progression ||= context_module_progressions.where(user_id: user).first
         end
       end
     end
-    progression.context_module = self if progression
     progression
   end
 

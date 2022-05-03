@@ -701,6 +701,41 @@ class ActiveRecord::Base
 
   scope :non_shadow, ->(key = primary_key) { where("#{key}<=? AND #{key}>?", Shard::IDS_PER_SHARD, 0) }
 
+  def self.create_and_ignore_on_duplicate(*args)
+    # FIXME: handle array fields and setting of nulls where those are not the default
+    model = new(*args)
+    attributes = []
+    values = []
+
+    model.run_callbacks :validation do
+      raise model.errors.full_messages.first unless model.valid?
+    end
+
+    model.run_callbacks :create do
+      timestamps = %w[created_at updated_at]
+      model.attributes.each do |attribute, value|
+        value = "NOW()" if timestamps.include? attribute
+        next if (model[attribute].nil? && !(timestamps.include? attribute)) || value.is_a?(Array)
+
+        values << connection.quote(value)
+        attributes << connection.quote_column_name(attribute)
+      end
+
+      insert_sql = <<~SQL.squish
+        INSERT INTO #{quoted_table_name}
+                    (#{attributes.join(",")})
+             VALUES (#{values.join(",")})
+        ON CONFLICT DO NOTHING
+      SQL
+
+      result = connection.exec_insert(insert_sql)
+
+      return find(result.last["id"]) unless result.last.nil?
+
+      false
+    end
+  end
+
   # skips validations, callbacks, and a transaction
   # do _NOT_ improve in the future to handle validations and callbacks - make
   # it a separate method or optional functionality. some callers explicitly
