@@ -180,7 +180,7 @@ module Lti
       #
       # @returns LineItem
       def update
-        line_item.update!(line_item_params.except(:end_date_time))
+        line_item.update!(line_item_params)
         update_assignment! if line_item.assignment_line_item?
         render json: LineItemsSerializer.new(line_item, line_item_id(line_item)),
                content_type: MIME_TYPE
