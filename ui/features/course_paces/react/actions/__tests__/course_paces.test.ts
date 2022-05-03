@@ -256,26 +256,6 @@ describe('Course paces actions', () => {
   })
 
   describe('syncUnpublishedChanges', () => {
-    beforeEach(() => {
-      ENV.FEATURES ||= {}
-      ENV.FEATURES.course_paces_blackout_dates = true
-    })
-
-    it('dispatches publishPace only if flag is not enabled', async () => {
-      ENV.FEATURES.course_paces_blackout_dates = false
-      const asyncDispatch = jest.fn(() => Promise.resolve())
-      const updatedPace = {...PRIMARY_PACE, excludeWeekends: false}
-      const getState = mockGetState(updatedPace, PRIMARY_PACE, {
-        syncing: SyncState.UNSYNCED,
-        blackoutDates: BLACKOUT_DATES
-      })
-
-      const thunkedAction = coursePaceActions.syncUnpublishedChanges()
-      await thunkedAction(asyncDispatch, getState)
-
-      expect(asyncDispatch.mock.calls.length).toBe(2)
-    })
-
     it('saves blackout dates and publishes the pace', async () => {
       const asyncDispatch = jest.fn(() => Promise.resolve())
       const updatedPace = {...PRIMARY_PACE, excludeWeekends: false}

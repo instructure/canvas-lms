@@ -51,8 +51,6 @@ beforeAll(() => {
     end_at: {date: COURSE.start_at, date_context: 'course'},
     start_at: {date: COURSE.end_at, date_context: 'course'}
   }
-  window.ENV.FEATURES ||= {}
-  window.ENV.FEATURES.course_paces_blackout_dates = true
 })
 afterEach(() => {
   jest.clearAllMocks()
