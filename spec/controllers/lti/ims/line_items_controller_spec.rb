@@ -148,6 +148,7 @@ module Lti
               label: label,
               resourceId: resource_id,
               tag: tag,
+              endDateTime: end_date_time.iso8601,
               resourceLinkId: item.resource_link.resource_link_uuid
             }.with_indifferent_access
 
@@ -205,7 +206,8 @@ module Lti
               scoreMaximum: score_max.to_f,
               label: label,
               resourceId: resource_id,
-              tag: tag
+              tag: tag,
+              endDateTime: end_date_time.iso8601
             }.with_indifferent_access
 
             expect(parsed_response_body).to eq expected_response
@@ -329,6 +331,7 @@ module Lti
                 :label => label,
                 :resourceId => resource_id,
                 :tag => tag,
+                :endDateTime => end_date_time.iso8601,
                 :resourceLinkId => item.resource_link.resource_link_uuid
               }.with_indifferent_access
 
