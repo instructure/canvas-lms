@@ -125,7 +125,7 @@ const thunkActions = {
     return (dispatch, getState) => {
       dispatch(uiActions.clearCategoryError('publish'))
 
-      if (ENV.FEATURES.course_paces_blackout_dates && getBlackoutDatesUnsynced(getState())) {
+      if (getBlackoutDatesUnsynced(getState())) {
         dispatch(uiActions.startSyncing())
         return dispatch(blackoutDateActions.syncBlackoutDates())
           .then(() => {
