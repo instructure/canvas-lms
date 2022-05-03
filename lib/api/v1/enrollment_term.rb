@@ -20,7 +20,7 @@
 module Api::V1::EnrollmentTerm
   include Api::V1::Json
 
-  def enrollment_term_json(enrollment_term, user, session, enrollments = [], includes = [])
+  def enrollment_term_json(enrollment_term, user, session, enrollments = [], includes = [], course_counts = nil)
     api_json(enrollment_term, user, session, only: %w[id name start_at end_at workflow_state grading_period_group_id created_at]).tap do |hash|
       hash["sis_term_id"] = enrollment_term.sis_source_id if enrollment_term.root_account.grants_any_right?(user, :read_sis, :manage_sis)
       if enrollment_term.root_account.grants_right?(user, :manage_sis)
@@ -28,6 +28,10 @@ module Api::V1::EnrollmentTerm
       end
       hash["start_at"], hash["end_at"] = enrollment_term.overridden_term_dates(enrollments) if enrollments.present?
       hash["overrides"] = date_overrides_json(enrollment_term) if includes.include?("overrides")
+      if includes.include?("course_count")
+        counts = course_counts || EnrollmentTerm.course_counts(enrollment_term)
+        hash["course_count"] = counts[enrollment_term.id] || 0
+      end
     end
   end
 
@@ -35,7 +39,8 @@ module Api::V1::EnrollmentTerm
     if includes.include?("overrides")
       ActiveRecord::Associations::Preloader.new.preload(enrollment_terms, :enrollment_dates_overrides)
     end
-    enrollment_terms.map { |t| enrollment_term_json(t, user, session, enrollments, includes) }
+    course_counts = EnrollmentTerm.course_counts(enrollment_terms) if includes.include?("course_count")
+    enrollment_terms.map { |t| enrollment_term_json(t, user, session, enrollments, includes, course_counts) }
   end
 
   protected def date_overrides_json(term)
