@@ -504,8 +504,8 @@ module Lti
                   let(:content_items) do
                     [
                       { type: "ltiResourceLink", url: "http://tool.url", iframe: { width: 642, height: 842 }, title: "Item 1" },
-                      { type: "ltiResourceLink", url: "http://tool.url", iframe: { width: 642, height: 842 }, title: "Item 2" },
-                      { type: "ltiResourceLink", url: "http://tool.url", iframe: { width: 642, height: 842 }, title: "Item 3" }
+                      { type: "ltiResourceLink", url: "http://tool.url", iframe: { width: 642 }, title: "Item 2" },
+                      { type: "ltiResourceLink", url: "http://tool.url", iframe: { height: 842 }, title: "Item 3" }
                     ]
                   end
 
@@ -513,6 +513,12 @@ module Lti
                     expect(subject).to be_successful
                     expect(context_module.content_tags[0][:link_settings]["selection_width"]).to be(642)
                     expect(context_module.content_tags[0][:link_settings]["selection_height"]).to be(842)
+
+                    expect(context_module.content_tags[1][:link_settings]["selection_width"]).to be(642)
+                    expect(context_module.content_tags[1][:link_settings]["selection_height"]).to be(nil)
+
+                    expect(context_module.content_tags[2][:link_settings]["selection_width"]).to be(nil)
+                    expect(context_module.content_tags[2][:link_settings]["selection_height"]).to be(842)
                   end
                 end
 
