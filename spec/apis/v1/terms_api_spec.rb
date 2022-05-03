@@ -141,6 +141,12 @@ describe TermsApiController, type: :request do
                                                                ])
     end
 
+    it "includes course count if requested" do
+      2.times { course_factory(active_all: true, account: @account, enrollment_term_id: @term1.id) }
+      json = get_terms(include: ["course_count"])
+      expect(json.map { |t| t["course_count"] }).to match_array([2, 0])
+    end
+
     describe "authorization" do
       def expect_terms_index_401
         api_call(:get, "/api/v1/accounts/#{@account.id}/terms",
@@ -218,10 +224,16 @@ describe TermsApiController, type: :request do
       expect(json["sis_import_id"]).to eq sis_batch.id
     end
 
-    it "includes overrides by default if requested" do
+    it "includes overrides" do
       @term.set_overrides(@account, "StudentEnrollment" => { end_at: "2017-01-20T00:00:00Z" })
       json = get_term
       expect(json["overrides"]).to eq({ "StudentEnrollment" => { "start_at" => nil, "end_at" => "2017-01-20T00:00:00Z" } })
+    end
+
+    it "includes course count" do
+      course_factory(active_all: true, account: @account, enrollment_term_id: @term.id)
+      json = get_term
+      expect(json["course_count"]).to eq 1
     end
 
     describe "authorization" do
