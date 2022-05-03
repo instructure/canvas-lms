@@ -557,8 +557,15 @@ class ApplicationController < ActionController::Base
 
     link_settings = @tag&.link_settings || {}
 
-    tool_dimensions.each do |k, v|
-      tool_dimensions[k] = link_settings[k.to_s] || @tool.settings[k] || v
+    tool_dimensions.each do |k, _v|
+      # it may happen that we get "link_settings"=>{"selection_width"=>"", "selection_height"=>""}
+      if link_settings[k.to_s].present?
+        tool_dimensions[k] = link_settings[k.to_s]
+      elsif @tool.settings[k] && @tool.settings[k] != 0
+        # ContextExternalTool#normalize_sizes! converts settings[:selection_width] and settings[:selection_height] to integer
+        tool_dimensions[k] = @tool.settings[k]
+      end
+
       tool_dimensions[k] = tool_dimensions[k].to_s << "px" unless /%|px/.match?(tool_dimensions[k].to_s)
     end
 
