@@ -1405,30 +1405,155 @@ RSpec.describe ApplicationController do
             allow(content_tag).to receive(:id).and_return(42)
           end
 
-          it "uses selection_width and selection_height if provided" do
-            controller.send(:content_tag_redirect, course, content_tag, nil)
+          context "when ContentTag provides selection_width or selection_height" do
+            before do
+              content_tag.update(link_settings: { selection_width: 543, selection_height: 321 })
+            end
 
-            expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq "500px"
-            expect(assigns[:lti_launch].tool_dimensions[:selection_height]).to eq "300px"
+            it "uses selection_width and selection_height from the ContentTag if provided" do
+              controller.send(:content_tag_redirect, course, content_tag, nil)
+
+              expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq "543px"
+              expect(assigns[:lti_launch].tool_dimensions[:selection_height]).to eq "321px"
+            end
+
+            it "uses selection_width from tool.settings[\"selection_width\"] if the ContentTag's is nil" do
+              content_tag.update(link_settings: { selection_width: nil, selection_height: 321 })
+              controller.send(:content_tag_redirect, course, content_tag, nil)
+
+              expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq "500px"
+              expect(assigns[:lti_launch].tool_dimensions[:selection_height]).to eq "321px"
+            end
+
+            it "uses selection_width from tool.settings[\"selection_width\"] if the ContentTag's is \"\"" do
+              content_tag.update(link_settings: { selection_width: "", selection_height: 321 })
+              controller.send(:content_tag_redirect, course, content_tag, nil)
+
+              expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq "500px"
+              expect(assigns[:lti_launch].tool_dimensions[:selection_height]).to eq "321px"
+            end
+
+            it "uses selection_height from tool.settings[\"selection_height\"] if the ContentTag`s is nil" do
+              content_tag.update(link_settings: { selection_width: 543, selection_height: nil })
+              controller.send(:content_tag_redirect, course, content_tag, nil)
+
+              expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq "543px"
+              expect(assigns[:lti_launch].tool_dimensions[:selection_height]).to eq "300px"
+            end
+
+            it "uses selection_height from tool.settings[\"selection_height\"] if the ContentTag`s is \"\"" do
+              content_tag.update(link_settings: { selection_width: 543, selection_height: "" })
+              controller.send(:content_tag_redirect, course, content_tag, nil)
+
+              expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq "543px"
+              expect(assigns[:lti_launch].tool_dimensions[:selection_height]).to eq "300px"
+            end
           end
 
-          it "uses selection_width and selection_height from the ContentTag if provided" do
-            content_tag.update(link_settings: { selection_width: 543, selection_height: 321 })
-            controller.send(:content_tag_redirect, course, content_tag, nil)
+          context "when ContentTag doesn't have link_settings and tool.settings provides selection_width or selection_height" do
+            # ContextExternalTool#normalize_sizes! converts settings[:selection_width] and settings[:selection_height] to integer
 
-            expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq "543px"
-            expect(assigns[:lti_launch].tool_dimensions[:selection_height]).to eq "321px"
+            it "uses selection_width and selection_height from the tool.settings if provided" do
+              controller.send(:content_tag_redirect, course, content_tag, nil)
+
+              expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq "500px"
+              expect(assigns[:lti_launch].tool_dimensions[:selection_height]).to eq "300px"
+            end
+
+            it "uses 100% for selection_width when is not provided by tool.settings" do
+              tool.update(settings: { selection_height: 300 })
+              controller.send(:content_tag_redirect, course, content_tag, nil)
+
+              expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq "100%"
+              expect(assigns[:lti_launch].tool_dimensions[:selection_height]).to eq "300px"
+            end
+
+            it "uses 100% for selection_width when tool.settings[\"selection_width\"] is nil" do
+              tool.update(settings: { selection_width: nil, selection_height: 300 })
+              controller.send(:content_tag_redirect, course, content_tag, nil)
+
+              expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq "100%"
+              expect(assigns[:lti_launch].tool_dimensions[:selection_height]).to eq "300px"
+            end
+
+            it "uses 100% for selection_width when tool.settings[\"selection_width\"] is 0" do
+              tool.update(settings: { selection_width: 0, selection_height: 300 })
+              controller.send(:content_tag_redirect, course, content_tag, nil)
+
+              expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq "100%"
+              expect(assigns[:lti_launch].tool_dimensions[:selection_height]).to eq "300px"
+            end
+
+            it "uses 100% for selection_width when tool.settings[\"selection_width\"] is \"\"" do
+              tool.update(settings: { selection_width: "", selection_height: 300 })
+              controller.send(:content_tag_redirect, course, content_tag, nil)
+
+              expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq "100%"
+              expect(assigns[:lti_launch].tool_dimensions[:selection_height]).to eq "300px"
+            end
+
+            it "uses 100% for selection_height when is not provided" do
+              tool.update(settings: { selection_width: 500 })
+              controller.send(:content_tag_redirect, course, content_tag, nil)
+
+              expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq "500px"
+              expect(assigns[:lti_launch].tool_dimensions[:selection_height]).to eq "100%"
+            end
+
+            it "uses 100% for selection_height when tool.settings[\"selection_height\"] is nil" do
+              tool.update(settings: { selection_width: 500, selection_height: nil })
+              controller.send(:content_tag_redirect, course, content_tag, nil)
+
+              expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq "500px"
+              expect(assigns[:lti_launch].tool_dimensions[:selection_height]).to eq "100%"
+            end
+
+            it "uses 100% for selection_height when tool.settings[\"selection_height\"] is 0" do
+              tool.update(settings: { selection_width: 500, selection_height: 0 })
+              controller.send(:content_tag_redirect, course, content_tag, nil)
+
+              expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq "500px"
+              expect(assigns[:lti_launch].tool_dimensions[:selection_height]).to eq "100%"
+            end
+
+            it "uses 100% for selection_height when tool.settings[\"selection_height\"] is \"\"" do
+              tool.update(settings: { selection_width: 500, selection_height: "" })
+              controller.send(:content_tag_redirect, course, content_tag, nil)
+
+              expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq "500px"
+              expect(assigns[:lti_launch].tool_dimensions[:selection_height]).to eq "100%"
+            end
           end
 
-          it "appends px to tool dimensions only when needed" do
-            tool.settings = {}
-            tool.save!
-            content_tag = ContentTag.create(content: tool, url: tool.url)
+          context do
+            it "appends px to tool dimensions when receives numeric values" do
+              tool.update(settings: { selection_width: 50, selection_height: 90 })
+              controller.send(:content_tag_redirect, course, content_tag, nil)
 
-            controller.send(:content_tag_redirect, course, content_tag, nil)
+              expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq "50px"
+              expect(assigns[:lti_launch].tool_dimensions[:selection_height]).to eq "90px"
+            end
 
-            expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq "100%"
-            expect(assigns[:lti_launch].tool_dimensions[:selection_height]).to eq "100%"
+            it "does not appends px to tool dimensions when dimensions already have px or %" do
+              content_tag.update(link_settings: { selection_width: "543px", selection_height: "90%" })
+              controller.send(:content_tag_redirect, course, content_tag, nil)
+
+              expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq "543px"
+              expect(assigns[:lti_launch].tool_dimensions[:selection_height]).to eq "90%"
+            end
+
+            it "does not appends px to tool dimensions when ContentTag and tool.settings don't provide the dimensions" do
+              # in this case, it will use the default values: { selection_width: "100%", selection_height: "100%" }
+              # see ApplicationController#tool_dimensions
+              tool.settings = {}
+              tool.save!
+              content_tag = ContentTag.create(content: tool, url: tool.url)
+
+              controller.send(:content_tag_redirect, course, content_tag, nil)
+
+              expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq "100%"
+              expect(assigns[:lti_launch].tool_dimensions[:selection_height]).to eq "100%"
+            end
           end
         end
       end
