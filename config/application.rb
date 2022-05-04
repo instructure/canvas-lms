@@ -270,10 +270,6 @@ module CanvasRails
     # since that could leak information (e.g. valid vs invalid username on
     # login page)
     config.action_view.field_error_proc = proc { |html_tag, _instance| html_tag }
-    # The issue being mitigated here is solved by https://github.com/rails/rails/pull/42056
-    if Rails.version >= "6.1" && Rails.version < "7.0"
-      config.action_view.preload_links_header = false
-    end
 
     class ExceptionsApp
       def call(env)
