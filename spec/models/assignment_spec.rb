@@ -9902,6 +9902,13 @@ describe Assignment do
             expect(assignment.line_items.first.resource_link.current_external_tool(assignment.context)).to eq tool
           end
 
+          context "and the points_possible is set to nil" do
+            it "sets the line_item score_maximum to 0" do
+              assignment.update!(submission_types: "none", points_possible: nil)
+              expect(assignment.reload.line_items.first.score_maximum).to eq(0)
+            end
+          end
+
           it_behaves_like "assignment to line item attribute sync check"
         end
       end
