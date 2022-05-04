@@ -72,11 +72,12 @@ describe('MessageDetailContainer', () => {
     onReplyAll = jest.fn(),
     onDelete = jest.fn(),
     onForward = jest.fn(),
+    setOnSuccess = jest.fn(),
     overrideProps = {}
   } = {}) =>
     render(
       <ApolloProvider client={mswClient}>
-        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess}}>
           <ConversationContext.Provider value={{isSubmissionCommentsType}}>
             <MessageDetailContainer
               conversation={conversation}
@@ -160,6 +161,19 @@ describe('MessageDetailContainer', () => {
         expect(mockOnReplyAll.mock.calls[0][0]._id).toBe(
           mockConversation.conversationMessagesConnection.nodes[1]._id
         )
+      })
+
+      it('should mark loaded conversation as read', async () => {
+        const mockSetOnSuccess = jest.fn()
+        const container = setup({
+          setOnSuccess: mockSetOnSuccess,
+          conversation: {...Conversation.mock(), workflowState: 'unread'}
+        })
+        // wait for query to load
+        await container.findAllByTestId('message-more-options')
+
+        await waitForApolloLoading()
+        expect(mockSetOnSuccess).toHaveBeenCalled()
       })
     })
   })
