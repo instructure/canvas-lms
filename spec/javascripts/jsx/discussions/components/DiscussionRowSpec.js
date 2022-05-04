@@ -260,7 +260,7 @@ test('renders locked at if appropriate', () => {
   const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
   const node = tree.find('.discussion-availability')
   ok(node.exists())
-  ok(node.text().includes('Was locked at'))
+  ok(node.text().includes('No longer available'))
   // We need a relative date to ensure past-ness, so we can't really insist
   // on a given date element appearing this time
   tree.unmount()

@@ -305,7 +305,7 @@ export class DiscussionRow extends Component {
     }
     if (availabilityEnd) {
       if (isPassedDelayedPostAt({checkDate: null, delayedDate: availabilityEnd})) {
-        return I18n.t('Was locked at %{date}', {date: $.datetimeString(availabilityEnd)})
+        return I18n.t('No longer available')
       } else {
         return I18n.t('Available until %{date}', {date: $.datetimeString(availabilityEnd)})
       }
