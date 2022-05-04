@@ -1180,7 +1180,7 @@ class Assignment < ActiveRecord::Base
       elsif saved_change_to_title? || saved_change_to_points_possible?
         line_items
           .find(&:assignment_line_item?)
-          &.update!(label: title, score_maximum: points_possible)
+          &.update!(label: title, score_maximum: points_possible || 0)
       end
 
       if lti_1_3_external_tool_tag? && !lti_resource_links.empty?
