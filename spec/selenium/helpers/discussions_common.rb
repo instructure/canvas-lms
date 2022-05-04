@@ -114,14 +114,13 @@ module DiscussionsCommon
 
   def click_entry_option(discussion_entry, menu_item_selector)
     li_selector = "#entry-#{discussion_entry.id}"
-    expect(fj(li_selector)).to be_displayed
+    wait_for(method: nil, timeout: 2) { fj(li_selector).displayed? }
     menu_button = fj("#{li_selector} .al-trigger")
     scroll_to(menu_button)
     menu_button.click
-    expect(menu_button).to be_displayed
     wait_for_ajaximations
     menu_item = fj("#{li_selector} #{menu_item_selector}")
-    expect(menu_item).to be_displayed
+    wait_for(method: nil, timeout: 2) { fj(menu_item).displayed? }
     force_click("#{li_selector} #{menu_item_selector}")
   end
 
