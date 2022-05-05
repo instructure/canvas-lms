@@ -19,7 +19,8 @@
 
 if Rails.version >= "6.1"
   module NoLinksHeader
-    def send_preload_links_header(preload_links, max_header_size: MAX_HEADER_SIZE)
+    # Max header size needs a default, since it's a noop it doesn't matter what
+    def send_preload_links_header(preload_links, max_header_size: 0)
       # Intentional noop so we don't bload the headers to be too big
     end
   end
