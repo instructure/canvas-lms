@@ -1113,6 +1113,13 @@ describe DiscussionTopicsController do
       get :new, params: { course_id: @course.id, is_announcement: true }
       expect(assigns[:js_env][:CONTEXT_ID]).to eq(@course.id)
     end
+
+    it "js_bundles includes discussion_create when ff is on" do
+      user_session(@teacher)
+      @course.root_account.enable_feature!(:discussion_create)
+      get :new, params: { course_id: @course.id }
+      expect(assigns[:js_bundles].first).to include(:discussion_topic_edit_v2)
+    end
   end
 
   describe "GET 'edit'" do

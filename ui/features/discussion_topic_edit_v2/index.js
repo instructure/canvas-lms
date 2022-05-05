@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import DiscussionTopicEdit from './react/DiscussionTopicEdit'
+import {DiscussionTopicEdit} from './react/DiscussionTopicEdit'
 import React from 'react'
 import ReactDom from 'react-dom'
 

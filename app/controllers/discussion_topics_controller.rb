@@ -501,6 +501,14 @@ class DiscussionTopicsController < ApplicationController
     @topic = @context.send(params[:is_announcement] ? :announcements : :discussion_topics).new
     add_discussion_or_announcement_crumb
     add_crumb t :create_new_crumb, "Create new"
+
+    if @context.root_account.feature_enabled?(:discussion_create)
+      js_env({ is_announcement: params[:is_announcement] })
+      js_bundle :discussion_topic_edit_v2
+      css_bundle :discussions_index, :learning_outcomes
+      render html: "", layout: params[:embed] == "true" ? "mobile_embed" : true
+      return
+    end
     edit
   end
 
