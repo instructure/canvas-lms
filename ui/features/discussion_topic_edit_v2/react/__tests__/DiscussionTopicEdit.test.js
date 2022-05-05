@@ -18,7 +18,7 @@
 
 import {render} from '@testing-library/react'
 import React from 'react'
-import DiscussionTopicEdit from '../DiscussionTopicEdit'
+import {DiscussionTopicEdit} from '../DiscussionTopicEdit'
 
 describe('DiscussionTopicEdit', () => {
   test('renders', () => {

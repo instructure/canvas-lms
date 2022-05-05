@@ -18,6 +18,6 @@
 
 import React from 'react'
 
-export default function DiscussionTopicEdit() {
+export const DiscussionTopicEdit = () => {
   return <div>page coming soon</div>
 }
