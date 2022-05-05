@@ -38,7 +38,13 @@ module CC
 
       zipper = ContentZipper.new
       zipper.user = @user
-      zipper.process_folder(course_folder, @zip_file, [CCHelper::WEB_RESOURCES_FOLDER], exporter: @manifest.exporter) do |file, folder_names|
+      zipper.process_folder(
+        course_folder,
+        @zip_file,
+        [CCHelper::WEB_RESOURCES_FOLDER],
+        exporter: @manifest.exporter,
+        referenced_files: @html_exporter.referenced_files
+      ) do |file, folder_names|
         next if file.display_name.blank?
 
         if file.is_a? Folder

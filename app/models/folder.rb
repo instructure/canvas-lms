@@ -513,7 +513,7 @@ class Folder < ActiveRecord::Base
     can :read_contents, :read_contents_for_export
 
     given do |user, session|
-      visible? && !locked? && context.grants_right?(user, session, :read)
+      !locked? && context.grants_right?(user, session, :read)
     end
     can :read_contents_for_export
 
