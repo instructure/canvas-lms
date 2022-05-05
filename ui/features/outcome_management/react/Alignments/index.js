@@ -18,7 +18,9 @@
 
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
 import AlignmentSummaryHeader from './AlignmentSummaryHeader'
+import AlignmentOutcomeItem from './AlignmentOutcomeItem'
 import useSearch from '@canvas/outcomes/react/hooks/useSearch'
 
 const AlignmentSummary = () => {
@@ -30,22 +32,36 @@ const AlignmentSummary = () => {
   const totalAlignments = 6800
   const totalArtifacts = 2400
   const alignedArtifacts = 2000
+  const title = 'Outcome 123 '.repeat(3)
+  const description = 'Outcome description '.repeat(10)
+  const alignmentCount = 15
 
   return (
-    <Flex data-testid="outcome-alignment-summary">
-      <Flex.Item as="div" size="100%" position="relative">
-        <AlignmentSummaryHeader
-          totalOutcomes={totalOutcomes}
-          alignedOutcomes={alignedOutcomes}
-          totalAlignments={totalAlignments}
-          totalArtifacts={totalArtifacts}
-          alignedArtifacts={alignedArtifacts}
-          searchString={search}
-          updateSearchHandler={onChangeHandler}
-          clearSearchHandler={onClearHandler}
+    <View data-testid="outcome-alignment-summary">
+      <View as="div" padding="0 0 small" borderWidth="0 0 small">
+        <Flex>
+          <Flex.Item as="div" size="100%" position="relative">
+            <AlignmentSummaryHeader
+              totalOutcomes={totalOutcomes}
+              alignedOutcomes={alignedOutcomes}
+              totalAlignments={totalAlignments}
+              totalArtifacts={totalArtifacts}
+              alignedArtifacts={alignedArtifacts}
+              searchString={search}
+              updateSearchHandler={onChangeHandler}
+              clearSearchHandler={onClearHandler}
+            />
+          </Flex.Item>
+        </Flex>
+      </View>
+      <View as="div">
+        <AlignmentOutcomeItem
+          title={title}
+          description={description}
+          alignmentCount={alignmentCount}
         />
-      </Flex.Item>
-    </Flex>
+      </View>
+    </View>
   )
 }
 
