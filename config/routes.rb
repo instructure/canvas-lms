@@ -1480,7 +1480,7 @@ CanvasRails::Application.routes.draw do
 
       get "users/:id/graded_submissions", controller: "users", action: "user_graded_submissions", as: :user_submissions
 
-      get "users/:id/show_k5_dashboard", controller: "users", action: "show_k5_dashboard"
+      get "show_k5_dashboard", controller: "users", action: "show_k5_dashboard"
 
       post "users/:id/clear_cache", action: :clear_cache, as: "clear_cache"
 
