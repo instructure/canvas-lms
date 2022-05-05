@@ -614,6 +614,7 @@ describe AccountsController do
         @account = Account.create!
         @user = account_admin_user(account: @account)
         user_session(@user)
+        post "update", params: toggle_k5_params(@account.id, false)
         enable_cache(:redis_cache_store) do
           expect(@controller).to receive(:uncached_k5_user?).twice
           @controller.send(:k5_user?)
