@@ -1370,7 +1370,7 @@ EG = {
         SpeedgraderHelpers.getHistory().back()
       }
     } else {
-      /// unmount spinner
+      // unmount spinner
       const spinnerMount = document.getElementById('speed_grader_loading')
       if (spinnerMount) ReactDOM.unmountComponentAtNode(spinnerMount)
       $('#speed_grader_loading').hide()
@@ -3670,7 +3670,7 @@ EG = {
     }
   },
 
-  beforeLeavingSpeedgrader(e) {
+  beforeLeavingSpeedgrader(event: BeforeUnloadEvent) {
     // Submit any draft comments that need submitting
     EG.addSubmissionComment(true)
 
@@ -3707,18 +3707,25 @@ EG = {
       return $.trim($add_a_comment_textarea.val()) !== ''
     }
 
-    if (hasPendingQuizSubmissions()) {
-      e.returnValue = I18n.t(
+    const isNewGradeSaved = ($grade.val() || null) === EG.currentStudent.submission.grade
+    if (!isNewGradeSaved) {
+      event.preventDefault()
+      event.returnValue = I18n.t(`There are unsaved changes to a grade.\n\nContinue anyway?`)
+      return event.returnValue
+    } else if (hasPendingQuizSubmissions()) {
+      event.preventDefault()
+      event.returnValue = I18n.t(
         'The following students have unsaved changes to their quiz submissions:\n\n' +
           '%{users}\nContinue anyway?',
         {users: userNamesWithPendingQuizSubmission().join('\n ')}
       )
-      return e.returnValue
+      return event.returnValue
     } else if (hasUnsubmittedComments()) {
-      e.returnValue = I18n.t(
+      event.preventDefault()
+      event.returnValue = I18n.t(
         'If you would like to keep your unsubmitted comments, please save them before navigating away from this page.'
       )
-      return e.returnValue
+      return event.returnValue
     }
     teardownHandleStatePopped()
     teardownBeforeLeavingSpeedgrader()
