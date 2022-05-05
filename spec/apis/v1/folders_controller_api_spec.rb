@@ -931,7 +931,7 @@ describe "Folders API", type: :request do
   end
 
   describe "#list_all_folders" do
-    def make_folders_in_context(context)
+    def make_folders_in_context(context, duplicatenames: false)
       @root = Folder.root_folders(context).first
       @f1 = @root.sub_folders.create!(name: "folder1", context: context, position: 1)
       @f2 = @root.sub_folders.create!(name: "folder2", context: context, position: 2)
@@ -939,13 +939,18 @@ describe "Folders API", type: :request do
       @f4 = @f3.sub_folders.create!(name: "folder2.1.1", context: context, position: 4)
       @f5 = @f4.sub_folders.create!(name: "folderlocked", context: context, position: 5, locked: true)
       @f6 = @f5.sub_folders.create!(name: "folderhidden", context: context, position: 6, hidden: true)
+      if duplicatenames
+        @f7 = @f2.sub_folders.create!(name: "folder1", context: context, position: 7)
+        @f8 = @f3.sub_folders.create!(name: "folder1", context: context, position: 8)
+        @f9 = @f4.sub_folders.create!(name: "folder1", context: context, position: 9)
+      end
     end
 
     context "course" do
       before :once do
         course_with_teacher(active_all: true)
         student_in_course(active_all: true)
-        make_folders_in_context @course
+        make_folders_in_context(@course, duplicatenames: true)
       end
 
       it "lists all folders in a course including subfolders" do
@@ -953,7 +958,7 @@ describe "Folders API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/folders",
                         { controller: "folders", action: "list_all_folders", format: "json", course_id: @course.id.to_param })
         res = json.map { |f| f["name"] }
-        expect(res).to eq ["course files", "folder1", "folder2", "folder2.1", "folder2.1.1", "folderhidden", "folderlocked"]
+        expect(res).to eq ["course files", "folder1", "folder1", "folder1", "folder1", "folder2", "folder2.1", "folder2.1.1", "folderhidden", "folderlocked"]
       end
 
       it "does not show hidden and locked files to unauthorized users" do
@@ -961,7 +966,7 @@ describe "Folders API", type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/folders",
                         { controller: "folders", action: "list_all_folders", format: "json", course_id: @course.id.to_param })
         res = json.map { |f| f["name"] }
-        expect(res).to eq ["course files", "folder1", "folder2", "folder2.1", "folder2.1.1"]
+        expect(res).to eq ["course files", "folder1", "folder1", "folder1", "folder1", "folder2", "folder2.1", "folder2.1.1"]
       end
 
       it "returns a 401 for unauthorized users" do
@@ -981,16 +986,27 @@ describe "Folders API", type: :request do
         expect(links.all? { |l| l =~ %r{api/v1/courses/#{@course.id}/folders} }).to be_truthy
         expect(links.find { |l| l.include?('rel="next"') }).to match(/page=2&per_page=3>/)
         expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1&per_page=3>/)
-        expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3&per_page=3>/)
+        expect(links.find { |l| l.include?('rel="last"') }).to match(/page=4&per_page=3>/)
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/folders",
-                        { controller: "folders", action: "list_all_folders", format: "json", course_id: @course.id.to_param, per_page: 3, page: 3 })
+                        { controller: "folders", action: "list_all_folders", format: "json", course_id: @course.id.to_param, per_page: 3, page: 4 })
         expect(json.length).to eq 1
         links = response.headers["Link"].split(",")
         expect(links.all? { |l| l =~ %r{api/v1/courses/#{@course.id}/folders} }).to be_truthy
-        expect(links.find { |l| l.include?('rel="prev"') }).to match(/page=2&per_page=3>/)
+        expect(links.find { |l| l.include?('rel="prev"') }).to match(/page=3&per_page=3>/)
         expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1&per_page=3>/)
-        expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3&per_page=3>/)
+        expect(links.find { |l| l.include?('rel="last"') }).to match(/page=4&per_page=3>/)
+      end
+
+      it "doesnt drop items in pagination" do
+        @user = @teacher
+        folders = []
+        4.times do |i|
+          folders.push(*api_call(:get, "/api/v1/courses/#{@course.id}/folders",
+                                 { controller: "folders", action: "list_all_folders", format: "json", course_id: @course.id.to_param, per_page: 3, page: i + 1 }))
+        end
+        res = folders.map { |f| f["full_name"] }
+        expect(res.size).to eq res.uniq.size
       end
     end
 
