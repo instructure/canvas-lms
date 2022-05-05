@@ -46,11 +46,11 @@ class RubricAssociation < ActiveRecord::Base
   before_save :update_assignment_points
   before_save :update_values
   after_create :update_rubric
-  after_create :link_to_assessments
   before_save :update_old_rubric
   after_destroy :update_rubric
   after_destroy :update_alignments
   after_save :assert_uniqueness
+  after_save :link_to_assessments
   after_save :update_alignments
 
   before_create :touch_association
@@ -124,6 +124,24 @@ class RubricAssociation < ActiveRecord::Base
       end
     end
   end
+
+  # Link the rubric association to any existing assessment_requests (i.e. peer-reviews) that haven't been completed and
+  # aren't currently linked to a rubric association. This routine is needed when an assignment is completed and
+  # submissions were already sent when peer-review links and a *then* a rubric is created.
+  def link_to_assessments
+    # this is implemented as an after_save (and not an after_create) in order to have it run after assert_uniqueness
+    return unless saved_change_to_id?
+
+    # Go up to the assignment and loop through all submissions.
+    # Update each submission's assessment_requests with a link to this rubric association
+    # but only if not already associated
+    if association_id && association_type == "Assignment"
+      association_object.submissions.each do |sub|
+        sub.assessment_requests.where(rubric_association_id: nil).update_all(rubric_association_id: id, workflow_state: "assigned")
+      end
+    end
+  end
+  protected :link_to_assessments
 
   def assignment
     if association_object.is_a?(Assignment)
@@ -221,21 +239,6 @@ class RubricAssociation < ActiveRecord::Base
     end
   end
   protected :update_rubric
-
-  # Link the rubric association to any existing assessment_requests (i.e. peer-reviews) that haven't been completed and
-  # aren't currently linked to a rubric association. This routine is needed when an assignment is completed and
-  # submissions were already sent when peer-review links and a *then* a rubric is created.
-  def link_to_assessments
-    # Go up to the assignment and loop through all submissions.
-    # Update each submission's assessment_requests with a link to this rubric association
-    # but only if not already associated
-    if association_id && association_type == "Assignment"
-      association_object.submissions.each do |sub|
-        sub.assessment_requests.where(rubric_association_id: nil).update_all(rubric_association_id: id, workflow_state: "assigned")
-      end
-    end
-  end
-  protected :link_to_assessments
 
   def unsubmitted_users
     context.students - rubric_assessments.map(&:user) - assessment_requests.map(&:user)
