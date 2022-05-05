@@ -53,7 +53,7 @@ import 'compiled/jquery/fixDialogButtons'
       $rubric.find(".summary").before($criterion.show());
       rubricEditing.updateCriteria($rubric);
       rubricEditing.updateRubricPoints($rubric);
-      rubricEditing.sizeRatings($criterion);
+      rubricEditing.originalSizeRatings($criterion);
       return $criterion;
     },
     addNewRatingColumn: function($this) {
@@ -87,7 +87,7 @@ import 'compiled/jquery/fixDialogButtons'
         }
         rubricEditing.hideCriterionAdd($rubric);
         rubricEditing.updateCriterionPoints($criterion);
-        rubricEditing.sizeRatings($criterion);
+        rubricEditing.originalSizeRatings($criterion);
         setTimeout(function() {
           $.screenReaderFlashMessageExclusive(I18n.t("New Rating Created"));
         }), 100
@@ -216,7 +216,7 @@ import 'compiled/jquery/fixDialogButtons'
       $rating.append($box.show());
       $box.find(":input:first").focus().select();
       $rating.addClass('editing');
-      rubricEditing.sizeRatings($rating.parents(".criterion"));
+      rubricEditing.originalSizeRatings($rating.parents(".criterion"));
     },
     hideEditRating: function(updateCurrent) {
       var $form = $("#edit_rating");
@@ -225,7 +225,7 @@ import 'compiled/jquery/fixDialogButtons'
       $rating.removeClass('editing');
       $form.appendTo($("body")).hide();
       $rating.find(".container").show();
-      rubricEditing.sizeRatings($rating.parents(".criterion"));
+      rubricEditing.originalSizeRatings($rating.parents(".criterion"));
       rubricEditing.hideCriterionAdd($rating.parents(".rubric"));
     },
     editCriterion: function($criterion) {
@@ -239,7 +239,7 @@ import 'compiled/jquery/fixDialogButtons'
       $box.fillFormData(data);
       $td.find(".container").hide().after($box.show());
       $box.find(":input:first").focus().select();
-      rubricEditing.sizeRatings($criterion);
+      rubricEditing.originalSizeRatings($criterion);
     },
     hideEditCriterion: function(updateCurrent) {
       var $form = $("#edit_criterion");
@@ -247,13 +247,12 @@ import 'compiled/jquery/fixDialogButtons'
       var $criterion = $form.parents(".criterion");
       $form.appendTo("body").hide();
       $criterion.find(".criterion_description").find(".container").show();
-      rubricEditing.sizeRatings($criterion);
+      rubricEditing.originalSizeRatings($criterion);
     },
 
     originalSizeRatings: function() {
       var $visibleCriteria = $(".rubric:not(.rubric_summary) .criterion:visible");
       if ($visibleCriteria.length) {
-        var scrollTop = $.windowScrollTop();
         $visibleCriteria.each(function() {
           var $this = $(this),
               $ratings = $this.find(".ratings:visible");
@@ -267,7 +266,6 @@ import 'compiled/jquery/fixDialogButtons'
             $ratingsContainers.css('height', (maxHeight - 10) + 'px');
           }
         });
-        rubricEditing.htmlBody.scrollTop(scrollTop);
       }
     },
 
@@ -375,7 +373,7 @@ import 'compiled/jquery/fixDialogButtons'
       var updateText = I18n.t('buttons.update_rubric', "Update Rubric");
       $form.find(".save_button").text($rubric.attr('id') == 'rubric_new' ? createText : updateText);
       $form.attr('method', 'PUT').attr('action', url);
-      rubricEditing.sizeRatings();
+      rubricEditing.originalSizeRatings();
 
       return $rubric;
     },
@@ -944,7 +942,7 @@ import 'compiled/jquery/fixDialogButtons'
       $(this).parents(".rating").fadeOut(function() {
         var $criterion = $(this).parents(".criterion");
         $(this).remove();
-        rubricEditing.sizeRatings($criterion);
+        rubricEditing.originalSizeRatings($criterion);
       });
       $target.focus();
     }).delegate('.add_rating_link_after', 'click', function(event) {
@@ -1018,7 +1016,7 @@ import 'compiled/jquery/fixDialogButtons'
     if($("#default_rubric").find(".criterion").length <= 1) {
       rubricEditing.addCriterion($("#default_rubric"));
     }
-    setInterval(rubricEditing.sizeRatings, 10000);
+    setInterval(rubricEditing.originalSizeRatings, 10000);
     $.publish('edit_rubric/initted')
   };
 
