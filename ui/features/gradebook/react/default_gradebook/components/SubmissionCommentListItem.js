@@ -125,7 +125,7 @@ export default class SubmissionCommentListItem extends React.Component {
                   theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
                   margin="none none xxx-small"
                 >
-                  {TextHelper.truncateText(this.props.author, {max: 22})}
+                  {TextHelper.truncateText(this.props.author, {max: 18})}
                 </Link>
               </div>
 
