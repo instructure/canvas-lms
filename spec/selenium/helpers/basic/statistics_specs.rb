@@ -31,6 +31,7 @@ shared_examples_for "statistics basic tests" do
   context "with admin initially logged in" do
     before do
       @course = Course.create!(name: "stats", account: account)
+      @course.start_at = Time.now
       @course.offer!
       admin_logged_in
     end
