@@ -254,6 +254,10 @@ class ContentZipper
 
     attachments = attachments.select { |a| opts[:exporter].export_object?(a) } if opts[:exporter]
     attachments.select { |a| !@check_user || a.grants_right?(@user, :download) }.each do |attachment|
+      # exclude files in hidden folders unless they're referenced in rich content (or the user is an admin)
+      next if @check_user && folder.hidden? &&
+              !folder.grants_right?(@user, :read_contents) && !opts[:referenced_files]&.key?(attachment.id)
+
       attachment.display_name = Attachment.shorten_filename(attachment.display_name)
       # Preventing further unwanted filename alterations during the rest of the process,
       # namely, in the block further below. Also, we want to avoid accidental saving of the file
