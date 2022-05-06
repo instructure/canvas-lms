@@ -19,13 +19,10 @@
 
 module Canvas::OAuth
   class InvalidRequestError < RequestError
-    def to_render_data
+    def as_json
       {
-        status: 400,
-        json: {
-          error: :invalid_request,
-          error_description: @message
-        }
+        error: :invalid_request,
+        error_description: @message
       }
     end
 

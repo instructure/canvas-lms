@@ -83,3 +83,15 @@ api_auth_error_updates:
     the "status" field will not be localized; it will always be given in
     English.
   applies_to: SiteAdmin
+no_redirect_on_oauth_token_method:
+  state: hidden
+  display_name: Updates to OAuth 2.0 flow to stop redirecting in the 'token' authentication
+  description: |-
+    If enabled, the OAuth 2.0 will now correctly return 4xx status codes to the
+    requesting client instead of redirecting them to themselves
+  applies_to: SiteAdmin
+  environments:
+    development:
+      state: on
+    ci:
+      state: on
