@@ -256,6 +256,7 @@ class DeveloperKey < ActiveRecord::Base
   # verify that the given uri has the same domain as this key's
   # redirect_uri domain.
   def redirect_domain_matches?(redirect_uri)
+    return false if redirect_uri.blank?
     return true if redirect_uris.include?(redirect_uri)
 
     # legacy deprecated
