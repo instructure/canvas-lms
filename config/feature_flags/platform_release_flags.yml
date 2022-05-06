@@ -95,3 +95,9 @@ no_redirect_on_oauth_token_method:
       state: on
     ci:
       state: on
+variable_substitution_numeric_to_string:
+  state: hidden
+  display_name: Returns string values instead of numeric values in variable substitutions
+  description: |-
+    If enabled, variable substitutions will return string values instead of numeric values
+  applies_to: RootAccount
