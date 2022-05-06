@@ -17,8 +17,10 @@
  */
 
 import renderAssignmentsApp from './react/index'
-import $ from 'jquery'
+import ready from '@instructure/ready'
+import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 
-$(() => {
+ready(() => {
+  monitorLtiMessages()
   renderAssignmentsApp(ENV, $('<div/>').appendTo('#content')[0])
 })
