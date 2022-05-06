@@ -114,11 +114,17 @@ async function ltiMessageHandler(e, platformStorageFeatureFlag = false) {
   }
 }
 
+let hasListener = false
+
 function monitorLtiMessages() {
   const platformStorageFeatureFlag = ENV?.FEATURES?.lti_platform_storage
-  window.addEventListener('message', e => {
+  const cb = e => {
     if (e.data !== '') ltiMessageHandler(e, platformStorageFeatureFlag)
-  })
+  }
+  if (!hasListener) {
+    window.addEventListener('message', cb)
+    hasListener = true
+  }
 }
 
 export {ltiState, SUBJECT_ALLOW_LIST, SUBJECT_IGNORE_LIST, ltiMessageHandler, monitorLtiMessages}
