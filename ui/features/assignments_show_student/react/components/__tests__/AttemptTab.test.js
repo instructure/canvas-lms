@@ -663,20 +663,28 @@ describe('ContentTabs', () => {
       fireEvent.change(fileInput, {target: {files}})
     }
 
-    it('calls uploadFile once for each file received that needs uploading', async () => {
+    async function generatePropsWithAttempt(attempt) {
       const props = await mockAssignmentAndSubmission({
         Assignment: {submissionTypes: ['online_upload']},
-        Submission: {attempt: 2}
+        Submission: {attempt}
       })
       props.focusAttemptOnInit = true
       props.updateUploadingFiles = jest.fn()
       props.createSubmissionDraft = jest.fn()
+      return props
+    }
 
-      const {container} = render(
+    function renderWithProps(props) {
+      return render(
         <MockedProvider>
-          <AttemptTab {...props} focusAttemptOnInit />
+          <AttemptTab {...props} />
         </MockedProvider>
       )
+    }
+
+    it('calls uploadFile once for each file received that needs uploading', async () => {
+      const props = await generatePropsWithAttempt(2)
+      const {container} = renderWithProps(props)
 
       await submitFiles(container, [
         new File(['foo'], 'file1.pdf', {type: 'application/pdf'}),
@@ -690,20 +698,9 @@ describe('ContentTabs', () => {
     })
 
     it('calls uploadFile with the URL pointing to the assignments api endpoint', async () => {
-      const props = await mockAssignmentAndSubmission({
-        Assignment: {submissionTypes: ['online_upload']},
-        Submission: {attempt: 2}
-      })
+      const props = await generatePropsWithAttempt(2)
       props.assignment.groupSet = null
-      props.focusAttemptOnInit = true
-      props.updateUploadingFiles = jest.fn()
-      props.createSubmissionDraft = jest.fn()
-
-      const {container} = render(
-        <MockedProvider>
-          <AttemptTab {...props} focusAttemptOnInit />
-        </MockedProvider>
-      )
+      const {container} = renderWithProps(props)
 
       await submitFiles(container, [new File(['foo'], 'file1.pdf', {type: 'application/pdf'})])
       const {calls} = uploadFileModule.uploadFile.mock
@@ -721,11 +718,7 @@ describe('ContentTabs', () => {
       props.updateUploadingFiles = jest.fn()
       props.createSubmissionDraft = jest.fn()
 
-      const {container} = render(
-        <MockedProvider>
-          <AttemptTab {...props} focusAttemptOnInit />
-        </MockedProvider>
-      )
+      const {container} = renderWithProps(props)
 
       await submitFiles(container, [new File(['foo'], 'file1.pdf', {type: 'application/pdf'})])
       const {calls} = uploadFileModule.uploadFile.mock
@@ -737,19 +730,8 @@ describe('ContentTabs', () => {
     // Byproduct of how the dummy submissions are being handled. Check out ViewManager
     // for some context around this
     it('creates a submission draft for the current attempt when not on attempt 0', async () => {
-      const props = await mockAssignmentAndSubmission({
-        Assignment: {submissionTypes: ['online_upload']},
-        Submission: {attempt: 2}
-      })
-      props.focusAttemptOnInit = true
-      props.updateUploadingFiles = jest.fn()
-      props.createSubmissionDraft = jest.fn()
-
-      const {container} = render(
-        <MockedProvider>
-          <AttemptTab {...props} focusAttemptOnInit />
-        </MockedProvider>
-      )
+      const props = await generatePropsWithAttempt(2)
+      const {container} = renderWithProps(props)
 
       await submitFiles(container, [new File(['foo'], 'file1.pdf', {type: 'application/pdf'})])
 
@@ -766,19 +748,8 @@ describe('ContentTabs', () => {
     })
 
     it('creates a submission draft for attempt 1 when on attempt 0', async () => {
-      const props = await mockAssignmentAndSubmission({
-        Assignment: {submissionTypes: ['online_upload']},
-        Submission: {attempt: 0}
-      })
-      props.focusAttemptOnInit = true
-      props.updateUploadingFiles = jest.fn()
-      props.createSubmissionDraft = jest.fn()
-
-      const {container} = render(
-        <MockedProvider>
-          <AttemptTab {...props} focusAttemptOnInit />
-        </MockedProvider>
-      )
+      const props = await generatePropsWithAttempt(0)
+      const {container} = renderWithProps(props)
 
       await submitFiles(container, [new File(['foo'], 'file1.pdf', {type: 'application/pdf'})])
 
@@ -795,14 +766,6 @@ describe('ContentTabs', () => {
     })
 
     it('renders a progress bar with the name of each file being uploaded', async () => {
-      const props = await mockAssignmentAndSubmission({
-        Assignment: {submissionTypes: ['online_upload']},
-        Submission: {attempt: 0}
-      })
-      props.focusAttemptOnInit = true
-      props.updateUploadingFiles = jest.fn()
-      props.createSubmissionDraft = jest.fn()
-
       const progressHandlers = []
 
       uploadFileModule.uploadFile.mockReset()
@@ -816,11 +779,8 @@ describe('ContentTabs', () => {
           return Promise.resolve({id: '2', name: 'file2.pdf'})
         })
 
-      const {container, findAllByRole} = render(
-        <MockedProvider>
-          <AttemptTab {...props} />
-        </MockedProvider>
-      )
+      const props = await generatePropsWithAttempt(0)
+      const {container, findAllByRole} = renderWithProps(props)
       await submitFiles(container, [
         new File(['asdf'], 'file1.pdf', {type: 'application/pdf'}),
         new File(['sdfg'], 'file2.pdf', {type: 'application/pdf'})
@@ -849,15 +809,19 @@ describe('ContentTabs', () => {
       )
     })
 
-    it('shows the URL of a file being uploaded if no name is present', async () => {
-      const props = await mockAssignmentAndSubmission({
-        Assignment: {submissionTypes: ['online_upload']},
-        Submission: {attempt: 0}
-      })
-      props.focusAttemptOnInit = true
-      props.updateUploadingFiles = jest.fn()
-      props.createSubmissionDraft = jest.fn()
+    function fireEventWithContentItem(contentItem) {
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            subject: 'LtiDeepLinkingResponse',
+            content_items: [contentItem]
+          }
+        })
+      )
+    }
 
+    it('shows the URL of a file being uploaded if no name is present', async () => {
       const progressHandlers = []
 
       uploadFileModule.uploadFile.mockReset()
@@ -866,31 +830,14 @@ describe('ContentTabs', () => {
           progressHandlers.push(onProgress)
           return Promise.resolve({id: '1', name: 'file1.pdf'})
         })
-        .mockImplementationOnce((url, data, file, ajaxLib, onProgress) => {
-          progressHandlers.push(onProgress)
-          return Promise.resolve({id: '2', name: 'file2.pdf'})
-        })
 
-      const {findAllByRole} = render(
-        <MockedProvider>
-          <AttemptTab {...props} />
-        </MockedProvider>
-      )
+      const props = await generatePropsWithAttempt(0)
+      const {container, findAllByRole} = renderWithProps(props)
 
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            subject: 'LtiDeepLinkingResponse',
-            content_items: [
-              {
-                url: 'http://localhost/some-lti-file',
-                mediaType: 'plain/txt'
-              }
-            ]
-          }
-        })
-      )
+      // It seems to be necessary to wait for something if the test is run in isolation
+      await waitFor(() => expect(container.querySelector('input[type="file"]')).toBeInTheDocument())
+
+      fireEventWithContentItem({ url: 'http://localhost/some-lti-file', mediaType: 'plain/txt' });
 
       progressHandlers[0]({loaded: 10, total: 100})
 
@@ -904,6 +851,41 @@ describe('ContentTabs', () => {
         'aria-label',
         'Upload progress for http://localhost/some-lti-file 10 percent'
       )
+    })
+
+    it('uses "text" of the LTI content item as the file name for display and API calls', async () => {
+      const progressHandlers = []
+
+      uploadFileModule.uploadFile.mockReset()
+      uploadFileModule.uploadFile
+        .mockImplementationOnce((url, data, file, ajaxLib, onProgress) => {
+          progressHandlers.push(onProgress)
+          return Promise.resolve({id: '1', name: 'file1.pdf'})
+        })
+
+      const props = await generatePropsWithAttempt(0)
+      const {container, findAllByRole} = renderWithProps(props)
+
+      // It seems to be necessary to wait for something if the test is run in isolation
+      await waitFor(() => expect(container.querySelector('input[type="file"]')).toBeInTheDocument())
+
+      fireEventWithContentItem({
+        url: 'http://localhost/some-lti-file',
+        text: "x.pdf",
+        mediaType: 'plain/txt'
+      });
+
+      progressHandlers[0]({loaded: 10, total: 100})
+
+      const progressBars = await findAllByRole('progressbar')
+      expect(progressBars[0]).toHaveAttribute('aria-label', 'Upload progress for x.pdf 10 percent')
+
+      expect(uploadFileModule.uploadFile.mock.calls[0][1]).toEqual({
+        url: 'http://localhost/some-lti-file',
+        name: "x.pdf",
+        content_type: 'plain/txt',
+        submit_assignment: false
+      })
     })
   })
 })
