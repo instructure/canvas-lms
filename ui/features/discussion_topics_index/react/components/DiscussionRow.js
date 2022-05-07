@@ -25,9 +25,7 @@ import {DragSource, DropTarget} from 'react-dnd'
 import {findDOMNode} from 'react-dom'
 import {func, bool, string, arrayOf} from 'prop-types'
 import cx from 'classnames'
-
-import $ from 'jquery'
-import '@canvas/datetime'
+import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 
 import {Text} from '@instructure/ui-text'
 import {Pill} from '@instructure/ui-pill'
@@ -110,7 +108,7 @@ const dropTarget = {
   }
 }
 
-export class DiscussionRow extends Component {
+class DiscussionRow extends Component {
   static propTypes = {
     canPublish: bool.isRequired,
     canReadAsAdmin: bool.isRequired,
@@ -142,7 +140,8 @@ export class DiscussionRow extends Component {
     onMoveDiscussion: func,
     toggleSubscriptionState: func.isRequired,
     updateDiscussion: func.isRequired,
-    DIRECT_SHARE_ENABLED: bool.isRequired
+    DIRECT_SHARE_ENABLED: bool.isRequired,
+    dateFormatter: func.isRequired
   }
 
   static defaultProps = {
@@ -171,7 +170,7 @@ export class DiscussionRow extends Component {
     this.onFocusManage(this.props)
   }
 
-  componentWillReceiveProps = nextProps => {
+  UNSAFE_componentWillReceiveProps = nextProps => {
     this.onFocusManage(nextProps)
   }
 
@@ -257,10 +256,10 @@ export class DiscussionRow extends Component {
     const assignment = this.props.discussion.assignment
     const dueDateString =
       assignment && assignment.due_at
-        ? I18n.t('Due %{date} ', {date: $.datetimeString(assignment.due_at)})
+        ? I18n.t('Due %{date} ', {date: this.props.dateFormatter(assignment.due_at)})
         : ' '
     result += dueDateString
-    const lastReplyAtDate = $.datetimeString(this.props.discussion.last_reply_at)
+    const lastReplyAtDate = this.props.dateFormatter(this.props.discussion.last_reply_at)
     if (lastReplyAtDate.length > 0 && this.props.discussion.discussion_subentry_count > 0) {
       result += I18n.t('Last post at %{date}', {date: lastReplyAtDate})
     }
@@ -301,13 +300,15 @@ export class DiscussionRow extends Component {
       availabilityBegin &&
       !isPassedDelayedPostAt({checkDate: null, delayedDate: availabilityBegin})
     ) {
-      return I18n.t('Not available until %{date}', {date: $.datetimeString(availabilityBegin)})
+      return I18n.t('Not available until %{date}', {
+        date: this.props.dateFormatter(availabilityBegin)
+      })
     }
     if (availabilityEnd) {
       if (isPassedDelayedPostAt({checkDate: null, delayedDate: availabilityEnd})) {
         return I18n.t('No longer available')
       } else {
-        return I18n.t('Available until %{date}', {date: $.datetimeString(availabilityEnd)})
+        return I18n.t('Available until %{date}', {date: this.props.dateFormatter(availabilityEnd)})
       }
     }
     return ''
@@ -700,7 +701,7 @@ export class DiscussionRow extends Component {
   }
 
   renderLastReplyAt = () => {
-    const datetimeString = $.datetimeString(this.props.discussion.last_reply_at)
+    const datetimeString = this.props.dateFormatter(this.props.discussion.last_reply_at)
     if (!datetimeString.length || this.props.discussion.discussion_subentry_count === 0) {
       return null
     }
@@ -720,11 +721,11 @@ export class DiscussionRow extends Component {
     let className = ''
     if (assignment && assignment.due_at) {
       className = 'due-date'
-      dueDateString = I18n.t('Due %{date}', {date: $.datetimeString(assignment.due_at)})
+      dueDateString = I18n.t('Due %{date}', {date: this.props.dateFormatter(assignment.due_at)})
     } else if (this.props.discussion.todo_date) {
       className = 'todo-date'
       dueDateString = I18n.t('To do %{date}', {
-        date: $.datetimeString(this.props.discussion.todo_date)
+        date: this.props.dateFormatter(this.props.discussion.todo_date)
       })
     }
     return <div className={`ic-discussion-row__content ${className}`}>{dueDateString}</div>
@@ -931,6 +932,20 @@ const mapState = (state, ownProps) => {
   return {...ownProps, ...propsFromState}
 }
 
+// The main component is a class component, so to use a React hook
+// we have to use a HOC to wrap it in a function component.
+function withDateFormatHook(Original) {
+  function WrappedComponent(props) {
+    const dateFormatter = useDateTimeFormat('time.formats.short')
+    return <Original {...props} dateFormatter={dateFormatter} />
+  }
+  const displayName = Original.displayName || Original.name
+  WrappedComponent.displayName = `WithDateFormat(${displayName})`
+  return WrappedComponent
+}
+
+const WrappedDiscussionRow = withDateFormatHook(DiscussionRow)
+
 export const DraggableDiscussionRow = compose(
   DropTarget('Discussion', dropTarget, dConnect => ({
     connectDropTarget: dConnect.dropTarget()
@@ -940,8 +955,11 @@ export const DraggableDiscussionRow = compose(
     isDragging: monitor.isDragging(),
     connectDragPreview: dConnect.dragPreview()
   }))
-)(DiscussionRow)
-export const ConnectedDiscussionRow = connect(mapState, mapDispatch)(DiscussionRow)
+)(WrappedDiscussionRow)
+
+export {DiscussionRow} // for tests only
+
+export const ConnectedDiscussionRow = connect(mapState, mapDispatch)(WrappedDiscussionRow)
 export const ConnectedDraggableDiscussionRow = connect(
   mapState,
   mapDispatch

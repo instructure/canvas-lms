@@ -609,18 +609,18 @@ fr:
   date:
     abbr_month_names:
     -
-    - Janv
-    - Févr
-    - Mars
-    - Avr
-    - Mai
-    - Juin
-    - Juil
-    - Août
-    - Sept
-    - Oct
-    - Nov
-    - Déc
+    - janv.
+    - févr.
+    - mars
+    - avr.
+    - mai
+    - juin
+    - juil.
+    - août
+    - sept.
+    - oct.
+    - nov.
+    - déc.
     formats:
       date_at_time: "%-d %b à %k:%M"
       default: "%d/%m/%Y"
@@ -658,18 +658,18 @@ fr-CA:
   date:
     abbr_month_names:
     -
-    - Jan
-    - Fév
-    - Mar
-    - Avr
-    - Mai
-    - Jun
-    - Jul
-    - Aou
-    - Sep
-    - Oct
-    - Nov
-    - Déc
+    - janv.
+    - févr.
+    - mars
+    - avr.
+    - mai
+    - juin
+    - juill.
+    - août
+    - sept.
+    - oct.
+    - nov.
+    - déc.
     formats:
       date_at_time: "%-d %b à %k:%M"
       default: "%d/%m/%Y"
@@ -689,7 +689,7 @@ fr-CA:
   locales:
     fr-CA: Français (Canada)
   time:
-    event: "%{date} sur %{time}"
+    event: "%{date} à %{time}"
     formats:
       tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
