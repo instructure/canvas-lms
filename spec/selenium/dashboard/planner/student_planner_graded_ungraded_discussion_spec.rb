@@ -94,7 +94,7 @@ describe "student planner" do
     it "shows the date in the index page" do
       get "/courses/#{@course.id}/discussion_topics/"
       todo_date = discussion_index_page_detail.text.split("To do ")[1]
-      expect(todo_date).to eq(format_time_for_view(@ungraded_discussion.todo_date))
+      expect(todo_date).to eq(@ungraded_discussion.todo_date.strftime("%b %-d, %-I:%M %p"))
     end
 
     it "shows the date in the show page" do
