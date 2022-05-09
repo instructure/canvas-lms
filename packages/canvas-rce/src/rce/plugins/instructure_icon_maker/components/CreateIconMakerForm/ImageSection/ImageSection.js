@@ -32,6 +32,7 @@ import {ImageOptions} from './ImageOptions'
 import {ColorInput} from '../../../../shared/ColorInput'
 import {convertFileToBase64} from '../../../svg/utils'
 import {transformForShape} from '../../../svg/image'
+import SingleColorSVG from './SingleColor/svg'
 
 const IMAGE_SECTION_ID = 'icon-maker-tray-image-section'
 const getImageSection = () => document.querySelector(`#${IMAGE_SECTION_ID}`)
@@ -144,11 +145,11 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig}) =
   }, [onChange, state.imageName])
 
   useEffect(() => {
-    if (state.icon) {
+    if (state.icon && state.icon in SingleColorSVG) {
       dispatch({...actions.START_LOADING})
       // eslint-disable-next-line promise/catch-or-return
       convertFileToBase64(
-        new Blob([state.icon.source(state.iconFillColor)], {
+        new Blob([SingleColorSVG[state.icon].source(state.iconFillColor)], {
           type: 'image/svg+xml'
         })
       ).then(base64Image => {

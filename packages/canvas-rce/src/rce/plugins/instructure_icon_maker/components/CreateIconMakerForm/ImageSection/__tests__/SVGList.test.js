@@ -58,6 +58,7 @@ describe('SVGList', () => {
       const {getByTestId} = subject()
       fireEvent.click(getByTestId('icon-maker-art'))
       expect(onSelect).toHaveBeenCalledWith(
+        expect.stringContaining('art'),
         expect.objectContaining({
           label: 'Art Icon'
         })
