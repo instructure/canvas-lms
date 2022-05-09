@@ -565,5 +565,58 @@ describe('ImageSection', () => {
         'backgroundImage: url(data:image/jpg;base64,asdfasdfjksdf==)'
       )
     })
+
+    it('renders color picker for single color icon', async () => {
+      const rendered = subject({editing: true})
+      rendered.rerender(
+        <ImageSection
+          {...{
+            ...defaultProps,
+            ...{
+              settings: {
+                encodedImage: 'data:image/jpg;base64,asdfasdfjksdf==',
+                encodedImageType: 'Course',
+                encodedImageName: 'banana.jpg',
+                imageSettings: {
+                  mode: 'SingleColor',
+                  icon: 'art'
+                }
+              },
+              editing: true
+            }
+          }}
+        />
+      )
+      expect(
+        rendered.container.querySelector('[name="single-color-image-fill"]')
+      ).toBeInTheDocument()
+    })
+
+    it('gets the color for selected icon', async () => {
+      const rendered = subject({editing: true})
+      rendered.rerender(
+        <ImageSection
+          {...{
+            ...defaultProps,
+            ...{
+              settings: {
+                encodedImage: 'data:image/jpg;base64,asdfasdfjksdf==',
+                encodedImageType: 'Course',
+                encodedImageName: 'banana.jpg',
+                imageSettings: {
+                  mode: 'SingleColor',
+                  icon: 'art',
+                  iconFillColor: '#00FF00'
+                }
+              },
+              editing: true
+            }
+          }}
+        />
+      )
+      expect(rendered.container.querySelector('[name="single-color-image-fill"]')).toHaveValue(
+        '#00FF00'
+      )
+    })
   })
 })

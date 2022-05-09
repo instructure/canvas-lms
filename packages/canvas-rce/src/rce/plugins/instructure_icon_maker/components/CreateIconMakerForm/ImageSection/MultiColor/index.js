@@ -23,7 +23,7 @@ import {actions} from '../../../../reducers/imageSection'
 import {convertFileToBase64} from '../../../../svg/utils'
 
 const MultiColor = ({dispatch, onLoaded}) => {
-  const onSelect = svg => {
+  const onSelect = (id, svg) => {
     dispatch({...actions.START_LOADING})
     dispatch({...actions.SET_IMAGE_NAME, payload: svg.label})
 

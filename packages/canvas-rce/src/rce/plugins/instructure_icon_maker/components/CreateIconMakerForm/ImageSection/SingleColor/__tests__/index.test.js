@@ -54,7 +54,7 @@ describe('SingleColor', () => {
 
       expect(dispatch).toHaveBeenNthCalledWith(2, {
         ...actions.SET_ICON,
-        payload: svg.art
+        payload: 'art'
       })
 
       expect(dispatch).toHaveBeenNthCalledWith(3, {

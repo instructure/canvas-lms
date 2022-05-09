@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import PropTypes from 'prop-types'
 
 import SVGList, {TYPE} from '../SVGList'
@@ -24,9 +24,9 @@ import {actions} from '../../../../reducers/imageSection'
 
 const SingleColor = ({data, dispatch, onLoaded}) => {
   const {iconFillColor} = data
-  const onSelect = svg => {
+  const onSelect = (id, svg) => {
     dispatch({...actions.SET_IMAGE_NAME, payload: svg.label})
-    dispatch({...actions.SET_ICON, payload: svg})
+    dispatch({...actions.SET_ICON, payload: id})
     dispatch({...actions.SET_IMAGE_COLLECTION_OPEN, payload: false})
   }
 
@@ -43,6 +43,7 @@ const SingleColor = ({data, dispatch, onLoaded}) => {
 SingleColor.propTypes = {
   dispatch: PropTypes.func,
   data: PropTypes.shape({
+    icon: PropTypes.string.isRequired,
     iconFillColor: PropTypes.string.isRequired
   }),
   onLoaded: PropTypes.func
@@ -51,6 +52,7 @@ SingleColor.propTypes = {
 SingleColor.defaultProps = {
   dispatch: () => {},
   data: {
+    icon: null,
     // Black color in color selector component
     iconFillColor: '#000000'
   },
