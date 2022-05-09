@@ -97,7 +97,7 @@ describe('queueUploads()', () => {
       resolvedNames: fileOptions()
     })
 
-    FileOptionsCollection.applyCategory = jest.fn(() => Promise.resolve([{}]))
+    FileOptionsCollection.applyCategory = jest.fn(() => Promise.resolve([]))
   })
 
   const subject = () => FileOptionsCollection.queueUploads(1, 'course')
