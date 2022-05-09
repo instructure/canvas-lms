@@ -21,6 +21,7 @@
 describe "MessageDispatcher" do
   describe ".dispatch" do
     before do
+      allow(InstStatsd::Statsd).to receive(:increment)
       message_model(dispatch_at: Time.now, workflow_state: "staged", to: "somebody", updated_at: Time.now.utc - 11.minutes, user: user_factory, path_type: "email")
     end
 
@@ -32,7 +33,7 @@ describe "MessageDispatcher" do
       run_jobs
       expect(@message.reload.dispatch_at).to be > Time.now.utc + 4.minutes
       expect(job.reload.attempts).to eq 1
-      expect(job.run_at).to eq @message.dispatch_at
+      expect(job.run_at).to be > @message.dispatch_at - 5.minutes
     end
 
     it "does not reschedule on canceled Message" do
@@ -43,6 +44,14 @@ describe "MessageDispatcher" do
       run_jobs
       expect(@message.reload.state).to eq :cancelled
       expect { job.reload }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
+    it "increments MessageDispatcher.dispatch.failed after Delayed::RetriableError" do
+      message = Message.new(id: -1, created_at: Time.zone.now)
+      worker = MessageDispatcher::DeliverWorker.new(message)
+      expect { worker.perform }.to raise_error(Delayed::RetriableError)
+
+      expect(InstStatsd::Statsd).to have_received(:increment).with("MessageDispatcher.dispatch.failed")
     end
   end
 
@@ -71,8 +80,8 @@ describe "MessageDispatcher" do
       # the original job is complete, but the individual message gets re-scheduled in its own job
       expect { job.reload }.to raise_error(ActiveRecord::RecordNotFound)
 
-      expect(job2.tag).to eq "Message::Queued#deliver"
-      expect(job2.payload_object.object.message).to eq @messages[1]
+      expect(job2.tag).to eq "MessageDispatcher::DeliverWorker#perform"
+      expect(job2.payload_object.message).to eq @messages[1]
       expect(job2.run_at.to_i).to eq @messages[1].dispatch_at.to_i
     end
   end
