@@ -21,6 +21,13 @@ import {Tag} from '@instructure/ui-tag'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {IconAddSolid, IconXSolid} from '@instructure/ui-icons'
+import {ApplyTheme} from '@instructure/ui-themeable'
+
+const themeOverride = {
+  [Tag.theme]: {
+    defaultBackground: 'white'
+  }
+}
 
 const Pill = ({studentId, observerId = null, text, onClick, selected = false}) => {
   const contents = selected ? (
@@ -39,7 +46,11 @@ const Pill = ({studentId, observerId = null, text, onClick, selected = false}) =
     </>
   )
 
-  return <Tag text={contents} onClick={() => onClick(studentId, observerId)} />
+  return (
+    <ApplyTheme theme={themeOverride}>
+      <Tag text={contents} onClick={() => onClick(studentId, observerId)} />
+    </ApplyTheme>
+  )
 }
 
 export default Pill
