@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import {isolate} from '@canvas/sentry'
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
@@ -107,8 +108,10 @@ function handleYoutubeLink() {
     $link.addClass('youtubed').after($after)
   }
 }
-trackEvent('Route', window.location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/')
-const JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE = '.dialog, .draggable, .resizable, .sortable, .tabs'
+
+function submitRouteEventToGA() {
+  trackEvent('Route', window.location.pathname.replace(/\/$/, '').replace(/\d+/g, '--') || '/')
+}
 
 function buildUrl(url) {
   try {
@@ -141,7 +144,7 @@ export function enhanceUserContent(visibilityMod) {
   if (ENV.SKIP_ENHANCING_USER_CONTENT) {
     return
   }
-
+  const JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE = '.dialog, .draggable, .resizable, .sortable, .tabs'
   const $content = $('#content')
   const visibilityQueryMod = visibilityMod === enhanceUserContent.ANY_VISIBILITY ? '' : ':visible'
   $(`.user_content:not(.enhanced)${visibilityQueryMod}`).addClass('unenhanced')
@@ -955,25 +958,28 @@ function makeAllExternalLinksExternalLinks() {
 }
 
 export default function enhanceTheEntireUniverse() {
-  retriggerEarlyClicks()
-  ellipsifyBreadcrumbs()
-  bindKeyboardShortcutsHelpPanel()
-  warnAboutRolesBeingSwitched()
-  expandQuotedTextWhenClicked()
-  previewEquellaContentWhenClicked()
-  openDialogsWhenClicked()
-  previewFilesWhenClicked()
-  enhanceUserContentWhenAsked()
-  enhanceUserContentRepeatedly()
-  showDiscussionTopicSubMessagesWhenClicked()
-  addDiscussionTopicEntryWhenClicked()
-  showAndHideRCEWhenAsked()
-  doThingsWhenDiscussionTopicSubMessageIsPosted()
-  cancelDiscussionTopicSubMessageWhenClicked()
-  highlightDiscussionTopicMessagesOnHover()
-  makeDatesPretty()
-  doThingsToModuleSequenceFooter()
-  showHideRemoveThingsToRightSideMoreLinksWhenClicked()
-  confirmAndDeleteRightSideTodoItemsWhenClicked()
-  makeAllExternalLinksExternalLinks()
+  [
+    submitRouteEventToGA,
+    retriggerEarlyClicks,
+    ellipsifyBreadcrumbs,
+    bindKeyboardShortcutsHelpPanel,
+    warnAboutRolesBeingSwitched,
+    expandQuotedTextWhenClicked,
+    previewEquellaContentWhenClicked,
+    openDialogsWhenClicked,
+    previewFilesWhenClicked,
+    enhanceUserContentWhenAsked,
+    enhanceUserContentRepeatedly,
+    showDiscussionTopicSubMessagesWhenClicked,
+    addDiscussionTopicEntryWhenClicked,
+    showAndHideRCEWhenAsked,
+    doThingsWhenDiscussionTopicSubMessageIsPosted,
+    cancelDiscussionTopicSubMessageWhenClicked,
+    highlightDiscussionTopicMessagesOnHover,
+    makeDatesPretty,
+    doThingsToModuleSequenceFooter,
+    showHideRemoveThingsToRightSideMoreLinksWhenClicked,
+    confirmAndDeleteRightSideTodoItemsWhenClicked,
+    makeAllExternalLinksExternalLinks,
+  ].map(isolate).map(x => x())
 }

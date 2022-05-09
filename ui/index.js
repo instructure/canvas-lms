@@ -28,6 +28,7 @@ import splitAssetString from '@canvas/util/splitAssetString'
 import mathml from 'mathml'
 import preventDefault from 'prevent-default'
 import loadBundle from 'bundles-generated'
+import {isolate} from '@canvas/sentry'
 
 // these are all things that either define global $.whatever or $.fn.blah
 // methods or set something up that other code expects to exist at runtime.
@@ -75,8 +76,11 @@ function afterDocumentReady() {
     advanceReadiness('deferredBundles')
   })
 
-  loadNewUserTutorials()
+  isolate(loadNewUserTutorials)()
+  isolate(setupMathML)()
+}
 
+function setupMathML() {
   // LS-1662: there are math equations on the page that
   // we don't see, so remain invisible and aren't
   // typeset my MathJax. Let's trick Canvas into knowing
@@ -194,28 +198,41 @@ maybePolyfillLocaleThenGo().catch(e =>
   console.error(`Front-end bundles did not successfully start! (${e.message})`)
 )
 
-if (ENV.csp)
+if (ENV.csp) {
   // eslint-disable-next-line promise/catch-or-return
-  import('./boot/initializers/setupCSP').then(({default: setupCSP}) => setupCSP(window.document))
-if (ENV.INCOMPLETE_REGISTRATION) import('./boot/initializers/warnOnIncompleteRegistration')
-if (ENV.badge_counts) import('./boot/initializers/showBadgeCounts')
+  import('./boot/initializers/setupCSP').then(({default: setupCSP}) =>
+    setupCSP(window.document)
+  )
+}
 
-$('html').removeClass('scripts-not-loaded')
+if (ENV.INCOMPLETE_REGISTRATION) {
+  isolate(() => { import('./boot/initializers/warnOnIncompleteRegistration') })()
+}
 
-$('.help_dialog_trigger').click(event => {
-  event.preventDefault()
-  // eslint-disable-next-line promise/catch-or-return
-  import('./boot/initializers/enableHelpDialog').then(({default: helpDialog}) => helpDialog.open())
-})
+if (ENV.badge_counts) {
+  isolate(() => { import('./boot/initializers/showBadgeCounts') })()
+}
 
-// Backbone routes
-$('body').on(
-  'click',
-  '[data-pushstate]',
-  preventDefault(function () {
-    Backbone.history.navigate($(this).attr('href'), true)
+isolate(doRandomThingsToDOM)()
+
+function doRandomThingsToDOM() {
+  $('html').removeClass('scripts-not-loaded')
+
+  $('.help_dialog_trigger').click(event => {
+    event.preventDefault()
+    // eslint-disable-next-line promise/catch-or-return
+    import('./boot/initializers/enableHelpDialog').then(({default: helpDialog}) => helpDialog.open())
   })
-)
+
+  // Backbone routes
+  $('body').on(
+    'click',
+    '[data-pushstate]',
+    preventDefault(function () {
+      Backbone.history.navigate($(this).attr('href'), true)
+    })
+  )
+}
 
 function loadNewUserTutorials() {
   if (
