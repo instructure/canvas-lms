@@ -50,6 +50,7 @@ class ApplicationController < ActionController::Base
   # make sure authlogic is before load_user
   skip_before_action :activate_authlogic
   prepend_before_action :activate_authlogic
+  before_action :respect_account_privacy
 
   around_action :set_locale
   around_action :set_timezone
@@ -779,6 +780,14 @@ class ApplicationController < ActionController::Base
     @domain_root_account = request.env["canvas.domain_root_account"] || LoadAccount.default_domain_root_account
     @files_domain = request.host_with_port != HostUrl.context_host(@domain_root_account) && HostUrl.is_file_host?(request.host_with_port)
     @domain_root_account
+  end
+
+  def respect_account_privacy
+    return if login_request?
+
+    return unless @domain_root_account.present? && @domain_root_account.settings[:require_user]
+
+    require_user
   end
 
   def set_response_headers

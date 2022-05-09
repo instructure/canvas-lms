@@ -3005,6 +3005,65 @@ RSpec.describe ApplicationController, "#redirect_to_login" do
   end
 end
 
+RSpec.describe ApplicationController, "#respect_account_privacy" do
+  controller do
+    before_action :require_user, only: :index
+
+    def index
+      render json: [{}]
+    end
+
+    def login
+      render json: [{}]
+    end
+
+    def public
+      render json: "anyone can see this"
+    end
+  end
+
+  context "when the account it set to require requests be authenticated" do
+    let(:account) { Account.default }
+
+    before do
+      controller.instance_variable_set(:@domain_root_account, account)
+      account.settings[:require_user] = true
+      account.save
+    end
+
+    after do
+      account.settings.delete(:require_user)
+      account.save
+    end
+
+    it "allows unauthenticated users to login" do
+      routes.draw { get "login" => "anonymous#login" }
+      params = { controller: "login/test_controller" }
+      allow(controller).to receive(:params).and_return(params)
+      response = get "login"
+      expect(response.code).not_to eq("302")
+    end
+
+    it "redirects requests to login for unauthenticated users" do
+      routes.draw { get "public" => "anonymous#public" }
+      response = get "public"
+      expect(response.code).to eq("302")
+    end
+
+    context "with an authenticated user" do
+      before do
+        user_factory
+        user_session(@user)
+      end
+
+      it "allows requests" do
+        response = get "index"
+        expect(response.code).not_to eq("302")
+      end
+    end
+  end
+end
+
 RSpec.describe ApplicationController, "#manage_live_events_context" do
   controller do
     def index
