@@ -20,8 +20,11 @@ import React from 'react'
 import {Tag} from '@instructure/ui-tag'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {Flex} from '@instructure/ui-flex'
 import {IconAddSolid, IconXSolid} from '@instructure/ui-icons'
 import {ApplyTheme} from '@instructure/ui-themeable'
+import {useScope as useI18nScope} from '@canvas/i18n'
 
 const themeOverride = {
   [Tag.theme]: {
@@ -29,22 +32,42 @@ const themeOverride = {
   }
 }
 
+const I18n = useI18nScope('pill')
+const ellipsis = () => I18n.t('…')
+const truncate = text => (text.length > 14 ? text.slice(0, 13) + ellipsis() : text)
+
+function renderIcon(selected) {
+  if (selected) {
+    return <IconXSolid data-testid="item-selected" />
+  } else {
+    return <IconAddSolid data-testid="item-unselected" color="brand" />
+  }
+}
+
 const Pill = ({studentId, observerId = null, text, onClick, selected = false}) => {
-  const contents = selected ? (
-    <>
-      <View margin="0 small 0 0">
-        <Text color="primary">{text}</Text>
-      </View>
-      <IconXSolid data-testid="item-selected" />
-    </>
-  ) : (
-    <>
-      <View margin="0 small 0 0">
-        <Text color="secondary">{text}</Text>
-      </View>
-      <IconAddSolid data-testid="item-unselected" color="brand" />
-    </>
-  )
+  const textColor = selected ? 'primary' : 'secondary'
+  const truncatedText = truncate(text)
+
+  const contents =
+    text < truncatedText ? (
+      <>
+        <Flex margin="0 small 0 0" justifyItems="space-between">
+          <Flex.Item>
+            <Tooltip as="div" renderTip={text}>
+              <Text color={textColor}>{truncatedText}</Text>
+            </Tooltip>
+          </Flex.Item>
+          <Flex.Item>{renderIcon(selected)}</Flex.Item>
+        </Flex>
+      </>
+    ) : (
+      <>
+        <View margin="0 small 0 0">
+          <Text color={textColor}>{text}</Text>
+        </View>
+        {renderIcon(selected)}
+      </>
+    )
 
   return (
     <ApplyTheme theme={themeOverride}>
