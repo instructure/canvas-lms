@@ -145,6 +145,7 @@
       %>
     <tr class="<%= assignment_presenter.classes %>"
         data-muted="<%= assignment_presenter.hide_grade_from_student? %>"
+        data-pending_quiz="<%= assignment_presenter.quiz_pending_review? %>"
         id="<%= "submission_" + assignment.id.to_s %>"
         <% if assignment_presenter.excused? %>
           <% excused_label = t "This assignment is excused and will not be considered in the total calculation" %>
