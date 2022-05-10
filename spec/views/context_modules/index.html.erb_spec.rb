@@ -124,4 +124,44 @@ describe "/context_modules/index" do
       expect(page.css(".module_item_send_to").length).to eq 0
     end
   end
+
+  context "assessments" do
+    before :once do
+      course_factory
+      @assignment = assignment_model
+      @assignment.update_attribute(:peer_reviews, true)
+      @reviewer = student_in_course(course: @course, active_enrollment: true).user
+      @reviewee = student_in_course(course: @course, active_enrollment: true).user
+      @assignment.assign_peer_review(@reviewer, @reviewee)
+      @assessment = @assignment.submission_for_student(@reviewer).assigned_assessments.first
+
+      context_module = @course.context_modules.create!
+      @module_item = context_module.add_item type: "assignment", id: @assignment.id
+      @module_item.publish! if @module_item.unpublished?
+    end
+
+    it "shows the list of assessment requests when peer_reviews_for_a2 FF is ON" do
+      @course.enable_feature! :peer_reviews_for_a2
+
+      view_context(@course, @reviewer)
+      assign(:modules, @course.context_modules.active)
+      assign(:is_student, true)
+      render "context_modules/index"
+      expect(response).not_to be_nil
+      page = Nokogiri("<document>" + response.body + "</document>")
+      expect(page.css("#context_module_item_#{@module_item.id}_#{@assessment.id}").length).to eq 1
+    end
+
+    it "does not show the list of assessment requests when peer_reviews_for_a2 FF is OFF" do
+      @course.disable_feature! :peer_reviews_for_a2
+
+      view_context(@course, @reviewer)
+      assign(:modules, @course.context_modules.active)
+      assign(:is_student, true)
+      render "context_modules/index"
+      expect(response).not_to be_nil
+      page = Nokogiri("<document>" + response.body + "</document>")
+      expect(page.css("#context_module_item_#{@module_item.id}_#{@assessment.id}").length).to eq 0
+    end
+  end
 end
