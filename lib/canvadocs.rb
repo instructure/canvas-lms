@@ -150,6 +150,7 @@ module Canvadocs
         klass = Canvadocs::HttpError
         klass = Canvadocs::ServerError if response.code.to_s == "500"
         klass = Canvadocs::BadGateway if response.code.to_s == "502"
+        klass = Canvadocs::HeavyLoadError if %w[503 504].include? response.code.to_s
         klass = Canvadocs::BadRequest if response.code.to_s == "400"
         raise klass, err_message
       end
@@ -205,6 +206,8 @@ module Canvadocs
   class BadGateway < HttpError; end
 
   class BadRequest < HttpError; end
+
+  class HeavyLoadError < HttpError; end
 
   def self.config
     PluginSetting.settings_for_plugin(:canvadocs)
