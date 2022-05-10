@@ -117,7 +117,11 @@ module Qti
   end
 
   def self.get_conversion_command(out_dir, manifest_file, file_path_prepend = nil)
-    prepend = file_path_prepend ? "--pathprepend=\"#{file_path_prepend}\" " : ""
-    "\"#{@migration_executable}\" #{prepend}--ucvars --nogui --overwrite --cpout=#{Shellwords.escape(out_dir)} #{Shellwords.escape(manifest_file)} 2>&1"
+    if @migration_executable.nil?
+      raise "Couldn't find QTI Migration Tool. See https://github.com/instructure/QTIMigrationTool/wiki for installation instructions."
+    else
+      prepend = file_path_prepend ? "--pathprepend=\"#{file_path_prepend}\" " : ""
+      "\"#{@migration_executable}\" #{prepend}--ucvars --nogui --overwrite --cpout=#{Shellwords.escape(out_dir)} #{Shellwords.escape(manifest_file)} 2>&1"
+    end
   end
 end
