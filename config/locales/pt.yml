@@ -1989,7 +1989,7 @@ pt:
   add_hostname_as_an_allowed_domain_1f58c38d: "Adicionar %{hostname} como um domínio permitido"
   add_hostname_to_the_whitelist_c808192e: "Adicionar %{hostname} à lista de permissões"
   add_icon_567dbcaa: "Adicionar ícone"
-  add_items_44913315: "Adicionar ítens"
+  add_items_44913315: "Adicionar itens"
   add_items_into_scoring_range_title_be08104e: "Adicionar item a %{scoring_range_title}"
   add_items_to_score_range_297d413b: "Adicionar itens ao Alcance de Classificação"
   add_link_5c01c1e8: "Adicionar Ligação"
@@ -6401,10 +6401,10 @@ pt:
     resource_pairing_codes_faq: "https://community.canvaslms.com/t5/Resource-Documents/Pairing-Codes-FAQ-PDF/ta-p/388738"
   community_releases_beta_test_schedule_e080d4d4: "#community.releases_beta_test_schedule"
   complete_4f4efbc: completo
-  complete_all_items_e1779257: "Completar Todos os Ítens"
+  complete_all_items_e1779257: "Completar Todos os Itens"
   complete_fd828dea: Completo
   complete_icon_7455be93: "ícone completo"
-  complete_one_item_90e5fb03: "Completar Um Iten"
+  complete_one_item_90e5fb03: "Completar Um Item"
   complete_registration_by_clicking_the_finish_the_r_6c1c958b: "Complete o registo clicando na ligação \"concluir o processo de registo\" enviado para o seu e-mail."
   complete_registration_by_clicking_the_finish_the_r_fcd13ac8: "Complete o registo ao clicar na ligação \"concluir o processo de registo\" enviado para o seu e-mail."
   complete_title_7482ddcf: "Completo %{title}"
@@ -7025,7 +7025,7 @@ pt:
       buttons: 
         add_module: "Adicionar módulo"
       labels: 
-        before_viewing: Prerequisitos
+        before_viewing: Pré-requisitos
         module_complete_when: Requisitos
         publish_final_grade: "Publicar nota final do aluno quando este módulo for concluído"
         require_sequential_progress: "Os estudantes têm de responder aos requisitos em ordem sequencial"
@@ -7134,7 +7134,7 @@ pt:
           move_module: "Mover este módulo"
           student_progress: "Ver o progresso do aluno neste módulo"
       manager_module: "Gerir módulo"
-      module_will_unlock_at: "Será desbloqueado em *%{unlock_date}*"
+      module_will_unlock_at: "Será desbloqueado no dia *%{unlock_date}*"
       modules_keyboard_drag_and_drop: "Aviso: para melhor acessibilidade na reordenação de Módulos (ou itens de Módulos), utilize a opção Mover para que se encontra no menu."
       progression_complete_count: "*%{count}* concluído"
       progression_started_count: "*%{count}* em curso"
@@ -7563,8 +7563,8 @@ pt:
     other: "%{count} itens eliminados com sucesso."
   count_items_found_224f86d3: 
     one: "Um ítem encontrado"
-    other: "Não foram encontrados ítens %{count}"
-    zero: "Não foram encontrados ítens"
+    other: "Não foram encontrados itens %{count}"
+    zero: "Não foram encontrados itens"
   count_items_on_page_page_961fc0c7: "%{count} itens na página %{page}"
   count_items_selected_91814713: 
     one: "%{count} item selecionado"
@@ -15247,7 +15247,7 @@ pt:
   locked_until_unlock_date_498ead5f: "Bloqueada até %{unlock_date}"
   locking_91f476a5: "A bloquear..."
   log_in_5c66644d: "Iniciar sessão"
-  log_in_c9e240ef: Registar
+  log_in_c9e240ef: "Iniciar sessão"
   log_in_to_submit_962106cf: "Faça o login para enviar"
   log_in_url_is_not_a_valid_uri_7b8c57ee: "O URL de login não é um URI válido"
   log_on_url_fc166e4c: "URL de log on"
@@ -15278,7 +15278,7 @@ pt:
           request_password: "Solicitar senha"
         dont_know_password: "Esqueceu a senha?"
         error: "Ocorreu um erro, por favor tente novamente mais tarde."
-        log_in: Registar
+        log_in: "Iniciar sessão"
         login_handle: "Introduza o seu %{login_handle_name} e enviar-lhe-emos uma ligação para alterar a sua palavra-passe."
         password: Palavra-passe
         sending: "A enviar..."
@@ -15307,7 +15307,7 @@ pt:
         labels: 
           password: "Senha "
           remember_me: "Permanecer ligado"
-        log_in: Registar
+        log_in: "Iniciar sessão"
         login_handle: "Introduza o seu %{login_handle_name} e enviar-lhe-emos uma ligação para alterar a sua palavra-passe."
         open_source_learning_management_system: "LMS Open Source"
     logout_confirm: 
@@ -18423,7 +18423,7 @@ pt:
   no_grading_schemes_to_display_8b0e92e7: "Não há esquemas de avaliação para mostrar"
   no_icon_1f6ea5f4: "sem ícone"
   no_integrations_available_6729d0ca: "Não há integrações disponíveis"
-  no_items_found_870b2d0d: "Não foram encontrados ítens"
+  no_items_found_870b2d0d: "Não foram encontrados itens"
   no_items_in_module_21f111a2: "Sem itens no módulo"
   no_job_selected_d6c5e6f4: "Nenhuma vaga selecionada"
   no_label_date_ff3a372f: "Sem %{label} Data"
@@ -20303,7 +20303,7 @@ pt:
     headers: 
       completion_prerequisites: "Pré-requisitos de conclusão"
     labels: 
-      requirements_must_be_completed: "Os seguintes prerrequisitos devem ser concluídos antes desta página ser desbloqueada"
+      requirements_must_be_completed: "Os seguintes pré-requisitos devem ser concluídos antes desta página ser desbloqueada"
   presentation_2d9387ca: Apresentação
   presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Apresenta a definição do teste para evitar a submissão automática de um teste cronometrado quando o tempo disponível tiver terminado."
   press_alt_f8_to_see_a_list_of_keyboard_shortcuts_2a8c7bc0: "Prima ALT + F8 para ver uma lista de atalhos de teclado"
