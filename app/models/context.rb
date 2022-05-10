@@ -265,6 +265,9 @@ module Context
       file_id = params[:file_id] || params[:id]
       file_id ||= uri.query && CGI.parse(uri.query).send(:[], "preview")&.first
       object ||= context.attachments.find_by(id: file_id) # attachments.find_by(id:) uses the replacement hackery
+      full_path = params[:full_path]
+      folder = full_path && Folder.find_by(name: full_path)
+      object ||= folder if folder && folder.context == context
     when "wiki_pages"
       object = context.wiki.find_page(CGI.unescape(params[:id]), include_deleted: true)
       if !object && params[:id].to_s.include?("+") # maybe it really is a "+"
