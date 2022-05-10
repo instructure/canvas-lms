@@ -27,6 +27,7 @@ import {initSentry} from './initializers/initSentry'
 import {up as renderRailsFlashNotifications} from './initializers/renderRailsFlashNotifications'
 import {up as activateCourseMenuToggler} from './initializers/activateCourseMenuToggler'
 import {up as enhanceUserContent} from './initializers/enhanceUserContent'
+import {isolate} from '@canvas/sentry'
 
 try {
   initSentry()
@@ -42,9 +43,9 @@ moment().locale(ENV.MOMENT_LOCALE)
 let runOnceAfterLocaleFiles = () => {
   configureDateTimeMomentParser()
   configureDateTime()
-  renderRailsFlashNotifications()
-  activateCourseMenuToggler()
-  enhanceUserContent()
+  isolate(renderRailsFlashNotifications)()
+  isolate(activateCourseMenuToggler)()
+  isolate(enhanceUserContent)()
 }
 
 window.addEventListener('canvasReadyStateChange', function({ detail }) {
@@ -54,7 +55,7 @@ window.addEventListener('canvasReadyStateChange', function({ detail }) {
   }
 })
 
-enableDTNPI({
+isolate(enableDTNPI)({
   endpoint: window.ENV.DATA_COLLECTION_ENDPOINT
 })
 
