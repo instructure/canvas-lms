@@ -155,7 +155,7 @@ class CanvadocSessionsController < ApplicationController
   rescue HmacHelper::Error => e
     Canvas::Errors.capture_exception(:canvadocs, e, :info)
     render plain: "unauthorized", status: :unauthorized
-  rescue Timeout::Error, Canvadocs::BadGateway, Canvadocs::ServerError => e
+  rescue Timeout::Error, Canvadocs::BadGateway, Canvadocs::ServerError, Canvadocs::HeavyLoadError => e
     Canvas::Errors.capture_exception(:canvadocs, e, :warn)
     render plain: "Service is currently unavailable. Try again later.",
            status: :service_unavailable

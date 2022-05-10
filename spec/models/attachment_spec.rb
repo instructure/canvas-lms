@@ -369,6 +369,23 @@ describe Attachment do
         canvadocable.submit_to_canvadocs 1
         expect(captured).to be_truthy
       end
+
+      it "downgrades Canvadocs heavy load errors to WARN" do
+        canvadocable = canvadocable_attachment_model content_type: "application/pdf"
+        cd_double = double
+        allow(canvadocable).to receive(:canvadoc).and_return(cd_double)
+        expect(canvadocable.canvadoc).not_to be_nil
+        expect(canvadocable.canvadoc).to receive(:upload).and_raise(Canvadocs::HeavyLoadError)
+        captured = false
+        allow(Canvas::Errors).to receive(:capture) do |e, _error_data, error_level|
+          if e.is_a?(Canvadocs::HeavyLoadError)
+            captured = true
+            expect(error_level).to eq(:warn)
+          end
+        end
+        canvadocable.submit_to_canvadocs 1
+        expect(captured).to be_truthy
+      end
     end
   end
 
