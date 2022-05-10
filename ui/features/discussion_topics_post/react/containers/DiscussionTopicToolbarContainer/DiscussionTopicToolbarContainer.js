@@ -46,9 +46,6 @@ export const DiscussionTopicToolbarContainer = props => {
   }
 
   const getGroupsMenuTopics = () => {
-    if (!props.discussionTopic.permissions?.readAsAdmin) {
-      return null
-    }
     if (!props.discussionTopic.groupSet) {
       return null
     }
