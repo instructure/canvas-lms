@@ -133,7 +133,7 @@ Once a Tool Proxy is created Canvas will automatically create a subscription to 
 Tools configured as described in section 1 of this document will be launchable from the assignment create/edit page in Canvas (see section 2.1).
 
 #### 2.1 The Similarity Detection Placement
-Tools configured as described in section 1 of this document will be made available to assignments using “File Upload” submission types. Other submission types are not supported at this time. Once “File Upload” submission type is selected, a “Plagiarism Review” dropdown box becomes available so that the user can associate the assignment to the plagiarism tool. Note that the plagiarism platform feature flag must be enabled in Canvas.
+Tools configured as described in section 1 of this document will be made available to assignments using “File Upload” or "Text Entry" submission types. Other submission types are not supported at this time. Once “File Upload” or "Text Entry" submission type is selected, a “Plagiarism Review” dropdown box becomes available so that the user can associate the assignment to the plagiarism tool. Note that the plagiarism platform feature flag must be enabled in Canvas.
 
 Selecting a tool in the "Plagiarism Review" selector initiates a standard LTI launch to the launch URL provided in the resource handler during the registration phase (see 1.2). This launch is intended to allow configuration of the plagiarism review tool during the assignment creation process.
 
@@ -203,7 +203,7 @@ These two actions will only occur if the same TP has been installed in the conte
 
 Once the course copy has occurred TPs should be aware that they will begin receiving `submission_created` webhooks for assignments for which they have never had an LTI launch occur. This is because it is unlikely that an instructor will edit each assignment in the new course, which is what would allow the `Canvas.placements.similarityDetection` placement LTI launch to occur. To access information about assignments that a TP has never received an LTI launch for use the <a href="plagiarism_detection_platform_assignments.html">Assignment LTI API</a>.
 
-TPs often have a configuration that is set on a per-assignment basis via their UI by the instructor creating the assignment and stored by the TP. There are two ways of handeling these TP configurations during a course copy: using reasonable defaults or using the LTI Tool Settings Service.
+TPs often have a configuration that is set on a per-assignment basis via their UI by the instructor creating the assignment and stored by the TP. There are two ways of handling these TP configurations during a course copy: using reasonable defaults or using the LTI Tool Settings Service.
 
 ##### Option 1: Using Defaults
 When receiving a `submission_created` webhook for an assignment that has never had an associated LTI launch, TP configuration items have not been set by the instructor. In these cases, TPs should use good defaults for any custom configuration they typically offer to instructors when configuring assignments. TPs may even wish to provide a resource handler that uses the `Canvas.placements.accountNavigation` placement in order to provide Canvas administrators the ability to set account-level default configurations.

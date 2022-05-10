@@ -79,21 +79,20 @@ module Lti
       subquery = ToolProxyBinding
                  .select("DISTINCT ON (x.ordering, lti_tool_proxy_bindings.tool_proxy_id) lti_tool_proxy_bindings.*, x.ordering")
                  .joins("INNER JOIN (
-            VALUES #{account_sql_string}) as x(context_type, context_id, ordering
-          ) ON lti_tool_proxy_bindings.context_type = x.context_type
-            AND lti_tool_proxy_bindings.context_id = x.context_id")
-                 .where('(lti_tool_proxy_bindings.context_type = ? AND lti_tool_proxy_bindings.context_id = ?)
-          OR (lti_tool_proxy_bindings.context_type = ? AND lti_tool_proxy_bindings.context_id IN (?))',
+                           VALUES #{account_sql_string}) as x(context_type, context_id, ordering
+                         ) ON lti_tool_proxy_bindings.context_type = x.context_type
+                           AND lti_tool_proxy_bindings.context_id = x.context_id")
+                 .where("(lti_tool_proxy_bindings.context_type = ? AND lti_tool_proxy_bindings.context_id = ?)
+                         OR (lti_tool_proxy_bindings.context_type = ? AND lti_tool_proxy_bindings.context_id IN (?))",
                         context.class.name, context.id, "Account", account_ids)
                  .order("lti_tool_proxy_bindings.tool_proxy_id, x.ordering").to_sql
       tools = joins("JOIN (#{subquery}) bindings on lti_tool_proxies.id = bindings.tool_proxy_id")
-              .select("lti_tool_proxies.*, bindings.enabled AS binding_enabled").
-              # changed this from eager_load, because eager_load likes to wipe out custom select attributes
-              joins(:product_family)
-              .joins(:resources).
-              # changed the order to go from the special ordering set up (to make sure we're going from the course to the
+              .select("lti_tool_proxies.*, bindings.enabled AS binding_enabled")
+              .joins(:product_family)
+              .joins(:resources)
+              # This is using a special ordering set up (to make sure we're going from the course to the
               # root account in order of parent accounts) and then takes the most recently installed tool
-              order("ordering, lti_tool_proxies.id DESC")
+              .order("ordering, lti_tool_proxies.id DESC")
               .where(lti_tool_proxies: { workflow_state: "active" })
               .where("lti_product_families.vendor_code = ? AND lti_product_families.product_code = ?", vendor_code, product_code)
               .where(lti_resource_handlers: { resource_type_code: resource_type_code })
