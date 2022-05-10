@@ -151,6 +151,22 @@ describe OutcomesController do
     end
   end
 
+  context "outcome_average_calculation" do
+    it "returns true if outcome_average_calculation feature flag is enabled" do
+      @account.root_account.enable_feature!(:outcome_average_calculation)
+      user_session(@admin)
+      get "index", params: { account_id: @account.id }
+      expect(assigns[:js_env][:OUTCOME_AVERAGE_CALCULATION]).to eq true
+    end
+
+    it "returns false if outcome_average_calculation feature flag is disabled" do
+      @account.root_account.disable_feature!(:outcome_average_calculation)
+      user_session(@admin)
+      get "index", params: { account_id: @account.id }
+      expect(assigns[:js_env][:OUTCOME_AVERAGE_CALCULATION]).to eq false
+    end
+  end
+
   describe "GET 'show'" do
     it "requires authorization" do
       course_outcome

@@ -273,7 +273,7 @@ const ProficiencyCalculation = ({
   setError,
   calcIntInputRef
 }) => {
-  const {contextType} = useCanvasContext()
+  const {contextType, outcomeAllowAverageCalculationFF} = useCanvasContext()
   const {calculationMethod: initialMethodKey, calculationInt: initialInt} = method
 
   const [calculationMethodKey, setCalculationMethodKey] = useState(initialMethodKey)
@@ -284,6 +284,8 @@ const ProficiencyCalculation = ({
 
   const individualOutcomeDisplay = individualOutcome === 'display'
   const individualOutcomeEdit = individualOutcome === 'edit'
+  const displayInvalidCalculationMethod =
+    method.calculationMethod === 'average' && !outcomeAllowAverageCalculationFF
 
   const setAllowSave = newAllowSave => {
     realSetAllowSave(newAllowSave)
@@ -304,12 +306,24 @@ const ProficiencyCalculation = ({
   // Updates state if component is in individual outcome display mode and
   // calculation method or int was changed externally (e.g. via outcome edit)
   useEffect(() => {
-    if (individualOutcomeDisplay) {
+    if (individualOutcomeDisplay && !displayInvalidCalculationMethod) {
       updateCalculationMethod(null, {id: method.calculationMethod})
       updateCalculationInt(method.calculationInt)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [method])
+
+  const [showAlert, setShowAlert] = useState(true)
+
+  useEffect(() => {
+    if (displayInvalidCalculationMethod && showAlert) {
+      showFlashAlert({
+        message: I18n.t('The selected calculation method is no longer available'),
+        type: 'error'
+      })
+      setShowAlert(false)
+    }
+  }, [displayInvalidCalculationMethod, method, showAlert])
 
   const calculationMethods = new CalculationMethodContent({
     calculation_method: calculationMethodKey,
@@ -317,7 +331,9 @@ const ProficiencyCalculation = ({
     is_individual_outcome: true,
     mastery_points: masteryPoints
   }).toJSON()
-  const currentMethod = calculationMethods[calculationMethodKey]
+  const currentMethod =
+    calculationMethods[calculationMethodKey] ||
+    calculationMethods[defaultProficiencyCalculation.calculationMethod]
 
   // Sync data/errors between internal/component and external/parent state
   const syncInternalWithExternalState = (calcMethodKey, calcInt) => {
