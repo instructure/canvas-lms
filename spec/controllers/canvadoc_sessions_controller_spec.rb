@@ -447,6 +447,13 @@ describe CanvadocSessionsController do
       assert_status(503)
     end
 
+    it "fails with a reasonable error when canvadocs has heavy load" do
+      allow_any_instance_of(Canvadocs::API).to receive(:session).and_raise(Canvadocs::HeavyLoadError)
+      get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
+      assert_status(503)
+      expect(response.body).to eq "Service is currently unavailable. Try again later."
+    end
+
     it "updates attachment.viewed_at if the owner (user that is the context of the attachment) views" do
       last_viewed_at = @attachment1.viewed_at
       @blob[:user_id] = @student.global_id

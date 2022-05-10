@@ -1788,7 +1788,8 @@ class Attachment < ActiveRecord::Base
     warnable_errors = [
       Canvadocs::BadGateway,
       Canvadoc::UploadTimeout,
-      Canvadocs::ServerError
+      Canvadocs::ServerError,
+      Canvadocs::HeavyLoadError
     ]
     error_level = warnable_errors.any? { |kls| e.is_a?(kls) } ? :warn : :error
     update_attribute(:workflow_state, "errored")
