@@ -263,7 +263,7 @@
                   <% disabled = hash[:locked] && hash[:inherited] %>
                   <tr class="future_listing">
                     <td colspan="2"><%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
-                      <%= r.label :restrict_student_future_listing, :en => "Restrict students from viewing future courses in enrollments list" %>
+                      <%= r.label :value, t("Restrict students from viewing future courses in enrollments list") %>
                     </td>
                   </tr>
                   <% unless disabled %>
