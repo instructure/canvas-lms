@@ -27,6 +27,8 @@
 - [Common Testing Scenarios](./11_testing.md)
 - [Deep Linking](./12_deep_linking.md)
 - [Basic Outcomes](./13_basic_outcomes.md)
+- [Placements] (./14_placements.md)
+- [Plagiarism] (./15_plagiarism.md)
 
 **Other Docs**
 - [External Tools Introduction - Canvas LMS REST API Documentation (instructure.com)](https://canvas.instructure.com/doc/api/file.tools_intro.html)
