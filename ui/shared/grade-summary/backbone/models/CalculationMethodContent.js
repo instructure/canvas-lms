@@ -118,6 +118,7 @@ export default class CalculationMethodContent {
   }
 
   toJSON() {
+    const outcomeAllowAverageCalculationFF = ENV.OUTCOME_AVERAGE_CALCULATION
     const alternativeCalculationValues = this.is_individual_outcome
       ? {
           decaying_average: {
@@ -231,17 +232,19 @@ export default class CalculationMethodContent {
         exampleScores: alternativeCalculationValues.highest.exampleScores,
         exampleResult: alternativeCalculationValues.highest.exampleResult
       },
-      average: {
-        method: alternativeCalculationValues.average.method,
-        friendlyCalculationMethod: I18n.t('Average'),
-        exampleText: I18n.t(
-          'Central value in a set of results. Calculated by dividing the sum of all item scores by the number of scores.'
-        ),
-        exampleScores: this.exampleScoreIntegers().slice(0, 7).join(', '),
-        exampleResult: numberFormat.outcomeScore(
-          this.average(this.exampleScoreIntegers().slice(0, 7))
-        )
-      }
+      ...(outcomeAllowAverageCalculationFF && {
+        average: {
+          method: alternativeCalculationValues.average.method,
+          friendlyCalculationMethod: I18n.t('Average'),
+          exampleText: I18n.t(
+            'Central value in a set of results. Calculated by dividing the sum of all item scores by the number of scores.'
+          ),
+          exampleScores: this.exampleScoreIntegers().slice(0, 7).join(', '),
+          exampleResult: numberFormat.outcomeScore(
+            this.average(this.exampleScoreIntegers().slice(0, 7))
+          )
+        }
+      })
     }
   }
 }
