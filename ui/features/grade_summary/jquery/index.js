@@ -19,11 +19,11 @@
 import _ from 'underscore'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/jquery/jquery.instructure_misc_helpers'/* replaceTags */
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* showIf */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf */
 import '@canvas/util/templateData'
 import '@canvas/media-comments/jquery/mediaCommentThumbnail'
-import '@canvas/media-comments'/* mediaComment */
+import '@canvas/media-comments' /* mediaComment */
 import axios from '@canvas/axios'
 import {camelize} from 'convert-case'
 import React from 'react'
@@ -88,10 +88,7 @@ const GradeSummary = {
 
     const $screenreaderLinkClone = $assignmentScore.find('.screenreader-only').clone(true)
     $assignmentScore.find('.grade').data('screenreader_link', $screenreaderLinkClone)
-    $assignmentScore
-      .find('.grade')
-      .empty()
-      .append($('#grade_entry'))
+    $assignmentScore.find('.grade').empty().append($('#grade_entry'))
     $assignmentScore.find('.score_value').hide()
     $ariaAnnouncer.text(I18n.t('Enter a What-If score.'))
 
@@ -102,11 +99,7 @@ const GradeSummary = {
       .find('.what_if_score')
       .text()
     const score = GradeSummary.parseScoreText(whatIfScoreText, 0, '0')
-    $('#grade_entry')
-      .val(score.formattedValue)
-      .show()
-      .focus()
-      .select()
+    $('#grade_entry').val(score.formattedValue).show().focus().select()
   },
 
   onScoreChange($assignment, options) {
@@ -161,9 +154,7 @@ const GradeSummary = {
       )
     }
 
-    $('#grade_entry')
-      .hide()
-      .appendTo($('body'))
+    $('#grade_entry').hide().appendTo($('body'))
 
     const $grade = $assignment.find('.grade')
 
@@ -180,10 +171,7 @@ const GradeSummary = {
     if (isChanged) {
       $assignmentScore.attr('title', '')
       $scoreTeaser.text(I18n.t('This is a What-If score'))
-      const $revertScore = $('#revert_score_template')
-        .clone(true)
-        .attr('id', '')
-        .show()
+      const $revertScore = $('#revert_score_template').clone(true).attr('id', '').show()
       $assignmentScore.find('.score_holder').append($revertScore)
       $grade.addClass('changed')
 
@@ -230,7 +218,11 @@ const GradeSummary = {
     if ($assignment.data('muted')) {
       title = I18n.t('Instructor has not posted this grade')
       // xsslint safeString.identifier title
-      $grade.html(`<i class="icon-off" aria-hidden="true" title="${title}"=></i>`)
+      $grade.html(`<i class="icon-off" aria-hidden="true" title="${title}"></i>`)
+    } else if ($assignment.data('pending_quiz')) {
+      title = I18n.t('Instructor has not posted this grade')
+      // xsslint safeString.identifier title
+      $grade.html(`<i class="icon-quiz" aria-hidden="true" title="${title}"></i>`)
     } else {
       title = I18n.t('Click to test a different score')
       $grade.text(score.formattedValue)
@@ -502,9 +494,7 @@ function updateStudentGrades() {
   $('.dropped').attr('title', '')
 
   // mark dropped assignments
-  $('.student_assignment')
-    .find('.points_possible')
-    .attr('aria-label', '')
+  $('.student_assignment').find('.points_possible').attr('aria-label', '')
 
   _.forEach(calculatedGrades.assignmentGroups, grades => {
     _.forEach(grades[currentOrFinal].submissions, submission => {
@@ -541,7 +531,7 @@ function bindShowAllDetailsButton($ariaAnnouncer) {
 
     if ($button.hasClass('showAll')) {
       $button.text(I18n.t('Hide All Details'))
-      $('tr.student_assignment.editable').each(function() {
+      $('tr.student_assignment.editable').each(function () {
         const assignmentId = $(this).getTemplateValue('assignment_id')
         const muted = $(this).data('muted')
         if (!muted) {
@@ -592,7 +582,7 @@ function getSelectMenuGroupProps() {
     selectedGradingPeriodID: ENV.current_grading_period_id,
     selectedStudentID: ENV.student_id,
     students: ENV.students
-  };
+  }
 }
 
 function renderSelectMenuGroup() {
@@ -603,7 +593,7 @@ function renderSelectMenuGroup() {
 }
 
 function setup() {
-  $(document).ready(function() {
+  $(document).ready(function () {
     GradeSummary.updateStudentGrades()
     const showAllWhatIfButton = $(this).find('#student-grades-whatif button')
     const revertButton = $(this).find('#revert-all-to-actual-score')
@@ -612,7 +602,7 @@ function setup() {
     $('.revert_all_scores_link').click(event => {
       event.preventDefault()
       // we pass in refocus: false here so the focus won't go to the revert arrows within the grid
-      $('#grades_summary .revert_score_link').each(function() {
+      $('#grades_summary .revert_score_link').each(function () {
         $(this).trigger('click', {skipEval: true, refocus: false})
       })
       $('#.show_guess_grades.exists').show()
@@ -625,7 +615,7 @@ function setup() {
     $(
       '.toggle_comments_link, .toggle_score_details_link, ' +
         '.toggle_rubric_assessments_link, .toggle_final_grade_info'
-    ).click(function(event) {
+    ).click(function (event) {
       event.preventDefault()
       const $row = $(`#${$(this).attr('aria-controls')}`)
       const originEl = this
@@ -638,16 +628,14 @@ function setup() {
       }
     })
 
-    $('.screenreader-toggle').click(function(event) {
+    $('.screenreader-toggle').click(function (event) {
       event.preventDefault()
       const ariaControl = $(this).data('aria')
       const originEl = $(`a[aria-controls='${ariaControl}']`)
 
       $(originEl).attr('aria-expanded', false)
       $(originEl).focus()
-      $(this)
-        .closest('.rubric_assessments, .comments')
-        .hide()
+      $(this).closest('.rubric_assessments, .comments').hide()
     })
 
     function editWhatIfScore(event) {
@@ -666,7 +654,7 @@ function setup() {
 
     $('.student_assignment.editable .assignment_score').on('click keypress', editWhatIfScore)
 
-    $('#grade_entry').keydown(function(event) {
+    $('#grade_entry').keydown(function (event) {
       if (event.keyCode === 13) {
         // Enter Key: Finish Changes
         $ariaAnnouncer.text('')
@@ -685,16 +673,16 @@ function setup() {
       }
     })
 
-    $('#grades_summary .student_assignment').bind('score_change', function(_event, options) {
+    $('#grades_summary .student_assignment').bind('score_change', function (_event, options) {
       GradeSummary.onScoreChange($(this), options)
     })
 
-    $('#grade_entry').blur(function() {
+    $('#grade_entry').blur(function () {
       const $assignment = $(this).parents('.student_assignment')
       $assignment.triggerHandler('score_change', {update: true, refocus: true})
     })
 
-    $('#grades_summary').delegate('.revert_score_link', 'click', function(event, options) {
+    $('#grades_summary').delegate('.revert_score_link', 'click', function (event, options) {
       event.preventDefault()
       event.stopPropagation()
 
@@ -704,20 +692,16 @@ function setup() {
     $('#grades_summary:not(.editable) .assignment_score').css('cursor', 'default')
 
     $('#grades_summary tr').hover(
-      function() {
-        $(this)
-          .find('th.title .context')
-          .addClass('context_hover')
+      function () {
+        $(this).find('th.title .context').addClass('context_hover')
       },
-      function() {
-        $(this)
-          .find('th.title .context')
-          .removeClass('context_hover')
+      function () {
+        $(this).find('th.title .context').removeClass('context_hover')
       }
     )
 
     $('.show_guess_grades_link').click(() => {
-      $('#grades_summary .student_entered_score').each(function() {
+      $('#grades_summary .student_entered_score').each(function () {
         const score = GradeSummary.parseScoreText($(this).text())
         if (score.numericalValue != null) {
           const $assignment = $(this).parents('.student_assignment')
@@ -731,18 +715,16 @@ function setup() {
       $.screenReaderFlashMessageExclusive(I18n.t('Grades are now showing what-if scores'))
     })
 
-    $('#grades_summary .student_entered_score').each(function() {
+    $('#grades_summary .student_entered_score').each(function () {
       const score = GradeSummary.parseScoreText($(this).text())
       if (score.numericalValue != null) {
-        $('.show_guess_grades')
-          .show()
-          .addClass('exists')
+        $('.show_guess_grades').show().addClass('exists')
       }
     })
 
     $('.comments .play_comment_link').mediaCommentThumbnail('normal')
 
-    $('.play_comment_link').live('click', function(event) {
+    $('.play_comment_link').live('click', function (event) {
       event.preventDefault()
       const $parent = $(this).parents('.comment_media')
       const commentId = $parent.getTemplateData({textValues: ['media_comment_id']}).media_comment_id

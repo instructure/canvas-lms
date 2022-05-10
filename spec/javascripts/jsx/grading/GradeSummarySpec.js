@@ -23,7 +23,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import fakeENV from 'helpers/fakeENV'
 import numberHelper from '@canvas/i18n/numberHelper'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
-import GradeSummary from 'ui/features/grade_summary/jquery/index.js'
+import GradeSummary from 'ui/features/grade_summary/jquery/index'
 import {createCourseGradesWithGradingPeriods} from '../gradebook/GradeCalculatorSpecHelper'
 
 const I18n = useI18nScope('gradingGradeSummary')
@@ -345,19 +345,19 @@ QUnit.module('GradeSummary.getOriginalScore', {
   }
 })
 
-test('parses the text of the .original_points element', function() {
+test('parses the text of the .original_points element', function () {
   const score = GradeSummary.getOriginalScore(this.$assignment)
   strictEqual(score.numericalValue, 10)
   strictEqual(score.formattedValue, '10')
 })
 
-test('sets "numericalValue" to a default of null', function() {
+test('sets "numericalValue" to a default of null', function () {
   this.$assignment.find('.original_points').text('invalid')
   const score = GradeSummary.getOriginalScore(this.$assignment)
   strictEqual(score.numericalValue, null)
 })
 
-test('sets "formattedValue" to formatted grade', function() {
+test('sets "formattedValue" to formatted grade', function () {
   this.$assignment.find('.original_score').text('C+ (78.5)')
   const score = GradeSummary.getOriginalScore(this.$assignment)
   equal(score.formattedValue, 'C+ (78.5)')
@@ -481,21 +481,21 @@ QUnit.module('GradeSummary.calculateSubtotalsByGradingPeriod', {
   }
 })
 
-test('calculates subtotals by grading period', function() {
+test('calculates subtotals by grading period', function () {
   equal(this.subtotals.length, 2, 'calculates a subtotal for each period')
 })
 
-test('creates teaser text for subtotals by grading period', function() {
+test('creates teaser text for subtotals by grading period', function () {
   equal(this.subtotals[0].teaserText, '8.00 / 10.00', 'builds teaser text for first period')
   equal(this.subtotals[1].teaserText, '9.00 / 10.00', 'builds teaser text for second period')
 })
 
-test('creates grade text for subtotals by grading period', function() {
+test('creates grade text for subtotals by grading period', function () {
   equal(this.subtotals[0].gradeText, '80%', 'builds grade text for first period')
   equal(this.subtotals[1].gradeText, '90%', 'builds grade text for second period')
 })
 
-test('assigns row element ids for subtotals by grading period', function() {
+test('assigns row element ids for subtotals by grading period', function () {
   equal(
     this.subtotals[0].rowElementId,
     '#submission_period-1',
@@ -514,21 +514,21 @@ QUnit.module('GradeSummary.calculateSubtotalsByAssignmentGroup', {
   }
 })
 
-test('calculates subtotals by assignment group', function() {
+test('calculates subtotals by assignment group', function () {
   equal(this.subtotals.length, 2, 'calculates a subtotal for each group')
 })
 
-test('calculates teaser text for subtotals by assignment group', function() {
+test('calculates teaser text for subtotals by assignment group', function () {
   equal(this.subtotals[0].teaserText, '6.00 / 10.00', 'builds teaser text for first group')
   equal(this.subtotals[1].teaserText, '7.00 / 10.00', 'builds teaser text for second group')
 })
 
-test('calculates grade text for subtotals by assignment group', function() {
+test('calculates grade text for subtotals by assignment group', function () {
   equal(this.subtotals[0].gradeText, '60%', 'builds grade text for first group')
   equal(this.subtotals[1].gradeText, '70%', 'builds grade text for second group')
 })
 
-test('calculates row element ids for subtotals by assignment group', function() {
+test('calculates row element ids for subtotals by assignment group', function () {
   equal(
     this.subtotals[0].rowElementId,
     '#submission_group-1',
@@ -570,10 +570,7 @@ test('avoids floating point calculation issues', () => {
 QUnit.module('GradeSummary.formatPercentGrade')
 
 test('returns an internationalized number value', () => {
-  sandbox
-    .stub(I18n.constructor.prototype, 'n')
-    .withArgs(1234)
-    .returns('1,234%')
+  sandbox.stub(I18n.constructor.prototype, 'n').withArgs(1234).returns('1,234%')
   equal(GradeSummary.formatPercentGrade(1234), '1,234%')
 })
 
@@ -690,12 +687,12 @@ QUnit.module('GradeSummary.setup', {
   }
 })
 
-test('shows the "Show Saved What-If Scores" button when any assignment has a What-If score', function() {
+test('shows the "Show Saved What-If Scores" button when any assignment has a What-If score', function () {
   GradeSummary.setup()
   ok(this.$showWhatIfScoresContainer.is(':visible'), 'button container is visible')
 })
 
-test('uses I18n to parse the .student_entered_score value', function() {
+test('uses I18n to parse the .student_entered_score value', function () {
   sandbox.spy(GradeSummary, 'parseScoreText')
   this.$assignment.find('.student_entered_score').text('7')
   GradeSummary.setup()
@@ -704,19 +701,19 @@ test('uses I18n to parse the .student_entered_score value', function() {
   equal(value, '7', 'GradeSummary.parseScoreText was called with the .student_entered_score')
 })
 
-test('shows the "Show Saved What-If Scores" button for assignments with What-If scores of "0"', function() {
+test('shows the "Show Saved What-If Scores" button for assignments with What-If scores of "0"', function () {
   this.$assignment.find('.student_entered_score').text('0')
   GradeSummary.setup()
   ok(this.$showWhatIfScoresContainer.is(':visible'), 'button container is visible')
 })
 
-test('does not show the "Show Saved What-If Scores" button for assignments without What-If scores', function() {
+test('does not show the "Show Saved What-If Scores" button for assignments without What-If scores', function () {
   this.$assignment.find('.student_entered_score').text('')
   GradeSummary.setup()
   ok(this.$showWhatIfScoresContainer.is(':hidden'), 'button container is hidden')
 })
 
-test('does not show the "Show Saved What-If Scores" button for assignments with What-If invalid scores', function() {
+test('does not show the "Show Saved What-If Scores" button for assignments with What-If invalid scores', function () {
   this.$assignment.find('.student_entered_score').text('null')
   GradeSummary.setup()
   ok(this.$showWhatIfScoresContainer.is(':hidden'), 'button container is hidden')
@@ -739,7 +736,7 @@ QUnit.module('Grade Summary "Show Saved What-If Scores" button', {
   }
 })
 
-test('reveals all What-If scores when clicked', function() {
+test('reveals all What-If scores when clicked', function () {
   this.$showWhatIfScoresButton.click()
   equal(
     this.$assignment.find('.what_if_score').text(),
@@ -748,13 +745,13 @@ test('reveals all What-If scores when clicked', function() {
   )
 })
 
-test('hides the assignment .score_value element', function() {
+test('hides the assignment .score_value element', function () {
   this.$showWhatIfScoresButton.click()
   const $scoreValue = $fixtures.find('.assignment_score .score_value').first()
   ok($scoreValue.is(':hidden'), '.score_value is hidden')
 })
 
-test('triggers onScoreChange for the assignment', function() {
+test('triggers onScoreChange for the assignment', function () {
   sandbox.stub(GradeSummary, 'onScoreChange')
   this.$showWhatIfScoresButton.click()
   equal(
@@ -775,7 +772,7 @@ test('triggers onScoreChange for the assignment', function() {
   )
 })
 
-test('uses I18n to parse the .student_entered_score value', function() {
+test('uses I18n to parse the .student_entered_score value', function () {
   sandbox.stub(GradeSummary, 'onScoreChange')
   sandbox.spy(GradeSummary, 'parseScoreText')
   this.$assignment.find('.student_entered_score').text('7')
@@ -785,7 +782,7 @@ test('uses I18n to parse the .student_entered_score value', function() {
   equal(value, '7', 'GradeSummary.parseScoreText was called with the .student_entered_score')
 })
 
-test('includes assignments with What-If scores of "0"', function() {
+test('includes assignments with What-If scores of "0"', function () {
   this.$assignment.find('.student_entered_score').text('0')
   this.$showWhatIfScoresButton.click()
   equal(
@@ -795,7 +792,7 @@ test('includes assignments with What-If scores of "0"', function() {
   )
 })
 
-test('ignores assignments without What-If scores', function() {
+test('ignores assignments without What-If scores', function () {
   sandbox.stub(GradeSummary, 'onScoreChange')
   this.$assignment.find('.student_entered_score').text('')
   this.$showWhatIfScoresButton.click()
@@ -805,7 +802,7 @@ test('ignores assignments without What-If scores', function() {
   equal(this.$assignment.find('.what_if_score').text(), '', 'what_if_score is not changed')
 })
 
-test('ignores assignments with invalid What-If score text', function() {
+test('ignores assignments with invalid What-If score text', function () {
   sandbox.stub(GradeSummary, 'onScoreChange')
   this.$assignment.find('.student_entered_score').text('null')
   this.$showWhatIfScoresButton.click()
@@ -815,17 +812,17 @@ test('ignores assignments with invalid What-If score text', function() {
   equal(this.$assignment.find('.what_if_score').text(), '', 'what_if_score is not changed')
 })
 
-test('hides itself when clicked', function() {
+test('hides itself when clicked', function () {
   this.$showWhatIfScoresButton.click()
   ok(this.$showWhatIfScoresButton.is(':hidden'), 'button is hidden')
 })
 
-test('sets focus on the "revert all scores" button', function() {
+test('sets focus on the "revert all scores" button', function () {
   this.$showWhatIfScoresButton.click()
   equal(document.activeElement, $('#revert-all-to-actual-score').get(0), 'button is active element')
 })
 
-test('displays a screenreader message indicating visibility of What-If scores', function() {
+test('displays a screenreader message indicating visibility of What-If scores', function () {
   sandbox.stub(GradeSummary, 'onScoreChange')
   sandbox.stub($, 'screenReaderFlashMessageExclusive')
   this.$showWhatIfScoresButton.click()
@@ -878,10 +875,7 @@ test('changes text to "Show All Details" when clicked twice', () => {
 QUnit.module('GradeSummary.onEditWhatIfScore', {
   setup() {
     fullPageSetup()
-    $fixtures
-      .find('.assignment_score .grade')
-      .first()
-      .append('5')
+    $fixtures.find('.assignment_score .grade').first().append('5')
   },
 
   onEditWhatIfScore() {
@@ -894,21 +888,21 @@ QUnit.module('GradeSummary.onEditWhatIfScore', {
   }
 })
 
-test('stores the original score when editing the the first time', function() {
+test('stores the original score when editing the the first time', function () {
   const $grade = $fixtures.find('.assignment_score .grade').first()
   const expectedHtml = $grade.html()
   this.onEditWhatIfScore()
   equal($grade.data('originalValue'), expectedHtml)
 })
 
-test('does not store the score when the original score is already stored', function() {
+test('does not store the score when the original score is already stored', function () {
   const $grade = $fixtures.find('.assignment_score .grade').first()
   $grade.data('originalValue', '10')
   this.onEditWhatIfScore()
   equal($grade.data('originalValue'), '10')
 })
 
-test('attaches a screenreader-only element to the grade element as data', function() {
+test('attaches a screenreader-only element to the grade element as data', function () {
   this.onEditWhatIfScore()
   const $grade = $fixtures.find('.assignment_score .grade').first()
   ok($grade.data('screenreader_link'), '"screenreader_link" is assigned as data')
@@ -918,45 +912,34 @@ test('attaches a screenreader-only element to the grade element as data', functi
   )
 })
 
-test('hides the score value', function() {
+test('hides the score value', function () {
   this.onEditWhatIfScore()
   const $scoreValue = $fixtures.find('.assignment_score .score_value').first()
   ok($scoreValue.is(':hidden'), '.score_value is hidden')
 })
 
-test('replaces the grade element content with a grade entry field', function() {
+test('replaces the grade element content with a grade entry field', function () {
   this.onEditWhatIfScore()
   const $gradeEntry = $fixtures.find('.assignment_score .grade > #grade_entry')
   equal($gradeEntry.length, 1, '#grade_entry is attached to the .grade element')
 })
 
-test('sets the value of the grade entry to the existing "What-If" score', function() {
-  $fixtures
-    .find('.assignment_score')
-    .first()
-    .find('.what_if_score')
-    .text('15')
+test('sets the value of the grade entry to the existing "What-If" score', function () {
+  $fixtures.find('.assignment_score').first().find('.what_if_score').text('15')
   this.onEditWhatIfScore()
   const $gradeEntry = $fixtures.find('#grade_entry').first()
   equal($gradeEntry.val(), '15', 'the previous "What-If" score is 15')
 })
 
-test('defaults the value of the grade entry to "0" when no score is present', function() {
+test('defaults the value of the grade entry to "0" when no score is present', function () {
   this.onEditWhatIfScore()
   const $gradeEntry = $fixtures.find('#grade_entry').first()
   equal($gradeEntry.val(), '0', 'there is no previous "What-If" score')
 })
 
-test('uses I18n to parse the existing "What-If" score', function() {
-  $fixtures
-    .find('.assignment_score')
-    .first()
-    .find('.what_if_score')
-    .text('1.234,56')
-  sandbox
-    .stub(numberHelper, 'parse')
-    .withArgs('1.234,56')
-    .returns('654321')
+test('uses I18n to parse the existing "What-If" score', function () {
+  $fixtures.find('.assignment_score').first().find('.what_if_score').text('1.234,56')
+  sandbox.stub(numberHelper, 'parse').withArgs('1.234,56').returns('654321')
   this.onEditWhatIfScore()
   const $gradeEntry = $fixtures.find('#grade_entry').first()
   equal(
@@ -966,26 +949,26 @@ test('uses I18n to parse the existing "What-If" score', function() {
   )
 })
 
-test('shows the grade entry', function() {
+test('shows the grade entry', function () {
   this.onEditWhatIfScore()
   const $gradeEntry = $fixtures.find('#grade_entry').first()
   ok($gradeEntry.is(':visible'), '#grade_entry does not have "visibility: none"')
 })
 
-test('sets focus on the grade entry', function() {
+test('sets focus on the grade entry', function () {
   this.onEditWhatIfScore()
   const $gradeEntry = $fixtures.find('#grade_entry').first()
   equal($gradeEntry.get(0), document.activeElement, '#grade_entry is the active element')
 })
 
-test('selects the grade entry', function() {
+test('selects the grade entry', function () {
   this.onEditWhatIfScore()
   const $gradeEntry = $fixtures.find('#grade_entry').get(0)
   equal($gradeEntry.selectionStart, 0, 'selection starts at beginning of score text')
   equal($gradeEntry.selectionEnd, 1, 'selection ends at end of score text')
 })
 
-test('announces message for entering a "What-If" score', function() {
+test('announces message for entering a "What-If" score', function () {
   this.onEditWhatIfScore()
   equal($('#aria-announcer').text(), 'Enter a What-If score.')
 })
@@ -996,11 +979,7 @@ QUnit.module('GradeSummary.onScoreChange', {
     sandbox.stub($, 'ajaxJSON')
     this.$assignment = $fixtures.find('#grades_summary .student_assignment').first()
     // reproduce the destructive part of .onEditWhatIfScore
-    this.$assignment
-      .find('.assignment_score')
-      .find('.grade')
-      .empty()
-      .append($('#grade_entry'))
+    this.$assignment.find('.assignment_score').find('.grade').empty().append($('#grade_entry'))
   },
 
   onScoreChange(score, options = {}) {
@@ -1013,43 +992,37 @@ QUnit.module('GradeSummary.onScoreChange', {
   }
 })
 
-test('updates .what_if_score with the parsed value from #grade_entry', function() {
+test('updates .what_if_score with the parsed value from #grade_entry', function () {
   this.onScoreChange('5')
   equal(this.$assignment.find('.what_if_score').text(), '5')
 })
 
-test('uses I18n to parse the #grade_entry score', function() {
-  sandbox
-    .stub(numberHelper, 'parse')
-    .withArgs('1.234,56')
-    .returns('654321')
+test('uses I18n to parse the #grade_entry score', function () {
+  sandbox.stub(numberHelper, 'parse').withArgs('1.234,56').returns('654321')
   this.onScoreChange('1.234,56')
   equal(this.$assignment.find('.what_if_score').text(), '654321')
 })
 
-test('uses the previous .what_if_score value when #grade_entry is blank', function() {
+test('uses the previous .what_if_score value when #grade_entry is blank', function () {
   this.$assignment.find('.what_if_score').text('9.0')
   this.onScoreChange('')
   equal(this.$assignment.find('.what_if_score').text(), '9')
 })
 
-test('uses I18n to parse the previous .what_if_score value', function() {
-  sandbox
-    .stub(numberHelper, 'parse')
-    .withArgs('9.0')
-    .returns('654321')
+test('uses I18n to parse the previous .what_if_score value', function () {
+  sandbox.stub(numberHelper, 'parse').withArgs('9.0').returns('654321')
   this.$assignment.find('.what_if_score').text('9.0')
   this.onScoreChange('')
   equal(this.$assignment.find('.what_if_score').text(), '654321')
 })
 
-test('removes the .dont_update class from the .student_assignment element when present', function() {
+test('removes the .dont_update class from the .student_assignment element when present', function () {
   this.$assignment.addClass('dont_update')
   this.onScoreChange('5')
   notOk(this.$assignment.hasClass('dont_update'))
 })
 
-test('saves the "What-If" grade using the api', function() {
+test('saves the "What-If" grade using the api', function () {
   this.onScoreChange('5', {update: true})
   equal($.ajaxJSON.callCount, 1, '$.ajaxJSON was called once')
   const [url, method, params] = $.ajaxJSON.getCall(0).args
@@ -1058,7 +1031,7 @@ test('saves the "What-If" grade using the api', function() {
   equal(params['submission[student_entered_score]'], 5)
 })
 
-test('updates the .student_entered_score element upon success api update', function() {
+test('updates the .student_entered_score element upon success api update', function () {
   $.ajaxJSON.callsFake((_url, _method, args, onSuccess) => {
     onSuccess({submission: {student_entered_score: args['submission[student_entered_score]']}})
   })
@@ -1066,42 +1039,38 @@ test('updates the .student_entered_score element upon success api update', funct
   equal(this.$assignment.find('.student_entered_score').text(), '5')
 })
 
-test('does not save the "What-If" grade when .dont_update class is present', function() {
+test('does not save the "What-If" grade when .dont_update class is present', function () {
   this.$assignment.addClass('dont_update')
   this.onScoreChange('5', {update: true})
   equal($.ajaxJSON.callCount, 0, '$.ajaxJSON was not called')
 })
 
-test('does not save the "What-If" grade when the "update" option is false', function() {
+test('does not save the "What-If" grade when the "update" option is false', function () {
   this.onScoreChange('5', {update: false})
   equal($.ajaxJSON.callCount, 0, '$.ajaxJSON was not called')
 })
 
-test('hides the #grade_entry input', function() {
+test('hides the #grade_entry input', function () {
   this.onScoreChange('5')
   ok($('#grade_entry').is(':hidden'))
 })
 
-test('moves the #grade_entry to the body', function() {
+test('moves the #grade_entry to the body', function () {
   this.onScoreChange('5')
-  ok(
-    $('#grade_entry')
-      .parent()
-      .is('body')
-  )
+  ok($('#grade_entry').parent().is('body'))
 })
 
-test('sets the .assignment_score title to ""', function() {
+test('sets the .assignment_score title to ""', function () {
   this.onScoreChange('5')
   equal(this.$assignment.find('.assignment_score').attr('title'), '')
 })
 
-test('sets the .assignment_score teaser text', function() {
+test('sets the .assignment_score teaser text', function () {
   this.onScoreChange('5')
   equal(this.$assignment.find('.score_teaser').text(), 'This is a What-If score')
 })
 
-test('copies the "revert score" link into the .score_holder element', function() {
+test('copies the "revert score" link into the .score_holder element', function () {
   this.onScoreChange('5')
   equal(
     this.$assignment.find('.score_holder .revert_score_link').length,
@@ -1111,25 +1080,25 @@ test('copies the "revert score" link into the .score_holder element', function()
   equal(this.$assignment.find('.score_holder .revert_score_link').text(), 'Revert Score')
 })
 
-test('adds the "changed" class to the .grade element', function() {
+test('adds the "changed" class to the .grade element', function () {
   this.onScoreChange('5')
   ok(this.$assignment.find('.grade').hasClass('changed'))
 })
 
-test('sets the .grade element content to the updated score', function() {
+test('sets the .grade element content to the updated score', function () {
   this.onScoreChange('5')
   const gradeText = this.$assignment.find('.grade').text()
   ok(gradeText.includes('5'))
 })
 
-test('sets the .grade element content to the previous score when the updated score is falsy', function() {
+test('sets the .grade element content to the previous score when the updated score is falsy', function () {
   this.$assignment.find('.grade').data('originalValue', '10.0')
   this.onScoreChange('')
   const gradeText = this.$assignment.find('.grade').text()
   ok(gradeText.includes('10'))
 })
 
-test('updates the score for the given assignment', function() {
+test('updates the score for the given assignment', function () {
   sandbox.stub(GradeSummary, 'updateScoreForAssignment')
   this.onScoreChange('5')
   equal(GradeSummary.updateScoreForAssignment.callCount, 1)
@@ -1151,10 +1120,7 @@ QUnit.module('GradeSummary - Revert Score', hooks => {
     const $scoreTeaser = $assignmentScore.find('.score_teaser')
     $assignmentScore.attr('title', '')
     $scoreTeaser.text('This is a What-If score')
-    const $revertScore = $('#revert_score_template')
-      .clone(true)
-      .attr('id', '')
-      .show()
+    const $revertScore = $('#revert_score_template').clone(true).attr('id', '').show()
     $assignmentScore.find('.score_holder').append($revertScore)
     $grade.addClass('changed')
     $assignment.find('.original_score').text('5')
@@ -1212,6 +1178,12 @@ QUnit.module('GradeSummary - Revert Score', hooks => {
     $assignment.data('muted', true)
     GradeSummary.onScoreRevert($assignment)
     equal($assignment.find('.grade .icon-off').length, 1)
+  })
+
+  test('sets the .grade html to the "icon-quiz" indicator when the assignment is a quiz waiting to be graded', () => {
+    $assignment.data('pending_quiz', true)
+    GradeSummary.onScoreRevert($assignment)
+    equal($assignment.find('.grade .icon-quiz').length, 1)
   })
 
   test('removes the "changed" class from the .grade element', () => {
