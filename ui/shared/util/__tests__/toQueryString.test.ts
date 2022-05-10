@@ -17,15 +17,20 @@
  */
 
 import toQueryString from '../toQueryString'
+import type {QueryParameterMap} from '../toQueryString'
 import $ from 'jquery'
 
 const func = () => 'result'
+const func2 = () => 'yet another result'
 
-const EX = {
+const EX: {[k: string]: QueryParameterMap} = {
   empty: {},
-  scalar: {frd: 1, butNo: false},
+  scalars_with_numbers_strings_and_bools: {frd: 1, str: 'syzygy', butNo: false},
+  scalars_with_null: {frd: 1, butNo: null},
+  scalars_with_undefined: {frd: 1, butNo: undefined, last: 'zzz'},
+  scalars_with_functions: {frd: 1, func, func2},
   simple_array: {blah: [1, 2, 3]},
-  mixed_types_array: {blah: [1, 'b', 'III', func]},
+  mixed_types_array: {blah: [1, 'b', 'III']},
   recursive_object: {blah: 1, sub: {one: 1, two: [2, 4]}, last: 'zzz'},
   array_of_objects: {
     blah: [
@@ -33,8 +38,7 @@ const EX = {
       {one: '1', two: '2'}
     ]
   },
-  object_with_arrays: {blah: {one: [1, 2, 3], two: [2, 4, 6]}},
-  with_function: {blah: func, last: 'zzz'}
+  object_with_arrays: {blah: {one: [1, 2, 3], two: [2, 4, 6]}}
 }
 
 describe('toQueryString::', () => {

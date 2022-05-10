@@ -25,8 +25,21 @@
 // objects within objects, {a: 1, b: {c: 2, d: 3}, e: 4} => a=1&b[c]=2&b[d]=3&e=4
 // ... so we have to do a lot of massaging with the params object before using it
 // So fun!
-export default function toQueryString(params: {[k: string]: any}): string {
-  const paramsWithIndexes: Array<[k: string, v: any]> = []
+
+type QueryParameterElement =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | (() => string) // n.b. for jQuery compatibility, this does not expect a generic return
+  | Array<QueryParameterElement>
+  | QueryParameterMap
+
+export type QueryParameterMap = {[k: string]: QueryParameterElement}
+
+export default function toQueryString(params: QueryParameterMap): string {
+  const paramsWithIndexes: Array<[k: string, v: string]> = []
 
   // fix up the array/object indexes to match the PHP standard
   function fixIndexes(elt: [string, string]): [string, string] {
@@ -39,21 +52,25 @@ export default function toQueryString(params: {[k: string]: any}): string {
     ]
   }
 
-  function serialize(k: string, obj: any, sfx: string): void {
-    if (obj instanceof Function) {
-      paramsWithIndexes.push([k + sfx, obj()])
-    } else if (obj instanceof Array) {
-      for (const k2 in obj) {
-        serialize(k, obj[k2], `${sfx}[${k2}]`)
+  function serialize(k: string, elt: QueryParameterElement, suffix: string): void {
+    if (elt instanceof Function) {
+      paramsWithIndexes.push([k + suffix, elt()])
+    } else if (elt instanceof Array) {
+      for (const k2 in elt) {
+        serialize(k, elt[k2], `${suffix}[${k2}]`)
       }
-    } else if (obj instanceof Object) {
-      for (const k2 in obj) {
-        serialize(k, obj[k2], `${sfx}{${k2}}`)
+    } else if (elt instanceof Object) {
+      for (const k2 in elt) {
+        serialize(k, elt[k2], `${suffix}{${k2}}`)
       }
-    } else if (typeof obj !== 'string') {
-      paramsWithIndexes.push([k + sfx, obj.toString()])
-    } else {
-      paramsWithIndexes.push([k + sfx, obj])
+    } else if (typeof elt === 'boolean' || typeof elt === 'number') {
+      paramsWithIndexes.push([k + suffix, elt.toString()])
+    } else if (typeof elt === 'undefined') {
+      paramsWithIndexes.push([k + suffix, 'undefined'])
+    } else if (elt === null) {
+      paramsWithIndexes.push([k + suffix, 'null'])
+    } else if (typeof elt === 'string') {
+      paramsWithIndexes.push([k + suffix, elt])
     }
   }
 
