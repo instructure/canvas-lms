@@ -8255,4 +8255,71 @@ describe Submission do
       expect(@submission.peer_reviewer?(user_factory)).to eq false
     end
   end
+
+  describe "send_timing_data_if_needed" do
+    it "calls Statsd when a classic quiz is manually graded" do
+      expect(InstStatsd::Statsd).to receive(:gauge).once.with("submission.manually_graded.grading_time", 600.0, "1.0", tags: { quiz_type: "classic_quiz" })
+
+      now = Time.now
+      Timecop.freeze(now) do
+        quiz_with_graded_submission([{ question_data: { :name => "question 1", :points_possible => 10, "question_type" => "essay_question" } }])
+      end
+
+      Timecop.freeze(10.minutes.from_now(now)) do
+        @quiz_submission.set_final_score(7)
+        @quiz_submission.save!
+      end
+    end
+
+    it "calls Statsd when a new quiz is manually graded" do
+      expect(InstStatsd::Statsd).to receive(:gauge).once.with("submission.manually_graded.grading_time", 300.0, "1.0", tags: { quiz_type: "new_quiz" })
+
+      now = Time.now
+      Timecop.freeze(now) do
+        quiz_with_graded_submission([{ question_data: { :name => "question 1", :points_possible => 10, "question_type" => "essay_question" } }])
+      end
+
+      allow(@quiz_submission.submission).to receive(:submission_type).and_return("basic_lti_launch")
+      allow(@quiz_submission.submission).to receive(:url).and_return("https://quiz-lti-iad-prod.instructure.com/lti/launch")
+      Timecop.freeze(5.minutes.from_now(now)) do
+        @quiz_submission.set_final_score(7)
+        @quiz_submission.save!
+      end
+    end
+
+    it "does not call Statsd when a quiz is automatically graded" do
+      expect(InstStatsd::Statsd).not_to receive(:gauge)
+
+      quiz_with_graded_submission([{ question_data: { :name => "question 1", :points_possible => 10, "question_type" => "multiple_choice_question" } }])
+    end
+
+    it "does not call Statsd when a submission is updated" do
+      expect(InstStatsd::Statsd).not_to receive(:gauge)
+
+      now = Time.now
+      Timecop.freeze(now) do
+        quiz_with_graded_submission([{ question_data: { :name => "question 1", :points_possible => 10, "question_type" => "essay_question" } }])
+      end
+
+      Timecop.freeze(10.minutes.from_now(now)) do
+        submission = @quiz.submissions.first
+        submission.excused = false
+        submission.save!
+      end
+    end
+
+    it "does not call Statsd when the time between submission and grading is less than 30 seconds" do
+      expect(InstStatsd::Statsd).not_to receive(:gauge)
+
+      now = Time.now
+      Timecop.freeze(now) do
+        quiz_with_graded_submission([{ question_data: { :name => "question 1", :points_possible => 10, "question_type" => "essay_question" } }])
+      end
+
+      Timecop.freeze(29.seconds.from_now(now)) do
+        @quiz_submission.set_final_score(7)
+        @quiz_submission.save!
+      end
+    end
+  end
 end

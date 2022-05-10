@@ -373,6 +373,7 @@ class Submission < ActiveRecord::Base
   after_save :create_audit_event!
   after_save :handle_posted_at_changed, if: :saved_change_to_posted_at?
   after_save :delete_submission_drafts!, if: :saved_change_to_attempt?
+  after_save :send_timing_data_if_needed
 
   def reset_regraded
     @regraded = false
@@ -2984,5 +2985,20 @@ class Submission < ActiveRecord::Base
       Assignment.find(assignment_id).hide_submissions(submission_ids: [id], skip_updating_timestamp: true, skip_muted_changed: true)
       assignment.reload
     end
+  end
+
+  def send_timing_data_if_needed
+    return unless saved_change_to_workflow_state? &&
+                  workflow_state == Submission.workflow_states.graded &&
+                  workflow_state_before_last_save == Submission.workflow_states.pending_review &&
+                  (submission_type == "online_quiz" || (submission_type == "basic_lti_launch" && url.include?("quiz-lti")))
+
+    time = graded_at - submitted_at
+    return if time < 30
+
+    InstStatsd::Statsd.gauge("submission.manually_graded.grading_time",
+                             time,
+                             Setting.get("submission_grading_timing_sample_rate", "1.0"),
+                             tags: { quiz_type: submission_type == "online_quiz" ? "classic_quiz" : "new_quiz" })
   end
 end
