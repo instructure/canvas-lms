@@ -128,6 +128,13 @@ export default [
         advancedCommand: '\\hat{ }',
         svgCommand: '\\hat{x}',
         label: formatMessage('Hat')
+      },
+      {
+        displayName: '\\vec{\u2B1A}',
+        command: '\\vec{\\placeholder{}}',
+        advancedCommand: '\\vec{ }',
+        svgCommand: '\\vec{v}',
+        label: formatMessage('Vector (Notation)')
       }
     ]
   },

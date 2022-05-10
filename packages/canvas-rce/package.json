@@ -40,7 +40,7 @@
     "fmt:check": "prettier -l '**/*.js'",
     "fmt:fix": "prettier --write '**/*.js'",
     "clean": "rm -rf lib && rm -rf es && rm -rf coverage && yarn demo:clean",
-    "generate-svgs": "yarn build:all && scripts/generateSvgs.js"
+    "generate-svgs": "yarn build:cjs && scripts/generateSvgs.js"
   },
   "author": "Instructure, Inc",
   "license": "AGPL-3.0",
