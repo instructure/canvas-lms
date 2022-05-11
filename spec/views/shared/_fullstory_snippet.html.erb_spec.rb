@@ -52,5 +52,11 @@ describe "shared/_fullstory_snippet.html.erb" do
       render partial: "shared/fullstory_snippet", locals: {}
       expect(response.body).to include("k5_user_bool")
     end
+
+    it "sets org_type when available" do
+      @current_user.account.external_integration_keys.create!(key_type: "salesforce_org_type", key_value: "Higher Ed")
+      render partial: "shared/fullstory_snippet", locals: {}
+      expect(response.body).to include("org_type_str: 'Higher Ed'")
+    end
   end
 end
