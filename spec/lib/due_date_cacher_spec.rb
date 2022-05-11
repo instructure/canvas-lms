@@ -457,6 +457,145 @@ describe DueDateCacher do
       end
     end
 
+    context "unassigning students that have concluded enrollments" do
+      before do
+        @assignment = @course.assignments.create!
+        @enrollment = @course.enrollments.find_by(user: @student, course_section: @course.default_section)
+        @second_section = @course.course_sections.create!(name: "Second Section")
+      end
+
+      let(:submission) { Submission.find_by(user: @student, assignment: @assignment) }
+
+      context "some students remain assigned to the assignment" do
+        before do
+          second_student = user_factory(active_all: true)
+          @course.enroll_student(second_student, enrollment_state: "active", section: @second_section)
+        end
+
+        it "does not delete the submission if all of a student's enrollments are completed" do
+          @enrollment.conclude
+          create_section_override_for_assignment(@assignment, course_section: @second_section)
+          @assignment.update!(only_visible_to_overrides: true)
+          cacher.recompute
+          expect(submission.workflow_state).to eq "unsubmitted"
+        end
+
+        it "does not delete the submission if all of a students enrollments are completed, rejected, or deleted" do
+          @course.enroll_student(
+            @student,
+            enrollment_state: "active",
+            section: @course.course_sections.create!(name: "Third Section"),
+            allow_multiple_enrollments: true
+          ).destroy
+
+          @course.enroll_student(
+            @student,
+            enrollment_state: "active",
+            section: @course.course_sections.create!(name: "Fourth Section"),
+            allow_multiple_enrollments: true
+          ).reject!
+
+          @enrollment.conclude
+          create_section_override_for_assignment(@assignment, course_section: @second_section)
+          @assignment.update!(only_visible_to_overrides: true)
+          cacher.recompute
+          expect(submission.workflow_state).to eq "unsubmitted"
+        end
+
+        it "deletes the submission if the student has at least one active enrollment" do
+          @course.enroll_student(
+            @student,
+            enrollment_state: "active",
+            section: @course.course_sections.create!(name: "Third Section"),
+            allow_multiple_enrollments: true
+          )
+
+          @enrollment.conclude
+          create_section_override_for_assignment(@assignment, course_section: @second_section)
+          @assignment.update!(only_visible_to_overrides: true)
+          cacher.recompute
+          expect(submission.workflow_state).to eq "deleted"
+        end
+
+        it "deletes the submission if the student has at least one inactive enrollment" do
+          @course.enroll_student(
+            @student,
+            enrollment_state: "active",
+            section: @course.course_sections.create!(name: "Third Section"),
+            allow_multiple_enrollments: true
+          ).deactivate
+
+          @enrollment.conclude
+          create_section_override_for_assignment(@assignment, course_section: @second_section)
+          @assignment.update!(only_visible_to_overrides: true)
+          cacher.recompute
+          expect(submission.workflow_state).to eq "deleted"
+        end
+      end
+
+      context "no students remain assigned to the assignment" do
+        it "does not delete the submission if all of a student's enrollments are completed" do
+          @enrollment.conclude
+          create_section_override_for_assignment(@assignment, course_section: @second_section)
+          @assignment.update!(only_visible_to_overrides: true)
+          cacher.recompute
+          expect(submission.workflow_state).to eq "unsubmitted"
+        end
+
+        it "does not delete the submission if all of a students enrollments are completed, rejected, or deleted" do
+          @course.enroll_student(
+            @student,
+            enrollment_state: "active",
+            section: @course.course_sections.create!(name: "Third Section"),
+            allow_multiple_enrollments: true
+          ).destroy
+
+          @course.enroll_student(
+            @student,
+            enrollment_state: "active",
+            section: @course.course_sections.create!(name: "Fourth Section"),
+            allow_multiple_enrollments: true
+          ).reject!
+
+          @enrollment.conclude
+          create_section_override_for_assignment(@assignment, course_section: @second_section)
+          @assignment.update!(only_visible_to_overrides: true)
+          cacher.recompute
+          expect(submission.workflow_state).to eq "unsubmitted"
+        end
+
+        it "deletes the submission if the student has at least one active enrollment" do
+          @course.enroll_student(
+            @student,
+            enrollment_state: "active",
+            section: @course.course_sections.create!(name: "Third Section"),
+            allow_multiple_enrollments: true
+          )
+
+          @enrollment.conclude
+          create_section_override_for_assignment(@assignment, course_section: @second_section)
+          @assignment.update!(only_visible_to_overrides: true)
+          cacher.recompute
+          expect(submission.workflow_state).to eq "deleted"
+        end
+
+        it "deletes the submission if the student has at least one inactive enrollment" do
+          @course.enroll_student(
+            @student,
+            enrollment_state: "active",
+            section: @course.course_sections.create!(name: "Third Section"),
+            allow_multiple_enrollments: true
+          ).deactivate
+
+          @enrollment.conclude
+          create_section_override_for_assignment(@assignment, course_section: @second_section)
+          @assignment.update!(only_visible_to_overrides: true)
+          cacher.recompute
+          expect(submission.workflow_state).to eq "deleted"
+        end
+      end
+    end
+
     describe "updated_at" do
       it "updates the updated_at when the workflow_state of a submission changes" do
         submission.update!(workflow_state: "deleted")
@@ -620,18 +759,6 @@ describe DueDateCacher do
 
         expect { @assignment.save! }.to change {
           Submission.first.updated_at
-        }
-      end
-
-      it "does not delete submissions for concluded enrollments" do
-        student2 = user_factory
-        @course.enroll_student(student2, enrollment_state: "active")
-        submission_model(assignment: @assignment, user: student2)
-        student2.enrollments.find_by(course: @course).conclude
-
-        @assignment.only_visible_to_overrides = true
-        expect { @assignment.save! }.not_to change {
-          Submission.active.where(user_id: student2.id).count
         }
       end
 
