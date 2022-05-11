@@ -384,6 +384,7 @@ QUnit.module('OutcomeView', {
     // don't clean up properly, we make sure that these run in a clean tiny state each time
     window.tinymce?.remove()
     ENV.PERMISSIONS = {manage_outcomes: true}
+    ENV.OUTCOME_AVERAGE_CALCULATION = true
     this.outcome1 = outcome1()
   },
   teardown() {
