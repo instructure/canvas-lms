@@ -318,10 +318,12 @@ class DueDateCacher
         scope = scope.where(user_id: @user_ids) if @user_ids.present?
 
         scope.find_each do |record|
-          counts.prior_student_ids << record.user_id if record.prior_count > 0
-
           if record.accepted_count > 0
-            counts.accepted_student_ids << record.user_id
+            if record.accepted_count == record.prior_count
+              counts.prior_student_ids << record.user_id
+            else
+              counts.accepted_student_ids << record.user_id
+            end
           else
             counts.deleted_student_ids << record.user_id
           end
