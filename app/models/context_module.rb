@@ -34,7 +34,14 @@ class ContextModule < ActiveRecord::Base
   after_save :touch_context
   after_save :invalidate_progressions
   after_save :relock_warning_check
+  after_save :print_self_for_debugging
   validates_presence_of :workflow_state, :context_id, :context_type
+
+  def print_self_for_debugging
+    puts "######################"
+    puts self.inspect
+    puts "######################"
+  end
 
   def relock_warning_check
     # if the course is already active and we're adding more stringent requirements
