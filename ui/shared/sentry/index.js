@@ -20,11 +20,11 @@ import {captureException} from '@sentry/browser'
 // Call a function for its side-effects. If it fails, don't unwind the stack,
 // instead just log the exception to Sentry and to the console.
 export function isolate(f) {
-  return function() {
+  return async function() {
     try {
       // DON'T propagate the return value; if they actually need it they should
       // be doing this by hand instead
-      f.apply(this, arguments)
+      await f.apply(this, arguments)
     }
     catch (e) {
       console.error(e)
