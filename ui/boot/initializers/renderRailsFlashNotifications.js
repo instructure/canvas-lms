@@ -20,9 +20,24 @@ import { initFlashContainer, renderServerNotifications } from '@canvas/rails-fla
 import ready from '@instructure/ready'
 
 export function up() {
-  ready(() => {
-    initFlashContainer()
+  return new Promise((resolve, reject) => {
+    ready(() => {
+      try {
+        initFlashContainer()
+      }
+      catch (e) {
+        return reject(e)
+      }
 
-    setTimeout(renderServerNotifications, 100)
+      setTimeout(function() {
+        try {
+          renderServerNotifications()
+          resolve()
+        }
+        catch (e) {
+          reject(e)
+        }
+      }, 100)
+    })
   })
 }

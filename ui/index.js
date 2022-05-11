@@ -206,11 +206,11 @@ if (ENV.csp) {
 }
 
 if (ENV.INCOMPLETE_REGISTRATION) {
-  isolate(() => { import('./boot/initializers/warnOnIncompleteRegistration') })()
+  isolate(() => import('./boot/initializers/warnOnIncompleteRegistration'))()
 }
 
 if (ENV.badge_counts) {
-  isolate(() => { import('./boot/initializers/showBadgeCounts') })()
+  isolate(() => import('./boot/initializers/showBadgeCounts'))()
 }
 
 isolate(doRandomThingsToDOM)()
@@ -234,7 +234,7 @@ function doRandomThingsToDOM() {
   )
 }
 
-function loadNewUserTutorials() {
+async function loadNewUserTutorials() {
   if (
     window.ENV.NEW_USER_TUTORIALS &&
     window.ENV.NEW_USER_TUTORIALS.is_enabled &&
@@ -242,15 +242,16 @@ function loadNewUserTutorials() {
     splitAssetString(window.ENV.context_asset_string)[0] === 'courses'
   ) {
     // eslint-disable-next-line promise/catch-or-return
-    import('./features/new_user_tutorial/index').then(({default: initializeNewUserTutorials}) => {
-      initializeNewUserTutorials()
-    })
+    const {
+      default: initializeNewUserTutorials
+    } = await import('./features/new_user_tutorial/index')
+
+    initializeNewUserTutorials()
   }
 }
 
-;(window.requestIdleCallback || window.setTimeout)(() => {
+;(window.requestIdleCallback || window.setTimeout)(isolate(async () => {
   // eslint-disable-next-line promise/catch-or-return
-  import('./boot/initializers/runOnEveryPageButDontBlockAnythingElse').then(() =>
-    advanceReadiness('asyncInitializers')
-  )
-})
+  await import('./boot/initializers/runOnEveryPageButDontBlockAnythingElse')
+  advanceReadiness('asyncInitializers')
+}))
