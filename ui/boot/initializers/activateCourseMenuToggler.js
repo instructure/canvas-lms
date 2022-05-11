@@ -24,5 +24,15 @@ import {initialize} from '@canvas/courses/jquery/toggleCourseNav'
 import ready from '@instructure/ready'
 
 export function up() {
-  ready(initialize)
+  return new Promise((resolve, reject) => {
+    ready(() => {
+      try {
+        initialize()
+        resolve()
+      }
+      catch (e) {
+        reject(e)
+      }
+    })
+  })
 }
