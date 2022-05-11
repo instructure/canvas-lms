@@ -81,7 +81,7 @@ export default class UploadMedia extends React.Component {
   constructor(props) {
     super(props)
 
-    let defaultSelectedPanel = this.inferSelectedPanel(props.tabs)
+    const defaultSelectedPanel = this.inferSelectedPanel(props.tabs)
 
     if (props.computerFile) {
       props.computerFile.title = props.computerFile.name
@@ -232,6 +232,10 @@ export default class UploadMedia extends React.Component {
       RECORD_PANEL_TITLE,
       MEDIA_RECORD_NOT_AVAILABLE
     } = this.props.uploadMediaTranslations.UploadMediaStrings
+
+    if (!this.props.open) {
+      return null
+    }
 
     return (
       <Tabs
