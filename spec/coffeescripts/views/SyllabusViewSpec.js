@@ -16,9 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* eslint-disable qunit/no-global-expect */
+/* eslint-disable jest/valid-expect */
+/* eslint-disable import/extensions */
 import $ from 'jquery'
 import _ from 'lodash'
-import tz from '@canvas/timezone'
 import tzInTest from '@canvas/timezone/specHelpers'
 import timezone from 'timezone'
 import denver from 'timezone/America/Denver'
@@ -128,7 +130,7 @@ QUnit.module('Syllabus', {
         'America/Denver': denver,
         'America/New_York': newYork
       },
-      formats: getI18nFormats(),
+      formats: getI18nFormats()
     })
 
     this.clock = sinon.useFakeTimers(new Date(2012, 0, 23, 15, 30).getTime())
@@ -156,12 +158,12 @@ QUnit.module('Syllabus', {
 
     const acollection = new SyllabusCollection(collections)
 
-    _.map(collections, collection => {
+    _.each(collections, collection => {
       const error = () => {
         ok(false, 'ajax call failed')
       }
 
-      var success = () => {
+      const success = () => {
         if (collection.canFetch('next')) {
           collection.fetch({
             page: 'next',
@@ -211,7 +213,7 @@ QUnit.module('Syllabus', {
   },
 
   renderAssertions() {
-    expect(24)
+    expect(26)
     // rendering
     const syllabus = $('#syllabusTableBody')
     ok(syllabus.length, 'syllabus - syllabus added to the dom')
@@ -228,6 +230,14 @@ QUnit.module('Syllabus', {
     } else {
       equal($('td.name a', assignments).length, 0, 'events - link not rendered for each assignment')
     }
+
+    const graded_discussions = $(
+      'tr.syllabus_assignment.assignment_type_discussion_topic',
+      syllabus
+    )
+    equal(graded_discussions.length, 1, 'graded discussions rendered')
+    const quizzes = $('tr.syllabus_assignment.assignment_type_quiz', syllabus)
+    equal(quizzes.length, 1, 'quizzes rendered')
 
     const events = $('tr.syllabus_event', syllabus)
     equal(events.length, 6, 'events - all events rendered')
@@ -301,7 +311,7 @@ QUnit.module('Syllabus', {
   }
 })
 
-test('render (user public course)', function() {
+test('render (user public course)', function () {
   this.view.can_read = true // public course -- can read
   this.view.is_valid_user = true // user - enrolled (can read)
 
@@ -309,7 +319,7 @@ test('render (user public course)', function() {
   this.renderAssertions()
 })
 
-test('render (anonymous public course)', function() {
+test('render (anonymous public course)', function () {
   this.view.can_read = true // public course -- can read
   this.view.is_valid_user = false // anonymous
 
@@ -317,7 +327,7 @@ test('render (anonymous public course)', function() {
   this.renderAssertions()
 })
 
-test('render (user public syllabus)', function() {
+test('render (user public syllabus)', function () {
   this.view.can_read = false // public syllabus -- cannot read
   this.view.is_valid_user = true // user - non-enrolled (cannot read)
 
@@ -325,7 +335,7 @@ test('render (user public syllabus)', function() {
   this.renderAssertions()
 })
 
-test('render (anonymous public syllabus)', function() {
+test('render (anonymous public syllabus)', function () {
   this.view.can_read = false // public syllabus -- cannot read
   this.view.is_valid_user = false // anonymous
 
@@ -333,7 +343,7 @@ test('render (anonymous public syllabus)', function() {
   this.renderAssertions()
 })
 
-test('syllabus interaction', function() {
+test('syllabus interaction', function () {
   expect(14)
 
   this.view.is_public_course = true
@@ -417,7 +427,7 @@ test('syllabus interaction', function() {
   deepEqual(actual.toArray(), expected, 'unhover event - events no longer highlighted')
 })
 
-test('mini calendar', function() {
+test('mini calendar', function () {
   expect(27)
 
   this.view.is_public_course = true
@@ -472,8 +482,8 @@ test('mini calendar', function() {
 
   prevMonthLink.simulate('click')
 
-  equal(parseInt($('.month_number').text()), 12, 'previous month - month changed to December')
-  equal(parseInt($('.year_number').text()), 2011, 'previous month - year changed to 2011')
+  equal(parseInt($('.month_number').text(), 10), 12, 'previous month - month changed to December')
+  equal(parseInt($('.year_number').text(), 10), 2011, 'previous month - year changed to 2011')
 
   expected = $('#mini_day_2012_01_01')
   actual = $('.mini_calendar_day.has_event')
@@ -491,8 +501,8 @@ test('mini calendar', function() {
   nextMonthLink.simulate('click')
   nextMonthLink.simulate('click')
 
-  equal(parseInt($('.month_number').text()), 2, 'next month - month changed to February')
-  equal(parseInt($('.year_number').text()), 2012, 'next month - year changed to 2012')
+  equal(parseInt($('.month_number').text(), 10), 2, 'next month - month changed to February')
+  equal(parseInt($('.year_number').text(), 10), 2012, 'next month - year changed to 2012')
 
   expected = $('#mini_day_2012_01_30, #mini_day_2012_01_31')
   actual = $('.mini_calendar_day.has_event')
@@ -509,8 +519,8 @@ test('mini calendar', function() {
 
   jumpToTodayLink.simulate('click')
 
-  equal(parseInt($('.month_number').text()), 1, 'jump to today - month changed to January')
-  equal(parseInt($('.year_number').text()), 2012, 'jump to today - year left at 2012')
+  equal(parseInt($('.month_number').text(), 10), 1, 'jump to today - month changed to January')
+  equal(parseInt($('.year_number').text(), 10), 2012, 'jump to today - year left at 2012')
 
   expected = $(
     '#mini_day_2012_01_01, #mini_day_2012_01_11, #mini_day_2012_01_23, #mini_day_2012_01_30, #mini_day_2012_01_31'

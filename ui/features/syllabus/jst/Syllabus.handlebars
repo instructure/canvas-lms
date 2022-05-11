@@ -2,7 +2,7 @@
 {{#each events}}
 
 <tr
-  class="date detail_list {{#if passed}} date_passed{{/if}}{{#if date}} events_{{strftime date "%Y_%m_%d"}}{{/if}} syllabus_{{type}} related-{{related_id}}{{#if override}} special_date{{/if}}"
+  class="date detail_list {{#if passed}} date_passed{{/if}}{{#if date}} events_{{strftime date "%Y_%m_%d"}}{{/if}} syllabus_{{type}} {{#if subtype}}assignment_type_{{subtype}}{{/if}} related-{{related_id}}{{#if override}} special_date{{/if}}"
   data-workflow-state="{{workflow_state}}">
   {{#if @first}}
   <td scope="row" rowspan="{{eventCount}}" valign="top" class="day_date"
@@ -13,7 +13,13 @@
   </td>
   {{/if}}
   <td class="name{{#unless last}} not_last{{/unless}}">
-    {{#ifEqual type 'assignment'}}
+    {{#ifEqual subtype 'discussion_topic' }}
+    <span class="screenreader-only">{{#t}}Discussion Topic{{/t}}</span>
+    {{addIcon 'discussion'}}
+    {{else}}{{#ifEqual subtype 'quiz' }}
+    <span class="screenreader-only">{{#t}}Quiz{{/t}}</span>
+    {{addIcon 'quiz'}}
+    {{else}}{{#ifEqual type 'assignment'}}
     <span class="screenreader-only">{{#t}}Assignment{{/t}}</span>
     {{addIcon 'assignment'}}
     {{else}}{{#ifEqual type 'wiki_page' }}
@@ -25,7 +31,7 @@
     {{else}}
     <span class="screenreader-only">{{#t}}Calendar Event{{/t}}</span>
     {{addIcon 'calendar-month'}}
-    {{/ifEqual}}{{/ifEqual}}{{/ifEqual}}
+    {{/ifEqual}}{{/ifEqual}}{{/ifEqual}}{{/ifEqual}}{{/ifEqual}}
     {{#if html_url}}
     <a href="{{html_url}}">{{title}}</a>
     {{else}}

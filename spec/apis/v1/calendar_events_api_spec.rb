@@ -1569,6 +1569,7 @@ describe CalendarEventsApiController, type: :request do
       all_day all_day_date assignment context_code created_at
       description end_at html_url id start_at title type updated_at
       url workflow_state context_name context_color important_dates
+      submission_types
     ]
 
     it "returns assignments within the given date range" do
