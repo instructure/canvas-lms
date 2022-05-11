@@ -361,7 +361,7 @@ class AccountNotification < ActiveRecord::Base
       user_ids = Set.new
       get_everybody = roles.empty?
 
-      course_roles = roles.select(&:course_role?).map { |r| r.role_for_root_account_id(account.resolved_root_account_id) }
+      course_roles = roles.compact.select(&:course_role?).map { |r| r.role_for_root_account_id(account.resolved_root_account_id) }
       if get_everybody || course_roles.any?
         Course.find_ids_in_ranges do |min_id, max_id|
           course_ids = Course.active.where(id: min_id..max_id, account_id: all_account_ids).pluck(:id)
@@ -375,12 +375,24 @@ class AccountNotification < ActiveRecord::Base
         end
       end
 
-      account_roles = roles.select(&:account_role?).map { |r| r.role_for_root_account_id(account.resolved_root_account_id) }
+      account_roles = roles.compact.select(&:account_role?).map { |r| r.role_for_root_account_id(account.resolved_root_account_id) }
       if get_everybody || account_roles.any?
         AccountUser.find_ids_in_ranges do |min_id, max_id|
           scope = AccountUser.where(id: min_id..max_id).active.where(account_id: all_account_ids)
           scope = scope.where(role_id: account_roles) unless get_everybody
           user_ids += scope.distinct.pluck(:user_id)
+        end
+      end
+
+      if roles.include?(nil)
+        Course.find_ids_in_ranges do |min_id, max_id|
+          course_ids = Course.active.where(id: min_id..max_id, account_id: all_account_ids).pluck(:id)
+          next unless course_ids.any?
+
+          course_ids.each_slice(50) do |sliced_course_ids|
+            scope = User.where.not(id: Enrollment.active_or_pending_by_date.where(course_id: sliced_course_ids).select(:user_id))
+            user_ids += scope.distinct.pluck(:id)
+          end
         end
       end
       user_ids.to_a.sort
