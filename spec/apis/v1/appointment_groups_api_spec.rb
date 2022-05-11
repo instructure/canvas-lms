@@ -306,7 +306,7 @@ describe AppointmentGroupsController, type: :request do
     expect(json["requiring_action"]).to be_falsey
   end
 
-  describe "past appointments" do
+  context "past appointments" do
     before :once do
       @ag = AppointmentGroup.create!(title: "yay",
                                      new_appointments: [["#{Time.now.year - 1}-01-01 12:00:00", "#{Time.now.year - 1}-01-01 13:00:00"],
@@ -506,29 +506,28 @@ describe AppointmentGroupsController, type: :request do
     end
   end
 
-  types = {
-    "users" => proc do
-      @ag = AppointmentGroup.create!(title: "yay", new_appointments: [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]], contexts: [@course])
-      @ag.publish!
-      @ag.appointments.first.reserve_for @student1, @me
-    end,
-    "groups" => proc do
-      cat = @course.group_categories.create(name: "foo")
-      @ag = AppointmentGroup.create!(title: "yay", sub_context_codes: [cat.asset_string], new_appointments: [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]], contexts: [@course])
-      @ag.publish!
-      group1 = cat.groups.create(context: @course)
-      group1.users << @student1
-      @ag.appointments.first.reserve_for group1, @me
-      group2 = cat.groups.create(context: @course)
-      group2.users << @student2
-    end
-  }
-  types.each do |type, block|
-    context "#{type.singularize}-level appointment groups" do
-      before :once, &block
+  context "participants" do
+    shared_examples_for "appointment group data" do |type|
+      before :once do
+        @current_types = %w[users groups]
+        case type
+        when "users"
+          @ag = AppointmentGroup.create!(title: "yay", new_appointments: [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]], contexts: [@course])
+          @ag.publish!
+          @ag.appointments.first.reserve_for @student1, @me
+        when "groups"
+          cat = @course.group_categories.create(name: "foo")
+          @ag = AppointmentGroup.create!(title: "yay", sub_context_codes: [cat.asset_string], new_appointments: [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"], ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]], contexts: [@course])
+          @ag.publish!
+          group1 = cat.groups.create(context: @course)
+          group1.users << @student1
+          @ag.appointments.first.reserve_for group1, @me
+          group2 = cat.groups.create(context: @course)
+          group2.users << @student2
+        end
+      end
 
       it "returns all #{type}" do
-        skip("LS-2567 to skip and fix")
         json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}/#{type}", {
                           controller: "appointment_groups", id: @ag.id.to_s, action: type,
                           format: "json"
@@ -554,7 +553,6 @@ describe AppointmentGroupsController, type: :request do
       end
 
       it "returns registered #{type}" do
-        skip("LS-2567 to skip and fix")
         json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}/#{type}?registration_status=registered", {
                           controller: "appointment_groups", id: @ag.id.to_s, action: type,
                           registration_status: "registered", format: "json"
@@ -564,7 +562,6 @@ describe AppointmentGroupsController, type: :request do
       end
 
       it "returns unregistered #{type}" do
-        skip("LS-2567 to skip and fix")
         json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}/#{type}?registration_status=unregistered", {
                           controller: "appointment_groups", id: @ag.id.to_s, action: type,
                           registration_status: "unregistered", format: "json"
@@ -574,7 +571,7 @@ describe AppointmentGroupsController, type: :request do
       end
 
       it "does not return non-#{type.singularize} participants" do
-        (types.keys - [type]).each do |other_type|
+        (@current_types - [type]).each do |other_type|
           json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}/#{other_type}", {
                             controller: "appointment_groups", id: @ag.id.to_s, action: other_type, format: "json"
                           })
@@ -582,9 +579,12 @@ describe AppointmentGroupsController, type: :request do
         end
       end
     end
+
+    it_behaves_like "appointment group data", "users"
+    it_behaves_like "appointment group data", "groups"
   end
 
-  describe "next_appointment" do
+  context "next_appointment" do
     before :once do
       @ag1 = AppointmentGroup.create!(
         title: "past",
