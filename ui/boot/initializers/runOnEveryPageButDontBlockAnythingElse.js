@@ -24,6 +24,7 @@
 
 import $ from 'jquery'
 import preventDefault from 'prevent-default'
+import {isolate} from '@canvas/sentry'
 
 // modules that do their own thing on every page that simply need to be required
 import '@canvas/media-comments'
@@ -39,7 +40,9 @@ import './activateLtiThumbnailLauncher'
 import './sanitizeCSSOverflow'
 import './trackGoogleAnalyticsEventsOnClick'
 
-if (ENV.page_view_update_url) import('./trackPageViews')
+if (ENV.page_view_update_url) {
+  isolate(() => import('./trackPageViews'))()
+}
 
 // preventDefault so we dont change the hash
 // this will make nested apps that use the hash happy
