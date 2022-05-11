@@ -105,7 +105,7 @@ export default class IndexView extends Backbone.View
             store: @indexMenuStore,
             contextType: contextType,
             contextId: contextId,
-            requestBulkEdit: requestBulkEditFn,
+            requestBulkEdit: if !ENV.IN_PACED_COURSE then requestBulkEditFn else undefined,
             setTrigger: @assignmentSettingsView.setTrigger.bind(@assignmentSettingsView)
             setDisableTrigger: @assignmentSyncSettingsView.setTrigger.bind(@assignmentSyncSettingsView)
             registerWeightToggle: @assignmentSettingsView.on.bind(@assignmentSettingsView)

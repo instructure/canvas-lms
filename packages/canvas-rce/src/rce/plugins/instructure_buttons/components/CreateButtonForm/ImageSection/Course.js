@@ -17,14 +17,14 @@
  */
 
 import React, {useEffect} from 'react'
-
+import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import ImageList from '../../../../instructure_image/Images'
 import {useStoreProps} from '../../../../shared/StoreContext'
 import useDataUrl from '../../../../shared/useDataUrl'
 import {actions} from '../../../reducers/imageSection'
 
-const Course = ({dispatch}) => {
+const Course = ({dispatch, onLoading, onLoaded}) => {
   const storeProps = useStoreProps()
   const {files, bookmark, isLoading, hasMore} = storeProps.images[storeProps.contextType]
   const {setUrl, dataUrl, dataLoading, dataError} = useDataUrl()
@@ -47,6 +47,11 @@ const Course = ({dispatch}) => {
       dispatch({...actions.SET_IMAGE_COLLECTION_OPEN, payload: false})
     }
   }, [dataLoading])
+
+  useEffect(() => {
+    if (isLoading) onLoading && onLoading()
+    else onLoaded && onLoaded()
+  }, [isLoading])
 
   return (
     <View>
@@ -73,6 +78,18 @@ const Course = ({dispatch}) => {
       />
     </View>
   )
+}
+
+Course.propTypes = {
+  dispatch: PropTypes.func,
+  onLoading: PropTypes.func,
+  onLoaded: PropTypes.func
+}
+
+Course.defaultProps = {
+  dispatch: () => {},
+  onLoading: () => {},
+  onLoaded: () => {}
 }
 
 export default Course

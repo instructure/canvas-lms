@@ -2440,6 +2440,7 @@ CanvasRails::Application.routes.draw do
       get "jobs2/:bucket/by_:group", action: :grouped_info, as: :jobs_grouped_info
       get "jobs2/:bucket", action: :list, as: :jobs_list, constraints: { bucket: /running|queued|future|failed/ }
       get "jobs2/:id", action: :lookup, constraints: { id: /\d+/ }
+      put "jobs2/manage", action: :manage
     end
   end
 

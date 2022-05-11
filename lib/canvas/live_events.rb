@@ -222,6 +222,10 @@ module Canvas::LiveEvents
   end
 
   def self.get_assignment_data(assignment)
+    created_on_blueprint_sync =
+      MasterCourses::ChildSubscription.is_child_course?(assignment.context) &&
+      assignment.migration_id&.start_with?(MasterCourses::MIGRATION_ID_PREFIX)
+
     event = {
       assignment_id: assignment.global_id,
       context_id: assignment.global_context_id,
@@ -240,7 +244,8 @@ module Canvas::LiveEvents
       lti_assignment_description: LiveEvents.truncate(assignment.description),
       lti_resource_link_id: assignment.lti_resource_link_id,
       lti_resource_link_id_duplicated_from: assignment.duplicate_of&.lti_resource_link_id,
-      submission_types: assignment.submission_types
+      submission_types: assignment.submission_types,
+      created_on_blueprint_sync: created_on_blueprint_sync || false
     }
     actl = assignment.assignment_configuration_tool_lookups.take
     domain = assignment.root_account&.domain(ApplicationController.test_cluster_name)
@@ -979,8 +984,12 @@ module Canvas::LiveEvents
   def self.get_master_template_created_data(master_template)
     {
       master_template_id: master_template.id,
-      master_course_id: master_template.course_id,
-      root_account_id: master_template.root_account_id
+      account_id: master_template.course.account.global_id,
+      account_uuid: master_template.course.account.uuid,
+      blueprint_course_id: master_template.course.global_id,
+      blueprint_course_uuid: master_template.course.uuid,
+      blueprint_course_title: master_template.course.name,
+      blueprint_course_workflow_state: master_template.course.workflow_state
     }
   end
 
@@ -991,8 +1000,26 @@ module Canvas::LiveEvents
   def self.master_migration_completed_data(master_migration)
     {
       master_migration_id: master_migration.id,
-      master_template_id: master_migration.master_template_id,
-      root_account_id: master_migration.root_account_id
+      master_template_id: master_migration.master_template.id,
+      account_id: master_migration.master_template.course.account.global_id,
+      account_uuid: master_migration.master_template.course.account.uuid,
+      blueprint_course_uuid: master_migration.master_template.course.uuid,
+      blueprint_course_id: master_migration.master_template.course.global_id
+    }
+  end
+
+  def self.blueprint_subscription_created(blueprint_subscription)
+    post_event_stringified("blueprint_subscription_created", blueprint_subscription_created_data(blueprint_subscription))
+  end
+
+  def self.blueprint_subscription_created_data(blueprint_subscription)
+    {
+      master_template_account_uuid: blueprint_subscription.master_template.course.account.uuid,
+      master_template_id: blueprint_subscription.master_template_id,
+      master_course_uuid: blueprint_subscription.master_template.course.uuid,
+      child_subscription_id: blueprint_subscription.id,
+      child_course_uuid: blueprint_subscription.child_course.uuid,
+      child_course_account_uuid: blueprint_subscription.child_course.account.uuid
     }
   end
 

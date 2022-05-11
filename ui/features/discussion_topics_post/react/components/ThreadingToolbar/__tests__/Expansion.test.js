@@ -66,16 +66,16 @@ describe('Expansion', () => {
   })
 
   it('indicates expansion status', () => {
-    const {queryByText, rerender} = setup({isExpanded: false})
-    expect(queryByText('Expand discussion thread')).toBeTruthy()
-    expect(queryByText('Collapse discussion thread')).toBeFalsy()
+    const {queryByTestId, rerender} = setup({isExpanded: false})
+    expect(queryByTestId('reply-expansion-btn-expand')).toBeTruthy()
+    expect(queryByTestId('reply-expansion-btn-collapse')).toBeFalsy()
 
     rerender(
       <Expansion onClick={Function.prototype} isExpanded delimiterKey="expansion" expandText="" />
     )
 
-    expect(queryByText('Expand discussion thread')).toBeFalsy()
-    expect(queryByText('Collapse discussion thread')).toBeTruthy()
+    expect(queryByTestId('reply-expansion-btn-expand')).toBeFalsy()
+    expect(queryByTestId('reply-expansion-btn-collapse')).toBeTruthy()
   })
 
   it('displays as readonly if isReadOnly is true', () => {

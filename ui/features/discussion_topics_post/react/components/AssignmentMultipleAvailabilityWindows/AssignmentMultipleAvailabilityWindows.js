@@ -30,36 +30,38 @@ const I18n = useI18nScope('discussion_posts')
 
 export function AssignmentMultipleAvailabilityWindows({...props}) {
   return (
-    <CondensedButton
-      onClick={() => {
-        props.onSetDueDateTrayOpen(true)
-      }}
-      data-testid="show-due-dates-button"
-    >
-      <Responsive
-        match="media"
-        query={responsiveQuerySizes({tablet: true, desktop: true})}
-        props={{
-          tablet: {
-            text: I18n.t('Due Dates (%{dueDateCount})', {
-              dueDateCount: props.assignmentOverrides.length
-            }),
-            textSize: 'x-small'
-          },
-          desktop: {
-            text: I18n.t('Show Due Dates (%{dueDateCount})', {
-              dueDateCount: props.assignmentOverrides.length
-            }),
-            textSize: 'small'
-          }
+    <span className="discussions-show-multiple-due-dates">
+      <CondensedButton
+        onClick={() => {
+          props.onSetDueDateTrayOpen(true)
         }}
-        render={responsiveProps => (
-          <Text weight="bold" size={responsiveProps.textSize}>
-            {responsiveProps.text}
-          </Text>
-        )}
-      />
-    </CondensedButton>
+        data-testid="show-due-dates-button"
+      >
+        <Responsive
+          match="media"
+          query={responsiveQuerySizes({tablet: true, desktop: true})}
+          props={{
+            tablet: {
+              text: I18n.t('Due Dates (%{dueDateCount})', {
+                dueDateCount: props.assignmentOverrides.length
+              }),
+              textSize: 'x-small'
+            },
+            desktop: {
+              text: I18n.t('Show Due Dates (%{dueDateCount})', {
+                dueDateCount: props.assignmentOverrides.length
+              }),
+              textSize: 'small'
+            }
+          }}
+          render={responsiveProps => (
+            <Text weight="bold" size={responsiveProps.textSize}>
+              {responsiveProps.text}
+            </Text>
+          )}
+        />
+      </CondensedButton>
+    </span>
   )
 }
 

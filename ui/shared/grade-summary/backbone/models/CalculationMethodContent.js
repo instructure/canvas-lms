@@ -70,6 +70,20 @@ class NMastery {
   }
 }
 
+class Average {
+  constructor(range) {
+    this.range = range
+  }
+
+  value() {
+    if (this.range.length > 0) {
+      return Math.round((_.sum(this.range) / this.range.length) * 100) / 100
+    } else {
+      return I18n.t('N/A')
+    }
+  }
+}
+
 export default class CalculationMethodContent {
   constructor(model) {
     // We can pass in a straight object or a backbone model
@@ -95,11 +109,16 @@ export default class CalculationMethodContent {
     ).value()
   }
 
+  average(range) {
+    return new Average(range).value()
+  }
+
   present() {
     return this.toJSON()[this.calculation_method]
   }
 
   toJSON() {
+    const outcomeAllowAverageCalculationFF = ENV.OUTCOME_AVERAGE_CALCULATION
     const alternativeCalculationValues = this.is_individual_outcome
       ? {
           decaying_average: {
@@ -114,12 +133,15 @@ export default class CalculationMethodContent {
             calculationIntLabel: I18n.t('# of times'),
             calculationIntDescription: I18n.t('must be between 1 and 10')
           },
-          lastest: {
+          latest: {
             method: I18n.t('Most Recent Score')
           },
           highest: {
             exampleScores: this.exampleScoreIntegers().join(', '),
             exampleResult: numberFormat.outcomeScore(_.max(this.exampleScoreIntegers()))
+          },
+          average: {
+            method: I18n.t('Average')
           }
         }
       : {
@@ -135,12 +157,15 @@ export default class CalculationMethodContent {
             calculationIntLabel: I18n.t('Items: '),
             calculationIntDescription: I18n.t('Between 1 and 10')
           },
-          lastest: {
+          latest: {
             method: I18n.t('Latest Score')
           },
           highest: {
             exampleScores: this.exampleScoreIntegers().slice(0, 4).join(', '),
             exampleResult: numberFormat.outcomeScore(_.max(this.exampleScoreIntegers().slice(0, 4)))
+          },
+          average: {
+            method: I18n.t('Average')
           }
         }
 
@@ -192,7 +217,7 @@ export default class CalculationMethodContent {
         validRange: [1, 10]
       },
       latest: {
-        method: alternativeCalculationValues.lastest.method,
+        method: alternativeCalculationValues.latest.method,
         friendlyCalculationMethod: I18n.t('Most Recent Score'),
         exampleText: I18n.t('Mastery score reflects the most recent graded assignment or quiz.'),
         exampleScores: this.exampleScoreIntegers().slice(0, 4).join(', '),
@@ -206,7 +231,20 @@ export default class CalculationMethodContent {
         ),
         exampleScores: alternativeCalculationValues.highest.exampleScores,
         exampleResult: alternativeCalculationValues.highest.exampleResult
-      }
+      },
+      ...(outcomeAllowAverageCalculationFF && {
+        average: {
+          method: alternativeCalculationValues.average.method,
+          friendlyCalculationMethod: I18n.t('Average'),
+          exampleText: I18n.t(
+            'Central value in a set of results. Calculated by dividing the sum of all item scores by the number of scores.'
+          ),
+          exampleScores: this.exampleScoreIntegers().slice(0, 7).join(', '),
+          exampleResult: numberFormat.outcomeScore(
+            this.average(this.exampleScoreIntegers().slice(0, 7))
+          )
+        }
+      })
     }
   }
 }

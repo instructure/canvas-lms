@@ -18,17 +18,11 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState, useContext, useEffect} from 'react'
-
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {
-  IconAddSolid,
-  IconArrowOpenDownLine,
-  IconArrowOpenUpLine,
-  IconXSolid
-} from '@instructure/ui-icons'
+import {IconArrowOpenDownLine, IconArrowOpenUpLine} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {Modal} from '@instructure/ui-modal'
@@ -36,14 +30,13 @@ import {NumberInput} from '@instructure/ui-number-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Table} from '@instructure/ui-table'
-import {Tag} from '@instructure/ui-tag'
 import {Text} from '@instructure/ui-text'
 import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
-import {View} from '@instructure/ui-view'
 
 import _ from 'lodash'
 import {OBSERVER_ENROLLMENTS_QUERY} from '../graphql/Queries'
+import Pill from './Pill'
 
 import {useQuery} from 'react-apollo'
 
@@ -149,29 +142,6 @@ const filterCriteria: FilterCriterion[] = [
   }
 ]
 
-// Interim Tag-like component representing a selectable student or observer
-// until whatever we're using gets finalized
-// Still needed: some sort of onClick handler so we can select and deselect
-const FakeTag = ({text, selected = false}) => {
-  const contents = selected ? (
-    <>
-      <View margin="0 small 0 0">
-        <Text color="primary">{text}</Text>
-      </View>
-      <IconXSolid />
-    </>
-  ) : (
-    <>
-      <View margin="0 small 0 0">
-        <Text color="secondary">{text}</Text>
-      </View>
-      <IconAddSolid color="brand" />
-    </>
-  )
-
-  return <Tag text={contents} />
-}
-
 function observerCount(students, observers) {
   return students.reduce((acc, student) => acc + (observers[student.id]?.length || 0), 0)
 }
@@ -226,6 +196,21 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
   const [open, setOpen] = useState(true)
   const [sending, setSending] = useState(false)
 
+  const initializeSelectedObservers = (students) =>
+    students.reduce((map, student) => {
+      map[student.id] = []
+      return map
+    }, {})
+
+  const [selectedObservers, setSelectedObservers] = useState(initializeSelectedObservers(students))
+  const [selectedStudents, setSelectedStudents] = useState(Object.keys(selectedObservers))
+  const [isIndeterminateStudentsCheckbox, setIsIndeterminateStudentsCheckbox] = useState(false)
+  const [isIndeterminateObserversCheckbox, setIsIndeterminateObserversCheckbox] = useState(false)
+  const [isCheckedStudentsCheckbox, setIsCheckedStudentsCheckbox] = useState(true)
+  const [isCheckedObserversCheckbox, setIsCheckedObserversCheckbox] = useState(false)
+  const [isDisabledStudentsCheckbox, setIsDisabledStudentsCheckbox] = useState(false)
+  const [isDisabledObserversCheckbox, setIsDisabledObserversCheckbox] = useState(false)
+
   const close = () => setOpen(false)
 
   const {loading, data} = useQuery(OBSERVER_ENROLLMENTS_QUERY, {
@@ -248,17 +233,52 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
     return results
   }, {})
 
-  const availableCriteria = filterCriteria.filter(criterion => criterion.shouldShow(assignment))
-  const [showTable, setShowTable] = useState(false)
-  const [selectedCriterion, setSelectedCriterion] = useState(availableCriteria[0])
+  const isLengthBetweenBoundaries = (subsetLength: number, totalLength: number) =>
+    subsetLength > 0 && subsetLength < totalLength
+
   const [cutoff, setCutoff] = useState(0.0)
-  const [attachments, setAttachments] = useState([])
-  const [pendingUploads, setPendingUploads] = useState([])
+  const availableCriteria = filterCriteria.filter(criterion => criterion.shouldShow(assignment))
   const sortedStudents = [...students].sort((a, b) => a.sortableName.localeCompare(b.sortableName))
   const [filteredStudents, setFilteredStudents] = useState(
     filterStudents(availableCriteria[0], sortedStudents, cutoff)
   )
   const [observersDisplayed, setObserversDisplayed] = useState(0.0)
+
+  useEffect(() => {
+    const partialStudentSelection = isLengthBetweenBoundaries(
+      selectedStudents.length,
+      filteredStudents.length
+    )
+    setIsIndeterminateStudentsCheckbox(partialStudentSelection)
+    setIsDisabledStudentsCheckbox(filteredStudents.length === 0)
+    setIsCheckedStudentsCheckbox(filteredStudents.length > 0 && selectedStudents.length === filteredStudents.length)
+  }, [selectedStudents, filteredStudents])
+
+  useEffect(() => {
+    const observerCountValue = observerCount(filteredStudents, observersByStudentID)
+    const selectedObserverCount = Object.values(selectedObservers).reduce(
+      (acc: number, array: any) => acc + array.length,
+      0
+    )
+    const partialObserverSelection = isLengthBetweenBoundaries(
+      selectedObserverCount,
+      observerCountValue
+    )
+    setIsIndeterminateObserversCheckbox(partialObserverSelection)
+    setIsDisabledObserversCheckbox(observerCountValue === 0)
+    setIsCheckedObserversCheckbox(observerCountValue > 0 && selectedObserverCount === observerCountValue)
+  }, [filteredStudents, observersByStudentID, selectedObservers])
+
+  useEffect(() => {
+    const initialValue = initializeSelectedObservers(filteredStudents)
+    setSelectedObservers(initialValue)
+    setSelectedStudents(Object.keys(initialValue))
+  }, [filteredStudents])
+
+  const [showTable, setShowTable] = useState(false)
+  const [selectedCriterion, setSelectedCriterion] = useState(availableCriteria[0])
+  const [attachments, setAttachments] = useState([])
+  const [pendingUploads, setPendingUploads] = useState([])
 
   useEffect(() => {
     if (!loading && data) {
@@ -307,6 +327,49 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
   const onReplaceAttachment = (id, e) => {
     onDeleteAttachment(id)
     onAddAttachment(e)
+  }
+
+  const toggleSelection = (id: string, array: Array<string>) => {
+    const index = array.indexOf(id)
+    const newArray = [...array]
+    if (index === -1) {
+      newArray.push(id)
+    } else {
+      newArray.splice(index, 1)
+    }
+    return newArray
+  }
+
+  const toggleStudentSelection = (id: string) => {
+    setSelectedStudents(toggleSelection(id, selectedStudents))
+  }
+
+  const toggleObserverSelection = (studentId: string, observerId: string) => {
+    const observers = selectedObservers[studentId]
+    const updatedObservers = toggleSelection(observerId, observers)
+    setSelectedObservers({...selectedObservers, [studentId]: updatedObservers})
+  }
+
+  const onStudentsCheckboxChanged = event => {
+    if (event.target.checked) {
+      setSelectedStudents(filteredStudents.map(element => element.id))
+    } else {
+      setSelectedStudents([])
+    }
+  }
+
+  const onObserversCheckboxChanged = event => {
+    if (event.target.checked) {
+      setSelectedObservers(
+        filteredStudents.reduce((map, student) => {
+          const observers = observersByStudentID[student.id] || []
+          map[student.id] = Object.values(observers).map(observer => observer._id)
+          return map
+        }, {})
+      )
+    } else {
+      setSelectedObservers(initializeSelectedObservers(students))
+    }
   }
 
   return (
@@ -371,6 +434,10 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
             </Item>
             <Item margin="0 0 0 medium">
               <Checkbox
+                indeterminate={isIndeterminateStudentsCheckbox}
+                disabled={isDisabledStudentsCheckbox}
+                onChange={onStudentsCheckboxChanged}
+                checked={isCheckedStudentsCheckbox}
                 defaultChecked
                 label={
                   <Text weight="bold">
@@ -381,6 +448,10 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
             </Item>
             <Item margin="0 0 0 medium">
               <Checkbox
+                indeterminate={isIndeterminateObserversCheckbox}
+                disabled={isDisabledObserversCheckbox}
+                onChange={onObserversCheckboxChanged}
+                checked={isCheckedObserversCheckbox}
                 label={
                   <Text weight="bold">
                     {I18n.t('%{observerCount} Observers', {
@@ -413,7 +484,12 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
                 {filteredStudents.map(student => (
                   <Row key={student.id}>
                     <Cell>
-                      <FakeTag text={student.name} selected />
+                      <Pill
+                        studentId={student.id}
+                        text={student.name}
+                        selected={selectedStudents.includes(student.id)}
+                        onClick={toggleStudentSelection}
+                      />
                     </Cell>
                     <Cell>
                       <Flex direction="row" margin="0 0 0 small" wrap="wrap">
@@ -422,7 +498,13 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
                           observer => observer.sortableName
                         ).map(observer => (
                           <Item key={observer._id}>
-                            <FakeTag text={observer.name} />
+                            <Pill
+                              studentId={student.id}
+                              observerId={observer._id}
+                              text={observer.name}
+                              selected={selectedObservers[student.id]?.includes(observer._id)}
+                              onClick={toggleObserverSelection}
+                            />
                           </Item>
                         ))}
                       </Flex>

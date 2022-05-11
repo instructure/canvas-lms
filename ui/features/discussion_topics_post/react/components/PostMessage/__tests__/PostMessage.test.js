@@ -63,12 +63,12 @@ describe('PostMessage', () => {
     expect(queryByText('Thoughts')).toBeTruthy()
   })
 
-  it('displays the title h1', () => {
+  it('displays the title h2', () => {
     const {queryByText} = setup()
     const screenReaderText = queryByText('Discussion Topic: Thoughts')
 
     expect(screenReaderText).toBeTruthy()
-    expect(screenReaderText.parentElement.parentElement.parentElement.tagName).toBe('H1')
+    expect(screenReaderText.parentElement.parentElement.parentElement.tagName).toBe('H2')
   })
 
   it('displays the message', () => {

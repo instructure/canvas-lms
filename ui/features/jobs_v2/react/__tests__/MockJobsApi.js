@@ -41,7 +41,7 @@ const fake_job = {
   run_at: '2022-04-02T13:01:00Z',
   locked_at: '2022-04-02T13:02:00Z',
   failed_at: '2022-04-02T13:03:00Z',
-  locked_by: 'fake_job_list_locked_by_value',
+  locked_by: 'job010001039065:12438',
   tag: 'fake_job_list_tag_value',
   max_attempts: 1,
   strand: 'fake_job_list_strand_value',

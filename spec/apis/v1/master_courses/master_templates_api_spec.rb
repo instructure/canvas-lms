@@ -459,6 +459,10 @@ describe MasterCourses::MasterTemplatesController, type: :request do
         @assignment.destroy
         @master.syllabus_body = "syllablah frd"
         @master.save!
+        @external_assignment = @master.assignments.create!(title: "external tool assignment", submission_types: "external_tool")
+        tag = @external_assignment.build_external_tool_tag(url: "http://example.com/tool")
+        tag.content_type = "ContextExternalTool"
+        tag.save!
       end
       run_master_migration(copy_settings: true)
     end
@@ -482,7 +486,9 @@ describe MasterCourses::MasterTemplatesController, type: :request do
           "html_url" => "http://www.example.com/courses/#{@master.id}/assignments/syllabus", "locked" => false,
           "exceptions" => [{ "course_id" => @minions.first.id, "conflicting_changes" => ["content"] }] },
         { "asset_id" => @master.id, "asset_type" => "settings", "asset_name" => "Course Settings", "change_type" => "updated",
-          "html_url" => "http://www.example.com/courses/#{@master.id}/settings", "locked" => false, "exceptions" => [] }
+          "html_url" => "http://www.example.com/courses/#{@master.id}/settings", "locked" => false, "exceptions" => [] },
+        { "asset_id" => @external_assignment.id, "asset_type" => "assignment", "asset_name" => "external tool assignment", "change_type" => "created",
+          "html_url" => "http://www.example.com/courses/#{@master.id}/assignments/#{@external_assignment.id}", "locked" => false, "exceptions" => [] }
       ]
       expect(json).to match_array(expected_result)
     end
@@ -496,6 +502,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       minion_assignment = minion.assignments.where(migration_id: @template.migration_id_for(@assignment)).first
       minion_file = minion.attachments.where(migration_id: @template.migration_id_for(@file)).first
       minion_quiz = minion.quizzes.where(migration_id: @template.migration_id_for(@quiz)).first
+      minion_external_assignment = minion.assignments.where(migration_id: @template.migration_id_for(@external_assignment)).first
       json = api_call_as_user(minion.teachers.first, :get,
                               "/api/v1/courses/#{minion.id}/blueprint_subscriptions/default/migrations/#{minion_migration.id}/details",
                               controller: "master_courses/master_templates", format: "json", subscription_id: "default",
@@ -514,7 +521,9 @@ describe MasterCourses::MasterTemplatesController, type: :request do
           "html_url" => "http://www.example.com/courses/#{minion.id}/assignments/syllabus", "locked" => false,
           "exceptions" => [{ "course_id" => minion.id, "conflicting_changes" => ["content"] }] },
         { "asset_id" => minion.id, "asset_type" => "settings", "asset_name" => "Course Settings", "change_type" => "updated",
-          "html_url" => "http://www.example.com/courses/#{minion.id}/settings", "locked" => false, "exceptions" => [] }
+          "html_url" => "http://www.example.com/courses/#{minion.id}/settings", "locked" => false, "exceptions" => [] },
+        { "asset_id" => minion_external_assignment.id, "asset_type" => "assignment", "asset_name" => "external tool assignment", "change_type" => "created",
+          "html_url" => "http://www.example.com/courses/#{minion.id}/assignments/#{minion_external_assignment.id}", "locked" => false, "exceptions" => [] }
       ]
       expect(json).to match_array(expected_result)
     end

@@ -56,6 +56,10 @@ export default class UsersPane extends React.Component {
       srMessageDisplayed: false
     }
     this.columnHeader = null
+    this.debouncedDispatchApplySearchFilter = debounce(
+      this.handleApplyingSearchFilter,
+      SEARCH_DEBOUNCE_TIME
+    )
   }
 
   componentDidMount() {
@@ -80,12 +84,19 @@ export default class UsersPane extends React.Component {
   }
 
   handleStateChange = () => {
-    this.setState({userList: this.props.store.getState().userList})
+    const userList = this.props.store.getState().userList
+    const lastPage = userList?.links?.last?.page
+    this.setState(oldState => {
+      const newState = {userList}
+      if (lastPage && !oldState.knownLastPage) newState.knownLastPage = lastPage
+      return newState
+    })
   }
 
-  handleApplyingSearchFilter = () => {
+  handleApplyingSearchFilter = (preserveLastPageValue = false) => {
     this.props.store.dispatch(UserActions.applySearchFilter(MIN_SEARCH_LENGTH))
     this.updateQueryString()
+    if (!preserveLastPageValue) this.setState({knownLastPage: undefined})
   }
 
   setColumnHeaderRef = element => {
@@ -96,11 +107,6 @@ export default class UsersPane extends React.Component {
     const searchFilter = this.props.store.getState().userList.searchFilter
     this.props.onUpdateQueryParams(searchFilter)
   }
-
-  debouncedDispatchApplySearchFilter = debounce(
-    this.handleApplyingSearchFilter,
-    SEARCH_DEBOUNCE_TIME
-  )
 
   handleUpdateSearchFilter = searchFilter => {
     this.props.store.dispatch(UserActions.updateSearchFilter({page: null, ...searchFilter}))
@@ -113,7 +119,7 @@ export default class UsersPane extends React.Component {
 
   handleSetPage = page => {
     this.props.store.dispatch(UserActions.updateSearchFilter({page}))
-    this.handleApplyingSearchFilter()
+    this.handleApplyingSearchFilter(true)
   }
 
   render() {
@@ -151,8 +157,8 @@ export default class UsersPane extends React.Component {
         <SearchMessage
           collection={{data: users, loading: isLoading, links}}
           setPage={this.handleSetPage}
+          knownLastPage={this.state.knownLastPage}
           noneFoundMessage={I18n.t('No users found')}
-          dataType="User"
         />
         {this.state.srMessageDisplayed && (
           <SRSearchMessage collection={{data: users, loading: isLoading, links}} dataType="User" />

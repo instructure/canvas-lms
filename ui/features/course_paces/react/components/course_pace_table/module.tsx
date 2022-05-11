@@ -16,7 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef, useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
+import {connect} from 'react-redux'
+import moment from 'moment-timezone'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {ApplyTheme} from '@instructure/ui-themeable'
@@ -34,8 +36,18 @@ import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 
+import {getDueDates} from '../../reducers/course_paces'
+import {getBlackoutDates} from '../../shared/reducers/blackout_dates'
+import {BlackoutDate} from '../../shared/types'
 import AssignmentRow from './assignment_row'
-import {Module as IModule, CoursePace, ResponsiveSizes} from '../../types'
+import BlackoutDateRow from './blackout_date_row'
+import {
+  Module as IModule,
+  CoursePaceItemDueDates,
+  CoursePace,
+  ResponsiveSizes,
+  StoreState
+} from '../../types'
 
 const I18n = useI18nScope('course_paces_module')
 
@@ -51,11 +63,19 @@ interface PassedProps {
   readonly compression: number
 }
 
-export const Module: React.FC<PassedProps> = props => {
+interface StoreProps {
+  readonly blackoutDates: BlackoutDate[]
+  readonly dueDates: CoursePaceItemDueDates
+}
+
+type ComponentProps = PassedProps & StoreProps
+
+export const Module: React.FC<ComponentProps> = props => {
   const [actuallyExpanded, setActuallyExpanded] = useState(props.showProjections)
   const [datesVisible, setDatesVisible] = useState(props.showProjections)
   const wasExpanded = useRef(props.showProjections)
   const isStudentPace = props.coursePace.context_type === 'Enrollment'
+  const isTableStacked = props.responsiveSize === 'small'
 
   useEffect(() => {
     if (!wasExpanded.current && props.showProjections) {
@@ -78,6 +98,34 @@ export const Module: React.FC<PassedProps> = props => {
       </Flex>
     )
   }
+
+  const mergeAssignmentsAndBlackoutDates = useCallback(() => {
+    const assignmentDueDates: CoursePaceItemDueDates = props.dueDates
+    const assignmentsWithDueDate = props.module.items.map(item => {
+      const item_due = assignmentDueDates[item.module_item_id]
+      const due_at = item_due ? moment(item_due).endOf('day') : undefined
+      return {...item, date: due_at, type: 'assignment'}
+    })
+    const blackoutDates = props.blackoutDates.map(bd => ({
+      ...bd,
+      date: bd.start_date,
+      type: 'blackout_date'
+    }))
+
+    const merged = assignmentsWithDueDate.concat(blackoutDates as Array<any>)
+    merged.sort((a, b) => {
+      if ('position' in a && 'position' in b) {
+        return a.position - b.position
+      }
+      if (!a.date && !!b.date) return -1
+      if (!!a.date && !b.date) return 1
+      if (!a.date && !b.date) return 0
+      if (a.date.isBefore(b.date)) return -1
+      if (a.date.isAfter(b.date)) return 1
+      return 0
+    })
+    return merged
+  }, [props.dueDates, props.blackoutDates, props.module.items])
 
   const renderDateColHeader = () => {
     if (!props.showProjections && !actuallyExpanded && !datesVisible) return null
@@ -115,7 +163,7 @@ export const Module: React.FC<PassedProps> = props => {
     )
   }
 
-  const assignmentRows: JSX.Element[] = props.module.items.map(item => {
+  const renderAssignmentRow = item => {
     // Scoping the key to the state of hard_end_dates and the coursePace id ensures a full re-render of the row if either the hard_end_date
     // status changes or the course pace changes. This is necessary because the AssignmentRow maintains the duration in local state,
     // and applying updates with componentWillReceiveProps makes it buggy (because the Redux updates can be slow, causing changes to
@@ -127,11 +175,30 @@ export const Module: React.FC<PassedProps> = props => {
         actuallyExpanded={actuallyExpanded}
         datesVisible={datesVisible}
         coursePaceItem={item}
+        dueDate={item.date}
+        isStacked={isTableStacked}
       />
     )
-  })
+  }
 
-  const headerPadding = `${props.responsiveSize === 'small' ? 'small' : 'medium'} small small`
+  const renderBlackoutDateRow = item => {
+    const key = `blackoutdate-${item.id}`
+    return <BlackoutDateRow key={key} blackoutDate={item} isStacked={isTableStacked} />
+  }
+
+  const renderRows = () => {
+    const rowData = mergeAssignmentsAndBlackoutDates()
+    return rowData.map(rd => {
+      if (rd.type === 'assignment') {
+        return renderAssignmentRow(rd)
+      } else if (rd.type === 'blackout_date') {
+        return renderBlackoutDateRow(rd)
+      }
+      return undefined // should never get here
+    })
+  }
+
+  const headerPadding = `${isTableStacked ? 'small' : 'medium'} small small`
 
   return (
     <View
@@ -168,13 +235,13 @@ export const Module: React.FC<PassedProps> = props => {
           <View as="div" borderWidth="0 small">
             <Table
               caption={`${props.index}. ${props.module.name}`}
-              layout={props.responsiveSize === 'small' ? 'stacked' : 'auto'}
+              layout={isTableStacked ? 'stacked' : 'auto'}
             >
               <Head>
                 <Row>
                   <ColHeader id={`module-${props.module.id}-assignments`} width="100%">
                     <View as="div" padding={headerPadding}>
-                      {I18n.t('Assignments')}
+                      {I18n.t('Item')}
                     </View>
                   </ColHeader>
                   <ColHeader
@@ -187,9 +254,7 @@ export const Module: React.FC<PassedProps> = props => {
                       alignItems="end"
                       justifyItems={isStudentPace ? 'center' : 'start'}
                       padding={headerPadding}
-                      margin={`0 0 0 ${
-                        isStudentPace || props.responsiveSize === 'small' ? '0' : 'xx-small'
-                      }`}
+                      margin={`0 0 0 ${isStudentPace || isTableStacked ? '0' : 'xx-small'}`}
                     >
                       <View id="days-column-title">{I18n.t('Days')}</View>
                       <Tooltip
@@ -217,7 +282,7 @@ export const Module: React.FC<PassedProps> = props => {
                   </ColHeader>
                 </Row>
               </Head>
-              <Body>{assignmentRows}</Body>
+              <Body>{renderRows()}</Body>
             </Table>
           </View>
         </ToggleDetails>
@@ -226,4 +291,11 @@ export const Module: React.FC<PassedProps> = props => {
   )
 }
 
-export default Module
+const mapStateToProps = (state: StoreState): StoreProps => {
+  return {
+    blackoutDates: getBlackoutDates(state),
+    dueDates: getDueDates(state)
+  }
+}
+
+export default connect(mapStateToProps)(Module)

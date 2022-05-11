@@ -42,9 +42,14 @@ describe('ProficiencyCalculation', () => {
     global.onerror = originalOnError
   })
 
-  const render = (children, {contextType = 'Account', contextId = '1'} = {}) => {
+  const render = (
+    children,
+    {contextType = 'Account', contextId = '1', outcomeAllowAverageCalculationFF = false} = {}
+  ) => {
     return rtlRender(
-      <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
+      <OutcomesContext.Provider
+        value={{env: {contextType, contextId, outcomeAllowAverageCalculationFF}}}
+      >
         {children}
       </OutcomesContext.Provider>
     )
@@ -232,6 +237,26 @@ describe('ProficiencyCalculation', () => {
         fireEvent.click(getByText('Save Mastery Calculation'))
         fireEvent.click(getByText('Save'))
         expect(update).toHaveBeenCalledWith('latest', null)
+      })
+    })
+
+    describe('average', () => {
+      it('calls update with the correct arguments', () => {
+        window.ENV.OUTCOME_AVERAGE_CALCULATION = true
+        const update = jest.fn()
+        const {getByDisplayValue, getByText} = render(
+          <ProficiencyCalculation {...makeProps({update})} />,
+          {
+            outcomeAllowAverageCalculationFF: true
+          }
+        )
+        const method = getByDisplayValue('Decaying Average')
+        fireEvent.click(method)
+        const newMethod = getByText('Average')
+        fireEvent.click(newMethod)
+        fireEvent.click(getByText('Save Mastery Calculation'))
+        fireEvent.click(getByText('Save'))
+        expect(update).toHaveBeenCalledWith('average', null)
       })
     })
 

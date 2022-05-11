@@ -243,8 +243,10 @@ module Lti
 
     def email
       # we are using sis_email for lti2 tools, or if the 'prefer_sis_email' extension is set for LTI 1
-      e = if !lti1? || (@tool&.extension_setting(nil, :prefer_sis_email)&.downcase ||
-            @tool&.extension_setting(:tool_configuration, :prefer_sis_email)&.downcase) == "true"
+      # accept the setting as a boolean or string for backwards-compatibility
+      e = if !lti1? ||
+             @tool&.extension_setting(nil, :prefer_sis_email)&.to_s&.downcase == "true" ||
+             @tool&.extension_setting(:tool_configuration, :prefer_sis_email)&.to_s&.downcase == "true"
             sis_email
           end
       e || @user.email

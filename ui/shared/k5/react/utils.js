@@ -411,3 +411,5 @@ export const GradingPeriodShape = {
   start_date: PropTypes.string,
   workflow_state: PropTypes.string
 }
+
+export const MOBILE_NAV_BREAKPOINT_PX = 768

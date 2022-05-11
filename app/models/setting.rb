@@ -63,9 +63,10 @@ class Setting < Switchman::UnshardedRecord
   end
 
   # Note that after calling this, you should send SIGHUP to all running Canvas processes
-  def self.set(name, value)
+  def self.set(name, value, secret: nil)
     s = Setting.where(name: name).first_or_initialize
     s.value = value&.to_s
+    s.secret = secret unless secret.nil?
     s.save!
     cache.delete(name)
     @all_settings = nil

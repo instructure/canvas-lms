@@ -603,6 +603,21 @@ RSpec.shared_examples "DiscussionType" do
     expect(type.resolve("courseSections { name }")[0]).to eq section.name
   end
 
+  it "returns the appropriate course sections for students and teachers" do
+    section1 = add_section("Dope Section 1")
+    section2 = add_section("Dope Section 2")
+    student = student_in_course(active_all: true, section: section2)
+    topic = discussion_topic_model(context: @course, is_section_specific: true, course_section_ids: [section1.id, section2.id])
+
+    type_student = GraphQLTypeTester.new(topic, current_user: student.user)
+    expect(type_student.resolve("courseSections { _id }").length).to eq 1
+    expect(type_student.resolve("courseSections { _id }")[0]).to eq section2.id.to_s
+    expect(type_student.resolve("courseSections { name }")[0]).to eq section2.name
+
+    type_teacher = GraphQLTypeTester.new(topic, current_user: @teacher)
+    expect(type_teacher.resolve("courseSections { _id }").length).to eq 2
+  end
+
   it "returns if the discussion is able to be unpublished" do
     result = discussion_type.resolve("canUnpublish")
     expect(result).to eq discussion.can_unpublish?

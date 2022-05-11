@@ -72,7 +72,8 @@ export const AddressBook = ({
   isLoadingMoreMenuData,
   inputValue,
   hasSelectAllFilterOption,
-  currentFilter
+  currentFilter,
+  activeCourseFilter
 }) => {
   const textInputRef = useRef(null)
   const componentViewRef = useRef(null)
@@ -189,8 +190,10 @@ export const AddressBook = ({
 
   // Provide selected IDs via callback
   useEffect(() => {
-    onSelectedIdsChange(selectedMenuItems)
-  }, [onSelectedIdsChange, selectedMenuItems])
+    if (selectedMenuItems.filter(x => !selectedRecipients.includes(x)).length > 0) {
+      onSelectedIdsChange(selectedMenuItems)
+    }
+  }, [onSelectedIdsChange, selectedMenuItems, selectedRecipients])
 
   // set initial recipients from props
   useEffect(() => {
@@ -225,6 +228,19 @@ export const AddressBook = ({
       return () => {}
     }
   }, [fetchMoreMenuData, hasMoreMenuData, menuItemCurrent])
+
+  useEffect(() => {
+    if (
+      activeCourseFilter?.contextID === null &&
+      activeCourseFilter?.contextName === null &&
+      selectedRecipients.length === 0 &&
+      selectedMenuItems.length !== 0
+    ) {
+      onSelectedIdsChange([])
+      setSelectedMenuItems([])
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeCourseFilter, selectedRecipients])
 
   // Render individual menu items
   const renderMenuItem = (menuItem, isLast) => {
@@ -496,6 +512,9 @@ export const AddressBook = ({
               }}
               renderTrigger={
                 <TextInput
+                  placeholder={
+                    selectedMenuItems.length === 0 ? I18n.t('Insert or Select Names') : null
+                  }
                   renderLabel={
                     <ScreenReaderContent>{I18n.t('Address Book Input')}</ScreenReaderContent>
                   }
@@ -571,6 +590,7 @@ export const AddressBook = ({
                 }
               }}
               disabled={isLimitReached}
+              margin="none none none xx-small"
             >
               <IconAddressBookLine />
             </IconButton>
@@ -662,7 +682,8 @@ AddressBook.propTypes = {
   /**
    * object that contains the current context filter information
    */
-  currentFilter: PropTypes.object
+  currentFilter: PropTypes.object,
+  activeCourseFilter: PropTypes.object
 }
 
 export default AddressBook

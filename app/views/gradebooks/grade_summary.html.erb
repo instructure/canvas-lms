@@ -131,7 +131,9 @@
         <th scope="col"><%= t('headers.due', "Due") %></th>
         <th scope="col" class="status"><%= t('Status') %></th>
         <th scope="col" class="assignment_score"><%= t('headers.score', "Score") %></th>
-        <th scope="col" class="possible"><%= t('headers.out_of', "Out of") %></th>
+        <% if !Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page) %>
+          <th scope="col" class="possible"><%= t('headers.out_of', "Out of") %></th>
+        <% end %>
         <th scope="col"><span class="screenreader-only"><%= t('headers.details', "Details") %></span></th>
         <th scope="col"><span class="screenreader-only"><%= t('headers.submission_progress_status', "Submission Progress Status") %></span></th>
       </tr>
@@ -228,6 +230,11 @@
                   <%= assignment_presenter.display_score %>
                 </span>
               <% end %>
+              <% if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page) %>
+                <% if assignment_presenter.points_graded? && assignment.points_possible.present? %>
+                  <span>/ <%= n(round_if_whole(assignment.points_possible)) %></span>
+                <% end %>
+              <% end %>
             </span>
             <div style="display: none;">
               <!-- Store the original points so we don't need to parse and guess at locale -->
@@ -256,9 +263,11 @@
             </div>
           </div>
         </td>
-        <td class="possible points_possible">
-          <%= n(round_if_whole(assignment.points_possible)) %>
-        </td>
+        <% if !Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page) %>
+          <td class="possible points_possible">
+            <%= n(round_if_whole(assignment.points_possible)) %>
+          </td>
+        <% end %>
         <td class="details">
           <% if !assignment.special_class %>
           <a href="#"

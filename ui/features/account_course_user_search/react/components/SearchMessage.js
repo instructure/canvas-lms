@@ -20,12 +20,15 @@ import React, {Component} from 'react'
 import {Billboard} from '@instructure/ui-billboard'
 import {Pagination} from '@instructure/ui-pagination'
 import {Spinner} from '@instructure/ui-spinner'
-import {array, func, string, shape, oneOf} from 'prop-types'
+import {array, func, string, shape} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View} from '@instructure/ui-view'
 import EmptyDesert from '@canvas/images/react/EmptyDesert'
 
 const I18n = useI18nScope('account_course_user_search')
+
+// exported for tests only
+export const LAST_PAGE_UNKNOWN_MARKER = '...'
 
 const linkPropType = shape({
   url: string.isRequired,
@@ -38,21 +41,14 @@ export default class SearchMessage extends Component {
       data: array.isRequired,
       links: shape({current: linkPropType})
     }).isRequired,
+    knownLastPage: string,
     setPage: func.isRequired,
-    noneFoundMessage: string.isRequired,
-    getLiveAlertRegion: func,
-    dataType: oneOf(['Course', 'User']).isRequired
-  }
-
-  static defaultProps = {
-    getLiveAlertRegion() {
-      return document.getElementById('flash_screenreader_holder')
-    }
+    noneFoundMessage: string.isRequired
   }
 
   state = {}
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (!nextProps.collection.loading) {
       const newState = {}
       if (this.state.pageBecomingCurrent) newState.pageBecomingCurrent = null
@@ -64,30 +60,35 @@ export default class SearchMessage extends Component {
     this.setState({pageBecomingCurrent: page}, () => this.props.setPage(page))
   }
 
-  isLastPageUnknown() {
-    return !this.props.collection.links.last
-  }
-
   currentPage() {
     return this.state.pageBecomingCurrent || Number(this.props.collection.links.current.page)
   }
 
+  isLastPageKnown() {
+    return (
+      this.props.knownLastPage || typeof this.props.collection?.links?.last?.page !== 'undefined'
+    )
+  }
+
   lastKnownPageNumber() {
+    if (this.props.knownLastPage) return Number(this.props.knownLastPage)
     const link =
       this.props.collection.links &&
       (this.props.collection.links.last || this.props.collection.links.next)
 
     if (!link) return 0
-    return Number(link.page)
+    return parseInt(link.page, 10)
   }
 
   renderPaginationButton(pageIndex) {
     const pageNumber = pageIndex + 1
+    const locale = ENV?.LOCALE || navigator.language
     const isCurrent = this.state.pageBecomingCurrent
       ? pageNumber === this.state.pageBecomingCurrent
       : pageNumber === this.currentPage()
     return (
       <Pagination.Page
+        data-testid="page-button"
         key={pageNumber}
         onClick={() => this.handleSetPage(pageNumber)}
         current={isCurrent}
@@ -96,7 +97,7 @@ export default class SearchMessage extends Component {
         {isCurrent && this.state.pageBecomingCurrent ? (
           <Spinner size="x-small" renderTitle={I18n.t('Loading...')} />
         ) : (
-          I18n.n(pageNumber)
+          new Intl.NumberFormat(locale).format(pageNumber)
         )}
       </Pagination.Page>
     )
@@ -117,7 +118,7 @@ export default class SearchMessage extends Component {
     } else if (collection.loading) {
       return (
         <View display="block" textAlign="center" padding="medium">
-          <Spinner size="medium" renderTitle={I18n.t('Loading...')} />
+          <Spinner data-testid="loading-spinner" size="medium" renderTitle={I18n.t('Loading...')} />
         </View>
       )
     } else if (!collection.data.length) {
@@ -144,12 +145,17 @@ export default class SearchMessage extends Component {
           labelPrev={I18n.t('Previous Page')}
         >
           {paginationButtons.concat(
-            this.isLastPageUnknown() ? (
-              <span key="page-count-is-unknown-indicator" aria-hidden>
-                ...
-              </span>
-            ) : (
+            this.isLastPageKnown() ? (
               []
+            ) : (
+              <Pagination.Page
+                data-testid="page-button"
+                key="last-page-unknown"
+                disabled
+                aria-hidden
+              >
+                {LAST_PAGE_UNKNOWN_MARKER}
+              </Pagination.Page>
             )
           )}
         </Pagination>

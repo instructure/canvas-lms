@@ -51,7 +51,7 @@ describe ContextModule do
 
       @course.account.role_overrides.create!(
         role: ta_role,
-        permission: "manage_course_content_edit",
+        permission: "manage_course_content_add",
         enabled: false
       )
       course_with_ta course: @course

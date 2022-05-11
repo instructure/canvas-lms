@@ -55,7 +55,9 @@ class OutcomesController < ApplicationController
         manage_proficiency_calculations:
           @context.grants_right?(@current_user, session, :manage_proficiency_calculations)
       },
-      OUTCOMES_FRIENDLY_DESCRIPTION: Account.site_admin.feature_enabled?(:outcomes_friendly_description)
+      OUTCOMES_FRIENDLY_DESCRIPTION: Account.site_admin.feature_enabled?(:outcomes_friendly_description),
+      OUTCOME_ALIGNMENT_SUMMARY: @context.root_account.feature_enabled?(:outcome_alignment_summary),
+      OUTCOME_AVERAGE_CALCULATION: @context.root_account.feature_enabled?(:outcome_average_calculation)
     )
 
     set_tutorial_js_env

@@ -21,7 +21,9 @@ class JobsV2Controller < ApplicationController
   BUCKETS = %w[queued running future failed].freeze
   SEARCH_LIMIT = 100
 
-  before_action :require_view_jobs
+  before_action :require_view_jobs, except: %i[manage]
+  before_action :require_manage_jobs, only: %i[manage]
+
   before_action :require_bucket, only: %i[grouped_info list search]
   before_action :require_group, only: %i[grouped_info search]
   before_action :set_date_range, only: %i[grouped_info list search]
@@ -31,6 +33,10 @@ class JobsV2Controller < ApplicationController
     require_site_admin_with_permission(:view_jobs)
   end
 
+  def require_manage_jobs
+    require_site_admin_with_permission(:manage_jobs)
+  end
+
   def index
     respond_to do |format|
       format.html do
@@ -38,12 +44,16 @@ class JobsV2Controller < ApplicationController
 
         css_bundle :jobs_v2
         js_bundle :jobs_v2
+
+        jobs_server = @domain_root_account.shard.delayed_jobs_shard&.database_server_id
+        cluster = @domain_root_account.shard&.database_server_id
         js_env(
+          manage_jobs: Account.site_admin.grants_right?(@current_user, session, :manage_jobs),
           jobs_scope_filter: {
-            jobs_server: @domain_root_account.shard.delayed_jobs_shard&.database_server_id || t("All Jobs"),
-            cluster: @domain_root_account.shard&.database_server_id,
-            shard: @domain_root_account.shard.name,
-            account: @domain_root_account.name,
+            jobs_server: (jobs_server && t("Server: %{server}", server: jobs_server)) || t("All Jobs"),
+            cluster: cluster && t("Cluster: %{cluster}", cluster: cluster),
+            shard: t("Shard: %{shard}", shard: @domain_root_account.shard.name),
+            account: t("Account: %{account}", account: @domain_root_account.name)
           }.compact
         )
 
@@ -220,6 +230,41 @@ class JobsV2Controller < ApplicationController
     end
   end
 
+  # @{not an}API Manage a strand
+  #
+  # @argument strand [Required,String]
+  #   The name of the strand to manage
+  #
+  # @argument max_concurrent [Integer]
+  #   The new maximum concurrency for the strand
+  #
+  # @argument priority [Integer]
+  #   The new priority value to set
+  #
+  def manage
+    strand = params[:strand].presence
+    return render json: { message: "missing strand" }, status: :bad_request unless strand
+
+    update_args = {}
+
+    if params[:max_concurrent].present?
+      update_args[:max_concurrent] = params[:max_concurrent].to_i
+    end
+
+    if params[:priority].present?
+      update_args[:priority] = params[:priority].to_i
+    end
+
+    count = nil
+    Delayed::Job.transaction do
+      Delayed::Job.advisory_lock(strand)
+      count = Delayed::Job.where(strand: strand).update_all(update_args)
+      # TODO: revisit this after DE-1158
+      unleash_more_jobs(strand, update_args[:max_concurrent]) if update_args[:max_concurrent]
+    end
+    render json: { status: "OK", count: count }
+  end
+
   protected
 
   def require_bucket
@@ -367,5 +412,12 @@ class JobsV2Controller < ApplicationController
   def set_navigation
     set_active_tab "jobs_v2"
     add_crumb t("#crumbs.jobs_v2", "Jobs v2")
+  end
+
+  def unleash_more_jobs(strand, new_parallelism)
+    needed_jobs = new_parallelism - Delayed::Job.where(strand: strand, next_in_strand: true).count
+    if needed_jobs > 0
+      Delayed::Job.where(strand: strand, next_in_strand: false, locked_by: nil, singleton: nil).order(:id).limit(needed_jobs).update_all(next_in_strand: true)
+    end
   end
 end

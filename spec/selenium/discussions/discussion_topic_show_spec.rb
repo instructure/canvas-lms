@@ -103,8 +103,6 @@ describe "Discussion Topic Show" do
 
     it "Displays when all features are turned on" do
       Account.site_admin.enable_feature! :react_discussions_post
-      Account.site_admin.enable_feature! :discussions_reporting
-      Account.site_admin.enable_feature! :discussion_anonymity
 
       gc = @course.account.group_categories.create(name: "Group Category")
       group = group_model(name: "Group", group_category: gc, context: @course.account)
@@ -157,13 +155,6 @@ describe "Discussion Topic Show" do
         fj("button:contains('Show older replies')").click
         wait_for_ajaximations
         expect(fj("span:contains('child reply number 1')")).to be_present
-      end
-    end
-
-    context "when the mentions feature flag is turned on" do
-      before :once do
-        Account.site_admin.enable_feature! :rce_mentions_in_discussions
-        Account.site_admin.enable_feature! :isolated_view
       end
 
       it "can mention users in the reply" do

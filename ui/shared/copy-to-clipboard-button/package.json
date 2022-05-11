@@ -1,0 +1,7 @@
+{
+  "name": "@canvas/copy-to-clipboard-button",
+  "private": true,
+  "version": "1.0.0",
+  "author": "Jeremy Stanley",
+  "main": "./react/index.js"
+}

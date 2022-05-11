@@ -158,13 +158,13 @@ describe CanvasOutcomesHelper do
   describe "#get_lmgb_results" do
     context "without account outcome settings" do
       it "returns nil with no provision settings" do
-        expect(subject.get_lmgb_results(account, "1", "assign.type")).to eq nil
+        expect(subject.get_lmgb_results(account, "1", "assign.type", "1")).to eq nil
       end
 
       it "returns nil with no outcome provision settings" do
         account.settings[:provision] = {}
         account.save!
-        expect(subject.get_lmgb_results(account, "1", "assign.type")).to eq nil
+        expect(subject.get_lmgb_results(account, "1", "assign.type", "1")).to eq nil
       end
     end
 
@@ -177,21 +177,31 @@ describe CanvasOutcomesHelper do
 
       context "without assignment ids" do
         it "returns nil when assignment ids is nil" do
-          expect(subject.get_lmgb_results(account, nil, "assign.type")).to eq nil
+          expect(subject.get_lmgb_results(account, nil, "assign.type", "1")).to eq nil
         end
 
         it "returns nil when assignment ids is empty" do
-          expect(subject.get_lmgb_results(account, "", "assign.type")).to eq nil
+          expect(subject.get_lmgb_results(account, "", "assign.type", "1")).to eq nil
         end
       end
 
       context "without assignment type" do
         it "returns nil when assignment type is nil" do
-          expect(subject.get_lmgb_results(account, "1", nil)).to eq nil
+          expect(subject.get_lmgb_results(account, "1", nil, "1")).to eq nil
         end
 
         it "returns nil when assignment type is empty" do
-          expect(subject.get_lmgb_results(account, "1", "")).to eq nil
+          expect(subject.get_lmgb_results(account, "1", "", "1")).to eq nil
+        end
+      end
+
+      context "without outcome ids type" do
+        it "returns nil when outcome ids is nil" do
+          expect(subject.get_lmgb_results(account, "1", "assign.type", nil)).to eq nil
+        end
+
+        it "returns nil when outcome ids is empty" do
+          expect(subject.get_lmgb_results(account, "1", "assign.type", "")).to eq nil
         end
       end
 
@@ -213,23 +223,43 @@ describe CanvasOutcomesHelper do
           end
 
           it "raises error on non 2xx response" do
-            stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type").to_return(status: 401, body: '{"valid_jwt":false}')
-            expect { subject.get_lmgb_results(@course, "1", "assign.type") }.to raise_error(RuntimeError, /Error retrieving results from Outcomes Service:/)
+            stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=1").to_return(status: 401, body: '{"valid_jwt":false}')
+            expect { subject.get_lmgb_results(@course, "1", "assign.type", "1") }.to raise_error(RuntimeError, /Error retrieving results from Outcomes Service:/)
           end
 
           it "returns results with one assignment id" do
-            stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type").to_return(status: 200, body: '{"results":[{"result":"stuff"}]}')
-            expect(subject.get_lmgb_results(@course, "1", "assign.type")).to eq [{ "result" => "stuff" }]
+            stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=1").to_return(status: 200, body: '{"results":[{"result":"stuff"}]}')
+            expect(subject.get_lmgb_results(@course, "1", "assign.type", "1")).to eq [{ "result" => "stuff" }]
           end
 
           it "returns results with multiple assignment ids" do
-            stub_get_lmgb_results("associated_asset_id_list=1,2&associated_asset_type=assign.type").to_return(status: 200, body: '{"results":[{"result_one":"stuff1"},{"result_two":"stuff2"}]}')
-            expect(subject.get_lmgb_results(@course, "1,2", "assign.type")).to eq [{ "result_one" => "stuff1" }, { "result_two" => "stuff2" }]
+            stub_get_lmgb_results("associated_asset_id_list=1,2&associated_asset_type=assign.type&external_outcome_id_list=1").to_return(status: 200, body: '{"results":[{"result_one":"stuff1"},{"result_two":"stuff2"}]}')
+            expect(subject.get_lmgb_results(@course, "1,2", "assign.type", "1")).to eq [{ "result_one" => "stuff1" }, { "result_two" => "stuff2" }]
           end
 
-          it "returns empty array when not assignment ids are matched" do
-            stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type.no.match").to_return(status: 200, body: '{"results":[]}')
-            expect(subject.get_lmgb_results(@course, "1", "assign.type.no.match")).to eq []
+          it "returns results with one outcome id" do
+            stub_get_lmgb_results("associated_asset_id_list=1,2&associated_asset_type=assign.type&external_outcome_id_list=1").to_return(status: 200, body: '{"results":[{"result_one":"stuff"}]}')
+            expect(subject.get_lmgb_results(@course, "1,2", "assign.type", "1")).to eq [{ "result_one" => "stuff" }]
+          end
+
+          it "returns results with multiple outcome ids" do
+            stub_get_lmgb_results("associated_asset_id_list=1,2&associated_asset_type=assign.type&external_outcome_id_list=1,2").to_return(status: 200, body: '{"results":[{"result_one":"stuff1"},{"result_two":"stuff2"}]}')
+            expect(subject.get_lmgb_results(@course, "1,2", "assign.type", "1,2")).to eq [{ "result_one" => "stuff1" }, { "result_two" => "stuff2" }]
+          end
+
+          it "returns empty array when assignment type is not matched" do
+            stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type.no.match&external_outcome_id_list=1").to_return(status: 200, body: '{"results":[]}')
+            expect(subject.get_lmgb_results(@course, "1", "assign.type.no.match", "1")).to eq []
+          end
+
+          it "returns empty array when assignment ids are not matched" do
+            stub_get_lmgb_results("associated_asset_id_list=4,5&associated_asset_type=assign.type&external_outcome_id_list=1").to_return(status: 200, body: '{"results":[]}')
+            expect(subject.get_lmgb_results(@course, "4,5", "assign.type", "1")).to eq []
+          end
+
+          it "returns empty array when no outcome ids are matched" do
+            stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=5").to_return(status: 200, body: '{"results":[]}')
+            expect(subject.get_lmgb_results(@course, "1", "assign.type", "5")).to eq []
           end
         end
 
@@ -239,7 +269,7 @@ describe CanvasOutcomesHelper do
           end
 
           it "returns nil when FF is off" do
-            expect(subject.get_lmgb_results(@course, nil, "assign.type")).to eq nil
+            expect(subject.get_lmgb_results(@course, "1", "assign.type", "1")).to eq nil
           end
         end
       end

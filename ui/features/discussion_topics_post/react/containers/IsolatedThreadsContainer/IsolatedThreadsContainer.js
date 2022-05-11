@@ -307,6 +307,7 @@ const IsolatedThreadContainer = props => {
       <ThreadingToolbar.Expansion
         key={`expand-${props.discussionEntry.id}`}
         delimiterKey={`expand-delimiter-${props.discussionEntry.id}`}
+        authorName={getDisplayName(props.discussionEntry)}
         expandText={I18n.t('View Replies')}
         isExpanded={false}
         onClick={() => props.onOpenIsolatedView(props.discussionEntry._id, null, false)}
@@ -380,7 +381,6 @@ const IsolatedThreadContainer = props => {
                             : null
                         }
                         onReport={
-                          ENV?.student_reporting_enabled &&
                           props.discussionTopic.permissions?.studentReporting
                             ? () => {
                                 setShowReportModal(true)

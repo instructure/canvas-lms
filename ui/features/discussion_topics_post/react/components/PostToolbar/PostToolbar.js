@@ -77,31 +77,35 @@ export function PostToolbar({repliesCount, unreadCount, ...props}) {
             <Flex>
               {props.onTogglePublish && (
                 <Flex.Item>
-                  <ToggleButton
-                    isEnabled={props.isPublished}
-                    enabledIcon={<IconCompleteSolid />}
-                    disabledIcon={<IconNoSolid />}
-                    enabledTooltipText={I18n.t('Unpublish')}
-                    disabledTooltipText={I18n.t('Publish')}
-                    enabledScreenReaderLabel={I18n.t('Published')}
-                    disabledScreenReaderLabel={I18n.t('Unpublished')}
-                    onClick={props.onTogglePublish}
-                    interaction={props.canUnpublish ? 'enabled' : 'disabled'}
-                  />
+                  <span className="discussion-post-publish">
+                    <ToggleButton
+                      isEnabled={props.isPublished}
+                      enabledIcon={<IconCompleteSolid />}
+                      disabledIcon={<IconNoSolid />}
+                      enabledTooltipText={I18n.t('Unpublish')}
+                      disabledTooltipText={I18n.t('Publish')}
+                      enabledScreenReaderLabel={I18n.t('Published')}
+                      disabledScreenReaderLabel={I18n.t('Unpublished')}
+                      onClick={props.onTogglePublish}
+                      interaction={props.canUnpublish ? 'enabled' : 'disabled'}
+                    />
+                  </span>
                 </Flex.Item>
               )}
               {props.onToggleSubscription && (
                 <Flex.Item>
-                  <ToggleButton
-                    isEnabled={props.isSubscribed}
-                    enabledIcon={<IconBookmarkSolid />}
-                    disabledIcon={<IconBookmarkLine />}
-                    enabledTooltipText={I18n.t('Unsubscribe')}
-                    disabledTooltipText={I18n.t('Subscribe')}
-                    enabledScreenReaderLabel={I18n.t('Subscribed')}
-                    disabledScreenReaderLabel={I18n.t('Unsubscribed')}
-                    onClick={props.onToggleSubscription}
-                  />
+                  <span className="discussion-post-subscribe">
+                    <ToggleButton
+                      isEnabled={props.isSubscribed}
+                      enabledIcon={<IconBookmarkSolid />}
+                      disabledIcon={<IconBookmarkLine />}
+                      enabledTooltipText={I18n.t('Unsubscribe')}
+                      disabledTooltipText={I18n.t('Subscribe')}
+                      enabledScreenReaderLabel={I18n.t('Subscribed')}
+                      disabledScreenReaderLabel={I18n.t('Unsubscribed')}
+                      onClick={props.onToggleSubscription}
+                    />
+                  </span>
                 </Flex.Item>
               )}
               <Flex.Item>
@@ -128,14 +132,16 @@ const ToolbarMenu = props => {
   return (
     <Menu
       trigger={
-        <IconButton
-          size="small"
-          screenReaderLabel={I18n.t('Manage Discussion')}
-          renderIcon={IconMoreLine}
-          withBackground={false}
-          withBorder={false}
-          data-testid="discussion-post-menu-trigger"
-        />
+        <span className="discussion-post-manage-discussion">
+          <IconButton
+            size="small"
+            screenReaderLabel={I18n.t('Manage Discussion')}
+            renderIcon={IconMoreLine}
+            withBackground={false}
+            withBorder={false}
+            data-testid="discussion-post-menu-trigger"
+          />
+        </span>
       }
     >
       {menuConfigs}
@@ -252,12 +258,14 @@ const getMenuConfigs = props => {
 
 const renderMenuItem = ({selectionCallback, icon, label, key}) => (
   <Menu.Item onSelect={selectionCallback} key={key}>
-    <Flex>
-      <Flex.Item>{icon}</Flex.Item>
-      <Flex.Item padding="0 0 0 xx-small">
-        <Text>{label}</Text>
-      </Flex.Item>
-    </Flex>
+    <span className={`discussion-thread-menuitem-${key}`}>
+      <Flex>
+        <Flex.Item>{icon}</Flex.Item>
+        <Flex.Item padding="0 0 0 xx-small">
+          <Text>{label}</Text>
+        </Flex.Item>
+      </Flex>
+    </span>
   </Menu.Item>
 )
 

@@ -7,3 +7,11 @@
 <% define_content :subject do %>
   <%= t "Grade changes and new comments released for: %{title}, %{course}", title: assignment.title, course: assignment.context.name %>
 <% end %>
+
+<% if asset.graded_at %>
+  <%= t :graded_date, "graded: %{date}", :date => (datetime_string(force_zone(asset.graded_at)) rescue t(:no_date_set, "No Date Set")) %>
+<% end %>
+<% if asset.score && user.try(:send_scores_in_emails?, assignment.context) %>
+  <%= t :score, "score: %{score} out of %{total}", :score => asset.score, :total => (assignment.points_possible || t(:not_applicable, "N/A")) %>
+<% end %>
+<%= t(:score_pending_review, "score pending review by the teacher") if asset.pending_review? %>

@@ -363,10 +363,10 @@ describe('K-5 Subject Course', () => {
       expect(studentViewBtn.href).toBe('http://localhost/courses/30/student_view/1')
     })
 
-    it('Should keep the navigation tab when accesing student view mode', () => {
+    it('Should keep the navigation tab when accessing student view mode', () => {
       const {getByRole} = render(<K5Course {...defaultProps} showStudentView />)
-      const studentViewBtn = getByRole('link', {name: 'Student View'})
       getByRole('tab', {name: 'Arts and Crafts Grades'}).click()
+      const studentViewBtn = getByRole('link', {name: 'Student View'})
       expect(studentViewBtn.href).toBe('http://localhost/courses/30/student_view/1#grades')
     })
 

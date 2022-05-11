@@ -362,6 +362,12 @@ class RoleOverride < ActiveRecord::Base
         true_for: %w[AccountAdmin],
         available_to: %w[AccountAdmin AccountMembership],
       },
+      manage_internal_settings: {
+        label: -> { t("permissions.manage_internal_settings", "Manage environment-wide internal settings") },
+        account_only: :site_admin,
+        true_for: %w[AccountAdmin],
+        available_to: %w[AccountAdmin AccountMembership],
+      },
       manage_user_logins: {
         label: -> { t("permissions.manage_user_logins", "Modify login details for users") },
         label_v2: -> { t("Users - manage login details") },

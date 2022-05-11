@@ -74,7 +74,7 @@ const ConversationListContainer = ({course, scope, onSelectConversation, userFil
   })
 
   const submissionCommentsQuery = useQuery(VIEWABLE_SUBMISSIONS_QUERY, {
-    variables: {userID},
+    variables: {userID, sort: 'desc'},
     skip: !isSubmissionCommentsType
   })
 

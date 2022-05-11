@@ -17,9 +17,9 @@
  */
 
 import React from 'react'
-import {act} from '@testing-library/react'
+import {act, getByText} from '@testing-library/react'
 
-import {PACE_MODULE_1, PRIMARY_PACE} from '../../../__tests__/fixtures'
+import {BLACKOUT_DATES, PACE_MODULE_1, PRIMARY_PACE} from '../../../__tests__/fixtures'
 import {renderConnected} from '../../../__tests__/utils'
 
 import {Module} from '../module'
@@ -30,7 +30,12 @@ const defaultProps = {
   coursePace: PRIMARY_PACE,
   responsiveSize: 'large' as const,
   showProjections: true,
-  compression: 0
+  compression: 0,
+  blackoutDates: [],
+  dueDates: {
+    [PACE_MODULE_1.items[0].module_item_id]: '2022-03-18T00:00:00-06:00',
+    [PACE_MODULE_1.items[1].module_item_id]: '2022-03-22T00:00:00-06:00'
+  }
 }
 
 describe('Module', () => {
@@ -70,10 +75,10 @@ describe('Module', () => {
     expect(queryByRole('button', {name: '1. How 2 B A H4CK32'})).toBeInTheDocument()
     expect(queryByRole('columnheader')).not.toBeInTheDocument()
     expect(
-      queryByRole('cell', {name: 'Assignments : Basic encryption/decryption 100 pts'})
+      queryByRole('cell', {name: 'Item : Basic encryption/decryption 100 pts'})
     ).toBeInTheDocument()
     expect(queryAllByTestId('pp-duration-cell')[0]).toBeInTheDocument()
-    expect(queryByRole('cell', {name: 'Due Date : Fri, Sep 3, 2021'})).toBeInTheDocument()
+    expect(queryByRole('cell', {name: 'Due Date : Tue, Mar 22, 2022'})).toBeInTheDocument()
     expect(queryAllByRole('cell', {name: 'Status : Published'})[0]).toBeInTheDocument()
   })
 
@@ -93,5 +98,41 @@ describe('Module', () => {
         name: 'Changing course pacing days may modify due dates.'
       })
     ).toBeInTheDocument()
+  })
+
+  it('merges assignments and blackout dates in the table', () => {
+    // the blackout dates fall between these 2 due dates
+    const dueDates = {
+      [defaultProps.module.items[0].module_item_id]: '2022-03-18T00:00:00-06:00',
+      [defaultProps.module.items[1].module_item_id]: '2022-03-29T00:00:00-06:00'
+    }
+
+    const {getAllByRole} = renderConnected(
+      <Module {...defaultProps} blackoutDates={BLACKOUT_DATES} dueDates={dueDates} />
+    )
+
+    const rows = getAllByRole('row')
+    expect(rows.length).toEqual(4)
+    expect(getByText(rows[1], 'Fri, Mar 18, 2022')).toBeInTheDocument()
+    expect(getByText(rows[2], 'Mon, Mar 21, 2022')).toBeInTheDocument()
+    expect(getByText(rows[2], 'Fri, Mar 25, 2022')).toBeInTheDocument()
+    expect(getByText(rows[3], 'Tue, Mar 29, 2022')).toBeInTheDocument()
+  })
+
+  it('In stacked format, blackout dates do not include the status entry', () => {
+    const dueDates = {
+      [defaultProps.module.items[0].module_item_id]: '2022-03-18T00:00:00-06:00',
+      [defaultProps.module.items[1].module_item_id]: '2022-03-29T00:00:00-06:00'
+    }
+    const {queryAllByRole} = renderConnected(
+      <Module
+        {...defaultProps}
+        responsiveSize="small"
+        showProjections
+        blackoutDates={BLACKOUT_DATES}
+        dueDates={dueDates}
+      />
+    )
+    expect(queryAllByRole('cell', {name: /Status/}).length).toEqual(2)
   })
 })

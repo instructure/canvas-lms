@@ -23,15 +23,17 @@ import {Text} from '@instructure/ui-text'
 
 export function ShowMoreRepliesButton({onClick, ...props}) {
   return (
-    <CondensedButton
-      onClick={onClick}
-      color="primary"
-      data-testid="show-more-replies-button"
-      interaction={props.fetchingMoreReplies ? 'disabled' : 'enabled'}
-      {...props}
-    >
-      <Text weight="bold">{props.buttonText}</Text>
-    </CondensedButton>
+    <span className="discussions-show-more-replies-button">
+      <CondensedButton
+        onClick={onClick}
+        color="primary"
+        data-testid="show-more-replies-button"
+        interaction={props.fetchingMoreReplies ? 'disabled' : 'enabled'}
+        {...props}
+      >
+        <Text weight="bold">{props.buttonText}</Text>
+      </CondensedButton>
+    </span>
   )
 }
 

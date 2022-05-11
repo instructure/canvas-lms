@@ -67,6 +67,22 @@ const entries = new EntryCollection(null)
 
 const filterModel = new DiscussionFilterState()
 
+function renderCoursePacingNotice() {
+  const $mountPoint = document.getElementById('course_paces_due_date_notice')
+
+  if ($mountPoint) {
+    import('@canvas/due-dates/react/CoursePacingNotice')
+      .then(CoursePacingNoticeModule => {
+        const renderNotice = CoursePacingNoticeModule.renderCoursePacingNotice
+        renderNotice($mountPoint, ENV.COURSE_ID)
+      })
+      .catch(ex => {
+        // eslint-disable-next-line no-console
+        console.error('Falied loading CoursePacingNotice', ex)
+      })
+  }
+}
+
 ready(() => {
   const discussionTopicToolbarView = new DiscussionTopicToolbarView({el: '#discussion-managebar'})
 
@@ -76,6 +92,8 @@ ready(() => {
       document.getElementById('keyboard-shortcut-modal')
     )
   }
+
+  renderCoursePacingNotice()
 
   // Rendering of the section tooltip
   const container = document.querySelector('#section_tooltip_root')
@@ -218,11 +236,12 @@ ready(() => {
       $container.one('scroll', () => router.navigate(''))
     }, 10)
   })
-  router.route('entry-:id', 'id', () => {
+  router.route('entry-:id', 'id', entry => {
     // Interval to deffer scrollng until page is fully loaded
-    const goToEntryIntervalId = setInterval( () => {
-      if(document.readyState === 'complete') {
-        entriesView.goToEntry.bind(entriesView)
+    const goToEntry = entriesView.goToEntry.bind(entriesView, entry)
+    const goToEntryIntervalId = setInterval(() => {
+      if (document.readyState === 'complete') {
+        goToEntry()
         clearInterval(goToEntryIntervalId)
       }
     }, 500)

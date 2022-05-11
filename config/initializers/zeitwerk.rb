@@ -58,6 +58,7 @@ Rails.autoloaders.each do |autoloader|
     "ssl_common" => "SSLCommon",
     "turnitin_id" => "TurnitinID",
     "uk_federation" => "UKFederation",
+    "unsharded_id_loader" => "UnshardedIDLoader",
     "vericite" => "VeriCite",
     "xml_helper" => "XMLHelper"
   )

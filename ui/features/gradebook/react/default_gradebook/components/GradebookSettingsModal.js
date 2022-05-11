@@ -416,6 +416,12 @@ export default class GradebookSettingsModal extends React.Component {
                         this.setViewOption('hideAssignmentGroupTotals', value)
                       }
                     }}
+                    hideTotal={{
+                      checked: this.state.viewOptions.hideTotal,
+                      onChange: value => {
+                        this.setViewOption('hideTotal', value)
+                      }
+                    }}
                     viewUngradedAsZero={{
                       allowed: this.props.allowViewUngradedAsZero,
                       checked: this.state.viewOptions.viewUngradedAsZero,

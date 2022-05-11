@@ -51,6 +51,7 @@ class GradebookSettingsController < ApplicationController
       },
       :enter_grades_as,
       :hide_assignment_group_totals,
+      :hide_total,
       :show_concluded_enrollments,
       :show_inactive_enrollments,
       :show_unpublished_assignments,

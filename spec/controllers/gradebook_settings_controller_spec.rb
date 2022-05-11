@@ -42,6 +42,7 @@ RSpec.describe GradebookSettingsController, type: :controller do
             "student_group_id" => "null"
           },
           "hide_assignment_group_totals" => "false",
+          "hide_total" => "false",
           "selected_view_options_filters" => ["assignmentGroups"],
           "show_inactive_enrollments" => "true", # values must be strings
           "show_concluded_enrollments" => "false",
@@ -91,6 +92,7 @@ RSpec.describe GradebookSettingsController, type: :controller do
         it { is_expected.to include "filter_columns_by" => { "grading_period_id" => "1401", "assignment_group_id" => "888" } }
         it { is_expected.to include "filter_rows_by" => { "section_id" => nil, "student_group_id" => nil } }
         it { is_expected.to include "hide_assignment_group_totals" => "false" }
+        it { is_expected.to include "hide_total" => "false" }
         it { is_expected.to include "selected_view_options_filters" => ["assignmentGroups"] }
         it { is_expected.to include "show_inactive_enrollments" => "true" }
         it { is_expected.to include "show_concluded_enrollments" => "false" }
@@ -103,7 +105,7 @@ RSpec.describe GradebookSettingsController, type: :controller do
         it { is_expected.to include "sort_rows_by_direction" => "descending" }
         it { is_expected.to include "view_ungraded_as_zero" => "true" }
         it { is_expected.not_to include "colors" }
-        it { is_expected.to have(15).items } # ensure we add specs for new additions
+        it { is_expected.to have(16).items } # ensure we add specs for new additions
 
         context "colors" do
           subject { json_parse.fetch("gradebook_settings").fetch("colors") }

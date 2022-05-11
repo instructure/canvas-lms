@@ -21,5 +21,6 @@ import PropTypes from 'prop-types'
 export const ImageCropperSettingsPropTypes = PropTypes.shape({
   image: PropTypes.string.isRequired,
   shape: PropTypes.string.isRequired,
+  rotation: PropTypes.number.isRequired,
   scaleRatio: PropTypes.number.isRequired
 })

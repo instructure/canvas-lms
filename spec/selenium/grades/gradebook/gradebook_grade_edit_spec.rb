@@ -151,7 +151,7 @@ describe "Gradebook editing grades" do
     # Select the search field (the closest element we can "click" that won't
     # cause something else to pop up), then tab to the settings icon and from
     # there to the grid itself (which requires two tabs to enter).
-    f(".search-query").click
+    f("#student-names-filter").click
     3.times { driver.action.send_keys(:tab).perform }
 
     first_header_cell = Gradebook.slick_headers_selector.first

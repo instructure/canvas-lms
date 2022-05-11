@@ -74,10 +74,12 @@ export const PeerReview = props => {
 
           return (
             <Flex>
-              <Link href={props.reviewLinkUrl} isWithinText={false} margin="0 xx-small 0 x-small">
-                <Flex.Item>{icon}</Flex.Item>
-                <Flex.Item margin="0 0 0 x-small">{message}</Flex.Item>
-              </Link>
+              <span className="discussions-peer-review">
+                <Link href={props.reviewLinkUrl} isWithinText={false} margin="0 xx-small 0 x-small">
+                  <Flex.Item>{icon}</Flex.Item>
+                  <Flex.Item margin="0 0 0 x-small">{message}</Flex.Item>
+                </Link>
+              </span>
             </Flex>
           )
         } else {
@@ -97,7 +99,9 @@ export const PeerReview = props => {
         return (
           <Flex>
             <Flex.Item margin="0 xx-small 0 x-small">{icon}</Flex.Item>
-            <Flex.Item>{message}</Flex.Item>
+            <Flex.Item>
+              <span className="discussions-peer-review">{message}</span>
+            </Flex.Item>
           </Flex>
         )
       }}

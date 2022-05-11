@@ -91,12 +91,14 @@ export const ReplyPreview = ({...props}) => {
                   <Flex.Item>{showTruncatedText()}</Flex.Item>
                   {message.length > TRUNCATE_LENGTH && (
                     <Flex.Item>
-                      <CondensedButton
-                        margin="small"
-                        onClick={() => setShouldShowTruncatedText(!shouldShowTruncatedText)}
-                      >
-                        <Text size={responsiveProps.textSize}>{readMoreButtonText}</Text>
-                      </CondensedButton>
+                      <span className="discussions-show-more-text">
+                        <CondensedButton
+                          margin="small"
+                          onClick={() => setShouldShowTruncatedText(!shouldShowTruncatedText)}
+                        >
+                          <Text size={responsiveProps.textSize}>{readMoreButtonText}</Text>
+                        </CondensedButton>
+                      </span>
                     </Flex.Item>
                   )}
                 </Flex>

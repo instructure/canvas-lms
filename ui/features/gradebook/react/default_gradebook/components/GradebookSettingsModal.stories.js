@@ -52,6 +52,7 @@ export default {
         criterion: 'name',
         direction: 'ascending'
       },
+      hideTotal: true,
       showNotes: true,
       showUnpublishedAssignments: true,
       showSeparateFirstLastNames: true,

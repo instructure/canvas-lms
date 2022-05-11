@@ -23,6 +23,7 @@ export const defaultState = DEFAULT_CROPPER_SETTINGS
 export const actions = {
   SET_IMAGE: 'SetImage',
   SET_SHAPE: 'SetShape',
+  SET_ROTATION: 'SetRotation',
   SET_SCALE_RATIO: 'SetScaleRatio'
 }
 
@@ -32,6 +33,8 @@ export const cropperSettingsReducer = (state, action) => {
       return {...state, image: action.payload}
     case actions.SET_SHAPE:
       return {...state, shape: action.payload}
+    case actions.SET_ROTATION:
+      return {...state, rotation: action.payload}
     case actions.SET_SCALE_RATIO:
       return {...state, scaleRatio: action.payload}
     default:

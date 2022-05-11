@@ -17,13 +17,12 @@
  */
 
 import React from 'react'
-
+import PropTypes from 'prop-types'
 import SVGList, {TYPE} from '../SVGList'
 import {actions} from '../../../../reducers/imageSection'
-
 import {convertFileToBase64} from '../../../../svg/utils'
 
-const MultiColor = ({dispatch, onMount}) => {
+const MultiColor = ({dispatch, onLoaded}) => {
   const onSelect = svg => {
     dispatch({...actions.START_LOADING})
     dispatch({...actions.SET_IMAGE_NAME, payload: svg.label})
@@ -39,7 +38,17 @@ const MultiColor = ({dispatch, onMount}) => {
     })
   }
 
-  return <SVGList type={TYPE.Multicolor} onSelect={onSelect} onMount={onMount} />
+  return <SVGList type={TYPE.Multicolor} onSelect={onSelect} onMount={onLoaded} />
+}
+
+MultiColor.propTypes = {
+  dispatch: PropTypes.func,
+  onLoaded: PropTypes.func
+}
+
+MultiColor.defaultProps = {
+  dispatch: () => {},
+  onLoaded: () => {}
 }
 
 export default MultiColor

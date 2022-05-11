@@ -59,6 +59,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   validates :points_possible, numericality: { less_than_or_equal_to: 2_000_000_000, allow_nil: true }
   validate :validate_quiz_type, if: :quiz_type_changed?
   validate :validate_ip_filter, if: :ip_filter_changed?
+  validate :validate_time_limit, if: :time_limit_changed?
   validate :validate_hide_results, if: :hide_results_changed?
   validate :validate_correct_answer_visibility, if: lambda { |quiz|
     quiz.show_correct_answers_at_changed? ||
@@ -950,6 +951,14 @@ class Quizzes::Quiz < ActiveRecord::Base
       ip_filter.split(",").each { |filter| ::IPAddr.new(filter) }
     rescue
       errors.add(:invalid_ip_filter, t("#quizzes.quiz.errors.invalid_ip_filter", "IP filter is not valid"))
+    end
+  end
+
+  def validate_time_limit
+    return if time_limit.blank?
+
+    unless time_limit > 0
+      errors.add(:time_limit, t("#quizzes.quiz.errors.invalid_time_limit", "Time Limit is not valid"))
     end
   end
 

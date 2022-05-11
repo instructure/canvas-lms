@@ -74,7 +74,8 @@ module Lti::IMS
           {
             type: "file",
             url: "https://filesamples.com/samples/document/txt/sample1.txt",
-            title: "sample1.txt"
+            title: "sample1.txt",
+            media_type: "text/html" # different than the mime type from extension
           },
           {
             type: "not",
@@ -123,6 +124,9 @@ module Lti::IMS
 
           expect(result.submission.reload.attempt).to eq attempt + 1
           expect(result.submission.attachments.count).to eq 1
+          attachment = result.submission.attachments.first
+          expect(attachment.display_name).to eq content_items.first[:title]
+          expect(attachment.content_type).to eq content_items.first[:media_type]
         end
       end
 

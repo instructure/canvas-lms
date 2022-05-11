@@ -112,6 +112,25 @@ describe CalendarsController do
       get "show", params: { user_id: @user.id }
       expect(response).to be_successful
     end
+
+    it "sets context.course_sections.can_create_ag based off :manage_calendar permission" do
+      @section1 = @course.default_section
+      @section2 = @course.course_sections.create!(name: "Section 2")
+      @user.enrollments.destroy_all
+      @course.enroll_teacher(@user, enrollment_state: :active, section: @section2)
+      @user.enrollments.update_all(limit_privileges_to_course_section: true)
+
+      get "show", params: { user_id: @user.id }
+      contexts = assigns(:contexts_json)
+      sections = contexts[1][:course_sections]
+      sections.each do |section|
+        if section[:name] == "Section 2"
+          expect(section[:can_create_ag]).to be_truthy
+        else
+          expect(section[:can_create_ag]).to be_falsey
+        end
+      end
+    end
   end
 end
 

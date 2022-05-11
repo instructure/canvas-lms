@@ -2182,6 +2182,14 @@ describe CoursesController do
       expect(json["is_public_to_auth_users"]).to be false
       expect(json["public_syllabus_to_auth"]).to be false
     end
+
+    it "returns an error if syllabus_body content is nested too deeply" do
+      stub_const("CanvasSanitize::SANITIZE", { parser_options: { max_tree_depth: 1 } })
+      put "create", params: { account_id: @account.id, course: { syllabus_body: "<div><span>deeeeeeep</span></div>" }, format: :json }
+      expect(response.status).to eq 400
+      json = JSON.parse response.body
+      expect(json["errors"].keys).to include "unparsable_content"
+    end
   end
 
   describe "POST create (granular permissions)" do
@@ -3012,6 +3020,15 @@ describe CoursesController do
         put "update", params: { id: @course.id, course: { name: "course paces" } }
         expect(Progress.find_by(context: @course_pace)).to be_nil
       end
+    end
+
+    it "returns an error if syllabus_body content is nested too deeply" do
+      user_session(@teacher)
+      stub_const("CanvasSanitize::SANITIZE", { parser_options: { max_tree_depth: 1 } })
+      put "update", params: { id: @course.id, course: { syllabus_body: "<div><span>deeeeeeep</span></div>" }, format: :json }
+      expect(response.status).to eq 400
+      json = JSON.parse response.body
+      expect(json["errors"].keys).to include "unparsable_content"
     end
   end
 

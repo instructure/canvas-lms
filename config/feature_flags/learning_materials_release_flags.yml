@@ -1,10 +1,4 @@
 ---
-rce_mentions_in_discussions:
-  state: hidden
-  display_name: RCE Mentions in Discussions
-  description: |-
-    When enabled, turns on "@mention" functionality in course discussions.
-  applies_to: SiteAdmin
 new_equation_editor:
   state: hidden
   display_name: RCE's new and improved equation editor dialog

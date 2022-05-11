@@ -26,7 +26,7 @@ import {mswServer} from '../../../../../../shared/msw/mswServer'
 import React from 'react'
 import waitForApolloLoading from '../../../../util/waitForApolloLoading'
 import {responsiveQuerySizes} from '../../../../util/utils'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import {ConversationContext} from '../../../../util/constants'
 
 jest.mock('../../../../util/utils', () => ({
@@ -97,6 +97,7 @@ describe('MessageDetailContainer', () => {
       it('should render', () => {
         const container = setup()
         expect(container).toBeTruthy()
+        expect(container.queryByTestId('submission-comment-header-line')).toBeNull()
       })
 
       it('should render conversation information correctly', async () => {
@@ -184,6 +185,17 @@ describe('MessageDetailContainer', () => {
 
         expect(await container.findByTestId('message-detail-header-desktop')).toBeInTheDocument()
         expect(await container.findByText('my student comment')).toBeInTheDocument()
+      })
+
+      it('should render with link in title', async () => {
+        const container = setup({
+          isSubmissionCommentsType: true,
+          conversation: mockSubmissionComment
+        })
+        expect(container).toBeTruthy()
+        await waitFor(() =>
+          expect(container.getByTestId('submission-comment-header-line')).toBeTruthy()
+        )
       })
 
       it('should not render reply option', async () => {

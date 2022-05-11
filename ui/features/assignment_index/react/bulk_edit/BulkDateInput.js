@@ -90,6 +90,8 @@ function BulkDateInput({
           newMoment.minute(m)
           newMoment.second(s)
           newMoment.millisecond(ms)
+        } else if (fancyMidnight) {
+          setDate(newMoment.endOf('day'))
         }
         setDate(newMoment.toDate())
       } else {

@@ -348,6 +348,9 @@ describe "Outcomes Import API", type: :request do
           expect(create_full_json(json: create_request({
                                                          calculation_method: "latest"
                                                        }))).not_to have_key("error")
+          expect(create_full_json(json: create_request({
+                                                         calculation_method: "average"
+                                                       }))).not_to have_key("error")
         end
 
         it "rejects malformed calculation methods" do
@@ -375,6 +378,10 @@ describe "Outcomes Import API", type: :request do
                                                        }))).to have_key("error")
           expect(create_full_json(json: create_request({
                                                          calculation_method: "latest",
+                                                         calculation_int: 1
+                                                       }))).to have_key("error")
+          expect(create_full_json(json: create_request({
+                                                         calculation_method: "average",
                                                          calculation_int: 1
                                                        }))).to have_key("error")
         end

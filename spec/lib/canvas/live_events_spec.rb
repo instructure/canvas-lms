@@ -896,6 +896,72 @@ describe Canvas::LiveEvents do
       Canvas::LiveEvents.assignment_created(@assignment)
     end
 
+    context "when the assignment is created as part of a blueprint sync" do
+      before do
+        course = course_model
+        master_template = MasterCourses::MasterTemplate.create!(course: course)
+        child_course = course_model
+        MasterCourses::ChildSubscription.create!(master_template: master_template, child_course: child_course)
+        @assignment = child_course.assignments.create!(assignment_valid_attributes
+          .merge({ migration_id: "mastercourse_1_1_bd72ce9cf355d1b2cc467b2156842281" }))
+      end
+
+      it "has the created_on_blueprint_sync field set as true" do
+        expect_event("assignment_created",
+                     hash_including({
+                                      assignment_id: @assignment.global_id.to_s,
+                                      created_on_blueprint_sync: true
+                                    }))
+        Canvas::LiveEvents.assignment_created(@assignment)
+      end
+    end
+
+    context "when the assignment is manually created in a blueprint child course" do
+      before do
+        master_template = MasterCourses::MasterTemplate.create!(course: course_model)
+        child_course = course_model
+        MasterCourses::ChildSubscription.create!(master_template: master_template, child_course: child_course)
+        @assignment = child_course.assignments.create!(assignment_valid_attributes)
+      end
+
+      it "has created_on_blueprint_sync set as false" do
+        expect_event("assignment_created",
+                     hash_including({
+                                      assignment_id: @assignment.global_id.to_s,
+                                      created_on_blueprint_sync: false
+                                    }))
+        Canvas::LiveEvents.assignment_created(@assignment)
+      end
+    end
+
+    context "when the assignment is manually created in a blueprint course" do
+      before do
+        course = course_model
+        MasterCourses::MasterTemplate.create!(course: course)
+        @assignment = course.assignments.create!(assignment_valid_attributes)
+      end
+
+      it "has created_on_blueprint_sync set as false" do
+        expect_event("assignment_created",
+                     hash_including({
+                                      assignment_id: @assignment.global_id.to_s,
+                                      created_on_blueprint_sync: false
+                                    }))
+        Canvas::LiveEvents.assignment_created(@assignment)
+      end
+    end
+
+    context "when the assignment is created in a non-blueprint course" do
+      it "has created_on_blueprint_sync set as false" do
+        expect_event("assignment_created",
+                     hash_including({
+                                      assignment_id: @assignment.global_id.to_s,
+                                      created_on_blueprint_sync: false
+                                    }))
+        Canvas::LiveEvents.assignment_created(@assignment)
+      end
+    end
+
     context "with assignment configuration tool lookup" do
       include_context "lti2_spec_helper"
       let(:product_family) do
@@ -1992,8 +2058,12 @@ describe Canvas::LiveEvents do
       it "triggers an master_template_created live event" do
         expect_event("master_template_created", {
                        master_template_id: @master_template.id.to_s,
-                       master_course_id: @master_template.course_id.to_s,
-                       root_account_id: @master_template.root_account_id.to_s
+                       account_id: @master_template.course.account.global_id.to_s,
+                       account_uuid: @master_template.course.account.uuid.to_s,
+                       blueprint_course_id: @master_template.course.global_id.to_s,
+                       blueprint_course_uuid: @master_template.course.uuid.to_s,
+                       blueprint_course_title: @master_template.course.name.to_s,
+                       blueprint_course_workflow_state: @master_template.course.workflow_state.to_s
                      }).once
         Canvas::LiveEvents.master_template_created(@master_template)
       end
@@ -2010,11 +2080,38 @@ describe Canvas::LiveEvents do
     context "completed" do
       it "triggers an master_migration_completed live event" do
         expect_event("master_migration_completed", {
-                       master_template_id: @master_template.id.to_s,
                        master_migration_id: @master_migration.id.to_s,
-                       root_account_id: @master_migration.root_account_id.to_s
+                       master_template_id: @master_template.id.to_s,
+                       account_id: @master_migration.master_template.course.account.global_id.to_s,
+                       account_uuid: @master_migration.master_template.course.account.uuid.to_s,
+                       blueprint_course_uuid: @master_migration.master_template.course.uuid.to_s,
+                       blueprint_course_id: @master_migration.master_template.course.global_id.to_s
                      }).once
         Canvas::LiveEvents.master_migration_completed(@master_migration)
+      end
+    end
+  end
+
+  describe "master template child subscription" do
+    before do
+      @course = course_model
+      @child_course = course_model
+      @master_template = MasterCourses::MasterTemplate.create!(course: @course)
+      @child_subscription =
+        MasterCourses::ChildSubscription.create!(master_template: @master_template, child_course: @child_course)
+    end
+
+    context "created" do
+      it "triggers an blueprint_subscription_created live event" do
+        expect_event("blueprint_subscription_created", {
+                       master_template_account_uuid: @master_template.course.account.uuid,
+                       master_template_id: @master_template.id.to_s,
+                       master_course_uuid: @course.uuid,
+                       child_subscription_id: @child_subscription.id.to_s,
+                       child_course_uuid: @child_course.uuid,
+                       child_course_account_uuid: @child_course.account.uuid
+                     }).once
+        Canvas::LiveEvents.blueprint_subscription_created(@child_subscription)
       end
     end
   end

@@ -2984,6 +2984,38 @@ describe Course do
             expect(syllabus_tab[:label]).to eq("Important Info")
           end
 
+          it "does not include manually-hidden external tools" do
+            @course.context_external_tools.create!(
+              url: "http://example.com/1",
+              consumer_key: "key",
+              shared_secret: "abcd",
+              name: "visible tool",
+              course_navigation: {
+                text: "visible tool",
+                url: "http://example.com/1",
+                default: false
+              }
+            )
+            hidden_tool = @course.context_external_tools.create!(
+              url: "http://example.com/2",
+              consumer_key: "key",
+              shared_secret: "abcd",
+              name: "hidden tool",
+              course_navigation: {
+                text: "hidden tool",
+                url: "http://example.com/2",
+                default: false
+              }
+            )
+
+            @course.tab_configuration = [{ "id" => hidden_tool.asset_string, "hidden" => true }]
+            @course.save!
+
+            tabs = @course.tabs_available(@user, include_external: true).pluck(:label)
+            expect(tabs).to be_include("visible tool")
+            expect(tabs).not_to be_include("hidden tool")
+          end
+
           context "with course_subject_tabs option" do
             it "returns subject tabs only by default" do
               length = Course.course_subject_tabs.length
@@ -4842,6 +4874,68 @@ describe Course do
       @course.enable_feature!(:analytics_2)
       tabs = @course.external_tool_tabs({}, User.new)
       expect(tabs.pluck(:id)).to include(tool.asset_string)
+    end
+  end
+
+  describe "#external_tool_tabs" do
+    subject { @course.external_tool_tabs({}, user).pluck(:id) }
+
+    before :once do
+      course_model
+    end
+
+    let(:course_tool) do
+      t = external_tool_model(context: @course)
+      t.course_navigation = { enabled: true }
+      t.save!
+      t
+    end
+    let(:account_tool) do
+      t = external_tool_model(context: @course.account)
+      t.course_navigation = { enabled: true }
+      t.save!
+      t
+    end
+    let(:wrong_tool) { external_tool_model(context: @course) }
+    let(:user) { User.new }
+
+    before do
+      account_tool
+      course_tool
+      wrong_tool
+    end
+
+    it "ignores tools without course_navigation" do
+      expect(subject).not_to include(wrong_tool.asset_string)
+    end
+
+    it "returns tools associated with the course" do
+      expect(subject).to include(course_tool.asset_string)
+    end
+
+    it "returns tools from course's account chain" do
+      expect(subject).to include(account_tool.asset_string)
+    end
+
+    context "when request is made from different shard by cross-shard user" do
+      specs_require_sharding
+
+      let(:cross_shard_account) do
+        @shard1.activate do
+          account_model
+        end
+      end
+      let(:user) do
+        u = @shard1.activate { User.create! }
+        @course.enroll_student(u, enrollment_state: "active")
+        u
+      end
+
+      it "returns tools from course's account chain" do
+        @shard1.activate do
+          expect(subject).to include(account_tool.asset_string)
+        end
+      end
     end
   end
 

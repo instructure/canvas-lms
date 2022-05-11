@@ -12,9 +12,8 @@ be prepared for this error, and retry the request at a later time.
 To assist applications with planning, every request will return a
 `X-Request-Cost` header that is a floating point number of the amount
 that request deducted from your remaining quota. If throttling is applicable
-to this request (it could be disabled on your Canvas installation, or
-you are whitelisted and not subject to throttling), there will also be
-a `X-Rate-Limit-Remaining` header of your remaining quota.
+to this request, there will also be a `X-Rate-Limit-Remaining` header of
+your remaining quota.
 
 Since the cost of a request is roughly based on the amount of time it takes
 to process, and the quota (by default) replenishes at a rate faster than

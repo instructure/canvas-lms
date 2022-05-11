@@ -26,6 +26,7 @@ class ImportedHtmlConverter
 
   CONTAINER_TYPES = %w[div p body].freeze
   LINK_ATTRS = %w[rel href src data value longdesc data-download-url].freeze
+  RCE_MEDIA_TYPES = %w[audio video].freeze
 
   attr_reader :link_parser, :link_resolver, :link_replacer
 
@@ -39,6 +40,17 @@ class ImportedHtmlConverter
   def convert(html, item_type, mig_id, field, opts = {})
     mig_id = mig_id.to_s
     doc = Nokogiri::HTML5(html || "")
+
+    # Replace source tags with iframes
+    doc.search("source[data-media-id]").each do |source|
+      next unless RCE_MEDIA_TYPES.include?(source.parent.name)
+
+      media_node = source.parent
+      media_node.name = "iframe"
+      media_node["src"] = source["src"]
+      source.remove
+    end
+
     doc.search("*").each do |node|
       LINK_ATTRS.each do |attr|
         @link_parser.convert_link(node, attr, item_type, mig_id, field)

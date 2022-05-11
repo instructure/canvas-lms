@@ -46,7 +46,7 @@ export const LockedDiscussion = props => {
         }
       }}
       render={responsiveProps => (
-        <View as="h1" margin={responsiveProps.titleMargin}>
+        <View as="h2" margin={responsiveProps.titleMargin}>
           <Text
             data-testid="locked-discussion"
             size={responsiveProps.titleTextSize}

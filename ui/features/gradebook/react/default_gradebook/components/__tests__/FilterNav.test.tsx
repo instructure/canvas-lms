@@ -21,7 +21,7 @@ import FilterNav from '../FilterNav'
 import fetchMock from 'fetch-mock'
 import store from '../../stores/index'
 import type {FilterNavProps} from '../FilterNav'
-import type {Filter} from '../../gradebook.d'
+import type {Filter, FilterCondition} from '../../gradebook.d'
 import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/extend-expect'
@@ -61,6 +61,15 @@ const defaultProps: FilterNavProps = {
   }
 }
 
+const defaultAppliedFilterConditions: FilterCondition[] = [
+  {
+    id: '2',
+    type: 'module',
+    value: '1',
+    created_at: new Date().toISOString()
+  }
+]
+
 const defaultFilters: Filter[] = [
   {
     id: '1',
@@ -69,10 +78,10 @@ const defaultFilters: Filter[] = [
       {
         id: '2',
         type: 'module',
-        created_at: new Date().toISOString()
+        value: '1',
+        created_at: '2022-02-05T10:18:34-07:00'
       }
     ],
-    is_applied: true,
     created_at: '2022-02-05T10:18:34-07:00'
   },
   {
@@ -82,10 +91,10 @@ const defaultFilters: Filter[] = [
       {
         id: '3',
         type: 'section',
+        value: '7',
         created_at: new Date().toISOString()
       }
     ],
-    is_applied: true,
     created_at: '2022-02-06T10:18:34-07:00'
   }
 ]
@@ -97,7 +106,6 @@ const mockPostResponse = {
     user_id: '1',
     name: 'test',
     payload: {
-      is_applied: false,
       conditions: [
         {
           id: 'f783e528-dbb5-4474-972a-0f1a19c29551',
@@ -114,7 +122,10 @@ const mockPostResponse = {
 
 describe('FilterNav', () => {
   beforeEach(() => {
-    store.setState({filters: defaultFilters})
+    store.setState({
+      filters: defaultFilters,
+      appliedFilterConditions: defaultAppliedFilterConditions
+    })
     fetchMock.mock('*', 200)
   })
   afterEach(() => {
@@ -132,45 +143,22 @@ describe('FilterNav', () => {
     await findByText(/Applied Filters:/)
   })
 
-  it('render filter tag for saved filter', async () => {
-    const {getByTestId} = render(<FilterNav {...defaultProps} />)
-    expect(await getByTestId('filter-tag-1')).toHaveTextContent('Filter 1')
-  })
-
-  it('clicking filter tag for saved filter removes the tag', async () => {
-    const {getByTestId, queryByTestId} = render(<FilterNav {...defaultProps} />)
-    userEvent.click(await getByTestId('filter-tag-1'))
-    expect(await queryByTestId('filter-tag-1')).toBeNull()
-  })
-
-  it('clicking filter tag for saved filter does not remove the filter', async () => {
-    const {getByTestId, getByText} = render(<FilterNav {...defaultProps} />)
-    userEvent.click(await getByTestId('filter-tag-1'))
-    userEvent.click(getByText('Filters'))
-    expect(getByTestId('filter-name-1')).toHaveTextContent('Filter 1')
-  })
-
   it('render condition tag for applied staged filter', async () => {
     store.setState({
-      stagedFilter: {
-        name: '',
-        conditions: [
-          {
-            id: '4',
-            type: 'module',
-            value: '1',
-            created_at: new Date().toISOString()
-          },
-          {
-            id: '5',
-            type: undefined,
-            value: undefined,
-            created_at: new Date().toISOString()
-          }
-        ],
-        is_applied: true,
-        created_at: new Date().toISOString()
-      }
+      stagedFilterConditions: [
+        {
+          id: '4',
+          type: 'module',
+          value: '1',
+          created_at: new Date().toISOString()
+        },
+        {
+          id: '5',
+          type: undefined,
+          value: undefined,
+          created_at: new Date().toISOString()
+        }
+      ]
     })
     const {getAllByTestId} = render(<FilterNav {...defaultProps} />)
     expect(await getAllByTestId('staged-filter-condition-tag')[0]).toHaveTextContent('Module 1')
@@ -183,7 +171,7 @@ describe('FilterNav', () => {
   })
 
   it('shows friendly panda image when there are no filters', async () => {
-    store.setState({filters: [], stagedFilter: null})
+    store.setState({filters: [], stagedFilterConditions: []})
     const {getByAltText, getByText} = render(<FilterNav {...defaultProps} />)
     userEvent.click(getByText('Filters'))
     expect(await getByAltText('Friendly panda')).toBeInTheDocument()
@@ -245,18 +233,18 @@ describe('FilterNav', () => {
     )
     userEvent.click(getByText('Filters'))
     expect(getAllByPlaceholderText(/Select condition type/)[0]).toBeInTheDocument()
-    const checkbox = getAllByRole('checkbox', {name: /Apply filter/})[0]
+    const checkbox = getAllByRole('checkbox', {name: /Apply conditions/})[0]
     expect(checkbox).toBeChecked()
     userEvent.click(checkbox)
     expect(checkbox).not.toBeChecked()
   })
 
   it('Enables filter', () => {
-    store.setState({filters: [{...defaultFilters[0], is_applied: false}]})
+    store.setState({filters: [{...defaultFilters[0]}], appliedFilterConditions: []})
     const {getByText, getByRole, getByPlaceholderText} = render(<FilterNav {...defaultProps} />)
     userEvent.click(getByText('Filters'))
     expect(getByPlaceholderText(/Select condition type/)).toBeInTheDocument()
-    const checkbox = getByRole('checkbox', {name: /Apply filter/})
+    const checkbox = getByRole('checkbox', {name: /Apply conditions/})
     expect(checkbox).not.toBeChecked()
     userEvent.click(checkbox)
     expect(checkbox).toBeChecked()
@@ -265,7 +253,10 @@ describe('FilterNav', () => {
 
 describe('FilterNav (save)', () => {
   beforeEach(() => {
-    store.setState({filters: defaultFilters})
+    store.setState({
+      filters: defaultFilters,
+      appliedFilterConditions: defaultAppliedFilterConditions
+    })
     fetchMock.post('/api/v1/courses/0/gradebook_filters', mockPostResponse)
   })
   afterEach(() => {

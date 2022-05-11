@@ -55,6 +55,20 @@ describe "Importers::QuizImporter" do
       expect(data["description"]).to be_present
       expect(quiz.description).to be_nil
     end
+
+    context "when the original quiz has points" do
+      it "retains the points from the original quiz" do
+        context = course_model
+        question_data = import_example_questions
+        data = get_import_data ["vista", "quiz"], "simple_quiz_data"
+
+        Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
+        quiz = Quizzes::Quiz.where(migration_id: data[:migration_id]).first
+
+        expect(quiz.points_possible).to eq data[:points_possible]
+        expect(quiz.points_possible).to be > 0
+      end
+    end
   end
 
   it "completes a quiz question reference" do

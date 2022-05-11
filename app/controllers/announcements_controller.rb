@@ -37,15 +37,14 @@ class AnnouncementsController < ApplicationController
 
     def load_announcements
       can_create = @context.announcements.temp_record.grants_right?(@current_user, session, :create)
+      can_edit = @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_edit)
+      can_delete = @context.grants_any_right?(@current_user, session, :manage_content, :manage_course_content_delete)
+
       js_env permissions: {
         create: can_create,
-        manage_content: @context.grants_any_right?(
-          @current_user,
-          session,
-          :manage_content,
-          *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
-        ),
-        moderate: can_create
+        moderate: can_create,
+        manage_course_content_edit: can_edit,
+        manage_course_content_delete: can_delete
       }
       js_env is_showing_announcements: true
       js_env atom_feed_url: feeds_announcements_format_path((@context_enrollment || @context).feed_code, :atom)

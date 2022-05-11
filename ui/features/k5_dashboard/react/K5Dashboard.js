@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useState, useLayoutEffect} from 'react'
 import {connect, Provider} from 'react-redux'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
@@ -51,7 +51,8 @@ import ResourcesPage from '@canvas/k5/react/ResourcesPage'
 import {
   groupAnnouncementsByHomeroom,
   saveElementaryDashboardPreference,
-  TAB_IDS
+  TAB_IDS,
+  MOBILE_NAV_BREAKPOINT_PX
 } from '@canvas/k5/react/utils'
 import {theme} from '@canvas/k5/react/k5-theme'
 import useFetchApi from '@canvas/use-fetch-api-hook'
@@ -130,6 +131,11 @@ const toRenderTabs = (currentUserRoles, hideGradesTabForStudents) =>
       currentUserRoles.includes('teacher')
   )
 
+const getWindowSize = () => ({
+  width: window.innerWidth,
+  height: window.innerHeight
+})
+
 export const K5Dashboard = ({
   assignmentsDueToday,
   assignmentsMissing,
@@ -176,6 +182,14 @@ export const K5Dashboard = ({
   const canDisableElementaryDashboard = currentUserRoles.some(r => ['admin', 'teacher'].includes(r))
   const useImportantDatesTray = responsiveSize !== 'large'
   const observerMode = currentUserRoles.includes('observer')
+
+  const [windowSize, setWindowSize] = useState(() => getWindowSize())
+  useLayoutEffect(() => {
+    const updateWindowSize = () => setWindowSize(getWindowSize())
+    window.addEventListener('resize', updateWindowSize)
+    return () => window.removeEventListener('resize', updateWindowSize)
+  }, [])
+  const showingMobileNav = windowSize.width < MOBILE_NAV_BREAKPOINT_PX
 
   // If the view width increases while the tray is open, change the state to close the tray
   if (trayOpen && !useImportantDatesTray) {
@@ -271,16 +285,29 @@ export const K5Dashboard = ({
   }
 
   const renderDashboardHeader = sticky => {
-    const showingIcons = useImportantDatesTray || canDisableElementaryDashboard
-    return (
-      <Flex as="section" margin={`medium 0 ${sticky && showingIcons ? '0' : 'small'} 0`}>
-        <Flex.Item shouldGrow shouldShrink margin="0 small 0 0">
-          <Heading as="h1" aria-hidden={observerMode} level={sticky ? 'h2' : 'h1'}>
-            {I18n.t('Welcome, %{name}!', {name: currentUser.display_name})}
-          </Heading>
-        </Flex.Item>
+    const showingAdditionalOptions =
+      useImportantDatesTray || canDisableElementaryDashboard || observerMode
+    const placeAdditionalOptionsAbove = observerMode && showingMobileNav
+    const additionalOptions = (
+      <>
+        {observerMode && (
+          <Flex.Item
+            as="div"
+            size={placeAdditionalOptionsAbove ? undefined : '16em'}
+            shouldGrow={placeAdditionalOptionsAbove}
+            margin="0 x-small 0 0"
+          >
+            <ObserverOptions
+              observedUsersList={observedUsersList}
+              currentUser={currentUser}
+              handleChangeObservedUser={handleChangeObservedUser}
+              canAddObservee={canAddObservee}
+              currentUserRoles={currentUserRoles}
+            />
+          </Flex.Item>
+        )}
         {useImportantDatesTray && (
-          <Flex.Item align="start">
+          <Flex.Item>
             <IconButton
               screenReaderLabel={I18n.t('View Important Dates')}
               onClick={() => setTrayOpen(true)}
@@ -291,11 +318,34 @@ export const K5Dashboard = ({
           </Flex.Item>
         )}
         {canDisableElementaryDashboard && (
-          <Flex.Item align="start">
+          <Flex.Item>
             <K5DashboardOptionsMenu onDisableK5Dashboard={handleDisableK5Dashboard} />
           </Flex.Item>
         )}
-      </Flex>
+      </>
+    )
+    const welcomeMessage = I18n.t('Welcome, %{name}!', {name: currentUser.display_name})
+    return (
+      <View as="div" margin={`medium 0 ${sticky && showingAdditionalOptions ? '0' : 'small'} 0`}>
+        {placeAdditionalOptionsAbove && (
+          <Flex margin={`0 0 ${sticky ? 'small' : 'medium'} 0`}>
+            {/* place the Welcome... heading above the observer picker when necessary since
+                the h1 should be the first item on the page */}
+            <ScreenReaderContent>
+              <Heading as="h1">{welcomeMessage}</Heading>
+            </ScreenReaderContent>
+            {additionalOptions}
+          </Flex>
+        )}
+        <Flex alignItems="center">
+          <Flex.Item shouldGrow shouldShrink margin="0 small 0 0">
+            <Heading as="h1" aria-hidden={placeAdditionalOptionsAbove} level={sticky ? 'h2' : 'h1'}>
+              {welcomeMessage}
+            </Heading>
+          </Flex.Item>
+          {!placeAdditionalOptionsAbove && additionalOptions}
+        </Flex>
+      </View>
     )
   }
 
@@ -319,23 +369,6 @@ export const K5Dashboard = ({
           padding="x-small medium medium medium"
           onFocus={scrollElementIntoViewIfCoveredByHeader(tabsRef)}
         >
-          {observerMode && (
-            <View as="div" maxWidth="16em">
-              <ScreenReaderContent>
-                <Heading as="h1">
-                  {I18n.t('Welcome, %{name}!', {name: currentUser.display_name})}
-                </Heading>
-              </ScreenReaderContent>
-              <ObserverOptions
-                observedUsersList={observedUsersList}
-                currentUser={currentUser}
-                handleChangeObservedUser={handleChangeObservedUser}
-                margin="medium 0 xx-small 0"
-                canAddObservee={canAddObservee}
-                currentUserRoles={currentUserRoles}
-              />
-            </View>
-          )}
           <K5DashboardContext.Provider
             value={{
               assignmentsDueToday,

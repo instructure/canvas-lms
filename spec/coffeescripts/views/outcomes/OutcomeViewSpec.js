@@ -384,6 +384,7 @@ QUnit.module('OutcomeView', {
     // don't clean up properly, we make sure that these run in a clean tiny state each time
     window.tinymce?.remove()
     ENV.PERMISSIONS = {manage_outcomes: true}
+    ENV.OUTCOME_AVERAGE_CALCULATION = true
     this.outcome1 = outcome1()
   },
   teardown() {
@@ -401,7 +402,7 @@ test('dropdown includes available calculation methods', function () {
     state: 'edit'
   })
   const methods = $.map($('#calculation_method option'), option => option.value)
-  deepEqual(['decaying_average', 'n_mastery', 'latest', 'highest'], methods)
+  deepEqual(['decaying_average', 'n_mastery', 'latest', 'highest', 'average'], methods)
   view.remove()
 })
 
@@ -460,6 +461,19 @@ test('calculation method of latest is rendered properly on show', () => {
   view.remove()
 })
 
+test('calculation method of average is rendered properly on show', () => {
+  const view = createView({
+    model: newOutcome({
+      calculation_method: 'average',
+      calculation_int: null
+    }),
+    state: 'show'
+  })
+  equal(view.$('#calculation_method').data('calculation-method'), 'average')
+  ok(!view.$('#calculation_int_left_side').is(':visible'))
+  view.remove()
+})
+
 test('calculation method of decaying_average is rendered properly on edit', () => {
   const view = createView({
     model: newOutcome({
@@ -510,6 +524,19 @@ test('calculation method of latest is rendered properly on edit', () => {
     state: 'edit'
   })
   equal(view.$('#calculation_method').val(), 'latest')
+  ok(!view.$('#calculation_int_left_side').is(':visible'))
+  view.remove()
+})
+
+test('calculation method of average is rendered properly on edit', () => {
+  const view = createView({
+    model: newOutcome({
+      calculation_method: 'average',
+      calculation_int: null
+    }),
+    state: 'edit'
+  })
+  equal(view.$('#calculation_method').val(), 'average')
   ok(!view.$('#calculation_int_left_side').is(':visible'))
   view.remove()
 })
@@ -565,6 +592,14 @@ test('calculation int updates when the calculation method is changed', () => {
       .$('#calculation_int_example')
       .text()
       .match(/most recent/)
+  )
+  changeSelectedCalcMethod(view, 'average')
+  equal(view.$('#calculation_method').val(), 'average')
+  ok(
+    view
+      .$('#calculation_int_example')
+      .text()
+      .match(/value in a set/)
   )
   view.remove()
 })

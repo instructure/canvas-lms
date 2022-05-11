@@ -24,7 +24,8 @@ import IndexHeader from '../IndexHeader'
 const hasText = text => node => node.text() === text
 const defaultPermissions = () => ({
   create: false,
-  manage_content: false,
+  manage_course_content_edit: false,
+  manage_course_content_delete: false,
   moderate: false
 })
 
@@ -60,7 +61,7 @@ test('lets me delete an announcement when I have the permission', () => {
   const tree = shallow(
     <IndexHeader
       {...defaultProps()}
-      permissions={{...defaultPermissions(), manage_content: true}}
+      permissions={{...defaultPermissions(), manage_course_content_delete: true}}
     />
   )
 

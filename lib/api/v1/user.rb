@@ -91,8 +91,9 @@ module Api::V1::User
 
       json[:merged_into_user_id] = user.merged_into_user_id if user.deleted? && user.merged_into_user_id
 
-      if includes.include?("avatar_url") && user.account.service_enabled?(:avatars)
-        json[:avatar_url] = avatar_url_for_user(user)
+      if user.account.service_enabled?(:avatars)
+        json[:avatar_url] = avatar_url_for_user(user) if includes.include?("avatar_url")
+        json[:avatar_state] = user.avatar_state if includes.include?("avatar_state") && user.grants_right?(current_user, :manage_user_details)
       end
 
       json[:last_name] = user.last_name if includes.include?("last_name")

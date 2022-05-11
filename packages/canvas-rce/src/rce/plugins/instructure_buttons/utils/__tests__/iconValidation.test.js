@@ -16,13 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  hasBackgroundColor,
-  hasVisibleText,
-  hasImage,
-  hasVisibleOutline,
-  validIcon
-} from '../iconValidation'
+import {hasBackgroundColor, hasText, hasImage, hasOutline, validIcon} from '../iconValidation'
 
 describe('icon validation', () => {
   let settings
@@ -31,10 +25,8 @@ describe('icon validation', () => {
     settings = {
       color: null,
       encodedImage: '',
-      outlineColor: null,
       outlineSize: 'none',
-      text: '',
-      textColor: null
+      text: ''
     }
   })
 
@@ -49,20 +41,14 @@ describe('icon validation', () => {
     })
   })
 
-  describe('hasVisibleText', () => {
-    it('is false if the icon has no text color', () => {
-      expect(hasVisibleText(settings)).toBe(false)
+  describe('hasText', () => {
+    it('is false if the icon has no text', () => {
+      expect(hasText(settings)).toBe(false)
     })
 
-    it('is false if the icon has text color but no text', () => {
-      settings.textColor = '#000000'
-      expect(hasVisibleText(settings)).toBe(false)
-    })
-
-    it('is true if the icon has text color and text', () => {
-      settings.textColor = '#000000'
+    it('is true if the icon has text', () => {
       settings.text = 'blah'
-      expect(hasVisibleText(settings)).toBe(true)
+      expect(hasText(settings)).toBe(true)
     })
   })
 
@@ -77,20 +63,14 @@ describe('icon validation', () => {
     })
   })
 
-  describe('hasVisibleOutline', () => {
-    it('is false if the icon has no outline color', () => {
-      expect(hasVisibleOutline(settings)).toBe(false)
+  describe('hasOutline', () => {
+    it('is false if the outline size is none', () => {
+      expect(hasOutline(settings)).toBe(false)
     })
 
-    it('is false if the icon has an outline color but outline size is none', () => {
-      settings.outlineColor = '#000000'
-      expect(hasVisibleOutline(settings)).toBe(false)
-    })
-
-    it('is true if the icon has outline color and outline size', () => {
-      settings.outlineColor = '#000000'
+    it('is true if the outline size is not none', () => {
       settings.outlineSize = 'small'
-      expect(hasVisibleOutline(settings)).toBe(true)
+      expect(hasOutline(settings)).toBe(true)
     })
   })
 
@@ -104,8 +84,7 @@ describe('icon validation', () => {
       expect(validIcon(settings)).toBe(true)
     })
 
-    it('is true if the icon has text color and text', () => {
-      settings.textColor = '#000000'
+    it('is true if the icon has text', () => {
       settings.text = 'blah'
       expect(validIcon(settings)).toBe(true)
     })
@@ -115,8 +94,7 @@ describe('icon validation', () => {
       expect(validIcon(settings)).toBe(true)
     })
 
-    it('is true if the icon has outline color and outline size', () => {
-      settings.outlineColor = '#000000'
+    it('is true if the icon outline size is not none', () => {
       settings.outlineSize = 'small'
       expect(validIcon(settings)).toBe(true)
     })

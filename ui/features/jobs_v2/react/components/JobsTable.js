@@ -21,22 +21,17 @@ import {Table} from '@instructure/ui-table'
 import React, {useCallback} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Responsive} from '@instructure/ui-responsive'
-import {IconCopyLine} from '@instructure/ui-icons'
-import {IconButton} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {InfoColumn, InfoColumnHeader} from './InfoColumn'
 import SortColumnHeader from './SortColumnHeader'
+import CopyToClipboardButton from '@canvas/copy-to-clipboard-button'
 
 const I18n = useI18nScope('jobs_v2')
 
-function copyToClipboardTruncatedValue(value) {
-  const copyToClipboardAction = () => {
-    navigator.clipboard.writeText(value)
-  }
-
+function CopyToClipboardTruncatedValue({value, onClick}) {
   if (!value) {
     return <Text color="secondary">-</Text>
   }
@@ -45,19 +40,15 @@ function copyToClipboardTruncatedValue(value) {
     <div className="copy-button-container">
       <Flex>
         <Flex.Item shouldGrow shouldShrink>
-          <TruncateText>
-            <Tooltip renderTip={value}>{value}</Tooltip>
-          </TruncateText>
+          <Tooltip renderTip={value}>
+            <Link onClick={() => onClick(value)}>
+              <TruncateText>{value}</TruncateText>
+            </Link>
+          </Tooltip>
         </Flex.Item>
         <Flex.Item>
           <div className="copy-button-container-cell">
-            <IconButton
-              size="small"
-              onClick={copyToClipboardAction}
-              screenReaderLabel={I18n.t('Copy')}
-            >
-              <IconCopyLine />
-            </IconButton>
+            <CopyToClipboardButton value={value} />
           </div>
         </Flex.Item>
       </Flex>
@@ -72,6 +63,7 @@ export default function JobsTable({
   sortColumn,
   onClickJob,
   onClickHeader,
+  onClickFilter,
   timeZone
 }) {
   const renderJobRow = useCallback(
@@ -81,10 +73,21 @@ export default function JobsTable({
           <Table.RowHeader>
             <Link onClick={() => onClickJob(job)}>{job.id}</Link>
           </Table.RowHeader>
-          <Table.Cell>{copyToClipboardTruncatedValue(job.tag)}</Table.Cell>
           <Table.Cell>
-            {copyToClipboardTruncatedValue(job.strand)}
-            {copyToClipboardTruncatedValue(job.singleton)}
+            <CopyToClipboardTruncatedValue
+              value={job.tag}
+              onClick={tag => onClickFilter('tag', tag)}
+            />
+          </Table.Cell>
+          <Table.Cell>
+            <CopyToClipboardTruncatedValue
+              value={job.strand}
+              onClick={strand => onClickFilter('strand', strand)}
+            />
+            <CopyToClipboardTruncatedValue
+              value={job.singleton}
+              onClick={singleton => onClickFilter('singleton', singleton)}
+            />
           </Table.Cell>
           <Table.Cell>
             {job.attempts} / {job.max_attempts}
@@ -96,7 +99,7 @@ export default function JobsTable({
         </Table.Row>
       )
     },
-    [bucket, onClickJob, timeZone]
+    [bucket, onClickFilter, onClickJob, timeZone]
   )
 
   const renderColHeader = useCallback(

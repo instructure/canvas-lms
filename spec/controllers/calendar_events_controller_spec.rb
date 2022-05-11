@@ -204,7 +204,7 @@ describe CalendarEventsController do
     end
 
     it "allows editing of event assigned to section" do
-      course_with_teacher
+      course_with_teacher(active_all: true)
       section = add_section("Section 01", course: @course)
       section_event = section.calendar_events.create(title: "some assignment")
       user_session(@teacher)
@@ -264,7 +264,7 @@ describe CalendarEventsController do
     end
 
     it "allows updating of event assigned to section" do
-      course_with_teacher
+      course_with_teacher(active_all: true)
       section = add_section("Section 01", course: @course)
       section_event = section.calendar_events.create(title: "some assignment")
       user_session(@teacher)
