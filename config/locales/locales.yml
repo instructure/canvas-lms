@@ -381,6 +381,8 @@ en-CA:
   locales:
     en-CA: English (Canada)
   time:
+    am: "a.m."
+    pm: "p.m."
     event: "%{date} at %{time}"
     formats:
       tiny: "%l:%M%P"
