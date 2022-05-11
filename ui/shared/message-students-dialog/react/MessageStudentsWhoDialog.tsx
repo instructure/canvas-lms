@@ -289,7 +289,7 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
   const [pendingUploads, setPendingUploads] = useState([])
 
   const isFormDataValid: boolean =
-    (message.length > 0 && (selectedStudents.length + Object.values(selectedObservers).flat().length) > 0)
+    (message.trim().length > 0 && (selectedStudents.length + Object.values(selectedObservers).flat().length) > 0)
 
   useEffect(() => {
     if (!loading && data) {

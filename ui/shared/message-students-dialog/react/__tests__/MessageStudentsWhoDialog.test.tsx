@@ -980,6 +980,25 @@ describe.skip('MessageStudentsWhoDialog', () => {
       expect(sendButton.disabled).toBe(true)
     })
 
+    it('is disabled when the message body has only whitespaces', async () => {
+      const mocks = await makeMocks()
+
+      const {findByRole, getByTestId} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <MessageStudentsWhoDialog {...makeProps()} />
+        </MockedProvider>
+      )
+
+      const recipientsButton = await findByRole('button', {name: 'Show all recipients'})
+      fireEvent.click(recipientsButton)
+
+      const messageTextArea = getByTestId('message-input')
+      fireEvent.change(messageTextArea, {target: {value: '   '}})
+
+      const sendButton = await findByRole('button', {name: 'Send'})
+      expect(sendButton.disabled).toBe(true)
+    })
+
     it('is disabled when there are no students/observers selected', async () => {
       const mocks = await makeMocks()
 
