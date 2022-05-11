@@ -70,6 +70,9 @@ class ActiveRecord::Base
     end
 
     def vacuum
+      # can't vacuum in a transaction
+      return if Rails.env.test?
+
       GuardRail.activate(:deploy) do
         connection.vacuum(table_name, analyze: true)
       end
