@@ -40,7 +40,7 @@ describe('AlignmentOutcomeItem', () => {
 
   it('displays number of alignments', () => {
     const {getByText} = render(<AlignmentOutcomeItem {...defaultProps()} />)
-    expect(getByText('Aligned:')).toBeInTheDocument()
+    expect(getByText('Alignments:')).toBeInTheDocument()
     expect(getByText('15')).toBeInTheDocument()
   })
 
