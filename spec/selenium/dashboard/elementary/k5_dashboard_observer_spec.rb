@@ -29,7 +29,6 @@ require_relative "../../../helpers/k5_common"
 require_relative "../shared_examples/k5_navigation_tabs_shared_examples"
 require_relative "../shared_examples/k5_subject_grades_shared_examples"
 require_relative "../shared_examples/k5_schedule_shared_examples"
-require_relative "../../../helpers/observer_enrollments_helper_spec"
 
 describe "observer k5 dashboard" do
   include_context "in-process server selenium tests"
@@ -166,13 +165,11 @@ describe "observer k5 dashboard" do
     end
 
     it "shows the observers name first if observer is also a student" do
-      skip("LS-3152: failing about half the time - showing the student not the observer")
       course_with_student(
         active_all: true,
         user: @observer,
         course: @art_course
       )
-
       get "/"
 
       expect(element_value_for_attr(observed_student_dropdown, "value")).to eq("Mom")
