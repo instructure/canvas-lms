@@ -213,6 +213,13 @@ describe('Course paces actions', () => {
       // compress() POSTs a flattened and stripped-down version of the course pace
       expect(fetchMock.calls()[0][1]?.body).toEqual(
         JSON.stringify({
+          blackout_dates: [
+            {
+              event_title: 'Spring break',
+              start_date: '2022-03-21T00:00:00.000-06:00',
+              end_date: '2022-03-25T00:00:00.000-06:00'
+            }
+          ],
           course_pace: {
             start_date: updatedPace.start_date,
             end_date: updatedPace.end_date,
@@ -256,26 +263,6 @@ describe('Course paces actions', () => {
   })
 
   describe('syncUnpublishedChanges', () => {
-    beforeEach(() => {
-      ENV.FEATURES ||= {}
-      ENV.FEATURES.course_paces_blackout_dates = true
-    })
-
-    it('dispatches publishPace only if flag is not enabled', async () => {
-      ENV.FEATURES.course_paces_blackout_dates = false
-      const asyncDispatch = jest.fn(() => Promise.resolve())
-      const updatedPace = {...PRIMARY_PACE, excludeWeekends: false}
-      const getState = mockGetState(updatedPace, PRIMARY_PACE, {
-        syncing: SyncState.UNSYNCED,
-        blackoutDates: BLACKOUT_DATES
-      })
-
-      const thunkedAction = coursePaceActions.syncUnpublishedChanges()
-      await thunkedAction(asyncDispatch, getState)
-
-      expect(asyncDispatch.mock.calls.length).toBe(2)
-    })
-
     it('saves blackout dates and publishes the pace', async () => {
       const asyncDispatch = jest.fn(() => Promise.resolve())
       const updatedPace = {...PRIMARY_PACE, excludeWeekends: false}

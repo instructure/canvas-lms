@@ -19,8 +19,21 @@
 #
 
 class MessageDispatcher < Delayed::PerformableMethod
+  DeliverWorker = Struct.new(:message) do
+    def perform
+      message.for_queue.deliver
+    rescue Delayed::RetriableError
+      InstStatsd::Statsd.increment("MessageDispatcher.dispatch.failed")
+      raise Delayed::RetriableError
+    end
+
+    def on_permanent_failure(error)
+      Canvas::Errors.capture_exception(self.class.name, error)
+    end
+  end
+
   def self.dispatch(message)
-    Delayed::Job.enqueue(new(message.for_queue, :deliver),
+    Delayed::Job.enqueue(DeliverWorker.new(message),
                          run_at: message.dispatch_at,
                          priority: 25,
                          max_attempts: 15)

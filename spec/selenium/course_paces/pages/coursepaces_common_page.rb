@@ -135,5 +135,9 @@ module CoursePacesCommonPageObject
       course_name: @course_name,
       name: "CoursePace Teacher"
     )
+    @course.start_at = "2022-04-25"
+    @course.conclude_at = "2022-05-25"
+    @course.restrict_enrollments_to_course_dates = true
+    @course.save!
   end
 end

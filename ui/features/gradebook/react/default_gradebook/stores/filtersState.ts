@@ -21,12 +21,7 @@ import uuid from 'uuid'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {FilterCondition, Filter} from '../gradebook.d'
-import {
-  compareFilterByDate,
-  deserializeFilter,
-  doFilterConditionsMatch,
-  findConditionValuesOfType
-} from '../Gradebook.utils'
+import {compareFilterByDate, deserializeFilter, doFilterConditionsMatch} from '../Gradebook.utils'
 import GradebookApi from '../apis/GradebookApi'
 import type {GradebookStore} from './index'
 
@@ -38,7 +33,7 @@ export type FiltersState = {
   stagedFilterConditions: FilterCondition[]
   isFiltersLoading: boolean
 
-  applyConditions: (appliedFilterConditions: FilterCondition[]) => Promise<void>
+  applyConditions: (conditions: FilterCondition[]) => Promise<void>
   initializeStagedFilter: (InitialColumnFilterSettings, InitialRowFilterSettings) => void
   fetchFilters: () => Promise<void>
   saveStagedFilter: (name: string) => Promise<void>
@@ -48,13 +43,14 @@ export type FiltersState = {
   deleteFilter: (filter: Filter) => Promise<any>
 }
 
-type InitialColumnFilterSettings = {
+export type InitialColumnFilterSettings = {
   assignment_group_id: null | string
   context_module_id: null | string
   grading_period_id: null | string
+  submissions: null | 'has-submissions' | 'has-ungraded-submissions'
 }
 
-type InitialRowFilterSettings = {
+export type InitialRowFilterSettings = {
   section_id: null | string
   student_group_id: null | string
 }
@@ -76,16 +72,11 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     initialRowFilterSettings: InitialRowFilterSettings,
     initialColumnFilterSettings: InitialColumnFilterSettings
   ) => {
-    const appliedFilterConditions: FilterCondition[] = []
+    const conditions: FilterCondition[] = []
 
     // Is section filter not represented?
-    if (
-      initialRowFilterSettings.section_id &&
-      !findConditionValuesOfType('section', get().filters).includes(
-        initialRowFilterSettings.section_id
-      )
-    ) {
-      appliedFilterConditions.push({
+    if (initialRowFilterSettings.section_id) {
+      conditions.push({
         id: uuid.v4(),
         value: initialRowFilterSettings.section_id,
         type: 'section',
@@ -94,13 +85,8 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     }
 
     // Is student group filter not represented?
-    if (
-      initialRowFilterSettings.student_group_id &&
-      !findConditionValuesOfType('student-group', get().filters).includes(
-        initialRowFilterSettings.student_group_id
-      )
-    ) {
-      appliedFilterConditions.push({
+    if (initialRowFilterSettings.student_group_id) {
+      conditions.push({
         id: uuid.v4(),
         value: initialRowFilterSettings.student_group_id,
         type: 'student-group',
@@ -108,15 +94,11 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
       })
     }
 
-    // Is assignment group filter not represented?
     if (
       initialColumnFilterSettings.assignment_group_id &&
-      initialColumnFilterSettings.assignment_group_id !== '0' &&
-      !findConditionValuesOfType('assignment-group', get().filters).includes(
-        initialColumnFilterSettings.assignment_group_id
-      )
+      initialColumnFilterSettings.assignment_group_id !== '0'
     ) {
-      appliedFilterConditions.push({
+      conditions.push({
         id: uuid.v4(),
         value: initialColumnFilterSettings.assignment_group_id,
         type: 'assignment-group',
@@ -124,15 +106,24 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
       })
     }
 
-    // Is module filter not represented?
     if (
-      initialColumnFilterSettings.context_module_id &&
-      initialColumnFilterSettings.context_module_id !== '0' &&
-      !findConditionValuesOfType('module', get().filters).includes(
-        initialColumnFilterSettings.context_module_id
+      ['has-ungraded-submissions', 'has-submissions'].includes(
+        initialColumnFilterSettings.submissions || ''
       )
     ) {
-      appliedFilterConditions.push({
+      conditions.push({
+        id: uuid.v4(),
+        value: initialColumnFilterSettings.submissions || undefined,
+        type: 'submissions',
+        created_at: new Date().toISOString()
+      })
+    }
+
+    if (
+      initialColumnFilterSettings.context_module_id &&
+      initialColumnFilterSettings.context_module_id !== '0'
+    ) {
+      conditions.push({
         id: uuid.v4(),
         value: initialColumnFilterSettings.context_module_id,
         type: 'module',
@@ -141,13 +132,8 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     }
 
     // Is grading period filter not represented?
-    if (
-      initialColumnFilterSettings.grading_period_id &&
-      !findConditionValuesOfType('grading-period', get().filters).includes(
-        initialColumnFilterSettings.grading_period_id
-      )
-    ) {
-      appliedFilterConditions.push({
+    if (initialColumnFilterSettings.grading_period_id) {
+      conditions.push({
         id: uuid.v4(),
         value: initialColumnFilterSettings.grading_period_id,
         type: 'grading-period',
@@ -156,12 +142,13 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     }
 
     const savedFilterAlreadyMatches = get().filters.some(filter =>
-      doFilterConditionsMatch(filter.conditions, appliedFilterConditions)
+      doFilterConditionsMatch(filter.conditions, conditions)
     )
 
-    if (!savedFilterAlreadyMatches) {
-      set({stagedFilterConditions: appliedFilterConditions})
-    }
+    set({
+      appliedFilterConditions: conditions,
+      stagedFilterConditions: !savedFilterAlreadyMatches ? conditions : []
+    })
   },
 
   fetchFilters: async () => {
@@ -201,14 +188,15 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     })
   },
 
-  updateStagedFilter: (stagedFilterConditions: FilterCondition[]) => {
+  updateStagedFilter: (newStagedFilterConditions: FilterCondition[]) => {
     const appliedFilterConditions = get().appliedFilterConditions
+    const stagedFilterConditions = get().stagedFilterConditions
     const isFilterApplied = doFilterConditionsMatch(stagedFilterConditions, appliedFilterConditions)
 
     set({
-      stagedFilterConditions,
+      stagedFilterConditions: newStagedFilterConditions,
       appliedFilterConditions: isFilterApplied
-        ? stagedFilterConditions
+        ? newStagedFilterConditions
         : get().appliedFilterConditions
     })
   },

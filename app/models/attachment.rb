@@ -45,9 +45,9 @@ class Attachment < ActiveRecord::Base
 
   CLONING_ERROR_TYPE = "attachment_clone_url"
 
-  BUTTONS_AND_ICONS = "icon_maker_icons"
+  ICON_MAKER_ICONS = "icon_maker_icons"
   UNCATEGORIZED = "uncategorized"
-  VALID_CATEGORIES = [BUTTONS_AND_ICONS, UNCATEGORIZED].freeze
+  VALID_CATEGORIES = [ICON_MAKER_ICONS, UNCATEGORIZED].freeze
 
   include HasContentTags
   include ContextModuleItem
@@ -541,6 +541,10 @@ class Attachment < ActiveRecord::Base
     if word_count.nil? && !deleted? && file_state != "broken" && Account.site_admin.feature_enabled?(:word_count_in_speed_grader)
       delay(singleton: "attachment_set_word_count_#{global_id}").update_word_count
     end
+  end
+
+  def remove_attachments_from_drafts
+    submission_draft_attachments.destroy_all
   end
 
   def update_word_count
@@ -1501,6 +1505,7 @@ class Attachment < ActiveRecord::Base
     # if the attachment being deleted belongs to a user and the uuid (hash of file) matches the avatar_image_url
     # then clear the avatar_image_url value.
     context.clear_avatar_image_url_with_uuid(self.uuid) if context_type == "User" && self.uuid.present?
+    remove_attachments_from_drafts
     true
   end
 

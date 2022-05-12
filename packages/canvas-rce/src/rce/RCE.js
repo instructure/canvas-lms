@@ -55,7 +55,7 @@ const RCE = forwardRef(function RCE(props, rceRef) {
     textareaId,
     textareaClassName,
     rcsProps,
-    use_rce_buttons_and_icons,
+    use_rce_icon_maker,
     onFocus,
     onBlur,
     onInit,
@@ -95,7 +95,7 @@ const RCE = forwardRef(function RCE(props, rceRef) {
       textareaId,
       textareaClassName,
       trayProps: rcsProps,
-      use_rce_buttons_and_icons,
+      use_rce_icon_maker,
       editorOptions: Object.assign(editorOptions, {
         selector: `#${textareaId}`,
         height,
@@ -188,8 +188,8 @@ RCE.propTypes = {
   // properties necessary for the RCE to us the RCS
   // if missing, RCE features that require the RCS are omitted
   rcsProps: trayPropTypes,
-  // enable the custom buttons feature (temporary until the feature is forced on)
-  use_rce_buttons_and_icons: bool,
+  // enable the custom icon maker feature (temporary until the feature is forced on)
+  use_rce_icon_maker: bool,
   // event handlers
   onFocus: func, // f(RCEWrapper component)
   onBlur: func, // f(event)
@@ -209,7 +209,7 @@ RCE.defaultProps = {
   maxInitRenderedRCEs: -1,
   mirroredAttrs: {},
   readOnly: false,
-  use_rce_buttons_and_icons: true,
+  use_rce_icon_maker: true,
   onFocus: () => {},
   onBlur: () => {},
   onContentChange: () => {},

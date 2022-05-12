@@ -215,104 +215,140 @@ describe DueDateCacher do
   end
 
   describe ".recompute_users_for_course" do
-    let!(:assignment_1) { @assignment }
-    let(:assignment_2) { assignment_model(course: @course) }
-    let(:assignments) { [assignment_1, assignment_2] }
+    context "when run for a sis import" do
+      specs_require_sharding
 
-    let!(:student_1) { @student }
-    let(:student_2) { student_in_course(course: @course) }
-    let(:student_ids) { [student_1.id, student_2.id] }
-    let(:instance) { instance_double("DueDateCacher", recompute: nil) }
+      before do
+        allow(Rails.env).to receive(:production?).and_return(true)
+      end
 
-    it "delegates to an instance" do
-      expect(DueDateCacher).to receive(:new).and_return(instance)
-      expect(instance).to receive(:recompute)
-      DueDateCacher.recompute_users_for_course(student_1.id, @course)
-    end
+      it "calls recompute_for_sis_import in a delayed job" do
+        expect do
+          DueDateCacher.recompute_users_for_course(@student.id, @course, nil, sis_import: true)
+        end.to change {
+          Delayed::Job.where(tag: "DueDateCacher#recompute_for_sis_import").count
+        }.from(0).to(1)
+      end
 
-    it "passes along the whole user array" do
-      expect(DueDateCacher).to receive(:new).and_return(instance)
-                                            .with(@course, Assignment.active.where(context: @course).pluck(:id), student_ids,
-                                                  hash_including(update_grades: false))
-      DueDateCacher.recompute_users_for_course(student_ids, @course)
-    end
+      it "limits the number of sis recompute jobs that can run concurrently" do
+        course_with_student(active_all: true)
+        assignment_model(course: @course)
 
-    it "calls recompute with the value of update_grades if it is set to true" do
-      expect(DueDateCacher).to receive(:new)
-        .with(@course, match_array(assignments.map(&:id)), [student_1.id], hash_including(update_grades: true))
-        .and_return(instance)
-      expect(instance).to receive(:recompute)
-      DueDateCacher.recompute_users_for_course(student_1.id, @course, assignments.map(&:id), update_grades: true)
-    end
-
-    it "calls recompute with the value of update_grades if it is set to false" do
-      expect(DueDateCacher).to receive(:new)
-        .with(@course, match_array(assignments.map(&:id)), [student_1.id], hash_including(update_grades: false))
-        .and_return(instance)
-      expect(instance).to receive(:recompute)
-      DueDateCacher.recompute_users_for_course(student_1.id, @course, assignments.map(&:id), update_grades: false)
-    end
-
-    it "passes assignments if it has any specified" do
-      expect(DueDateCacher).to receive(:new).and_return(instance)
-                                            .with(@course, assignments, student_ids, hash_including(update_grades: false))
-      DueDateCacher.recompute_users_for_course(student_ids, @course, assignments)
-    end
-
-    it "handles being called with a course id" do
-      expect(DueDateCacher).to receive(:new).and_return(instance)
-                                            .with(@course, Assignment.active.where(context: @course).pluck(:id), student_ids,
-                                                  hash_including(update_grades: false))
-      DueDateCacher.recompute_users_for_course(student_ids, @course.id)
-    end
-
-    it "queues a delayed job in a singleton if given no assignments and no singleton option" do
-      @instance = double
-      expect(DueDateCacher).to receive(:new).and_return(@instance)
-      expect(@instance).to receive(:delay_if_production)
-        .with(
-          singleton: "cached_due_date:calculator:Course:#{@course.global_id}:Users:#{Digest::SHA256.hexdigest(student_1.id.to_s)}:UpdateGrades:0",
-          strand: "cached_due_date:calculator:Course:#{@course.global_id}",
-          max_attempts: 10
+        Setting.set("DueDateCacher#recompute_for_sis_import_num_strands", "1")
+        Delayed::Job.create!(
+          locked_at: Time.zone.now,
+          locked_by: "foo",
+          tag: "DueDateCacher#recompute_for_sis_import",
+          shard_id: @course.shard.id
         )
-        .and_return(@instance)
-      expect(@instance).to receive(:recompute)
-      DueDateCacher.recompute_users_for_course(student_1.id, @course)
-    end
-
-    it "queues a delayed job in a singleton if given no assignments and a singleton option" do
-      @instance = double
-      expect(DueDateCacher).to receive(:new).and_return(@instance)
-      expect(@instance).to receive(:delay_if_production)
-        .with(singleton: "what:up:dog", max_attempts: 10, strand: "cached_due_date:calculator:Course:#{@course.global_id}")
-        .and_return(@instance)
-      expect(@instance).to receive(:recompute)
-      DueDateCacher.recompute_users_for_course(student_1.id, @course, nil, singleton: "what:up:dog", strand: "cached_due_date:calculator:Course:#{@course.global_id}")
-    end
-
-    it "initializes a DueDateCacher with the value of executing_user if set" do
-      expect(DueDateCacher).to receive(:new)
-        .with(@course, match_array(assignments.map(&:id)), [student_1.id], hash_including(executing_user: student_1))
-        .and_return(instance)
-
-      DueDateCacher.recompute_users_for_course(student_1.id, @course, nil, executing_user: student_1)
-    end
-
-    it "initializes a DueDateCacher with the user set by with_executing_user if executing_user is not passed" do
-      expect(DueDateCacher).to receive(:new)
-        .with(@course, match_array(assignments.map(&:id)), [student_1.id], hash_including(executing_user: student_1))
-        .and_return(instance)
-
-      DueDateCacher.with_executing_user(student_1) do
-        DueDateCacher.recompute_users_for_course(student_1.id, @course, nil)
+        expect do
+          DueDateCacher.recompute_users_for_course(@student.id, @course, nil, sis_import: true)
+        end.not_to change {
+          Delayed::Job.where(tag: "DueDateCacher#recompute_for_sis_import").count
+        }.from(1)
       end
     end
 
-    it "initializes a DueDateCacher with a nil executing_user if no user has been specified" do
-      expect(DueDateCacher).to receive(:new)
-        .with(@course, match_array(assignments.map(&:id)), hash_including(executing_user: nil))
-        .and_return(instance)
-      DueDateCacher.recompute_course(@course, run_immediately: true)
+    context "when not run for a sis import" do
+      let!(:assignment_1) { @assignment }
+      let(:assignment_2) { assignment_model(course: @course) }
+      let(:assignments) { [assignment_1, assignment_2] }
+
+      let!(:student_1) { @student }
+      let(:student_2) { student_in_course(course: @course) }
+      let(:student_ids) { [student_1.id, student_2.id] }
+      let(:instance) { instance_double("DueDateCacher", recompute: nil) }
+
+      it "delegates to an instance" do
+        expect(DueDateCacher).to receive(:new).and_return(instance)
+        expect(instance).to receive(:recompute)
+        DueDateCacher.recompute_users_for_course(student_1.id, @course)
+      end
+
+      it "passes along the whole user array" do
+        expect(DueDateCacher).to receive(:new).and_return(instance)
+                                              .with(@course, Assignment.active.where(context: @course).pluck(:id), student_ids,
+                                                    hash_including(update_grades: false))
+        DueDateCacher.recompute_users_for_course(student_ids, @course)
+      end
+
+      it "calls recompute with the value of update_grades if it is set to true" do
+        expect(DueDateCacher).to receive(:new)
+          .with(@course, match_array(assignments.map(&:id)), [student_1.id], hash_including(update_grades: true))
+          .and_return(instance)
+        expect(instance).to receive(:recompute)
+        DueDateCacher.recompute_users_for_course(student_1.id, @course, assignments.map(&:id), update_grades: true)
+      end
+
+      it "calls recompute with the value of update_grades if it is set to false" do
+        expect(DueDateCacher).to receive(:new)
+          .with(@course, match_array(assignments.map(&:id)), [student_1.id], hash_including(update_grades: false))
+          .and_return(instance)
+        expect(instance).to receive(:recompute)
+        DueDateCacher.recompute_users_for_course(student_1.id, @course, assignments.map(&:id), update_grades: false)
+      end
+
+      it "passes assignments if it has any specified" do
+        expect(DueDateCacher).to receive(:new).and_return(instance)
+                                              .with(@course, assignments, student_ids, hash_including(update_grades: false))
+        DueDateCacher.recompute_users_for_course(student_ids, @course, assignments)
+      end
+
+      it "handles being called with a course id" do
+        expect(DueDateCacher).to receive(:new).and_return(instance)
+                                              .with(@course, Assignment.active.where(context: @course).pluck(:id), student_ids,
+                                                    hash_including(update_grades: false))
+        DueDateCacher.recompute_users_for_course(student_ids, @course.id)
+      end
+
+      it "queues a delayed job in a singleton if given no assignments and no singleton option" do
+        @instance = double
+        expect(DueDateCacher).to receive(:new).and_return(@instance)
+        expect(@instance).to receive(:delay_if_production)
+          .with(
+            singleton: "cached_due_date:calculator:Course:#{@course.global_id}:Users:#{Digest::SHA256.hexdigest(student_1.id.to_s)}:UpdateGrades:0",
+            strand: "cached_due_date:calculator:Course:#{@course.global_id}",
+            max_attempts: 10
+          )
+          .and_return(@instance)
+        expect(@instance).to receive(:recompute)
+        DueDateCacher.recompute_users_for_course(student_1.id, @course)
+      end
+
+      it "queues a delayed job in a singleton if given no assignments and a singleton option" do
+        @instance = double
+        expect(DueDateCacher).to receive(:new).and_return(@instance)
+        expect(@instance).to receive(:delay_if_production)
+          .with(singleton: "what:up:dog", max_attempts: 10, strand: "cached_due_date:calculator:Course:#{@course.global_id}")
+          .and_return(@instance)
+        expect(@instance).to receive(:recompute)
+        DueDateCacher.recompute_users_for_course(student_1.id, @course, nil, singleton: "what:up:dog", strand: "cached_due_date:calculator:Course:#{@course.global_id}")
+      end
+
+      it "initializes a DueDateCacher with the value of executing_user if set" do
+        expect(DueDateCacher).to receive(:new)
+          .with(@course, match_array(assignments.map(&:id)), [student_1.id], hash_including(executing_user: student_1))
+          .and_return(instance)
+
+        DueDateCacher.recompute_users_for_course(student_1.id, @course, nil, executing_user: student_1)
+      end
+
+      it "initializes a DueDateCacher with the user set by with_executing_user if executing_user is not passed" do
+        expect(DueDateCacher).to receive(:new)
+          .with(@course, match_array(assignments.map(&:id)), [student_1.id], hash_including(executing_user: student_1))
+          .and_return(instance)
+
+        DueDateCacher.with_executing_user(student_1) do
+          DueDateCacher.recompute_users_for_course(student_1.id, @course, nil)
+        end
+      end
+
+      it "initializes a DueDateCacher with a nil executing_user if no user has been specified" do
+        expect(DueDateCacher).to receive(:new)
+          .with(@course, match_array(assignments.map(&:id)), hash_including(executing_user: nil))
+          .and_return(instance)
+        DueDateCacher.recompute_course(@course, run_immediately: true)
+      end
     end
   end
 
@@ -417,6 +453,145 @@ describe DueDateCacher do
           expect { DueDateCacher.new(@course, [@assignment.id]).recompute }.not_to change {
             @assignment.all_submissions.find_by(user: @student).workflow_state
           }.from("unsubmitted")
+        end
+      end
+    end
+
+    context "unassigning students that have concluded enrollments" do
+      before do
+        @assignment = @course.assignments.create!
+        @enrollment = @course.enrollments.find_by(user: @student, course_section: @course.default_section)
+        @second_section = @course.course_sections.create!(name: "Second Section")
+      end
+
+      let(:submission) { Submission.find_by(user: @student, assignment: @assignment) }
+
+      context "some students remain assigned to the assignment" do
+        before do
+          second_student = user_factory(active_all: true)
+          @course.enroll_student(second_student, enrollment_state: "active", section: @second_section)
+        end
+
+        it "does not delete the submission if all of a student's enrollments are completed" do
+          @enrollment.conclude
+          create_section_override_for_assignment(@assignment, course_section: @second_section)
+          @assignment.update!(only_visible_to_overrides: true)
+          cacher.recompute
+          expect(submission.workflow_state).to eq "unsubmitted"
+        end
+
+        it "does not delete the submission if all of a students enrollments are completed, rejected, or deleted" do
+          @course.enroll_student(
+            @student,
+            enrollment_state: "active",
+            section: @course.course_sections.create!(name: "Third Section"),
+            allow_multiple_enrollments: true
+          ).destroy
+
+          @course.enroll_student(
+            @student,
+            enrollment_state: "active",
+            section: @course.course_sections.create!(name: "Fourth Section"),
+            allow_multiple_enrollments: true
+          ).reject!
+
+          @enrollment.conclude
+          create_section_override_for_assignment(@assignment, course_section: @second_section)
+          @assignment.update!(only_visible_to_overrides: true)
+          cacher.recompute
+          expect(submission.workflow_state).to eq "unsubmitted"
+        end
+
+        it "deletes the submission if the student has at least one active enrollment" do
+          @course.enroll_student(
+            @student,
+            enrollment_state: "active",
+            section: @course.course_sections.create!(name: "Third Section"),
+            allow_multiple_enrollments: true
+          )
+
+          @enrollment.conclude
+          create_section_override_for_assignment(@assignment, course_section: @second_section)
+          @assignment.update!(only_visible_to_overrides: true)
+          cacher.recompute
+          expect(submission.workflow_state).to eq "deleted"
+        end
+
+        it "deletes the submission if the student has at least one inactive enrollment" do
+          @course.enroll_student(
+            @student,
+            enrollment_state: "active",
+            section: @course.course_sections.create!(name: "Third Section"),
+            allow_multiple_enrollments: true
+          ).deactivate
+
+          @enrollment.conclude
+          create_section_override_for_assignment(@assignment, course_section: @second_section)
+          @assignment.update!(only_visible_to_overrides: true)
+          cacher.recompute
+          expect(submission.workflow_state).to eq "deleted"
+        end
+      end
+
+      context "no students remain assigned to the assignment" do
+        it "does not delete the submission if all of a student's enrollments are completed" do
+          @enrollment.conclude
+          create_section_override_for_assignment(@assignment, course_section: @second_section)
+          @assignment.update!(only_visible_to_overrides: true)
+          cacher.recompute
+          expect(submission.workflow_state).to eq "unsubmitted"
+        end
+
+        it "does not delete the submission if all of a students enrollments are completed, rejected, or deleted" do
+          @course.enroll_student(
+            @student,
+            enrollment_state: "active",
+            section: @course.course_sections.create!(name: "Third Section"),
+            allow_multiple_enrollments: true
+          ).destroy
+
+          @course.enroll_student(
+            @student,
+            enrollment_state: "active",
+            section: @course.course_sections.create!(name: "Fourth Section"),
+            allow_multiple_enrollments: true
+          ).reject!
+
+          @enrollment.conclude
+          create_section_override_for_assignment(@assignment, course_section: @second_section)
+          @assignment.update!(only_visible_to_overrides: true)
+          cacher.recompute
+          expect(submission.workflow_state).to eq "unsubmitted"
+        end
+
+        it "deletes the submission if the student has at least one active enrollment" do
+          @course.enroll_student(
+            @student,
+            enrollment_state: "active",
+            section: @course.course_sections.create!(name: "Third Section"),
+            allow_multiple_enrollments: true
+          )
+
+          @enrollment.conclude
+          create_section_override_for_assignment(@assignment, course_section: @second_section)
+          @assignment.update!(only_visible_to_overrides: true)
+          cacher.recompute
+          expect(submission.workflow_state).to eq "deleted"
+        end
+
+        it "deletes the submission if the student has at least one inactive enrollment" do
+          @course.enroll_student(
+            @student,
+            enrollment_state: "active",
+            section: @course.course_sections.create!(name: "Third Section"),
+            allow_multiple_enrollments: true
+          ).deactivate
+
+          @enrollment.conclude
+          create_section_override_for_assignment(@assignment, course_section: @second_section)
+          @assignment.update!(only_visible_to_overrides: true)
+          cacher.recompute
+          expect(submission.workflow_state).to eq "deleted"
         end
       end
     end
@@ -584,18 +759,6 @@ describe DueDateCacher do
 
         expect { @assignment.save! }.to change {
           Submission.first.updated_at
-        }
-      end
-
-      it "does not delete submissions for concluded enrollments" do
-        student2 = user_factory
-        @course.enroll_student(student2, enrollment_state: "active")
-        submission_model(assignment: @assignment, user: student2)
-        student2.enrollments.find_by(course: @course).conclude
-
-        @assignment.only_visible_to_overrides = true
-        expect { @assignment.save! }.not_to change {
-          Submission.active.where(user_id: student2.id).count
         }
       end
 

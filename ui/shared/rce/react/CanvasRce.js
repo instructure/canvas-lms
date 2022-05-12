@@ -131,7 +131,7 @@ const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
       onBlur={onBlur}
       onContentChange={onContentChange}
       onInit={onInit}
-      use_rce_buttons_and_icons={shouldUseFeature(Feature.ButtonsAndIcons, window.ENV)}
+      use_rce_icon_maker={shouldUseFeature(Feature.IconMaker, window.ENV)}
       {...rest}
     />
   )

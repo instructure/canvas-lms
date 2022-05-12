@@ -27,7 +27,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Heading} from '@instructure/ui-heading'
 
 import PacePicker from './pace_picker'
-import ProjectedDates from './projected_dates/projected_dates_2'
+import ProjectedDates from './projected_dates/projected_dates'
 import Settings from './settings/settings'
 import UnpublishedChangesIndicator from '../unpublished_changes_indicator'
 import {getSelectedContextId, getSelectedContextType} from '../../reducers/ui'

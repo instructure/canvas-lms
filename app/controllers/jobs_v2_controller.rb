@@ -37,6 +37,10 @@ class JobsV2Controller < ApplicationController
     require_site_admin_with_permission(:manage_jobs)
   end
 
+  def redirect
+    redirect_to(Account.site_admin.feature_enabled?(:jobs_v2) ? jobs_v2_index_url : jobs_v1_index_url)
+  end
+
   def index
     respond_to do |format|
       format.html do
@@ -410,8 +414,8 @@ class JobsV2Controller < ApplicationController
   end
 
   def set_navigation
-    set_active_tab "jobs_v2"
-    add_crumb t("#crumbs.jobs_v2", "Jobs v2")
+    set_active_tab "jobs"
+    add_crumb t("#crumbs.jobs", "Jobs")
   end
 
   def unleash_more_jobs(strand, new_parallelism)

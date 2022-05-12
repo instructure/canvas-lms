@@ -73,7 +73,8 @@ export const AddressBook = ({
   inputValue,
   hasSelectAllFilterOption,
   currentFilter,
-  activeCourseFilter
+  activeCourseFilter,
+  addressBookMessages
 }) => {
   const textInputRef = useRef(null)
   const componentViewRef = useRef(null)
@@ -187,13 +188,6 @@ export const AddressBook = ({
       setIsMenuOpen(false)
     }
   }, [selectedMenuItems, limitTagCount, textInputRef])
-
-  // Provide selected IDs via callback
-  useEffect(() => {
-    if (selectedMenuItems.filter(x => !selectedRecipients.includes(x)).length > 0) {
-      onSelectedIdsChange(selectedMenuItems)
-    }
-  }, [onSelectedIdsChange, selectedMenuItems, selectedRecipients])
 
   // set initial recipients from props
   useEffect(() => {
@@ -476,6 +470,7 @@ export const AddressBook = ({
     }
 
     setSelectedMenuItems([...newSelectedMenuItems])
+    onSelectedIdsChange([...newSelectedMenuItems])
   }
 
   const removeTag = removeMenuItem => {
@@ -487,12 +482,13 @@ export const AddressBook = ({
       menuItem => menuItem.id !== removeMenuItem.id
     )
     setSelectedMenuItems([...newSelectedMenuItems])
+    onSelectedIdsChange([...newSelectedMenuItems])
   }
 
   return (
     <View as="div" width={width}>
       <div ref={componentViewRef}>
-        <Flex>
+        <Flex alignItems="start">
           <Flex.Item padding="none xxx-small none none" shouldGrow shouldShrink>
             <Popover
               on="click"
@@ -545,6 +541,7 @@ export const AddressBook = ({
                     setIsMenuOpen(true)
                   }}
                   data-testid="address-book-input"
+                  messages={addressBookMessages}
                 />
               }
             >
@@ -683,7 +680,8 @@ AddressBook.propTypes = {
    * object that contains the current context filter information
    */
   currentFilter: PropTypes.object,
-  activeCourseFilter: PropTypes.object
+  activeCourseFilter: PropTypes.object,
+  addressBookMessages: PropTypes.array
 }
 
 export default AddressBook

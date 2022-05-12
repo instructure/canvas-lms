@@ -440,6 +440,46 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
         subject.commit_history("http://url", "80", -1)
         expect(submission.reload.workflow_state).to eq(Submission.workflow_states.pending_review)
       end
+
+      context "and then manual grading is completed" do
+        subject do
+          super().commit_history("http://url", "80", -1)
+          BasicLTI::QuizzesNextVersionedSubmission.new(
+            assignment,
+            @user
+          ).commit_history("http://url", grade, -1)
+
+          assignment.submission_for_student(@user)
+        end
+
+        let(:grade) { raise "set in contexts" }
+
+        shared_examples_for "contexts that grade a submission" do
+          it "sets workflow_state to graded" do
+            expect(subject.workflow_state).to eq Submission.workflow_states.graded
+          end
+
+          it "gives the correct score to the submission" do
+            expect(subject.score).to eq grade.to_f
+          end
+
+          it "gives the correct grade to the submission" do
+            expect(subject.grade).to eq grade
+          end
+        end
+
+        context "with an unchanged score" do
+          let(:grade) { "80" }
+
+          it_behaves_like "contexts that grade a submission"
+        end
+
+        context "with a changed score" do
+          let(:grade) { "90" }
+
+          it_behaves_like "contexts that grade a submission"
+        end
+      end
     end
 
     context "with prioritizeNonToolGrade details" do

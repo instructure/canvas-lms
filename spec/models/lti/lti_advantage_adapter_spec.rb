@@ -27,7 +27,11 @@ describe Lti::LtiAdvantageAdapter do
   let(:return_url) { "http://www.platform.com/return_url" }
   let(:user) { @student }
   let(:opts) { { resource_type: "course_navigation", domain: "test.com" } }
-  let(:controller_double) { double(polymorphic_url: "test.com") }
+  let(:controller_double) do
+    controller = double(polymorphic_url: "test.com")
+    allow(controller).to receive(:params)
+    controller
+  end
   let(:expander_opts) { { current_user: user, tool: tool, controller: controller_double } }
   let(:expander) do
     Lti::VariableExpander.new(

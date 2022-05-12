@@ -26,7 +26,7 @@ beforeEach(() => {
 before(() => {
   StyleSheetTestUtils.suppressStyleInjection()
 
-  // Building an svg for Buttons and Icons requires canvas at times.
+  // Building an svg for Icon Maker requires canvas at times.
   HTMLCanvasElement.prototype.getContext = () => ({})
 })
 

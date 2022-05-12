@@ -89,6 +89,7 @@ describe('getRCSProps', () => {
       active_brand_config_json_url: 'http://the.theme.here/',
       DEEP_LINKING_POST_MESSAGE_ORIGIN: 'https://canvas.instructure.com',
       FEATURES: {
+        // Release flag was NOT re-named, so left here as "buttons_and_icons_cropper"
         buttons_and_icons_cropper: true
       }
     }
@@ -98,7 +99,8 @@ describe('getRCSProps', () => {
       themeUrl: 'http://the.theme.here/',
       canvasUrl: 'https://canvas.instructure.com',
       features: {
-        buttons_and_icons_cropper: true
+        // This feature name was renamed in getRCSProps() to "icon_maker_cropper"
+        icon_maker_cropper: true
       }
     })
   })

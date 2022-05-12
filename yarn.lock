@@ -11649,6 +11649,11 @@ expect@^27.1.0:
     jest-message-util "^27.1.0"
     jest-regex-util "^27.0.6"
 
+export-from-json@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/export-from-json/-/export-from-json-1.6.0.tgz#4a79ba2f6f6aacd1d0e843a40f55009f603614a4"
+  integrity sha512-DLHwOGYeGnATM6tOMOWgs9dbzCjO+DwO3YGaha2R6kmLCE5iL8dz5sOywWeJs4P1rhxpdaVILKhCB4mUrTbbGg==
+
 exports-loader@^0.7:
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/exports-loader/-/exports-loader-0.7.0.tgz#84881c784dea6036b8e1cd1dac3da9b6409e21a5"

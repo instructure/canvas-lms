@@ -201,11 +201,11 @@ describe('ConversationListHolder', () => {
   })
 
   it('should be able to open conversations', () => {
-    const onOpenMock = jest.fn()
-    const {getAllByText} = render(<ConversationListHolder onOpen={onOpenMock} {...props} />)
+    const onSelectMock = jest.fn()
+    const {getAllByText} = render(<ConversationListHolder onSelect={onSelectMock} {...props} />)
     const conversation = getAllByText('This is a different subject line')
     fireEvent.click(conversation[0])
-    expect(onOpenMock).toHaveBeenCalled()
+    expect(onSelectMock).toHaveBeenCalled()
   })
 
   it('should be able to select multiple conversations using cmd key', () => {
@@ -231,28 +231,6 @@ describe('ConversationListHolder', () => {
     })
     fireEvent.click(conversations[4], {
       ctrlKey: true
-    })
-    const checkboxes = getAllByTestId('conversationListItem-Checkbox')
-    expect(checkboxes.filter(c => c.checked === true).length).toBe(3)
-  })
-
-  it('should be able to select range of conversations ASC', () => {
-    const {getAllByTestId} = render(<ConversationListHolder {...props} />)
-    const conversations = getAllByTestId('conversationListItem-Item')
-    fireEvent.click(conversations[0])
-    fireEvent.click(conversations[3], {
-      shiftKey: true
-    })
-    const checkboxes = getAllByTestId('conversationListItem-Checkbox')
-    expect(checkboxes.filter(c => c.checked === true).length).toBe(4)
-  })
-
-  it('should be able to select range of conversations DESC', () => {
-    const {getAllByTestId} = render(<ConversationListHolder {...props} />)
-    const conversations = getAllByTestId('conversationListItem-Item')
-    fireEvent.click(conversations[3])
-    fireEvent.click(conversations[1], {
-      shiftKey: true
     })
     const checkboxes = getAllByTestId('conversationListItem-Checkbox')
     expect(checkboxes.filter(c => c.checked === true).length).toBe(3)

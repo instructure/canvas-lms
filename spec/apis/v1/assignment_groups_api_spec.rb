@@ -295,7 +295,7 @@ describe AssignmentGroupsController, type: :request do
       @course.enroll_teacher(@teacher)
       # make a1 and a3 visible
       create_section_override_for_assignment(@a1, course_section: @section)
-      @a3.grade_student(@user, grade: 10, grader: @teacher)
+      create_adhoc_override_for_assignment(@a3, @user)
 
       [@a1, @a2, @a3, @a4].each(&:reload)
 

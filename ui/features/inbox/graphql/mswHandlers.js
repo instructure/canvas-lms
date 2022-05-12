@@ -123,6 +123,44 @@ export const handlers = [
           })
         }
       ]
+
+      if (req.variables.scope === 'multipleConversations') {
+        data.legacyNode.conversationsConnection.nodes = [
+          {
+            ...ConversationParticipant.mock(
+              {_id: '256', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU2', workflowState: 'unread'},
+              {_id: '257', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU4', workflowState: 'unread'}
+            ),
+            conversation: Conversation.mock({
+              _id: '197',
+              id: 'Q29udmVyc2F0aW9uLTE5Nw==',
+              subject: 'This is an inbox conversation'
+            })
+          },
+          {
+            ...ConversationParticipant.mock(
+              {_id: '256', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU2', workflowState: 'unread'},
+              {_id: '257', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU4', workflowState: 'unread'}
+            ),
+            conversation: Conversation.mock({
+              _id: '905',
+              id: '905',
+              subject: 'This is an inbox conversation'
+            })
+          },
+          {
+            ...ConversationParticipant.mock(
+              {_id: '256', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU2', workflowState: 'unread'},
+              {_id: '257', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU4', workflowState: 'unread'}
+            ),
+            conversation: Conversation.mock({
+              _id: '906',
+              id: '906',
+              subject: 'This is an inbox conversation'
+            })
+          }
+        ]
+      }
       data.legacyNode.conversationsConnection.nodes[0].conversation.conversationMessagesConnection.nodes =
         [
           ConversationMessage.mock({
@@ -171,7 +209,6 @@ export const handlers = [
           })
         ]
     }
-
     return res(ctx.data(data))
   }),
 

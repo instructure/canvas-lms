@@ -56,6 +56,11 @@ export const AddressBookContainer = props => {
     }
   }, [props.activeCourseFilter])
 
+  useEffect(() => {
+    props.onInputValueChange(inputValue)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inputValue])
+
   const fetchMoreMenuData = () => {
     setIsLoadingMoreData(true)
     addressBookRecipientsQuery.fetchMore({
@@ -226,6 +231,7 @@ export const AddressBookContainer = props => {
       hasSelectAllFilterOption={props.hasSelectAllFilterOption}
       currentFilter={filterHistory[filterHistory.length - 1]}
       activeCourseFilter={props.activeCourseFilter}
+      addressBookMessages={props.addressBookMessages}
     />
   )
 }
@@ -235,6 +241,7 @@ AddressBookContainer.propTypes = {
    * Callback which provides an array of selected items
    */
   onSelectedIdsChange: PropTypes.func,
+  onInputValueChange: PropTypes.func,
   /**
    * An array of selected recepient objects
    */
@@ -262,11 +269,13 @@ AddressBookContainer.propTypes = {
   /**
    * bool which determines if "select all" in a context menu appears
    */
-  hasSelectAllFilterOption: PropTypes.bool
+  hasSelectAllFilterOption: PropTypes.bool,
+  addressBookMessages: PropTypes.array
 }
 
 AddressBookContainer.defaultProps = {
   onSelectedIdsChange: () => {},
+  onInputValueChange: () => {},
   hasSelectAllFilterOption: false
 }
 

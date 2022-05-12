@@ -395,7 +395,7 @@ describe('sources/api', () => {
     })
   })
 
-  describe('fetchButtonsAndIconsFolder', () => {
+  describe('fetchIconMakerFolder', () => {
     let folders
 
     beforeEach(() => {
@@ -410,14 +410,14 @@ describe('sources/api', () => {
 
     it('calls fetchPage with the proper params', () => {
       return apiSource
-        .fetchButtonsAndIconsFolder({
+        .fetchIconMakerFolder({
           contextType: 'course',
           contextId: '22'
         })
         .then(() => {
           sinon.assert.calledWith(
             apiSource.fetchPage,
-            '/api/folders/buttons_and_icons?contextType=course&contextId=22'
+            '/api/folders/icon_maker?contextType=course&contextId=22'
           )
         })
     })

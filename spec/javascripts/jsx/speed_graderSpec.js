@@ -926,6 +926,7 @@ QUnit.module('SpeedGrader', rootHooks => {
       fakeENV.setup(env)
       sandbox.spy($.fn, 'append')
       sandbox.spy($, 'ajaxJSON')
+      sinon.stub($, 'flashError')
       server = sinon.fakeServer.create({respondImmediately: true})
       server.respondWith('POST', 'my_url.com', [
         200,
@@ -1023,6 +1024,7 @@ QUnit.module('SpeedGrader', rootHooks => {
       SpeedGrader.teardown()
       fakeENV.teardown()
       server.restore()
+      $.flashError.restore()
     })
 
     QUnit.module('when assignment is moderated', contextHooks => {
@@ -1109,6 +1111,16 @@ QUnit.module('SpeedGrader', rootHooks => {
       equal(formData['submission[score]'], undefined)
       equal(formData['submission[grade]'], '56')
       equal(formData['submission[user_id]'], 4)
+      SpeedGraderHelpers.determineGradeToSubmit.restore()
+    })
+
+    test('handleGradeSubmit should not submit grade and show a flash message if grade is invalid', function () {
+      SpeedGrader.EG.jsonReady()
+      sandbox.stub(SpeedGraderHelpers, 'determineGradeToSubmit').returns('NaN')
+      SpeedGrader.EG.handleGradeSubmit(null, false)
+      strictEqual($.flashError.callCount, 1)
+      const [errorMessage] = $.flashError.firstCall.args
+      strictEqual(errorMessage, 'Invalid Grade')
       SpeedGraderHelpers.determineGradeToSubmit.restore()
     })
 

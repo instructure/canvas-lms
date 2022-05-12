@@ -609,7 +609,7 @@ class UserMerge
       scope = model.where(user_id: from_user)
       case model.name
       when "Submission"
-        # we prefer submissions that have grades then submissions that have
+        # we prefer submissions that have grades than submissions that have
         # a submission... that sort of makes sense.
         # we swap empty objects in cases of collision so that we don't
         # end up causing a unique index violation for a given assignment for
@@ -631,6 +631,7 @@ class UserMerge
         merge_data.build_more_data(to_move, data: data) unless to_move.empty?
         merge_data.build_more_data(move_back, data: data) unless move_back.empty?
         swap_submission(model, move_back, table, to_move, to_move_ids, "fk_rails_8d85741475")
+        swap_assignment_override_student(model, move_back, to_move)
       when "Quizzes::QuizSubmission"
         subscope = already_scope.to_a
         to_move = model.where(user_id: from_user).joins(:submission).where(submissions: { user_id: target_user }).to_a
@@ -641,6 +642,7 @@ class UserMerge
         merge_data.build_more_data(to_move, data: data)
         merge_data.build_more_data(move_back, data: data)
         swap_submission(model, move_back, table, to_move, to_move, "fk_rails_04850db4b4")
+        swap_assignment_override_student(model, move_back, to_move)
       end
     rescue => e
       Rails.logger.error "migrating #{table} column user_id failed: #{e}"
@@ -664,6 +666,32 @@ class UserMerge
       model.where(id: move_back).update_all(user_id: from_user.id)
       update_versions(model.where(id: to_move), table, :user_id)
       update_versions(model.where(id: move_back), table, :user_id)
+    end
+  end
+
+  def swap_assignment_override_student(model, move_back, to_move)
+    return if to_move.empty?
+
+    to_move_ids = model.where(id: to_move).select(:assignment_id)
+    move_back_ids = model.where(id: move_back).select(:assignment_id)
+    to_move = AssignmentOverrideStudent.where(user_id: from_user, assignment_id: to_move_ids)
+    move_back = AssignmentOverrideStudent.where(user_id: from_user, assignment_id: move_back_ids)
+    # bail early if we don't have any student overrides to move
+    return unless to_move.exists?
+
+    merge_data.build_more_data(to_move, data: data)
+    merge_data.build_more_data(move_back, data: data)
+
+    AssignmentOverrideStudent.transaction do
+      connection = AssignmentOverrideStudent.connection
+      fkey = connection.find_foreign_key(:assignment_override_students, :users)
+      # DEFERRED constraints are not checked until transaction commit (at the end of the statement)
+      # We defer due to the unique constraint on (assignment_id, user_id) so we can
+      # swap user id's without facing a violation
+      connection.execute("SET CONSTRAINTS #{connection.quote_table_name(fkey)} DEFERRED")
+      move_back.update_all(user_id: -from_user.id)
+      to_move.update_all(user_id: target_user.id)
+      move_back.update_all(user_id: from_user.id)
     end
   end
 

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const BUTTON_AND_ICON_PARAM = 'icon_maker_icon'
+const ICON_MAKER_PARAM = 'icon_maker_icon'
 
 export default function buildDownloadUrl(url) {
   let downloadUrl
@@ -24,10 +24,11 @@ export default function buildDownloadUrl(url) {
   try {
     downloadUrl = new URL(url)
   } catch (e) {
-    throw `Error parsing ${url}. 'buildButtonAndIconURL' only supports absolute URLs.`
+    // eslint-disable-next-line no-throw-literal
+    throw `Error parsing ${url}. 'buildDownloadUrl' only supports absolute URLs.`
   }
 
-  downloadUrl.searchParams.append(BUTTON_AND_ICON_PARAM, 1)
+  downloadUrl.searchParams.append(ICON_MAKER_PARAM, 1)
 
   return downloadUrl.toString()
 }

@@ -52,7 +52,6 @@ interface StoreProps {
 
 interface DispatchProps {
   readonly loadLatestPaceByContext: typeof coursePaceActions.loadLatestPaceByContext
-  readonly setEndDate: typeof coursePaceActions.setEndDate
   readonly showLoadingOverlay: typeof uiActions.showLoadingOverlay
   readonly toggleExcludeWeekends: typeof coursePaceActions.toggleExcludeWeekends
   readonly updateBlackoutDates: typeof blackoutDateActions.updateBlackoutDates
@@ -122,15 +121,13 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
     }
     return (
       <div style={{display: 'inline-block'}}>
-        {ENV.FEATURES.course_paces_blackout_dates && (
-          <BlackoutDatesModal
-            key={this.state.blackoutDatesModalKey}
-            blackoutDates={this.props.blackoutDates}
-            open={this.state.showBlackoutDatesModal}
-            onSave={this.handleSaveBlackoutDates}
-            onCancel={this.closeBlackoutDatesModal}
-          />
-        )}
+        <BlackoutDatesModal
+          key={this.state.blackoutDatesModalKey}
+          blackoutDates={this.props.blackoutDates}
+          open={this.state.showBlackoutDatesModal}
+          onSave={this.handleSaveBlackoutDates}
+          onCancel={this.closeBlackoutDatesModal}
+        />
         <Menu
           trigger={
             <IconButton screenReaderLabel={I18n.t('Modify Settings')} margin={this.props.margin}>
@@ -156,18 +153,16 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
           >
             {I18n.t('Skip Weekends')}
           </MenuItem>
-          {ENV.FEATURES.course_paces_blackout_dates && (
-            <MenuItem
-              type="button"
-              onSelect={() => {
-                this.setState({showSettingsPopover: false})
-                this.showBlackoutDatesModal()
-              }}
-              disabled={this.props.isSyncing}
-            >
-              {I18n.t('Manage Blackout Dates')}
-            </MenuItem>
-          )}
+          <MenuItem
+            type="button"
+            onSelect={() => {
+              this.setState({showSettingsPopover: false})
+              this.showBlackoutDatesModal()
+            }}
+            disabled={this.props.isSyncing}
+          >
+            {I18n.t('Manage Blackout Dates')}
+          </MenuItem>
         </Menu>
       </div>
     )
@@ -187,7 +182,6 @@ const mapStateToProps = (state: StoreState): StoreProps => {
 
 export default connect(mapStateToProps, {
   loadLatestPaceByContext: coursePaceActions.loadLatestPaceByContext,
-  setEndDate: coursePaceActions.setEndDate,
   showLoadingOverlay: uiActions.showLoadingOverlay,
   toggleExcludeWeekends: coursePaceActions.toggleExcludeWeekends,
   updateBlackoutDates: blackoutDateActions.updateBlackoutDates

@@ -179,9 +179,11 @@ export const K5Dashboard = ({
     observedUserId: initialObservedId,
     isObserver: currentUserRoles.includes('observer')
   })
-  const canDisableElementaryDashboard = currentUserRoles.some(r => ['admin', 'teacher'].includes(r))
-  const useImportantDatesTray = responsiveSize !== 'large'
   const observerMode = currentUserRoles.includes('observer')
+  const canDisableElementaryDashboard =
+    currentUserRoles.some(r => ['admin', 'teacher'].includes(r)) &&
+    (!observerMode || observedUserId === currentUser.id)
+  const useImportantDatesTray = responsiveSize !== 'large'
 
   const [windowSize, setWindowSize] = useState(() => getWindowSize())
   useLayoutEffect(() => {

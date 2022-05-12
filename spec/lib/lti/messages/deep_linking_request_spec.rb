@@ -46,6 +46,13 @@ describe Lti::Messages::DeepLinkingRequest do
       expect(subject["deep_link_return_url"]).to eq deep_linking_return_url
     end
 
+    it 'sets the assignment "deep_link_return_url"' do
+      assignment_return_url = "http://www.platform.com/assignment/1/return_url"
+      allow(controller).to receive(:course_assignment_deep_linking_response_url).and_return(assignment_return_url)
+      allow(controller).to receive(:params).and_return({ "secure_params" => assignment.secure_params })
+      expect(subject["deep_link_return_url"]).to eq assignment_return_url
+    end
+
     shared_examples_for "sets deep linking attributes" do
       it 'sets the correct "accept_types"' do
         expect(subject["accept_types"]).to match_array accept_types

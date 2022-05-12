@@ -95,7 +95,7 @@ export class BlackoutDatesTable extends React.Component<ComponentProps, LocalSta
       )
     }
     return dates.map(bd => (
-      <Row key={`blackout-date-${bd.id}`}>
+      <Row key={`blackout-date-${bd.id || bd.temp_id}`}>
         <Cell>
           <div style={{overflowWrap: 'break-word'}}>{bd.event_title}</div>
         </Cell>

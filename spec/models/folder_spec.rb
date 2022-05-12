@@ -497,17 +497,17 @@ describe Folder do
     end
   end
 
-  describe ".buttons_and_icons_folder" do
+  describe "icon_maker_folder" do
     let_once(:course) { Course.create! }
 
-    subject { Folder.buttons_and_icons_folder(course) }
+    subject { Folder.icon_maker_folder(course) }
 
-    context "when a 'Buttons and Icons' folder does not yet exist" do
-      it "creates a folder with BUTTONS_AND_ICONS_UNIQUE_TYPE unique type when one does not exist" do
+    context "when a 'Icon Maker' folder does not yet exist" do
+      it "creates a folder with ICON_MAKER_UNIQUE_TYPE unique type when one does not exist" do
         expect do
           subject
         end.to change {
-          course.folders.where(unique_type: Folder::BUTTONS_AND_ICONS_UNIQUE_TYPE).count
+          course.folders.where(unique_type: Folder::ICON_MAKER_UNIQUE_TYPE).count
         }.from(0).to(1)
       end
 
@@ -518,10 +518,10 @@ describe Folder do
 
     context "when an 'Icon Maker Icons' folder already exists" do
       before do
-        @existing_folder = Folder.buttons_and_icons_folder(course)
+        @existing_folder = Folder.icon_maker_folder(course)
       end
 
-      it "returns, rather than creates, the existing BUTTONS_AND_ICONS_UNIQUE_TYPE folder" do
+      it "returns, rather than creates, the existing ICON_MAKER_UNIQUE_TYPE folder" do
         expect(subject).to eq @existing_folder
       end
     end

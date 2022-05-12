@@ -27,6 +27,7 @@ import {ApolloProvider, createClient} from '@canvas/apollo'
 import OutcomesContext, {getContext} from '@canvas/outcomes/react/contexts/OutcomesContext'
 import ManagementHeader from './ManagementHeader'
 import OutcomeManagementPanel from './Management/index'
+import AlignmentSummary from './Alignments/index'
 import {
   showOutcomesImporter,
   showOutcomesImporterIfInProgress
@@ -228,7 +229,9 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
             renderTitle={I18n.t('Alignments')}
             isSelected={selectedIndex === alignmentTabIndex}
             id="alignments"
-          />
+          >
+            <AlignmentSummary />
+          </Tabs.Panel>
         )}
       </Tabs>
       <div ref={onSetImportRef} />

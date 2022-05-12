@@ -32,6 +32,7 @@ module Lti::IMS
         label: @line_item.label,
         resourceId: @line_item.resource_id,
         tag: @line_item.tag,
+        endDateTime: @line_item.end_date_time,
         resourceLinkId: @line_item.resource_link&.resource_link_uuid,
       }.merge(@line_item.extensions)
         .merge(@include_launch_url ? @line_item.launch_url_extension : {})

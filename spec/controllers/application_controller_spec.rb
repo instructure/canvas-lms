@@ -2464,33 +2464,78 @@ RSpec.describe ApplicationController do
     end
 
     it "returns false if no current user" do
+      expect(@controller).not_to receive(:uncached_k5_user?)
       @controller.instance_variable_set(:@current_user, nil)
       expect(@controller.send(:k5_user?)).to be_falsey
     end
 
-    it "returns correct value for another user if provided" do
-      course_with_student(active_all: true) # not in @k5_account subaccount
-      expect(@controller.send(:k5_user?, { user: @user })).to be_falsey
-      @controller.instance_variable_set(:@current_user, @user)
-      expect(@controller.send(:k5_user?, { user: @student1 })).to be_truthy
-    end
+    context "as an observer" do
+      before :once do
+        @observer = @teacher1
+        @student = course_with_student(active_all: true).user
+        @course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: :active, associated_user_id: @student)
+      end
 
-    it "returns false for a k5 observer observing a non-k5 student" do
-      @student = course_with_student(active_all: true).user
-      @course.enroll_user(@teacher1, "ObserverEnrollment", enrollment_state: :active, associated_user_id: @student)
-      user_session(@teacher1)
-      @controller.instance_variable_set(:@current_user, @teacher1)
-      @controller.instance_variable_set(:@selected_observed_user, @student)
-      expect(@controller.send(:k5_user?)).to be_falsey
-    end
+      before do
+        user_session(@observer)
+        @controller.instance_variable_set(:@current_user, @observer)
+      end
 
-    it "only considers provided courses if course_ids is passed" do
-      @k5_course = @course
-      @classic_course = course_factory(active_all: true)
-      @classic_course.enroll_student(@student1, enrollment_state: :active)
-      expect(@controller.send(:k5_user?, { user: @student1, course_ids: [@classic_course.id] })).to be_falsey
-      expect(@controller.send(:k5_user?, { user: @student1, course_ids: [@k5_course.id] })).to be_truthy
-      expect(@controller.send(:k5_user?, { user: @student1, course_ids: [@k5_course.id, @classic_course.id] })).to be_truthy
+      it "returns false for a k5 observer actively observing a non-k5 student" do
+        @controller.instance_variable_set(:@selected_observed_user, @student)
+        expect(@controller.send(:k5_user?)).to be_falsey
+      end
+
+      it "returns true for a k5 observer observing a non-k5 student if observer is selected" do
+        expect(@controller.send(:k5_user?)).to be_truthy
+      end
+
+      it "only considers courses where user is observing student" do
+        k5_course = course_factory(account: @k5_account, active_all: true)
+        k5_course.enroll_student(@student, enrollment_state: :active)
+        @controller.instance_variable_set(:@selected_observed_user, @student)
+        expect(@controller.send(:k5_user?)).to be_falsey
+      end
+
+      it "ignores an observer's ObserverEnrollments when determining k5_user? for themself" do
+        @observer.enrollments.not_of_observer_type.destroy_all
+        classic_course = course_factory(active_all: true)
+        classic_course.enroll_teacher(@observer, enrollment_state: :active)
+        k5_course = course_factory(account: @k5_account, active_all: true)
+        k5_course.enroll_student(@student, enrollment_state: :active)
+        k5_course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: :active, associated_user_id: @student)
+
+        expect(@controller.send(:k5_user?)).to be_falsey
+      end
+
+      it "returns true when a k5 student is selected, even if observer has disabled k5 dashboard" do
+        toggle_k5_setting(@course.account)
+        @observer.preferences[:elementary_dashboard_disabled] = true
+        @observer.save!
+        @controller.instance_variable_set(:@selected_observed_user, @student)
+        expect(@controller.send(:k5_user?)).to be_truthy
+      end
+
+      context "with sharding" do
+        specs_require_sharding
+
+        before :once do
+          @shard2.activate do
+            @s2_k5_account = Account.create!
+            toggle_k5_setting(@s2_k5_account)
+          end
+        end
+
+        it "considers courses across shards where user is observing student" do
+          @k5_course = course_factory(active_all: true, account: @s2_k5_account)
+          @k5_course.enroll_student(@student, enrollment_state: :active)
+          @controller.instance_variable_set(:@selected_observed_user, @student)
+          expect(@controller.send(:k5_user?)).to be_falsey
+
+          @k5_course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: :active, associated_user_id: @student)
+          expect(@controller.send(:k5_user?)).to be_truthy
+        end
+      end
     end
 
     context "with sharding" do
@@ -2546,17 +2591,6 @@ RSpec.describe ApplicationController do
         @shard2.activate do
           expect(@controller.send(:k5_user?)).to be_falsey
         end
-      end
-
-      it "handles course_ids with course ids from multiple shards properly" do
-        @k5_course = @course
-        @shard2.activate do
-          @classic_course = course_factory(active_all: true, account: Account.create!)
-        end
-        @classic_course.enroll_student(@student1, enrollment_state: :active)
-        expect(@controller.send(:k5_user?, { user: @student1, course_ids: [@classic_course.id] })).to be_falsey
-        expect(@controller.send(:k5_user?, { user: @student1, course_ids: [@k5_course.id] })).to be_truthy
-        expect(@controller.send(:k5_user?, { user: @student1, course_ids: [@k5_course.id, @classic_course.id] })).to be_truthy
       end
     end
   end
@@ -2967,6 +3001,65 @@ RSpec.describe ApplicationController, "#redirect_to_login" do
   context "given an unauthenticated pdf request" do
     it_behaves_like "redirectable to html login page" do
       let(:format) { :pdf }
+    end
+  end
+end
+
+RSpec.describe ApplicationController, "#respect_account_privacy" do
+  controller do
+    before_action :require_user, only: :index
+
+    def index
+      render json: [{}]
+    end
+
+    def login
+      render json: [{}]
+    end
+
+    def public
+      render json: "anyone can see this"
+    end
+  end
+
+  context "when the account it set to require requests be authenticated" do
+    let(:account) { Account.default }
+
+    before do
+      controller.instance_variable_set(:@domain_root_account, account)
+      account.settings[:require_user] = true
+      account.save
+    end
+
+    after do
+      account.settings.delete(:require_user)
+      account.save
+    end
+
+    it "allows unauthenticated users to login" do
+      routes.draw { get "login" => "anonymous#login" }
+      params = { controller: "login/test_controller" }
+      allow(controller).to receive(:params).and_return(params)
+      response = get "login"
+      expect(response.code).not_to eq("302")
+    end
+
+    it "redirects requests to login for unauthenticated users" do
+      routes.draw { get "public" => "anonymous#public" }
+      response = get "public"
+      expect(response.code).to eq("302")
+    end
+
+    context "with an authenticated user" do
+      before do
+        user_factory
+        user_session(@user)
+      end
+
+      it "allows requests" do
+        response = get "index"
+        expect(response.code).not_to eq("302")
+      end
     end
   end
 end

@@ -84,21 +84,30 @@ describe('#initializeReaderButton', () => {
         }
 
         it('sends the HTML and MathML as chunks', async () => {
+          expect.assertions(1)
+
+          // This whitespace is meaningful for the snapshot so please don't remove it!
           const fakeLaunchAsync = (...args) => {
-            expect(args[2].chunks).toMatchObject([
-              {
-                content: '<div>\n              Some simple content\n              ',
-                mimeType: 'text/html'
-              },
-              {
-                content: '<mrow><apply><minus/><ci>a</ci><ci>b</ci></apply></mrow>',
-                mimeType: 'application/mathml+xml'
-              },
-              {
-                content: 'Some post math content\n            \n          ',
-                mimeType: 'text/html'
-              }
-            ])
+            expect(args[2].chunks).toMatchInlineSnapshot(`
+              Array [
+                Object {
+                  "content": "<div>
+                            Some simple content
+                            </div>",
+                  "mimeType": "text/html",
+                },
+                Object {
+                  "content": "<mrow><apply><minus/><ci>a</ci><ci>b</ci></apply></mrow>",
+                  "mimeType": "application/mathml+xml",
+                },
+                Object {
+                  "content": "Some post math content
+                          
+                        ",
+                  "mimeType": "text/html",
+                },
+              ]
+            `)
           }
 
           const fakeReaderLib = Promise.resolve({

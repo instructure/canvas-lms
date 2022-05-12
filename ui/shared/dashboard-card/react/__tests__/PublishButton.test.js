@@ -20,6 +20,7 @@ import {mount} from 'enzyme'
 import $ from 'jquery'
 import PublishButton from '../PublishButton'
 import * as apiClient from '@canvas/courses/courseAPIClient'
+import {waitFor} from '@testing-library/dom'
 
 jest.mock('@canvas/courses/courseAPIClient')
 
@@ -39,6 +40,7 @@ describe('PublishButton', () => {
     jest.clearAllMocks()
     jest.spyOn($, 'flashError').mockImplementation()
     apiClient.getModules.mockReturnValue(Promise.resolve({data: []}))
+    expect.hasAssertions()
   })
 
   describe('when defaultView is modules', () => {
@@ -61,15 +63,15 @@ describe('PublishButton', () => {
     })
 
     it('flashes an error when getModules fails', async () => {
-      apiClient.getModules.mockRejectedValue(Promise.reject())
+      apiClient.getModules.mockRejectedValue(Promise.resolve())
       const wrapper = mount(<PublishButton {...createMockProps()} />)
-      try {
-        await wrapper.find('button').simulate('click')
-      } catch (e) {
+
+      await wrapper.find('button').simulate('click')
+      await waitFor(() => {
         expect($.flashError).toHaveBeenCalledWith(
           'An error ocurred while fetching course details. Please try again.'
         )
-      }
+      })
     })
   })
 

@@ -50,8 +50,6 @@ export const regularActions = {
   setCategoryError: (category: string, error?: string) =>
     createAction(Constants.SET_CATEGORY_ERROR, {category, error: error || ''}),
   clearCategoryError: (category: string) => createAction(Constants.CLEAR_CATEGORY_ERROR, category),
-  toggleDivideIntoWeeks: () => createAction(Constants.TOGGLE_DIVIDE_INTO_WEEKS),
-  toggleShowProjections: () => createAction(Constants.TOGGLE_SHOW_PROJECTIONS),
   showLoadingOverlay: (message: string) => createAction(Constants.SHOW_LOADING_OVERLAY, message),
   hideLoadingOverlay: () => createAction(Constants.HIDE_LOADING_OVERLAY),
   setSelectedPaceContext: (

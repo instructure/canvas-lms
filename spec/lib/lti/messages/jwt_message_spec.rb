@@ -288,35 +288,213 @@ describe Lti::Messages::JwtMessage do
     end
   end
 
-  describe "launch presentation" do
+  describe "launch_presentation claim" do
     let(:message_launch_presentation) { decoded_jwt["https://purl.imsglobal.org/spec/lti/claim/launch_presentation"] }
 
-    it "sets the document target" do
-      expect(message_launch_presentation["document_target"]).to eq "iframe"
+    shared_examples "includes document_target, return_url and locale" do
+      it "sets the document target" do
+        expect(message_launch_presentation["document_target"]).to eq "iframe"
+      end
+
+      it "sets the return url" do
+        expect(message_launch_presentation["return_url"]).to eq return_url
+      end
+
+      it "sets the locale" do
+        expected_locale = "ca"
+        allow(I18n).to receive(:locale).and_return expected_locale
+        expect(message_launch_presentation["locale"]).to eq expected_locale
+      end
     end
 
-    it "sets the height" do
-      expect(message_launch_presentation["height"]).to eq 400
+    shared_examples "includes dimensions from the tool.placement" do
+      it "sets the height from the tool.placement[\"selection_height\"]" do
+        expect(message_launch_presentation["height"]).to eq 400
+      end
+
+      it "sets the width from the tool.placement[\"selection_width\"]" do
+        expect(message_launch_presentation["width"]).to eq 500
+      end
     end
 
-    it "sets the width" do
-      expect(message_launch_presentation["width"]).to eq 500
+    context "when launching a content without ContentTag" do
+      context "when tool.placement don't provide selection_width and selection_height" do
+        before :once do
+          tool.course_navigation = tool.course_navigation.merge(selection_width: nil, selection_height: nil)
+          tool.save!
+        end
+
+        context "when tool.settings provides selection_width and selection_height" do
+          before :once do
+            tool.settings = {
+              selection_width: 321,
+              selection_height: 654
+            }
+            tool.save!
+          end
+
+          it_behaves_like "includes document_target, return_url and locale"
+
+          it "sets the height from the tool.settings" do
+            expect(message_launch_presentation["height"]).to eq 654
+          end
+
+          it "sets the width from the tool.settings" do
+            expect(message_launch_presentation["width"]).to eq 321
+          end
+        end
+
+        context "when tool.settings don't provide selection_width and selection_height" do
+          it_behaves_like "includes document_target, return_url and locale"
+
+          it "sets a default height" do
+            # see ContextExternalTool.calculate_extension_setting
+            # see ContextExternalTool.extension_default_value
+            expect(message_launch_presentation["height"]).to eq 400
+          end
+
+          it "sets a default width" do
+            # see ContextExternalTool.calculate_extension_setting
+            # see ContextExternalTool.extension_default_value
+            expect(message_launch_presentation["width"]).to eq 800
+          end
+        end
+      end
+
+      context "when tool.placement doesn't exist" do
+        before :once do
+          tool.course_navigation = nil
+          tool.save!
+        end
+
+        context "when tool.settings provides selection_width and selection_height" do
+          before :once do
+            tool.settings = {
+              selection_width: 321,
+              selection_height: 654
+            }
+            tool.save!
+          end
+
+          it_behaves_like "includes document_target, return_url and locale"
+
+          it "sets the height from the tool.settings" do
+            expect(message_launch_presentation["height"]).to eq 654
+          end
+
+          it "sets the width from the tool.settings" do
+            expect(message_launch_presentation["width"]).to eq 321
+          end
+        end
+
+        context "when tool.settings don't provide selection_width and selection_height" do
+          it_behaves_like "includes document_target, return_url and locale"
+
+          it "does not include height" do
+            # Optional attribute
+            # see https://www.imsglobal.org/spec/lti/v1p3/#launch-presentation-claim
+            expect(message_launch_presentation).not_to include "height"
+          end
+
+          it "does not include width" do
+            # Optional attribute
+            # see https://www.imsglobal.org/spec/lti/v1p3/#launch-presentation-claim
+            expect(message_launch_presentation).not_to include "width"
+          end
+        end
+      end
     end
 
-    it "sets the return url" do
-      expect(message_launch_presentation["return_url"]).to eq return_url
+    context "when launching a content with ContentTag" do
+      before :once do
+        assignment.external_tool_tag = ContentTag.create!(
+          context: assignment,
+          content: tool,
+          url: tool.url
+        )
+        assignment.save!
+      end
+
+      let(:controller) do
+        controller = double("controller")
+        allow(controller).to receive(:request).and_return(double("request"))
+        controller
+      end
+
+      let(:expander) do
+        Lti::VariableExpander.new(
+          course.root_account,
+          course,
+          controller,
+          {
+            content_tag: assignment.external_tool_tag
+          }
+        )
+      end
+
+      context "with link_settings" do
+        context "with selection_width" do
+          before :once do
+            assignment.external_tool_tag.link_settings = { selection_width: "456px" }
+            assignment.external_tool_tag.save!
+          end
+
+          it_behaves_like "includes document_target, return_url and locale"
+
+          it "sets the height from the tool.placement[\"selection_height\"]" do
+            expect(message_launch_presentation["height"]).to eq 400
+          end
+
+          it "sets the width from the ContentTag" do
+            expect(message_launch_presentation["width"]).to eq 456
+          end
+        end
+
+        context "includes selection_width and empty selection_height" do
+          before :once do
+            assignment.external_tool_tag.link_settings = { selection_width: 456, selection_height: "" }
+            assignment.external_tool_tag.save!
+          end
+
+          it_behaves_like "includes document_target, return_url and locale"
+
+          it "sets the height from the tool.placement[\"selection_height\"]" do
+            expect(message_launch_presentation["height"]).to eq 400
+          end
+
+          it "sets the width from the ContentTag" do
+            expect(message_launch_presentation["width"]).to eq 456
+          end
+        end
+
+        context "includes both selection_width and selection_height" do
+          before :once do
+            assignment.external_tool_tag.link_settings = { selection_width: "456", selection_height: 789 }
+            assignment.external_tool_tag.save!
+          end
+
+          it_behaves_like "includes document_target, return_url and locale"
+
+          it "sets the height from the ContentTag" do
+            expect(message_launch_presentation["height"]).to eq 789
+          end
+
+          it "sets the width from the ContentTag" do
+            expect(message_launch_presentation["width"]).to eq 456
+          end
+        end
+      end
+
+      context "without link_settings" do
+        it_behaves_like "includes document_target, return_url and locale"
+        it_behaves_like "includes dimensions from the tool.placement"
+      end
     end
 
-    it "sets the locale" do
-      expected_locale = "ca"
-      allow(I18n).to receive(:locale).and_return expected_locale
-      expect(message_launch_presentation["locale"]).to eq expected_locale
-    end
-
-    context "when launch presentation claim group disabled" do
+    context "when launch_presentation claim group disabled" do
       let(:opts) { super().merge({ claim_group_blacklist: [:launch_presentation] }) }
 
-      it "does not set the launch presentation claim" do
+      it "does not set the launch_presentation claim" do
         expect(message_launch_presentation).to be_nil
       end
     end

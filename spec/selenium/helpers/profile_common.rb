@@ -61,7 +61,6 @@ shared_examples "user settings page change pic window" do
   include SharedExamplesCommon
 
   it "allows user to click to change profile pic", priority: "1" do
-    skip("ADMIN-2680")
     enable_avatars(true)
     get "/profile/settings"
 
@@ -79,8 +78,6 @@ shared_examples "user settings page change pic window" do
     # There are 'Upload Picture' and 'From Gravatar' buttons
     expect(f(".nav.nav-pills .active")).to include_text("Upload a Picture")
     expect(fj('.nav.nav-pills li :contains("From Gravatar")')).to include_text("From Gravatar")
-    # Firefox and Chrome: There is a 'Take a Picture' button
-    expect(fj('.nav.nav-pills li :contains("Take a Picture")')).to include_text("Take a Picture")
 
     # There are 'X', Save, and Cancel buttons
     expect(f("button.ui-dialog-titlebar-close")).to be_truthy

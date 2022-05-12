@@ -81,7 +81,7 @@ export type Props = {
   assignment: Assignment
   onClose: () => void
   students: Student[]
-  onSend: () => void
+  onSend: (args: SendArgs) => void
   messageAttachmentUploadFolderId: string
 }
 
@@ -90,6 +90,12 @@ type FilterCriterion = {
   readonly shouldShow: (assignment: Assignment) => boolean
   readonly title: string
   readonly value: string
+}
+
+type SendArgs = {
+  recipientsIds: number[]
+  subject: string
+  body: string
 }
 
 const isScored = (assignment: Assignment) =>
@@ -195,6 +201,8 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [open, setOpen] = useState(true)
   const [sending, setSending] = useState(false)
+  const [subject, setSubject] = useState('')
+  const [message, setMessage] = useState('')
 
   const initializeSelectedObservers = (students) =>
     students.reduce((map, student) => {
@@ -280,6 +288,9 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
   const [attachments, setAttachments] = useState([])
   const [pendingUploads, setPendingUploads] = useState([])
 
+  const isFormDataValid: boolean =
+    (message.length > 0 && (selectedStudents.length + Object.values(selectedObservers).flat().length) > 0)
+
   useEffect(() => {
     if (!loading && data) {
       setObserversDisplayed(
@@ -312,7 +323,15 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
       // which then calls onSend() when pendingUploads are complete.
       setSending(true)
     } else {
-      onSend()
+      const recipientsIds = [...selectedStudents, ...Object.values(selectedObservers).flat()]
+      const uniqueRecipientsIds = [...new Set(recipientsIds)]
+      const args = {
+        recipientsIds: uniqueRecipientsIds,
+        subject,
+        body: message
+      }
+      onSend(args)
+      onClose()
     }
   }
 
@@ -516,12 +535,24 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
           )}
 
           <br />
-          <TextInput renderLabel={I18n.t('Subject')} placeholder={I18n.t('Type Something…')} />
+          <TextInput
+            data-testid="subject-input"
+            renderLabel={I18n.t('Subject')}
+            placeholder={I18n.t('Type Something…')}
+            value={subject}
+            onChange={(_event, value) => {
+              setSubject(value)
+            }}
+          />
           <br />
           <TextArea
+            data-testid="message-input"
+            isRequired={true}
             height="200px"
             label={I18n.t('Message')}
             placeholder={I18n.t('Type your message here…')}
+            value={message}
+            onChange={e => setMessage(e.target.value)}
           />
           <AttachmentDisplay
             attachments={[...attachments, ...pendingUploads]}
@@ -543,7 +574,7 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
                   </Button>
                 </Item>
                 <Item margin="0 0 0 x-small">
-                  <Button color="primary" onClick={handleSendButton}>
+                  <Button interaction={isFormDataValid ? 'enabled' : 'disabled'} color="primary" onClick={handleSendButton}>
                     {I18n.t('Send')}
                   </Button>
                 </Item>

@@ -29,6 +29,7 @@ import FeatureFlags from '@canvas/feature-flags'
 import ready from '@instructure/ready'
 import MicrosoftSyncAccountSettings from '@canvas/integrations/react/accounts/microsoft_sync/MicrosoftSyncAccountSettings'
 import CourseCreationSettings from './react/course_creation_settings/CourseCreationSettings'
+import {InternalSettings} from './react/internal_settings/InternalSettings'
 
 const I18n = useI18nScope('account_settings_jsx_bundle')
 
@@ -61,6 +62,11 @@ ready(() => {
       </View>,
       document.getElementById('tab-security')
     )
+  }
+
+  const internalSettingsMountpoint = document.getElementById('tab-internal-settings')
+  if (internalSettingsMountpoint) {
+    ReactDOM.render(<InternalSettings />, internalSettingsMountpoint)
   }
 
   if (document.getElementById('tab-integrations')) {

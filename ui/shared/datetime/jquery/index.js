@@ -25,7 +25,6 @@ import {changeTimezone} from '../changeTimezone'
 import DatetimeField from './InstrumentedDatetimeField'
 import renderDatepickerTime from '../react/components/render-datepicker-time'
 import '@canvas/keycodes'
-import 'date'/* Date.parse, Date.UTC, Date.today */
 import 'jqueryui/datepicker'
 
 const I18n = useI18nScope('instructure_date_and_time')
@@ -125,9 +124,18 @@ $.fn.datepicker = function (options) {
       const numericMin = parseInt(min || '0', 10)
 
       if (tz.hasMeridian()) {
-        const isPM =
-          !ampm || !!ampm.match(new RegExp('^' + I18n.t('#time.pm'), 'i')) || numericHr > 12
+        let isPM = numericHr > 12 // definitely PM if the hour value is past noon
         numericHr %= 12
+
+        // Check for the "post meridian" marker in this locale (ignoring
+        // any punctuation) to see if need to add 12 to the hour to get
+        // the final 24-hour value. Note that hours past 12 are always
+        // considered PM no matter what the am/pm selection is.
+        if (!isPM && ampm) {
+          const pmMatch = new RegExp(I18n.t('#time.pm').replace(/[-/:. ]/g, ''))
+          isPM = pmMatch.test(ampm.replace(/[-/:. ]/g, ''))
+        }
+
         if (isPM) numericHr = (numericHr + 12) % 24
       }
 

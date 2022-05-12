@@ -56,7 +56,7 @@ module Lti
           return
         end
 
-        # deep linking on the new assignment page should:
+        # deep linking on the new/edit assignment page should:
         # * only use the first content item to create an assignment
         # * not create a new module
         # * reload the page
@@ -68,7 +68,7 @@ module Lti
 
           item_for_assignment = lti_resource_links.first
           if allow_line_items? && item_for_assignment.key?(:lineItem) && validate_line_item!(item_for_assignment)
-            create_assignment!(item_for_assignment)
+            create_update_assignment!(item_for_assignment, params[:assignment_id])
           end
 
           render_content_items(items: [item_for_assignment])
@@ -81,7 +81,7 @@ module Lti
           next unless allow_line_items? && content_item.key?(:lineItem)
           next unless validate_line_item!(content_item)
 
-          create_assignment!(content_item)
+          create_update_assignment!(content_item)
         end
 
         # receiving only invalid content items should:

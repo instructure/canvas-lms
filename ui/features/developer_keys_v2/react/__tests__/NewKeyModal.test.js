@@ -34,9 +34,8 @@ beforeEach(() => {
 
 afterEach(() => {
   window.ENV = oldEnv
+  jest.restoreAllMocks()
 })
-
-afterEach(() => jest.restoreAllMocks())
 
 const selectedScopes = [
   'url:POST|/api/v1/accounts/:account_id/account_notifications',
@@ -47,6 +46,7 @@ const fakeActions = {
   createOrEditDeveloperKey: () => {},
   developerKeysModalClose: () => {},
   editDeveloperKey: () => {},
+  listDeveloperKeysReplace: () => {},
   listDeveloperKeyScopesSet: () => {},
   resetLtiState: () => {},
   saveLtiToolConfiguration: () => {},
@@ -166,6 +166,7 @@ const modal = extraProps => (
     mountNode={modalMountNode}
     selectedScopes={selectedScopes}
     store={{dispatch: () => Promise.resolve()}}
+    handleSuccessfulSave={() => {}}
     {...extraProps}
   />
 )
@@ -293,6 +294,64 @@ describe('scope selection', () => {
     wrapper.instance().submitForm()
     expect(flashStub).not.toHaveBeenCalled()
     wrapper.unmount()
+  })
+})
+
+describe('a11y checks', () => {
+  it('renders the saving spinner with a polite aria-live attribute', () => {
+    const wrapper = shallow(
+      modal({
+        createOrEditDeveloperKeyState: {
+          ...createDeveloperKeyState
+        },
+        actions: {
+          ...fakeActions
+        }
+      })
+    )
+
+    wrapper.setState({isSaving: true})
+
+    expect(wrapper.find('Spinner').first().getElement().props['aria-live']).toBe('polite')
+  })
+
+  describe('flash alerts checks', () => {
+    const successfulSaveStub = jest.fn()
+    const unsuccessfulSaveStub = jest.fn()
+
+    afterEach(() => {
+      successfulSaveStub.mockClear()
+      unsuccessfulSaveStub.mockClear()
+    })
+    describe('Developer Key gets edited and saved successfully', () => {
+      const updateLtiKeyStub = jest.fn().mockResolvedValue({
+        developer_key: developerKey,
+        tool_configuration: validToolConfig
+      })
+
+      it('calls the provided success handler function', async () => {
+        const wrapper = mount(
+          modal({
+            createOrEditDeveloperKeyState: {
+              ...createDeveloperKeyState
+            },
+            actions: {
+              ...fakeActions,
+              updateLtiKey: updateLtiKeyStub
+            },
+            handleSuccessfulSave: successfulSaveStub,
+          })
+        )
+
+        await wrapper
+          .instance()
+          .saveLTIKeyEdit(validToolConfig.extensions[0].settings, developerKey)
+
+        expect(updateLtiKeyStub).toHaveBeenCalled()
+        expect(successfulSaveStub).toHaveBeenCalledTimes(1)
+        wrapper.unmount()
+      })
+    })
   })
 })
 

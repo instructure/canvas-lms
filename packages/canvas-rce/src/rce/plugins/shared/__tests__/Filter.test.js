@@ -74,13 +74,13 @@ describe('RCE Plugins > Filter', () => {
   }
 
   it('does not render "Icon Maker Icons" option when the feature is disabled', () => {
-    renderComponent({use_rce_buttons_and_icons: false})
+    renderComponent({use_rce_icon_maker: false})
     fireEvent.click(getContentSubtypeField())
     expect(component.queryByText('Icon Maker Icons')).toBeNull()
   })
 
   it('renders "Icon Maker Icons" option when the feature is enabled', () => {
-    renderComponent({use_rce_buttons_and_icons: true})
+    renderComponent({use_rce_icon_maker: true})
     fireEvent.click(getContentSubtypeField())
     expect(component.queryByText('Icon Maker Icons')).toBeInTheDocument()
   })
@@ -193,7 +193,7 @@ describe('RCE Plugins > Filter', () => {
 
   describe('"Content Subtype" field', () => {
     beforeEach(() => {
-      renderComponent({userContextType: 'course', use_rce_buttons_and_icons: true})
+      renderComponent({userContextType: 'course', use_rce_icon_maker: true})
       selectContentType('User Files')
     })
 

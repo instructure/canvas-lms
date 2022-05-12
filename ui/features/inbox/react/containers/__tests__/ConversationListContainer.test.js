@@ -22,7 +22,7 @@ import {handlers} from '../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../shared/msw/mswServer'
 import React from 'react'
-import {render, fireEvent, waitFor} from '@testing-library/react'
+import {render, fireEvent, waitFor, screen} from '@testing-library/react'
 import waitForApolloLoading from '../../../util/waitForApolloLoading'
 import {responsiveQuerySizes} from '../../../util/utils'
 
@@ -127,6 +127,13 @@ describe('ConversationListContainer', () => {
   })
 
   describe('Selected Conversations', () => {
+    beforeEach(() => {
+      window.document.getSelection = () => {
+        return {
+          removeAllRanges: () => {}
+        }
+      }
+    })
     it('should track when conversations are clicked', async () => {
       const mock = jest.fn()
       const conversationList = await setup({
@@ -145,7 +152,73 @@ describe('ConversationListContainer', () => {
         })
       )
 
-      expect(mock.mock.calls.length).toBe(4)
+      expect(mock.mock.calls.length).toBe(3)
+    })
+
+    it('should be able to select range of conversations ASC', async () => {
+      const mock = jest.fn()
+      const conversationList = await setup({
+        onSelectConversation: mock,
+        scope: 'multipleConversations'
+      })
+      await waitForApolloLoading()
+
+      const conversations = await conversationList.findAllByTestId('conversationListItem-Item')
+      fireEvent.click(conversations[0])
+      fireEvent.click(conversations[2], {
+        shiftKey: true
+      })
+      const checkboxes = await conversationList.findAllByTestId('conversationListItem-Checkbox')
+      expect(checkboxes.filter(c => c.checked === true).length).toBe(3)
+    })
+
+    it('should be able to select range of conversations DESC', async () => {
+      const mock = jest.fn()
+      const conversationList = await setup({
+        onSelectConversation: mock,
+        scope: 'multipleConversations'
+      })
+      await waitForApolloLoading()
+
+      const conversations = await conversationList.findAllByTestId('conversationListItem-Item')
+      fireEvent.click(conversations[2])
+      fireEvent.click(conversations[0], {
+        shiftKey: true
+      })
+      const checkboxes = await conversationList.findAllByTestId('conversationListItem-Checkbox')
+      expect(checkboxes.filter(c => c.checked === true).length).toBe(3)
+    })
+  })
+
+  describe('responsiveness', () => {
+    describe('tablet', () => {
+      beforeEach(() => {
+        responsiveQuerySizes.mockImplementation(() => ({
+          tablet: {maxWidth: '67'}
+        }))
+      })
+
+      it('should emit correct test id for tablet', async () => {
+        const component = setup()
+        expect(component.container).toBeTruthy()
+        const listItem = await component.findByTestId('list-items-tablet')
+        expect(listItem).toBeTruthy()
+      })
+    })
+
+    describe('desktop', () => {
+      beforeEach(() => {
+        responsiveQuerySizes.mockImplementation(() => ({
+          desktop: {minWidth: '768'}
+        }))
+      })
+
+      it('should emit correct test id for desktop', async () => {
+        const component = setup()
+        expect(component.container).toBeTruthy()
+        const listItem = await screen.findByTestId('list-items-desktop')
+        expect(listItem).toBeTruthy()
+      })
     })
   })
 })

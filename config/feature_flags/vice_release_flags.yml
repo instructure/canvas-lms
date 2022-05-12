@@ -47,6 +47,14 @@ isolated_view:
     Discussions Redesign work.
   applies_to: SiteAdmin
 
+discussion_create:
+  state: hidden
+  display_name: Discussion Create/Edit Page React Update
+  description: |-
+    This feature flag enables the use of the updated
+    discussion create/edit page
+  applies_to: RootAccount
+
 react_inbox:
   state: hidden
   display_name: Update Inbox page to use react/instui

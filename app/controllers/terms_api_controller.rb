@@ -69,6 +69,11 @@
 #           "description": "Term date overrides for specific enrollment types",
 #           "example": {"StudentEnrollment": {"start_at": "2014-01-07T08:00:00-05:00", "end_at": "2014-05-14T05:00:00-04:0"}},
 #           "type": "object"
+#         },
+#         "course_count": {
+#           "description": "The number of courses in the term (available via include)",
+#           "example": "80",
+#           "type": "integer"
 #         }
 #       }
 #     }
@@ -104,6 +109,7 @@ class TermsApiController < ApplicationController
   #   Array of additional information to include.
   #
   #   "overrides":: term start/end dates overridden for different enrollment types
+  #   "course_count":: the number of courses in each term
   #
   # @example_request
   #   curl -H 'Authorization: Bearer <token>' \
@@ -159,7 +165,7 @@ class TermsApiController < ApplicationController
   # @returns EnrollmentTerm
   def show
     term = api_find(@context.enrollment_terms, params[:id])
-    render json: enrollment_term_json(term, @current_user, session, nil, %w[overrides])
+    render json: enrollment_term_json(term, @current_user, session, nil, %w[course_count overrides])
   end
 
   protected

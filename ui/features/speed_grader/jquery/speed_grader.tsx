@@ -3417,7 +3417,12 @@ EG = {
       formData['submission[score]'] = grade
     } else {
       // Any manually entered grade is a grade.
-      formData['submission[grade]'] = EG.formatGradeForSubmission(grade)
+
+      const formattedGrade = EG.formatGradeForSubmission(grade)
+      if (formattedGrade === 'NaN') {
+        return $.flashError(I18n.t('Invalid Grade'))
+      }
+      formData['submission[grade]'] = formattedGrade
     }
     if (ENV.grading_role === 'moderator' || ENV.grading_role === 'provisional_grader') {
       formData['submission[provisional]'] = true
@@ -3561,7 +3566,7 @@ EG = {
       formattedGrade = numberHelper.parse(formattedGrade)
       formattedGrade = round(formattedGrade, 2).toString()
 
-      if (EG.isGradingTypePercent()) {
+      if (EG.isGradingTypePercent() && formattedGrade !== 'NaN') {
         formattedGrade += '%'
       }
     }

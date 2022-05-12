@@ -121,8 +121,6 @@ describe "announcements" do
       end
 
       it "performs front-end validation for message", priority: "1" do
-        skip("Skip for now -- message box is not emitted with enhanced RCE LS-1851")
-
         topic_title = "new topic with file"
         get new_url
 
