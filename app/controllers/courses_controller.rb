@@ -3162,7 +3162,7 @@ class CoursesController < ApplicationController
       if @course.account.feature_enabled?(:course_paces) && (changes.keys & %w[start_at conclude_at restrict_enrollments_to_course_dates]).present?
         @course.course_paces.find_each(&:create_publish_progress)
       end
-      disable_conditional_release if changes[:conditional_release]&.last == false
+      @course.disable_conditional_release if changes[:conditional_release]&.last == false
 
       # RUBY 3.0 - **{} can go away, because data won't implicitly convert to kwargs
       @course.delay_if_production(priority: Delayed::LOW_PRIORITY).touch_content_if_public_visibility_changed(changes, **{})
@@ -3975,11 +3975,5 @@ class CoursesController < ApplicationController
       :show_announcements_on_home_page, :home_page_announcement_limit, :allow_final_grade_override, :filter_speed_grader_by_student_group, :homeroom_course,
       :template, :course_color, :homeroom_course_id, :sync_enrollments_from_homeroom, :friendly_name, :enable_course_paces, :default_due_time, :conditional_release
     )
-  end
-
-  def disable_conditional_release
-    ConditionalRelease::Service.delay_if_production(priority: Delayed::LOW_PRIORITY,
-                                                    n_strand: ["conditional_release_unassignment", @course.global_root_account_id])
-                               .release_mastery_paths_content_in_course(@course)
   end
 end
