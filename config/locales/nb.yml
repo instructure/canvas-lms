@@ -24426,7 +24426,7 @@ nb:
         assign_rubric: "Tildel vurderingsveiledning"
     select_content_dialog: 
       add_to_module: "Legg til %{item} til *modul*"
-      assignment_item: Assignment
+      assignment_item: Oppgave
       assignment_item_select_label: "Velg oppgave du vil knytte til, eller legger til en oppgave ved å velge \"Ny oppgave\"."
       assignment_item_select_label_create: "Velg oppgave du vil knytte til, eller legger til en oppgave ved å velge «Opprett oppgave»."
       assignment_item_select_label_new: "Velg oppgave du vil knytte til, eller legger til en oppgave ved å velge «Ny oppgave»."
