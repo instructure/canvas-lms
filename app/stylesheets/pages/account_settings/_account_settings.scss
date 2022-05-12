@@ -232,6 +232,21 @@
   display: none;
 }
 
+.caution-text {
+  display: flex;
+  & i {
+    color: $ic-color-danger;
+    margin-#{direction(left)}: -0.1rem;
+    margin-#{direction(right)}: 0.3rem;
+  }
+  & p {
+    margin: 0;
+  }
+  &:not(.shown) {
+    display: none;
+  }
+}
+
 #survey_announcement_field {
   line-height: 30px;
   input#account_notification_months_in_display_cycle {

@@ -2464,4 +2464,76 @@ describe Account do
       expect(act.unless_dummy).to be(act)
     end
   end
+
+  describe "#update_conditional_release" do
+    let(:root_account) { account_model }
+    let(:root_account_course) { course_model(account: root_account) }
+    let(:sub_account) { account_model(root_account: root_account) }
+    let(:sub_account_course) { course_model(account: sub_account) }
+
+    before do
+      root_account.settings[:conditional_release] = { value: true, locked: false }
+      root_account.save!
+      sub_account.settings[:conditional_release] = { value: true, locked: false }
+      sub_account.save!
+    end
+
+    it "disables conditional release for courses if not enabled" do
+      root_account_course.conditional_release = true
+      root_account_course.save!
+      expect(root_account_course.conditional_release).to eq(true)
+      root_account.settings[:conditional_release] = { value: false, locked: false }
+      root_account.save!
+      root_account.update_conditional_release
+      root_account_course.reload
+      expect(root_account_course.conditional_release).to eq(false)
+    end
+
+    it "allows courses to use conditional release if enabled" do
+      expect(root_account.conditional_release?).to eq(true)
+      expect(root_account_course.account.conditional_release?).to eq(true)
+    end
+
+    it "allows sub-account courses to use conditional release if enabled and locked" do
+      root_account.settings[:conditional_release] = { value: true, locked: true }
+      root_account.save!
+      sub_account.settings[:conditional_release] = { value: false, locked: false }
+      sub_account.save!
+      root_account.update_conditional_release
+      expect(sub_account_course.account.conditional_release?).to eq(true)
+    end
+
+    it "updates sub-accounts when the root account is updated" do
+      root_account.settings[:conditional_release] = { value: true, locked: true }
+      root_account.save!
+      sub_account.settings[:conditional_release] = { value: false, locked: false }
+      sub_account.save!
+
+      expect(sub_account_course.account.conditional_release?).to eq(true)
+      root_account.settings[:conditional_release] = { value: true, locked: false }
+      root_account.save!
+      root_account.update_conditional_release
+      sub_account_course.account.reload
+      expect(sub_account_course.account.conditional_release?).to eq(false)
+    end
+
+    it "disables sub-account courses if not enabled and locked at the root level" do
+      root_account.settings[:conditional_release] = { value: false, locked: false }
+      root_account.save!
+      sub_account.settings[:conditional_release] = { value: true, locked: false }
+      sub_account.save!
+      sub_account_course.conditional_release = true
+      sub_account_course.save!
+
+      expect(sub_account_course.account.conditional_release?).to eq(true)
+      expect(sub_account_course.conditional_release).to eq(true)
+      root_account.settings[:conditional_release] = { value: false, locked: true }
+      root_account.save!
+      root_account.update_conditional_release
+      sub_account_course.account.reload
+      sub_account_course.reload
+      expect(sub_account_course.account.conditional_release?).to eq(false)
+      expect(sub_account_course.conditional_release).to eq(false)
+    end
+  end
 end

@@ -509,6 +509,10 @@ $(document).ready(function () {
     })
     .trigger('change')
 
+  $('#account_settings_conditional_release_value').change(function () {
+    $('#conditional_release_caution_text').toggleClass('shown', !this.checked)
+  })
+
   const $rce_container = $('#custom_tos_rce_container')
   $('#terms_of_service_modal').hide()
   if ($rce_container.length > 0) {
