@@ -935,3 +935,22 @@ describe Canvadocs do
     end
   end
 end
+
+describe Canvadocs::API do
+  let(:canvadocs_api) { Canvadocs::API.new(token: "secret") }
+
+  describe ".api_call" do
+    it "raises HeavyLoadError when the response is 503 or 504" do
+      response = double
+      allow(response).to receive(:code).and_return("503")
+      allow(response).to receive(:body).and_return("Too busy")
+
+      allow_any_instance_of(Net::HTTP).to receive(:request).and_return(response)
+      expect { canvadocs_api.api_call("get", "endpoint") }.to raise_error(Canvadocs::HeavyLoadError)
+
+      allow(response).to receive(:code).and_return("504")
+      allow_any_instance_of(Net::HTTP).to receive(:request).and_return(response)
+      expect { canvadocs_api.api_call("get", "endpoint") }.to raise_error(Canvadocs::HeavyLoadError)
+    end
+  end
+end
