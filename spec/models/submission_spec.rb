@@ -8258,7 +8258,7 @@ describe Submission do
 
   describe "send_timing_data_if_needed" do
     it "calls Statsd when a classic quiz is manually graded" do
-      expect(InstStatsd::Statsd).to receive(:gauge).once.with("submission.manually_graded.grading_time", 600.0, "1.0", tags: { quiz_type: "classic_quiz" })
+      expect(InstStatsd::Statsd).to receive(:gauge).once.with("submission.manually_graded.grading_time", 600.0, 1.0, tags: { quiz_type: "classic_quiz" })
 
       now = Time.now
       Timecop.freeze(now) do
@@ -8272,7 +8272,7 @@ describe Submission do
     end
 
     it "calls Statsd when a new quiz is manually graded" do
-      expect(InstStatsd::Statsd).to receive(:gauge).once.with("submission.manually_graded.grading_time", 300.0, "1.0", tags: { quiz_type: "new_quiz" })
+      expect(InstStatsd::Statsd).to receive(:gauge).once.with("submission.manually_graded.grading_time", 300.0, 1.0, tags: { quiz_type: "new_quiz" })
 
       now = Time.now
       Timecop.freeze(now) do
