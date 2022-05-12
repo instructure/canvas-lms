@@ -54,6 +54,103 @@ describe JwtsController do
       end
     end
 
+    context "with workflows that doesn't require context" do
+      before { user_session(token_user) }
+
+      it "generates a token that doesn't have context_id" do
+        post "create", params: { workflows: ["ui"] }, format: "json"
+        decrypted_token_body = translate_token.call(response)
+        expect(decrypted_token_body).to_not have_key(:context_id)
+      end
+
+      it "generates a token that doesn't have context_type" do
+        post "create", params: { workflows: ["ui"] }, format: "json"
+        decrypted_token_body = translate_token.call(response)
+        expect(decrypted_token_body).to_not have_key(:context_type)
+      end
+    end
+
+    context "with workflows that require context" do
+      before :once do
+        course_with_teacher(active_all: true)
+        @context_id = @course.id
+        @context_uuid = @course.uuid
+      end
+
+      before { user_session(@teacher) }
+
+      let(:params) { { workflows: ["ui", "rich_content"], context_type: "Course", context_id: @context_id } }
+
+      it "generates a token that has course context_id" do
+        post "create", params: params, format: "json"
+        decrypted_token_body = translate_token.call(response)
+        expect(decrypted_token_body[:context_id]).to eq(@context_id.to_s)
+      end
+
+      it "generates a token that has course context_type" do
+        post "create", params: params, format: "json"
+        decrypted_token_body = translate_token.call(response)
+        expect(decrypted_token_body[:context_type]).to eq("Course")
+      end
+
+      it "generates a token that has user context_id" do
+        post "create", params: params.merge(context_type: "User", context_id: @teacher.id), format: "json"
+        decrypted_token_body = translate_token.call(response)
+        expect(decrypted_token_body[:context_id]).to eq(@teacher.id.to_s)
+      end
+
+      it "generates a token that has user context_type" do
+        post "create", params: params.merge(context_type: "User", context_id: @teacher.id), format: "json"
+        decrypted_token_body = translate_token.call(response)
+        expect(decrypted_token_body[:context_type]).to eq("User")
+      end
+
+      context "returns error when" do
+        it "context_type param is missing" do
+          post "create", params: params.except(:context_type), format: "json"
+          expect(response.status).to eq(400)
+          expect(response.body).to match(/Missing context_type parameter./)
+        end
+
+        it "context_id or context_uuid param is missing" do
+          post "create", params: params.except(:context_id), format: "json"
+          expect(response.status).to eq(400)
+          expect(response.body).to match(/Missing context_id or context_uuid parameter./)
+        end
+
+        it "context_type and context_uuid are passed" do
+          post "create", params: params.merge({ context_uuid: @context_uuid }), format: "json"
+          expect(response.status).to eq(400)
+          expect(response.body).to match(/Should provide context_id or context_uuid parameters, but not both./)
+        end
+
+        it "context_type is invalid" do
+          post "create", params: params.merge({ context_type: "unknown" }), format: "json"
+          expect(response.status).to eq(400)
+          expect(response.body).to match(/Invalid context_type parameter./)
+        end
+
+        it "context not found with id" do
+          post "create", params: params.merge({ context_id: "unknown" }), format: "json"
+          expect(response.status).to eq(404)
+          expect(response.body).to match(/Context not found./)
+        end
+
+        it "context not found with uuid" do
+          post "create", params: params.except(:context_id).merge({ context_uuid: "unknown" }), format: "json"
+          expect(response.status).to eq(404)
+          expect(response.body).to match(/Context not found./)
+        end
+
+        it "context is unauthorized" do
+          generic_user = user_factory
+          user_session(generic_user)
+          post "create", params: params, format: "json"
+          assert_unauthorized
+        end
+      end
+    end
+
     it "doesn't allow using a token to gen a token" do
       token = build_wrapped_token(token_user.global_id)
       @request.headers["Authorization"] = "Bearer #{token}"
