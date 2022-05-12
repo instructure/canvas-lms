@@ -70,17 +70,6 @@ describe "observer k5 dashboard" do
       expect(announcement_title(announcement_heading1)).to be_displayed
     end
 
-    it "shows missing assignments on dashboard schedule tab" do
-      skip("needs at least LS-2481")
-      now = Time.zone.now
-      create_dated_assignment(@subject_course, "missing assignment1", 1.day.ago(now))
-      create_dated_assignment(@subject_course, "missing assignment2", 1.day.ago(now))
-
-      get "/#schedule"
-
-      expect(missing_data.text).to eq("Show 2 missing items")
-    end
-
     it "show the grades progress bar with the appropriate progress" do
       subject_grade = "75"
 

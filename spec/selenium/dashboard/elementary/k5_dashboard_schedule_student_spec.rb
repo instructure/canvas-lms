@@ -117,15 +117,6 @@ describe "student k5 dashboard schedule" do
       expect(items_missing_exists?).to be_truthy
     end
 
-    it "shows missing items and count if there are missing items" do
-      create_dated_assignment(@subject_course, "missing assignment1", 1.day.ago(@now))
-      create_dated_assignment(@subject_course, "missing assignment2", 1.day.ago(@now))
-
-      get "/#schedule"
-
-      expect(missing_data.text).to eq("Show 2 missing items")
-    end
-
     it "shows the list of missing assignments in dropdown" do
       skip("LS-2203 click_missing items is not working right all the time. unskip when fixed")
       assignment1 = create_dated_assignment(@subject_course, "missing assignment1", 1.day.ago(@now))
