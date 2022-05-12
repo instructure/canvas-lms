@@ -458,8 +458,8 @@ describe Account do
     end
 
     it "is able to specify a list of enabled services" do
-      @a.allowed_services = "twitter"
-      expect(@a.service_enabled?(:twitter)).to be_truthy
+      @a.allowed_services = "fakeService"
+      # expect(@a.service_enabled?(:twitter)).to be_truthy
       expect(@a.service_enabled?(:diigo)).to be_falsey
       expect(@a.service_enabled?(:avatars)).to be_falsey
     end
@@ -469,29 +469,22 @@ describe Account do
     end
 
     it "adds and remove services from the defaults" do
-      @a.allowed_services = "+avatars,-twitter"
+      @a.allowed_services = "+avatars,-myplugin"
       expect(@a.service_enabled?(:avatars)).to be_truthy
-      expect(@a.service_enabled?(:twitter)).to be_falsey
+      expect(@a.service_enabled?(:myplugin)).to be_falsey
     end
 
     it "allows settings services" do
       expect { @a.enable_service(:completly_bogs) }.to raise_error("Invalid Service")
 
-      @a.disable_service(:twitter)
-      expect(@a.service_enabled?(:twitter)).to be_falsey
+      @a.disable_service(:avatars)
+      expect(@a.service_enabled?(:avatars)).to be_falsey
 
-      @a.enable_service(:twitter)
-      expect(@a.service_enabled?(:twitter)).to be_truthy
+      @a.enable_service(:avatars)
+      expect(@a.service_enabled?(:avatars)).to be_truthy
     end
 
     it "uses + and - by default when setting service availability" do
-      @a.enable_service(:twitter)
-      expect(@a.service_enabled?(:twitter)).to be_truthy
-      expect(@a.allowed_services).to be_nil
-
-      @a.disable_service(:twitter)
-      expect(@a.allowed_services).to match("\\-twitter")
-
       @a.disable_service(:avatars)
       expect(@a.service_enabled?(:avatars)).to be_falsey
       expect(@a.allowed_services).not_to match("avatars")
@@ -504,13 +497,12 @@ describe Account do
     it "is able to set service availibity for previously hard-coded values" do
       @a.allowed_services = "avatars"
 
-      @a.enable_service(:twitter)
-      expect(@a.service_enabled?(:twitter)).to be_truthy
-      expect(@a.allowed_services).to match(/twitter/)
+      @a.enable_service(:avatars)
+      expect(@a.service_enabled?(:avatars)).to be_truthy
+      expect(@a.allowed_services).to match(/avatars/)
       expect(@a.allowed_services).not_to match(/[+-]/)
 
       @a.disable_service(:avatars)
-      @a.disable_service(:twitter)
       expect(@a.allowed_services).to be_nil
     end
 
