@@ -2998,7 +2998,7 @@ class Submission < ActiveRecord::Base
 
     InstStatsd::Statsd.gauge("submission.manually_graded.grading_time",
                              time,
-                             Setting.get("submission_grading_timing_sample_rate", "1.0"),
+                             Setting.get("submission_grading_timing_sample_rate", "1.0").to_f,
                              tags: { quiz_type: submission_type == "online_quiz" ? "classic_quiz" : "new_quiz" })
   end
 end
