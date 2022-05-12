@@ -105,7 +105,7 @@ const AlignmentOutcomeItem = ({title, description, alignmentCount}) => {
             )}
           </div>
         </Flex.Item>
-        <Flex.Item size="7rem" alignSelf="end">
+        <Flex.Item size="9rem" alignSelf="end">
           <div
             style={{
               padding: '0.4375rem 0.5rem 0 0',
@@ -117,7 +117,7 @@ const AlignmentOutcomeItem = ({title, description, alignmentCount}) => {
               {alignmentCount}
             </Text>
             <View padding="0 xxx-small 0 0">
-              <Text size="medium">{`${I18n.t('Aligned')}:`}</Text>
+              <Text size="medium">{`${I18n.t('Alignments')}:`}</Text>
             </View>
           </div>
         </Flex.Item>
