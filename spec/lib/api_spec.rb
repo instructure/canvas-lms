@@ -80,8 +80,8 @@ describe Api do
     it "finds record from other root account explicitly" do
       account = Account.create(name: "new")
       @user = user_with_pseudonym username: "sis_user_1@example.com", account: account
-      expect(Api).to receive(:sis_parse_id).with("root_account:school:sis_login_id:sis_user_1@example.com", anything, anything, anything)
-                                           .and_return(["LOWER(pseudonyms.unique_id)", [QuotedValue.new("LOWER('sis_user_1@example.com')"), account]])
+      expect(Api).to receive(:sis_parse_id).with("root_account:school:sis_login_id:sis_user_1@example.com", anything, anything)
+                                           .and_return(["sis_login_id", ["sis_user_1@example.com", account]])
       expect(@api.api_find(User, "root_account:school:sis_login_id:sis_user_1@example.com")).to eq @user
     end
 
@@ -185,6 +185,23 @@ describe Api do
       @user.lti_context_id = Canvas::Security.hmac_sha1(@user.asset_string.to_s, "key")
       @user.save!
       expect(@api.api_find(User, "lti_user_id:#{@user.lti_context_id}")).to eq @user
+    end
+
+    it "finds merged user by their previous lti_context_id" do
+      @user.update!(lti_context_id: Canvas::Security.hmac_sha1(@user.asset_string.to_s, "key"))
+
+      user2 = User.create!
+      user2_lti_context_id = Canvas::Security.hmac_sha1(user2.asset_string.to_s, "key")
+      user2.update!(lti_context_id: user2_lti_context_id)
+
+      course = course_factory(active_all: true)
+      course.enroll_user(@user)
+      course2 = course_factory(active_all: true)
+      course2.enroll_user(user2)
+
+      UserMerge.from(user2).into(@user)
+
+      expect(@api.api_find(User, "lti_user_id:#{user2_lti_context_id}")).to eq @user
     end
 
     it "finds user by lti_context_id, aliased to lti_1_1_id" do
@@ -337,9 +354,11 @@ describe Api do
           @user = user_with_pseudonym username: "sis_user_1@example.com", account: @account
         end
         expect(Api).to receive(:sis_parse_id)
-          .with("root_account:school:sis_login_id:sis_user_1@example.com", anything, anything, anything)
+          .with("root_account:school:sis_login_id:sis_user_1@example.com", anything, anything)
           .twice
-          .and_return(["LOWER(pseudonyms.unique_id)", [QuotedValue.new("LOWER('sis_user_1@example.com')"), @account]])
+          .and_return(["sis_login_id", ["sis_user_1@example.com", @account]])
+        # TODO: make sure there is a test for if the MRA sis_parse_id adds an acct to the
+        # sis_id, and then a transform is also called on it.
         expect(@api.api_find(User, "root_account:school:sis_login_id:sis_user_1@example.com")).to eq @user
         # works through an association, too
         account2 = Account.create!
@@ -352,19 +371,19 @@ describe Api do
 
   context "map_ids" do
     it "maps an empty list" do
-      expect(Api.map_ids([], User, Account.default)).to eq []
+      expect(Api.map_ids([], User, Account.default)).to eq([])
     end
 
     it "maps a list of AR ids" do
-      expect(Api.map_ids([1, 2, "3", "4"], User, Account.default).sort).to eq [1, 2, 3, 4]
+      expect(Api.map_ids([1, 2, "3", "4"], User, Account.default).sort).to eq([1, 2, 3, 4])
     end
 
     it "bails on ids it can't figure out" do
-      expect(Api.map_ids(["nonexistentcolumn:5", "sis_nonexistentcolumn:6", 7], User, Account.default)).to eq [7]
+      expect(Api.map_ids(["nonexistentcolumn:5", "sis_nonexistentcolumn:6", 7], User, Account.default)).to eq([7])
     end
 
     it "filters out sis ids that don't exist, but not filter out AR ids" do
-      expect(Api.map_ids(["sis_user_id:1", "2"], User, Account.default)).to eq [2]
+      expect(Api.map_ids(["sis_user_id:1", "2"], User, Account.default)).to eq([2])
     end
 
     it "finds sis ids that exist" do
@@ -416,8 +435,8 @@ describe Api do
       relation_result = double(eager_load_values: nil, pluck: pluck_result)
       expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ lookups: { "id" => "test-lookup" } })
       expect(Api).to receive(:sis_parse_ids).with("test-ids", { "id" => "test-lookup" }, anything, root_account: "test-root-account")
-                                            .and_return({ "test-lookup" => ["thing1", "thing2"], "other-lookup" => ["thing2", "thing3"] })
-      expect(Api).to receive(:relation_for_sis_mapping_and_columns).with(collection, { "other-lookup" => ["thing2", "thing3"] }, { lookups: { "id" => "test-lookup" } }, "test-root-account").and_return(relation_result)
+                                            .and_return({ "test-lookup" => { ids: ["thing1", "thing2"] }, "other-lookup" => { ids: ["thing2", "thing3"] } })
+      expect(Api).to receive(:relation_for_sis_mapping_and_columns).with(collection, { "other-lookup" => { ids: ["thing2", "thing3"] } }, { lookups: { "id" => "test-lookup" } }, "test-root-account").and_return(relation_result)
       expect(Api.map_ids("test-ids", collection, "test-root-account")).to eq %w[thing1 thing2 thing3]
     end
 
@@ -436,7 +455,7 @@ describe Api do
       collection = double
       expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ lookups: { "id" => "test-lookup" } })
       expect(Api).to receive(:sis_parse_ids).with("test-ids", { "id" => "test-lookup" }, anything, root_account: "test-root-account")
-                                            .and_return({ "test-lookup" => ["thing1", "thing2"] })
+                                            .and_return({ "test-lookup" => { ids: ["thing1", "thing2"] } })
       expect(Api).not_to receive(:relation_for_sis_mapping_and_columns)
       expect(Api.map_ids("test-ids", collection, "test-root-account")).to eq ["thing1", "thing2"]
     end
@@ -457,56 +476,67 @@ describe Api do
     end
 
     it "handles numeric ids" do
-      expect(Api.sis_parse_id(1, @lookups)).to eq ["users.id", 1]
-      expect(Api.sis_parse_id(10, @lookups)).to eq ["users.id", 10]
+      # TODO: check for the "users.id" part in a separate sis_parse_ids test
+      expect(Api.sis_parse_id(1)).to eq ["id", 1]
+      expect(Api.sis_parse_id(10)).to eq ["id", 10]
     end
 
     it "handles numeric ids as strings" do
-      expect(Api.sis_parse_id("1", @lookups)).to eq ["users.id", 1]
-      expect(Api.sis_parse_id("10", @lookups)).to eq ["users.id", 10]
+      expect(Api.sis_parse_id("1")).to eq ["id", 1]
+      expect(Api.sis_parse_id("10")).to eq ["id", 10]
     end
 
     it "handles hex_encoded sis_fields" do
-      expect(Api.sis_parse_id("hex:sis_login_id:7369737573657233406578616d706c652e636f6d", @lookups)).to eq ["LOWER(pseudonyms.unique_id)", "LOWER('sisuser3@example.com')"]
-      expect(Api.sis_parse_id("hex:sis_user_id:7369737573657234406578616d706c652e636f6d", @lookups)).to eq ["pseudonyms.sis_user_id", "sisuser4@example.com"]
+      expect(Api.sis_parse_id("hex:sis_login_id:7369737573657233406578616d706c652e636f6d")).to eq ["sis_login_id", "sisuser3@example.com"]
+      expect(Api.sis_parse_id("hex:sis_user_id:7369737573657234406578616d706c652e636f6d")).to eq ["sis_user_id", "sisuser4@example.com"]
     end
 
     it "does not handle invalid hex fields" do
-      expect(Api.sis_parse_id("hex:sis_user_id:7369737573657234406578616g706c652e636f6d", @lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("hex:sis_user_id:7369737573657234406578616d06c652e636f6d", @lookups)).to eq [nil, nil]
+      expect(Api.sis_parse_id("hex:sis_user_id:7369737573657234406578616g706c652e636f6d")).to eq [nil, nil]
+      expect(Api.sis_parse_id("hex:sis_user_id:7369737573657234406578616d06c652e636f6d")).to eq [nil, nil]
     end
 
     it "does not handle hex_encoded non-sis fields" do
-      expect(Api.sis_parse_id("hex:id:7369737573657233406578616d706c652e636f6d", @lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("hex:1234", @lookups)).to eq [nil, nil]
+      expect(Api.sis_parse_id("hex:id:7369737573657233406578616d706c652e636f6d")).to eq [nil, nil]
+      expect(Api.sis_parse_id("hex:1234")).to eq [nil, nil]
     end
 
     it "handles plain sis_fields" do
-      expect(Api.sis_parse_id("sis_login_id:sisuser3@example.com", @lookups)).to eq ["LOWER(pseudonyms.unique_id)", "LOWER('sisuser3@example.com')"]
-      expect(Api.sis_parse_id("sis_user_id:sisuser4", @lookups)).to eq ["pseudonyms.sis_user_id", "sisuser4"]
+      expect(Api.sis_parse_id("sis_login_id:sisuser3@example.com")).to eq ["sis_login_id", "sisuser3@example.com"]
+      expect(Api.sis_parse_id("sis_user_id:sisuser4")).to eq ["sis_user_id", "sisuser4"]
     end
 
     it "does not handle plain sis_fields that don't exist" do
-      expect(Api.sis_parse_id("sis_nonexistent_column:1", @lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("sis_nonexistent:a", @lookups)).to eq [nil, nil]
+      # TODO: make sure this is the same behavior before
+      expect(Api.sis_parse_id("sis_nonexistent_column:1")).to eq(["sis_nonexistent_column", "1"])
+      expect(Api.sis_parse_id("sis_nonexistent:a")).to eq(["sis_nonexistent", "a"])
+
+      expect(Api.sis_parse_ids(["sis_nonexistent_column:1"], @lookups)).to eq({})
+      expect(Api.sis_parse_ids(["sis_nonexistent:1"], @lookups)).to eq({})
     end
 
     it "does not handle other things" do
-      expect(Api.sis_parse_id("id:1", @lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("a1", @lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("\t10\n11 ", @lookups)).to eq [nil, nil]
+      expect(Api.sis_parse_id("id:1")).to eq [nil, nil]
+      expect(Api.sis_parse_id("a1")).to eq [nil, nil]
+      expect(Api.sis_parse_id("\t10\n11 ")).to eq [nil, nil]
     end
 
     it "handles surrounding whitespace" do
-      expect(Api.sis_parse_id("\t10  ", @lookups)).to eq ["users.id", 10]
-      expect(Api.sis_parse_id("\t10\n", @lookups)).to eq ["users.id", 10]
-      expect(Api.sis_parse_id("  hex:sis_login_id:7369737573657233406578616d706c652e636f6d     ", @lookups)).to eq ["LOWER(pseudonyms.unique_id)", "LOWER('sisuser3@example.com')"]
-      expect(Api.sis_parse_id("  sis_login_id:sisuser3@example.com\t", @lookups)).to eq ["LOWER(pseudonyms.unique_id)", "LOWER('sisuser3@example.com')"]
+      expect(Api.sis_parse_id("\t10  ")).to eq ["id", 10]
+      expect(Api.sis_parse_id("\t10\n")).to eq ["id", 10]
+
+      expect(Api.sis_parse_id("  hex:sis_login_id:7369737573657233406578616d706c652e636f6d     ")).to eq ["sis_login_id", "sisuser3@example.com"]
+      expect(Api.sis_parse_ids(["  hex:sis_login_id:7369737573657233406578616d706c652e636f6d     "], @lookups)).to eq({ "LOWER(pseudonyms.unique_id)" => { ids: ["LOWER('sisuser3@example.com')"] } })
+
+      expect(Api.sis_parse_id("  sis_login_id:sisuser3@example.com\t")).to eq ["sis_login_id", "sisuser3@example.com"]
+      expect(Api.sis_parse_ids(["  sis_login_id:sisuser3@example.com\t"], @lookups)).to eq({ "LOWER(pseudonyms.unique_id)" => { ids: ["LOWER('sisuser3@example.com')"] } })
     end
 
     it "handles user uuid" do
-      expect(Api.sis_parse_id("uuid:tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0", @lookups)).to \
-        eq ["users.uuid", "tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0"]
+      expect(Api.sis_parse_id("uuid:tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0")).to \
+        eq ["uuid", "tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0"]
+      expect(Api.sis_parse_ids(["uuid:tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0"], @lookups)).to \
+        eq({ "users.uuid" => { ids: ["tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0"] } })
     end
   end
 
@@ -516,27 +546,27 @@ describe Api do
     end
 
     it "handles a list of ar_ids" do
-      expect(Api.sis_parse_ids([1, 2, 3], @lookups)).to eq({ "users.id" => [1, 2, 3] })
-      expect(Api.sis_parse_ids(%w[1 2 3], @lookups)).to eq({ "users.id" => [1, 2, 3] })
+      expect(Api.sis_parse_ids([1, 2, 3], @lookups)).to eq({ "users.id" => { ids: [1, 2, 3] } })
+      expect(Api.sis_parse_ids(%w[1 2 3], @lookups)).to eq({ "users.id" => { ids: [1, 2, 3] } })
     end
 
     it "handles a list of sis ids" do
-      expect(Api.sis_parse_ids(["sis_user_id:U1", "sis_user_id:U2", "sis_user_id:U3"], @lookups)).to eq({ "pseudonyms.sis_user_id" => %w[U1 U2 U3] })
+      expect(Api.sis_parse_ids(["sis_user_id:U1", "sis_user_id:U2", "sis_user_id:U3"], @lookups)).to eq({ "pseudonyms.sis_user_id" => { ids: %w[U1 U2 U3] } })
     end
 
     it "removes duplicates" do
-      expect(Api.sis_parse_ids([1, 2, 3, 2], @lookups)).to eq({ "users.id" => [1, 2, 3] })
-      expect(Api.sis_parse_ids([1, 2, 2, 3], @lookups)).to eq({ "users.id" => [1, 2, 3] })
-      expect(Api.sis_parse_ids(["sis_user_id:U1", "sis_user_id:U2", "sis_user_id:U2", "sis_user_id:U3"], @lookups)).to eq({ "pseudonyms.sis_user_id" => %w[U1 U2 U3] })
-      expect(Api.sis_parse_ids(["sis_user_id:U1", "sis_user_id:U2", "sis_user_id:U3", "sis_user_id:U2"], @lookups)).to eq({ "pseudonyms.sis_user_id" => %w[U1 U2 U3] })
+      expect(Api.sis_parse_ids([1, 2, 3, 2], @lookups)).to eq({ "users.id" => { ids: [1, 2, 3] } })
+      expect(Api.sis_parse_ids([1, 2, 2, 3], @lookups)).to eq({ "users.id" => { ids: [1, 2, 3] } })
+      expect(Api.sis_parse_ids(["sis_user_id:U1", "sis_user_id:U2", "sis_user_id:U2", "sis_user_id:U3"], @lookups)).to eq({ "pseudonyms.sis_user_id" => { ids: %w[U1 U2 U3] } })
+      expect(Api.sis_parse_ids(["sis_user_id:U1", "sis_user_id:U2", "sis_user_id:U3", "sis_user_id:U2"], @lookups)).to eq({ "pseudonyms.sis_user_id" => { ids: %w[U1 U2 U3] } })
     end
 
     it "works with mixed sis id types" do
-      expect(Api.sis_parse_ids([1, 2, "sis_user_id:U1", 3, "sis_user_id:U2", "sis_user_id:U3", "sis_login_id:A1"], @lookups)).to eq({ "users.id" => [1, 2, 3], "pseudonyms.sis_user_id" => %w[U1 U2 U3], "LOWER(pseudonyms.unique_id)" => ["LOWER('A1')"] })
+      expect(Api.sis_parse_ids([1, 2, "sis_user_id:U1", 3, "sis_user_id:U2", "sis_user_id:U3", "sis_login_id:A1"], @lookups)).to eq({ "users.id" => { ids: [1, 2, 3] }, "pseudonyms.sis_user_id" => { ids: %w[U1 U2 U3] }, "LOWER(pseudonyms.unique_id)" => { ids: ["LOWER('A1')"] } })
     end
 
     it "skips invalid things" do
-      expect(Api.sis_parse_ids([1, 2, 3, "a1", "invalid", "sis_nonexistent:3"], @lookups)).to eq({ "users.id" => [1, 2, 3] })
+      expect(Api.sis_parse_ids([1, 2, 3, "a1", "invalid", "sis_nonexistent:3"], @lookups)).to eq({ "users.id" => { ids: [1, 2, 3] } })
     end
   end
 
@@ -580,7 +610,7 @@ describe Api do
     end
 
     it "properly generates an escaped arg string" do
-      expect(Api.relation_for_sis_mapping_and_columns(User, { "id" => ["1", 2, 3] }, { scope: "scope" }, Account.default).to_sql).to match(/\(scope = #{Account.default.id} AND id IN \('1',2,3\)\)/)
+      expect(Api.relation_for_sis_mapping_and_columns(User, { "id" => { ids: ["1", 2, 3] } }, { scope: "scope" }, Account.default).to_sql).to match(/\(scope = #{Account.default.id} AND \(id IN \('1',2,3\)\)\)/)
     end
 
     it "works with no columns" do
@@ -588,111 +618,111 @@ describe Api do
     end
 
     it "adds in joins if the sis_mapping has some with columns" do
-      expect(Api.relation_for_sis_mapping_and_columns(User, { "id" => ["1", 2, 3] }, { scope: "scope", joins: "some joins" }, Account.default).eager_load_values).to eq ["some joins"]
+      expect(Api.relation_for_sis_mapping_and_columns(User, { "id" => { ids: ["1", 2, 3] } }, { scope: "scope", joins: "some joins" }, Account.default).eager_load_values).to eq ["some joins"]
     end
 
     it "works with a few different column types and account scopings" do
-      expect(Api.relation_for_sis_mapping_and_columns(User, { "id1" => [1, 2, 3], "id2" => %w[a b c], "id3" => %w[s1 s2 s3] }, { scope: "some_scope", is_not_scoped_to_account: ["id3"].to_set }, Account.default).to_sql).to match(/\(\(some_scope = #{Account.default.id} AND id1 IN \(1,2,3\)\) OR \(some_scope = #{Account.default.id} AND id2 IN \('a','b','c'\)\) OR id3 IN \('s1','s2','s3'\)\)/)
+      expect(Api.relation_for_sis_mapping_and_columns(User, { "id1" => { ids: [1, 2, 3] }, "id2" => { ids: %w[a b c] }, "id3" => { ids: %w[s1 s2 s3] } }, { scope: "some_scope", is_not_scoped_to_account: ["id3"] }, Account.default).to_sql).to match(/\(\(some_scope = #{Account.default.id} AND \(id1 IN \(1,2,3\)\)\) OR \(some_scope = #{Account.default.id} AND \(id2 IN \('a','b','c'\)\)\) OR id3 IN \('s1','s2','s3'\)\)/)
     end
 
     it "fails if we're scoping to an account and the scope isn't provided" do
-      expect(-> { Api.relation_for_sis_mapping_and_columns(User, { "id" => ["1", 2, 3] }, {}, Account.default) }).to raise_error("missing scope for collection")
+      expect(-> { Api.relation_for_sis_mapping_and_columns(User, { "id" => { ids: ["1", 2, 3] } }, {}, Account.default) }).to raise_error("missing scope for collection")
     end
   end
 
   context "sis_mappings" do
     it "captures course lookups correctly" do
       lookups = Api.sis_find_sis_mapping_for_collection(Course)[:lookups]
-      expect(Api.sis_parse_id("sis_course_id:1", lookups)).to eq ["sis_source_id", "1"]
-      expect(Api.sis_parse_id("sis_term_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("sis_user_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("sis_login_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("sis_account_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("sis_section_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("1", lookups)).to eq ["id", 1]
+      expect(Api.sis_parse_ids(["sis_course_id:1"], lookups)).to eq({ "sis_source_id" => { ids: ["1"] } })
+      expect(Api.sis_parse_ids(["sis_term_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["sis_user_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["sis_login_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["sis_account_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["sis_section_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["1"], lookups)).to eq({ "id" => { ids: [1] } })
     end
 
     it "captures enrollment_term lookups correctly" do
       lookups = Api.sis_find_sis_mapping_for_collection(EnrollmentTerm)[:lookups]
-      expect(Api.sis_parse_id("sis_term_id:1", lookups)).to eq ["sis_source_id", "1"]
-      expect(Api.sis_parse_id("sis_course_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("sis_user_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("sis_login_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("sis_account_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("sis_section_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("1", lookups)).to eq ["id", 1]
+      expect(Api.sis_parse_ids(["sis_term_id:1"], lookups)).to eq("sis_source_id" => { ids: ["1"] })
+      expect(Api.sis_parse_ids(["sis_course_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["sis_user_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["sis_login_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["sis_account_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["sis_section_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["1"], lookups)).to eq("id" => { ids: [1] })
     end
 
     it "capture user lookups correctly" do
       lookups = Api.sis_find_sis_mapping_for_collection(User)[:lookups]
-      expect(Api.sis_parse_id("sis_user_id:1", lookups)).to eq ["pseudonyms.sis_user_id", "1"]
-      expect(Api.sis_parse_id("sis_login_id:1", lookups)).to eq ["LOWER(pseudonyms.unique_id)", "LOWER('1')"]
-      expect(Api.sis_parse_id("sis_course_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("sis_term_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("sis_account_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("sis_section_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("1", lookups)).to eq ["users.id", 1]
-      expect(Api.sis_parse_id("uuid:tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0", lookups)).to \
-        eq ["users.uuid", "tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0"]
+      expect(Api.sis_parse_ids(["sis_user_id:1"], lookups)).to eq({ "pseudonyms.sis_user_id" => { ids: ["1"] } })
+      expect(Api.sis_parse_ids(["sis_login_id:1"], lookups)).to eq({ "LOWER(pseudonyms.unique_id)" => { ids: ["LOWER('1')"] } })
+      expect(Api.sis_parse_ids(["sis_course_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["sis_term_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["sis_account_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["sis_section_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["1"], lookups)).to eq({ "users.id" => { ids: [1] } })
+      expect(Api.sis_parse_ids(["uuid:tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0"], lookups)).to \
+        eq({ "users.uuid" => { ids: ["tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0"] } })
     end
 
     it "captures account lookups correctly" do
       lookups = Api.sis_find_sis_mapping_for_collection(Account)[:lookups]
-      expect(Api.sis_parse_id("sis_account_id:1", lookups)).to eq ["sis_source_id", "1"]
-      expect(Api.sis_parse_id("sis_course_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("sis_term_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("sis_user_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("sis_login_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("sis_section_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("1", lookups)).to eq ["id", 1]
+      expect(Api.sis_parse_ids(["sis_account_id:1"], lookups)).to eq({ "sis_source_id" => { ids: ["1"] } })
+      expect(Api.sis_parse_ids(["sis_course_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["sis_term_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["sis_user_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["sis_login_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["sis_section_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["1"], lookups)).to eq({ "id" => { ids: [1] } })
     end
 
     it "captures course_section lookups correctly" do
       lookups = Api.sis_find_sis_mapping_for_collection(CourseSection)[:lookups]
-      expect(Api.sis_parse_id("sis_section_id:1", lookups)).to eq ["sis_source_id", "1"]
-      expect(Api.sis_parse_id("sis_course_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("sis_term_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("sis_user_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("sis_login_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("sis_account_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("1", lookups)).to eq ["id", 1]
+      expect(Api.sis_parse_ids(["sis_section_id:1"], lookups)).to eq({ "sis_source_id" => { ids: ["1"] } })
+      expect(Api.sis_parse_ids(["sis_course_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["sis_term_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["sis_user_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["sis_login_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["sis_account_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["1"], lookups)).to eq({ "id" => { ids: [1] } })
     end
 
     it "captures group_categories lookups correctly" do
       lookups = Api.sis_find_sis_mapping_for_collection(GroupCategory)[:lookups]
-      expect(Api.sis_parse_id("sis_group_category_id:1", lookups)).to eq ["sis_source_id", "1"]
-      expect(Api.sis_parse_id("sis_section_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("sis_course_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("sis_term_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("sis_user_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("sis_login_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("sis_account_id:1", lookups)).to eq [nil, nil]
-      expect(Api.sis_parse_id("1", lookups)).to eq ["id", 1]
+      expect(Api.sis_parse_ids(["sis_group_category_id:1"], lookups)).to eq({ "sis_source_id" => { ids: ["1"] } })
+      expect(Api.sis_parse_ids(["sis_section_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["sis_course_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["sis_term_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["sis_user_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["sis_login_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["sis_account_id:1"], lookups)).to eq({})
+      expect(Api.sis_parse_ids(["1"], lookups)).to eq({ "id" => { ids: [1] } })
     end
 
     it "queries the course table correctly" do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(Course)
-      expect(Api.relation_for_sis_mapping_and_columns(Course, { "sis_source_id" => ["1"], "id" => ["1"] }, sis_mapping, Account.default).to_sql).to match(/id IN \('1'\) OR \(root_account_id = #{Account.default.id} AND sis_source_id IN \('1'\)\)/)
+      expect(Api.relation_for_sis_mapping_and_columns(Course, { "sis_source_id" => { ids: ["1"] }, "id" => { ids: ["1"] } }, sis_mapping, Account.default).to_sql).to match(/\(root_account_id = #{Account.default.id} AND \(sis_source_id IN \('1'\)\)\) OR id IN \('1'\)/)
     end
 
     it "queries the enrollment_term table correctly" do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(EnrollmentTerm)
-      expect(Api.relation_for_sis_mapping_and_columns(EnrollmentTerm, { "sis_source_id" => ["1"], "id" => ["1"] }, sis_mapping, Account.default).to_sql).to match(/id IN \('1'\) OR \(root_account_id = #{Account.default.id} AND sis_source_id IN \('1'\)\)/)
+      expect(Api.relation_for_sis_mapping_and_columns(EnrollmentTerm, { "sis_source_id" => { ids: ["1"] }, "id" => { ids: ["1"] } }, sis_mapping, Account.default).to_sql).to match(/\(root_account_id = #{Account.default.id} AND \(sis_source_id IN \('1'\)\)\) OR id IN \('1'\)/)
     end
 
     it "queries the user table correctly" do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(User)
-      expect(Api.relation_for_sis_mapping_and_columns(User, { "pseudonyms.sis_user_id" => ["1"], "pseudonyms.unique_id" => ["1"], "users.id" => ["1"] }, sis_mapping, Account.default).to_sql).to match(/\(pseudonyms.account_id = #{Account.default.id} AND pseudonyms.sis_user_id IN \('1'\)\) OR \(pseudonyms.account_id = #{Account.default.id} AND pseudonyms.unique_id IN \('1'\)\) OR users.id IN \('1'\)/)
+      expect(Api.relation_for_sis_mapping_and_columns(User, { "pseudonyms.sis_user_id" => { ids: ["1"] }, "pseudonyms.unique_id" => { ids: ["1"] }, "users.id" => { ids: ["1"] } }, sis_mapping, Account.default).to_sql).to match(/\(pseudonyms.account_id = #{Account.default.id} AND \(pseudonyms.sis_user_id IN \('1'\)\)\) OR \(pseudonyms.account_id = #{Account.default.id} AND \(pseudonyms.unique_id IN \('1'\)\)\) OR users.id IN \('1'\)/)
     end
 
     it "queries the account table correctly" do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(Account)
-      expect(Api.relation_for_sis_mapping_and_columns(Account, { "sis_source_id" => ["1"], "id" => ["1"] }, sis_mapping, Account.default).to_sql).to match(/id IN \('1'\) OR \(root_account_id = #{Account.default.id} AND sis_source_id IN \('1'\)\)/)
+      expect(Api.relation_for_sis_mapping_and_columns(Account, { "sis_source_id" => { ids: ["1"] }, "id" => { ids: ["1"] } }, sis_mapping, Account.default).to_sql).to match(/\(root_account_id = #{Account.default.id} AND \(sis_source_id IN \('1'\)\)\) OR id IN \('1'\)/)
     end
 
     it "queries the course_section table correctly" do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(CourseSection)
-      expect(Api.relation_for_sis_mapping_and_columns(CourseSection, { "sis_source_id" => ["1"], "id" => ["1"] }, sis_mapping, Account.default).to_sql).to match(/id IN \('1'\) OR \(root_account_id = #{Account.default.id} AND sis_source_id IN \('1'\)\)/)
+      expect(Api.relation_for_sis_mapping_and_columns(CourseSection, { "sis_source_id" => { ids: ["1"] }, "id" => { ids: ["1"] } }, sis_mapping, Account.default).to_sql).to match(/\(root_account_id = #{Account.default.id} AND \(sis_source_id IN \('1'\)\)\) OR id IN \('1'\)/)
     end
   end
 
