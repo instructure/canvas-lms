@@ -16,17 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import ReactDOM from 'react-dom'
-import JobsIndex from './react'
-import ready from '@instructure/ready'
-import {ApolloProvider, createClient} from '@canvas/apollo'
+import gql from 'graphql-tag'
 
-ready(() => {
-  ReactDOM.render(
-    <ApolloProvider client={createClient()}>
-      <JobsIndex />
-    </ApolloProvider>,
-    document.getElementById('content')
-  )
-})
+export const GET_SETTING_QUERY = gql`
+  query GetSetting($name: String!) {
+    internalSetting(name: $name) {
+      id
+      value
+    }
+  }
+`
+
+export const SET_SETTING_MUTATION = gql`
+  mutation SetSetting($id: ID!, $value: String!) {
+    updateInternalSetting(input: {internalSettingId: $id, value: $value}) {
+      internalSetting {
+        id
+        value
+      }
+      errors {
+        message
+      }
+    }
+  }
+`
