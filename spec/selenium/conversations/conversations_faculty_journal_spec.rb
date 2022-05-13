@@ -41,69 +41,7 @@ describe "conversations new" do
     @group.users = [@s1, @s2]
   end
 
-  context "Course with Faculty Journal not enabled" do
-    before do
-      site_admin_logged_in
-    end
-
-    it "allows a site admin to enable faculty journal", priority: "2" do
-      get account_settings_url
-      f("#account_enable_user_notes").click
-      f('.Button.Button--primary[type="submit"]').click
-      wait_for_ajaximations
-      expect(is_checked("#account_enable_user_notes")).to be_truthy
-    end
-  end
-
-  context "Course with Faculty Journal enabled" do
-    before do
-      site_admin_logged_in
-      @course.account.update_attribute(:enable_user_notes, true)
-    end
-
-    it "checks the Journal messages for correct time and sender", priority: "1" do
-      user_session(@teacher)
-      conversations
-      compose course: @course, subject: "Christmas", to: [@s1], body: "The Fat Man cometh.", journal: true, send: true
-      time = format_time_for_view(UserNote.last.updated_at)
-      get student_user_notes_url
-      expect(f(".subject")).to include_text("Christmas")
-      expect(f(".user_content").text).to eq "The Fat Man cometh."
-      expect(f(".creator_name")).to include_text(@teacher.name)
-      expect(f(".creator_name")).to include_text(time)
-    end
-
-    it "allows an admin to delete a Journal message", priority: "1" do
-      skip_if_safari(:alert)
-      user_session(@teacher)
-      conversations
-      compose course: @course, subject: "Christmas", to: [@s1], body: "The Fat Man cometh.", journal: true, send: true
-      get student_user_notes_url
-      f(".delete_link").click
-      driver.switch_to.alert.accept
-      wait_for_ajaximations
-      expect(f(".title.subject").text).to eq("")
-      get student_user_notes_url
-      expect(f(".title.subject").text).to eq("")
-    end
-
-    it "allows a new entry by an admin", priority: "1" do
-      get student_user_notes_url
-      f("#new_user_note_button").click
-      wait_for_ajaximations # wait for the form to `.slideDown()`
-      replace_content(f("#user_note_title"), "FJ Title 2")
-      replace_content(f("textarea"), "FJ Body text 2")
-      f(".send_button").click
-      wait_for_ajaximations
-      time = format_time_for_view(UserNote.last.updated_at)
-      get student_user_notes_url
-      expect(f(".subject").text).to eq "FJ Title 2"
-      expect(f(".user_content").text).to eq "FJ Body text 2"
-      expect(f(".creator_name")).to include_text(time)
-    end
-  end
-
-  context "Faculty Journal" do
+  context "Conversations Faculty Journal" do
     before do
       Account.default.update_attribute(:enable_user_notes, true)
     end
@@ -183,21 +121,6 @@ describe "conversations new" do
         expect(f(".user_note")).not_to be_displayed
         add_message_recipient(@s3)
         expect(is_checked(".user_note")).not_to be_present
-      end
-
-      it "has the Journal entry checkbox visible", priority: "1" do
-        user_session(@teacher)
-        conversations
-        f("#compose-btn").click
-        wait_for_ajaximations
-        expect(f(".user_note")).not_to be_displayed
-
-        select_message_course(@course)
-        add_message_recipient(@s1)
-        write_message_body("Give the Turkey his day")
-        expect(f(".user_note")).to be_displayed
-        add_message_recipient(@s2)
-        expect(f(".user_note")).to be_displayed
       end
 
       it "sends a message with faculty journal checked", priority: "1" do
