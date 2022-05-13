@@ -728,7 +728,7 @@ describe ApplicationHelper do
       allow(BrandConfig).to receive(:k12_config)
 
       # this is what happens if you pick "Canvas Default" from the theme picker
-      session[:brand_config_md5] = false
+      session[:brand_config] = { md5: nil, type: :default }
 
       expect(helper.send(:active_brand_config)).to eq BrandConfig.k12_config
     end

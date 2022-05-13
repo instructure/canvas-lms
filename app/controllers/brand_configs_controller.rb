@@ -33,8 +33,9 @@ class BrandConfigsController < ApplicationController
     css_bundle :brand_config_index
     js_bundle :brand_configs
 
-    base_brand_config = @account.first_parent_brand_config || BrandConfig.new
+    base_brand_config = @account.first_parent_brand_config
     base_brand_config ||= BrandConfig.k12_config if k12?
+    base_brand_config ||= BrandConfig.new
 
     js_env brandConfigStuff: {
       baseBrandableVariables: BrandableCSS.all_brand_variable_values(base_brand_config),
@@ -53,7 +54,8 @@ class BrandConfigsController < ApplicationController
     brand_config = active_brand_config(ignore_parents: true) || BrandConfig.new
 
     js_env brandConfig: brand_config.as_json(include_root: false),
-           hasUnsavedChanges: session.key?(:brand_config_md5),
+           isDefaultConfig: session[:brand_config]&.[](:type) == :default,
+           hasUnsavedChanges: session.key?(:brand_config),
            variableSchema: default_schema,
            allowGlobalIncludes: @account.allow_global_includes?,
            account_id: @account.id
@@ -144,14 +146,14 @@ class BrandConfigsController < ApplicationController
   #   If set, will activate this specific brand config as the active one in the session.
   #   If the empty string ('') is passed, will use the parent theme for this session.
   def save_to_user_session
-    old_md5 = session.delete(:brand_config_md5)
-    session[:brand_config_md5] = if params[:brand_config_md5] == ""
-                                   @account.first_parent_brand_config&.md5 || false
-                                 elsif params[:brand_config_md5]
-                                   BrandConfig.find(params[:brand_config_md5]).md5
-                                 end
+    old_editing_config = session.delete(:brand_config)
+    session[:brand_config] = if params[:brand_config_md5] == ""
+                               { md5: @account.first_parent_brand_config&.md5, type: :default }
+                             elsif params[:brand_config_md5]
+                               { md5: BrandConfig.find(params[:brand_config_md5]).md5, type: :base }
+                             end
 
-    BrandConfig.destroy_if_unused(old_md5) if old_md5 != session[:brand_config_md5]
+    BrandConfig.destroy_if_unused(old_editing_config[:md5]) if old_editing_config && (old_editing_config[:md5] != session[:brand_config]&.[](:md5))
     redirect_to account_theme_editor_path(@account)
   end
 
@@ -159,7 +161,8 @@ class BrandConfigsController < ApplicationController
   # they POST to this action to save it to their account so everyone else sees it.
   def save_to_account
     old_md5 = @account.brand_config_md5
-    new_md5 = session.delete(:brand_config_md5).presence
+    session_config = session.delete(:brand_config)
+    new_md5 = session_config.nil? || session_config[:type] == :default ? nil : session_config[:md5]
     new_brand_config = new_md5 && BrandConfig.find(new_md5)
     progress = BrandConfigRegenerator.process(@account, @current_user, new_brand_config)
 
@@ -173,7 +176,7 @@ class BrandConfigsController < ApplicationController
   # When you close the theme editor, it will send a DELETE to this action to
   # clear out the session brand_config that you were prevewing.
   def destroy
-    old_md5 = session.delete(:brand_config_md5).presence
+    old_md5 = session.delete(:brand_config)&.[](:md5)
     BrandConfig.destroy_if_unused(old_md5)
     redirect_to account_brand_configs_path(@account), notice: t("Theme editor changes have been cancelled.")
   end
