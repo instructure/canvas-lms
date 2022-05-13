@@ -352,6 +352,12 @@ class Quizzes::QuizQuestionsController < ApplicationController
   # @returns QuizQuestion
 
   def update
+    @question_name = params[:question][:question_name]
+    if @question_name.length > 255
+      render json: {errors: {question_name: t('errors.messages.too_long', "Question name is too long (maximum is 255 characters)")}}, status: 422
+      return
+    end
+
     if authorized_action(@quiz, @current_user, :update)
       @question = @quiz.quiz_questions.active.find(params[:id])
       question_data = params[:question].to_unsafe_h
