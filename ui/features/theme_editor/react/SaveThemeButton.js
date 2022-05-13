@@ -29,6 +29,7 @@ export default class SaveThemeButton extends Component {
   static propTypes = {
     accountID: PropTypes.string.isRequired,
     brandConfigMd5: customTypes.md5,
+    isDefaultConfig: PropTypes.bool.isRequired,
     sharedBrandConfigBeingEdited: customTypes.sharedBrandConfig.isRequired,
     onSave: PropTypes.func.isRequired
   }
@@ -80,7 +81,7 @@ export default class SaveThemeButton extends Component {
     ) {
       disable = true
       disableMessage = I18n.t('There are no unsaved changes')
-    } else if (!this.props.brandConfigMd5) {
+    } else if (this.props.isDefaultConfig) {
       disable = true
     }
 

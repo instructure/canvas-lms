@@ -33,6 +33,7 @@ ready(() => {
       {...{
         brandConfig: window.ENV.brandConfig,
         hasUnsavedChanges: window.ENV.hasUnsavedChanges,
+        isDefaultConfig: window.ENV.isDefaultConfig,
         variableSchema: window.ENV.variableSchema,
         sharedBrandConfigs: window.ENV.sharedBrandConfigs,
         allowGlobalIncludes: window.ENV.allowGlobalIncludes,

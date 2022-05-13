@@ -25,7 +25,7 @@
   </div>
 </noscript>
 
-<% unless params[:previewing_from_themeeditor] || !session.has_key?(:brand_config_md5) %>
+<% unless params[:previewing_from_themeeditor] || !session.has_key?(:brand_config) %>
   <div role="alert" class="ic-flash-static ic-flash-info ic-flash--Theme-Editor">
     <% if params[:editing_brand_config] %>
       <%= t("You're editing your Canvas Theme! The changes have not been applied yet.") %>
