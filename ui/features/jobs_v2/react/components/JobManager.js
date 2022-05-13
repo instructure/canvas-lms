@@ -17,7 +17,9 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import React, {useState, useCallback, useMemo} from 'react'
+import React, {useState, useMemo} from 'react'
+import {useQuery, useMutation} from 'react-apollo'
+import {GET_SETTING_QUERY, SET_SETTING_MUTATION} from '../../graphql/Queries'
 import {Modal} from '@instructure/ui-modal'
 import {Button, IconButton, CloseButton} from '@instructure/ui-buttons'
 import {IconSettingsLine, IconWarningLine} from '@instructure/ui-icons'
@@ -57,59 +59,77 @@ export default function JobManager({groupType, groupText, jobs, onUpdate}) {
   const [error, setError] = useState(false)
   const [maxConcurrent, setMaxConcurrent] = useState(computedMaxConcurrent)
   const [priority, setPriority] = useState(computedPriority)
+  const [numStrands, setNumStrands] = useState()
+  const [numStrandsOG, setNumStrandsOG] = useState()
+  const [numStrandsSettingId, setNumStrandsSettingId] = useState()
 
-  const handleClose = useCallback(() => setModalOpen(false), [])
+  const handleClose = () => setModalOpen(false)
 
-  const handleSubmit = useCallback(
-    e => {
-      e.preventDefault()
-      setLoading(true)
-      setError(false)
-      return doFetchApi({
+  const [saveSetting] = useMutation(SET_SETTING_MUTATION)
+
+  const handleSubmit = e => {
+    e.preventDefault()
+    setLoading(true)
+    setError(false)
+
+    const calls = [
+      doFetchApi({
         method: 'PUT',
         path: '/api/v1/jobs2/manage',
         params: {strand: groupText, max_concurrent: maxConcurrent || '', priority}
-      }).then(
-        result => {
-          setLoading(false)
-          handleClose()
-          onUpdate(result)
-        },
-        _error => {
-          setLoading(false)
-          setError(true)
+      })
+    ]
+    if (numStrands && numStrands !== numStrandsOG) {
+      calls.push(saveSetting({variables: {id: numStrandsSettingId, value: numStrands.toString()}}))
+    }
+
+    return Promise.all(calls).then(
+      results => {
+        handleClose()
+        onUpdate(results[0])
+        if (results.length === 2) {
+          setNumStrandsOG(numStrands)
         }
-      )
-    },
-    [groupText, handleClose, maxConcurrent, onUpdate, priority]
-  )
+        setLoading(false)
+      },
+      _error => {
+        setLoading(false)
+        setError(true)
+      }
+    )
+  }
 
-  const onChangeConcurrency = useCallback((_event, value) => {
+  const onChangeConcurrency = (_event, value) =>
     setMaxConcurrent(value && boundMaxConcurrent(parseInt(value, 10)))
-  }, [])
 
-  const onIncrementConcurrency = useCallback(
-    diff => {
-      setMaxConcurrent(boundMaxConcurrent(maxConcurrent + diff))
-    },
-    [maxConcurrent]
-  )
+  const onIncrementConcurrency = diff => setMaxConcurrent(boundMaxConcurrent(maxConcurrent + diff))
 
-  const onChangePriority = useCallback((_event, value) => {
+  const onChangePriority = (_event, value) =>
     setPriority(value && boundPriority(parseInt(value, 10)))
-  }, [])
 
-  const onIncrementPriority = useCallback(
-    diff => {
-      setPriority(boundPriority(priority + diff))
-    },
-    [priority]
-  )
+  const onIncrementPriority = diff => setPriority(boundPriority(priority + diff))
 
-  const enableSubmit = useCallback(
-    () => !loading && typeof maxConcurrent === 'number' && typeof priority === 'number',
-    [loading, maxConcurrent, priority]
-  )
+  const onChangeNumStrands = (_event, value) =>
+    setNumStrands(value && boundMaxConcurrent(parseInt(value, 10)))
+
+  const onIncrementNumStrands = diff => setNumStrands(boundMaxConcurrent(numStrands + diff))
+
+  const enableSubmit = () =>
+    !loading && typeof maxConcurrent === 'number' && typeof priority === 'number'
+
+  useQuery(GET_SETTING_QUERY, {
+    skip: groupType !== 'strand',
+    variables: {name: `${groupText}_num_strands`},
+    onCompleted: data => {
+      const setting = data.internalSetting
+      if (setting) {
+        const n = parseInt(setting.value, 10)
+        setNumStrands(n)
+        setNumStrandsOG(n)
+        setNumStrandsSettingId(setting.id)
+      }
+    }
+  })
 
   // presently all we do is update parallelism / priority for entire strands, so don't render an icon otherwise
   if (groupType !== 'strand' || !groupText || jobs.length === 0) return null
@@ -153,17 +173,30 @@ export default function JobManager({groupType, groupText, jobs, onUpdate}) {
             <Flex.Item padding="0 xx-small">
               <Text fontStyle="italic">{I18n.t('Smaller numbers mean higher priority')}</Text>
             </Flex.Item>
-            {computedMaxConcurrent > 1 ? (
-              <Flex.Item margin="medium 0 0 0" padding="xx-small">
-                <NumberInput
-                  renderLabel={I18n.t('Max n_strand parallelism')}
-                  value={maxConcurrent}
-                  onChange={onChangeConcurrency}
-                  onIncrement={() => onIncrementConcurrency(1)}
-                  onDecrement={() => onIncrementConcurrency(-1)}
-                />
-              </Flex.Item>
-            ) : null}
+            {maxConcurrent > 1 && (
+              <>
+                <Flex.Item margin="medium 0 0 0" padding="xx-small">
+                  <NumberInput
+                    renderLabel={I18n.t('Dynamic concurrency')}
+                    value={maxConcurrent}
+                    onChange={onChangeConcurrency}
+                    onIncrement={() => onIncrementConcurrency(1)}
+                    onDecrement={() => onIncrementConcurrency(-1)}
+                  />
+                </Flex.Item>
+                {numStrands && (
+                  <Flex.Item margin="medium 0 0 0" padding="xx-small">
+                    <NumberInput
+                      renderLabel={I18n.t('Permanent num_strands setting')}
+                      value={numStrands}
+                      onChange={onChangeNumStrands}
+                      onIncrement={() => onIncrementNumStrands(1)}
+                      onDecrement={() => onIncrementNumStrands(-1)}
+                    />
+                  </Flex.Item>
+                )}
+              </>
+            )}
           </Flex>
         </Modal.Body>
         <Modal.Footer>
