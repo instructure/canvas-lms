@@ -81,15 +81,16 @@ module Api
     sis_mapping = sis_find_sis_mapping_for_collection(collection)
     columns = sis_parse_ids(ids, sis_mapping[:lookups], current_user,
                             root_account: root_account)
-    result = columns.delete(sis_mapping[:lookups]["id"]) || []
+    result = columns.delete(sis_mapping[:lookups]["id"]) || { ids: [] }
     unless columns.empty?
       relation = relation_for_sis_mapping_and_columns(collection, columns, sis_mapping, root_account)
       # pluck ignores eager_load
       relation = relation.joins(*relation.eager_load_values) if relation.eager_load_values.present?
-      result.concat relation.pluck(:id)
-      result.uniq!
+      result[:ids].concat relation.pluck(:id)
+      result[:ids].uniq!
+      result[:ids]
     end
-    result
+    result[:ids]
   end
 
   SIS_MAPPINGS = {
@@ -116,11 +117,17 @@ module Api
                    "id" => "users.id",
                    "sis_integration_id" => "pseudonyms.integration_id",
                    "lti_context_id" => "users.lti_context_id", # leaving for legacy reasons
-                   "lti_user_id" => "users.lti_context_id", # leaving for legacy reasons
+                   "lti_user_id" => {
+                     column: [
+                       "users.lti_context_id",
+                       "user_past_lti_ids.user_lti_context_id",
+                     ],
+                     joins_needed_for_query: [:past_lti_ids],
+                   },
                    "lti_1_1_id" => "users.lti_context_id",
                    "lti_1_3_id" => "users.lti_id",
                    "uuid" => "users.uuid" }.freeze,
-        is_not_scoped_to_account: ["users.id", "users.lti_context_id", "users.lti_id", "users.uuid"].freeze,
+        is_not_scoped_to_account: ["users.id", "users.lti_context_id", "user_past_lti_ids.user_lti_context_id", "users.lti_id", "users.uuid"].freeze,
         scope: "pseudonyms.account_id",
         joins: :pseudonym }.freeze,
     "accounts" =>
@@ -161,10 +168,16 @@ module Api
   ID_REGEX = /\A\d{1,#{MAX_ID_LENGTH}}\z/.freeze
   UUID_REGEX = /\Auuid:(\w{40,})\z/.freeze
 
-  def self.sis_parse_id(id, lookups, _current_user = nil,
+  def self.not_scoped_to_account?(columns, sis_mapping)
+    flattened_array_of_columns = [columns].flatten
+    not_scoped_to_account_columns = sis_mapping[:is_not_scoped_to_account] || []
+    (flattened_array_of_columns - not_scoped_to_account_columns).empty?
+  end
+
+  def self.sis_parse_id(id, _current_user = nil,
                         root_account: nil)
-    # returns column_name, column_value
-    return lookups["id"], id if id.is_a?(Numeric) || id.is_a?(ActiveRecord::Base)
+    # returns sis_column_name, column_value
+    return "id", id if id.is_a?(Numeric) || id.is_a?(ActiveRecord::Base)
 
     id = id.to_s.strip
     case id
@@ -175,36 +188,56 @@ module Api
       sis_column = $1
       sis_id = $2
     when ID_REGEX
-      return lookups["id"], (/\A\d+\z/.match?(id) ? id.to_i : id)
+      return "id", (/\A\d+\z/.match?(id) ? id.to_i : id)
     when UUID_REGEX
-      return lookups["uuid"], $1
+      return "uuid", $1
     else
       return nil, nil
     end
 
-    column = lookups[sis_column]
-    return nil, nil unless column
-
-    if column.is_a?(Hash)
-      sis_id = column[:transform].call(sis_id)
-      column = column[:column]
-    end
-    [column, sis_id]
+    [sis_column, sis_id]
   end
 
   def self.sis_parse_ids(ids, lookups, current_user = nil, root_account: nil)
-    # returns {column_name => [column_value,...].uniq, ...}
+    # returns an object like {
+    #   "column_name" => {
+    #     ids: [column_value, ...].uniq,
+    #     joins_needed_for_query: [relation_name, ...] <-- optional
+    #   }
+    # }
     columns = {}
     ids.compact.each do |id|
-      column, sis_id = sis_parse_id(id, lookups,
-                                    current_user,
-                                    root_account: root_account)
-      next unless column && sis_id
+      sis_column, sis_id = sis_parse_id(id, current_user, root_account: root_account)
 
-      columns[column] ||= []
-      columns[column] << sis_id
+      next unless sis_column && sis_id
+
+      column = lookups[sis_column]
+      if column.is_a?(Hash)
+        column_name = column[:column]
+
+        if column[:transform]
+          if sis_id.is_a? Array
+            # this means that the MRA override sis_parse_id function turned sis_id into [sis_id, @account]
+            sis_id[0] = column[:transform].call(sis_id[0])
+          else
+            sis_id = column[:transform].call(sis_id)
+          end
+        end
+        if (joins_needed_for_query = column[:joins_needed_for_query])
+          columns[column_name] ||= {}
+          columns[column_name][:joins_needed_for_query] ||= []
+          columns[column_name][:joins_needed_for_query] << joins_needed_for_query
+        end
+        column = column_name
+      end
+
+      next unless column
+
+      columns[column] ||= {}
+      columns[column][:ids] ||= []
+      columns[column][:ids] << sis_id
     end
-    columns.each_key { |key| columns[key].uniq! }
+    columns.each_key { |key| columns[key][:ids].uniq! }
     columns
   end
 
@@ -246,20 +279,31 @@ module Api
 
     relation = relation.all unless relation.is_a?(ActiveRecord::Relation)
 
-    not_scoped_to_account = sis_mapping[:is_not_scoped_to_account] || []
-    if columns.length == 1 && not_scoped_to_account.include?(columns.keys.first)
-      relation = relation.where(columns)
+    if columns.keys.flatten.length == 1 && not_scoped_to_account?(columns.keys.first, sis_mapping)
+      queryable_columns = {}
+      columns.each_pair { |column_name, value| queryable_columns[column_name] = value[:ids] }
+      relation = relation.where(queryable_columns)
     else
       args = []
       query = []
-      columns.keys.sort.each do |column|
-        if not_scoped_to_account.include?(column)
-          query << "#{column} IN (?)"
-          args << columns[column]
+      columns.each_key do |column|
+        relation = relation.left_outer_joins(columns[column][:joins_needed_for_query]) if columns[column][:joins_needed_for_query]
+        if not_scoped_to_account?(column, sis_mapping)
+          conditions = []
+          if column.is_a?(Array)
+            column.each do |column_name|
+              conditions << "#{column_name} IN (?)"
+              args << columns[column][:ids]
+            end
+          else
+            conditions << "#{column} IN (?)"
+            args << columns[column][:ids]
+          end
+          query << conditions.join(" OR ").to_s
         else
           raise ArgumentError, "missing scope for collection" unless sis_mapping[:scope]
 
-          ids = columns[column]
+          ids = columns[column][:ids]
           if ids.any?(Array)
             ids_hash = {}
             ids.each do |id|
@@ -276,8 +320,17 @@ module Api
             sub_args = []
             root_accounts_on_shard.each do |root_account|
               ids = ids_hash[root_account]
-              sub_query << "(#{sis_mapping[:scope]} = #{root_account.id} AND #{column} IN (?))"
-              sub_args << ids
+              conditions = []
+              if column.is_a?(Array)
+                column.each do |column_name|
+                  conditions << "#{column_name} IN (?)"
+                  sub_args << ids
+                end
+              else
+                conditions << "#{column} IN (?)"
+                sub_args << ids
+              end
+              sub_query << "(#{sis_mapping[:scope]} = #{root_account.id} AND (#{conditions.join(" OR ")}))"
             end
             if Shard.current == relation.primary_shard
               query.concat(sub_query)
