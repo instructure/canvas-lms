@@ -494,59 +494,6 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  API_NEEDED_FIELDS = %w[
-    id
-    title
-    context_id
-    context_type
-    position
-    points_possible
-    grading_type
-    due_at
-    description
-    duplicate_of_id
-    lock_at
-    unlock_at
-    assignment_group_id
-    peer_reviews
-    anonymous_peer_reviews
-    automatic_peer_reviews
-    peer_reviews_due_at
-    peer_review_count
-    intra_group_peer_reviews
-    submission_types
-    group_category_id
-    grade_group_students_individually
-    turnitin_enabled
-    vericite_enabled
-    turnitin_settings
-    allowed_extensions
-    could_be_locked
-    freeze_on_copy
-    copied
-    all_day
-    all_day_date
-    created_at
-    updated_at
-    post_to_sis
-    integration_data
-    integration_id
-    only_visible_to_overrides
-    moderated_grading
-    grades_published_at
-    omit_from_final_grade
-    grading_standard_id
-    anonymous_instructor_annotations
-    anonymous_grading
-    workflow_state
-    graders_anonymous_to_graders
-    grader_comments_visible_to_graders
-    grader_names_visible_to_final_grader
-    grader_count
-    important_dates
-    muted
-  ].freeze
-
   def external_tool?
     submission_types == "external_tool"
   end
@@ -2974,20 +2921,13 @@ class Assignment < ActiveRecord::Base
                        purpose: purpose).where("asset_id=assignments.id"))
   }
 
-  # the map on the API_NEEDED_FIELDS here is because PostgreSQL will see the
-  # query as ambigious for the "due_at" field if combined with another table
-  # (e.g. assignment overrides) with similar fields (like id,lock_at,etc),
-  # throwing an error.
-  scope :api_needed_fields, -> { select(API_NEEDED_FIELDS.map { |f| "assignments." + f.to_s }) }
-
   # This should only be used in the course drop down to show assignments needing a submission
   scope :need_submitting_info, lambda { |user_id, limit|
-    chain = api_needed_fields
-            .where("(SELECT COUNT(id) FROM #{Submission.quoted_table_name}
+    chain = where("NOT EXISTS (SELECT 1 FROM #{Submission.quoted_table_name}
             WHERE assignment_id = assignments.id
             AND submissions.workflow_state <> 'deleted'
             AND (submission_type IS NOT NULL OR excused = ?)
-            AND user_id = ?) = 0", true, user_id)
+            AND user_id = ?)", true, user_id)
             .limit(limit)
             .order("assignments.due_at")
 
