@@ -149,10 +149,10 @@ describe BrandConfigsController do
     it "allows authorized admin to create" do
       admin = account_admin_user(account: @account)
       user_session(admin)
-      session[:brand_config_md5] = @bc.md5
+      session[:brand_config] = { md5: @bc.md5, type: :base }
       delete "destroy", params: { account_id: @account.id }
       assert_status(302)
-      expect(session[:brand_config_md5]).to be_nil
+      expect(session[:brand_config]).to be_nil
       expect { @bc.reload }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
@@ -178,7 +178,7 @@ describe BrandConfigsController do
 
       admin = account_admin_user(account: @account)
       user_session(admin)
-      session[:brand_config_md5] = @bc.md5
+      session[:brand_config] = { md5: @bc.md5, type: :base }
       post "save_to_account", params: { account_id: @account.id }
       assert_status(200)
       json = JSON.parse(response.body)
@@ -199,16 +199,16 @@ describe BrandConfigsController do
       user_session(admin)
       post "save_to_user_session", params: { account_id: @account.id, brand_config_md5: @bc.md5 }
       assert_status(302)
-      expect(session[:brand_config_md5]).to eq @bc.md5
+      expect(session[:brand_config]).to eq({ md5: @bc.md5, type: :base })
     end
 
     it "allows authorized admin to remove" do
       admin = account_admin_user(account: @account)
       user_session(admin)
-      session[:brand_config_md5] = @bc.md5
+      session[:brand_config] = { md5: @bc.md5, type: :base }
       post "save_to_user_session", params: { account_id: @account.id, brand_config_md5: "" }
       assert_status(302)
-      expect(session[:brand_config_md5]).to eq false
+      expect(session[:brand_config]).to eq({ md5: nil, type: :default })
       expect { @bc.reload }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
@@ -217,7 +217,7 @@ describe BrandConfigsController do
       user_session(user)
       post "save_to_user_session", params: { account_id: @account.id, brand_config_md5: @bc.md5 }
       assert_status(401)
-      expect(session[:brand_config_md5]).to be_nil
+      expect(session[:brand_config]).to be_nil
     end
   end
 end
