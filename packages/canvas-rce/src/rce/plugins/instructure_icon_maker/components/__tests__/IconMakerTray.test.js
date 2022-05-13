@@ -66,6 +66,8 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
     return render(<IconMakerTray {...componentProps} />)
   }
 
+  const {confirm} = window.confirm
+
   beforeAll(() => {
     global.fetch = jest.fn().mockResolvedValue({
       blob: () => Promise.resolve(new Blob())
@@ -76,6 +78,13 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
       canvasUrl: 'https://domain.from.env'
     }
     RceApiSource.mockImplementation(() => rcs)
+
+    delete window.confirm
+    window.confirm = jest.fn(() => true)
+  })
+
+  afterAll(() => {
+    window.confirm = confirm
   })
 
   beforeEach(() => {
@@ -92,6 +101,15 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
     renderComponent({...defaults, onUnmount})
     userEvent.click(screen.getByText(/close/i))
     await waitFor(() => expect(onUnmount).toHaveBeenCalled())
+  })
+
+  it('does not close the tray when the user has unsaved changes', () => {
+    const onUnmount = jest.fn()
+    renderComponent({...defaults, onUnmount})
+    // edit the icon before clicking on close
+    setIconColor('#000000')
+    userEvent.click(screen.getByText(/close/i))
+    expect(window.confirm).toHaveBeenCalled()
   })
 
   describe('when the user has not created a valid icon', () => {
