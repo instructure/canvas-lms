@@ -52,10 +52,12 @@ describe "submissions" do
       original_number_of_group = Group.count
       create_assignment_preparation
       f("#has_group_category").click
-      replace_content(f("#new_category_name"), "canv")
-      f("#split_groups").click
-      replace_content(f("input[name=create_group_count]"), "1")
-      f("#newGroupSubmitButton").click
+      replace_and_proceed f("#new-group-set-name"), "canv"
+      fxpath("//input[@data-testid='radio-button-split-groups']/..").click
+      replace_and_proceed f("#textinput-create-groups-count"), "1"
+      f(%(button[data-testid="group-set-save"])).click
+      wait_for_ajaximations
+      run_jobs
       wait_for_ajaximations
       submit_assignment_form
       validate_edit_and_publish_links_exist

@@ -33,10 +33,10 @@ describe "new groups" do
     it "allows teachers to add a group set", priority: "1" do
       get "/courses/#{@course.id}/groups"
       click_add_group_set
-      f("#new_category_name").send_keys("Test Group Set")
+      replace_and_proceed f("#new-group-set-name"), "Test Group Set"
+      f(%(button[data-testid="group-set-save"])).click
 
-      save_group_set
-      wait_for_ajaximations
+      wait_for(method: nil, timeout: 3) { f("#group_categories_tabs .collectionViewItems").displayed? }
       # Looks in the group tab list for the last item, which should be the group set
       expect(fj(".collectionViewItems[role=tablist]>li:last-child").text).to match "Test Group Set"
     end
@@ -178,9 +178,12 @@ describe "new groups" do
       get "/courses/#{@course.id}/groups"
 
       click_add_group_set
-      f("#new_category_name").send_keys("Test Group Set")
-      f(".self-signup-toggle").click
-      manually_set_groupset_limit("2")
+      replace_and_proceed f("#new-group-set-name"), "Test Group Set"
+      fxpath("//input[@data-testid='checkbox-allow-self-signup']/..").click
+      replace_and_proceed f("#textinput-limit-group-size"), "2"
+      f(%(button[data-testid="group-set-save"])).click
+      wait_for_ajaximations
+
       expect(f(".group-category-summary")).to include_text("Groups are limited to 2 members.")
 
       # Creates a group and checks to see if group set's limit is inherited by its groups
@@ -205,7 +208,9 @@ describe "new groups" do
 
       f(".icon-edit.edit-category").click
 
-      manually_set_groupset_limit("2")
+      replace_content(fj('input[name="group_limit"]:visible'), "2")
+      f(".btn.btn-primary[type=submit]").click
+      wait_for_ajaximations
       expect(f(".group-summary")).to include_text("0 / 2 students")
       manually_fill_limited_group("2", 2)
     end
@@ -424,20 +429,19 @@ describe "new groups" do
       get "/courses/#{@course.id}/groups"
 
       click_add_group_set
-      f("#new_category_name").send_keys("Test Group Set")
-      f("#split_groups").click
+      replace_and_proceed f("#new-group-set-name"), "Test Group Set"
+      fxpath("//input[@data-testid='radio-button-split-groups']/..").click
 
-      expect(f(".auto-group-leader-controls")).to be_displayed
-      expect(f("input[value='FIRST']")).not_to be_enabled
-      expect(f("input[value='RANDOM']")).not_to be_enabled
+      expect(f('span[data-testid="group-leadership-controls"] input[data-testid="first"]')).not_to be_enabled
+      expect(f('span[data-testid="group-leadership-controls"] input[data-testid="random"]')).not_to be_enabled
 
-      checkbox = f("input[type='checkbox'][name='enable_auto_leader']")
-      checkbox.click
-      expect(f("input[value='FIRST']")).to be_enabled
-      expect(f("input[value='RANDOM']")).to be_enabled
+      fxpath("//span[@data-testid='group-leadership-controls']//input[@data-testid='enable-auto']/..").click
 
-      replace_content(fj('.input-micro[name="create_group_count"]'), 2)
-      save_group_set
+      expect(f('span[data-testid="group-leadership-controls"] input[data-testid="first"]')).to be_enabled
+      expect(f('span[data-testid="group-leadership-controls"] input[data-testid="random"]')).to be_enabled
+
+      replace_and_proceed f("#textinput-create-groups-count"), "2"
+      f(%(button[data-testid="group-set-save"])).click
       # Need to run delayed jobs for the random group assignments to work, and then refresh the page
       run_jobs
       get "/courses/#{@course.id}/groups"
@@ -645,7 +649,9 @@ describe "new groups" do
         get "/courses/#{@course.id}/groups"
 
         manually_enable_self_signup
-        manually_set_groupset_limit
+        replace_and_proceed f("#textinput-limit-group-size"), "2"
+        f(%(button[data-testid="group-set-save"])).click
+        wait_for_ajaximations
 
         open_clone_group_set_option
         set_cloned_groupset_name(@group_category.first.name + " clone", true)
