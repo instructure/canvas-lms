@@ -185,14 +185,6 @@ module GroupsCommon
     wait_for_ajaximations
   end
 
-  # Used to set group_limit field manually. Assumes you are on Edit Group Set page and self-sign up is checked
-  def manually_set_groupset_limit(member_limit = "2")
-    replace_content(fj('input[name="group_limit"]:visible'), member_limit)
-    scroll_page_to_bottom
-    fj(".btn.btn-primary[type=submit]").click
-    wait_for_ajaximations
-  end
-
   def manually_fill_limited_group(member_limit = "2", student_count = 0)
     student_count.times do |n|
       f(".assign-to-group").click
@@ -304,11 +296,6 @@ module GroupsCommon
   # Only use to add group_set if no group sets already exist
   def click_add_group_set
     f("#add-group-set").click
-    wait_for_ajaximations
-  end
-
-  def save_group_set
-    move_to_click("#newGroupSubmitButton")
     wait_for_ajaximations
   end
 
