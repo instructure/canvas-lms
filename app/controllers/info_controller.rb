@@ -19,6 +19,7 @@
 #
 
 class InfoController < ApplicationController
+  skip_before_action :check_pending_otp, only: %i[web_app_manifest]
   skip_before_action :load_account, only: %i[health_check readiness deep]
   skip_before_action :load_user, only: %i[health_check readiness deep browserconfig]
 
