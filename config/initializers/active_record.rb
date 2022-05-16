@@ -531,7 +531,7 @@ class ActiveRecord::Base
       @polymorph_module.class_eval <<-RUBY, __FILE__, __LINE__ + 1
         def #{reflection.name}=(record)
           if record && [#{specific_classes.join(', ')}].none? { |klass| record.is_a?(klass) }
-            message = "one of #{specific_classes.join(', ')} expected, got \#{record.class}"
+            message = "one of #{specific_classes.join(', ')} expected, got \#{record.class} \#{record.inspect} \#{self.inspect} "
             raise ActiveRecord::AssociationTypeMismatch, message
           end
           super
