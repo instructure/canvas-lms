@@ -152,17 +152,77 @@ describe "conversations new" do
         f("button[data-testid='compose']").click
         # select the only course option
         f("input[placeholder='Select Course']").click
-        f("li[role='none']").click
-        ff("input[aria-label='Address Book']")[1].send_keys "first student"
+        fj("li:contains('#{@course.name}')").click
+        ff("input[aria-label='Address Book']")[1].send_keys @s1.name
         wait_for_ajaximations
-        driver.action.send_keys(:arrow_down).perform
-        driver.action.send_keys(:enter).perform
-        wait_for_ajaximations
+        fj("li:contains('#{@s1.name}')").click
         fj("label:contains('Add as a Faculty Journal entry')").click
         f("textarea[data-testid='message-body']").send_keys "hallo!"
         fj("button:contains('Send')").click
         wait_for_ajaximations
         expect(@s1.user_notes.last.note).to eq "hallo!"
+      end
+
+      it "can faculty journalize a message sent to a group" do
+        user_session(@teacher)
+        get conversations_path
+        f("button[data-testid='compose']").click
+        f("input[placeholder='Select Course']").click
+        fj("li:contains('#{@course.name}')").click
+        ff("input[aria-label='Address Book']")[1].click
+        fj("li:contains('Student Groups')").click
+        wait_for_ajaximations
+        fj("li:contains('#{@group.name}')").click
+        fj("li:contains('All in #{@group.name}')").click
+        fj("label:contains('Add as a Faculty Journal entry')").click
+        f("textarea[data-testid='message-body']").send_keys "this is a group message!"
+        fj("button:contains('Send')").click
+        wait_for_ajaximations
+        expect(@s1.user_notes.last.note).to eq "this is a group message!"
+      end
+
+      it "does not show faculty journal option if sender is a student" do
+        user_session(@s1)
+        get conversations_path
+        f("button[data-testid='compose']").click
+        f("input[placeholder='Select Course']").click
+        fj("li:contains('#{@course.name}')").click
+        ff("input[aria-label='Address Book']")[1].click
+        fj("li:contains('Students')").click
+        wait_for_ajaximations
+        fj("li:contains('#{@s2.name}')").click
+        wait_for_ajaximations
+        expect(f("body")).not_to contain_jqcss "label:contains('Add as a Faculty Journal entry')"
+      end
+
+      it "does not show faculty journal option if disabled at the account level" do
+        account.update_attribute(:enable_user_notes, false)
+
+        user_session(@teacher)
+        get conversations_path
+        f("button[data-testid='compose']").click
+        f("input[placeholder='Select Course']").click
+        fj("li:contains('#{@course.name}')").click
+        ff("input[aria-label='Address Book']")[1].click
+        fj("li:contains('Students')").click
+        wait_for_ajaximations
+        fj("li:contains('#{@s2.name}')").click
+        wait_for_ajaximations
+        expect(f("body")).not_to contain_jqcss "label:contains('Add as a Faculty Journal entry')"
+      end
+
+      it "does not show faculty journal option if messaging a non-student" do
+        user_session(@teacher)
+        get conversations_path
+        f("button[data-testid='compose']").click
+        f("input[placeholder='Select Course']").click
+        fj("li:contains('#{@course.name}')").click
+        ff("input[aria-label='Address Book']")[1].click
+        fj("li:contains('Teachers')").click
+        wait_for_ajaximations
+        fj("li:contains('#{@teacher.name}')").click
+        wait_for_ajaximations
+        expect(f("body")).not_to contain_jqcss "label:contains('Add as a Faculty Journal entry')"
       end
     end
   end
