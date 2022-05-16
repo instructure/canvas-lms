@@ -44,6 +44,7 @@ if settings.present?
       AuthenticationMethods::LoggedOutError
       ActionController::InvalidAuthenticityToken
       Folio::InvalidPage
+      Turnitin::Errors::SubmissionNotScoredError
     }
   end
 
