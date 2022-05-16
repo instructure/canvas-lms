@@ -21,6 +21,8 @@
 # references to SMTP exception classes in the code.
 require 'net/smtp'
 
+return if Rails.env != "production"
+
 config = {
   :domain => "unknowndomain.example.com",
   :delivery_method => :smtp,
