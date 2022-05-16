@@ -36,8 +36,10 @@ export default class Header extends React.Component {
       <div className="Header">
         <h2 className="page-header" ref="pageHeader">
           <span className="externalApps_label_text">{I18n.t('External Apps')}</span>
-          <div className="externalApps_buttons_container">{this.props.children}</div>
         </h2>
+        <div className="externalApps_buttons_container">
+          {this.props.children}
+        </div>
 
         <div>
           <p>
