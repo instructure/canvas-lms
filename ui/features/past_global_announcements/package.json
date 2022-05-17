@@ -1,5 +1,8 @@
 {
   "name": "@canvas-features/past_global_announcements",
   "private": true,
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "canvas": {
+    "component": "announcements"
+  }
 }

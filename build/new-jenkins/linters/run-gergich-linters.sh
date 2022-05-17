@@ -31,6 +31,7 @@ ruby script/rlint --no-fail-on-offense
 [ "${SKIP_ESLINT-}" != "true" ] && ruby script/eslint
 ruby script/lint_commit_message
 node script/yarn-validate-workspace-deps.js 2>/dev/null < <(yarn --silent workspaces info --json)
+node ui-build/tools/component-info.mjs -i -v -g
 
 rake css:styleguide doc:api
 
