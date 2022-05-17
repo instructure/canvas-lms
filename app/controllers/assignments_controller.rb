@@ -121,7 +121,18 @@ class AssignmentsController < ApplicationController
   end
 
   def render_a2_student_view(student:)
-    submission = @assignment.submissions.find_by(user: student)
+    submission = if @context.feature_enabled?(:peer_reviews_for_a2)
+                   if params[:reviewee_id].present? && !@assignment.anonymize_students?
+                     @assignment.submissions.find_by(user_id: params[:reviewee_id])
+                   elsif params[:anonymous_asset_id].present?
+                     @assignment.submissions.find_by(anonymous_id: params[:anonymous_asset_id])
+                   else
+                     @assignment.submissions.find_by(user: student)
+                   end
+                 else
+                   @assignment.submissions.find_by(user: student)
+                 end
+
     graphql_submission_id = nil
     if submission
       graphql_submission_id = CanvasSchema.id_from_object(
