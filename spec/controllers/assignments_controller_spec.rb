@@ -921,6 +921,75 @@ describe AssignmentsController do
           get "show", params: { course_id: @course.id, id: @assignment.id }
           expect(assigns[:js_env][:belongs_to_unpublished_module]).to eq(true)
         end
+
+        context "peer reviews" do
+          before do
+            @assignment.update_attribute(:peer_reviews, true)
+            @reviewee = student_in_course(course: @course, active_enrollment: true).user
+            @assignment.assign_peer_review(@student, @reviewee)
+
+            @student_submission = @assignment.submission_for_student(@student)
+            @reviewee_submission =  @assignment.submission_for_student(@reviewee)
+
+            @reviewee_submission_id = CanvasSchema.id_from_object(
+              @reviewee_submission,
+              CanvasSchema.resolve_type(nil, @reviewee_submission, nil),
+              nil
+            )
+            @student_submission_id = CanvasSchema.id_from_object(
+              @student_submission,
+              CanvasSchema.resolve_type(nil, @student_submission, nil),
+              nil
+            )
+
+            @course.enable_feature!(:peer_reviews_for_a2)
+            @course.enable_feature!(:assignments_2_student)
+          end
+
+          it "sets SUBMISSION_ID coresponding to the reviewee when reviewee_id param is present" do
+            user_session(@student)
+
+            get "show", params: { course_id: @course.id, id: @assignment.id, reviewee_id: @reviewee.id }
+            expect(assigns[:js_env][:SUBMISSION_ID]).to eq @reviewee_submission_id
+          end
+
+          it "sets SUBMISSION_ID coresponding to the reviewee when anonymous_asset_id param is present" do
+            user_session(@student)
+
+            get "show", params: { course_id: @course.id, id: @assignment.id, anonymous_asset_id: @reviewee_submission.anonymous_id }
+            expect(assigns[:js_env][:SUBMISSION_ID]).to eq @reviewee_submission_id
+          end
+
+          it "sets SUBMISSION_ID to NULL when the reviewee_id is not valid" do
+            user_session(@student)
+
+            get "show", params: { course_id: @course.id, id: @assignment.id, reviewee_id: 9999 }
+            expect(assigns[:js_env][:SUBMISSION_ID]).to eq nil
+          end
+
+          it "sets SUBMISSION_ID to NULL when the anonymous_asset_id is not valid" do
+            user_session(@student)
+
+            get "show", params: { course_id: @course.id, id: @assignment.id, anonymous_asset_id: 9999 }
+            expect(assigns[:js_env][:SUBMISSION_ID]).to eq nil
+          end
+
+          it "sets the student SUBMISSION_ID when peer_reviews_for_a2 FF is off and reviewee_id param is present" do
+            @course.disable_feature!(:peer_reviews_for_a2)
+
+            user_session(@student)
+            get "show", params: { course_id: @course.id, id: @assignment.id, reviewee_id: @reviewee.id }
+            expect(assigns[:js_env][:SUBMISSION_ID]).to eq @student_submission.id
+          end
+
+          it "sets the student SUBMISSION_ID when peer_reviews_for_a2 FF is off and anonymous_asset_id param is present" do
+            @course.disable_feature!(:peer_reviews_for_a2)
+
+            user_session(@student)
+            get "show", params: { course_id: @course.id, id: @assignment.id, anonymous_asset_id: @reviewee_submission.anonymous_id }
+            expect(assigns[:js_env][:SUBMISSION_ID]).to eq @student_submission.id
+          end
+        end
       end
 
       context "when logged in as an observer" do
