@@ -111,14 +111,15 @@ it('is valid when valid', () => {
   expect(wrapper.instance().valid()).toEqual(true)
 })
 
-const placements = [
+const alwaysDeeplinkingPlacements = [
   'editor_button',
   'migration_selection',
   'homework_submission',
-  'conference_selection'
+  'conference_selection',
+  'submission_type_selection'
 ]
 
-placements.forEach(placementName => {
+alwaysDeeplinkingPlacements.forEach(placementName => {
   it('displays alert when placement only supports deep linking', () => {
     const wrapper = mount(<Placement {...props({placementName})} />)
     wrapper.find('button').simulate('click')
