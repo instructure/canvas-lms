@@ -104,6 +104,7 @@ module Turnitin
           attempt_number = subject.class.max_attempts - 1
           original_submission_response = double("original_submission_mock")
           allow(original_submission_response).to receive(:headers).and_return({})
+          allow(original_submission_response).to receive(:status).and_return(403)
           expect_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:original_submission).and_yield(original_submission_response)
           allow_any_instance_of(subject.class).to receive(:attempt_number).and_return(attempt_number)
           mock = double
@@ -124,45 +125,99 @@ module Turnitin
         before do
           response_response = double("response_mock")
           allow(response_response).to receive(:body).and_return(tii_response)
-          allow_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:response).and_return(response_response)
+          allow(subject.turnitin_client).to receive(:response).and_return(response_response)
+          allow(subject.class).to receive(:max_attempts).and_return(1)
         end
 
-        it 'creates an attachment for "Errors::ScoreStillPendingError"' do
-          allow(subject.class).to receive(:max_attempts).and_return(1)
-          original_submission_response = double("original_submission_mock")
-          allow(original_submission_response).to receive(:headers).and_return({})
-          expect_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:original_submission).and_yield(original_submission_response)
-          expect { subject.process }.to raise_error(Errors::ScoreStillPendingError)
-          attachment = lti_assignment.attachments.first
-          expect(lti_assignment.attachments.count).to eq 1
-          expect(attachment.display_name).to eq "Failed turnitin submission"
+        shared_examples_for "an error occurring when fetching the submission" do
+          def process
+            expect { subject.process }.to raise_error(error)
+          end
+
+          let(:sub) { lti_assignment.submissions.first }
+
+          it "creates an attachment" do
+            process
+            attachment = lti_assignment.attachments.first
+            expect(lti_assignment.attachments.count).to eq 1
+            expect(attachment.display_name).to eq "Failed turnitin submission"
+          end
+
+          it "creates a submission if we got an uploaded at" do
+            process
+            expect(sub.workflow_state).to eq("submitted")
+            expect(sub.submitted_at).to_not be(nil)
+            expect(sub.submitted_at).to eq(subject.turnitin_client.uploaded_at)
+            expect(sub.turnitin_data).to eq(
+              "attachment_#{lti_assignment.attachments.first.id}" => {
+                status: "error",
+                public_error_message: "Turnitin has not returned a submission after 1 attempts to retrieve one."
+              }
+            )
+          end
+
+          it "creates an attachment but no submission if we got a response w/o date_uploaded" do
+            tii_response["meta"].delete "date_uploaded"
+            process
+            expect(sub.workflow_state).to eq("unsubmitted")
+            expect(sub.turnitin_data).to be_blank
+            expect(lti_assignment.attachments.count).to eq 1
+            expect(lti_assignment.attachments.first.display_name).to eq "Failed turnitin submission"
+          end
         end
 
-        it 'creates an attachment for "Faraday::TimeoutError"' do
-          allow(subject.class).to receive(:max_attempts).and_return(1)
-          expect_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:original_submission).and_raise(Faraday::TimeoutError, "Net::ReadTimeout")
-          expect { subject.process }.to raise_error(Faraday::TimeoutError)
-          attachment = lti_assignment.attachments.first
-          expect(lti_assignment.attachments.count).to eq 1
-          expect(attachment.display_name).to eq "Failed turnitin submission"
+        context "when getting a Errors::OriginalSubmissionUnavailableError" do
+          let(:error) { Errors::OriginalSubmissionUnavailableError }
+
+          before do
+            original_submission_response = double("original_submission_mock")
+            allow(original_submission_response).to receive(:headers).and_return({})
+            allow(original_submission_response).to receive(:status).and_return(403)
+            allow(subject.turnitin_client).to receive(:original_submission).and_yield(original_submission_response)
+          end
+
+          it_behaves_like "an error occurring when fetching the submission"
+
+          it "creates an Attachment with the status code in the text" do
+            orig_method = lti_assignment.attachments.method(:create!)
+            expect(lti_assignment.attachments).to receive(:create!) do |opts|
+              data = opts[:uploaded_data]
+              expect(data.read).to match(/Status code: 403/)
+              data.rewind
+              orig_method.call(opts)
+            end
+            expect { subject.process }.to raise_error(error)
+          end
         end
 
-        it 'creates an attachment for "Errno::ETIMEDOUT"' do
-          allow(subject.class).to receive(:max_attempts).and_return(1)
-          expect_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:original_submission).and_raise(Errno::ETIMEDOUT, 'Connection timed out - connect(2) for "api.turnitin.com" port 443')
-          expect { subject.process }.to raise_error(Errno::ETIMEDOUT)
-          attachment = lti_assignment.attachments.first
-          expect(lti_assignment.attachments.count).to eq 1
-          expect(attachment.display_name).to eq "Failed turnitin submission"
+        context "when getting a Faraday::TimeoutError" do
+          let(:error) { Faraday::TimeoutError.new("Net::ReadTimeout") }
+
+          before do
+            allow(subject.turnitin_client).to receive(:original_submission).and_raise(error)
+          end
+
+          it_behaves_like "an error occurring when fetching the submission"
         end
 
-        it 'creates an attachment for "Faraday::ConnectionFailed"' do
-          allow(subject.class).to receive(:max_attempts).and_return(1)
-          expect_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:original_submission).and_raise(Faraday::ConnectionFailed, "Connection reset by peer")
-          expect { subject.process }.to raise_error(Faraday::ConnectionFailed)
-          attachment = lti_assignment.attachments.first
-          expect(lti_assignment.attachments.count).to eq 1
-          expect(attachment.display_name).to eq "Failed turnitin submission"
+        context "when the error is Errno::ETIMEDOUT" do
+          let(:error) { Errno::ETIMEDOUT.new('Connection timed out - connect(2) for "api.turnitin.com" port 443') }
+
+          before do
+            allow(subject.turnitin_client).to receive(:original_submission).and_raise(error)
+          end
+
+          it_behaves_like "an error occurring when fetching the submission"
+        end
+
+        context "when the error is Faraday::ConnectionFailed" do
+          let(:error) { Faraday::ConnectionFailed.new('Connection timed out - connect(2) for "api.turnitin.com" port 443') }
+
+          before do
+            allow(subject.turnitin_client).to receive(:original_submission).and_raise(error)
+          end
+
+          it_behaves_like "an error occurring when fetching the submission"
         end
       end
     end
