@@ -48,7 +48,8 @@ export default class Placement extends React.Component {
     'editor_button',
     'migration_selection',
     'homework_submission',
-    'conference_selection'
+    'conference_selection',
+    'submission_type_selection'
   ]
 
   canBeEither = [
