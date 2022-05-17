@@ -28,13 +28,16 @@ import {IconArrowOpenEndLine, IconArrowOpenDownLine} from '@instructure/ui-icons
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
+import AlignmentItem from './AlignmentItem'
+import {alignmentShape} from './shapes'
 
 const I18n = useI18nScope('AlignmentSummary')
 
-const AlignmentOutcomeItem = ({title, description, alignmentCount}) => {
+const AlignmentOutcomeItem = ({title, description, alignments}) => {
   const [truncated, setTruncated] = useState(true)
   const onClickHandler = () => setTruncated(prevState => !prevState)
   const truncatedDescription = stripHtmlTags(description || '')
+  const alignmentsCount = alignments?.length || 0
 
   return (
     <View as="div" padding="x-small 0" borderWidth="0 0 small" data-testid="alignment-outcome-item">
@@ -103,6 +106,24 @@ const AlignmentOutcomeItem = ({title, description, alignmentCount}) => {
                 dangerouslySetInnerHTML={{__html: description}}
               />
             )}
+
+            {!truncated && alignmentsCount > 0 && (
+              <View as="div" padding="small 0 small">
+                {alignments.map(
+                  ({id, type, title: alignmentTitle, url, moduleTitle, moduleUrl}) => (
+                    <AlignmentItem
+                      id={id}
+                      key={id}
+                      type={type}
+                      title={alignmentTitle}
+                      url={url}
+                      moduleTitle={moduleTitle}
+                      moduleUrl={moduleUrl}
+                    />
+                  )
+                )}
+              </View>
+            )}
           </div>
         </Flex.Item>
         <Flex.Item size="9rem" alignSelf="end">
@@ -114,7 +135,7 @@ const AlignmentOutcomeItem = ({title, description, alignmentCount}) => {
             }}
           >
             <Text size="medium" weight="bold">
-              {alignmentCount}
+              {alignmentsCount}
             </Text>
             <View padding="0 xxx-small 0 0">
               <Text size="medium">{`${I18n.t('Alignments')}:`}</Text>
@@ -129,7 +150,7 @@ const AlignmentOutcomeItem = ({title, description, alignmentCount}) => {
 AlignmentOutcomeItem.propTypes = {
   title: PropTypes.string.isRequired,
   description: PropTypes.string,
-  alignmentCount: PropTypes.number.isRequired
+  alignments: PropTypes.arrayOf(alignmentShape).isRequired
 }
 
 export default memo(AlignmentOutcomeItem)

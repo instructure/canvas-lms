@@ -32,9 +32,26 @@ const AlignmentSummary = () => {
   const totalAlignments = 6800
   const totalArtifacts = 2400
   const alignedArtifacts = 2000
-  const title = 'Outcome 123 '.repeat(3)
-  const description = 'Outcome description '.repeat(10)
-  const alignmentCount = 15
+  const title = 'Outcome 123'
+  const description = 'Long outcome description '.repeat(10)
+  const alignments = [
+    {
+      id: '1',
+      type: 'Assignment',
+      title: 'Assignment 1',
+      url: '/courses/1/outcomes/1/alignments/3',
+      moduleTitle: 'Module 1',
+      moduleUrl: '/courses/1/modules/1'
+    },
+    {
+      id: '2',
+      type: 'Rubric',
+      title: 'Rubric 1',
+      url: '/courses/1/outcomes/1/alignments/5',
+      moduleTitle: null,
+      moduleUrl: null
+    }
+  ]
 
   return (
     <View data-testid="outcome-alignment-summary">
@@ -55,11 +72,7 @@ const AlignmentSummary = () => {
         </Flex>
       </View>
       <View as="div">
-        <AlignmentOutcomeItem
-          title={title}
-          description={description}
-          alignmentCount={alignmentCount}
-        />
+        <AlignmentOutcomeItem title={title} description={description} alignments={alignments} />
       </View>
     </View>
   )
