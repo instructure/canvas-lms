@@ -1379,19 +1379,15 @@ test('it attaches assignment external tools component', function () {
   equal(view.$assignmentExternalTools.children().size(), 1)
 })
 
-test('receives iframe dimensions via Deep Linking response', async () => {
-  // context:
-  //   a deep linking response for the assignment_selection placement is processed in
-  //   ui/shared/select-content-dialog/jquery/select_content_dialog.js
-  //
-  //   the $('#select_context_content_dialog .add_item_button') block submits an Object mocked below
+test('#handleAssignmentSelectionSubmit updates the external_tool_tag_attributes input fields', async () => {
   const data = {
     'item[assignment_id]': '',
-    'item[custom_params]': '',
+    'item[custom_params]':
+      '{"RootAccountId":"$Canvas.rootAccount.id","ExternalToolGlobalId":"$Canvas.externalTool.global_id","ShardId":"$Canvas.shard.id"}',
     'item[type]': 'context_external_tool',
     'item[id]': 1,
     'item[url]': 'https://foo.bar/internal_link/klIknZO7sE',
-    'item[new_tab]': '0',
+    'item[new_tab]': '1',
     'item[iframe][width]': '111',
     'item[iframe][height]': '222'
   }
@@ -1400,8 +1396,59 @@ test('receives iframe dimensions via Deep Linking response', async () => {
   // when selectContentDialog.submit is triggered the handleAssignmentSelectionSubmit function is called
   view.handleAssignmentSelectionSubmit(data)
 
-  equal(view.$('#assignment_external_tool_tag_attributes_iframe_width')?.val(), '111')
-  equal(view.$('#assignment_external_tool_tag_attributes_iframe_height')?.val(), '222')
+  equal(
+    view.$externalToolsCustomParams.val(),
+    '{"RootAccountId":"$Canvas.rootAccount.id","ExternalToolGlobalId":"$Canvas.externalTool.global_id","ShardId":"$Canvas.shard.id"}'
+  )
+  equal(view.$externalToolsContentType.val(), 'context_external_tool')
+  equal(view.$externalToolsContentId.val(), '1')
+  equal(view.$externalToolsUrl.val(), 'https://foo.bar/internal_link/klIknZO7sE')
+  equal(view.$externalToolsNewTab.val(), '1')
+  equal(view.$externalToolsIframeWidth.val(), '111')
+  equal(view.$externalToolsIframeHeight.val(), '222')
+})
+
+test('has the expected DOM structure for handling deep linking messages', async () => {
+  // see ui/features/assignment_edit/deepLinking.js
+  const view = editView()
+
+  // Input elements exists
+  equal(
+    view.$("input[name='external_tool_tag_attributes[content_id]']").attr('id'),
+    'assignment_external_tool_tag_attributes_content_id'
+  )
+
+  equal(
+    view.$("input[name='external_tool_tag_attributes[content_type]']").attr('id'),
+    'assignment_external_tool_tag_attributes_content_type'
+  )
+
+  // _submission_types_form.handlebars creates 2 inputs with the same name:
+  //   1st is input[type="hidden"] without id
+  //   2nd is input[type="checkbox"] with id
+  equal(view.$("input[name='external_tool_tag_attributes[new_tab]']").attr('type'), 'hidden')
+  equal(view.$('input#assignment_external_tool_tag_attributes_new_tab').attr('type'), 'checkbox')
+
+  equal(
+    view.$("input[name='external_tool_tag_attributes[url]']").attr('id'),
+    'assignment_external_tool_tag_attributes_url'
+  )
+  equal(
+    view.$("input[name='external_tool_tag_attributes[link_settings][selection_width]']").attr('id'),
+    'assignment_external_tool_tag_attributes_iframe_width'
+  )
+
+  equal(
+    view
+      .$("input[name='external_tool_tag_attributes[link_settings][selection_height]']")
+      .attr('id'),
+    'assignment_external_tool_tag_attributes_iframe_height'
+  )
+
+  equal(
+    view.$("input[name='external_tool_tag_attributes[custom_params]']").attr('id'),
+    'assignment_external_tool_tag_attributes_custom_params'
+  )
 })
 
 QUnit.module('EditView: Quizzes 2', {

@@ -31,9 +31,13 @@ import PeerReviewsSelector from '@canvas/assignments/backbone/views/PeerReviewsS
 import '@canvas/grading-standards'
 import LockManager from '@canvas/blueprint-courses/react/components/LockManager/index'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
+import {addDeepLinkingListener} from '@canvas/deep-linking/DeepLinking'
+import handleResponse from './deepLinking'
 
 ready(() => {
   monitorLtiMessages()
+  addDeepLinkingListener(handleResponse)
+
   const lockManager = new LockManager()
   lockManager.init({itemType: 'assignment', page: 'edit'})
   const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : {}
