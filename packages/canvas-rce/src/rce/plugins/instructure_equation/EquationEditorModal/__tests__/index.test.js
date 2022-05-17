@@ -73,12 +73,10 @@ jest.mock('../advancedPreference', () => {
 })
 
 describe('EquationEditorModal', () => {
-  let editor, mockFn, oldENV
+  let editor, mockFn
 
   beforeAll(() => {
-    oldENV = window.ENV
-
-    window.ENV = {
+    ENV = {
       FEATURES: {
         new_equation_editor: true
       }
@@ -124,10 +122,6 @@ describe('EquationEditorModal', () => {
 
   afterEach(() => {
     jest.clearAllMocks()
-  })
-
-  afterAll(() => {
-    window.ENV = oldENV
   })
 
   describe('loadExistingFormula', () => {
@@ -549,6 +543,42 @@ describe('EquationEditorModal', () => {
       renderModal({editor})
       toggleMode()
       expect(advancedPreference.set).toHaveBeenCalled()
+    })
+  })
+
+  describe('keyboard shortcuts', () => {
+    beforeEach(() => {
+      ENV.disable_keyboard_shortcuts = false
+    })
+
+    describe('are disabled when', () => {
+      it('the modal is opened', () => {
+        renderModal()
+        expect(ENV.disable_keyboard_shortcuts).toBe(true)
+      })
+    })
+
+    describe('original state is restored when', () => {
+      it('the close button is clicked', () => {
+        const {getByRole} = renderModal()
+        const closeButton = getByRole('button', {name: /close/i})
+        fireEvent.click(closeButton)
+        expect(ENV.disable_keyboard_shortcuts).toBe(false)
+      })
+
+      it('the cancel button is clicked', () => {
+        const {getByRole} = renderModal()
+        const cancelButton = getByRole('button', {name: /cancel/i})
+        fireEvent.click(cancelButton)
+        expect(ENV.disable_keyboard_shortcuts).toBe(false)
+      })
+
+      it('the done button is clicked', () => {
+        const {getByRole} = renderModal()
+        const doneButton = getByRole('button', {name: /done/i})
+        fireEvent.click(doneButton)
+        expect(ENV.disable_keyboard_shortcuts).toBe(false)
+      })
     })
   })
 })
