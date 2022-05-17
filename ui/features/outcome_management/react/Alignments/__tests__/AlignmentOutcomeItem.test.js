@@ -24,7 +24,16 @@ describe('AlignmentOutcomeItem', () => {
   const defaultProps = (props = {}) => ({
     title: 'Outcome Title',
     description: 'Outcome Description',
-    alignmentCount: 15,
+    alignments: [
+      {
+        id: '1',
+        type: 'Assignment',
+        title: 'Assignment 1',
+        url: '/courses/1/outcomes/1/alignments/3',
+        moduleTitle: 'Module 1',
+        moduleUrl: '/courses/1/modules/1'
+      }
+    ],
     ...props
   })
 
@@ -41,7 +50,7 @@ describe('AlignmentOutcomeItem', () => {
   it('displays number of alignments', () => {
     const {getByText} = render(<AlignmentOutcomeItem {...defaultProps()} />)
     expect(getByText('Alignments:')).toBeInTheDocument()
-    expect(getByText('15')).toBeInTheDocument()
+    expect(getByText('1')).toBeInTheDocument()
   })
 
   it('displays right pointing caret when description is collapsed', () => {
