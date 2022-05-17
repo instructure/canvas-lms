@@ -70,6 +70,7 @@ module Lti::IMS
             User.id
             Canvas.user.id
             vnd.instructure.User.uuid
+            com.instructure.User.sectionNames
             Canvas.user.globalId
             Canvas.user.sisSourceId
             Person.sourcedId
@@ -80,6 +81,8 @@ module Lti::IMS
             User.username
             Canvas.user.loginId
             Canvas.user.sisIntegrationId
+            Canvas.course.sectionIds
+            Canvas.group.contextIds
             Canvas.xapi.url
             Caliper.url
           ]
