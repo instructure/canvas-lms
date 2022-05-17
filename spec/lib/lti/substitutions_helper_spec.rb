@@ -263,6 +263,47 @@ module Lti
         helper = SubstitutionsHelper.new(account, root_account, nil)
         expect(helper.account_enrollments).to eq []
       end
+
+      context "with cross-shard account in chain" do
+        let(:xshard_account) { @shard1.activate { account_model } }
+        let(:xshard_enrollment) { xshard_account.account_users.create!(user: user) }
+
+        before do
+          allow(account).to receive(:account_chain).and_return [account, root_account, xshard_account]
+          xshard_enrollment
+        end
+
+        it "queries correct shard for enrollments" do
+          expect(subject.account_enrollments).to eq [xshard_enrollment]
+        end
+
+        context "with federated parent account chain argument" do
+          before do
+            allow(account).to receive(:account_chain).with(include_federated_parent: true).and_return [account, root_account, xshard_account]
+            allow(account).to receive(:account_chain).with(include_federated_parent: false).and_return [account, root_account]
+          end
+
+          context "with non-primary_settings_root_account" do
+            before do
+              allow(root_account).to receive(:primary_settings_root_account?).and_return false
+            end
+
+            it "includes federated parent account in enrollment query" do
+              expect(subject.account_enrollments).to eq [xshard_enrollment]
+            end
+          end
+
+          context "with primary_settings_root_account" do
+            before do
+              allow(root_account).to receive(:primary_settings_root_account?).and_return true
+            end
+
+            it "does not include federated parent account in enrollment query" do
+              expect(subject.account_enrollments).to eq []
+            end
+          end
+        end
+      end
     end
 
     describe "#current_lis_roles" do
