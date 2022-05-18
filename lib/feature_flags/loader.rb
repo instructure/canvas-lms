@@ -55,11 +55,9 @@ module FeatureFlags
       [:display_name, :description].each do |field|
         definition[field] = wrap_translate_text(definition[field])
       end
-      definition[:enable_at] = Date.parse(definition[:enable_at]) if definition[:enable_at]
       definition[:state] = ensure_state_if_boolean(definition[:state]) if definition.key? :state
       definition[:environments]&.each do |_env_name, env|
         env[:state] = ensure_state_if_boolean(env[:state]) if env.key? :state
-        env[:enable_at] = Date.parse(env[:enable_at]) if env.key? :enable_at
       end
       Feature.register({ name => definition })
     end
