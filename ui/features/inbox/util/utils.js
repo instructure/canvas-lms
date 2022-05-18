@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import _ from 'underscore'
 
 export const responsiveQuerySizes = ({mobile = false, tablet = false, desktop = false} = {}) => {
   const querySizes = {}
@@ -34,7 +33,7 @@ export const responsiveQuerySizes = ({mobile = false, tablet = false, desktop = 
 // Takes in data from either a VIEWABLE_SUBMISSIONS_QUERY or CONVERSATIONS_QUERY
 // Outputs an inbox conversation wrapper
 export const inboxConversationsWrapper = (data, isSubmissionComments = false) => {
-  let inboxConversations = []
+  const inboxConversations = []
   if (data) {
     data.forEach(conversation => {
       const inboxConversation = {}
@@ -73,7 +72,6 @@ export const inboxConversationsWrapper = (data, isSubmissionComments = false) =>
       }
       inboxConversations.push(inboxConversation)
     })
-    inboxConversations = _.sortBy(inboxConversations, 'lastMessageCreatedAt').reverse()
   }
   return inboxConversations
 }

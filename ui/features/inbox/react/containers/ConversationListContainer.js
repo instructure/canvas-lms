@@ -24,7 +24,7 @@ import {ConversationListHolder} from '../components/ConversationListHolder/Conve
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Mask} from '@instructure/ui-overlays'
 import PropTypes from 'prop-types'
-import React, {useContext, useMemo} from 'react'
+import React, {useContext, useMemo, useState} from 'react'
 import {Spinner} from '@instructure/ui-spinner'
 import {useQuery, useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
@@ -36,6 +36,7 @@ const I18n = useI18nScope('conversations_2')
 const ConversationListContainer = ({course, scope, onSelectConversation, userFilter}) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const {isSubmissionCommentsType} = useContext(ConversationContext)
+  const [isLoadingMoreData, setIsLoadingMoreData] = useState(false)
 
   const userID = ENV.current_user_id?.toString()
 
@@ -71,22 +72,106 @@ const ConversationListContainer = ({course, scope, onSelectConversation, userFil
   const conversationsQuery = useQuery(CONVERSATIONS_QUERY, {
     variables: {userID, scope, filter: [userFilter, course]},
     fetchPolicy: 'cache-and-network',
-    skip: isSubmissionCommentsType
+    skip: isSubmissionCommentsType || scope === 'submission_comments'
   })
 
   const submissionCommentsQuery = useQuery(VIEWABLE_SUBMISSIONS_QUERY, {
     variables: {userID, sort: 'desc'},
-    skip: !isSubmissionCommentsType
+    fetchPolicy: 'cache-and-network',
+    skip: !isSubmissionCommentsType || !(scope === 'submission_comments')
   })
 
+  const fetchMoreMenuData = () => {
+    setIsLoadingMoreData(true)
+    if (!isSubmissionCommentsType) {
+      conversationsQuery.fetchMore({
+        variables: {
+          _id: inboxItemData[inboxItemData.length - 1]._node_id,
+          userID,
+          scope,
+          filter: [userFilter, course],
+          afterConversation:
+            conversationsQuery.data?.legacyNode?.conversationsConnection?.pageInfo.endCursor
+        },
+        updateQuery: (previousResult, {fetchMoreResult}) => {
+          setIsLoadingMoreData(false)
+
+          const prev_nodes = previousResult.legacyNode.conversationsConnection.nodes
+          const fetchMore_nodes = fetchMoreResult.legacyNode.conversationsConnection.nodes
+          const fetchMore_pageInfo = fetchMoreResult?.legacyNode?.conversationsConnection?.pageInfo
+          return {
+            legacyNode: {
+              _id: fetchMoreResult?.legacyNode?._id,
+              id: fetchMoreResult?.legacyNode?.id,
+              conversationsConnection: {
+                nodes: [...prev_nodes, ...fetchMore_nodes],
+                pageInfo: fetchMore_pageInfo,
+                __typename: 'ConversationParticipantConnection'
+              },
+              __typename: 'User'
+            }
+          }
+        }
+      })
+    } else {
+      submissionCommentsQuery.fetchMore({
+        variables: {
+          _id: inboxItemData[inboxItemData.length - 1]._node_id,
+          userID,
+          sort: 'desc',
+          afterSubmission:
+            submissionCommentsQuery.data?.legacyNode?.viewableSubmissionsConnection?.pageInfo
+              .endCursor
+        },
+        updateQuery: (previousResult, {fetchMoreResult}) => {
+          setIsLoadingMoreData(false)
+
+          const prev_nodes = previousResult.legacyNode.viewableSubmissionsConnection.nodes
+          const fetchMore_nodes = fetchMoreResult.legacyNode.viewableSubmissionsConnection.nodes
+          const fetchMore_pageInfo =
+            fetchMoreResult?.legacyNode?.viewableSubmissionsConnection?.pageInfo
+          return {
+            legacyNode: {
+              _id: fetchMoreResult?.legacyNode?._id,
+              id: fetchMoreResult?.legacyNode?.id,
+              viewableSubmissionsConnection: {
+                nodes: [...prev_nodes, ...fetchMore_nodes],
+                pageInfo: fetchMore_pageInfo,
+                __typename: 'SubmissionConnection'
+              },
+              __typename: 'User'
+            }
+          }
+        }
+      })
+    }
+  }
+
   const inboxItemData = useMemo(() => {
+    if (
+      (conversationsQuery.loading && !conversationsQuery.data) ||
+      (submissionCommentsQuery.loading && !submissionCommentsQuery.data)
+    ) {
+      return []
+    }
     const data = isSubmissionCommentsType
       ? submissionCommentsQuery.data?.legacyNode?.viewableSubmissionsConnection?.nodes
       : conversationsQuery.data?.legacyNode?.conversationsConnection?.nodes
-    return inboxConversationsWrapper(data, isSubmissionCommentsType)
-  }, [conversationsQuery.data, isSubmissionCommentsType, submissionCommentsQuery.data])
+    const inboxData = inboxConversationsWrapper(data, isSubmissionCommentsType)
 
-  if (conversationsQuery.loading || submissionCommentsQuery.loading) {
+    if (inboxData.length > 0 && !conversationsQuery.loading && !submissionCommentsQuery.loading) {
+      inboxData[inboxData.length - 1].isLast = true
+    }
+    return inboxData
+  }, [
+    conversationsQuery.loading,
+    conversationsQuery.data,
+    submissionCommentsQuery.loading,
+    submissionCommentsQuery.data,
+    isSubmissionCommentsType
+  ])
+
+  const renderLoading = () => {
     return (
       <View as="div" style={{position: 'relative'}} height="100%">
         <Mask>
@@ -96,15 +181,19 @@ const ConversationListContainer = ({course, scope, onSelectConversation, userFil
     )
   }
 
-  if (conversationsQuery.error || submissionCommentsQuery.error) {
-    setOnFailure(I18n.t('Unable to load messages.'))
+  if (conversationsQuery.loading && submissionCommentsQuery.loading) {
+    renderLoading()
   }
 
   return (
     <Responsive
       match="media"
-      query={responsiveQuerySizes({tablet: true, desktop: true})}
+      query={responsiveQuerySizes({mobile: true, tablet: true, desktop: true})}
       props={{
+        mobile: {
+          textSize: 'x-small',
+          datatestid: 'list-items-mobile'
+        },
         tablet: {
           textSize: 'x-small',
           datatestid: 'list-items-tablet'
@@ -121,6 +210,15 @@ const ConversationListContainer = ({course, scope, onSelectConversation, userFil
           onStar={handleStar}
           textSize={responsiveProps.textSize}
           datatestid={responsiveProps.datatestid}
+          hasMoreMenuData={
+            conversationsQuery.data?.legacyNode?.conversationsConnection?.pageInfo?.hasNextPage ||
+            submissionCommentsQuery.data?.legacyNode?.viewableSubmissionsConnection?.pageInfo
+              ?.hasNextPage
+          }
+          fetchMoreMenuData={fetchMoreMenuData}
+          isLoadingMoreMenuData={isLoadingMoreData}
+          isLoading={conversationsQuery.loading || submissionCommentsQuery.loading}
+          isError={conversationsQuery.error || submissionCommentsQuery.error}
         />
       )}
     />

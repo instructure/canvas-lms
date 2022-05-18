@@ -78,7 +78,12 @@ export const ADDRESS_BOOK_RECIPIENTS = gql`
 `
 
 export const CONVERSATIONS_QUERY = gql`
-  query GetConversationsQuery($userID: ID!, $filter: [String!], $scope: String = "") {
+  query GetConversationsQuery(
+    $userID: ID!
+    $filter: [String!]
+    $scope: String = ""
+    $afterConversation: String
+  ) {
     legacyNode(_id: $userID, type: User) {
       ... on User {
         _id
@@ -86,6 +91,8 @@ export const CONVERSATIONS_QUERY = gql`
         conversationsConnection(
           scope: $scope # e.g. archived
           filter: $filter # e.g. [course_1, user_1]
+          first: 20
+          after: $afterConversation
         ) {
           nodes {
             ...ConversationParticipant
@@ -98,6 +105,9 @@ export const CONVERSATIONS_QUERY = gql`
               }
             }
           }
+          pageInfo {
+            ...PageInfo
+          }
         }
       }
     }
@@ -105,6 +115,7 @@ export const CONVERSATIONS_QUERY = gql`
   ${ConversationParticipant.fragment}
   ${Conversation.fragment}
   ${ConversationMessage.fragment}
+  ${PageInfo.fragment}
 `
 
 export const CONVERSATION_MESSAGES_QUERY = gql`
@@ -179,12 +190,13 @@ export const VIEWABLE_SUBMISSIONS_QUERY = gql`
     $userID: ID!
     $sort: SubmissionCommentsSortOrderType
     $allComments: Boolean = true
+    $afterSubmission: String
   ) {
     legacyNode(_id: $userID, type: User) {
       ... on User {
         _id
         id
-        viewableSubmissionsConnection {
+        viewableSubmissionsConnection(first: 20, after: $afterSubmission) {
           nodes {
             _id
             commentsConnection(sortOrder: $sort, filter: {allComments: $allComments}) {
@@ -193,11 +205,15 @@ export const VIEWABLE_SUBMISSIONS_QUERY = gql`
               }
             }
           }
+          pageInfo {
+            ...PageInfo
+          }
         }
       }
     }
   }
   ${SubmissionComment.fragment}
+  ${PageInfo.fragment}
 `
 
 export const SUBMISSION_COMMENTS_QUERY = gql`
