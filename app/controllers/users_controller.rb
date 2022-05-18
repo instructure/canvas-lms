@@ -1393,7 +1393,7 @@ class UsersController < ApplicationController
             require_sis: false,
             include_all_pseudonyms: true
           )
-        @user.last_login = pseudonyms.max_by(&:current_login_at).current_login_at
+        @user.last_login = pseudonyms&.max_by(&:current_login_at)&.current_login_at
       end
 
       render json: user_json(@user, @current_user, session, includes, @domain_root_account),
