@@ -90,7 +90,14 @@ function updateGradebookFilter(courseId, filter) {
   })
 }
 
-function sendMessageStudentsWho(recipientsIds, subject, body, contextCode, mediaFile) {
+function sendMessageStudentsWho(
+  recipientsIds,
+  subject,
+  body,
+  contextCode,
+  mediaFile,
+  attachmentIds
+) {
   const params = {
     recipients: recipientsIds,
     subject,
@@ -104,6 +111,10 @@ function sendMessageStudentsWho(recipientsIds, subject, body, contextCode, media
   if (mediaFile) {
     params.media_comment_id = mediaFile.id
     params.media_comment_type = mediaFile.type
+  }
+
+  if (attachmentIds) {
+    params.attachment_ids = attachmentIds
   }
 
   return axios.post('/api/v1/conversations', params)

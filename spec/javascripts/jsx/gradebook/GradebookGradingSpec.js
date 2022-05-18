@@ -1356,6 +1356,30 @@ QUnit.module('Gradebook#sendMessageStudentsWho', hooks => {
     strictEqual(apiRequestStub.firstCall.args[2], body)
   })
 
+  test('if provided, includes mediaFile as the fifth parameter', async () => {
+    const mediaFile = {id: '1959', type: 'video'}
+    await gradebook.sendMessageStudentsWho({
+      body,
+      mediaFile,
+      recipientsIds,
+      subject
+    })
+
+    deepEqual(apiRequestStub.firstCall.args[4], mediaFile)
+  })
+
+  test('if provided, includes attachmentIds as the sixth parameter', async () => {
+    const attachmentIds = ['4', '82']
+    await gradebook.sendMessageStudentsWho({
+      attachmentIds,
+      body,
+      recipientsIds,
+      subject
+    })
+
+    deepEqual(apiRequestStub.firstCall.args[5], attachmentIds)
+  })
+
   test('shows a success flash alert when the process succeeds', async () => {
     const message = 'Message sent successfully'
     await gradebook.sendMessageStudentsWho({
