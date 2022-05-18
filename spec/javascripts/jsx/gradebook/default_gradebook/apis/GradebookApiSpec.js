@@ -302,6 +302,15 @@ QUnit.module('GradebookApi.sendMessageStudentsWho', hooks => {
       strictEqual(bodyData.media_comment_type, 'video')
     }))
 
+  test('includes attachment_ids param if passed attachment ids', () =>
+    GradebookApi.sendMessageStudentsWho(recipientsIds, subject, body, contextCode, null, [
+      '4',
+      '8'
+    ]).then(() => {
+      const bodyData = JSON.parse(getRequest().requestBody)
+      deepEqual(bodyData.attachment_ids, ['4', '8'])
+    }))
+
   test('does not include media comment params if not passed a media file', () =>
     GradebookApi.sendMessageStudentsWho(recipientsIds, subject, body, contextCode).then(() => {
       const bodyData = JSON.parse(getRequest().requestBody)

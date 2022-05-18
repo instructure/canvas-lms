@@ -100,6 +100,10 @@ export type Props = {
   userId: string
 }
 
+type Attachment = {
+  id: string
+}
+
 type MediaFile = {
   id: string
   type: string
@@ -128,6 +132,7 @@ type FilterCriterion = {
 }
 
 type SendArgs = {
+  attachmentIds?: string[]
   recipientsIds: number[]
   subject: string
   body: string
@@ -329,11 +334,12 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
 
   const [showTable, setShowTable] = useState(false)
   const [selectedCriterion, setSelectedCriterion] = useState(availableCriteria[0])
-  const [attachments, setAttachments] = useState([])
+  const [attachments, setAttachments] = useState<Attachment[]>([])
   const [pendingUploads, setPendingUploads] = useState([])
 
   const isFormDataValid: boolean =
-    (message.trim().length > 0 && (selectedStudents.length + Object.values(selectedObservers).flat().length) > 0)
+    message.trim().length > 0 &&
+    selectedStudents.length + Object.values(selectedObservers).flat().length > 0
 
   useEffect(() => {
     if (!loading && data) {
@@ -392,6 +398,10 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
           id: mediaUploadFile.media_id,
           type: mediaUploadFile.media_type
         }
+      }
+
+      if (attachments?.length) {
+        args.attachmentIds = attachments.map((attachment: Attachment) => attachment.id)
       }
 
       onSend(args)
