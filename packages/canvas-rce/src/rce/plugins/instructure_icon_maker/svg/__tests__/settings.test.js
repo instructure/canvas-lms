@@ -297,6 +297,203 @@ describe('useSvgSettings()', () => {
       })
     })
 
+    describe('parses the SVG settings from a legacy SVG metadata structure', () => {
+      const bodyGenerator = overrideParams => `
+          <svg height="100" width="100">
+          <metadata>
+            ${JSON.stringify({
+              ...{
+                name: 'Test Image',
+                alt: 'a test image',
+                shape: 'triangle',
+                size: 'large',
+                color: '#FF2717',
+                outlineColor: '#06A3B7',
+                outlineSize: 'small',
+                text: 'Some Text',
+                textSize: 'medium',
+                textColor: '#009606',
+                textBackgroundColor: '#06A3B7',
+                textPosition: 'middle',
+                imageSettings: {
+                  cropperSettings: null,
+                  icon: {
+                    label: 'Art Icon'
+                  },
+                  iconFillColor: '#FFFFFF',
+                  image: 'Art Icon',
+                  mode: 'SingleColor'
+                }
+              },
+              ...overrideParams
+            })}
+          </metadata>
+          <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/>
+        </svg>`
+
+      const overwriteUrl = () =>
+        (mock = fetchMock.mock({
+          name: 'download-url',
+          matcher: '*',
+          response: () => ({body}),
+          overwriteRoutes: true
+        }))
+
+      beforeEach(() => {
+        // Legacy metadata structure
+        body = bodyGenerator()
+        overwriteUrl(body)
+      })
+
+      it('replaces icon type from object to string for single-color images', async () => {
+        const {result, waitForValueToChange} = renderHook(() => useSvgSettings(ed, editing, rcs))
+
+        await waitForValueToChange(() => {
+          return result.current[0]
+        })
+
+        expect(result.current[0]).toEqual({
+          type: 'image/svg+xml-icon-maker-icons',
+          alt: 'a test image',
+          shape: 'triangle',
+          size: 'large',
+          color: '#FF2717',
+          encodedImage: '',
+          encodedImageType: '',
+          encodedImageName: '',
+          outlineColor: '#06A3B7',
+          outlineSize: 'small',
+          text: 'Some Text',
+          textSize: 'medium',
+          textColor: '#009606',
+          textBackgroundColor: '#06A3B7',
+          imageSettings: {
+            cropperSettings: null,
+            icon: 'art',
+            iconFillColor: '#FFFFFF',
+            image: 'Art Icon',
+            mode: 'SingleColor'
+          },
+          textPosition: 'middle',
+          x: 0,
+          y: 0,
+          translateX: 0,
+          translateY: 0,
+          width: 0,
+          height: 0,
+          name: 'Test Icon',
+          originalName: 'Test Icon',
+          transform: ''
+        })
+      })
+
+      it('replaces icon type from object to string for single-color images even using another language', async () => {
+        body = bodyGenerator({
+          imageSettings: {
+            cropperSettings: null,
+            icon: {
+              // Spanish label
+              label: 'Ícono de arte'
+            },
+            iconFillColor: '#FFFFFF',
+            image: 'Art Icon',
+            mode: 'SingleColor'
+          }
+        })
+        overwriteUrl()
+
+        const {result, waitForValueToChange} = renderHook(() => useSvgSettings(ed, editing, rcs))
+
+        await waitForValueToChange(() => {
+          return result.current[0]
+        })
+
+        expect(result.current[0]).toEqual({
+          type: 'image/svg+xml-icon-maker-icons',
+          alt: 'a test image',
+          shape: 'triangle',
+          size: 'large',
+          color: '#FF2717',
+          encodedImage: '',
+          encodedImageType: '',
+          encodedImageName: '',
+          outlineColor: '#06A3B7',
+          outlineSize: 'small',
+          text: 'Some Text',
+          textSize: 'medium',
+          textColor: '#009606',
+          textBackgroundColor: '#06A3B7',
+          imageSettings: {
+            cropperSettings: null,
+            icon: 'art',
+            iconFillColor: '#FFFFFF',
+            image: 'Art Icon',
+            mode: 'SingleColor'
+          },
+          textPosition: 'middle',
+          x: 0,
+          y: 0,
+          translateX: 0,
+          translateY: 0,
+          width: 0,
+          height: 0,
+          name: 'Test Icon',
+          originalName: 'Test Icon',
+          transform: ''
+        })
+      })
+
+      it('sets image settings to null when label is not found', async () => {
+        body = bodyGenerator({
+          imageSettings: {
+            cropperSettings: null,
+            icon: {
+              // Invalid label
+              label: 'Banana'
+            },
+            iconFillColor: '#FFFFFF',
+            image: 'Art Icon',
+            mode: 'SingleColor'
+          }
+        })
+        overwriteUrl()
+
+        const {result, waitForValueToChange} = renderHook(() => useSvgSettings(ed, editing, rcs))
+
+        await waitForValueToChange(() => {
+          return result.current[0]
+        })
+
+        expect(result.current[0]).toEqual({
+          type: 'image/svg+xml-icon-maker-icons',
+          alt: 'a test image',
+          shape: 'triangle',
+          size: 'large',
+          color: '#FF2717',
+          encodedImage: '',
+          encodedImageType: '',
+          encodedImageName: '',
+          outlineColor: '#06A3B7',
+          outlineSize: 'small',
+          text: 'Some Text',
+          textSize: 'medium',
+          textColor: '#009606',
+          textBackgroundColor: '#06A3B7',
+          imageSettings: null,
+          textPosition: 'middle',
+          x: 0,
+          y: 0,
+          translateX: 0,
+          translateY: 0,
+          width: 0,
+          height: 0,
+          name: 'Test Icon',
+          originalName: 'Test Icon',
+          transform: ''
+        })
+      })
+    })
+
     it('sets the status to "loading"', () => {
       const result = subject()
       expect(result.current[1]).toEqual(statuses.LOADING)
