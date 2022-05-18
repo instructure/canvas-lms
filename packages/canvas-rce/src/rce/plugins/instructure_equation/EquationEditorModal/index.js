@@ -66,6 +66,7 @@ export default class EquationEditorModal extends Component {
     workingFormula: ''
   }
 
+  hostPageDisablesShortcuts = null
   originalFormula = null
 
   previewElement = React.createRef()
@@ -198,6 +199,7 @@ export default class EquationEditorModal extends Component {
     if (isMathJaxEvent) {
       return
     }
+    ENV.disable_keyboard_shortcuts = this.hostPageDisablesShortcuts
     this.props.onModalDismiss?.()
   }
 
@@ -208,6 +210,8 @@ export default class EquationEditorModal extends Component {
     if (output) {
       onEquationSubmit(output)
     }
+
+    ENV.disable_keyboard_shortcuts = this.hostPageDisablesShortcuts
     onModalDismiss()
   }
 
@@ -271,6 +275,8 @@ export default class EquationEditorModal extends Component {
 
   handleOpen = () => {
     this.originalFormula = null
+    this.hostPageDisablesShortcuts = ENV.disable_keyboard_shortcuts
+    ENV.disable_keyboard_shortcuts = true
   }
 
   handleFieldRef = node => {
