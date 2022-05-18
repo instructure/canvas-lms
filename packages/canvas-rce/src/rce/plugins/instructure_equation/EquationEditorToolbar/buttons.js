@@ -105,8 +105,12 @@ export default [
         displayName: '\\int_{\\ }^{\\ }',
         command: '\\int_{\\placeholder{}}^{\\placeholder{}}',
         advancedCommand: '\\int_{ }^{ }',
-        svgCommand: '\\int',
-        label: formatMessage('Integral')
+        svgCommand: '\\int_a^b',
+        label: formatMessage('Definite Integral')
+      },
+      {
+        command: '\\int',
+        label: formatMessage('Indefinite Integral')
       },
       {command: '\\mathbb{N}', label: formatMessage('Natural Numbers')},
       {command: '\\mathbb{P}', label: formatMessage('Prime Numbers')},
