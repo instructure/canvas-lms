@@ -1367,8 +1367,6 @@ class AssignmentsApiController < ApplicationController
     end
 
     if authorized_action(@assignment, @current_user, :update)
-      # Giving us the option to increment the request cost here if need be. Remove with LS-2614.
-      increment_request_cost(Setting.get("assignments_api_update_request_cost", "0").to_i)
       @assignment.content_being_saved_by(@current_user)
       @assignment.updating_user = @current_user
       # update_api_assignment mutates params so this has to be done here
