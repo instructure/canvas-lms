@@ -53,11 +53,6 @@
 #             ]
 #           }
 #         },
-#         "enable_at": {
-#           "description": "The date this feature will be globally enabled, or null if this is not planned. (This information is subject to change.)",
-#           "example": "2014-01-01T00:00:00Z",
-#           "type": "datetime"
-#         },
 #         "feature_flag": {
 #           "description": "The FeatureFlag that applies to the caller",
 #           "example": {"feature": "fancy_wickets", "state": "allowed"},
@@ -70,11 +65,6 @@
 #         },
 #         "beta": {
 #           "description": "Whether the feature is a feature preview. If true, opting in includes ongoing updates outside the regular release schedule.",
-#           "example": true,
-#           "type": "boolean"
-#         },
-#         "pending_enforcement": {
-#           "description": "Whether the feature is nearing completion and will be finalized at an upcoming date.",
 #           "example": true,
 #           "type": "boolean"
 #         },

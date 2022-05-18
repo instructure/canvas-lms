@@ -28,8 +28,8 @@ const rows = [
   sampleData.betaFeature,
   sampleData.onFeature,
   sampleData.offFeature,
-  sampleData.pendingEnforcementOnFeature,
-  sampleData.pendingEnforcementOffFeature
+  sampleData.siteAdminOnFeature,
+  sampleData.siteAdminOffFeature
 ]
 const title = 'Section 123'
 

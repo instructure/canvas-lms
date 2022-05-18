@@ -46,7 +46,7 @@ describe "Feature Flags API", type: :request do
                                                          "account_feature" => Feature.new(feature: "account_feature", applies_to: "Account", state: "on", display_name: -> { "Account Feature FRD" }, description: -> { "FRD!!" }, beta: true, autoexpand: true),
                                                          "course_feature" => Feature.new(feature: "course_feature", applies_to: "Course", state: "allowed", development: true, release_notes_url: "http://example.com", display_name: "not localized", description: "srsly"),
                                                          "user_feature" => Feature.new(feature: "user_feature", applies_to: "User", state: "allowed"),
-                                                         "root_opt_in_feature" => Feature.new(feature: "root_opt_in_feature", applies_to: "Course", state: "allowed", root_opt_in: true, pending_enforcement: true),
+                                                         "root_opt_in_feature" => Feature.new(feature: "root_opt_in_feature", applies_to: "Course", state: "allowed", root_opt_in: true),
                                                          "hidden_feature" => Feature.new(feature: "hidden_feature", applies_to: "Course", state: "hidden"),
                                                          "hidden_user_feature" => Feature.new(feature: "hidden_user_feature", applies_to: "User", state: "hidden"),
                                                          "compact_live_event_payloads" => live_event_feature
@@ -119,7 +119,6 @@ describe "Feature Flags API", type: :request do
          { "feature" => "root_opt_in_feature",
            "applies_to" => "Course",
            "root_opt_in" => true,
-           "pending_enforcement" => true,
            "feature_flag" =>
               { "context_id" => t_root_account.id,
                 "context_type" => "Account",

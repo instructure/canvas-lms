@@ -20,7 +20,7 @@
 
 class Feature
   ATTRS = %i[feature display_name description applies_to state
-             root_opt_in enable_at beta type pending_enforcement
+             root_opt_in beta type
              release_notes_url custom_transition_proc visible_on
              after_state_change_proc autoexpand touch_context].freeze
   attr_reader(*ATTRS)
@@ -94,14 +94,8 @@ class Feature
   #                               #   cannot be turned on. It is intended for use in environment state overrides.
   #     root_opt_in: false,       # if true, 'allowed' features in source or site admin
   #                               # will be inherited in "off" state by root accounts
-  #     enable_at: "2014-01-01",  # estimated release date shown in UI
   #     beta: false,              # 'beta' tag shown in UI
   #     release_notes_url: 'http://example.com/',
-  #
-  #     # features that are pending_enforcement are nearing completion and will be finalized at a future date
-  #     # when marking a feature as pending_enforcement the enable_at field should also be set along with
-  #     # a beta environment enable_at date
-  #     pending_enforcement: false, # 'pending enforcement' tag shown in UI
   #
   #     # allow overriding feature definitions on a per-environment basis
   #     # valid environments are development, production, beta, test, ci
