@@ -152,7 +152,7 @@ describe('EquationEditorModal', () => {
         })
       })
 
-      it('loads an advanced formula in the advanced editor', async () => {
+      it.skip('loads an advanced formula in the advanced editor', async () => {
         editor.selection.getContent = () => '\\(\\displaystyle\\)'
         renderModal({editor})
         await waitFor(() => {
@@ -175,7 +175,7 @@ describe('EquationEditorModal', () => {
         })
       })
 
-      it('loads an advanced formula in the advanced editor', async () => {
+      it.skip('loads an advanced formula in the advanced editor', async () => {
         editor.selection.getContent = () => 'non-latex-content'
         editor.selection.getNode = () => ({
           tagName: 'IMG',
