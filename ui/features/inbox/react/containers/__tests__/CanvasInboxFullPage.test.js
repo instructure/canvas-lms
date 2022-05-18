@@ -29,6 +29,7 @@ import waitForApolloLoading from '../../../util/waitForApolloLoading'
 import {graphql} from 'msw'
 import {ConversationParticipant} from '../../../graphql/ConversationParticipant'
 import {Conversation} from '../../../graphql/Conversation'
+import {PageInfo} from '../../../graphql/PageInfo'
 
 jest.mock('../../../util/utils', () => ({
   ...jest.requireActual('../../../util/utils'),
@@ -188,6 +189,7 @@ describe('CanvasInbox Full Page', () => {
                     })
                   }
                 ],
+                pageInfo: PageInfo.mock({hasNextPage: false}),
                 __typename: 'ConversationParticipantConnection'
               },
               __typename: 'User'

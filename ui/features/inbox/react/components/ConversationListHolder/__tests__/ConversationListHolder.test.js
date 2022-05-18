@@ -143,7 +143,12 @@ const props = {
       ],
       participants: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
     }
-  ]
+  ],
+  isLoading: false,
+  isLoadingMoreMenuData: false,
+  hasMoreMenuData: false,
+  fetchMoreMenuData: jest.fn(),
+  isError: false
 }
 
 jest.mock('../../../../util/utils', () => ({
