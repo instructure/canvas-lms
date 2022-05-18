@@ -68,4 +68,8 @@ environment_configuration(defined?(config) && config) do |config|
 
   # eval <env>-local.rb if it exists
   Dir[File.dirname(__FILE__) + "/" + File.basename(__FILE__, ".rb") + "-*.rb"].each { |localfile| eval(File.new(localfile).read, nil, localfile, 1) }
+
+  config.active_record.dump_schema_after_migration = false
+
 end
+
