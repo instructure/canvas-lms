@@ -91,9 +91,9 @@ describe QuizzesNext::ExportService do
   end
 
   describe ".send_imported_content" do
-    let(:new_course) { double("course") }
+    let(:new_course) { course_model }
     let(:root_account) { double("account") }
-    let(:content_migration) { double(started_at: 1.hour.ago) }
+    let(:content_migration) { double(started_at: 1.hour.ago, migration_type: "some_type") }
     let(:new_assignment1) { assignment_model(id: 1) }
     let(:new_assignment2) { assignment_model(id: 2) }
     let(:old_assignment1) { assignment_model(id: 3) }
@@ -126,7 +126,8 @@ describe QuizzesNext::ExportService do
         new_course_uuid: "100006",
         new_course_resource_link_id: "ctx-1234",
         domain: "canvas.instructure.com",
-        new_course_name: "Course Name"
+        new_course_name: "Course Name",
+        created_on_blueprint_sync: false
       }
 
       basic_import_content[:assignments] << {
@@ -187,6 +188,73 @@ describe QuizzesNext::ExportService do
       # is raised when we try to access a key that is not present in the
       # assignment hash, which is what has led to this fix.
       expect { described_class.send_imported_content(new_course, content_migration, basic_import_content) }.not_to raise_error
+    end
+
+    context "when the assignment is created as part of a blueprint sync" do
+      let(:content_migration) { double(started_at: 1.hour.ago, migration_type: "master_course_import") }
+
+      before do
+        course = course_model
+        master_template = MasterCourses::MasterTemplate.create!(course: course)
+        @child_course = course_model
+        MasterCourses::ChildSubscription.create!(master_template: master_template, child_course: @child_course)
+        allow(@child_course).to receive(:root_account).and_return(root_account)
+      end
+
+      it "emits a live event with the field created_on_blueprint_sync set as true" do
+        basic_import_content[:assignments] << {
+          original_resource_link_id: "link-5678",
+          "$canvas_assignment_id": new_assignment2.id,
+          original_assignment_id: old_assignment2.id
+        }
+
+        expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).with(
+          hash_including(created_on_blueprint_sync: true)
+        ).once
+        described_class.send_imported_content(@child_course, content_migration, basic_import_content)
+      end
+    end
+
+    context "when an assignment is imported into a blueprint child course" do
+      let(:content_migration) { double(started_at: 1.hour.ago, migration_type: "common_cartridge_importer") }
+
+      before do
+        course = course_model
+        master_template = MasterCourses::MasterTemplate.create!(course: course)
+        @child_course = course_model
+        MasterCourses::ChildSubscription.create!(master_template: master_template, child_course: @child_course)
+        allow(@child_course).to receive(:root_account).and_return(root_account)
+      end
+
+      it "emits a live event with the field created_on_blueprint_sync set as false" do
+        basic_import_content[:assignments] << {
+          original_resource_link_id: "link-5678",
+          "$canvas_assignment_id": new_assignment2.id,
+          original_assignment_id: old_assignment2.id
+        }
+
+        expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).with(
+          hash_including(created_on_blueprint_sync: false)
+        ).once
+        described_class.send_imported_content(@child_course, content_migration, basic_import_content)
+      end
+    end
+
+    context "when an assignment is imported into a non-blueprint course" do
+      let(:content_migration) { double(started_at: 1.hour.ago, migration_type: "common_cartridge_importer") }
+
+      it "emits a live event with the field created_on_blueprint_sync set as false" do
+        basic_import_content[:assignments] << {
+          original_resource_link_id: "link-5678",
+          "$canvas_assignment_id": new_assignment2.id,
+          original_assignment_id: old_assignment2.id
+        }
+
+        expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).with(
+          hash_including(created_on_blueprint_sync: false)
+        ).once
+        described_class.send_imported_content(new_course, content_migration, basic_import_content)
+      end
     end
   end
 end

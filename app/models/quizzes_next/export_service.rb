@@ -73,13 +73,18 @@ module QuizzesNext
         end
 
         if send_quizzes_next_quiz_duplicated
+          is_blueprint_sync =
+            content_migration.migration_type == "master_course_import" &&
+            MasterCourses::ChildSubscription.is_child_course?(new_course)
+
           Canvas::LiveEvents.quizzes_next_quiz_duplicated(
             {
               original_course_uuid: imported_content[:original_course_uuid],
               new_course_uuid: new_course.uuid,
               new_course_resource_link_id: new_course.lti_context_id,
               domain: new_course.root_account&.domain(ApplicationController.test_cluster_name),
-              new_course_name: new_course.name
+              new_course_name: new_course.name,
+              created_on_blueprint_sync: is_blueprint_sync
             }
           )
         end
