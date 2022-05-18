@@ -25,7 +25,7 @@ import ReactDOM from 'react-dom'
 ready(() => {
   ReactDOM.render(
     <DiscussionTopicsPost discussionTopicId={ENV.discussion_topic_id} />,
-    $('<div/>').appendTo('#content')[0]
+    $('<div class="discussion-redesign-layout"/>').appendTo('#content')[0]
   )
 })
 if (ENV.SEQUENCE != null) {
