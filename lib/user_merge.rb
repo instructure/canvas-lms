@@ -621,9 +621,11 @@ class UserMerge
                             .where.not(unique_id => already_scope.having_submission.select(unique_id))
                             .where.not(id: to_move_ids)
                             .pluck(:id)
-        to_move_ids += scope.without_submission # placeholder submissions
+        # only include placeholder submissions for a conflicting assignment
+        # if there isn't already an existing submission for the target user
+        to_move_ids += scope.without_submission
                             .select(unique_id)
-                            .where.not(unique_id => already_scope.without_submission.select(unique_id))
+                            .where.not(unique_id => already_scope.having_submission.select(unique_id))
                             .where.not(id: to_move_ids)
                             .pluck(:id)
         to_move = scope.where(id: to_move_ids).to_a
