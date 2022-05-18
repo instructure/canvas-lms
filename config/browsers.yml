@@ -7,6 +7,6 @@
 # ESR version and the latest chrome rapid release version.
 # these browsers must also match what's available in test.
 minimums:
-  chrome: 83
-  safari: 12
-  firefox: 78
+  chrome: 94
+  safari: 14
+  firefox: 90
