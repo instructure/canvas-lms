@@ -336,10 +336,7 @@ export default class AttemptTab extends Component {
   renderFileAttempt = () => {
     return isSubmitted(this.props.submission) ? (
       <LazyLoad errorCategory="Assignments 2 FilePreview on AttemptTab">
-        <FilePreview
-          key={this.props.submission.attempt}
-          files={this.props.submission.attachments}
-        />
+        <FilePreview submission={this.props.submission} />
       </LazyLoad>
     ) : (
       this.renderFileUpload()

@@ -20,23 +20,25 @@ import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import previewUnavailable from '../../../images/PreviewUnavailable.svg'
-import PropTypes from 'prop-types'
 import React, {Component} from 'react'
-import {SubmissionFile} from '@canvas/assignments/graphql/student/File'
+import {Submission} from '@canvas/assignments/graphql/student/Submission'
+import elideString from '../../helpers/elideString'
+import OriginalityReport from '../OriginalityReport'
 
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {IconDownloadLine} from '@instructure/ui-icons'
+import {IconDownloadLine, IconCompleteSolid} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import theme from '@instructure/canvas-theme'
-import {Tooltip} from '@instructure/ui-tooltip'
+import {Table} from '@instructure/ui-table'
+import {Link} from '@instructure/ui-link'
 
 const I18n = useI18nScope('assignments_2')
 
 export default class FilePreview extends Component {
   static propTypes = {
-    files: PropTypes.arrayOf(SubmissionFile.shape)
+    submission: Submission.shape
   }
 
   state = {
@@ -80,7 +82,7 @@ export default class FilePreview extends Component {
   }
 
   selectFile = index => {
-    if (index >= 0 || index < this.props.files.length) {
+    if (index >= 0 || index < this.props.submission.attachments.length) {
       this.setState({selectedFile: index})
     }
   }
@@ -115,33 +117,57 @@ export default class FilePreview extends Component {
   }
 
   renderFileIcons = () => {
-    const iconsContainerStyle = {
-      borderRight: `1px solid ${theme.variables.colors.borderMedium}`,
-      margin: '-1px',
-      padding: theme.variables.spacing.small
-    }
-
-    const iconsStyle = {
-      display: 'block',
-      textAlign: 'center',
-      margin: `0 0 ${theme.variables.spacing.xSmall} 0`
-    }
+    const cellTheme = {background: theme.variables.colors.backgroundLight}
 
     return (
-      <div data-testid="assignments_2_file_icons" style={iconsContainerStyle}>
-        {this.props.files.map((file, index) => (
-          <div key={file.id} style={iconsStyle}>
-            <Tooltip renderTip={file.displayName} placement="bottom" color="primary">
-              {this.shouldDisplayThumbnail(file)
-                ? this.renderThumbnail(file, index)
-                : this.renderIcon(file, index)}
-            </Tooltip>
-            <div style={{display: 'block', margin: '2px 0 0 0'}}>
-              <Text size="small">{this.capitalize(this.translateMimeClass(file.mimeClass))}</Text>
-            </div>
-          </div>
-        ))}
-      </div>
+      <Table caption={I18n.t('Uploaded files')} data-testid="uploaded_files_table">
+        <Table.Head>
+          <Table.Row>
+            <Table.ColHeader id="thumbnail" width="1rem" theme={cellTheme} />
+            <Table.ColHeader id="filename" theme={cellTheme}>
+              {I18n.t('File Name')}
+            </Table.ColHeader>
+            <Table.ColHeader id="size" theme={cellTheme}>
+              {I18n.t('Size')}
+            </Table.ColHeader>
+            <Table.ColHeader id="originality_report" theme={cellTheme} />
+            <Table.ColHeader id="upload-success" width="1rem" theme={cellTheme} />
+          </Table.Row>
+        </Table.Head>
+        <Table.Body>
+          {this.props.submission.attachments.map((file, index) => (
+            <Table.Row key={file._id}>
+              <Table.Cell theme={cellTheme}>
+                {this.shouldDisplayThumbnail(file)
+                  ? this.renderThumbnail(file, index)
+                  : this.renderIcon(file, index)}
+              </Table.Cell>
+              <Table.Cell theme={cellTheme}>
+                <>
+                  <Link onClick={() => this.selectFile(index)}>
+                    {elideString(file.displayName || file.name)}
+                  </Link>
+                  <ScreenReaderContent>{file.displayName || file.name}</ScreenReaderContent>
+                </>
+              </Table.Cell>
+              <Table.Cell theme={cellTheme} data-testid="file-size">
+                {file.size}
+              </Table.Cell>
+              <Table.Cell theme={cellTheme}>
+                {this.props.submission.turnitinData &&
+                  this.props.submission.turnitinData.length !== 0 && (
+                    <Flex.Item>
+                      <OriginalityReport turnitinData={this.props.submission.turnitinData[index]} />
+                    </Flex.Item>
+                  )}
+              </Table.Cell>
+              <Table.Cell theme={cellTheme}>
+                <IconCompleteSolid color="success" />
+              </Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table>
     )
   }
 
@@ -182,7 +208,7 @@ export default class FilePreview extends Component {
       borderLeft: `1px solid ${theme.variables.colors.borderMedium}`
     }
 
-    const selectedFile = this.props.files[this.state.selectedFile]
+    const selectedFile = this.props.submission.attachments[this.state.selectedFile]
     if (!selectedFile.submissionPreviewUrl) {
       return (
         <div
@@ -224,22 +250,18 @@ export default class FilePreview extends Component {
   }
 
   render() {
-    if (!this.props.files) {
+    if (!this.props.submission.attachments) {
       return <LoadingIndicator />
     }
 
-    if (this.props.files.length) {
+    if (this.props.submission.attachments.length) {
       return (
-        <div style={{margin: '-0.75rem'}}>
-          <Flex>
-            {this.props.files.length > 1 && (
-              <Flex.Item align="start">{this.renderFileIcons()}</Flex.Item>
-            )}
-            <Flex.Item shrink grow align="start">
-              {this.renderFilePreview()}
-            </Flex.Item>
-          </Flex>
-        </div>
+        <Flex data-testid="file-preview" direction="column" width="100%" alignItems="stretch">
+          {this.props.submission.attachments.length > 1 && (
+            <Flex.Item padding="0 x-large x-large">{this.renderFileIcons()}</Flex.Item>
+          )}
+          <Flex.Item>{this.renderFilePreview()}</Flex.Item>
+        </Flex>
       )
     } else {
       return this.renderUnavailablePreview(I18n.t('No Submission'))

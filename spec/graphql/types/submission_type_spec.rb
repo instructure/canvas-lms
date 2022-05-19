@@ -542,15 +542,15 @@ describe Types::SubmissionType do
   end
 
   describe "turnitin_data" do
-    tii_data = {
-      similarity_score: 10,
-      state: "acceptable",
-      report_url: "http://example.com",
-      status: "scored"
-    }
-
     before(:once) do
-      @submission.turnitin_data[@submission.asset_string] = tii_data
+      @tii_data = {
+        similarity_score: 10,
+        state: "acceptable",
+        report_url: "http://example.com",
+        status: "scored"
+      }
+
+      @submission.turnitin_data[@submission.asset_string] = @tii_data
       @submission.turnitin_data[:last_processed_attempt] = 1
       @submission.save!
     end
@@ -561,10 +561,16 @@ describe Types::SubmissionType do
       ).to eq [@submission.id.to_s]
       expect(
         submission_type.resolve("turnitinData { status }")
-      ).to eq [tii_data[:status]]
+      ).to eq [@tii_data[:status]]
       expect(
         submission_type.resolve("turnitinData { score }")
-      ).to eq [tii_data[:similarity_score]]
+      ).to eq [@tii_data[:similarity_score]]
+      expect(
+        submission_type.resolve("turnitinData { state }")
+      ).to eq [@tii_data[:state]]
+      expect(
+        submission_type.resolve("turnitinData { reportUrl }")
+      ).to eq [@tii_data[:report_url]]
     end
   end
 
