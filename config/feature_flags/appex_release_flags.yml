@@ -4,3 +4,8 @@ jobs_v2:
   description: |-
     New and improved jobs control panel
   applies_to: SiteAdmin
+feature_flag_test:
+  state: allowed
+  applies_to: SiteAdmin
+  display_name: Test Feature Flag
+  description: This flag is a no-op and is only intended for testing.
