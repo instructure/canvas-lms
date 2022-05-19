@@ -283,15 +283,16 @@ class DeveloperKey < ActiveRecord::Base
     binding = DeveloperKeyAccountBinding.find_site_admin_cached(self)
     return binding if binding.present?
 
-    # Search for bindings in the account chain starting with the highest account
-    accounts = Account.account_chain_ids(binding_account).reverse
+    # Search for bindings in the account chain starting with the highest account,
+    # and include consortium parent if necessary
+    accounts = binding_account.account_chain(include_federated_parent: !binding_account.primary_settings_root_account?).reverse
     binding = DeveloperKeyAccountBinding.find_in_account_priority(accounts, id)
 
     # If no explicity set bindings were found check for 'allow' bindings
-    binding ||= DeveloperKeyAccountBinding.find_in_account_priority(accounts.reverse, id, false)
+    binding ||= DeveloperKeyAccountBinding.find_in_account_priority(accounts.reverse, id, explicitly_set: false)
 
-    # Check binding not for wrong account (on different shard)
-    return nil if binding && binding.shard.id != binding_account.shard.id
+    # Check binding not for wrong account (on different shard from any shard in account chain)
+    return nil if binding && accounts.map { |a| a.shard.id }.exclude?(binding.shard.id)
 
     binding
   end
