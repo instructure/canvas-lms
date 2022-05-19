@@ -450,7 +450,11 @@ function mergeStudentsAndSubmission() {
       // sorting for isAnonymous occurred earlier before setting up studentMap
       if (!isAnonymous && utils.shouldHideStudentNames()) {
         window.jsonData.studentsWithSubmissions.sort(
-          EG.compareStudentsBy(student => student.submission.id)
+          EG.compareStudentsBy(student => {
+            const studentIndex = student.index || 0
+            // adding 1 to avoid issues with index 0 being given 'falsey treatment' in compareStudentsBy
+            return studentIndex + 1
+          })
         )
       }
     }
