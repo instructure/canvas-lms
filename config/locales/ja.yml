@@ -26774,7 +26774,7 @@ ja:
       one: "%{count} 分前"
       other: "%{count} 分前"
     due_date: "%{date} 終了日 %{time}"
-    event: "%{date} 日  %{time}"
+    event: "%{date} %{time}"
     formats: 
       default: "%a %Y %b %d %H:%M:%S %z"
       long: "%Y %B %d %H:%M"
