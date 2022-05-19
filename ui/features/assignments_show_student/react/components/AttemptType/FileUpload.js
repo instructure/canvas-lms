@@ -418,13 +418,13 @@ class FileUpload extends Component {
 
     return (
       <Flex data-testid="upload-pane" direction="column" width="100%" alignItems="stretch">
-        <Flex.Item overflowY="hidden" padding="large small">
-          {this.renderUploadBox()}
-        </Flex.Item>
-
         {files.length > 0 && (
           <Flex.Item padding="0 x-large x-large">{this.renderUploadedFiles(files)}</Flex.Item>
         )}
+
+        <Flex.Item overflowY="hidden" padding="large small">
+          {this.renderUploadBox()}
+        </Flex.Item>
       </Flex>
     )
   }

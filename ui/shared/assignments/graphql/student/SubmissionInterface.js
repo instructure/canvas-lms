@@ -21,6 +21,7 @@ import {MediaObject} from './MediaObject'
 import {SubmissionDraft} from './SubmissionDraft'
 import {SubmissionFile} from './File'
 import {AssessmentRequest} from './AssessmentRequest'
+import {TurnitinData} from './TurnitinData'
 
 export const SubmissionInterface = {
   fragment: gql`
@@ -52,6 +53,9 @@ export const SubmissionInterface = {
       submissionStatus
       submissionType
       submittedAt
+      turnitinData {
+        ...TurnitinData
+      }
       feedbackForCurrentAttempt
       unreadCommentCount
       url
@@ -63,6 +67,7 @@ export const SubmissionInterface = {
     ${SubmissionFile.fragment}
     ${SubmissionDraft.fragment}
     ${AssessmentRequest.fragment}
+    ${TurnitinData.fragment}
   `,
 
   shape: shape({
@@ -84,6 +89,7 @@ export const SubmissionInterface = {
     submissionStatus: string,
     submissionType: string,
     submittedAt: string,
+    turnitinData: arrayOf(TurnitinData.shape),
     feedbackForCurrentAttempt: bool.isRequired,
     unreadCommentCount: number.isRequired,
     url: string,
@@ -111,6 +117,7 @@ export const DefaultMocks = {
     submissionStatus: 'unsubmitted',
     submissionType: null,
     submittedAt: null,
+    turnitinData: null,
     feedbackForCurrentAttempt: false,
     unreadCommentCount: 0,
     url: null,

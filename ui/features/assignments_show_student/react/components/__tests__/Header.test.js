@@ -399,6 +399,131 @@ describe('submission workflow tracker', () => {
   })
 })
 
+describe('originality report', () => {
+  it('is rendered when a submission exists with turnitinData attached and the assignment is available with a text entry submission', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: {submissionType: 'online_text_entry'}
+    })
+    props.submission.turnitinData = [
+      {
+        similarity_score: 10,
+        state: 'acceptable',
+        report_url: 'http://example.com',
+        status: 'scored',
+        data: '{}'
+      }
+    ]
+    const {queryByTestId} = render(<Header {...props} />)
+    expect(queryByTestId('originality_report')).toBeInTheDocument()
+  })
+
+  it('is rendered when a submission exists with turnitinData attached and the assignment is available with a online upload submission with only one attachment', async () => {
+    const file = {
+      _id: '1',
+      displayName: 'file_1.png',
+      id: '1',
+      mimeClass: 'image',
+      submissionPreviewUrl: '/preview_url',
+      thumbnailUrl: '/thumbnail_url',
+      url: '/url'
+    }
+    const props = await mockAssignmentAndSubmission({
+      Submission: {submissionType: 'online_upload', attachments: [file]}
+    })
+    props.submission.turnitinData = [
+      {
+        similarity_score: 10,
+        state: 'acceptable',
+        report_url: 'http://example.com',
+        status: 'scored',
+        data: '{}'
+      }
+    ]
+    const {queryByTestId} = render(<Header {...props} />)
+    expect(queryByTestId('originality_report')).toBeInTheDocument()
+  })
+
+  it('is not rendered when a submission exists with turnitinData attached and the assignment is available with a online upload submission with more than one attachment', async () => {
+    const files = [
+      {
+        _id: '1',
+        displayName: 'file_1.png',
+        id: '1',
+        mimeClass: 'image',
+        submissionPreviewUrl: '/preview_url',
+        thumbnailUrl: '/thumbnail_url',
+        url: '/url'
+      },
+      {
+        _id: '1',
+        displayName: 'file_1.png',
+        id: '1',
+        mimeClass: 'image',
+        submissionPreviewUrl: '/preview_url',
+        thumbnailUrl: '/thumbnail_url',
+        url: '/url'
+      }
+    ]
+    const props = await mockAssignmentAndSubmission({
+      Submission: {submissionType: 'online_upload', attachments: files}
+    })
+    props.submission.turnitinData = [
+      {
+        similarity_score: 10,
+        state: 'acceptable',
+        report_url: 'http://example.com',
+        status: 'scored',
+        data: '{}'
+      },
+      {
+        similarity_score: 10,
+        state: 'acceptable',
+        report_url: 'http://example.com',
+        status: 'scored',
+        data: '{}'
+      }
+    ]
+    const {queryByTestId} = render(<Header {...props} />)
+    expect(queryByTestId('originality_report')).not.toBeInTheDocument()
+  })
+
+  it('is not rendered when no submission object is present', async () => {
+    const props = await mockAssignmentAndSubmission({Submission: null})
+    props.allSubmissions = [{id: '1', _id: '1'}]
+    const {queryByTestId} = render(<Header {...props} />)
+    expect(queryByTestId('originality_report')).not.toBeInTheDocument()
+  })
+
+  it('is not rendered when there is no current user', async () => {
+    const props = await mockAssignmentAndSubmission()
+    props.assignment.env.currentUser = null
+    const {queryByTestId} = render(<Header {...props} />)
+    expect(queryByTestId('originality_report')).not.toBeInTheDocument()
+  })
+
+  it('is not rendered when the assignment has not been unlocked yet', async () => {
+    const props = await mockAssignmentAndSubmission()
+    props.assignment.env.modulePrereq = 'simulate not null'
+    const {queryByTestId} = render(<Header {...props} />)
+    expect(queryByTestId('originality_report')).not.toBeInTheDocument()
+  })
+
+  it('is not rendered when the assignment has uncompleted prerequisites', async () => {
+    const props = await mockAssignmentAndSubmission()
+    props.assignment.env.unlockDate = 'soon'
+    const {queryByTestId} = render(<Header {...props} />)
+    expect(queryByTestId('originality_report')).not.toBeInTheDocument()
+  })
+
+  it('is not rendered when the submission has no turnitinData', async () => {
+    const props = await mockAssignmentAndSubmission()
+    props.submission.turnitinData = null
+    props.assignment.env.unlockDate = 'soon'
+    const {queryByTestId} = render(<Header {...props} />)
+    expect(queryByTestId('originality_report')).not.toBeInTheDocument()
+  })
+})
+
 describe('Add Comment/View Feedback button', () => {
   it('renders as "Add Comment" by default', async () => {
     const props = await mockAssignmentAndSubmission()
