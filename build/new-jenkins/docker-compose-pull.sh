@@ -17,8 +17,8 @@ DOCKER_IMAGES=(
   $POSTGRES_IMAGE_TAG
   $REGISTRY_BASE/canvas-rce-api
   $REGISTRY_BASE/redis:alpine
-  $REGISTRY_BASE/selenium-node-chrome:"${CHROME_VERSION:-98.0}"
-  $REGISTRY_BASE/selenium-hub:4.1.2-20220217
+  $REGISTRY_BASE/selenium-node-chrome
+  $REGISTRY_BASE/selenium-hub
 )
 
 echo "${DOCKER_IMAGES[@]}" | xargs -P0 -n1 ./build/new-jenkins/docker-with-flakey-network-protection.sh pull &

@@ -321,6 +321,7 @@ describe "context modules" do
 
     describe "sequence footer" do
       it "shows the right nav when an item is in modules multiple times" do
+        skip "LS-3185 (5/19/2022)"
         @assignment = @course.assignments.create!(title: "some assignment")
         @atag1 = @module_1.add_item(id: @assignment.id, type: "assignment")
         @after1 = @module_1.add_item(type: "external_url", title: "url1", url: "http://example.com/1")
