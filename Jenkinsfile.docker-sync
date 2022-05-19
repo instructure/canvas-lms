@@ -29,11 +29,11 @@ final SYNC_IMAGES = [
   ],
   'selenium/hub:4.1': [
     job: null,
-    target: 'starlord.inscloudgate.net/jenkins/selenium-hub:latest'
+    target: 'starlord.inscloudgate.net/jenkins/selenium-hub:4.1'
   ],
   'selenium/node-chrome:101.0': [
     job: null,
-    target: 'starlord.inscloudgate.net/jenkins/selenium-node-chrome:latest'
+    target: 'starlord.inscloudgate.net/jenkins/selenium-node-chrome:101.0'
   ]
 ]
 
