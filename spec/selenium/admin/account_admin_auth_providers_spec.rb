@@ -234,6 +234,7 @@ describe "account authentication" do
         end
 
         it "saves federated attributes" do
+          skip "FOO-2941 5/19/2022"
           get "/accounts/self/authentication_providers"
           click_option("select.canvas_attribute", "locale")
           f(".add_federated_attribute_button").click
@@ -283,6 +284,7 @@ describe "account authentication" do
         end
 
         it "clears provisioning only when toggling jit provisioning" do
+          skip "FOO-2941 5/19/2022"
           get "/accounts/self/authentication_providers"
           click_option("select.canvas_attribute", "locale")
           f(".add_federated_attribute_button").click
