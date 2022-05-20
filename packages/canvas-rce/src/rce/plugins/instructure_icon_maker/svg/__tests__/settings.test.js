@@ -21,6 +21,7 @@ import {renderHook, act} from '@testing-library/react-hooks/dom'
 import {useSvgSettings, svgFromUrl, statuses} from '../settings'
 import Editor from '../../../shared/__tests__/FakeEditor'
 import RceApiSource from '../../../../../rcs/api'
+import {TYPE} from '../constants'
 
 jest.mock('../../../../../rcs/api')
 
@@ -54,7 +55,7 @@ describe('useSvgSettings()', () => {
       const [settings, ,] = subject().current
 
       expect(settings).toEqual({
-        type: 'image/svg+xml-icon-maker-icons',
+        type: TYPE,
         alt: '',
         shape: 'square',
         size: 'small',
@@ -105,7 +106,7 @@ describe('useSvgSettings()', () => {
         const result = subject()
         act(() => result.current[2](settingsUpdate))
         expect(result.current[0]).toEqual({
-          type: 'image/svg+xml-icon-maker-icons',
+          type: TYPE,
           name: 'Banana',
           alt: '',
           shape: 'square',
@@ -269,7 +270,7 @@ describe('useSvgSettings()', () => {
       })
 
       expect(result.current[0]).toEqual({
-        type: 'image/svg+xml-icon-maker-icons',
+        type: TYPE,
         alt: 'a test image',
         shape: 'triangle',
         size: 'large',
@@ -519,7 +520,7 @@ describe('useSvgSettings()', () => {
       it('uses the default settings', () => {
         const result = subject()
         expect(result.current[0]).toEqual({
-          type: 'image/svg+xml-icon-maker-icons',
+          type: TYPE,
           alt: '',
           shape: 'square',
           size: 'small',
@@ -552,7 +553,7 @@ describe('useSvgSettings()', () => {
       it('uses the default settings', async () => {
         const result = subject()
         expect(result.current[0]).toEqual({
-          type: 'image/svg+xml-icon-maker-icons',
+          type: TYPE,
           alt: '',
           shape: 'square',
           size: 'small',

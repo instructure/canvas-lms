@@ -23,10 +23,15 @@ import * as actions from '../../../src/sidebar/actions/upload'
 import * as filesActions from '../../../src/sidebar/actions/files'
 import * as imagesActions from '../../../src/sidebar/actions/images'
 import {buildSvg} from '../../../src/rce/plugins/instructure_icon_maker/svg'
-import {DEFAULT_SETTINGS} from '../../../src/rce/plugins/instructure_icon_maker/svg/constants'
 import {spiedStore} from './utils'
 import Bridge from '../../../src/bridge'
 import K5Uploader from '@instructure/k5uploader'
+import {
+  DEFAULT_SETTINGS,
+  SVG_TYPE,
+  ICON_MAKER_ICONS,
+  TYPE
+} from '../../../src/rce/plugins/instructure_icon_maker/svg/constants'
 
 const fakeFileReader = {
   readAsDataURL() {
@@ -231,7 +236,7 @@ describe('Upload data actions', () => {
         contextId: 101,
         contextType: 'course',
         onDuplicate: undefined,
-        category: 'icon_maker_icons'
+        category: ICON_MAKER_ICONS
       }
 
       return store.dispatch(actions.uploadToIconMakerFolder(svg)).then(() => {
@@ -274,7 +279,7 @@ describe('Upload data actions', () => {
             parentFolderId: 2
           },
           {
-            category: 'icon_maker_icons',
+            category: ICON_MAKER_ICONS,
             contextId: 101,
             contextType: 'course',
             host: 'http://host:port',
@@ -453,7 +458,7 @@ describe('Upload data actions', () => {
         slice: () => ({
           text: async () => fileText
         }),
-        type: 'image/svg'
+        type: SVG_TYPE
       })
 
       const fileProps = () => ({
@@ -464,7 +469,7 @@ describe('Upload data actions', () => {
 
       describe('when the file is an icon maker svg', () => {
         beforeEach(() => {
-          fileText = 'something something image/svg+xml-icon-maker-icons'
+          fileText = 'something something ' + TYPE
         })
 
         it('sets the category to "icon_maker_icons"', () => {
@@ -473,7 +478,7 @@ describe('Upload data actions', () => {
               successSource.preflightUpload,
               sinon.match.object,
               sinon.match({
-                category: 'icon_maker_icons'
+                category: ICON_MAKER_ICONS
               })
             )
           })

@@ -21,6 +21,7 @@ import sinon from 'sinon'
 import RceApiSource, {headerFor, originFromHost} from '../../src/rcs/api'
 import fetchMock from 'fetch-mock'
 import * as fileUrl from '../../src/common/fileUrl'
+import {ICON_MAKER_ICONS} from '../../src/rce/plugins/instructure_icon_maker/svg/constants'
 
 describe('sources/api', () => {
   const endpoint = 'wikiPages'
@@ -471,10 +472,10 @@ describe('sources/api', () => {
       fetchMock.mock(uri, '{}')
 
       return apiSource
-        .preflightUpload(fileProps, {category: 'icon_maker_icons'}, apiProps)
+        .preflightUpload(fileProps, {category: ICON_MAKER_ICONS}, apiProps)
         .then(() => {
           const body = JSON.parse(fetchMock.lastOptions(uri).body)
-          assert.equal(body.category, 'icon_maker_icons')
+          assert.equal(body.category, ICON_MAKER_ICONS)
         })
     })
 

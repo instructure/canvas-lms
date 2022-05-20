@@ -16,11 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import registerEditToolbar, {
-  BUTTON_ID,
-  shouldShowEditButton,
-  TOOLBAR_ID
-} from '../registerEditToolbar'
+import registerEditToolbar, {shouldShowEditButton} from '../registerEditToolbar'
+import {BUTTON_ID, TOOLBAR_ID} from '../svg/constants'
 
 let editor, onAction
 

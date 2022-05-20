@@ -15,8 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-const ICON_MAKER_PARAM = 'icon_maker_icon'
+import {ICON_MAKER_PARAM} from '../instructure_icon_maker/svg/constants'
 
 export default function buildDownloadUrl(url) {
   let downloadUrl
