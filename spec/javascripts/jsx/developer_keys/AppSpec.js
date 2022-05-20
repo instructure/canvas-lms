@@ -40,6 +40,11 @@ function developerKeyRows(componentNode, index) {
   return panel.querySelectorAll("table[data-automation='devKeyAdminTable'] tr")
 }
 
+function inheritedDeveloperKeyRows(componentNode, index) {
+  const panel = componentNode.querySelectorAll("div[role='tabpanel']")[index]
+  return panel.querySelectorAll("table[data-automation='devKeyInheritedTable'] tr")
+}
+
 function generateKeyList(numKeys = 10) {
   return [...Array(numKeys).keys()].map(n => ({
     id: `${n}`,
@@ -127,13 +132,13 @@ test('requests more account dev keys when the account "show all" button is click
   }
   const component = renderComponent(overrides)
   const componentNode = ReactDOM.findDOMNode(component)
-  component.mainTableRef.createSetFocusCallback = callbackSpy
+  component.mainTableRef.setFocusCallback = callbackSpy
 
   clickShowAllButton(componentNode)
   ok(callbackSpy.called)
 })
 
-test('calls the tables createSetFocusCallback after loading more account keys', () => {
+test('calls the tables setFocusCallback after loading more account keys', () => {
   const callbackSpy = sinon.spy()
   const overrides = {
     applicationState: initialApplicationState(generateKeyList()),
@@ -146,14 +151,14 @@ test('calls the tables createSetFocusCallback after loading more account keys', 
   const component = renderComponent(overrides)
   const componentNode = ReactDOM.findDOMNode(component)
   const focusSpy = sinon.spy()
-  component.mainTableRef.createSetFocusCallback = focusSpy
+  component.mainTableRef.setFocusCallback = focusSpy
 
   clickShowAllButton(componentNode)
 
   ok(focusSpy.called)
 })
 
-test('calls the tables createSetFocusCallback after loading more inherited keys', () => {
+test('calls the tables setFocusCallback after loading more inherited keys', () => {
   const callbackSpy = sinon.spy()
   const overrides = {
     applicationState: initialApplicationState(generateKeyList(), generateKeyList()),
@@ -168,7 +173,7 @@ test('calls the tables createSetFocusCallback after loading more inherited keys'
   const focusSpy = sinon.spy()
 
   clickInheritedTab(componentNode)
-  component.inheritedTableRef.createSetFocusCallback = focusSpy
+  component.inheritedTableRef.setFocusCallback = focusSpy
 
   clickShowAllButton(componentNode, 1)
 
@@ -180,7 +185,7 @@ test('renders the correct keys in the inherited tab', () => {
   const componentNode = ReactDOM.findDOMNode(component)
   clickInheritedTab(componentNode)
   ok(
-    Array.from(developerKeyRows(componentNode, 1)[1].querySelectorAll('td div')).some(
+    Array.from(inheritedDeveloperKeyRows(componentNode, 1)[1].querySelectorAll('td div')).some(
       n => n.innerText === '2'
     )
   )
@@ -190,7 +195,7 @@ test('only renders inherited keys in the inherited tab', () => {
   const component = renderComponent()
   const componentNode = ReactDOM.findDOMNode(component)
   clickInheritedTab(componentNode)
-  equal(developerKeyRows(componentNode, 1).length, 2)
+  equal(inheritedDeveloperKeyRows(componentNode, 1).length, 2)
 })
 
 test('renders the correct keys in the account tab', () => {
@@ -355,25 +360,9 @@ test('opens the key selection menu when the create button is clicked', () => {
   }
   const wrapper = mount(<DeveloperKeysApp {...props} />)
 
-  notOk(
-    wrapper
-      .find('Menu')
-      .first()
-      .find('Portal')
-      .exists()
-  )
-  wrapper
-    .find('Button')
-    .first()
-    .simulate('click')
-  ok(
-    wrapper
-      .find('Menu')
-      .first()
-      .find('Portal')
-      .first()
-      .prop('open')
-  )
+  notOk(wrapper.find('Menu').first().find('Portal').exists())
+  wrapper.find('Button').first().simulate('click')
+  ok(wrapper.find('Menu').first().find('Portal').first().prop('open'))
   wrapper.unmount()
   window.ENV = {}
 })

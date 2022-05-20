@@ -138,9 +138,9 @@ describe "Developer Keys" do
       DeveloperKey.all.each { |key| key.update(visible: true) }
       get "/accounts/#{Account.default.id}/developer_keys"
       click_inherited_tab
-      expect(ff("table[data-automation='devKeyAdminTable'] tbody tr")).to have_size(10)
+      expect(ff("table[data-automation='devKeyInheritedTable'] tbody tr")).to have_size(10)
       find_button("Show All Keys").click
-      expect(ff("table[data-automation='devKeyAdminTable'] tbody tr")).to have_size(11)
+      expect(ff("table[data-automation='devKeyInheritedTable'] tbody tr")).to have_size(11)
     end
 
     it "renders the key not visible by default upon creation" do
@@ -258,7 +258,7 @@ describe "Developer Keys" do
         fj("span:contains('Off'):last").click
         click_account_tab
         click_inherited_tab
-        expect(f("table[data-automation='devKeyAdminTable'] input[value='off']").attribute("tabindex")).to eq "0"
+        expect(f("table[data-automation='devKeyInheritedTable'] input[value='off']").attribute("tabindex")).to eq "0"
       end
 
       it "only show create developer key button for account tab panel" do
