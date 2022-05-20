@@ -129,12 +129,15 @@ export function transitionMessage(flag, name) {
     message = flag.transitions[name].message
   }
 
-  if (ENV.ACCOUNT?.site_admin && ENV.PRODUCTION) {
-    // It is relatively unlikely that there will ever be another message
-    // But ensure it is displayed if it exists
+  if (ENV.ACCOUNT?.site_admin && ENV.RAILS_ENVIRONMENT !== 'development') {
     message = (
       <div>
-        <p>{I18n.t('This will affect every customer. Are you sure?')}</p>
+        <p>
+          {I18n.t(
+            `You are currently in the %{environment} environment. This will affect every customer. Are you sure?`,
+            {environment: ENV.RAILS_ENVIRONMENT}
+          )}
+        </p>
         <p>{message}</p>
       </div>
     )

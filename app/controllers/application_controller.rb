@@ -229,7 +229,8 @@ class ApplicationController < ActionController::Base
             collapse_global_nav: @current_user&.collapse_global_nav?,
             release_notes_badge_disabled: @current_user&.release_notes_badge_disabled?,
           },
-          FULL_STORY_ENABLED: fullstory_enabled_for_session?(session)
+          FULL_STORY_ENABLED: fullstory_enabled_for_session?(session),
+          RAILS_ENVIRONMENT: Canvas.environment
         }
         @js_env[:IN_PACED_COURSE] = @context.enable_course_paces? if @context.try(:enable_course_paces?)
 
@@ -245,7 +246,6 @@ class ApplicationController < ActionController::Base
             url_deny_pattern: Setting.get("sentry_frontend_url_deny_pattern", ""), # regexp
 
             # these values need to correlate with the backend for Sentry features to work properly
-            environment: Canvas.environment,
             revision: "canvas-lms@#{Canvas.semver_revision}"
           }
         end
