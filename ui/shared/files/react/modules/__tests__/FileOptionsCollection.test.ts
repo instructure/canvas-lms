@@ -17,6 +17,11 @@
  */
 
 import FileOptionsCollection from '../FileOptionsCollection'
+import {
+  TYPE,
+  ICON_MAKER_ICONS,
+  SVG_TYPE
+} from '../../../../../../packages/canvas-rce/src/rce/plugins/instructure_icon_maker/svg/constants.js'
 
 describe('applyCategory()', () => {
   let fileText, fileType
@@ -38,17 +43,17 @@ describe('applyCategory()', () => {
 
   describe('when the file is an svg', () => {
     beforeEach(() => {
-      fileType = 'image/svg'
+      fileType = SVG_TYPE
     })
 
     describe('when the file is a button & icon', () => {
       beforeEach(() => {
-        fileText = 'something something image/svg+xml-icon-maker-icons'
+        fileText = 'something something ' + TYPE
       })
 
       it('adds the icon  maker icons category', async () => {
         const options = await subject()
-        expect(options[0].category).toEqual('icon_maker_icons')
+        expect(options[0].category).toEqual(ICON_MAKER_ICONS)
       })
     })
 

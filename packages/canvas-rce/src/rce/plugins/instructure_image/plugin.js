@@ -22,7 +22,7 @@ import {isImageEmbed} from '../shared/ContentSelection'
 import {isOKToLink} from '../../contentInsertionUtils'
 import TrayController from './ImageOptionsTray/TrayController'
 import clickCallback from './clickCallback'
-import {ICON_MAKER_ATTRIBUTE} from '../instructure_icon_maker/registerEditToolbar'
+import {ICON_MAKER_ATTRIBUTE} from '../instructure_icon_maker/svg/constants'
 
 const COURSE_PLUGIN_KEY = 'course_images'
 const USER_PLUGIN_KEY = 'user_images'

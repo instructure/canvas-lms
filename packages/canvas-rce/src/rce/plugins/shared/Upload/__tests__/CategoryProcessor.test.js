@@ -17,6 +17,7 @@
  */
 
 import * as CategoryProcessor from '../CategoryProcessor'
+import {TYPE, ICON_MAKER_ICONS, SVG_TYPE} from '../../../instructure_icon_maker/svg/constants'
 
 describe('process()', () => {
   let fileText, fileType
@@ -36,14 +37,14 @@ describe('process()', () => {
 
   describe('when the file type matches the SVG processor', () => {
     beforeEach(() => {
-      fileType = 'image/svg'
-      fileText = 'something something image/svg+xml-icon-maker-icons'
+      fileType = SVG_TYPE
+      fileText = 'something something ' + TYPE
     })
 
     it('processes the file with the SVG processor', async () => {
       const category = await subject()
       expect(category).toMatchObject({
-        category: 'icon_maker_icons'
+        category: ICON_MAKER_ICONS
       })
     })
   })

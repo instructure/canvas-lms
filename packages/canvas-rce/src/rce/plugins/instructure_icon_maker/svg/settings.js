@@ -18,12 +18,12 @@
 
 import {useState, useEffect, useReducer} from 'react'
 import {svgSettings as svgSettingsReducer, defaultState} from '../reducers/svgSettings'
-import {ICON_MAKER_ATTRIBUTE, ICON_MAKER_DOWNLOAD_URL_ATTR} from '../registerEditToolbar'
+import {ICON_MAKER_ATTRIBUTE, ICON_MAKER_DOWNLOAD_URL_ATTR, SVG_XML_TYPE} from './constants'
 import RceApiSource from '../../../../rcs/api'
 import {modes} from '../reducers/imageSection'
 import iconsLabels from '../utils/iconsLabels'
 
-const TYPE = 'image/svg+xml'
+const TYPE = SVG_XML_TYPE
 
 export const statuses = {
   ERROR: 'error',
@@ -127,7 +127,7 @@ export function useSvgSettings(editor, editing, rcsConfig) {
 
     // If we are editing rather than creating, fetch existing settings
     if (editing) fetchSvgSettings()
-  }, [editor, editing, urlFromNode, rcsConfig])
+  }, [editor, editing, urlFromNode, rcsConfig, buildFilesUrl])
 
   return [settings, status, dispatch]
 }

@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ICON_MAKER_ICONS} from '../../instructure_icon_maker/registerEditToolbar'
+import {ICON_MAKER_ICONS, TYPE, SVG_TYPE} from '../../instructure_icon_maker/svg/constants'
 
-export const typeTest = 'image/svg'
+export const typeTest = SVG_TYPE
 const sliceSize = 400 // bytes
-const iconMakerType = 'image/svg+xml-icon-maker-icons'
+const iconMakerType = TYPE
 
 export async function process(file) {
   try {

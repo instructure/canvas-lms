@@ -18,8 +18,8 @@
 
 import React from 'react'
 import {fireEvent, render, waitFor} from '@testing-library/react'
-
 import Filter, {useFilterSettings} from '../Filter'
+import {ICON_MAKER_ICONS} from '../../instructure_icon_maker/svg/constants'
 
 describe('RCE Plugins > Filter', () => {
   let currentFilterSettings
@@ -249,7 +249,7 @@ describe('RCE Plugins > Filter', () => {
       })
 
       it('sets the content subtype to "icon_maker_icons"', () => {
-        expect(currentFilterSettings.contentSubtype).toEqual('icon_maker_icons')
+        expect(currentFilterSettings.contentSubtype).toEqual(ICON_MAKER_ICONS)
       })
 
       it('sets the content type to "course_files"', () => {

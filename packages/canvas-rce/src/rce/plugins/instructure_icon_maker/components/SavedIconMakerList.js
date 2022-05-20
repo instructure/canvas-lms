@@ -21,7 +21,7 @@ import React from 'react'
 import {View} from '@instructure/ui-view'
 import ImageList from '../../instructure_image/Images'
 import {useStoreProps} from '../../shared/StoreContext'
-import {ICON_MAKER_ICONS} from '../registerEditToolbar'
+import {ICON_MAKER_ICONS} from '../svg/constants'
 
 const SavedIconMakerList = ({onImageEmbed}) => {
   const storeProps = useStoreProps()

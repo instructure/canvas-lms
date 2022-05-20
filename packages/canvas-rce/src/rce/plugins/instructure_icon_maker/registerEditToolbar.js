@@ -17,13 +17,7 @@
  */
 
 import formatMessage from '../../../format-message'
-
-export const BUTTON_ID = 'inst-icon-maker-edit'
-export const TOOLBAR_ID = 'inst-icon-maker-edit-toolbar'
-
-export const ICON_MAKER_ATTRIBUTE = 'data-inst-icon-maker-icon'
-export const ICON_MAKER_DOWNLOAD_URL_ATTR = 'data-download-url'
-export const ICON_MAKER_ICONS = 'icon_maker_icons'
+import {BUTTON_ID, TOOLBAR_ID, ICON_MAKER_ATTRIBUTE} from './svg/constants'
 
 export const shouldShowEditButton = node => !!node?.getAttribute(ICON_MAKER_ATTRIBUTE)
 

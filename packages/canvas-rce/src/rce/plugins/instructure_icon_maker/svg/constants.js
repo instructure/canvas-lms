@@ -17,6 +17,17 @@
  */
 
 export const TYPE = 'image/svg+xml-icon-maker-icons'
+// New constants added to centralize imports
+export const BUTTON_ID = 'inst-icon-maker-edit'
+export const TOOLBAR_ID = 'inst-icon-maker-edit-toolbar'
+
+export const ICON_MAKER_ATTRIBUTE = 'data-inst-icon-maker-icon'
+export const ICON_MAKER_DOWNLOAD_URL_ATTR = 'data-download-url'
+export const ICON_MAKER_ICONS = 'icon_maker_icons'
+export const ICON_MAKER_PARAM = 'icon_maker_icon'
+// different definitions for filetypes
+export const SVG_XML_TYPE = 'image/svg+xml'
+export const SVG_TYPE = 'image/svg'
 
 export const Size = {
   None: 'none',

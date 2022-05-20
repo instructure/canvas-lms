@@ -30,7 +30,7 @@ import formatMessage from '../../../format-message'
 import Filter, {useFilterSettings} from './Filter'
 import {StoreProvider} from './StoreContext'
 import {getTrayHeight} from './trayUtils'
-import {ICON_MAKER_ICONS} from '../instructure_icon_maker/registerEditToolbar'
+import {ICON_MAKER_ICONS} from '../instructure_icon_maker/svg/constants'
 
 /**
  * Returns the translated tray label
