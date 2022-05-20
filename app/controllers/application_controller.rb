@@ -77,6 +77,14 @@ class ApplicationController < ActionController::Base
   before_action :init_body_classes
   after_action :set_response_headers
   after_action :update_enrollment_last_activity_at
+  before_action :ensure_domain_matches_canvas_domain
+
+  def ensure_domain_matches_canvas_domain
+    uri = URI.parse(request.domain)
+    if uri != ENV["CANVAS_DOMAIN"]
+      redirect_to root_path
+    end
+  end
 
   add_crumb(proc {
     title = I18n.t('links.dashboard', 'My Dashboard')
