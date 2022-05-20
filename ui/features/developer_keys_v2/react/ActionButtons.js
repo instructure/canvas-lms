@@ -45,10 +45,8 @@ class DeveloperKeyActionButtons extends React.Component {
     event.preventDefault()
     const confirmResult = confirm(this.confirmationMessage(developerKey))
     if (confirmResult) {
-      const callBack = onDelete()
-      deleteDeveloperKey(developerKey)(dispatch).then(() => {
-        callBack()
-      })
+      onDelete(developerKey.id)
+      dispatch(deleteDeveloperKey(developerKey))
     }
   }
 
