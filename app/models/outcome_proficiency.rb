@@ -180,8 +180,7 @@ class OutcomeProficiency < ApplicationRecord
         updateable = batch
                      .active
                      .aligned_to_outcomes
-                     .unassessed
-                     .with_at_most_one_association
+                     .unassessed_and_with_at_most_one_association
         updateable.each(&:update_mastery_scales)
       end
     end
