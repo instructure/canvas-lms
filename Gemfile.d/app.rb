@@ -37,7 +37,7 @@ else
   gem "rails", "6.1.4.6"
     gem "tzinfo", "2.0.4"
   gem_override "switchman", "3.0.24"
-    gem "guardrail", "3.0.0"
+    gem "guardrail", "3.0.2"
   gem_override "switchman-inst-jobs", "4.0.6"
 end
   gem "irb", "1.4.1"
