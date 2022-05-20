@@ -724,7 +724,7 @@ class ActiveRecord::Base
       configurations.configs_for.each do |config|
         config.instance_variable_set(:@configuration_hash, config.configuration_hash.merge(override).freeze)
       end
-      clear_all_connections!
+      clear_all_connections!(nil)
 
       # Just return something that isn't an ar connection object so consoles don't explode
       override
