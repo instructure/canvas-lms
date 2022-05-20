@@ -21,8 +21,11 @@
     <span class="title"><%= t('headers.available', "Available") %></span>
     <span class="value">
       <% if association.lock_at && association.unlock_at %>
+        <% availability_window = association.lock_at - association.unlock_at %>
         <%= mt(:quiz_available_through, "%{start_time} - %{end_time}", :start_time => datetime_string(association.unlock_at), :end_time => datetime_string(association.lock_at)) %>
-        <span style="font-size: 0.8em;"><%= time_ago_in_words(Time.now + (association.lock_at - association.unlock_at)) rescue "" %></span>
+        <% if availability_window <= 1.day %>
+          <span style="font-size: 0.8em;"><%= readable_duration(availability_window) %></span>
+        <% end %>
       <% elsif association.lock_at %>
         <%= t(:quiz_available_until, "until %{end_time}", :end_time => datetime_string(association.lock_at)) %>
       <% else %>
