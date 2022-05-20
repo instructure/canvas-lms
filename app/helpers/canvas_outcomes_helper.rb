@@ -45,8 +45,7 @@ module CanvasOutcomesHelper
     )
 
     if /^2/.match?(response.code.to_s)
-      json = JSON.parse(response.body)
-      json["results"]
+      response.body
     else
       raise "Error retrieving results from Outcomes Service: #{response.body}"
     end
