@@ -21,8 +21,9 @@ class JobsV2Controller < ApplicationController
   BUCKETS = %w[queued running future failed].freeze
   SEARCH_LIMIT = 100
 
-  before_action :require_view_jobs, except: %i[manage]
-  before_action :require_manage_jobs, only: %i[manage]
+  MANAGE_ENDPOINTS = %i[manage requeue].freeze
+  before_action :require_view_jobs, except: MANAGE_ENDPOINTS
+  before_action :require_manage_jobs, only: MANAGE_ENDPOINTS
 
   before_action :require_bucket, only: %i[grouped_info list search]
   before_action :require_group, only: %i[grouped_info search]
@@ -269,6 +270,18 @@ class JobsV2Controller < ApplicationController
     render json: { status: "OK", count: count }
   end
 
+  # @{not an}API requeue a failed job
+  #
+  # given a job that exhausted all of its max_attempts and has been put into failed_jobs
+  # requeue it. it will be attempted once more and not retried if max_attempts > 1
+  # (this will push attempts over max_attempts)
+  #
+  def requeue
+    failed_job = Delayed::Job::Failed.find(params[:id])
+    job = failed_job.requeue!
+    render json: job_json(job)
+  end
+
   protected
 
   def require_bucket
@@ -324,7 +337,7 @@ class JobsV2Controller < ApplicationController
 
   def job_json(job, base_time: nil)
     job_fields = %w[id tag strand singleton shard_id max_concurrent priority attempts max_attempts locked_by run_at locked_at handler]
-    job_fields += %w[failed_at original_job_id last_error] if job.is_a?(Delayed::Job::Failed)
+    job_fields += %w[failed_at original_job_id requeued_job_id last_error] if job.is_a?(Delayed::Job::Failed)
     json = api_json(job, @current_user, nil, only: job_fields)
     if @bucket && base_time
       json["info"] = list_info_data(job, base_time: base_time)
