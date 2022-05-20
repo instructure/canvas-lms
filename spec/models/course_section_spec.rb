@@ -573,6 +573,18 @@ describe CourseSection, "moving to new course" do
         expect(@section1.grants_right?(@user, :manage_calendar)).to be_falsey
         expect(@section2.grants_right?(@user, :manage_calendar)).to be_falsey
       end
+
+      it "returns true for an admin whose account membership grants :manage_calendar" do
+        account_admin_user(account: @course1.account, user: @user)
+        expect(@section1.grants_right?(@user, :manage_calendar)).to be_truthy
+        expect(@section2.grants_right?(@user, :manage_calendar)).to be_truthy
+      end
+
+      it "returns false for an admin whose account membership does not grant :manage_calendar" do
+        account_admin_user_with_role_changes(account: @course1.account, user: @user, role_changes: { manage_calendar: false })
+        expect(@section1.grants_right?(@user, :manage_calendar)).to be_falsey
+        expect(@section2.grants_right?(@user, :manage_calendar)).to be_falsey
+      end
     end
   end
 
