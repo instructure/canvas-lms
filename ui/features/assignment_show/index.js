@@ -38,6 +38,7 @@ import DirectShareUserModal from '@canvas/direct-sharing/react/components/Direct
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import {setupSubmitHandler} from '@canvas/assignments/jquery/reuploadSubmissionsHelper'
 import ready from '@instructure/ready'
+import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 
 const I18n = useI18nScope('assignment')
 
@@ -45,6 +46,7 @@ ready(() => {
   const lockManager = new LockManager()
   lockManager.init({itemType: 'assignment', page: 'show'})
   renderCoursePacingNotice()
+  monitorLtiMessages()
 })
 
 let studentGroupSelectionRequestTrackers = []

@@ -30,8 +30,10 @@ import GroupCategorySelector from '@canvas/groups/backbone/views/GroupCategorySe
 import PeerReviewsSelector from '@canvas/assignments/backbone/views/PeerReviewsSelector.coffee'
 import '@canvas/grading-standards'
 import LockManager from '@canvas/blueprint-courses/react/components/LockManager/index'
+import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 
 ready(() => {
+  monitorLtiMessages()
   const lockManager = new LockManager()
   lockManager.init({itemType: 'assignment', page: 'edit'})
   const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : {}
