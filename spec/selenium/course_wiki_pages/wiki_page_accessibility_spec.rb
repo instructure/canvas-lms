@@ -247,6 +247,7 @@ describe "Wiki Pages" do
         expect(f(".restore-link")).to be_present
         expect_new_page_load do
           f(".restore-link").click
+          f('button[data-testid="confirm-button"]').click
         end
         f(".close-button").click
         wait_for_ajaximations
