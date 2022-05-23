@@ -41,10 +41,8 @@
 <%
   if @context.syllabus_course_summary?
     js_env :SYLLABUS_PER_PAGE => Setting.get('syllabus_per_page', Setting.get('api_max_per_page', '50'))
-    js_bundle :syllabus
-  else
-    js_bundle :syllabus_static
   end
+  js_bundle :syllabus
   css_bundle :tinymce
 %>
 <%= render :partial => 'assignments/syllabus_content' %>
