@@ -111,3 +111,9 @@ remember_course_nav_collapsed_state:
     When this flag is enabled, the course navigation will remain collapsed or expanded
     when navigating between pages depending on how it was last set by the user, instead
     of defaulting to expanded on most pages.
+section_level_calendar_permissions:
+  applies_to: SiteAdmin
+  state: allowed_on
+  display_name: Section-level calendar permissions
+  description: |-
+    Allow permissions to manage the calendar to be granted at a section-level.
