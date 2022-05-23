@@ -20,6 +20,8 @@ import {useState, useEffect, useReducer} from 'react'
 import {svgSettings as svgSettingsReducer, defaultState} from '../reducers/svgSettings'
 import {ICON_MAKER_ATTRIBUTE, ICON_MAKER_DOWNLOAD_URL_ATTR} from '../registerEditToolbar'
 import RceApiSource from '../../../../rcs/api'
+import {modes} from '../reducers/imageSection'
+import iconsLabels from '../utils/iconsLabels'
 
 const TYPE = 'image/svg+xml'
 
@@ -56,28 +58,28 @@ const getImageNode = (editor, editing) => {
   return iconMaker
 }
 
+const buildFilesUrl = (fileId, rcsConfig) => {
+  // http://canvas.docker/files/2169/download?download_frd=1&amp;icon_maker_icon=1
+
+  const downloadURL = new URL(`${rcsConfig.canvasUrl}/files/${fileId}/download`)
+
+  // Adding the Course ID to the request causes Canvas to follow the chain
+  // of files that were uploaded and "replaced" previous versions of the file.
+  downloadURL.searchParams.append('replacement_chain_context_type', 'course')
+  downloadURL.searchParams.append('replacement_chain_context_id', rcsConfig.contextId)
+
+  // Prevent the browser from using an old cached SVGs
+  downloadURL.searchParams.append('ts', Date.now())
+
+  // Yes, we want do download for real dude
+  downloadURL.searchParams.append('download_frd', 1)
+
+  return downloadURL.toString()
+}
+
 export function useSvgSettings(editor, editing, rcsConfig) {
   const [settings, dispatch] = useReducer(svgSettingsReducer, defaultState)
   const [status, setStatus] = useState(statuses.IDLE)
-
-  const buildFilesUrl = (fileId, host) => {
-    // http://canvas.docker/files/2169/download?download_frd=1&amp;icon_maker_icon=1
-
-    const downloadURL = new URL(`${host}/files/${fileId}/download`)
-
-    // Adding the Course ID to the request causes Canvas to follow the chain
-    // of files that were uploaded and "replaced" previous versions of the file.
-    downloadURL.searchParams.append('replacement_chain_context_type', 'course')
-    downloadURL.searchParams.append('replacement_chain_context_id', rcsConfig.contextId)
-
-    // Prevent the browser from using an old cached SVGs
-    downloadURL.searchParams.append('ts', Date.now())
-
-    // Yes, we want do download for real dude
-    downloadURL.searchParams.append('download_frd', 1)
-
-    return downloadURL.toString()
-  }
 
   const urlFromNode = getImageNode(editor, editing)?.getAttribute(ICON_MAKER_DOWNLOAD_URL_ATTR)
 
@@ -91,7 +93,7 @@ export function useSvgSettings(editor, editing, rcsConfig) {
         // Parse out the file ID from something like
         // /courses/1/files/3/preview?...
         const fileId = urlFromNode.split('files/')[1]?.split('/')[0]
-        const downloadUrl = buildFilesUrl(fileId, rcsConfig.canvasUrl)
+        const downloadUrl = buildFilesUrl(fileId, rcsConfig)
 
         // Parse SVG. If no SVG found, return defaults
         const svg = await svgFromUrl(downloadUrl)
@@ -113,6 +115,8 @@ export function useSvgSettings(editor, editing, rcsConfig) {
         metadataJson.name = fileName
         metadataJson.originalName = fileName
 
+        processMetadataForBackwardCompatibility(metadataJson)
+
         // settings found, return parsed results
         dispatch(metadataJson)
         setStatus(statuses.IDLE)
@@ -133,4 +137,17 @@ export async function svgFromUrl(url) {
 
   const data = await response.text()
   return new DOMParser().parseFromString(data, TYPE)
+}
+
+function processMetadataForBackwardCompatibility(metadataJson) {
+  const icon = metadataJson?.imageSettings?.icon
+  const mode = metadataJson?.imageSettings?.mode
+  if (mode === modes.singleColorImages.type && typeof icon === 'object') {
+    const foundIconId = iconsLabels[icon.label]
+    if (foundIconId) {
+      metadataJson.imageSettings.icon = foundIconId
+    } else {
+      metadataJson.imageSettings = null
+    }
+  }
 }
