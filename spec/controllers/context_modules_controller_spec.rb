@@ -623,43 +623,29 @@ describe ContextModulesController do
     end
 
     describe "update_module_link_default_tab" do
-      context "with the :remember_module_links_default flag disabled" do
-        it "does not update the user preference value" do
-          @teacher.set_preference(:module_links_default_new_tab, false)
-          post "add_item", params: { course_id: @course.id, context_module_id: @module.id, item: { type: "external_url", title: "URL", url: "http://example.org", new_tab: 1 } }
-          expect(@teacher.get_preference(:module_links_default_new_tab)).to be_falsey
-        end
+      it "updates the user preference value to true when external_url is added" do
+        @teacher.set_preference(:module_links_default_new_tab, false)
+        post "add_item", params: { course_id: @course.id, context_module_id: @module.id, item: { type: "external_url", title: "URL", url: "http://example.org", new_tab: 1 } }
+        expect(@teacher.get_preference(:module_links_default_new_tab)).to be_truthy
       end
 
-      context "with the :remember_module_links_default flag enabled" do
-        before :once do
-          Account.site_admin.enable_feature!(:remember_module_links_default)
-        end
+      it "updates the user preference value to false when external_url is added" do
+        @teacher.set_preference(:module_links_default_new_tab, true)
+        post "add_item", params: { course_id: @course.id, context_module_id: @module.id, item: { type: "external_url", title: "URL", url: "http://example.org", new_tab: 0 } }
+        expect(@teacher.get_preference(:module_links_default_new_tab)).to be_falsey
+      end
 
-        it "updates the user preference value to true when external_url is added" do
-          @teacher.set_preference(:module_links_default_new_tab, false)
-          post "add_item", params: { course_id: @course.id, context_module_id: @module.id, item: { type: "external_url", title: "URL", url: "http://example.org", new_tab: 1 } }
-          expect(@teacher.get_preference(:module_links_default_new_tab)).to be_truthy
-        end
+      it "updates the user preference value to true when context_external_tool is added" do
+        @teacher.set_preference(:module_links_default_new_tab, false)
+        post "add_item", params: { course_id: @course.id, context_module_id: @module.id, item: { type: "context_external_tool", title: "Example Tool", url: "http://example.com/tool", new_tab: 1 } }
+        expect(@teacher.get_preference(:module_links_default_new_tab)).to be_truthy
+      end
 
-        it "updates the user preference value to false when external_url is added" do
-          @teacher.set_preference(:module_links_default_new_tab, true)
-          post "add_item", params: { course_id: @course.id, context_module_id: @module.id, item: { type: "external_url", title: "URL", url: "http://example.org", new_tab: 0 } }
-          expect(@teacher.get_preference(:module_links_default_new_tab)).to be_falsey
-        end
-
-        it "updates the user preference value to true when context_external_tool is added" do
-          @teacher.set_preference(:module_links_default_new_tab, false)
-          post "add_item", params: { course_id: @course.id, context_module_id: @module.id, item: { type: "context_external_tool", title: "Example Tool", url: "http://example.com/tool", new_tab: 1 } }
-          expect(@teacher.get_preference(:module_links_default_new_tab)).to be_truthy
-        end
-
-        it "does not update the user preference value when assignment is added" do
-          @teacher.set_preference(:module_links_default_new_tab, false)
-          assignment = @course.assignments.create! title: "An Assignment"
-          post "add_item", params: { course_id: @course.id, context_module_id: @module.id, item: { type: "assignment", title: "Assignment", id: assignment.id, new_tab: 1 } }
-          expect(@teacher.get_preference(:module_links_default_new_tab)).to be_falsey
-        end
+      it "does not update the user preference value when assignment is added" do
+        @teacher.set_preference(:module_links_default_new_tab, false)
+        assignment = @course.assignments.create! title: "An Assignment"
+        post "add_item", params: { course_id: @course.id, context_module_id: @module.id, item: { type: "assignment", title: "Assignment", id: assignment.id, new_tab: 1 } }
+        expect(@teacher.get_preference(:module_links_default_new_tab)).to be_falsey
       end
     end
   end
@@ -711,10 +697,6 @@ describe ContextModulesController do
     end
 
     describe "update_module_link_default_tab" do
-      before :once do
-        Account.site_admin.enable_feature!(:remember_module_links_default)
-      end
-
       it "updates the user preference value to true when external_url is updated" do
         @teacher.set_preference(:module_links_default_new_tab, false)
         put "update_item", params: { course_id: @course.id, id: @external_url_item.id, content_tag: { url: "http://newurl.org", new_tab: 1 } }
