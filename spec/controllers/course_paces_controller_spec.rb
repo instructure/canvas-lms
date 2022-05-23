@@ -72,6 +72,8 @@ describe CoursePacesController, type: :controller do
     @course.save!
     @course.account.enable_feature!(:course_paces)
 
+    @another_section = @course.course_sections.create!
+
     @course_section = @course.course_sections.first
 
     @valid_params = {
@@ -122,7 +124,7 @@ describe CoursePacesController, type: :controller do
                                                                                      full_name: @student.name,
                                                                                      sortable_name: @student.sortable_name
                                                                                    }))
-      expect(js_env[:SECTIONS].length).to be(1)
+      expect(js_env[:SECTIONS].length).to be(2)
       expect(js_env[:SECTIONS][@section.id]).to match(hash_including({
                                                                        id: @section.id,
                                                                        course_id: @course.id,
@@ -130,6 +132,13 @@ describe CoursePacesController, type: :controller do
                                                                        start_at: @section.start_at,
                                                                        end_at: @section.end_at
                                                                      }))
+      expect(js_env[:SECTIONS][@another_section.id]).to match(hash_including({
+                                                                               id: @another_section.id,
+                                                                               course_id: @course.id,
+                                                                               name: @another_section.name,
+                                                                               start_at: @another_section.start_at,
+                                                                               end_at: @another_section.end_at
+                                                                             }))
       expect(js_env[:COURSE_PACE]).to match(hash_including({
                                                              id: @course_pace.id,
                                                              course_id: @course.id,
