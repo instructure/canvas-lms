@@ -32,11 +32,9 @@
   left_side_custom = nil
   right_side = (yield :right_side).presence
 
-  if Account.site_admin.feature_enabled?(:remember_course_nav_collapsed_state)
-    # Collapse the course menu according to user preference, unless a certain action
-    # requests that it default to collapsed for that page
-    @collapse_course_menu ||= @current_user&.reload&.collapse_course_nav?
-  end
+  # Collapse the course menu according to user preference, unless a certain action
+  # requests that it default to collapsed for that page
+  @collapse_course_menu ||= @current_user&.reload&.collapse_course_nav?
 
   if @collapse_course_menu
     subnav_menu_text = t('Show Navigation Menu')
