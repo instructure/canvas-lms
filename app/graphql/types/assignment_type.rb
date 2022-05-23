@@ -35,6 +35,12 @@ module Types
       value "unpublished"
       value "published"
       value "deleted"
+      value "duplicating"
+      value "failed_to_duplicate"
+      value "importing"
+      value "fail_to_import"
+      value "migrating"
+      value "failed_to_migrate"
     end
 
     GRADING_TYPES = Assignment::ALLOWED_GRADING_TYPES.zip(Assignment::ALLOWED_GRADING_TYPES).to_h
