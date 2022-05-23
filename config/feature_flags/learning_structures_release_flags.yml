@@ -95,14 +95,6 @@ calendar_series:
   display_name: Calendar Series
   description: |-
     This flag allows calendar event series to be created from the Canvas Calendar.
-remember_course_nav_collapsed_state:
-  applies_to: SiteAdmin
-  state: hidden
-  display_name: Remember Course Navigation Collapsed State
-  description: |-
-    When this flag is enabled, the course navigation will remain collapsed or expanded
-    when navigating between pages depending on how it was last set by the user, instead
-    of defaulting to expanded on most pages.
 section_level_calendar_permissions:
   applies_to: SiteAdmin
   state: allowed_on
