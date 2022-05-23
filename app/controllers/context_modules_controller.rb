@@ -821,7 +821,7 @@ class ContextModulesController < ApplicationController
   end
 
   def update_module_link_default_tab(tag)
-    if Account.site_admin.feature_enabled?(:remember_module_links_default) && LINK_ITEM_TYPES.include?(tag.content_type)
+    if LINK_ITEM_TYPES.include?(tag.content_type)
       current_value = @current_user.get_preference(:module_links_default_new_tab)
       if current_value && !tag.new_tab
         @current_user.set_preference(:module_links_default_new_tab, false)

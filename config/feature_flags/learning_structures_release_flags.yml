@@ -95,14 +95,6 @@ calendar_series:
   display_name: Calendar Series
   description: |-
     This flag allows calendar event series to be created from the Canvas Calendar.
-remember_module_links_default:
-  applies_to: SiteAdmin
-  state: hidden
-  display_name: Remember Whether Module Links Load in New Tab
-  description: |-
-    When adding external links to a module, users can select whether those links should
-    load in a new tab. When this flag is enabled, that checkbox will be selected by default
-    if the user checked it last time they added an external link.
 remember_course_nav_collapsed_state:
   applies_to: SiteAdmin
   state: hidden
