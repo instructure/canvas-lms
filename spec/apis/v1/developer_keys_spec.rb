@@ -78,8 +78,37 @@ describe DeveloperKeysController, type: :request do
       d.update! visible: true
       get "/api/v1/accounts/#{a.id}/developer_keys", params: { inherited: true }
       expect(json_parse.first.keys).to match_array(
-        %w[name created_at icon_url workflow_state id developer_key_account_binding is_lti_key]
+        %w[name created_at icon_url workflow_state id developer_key_account_binding is_lti_key inherited_from]
       )
+    end
+
+    context "when inherited is set for siteadmin key" do
+      subject { get "/api/v1/accounts/#{account.id}/developer_keys", params: { inherited: true } }
+
+      let(:account) { Account.create! }
+      let(:key) do
+        d = DeveloperKey.create!(account: nil)
+        d.update! visible: true
+        d
+      end
+
+      before do
+        allow_any_instance_of(DeveloperKeysController).to receive(:context_is_domain_root_account?).and_return(true)
+        user_session(account_admin_user(account: account))
+        key
+      end
+
+      it "only includes a subset of attributes" do
+        subject
+        expect(json_parse.first.keys).to match_array(
+          %w[name created_at icon_url workflow_state id developer_key_account_binding is_lti_key inherited_from]
+        )
+      end
+
+      it "sets inherited_from to global" do
+        subject
+        expect(json_parse.first["inherited_from"]).to eq "global"
+      end
     end
 
     it "only includes tool_configuration if inherited is not set" do
