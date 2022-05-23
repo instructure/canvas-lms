@@ -59,7 +59,9 @@ module Api::V1::DeveloperKey
         hash["developer_key_account_binding"] = DeveloperKeyAccountBindingSerializer.new(account_binding, context)
       end
 
-      unless inherited
+      if inherited
+        hash["inherited_from"] = key.account_id.present? ? "federated_parent" : "global"
+      else
         hash["account_name"] = key.account_name
         hash["visible"] = key.visible
       end
