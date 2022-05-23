@@ -354,16 +354,18 @@ function mergeStudentsAndSubmission() {
     window.jsonData.submissionsMap[submission[anonymizableUserId]] = submission
   })
 
-  jsonData.studentsWithSubmissions = jsonData.studentsWithSubmissions.reduce(
+  window.jsonData.studentsWithSubmissions = window.jsonData.studentsWithSubmissions.reduce(
     (students, student, index) => {
-      const submission = jsonData.submissionsMap[student[anonymizableId]]
+      const submission = window.jsonData.submissionsMap[student[anonymizableId]]
       // Hide students that don't have a submission object. This is legacy support
       // for when we used to not create submission objects for assigned concluded students.
       // For all new assignments, every assigned student (regardless of concluded/inactive
       // status) should have a submission object.
       if (submission) {
-        student.enrollments = jsonData.studentEnrollmentMap[student[anonymizableId]]
-        student.section_ids = Object.keys(jsonData.studentSectionIdsMap[student[anonymizableId]])
+        student.enrollments = window.jsonData.studentEnrollmentMap[student[anonymizableId]]
+        student.section_ids = Object.keys(
+          window.jsonData.studentSectionIdsMap[student[anonymizableId]]
+        )
         student.submission = submission
         student.submission_state = SpeedgraderHelpers.submissionState(student, ENV.grading_role)
         student.index = index
@@ -2631,11 +2633,11 @@ EG = {
 
   totalStudentCount() {
     if (sectionToShow) {
-      return _.filter(jsonData.studentsWithSubmissions, student =>
+      return _.filter(window.jsonData.studentsWithSubmissions, student =>
         _.includes(student.section_ids, sectionToShow)
       ).length
     } else {
-      return jsonData.studentsWithSubmissions.length
+      return window.jsonData.studentsWithSubmissions.length
     }
   },
 
@@ -3688,7 +3690,7 @@ EG = {
         snapshot =>
           snapshot &&
           $.map(
-            jsonData.studentsWithSubmissions,
+            window.jsonData.studentsWithSubmissions,
             student => snapshot === student && student.name
           )[0]
       )
