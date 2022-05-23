@@ -40,6 +40,11 @@ const defaultProps = {
   changeCount: 0
 }
 
+beforeAll(() => {
+  window.ENV.FEATURES ||= {}
+  window.ENV.FEATURES.course_paces_for_sections = true
+})
+
 afterEach(() => {
   jest.clearAllMocks()
 })
@@ -55,12 +60,11 @@ describe('PacePicker', () => {
     act(() => picker.click())
     expect(screen.getByRole('menuitem', {name: 'Course'})).toBeInTheDocument()
 
-    // Commented out since we're not implementing this feature yet
-    // const sections = screen.getByRole('button', {name: 'Sections'})
-    // expect(sections).toBeInTheDocument()
-    // act(() => sections.click())
-    // expect(screen.getByRole('menuitem', {name: 'Hackers'})).toBeInTheDocument()
-    // expect(screen.getByRole('menuitem', {name: 'Mercenaries'})).toBeInTheDocument()
+    const sections = screen.getByRole('button', {name: 'Sections'})
+    expect(sections).toBeInTheDocument()
+    act(() => sections.click())
+    expect(screen.getByRole('menuitem', {name: 'Hackers'})).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', {name: 'Mercenaries'})).toBeInTheDocument()
 
     const students = screen.getByRole('button', {name: 'Students'})
     expect(students).toBeInTheDocument()
@@ -81,11 +85,10 @@ describe('PacePicker', () => {
     act(() => screen.getByRole('menuitem', {name: 'Course'}).click())
     expect(selectPaceContextFn).toHaveBeenCalledWith('Course', COURSE.id)
 
-    // Commented out since we're not implementing this feature yet
-    // act(() => picker.click())
-    // act(() => screen.getByRole('button', {name: 'Sections'}).click())
-    // act(() => screen.getByRole('menuitem', {name: 'Hackers'}).click())
-    // expect(selectPaceContextFn).toHaveBeenCalledWith('Section', SECTION_1.id)
+    act(() => picker.click())
+    act(() => screen.getByRole('button', {name: 'Sections'}).click())
+    act(() => screen.getByRole('menuitem', {name: 'Hackers'}).click())
+    expect(selectPaceContextFn).toHaveBeenCalledWith('Section', SORTED_SECTIONS[0].id)
 
     act(() => picker.click())
     act(() => screen.getByRole('button', {name: 'Students'}).click())
