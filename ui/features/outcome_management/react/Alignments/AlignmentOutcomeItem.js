@@ -29,7 +29,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
 import AlignmentItem from './AlignmentItem'
-import {alignmentShape} from './shapes'
+import {alignmentShape} from './propTypeShapes'
 
 const I18n = useI18nScope('AlignmentSummary')
 
