@@ -319,6 +319,37 @@ describe OriginalityReport do
       end.to_not raise_error
     end
 
+    it "does not explode if the report is gone but a newer one exists" do
+      expect do
+        # This can happen when a previously run job deleted and recreated the report
+        OriginalityReport.copy_to_group_submissions!(
+          report_id: -1,
+          user_id: submission_one.user_id,
+          submission_id: submission_one.id,
+          attachment_id: originality_report.attachment_id,
+          updated_at: originality_report.updated_at - 1.hour
+        )
+      end.to_not raise_error
+    end
+
+    it "explodes if the report is gone but no newer one exists" do
+      params = {
+        report_id: -1,
+        user_id: submission_one.user_id,
+        submission_id: submission_one.id,
+        attachment_id: originality_report.attachment_id,
+        updated_at: originality_report.updated_at - 1.hour,
+      }
+      expect do
+        OriginalityReport.copy_to_group_submissions!(**params.merge(attachment_id: -1))
+      end.to raise_error(ActiveRecord::RecordNotFound)
+      expect do
+        OriginalityReport.copy_to_group_submissions!(
+          **params.merge(updated_at: originality_report.updated_at + 1.hour)
+        )
+      end.to raise_error(ActiveRecord::RecordNotFound)
+    end
+
     it "replaces originality reports that have the same attachment/submission combo" do
       originality_report.copy_to_group_submissions!
       expect do
@@ -345,6 +376,26 @@ describe OriginalityReport do
       expect do
         non_group_report.copy_to_group_submissions!
       end.not_to change(OriginalityReport, :count)
+    end
+
+    it "does not overwrite newer reports or create an extra report" do
+      originality_report.copy_to_group_submissions!
+      report_two = submission_two.originality_reports.first
+      report_two.touch
+      expect do
+        originality_report.copy_to_group_submissions!
+      end.not_to change { report_two.reload.updated_at }
+      expect(submission_two.originality_reports.count).to eq(1)
+    end
+
+    it "uses the updated_at of the original report so an old report doesn't look new" do
+      originality_report.copy_to_group_submissions!
+      expect(submission_two.originality_reports.first.updated_at).to \
+        eq(originality_report.updated_at)
+      originality_report.touch
+      originality_report.copy_to_group_submissions!
+      expect(submission_two.originality_reports.first.updated_at).to \
+        eq(originality_report.updated_at)
     end
 
     context "with sharding" do
@@ -410,6 +461,42 @@ describe OriginalityReport do
         originality_report.copy_to_group_submissions!
         resource_link_id = submission_two.originality_reports.first.lti_link.resource_link_id
         expect(resource_link_id).not_to eq link.resource_link_id
+      end
+    end
+  end
+
+  describe ".copy_to_group_submissions_later!" do
+    context "when the submission is a group submission" do
+      let(:group) { course.groups.create!(name: "group one") }
+
+      before do
+        group.add_user(submission.user)
+        submission.update!(group: group)
+      end
+
+      it "enqueues a job to copy_to_group_submissions! with the correct parameters" do
+        delay_mock = double
+        expected_strand = "originality_report_copy_to_group_submissions:" \
+                          "#{submission.global_assignment_id}:#{submission.group_id}:" \
+                          "#{subject.attachment_id}"
+        expect(described_class).to receive(:delay_if_production).with(
+          strand: expected_strand
+        ).and_return(delay_mock)
+        expect(delay_mock).to receive(:copy_to_group_submissions!).with(
+          report_id: subject.id,
+          user_id: submission.user_id,
+          submission_id: submission.id,
+          attachment_id: subject.attachment_id,
+          updated_at: subject.updated_at
+        )
+        subject.copy_to_group_submissions_later!
+      end
+    end
+
+    context "when the submission is not a group submission" do
+      it "doesn't enqueue if submission is not a group submission" do
+        expect(described_class).to_not receive(:delay_if_production)
+        subject.copy_to_group_submissions_later!
       end
     end
   end
