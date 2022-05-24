@@ -164,10 +164,12 @@ class Announcement < DiscussionTopic
     return if !saved_changes.key?("workflow_state") || saved_changes["workflow_state"][1] != "active"
     return if context_type != "Course"
 
-    observer_enrollments = course.enrollments.active.where(type: "ObserverEnrollment")
+    observer_enrollments = course.enrollments.active.of_observer_type.where.not(associated_user_id: nil)
     observer_enrollments.each do |enrollment|
       observer = enrollment.user
       student = enrollment.associated_user
+      next unless visible_for?(student)
+
       threshold = ObserverAlertThreshold.where(observer: observer, alert_type: "course_announcement", student: student).first
       next unless threshold
 

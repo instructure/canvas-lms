@@ -135,7 +135,7 @@ describe ObserverAlert do
 
   describe "course_announcement" do
     before :once do
-      @course = course_factory
+      @course = course_factory(active_all: true)
       @student = student_in_course(active_all: true, course: @course).user
       observer = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
       ObserverAlertThreshold.create!(student: @student, observer: @observer, alert_type: "course_announcement")
@@ -185,6 +185,37 @@ describe ObserverAlert do
 
       expect(alert1.count).to eq 1
       expect(alert2.count).to eq 1
+    end
+
+    it "does not create an alert if the course is unpublished" do
+      @course.claim!
+      announcement_model(context: @course)
+      alerts = ObserverAlert.where(student: @student, observer: @observer)
+      expect(alerts.count).to eq 0
+    end
+
+    it "creates alerts only for observers in sections where the announcement is created" do
+      @section1 = @course.default_section
+      @section2 = @course.course_sections.create!
+
+      Announcement.create!(
+        message: "Just for section 2",
+        context: @course,
+        workflow_state: "published",
+        is_section_specific: true,
+        course_sections: [@section2]
+      )
+      alerts = ObserverAlert.where(student: @student, observer: @observer)
+      expect(alerts.count).to eq 0
+
+      Announcement.create!(
+        message: "Just for section 1",
+        context: @course,
+        workflow_state: "published",
+        is_section_specific: true,
+        course_sections: [@section1]
+      )
+      expect(alerts.count).to eq 1
     end
   end
 
