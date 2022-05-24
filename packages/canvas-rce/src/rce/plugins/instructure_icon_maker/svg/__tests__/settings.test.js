@@ -69,7 +69,7 @@ describe('useSvgSettings()', () => {
         textSize: 'small',
         textColor: '#000000',
         textBackgroundColor: null,
-        textPosition: 'middle',
+        textPosition: 'below',
         x: 0,
         y: 0,
         translateX: 0,
@@ -121,7 +121,7 @@ describe('useSvgSettings()', () => {
           textSize: 'small',
           textColor: '#000000',
           textBackgroundColor: null,
-          textPosition: 'middle',
+          textPosition: 'below',
           x: 0,
           y: 0,
           translateX: 0,
@@ -169,7 +169,7 @@ describe('useSvgSettings()', () => {
             "textSize":"medium",
             "textColor":"#009606",
             "textBackgroundColor":"#06A3B7",
-            "textPosition":"middle"
+            "textPosition":"below"
           }
         </metadata>
         <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/>
@@ -285,7 +285,7 @@ describe('useSvgSettings()', () => {
         textColor: '#009606',
         textBackgroundColor: '#06A3B7',
         imageSettings: null,
-        textPosition: 'middle',
+        textPosition: 'below',
         x: 0,
         y: 0,
         translateX: 0,
@@ -315,7 +315,7 @@ describe('useSvgSettings()', () => {
                 textSize: 'medium',
                 textColor: '#009606',
                 textBackgroundColor: '#06A3B7',
-                textPosition: 'middle',
+                textPosition: 'below',
                 imageSettings: {
                   cropperSettings: null,
                   icon: {
@@ -375,7 +375,7 @@ describe('useSvgSettings()', () => {
             image: 'Art Icon',
             mode: 'SingleColor'
           },
-          textPosition: 'middle',
+          textPosition: 'below',
           x: 0,
           y: 0,
           translateX: 0,
@@ -431,7 +431,7 @@ describe('useSvgSettings()', () => {
             image: 'Art Icon',
             mode: 'SingleColor'
           },
-          textPosition: 'middle',
+          textPosition: 'below',
           x: 0,
           y: 0,
           translateX: 0,
@@ -481,7 +481,7 @@ describe('useSvgSettings()', () => {
           textColor: '#009606',
           textBackgroundColor: '#06A3B7',
           imageSettings: null,
-          textPosition: 'middle',
+          textPosition: 'below',
           x: 0,
           y: 0,
           translateX: 0,
@@ -534,7 +534,7 @@ describe('useSvgSettings()', () => {
           textSize: 'small',
           textColor: '#000000',
           textBackgroundColor: null,
-          textPosition: 'middle',
+          textPosition: 'below',
           x: 0,
           y: 0,
           translateX: 0,
@@ -568,7 +568,7 @@ describe('useSvgSettings()', () => {
           textColor: '#000000',
           textBackgroundColor: null,
           imageSettings: null,
-          textPosition: 'middle',
+          textPosition: 'below',
           x: 0,
           y: 0,
           translateX: 0,
@@ -610,7 +610,7 @@ describe('useSvgSettings()', () => {
                 "textSize":"medium",
                 "textColor":"#009606",
                 "textBackgroundColor":"#06A3B7",
-                "textPosition":"middle"
+                "textPosition":"below"
               }
             </metadata>
             <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/>
@@ -632,7 +632,7 @@ describe('useSvgSettings()', () => {
                 "textSize":"medium",
                 "textColor":"#009606",
                 "textBackgroundColor":"#06A3B7",
-                "textPosition":"middle"
+                "textPosition":"below"
               }
             </metadata>
             <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/>

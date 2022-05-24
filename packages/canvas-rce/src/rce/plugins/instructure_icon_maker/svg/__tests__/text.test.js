@@ -36,7 +36,7 @@ describe('buildText()', () => {
         font-size="14"
         font-weight="bold"
         x="55"
-        y="68"
+        y="144"
       >
         <tspan
           dy="0"
@@ -58,7 +58,7 @@ describe('buildText()', () => {
         font-size="14"
         font-weight="bold"
         x="47"
-        y="68"
+        y="144"
       >
         <tspan
           dy="0"
@@ -111,7 +111,7 @@ describe('buildText()', () => {
           font-size="14"
           font-weight="bold"
           x="55"
-          y="68"
+          y="144"
         >
           <tspan
             dy="0"
@@ -131,7 +131,7 @@ describe('buildText()', () => {
           font-size="16"
           font-weight="bold"
           x="55"
-          y="69"
+          y="146"
         >
           <tspan
             dy="0"
@@ -151,7 +151,7 @@ describe('buildText()', () => {
           font-size="22"
           font-weight="bold"
           x="55"
-          y="72"
+          y="152"
         >
           <tspan
             dy="0"
@@ -171,7 +171,7 @@ describe('buildText()', () => {
           font-size="28"
           font-weight="bold"
           x="55"
-          y="75"
+          y="158"
         >
           <tspan
             dy="0"
@@ -193,7 +193,7 @@ describe('buildText()', () => {
           font-size="14"
           font-weight="bold"
           x="55"
-          y="68"
+          y="144"
         >
           <tspan
             dy="0"
@@ -213,7 +213,7 @@ describe('buildText()', () => {
           font-size="14"
           font-weight="bold"
           x="55"
-          y="68"
+          y="144"
         >
           <tspan
             dy="0"
@@ -235,7 +235,7 @@ describe('buildText()', () => {
           font-size="14"
           font-weight="bold"
           x="55"
-          y="68"
+          y="144"
         >
           <tspan
             dy="0"
@@ -255,7 +255,7 @@ describe('buildText()', () => {
           font-size="14"
           font-weight="bold"
           x="55"
-          y="68"
+          y="144"
         >
           <tspan
             dy="0"
@@ -270,14 +270,14 @@ describe('buildText()', () => {
 
   describe('builds <text /> when text position', () => {
     it('is middle', () => {
-      expect(buildText({...settings, textPosition: 'middle'})).toMatchInlineSnapshot(`
+      expect(buildText({...settings, textPosition: 'below'})).toMatchInlineSnapshot(`
         <text
           fill="#000000"
           font-family="Lato Extended"
           font-size="14"
           font-weight="bold"
           x="55"
-          y="68"
+          y="144"
         >
           <tspan
             dy="0"
@@ -339,7 +339,7 @@ describe('buildTextBackground()', () => {
   it('builds <path /> if text is valid', () => {
     expect(buildTextBackground({...settings, text: 'Hello World!'})).toMatchInlineSnapshot(`
       <path
-        d="M55,52 h14 a4,4 0 0 1 4,4 v16 a4,4 0 0 1 -4,4 h-14 a4,4 0 0 1 -4,-4 v-16 a4,4 0 0 1 4,-4 z"
+        d="M55,128 h14 a4,4 0 0 1 4,4 v16 a4,4 0 0 1 -4,4 h-14 a4,4 0 0 1 -4,-4 v-16 a4,4 0 0 1 4,-4 z"
         fill=""
       />
     `)
@@ -382,12 +382,12 @@ describe('getContainerHeight()', () => {
   })
 
   it('returns base size if is greater', () => {
-    expect(getContainerHeight({...settings, text: 'Hello World!'})).toBe(122)
+    expect(getContainerHeight({...settings, text: 'Hello World!'})).toBe(162)
   })
 
   it('returns text background height if is greater', () => {
     const text =
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua.'
-    expect(getContainerHeight({...settings, text})).toBe(142)
+    expect(getContainerHeight({...settings, text})).toBe(218)
   })
 })

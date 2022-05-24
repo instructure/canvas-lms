@@ -39,13 +39,13 @@ describe('buildSvg()', () => {
     expect(buildSvg(settings)).toMatchInlineSnapshot(`
       <svg
         fill="none"
-        height="218px"
-        viewBox="0 0 218 218"
+        height="244px"
+        viewBox="0 0 218 244"
         width="218px"
         xmlns="http://www.w3.org/2000/svg"
       >
         <metadata>
-          {"type":"image/svg+xml-icon-maker-icons","alt":"","shape":"circle","size":"large","color":"#000","outlineColor":"#fff","outlineSize":"large","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"middle","encodedImage":"","encodedImageType":"","encodedImageName":"","x":0,"y":0,"translateX":0,"translateY":0,"width":0,"height":0,"transform":"","imageSettings":null}
+          {"type":"image/svg+xml-icon-maker-icons","alt":"","shape":"circle","size":"large","color":"#000","outlineColor":"#fff","outlineSize":"large","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"below","encodedImage":"","encodedImageType":"","encodedImageName":"","x":0,"y":0,"translateX":0,"translateY":0,"width":0,"height":0,"transform":"","imageSettings":null}
         </metadata>
         <svg
           fill="none"
@@ -85,8 +85,8 @@ describe('buildSvg()', () => {
     expect(buildSvg(settings, options)).toMatchInlineSnapshot(`
       <svg
         fill="none"
-        height="218px"
-        viewBox="0 0 218 218"
+        height="244px"
+        viewBox="0 0 218 244"
         width="218px"
         xmlns="http://www.w3.org/2000/svg"
       >
@@ -150,13 +150,13 @@ describe('buildSvg()', () => {
     expect(buildSvg(settings)).toMatchInlineSnapshot(`
       <svg
         fill="none"
-        height="218px"
-        viewBox="0 0 218 218"
+        height="258px"
+        viewBox="0 0 218 258"
         width="218px"
         xmlns="http://www.w3.org/2000/svg"
       >
         <metadata>
-          {"type":"image/svg+xml-icon-maker-icons","alt":"","shape":"circle","size":"large","color":"#000","outlineColor":"#fff","outlineSize":"large","text":"Hello World!","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"middle","encodedImage":"","encodedImageType":"","encodedImageName":"","x":0,"y":0,"translateX":0,"translateY":0,"width":0,"height":0,"transform":"","imageSettings":null}
+          {"type":"image/svg+xml-icon-maker-icons","alt":"","shape":"circle","size":"large","color":"#000","outlineColor":"#fff","outlineSize":"large","text":"Hello World!","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"below","encodedImage":"","encodedImageType":"","encodedImageName":"","x":0,"y":0,"translateX":0,"translateY":0,"width":0,"height":0,"transform":"","imageSettings":null}
         </metadata>
         <svg
           fill="none"
@@ -187,7 +187,7 @@ describe('buildSvg()', () => {
           </g>
         </svg>
         <path
-          d="M103,100 h14 a4,4 0 0 1 4,4 v16 a4,4 0 0 1 -4,4 h-14 a4,4 0 0 1 -4,-4 v-16 a4,4 0 0 1 4,-4 z"
+          d="M103,224 h14 a4,4 0 0 1 4,4 v16 a4,4 0 0 1 -4,4 h-14 a4,4 0 0 1 -4,-4 v-16 a4,4 0 0 1 4,-4 z"
           fill=""
         />
         <text
@@ -196,7 +196,7 @@ describe('buildSvg()', () => {
           font-size="14"
           font-weight="bold"
           x="103"
-          y="116"
+          y="240"
         >
           <tspan
             dy="0"
