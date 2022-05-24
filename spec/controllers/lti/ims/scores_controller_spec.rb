@@ -387,7 +387,7 @@ module Lti::IMS
               ]
             end
             let(:params_overrides) do
-              super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items: content_items, new_submission: false })
+              super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items: content_items, new_submission: false }, :scoreGiven => 10, :scoreMaximum => line_item.score_maximum)
             end
             let(:expected_progress_url) do
               "http://test.host/api/lti/courses/#{context_id}/progress/"
@@ -527,11 +527,65 @@ module Lti::IMS
                 expect(progress_url).to include expected_progress_url
               end
 
+              shared_examples_for "no updates are made with FF on" do
+                before do
+                  Account.root_accounts.first.enable_feature! :ags_scores_file_error_improvements
+                end
+
+                it "does not update submission" do
+                  score = result.submission.score
+                  send_request
+                  expect(result.submission.reload.score).to eq score
+                end
+
+                it "does not update result" do
+                  score = result.result_score
+                  send_request
+                  expect(result.result_score).to eq score
+                end
+
+                it "does not submit assignment" do
+                  submission_body = { submitted_at: 1.hour.ago, submission_type: "external_tool" }
+                  attempt = result.submission.assignment.submit_homework(user, submission_body).attempt
+                  send_request
+                  expect(result.submission.reload.attempt).to eq attempt
+                end
+              end
+
+              shared_examples_for "updates are made with FF off" do
+                before do
+                  Account.root_accounts.first.disable_feature! :ags_scores_file_error_improvements
+                end
+
+                it "updates submission" do
+                  result
+                  send_request
+                  expect(result.submission.reload.score).to eq 10
+                end
+
+                it "updates result" do
+                  result
+                  send_request
+                  expect(result.reload.result_score).to eq 10
+                end
+
+                # since the file upload process submits the assignment when content items are present
+                it "does not submit assignment" do
+                  submission_body = { submitted_at: 1.hour.ago, submission_type: "external_tool" }
+                  attempt = result.submission.assignment.submit_homework(user, submission_body).attempt
+                  send_request
+                  expect(result.submission.reload.attempt).to eq attempt
+                end
+              end
+
               shared_examples_for "a 400" do
                 it "returns bad request" do
                   send_request
                   expect(response).to be_bad_request
                 end
+
+                it_behaves_like "no updates are made with FF on"
+                it_behaves_like "updates are made with FF off"
               end
 
               shared_examples_for "a 500" do
@@ -539,6 +593,9 @@ module Lti::IMS
                   send_request
                   expect(response).to be_server_error
                 end
+
+                it_behaves_like "no updates are made with FF on"
+                it_behaves_like "updates are made with FF off"
               end
 
               context "when InstFS is unreachable" do
