@@ -136,7 +136,7 @@ test('disabling button: disabled if there are no unsaved changes', () => {
 })
 
 test('disabling button: disabled if everything is default', () => {
-  const wrapper = shallow(<SaveThemeButton {...props} brandConfigMd5={null} />)
+  const wrapper = shallow(<SaveThemeButton {...props} brandConfigMd5={null} isDefaultConfig={true} />)
   ok(
     wrapper
       .find('.Button--primary')
