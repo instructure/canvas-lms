@@ -51,7 +51,7 @@ export const DEFAULT_SETTINGS = {
   textSize: Size.Small,
   textColor: '#000000',
   textBackgroundColor: null,
-  textPosition: 'middle',
+  textPosition: 'below',
   encodedImage: '',
   encodedImageType: '',
   encodedImageName: '',
