@@ -105,9 +105,14 @@ export default function commonEventFactory(data, contexts) {
       obj.can_delete = true
     }
   } else {
-    // If the user can create an event in a context, they can also edit/delete
-    // any events in that context.
-    if (contextInfo.can_create_calendar_events) {
+    if (actualContextInfo) {
+      // If we're in a section context, actualContextInfo is set and we should check
+      // permissions from there, not from the parent context
+      obj.can_edit = actualContextInfo.can_create_ag
+      obj.can_delete = actualContextInfo.can_create_ag
+    } else if (contextInfo.can_create_calendar_events) {
+      // If the user can create an event in a context, they can also edit/delete
+      // any events in that context.
       obj.can_edit = true
       obj.can_delete = true
     }
