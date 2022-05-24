@@ -51,6 +51,12 @@ module Api::V1::Section
       res["user_count"] = GuardRail.activate(:secondary) { section.enrollments.not_fake.active_or_pending_by_date_ignoring_access.count }
     end
 
+    if includes.include?("permissions")
+      res["permissions"] = {
+        manage_calendar: section.grants_right?(user, session, :manage_calendar)
+      }
+    end
+
     res
   end
 

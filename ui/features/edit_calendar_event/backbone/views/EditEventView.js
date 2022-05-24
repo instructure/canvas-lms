@@ -140,6 +140,7 @@ export default class EditCalendarEventView extends Backbone.View {
 
     _.defer(this.toggleDuplicateOptions)
     _.defer(this.renderConferenceWidget)
+    _.defer(this.disableDatePickers)
 
     return this
   }
@@ -203,12 +204,15 @@ export default class EditCalendarEventView extends Backbone.View {
       'use_section_dates',
       this.model.get('use_section_dates')
     )
-    return $('.show_if_using_sections input').prop('disabled', !this.model.get('use_section_dates'))
   }
 
   toggleUseSectionDates(e) {
     this.model.set('use_section_dates', !this.model.get('use_section_dates'))
     return this.updateRemoveChildEvents(e)
+  }
+
+  disableDatePickers() {
+    $('.date_field:disabled + button').prop('disabled', true)
   }
 
   toggleHtmlView(event) {
@@ -307,6 +311,13 @@ export default class EditCalendarEventView extends Backbone.View {
     const result = super.toJSON(...arguments)
     result.recurringEventLimit = 200
     result.k5_course = ENV.K5_SUBJECT_COURSE || ENV.K5_HOMEROOM_COURSE
+    result.disableSectionDates =
+      result.use_section_dates &&
+      result.course_sections.filter(
+        section => !section.permissions.manage_calendar && section.event
+      ).length > 0
+        ? 'disabled'
+        : ''
     return result
   }
 
