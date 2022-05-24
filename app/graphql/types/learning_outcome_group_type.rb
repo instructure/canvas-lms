@@ -69,6 +69,7 @@ module Types
 
     field :outcomes, Types::ContentTagConnection, null: false do
       argument :search_query, String, required: false
+      argument :filter, String, required: false
     end
     def outcomes(**args)
       learning_outcome_group_children_service.suboutcomes_by_group_id(object.id, args)
