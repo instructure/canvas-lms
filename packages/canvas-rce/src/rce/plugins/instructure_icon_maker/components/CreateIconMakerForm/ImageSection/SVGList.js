@@ -59,7 +59,7 @@ const SVGList = ({type, onSelect, fillColor, onMount}) => {
           <Link
             data-testid={`icon-maker-${iconName}`}
             draggable={false}
-            onClick={() => onSelect(svgSourceList[iconName])}
+            onClick={() => onSelect(iconName, svgSourceList[iconName])}
             title={svgSourceList[iconName].label}
           >
             <View
