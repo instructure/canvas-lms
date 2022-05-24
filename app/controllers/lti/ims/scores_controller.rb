@@ -195,6 +195,35 @@ module Lti::IMS
     #         }
     #   }
     def create
+      return old_create unless @domain_root_account.feature_enabled? :ags_scores_file_error_improvements
+
+      # process file first, and prevent other requested changes if upload fails
+      json = {}
+      if has_content_items?
+        begin
+          content_items = upload_submission_files
+          json[Lti::Result::AGS_EXT_SUBMISSION] = { content_items: content_items }
+        rescue Net::ReadTimeout, CanvasHttp::CircuitBreakerError
+          return render_error("failed to communicate with file service", :gateway_timeout)
+        rescue CanvasHttp::InvalidResponseCodeError => e
+          err_message = "uploading to file service failed with #{e.code}: #{e.body}"
+          return render_error(err_message, :bad_request) if e.code == 400
+
+          # 5xx and other unexpected errors
+          return render_error(err_message, :internal_server_error)
+        end
+      end
+
+      submit_homework if new_submission? && !has_content_items?
+      update_or_create_result
+      json[:resultUrl] = result_url
+
+      render json: json, content_type: MIME_TYPE
+    end
+
+    private
+
+    def old_create
       submit_homework if new_submission? && !has_content_items?
       update_or_create_result
       json = { resultUrl: result_url }
@@ -216,8 +245,6 @@ module Lti::IMS
 
       render json: json, content_type: MIME_TYPE
     end
-
-    private
 
     REQUIRED_PARAMS = %i[userId activityProgress gradingProgress timestamp].freeze
     OPTIONAL_PARAMS = %i[scoreGiven scoreMaximum comment].freeze
