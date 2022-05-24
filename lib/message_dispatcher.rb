@@ -24,7 +24,7 @@ class MessageDispatcher < Delayed::PerformableMethod
       message.for_queue.deliver
     rescue Delayed::RetriableError
       InstStatsd::Statsd.increment("MessageDispatcher.dispatch.failed")
-      raise Delayed::RetriableError
+      raise
     end
 
     def on_permanent_failure(error)
