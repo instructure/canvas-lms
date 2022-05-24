@@ -5,15 +5,7 @@
       <input class="select-checkbox" id="conversation-checkbox-{{id}}" type="checkbox" />
     </label> --}}
   </div>
-  <input href="#"
-      class="read-state {{#unless unread}}read{{/unless}}"
-      type="checkbox"
-      aria-checked="{{#if unread}}true{{else}}false{{/if}}"
-      title="{{#if unread}}{{#t}}Mark as read{{/t}}{{else}}{{#t}}Mark as unread{{/t}}{{/if}}">
-    <span class="screenreader-only">
-      {{#t}}Unread{{/t}}
-    </span>
-  </a>
+  <div class="read-state-tooltip"></div>
 </div>
 
 <div class="message-middle-column">
