@@ -251,6 +251,7 @@ describe "account authentication" do
         end
 
         it "shows and saves provisioning only checkboxes" do
+          skip "FOO-2941 5/19/2022"
           get "/accounts/self/authentication_providers"
           click_option("select.canvas_attribute", "locale")
           f(".add_federated_attribute_button").click
@@ -273,6 +274,7 @@ describe "account authentication" do
         end
 
         it "hides provisioning only when jit provisioning is disabled" do
+          skip "FOO-2941 5/19/2022"
           ap.update_attribute(:federated_attributes, { "locale" => "provider_locale" })
           ap.update_attribute(:jit_provisioning, true)
           get "/accounts/self/authentication_providers"
@@ -300,6 +302,7 @@ describe "account authentication" do
         end
 
         it "hides the add attributes button when all are added" do
+          skip "FOO-2941 5/19/2022"
           get "/accounts/self/authentication_providers"
           AuthenticationProvider::CANVAS_ALLOWED_FEDERATED_ATTRIBUTES.length.times do
             f(".add_federated_attribute_button").click
@@ -312,6 +315,7 @@ describe "account authentication" do
         end
 
         it "can remove all attributes" do
+          skip "FOO-2941 5/19/2022"
           ap.update_attribute(:federated_attributes, { "locale" => "provider_locale" })
           get "/accounts/self/authentication_providers"
 
@@ -325,6 +329,7 @@ describe "account authentication" do
         end
 
         it "doesn't include screenreader text when removing attributes" do
+          skip "FOO-2941 5/19/2022"
           ap.update_attribute(:federated_attributes, { "locale" => "provider_locale" })
           get "/accounts/self/authentication_providers"
 
