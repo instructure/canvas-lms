@@ -19,16 +19,14 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import SyllabusBehaviors from '@canvas/syllabus/backbone/behaviors/SyllabusBehaviors'
-import {useScope as useI18nScope} from '@canvas/i18n'
 import SyllabusCollection from './backbone/collections/SyllabusCollection'
 import SyllabusCalendarEventsCollection from './backbone/collections/SyllabusCalendarEventsCollection'
 import SyllabusAppointmentGroupsCollection from './backbone/collections/SyllabusAppointmentGroupsCollection'
 import SyllabusPlannerCollection from './backbone/collections/SyllabusPlannerCollection'
 import SyllabusView from './backbone/views/SyllabusView'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
+import {attachImmersiveReaderButton} from './util/utils'
 import ready from '@instructure/ready'
-
-const I18n = useI18nScope('syllabus')
 
 const immersive_reader_mount_point = () => document.getElementById('immersive_reader_mount_point')
 const immersive_reader_mobile_mount_point = () =>
@@ -88,8 +86,13 @@ if (!(ENV.IN_PACED_COURSE && !ENV.current_user_is_student) && showCourseSummary)
 
 ready(() => {
   // Attach the immersive reader button if enabled
-  if (immersive_reader_mount_point() || immersive_reader_mobile_mount_point()) {
-    attachImmersiveReaderButton()
+  const activeMountPoints = [
+    immersive_reader_mount_point(),
+    immersive_reader_mobile_mount_point()
+  ].filter(node => !!node)
+
+  if (activeMountPoints.length > 0) {
+    attachImmersiveReaderButton(activeMountPoints)
   }
 
   // Finish early if we don't need show summary content
@@ -150,35 +153,4 @@ function renderCoursePacingNotice() {
         console.error('Falied loading CoursePacingNotice', ex)
       })
   }
-}
-
-function attachImmersiveReaderButton() {
-  import(/* webpackChunkName: "[request]" */ '@canvas/immersive-reader/ImmersiveReader')
-    .then(ImmersiveReader => {
-      const courseSyllabusText = () => document.querySelector('#course_syllabus').innerHTML
-      const title = I18n.t('Course Syllabus')
-      let content
-
-      // We display a default message in #course_syllabus_details when the user
-      // hasn't set any text in the syllabus.
-      if ($.trim(courseSyllabusText())) {
-        content = courseSyllabusText
-      } else {
-        content = () => document.querySelector('#course_syllabus_details').innerHTML
-      }
-
-      if (immersive_reader_mount_point()) {
-        ImmersiveReader.initializeReaderButton(immersive_reader_mount_point(), {content, title})
-      }
-
-      if (immersive_reader_mobile_mount_point()) {
-        ImmersiveReader.initializeReaderButton(immersive_reader_mobile_mount_point(), {
-          content,
-          title
-        })
-      }
-    })
-    .catch(e => {
-      console.log('Error loading immersive readers.', e) // eslint-disable-line no-console
-    })
 }
