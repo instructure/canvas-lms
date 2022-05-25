@@ -61,7 +61,12 @@ function initialApplicationState(list = null, inheritedList = null) {
       listDeveloperKeysPending: false,
       listDeveloperKeysSuccessful: false,
       inheritedList: inheritedList || [
-        {id: 2, api_key: 'abc12345678', created_at: '2012-06-07T20:36:50Z'}
+        {
+          id: 2,
+          api_key: 'abc12345678',
+          created_at: '2012-06-07T20:36:50Z',
+          inherited_from: 'global'
+        }
       ],
       list: list || [{id: 1, api_key: 'abc12345678', created_at: '2012-06-07T20:36:50Z'}],
       nextPage: 'http://...',
@@ -108,9 +113,7 @@ test('requests more inherited dev keys when the inherited "show all" button is c
   const overrides = {
     applicationState: initialApplicationState(generateKeyList(), generateKeyList(20)),
     actions: {
-      getRemainingInheritedDeveloperKeys: () => () => ({
-        then: callbackSpy
-      })
+      getRemainingInheritedDeveloperKeys: () => callbackSpy
     }
   }
   const component = renderComponent(overrides)

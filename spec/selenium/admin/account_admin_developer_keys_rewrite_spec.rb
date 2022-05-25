@@ -120,7 +120,7 @@ describe "Developer Keys" do
       fj("table[data-automation='devKeyAdminTable'] tbody tr button:has(svg[name='IconTrash'])").click
       accept_alert
       wait_for_ajaximations
-      expect(element_exists?("table[data-automation='devKeyAdminTable']")).to eq(false)
+      expect(element_exists?("table[data-automation='devKeyAdminTable'] tbody tr")).to eq(false)
       expect(Account.default.developer_keys.nondeleted.count).to eq 0
     end
 
@@ -179,7 +179,7 @@ describe "Developer Keys" do
         site_admin_logged_in
         site_admin_developer_key.update(visible: true)
         get "/accounts/site_admin/developer_keys"
-        fj("span:contains('On'):last").click
+        fj("div:contains('On'):last").click
         accept_alert
         get "/accounts/#{Account.default.id}/developer_keys"
         click_inherited_tab
@@ -191,7 +191,7 @@ describe "Developer Keys" do
         site_admin_logged_in
         site_admin_developer_key.update(visible: true)
         get "/accounts/site_admin/developer_keys"
-        fj("span:contains('Off'):last").click
+        fj("div:contains('Off'):last").click
         get "/accounts/#{Account.default.id}/developer_keys"
         click_inherited_tab
         # checks that the state toggle is disabled from interaction
@@ -205,13 +205,13 @@ describe "Developer Keys" do
         site_admin_developer_key.developer_key_account_bindings.first.update!(workflow_state: "allow")
         get "/accounts/#{Account.default.id}/developer_keys"
         click_inherited_tab
-        fj("span:contains('On'):last").click
+        fj("div:contains('On'):last").click
         accept_alert
         get "/accounts/site_admin/developer_keys"
-        fj("span:contains('Off'):last").click
+        fj("div:contains('Off'):last").click
         accept_alert
         expect(DeveloperKeyAccountBinding.where(account_id: Account.site_admin.id).first.workflow_state).to eq "off"
-        fj("span:contains('Allow'):last").click
+        fj("div:contains('Allow'):last").click
         accept_alert
         get "/accounts/#{Account.default.id}/developer_keys"
         click_inherited_tab
@@ -223,7 +223,7 @@ describe "Developer Keys" do
       it "allows for root account dev key status 'on'" do
         root_developer_key
         get "/accounts/#{Account.default.id}/developer_keys"
-        fj("span:contains('On'):last").click
+        fj("div:contains('On'):last").click
         accept_alert
         keep_trying_until { expect(current_active_element.attribute("value")).to eq "on" }
         expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq "on"
@@ -233,7 +233,7 @@ describe "Developer Keys" do
         root_developer_key
         DeveloperKeyAccountBinding.last.update(workflow_state: "on")
         get "/accounts/#{Account.default.id}/developer_keys"
-        fj("span:contains('Off'):last").click
+        fj("div:contains('Off'):last").click
         accept_alert
         keep_trying_until { expect(current_active_element.attribute("value")).to eq "off" }
         expect(DeveloperKeyAccountBinding.last.reload.workflow_state).to eq "off"
@@ -242,7 +242,7 @@ describe "Developer Keys" do
       it "persists state when switching between account and inheritance tabs" do
         root_developer_key
         get "/accounts/#{Account.default.id}/developer_keys"
-        fj("span:contains('On'):last").click
+        fj("div:contains('On'):last").click
         accept_alert
         click_inherited_tab
         click_account_tab
@@ -255,7 +255,7 @@ describe "Developer Keys" do
         DeveloperKeyAccountBinding.first.update(workflow_state: "allow")
         get "/accounts/#{Account.default.id}/developer_keys"
         click_inherited_tab
-        fj("span:contains('Off'):last").click
+        fj("div:contains('Off'):last").click
         click_account_tab
         click_inherited_tab
         expect(f("table[data-automation='devKeyInheritedTable'] input[value='off']").attribute("tabindex")).to eq "0"
@@ -265,7 +265,7 @@ describe "Developer Keys" do
         get "/accounts/#{Account.default.id}/developer_keys"
         expect(fj("#reactContent span:contains('Developer Key')")).to be_truthy
         click_inherited_tab
-        expect(f("#reactContent")).not_to contain_jqcss("span:contains('Developer Key')")
+        expect(f("#reactContent")).not_to contain_jqcss("button span:contains('Developer Key')")
       end
     end
 
