@@ -69,7 +69,10 @@ TimeZoneSelect.propTypes = {
   priority_zones: arrayOf(timezoneShape)
 }
 
-import(`./localized-timezone-lists/${ENV.LOCALE || 'en'}.json`)
+import(
+  /* webpackChunkName: "[request]" */
+  `./localized-timezone-lists/${ENV.LOCALE || 'en'}.json`
+)
   .catch(() => import(`./localized-timezone-lists/en.json`)) // fall back to english if a user has a locale set that we don't have a list for
   .then(defaultsJSON => {
     TimeZoneSelect.defaultProps = {
