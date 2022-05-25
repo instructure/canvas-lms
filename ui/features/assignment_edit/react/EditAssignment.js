@@ -29,7 +29,12 @@ import LoadingIndicator from '@canvas/loading-indicator'
 
 const I18n = useI18nScope('assignment')
 
-const FileBrowser = React.lazy(() => import('@canvas/rce/FileBrowser'))
+const FileBrowser = React.lazy(() =>
+  import(
+    /* webpackChunkName: "[request]" */
+    '@canvas/rce/FileBrowser'
+  )
+)
 
 const attachmentNameStyle = {
   display: 'inline-block',

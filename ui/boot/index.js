@@ -48,7 +48,7 @@ let runOnceAfterLocaleFiles = () => {
   isolate(enhanceUserContent)()
 }
 
-window.addEventListener('canvasReadyStateChange', function({ detail }) {
+window.addEventListener('canvasReadyStateChange', function ({detail}) {
   if (detail === 'localeFiles' || window.canvasReadyState === 'complete') {
     runOnceAfterLocaleFiles()
     runOnceAfterLocaleFiles = () => {}
@@ -65,6 +65,7 @@ isolate(enableDTNPI)({
 if (process.env.NODE_ENV !== 'production') {
   const setupConsoleMessageFilter = async () => {
     const {filterUselessConsoleMessages} = await import(
+      /* webpackChunkName: "[request]" */
       '@instructure/js-utils/es/filterUselessConsoleMessages'
     )
 

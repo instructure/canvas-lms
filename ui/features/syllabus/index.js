@@ -140,7 +140,7 @@ function renderCoursePacingNotice() {
   const $mountPoint = document.getElementById('syllabusContainer')
   if ($mountPoint) {
     // replace the table with the notice
-    import('@canvas/due-dates/react/CoursePacingNotice')
+    import(/* webpackChunkName: "[request]" */ '@canvas/due-dates/react/CoursePacingNotice')
       .then(CoursePacingNoticeModule => {
         const renderNotice = CoursePacingNoticeModule.renderCoursePacingNotice
         renderNotice($mountPoint, courseId)
@@ -153,7 +153,7 @@ function renderCoursePacingNotice() {
 }
 
 function attachImmersiveReaderButton() {
-  import('@canvas/immersive-reader/ImmersiveReader')
+  import(/* webpackChunkName: "[request]" */ '@canvas/immersive-reader/ImmersiveReader')
     .then(ImmersiveReader => {
       const courseSyllabusText = () => document.querySelector('#course_syllabus').innerHTML
       const title = I18n.t('Course Syllabus')
