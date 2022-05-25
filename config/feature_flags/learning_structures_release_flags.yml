@@ -37,13 +37,10 @@ course_paces:
       feedback by joining the *Course Pacing User Group*.
   applies_to: Account
   beta: true
-course_paces_blackout_dates:
-  state: hidden
-  display_name: 'Course pacing blackout dates'
-  description: Add blackout dates UI to course pacing. Requires course_paces enabled.
-  applies_to: SiteAdmin
   environments:
     development:
+      state: allowed_on
+    beta:
       state: allowed_on
     ci:
       state: allowed_on

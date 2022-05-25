@@ -158,7 +158,6 @@ export default class TeacherView extends React.Component {
     this.setState({messageStudentsWhoOpen: false, sendingMessageStudentsWhoNow: false})
   }
 
-  // TODO(EVAL): This needs to be implemented in EVAL-2064.
   handleSendMessageStudentsWho = () => {}
 
   handleDeleteButtonPressed = () => {
@@ -379,6 +378,9 @@ export default class TeacherView extends React.Component {
     )
   }
 
+  // At the moment the MessageStudentsWhoDialog doesn't have
+  // busy, onSend, messageAttachmentUploadFolderId props
+  // these props needs to be reviewed in the future
   renderMessageStudentsWhoDialog = () => (
     <MessageStudentsWhoDialog
       assignment={this.props.assignment}

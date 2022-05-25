@@ -179,9 +179,9 @@
 jobs_opts = {
   :max_attempts => Delayed::Settings.max_attempts,
   :flavor => @flavor,
-  :url => jobs_url(:only => :jobs),
-  :batch_update_url => batch_update_jobs_url,
-  :job_url => jobs_url,
+  :url => jobs_v1_index_url(:only => :jobs),
+  :batch_update_url => batch_update_jobs_v1_index_url,
+  :job_url => jobs_v1_index_url,
   :on_hold_attempt_count => Delayed::Job::ON_HOLD_COUNT,
   :limit => JobsController::LIMIT,
   :starting_query => params[:q],
@@ -189,12 +189,12 @@ jobs_opts = {
   :super_slow_threshold => Setting.get('jobs.super_slow_threshold', 3600).to_f
 }
 running_opts = jobs_opts.merge({
-  :url => jobs_url(:only => :running),
+  :url => jobs_v1_index_url(:only => :running),
   :refresh_rate => @running_jobs_refresh_seconds * 1000,
   :starting_query => nil,
 })
 tags_opts = {
-  :url => jobs_url(:only => :tags),
+  :url => jobs_v1_index_url(:only => :tags),
   :refresh_rate => @job_tags_refresh_seconds * 1000,
 }
 

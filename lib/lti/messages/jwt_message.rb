@@ -124,10 +124,14 @@ module Lti::Messages
 
     def add_launch_presentation_claims!
       @message.launch_presentation.document_target = "iframe"
-      @message.launch_presentation.height = @tool.extension_setting(@opts[:resource_type], :selection_height)
-      @message.launch_presentation.width = @tool.extension_setting(@opts[:resource_type], :selection_width)
       @message.launch_presentation.return_url = @return_url
       @message.launch_presentation.locale = I18n.locale || I18n.default_locale.to_s
+
+      content_tag_link_settings = @expander.content_tag&.link_settings
+      height = content_tag_link_settings&.dig("selection_height")&.to_s&.gsub(/px$/, "").presence || @tool.extension_setting(@opts[:resource_type], :selection_height) || @tool.settings[:selection_height]
+      width = content_tag_link_settings&.dig("selection_width")&.to_s&.gsub(/px$/, "").presence || @tool.extension_setting(@opts[:resource_type], :selection_width) || @tool.settings[:selection_width]
+      @message.launch_presentation.height = height.to_i if height.present?
+      @message.launch_presentation.width = width.to_i if width.present?
     end
 
     def add_i18n_claims!

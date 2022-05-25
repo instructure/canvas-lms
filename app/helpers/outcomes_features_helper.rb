@@ -22,4 +22,8 @@ module OutcomesFeaturesHelper
   def account_level_mastery_scales_enabled?(context)
     context&.root_account&.feature_enabled?(:account_level_mastery_scales)
   end
+
+  def outcome_alignment_summary_enabled?(context)
+    context&.root_account&.feature_enabled?(:outcome_alignment_summary)
+  end
 end

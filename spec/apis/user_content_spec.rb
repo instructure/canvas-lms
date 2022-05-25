@@ -245,7 +245,7 @@ describe UserContent, type: :request do
     @wiki_page.save!
     api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@wiki_page.url}",
              { controller: "wiki_pages_api", action: "show",
-               format: "json", course_id: @course.id.to_s, url: @wiki_page.url })
+               format: "json", course_id: @course.id.to_s, url_or_id: @wiki_page.url })
     assert_status(200)
   end
 
@@ -280,7 +280,7 @@ describe UserContent, type: :request do
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@wiki_page.url}",
                         { controller: "wiki_pages_api", action: "show",
-                          format: "json", course_id: @course.id.to_s, url: @wiki_page.url })
+                          format: "json", course_id: @course.id.to_s, url_or_id: @wiki_page.url })
         doc = Nokogiri::HTML5.fragment(json["body"])
         expect(doc.css("a").collect { |att| att["data-api-endpoint"] }).to eq [
           "http://www.example.com/api/v1/courses/#{@course.id}/assignments",
@@ -290,7 +290,7 @@ describe UserContent, type: :request do
           "http://www.example.com/api/v1/courses/#{@course.id}/pages/test-wiki-page-2",
           "http://www.example.com/api/v1/courses/#{@course.id}/pages",
           "http://www.example.com/api/v1/courses/#{@course.id}/pages/test-wiki-page",
-          "http://www.example.com/api/v1/courses/#{@course.id}/pages/test-wiki%20page-2",
+          "http://www.example.com/api/v1/courses/#{@course.id}/pages/test-wiki%2520page-2",
           "http://www.example.com/api/v1/courses/#{@course.id}/discussion_topics",
           "http://www.example.com/api/v1/courses/#{@course.id}/discussion_topics/456",
           "http://www.example.com/api/v1/courses/#{@course.id}/folders/root",
@@ -329,7 +329,7 @@ describe UserContent, type: :request do
 
         json = api_call(:get, "/api/v1/groups/#{@group.id}/pages/#{@wiki_page.url}",
                         { controller: "wiki_pages_api", action: "show",
-                          format: "json", group_id: @group.id.to_s, url: @wiki_page.url })
+                          format: "json", group_id: @group.id.to_s, url_or_id: @wiki_page.url })
         doc = Nokogiri::HTML5.fragment(json["body"])
         expect(doc.css("a").collect { |att| att["data-api-endpoint"] }).to eq [
           "http://www.example.com/api/v1/groups/#{@group.id}/pages",

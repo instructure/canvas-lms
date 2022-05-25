@@ -17,47 +17,55 @@
  */
 
 import React from 'react'
-
-import Module from './module'
-import {CoursePace, ResponsiveSizes, StoreState} from '../../types'
 import {connect} from 'react-redux'
-import {getCoursePace, getCompression} from '../../reducers/course_paces'
+
+import {CoursePace, ModuleWithDueDates, ResponsiveSizes, StoreState} from '../../types'
+import {
+  getCoursePace,
+  getCompression,
+  getModulesWithItemsMergedWithDueDatesAndBlackoutDates
+} from '../../reducers/course_paces'
 import {getResponsiveSize, getShowProjections} from '../../reducers/ui'
+import {Module} from './module'
 
 interface StoreProps {
   readonly coursePace: CoursePace
   readonly responsiveSize: ResponsiveSizes
   readonly showProjections: boolean
   readonly compression: number
+  readonly modulesWithItemsWithDates: ModuleWithDueDates[]
 }
-
 export const CoursePaceTable: React.FC<StoreProps> = ({
   coursePace,
   responsiveSize,
   showProjections,
-  compression
-}) => (
-  <>
-    {coursePace.modules.map((module, index) => (
-      <Module
-        key={`module-${module.id}`}
-        index={index + 1}
-        module={module}
-        coursePace={coursePace}
-        responsiveSize={responsiveSize}
-        showProjections={showProjections}
-        compression={compression}
-      />
-    ))}
-  </>
-)
+  compression,
+  modulesWithItemsWithDates
+}) => {
+  return (
+    <>
+      {modulesWithItemsWithDates.map((module, index) => (
+        <Module
+          key={module.id}
+          index={index + 1}
+          module={module}
+          coursePace={coursePace}
+          responsiveSize={responsiveSize}
+          showProjections={showProjections}
+          compression={compression}
+        />
+      ))}
+    </>
+  )
+}
 
 const mapStateToProps = (state: StoreState) => {
   return {
     coursePace: getCoursePace(state),
     responsiveSize: getResponsiveSize(state),
     showProjections: getShowProjections(state),
-    compression: getCompression(state)
+    compression: getCompression(state),
+    modulesWithItemsWithDates: getModulesWithItemsMergedWithDueDatesAndBlackoutDates(state)
   }
 }
 

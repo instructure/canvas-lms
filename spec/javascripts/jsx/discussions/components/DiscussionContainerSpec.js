@@ -83,7 +83,7 @@ test('renders passed in component when renderContainerBackground is present', ()
 test('renders regular discussion row when user does not have moderate permissions', () => {
   const props = defaultProps()
   const tree = shallow(<DiscussionsContainer {...props} />)
-  const node = tree.find('Connect(DiscussionRow)')
+  const node = tree.find('Connect(WithDateFormat(DiscussionRow))')
   ok(node.exists())
 })
 
@@ -91,13 +91,13 @@ test('renders a draggable discussion row when user has moderate permissions', ()
   const props = defaultProps()
   props.permissions.moderate = true
   const tree = shallow(<DiscussionsContainer {...props} />)
-  const node = tree.find('Connect(DropTarget(DragSource(DiscussionRow)))')
+  const node = tree.find('Connect(DropTarget(DragSource(WithDateFormat(DiscussionRow))))')
   ok(node.exists())
 })
 
 test('discussionTarget canDrop returns false if assignment due_at is in the past', () => {
   const assignment = {due_at: '2017-05-13T00:59:59Z'}
-  const getItem = function() {
+  const getItem = function () {
     return {assignment}
   }
   const mockMonitor = {getItem}
@@ -106,7 +106,7 @@ test('discussionTarget canDrop returns false if assignment due_at is in the past
 
 test('discussionTarget canDrop returns true if not dragging to closed state', () => {
   const assignment = {due_at: '2018-05-13T00:59:59Z'}
-  const getItem = function() {
+  const getItem = function () {
     return {assignment}
   }
   const mockMonitor = {getItem}
@@ -116,7 +116,7 @@ test('discussionTarget canDrop returns true if not dragging to closed state', ()
 test('discussionTarget canDrop returns true if assignment due_at is in the future', () => {
   const dueAt = moment().add(7, 'days')
   const assignment = {due_at: dueAt.format()}
-  const getItem = function() {
+  const getItem = function () {
     return {assignment}
   }
   const mockMonitor = {getItem}

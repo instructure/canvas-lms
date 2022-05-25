@@ -2013,6 +2013,15 @@ describe AssignmentsApiController, type: :request do
       end
     end
 
+    it "does not allow creating an assignment with allowed_extensions longer than 255" do
+      api_create_assignment_in_course(@course, { description: "description",
+                                                 allowed_extensions: "--docx" * 50 })
+      json = JSON.parse response.body
+      expect(json["errors"]).to_not be_nil
+      expect(json["errors"]&.keys).to eq ["assignment[allowed_extensions]"]
+      expect(json["errors"]["assignment[allowed_extensions]"].first["message"]).to eq("Value too long, allowed length is 255")
+    end
+
     it "sets the lti_context_id if provided" do
       lti_assignment_id = SecureRandom.uuid
       jwt = Canvas::Security.create_jwt(lti_assignment_id: lti_assignment_id)

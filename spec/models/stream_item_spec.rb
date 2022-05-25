@@ -78,8 +78,6 @@ describe StreamItem do
         si.data = { notification_id: nil }
       end
       StreamItem.where(id: si2).update_all(updated_at: 1.year.ago)
-      # stub this out so that the vacuum is skipped (can't run in specs in a transaction)
-      allow(Shard.current.database_server).to receive(:unguard)
       expect do
         StreamItem.destroy_stream_items_using_setting
       end.to change(StreamItem, :count).by(-1)

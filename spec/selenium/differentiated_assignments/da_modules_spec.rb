@@ -56,10 +56,10 @@ describe "interaction with differentiated assignments/quizzes/discusssions in mo
       expect_module_to_have_items(@module)
     end
 
-    it "shows module items with graded submissions" do
+    it "does not show unassigned module items with graded submissions" do
       grade_da_assignments
       get "/courses/#{@course.id}/modules"
-      expect_module_to_have_items(@module)
+      expect_module_to_not_have_items(@module)
     end
 
     it "ignores completion requirements of inaccessible module items" do
@@ -98,10 +98,10 @@ describe "interaction with differentiated assignments/quizzes/discusssions in mo
         expect_module_to_have_items(@module)
       end
 
-      it "shows module items with graded submissions", priority: "1" do
+      it "does not show unassigned module items with graded submissions", priority: "1" do
         grade_da_assignments
         get "/courses/#{@course.id}/modules"
-        expect_module_to_have_items(@module)
+        expect_module_to_not_have_items(@module)
       end
     end
 

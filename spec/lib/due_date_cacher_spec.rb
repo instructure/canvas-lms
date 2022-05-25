@@ -215,104 +215,140 @@ describe DueDateCacher do
   end
 
   describe ".recompute_users_for_course" do
-    let!(:assignment_1) { @assignment }
-    let(:assignment_2) { assignment_model(course: @course) }
-    let(:assignments) { [assignment_1, assignment_2] }
+    context "when run for a sis import" do
+      specs_require_sharding
 
-    let!(:student_1) { @student }
-    let(:student_2) { student_in_course(course: @course) }
-    let(:student_ids) { [student_1.id, student_2.id] }
-    let(:instance) { instance_double("DueDateCacher", recompute: nil) }
+      before do
+        allow(Rails.env).to receive(:production?).and_return(true)
+      end
 
-    it "delegates to an instance" do
-      expect(DueDateCacher).to receive(:new).and_return(instance)
-      expect(instance).to receive(:recompute)
-      DueDateCacher.recompute_users_for_course(student_1.id, @course)
-    end
+      it "calls recompute_for_sis_import in a delayed job" do
+        expect do
+          DueDateCacher.recompute_users_for_course(@student.id, @course, nil, sis_import: true)
+        end.to change {
+          Delayed::Job.where(tag: "DueDateCacher#recompute_for_sis_import").count
+        }.from(0).to(1)
+      end
 
-    it "passes along the whole user array" do
-      expect(DueDateCacher).to receive(:new).and_return(instance)
-                                            .with(@course, Assignment.active.where(context: @course).pluck(:id), student_ids,
-                                                  hash_including(update_grades: false))
-      DueDateCacher.recompute_users_for_course(student_ids, @course)
-    end
+      it "limits the number of sis recompute jobs that can run concurrently" do
+        course_with_student(active_all: true)
+        assignment_model(course: @course)
 
-    it "calls recompute with the value of update_grades if it is set to true" do
-      expect(DueDateCacher).to receive(:new)
-        .with(@course, match_array(assignments.map(&:id)), [student_1.id], hash_including(update_grades: true))
-        .and_return(instance)
-      expect(instance).to receive(:recompute)
-      DueDateCacher.recompute_users_for_course(student_1.id, @course, assignments.map(&:id), update_grades: true)
-    end
-
-    it "calls recompute with the value of update_grades if it is set to false" do
-      expect(DueDateCacher).to receive(:new)
-        .with(@course, match_array(assignments.map(&:id)), [student_1.id], hash_including(update_grades: false))
-        .and_return(instance)
-      expect(instance).to receive(:recompute)
-      DueDateCacher.recompute_users_for_course(student_1.id, @course, assignments.map(&:id), update_grades: false)
-    end
-
-    it "passes assignments if it has any specified" do
-      expect(DueDateCacher).to receive(:new).and_return(instance)
-                                            .with(@course, assignments, student_ids, hash_including(update_grades: false))
-      DueDateCacher.recompute_users_for_course(student_ids, @course, assignments)
-    end
-
-    it "handles being called with a course id" do
-      expect(DueDateCacher).to receive(:new).and_return(instance)
-                                            .with(@course, Assignment.active.where(context: @course).pluck(:id), student_ids,
-                                                  hash_including(update_grades: false))
-      DueDateCacher.recompute_users_for_course(student_ids, @course.id)
-    end
-
-    it "queues a delayed job in a singleton if given no assignments and no singleton option" do
-      @instance = double
-      expect(DueDateCacher).to receive(:new).and_return(@instance)
-      expect(@instance).to receive(:delay_if_production)
-        .with(
-          singleton: "cached_due_date:calculator:Course:#{@course.global_id}:Users:#{Digest::SHA256.hexdigest(student_1.id.to_s)}:UpdateGrades:0",
-          strand: "cached_due_date:calculator:Course:#{@course.global_id}",
-          max_attempts: 10
+        Setting.set("DueDateCacher#recompute_for_sis_import_num_strands", "1")
+        Delayed::Job.create!(
+          locked_at: Time.zone.now,
+          locked_by: "foo",
+          tag: "DueDateCacher#recompute_for_sis_import",
+          shard_id: @course.shard.id
         )
-        .and_return(@instance)
-      expect(@instance).to receive(:recompute)
-      DueDateCacher.recompute_users_for_course(student_1.id, @course)
-    end
-
-    it "queues a delayed job in a singleton if given no assignments and a singleton option" do
-      @instance = double
-      expect(DueDateCacher).to receive(:new).and_return(@instance)
-      expect(@instance).to receive(:delay_if_production)
-        .with(singleton: "what:up:dog", max_attempts: 10, strand: "cached_due_date:calculator:Course:#{@course.global_id}")
-        .and_return(@instance)
-      expect(@instance).to receive(:recompute)
-      DueDateCacher.recompute_users_for_course(student_1.id, @course, nil, singleton: "what:up:dog", strand: "cached_due_date:calculator:Course:#{@course.global_id}")
-    end
-
-    it "initializes a DueDateCacher with the value of executing_user if set" do
-      expect(DueDateCacher).to receive(:new)
-        .with(@course, match_array(assignments.map(&:id)), [student_1.id], hash_including(executing_user: student_1))
-        .and_return(instance)
-
-      DueDateCacher.recompute_users_for_course(student_1.id, @course, nil, executing_user: student_1)
-    end
-
-    it "initializes a DueDateCacher with the user set by with_executing_user if executing_user is not passed" do
-      expect(DueDateCacher).to receive(:new)
-        .with(@course, match_array(assignments.map(&:id)), [student_1.id], hash_including(executing_user: student_1))
-        .and_return(instance)
-
-      DueDateCacher.with_executing_user(student_1) do
-        DueDateCacher.recompute_users_for_course(student_1.id, @course, nil)
+        expect do
+          DueDateCacher.recompute_users_for_course(@student.id, @course, nil, sis_import: true)
+        end.not_to change {
+          Delayed::Job.where(tag: "DueDateCacher#recompute_for_sis_import").count
+        }.from(1)
       end
     end
 
-    it "initializes a DueDateCacher with a nil executing_user if no user has been specified" do
-      expect(DueDateCacher).to receive(:new)
-        .with(@course, match_array(assignments.map(&:id)), hash_including(executing_user: nil))
-        .and_return(instance)
-      DueDateCacher.recompute_course(@course, run_immediately: true)
+    context "when not run for a sis import" do
+      let!(:assignment_1) { @assignment }
+      let(:assignment_2) { assignment_model(course: @course) }
+      let(:assignments) { [assignment_1, assignment_2] }
+
+      let!(:student_1) { @student }
+      let(:student_2) { student_in_course(course: @course) }
+      let(:student_ids) { [student_1.id, student_2.id] }
+      let(:instance) { instance_double("DueDateCacher", recompute: nil) }
+
+      it "delegates to an instance" do
+        expect(DueDateCacher).to receive(:new).and_return(instance)
+        expect(instance).to receive(:recompute)
+        DueDateCacher.recompute_users_for_course(student_1.id, @course)
+      end
+
+      it "passes along the whole user array" do
+        expect(DueDateCacher).to receive(:new).and_return(instance)
+                                              .with(@course, Assignment.active.where(context: @course).pluck(:id), student_ids,
+                                                    hash_including(update_grades: false))
+        DueDateCacher.recompute_users_for_course(student_ids, @course)
+      end
+
+      it "calls recompute with the value of update_grades if it is set to true" do
+        expect(DueDateCacher).to receive(:new)
+          .with(@course, match_array(assignments.map(&:id)), [student_1.id], hash_including(update_grades: true))
+          .and_return(instance)
+        expect(instance).to receive(:recompute)
+        DueDateCacher.recompute_users_for_course(student_1.id, @course, assignments.map(&:id), update_grades: true)
+      end
+
+      it "calls recompute with the value of update_grades if it is set to false" do
+        expect(DueDateCacher).to receive(:new)
+          .with(@course, match_array(assignments.map(&:id)), [student_1.id], hash_including(update_grades: false))
+          .and_return(instance)
+        expect(instance).to receive(:recompute)
+        DueDateCacher.recompute_users_for_course(student_1.id, @course, assignments.map(&:id), update_grades: false)
+      end
+
+      it "passes assignments if it has any specified" do
+        expect(DueDateCacher).to receive(:new).and_return(instance)
+                                              .with(@course, assignments, student_ids, hash_including(update_grades: false))
+        DueDateCacher.recompute_users_for_course(student_ids, @course, assignments)
+      end
+
+      it "handles being called with a course id" do
+        expect(DueDateCacher).to receive(:new).and_return(instance)
+                                              .with(@course, Assignment.active.where(context: @course).pluck(:id), student_ids,
+                                                    hash_including(update_grades: false))
+        DueDateCacher.recompute_users_for_course(student_ids, @course.id)
+      end
+
+      it "queues a delayed job in a singleton if given no assignments and no singleton option" do
+        @instance = double
+        expect(DueDateCacher).to receive(:new).and_return(@instance)
+        expect(@instance).to receive(:delay_if_production)
+          .with(
+            singleton: "cached_due_date:calculator:Course:#{@course.global_id}:Users:#{Digest::SHA256.hexdigest(student_1.id.to_s)}:UpdateGrades:0",
+            strand: "cached_due_date:calculator:Course:#{@course.global_id}",
+            max_attempts: 10
+          )
+          .and_return(@instance)
+        expect(@instance).to receive(:recompute)
+        DueDateCacher.recompute_users_for_course(student_1.id, @course)
+      end
+
+      it "queues a delayed job in a singleton if given no assignments and a singleton option" do
+        @instance = double
+        expect(DueDateCacher).to receive(:new).and_return(@instance)
+        expect(@instance).to receive(:delay_if_production)
+          .with(singleton: "what:up:dog", max_attempts: 10, strand: "cached_due_date:calculator:Course:#{@course.global_id}")
+          .and_return(@instance)
+        expect(@instance).to receive(:recompute)
+        DueDateCacher.recompute_users_for_course(student_1.id, @course, nil, singleton: "what:up:dog", strand: "cached_due_date:calculator:Course:#{@course.global_id}")
+      end
+
+      it "initializes a DueDateCacher with the value of executing_user if set" do
+        expect(DueDateCacher).to receive(:new)
+          .with(@course, match_array(assignments.map(&:id)), [student_1.id], hash_including(executing_user: student_1))
+          .and_return(instance)
+
+        DueDateCacher.recompute_users_for_course(student_1.id, @course, nil, executing_user: student_1)
+      end
+
+      it "initializes a DueDateCacher with the user set by with_executing_user if executing_user is not passed" do
+        expect(DueDateCacher).to receive(:new)
+          .with(@course, match_array(assignments.map(&:id)), [student_1.id], hash_including(executing_user: student_1))
+          .and_return(instance)
+
+        DueDateCacher.with_executing_user(student_1) do
+          DueDateCacher.recompute_users_for_course(student_1.id, @course, nil)
+        end
+      end
+
+      it "initializes a DueDateCacher with a nil executing_user if no user has been specified" do
+        expect(DueDateCacher).to receive(:new)
+          .with(@course, match_array(assignments.map(&:id)), hash_including(executing_user: nil))
+          .and_return(instance)
+        DueDateCacher.recompute_course(@course, run_immediately: true)
+      end
     end
   end
 

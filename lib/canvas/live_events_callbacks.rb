@@ -158,7 +158,7 @@ module Canvas::LiveEventsCallbacks
     when ContextModule
       Canvas::LiveEvents.module_updated(obj)
     when ContextModuleProgression
-      if changes["completed_at"]
+      if changes["requirements_met"] && changes["requirements_met"].second.length > changes["requirements_met"].first.length
         singleton_key = "course_progress_course_#{obj.context_module.global_context_id}_user_#{obj.global_user_id}"
         CourseProgress.delay_if_production(
           singleton: singleton_key,

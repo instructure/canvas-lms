@@ -39,10 +39,12 @@ describe('shouldUseFeature()', () => {
     })
   }
 
-  describe('when the feature is buttons and icons', () => {
-    beforeEach(() => (feature = Feature.ButtonsAndIcons))
+  describe('when the feature is icon maker', () => {
+    beforeEach(() => (feature = Feature.IconMaker))
 
-    describe('and the buttons & icons feature flag is on', () => {
+    // This feature was re-named to match the updated name: "Buttons and Icons" => "Icon Maker"
+    // But the feature flag was NOT renamed so it's still "buttons_and_icons_root_account"
+    describe('and the buttons & icons (icon maker) feature flag is on', () => {
       beforeEach(() => {
         windowEnv.FEATURES = {
           buttons_and_icons_root_account: true
@@ -75,7 +77,9 @@ describe('shouldUseFeature()', () => {
       })
     })
 
-    describe('and the buttons & icons feature flag is off', () => {
+    // This feature was re-named to match the updated name: "Buttons and Icons" => "Icon Maker"
+    // But the feature flag was NOT renamed so it's still "buttons_and_icons_root_account"
+    describe('and the buttons & icons (icon maker) feature flag is off', () => {
       beforeEach(() => {
         windowEnv.FEATURES = {
           buttons_and_icons_root_account: true

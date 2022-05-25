@@ -482,7 +482,6 @@ describe "context modules" do
     end
 
     it "publishes a file from the modules page", priority: "1" do
-      skip("LS-3063 -- this one is failing when it tries to find the Published value sometimes")
       @module = @course.context_modules.create!(name: "some module")
       @file = @course.attachments.create!(display_name: "some file", uploaded_data: default_uploaded_data, locked: true)
       @tag = @module.add_item({ id: @file.id, type: "attachment" })
@@ -492,8 +491,8 @@ describe "context modules" do
       ff(".permissions-dialog-form input[name='permissions']")[0].click
       f(".permissions-dialog-form [type='submit']").click
       wait_for_ajaximations
-      expect(@file.reload).to be_published
-      expect(f("[data-id='#{@file.id}'] > button.published-status")[:title]).to eq("Published")
+      refresh_page
+      expect(f("[aria-label='some file is Published - Click to modify']")).to be_displayed
     end
 
     it "shows the file publish button on course home" do

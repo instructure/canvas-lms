@@ -76,7 +76,6 @@ export const getCoursePace = (state: StoreState): CoursePacesState => state.cour
 export const getCoursePaceModules = (state: StoreState) => state.coursePace.modules
 export const getCoursePaceType = (state: StoreState): PaceContextTypes =>
   state.coursePace.context_type
-export const getHardEndDates = (state: StoreState): boolean => state.coursePace.hard_end_dates
 export const getPacePublishing = (state: StoreState): boolean => {
   const progress = state.coursePace.publishingProgress
   if (!progress) return false
@@ -87,7 +86,6 @@ export const getPublishingError = (state: StoreState): string | undefined => {
   if (!progress || progress.workflow_state !== 'failed') return undefined
   return progress.message
 }
-export const getEndDate = (state: StoreState): OptionalDate => state.coursePace.end_date
 export const getOriginalEndDate = (state: StoreState): OptionalDate =>
   state.original.coursePace.end_date
 export const isStudentPace = (state: StoreState) => state.coursePace.context_type === 'Enrollment'
@@ -101,12 +99,10 @@ export const getCoursePaceItems = createSelector(getCoursePaceModules, getModule
 
 export const getSettingChanges = createDeepEqualSelector(
   getExcludeWeekends,
-  getHardEndDates,
   getOriginalPace,
-  getEndDate,
   getOriginalBlackoutDates,
   getBlackoutDates,
-  (excludeWeekends, hardEndDates, originalPace, endDate, originalBlackoutDates, blackoutDates) => {
+  (excludeWeekends, originalPace, originalBlackoutDates, blackoutDates) => {
     const changes: Change[] = []
 
     if (excludeWeekends !== originalPace.exclude_weekends)
@@ -120,24 +116,6 @@ export const getSettingChanges = createDeepEqualSelector(
     if (blackoutChanges.length) {
       changes.splice(0, 0, ...blackoutChanges)
     }
-
-    // we want to validate that if hardEndDates is true that the endDate is a valid date
-    if (
-      hardEndDates !== originalPace.hard_end_dates &&
-      (!hardEndDates || (hardEndDates && endDate))
-    )
-      changes.push({
-        id: 'hard_end_dates',
-        oldValue: originalPace.hard_end_dates,
-        newValue: hardEndDates
-      })
-
-    if (endDate && endDate !== originalPace.end_date)
-      changes.push({
-        id: 'end_date',
-        oldValue: originalPace.end_date,
-        newValue: endDate
-      })
 
     return changes
   }
@@ -416,6 +394,116 @@ export const getCompression = createSelector(
   }
 )
 
+// sort module items by position or date
+// (blackout date type items don't have a position)
+function compareModuleItemOrder(a, b) {
+  if ('position' in a && 'position' in b) {
+    return a.position - b.position
+  }
+  if (!a.date && !!b.date) return -1
+  if (!!a.date && !b.date) return 1
+  if (!a.date && !b.date) return 0
+  if (a.date.isBefore(b.date)) return -1
+  if (a.date.isAfter(b.date)) return 1
+  return 0
+}
+
+// merge due dates into the module items,
+// then add blackout dates,
+// then sort so ordered for display
+export const mergeAssignmentsAndBlackoutDates = (
+  coursePace: CoursePace,
+  dueDates: CoursePaceItemDueDates,
+  blackoutDates: BlackoutDate[]
+) => {
+  // throw out any blackout dates before or after the pace start and end
+  // then strip down blackout dates and assign "start_date" to "date"
+  // for merging with assignment due dates
+  const paceStart = moment(coursePace.start_date)
+  const dueDateKeys = Object.keys(dueDates)
+  let veryLastDueDate = moment('3000-01-01T00:00:00Z')
+  if (dueDateKeys.length) {
+    veryLastDueDate = moment(dueDates[dueDateKeys[dueDateKeys.length - 1]])
+  }
+  const paceEnd = coursePace.end_date ? moment(coursePace.end_date) : veryLastDueDate
+  const boDates: Array<any> = blackoutDates
+    .filter(bd => {
+      if (bd.end_date.isBefore(paceStart)) return false
+      if (bd.start_date.isAfter(paceEnd)) return false
+      return true
+    })
+    // because due dates will never fall w/in a blackout period
+    // we can just deal with one end or the other when sorting into place.
+    // I chose blackout's start_date
+    .map(bd => ({
+      ...bd,
+      date: bd.start_date,
+      type: 'blackout_date'
+    }))
+
+  // merge due dates into module items
+  const modules = coursePace.modules
+  const modulesWithDueDates = modules.reduce(
+    (runningValue: Array<any>, module: Module): Array<any> => {
+      const assignmentDueDates: CoursePaceItemDueDates = dueDates
+
+      const assignmentsWithDueDate = module.items.map(item => {
+        const item_due = assignmentDueDates[item.module_item_id]
+        const due_at = item_due ? moment(item_due).endOf('day') : undefined
+        return {...item, date: due_at, type: 'assignment'}
+      })
+
+      runningValue.push({
+        ...module,
+        itemsWithDates: assignmentsWithDueDate,
+        moduleKey: `${module.id}-${Date.now()}`
+      })
+      return runningValue
+    },
+    []
+  )
+
+  // merge the blackout dates into each module's items
+  const modulesWithBlackoutDates = modulesWithDueDates.reduce(
+    (runningValue: Array<any>, module: any, index: number): Array<any> => {
+      const items = module.itemsWithDates
+
+      if (index === modulesWithDueDates.length - 1) {
+        // the last module gets the rest of the blackout dates
+        module.itemsWithDates.splice(module.itemsWithDates.length, 0, ...boDates)
+        module.itemsWithDates.sort(compareModuleItemOrder)
+      } else if (items.length) {
+        // find the blackout dates that occur before or during
+        // the item due dates
+        const lastDueDate = items[items.length - 1].date
+        let firstBoDateAfterModule = boDates.length
+        for (let i = 0; i < boDates.length; ++i) {
+          if (boDates[i].date.isAfter(lastDueDate)) {
+            firstBoDateAfterModule = i
+            break
+          }
+        }
+        // merge those blackout dates into the module items
+        // and remove them from the working list of blackout dates
+        const boDatesWithinModule = boDates.slice(0, firstBoDateAfterModule)
+        boDates.splice(0, firstBoDateAfterModule)
+        module.itemsWithDates.splice(module.itemsWithDates.length, 0, ...boDatesWithinModule)
+        module.itemsWithDates.sort(compareModuleItemOrder)
+      }
+      return runningValue.concat(module)
+    },
+    []
+  )
+  return modulesWithBlackoutDates
+}
+
+export const getModulesWithItemsMergedWithDueDatesAndBlackoutDates = createDeepEqualSelector(
+  getCoursePace,
+  getDueDates,
+  getBlackoutDates,
+  mergeAssignmentsAndBlackoutDates
+)
+
 /* Reducers */
 
 export default (
@@ -448,21 +536,6 @@ export default (
       } else {
         return {...state, exclude_weekends: true}
       }
-    case CoursePaceConstants.TOGGLE_HARD_END_DATES:
-      if (state.hard_end_dates) {
-        return {...state, hard_end_dates: false, end_date: ''}
-      } else {
-        let endDate = action.payload as OptionalDate
-        if (!endDate) {
-          if (state.course.end_at) {
-            endDate = state.course.end_at
-          } else {
-            endDate = moment(state.start_date).add(30, 'd').format('YYYY-MM-DD')
-          }
-        }
-        return {...state, hard_end_dates: true, end_date: endDate}
-      }
-
     case CoursePaceConstants.RESET_PACE:
       return {
         ...(action.payload as CoursePace),

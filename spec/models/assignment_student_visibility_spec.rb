@@ -303,10 +303,19 @@ describe "differentiated_assignments" do
             enroller_user_in_section(@section_foo)
           end
 
-          it "does not keep the assignment visible even if there is a grade" do
+          it "does not keep the assignment visible even if there is a grade (original enrollment deleted)" do
             @assignment.grade_student(@user, grade: 10, grader: @teacher)
-            Score.where(enrollment_id: @user.enrollments).each(&:destroy_permanently!)
-            @user.enrollments.each(&:destroy_permanently!)
+            section_foo_enrollment = @course.enrollments.find_by(user: @user, course_section: @section_foo)
+            section_foo_enrollment.scores.each(&:destroy_permanently!)
+            section_foo_enrollment.destroy_permanently!
+            enroller_user_in_section(@section_bar, { user: @user })
+            ensure_user_does_not_see_assignment
+          end
+
+          it "does not keep the assignment visible even if there is a grade (original enrollment deactivated)" do
+            @assignment.grade_student(@user, grade: 10, grader: @teacher)
+            section_foo_enrollment = @course.enrollments.find_by(user: @user, course_section: @section_foo)
+            section_foo_enrollment.deactivate
             enroller_user_in_section(@section_bar, { user: @user })
             ensure_user_does_not_see_assignment
           end

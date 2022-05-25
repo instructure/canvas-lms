@@ -3,7 +3,7 @@
   <tr class="reports">
     <th class="reports"><%= t 'headers.report_name', 'Name' %></th>
     <th class="reports"><%= t 'headers.report_last_run', 'Last Run' %></th>
-    <th class="reports"></th>
+    <th class="reports">Run Report</th>
   </tr>
   <% @available_reports.sort_by {|_, details| details.title}.each do |report, details|
     title = details.title

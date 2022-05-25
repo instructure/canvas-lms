@@ -27,11 +27,6 @@ const defaultProps = {
 }
 
 describe('Course paces header', () => {
-  beforeAll(() => {
-    ENV.FEATURES ||= {}
-    ENV.FEATURES.course_paces_blackout_dates = true
-  })
-
   it('renders', () => {
     const {getByRole, getByText} = renderConnected(<Header {...defaultProps} />)
     expect(getByRole('button', {name: 'Course Pacing'})).toBeInTheDocument()

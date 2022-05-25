@@ -522,5 +522,21 @@ describe CoursePacesController, type: :controller do
       json_response = JSON.parse(response.body)
       expect(json_response.keys).to eq(course_pace_module_items_attributes.map { |i| i[:module_item_id].to_s })
     end
+
+    it "prefers incoming blackout dates over what is already on the course" do
+      # course starts at 2021-09-30
+      course_pace_params = @valid_params.merge(end_date: @course_pace.start_date + 5.days)
+      post :compress_dates, params: { course_id: @course.id, course_pace: course_pace_params, blackout_dates: [
+        {
+          event_title: "blackout dates 2",
+          start_date: "2021-09-30", # thurs
+          end_date: "2021-10-01" # fri
+        }
+      ] }
+      expect(response).to be_successful
+      json_response = JSON.parse(response.body)
+      # skip the weekend, then due dates are mon and tues
+      expect(json_response.values).to eq(%w[2021-10-04 2021-10-05])
+    end
   end
 end

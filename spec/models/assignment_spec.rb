@@ -3054,6 +3054,30 @@ describe Assignment do
         it "does not return students outside the class" do
           expect(@assignment.students_with_visibility.include?(@student3)).to be_falsey
         end
+
+        it "does not return students that were graded then deactivated in the assigned section, and are active in another section" do
+          @course.enroll_student(
+            @student1,
+            section: @section2,
+            allow_multiple_enrollments: true,
+            enrollment_state: "active"
+          )
+          @assignment.grade_student(@student1, score: 10, grader: @teacher)
+          @course.enrollments.find_by(user: @student1, course_section: @section1).deactivate
+          expect(@assignment.students_with_visibility).not_to include @student1
+        end
+
+        it "does not return students that submitted then were deactivated in the assigned section, and are active in another section" do
+          @course.enroll_student(
+            @student1,
+            section: @section2,
+            allow_multiple_enrollments: true,
+            enrollment_state: "active"
+          )
+          @assignment.submit_homework(@student1, submission_type: "online_url", url: "http://example.com")
+          @course.enrollments.find_by(user: @student1, course_section: @section1).deactivate
+          expect(@assignment.students_with_visibility).not_to include @student1
+        end
       end
 
       context "permissions" do
@@ -7182,6 +7206,14 @@ describe Assignment do
       a.allowed_extensions = [".DOC", " .XLS", " .TXT"]
       expect(a.allowed_extensions).to eq %w[doc xls txt]
     end
+
+    it "must not allow allowed_extensions longer than the maximum length" do
+      a = Assignment.new(assignment_valid_attributes.merge({
+                                                             course: @course,
+                                                             allowed_extensions: ["docx", "pdf"] * 20
+                                                           }))
+      expect { a.save! }.to raise_error(ActiveRecord::RecordInvalid)
+    end
   end
 
   describe "generating comments from files" do
@@ -9900,6 +9932,13 @@ describe Assignment do
             assignment.reload
             expect(assignment.line_items.length).to eq 1
             expect(assignment.line_items.first.resource_link.current_external_tool(assignment.context)).to eq tool
+          end
+
+          context "and the points_possible is set to nil" do
+            it "sets the line_item score_maximum to 0" do
+              assignment.update!(submission_types: "none", points_possible: nil)
+              expect(assignment.reload.line_items.first.score_maximum).to eq(0)
+            end
           end
 
           it_behaves_like "assignment to line item attribute sync check"

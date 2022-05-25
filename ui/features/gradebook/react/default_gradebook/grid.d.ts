@@ -49,8 +49,15 @@ export type GridData = {
 export type GridDisplaySettings = {
   colors: StatusColors
   enterGradesAs: string
+  filterColumnsBy: {
+    assignmentGroupId: null | string
+    contextModuleId: null | string
+    gradingPeriodId: null | string
+    submissions: null | 'has-ungraded-submissions' | 'has-submissions'
+  }
   filterColumnsBy: {assignmentGroupId: null; contextModuleId: null; gradingPeriodId: null}
   filterRowsBy: {sectionId: null; studentGroupId: null}
+  hideTotal: boolean
   selectedPrimaryInfo: string
   selectedSecondaryInfo: string
   selectedViewOptionsFilters: string[]
@@ -73,4 +80,6 @@ export type GridDisplaySettings = {
   showUnpublishedAssignments: boolean
   showSeparateFirstLastNames: boolean
   hideAssignmentGroupTotals: boolean
+  hideAssignmentGroupTotals: boolean
+  hideTotal: boolean
 }

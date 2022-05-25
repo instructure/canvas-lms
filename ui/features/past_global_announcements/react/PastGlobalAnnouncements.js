@@ -17,9 +17,11 @@
  */
 
 import React, {useState} from 'react'
+import {Heading} from '@instructure/ui-heading'
 import {Tabs} from '@instructure/ui-tabs'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import AnnouncementFactory from './AnnouncementFactory'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -32,10 +34,13 @@ const PastGlobalAnnouncements = () => {
 
   return (
     <>
+      <Heading level="h1">
+        <ScreenReaderContent>{I18n.t('Global Announcements')}</ScreenReaderContent>
+      </Heading>
       <Tabs
         margin="0 auto"
         padding="medium"
-        onRequestTabChange={(event, {index}) => {setSelectedIndex(index)}}
+        onRequestTabChange={(_event, {index}) => setSelectedIndex(index)}
       >
         <Tabs.Panel
           id="currentTab"

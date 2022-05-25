@@ -41,7 +41,8 @@ export function getInitialGridDisplaySettings(settings, colors): GridDisplaySett
   const filterColumnsBy = {
     assignmentGroupId: null,
     contextModuleId: null,
-    gradingPeriodId: null
+    gradingPeriodId: null,
+    submissions: null
   }
   if (settings.filter_columns_by != null) {
     Object.assign(filterColumnsBy, camelize(settings.filter_columns_by))

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {MOCK_OBSERVED_USERS_LIST} from '@canvas/observer-picker/react/__tests__/fixtures'
-import {OBSERVER_COOKIE_PREFIX} from '@canvas/observer-picker/ObserverGetObservee'
+import {OBSERVER_COOKIE_PREFIX, clearObservedId} from '@canvas/observer-picker/ObserverGetObservee'
 import {act, render, waitFor} from '@testing-library/react'
 import K5Dashboard from '../K5Dashboard'
 import moxios from 'moxios'
@@ -48,6 +48,7 @@ describe('K5Dashboard Parent Support', () => {
   afterAll(() => {
     jest.setTimeout(5000)
   })
+
   beforeEach(() => {
     document.cookie = `${observedUserCookieName}=4;path=/`
     moxios.install()
@@ -213,6 +214,27 @@ describe('K5Dashboard Parent Support', () => {
         exact: false
       })
     ).toBeInTheDocument()
+  })
+
+  it('does not show options to disable k5 dashboard if student is selected', async () => {
+    clearObservedId(defaultProps.currentUser.id)
+    const {getByRole, findByRole, getByText, queryByRole} = render(
+      <K5Dashboard
+        {...defaultProps}
+        currentUserRoles={['user', 'observer', 'teacher']}
+        observedUsersList={[defaultProps.currentUser, ...MOCK_OBSERVED_USERS_LIST]}
+      />
+    )
+    const select = getByRole('combobox', {name: 'Select a student to view'})
+    expect(select.value).toBe('Geoffrey Jellineck')
+    expect(await findByRole('button', {name: 'Dashboard Options'})).toBeInTheDocument()
+
+    act(() => select.click())
+    act(() => getByText('Student 4').click())
+    expect(select.value).toBe('Student 4')
+    await waitFor(() =>
+      expect(queryByRole('button', {name: 'Dashboard Options'})).not.toBeInTheDocument()
+    )
   })
 
   describe('switching to classic student', () => {

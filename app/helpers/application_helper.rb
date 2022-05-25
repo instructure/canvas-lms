@@ -771,13 +771,13 @@ module ApplicationHelper
       if ignore_branding
         nil
       else
-        # If the user is actively working on unapplied changes in theme editor, session[:brand_config_md5]
-        # will either be the md5 of the thing they are working on or `false`, meaning they want
-        # to start from a blank slate.
+        # If the user is actively working on unapplied changes in theme editor, session[:brand_config]
+        # will contain either the md5 of the thing they are working on (potentially an inherited parent
+        # config) or `nil`, meaning there is no inherited config and we are working from the default brand config.
         brand_config =
-          if session.key?(:brand_config_md5)
+          if session.key?(:brand_config)
             BrandConfig.shard(@domain_root_account.account_chain(include_site_admin: true).pluck(:shard).uniq)
-                       .where(md5: session[:brand_config_md5]).first
+                       .where(md5: session[:brand_config][:md5]).first
           else
             account = brand_config_account(opts)
             if opts[:ignore_parents]

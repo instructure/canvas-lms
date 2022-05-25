@@ -334,6 +334,33 @@ describe "Common Cartridge exporting" do
       expect(@zip_file.find_entry(path)).not_to be_nil
     end
 
+    describe "hidden folders" do
+      before :once do
+        folder = Folder.create!(name: "hidden", context: @course, hidden: true, parent_folder: Folder.root_folders(@course).first)
+        linked_att = Attachment.create!(filename: "linked.png", uploaded_data: StringIO.new("1"), folder: folder, context: @course)
+        Attachment.create!(filename: "not-linked.jpg", uploaded_data: StringIO.new("2"), folder: folder, context: @course)
+        @course.wiki_pages.create!(title: "paeg", body: "Image yo: <img src=\"/courses/#{@course.id}/files/#{linked_att.id}/preview\">")
+        @ce.export_type = ContentExport::COMMON_CARTRIDGE
+        @ce.save!
+      end
+
+      it "includes all files for teacher export" do
+        run_export
+
+        expect(@zip_file.find_entry("web_resources/hidden/linked.png")).not_to be_nil
+        expect(@zip_file.find_entry("web_resources/hidden/not-linked.jpg")).not_to be_nil
+      end
+
+      it "excludes unlinked files for student export" do
+        @ce.user = @course.student_view_student
+        @ce.save!
+        run_export
+
+        expect(@zip_file.find_entry("web_resources/hidden/linked.png")).not_to be_nil
+        expect(@zip_file.find_entry("web_resources/hidden/not-linked.jpg")).to be_nil
+      end
+    end
+
     it "includes media objects" do
       skip "PHO-360 (9/17/2020)"
 

@@ -50,25 +50,25 @@ export const ConversationListHolder = ({...props}) => {
   useEffect(() => {
     provideConversationsForOnSelect(selectedMessages)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.conversations])
+  }, [props.conversations, selectedMessages])
 
   // Toggle function for adding/removing IDs from state
   const updatedSelectedItems = _id => {
-    const updatedSelectedMessage = selectedMessages
-    if (selectedMessages.includes(_id)) {
-      const index = updatedSelectedMessage.indexOf(_id)
-      updatedSelectedMessage.splice(index, 1)
-    } else {
-      updatedSelectedMessage.push(_id)
-    }
-    setSelectedMessages([...updatedSelectedMessage])
-    provideConversationsForOnSelect([...updatedSelectedMessage])
+    setSelectedMessages(prevState => {
+      const updatedSelectedMessage = [...prevState]
+      if (prevState.includes(_id)) {
+        const index = updatedSelectedMessage.indexOf(_id)
+        updatedSelectedMessage.splice(index, 1)
+      } else {
+        updatedSelectedMessage.push(_id)
+      }
+      return updatedSelectedMessage
+    })
   }
 
   const removeFromSelectedConversations = _id => {
     const updatedSelectedMessage = selectedMessages.filter(id => id !== _id)
     setSelectedMessages([...updatedSelectedMessage])
-    provideConversationsForOnSelect([...updatedSelectedMessage])
   }
 
   // Key handler for MessageListItems
@@ -77,7 +77,6 @@ export const ConversationListHolder = ({...props}) => {
     if (e.shiftKey) {
       window.document.getSelection().removeAllRanges()
     }
-
     if (e.shiftKey && rangeClickStart && multiple) {
       // Range Click
       rangeSelect(_id)
@@ -96,11 +95,9 @@ export const ConversationListHolder = ({...props}) => {
       setMultiselect(e.target.id.includes('Checkbox'))
 
       if (e.target.id.includes('Checkbox')) {
-        setSelectedMessages([...selectedMessages, _id])
-        provideConversationsForOnSelect([...selectedMessages, _id])
+        setSelectedMessages(prevSelectedMessages => [...prevSelectedMessages, _id])
       } else {
         setSelectedMessages([_id])
-        provideConversationsForOnSelect([_id])
       }
     }
   }
@@ -143,7 +140,6 @@ export const ConversationListHolder = ({...props}) => {
       }
     })
     setSelectedMessages([...updatedSelectedMessage])
-    provideConversationsForOnSelect([...updatedSelectedMessage])
   }
 
   const [readStateChangeConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
@@ -168,7 +164,14 @@ export const ConversationListHolder = ({...props}) => {
   })
 
   return (
-    <View as="div" height="100%" overflowX="hidden" overflowY="auto" borderWidth="small">
+    <View
+      as="div"
+      height="100%"
+      overflowX="hidden"
+      overflowY="auto"
+      borderWidth="small"
+      data-testid={props.datatestid}
+    >
       {props.conversations?.map(conversation => {
         return (
           <ConversationListItem
@@ -177,14 +180,13 @@ export const ConversationListHolder = ({...props}) => {
             isStarred={conversation?.label === 'starred'}
             isSelected={selectedMessages.includes(conversation._id)}
             isUnread={conversation?.workflowState === 'unread'}
-            onOpen={props.onOpen}
-            onRemoveFromSelectedConversations={removeFromSelectedConversations}
             onSelect={handleItemSelection}
             onStar={props.onStar}
             key={conversation._id}
             readStateChangeConversationParticipants={
               isSubmissionCommentsType ? () => {} : readStateChangeConversationParticipants
             }
+            textSize={props.textSize}
           />
         )
       })}
@@ -212,13 +214,13 @@ export const ConversationListHolder = ({...props}) => {
 ConversationListHolder.propTypes = {
   conversations: PropTypes.arrayOf(PropTypes.object),
   id: PropTypes.string,
-  onOpen: PropTypes.func,
   onSelect: PropTypes.func,
-  onStar: PropTypes.func
+  onStar: PropTypes.func,
+  textSize: PropTypes.string,
+  datatestid: PropTypes.string
 }
 
 ConversationListHolder.defaultProps = {
-  onOpen: () => {},
   onSelect: () => {},
   onStar: () => {}
 }

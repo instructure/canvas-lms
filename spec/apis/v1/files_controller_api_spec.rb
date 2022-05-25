@@ -543,7 +543,7 @@ describe "Files API", type: :request do
     context "with 'category' present in params" do
       subject { Attachment.find_by(instfs_uuid: instfs_uuid) }
 
-      let(:category) { Attachment::BUTTONS_AND_ICONS }
+      let(:category) { Attachment::ICON_MAKER_ICONS }
       let(:params) { base_params.merge(category: category, controller: "files", action: "api_capture", format: "json") }
 
       it "sets the attachment category" do
@@ -820,17 +820,17 @@ describe "Files API", type: :request do
         )
       end
 
-      let(:category) { Attachment::BUTTONS_AND_ICONS }
-      let(:button_and_icon) { @a1 }
+      let(:category) { Attachment::ICON_MAKER_ICONS }
+      let(:icon_maker) { @a1 }
       let(:uncategorized) { @a2 }
 
       before do
-        button_and_icon.update!(category: category)
+        icon_maker.update!(category: category)
 
         @files_path_options[:category] = category
       end
 
-      it { is_expected.to include button_and_icon }
+      it { is_expected.to include icon_maker }
       it { is_expected.not_to include uncategorized }
     end
 

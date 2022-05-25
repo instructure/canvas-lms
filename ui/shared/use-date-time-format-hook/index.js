@@ -32,9 +32,23 @@ const optionsList = {
     second: 'numeric',
     timeZoneName: 'short'
   },
+  'time.formats.medium': {
+    // ddd, D MMM YYYY HH:mma
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric'
+  },
+  'time.formats.short': {
+    // ddd, D MMM HH:mma
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric'
+  },
   'date.formats.full': {
     // MMM D, YYYY h:mma
-    name: 'date.formats.full',
     month: 'short',
     day: 'numeric',
     year: 'numeric',
@@ -43,7 +57,6 @@ const optionsList = {
   },
   'date.formats.date_at_time': {
     // MMM D [at] h:mma
-    name: 'date.formats.date_at_time',
     dateStyle: 'long',
     timeStyle: 'short'
   },
@@ -61,7 +74,6 @@ const optionsList = {
   },
   'date.formats.full_with_weekday': {
     // MMM D, YYYY h:mma
-    name: 'date.formats.full_with_weekday',
     weekday: 'short',
     month: 'short',
     day: 'numeric',
@@ -105,6 +117,7 @@ Object.freeze(optionsList)
 
 export default function useDateTimeFormat(formatName, timeZone, locale) {
   locale = locale || ENV?.LOCALE || navigator.language
+  if (locale === 'fr-CA') locale = 'fr-QB' // Français québécois time formatting is more like we want
   timeZone = timeZone || ENV?.TIMEZONE || Intl.DateTimeFormat().resolvedOptions().timeZone
 
   const formatter = useMemo(() => {

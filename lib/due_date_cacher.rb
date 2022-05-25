@@ -123,21 +123,38 @@ class DueDateCacher
   end
 
   def self.recompute_users_for_course(user_ids, course, assignments = nil, inst_jobs_opts = {})
+    opts = inst_jobs_opts.extract!(:update_grades, :executing_user, :sis_import, :require_singleton).reverse_merge(require_singleton: assignments.nil?)
     user_ids = Array(user_ids)
     course = Course.find(course) unless course.is_a?(Course)
-    update_grades = inst_jobs_opts.delete(:update_grades) || false
+    update_grades = opts[:update_grades] || false
     inst_jobs_opts[:max_attempts] ||= 10
     inst_jobs_opts[:strand] ||= "cached_due_date:calculator:Course:#{course.global_id}"
-    if assignments.nil?
+    if opts[:require_singleton]
       inst_jobs_opts[:singleton] ||= "cached_due_date:calculator:Course:#{course.global_id}:Users:#{Digest::SHA256.hexdigest(user_ids.sort.join(":"))}:UpdateGrades:#{update_grades ? 1 : 0}"
     end
     assignments ||= Assignment.active.where(context: course).pluck(:id)
     return if assignments.empty?
 
     current_caller = caller(1..1).first
-    executing_user = inst_jobs_opts.delete(:executing_user) || current_executing_user
-    due_date_cacher = new(course, assignments, user_ids, update_grades: update_grades, original_caller: current_caller, executing_user: executing_user)
+    executing_user = opts[:executing_user] || current_executing_user
 
+    if opts[:sis_import]
+      running_jobs_count = Delayed::Job.running.where(shard_id: course.shard.id, tag: "DueDateCacher#recompute_for_sis_import").count
+      max_jobs = Setting.get("DueDateCacher#recompute_for_sis_import_num_strands", "10").to_i
+
+      if running_jobs_count >= max_jobs
+        # there are too many sis recompute jobs running concurrently now. let's check again in a bit to see if we can run.
+        return delay_if_production(
+          **inst_jobs_opts,
+          run_at: Setting.get("DueDateCacher#recompute_for_sis_import_requeue_delay", "10").to_i.seconds.from_now
+        ).recompute_users_for_course(user_ids, course, assignments, opts)
+      else
+        due_date_cacher = new(course, assignments, user_ids, update_grades: update_grades, original_caller: current_caller, executing_user: executing_user)
+        return due_date_cacher.delay_if_production(**inst_jobs_opts).recompute_for_sis_import
+      end
+    end
+
+    due_date_cacher = new(course, assignments, user_ids, update_grades: update_grades, original_caller: current_caller, executing_user: executing_user)
     due_date_cacher.delay_if_production(**inst_jobs_opts).recompute
   end
 
@@ -165,6 +182,12 @@ class DueDateCacher
     if executing_user.present?
       @executing_user_id = executing_user.is_a?(User) ? executing_user.id : executing_user
     end
+  end
+
+  # exists so that we can identify (and limit) jobs running specifically for sis imports
+  # Delayed::Job.where(tag: "DueDateCacher#recompute_for_sis_import")
+  def recompute_for_sis_import
+    recompute
   end
 
   def recompute

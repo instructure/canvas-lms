@@ -2943,32 +2943,19 @@ describe UsersController do
 
   describe "#show_k5_dashboard" do
     before :once do
-      @observer = user_factory(active_all: true)
-      @student = user_factory(active_all: true)
-      course_factory(active_all: true)
-      @course.enroll_student(@student)
+      user_factory
     end
 
-    before do
-      user_session(@observer)
-    end
-
-    it "returns unauthorized for arbitrary user" do
-      get "show_k5_dashboard", params: { id: @student.id }, format: "json"
+    it "returns unauthorized if unauthenticated" do
+      get "show_k5_dashboard", format: "json"
       assert_unauthorized
     end
 
-    it "returns value for self" do
-      allow(controller).to receive(:k5_user?).with({ user: @observer, course_ids: [] }).and_return(true)
-      get "show_k5_dashboard", params: { id: "self" }, format: "json"
-      expect(json_parse["k5_user"]).to be_truthy
-    end
-
-    it "returns value for linked student" do
-      @course.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @student)
-      allow(controller).to receive(:k5_user?).with({ user: @student, course_ids: [@course.id] }).and_return(true)
-      get "show_k5_dashboard", params: { id: @student.id }, format: "json"
-      expect(json_parse["k5_user"]).to be_truthy
+    it "returns value of k5_user?" do
+      user_session(@user)
+      allow(controller).to receive(:k5_user?).and_return(true)
+      get "show_k5_dashboard", format: "json"
+      expect(json_parse["show_k5_dashboard"]).to be_truthy
     end
   end
 end

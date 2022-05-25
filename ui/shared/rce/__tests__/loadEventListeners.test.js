@@ -26,10 +26,16 @@ describe('loadEventListeners', () => {
   let fakeEditor, dispatchEvent
   beforeAll(() => {
     window.INST.editorButtons = [{id: '__BUTTON_ID__'}]
+
+    ENV = {
+      context_asset_string: 'course_1'
+    }
+
     fakeEditor = {
       id: 'someId',
       bookmarkMoved: false,
       focus: () => {},
+      getContent() {},
       dom: {createHTML: () => "<a href='#'>stub link html</a>"},
       selection: {
         getBookmark: () => ({}),
@@ -48,6 +54,7 @@ describe('loadEventListeners', () => {
         }
       }
     }
+
     dispatchEvent = name => {
       const event = document.createEvent('CustomEvent')
       const eventData = {

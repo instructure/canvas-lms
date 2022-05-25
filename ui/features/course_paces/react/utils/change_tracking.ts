@@ -122,12 +122,6 @@ export const summarizeSettingChanges = (settingChanges: Change[]): SummarizedCha
       case 'exclude_weekends':
         summary = formatBooleanSettingChange(change as Change<boolean>, I18n.t('Skip Weekends'))
         break
-      case 'hard_end_dates':
-        summary = formatBooleanSettingChange(
-          change as Change<boolean>,
-          I18n.t('Require Completion by Specified End Date')
-        )
-        break
       case 'require_completion':
         if (change.newValue && endDateChange) {
           summary = I18n.t('Require Completion by End Date was turned on and set to %{date}.', {

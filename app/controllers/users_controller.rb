@@ -199,7 +199,8 @@ class UsersController < ApplicationController
                                         user_dashboard toggle_hide_dashcard_color_overlays
                                         masquerade external_tool dashboard_sidebar settings activity_stream
                                         activity_stream_summary pandata_events_token dashboard_cards
-                                        user_graded_submissions show terminate_sessions dashboard_stream_items]
+                                        user_graded_submissions show terminate_sessions dashboard_stream_items
+                                        show_k5_dashboard]
   before_action :require_registered_user, only: [:delete_user_service,
                                                  :create_user_service]
   before_action :reject_student_view_student, only: %i[delete_user_service
@@ -2756,31 +2757,11 @@ class UsersController < ApplicationController
     end
   end
 
-  # @API Get whether user sees Canvas for Elementary dashboard
-  #
-  # Returns +true+ if the provided user sees the Canvas for Elementary dashboard, and +false+ otherwise.
-  # If the requesting user has user preference +:elementary_dashboard_disabled+ set, then this
-  # request will return +false+. Only considers courses where the requesting user is observing the
-  # provided user when making the determination.
-  #
-  # @example_request
-  #   curl https://<canvas>/api/v1/users/self/show_k5_dashboard \
-  #     -X GET \
-  #     -H 'Authorization: Bearer <token>'
-  #
-  # @returns boolean
   def show_k5_dashboard
-    user = api_find(User, params[:id])
-    if user
-      scope = @current_user.observer_enrollments.active_or_pending_by_date.where(associated_user: user).shard(@current_user.in_region_associated_shards)
-      if user.grants_right?(@current_user, session, :read) || scope.exists?
-        # Reload @current_user to make sure we get a current value for their :elementary_dashboard_disabled preference
-        @current_user.reload
-        render json: { k5_user: k5_user?(user: user, course_ids: scope.pluck(:course_id)) }
-      else
-        render_unauthorized_action
-      end
-    end
+    # reload @current_user to make sure we get a current value for their :elementary_dashboard_disabled preference
+    @current_user.reload
+    observed_users(@current_user, session) if @current_user.roles(@domain_root_account).include?("observer")
+    render json: { show_k5_dashboard: k5_user? }
   end
 
   protected

@@ -65,7 +65,7 @@ describe AssignmentGroup do
       @destroyed_assignment = assignments.first
       @destroyed_assignment.destroy
       @assignment = assignments.second
-      @assignment.grade_student(@student, grade: 10, grader: @teacher)
+      create_adhoc_override_for_assignment(@assignment, @student)
       @overridden_assignment = assignments.last
       create_section_override_for_assignment(@overridden_assignment, course_section: @s)
       @course.reload

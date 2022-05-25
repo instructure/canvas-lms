@@ -16,15 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import getCookie from '@instructure/get-cookie'
 import parseLinkHeader from 'parse-link-header'
 import {defaultFetchOptions} from '@instructure/js-utils'
+import toQueryString from '@canvas/util/toQueryString'
+import type {QueryParameterMap} from '@canvas/util/toQueryString'
 
-function constructRelativeUrl({path, params}: {path: string; params: {[k: string]: any}}) {
-  const queryString = $.param(params)
-  if (!queryString.length) return path
-  return `${path}?${queryString}`
+function constructRelativeUrl({path, params}: {path: string; params: QueryParameterMap}): string {
+  const queryString = toQueryString(params)
+  if (queryString.length === 0) return path
+  return path + '?' + queryString
 }
 
 // https://fetch.spec.whatwg.org/#requestinit
@@ -36,8 +37,8 @@ export type DoFetchApiOpts = {
   path: string
   method?: string
   headers?: {[k: string]: string}
-  params?: {[k: string]: any}
-  body?: any
+  params?: QueryParameterMap
+  body?: unknown
   fetchOpts?: RequestInit
 }
 
@@ -49,7 +50,7 @@ export type DoFetchApiResults<T> = {
 
 // NOTE: we do NOT deep-merge customFetchOptions.headers, they should be passed
 // in the headers arg instead.
-export default async function doFetchApi<T = any>({
+export default async function doFetchApi<T = unknown>({
   path,
   method = 'GET',
   headers = {},

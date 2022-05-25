@@ -1,34 +1,43 @@
 <fieldset class="quota_settings">
   <legend>{{#t "default_account_quota_title"}}Default Account Quotas{{/t}}</legend>
   <div class="responsive-control-group">
-    <label id="default_course_storage_mb_label" class="control-label" for="default_course_storage_mb">{{#t "default_course_storage_quota"}}Course Quota{{/t}}</label>
+    <label class="control-label" for="default_course_storage_mb">{{#t
+      "default_course_storage_quota"}}Course Quota{{/t}}</label>
     <div class="controls">
       <div class="input-append">
-        <input aria-labelledby="default_course_storage_mb_label" name="default_storage_quota_mb" type="text" class="span2" title="{{#t "megabytes_tooltip"}}megabytes{{/t}}" maxlength="13" value="{{default_storage_quota_mb}}" id="default_course_storage_mb">
+        <input name="default_storage_quota_mb" type="text" class="span2" title="{{#t "
+          megabytes_tooltip"}}megabytes{{/t}}" maxlength="13" value="{{default_storage_quota_mb}}"
+          id="default_course_storage_mb">
         <span class="add-on">{{#t "megabytes"}}megabytes{{/t}}</span>
       </div>
     </div>
   </div>
   {{#if root_account}}
-    <div class="responsive-control-group margin-t-m">
-      <label id="default_user_storage_mb_label" class="control-label" for="default_user_storage_mb">{{#t "default_user_storage_quota"}}User Quota{{/t}}</label>
-      <div class="controls">
-        <div class="input-append">
-          <input aria-labelledby="default_user_storage_mb_label" name="default_user_storage_quota_mb" type="text" class="span2" title="{{#t "megabytes_tooltip"}}megabytes{{/t}}" maxlength="13" value="{{default_user_storage_quota_mb}}" id="default_user_storage_mb">
-          <span class="add-on">{{#t "megabytes"}}megabytes{{/t}}</span>
-        </div>
+  <div class="responsive-control-group margin-t-m">
+    <label class="control-label" for="default_user_storage_mb">{{#t
+      "default_user_storage_quota"}}User Quota{{/t}}</label>
+    <div class="controls">
+      <div class="input-append">
+        <input name="default_user_storage_quota_mb" type="text" class="span2" title="{{#t "
+          megabytes_tooltip"}}megabytes{{/t}}" maxlength="13" value="{{default_user_storage_quota_mb}}"
+          id="default_user_storage_mb">
+        <span class="add-on">{{#t "megabytes"}}megabytes{{/t}}</span>
       </div>
     </div>
+  </div>
   {{/if}}
   <div class="responsive-control-group margin-t-m">
-      <label id="default_group_storage_mb_label" class="control-label" for="default_group_storage_mb">{{#t "default_group_storage_quota"}}Group Quota{{/t}}</label>
-      <div class="controls">
-        <div class="input-append">
-          <input aria-labelledby="default_group_storage_mb_label" name="default_group_storage_quota_mb" type="text" class="span2" title="{{#t "megabytes_tooltip"}}megabytes{{/t}}" maxlength="13" value="{{default_group_storage_quota_mb}}" id="default_group_storage_mb">
-          <span class="add-on">{{#t "megabytes"}}megabytes{{/t}}</span>
-        </div>
+    <label class="control-label" for="default_group_storage_mb">{{#t
+      "default_group_storage_quota"}}Group Quota{{/t}}</label>
+    <div class="controls">
+      <div class="input-append">
+        <input name="default_group_storage_quota_mb" type="text" class="span2" title="{{#t "
+          megabytes_tooltip"}}megabytes{{/t}}" maxlength="13" value="{{default_group_storage_quota_mb}}"
+          id="default_group_storage_mb">
+        <span class="add-on">{{#t "megabytes"}}megabytes{{/t}}</span>
       </div>
     </div>
+  </div>
 
   <div class="responsive-button-container margin-t-m">
     <button type="submit" class="btn responsive-control-button">

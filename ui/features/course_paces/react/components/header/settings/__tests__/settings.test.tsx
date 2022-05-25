@@ -27,8 +27,6 @@ import {Settings} from '../settings'
 const loadLatestPaceByContext = jest.fn()
 const showLoadingOverlay = jest.fn()
 const toggleExcludeWeekends = jest.fn()
-const toggleHardEndDates = jest.fn()
-const setEndDate = jest.fn()
 const updateBlackoutDates = jest.fn()
 
 const defaultProps = {
@@ -41,8 +39,6 @@ const defaultProps = {
   loadLatestPaceByContext,
   showLoadingOverlay,
   toggleExcludeWeekends,
-  toggleHardEndDates,
-  setEndDate,
   updateBlackoutDates
 }
 
@@ -51,8 +47,6 @@ beforeAll(() => {
     end_at: {date: COURSE.start_at, date_context: 'course'},
     start_at: {date: COURSE.end_at, date_context: 'course'}
   }
-  window.ENV.FEATURES ||= {}
-  window.ENV.FEATURES.course_paces_blackout_dates = true
 })
 afterEach(() => {
   jest.clearAllMocks()

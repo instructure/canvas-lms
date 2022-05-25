@@ -37,7 +37,7 @@ class AuthenticationProvider::OAuth < AuthenticationProvider::Delegated
   alias_method :consumer_secret, :auth_decrypted_password
 
   def consumer
-    @client ||= OAuth::Consumer.new(consumer_key, consumer_secret, consumer_options)
+    @client ||= ::OAuth::Consumer.new(consumer_key, consumer_secret, consumer_options)
   end
 
   def provider_attributes

@@ -638,10 +638,10 @@ class FoldersController < ApplicationController
     end
   end
 
-  def buttons_and_icons_folder
+  def icon_maker_folder
     require_context
     if @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
-      @folder = Folder.buttons_and_icons_folder(@context)
+      @folder = Folder.icon_maker_folder(@context)
       render json: folder_json(@folder, @current_user, session)
     end
   end

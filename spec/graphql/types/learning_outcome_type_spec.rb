@@ -148,4 +148,34 @@ describe Types::LearningOutcomeType do
         .to eq course_fd.id.to_s
     end
   end
+
+  context "alignments" do
+    before do
+      course_model
+      assignment1 = assignment_model({
+                                       course: @course,
+                                       name: "First Assignment",
+                                       due_at: nil,
+                                       points_possible: 10,
+                                       submission_types: "online_text_entry,online_upload",
+                                     })
+      assignment2 = assignment_model({
+                                       course: @course,
+                                       name: "Second Assignment",
+                                       due_at: nil,
+                                       points_possible: 20,
+                                       submission_types: "online_text_entry",
+                                     })
+      @outcome = outcome_model(context: @course, title: "outcome")
+      @alignment1 = @outcome.align(assignment1, @course)
+      @alignment2 = @outcome.align(assignment2, @course)
+      @course.account.enable_feature!(:outcome_alignment_summary)
+    end
+
+    it "resolves alignments correctly" do
+      alignment_ids = outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { _id }")
+      expect(alignment_ids.length).to eq 2
+      expect(alignment_ids).to include(@alignment1.id.to_s, @alignment2.id.to_s)
+    end
+  end
 end

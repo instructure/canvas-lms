@@ -61,6 +61,10 @@ module CoursePacesPageObject
     "input[placeholder='e.g., Winter Break']"
   end
 
+  def blackout_module_item_selector
+    "[data-testid='pp-blackout-date-row']"
+  end
+
   def cancel_button_selector
     "button:contains('Cancel')"
   end
@@ -257,6 +261,10 @@ module CoursePacesPageObject
 
   def blackout_date_title_input
     f(blackout_date_title_input_selector)
+  end
+
+  def blackout_module_item
+    f(blackout_module_item_selector)
   end
 
   def cancel_button

@@ -80,6 +80,7 @@ const notComplete = progress => progress.completion !== 100
 export default class ThemeEditor extends React.Component {
   static propTypes = {
     brandConfig: customTypes.brandConfig,
+    isDefaultConfig: PropTypes.bool.isRequired,
     hasUnsavedChanges: PropTypes.bool.isRequired,
     variableSchema: customTypes.variableSchema,
     allowGlobalIncludes: PropTypes.bool,
@@ -458,6 +459,7 @@ export default class ThemeEditor extends React.Component {
               sharedBrandConfigBeingEdited={this.state.sharedBrandConfigBeingEdited}
               accountID={this.props.accountID}
               brandConfigMd5={this.props.brandConfig.md5}
+              isDefaultConfig={this.props.isDefaultConfig}
               onSave={this.updateSharedBrandConfigBeingEdited}
             />
             &nbsp;
@@ -476,7 +478,7 @@ export default class ThemeEditor extends React.Component {
       tooltipForWhyApplyIsDisabled = I18n.t(
         'You need to "Preview Changes" before you can apply this to your account'
       )
-    } else if (this.props.brandConfig.md5 && !this.displayedMatchesSaved()) {
+    } else if (!this.props.isDefaultConfig && !this.displayedMatchesSaved()) {
       tooltipForWhyApplyIsDisabled = I18n.t('You need to "Save" before applying to this account')
     } else if (this.state.isApplying) {
       tooltipForWhyApplyIsDisabled = I18n.t('Applying, please be patient')

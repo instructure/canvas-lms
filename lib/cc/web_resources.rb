@@ -38,7 +38,13 @@ module CC
 
       zipper = ContentZipper.new
       zipper.user = @user
-      zipper.process_folder(course_folder, @zip_file, [CCHelper::WEB_RESOURCES_FOLDER], exporter: @manifest.exporter) do |file, folder_names|
+      zipper.process_folder(
+        course_folder,
+        @zip_file,
+        [CCHelper::WEB_RESOURCES_FOLDER],
+        exporter: @manifest.exporter,
+        referenced_files: @html_exporter.referenced_files
+      ) do |file, folder_names|
         next if file.display_name.blank?
 
         if file.is_a? Folder
@@ -50,7 +56,7 @@ module CC
         path = File.join(folder_names, file.display_name)
         @added_attachments[file.id] = path
         migration_id = create_key(file)
-        if file_or_folder_restricted?(file) || file.usage_rights || file.display_name != file.unencoded_filename || file.category == Attachment::BUTTONS_AND_ICONS
+        if file_or_folder_restricted?(file) || file.usage_rights || file.display_name != file.unencoded_filename || file.category == Attachment::ICON_MAKER_ICONS
           files_with_metadata[:files] << [file, migration_id]
         end
         @resources.resource(

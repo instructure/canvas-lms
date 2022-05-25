@@ -912,7 +912,7 @@ describe ContentMigration do
     end
 
     context "with late policy" do
-      it "copies it over" do
+      it "copies if no selection is made" do
         @copy_from.create_late_policy!(missing_submission_deduction_enabled: true, late_submission_deduction: 15.0, late_submission_interval: "day")
         run_course_copy
 
@@ -920,32 +920,17 @@ describe ContentMigration do
         expect(new_late_policy.missing_submission_deduction_enabled).to be_truthy
       end
 
-      it "does not copy it over if the export should have had no settings" do
+      # This is for faulty direct shares that were exported with late policy in their cartridges
+      # when they shouldn't have, or for commons course packages where settings shouldn't be imported
+      it "does not copy if settings are skipped" do
         @copy_from.create_late_policy!(missing_submission_deduction_enabled: true, late_submission_deduction: 15.0, late_submission_interval: "day")
         @copy_to.create_late_policy!(missing_submission_deduction_enabled: true, late_submission_deduction: 10.0, late_submission_interval: "day")
 
         @cm.copy_options = { everything: true }
+        @cm.migration_settings = { importer_skips: ["all_course_settings"] }
         @cm.save!
 
-        run_export_and_import do |export|
-          export.selected_content = { all_course_settings: false }
-        end
-
-        expect(@copy_to.reload.late_policy.late_submission_deduction).to eq 10.0
-      end
-
-      # This is for faulty direct shares that were exported with
-      # late policy in their cartridges when they shouldn't have
-      it "does not copy it over if the import requires no settings" do
-        @copy_from.create_late_policy!(missing_submission_deduction_enabled: true, late_submission_deduction: 15.0, late_submission_interval: "day")
-        @copy_to.create_late_policy!(missing_submission_deduction_enabled: true, late_submission_deduction: 10.0, late_submission_interval: "day")
-
-        @cm.copy_options = { everything: false }
-        @cm.save!
-
-        run_export_and_import do |export|
-          export.selected_content = { all_course_settings: true }
-        end
+        run_course_copy
 
         expect(@copy_to.reload.late_policy.late_submission_deduction).to eq 10.0
       end

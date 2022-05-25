@@ -81,6 +81,7 @@ export default function CommentArea({getTextAreaRef, courseId, userId}) {
           value={comment}
           onChange={e => setComment(e.target.value)}
           textareaRef={setTextAreaRef}
+          resize="vertical"
           {...textAreaProps}
         />
         {!!ENV.EMOJIS_ENABLED && (

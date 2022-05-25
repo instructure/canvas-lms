@@ -22,6 +22,20 @@ import {merge} from 'lodash'
 import fakeENV from 'helpers/fakeENV'
 import {DiscussionRow} from 'ui/features/discussion_topics_index/react/components/DiscussionRow.js'
 
+// We can't call the wrapped component because a lot of these tests are depending
+// on the class component instances. So we've got to cobble up enough of the date
+// formatter to send in as a prop.
+const dateFormatter = date => {
+  const fmtr = Intl.DateTimeFormat('en').format
+  try {
+    if (date === null) return ''
+    return fmtr(date instanceof Date ? date : new Date(date))
+  } catch (e) {
+    if (e instanceof RangeError) return ''
+    throw e
+  }
+}
+
 QUnit.module('DiscussionRow component')
 
 const makeProps = (props = {}) =>
@@ -53,7 +67,8 @@ const makeProps = (props = {}) =>
       masterCourseData: {},
       setCopyTo: () => {},
       setSendToOpen: () => {},
-      DIRECT_SHARE_ENABLED: false
+      DIRECT_SHARE_ENABLED: false,
+      dateFormatter
     },
     props
   )
@@ -228,7 +243,7 @@ test('renders a last reply at date', () => {
   const node = tree.find('.last-reply-at')
   ok(node.exists())
   ok(node.text().includes('Last post at'))
-  ok(node.text().includes('Feb'))
+  ok(node.text().includes('2/14'))
   tree.unmount()
 })
 
@@ -260,7 +275,7 @@ test('renders locked at if appropriate', () => {
   const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
   const node = tree.find('.discussion-availability')
   ok(node.exists())
-  ok(node.text().includes('Was locked at'))
+  ok(node.text().includes('No longer available'))
   // We need a relative date to ensure past-ness, so we can't really insist
   // on a given date element appearing this time
   tree.unmount()

@@ -108,18 +108,6 @@ describe "discussions overrides" do
       expect(f(".discussion-topic-due-dates")).to be_present
     end
 
-    it "does not show the add due date button after the last available section is selected", priority: "2" do
-      skip("Example skipped due to an issue in the assignment add button for due dates")
-      get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
-      @new_section_1 = @course.course_sections.create!(name: "Additional Section")
-      expect_new_page_load { f(".edit-btn").click }
-      f("#add_due_date").click
-      wait_for_ajaximations
-      select_last_override_section(@new_section_1.name)
-      assign_dates_for_last_override_section
-      expect(f("#add_due_date")).not_to be_present
-    end
-
     it "allows to not set due dates for everyone", priority: "2" do
       get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
       expect_new_page_load { f(".edit-btn").click }

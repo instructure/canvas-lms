@@ -127,6 +127,7 @@ type Props = {
   showUnpostedMenuItem: any
   sortBySetting: any
   submissionsLoaded: boolean
+  onSendMesssageStudentsWho: any
 }
 
 type State = {
@@ -231,7 +232,8 @@ export default class AssignmentColumnHeader extends ColumnHeader<Props, State> {
     onMenuDismiss: func.isRequired,
     showMessageStudentsWithObserversDialog: bool.isRequired,
     showUnpostedMenuItem: bool.isRequired,
-    messageAttachmentUploadFolderId: string.isRequired
+    messageAttachmentUploadFolderId: string.isRequired,
+    onSendMesssageStudentsWho: func.isRequired
   }
 
   static defaultProps = {
@@ -310,8 +312,9 @@ export default class AssignmentColumnHeader extends ColumnHeader<Props, State> {
     this.props.enterGradesAsSetting.onSelect(values[0])
   }
 
-  // TODO(EVAL): This needs to be implemented in EVAL-2064.
-  handleSendMessageStudentsWho = () => {}
+  handleSendMessageStudentsWho = args => {
+    this.props.onSendMesssageStudentsWho(args)
+  }
 
   showMessageStudentsWhoDialog = async () => {
     // @ts-ignore

@@ -179,7 +179,7 @@ module Importers
 
         everything_selected = !migration.copy_options || migration.is_set?(migration.copy_options[:everything])
 
-        if everything_selected || migration.is_set?(migration.copy_options[:all_course_settings])
+        if (everything_selected || migration.is_set?(migration.copy_options[:all_course_settings])) && !(migration.should_skip_import? "all_course_settings")
           import_settings_from_migration(course, data, migration)
           Importers::LatePolicyImporter.process_migration(data, migration) unless migration.should_skip_import? "LatePolicy"
         end

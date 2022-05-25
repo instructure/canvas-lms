@@ -49,17 +49,19 @@ export function sizeMediaPlayer(player, type, container) {
     width: player.videoWidth,
     height: player.videoHeight
   }
-  if (sz.width > sz.height) {
-    sz.width = container.width
-    sz.height = (player.videoHeight / player.videoWidth) * sz.width
-  } else {
-    sz.height = container.height
-    sz.width = (player.videoWidth / player.videoHeight) * sz.height
-  }
+  if (container?.width && container?.height) {
+    if (sz.width > sz.height) {
+      sz.width = container.width
+      sz.height = (player.videoHeight / player.videoWidth) * sz.width
+    } else {
+      sz.height = container.height
+      sz.width = (player.videoWidth / player.videoHeight) * sz.height
+    }
 
-  if (sz.height > container.height) {
-    sz.width *= container.height / sz.height
-    sz.height = container.height
+    if (sz.height > container.height) {
+      sz.width *= container.height / sz.height
+      sz.height = container.height
+    }
   }
 
   sz.width = `${Math.round(sz.width)}px`
