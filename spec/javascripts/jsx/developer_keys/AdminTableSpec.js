@@ -56,8 +56,9 @@ function componentNode(keyList = null) {
   return ReactDOM.findDOMNode(component(keyList))
 }
 
-test('it does not render the table if no keys are given', () => {
-  notOk(componentNode([]))
+test('it renders table with placeholder text if no keys are given', () => {
+  const node = componentNode([])
+  equal(node.querySelectorAll('span')[2].innerText, 'Nothing here yet')
 })
 
 test('does render the "Owner Email" heading', () => {

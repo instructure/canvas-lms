@@ -18,6 +18,8 @@
 
 import $ from 'jquery'
 import {Table} from '@instructure/ui-table'
+import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import React from 'react'
 import {arrayOf, func, shape, string} from 'prop-types'
@@ -37,11 +39,12 @@ const createSetFocusCallback =
     const developerKey = developerKeysList
       .concat(developerKeys)
       .reverse()
-      .find(key => !developerKeyRef(key).isDisabled())
+      .find(key => {
+        const keyRef = developerKeyRef(key)
+        return keyRef && !keyRef.isDisabled()
+      })
     const ref = developerKey ? developerKeyRef(developerKey) : undefined
-    if (ref) {
-      handleRef(ref)
-    }
+    handleRef(ref)
     return ref
   }
 
@@ -81,7 +84,7 @@ class AdminTable extends React.Component {
       srMsg: I18n.t(
         'Loaded more developer keys. Focus moved to the delete button of the last loaded developer key in the list.'
       ),
-      handleRef: ref => ref.focusDeleteLink()
+      handleRef: ref => ref && ref.focusDeleteLink()
     })
 
   developerKeyRef = key => {
@@ -90,9 +93,6 @@ class AdminTable extends React.Component {
 
   render() {
     const {developerKeysList} = this.props
-    if (developerKeysList.length === 0) {
-      return null
-    }
     const srcontent = I18n.t('Developer Keys')
     return (
       <div>
@@ -113,7 +113,7 @@ class AdminTable extends React.Component {
             </Table.Row>
           </Table.Head>
           <Table.Body>
-            {this.props.developerKeysList.map(developerKey => (
+            {developerKeysList.map(developerKey => (
               <DeveloperKey
                 ref={key => {
                   this[`developerKey-${developerKey.id}`] = key
@@ -129,6 +129,11 @@ class AdminTable extends React.Component {
             ))}
           </Table.Body>
         </Table>
+        {developerKeysList.length === 0 && (
+          <View as="div" margin="medium" textAlign="center">
+            <Text size="large">{I18n.t('Nothing here yet')}</Text>
+          </View>
+        )}
       </div>
     )
   }

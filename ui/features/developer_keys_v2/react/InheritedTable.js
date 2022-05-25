@@ -18,6 +18,8 @@
 
 import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
 import React from 'react'
 import {arrayOf, func, shape, string} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -31,15 +33,15 @@ const I18n = useI18nScope('react_developer_keys')
 
 class InheritedTable extends React.Component {
   // this should be called when more keys are loaded,
-  // and only handles the screenreader callout
+  // and only handles the screenreader callout and focus
   setFocusCallback = () =>
     createSetFocusCallback({
       developerKeysList: this.props.developerKeysList,
       developerKeyRef: this.developerKeyRef,
       srMsg: I18n.t(
-        'Loaded more developer keys. Focus moved to the name of the last loaded developer key in the list.'
+        'Loaded more developer keys. Focus moved to the last enabled developer key in the list.'
       ),
-      handleRef: ref => ref.focusToggleGroup()
+      handleRef: ref => (ref ? ref.focusToggleGroup() : this.props.setFocus())
     })
 
   developerKeyRef = key => {
@@ -47,28 +49,32 @@ class InheritedTable extends React.Component {
   }
 
   render() {
-    const {developerKeysList} = this.props
-    if (developerKeysList.length === 0) {
-      return null
-    }
-    const srcontent = I18n.t('Inherited Developer Keys Table')
+    const {developerKeysList, prefix, label} = this.props
     return (
       <div>
         <Table
           data-automation="devKeyInheritedTable"
-          caption={<ScreenReaderContent>{srcontent}</ScreenReaderContent>}
+          caption={<ScreenReaderContent>{label}</ScreenReaderContent>}
           size="medium"
         >
           <Table.Head>
             <Table.Row>
-              <Table.ColHeader id="keystable-name">{I18n.t('Name')}</Table.ColHeader>
-              <Table.ColHeader id="keystable-details">{I18n.t('Details')}</Table.ColHeader>
-              <Table.ColHeader id="keystable-type">{I18n.t('Type')}</Table.ColHeader>
-              <Table.ColHeader id="keystable-state">{I18n.t('State')}</Table.ColHeader>
+              <Table.ColHeader id={`${prefix}-name`} width="45%">
+                {I18n.t('Name')}
+              </Table.ColHeader>
+              <Table.ColHeader id={`${prefix}-details`} width="25%">
+                {I18n.t('Details')}
+              </Table.ColHeader>
+              <Table.ColHeader id={`${prefix}-type`} width="15%">
+                {I18n.t('Type')}
+              </Table.ColHeader>
+              <Table.ColHeader id={`${prefix}-state`} width="15%">
+                {I18n.t('State')}
+              </Table.ColHeader>
             </Table.Row>
           </Table.Head>
           <Table.Body>
-            {this.props.developerKeysList.map(developerKey => (
+            {developerKeysList.map(developerKey => (
               <DeveloperKey
                 ref={key => {
                   this[`developerKey-${developerKey.id}`] = key
@@ -85,6 +91,11 @@ class InheritedTable extends React.Component {
             ))}
           </Table.Body>
         </Table>
+        {developerKeysList.length === 0 && (
+          <View as="div" margin="medium" textAlign="center">
+            <Text size="large">{I18n.t('Nothing here yet')}</Text>
+          </View>
+        )}
       </div>
     )
   }
@@ -96,11 +107,16 @@ InheritedTable.propTypes = {
   }).isRequired,
   actions: shape({}).isRequired,
   developerKeysList: arrayOf(DeveloperKey.propTypes.developerKey).isRequired,
+  label: string.isRequired,
+  prefix: string.isRequired,
   ctx: shape({
     params: shape({
       contextId: string.isRequired
     })
-  }).isRequired
+  }).isRequired,
+  setFocus: func
 }
+
+InheritedTable.defaultProps = {setFocus: () => {}}
 
 export default InheritedTable

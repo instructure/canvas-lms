@@ -80,6 +80,8 @@ function disabledDevKeyList(numKeys = 10) {
 function component(keyList, props = {}) {
   return TestUtils.renderIntoDocument(
     <InheritedTable
+      label="Test Inherited Table"
+      prefix="test"
       store={{dispatch: () => {}}}
       actions={{}}
       developerKeysList={keyList || devKeyList()}
@@ -97,8 +99,9 @@ function componentNode(keyList = null) {
   return ReactDOM.findDOMNode(component(keyList))
 }
 
-test('it does not render the table if no keys are given', () => {
-  notOk(componentNode([]))
+test('it renders table with placeholder text if no keys are given', () => {
+  const node = componentNode([])
+  equal(node.querySelectorAll('span')[2].innerText, 'Nothing here yet')
 })
 
 test('focuses toggle group if show more button clicked', () => {
@@ -141,7 +144,7 @@ test('makes correct screenReader notification if show more button clicked', () =
   table.setFocusCallback()([list[9]])
   ok(
     flashSpy.calledWith(
-      'Loaded more developer keys. Focus moved to the name of the last loaded developer key in the list.'
+      'Loaded more developer keys. Focus moved to the last enabled developer key in the list.'
     )
   )
   $.screenReaderFlashMessageExclusive = tmp

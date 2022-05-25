@@ -111,15 +111,7 @@ class DeveloperKeysApp extends React.Component {
     } = this.props
 
     const callBack = this.inheritedTableRef.setFocusCallback()
-    getRemainingInheritedDeveloperKeys(
-      inheritedNextPage,
-      [],
-      callBack
-    )(dispatch).then(foundActiveKey => {
-      if (!foundActiveKey) {
-        this.focusInheritedTab()
-      }
-    })
+    getRemainingInheritedDeveloperKeys(inheritedNextPage, [], callBack)(dispatch)
   }
 
   showMoreInheritedButton() {
@@ -174,6 +166,10 @@ class DeveloperKeysApp extends React.Component {
       ctx
     } = this.props
     const tab = this.state.selectedTab
+    const globalInheritedList = (inheritedList || []).filter(key => key.inherited_from === 'global')
+    const parentInheritedList = (inheritedList || []).filter(
+      key => key.inherited_from === 'federated_parent'
+    )
 
     return (
       <div>
@@ -224,12 +220,33 @@ class DeveloperKeysApp extends React.Component {
               id="tab-panel-inherited"
               isSelected={tab === 'tab-panel-inherited'}
             >
+              {parentInheritedList.length > 0 && (
+                <>
+                  <Heading margin="small" level="h2">
+                    {I18n.t('Consortium Parent Keys')}
+                  </Heading>
+                  <InheritedTable
+                    prefix="parent"
+                    label={I18n.t('Parent Inherited Developer Keys')}
+                    store={store}
+                    actions={actions}
+                    developerKeysList={parentInheritedList}
+                    ctx={ctx}
+                  />
+                  <Heading margin="small" level="h2">
+                    {I18n.t('Global Keys')}
+                  </Heading>
+                </>
+              )}
               <InheritedTable
+                prefix="global"
+                label={I18n.t('Global Inherited Developer Keys')}
                 ref={this.setInheritedTableRef}
                 store={store}
                 actions={actions}
-                developerKeysList={inheritedList}
+                developerKeysList={globalInheritedList}
                 ctx={ctx}
+                setFocus={this.focusInheritedTab}
               />
               <View as="div" margin="small" padding="large" textAlign="center">
                 {listInheritedDeveloperKeysPending ? (
