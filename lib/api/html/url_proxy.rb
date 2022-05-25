@@ -135,7 +135,7 @@ module Api
             # made absolute with the canvas hostname prepended
             if !url.host && url_str[0] == "/"[0]
               # transpose IDs in the URL
-              if context.shard != target_shard && (args = recognize_path(url_str)) && args[:controller] != "equation_images"
+              if context.shard != target_shard && (args = recognize_path(url_str)) && args[:controller] != absolute_controller("equation_images")
                 transpose_ids(args)
                 args[:host] = host
                 args[:protocol] = protocol
@@ -187,10 +187,11 @@ module Api
         req = Rails.application.routes.send(:make_request, env)
         Rails.application.routes.router.recognize(req) do |route, params|
           params.each do |key, value|
-            if value.is_a?(String)
-              value = value.dup.force_encoding(Encoding::BINARY)
-              params[key] = URI.parser.unescape(value)
-            end
+            next unless value.is_a?(String)
+
+            value = value.dup.force_encoding(Encoding::BINARY)
+            value = absolute_controller(value) if key == :controller
+            params[key] = URI.parser.unescape(value)
           end
           req.path_parameters = params
           app = route.app
@@ -200,6 +201,13 @@ module Api
         end
 
         nil
+      end
+
+      def absolute_controller(controller_string)
+        # Use an absolute controller path, otherwise
+        # `#url_for` attempts to maintain the namespace of
+        # the @proxy class.
+        "/#{controller_string}"
       end
 
       def transpose_ids(args)

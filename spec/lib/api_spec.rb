@@ -34,6 +34,12 @@ class TestApiInstance
   end
 end
 
+module TestNamespace
+  class TestClass
+    include Api
+  end
+end
+
 describe Api do
   context "api_find" do
     before do
@@ -785,32 +791,50 @@ describe Api do
     context "sharding" do
       specs_require_sharding
 
-      it "transposes ids in urls, leaving equation images alone" do
-        html = @shard1.activate do
-          a = Account.create!
-          student_in_course(account: a, active_all: true)
-          @file = attachment_model(context: @course, folder: Folder.root_folders(@course).first)
-          <<~HTML
-            <img src="/equation_images/1%2520%252B%25201%2520%252B%2520n%2520%252B%25202%250A2%2520%252B%25201n%2520%252B%25202n%250A3%2520%252B%2520n%250Ax%2520%252B%250A4%2520%252B%250An?scale=1">
-            <img src="/courses/#{@course.id}/files/#{@file.id}/download?wrap=1" data-api-returntype="File" data-api-endpoint="https://canvas.vanity.edu/api/v1/courses/#{@course.id}/files/#{@file.id}">
-            <a href="/courses/#{@course.id}/pages/module-1" data-api-returntype="Page" data-api-endpoint="https://canvas.vanity.edu/api/v1/courses/#{@course.id}/pages/module-1">link</a>
-          HTML
+      shared_examples_for "proxy classes that define #url_for" do
+        let(:proxy_instance) { raise "set in contexts" }
+
+        before do
+          proxy_instance.instance_variable_set(:@domain_root_account, Account.default)
+          proxy_instance.extend Rails.application.routes.url_helpers
+          proxy_instance.extend ActionDispatch::Routing::UrlFor
+
+          allow(proxy_instance).to receive(:request).and_return(nil)
+          allow(proxy_instance).to receive(:get_host_and_protocol_from_request).and_return(["school.instructure.com", "https"])
+          allow(proxy_instance).to receive(:url_options).and_return({})
         end
 
-        @k = klass.new
-        @k.instance_variable_set(:@domain_root_account, Account.default)
-        @k.extend Rails.application.routes.url_helpers
-        @k.extend ActionDispatch::Routing::UrlFor
-        allow(@k).to receive(:request).and_return(nil)
-        allow(@k).to receive(:get_host_and_protocol_from_request).and_return(["school.instructure.com", "https"])
-        allow(@k).to receive(:url_options).and_return({})
+        it "transposes ids in urls, leaving equation images alone" do
+          html = @shard1.activate do
+            a = Account.create!
+            student_in_course(account: a, active_all: true)
+            @file = attachment_model(context: @course, folder: Folder.root_folders(@course).first)
+            <<~HTML
+              <img src="/equation_images/1%2520%252B%25201%2520%252B%2520n%2520%252B%25202%250A2%2520%252B%25201n%2520%252B%25202n%250A3%2520%252B%2520n%250Ax%2520%252B%250A4%2520%252B%250An?scale=1">
+              <img src="/courses/#{@course.id}/files/#{@file.id}/download?wrap=1" data-api-returntype="File" data-api-endpoint="https://canvas.vanity.edu/api/v1/courses/#{@course.id}/files/#{@file.id}">
+              <a href="/courses/#{@course.id}/pages/module-1" data-api-returntype="Page" data-api-endpoint="https://canvas.vanity.edu/api/v1/courses/#{@course.id}/pages/module-1">link</a>
+            HTML
+          end
 
-        res = @k.api_user_content(html, @course, @student)
-        expect(res).to eq <<~HTML
-          <img src="https://school.instructure.com/equation_images/1%2520%252B%25201%2520%252B%2520n%2520%252B%25202%250A2%2520%252B%25201n%2520%252B%25202n%250A3%2520%252B%2520n%250Ax%2520%252B%250A4%2520%252B%250An?scale=1">
-          <img src="https://school.instructure.com/courses/#{@shard1.id}~#{@course.local_id}/files/#{@shard1.id}~#{@file.local_id}/download?verifier=#{@file.uuid}&amp;wrap=1" data-api-returntype="File" data-api-endpoint="https://school.instructure.com/api/v1/courses/#{@shard1.id}~#{@course.local_id}/files/#{@shard1.id}~#{@file.local_id}">
-          <a href="https://school.instructure.com/courses/#{@shard1.id}~#{@course.local_id}/pages/module-1" data-api-returntype="Page" data-api-endpoint="https://school.instructure.com/api/v1/courses/#{@shard1.id}~#{@course.local_id}/pages/module-1">link</a>
-        HTML
+          res = proxy_instance.api_user_content(html, @course, @student)
+          expect(res).to eq <<~HTML
+            <img src="https://school.instructure.com/equation_images/1%2520%252B%25201%2520%252B%2520n%2520%252B%25202%250A2%2520%252B%25201n%2520%252B%25202n%250A3%2520%252B%2520n%250Ax%2520%252B%250A4%2520%252B%250An?scale=1">
+            <img src="https://school.instructure.com/courses/#{@shard1.id}~#{@course.local_id}/files/#{@shard1.id}~#{@file.local_id}/download?verifier=#{@file.uuid}&amp;wrap=1" data-api-returntype="File" data-api-endpoint="https://school.instructure.com/api/v1/courses/#{@shard1.id}~#{@course.local_id}/files/#{@shard1.id}~#{@file.local_id}">
+            <a href="https://school.instructure.com/courses/#{@shard1.id}~#{@course.local_id}/pages/module-1" data-api-returntype="Page" data-api-endpoint="https://school.instructure.com/api/v1/courses/#{@shard1.id}~#{@course.local_id}/pages/module-1">link</a>
+          HTML
+        end
+      end
+
+      context "with non-namespaced proxy class" do
+        it_behaves_like "proxy classes that define #url_for" do
+          let(:proxy_instance) { klass.new }
+        end
+      end
+
+      context "with namespaced proxy class" do
+        it_behaves_like "proxy classes that define #url_for" do
+          let(:proxy_instance) { TestNamespace::TestClass.new }
+        end
       end
     end
   end
