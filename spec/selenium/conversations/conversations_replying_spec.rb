@@ -48,8 +48,35 @@ describe "conversations new" do
         Account.default.set_feature_flag! :react_inbox, "on"
       end
 
+      it "replies to most recent author using the individual message reply button", ignore_js_errors: true do
+        get "/conversations"
+        f("div[data-testid='conversation']").click
+        wait_for_ajaximations
+        f("button[data-testid='message-reply']").click
+        f("textarea[data-testid='message-body']").send_keys("Quit playing games with my heart")
+        f("button[data-testid='send-button']").click
+        wait_for_ajaximations
+        expect(ConversationMessage.last.body).to eq "Quit playing games with my heart"
+        participants = ConversationMessage.last.conversation_message_participants
+        expect(participants.collect(&:user_id)).to match_array [@s2.id, @teacher.id]
+      end
+
+      it "replies to everyone using the individual message reply all button", ignore_js_errors: true do
+        get "/conversations"
+        f("div[data-testid='conversation']").click
+        wait_for_ajaximations
+        f("button[data-testid='message-more-options']").click
+        fj("li:contains('Reply All')").click
+        f("textarea[data-testid='message-body']").send_keys("everybody")
+        f("button[data-testid='send-button']").click
+        wait_for_ajaximations
+        expect(ConversationMessage.last.body).to eq "everybody"
+        participants = ConversationMessage.last.conversation_message_participants
+        expect(participants.collect(&:user_id)).to match_array [@s2.id, @teacher.id, @s1.id]
+      end
+
       # the js errors caught in here are captured by VICE-2507
-      it "show record / upload media ui when kaltura is enabled", ignore_js_errors: true do
+      it "reply from top bar show record / upload media ui when kaltura is enabled", ignore_js_errors: true do
         stub_kaltura
         get "/conversations"
         f("div[data-testid='conversation']").click
@@ -63,7 +90,7 @@ describe "conversations new" do
         expect(f("input[type='file']")).to be_truthy
       end
 
-      it "reply from mobile detail message view", ignore_js_errors: true do
+      it "reply from conversation header from mobile detail message view", ignore_js_errors: true do
         driver.manage.window.resize_to(565, 836)
         get "/conversations"
         f("div[data-testid='conversation']").click
@@ -75,6 +102,30 @@ describe "conversations new" do
         wait_for_ajaximations
         expect(ConversationMessage.last.body).to eq "hello friends"
         resize_screen_to_standard
+      end
+
+      it "replying using top bar reply button replies to most recent author", ignore_js_errors: true do
+        get "/conversations"
+        f("div[data-testid='conversation']").click
+        wait_for_ajaximations
+        f("span[data-testid='desktop-message-action-header'] button[data-testid='reply']").click
+        f("textarea[data-testid='message-body']").send_keys("just you and me")
+        f("button[data-testid='send-button']").click
+        wait_for_ajaximations
+        participants = ConversationMessage.last.conversation_message_participants
+        expect(participants.collect(&:user_id)).to match_array [@s2.id, @teacher.id]
+      end
+
+      it "replying using top bar reply all button replies to everyone in conversation", ignore_js_errors: true do
+        get "/conversations"
+        f("div[data-testid='conversation']").click
+        wait_for_ajaximations
+        f("span[data-testid='desktop-message-action-header'] button[data-testid='reply-all']").click
+        f("textarea[data-testid='message-body']").send_keys("everybody")
+        f("button[data-testid='send-button']").click
+        wait_for_ajaximations
+        participants = ConversationMessage.last.conversation_message_participants
+        expect(participants.collect(&:user_id)).to match_array [@s2.id, @teacher.id, @s1.id]
       end
     end
 
@@ -137,21 +188,6 @@ describe "conversations new" do
         it "replies to all users from the settings icon next to the message", priority: "2" do
           go_to_inbox_and_select_message
           f(".message-detail-actions .icon-settings").click
-          f(".ui-menu-item .reply-all-btn").click
-          assert_number_of_recipients(2)
-        end
-
-        it "replies to message from mouse hover", priority: "2" do
-          go_to_inbox_and_select_message
-          driver.action.move_to(f(".message-content .message-item-view")).perform
-          f(".message-info .reply-btn").click
-          assert_number_of_recipients(1)
-        end
-
-        it "replies to all from mouse hover", priority: "2" do
-          go_to_inbox_and_select_message
-          driver.action.move_to(f(".message-content .message-item-view")).perform
-          f(".message-info .icon-settings").click
           f(".ui-menu-item .reply-all-btn").click
           assert_number_of_recipients(2)
         end
