@@ -41,6 +41,7 @@ class CourseSection < ActiveRecord::Base
     where("discussion_topic_section_visibilities.workflow_state<>'deleted'")
   }, dependent: :destroy
   has_many :discussion_topics, through: :discussion_topic_section_visibilities
+  has_many :course_paces, dependent: :destroy
 
   before_validation :infer_defaults, :verify_unique_sis_source_id, :verify_unique_integration_id
   validates :course_id, :root_account_id, :workflow_state, presence: true
@@ -54,6 +55,7 @@ class CourseSection < ActiveRecord::Base
   after_save :update_account_associations_if_changed
   after_save :delete_enrollments_later_if_deleted
   after_save :update_enrollment_states_if_necessary
+  after_save :republish_course_pace_if_needed
 
   include StickySisFields
   are_sis_sticky :course_id, :name, :start_at, :end_at, :restrict_enrollments_to_section_dates
@@ -418,5 +420,12 @@ class CourseSection < ActiveRecord::Base
       EnrollmentState.delay_if_production(n_strand: ["invalidate_enrollment_states", global_root_account_id])
                      .invalidate_states_for_course_or_section(self)
     end
+  end
+
+  def republish_course_pace_if_needed
+    return unless (saved_changes.keys & %w[start_at conclude_at restrict_enrollments_to_section_dates]).present?
+    return unless course.enable_course_paces?
+
+    course_paces.published.find_each(&:create_publish_progress)
   end
 end
