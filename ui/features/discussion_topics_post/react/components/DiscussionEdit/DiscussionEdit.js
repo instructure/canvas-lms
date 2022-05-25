@@ -143,6 +143,7 @@ export const DiscussionEdit = props => {
               setTimeout(() => {
                 rceRef?.current?.focus()
               }, 1000)
+              props.onInit()
             }}
             ref={rceRef}
             onContentChange={content => {
@@ -290,7 +291,8 @@ DiscussionEdit.propTypes = {
   onSetDraftSaved: PropTypes.func,
   isEdit: PropTypes.bool,
   quotedEntry: PropTypes.object,
-  updateDraft: PropTypes.func
+  updateDraft: PropTypes.func,
+  onInit: PropTypes.func
 }
 
 DiscussionEdit.defaultProps = {
@@ -298,7 +300,8 @@ DiscussionEdit.defaultProps = {
   isEdit: false,
   quotedEntry: null,
   value: '',
-  updateDraft: () => {}
+  updateDraft: () => {},
+  onInit: () => {}
 }
 
 export default DiscussionEdit

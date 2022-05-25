@@ -467,6 +467,13 @@ export const IsolatedViewContainer = props => {
                     }
                   })
                 }}
+                onInit={() => {
+                  // TinyMCE popup menus' z-index should be greater than tray.
+                  const menus = document.querySelector('.tox.tox-tinymce-aux')
+                  if (menus) {
+                    menus.style.zIndex = '10000'
+                  }
+                }}
               />
             </View>
           )}
