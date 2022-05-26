@@ -46,7 +46,8 @@ module SendToStream
       block = self.class.send_to_stream_block rescue nil
       stream_recipients = Array(instance_eval(&block)) if block
       if stream_recipients.present?
-        delay_if_production(priority: Delayed::LOW_PRIORITY).create_stream_items
+        strand = "create_stream_items:#{stream_recipients.compact.filter_map { |u| User.infer_id(u) }.uniq.join("_").hex}"
+        delay_if_production(priority: Delayed::LOW_PRIORITY, strand: strand).create_stream_items
       end
       true
     end
