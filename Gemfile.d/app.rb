@@ -102,7 +102,7 @@ gem_override "inst-jobs", "3.1.3"
     gem "et-orbi", "1.2.4", require: false
 gem "inst-jobs-autoscaling", "2.1.1"
   gem "aws-sdk-autoscaling", "1.49.0", require: false
-gem "inst-jobs-statsd", "2.1.2"
+gem "inst-jobs-statsd", "2.2.0"
 # if updating json gem it will need to be hotfixed because if a newer version of
 # the json gem is installed, it will always use that one even before bundler
 # gets activated. Updating the gem in it's own commit will make this easier.
