@@ -1761,6 +1761,13 @@ module Lti
             expect(exp_hash[:test]).to eq right_now.utc.iso8601
           end
 
+          it "has substitution for $Canvas.assignment.allDueAts.iso8601" do
+            allow(variable_expander).to receive(:unique_submission_dates).and_return([right_now, nil])
+            exp_hash = { test: "$Canvas.assignment.allDueAts.iso8601" }
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq right_now.utc.iso8601 + ","
+          end
+
           it "handles a nil unlock_at" do
             allow(assignment).to receive(:unlock_at).and_return(nil)
             exp_hash = { test: "$Canvas.assignment.unlockAt.iso8601" }
