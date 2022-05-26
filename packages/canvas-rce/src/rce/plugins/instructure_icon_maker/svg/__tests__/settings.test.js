@@ -21,6 +21,7 @@ import {renderHook, act} from '@testing-library/react-hooks/dom'
 import {useSvgSettings, svgFromUrl, statuses} from '../settings'
 import Editor from '../../../shared/__tests__/FakeEditor'
 import RceApiSource from '../../../../../rcs/api'
+import {TYPE} from '../constants'
 
 jest.mock('../../../../../rcs/api')
 
@@ -54,7 +55,7 @@ describe('useSvgSettings()', () => {
       const [settings, ,] = subject().current
 
       expect(settings).toEqual({
-        type: 'image/svg+xml-icon-maker-icons',
+        type: TYPE,
         alt: '',
         shape: 'square',
         size: 'small',
@@ -68,7 +69,7 @@ describe('useSvgSettings()', () => {
         textSize: 'small',
         textColor: '#000000',
         textBackgroundColor: null,
-        textPosition: 'middle',
+        textPosition: 'below',
         x: 0,
         y: 0,
         translateX: 0,
@@ -105,7 +106,7 @@ describe('useSvgSettings()', () => {
         const result = subject()
         act(() => result.current[2](settingsUpdate))
         expect(result.current[0]).toEqual({
-          type: 'image/svg+xml-icon-maker-icons',
+          type: TYPE,
           name: 'Banana',
           alt: '',
           shape: 'square',
@@ -120,7 +121,7 @@ describe('useSvgSettings()', () => {
           textSize: 'small',
           textColor: '#000000',
           textBackgroundColor: null,
-          textPosition: 'middle',
+          textPosition: 'below',
           x: 0,
           y: 0,
           translateX: 0,
@@ -168,7 +169,7 @@ describe('useSvgSettings()', () => {
             "textSize":"medium",
             "textColor":"#009606",
             "textBackgroundColor":"#06A3B7",
-            "textPosition":"middle"
+            "textPosition":"below"
           }
         </metadata>
         <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/>
@@ -269,7 +270,7 @@ describe('useSvgSettings()', () => {
       })
 
       expect(result.current[0]).toEqual({
-        type: 'image/svg+xml-icon-maker-icons',
+        type: TYPE,
         alt: 'a test image',
         shape: 'triangle',
         size: 'large',
@@ -284,7 +285,7 @@ describe('useSvgSettings()', () => {
         textColor: '#009606',
         textBackgroundColor: '#06A3B7',
         imageSettings: null,
-        textPosition: 'middle',
+        textPosition: 'below',
         x: 0,
         y: 0,
         translateX: 0,
@@ -314,7 +315,7 @@ describe('useSvgSettings()', () => {
                 textSize: 'medium',
                 textColor: '#009606',
                 textBackgroundColor: '#06A3B7',
-                textPosition: 'middle',
+                textPosition: 'below',
                 imageSettings: {
                   cropperSettings: null,
                   icon: {
@@ -374,7 +375,7 @@ describe('useSvgSettings()', () => {
             image: 'Art Icon',
             mode: 'SingleColor'
           },
-          textPosition: 'middle',
+          textPosition: 'below',
           x: 0,
           y: 0,
           translateX: 0,
@@ -430,7 +431,7 @@ describe('useSvgSettings()', () => {
             image: 'Art Icon',
             mode: 'SingleColor'
           },
-          textPosition: 'middle',
+          textPosition: 'below',
           x: 0,
           y: 0,
           translateX: 0,
@@ -480,7 +481,7 @@ describe('useSvgSettings()', () => {
           textColor: '#009606',
           textBackgroundColor: '#06A3B7',
           imageSettings: null,
-          textPosition: 'middle',
+          textPosition: 'below',
           x: 0,
           y: 0,
           translateX: 0,
@@ -519,7 +520,7 @@ describe('useSvgSettings()', () => {
       it('uses the default settings', () => {
         const result = subject()
         expect(result.current[0]).toEqual({
-          type: 'image/svg+xml-icon-maker-icons',
+          type: TYPE,
           alt: '',
           shape: 'square',
           size: 'small',
@@ -533,7 +534,7 @@ describe('useSvgSettings()', () => {
           textSize: 'small',
           textColor: '#000000',
           textBackgroundColor: null,
-          textPosition: 'middle',
+          textPosition: 'below',
           x: 0,
           y: 0,
           translateX: 0,
@@ -552,7 +553,7 @@ describe('useSvgSettings()', () => {
       it('uses the default settings', async () => {
         const result = subject()
         expect(result.current[0]).toEqual({
-          type: 'image/svg+xml-icon-maker-icons',
+          type: TYPE,
           alt: '',
           shape: 'square',
           size: 'small',
@@ -567,7 +568,7 @@ describe('useSvgSettings()', () => {
           textColor: '#000000',
           textBackgroundColor: null,
           imageSettings: null,
-          textPosition: 'middle',
+          textPosition: 'below',
           x: 0,
           y: 0,
           translateX: 0,
@@ -609,7 +610,7 @@ describe('useSvgSettings()', () => {
                 "textSize":"medium",
                 "textColor":"#009606",
                 "textBackgroundColor":"#06A3B7",
-                "textPosition":"middle"
+                "textPosition":"below"
               }
             </metadata>
             <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/>
@@ -631,7 +632,7 @@ describe('useSvgSettings()', () => {
                 "textSize":"medium",
                 "textColor":"#009606",
                 "textBackgroundColor":"#06A3B7",
-                "textPosition":"middle"
+                "textPosition":"below"
               }
             </metadata>
             <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/>

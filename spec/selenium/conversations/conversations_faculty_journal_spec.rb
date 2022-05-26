@@ -41,69 +41,7 @@ describe "conversations new" do
     @group.users = [@s1, @s2]
   end
 
-  context "Course with Faculty Journal not enabled" do
-    before do
-      site_admin_logged_in
-    end
-
-    it "allows a site admin to enable faculty journal", priority: "2" do
-      get account_settings_url
-      f("#account_enable_user_notes").click
-      f('.Button.Button--primary[type="submit"]').click
-      wait_for_ajaximations
-      expect(is_checked("#account_enable_user_notes")).to be_truthy
-    end
-  end
-
-  context "Course with Faculty Journal enabled" do
-    before do
-      site_admin_logged_in
-      @course.account.update_attribute(:enable_user_notes, true)
-    end
-
-    it "checks the Journal messages for correct time and sender", priority: "1" do
-      user_session(@teacher)
-      conversations
-      compose course: @course, subject: "Christmas", to: [@s1], body: "The Fat Man cometh.", journal: true, send: true
-      time = format_time_for_view(UserNote.last.updated_at)
-      get student_user_notes_url
-      expect(f(".subject")).to include_text("Christmas")
-      expect(f(".user_content").text).to eq "The Fat Man cometh."
-      expect(f(".creator_name")).to include_text(@teacher.name)
-      expect(f(".creator_name")).to include_text(time)
-    end
-
-    it "allows an admin to delete a Journal message", priority: "1" do
-      skip_if_safari(:alert)
-      user_session(@teacher)
-      conversations
-      compose course: @course, subject: "Christmas", to: [@s1], body: "The Fat Man cometh.", journal: true, send: true
-      get student_user_notes_url
-      f(".delete_link").click
-      driver.switch_to.alert.accept
-      wait_for_ajaximations
-      expect(f(".title.subject").text).to eq("")
-      get student_user_notes_url
-      expect(f(".title.subject").text).to eq("")
-    end
-
-    it "allows a new entry by an admin", priority: "1" do
-      get student_user_notes_url
-      f("#new_user_note_button").click
-      wait_for_ajaximations # wait for the form to `.slideDown()`
-      replace_content(f("#user_note_title"), "FJ Title 2")
-      replace_content(f("textarea"), "FJ Body text 2")
-      f(".send_button").click
-      wait_for_ajaximations
-      time = format_time_for_view(UserNote.last.updated_at)
-      get student_user_notes_url
-      expect(f(".subject").text).to eq "FJ Title 2"
-      expect(f(".user_content").text).to eq "FJ Body text 2"
-      expect(f(".creator_name")).to include_text(time)
-    end
-  end
-
-  context "Faculty Journal" do
+  context "Conversations Faculty Journal" do
     before do
       Account.default.update_attribute(:enable_user_notes, true)
     end
@@ -185,21 +123,6 @@ describe "conversations new" do
         expect(is_checked(".user_note")).not_to be_present
       end
 
-      it "has the Journal entry checkbox visible", priority: "1" do
-        user_session(@teacher)
-        conversations
-        f("#compose-btn").click
-        wait_for_ajaximations
-        expect(f(".user_note")).not_to be_displayed
-
-        select_message_course(@course)
-        add_message_recipient(@s1)
-        write_message_body("Give the Turkey his day")
-        expect(f(".user_note")).to be_displayed
-        add_message_recipient(@s2)
-        expect(f(".user_note")).to be_displayed
-      end
-
       it "sends a message with faculty journal checked", priority: "1" do
         user_session(@teacher)
         conversations
@@ -229,17 +152,77 @@ describe "conversations new" do
         f("button[data-testid='compose']").click
         # select the only course option
         f("input[placeholder='Select Course']").click
-        f("li[role='none']").click
-        ff("input[aria-label='Address Book']")[1].send_keys "first student"
+        fj("li:contains('#{@course.name}')").click
+        ff("input[aria-label='Address Book']")[1].send_keys @s1.name
         wait_for_ajaximations
-        driver.action.send_keys(:arrow_down).perform
-        driver.action.send_keys(:enter).perform
-        wait_for_ajaximations
+        fj("li:contains('#{@s1.name}')").click
         fj("label:contains('Add as a Faculty Journal entry')").click
         f("textarea[data-testid='message-body']").send_keys "hallo!"
         fj("button:contains('Send')").click
         wait_for_ajaximations
         expect(@s1.user_notes.last.note).to eq "hallo!"
+      end
+
+      it "can faculty journalize a message sent to a group" do
+        user_session(@teacher)
+        get conversations_path
+        f("button[data-testid='compose']").click
+        f("input[placeholder='Select Course']").click
+        fj("li:contains('#{@course.name}')").click
+        ff("input[aria-label='Address Book']")[1].click
+        fj("li:contains('Student Groups')").click
+        wait_for_ajaximations
+        fj("li:contains('#{@group.name}')").click
+        fj("li:contains('All in #{@group.name}')").click
+        fj("label:contains('Add as a Faculty Journal entry')").click
+        f("textarea[data-testid='message-body']").send_keys "this is a group message!"
+        fj("button:contains('Send')").click
+        wait_for_ajaximations
+        expect(@s1.user_notes.last.note).to eq "this is a group message!"
+      end
+
+      it "does not show faculty journal option if sender is a student" do
+        user_session(@s1)
+        get conversations_path
+        f("button[data-testid='compose']").click
+        f("input[placeholder='Select Course']").click
+        fj("li:contains('#{@course.name}')").click
+        ff("input[aria-label='Address Book']")[1].click
+        fj("li:contains('Students')").click
+        wait_for_ajaximations
+        fj("li:contains('#{@s2.name}')").click
+        wait_for_ajaximations
+        expect(f("body")).not_to contain_jqcss "label:contains('Add as a Faculty Journal entry')"
+      end
+
+      it "does not show faculty journal option if disabled at the account level" do
+        account.update_attribute(:enable_user_notes, false)
+
+        user_session(@teacher)
+        get conversations_path
+        f("button[data-testid='compose']").click
+        f("input[placeholder='Select Course']").click
+        fj("li:contains('#{@course.name}')").click
+        ff("input[aria-label='Address Book']")[1].click
+        fj("li:contains('Students')").click
+        wait_for_ajaximations
+        fj("li:contains('#{@s2.name}')").click
+        wait_for_ajaximations
+        expect(f("body")).not_to contain_jqcss "label:contains('Add as a Faculty Journal entry')"
+      end
+
+      it "does not show faculty journal option if messaging a non-student" do
+        user_session(@teacher)
+        get conversations_path
+        f("button[data-testid='compose']").click
+        f("input[placeholder='Select Course']").click
+        fj("li:contains('#{@course.name}')").click
+        ff("input[aria-label='Address Book']")[1].click
+        fj("li:contains('Teachers')").click
+        wait_for_ajaximations
+        fj("li:contains('#{@teacher.name}')").click
+        wait_for_ajaximations
+        expect(f("body")).not_to contain_jqcss "label:contains('Add as a Faculty Journal entry')"
       end
     end
   end

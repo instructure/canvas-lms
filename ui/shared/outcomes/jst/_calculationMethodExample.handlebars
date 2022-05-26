@@ -4,6 +4,11 @@
 
   <dt class="example">{{#t}}Example{{/t}}: </dt>
   <dd id="calculation_int_example" class="example">{{exampleText}}</dd>
+  
+  {{#if exampleWarning}}
+  <dt class="example">{{#t}}Warning{{/t}}: </dt>
+  <dd class="example">{{exampleWarning}}</dd>
+  {{/if}}
 
   <dt class="example">
     <span aria-hidden="true">{{#t}}1- Item scores{{/t}}: </span>

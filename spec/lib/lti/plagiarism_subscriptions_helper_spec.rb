@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../../apis/lti/lti2_api_spec_helper"
-require_relative "../../../lib/lti/plagiarism_subscriptions_helper"
+require "spec/apis/lti/lti2_api_spec_helper"
+require "lib/lti/plagiarism_subscriptions_helper"
 
 describe Lti::PlagiarismSubscriptionsHelper do
   include_context "lti2_api_spec_helper"
@@ -50,6 +50,7 @@ describe Lti::PlagiarismSubscriptionsHelper do
     course_with_teacher(active_all: true)
     allow(subscription_service).to receive_messages(create_tool_proxy_subscription: stub_response)
     allow(subscription_service).to receive_messages(available?: true)
+    allow(subscription_service).to receive_messages(disabled?: false)
 
     tool_proxy[:raw_data]["enabled_capability"] = [Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2]
     tool_proxy[:raw_data]["tool_profile"] = { "service_offered" => [submission_event_service] }
@@ -89,12 +90,18 @@ describe Lti::PlagiarismSubscriptionsHelper do
 
     context "bad subscriptions service configuration" do
       before do
-        ss = class_double(Services::LiveEventsSubscriptionService).as_stubbed_const
-        allow(ss).to receive_messages(create_tool_proxy_subscription: stub_bad_response)
-        allow(ss).to receive_messages(available?: false)
+        @ss = class_double(Services::LiveEventsSubscriptionService).as_stubbed_const
+        allow(@ss).to receive_messages(create_tool_proxy_subscription: stub_bad_response)
+        allow(@ss).to receive_messages(available?: false)
+      end
+
+      it "does nothing if service is disabled" do
+        expect(@ss).to receive_messages(disabled?: true)
+        expect(subscription_helper.create_subscription).to be_nil
       end
 
       it "raises 'PlagiarismSubscriptionError' with error message if subscriptions service is not configured" do
+        expect(@ss).to receive_messages(disabled?: false)
         expect { subscription_helper.create_subscription }.to raise_exception(Lti::PlagiarismSubscriptionsHelper::PlagiarismSubscriptionError, "Live events subscriptions service is not configured")
       end
     end

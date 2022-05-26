@@ -1435,7 +1435,6 @@ class Course < ActiveRecord::Base
   end
 
   def do_offer
-    self.start_at ||= Time.now
     delay_if_production.invite_uninvited_students
   end
 

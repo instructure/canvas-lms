@@ -110,7 +110,22 @@ class DeveloperKeysController < ApplicationController
               DeveloperKey.where(account_id: @context.id)
             end
     scope = scope.eager_load(:tool_configuration) unless params[:inherited]
-    scope.nondeleted.preload(:account).order("developer_keys.id DESC")
+    scope = scope.nondeleted.preload(:account).order("developer_keys.id DESC")
+
+    # query for parent keys is most likely cross-shard,
+    # so doesn't fit into the scope cases above
+    if params[:inherited].present? && !@context.primary_settings_root_account?
+      federated_parent = @context.account_chain(include_federated_parent: true).last
+      parent_keys = DeveloperKey
+                    .shard(federated_parent.shard)
+                    .where(account: federated_parent)
+                    .nondeleted
+                    .order("developer_keys.id DESC")
+
+      return parent_keys + scope
+    end
+
+    scope
   end
 
   def set_key

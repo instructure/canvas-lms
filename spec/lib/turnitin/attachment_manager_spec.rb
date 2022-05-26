@@ -29,18 +29,37 @@ module Turnitin
     describe ".create_attachment" do
       it "creates an attachment" do
         expect do
-          subject.class.create_attachment(lti_student, lti_assignment, tool, outcome_response_json)
+          subject.class.create_attachment(tii_client, lti_student, lti_assignment)
         end.to change { lti_assignment.attachments.count }.by(1)
       end
 
       it "uses the filename from the tii client and replaces forward slashes with dashes" do
-        subject.class.create_attachment(lti_student, lti_assignment, tool, outcome_response_json)
+        subject.class.create_attachment(tii_client, lti_student, lti_assignment)
         expect(lti_assignment.attachments.first.display_name).to eq "my-new-filename.txt"
       end
 
       it "assigns the correct user" do
-        subject.class.create_attachment(lti_student, lti_assignment, tool, outcome_response_json)
+        subject.class.create_attachment(tii_client, lti_student, lti_assignment)
         expect(lti_assignment.attachments.first.user).to eq lti_student
+      end
+
+      context "when the TII response is an error" do
+        let(:response_mock) do
+          r_mock = double("response")
+          allow(r_mock).to receive(:headers).and_return({})
+          allow(r_mock).to receive(:body).and_return("abcdef")
+          allow(r_mock).to receive(:status).and_return(401)
+          r_mock
+        end
+
+        it "raises a OriginalSubmissionUnavailableError with the status code" do
+          expect do
+            subject.class.create_attachment(tii_client, lti_student, lti_assignment)
+          end.to raise_error do |e|
+            expect(e).to be_a(Turnitin::Errors::OriginalSubmissionUnavailableError)
+            expect(e.status_code).to eq(401)
+          end
+        end
       end
     end
 

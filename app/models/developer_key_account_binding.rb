@@ -48,8 +48,8 @@ class DeveloperKeyAccountBinding < ApplicationRecord
             .eager_load(developer_key: :tool_configuration)
   }
 
-  # Find a DeveloperKeyAccountBinding in order of account_ids. The search for a binding will
-  # be prioritized by the order of account_ids. If a binding is found for the first account
+  # Find a DeveloperKeyAccountBinding in order of accounts. The search for a binding will
+  # be prioritized by the order of accounts. If a binding is found for the first account
   # that binding will be returned, otherwise the next account will be searched and so on.
   #
   # By default only bindings with a workflow set to “on” or “off” are considered. To include
@@ -65,16 +65,21 @@ class DeveloperKeyAccountBinding < ApplicationRecord
   #
   # find_in_account_priority([1, 2, 3, 4], developer_key.id, false) would return the binding for
   # account 2.
-  def self.find_in_account_priority(account_ids, developer_key_id, explicitly_set = true)
-    raise "Account ids must be integers" if account_ids.any? { |id| !id.is_a?(Integer) }
+  #
+  # With a cross-shard account at some point in the account chain, bindings are searched for across
+  # each shard of each account. Bindings on the current shard are prioritized.
+  def self.find_in_account_priority(accounts, developer_key_id, explicitly_set: true)
+    bindings = Shard.partition_by_shard(accounts) do |accounts_by_shard|
+      account_ids_string = "{#{accounts_by_shard.map(&:id).join(",")}}"
+      relation = DeveloperKeyAccountBinding
+                 .joins(sanitize_sql("JOIN unnest('#{account_ids_string}'::int8[]) WITH ordinality AS i (id, ord) ON i.id=account_id"))
+                 .where(developer_key_id: developer_key_id)
+                 .order(:ord)
+      relation = relation.where.not(workflow_state: "allow") if explicitly_set
+      relation.take
+    end
 
-    account_ids_string = "{#{account_ids.join(",")}}"
-    relation = DeveloperKeyAccountBinding
-               .joins("JOIN unnest('#{account_ids_string}'::int8[]) WITH ordinality AS i (id, ord) ON i.id=account_id")
-               .where(developer_key_id: developer_key_id)
-               .order(:ord)
-    relation = relation.where.not(workflow_state: "allow") if explicitly_set
-    relation.take
+    bindings.compact.partition { |b| b.shard == Shard.current }.flatten.first
   end
 
   def self.find_site_admin_cached(developer_key)

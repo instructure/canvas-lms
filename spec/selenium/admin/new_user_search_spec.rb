@@ -23,7 +23,6 @@ require_relative "pages/new_course_search_page"
 require_relative "pages/new_user_edit_modal_page"
 require_relative "pages/edit_existing_user_modal_page"
 require_relative "pages/masquerade_page"
-require_relative "../conversations/conversations_new_message_modal_page"
 
 describe "new account user search" do
   include_context "in-process server selenium tests"
@@ -31,7 +30,6 @@ describe "new account user search" do
   include NewCourseSearchPage
   include NewUserEditModalPage
   include MasqueradePage
-  include ConversationsNewMessageModalPage
   include EditExistingUserModalPage
 
   before :once do
@@ -66,7 +64,7 @@ describe "new account user search" do
 
     it "opens the conversation page when clicking the send message button", priority: "1" do
       click_message_button(@user.name)
-      expect(message_recipient_input).to include_text @user.name
+      expect(f(".message-header-input .ac-token")).to include_text @user.name
     end
 
     it "searches but not find bogus user", priority: "1" do

@@ -29,6 +29,11 @@ import _ from 'underscore'
 import Backbone from '@canvas/backbone'
 import template from '../../jst/Syllabus.handlebars'
 
+function assignmentSubType(json) {
+  if (/discussion/.test(json.submission_types)) return 'discussion_topic'
+  if (/quiz/.test(json.submission_types)) return 'quiz'
+  return undefined
+}
 export default class SyllabusView extends Backbone.View {
   static initClass() {
     this.prototype.template = template
@@ -124,6 +129,7 @@ export default class SyllabusView extends Backbone.View {
       } else if (html_url_for_event) {
         html_url = json.html_url
       }
+
       const title = json.title
       if (json.start_at) {
         start_at = $.fudgeDateForProfileTimezone(json.start_at)
@@ -178,6 +184,7 @@ export default class SyllabusView extends Backbone.View {
       lastEvent = {
         related_id,
         type: json.type,
+        subtype: assignmentSubType(json),
         title,
         html_url,
         start_at,

@@ -74,7 +74,6 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
   ) => {
     const conditions: FilterCondition[] = []
 
-    // Is section filter not represented?
     if (initialRowFilterSettings.section_id) {
       conditions.push({
         id: uuid.v4(),
@@ -84,7 +83,6 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
       })
     }
 
-    // Is student group filter not represented?
     if (initialRowFilterSettings.student_group_id) {
       conditions.push({
         id: uuid.v4(),
@@ -131,8 +129,10 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
       })
     }
 
-    // Is grading period filter not represented?
-    if (initialColumnFilterSettings.grading_period_id) {
+    if (
+      initialColumnFilterSettings.grading_period_id &&
+      initialColumnFilterSettings.grading_period_id !== '0'
+    ) {
       conditions.push({
         id: uuid.v4(),
         value: initialColumnFilterSettings.grading_period_id,

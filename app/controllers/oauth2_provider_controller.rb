@@ -19,7 +19,6 @@
 #
 
 class OAuth2ProviderController < ApplicationController
-  rescue_from Canvas::OAuth::RequestError, with: :oauth_error
   protect_from_forgery except: %i[token destroy], with: :exception
   before_action :run_login_hooks, only: %i[token]
   skip_before_action :require_reacceptance_of_terms, only: %i[token destroy]
@@ -35,14 +34,12 @@ class OAuth2ProviderController < ApplicationController
     scopes = (params[:scope] || params[:scopes] || "").split
 
     provider = Canvas::OAuth::Provider.new(params[:client_id], params[:redirect_uri], scopes, params[:purpose])
-    unless provider.has_valid_key?
-      @should_not_redirect = true
-      raise Canvas::OAuth::RequestError, :invalid_client_id
-    end
-
-    unless provider.has_valid_redirect?
-      @should_not_redirect = true
-      raise Canvas::OAuth::RequestError, :invalid_redirect
+    begin
+      raise Canvas::OAuth::RequestError, :invalid_client_id unless provider.has_valid_key?
+      raise Canvas::OAuth::RequestError, :invalid_redirect unless provider.has_valid_redirect?
+    rescue Canvas::OAuth::RequestError => e
+      oauth_error(e)
+      return
     end
 
     if provider.key.require_scopes? && !provider.valid_scopes?
@@ -98,6 +95,8 @@ class OAuth2ProviderController < ApplicationController
       redirect_to login_url(params.permit(:canvas_login, :force_login,
                                           :authentication_provider, pseudonym_session: :unique_id))
     end
+  rescue Canvas::OAuth::RequestError => e
+    Canvas::OAuth::Provider.is_oob?(params[:redirect_uri]) ? oauth_error(e) : redirect_oauth_error(e)
   end
 
   def confirm
@@ -157,6 +156,8 @@ class OAuth2ProviderController < ApplicationController
     increment_request_cost(Setting.get("oauth_token_additional_request_cost", "200").to_i)
 
     render json: token
+  rescue Canvas::OAuth::RequestError => e
+    Account.site_admin.feature_enabled?(:no_redirect_on_oauth_token_method) ? oauth_error(e) : old_silly_behavior(e)
   end
 
   def destroy
@@ -179,7 +180,17 @@ class OAuth2ProviderController < ApplicationController
   private
 
   def oauth_error(exception)
-    if @should_not_redirect || params[:redirect_uri] == Canvas::OAuth::Provider::OAUTH2_OOB_URI || params[:redirect_uri].blank?
+    response["WWW-Authenticate"] = "Canvas OAuth 2.0" if exception.http_status == 401
+    render(exception.to_render_data)
+  end
+
+  def redirect_oauth_error(exception)
+    redirect_to exception.redirect_uri(params[:redirect_uri])
+  end
+
+  # this method should be removed when the no_redirect_on_oauth_token_method flag is removed
+  def old_silly_behavior(exception)
+    if @should_not_redirect || Canvas::OAuth::Provider.is_oob?(params[:redirect_uri]) || params[:redirect_uri].blank?
       response["WWW-Authenticate"] = "Canvas OAuth 2.0" if exception.http_status == 401
       render(exception.to_render_data)
     else

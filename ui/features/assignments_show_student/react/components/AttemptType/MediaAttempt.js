@@ -17,7 +17,7 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {getAutoTrack} from '../../../../media_player_iframe_content/react/CanvasMediaPlayer'
+import {getAutoTrack} from '@canvas/canvas-media-player'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {bool, func} from 'prop-types'
 import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
@@ -38,7 +38,7 @@ import {
   UploadMediaStrings,
   MediaCaptureStrings,
   SelectStrings
-} from '../../helpers/UploadMediaTranslations'
+} from '@canvas/upload-media-translations'
 import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
 
 import {Button} from '@instructure/ui-buttons'

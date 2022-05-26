@@ -23,14 +23,15 @@ import {Attachment, attachmentProp} from './Attachment'
 
 export const AttachmentDisplay = ({...props}) => {
   return (
-    <Flex>
+    <Flex alignItems="start" wrap="wrap">
       {props.attachments.map(a => (
-        <Attachment
-          key={a.id}
-          attachment={a}
-          onReplace={props.onReplaceItem.bind(null, a.id)}
-          onDelete={props.onDeleteItem.bind(null, a.id)}
-        />
+        <Flex.Item key={a.id}>
+          <Attachment
+            attachment={a}
+            onReplace={props.onReplaceItem.bind(null, a.id)}
+            onDelete={props.onDeleteItem.bind(null, a.id)}
+          />
+        </Flex.Item>
       ))}
     </Flex>
   )

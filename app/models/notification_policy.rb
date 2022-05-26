@@ -180,7 +180,7 @@ class NotificationPolicy < ActiveRecord::Base
                            "never"
                          end
           np.save!
-        rescue ActiveRecord::RecordNotUnique
+        rescue ActiveRecord::RecordNotUnique, ActiveRecord::InvalidForeignKey
           np = nil
           raise ActiveRecord::Rollback
         end

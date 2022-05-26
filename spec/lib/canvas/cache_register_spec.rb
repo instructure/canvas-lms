@@ -234,6 +234,12 @@ describe Canvas::CacheRegister do
             end
           end
         end
+
+        it "doesn't raise when passed a new record" do
+          expect do
+            User.clear_cache_keys(User.new, :enrollments)
+          end.not_to raise_error
+        end
       end
     end
   end
@@ -320,6 +326,12 @@ describe Canvas::CacheRegister do
         expect(Rails.cache).not_to receive(:fetch_with_cache_register)
         check_cache
       end
+    end
+
+    it "does not cache on a new record" do
+      expect(Canvas::CacheRegister).not_to receive(:redis)
+      res1 = Rails.cache.fetch_with_batched_keys("blah", batch_object: User.new, batched_keys: [:enrollments]) { 1 }
+      expect(res1).to eq 1
     end
 
     it "checks the key types" do

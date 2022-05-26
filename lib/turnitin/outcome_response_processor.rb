@@ -17,6 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+# Jobs for LTI 1 plagiarism tools. After TII hits an endpoint
+# (LtiAppController#turnitin_outcomes_placement) saying they have received a
+# submission, it starts a job to run #process here, which will downloads the
+# submission content attachment attachment and kicks off a job to get the
+# plagiarism data later. (or just the plagiarism score if run a second time)
+# See doc/lti_manual/15_plagiarism.md
 module Turnitin
   class OutcomeResponseProcessor
     # this one goes to 14 (so that the last attempt is ~24hr after the first)
@@ -40,9 +46,10 @@ module Turnitin
 
     def new_submission
       # Create an attachment for the file submitted via the TII tool.
-      # If the score is still pending, this will raise
-      # `Errors::ScoreStillPendingError`
-      attachment = AttachmentManager.create_attachment(@user, @assignment, @tool, @outcomes_response_json)
+      # If the submission is still pending, this will raise
+      # `Errors::OriginalSubmissionUnavailableError`
+      # Uses same turnitin_client to avoid fetching the TII submission info JSON multiple times
+      attachment = AttachmentManager.create_attachment(turnitin_client, @user, @assignment)
 
       # If we've made it this far, we've successfully
       # retrieved an attachment from TII
@@ -65,9 +72,9 @@ module Turnitin
       stash_turnitin_client do
         delay(max_attempts: self.class.max_attempts).update_originality_data(submission, asset_string)
       end
-    rescue Errors::ScoreStillPendingError
+    rescue Errors::OriginalSubmissionUnavailableError => e
       if attempt_number == self.class.max_attempts
-        create_error_attachment
+        handle_failure_fetching_original_submission(e.status_code)
         raise
       else
         turnitin_processor = Turnitin::OutcomeResponseProcessor.new(@tool, @assignment, @user, @outcomes_response_json)
@@ -81,9 +88,23 @@ module Turnitin
       end
     rescue
       if attempt_number == self.class.max_attempts
-        create_error_attachment
+        handle_failure_fetching_original_submission
       end
       raise
+    end
+
+    # Create an error attachment. If we got an uploaded_at date, also make a
+    # dummy submission with turnitin error so it shows up in speedgrader.
+    def handle_failure_fetching_original_submission(status_code = nil)
+      error_attachment = create_error_attachment(status_code)
+
+      return unless turnitin_client.uploaded_at
+
+      update_turnitin_data_with_error!(
+        submit_homework(error_attachment),
+        error_attachment.asset_string,
+        missing_submission: true
+      )
     end
 
     def resubmit(submission, asset_string)
@@ -106,23 +127,39 @@ module Turnitin
         # Retry the update_originality_data job
         raise Errors::SubmissionNotScoredError
       else
-        new_data = {
-          status: "error",
-          public_error_message: I18n.t(
+        update_turnitin_data_with_error!(submission, asset_string, missing_submission: false)
+      end
+    end
+
+    def update_turnitin_data_with_error!(submission, asset_string, missing_submission:)
+      msg =
+        if missing_submission
+          I18n.t(
+            "Turnitin has not returned a submission after %{max_tries} attempts to retrieve one.",
+            max_tries: self.class.max_attempts
+          )
+        else
+          I18n.t(
             "turnitin.no_score_after_retries",
             "Turnitin has not returned a score after %{max_tries} attempts to retrieve one.",
             max_tries: self.class.max_attempts
           )
-        }
-        update_turnitin_data!(submission, asset_string, new_data)
-      end
+        end
+
+      new_data = { status: "error", public_error_message: msg }
+      update_turnitin_data!(submission, asset_string, new_data)
     end
 
     private
 
-    def create_error_attachment
+    def create_error_attachment(status_code = nil)
+      msg = I18n.t(
+        "An error occurred while attempting to contact Turnitin. Status code: %{status_code}",
+        status_code: status_code || ""
+      )
+
       @assignment.attachments.create!(
-        uploaded_data: StringIO.new(I18n.t("An error occurred while attempting to contact Turnitin.")),
+        uploaded_data: StringIO.new(msg),
         display_name: "Failed turnitin submission",
         filename: "failed_turnitin.txt",
         user: @user

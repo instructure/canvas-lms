@@ -90,18 +90,19 @@ gem "i18nliner", "0.1.2", github: "instructure/i18nliner", ref: "rails-61"
   gem "ruby_parser", "3.18.1", require: false
 gem "icalendar", "2.7.0", require: false
 gem "diplomat", "2.5.1", require: false
-gem "ims-lti", "2.3.1", require: "ims"
+gem "ims-lti", "2.3.2", require: "ims"
+
 gem "inst_access", "0.1.1"
 gem "inst_statsd", "2.2.0"
   gem "statsd-ruby", "1.4.0", require: false
   gem "aroi", "0.0.7", require: false
   gem "dogstatsd-ruby", "4.8.2"
-gem_override "inst-jobs", "3.0.13"
+gem_override "inst-jobs", "3.1.1"
   gem "fugit", "1.4.0", require: false
     gem "et-orbi", "1.2.4", require: false
 gem "inst-jobs-autoscaling", "2.1.1"
   gem "aws-sdk-autoscaling", "1.49.0", require: false
-gem "inst-jobs-statsd", "2.1.2"
+gem "inst-jobs-statsd", "2.2.0"
 # if updating json gem it will need to be hotfixed because if a newer version of
 # the json gem is installed, it will always use that one even before bundler
 # gets activated. Updating the gem in it's own commit will make this easier.

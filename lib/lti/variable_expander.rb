@@ -127,12 +127,20 @@ module Lti
     def expand_variables!(var_hash)
       var_hash.update(var_hash) do |_, v|
         expansion, args = self.class.find_expansion(v)
-        if expansion
-          expansion.expand(self, *args)
-        elsif v.respond_to?(:to_s) && v.to_s =~ SUBSTRING_REGEX
-          expand_substring_variables(v)
+        output = if expansion
+                   expansion.expand(self, *args)
+                 elsif v.respond_to?(:to_s) && v.to_s =~ SUBSTRING_REGEX
+                   expand_substring_variables(v)
+                 else
+                   v
+                 end
+
+        if @root_account&.feature_enabled?(:variable_substitution_numeric_to_string) &&
+           @tool.is_a?(ContextExternalTool) && @tool.use_1_3? &&
+           output.is_a?(Numeric)
+          output&.to_s
         else
-          v
+          output
         end
       end
     end

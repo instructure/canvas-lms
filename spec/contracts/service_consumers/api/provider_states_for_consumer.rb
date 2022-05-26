@@ -108,6 +108,7 @@ module Pact::Canvas
       # with contract tests until we are able to use Pact provider_params
       course.lti_context_id = "9b4ef1eea0eb4c3498983e09a6ef88f1"
       course.uuid = "eylMsUDGR6aQDPCO5kOE6AGyH6ePPZLfV7CN1dV2"
+      course.start_at ||= Time.now
       course.save!
       course
     end
@@ -287,6 +288,7 @@ module Pact::Canvas
         #        I had to add the "-<index>" because these need to be unique
         mcourse.lti_context_id = "9b4ef1eea0eb4c3498983e09a6ef88f1-#{index}"
         mcourse.uuid = "eylMsUDGR6aQDPCO5kOE6AGyH6ePPZLfV7CN1dV2-#{index}"
+        mcourse.start_at ||= Time.now
         mcourse.save!
 
         # Enroll our student and teacher in each course

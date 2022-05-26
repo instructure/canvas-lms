@@ -29,18 +29,21 @@ export default class ToolLaunchResizer {
 
   tool_content_wrapper(wrapperId) {
     let container = $(`div[data-tool-wrapper-id*='${this.sanitizedWrapperId(wrapperId)}']`)
-    if (container.length <= 0 && $('.tool_content_wrapper').length === 1) {
-      container = $('.tool_content_wrapper')
+    const tool_content_wrapper = $('.tool_content_wrapper')
+    if (container.length <= 0 && tool_content_wrapper.length === 1) {
+      container = tool_content_wrapper
     }
     return container
   }
 
-  resize_tool_content_wrapper(height, container) {
+  resize_tool_content_wrapper(height, container, force_height = false) {
     let setHeight = height
     if (typeof setHeight !== 'number') {
       setHeight = this.minToolHeight
     }
     const toolWrapper = container || this.tool_content_wrapper()
-    toolWrapper.height(!height || this.minToolHeight > setHeight ? this.minToolHeight : setHeight)
+    if (force_height) toolWrapper.height(setHeight)
+    else
+      toolWrapper.height(!height || this.minToolHeight > setHeight ? this.minToolHeight : setHeight)
   }
 }

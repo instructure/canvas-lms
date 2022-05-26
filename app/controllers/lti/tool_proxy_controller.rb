@@ -39,6 +39,8 @@ module Lti
 
         render json: '{"status":"success"}'
       end
+    rescue Lti::PlagiarismSubscriptionsHelper::PlagiarismSubscriptionError => e
+      render json: { status: "error", errors: [{ message: e }] }, status: :service_unavailable
     end
 
     def accept_update

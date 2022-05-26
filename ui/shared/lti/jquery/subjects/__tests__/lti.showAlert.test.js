@@ -36,7 +36,7 @@ describe('lti.showAlert handler', () => {
       message = {}
     })
 
-    it('sends bad request postMesssage', () => {
+    it('sends bad request postMessage', () => {
       handler({message, responseMessages})
       expect(responseMessages.sendBadRequestError).toHaveBeenCalledWith(
         "Missing required 'body' field"
@@ -49,7 +49,7 @@ describe('lti.showAlert handler', () => {
       message = {body, alertType: 'bad'}
     })
 
-    it('sends bad request postMesssage', () => {
+    it('sends bad request postMessage', () => {
       handler({message, responseMessages})
       expect(responseMessages.sendBadRequestError).toHaveBeenCalledWith(
         "Unsupported value for 'alertType' field"
@@ -78,7 +78,7 @@ describe('lti.showAlert handler', () => {
         expect($[method]).toHaveBeenCalled()
       })
 
-      it('sends success postMesssage', () => {
+      it('sends success postMessage', () => {
         handler({message, responseMessages})
         expect(responseMessages.sendSuccess).toHaveBeenCalled()
       })

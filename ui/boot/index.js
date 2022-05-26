@@ -79,27 +79,6 @@ if (process.env.NODE_ENV !== 'production') {
   setupConsoleMessageFilter()
 }
 
-if (process.env.NODE_ENV !== 'production' && process.env.DEPRECATION_SENTRY_DSN) {
-  const setupSentry = async () => {
-    const Raven = await import('raven-js')
-    Raven.config(process.env.DEPRECATION_SENTRY_DSN, {
-      release: process.env.GIT_COMMIT
-    }).install()
-
-    try {
-      const {
-        default: setup
-      } = await import('./initializers/setupRavenConsoleLoggingPlugin')
-      setup(Raven, {loggerName: 'console'})
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error(`ERROR: could not set up Raven console logging: ${e.message}`)
-    }
-  }
-
-  setupSentry()
-}
-
 // setup the inst-ui default theme
 // override the fontFamily to include "Lato Extended", which we prefer
 // to load over plain Lato (see LS-1559)

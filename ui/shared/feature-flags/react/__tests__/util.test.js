@@ -110,24 +110,52 @@ describe('feature_flags:util', () => {
   })
 
   describe('transitionMessage', () => {
-    it('generates message with warning if flipping a siteadmin flag in production', () => {
+    it('generates message with warning if flipping a siteadmin flag in anything except development', () => {
+      global.ENV.RAILS_ENVIRONMENT = 'test-env'
+      global.ENV.ACCOUNT.site_admin = true
       const message = util.transitionMessage(sampleData.offFeature.feature_flag, 'on')
       const {getByText} = render(message)
-      expect(getByText('This will affect every customer. Are you sure?')).toBeInTheDocument()
+      expect(
+        getByText(
+          'You are currently in the test-env environment. This will affect every customer. Are you sure?'
+        )
+      ).toBeInTheDocument()
     })
 
-    it('does not return a message for non-siteadmin accounts', () => {
+    it('does not return a message for siteadmin accounts in development', () => {
+      global.ENV.RAILS_ENVIRONMENT = 'development'
+      global.ENV.ACCOUNT.site_admin = true
+      const message = util.transitionMessage(sampleData.offFeature.feature_flag, 'on')
+      const {queryByText} = render(message)
+      expect(
+        queryByText(
+          'You are currently in the development environment. This will affect every customer. Are you sure?'
+        )
+      ).not.toBeInTheDocument()
+    })
+
+    it('does not return a message for non-siteadmin accounts in anything except development', () => {
+      global.ENV.RAILS_ENVIRONMENT = 'test-env'
       global.ENV.ACCOUNT.site_admin = false
       const message = util.transitionMessage(sampleData.offFeature.feature_flag, 'on')
       const {queryByText} = render(message)
-      expect(queryByText('This will affect every customer. Are you sure?')).not.toBeInTheDocument()
+      expect(
+        queryByText(
+          'You are currently in the test-env environment. This will affect every customer. Are you sure?'
+        )
+      ).not.toBeInTheDocument()
     })
 
-    it('does not return a message for non-production environments', () => {
-      global.ENV.PRODUCTION = false
+    it('does not return a message for non-siteadmin accounts in development', () => {
+      global.ENV.RAILS_ENVIRONMENT = 'development'
+      global.ENV.ACCOUNT.site_admin = false
       const message = util.transitionMessage(sampleData.offFeature.feature_flag, 'on')
       const {queryByText} = render(message)
-      expect(queryByText('This will affect every customer. Are you sure?')).not.toBeInTheDocument()
+      expect(
+        queryByText(
+          'You are currently in the development environment. This will affect every customer. Are you sure?'
+        )
+      ).not.toBeInTheDocument()
     })
   })
 })

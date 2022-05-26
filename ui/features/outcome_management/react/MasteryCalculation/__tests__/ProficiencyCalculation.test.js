@@ -506,6 +506,22 @@ describe('ProficiencyCalculation', () => {
         expect(exampleFinalScore).toBeInTheDocument()
         expect(within(exampleFinalScore).getByText('N/A')).toBeInTheDocument()
       })
+
+      it('renders example with a warning when average calculation method selected', () => {
+        window.ENV.OUTCOME_AVERAGE_CALCULATION = true
+        const update = jest.fn()
+        const {getByDisplayValue, getByText} = render(
+          <ProficiencyCalculation {...makeProps({update})} />,
+          {
+            outcomeAllowAverageCalculationFF: true
+          }
+        )
+        const method = getByDisplayValue('Decaying Average')
+        fireEvent.click(method)
+        const newMethod = getByText('Average')
+        fireEvent.click(newMethod)
+        expect(getByText('Warning')).toBeInTheDocument()
+      })
     })
 
     it('does not render the save button', () => {

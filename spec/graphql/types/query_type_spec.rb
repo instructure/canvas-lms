@@ -123,4 +123,58 @@ describe Types::QueryType do
       ).to eq @outcome.id.to_s
     end
   end
+
+  context "internalSetting" do
+    before :once do
+      @setting = Setting.create!(name: "sadmississippi_num_strands", value: 10)
+    end
+
+    context "as site admin" do
+      before :once do
+        @admin = site_admin_user
+      end
+
+      it "loads by id" do
+        thing = CanvasSchema.execute("{internalSetting(id: #{@setting.id}) { name }}",
+                                     context: { current_user: @admin })
+        expect(thing["data"]).to eq({ "internalSetting" => { "name" => "sadmississippi_num_strands" } })
+      end
+
+      it "loads by name" do
+        thing = CanvasSchema.execute('{internalSetting(name: "sadmississippi_num_strands") { _id }}',
+                                     context: { current_user: @admin })
+        expect(thing["data"]).to eq({ "internalSetting" => { "_id" => @setting.id.to_s } })
+      end
+
+      it "errors if neither is provided" do
+        thing = CanvasSchema.execute("{internalSetting { _id }}",
+                                     context: { current_user: @admin })
+        expect(thing["errors"][0]["message"]).to eq "Must specify exactly one of id or name"
+      end
+
+      it "errors if both are provided" do
+        thing = CanvasSchema.execute('{internalSetting(id: 5, name: "foo") { _id }}',
+                                     context: { current_user: @admin })
+        expect(thing["errors"][0]["message"]).to eq "Must specify exactly one of id or name"
+      end
+    end
+
+    context "as non site admin" do
+      before :once do
+        @admin = account_admin_user
+      end
+
+      it "rejects by id" do
+        thing = CanvasSchema.execute("{internalSetting(id: #{@setting.id}) { name }}",
+                                     context: { current_user: @admin })
+        expect(thing["data"]).to eq({ "internalSetting" => nil })
+      end
+
+      it "rejects by name" do
+        thing = CanvasSchema.execute('{internalSetting(name: "sadmississippi_num_strands") { _id }}',
+                                     context: { current_user: @admin })
+        expect(thing["data"]).to eq({ "internalSetting" => nil })
+      end
+    end
+  end
 end

@@ -28,12 +28,12 @@ services:
     init: true
 
   selenium-hub:
-    image: starlord.inscloudgate.net/jenkins/selenium-hub
+    image: starlord.inscloudgate.net/jenkins/selenium-hub:${HUB_VERSION:-4.1}
     environment:
       GRID_BROWSER_TIMEOUT: 3000
 
   selenium-chrome: &NODE_CHROME
-    image: starlord.inscloudgate.net/jenkins/selenium-node-chrome
+    image: starlord.inscloudgate.net/jenkins/selenium-node-chrome:${CHROME_VERSION:-101.0}
     environment: &NODE_CHROME_ENV
       SE_EVENT_BUS_HOST: selenium-hub
       SE_EVENT_BUS_PUBLISH_PORT: 4442

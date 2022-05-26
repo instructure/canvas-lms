@@ -133,6 +133,7 @@ export default class MessageParticipantsDialog {
 
     if (this.group) {
       data.tags = this.group.context_codes
+      data.context_code = this.group.context_codes[0]
     } else if (this.opts.timeslot) {
       data.tags = this.opts.timeslot.all_context_codes.split(',')
     }

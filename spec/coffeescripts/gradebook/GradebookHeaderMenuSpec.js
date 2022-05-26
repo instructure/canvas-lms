@@ -65,7 +65,7 @@ QUnit.module('GradebookHeaderMenu#hideMenuActionsWithUnmetDependencies', {
       submissions_downloads: 1
     }
     this.gradebook = {
-      options: {gradebook_is_editable: true}
+      options: {gradebook_is_editable: true, currentUserId: '123'}
     }
     this.menuElement = document.createElement('ul')
     this.createMenu(this.menuElement)
@@ -146,7 +146,7 @@ test('hides the curveGrades menu item when @assignment.points_possible is 0', fu
 })
 
 test('does not hide the downloadSubmissions menu item when @assignment.submission_types is online_text_entry or online_url', function () {
-  ;['online_text_entry', 'online_url'].forEach(submission_type => {
+  ;['online_text_entry', 'online_url'].forEach(_submission_type => {
     this.assignment.submission_types = 'online_text_entry'
     this.hideMenuActionsWithUnmetDependencies(this.menu)
     ok(this.visibleMenuItemNames(this.menu).includes('downloadSubmissions'))
@@ -183,7 +183,7 @@ QUnit.module('GradebookHeaderMenu#disableUnavailableMenuActions', {
     this.createMenu(this.menuElement)
     this.menu = $(this.menuElement)
     this.gradebook = {
-      options: {gradebook_is_editable: true}
+      options: {gradebook_is_editable: true, currentUserId: '123'}
     }
   },
   teardown() {
@@ -437,7 +437,8 @@ QUnit.module('GradebookHeaderMenu#messageStudentsWho', () => {
             score: 4,
             submittedAt: undefined
           }
-        ]
+        ],
+        userId: '1'
       }
     })
 

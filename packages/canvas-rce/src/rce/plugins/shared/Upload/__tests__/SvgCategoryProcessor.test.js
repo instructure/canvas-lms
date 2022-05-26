@@ -17,6 +17,7 @@
  */
 
 import * as SvgCategoryProcessor from '../SvgCategoryProcessor'
+import {TYPE, ICON_MAKER_ICONS} from '../../../instructure_icon_maker/svg/constants'
 
 describe('process()', () => {
   let fileText
@@ -35,13 +36,13 @@ describe('process()', () => {
 
   describe('when the file includes icon maker type', () => {
     beforeEach(() => {
-      fileText = 'something something image/svg+xml-icon-maker-icons'
+      fileText = 'something something ' + TYPE
     })
 
     it('returns the icon maker category', async () => {
       const category = await subject()
       expect(category).toMatchObject({
-        category: 'icon_maker_icons'
+        category: ICON_MAKER_ICONS
       })
     })
   })

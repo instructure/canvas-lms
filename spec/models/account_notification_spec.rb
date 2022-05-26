@@ -447,6 +447,19 @@ describe AccountNotification do
         expect(an.applicable_user_ids).to match_array(expected_users.map(&:id))
       end
 
+      it "filters by un-enrolled users (nil)" do
+        an = account_notification(account: Account.default, role_ids: [nil])
+        expected_users = []
+
+        User.all.each do |u|
+          if u.enrollments.active_or_pending_by_date.count == 0
+            expected_users << u
+          end
+        end
+
+        expect(an.applicable_user_ids).to match_array(expected_users.map(&:id))
+      end
+
       it "filters by account role" do
         an = account_notification(account: @accounts[:sub2], role_ids: [admin_role.id])
         expect(an.applicable_user_ids).to eq [@account_admins[:sub2].id]

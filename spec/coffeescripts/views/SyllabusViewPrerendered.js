@@ -69,6 +69,7 @@ export default {
       end_at: '2012-01-31T20:00:00-07:00',
       url: 'http://localhost/api/v1/calendar_events/assignment_1',
       html_url: 'http://localhost/courses/1/assignments/1',
+      submission_types: 'none',
       type: 'assignment',
       assignment_overrides: [
         {
@@ -90,6 +91,7 @@ export default {
       end_at: '2012-01-01T13:00:00-07:00',
       url: 'http://localhost/api/v1/calendar_events/assignment_2',
       html_url: 'http://localhost/courses/1/assignments/2',
+      submission_types: 'discussion_topic',
       type: 'assignment'
     },
     {
@@ -100,6 +102,7 @@ export default {
       end_at: '2012-01-23T10:00:00-07:00',
       url: 'http://localhost/api/v1/calendar_events/assignment_1',
       html_url: 'http://localhost/courses/1/assignments/1',
+      submission_types: 'online_quiz',
       type: 'assignment',
       assignment_overrides: [
         {
@@ -121,6 +124,7 @@ export default {
       end_at: null,
       url: 'http://localhost/api/v1/calendar_events/assignment_4',
       html_url: 'http://localhost/courses/1/assignments/4',
+      submission_types: 'none',
       type: 'assignment'
     },
     {
@@ -131,6 +135,7 @@ export default {
       end_at: '2012-01-30T10:00:00-07:00',
       url: 'http://localhost/api/v1/calendar_events/assignment_1',
       html_url: 'http://localhost/courses/1/assignments/1',
+      submission_types: 'none',
       type: 'assignment',
       assignment_overrides: [
         {
@@ -152,6 +157,7 @@ export default {
       end_at: null,
       url: 'http://localhost/api/v1/calendar_events/assignment_5',
       html_url: 'http://localhost/courses/1/assignments/5',
+      submission_types: 'none',
       type: 'assignment'
     },
     {
@@ -162,6 +168,7 @@ export default {
       end_at: '2012-01-31T10:00:00-07:00',
       url: 'http://localhost/api/v1/calendar_events/assignment_1',
       html_url: 'http://localhost/courses/1/assignments/1',
+      submission_types: 'none',
       type: 'assignment',
       assignment_overrides: [
         {
@@ -183,6 +190,7 @@ export default {
       end_at: '2012-01-11T11:00:00-07:00',
       url: 'http://localhost/api/v1/calendar_events/assignment_3',
       html_url: 'http://localhost/courses/1/assignments/3',
+      submission_types: 'none',
       type: 'assignment'
     },
     {
@@ -193,6 +201,7 @@ export default {
       end_at: '2012-01-11T10:00:00-07:00',
       url: 'http://localhost/api/v1/calendar_events/assignment_1',
       html_url: 'http://localhost/courses/1/assignments/1',
+      submission_types: 'none',
       type: 'assignment',
       assignment_overrides: [
         {
@@ -214,6 +223,7 @@ export default {
       end_at: '2012-01-01T10:00:00-07:00',
       url: 'http://localhost/api/v1/calendar_events/assignment_1',
       html_url: 'http://localhost/courses/1/assignments/1',
+      submission_types: 'none',
       type: 'assignment'
     }
   ],

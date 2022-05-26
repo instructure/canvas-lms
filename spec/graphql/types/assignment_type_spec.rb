@@ -19,6 +19,7 @@
 #
 
 require_relative "../graphql_spec_helper"
+require_relative "./shared_examples/types_with_enumerable_workflow_states"
 
 describe Types::AssignmentType do
   let_once(:course) { course_factory(active_all: true) }
@@ -50,6 +51,11 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("anonymousInstructorAnnotations")).to eq assignment.anonymous_instructor_annotations
     expect(assignment_type.resolve("postToSis")).to eq assignment.post_to_sis
     expect(assignment_type.resolve("canUnpublish")).to eq assignment.can_unpublish?
+  end
+
+  it_behaves_like "types with enumerable workflow states" do
+    let(:enum_class) { Types::AssignmentType::AssignmentStateType }
+    let(:model_class) { Assignment }
   end
 
   context "top-level permissions" do

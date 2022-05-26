@@ -20,7 +20,7 @@ import {
   ICON_MAKER_ICONS,
   ICON_MAKER_ATTRIBUTE,
   ICON_MAKER_DOWNLOAD_URL_ATTR
-} from '../../rce/plugins/instructure_icon_maker/registerEditToolbar'
+} from '../../rce/plugins/instructure_icon_maker/svg/constants'
 
 import buildDownloadUrl from '../../rce/plugins/shared/buildDownloadUrl'
 

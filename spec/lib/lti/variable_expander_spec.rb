@@ -19,6 +19,7 @@
 #
 
 require_dependency "lti/variable_expander"
+
 module Lti
   describe VariableExpander do
     let(:root_account) { Account.create!(lti_guid: "test-lti-guid") }
@@ -1192,7 +1193,7 @@ module Lti
               ]
             end
 
-            context "the tool in use is an LTI 1.3 tool" do
+            context "the tool in use is a LTI 1.3 tool" do
               before do
                 allow(tool).to receive(:use_1_3?).and_return(true)
               end
@@ -1712,7 +1713,7 @@ module Lti
           expect(exp_hash[:allowed_attempts]).to eq 5
         end
 
-        context '#$Canvas.assignment.submission.studentAttempts' do
+        describe "$Canvas.assignment.submission.studentAttempts" do
           before do
             user.save
             course.save
@@ -2166,6 +2167,333 @@ module Lti
 
         expander.expand_variables!(exp_hash)
         expect(exp_hash[:test]).to eq "string stuff: create_forum,read_forum"
+      end
+    end
+
+    context "when :variable_substitution_numeric_to_string feature flag is ON" do
+      before do
+        root_account.enable_feature! :variable_substitution_numeric_to_string
+        root_account.save!
+      end
+
+      context "when using a LTI 1.3 tool" do
+        before do
+          allow(tool).to receive(:is_a?).with(ContextExternalTool).and_return(true)
+          allow(tool).to receive(:use_1_3?).and_return(true)
+        end
+
+        it "echoes registered variable if blacklisted" do
+          VariableExpander.register_expansion("test_expan", ["a"], -> { @context })
+          VariableExpander.register_expansion("variable1", ["a"], -> { 1 })
+          variable_expander.variable_blacklist = ["test_expan"]
+          expanded1 = variable_expander.expand_variables!({ some_name: "$test_expan" })
+          expanded2 = variable_expander.expand_variables!({ some_name: "$variable1" })
+          expect(expanded1.count).to eq 1
+          expect(expanded1[:some_name]).to eq "$test_expan"
+          expect(expanded2.count).to eq 1
+          expect(expanded2[:some_name]).to eq "1"
+        end
+
+        describe "#variable expansions" do
+          it "has substitution for com.instructure.OriginalityReport.id" do
+            exp_hash = { test: "$com.instructure.OriginalityReport.id" }
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq originality_report.id.to_s
+          end
+
+          it "has substitution for com.instructure.Submission.id" do
+            exp_hash = { test: "$com.instructure.Submission.id" }
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq originality_report.submission.id.to_s
+          end
+
+          it "has substitution for com.instructure.File.id" do
+            exp_hash = { test: "$com.instructure.File.id" }
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq originality_report.attachment.id.to_s
+          end
+
+          it "has substitution for $Canvas.account.id" do
+            allow(account).to receive(:id).and_return(12_345)
+            exp_hash = { test: "$Canvas.account.id" }
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq "12345"
+          end
+
+          it "has substitution for $Canvas.rootAccount.id" do
+            allow(root_account).to receive(:id).and_return(54_321)
+            exp_hash = { test: "$Canvas.rootAccount.id" }
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq "54321"
+          end
+
+          it "has substitution for $Canvas.root_account.id" do
+            allow(root_account).to receive(:id).and_return(54_321)
+            exp_hash = { test: "$Canvas.root_account.id" }
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq "54321"
+          end
+
+          it "has substitution for $Canvas.root_account.global_id" do
+            allow(root_account).to receive(:global_id).and_return(10_054_321)
+            exp_hash = { test: "$Canvas.root_account.global_id" }
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq "10054321"
+          end
+
+          it "has substitution for $Canvas.shard.id" do
+            exp_hash = { test: "$Canvas.shard.id" }
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to eq Shard.current.id.to_s
+          end
+
+          context "when launching from a group assignment" do
+            let(:group) { group_category.groups.create!(name: "test", context: assignment_course) }
+            let(:group_category) { GroupCategory.create!(name: "test", context: assignment_course) }
+            let(:new_assignment) { assignment_model(course: assignment_course) }
+            let(:assignment_course) do
+              c = course_model(account: account)
+              c.save!
+              c
+            end
+            let(:variable_expander) do
+              VariableExpander.new(
+                root_account,
+                account,
+                controller,
+                current_user: user,
+                tool: tool,
+                assignment: new_assignment
+              )
+            end
+
+            before do
+              group.update!(users: [user])
+              new_assignment.update!(group_category: group_category)
+            end
+
+            describe "com.instructure.Group.id" do
+              let(:expansion_string) { "$com.instructure.Group.id" }
+
+              it "has a substitution for com.instructure.Group.id" do
+                exp_hash = { test: expansion_string }
+                variable_expander.expand_variables!(exp_hash)
+                expect(exp_hash[:test]).to eq group.id.to_s
+              end
+            end
+          end
+
+          context "context is a course" do
+            let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool: tool) }
+
+            it "has substitution for $Canvas.course.id" do
+              allow(course).to receive(:id).and_return(123)
+              exp_hash = { test: "$Canvas.course.id" }
+              variable_expander.expand_variables!(exp_hash)
+              expect(exp_hash[:test]).to eq "123"
+            end
+
+            describe "$com.instructure.User.observees" do
+              subject do
+                exp_hash = { test: "$com.instructure.User.observees" }
+                variable_expander.expand_variables!(exp_hash)
+                exp_hash[:test]
+              end
+
+              let(:context) do
+                c = variable_expander.context
+                c.save!
+                c
+              end
+              let(:student) { user_factory }
+              let(:observer) { user_factory }
+
+              before do
+                context.enroll_student(student)
+                variable_expander.current_user = observer
+              end
+
+              context "when the current user is observing users in the context" do
+                before do
+                  observer_enrollment = context.enroll_user(observer, "ObserverEnrollment")
+                  observer_enrollment.update!(associated_user_id: student.id)
+                end
+
+                context "the tool in use is not a LTI 1.3 tool" do
+                  before do
+                    allow(tool).to receive(:use_1_3?).and_return(false)
+                  end
+
+                  it "produces a comma-separated string of user UUIDs" do
+                    expect(subject.split(",")).to match_array [
+                      Lti::Asset.opaque_identifier_for(student)
+                    ]
+                  end
+                end
+
+                context "the tool in use is a LTI 1.3 tool" do
+                  it "returns the users' lti id instead of lti 1.1 user_id" do
+                    expect(subject.split(",")).to match_array [
+                      student.lti_id
+                    ]
+                  end
+                end
+              end
+            end
+          end
+
+          context "context is a course and there is a user" do
+            let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool: tool) }
+            let(:user) { user_factory }
+
+            it "has substitution for $Canvas.externalTool.global_id" do
+              course.save!
+              tool = course.context_external_tools.create!(domain: "example.com", consumer_key: "12345", shared_secret: "secret", privacy_level: "anonymous", name: "tool", use_1_3: true)
+              expander = VariableExpander.new(root_account, course, controller, current_user: user, tool: tool)
+              exp_hash = { test: "$Canvas.externalTool.global_id" }
+              expander.expand_variables!(exp_hash)
+              expect(exp_hash[:test]).to eq tool.global_id.to_s
+            end
+          end
+
+          context "context is a course with an assignment and a user" do
+            let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool: tool, assignment: assignment) }
+
+            it "has substitution for $Canvas.assignment.id" do
+              allow(assignment).to receive(:id).and_return(2015)
+              exp_hash = { test: "$Canvas.assignment.id" }
+              variable_expander.expand_variables!(exp_hash)
+              expect(exp_hash[:test]).to eq "2015"
+            end
+
+            describe "$Canvas.assignment.pointsPossible" do
+              it "has substitution for $Canvas.assignment.pointsPossible" do
+                allow(assignment).to receive(:points_possible).and_return(10.0)
+                exp_hash = { test: "$Canvas.assignment.pointsPossible" }
+                variable_expander.expand_variables!(exp_hash)
+                expect(exp_hash[:test]).to eq "10"
+              end
+
+              it "does not round if not whole" do
+                allow(assignment).to receive(:points_possible).and_return(9.5)
+                exp_hash = { test: "$Canvas.assignment.pointsPossible" }
+                variable_expander.expand_variables!(exp_hash)
+                expect(exp_hash[:test]).to eq "9.5"
+              end
+
+              it "rounds if whole" do
+                allow(assignment).to receive(:points_possible).and_return(9.0)
+                exp_hash = { test: "$Canvas.assignment.pointsPossible" }
+                variable_expander.expand_variables!(exp_hash)
+                expect(exp_hash[:test]).to eq "9"
+              end
+            end
+
+            it "has substitution for $Canvas.assignment.allowedAttempts" do
+              assignment.allowed_attempts = 5
+              exp_hash = { allowed_attempts: "$Canvas.assignment.allowedAttempts" }
+              variable_expander.expand_variables!(exp_hash)
+              expect(exp_hash[:allowed_attempts]).to eq "5"
+            end
+
+            describe "$Canvas.assignment.submission.studentAttempts" do
+              before do
+                user.save
+                course.save
+                assignment.context = course
+                assignment.save
+                submission = submission_model(user: user, assignment: assignment)
+                submission.attempt = 2
+                submission.save
+              end
+
+              it "has substitution when the user is a student" do
+                allow(course).to receive(:user_is_student?).and_return(true)
+                exp_hash = { attempts: "$Canvas.assignment.submission.studentAttempts" }
+                variable_expander.expand_variables!(exp_hash)
+                expect(exp_hash[:attempts]).to eq "2"
+              end
+            end
+          end
+
+          context "user is logged in" do
+            it "has substitution for $Canvas.user.id" do
+              allow(user).to receive(:id).and_return(456)
+              exp_hash = { test: "$Canvas.user.id" }
+              variable_expander.expand_variables!(exp_hash)
+              expect(exp_hash[:test]).to eq "456"
+            end
+
+            it "has substitution for $Canvas.user.globalId" do
+              allow(user).to receive(:global_id).and_return(456)
+              exp_hash = { test: "$Canvas.user.globalId" }
+              variable_expander.expand_variables!(exp_hash)
+              expect(exp_hash[:test]).to eq "456"
+            end
+
+            it "has substitution for $User.id" do
+              allow(user).to receive(:id).and_return(456)
+              exp_hash = { test: "$User.id" }
+              variable_expander.expand_variables!(exp_hash)
+              expect(exp_hash[:test]).to eq "456"
+            end
+
+            context "attachment" do
+              let(:attachment) do
+                attachment = attachment_obj_with_context(course)
+                attachment.media_object = media_object
+                attachment.usage_rights = usage_rights
+                attachment
+              end
+              let(:media_object) do
+                mo = MediaObject.new
+                mo.media_id = "1234"
+                mo.media_type = "video"
+                mo.duration = 555
+                mo.total_size = 444
+                mo.title = "some title"
+                mo
+              end
+              let(:usage_rights) do
+                ur = UsageRights.new
+                ur.legal_copyright = "legit"
+                ur
+              end
+              let(:variable_expander) { VariableExpander.new(root_account, account, controller, current_user: user, tool: tool, attachment: attachment) }
+
+              it "has substitution for $Canvas.file.media.duration" do
+                exp_hash = { test: "$Canvas.file.media.duration" }
+                variable_expander.expand_variables!(exp_hash)
+                expect(exp_hash[:test]).to eq "555"
+              end
+
+              it "has substitution for $Canvas.file.media.size" do
+                exp_hash = { test: "$Canvas.file.media.size" }
+                variable_expander.expand_variables!(exp_hash)
+                expect(exp_hash[:test]).to eq "444"
+              end
+            end
+
+            it "has substitution for $Canvas.masqueradingUser.id" do
+              masquerading_user = User.new
+              allow(masquerading_user).to receive(:id).and_return(7878)
+              allow(user).to receive(:id).and_return(42)
+              variable_expander.instance_variable_set("@current_user", masquerading_user)
+              exp_hash = { test: "$Canvas.masqueradingUser.id" }
+              variable_expander.expand_variables!(exp_hash)
+              expect(exp_hash[:test]).to eq "42"
+            end
+
+            it "has substitution for Canvas.moduleItem.id" do
+              content_tag = double("content_tag")
+              allow(content_tag).to receive(:id).and_return(7878)
+              variable_expander.instance_variable_set("@content_tag", content_tag)
+              exp_hash = { test: "$Canvas.moduleItem.id" }
+              variable_expander.expand_variables!(exp_hash)
+              expect(exp_hash[:test]).to eq "7878"
+            end
+          end
+        end
       end
     end
   end

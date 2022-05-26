@@ -183,20 +183,6 @@ if (!Array.prototype.flatMap) {
 
 require('@instructure/ui-themes')
 
-if (process.env.DEPRECATION_SENTRY_DSN) {
-  const Raven = require('raven-js')
-  Raven.config(process.env.DEPRECATION_SENTRY_DSN, {
-    release: process.env.GIT_COMMIT,
-    autoBreadcrumbs: {
-      xhr: false
-    }
-  }).install()
-
-  const setupRavenConsoleLoggingPlugin =
-    require('../ui/boot/initializers/setupRavenConsoleLoggingPlugin').default
-  setupRavenConsoleLoggingPlugin(Raven, {loggerName: 'console-jest'})
-}
-
 // set up mocks for native APIs
 if (!('MutationObserver' in window)) {
   Object.defineProperty(window, 'MutationObserver', {

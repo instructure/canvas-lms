@@ -16,20 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Component, Suspense} from 'react'
+import React, {Component} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {connect} from 'react-redux'
-import {arrayOf, bool, func, objectOf, oneOf, shape, string, number, element} from 'prop-types'
+import {arrayOf, bool, func, objectOf, oneOf, shape, string, number} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
 import {List} from '@instructure/ui-list'
 import {Heading} from '@instructure/ui-heading'
-import {Spinner} from '@instructure/ui-spinner'
 import {Table} from '@instructure/ui-table'
 import {TextInput} from '@instructure/ui-text-input'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Button, IconButton} from '@instructure/ui-buttons'
-import {Tray} from '@instructure/ui-tray'
 import {IconPlusSolid, IconTrashLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Billboard} from '@instructure/ui-billboard'
@@ -40,8 +38,6 @@ import EmptyDesert from '@canvas/images/react/EmptyDesert'
 import {addDomain, removeDomain, copyInheritedIfNeeded} from '../actions'
 
 const I18n = useI18nScope('security_panel')
-
-const ViolationTray = React.lazy(() => import('./ViolationTray'))
 
 const PROTOCOL_REGEX = /^(?:(ht|f)tp(s?)\:\/\/)?/
 
@@ -60,9 +56,7 @@ export class Whitelist extends Component {
       inherited: arrayOf(string),
       tools: objectOf(arrayOf(shape({id: string, name: string, account_id: string})))
     }).isRequired,
-    maxDomains: number.isRequired,
-    accountId: string.isRequired,
-    liveRegion: arrayOf(element).isRequired
+    maxDomains: number.isRequired
   }
 
   static defaultProps = {
@@ -71,15 +65,12 @@ export class Whitelist extends Component {
 
   state = {
     addDomainInputValue: '',
-    errors: [],
-    showViolationTray: false
+    errors: []
   }
 
   deleteButtons = []
 
   addDomainBtn = null
-
-  closeViolationTray = () => this.setState({showViolationTray: false})
 
   validateInput = input => {
     const domainOnly = input.replace(PROTOCOL_REGEX, '')
@@ -163,13 +154,6 @@ export class Whitelist extends Component {
                     })}
               </Heading>
             </Flex.Item>
-            {!this.props.isSubAccount && (
-              <Flex.Item>
-                <Button variant="link" onClick={() => this.setState({showViolationTray: true})}>
-                  {I18n.t('View Violation Log')}
-                </Button>
-              </Flex.Item>
-            )}
           </Flex>
         </View>
 
@@ -302,27 +286,6 @@ export class Whitelist extends Component {
             </Table>
           </View>
         )}
-        <Tray
-          label={I18n.t('Violation Log Tray')}
-          open={this.state.showViolationTray}
-          onDismiss={this.closeViolationTray}
-          size="medium"
-          placement="end"
-          liveRegion={this.props.liveRegion}
-        >
-          <Suspense
-            fallback={
-              <Spinner size="large" margin="large auto" renderTitle={() => I18n.t('Loading')} />
-            }
-          >
-            <ViolationTray
-              accountId={this.props.accountId}
-              handleClose={this.closeViolationTray}
-              addDomain={this.props.addDomain}
-              whitelistedDomains={this.props.whitelistedDomains}
-            />
-          </Suspense>
-        </Tray>
       </div>
     )
   }

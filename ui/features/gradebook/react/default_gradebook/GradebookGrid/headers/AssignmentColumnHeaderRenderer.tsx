@@ -192,8 +192,9 @@ function getProps(column, gradebook, options) {
 
     submissionsLoaded: gradebook.contentLoadStates.submissionsLoaded,
     messageAttachmentUploadFolderId: gradebook.options.message_attachment_upload_folder_id,
+    userId: gradebook.options.currentUserId,
 
-    onSendMesssageStudentsWho: args => gradebook.sendMesssageStudentsWho(args)
+    onSendMessageStudentsWho: args => gradebook.sendMessageStudentsWho(args)
   }
 }
 

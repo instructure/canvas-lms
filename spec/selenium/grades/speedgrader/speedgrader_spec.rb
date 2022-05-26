@@ -1051,10 +1051,12 @@ describe "Speedgrader" do
 
       # Open shortcut modal
       Speedgrader.click_keyboard_shortcuts_link
+      wait_for_animations
       expect(Speedgrader.keyboard_navigation_modal).to be_displayed
 
       # Close shortcut modal
       Speedgrader.keyboard_modal_close_button.click
+      wait_for_animations
       expect(Speedgrader.keyboard_navigation_modal).not_to be_displayed
     end
 

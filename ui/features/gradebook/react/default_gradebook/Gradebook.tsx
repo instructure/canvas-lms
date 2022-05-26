@@ -4717,12 +4717,14 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       })
   }
 
-  sendMesssageStudentsWho = args => {
-    return GradebookApi.sendMesssageStudentsWho(
+  sendMessageStudentsWho = args => {
+    return GradebookApi.sendMessageStudentsWho(
       args.recipientsIds,
       args.subject,
       args.body,
-      `course_${this.options.context_id}`
+      `course_${this.options.context_id}`,
+      args.mediaFile,
+      args.attachmentIds
     )
       .then(FlashAlert.showFlashSuccess(I18n.t('Message sent successfully')))
       .catch(FlashAlert.showFlashError(I18n.t('There was an error sending the message')))

@@ -354,16 +354,18 @@ function mergeStudentsAndSubmission() {
     window.jsonData.submissionsMap[submission[anonymizableUserId]] = submission
   })
 
-  jsonData.studentsWithSubmissions = jsonData.studentsWithSubmissions.reduce(
+  window.jsonData.studentsWithSubmissions = window.jsonData.studentsWithSubmissions.reduce(
     (students, student, index) => {
-      const submission = jsonData.submissionsMap[student[anonymizableId]]
+      const submission = window.jsonData.submissionsMap[student[anonymizableId]]
       // Hide students that don't have a submission object. This is legacy support
       // for when we used to not create submission objects for assigned concluded students.
       // For all new assignments, every assigned student (regardless of concluded/inactive
       // status) should have a submission object.
       if (submission) {
-        student.enrollments = jsonData.studentEnrollmentMap[student[anonymizableId]]
-        student.section_ids = Object.keys(jsonData.studentSectionIdsMap[student[anonymizableId]])
+        student.enrollments = window.jsonData.studentEnrollmentMap[student[anonymizableId]]
+        student.section_ids = Object.keys(
+          window.jsonData.studentSectionIdsMap[student[anonymizableId]]
+        )
         student.submission = submission
         student.submission_state = SpeedgraderHelpers.submissionState(student, ENV.grading_role)
         student.index = index
@@ -450,7 +452,11 @@ function mergeStudentsAndSubmission() {
       // sorting for isAnonymous occurred earlier before setting up studentMap
       if (!isAnonymous && utils.shouldHideStudentNames()) {
         window.jsonData.studentsWithSubmissions.sort(
-          EG.compareStudentsBy(student => student.submission.id)
+          EG.compareStudentsBy(student => {
+            const studentIndex = student.index || 0
+            // adding 1 to avoid issues with index 0 being given 'falsey treatment' in compareStudentsBy
+            return studentIndex + 1
+          })
         )
       }
     }
@@ -1370,7 +1376,7 @@ EG = {
         SpeedgraderHelpers.getHistory().back()
       }
     } else {
-      /// unmount spinner
+      // unmount spinner
       const spinnerMount = document.getElementById('speed_grader_loading')
       if (spinnerMount) ReactDOM.unmountComponentAtNode(spinnerMount)
       $('#speed_grader_loading').hide()
@@ -2627,11 +2633,11 @@ EG = {
 
   totalStudentCount() {
     if (sectionToShow) {
-      return _.filter(jsonData.studentsWithSubmissions, student =>
+      return _.filter(window.jsonData.studentsWithSubmissions, student =>
         _.includes(student.section_ids, sectionToShow)
       ).length
     } else {
-      return jsonData.studentsWithSubmissions.length
+      return window.jsonData.studentsWithSubmissions.length
     }
   },
 
@@ -3670,7 +3676,7 @@ EG = {
     }
   },
 
-  beforeLeavingSpeedgrader(e) {
+  beforeLeavingSpeedgrader(event: BeforeUnloadEvent) {
     // Submit any draft comments that need submitting
     EG.addSubmissionComment(true)
 
@@ -3684,7 +3690,7 @@ EG = {
         snapshot =>
           snapshot &&
           $.map(
-            jsonData.studentsWithSubmissions,
+            window.jsonData.studentsWithSubmissions,
             student => snapshot === student && student.name
           )[0]
       )
@@ -3707,18 +3713,25 @@ EG = {
       return $.trim($add_a_comment_textarea.val()) !== ''
     }
 
-    if (hasPendingQuizSubmissions()) {
-      e.returnValue = I18n.t(
+    const isNewGradeSaved = ($grade.val() || null) === EG.currentStudent.submission.grade
+    if (!isNewGradeSaved) {
+      event.preventDefault()
+      event.returnValue = I18n.t(`There are unsaved changes to a grade.\n\nContinue anyway?`)
+      return event.returnValue
+    } else if (hasPendingQuizSubmissions()) {
+      event.preventDefault()
+      event.returnValue = I18n.t(
         'The following students have unsaved changes to their quiz submissions:\n\n' +
           '%{users}\nContinue anyway?',
         {users: userNamesWithPendingQuizSubmission().join('\n ')}
       )
-      return e.returnValue
+      return event.returnValue
     } else if (hasUnsubmittedComments()) {
-      e.returnValue = I18n.t(
+      event.preventDefault()
+      event.returnValue = I18n.t(
         'If you would like to keep your unsubmitted comments, please save them before navigating away from this page.'
       )
-      return e.returnValue
+      return event.returnValue
     }
     teardownHandleStatePopped()
     teardownBeforeLeavingSpeedgrader()

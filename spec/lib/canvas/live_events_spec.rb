@@ -612,34 +612,6 @@ describe Canvas::LiveEvents do
           Canvas::LiveEvents.send(event_name.to_sym, submission)
         end
 
-        it "temporarily includes multiple associated_integration_ids if there is an installed tool proxy" do
-          submission.assignment.assignment_configuration_tool_lookups.create!(
-            tool_product_code: "turnitin-lti",
-            tool_vendor_code: "turnitin.com",
-            tool_resource_type_code: "resource-type-code",
-            tool_type: "Lti::MessageHandler"
-          )
-
-          tool_proxy = create_tool_proxy(submission.assignment.course)
-          tool_proxy[:raw_data]["tool_profile"] = { "service_offered" => [submission_event_service] }
-          tool_proxy.save!
-
-          Lti::ResourceHandler.create!(
-            tool_proxy: tool_proxy,
-            name: "resource_handler",
-            resource_type_code: "resource-type-code"
-          )
-
-          expect_event(
-            event_name,
-            hash_including(
-              associated_integration_ids: [tool_proxy.guid, "turnitin.com_turnitin-lti_test.com/submission"]
-            ),
-            course_context
-          )
-          Canvas::LiveEvents.send(event_name.to_sym, submission)
-        end
-
         it "does not include the associated_integration_id if there is no longer an installed tool with that id" do
           submission.assignment.assignment_configuration_tool_lookups.create!(tool_product_code: "turnitin-lti",
                                                                               tool_vendor_code: "turnitin.com", tool_type: "Lti::MessageHandler")
@@ -994,30 +966,6 @@ describe Canvas::LiveEvents do
         expect_event(
           "assignment_created",
           hash_including(associated_integration_id: tool_proxy.guid)
-        )
-        Canvas::LiveEvents.assignment_created(@assignment)
-      end
-
-      it "temporarily includes multiple associated_integration_ids if there is an installed tool proxy" do
-        @assignment.assignment_configuration_tool_lookups.create!(
-          tool_product_code: "turnitin-lti",
-          tool_vendor_code: "turnitin.com",
-          tool_resource_type_code: "resource-type-code",
-          tool_type: "Lti::MessageHandler"
-        )
-        tool_proxy = create_tool_proxy(@assignment.course)
-        tool_proxy[:raw_data]["tool_profile"] = { "service_offered" => [submission_event_service] }
-        tool_proxy.save!
-
-        Lti::ResourceHandler.create!(
-          tool_proxy: tool_proxy,
-          name: "resource_handler",
-          resource_type_code: "resource-type-code"
-        )
-
-        expect_event(
-          "assignment_created",
-          hash_including(associated_integration_ids: [tool_proxy.guid, "turnitin.com_turnitin-lti_test.com/submission"])
         )
         Canvas::LiveEvents.assignment_created(@assignment)
       end

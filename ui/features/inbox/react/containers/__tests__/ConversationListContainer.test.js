@@ -143,7 +143,6 @@ describe('ConversationListContainer', () => {
       await waitForApolloLoading()
 
       const checkboxes = await conversationList.findAllByText('not selected')
-
       fireEvent(
         checkboxes[0],
         new MouseEvent('click', {
@@ -152,7 +151,7 @@ describe('ConversationListContainer', () => {
         })
       )
 
-      expect(mock.mock.calls.length).toBe(3)
+      expect(mock.mock.calls.length).toBe(4)
     })
 
     it('should be able to select range of conversations ASC', async () => {

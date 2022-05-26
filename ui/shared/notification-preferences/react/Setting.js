@@ -68,6 +68,7 @@ const renderPreferenceButton = preferenceConfig => (
       renderIcon={preferenceConfig.icon}
       color={preferenceConfig.color}
       screenReaderLabel={preferenceConfig.getScreenReaderLabel()}
+      aria-haspopup="true"
     />
   </Tooltip>
 )

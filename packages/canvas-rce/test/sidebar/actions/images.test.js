@@ -19,6 +19,7 @@
 import assert from 'assert'
 import sinon from 'sinon'
 import * as actions from '../../../src/sidebar/actions/images'
+import {ICON_MAKER_ICONS} from '../../../src/rce/plugins/instructure_icon_maker/svg/constants'
 
 const sortBy = {sort: 'alphabetical', order: 'asc'}
 const searchString = 'hello'
@@ -75,7 +76,7 @@ describe('Image dispatch shapes', () => {
           },
           contextType,
           opts: {
-            category: 'icon_maker_icons'
+            category: ICON_MAKER_ICONS
           }
         }
       })

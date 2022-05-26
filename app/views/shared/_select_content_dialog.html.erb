@@ -27,7 +27,7 @@
   newquizzes_engine_selected = @context.settings.dig(:engine_selected, :user_id, :newquizzes_engine_selected)
   newquizzes_engine_selected = ['true', 'false'].include?(newquizzes_engine_selected) ? newquizzes_engine_selected : nil
   add_assignment_permission = @context.root_account.feature_enabled?(:granular_permissions_manage_assignments) ? :manage_assignments_add : :manage_assignments
-  module_links_default_new_tab = Account.site_admin.feature_enabled?(:remember_module_links_default) && @current_user&.get_preference(:module_links_default_new_tab)
+  module_links_default_new_tab = @current_user&.get_preference(:module_links_default_new_tab)
 %>
 <% cache([@context, 'select_context_content_dialog_1', only].cache_key) do %>
   <div id="select_context_content_dialog" style="display: none;">

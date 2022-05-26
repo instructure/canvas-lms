@@ -47,6 +47,7 @@ export const handlers = [
         id: 'VXNlci05',
         conversationsConnection: {
           nodes: [],
+          pageInfo: PageInfo.mock({hasNextPage: false}),
           __typename: 'ConversationParticipantConnection'
         },
         __typename: 'User'
@@ -249,6 +250,78 @@ export const handlers = [
           __typename: 'User'
         },
         __typename: 'Submission'
+      }
+    }
+
+    return res(ctx.data(data))
+  }),
+
+  graphql.query('ViewableSubmissionsQuery', (req, res, ctx) => {
+    const data = {
+      legacyNode: {
+        _id: '9',
+        id: 'VXNlci05',
+        viewableSubmissionsConnection: {
+          nodes: [
+            {
+              _id: '9',
+              commentsConnection: {
+                nodes: [
+                  {
+                    _id: '1',
+                    id: 'U3VibWlzc2lvbkNvbW1lbnQtMQ==',
+                    submissionId: '3',
+                    createdAt: '2022-04-04T12:19:38-06:00',
+                    attempt: 0,
+                    author: User.mock(),
+                    assignment: {
+                      id: 'QXNzaWdubWVudC0x',
+                      _id: '1',
+                      name: 'test assignment',
+                      __typename: 'Assignment'
+                    },
+                    comment: 'my student comment',
+                    course: Course.mock(),
+                    read: true,
+                    __typename: 'SubmissionComment'
+                  }
+                ],
+                __typename: 'SubmissionCommentConnection'
+              },
+              __typename: 'Submission'
+            },
+            {
+              _id: '10',
+              commentsConnection: {
+                nodes: [
+                  {
+                    _id: '1',
+                    id: 'U3VibWlzc2lvbkNvbW1lbnQtMQ==',
+                    submissionId: '3',
+                    createdAt: '2022-04-04T12:19:38-06:00',
+                    attempt: 0,
+                    author: User.mock(),
+                    assignment: {
+                      id: 'QXNzaWdubWVudC0x',
+                      _id: '1',
+                      name: 'test assignment',
+                      __typename: 'Assignment'
+                    },
+                    comment: 'my student comment',
+                    course: Course.mock(),
+                    read: true,
+                    __typename: 'SubmissionComment'
+                  }
+                ],
+                __typename: 'SubmissionCommentConnection'
+              },
+              __typename: 'Submission'
+            }
+          ],
+          pageInfo: PageInfo.mock({hasNextPage: false}),
+          __typename: 'SubmissionConnection'
+        },
+        __typename: 'User'
       }
     }
 

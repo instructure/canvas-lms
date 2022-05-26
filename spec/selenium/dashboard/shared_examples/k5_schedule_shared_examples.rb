@@ -47,6 +47,16 @@ shared_examples_for "k5 schedule" do
 
       expect(schedule_item.text).to include(assignment_title)
     end
+
+    it "shows missing assignments on dashboard schedule tab" do
+      now = Time.zone.now
+      create_dated_assignment(@subject_course, "missing assignment1", 1.day.ago(now))
+      create_dated_assignment(@subject_course, "missing assignment2", 1.day.ago(now))
+
+      get "/#schedule"
+
+      expect(missing_data.text).to eq("Show 2 missing items")
+    end
   end
 
   context "navigation" do

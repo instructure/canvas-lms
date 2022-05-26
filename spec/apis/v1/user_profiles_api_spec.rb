@@ -191,7 +191,6 @@ describe "User Profile API", type: :request do
   context "user_services" do
     before :once do
       @student.user_services.create! service: "skype", service_user_name: "user", service_user_id: "user", visible: false
-      @student.user_services.create! service: "twitter", service_user_name: "user", service_user_id: "user", visible: true
       @student.user_services.create! service: "somethingthatdoesntexistanymore", service_user_name: "user", service_user_id: "user", visible: true
     end
 
@@ -206,19 +205,7 @@ describe "User Profile API", type: :request do
                       user_id: @student.to_param, format: "json",
                       include: ["user_services"])
       expect(json["user_services"]).to eq [
-        { "service" => "skype", "visible" => false, "service_user_link" => "skype:user?add" },
-        { "service" => "twitter", "visible" => true, "service_user_link" => "http://www.twitter.com/user" }
-      ]
-    end
-
-    it "only returns visible services for other users" do
-      @user = @admin
-      json = api_call(:get, "/api/v1/users/#{@student.id}/profile?include[]=user_services",
-                      controller: "profile", action: "settings",
-                      user_id: @student.to_param, format: "json",
-                      include: %w[user_services])
-      expect(json["user_services"]).to eq [
-        { "service" => "twitter", "visible" => true, "service_user_link" => "http://www.twitter.com/user" },
+        { "service" => "skype", "visible" => false, "service_user_link" => "skype:user?add" }
       ]
     end
 
