@@ -44,6 +44,20 @@ course_paces:
       state: allowed_on
     ci:
       state: allowed_on
+course_paces_for_sections:
+  state: hidden
+  display_name: 'Per Section Course Paces'
+  description: Enable unique course paces for course sections.
+  applies_to: SiteAdmin
+  environments:
+    development:
+      state: allowed_on
+    beta:
+      state: allowed_on
+    ci:
+      state: allowed_on
+    production:
+      state: allowed_on
 create_course_subaccount_picker:
   state: hidden
   applies_to: RootAccount
