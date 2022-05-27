@@ -2246,6 +2246,11 @@ describe EnrollmentsApiController, type: :request do
         expect(response.code).to eql "401"
       end
 
+      it "returns 401 unauthorized for a course listing with a specific user_if provided" do
+        raw_api_call(:get, @path, @params.merge(user_id: @course.students.active.first.id))
+        expect(response.code).to eql "401"
+      end
+
       it "returns 404 for a user querying from the wrong account" do
         sub = @enrollment.root_account.sub_accounts.create!(name: "sub")
         bad_path = "/api/v1/accounts/#{sub.id}/enrollments/#{@enrollment.id}"
