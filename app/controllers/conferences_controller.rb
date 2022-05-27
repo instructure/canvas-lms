@@ -457,6 +457,7 @@ class ConferencesController < ApplicationController
     if authorized_action(@conference, @current_user, :delete)
       @conference.transaction do
         @conference.web_conference_participants.scope.delete_all
+        @conference.calendar_event&.update_columns(web_conference_id: nil) # explicitly nullify the calendar_event
         @conference.destroy
       end
       respond_to do |format|
