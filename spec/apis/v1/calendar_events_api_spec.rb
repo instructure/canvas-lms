@@ -2942,7 +2942,7 @@ describe CalendarEventsApiController, type: :request do
 
     it "omits DTEND for all day events" do
       # assignments due at 23:59 are treated as all day events
-      due_at = Time.utc(2022, 4, 27, 23, 59)
+      due_at = 1.day.from_now.end_of_day
       @course.assignments.create(title: "i am all day", due_at: due_at)
       get "/feeds/calendars/#{@user.feed_code}.ics"
       expect(response).to be_successful
