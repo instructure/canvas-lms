@@ -277,7 +277,12 @@ module Importers
 
       item.generate_quiz_data if hash[:available] || item.published?
 
-      item.points_possible = hash[:points_possible] if hash.key?(:points_possible) && migration.quizzes_next_migration?
+      if hash.key?(:points_possible) && migration.quizzes_next_migration?
+        item.points_possible = hash[:points_possible]
+
+        # prevent overriding the points_possible field
+        item.saved_by_new_quizzes_migration = true
+      end
 
       if hash[:available]
         item.workflow_state = "available"

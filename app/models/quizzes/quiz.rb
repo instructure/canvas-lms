@@ -36,7 +36,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   include LockedFor
 
   attr_readonly :context_id, :context_type
-  attr_accessor :notify_of_update
+  attr_accessor :notify_of_update, :saved_by, :saved_by_new_quizzes_migration
 
   has_many :quiz_questions, -> { order(:position) }, dependent: :destroy, class_name: "Quizzes::QuizQuestion", inverse_of: :quiz
   has_many :quiz_submissions, dependent: :destroy, class_name: "Quizzes::QuizSubmission"
@@ -436,8 +436,6 @@ class Quizzes::Quiz < ActiveRecord::Base
     end
   end
 
-  attr_accessor :saved_by
-
   def update_assignment
     delay_if_production.set_unpublished_question_count if id
     if !assignment_id && @old_assignment_id
@@ -780,7 +778,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     if opts[:persist] != false
       self.quiz_data = data
 
-      unless survey?
+      unless survey? || saved_by_new_quizzes_migration
         possible = self.class.count_points_possible(data)
         self.points_possible = [possible, 0].max
       end

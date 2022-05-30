@@ -68,6 +68,23 @@ describe "Importers::QuizImporter" do
         expect(quiz.points_possible).to eq data[:points_possible]
         expect(quiz.points_possible).to be > 0
       end
+
+      context "when the quiz is available" do
+        it "retains the points from the original quiz regardless of the duplicated quiz points count" do
+          allow(Quizzes::Quiz).to receive(:count_points_possible).and_return(0.0)
+
+          context = course_model
+          question_data = import_example_questions
+          data = get_import_data ["vista", "quiz"], "simple_quiz_data"
+          data[:available] = true
+
+          Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
+          quiz = Quizzes::Quiz.where(migration_id: data[:migration_id]).first
+
+          expect(quiz.points_possible).to eq data[:points_possible]
+          expect(quiz.points_possible).to be > 0
+        end
+      end
     end
   end
 
