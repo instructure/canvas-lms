@@ -73,21 +73,3 @@ def calcBundleSizes() {
      )
    }
 }
-
-def runESCheck() {
-  sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_CACHE_IMAGE'
-
-  def statusCode = sh(script: '''
-    docker run --name webpack-cache \
-    $WEBPACK_CACHE_IMAGE bash -c \
-      "yarn add es-check@5 --silent && node_modules/.bin/es-check es10 ./public/dist/**/*.js > /tmp/escheck.out"
-   ''', returnStatus:true)
-
-   if (statusCode != 0) {
-      sh 'docker cp webpack-cache:/tmp/escheck.out tmp/escheck.out'
-
-      def data = readFile(file: 'tmp/escheck.out')
-      echo data
-      gerrit.submitLintReview('-2', 'ES version matching errors exist')
-   }
-}
