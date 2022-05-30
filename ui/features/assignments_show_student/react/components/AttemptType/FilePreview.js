@@ -60,7 +60,7 @@ export default class FilePreview extends Component {
       case 'pdf':
         return I18n.t('pdf')
       case 'ppt':
-        return I18n.t('ptt')
+        return I18n.t('ppt')
       case 'text':
         return I18n.t('text')
       case 'video':
