@@ -499,12 +499,6 @@ pipeline {
                         gerrit.submitLintReview('-2', 'This commit contains only changes to config/locales/, this could be a bad sign!')
                       }
 
-                  extendedStage('Webpack ES-Check')
-                    .hooks(buildSummaryReportHooks.call())
-                    .obeysAllowStages(false)
-                    .required(env.GERRIT_CHANGE_ID != '0')
-                    .execute { webpackStage.&runESCheck() }
-
                   extendedStage('Webpack Bundle Size Check')
                     .hooks(buildSummaryReportHooks.call())
                     .obeysAllowStages(false)
