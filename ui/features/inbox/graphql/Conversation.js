@@ -20,6 +20,7 @@ import {arrayOf, shape, string} from 'prop-types'
 import {ConversationMessage} from './ConversationMessage'
 import {ConversationParticipant} from './ConversationParticipant'
 import gql from 'graphql-tag'
+import {PageInfo} from './PageInfo'
 import {User} from './User'
 
 export const Conversation = {
@@ -88,6 +89,7 @@ export const Conversation = {
           ]
         })
       ],
+      pageInfo: PageInfo.mock({hasNextPage: false}),
       __typename: 'ConversationMessageConnection'
     },
     conversationParticipantsConnection = {

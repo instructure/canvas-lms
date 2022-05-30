@@ -119,13 +119,16 @@ export const CONVERSATIONS_QUERY = gql`
 `
 
 export const CONVERSATION_MESSAGES_QUERY = gql`
-  query GetConversationMessagesQuery($conversationID: ID!) {
+  query GetConversationMessagesQuery($conversationID: ID!, $afterMessage: String) {
     legacyNode(_id: $conversationID, type: Conversation) {
       ... on Conversation {
         ...Conversation
-        conversationMessagesConnection {
+        conversationMessagesConnection(first: 20, after: $afterMessage) {
           nodes {
             ...ConversationMessage
+          }
+          pageInfo {
+            ...PageInfo
           }
         }
         contextName
@@ -134,6 +137,7 @@ export const CONVERSATION_MESSAGES_QUERY = gql`
   }
   ${Conversation.fragment}
   ${ConversationMessage.fragment}
+  ${PageInfo.fragment}
 `
 
 export const COURSES_QUERY = gql`
@@ -221,14 +225,23 @@ export const SUBMISSION_COMMENTS_QUERY = gql`
     $submissionID: ID!
     $sort: SubmissionCommentsSortOrderType
     $allComments: Boolean = true
+    $afterComment: String
   ) {
     legacyNode(_id: $submissionID, type: Submission) {
       ... on Submission {
         _id
         id
-        commentsConnection(sortOrder: $sort, filter: {allComments: $allComments}) {
+        commentsConnection(
+          sortOrder: $sort
+          filter: {allComments: $allComments}
+          first: 20
+          after: $afterComment
+        ) {
           nodes {
             ...SubmissionComment
+          }
+          pageInfo {
+            ...PageInfo
           }
         }
         user {
@@ -238,4 +251,5 @@ export const SUBMISSION_COMMENTS_QUERY = gql`
     }
   }
   ${SubmissionComment.fragment}
+  ${PageInfo.fragment}
 `

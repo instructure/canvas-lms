@@ -243,6 +243,7 @@ export const handlers = [
               __typename: 'SubmissionComment'
             }
           ],
+          pageInfo: PageInfo.mock({hasNextPage: false}),
           __typename: 'SubmissionCommentConnection'
         },
         user: {
