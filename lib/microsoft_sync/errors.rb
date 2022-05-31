@@ -137,7 +137,17 @@ module MicrosoftSync
       end
     end
 
+    class GroupNotFoundGracefulCancelError < Errors::GracefulCancelError
+      def self.public_message
+        I18n.t "The Microsoft 365 Group created by sync no longer exists. Usually, this means " \
+               "the group was deleted on the Microsoft side (e.g., by an admin). A manual " \
+               "re-sync should resolve the issue and recreate the group if necessary."
+      end
+    end
+
     class TeamAlreadyExists < StandardError; end
+
+    class GroupNotFound < StandardError; end
 
     class OwnersQuotaExceeded < StandardError; end
 
@@ -233,6 +243,8 @@ module MicrosoftSync
 
     # Microsoft's API being eventually consistent requires us to retry 404s
     # (HTTPNotFound) is many cases, particularly when first adding a group.
-    INTERMITTENT_AND_NOTFOUND = [*INTERMITTENT, HTTPNotFound].freeze
+    NOT_FOUND = [HTTPNotFound, GroupNotFound].freeze
+
+    INTERMITTENT_AND_NOTFOUND = [*INTERMITTENT, *NOT_FOUND].freeze
   end
 end
