@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {ApolloProvider} from 'react-apollo'
-import {render, fireEvent, screen} from '@testing-library/react'
+import {act, render, fireEvent, screen} from '@testing-library/react'
 import {mswClient} from '../../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../../shared/msw/mswServer'
 import {AddressBookContainer} from '../AddressBookContainer'
@@ -156,14 +156,19 @@ describe('Should load <AddressBookContainer> normally', () => {
     })
 
     it('should filter menu when typing', async () => {
+      jest.useFakeTimers()
       const {container} = setup()
       fireEvent.change(container.querySelector('input'), {target: {value: 'Fred'}})
+
+      // for debouncing
+      act(() => jest.advanceTimersByTime(1000))
       const items = await screen.findAllByTestId('address-book-item')
       // Expects The user Fred and a back button
       expect(items.length).toBe(2)
     })
 
     it('should return to last filter when backing out of search', async () => {
+      jest.useFakeTimers()
       const {container} = setup()
       let items = await screen.findAllByTestId('address-book-item')
       // open students submenu
@@ -173,21 +178,28 @@ describe('Should load <AddressBookContainer> normally', () => {
       expect(items.length).toBe(4)
       fireEvent.change(container.querySelector('input'), {target: {value: 'Fred'}})
 
+      // for debouncing
+      act(() => jest.advanceTimersByTime(1000))
       items = await screen.findAllByTestId('address-book-item')
       // search results
       expect(items.length).toBe(2)
       fireEvent.mouseDown(items[0])
 
+      act(() => jest.advanceTimersByTime(1000))
       items = await screen.findAllByTestId('address-book-item')
       // the student sub-menu
       expect(items.length).toBe(4)
     })
 
     it('Should clear text field when item is clicked', async () => {
+      jest.useFakeTimers()
       const {container} = setup()
       let input = container.querySelector('input')
       fireEvent.change(input, {target: {value: 'Fred'}})
       expect(input.value).toBe('Fred')
+
+      // for debouncing
+      act(() => jest.advanceTimersByTime(1000))
 
       const items = await screen.findAllByTestId('address-book-item')
       // Expects Fred and a back button
