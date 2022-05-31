@@ -13,7 +13,6 @@ namespace :ci do
   end
 
   task reset_database: :environment do
-    ENV["RANDOMIZE_SEQUENCES"] = "0"
     raise "need to set RAILS_ENV=test" unless Rails.env.test?
 
     require "spec/support/test_database_utils"

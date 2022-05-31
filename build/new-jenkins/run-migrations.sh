@@ -5,7 +5,7 @@ set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 # Append thread count used to build images.
 TAG_THREADS_SUFFIX=${RSPEC_PROCESSES:-"1"}
 
-export CACHE_VERSION="2021-07-12.1"
+export CACHE_VERSION="2022-05-31.1"
 export CACHE_SUFFIX="-$TAG_THREADS_SUFFIX"
 
 source ./build/new-jenkins/docker-build-helpers.sh
