@@ -404,10 +404,14 @@ module AccountReports::ReportHelper
 
   def activate_report_db(replica: :report, &block)
     # if there is no report db configured, use the secondary.
-    if Shard.current.database_server.config[:report]
-      GuardRail.activate(replica, &block)
-    else
-      GuardRail.activate(:secondary, &block)
+    # Rails 6.1 - Shard.current.database_server.roles will be set.
+    # It is not set in older versions of Rails.
+    Shard.current.database_server.tap do |ds|
+      if (ds.respond_to?(:roles) && ds.roles.include?(replica)) || ds.config[replica]
+        GuardRail.activate(replica, &block)
+      else
+        GuardRail.activate(:secondary, &block)
+      end
     end
   end
 
