@@ -14,7 +14,7 @@ done
 docker-compose exec -T cassandra cqlsh -e "${create_cmd[@]}"
 
 docker-compose exec -T canvas bin/rails db:migrate >> ./migrate.log
-docker-compose exec -T canvas bin/rails runner "require 'switchman/test_helper'; Switchman::TestHelper.recreate_persistent_test_shards"
+docker-compose exec -T canvas bin/rake ci:reset_database RAILS_ENV=test CREATE_SHARDS=1
 
 for keyspace in auditors global_lookups page_views; do
   seq 0 $DATABASE_PROCESSES | parallel "docker-compose exec -T cassandra bash -c 'cqlsh -e \"DESCRIBE KEYSPACE ${keyspace}\" | sed \"s/CREATE KEYSPACE ${keyspace}/CREATE KEYSPACE ${keyspace}{}/g ; s/CREATE TABLE ${keyspace}/CREATE TABLE ${keyspace}{}/g\" > ${keyspace}{} && cqlsh -f \"${keyspace}{}\"'"

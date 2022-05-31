@@ -42,7 +42,7 @@ module TestDatabaseUtils
       # this won't create/migrate them, but it will let us with_each_shard any
       # persistent ones that already exist
       require "switchman/test_helper"
-      ::Switchman::TestHelper.recreate_persistent_test_shards(dont_create: true)
+      ::Switchman::TestHelper.recreate_persistent_test_shards(dont_create: ENV["CREATE_SHARDS"] != "1")
 
       truncate_all_tables! if truncate_all_tables?
       randomize_sequences! if randomize_sequences?
