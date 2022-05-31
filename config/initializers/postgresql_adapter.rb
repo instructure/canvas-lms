@@ -177,79 +177,10 @@ module PostgreSQLAdapterExtensions
     [index_name, index_type, index_columns, index_options, algorithm, using]
   end
 
-  if Rails.version < "6.1"
-    def remove_index(table_name, options = {})
-      table = ActiveRecord::ConnectionAdapters::PostgreSQL::Utils.extract_schema_qualified_name(table_name.to_s)
+  def index_algorithm(algorithm)
+    return nil if open_transactions > 0
 
-      if options.is_a?(Hash) && options.key?(:name)
-        provided_index = ActiveRecord::ConnectionAdapters::PostgreSQL::Utils.extract_schema_qualified_name(options[:name].to_s)
-
-        options[:name] = provided_index.identifier
-        table = ActiveRecord::ConnectionAdapters::PostgreSQL::Name.new(provided_index.schema, table.identifier) unless table.schema.present?
-
-        if provided_index.schema.present? && table.schema != provided_index.schema
-          raise ArgumentError, "Index schema '#{provided_index.schema}' does not match table schema '#{table.schema}'"
-        end
-      end
-
-      name = index_name_for_remove(table.to_s, options)
-      return if name.nil? && options[:if_exists]
-
-      index_to_remove = ActiveRecord::ConnectionAdapters::PostgreSQL::Name.new(table.schema, name)
-      algorithm =
-        if options.is_a?(Hash) && options.key?(:algorithm)
-          index_algorithms.fetch(options[:algorithm]) do
-            raise ArgumentError, "Algorithm must be one of the following: #{index_algorithms.keys.map(&:inspect).join(", ")}"
-          end
-        end
-      algorithm = nil if open_transactions > 0
-      if_exists = " IF EXISTS" if options.is_a?(Hash) && options[:if_exists]
-      execute "DROP INDEX #{algorithm} #{if_exists} #{quote_table_name(index_to_remove)}"
-    end
-  else
-    def index_algorithm(algorithm)
-      return nil if open_transactions > 0
-
-      super
-    end
-  end
-
-  if Rails.version < "6.1"
-    def index_name_for_remove(table_name, options = {})
-      return options[:name] if can_remove_index_by_name?(options)
-
-      checks = []
-
-      if options.is_a?(Hash)
-        checks << ->(i) { i.name == options[:name].to_s } if options.key?(:name)
-        column_names = index_column_names(options[:column])
-      else
-        column_names = index_column_names(options)
-      end
-
-      if column_names.present?
-        checks << ->(i) { index_name(table_name, i.columns) == index_name(table_name, column_names) }
-      end
-
-      raise ArgumentError, "No name or columns specified" if checks.none?
-
-      matching_indexes = indexes(table_name).select { |i| checks.all? { |check| check[i] } }
-
-      if matching_indexes.count > 1
-        raise ArgumentError, "Multiple indexes found on #{table_name} columns #{column_names}. " \
-                             "Specify an index name from #{matching_indexes.map(&:name).join(", ")}"
-      elsif matching_indexes.none?
-        return if options.is_a?(Hash) && options[:if_exists]
-
-        raise ArgumentError, "No indexes found on #{table_name} with the options provided."
-      else
-        matching_indexes.first.name
-      end
-    end
-
-    def can_remove_index_by_name?(options)
-      options.is_a?(Hash) && options.key?(:name) && options.except(:name, :algorithm, :if_exists).empty?
-    end
+    super
   end
 
   def add_column(table_name, column_name, type, if_not_exists: false, **options)
@@ -416,11 +347,7 @@ module ReferenceDefinitionExtensions
     end
 
     if index
-      if Rails.version < "6.1"
-        table.index(column_names, index_options)
-      else
-        table.index(column_names, **index_options(table.name))
-      end
+      table.index(column_names, **index_options(table.name))
     end
   end
 
@@ -445,11 +372,7 @@ module SchemaStatementsExtensions
   end
 end
 
-if Rails.version < "6.1"
-  ActiveRecord::ConnectionAdapters::PostgreSQLAdapter::SchemaCreation.prepend(SchemaCreationExtensions)
-else
-  ActiveRecord::ConnectionAdapters::PostgreSQL::SchemaCreation.prepend(SchemaCreationExtensions)
-end
+ActiveRecord::ConnectionAdapters::PostgreSQL::SchemaCreation.prepend(SchemaCreationExtensions)
 ActiveRecord::ConnectionAdapters::ColumnDefinition.prepend(ColumnDefinitionExtensions)
 ActiveRecord::ConnectionAdapters::ReferenceDefinition.prepend(ReferenceDefinitionExtensions)
 ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(SchemaStatementsExtensions)

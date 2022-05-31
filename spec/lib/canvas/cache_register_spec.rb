@@ -419,7 +419,7 @@ describe Canvas::CacheRegister do
       key = Account.base_cache_register_key_for(Account.default) + "/feature_flags"
       allow(Canvas::CacheRegister).to receive(:can_use_multi_cache_redis?).and_return(true)
       expect(Canvas::CacheRegister).to_not receive(:redis)
-      expect(MultiCache).to receive(:delete).with(key)
+      expect(MultiCache).to receive(:delete).with(key, { unprefixed_key: true })
       Account.default.clear_cache_key(:feature_flags)
     end
   end

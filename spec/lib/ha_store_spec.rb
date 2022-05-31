@@ -29,7 +29,7 @@ describe ActiveSupport::Cache::HaStore do
   describe "#delete" do
     it "triggers a consul event when configured" do
       # will get called twice; once with rails52: prefix, once without
-      expect(Diplomat::Event).to receive(:fire).with("invalidate", match(/mykey$/), nil, nil, nil, nil).twice
+      expect(Diplomat::Event).to receive(:fire).with("invalidate", match(/mykey$/), nil, nil, nil, nil).exactly(SUPPORTED_VERSIONS.count).times
       store.delete("mykey")
     end
   end

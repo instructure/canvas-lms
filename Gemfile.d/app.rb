@@ -27,19 +27,11 @@ def gem_override(name, version)
   end
 end
 
-if CANVAS_RAILS == "6.0"
-  gem "rails", "6.0.4.7"
-    gem "tzinfo", "1.2.7"
-  gem_override "switchman", "2.2.3"
-    gem "guardrail", "2.0.1"
-  gem_override "switchman-inst-jobs", "3.2.10"
-else
-  gem "rails", "6.1.4.6"
-    gem "tzinfo", "2.0.4"
-  gem_override "switchman", "3.0.24"
-    gem "guardrail", "3.0.2"
-  gem_override "switchman-inst-jobs", "4.0.6"
-end
+gem "rails", "6.1.4.6"
+  gem "tzinfo", "2.0.4"
+gem_override "switchman", "3.0.24"
+  gem "guardrail", "3.0.2"
+gem_override "switchman-inst-jobs", "4.0.6"
   gem "irb", "1.4.1"
   gem "open4", "1.3.4", require: false
 

@@ -73,9 +73,9 @@ module TestDatabaseUtils
     private
 
     def each_connection(&block)
-      ::Shard.with_each_shard(Rails.version < "6.1" ? ::Shard.categories : ::Shard.sharded_models) do
+      ::Shard.with_each_shard(::Shard.sharded_models) do
         models = ::ActiveRecord::Base.descendants
-        models.reject! { |m| Rails.version < "6.1" ? m.shard_category == :unsharded : m.connection_classes == [::Switchman::UnshardedRecord] } unless ::Shard.current.default?
+        models.reject! { |m| m.connection_classes == [::Switchman::UnshardedRecord] } unless ::Shard.current.default?
         model_connections = models.map(&:connection).uniq
         model_connections.each(&block)
       end
