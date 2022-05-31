@@ -89,6 +89,7 @@
     "@instructure/ui-tree-browser": "^7",
     "@instructure/ui-view": "^7",
     "@instructure/uid": "^7",
+    "@instructure/updown": "^1.1",
     "@microsoft/immersive-reader-sdk": "^1.1.0",
     "@popperjs/core": "^2.9.2",
     "@sentry/cli": "^1.72.2",
