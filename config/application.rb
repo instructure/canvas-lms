@@ -129,12 +129,6 @@ module CanvasRails
       require_dependency "canvas/plugins/default_plugins"
       Canvas::Plugins::DefaultPlugins.apply_all
       ActiveSupport::JSON::Encoding.escape_html_entities_in_json = true
-
-      if Rails.version < "6.1"
-        # On rails 6.1, this comes from switchman; on rails 6.0 canvas provides it
-        require_relative "#{__dir__}/../app/models/unsharded_record.rb"
-        Switchman::UnshardedRecord = UnshardedRecord
-      end
     end
 
     module PostgreSQLEarlyExtensions
@@ -210,19 +204,25 @@ module CanvasRails
 
     module RailsCacheShim
       def delete(key, options = nil)
-        r1 = super(key, (options || {}).merge(use_new_rails: Rails.version >= "6.1")) # prefer rails new if on old rails and vice versa
-        r2 = super(key, (options || {}).merge(use_new_rails: Rails.version < "6.1"))
-        r1 || r2
+        if options&.[](:unprefixed_key)
+          super
+        else
+          SUPPORTED_VERSIONS.any? do |version|
+            super(key, (options || {}).merge(explicit_version: version.delete(".")))
+          end
+        end
       end
 
       private
 
       def normalize_key(key, options)
-        result = super
-        if options&.key?(:use_new_rails) ? options[:use_new_rails] : Rails.version >= "6.1"
-          result = "rails61:#{result}"
+        if options[:unprefixed_key]
+          super
+        elsif options[:explicit_version]
+          "rails#{options[:explicit_version]}:#{super}"
+        else
+          "rails#{Rails::VERSION::MAJOR}#{Rails::VERSION::MINOR}:#{super}"
         end
-        result
       end
     end
 

@@ -17,15 +17,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-if Rails.version >= "6.1"
-  module NoLinksHeader
-    # Max header size needs a default, since it's a noop it doesn't matter what
-    def send_preload_links_header(preload_links, max_header_size: 0)
-      # Intentional noop so we don't bload the headers to be too big
-    end
+module NoLinksHeader
+  # Max header size needs a default, since it's a noop it doesn't matter what
+  def send_preload_links_header(preload_links, max_header_size: 0)
+    # Intentional noop so we don't bload the headers to be too big
   end
-
-  # Directly put it in ActionView::Base in case that has already been loaded
-  ActionView::Helpers::AssetTagHelper.prepend(NoLinksHeader)
-  ActionView::Base.prepend(NoLinksHeader)
 end
+
+# Directly put it in ActionView::Base in case that has already been loaded
+ActionView::Helpers::AssetTagHelper.prepend(NoLinksHeader)
+ActionView::Base.prepend(NoLinksHeader)

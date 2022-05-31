@@ -23,11 +23,7 @@ module Messages
           log "Done. Bye!"
           log "*" * 80
           unless Rails.env.test?
-            if Rails.version < "6.1"
-              ActiveRecord::Base.connection_pool.current_pool.disconnect!
-            else
-              ActiveRecord::Base.connection_pool.disconnect!
-            end
+            ActiveRecord::Base.connection_pool.disconnect!
           end
         end
       end
