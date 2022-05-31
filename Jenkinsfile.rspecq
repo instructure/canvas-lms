@@ -205,12 +205,12 @@ pipeline {
 
           extendedStage('Runner').hooks(postRunnerHandler).obeysAllowStages(false).execute {
             extendedStage('Builder').hooks(postBuildHandler).obeysAllowStages(false).nodeRequirements(rspecNodeRequirements).execute {
-              stage('Setup') {
+              extendedStage('RSpecQ Setup').hooks(postStageHandler).obeysAllowStages(false).execute {
                 setupNode()
               }
 
               if (!configuration.isChangeMerged() && env.GERRIT_REFSPEC != "refs/heads/master" && env.ENABLE_CRYSTALBALL == '1') {
-                stage('Compute Build Distribution') {
+                extendedStage('RSpecQ Compute Build Distribution').hooks(postStageHandler).obeysAllowStages(false).execute {
                   computeTestCount()
                 }
               }
