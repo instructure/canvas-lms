@@ -545,7 +545,7 @@ pipeline {
                   def nestedStages = [:]
 
                   extendedStage('Javascript')
-                    .hooks(buildSummaryReportHooks.call())
+                    .hooks(buildSummaryReportHooks.withRunManifest(true))
                     .queue(nestedStages, jobName: '/Canvas/test-suites/JS', buildParameters: buildParameters + [
                       string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
                     ])

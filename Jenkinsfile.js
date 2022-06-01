@@ -42,36 +42,52 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          def runnerStages = [:]
+          def postRunnerHandler = [
+            onStageEnded: { stageName, stageConfig, result ->
+              node('master') {
+                buildSummaryReport.saveRunManifest()
+              }
+            }
+          ]
 
-          for (int i = 0; i < jsStage.JEST_NODE_COUNT; i++) {
-            String index = i
-            extendedStage("Runner - Jest ${i}").nodeRequirements(label: 'canvas-docker', podTemplate: jsStage.jestNodeRequirementsTemplate(index)).obeysAllowStages(false).timeout(10).queue(runnerStages) {
+          def postStageHandler = [
+            onStageEnded: { stageName, stageConfig, result ->
+              buildSummaryReport.setStageTimings(stageName, stageConfig.timingValues())
+            }
+          ]
+
+          extendedStage('Runner').hooks(postRunnerHandler).obeysAllowStages(false).execute {
+            def runnerStages = [:]
+
+            for (int i = 0; i < jsStage.JEST_NODE_COUNT; i++) {
+              String index = i
+              extendedStage("Runner - Jest ${i}").hooks(postStageHandler).nodeRequirements(label: 'canvas-docker', podTemplate: jsStage.jestNodeRequirementsTemplate(index)).obeysAllowStages(false).timeout(10).queue(runnerStages) {
+                def tests = [:]
+
+                callableWithDelegate(jsStage.queueJestDistribution(index))(tests)
+
+                parallel(tests)
+              }
+            }
+
+            extendedStage('Runner - Coffee').hooks(postStageHandler).nodeRequirements(label: 'canvas-docker', podTemplate: jsStage.coffeeNodeRequirementsTemplate()).obeysAllowStages(false).timeout(10).queue(runnerStages) {
               def tests = [:]
 
-              callableWithDelegate(jsStage.queueJestDistribution(index))(tests)
+              callableWithDelegate(jsStage.queueCoffeeDistribution())(tests)
 
               parallel(tests)
             }
+
+            extendedStage('Runner - Karma').hooks(postStageHandler).nodeRequirements(label: 'canvas-docker', podTemplate: jsStage.karmaNodeRequirementsTemplate()).obeysAllowStages(false).timeout(10).queue(runnerStages) {
+              def tests = [:]
+
+              callableWithDelegate(jsStage.queueKarmaDistribution())(tests)
+
+              parallel(tests)
+            }
+
+            parallel(runnerStages)
           }
-
-          extendedStage('Runner - Coffee').nodeRequirements(label: 'canvas-docker', podTemplate: jsStage.coffeeNodeRequirementsTemplate()).obeysAllowStages(false).timeout(10).queue(runnerStages) {
-            def tests = [:]
-
-            callableWithDelegate(jsStage.queueCoffeeDistribution())(tests)
-
-            parallel(tests)
-          }
-
-          extendedStage('Runner - Karma').nodeRequirements(label: 'canvas-docker', podTemplate: jsStage.karmaNodeRequirementsTemplate()).obeysAllowStages(false).timeout(10).queue(runnerStages) {
-            def tests = [:]
-
-            callableWithDelegate(jsStage.queueKarmaDistribution())(tests)
-
-            parallel(tests)
-          }
-
-          parallel(runnerStages)
         }
       }
     }

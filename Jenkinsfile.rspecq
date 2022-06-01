@@ -204,7 +204,7 @@ pipeline {
           ]
 
           extendedStage('Runner').hooks(postRunnerHandler).obeysAllowStages(false).execute {
-            extendedStage('Builder').hooks(postBuildHandler).obeysAllowStages(false).nodeRequirements(rspecNodeRequirements).execute {
+            extendedStage('Builder').hooks(postStageHandler + postBuildHandler).obeysAllowStages(false).nodeRequirements(rspecNodeRequirements).execute {
               extendedStage('RSpecQ Setup').hooks(postStageHandler).obeysAllowStages(false).execute {
                 setupNode()
               }
