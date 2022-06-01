@@ -492,6 +492,11 @@ class ContextModuleProgression < ActiveRecord::Base
 
   scope :for_user, ->(user) { where(user_id: user) }
   scope :for_modules, ->(mods) { where(context_module_id: mods) }
+  scope :for_course, lambda { |course_id|
+    joins(:context_module)
+      .readonly(false)
+      .where(context_modules: { context_type: "Course", context_id: course_id })
+  }
 
   workflow do
     state :locked
