@@ -19,6 +19,8 @@
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 import ExternalContentSuccess from 'ui/features/external_content_success/index.js'
+import React from 'react'
+import ReactDOM from 'react-dom'
 
 QUnit.module('ExternalContentSuccess', {
   setup() {
@@ -79,4 +81,70 @@ test('with iframe should return the `launch_type` to getLaunchType', () => {
   )
 
   equal(ExternalContentSuccess.getLaunchType(), 'assignment_index_menu')
+})
+
+QUnit.module('ExternalContentSuccess: lti_errormsg', {
+  setup() {
+    fakeENV.setup({
+      service: 'external_tool_redirect'
+    })
+    ENV.lti_errormsg = 'this is a LTI error message'
+  },
+  teardown() {
+    fakeENV.teardown()
+    ReactDOM.unmountComponentAtNode(document.querySelector('#lti_messages_wrapper'))
+    $('#fixtures').html('')
+  }
+})
+
+test('show the "lti_errormsg" message', () => {
+  equal(ENV.lti_errormsg, 'this is a LTI error message')
+  ExternalContentSuccess.processLtiMessages(ENV, document.querySelector('#fixtures'))
+
+  equal(document.querySelector('#lti_error_message')?.innerText, ENV.lti_errormsg)
+})
+
+QUnit.module('ExternalContentSuccess: lti_msg', {
+  setup() {
+    fakeENV.setup({
+      service: 'external_tool_redirect'
+    })
+    ENV.lti_msg = 'this is a LTI message'
+  },
+  teardown() {
+    fakeENV.teardown()
+    ReactDOM.unmountComponentAtNode(document.querySelector('#lti_messages_wrapper'))
+    $('#fixtures').html('')
+  }
+})
+
+test('show the "lti_msg" message', () => {
+  equal(ENV.lti_msg, 'this is a LTI message')
+  ExternalContentSuccess.processLtiMessages(ENV, document.querySelector('#fixtures'))
+
+  equal(document.querySelector('#lti_message')?.innerText, ENV.lti_msg)
+})
+
+QUnit.module('ExternalContentSuccess: lti_msg and lti_errormsg', {
+  setup() {
+    fakeENV.setup({
+      service: 'external_tool_redirect'
+    })
+    ENV.lti_msg = 'this is a LTI message'
+    ENV.lti_errormsg = 'this is a LTI error message'
+  },
+  teardown() {
+    fakeENV.teardown()
+    ReactDOM.unmountComponentAtNode(document.querySelector('#lti_messages_wrapper'))
+    $('#fixtures').html('')
+  }
+})
+
+test('show "lti_msg" and "lti_errormsg" messages', () => {
+  equal(ENV.lti_msg, 'this is a LTI message')
+  equal(ENV.lti_errormsg, 'this is a LTI error message')
+  ExternalContentSuccess.processLtiMessages(ENV, document.querySelector('#fixtures'))
+
+  equal(document.querySelector('#lti_message')?.innerText, ENV.lti_msg)
+  equal(document.querySelector('#lti_error_message')?.innerText, ENV.lti_errormsg)
 })

@@ -21,6 +21,9 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/rails-flash-notifications'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import {Alert} from '@instructure/ui-alerts'
 
 const I18n = useI18nScope('external_content.success')
 
@@ -98,7 +101,44 @@ ExternalContentSuccess.a2DataReady = function (data) {
   )
 }
 
-ExternalContentSuccess.start = function () {
+ExternalContentSuccess.processLtiMessages = async (messages, target) => {
+  const errorMessage = messages?.lti_errormsg
+  const message = messages?.lti_msg
+
+  if (errorMessage || message) {
+    const wrapper = document.createElement('div')
+    wrapper.setAttribute('id', 'lti_messages_wrapper')
+    target.parentNode.insertBefore(wrapper, target)
+
+    await new Promise((resolve) => {
+      ReactDOM.render(
+        <>
+          {[
+            [errorMessage, true],
+            [message, false]
+          ]
+            .filter(([msg, _]) => msg !== undefined)
+            .map(([msg, isError], index) => {
+              return (
+                <Alert
+                  key={index}
+                  variant={isError ? "error" : "info"}
+                  renderCloseButtonLabel="Close"
+                  onDismiss={() => resolve()}
+                  timeout={5000}
+                >
+                  <span id={isError ? "lti_error_message" : "lti_message"}>{msg}</span>
+                </Alert>
+              )
+            })}
+        </>
+        , wrapper)
+    })
+    ReactDOM.unmountComponentAtNode(wrapper)
+  }
+}
+
+ExternalContentSuccess.start = async function () {
   while (parentWindow && parentWindow.parent !== parentWindow && !parentWindow[callback]) {
     parentWindow = parentWindow.parent
   }
@@ -107,12 +147,7 @@ ExternalContentSuccess.start = function () {
     parentWindow.$ = $
   }
 
-  if (lti_response_messages && lti_response_messages.lti_errormsg) {
-    parentWindow.$.flashError(lti_response_messages.lti_errormsg)
-  }
-  if (lti_response_messages && lti_response_messages.lti_msg) {
-    parentWindow.$.flashMessage(lti_response_messages.lti_msg)
-  }
+  await this.processLtiMessages(lti_response_messages, document.querySelector('.ic-app'))
 
   if (ENV.oembed) {
     const url = $.replaceTags(
