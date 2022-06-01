@@ -31,7 +31,13 @@ import {bool, func} from 'prop-types'
 
 const I18n = useI18nScope('assignments_2')
 
-const CommentsTrayBody = lazy(() => import('./CommentsTrayBody'))
+const CommentsTrayBody = lazy(() =>
+  import(
+    /* webpackChunkName: "CommentsTrayBody" */
+    /* webpackPrefetch: true */
+    './CommentsTrayBody'
+  )
+)
 
 function TrayContent(props) {
   // Case where this is backed by a submission draft, not a real submission, so
