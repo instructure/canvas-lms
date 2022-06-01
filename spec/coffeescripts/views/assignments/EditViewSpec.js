@@ -401,6 +401,13 @@ test('routes to return_to', function () {
   equal(view.locationAfterSave({return_to: currentOrigin + '/bar'}), currentOrigin + '/bar')
 })
 
+test('routes to the build page normally regardless of the return_to param', function () {
+  const view = this.editView({html_url: 'http://foo'})
+  sandbox.stub(view.assignment, 'showBuildButton').returns(true)
+  view.preventBuildNavigation = false
+  equal(view.locationAfterSave({return_to: 'http://calendar'}), 'http://foo?display=full_width')
+})
+
 test('does not route to return_to with javascript protocol', function () {
   const view = this.editView({html_url: currentOrigin + '/foo'})
   // eslint-disable-next-line no-script-url

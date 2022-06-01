@@ -1037,7 +1037,7 @@ export default class EditView extends ValidatedFormView
     window.location = @locationAfterSave(deparam())
 
   locationAfterSave: (params) ->
-    return params['return_to'] if returnToHelper.isValid(params['return_to'])
+    return params['return_to'] if returnToHelper.isValid(params['return_to']) && !@assignment.showBuildButton()
     useCancelLocation = @assignment.showBuildButton() && @preventBuildNavigation
     return @locationAfterCancel(deparam()) if useCancelLocation
     htmlUrl = @model.get 'html_url'
