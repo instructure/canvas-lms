@@ -142,9 +142,15 @@ def queueTestStage() {
       "TEST_RESULT_OUTPUT_DIR=js-results/${containerName}",
     ]
 
+    def postStageHandler = [
+      onStageEnded: { stageName, stageConfig, result ->
+        buildSummaryReport.setStageTimings(stageName, stageConfig.timingValues())
+      }
+    ]
+
     extendedStage(containerName)
       .envVars(baseEnvVars + additionalEnvVars)
-      .hooks([onNodeReleasing: this.tearDownNode()])
+      .hooks(postStageHandler + [onNodeReleasing: this.tearDownNode()])
       .obeysAllowStages(false)
       .nodeRequirements(container: containerName)
       .queue(stages) { sh(scriptName) }
