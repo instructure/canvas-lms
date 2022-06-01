@@ -2052,7 +2052,6 @@ class UsersController < ApplicationController
       user_params.delete(:avatar_image)
 
       managed_attributes << :avatar_image
-      user_params[:avatar_image] = {}
       if (token = avatar.try(:[], :token))
         if (av_json = avatar_for_token(@user, token))
           user_params[:avatar_image] = { type: av_json["type"],
@@ -2061,7 +2060,10 @@ class UsersController < ApplicationController
       elsif (url = avatar.try(:[], :url))
         user_params[:avatar_image] = { url: url }
       end
-      user_params[:avatar_image][:state] = avatar.try(:[], :state)
+
+      if (state = avatar.try(:[], :state))
+        user_params[:avatar_image] = { state: state }
+      end
     end
 
     if managed_attributes.empty? || !user_params.except(*managed_attributes).empty?
