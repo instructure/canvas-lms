@@ -593,6 +593,7 @@ class Assignment < ActiveRecord::Base
 
   after_save  :start_canvadocs_render, if: :saved_change_to_annotatable_attachment_id?
   after_save  :update_due_date_smart_alerts, if: :update_cached_due_dates?
+  after_save  :mark_module_progressions_outdated, if: :update_cached_due_dates?
 
   after_commit :schedule_do_auto_peer_review_job_if_automatic_peer_review
 
@@ -3986,5 +3987,11 @@ class Assignment < ActiveRecord::Base
     provisional_grades.each_with_object({}) do |provisional_grade, hash|
       hash[provisional_grade.id] = active_user_ids.include?(provisional_grade.scorer_id)
     end
+  end
+
+  def mark_module_progressions_outdated
+    progressions = ContextModuleProgression.for_course(context).where(current: true)
+    progressions.update_all(current: false)
+    User.where(id: progressions.pluck(:user_id)).touch_all
   end
 end
