@@ -40,9 +40,21 @@ import VisualOnFocusMessage from './VisualOnFocusMessage'
 
 const I18n = useI18nScope('assignments_2_student_content')
 
-const LoggedOutTabs = lazy(() => import('./LoggedOutTabs'))
+const LoggedOutTabs = lazy(() =>
+  import(
+    /* webpackChunkName: "LoggedOutTabs" */
+    /* webpackPrefetch: true */
+    './LoggedOutTabs'
+  )
+)
 
-const RubricsQuery = lazy(() => import('./RubricsQuery'))
+const RubricsQuery = lazy(() =>
+  import(
+    /* webpackChunkName: "RubricsQuery" */
+    /* webpackPrefetch: true */
+    './RubricsQuery'
+  )
+)
 
 function EnrollmentConcludedNotice() {
   return (
