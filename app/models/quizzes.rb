@@ -19,6 +19,6 @@
 #
 module Quizzes
   # force loading of constants that need autoloading protection
-  # see lib/quizzes/preloader.rb
+  # see app/models/quizzes/preloader.rb
   include Preloader
 end
