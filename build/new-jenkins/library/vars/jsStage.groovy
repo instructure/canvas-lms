@@ -53,10 +53,21 @@ def karmaNodeRequirementsTemplate() {
   def karmaContainers = []
 
   karmaContainers = karmaContainers + (0..JSG_NODE_COUNT).collect { index -> baseTestContainer + [name: "jsg${index}"] }
-  karmaContainers = karmaContainers + ['jsa', 'jsh', 'packages'].collect { group -> baseTestContainer + [name: group] }
+  karmaContainers = karmaContainers + ['jsa', 'jsh'].collect { group -> baseTestContainer + [name: group] }
 
   return [
     containers: karmaContainers,
+  ]
+}
+
+def packagesNodeRequirementsTemplate() {
+  def baseTestContainer = [
+    image: env.KARMA_RUNNER_IMAGE,
+    command: 'cat'
+  ]
+
+  return [
+    containers: [baseTestContainer + [name: "packages"]],
   ]
 }
 
@@ -129,7 +140,11 @@ def queueKarmaDistribution() {
     ['jsa', 'jsh'].each { group ->
       callableWithDelegate(queueTestStage())(stages, "${group}", ["JSPEC_GROUP=${group}"], 'yarn test:karma:headless')
     }
+  }
+}
 
+def queuePackagesDistribution() {
+  { stages ->
     callableWithDelegate(queueTestStage())(stages, 'packages', [], 'TEST_RESULT_OUTPUT_DIR=/usr/src/app/$TEST_RESULT_OUTPUT_DIR yarn test:packages')
   }
 }
