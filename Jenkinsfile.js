@@ -86,6 +86,14 @@ pipeline {
               parallel(tests)
             }
 
+            extendedStage('Runner - Packages').hooks(postStageHandler).nodeRequirements(label: 'canvas-docker', podTemplate: jsStage.packagesNodeRequirementsTemplate()).obeysAllowStages(false).timeout(10).queue(runnerStages) {
+              def tests = [:]
+
+              callableWithDelegate(jsStage.queuePackagesDistribution())(tests)
+
+              parallel(tests)
+            }
+
             parallel(runnerStages)
           }
         }
