@@ -28,7 +28,13 @@ import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('assignments_2')
 
-const RubricTab = lazy(() => import('./RubricTab'))
+const RubricTab = lazy(() =>
+  import(
+    /* webpackChunkName: "RubricTab" */
+    /* webpackPrefetch: true */
+    './RubricTab'
+  )
+)
 
 ContentTabs.propTypes = {
   assignment: Assignment.shape,
