@@ -102,9 +102,12 @@ def tearDownNode(prefix) {
     cancel_node(SUCCESS_NOT_BUILT, 'Node cancelled!')
     return
   }
-  sh 'rm -rf ./tmp && mkdir -p tmp'
-  sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results tmp/rspec_results canvas_ --allow-error --clean-dir'
-  sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures/$prefix canvas_ --allow-error --clean-dir"
+
+  sh """
+    rm -rf ./tmp && mkdir -p tmp
+    build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results tmp/rspec_results canvas_ --allow-error --clean-dir
+    build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures/$prefix canvas_ --allow-error --clean-dir
+  """
 
   if (env.COVERAGE == '1') {
     sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/coverage tmp/coverage canvas_ --allow-error --clean-dir'
@@ -151,8 +154,6 @@ def tearDownNode(prefix) {
     sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/parallel_runtime/ ./tmp/parallel_runtime_rspec_tests canvas_ --allow-error --clean-dir'
     archiveArtifacts(artifacts: 'tmp/parallel_runtime_rspec_tests/**/*.log')
   }
-
-  sh 'rm -rf ./tmp'
 }
 
 def runRspecqSuite() {
