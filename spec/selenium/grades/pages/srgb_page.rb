@@ -47,6 +47,10 @@ class SRGB
       f("#student_and_assignment_grade")
     end
 
+    def excuse_checkbox
+      f("#submission-excused")
+    end
+
     def grade_for_label
       f("label[for='student_and_assignment_grade']")
     end

@@ -81,6 +81,14 @@ const GradingCellComponent = Ember.Component.extend({
     return ENV.GRADEBOOK_OPTIONS.change_grade_url
   },
 
+  isExcused(value) {
+    return (
+      value &&
+      typeof value === 'string' &&
+      (value?.toUpperCase() === 'EXCUSED' || value?.toUpperCase() === 'EX')
+    )
+  },
+
   saveURL: function () {
     const submission = this.get('submission')
     return this.changeGradeURL()
@@ -199,11 +207,14 @@ const GradingCellComponent = Ember.Component.extend({
     }
 
     const url = this.get('saveURL')
-    let value = this.$('input, select').val()
+    let value = this.$('input, select').val() || this.value
 
-    const excused = typeof value === 'string' && value.toUpperCase() === 'EX'
-    this.setExcusedWithoutTriggeringSave(excused)
-
+    const excused = this.isExcused(value)
+    if (this.get('excused') && excused) {
+      return
+    } else {
+      this.setExcusedWithoutTriggeringSave(excused)
+    }
     if (this.get('isPassFail') && value === '-') {
       value = ''
     }
@@ -217,18 +228,17 @@ const GradingCellComponent = Ember.Component.extend({
       return
     }
 
-    if ((value && this.get('isPoints')) || this.get('isPercent')) {
+    if ((!this.isExcused(value) && this.get('isPoints')) || this.get('isPercent')) {
       let formattedGrade = value
-      formattedGrade = numberHelper.parse(formattedGrade.replace(/%/g, '')).toString()
+      formattedGrade = numberHelper.parse(formattedGrade?.replace(/%/g, '')).toString()
       if (formattedGrade === 'NaN') {
         return $.flashError(I18n.t('Invalid Grade'))
       }
     }
 
-    const data =
-      typeof value === 'string' && value.toUpperCase() === 'EX'
-        ? {'submission[excuse]': true}
-        : {'submission[posted_grade]': value}
+    const data = this.isExcused(value)
+      ? {'submission[excuse]': true}
+      : {'submission[posted_grade]': value}
     const save = this.ajax(url, {
       type: 'PUT',
       data
