@@ -58,18 +58,18 @@ def calcBundleSizes() {
      }
    }
 
-   if (!bigFileList.isEmpty()) {
-     def authorSlackId = env.GERRIT_EVENT_ACCOUNT_EMAIL ? slackUserIdFromEmail(email: env.GERRIT_EVENT_ACCOUNT_EMAIL, botUser: true, tokenCredentialId: 'slack-user-id-lookup') : ''
-     def authorSlackMsg = authorSlackId ? "<@$authorSlackId>" : env.GERRIT_EVENT_ACCOUNT_NAME
-     def authorSegment = "Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> by ${authorSlackMsg} includes an asset bundle over the recommended max size"
-     def bigFiles = bigFileList.join(", ")
-     def extra = "Bundle ${bigFiles} is too big and not in our known list of oversized bundles. This patchset may have pushed in over the acceptable limit. Please review the <https://inst.splunkcloud.com/en-US/app/search/report?sid=scheduler_cm9iZXJ0LmJ1dGVuQGluc3RydWN0dXJlLmNvbQ__search__RMD5ca61b6204ef60fe9_at_1650416400_45040_1987C8A1-0299-4A02-A75B-503AB27123E0&s=%2FservicesNS%2Fnobody%2Fsearch%2Fsaved%2Fsearches%2Fwebpack_bundle_size|Webpack Bundle Size> to see how bundles have grown over time."
-     def summaryUrl = "${env.BUILD_URL}/build-summary-report"
+  //  if (!bigFileList.isEmpty()) {
+    //  def authorSlackId = env.GERRIT_EVENT_ACCOUNT_EMAIL ? slackUserIdFromEmail(email: env.GERRIT_EVENT_ACCOUNT_EMAIL, botUser: true, tokenCredentialId: 'slack-user-id-lookup') : ''
+    //  def authorSlackMsg = authorSlackId ? "<@$authorSlackId>" : env.GERRIT_EVENT_ACCOUNT_NAME
+    //  def authorSegment = "Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> by ${authorSlackMsg} includes an asset bundle over the recommended max size"
+    //  def bigFiles = bigFileList.join(", ")
+    //  def extra = "Bundle ${bigFiles} is too big and not in our known list of oversized bundles. This patchset may have pushed in over the acceptable limit. Please review the <https://inst.splunkcloud.com/en-US/app/search/report?sid=scheduler_cm9iZXJ0LmJ1dGVuQGluc3RydWN0dXJlLmNvbQ__search__RMD5ca61b6204ef60fe9_at_1650416400_45040_1987C8A1-0299-4A02-A75B-503AB27123E0&s=%2FservicesNS%2Fnobody%2Fsearch%2Fsaved%2Fsearches%2Fwebpack_bundle_size|Webpack Bundle Size> to see how bundles have grown over time."
+    //  def summaryUrl = "${env.BUILD_URL}/build-summary-report"
 
-     slackSend(
-       channel: '#canvas_builds',
-       color: 'warning',
-       message: "${authorSegment}. Build <${summaryUrl}|#${env.BUILD_NUMBER}>\n\n$extra"
-     )
-   }
+    //  slackSend(
+    //    channel: '#canvas_builds',
+    //    color: 'warning',
+    //    message: "${authorSegment}. Build <${summaryUrl}|#${env.BUILD_NUMBER}>\n\n$extra"
+    //  )
+  //  }
 }
