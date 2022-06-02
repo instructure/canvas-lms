@@ -62,6 +62,14 @@ RSpec.describe AnonymousSubmissionsController do
       expect(body["published_score"]).to eq 10
     end
 
+    it "renders unauthorized for students that cannot access the course" do
+      @course.enrollments.find_by(user: @student).deactivate
+      user_session(@student)
+      request.accept = Mime[:json].to_s
+      get :show, params: { course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id }, format: :json
+      expect(response).to have_http_status(:unauthorized)
+    end
+
     it "mark read if reading one's own submission" do
       user_session(@student)
       request.accept = Mime[:json].to_s
@@ -110,7 +118,6 @@ RSpec.describe AnonymousSubmissionsController do
     end
 
     it "shows rubric assessments to peer reviewers" do
-      course_with_student(active_all: true)
       @course.account.enable_service(:avatars)
       @assessor = @student
       outcome_with_rubric
