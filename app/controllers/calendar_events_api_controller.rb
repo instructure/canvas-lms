@@ -19,6 +19,7 @@
 #
 
 require "atom"
+require "rrule"
 
 # @API Calendar Events
 #
@@ -473,6 +474,9 @@ class CalendarEventsApiController < ApplicationController
   # @argument calendar_event[duplicate][append_iterator] [Boolean]
   #   Defaults to false.  If set to `true`, an increasing counter number will be appended to the event title
   #   when the event is duplicated.  (e.g. Event 1, Event 2, Event 3, etc)
+  # @argument calendar_event[rrule] [string]
+  #   If the :calendar_series flag is on, this parameter replaces the calendar_event[duplicate] parameters
+  #   Its value is the iCalendar RRULE, though unending series are capped at 200 instances.
   #
   # @example_request
   #
@@ -489,6 +493,7 @@ class CalendarEventsApiController < ApplicationController
     end
 
     params_for_create = calendar_event_params
+    params_for_create[:series_id] = CalendarEvent.maximum(:series_id).to_i.next if params_for_create[:rrule].present?
     if params_for_create[:description].present?
       params_for_create[:description] = process_incoming_html_content(params_for_create[:description])
     end
@@ -501,21 +506,34 @@ class CalendarEventsApiController < ApplicationController
     @event.validate_context! if @context.is_a?(AppointmentGroup)
 
     if authorized_action(@event, @current_user, :create)
-      # Create duplicates if necessary
-      events = []
-      dup_options = get_duplicate_params(params[:calendar_event])
+      rrule = params_for_create[:rrule]
+      # Create multiple events if necessary
+      if rrule.present? && Account.site_admin.feature_enabled?(:calendar_series)
+        start_at = Time.parse(params_for_create[:start_at]) if params_for_create[:start_at]
+        rr = validate_and_parse_rrule(
+          rrule,
+          dtstart: start_at,
+          tzid: @current_user.time_zone&.tzinfo&.name || "UTC"
+        )
+        return false if rr.nil?
 
-      if dup_options[:count] > RECURRING_EVENT_LIMIT
-        InstStatsd::Statsd.gauge("calendar_events_api.recurring.count_exceeding_limit", dup_options[:count])
-        return render json: {
-          message: t("only a maximum of %{limit} events can be created",
-                     limit: RECURRING_EVENT_LIMIT)
-        }, status: :bad_request
-      elsif dup_options[:count] > 0
-        InstStatsd::Statsd.gauge("calendar_events_api.recurring.count", dup_options[:count])
-        events += create_event_and_duplicates(dup_options)
+        events = create_event_series(params_for_create, rr)
       else
-        events = [@event]
+        events = []
+        dup_options = get_duplicate_params(params[:calendar_event])
+
+        if dup_options[:count] > RECURRING_EVENT_LIMIT
+          InstStatsd::Statsd.gauge("calendar_events_api.recurring.count_exceeding_limit", dup_options[:count])
+          return render json: {
+            message: t("only a maximum of %{limit} events can be created",
+                       limit: RECURRING_EVENT_LIMIT)
+          }, status: :bad_request
+        elsif dup_options[:count] > 0
+          InstStatsd::Statsd.gauge("calendar_events_api.recurring.count", dup_options[:count])
+          events += create_event_and_duplicates(dup_options)
+        else
+          events = [@event]
+        end
       end
 
       return unless events.all? { |event| authorize_user_for_conference(@current_user, event.web_conference) }
@@ -1360,7 +1378,7 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def get_duplicate_params(event_data = {})
-    duplicate_data = params[:calendar_event][:duplicate]
+    duplicate_data = event_data[:duplicate] || params[:calendar_event][:duplicate]
     duplicate_data ||= {}
 
     {
@@ -1406,6 +1424,107 @@ class CalendarEventsApiController < ApplicationController
     end
 
     event_attributes
+  end
+
+  ###### recurring event series #######
+  # once the calendar_series flag is turned on in prod
+  # the above code for duplicate events can be removed
+  # along with the flag
+  #####################################
+  def create_event_series(event_attributes, rrule)
+    @context ||= @current_user
+    if @current_user
+      get_all_pertinent_contexts(include_groups: true)
+    end
+
+    first_start_at = Time.parse(event_attributes[:start_at]) if event_attributes[:start_at]
+    first_end_at = Time.parse(event_attributes[:end_at]) if event_attributes[:end_at]
+    duration = first_end_at - first_start_at if first_start_at && first_end_at
+
+    rrule.all(limit: RECURRING_EVENT_LIMIT).map do |dtstart|
+      event_attributes = set_series_params(event_attributes, dtstart, duration)
+      event = @context.calendar_events.build(event_attributes)
+      event.validate_context! if @context.is_a?(AppointmentGroup)
+      event.updating_user = @current_user
+      event
+    end
+  end
+
+  def set_series_params(event_attributes, dtstart, duration)
+    duration ||= 0
+    event_attributes[:start_at] = dtstart.iso8601 if dtstart
+    event_attributes[:end_at] = (dtstart + duration).iso8601 if dtstart
+
+    # I don't know how we'd handle child events of a series
+    if event_attributes[:child_event_data].present?
+      return render json: { error: t("recurring events cannot have child events") }, status: :bad_request
+    end
+
+    if event_attributes.key?(:web_conference)
+      override_params = { user_settings: { scheduled_date: event_attributes[:start_at] } }
+      event_attributes[:web_conference] = find_or_initialize_conference(@context, event_attributes[:web_conference], override_params)
+    end
+
+    event_attributes
+  end
+
+  def validate_and_parse_rrule(rrule, dtstart: nil, tzid: "UTC")
+    rr = nil
+    # Though we can use the RRule::Rule below to determine if COUNT is too large
+    # it's initialization can take a long time and periodically fails specs.
+    # Let's do a quick check here first and abandon the request if too large.
+    # We still need to check later because the RRULE could be "until some date"
+    # and not an explicit count.
+    rrule_fields = Hash[*rrule.split(/[;=]/)]
+    count = rrule_fields.fetch("COUNT", 1).to_i
+
+    if count <= 0
+      render json: { message: t("COUNT must be greater than 0") }, status: :bad_request
+      return nil
+    end
+
+    if count > RECURRING_EVENT_LIMIT
+      InstStatsd::Statsd.gauge("calendar_events_api.recurring.count_exceeding_limit", count)
+      render json: {
+        message: t("COUNT must be %{limit} or less",
+                   limit: RECURRING_EVENT_LIMIT)
+      }, status: :bad_request
+      return nil
+    end
+
+    # We do not support never ending series because each event in the series
+    # must get created in the db to support the paginated calendar_events api
+    bounded = rrule_fields.fetch("UNTIL", false) || rrule_fields.fetch("COUNT", false)
+    unless bounded
+      render json: {
+        message: t("The series recurrance rule must include a COUNT or UNTIL")
+      }, status: :bad_request
+      return nil
+    end
+
+    begin
+      rr = RRule::Rule.new(
+        rrule,
+        dtstart: dtstart,
+        tzid: tzid
+      )
+    rescue => e
+      render json: {
+        message: t("Failed parsing the event's recurrance rule: %{e}", e: e)
+      }, status: :bad_request
+      return nil
+    end
+    # If RRULE generates a lot of events, rr.count can take a very long time to compute.
+    # Asking it for 1 too many results is fast and gets the job done
+    if rr.all(limit: RECURRING_EVENT_LIMIT + 1).length > RECURRING_EVENT_LIMIT
+      InstStatsd::Statsd.gauge("calendar_events_api.recurring.count_exceeding_limit", rr.count)
+      render json: {
+        message: t("A maximum of %{limit} events may be created",
+                   limit: RECURRING_EVENT_LIMIT)
+      }, status: :bad_request
+      return nil
+    end
+    rr
   end
 
   def require_user_or_observer
