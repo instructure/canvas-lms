@@ -83,6 +83,7 @@ gem "i18nliner", "0.1.2", github: "instructure/i18nliner", ref: "rails-61"
 gem "icalendar", "2.7.0", require: false
 gem "diplomat", "2.5.1", require: false
 gem "ims-lti", "2.3.2", require: "ims"
+gem "rrule", "0.4.4", require: false
 
 gem "inst_access", "0.1.1"
 gem "inst_statsd", "2.2.0"

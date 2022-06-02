@@ -49,7 +49,7 @@ module Api::V1::CalendarEvent
       event,
       user,
       session,
-      only: %w[id created_at updated_at start_at end_at all_day all_day_date title workflow_state comments]
+      only: %w[id created_at updated_at start_at end_at all_day all_day_date title workflow_state comments series_id rrule]
     )
 
     if user
