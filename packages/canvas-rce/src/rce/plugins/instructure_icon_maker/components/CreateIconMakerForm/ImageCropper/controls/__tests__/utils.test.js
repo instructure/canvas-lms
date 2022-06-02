@@ -16,7 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {calculateScaleRatio, calculateRotation, getNearestRectAngle} from '../utils'
+import {
+  calculateScaleRatio,
+  calculateScalePercentage,
+  calculateRotation,
+  getNearestRectAngle
+} from '../utils'
 
 describe('calculateScaleRatio()', () => {
   it('when ratio exceeds maximum ratio', () => {
@@ -32,6 +37,23 @@ describe('calculateScaleRatio()', () => {
   it('when ratio is between thresholds', () => {
     const result = calculateScaleRatio(1.5)
     expect(result).toEqual(1.5)
+  })
+})
+
+describe('calculateScalePercentage()', () => {
+  it('when ratio exceeds maximum percentage', () => {
+    const result = calculateScalePercentage(250)
+    expect(result).toEqual(200)
+  })
+
+  it('when ratio exceeds minimum percentage', () => {
+    const result = calculateScalePercentage(50)
+    expect(result).toEqual(100)
+  })
+
+  it('when ratio is between thresholds', () => {
+    const result = calculateScalePercentage(150)
+    expect(result).toEqual(150)
   })
 })
 

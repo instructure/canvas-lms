@@ -17,8 +17,7 @@
  */
 
 import React from 'react'
-import {fireEvent, render} from '@testing-library/react'
-
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import {ZoomControls} from '../ZoomControls'
 
 describe('ZoomControls', () => {
@@ -61,5 +60,304 @@ describe('ZoomControls', () => {
     const zoomInButton = container.querySelectorAll('button')[1]
     fireEvent.click(zoomInButton)
     expect(callback).toHaveBeenCalledWith(1.6)
+  })
+
+  describe('sets zoom manually', () => {
+    const timeout = 2000
+
+    it('increment using up arrow', () => {
+      const callback = jest.fn()
+      const {container} = render(<ZoomControls scaleRatio={1.5} onChange={callback} />)
+      const input = container.querySelector('label input[type="text"]')
+      fireEvent.keyDown(input, {keyCode: 38})
+      expect(callback).toHaveBeenCalledWith(1.51)
+    })
+
+    it('increment using down arrow', () => {
+      const callback = jest.fn()
+      const {container} = render(<ZoomControls scaleRatio={1.5} onChange={callback} />)
+      const input = container.querySelector('label input[type="text"]')
+      fireEvent.keyDown(input, {keyCode: 40})
+      expect(callback).toHaveBeenCalledWith(1.49)
+    })
+
+    describe('on blur input', () => {
+      it('with custom valid positive percentage', () => {
+        const callback = jest.fn()
+        const {container} = render(<ZoomControls onChange={callback} />)
+        const input = container.querySelector('label input[type="text"]')
+        fireEvent.change(input, {target: {value: '150%'}})
+        fireEvent.blur(input)
+        expect(callback).toHaveBeenCalledWith(1.5)
+      })
+
+      it('with custom valid positive value that is lower than 100', () => {
+        const callback = jest.fn()
+        const {container} = render(<ZoomControls scaleRatio={1.5} onChange={callback} />)
+        const input = container.querySelector('label input[type="text"]')
+        fireEvent.change(input, {target: {value: '90%'}})
+        fireEvent.blur(input)
+        expect(callback).toHaveBeenCalledWith(1)
+      })
+
+      it('with custom valid positive value that is greater than 200', () => {
+        const callback = jest.fn()
+        const {container} = render(<ZoomControls onChange={callback} />)
+        const input = container.querySelector('label input[type="text"]')
+        fireEvent.change(input, {target: {value: '300%'}})
+        fireEvent.blur(input)
+        expect(callback).toHaveBeenCalledWith(2)
+      })
+
+      it('with custom valid positive percentage with decimals', () => {
+        const callback = jest.fn()
+        const {container} = render(<ZoomControls onChange={callback} />)
+        const input = container.querySelector('label input[type="text"]')
+        fireEvent.change(input, {target: {value: '150.100%'}})
+        fireEvent.blur(input)
+        expect(callback).toHaveBeenCalledWith(1.5)
+      })
+
+      it('with custom valid positive percentage without % symbol', () => {
+        const callback = jest.fn()
+        const {container} = render(<ZoomControls onChange={callback} />)
+        const input = container.querySelector('label input[type="text"]')
+        fireEvent.change(input, {target: {value: '150'}})
+        fireEvent.blur(input)
+        expect(callback).toHaveBeenCalledWith(1.5)
+      })
+
+      it('with custom valid positive percentage with decimals and without % symbol', () => {
+        const callback = jest.fn()
+        const {container} = render(<ZoomControls onChange={callback} />)
+        const input = container.querySelector('label input[type="text"]')
+        fireEvent.change(input, {target: {value: '150.201'}})
+        fireEvent.blur(input)
+        expect(callback).toHaveBeenCalledWith(1.5)
+      })
+
+      it('with custom valid negative percentage', () => {
+        const callback = jest.fn()
+        const {container} = render(<ZoomControls scaleRatio={1.5} onChange={callback} />)
+        const input = container.querySelector('label input[type="text"]')
+        fireEvent.change(input, {target: {value: '-100%'}})
+        fireEvent.blur(input)
+        expect(callback).toHaveBeenCalledWith(1)
+      })
+
+      it('with custom valid negative percentage with decimals', () => {
+        const callback = jest.fn()
+        const {container} = render(<ZoomControls scaleRatio={1.5} onChange={callback} />)
+        const input = container.querySelector('label input[type="text"]')
+        fireEvent.change(input, {target: {value: '-100.100%'}})
+        fireEvent.blur(input)
+        expect(callback).toHaveBeenCalledWith(1)
+      })
+
+      it('with custom valid negative percentage without % symbol', () => {
+        const callback = jest.fn()
+        const {container} = render(<ZoomControls scaleRatio={1.5} onChange={callback} />)
+        const input = container.querySelector('label input[type="text"]')
+        fireEvent.change(input, {target: {value: '-100'}})
+        fireEvent.blur(input)
+        expect(callback).toHaveBeenCalledWith(1)
+      })
+
+      it('with custom valid negative percentage with decimals and without % symbol', () => {
+        const callback = jest.fn()
+        const {container} = render(<ZoomControls scaleRatio={1.5} onChange={callback} />)
+        const input = container.querySelector('label input[type="text"]')
+        fireEvent.change(input, {target: {value: '-150.201'}})
+        fireEvent.blur(input)
+        expect(callback).toHaveBeenCalledWith(1)
+      })
+
+      it('with custom invalid percentage', () => {
+        const callback = jest.fn()
+        const {container} = render(<ZoomControls onChange={callback} />)
+        const input = container.querySelector('label input[type="text"]')
+        fireEvent.change(input, {target: {value: 'banana'}})
+        fireEvent.blur(input)
+        expect(callback).not.toHaveBeenCalled()
+      })
+
+      it('with custom empty percentage', () => {
+        const callback = jest.fn()
+        const {container} = render(<ZoomControls onChange={callback} />)
+        const input = container.querySelector('label input[type="text"]')
+        fireEvent.change(input, {target: {value: ''}})
+        fireEvent.blur(input)
+        expect(callback).not.toHaveBeenCalled()
+      })
+
+      it('with shows error message', () => {
+        const callback = jest.fn()
+        const {container} = render(<ZoomControls onChange={callback} />)
+        const input = container.querySelector('label input[type="text"]')
+        fireEvent.change(input, {target: {value: ''}})
+        fireEvent.blur(input)
+        const messageContainer = container.querySelector('label > span > span:last-child')
+        expect(messageContainer.textContent).toEqual('Invalid entry.')
+      })
+    })
+
+    describe('on change and debounce input', () => {
+      it('with custom valid positive percentage', async () => {
+        const callback = jest.fn()
+        const {container} = render(<ZoomControls onChange={callback} />)
+        const input = container.querySelector('label input[type="text"]')
+        fireEvent.change(input, {target: {value: '150%'}})
+        await waitFor(
+          () => {
+            expect(callback).toHaveBeenCalledWith(1.5)
+          },
+          {timeout}
+        )
+      })
+
+      it('with custom valid positive value that exceeds 200', async () => {
+        const callback = jest.fn()
+        const {container} = render(<ZoomControls onChange={callback} />)
+        const input = container.querySelector('label input[type="text"]')
+        fireEvent.change(input, {target: {value: '300'}})
+        await waitFor(
+          () => {
+            expect(callback).toHaveBeenCalledWith(2)
+          },
+          {timeout}
+        )
+      })
+
+      it('with custom valid positive percentage with decimals', async () => {
+        const callback = jest.fn()
+        const {container} = render(<ZoomControls onChange={callback} />)
+        const input = container.querySelector('label input[type="text"]')
+        fireEvent.change(input, {target: {value: '150.100%'}})
+        await waitFor(
+          () => {
+            expect(callback).toHaveBeenCalledWith(1.5)
+          },
+          {timeout}
+        )
+      })
+
+      it('with custom valid positive percentage without % symbol', async () => {
+        const callback = jest.fn()
+        const {container} = render(<ZoomControls onChange={callback} />)
+        const input = container.querySelector('label input[type="text"]')
+        fireEvent.change(input, {target: {value: '150'}})
+        await waitFor(
+          () => {
+            expect(callback).toHaveBeenCalledWith(1.5)
+          },
+          {timeout}
+        )
+      })
+
+      it('with custom valid positive percentage with decimals and without % symbol', async () => {
+        const callback = jest.fn()
+        const {container} = render(<ZoomControls onChange={callback} />)
+        const input = container.querySelector('label input[type="text"]')
+        fireEvent.change(input, {target: {value: '150.201'}})
+        await waitFor(
+          () => {
+            expect(callback).toHaveBeenCalledWith(1.5)
+          },
+          {timeout}
+        )
+      })
+
+      it('with custom valid negative percentage', async () => {
+        const callback = jest.fn()
+        const {container} = render(<ZoomControls scaleRatio={1.5} onChange={callback} />)
+        const input = container.querySelector('label input[type="text"]')
+        fireEvent.change(input, {target: {value: '-150%'}})
+        await waitFor(
+          () => {
+            expect(callback).toHaveBeenCalledWith(1)
+          },
+          {timeout}
+        )
+      })
+
+      it('with custom valid negative percentage with decimals', async () => {
+        const callback = jest.fn()
+        const {container} = render(<ZoomControls scaleRatio={1.5} onChange={callback} />)
+        const input = container.querySelector('label input[type="text"]')
+        fireEvent.change(input, {target: {value: '-150.100%'}})
+        await waitFor(
+          () => {
+            expect(callback).toHaveBeenCalledWith(1)
+          },
+          {timeout}
+        )
+      })
+
+      it('with custom valid negative percentage without % symbol', async () => {
+        const callback = jest.fn()
+        const {container} = render(<ZoomControls scaleRatio={1.5} onChange={callback} />)
+        const input = container.querySelector('label input[type="text"]')
+        fireEvent.change(input, {target: {value: '-150'}})
+        await waitFor(
+          () => {
+            expect(callback).toHaveBeenCalledWith(1)
+          },
+          {timeout}
+        )
+      })
+
+      it('with custom valid negative percentage with decimals and without % symbol', async () => {
+        const callback = jest.fn()
+        const {container} = render(<ZoomControls scaleRatio={1.5} onChange={callback} />)
+        const input = container.querySelector('label input[type="text"]')
+        fireEvent.change(input, {target: {value: '-150.201'}})
+        await waitFor(
+          () => {
+            expect(callback).toHaveBeenCalledWith(1)
+          },
+          {timeout}
+        )
+      })
+
+      it('with custom invalid percentage', async () => {
+        const callback = jest.fn()
+        const {container} = render(<ZoomControls onChange={callback} />)
+        const input = container.querySelector('label input[type="text"]')
+        fireEvent.change(input, {target: {value: 'banana'}})
+        await waitFor(
+          () => {
+            expect(callback).not.toHaveBeenCalled()
+          },
+          {timeout}
+        )
+      })
+
+      it('with custom empty percentage', async () => {
+        const callback = jest.fn()
+        const {container} = render(<ZoomControls onChange={callback} />)
+        const input = container.querySelector('label input[type="text"]')
+        fireEvent.change(input, {target: {value: ''}})
+        await waitFor(
+          () => {
+            expect(callback).not.toHaveBeenCalled()
+          },
+          {timeout}
+        )
+      })
+
+      it('with shows error message', async () => {
+        const callback = jest.fn()
+        const {container} = render(<ZoomControls onChange={callback} />)
+        const input = container.querySelector('label input[type="text"]')
+        fireEvent.change(input, {target: {value: ''}})
+        await waitFor(
+          () => {
+            const messageContainer = container.querySelector('label > span > span:last-child')
+            expect(messageContainer.textContent).toEqual('Invalid entry.')
+          },
+          {timeout}
+        )
+      })
+    })
   })
 })
