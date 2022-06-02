@@ -386,8 +386,9 @@ module Lti::IMS
                 }
               ]
             end
+            let(:submitted_at) { 5.minutes.ago.iso8601(3) }
             let(:params_overrides) do
-              super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items: content_items, new_submission: false }, :scoreGiven => 10, :scoreMaximum => line_item.score_maximum)
+              super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items: content_items, new_submission: false, submitted_at: submitted_at }, :scoreGiven => 10, :scoreMaximum => line_item.score_maximum)
             end
             let(:expected_progress_url) do
               "http://test.host/api/lti/courses/#{context_id}/progress/"
@@ -401,13 +402,6 @@ module Lti::IMS
             it "uses submission_type online_upload" do
               send_request
               expect(result.submission.reload.submission_type).to eq "online_upload"
-            end
-
-            it "only submits assignment once" do
-              submission_body = { submitted_at: 1.hour.ago, submission_type: "external_tool" }
-              attempt = result.submission.assignment.submit_homework(user, submission_body).attempt
-              send_request
-              expect(result.submission.reload.attempt).to eq attempt + 1
             end
 
             context "for assignment with attempt limit" do
@@ -453,6 +447,13 @@ module Lti::IMS
             end
 
             shared_examples_for "a file submission" do
+              it "only submits assignment once" do
+                submission_body = { submitted_at: 1.hour.ago, submission_type: "external_tool" }
+                attempt = result.submission.assignment.submit_homework(user, submission_body).attempt
+                send_request
+                expect(result.submission.reload.attempt).to eq attempt + 1
+              end
+
               it "creates an attachment" do
                 send_request
                 attachment = Attachment.last
@@ -471,6 +472,28 @@ module Lti::IMS
               it "calculates content_type from extension" do
                 send_request
                 expect(Attachment.last.content_type).to eq "text/plain"
+              end
+
+              context "with FF on" do
+                before do
+                  Account.root_accounts.first.enable_feature! :ags_scores_file_error_improvements
+                end
+
+                it "sets submitted_at correctly" do
+                  send_request
+                  expect(result.submission.reload.submitted_at).to eq submitted_at
+                end
+              end
+
+              context "with FF off" do
+                before do
+                  Account.root_accounts.first.disable_feature! :ags_scores_file_error_improvements
+                end
+
+                it "ignores submitted_at" do
+                  send_request
+                  expect(result.submission.reload.submitted_at).not_to eq submitted_at
+                end
               end
 
               context "with valid explicit media_type" do
