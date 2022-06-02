@@ -127,7 +127,7 @@ module Api::V1
       return unless enrollments
 
       if include_total_scores?
-        ActiveRecord::Associations::Preloader.new.preload(enrollments, :scores)
+        ActiveRecord::Associations.preload(enrollments, :scores)
       end
       enrollments.map { |e| enrollment_hash(e) }
     end

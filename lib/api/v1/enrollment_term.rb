@@ -37,7 +37,7 @@ module Api::V1::EnrollmentTerm
 
   def enrollment_terms_json(enrollment_terms, user, session, enrollments = [], includes = [])
     if includes.include?("overrides")
-      ActiveRecord::Associations::Preloader.new.preload(enrollment_terms, :enrollment_dates_overrides)
+      ActiveRecord::Associations.preload(enrollment_terms, :enrollment_dates_overrides)
     end
     course_counts = EnrollmentTerm.course_counts(enrollment_terms) if includes.include?("course_count")
     enrollment_terms.map { |t| enrollment_term_json(t, user, session, enrollments, includes, course_counts) }

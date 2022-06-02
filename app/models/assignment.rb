@@ -1593,13 +1593,13 @@ class Assignment < ActiveRecord::Base
         :context_module_tags
       end
 
-    ActiveRecord::Associations::Preloader.new.preload(assignments, [
-                                                        module_tags_include,
-                                                        :context, # necessary while wiki_page assignments behind feature flag
-                                                        { discussion_topic: :context_module_tags },
-                                                        { wiki_page: :context_module_tags },
-                                                        { quiz: :context_module_tags }
-                                                      ])
+    ActiveRecord::Associations.preload(assignments, [
+                                         module_tags_include,
+                                         :context, # necessary while wiki_page assignments behind feature flag
+                                         { discussion_topic: :context_module_tags },
+                                         { wiki_page: :context_module_tags },
+                                         { quiz: :context_module_tags }
+                                       ])
   end
 
   def self.preload_unposted_anonymous_submissions(assignments)

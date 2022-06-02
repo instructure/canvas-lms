@@ -24,7 +24,7 @@ end
 module ArbitraryStrongishParams
   ANYTHING = Object.new.freeze
 
-  def initialize(attributes = {})
+  def initialize(...)
     @anythings = {}.with_indifferent_access
     super
   end

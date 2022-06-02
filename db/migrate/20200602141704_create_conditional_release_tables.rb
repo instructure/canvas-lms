@@ -22,52 +22,52 @@ class CreateConditionalReleaseTables < ActiveRecord::Migration[5.2]
 
   def change
     create_table :conditional_release_rules do |t|
-      t.references :course, foreign_key: true, limit: 8
-      t.references :trigger_assignment, foreign_key: { to_table: "assignments" }, limit: 8
+      t.references :course, foreign_key: true
+      t.references :trigger_assignment, foreign_key: { to_table: "assignments" }
       t.datetime :deleted_at
 
-      t.references :root_account, foreign_key: { to_table: "accounts" }, limit: 8, null: false,
+      t.references :root_account, foreign_key: { to_table: "accounts" }, null: false,
                                   index: { name: "index_cr_rules_on_root_account_id" }
       t.index [:root_account_id, :course_id], where: "deleted_at IS NULL", name: "index_cr_rules_on_account_and_course"
       t.timestamps
     end
 
     create_table :conditional_release_scoring_ranges do |t|
-      t.references :rule, foreign_key: { to_table: "conditional_release_rules" }, limit: 8, index: false, null: false
+      t.references :rule, foreign_key: { to_table: "conditional_release_rules" }, index: false, null: false
       t.decimal :lower_bound
       t.decimal :upper_bound
       t.integer :position
       t.datetime :deleted_at
       t.index :rule_id, where: "deleted_at IS NULL", name: "index_cr_scoring_ranges_on_rule_id"
 
-      t.references :root_account, foreign_key: { to_table: "accounts" }, limit: 8, null: false,
+      t.references :root_account, foreign_key: { to_table: "accounts" }, null: false,
                                   index: { name: "index_cr_scoring_ranges_on_root_account_id" }
       t.timestamps
     end
 
     create_table :conditional_release_assignment_sets do |t|
-      t.references :scoring_range, foreign_key: { to_table: "conditional_release_scoring_ranges" }, limit: 8, index: false, null: false
+      t.references :scoring_range, foreign_key: { to_table: "conditional_release_scoring_ranges" }, index: false, null: false
       t.integer :position
       t.datetime :deleted_at
       t.index :scoring_range_id, where: "deleted_at IS NULL", name: "index_cr_assignment_sets_on_scoring_range_id"
 
-      t.references :root_account, foreign_key: { to_table: "accounts" }, limit: 8, null: false,
+      t.references :root_account, foreign_key: { to_table: "accounts" }, null: false,
                                   index: { name: "index_cr_assignment_sets_on_root_account_id" }
       t.timestamps
     end
 
     create_table :conditional_release_assignment_set_associations do |t|
-      t.references :assignment_set, foreign_key: { to_table: "conditional_release_assignment_sets" }, limit: 8, index: false
+      t.references :assignment_set, foreign_key: { to_table: "conditional_release_assignment_sets" }, index: false
       t.index :assignment_id, where: "deleted_at IS NULL", name: "index_cr_assignment_set_associations_on_set"
 
-      t.references :assignment, foreign_key: true, limit: 8, index: false
+      t.references :assignment, foreign_key: true, index: false
       t.integer :position
       t.datetime :deleted_at
 
       t.index [:assignment_id, :assignment_set_id], unique: true, where: "deleted_at IS NULL",
                                                     name: "index_cr_assignment_set_associations_on_assignment_and_set"
 
-      t.references :root_account, foreign_key: { to_table: "accounts" }, limit: 8, null: false,
+      t.references :root_account, foreign_key: { to_table: "accounts" }, null: false,
                                   index: { name: "index_cr_assignment_set_associations_on_root_account_id" }
       t.timestamps
     end
@@ -84,7 +84,7 @@ class CreateConditionalReleaseTables < ActiveRecord::Migration[5.2]
       t.index %i[assignment_set_id student_id created_at], order: { created_at: :desc }, where: "deleted_at IS NULL",
                                                            name: "index_cr_assignment_set_actions_on_set_and_student"
 
-      t.references :root_account, foreign_key: { to_table: "accounts" }, limit: 8, null: false,
+      t.references :root_account, foreign_key: { to_table: "accounts" }, null: false,
                                   index: { name: "index_cr_assignment_set_actions_on_root_account_id" }
       t.timestamps
     end

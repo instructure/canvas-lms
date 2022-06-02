@@ -74,8 +74,8 @@ module ConditionalRelease
 
         existing_overrides = AssignmentOverride.active
                                                .where(assignment_id: assignments_to_assign + assignments_to_unassign, set_type: "ADHOC").to_a
-        ActiveRecord::Associations::Preloader.new.preload(existing_overrides, :assignment_override_students,
-                                                          AssignmentOverrideStudent.where(user_id: student_id)) # only care about records for this student
+        ActiveRecord::Associations.preload(existing_overrides, :assignment_override_students,
+                                           AssignmentOverrideStudent.where(user_id: student_id)) # only care about records for this student
         existing_overrides_map = existing_overrides.group_by(&:assignment_id)
 
         assignments_to_assign.each do |to_assign|

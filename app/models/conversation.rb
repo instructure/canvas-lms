@@ -511,7 +511,7 @@ class Conversation < ActiveRecord::Base
   end
 
   def subscribed_participants
-    ActiveRecord::Associations::Preloader.new.preload(conversation_participants, :user) unless ModelCache[:users]
+    ActiveRecord::Associations.preload(conversation_participants, :user) unless ModelCache[:users]
     conversation_participants.select(&:subscribed?).filter_map(&:user)
   end
 

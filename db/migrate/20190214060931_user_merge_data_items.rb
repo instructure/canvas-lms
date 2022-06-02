@@ -22,8 +22,8 @@ class UserMergeDataItems < ActiveRecord::Migration[5.1]
 
   def change
     create_table :user_merge_data_items do |t|
-      t.references :user_merge_data, limit: 8, foreign_key: true, index: true, null: false
-      t.references :user, limit: 8, foreign_key: true, index: true, null: false
+      t.references :user_merge_data, foreign_key: true, index: true, null: false
+      t.references :user, foreign_key: true, index: true, null: false
       t.string :item_type, null: false, limit: 255
       t.text :item, null: false
     end

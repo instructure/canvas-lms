@@ -213,10 +213,10 @@ class Notification < Switchman::UnshardedRecord
     if TYPES_TO_PRELOAD_CONTEXT_ROLES.include?(name)
       case asset
       when Assignment
-        ActiveRecord::Associations::Preloader.new.preload(asset, :assignment_overrides)
+        ActiveRecord::Associations.preload(asset, :assignment_overrides)
         asset.context.preload_user_roles!
       when AssignmentOverride
-        ActiveRecord::Associations::Preloader.new.preload(asset.assignment, :assignment_overrides)
+        ActiveRecord::Associations.preload(asset.assignment, :assignment_overrides)
         asset.assignment.context.preload_user_roles!
       end
     end

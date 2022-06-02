@@ -378,7 +378,7 @@ module Api::V1::Assignment
       should_show_statistics = opts[:include_score_statistics] && assignment.can_view_score_statistics?(user)
 
       if submission.is_a?(Array)
-        ActiveRecord::Associations::Preloader.new.preload(submission, :quiz_submission) if assignment.quiz?
+        ActiveRecord::Associations.preload(submission, :quiz_submission) if assignment.quiz?
         hash["submission"] = submission.map { |s| submission_json(s, assignment, user, session, assignment.context, params[:include], params) }
         should_show_statistics &&= submission.any? do |s|
           s.assignment = assignment # Avoid extra query in submission.hide_grade_from_student? to get assignment

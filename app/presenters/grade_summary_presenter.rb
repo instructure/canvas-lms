@@ -213,7 +213,7 @@ class GradeSummaryPresenter
                    .where(user_id: student).to_a
 
       if vericite_enabled? || turnitin_enabled?
-        ActiveRecord::Associations::Preloader.new.preload(ss, :originality_reports)
+        ActiveRecord::Associations.preload(ss, :originality_reports)
       end
 
       assignments_index = assignments.index_by(&:id)

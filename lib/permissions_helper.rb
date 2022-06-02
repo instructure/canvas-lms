@@ -24,8 +24,8 @@ module PermissionsHelper
     raise "invalid permission" unless RoleOverride.permissions.key?(permission)
 
     enrollments ||= participating_enrollments
-    ActiveRecord::Associations::Preloader.new.preload(enrollments, :course)
-    ActiveRecord::Associations::Preloader.new.preload(enrollments, :enrollment_state)
+    ActiveRecord::Associations.preload(enrollments, :course)
+    ActiveRecord::Associations.preload(enrollments, :enrollment_state)
     allowed_ens = []
     Shard.partition_by_shard(enrollments) do |sharded_enrollments|
       perms_hash = get_permissions_info_by_account(sharded_enrollments.map(&:course), sharded_enrollments, [permission])

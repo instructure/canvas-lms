@@ -146,7 +146,7 @@ module Api::V1::CalendarEvent
         events = can_read_child_events ? event.child_events.to_a : event.child_events_for(participant)
 
         # do some preloads
-        ActiveRecord::Associations::Preloader.new.preload(events, :context)
+        ActiveRecord::Associations.preload(events, :context)
         if events.first.context.is_a?(User) && user_json_is_admin?(@context, user)
           user_json_preloads(events.map(&:context))
         end
@@ -248,7 +248,7 @@ module Api::V1::CalendarEvent
       appointments_scope = appointments_scope.where("end_at IS NULL OR end_at>?", Time.now.utc) unless options[:include_past_appointments]
       if include.include?("child_events")
         all_child_events = appointments_scope.map(&:child_events).flatten
-        ActiveRecord::Associations::Preloader.new.preload(all_child_events, :context)
+        ActiveRecord::Associations.preload(all_child_events, :context)
         user_json_preloads(all_child_events.map(&:context)) if !all_child_events.empty? && all_child_events.first.context.is_a?(User) && user_json_is_admin?(@context, user)
       end
       hash["appointments"] = appointments_scope.map do |event|

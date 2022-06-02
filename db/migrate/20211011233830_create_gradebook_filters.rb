@@ -22,8 +22,8 @@ class CreateGradebookFilters < ActiveRecord::Migration[6.0]
 
   def change
     create_table :gradebook_filters do |t|
-      t.references :course, null: false, foreign_key: true, limit: 8, index: false
-      t.references :user, null: false, foreign_key: true, limit: 8
+      t.references :course, null: false, foreign_key: true, index: false
+      t.references :user, null: false, foreign_key: true
       t.string :name, limit: 255, null: false
       t.jsonb :payload, null: false, default: {}
       t.timestamps

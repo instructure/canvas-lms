@@ -50,7 +50,7 @@ module Api::V1::Submission
       else
         histories = submission.submission_history
         if includes.include?("group")
-          ActiveRecord::Associations::Preloader.new.preload(histories, :group)
+          ActiveRecord::Associations.preload(histories, :group)
         end
         hash["submission_history"] = histories.map do |ver|
           ver.without_versioned_attachments do
@@ -245,7 +245,7 @@ module Api::V1::Submission
                 else
                   assignment.discussion_topic.discussion_entries.active.for_user(attempt.user_id).to_a
                 end
-      ActiveRecord::Associations::Preloader.new.preload(entries, :discussion_entry_participants, DiscussionEntryParticipant.where(user_id: user))
+      ActiveRecord::Associations.preload(entries, :discussion_entry_participants, DiscussionEntryParticipant.where(user_id: user))
       hash["discussion_entries"] = discussion_entry_api_json(entries, assignment.discussion_topic.context, user, session)
     end
 

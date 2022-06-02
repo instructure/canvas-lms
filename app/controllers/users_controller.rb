@@ -236,7 +236,7 @@ class UsersController < ApplicationController
       @grades = grades_for_presenter(@presenter, @grading_periods)
       js_env grades_for_student_url: grades_for_student_url
 
-      ActiveRecord::Associations::Preloader.new.preload(@observed_enrollments, :course)
+      ActiveRecord::Associations.preload(@observed_enrollments, :course)
 
       @page_title = t(:page_title, "Grades")
       js_bundle :user_grades
@@ -1158,7 +1158,7 @@ class UsersController < ApplicationController
       includes = Array(params[:include])
       planner_overrides = includes.include?("planner_overrides")
       include_course = includes.include?("course")
-      ActiveRecord::Associations::Preloader.new.preload(assignments, :context) if include_course
+      ActiveRecord::Associations.preload(assignments, :context) if include_course
 
       json = assignments.map do |as|
         assmt_json = assignment_json(as, user, session, include_planner_override: planner_overrides)

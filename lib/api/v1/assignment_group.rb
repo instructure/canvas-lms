@@ -44,7 +44,7 @@ module Api::V1::AssignmentGroup
 
       # Preload assignments' post policies for Assignment#assignment_json.
       if assignments.present?
-        ActiveRecord::Associations::Preloader.new.preload(assignments, :post_policy)
+        ActiveRecord::Associations.preload(assignments, :post_policy)
         Assignment.preload_unposted_anonymous_submissions(assignments)
       end
 
@@ -69,7 +69,7 @@ module Api::V1::AssignmentGroup
       end
 
       if includes.include?("score_statistics")
-        ActiveRecord::Associations::Preloader.new.preload(assignments, :score_statistic)
+        ActiveRecord::Associations.preload(assignments, :score_statistic)
       end
 
       hash["assignments"] = assignments.map do |assignment|

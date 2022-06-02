@@ -142,7 +142,7 @@ class RoleOverridesController < ApplicationController
       roles += scope.where(workflow_state: states).order(:id).to_a
 
       roles = Api.paginate(roles, self, route)
-      ActiveRecord::Associations::Preloader.new.preload(roles, :account)
+      ActiveRecord::Associations.preload(roles, :account)
       preloaded_overrides = RoleOverride.preload_overrides(@context, roles)
       render json: roles.map { |role| role_json(@context, role, @current_user, session, preloaded_overrides: preloaded_overrides) }
     end

@@ -86,7 +86,7 @@ module Api::V1::QuizSubmission
 
     # Always preload submissions since we need to check whether the user can
     # see each quiz submission's score
-    ActiveRecord::Associations::Preloader.new.preload(quiz_submissions, :submission)
+    ActiveRecord::Associations.preload(quiz_submissions, :submission)
 
     hash[:quiz_submissions] = [quiz_submissions].flatten.map do |qs|
       quiz_submission_json(qs, quiz, user, session, context)

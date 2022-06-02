@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-describe Moodle::Converter do
+describe MoodleImporter::Converter do
   before(:once) do
     fixture_dir = File.dirname(__FILE__) + "/fixtures"
     archive_file_path = File.join(fixture_dir, "moodle_backup_2.zip")
     unzipped_file_path = create_temp_dir!
-    converter = Moodle::Converter.new(export_archive_path: archive_file_path, course_name: "oi", base_download_dir: unzipped_file_path)
+    converter = MoodleImporter::Converter.new(export_archive_path: archive_file_path, course_name: "oi", base_download_dir: unzipped_file_path)
     converter.export
     @base_course_data = converter.course.with_indifferent_access
 

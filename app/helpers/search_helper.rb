@@ -88,8 +88,8 @@ module SearchHelper
       end
 
       add_groups = lambda do |groups, group_context = nil|
-        ActiveRecord::Associations::Preloader.new.preload(groups, [:group_category, :context])
-        ActiveRecord::Associations::Preloader.new.preload(groups, :group_memberships, GroupMembership.where(user_id: @current_user))
+        ActiveRecord::Associations.preload(groups, [:group_category, :context])
+        ActiveRecord::Associations.preload(groups, :group_memberships, GroupMembership.where(user_id: @current_user))
         groups.each do |group|
           group.can_participate = true
           contexts[:groups][group.id] = {

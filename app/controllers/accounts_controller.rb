@@ -331,7 +331,7 @@ class AccountsController < ApplicationController
                     else
                       []
                     end
-        ActiveRecord::Associations::Preloader.new.preload(@accounts, :root_account)
+        ActiveRecord::Associations.preload(@accounts, :root_account)
 
         # originally had 'includes' instead of 'include' like other endpoints
         includes = params[:include] || params[:includes]
@@ -377,7 +377,7 @@ class AccountsController < ApplicationController
     else
       @accounts = []
     end
-    ActiveRecord::Associations::Preloader.new.preload(@accounts, :root_account)
+    ActiveRecord::Associations.preload(@accounts, :root_account)
     render json: @accounts.map { |a| account_json(a, @current_user, session, params[:includes] || [], true) }
   end
 
@@ -483,7 +483,7 @@ class AccountsController < ApplicationController
     @accounts = Api.paginate(@accounts, self, api_v1_sub_accounts_url,
                              total_entries: recursive ? nil : @accounts.count)
 
-    ActiveRecord::Associations::Preloader.new.preload(@accounts, [:root_account, :parent_account])
+    ActiveRecord::Associations.preload(@accounts, [:root_account, :parent_account])
     render json: @accounts.map { |a| account_json(a, @current_user, session, []) }
   end
 
@@ -760,10 +760,10 @@ class AccountsController < ApplicationController
     GuardRail.activate(:secondary) do
       @courses = Api.paginate(@courses, self, api_v1_account_courses_url, { total_entries: nil })
 
-      ActiveRecord::Associations::Preloader.new.preload(@courses, [:account, :root_account, course_account_associations: :account])
+      ActiveRecord::Associations.preload(@courses, [:account, :root_account, course_account_associations: :account])
       preload_teachers(@courses) if includes.include?("teachers")
       preload_teachers(@courses) if includes.include?("active_teachers")
-      ActiveRecord::Associations::Preloader.new.preload(@courses, [:enrollment_term]) if includes.include?("term") || includes.include?("concluded")
+      ActiveRecord::Associations.preload(@courses, [:enrollment_term]) if includes.include?("term") || includes.include?("concluded")
 
       if includes.include?("total_students")
         student_counts = StudentEnrollment.shard(@account.shard).not_fake.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')")
@@ -1193,7 +1193,7 @@ class AccountsController < ApplicationController
     if authorized_action(@account, @current_user, :read_as_admin)
       @account_users = @account.account_users.active
       @account_user_permissions_cache = AccountUser.create_permissions_cache(@account_users, @current_user, session)
-      ActiveRecord::Associations::Preloader.new.preload(@account_users, user: :communication_channels)
+      ActiveRecord::Associations.preload(@account_users, user: :communication_channels)
       order_hash = {}
       @account.available_account_roles.each_with_index do |role, idx|
         order_hash[role.id] = idx

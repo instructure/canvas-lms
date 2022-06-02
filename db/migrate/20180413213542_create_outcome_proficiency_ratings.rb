@@ -23,7 +23,7 @@ class CreateOutcomeProficiencyRatings < ActiveRecord::Migration[5.1]
 
   def change
     create_table :outcome_proficiency_ratings do |t|
-      t.references :outcome_proficiency, foreign_key: true, limit: 8, null: false
+      t.references :outcome_proficiency, foreign_key: true, null: false
       t.string :description, null: false, limit: 255
       t.float :points, null: false
       t.boolean :mastery, null: false

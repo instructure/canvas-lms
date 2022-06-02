@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Moodle
-  class Railtie < ::Rails::Engine
-    isolate_namespace Moodle
+module MoodleImporter
+  class Engine < ::Rails::Engine
+    isolate_namespace MoodleImporter
 
     config.paths["lib"].eager_load!
 
@@ -37,7 +37,7 @@ module Moodle
         settings: {
           migration_partial: "moodle_config",
           worker: "CCWorker",
-          provides: { moodle_1_9: Moodle::Converter, moodle_2: Moodle::Converter },
+          provides: { moodle_1_9: MoodleImporter::Converter, moodle_2: MoodleImporter::Converter },
           valid_contexts: %w[Account Course]
         }
       }
