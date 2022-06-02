@@ -52,17 +52,17 @@ export default class AppList extends React.Component {
     store.removeChangeListener(this.onChange)
   }
 
-  get contextType() {
-    return splitAssetString(ENV.context_asset_string, false)[0]
-  }
-
   refreshAppList = () => {
     store.reset()
     store.fetch()
   }
 
+  isAccountContext() {
+    return splitAssetString(ENV.context_asset_string, false)[0] === 'account'
+  }
+
   manageAppListButton = () => {
-    if (this.contextType === 'account') {
+    if (this.isAccountContext()) {
       return (
         <ManageAppListButton onUpdateAccessToken={this.refreshAppList} extAppStore={extStore} />
       )
@@ -90,7 +90,7 @@ export default class AppList extends React.Component {
     } else {
       return store
         .filteredApps()
-        .map(app => <AppTile key={app.app_id} app={app} baseUrl={this.props.baseUrl} />)
+        .map(app => <AppTile key={app.id} app={app} baseUrl={this.props.baseUrl} />)
     }
   }
 
