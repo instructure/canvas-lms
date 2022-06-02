@@ -417,6 +417,11 @@ module Lti::IMS
           }
         )
 
+        if submitted_at && @domain_root_account.feature_enabled?(:ags_scores_file_error_improvements)
+          # the file upload process uses the Progress#created_at for the homework submission time
+          Progress.find(preflight_json[:progress][:id]).update!(created_at: submitted_at)
+        end
+
         if preflight_json[:upload_url]
           # Pt 2 of the file upload process, with InstFS enabled.
           response = CanvasHttp.post(
