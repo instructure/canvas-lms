@@ -35,6 +35,8 @@ export function determineSubmissionSelection(submission) {
     return 'missing'
   } else if (submission.late) {
     return 'late'
+  } else if (submission.late_policy_status === 'extended') {
+    return 'extended'
   } else {
     return 'none'
   }

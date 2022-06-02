@@ -17,7 +17,7 @@
  */
 
 export function classNamesForAssignmentCell(assignment, submissionData) {
-  const classNames = []
+  const classNames: string[] = []
 
   if (submissionData) {
     // Exclusive Classes (only one of these can be used at a time)
@@ -25,6 +25,8 @@ export function classNamesForAssignmentCell(assignment, submissionData) {
       classNames.push('dropped')
     } else if (submissionData.excused) {
       classNames.push('excused')
+    } else if (submissionData.extended) {
+      classNames.push('extended')
     } else if (submissionData.late) {
       classNames.push('late')
     } else if (submissionData.resubmitted) {

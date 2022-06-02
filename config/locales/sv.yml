@@ -1179,6 +1179,13 @@ sv:
             check_box: "Sektion CSV"
           users: 
             check_box: "Användare CSV"
+    mit: 
+      student_module_completion: 
+        parameters: 
+          account_reports: 
+            mit: 
+              student_module_completion: 
+                check_box: "Enkel rapport"
     new_excelsior_activity_report_csv_parameters: 
       account_reports: 
         excelsior: 
@@ -2315,6 +2322,7 @@ sv:
   allow_outcome_extra_credit_57c1e84e: "Tillåt extra poäng för lärandemål"
   allow_pages_to_be_deleted_in_bulk_199d3d3b: "Tillåt sidor att raderas i bulk"
   allow_passive_acceptance_of_terms_of_service_63ef5994: "Tillåt passivt godkännande av användningsvillkoren"
+  allow_permissions_to_manage_the_calendar_to_be_gra_7d7818de: "Bevilja behörigheter för hantering av kalendern på sektionsnivå"
   allow_postable_submission_comments_a301b742: "Tillåt publicerbara inlämningskommentarer"
   allow_push_notification_opt_out_827f288b: "Gör det möjligt att välja bort push-aviseringar"
   allow_reassigning_assignments_from_speedgrader_to__ff856a96: "Tillåt omtilldelning av uppgifter från SpeedGrader till en students att-göra-lista"
@@ -3062,6 +3070,7 @@ sv:
   an_error_occurred_when_saving_the_group_536c8f66: "Ett fel inträffade när gruppen sparades."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Ett fel uppstod när användarens rätt för %{filename} ställdes in"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "Ett fel inträffade när Turnitin kontaktades."
+  an_error_occurred_while_attempting_to_contact_turn_c987545: "Ett fel inträffade när Turnitin kontaktades. Statuskod: %{status_code}"
   an_error_occurred_while_checking_the_migration_sta_d17035b1: "Ett fel uppstod när du kontrollerade migrationsstatusen"
   an_error_occurred_while_creating_this_group_please_ec96f426: "Ett fel inträffade när den här gruppen skapades. Försök igen."
   an_error_occurred_while_creating_this_outcome_54842fbd: "Ett fel inträffade när lärandemålet skulle skapas."
@@ -4774,6 +4783,7 @@ sv:
   avatar_for_name_e3ba987c: "Avatar för %{name}"
   avatar_for_studentname_8ea511ae: "Profilbild för %{studentName}"
   average_49c63f9b: Genomsnitt
+  average_is_not_a_good_fit_for_most_outcomes_based__f351ed94: "Ett genomsnitt kanske inte är lämpligt för de flesta lärandemålbaserade eller måluppfyllelsebaserade användingsfallen för inlärning eftersom studenter kan behöva tid att uppnå måluppfyllelse av ett lärandemål och tidigare lägre resultat kan påverka ett slutresultat."
   average_score_15cd7c3c: "Genomsnittlig poäng"
   avg_alignments_per_artifact_5573d99c: "Medel. Justeringar per artefakt"
   avg_alignments_per_outcome_4daf75cd: "Medel. Justeringar per lärandemål"
@@ -7024,6 +7034,7 @@ sv:
   context_module_sub_header_2f39e87b: "Underrubrik för kontextmodul"
   context_modules: 
     add_context_module_form: 
+      before_viewing: Förutsättningar
       button: 
         delete_label: "Radera förutsättningar"
         delete_title: "Radera förutsättningar"
@@ -10295,6 +10306,7 @@ sv:
   duration_hours_hours_and_minutes_minutes_d5da8c3: "Varaktighet: %{hours} timmar och %{minutes} minuter"
   duration_minutes_minutes_d7b9182b: "Varaktighet: %{minutes} minuter"
   dutch_6d05cee5: Holländska
+  dynamic_concurrency_231dbdc5: "Dynamisk samtidighet"
   e_c2991d1b: e
   e_g_doe_jon_fe1d9298: "Ex. Jansson, Jan"
   e_g_http_university_edu_helpdesk_acab04d6: "t.ex. http://university.edu/helpdesk"
@@ -13977,6 +13989,9 @@ sv:
   if_enabled_syncing_course_enrollments_to_microsoft_6f4f2bf9: |-
       Om aktiverad, blir synkronisering av kursregistreringar till Microsoft Groups
       tillgängligt. Kontoadministratörer kan aktivera detta i kontoinställningarna.
+  if_enabled_the_oauth_2_0_will_now_correctly_return_e33cca64: |-
+      Om OAuth 2.0 aktiveras kommer 4xx-statuskoder att returneras korrekt till den
+      begärande klienten istället för att omdirigera till sig själva
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: "Om alternativet är aktiverat visas alternativet matriser utan poäng."
   if_enabled_the_parent_sign_up_form_will_require_a__a9c32041: "Om funktionen är aktiverad krävs en studentsammankoppling istället för barnets användarnamn och lösenord"
   if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: |-
@@ -13986,6 +14001,7 @@ sv:
       som webbplatsadministratörens konto. Beteendet i andra instanser
       är redan samma.
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "Om aktiverat kommer användare kunna konfigurerar LTI 2 verktyg."
+  if_enabled_variable_substitutions_will_return_stri_26421822: "Om aktiverad kommer olika ersättningar att returnera strängvärden istället för numeriska värden"
   if_enabled_when_an_lti_toolproxy_is_created_it_wil_9c2ea3ec: |-
       Om aktiverad när en Lti::ToolProxy skapas kommer den att
       skapa livehändelsen direkt i verktyget
@@ -14289,6 +14305,7 @@ sv:
   include_assignments_graded_with_a_0_score_fb784115: "Ta med uppgifter som fått resultatet 0."
   include_byte_order_mark_in_compatible_spreadsheet__ebd6e18: "Inkludera byteordningsmärke i kompatibla exporter av kalkylblad"
   include_byte_order_mark_in_gradebook_exports_d2ad0d4e: "Inkludera byteordningsmärke i exporter av omdömesböcker"
+  include_classic_quizzes_ecf3fb2b: "Inkludera klassiska quiz"
   include_course_scores_e38e71da: "Inkludera kursresultat"
   include_course_settings_c4c08764: "Inkludera kursinställningar"
   include_deleted_enrollments_1c87684a: "Inkludera raderade registreringar"
@@ -15674,6 +15691,7 @@ sv:
   maximum_number_of_communication_channels_reached_70c4d2f9: "Max. antal kommunikationskanaler har uppnåtts"
   may_have_one_featured_link_and_one_new_link_at_a_t_21106efe: "(Kan ha en visad länk och en ny länk samtidigt)"
   media_af190855: Media
+  media_comment_content_5c2341fb: "Innehåll i mediekommentar"
   media_comment_dialog_manager: 
     messages: 
       loading: "Läser in ..."
@@ -18934,6 +18952,7 @@ sv:
     format: 
       delimiter: " "
       precision: 3
+      round_mode: förinställd
       separator: ","
       significant: false
       strip_insignificant_zeros: false
@@ -19662,6 +19681,7 @@ sv:
   performance_improvements_for_loading_data_into_gra_1c3a0c60: "Bättre prestanda för datainläsning i bedömningsöversikten."
   performance_improvements_for_the_grade_calculation_7d9b0b16: "Prestandaförbättringar i processen för omdömesberäkningar"
   performed_by_70b3ce96: "Genomförd av"
+  permanent_num_strands_setting_141e8a0c: "Permanent num_strands-inställning"
   permission_must_be_enabled_for_someone_397e1ce3: "Tillstånd måste aktiveras för någon"
   permission_not_found_620b80d1: "Behörighet hittades inte"
   permission_to_change_this_mastery_calculation_at_t_9b1966c5: "Behörighet att ändra den här måluppfyllelseberäkningen på den kursnivå den aktiverats för:"
@@ -19713,6 +19733,7 @@ sv:
   plagiarism_review_7bccc7df: Plagieringsgranskning
   plagiarism_review_tool_error_513f47ff: "Fel med plagiatgranskningsverktyg"
   plagiarism_review_tool_is_missing_submission_event_75273069: "Plagiatgranskningsverktyg saknar tjänsten inlämningshändelse"
+  plagiarism_review_tool_live_event_subscription_err_9094579d: "Prenumerationsfel i plagieringsgranskningsverktyget vid livehändelse"
   plagiarism_review_tool_submission_event_service_is_b023b4c7: "Plagiat-granskningsverktyg saknar slutpunkt för tjänsten inlämningshändelse"
   plain_text_e3ab33aa: "Oformaterad text"
   plain_text_view_7640af4c: "Vanlig text-vy"
@@ -20790,6 +20811,7 @@ sv:
       *urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol*-protokollet.
       Ytterligare SAML-leverantörer kan konfigureras så att de följer svaret
       från identifieringstjänsten.
+  provide_tutorial_information_for_instructors_new_t_163c8ed4: "Tillhandahåll information om självstudier för nya Canvas-lärare."
   provide_tutorial_information_for_new_users_in_a_fl_c23462ac: "Ge handledningsinformation för nya användare i ett utfällbara fack."
   provider_attribute_b1cad655: Leverantörsattribut
   provider_icon_5064fa6e: Leverantörsikon
@@ -22747,6 +22769,7 @@ sv:
   remove_linked_student_name_52dc7fce: "Ta bort den länkade studenten %{name}"
   remove_mastery_level_b1e8dcb0: "Ta bort måluppfyllelse"
   remove_media_attachment_d2926f1e: "Ta bort mediebilaga"
+  remove_media_comment_f4afdb4b: "Ta bort mediakommentar"
   remove_missing_status_when_graded_d0755cc7: "Ta bort saknad status efter bedömning"
   remove_name_624e06be: "Ta bort %{name}"
   remove_name_as_an_admin_c296cf49: "Ta bort %{name} som admin"
@@ -22975,6 +22998,7 @@ sv:
   retry_ebd5f8ba: "Försök igen"
   retry_migrating_name_bdc802ef: "Prova migreringen igen \"%{name}\""
   return_to_parent_folder_4ece2184: "återgå till överordnad mapp"
+  returns_string_values_instead_of_numeric_values_in_a6dfdf7d: "Returnerar strängvärden istället för numeriska värden i olika ersättningar"
   revert_date_changes_5105ce5: "Återställ datumändringar"
   revert_to_actual_score_f665eea9: "Återgå till det verkliga resultatet"
   revert_to_old_ui_3211da41: "Återgå till det gamla användargränssnittet"
@@ -23559,6 +23583,7 @@ sv:
   section_id_6f73f3d5: sektions-id
   section_id_8ec4f46f: "Sektions ID"
   section_id_b5aad4a7: Sektions-ID
+  section_level_calendar_permissions_6aff8cdb: "Kalenderbehörigheter på sektionsnivå"
   section_name_b6d82574: "Sektionens namn"
   section_name_edb51b2: "sektionens namn"
   section_removed_2ac72a79: "%{section} har tagits bort"
@@ -26006,6 +26031,7 @@ sv:
   terms_of_service_bedefcaf: Användarvillkor
   terms_of_service_f183ff7f: Användarvillkor
   test_cluster_only_70e61c19: "Endast testkluster"
+  test_feature_flag_980151e0: Testfunktionsflagga
   testing_state_effd4a82: Testningsstatus
   text_7f4593da: Text
   text_df773ce4: text
@@ -26263,6 +26289,7 @@ sv:
   the_outcomes_that_you_have_selected_cannot_be_remo_fc7244f2: 
     one: "Det går inte att ta bort det lärandemål du valde eftersom det är associerat till innehåll i den här kursen."
     other: "Det går inte att ta bort de lärandemål du valde eftersom de är associerade till innehåll i den här kursen."
+  the_plagiarism_platform_settings_can_t_be_changed__629adec6: "Det går inte att ändra inställningarna för plagieringsplattformens eftersom studenterna redan har lämnat in den här uppgiften."
   the_preceding_content_is_partner_provided_d753928c: "Det föregående innehållet har tillhandahållits av partner"
   the_previous_sis_batch_was_aborted_d7d89955: "Föregående SIS-batch avbröts"
   the_proficiency_calculation_was_set_by_your_admin__c31f8e95: "Kompetensberäkningen angavs av din administratör och gäller för alla kurser i det här kontot."
@@ -26378,6 +26405,7 @@ sv:
   there_are_no_unsynched_changes_d208547c: "Det finns inga osynkade ändringar"
   there_are_no_user_accounts_to_split_from_this_user_4e132eb1: "Det finns inga användarkonton som kan delas från den här användaren."
   there_are_unread_rubric_comments_337270ca: "Det finns olästa matriskommentarer."
+  there_are_unsaved_changes_to_a_grade_n_ncontinue_a_103d3b3c: "Det finns osparade ändringar i ett omdöme.\\n\\nVill du fortsätta i alla fall?"
   there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "Det är en 2-appsgräns för placering i RCE-verktygsfältet Denna inställning gäller endast för det förbättrade RCE."
   there_is_a_2_app_limit_for_placement_within_the_rc_971821a8: "Det är en 2-appsgräns för placering i RCE-verktygsfältet"
   there_is_currently_1_available_grader_758e4a21: "Det finns för närvarande 1 tillgänglig bedömare"
@@ -26508,7 +26536,7 @@ sv:
   these_pronouns_will_be_available_to_canvas_users_i_e8f474e5: "Dessa pronomen kommer att finnas tillgängliga för Canvas-användare i ditt konto."
   these_scores_are_out_of_order_4f0859ef: "dessa poäng är i oordning"
   they_them_d6125799: de/dem
-  they_them_f4d17a04: De/dem
+  they_them_f4d17a04: Hen
   they_were_merged_into_other_user_64758f01: "De samman kopplades till *%{other_user}*."
   this_account_does_not_allow_for_microsoft_teams_sy_266f11c7: "Det går inte att aktivera Microsoft Teams Sync för det här kontot. Aktivera funktionsflaggan för synkronisering av registreringar i Microsoft Group innan du redigerar några inställningar."
   this_account_doesn_t_allow_for_microsoft_teams_syn_744dbd76: "Det går inte att aktivera Microsoft Teams Sync för det här kontot. Aktivera funktionsflaggan för synkronisering av registreringar i Microsoft Group innan du redigerar några inställningar."
@@ -26635,6 +26663,7 @@ sv:
   this_file_9443cda1: "Den här filen"
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "Den här filen måste ha usage_rights inställt innan den kan publiceras."
   this_flag_allows_calendar_event_series_to_be_creat_cb8d5a60: "Den här flaggan tillåter att serier av kalenderhändelser skapas från Canvas-kalendern."
+  this_flag_is_a_no_op_and_is_only_intended_for_test_e969f9c: "Den här flaggan kan inte väljas och är endast avsedd för testning."
   this_flag_updates_the_title_of_the_feature_flags_t_513820f8: "Den här flaggan uppdaterar titeln på fliken för funktionsflaggor till ”Funktionsalternativ” och lägger till ”Förhandsgranskningsfunktion” för framtida förhandsgranskningsprojekt."
   this_flag_will_not_cause_any_change_in_behavior_24c0308b: "Den här flaggan ändrar inte beteendet."
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Mappen är för tillfället låst och kan inte visas."
@@ -27837,6 +27866,7 @@ sv:
     no_score_after_retries: "Turnitin har inte returnerat ett resultat efter %{max_tries} försök att hämta det."
     tooltip: 
       score: "Likhetspoäng – Se detaljerad rapport"
+  turnitin_has_not_returned_a_submission_after_max_t_c44bbdb6: "Turnitin har inte returnerat en inlämning efter %{max_tries} försök att hämta en."
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "Skicka in igen"
@@ -27868,6 +27898,7 @@ sv:
   type_to_search_de63ad38: "Skriv för att söka"
   type_to_search_use_arrow_keys_to_navigate_options_5d538c0: "Ange text för att söka och använd piltangenter för att välja bland alternativen."
   type_your_message_here_3551e252: "Skriv meddelandet här ..."
+  uc_irvine_quiz_adoption_report_9279da8e: "UC Irvine-rapport om införande av quiz"
   uc_merced_student_activity_report_4a9a1eb8: "Aktivitetsrapport för UC Merced-student"
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "Oj då! Kontakta din Catalog-utvecklare Felmeddelande: %{message}"
   ukrainian_945b00b7: Ukrainska
@@ -28158,6 +28189,7 @@ sv:
       och uppdaterad användarupplevelse
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Uppdaterade ikoner för publicering av policyer i kolumnrubriken för uppgifter i den nya omdömesboken."
   updates_to_json_api_auth_error_http_code_and_json__5936d452: "Uppdateringar till JSON API:s HTTP-autentiseringsfelkod och JSON-statusfält"
+  updates_to_oauth_2_0_flow_to_stop_redirecting_in_t_51c14b07: "Uppdaterar OAuth 2.0-flödet för att stoppa omdirigering i autentisering av ”token”"
   updating_6edbab78: Uppdaterar
   updating_discussion_failed_aadb2d35: "Det gick inte att uppdatera diskussionen"
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: "Om du uppdaterar Catalog-URL:n blir din gamla URL omedelbart oåtkomlig för användare! Om en det finns en befintligt konfigurerad betalningsprocessor måste ändringar utföras av en Catalog-tekniker."
@@ -29385,6 +29417,7 @@ sv:
       Du kommer att ta bort den här gruppen från din översikt. Den kommer ändå att finnas tillgänglig
                     i Kurser > Alla kurser från huvudmenyn.
   you_are_currently_acting_as_user_name_8d2be0ee: "Du agerar för närvarande som %{user_name}"
+  you_are_currently_in_the_environment_environment_t_449c4c0f: "Du är för närvarande i %{environment}-miljön. Detta kommer att påverka alla kunder. Är du säker?"
   you_are_currently_logged_into_student_view_3e8a1da: "Du är för tillfället inloggad i Studentens vy"
   you_are_currently_masquerading_as_user_name_f4a00ade: "Du maskerar dig just nu som %{user_name}"
   you_are_currently_receiving_notifications_for_this_4f542bb2: "Du tar för närvarande emot aviseringar för den här %{contextType}. För att inaktivera %{contextType}-aviseringar, använd reglaget ovan."

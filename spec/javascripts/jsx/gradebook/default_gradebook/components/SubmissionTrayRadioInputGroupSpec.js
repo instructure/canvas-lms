@@ -41,11 +41,21 @@ function mountComponent(customProps) {
 }
 
 QUnit.module('SubmissionTrayRadioInputGroup', {
+  setup() {
+    this.originalENV = window.ENV
+    window.ENV = {
+      FEATURES: {
+        extended_submission_state: true
+      }
+    }
+  },
+
   getRadioOption(value) {
     return this.wrapper.find(`input[type="radio"][value="${value}"]`).instance()
   },
 
   teardown() {
+    window.ENV = this.originalENV
     this.wrapper.unmount()
   }
 })
@@ -65,7 +75,7 @@ test('renders all SubmissionTrayRadioInputs enabled if disabled is false', funct
   const inputDisabledStatus = this.wrapper
     .find('SubmissionTrayRadioInput')
     .map(input => input.props().disabled)
-  deepEqual(inputDisabledStatus, [false, false, false, false])
+  deepEqual(inputDisabledStatus, [false, false, false, false, false])
 })
 
 test('renders all SubmissionTrayRadioInputs disabled if disabled is false', function () {
@@ -73,7 +83,7 @@ test('renders all SubmissionTrayRadioInputs disabled if disabled is false', func
   const inputDisabledStatus = this.wrapper
     .find('SubmissionTrayRadioInput')
     .map(input => input.props().disabled)
-  deepEqual(inputDisabledStatus, [true, true, true, true])
+  deepEqual(inputDisabledStatus, [true, true, true, true, true])
 })
 
 test('renders with "none" selected if the submission is not late, missing, or excused', function () {
@@ -146,6 +156,20 @@ test('renders with "Missing" selected if the submission is not excused and is mi
     submission: {excused: false, late: false, missing: true, secondsLate: 0}
   })
   const radio = this.getRadioOption('missing')
+  strictEqual(radio.checked, true)
+})
+
+test('renders with "Extended" selected if the submission is not excused and is extended', function () {
+  this.wrapper = mountComponent({
+    submission: {
+      excused: false,
+      late: false,
+      missing: false,
+      latePolicyStatus: 'extended',
+      secondsLate: 0
+    }
+  })
+  const radio = this.getRadioOption('extended')
   strictEqual(radio.checked, true)
 })
 

@@ -331,27 +331,27 @@ function sectionSelectionOptions(
 }
 
 function mergeStudentsAndSubmission() {
-  window.jsonData.studentsWithSubmissions = window.jsonData.context.students
-  window.jsonData.studentMap = {}
-  window.jsonData.studentEnrollmentMap = {}
-  window.jsonData.studentSectionIdsMap = {}
-  window.jsonData.submissionsMap = {}
+  const jsonData = window.jsonData
 
-  window.jsonData.context.enrollments.forEach(enrollment => {
+  jsonData.studentsWithSubmissions = jsonData.context.students
+  jsonData.studentMap = {}
+  jsonData.studentEnrollmentMap = {}
+  jsonData.studentSectionIdsMap = {}
+  jsonData.submissionsMap = {}
+
+  jsonData.context.enrollments.forEach(enrollment => {
     const enrollmentAnonymizableUserId = enrollment[anonymizableUserId]
-    window.jsonData.studentEnrollmentMap[enrollmentAnonymizableUserId] =
-      window.jsonData.studentEnrollmentMap[enrollmentAnonymizableUserId] || []
-    window.jsonData.studentSectionIdsMap[enrollmentAnonymizableUserId] =
-      window.jsonData.studentSectionIdsMap[enrollmentAnonymizableUserId] || {}
+    jsonData.studentEnrollmentMap[enrollmentAnonymizableUserId] =
+      jsonData.studentEnrollmentMap[enrollmentAnonymizableUserId] || []
+    jsonData.studentSectionIdsMap[enrollmentAnonymizableUserId] =
+      jsonData.studentSectionIdsMap[enrollmentAnonymizableUserId] || {}
 
-    window.jsonData.studentEnrollmentMap[enrollmentAnonymizableUserId].push(enrollment)
-    window.jsonData.studentSectionIdsMap[enrollmentAnonymizableUserId][
-      enrollment.course_section_id
-    ] = true
+    jsonData.studentEnrollmentMap[enrollmentAnonymizableUserId].push(enrollment)
+    jsonData.studentSectionIdsMap[enrollmentAnonymizableUserId][enrollment.course_section_id] = true
   })
 
-  window.jsonData.submissions.forEach(submission => {
-    window.jsonData.submissionsMap[submission[anonymizableUserId]] = submission
+  jsonData.submissions.forEach(submission => {
+    jsonData.submissionsMap[submission[anonymizableUserId]] = submission
   })
 
   window.jsonData.studentsWithSubmissions = window.jsonData.studentsWithSubmissions.reduce(
@@ -379,12 +379,12 @@ function mergeStudentsAndSubmission() {
 
   // need to presort by anonymous_id for anonymous assignments so that the index property can be consistent
   if (isAnonymous)
-    window.jsonData.studentsWithSubmissions.sort((a, b) =>
+    jsonData.studentsWithSubmissions.sort((a, b) =>
       a.anonymous_name_position > b.anonymous_name_position ? 1 : -1
     )
 
   // handle showing students only in a certain section.
-  if (!window.jsonData.GROUP_GRADING_MODE) {
+  if (!jsonData.GROUP_GRADING_MODE) {
     sectionToShow = ENV.selected_section_id
   }
 
@@ -394,12 +394,12 @@ function mergeStudentsAndSubmission() {
   if (sectionToShow) {
     sectionToShow = sectionToShow.toString()
 
-    const studentsInSection = window.jsonData.studentsWithSubmissions.filter(student =>
+    const studentsInSection = jsonData.studentsWithSubmissions.filter(student =>
       student.section_ids.includes(sectionToShow)
     )
 
     if (studentsInSection.length > 0) {
-      window.jsonData.studentsWithSubmissions = studentsInSection
+      jsonData.studentsWithSubmissions = studentsInSection
     } else {
       // eslint-disable-next-line no-alert
       alert(
@@ -412,11 +412,11 @@ function mergeStudentsAndSubmission() {
     }
   }
 
-  window.jsonData.studentMap = _.keyBy(window.jsonData.studentsWithSubmissions, anonymizableId)
+  jsonData.studentMap = _.keyBy(jsonData.studentsWithSubmissions, anonymizableId)
 
   switch (userSettings.get('eg_sort_by')) {
     case 'submitted_at': {
-      window.jsonData.studentsWithSubmissions.sort(
+      jsonData.studentsWithSubmissions.sort(
         EG.compareStudentsBy(student => {
           const submittedAt = student && student.submission && student.submission.submitted_at
           if (submittedAt) {
@@ -438,7 +438,7 @@ function mergeStudentsAndSubmission() {
         graded: 4,
         not_gradeable: 5
       }
-      window.jsonData.studentsWithSubmissions.sort(
+      jsonData.studentsWithSubmissions.sort(
         EG.compareStudentsBy(
           student =>
             student && states[SpeedgraderHelpers.submissionState(student, ENV.grading_role)]
@@ -1201,7 +1201,7 @@ function statusMenuComponent(submission) {
 
 function getLateMissingAndExcusedPills() {
   return document.querySelectorAll(
-    '.submission-missing-pill, .submission-late-pill, .submission-excused-pill'
+    '.submission-missing-pill, .submission-late-pill, .submission-excused-pill, .submission-extended-pill'
   )
 }
 
@@ -2499,11 +2499,15 @@ EG = {
           grade = GradeFormatHelper.formatGrade(s.grade)
         }
 
+        const late_policy_status =
+          (s.late && 'late') || (s.missing && 'missing') || s.late_policy_status
+
         return {
           value: i,
           late: s.late,
           missing: s.missing,
           excused: s.excused,
+          late_policy_status,
           selected: selectedIndex === i,
           submittedAt: $.datetimeString(s.submitted_at) || noSubmittedAt,
           grade

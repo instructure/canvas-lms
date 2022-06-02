@@ -1,0 +1,11 @@
+---
+extended_submission_state:
+  state: hidden
+  applies_to: RootAccount
+  display_name: UI features for "extended" Submissions
+  description: Enables UI features for managing "extended" Submissions.
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on

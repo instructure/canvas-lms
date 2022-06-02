@@ -52,7 +52,7 @@ describe('Statuses Modal', () => {
     expect(getByRole('heading', {name: /Statuses/i})).toBeTruthy()
   })
 
-  it('renders five StatusColorListItems', () => {
+  it('renders six StatusColorListItems', () => {
     const onClose = jest.fn()
     const afterUpdateStatusColors = jest.fn()
 
@@ -65,7 +65,7 @@ describe('Statuses Modal', () => {
     )
 
     const {getAllByRole} = within(document.body)
-    expect(getAllByRole('listitem').length).toBe(5)
+    expect(getAllByRole('listitem').length).toBe(6)
   })
 
   it('onClose is called when closed', () => {

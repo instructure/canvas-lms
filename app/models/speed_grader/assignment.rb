@@ -173,7 +173,7 @@ module SpeedGrader
 
       word_count_enabled = assignment.root_account.feature_enabled?(:word_count_in_speed_grader)
       res[:submissions] = submissions.map do |sub|
-        submission_methods = %i[submission_history late external_tool_url entered_score entered_grade seconds_late missing]
+        submission_methods = %i[submission_history late external_tool_url entered_score entered_grade seconds_late missing late_policy_status]
         submission_methods << :word_count if word_count_enabled
         json = sub.as_json(
           include_root: false,
@@ -226,7 +226,7 @@ module SpeedGrader
           json["submission_history"] = json["submission_history"].map do |version|
             # to avoid a call to the DB in Submission#missing?
             version.assignment = sub.assignment
-            version_methods = %i[versioned_attachments late missing external_tool_url]
+            version_methods = %i[versioned_attachments late missing external_tool_url late_policy_status]
             version_methods << :word_count if word_count_enabled
             version.as_json(only: submission_json_fields, methods: version_methods).tap do |version_json|
               version_json["submission"]["has_originality_report"] = version.has_originality_report?
