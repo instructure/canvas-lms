@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "account_reports/report_helper"
-
 module AccountReports
   class CourseReports
     include ReportHelper

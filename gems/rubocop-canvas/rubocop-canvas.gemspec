@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "activesupport", "~> 6.0"
+  spec.add_dependency "activesupport", ">= 6.0"
   spec.add_dependency "jira_ref_parser", "1.0.1"
   spec.add_dependency "outrigger", "~> 3.0"
   spec.add_dependency "rubocop", "~> 1.19"

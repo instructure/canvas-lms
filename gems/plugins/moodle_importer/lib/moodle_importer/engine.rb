@@ -20,8 +20,10 @@
 module Moodle
   class Railtie < ::Rails::Engine
     isolate_namespace Moodle
+
+    config.paths["lib"].eager_load!
+
     initializer "moodle_importer.canvas_plugin" do
-      require "moodle_importer/converter"
       require "moodle2cc"
     end
 

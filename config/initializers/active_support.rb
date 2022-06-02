@@ -25,8 +25,6 @@ ActiveSupport::SafeBuffer.class_eval do
 end
 
 module ActiveSupport::Cache
-  require "active_support/cache_register"
-
   Store.prepend(ActiveSupport::CacheRegister::Cache::Store)
 
   module AllowMocksInStore

@@ -27,22 +27,22 @@ def gem_override(name, version)
   end
 end
 
-gem "rails", "6.1.4.6"
+gem "rails", CANVAS_RAILS == "6.1" ? "6.1.4.6" : "7.0.3"
   gem "tzinfo", "2.0.4"
-gem_override "switchman", "3.0.24"
+gem_override "switchman", "3.1.1"
   gem "guardrail", "3.0.2"
-gem_override "switchman-inst-jobs", "4.0.6"
+gem_override "switchman-inst-jobs", "4.0.7"
   gem "irb", "1.4.1"
   gem "open4", "1.3.4", require: false
 
-gem "academic_benchmarks", "1.1.1", require: false
+gem "academic_benchmarks", "1.1.2", require: false
 gem "active_model-better_errors", "1.6.7", require: "active_model/better_errors"
 gem "active_model_serializers", "0.9.0alpha1",
     github: "rails-api/active_model_serializers", ref: "61882e1e4127facfe92e49057aec71edbe981829"
 gem "activerecord-pg-extensions", "0.4.4"
 gem "addressable", "2.7.0", require: false
 gem "after_transaction_commit", "2.2.2"
-gem "authlogic", "6.4.1"
+gem "authlogic", "6.4.2"
   gem "scrypt", "3.0.7"
 gem "aws-sdk-core", "3.109.2", require: false
   gem "aws-partitions", "1.393.0", require: false
@@ -66,7 +66,7 @@ gem "canvas_webex", "0.18.2"
 gem "crocodoc-ruby", "0.0.1", require: false
 gem "ddtrace", "0.42.0", require: false
 gem "docx", "0.6.2"
-gem "encrypted_cookie_store-instructure", "1.2.11", require: "encrypted_cookie_store"
+gem "encrypted_cookie_store-instructure", "1.2.12", require: "encrypted_cookie_store"
 gem "folio-pagination", "0.0.12", require: "folio/rails"
 gem "ffi", "1.14.2", require: false
 gem "gepub", "1.0.15"
@@ -114,7 +114,7 @@ gem "nokogiri", "1.12.5", require: false
 gem "oauth", "0.5.4", require: false
 gem "oauth2", "1.4.4", require: false
 gem "oj", "3.10.16"
-gem "outrigger", "3.0.0"
+gem "outrigger", "3.0.1"
 gem "pdf-reader", "2.5.0"
 gem "pg_query", "2.1.2"
 gem "prawn-rails", "1.3.0"
@@ -133,7 +133,7 @@ gem "ruby2_keywords", "0.0.3"
 gem "rubycas-client", "2.3.9", require: false
 gem "ruby-rtf", "0.0.5"
 gem "rubyzip", "2.3.0", require: "zip"
-gem "saml2", "3.1.1"
+gem "saml2", "3.1.2"
   gem "nokogiri-xmlsec-instructure", "0.10.1", require: false
 gem "sanitize", "6.0.0", require: false
 gem "sentry-ruby", "5.1.0"
