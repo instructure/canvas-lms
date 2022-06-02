@@ -605,7 +605,7 @@ class ConversationsController < ApplicationController
     messages = nil
     GuardRail.activate(:secondary) do
       messages = @conversation.messages
-      ActiveRecord::Associations::Preloader.new.preload(messages, :asset)
+      ActiveRecord::Associations.preload(messages, :asset)
     end
 
     render json: conversation_json(@conversation,

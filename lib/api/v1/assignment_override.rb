@@ -58,7 +58,7 @@ module Api::V1::AssignmentOverride
   def assignment_override_collection(assignment, include_students = false)
     overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(assignment, @current_user)
     if include_students
-      ActiveRecord::Associations::Preloader.new.preload(overrides, :assignment_override_students)
+      ActiveRecord::Associations.preload(overrides, :assignment_override_students)
     end
     overrides
   end
@@ -424,7 +424,7 @@ module Api::V1::AssignmentOverride
     overrides_to_keep = split_overrides[:keep] || []
     overrides_to_delete = split_overrides[:delete] || []
 
-    ActiveRecord::Associations::Preloader.new.preload(overrides_to_keep, :assignment_override_students)
+    ActiveRecord::Associations.preload(overrides_to_keep, :assignment_override_students)
 
     override_errors = []
     overrides_to_save = overrides_params.map do |override_params|

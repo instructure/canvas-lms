@@ -371,7 +371,7 @@ class OutcomeResultsController < ApplicationController
     filters << "completed" if exclude_concluded
     filters << "inactive" if exclude_inactive
 
-    ActiveRecord::Associations::Preloader.new.preload(@users, :enrollments)
+    ActiveRecord::Associations.preload(@users, :enrollments)
     @users = @users.reject { |u| u.enrollments.all? { |e| filters.include? e.workflow_state } }
   end
 
@@ -588,7 +588,7 @@ class OutcomeResultsController < ApplicationController
         associations << { associated_asset: :learning_outcome_group }
       end
       @outcome_links.each_slice(100) do |outcome_links_slice|
-        ActiveRecord::Associations::Preloader.new.preload(outcome_links_slice, associations)
+        ActiveRecord::Associations.preload(outcome_links_slice, associations)
       end
       @outcomes = @outcome_links.map(&:learning_outcome_content)
     end

@@ -32,7 +32,7 @@ class CreatePacePlans < ActiveRecord::Migration[6.0]
       t.boolean :hard_end_dates, null: false, default: false
       t.timestamps
       t.datetime :published_at
-      t.references :root_account, foreign_key: { to_table: "accounts" }, limit: 8, null: false, index: true
+      t.references :root_account, foreign_key: { to_table: "accounts" }, null: false, index: true
 
       t.index [:course_id], unique: true, where: "course_section_id IS NULL AND user_id IS NULL AND workflow_state='active'", name: "pace_plans_unique_primary_plan_index"
       t.index [:course_section_id], unique: true, where: "workflow_state='active'"

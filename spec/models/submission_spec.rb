@@ -1542,7 +1542,7 @@ describe Submission do
       version = Version.find_by(versionable: @submission)
       version.update_attribute(:versionable_id, Submission.last.id + 1)
       expect do
-        ActiveRecord::Associations::Preloader.new.preload([version].map(&:model), :originality_reports)
+        ActiveRecord::Associations.preload([version].map(&:model), :originality_reports)
       end.not_to raise_error
     end
   end

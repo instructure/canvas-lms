@@ -620,7 +620,7 @@ class ActiveRecord::Base
   end
 
   def self.current_xlog_location
-    Shard.current(connection_classes).database_server.unguard do
+    Shard.current(connection_class_for_self).database_server.unguard do
       GuardRail.activate(:primary) do
         if Rails.env.test? ? in_transaction_in_test? : connection.open_transactions > 0
           raise "don't run current_xlog_location in a transaction"
@@ -2076,8 +2076,21 @@ else
       @association_cache = {}
     end
   end
+  # Ensure it makes it onto activerecord::base even if assocations are already attached to base
   ActiveRecord::Associations.prepend(ClearableAssociationCache)
+  ActiveRecord::Base.prepend(ClearableAssociationCache)
 end
+
+module VersionAgnosticPreloader
+  def preload(records, associations, preload_scope = nil)
+    if Rails.version < "7.0"
+      ActiveRecord::Associations::Preloader.new.preload(records, associations, preload_scope)
+    else
+      ActiveRecord::Associations::Preloader.new(records: Array.wrap(records), associations: associations, scope: preload_scope).call
+    end
+  end
+end
+ActiveRecord::Associations.singleton_class.include(VersionAgnosticPreloader)
 
 Rails.application.config.after_initialize do
   ActiveSupport.on_load(:active_record) do

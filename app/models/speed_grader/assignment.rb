@@ -96,7 +96,7 @@ module SpeedGrader
       all_provisional_rubric_assessments =
         grading_role == :moderator ? assignment.visible_rubric_assessments_for(current_user, provisional_moderator: true) : []
 
-      ActiveRecord::Associations::Preloader.new.preload(assignment, :moderated_grading_selections) if provisional_grader_or_moderator?
+      ActiveRecord::Associations.preload(assignment, :moderated_grading_selections) if provisional_grader_or_moderator?
 
       includes = [{ versions: :versionable }, :quiz_submission, :user, :attachment_associations, :assignment, :originality_reports]
       includes << { all_submission_comments: { submission: { assignment: { context: :root_account } } } }

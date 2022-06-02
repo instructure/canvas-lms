@@ -332,9 +332,9 @@ class StreamItem < ActiveRecord::Base
   def self.prepare_object_for_unread(object)
     case object
     when DiscussionEntry
-      ActiveRecord::Associations::Preloader.new.preload(object, :discussion_entry_participants)
+      ActiveRecord::Associations.preload(object, :discussion_entry_participants)
     when DiscussionTopic
-      ActiveRecord::Associations::Preloader.new.preload(object, :discussion_topic_participants)
+      ActiveRecord::Associations.preload(object, :discussion_topic_participants)
     end
   end
 

@@ -1527,7 +1527,7 @@ describe ContextModule do
 
       it "does not reload the tags if already loaded" do
         expect(ContentTag).not_to receive(:visible_to_students_in_course_with_da)
-        ActiveRecord::Associations::Preloader.new.preload(@module, content_tags: :content)
+        ActiveRecord::Associations.preload(@module, content_tags: :content)
         @module.content_tags_visible_to(@student_1)
       end
 

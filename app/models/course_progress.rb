@@ -34,7 +34,7 @@ class CourseProgress
   def modules
     @_modules ||= begin
       result = course.modules_visible_to(user)
-      ActiveRecord::Associations::Preloader.new.preload(result, :content_tags)
+      ActiveRecord::Associations.preload(result, :content_tags)
       result
     end
   end

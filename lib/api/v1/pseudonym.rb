@@ -44,7 +44,7 @@ module Api::V1::Pseudonym
   end
 
   def pseudonyms_json(pseudonyms, current_user, session)
-    ActiveRecord::Associations::Preloader.new.preload(pseudonyms, :authentication_provider)
+    ActiveRecord::Associations.preload(pseudonyms, :authentication_provider)
     pseudonyms.map do |p|
       pseudonym_json(p, current_user, session)
     end

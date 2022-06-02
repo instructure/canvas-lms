@@ -123,14 +123,14 @@ module Api::V1::PlannerItem
       end
     end
 
-    ActiveRecord::Associations::Preloader.new.preload(preload_items, :planner_overrides, ::PlannerOverride.where(user: user))
+    ActiveRecord::Associations.preload(preload_items, :planner_overrides, ::PlannerOverride.where(user: user))
     events, other_items = preload_items.partition { |i| i.is_a?(::CalendarEvent) }
-    ActiveRecord::Associations::Preloader.new.preload(events, :context) if events.any?
+    ActiveRecord::Associations.preload(events, :context) if events.any?
     assessment_requests, plannable_items = other_items.partition { |i| i.is_a?(::AssessmentRequest) }
-    ActiveRecord::Associations::Preloader.new.preload(assessment_requests, [:assessor_asset, asset: { assignment: :context }]) if assessment_requests.any?
+    ActiveRecord::Associations.preload(assessment_requests, [:assessor_asset, asset: { assignment: :context }]) if assessment_requests.any?
     notes, context_items = plannable_items.partition { |i| i.is_a?(::PlannerNote) }
-    ActiveRecord::Associations::Preloader.new.preload(notes, user: { pseudonym: :account }) if notes.any?
-    ActiveRecord::Associations::Preloader.new.preload(context_items, { context: :root_account }) if context_items.any?
+    ActiveRecord::Associations.preload(notes, user: { pseudonym: :account }) if notes.any?
+    ActiveRecord::Associations.preload(context_items, { context: :root_account }) if context_items.any?
     ss = submission_statuses(context_items.select { |i| i.is_a?(::Assignment) }, user)
     discussions = context_items.select { |i| i.is_a?(::DiscussionTopic) }
     topics_status = topics_status_for(user, discussions.map(&:id))

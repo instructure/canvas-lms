@@ -109,7 +109,7 @@ class GradebookExporter
     assignments = select_in_grading_period(calc.gradable_assignments).to_a
     Assignment.preload_unposted_anonymous_submissions(assignments)
 
-    ActiveRecord::Associations::Preloader.new.preload(assignments, :assignment_group)
+    ActiveRecord::Associations.preload(assignments, :assignment_group)
     assignments = sort_assignments(assignments)
 
     groups = calc.groups

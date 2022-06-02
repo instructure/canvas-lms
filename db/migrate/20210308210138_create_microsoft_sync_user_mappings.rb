@@ -25,7 +25,7 @@ class CreateMicrosoftSyncUserMappings < ActiveRecord::Migration[6.0]
   def up
     create_table :microsoft_sync_user_mappings do |t|
       t.references :root_account, foreign_key: { to_table: :accounts }, index: false, null: false
-      t.references :user, limit: 8, null: false, foreign_key: true, index: false
+      t.references :user, null: false, foreign_key: true, index: false
       t.string :aad_id
       t.timestamps
       t.index [:user_id, :root_account_id], unique: true, name: "index_microsoft_sync_user_mappings_ra_id_user_id"

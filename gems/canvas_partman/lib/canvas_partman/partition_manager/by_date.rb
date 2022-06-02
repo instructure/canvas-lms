@@ -117,7 +117,7 @@ module CanvasPartman
       end
 
       def generate_check_constraint(date)
-        constraint_range = generate_date_constraint_range(date).map { |d| d.to_s(:db) }
+        constraint_range = generate_date_constraint_range(date).map { |d| Rails.version < "7.0" ? d.to_s(:db) : d.to_fs(:db) }
 
         <<~SQL.squish
           #{base_class.partitioning_field} >= TIMESTAMP '#{constraint_range[0]}'

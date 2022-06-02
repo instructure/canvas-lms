@@ -386,7 +386,7 @@ class CalendarEventsApiController < ApplicationController
               end
 
       events = Api.paginate(scope, self, route_url)
-      ActiveRecord::Associations::Preloader.new.preload(events, :child_events) if @type == :event
+      ActiveRecord::Associations.preload(events, :child_events) if @type == :event
       if @type == :assignment
         events = apply_assignment_overrides(events, user)
         mark_submitted_assignments(user, events)
@@ -395,7 +395,7 @@ class CalendarEventsApiController < ApplicationController
                                   .group_by(&:assignment_id)
         end
         # preload data used by assignment_json
-        ActiveRecord::Associations::Preloader.new.preload(events, :discussion_topic)
+        ActiveRecord::Associations.preload(events, :discussion_topic)
         Shard.partition_by_shard(events) do |shard_events|
           having_submission = Assignment.assignment_ids_with_submissions(shard_events.map(&:id))
           shard_events.each do |event|
@@ -415,9 +415,9 @@ class CalendarEventsApiController < ApplicationController
 
       if @errors.empty?
         calendar_events, assignments = events.partition { |e| e.is_a?(CalendarEvent) }
-        ActiveRecord::Associations::Preloader.new.preload(calendar_events, [:context, :parent_event])
-        ActiveRecord::Associations::Preloader.new.preload(assignments, Api::V1::Assignment::PRELOADS)
-        ActiveRecord::Associations::Preloader.new.preload(assignments.map(&:context), %i[account grading_period_groups enrollment_term])
+        ActiveRecord::Associations.preload(calendar_events, [:context, :parent_event])
+        ActiveRecord::Associations.preload(assignments, Api::V1::Assignment::PRELOADS)
+        ActiveRecord::Associations.preload(assignments.map(&:context), %i[account grading_period_groups enrollment_term])
 
         json = events.map do |event|
           subs = submissions[event.id] if submissions
@@ -799,7 +799,7 @@ class CalendarEventsApiController < ApplicationController
     @contexts.each do |context|
       log_asset_access(["calendar_feed", context], "calendar", "other", context: @context)
     end
-    ActiveRecord::Associations::Preloader.new.preload(@events, :context)
+    ActiveRecord::Associations.preload(@events, :context)
 
     respond_to do |format|
       format.ics do
@@ -1258,7 +1258,7 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def apply_assignment_overrides(events, user)
-    ActiveRecord::Associations::Preloader.new.preload(events, [:context, :assignment_overrides])
+    ActiveRecord::Associations.preload(events, [:context, :assignment_overrides])
     events.each { |e| e.has_no_overrides = true if e.assignment_overrides.empty? }
 
     if AssignmentOverrideApplicator.should_preload_override_students?(events, user, "calendar_events_api")
@@ -1266,7 +1266,7 @@ class CalendarEventsApiController < ApplicationController
     end
 
     unless (params[:excludes] || []).include?("assignments")
-      ActiveRecord::Associations::Preloader.new.preload(events, [:rubric, :rubric_association])
+      ActiveRecord::Associations.preload(events, [:rubric, :rubric_association])
       # improves locked_json performance
 
       student_events = events.reject { |e| e.context.grants_right?(user, session, :read_as_admin) }

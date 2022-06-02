@@ -1055,7 +1055,7 @@ module ApplicationHelper
               .where(context_type: "Submission")
               .preload(:context)
               .to_a
-            ActiveRecord::Associations::Preloader.new.preload(
+            ActiveRecord::Associations.preload(
               aas.map(&:submission),
               assignment: :context
             )

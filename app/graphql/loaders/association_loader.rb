@@ -54,7 +54,7 @@ class Loaders::AssociationLoader < GraphQL::Batch::Loader
   end
 
   def perform(records)
-    ActiveRecord::Associations::Preloader.new.preload(records, @association)
+    ActiveRecord::Associations.preload(records, @association)
     records.each { |r| fulfill(r, r.send(@association)) }
   end
 end

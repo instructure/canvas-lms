@@ -13,7 +13,7 @@ done
 
 docker-compose exec -T cassandra cqlsh -e "${create_cmd[@]}"
 
-docker-compose exec -T canvas bin/rails db:migrate >> ./migrate.log
+docker-compose exec -T canvas bin/rails --trace db:migrate >> ./migrate.log
 docker-compose exec -T canvas bin/rake ci:reset_database RAILS_ENV=test CREATE_SHARDS=1
 
 for keyspace in auditors global_lookups page_views; do

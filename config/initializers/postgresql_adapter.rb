@@ -323,7 +323,7 @@ module SchemaCreationExtensions
     suffix = ActiveRecord::Base.table_name_suffix
     to_table = "#{prefix}#{to_table}#{suffix}"
 
-    options = foreign_key_options(from_table, to_table, options)
+    options = @conn.foreign_key_options(from_table, to_table, options)
     fk = ActiveRecord::ConnectionAdapters::ForeignKeyDefinition.new(from_table, to_table, options)
     visit_ForeignKeyDefinition(fk, constraint_type: :column)
   end

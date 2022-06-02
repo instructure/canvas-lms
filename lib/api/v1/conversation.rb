@@ -94,8 +94,8 @@ module Api::V1::Conversation
   end
 
   def conversation_recipients_json(recipients, current_user, session)
-    ActiveRecord::Associations::Preloader.new.preload(recipients.select { |r| r.is_a?(User) },
-                                                      { pseudonym: :account }) # for avatar_url
+    ActiveRecord::Associations.preload(recipients.select { |r| r.is_a?(User) },
+                                       { pseudonym: :account }) # for avatar_url
 
     preload_common_contexts(current_user, recipients)
     include_avatars = should_include_participant_avatars?(recipients.count)
@@ -119,7 +119,7 @@ module Api::V1::Conversation
     options[:include_participant_avatars] = false unless should_include_participant_avatars?(users.count)
 
     if options[:include_participant_avatars]
-      ActiveRecord::Associations::Preloader.new.preload(users, { pseudonym: :account }) # for avatar_url
+      ActiveRecord::Associations.preload(users, { pseudonym: :account }) # for avatar_url
     end
 
     preload_common_contexts(current_user, users) if options[:include_participant_contexts]

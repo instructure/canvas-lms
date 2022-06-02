@@ -252,7 +252,7 @@ describe Outcomes::ResultAnalytics do
 
   describe "#outcome_results_rollups" do
     before do
-      allow_any_instance_of(ActiveRecord::Associations::Preloader).to receive(:preload)
+      allow(ActiveRecord::Associations).to receive(:preload)
     end
 
     it "returns a rollup for each distinct user_id" do
@@ -312,7 +312,7 @@ describe Outcomes::ResultAnalytics do
 
   describe "#aggregate_outcome_results_rollup" do
     before do
-      allow_any_instance_of(ActiveRecord::Associations::Preloader).to receive(:preload)
+      allow(ActiveRecord::Associations).to receive(:preload)
     end
 
     context "with n_mastery outcome and results below mastery" do
@@ -463,7 +463,7 @@ describe Outcomes::ResultAnalytics do
 
   describe "#rating_percents" do
     before do
-      allow_any_instance_of(ActiveRecord::Associations::Preloader).to receive(:preload)
+      allow(ActiveRecord::Associations).to receive(:preload)
     end
 
     it "computes percents" do

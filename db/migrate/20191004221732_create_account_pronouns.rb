@@ -22,7 +22,7 @@ class CreateAccountPronouns < ActiveRecord::Migration[5.2]
   tag :predeploy
   def change
     create_table :account_pronouns do |t|
-      t.belongs_to :account, foreign_key: true, limit: 8, index: true
+      t.belongs_to :account, foreign_key: true, index: true
       t.string :pronoun, null: false
       t.timestamps
       t.string :workflow_state

@@ -229,9 +229,9 @@ module Api::V1::Course
           to_preload << course
         end
       end
-      ActiveRecord::Associations::Preloader.new.preload(to_preload, [:teachers]) if to_preload.any?
+      ActiveRecord::Associations.preload(to_preload, [:teachers]) if to_preload.any?
     else
-      ActiveRecord::Associations::Preloader.new.preload(courses, [:teachers])
+      ActiveRecord::Associations.preload(courses, [:teachers])
     end
   end
 end
