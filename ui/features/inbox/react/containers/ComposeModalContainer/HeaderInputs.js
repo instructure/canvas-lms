@@ -128,6 +128,7 @@ const HeaderInputs = props => {
                 }}
                 onCourseFilterSelect={onContextSelect}
                 activeCourseFilterID={props.activeCourseFilter?.contextID}
+                courseMessages={props.courseMessages}
               />
             )
           }
@@ -234,7 +235,8 @@ HeaderInputs.propTypes = {
    * Bool to control open/closed state of the AddressBookContainer menu for testing
    */
   addressBookContainerOpen: PropTypes.bool,
-  addressBookMessages: PropTypes.array
+  addressBookMessages: PropTypes.array,
+  courseMessages: PropTypes.array
 }
 
 export default HeaderInputs

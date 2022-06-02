@@ -100,7 +100,8 @@ export class CourseSelect extends React.Component {
       )
     }).isRequired,
     onCourseFilterSelect: PropTypes.func,
-    activeCourseFilterID: PropTypes.string
+    activeCourseFilterID: PropTypes.string,
+    courseMessages: PropTypes.array
   }
 
   static getDerivedStateFromProps(props, state) {
@@ -301,6 +302,7 @@ export class CourseSelect extends React.Component {
             />
           ) : null
         }
+        messages={this.props.courseMessages}
         data-testid="course-select"
       >
         {this.renderGroups()}

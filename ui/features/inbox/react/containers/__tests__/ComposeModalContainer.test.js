@@ -74,7 +74,8 @@ describe('ComposeModalContainer', () => {
     window.ENV = {
       current_user_id: '1',
       CONVERSATIONS: {
-        ATTACHMENTS_FOLDER_ID: 1
+        ATTACHMENTS_FOLDER_ID: 1,
+        CAN_MESSAGE_ACCOUNT_CONTEXT: false
       }
     }
   })
@@ -227,6 +228,13 @@ describe('ComposeModalContainer', () => {
       const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
 
       const component = setup({setOnSuccess: mockedSetOnSuccess})
+
+      // Set Course
+      const courseDropdown = await component.findByTestId('course-select')
+      fireEvent.click(courseDropdown)
+
+      const option = await component.findByText('Fighting Magneto 101')
+      fireEvent.click(option)
 
       // Set subject
       const subjectInput = await component.findByTestId('subject-input')
@@ -522,5 +530,18 @@ describe('ComposeModalContainer', () => {
     fireEvent.click(button)
 
     expect(component.findByText('Invalid recipient')).toBeTruthy()
+  })
+
+  it('validates course', async () => {
+    const component = setup()
+
+    // Wait for modal to load
+    await component.findByTestId('message-body')
+
+    // Hit send
+    const button = component.getByTestId('send-button')
+    fireEvent.click(button)
+
+    expect(component.findByText('Please select a course')).toBeTruthy()
   })
 })
