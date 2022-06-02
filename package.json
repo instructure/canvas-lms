@@ -370,6 +370,7 @@
     "test:karma:watch": "node --max-old-space-size=4096 ./node_modules/.bin/karma start",
     "test:karma:watch:headless": "yarn run test:karma:watch --browsers ChromeHeadlessNoSandbox",
     "test:packages": "if [ \"$COVERAGE\" = \"1\" ]; then yarn workspace-run-serial test:coverage; else yarn workspace-run-serial test; fi",
+    "test:packages:parallel": "if [ \"$COVERAGE\" = \"1\" ]; then yarn workspace-run test:coverage; else yarn workspace-run test; fi",
     "build": "yarn run build:css && yarn run build:js",
     "build:watch": "concurrently --raw \"yarn build:css:watch\" \"yarn build:js:watch\"",
     "build:css": "brandable_css",
