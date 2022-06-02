@@ -83,8 +83,8 @@ def computeTestCount() {
 
   def formatterResult = sh(script: 'docker-compose exec -T canvas cat formatter_out.txt', returnStdout: true).trim().split(" ")
 
-  def nodeTotal = formatterResult[0]
-  def specTotal = formatterResult[1]
+  def nodeTotal = formatterResult[0].toInteger()
+  def specTotal = formatterResult[1].toInteger()
 
   summaryMessage += "${specTotal} specs across ${specUnique.size()} files using ${nodeTotal} nodes"
 
