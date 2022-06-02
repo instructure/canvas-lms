@@ -46,36 +46,10 @@ def setupNode() {
   sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')
 }
 
-def exampleCount(testList) {
-  sh(script: "docker-compose exec -T canvas bundle exec rspec --dry-run \
-                                    --require './spec/formatters/example_count_formatter.rb' \
-                                    --format ExampleCountRecorder \
-                                    --out spec_count.txt --pattern ${testList.join(',')}", label: 'Get Test Count')
-  return sh(script: 'docker-compose exec -T canvas cat spec_count.txt', returnStdout: true).trim().toInteger()
-}
-
-def calcNodes(seleniumCount, seleniumPartition, rspecCount, rspecPartition) {
-  nodeTotal = (rspecCount + rspecPartition - 1).intdiv(rspecPartition)
-  nodeTotal += (seleniumCount + seleniumPartition - 1).intdiv(seleniumPartition)
-  rspecqNodeTotal = nodeTotal > rspecqNodeTotal ? rspecqNodeTotal : nodeTotal
-}
-
-def getColor(testCount, partition) {
-  if (testCount <= partition) {
-    return 'good'
-  } else if (testCount <= (partition * 4)) {
-    return 'warning'
-  }
-  return 'danger'
-}
-
 def computeTestCount() {
-  def seleniumPartition = (env.RSPEC_PROCESSES.toInteger() * 25) // 25 tests per process
-  def rspecPartition = (env.RSPEC_PROCESSES.toInteger() * 190) // 190 tests per process
   def specs = readFile(file: 'tmp/crystalball_spec_list.txt')
   def mapVersion = readFile(file: 'tmp/crystalball_map_version.txt')
   def specUnique = specs.tokenize(',').unique()
-  def totalPrediction = specUnique.join('\n')
   env.CRYSTALBALL_SPEC = specUnique.join(' ')
 
   summaryMessage = "Map: $mapVersion\n"
@@ -102,24 +76,22 @@ def computeTestCount() {
     return
   }
 
-  // split crystalball_spec
-  def seleniumTests = specUnique.findAll { it.contains('/selenium') }
-  def rspecTests = specUnique - seleniumTests
-  def seleniumCount = seleniumTests.size() > 0 ? exampleCount(seleniumTests) : 0
-  def rspecCount = rspecTests.size() > 0 ? exampleCount(rspecTests) : 0
+  sh(script: "docker-compose exec -T canvas bundle exec rspec --dry-run \
+                                      --require './spec/formatters/node_count_formatter.rb' \
+                                      --format NodeCountRecorder \
+                                      --out formatter_out.txt --pattern ${specUnique.join(',')}", label: 'Get Node Count')
 
-  // Format crystalball message
-  summaryMessage += seleniumCount > 0 ? "$seleniumCount Individual Selenium spec(s) across ${seleniumTests.size()} file(s)\n" : ''
-  summaryMessage += rspecCount > 0 ? "$rspecCount Individual Rspec spec(s) across ${rspecTests.size()} file(s)\n" : ''
-  summaryMessage += seleniumCount > 0 ? "${seleniumTests.join('\n')}\n" : ''
-  summaryMessage += rspecCount > 0 ? "${rspecTests.join('\n')}" : ''
+  def formatterResult = sh(script: 'docker-compose exec -T canvas cat formatter_out.txt', returnStdout: true).trim().split(" ")
 
-  crystalballColor = getColor(seleniumCount+rspecCount, seleniumPartition+rspecPartition)
+  def nodeTotal = formatterResult[0]
+  def specTotal = formatterResult[1]
 
-  echo "total prediction: \n====\n$totalPrediction\n===="
+  summaryMessage += "${specTotal} specs across ${specUnique.size()} files using ${nodeTotal} nodes"
 
-  // Calculate nodes
-  calcNodes(seleniumCount, seleniumPartition, rspecCount, rspecPartition)
+  echo "=== Prediction Summary ===\n${summaryMessage}\n${specUnique.join('\n')}"
+
+  crystalballColor = nodeTotal > rspecqNodeTotal ? 'warning' : 'good'
+  rspecqNodeTotal = nodeTotal > rspecqNodeTotal ? rspecqNodeTotal : nodeTotal
 }
 
 def sendCrystalballSlack(summary, color, status) {
