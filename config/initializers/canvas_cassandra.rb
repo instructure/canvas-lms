@@ -17,5 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-CanvasCassandra.logger = Rails.logger
-CanvasCassandra.settings_store = Setting # to avoid having to pull this out as a full engine yet.
+Rails.configuration.to_prepare do
+  CanvasCassandra.logger = Rails.logger
+  CanvasCassandra.settings_store = Setting # to avoid having to pull this out as a full engine yet.
+end

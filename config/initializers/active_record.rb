@@ -2068,7 +2068,16 @@ module MaxRuntimeConnectionPool
 end
 ActiveRecord::ConnectionAdapters::ConnectionPool.prepend(MaxRuntimeConnectionPool)
 
-ActiveRecord::Associations.send(:public, :clear_association_cache)
+if Rails.version < "7.0"
+  ActiveRecord::Associations.send(:public, :clear_association_cache)
+else
+  module ClearableAssociationCache
+    def clear_association_cache
+      @association_cache = {}
+    end
+  end
+  ActiveRecord::Associations.prepend(ClearableAssociationCache)
+end
 
 Rails.application.config.after_initialize do
   ActiveSupport.on_load(:active_record) do

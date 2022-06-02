@@ -107,6 +107,16 @@ module CanvasRails
 
     config.paths["lib"].eager_load!
     config.paths.add("app/middleware", eager_load: true, autoload_once: true)
+    # The main autoloader should ignore it so the `once` autoloader can happily load it
+    Rails.autoloaders.main.ignore("#{__dir__}/../lib/base")
+    config.paths.add("lib/base", eager_load: true, autoload_once: true)
+
+    # This needs to be set for things in the `once` autoloader really early
+    Rails.autoloaders.each do |autoloader|
+      autoloader.inflector.inflect(
+        "csv_with_i18n" => "CSVWithI18n"
+      )
+    end
 
     # prevent directory->module inference in these directories from wreaking
     # havoc on the app (e.g. stylesheets/base -> ::Base)
@@ -322,10 +332,6 @@ module CanvasRails
           DynamicSettingsInitializer.bootstrap!
         end
       end
-    end
-
-    initializer "canvas.cache_config", before: "canvas.extend_shard" do
-      CanvasCacheInit.apply!
     end
 
     initializer "canvas.extend_shard", before: "active_record.initialize_database" do
