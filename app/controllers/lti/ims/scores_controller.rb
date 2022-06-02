@@ -206,6 +206,10 @@ module Lti::IMS
         rescue Net::ReadTimeout, CanvasHttp::CircuitBreakerError
           return render_error("failed to communicate with file service", :gateway_timeout)
         rescue CanvasHttp::InvalidResponseCodeError => e
+          if e.code == 502 || (e.code == 400 && e.body.include?("timed-out"))
+            return render_error("file url timed out", :gateway_timeout)
+          end
+
           err_message = "uploading to file service failed with #{e.code}: #{e.body}"
           return render_error(err_message, :bad_request) if e.code == 400
 

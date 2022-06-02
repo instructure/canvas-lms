@@ -625,6 +625,68 @@ module Lti::IMS
 
                 it_behaves_like "a 400"
               end
+
+              context "when file upload url times out" do
+                context "and FF is on" do
+                  before do
+                    Account.root_accounts.first.enable_feature! :ags_scores_file_error_improvements
+                  end
+
+                  context "and InstFS responds with a 502" do
+                    before do
+                      allow(CanvasHttp).to receive(:post).and_return(
+                        double(class: Net::HTTPBadRequest, code: 502, body: {})
+                      )
+                    end
+
+                    it "returns 504 and specific error message" do
+                      send_request
+                      expect(response.code).to eq "504"
+                      expect(response.body).to include("file url timed out")
+                    end
+                  end
+
+                  context "and InstFS responds with a 400" do
+                    before do
+                      allow(CanvasHttp).to receive(:post).and_return(
+                        double(class: Net::HTTPBadRequest, code: 400, body: "The service received no request body and has timed-out")
+                      )
+                    end
+
+                    it "returns 504 and specific error message" do
+                      send_request
+                      expect(response.code).to eq "504"
+                      expect(response.body).to include("file url timed out")
+                    end
+                  end
+                end
+
+                context "and FF is off" do
+                  before do
+                    Account.root_accounts.first.disable_feature! :ags_scores_file_error_improvements
+                  end
+
+                  context "and InstFS responds with a 502" do
+                    before do
+                      allow(CanvasHttp).to receive(:post).and_return(
+                        double(class: Net::HTTPBadRequest, code: 502, body: {})
+                      )
+                    end
+
+                    it_behaves_like "a 500"
+                  end
+
+                  context "and InstFS responds with a 400" do
+                    before do
+                      allow(CanvasHttp).to receive(:post).and_return(
+                        double(class: Net::HTTPBadRequest, code: 400, body: "The service received no request body and has timed-out")
+                      )
+                    end
+
+                    it_behaves_like "a 400"
+                  end
+                end
+              end
             end
           end
         end
