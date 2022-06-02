@@ -161,7 +161,7 @@ def maybeSlackSendFailure() {
   slackSend(
     channel: '#canvas_builds-noisy',
     color: 'danger',
-    message: "${env.JOB_NAME} <${getSummaryUrl()}|#${env.BUILD_NUMBER}> failed. Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}>."
+    message: "${env.JOB_NAME} <${getSummaryUrl()}|#${env.BUILD_NUMBER}> failed. Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}>. (${currentBuild.durationString})"
   )
 }
 
@@ -177,7 +177,7 @@ def maybeSlackSendSuccess() {
   slackSend(
     channel: '#canvas_builds-noisy',
     color: 'good',
-    message: "${env.JOB_NAME} <${getSummaryUrl()}|#${env.BUILD_NUMBER}> succeeded. Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}>."
+    message: "${env.JOB_NAME} <${getSummaryUrl()}|#${env.BUILD_NUMBER}> succeeded. Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}>. (${currentBuild.durationString})"
   )
 }
 
