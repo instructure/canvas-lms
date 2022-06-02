@@ -921,7 +921,7 @@ describe SubmissionsController do
       expect(body["body"]).to be nil
     end
 
-    it "renders the page for submitting student" do
+    it "renders the page for submitting student who can access the course" do
       user_session(@student)
       @assignment.update!(anonymous_grading: true)
       @assignment.ensure_post_policy(post_manually: true)
@@ -930,8 +930,17 @@ describe SubmissionsController do
       expect(assigns.dig(:js_env, :media_comment_asset_string)).to eq @student.asset_string
     end
 
+    it "does not render the page for submitting student who cannot access the course" do
+      user_session(@student)
+      @assignment.update!(anonymous_grading: true)
+      @assignment.ensure_post_policy(post_manually: true)
+      @course.enrollments.find_by(user: @student).deactivate
+      get :show, params: { course_id: @context.id, assignment_id: @assignment.id, id: @student.id }
+      assert_unauthorized
+    end
+
     describe "peer reviewers" do
-      let(:course) { Course.create! }
+      let(:course) { Course.create!(workflow_state: "available") }
       let(:assignment) { course.assignments.create!(peer_reviews: true) }
       let(:reviewer) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
       let(:reviewer_sub) { assignment.submissions.find_by!(user: reviewer) }
@@ -1044,7 +1053,6 @@ describe SubmissionsController do
     end
 
     it "shows rubric assessments to peer reviewers" do
-      course_with_student(active_all: true)
       @course.account.enable_service(:avatars)
       @assessor = @student
       outcome_with_rubric
