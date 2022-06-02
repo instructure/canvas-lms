@@ -217,7 +217,7 @@ export const ConversationListHolder = ({
         data-testid="conversation-list-no-messages"
       >
         <Flex.Item shouldGrow shouldShrink>
-          <img src={InboxEmpty} alt="No messages Panda" />
+          <img src={InboxEmpty} alt="No messages Panda" aria-hidden="true" />
         </Flex.Item>
         <Flex.Item>
           <Text color="primary" size="small" weight="bold">
