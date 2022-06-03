@@ -18943,7 +18943,6 @@ fr:
     format: 
       delimiter: " "
       precision: 3
-      round_mode: "par défaut"
       separator: ","
       significant: false
       strip_insignificant_zeros: false

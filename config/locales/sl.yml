@@ -15256,7 +15256,6 @@ sl:
     format: 
       delimiter: ","
       precision: 3
-      round_mode: privzeto
       separator: "."
       significant: false
       strip_insignificant_zeros: false

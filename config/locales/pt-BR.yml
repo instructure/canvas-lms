@@ -18936,7 +18936,6 @@ pt-BR:
     format: 
       delimiter: ","
       precision: 3
-      round_mode: padrão
       separator: "."
       significant: false
       strip_insignificant_zeros: false

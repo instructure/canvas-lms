@@ -14945,7 +14945,6 @@ ca:
     format: 
       delimiter: ","
       precision: 3
-      round_mode: "valor per defecte"
       separator: "."
       significant: false
       strip_insignificant_zeros: false

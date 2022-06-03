@@ -14052,7 +14052,6 @@ es-ES:
     format: 
       delimiter: ","
       precision: 3
-      round_mode: predeterminado
       separator: "."
       significant: false
       strip_insignificant_zeros: false

@@ -16666,7 +16666,6 @@ da-x-k12:
     format: 
       delimiter: "."
       precision: 3
-      round_mode: standard
       separator: ","
       significant: false
       strip_insignificant_zeros: false
