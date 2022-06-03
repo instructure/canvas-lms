@@ -16663,7 +16663,6 @@ sv-x-k12:
     format: 
       delimiter: " "
       precision: 3
-      round_mode: förinställd
       separator: ","
       significant: false
       strip_insignificant_zeros: false

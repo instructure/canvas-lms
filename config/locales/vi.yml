@@ -13921,7 +13921,6 @@ vi:
     format: 
       delimiter: ","
       precision: 3
-      round_mode: "mặc định"
       separator: "."
       significant: false
       strip_insignificant_zeros: false
