@@ -1172,124 +1172,203 @@ describe CalendarEventsApiController, type: :request do
       end
     end
 
-    describe "event series" do
+    context "event series" do
       before :once do
         Account.site_admin.enable_feature!(:calendar_series)
       end
 
-      it "creates an event series if an rrule has been specified" do
-        start_at = Time.zone.now.utc.change(hour: 0, min: 1)
-        end_at = Time.zone.now.utc.change(hour: 23)
-        json = api_call(
-          :post,
-          "/api/v1/calendar_events",
-          { controller: "calendar_events_api", action: "create", format: "json" },
-          {
-            calendar_event: {
-              context_code: @course.asset_string,
-              title: "many me",
-              start_at: start_at.iso8601,
-              end_at: end_at.iso8601,
-              rrule: "RRULE:FREQ=WEEKLY;INTERVAL=1;COUNT=3"
+      describe "create" do
+        it "creates an event series if an rrule has been specified" do
+          start_at = Time.zone.now.utc.change(hour: 0, min: 1)
+          end_at = Time.zone.now.utc.change(hour: 23)
+          json = api_call(
+            :post,
+            "/api/v1/calendar_events",
+            { controller: "calendar_events_api", action: "create", format: "json" },
+            {
+              calendar_event: {
+                context_code: @course.asset_string,
+                title: "many me",
+                start_at: start_at.iso8601,
+                end_at: end_at.iso8601,
+                rrule: "RRULE:FREQ=WEEKLY;INTERVAL=1;COUNT=3"
+              }
             }
-          }
-        )
-        assert_status(201)
-        expect(json.keys).to match_array expected_fields
-        expect(json["title"]).to eq "many me"
-        expect(json["series_id"]).to be_a_kind_of(Numeric)
+          )
+          assert_status(201)
+          expect(json.keys).to match_array expected_fields
+          expect(json["title"]).to eq "many me"
+          expect(json["series_id"]).to be_a_kind_of(Numeric)
 
-        duplicates = json["duplicates"]
-        expect(duplicates.count).to eq 2
+          duplicates = json["duplicates"]
+          expect(duplicates.count).to eq 2
 
-        duplicates.to_a.each_with_index do |duplicate, i|
-          start_result = Time.iso8601(duplicate["calendar_event"]["start_at"])
-          end_result = Time.iso8601(duplicate["calendar_event"]["end_at"])
-          expect(duplicate["calendar_event"]["title"]).to eql "many me"
-          expect(start_result).to eq(start_at + (i + 1).weeks)
-          expect(end_result).to eq(end_at + (i + 1).weeks)
+          duplicates.to_a.each_with_index do |duplicate, i|
+            start_result = Time.iso8601(duplicate["calendar_event"]["start_at"])
+            end_result = Time.iso8601(duplicate["calendar_event"]["end_at"])
+            expect(duplicate["calendar_event"]["title"]).to eql "many me"
+            expect(start_result).to eq(start_at + (i + 1).weeks)
+            expect(end_result).to eq(end_at + (i + 1).weeks)
+          end
+        end
+
+        it "fails if RRULE's COUNT creates too many events" do
+          start_at = Time.zone.now.utc.change(hour: 0, min: 1)
+          end_at = Time.zone.now.utc.change(hour: 23)
+          api_call(
+            :post,
+            "/api/v1/calendar_events",
+            { controller: "calendar_events_api", action: "create", format: "json" },
+            {
+              calendar_event: {
+                context_code: @course.asset_string,
+                title: "ohai",
+                start_at: start_at.iso8601,
+                end_at: end_at.iso8601,
+                rrule: "RRULE:FREQ=WEEKLY;INTERVAL=1;COUNT=201"
+              }
+            }
+          )
+          assert_status(400)
+        end
+
+        it "fails if RRULE's UNTIL date creates too many events" do
+          start_at = Time.zone.now.utc.change(hour: 0, min: 1)
+          end_at = Time.zone.now.utc.change(hour: 23)
+          series_end = start_at + 1.year
+          api_call(
+            :post,
+            "/api/v1/calendar_events",
+            { controller: "calendar_events_api", action: "create", format: "json" },
+            {
+              calendar_event: {
+                context_code: @course.asset_string,
+                title: "ohai",
+                start_at: start_at.iso8601,
+                end_at: end_at.iso8601,
+                rrule: "RRULE:FREQ=DAILY;INTERVAL=1;UNTIL=#{series_end.iso8601}"
+              }
+            }
+          )
+          assert_status(400)
+        end
+
+        it "doesn't die on unreasonable recurring event counts" do
+          start_at = Time.zone.now.utc.change(hour: 0, min: 1)
+          end_at = Time.zone.now.utc.change(hour: 23)
+          api_call(
+            :post,
+            "/api/v1/calendar_events",
+            { controller: "calendar_events_api", action: "create", format: "json" },
+            {
+              calendar_event: {
+                context_code: @course.asset_string,
+                title: "ohai",
+                start_at: start_at.iso8601,
+                end_at: end_at.iso8601,
+                rrule: "RRULE:FREQ=WEEKLY;INTERVAL=1;COUNT=1000000"
+              }
+            }
+          )
+          assert_status(400)
+        end
+
+        it "requires the series to have an end" do
+          start_at = Time.zone.now.utc.change(hour: 0, min: 1)
+          end_at = Time.zone.now.utc.change(hour: 23)
+          api_call(
+            :post,
+            "/api/v1/calendar_events",
+            { controller: "calendar_events_api", action: "create", format: "json" },
+            {
+              calendar_event: {
+                context_code: @course.asset_string,
+                title: "ohai",
+                start_at: start_at.iso8601,
+                end_at: end_at.iso8601,
+                rrule: "RRULE:FREQ=WEEKLY;INTERVAL=1;" # <<< no COUNT or UNTIL
+              }
+            }
+          )
+          assert_status(400)
         end
       end
 
-      it "fails if RRULE's COUNT creates too many events" do
-        start_at = Time.zone.now.utc.change(hour: 0, min: 1)
-        end_at = Time.zone.now.utc.change(hour: 23)
-        api_call(
-          :post,
-          "/api/v1/calendar_events",
-          { controller: "calendar_events_api", action: "create", format: "json" },
-          {
-            calendar_event: {
-              context_code: @course.asset_string,
-              title: "ohai",
-              start_at: start_at.iso8601,
-              end_at: end_at.iso8601,
-              rrule: "RRULE:FREQ=WEEKLY;INTERVAL=1;COUNT=201"
+      describe "destroy" do
+        before do
+          start_at = Time.zone.now.utc.change(hour: 0, min: 1)
+          end_at = Time.zone.now.utc.change(hour: 23)
+          @event_series = api_call(
+            :post,
+            "/api/v1/calendar_events",
+            { controller: "calendar_events_api", action: "create", format: "json" },
+            {
+              calendar_event: {
+                context_code: @course.asset_string,
+                title: "many me",
+                start_at: start_at.iso8601,
+                end_at: end_at.iso8601,
+                rrule: "RRULE:FREQ=WEEKLY;INTERVAL=1;COUNT=3"
+              }
             }
-          }
-        )
-        assert_status(400)
-      end
+          )
+        end
 
-      it "fails if RRULE's UNTIL date creates too many events" do
-        start_at = Time.zone.now.utc.change(hour: 0, min: 1)
-        end_at = Time.zone.now.utc.change(hour: 23)
-        series_end = start_at + 1.year
-        api_call(
-          :post,
-          "/api/v1/calendar_events",
-          { controller: "calendar_events_api", action: "create", format: "json" },
-          {
-            calendar_event: {
-              context_code: @course.asset_string,
-              title: "ohai",
-              start_at: start_at.iso8601,
-              end_at: end_at.iso8601,
-              rrule: "RRULE:FREQ=DAILY;INTERVAL=1;UNTIL=#{series_end.iso8601}"
-            }
-          }
-        )
-        assert_status(400)
-      end
+        it "deletes one event of a series" do
+          target_event_id = @event_series["id"]
+          series_count = @event_series["duplicates"].length + 1
+          series_id = @event_series["series_id"]
 
-      it "doesn't die on unreasonable recurring event counts" do
-        start_at = Time.zone.now.utc.change(hour: 0, min: 1)
-        end_at = Time.zone.now.utc.change(hour: 23)
-        api_call(
-          :post,
-          "/api/v1/calendar_events",
-          { controller: "calendar_events_api", action: "create", format: "json" },
-          {
-            calendar_event: {
-              context_code: @course.asset_string,
-              title: "ohai",
-              start_at: start_at.iso8601,
-              end_at: end_at.iso8601,
-              rrule: "RRULE:FREQ=WEEKLY;INTERVAL=1;COUNT=1000000"
-            }
-          }
-        )
-        assert_status(400)
-      end
+          json = api_call(:delete, "/api/v1/calendar_events/#{target_event_id}?which=one",
+                          { controller: "calendar_events_api", action: "destroy", id: target_event_id.to_s, which: "one", format: "json" })
+          assert_status(200)
+          expect(json.length).to eq 1
+          expect(json[0].keys).to match_array expected_fields
+          expect(json[0]["id"]).to be target_event_id
 
-      it "requires the series to have an end" do
-        start_at = Time.zone.now.utc.change(hour: 0, min: 1)
-        end_at = Time.zone.now.utc.change(hour: 23)
-        api_call(
-          :post,
-          "/api/v1/calendar_events",
-          { controller: "calendar_events_api", action: "create", format: "json" },
-          {
-            calendar_event: {
-              context_code: @course.asset_string,
-              title: "ohai",
-              start_at: start_at.iso8601,
-              end_at: end_at.iso8601,
-              rrule: "RRULE:FREQ=WEEKLY;INTERVAL=1;" # <<< no COUNT or UNTIL
-            }
-          }
-        )
-        assert_status(400)
+          remaining_events = CalendarEvent.where(series_id: series_id, workflow_state: "active")
+          expect(remaining_events.length).to eql series_count - 1
+        end
+
+        it "deletes and event and all following" do
+          target_event_id = @event_series["duplicates"][0]["calendar_event"]["id"] # middle event in the series
+          series_count = @event_series["duplicates"].length + 1
+          series_id = @event_series["series_id"]
+
+          json = api_call(:delete, "/api/v1/calendar_events/#{target_event_id}?which=following",
+                          { controller: "calendar_events_api", action: "destroy", id: target_event_id.to_s, which: "following", format: "json" })
+          assert_status(200)
+          expect(json.length).to eq 2
+          expect(json[0].keys).to match_array expected_fields
+          expect(json[0]["id"]).to be target_event_id
+          expect(json[1]["id"]).to be @event_series["duplicates"][1]["calendar_event"]["id"]
+
+          remaining_events = CalendarEvent.where(series_id: series_id, workflow_state: "active")
+          expect(remaining_events.length).to eql series_count - 2
+        end
+
+        it "deletes all in the series" do
+          target_event_id = @event_series["duplicates"][0]["calendar_event"]["id"] # middle event in the series
+          series_id = @event_series["series_id"]
+
+          json = api_call(:delete, "/api/v1/calendar_events/#{target_event_id}?which=all",
+                          { controller: "calendar_events_api", action: "destroy", id: target_event_id.to_s, which: "all", format: "json" })
+          assert_status(200)
+          expect(json.length).to eq 3
+
+          remaining_events = CalendarEvent.where(series_id: series_id, workflow_state: "active")
+          expect(remaining_events.length).to eql 0
+        end
+
+        it "returns an error for invalid 'which' parameter" do
+          target_event_id = @event_series["id"]
+
+          json = api_call(:delete, "/api/v1/calendar_events/#{target_event_id}?which=bogus",
+                          { controller: "calendar_events_api", action: "destroy", id: target_event_id.to_s, which: "bogus", format: "json" })
+          assert_status(400)
+          expect(json.length).to eq 1
+          expect(json["error"]).to eql "Invalid parameter which='bogus'"
+        end
       end
     end
 
