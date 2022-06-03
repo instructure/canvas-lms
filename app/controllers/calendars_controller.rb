@@ -36,7 +36,7 @@ class CalendarsController < ApplicationController
                          else
                            @current_user.get_preference(:selected_calendar_contexts)
                          end
-    @wrap_titles = @domain_root_account&.feature_enabled?(:wrap_calendar_event_titles)
+    @inline_titles = @domain_root_account&.feature_enabled?(:wrap_calendar_event_titles)
     # somewhere there's a bad link that doesn't separate parameters properly.
     # make sure we don't do a find on a non-numeric id.
     if params[:event_id] && params[:event_id] =~ Api::ID_REGEX && (event = CalendarEvent.where(id: params[:event_id]).first) && event.start_at

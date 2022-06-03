@@ -406,9 +406,8 @@ use_semi_colon_field_separators_in_gradebook_exports:
 wrap_calendar_event_titles:
   type: setting
   state: allowed
-  display_name: Wrap event titles in Calendar month view
-  description: Show calendar events in the month view on multiple lines if the title
-    doesn't fit on a single line
+  display_name: event title tooltips in Calendar month view
+  description: Display a tooltip for calendar events if the title doesn't fit on a single line
   applies_to: RootAccount
   root_opt_in: true
 gradebook_show_first_last_names:

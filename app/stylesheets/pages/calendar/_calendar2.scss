@@ -18,8 +18,8 @@
 
 @import 'base/environment';
 
-.wrap-calendar-event-titles .fc-day-grid-event .fc-content {
-  white-space: normal;
+.inline-calendar-event-titles .fc-day-grid-event .fc-content {
+  text-overflow: ellipsis;
 }
 
 .fc-rtl .fc-toolbar {
