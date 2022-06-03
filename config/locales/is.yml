@@ -17113,7 +17113,6 @@ is:
     format: 
       delimiter: "."
       precision: 3
-      round_mode: sjálfgildi
       separator: ","
       significant: false
       strip_insignificant_zeros: false
