@@ -878,6 +878,13 @@ th:
             check_box: "CSV กลุ่มย่อย"
           users: 
             check_box: "CSV ผู้ใช้"
+    mit: 
+      student_module_completion: 
+        parameters: 
+          account_reports: 
+            mit: 
+              student_module_completion: 
+                check_box: รายงานอย่างง่าย
     new_excelsior_activity_report_csv_parameters: 
       account_reports: 
         excelsior: 
@@ -1821,6 +1828,7 @@ th:
   allow_opt_out_of_inbox: "อนุญาตให้ผู้ใช้สามารถถอนตัวจากการรับเมลการพูดคุย รายการนี้จะทำให้ข้อความการพูดคุยและการแจ้งข้อมูลทั้งหมดถูกจัดส่งเป็นการแจ้งข้อมูลแบบเร่งด่วนไปยังอีเมลหลักของผู้ใช้ ปิดซ่อนตราสัญลักษณ์ข้อความที่ไม่ได้อ่านในกล่องจดหมายสำหรับการพูดคุยในกล่องจดหมายและซ่อนค่าปรับแต่งการแจ้งข้อมูลการพูดคุย"
   allow_outcome_extra_credit_57c1e84e: อนุญาตเครดิตพิเศษสำหรับผลลัพธ์
   allow_passive_acceptance_of_terms_of_service_63ef5994: อนุญาตการตอบรับโดยปริยายสำหรับเงื่อนไขการให้บริการ
+  allow_permissions_to_manage_the_calendar_to_be_gra_7d7818de: อนุญาตให้จัดการปฏิทินได้ในระดับหัวข้อย่อย
   allow_push_notification_opt_out_827f288b: อนุญาตการแจ้งไม่รับการแจ้งเตือนแบบพุช
   allow_self_sign_up_7520f8c5: อนุญาตให้สมัครด้วยตัวเอง
   allow_students_to_download_course_content_and_view_810e66ec: อนุญาตให้ผู้เรียนสามารถดาวน์โหลดเนื้อหาบทเรียนและดูเนื้อหาออฟไลน์
@@ -2198,6 +2206,7 @@ th:
   an_error_occurred_when_cloning_the_group_set_8e80da6b: เกิดข้อผิดพลาดขณะโคลนชุดกลุ่ม
   an_error_occurred_when_saving_the_group_536c8f66: เกิดข้อผิดพลาดขณะบันทึกกลุ่ม
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "เกิดข้อผิดพลาดขณะพยายามติดต่อ Turnitin"
+  an_error_occurred_while_attempting_to_contact_turn_c987545: "เกิดข้อผิดพลาดขณะพยายามติดต่อ Turnitin รหัสสถานะ: %{status_code}"
   an_error_occurred_while_checking_the_migration_sta_d17035b1: เกิดข้อผิดพลาดขณะตรวจสอบสถานะการโอนย้าย
   an_error_occurred_while_creating_this_group_please_ec96f426: "เกิดข้อผิดพลาดขณะจัดทำกลุ่มนี้ กรุณาลองใหม่อีกครั้งในภายหลัง"
   an_error_occurred_while_creating_this_outcome_plea_f1c69d92: "เกิดข้อผิดพลาดขณะจัดทำผลลัพธ์นี้ กรุณาลองใหม่อีกครั้งในภายหลัง"
@@ -3442,6 +3451,7 @@ th:
   avatar_for_author_2eabbf55: "ภาพประจำตัวสำหรับ %{author}"
   avatar_for_name_e3ba987c: "ภาพประจำตัวสำหรับ %{name}"
   average_49c63f9b: เฉลี่ย
+  average_is_not_a_good_fit_for_most_outcomes_based__f351ed94: "ค่าเฉลี่ยไม่เหมาะสมสำหรับกรณีการใช้งานเพื่อการเรียนรู้แบบอิงผลลัพธ์หรือความเชี่ยวชาญเนื่องจากผู้เรียนอาจต้องการเวลาในการพัฒนาความเชี่ยวชาญจากผลลัพธ์ และผลงานที่ไม่ดีนักใน่วงแรกอาจทำให้ค่าเฉลี่ยลดลง"
   avg_alignments_per_artifact_5573d99c: "เฉลี่ย การปรับประสานต่อผลงาน"
   avg_alignments_per_outcome_4daf75cd: "เฉลี่ย การปรับประสานต่อผลลัพธ์"
   avi_2d8cc99f: AVI
@@ -5265,6 +5275,7 @@ th:
   context_module_sub_header_2f39e87b: หัวเรื่องย่อยโมดูลเนื้อหา
   context_modules: 
     add_context_module_form: 
+      before_viewing: เงื่อนไขเบื้องต้น
       buttons: 
         add_module: เพิ่มหน่วยการเรียน
       labels: 
@@ -7612,6 +7623,7 @@ th:
   duration_hours_hours_and_minutes_minutes_d5da8c3: "ระยะเวลา: %{hours} ชั่วโมงและ %{minutes} นาที"
   duration_minutes_minutes_d7b9182b: "ระยะเวลา: %{minutes} นาที"
   dutch_6d05cee5: เนเธอร์แลนด์
+  dynamic_concurrency_231dbdc5: ความสอดพ้องแบบแปรผัน
   e_c2991d1b: e
   e_g_http_university_edu_helpdesk_acab04d6: "เช่น http://university.edu/helpdesk"
   e_mail_only_2cc5e513: อีเมลเท่านั้น
@@ -9979,6 +9991,9 @@ th:
   if_enabled_syncing_course_enrollments_to_microsoft_6f4f2bf9: |-
       หากเปิดใช้งานไว้ การซิงค์การลงทะเบียนบทเรียนไปยัง Microsoft Groups จะ
       สามารถใช้ได้ ผู้ดูแลบัญชีผู้ใช้สามารถเปิดใช้ค่าปรับตั้งทางบัญชีนี้
+  if_enabled_the_oauth_2_0_will_now_correctly_return_e33cca64: |-
+      หากเปิดใช้งานไว้ OAuth 2.0 จะแจ้งรหัสสถานะ 4xx ที่ถูกต้องไปยัง
+      ไคลเอนท์ที่ร้องขอแทนการเปลี่ยนเส้นทางเข้าหาตัวเองในตอนนี้
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: "หากเปิดใช้งานไว้ ตัวเลือกนี้จะถูกนำเสนอแบบมีเกณฑ์การให้คะแนนแบบไม่ระบุคะแนน"
   if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: |-
       หากเปิดใช้งานไว้ UI คีย์ผู้พัฒนาสำหรับดูแลไซต์จะแสดงเฉพาะ
@@ -9986,6 +10001,7 @@ th:
       ส่วนทำรายการของ Canvas ที่บัญชีรากอยู่ใน shard
       เดียวกับบัญชีผู้ดูแลไซต์ รูปแบบการทำงานของส่วนทำรายการอื่น
       จะดำเนินการในลักษณะนี้อยู่แล้ว
+  if_enabled_variable_substitutions_will_return_stri_26421822: "หากเปิดใช้งานไว้ ส่วนการแทนที่แบบแปรผันจะแจ้งค่าชุดอักขระแทนค่าตัวเลข"
   if_lti_add_is_disabled_users_can_still_install_app_78aa7908: "หากปิดใช้งาน LTI - เพิ่ม ไว้ ผู้ใช้ยังสามารถติดตั้งแอพที่ได้รับการรับรองผ่านศูนย์แอพ Canvas (หากเปิดใช้งานไว้สำหรับสถาบันของคุณ) ทั้งนี้หากไม่ได้เปิดใช้งาน LTI - ลบ ไว้ จะไม่สามารถลบแอพจากภายนอกที่เพิ่มเข้ามาได้ด้วยตัวเอง"
   if_mastery_scales_are_enabled_the_report_will_be_t_bf48d520: "หากระดับความเชี่ยวชาญถูกเปิดใช้งานไว้ รายงานจะถูกตัดทอนเพื่อไม่ให้รวมวิธีการคำนวณ จำนวนเต็มในการคำนวณ คะแนนความเชี่ยวชาญหรือคะแนนประเมิน"
   if_new_quizzes_is_enabled_this_allows_for_the_crea_87343d6f: |-
@@ -10164,6 +10180,7 @@ th:
   include_assignment_description_36e6ed1b: รวมรายละเอียดภารกิจ
   include_assignments_graded_with_a_0_score_fb784115: "รวมภารกิจที่ให้เกรดคะแนนเป็น 0"
   include_byte_order_mark_in_compatible_spreadsheet__ebd6e18: "รวม Byte-Order Mark ในส่วนการส่งออกกระดาษคำนวณที่รองรับ"
+  include_classic_quizzes_ecf3fb2b: รวมแบบทดสอบแบบคลาสสิค
   include_course_scores_e38e71da: รวมคะแนนบทเรียน
   include_course_settings_c4c08764: รวมค่าปรับตั้งบทเรียน
   include_deleted_enrollments_1c87684a: รวมการลงทะเบียนที่ลบแล้ว
@@ -11302,6 +11319,7 @@ th:
   maximum_number_of_communication_channels_reached_70c4d2f9: จำนวนช่องทางการสื่อสารสูงสุดที่เข้าถึง
   may_have_one_featured_link_and_one_new_link_at_a_t_21106efe: (มีได้แค่ลิงค์นำเสนอหนึ่งลิงค์และลิงค์ใหม่หนึ่งลิงค์ต่อครั้ง)
   media_af190855: สื่อ
+  media_comment_content_5c2341fb: เนื้อหาความเห็นแบบสื่อ
   media_comment_dialog_manager: 
     messages: 
       loading: กำลังโหลด...
@@ -13950,6 +13968,7 @@ th:
     format: 
       delimiter: ","
       precision: 3
+      round_mode: ค่าเริ่มต้น
       separator: "."
       significant: false
       strip_insignificant_zeros: false
@@ -14507,6 +14526,7 @@ th:
   percentused_of_bytesavailable_used_a859a40d: "ใช้ไป %{percentUsed} จาก %{bytesAvailable}"
   performance_ac5f9e70: ประสิทธิภาพ
   performed_by_70b3ce96: ดำเนินการโดย
+  permanent_num_strands_setting_141e8a0c: "การตั้งค่า num_strands ถาวร"
   permission_must_be_enabled_for_someone_397e1ce3: จะต้องเปิดใช้สิทธิ์อนุญาตให้กับบางคน
   permission_not_found_620b80d1: ไม่พบสิทธิ์อนุญาต
   permission_to_change_this_mastery_calculation_at_t_9b1966c5: "สิทธิ์อนุญาตในการแก้ไขส่วนการคำนวณความเชี่ยวชาญในระดับบทเรียนนี้ถูกเปิดใช้งานไว้สำหรับ:"
@@ -14546,6 +14566,7 @@ th:
   plagiarism_review_7bccc7df: การพิจารณาการคัดลอกผลงาน
   plagiarism_review_tool_error_513f47ff: ข้อผิดพลาดเครื่องมือพิจารณาการคัดลอกผลงาน
   plagiarism_review_tool_is_missing_submission_event_75273069: เครื่องมือพิจารณาการคัดลอกผลงานไม่มีบริการกิจกรรมการจัดส่ง
+  plagiarism_review_tool_live_event_subscription_err_9094579d: ข้อผิดพลาดในการสมัครบริการไลฟ์เครื่องมือพิจารณาการคัดลอกผลงาน
   plagiarism_review_tool_submission_event_service_is_b023b4c7: บริการกิจกรรมการจัดส่งของเครื่องมือพิจารณาการคัดลอกผลงานไม่มีปลายทาง
   plain_text_e3ab33aa: อักษรอย่างเดียว
   plain_text_view_7640af4c: มุมมองอักษรอย่างเดียว
@@ -15432,6 +15453,7 @@ th:
       *urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol*
       ผู้ให้บริการ SAML เพิ่มเติมจะต้องกำหนดค่าเพื่อติดตามการตอบกลับ
       จากบริการการสืบค้น
+  provide_tutorial_information_for_instructors_new_t_163c8ed4: "แจ้งข้อมูลการฝึกสอนให้แก่ผู้สอนที่ยังไม่คุ้นเคยกับ Canvas"
   provide_tutorial_information_for_new_users_in_a_fl_c23462ac: ระบุข้อมูลแนะนำสำหรับผู้ใช้ใหม่ในแถบรายการเลื่อน
   provider_attribute_b1cad655: คุณลักษณะของผู้ให้บริการ
   provider_icon_5064fa6e: ไอคอนผู้ให้บริการ
@@ -16939,6 +16961,7 @@ th:
   remove_linked_student_name_52dc7fce: "ลบผู้เรียน %{name} ที่เชื่อมโยงไว้"
   remove_mastery_level_b1e8dcb0: ลบระดับความเชี่ยวชาญ
   remove_media_attachment_d2926f1e: ลบเอกสารแนบสำหรับสื่อ
+  remove_media_comment_f4afdb4b: ลบความเห็นแบบสื่อ
   remove_missing_status_when_graded_d0755cc7: "ลบสถานะ ขาดหาย เมื่อให้เกรดแล้ว"
   remove_name_624e06be: "ลบ %{name}"
   remove_name_as_an_admin_c296cf49: "ลบ %{name} ในฐานะผู้ดูแลระบบ"
@@ -17121,6 +17144,7 @@ th:
   retry_ebd5f8ba: ลองใหม่
   retry_migrating_name_bdc802ef: "ลองโอนย้าย “%{name}” อีกครั้ง"
   return_to_parent_folder_4ece2184: กลับไปที่โฟลเดอร์ต้นทาง
+  returns_string_values_instead_of_numeric_values_in_a6dfdf7d: แจ้งค่าชุดอักขระแทนค่าตัวเลขในส่วนการแทนที่แบบแปรผัน
   revert_date_changes_5105ce5: คืนค่าการเปลี่ยนวันที่
   revert_to_actual_score_f665eea9: กลับคืนเป็นคะแนนจริง
   reverts_the_visible_assignments_scope_to_its_origi_87eb35d: ปรับขอบเขตภารกิจที่จัดแสดงเป็นรูปแบบเริ่มต้น
@@ -17583,6 +17607,7 @@ th:
   section_id_6f73f3d5: "ID กลุ่มย่อย"
   section_id_8ec4f46f: "ID กลุ่มย่อย"
   section_id_b5aad4a7: "ID กลุ่มย่อย"
+  section_level_calendar_permissions_6aff8cdb: สิทธิ์อนุญาตปฏิทินระดับหัวข้อย่อย
   section_name_b6d82574: ชื่อหัวข้อ
   section_name_edb51b2: ชื่อกลุ่มย่อย
   section_removed_2ac72a79: "ลบ %{section} แล้ว"
@@ -19431,6 +19456,7 @@ th:
   terms_not_found_terms_must_be_included_with_multi__ca2e5c25: "ไม่พบเทอม เทอมจะต้องรวมอยู่กับ multi_term_batch_mode"
   terms_of_service_attributes_not_valid_f3f9fca9: คุณลักษณะเงื่อนไขการให้บริการไม่ถูกต้อง
   test_cluster_only_70e61c19: คลัสเตอร์ทดสอบเท่านั้น
+  test_feature_flag_980151e0: ทดสอบหมายเหตุกำกับข้อมูลนำเสนอ
   testing_state_effd4a82: สถานะการทดสอบ
   text_7f4593da: ข้อความ
   text_df773ce4: ข้อความ
@@ -19625,6 +19651,7 @@ th:
   the_outcomes_that_you_have_selected_cannot_be_remo_fc7244f2: 
     one: ผลลัพธ์ที่คุณเลือกเอาไว้ไม่สามารถลบได้เนื่องจากประสานไว้กับเนื้อหาในบทเรียนนี้
     other: ผลลัพธ์ที่คุณเลือกเอาไว้ไม่สามารถลบได้เนื่องจากประสานไว้กับเนื้อหาในบทเรียนนี้
+  the_plagiarism_platform_settings_can_t_be_changed__629adec6: แพลตฟอร์มตรวจสอบการคัดลอกผลงานไม่สามารถแก้ไขค่าได้เนื่องจากผู้เรียนส่งผลงานในภารกิจนี้แล้ว
   the_preceding_content_is_partner_provided_d753928c: เนื้อหาก่อนหน้าไม่ได้จัดหาโดยผู้ใช้
   the_previous_sis_batch_was_aborted_d7d89955: "ชุด SIS ก่อนหน้าถูกล้มเลิก"
   the_profile_picture_has_been_removed_74d50047: ลบภาพโพรไฟล์แล้ว
@@ -19726,6 +19753,7 @@ th:
   there_are_no_unsynced_changes_4e8f0838: ไม่มีการเปลี่ยนแปลงที่ไม่ได้ซิงค์
   there_are_no_user_accounts_to_split_from_this_user_4e132eb1: ไม่มีบัญชีผู้ใช้สำหรับแยกจากผู้ใช้รายนี้
   there_are_unread_rubric_comments_337270ca: ไม่มีความเห็นสำหรับเกณฑ์การให้คะแนนนที่ไม่ได้อ่าน
+  there_are_unsaved_changes_to_a_grade_n_ncontinue_a_103d3b3c: มีการเปลี่ยนแปลงที่ยังไม่ได้บันทึกสำหรับเกรด\n\nดำเนินการต่อหรือไม่
   there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "จำกัดการจัดวางไว้ที่ 2 แอพภายในแถบเครื่องมือ RCE ค่าปรับตั้งนี้มีผลกับ RCE แบบพิเศษเท่านั้น"
   there_is_a_2_app_limit_for_placement_within_the_rc_971821a8: "จำกัดการจัดวางไว้ที่ 2 แอพภายในแถบเครื่องมือ RCE"
   there_is_currently_1_available_grader_758e4a21: "ปัจจุบันมีผู้ให้เกรดใช้ได้ 1 ราย"
@@ -19914,6 +19942,7 @@ th:
   this_file_9443cda1: ไฟล์นี้
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "ไฟล์นี้จะต้องมี usage_rights กำหนดไว้ก่อนสามารถเผยแพร่ได้"
   this_flag_allows_calendar_event_series_to_be_creat_cb8d5a60: "หมายเหตุกำกับนี้ช่วยให้สามารถจัดทำชุดกิจกรรมในปฏิทินจากปฏิทิน (Calendar) ของ Canvas"
+  this_flag_is_a_no_op_and_is_only_intended_for_test_e969f9c: "หมายเหตุกำกับนี้ไม่ต้องดำเนินการใด ๆ เป็นแค่การทดสอบเท่านั้น"
   this_flag_updates_the_title_of_the_feature_flags_t_513820f8: "หมายเหตุกำกับนี้เป็นการอัพเดตชื่อแท็บหมายเหตุกำกับคุณสมบัติการทำงานเป็น “ตัวเลือกคุณสมบัติ” (Feature Options) และเพิ่มรายการ “แสดงตัวอย่างคุณสมบัติ” (Feature Preview) ไว้สำรหับโปรเจคต์ที่แสดงตัวอย่างคุณสมบัติ"
   this_folder_is_currently_locked_and_unavailable_to_f85c451: โฟลเดอร์นี้ปัจจุบันล็อคอยู่และไม่พร้อมสำหรับเรียกดู
   this_grade_differs_from_the_student_s_view_of_the__f78d0023: เกรดนี้แตกต่างจากมุมมองเกรดของผู้เรียนเนื่องจากเกรดสำหรับภารกิจบางส่วนยังไม่ได้แจ้งไว้
@@ -20647,6 +20676,7 @@ th:
     no_score_after_retries: "Turnitin ยังไม่ได้แจ้งคะแนนหลังทำรายการเรียกค้นไป %{max_tries} ครั้ง"
     tooltip: 
       score: "คะแนนความใกล้เคียง - ดูรายงานอย่างละเอียด"
+  turnitin_has_not_returned_a_submission_after_max_t_c44bbdb6: "Turnitin ยังไม่ได้ตีกลับผลงานจัดส่งหลังทำรายการเรียกค้นไป %{max_tries} ครั้ง"
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: จัดส่งใหม่
@@ -20675,6 +20705,7 @@ th:
   type_to_search_de63ad38: พิมพ์เพื่อค้นหา
   type_to_search_use_arrow_keys_to_navigate_options_5d538c0: "พิมพ์เพื่อค้นหา ใช้ปุ่มลูกศรเพื่อพิจารณาตัวเลือกต่าง ๆ"
   type_your_message_here_3551e252: พิมพ์ข้อความของคุณที่นี่...
+  uc_irvine_quiz_adoption_report_9279da8e: "รายงานการรับแบบทดสอบ UC Irvine"
   uc_merced_student_activity_report_4a9a1eb8: "รายงานกิจกรรมของผู้เรียนสำหรับ UC Merced"
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "โอ๊ะ โอ! ติดต่อผู้จัดทำแคตาล็อกที่เป็นมิตรของคุณ ข้อความแจ้งข้อผิดพลาด: %{message}"
   ukrainian_945b00b7: ยูเครน
@@ -20911,6 +20942,7 @@ th:
   updated_group_group_name_727b1d98: "อัพเดตกลุ่ม %{group_name} แล้ว"
   updated_mastery_connect_icon_70b6a9b9: "ไอคอน Mastery Connect ล่าสุด"
   updates_to_json_api_auth_error_http_code_and_json__5936d452: "ข้อมูลอัพเดตสำหรับรหัส HTTP ข้อผิดพลาดการตรวจรับรอง JSON API และฟิลด์สถานะ JSON"
+  updates_to_oauth_2_0_flow_to_stop_redirecting_in_t_51c14b07: "ข้อมูลอัพเดตสำหรับโครงสร้าง OAuth เพื่อหยุดเปลี่ยนเส้นทางในการตรวจรับรอง “ชุดข้อมูล”"
   updating_6edbab78: กำลังอัพเดต
   updating_discussion_failed_aadb2d35: อัพเดตการพูดคุยล้มเหลว
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: "การอัพเดต URL แคตาล้อกจะทำให้ URL เก่าของคุณไม่สามารถใช้งานได้สำหรับผู้ใช้โดยมีผลในทันที หากมีการกำหนดค่าผู้ดำเนินการชำระเงินในปัจจุบันไว้ การแก้ไขจะต้องอาศัยความช่วยเหลือจากวิศวกรสำหรับแคตาล็อก"
@@ -21896,6 +21928,7 @@ th:
       คุณกำลังจะลบบทเรียนนี้จากแผงข้อมูลของคุณ ข้อมูลจะยังสามารถใช้การได้
                     โดยไปที่ บทเรียน > บทเรียนทั้งหมด จากเมนูหลัก
   you_are_currently_acting_as_user_name_8d2be0ee: "ปัจจุบันคุณดำเนินการในฐานะ %{user_name}"
+  you_are_currently_in_the_environment_environment_t_449c4c0f: "ปัจจุบันคุณอยู่ใน %{environment} กรณีนี้จะมีผลกับลูกค้าทุกราย แน่ใจหรือไม่"
   you_are_currently_logged_into_student_view_3e8a1da: ปัจจุบันคุณล็อกอินในมุมมองผู้เรียน
   you_are_currently_receiving_notifications_for_this_9646b09d: "คุณกำลังได้รับการแจ้งข้อมูลสำหรับบทเรียนนี้ ปิดใช้งานการแจ้งข้อมูลบทเรียนโดยใช้ฟังก์ชั่นเปิดปิดด้านบน"
   you_are_here_54075d8c: "คุณอยู่ที่นี่:"
