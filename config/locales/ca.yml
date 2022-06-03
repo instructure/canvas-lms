@@ -939,6 +939,13 @@ ca:
             check_box: "CSV de seccions"
           users: 
             check_box: "CSV d’usuaris"
+    mit: 
+      student_module_completion: 
+        parameters: 
+          account_reports: 
+            mit: 
+              student_module_completion: 
+                check_box: "Informe simple"
     new_excelsior_activity_report_csv_parameters: 
       account_reports: 
         excelsior: 
@@ -1936,6 +1943,7 @@ ca:
   allow_outcome_extra_credit_57c1e84e: "Permet crèdit extra del resultat"
   allow_pages_to_be_deleted_in_bulk_199d3d3b: "Permet la supressió de pàgines en massa"
   allow_passive_acceptance_of_terms_of_service_63ef5994: "Permet l'acceptació passiva de les Condicions del servei"
+  allow_permissions_to_manage_the_calendar_to_be_gra_7d7818de: "Permeteu que es concedeixin a la secció permisos per gestionar el calendari."
   allow_postable_submission_comments_a301b742: "Permet comentaris sobre l'entrega publicables"
   allow_push_notification_opt_out_827f288b: "Permet donar-se de baixa de les notificacions d'inserció"
   allow_reassigning_assignments_from_speedgrader_to__ff856a96: "Permet reassignar les tasques de l’SpeedGrader a la llista de Tasques pendents d’un estudiant"
@@ -2486,6 +2494,7 @@ ca:
   an_error_occurred_when_cloning_the_group_set_8e80da6b: "S'ha produït un error en clonar el conjunt de grups."
   an_error_occurred_when_saving_the_group_536c8f66: "S'ha produït un error en desar el grup."
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "S'ha produït un error en intentar contactar amb el Turnitin."
+  an_error_occurred_while_attempting_to_contact_turn_c987545: "S'ha produït un error en intentar contactar amb el Turnitin. Codi d'estat: %{status_code}"
   an_error_occurred_while_checking_the_migration_sta_d17035b1: "S'ha produït un error en comprovar l'estat de la migració"
   an_error_occurred_while_creating_this_group_please_ec96f426: "S'ha produït un error en crear aquest grup. Torneu-ho a provar."
   an_error_occurred_while_creating_this_outcome_54842fbd: "S'ha produït un error en crear aquest resultat."
@@ -3808,6 +3817,7 @@ ca:
   avatar_for_author_2eabbf55: "Avatar de %{author}"
   avatar_for_name_e3ba987c: "Avatar de %{name}"
   average_49c63f9b: Mitjà
+  average_is_not_a_good_fit_for_most_outcomes_based__f351ed94: "La mitjana no és una bona referència per a la majoria dels casos pràctics d’aprenentatge basat en els resultats o en el domini perquè és possible que els estudiants necessitin temps per assolir el domini d’un resultat i el rendiment més baix primerenc pot enfonsar una mitjana."
   avg_alignments_per_artifact_5573d99c: "Mitjana d’alineacions per artefacte"
   avg_alignments_per_outcome_4daf75cd: "Mitjana d’alineacions per resultat"
   avi_2d8cc99f: AVI
@@ -5706,6 +5716,7 @@ ca:
   context_module_sub_header_2f39e87b: "Capçalera secundària del contingut de context"
   context_modules: 
     add_context_module_form: 
+      before_viewing: Prerequisits
       buttons: 
         add_module: "Afegeix un contingut"
       labels: 
@@ -6020,8 +6031,8 @@ ca:
   couldn_t_track_assigning_students_to_groups_but_it_b6510770: "No s’ha pogut fer un seguiment de l'assignació d’estudiants als grups, però encara s'hi estan assignant. Comproveu el resultat manualment més endavant. (%{errorMessage})"
   count_40eced3b: Recompte
   count_alignable_artifacts_7779644a: 
-    one: "%{count} ARTEFACTE ALINEABLE"
-    other: "%{count} ARTEFACTES ALINEABLES"
+    one: "%{count} ARTEFACTE ALINEABLE"
+    other: "%{count} ARTEFACTES ALINEABLES"
   count_alignments_40fbc23c: 
     one: "%{count} alineació"
     other: "%{count} alineacions"
@@ -6125,8 +6136,8 @@ ca:
     one: "%{count} resultat"
     other: "%{count} resultats"
   count_outcomes_3ceaa024: 
-    one: "%{count} RESULTAT"
-    other: "%{count} RESULTATS"
+    one: "%{count} RESULTAT"
+    other: "%{count} RESULTATS"
   count_outcomes_have_been_moved_to_newgrouptitle_3018f532: 
     one: "\"%{outcomeTitle}\" s’ha desplaçat a \"%{newGroupTitle}\"."
     other: "S’han desplaçat %{count} resultats a \"%{newGroupTitle}\"."
@@ -7104,7 +7115,7 @@ ca:
   create_new_group_bf9561d4: "Crea un grup nou"
   create_new_group_fca5cc73: "Crea un grup nou"
   create_new_group_set_13b1f62a: "Crea un conjunt de grups nou"
-  create_number_of_groups_groups_now_f89f220e: "Crea %{number_of_groups} grups ara"
+  create_number_of_groups_groups_now_f89f220e: "Crea %{number_of_groups} grups ara"
   create_outcome_4dac05a0: "Crea un resultat"
   create_pages_581a4d59: "Crea pàgines"
   create_slots_71dbb2f8: "Crea intervals"
@@ -8235,6 +8246,7 @@ ca:
   duration_hours_hours_and_minutes_minutes_d5da8c3: "Durada: %{hours} hores i %{minutes} minuts"
   duration_minutes_minutes_d7b9182b: "Durada: %{minutes} minuts"
   dutch_6d05cee5: Neerlandès
+  dynamic_concurrency_231dbdc5: "Concurrència dinàmica"
   e_c2991d1b: e
   e_g_http_university_edu_helpdesk_acab04d6: "p. ex., http://university.edu/helpdesk"
   e_mail_only_2cc5e513: "Només l'adreça electrònica"
@@ -10784,6 +10796,9 @@ ca:
   if_enabled_syncing_course_enrollments_to_microsoft_6f4f2bf9: |-
       Si s'habilita, la sincronització d’inscripcions a l'assignatura als grups de Microsoft estarà
       disponible. Els administradors de l'usuari poden habilitar-ho a la configuració de l'usuari.
+  if_enabled_the_oauth_2_0_will_now_correctly_return_e33cca64: |-
+      Si s’habilita, OAuth 2.0 tornarà ara correctament els codis d'estat al
+      client sol·licitant en lloc de redirigir-los a ell mateix
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: "Si s'habilita, es mostrarà l'opció per a tenir rúbriques sense puntuació."
   if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: |-
       Si s'habilita, la UI de la clau de desenvolupador de l'administrador del lloc només mostrarà les
@@ -10791,6 +10806,7 @@ ca:
       aquelles instàncies del Canvas on els comptes arrel siguin a la mateixa partició
       que l'usuari de l'administrador del lloc. El comportament d'altres instàncies
       ja era així.
+  if_enabled_variable_substitutions_will_return_stri_26421822: "Si s’habiliten, les substitucions de variables tornaran valors de cadena en lloc de valors numèrics."
   if_enabled_when_an_lti_toolproxy_is_created_it_wil_9c2ea3ec: |-
       Si s’activa aquesta opció, quan es generi un Lti::ToolProxy, es
       crearà la subscripció a l’esdeveniment en directe directament a l’eina
@@ -11039,6 +11055,7 @@ ca:
   include_assignment_description_36e6ed1b: "Inclou la descripció de l'activitat"
   include_assignments_graded_with_a_0_score_fb784115: "Incloeu les activitats qualificades amb una puntuació de 0."
   include_byte_order_mark_in_compatible_spreadsheet__ebd6e18: "Inclou la marca d'ordre de bytes en les exportacions de fulls de càlcul compatibles"
+  include_classic_quizzes_ecf3fb2b: "Inclou proves clàssiques"
   include_course_scores_e38e71da: "Inclou les puntuacions de l'assignatura"
   include_course_settings_c4c08764: "Inclou la configuració de l'assignatura"
   include_deleted_enrollments_1c87684a: "Inclou les inscripcions suprimides"
@@ -12229,6 +12246,7 @@ ca:
   maximum_number_of_communication_channels_reached_70c4d2f9: "S'ha assolit el número màxim de canals de comunicació"
   may_have_one_featured_link_and_one_new_link_at_a_t_21106efe: "(Es pot tenir un enllaç Destacat i un enllaç Nou a la vegada)"
   media_af190855: "Element multimèdia"
+  media_comment_content_5c2341fb: "Contingut del comentari multimèdia"
   media_comment_dialog_manager: 
     messages: 
       loading: "S'està carregant…"
@@ -14195,7 +14213,7 @@ ca:
   must_be_a_number_f6e09df7: "ha de ser un número"
   must_be_a_valid_number_59f0069: "Ha de ser un número vàlid"
   must_be_after_start_date_95e251a3: "ha de ser posterior a la data d'inici"
-  must_be_at_least_one_group_per_section_there_are_c_8e8b58e4: "Hi ha d’haver un grup per secció com a mínim; hi ha %{count} seccions"
+  must_be_at_least_one_group_per_section_there_are_c_8e8b58e4: "Hi ha d’haver un grup per secció com a mínim; hi ha %{count} seccions"
   must_be_between_1_and_10_e99eb0d1: "ha de ser entre 1 y 10"
   must_be_between_1_and_5_3b42aca1: "ha de ser entre 1 y 5"
   must_be_between_1_and_99_589b827d: "ha de ser entre 1 y 99"
@@ -14927,6 +14945,7 @@ ca:
     format: 
       delimiter: ","
       precision: 3
+      round_mode: "valor per defecte"
       separator: "."
       significant: false
       strip_insignificant_zeros: false
@@ -15514,6 +15533,7 @@ ca:
   performance_improvements_for_loading_data_into_gra_1c3a0c60: "Millores del rendiment de la càrrega de dades al llibre de qualificacions."
   performance_improvements_for_the_grade_calculation_7d9b0b16: "Millores del rendiment del procés de càlcul de les qualificacions."
   performed_by_70b3ce96: "Realitzat per"
+  permanent_num_strands_setting_141e8a0c: "Configuració de num_strands permanent"
   permission_must_be_enabled_for_someone_397e1ce3: "El permís ha d'estar habilitat per a algú"
   permission_not_found_620b80d1: "No s'ha trobat cap permís"
   permission_to_change_this_mastery_calculation_at_t_9b1966c5: "El permís per canviar aquest càlcul de domini a nivell de l'assignatura s’ha habilitat per a:"
@@ -15557,6 +15577,7 @@ ca:
   plagiarism_review_7bccc7df: "Revisió de plagi"
   plagiarism_review_tool_error_513f47ff: "Error de l'eina de revisió del plagi"
   plagiarism_review_tool_is_missing_submission_event_75273069: "Falta el servei d'esdeveniments d'entrega a l'eina de revisió del plagi"
+  plagiarism_review_tool_live_event_subscription_err_9094579d: "Error de subscripció als esdeveniments en directe sobre l’eina de revisió de plagi"
   plagiarism_review_tool_submission_event_service_is_b023b4c7: "Falta l'extrem al servei d'esdeveniments d'entrega de l'eina de revisió del plagi"
   plain_text_e3ab33aa: "Text sense format"
   plain_text_view_7640af4c: "Visualització de text sense format"
@@ -16485,6 +16506,7 @@ ca:
       *urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol*.
       Els proveïdors SAML addicionals també s'han de configurar per seguir la resposta
       del servei de descobriment.
+  provide_tutorial_information_for_instructors_new_t_163c8ed4: "Proporciona informació sobre tutorials per a instructors nous al Canvas."
   provide_tutorial_information_for_new_users_in_a_fl_c23462ac: "Permet proporcionar informació sobre el tutorial per a nous usuaris en una safata desplegable."
   provider_attribute_b1cad655: "Atribut del proveïdor"
   provider_icon_5064fa6e: "Icona de proveïdor"
@@ -18002,6 +18024,7 @@ ca:
   remove_linked_student_name_52dc7fce: "Suprimeix l'estudiant enllaçat %{name}"
   remove_mastery_level_b1e8dcb0: "Suprimeix el nivell de domini"
   remove_media_attachment_d2926f1e: "Suprimeix el fitxer multimèdia adjunt"
+  remove_media_comment_f4afdb4b: "Suprimeix el comentari multimèdia"
   remove_missing_status_when_graded_d0755cc7: "Un cop feta la qualificació, canvia l’estat perquè ja no consti com no presentat"
   remove_name_624e06be: "Elimina %{name}"
   remove_name_as_an_admin_c296cf49: "Suprimeix a %{name} com a administrador"
@@ -18204,6 +18227,7 @@ ca:
   retry_ebd5f8ba: "Torna-ho a provar"
   retry_migrating_name_bdc802ef: "Torna a provar la migració de \"%{name}\""
   return_to_parent_folder_4ece2184: "torna a la carpeta principal"
+  returns_string_values_instead_of_numeric_values_in_a6dfdf7d: "Torna valors de cadena en lloc de valors numèrics en les substitucions de variables"
   revert_date_changes_5105ce5: "Reverteix els canvis de les dates"
   revert_to_actual_score_f665eea9: "Reverteix a la puntuació real"
   revert_to_old_ui_3211da41: "Reverteix a la IU anterior"
@@ -18679,6 +18703,7 @@ ca:
   section_id_6f73f3d5: "id de la secció"
   section_id_8ec4f46f: "ID de la secció"
   section_id_b5aad4a7: "ID de la secció"
+  section_level_calendar_permissions_6aff8cdb: "Permisos de calendari a la secció"
   section_name_b6d82574: "Nom de la secció"
   section_name_edb51b2: "nom de la secció"
   section_removed_2ac72a79: "S'ha suprimit %{section}"
@@ -19824,8 +19849,8 @@ ca:
   split_74c03348: Divideix
   split_merged_users_6b81c595: "Divideix els usuaris fusionats"
   split_student_names_df0ef806: "Divideix els noms dels estudiants"
-  split_students_into_groups_with_num_members_studen_c49d5136: "Dividiu els estudiants en grups amb %{num_members} estudiants per grup"
-  split_students_into_num_groups_groups_e9854f16: "Dividiu els estudiants en %{num_groups} grups"
+  split_students_into_groups_with_num_members_studen_c49d5136: "Dividiu els estudiants en grups amb %{num_members} estudiants per grup"
+  split_students_into_num_groups_groups_e9854f16: "Dividiu els estudiants en %{num_groups} grups"
   splitting_disabled_reached_maximum_of_three_assign_716acb13: "Desactivada la funció de divisió: s'ha arribat al màxim de tres grups d'activitats en un interval de puntuació"
   splitting_disabled_there_can_only_be_a_maximum_of__7070ec11: "Desactivada la funció de divisió: només poden haver-hi tres grups d'activitats en un interval de puntuació."
   spreadsheet_6d622119: "Full de càlcul"
@@ -20606,6 +20631,7 @@ ca:
   terms_not_found_terms_must_be_included_with_multi__ca2e5c25: "No s'han trobat els períodes acadèmics. Els períodes acadèmics s'han d'incloure amb multi_term_batch_mode"
   terms_of_service_attributes_not_valid_f3f9fca9: "Els atributs de les Condicions del servei no són vàlids"
   test_cluster_only_70e61c19: "Només clúster de prova"
+  test_feature_flag_980151e0: "Marca de característica opcional de la prova"
   testing_state_effd4a82: "Estat de prova"
   text_7f4593da: Text
   text_df773ce4: text
@@ -20831,6 +20857,7 @@ ca:
   the_outcomes_that_you_have_selected_cannot_be_remo_fc7244f2: 
     one: "No es pot recuperar el resultat que heu seleccionat perquè està alineat amb el contingut de l'assignatura."
     other: "No es poden recuperar els resultats que heu seleccionat perquè estan alineats amb el contingut de l'assignatura."
+  the_plagiarism_platform_settings_can_t_be_changed__629adec6: "La configuració de la plataforma de plagi no es pot canviar perquè els estudiants ja han entregat aquesta activitat"
   the_preceding_content_is_partner_provided_d753928c: "El contingut anterior està proporcionat per proveïdors"
   the_previous_sis_batch_was_aborted_d7d89955: "El lot anterior del SIS s'ha abandonat"
   the_proficiency_calculation_was_set_by_your_admin__c31f8e95: "El vostre administrador ha establert el càlcul de la competència, que s’aplica a tots els cursos d’aquest compte."
@@ -20937,6 +20964,7 @@ ca:
   there_are_no_unsynced_changes_4e8f0838: "No hi ha canvis sense sincronitzar"
   there_are_no_user_accounts_to_split_from_this_user_4e132eb1: "No hi ha cap usuari d’usuari per dividir d'aquest usuari."
   there_are_unread_rubric_comments_337270ca: "Hi ha comentaris a la rúbrica sense llegir."
+  there_are_unsaved_changes_to_a_grade_n_ncontinue_a_103d3b3c: "Hi ha una nota que conté canvis sense desar.\\n\\nVoleu continuar de tota manera?"
   there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "Hi ha un límit de 2 aplicacions per ubicar dins la barra d'eines de l'RCE. Aquest paràmetre només s'aplica a l'RCE millorat."
   there_is_a_2_app_limit_for_placement_within_the_rc_971821a8: "Hi ha un límit de 2 aplicacions per ubicar dins la barra d'eines de l'RCE."
   there_is_currently_1_available_grader_758e4a21: "Actualment hi ha un qualificador disponible"
@@ -21155,6 +21183,7 @@ ca:
   this_file_9443cda1: "Aquest fitxer"
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "Aquest fitxer ha de tenir usage_rights definits abans de poder-lo publicar."
   this_flag_allows_calendar_event_series_to_be_creat_cb8d5a60: "Aquesta marca permet crear sèries d’esdeveniments del calendari des del calendari del Canvas."
+  this_flag_is_a_no_op_and_is_only_intended_for_test_e969f9c: "Aquesta marca no fa referència a cap operació i només serveix com a prova."
   this_flag_updates_the_title_of_the_feature_flags_t_513820f8: "Aquesta marca actualitza el títol de la pestanya de marques de característiques a “Característiques opcionals” i afegeix una càpsula “Visualització prèvia de característiques” per als projectes de visualització prèvia de característiques."
   this_flag_will_not_cause_any_change_in_behavior_24c0308b: "Aquesta marca no causarà cap canvi de comportament."
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Aquesta carpeta està bloquejada actualment i no es pot visualitzar."
@@ -22118,6 +22147,7 @@ ca:
     no_score_after_retries: "El Turnitin no ha tornat una puntuació després de %{max_tries} intents per obtenir-ne una."
     tooltip: 
       score: "Puntuació de similitud - Mostra l'informe detallat"
+  turnitin_has_not_returned_a_submission_after_max_t_c44bbdb6: "El Turnitin no ha tornat cap entrega després de %{max_tries} intents d’obtenir-ne una."
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "Torna a entregar"
@@ -22146,6 +22176,7 @@ ca:
   type_to_search_de63ad38: "Escriu per cercar"
   type_to_search_use_arrow_keys_to_navigate_options_5d538c0: "Escriviu per cercar o utilitzeu les tecles de fletxes per navegar per les opcions."
   type_your_message_here_3551e252: "Escriviu el vostre missatge aquí…"
+  uc_irvine_quiz_adoption_report_9279da8e: "Informe d'adopció de proves UC Irvine"
   uc_merced_student_activity_report_4a9a1eb8: "Informe d’activitat de l’estudiant d’UC Merced"
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "Oh! Poseu-vos en contacte amb el vostre desenvolupador de catàleg amistós. Missatge d’error: %{message}"
   ukrainian_945b00b7: Ucraïnès
@@ -22397,6 +22428,7 @@ ca:
       i actualitzada
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Actualitza la visualització de les icones de Normativa de publicació a la capçalera de la columna de tasques del Llibre de qualificacions nou."
   updates_to_json_api_auth_error_http_code_and_json__5936d452: "Actualitzacions del codi HTTP d’error d’autenticació de l’API de JSON i del camp d’estat de JSON"
+  updates_to_oauth_2_0_flow_to_stop_redirecting_in_t_51c14b07: "Actualitza al flux d’OAuth 2.0 perquè no es produeixin redireccions en l’autenticació del “testimoni”."
   updating_6edbab78: "S'està actualitzant"
   updating_discussion_failed_aadb2d35: "No s'ha pogut actualitzar el fòrum"
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: "Si s’actualitza l’URL del catàleg, l’URL antic deixarà de ser accessible immediatament per als usuaris. Si s’ha configurat un processador de pagaments existent, caldrà l’ajuda d’un enginyer del catàleg per implementar els canvis."
@@ -23437,6 +23469,7 @@ ca:
       Esteu a punt de suprimir aquesta assignatura del vostre panell de control. Encara estarà disponible
                     navegant a Assignatures > Totes les assignatures des del menú principal.
   you_are_currently_acting_as_user_name_8d2be0ee: "Esteu actuant com a %{user_name}"
+  you_are_currently_in_the_environment_environment_t_449c4c0f: "Actualment sou a l’entorn %{environment}. Això afectarà tots els clients. Segur que voleu fer-ho?"
   you_are_currently_logged_into_student_view_3e8a1da: "Actualment teniu la sessió iniciada a la Vista d'estudiant"
   you_are_currently_receiving_notifications_for_this_4f542bb2: "Esteu rebent notificacions per a aquest %{contextType}. Per inhabilitar les notificacions de %{contextType}, feu servir el commutador de dalt."
   you_are_currently_receiving_notifications_for_this_9646b09d: "Esteu rebent notificacions per a aquesta assignatura. Per inhabilitar les notificacions de l'assignatura, feu servir el commutador de dalt."

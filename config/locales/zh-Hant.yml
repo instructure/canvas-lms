@@ -1182,6 +1182,13 @@ zh-Hant:
             check_box: "分班 CSV"
           users: 
             check_box: "使用者 CSV"
+    mit: 
+      student_module_completion: 
+        parameters: 
+          account_reports: 
+            mit: 
+              student_module_completion: 
+                check_box: 簡易報告
     new_excelsior_activity_report_csv_parameters: 
       account_reports: 
         excelsior: 
@@ -2318,6 +2325,7 @@ zh-Hant:
   allow_outcome_extra_credit_57c1e84e: 允許成果額外加分
   allow_pages_to_be_deleted_in_bulk_199d3d3b: 允許批量刪除頁面
   allow_passive_acceptance_of_terms_of_service_63ef5994: 允許被動接受服務條款
+  allow_permissions_to_manage_the_calendar_to_be_gra_7d7818de: 允許在分班層級授予管理行事曆的權限。
   allow_postable_submission_comments_a301b742: 允許可公佈提交項目評論
   allow_push_notification_opt_out_827f288b: 允許推送通知選擇退出
   allow_reassigning_assignments_from_speedgrader_to__ff856a96: "允許從 SpeedGrader 重新指派作業到學生的待辦清單"
@@ -3067,6 +3075,7 @@ zh-Hant:
   an_error_occurred_when_saving_the_group_536c8f66: 儲存群組時發生錯誤。
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "在為 %{filename} 設置使用權時發生了一個錯誤"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "試圖聯絡 Turnitin 時發生錯誤。"
+  an_error_occurred_while_attempting_to_contact_turn_c987545: "試圖聯絡 Turnitin 時發生錯誤。狀態碼：%{status_code}"
   an_error_occurred_while_checking_the_migration_sta_d17035b1: 檢查遷移狀態時發生錯誤
   an_error_occurred_while_creating_this_group_please_ec96f426: 建立此群組時發生錯誤。請重試。
   an_error_occurred_while_creating_this_outcome_54842fbd: 建立此成果時發生錯誤。
@@ -4774,6 +4783,7 @@ zh-Hant:
   avatar_for_name_e3ba987c: "%{name} 的頭像"
   avatar_for_studentname_8ea511ae: "頭像%{studentName}"
   average_49c63f9b: 平均
+  average_is_not_a_good_fit_for_most_outcomes_based__f351ed94: 平均值不適合多數基於學習成果或掌握程度的學習使用情況，因為學生可能需要時間達到學習成果的掌握程度，早期較差的表現可能拉低平均值。
   average_score_15cd7c3c: 平均分數
   avg_alignments_per_artifact_5573d99c: 平均每個作品的對應關係
   avg_alignments_per_outcome_4daf75cd: 平均每個學習成果的對應關係
@@ -7024,6 +7034,7 @@ zh-Hant:
   context_module_sub_header_2f39e87b: 內容單元子標題
   context_modules: 
     add_context_module_form: 
+      before_viewing: 先決條件
       button: 
         delete_label: 刪除先決條件
         delete_title: 刪除先決條件
@@ -10292,6 +10303,7 @@ zh-Hant:
   duration_hours_hours_and_minutes_minutes_d5da8c3: "持續時間：%{hours}小時和 %{minutes} 分鐘"
   duration_minutes_minutes_d7b9182b: "持續時間：%{minutes}分鐘"
   dutch_6d05cee5: 荷蘭語
+  dynamic_concurrency_231dbdc5: 動態並行
   e_c2991d1b: e
   e_g_doe_jon_fe1d9298: 例如，Doe、Jon
   e_g_http_university_edu_helpdesk_acab04d6: "例如， http://university.edu/helpdesk"
@@ -13961,6 +13973,9 @@ zh-Hant:
   if_enabled_syncing_course_enrollments_to_microsoft_6f4f2bf9: |-
       啟用後，同步課程註冊學生至 Microsoft Group 將
       可使用。帳戶管理員可於帳戶設定中啟用此功能。
+  if_enabled_the_oauth_2_0_will_now_correctly_return_e33cca64: |-
+      啟用後，OAuth 2.0 將正確傳回 4xx 狀態碼到
+      請求的用戶端，而不是將其重新導向回自己
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: 如果啟用，選項將顯示為非計分評分標準。
   if_enabled_the_parent_sign_up_form_will_require_a__a9c32041: 如果啟用，父母註冊表格將需要一個學生配對代碼，而不是兒童使用者名稱和密碼
   if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: |-
@@ -13970,6 +13985,7 @@ zh-Hant:
       同一碎片的 Canvas 環境。其他環境的行為
       已採用此方式。
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "如啟用，用戶將能夠對 LTI 2工具進行配置。"
+  if_enabled_variable_substitutions_will_return_stri_26421822: 啟用後，變數取代將傳回字串值，而非數值
   if_enabled_when_an_lti_toolproxy_is_created_it_wil_9c2ea3ec: |-
       啟用後，如果有人創建了 Lti::ToolProxy，將自動
       直接在工具創建現場活動訂閱
@@ -14273,6 +14289,7 @@ zh-Hant:
   include_assignments_graded_with_a_0_score_fb784115: "納入已評分為 0 分的作業列表。"
   include_byte_order_mark_in_compatible_spreadsheet__ebd6e18: 在成績單匯出中加入位元組順序標記
   include_byte_order_mark_in_gradebook_exports_d2ad0d4e: 在成績單匯出中包括位元組順序標記
+  include_classic_quizzes_ecf3fb2b: 包括傳統測驗
   include_course_scores_e38e71da: 包括課程分數
   include_course_settings_c4c08764: 包括課程設定
   include_deleted_enrollments_1c87684a: 包括已刪除的註冊
@@ -15658,6 +15675,7 @@ zh-Hant:
   maximum_number_of_communication_channels_reached_70c4d2f9: 達到最大的通訊頻道數目
   may_have_one_featured_link_and_one_new_link_at_a_t_21106efe: （可以同時設定一個精選連結和一個新連結）
   media_af190855: 媒體
+  media_comment_content_5c2341fb: 媒體評論內容
   media_comment_dialog_manager: 
     messages: 
       loading: 正在載入……
@@ -18918,6 +18936,7 @@ zh-Hant:
     format: 
       delimiter: ，
       precision: 3
+      round_mode: 預設
       separator: "."
       significant: false
       strip_insignificant_zeros: false
@@ -19646,6 +19665,7 @@ zh-Hant:
   performance_improvements_for_loading_data_into_gra_1c3a0c60: 載入資料至成績單時的表現改進。
   performance_improvements_for_the_grade_calculation_7d9b0b16: 評分計算過程的效能改進。
   performed_by_70b3ce96: 執行者
+  permanent_num_strands_setting_141e8a0c: "永久 num_strands 設定"
   permission_must_be_enabled_for_someone_397e1ce3: 必須為某人啟用權限
   permission_not_found_620b80d1: 找不到權限
   permission_to_change_this_mastery_calculation_at_t_9b1966c5: 已啟用在課程級別啟用變更掌握程度計算的權限：
@@ -19697,6 +19717,7 @@ zh-Hant:
   plagiarism_review_7bccc7df: 抄襲評審
   plagiarism_review_tool_error_513f47ff: 抄襲評審工具錯誤
   plagiarism_review_tool_is_missing_submission_event_75273069: 抄襲評審工具缺少提交事項服務
+  plagiarism_review_tool_live_event_subscription_err_9094579d: 抄襲檢閱工具即時事件訂閱錯誤
   plagiarism_review_tool_submission_event_service_is_b023b4c7: 抄襲評審工具提交事項服務缺少終結點
   plain_text_e3ab33aa: 純文字
   plain_text_view_7640af4c: 純文字視圖
@@ -20779,6 +20800,7 @@ zh-Hant:
       *urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol* 協議。
       額外 SAML 供應商亦必須設定至
       跟從探索服務的回應。
+  provide_tutorial_information_for_instructors_new_t_163c8ed4: "提供新的導師教學資訊給 Canvas。"
   provide_tutorial_information_for_new_users_in_a_fl_c23462ac: 以彈出列表提供教程資訊予新使用者。
   provider_attribute_b1cad655: 提供方屬性
   provider_icon_5064fa6e: 提供方圖標
@@ -22736,6 +22758,7 @@ zh-Hant:
   remove_linked_student_name_52dc7fce: "移除已連接的學生%{name}"
   remove_mastery_level_b1e8dcb0: 移除掌握程度級別
   remove_media_attachment_d2926f1e: 移除媒體附件
+  remove_media_comment_f4afdb4b: 移除媒體評論
   remove_missing_status_when_graded_d0755cc7: 移除評分時缺少的狀態
   remove_name_624e06be: "移除 %{name}"
   remove_name_as_an_admin_c296cf49: "移除 %{name} 作為管理員"
@@ -22964,6 +22987,7 @@ zh-Hant:
   retry_ebd5f8ba: 重試
   retry_migrating_name_bdc802ef: "重新嘗試遷移 \"%{name}\""
   return_to_parent_folder_4ece2184: 返回至母檔案夾
+  returns_string_values_instead_of_numeric_values_in_a6dfdf7d: 在變數取代中傳回字串值，而非數值
   revert_date_changes_5105ce5: 取消日期變更
   revert_to_actual_score_f665eea9: 還原至實際分數
   revert_to_old_ui_3211da41: "回覆成舊 UI"
@@ -23547,6 +23571,7 @@ zh-Hant:
   section_id_6f73f3d5: 班別ID
   section_id_8ec4f46f: "分班 ID"
   section_id_b5aad4a7: "分班 ID"
+  section_level_calendar_permissions_6aff8cdb: 分班層級行事曆權限
   section_name_b6d82574: 班別名稱
   section_name_edb51b2: 分班名稱
   section_removed_2ac72a79: "%{section}已移除"
@@ -25992,6 +26017,7 @@ zh-Hant:
   terms_of_service_bedefcaf: 服務條款
   terms_of_service_f183ff7f: 服務條款
   test_cluster_only_70e61c19: 僅限測試群組
+  test_feature_flag_980151e0: 測試功能新增標記
   testing_state_effd4a82: 正在測試狀態
   text_7f4593da: 文字
   text_df773ce4: 文字
@@ -26249,6 +26275,7 @@ zh-Hant:
   the_outcomes_that_you_have_selected_cannot_be_remo_fc7244f2: 
     one: 您已選擇的學習成果不能被移除，因為它們已與此課程中的內容對齊。
     other: 您已選擇的學習成果不能被移除，因為它們已與此課程中的內容對齊。
+  the_plagiarism_platform_settings_can_t_be_changed__629adec6: 學生已提交此作業，因此無法變更抄襲平台設定
   the_preceding_content_is_partner_provided_d753928c: 上述內容由合作夥伴提供
   the_previous_sis_batch_was_aborted_d7d89955: "已捨棄先前 SIS 批次"
   the_proficiency_calculation_was_set_by_your_admin__c31f8e95: 能力計算由您的管理員設定，並且套用到此帳戶中的所有課程。
@@ -26364,6 +26391,7 @@ zh-Hant:
   there_are_no_unsynched_changes_d208547c: 沒有未同步的變更
   there_are_no_user_accounts_to_split_from_this_user_4e132eb1: 無使用者帳戶可從此使用者中分拆出來。
   there_are_unread_rubric_comments_337270ca: 有未讀取的評分標準評論。
+  there_are_unsaved_changes_to_a_grade_n_ncontinue_a_103d3b3c: 評分中有未儲存的變更。\n\n是否仍要繼續？
   there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "RCE 工具欄的應用程式數量上限為 2。此設定僅適用於升級版 RCE。"
   there_is_a_2_app_limit_for_placement_within_the_rc_971821a8: "RCE 工具欄的應用程式數量上限為 2。"
   there_is_currently_1_available_grader_758e4a21: "目前有 1 位可用評分員"
@@ -26621,6 +26649,7 @@ zh-Hant:
   this_file_9443cda1: 此文儅
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "此文檔在能夠發佈之前必須首先設置 usage_rights。"
   this_flag_allows_calendar_event_series_to_be_creat_cb8d5a60: "此標記允許從 Canvas 行事曆建立行事曆活動系列。"
+  this_flag_is_a_no_op_and_is_only_intended_for_test_e969f9c: 此新增標記無操作且僅用於測試。
   this_flag_updates_the_title_of_the_feature_flags_t_513820f8: 此標記將功能標記標籤的標題更新為「功能選項」，然後添加功能預覽專案的「功能預覽」片段。
   this_flag_will_not_cause_any_change_in_behavior_24c0308b: 此標記不會導致行為有任何改變。
   this_folder_is_currently_locked_and_unavailable_to_f85c451: 此文件夾目前已鎖定，無法檢視。
@@ -27825,6 +27854,7 @@ zh-Hant:
     no_score_after_retries: "在 %{max_tries} 次嘗試取回一個分數之後，Turnitin 尚未返回一個分數。"
     tooltip: 
       score: "相似分數 - 參閱詳細報告"
+  turnitin_has_not_returned_a_submission_after_max_t_c44bbdb6: "在 %{max_tries} 次嘗試取回一個提交項目之後，Turnitin 尚未返回一個提交項目。"
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: 重新提交
@@ -27856,6 +27886,7 @@ zh-Hant:
   type_to_search_de63ad38: 輸入以搜尋
   type_to_search_use_arrow_keys_to_navigate_options_5d538c0: 輸入以搜尋，使用箭頭鍵導航選項。
   type_your_message_here_3551e252: 在此處輸入您的訊息...
+  uc_irvine_quiz_adoption_report_9279da8e: "UC Irvine 測驗採用報告"
   uc_merced_student_activity_report_4a9a1eb8: "UC Merced 學生活動報告"
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "噢！聯絡您的易記目錄開發人員。錯誤訊息：%{message}"
   ukrainian_945b00b7: 烏克蘭語
@@ -28146,6 +28177,7 @@ zh-Hant:
       的使用者體驗
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: 在新成績單作業欄目標題更新《發帖政策》圖標。
   updates_to_json_api_auth_error_http_code_and_json__5936d452: "更新 JSON API 驗證錯誤 HTTP 代碼和 JSON 狀態欄位"
+  updates_to_oauth_2_0_flow_to_stop_redirecting_in_t_51c14b07: "更新至 OAuth 2.0 流程以停止在「許可證」驗證中的重新導向"
   updating_6edbab78: 正在更新
   updating_discussion_failed_aadb2d35: 更新討論區失敗
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: "更新 Catalog URL 將您的舊 URL 無法立刻讓有效的使用者存取！如果有已設定的現有付款處理者，變更需要 Catalog 工程師的協助。"
@@ -29369,6 +29401,7 @@ zh-Hant:
       您將從您的儀錶板中刪除此課程。該課程依然可用，
                     可在主選單中導航至「課程 > 所有課程」。
   you_are_currently_acting_as_user_name_8d2be0ee: "您目前正在作為%{user_name}"
+  you_are_currently_in_the_environment_environment_t_449c4c0f: "您目前在 %{environment} 環境中。這將影響每個客戶。是否確定？"
   you_are_currently_logged_into_student_view_3e8a1da: 您目前已登入學生視圖
   you_are_currently_masquerading_as_user_name_f4a00ade: "您目前正在偽裝成 %{user_name}"
   you_are_currently_receiving_notifications_for_this_4f542bb2: "您目前正在接收此 %{contextType} 的通知。若要停用 %{contextType} 通知，請使用以上的切換。"

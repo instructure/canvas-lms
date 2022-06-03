@@ -1201,6 +1201,13 @@ ru:
             check_box: "CSV разделов"
           users: 
             check_box: "CSV пользователей"
+    mit: 
+      student_module_completion: 
+        parameters: 
+          account_reports: 
+            mit: 
+              student_module_completion: 
+                check_box: "Простой отчет"
     new_excelsior_activity_report_csv_parameters: 
       account_reports: 
         excelsior: 
@@ -2345,6 +2352,7 @@ ru:
   allow_outcome_extra_credit_57c1e84e: "Разрешить добавлять в результат дополнительные баллы"
   allow_pages_to_be_deleted_in_bulk_199d3d3b: "Позволяет удалять несколько страниц за один раз"
   allow_passive_acceptance_of_terms_of_service_63ef5994: "Разрешить пассивное принятие Условий предоставления услуг"
+  allow_permissions_to_manage_the_calendar_to_be_gra_7d7818de: "Разрешить управлять календарем для получения доступа на уровне разделов."
   allow_postable_submission_comments_a301b742: "Разрешать публикуемые комментарий при отправке"
   allow_push_notification_opt_out_827f288b: "Позволяет отказаться от push-уведомлений"
   allow_reassigning_assignments_from_speedgrader_to__ff856a96: "Разрешить переназначение заданий из SpeedGrader в список заданий студента"
@@ -3099,6 +3107,7 @@ ru:
   an_error_occurred_when_saving_the_group_536c8f66: "Возникла ошибка при сохранении группы."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Возникла ошибка при установке права на использование для %{filename}"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "При попытке связаться с Turnitin произошла ошибка."
+  an_error_occurred_while_attempting_to_contact_turn_c987545: "При попытке связаться с Turnitin произошла ошибка. Код состояния: %{status_code}"
   an_error_occurred_while_checking_the_migration_sta_d17035b1: "Произошла ошибка во время проверки статуса миграции"
   an_error_occurred_while_creating_this_group_please_ec96f426: "Произошла ошибка при создании этой группы. Попробуйте еще раз."
   an_error_occurred_while_creating_this_outcome_54842fbd: "Произошла ошибка при создании этого результата."
@@ -4864,6 +4873,7 @@ ru:
   avatar_for_name_e3ba987c: "Аватар %{name}"
   avatar_for_studentname_8ea511ae: "Аватар для %{studentName}"
   average_49c63f9b: Среднее
+  average_is_not_a_good_fit_for_most_outcomes_based__f351ed94: "Средний показатель не является точным соответствием для большинства случаев использования на основе результатов или на основе достижений, потому что студентам может понадобиться время для достижения результатов и ранние более низкие ранние показатели могут снизить средний показатель."
   average_score_15cd7c3c: "Средняя оценка"
   avg_alignments_per_artifact_5573d99c: "Усредн. Согласования по артефакту"
   avg_alignments_per_outcome_4daf75cd: "Усредн. Согласования по результату"
@@ -7109,6 +7119,7 @@ ru:
   context_module_sub_header_2f39e87b: "Подзаголовок контекстного модуля"
   context_modules: 
     add_context_module_form: 
+      before_viewing: "Предварительные условия"
       button: 
         delete_label: "Удалить предварительные условия"
         delete_title: "Удалить предварительные условия"
@@ -10566,6 +10577,7 @@ ru:
   duration_hours_hours_and_minutes_minutes_d5da8c3: "Длительность: %{hours} часов и %{minutes} минут"
   duration_minutes_minutes_d7b9182b: "Длительность: %{minutes} минут"
   dutch_6d05cee5: Голландский
+  dynamic_concurrency_231dbdc5: "Динамический параллелизм"
   e_c2991d1b: e
   e_g_doe_jon_fe1d9298: "например, Иванов, Иван"
   e_g_http_university_edu_helpdesk_acab04d6: "например, http://university.edu/helpdesk"
@@ -14308,6 +14320,9 @@ ru:
   if_enabled_syncing_course_enrollments_to_microsoft_6f4f2bf9: |-
       Если данная опция включена, синхронизация записи на курсы с группами Microsoft будет
       доступна. Администраторы учетных записей могут включать эту опцию в настройках учетных записей.
+  if_enabled_the_oauth_2_0_will_now_correctly_return_e33cca64: |-
+      В случае активации OAuth 2.0 точно возвращает коды состояния 4xx
+      запрашивающему клиенту вместо перенаправления их самому себе
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: "Если эта функция активирована, она будет представляться в рубрике без оценок."
   if_enabled_the_parent_sign_up_form_will_require_a__a9c32041: "Если включено, для формы регистрации родителей потребуется код сопряжения студента вместо имени пользователя и пароля"
   if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: |-
@@ -14317,6 +14332,7 @@ ru:
       что и учетная запись администратора сайта. Поведение в других случаях
       уже было таким.
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "Если включено, пользователи смогут настраивать инструменты LTI 2."
+  if_enabled_variable_substitutions_will_return_stri_26421822: "В случае активации различные подстановки будут приводить к получению строковых значений вместо числовых значений"
   if_enabled_when_an_lti_toolproxy_is_created_it_wil_9c2ea3ec: |-
       Если активировано, когда создано Lti::ToolProxy, это
       создаст подписку Интерактивные события непосредственно в инструменте
@@ -14621,6 +14637,7 @@ ru:
   include_assignments_graded_with_a_0_score_fb784115: "Включить задания с оценкой 0 баллов."
   include_byte_order_mark_in_compatible_spreadsheet__ebd6e18: "Включить метку порядка байтов в совместимый экспорт бухучета"
   include_byte_order_mark_in_gradebook_exports_d2ad0d4e: "Включать метку порядка байтов в экспорт журналов оценок"
+  include_classic_quizzes_ecf3fb2b: "Включить Классические тесты"
   include_course_scores_e38e71da: "Включить оценки курса"
   include_course_settings_c4c08764: "Включить настройки курса"
   include_deleted_enrollments_1c87684a: "Включить удаленные регистрации"
@@ -16030,6 +16047,7 @@ ru:
   maximum_number_of_communication_channels_reached_70c4d2f9: "Максимальное достигнутое количество каналов коммуникации"
   may_have_one_featured_link_and_one_new_link_at_a_t_21106efe: "(Может иметь ссылку «Рекомендованный» и «Новый» одновременно)"
   media_af190855: Мультимедиа
+  media_comment_content_5c2341fb: "Содержание мультимедийного комментария"
   media_comment_dialog_manager: 
     messages: 
       loading: "Выполняется загрузка..."
@@ -19333,6 +19351,7 @@ ru:
     format: 
       delimiter: " "
       precision: 3
+      round_mode: "по умолчанию"
       separator: ","
       significant: false
       strip_insignificant_zeros: false
@@ -20069,6 +20088,7 @@ ru:
   performance_improvements_for_loading_data_into_gra_1c3a0c60: "Улучшение производительности для загрузки данных в табель успеваемости."
   performance_improvements_for_the_grade_calculation_7d9b0b16: "Улучшение производительности процесса вычисления успеваемости."
   performed_by_70b3ce96: Выполнил
+  permanent_num_strands_setting_141e8a0c: "Неизменяемая num_strands настройка"
   permission_must_be_enabled_for_someone_397e1ce3: "Разрешение должно быть включено для кого-то"
   permission_not_found_620b80d1: "Разрешение не найдено."
   permission_to_change_this_mastery_calculation_at_t_9b1966c5: "Разрешение на изменение этого расчета владения на уровне курса включено для:"
@@ -20120,6 +20140,7 @@ ru:
   plagiarism_review_7bccc7df: "Проверка на наличие плагиата"
   plagiarism_review_tool_error_513f47ff: "Ошибка инструментария проверки на плагиат"
   plagiarism_review_tool_is_missing_submission_event_75273069: "У инструментария проверки на плагиат отсутствует служба событий сдачи"
+  plagiarism_review_tool_live_event_subscription_err_9094579d: "Ошибка подписки на интерактивные события инструмента проверки на наличие плагиата"
   plagiarism_review_tool_submission_event_service_is_b023b4c7: "У службы событий сдачи инструментария проверки на плагиат отсутствует отсутствует конечная точка"
   plain_text_e3ab33aa: "Обычный текст"
   plain_text_view_7640af4c: "Представление обычного текста"
@@ -21201,6 +21222,7 @@ ru:
       *urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol*. Дополнительные
       поставщики SAML также должны быть сконфигурированы для отслеживания ответа
       от службы обнаружения.
+  provide_tutorial_information_for_instructors_new_t_163c8ed4: "Предоставить больше информации для инструкторов-новичков по работе с Canvas."
   provide_tutorial_information_for_new_users_in_a_fl_c23462ac: "Разместить учебную информацию для новых пользователей во всплывающем лотке."
   provider_attribute_b1cad655: "Атрибут провайдера"
   provider_icon_5064fa6e: "Иконка провайдера"
@@ -23258,6 +23280,7 @@ ru:
   remove_linked_student_name_52dc7fce: "Удалить связанного учащегося %{name}"
   remove_mastery_level_b1e8dcb0: "Удалить уровень владения"
   remove_media_attachment_d2926f1e: "Удалить медиа-вложение"
+  remove_media_comment_f4afdb4b: "Удалить мультимедийный комментарий"
   remove_missing_status_when_graded_d0755cc7: "Удалить статус отсутствия при выставлении оценки"
   remove_name_624e06be: "Удалить %{name}"
   remove_name_as_an_admin_c296cf49: "Удалить %{name} в качестве администратора"
@@ -23499,6 +23522,7 @@ ru:
   retry_ebd5f8ba: "Повторите попытку"
   retry_migrating_name_bdc802ef: "Повторить перенос \"%{name}\""
   return_to_parent_folder_4ece2184: "возврат в родительский каталог"
+  returns_string_values_instead_of_numeric_values_in_a6dfdf7d: "Выдает строковые значения вместо числовых значений в различных подстановках"
   revert_date_changes_5105ce5: "Отменить изменения дат"
   revert_to_actual_score_f665eea9: "Вернуться к фактической оценке"
   revert_to_old_ui_3211da41: "Вернуться к старому пользовательскому интерфейсу"
@@ -24091,6 +24115,7 @@ ru:
   section_id_6f73f3d5: "идентификатор раздела"
   section_id_8ec4f46f: "Идентификатор раздела"
   section_id_b5aad4a7: "Идентификатор раздела"
+  section_level_calendar_permissions_6aff8cdb: "Календарные разрешения на уровне разделов"
   section_name_b6d82574: "Название раздела"
   section_name_edb51b2: "название раздела"
   section_removed_2ac72a79: "%{section} удалено"
@@ -26592,6 +26617,7 @@ ru:
   terms_of_service_bedefcaf: "Условия предоставления услуг"
   terms_of_service_f183ff7f: "Условия предоставления услуг"
   test_cluster_only_70e61c19: "Только тестовый кластер"
+  test_feature_flag_980151e0: "Флажок тестовой функции"
   testing_state_effd4a82: "Тестирование состояния"
   text_7f4593da: Текст
   text_df773ce4: text
@@ -26859,6 +26885,7 @@ ru:
     many: "Выбранные вами результатов нельзя удалить, так как они согласованы с контентом в этом курсе."
     one: "Выбранный вами результат невозможно удалить, так как он согласован с контентом в этом курсе."
     other: "Выбранные вами результатов нельзя удалить, так как они согласованы с контентом в этом курсе."
+  the_plagiarism_platform_settings_can_t_be_changed__629adec6: "Настройки платформы проверки на наличие плагиата не могут быть изменены, потому что студенты уже выполнили отправку по этому заданию"
   the_preceding_content_is_partner_provided_d753928c: "Предыдущий контент предоставляется партнером"
   the_previous_sis_batch_was_aborted_d7d89955: "Предыдущий пакет SIS был прерван"
   the_proficiency_calculation_was_set_by_your_admin__c31f8e95: "Расчет уровня профподготовки была задана вашим администратором и применяется ко всем курсам в этой учетной записи."
@@ -26980,6 +27007,7 @@ ru:
   there_are_no_unsynched_changes_d208547c: "Несинхрониз. изменения отсутствуют"
   there_are_no_user_accounts_to_split_from_this_user_4e132eb1: "Нет учетных записей пользователей для разделения с этим пользователем."
   there_are_unread_rubric_comments_337270ca: "Есть непрочитанные комментарии в рубрике."
+  there_are_unsaved_changes_to_a_grade_n_ncontinue_a_103d3b3c: "Имеются несохраненные изменения в оценке.\\n\\nВсе равно продолжить?"
   there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "На панель инструментов RCE можно добавить не более 2 приложений. Эта настройка применяется только к расширенному RCE."
   there_is_a_2_app_limit_for_placement_within_the_rc_971821a8: "На панель инструментов RCE можно добавить не более 2 приложений."
   there_is_currently_1_available_grader_758e4a21: "В настоящее время доступен 1 оценщик"
@@ -27239,6 +27267,7 @@ ru:
   this_file_9443cda1: "Этот файл"
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "До публикации для этого файла необходимо настроить usage_rights."
   this_flag_allows_calendar_event_series_to_be_creat_cb8d5a60: "Этот флаг позволяет создавать серии календарных событий из календаря Canvas."
+  this_flag_is_a_no_op_and_is_only_intended_for_test_e969f9c: "Этот флажок является нерабочим и предназначен только для тестирования."
   this_flag_updates_the_title_of_the_feature_flags_t_513820f8: "Этот флаг обновляет название вкладки флагов функций на «Параметры функций» и добавляет «Предварительный просмотр функций» для проектов предварительного просмотра функций."
   this_flag_will_not_cause_any_change_in_behavior_24c0308b: "Установка этого флажка не приводит к изменению поведения."
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "Эта папка в данный момент заблокирована и недоступна для просмотра."
@@ -28449,6 +28478,7 @@ ru:
     no_score_after_retries: "Turnitin не возвратил балл после %{max_tries} попыток получения."
     tooltip: 
       score: "Коэффициент сходства - См. подробный отчет"
+  turnitin_has_not_returned_a_submission_after_max_t_c44bbdb6: "Turnitin не выдал разрешение после %{max_tries} попыток для его получения."
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: "Отправить повторно"
@@ -28480,6 +28510,7 @@ ru:
   type_to_search_de63ad38: "Набрать для поиска"
   type_to_search_use_arrow_keys_to_navigate_options_5d538c0: "Наберите для поиска, используйте клавиши со стрелками для навигации по параметрам."
   type_your_message_here_3551e252: "Введите свое сообщение здесь..."
+  uc_irvine_quiz_adoption_report_9279da8e: "Отчет о принятии теста UC Irvine"
   uc_merced_student_activity_report_4a9a1eb8: "Отчет о деятельности студентов UC Merced"
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "Ой-ой! Свяжитесь со своим дружественным разработчиком каталога. Сообщение об ошибке: %{message}"
   ukrainian_945b00b7: Украинский
@@ -28775,6 +28806,7 @@ ru:
       и повышенный комфорт пользователя
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Обновляет значки Политики публикации в заголовке столбца заданий Нового журнала оценок."
   updates_to_json_api_auth_error_http_code_and_json__5936d452: "Обновление кода HTTP и поля состояния JSON ошибки аутентификации API JSON"
+  updates_to_oauth_2_0_flow_to_stop_redirecting_in_t_51c14b07: "Обновления потока OAuth 2.0 для прекращения перенаправления в аутентификацию ‘маркер'"
   updating_6edbab78: Обновление
   updating_discussion_failed_aadb2d35: "Не удалось обновить обсуждение"
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: "Обновление URL-адреса каталога приведет к тому, что ваш старый URL станет недоступным для пользователей незамедлительно! Если настроен существующий платежный оператор, для внесения изменений потребуется помощь инженера по каталогу."
@@ -30041,6 +30073,7 @@ ru:
       ВЫ собираетесь удалить этот курс со своей информационной панели. Доступ к нему все равно будет возможен
                     путем перехода по пути Курсы > Все Курсы из главного меню.
   you_are_currently_acting_as_user_name_8d2be0ee: "В настоящее время вы действуете как %{user_name}"
+  you_are_currently_in_the_environment_environment_t_449c4c0f: "В настоящее время вы находитесь в среде %{environment}. Это окажет влияние на всех клиентов. Вы уверены?"
   you_are_currently_logged_into_student_view_3e8a1da: "В настоящее время вы зашли в систему как студент"
   you_are_currently_masquerading_as_user_name_f4a00ade: "В настоящий момент вы подменены как %{user_name}"
   you_are_currently_receiving_notifications_for_this_4f542bb2: "В настоящее время вы получаете уведомления для этого %{contextType}. Для отключения уведомлений %{contextType} используйте расположенный выше переключатель."

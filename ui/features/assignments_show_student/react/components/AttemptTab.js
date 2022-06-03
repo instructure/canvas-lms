@@ -49,13 +49,55 @@ import theme from '@instructure/canvas-theme'
 
 const I18n = useI18nScope('assignments_2_attempt_tab')
 
-const ExternalToolSubmission = lazy(() => import('./AttemptType/ExternalToolSubmission'))
-const FilePreview = lazy(() => import('./AttemptType/FilePreview'))
-const FileUpload = lazy(() => import('./AttemptType/FileUpload'))
-const MediaAttempt = lazy(() => import('./AttemptType/MediaAttempt'))
-const TextEntry = lazy(() => import('./AttemptType/TextEntry'))
-const UrlEntry = lazy(() => import('./AttemptType/UrlEntry'))
-const StudentAnnotationAttempt = lazy(() => import('./AttemptType/StudentAnnotationAttempt'))
+const ExternalToolSubmission = lazy(() =>
+  import(
+    /* webpackChunkName: "ExternalToolSubmission" */
+    /* webpackPrefetch: true */
+    './AttemptType/ExternalToolSubmission'
+  )
+)
+const FilePreview = lazy(() =>
+  import(
+    /* webpackChunkName: "FilePreview" */
+    /* webpackPrefetch: true */
+    './AttemptType/FilePreview'
+  )
+)
+const FileUpload = lazy(() =>
+  import(
+    /* webpackChunkName: "FileUpload" */
+    /* webpackPrefetch: true */
+    './AttemptType/FileUpload'
+  )
+)
+const MediaAttempt = lazy(() =>
+  import(
+    /* webpackChunkName: "MediaAttempt" */
+    /* webpackPrefetch: true */
+    './AttemptType/MediaAttempt'
+  )
+)
+const TextEntry = lazy(() =>
+  import(
+    /* webpackChunkName: "TextEntry" */
+    /* webpackPrefetch: true */
+    './AttemptType/TextEntry'
+  )
+)
+const UrlEntry = lazy(() =>
+  import(
+    /* webpackChunkName: "UrlEntry" */
+    /* webpackPrefetch: true */
+    './AttemptType/UrlEntry'
+  )
+)
+const StudentAnnotationAttempt = lazy(() =>
+  import(
+    /* webpackChunkName: "StudentAnnotationAttempt" */
+    /* webpackPrefetch: true */
+    './AttemptType/StudentAnnotationAttempt'
+  )
+)
 
 const iconsByType = {
   media_recording: IconAttachMediaLine,

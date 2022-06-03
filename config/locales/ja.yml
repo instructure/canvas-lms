@@ -1182,6 +1182,13 @@ ja:
             check_box: "セクション CSV"
           users: 
             check_box: "ユーザ CSV"
+    mit: 
+      student_module_completion: 
+        parameters: 
+          account_reports: 
+            mit: 
+              student_module_completion: 
+                check_box: 簡単なレポート
     new_excelsior_activity_report_csv_parameters: 
       account_reports: 
         excelsior: 
@@ -2318,6 +2325,7 @@ ja:
   allow_outcome_extra_credit_57c1e84e: アウトカムの追加クレジットを許可する
   allow_pages_to_be_deleted_in_bulk_199d3d3b: ページの一括削除を許可する
   allow_passive_acceptance_of_terms_of_service_63ef5994: 利用規約の受諾を許可する
+  allow_permissions_to_manage_the_calendar_to_be_gra_7d7818de: カレンダーを管理する権限をセクションレベルで付与できるようにする。
   allow_postable_submission_comments_a301b742: 投稿可能な提出コメントを許可する
   allow_push_notification_opt_out_827f288b: プッシュ通知のオプトアウトを許可する
   allow_reassigning_assignments_from_speedgrader_to__ff856a96: SpeedGraderから受講生のToDoリストへの課題の再割り当てを許可する
@@ -3067,6 +3075,7 @@ ja:
   an_error_occurred_when_saving_the_group_536c8f66: グループを保存中にエラーが発生しました。
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "%{filename} の使用権を設定する際にエラーが発生しました。"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: Turnitinに連絡中にエラーが発生しました。
+  an_error_occurred_while_attempting_to_contact_turn_c987545: "Turnitinに連絡中にエラーが発生しました。ステータスコード:%{status_code}"
   an_error_occurred_while_checking_the_migration_sta_d17035b1: 移行ステータスの確認中にエラーが発生しました
   an_error_occurred_while_creating_this_group_please_ec96f426: このグループの作成中にエラーが起こりました。再度試してください。
   an_error_occurred_while_creating_this_outcome_54842fbd: この成果の作成中にエラーが発生しました。
@@ -4774,6 +4783,7 @@ ja:
   avatar_for_name_e3ba987c: "%{name}のアバター"
   avatar_for_studentname_8ea511ae: "～のアバター%{studentName}"
   average_49c63f9b: 平均
+  average_is_not_a_good_fit_for_most_outcomes_based__f351ed94: 受講者がアウトカムを熟達するのに時間がかかることがあり、初期の成績不振が平均値を下げることがあるため、平均値はほとんどのアウトカムベースまたは熟達ベースの学習のユースケースに適していません。
   average_score_15cd7c3c: 平均スコア
   avg_alignments_per_artifact_5573d99c: 平均アーティファクトごとのアライメント
   avg_alignments_per_outcome_4daf75cd: 平均アウトカムごとのアライメント
@@ -7020,6 +7030,7 @@ ja:
   context_module_sub_header_2f39e87b: コンテクストモジュールのサブヘッダー
   context_modules: 
     add_context_module_form: 
+      before_viewing: コース受講前提条件
       button: 
         delete_label: 前提条件を削除
         delete_title: 前提条件を削除
@@ -10287,6 +10298,7 @@ ja:
   duration_hours_hours_and_minutes_minutes_d5da8c3: "期間:%{hours}時間 %{minutes} 分"
   duration_minutes_minutes_d7b9182b: "期間:%{minutes}分"
   dutch_6d05cee5: オランダ語
+  dynamic_concurrency_231dbdc5: ダイナミック同時接続数
   e_c2991d1b: e
   e_g_doe_jon_fe1d9298: "例, Doe, Jon"
   e_g_http_university_edu_helpdesk_acab04d6: "例：http://university.edu/helpdesk"
@@ -13965,6 +13977,9 @@ ja:
   if_enabled_syncing_course_enrollments_to_microsoft_6f4f2bf9: |-
       有効にすると、コース登録とMicrosoftグループを同期
       できるようになります。アカウント管理者は、アカウント設定でこれを有効にすることができます。
+  if_enabled_the_oauth_2_0_will_now_correctly_return_e33cca64: |-
+      有効にすると、OAuth 2.0は、自分自身にリダイレクトする代わりに、
+      要求してきたクライアントに4xxステータスコードを正しく返します
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: このオプションを有効にすると、スコアリングされないルーブリックが表示されます。
   if_enabled_the_parent_sign_up_form_will_require_a__a9c32041: 有効にすると、親のサインアップフォームでは、子のユーザー名とパスワードの代わりに受講生のペアリングコードが必要になります
   if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: |-
@@ -13974,6 +13989,7 @@ ja:
       同じシャードにあるCanvasインスタンスにのみ影響することに注意してください。他のインスタンスの動作はすでに
       このように動作していました。
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "有効な場合、ユーザは LTI 2 ツールを設定できます。"
+  if_enabled_variable_substitutions_will_return_stri_26421822: 有効にすると、変数の置換は数値の代わりに文字列の値を返します。
   if_enabled_when_an_lti_toolproxy_is_created_it_wil_9c2ea3ec: |-
       有効な場合、Lti :: ToolProxyが作成されると、
       課題ではなく、
@@ -14277,6 +14293,7 @@ ja:
   include_assignments_graded_with_a_0_score_fb784115: 採点が0点の課題を含めてください。
   include_byte_order_mark_in_compatible_spreadsheet__ebd6e18: 対応するスプレッドシートのエクスポートにバイトオーダーマークを含める
   include_byte_order_mark_in_gradebook_exports_d2ad0d4e: グレードブックのエクスポートにバイトオーダーのマークを含める
+  include_classic_quizzes_ecf3fb2b: クラシックな小テストの追加
   include_course_scores_e38e71da: コースのスコアを含める
   include_course_settings_c4c08764: コース設定を含める
   include_deleted_enrollments_1c87684a: 削除された登録を含める
@@ -15662,6 +15679,7 @@ ja:
   maximum_number_of_communication_channels_reached_70c4d2f9: 通信チャンネルの最大数に達しました
   may_have_one_featured_link_and_one_new_link_at_a_t_21106efe: (ひとつの注目リンクとひとつの新規リンクを同時に使用できます)
   media_af190855: メディア
+  media_comment_content_5c2341fb: メディアコメントの内容
   media_comment_dialog_manager: 
     messages: 
       loading: 読み込み中・・・
@@ -18922,6 +18940,7 @@ ja:
     format: 
       delimiter: ","
       precision: 3
+      round_mode: デフォルト
       separator: "."
       significant: false
       strip_insignificant_zeros: false
@@ -19648,6 +19667,7 @@ ja:
   performance_improvements_for_loading_data_into_gra_1c3a0c60: 成績表にデータを読み込む際のパフォーマンスの向上。
   performance_improvements_for_the_grade_calculation_7d9b0b16: 成績計算プロセスのためのパフォーマンス改善です。
   performed_by_70b3ce96: 実行者
+  permanent_num_strands_setting_141e8a0c: "半永久的な num_strands 設定"
   permission_must_be_enabled_for_someone_397e1ce3: 誰かのために許可を有効にする必要があります
   permission_not_found_620b80d1: 権限が見つかりません
   permission_to_change_this_mastery_calculation_at_t_9b1966c5: コースレベルでこの達成計算を変更する権限は、次の場合に有効になります：
@@ -19699,6 +19719,7 @@ ja:
   plagiarism_review_7bccc7df: "Plagiarism レビュー"
   plagiarism_review_tool_error_513f47ff: 盗作鑑定ツールのエラー
   plagiarism_review_tool_is_missing_submission_event_75273069: 盗作鑑定ツールに提出イベントサービスがありません
+  plagiarism_review_tool_live_event_subscription_err_9094579d: "剽窃判定ツール ライブイベント申し込みエラー"
   plagiarism_review_tool_submission_event_service_is_b023b4c7: 盗作鑑定ツール提出イベントサービスにエンドポイントがありません
   plain_text_e3ab33aa: "プレーン テキスト"
   plain_text_view_7640af4c: "プレーン テキスト表示"
@@ -20778,6 +20799,7 @@ ja:
       *urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol* プロトコルに準拠するものとします。
       追加のSAMLプロバイダも
       ディスカバリサービスからの応答に従うように設定する必要があります。
+  provide_tutorial_information_for_instructors_new_t_163c8ed4: Canvasを初めて使う講師のためのチュートリアル情報の提供
   provide_tutorial_information_for_new_users_in_a_fl_c23462ac: 新規ユーザーのチュートリアル情報をフライアウトトレイに提供します。
   provider_attribute_b1cad655: プロバイダ属性
   provider_icon_5064fa6e: プロバイダーアイコン
@@ -22735,6 +22757,7 @@ ja:
   remove_linked_student_name_52dc7fce: "リンクされた受講者を削除する%{name}"
   remove_mastery_level_b1e8dcb0: 達成度を削除する
   remove_media_attachment_d2926f1e: 媒体添付書類を削除
+  remove_media_comment_f4afdb4b: "メディア コメントを削除する"
   remove_missing_status_when_graded_d0755cc7: 採点時に不足しているステータスを削除する
   remove_name_624e06be: "%{name}を削除する"
   remove_name_as_an_admin_c296cf49: "%{name}管理者として削除"
@@ -22963,6 +22986,7 @@ ja:
   retry_ebd5f8ba: 再試行
   retry_migrating_name_bdc802ef: "\"%{name}\"の移行を再試行する"
   return_to_parent_folder_4ece2184: 親フォルダーに戻る
+  returns_string_values_instead_of_numeric_values_in_a6dfdf7d: 変数の代入で数値の代わりに文字列値を返します
   revert_date_changes_5105ce5: 日付の変更を元に戻す
   revert_to_actual_score_f665eea9: 実際のスコアに戻す
   revert_to_old_ui_3211da41: "古い UI に戻る"
@@ -23546,6 +23570,7 @@ ja:
   section_id_6f73f3d5: "セクション id"
   section_id_8ec4f46f: "セクション ID"
   section_id_b5aad4a7: "セクション ID"
+  section_level_calendar_permissions_6aff8cdb: セクションレベルのカレンダー権限
   section_name_b6d82574: セクション名
   section_name_edb51b2: セクション名
   section_removed_2ac72a79: "%{section}削除済み"
@@ -25998,6 +26023,7 @@ ja:
   terms_of_service_bedefcaf: サービス利用規約
   terms_of_service_f183ff7f: サービス利用規約
   test_cluster_only_70e61c19: クラスタのみをテストする
+  test_feature_flag_980151e0: テスト機能フラグ
   testing_state_effd4a82: テストの状態
   text_7f4593da: テキスト
   text_df773ce4: text
@@ -26254,6 +26280,7 @@ ja:
   the_outcomes_that_you_have_selected_cannot_be_remo_fc7244f2: 
     one: 選択した結果は、このコースのコンテンツに沿ってアラインされているため、削除できません。
     other: 選択したアウトカムは、このコースのコンテンツに沿ってアラインされているため、削除できません。
+  the_plagiarism_platform_settings_can_t_be_changed__629adec6: 受講者がすでにこの課題を提出しているため、剽窃プラットフォームの設定を変更できません。
   the_preceding_content_is_partner_provided_d753928c: 上記のコンテンツはパートナーが提供しています
   the_previous_sis_batch_was_aborted_d7d89955: 以前のSISバッチは中止されました
   the_proficiency_calculation_was_set_by_your_admin__c31f8e95: 熟達スコアの計算は管理者によって設定され、このアカウントのすべてのコースに適用されます。
@@ -26369,6 +26396,7 @@ ja:
   there_are_no_unsynched_changes_d208547c: 同期されていない変更はありません
   there_are_no_user_accounts_to_split_from_this_user_4e132eb1: このユーザーから分割するユーザーアカウントはありません。
   there_are_unread_rubric_comments_337270ca: 未読のルーブリックコメントがあります。
+  there_are_unsaved_changes_to_a_grade_n_ncontinue_a_103d3b3c: 評定に未保存の変更があります。\n\nそれでも続けますか?
   there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: RCEツールバー内の配置には、2つのアプリ制限があります。この設定は、拡張RCEにのみ適用されます。
   there_is_a_2_app_limit_for_placement_within_the_rc_971821a8: RCEツールバー内の配置には、2つのアプリ制限があります。
   there_is_currently_1_available_grader_758e4a21: 現在1名の利用可能な採点者がいます
@@ -26626,6 +26654,7 @@ ja:
   this_file_9443cda1: このファイル
   this_file_must_have_usage_rights_set_before_it_can_55aba559: "公開する前に、このファイルに usage_rights を設定する必要があります。"
   this_flag_allows_calendar_event_series_to_be_creat_cb8d5a60: "このフラグにより、Canvas Calendar からカレンダーイベントシリーズを作成できるようになります。"
+  this_flag_is_a_no_op_and_is_only_intended_for_test_e969f9c: このフラグは無効であり、テスト目的のみとしています。
   this_flag_updates_the_title_of_the_feature_flags_t_513820f8: このフラグは、機能フラグタブの名称を「機能オプション」に更新し、機能プレビュープロジェクト用の「機能プレビュー」ピルを追加します。
   this_flag_will_not_cause_any_change_in_behavior_24c0308b: このフラグが動作の変更の原因となることはありません。
   this_folder_is_currently_locked_and_unavailable_to_f85c451: このフォルダは現在ロックされており、表示できません。
@@ -27830,6 +27859,7 @@ ja:
     no_score_after_retries: "スコアの取得を %{max_tries} 回試行しましたが、Turnitin がスコアを返しませんでした。"
     tooltip: 
       score: "類似スコア - 詳細レポートを参照"
+  turnitin_has_not_returned_a_submission_after_max_t_c44bbdb6: "Turnitinが %{max_tries} 回取得しようとした後、提出を返していません。"
   turnitin_info: 
     buttons: 
       resubmit_to_turnitin: 再提出
@@ -27861,6 +27891,7 @@ ja:
   type_to_search_de63ad38: タイプして検索する
   type_to_search_use_arrow_keys_to_navigate_options_5d538c0: テイプして検索、矢印キーを使用してオプションを移動します。
   type_your_message_here_3551e252: ここにメッセージを入力してください…
+  uc_irvine_quiz_adoption_report_9279da8e: "UC Irvine 校小テスト採用レポート"
   uc_merced_student_activity_report_4a9a1eb8: "UC Merced 受講者アクティビティレポート"
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "エラーです！Catalog 開発者までご連絡ください。エラーメッセージ：%{message}"
   ukrainian_945b00b7: ウクライナ語
@@ -28151,6 +28182,7 @@ ja:
       かつアップデートされたユーザーエクスペリエンスに更新します
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "[新しい成績表の割り当て]列ヘッダーの投稿ポリシーアイコンの表示を更新します。"
   updates_to_json_api_auth_error_http_code_and_json__5936d452: "JSON API認証エラーのHTTPコードとJSONステータスフィールドの更新"
+  updates_to_oauth_2_0_flow_to_stop_redirecting_in_t_51c14b07: "OAuth 2.0フローのアップデートにより、「トークン」認証でのリダイレクトを停止しました。"
   updating_6edbab78: 更新しています
   updating_discussion_failed_aadb2d35: ディスカッションの更新に失敗しました
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: "Catalog の URL を更新すると、ユーザは古い URL ではアクセスできなくなります。既存の決済代行会社が設定されている場合、変更には Catalog エンジニアの助けが必要です。"
@@ -29375,6 +29407,7 @@ ja:
       このコースをダッシュ​​ボードから削除しようとしています。メインメニューから[コース]> [すべてのコース]に移動すると、
                     は引き続き利用できます。
   you_are_currently_acting_as_user_name_8d2be0ee: "あなたは現在、～として行動しています%{user_name}"
+  you_are_currently_in_the_environment_environment_t_449c4c0f: "あなたは現在、この %{environment} 環境にいます。これはすべての顧客に影響します。よろしいですか？"
   you_are_currently_logged_into_student_view_3e8a1da: 現在、受講者ビューにログインしています
   you_are_currently_masquerading_as_user_name_f4a00ade: "現在、%{user_name} としてマスカレードしています"
   you_are_currently_receiving_notifications_for_this_4f542bb2: "現在この%{contextType}の通知を受け取っています。%{contextType}の通知を無効にするには、上記の切り替えを使用してください。"
