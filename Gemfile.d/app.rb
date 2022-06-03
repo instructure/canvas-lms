@@ -151,6 +151,7 @@ gem "will_paginate", "3.3.0", require: false # required for folio-pagination
 # needs pin to satisfy varying requirements of google_drive and another gem
 gem "faraday", "0.17.4"
   gem "faraday_middleware", "0.14.0"
+  gem "multipart-post", "2.1.1"
 
 path "engines" do
   gem "audits"
