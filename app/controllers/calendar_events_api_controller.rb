@@ -721,15 +721,23 @@ class CalendarEventsApiController < ApplicationController
   #
   # @argument cancel_reason [String]
   #   Reason for deleting/canceling the event.
+  # @argument which [String, "one"|"all"|"following"]
+  #   Delete just the event whose ID is in in the URL, all events
+  #   in the series, or the given event and all those following.
   #
   # @example_request
   #
-  #   curl 'https://<canvas>/api/v1/calendar_events/234.json' \
+  #   curl 'https://<canvas>/api/v1/calendar_events/234' \
   #        -X DELETE \
   #        -F 'cancel_reason=Greendale layed off the janitorial staff :(' \
+  #        -F 'which=following'
   #        -H "Authorization: Bearer <token>"
   def destroy
     get_event
+    if @event.series_id && Account.site_admin.feature_enabled?(:calendar_series)
+      destroy_from_series
+      return
+    end
     if authorized_action(@event, @current_user, :delete) && check_for_past_signup(@event.parent_event)
       @event.updating_user = @current_user
       @event.cancel_reason = params[:cancel_reason]
@@ -741,6 +749,46 @@ class CalendarEventsApiController < ApplicationController
       else
         render json: @event.errors, status: :bad_request
       end
+    end
+  end
+
+  def destroy_from_series
+    if authorized_action(@event, @current_user, :delete) && check_for_past_signup(@event.parent_event)
+      which = params[:which] || "one"
+      case which
+      when "one"
+        events = [@event]
+      when "all"
+        events = CalendarEvent.active.where(series_id: @event.series_id)
+      when "following"
+        events = CalendarEvent.active.where("series_id = ? AND start_at >= ?", @event.series_id, @event.start_at)
+      else
+        render json: { error: t("Invalid parameter which='%{which}'", which: which) }, status: :bad_request
+        return
+      end
+
+      CalendarEvent.skip_touch_context
+      CalendarEvent.transaction do
+        events.each do |event|
+          event.updating_user = @current_user
+          event.cancel_reason = params[:cancel_reason]
+          if event.destroy
+            if event.appointment_group && @event.appointment_group.appointments.count == 0
+              event.appointment_group.destroy(@current_user)
+            end
+          else
+            render json: event.errors, status: :bad_request
+            raise ActiveRecord::Rollback
+          end
+        end
+      end
+      CalendarEvent.skip_touch_context(false)
+      @event.context.touch # assume all events in the series belong to the same context
+
+      json = events.map do |event|
+        event_json(event, @current_user, session)
+      end
+      render json: json
     end
   end
 
@@ -1497,7 +1545,7 @@ class CalendarEventsApiController < ApplicationController
     bounded = rrule_fields.fetch("UNTIL", false) || rrule_fields.fetch("COUNT", false)
     unless bounded
       render json: {
-        message: t("The series recurrance rule must include a COUNT or UNTIL")
+        message: t("The series recurrence rule must include a COUNT or UNTIL")
       }, status: :bad_request
       return nil
     end
@@ -1510,7 +1558,7 @@ class CalendarEventsApiController < ApplicationController
       )
     rescue => e
       render json: {
-        message: t("Failed parsing the event's recurrance rule: %{e}", e: e)
+        message: t("Failed parsing the event's recurrence rule: %{e}", e: e)
       }, status: :bad_request
       return nil
     end
