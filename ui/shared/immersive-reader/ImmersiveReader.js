@@ -26,6 +26,7 @@ import {defaultFetchOptions} from '@instructure/js-utils'
 import {CookiePolicy} from '@microsoft/immersive-reader-sdk'
 import WithBreakpoints from 'with-breakpoints'
 import ContentChunker from './ContentChunker'
+import ContentUtils from './ContentUtils'
 
 const I18n = useI18nScope('ImmersiveReader')
 
@@ -54,7 +55,18 @@ function handleClick({title, content}, readerSDK) {
       fetch('/api/v1/immersive_reader/authenticate', defaultFetchOptions)
         .then(response => response.json())
         .then(({token, subdomain}) => {
-          const chunks = new ContentChunker().chunk(content())
+          let htmlPayload = content()
+
+          // For any images that are hyperlinked (i.e. their immedediate parent is an anchor tag)
+          // we want to remove each hyperlinked image's parent anchor tag before sending the html payload
+          // to Immersive Reader (IR)
+          // Otherwise IR will not read the hyperlinked image's alt text; it will instead read the anchor's href value
+          const contentUtils = new ContentUtils(htmlPayload)
+          if (contentUtils.htmlContainsHyperlinkedImage()) {
+            htmlPayload = contentUtils.removeAnchorFromHyperlinkedImages()
+          }
+
+          const chunks = new ContentChunker().chunk(htmlPayload)
           const requestContent = {
             title,
             chunks
