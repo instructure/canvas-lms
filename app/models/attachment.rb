@@ -1384,6 +1384,11 @@ class Attachment < ActiveRecord::Base
     end
     can :read
 
+    given do |user|
+      user && attachment_associations.joins(:submission).where(submissions: { user: user }).exists?
+    end
+    can :read
+
     given do |_user, session|
       (u = session.try(:file_access_user)) &&
         (user_can_read_through_context?(u, session) ||

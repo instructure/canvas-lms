@@ -1136,6 +1136,52 @@ describe Attachment do
       expect(aq_att1.grants_right?(student, :download)).to eq true
       expect(aq_att2.grants_right?(student, :download)).to eq false
     end
+
+    context "group assignment" do
+      before :once do
+        group_category = @course.group_categories.create!(name: "Group Category")
+        group_1 = group_model(context: @course, group_category: group_category)
+        group_2 = group_model(context: @course, group_category: group_category)
+
+        @user_1 = user_model
+        @user_2 = user_model
+        @user_3 = user_model
+        @user_4 = user_model
+
+        course.enroll_student(@user_1).accept
+        course.enroll_student(@user_2).accept
+        course.enroll_student(@user_3).accept
+        course.enroll_student(@user_4).accept
+
+        group_1.add_user(@user_1)
+        group_1.add_user(@user_2)
+
+        group_2.add_user(@user_3)
+        group_2.add_user(@user_4)
+
+        assignment = assignment_model(course: @course, submission_types: "online_upload")
+        assignment.group_category = group_category
+        assignment.save!
+
+        @attachment = attachment_model(context: @user_1)
+
+        submission_1 = assignment.find_or_create_submission(@user_1)
+        submission_2 = assignment.find_or_create_submission(@user_2)
+
+        @attachment.attachment_associations.create!(context: submission_1)
+        @attachment.attachment_associations.create!(context: submission_2)
+      end
+
+      it "does allow read attachments for users in the same group" do
+        expect(@attachment.grants_right?(@user_1, :read)).to eql(true)
+        expect(@attachment.grants_right?(@user_2, :read)).to eql(true)
+      end
+
+      it "does not allow read attachments for users in another group" do
+        expect(@attachment.grants_right?(@user_3, :read)).to eql(false)
+        expect(@attachment.grants_right?(@user_4, :read)).to eql(false)
+      end
+    end
   end
 
   context "duplicate handling" do
