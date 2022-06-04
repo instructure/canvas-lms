@@ -198,6 +198,7 @@ nn:
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "Ein partnar-ID er nødvendig for å bruke Academic Benchmarks"
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "Ein partnarnøkkel er nødvendig for å bruke Academic Benchmarks"
   a_problem_occurred_adding_reviewers_57b083d9: "Det oppstod eit problem då nye fagfellevurderarar blei lagt til."
+  a_process_is_already_in_progress_f4495f5e: "Ein prosess er allereie i gang."
   a_public_privacy_level_will_send_the_launching_use_63bdbfaa: "Eit offentleg personvernnivå vil sende brukarane sine personopplysningar til tenestetilbyderen. Ved å sette den til privat kan ein i motsett fall hindre at slik informasjon kjem fram til tenester som er avhengig av den."
   a_redirect_uri_is_required_please_supply_one_471908db: "Krav om omdirigerings_URL. Legg til ein."
   a_role_name_is_required_47efd33: "Eit rollenamn er obligatorisk"
@@ -220,6 +221,7 @@ nn:
   a_z_243c3301: A–Å
   a_z_29d8e67c: "A - Å"
   about_this_service_b10bc808: "Om denne tenesta"
+  above_max_rating_64b29915: "Over maksimal vurdering"
   academic_benchmark: 
     no_api_key: "Ein API-nøkkel er nødvendig for å bruke Academic Benchmarks"
     no_file: "Resultatfil eller autoritet er ikkje gitt"
@@ -283,6 +285,7 @@ nn:
     tab_faculty_journal: Faglærarprotokoll
     tab_grading_standards: Karaktersetjing
     tab_jobs: Jobbar
+    tab_jobs_v2: "Jobber v2"
     tab_outcomes: Læringsmål
     tab_permissions: Løyve
     tab_plugins: Programtillegg
@@ -411,6 +414,7 @@ nn:
       unknown_user_url_description: "URL-en for omdirigering av godkjend brukar finst ikkje i Canvas."
   account_course_and_user_search_22bf297a: "Konto, emne- og brukarsøk"
   account_creation_still_in_progress_ac0e0a18: "Kontooppretting held fram"
+  account_default_time_8c7ab62d: "Kontostandard (%{time})"
   account_domain_78f43049: Kontoområde
   account_domain_lookups_f9d1147e: Kontoområdeoppslag
   account_groups_2f301732: Kontogrupper
@@ -2021,6 +2025,8 @@ nn:
       Legg til ein ny Returnerte e-postar fane i kontoadministratorverktøy, som
       tillet deg å søke etter e-postadresser kor Canvas varslar
       har blitt returnert
+  adds_an_account_course_setting_for_a_default_due_t_9903738a: "Legg til ein standard konto-/kursinnstilling for forfallstid for nye oppdrag"
+  adds_an_emoji_picker_that_allows_students_and_teac_cf517b1b: "Legg til ein emojioversikt som lar elever og lærere legge til emojier i innsendingskommentarane sine."
   adds_analytics_link_on_the_user_settings_menu_3a048816: "Legg til analyselenke i meny for brukarinnstillingar."
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Legg til analyse til eit studentkontekstkort"
   adds_granular_permissions_for_adding_and_removing__e1e484a3: "Legg til detaljerte løyve for å legge til og fjerne kvar rolle, og eit separat løyve for andre emneadministrasjonshandlingar"
@@ -2059,6 +2065,7 @@ nn:
   after_last_attempt_c9168da2: "Etter siste forsøk"
   after_the_assignment_is_graded_53754607: "Etter at oppgåva er vurdert"
   after_the_due_date_eee89c9c: "Etter innleveringsfristen"
+  after_the_first_attempt_you_cannot_leave_comments__3922325f: "Etter fyrste forsøk kan du ikkje legge att kommentarar før du har levert oppgåva."
   ahead_21f22939: Komande
   ajax_errors: 
     error_heading: "AJAX-feil: %{status_code}"
@@ -2122,6 +2129,7 @@ nn:
   all_accounts_3bafc860: "Alle kontoar"
   all_assignment_groups_a65e9e46: "Alle oppgåvegruppene"
   all_assignments_b79a4d6a: "Alle oppgåvene"
+  all_changes_published_27a53ffd: "Alle endringar publisert"
   all_changes_were_saved_f6f3ddcc: "Alle endringar er lagra"
   all_close_dates_must_be_on_or_after_the_end_date_b898d85d: "Alle lukkedatoar må vere på eller etter sluttdatoen"
   all_comments_are_sent_to_the_whole_group_284591e7: "Alle kommentarar blir sende til heile gruppa"
@@ -2143,12 +2151,17 @@ nn:
   all_grading_periods_77974940: "Alle periodar for karaktersetjing"
   all_grading_periods_must_have_a_title_a1a38d87: "Alle karaktersetjingsperiodar må ha ein tittel"
   all_groups_cea25817: "Alle grupper"
+  all_grouptitle_outcomes_dcc565d1: "Alle %{groupTitle} Utfall"
   all_image_types_allowed_9c65004d: "Alle bildetyper tillatne"
   all_items_a49b66c7: "Alle element"
+  all_items_marked_processed_have_been_saved_by_canv_7045295a: "Alle element merka med \"behandla\" er lagra av Canvas."
   all_media_types_allowed_3c0cdce7: "Alle mediatyper tillatne"
   all_modules_20c9a1c8: "Alle modular"
   all_my_files_a0213441: "Alle filene mine"
   all_my_sections_375248b3: "Alle mine seksjonar"
+  all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "Alle utfall frå %{groupTitle} har blitt lagt til dette kurset."
+  all_outcomes_from_grouptitle_have_been_successfull_6267efe4: "Alle utfall frå %{groupTitle} har blitt lagt til %{targetGroupTitle}."
+  all_outcomes_from_grouptitle_have_been_successfull_cb6ad008: "Alle utfall frå %{groupTitle}har blitt lagt til denne kontoen."
   all_quiz_submissions_report_72a6d2fa: "Rapport over alle quizinnleveringar"
   all_roles_f3bba14d: "Alle roller"
   all_rubrics_5114c466: "Alle vurderingsskjema"
@@ -2159,11 +2172,14 @@ nn:
   all_students_have_taken_the_quiz_b558f8b4: "Alle studentar har tatt quizen"
   all_students_have_taken_the_survey_494f9f42: "Alle studentar har teke undersøkinga"
   all_students_will_be_able_to_see_their_grade_and_o_66c1beab: "Alle studentar kan sjå vurderinga og/eller tilbakemeldingane."
+  all_subject_navigation_has_been_disabled_f06b0154: "All emnenavigering er deaktivert."
+  all_subjects_5a42cfdb: "Alle emner"
   all_submission_comments_have_been_marked_as_read_74c0683b: "Alle innleveringskommentarar er merka som lesne"
   all_submissions_must_have_a_selected_grade_3a84e5a9: "Alle innleveringar må ha ein vurdering."
   all_terms_cd27b0fb: "Alle semester"
   all_timezones_5e8afa7b: "Alle tidssoner"
   all_types_allowed_287eb6b0: "Alle typer tillatne"
+  all_ungraded_artifacts_ec3ba09: "Alle ugraderte gjenstandar"
   all_users_associated_with_this_course_6be8d492: "Alle brukarar som er tilknytta emnet"
   all_users_associated_with_this_institution_d29850be: "Alle brukarar som er tilknytta institusjonen"
   all_versions_student_submission_report_e4def68d: "Rapport for alle versjonar av studentinnlevering"
@@ -2179,6 +2195,7 @@ nn:
   allow_conference_selection_lti_placement_c020ad8d: "Tillat konferanseval for LTI plassering"
   allow_course_content_to_be_downloaded_and_viewed_o_48a0d252: "Tillat at emneinnhaldet kan bli lasta ned og lest når du ikkje er på nett"
   allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Tillat at emnebilde blir tilordna til eit emne og brukt på dashbordkorta. "
+  allow_creation_anywhere_the_user_has_active_enroll_13c84fc2: "Tillat oppretting kvar som helst der brukaren har aktive påmeldingar"
   allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "Tillat at kvar brukar kan reorganisere dashbordkorta sine. "
   allow_final_grade_override_8cf4336b: "Tillat å overstyre sluttvurdering"
   allow_final_grade_override_a21a79ee: "Tillat å overstyre sluttvurdering"
@@ -7390,6 +7407,7 @@ nn:
     grading_standards: Karaktersetjing
     groups: Grupper
     jobs: Jobbar
+    jobs_v2: "Jobber v2"
     media: Media
     messages: Meldingar
     modules: Modular
@@ -12061,6 +12079,7 @@ nn:
       job_handler: Jobbehandlar
       last_error: "Siste feil"
   jobs_ec5d59d8: Jobbar
+  jobs_v2_b20a83f7: "Jobber v2"
   join_6cafecca: "Ta del"
   join_course_511e6cb3: "Delta i %{course}"
   join_group_group_name_871a5e3f: "Bli med i gruppa %{group_name}"
