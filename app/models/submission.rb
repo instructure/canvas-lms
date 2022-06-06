@@ -1605,7 +1605,7 @@ class Submission < ActiveRecord::Base
   def score_late_or_none(late_policy, points_possible, grading_type)
     raw_score = score_changed? || @regraded ? score : entered_score
     deducted = late_points_deducted(raw_score, late_policy, points_possible, grading_type)
-    new_score = raw_score && (raw_score - deducted)
+    new_score = raw_score && (deducted > raw_score ? [0.0, raw_score].min : raw_score - deducted)
     self.points_deducted = late? ? deducted : nil
     self.score = new_score
   end

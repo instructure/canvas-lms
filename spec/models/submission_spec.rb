@@ -1321,6 +1321,25 @@ describe Submission do
       end
     end
 
+    context "when applied late policy deducts 100%" do
+      before(:once) do
+        @date = Time.zone.local(2017, 1, 15, 12)
+        Timecop.travel(@date) do
+          Auditors::ActiveRecord::Partitioner.process
+        end
+        @assignment.update!(due_at: @date - 12.days, points_possible: 1, submission_types: "online_text_entry")
+        @late_policy = late_policy_factory(course: @course, deduct: 10.0, every: :day)
+      end
+
+      it "sets the score to 0 when grade has three decimal points and ending in 5" do
+        Timecop.freeze(@date) do
+          @assignment.submit_homework(@student, body: "a body")
+          @assignment.grade_student(@student, grade: 0.555, grader: @teacher)
+          expect(submission.score).to eq 0.0
+        end
+      end
+    end
+
     context "when submitting to an LTI assignment" do
       before(:once) do
         @date = Time.zone.local(2017, 1, 15, 12)
