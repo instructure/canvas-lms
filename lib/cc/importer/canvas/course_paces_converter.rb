@@ -39,6 +39,7 @@ module CC::Importer::Canvas
           item = {}
           item[:duration] = get_int_val(item_node, "duration")
           item[:module_item_migration_id] = get_node_val(item_node, "module_item_identifierref")
+          item[:pace_item_migration_id] = get_node_val(item_node, "pace_item_identifier")
           course_pace[:module_items] << item
         end
 

@@ -22,6 +22,11 @@ class CoursePace < ActiveRecord::Base
   include Workflow
   include Canvas::SoftDeletable
 
+  include MasterCourses::Restrictor
+  restrict_columns :content, [:duration]
+  restrict_columns :state, [:workflow_state]
+  restrict_columns :settings, %i[exclude_weekends hard_end_dates]
+
   extend RootAccountResolver
   resolves_root_account through: :course
 
@@ -56,6 +61,10 @@ class CoursePace < ActiveRecord::Base
   end
 
   self.ignored_columns = %i[start_date]
+
+  def asset_name
+    I18n.t("Course Pace")
+  end
 
   def valid_secondary_context
     if course_section_id.present? && user_id.present?

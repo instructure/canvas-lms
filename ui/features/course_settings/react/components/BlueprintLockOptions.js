@@ -45,7 +45,8 @@ const keys = [
   {objectType: 'discussion_topic'},
   {objectType: 'wiki_page', lockableAttributes: ['content']},
   {objectType: 'attachment', lockableAttributes: ['content']},
-  {objectType: 'quiz'}
+  {objectType: 'quiz'},
+  {objectType: 'course_pace', lockableAttributes: ['content']}
 ]
 
 export default class BlueprintLockOptions extends React.Component {

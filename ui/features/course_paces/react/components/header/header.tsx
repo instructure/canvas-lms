@@ -25,10 +25,10 @@ import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Heading} from '@instructure/ui-heading'
-
 import PacePicker from './pace_picker'
 import ProjectedDates from './projected_dates/projected_dates'
 import Settings from './settings/settings'
+import BlueprintLock from './blueprint_lock'
 import UnpublishedChangesIndicator from '../unpublished_changes_indicator'
 import {getSelectedContextId, getSelectedContextType} from '../../reducers/ui'
 import {isNewPace} from '../../reducers/course_paces'
@@ -46,6 +46,8 @@ type StoreProps = {
 
 type PassedProps = {
   handleDrawerToggle?: () => void
+  setIsBlueprintLocked: (arg) => void
+  readonly isBlueprintLocked: boolean
 }
 
 export type HeaderProps = PassedProps & StoreProps
@@ -86,7 +88,15 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
             <PacePicker />
           </FlexItem>
           <FlexItem margin="0 0 small" shouldGrow>
-            <Settings margin="0 0 0 small" />
+            <Settings
+              isBlueprintLocked={props.isBlueprintLocked && props.context_type == 'Course'}
+              margin="0 0 0 small"
+            />
+            <BlueprintLock
+              newPace={props.newPace}
+              contextIsCoursePace={props.context_type == 'Course'}
+              setIsBlueprintLocked={props.setIsBlueprintLocked}
+            />
           </FlexItem>
           <FlexItem textAlign="end" margin="0 0 small small">
             {props.context_type !== 'Enrollment' && (

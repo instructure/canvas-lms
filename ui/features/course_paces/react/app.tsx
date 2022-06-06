@@ -73,6 +73,8 @@ export const App: React.FC<ResponsiveComponentProps> = ({
     pollForPublishStatus()
   }, [pollForPublishStatus])
 
+  const [isBlueprintLocked, setIsBlueprintLocked] = useState(false)
+
   useEffect(() => {
     setResponsiveSize(responsiveSize)
   }, [responsiveSize, setResponsiveSize])
@@ -87,10 +89,14 @@ export const App: React.FC<ResponsiveComponentProps> = ({
       <Flex as="div" direction="column" margin="small">
         <View>
           <Errors />
-          <Header handleDrawerToggle={() => setTrayOpen(!trayOpen)} />
+          <Header
+            isBlueprintLocked={isBlueprintLocked}
+            setIsBlueprintLocked={setIsBlueprintLocked}
+            handleDrawerToggle={() => setTrayOpen(!trayOpen)}
+          />
         </View>
-        <Body />
-        <Footer />
+        <Body blueprintLocked={isBlueprintLocked} />
+        <Footer blueprintLocked={isBlueprintLocked} />
         <Tray
           label={I18n.t('Unpublished Changes tray')}
           open={trayOpen}

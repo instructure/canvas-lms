@@ -65,6 +65,10 @@ module CoursePacesPageObject
     "[data-testid='pp-blackout-date-row']"
   end
 
+  def blueprint_container_for_pacing_selector
+    ".blueprint-label"
+  end
+
   def cancel_button_selector
     "button:contains('Cancel')"
   end
@@ -301,6 +305,18 @@ module CoursePacesPageObject
     f(blackout_module_item_selector)
   end
 
+  def blueprint_child_course_label
+    f(".bpc__lock-no__toggle")
+  end
+
+  def blueprint_container_for_pacing
+    f(blueprint_container_for_pacing_selector)
+  end
+
+  def blueprint_lock_icon_button
+    f(".bpc-lock-toggle__label").find_element(:xpath, "../../../parent::button")
+  end
+
   def cancel_button
     fj(cancel_button_selector)
   end
@@ -458,8 +474,8 @@ module CoursePacesPageObject
   end
 
   #----------------------- Actions & Methods -------------------------
-  def visit_course_paces_page
-    get "/courses/#{@course.id}/course_pacing"
+  def visit_course_paces_page(course_id_override: false)
+    get "/courses/#{course_id_override || @course.id}/course_pacing"
   end
 
   #----------------------- Click Items -------------------------------

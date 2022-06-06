@@ -181,6 +181,81 @@ describe MasterCourses::MasterMigration do
     end
   end
 
+  describe "Course pace migration" do
+    before :once do
+      account_admin_user(active_all: true)
+      @copy_from = @course
+
+      @copy_to = course_factory
+      @sub = @template.add_child_course!(@copy_to)
+
+      @module = @copy_from.context_modules.create! name: "M"
+      @assignment = @copy_from.assignments.create! name: "A", workflow_state: "unpublished"
+      @tag = @assignment.context_module_tags.create! context_module: @module, context: @copy_from, tag_type: "context_module"
+
+      @original_pace = @copy_from.course_paces.create!
+      @original_pace_item = @original_pace.course_pace_module_items.create! module_item: @tag, duration: 2
+
+      run_master_migration
+      @copied_pace = @copy_to.course_paces.where(migration_id: mig_id(@original_pace)).first
+      @copied_pace_item = @copied_pace.course_pace_module_items.where(migration_id: mig_id(@original_pace_item)).first
+
+      @original_pace.touch
+    end
+
+    it "copies the module item data over" do
+      expect(@copied_pace_item).to be_truthy
+      expect(@copied_pace_item.duration).to eq 2
+    end
+
+    it "updates module item data" do
+      @original_pace_item.update!(duration: 4)
+      Timecop.travel(1.minute.from_now) do
+        run_master_migration
+      end
+      expect(@copied_pace_item.reload.duration).to eq 4
+    end
+
+    it "does not overwrite downstream changes" do
+      @copied_pace_item.update!(duration: 10)
+      @original_pace_item.update!(duration: 4)
+      Timecop.travel(1.minute.from_now) do
+        run_master_migration
+      end
+      expect(@copied_pace_item.reload.duration).to eq 10
+    end
+
+    it "does overwrite downstream changes if locked" do
+      @copied_pace_item.update!(duration: 10)
+      @original_pace_item.update!(duration: 4)
+      @template.content_tag_for(@original_pace).update_attribute(:restrictions, { content: true })
+      Timecop.travel(1.minute.from_now) do
+        run_master_migration
+      end
+      expect(@copied_pace_item.reload.duration).to eq 4
+    end
+
+    it "keeps course pace related tags up to date when default restrictions are set" do
+      @pace_1 = @copy_from.course_paces.create!
+      @pace_2 = @copy_from.course_paces.create!
+
+      pace_tag1 = @template.create_content_tag_for!(@pace_1, use_default_restrictions: true)
+      pace_tag2 = @template.create_content_tag_for!(@pace_2, use_default_restrictions: false)
+
+      pace_restricts = { content: true }
+
+      @template.update_attribute(:default_restrictions_by_type, { "CoursePace" => pace_restricts })
+      expect(pace_tag1.reload.restrictions).to be_blank # shouldn't have updated yet because it's not configured to use per-object defaults
+
+      @template.update_attribute(:use_default_restrictions_by_type, true)
+      expect(pace_tag1.reload.restrictions).to eq pace_restricts
+      expect(pace_tag2.reload.restrictions).to be_blank # shouldn't have updated because use_default_restrictions is not set
+
+      @template.update_attribute(:default_restrictions_by_type, {})
+      expect(pace_tag1.reload.restrictions).to be_blank
+    end
+  end
+
   describe "all the copying" do
     before :once do
       account_admin_user(active_all: true)

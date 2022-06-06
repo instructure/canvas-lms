@@ -25,6 +25,7 @@ import {IconButton} from '@instructure/ui-buttons'
 import {IconSettingsLine} from '@instructure/ui-icons'
 import {uid} from '@instructure/uid'
 import {Menu} from '@instructure/ui-menu'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 import BlackoutDatesModal from '../../../shared/components/blackout_dates_modal'
 import {StoreState, CoursePace} from '../../../types'
@@ -59,6 +60,7 @@ interface DispatchProps {
 
 interface PassedProps {
   readonly margin?: string
+  readonly isBlueprintLocked: boolean
 }
 
 type ComponentProps = StoreProps & DispatchProps & PassedProps
@@ -121,49 +123,55 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
     }
     return (
       <div style={{display: 'inline-block'}}>
-        <BlackoutDatesModal
-          key={this.state.blackoutDatesModalKey}
-          blackoutDates={this.props.blackoutDates}
-          open={this.state.showBlackoutDatesModal}
-          onSave={this.handleSaveBlackoutDates}
-          onCancel={this.closeBlackoutDatesModal}
-        />
-        <Menu
-          trigger={
-            <IconButton screenReaderLabel={I18n.t('Modify Settings')} margin={this.props.margin}>
-              <IconSettingsLine />
-            </IconButton>
-          }
-          placement="bottom start"
-          show={this.state.showSettingsPopover}
-          onToggle={newState =>
-            this.setState({
-              showSettingsPopover: newState
-            })
-          }
-          shouldHideOnSelect={false}
-          withArrow={false}
+        <Tooltip
+          renderTip={I18n.t('You cannot edit a locked pace')}
+          on={this.props.isBlueprintLocked ? ['hover', 'focus'] : []}
         >
-          <MenuItem
-            type="checkbox"
-            selected={this.props.excludeWeekends}
-            onSelect={this.props.toggleExcludeWeekends}
-            disabled={this.props.isSyncing}
-            data-testid="skip-weekends-toggle"
+          <BlackoutDatesModal
+            key={this.state.blackoutDatesModalKey}
+            blackoutDates={this.props.blackoutDates}
+            open={this.state.showBlackoutDatesModal}
+            onSave={this.handleSaveBlackoutDates}
+            onCancel={this.closeBlackoutDatesModal}
+          />
+          <Menu
+            trigger={
+              <IconButton screenReaderLabel={I18n.t('Modify Settings')} margin={this.props.margin}>
+                <IconSettingsLine />
+              </IconButton>
+            }
+            placement="bottom start"
+            show={this.state.showSettingsPopover}
+            onToggle={newState =>
+              this.setState({
+                showSettingsPopover: newState
+              })
+            }
+            disabled={this.props.isBlueprintLocked}
+            shouldHideOnSelect={false}
+            withArrow={false}
           >
-            {I18n.t('Skip Weekends')}
-          </MenuItem>
-          <MenuItem
-            type="button"
-            onSelect={() => {
-              this.setState({showSettingsPopover: false})
-              this.showBlackoutDatesModal()
-            }}
-            disabled={this.props.isSyncing}
-          >
-            {I18n.t('Manage Blackout Dates')}
-          </MenuItem>
-        </Menu>
+            <MenuItem
+              type="checkbox"
+              selected={this.props.excludeWeekends}
+              onSelect={this.props.toggleExcludeWeekends}
+              disabled={this.props.isSyncing}
+              data-testid="skip-weekends-toggle"
+            >
+              {I18n.t('Skip Weekends')}
+            </MenuItem>
+            <MenuItem
+              type="button"
+              onSelect={() => {
+                this.setState({showSettingsPopover: false})
+                this.showBlackoutDatesModal()
+              }}
+              disabled={this.props.isSyncing}
+            >
+              {I18n.t('Manage Blackout Dates')}
+            </MenuItem>
+          </Menu>
+        </Tooltip>
       </div>
     )
   }

@@ -23,7 +23,9 @@ import {Header} from '../header'
 const defaultProps = {
   context_type: 'Course',
   context_id: '17',
-  newPace: false
+  newPace: false,
+  isBlueprintLocked: false,
+  setIsBlueprintLocked: () => {}
 }
 
 beforeAll(() => {

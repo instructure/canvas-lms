@@ -56,15 +56,26 @@ class CoursePacesController < ApplicationController
       progress_json = progress_json(progress, @current_user, session)
     end
 
+    status = setup_master_course_restrictions([@course_pace], @context)
+
+    if status
+      master_course_data = @course_pace.master_course_api_restriction_data(status)
+      master_course_data[:default_restrictions] = MasterCourses::MasterTemplate.full_template_for(@context).default_restrictions_for(@course_pace) if status == :master
+    end
+
     js_env({
              BLACKOUT_DATES: @blackout_dates.as_json(include_root: false),
              COURSE: course_json(@context, @current_user, session, [], nil),
              ENROLLMENTS: enrollments_json(@context),
              SECTIONS: sections_json(@context),
+             COURSE_ID: @context.id,
+             COURSE_PACE_ID: @course_pace.id,
              COURSE_PACE: CoursePacePresenter.new(@course_pace).as_json,
              COURSE_PACE_PROGRESS: progress_json,
-             VALID_DATE_RANGE: CourseDateRange.new(@context)
+             VALID_DATE_RANGE: CourseDateRange.new(@context),
+             MASTER_COURSE_DATA: master_course_data
            })
+
     js_bundle :course_paces
     css_bundle :course_paces
   end
@@ -191,7 +202,8 @@ class CoursePacesController < ApplicationController
         publish: [:manage_course_content_edit],
         create: [:manage_course_content_add],
         update: [:manage_course_content_edit],
-        compress_dates: [:manage_course_content_edit]
+        compress_dates: [:manage_course_content_edit],
+        master_course_info: [:manage_course_content_edit],
       }
     )
   end

@@ -388,6 +388,29 @@ describe Course do
         expect(@course.allow_final_grade_override).to eq "false"
       end
     end
+
+    describe "enable_course_paces" do
+      let(:migration) { build_migration(@course, {}, all_course_settings: true) }
+
+      it "is set to true when originally true" do
+        import_data = { course: { enable_course_paces: "true" } }.with_indifferent_access
+        Importers::CourseContentImporter.import_content(@course, import_data, nil, migration)
+        expect(@course.enable_course_paces).to eq true
+      end
+
+      it "is set to false when originally true, but with the FF off" do
+        import_data = { course: { enable_course_paces: "true" } }.with_indifferent_access
+        @course.root_account.disable_feature!(:course_paces)
+        Importers::CourseContentImporter.import_content(@course, import_data, nil, migration)
+        expect(@course.enable_course_paces).to eq false
+      end
+
+      it "is set to false when originally false" do
+        import_data = { course: { enable_course_paces: "false" } }.with_indifferent_access
+        Importers::CourseContentImporter.import_content(@course, import_data, nil, migration)
+        expect(@course.enable_course_paces).to eq false
+      end
+    end
   end
 
   describe "shift_date_options" do

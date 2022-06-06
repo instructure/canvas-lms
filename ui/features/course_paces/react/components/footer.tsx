@@ -32,6 +32,7 @@ import {
   getPacePublishing,
   getUnpublishedChangeCount,
   isNewPace,
+  isSectionPace,
   isStudentPace
 } from '../reducers/course_paces'
 import {getBlackoutDatesSyncing, getBlackoutDatesUnsynced} from '../shared/reducers/blackout_dates'
@@ -45,6 +46,7 @@ interface StoreProps {
   readonly isSyncing: boolean
   readonly blackoutDatesUnsynced: boolean
   readonly showLoadingOverlay: boolean
+  readonly sectionPace: boolean
   readonly studentPace: boolean
   readonly newPace: boolean
   readonly unpublishedChanges: boolean
@@ -55,7 +57,11 @@ interface DispatchProps {
   syncUnpublishedChanges: typeof coursePaceActions.syncUnpublishedChanges
 }
 
-type ComponentProps = StoreProps & DispatchProps
+interface PassedProps {
+  readonly blueprintLocked: boolean
+}
+
+type ComponentProps = StoreProps & DispatchProps & PassedProps
 
 export const Footer: React.FC<ComponentProps> = ({
   autoSaving,
@@ -66,8 +72,10 @@ export const Footer: React.FC<ComponentProps> = ({
   onResetPace,
   showLoadingOverlay,
   studentPace,
+  sectionPace,
   newPace,
-  unpublishedChanges
+  unpublishedChanges,
+  blueprintLocked
 }) => {
   const handlePublish = useCallback(() => {
     syncUnpublishedChanges()
@@ -76,7 +84,8 @@ export const Footer: React.FC<ComponentProps> = ({
   if (studentPace) return null
 
   const cancelDisabled = autoSaving || isSyncing || showLoadingOverlay || !unpublishedChanges
-  const pubDisabled = !newPace && cancelDisabled
+  const pubDisabled =
+    !newPace && (cancelDisabled || (blueprintLocked && !sectionPace && !studentPace))
 
   // This wrapper div attempts to roughly match the dimensions of the publish button
   let publishLabel = I18n.t('Publish')
@@ -101,6 +110,8 @@ export const Footer: React.FC<ComponentProps> = ({
   } else if (showLoadingOverlay) {
     cancelTip = I18n.t('You cannot cancel while loading the pace')
     pubTip = I18n.t('You cannot publish while loading the pace')
+  } else if (blueprintLocked) {
+    pubTip = I18n.t('You cannot edit a locked pace')
   } else if (newPace) {
     cancelTip = I18n.t('There are no pending changes to cancel')
   } else {
@@ -122,7 +133,11 @@ export const Footer: React.FC<ComponentProps> = ({
         </Button>
       </Tooltip>
       <Tooltip renderTip={pubDisabled && pubTip} on={pubDisabled ? ['hover', 'focus'] : []}>
-        <Button color="primary" onClick={() => pubDisabled || handlePublish()}>
+        <Button
+          color="primary"
+          disabled={blueprintLocked && !sectionPace && !studentPace}
+          onClick={() => pubDisabled || handlePublish()}
+        >
           {publishLabel}
         </Button>
       </Tooltip>
@@ -139,6 +154,7 @@ const mapStateToProps = (state: StoreState): StoreProps => {
     blackoutDatesUnsynced: getBlackoutDatesUnsynced(state),
     showLoadingOverlay: getShowLoadingOverlay(state),
     studentPace: isStudentPace(state),
+    sectionPace: isSectionPace(state),
     newPace: isNewPace(state),
     unpublishedChanges: getUnpublishedChangeCount(state) !== 0
   }

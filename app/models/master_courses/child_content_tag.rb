@@ -34,6 +34,7 @@ class MasterCourses::ChildContentTag < ActiveRecord::Base
                                      :context_external_tool,
                                      :context_module,
                                      :content_tag,
+                                     :course_pace,
                                      :discussion_topic,
                                      :learning_outcome,
                                      :learning_outcome_group,
