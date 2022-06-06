@@ -49,6 +49,7 @@ const CanvasInbox = () => {
   const [composeModal, setComposeModal] = useState(false)
   const [deleteDisabled, setDeleteDisabled] = useState(true)
   const [archiveDisabled, setArchiveDisabled] = useState(true)
+  const [canReply, setCanReply] = useState(true)
   const [isReply, setIsReply] = useState(false)
   const [isReplyAll, setIsReplyAll] = useState(false)
   const [isForward, setIsForward] = useState(false)
@@ -316,6 +317,7 @@ const CanvasInbox = () => {
                   displayUnarchiveButton={displayUnarchiveButton}
                   conversationsQueryOptions={conversationsQueryOption}
                   onDelete={handleDelete}
+                  canReply={canReply}
                 />
               </Flex.Item>
             )}
@@ -378,6 +380,7 @@ const CanvasInbox = () => {
                           </View>
                         )}
                         <MessageDetailContainer
+                          setCanReply={setCanReply}
                           conversation={selectedConversations[0]}
                           onReply={conversationMessage => onReply({conversationMessage})}
                           onReplyAll={conversationMessage =>

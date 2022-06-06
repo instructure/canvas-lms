@@ -29,19 +29,21 @@ const I18n = useI18nScope('conversations_2')
 export const MessageDetailActions = ({...props}) => {
   return (
     <>
-      <Tooltip renderTip={I18n.t('Reply')} on={['hover', 'focus']}>
-        <IconButton
-          size="small"
-          margin="0 x-small 0 0"
-          screenReaderLabel={I18n.t('Reply')}
-          onClick={props.onReply}
-          data-testid="message-reply"
-          withBackground={false}
-          withBorder={false}
-        >
-          <IconReplyLine />
-        </IconButton>
-      </Tooltip>
+      {props.onReply && (
+        <Tooltip renderTip={I18n.t('Reply')} on={['hover', 'focus']}>
+          <IconButton
+            size="small"
+            margin="0 x-small 0 0"
+            screenReaderLabel={I18n.t('Reply')}
+            onClick={props.onReply}
+            data-testid="message-reply"
+            withBackground={false}
+            withBorder={false}
+          >
+            <IconReplyLine />
+          </IconButton>
+        </Tooltip>
+      )}
       <Menu
         placement="bottom"
         trigger={
@@ -59,12 +61,16 @@ export const MessageDetailActions = ({...props}) => {
           </Tooltip>
         }
       >
-        <Menu.Item value="reply-all" onSelect={props.onReplyAll}>
-          {I18n.t('Reply All')}
-        </Menu.Item>
-        <Menu.Item value="forward" onSelect={props.onForward}>
-          {I18n.t('Forward')}
-        </Menu.Item>
+        {props.onReplyAll && (
+          <Menu.Item value="reply-all" onSelect={props.onReplyAll}>
+            {I18n.t('Reply All')}
+          </Menu.Item>
+        )}
+        {props.onForward && (
+          <Menu.Item value="forward" onSelect={props.onForward}>
+            {I18n.t('Forward')}
+          </Menu.Item>
+        )}
         <Menu.Item value="delete" onSelect={props.onDelete} data-testid="message-delete">
           {I18n.t('Delete')}
         </Menu.Item>

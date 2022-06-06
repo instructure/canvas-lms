@@ -149,6 +149,11 @@ export const MessageDetailContainer = props => {
       ? submissionCommentsQuery.data?.legacyNode
       : conversationMessagesQuery.data?.legacyNode
 
+    if (data) {
+      const canReply = isSubmissionCommentsType ? true : data?.canReply
+      props.setCanReply(canReply)
+    }
+
     const messageData = inboxMessagesWrapper(data, isSubmissionCommentsType)
 
     if (
@@ -164,6 +169,7 @@ export const MessageDetailContainer = props => {
     conversationMessagesQuery.data,
     conversationMessagesQuery.loading,
     isSubmissionCommentsType,
+    props,
     submissionCommentsQuery.data,
     submissionCommentsQuery.loading
   ])
@@ -278,7 +284,7 @@ export const MessageDetailContainer = props => {
 
   const renderLoading = () => {
     return (
-      <View as="div" textAlign="center" margin="large none">
+      <View as="div" textAlign="center" margin="large none" data-testid="conversation-loader">
         <Spinner renderTitle={() => I18n.t('Loading Conversation Messages')} variant="inverse" />
       </View>
     )
@@ -300,8 +306,8 @@ export const MessageDetailContainer = props => {
       <MessageDetailItem
         conversationMessage={message}
         contextName={inboxMessageData?.contextName}
-        onReply={() => props.onReply(message)}
-        onReplyAll={() => props.onReplyAll(message)}
+        onReply={inboxMessageData?.canReply ? () => props.onReply(message) : null}
+        onReplyAll={inboxMessageData?.canReply ? () => props.onReplyAll(message) : null}
         onDelete={() => handleDeleteConversationMessage(message._id)}
         onForward={() => props.onForward(message)}
       />
@@ -329,8 +335,8 @@ export const MessageDetailContainer = props => {
         focusRef={setMessageRef}
         text={props.conversation.subject}
         onForward={props.onForward}
-        onReply={props.onReply}
-        onReplyAll={props.onReplyAll}
+        onReply={inboxMessageData?.canReply ? props.onReply : null}
+        onReplyAll={inboxMessageData?.canReply ? props.onReplyAll : null}
         onDelete={() => props.onDelete([props.conversation._id])}
         submissionCommentURL={inboxMessageData?.submissionCommentURL}
       />
@@ -350,5 +356,6 @@ MessageDetailContainer.propTypes = {
   onReply: PropTypes.func,
   onReplyAll: PropTypes.func,
   onDelete: PropTypes.func,
-  onForward: PropTypes.func
+  onForward: PropTypes.func,
+  setCanReply: PropTypes.func
 }

@@ -26,6 +26,7 @@ import {graphql} from 'msw'
 import {Group} from './Group'
 import {User} from './User'
 import {PageInfo} from './PageInfo'
+import {CONVERSATION_ID_WHERE_CAN_REPLY_IS_FALSE} from '../util/constants'
 
 // helper function that filters out undefined values in objects before assigning
 const mswAssign = (target, ...objects) => {
@@ -214,6 +215,9 @@ export const handlers = [
   }),
 
   graphql.query('GetConversationMessagesQuery', (req, res, ctx) => {
+    if (req.variables.conversationID === CONVERSATION_ID_WHERE_CAN_REPLY_IS_FALSE) {
+      return res(ctx.data({legacyNode: Conversation.mock({canReply: false})}))
+    }
     return res(ctx.data({legacyNode: Conversation.mock()}))
   }),
 
