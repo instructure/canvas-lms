@@ -710,6 +710,9 @@ class SubmissionsApiController < ApplicationController
   # @argument comment[text_comment] [String]
   #   Add a textual comment to the submission.
   #
+  # @argument comment[attempt] [Integer]
+  #   The attempt number (starts at 1) to associate the comment with.
+  #
   # @argument comment[group_comment] [Boolean]
   #   Whether or not this comment should be sent to the entire group (defaults
   #   to false). Ignored if this is not a group assignment or if no text_comment
@@ -913,8 +916,9 @@ class SubmissionsApiController < ApplicationController
       if comment.is_a?(ActionController::Parameters)
         admin_in_context = !@context_enrollment || @context_enrollment.admin?
         comment = {
-          comment: comment[:text_comment],
+          attempt: comment[:attempt],
           author: @current_user,
+          comment: comment[:text_comment],
           hidden: @submission.hide_grade_from_student? && admin_in_context
         }.merge(
           comment.permit(:media_comment_id, :media_comment_type, :group_comment).to_unsafe_h

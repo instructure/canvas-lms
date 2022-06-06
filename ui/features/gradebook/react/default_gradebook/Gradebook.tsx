@@ -3686,6 +3686,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       group_comment: groupComment,
       text_comment: comment
     }
+    const {attempt} = this.getSubmission(studentId, assignmentId) || {}
+    if (attempt) {
+      commentData.attempt = attempt
+    }
+
     return SubmissionCommentApi.createSubmissionComment(
       this.options.context_id,
       assignmentId,
