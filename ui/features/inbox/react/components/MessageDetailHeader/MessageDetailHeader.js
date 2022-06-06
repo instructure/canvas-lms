@@ -116,6 +116,14 @@ export const MessageDetailHeader = ({...props}) => {
                     {I18n.t('Forward')}
                   </Menu.Item>
                 )}
+                {props.scope !== 'sent' && (
+                  <Menu.Item
+                    value={props.onArchive ? 'archive' : 'unarchive'}
+                    onSelect={props.onArchive ? props.onArchive : props.onUnarchive}
+                  >
+                    {props.onArchive ? I18n.t('Archive') : I18n.t('Unarchive')}
+                  </Menu.Item>
+                )}
                 <Menu.Item value="star">{I18n.t('Star')}</Menu.Item>
                 <Menu.Item value="delete" onSelect={props.onDelete}>
                   {I18n.t('Delete')}
@@ -134,10 +142,13 @@ MessageDetailHeader.propTypes = {
   text: PropTypes.string,
   onReply: PropTypes.func,
   onReplyAll: PropTypes.func,
+  onArchive: PropTypes.func,
+  onUnarchive: PropTypes.func,
   onDelete: PropTypes.func,
   focusRef: PropTypes.any,
   onForward: PropTypes.func,
-  submissionCommentURL: PropTypes.string
+  submissionCommentURL: PropTypes.string,
+  scope: PropTypes.string
 }
 
 MessageDetailHeader.defaultProps = {

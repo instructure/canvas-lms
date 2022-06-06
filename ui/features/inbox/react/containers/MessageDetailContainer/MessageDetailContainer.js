@@ -337,8 +337,11 @@ export const MessageDetailContainer = props => {
         onForward={props.onForward}
         onReply={inboxMessageData?.canReply ? props.onReply : null}
         onReplyAll={inboxMessageData?.canReply ? props.onReplyAll : null}
+        onArchive={props.onArchive}
+        onUnarchive={props.onUnarchive}
         onDelete={() => props.onDelete([props.conversation._id])}
         submissionCommentURL={inboxMessageData?.submissionCommentURL}
+        scope={props.scope}
       />
       {isLoading && !isLoadingMoreData && renderLoading()}
       {(!isLoading || isLoadingMoreData) && (
@@ -355,7 +358,10 @@ MessageDetailContainer.propTypes = {
   conversation: Conversation.shape,
   onReply: PropTypes.func,
   onReplyAll: PropTypes.func,
+  onArchive: PropTypes.func,
+  onUnarchive: PropTypes.func,
   onDelete: PropTypes.func,
   onForward: PropTypes.func,
-  setCanReply: PropTypes.func
+  setCanReply: PropTypes.func,
+  scope: PropTypes.string
 }
