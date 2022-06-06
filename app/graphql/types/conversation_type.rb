@@ -30,6 +30,12 @@ module Types
     field :context_id, ID, null: true
     field :subject, String, null: true
     field :updated_at, Types::DateTimeType, null: true
+    field :can_reply, Boolean, null: true
+    def can_reply
+      other_users = object.participants.reject { |u| u.id == current_user.id }
+      audience = other_users.map(&:id)
+      !object.replies_locked_for?(current_user, audience)
+    end
 
     field :conversation_messages_connection, Types::ConversationMessageType.connection_type, null: true do
       argument :participants, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User")

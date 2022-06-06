@@ -123,6 +123,7 @@ export const CONVERSATION_MESSAGES_QUERY = gql`
     legacyNode(_id: $conversationID, type: Conversation) {
       ... on Conversation {
         ...Conversation
+        canReply
         conversationMessagesConnection(first: 20, after: $afterMessage) {
           nodes {
             ...ConversationMessage
