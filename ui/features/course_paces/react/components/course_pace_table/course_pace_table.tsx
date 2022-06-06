@@ -25,7 +25,7 @@ import {
   getCompression,
   getModulesWithItemsMergedWithDueDatesAndBlackoutDates
 } from '../../reducers/course_paces'
-import {getResponsiveSize, getShowProjections} from '../../reducers/ui'
+import {getResponsiveSize, getShowProjections, getSelectedContextType} from '../../reducers/ui'
 import {Module} from './module'
 
 interface StoreProps {
@@ -35,12 +35,18 @@ interface StoreProps {
   readonly compression: number
   readonly modulesWithItemsWithDates: ModuleWithDueDates[]
 }
-export const CoursePaceTable: React.FC<StoreProps> = ({
+
+interface PassedProps {
+  readonly blueprintLocked: boolean
+}
+
+export const CoursePaceTable: React.FC<StoreProps & PassedProps> = ({
   coursePace,
   responsiveSize,
   showProjections,
   compression,
-  modulesWithItemsWithDates
+  modulesWithItemsWithDates,
+  blueprintLocked
 }) => {
   return (
     <>
@@ -52,6 +58,7 @@ export const CoursePaceTable: React.FC<StoreProps> = ({
           coursePace={coursePace}
           responsiveSize={responsiveSize}
           showProjections={showProjections}
+          blueprintLocked={blueprintLocked}
           compression={compression}
         />
       ))}

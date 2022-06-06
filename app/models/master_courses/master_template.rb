@@ -275,6 +275,8 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
       item_scope = case klass
                    when "Attachment"
                      course.attachments.where(file_state: "deleted")
+                   when "CoursePace"
+                     course.course_paces.where(workflow_state: "deleted")
                    else
                      klass.constantize.where(context_id: course, context_type: "Course", workflow_state: "deleted")
                    end

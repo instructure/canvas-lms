@@ -80,6 +80,12 @@ describe ContentMigration do
         course_pace_to = @copy_to.course_paces.where(workflow_state: "unpublished").take
         expect(course_pace_to.course_pace_module_items.count).to eq 1
       end
+
+      it "does not copy paces if the FF is off" do
+        @copy_from.root_account.disable_feature!(:course_paces)
+        run_course_copy
+        expect(@copy_to.course_paces).to eq []
+      end
     end
   end
 end

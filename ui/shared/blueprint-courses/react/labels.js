@@ -71,6 +71,9 @@ const itemTypeLabels = {
   },
   get settings() {
     return I18n.t('Settings')
+  },
+  get course_pace() {
+    return I18n.t('Course Pace')
   }
 }
 
@@ -89,6 +92,9 @@ const itemTypeLabelPlurals = {
   },
   get attachment() {
     return I18n.t('Files')
+  },
+  get course_pace() {
+    return I18n.t('Course Pace')
   }
 }
 
