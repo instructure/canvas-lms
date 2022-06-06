@@ -43,11 +43,11 @@ describe ObserverEnrollmentsHelper do
     course.enroll_user(observer, "ObserverEnrollment", { associated_user_id: linked_student.id })
   end
 
-  it "returns empty list if user has no self or observer enrollments" do
+  it "returns empty list if user has no self or unlinked observer enrollments" do
     expect(observed_users(@observer, nil)).to eq []
   end
 
-  it "returns just self user if user has no observer enrollments" do
+  it "returns self user if user has only self enrollments" do
     @course1.enroll_teacher(@observer)
 
     users = observed_users(@observer, nil)
@@ -69,7 +69,7 @@ describe ObserverEnrollmentsHelper do
     expect(@selected_observed_user.id).to be(@observer.id)
   end
 
-  it "does not include self user if no own enrollments" do
+  it "does not include self user if no self of unlinked observer enrollments" do
     enroll_observer(@course1, @observer, @student1)
     enroll_observer(@course1, @observer, @student2)
 
@@ -78,6 +78,15 @@ describe ObserverEnrollmentsHelper do
     expect(users[0][:name]).to eq("Student 1")
     expect(users[1][:name]).to eq("Student 2")
     expect(@selected_observed_user.id).to be(@student1.id)
+  end
+
+  it "includes self user if the user has unlinked observer enrollments" do
+    @course1.enroll_user(@observer, "ObserverEnrollment")
+
+    users = observed_users(@observer, nil)
+    expect(users.length).to be(1)
+    expect(users[0][:name]).to eq("Observer")
+    expect(@selected_observed_user.id).to be(@observer.id)
   end
 
   it "sorts by sortable name except self enrollment" do

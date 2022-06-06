@@ -119,17 +119,22 @@ const K5DashboardOptionsMenu = ({onDisableK5Dashboard}) => {
   )
 }
 
-const toRenderTabs = (currentUserRoles, hideGradesTabForStudents) =>
-  DASHBOARD_TABS.filter(
-    ({id}) =>
-      (id !== TAB_IDS.TODO &&
-        !(
-          hideGradesTabForStudents &&
-          id === TAB_IDS.GRADES &&
-          currentUserRoles.includes('student')
-        )) ||
-      currentUserRoles.includes('teacher')
-  )
+const toRenderTabs = (currentUserRoles, hideGradesTabForStudents, selectedSelfUser) =>
+  DASHBOARD_TABS.filter(({id}) => {
+    switch (id) {
+      case TAB_IDS.TODO:
+        return currentUserRoles.includes('teacher')
+      case TAB_IDS.GRADES:
+        return (
+          currentUserRoles.includes('teacher') ||
+          currentUserRoles.includes('admin') ||
+          (currentUserRoles.includes('student') && !hideGradesTabForStudents) ||
+          (currentUserRoles.includes('observer') && !selectedSelfUser)
+        )
+      default:
+        return true
+    }
+  })
 
 const getWindowSize = () => ({
   width: window.innerWidth,
@@ -160,8 +165,11 @@ export const K5Dashboard = ({
   const initialObservedId = observedUsersList.find(o => o.id === savedObservedId(currentUser.id))
     ? savedObservedId(currentUser.id)
     : undefined
+  const [observedUserId, setObservedUserId] = useState(initialObservedId)
+  const observerMode = currentUserRoles.includes('observer')
+  const selectedSelfUser = observerMode && currentUser.id === observedUserId
 
-  const availableTabs = toRenderTabs(currentUserRoles, hideGradesTabForStudents)
+  const availableTabs = toRenderTabs(currentUserRoles, hideGradesTabForStudents, selectedSelfUser)
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, availableTabs)
   const [cards, setCards] = useState(null)
   const [cardsSettled, setCardsSettled] = useState(false)
@@ -170,7 +178,6 @@ export const K5Dashboard = ({
   const [loadingAnnouncements, setLoadingAnnouncements] = useState(true)
   const [tabsRef, setTabsRef] = useState(null)
   const [trayOpen, setTrayOpen] = useState(false)
-  const [observedUserId, setObservedUserId] = useState(initialObservedId)
   const [cardDashboardLoader, setCardDashboardLoader] = useState(null)
   const plannerInitialized = usePlanner({
     plannerEnabled,
@@ -179,7 +186,6 @@ export const K5Dashboard = ({
     observedUserId: initialObservedId,
     isObserver: currentUserRoles.includes('observer')
   })
-  const observerMode = currentUserRoles.includes('observer')
   const canDisableElementaryDashboard =
     currentUserRoles.some(r => ['admin', 'teacher'].includes(r)) &&
     (!observerMode || observedUserId === currentUser.id)

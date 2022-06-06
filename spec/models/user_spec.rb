@@ -805,7 +805,7 @@ describe User do
         observer_enrollment2.associated_user_id = @student.id
         observer_enrollment2.save!
 
-        @teacher_course = course_factory(course_name: "English ", active_course: true)
+        @teacher_course = course_factory(course_name: "English", active_course: true)
         @teacher_enrollment = @teacher_course.enroll_user(@user, "TeacherEnrollment", enrollment_state: "active")
         @teacher_enrollment.save!
 
@@ -845,6 +845,16 @@ describe User do
          .map { |c| [c.id, c.primary_enrollment_type] }).to eq [
            [@student_course.id, "StudentEnrollment"]
          ]
+      end
+
+      it "includes only unlinked observer enrollments if the associated_user is the current user" do
+        user_factory(active_all: true)
+        @observer_course.enroll_user(@user, "ObserverEnrollment", enrollment_state: :active)
+        @observer_course2.enroll_user(@user, "ObserverEnrollment", enrollment_state: :active, associated_user_id: @student.id)
+
+        expect(@user
+                 .courses_with_primary_enrollment(:current_and_invited_courses, nil, observee_user: @user)
+                 .pluck(:id)).to eq([@observer_course.id])
       end
 
       describe "with cross sharding" do

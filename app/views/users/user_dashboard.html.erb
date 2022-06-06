@@ -50,7 +50,7 @@
         <%= prefetch_xhr("/api/v1/planner/items?start_date=#{beginning_of_day}") %>
         <%= prefetch_xhr('/api/v1/users/self/missing_submissions?include%5B%5D=planner_overrides&filter%5B%5D=current_grading_period&filter%5B%5D=submittable') %>
       <% end %>
-    <% else  #is_observer %>
+    <% else  #is_observer, self is not selected %>
       <% observed_course_ids = @current_user.cached_course_ids_for_observed_user(@selected_observed_user)
         .sort {|a, b| a <=> b }
         .map {|cid|  "course_ids%5B%5D=#{cid}" }
