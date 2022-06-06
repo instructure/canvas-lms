@@ -117,6 +117,12 @@ describe Quizzes::QuizRegrader::Answer do
   end
 
   describe "#regrade!" do
+    it "uses BigDecimal for scoring" do
+      mark_original_answer_as!(:correct)
+      score_question_as!(:wrong)
+      expect(wrapper.regrade!).to be_instance_of(BigDecimal)
+    end
+
     context "full_credit regrade option" do
       it "returns the points possible for the question if the answer was not correct before" do
         mark_original_answer_as!(:wrong)
