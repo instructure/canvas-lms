@@ -229,6 +229,7 @@ export type AssignmentGroupMap = {
 }
 
 export type Submission = {
+  attempt: number | null
   user_id: string
   assignment_id: string
   submitted_at: string
