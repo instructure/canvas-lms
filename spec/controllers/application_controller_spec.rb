@@ -2512,7 +2512,7 @@ RSpec.describe ApplicationController do
         expect(@controller.send(:k5_user?)).to be_falsey
       end
 
-      it "ignores an observer's ObserverEnrollments when determining k5_user? for themself" do
+      it "ignores a user's linked ObserverEnrollments when determining k5_user? for themself" do
         @observer.enrollments.not_of_observer_type.destroy_all
         classic_course = course_factory(active_all: true)
         classic_course.enroll_teacher(@observer, enrollment_state: :active)
@@ -2521,6 +2521,16 @@ RSpec.describe ApplicationController do
         k5_course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: :active, associated_user_id: @student)
 
         expect(@controller.send(:k5_user?)).to be_falsey
+      end
+
+      it "considers a user's unlinked ObserverEnrollments when determining k5_user? for themself" do
+        @observer.enrollments.not_of_observer_type.destroy_all
+        classic_course = course_factory(active_all: true)
+        classic_course.enroll_teacher(@observer, enrollment_state: :active)
+        k5_course = course_factory(account: @k5_account, active_all: true)
+        k5_course.enroll_user(@observer, "ObserverEnrollment", enrollment_state: :active)
+
+        expect(@controller.send(:k5_user?)).to be_truthy
       end
 
       it "returns true when a k5 student is selected, even if observer has disabled k5 dashboard" do

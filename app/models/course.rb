@@ -105,6 +105,10 @@ class Course < ActiveRecord::Base
     where("enrollments.workflow_state NOT IN ('rejected', 'deleted') AND enrollments.type<>'ObserverEnrollment'")
       .preload(:user)
   }, class_name: "Enrollment"
+  has_many :enrollments_excluding_linked_observers, lambda {
+    where("enrollments.workflow_state NOT IN ('rejected', 'deleted') AND NOT (enrollments.type = 'ObserverEnrollment' AND enrollments.associated_user_id IS NOT NULL)")
+      .preload(:user)
+  }, class_name: "Enrollment"
   has_many :participating_observers, -> { where(enrollments: { workflow_state: "active" }) }, through: :observer_enrollments, source: :user
   has_many :participating_observers_by_date, lambda {
                                                where(enrollments: { type: "ObserverEnrollment", workflow_state: "active" })
