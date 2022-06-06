@@ -92,7 +92,7 @@ describe SisImportsApiController, type: :request do
                     { controller: "sis_imports_api", action: "create",
                       format: "json", account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
-                      attachment: fixture_file_upload("files/sis/test_user_1.csv", "text/csv") })
+                      attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv") })
     expect(Delayed::Job.where(singleton: "sis_batch:account:#{@account.id}").count).to eq 1
 
     expect(json).to have_key("created_at")
@@ -286,7 +286,7 @@ describe SisImportsApiController, type: :request do
                { controller: "sis_imports_api", action: "create",
                  format: "json", account_id: @account.id.to_s },
                { import_type: "instructure_csv",
-                 attachment: fixture_file_upload("files/sis/test_user_1.csv", "text/csv") })
+                 attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv") })
     end.to change { Delayed::Job.strand_size("sis_batch:account:#{@account.id}") }.by(0)
   end
 
@@ -296,7 +296,7 @@ describe SisImportsApiController, type: :request do
                     { controller: "sis_imports_api", action: "create",
                       format: "json", account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
-                      attachment: fixture_file_upload("files/sis/test_user_1.csv", "text/csv"),
+                      attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
                       batch_mode: "1",
                       batch_mode_term_id: @account.default_enrollment_term.id })
     batch = SisBatch.find(json["id"])
@@ -310,7 +310,7 @@ describe SisImportsApiController, type: :request do
                     { controller: "sis_imports_api", action: "create",
                       format: "json", account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
-                      attachment: fixture_file_upload("files/sis/test_user_1.csv", "text/csv"),
+                      attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
                       batch_mode: "1",
                       change_threshold: 7,
                       batch_mode_term_id: @account.default_enrollment_term.id })
@@ -324,7 +324,7 @@ describe SisImportsApiController, type: :request do
                     { controller: "sis_imports_api", action: "create",
                       format: "json", account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
-                      attachment: fixture_file_upload("files/sis/test_user_1.csv", "text/csv"),
+                      attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
                       multi_term_batch_mode: "1" })
     expect(json["message"]).to eq "change_threshold is required to use multi term_batch mode."
   end
@@ -335,7 +335,7 @@ describe SisImportsApiController, type: :request do
                     { controller: "sis_imports_api", action: "create",
                       format: "json", account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
-                      attachment: fixture_file_upload("files/sis/test_user_1.csv", "text/csv"),
+                      attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
                       batch_mode: "1",
                       multi_term_batch_mode: "1",
                       change_threshold: 7, })
@@ -350,7 +350,7 @@ describe SisImportsApiController, type: :request do
                     { controller: "sis_imports_api", action: "create",
                       format: "json", account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
-                      attachment: fixture_file_upload("files/sis/test_user_1.csv", "text/csv"),
+                      attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
                       batch_mode: "true",
                       clear_sis_stickiness: "true",
                       override_sis_stickiness: "true",
@@ -374,7 +374,7 @@ describe SisImportsApiController, type: :request do
       },
       {
         import_type: "instructure_csv",
-        attachment: fixture_file_upload("files/sis/test_user_1.csv", "text/csv"),
+        attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
         update_sis_id_if_login_claimed: true
       }
     )
@@ -388,7 +388,7 @@ describe SisImportsApiController, type: :request do
                     { controller: "sis_imports_api", action: "create",
                       format: "json", account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
-                      attachment: fixture_file_upload("files/sis/test_user_1.csv", "text/csv"),
+                      attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
                       diffing_data_set_identifier: "my-users-data",
                       diffing_drop_status: "inactive",
                       change_threshold: 7,
@@ -410,7 +410,7 @@ describe SisImportsApiController, type: :request do
                     { controller: "sis_imports_api", action: "create",
                       format: "json", account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
-                      attachment: fixture_file_upload("files/sis/test_user_1.csv", "text/csv"),
+                      attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
                       diffing_data_set_identifier: "my-users-data",
                       diffing_remaster_data_set: "true",
                       diffing_drop_status: "inactive",
@@ -434,7 +434,7 @@ describe SisImportsApiController, type: :request do
       { controller: "sis_imports_api", action: "create",
         format: "json", account_id: @account.id.to_s },
       { import_type: "instructure_csv",
-        attachment: fixture_file_upload("files/sis/test_user_1.csv", "text/csv"),
+        attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
         diffing_data_set_identifier: "my-users-data",
         diffing_drop_status: "deleted_last_completed",
         change_threshold: 7, }
@@ -453,7 +453,7 @@ describe SisImportsApiController, type: :request do
                     { controller: "sis_imports_api", action: "create",
                       format: "json", account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
-                      attachment: fixture_file_upload("files/sis/test_user_1.csv", "text/csv"),
+                      attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
                       diffing_data_set_identifier: "my-users-data",
                       diffing_drop_status: "invalid",
                       change_threshold: 7, }, {}, expected_status: 400)
@@ -467,7 +467,7 @@ describe SisImportsApiController, type: :request do
                       { controller: "sis_imports_api", action: "create",
                         format: "json", account_id: @account.id.to_s },
                       { import_type: "instructure_csv",
-                        attachment: fixture_file_upload("files/sis/test_user_1.csv", "text/csv"),
+                        attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
                         batch_mode: "1" }, {}, expected_status: 400)
       expect(json["message"]).to eq "Batch mode specified, but the given batch_mode_term_id cannot be found."
     end.to change(SisBatch, :count).by(0)
@@ -479,7 +479,7 @@ describe SisImportsApiController, type: :request do
                     { controller: "sis_imports_api", action: "create",
                       format: "json", account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
-                      attachment: fixture_file_upload("files/sis/test_user_1.csv", "text/csv") })
+                      attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv") })
     batch = SisBatch.find(json["id"])
     expect(batch.options).to eq({ skip_deletes: false, update_sis_id_if_login_claimed: false })
     batch.destroy
@@ -489,7 +489,7 @@ describe SisImportsApiController, type: :request do
                     { controller: "sis_imports_api", action: "create",
                       format: "json", account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
-                      attachment: fixture_file_upload("files/sis/test_user_1.csv", "text/csv"),
+                      attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
                       override_sis_stickiness: "1" })
     batch = SisBatch.find(json["id"])
     expect(batch.options).to eq({
@@ -504,7 +504,7 @@ describe SisImportsApiController, type: :request do
                     { controller: "sis_imports_api", action: "create",
                       format: "json", account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
-                      attachment: fixture_file_upload("files/sis/test_user_1.csv", "text/csv"),
+                      attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
                       override_sis_stickiness: "1",
                       add_sis_stickiness: "1" })
     batch = SisBatch.find(json["id"])
@@ -521,7 +521,7 @@ describe SisImportsApiController, type: :request do
                     { controller: "sis_imports_api", action: "create",
                       format: "json", account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
-                      attachment: fixture_file_upload("files/sis/test_user_1.csv", "text/csv"),
+                      attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
                       override_sis_stickiness: "1",
                       clear_sis_stickiness: "1" })
     batch = SisBatch.find(json["id"])
@@ -538,7 +538,7 @@ describe SisImportsApiController, type: :request do
                     { controller: "sis_imports_api", action: "create",
                       format: "json", account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
-                      attachment: fixture_file_upload("files/sis/test_user_1.csv", "text/csv"),
+                      attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
                       add_sis_stickiness: "1" })
     batch = SisBatch.find(json["id"])
     expect(batch.options).to eq({ skip_deletes: false, update_sis_id_if_login_claimed: false })
@@ -549,7 +549,7 @@ describe SisImportsApiController, type: :request do
                     { controller: "sis_imports_api", action: "create",
                       format: "json", account_id: @account.id.to_s },
                     { import_type: "instructure_csv",
-                      attachment: fixture_file_upload("files/sis/test_user_1.csv", "text/csv"),
+                      attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv"),
                       clear_sis_stickiness: "1" })
     batch = SisBatch.find(json["id"])
     expect(batch.options).to eq({ skip_deletes: false, update_sis_id_if_login_claimed: false })
@@ -958,7 +958,7 @@ describe SisImportsApiController, type: :request do
              { controller: "sis_imports_api", action: "create",
                format: "json", account_id: @account.id.to_s },
              { import_type: "instructure_csv",
-               attachment: fixture_file_upload("files/sis/test_user_1.csv", "text/csv") },
+               attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv") },
              {},
              expected_status: 401)
   end
@@ -970,7 +970,7 @@ describe SisImportsApiController, type: :request do
              { controller: "sis_imports_api", action: "create",
                format: "json", account_id: @account.id.to_s },
              { import_type: "instructure_csv",
-               attachment: fixture_file_upload("files/sis/test_user_1.csv", "text/csv") },
+               attachment: fixture_file_upload("sis/test_user_1.csv", "text/csv") },
              {},
              expected_status: 200)
   end

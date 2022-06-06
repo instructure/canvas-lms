@@ -351,9 +351,9 @@ module GroupsCommon
                             @testgroup.first
                           end
 
-    add_file(fixture_file_upload("files/example.pdf", "application/pdf"),
+    add_file(fixture_file_upload("example.pdf", "application/pdf"),
              @testgroup.first, "example.pdf")
-    add_file(fixture_file_upload("files/a_file.txt", "text/plain"),
+    add_file(fixture_file_upload("a_file.txt", "text/plain"),
              second_file_context, "a_file.txt")
   end
 

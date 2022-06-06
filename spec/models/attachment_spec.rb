@@ -2585,31 +2585,31 @@ describe Attachment do
       end
 
       it "updates the word count for a PDF" do
-        attachment_model(filename: "test.pdf", uploaded_data: fixture_file_upload("files/example.pdf", "application/pdf"))
+        attachment_model(filename: "test.pdf", uploaded_data: fixture_file_upload("example.pdf", "application/pdf"))
         @attachment.update_word_count
         expect(@attachment.word_count).to eq 3320
       end
 
       it "updates the word count for a DOCX file" do
-        attachment_model(filename: "test.docx", uploaded_data: fixture_file_upload("files/test.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+        attachment_model(filename: "test.docx", uploaded_data: fixture_file_upload("test.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
         @attachment.update_word_count
         expect(@attachment.word_count).to eq 5
       end
 
       it "updates the word count for an RTF file" do
-        attachment_model(filename: "test.rtf", uploaded_data: fixture_file_upload("files/test.rtf", "application/rtf"))
+        attachment_model(filename: "test.rtf", uploaded_data: fixture_file_upload("test.rtf", "application/rtf"))
         @attachment.update_word_count
         expect(@attachment.word_count).to eq 5
       end
 
       it "updates the word count for a text file" do
-        attachment_model(filename: "test.txt", uploaded_data: fixture_file_upload("files/amazing_file.txt", "text/plain"))
+        attachment_model(filename: "test.txt", uploaded_data: fixture_file_upload("amazing_file.txt", "text/plain"))
         @attachment.update_word_count
         expect(@attachment.word_count).to eq 5
       end
 
       it "sets 0 if the file is not supported" do
-        attachment_model(filename: "test.png", uploaded_data: fixture_file_upload("files/instructure.png", "image/png"))
+        attachment_model(filename: "test.png", uploaded_data: fixture_file_upload("instructure.png", "image/png"))
         @attachment.update_word_count
         expect(@attachment.word_count).to eq 0
       end

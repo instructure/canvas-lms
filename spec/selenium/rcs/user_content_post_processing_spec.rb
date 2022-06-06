@@ -28,7 +28,7 @@ describe "user_content post processing" do
       @course.attachments.create!(
         display_name: "file",
         context: @teacher,
-        uploaded_data: fixture_file_upload("files/a_file.txt", "text/plain")
+        uploaded_data: fixture_file_upload("a_file.txt", "text/plain")
       )
     @file.save!
     @file_url = "/users/#{@teacher.id}/files/#{@file.id}"
@@ -178,7 +178,7 @@ describe "user_content post processing" do
         @teacher.attachments.create!(
           display_name: "file",
           context: @teacher,
-          uploaded_data: fixture_file_upload("files/a_file.txt", "text/plain")
+          uploaded_data: fixture_file_upload("a_file.txt", "text/plain")
         )
       file.save!
       file_url = "/users/#{@teacher.id}/files/#{file.id}"

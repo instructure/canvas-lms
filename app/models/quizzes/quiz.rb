@@ -1195,14 +1195,14 @@ class Quizzes::Quiz < ActiveRecord::Base
             SELECT ao.quiz_id, aos.user_id, ao.due_at, ao.due_at_overridden, 1 AS priority
             FROM #{AssignmentOverride.quoted_table_name} ao
             INNER JOIN #{AssignmentOverrideStudent.quoted_table_name} aos ON ao.id = aos.assignment_override_id AND ao.set_type = 'ADHOC'
-            WHERE aos.user_id = #{User.connection.quote(user)}
+            WHERE aos.user_id = #{User.connection.quote(user.id_for_database)}
               AND ao.workflow_state = 'active'
               AND aos.workflow_state <> 'deleted'
             UNION
             SELECT ao.quiz_id, e.user_id, ao.due_at, ao.due_at_overridden, 1 AS priority
             FROM #{AssignmentOverride.quoted_table_name} ao
             INNER JOIN #{Enrollment.quoted_table_name} e ON e.course_section_id = ao.set_id AND ao.set_type = 'CourseSection'
-            WHERE e.user_id = #{User.connection.quote(user)}
+            WHERE e.user_id = #{User.connection.quote(user.id_for_database)}
               AND e.workflow_state NOT IN ('rejected', 'deleted', 'inactive')
               AND ao.workflow_state = 'active'
             UNION
@@ -1211,7 +1211,7 @@ class Quizzes::Quiz < ActiveRecord::Base
             INNER JOIN #{Enrollment.quoted_table_name} e ON e.course_id = q.context_id
             WHERE e.workflow_state NOT IN ('rejected', 'deleted', 'inactive')
               AND e.type in ('StudentEnrollment', 'StudentViewEnrollment')
-              AND e.user_id = #{User.connection.quote(user)}
+              AND e.user_id = #{User.connection.quote(user.id_for_database)}
               AND q.assignment_id IS NULL
               AND NOT q.only_visible_to_overrides
           ) o
