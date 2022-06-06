@@ -421,7 +421,7 @@ const MessageListActionContainer = props => {
                 markAsRead={handleMarkAsRead}
                 reply={props.onReply}
                 replyAll={props.onReplyAll}
-                replyDisabled={!hasSelectedConversations()}
+                replyDisabled={!hasSelectedConversations() || !props.canReply}
                 star={!firstConversationIsStarred ? () => handleStar(true) : null}
                 unstar={firstConversationIsStarred ? () => handleStar(false) : null}
                 settingsDisabled={!hasSelectedConversations()}
@@ -456,10 +456,12 @@ MessageListActionContainer.propTypes = {
   displayUnarchiveButton: PropTypes.bool,
   conversationsQueryOptions: PropTypes.object,
   onDelete: PropTypes.func,
-  activeCourseFilter: PropTypes.string
+  activeCourseFilter: PropTypes.string,
+  canReply: PropTypes.bool
 }
 
 MessageListActionContainer.defaultProps = {
   selectedConversations: [],
-  conversationsQueryOptions: {}
+  conversationsQueryOptions: {},
+  canReply: true
 }

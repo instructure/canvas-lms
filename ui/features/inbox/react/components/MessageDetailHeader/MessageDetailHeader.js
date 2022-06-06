@@ -72,20 +72,22 @@ export const MessageDetailHeader = ({...props}) => {
               )}
             </Heading>
           </Flex.Item>
-          <Flex.Item>
-            <Tooltip renderTip={I18n.t('Reply')} on={['hover', 'focus']}>
-              <IconButton
-                data-testid="message-detail-header-reply-btn"
-                margin="0 x-small 0 0"
-                screenReaderLabel={I18n.t('Reply')}
-                onClick={() => props.onReply()}
-                withBackground={false}
-                withBorder={false}
-              >
-                <IconReplyLine />
-              </IconButton>
-            </Tooltip>
-          </Flex.Item>
+          {props.onReply && (
+            <Flex.Item>
+              <Tooltip renderTip={I18n.t('Reply')} on={['hover', 'focus']}>
+                <IconButton
+                  data-testid="message-detail-header-reply-btn"
+                  margin="0 x-small 0 0"
+                  screenReaderLabel={I18n.t('Reply')}
+                  onClick={() => props.onReply()}
+                  withBackground={false}
+                  withBorder={false}
+                >
+                  <IconReplyLine />
+                </IconButton>
+              </Tooltip>
+            </Flex.Item>
+          )}
           {!isSubmissionCommentsType && (
             <Flex.Item>
               <Menu
@@ -104,12 +106,16 @@ export const MessageDetailHeader = ({...props}) => {
                   </Tooltip>
                 }
               >
-                <Menu.Item value="reply-all" onSelect={() => props.onReplyAll()}>
-                  {I18n.t('Reply All')}
-                </Menu.Item>
-                <Menu.Item value="forward" onSelect={() => props.onForward()}>
-                  {I18n.t('Forward')}
-                </Menu.Item>
+                {props.onReplyAll && (
+                  <Menu.Item value="reply-all" onSelect={() => props.onReplyAll()}>
+                    {I18n.t('Reply All')}
+                  </Menu.Item>
+                )}
+                {props.onForward && (
+                  <Menu.Item value="forward" onSelect={() => props.onForward()}>
+                    {I18n.t('Forward')}
+                  </Menu.Item>
+                )}
                 <Menu.Item value="star">{I18n.t('Star')}</Menu.Item>
                 <Menu.Item value="delete" onSelect={props.onDelete}>
                   {I18n.t('Delete')}

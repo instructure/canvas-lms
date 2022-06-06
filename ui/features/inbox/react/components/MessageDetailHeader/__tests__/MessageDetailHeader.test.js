@@ -62,6 +62,21 @@ describe('MessageDetailHeader', () => {
     expect(queryByTestId('message-more-options')).not.toBeInTheDocument()
   })
 
+  it('does not render the forward or reply all options when function is not provided', () => {
+    const props = {text: 'Message Header Text'}
+    props.onReplyAll = null
+    props.onForward = null
+
+    const {getByRole, queryByText, queryByTestId} = render(<MessageDetailHeader {...props} />)
+    const moreOptionsButton = getByRole(
+      (role, element) => role === 'button' && element.textContent === 'More options'
+    )
+
+    fireEvent.click(moreOptionsButton)
+    expect(queryByText('Reply All')).not.toBeInTheDocument()
+    expect(queryByTestId('message-detail-header-reply-btn')).not.toBeInTheDocument()
+  })
+
   describe('sends the selected option to the provided callback function', () => {
     const props = {
       text: 'Button Test'
