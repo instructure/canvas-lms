@@ -58,83 +58,6 @@ const MessageListActionContainer = props => {
 
   const hasSelectedConversations = () => props.selectedConversations.length > 0
 
-  const removeOutOfScopeConversationsFromCache = (cache, result) => {
-    if (result.data.updateConversationParticipants.errors) {
-      return
-    }
-
-    const conversationsFromCache = JSON.parse(
-      JSON.stringify(cache.readQuery(props.conversationsQueryOptions))
-    )
-    const conversationParticipantIDsFromResult =
-      result.data.updateConversationParticipants.conversationParticipants.map(cp => cp._id)
-
-    const updatedCPs = conversationsFromCache.legacyNode.conversationsConnection.nodes.filter(
-      conversationParticipant =>
-        !conversationParticipantIDsFromResult.includes(conversationParticipant._id)
-    )
-    conversationsFromCache.legacyNode.conversationsConnection.nodes = updatedCPs
-    cache.writeQuery({...props.conversationsQueryOptions, data: conversationsFromCache})
-  }
-
-  const handleArchiveComplete = data => {
-    const archiveSuccessMsg = I18n.t(
-      {
-        one: 'Message Archived!',
-        other: 'Messages Archived!'
-      },
-      {count: props.selectedConversations.length}
-    )
-    if (data.updateConversationParticipants.errors) {
-      // keep delete button enabled since deletion returned errors
-      props.archiveToggler(false)
-      setOnFailure(I18n.t('Archive operation failed'))
-    } else {
-      props.archiveToggler(true)
-      props.onConversationRemove(props.selectedConversations)
-      setOnSuccess(archiveSuccessMsg) // screenReaderOnly
-    }
-  }
-
-  const handleUnarchiveComplete = data => {
-    const unarchiveSuccessMsg = I18n.t(
-      {
-        one: 'Message Unarchived!',
-        other: 'Messages Unarchived!'
-      },
-      {count: props.selectedConversations.length}
-    )
-    if (data.updateConversationParticipants.errors) {
-      // keep delete button enabled since deletion returned errors
-      props.archiveToggler(true)
-      setOnFailure(I18n.t('Unarchive operation failed'))
-    } else {
-      props.archiveToggler(false)
-      props.onConversationRemove(props.selectedConversations)
-      setOnSuccess(unarchiveSuccessMsg) // screenReaderOnly
-    }
-  }
-
-  const [archiveConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
-    update: removeOutOfScopeConversationsFromCache,
-    onCompleted(data) {
-      handleArchiveComplete(data)
-    },
-    onError() {
-      setOnFailure(I18n.t('Archive operation failed'))
-    }
-  })
-
-  const [unarchiveConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
-    update: removeOutOfScopeConversationsFromCache,
-    onCompleted(data) {
-      handleUnarchiveComplete(data)
-    },
-    onError() {
-      setOnFailure(I18n.t('Unarchive operation failed'))
-    }
-  })
-
   const [readStateChangeConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
     onCompleted(data) {
       if (data.updateConversationParticipants.errors) {
@@ -239,52 +162,6 @@ const MessageListActionContainer = props => {
 
   if (error) {
     setOnFailure(I18n.t('Unable to load courses menu.'))
-  }
-
-  const handleArchive = () => {
-    const archiveConfirmMsg = I18n.t(
-      {
-        one: 'Are you sure you want to archive your copy of this conversation?',
-        other: 'Are you sure you want to archive your copy of these conversations?'
-      },
-      {count: props.selectedConversations.length}
-    )
-
-    const confirmResult = window.confirm(archiveConfirmMsg) // eslint-disable-line no-alert
-    if (confirmResult) {
-      archiveConversationParticipants({
-        variables: {
-          conversationIds: props.selectedConversations.map(convo => convo._id),
-          workflowState: 'archived'
-        }
-      })
-    } else {
-      // confirm message was cancelled by user
-      props.archiveToggler(false)
-    }
-  }
-
-  const handleUnarchive = () => {
-    const unarchiveConfirmMsg = I18n.t(
-      {
-        one: 'Are you sure you want to unarchive your copy of this conversation?',
-        other: 'Are you sure you want to unarchive your copy of these conversations?'
-      },
-      {count: props.selectedConversations.length}
-    )
-
-    const confirmResult = window.confirm(unarchiveConfirmMsg) // eslint-disable-line no-alert
-    if (confirmResult) {
-      unarchiveConversationParticipants({
-        variables: {
-          conversationIds: props.selectedConversations.map(convo => convo._id),
-          workflowState: 'read'
-        }
-      })
-    } else {
-      // confirm message was cancelled by user
-      props.archiveToggler(false)
-    }
   }
 
   const handleStar = starred => {
@@ -410,8 +287,8 @@ const MessageListActionContainer = props => {
               padding={responsiveProps.messageActionButtons.padding}
             >
               <MessageActionButtons
-                archive={props.displayUnarchiveButton ? undefined : handleArchive}
-                unarchive={props.displayUnarchiveButton ? handleUnarchive : undefined}
+                archive={props.displayUnarchiveButton ? undefined : props.onArchive}
+                unarchive={props.displayUnarchiveButton ? props.onUnarchive : undefined}
                 archiveDisabled={props.archiveDisabled || props.activeMailbox === 'sent'}
                 compose={props.onCompose}
                 delete={() => props.onDelete()}
@@ -449,12 +326,11 @@ MessageListActionContainer.propTypes = {
   onReply: PropTypes.func,
   onReplyAll: PropTypes.func,
   onForward: PropTypes.func,
+  onArchive: PropTypes.func,
+  onUnarchive: PropTypes.func,
   deleteDisabled: PropTypes.bool,
-  archiveToggler: PropTypes.func,
   archiveDisabled: PropTypes.bool,
-  onConversationRemove: PropTypes.func,
   displayUnarchiveButton: PropTypes.bool,
-  conversationsQueryOptions: PropTypes.object,
   onDelete: PropTypes.func,
   activeCourseFilter: PropTypes.string,
   canReply: PropTypes.bool
@@ -462,6 +338,5 @@ MessageListActionContainer.propTypes = {
 
 MessageListActionContainer.defaultProps = {
   selectedConversations: [],
-  conversationsQueryOptions: {},
   canReply: true
 }
