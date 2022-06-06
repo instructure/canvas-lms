@@ -1146,6 +1146,7 @@ describe "Users API", type: :request do
             p4 = @u.pseudonyms.create!(account: @account, unique_id: "p4")
             p4.current_login_at = 4.minutes.ago
             p4.save!
+            @u.pseudonyms.create!(account: @account, unique_id: "p5") # never logged in
           end
           @shard2.activate do
             account = Account.create!
