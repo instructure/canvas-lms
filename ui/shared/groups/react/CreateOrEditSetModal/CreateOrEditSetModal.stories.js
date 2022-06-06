@@ -19,7 +19,7 @@
 /* eslint-disable no-console */
 import React, {useState} from 'react'
 import awaitElement from '@canvas/await-element'
-import {renderCreateDialog, CreateGroupSetModal} from './index'
+import {renderCreateDialog, CreateOrEditSetModal} from './index'
 import {Button} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {NumberInput} from '@instructure/ui-number-input'
@@ -31,8 +31,8 @@ import {uniqueId} from 'lodash'
 let reminder = false
 
 export default {
-  title: 'Examples/manage_groups/CreateGroupSetModal',
-  component: CreateGroupSetModal
+  title: 'Examples/manage_groups/CreateOrEditSetModal',
+  component: CreateOrEditSetModal
 }
 
 let mockApiConfig = {}
