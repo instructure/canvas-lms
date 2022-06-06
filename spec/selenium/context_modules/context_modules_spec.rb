@@ -360,7 +360,7 @@ describe "context modules" do
       it "does not duplicate items on multiple uploads when replace is chosen" do
         # create the existing module item
         filename, fullpath, _data = get_file("a_file.txt")
-        file = @course.attachments.create!(display_name: filename, uploaded_data: fixture_file_upload("files/a_file.txt", "text/plain"))
+        file = @course.attachments.create!(display_name: filename, uploaded_data: fixture_file_upload("a_file.txt", "text/plain"))
         file.context = @course
         file.save!
         @mod.add_item({ id: file.id, type: "attachment" })
@@ -375,7 +375,7 @@ describe "context modules" do
 
       it "adds an uploaded file if the same content was just deleted" do
         filename, fullpath, _data = get_file("a_file.txt")
-        file = @course.attachments.create!(display_name: filename, uploaded_data: fixture_file_upload("files/a_file.txt", "text/plain"))
+        file = @course.attachments.create!(display_name: filename, uploaded_data: fixture_file_upload("a_file.txt", "text/plain"))
         file.context = @course
         file.save!
         @mod.add_item({ id: file.id, type: "attachment" })
@@ -395,7 +395,7 @@ describe "context modules" do
       it "replaces an existing module item with a replacement uploaded file" do
         # create the existing module item
         filename, fullpath, _data = get_file("a_file.txt")
-        file = @course.attachments.create!(display_name: filename, uploaded_data: fixture_file_upload("files/a_file.txt", "text/plain"))
+        file = @course.attachments.create!(display_name: filename, uploaded_data: fixture_file_upload("a_file.txt", "text/plain"))
         file.context = @course
         file.save!
         @mod.add_item({ id: file.id, type: "attachment" })
@@ -409,7 +409,7 @@ describe "context modules" do
 
       it "closing the rename dialog should not close the module dialog" do
         filename, fullpath, _data = get_file("a_file.txt")
-        file = @course.attachments.create!(display_name: filename, uploaded_data: fixture_file_upload("files/a_file.txt", "text/plain"))
+        file = @course.attachments.create!(display_name: filename, uploaded_data: fixture_file_upload("a_file.txt", "text/plain"))
         file.context = @course
         file.save!
 
@@ -439,7 +439,7 @@ describe "context modules" do
 
       it "skipping the only file should not close the add item to module dialog" do
         filename, fullpath, _data = get_file("a_file.txt")
-        file = @course.attachments.create!(display_name: filename, uploaded_data: fixture_file_upload("files/a_file.txt", "text/plain"))
+        file = @course.attachments.create!(display_name: filename, uploaded_data: fixture_file_upload("a_file.txt", "text/plain"))
         file.context = @course
         file.save!
 
@@ -460,7 +460,7 @@ describe "context modules" do
 
       it "does not ask to rename upload after folder change" do
         filename, fullpath, _data = get_file("a_file.txt")
-        file = @course.attachments.create!(display_name: filename, uploaded_data: fixture_file_upload("files/a_file.txt", "text/plain"))
+        file = @course.attachments.create!(display_name: filename, uploaded_data: fixture_file_upload("a_file.txt", "text/plain"))
         file.context = @course
         file.save!
 
@@ -490,7 +490,7 @@ describe "context modules" do
       it "creates a module item with a replacement uploaded file if in a different module" do
         # create the existing module item
         filename, fullpath, _data = get_file("a_file.txt")
-        file = @course.attachments.create!(display_name: filename, uploaded_data: fixture_file_upload("files/a_file.txt", "text/plain"))
+        file = @course.attachments.create!(display_name: filename, uploaded_data: fixture_file_upload("a_file.txt", "text/plain"))
         file.context = @course
         file.save!
         @mod.add_item({ id: file.id, type: "attachment" })

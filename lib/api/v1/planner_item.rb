@@ -210,7 +210,7 @@ module Api::V1::PlannerItem
                    COALESCE(dtp.workflow_state, 'unread') AS unread_state")
           .joins("LEFT JOIN #{DiscussionTopicParticipant.quoted_table_name} AS dtp
                     ON dtp.discussion_topic_id = discussion_topics.id
-                    AND dtp.user_id = #{User.connection.quote(user)}
+                    AND dtp.user_id = #{User.connection.quote(user&.id_for_database)}
                   LEFT JOIN #{DiscussionEntry.quoted_table_name} AS de
                     ON de.discussion_topic_id = discussion_topics.id
                     AND dtp.id IS NULL")

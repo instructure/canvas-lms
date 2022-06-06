@@ -40,7 +40,7 @@ describe "better_file_browsing" do
       add_folder("A New Folder")
       created_folder = @teacher.folders.find_by(name: "A New Folder")
       expect(created_folder).to be_present
-      add_file(fixture_file_upload("files/example.pdf", "application/pdf"), @user, "example.pdf", created_folder)
+      add_file(fixture_file_upload("example.pdf", "application/pdf"), @user, "example.pdf", created_folder)
       fj('a.treeLabel:contains("A New Folder")').click
       wait_for_ajaximations
       expect(ff(".ef-name-col__text")[0]).to include_text "example.pdf"
@@ -50,7 +50,7 @@ describe "better_file_browsing" do
   context "As a teacher" do
     before(:once) do
       course_with_teacher(active_all: true)
-      add_file(fixture_file_upload("files/example.pdf", "application/pdf"),
+      add_file(fixture_file_upload("example.pdf", "application/pdf"),
                @course, "example.pdf")
     end
 
@@ -205,7 +205,7 @@ describe "better_file_browsing" do
       course_with_teacher_logged_in
       txt_files = ["a_file.txt", "b_file.txt", "c_file.txt"]
       txt_files.map do |text_file|
-        add_file(fixture_file_upload("files/#{text_file}", "text/plain"), @course, text_file)
+        add_file(fixture_file_upload(text_file.to_s, "text/plain"), @course, text_file)
       end
       get "/courses/#{@course.id}/files"
     end
@@ -221,7 +221,7 @@ describe "better_file_browsing" do
     before(:once) do
       course_with_teacher(active_all: true)
       txt_files = ["a_file.txt", "b_file.txt", "c_file.txt"]
-      txt_files.map { |text_file| add_file(fixture_file_upload("files/#{text_file}", "text/plain"), @course, text_file) }
+      txt_files.map { |text_file| add_file(fixture_file_upload(text_file.to_s, "text/plain"), @course, text_file) }
     end
 
     before do
@@ -284,9 +284,9 @@ describe "better_file_browsing" do
 
       before(:once) do
         user_files = ["a_file.txt", "b_file.txt"]
-        user_files.map { |text_file| add_file(fixture_file_upload("files/#{text_file}", "text/plain"), @teacher, text_file) }
+        user_files.map { |text_file| add_file(fixture_file_upload(text_file.to_s, "text/plain"), @teacher, text_file) }
         # Course file
-        add_file(fixture_file_upload("files/c_file.txt", "text/plain"), @course, "c_file.txt")
+        add_file(fixture_file_upload("c_file.txt", "text/plain"), @course, "c_file.txt")
       end
 
       let(:folder_name) { "destination_folder" }
@@ -310,7 +310,7 @@ describe "better_file_browsing" do
   context "Publish Cloud Dialog" do
     before(:once) do
       course_with_teacher(active_all: true)
-      add_file(fixture_file_upload("files/a_file.txt", "text/plain"),
+      add_file(fixture_file_upload("a_file.txt", "text/plain"),
                @course, "a_file.txt")
     end
 
@@ -335,9 +335,9 @@ describe "better_file_browsing" do
   context "File Preview" do
     before do
       course_with_teacher_logged_in
-      add_file(fixture_file_upload("files/a_file.txt", "text/plain"),
+      add_file(fixture_file_upload("a_file.txt", "text/plain"),
                @course, "a_file.txt")
-      add_file(fixture_file_upload("files/b_file.txt", "text/plain"),
+      add_file(fixture_file_upload("b_file.txt", "text/plain"),
                @course, "b_file.txt")
       get "/courses/#{@course.id}/files"
     end
@@ -370,11 +370,11 @@ describe "better_file_browsing" do
       course_with_teacher(active_all: true)
       @course.usage_rights_required = true
       @course.save!
-      add_file(fixture_file_upload("files/a_file.txt", "text/plan"),
+      add_file(fixture_file_upload("a_file.txt", "text/plan"),
                @course, "a_file.txt")
-      add_file(fixture_file_upload("files/amazing_file.txt", "text/plan"),
+      add_file(fixture_file_upload("amazing_file.txt", "text/plan"),
                @user, "amazing_file.txt")
-      add_file(fixture_file_upload("files/a_file.txt", "text/plan"),
+      add_file(fixture_file_upload("a_file.txt", "text/plan"),
                @user, "a_file.txt")
     end
 
@@ -479,7 +479,7 @@ describe "better_file_browsing" do
       course_with_teacher_logged_in
       @course.usage_rights_required = true
       @course.save!
-      add_file(fixture_file_upload("files/b_file.txt", "text/plain"), @course, "b_file.txt")
+      add_file(fixture_file_upload("b_file.txt", "text/plain"), @course, "b_file.txt")
 
       get "/courses/#{@course.id}/files"
       expect(f(".btn-link.published-status.published")).to be_displayed
@@ -491,8 +491,8 @@ describe "better_file_browsing" do
       # this test performs 2 sample sort combinations
       course_with_teacher_logged_in
 
-      add_file(fixture_file_upload("files/example.pdf", "application/pdf"), @course, "a_example.pdf")
-      add_file(fixture_file_upload("files/b_file.txt", "text/plain"), @course, "b_file.txt")
+      add_file(fixture_file_upload("example.pdf", "application/pdf"), @course, "a_example.pdf")
+      add_file(fixture_file_upload("b_file.txt", "text/plain"), @course, "b_file.txt")
 
       get "/courses/#{@course.id}/files"
 

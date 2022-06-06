@@ -163,7 +163,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
 
   def self.row_values(batch_entry, user_id, root_account_id, default_state, update_values)
     [
-      connection.quote(batch_entry),
+      connection.quote(batch_entry.is_a?(ActiveRecord::Base) ? batch_entry.id_for_database : batch_entry),
       connection.quote(user_id),
       connection.quote(root_account_id),
       connection.quote(default_state),

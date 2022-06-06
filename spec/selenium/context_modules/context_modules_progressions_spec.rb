@@ -346,7 +346,7 @@ describe "context modules" do
     end
 
     it "shows student progress once File-view requirement is met", priority: "1" do
-      @file = @course.attachments.create!(display_name: "file", uploaded_data: fixture_file_upload("files/a_file.txt", "text/plain"))
+      @file = @course.attachments.create!(display_name: "file", uploaded_data: fixture_file_upload("a_file.txt", "text/plain"))
       @file.context = @course
       @file.save!
       tag = @module1.add_item({ id: @file.id, type: "attachment" })

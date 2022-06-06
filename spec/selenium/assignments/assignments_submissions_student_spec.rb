@@ -416,7 +416,7 @@ describe "submissions" do
       it "allows uploaded files to be used for submission", priority: "1" do
         local_storage!
 
-        add_file(fixture_file_upload("files/html-editing-test.html", "text/html"),
+        add_file(fixture_file_upload("html-editing-test.html", "text/html"),
                  @student, "html-editing-test.html")
         File.read(fixture_file_path("files/html-editing-test.html"))
         assignment = @course.assignments.create!(title: "assignment 1",
