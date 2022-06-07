@@ -396,6 +396,7 @@ describe SpeedGrader::Assignment do
         end
       end
       let(:versioned_attachments) { sub[:submission_history][0][:submission][:versioned_attachments] }
+      let(:canvadoc_url) { versioned_attachments.first.dig(:attachment, :canvadoc_url) }
 
       it "creates a non-annotatable DocViewer session for Discussion attachments" do
         assignment.anonymous_grading = true
@@ -405,7 +406,6 @@ describe SpeedGrader::Assignment do
         entry.save!
         topic.ensure_submission(@student)
 
-        canvadoc_url = versioned_attachments.first.dig(:attachment, :canvadoc_url)
         expect(canvadoc_url.include?("enable_annotations%22:false")).to eq true
       end
 
@@ -417,7 +417,6 @@ describe SpeedGrader::Assignment do
         entry.save!
         topic.ensure_submission(@student)
 
-        canvadoc_url = versioned_attachments.first.fetch(:attachment).fetch(:canvadoc_url)
         expect(canvadoc_url.include?("anonymous_instructor_annotations%22:true")).to eq true
       end
 
@@ -428,7 +427,6 @@ describe SpeedGrader::Assignment do
         entry.save!
         topic.ensure_submission(@student)
 
-        canvadoc_url = versioned_attachments.first.fetch(:attachment).fetch(:canvadoc_url)
         expect(canvadoc_url.include?("enrollment_type%22:%22teacher%22")).to eq true
       end
 
@@ -436,8 +434,30 @@ describe SpeedGrader::Assignment do
         submission = assignment.submit_homework(@student, attachments: [attachment])
         allow(Canvadocs).to receive(:enabled?).and_return(true)
 
-        canvadoc_url = versioned_attachments.first.fetch(:attachment).fetch(:canvadoc_url)
         expect(canvadoc_url.include?("%22submission_id%22:#{submission.id}")).to be true
+      end
+
+      describe "disable_annotation_notifications" do
+        it "disables annotations if the assignment posts manually and the submission is not posted" do
+          assignment.ensure_post_policy(post_manually: true)
+          assignment.submit_homework(@student, attachments: [attachment])
+          allow(Canvadocs).to receive(:enabled?).and_return(true)
+          expect(canvadoc_url).to include "disable_annotation_notifications%22:true"
+        end
+
+        it "enables annotations if the assignment posts automatically" do
+          assignment.submit_homework(@student, attachments: [attachment])
+          allow(Canvadocs).to receive(:enabled?).and_return(true)
+          expect(canvadoc_url).to include "disable_annotation_notifications%22:false"
+        end
+
+        it "enables annotations if the assignment posts manually and the submission has been posted" do
+          assignment.ensure_post_policy(post_manually: true)
+          submission = assignment.submit_homework(@student, attachments: [attachment])
+          assignment.post_submissions(submission_ids: [submission.id])
+          allow(Canvadocs).to receive(:enabled?).and_return(true)
+          expect(canvadoc_url).to include "disable_annotation_notifications%22:false"
+        end
       end
     end
 
