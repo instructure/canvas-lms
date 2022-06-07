@@ -1637,27 +1637,29 @@ class Attachment < ActiveRecord::Base
   def send_to_purgatory(deleted_by_user = nil)
     make_rootless
     new_instfs_uuid = nil
-    if Attachment.s3_storage? && s3object.exists?
-      s3object.copy_to(bucket.object(purgatory_filename))
-    elsif instfs_hosted? && InstFS.enabled?
+    if instfs_hosted? && InstFS.enabled? && instfs_uuid
       # copy to a new instfs file
       new_instfs_uuid = InstFS.duplicate_file(instfs_uuid)
+    elsif Attachment.s3_storage? && s3object.exists?
+      s3object.copy_to(bucket.object(purgatory_filename))
     elsif Attachment.local_storage?
       FileUtils.mkdir(local_purgatory_directory) unless File.exist?(local_purgatory_directory)
       FileUtils.cp full_filename, local_purgatory_file
     end
-    if Purgatory.where(attachment_id: self).exists?
-      p = Purgatory.where(attachment_id: self).take
+    if (p = Purgatory.find_by(attachment_id: self))
       p.deleted_by_user = deleted_by_user
       p.old_filename = filename
       p.old_display_name = display_name
       p.old_content_type = content_type
+      p.old_workflow_state = workflow_state
+      p.old_file_state = file_state
       p.new_instfs_uuid = new_instfs_uuid
       p.workflow_state = "active"
       p.save!
     else
-      Purgatory.create!(attachment: self, old_filename: filename, old_display_name: display_name,
-                        old_content_type: content_type, new_instfs_uuid: new_instfs_uuid, deleted_by_user: deleted_by_user)
+      Purgatory.create!(attachment: self, old_filename: filename, old_display_name: display_name, old_content_type: content_type,
+                        old_file_state: file_state, old_workflow_state: workflow_state, new_instfs_uuid: new_instfs_uuid,
+                        deleted_by_user: deleted_by_user)
     end
   end
 
@@ -1682,14 +1684,12 @@ class Attachment < ActiveRecord::Base
     write_attribute(:display_name, p.old_display_name)
     write_attribute(:content_type, p.old_content_type)
     write_attribute(:root_attachment_id, nil)
+    write_attribute(:file_state, p.old_file_state) if p.old_file_state
+    write_attribute(:workflow_state, p.old_workflow_state) if p.old_workflow_state
 
-    if InstFS.enabled?
-      if p.new_instfs_uuid
-        # just set it to the copied uuid, shouldn't get deleted when expired since we'll set p to 'restored'
-        write_attribute(:instfs_uuid, p.new_instfs_uuid)
-      else
-        raise "purgatory record was created before being fixed for inst-fs"
-      end
+    if InstFS.enabled? && p.new_instfs_uuid
+      # just set it to the copied uuid, shouldn't get deleted when expired since we'll set p to 'restored'
+      write_attribute(:instfs_uuid, p.new_instfs_uuid)
     elsif Attachment.s3_storage?
       old_s3object = bucket.object(purgatory_filename)
       raise Attachment::FileDoesNotExist unless old_s3object.exists?

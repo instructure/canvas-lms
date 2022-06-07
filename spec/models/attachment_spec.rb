@@ -789,11 +789,15 @@ describe Attachment do
         a = attachment_model(uploaded_data: default_uploaded_data)
         old_filename = a.filename
         old_content_type = a.content_type
+        old_file_state = a.file_state
+        old_workflow_state = a.workflow_state
         a.destroy_content_and_replace
         purgatory = Purgatory.where(attachment_id: a).take
         expect(purgatory.old_filename).to eq old_filename
         expect(purgatory.old_display_name).to eq old_filename
         expect(purgatory.old_content_type).to eq old_content_type
+        expect(purgatory.old_file_state).to eq old_file_state
+        expect(purgatory.old_workflow_state).to eq old_workflow_state
         a.reload
         expect(a.filename).to eq "file_removed.pdf"
         expect(a.display_name).to eq "file_removed.pdf"
@@ -802,6 +806,8 @@ describe Attachment do
         expect(a.filename).to eq old_filename
         expect(a.display_name).to eq old_filename
         expect(a.content_type).to eq old_content_type
+        expect(a.file_state).to eq old_file_state
+        expect(a.workflow_state).to eq old_workflow_state
         expect(purgatory.reload.workflow_state).to eq "restored"
         a.destroy_content_and_replace
         expect(purgatory.reload.workflow_state).to eq "active"
