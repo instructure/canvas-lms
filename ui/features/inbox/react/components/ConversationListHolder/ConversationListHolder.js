@@ -131,14 +131,14 @@ export const ConversationListHolder = ({
     } else {
       // Single Select
       setRangeClickStart(_id)
-      if (selectedMessages.includes(_id) && e.target.id.includes('Checkbox')) {
+      if (selectedMessages.includes(_id) && e.target.type === 'checkbox') {
         removeFromSelectedConversations(_id)
         return
       }
 
-      setMultiselect(e.target.id.includes('Checkbox'))
+      setMultiselect(e.target.type === 'checkbox')
 
-      if (e.target.id.includes('Checkbox')) {
+      if (e.target.type === 'checkbox') {
         setSelectedMessages(prevSelectedMessages => [...prevSelectedMessages, _id])
       } else {
         setSelectedMessages([_id])
