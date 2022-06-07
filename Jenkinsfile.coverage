@@ -51,7 +51,7 @@ def redisUrl() {
 def generateSkippedSpecsReport() {
   try{
     copyArtifacts(
-      filter: 'tmp/rspec_results/**',
+      filter: 'tmp/*_rspec_results/**',
       optional: false,
       projectName: env.JOB_NAME,
       selector: specific(env.BUILD_NUMBER),
@@ -100,6 +100,7 @@ pipeline {
 
   environment {
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml'
+    COMPOSE_PROJECT_NAME = 'coverage'
     FORCE_FAILURE = "${configuration.isForceFailureSelenium() ? '1' : ''}"
     RERUNS_RETRY = "${configuration.getInteger('rspecq-max-requeues')}"
     RSPECQ_FILE_SPLIT_THRESHOLD = "${configuration.fileSplitThreshold()}"
@@ -138,7 +139,7 @@ pipeline {
               buildSummaryReport.saveRunManifest()
 
               copyArtifacts(
-                filter: 'tmp/coverage/**',
+                filter: 'tmp/*/coverage/**',
                 optional: false,
                 projectName: env.JOB_NAME,
                 selector: specific(env.BUILD_NUMBER),
@@ -146,9 +147,9 @@ pipeline {
 
               withEnv(['COMPOSE_FILE=docker-compose.new-jenkins.yml']) {
                 sh """
-                  docker-compose run -v \$(pwd)/\$LOCAL_WORKDIR/tmp/coverage/:/tmp/coverage \
+                  docker-compose run -v \$(pwd)/\$LOCAL_WORKDIR/tmp/:/tmp \
                   --name coverage-collator canvas bash -c \
-                  "bundle install; bundle exec rake coverage:report['/tmp/coverage/canvas__*/**']"
+                  "bundle install; bundle exec rake coverage:report['/tmp/*/coverage/**']"
                 """
 
                 sh 'docker cp coverage-collator:/usr/src/app/coverage/ coverage'
@@ -242,7 +243,7 @@ pipeline {
                           "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}_selenium",
                           "TEST_PATTERN=${env.SELENIUM_TEST_PATTERN}",
                           'EXCLUDE_TESTS=.*/(selenium/performance|instfs/selenium|contracts)'])
-                      .hooks(postStageHandler + [onNodeAcquired: { rspecStage.setupNode() }, onNodeReleasing: { rspecStage.tearDownNode('selenium') }])
+                      .hooks(postStageHandler + [onNodeAcquired: { rspecStage.setupNode() }, onNodeReleasing: { rspecStage.tearDownNode() }])
                       .timeout(30)
                       .queue(rspecqStages) { rspecStage.runRspecqSuite() }
 
@@ -253,7 +254,7 @@ pipeline {
                           "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}_selenium",
                           "TEST_PATTERN=${env.SELENIUM_TEST_PATTERN}",
                           'EXCLUDE_TESTS=.*/(selenium/performance|instfs/selenium|contracts)'])
-                      .hooks(postStageHandler + [onNodeAcquired: { rspecStage.setupNode() }, onNodeReleasing: { rspecStage.tearDownNode('selenium') }])
+                      .hooks(postStageHandler + [onNodeAcquired: { rspecStage.setupNode() }, onNodeReleasing: { rspecStage.tearDownNode() }])
                       .nodeRequirements(rspecNodeRequirements)
                       .timeout(30)
                       .queue(rspecqStages) { rspecStage.runRspecqSuite() }
@@ -264,7 +265,7 @@ pipeline {
                   rspecNodeTotal.times { index ->
                     extendedStage("RSpecQ Rspec Set ${(index + 1).toString().padLeft(2, '0')}")
                       .envVars(["CI_NODE_INDEX=$index", "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}_rspec"])
-                      .hooks(postStageHandler + [onNodeAcquired: { rspecStage.setupNode() }, onNodeReleasing: { rspecStage.tearDownNode('rspec') }])
+                      .hooks(postStageHandler + [onNodeAcquired: { rspecStage.setupNode() }, onNodeReleasing: { rspecStage.tearDownNode() }])
                       .nodeRequirements(rspecNodeRequirements)
                       .timeout(30)
                       .queue(rspecqStages) { rspecStage.runRspecqSuite() }
