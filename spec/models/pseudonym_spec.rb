@@ -130,10 +130,28 @@ describe Pseudonym do
     expect(@user.user_account_associations).to eq []
   end
 
-  it "allows deleting pseudonyms" do
-    user_with_pseudonym(active_all: true)
-    expect(@pseudonym.destroy).to eql(true)
-    expect(@pseudonym).to be_deleted
+  describe "#destroy" do
+    it "allows deleting pseudonyms" do
+      user_with_pseudonym(active_all: true)
+      expect(@pseudonym.destroy).to eql(true)
+      expect(@pseudonym).to be_deleted
+    end
+
+    it "records an audit log record" do
+      pseudonym_model
+      @pseudonym.destroy
+      expect(@pseudonym.auditor_records.where(action: "deleted")).to exist
+    end
+
+    context "with current_user specified" do
+      it "records an audit log with the current_user" do
+        pseudonym_model
+        performing_user = user_model
+        @pseudonym.current_user = performing_user
+        @pseudonym.destroy
+        expect(@pseudonym.auditor_records.where(action: "deleted", performing_user: performing_user.id)).to exist
+      end
+    end
   end
 
   it "allows deleting system-generated pseudonyms" do
