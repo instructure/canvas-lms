@@ -709,7 +709,7 @@ class CalendarEvent < ActiveRecord::Base
       event.dtend = Icalendar::Values::DateTime.new(end_at.utc_datetime, "tzid" => "UTC") if end_at
 
       if @event.all_day && @event.all_day_date
-        event.dtstart = Date.new(@event.all_day_date.year, @event.all_day_date.month, @event.all_day_date.day)
+        event.dtstart = Icalendar::Values::Date.new(@event.all_day_date)
         event.dtstart.ical_params = { "VALUE" => ["DATE"] }
         # per rfc5545 3.6.12, DTEND for all day events can omit DTEND
         event.dtend = nil
