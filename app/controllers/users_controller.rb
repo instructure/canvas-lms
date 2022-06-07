@@ -429,10 +429,16 @@ class UsersController < ApplicationController
       users = users.with_last_login if params[:sort] == "last_login"
     end
 
-    includes = (params[:include] || []) & %w[avatar_url email last_login time_zone uuid]
+    includes = (params[:include] || []) & %w[avatar_url email last_login time_zone uuid total_entries]
     includes << "last_login" if params[:sort] == "last_login" && !includes.include?("last_login")
+    page_opts = { total_entries: nil }
+
     GuardRail.activate(:secondary) do
-      users = Api.paginate(users, self, api_v1_account_users_url, { total_entries: nil })
+      if includes.include?("total_entries")
+        page_opts[:total_entries] = users.size
+        includes.delete("total_entries")
+      end
+      users = Api.paginate(users, self, api_v1_account_users_url, page_opts)
       user_json_preloads(users, includes.include?("email"))
       User.preload_last_login(users, @context.resolved_root_account_id) if includes.include?("last_login") && params[:sort] != "last_login"
       render json: users.map { |u| user_json(u, @current_user, session, includes) }
