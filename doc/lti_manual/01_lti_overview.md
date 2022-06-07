@@ -84,3 +84,19 @@ More information about these are found in the spec [here](http://www.imsglobal.o
 Rather than making a clean break in implementation as we did with LTI 2.0, the team decided to piggy-back on as much existing LTI 1.1 code as we could to quickly reach feature parity.
 
 This worked very well in general, although some code may feel initially confusing without knowing it serves LTI 1.1 and LTI 1.3. More details on the LTI launch code can be found [here](./03_lti_launches).
+
+Here's an entity relationship diagram which indicates the relationship b/w some of the tables associated with LTI data:
+
+![LTI tables](assets/lti_tables.png)
+The LTI 2 tables are not pictured here for simplicity, those include:
+
+```
+lti_tool_consumer_profiles
+lti_tool_settings
+lti_product_families
+lti_resource_handlers
+lti_tool_proxy_bindings
+lti_tool_proxies
+lti_message_handlers
+lti_links
+```

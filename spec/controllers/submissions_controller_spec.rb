@@ -157,7 +157,7 @@ describe SubmissionsController do
         )
       end
       let(:resource_link) do
-        Lti::ResourceLink.create(context: @course, context_external_tool: tool)
+        Lti::ResourceLink.create(context: @course, context_external_tool: tool, url: "http://www.example.com")
       end
       let(:params) do
         {

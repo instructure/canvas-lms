@@ -971,6 +971,10 @@ module Api::V1::Assignment
       assignment.lti_resource_link_custom_params = custom_params.presence&.to_unsafe_h || {}
     end
 
+    if external_tool_tag_attributes&.include?(:url)
+      assignment.lti_resource_link_url = external_tool_tag_attributes[:url]
+    end
+
     {
       assignment: assignment,
       overrides: overrides,

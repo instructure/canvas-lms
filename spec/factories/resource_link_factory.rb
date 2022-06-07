@@ -29,7 +29,8 @@ module Factories
       context: assignment,
       context_external_tool: overrides.fetch(:with_context_external_tool) do |_|
         external_tool_model(context: overrides[:context], opts: overrides.fetch(:context_external_tool, {}))
-      end
+      end,
+      url: overrides.fetch(:url, "http://www.example.com/launch")
     }
 
     Lti::ResourceLink.create!(params)
