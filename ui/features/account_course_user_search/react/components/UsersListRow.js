@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {string, func, shape, bool} from 'prop-types'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {Table} from '@instructure/ui-table'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {IconMasqueradeLine, IconMessageLine, IconEditLine} from '@instructure/ui-icons'
@@ -50,9 +50,14 @@ export default function UsersListRow({accountId, user, permissions, handleSubmit
             data-testid="user-list-row-tooltip"
             renderTip={I18n.t('Act as %{name}', {name: user.name})}
           >
-            <Button variant="icon" size="small" href={`/users/${user.id}/masquerade`}>
+            <IconButton
+              withBorder={false}
+              withBackground={false}
+              size="small"
+              href={`/users/${user.id}/masquerade`}
+            >
               <IconMasqueradeLine title={I18n.t('Act as %{name}', {name: user.name})} />
-            </Button>
+            </IconButton>
           </Tooltip>
         )}
         {permissions.can_message_users && (
@@ -60,13 +65,14 @@ export default function UsersListRow({accountId, user, permissions, handleSubmit
             data-testid="user-list-row-tooltip"
             renderTip={I18n.t('Send message to %{name}', {name: user.name})}
           >
-            <Button
-              variant="icon"
+            <IconButton
+              withBorder={false}
+              withBackground={false}
               size="small"
               href={`/conversations?user_name=${user.name}&user_id=${user.id}`}
             >
               <IconMessageLine title={I18n.t('Send message to %{name}', {name: user.name})} />
-            </Button>
+            </IconButton>
           </Tooltip>
         )}
         {permissions.can_edit_users && (
@@ -81,9 +87,9 @@ export default function UsersListRow({accountId, user, permissions, handleSubmit
                 data-testid="user-list-row-tooltip"
                 renderTip={I18n.t('Edit %{name}', {name: user.name})}
               >
-                <Button variant="icon" size="small">
+                <IconButton withBorder={false} withBackground={false} size="small">
                   <IconEditLine title={I18n.t('Edit %{name}', {name: user.name})} />
-                </Button>
+                </IconButton>
               </Tooltip>
             </span>
           </CreateOrUpdateUserModal>

@@ -18,15 +18,11 @@
 
 import React from 'react'
 import {Avatar} from '@instructure/ui-avatar'
-import {Button} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 
 export default function UserLink({size, avatar_url, name, avatarName, ...propsToPassOnToLink}) {
   return (
-    <Button
-      variant="link"
-      theme={{mediumPaddingHorizontal: '0', mediumHeight: '1rem'}}
-      {...propsToPassOnToLink}
-    >
+    <Link theme={{mediumPaddingHorizontal: '0', mediumHeight: '1rem'}} {...propsToPassOnToLink}>
       <Avatar
         size={size}
         name={avatarName}
@@ -35,13 +31,13 @@ export default function UserLink({size, avatar_url, name, avatarName, ...propsTo
         data-fs-exclude
       />
       {name}
-    </Button>
+    </Link>
   )
 }
 
 UserLink.propTypes = {
   size: Avatar.propTypes.size,
-  href: Button.propTypes.href,
+  href: Link.propTypes.href,
   name: Avatar.propTypes.name,
   avatarName: Avatar.propTypes.name,
   avatar_url: Avatar.propTypes.src

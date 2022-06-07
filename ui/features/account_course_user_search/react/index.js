@@ -17,50 +17,52 @@
  */
 
 import React from 'react'
-import {string, bool, shape} from 'prop-types'
+import {string, bool, shape, func} from 'prop-types'
 import {stringify} from 'qs'
 import permissionFilter from './helpers/permissionFilter'
 import CoursesStore from './store/CoursesStore'
 import TermsStore from './store/TermsStore'
 import AccountsTreeStore from './store/AccountsTreeStore'
 import UsersStore from './store/UsersStore'
+import useImmediate from '@canvas/use-immediate-hook'
 
 const stores = [CoursesStore, TermsStore, AccountsTreeStore, UsersStore]
 
-export default class AccountCourseUserSearch extends React.Component {
-  static propTypes = {
-    accountId: string.isRequired,
-    rootAccountId: string.isRequired,
-    permissions: shape({
-      analytics: bool.isRequired
-    }).isRequired
-  }
-
-  componentWillMount() {
-    const {accountId, rootAccountId} = this.props
+const AccountCourseUserSearch = props => {
+  useImmediate(() => {
+    const {accountId, rootAccountId} = props
     stores.forEach(s => {
       s.reset({accountId, rootAccountId})
     })
-  }
+  }, [])
 
-  updateQueryParams(params) {
+  function updateQueryParams(params) {
     const query = stringify(params)
     window.history.replaceState(null, null, `?${query}`)
   }
 
-  render() {
-    const tabList = this.props.store.getState().tabList
-    const tabs = permissionFilter(tabList.tabs, this.props.permissions)
-    const ActivePane = tabs.length === 1 ? tabs[0].pane : tabs[tabList.selected].pane
+  const {tabList} = props.store.getState()
+  const tabs = permissionFilter(tabList.tabs, props.permissions)
+  const ActivePane = tabs.length === 1 ? tabs[0].pane : tabs[tabList.selected].pane
 
-    return (
-      <ActivePane
-        {...{
-          ...this.props,
-          onUpdateQueryParams: this.updateQueryParams,
-          queryParams: tabList.queryParams
-        }}
-      />
-    )
-  }
+  return (
+    <ActivePane
+      {...props}
+      onUpdateQueryParams={updateQueryParams}
+      queryParams={tabList.queryParams}
+    />
+  )
 }
+
+AccountCourseUserSearch.propTypes = {
+  accountId: string.isRequired,
+  rootAccountId: string.isRequired,
+  permissions: shape({
+    analytics: bool.isRequired
+  }).isRequired,
+  store: shape({
+    getState: func.isRequired
+  }).isRequired
+}
+
+export default AccountCourseUserSearch
