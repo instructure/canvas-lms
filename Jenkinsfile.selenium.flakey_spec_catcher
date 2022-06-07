@@ -132,7 +132,6 @@ def computeTestCount() {
 }
 
 def executeFlakeySpecCatcher() {
-  sh 'rm -vrf tmp'
   try {
     sh 'build/new-jenkins/rspec-flakey-spec-catcher.sh'
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
@@ -147,8 +146,11 @@ def executeFlakeySpecCatcher() {
       throw e
     }
   } finally {
-    sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/tmp/fsc.out tmp/${env.NODE_NUMBER} canvas_ --allow-error --clean-dir"
-    archiveArtifacts artifacts: "tmp/${env.NODE_NUMBER}/**/fsc.out", allowEmptyArchive: true
+    sh """
+    rm -vrf tmp && mkdir -p tmp
+    docker cp flakey-spec-catcher_canvas_1:/usr/src/app/tmp/fsc.out tmp/fsc-${env.NODE_NUMBER}.out || true
+    """
+    archiveArtifacts artifacts: "tmp/fsc-${env.NODE_NUMBER}.out", allowEmptyArchive: true
   }
 }
 

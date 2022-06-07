@@ -130,6 +130,7 @@ pipeline {
   environment {
     REGISTRY_BASE = 'starlord.inscloudgate.net/jenkins'
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml'
+    COMPOSE_PROJECT_NAME = 'test-queue'
     FORCE_FAILURE = "${configuration.isForceFailureSelenium() ? '1' : ''}"
     RERUNS_RETRY = "${configuration.getInteger('rspecq-max-requeues')}"
     RSPEC_PROCESSES = "${configuration.getInteger('rspecq-processes')}"
@@ -216,7 +217,7 @@ pipeline {
                     .envVars(['CI_NODE_INDEX=0',
                         "CRYSTAL_BALL_SPECS=${env.CRYSTALBALL_SPEC}",
                         "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}"])
-                    .hooks(postStageHandler + [onNodeReleasing: { rspecStage.tearDownNode('rspec') }])
+                    .hooks(postStageHandler + [onNodeReleasing: { rspecStage.tearDownNode() }])
                     .timeout(30)
                     .queue(rspecqStages) { rspecStage.runRspecqSuite() }
 
@@ -226,7 +227,7 @@ pipeline {
                     .envVars(["CI_NODE_INDEX=$index",
                         "CRYSTAL_BALL_SPECS=${env.CRYSTALBALL_SPEC}",
                         "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}"])
-                    .hooks(postStageHandler + [onNodeAcquired: { rspecStage.setupNode() }, onNodeReleasing: { rspecStage.tearDownNode('rspec') }])
+                    .hooks(postStageHandler + [onNodeAcquired: { rspecStage.setupNode() }, onNodeReleasing: { rspecStage.tearDownNode() }])
                     .nodeRequirements(rspecNodeRequirements)
                     .timeout(30)
                     .queue(rspecqStages) { rspecStage.runRspecqSuite() }

@@ -55,17 +55,17 @@ def getResultsHTMLUrl() {
 
 def postFn() {
   copyArtifacts(
-    filter: 'tmp/crystalball/**',
+    filter: 'tmp/*/crystalball/**',
     optional: false,
     projectName: env.JOB_NAME,
     selector: specific(env.BUILD_NUMBER),
   )
 
   sh """
-    docker-compose run -v \$(pwd)/\$LOCAL_WORKDIR/tmp/crystalball/:/tmp/crystalball \
+    docker-compose run -v \$(pwd)/\$LOCAL_WORKDIR/tmp/:/tmp \
     -v \$(pwd)/\$LOCAL_WORKDIR/build:/usr/src/app/build \
     --name crystalball-parser \
-    canvas bash -c 'ruby build/new-jenkins/crystalball_merge_coverage.rb /tmp/crystalball/'
+    canvas bash -c 'ruby build/new-jenkins/crystalball_merge_coverage.rb "/tmp/*/crystalball/"'
   """
 
   sh 'docker cp crystalball-parser:/usr/src/app/crystalball_map.yml .'
@@ -105,6 +105,7 @@ pipeline {
   environment {
     BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
     COMPOSE_FILE = 'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml'
+    COMPOSE_PROJECT_NAME = 'crystalball-map'
     RERUNS_RETRY = "${configuration.getInteger('rspecq-max-requeues')}"
     RSPECQ_FILE_SPLIT_THRESHOLD = '9999'
     RSPECQ_MAX_REQUEUES = "${configuration.getInteger('rspecq-max-requeues')}"
@@ -212,7 +213,7 @@ pipeline {
                   .envVars(['CI_NODE_INDEX=0',
                       "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}",
                       "CRYSTALBALL_MAP=1"])
-                  .hooks(postStageHandler + [onNodeAcquired: { sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers') }, onNodeReleasing: { rspecStage.tearDownNode('rspec') }])
+                  .hooks(postStageHandler + [onNodeAcquired: { sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers') }, onNodeReleasing: { rspecStage.tearDownNode() }])
                   .timeout(30)
                   .queue(rspecqStages) {
                     rspecStage.runRspecqSuite()
@@ -224,7 +225,7 @@ pipeline {
                   .envVars(["CI_NODE_INDEX=$index",
                       "BUILD_NAME=${env.JOB_NAME}_build${env.BUILD_NUMBER}",
                       "CRYSTALBALL_MAP=1"])
-                  .hooks(postStageHandler + [onNodeAcquired: { rspecStage.setupNode() }, onNodeReleasing: { rspecStage.tearDownNode('rspec') }])
+                  .hooks(postStageHandler + [onNodeAcquired: { rspecStage.setupNode() }, onNodeReleasing: { rspecStage.tearDownNode() }])
                   .nodeRequirements(rspecNodeRequirements)
                   .timeout(30)
                   .queue(rspecqStages) { rspecStage.runRspecqSuite() }

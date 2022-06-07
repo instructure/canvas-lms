@@ -64,7 +64,7 @@ def createDistribution(nestedStages) {
   rspecqNodeTotal.times { index ->
     extendedStage("RSpecQ Test Set ${(index + 1).toString().padLeft(2, '0')}")
       .envVars(rspecqEnvVars + ["CI_NODE_INDEX=$index"])
-      .hooks(buildSummaryReportHooks.call() + [onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('spec') }])
+      .hooks(buildSummaryReportHooks.call() + [onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode() }])
       .nodeRequirements(RSPEC_NODE_REQUIREMENTS)
       .timeout(15)
       .queue(nestedStages, this.&runRspecqSuite)
@@ -97,46 +97,56 @@ def setupNode() {
   }
 }
 
-def tearDownNode(prefix) {
+def tearDownNode() {
   if (env.AUTO_CANCELLED?.split(',')?.contains("${env.CI_NODE_INDEX}")) {
     cancel_node(SUCCESS_NOT_BUILT, 'Node cancelled!')
     return
   }
 
-  sh """
-    rm -rf ./tmp && mkdir -p tmp
-    build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results tmp/rspec_results canvas_ --allow-error --clean-dir
-    build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures/$prefix canvas_ --allow-error --clean-dir
+  def destDir = "tmp/${env.CI_NODE_INDEX}"
+  def srcDir = "${env.COMPOSE_PROJECT_NAME}_canvas_1:/usr/src/app"
+  def uploadDockerLogs = configuration.getBoolean('upload-docker-logs', 'false')
+
+  sh """#!/bin/bash
+    set -ex
+
+    rm -rf ./tmp && mkdir -p $destDir ${destDir}_rspec_results
+    docker cp ${srcDir}/log/results ${destDir}_rspec_results/ || true
+    docker cp ${srcDir}/log/spec_failures ${destDir}/spec_failures/ || true
+
+    if [[ "\$COVERAGE" == "1" ]]; then
+      docker cp ${srcDir}/coverage ${destDir}/coverage/ || true
+    fi
+
+    if [[ "\$CRYSTALBALL_MAP" == "1" ]]; then
+      docker cp ${srcDir}/log/results/crystalball_results ${destDir}/crystalball/ || true
+    fi
+
+    if [[ "\$RSPEC_LOG" == "1" ]]; then
+      docker cp ${srcDir}/log/parallel_runtime ${destDir}/parallel_runtime_rspec_tests/ || true
+    fi
+
+    if [[ "${uploadDockerLogs}" = "1" ]]; then
+      docker ps -aq | xargs -I{} -n1 -P1 docker logs --timestamps --details {} 2>&1 > ${destDir}/docker.log
+    fi
+
+    find tmp
   """
 
-  if (env.COVERAGE == '1') {
-    sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/coverage tmp/coverage canvas_ --allow-error --clean-dir'
-    archiveArtifacts allowEmptyArchive: true, artifacts: 'tmp/coverage/**/*'
-  }
-
-  if (env.CRYSTALBALL_MAP == '1') {
-    sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results/crystalball_results tmp/crystalball canvas_ --allow-error --clean-dir'
-    archiveArtifacts allowEmptyArchive: true, artifacts: 'tmp/crystalball/**/*'
-  }
-
-  if (configuration.getBoolean('upload-docker-logs', 'false')) {
-    sh "docker ps -aq | xargs -I{} -n1 -P1 docker logs --timestamps --details {} 2>&1 > tmp/docker-${prefix}-${CI_NODE_INDEX}.log"
-    archiveArtifacts(artifacts: "tmp/docker-${prefix}-${CI_NODE_INDEX}.log")
-  }
+  archiveArtifacts allowEmptyArchive: true, artifacts: "$destDir/**/*"
 
   if (env.ENABLE_AXE_SELENIUM == '1' || env.COVERAGE == '1') {
-    archiveArtifacts allowEmptyArchive: true, artifacts: 'tmp/rspec_results/**/*'
+    archiveArtifacts allowEmptyArchive: true, artifacts: "${destDir}_rspec_results/**/*"
   }
 
-  archiveArtifacts allowEmptyArchive: true, artifacts: "tmp/spec_failures/$prefix/**/*"
-  findFiles(glob: "tmp/spec_failures/$prefix/**/index.html").each { file ->
-    // node_18/spec_failures/canvas__9224fba6fc34/spec_failures/Initial/spec/selenium/force_failure_spec.rb:20/index
+  findFiles(glob: "$destDir/spec_failures/**/index.html").each { file ->
+    // tmp/node_18/spec_failures/Initial/spec/selenium/force_failure_spec.rb:20/index
     // split on the 5th to give us the rerun category (Initial, Rerun_1, Rerun_2...)
 
-    def pathCategory = file.getPath().split('/')[5]
+    def pathCategory = file.getPath().split('/')[3]
     def finalCategory = reruns_retry.toInteger() == 0 ? 'Initial' : "Rerun_${reruns_retry.toInteger()}"
     def splitPath = file.getPath().split('/').toList()
-    def specTitle = splitPath.subList(6, splitPath.size() - 1).join('/')
+    def specTitle = splitPath.subList(4, splitPath.size() - 1).join('/')
     def artifactsPath = "${currentBuild.getAbsoluteUrl()}artifact/${file.getPath()}"
 
     buildSummaryReport.addFailurePath(specTitle, artifactsPath, pathCategory)
@@ -148,12 +158,7 @@ def tearDownNode(prefix) {
     }
   }
 
-  junit allowEmptyResults: true, testResults: 'tmp/rspec_results/**/*.xml', skipMarkingBuildUnstable: true
-
-  if (env.RSPEC_LOG == '1') {
-    sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/parallel_runtime/ ./tmp/parallel_runtime_rspec_tests canvas_ --allow-error --clean-dir'
-    archiveArtifacts(artifacts: 'tmp/parallel_runtime_rspec_tests/**/*.log')
-  }
+  junit allowEmptyResults: true, testResults: "${destDir}_rspec_results/**/*.xml", skipMarkingBuildUnstable: true
 }
 
 def runRspecqSuite() {

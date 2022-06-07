@@ -58,6 +58,7 @@ pipeline {
   }
 
   environment {
+    COMPOSE_PROJECT_NAME = 'main-axe'
     BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
     POSTGRES = configuration.postgres()
     RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
@@ -107,7 +108,7 @@ pipeline {
         }
 
         copyArtifacts(
-          filter: 'tmp/rspec_results/**',
+          filter: 'tmp/*_rspec_results/**',
           optional: false,
           projectName: env.JOB_NAME,
           selector: specific(env.BUILD_NUMBER),
@@ -115,9 +116,9 @@ pipeline {
 
         withEnv(['COMPOSE_FILE=docker-compose.new-jenkins.yml']) {
           sh """
-            docker-compose run -v \$(pwd)/\$LOCAL_WORKDIR/tmp/rspec_results/:/tmp/rspec_results \
+            docker-compose run -v \$(pwd)/\$LOCAL_WORKDIR/tmp/:/tmp \
             --name stormbreaker-results canvas bash -c \
-            "bundle install; bundle exec rake stormbreaker:combine_results['/tmp/rspec_results/**']"
+            "bundle install; bundle exec rake stormbreaker:combine_results['/tmp/*_rspec_results/**']"
           """
 
           sh 'docker cp stormbreaker-results:/usr/src/app/results.html .'
