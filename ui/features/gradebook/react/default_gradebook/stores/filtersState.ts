@@ -48,6 +48,8 @@ export type InitialColumnFilterSettings = {
   context_module_id: null | string
   grading_period_id: null | string
   submissions: null | 'has-submissions' | 'has-ungraded-submissions'
+  start_date: null | string
+  end_date: null | string
 }
 
 export type InitialRowFilterSettings = {
@@ -74,7 +76,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
   ) => {
     const conditions: FilterCondition[] = []
 
-    if (initialRowFilterSettings.section_id) {
+    if (typeof initialRowFilterSettings.section_id === 'string') {
       conditions.push({
         id: uuid.v4(),
         value: initialRowFilterSettings.section_id,
@@ -83,7 +85,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
       })
     }
 
-    if (initialRowFilterSettings.student_group_id) {
+    if (typeof initialRowFilterSettings.student_group_id === 'string') {
       conditions.push({
         id: uuid.v4(),
         value: initialRowFilterSettings.student_group_id,
@@ -93,7 +95,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     }
 
     if (
-      initialColumnFilterSettings.assignment_group_id &&
+      typeof initialColumnFilterSettings.assignment_group_id === 'string' &&
       initialColumnFilterSettings.assignment_group_id !== '0'
     ) {
       conditions.push({
@@ -118,7 +120,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     }
 
     if (
-      initialColumnFilterSettings.context_module_id &&
+      typeof initialColumnFilterSettings.context_module_id === 'string' &&
       initialColumnFilterSettings.context_module_id !== '0'
     ) {
       conditions.push({
@@ -129,8 +131,26 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
       })
     }
 
+    if (initialColumnFilterSettings.start_date && initialColumnFilterSettings.start_date !== '0') {
+      conditions.push({
+        id: uuid.v4(),
+        value: initialColumnFilterSettings.start_date,
+        type: 'start-date',
+        created_at: new Date().toISOString()
+      })
+    }
+
+    if (initialColumnFilterSettings.end_date && initialColumnFilterSettings.end_date !== '0') {
+      conditions.push({
+        id: uuid.v4(),
+        value: initialColumnFilterSettings.end_date,
+        type: 'end-date',
+        created_at: new Date().toISOString()
+      })
+    }
+
     if (
-      initialColumnFilterSettings.grading_period_id &&
+      typeof initialColumnFilterSettings.grading_period_id === 'string' &&
       initialColumnFilterSettings.grading_period_id !== '0'
     ) {
       conditions.push({

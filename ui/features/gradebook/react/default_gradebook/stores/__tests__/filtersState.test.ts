@@ -170,7 +170,9 @@ describe('filterState', () => {
       assignment_group_id: null,
       context_module_id: null,
       grading_period_id: null,
-      submissions: null
+      submissions: null,
+      start_date: null,
+      end_date: null
     }
     store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
     expect(store.getState().stagedFilterConditions.length).toStrictEqual(0)
@@ -187,7 +189,9 @@ describe('filterState', () => {
       assignment_group_id: null,
       context_module_id: null,
       grading_period_id: null,
-      submissions: null
+      submissions: null,
+      start_date: null,
+      end_date: null
     }
     store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
     expect(store.getState().stagedFilterConditions).not.toBeNull()
@@ -211,7 +215,9 @@ describe('filterState', () => {
       assignment_group_id: null,
       context_module_id: null,
       grading_period_id: null,
-      submissions: null
+      submissions: null,
+      start_date: null,
+      end_date: null
     }
     store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
     expect(store.getState().stagedFilterConditions).not.toBeNull()
@@ -235,7 +241,9 @@ describe('filterState', () => {
       assignment_group_id: '1',
       context_module_id: null,
       grading_period_id: null,
-      submissions: null
+      submissions: null,
+      start_date: null,
+      end_date: null
     }
     store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
     expect(store.getState().stagedFilterConditions).not.toBeNull()
@@ -259,7 +267,9 @@ describe('filterState', () => {
       assignment_group_id: null,
       context_module_id: null,
       grading_period_id: null,
-      submissions: 'has-submissions'
+      submissions: 'has-submissions',
+      start_date: null,
+      end_date: null
     }
     store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
     expect(store.getState().stagedFilterConditions).not.toBeNull()
@@ -283,7 +293,9 @@ describe('filterState', () => {
       assignment_group_id: '0',
       context_module_id: null,
       grading_period_id: null,
-      submissions: null
+      submissions: null,
+      start_date: null,
+      end_date: null
     }
     store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
     expect(store.getState().stagedFilterConditions.length).toStrictEqual(0)
@@ -300,7 +312,9 @@ describe('filterState', () => {
       assignment_group_id: null,
       context_module_id: null,
       grading_period_id: '1',
-      submissions: null
+      submissions: null,
+      start_date: null,
+      end_date: null
     }
     store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
     expect(store.getState().stagedFilterConditions).not.toBeNull()
@@ -324,7 +338,9 @@ describe('filterState', () => {
       assignment_group_id: null,
       context_module_id: '1',
       grading_period_id: null,
-      submissions: null
+      submissions: null,
+      start_date: null,
+      end_date: null
     }
     store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
     expect(store.getState().stagedFilterConditions).toMatchObject([
@@ -347,7 +363,9 @@ describe('filterState', () => {
       assignment_group_id: null,
       context_module_id: '0',
       grading_period_id: null,
-      submissions: null
+      submissions: null,
+      start_date: null,
+      end_date: null
     }
     store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
     expect(store.getState().stagedFilterConditions.length).toStrictEqual(0)
