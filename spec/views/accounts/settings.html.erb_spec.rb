@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "accounts/settings.html.erb" do
+describe "accounts/settings" do
   before do
     assign(:account_roles, [])
     assign(:course_roles, [])

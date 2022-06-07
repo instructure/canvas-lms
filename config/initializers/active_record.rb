@@ -746,10 +746,16 @@ class ActiveRecord::Base
     self.updated_at = Time.now.utc if touch
     if new_record?
       self.created_at = updated_at if touch
-      self.id = self.class._insert_record(attributes_with_values(Rails.version < "7.0" ? attribute_names_for_partial_writes : attribute_names_for_partial_inserts))
+      self.id = self.class._insert_record(
+        attributes_with_values(Rails.version < "7.0" ? attribute_names_for_partial_writes : attribute_names_for_partial_inserts)
+        .transform_values { |attr| attr.is_a?(ActiveModel::Attribute) ? attr.value : attr }
+      )
       @new_record = false
     else
-      update_columns(attributes_with_values(Rails.version < "7.0" ? attribute_names_for_partial_writes : attribute_names_for_partial_updates))
+      update_columns(
+        attributes_with_values(Rails.version < "7.0" ? attribute_names_for_partial_writes : attribute_names_for_partial_updates)
+        .transform_values { |attr| attr.is_a?(ActiveModel::Attribute) ? attr.value : attr }
+      )
     end
     changes_applied
   end
@@ -1164,7 +1170,7 @@ module UsefulBatchEnumerator
 
         found_match = true
 
-        raw_update = update.value.value_before_type_cast
+        raw_update = update.value.is_a?(ActiveModel::Attribute) ? update.value.value_before_type_cast : update.value
         # we want to check exact class here, not ancestry, since we want to ignore
         # subclasses we don't understand
         if pred.instance_of?(Arel::Nodes::Equality)
@@ -1172,15 +1178,16 @@ module UsefulBatchEnumerator
         elsif pred.instance_of?(Arel::Nodes::NotEqual)
           update == pred.right
         elsif pred.instance_of?(Arel::Nodes::GreaterThanOrEqual)
-          raw_update < pred.right.value.value_before_type_cast
+          raw_update < (pred.right.value.is_a?(ActiveModel::Attribute) ? pred.right.value.value_before_type_cast : pred.right.value)
         elsif pred.instance_of?(Arel::Nodes::GreaterThan)
-          raw_update <= pred.right.value.value_before_type_cast
+          raw_update <= (pred.right.value.is_a?(ActiveModel::Attribute) ? pred.right.value.value_before_type_cast : pred.right.value)
         elsif pred.instance_of?(Arel::Nodes::LessThanOrEqual)
-          raw_update >= pred.right.value.value_before_type_cast
+          raw_update >= (pred.right.value.is_a?(ActiveModel::Attribute) ? pred.right.value.value_before_type_cast : pred.right.value)
         elsif pred.instance_of?(Arel::Nodes::LessThan)
-          raw_update > pred.right.value.value_before_type_cast
+          raw_update > (pred.right.value.is_a?(ActiveModel::Attribute) ? pred.right.value.value_before_type_cast : pred.right.value)
         elsif pred.instance_of?(Arel::Nodes::Between)
-          raw_update < pred.right.left.value.value_before_type_cast || raw_update > pred.right.right.value.value_before_type_cast
+          raw_update < (pred.right.left.value.is_a?(ActiveModel::Attribute) ? pred.right.left.value.value_before_type_cast : pred.right.left.value) ||
+            raw_update > (pred.right.right.value.is_a?(ActiveModel::Attribute) ? pred.right.right.value.value_before_type_cast : pred.right.right.value)
         elsif pred.instance_of?(Arel::Nodes::In) && pred.right.is_a?(Array)
           pred.right.exclude?(update)
         elsif pred.instance_of?(Arel::Nodes::NotIn) && pred.right.is_a?(Array)
@@ -1188,9 +1195,9 @@ module UsefulBatchEnumerator
         elsif pred.instance_of?(Arel::Nodes::HomogeneousIn)
           case pred.type
           when :in
-            pred.right.map(&:value).exclude?(update.value.value)
+            pred.right.map(&:value).exclude?(update.value.is_a?(ActiveModel::Attribute) ? update.value.value : update.value)
           when :notin
-            pred.right.map(&:value).include?(update.value.value)
+            pred.right.map(&:value).include?(update.value.is_a?(ActiveModel::Attribute) ? update.value.value : update.value)
           end
         end
       end && found_match

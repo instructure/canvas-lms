@@ -21,7 +21,7 @@
 require "spec_helper"
 require_relative "../views_helper"
 
-describe "assignments/_submission_sidebar.html.erb" do
+describe "assignments/_submission_sidebar" do
   let(:course) { Course.create! }
   let(:student) { User.create! }
   let(:teacher) { User.create! }
