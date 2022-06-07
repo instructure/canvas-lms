@@ -1085,6 +1085,16 @@ describe "Users API", type: :request do
       expect(json.map { |r| r["id"] }).to eq [@student.id]
     end
 
+    it "sets pagination total_pages/last page link if includes total entries is set" do
+      @account = Account.default
+      @user = @admin
+      api_call(:get, "/api/v1/accounts/#{@account.id}/users",
+               { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param },
+               { role_filter_id: student_role.id.to_s, include: ["total_entries"] })
+      expect(response).to be_successful
+      expect(response.headers["Link"]).to include("last")
+    end
+
     context "includes last login info" do
       before :once do
         @account = Account.default
@@ -1186,12 +1196,27 @@ describe "Users API", type: :request do
       end
     end
 
-    it "does not return a next-page link on the last page" do
+    it "does return a next header on the last page" do
       @account = Account.default
       u = User.create!(name: "test user")
       u.pseudonyms.create!(account: @account, unique_id: "user")
 
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param }, { search_term: u.id.to_s, per_page: "1", page: "1" })
+      expect(json.length).to eq 1
+      expect(response.headers["Link"]).to include("rel=\"next\"")
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param }, { search_term: u.id.to_s, per_page: "1", page: "2" })
+      expect(json).to be_empty
+      expect(response.headers["Link"]).to_not include("rel=\"next\"")
+    end
+
+    it "does not return a next-page link on the last page if includes total entries is set" do
+      @account = Account.default
+      u = User.create!(name: "test user")
+      u.pseudonyms.create!(account: @account, unique_id: "user")
+
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
+                      { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param },
+                      { search_term: u.id.to_s, per_page: "1", page: "1", include: ["total_entries"] })
       expect(json.length).to eq 1
       expect(response.headers["Link"]).to_not include("rel=\"next\"")
     end
