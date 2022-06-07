@@ -32,6 +32,6 @@ module GlobalNavigationHelper
   private
 
   def render_icon_partial(base, icon)
-    render "shared/svg/#{base}svg_icon_#{icon}.svg"
+    render partial: "shared/svg/#{base}svg_icon_#{icon}", formats: [:svg]
   end
 end

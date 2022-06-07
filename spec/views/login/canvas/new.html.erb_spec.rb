@@ -21,7 +21,7 @@
 require_relative "../../../spec_helper"
 require_relative "../../views_helper"
 
-describe "login/canvas/new.html.erb" do
+describe "login/canvas/new" do
   before do
     assign(:domain_root_account, Account.default)
   end

@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "courses/settings.html.erb" do
+describe "courses/settings" do
   before :once do
     @subaccount = account_model(parent_account: Account.default, name: "subaccount")
     @other_subaccount = account_model(parent_account: Account.default)
