@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {number, string, shape, arrayOf, bool} from 'prop-types'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton, CondensedButton} from '@instructure/ui-buttons'
 import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -152,9 +152,15 @@ export default class CoursesListRow extends React.Component {
       const addUsersTip = I18n.t('Add Users to %{name}', {name})
       return (
         <Tooltip renderTip={addUsersTip}>
-          <Button variant="icon" size="small" onClick={this.openAddUsersToCourseDialog}>
+          <IconButton
+            withBorder={false}
+            withBackground={false}
+            size="small"
+            onClick={this.openAddUsersToCourseDialog}
+            screenReaderLabel={addUsersTip}
+          >
             <IconPlusLine title={addUsersTip} />
-          </Button>
+          </IconButton>
         </Tooltip>
       )
     }
@@ -231,9 +237,9 @@ export default class CoursesListRow extends React.Component {
             </div>
           ))}
           {teachers && teachers.length > 2 && teachersToShow.length === 2 && (
-            <Button variant="link" size="small" onClick={this.showMoreTeachers}>
+            <CondensedButton size="small" onClick={this.showMoreTeachers}>
               {I18n.t('Show More')}
-            </Button>
+            </CondensedButton>
           )}
           {!teachers && teacher_count && I18n.t('%{teacher_count} teachers', {teacher_count})}
         </Table.Cell>
@@ -244,14 +250,26 @@ export default class CoursesListRow extends React.Component {
         <Table.Cell textAlign="end">
           {this.renderAddEnrollments()}
           <Tooltip renderTip={statsTip}>
-            <Button variant="icon" size="small" href={`${url}/statistics`}>
+            <IconButton
+              withBorder={false}
+              withBackground={false}
+              size="small"
+              href={`${url}/statistics`}
+              screenReaderLabel={statsTip}
+            >
               <IconStatsLine title={statsTip} />
-            </Button>
+            </IconButton>
           </Tooltip>
           <Tooltip renderTip={settingsTip}>
-            <Button variant="icon" size="small" href={`${url}/settings`}>
+            <IconButton
+              withBorder={false}
+              withBackground={false}
+              size="small"
+              href={`${url}/settings`}
+              screenReaderLabel={settingsTip}
+            >
               <IconSettingsLine title={settingsTip} />
-            </Button>
+            </IconButton>
           </Tooltip>
         </Table.Cell>
       </Table.Row>
