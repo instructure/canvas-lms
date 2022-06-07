@@ -637,7 +637,8 @@ class ApplicationController < ActionController::Base
   # Let's just not use the new math handling there.
   def use_new_math_equation_handling?
     !(params[:controller] == "quizzes/quizzes" && params[:action] == "edit") &&
-      params[:controller] != "question_banks"
+      params[:controller] != "question_banks" &&
+      params[:controller] != "eportfolio_entries"
   end
 
   def user_url(*opts)

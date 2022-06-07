@@ -2361,6 +2361,21 @@ RSpec.describe ApplicationController do
         expect(@controller.js_env[:FEATURES][:new_math_equation_handling]).to be_falsey
       end
     end
+
+    context "with the eportfolio_entries controller" do
+      before do
+        allow(controller).to receive(:params).and_return(
+          {
+            controller: "eportfolio_entries"
+          }
+        )
+      end
+
+      it "sets new_math_equation_handling to false" do
+        expect(@controller.use_new_math_equation_handling?).to be_falsey
+        expect(@controller.js_env[:FEATURES][:new_math_equation_handling]).to be_falsey
+      end
+    end
   end
 
   describe "k5_user? helper" do
