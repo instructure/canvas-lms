@@ -1003,7 +1003,7 @@ class Account < ActiveRecord::Base
     chain
   end
 
-  def self.account_chain_ids(starting_account_id)
+  def self.account_chain_ids(starting_account_id, include_federated_parent_id: false)
     block = lambda do |_name|
       original_shard = Shard.current
       Shard.shard_for(starting_account_id).activate do
@@ -1030,7 +1030,9 @@ class Account < ActiveRecord::Base
       end
     end
     key = Account.cache_key_for_id(starting_account_id, :account_chain)
-    key ? Rails.cache.fetch(["account_chain_ids", key], &block) : block.call(nil)
+    result = key ? Rails.cache.fetch(["account_chain_ids", key], &block) : block.call(nil)
+    Account.add_federated_parent_id_to_chain!(result) if include_federated_parent_id
+    result
   end
 
   def self.multi_account_chain_ids(starting_account_ids)
@@ -1049,6 +1051,10 @@ class Account < ActiveRecord::Base
   end
 
   def self.add_federated_parent_to_chain!(chain)
+    chain
+  end
+
+  def self.add_federated_parent_id_to_chain!(chain)
     chain
   end
 
@@ -1078,8 +1084,8 @@ class Account < ActiveRecord::Base
     @account_chain
   end
 
-  def account_chain_ids
-    @cached_account_chain_ids ||= Account.account_chain_ids(self)
+  def account_chain_ids(include_federated_parent_id: false)
+    @cached_account_chain_ids ||= Account.account_chain_ids(self, include_federated_parent_id: include_federated_parent_id)
   end
 
   def account_chain_loop

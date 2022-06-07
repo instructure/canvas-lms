@@ -242,7 +242,8 @@ class DeveloperKey < ActiveRecord::Base
     return true if account_id.blank?
     return true if target_account.id == account_id
 
-    target_account.account_chain_ids.include?(account_id)
+    # Include the federated parent unless we are the federated parent
+    target_account.account_chain_ids(include_federated_parent_id: !target_account.primary_settings_root_account?).include?(account_id)
   end
 
   def account_name
