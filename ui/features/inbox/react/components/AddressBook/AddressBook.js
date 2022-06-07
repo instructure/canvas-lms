@@ -564,7 +564,8 @@ export const AddressBook = ({
                       paddingInlineStart: '0px',
                       marginBlockStart: '0px',
                       marginBlockEnd: '0px',
-                      margin: '0'
+                      margin: '0',
+                      maxWidth: '100%'
                     }}
                     data-testid="address-book-popover"
                   >
