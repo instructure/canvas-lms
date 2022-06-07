@@ -84,7 +84,7 @@ describe('DiscussionsIsolatedView', () => {
     )
   }
 
-  it('should be able to post a reply to an entry', async () => {
+  it.skip('should be able to post a reply to an entry', async () => {
     const mocks = [
       ...getDiscussionQueryMock(),
       ...getDiscussionSubentriesQueryMock({
