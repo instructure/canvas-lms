@@ -1165,7 +1165,7 @@ RSpec.describe ApplicationController do
               before do
                 content_tag.update!(
                   context: course,
-                  associated_asset: Lti::ResourceLink.create_with(course, tool, abc: "def")
+                  associated_asset: Lti::ResourceLink.create_with(course, tool, { abc: "def" }, "http://www.example.com/launch")
                 )
               end
 

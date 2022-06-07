@@ -1,0 +1,134 @@
+@startuml lti_tables
+
+
+' Type	        Symbol
+' Zero or One	|o--
+' Exactly One	||--
+' Zero or Many	}o--
+' One or Many	}|--
+
+
+' hide the spot
+hide circle
+
+' avoid problems with angled crows feet
+skinparam linetype ortho
+
+entity "assigments" {
+  An assignment for on or more users to do
+  --
+  name   : text
+  due_at : date
+}
+
+entity "lti_line_items" {
+  LTI's version of assignment
+  (A thing a user can earn a grade for)
+  --
+  assignment_id : bigint
+  lti_resource_link_id: bigint
+  extensions : jsonb
+}
+
+entity "lti_results" {
+    LTI's version of a grade in a
+    gradebook
+    --
+    lti_line_item_id : bigint
+    submission_id    : bigint
+    user_id          : bigint
+    result_score     : double
+    result_maximum   : double
+}
+
+entity "submissions" {
+  A user's submission to an assignment
+  --
+  user_id : bigint
+  assignment_id : bigint
+  cached_due_date : text
+}
+
+entity "lti_resource_links" {
+  Maps a tool and a context to some tool content,
+  keeping track of custom parameters and
+  specific settings for that link
+  --
+  context_external_tool_id : bigint
+  custom : jsonb
+  resource_link_uuid : uuid
+  lookup_uuid : uuid
+  context_type : varchar
+}
+
+entity "context_external_tools" {
+  A tool in some context
+  (Course, Account)
+  --
+  domain: varchar
+  url: varchar
+  consumer_key: varchar
+  shared_secret: varchar
+  tool_id : varchar
+  developer_key_id: varchar
+  context_type: varchar
+}
+
+entity "lti_tool_configurations" {
+  Extra LTI-specific JSON config
+  on Developer API keys
+  --
+  settings : jsonb
+}
+
+entity "developer_keys" {
+  An API key that an application 
+  can use to access Canvas's APIs
+  --
+  api_key: varchar
+}
+
+entity "content_tag" {
+  An item in a module
+  --
+  title: varchar
+  url: varchar
+}
+
+entity "context_external_tool_placements" {
+  A context-tool added to a "placement" 
+  --
+  placement_type: varchar
+  context_external_tool_id: bigint
+}
+
+
+
+assigments ||.o{ submissions
+
+assigments   ||..o{ lti_line_items
+lti_line_items ||.o{ lti_results 
+submissions ||..|| lti_results
+
+context_external_tools ||..o{ lti_resource_links
+
+lti_resource_links ||.o{ lti_line_items
+
+developer_keys ||..o{ context_external_tools
+developer_keys ||.|| lti_tool_configurations
+
+content_tag |o.o| lti_resource_links
+
+' These tables were not included in this diagram, 
+' as they are only pertinent to LTI2:
+'  lti_tool_consumer_profiles
+'  lti_tool_settings
+'  lti_product_families
+'  lti_resource_handlers
+'  lti_tool_proxy_bindings
+'  lti_tool_proxies
+'  lti_message_handlers
+'  lti_links
+
+@enduml
+

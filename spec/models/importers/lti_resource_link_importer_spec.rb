@@ -64,7 +64,8 @@ describe Importers::LtiResourceLinkImporter do
           context_external_tool: tool,
           context: assignment,
           lookup_uuid: lookup_uuid,
-          custom: nil
+          custom: nil,
+          url: "http://www.example.com/launch"
         )
       end
 

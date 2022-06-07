@@ -94,7 +94,7 @@ describe('processEditorContentItems', () => {
 
     it('creates content for an LTI ResourceLink content item', () => {
       expect(send.mock.calls[1][2]).toEqual(
-        '<a href="test?display=borderless&amp;url=http%3A%2F%2Fwww.test.com" title="link title" target="_blank">link text</a>'
+        '<a href="test?display=borderless" title="link title" target="_blank">link text</a>'
       )
     })
 
@@ -124,7 +124,7 @@ describe('processEditorContentItems', () => {
 
     it('creates content for an LTI ResourceLink content item', () => {
       expect(send.mock.calls[1][2]).toEqual(
-        '<a href="test?display=borderless&amp;url=http%3A%2F%2Fwww.test.com" title="link title" target="_blank">user selection</a>'
+        '<a href="test?display=borderless" title="link title" target="_blank">user selection</a>'
       )
     })
   })

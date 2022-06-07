@@ -722,7 +722,8 @@ class ContextModule < ActiveRecord::Base
             context: context,
             lookup_uuid: params[:lti_resource_link_lookup_uuid].presence,
             custom: Lti::DeepLinkingUtil.validate_custom_params(params[:custom_params]),
-            context_external_tool: content
+            context_external_tool: content,
+            url: params[:url]
           )
       end
     when "context_module_sub_header", "sub_header"

@@ -47,7 +47,8 @@ describe Lti::Messages::ResourceLinkRequest do
           custom: {
             link_has_expansion2: "$Canvas.assignment.id",
             no_expansion: "overrides tool param!"
-          }
+          },
+          url: "http://www.example.com/launch"
         )
       end
       let(:opts) { super().merge(resource_link: resource_link) }
