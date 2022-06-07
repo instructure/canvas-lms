@@ -181,20 +181,20 @@ export default class DateValidator {
   getSectionRange(section) {
     if (!section.override_course_and_term_dates) return this.dateRange
 
+    const dateRange = {...this.dateRange}
     if (section.start_at) {
-      this.dateRange.start_at = {
+      dateRange.start_at = {
         date: section.start_at,
         date_context: 'section'
       }
     }
     if (section.end_at) {
-      this.dateRange.end_at = {
+      dateRange.end_at = {
         date: section.end_at,
         date_context: 'section'
       }
     }
-
-    return this.dateRange
+    return dateRange
   }
 
   _validateMultipleGradingPeriods(date, errs) {
