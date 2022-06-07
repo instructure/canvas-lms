@@ -1691,6 +1691,20 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
   }
 
+  updateCurrentStartDate = (startDate: null | string) => {
+    if (this.getFilterColumnsBySetting('startDate') !== startDate) {
+      this.gridDisplaySettings.filterColumnsBy.startDate = startDate
+      this.saveSettings()
+    }
+  }
+
+  updateCurrentEndDate = (endDate: null | string) => {
+    if (this.getFilterColumnsBySetting('endDate') !== endDate) {
+      this.gridDisplaySettings.filterColumnsBy.endDate = endDate
+      this.saveSettings()
+    }
+  }
+
   moduleList = () => {
     return this.courseContent.contextModules.sort((a: Module, b: Module) => {
       return a.position - b.position
@@ -2873,7 +2887,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
           assignment_group_id: this.gridDisplaySettings.filterColumnsBy.assignmentGroupId,
           context_module_id: this.gridDisplaySettings.filterColumnsBy.contextModuleId,
           grading_period_id: this.gridDisplaySettings.filterColumnsBy.gradingPeriodId,
-          submissions: this.gridDisplaySettings.filterColumnsBy.submissions
+          submissions: this.gridDisplaySettings.filterColumnsBy.submissions,
+          start_date: this.gridDisplaySettings.filterColumnsBy.startDate,
+          end_date: this.gridDisplaySettings.filterColumnsBy.endDate
         },
         filter_rows_by: {
           section_id: this.gridDisplaySettings.filterRowsBy.sectionId,
@@ -4808,6 +4824,34 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         }
       }
 
+      // modules
+      const prevModulesIds = findConditionValuesOfType('module', prevProps.appliedFilterConditions)
+      const moduleIds = findConditionValuesOfType('module', this.props.appliedFilterConditions)
+      if (prevModulesIds[0] !== moduleIds[0]) {
+        if (moduleIds.length === 0 || !moduleIds[0]) {
+          this.updateCurrentModule(null)
+        } else {
+          this.updateCurrentModule(moduleIds[0])
+        }
+      }
+
+      // assignment groups
+      const prevAssignmentGroupIds = findConditionValuesOfType(
+        'assignment-group',
+        prevProps.appliedFilterConditions
+      )
+      const assignmentGroupIds = findConditionValuesOfType(
+        'assignment-group',
+        this.props.appliedFilterConditions
+      )
+      if (prevAssignmentGroupIds[0] !== assignmentGroupIds[0]) {
+        if (assignmentGroupIds.length === 0 || !assignmentGroupIds[0]) {
+          this.updateCurrentAssignmentGroup(null)
+        } else {
+          this.updateCurrentAssignmentGroup(assignmentGroupIds[0])
+        }
+      }
+
       // student groups
       const prevStudentGroupIds = findConditionValuesOfType(
         'student-group',
@@ -4839,6 +4883,31 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
           this.updateCurrentGradingPeriod(null)
         } else {
           this.updateCurrentGradingPeriod(gradingPeriodId)
+        }
+      }
+
+      // start-date
+      const prevStartDate = findConditionValuesOfType(
+        'start-date',
+        prevProps.appliedFilterConditions
+      )
+      const startDate = findConditionValuesOfType('start-date', this.props.appliedFilterConditions)
+      if (prevStartDate[0] !== startDate[0]) {
+        if (startDate.length === 0 || !startDate[0]) {
+          this.updateCurrentStartDate(null)
+        } else {
+          this.updateCurrentStartDate(startDate[0])
+        }
+      }
+
+      // end-date
+      const prevEndDate = findConditionValuesOfType('end-date', prevProps.appliedFilterConditions)
+      const endDate = findConditionValuesOfType('end-date', this.props.appliedFilterConditions)
+      if (prevEndDate[0] !== endDate[0]) {
+        if (startDate.length === 0 || !endDate[0]) {
+          this.updateCurrentEndDate(null)
+        } else {
+          this.updateCurrentEndDate(endDate[0])
         }
       }
 
