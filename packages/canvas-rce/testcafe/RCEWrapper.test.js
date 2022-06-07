@@ -16,14 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable mocha/no-global-tests, mocha/handle-done-callback */
-
 import {Selector, ClientFunction} from 'testcafe'
-
+// eslint-disable-next-line babel/no-unused-expressions
 fixture`RCEWrapper`.page`./testcafe.html`
-
-const tinyIframe = Selector('.tox-edit-area__iframe')
-const textarea = Selector('#textarea')
+const tinyIframe = Selector('#textarea_ifr')
+const textArea = Selector('.RceHtmlEditor')
 const rceContainer = Selector('.tox-tinymce')
 const toggleButton = Selector('button').withText('</>')
 const linksButton = Selector('[role="button"][aria-label="Links"] .tox-split-button__chevron')
@@ -37,9 +34,6 @@ const selectword = Selector('#selectword')
 const linksTraySelector = '[role="dialog"][aria-label="Course Links"]'
 const rceBody = Selector('#tinymce')
 const linksPanelSelector = Selector('[data-testid="instructure_links-LinksPanel"]')
-const imagesButton = Selector('[role="button"][aria-label="Images"] .tox-split-button__chevron')
-const uploadImageMenuItem = Selector('[role^="menuitem"][title="Upload Image"]')
-const uploadImageDialog = Selector('[role="dialog"][aria-label="Upload Image"]')
 
 function named(name) {
   return Selector(`[name="${name}"]`)
@@ -49,44 +43,33 @@ function specificValue(value) {
   return Selector(`[value="${value}"]`)
 }
 
-test('edits in the textarea are reflected in the editor', async t => {
+test.skip('edits in the textarea are reflected in the editor', async t => {
   // const myText = ClientFunction(() => document.querySelector('#tinymce').innerText)
   await t
     .click(toggleButton)
-    .typeText(textarea, 'this is new content')
+    .typeText(textArea, 'this is new content')
     .click(toggleButton)
     .switchToIframe(tinyIframe)
 
-  await t
-    .expect(rceBody.withExactText('this is new content').visible)
-    .ok()
-    .switchToMainWindow()
+  await t.expect(rceBody.withExactText('this is new content').visible).ok().switchToMainWindow()
 
   await t
     .click(toggleButton)
     .pressKey('end')
-    .typeText(textarea, 'this is more content')
+    .typeText(textArea, 'this is more content')
     .click(toggleButton)
     .switchToIframe(tinyIframe)
-    .expect(
-      Selector('body')
-        .find('p')
-        .withExactText('this is new content').visible
-    )
+    .expect(Selector('body').find('p').withExactText('this is new content').visible)
     .ok()
-    .expect(
-      Selector('body')
-        .find('p')
-        .withExactText('this is more content').visible
-    )
+    .expect(Selector('body').find('p').withExactText('this is more content').visible)
     .ok()
     .switchToMainWindow()
 })
 
-test('shows the create links menu', async t => {
+test.skip('shows the create links menu', async t => {
   await t
     .click(toggleButton)
-    .typeText(textarea, '<div>this is <span id="selectword">selected</span> text</div>')
+    .typeText(textArea, '<div>this is <span id="selectword">selected</span> text</div>')
     .click(toggleButton)
     .expect(rceContainer.visible)
     .ok()
@@ -102,11 +85,11 @@ test('shows the create links menu', async t => {
     .ok()
 })
 
-test('shows the edit links menu', async t => {
+test.skip('shows the edit links menu', async t => {
   await t
     .click(toggleButton)
     .typeText(
-      textarea,
+      textArea,
       '<div>this is <a href="http://example.com"><span id="selectword">selected</span></a> text</div>'
     )
     .click(toggleButton)
@@ -124,10 +107,10 @@ test('shows the edit links menu', async t => {
     .ok()
 })
 
-test('can create an external link', async t => {
+test.skip('can create an external link', async t => {
   await t
     .click(toggleButton)
-    .typeText(textarea, '<div>this is <span id="selectword">selected</span> text</div>')
+    .typeText(textArea, '<div>this is <span id="selectword">selected</span> text</div>')
     .click(toggleButton)
     .expect(rceContainer.visible)
     .ok()
@@ -155,11 +138,11 @@ test('can create an external link', async t => {
     .ok()
 })
 
-test('can edit an external link', async t => {
+test.skip('can edit an external link', async t => {
   await t
     .click(toggleButton)
     .typeText(
-      textarea,
+      textArea,
       '<div>this is <a href="http://example.com"><span id="selectword">selected</span></a> text</div>'
     )
     .click(toggleButton)
@@ -174,47 +157,36 @@ test('can edit an external link', async t => {
   // the link is selected, the toolbar button should be enabled
   // await t.expect(linksButton.hasClass('tox-tbtn--enabled')).ok()
 
-  await t
-    .click(linksButton)
-    .click(editLinkMenuItem)
-    .expect(linkTray.visible)
-    .ok()
+  await t.click(linksButton).click(editLinkMenuItem).expect(linkTray.visible).ok()
 
   await t.expect(specificValue('http://example.com').exists).ok()
   await t.expect(specificValue('selected').exists).ok()
 })
 
-test('expands selection to edit external link', async t => {
+test.skip('expands selection to edit external link', async t => {
   await t
     .click(toggleButton)
     .typeText(
-      textarea,
+      textArea,
       '<div>this is <a href="http://example.com"><span id="selectword">selected</span></a> text</div>'
     )
     .click(toggleButton)
     .expect(rceContainer.visible)
     .ok()
 
-  await t
-    .switchToIframe(tinyIframe)
-    .click(selectword, {caretPos: 1})
-    .switchToMainWindow()
+  await t.switchToIframe(tinyIframe).click(selectword, {caretPos: 1}).switchToMainWindow()
 
-  await t
-    .click(linksButton)
-    .click(editLinkMenuItem)
-    .expect(linkTray.visible)
-    .ok()
+  await t.click(linksButton).click(editLinkMenuItem).expect(linkTray.visible).ok()
 
   await t.expect(specificValue('http://example.com').exists).ok()
   await t.expect(specificValue('selected').exists).ok()
 })
 
-test('can remove a link', async t => {
+test.skip('can remove a link', async t => {
   await t
     .click(toggleButton)
     .typeText(
-      textarea,
+      textArea,
       '<div>this is <a href="http://example.com"><span id="selectword">selected</span></a> text</div>'
     )
     .click(toggleButton)
@@ -228,14 +200,11 @@ test('can remove a link', async t => {
     .click(linksButton)
     .click(removeLinkMenuItem)
 
-  await t
-    .switchToIframe(tinyIframe)
-    .expect(Selector('a').exists)
-    .notOk()
+  await t.switchToIframe(tinyIframe).expect(Selector('a').exists).notOk()
 })
 
 // fails at the React.lazy call to load the tray's panel
-test('focus returns on dismissing tray', async t => {
+test.skip('focus returns on dismissing tray', async t => {
   const tinymceSelection = ClientFunction(() => tinymce.get('textarea').selection.getContent()) // the textarea id is from testcafe.html
   const focusedId = ClientFunction(() => document.activeElement.id)
   const focusedTag = ClientFunction(() => document.activeElement.tagName)
@@ -243,7 +212,7 @@ test('focus returns on dismissing tray', async t => {
 
   await t
     .click(toggleButton)
-    .typeText(textarea, '<div>this is <span id="selectword">selected</span> text</div>')
+    .typeText(textArea, '<div>this is <span id="selectword">selected</span> text</div>')
     .click(toggleButton)
     .expect(rceContainer.visible)
     .ok()
@@ -276,31 +245,23 @@ test('focus returns on dismissing tray', async t => {
 })
 
 test('show the kb shortcut modal various ways', async t => {
-  const hiddenbutton = Selector('[data-testid="ShowOnFocusButton__sronly"]')
   const kbshortcutbutton = Selector('button[data-testid="ShowOnFocusButton__button"]')
   const sbKbshortcutbutton = Selector('button[title="View keyboard shortcuts"]')
   const shortcutmodal = Selector('[data-testid="RCE_KeyboardShortcutModal"]')
-  const editorStatusbar = Selector('[title="Editor Statusbar"]')
   const focusKBSCBtn = ClientFunction(() => kbshortcutbutton().focus(), {
     dependencies: {kbshortcutbutton}
   })
-  const focusStatusbar = ClientFunction(() => editorStatusbar().focus(), {
-    dependencies: {editorStatusbar}
+  const focusSBKBSCBtn = ClientFunction(() => sbKbshortcutbutton().focus(), {
+    dependencies: {sbKbshortcutbutton}
   })
 
-  await t
-    .expect(hiddenbutton.exists)
-    .ok()
-    .expect(kbshortcutbutton.exists)
-    .ok()
+  await t.expect(kbshortcutbutton.exists).ok()
 
   await focusKBSCBtn()
 
   // open keyboard shortcut modal from the show-on-focus button
   // close with escape
   await t
-    .expect(hiddenbutton.exists)
-    .notOk()
     .expect(kbshortcutbutton.visible)
     .ok()
     .click(kbshortcutbutton)
@@ -325,8 +286,7 @@ test('show the kb shortcut modal various ways', async t => {
   // open modal from button in status bar
   // debugger;
   // close with the close button
-
-  await focusStatusbar()
+  await focusSBKBSCBtn()
 
   await t
     .expect(sbKbshortcutbutton.exists)
@@ -339,7 +299,7 @@ test('show the kb shortcut modal various ways', async t => {
     .notOk()
 })
 
-// test('can bring up the images dialog', async t => {
+// test.skip('can bring up the images dialog', async t => {
 //   await t
 //     .switchToMainWindow()
 //     .click(imagesButton())
