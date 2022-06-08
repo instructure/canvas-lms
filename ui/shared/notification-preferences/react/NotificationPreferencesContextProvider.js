@@ -18,7 +18,7 @@
 
 import React, {createContext, useState} from 'react'
 
-const DEFAULT_CONTEXT = 'account'
+const DEFAULT_CONTEXT = {value: 'account', name: 'Account'}
 
 export const NotificationPreferencesContext = createContext(null)
 

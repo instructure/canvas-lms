@@ -17,12 +17,13 @@
  */
 
 import React, {useCallback, useMemo} from 'react'
-import {arrayOf, func, string} from 'prop-types'
+import {arrayOf, func, object} from 'prop-types'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Flex} from '@instructure/ui-flex'
 import {EnrollmentShape} from './Shape'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {groupBy, sortBy, sortedUniqBy} from 'lodash'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = useI18nScope('notification_preferences')
 
@@ -36,8 +37,11 @@ export default function NotificationPreferencesContextSelect(props) {
   }, [props.enrollments])
 
   const handleChange = useCallback(
-    (_, data) => {
-      if (props.handleContextChanged) props.handleContextChanged(data.value)
+    (e, data) => {
+      if (props.handleContextChanged) {
+        const name = e.target.textContent ? e.target.textContent : props.currentContext.name
+        props.handleContextChanged({value: data.value, name})
+      }
     },
     [props]
   )
@@ -45,9 +49,13 @@ export default function NotificationPreferencesContextSelect(props) {
   return (
     <Flex justifyItems="space-between" margin="small 0">
       <SimpleSelect
-        renderLabel={I18n.t('Settings for')}
-        value={props.currentContext || 'account'}
+        renderLabel={[
+          I18n.t('Settings for'),
+          <ScreenReaderContent>{props.currentContext.name}</ScreenReaderContent>
+        ]}
+        value={props.currentContext.value || 'account'}
         onChange={handleChange}
+        data-testId="settings-for-label"
       >
         <SimpleSelect.Option id="account" value="account">
           {I18n.t('Account')}
@@ -67,7 +75,7 @@ export default function NotificationPreferencesContextSelect(props) {
 }
 
 NotificationPreferencesContextSelect.propTypes = {
-  currentContext: string,
+  currentContext: object,
   enrollments: arrayOf(EnrollmentShape),
   handleContextChanged: func
 }

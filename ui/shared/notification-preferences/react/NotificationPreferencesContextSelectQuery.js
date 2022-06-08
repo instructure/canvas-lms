@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useContext, useEffect} from 'react'
-import {func, string} from 'prop-types'
+import {func, string, object} from 'prop-types'
 import {useQuery} from 'react-apollo'
 import NotificationPreferencesContextSelect from './NotificationPreferencesContextSelect'
 import {NOTIFICATION_PREFERENCES_CONTEXT_SELECT_QUERY} from '../graphql/Queries'
@@ -51,6 +51,6 @@ export default function NotificationPreferencesContextSelectQuery(props) {
 
 NotificationPreferencesContextSelectQuery.propTypes = {
   userId: string.isRequired,
-  currentContext: string.isRequired,
+  currentContext: object.isRequired,
   onContextChanged: func
 }
