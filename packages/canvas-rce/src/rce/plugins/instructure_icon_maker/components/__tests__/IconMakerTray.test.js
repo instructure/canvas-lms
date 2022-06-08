@@ -282,7 +282,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
     await waitFor(() => expect(defaults.onUnmount).toHaveBeenCalled())
   })
 
-  it('writes the content to the editor without alt attribute', async () => {
+  it('writes the content to the editor without alt attribute when no alt text entered', async () => {
     render(<IconMakerTray {...defaults} />)
 
     setIconColor('#000000')
@@ -295,6 +295,19 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
     `)
 
     await waitFor(() => expect(defaults.onUnmount).toHaveBeenCalled())
+  })
+
+  it('writes the content to the editor with alt="" if is decorative', async () => {
+    render(<IconMakerTray {...defaults} />)
+    setIconColor('#000000')
+    userEvent.click(screen.getByRole('checkbox', {name: /Decorative Icon/}))
+    userEvent.click(screen.getByRole('button', {name: /apply/i}))
+    await waitFor(() => expect(editor.insertContent).toHaveBeenCalled())
+    expect(editor.insertContent.mock.calls[0]).toMatchInlineSnapshot(`
+      Array [
+        "<img src=\\"https://uploaded.url\\" alt=\\"\\" data-inst-icon-maker-icon=\\"true\\" data-download-url=\\"https://uploaded.url/?icon_maker_icon=1\\">",
+      ]
+    `)
   })
 
   describe('the "replace all instances" checkbox', () => {
