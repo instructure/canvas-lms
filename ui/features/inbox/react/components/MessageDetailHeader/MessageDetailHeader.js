@@ -35,6 +35,9 @@ const I18n = useI18nScope('conversations_2')
 export const MessageDetailHeader = ({...props}) => {
   const {isSubmissionCommentsType} = useContext(ConversationContext)
 
+  const showArchive = props.scope !== 'sent' && props.onArchive
+  const showUnarchive = props.scope !== 'sent' && props.onUnarchive
+
   return (
     <Responsive
       match="media"
@@ -116,15 +119,26 @@ export const MessageDetailHeader = ({...props}) => {
                     {I18n.t('Forward')}
                   </Menu.Item>
                 )}
-                {props.scope !== 'sent' && (
-                  <Menu.Item
-                    value={props.onArchive ? 'archive' : 'unarchive'}
-                    onSelect={props.onArchive ? props.onArchive : props.onUnarchive}
-                  >
-                    {props.onArchive ? I18n.t('Archive') : I18n.t('Unarchive')}
+                {showArchive && (
+                  <Menu.Item value="archive" onSelect={props.onArchive}>
+                    {I18n.t('Archive')}
                   </Menu.Item>
                 )}
-                <Menu.Item value="star">{I18n.t('Star')}</Menu.Item>
+                {showUnarchive && (
+                  <Menu.Item value="unarchive" onSelect={props.onUnarchive}>
+                    {I18n.t('Unarchive')}
+                  </Menu.Item>
+                )}
+                {props.onStar && (
+                  <Menu.Item value="star" onSelect={props.onStar}>
+                    {I18n.t('Star')}
+                  </Menu.Item>
+                )}
+                {props.onUnstar && (
+                  <Menu.Item value="unstar" onSelect={props.onUnstar}>
+                    {I18n.t('Unstar')}
+                  </Menu.Item>
+                )}
                 <Menu.Item value="delete" onSelect={props.onDelete}>
                   {I18n.t('Delete')}
                 </Menu.Item>
@@ -144,6 +158,8 @@ MessageDetailHeader.propTypes = {
   onReplyAll: PropTypes.func,
   onArchive: PropTypes.func,
   onUnarchive: PropTypes.func,
+  onStar: PropTypes.func,
+  onUnstar: PropTypes.func,
   onDelete: PropTypes.func,
   focusRef: PropTypes.any,
   onForward: PropTypes.func,

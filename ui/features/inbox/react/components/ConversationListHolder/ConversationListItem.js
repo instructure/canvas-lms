@@ -210,7 +210,9 @@ export const ConversationListItem = ({...props}) => {
                                   props.isStarred ? I18n.t('starred') : I18n.t('not starred')
                                 }
                                 onClick={handleConversationStarClick}
-                                data-testid="visible-star"
+                                data-testid={
+                                  props.isStarred ? 'visible-starred' : 'visible-not-starred'
+                                }
                               />
                             ) : (
                               <ScreenReaderContent>

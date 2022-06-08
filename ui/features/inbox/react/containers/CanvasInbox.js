@@ -356,6 +356,51 @@ const CanvasInbox = () => {
     }
   })
 
+  const firstConversation = selectedConversations.length > 0 ? selectedConversations[0] : {}
+
+  const myConversationParticipant = firstConversation?.participants?.find(
+    node => node.user._id === ENV.current_user_id
+  )
+  const firstConversationIsStarred = myConversationParticipant?.label === 'starred'
+
+  const [starConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
+    onCompleted: () => {
+      if (firstConversationIsStarred) {
+        setOnSuccess(
+          I18n.t(
+            {
+              one: 'The conversation has been successfully unstarred.',
+              other: 'The conversations has been successfully unstarred.'
+            },
+            {count: selectedConversations.length}
+          )
+        )
+      } else {
+        setOnSuccess(
+          I18n.t(
+            {
+              one: 'The conversation has been successfully starred.',
+              other: 'The conversations has been successfully starred.'
+            },
+            {count: selectedConversations.length}
+          )
+        )
+      }
+    },
+    onError: () => {
+      setOnFailure(I18n.t('There was an unexpected error updating the conversation participants.'))
+    }
+  })
+
+  const handleStar = starred => {
+    starConversationParticipants({
+      variables: {
+        conversationIds: selectedConversations.map(convo => convo._id),
+        starred
+      }
+    })
+  }
+
   const onReply = ({conversationMessage = null, replyAll = false} = {}) => {
     conversationMessage = isSubmissionCommentsType ? {} : conversationMessage
     setSelectedConversationMessage(conversationMessage)
@@ -439,6 +484,8 @@ const CanvasInbox = () => {
                   onConversationRemove={removeFromSelectedConversations}
                   displayUnarchiveButton={displayUnarchiveButton}
                   conversationsQueryOptions={conversationsQueryOption}
+                  onStar={handleStar}
+                  firstConversationIsStarred={firstConversationIsStarred}
                   onDelete={handleDelete}
                   canReply={canReply}
                 />
@@ -513,6 +560,20 @@ const CanvasInbox = () => {
                           onUnarchive={displayUnarchiveButton ? handleUnarchive : undefined}
                           onDelete={handleDelete}
                           onForward={conversationMessage => onForward({conversationMessage})}
+                          onStar={
+                            !firstConversationIsStarred
+                              ? () => {
+                                  handleStar(true)
+                                }
+                              : null
+                          }
+                          onUnstar={
+                            firstConversationIsStarred
+                              ? () => {
+                                  handleStar(false)
+                                }
+                              : null
+                          }
                           scope={scope}
                         />
                       </>
