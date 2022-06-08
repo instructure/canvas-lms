@@ -79,6 +79,7 @@ class DashboardHeader extends React.Component {
     super(...args)
     this.cardDashboardLoader = new CardDashboardLoader()
     this.planner_init_promise = undefined
+    this.plannerLoaded = false
     if (this.props.planner_enabled) {
       // setup observing another user?
       let observedUser
@@ -189,7 +190,10 @@ class DashboardHeader extends React.Component {
     if (newView === 'planner' && this.props.planner_enabled) {
       this.planner_init_promise
         .then(() => {
-          this.loadPlannerComponent()
+          if (!this.plannerLoaded) {
+            this.loadPlannerComponent()
+            this.plannerLoaded = true
+          }
         })
         .catch(_ex => {
           showFlashAlert({message: I18n.t('Failed initializing dashboard'), type: 'error'})
