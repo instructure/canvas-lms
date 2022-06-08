@@ -38,7 +38,7 @@ module Canvas::OAuth
       }.freeze,
 
       invalid_refresh_token: {
-        error: :invalid_request,
+        error: :invalid_grant,
         error_description: "refresh_token not found"
       }.freeze,
 

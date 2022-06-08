@@ -16,6 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import {useScope as useI18nScope} from '@canvas/i18n'
+import numberHelper from '@canvas/i18n/numberHelper'
 import GRADEBOOK_TRANSLATIONS from '@canvas/grading/GradebookTranslations'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import OutlierScoreHelper from '@canvas/grading/OutlierScoreHelper'
@@ -34,7 +35,7 @@ const GradingCellComponent = Ember.Component.extend({
   isPercent: Ember.computed.equal('assignment.grading_type', 'percent'),
   isLetterGrade: Ember.computed.equal('assignment.grading_type', 'letter_grade'),
   isPassFail: Ember.computed.equal('assignment.grading_type', 'pass_fail'),
-  isInPastGradingPeriodAndNotAdmin: function() {
+  isInPastGradingPeriodAndNotAdmin: function () {
     return this.submission != null ? this.submission.gradeLocked : undefined
   }.property('submission'),
   nilPointsPossible: Ember.computed.none('assignment.points_possible'),
@@ -59,7 +60,7 @@ const GradingCellComponent = Ember.Component.extend({
     }
   ],
 
-  outOfText: function() {
+  outOfText: function () {
     if (this.submission && this.submission.excused) {
       return I18n.t('Excused')
     } else if (this.get('isGpaScale')) {
@@ -80,14 +81,14 @@ const GradingCellComponent = Ember.Component.extend({
     return ENV.GRADEBOOK_OPTIONS.change_grade_url
   },
 
-  saveURL: function() {
+  saveURL: function () {
     const submission = this.get('submission')
     return this.changeGradeURL()
       .replace(':assignment', submission.assignment_id)
       .replace(':submission', submission.user_id)
   }.property('submission.assignment_id', 'submission.user_id'),
 
-  score: function() {
+  score: function () {
     if (this.submission.score != null) {
       return I18n.n(this.submission.score)
     } else {
@@ -95,7 +96,7 @@ const GradingCellComponent = Ember.Component.extend({
     }
   }.property('submission.score'),
 
-  entered_score: function() {
+  entered_score: function () {
     if (this.submission.entered_score != null) {
       return I18n.n(this.submission.entered_score)
     } else {
@@ -103,7 +104,7 @@ const GradingCellComponent = Ember.Component.extend({
     }
   }.property('submission.entered_score'),
 
-  late_penalty: function() {
+  late_penalty: function () {
     if (this.submission.points_deducted != null) {
       return I18n.n(-1 * this.submission.points_deducted)
     } else {
@@ -111,7 +112,7 @@ const GradingCellComponent = Ember.Component.extend({
     }
   }.property('submission.points_deducted'),
 
-  points_possible: function() {
+  points_possible: function () {
     if (this.assignment.points_possible != null) {
       return I18n.n(this.assignment.points_possible)
     } else {
@@ -119,7 +120,7 @@ const GradingCellComponent = Ember.Component.extend({
     }
   }.property('assignment.points_possible'),
 
-  final_grade: function() {
+  final_grade: function () {
     if (this.submission.grade != null) {
       return GradeFormatHelper.formatGrade(this.submission.grade)
     } else {
@@ -132,7 +133,7 @@ const GradingCellComponent = Ember.Component.extend({
     return $.ajaxJSON(url, type, data)
   },
 
-  excusedToggled: function() {
+  excusedToggled: function () {
     if (this.shouldSaveExcused) {
       this.updateSubmissionExcused()
     }
@@ -155,10 +156,8 @@ const GradingCellComponent = Ember.Component.extend({
     return (this.shouldSaveExcused = true)
   },
 
-  submissionDidChange: function() {
-    const newVal = (this.submission != null
-    ? this.submission.excused
-    : undefined)
+  submissionDidChange: function () {
+    const newVal = (this.submission != null ? this.submission.excused : undefined)
       ? 'EX'
       : (this.submission != null ? this.submission.entered_grade : undefined) || '-'
 
@@ -211,9 +210,21 @@ const GradingCellComponent = Ember.Component.extend({
 
     value = GradeFormatHelper.delocalizeGrade(value)
 
-    if (value === submission.grade) {
+    if (
+      value === submission.grade ||
+      ((value === '-' || value === '') && submission.grade === null)
+    ) {
       return
     }
+
+    if ((value && this.get('isPoints')) || this.get('isPercent')) {
+      let formattedGrade = value
+      formattedGrade = numberHelper.parse(formattedGrade.replace(/%/g, '')).toString()
+      if (formattedGrade === 'NaN') {
+        return $.flashError(I18n.t('Invalid Grade'))
+      }
+    }
+
     const data =
       typeof value === 'string' && value.toUpperCase() === 'EX'
         ? {'submission[excuse]': true}
@@ -225,7 +236,7 @@ const GradingCellComponent = Ember.Component.extend({
     return save.then(this.boundUpdateSuccess, this.onUpdateError)
   },
 
-  bindSave: function() {
+  bindSave: function () {
     this.boundUpdateSuccess = this.onUpdateSuccess.bind(this)
   }.on('init'),
 

@@ -201,6 +201,7 @@ module K5ScheduleTabPageObject
   end
 
   def click_missing_items
+    driver.execute_script("arguments[0].scrollIntoView()", items_missing)
     items_missing.click
   end
 

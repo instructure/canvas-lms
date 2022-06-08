@@ -181,7 +181,7 @@ module Api::V1::CalendarEvent
 
   def assignment_event_json(assignment, user, session, options = {})
     excludes = options[:excludes] || []
-    target_fields = %w[created_at updated_at title all_day all_day_date workflow_state]
+    target_fields = %w[created_at updated_at title all_day all_day_date workflow_state submission_types]
     target_fields << "description" unless excludes.include?("description")
     hash = api_json(assignment, user, session, only: target_fields)
     hash["description"] = api_user_content(hash["description"], assignment.context) unless excludes.include?("description")

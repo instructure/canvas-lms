@@ -29,6 +29,7 @@ import TimeLateInput from '@canvas/grading/TimeLateInput'
 const I18n = useI18nScope('speed_grader')
 
 const statusesMap = {
+  extended: I18n.t('Extended'),
   excused: I18n.t('Excused'),
   late: I18n.t('Late'),
   missing: I18n.t('Missing'),
@@ -49,7 +50,10 @@ export default function SpeedGraderStatusMenu(props) {
     props.updateSubmission(data)
   }
 
-  const menuOptions = ['late', 'missing', 'excused', 'none'].map(status => (
+  const optionValues = ['late', 'missing', 'excused', 'none']
+  if (ENV.FEATURES && ENV.FEATURES.extended_submission_state) optionValues.splice(3, 0, 'extended')
+
+  const menuOptions = optionValues.map(status => (
     <Menu.Item
       key={status}
       value={status}

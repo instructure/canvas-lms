@@ -111,18 +111,30 @@ test('does not resize any other container', () => {
   equal($('.tool_content_wrapper').height(), 300)
 })
 
-test('defaults the resize height to 450px', () => {
+test('defaults the resize height to 450px if no `#tool_content` is found', () => {
   document.querySelector('#second-wrapper').className = ''
+  document.querySelectorAll('#tool_content').forEach(element => {
+    element.id = 'another_tool_content'
+  })
   const launchResizer = new ToolLaunchResizer()
   launchResizer.resize_tool_content_wrapper()
   equal($('.tool_content_wrapper').height(), 450)
+  document.querySelectorAll('#another_tool_content').forEach(element => {
+    element.id = 'tool_content'
+  })
   document.querySelector('#second-wrapper').className = 'tool_content_wrapper'
 })
 
-test('defaults the resize height to 450px if non numeric value passed', () => {
+test('defaults the resize height to 450px if non numeric value passed and no `#tool_content` is found', () => {
   document.querySelector('#second-wrapper').className = ''
+  document.querySelectorAll('#tool_content').forEach(element => {
+    element.id = 'another_tool_content'
+  })
   const launchResizer = new ToolLaunchResizer()
   launchResizer.resize_tool_content_wrapper({a: 1})
   equal($('.tool_content_wrapper').height(), 450)
+  document.querySelectorAll('#another_tool_content').forEach(element => {
+    element.id = 'tool_content'
+  })
   document.querySelector('#second-wrapper').className = 'tool_content_wrapper'
 })

@@ -184,7 +184,7 @@ module CanvasKaltura
                           partnerId: partnerId,
                           userId: userId,
                           type: type)
-      @ks = result.content
+      @ks = result.content if result.respond_to? :content
     end
 
     def mediaGet(entryId)
@@ -369,9 +369,12 @@ module CanvasKaltura
         requestParams += "&#{URI.escape(key.to_s)}=#{URI.escape(value.to_s)}"
       end
       response = sendRequest(Net::HTTP::Get.new("#{@endpoint}/?#{requestParams}"))
-      result = Nokogiri::XML(response.body).css("result").first
-      Canvas::Errors.capture("Unexpected kaltura_client response", response, :info) if result.nil?
-      result
+      if response.is_a? Net::HTTPServiceUnavailable
+        CanvasKaltura.error_handler.capture("Kaltura service unavailable", response, :warn)
+        nil
+      else
+        Nokogiri::XML(response.body).css("result").first
+      end
     end
 
     # FIXME: SSL verifification should not be turned off, but since we're just

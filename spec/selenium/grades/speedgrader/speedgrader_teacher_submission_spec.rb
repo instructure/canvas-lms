@@ -415,11 +415,10 @@ describe "speed grader submissions" do
       end
 
       it "displays an error icon if submission status is error", priority: "2" do
+        @assignment.turnitin_enabled = true
+        @assignment.save!
         student_submission
         @submission.originality_reports.create!(workflow_state: "error")
-
-        @submission.assignment.turnitin_enabled = true
-        @submission.assignment.save!
 
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
         wait_for_ajaximations

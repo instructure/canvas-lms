@@ -40,7 +40,7 @@ export default function ConfirmationDialog({
       label={label}
       onDismiss={onReject}
       open={open}
-      size="small"
+      size="medium"
       footer={
         <>
           <Button onClick={onReject}>{I18n.t('Cancel')}</Button>

@@ -29,6 +29,93 @@ describe "conversations new" do
     @teacher.update_attribute(:name, "Teacher")
   end
 
+  # the js errors caught in here are captured by VICE-2507
+  context "when react_inbox feature flag is ON", ignore_js_errors: true do
+    before do
+      Account.default.set_feature_flag! :react_inbox, "on"
+    end
+
+    it "shows no conversations selected ui" do
+      get "/conversations"
+      expect(fj("span:contains('No Conversations to Show')")).to be_present
+      expect(fj("span:contains('No Conversations Selected')")).to be_present
+    end
+
+    context "with an existing conversation" do
+      before do
+        @participant = conversation(@teacher, @s[0], @s[1], body: "hi there", workflow_state: "unread")
+        @convo = @participant.conversation
+        @convo.update_attribute(:subject, "test")
+      end
+
+      it "forwards conversations via the top bar menu" do
+        get "/conversations"
+        f("div[data-testid='conversation']").click
+        wait_for_ajaximations
+        messages = ff("span[data-testid='message-detail-item-desktop']")
+        expect(messages.count).to eq 1
+        expect(messages[0].text).to include "#{@teacher.name}, #{@s[0].name}, #{@s[1].name}"
+        f("span[data-testid='desktop-message-action-header'] button[data-testid='settings']").click
+        fj("li:contains('Forward')").click
+        ff("input[aria-label='Address Book']")[1].click
+        fj("div[data-testid='address-book-item']:contains('Students')").click
+        fj("div[data-testid='address-book-item']:contains('#{@s[2].name}')").click
+        f("textarea[data-testid='message-body']").send_keys "forwarding to you"
+        fj("button:contains('Send')").click
+        wait_for_ajaximations
+        messages = ff("span[data-testid='message-detail-item-desktop']")
+        expect(messages.count).to eq 2
+        expect(messages[0].text).to include "#{@teacher.name}, #{@s[2].name}"
+        expect(messages[0].text).not_to include @s[0].name.to_s
+        expect(messages[0].text).not_to include @s[1].name.to_s
+      end
+
+      it "forwards conversations via the conversation header menu" do
+        get "/conversations"
+        f("div[data-testid='conversation']").click
+        wait_for_ajaximations
+        messages = ff("span[data-testid='message-detail-item-desktop']")
+        expect(messages.count).to eq 1
+        expect(messages[0].text).to include "#{@teacher.name}, #{@s[0].name}, #{@s[1].name}"
+        f("button[data-testid='more-options']").click
+        fj("li:contains('Forward')").click
+        ff("input[aria-label='Address Book']")[1].click
+        fj("div[data-testid='address-book-item']:contains('Students')").click
+        fj("div[data-testid='address-book-item']:contains('#{@s[0].name}')").click
+        f("textarea[data-testid='message-body']").send_keys "forwarding to you"
+        fj("button:contains('Send')").click
+        wait_for_ajaximations
+        messages = ff("span[data-testid='message-detail-item-desktop']")
+        expect(messages.count).to eq 2
+        expect(messages[0].text).to include "#{@teacher.name}, #{@s[0].name}"
+        expect(messages[0].text).not_to include @s[1].name.to_s
+        expect(messages[0].text).not_to include @s[2].name.to_s
+      end
+
+      it "forwards conversations via the individual message menu" do
+        get "/conversations"
+        f("div[data-testid='conversation']").click
+        wait_for_ajaximations
+        messages = ff("span[data-testid='message-detail-item-desktop']")
+        expect(messages.count).to eq 1
+        expect(messages[0].text).to include "#{@teacher.name}, #{@s[0].name}, #{@s[1].name}"
+        f("button[data-testid='message-more-options']").click
+        fj("li:contains('Forward')").click
+        ff("input[aria-label='Address Book']")[1].click
+        fj("div[data-testid='address-book-item']:contains('Students')").click
+        fj("div[data-testid='address-book-item']:contains('#{@s[1].name}')").click
+        f("textarea[data-testid='message-body']").send_keys "forwarding to you"
+        fj("button:contains('Send')").click
+        wait_for_ajaximations
+        messages = ff("span[data-testid='message-detail-item-desktop']")
+        expect(messages.count).to eq 2
+        expect(messages[0].text).to include "#{@teacher.name}, #{@s[1].name}"
+        expect(messages[0].text).not_to include @s[0].name.to_s
+        expect(messages[0].text).not_to include @s[2].name.to_s
+      end
+    end
+  end
+
   context "when react_inbox feature flag is off" do
     before do
       Account.default.set_feature_flag! :react_inbox, "off"
@@ -192,17 +279,17 @@ describe "conversations new" do
         # Tests forwarding messages via the top level More Options gear menu
         click_more_options(admin: true)
         forward_message(@s[2])
-        expect(ffj(".message-item-view").length).to eq message_count += 1
+        expect(ff(".message-item-view").length).to eq message_count += 1
 
         # Tests forwarding messages via the conversation level More Options gear menu
         click_more_options(convo: true)
         forward_message(@s[0])
-        expect(ffj(".message-item-view").length).to eq message_count += 1
+        expect(ff(".message-item-view").length).to eq message_count += 1
 
         # Tests forwarding messages via the message level More Options gear menu
         click_more_options({ message: true }, 0)
         forward_message(@s[1])
-        expect(ffj(".message-item-view").length).to eq message_count + 1
+        expect(ff(".message-item-view").length).to eq message_count + 1
       end
 
       it "displays message count", priority: "1" do

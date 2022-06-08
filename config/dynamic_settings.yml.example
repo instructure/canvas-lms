@@ -40,6 +40,11 @@ development:
         aws_secret_access_key_dec: secret
         # stub_credentials: true # can be used in dev to print creds to stdout
       live-events-subscription-service:
+        # Causes errors installing LTI 2 originality tools if not set up correctly
+        # Comment out or set to false to use the live events ecosystem
+        # LTI 2 Originality Report tools will not work properly without
+        # the live events ecosystem set up
+        # disabled: true
         app-host: "http://les.docker"
         sad-panda: null
       math-man:

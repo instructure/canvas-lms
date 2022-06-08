@@ -38,7 +38,7 @@ module SimpleTags
       options[:mode] ||= :or
       conditions = handle_tags(tags, options) +
                    tags.map do |tag|
-                     wildcard(quoted_table_name + ".tags", tag, delimiter: ",")
+                     wildcard(ConversationParticipant.quoted_table_name + ".tags", tag, delimiter: ",")
                    end
       if conditions.empty?
         none

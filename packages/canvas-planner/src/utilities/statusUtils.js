@@ -23,6 +23,7 @@ const PILL_MAPPING = {
   late: () => ({id: 'late', text: formatMessage('Late'), variant: 'danger'}),
   graded: () => ({id: 'graded', text: formatMessage('Graded')}),
   excused: () => ({id: 'excused', text: formatMessage('Excused')}),
+  extended: () => ({id: 'extended', text: formatMessage('Extended')}),
   submitted: () => ({id: 'submitted', text: formatMessage('Submitted')}),
   new_grades: () => ({id: 'new_grades', text: formatMessage('Graded')}),
   new_feedback: () => ({id: 'new_feedback', text: formatMessage('Feedback')}),
@@ -108,6 +109,9 @@ export function getBadgesForItems(items) {
     badges.push(PILL_MAPPING.missing())
   } else if (items.some(showPillForOverdueStatus.bind(this, 'late'))) {
     badges.push(PILL_MAPPING.late())
+  }
+  if (items.some(i => i.status && i.status.extended)) {
+    badges.push(PILL_MAPPING.extended())
   }
   if (items.some(i => i.status && i.newActivity && i.status.has_feedback)) {
     badges.push(PILL_MAPPING.new_feedback())

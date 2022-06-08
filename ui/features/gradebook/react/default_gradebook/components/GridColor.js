@@ -45,7 +45,8 @@ GridColor.propTypes = {
     missing: string,
     resubmitted: string,
     dropped: string,
-    excused: string
+    excused: string,
+    extended: string
   }).isRequired,
   statuses: arrayOf(string)
 }

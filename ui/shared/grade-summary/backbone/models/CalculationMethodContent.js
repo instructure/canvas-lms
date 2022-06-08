@@ -239,6 +239,9 @@ export default class CalculationMethodContent {
           exampleText: I18n.t(
             'Central value in a set of results. Calculated by dividing the sum of all item scores by the number of scores.'
           ),
+          exampleWarning: I18n.t(
+            'Average is not a good fit for most outcomes-based or mastery-based learning use cases because students may need time to reach mastery of an outcome and early poorer performance can bring down an average.'
+          ),
           exampleScores: this.exampleScoreIntegers().slice(0, 7).join(', '),
           exampleResult: numberFormat.outcomeScore(
             this.average(this.exampleScoreIntegers().slice(0, 7))

@@ -229,7 +229,8 @@ class ApplicationController < ActionController::Base
             collapse_global_nav: @current_user&.collapse_global_nav?,
             release_notes_badge_disabled: @current_user&.release_notes_badge_disabled?,
           },
-          FULL_STORY_ENABLED: fullstory_enabled_for_session?(session)
+          FULL_STORY_ENABLED: fullstory_enabled_for_session?(session),
+          RAILS_ENVIRONMENT: Canvas.environment
         }
         @js_env[:IN_PACED_COURSE] = @context.enable_course_paces? if @context.try(:enable_course_paces?)
 
@@ -245,7 +246,6 @@ class ApplicationController < ActionController::Base
             url_deny_pattern: Setting.get("sentry_frontend_url_deny_pattern", ""), # regexp
 
             # these values need to correlate with the backend for Sentry features to work properly
-            environment: Canvas.environment,
             revision: "canvas-lms@#{Canvas.semver_revision}"
           }
         end
@@ -312,12 +312,13 @@ class ApplicationController < ActionController::Base
   # so altogether we can get them faster the vast majority of the time
   JS_ENV_SITE_ADMIN_FEATURES = %i[
     featured_help_links feature_flag_filters conferencing_in_planner word_count_in_speed_grader observer_picker
-    lti_platform_storage scale_equation_images new_equation_editor buttons_and_icons_cropper
+    lti_platform_storage scale_equation_images new_equation_editor buttons_and_icons_cropper course_paces_for_sections
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours files_dnd usage_rights_discussion_topics
     granular_permissions_manage_users create_course_subaccount_picker
     lti_deep_linking_module_index_menu_modal lti_multiple_assignment_deep_linking buttons_and_icons_root_account
+    extended_submission_state
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes

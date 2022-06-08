@@ -32,6 +32,14 @@ module CanvasKaltura
     @logger
   end
 
+  def self.error_handler=(error_handler)
+    @error_handler = error_handler
+  end
+
+  def self.error_handler
+    @error_handler
+  end
+
   def self.cache=(cache)
     @cache = cache
   end

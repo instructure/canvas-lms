@@ -33,6 +33,90 @@ describe "conversations index page" do
     @group.users = [@s1, @s2]
   end
 
+  # the js errors caught in here are captured by VICE-2507
+  context "when react_inbox feature flag is on", ignore_js_errors: true do
+    before do
+      Account.default.set_feature_flag! :react_inbox, "on"
+    end
+
+    it "searches by recepient name" do
+      conversation(@teacher, @s1, body: "adrian")
+      conversation(@teacher, @s2, body: "roberto")
+      get "/conversations"
+      list_items = ff("span[data-testid='conversationListItem-Item']")
+      expect(list_items.count).to eq 2
+      f("input[placeholder='Insert or Select Names']").send_keys @s2.name
+      wait_for_ajaximations
+      fj("li:contains('#{@s2.name}')").click
+      list_items = ff("span[data-testid='conversationListItem-Item']")
+      expect(list_items.count).to eq 1
+      expect(fj("span:contains('roberto')")).to be_present
+    end
+
+    context "multi-select" do
+      before do
+        conversation(@teacher, @s1, @s2, workflow_state: "read")
+        conversation(@teacher, @s1, @s2, workflow_state: "read")
+        conversation(@teacher, @s1, @s2, workflow_state: "read")
+      end
+
+      it "archives conversation by clicking on checkbox" do
+        get "/conversations"
+        convos = ff("[data-testid='conversation']")
+        convos[0].find("input").find_element(:xpath, "..").click
+        wait_for_ajaximations
+        f("button[data-testid='archive']").click
+        driver.switch_to.alert.accept
+        wait_for_ajaximations
+        expect(ff("[data-testid='conversation']").count).to eq 2
+        f("input[title='Inbox']").click
+        fj("li:contains('Archived')").click
+        expect(ff("[data-testid='conversation']").count).to eq 1
+      end
+
+      it "deletes multiple individually selected conversations via ctrl(or command)+click" do
+        get "/conversations"
+        convos = ff("[data-testid='conversation']")
+        convos[0].click
+        driver.action.key_down(modifier).move_to(convos[2]).click.key_up(modifier).perform
+        f("button[data-testid='delete']").click
+        driver.switch_to.alert.accept
+        wait_for_ajaximations
+        expect(ff("[data-testid='conversation']").count).to eq 1
+      end
+
+      it "stars a range of consecutive conversations using shift+click" do
+        get "/conversations"
+        convos = ff("[data-testid='conversation']")
+        convos[0].click
+        driver.action.key_down(:shift).move_to(convos[2]).click.key_up(:shift).perform
+        f("button[data-testid='settings']").click
+        fj("li:contains('Star')").click
+        wait_for_ajaximations
+        f("input[title='Inbox']").click
+        fj("li:contains('Starred')").click
+        wait_for_ajaximations
+        expect(ff("[data-testid='conversation']").count).to eq 3
+      end
+
+      it "marks all selected conversations as unread" do
+        get "/conversations"
+        convos = ff("[data-testid='conversation']")
+        convos[0].click
+        driver.action.key_down(:shift).move_to(convos[2]).click.key_up(:shift).perform
+        f("button[data-testid='settings']").click
+        fj("li:contains('Mark all as unread')").click
+        wait_for_ajaximations
+        f("input[title='Inbox']").click
+        fj("li:contains('Unread')").click
+        wait_for_ajaximations
+        # this should be 3. but the bug in VICE-2801 limits it to 2
+        # change this to 3 when VICE-2801 is fixed
+        expect(ff("[data-testid='conversation']").count).to eq 2
+      end
+    end
+  end
+
   context "when react_inbox feature flag is off" do
     before do
       Account.default.set_feature_flag! :react_inbox, "off"
@@ -93,15 +177,6 @@ describe "conversations index page" do
         wait_for_ajaximations
         expect(f(".messages")).not_to contain_css("li")
       end
-
-      # TODO: reimplement per CNVS-29601, but make sure we're testing at the right level
-      it "should mark multiple conversations as unread"
-
-      # TODO: reimplement per CNVS-29602, but make sure we're testing at the right level
-      it "should mark multiple conversations as unread"
-
-      # TODO: reimplement per CNVS-29603, but make sure we're testing at the right level
-      it "should star multiple conversations"
     end
   end
 end

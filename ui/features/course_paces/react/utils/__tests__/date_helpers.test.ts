@@ -17,7 +17,12 @@
  */
 
 import moment from 'moment-timezone'
-import {addDays} from '../date_stuff/date_helpers'
+import {
+  addDays,
+  rawDaysBetweenInclusive,
+  inBlackoutDate,
+  daysBetween
+} from '../date_stuff/date_helpers'
 
 moment.tz.setDefault('America/Denver')
 
@@ -95,6 +100,119 @@ describe('date_helpers', () => {
       const start = moment('2022-05-02T00:00:00') // Mon
       const end = addDays(start, 4, false, blackouts)
       expect(end).toEqual('2022-05-09T00:00:00.000-06:00')
+    })
+  })
+
+  describe('daysBetween', () => {
+    it('counts unskipped days, inclusive', () => {
+      const count = daysBetween(
+        moment('2022-05-16T00:00:00-06:00'),
+        moment('2022-05-20T00:00:00-06:00'),
+        false,
+        [],
+        true
+      )
+      expect(count).toEqual(5)
+    })
+
+    it('counts unskipped days, exclusive', () => {
+      const count = daysBetween(
+        moment('2022-05-16T00:00:00-06:00'),
+        moment('2022-05-20T00:00:00-06:00'),
+        false,
+        [],
+        false
+      )
+      expect(count).toEqual(4)
+    })
+
+    it('skips weekends', () => {
+      const count = daysBetween(
+        moment('2022-05-13T00:00:00-06:00'),
+        moment('2022-05-20T00:00:00-06:00'),
+        true,
+        [],
+        true
+      )
+      expect(count).toEqual(6)
+    })
+
+    it('skips blackout dates', () => {
+      const blackouts = [
+        {
+          event_title: 'Tues and Wed',
+          start_date: moment('2022-05-03T00:00:00').endOf('day'), // Tues
+          end_date: moment('2022-05-04T00:00:00').endOf('day') // Wed
+        }
+      ]
+      const count = daysBetween(
+        moment('2022-05-02T00:00:00-06:00'),
+        moment('2022-05-06T00:00:00-06:00'),
+        true,
+        blackouts,
+        true
+      )
+      expect(count).toEqual(3)
+    })
+
+    it('skips blackout dates and weekends', () => {
+      const blackouts = [
+        {
+          event_title: 'Tues and Wed',
+          start_date: moment('2022-05-06T00:00:00').endOf('day'), // Fri
+          end_date: moment('2022-05-10T00:00:00').endOf('day') // tues
+        }
+      ]
+      const count = daysBetween(
+        moment('2022-05-05T00:00:00-06:00'), // thurs
+        moment('2022-05-13T00:00:00-06:00'), // fri
+        true,
+        blackouts,
+        true
+      )
+      expect(count).toEqual(4)
+    })
+  })
+
+  describe('rawDaysBetweenInclusive', () => {
+    it('counts days', () => {
+      const count = rawDaysBetweenInclusive(
+        moment('2022-05-16T00:00:00-06:00'), // monday
+        moment('2022-05-20T00:00:00-06:00') // friday
+      )
+      expect(count).toEqual(5)
+    })
+
+    it('handles start == end', () => {
+      const count = rawDaysBetweenInclusive(
+        moment('2022-05-16T00:00:00-06:00'), // monday
+        moment('2022-05-16T00:00:00-06:00') // friday
+      )
+      expect(count).toEqual(1)
+    })
+  })
+
+  describe('inBlackoutDate', () => {
+    it('can say no', () => {
+      const blackouts = [
+        {
+          event_title: 'Tues and Wed',
+          start_date: moment('2022-05-03T00:00:00'), // Tues
+          end_date: moment('2022-05-04T00:00:00') // Wed
+        }
+      ]
+      expect(inBlackoutDate('2022-05-16T00:00:00-06:00', blackouts)).toBeFalsy()
+    })
+
+    it('can say yes', () => {
+      const blackouts = [
+        {
+          event_title: 'Tues and Wed',
+          start_date: moment('2022-05-03T00:00:00'), // Tues
+          end_date: moment('2022-05-04T00:00:00') // Wed
+        }
+      ]
+      expect(inBlackoutDate('2022-05-03T00:00:00-06:00', blackouts)).toBeTruthy()
     })
   })
 })

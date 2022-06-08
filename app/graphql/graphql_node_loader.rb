@@ -96,6 +96,10 @@ module GraphQLNodeLoader
       return nil unless Account.site_admin.grants_right?(ctx[:current_user], ctx[:session], :manage_internal_settings)
 
       Loaders::UnshardedIDLoader.for(Setting).load(id)
+    when "InternalSettingByName"
+      return nil unless Account.site_admin.grants_right?(ctx[:current_user], ctx[:session], :manage_internal_settings)
+
+      Setting.where(name: id).take
     when "MediaObject"
       Loaders::MediaObjectLoader.load(id)
     when "Module"

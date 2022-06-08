@@ -43,7 +43,7 @@ export function initSentry() {
 
     init({
       dsn: sentrySettings.dsn,
-      environment: sentrySettings.environment,
+      environment: ENV.RAILS_ENVIRONMENT,
       release: sentrySettings.revision,
 
       denyUrls,

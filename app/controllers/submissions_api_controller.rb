@@ -148,7 +148,7 @@
 #           "type": "boolean"
 #         },
 #         "late_policy_status": {
-#           "description": "The status of the submission in relation to the late policy. Can be late, missing, none, or null.",
+#           "description": "The status of the submission in relation to the late policy. Can be late, missing, extended, none, or null.",
 #           "example": "missing",
 #           "type": "string"
 #         },
@@ -767,7 +767,8 @@ class SubmissionsApiController < ApplicationController
   #   Sets the "excused" status of an assignment.
   #
   # @argument submission[late_policy_status] [String]
-  #   Sets the late policy status to either "late", "missing", "none", or null.
+  #   Sets the late policy status to either "late", "missing", "extended", "none", or null.
+  #     NB: "extended" values can only be set in the UI when the "UI features for 'extended' Submissions" Account Feature is on
   #
   # @argument submission[seconds_late_override] [Integer]
   #   Sets the seconds late if late policy status is "late"
@@ -1044,7 +1045,8 @@ class SubmissionsApiController < ApplicationController
   #   Sets the "excused" status of an assignment.
   #
   # @argument submission[late_policy_status] [String]
-  #   Sets the late policy status to either "late", "missing", "none", or null.
+  #   Sets the late policy status to either "late", "missing", "extended", "none", or null.
+  #     NB: "extended" values can only be set in the UI when the "UI features for 'extended' Submissions" Account Feature is on
   #
   # @argument submission[seconds_late_override] [Integer]
   #   Sets the seconds late if late policy status is "late"

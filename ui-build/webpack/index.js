@@ -126,8 +126,7 @@ module.exports = {
   devtool: skipSourcemaps
     ? false
     : process.env.NODE_ENV === 'production' ||
-      process.env.COVERAGE === '1' ||
-      process.env.SENTRY_DSN
+      process.env.COVERAGE === '1'
     ? 'source-map'
     : 'eval',
 
@@ -290,7 +289,6 @@ module.exports = {
     // debug/propType checking in prod.
     new webpack.EnvironmentPlugin({
       NODE_ENV: null,
-      DEPRECATION_SENTRY_DSN: null,
       GIT_COMMIT: null,
       ALWAYS_APPEND_UI_TESTABLE_LOCATORS: null
     }),

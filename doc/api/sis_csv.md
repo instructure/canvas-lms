@@ -1229,29 +1229,29 @@ first matching provider).</p>
 <tr>
 <td>existing_user_id</td>
 <td>text</td>
-<td></td>
 <td>✓&#42;</td>
+<td></td>
 <td>The User sis id from users.csv, required to identify a user.</td>
 </tr>
 <tr>
 <td>existing_integration_id</td>
 <td>text</td>
-<td></td>
 <td>✓&#42;</td>
+<td></td>
 <td>The User integration_id from users.csv, required to identify a user.</td>
 </tr>
 <tr>
 <td>existing_canvas_user_id</td>
 <td>text</td>
-<td></td>
 <td>✓&#42;</td>
+<td></td>
 <td>The canvas id for a user, required to identify a user.</td>
 </tr>
 <tr>
 <td>root_account</td>
 <td>text</td>
-<td></td>
 <td>✓&#42;</td>
+<td></td>
 <td>The domain of the account to search for the user. This field is required when identifying a user in a trusted account.</td>
 </tr>
 <tr>

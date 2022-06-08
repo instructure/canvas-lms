@@ -29,7 +29,6 @@ require_relative "../../../helpers/k5_common"
 require_relative "../shared_examples/k5_navigation_tabs_shared_examples"
 require_relative "../shared_examples/k5_subject_grades_shared_examples"
 require_relative "../shared_examples/k5_schedule_shared_examples"
-require_relative "../../../helpers/observer_enrollments_helper_spec"
 
 describe "observer k5 dashboard" do
   include_context "in-process server selenium tests"
@@ -69,17 +68,6 @@ describe "observer k5 dashboard" do
 
       expect(dashboard_card_specific_subject("Math")).to be_displayed
       expect(announcement_title(announcement_heading1)).to be_displayed
-    end
-
-    it "shows missing assignments on dashboard schedule tab" do
-      skip("needs at least LS-2481")
-      now = Time.zone.now
-      create_dated_assignment(@subject_course, "missing assignment1", 1.day.ago(now))
-      create_dated_assignment(@subject_course, "missing assignment2", 1.day.ago(now))
-
-      get "/#schedule"
-
-      expect(missing_data.text).to eq("Show 2 missing items")
     end
 
     it "show the grades progress bar with the appropriate progress" do
@@ -166,13 +154,11 @@ describe "observer k5 dashboard" do
     end
 
     it "shows the observers name first if observer is also a student" do
-      skip("LS-3152: failing about half the time - showing the student not the observer")
       course_with_student(
         active_all: true,
         user: @observer,
         course: @art_course
       )
-
       get "/"
 
       expect(element_value_for_attr(observed_student_dropdown, "value")).to eq("Mom")

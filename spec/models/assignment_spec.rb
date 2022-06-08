@@ -7829,9 +7829,26 @@ describe Assignment do
       "not_graded",
       ""
     ].each do |type|
-      it "returns true if the flag is on and the submission type is #{type}" do
+      it "returns true if the assignment_2_student flag is on and the submission type is #{type}" do
         assignment.submission_types = type
         expect(assignment).to be_a2_enabled
+      end
+    end
+
+    describe "peer reviews enabled" do
+      before do
+        allow(@course).to receive(:feature_enabled?).with(:peer_reviews_for_a2).and_return(true)
+        assignment.submission_types = "online_text_entry"
+        assignment.peer_reviews = true
+      end
+
+      it "returns true if assignment_2_student flag is on and peer_reviews_for_a2 flags is on" do
+        expect(assignment).to be_a2_enabled
+      end
+
+      it "returns false if assignment_2_student is on and peer_reviews_for_a2 flags is off" do
+        allow(@course).to receive(:feature_enabled?).with(:peer_reviews_for_a2).and_return(false)
+        expect(assignment).not_to be_a2_enabled
       end
     end
   end

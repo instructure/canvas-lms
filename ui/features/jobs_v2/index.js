@@ -20,7 +20,13 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import JobsIndex from './react'
 import ready from '@instructure/ready'
+import {ApolloProvider, createClient} from '@canvas/apollo'
 
 ready(() => {
-  ReactDOM.render(<JobsIndex />, document.getElementById('content'))
+  ReactDOM.render(
+    <ApolloProvider client={createClient()}>
+      <JobsIndex />
+    </ApolloProvider>,
+    document.getElementById('content')
+  )
 })

@@ -331,39 +331,41 @@ function sectionSelectionOptions(
 }
 
 function mergeStudentsAndSubmission() {
-  window.jsonData.studentsWithSubmissions = window.jsonData.context.students
-  window.jsonData.studentMap = {}
-  window.jsonData.studentEnrollmentMap = {}
-  window.jsonData.studentSectionIdsMap = {}
-  window.jsonData.submissionsMap = {}
+  const jsonData = window.jsonData
 
-  window.jsonData.context.enrollments.forEach(enrollment => {
+  jsonData.studentsWithSubmissions = jsonData.context.students
+  jsonData.studentMap = {}
+  jsonData.studentEnrollmentMap = {}
+  jsonData.studentSectionIdsMap = {}
+  jsonData.submissionsMap = {}
+
+  jsonData.context.enrollments.forEach(enrollment => {
     const enrollmentAnonymizableUserId = enrollment[anonymizableUserId]
-    window.jsonData.studentEnrollmentMap[enrollmentAnonymizableUserId] =
-      window.jsonData.studentEnrollmentMap[enrollmentAnonymizableUserId] || []
-    window.jsonData.studentSectionIdsMap[enrollmentAnonymizableUserId] =
-      window.jsonData.studentSectionIdsMap[enrollmentAnonymizableUserId] || {}
+    jsonData.studentEnrollmentMap[enrollmentAnonymizableUserId] =
+      jsonData.studentEnrollmentMap[enrollmentAnonymizableUserId] || []
+    jsonData.studentSectionIdsMap[enrollmentAnonymizableUserId] =
+      jsonData.studentSectionIdsMap[enrollmentAnonymizableUserId] || {}
 
-    window.jsonData.studentEnrollmentMap[enrollmentAnonymizableUserId].push(enrollment)
-    window.jsonData.studentSectionIdsMap[enrollmentAnonymizableUserId][
-      enrollment.course_section_id
-    ] = true
+    jsonData.studentEnrollmentMap[enrollmentAnonymizableUserId].push(enrollment)
+    jsonData.studentSectionIdsMap[enrollmentAnonymizableUserId][enrollment.course_section_id] = true
   })
 
-  window.jsonData.submissions.forEach(submission => {
-    window.jsonData.submissionsMap[submission[anonymizableUserId]] = submission
+  jsonData.submissions.forEach(submission => {
+    jsonData.submissionsMap[submission[anonymizableUserId]] = submission
   })
 
-  jsonData.studentsWithSubmissions = jsonData.studentsWithSubmissions.reduce(
+  window.jsonData.studentsWithSubmissions = window.jsonData.studentsWithSubmissions.reduce(
     (students, student, index) => {
-      const submission = jsonData.submissionsMap[student[anonymizableId]]
+      const submission = window.jsonData.submissionsMap[student[anonymizableId]]
       // Hide students that don't have a submission object. This is legacy support
       // for when we used to not create submission objects for assigned concluded students.
       // For all new assignments, every assigned student (regardless of concluded/inactive
       // status) should have a submission object.
       if (submission) {
-        student.enrollments = jsonData.studentEnrollmentMap[student[anonymizableId]]
-        student.section_ids = Object.keys(jsonData.studentSectionIdsMap[student[anonymizableId]])
+        student.enrollments = window.jsonData.studentEnrollmentMap[student[anonymizableId]]
+        student.section_ids = Object.keys(
+          window.jsonData.studentSectionIdsMap[student[anonymizableId]]
+        )
         student.submission = submission
         student.submission_state = SpeedgraderHelpers.submissionState(student, ENV.grading_role)
         student.index = index
@@ -377,12 +379,12 @@ function mergeStudentsAndSubmission() {
 
   // need to presort by anonymous_id for anonymous assignments so that the index property can be consistent
   if (isAnonymous)
-    window.jsonData.studentsWithSubmissions.sort((a, b) =>
+    jsonData.studentsWithSubmissions.sort((a, b) =>
       a.anonymous_name_position > b.anonymous_name_position ? 1 : -1
     )
 
   // handle showing students only in a certain section.
-  if (!window.jsonData.GROUP_GRADING_MODE) {
+  if (!jsonData.GROUP_GRADING_MODE) {
     sectionToShow = ENV.selected_section_id
   }
 
@@ -392,12 +394,12 @@ function mergeStudentsAndSubmission() {
   if (sectionToShow) {
     sectionToShow = sectionToShow.toString()
 
-    const studentsInSection = window.jsonData.studentsWithSubmissions.filter(student =>
+    const studentsInSection = jsonData.studentsWithSubmissions.filter(student =>
       student.section_ids.includes(sectionToShow)
     )
 
     if (studentsInSection.length > 0) {
-      window.jsonData.studentsWithSubmissions = studentsInSection
+      jsonData.studentsWithSubmissions = studentsInSection
     } else {
       // eslint-disable-next-line no-alert
       alert(
@@ -410,11 +412,11 @@ function mergeStudentsAndSubmission() {
     }
   }
 
-  window.jsonData.studentMap = _.keyBy(window.jsonData.studentsWithSubmissions, anonymizableId)
+  jsonData.studentMap = _.keyBy(jsonData.studentsWithSubmissions, anonymizableId)
 
   switch (userSettings.get('eg_sort_by')) {
     case 'submitted_at': {
-      window.jsonData.studentsWithSubmissions.sort(
+      jsonData.studentsWithSubmissions.sort(
         EG.compareStudentsBy(student => {
           const submittedAt = student && student.submission && student.submission.submitted_at
           if (submittedAt) {
@@ -436,7 +438,7 @@ function mergeStudentsAndSubmission() {
         graded: 4,
         not_gradeable: 5
       }
-      window.jsonData.studentsWithSubmissions.sort(
+      jsonData.studentsWithSubmissions.sort(
         EG.compareStudentsBy(
           student =>
             student && states[SpeedgraderHelpers.submissionState(student, ENV.grading_role)]
@@ -450,7 +452,11 @@ function mergeStudentsAndSubmission() {
       // sorting for isAnonymous occurred earlier before setting up studentMap
       if (!isAnonymous && utils.shouldHideStudentNames()) {
         window.jsonData.studentsWithSubmissions.sort(
-          EG.compareStudentsBy(student => student.submission.id)
+          EG.compareStudentsBy(student => {
+            const studentIndex = student.index || 0
+            // adding 1 to avoid issues with index 0 being given 'falsey treatment' in compareStudentsBy
+            return studentIndex + 1
+          })
         )
       }
     }
@@ -1195,7 +1201,7 @@ function statusMenuComponent(submission) {
 
 function getLateMissingAndExcusedPills() {
   return document.querySelectorAll(
-    '.submission-missing-pill, .submission-late-pill, .submission-excused-pill'
+    '.submission-missing-pill, .submission-late-pill, .submission-excused-pill, .submission-extended-pill'
   )
 }
 
@@ -1370,7 +1376,7 @@ EG = {
         SpeedgraderHelpers.getHistory().back()
       }
     } else {
-      /// unmount spinner
+      // unmount spinner
       const spinnerMount = document.getElementById('speed_grader_loading')
       if (spinnerMount) ReactDOM.unmountComponentAtNode(spinnerMount)
       $('#speed_grader_loading').hide()
@@ -2493,11 +2499,15 @@ EG = {
           grade = GradeFormatHelper.formatGrade(s.grade)
         }
 
+        const late_policy_status =
+          (s.late && 'late') || (s.missing && 'missing') || s.late_policy_status
+
         return {
           value: i,
           late: s.late,
           missing: s.missing,
           excused: s.excused,
+          late_policy_status,
           selected: selectedIndex === i,
           submittedAt: $.datetimeString(s.submitted_at) || noSubmittedAt,
           grade
@@ -2627,11 +2637,11 @@ EG = {
 
   totalStudentCount() {
     if (sectionToShow) {
-      return _.filter(jsonData.studentsWithSubmissions, student =>
+      return _.filter(window.jsonData.studentsWithSubmissions, student =>
         _.includes(student.section_ids, sectionToShow)
       ).length
     } else {
-      return jsonData.studentsWithSubmissions.length
+      return window.jsonData.studentsWithSubmissions.length
     }
   },
 
@@ -3670,7 +3680,7 @@ EG = {
     }
   },
 
-  beforeLeavingSpeedgrader(e) {
+  beforeLeavingSpeedgrader(event: BeforeUnloadEvent) {
     // Submit any draft comments that need submitting
     EG.addSubmissionComment(true)
 
@@ -3684,7 +3694,7 @@ EG = {
         snapshot =>
           snapshot &&
           $.map(
-            jsonData.studentsWithSubmissions,
+            window.jsonData.studentsWithSubmissions,
             student => snapshot === student && student.name
           )[0]
       )
@@ -3707,18 +3717,25 @@ EG = {
       return $.trim($add_a_comment_textarea.val()) !== ''
     }
 
-    if (hasPendingQuizSubmissions()) {
-      e.returnValue = I18n.t(
+    const isNewGradeSaved = ($grade.val() || null) === EG.currentStudent.submission.grade
+    if (!isNewGradeSaved) {
+      event.preventDefault()
+      event.returnValue = I18n.t(`There are unsaved changes to a grade.\n\nContinue anyway?`)
+      return event.returnValue
+    } else if (hasPendingQuizSubmissions()) {
+      event.preventDefault()
+      event.returnValue = I18n.t(
         'The following students have unsaved changes to their quiz submissions:\n\n' +
           '%{users}\nContinue anyway?',
         {users: userNamesWithPendingQuizSubmission().join('\n ')}
       )
-      return e.returnValue
+      return event.returnValue
     } else if (hasUnsubmittedComments()) {
-      e.returnValue = I18n.t(
+      event.preventDefault()
+      event.returnValue = I18n.t(
         'If you would like to keep your unsubmitted comments, please save them before navigating away from this page.'
       )
-      return e.returnValue
+      return event.returnValue
     }
     teardownHandleStatePopped()
     teardownBeforeLeavingSpeedgrader()

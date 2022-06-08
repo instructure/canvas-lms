@@ -105,10 +105,6 @@ describe "courses" do
     end
 
     describe "course navigation menu" do
-      before :once do
-        Account.site_admin.enable_feature!(:remember_course_nav_collapsed_state)
-      end
-
       it "collapses and persists when clicking the collapse/expand button" do
         visit_course(@course)
         expect(left_side).to be_displayed

@@ -25,7 +25,7 @@ import {TextInput} from '@instructure/ui-text-input'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {IconButton} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {ICON_MAKER_ICONS} from '../instructure_icon_maker/registerEditToolbar'
+import {ICON_MAKER_ICONS} from '../instructure_icon_maker/svg/constants'
 import {
   IconLinkLine,
   IconFolderLine,
@@ -257,8 +257,8 @@ export default function Filter(props) {
 
               {props.use_rce_icon_maker && (
                 <SimpleSelect.Option
-                  id="icon_maker_icons"
-                  value="icon_maker_icons"
+                  id={ICON_MAKER_ICONS}
+                  value={ICON_MAKER_ICONS}
                   renderBeforeLabel={IconImageLine}
                 >
                   {formatMessage('Icon Maker Icons')}

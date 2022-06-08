@@ -18,13 +18,14 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Flex} from '@instructure/ui-flex'
+import {Spinner} from '@instructure/ui-spinner'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
-import React, {useEffect, useState, useContext} from 'react'
+import React, {useEffect, useState, useContext, useCallback, useMemo} from 'react'
+import {useMutation} from 'react-apollo'
 import InboxEmpty from '../../../svg/inbox-empty.svg'
 import {ConversationContext} from '../../../util/constants'
 import {Text} from '@instructure/ui-text'
-import {useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 
 import {ConversationListItem} from './ConversationListItem'
@@ -32,16 +33,29 @@ import {UPDATE_CONVERSATION_PARTICIPANTS} from '../../../graphql/Mutations'
 
 const I18n = useI18nScope('conversations_2')
 
-export const ConversationListHolder = ({...props}) => {
+export const ConversationListHolder = ({
+  isLoading,
+  fetchMoreMenuData,
+  hasMoreMenuData,
+  isLoadingMoreMenuData,
+  ...props
+}) => {
   const [selectedMessages, setSelectedMessages] = useState([])
   const [rangeClickStart, setRangeClickStart] = useState()
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const {setMultiselect, isSubmissionCommentsType} = useContext(ConversationContext)
 
+  const [menuData, setMenuData] = useState([...props.conversations])
+  const [lastConversationItem, setLastConversationItem] = useState(null)
+
   const provideConversationsForOnSelect = conversationIds => {
     const matchedConversations = props.conversations?.filter(c => conversationIds.includes(c._id))
     props.onSelect(matchedConversations)
   }
+
+  const onItemRefSet = useCallback(refCurrent => {
+    setLastConversationItem(refCurrent)
+  }, [])
   /*
    * When conversations change, we need to re-provide the selectedConversations (CanvasInbox).
    * That way, other components have the latest state of the selected the conversations.
@@ -49,6 +63,7 @@ export const ConversationListHolder = ({...props}) => {
    */
   useEffect(() => {
     provideConversationsForOnSelect(selectedMessages)
+    setMenuData([...props.conversations])
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.conversations, selectedMessages])
 
@@ -65,6 +80,35 @@ export const ConversationListHolder = ({...props}) => {
       return updatedSelectedMessage
     })
   }
+
+  // Creates an oberserver on the last scroll item to fetch more data when it becomes visible
+  useEffect(() => {
+    if (lastConversationItem && hasMoreMenuData) {
+      const observer = new IntersectionObserver(
+        ([menuItem]) => {
+          if (menuItem.isIntersecting) {
+            observer.unobserve(lastConversationItem)
+            setLastConversationItem(null)
+            fetchMoreMenuData()
+          }
+        },
+        {
+          root: null,
+          rootMargin: '0px',
+          threshold: 0.4
+        }
+      )
+
+      if (lastConversationItem) {
+        observer.observe(lastConversationItem)
+      }
+
+      return () => {
+        if (lastConversationItem) observer.unobserve(lastConversationItem)
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasMoreMenuData, isSubmissionCommentsType, lastConversationItem])
 
   const removeFromSelectedConversations = _id => {
     const updatedSelectedMessage = selectedMessages.filter(id => id !== _id)
@@ -163,6 +207,94 @@ export const ConversationListHolder = ({...props}) => {
     }
   })
 
+  // Render no results found item
+  const renderNoResultsFound = () => {
+    return (
+      <Flex
+        textAlign="center"
+        direction="column"
+        margin="large 0 0 0"
+        data-testid="conversation-list-no-messages"
+      >
+        <Flex.Item shouldGrow shouldShrink>
+          <img src={InboxEmpty} alt="No messages Panda" />
+        </Flex.Item>
+        <Flex.Item>
+          <Text color="primary" size="small" weight="bold">
+            {I18n.t('No Conversations to Show')}
+          </Text>
+        </Flex.Item>
+      </Flex>
+    )
+  }
+
+  // Render individual menu items
+  const renderMenuItem = (conversation, isLast) => {
+    return (
+      <View
+        key={`conversation-${conversation._id}`}
+        elementRef={el => {
+          if (isLast) {
+            onItemRefSet(el)
+          }
+        }}
+      >
+        <ConversationListItem
+          id={conversation._id}
+          conversation={conversation}
+          isStarred={conversation?.label === 'starred'}
+          isSelected={selectedMessages.includes(conversation._id)}
+          isUnread={conversation?.workflowState === 'unread'}
+          onSelect={handleItemSelection}
+          onStar={props.onStar}
+          key={conversation._id}
+          readStateChangeConversationParticipants={
+            isSubmissionCommentsType ? () => {} : readStateChangeConversationParticipants
+          }
+          textSize={props.textSize}
+        />
+      </View>
+    )
+  }
+
+  // Loading renderer
+  const renderLoading = () => {
+    return (
+      <View as="div" padding="xx-small" data-testid="menu-loading-spinner">
+        <Flex width="100%" margin="xxx-small none xxx-small xxx-small">
+          <Flex.Item align="start" margin="0 small 0 0">
+            <Spinner renderTitle={I18n.t('Loading')} size="x-small" />
+          </Flex.Item>
+          <Flex.Item align="center" shouldGrow shouldShrink>
+            <View>
+              <Text>{I18n.t('Loading')}</Text>
+            </View>
+          </Flex.Item>
+        </Flex>
+      </View>
+    )
+  }
+
+  // Memo which returns array of ConversationListItem's
+  const renderedItems = useMemo(() => {
+    if (menuData.length === 0 && !isLoading) {
+      return renderNoResultsFound()
+    }
+
+    if (isLoading && !isLoadingMoreMenuData) {
+      return renderLoading()
+    }
+
+    return menuData.map(conversation => {
+      return renderMenuItem(conversation, conversation?.isLast)
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [menuData])
+
+  if (props.isError) {
+    setOnFailure(I18n.t('Unable to load messages.'))
+  }
+
   return (
     <View
       as="div"
@@ -172,40 +304,12 @@ export const ConversationListHolder = ({...props}) => {
       borderWidth="small"
       data-testid={props.datatestid}
     >
-      {props.conversations?.map(conversation => {
-        return (
-          <ConversationListItem
-            id={conversation._id}
-            conversation={conversation}
-            isStarred={conversation?.label === 'starred'}
-            isSelected={selectedMessages.includes(conversation._id)}
-            isUnread={conversation?.workflowState === 'unread'}
-            onSelect={handleItemSelection}
-            onStar={props.onStar}
-            key={conversation._id}
-            readStateChangeConversationParticipants={
-              isSubmissionCommentsType ? () => {} : readStateChangeConversationParticipants
-            }
-            textSize={props.textSize}
-          />
-        )
-      })}
-      {props.conversations?.length === 0 && (
-        <Flex
-          textAlign="center"
-          direction="column"
-          margin="large 0 0 0"
-          data-testid="conversation-list-no-messages"
-        >
-          <Flex.Item shouldGrow shouldShrink>
-            <img src={InboxEmpty} alt="No messages Panda" />
-          </Flex.Item>
-          <Flex.Item>
-            <Text color="primary" size="small" weight="bold">
-              {I18n.t('No Conversations to Show')}
-            </Text>
-          </Flex.Item>
-        </Flex>
+      {isLoading && !isLoadingMoreMenuData && renderLoading()}
+      {(!isLoading || isLoadingMoreMenuData) && (
+        <View as="div" height="100%" overflowX="hidden" overflowY="auto" borderWidth="small">
+          {renderedItems}
+          {isLoadingMoreMenuData && renderLoading()}
+        </View>
       )}
     </View>
   )
@@ -217,7 +321,24 @@ ConversationListHolder.propTypes = {
   onSelect: PropTypes.func,
   onStar: PropTypes.func,
   textSize: PropTypes.string,
-  datatestid: PropTypes.string
+  datatestid: PropTypes.string,
+  /**
+   * Bool when conversations query is loading
+   */
+  isLoading: PropTypes.bool,
+  /**
+   * Bool when conversations query is fetching more
+   */
+  isLoadingMoreMenuData: PropTypes.bool,
+  /**
+   * Function to fetch next page
+   */
+  fetchMoreMenuData: PropTypes.func,
+  /**
+   * Bool to determine if there is a next page
+   */
+  hasMoreMenuData: PropTypes.bool,
+  isError: PropTypes.bool
 }
 
 ConversationListHolder.defaultProps = {

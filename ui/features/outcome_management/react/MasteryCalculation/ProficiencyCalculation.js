@@ -230,28 +230,32 @@ const Form = ({
   </FormFieldGroup>
 )
 
-const Example = ({currentMethod, individualOutcomeExample}) => {
-  return (
-    <div>
-      <Text weight="bold">{I18n.t('Example')}</Text>
-      <Text>
+const Example = ({currentMethod, individualOutcomeExample}) => (
+  <View as="div">
+    <Text weight="bold">{I18n.t('Example')}</Text>
+    <View as="div" padding={individualOutcomeExample ? 'x-small 0 x-small' : 'small 0 x-small'}>
+      {currentMethod.exampleText}
+    </View>
+    {currentMethod?.exampleWarning && (
+      <div style={{padding: individualOutcomeExample ? '0.25rem 0 0' : '0.5rem 0 0'}}>
+        <Text weight="bold">{I18n.t('Warning')}</Text>
         <View as="div" padding={individualOutcomeExample ? 'x-small 0 x-small' : 'small 0 x-small'}>
-          {currentMethod.exampleText}
+          {currentMethod.exampleWarning}
         </View>
-        <View as="div" padding="x-small 0">
-          {I18n.t('Item Scores:')}&nbsp;
-          <Text weight="bold">{currentMethod.exampleScores}</Text>
-        </View>
-        <View as="div" padding="x-small 0">
-          {I18n.t('Final Score:')}&nbsp;
-          <Text weight="bold" data-testid="proficiency-calculation-example-final-score">
-            {currentMethod.exampleResult}
-          </Text>
-        </View>
+      </div>
+    )}
+    <View as="div" padding="x-small 0">
+      {I18n.t('Item Scores:')}&nbsp;
+      <Text weight="bold">{currentMethod.exampleScores}</Text>
+    </View>
+    <View as="div" padding="x-small 0">
+      {I18n.t('Final Score:')}&nbsp;
+      <Text weight="bold" data-testid="proficiency-calculation-example-final-score">
+        {currentMethod.exampleResult}
       </Text>
-    </div>
-  )
-}
+    </View>
+  </View>
+)
 
 const getModalText = contextType => {
   if (contextType === 'Course') {

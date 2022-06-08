@@ -635,7 +635,6 @@ describe "context modules" do
 
     context "load in a new tab checkbox" do
       before :once do
-        Account.site_admin.enable_feature!(:remember_module_links_default)
         @course.context_modules.create!(name: "New Module")
       end
 

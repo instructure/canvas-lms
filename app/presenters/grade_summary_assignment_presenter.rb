@@ -91,6 +91,10 @@ class GradeSummaryAssignmentPresenter
     hide_grade_from_student? || submission.nil?
   end
 
+  def quiz_pending_review?
+    submission&.submission_type == "online_quiz" && submission&.workflow_state == "pending_review"
+  end
+
   def original_points
     has_no_score_display? ? "" : submission.published_score
   end
@@ -144,6 +148,7 @@ class GradeSummaryAssignmentPresenter
     classes << "assignment_graded" if graded?
     classes << special_class
     classes << "excused" if excused?
+    classes << "extended" if extended?
     classes.join(" ")
   end
 
@@ -157,6 +162,10 @@ class GradeSummaryAssignmentPresenter
 
   def excused?
     submission.try(:excused?)
+  end
+
+  def extended?
+    submission.try(:extended?)
   end
 
   def deduction_present?

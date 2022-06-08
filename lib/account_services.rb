@@ -44,12 +44,6 @@ module AccountServices
                                       description: "",
                                       expose_to_ui: :service
                                     },
-                                    twitter: {
-                                      name: I18n.t("Twitter"),
-                                      description: "",
-                                      expose_to_ui: :service,
-                                      expose_to_ui_proc: proc { !!Twitter::Connection.config }
-                                    },
                                     delicious: {
                                       name: I18n.t("Delicious"),
                                       description: "",

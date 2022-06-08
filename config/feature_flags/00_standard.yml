@@ -260,7 +260,7 @@ new_user_tutorial:
   type: setting
   state: allowed
   display_name: New User Tutorial
-  description: Provide tutorial information for new users in a flyout tray.
+  description: Provide tutorial information for instructors new to Canvas.
   applies_to: RootAccount
   root_opt_in: true
 new_user_tutorial_on_off:

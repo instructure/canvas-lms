@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import htmlEscape from 'html-escape'
 import {trackEvent} from '@canvas/google-analytics'
 import '@canvas/module-sequence-footer'
 import MarkAsDone from '@canvas/util/jquery/markAsDone'
@@ -27,10 +26,10 @@ import ready from '@instructure/ready'
 
 ready(() => {
   const $toolForm = $('#tool_form')
-  
-  const launchToolManually = function() {
-    const $button = $toolForm.find('button')  
-  
+
+  const launchToolManually = function () {
+    const $button = $toolForm.find('button')
+
     $toolForm.show()
 
     // Firefox remembers disabled state after page reloads
@@ -41,14 +40,12 @@ ready(() => {
       $button.attr('disabled', true).text($button.data('expired_message'))
     }, 60 * 2.5 * 1000)
 
-    $toolForm.submit(function() {
-      $(this)
-        .find('.load_tab,.tab_loaded')
-        .toggle()
-  })
-}
+    $toolForm.submit(function () {
+      $(this).find('.load_tab,.tab_loaded').toggle()
+    })
+  }
 
-  const launchToolInNewTab = function() {
+  const launchToolInNewTab = function () {
     $toolForm.attr('target', '_blank')
     launchToolManually()
   }
@@ -62,12 +59,14 @@ ready(() => {
       $toolForm.removeAttr('target')
       try {
         $toolForm.submit()
+        // eslint-disable-next-line no-empty
       } catch (e) {}
       break
     default:
       // Firefox throws an error when submitting insecure content
       try {
         $toolForm.submit()
+        // eslint-disable-next-line no-empty
       } catch (e) {}
 
       $('#tool_content').bind('load', () => {
@@ -95,41 +94,65 @@ ready(() => {
   trackEvent(messageType, toolName, toolPath)
 
   // Iframe resize handler
-  let $tool_content_wrapper
-  let min_tool_height, canvas_chrome_height
+  const $tool_content_wrapper = $('.tool_content_wrapper')
+  let tool_height, canvas_chrome_height
 
   const $window = $(window)
-  $tool_content_wrapper = $('.tool_content_wrapper')
-  const toolResizer = new ToolLaunchResizer(min_tool_height)
-  const $tool_content = $('iframe#tool_content')
+  const toolResizer = new ToolLaunchResizer(tool_height)
 
   const $external_content_info_alerts = $tool_content_wrapper.find(
     '.before_external_content_info_alert, .after_external_content_info_alert'
   )
 
-  $external_content_info_alerts.on('focus', function(e) {
+  $external_content_info_alerts.on('focus', function () {
     $tool_content_wrapper.find('iframe').css('border', '2px solid #0374B5')
     $(this).removeClass('screenreader-only-tool')
   })
 
-  $external_content_info_alerts.on('blur', function(e) {
+  $external_content_info_alerts.on('blur', function () {
     $tool_content_wrapper.find('iframe').css('border', 'none')
     $(this).addClass('screenreader-only-tool')
   })
 
-  if (!$('body').hasClass('ic-full-screen-lti-tool')) {
+  const is_full_screen = $('body').hasClass('ic-full-screen-lti-tool')
+
+  if (!is_full_screen) {
     canvas_chrome_height = $tool_content_wrapper.offset().top + $('#footer').outerHeight(true)
   }
 
-  // Only calculate height on resize if body does not have
-  // .ic-full-screen-lti-tool class
-  if ($tool_content_wrapper.length && !$('body').hasClass('ic-full-screen-lti-tool')) {
+  if ($tool_content_wrapper.length) {
     $window
-      .resize(() => {
+      .on('resize', () => {
+        // https://api.jquery.com/resize/
+        // https://developer.mozilla.org/en-US/docs/Web/API/Window/resize_event
+
         if (!$tool_content_wrapper.data('height_overridden')) {
-          toolResizer.resize_tool_content_wrapper(
-            $window.height() - canvas_chrome_height - $('#sequence_footer').outerHeight(true)
-          )
+          if (is_full_screen) {
+            // divs from app/views/lti/_lti_message.html.erb that usually have 1px
+            const div_before_iframe =
+              document.querySelector('div.before_external_content_info_alert')?.offsetHeight || 0
+            const div_after_iframe =
+              document.querySelector('div.after_external_content_info_alert')?.offsetHeight || 0
+
+            // header#mobile-header
+            //   hidden when screen width > 768px
+            //   see app/stylesheets/base/_ic_app_header.scss
+            //   see https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetHeight
+            const mobile_header_height =
+              document.querySelector('header#mobile-header')?.offsetHeight || 0
+
+            tool_height =
+              window.innerHeight - mobile_header_height - div_before_iframe - div_after_iframe
+
+            toolResizer.resize_tool_content_wrapper(tool_height, $tool_content_wrapper, true)
+          } else {
+            toolResizer.resize_tool_content_wrapper(
+              $window.height() -
+                canvas_chrome_height -
+                // module item navigation from PLAT-1687
+                $('#sequence_footer').outerHeight(true)
+            )
+          }
         }
       })
       .triggerHandler('resize')
@@ -143,7 +166,7 @@ ready(() => {
     })
   }
 
-  $('#content').on('click', '#mark-as-done-checkbox', function() {
+  $('#content').on('click', '#mark-as-done-checkbox', function () {
     MarkAsDone.toggle(this)
   })
 })

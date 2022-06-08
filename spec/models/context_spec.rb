@@ -129,6 +129,14 @@ describe Context do
       expect(Context.find_asset_by_url("/courses/#{@course.id}/file_contents/course%20files//#{@attachment.name}")).to eq @attachment
     end
 
+    it "finds folders" do
+      f = Folder.root_folders(@course).first
+      child = f.active_sub_folders.build(name: "child")
+      child.context = @course
+      child.save!
+      expect(Context.find_asset_by_url("/courses/#{@course.id}/files/child")).to eq @child
+    end
+
     it "finds assignments" do
       assignment_model(course: @course)
       expect(Context.find_asset_by_url("/courses/#{@course.id}/assignments/#{@assignment.id}")).to eq @assignment

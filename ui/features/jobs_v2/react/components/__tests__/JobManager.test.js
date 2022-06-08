@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {fireEvent} from '@testing-library/react'
+import renderWithMocks, {updateInternalSettingMutation} from './MockSettingsApi'
 import JobManager from '../JobManager'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
@@ -39,10 +40,11 @@ describe('JobManager', () => {
 
   beforeEach(() => {
     doFetchApi.mockClear()
+    updateInternalSettingMutation.mockClear()
   })
 
   it("doesn't render a button if a strand isn't selected", async () => {
-    const {queryByRole} = render(
+    const {queryByRole} = renderWithMocks(
       <JobManager groupType="tag" groupText="foobar" jobs={[fakeJob]} onUpdate={jest.fn()} />
     )
     expect(queryByRole('button', {name: /Manage strand/})).not.toBeInTheDocument()
@@ -50,11 +52,12 @@ describe('JobManager', () => {
 
   it('edits priority but not concurrency for normal strand', async () => {
     const onUpdate = jest.fn()
-    const {getByRole, getByLabelText, queryByLabelText} = render(
+    const {getByRole, getByLabelText, queryByLabelText} = renderWithMocks(
       <JobManager groupType="strand" groupText="foobar" jobs={[fakeJob]} onUpdate={onUpdate} />
     )
     fireEvent.click(getByRole('button', {name: /Manage strand/}))
-    expect(queryByLabelText('Max n_strand parallelism')).not.toBeInTheDocument()
+    expect(queryByLabelText('Dynamic concurrency')).not.toBeInTheDocument()
+    expect(queryByLabelText('Permanent num_strands setting')).not.toBeInTheDocument()
     fireEvent.change(getByLabelText('Priority'), {target: {value: '11'}})
     fireEvent.click(getByRole('button', {name: 'Apply'}))
     expect(doFetchApi).toHaveBeenCalledWith({
@@ -68,7 +71,7 @@ describe('JobManager', () => {
 
   it('edits both priority and concurrency for n_strand', async () => {
     const onUpdate = jest.fn()
-    const {getByRole, getByLabelText} = render(
+    const {getByRole, getByLabelText} = renderWithMocks(
       <JobManager
         groupType="strand"
         groupText="foobar"
@@ -76,9 +79,11 @@ describe('JobManager', () => {
         onUpdate={onUpdate}
       />
     )
+    await flushPromises()
     fireEvent.click(getByRole('button', {name: /Manage strand/}))
     fireEvent.change(getByLabelText('Priority'), {target: {value: '11'}})
-    fireEvent.change(getByLabelText('Max n_strand parallelism'), {target: {value: '7'}})
+    fireEvent.change(getByLabelText('Dynamic concurrency'), {target: {value: '7'}})
+    fireEvent.change(getByLabelText('Permanent num_strands setting'), {target: {value: '14'}})
     fireEvent.click(getByRole('button', {name: 'Apply'}))
     expect(doFetchApi).toHaveBeenCalledWith({
       path: '/api/v1/jobs2/manage',
@@ -87,5 +92,31 @@ describe('JobManager', () => {
     })
     await flushPromises()
     expect(onUpdate).toHaveBeenCalledWith({status: 'OK', count: 1})
+    expect(updateInternalSettingMutation).toHaveBeenCalled()
+  })
+
+  it("doesn't mutate the num_strands setting if unchanged", async () => {
+    const onUpdate = jest.fn()
+    const {getByRole, getByLabelText} = renderWithMocks(
+      <JobManager
+        groupType="strand"
+        groupText="foobar"
+        jobs={[{...fakeJob, max_concurrent: 2}]}
+        onUpdate={onUpdate}
+      />
+    )
+    await flushPromises()
+    fireEvent.click(getByRole('button', {name: /Manage strand/}))
+    fireEvent.change(getByLabelText('Priority'), {target: {value: '15'}})
+    fireEvent.change(getByLabelText('Dynamic concurrency'), {target: {value: '8'}})
+    fireEvent.click(getByRole('button', {name: 'Apply'}))
+    expect(doFetchApi).toHaveBeenCalledWith({
+      path: '/api/v1/jobs2/manage',
+      method: 'PUT',
+      params: {strand: 'foobar', priority: 15, max_concurrent: 8}
+    })
+    await flushPromises()
+    expect(onUpdate).toHaveBeenCalledWith({status: 'OK', count: 1})
+    expect(updateInternalSettingMutation).not.toHaveBeenCalled()
   })
 })

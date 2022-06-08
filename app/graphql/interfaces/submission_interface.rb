@@ -91,6 +91,7 @@ module Interfaces::SubmissionInterface
     graphql_name "LatePolicyStatusType"
     value "late"
     value "missing"
+    value "extended"
     value "none"
   end
 

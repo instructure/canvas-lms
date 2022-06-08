@@ -21,6 +21,7 @@ import Color from 'tinycolor2'
 export type StatusColors = {
   dropped: string
   excused: string
+  extended: string
   late: string
   missing: string
   resubmitted: string
@@ -42,6 +43,7 @@ export const defaultColors = {
 const defaultStatusColors = {
   dropped: defaultColors.orange,
   excused: defaultColors.yellow,
+  extended: defaultColors.lavender,
   late: defaultColors.blue,
   missing: defaultColors.salmon,
   resubmitted: defaultColors.green

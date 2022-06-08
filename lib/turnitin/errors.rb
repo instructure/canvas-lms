@@ -20,5 +20,12 @@
 module Turnitin::Errors
   class SubmissionNotScoredError < StandardError; end
 
-  class ScoreStillPendingError < StandardError; end
+  class OriginalSubmissionUnavailableError < StandardError
+    attr_reader :status_code
+
+    def initialize(status_code = nil)
+      super("#{self.class.name}, got #{status_code}")
+      @status_code = status_code
+    end
+  end
 end

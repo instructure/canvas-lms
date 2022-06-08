@@ -489,4 +489,19 @@ describe "profile" do
       expect(@other_student.avatar_image_url?).to be(false)
     end
   end
+
+  context "allow_opt_out_of_inbox" do
+    it "does not show when feature is off", priority: "1" do
+      course_with_teacher_logged_in
+      get "/profile/settings"
+      expect(f("#content")).not_to contain_css("#disable_inbox")
+    end
+
+    it "reveals when the feature flag is set", priority: "1" do
+      course_with_teacher_logged_in
+      @course.root_account.enable_feature!(:allow_opt_out_of_inbox)
+      get "/profile/settings"
+      expect(ff("#disable_inbox").count).to eq 1
+    end
+  end
 end

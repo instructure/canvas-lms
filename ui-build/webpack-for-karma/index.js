@@ -197,7 +197,6 @@ module.exports = {
       JSPEC_RECURSE: '1',
       JSPEC_VERBOSE: '0',
       A11Y_REPORT: false,
-      SENTRY_DSN: null,
       GIT_COMMIT: null
     }),
 
@@ -211,21 +210,6 @@ module.exports = {
         group: process.env.JSPEC_GROUP,
         nodeIndex: +process.env.CI_NODE_INDEX,
         nodeTotal: +process.env.CI_NODE_TOTAL,
-      })
-    ] : []
-  ).concat(
-    process.env.SENTRY_DSN ? [
-      new require('@sentry/webpack-plugin')({
-        release: process.env.GIT_COMMIT,
-        include: [
-          path.join(canvasDir, 'ui'),
-          path.join(canvasDir, 'spec/javascripts/jsx'),
-          path.join(canvasDir, 'spec/coffeescripts')
-        ],
-        ignore: [
-          path.join(canvasDir, 'public/javascripts/translations'),
-          /bower\//
-        ]
       })
     ] : []
   )

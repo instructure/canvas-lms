@@ -1435,7 +1435,6 @@ class Course < ActiveRecord::Base
   end
 
   def do_offer
-    self.start_at ||= Time.now
     delay_if_production.invite_uninvited_students
   end
 
@@ -3923,7 +3922,7 @@ class Course < ActiveRecord::Base
     # Who..." for unsubmitted.
     expire_time = Setting.get("late_policy_tainted_submissions", 1.hour).to_i
     Rails.cache.fetch(["late_policy_tainted_submissions", self].cache_key, expires_in: expire_time) do
-      submissions.except(:order).where(late_policy_status: %w[missing late none]).exists?
+      submissions.except(:order).where(late_policy_status: %w[missing late extended none]).exists?
     end
   end
 

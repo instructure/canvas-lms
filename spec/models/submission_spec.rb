@@ -43,7 +43,7 @@ describe Submission do
 
   it { is_expected.to validate_numericality_of(:points_deducted).is_greater_than_or_equal_to(0).allow_nil }
   it { is_expected.to validate_numericality_of(:seconds_late_override).is_greater_than_or_equal_to(0).allow_nil }
-  it { is_expected.to validate_inclusion_of(:late_policy_status).in_array(%w[none missing late]).allow_nil }
+  it { is_expected.to validate_inclusion_of(:late_policy_status).in_array(%w[none missing late extended]).allow_nil }
   it { is_expected.to validate_inclusion_of(:cached_tardiness).in_array(["missing", "late"]).allow_nil }
 
   it { is_expected.to delegate_method(:auditable?).to(:assignment).with_prefix(true) }
@@ -1194,6 +1194,29 @@ describe Submission do
 
         it "sets points_deducted to nil" do
           expect { submission.update!(late_policy_status: "none") }
+            .to change { submission.points_deducted }.from(400).to(nil)
+        end
+      end
+
+      context "when change late_policy_status from late to extended" do
+        before do
+          @assignment.course.update!(late_policy: @late_policy)
+          @assignment.submit_homework(@student, body: "a body")
+
+          submission.update!(
+            score: 700,
+            late_policy_status: "late",
+            seconds_late_override: 4.hours
+          )
+        end
+
+        it "removes late penalty from score" do
+          expect { submission.update!(late_policy_status: "extended") }
+            .to change { submission.score }.from(300).to(700)
+        end
+
+        it "sets points_deducted to nil" do
+          expect { submission.update!(late_policy_status: "extended") }
             .to change { submission.points_deducted }.from(400).to(nil)
         end
       end
@@ -3831,6 +3854,12 @@ describe Submission do
         expect(Submission.missing).to be_empty
       end
 
+      it "excludes submission when past due and extended" do
+        @submission.update(late_policy_status: "extended")
+
+        expect(Submission.missing).to be_empty
+      end
+
       it "excludes submission when past due and assignment does not expect a submission" do
         @submission.assignment.update(submission_types: "none")
 
@@ -3892,6 +3921,12 @@ describe Submission do
 
       it "excludes submission when late_policy_status is not nil, not missing" do
         @submission.update(late_policy_status: "foo")
+
+        expect(Submission.missing).to be_empty
+      end
+
+      it "excludes submission when late_policy_status is extended" do
+        @submission.update(late_policy_status: "extended")
 
         expect(Submission.missing).to be_empty
       end
@@ -7099,6 +7134,10 @@ describe Submission do
       @late_quiz2_submission = @late_quiz2.submission
       Submission.where(id: @late_quiz2_submission).update_all(submitted_at: @now, cached_due_date: @now - 1.hour)
 
+      @late_quiz_extended = generate_quiz_submission(@quiz, student: User.create, finished_at: @now)
+      @late_quiz_extended_submission = @late_quiz_extended.submission
+      Submission.where(id: @late_quiz_extended_submission).update_all(submitted_at: @now, cached_due_date: @now - 1.hour, late_policy_status: "extended")
+
       @timely_quiz_marked_late = generate_quiz_submission(@quiz, student: User.create, finished_at: @now)
       @timely_quiz_marked_late_submission = @timely_quiz_marked_late.submission
       Submission.where(id: @timely_quiz_marked_late_submission).update_all(submitted_at: @now, cached_due_date: nil)
@@ -7195,6 +7234,10 @@ describe Submission do
       expect(@late_submission_ids).to include(@ongoing_timely_quiz_marked_late_submission.id)
     end
 
+    it "excludes quizzes that are late but have been marked as extended" do
+      expect(@late_submission_ids).not_to include(@late_quiz_extended_submission.id)
+    end
+
     ### Homeworks
     it "excludes unsubmitted homeworks" do
       expect(@late_submission_ids).not_to include(@unsubmitted_hw.id)
@@ -7265,6 +7308,10 @@ describe Submission do
       @late_quiz2 = generate_quiz_submission(@quiz, student: User.create, finished_at: @now)
       @late_quiz2_submission = @late_quiz2.submission
       Submission.where(id: @late_quiz2_submission).update_all(submitted_at: @now, cached_due_date: @now - 1.hour)
+
+      @late_quiz_extended = generate_quiz_submission(@quiz, student: User.create, finished_at: @now)
+      @late_quiz_extended_submission = @late_quiz_extended.submission
+      Submission.where(id: @late_quiz_extended_submission).update_all(submitted_at: @now, cached_due_date: @now - 1.hour, late_policy_status: "extended")
 
       @timely_quiz_marked_late = generate_quiz_submission(@quiz, student: User.create, finished_at: @now)
       @timely_quiz_marked_late_submission = @timely_quiz_marked_late.submission
@@ -7360,6 +7407,10 @@ describe Submission do
 
     it "excludes quizzes that have been manually marked as late but are being retaken" do
       expect(@not_late_submission_ids).not_to include(@ongoing_timely_quiz_marked_late_submission.id)
+    end
+
+    it "includes quizzes that are late but have been marked as extended" do
+      expect(@not_late_submission_ids).to include(@late_quiz_extended_submission.id)
     end
 
     ### Homeworks

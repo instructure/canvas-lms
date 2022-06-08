@@ -41,7 +41,8 @@ module Types
         channels = channels.reject { |cc| cc.path_type == CommunicationChannel::TYPE_PUSH }
       end
 
-      channels
+      # remove Twitter notification types
+      channels.reject { |cc| cc.path_type == CommunicationChannel::TYPE_TWITTER }
     end
 
     field :send_scores_in_emails, Boolean, null: true do

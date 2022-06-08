@@ -33,6 +33,9 @@ export const formatDate = (date: string | moment.Moment): string => {
 // Calculates the days between the start and end dates.
 // Skips weekends if excludeWeekends is true, and includes
 // the end date if inclusiveEnd is true.
+// Note: before evaluating, start and end are converted to end of day
+//       to keep from being surprised, blackoutDates should also be
+//       set to end of day.
 export const daysBetween = (
   start: string | moment.Moment,
   end: string | moment.Moment,

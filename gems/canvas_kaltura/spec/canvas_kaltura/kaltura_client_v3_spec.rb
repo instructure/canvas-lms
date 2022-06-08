@@ -213,6 +213,15 @@ describe CanvasKaltura::ClientV3 do
     end
   end
 
+  describe "getRequest" do
+    it "logs service unavailable errors" do
+      http_error = Net::HTTPServiceUnavailable.new(nil, nil, nil)
+      allow(@kaltura).to receive(:sendRequest).and_return(http_error)
+      expect(CanvasKaltura.error_handler).to receive(:capture).with("Kaltura service unavailable", http_error, :warn)
+      @kaltura.mediaGet(12_345)
+    end
+  end
+
   describe "startSession" do
     it "sends Kaltura a request with proper parameters for a user" do
       user_id = 12_345

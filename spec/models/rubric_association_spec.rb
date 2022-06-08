@@ -45,6 +45,18 @@ describe RubricAssociation do
       )
     end
 
+    it "re-aligns peer review assessments to use the new rubric when the rubric is changed on the assignment" do
+      @assignment.assign_peer_review(@student_1, @student_2)
+      @assignment.assign_peer_review(@student_2, @student_1)
+      original_rubric = @course.rubrics.create! { |r| r.user = @teacher }
+      ra_params = rubric_association_params_for_assignment(@assignment, use_for_grading: "1")
+      RubricAssociation.generate(@teacher, original_rubric, @course, ra_params.dup)
+      new_rubric = @course.rubrics.create! { |r| r.user = @teacher }
+      rubric_association = RubricAssociation.generate(@teacher, new_rubric, @course, ra_params.dup)
+      assessment_request = Submission.find_by(user: @student_1, assignment: @assignment).assessment_requests.first
+      expect(assessment_request.rubric_association_id).to eq rubric_association.id
+    end
+
     it "disable use_for_grading if hide_points enabled" do
       # Create the rubric
       @rubric = @course.rubrics.create! { |r| r.user = @teacher }

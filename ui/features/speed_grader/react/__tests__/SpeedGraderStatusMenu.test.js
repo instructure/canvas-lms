@@ -26,6 +26,8 @@ describe('SpeedGraderStatusMenu', () => {
   const renderComponent = () => render(<SpeedGraderStatusMenu {...props} />)
 
   beforeEach(() => {
+    window.ENV = {FEATURES: {}}
+
     props = {
       lateSubmissionInterval: 'day',
       locale: 'en',

@@ -2393,7 +2393,7 @@ QUnit.module('SpeedGrader', rootHooks => {
             {
               grade: 'F',
               grade_matches_current_submission: false,
-              id: '2503',
+              id: '14',
               score: 0,
               submission_history: [],
               submitted_at: '2015-05-06T12:00:00Z',
@@ -2454,6 +2454,13 @@ QUnit.module('SpeedGrader', rootHooks => {
           SpeedGrader.EG.jsonReady()
           const ids = window.jsonData.studentsWithSubmissions.map(student => student.id)
           deepEqual(ids, ['1101', '1103', '1102', '1104'])
+        })
+
+        test('sorts students by their assigned index when names are hidden', () => {
+          userSettings.get.withArgs('eg_hide_student_names').returns(true)
+          SpeedGrader.EG.jsonReady()
+          const ids = window.jsonData.studentsWithSubmissions.map(student => student.id)
+          deepEqual(ids, ['1101', '1102', '1103', '1104'])
         })
 
         test('sorts students by sortable_name when submission statuses match', () => {

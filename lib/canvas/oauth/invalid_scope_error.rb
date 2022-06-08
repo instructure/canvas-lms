@@ -24,13 +24,10 @@ module Canvas::OAuth
             "The following scopes were requested, but not granted: #{missing_scopes.to_sentence(locale: :en)}")
     end
 
-    def to_render_data
+    def as_json
       {
-        status: 400,
-        json: {
-          error: :invalid_scope,
-          error_description: @message
-        }
+        error: :invalid_scope,
+        error_description: @message
       }
     end
 

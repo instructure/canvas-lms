@@ -362,30 +362,6 @@ TEXT
           </div>
         </div>
       </li>
-      <li id="unregistered_service_twitter" class="service" style="<%= hidden if services.include?("twitter") || !feature_and_service_enabled?(:twitter) %>">
-        <a href="#" class="btn btn-small"><%= image_tag "twitter_icon.png", :alt => '' %> <%= t('links.twitter', "Twitter") %></a>
-        <div style="display: none; text-align: <%= direction('left') %>;" class="content" title="<%= t('titles.authorize_twitter', "Authorize Twitter") %>" id="unregistered_service_twitter_dialog">
-          <div>
-            <%= image_tag "twitter.png", :style => "float: #{direction('left')}; padding-#{ direction('right') }: 5px;", :alt => '' %>
-            <div style="font-size: 1.2em; font-weight: bold;"><%= t('headers.twitter_access', "Twitter Access") %></div>
-            <%= mt(:twitter_description, <<~TEXT)
-Twitter is a service for posting and subscribing to short messages.
-If you have a Twitter account, you can register it here.  Then if you allow
-fellow course/group members to see your registered services, they can
-easily connect with your Twitter account.
-
-You can also sign up to have notifications sent to your Twitter account.
-These notifications will be sent as direct messages to yourself from
-yourself, and won't appear in your public stream.
-TEXT
-            %>
-            <div class="clear"></div>
-          </div>
-          <div style="text-align: center; margin-top: 10px;">
-            <a class="btn btn-primary" href="<%= oauth_url(:service => "twitter", :return_to => settings_profile_url) %>"><%= t('buttons.authorize_twitter', "Authorize Twitter Access") %></a>
-          </div>
-        </div>
-      </li>
       <li id="unregistered_service_delicious" class="service" style="<%= hidden if services.include?("delicious") || !service_enabled?(:delicious) %>">
         <a href="#" class="btn btn-small"><%= image_tag "delicious_icon.png", :alt => '' %> <%= t('links.delicious', "Delicious") %></a>
         <div style="display: none; text-align: <%= direction('left') %>;" class="content" title="<%= t('titles.delicious_login', "Delicious Login") %>" id="unregistered_service_delicious_dialog">
