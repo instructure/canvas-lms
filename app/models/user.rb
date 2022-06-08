@@ -427,7 +427,7 @@ class User < ActiveRecord::Base
   after_save :update_account_associations_if_necessary
   after_save :self_enroll_if_necessary
 
-  def courses_for_enrollments(enrollment_scope, associated_user = nil, include_completed_courses = true)
+  def courses_for_enrollments(enrollment_scope, associated_user = nil, include_completed_courses = true, exclude_restricted_inactivated_courses = false)
     if associated_user && associated_user != self
       join = :observer_enrollments
       scope = Course.active.joins(join)
@@ -442,6 +442,10 @@ class User < ActiveRecord::Base
       scope = scope.joins(join => :enrollment_state)
                    .where(enrollment_states: { restricted_access: false })
                    .where("enrollment_states.state IN ('active', 'invited', 'pending_invited', 'pending_active')")
+    end
+
+    if exclude_restricted_inactivated_courses
+      scope = scope.joins(join => :enrollment_state).where("enrollment_states.restricted_access <> 'true' OR enrollment_states.state NOT IN ('invited', 'pending_invited', 'pending_active')")
     end
     scope
   end
@@ -1904,7 +1908,7 @@ class User < ActiveRecord::Base
     @courses_with_primary_enrollment.fetch(cache_key) do
       res = shard.activate do
         result = Rails.cache.fetch([self, "courses_with_primary_enrollment2", association, options, ApplicationController.region].cache_key, expires_in: 15.minutes) do
-          scope = courses_for_enrollments(enrollments.current_and_invited, options[:observee_user], !!options[:include_completed_courses])
+          scope = courses_for_enrollments(enrollments.current_and_invited, options[:observee_user], !!options[:include_completed_courses], !!options[:exclude_restricted_inactivated_courses])
           shards = in_region_associated_shards
           # Limit favorite courses based on current shard.
           if association == :favorite_courses
