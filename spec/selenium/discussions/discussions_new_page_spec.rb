@@ -132,7 +132,7 @@ describe "discussions" do
 
           f('input[type=checkbox][name="assignment[set_assignment]"]').click
           f("#has_group_category").click
-          close_visible_dialog
+          f(%(span[data-testid="group-set-close"])).click
           f("#edit_discussion_form_buttons .btn-primary[type=submit]").click
           wait_for_ajaximations
           error_box = f("div[role='alert'] .error_text")
