@@ -34,6 +34,10 @@ describe('buildMetadata() / parseMetadata()', () => {
 
     const svg = createSvgElement('svg')
     svg.appendChild(metadata)
-    expect(parseMetadata(svg)).toEqual(settings)
+
+    // Remove the instance specific attributes
+    // that aren't included in the embedded metadata
+    const {alt, isDecorative, ...embeddedMetadata} = settings
+    expect(parseMetadata(svg)).toEqual(embeddedMetadata)
   })
 })

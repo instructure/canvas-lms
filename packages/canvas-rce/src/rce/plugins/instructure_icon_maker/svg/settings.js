@@ -115,7 +115,9 @@ export function useSvgSettings(editor, editing, rcsConfig) {
         metadataJson.name = fileName
         metadataJson.originalName = fileName
 
-        if (altText) {
+        if (altText === '') {
+          metadataJson.isDecorative = true
+        } else if (altText) {
           metadataJson.alt = altText
         }
 

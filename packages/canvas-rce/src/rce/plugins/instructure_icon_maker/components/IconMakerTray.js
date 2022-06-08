@@ -207,7 +207,9 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
 
     img.setAttribute('src', url)
 
-    if (settings.alt) {
+    if (settings.isDecorative) {
+      img.setAttribute('alt', '')
+    } else if (settings.alt) {
       img.setAttribute('alt', settings.alt)
     }
 

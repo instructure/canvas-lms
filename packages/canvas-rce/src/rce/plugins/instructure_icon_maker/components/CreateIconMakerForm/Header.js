@@ -25,6 +25,7 @@ import {TextArea} from '@instructure/ui-text-area'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
+import {Checkbox} from '@instructure/ui-checkbox'
 import {IconQuestionLine} from '@instructure/ui-icons'
 import {decode} from '../../svg/utils'
 import useDebouncedValue from '../../utils/useDebouncedValue'
@@ -93,11 +94,19 @@ export const Header = ({settings, onChange, allowNameChange, nameRef}) => {
         <TextArea
           id="icon-alt-text"
           height="4rem"
+          disabled={settings.isDecorative}
           label={textAreaLabel}
           onChange={setAlt}
-          placeholder={formatMessage('(Describe the image)')}
+          placeholder={formatMessage('(Describe the icon)')}
           resize="vertical"
           value={alt}
+        />
+      </Flex.Item>
+      <Flex.Item padding="small">
+        <Checkbox
+          checked={settings.isDecorative}
+          label={formatMessage('Decorative Icon')}
+          onChange={() => onChange({isDecorative: !settings.isDecorative})}
         />
       </Flex.Item>
     </Flex>

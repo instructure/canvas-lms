@@ -55,12 +55,14 @@ describe('useSvgSettings()', () => {
 
       expect(settings).toMatchInlineSnapshot(`
         Object {
+          "alt": "",
           "color": null,
           "encodedImage": "",
           "encodedImageName": "",
           "encodedImageType": "",
           "height": 0,
           "imageSettings": null,
+          "isDecorative": false,
           "outlineColor": "#000000",
           "outlineSize": "none",
           "shape": "square",
@@ -107,12 +109,14 @@ describe('useSvgSettings()', () => {
         act(() => result.current[2](settingsUpdate))
         expect(result.current[0]).toMatchInlineSnapshot(`
           Object {
+            "alt": "",
             "color": null,
             "encodedImage": "",
             "encodedImageName": "",
             "encodedImageType": "",
             "height": 0,
             "imageSettings": null,
+            "isDecorative": false,
             "name": "Banana",
             "outlineColor": "#000000",
             "outlineSize": "none",
@@ -279,6 +283,7 @@ describe('useSvgSettings()', () => {
           "encodedImageType": "",
           "height": 0,
           "imageSettings": null,
+          "isDecorative": false,
           "name": "Test Icon",
           "originalName": "Test Icon",
           "outlineColor": "#06A3B7",
@@ -371,6 +376,7 @@ describe('useSvgSettings()', () => {
               "image": "Art Icon",
               "mode": "SingleColor",
             },
+            "isDecorative": false,
             "name": "Test Icon",
             "originalName": "Test Icon",
             "outlineColor": "#06A3B7",
@@ -429,6 +435,7 @@ describe('useSvgSettings()', () => {
               "image": "Art Icon",
               "mode": "SingleColor",
             },
+            "isDecorative": false,
             "name": "Test Icon",
             "originalName": "Test Icon",
             "outlineColor": "#06A3B7",
@@ -481,6 +488,7 @@ describe('useSvgSettings()', () => {
             "encodedImageType": "",
             "height": 0,
             "imageSettings": null,
+            "isDecorative": false,
             "name": "Test Icon",
             "originalName": "Test Icon",
             "outlineColor": "#06A3B7",
@@ -530,12 +538,14 @@ describe('useSvgSettings()', () => {
         const result = subject()
         expect(result.current[0]).toMatchInlineSnapshot(`
           Object {
+            "alt": "",
             "color": null,
             "encodedImage": "",
             "encodedImageName": "",
             "encodedImageType": "",
             "height": 0,
             "imageSettings": null,
+            "isDecorative": false,
             "outlineColor": "#000000",
             "outlineSize": "none",
             "shape": "square",
@@ -564,12 +574,14 @@ describe('useSvgSettings()', () => {
         const result = subject()
         expect(result.current[0]).toMatchInlineSnapshot(`
           Object {
+            "alt": "",
             "color": null,
             "encodedImage": "",
             "encodedImageName": "",
             "encodedImageType": "",
             "height": 0,
             "imageSettings": null,
+            "isDecorative": false,
             "outlineColor": "#000000",
             "outlineSize": "none",
             "shape": "square",
