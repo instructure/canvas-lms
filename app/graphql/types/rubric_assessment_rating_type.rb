@@ -27,6 +27,10 @@ module Types
 
     field :comments, String, null: true
     field :comments_html, String, null: true
+    field :artifact_attempt, Integer, null: false
+    def artifact_attempt
+      object[:artifact_attempt] || 0
+    end
 
     field :criterion, RubricCriterionType, <<~MD, null: true
       The rubric criteria that this assessment is for
