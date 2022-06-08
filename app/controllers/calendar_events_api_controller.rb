@@ -185,6 +185,14 @@ require "rrule"
 #           "description": "Boolean indicating whether this has important dates.",
 #           "example": true,
 #           "type": "boolean"
+#         },
+#         "series_uuid": {
+#           "description": "Identifies the recurring event series this event may belong to",
+#           "type": "uuid"
+#         },
+#         "rrule": {
+#           "description": "An iCalendar RRULE for defining how events in a recurring event series repeat.",
+#           "type": "string"
 #         }
 #       }
 #     }
@@ -475,8 +483,11 @@ class CalendarEventsApiController < ApplicationController
   #   Defaults to false.  If set to `true`, an increasing counter number will be appended to the event title
   #   when the event is duplicated.  (e.g. Event 1, Event 2, Event 3, etc)
   # @argument calendar_event[rrule] [string]
-  #   If the :calendar_series flag is on, this parameter replaces the calendar_event[duplicate] parameters
-  #   Its value is the iCalendar RRULE, though unending series are capped at 200 instances.
+  #   If the calendar_series flag is enabled,
+  #   this parameter replaces the calendar_event's duplicate parameter to
+  #   create a series of recurring events.
+  #   Its value is the {https://icalendar.org/iCalendar-RFC-5545/3-8-5-3-recurrence-rule.html iCalendar RRULE}
+  #   defining how the event repeats, though unending series not supported.
   #
   # @example_request
   #
@@ -493,7 +504,6 @@ class CalendarEventsApiController < ApplicationController
     end
 
     params_for_create = calendar_event_params
-    params_for_create[:series_id] = CalendarEvent.maximum(:series_id).to_i.next if params_for_create[:rrule].present?
     if params_for_create[:description].present?
       params_for_create[:description] = process_incoming_html_content(params_for_create[:description])
     end
@@ -662,10 +672,20 @@ class CalendarEventsApiController < ApplicationController
   #   Section-level end time(s) if this is a course event.
   # @argument calendar_event[child_event_data][X][context_code] [String]
   #   Context code(s) corresponding to the section-level start and end time(s).
+  # @argument calendar_event[rrule] [Optional, String]
+  #   Valid if the calendar_series feature is enabled and the event whose
+  #   ID is in the URL is part of a series.
+  #   This defines the shape of the recurring event series after it's updated.
+  #   Its value is the iCalendar RRULE, though unending series not supported.
+  # @argument which [Optional, String, "one"|"all"|"following"]
+  #   Valid if the calendar_series feature is enabled and the event whose
+  #   ID is in the URL is part of a series.
+  #   Update just the event whose ID is in in the URL, all events
+  #   in the series, or the given event and all those following.
   #
   # @example_request
   #
-  #   curl 'https://<canvas>/api/v1/calendar_events/234.json' \
+  #   curl 'https://<canvas>/api/v1/calendar_events/234' \
   #        -X PUT \
   #        -F 'calendar_event[title]=Epic Paintball Fight!' \
   #        -H "Authorization: Bearer <token>"
@@ -687,10 +707,10 @@ class CalendarEventsApiController < ApplicationController
 
         if @event.context != context
           if @event.context.is_a?(AppointmentGroup)
-            return render json: { message: "Cannot move Scheduler appointments between calendars" }, status: :bad_request
+            return render json: { message: t("Cannot move Scheduler appointments between calendars") }, status: :bad_request
           end
           if @event.parent_calendar_event_id.present? || @event.child_events.any? || @event.effective_context_code.present?
-            return render json: { message: "Cannot move events with section-specific times between calendars" }, status: :bad_request
+            return render json: { message: t("Cannot move events with section-specific times between calendars") }, status: :bad_request
           end
 
           @event.context = context
@@ -707,6 +727,10 @@ class CalendarEventsApiController < ApplicationController
         params_for_update[:web_conference] = web_conference
       end
 
+      if @event[:series_uuid] && Account.site_admin.feature_enabled?(:calendar_series)
+        return update_from_series(@event, params_for_update, params[:which])
+      end
+
       if @event.update(params_for_update)
         render json: event_json(@event, @current_user, session, include: includes("web_conference"))
       else
@@ -721,7 +745,9 @@ class CalendarEventsApiController < ApplicationController
   #
   # @argument cancel_reason [String]
   #   Reason for deleting/canceling the event.
-  # @argument which [String, "one"|"all"|"following"]
+  # @argument which [Optional, String, "one"|"all"|"following"]
+  #   Valid if the calendar_series feature is enabled and the
+  #   event whose ID is in the URL is part of a series.
   #   Delete just the event whose ID is in in the URL, all events
   #   in the series, or the given event and all those following.
   #
@@ -734,7 +760,7 @@ class CalendarEventsApiController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   def destroy
     get_event
-    if @event.series_id && Account.site_admin.feature_enabled?(:calendar_series)
+    if @event.series_uuid.present? && Account.site_admin.feature_enabled?(:calendar_series)
       destroy_from_series
       return
     end
@@ -753,43 +779,236 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def destroy_from_series
-    if authorized_action(@event, @current_user, :delete) && check_for_past_signup(@event.parent_event)
-      which = params[:which] || "one"
-      case which
-      when "one"
-        events = [@event]
-      when "all"
-        events = CalendarEvent.active.where(series_id: @event.series_id)
-      when "following"
-        events = CalendarEvent.active.where("series_id = ? AND start_at >= ?", @event.series_id, @event.start_at)
-      else
-        render json: { error: t("Invalid parameter which='%{which}'", which: which) }, status: :bad_request
+    events = find_which_series_events(target_event: @event, which: params[:which], for_update: false)
+    return if events.blank?
+
+    events.each do |event|
+      return false unless authorized_action(event, @current_user, :delete) && check_for_past_signup(@event.parent_event)
+    end
+
+    error = nil
+    CalendarEvent.skip_touch_context
+    CalendarEvent.transaction do
+      events.find_each do |event|
+        event.updating_user = @current_user
+        event.cancel_reason = params[:cancel_reason]
+        if event.destroy
+          if event.appointment_group && @event.appointment_group.appointments.count == 0
+            event.appointment_group.destroy(@current_user)
+          end
+        else
+          error = event.errors
+          raise ActiveRecord::Rollback
+        end
+      end
+    end
+    CalendarEvent.skip_touch_context(false)
+
+    return render json: error, status: :bad_request if error
+
+    @event.context.touch # assume all events in the series belong to the same context
+
+    json = events.map do |event|
+      event_json(event, @current_user, session)
+    end
+    render json: json
+  end
+
+  # updating event data in a series has some tricky bits
+  # 1. if which=="one"
+  #    - if the rrule changed, return an error
+  #    - just update it and we're finished
+  # 2. if which="all"
+  #    - if the date changed, return an error
+  #    - get the first event in the series' start_at
+  #      and use it as the dtstart when parsing the rrule,
+  #    - then update each event with the new params.
+  #    - You cannot use target_event (the event the user edited in the UI)
+  #      because they can edit an event in the middle of the series
+  #      then say update all.
+  # 3. if which="following":
+  #    a. if the date-time is unchanged, update the non-date-time
+  #       properties with the new params foraeffected events
+  #       events in the series
+  #    b. if the date-time did change
+  #       - start a new series for the affected events
+  #       - use the start_at from the target_event
+  #       - limit the dtstart dates generated by the rrule to the
+  #         number of affected events.
+  #  4. If the RRULE changed, only which=="all" or "following" apply
+  #     a. if which="all",
+  #        - regenerate the list of dtstarts using the first event's start_at
+  #        - update events we have, create more or delete leftovers if necessary
+  #     b. if which="following",
+  #        - start a new series for the affected events.
+  #        - the same as "all", but for the subset of affected events
+  #   5. If the date-time and RRULE changed, deal with that too.
+  #
+  def update_from_series(target_event, params_for_update, which)
+    which ||= "one"
+    params_for_update[:rrule] ||= target_event.rrule
+    rrule = params_for_update[:rrule]
+    rrule_changed = rrule != target_event[:rrule]
+    params_for_update[:series_uuid] ||= target_event.series_uuid
+    params_for_update[:start_at] ||= target_event.start_at.iso8601
+    params_for_update[:end_at] ||= target_event.end_at.iso8601
+
+    if which == "one" && rrule.present? && rrule_changed
+      render json: { message: t("You may not update one event with a new rrule.") }, status: :bad_request
+      return
+    end
+    if which == "all" && Date.parse(params_for_update[:start_at]) != target_event.start_at.to_date
+      render json: { message: t("You may not change the start date when changing all events in the series") }, status: :bad_request
+      return
+    end
+
+    if which == "one"
+      if target_event.workflow_state == "locked"
+        render json: { message: t("You may not update a locked event") }, status: :bad_request
         return
+      elsif target_event.update(params_for_update)
+        render json: event_json(target_event, @current_user, session, include: includes("web_conference"))
+      else
+        render json: { message: t("Update failed") }, status: bad_request
+      end
+      return
+    end
+
+    all_events = find_which_series_events(target_event: target_event, which: "all", for_update: true)
+    events = which == "following" ? all_events.where("start_at >= ?", target_event.start_at) : all_events
+    if events.blank?
+      # i don't believe we can get here, but cya
+      render json: { message: t("No events were found to update") }, status: :bad_request
+      return
+    end
+
+    tz = @current_user.time_zone || ActiveSupport::TimeZone.new("UTC")
+    target_start = Time.parse(params_for_update[:start_at]).in_time_zone(tz)
+    target_end = Time.parse(params_for_update[:end_at]).in_time_zone(tz)
+    if which == "all"
+      # the target_event not be the first event in the series. We need to find it
+      # as the anchor for the series dates
+      start_date0 = events[0].start_at.in_time_zone(tz).to_date
+      end_date0 = events[0].end_at.in_time_zone(tz).to_date
+      first_start_at = Time.new(start_date0.year, start_date0.month, start_date0.day, target_start.hour, target_start.min, target_start.sec, tz)
+      first_end_at = Time.new(end_date0.year, end_date0.month, end_date0.day, target_end.hour, target_end.min, target_end.sec, tz)
+    else
+      first_start_at = target_start
+      first_end_at = target_end
+      date_time_changed = Time.parse(params_for_update[:start_at]) != target_event.start_at ||
+                          Time.parse(params_for_update[:end_at]) != target_event.end_at
+    end
+    duration = first_end_at - first_start_at
+
+    rr = validate_and_parse_rrule(
+      rrule,
+      dtstart: first_start_at,
+      tzid: tz&.tzinfo&.name || "UTC"
+    )
+    return false if rr.nil?
+
+    if (all_events.length > events.length && date_time_changed) || rrule_changed
+      # updating date-time for half a series starts a new series
+      params_for_update[:series_uuid] = SecureRandom.uuid if all_events.length > events.length
+    else
+      params_for_update[:series_uuid] = target_event[:series_uuid]
+    end
+
+    events = events.to_a
+    update_limit = rrule_changed ? RECURRING_EVENT_LIMIT : events.length
+
+    error = nil
+    CalendarEvent.skip_touch_context
+    CalendarEvent.transaction do
+      dtstart_list = rr.all(limit: update_limit)
+      if events.length > dtstart_list.length
+        # truncate the list of events we're updating to how many
+        # we'll end up with given the (possible updated) rrule
+        events.drop(dtstart_list.length).each do |event|
+          unless event.grants_any_right?(@current_user, session, :delete)
+            error = { message: t("Failed deleting an event from the series, update not saved"), status: :unauthorized }
+            raise ActiveRecord::Rollback
+          end
+
+          unless event.destroy
+            error = { message: t("Failed deleting an event from the series, update not saved") }
+            raise ActiveRecord::Rollback
+          end
+        end
+        events = events.take(dtstart_list.length)
       end
 
-      CalendarEvent.skip_touch_context
-      CalendarEvent.transaction do
-        events.each do |event|
+      dtstart_list.each_with_index do |dtstart, i|
+        params_for_update = set_series_params(params_for_update, dtstart, duration)
+        event = events[i]
+        if event.nil?
+          event = target_event.context.calendar_events.build(params_for_update)
+          events << event
+          unless event.grants_any_right?(@current_user, session, :create)
+            error = { message: t("Failed creating an event for the series, update not saved"), status: :unauthorized }
+            raise ActiveRecord::Rollback
+          end
+
+          unless event.save
+            error = { message: t("Failed creating an event for the series, update not saved") }
+            raise ActiveRecord::Rollback
+          end
+        else
           event.updating_user = @current_user
-          event.cancel_reason = params[:cancel_reason]
-          if event.destroy
-            if event.appointment_group && @event.appointment_group.appointments.count == 0
-              event.appointment_group.destroy(@current_user)
-            end
-          else
-            render json: event.errors, status: :bad_request
+          unless event.grants_any_right?(@current_user, session, :update)
+            error = { message: t("Failed updating an event in the series, update not saved"), status: :unauthorized }
+            raise ActiveRecord::Rollback
+          end
+
+          unless event.update(params_for_update)
+            error = { message: t("Failed updating an event in the series, update not saved") }
             raise ActiveRecord::Rollback
           end
         end
       end
-      CalendarEvent.skip_touch_context(false)
-      @event.context.touch # assume all events in the series belong to the same context
-
-      json = events.map do |event|
-        event_json(event, @current_user, session)
-      end
-      render json: json
     end
+    CalendarEvent.skip_touch_context(false)
+
+    if error
+      status = error[:status] || :bad_request
+      error.delete(:status)
+      return render json: error, status: status
+    end
+
+    target_event.context.touch
+
+    json = events.map do |event|
+      event_json(
+        event,
+        @current_user,
+        session,
+        { include: includes("web_conference") }
+      )
+    end
+    render json: json
+  end
+
+  def find_which_series_events(target_event:, which:, for_update:)
+    #  from the model: locked events may only be deleted, they cannot be edited directly
+    workflow_state_not = for_update ? ["deleted", "locked"] : ["deleted"]
+    events = nil
+    case which
+    when "one"
+      events = CalendarEvent.where(id: target_event.id) unless for_update && target_event.workflow_state == "locked"
+    when "all"
+      events = CalendarEvent
+               .where(series_uuid: target_event.series_uuid)
+               .where.not(workflow_state: workflow_state_not)
+               .order(:id)
+    when "following"
+      events = CalendarEvent
+               .where("series_uuid = ? AND start_at >= ?", target_event.series_uuid, target_event.start_at)
+               .where.not(workflow_state: workflow_state_not)
+               .order(:id)
+    else
+      render json: { error: t("Invalid parameter which='%{which}'", which: which) }, status: :bad_request
+    end
+    events
   end
 
   def public_feed
@@ -1485,11 +1704,16 @@ class CalendarEventsApiController < ApplicationController
       get_all_pertinent_contexts(include_groups: true)
     end
 
+    event_attributes[:series_uuid] = SecureRandom.uuid
+
     first_start_at = Time.parse(event_attributes[:start_at]) if event_attributes[:start_at]
     first_end_at = Time.parse(event_attributes[:end_at]) if event_attributes[:end_at]
     duration = first_end_at - first_start_at if first_start_at && first_end_at
+    dtstart_list = rrule.all(limit: RECURRING_EVENT_LIMIT)
 
-    rrule.all(limit: RECURRING_EVENT_LIMIT).map do |dtstart|
+    InstStatsd::Statsd.gauge("calendar_events_api.recurring.count", dtstart_list.length)
+
+    dtstart_list.map do |dtstart|
       event_attributes = set_series_params(event_attributes, dtstart, duration)
       event = @context.calendar_events.build(event_attributes)
       event.validate_context! if @context.is_a?(AppointmentGroup)
@@ -1545,7 +1769,8 @@ class CalendarEventsApiController < ApplicationController
     bounded = rrule_fields.fetch("UNTIL", false) || rrule_fields.fetch("COUNT", false)
     unless bounded
       render json: {
-        message: t("The series recurrence rule must include a COUNT or UNTIL")
+        message: t("The series recurrence rule must include a %{COUNT} or %{UNTIL}",
+                   COUNT: "COUNT", UNTIL: "UNTIL")
       }, status: :bad_request
       return nil
     end
@@ -1632,7 +1857,7 @@ class CalendarEventsApiController < ApplicationController
   def check_for_past_signup(event)
     if event && event.end_at < Time.now.utc && event.context.is_a?(AppointmentGroup) &&
        !event.context.grants_right?(@current_user, :manage)
-      render json: { message: "Cannot create or change reservation for past appointment" }, status: :forbidden
+      render json: { message: t("Cannot create or change reservation for past appointment") }, status: :forbidden
       return false
     end
     true
