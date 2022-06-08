@@ -806,7 +806,7 @@ describe Types::UserType do
         grader_count: 10,
         final_grader: @teacher
       )
-      assignment2 = @course.assignments.create!(
+      @assignment2 = @course.assignments.create!(
         name: "Assignment without Comments",
         moderated_grading: true,
         grader_count: 10,
@@ -814,7 +814,7 @@ describe Types::UserType do
       )
 
       assignment.grade_student(@student, grade: 1, grader: @teacher, provisional: true)
-      assignment2.grade_student(@student, grade: 1, grader: @teacher, provisional: true)
+      @assignment2.grade_student(@student, grade: 1, grader: @teacher, provisional: true)
 
       @student_submission_1 = assignment.submissions.find_by(user: @student)
 
@@ -832,6 +832,16 @@ describe Types::UserType do
         query_result = teacher_type.resolve("viewableSubmissionsConnection { nodes { _id }  }")
         expect(query_result.count).to eq 1
         expect(query_result[0].to_i).to eq @student_submission_1.id
+      end
+
+      it "gets submissions with comments in order of last_comment_at || created_at DESC" do
+        student_submission_2 = @assignment2.submissions.find_by(user: @student)
+        student_submission_2.add_comment(author: @student, comment: "Fourth comment")
+        student_submission_2.add_comment(author: @teacher, comment: "Fifth comment")
+
+        query_result = teacher_type.resolve("viewableSubmissionsConnection { nodes { _id }  }")
+        expect(query_result.count).to eq 2
+        expect(query_result[0].to_i).to eq student_submission_2.id
       end
 
       it "can retrieve submission comments" do

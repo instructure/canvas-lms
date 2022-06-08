@@ -319,7 +319,7 @@ module Types
         submission_ids = StreamItem.where(id: shard_stream_items.map(&:stream_item_id)).pluck(:asset_id)
         submissions += Submission.where(id: submission_ids)
       end
-      submissions
+      submissions.sort_by { |t| t.last_comment_at || t.created_at }.reverse
     end
 
     field :comment_bank_items_connection, Types::CommentBankItemType.connection_type, null: true do
