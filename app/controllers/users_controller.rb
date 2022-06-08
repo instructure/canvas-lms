@@ -2008,9 +2008,13 @@ class UsersController < ApplicationController
   #   suspends or unsuspends all logins for this user that the calling user
   #   has permission to
   #
+  # @argument override_sis_stickiness [boolean]
+  #   by default and when the value is true it updates all the fields
+  #   when the value is false then fields which in stuck_sis_fields will not be updated
+  #
   # @example_request
   #
-  #   curl 'https://<canvas>/api/v1/users/133.json' \
+  #   curl 'https://<canvas>/api/v1/users/133' \
   #        -X PUT \
   #        -F 'user[name]=Sheldon Cooper' \
   #        -F 'user[short_name]=Shelly' \
@@ -2077,6 +2081,11 @@ class UsersController < ApplicationController
     end
 
     managed_attributes << { avatar_image: strong_anything } if managed_attributes.delete(:avatar_image)
+
+    if params[:override_sis_stickiness] && !value_to_boolean(params[:override_sis_stickiness])
+      managed_attributes -= [*@user.stuck_sis_fields]
+    end
+
     user_params = user_params.permit(*managed_attributes)
     new_email = user_params.delete(:email)
     # admins can update avatar images even if they are locked
