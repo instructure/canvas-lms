@@ -84,5 +84,29 @@ describe "MessageDispatcher" do
       expect(job2.payload_object.message).to eq @messages[1]
       expect(job2.run_at.to_i).to eq @messages[1].dispatch_at.to_i
     end
+
+    describe "cross_shard" do
+      specs_require_sharding
+
+      before do
+        @shard1.activate do
+          @messages += (0...3).map { message_model(dispatch_at: Time.now, workflow_state: "staged", to: "somebody", updated_at: Time.now.utc - 11.minutes, user: user_factory, path_type: "email") }
+        end
+      end
+
+      it "loads all the matches" do
+        track_jobs { MessageDispatcher.batch_dispatch(@messages) }
+        expect(created_jobs.size).to eq 1
+        job = created_jobs.first
+
+        am_message = double
+        allow(am_message).to receive(:deliver_now).and_return(true)
+        allow(Mailer).to receive(:create_message).and_return(am_message)
+
+        track_jobs { Delayed::Worker.new.perform(job) }
+        @messages.each(&:reload)
+        expect(@messages.map(&:state)).to eq %i[sent sent sent sent sent sent]
+      end
+    end
   end
 end
