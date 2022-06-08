@@ -33,7 +33,7 @@ describe CalendarEventsApiController, type: :request do
       context_code created_at description duplicates end_at hidden html_url
       id location_address location_name parent_event_id start_at
       title type updated_at url workflow_state context_name context_color important_dates
-      series_id rrule
+      series_uuid rrule
     ]
     expected_slot_fields = (expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group available_slots participants_per_appointment reserve_url participant_type effective_context_code])
     expected_reservation_event_fields = (expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group effective_context_code participant_type])
@@ -1191,14 +1191,14 @@ describe CalendarEventsApiController, type: :request do
                 title: "many me",
                 start_at: start_at.iso8601,
                 end_at: end_at.iso8601,
-                rrule: "RRULE:FREQ=WEEKLY;INTERVAL=1;COUNT=3"
+                rrule: "FREQ=WEEKLY;INTERVAL=1;COUNT=3"
               }
             }
           )
           assert_status(201)
           expect(json.keys).to match_array expected_fields
           expect(json["title"]).to eq "many me"
-          expect(json["series_id"]).to be_a_kind_of(Numeric)
+          expect(json["series_uuid"]).not_to be_nil
 
           duplicates = json["duplicates"]
           expect(duplicates.count).to eq 2
@@ -1225,7 +1225,7 @@ describe CalendarEventsApiController, type: :request do
                 title: "ohai",
                 start_at: start_at.iso8601,
                 end_at: end_at.iso8601,
-                rrule: "RRULE:FREQ=WEEKLY;INTERVAL=1;COUNT=201"
+                rrule: "FREQ=WEEKLY;INTERVAL=1;COUNT=201"
               }
             }
           )
@@ -1246,7 +1246,7 @@ describe CalendarEventsApiController, type: :request do
                 title: "ohai",
                 start_at: start_at.iso8601,
                 end_at: end_at.iso8601,
-                rrule: "RRULE:FREQ=DAILY;INTERVAL=1;UNTIL=#{series_end.iso8601}"
+                rrule: "FREQ=DAILY;INTERVAL=1;UNTIL=#{series_end.iso8601}"
               }
             }
           )
@@ -1266,7 +1266,7 @@ describe CalendarEventsApiController, type: :request do
                 title: "ohai",
                 start_at: start_at.iso8601,
                 end_at: end_at.iso8601,
-                rrule: "RRULE:FREQ=WEEKLY;INTERVAL=1;COUNT=1000000"
+                rrule: "FREQ=WEEKLY;INTERVAL=1;COUNT=1000000"
               }
             }
           )
@@ -1286,7 +1286,7 @@ describe CalendarEventsApiController, type: :request do
                 title: "ohai",
                 start_at: start_at.iso8601,
                 end_at: end_at.iso8601,
-                rrule: "RRULE:FREQ=WEEKLY;INTERVAL=1;" # <<< no COUNT or UNTIL
+                rrule: "FREQ=WEEKLY;INTERVAL=1;" # <<< no COUNT or UNTIL
               }
             }
           )
@@ -1308,7 +1308,7 @@ describe CalendarEventsApiController, type: :request do
                 title: "many me",
                 start_at: start_at.iso8601,
                 end_at: end_at.iso8601,
-                rrule: "RRULE:FREQ=WEEKLY;INTERVAL=1;COUNT=3"
+                rrule: "FREQ=WEEKLY;INTERVAL=1;COUNT=3"
               }
             }
           )
@@ -1317,7 +1317,7 @@ describe CalendarEventsApiController, type: :request do
         it "deletes one event of a series" do
           target_event_id = @event_series["id"]
           series_count = @event_series["duplicates"].length + 1
-          series_id = @event_series["series_id"]
+          series_uuid = @event_series["series_uuid"]
 
           json = api_call(:delete, "/api/v1/calendar_events/#{target_event_id}?which=one",
                           { controller: "calendar_events_api", action: "destroy", id: target_event_id.to_s, which: "one", format: "json" })
@@ -1326,14 +1326,14 @@ describe CalendarEventsApiController, type: :request do
           expect(json[0].keys).to match_array expected_fields
           expect(json[0]["id"]).to be target_event_id
 
-          remaining_events = CalendarEvent.where(series_id: series_id, workflow_state: "active")
+          remaining_events = CalendarEvent.where(series_uuid: series_uuid, workflow_state: "active")
           expect(remaining_events.length).to eql series_count - 1
         end
 
-        it "deletes and event and all following" do
+        it "deletes an event and all following" do
           target_event_id = @event_series["duplicates"][0]["calendar_event"]["id"] # middle event in the series
           series_count = @event_series["duplicates"].length + 1
-          series_id = @event_series["series_id"]
+          series_uuid = @event_series["series_uuid"]
 
           json = api_call(:delete, "/api/v1/calendar_events/#{target_event_id}?which=following",
                           { controller: "calendar_events_api", action: "destroy", id: target_event_id.to_s, which: "following", format: "json" })
@@ -1343,20 +1343,20 @@ describe CalendarEventsApiController, type: :request do
           expect(json[0]["id"]).to be target_event_id
           expect(json[1]["id"]).to be @event_series["duplicates"][1]["calendar_event"]["id"]
 
-          remaining_events = CalendarEvent.where(series_id: series_id, workflow_state: "active")
+          remaining_events = CalendarEvent.where(series_uuid: series_uuid, workflow_state: "active")
           expect(remaining_events.length).to eql series_count - 2
         end
 
         it "deletes all in the series" do
           target_event_id = @event_series["duplicates"][0]["calendar_event"]["id"] # middle event in the series
-          series_id = @event_series["series_id"]
+          series_uuid = @event_series["series_uuid"]
 
           json = api_call(:delete, "/api/v1/calendar_events/#{target_event_id}?which=all",
                           { controller: "calendar_events_api", action: "destroy", id: target_event_id.to_s, which: "all", format: "json" })
           assert_status(200)
           expect(json.length).to eq 3
 
-          remaining_events = CalendarEvent.where(series_id: series_id, workflow_state: "active")
+          remaining_events = CalendarEvent.where(series_uuid: series_uuid, workflow_state: "active")
           expect(remaining_events.length).to eql 0
         end
 
@@ -1368,6 +1368,162 @@ describe CalendarEventsApiController, type: :request do
           assert_status(400)
           expect(json.length).to eq 1
           expect(json["error"]).to eql "Invalid parameter which='bogus'"
+        end
+      end
+
+      describe "update" do
+        before do
+          start_at = Time.zone.now.utc.change(hour: 0, min: 1)
+          end_at = Time.zone.now.utc.change(hour: 23)
+          @event_series = api_call(
+            :post,
+            "/api/v1/calendar_events",
+            { controller: "calendar_events_api", action: "create", format: "json" },
+            {
+              calendar_event: {
+                context_code: @course.asset_string,
+                title: "many me",
+                start_at: start_at.iso8601,
+                end_at: end_at.iso8601,
+                rrule: "FREQ=WEEKLY;INTERVAL=1;COUNT=3"
+              }
+            }
+          )
+        end
+
+        it "updates one event from the series" do
+          target_event = @event_series["duplicates"][0]["calendar_event"]
+          target_event_id = target_event["id"]
+          new_start_at = (Time.parse(target_event["start_at"]) + 15.minutes).iso8601
+
+          json = api_call(:put, "/api/v1/calendar_events/#{target_event_id}",
+                          { controller: "calendar_events_api", action: "update", id: target_event_id.to_s, format: "json" },
+                          { calendar_event: { start_at: new_start_at, title: "this is different" } })
+          expect(json.keys).to match_array expected_fields
+          expect(json["title"]).to eql "this is different"
+          expect(json["start_at"]).to eql new_start_at
+        end
+
+        it "updates all events in the series" do
+          orig_events = [@event_series.except("duplicates")]
+          orig_events += @event_series["duplicates"].map { |e| e["calendar_event"] }
+          target_event = @event_series["duplicates"][0]["calendar_event"]
+          target_event_id = target_event["id"]
+          new_title = "a new title"
+          new_start_at = (Time.parse(target_event["start_at"]) + 15.minutes).iso8601
+
+          json = api_call(:put, "/api/v1/calendar_events/#{target_event_id}",
+                          { controller: "calendar_events_api", action: "update", id: target_event_id.to_s, format: "json" },
+                          { calendar_event: { start_at: new_start_at, title: new_title }, which: "all" })
+          assert_status(200)
+          expect(json.length).to eql 3
+          json.each_with_index do |event, i|
+            expect(event.keys).to match_array expected_fields
+            expect(event["id"]).to eql orig_events[i]["id"]
+            expect(event["title"]).to eql new_title
+            expect(event["start_at"]).to eql (Time.parse(orig_events[i]["start_at"]) + 15.minutes).iso8601
+          end
+        end
+
+        it "updates an event and all following" do
+          orig_events = [@event_series.except("duplicates")]
+          orig_events += @event_series["duplicates"].map { |e| e["calendar_event"] }
+          target_event = @event_series["duplicates"][0]["calendar_event"]
+          target_event_id = target_event["id"]
+          series_uuid = target_event["series_uuid"]
+          new_title = "a new title"
+          new_start_at = (Time.parse(target_event["start_at"]) + 15.minutes).iso8601
+
+          json = api_call(:put, "/api/v1/calendar_events/#{target_event_id}",
+                          { controller: "calendar_events_api", action: "update", id: target_event_id.to_s, format: "json" },
+                          { calendar_event: { start_at: new_start_at, title: new_title }, which: "following" })
+          assert_status(200)
+          expect(json.length).to eql 2
+          orig_events.shift
+          json.each_with_index do |event, i|
+            expect(event.keys).to match_array expected_fields
+            expect(event["id"]).to eql orig_events[i]["id"]
+            expect(event["title"]).to eql new_title
+            expect(event["start_at"]).to eql (Time.parse(orig_events[i]["start_at"]) + 15.minutes).iso8601
+            # we changed start_at, so the changed events belong to a new series
+            expect(event["series_uuid"]).not_to eql series_uuid
+          end
+          orig_series = CalendarEvent.where(series_uuid: series_uuid)
+          expect(orig_series.length).to eql 1
+        end
+
+        it "returns an error when which='one' and the rrule changed" do
+          target_event_id = @event_series["duplicates"][0]["calendar_event"]["id"].to_s
+          json = api_call(:put, "/api/v1/calendar_events/#{target_event_id}",
+                          { controller: "calendar_events_api", action: "update", id: target_event_id, format: "json" },
+                          { calendar_event: { title: "new title", rrule: "FREQ=WEEKLY;INTERVAL=1;COUNT=4" }, which: "one" })
+          assert_status(400)
+          expect(json["message"]).to eql "You may not update one event with a new rrule."
+        end
+
+        it "returns an error when which='all' and the start date changes" do
+          target_event = @event_series["duplicates"][0]["calendar_event"]
+          target_event_id = target_event["id"].to_s
+          new_start_at = (Time.parse(target_event["start_at"]) + 1.day).iso8601
+
+          json = api_call(:put, "/api/v1/calendar_events/#{target_event_id}",
+                          { controller: "calendar_events_api", action: "update", id: target_event_id, format: "json" },
+                          { calendar_event: { title: "new title", start_at: new_start_at }, which: "all" })
+          assert_status(400)
+          expect(json["message"]).to eql "You may not change the start date when changing all events in the series"
+        end
+
+        it "extends the series when updating the rrule" do
+          orig_events = [@event_series.except("duplicates")]
+          orig_events += @event_series["duplicates"].map { |e| e["calendar_event"] }
+          target_event = @event_series["duplicates"][0]["calendar_event"]
+          target_event_id = target_event["id"]
+          rrule = "FREQ=WEEKLY;INTERVAL=1;COUNT=4"
+          new_title = "a new title"
+          new_start_at = (Time.parse(target_event["start_at"]) + 15.minutes).iso8601
+
+          json = api_call(:put, "/api/v1/calendar_events/#{target_event_id}",
+                          { controller: "calendar_events_api", action: "update", id: target_event_id.to_s, format: "json" },
+                          { calendar_event: { start_at: new_start_at, title: new_title, rrule: rrule }, which: "following" })
+          assert_status(200)
+          expect(json.length).to eql 4
+          orig_events.shift # we didn't update the first event in teh series
+          orig_events.each_with_index do |event, i|
+            expect(json[i].keys).to match_array expected_fields
+            expect(json[i]["id"]).to eql event["id"]
+            expect(json[i]["title"]).to eql new_title
+            expect(json[i]["start_at"]).to eql (Time.parse(event["start_at"]) + 15.minutes).iso8601
+            # we changed start_at, so the changed events belong to a new series
+            expect(json[0]["series_uuid"]).not_to eql event["series_uuid"]
+          end
+          # the new event
+          expect(json[2]["title"]).to eql new_title
+          expect(json[2]["start_at"]).to eql (Time.parse(json[1]["start_at"]) + 1.week).iso8601
+          expect(CalendarEvent.where(series_uuid: orig_events[0]["series_uuid"]).length).to eql 1
+          expect(CalendarEvent.where(series_uuid: json[0]["series_uuid"]).length).to eql 4
+        end
+
+        it "truncates the series when updating the rrule" do
+          orig_events = [@event_series.except("duplicates")]
+          orig_events += @event_series["duplicates"].map { |e| e["calendar_event"] }
+          target_event = orig_events[0]
+          target_event_id = target_event["id"]
+          rrule = "FREQ=WEEKLY;INTERVAL=1;COUNT=2"
+          new_title = "a new title"
+          new_start_at = (Time.parse(target_event["start_at"]) + 15.minutes).iso8601
+
+          json = api_call(:put, "/api/v1/calendar_events/#{target_event_id}",
+                          { controller: "calendar_events_api", action: "update", id: target_event_id.to_s, format: "json" },
+                          { calendar_event: { start_at: new_start_at, title: new_title, rrule: rrule }, which: "all" })
+          assert_status(200)
+          expect(json.length).to eql 2
+          json.each_with_index do |event, i|
+            expect(json[i].keys).to match_array expected_fields
+            expect(json[i]["id"]).to eql orig_events[i]["id"]
+            expect(json[i]["title"]).to eql new_title
+            expect(json[i]["start_at"]).to eql (Time.parse(orig_events[i]["start_at"]) + 15.minutes).iso8601
+            expect(json[0]["series_uuid"]).to eql event["series_uuid"]
+          end
         end
       end
     end

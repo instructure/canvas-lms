@@ -31,8 +31,11 @@ class CalendarEvent < ActiveRecord::Base
   include Plannable
 
   include MasterCourses::Restrictor
+
+  self.ignored_columns = %i[series_id]
+
   restrict_columns :content, [:title, :description]
-  restrict_columns :settings, %i[location_name location_address start_at end_at all_day all_day_date series_id rrule]
+  restrict_columns :settings, %i[location_name location_address start_at end_at all_day all_day_date series_uuid rrule]
 
   attr_accessor :cancel_reason, :imported
 
@@ -43,7 +46,7 @@ class CalendarEvent < ActiveRecord::Base
 
   PERMITTED_ATTRIBUTES = %i[title description start_at end_at location_name
                             location_address time_zone_edited cancel_reason participants_per_appointment
-                            remove_child_events all_day comments important_dates series_id rrule].freeze
+                            remove_child_events all_day comments important_dates series_uuid rrule].freeze
   def self.permitted_attributes
     PERMITTED_ATTRIBUTES
   end
