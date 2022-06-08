@@ -362,3 +362,23 @@ it('adds to partialWeekDays', () => {
     partialWeekDays: [...originalDays, ...newDays]
   })
 })
+
+it('resets loading state on CLEAR_LOADING', () => {
+  const newState = loadingReducer(
+    initialState({
+      futureNextUrl: 'http://link_for_someone_else',
+      pastNextUrl: 'http://hello',
+      partialPastDays: [1, 2, 3],
+      partialFutureDays: [],
+      partialWeekDays: [{}]
+    }),
+    Actions.clearLoading()
+  )
+  expect(newState).toMatchObject({
+    futureNextUrl: null,
+    pastNextUrl: null,
+    partialPastDays: [],
+    partialFutureDays: [],
+    partialWeekDays: []
+  })
+})
