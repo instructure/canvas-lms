@@ -41,9 +41,6 @@ module.exports = {
         test: /\.(woff(2)?|otf|ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
         use: 'file-loader'
       }
-    ],
-    noParse: [
-      /i18nliner\/dist\/lib\/i18nliner/ // i18nLiner has a `require('fs')` that it doesn't actually need, ignore it.
     ]
   },
   plugins: [

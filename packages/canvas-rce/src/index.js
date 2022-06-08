@@ -21,11 +21,13 @@ import {renderIntoDiv as render} from './rce/root'
 import {headerFor, originFromHost} from './rcs/api'
 import getTranslations from './getTranslations'
 import defaultTinymceConfig from './defaultTinymceConfig'
+import {setLocale} from './canvasFileBrowser/natcompare'
 
 export const defaultConfiguration = defaultTinymceConfig
 
 export function renderIntoDiv(editorEl, props, cb) {
   const language = normalizeLocale(props.language)
+  setLocale(language)
   if (process.env.BUILD_LOCALE || language === 'en') {
     render(editorEl, props, cb)
   } else {
