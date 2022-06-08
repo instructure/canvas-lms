@@ -3397,6 +3397,16 @@ describe Submission do
       end
 
       it { is_expected.not_to be_grants_right(student, nil, :view_turnitin_report) }
+
+      context "when the teacher's enrollment is concluded" do
+        before do
+          @course.enrollments.where(user: teacher).each(&:conclude)
+        end
+
+        it "still allows the teacher (with view_all_grades) to see reports" do
+          expect(@submission).to be_grants_right(teacher, nil, :view_turnitin_report)
+        end
+      end
     end
   end
 
