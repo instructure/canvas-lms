@@ -21,8 +21,6 @@ import {render, waitFor, fireEvent, within, screen} from '@testing-library/react
 import FileBrowser from '../FileBrowser'
 import {apiSource} from './filesHelpers'
 
-jest.mock('../natcompare', () => ({strings: a => a}))
-
 const defaultProps = overrides => ({
   allowedUpload: true,
   selectFile: jest.fn(),

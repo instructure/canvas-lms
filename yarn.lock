@@ -13891,19 +13891,6 @@ i18n-js@^3:
   resolved "https://registry.yarnpkg.com/i18n-js/-/i18n-js-3.8.0.tgz#b8fd6b12e1d88cb71f9806c29bca7c31c012e504"
   integrity sha512-hDsGgPuvw/2P+lXSbOafAwspK8Ste8YrwuuUg17W3wEcO1JkQxBlPgsN1t2+852nTnz4YSYTjZc/1nAA2PC/nw==
 
-i18nliner@~0.2.0:
-  version "0.2.6"
-  resolved "https://codeload.github.com/instructure/i18nliner-js/tar.gz/089da4716c98dc536a8c4f79f187b37697591a03"
-  dependencies:
-    "@babel/parser" "^7"
-    "@babel/traverse" "^7"
-    cli-color "^1"
-    crc32 "~0.2.2"
-    gglobby "0.0.3"
-    minimist "~1.2.0"
-    mkdirp "~0.5.1"
-    speakingurl "13.0.0"
-
 ic-ajax@~2.0.1:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/ic-ajax/-/ic-ajax-2.0.2.tgz#50c8ab1c494320fac66830ce1ee3990ab827f596"
