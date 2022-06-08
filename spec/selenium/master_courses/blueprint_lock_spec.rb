@@ -26,7 +26,7 @@ shared_context "blueprint lock context" do
   end
 
   def blueprint_lock_icon_button
-    blueprint_lock_icon_label.find_element(:xpath, "../../parent::button")
+    blueprint_lock_icon_label.find_element(:xpath, "../../../parent::button")
   end
 
   def associated_index_lock_icon

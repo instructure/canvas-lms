@@ -119,17 +119,14 @@ exports[`renders the ProficiencyRating component 1`] = `
         onToggle={[Function]}
         placement="bottom center"
         renderTrigger={
-          <Button
+          <CondensedButton
             as="button"
+            color="primary"
             cursor="pointer"
-            display="inline-block"
             elementRef={[Function]}
             margin="0"
             size="medium"
-            textAlign="center"
             type="button"
-            variant="link"
-            withBackground={true}
           >
             <div>
               <span
@@ -142,7 +139,7 @@ exports[`renders the ProficiencyRating component 1`] = `
               />
               Change
             </div>
-          </Button>
+          </CondensedButton>
         }
         shadow="resting"
         shouldAlignArrow={false}

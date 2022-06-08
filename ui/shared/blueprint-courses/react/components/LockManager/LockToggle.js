@@ -20,6 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 
+import {View} from '@instructure/ui-view'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Text} from '@instructure/ui-text'
@@ -36,36 +37,40 @@ const modes = {
     label: I18n.t('Locked'),
     icon: IconBlueprintLockSolid,
     tooltip: I18n.t('Unlock'),
-    variant: 'primary'
+    color: 'primary'
   },
   ADMIN_UNLOCKED: {
     label: I18n.t('Blueprint'),
     icon: IconBlueprintSolid,
     tooltip: I18n.t('Lock'),
-    variant: 'default'
+    color: 'secondary'
   },
   ADMIN_WILLUNLOCK: {
     label: I18n.t('Blueprint'),
     icon: IconBlueprintSolid,
     tooltip: I18n.t('Unlock'),
-    variant: 'default'
+    color: 'secondary'
   },
   ADMIN_WILLLOCK: {
     label: I18n.t('Locked'),
     icon: IconBlueprintLockSolid,
     tooltip: I18n.t('Lock'),
-    variant: 'primary'
+    color: 'primary'
   },
   TEACH_LOCKED: {
     label: I18n.t('Locked'),
-    icon: IconBlueprintLockSolid
+    icon: IconBlueprintLockSolid,
+    color: 'secondary'
   },
   TEACH_UNLOCKED: {
     label: I18n.t('Blueprint'),
-    icon: IconBlueprintSolid
+    icon: IconBlueprintSolid,
+    color: 'secondary'
   }
 }
 
+const biggestLabelLength = Math.max(...Object.values(modes).map(mode => mode.label.length))
+const buttonWidth = biggestLabelLength * 0.8 + 'em'
 class LockToggle extends Component {
   static propTypes = {
     isLocked: PropTypes.bool.isRequired,
@@ -97,21 +102,11 @@ class LockToggle extends Component {
   constructor(props) {
     super(props)
     this.state = {}
-    this.toggleBtnRef = null
 
     if (props.isToggleable) {
       this.state.mode = props.isLocked ? modes.ADMIN_LOCKED : modes.ADMIN_UNLOCKED
     } else {
       this.state.mode = props.isLocked ? modes.TEACH_LOCKED : modes.TEACH_UNLOCKED
-    }
-  }
-
-  componentDidMount() {
-    // Fixing the width of the Toggle button to the biggest possible label to avoid resizing the button
-    const biggestLabelLength = Math.max(...Object.values(modes).map(mode => mode.label.length))
-
-    if (this.toggleBtnRef) {
-      this.toggleBtnRef.style.width = biggestLabelLength * 0.845 + 'em'
     }
   }
 
@@ -137,7 +132,7 @@ class LockToggle extends Component {
     let toggle = null
 
     if (this.props.isToggleable) {
-      const variant = this.state.mode.variant
+      const color = this.state.mode.color
       const tooltip = this.state.mode.tooltip
       const srLabel = this.props.isLocked
         ? I18n.t('Locked. Click to unlock.')
@@ -146,24 +141,24 @@ class LockToggle extends Component {
       toggle = (
         <Tooltip renderTip={tooltip} placement="top" color="primary" on={['hover', 'focus']}>
           {this.props.breakpoints.miniTablet ? (
-            <Button
-              id="lock-toggle-btn"
-              elementRef={r => (this.toggleBtnRef = r)}
-              variant={variant}
-              onClick={this.props.onClick}
-              onFocus={this.onEnter}
-              onBlur={this.onExit}
-              onMouseEnter={this.onEnter}
-              onMouseLeave={this.onExit}
-              aria-pressed={this.props.isLocked}
-            >
-              <Icon />
-              <PresentationContent>{text}</PresentationContent>
-              <ScreenReaderContent>{srLabel}</ScreenReaderContent>
-            </Button>
+            <View as="span" display="block" width={buttonWidth}>
+              <Button
+                display="block"
+                color={color}
+                onClick={this.props.onClick}
+                onFocus={this.onEnter}
+                onBlur={this.onExit}
+                onMouseEnter={this.onEnter}
+                onMouseLeave={this.onExit}
+                aria-pressed={this.props.isLocked}
+              >
+                <Icon /> <PresentationContent>{text}</PresentationContent>
+                <ScreenReaderContent>{srLabel}</ScreenReaderContent>
+              </Button>
+            </View>
           ) : (
             <IconButton
-              color={variant === 'primary' ? variant : null}
+              color={color}
               onClick={this.props.onClick}
               onFocus={this.onEnter}
               onBlur={this.onExit}

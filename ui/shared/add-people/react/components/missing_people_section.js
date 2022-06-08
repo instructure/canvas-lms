@@ -24,7 +24,7 @@ import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {TextInput} from '@instructure/ui-text-input'
-import {Button} from '@instructure/ui-buttons'
+import {CondensedButton} from '@instructure/ui-buttons'
 
 const I18n = useI18nScope('add_people_missing_people_section')
 
@@ -222,13 +222,9 @@ class MissingPeopleSection extends React.Component {
               />
             </Table.Cell>
             <Table.Cell colSpan="2">
-              <Button
-                variant="link"
-                onClick={this.onSelectNewForMissing}
-                data-address={missing.address}
-              >
+              <CondensedButton onClick={this.onSelectNewForMissing} data-address={missing.address}>
                 {namePrompt}
-              </Button>
+              </CondensedButton>
             </Table.Cell>
             <Table.RowHeader>{missing.address}</Table.RowHeader>
           </Table.Row>
@@ -301,14 +297,13 @@ class MissingPeopleSection extends React.Component {
               />
             </Table.Cell>
             <Table.Cell>
-              <Button
-                variant="link"
+              <CondensedButton
                 onClick={this.onSelectNewForMissing}
                 data-address={missing.address}
                 theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
               >
                 {namePrompt}
-              </Button>
+              </CondensedButton>
             </Table.Cell>
             <Table.RowHeader>{missing.address}</Table.RowHeader>
           </Table.Row>

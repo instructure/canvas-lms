@@ -18,7 +18,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {Tray} from '@instructure/ui-tray'
 import {IconXSolid} from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -93,8 +93,9 @@ export default class BreakdownDetails extends React.Component {
         <div className="crs-breakdown-details">
           <div className="crs-breakdown-details__content">
             <span className="crs-breakdown-details__closeButton">
-              <Button
-                variant="icon"
+              <IconButton
+                withBorder={false}
+                withBackground={false}
                 ref={e => {
                   this.closeButton = e
                 }}
@@ -103,7 +104,7 @@ export default class BreakdownDetails extends React.Component {
                 <span className="crs-breakdown-details__closeButtonIcon">
                   <IconXSolid title={I18n.t('Close details sidebar')} />
                 </span>
-              </Button>
+              </IconButton>
             </span>
             <StudentRangesView
               assignment={this.props.assignment}
