@@ -138,7 +138,7 @@ class CoursePace < ActiveRecord::Base
 
               # If it exists let's just add the student to it and remove them from the other
               if correct_date_override
-                current_override&.assignment_override_students&.find_by(user_id: user_id)&.destroy
+                AssignmentOverrideStudent.where(assignment: assignment, user_id: user_id).destroy_all
                 correct_date_override.assignment_override_students.create(
                   user_id: user_id,
                   no_enrollment: false
@@ -146,7 +146,7 @@ class CoursePace < ActiveRecord::Base
               elsif current_override&.assignment_override_students&.size == 1
                 current_override.update(due_at: due_time.to_s)
               else
-                current_override&.assignment_override_students&.find_by(user_id: user_id)&.destroy
+                AssignmentOverrideStudent.where(assignment: assignment, user_id: user_id).destroy_all
                 assignment.assignment_overrides.create!(
                   set_type: "ADHOC",
                   due_at_overridden: true,
