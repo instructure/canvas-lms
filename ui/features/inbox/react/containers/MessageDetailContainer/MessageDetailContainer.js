@@ -339,6 +339,8 @@ export const MessageDetailContainer = props => {
         onReplyAll={inboxMessageData?.canReply ? props.onReplyAll : null}
         onArchive={props.onArchive}
         onUnarchive={props.onUnarchive}
+        onStar={props.onStar}
+        onUnstar={props.onUnstar}
         onDelete={() => props.onDelete([props.conversation._id])}
         submissionCommentURL={inboxMessageData?.submissionCommentURL}
         scope={props.scope}
@@ -362,6 +364,8 @@ MessageDetailContainer.propTypes = {
   onUnarchive: PropTypes.func,
   onDelete: PropTypes.func,
   onForward: PropTypes.func,
+  onStar: PropTypes.func,
+  onUnstar: PropTypes.func,
   setCanReply: PropTypes.func,
   scope: PropTypes.string
 }

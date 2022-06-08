@@ -142,6 +142,24 @@ describe "conversations new" do
         f("button[data-testid='more-options']").click
         expect(f("body")).not_to contain_jqcss("li:contains('Archive')")
       end
+
+      it "stars and unstars a conversation via conversation header menu" do
+        get "/conversations"
+        f("div[data-testid='conversation']").click
+        wait_for_ajaximations
+        expect(f("button[data-testid='visible-not-starred']")).to be_present
+
+        f("button[data-testid='more-options']").click
+        fj("li:contains('Star')").click
+        wait_for_ajaximations
+        expect(f("button[data-testid='visible-starred']")).to be_present
+
+        f("button[data-testid='more-options']").click
+        fj("li:contains('Unstar')").click
+        wait_for_ajaximations
+        # verify that convo is unastarred by making sure button is no present
+        expect(f("body")).not_to contain_jqcss("button[data-testid*='starred']")
+      end
     end
   end
 

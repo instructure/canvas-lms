@@ -130,6 +130,54 @@ describe('MessageDetailHeader', () => {
       expect(props.onForward).toHaveBeenCalled()
       expect(props.onForward.mock.calls[0][0]).toBe(undefined)
     })
+
+    it('sends the selected option to the onStar callback function', () => {
+      props.onStar = jest.fn()
+      const {getByRole, getByText} = render(<MessageDetailHeader {...props} />)
+      const moreOptionsButton = getByRole(
+        (role, element) => role === 'button' && element.textContent === 'More options'
+      )
+      fireEvent.click(moreOptionsButton)
+      fireEvent.click(getByText('Star'))
+
+      expect(props.onStar).toHaveBeenCalled()
+    })
+
+    it('sends the selected option to the onUnstar callback function', () => {
+      props.onUnstar = jest.fn()
+      const {getByRole, getByText} = render(<MessageDetailHeader {...props} />)
+      const moreOptionsButton = getByRole(
+        (role, element) => role === 'button' && element.textContent === 'More options'
+      )
+      fireEvent.click(moreOptionsButton)
+      fireEvent.click(getByText('Unstar'))
+
+      expect(props.onUnstar).toHaveBeenCalled()
+    })
+
+    it('sends the selected option to the onArchive callback function', () => {
+      props.onArchive = jest.fn()
+      const {getByRole, getByText} = render(<MessageDetailHeader {...props} />)
+      const moreOptionsButton = getByRole(
+        (role, element) => role === 'button' && element.textContent === 'More options'
+      )
+      fireEvent.click(moreOptionsButton)
+      fireEvent.click(getByText('Archive'))
+
+      expect(props.onArchive).toHaveBeenCalled()
+    })
+
+    it('sends the selected option to the onUnarchive callback function', () => {
+      props.onUnarchive = jest.fn()
+      const {getByRole, getByText} = render(<MessageDetailHeader {...props} />)
+      const moreOptionsButton = getByRole(
+        (role, element) => role === 'button' && element.textContent === 'More options'
+      )
+      fireEvent.click(moreOptionsButton)
+      fireEvent.click(getByText('Unarchive'))
+
+      expect(props.onUnarchive).toHaveBeenCalled()
+    })
   })
 
   describe('Responsive', () => {

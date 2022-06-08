@@ -133,13 +133,13 @@ describe('ConversationListItem', () => {
       const {queryByTestId, getByText} = render(<ConversationListItem {...props} />)
 
       // star not shown by default
-      expect(queryByTestId('visible-star')).not.toBeInTheDocument()
+      expect(queryByTestId('visible-not-starred')).not.toBeInTheDocument()
       // star shown when conversation is moused over
       const subjectLine = getByText('This is the subject line')
       fireEvent.mouseOver(subjectLine)
-      expect(queryByTestId('visible-star')).toBeInTheDocument()
+      expect(queryByTestId('visible-not-starred')).toBeInTheDocument()
 
-      fireEvent.click(queryByTestId('visible-star'))
+      fireEvent.click(queryByTestId('visible-not-starred'))
       expect(onStarMock).toHaveBeenLastCalledWith(true, props.conversation._id)
     })
 
