@@ -196,42 +196,19 @@ export const ConversationListItem = ({...props}) => {
               <Grid.Col width="auto">
                 {!isSubmissionCommentsType && (
                   <View textAlign="center" as="div" width={30} height={30} margin="0 small 0 0">
-                    <Focusable>
-                      {({focused}) => {
-                        return (
-                          <div>
-                            {focused || isHovering || props.isStarred ? (
-                              <IconButton
-                                size="small"
-                                withBackground={false}
-                                withBorder={false}
-                                renderIcon={props.isStarred ? IconStarSolid : IconStarLightLine}
-                                screenReaderLabel={
-                                  props.isStarred ? I18n.t('starred') : I18n.t('not starred')
-                                }
-                                onClick={handleConversationStarClick}
-                                data-testid={
-                                  props.isStarred ? 'visible-starred' : 'visible-not-starred'
-                                }
-                              />
-                            ) : (
-                              <ScreenReaderContent>
-                                <IconButton
-                                  size="small"
-                                  withBackground={false}
-                                  withBorder={false}
-                                  renderIcon={props.isStarred ? IconStarSolid : IconStarLightLine}
-                                  screenReaderLabel={
-                                    props.isStarred ? I18n.t('starred') : I18n.t('not starred')
-                                  }
-                                  onClick={handleConversationStarClick}
-                                />
-                              </ScreenReaderContent>
-                            )}
-                          </div>
-                        )
-                      }}
-                    </Focusable>
+                    <div>
+                      <IconButton
+                        size="small"
+                        withBackground={false}
+                        withBorder={false}
+                        renderIcon={props.isStarred ? IconStarSolid : IconStarLightLine}
+                        screenReaderLabel={
+                          props.isStarred ? I18n.t('starred') : I18n.t('not starred')
+                        }
+                        onClick={handleConversationStarClick}
+                        data-testid={props.isStarred ? 'visible-starred' : 'visible-not-starred'}
+                      />
+                    </div>
                   </View>
                 )}
               </Grid.Col>

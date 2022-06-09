@@ -157,8 +157,7 @@ describe "conversations new" do
         f("button[data-testid='more-options']").click
         fj("li:contains('Unstar')").click
         wait_for_ajaximations
-        # verify that convo is unastarred by making sure button is no present
-        expect(f("body")).not_to contain_jqcss("button[data-testid*='starred']")
+        expect(f("button[data-testid='visible-not-starred']")).to be_present
       end
     end
   end
