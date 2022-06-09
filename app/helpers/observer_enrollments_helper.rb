@@ -37,7 +37,7 @@ module ObserverEnrollmentsHelper
         scope = scope.where(course_id: course_id) if course_id
         has_own_enrollments = scope.not_of_observer_type.exists?
         users = User.where(
-          id: scope.of_observer_type.where.not(associated_user_id: nil).limit(MAX_OBSERVED_USERS).pluck(:associated_user_id)
+          id: scope.of_observer_type.where.not(associated_user_id: nil).distinct.limit(MAX_OBSERVED_USERS).pluck(:associated_user_id)
         ).sort_by { |u| Canvas::ICU.collation_key(u.sortable_name) }.to_a
         users.prepend(user) if has_own_enrollments
         users
