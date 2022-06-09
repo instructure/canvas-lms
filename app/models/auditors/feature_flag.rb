@@ -96,9 +96,9 @@ class Auditors::FeatureFlag
   end
 
   Stream = Audits.stream do
-    auth_ar_type = Auditors::ActiveRecord::FeatureFlagRecord
+    ff_ar_type = Auditors::ActiveRecord::FeatureFlagRecord
     backend_strategy -> { Audits.backend_strategy }
-    active_record_type auth_ar_type
+    active_record_type ff_ar_type
     database -> { CanvasCassandra::DatabaseBuilder.from_config(:auditors) }
     table :feature_flags
     record_type Auditors::FeatureFlag::Record
@@ -109,7 +109,7 @@ class Auditors::FeatureFlag
       table :feature_flag_changes_by_feature_flag
       entry_proc ->(record) { record.feature_flag }
       key_proc ->(feature_flag) { feature_flag.global_id }
-      ar_scope_proc ->(feature_flag) { auth_ar_type.where(feature_flag_id: feature_flag.id) }
+      ar_scope_proc ->(feature_flag) { ff_ar_type.where(feature_flag_id: feature_flag.id) }
     end
   end
 

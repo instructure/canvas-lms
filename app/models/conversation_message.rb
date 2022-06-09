@@ -190,7 +190,7 @@ class ConversationMessage < ActiveRecord::Base
     return [] unless conversation
 
     subscribed = subscribed_participants.reject { |u| u.id == author_id }.map { |x| x.becomes(User) }
-    ActiveRecord::Associations::Preloader.new.preload(conversation_message_participants, :user)
+    ActiveRecord::Associations.preload(conversation_message_participants, :user)
     participants = conversation_message_participants.map(&:user)
     subscribed & participants
   end

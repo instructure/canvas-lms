@@ -24,11 +24,11 @@ module Api::V1::StreamItem
 
   def stream_item_preloads(stream_items)
     discussion_topics = stream_items.select { |si| ["DiscussionTopic", "Announcement"].include?(si.asset_type) }
-    ActiveRecord::Associations::Preloader.new.preload(discussion_topics, :context)
+    ActiveRecord::Associations.preload(discussion_topics, :context)
     assessment_requests = stream_items.select { |si| si.asset_type == "AssessmentRequest" }.map(&:data)
-    ActiveRecord::Associations::Preloader.new.preload(assessment_requests, asset: :assignment)
+    ActiveRecord::Associations.preload(assessment_requests, asset: :assignment)
     submissions = stream_items.select { |si| si.asset_type == "Submission" }
-    ActiveRecord::Associations::Preloader.new.preload(submissions, asset: { assignment: :context })
+    ActiveRecord::Associations.preload(submissions, asset: { assignment: :context })
   end
 
   def stream_item_json(stream_item_instance, stream_item, current_user, session)

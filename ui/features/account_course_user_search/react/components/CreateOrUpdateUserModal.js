@@ -82,7 +82,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
 
   state = {...initialState}
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     if (this.props.createOrUpdate === 'update') {
       // only get the attributes from the user that we are actually going to show in the <input>s
       // and send to the server. Because if we send the server extraneous attributes like user[id]

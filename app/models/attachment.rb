@@ -20,6 +20,9 @@
 
 require "atom"
 require "crocodoc"
+require "fileutils"
+require "securerandom"
+require "rchardet"
 
 # See the uploads controller and views for examples on how to use this model.
 class Attachment < ActiveRecord::Base
@@ -259,6 +262,67 @@ class Attachment < ActiveRecord::Base
   READ_FILE_CHUNK_SIZE = 4096
   def self.read_file_chunk_size
     READ_FILE_CHUNK_SIZE
+  end
+
+  def self.convert_attachment_encoding?(file_path, file_encoding)
+    error_count = 0
+    file = File.open(file_path)
+    chunk = file.read(read_file_chunk_size)
+    encoding_converter = Encoding::Converter.new(file_encoding, Encoding::UTF_8)
+
+    converted_file = File.basename(file_path, File.extname(file_path)) + "_" + SecureRandom.hex + "." + File.extname(file_path)
+    converted_file_path = File.join(File.dirname(file_path), converted_file)
+    converted_file = File.new(converted_file_path, "w:UTF-8")
+    while chunk
+      begin
+        converted_chunk = encoding_converter.convert(chunk.dup)
+        raise EncodingError unless converted_chunk.valid_encoding?
+
+        converted_file.write(converted_chunk)
+      rescue EncodingError
+        error_count += 1
+        if !file.eof? && error_count <= 4
+          # we may have split a utf-8 character in the chunk - try to resolve it, but only to a point
+          chunk << file.read(1)
+          next
+        else
+          file.close
+          converted_file.close
+
+          File.unlink(converted_file_path)
+
+          raise
+        end
+      end
+
+      error_count = 0
+      chunk = file.read(read_file_chunk_size)
+    end
+
+    file.close
+    converted_file.close
+
+    File.unlink(file_path)
+    FileUtils.mv(converted_file_path, file_path)
+
+    true
+  rescue EncodingError
+    false
+  end
+
+  def self.get_file_encoding?(file_path)
+    content = File.open(file_path, "rb", &:read)
+    CharDet.detect(content)
+  end
+
+  def self.convert_to_utf8?(file)
+    file_path = File.absolute_path(file.to_path)
+    file_encoding = Attachment.get_file_encoding?(file_path)
+
+    return false if file_encoding["confidence"].to_d <= 0.5.to_d
+    return true if Attachment.convert_attachment_encoding?(file_path, file_encoding["encoding"])
+
+    false
   end
 
   def self.valid_utf8?(file)

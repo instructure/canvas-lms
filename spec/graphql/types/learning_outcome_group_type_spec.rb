@@ -73,6 +73,25 @@ describe Types::LearningOutcomeGroupType do
                                                                                                                                       ])
   end
 
+  it "accepts filter in outcomes" do
+    course = Course.create!
+    course.account.enable_feature!(:outcome_alignment_summary)
+    @outcome2.align(assignment_model, course)
+    expect(outcome_group_type.resolve("outcomes(filter: \"WITH_ALIGNMENTS\") { nodes { ... on LearningOutcome { _id } } }")).to match_array([
+                                                                                                                                              @outcome2.id.to_s
+                                                                                                                                            ])
+  end
+
+  it "accepts both search_query and filter in outcomes" do
+    course = Course.create!
+    course.account.enable_feature!(:outcome_alignment_summary)
+    @outcome1.align(assignment_model, course)
+    @outcome2.align(assignment_model, course)
+    expect(outcome_group_type.resolve("outcomes(filter: \"WITH_ALIGNMENTS\", searchQuery: \"BBBB\") { nodes { ... on LearningOutcome { _id } } }")).to match_array([
+                                                                                                                                                                     @outcome1.id.to_s
+                                                                                                                                                                   ])
+  end
+
   it "returns isImported for a given context" do
     course = Course.create!
     root_group = course.root_outcome_group

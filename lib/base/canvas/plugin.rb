@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency "canvas"
-
 module Canvas
   class NoPluginError < StandardError; end
 
@@ -203,11 +201,6 @@ module Canvas
       return nil if ignore_unrecognized
 
       value.to_i != 0
-    end
-  end
-
-  module Plugins
-    module Validators
     end
   end
 end

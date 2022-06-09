@@ -26,7 +26,6 @@ module Auditors::ActiveRecord
     self.partitioning_field = "created_at"
     self.table_name = "auditor_feature_flag_records"
 
-    belongs_to :account, inverse_of: :auditor_grade_change_records
     belongs_to :user
     belongs_to :root_account,
                class_name: "Account",

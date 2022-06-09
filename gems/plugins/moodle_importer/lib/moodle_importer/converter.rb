@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Moodle
+module MoodleImporter
   class Converter < Canvas::Migration::Migrator
     def initialize(settings)
       super(settings, "moodle")

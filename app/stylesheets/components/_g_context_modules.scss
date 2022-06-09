@@ -317,6 +317,11 @@ $context_module_bg_color: $ic-color-light;
       display: inline-block;
     }
   }
+  .type_icon.display_icons {
+    i {
+      display: inline-block;
+    }
+  }
   &.attachment {
     .icon-document {
       display: none;

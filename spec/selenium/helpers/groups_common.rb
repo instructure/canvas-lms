@@ -185,14 +185,6 @@ module GroupsCommon
     wait_for_ajaximations
   end
 
-  # Used to set group_limit field manually. Assumes you are on Edit Group Set page and self-sign up is checked
-  def manually_set_groupset_limit(member_limit = "2")
-    replace_content(fj('input[name="group_limit"]:visible'), member_limit)
-    scroll_page_to_bottom
-    fj(".btn.btn-primary[type=submit]").click
-    wait_for_ajaximations
-  end
-
   def manually_fill_limited_group(member_limit = "2", student_count = 0)
     student_count.times do |n|
       f(".assign-to-group").click
@@ -307,11 +299,6 @@ module GroupsCommon
     wait_for_ajaximations
   end
 
-  def save_group_set
-    move_to_click("#newGroupSubmitButton")
-    wait_for_ajaximations
-  end
-
   def create_and_submit_assignment_from_group(student)
     category = @group_category[0]
     assignment = @course.assignments.create({
@@ -351,9 +338,9 @@ module GroupsCommon
                             @testgroup.first
                           end
 
-    add_file(fixture_file_upload("files/example.pdf", "application/pdf"),
+    add_file(fixture_file_upload("example.pdf", "application/pdf"),
              @testgroup.first, "example.pdf")
-    add_file(fixture_file_upload("files/a_file.txt", "text/plain"),
+    add_file(fixture_file_upload("a_file.txt", "text/plain"),
              second_file_context, "a_file.txt")
   end
 

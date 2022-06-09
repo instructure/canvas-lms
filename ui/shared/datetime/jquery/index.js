@@ -132,7 +132,7 @@ $.fn.datepicker = function (options) {
         // the final 24-hour value. Note that hours past 12 are always
         // considered PM no matter what the am/pm selection is.
         if (!isPM && ampm) {
-          const pmMatch = new RegExp(I18n.t('#time.pm').replace(/[-/:. ]/g, ''))
+          const pmMatch = new RegExp(I18n.t('#time.pm').replace(/[-/:. ]/g, ''), 'i')
           isPM = pmMatch.test(ampm.replace(/[-/:. ]/g, ''))
         }
 

@@ -35,6 +35,9 @@ const I18n = useI18nScope('conversations_2')
 export const MessageDetailHeader = ({...props}) => {
   const {isSubmissionCommentsType} = useContext(ConversationContext)
 
+  const showArchive = props.scope !== 'sent' && props.onArchive
+  const showUnarchive = props.scope !== 'sent' && props.onUnarchive
+
   return (
     <Responsive
       match="media"
@@ -72,20 +75,22 @@ export const MessageDetailHeader = ({...props}) => {
               )}
             </Heading>
           </Flex.Item>
-          <Flex.Item>
-            <Tooltip renderTip={I18n.t('Reply')} on={['hover', 'focus']}>
-              <IconButton
-                data-testid="message-detail-header-reply-btn"
-                margin="0 x-small 0 0"
-                screenReaderLabel={I18n.t('Reply')}
-                onClick={() => props.onReply()}
-                withBackground={false}
-                withBorder={false}
-              >
-                <IconReplyLine />
-              </IconButton>
-            </Tooltip>
-          </Flex.Item>
+          {props.onReply && (
+            <Flex.Item>
+              <Tooltip renderTip={I18n.t('Reply')} on={['hover', 'focus']}>
+                <IconButton
+                  data-testid="message-detail-header-reply-btn"
+                  margin="0 x-small 0 0"
+                  screenReaderLabel={I18n.t('Reply')}
+                  onClick={() => props.onReply()}
+                  withBackground={false}
+                  withBorder={false}
+                >
+                  <IconReplyLine />
+                </IconButton>
+              </Tooltip>
+            </Flex.Item>
+          )}
           {!isSubmissionCommentsType && (
             <Flex.Item>
               <Menu
@@ -104,13 +109,36 @@ export const MessageDetailHeader = ({...props}) => {
                   </Tooltip>
                 }
               >
-                <Menu.Item value="reply-all" onSelect={() => props.onReplyAll()}>
-                  {I18n.t('Reply All')}
-                </Menu.Item>
-                <Menu.Item value="forward" onSelect={() => props.onForward()}>
-                  {I18n.t('Forward')}
-                </Menu.Item>
-                <Menu.Item value="star">{I18n.t('Star')}</Menu.Item>
+                {props.onReplyAll && (
+                  <Menu.Item value="reply-all" onSelect={() => props.onReplyAll()}>
+                    {I18n.t('Reply All')}
+                  </Menu.Item>
+                )}
+                {props.onForward && (
+                  <Menu.Item value="forward" onSelect={() => props.onForward()}>
+                    {I18n.t('Forward')}
+                  </Menu.Item>
+                )}
+                {showArchive && (
+                  <Menu.Item value="archive" onSelect={props.onArchive}>
+                    {I18n.t('Archive')}
+                  </Menu.Item>
+                )}
+                {showUnarchive && (
+                  <Menu.Item value="unarchive" onSelect={props.onUnarchive}>
+                    {I18n.t('Unarchive')}
+                  </Menu.Item>
+                )}
+                {props.onStar && (
+                  <Menu.Item value="star" onSelect={props.onStar}>
+                    {I18n.t('Star')}
+                  </Menu.Item>
+                )}
+                {props.onUnstar && (
+                  <Menu.Item value="unstar" onSelect={props.onUnstar}>
+                    {I18n.t('Unstar')}
+                  </Menu.Item>
+                )}
                 <Menu.Item value="delete" onSelect={props.onDelete}>
                   {I18n.t('Delete')}
                 </Menu.Item>
@@ -128,10 +156,15 @@ MessageDetailHeader.propTypes = {
   text: PropTypes.string,
   onReply: PropTypes.func,
   onReplyAll: PropTypes.func,
+  onArchive: PropTypes.func,
+  onUnarchive: PropTypes.func,
+  onStar: PropTypes.func,
+  onUnstar: PropTypes.func,
   onDelete: PropTypes.func,
   focusRef: PropTypes.any,
   onForward: PropTypes.func,
-  submissionCommentURL: PropTypes.string
+  submissionCommentURL: PropTypes.string,
+  scope: PropTypes.string
 }
 
 MessageDetailHeader.defaultProps = {

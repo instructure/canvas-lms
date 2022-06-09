@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "communication_channels/confirm.html.erb" do
+describe "communication_channels/confirm" do
   before do
     user_factory
     assign(:user, @user)

@@ -106,8 +106,8 @@ require "sharding_spec_helper"
 # and then ensure people aren't creating records outside the rspec
 # lifecycle, e.g. inside a describe/context block rather than a
 # let/before/example
-TestDatabaseUtils.reset_database!
-TestDatabaseUtils.check_migrations!
+TestDatabaseUtils.reset_database! unless ENV["DB_VALIDITY_ENSURED"] == "1"
+TestDatabaseUtils.check_migrations! unless ENV["DB_VALIDITY_ENSURED"] == "1"
 BlankSlateProtection.install!
 GreatExpectations.install!
 

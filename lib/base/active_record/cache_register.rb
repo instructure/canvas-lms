@@ -82,7 +82,7 @@ module ActiveRecord
             if multi_key_types.any?
               base_keys.each do |base_key|
                 multi_key_types.each do |type|
-                  MultiCache.delete("#{base_key}/#{type}")
+                  MultiCache.delete("#{base_key}/#{type}", { unprefixed_key: true })
                 end
               end
             end

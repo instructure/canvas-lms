@@ -620,7 +620,7 @@ class ActiveRecord::Base
   end
 
   def self.current_xlog_location
-    Shard.current(send(Rails.version < "6.1" ? :shard_category : :connection_classes)).database_server.unguard do
+    Shard.current(connection_class_for_self).database_server.unguard do
       GuardRail.activate(:primary) do
         if Rails.env.test? ? in_transaction_in_test? : connection.open_transactions > 0
           raise "don't run current_xlog_location in a transaction"
@@ -746,24 +746,28 @@ class ActiveRecord::Base
     self.updated_at = Time.now.utc if touch
     if new_record?
       self.created_at = updated_at if touch
-      self.id = self.class._insert_record(attributes_with_values(attribute_names_for_partial_writes))
+      self.id = self.class._insert_record(
+        attributes_with_values(Rails.version < "7.0" ? attribute_names_for_partial_writes : attribute_names_for_partial_inserts)
+        .transform_values { |attr| attr.is_a?(ActiveModel::Attribute) ? attr.value : attr }
+      )
       @new_record = false
     else
-      update_columns(attributes_with_values(attribute_names_for_partial_writes))
+      update_columns(
+        attributes_with_values(Rails.version < "7.0" ? attribute_names_for_partial_writes : attribute_names_for_partial_updates)
+        .transform_values { |attr| attr.is_a?(ActiveModel::Attribute) ? attr.value : attr }
+      )
     end
     changes_applied
   end
 
-  if Rails.version >= "6.1"
-    def self.override_db_configs(override)
-      configurations.configs_for.each do |config|
-        config.instance_variable_set(:@configuration_hash, config.configuration_hash.merge(override).freeze)
-      end
-      clear_all_connections!(nil)
-
-      # Just return something that isn't an ar connection object so consoles don't explode
-      override
+  def self.override_db_configs(override)
+    configurations.configs_for.each do |config|
+      config.instance_variable_set(:@configuration_hash, config.configuration_hash.merge(override).freeze)
     end
+    clear_all_connections!(nil)
+
+    # Just return something that isn't an ar connection object so consoles don't explode
+    override
   end
 end
 
@@ -777,11 +781,7 @@ module UsefulFindInBatches
     else
       enum_for(:find_each, start: start, finish: finish, order: order, **kwargs) do
         relation = self
-        if Rails.version < "6.1"
-          apply_limits(relation, start, finish).size
-        else
-          apply_limits(relation, start, finish, order).size
-        end
+        apply_limits(relation, start, finish, order).size
       end
     end
   end
@@ -791,11 +791,7 @@ module UsefulFindInBatches
     relation = self
     unless block_given?
       return to_enum(:find_in_batches, start: start, finish: finish, order: order, batch_size: batch_size, **kwargs) do
-        total = if Rails.version < "6.1"
-                  apply_limits(relation, start, finish).size
-                else
-                  apply_limits(relation, start, finish, order).size
-                end
+        total = apply_limits(relation, start, finish, order).size
         (total - 1).div(batch_size) + 1
       end
     end
@@ -821,11 +817,7 @@ module UsefulFindInBatches
     if strategy == :id
       raise ArgumentError, "GROUP BY is incompatible with :id batches strategy" unless group_values.empty?
 
-      if Rails.version < "6.1"
-        return activate { |r| r.call_super(:in_batches, UsefulFindInBatches, start: start, finish: finish, **kwargs, &block) }
-      else
-        return activate { |r| r.call_super(:in_batches, UsefulFindInBatches, start: start, finish: finish, order: order, **kwargs, &block) }
-      end
+      return activate { |r| r.call_super(:in_batches, UsefulFindInBatches, start: start, finish: finish, order: order, **kwargs, &block) }
     end
 
     kwargs.delete(:error_on_ignore)
@@ -870,11 +862,7 @@ module UsefulFindInBatches
 
   def in_batches_with_cursor(of: 1000, start: nil, finish: nil, order: :asc, load: false)
     klass.transaction do
-      relation = if Rails.version < "6.1"
-                   apply_limits(clone, start, finish)
-                 else
-                   apply_limits(clone, start, finish, order)
-                 end
+      relation = apply_limits(clone, start, finish, order)
 
       relation.skip_query_cache!
       unless load
@@ -914,11 +902,7 @@ module UsefulFindInBatches
     limited_query = limit(0).to_sql
 
     relation = self
-    relation_for_copy = if Rails.version < "6.1"
-                          apply_limits(relation, start, finish)
-                        else
-                          apply_limits(relation, start, finish, order)
-                        end
+    relation_for_copy = apply_limits(relation, start, finish, order)
     unless load
       relation_for_copy = relation_for_copy.except(:select).select(primary_key)
     end
@@ -1012,11 +996,7 @@ module UsefulFindInBatches
   # and yields the objects in batches in the same order as the scope specified
   # so the DB connection can be fully recycled during each block.
   def in_batches_with_pluck_ids(of: 1000, start: nil, finish: nil, order: :asc, load: false)
-    relation = if Rails.version < "6.1"
-                 apply_limits(self, start, finish)
-               else
-                 apply_limits(self, start, finish, order)
-               end
+    relation = apply_limits(self, start, finish, order)
     all_object_ids = relation.pluck(:id)
     current_order_values = order_values
     all_object_ids.in_groups_of(of) do |id_batch|
@@ -1044,11 +1024,7 @@ module UsefulFindInBatches
              group, or order)."
       end
 
-      relation = if Rails.version < "6.1"
-                   apply_limits(self, start, finish)
-                 else
-                   apply_limits(self, start, finish, order)
-                 end
+      relation = apply_limits(self, start, finish, order)
       sql = relation.to_sql
       table = "#{table_name}_in_batches_temp_table_#{sql.hash.abs.to_s(36)}"
       table = table[-63..] if table.length > 63
@@ -1189,12 +1165,12 @@ module UsefulBatchEnumerator
     @relation.send(:_substitute_values, updates).any? do |(attr, update)|
       found_match = false
       predicates.any? do |pred|
-        next unless pred.is_a?(Arel::Nodes::Binary) || (Rails.version >= "6.1" && pred.is_a?(Arel::Nodes::HomogeneousIn))
+        next unless pred.is_a?(Arel::Nodes::Binary) || pred.is_a?(Arel::Nodes::HomogeneousIn)
         next unless pred.left == attr
 
         found_match = true
 
-        raw_update = update.value.value_before_type_cast
+        raw_update = update.value.is_a?(ActiveModel::Attribute) ? update.value.value_before_type_cast : update.value
         # we want to check exact class here, not ancestry, since we want to ignore
         # subclasses we don't understand
         if pred.instance_of?(Arel::Nodes::Equality)
@@ -1202,25 +1178,26 @@ module UsefulBatchEnumerator
         elsif pred.instance_of?(Arel::Nodes::NotEqual)
           update == pred.right
         elsif pred.instance_of?(Arel::Nodes::GreaterThanOrEqual)
-          raw_update < pred.right.value.value_before_type_cast
+          raw_update < (pred.right.value.is_a?(ActiveModel::Attribute) ? pred.right.value.value_before_type_cast : pred.right.value)
         elsif pred.instance_of?(Arel::Nodes::GreaterThan)
-          raw_update <= pred.right.value.value_before_type_cast
+          raw_update <= (pred.right.value.is_a?(ActiveModel::Attribute) ? pred.right.value.value_before_type_cast : pred.right.value)
         elsif pred.instance_of?(Arel::Nodes::LessThanOrEqual)
-          raw_update >= pred.right.value.value_before_type_cast
+          raw_update >= (pred.right.value.is_a?(ActiveModel::Attribute) ? pred.right.value.value_before_type_cast : pred.right.value)
         elsif pred.instance_of?(Arel::Nodes::LessThan)
-          raw_update > pred.right.value.value_before_type_cast
+          raw_update > (pred.right.value.is_a?(ActiveModel::Attribute) ? pred.right.value.value_before_type_cast : pred.right.value)
         elsif pred.instance_of?(Arel::Nodes::Between)
-          raw_update < pred.right.left.value.value_before_type_cast || raw_update > pred.right.right.value.value_before_type_cast
+          raw_update < (pred.right.left.value.is_a?(ActiveModel::Attribute) ? pred.right.left.value.value_before_type_cast : pred.right.left.value) ||
+            raw_update > (pred.right.right.value.is_a?(ActiveModel::Attribute) ? pred.right.right.value.value_before_type_cast : pred.right.right.value)
         elsif pred.instance_of?(Arel::Nodes::In) && pred.right.is_a?(Array)
           pred.right.exclude?(update)
         elsif pred.instance_of?(Arel::Nodes::NotIn) && pred.right.is_a?(Array)
           pred.right.include?(update)
-        elsif Rails.version >= "6.1" && pred.instance_of?(Arel::Nodes::HomogeneousIn)
+        elsif pred.instance_of?(Arel::Nodes::HomogeneousIn)
           case pred.type
           when :in
-            pred.right.map(&:value).exclude?(update.value.value)
+            pred.right.map(&:value).exclude?(update.value.is_a?(ActiveModel::Attribute) ? update.value.value : update.value)
           when :notin
-            pred.right.map(&:value).include?(update.value.value)
+            pred.right.map(&:value).include?(update.value.is_a?(ActiveModel::Attribute) ? update.value.value : update.value)
           end
         end
       end && found_match
@@ -1413,13 +1390,8 @@ module UpdateAndDeleteWithJoins
   end
 
   def update_all(updates, *args)
-    db = Shard.current(klass.send(Rails.version < "6.1" ? :shard_category : :connection_classes)).database_server
     if joins_values.empty?
-      if Rails.version < "6.1" && ::GuardRail.environment == db.guard_rail_environment
-        return super
-      else
-        Shard.current.database_server.unguard { return super }
-      end
+      Shard.current.database_server.unguard { return super }
     end
 
     stmt = Arel::UpdateManager.new
@@ -1455,11 +1427,7 @@ module UpdateAndDeleteWithJoins
     end
     where_sql = collector.value
     sql.concat("WHERE " + where_sql)
-    if Rails.version < "6.1" && ::GuardRail.environment == db.guard_rail_environment
-      connection.update(sql, "#{name} Update")
-    else
-      Shard.current.database_server.unguard { connection.update(sql, "#{name} Update") }
-    end
+    Shard.current.database_server.unguard { connection.update(sql, "#{name} Update") }
   end
 
   def delete_all
@@ -1663,46 +1631,24 @@ module Migrator
     super.select(&:runnable?)
   end
 
-  if Rails.version < "6.1"
-    def execute_migration_in_transaction(migration, direct)
-      old_in_migration, ActiveRecord::Base.in_migration = ActiveRecord::Base.in_migration, true
-      if defined?(Marginalia)
-        old_migration_name, Marginalia::Comment.migration = Marginalia::Comment.migration, migration.name
-      end
-      if down? && !Rails.env.test? && !$confirmed_migrate_down
-        require "highline"
-        if HighLine.new.ask("Revert migration #{migration.name} (#{migration.version}) ? [y/N/a] > ") !~ /^([ya])/i
-          raise("Revert not confirmed")
-        end
-
-        $confirmed_migrate_down = true if $1.casecmp?("a")
-      end
-
-      super
-    ensure
-      ActiveRecord::Base.in_migration = old_in_migration
-      Marginalia::Comment.migration = old_migration_name if defined?(Marginalia)
+  def execute_migration_in_transaction(migration)
+    old_in_migration, ActiveRecord::Base.in_migration = ActiveRecord::Base.in_migration, true
+    if defined?(Marginalia)
+      old_migration_name, Marginalia::Comment.migration = Marginalia::Comment.migration, migration.name
     end
-  else
-    def execute_migration_in_transaction(migration)
-      old_in_migration, ActiveRecord::Base.in_migration = ActiveRecord::Base.in_migration, true
-      if defined?(Marginalia)
-        old_migration_name, Marginalia::Comment.migration = Marginalia::Comment.migration, migration.name
-      end
-      if down? && !Rails.env.test? && !$confirmed_migrate_down
-        require "highline"
-        if HighLine.new.ask("Revert migration #{migration.name} (#{migration.version}) ? [y/N/a] > ") !~ /^([ya])/i
-          raise("Revert not confirmed")
-        end
-
-        $confirmed_migrate_down = true if $1.casecmp?("a")
+    if down? && !Rails.env.test? && !$confirmed_migrate_down
+      require "highline"
+      if HighLine.new.ask("Revert migration #{migration.name} (#{migration.version}) ? [y/N/a] > ") !~ /^([ya])/i
+        raise("Revert not confirmed")
       end
 
-      super
-    ensure
-      ActiveRecord::Base.in_migration = old_in_migration
-      Marginalia::Comment.migration = old_migration_name if defined?(Marginalia)
+      $confirmed_migrate_down = true if $1.casecmp?("a")
     end
+
+    super
+  ensure
+    ActiveRecord::Base.in_migration = old_in_migration
+    Marginalia::Comment.migration = old_migration_name if defined?(Marginalia)
   end
 end
 ActiveRecord::Migrator.prepend(Migrator)
@@ -1828,20 +1774,6 @@ ActiveRecord::Associations::CollectionAssociation.class_eval do
   def distinct
     scope.distinct
   end
-end
-
-if Rails.version < "6.1"
-  module UnscopeCallbacks
-    def run_callbacks(kind)
-      return super if __callbacks[kind].empty?
-
-      # in rails 6.1, we can get rid of this entire monkeypatch
-      scope = self.class.current_scope&.clone || self.class.default_scoped
-      scope = scope.klass.unscoped
-      scope.scoping { super }
-    end
-  end
-  ActiveRecord::Base.include UnscopeCallbacks
 end
 
 module MatchWithDiscard
@@ -2047,7 +1979,7 @@ ActiveRecord::Relation.prepend(DontExplicitlyNameColumnsBecauseOfIgnores)
 module PreserveShardAfterTransaction
   def after_transaction_commit(&block)
     shards = Shard.send(:active_shards)
-    shards[Rails.version < "6.1" ? :delayed_jobs : Delayed::Backend::ActiveRecord::AbstractJob] = Shard.current.delayed_jobs_shard if ::ActiveRecord::Migration.open_migrations.positive?
+    shards[Delayed::Backend::ActiveRecord::AbstractJob] = Shard.current.delayed_jobs_shard if ::ActiveRecord::Migration.open_migrations.positive?
     super { Shard.activate(shards, &block) }
   end
 end
@@ -2095,12 +2027,7 @@ ActiveRecord::ConnectionAdapters::ConnectionPool.prepend(RestoreConnectionConnec
 
 module MaxRuntimeConnectionPool
   def max_runtime
-    # TODO: Rails 6.1 uses a PoolConfig object instead
-    if Rails.version < "6.1"
-      @spec.config[:max_runtime]
-    else
-      db_config.configuration_hash[:max_runtime]
-    end
+    db_config.configuration_hash[:max_runtime]
   end
 
   def acquire_connection(*)
@@ -2148,7 +2075,29 @@ module MaxRuntimeConnectionPool
 end
 ActiveRecord::ConnectionAdapters::ConnectionPool.prepend(MaxRuntimeConnectionPool)
 
-ActiveRecord::Associations.send(:public, :clear_association_cache)
+if Rails.version < "7.0"
+  ActiveRecord::Associations.send(:public, :clear_association_cache)
+else
+  module ClearableAssociationCache
+    def clear_association_cache
+      @association_cache = {}
+    end
+  end
+  # Ensure it makes it onto activerecord::base even if assocations are already attached to base
+  ActiveRecord::Associations.prepend(ClearableAssociationCache)
+  ActiveRecord::Base.prepend(ClearableAssociationCache)
+end
+
+module VersionAgnosticPreloader
+  def preload(records, associations, preload_scope = nil)
+    if Rails.version < "7.0"
+      ActiveRecord::Associations::Preloader.new.preload(records, associations, preload_scope)
+    else
+      ActiveRecord::Associations::Preloader.new(records: Array.wrap(records), associations: associations, scope: preload_scope).call
+    end
+  end
+end
+ActiveRecord::Associations.singleton_class.include(VersionAgnosticPreloader)
 
 Rails.application.config.after_initialize do
   ActiveSupport.on_load(:active_record) do

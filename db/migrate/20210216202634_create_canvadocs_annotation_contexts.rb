@@ -22,9 +22,9 @@ class CreateCanvadocsAnnotationContexts < ActiveRecord::Migration[5.2]
 
   def change
     create_table :canvadocs_annotation_contexts do |t|
-      t.belongs_to :attachment, foreign_key: true, limit: 8, index: true, null: false
-      t.belongs_to :submission, foreign_key: true, limit: 8, index: true, null: false
-      t.belongs_to :root_account, index: true, foreign_key: { to_table: :accounts }, limit: 8, null: false
+      t.belongs_to :attachment, foreign_key: true, index: true, null: false
+      t.belongs_to :submission, foreign_key: true, index: true, null: false
+      t.belongs_to :root_account, index: true, foreign_key: { to_table: :accounts }, null: false
 
       t.string :launch_id, null: false
       t.integer :submission_attempt

@@ -51,13 +51,6 @@ class PeriodicJobs
 
   def self.with_each_shard_by_database_in_region(klass, method, *args, jitter: nil, local_offset: false, connection_class: nil)
     callback = -> { Canvas::Errors.capture_exception(:periodic_job, $ERROR_INFO) }
-    if Rails.version < "6.1"
-      connection_class = if connection_class == Delayed::Backend::ActiveRecord::AbstractJob
-                           :delayed_jobs
-                         elsif connection_class == ActiveRecord::Base
-                           :primary
-                         end
-    end
     Shard.with_each_shard(Shard.in_current_region, exception: callback) do
       current_shard = Shard.current(connection_class)
       strand = "#{klass}.#{method}:#{current_shard.database_server.id}"

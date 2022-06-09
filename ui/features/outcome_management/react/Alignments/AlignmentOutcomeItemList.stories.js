@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,9 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-import SyllabusBehaviors from '@canvas/syllabus/backbone/behaviors/SyllabusBehaviors'
+import React from 'react'
+import AlignmentOutcomeItemList from './AlignmentOutcomeItemList'
+import {generateOutcomes} from './__tests__/testData'
 
-$(() => {
-  SyllabusBehaviors.bindToEditSyllabus(false)
-})
+export default {
+  title: 'Examples/Outcomes/AlignmentOutcomeItemList',
+  component: AlignmentOutcomeItemList,
+  args: {
+    outcomes: generateOutcomes(5)
+  }
+}
+
+const Template = args => <AlignmentOutcomeItemList {...args} />
+
+export const Default = Template.bind({})

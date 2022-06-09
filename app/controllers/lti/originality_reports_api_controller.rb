@@ -194,7 +194,7 @@ module Lti
       else
         @report = OriginalityReport.new(create_report_params)
         if @report.save
-          OriginalityReport.delay_if_production.copy_to_group_submissions!(report_id: @report.id, user_id: @report.submission.user_id)
+          @report.copy_to_group_submissions_later!
           render json: api_json(@report, @current_user, session), status: :created
         else
           render json: @report.errors, status: :bad_request
@@ -245,7 +245,7 @@ module Lti
     def update
       updates = { error_message: nil }.merge(update_report_params)
       if @report.update(updates)
-        OriginalityReport.delay_if_production.copy_to_group_submissions!(report_id: @report.id, user_id: @report.submission.user_id)
+        @report.copy_to_group_submissions_later!
         render json: api_json(@report, @current_user, session)
       else
         render json: @report.errors, status: :bad_request

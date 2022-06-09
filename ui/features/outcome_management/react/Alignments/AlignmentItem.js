@@ -22,7 +22,7 @@ import {Text} from '@instructure/ui-text'
 import {IconAssignmentLine, IconRubricLine} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {alignmentShape} from './shapes'
+import {alignmentShape} from './propTypeShapes'
 
 const I18n = useI18nScope('AlignmentSummary')
 

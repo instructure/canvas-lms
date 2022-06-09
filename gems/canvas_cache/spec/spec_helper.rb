@@ -24,29 +24,6 @@ require "active_record"
 
 Rails.env = "test"
 
-# Right now Canvas injects the Setting class as the store.
-# It would be great to pull that one out to something we can
-# depend on as an adapter that Canvas can submit Setting itself
-# as a strategy for...anyway, use this for now for specs
-class MemorySettings
-  def initialize(data = {})
-    @settings = data || {}
-  end
-
-  def get(key, default)
-    @settings.fetch(key, default)
-  end
-
-  def set(key, value)
-    @settings[key] = value
-  end
-
-  def skip_cache
-    yield
-  end
-end
-CanvasCache.settings_store = MemorySettings.new
-
 # give the logger some implementation since
 # we aren't initializing a full app in these specs
 Rails.logger = Logger.new($stdout)

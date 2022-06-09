@@ -75,10 +75,12 @@ QUnit.module('#apiCreateSubmissionComment', hooks => {
   let createSubmissionCommentStub
   let gradebook
   let student
+  let sandbox
 
   hooks.beforeEach(() => {
+    sandbox = sinon.createSandbox()
     assignment = {grade_group_students_individually: true, group_category_id: '2201', id: '2301'}
-    createSubmissionCommentStub = sinon.stub(SubmissionCommentApi, 'createSubmissionComment')
+    createSubmissionCommentStub = sandbox.stub(SubmissionCommentApi, 'createSubmissionComment')
     createSubmissionCommentStub.resolves()
     gradebook = createGradebook()
     student = {
@@ -91,7 +93,7 @@ QUnit.module('#apiCreateSubmissionComment', hooks => {
   })
 
   hooks.afterEach(() => {
-    createSubmissionCommentStub.restore()
+    sandbox.restore()
   })
 
   test('calls the success function on a successful call', () => {
@@ -104,7 +106,7 @@ QUnit.module('#apiCreateSubmissionComment', hooks => {
   })
 
   test('calls showFlashSuccess on a successful call', () => {
-    sinon.stub(gradebook, 'renderSubmissionTray')
+    sandbox.stub(gradebook, 'renderSubmissionTray')
 
     gradebook.setSubmissionTrayState(false, student.id, assignment.id)
     const showFlashSuccessStub = sandbox.stub(FlashAlert, 'showFlashSuccess')
@@ -141,6 +143,22 @@ QUnit.module('#apiCreateSubmissionComment', hooks => {
     gradebook.apiCreateSubmissionComment('a comment')
     const commentData = createSubmissionCommentStub.firstCall.args[3]
     strictEqual(commentData.group_comment, 0)
+  })
+
+  test('includes comment attempt in call if submission has attempt', () => {
+    sandbox.stub(gradebook, 'getSubmission').returns({attempt: 3})
+    gradebook.setSubmissionTrayState(false, student.id, assignment.id)
+    gradebook.apiCreateSubmissionComment('a comment')
+    const commentData = createSubmissionCommentStub.firstCall.args[3]
+    strictEqual(commentData.attempt, 3)
+  })
+
+  test('does not include comment attempt in call if submission does not have attempt', () => {
+    sandbox.stub(gradebook, 'getSubmission').returns({})
+    gradebook.setSubmissionTrayState(false, student.id, assignment.id)
+    gradebook.apiCreateSubmissionComment('a comment')
+    const commentData = createSubmissionCommentStub.firstCall.args[3]
+    notOk(Object.keys(commentData).includes('attempt'))
   })
 
   test('includes comment text_comment in call', () => {

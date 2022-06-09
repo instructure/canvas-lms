@@ -35,7 +35,7 @@ describe "people" do
 
   def open_student_group_dialog
     f("#add-group-set").click
-    dialog = fj(".ui-dialog:visible")
+    dialog = f(%(span[data-testid="modal-create-groupset"]))
     expect(dialog).to be_displayed
     dialog
   end
@@ -46,8 +46,8 @@ describe "people" do
       fln("View User Groups").click
     end
     open_student_group_dialog
-    replace_content(f("#new_category_name"), group_text)
-    submit_form(".group-category-create")
+    replace_and_proceed f("#new-group-set-name"), group_text
+    f(%(button[data-testid="group-set-save"])).click
     wait_for_ajaximations
     expect(f(".collectionViewItems")).to include_text(group_text)
   end
@@ -232,7 +232,8 @@ describe "people" do
       create_student_group
     end
 
-    it "tests self sign up functionality" do
+    # This just duplicates a test in the Jest spec for the modal
+    xit "tests self sign up functionality" do
       get "/courses/#{@course.id}/users"
       f("#people-options .Button").click
       expect_new_page_load { fln("View User Groups").click }
@@ -249,11 +250,11 @@ describe "people" do
         f("#people-options .Button").click
         fln("View User Groups").click
       end
-      dialog = open_student_group_dialog
-      replace_content(f("#new_category_name"), "new group")
-      dialog.find_element(:css, "#enable_self_signup").click
-      replace_content(fj('input[name="create_group_count"]:visible'), group_count)
-      submit_form(".group-category-create")
+      open_student_group_dialog
+      replace_and_proceed f("#new-group-set-name"), "new group"
+      fxpath("//input[@data-testid='checkbox-allow-self-signup']/..").click
+      replace_and_proceed f("#textinput-create-groups-now"), group_count
+      f(%(button[data-testid="group-set-save"])).click
       wait_for_ajaximations
       expect(@course.groups.count).to eq 4
       expect(f(".groups-with-count")).to include_text("Groups (#{group_count})")
@@ -268,12 +269,12 @@ describe "people" do
         f("#people-options .Button").click
         fln("View User Groups").click
       end
-      dialog = open_student_group_dialog
-      replace_content(f("#new_category_name"), "new group")
-      dialog.find_element(:css, "#split_groups").click
-      replace_content(fj('input[name="create_group_count"]:visible'), group_count)
+      open_student_group_dialog
+      replace_and_proceed f("#new-group-set-name"), "new group"
+      fxpath("//input[@data-testid='radio-button-split-groups']/..").click
+      replace_and_proceed f("#textinput-create-groups-count"), group_count
       expect(@course.groups.count).to eq 0
-      submit_form(".group-category-create")
+      f(%(button[data-testid="group-set-save"])).click
       wait_for_ajaximations
       run_jobs
       wait_for_ajaximations
@@ -284,12 +285,10 @@ describe "people" do
     it "auto-creates groups based on # of students" do
       enroll_more_students
       get "/courses/#{@course.id}/groups#new"
-      f("#new_category_name").send_keys("Groups of 2")
-      f("input#num_students").click
-      count_input = f("input[name='create_group_member_count']")
-      count_input.clear
-      count_input.send_keys 2
-      fj("button:contains('Save')").click
+      replace_and_proceed f("#new-group-set-name"), "Groups of 2"
+      fxpath("//input[@data-testid='radio-button-group-members']/..").click
+      replace_and_proceed f("#textinput-create-members-count"), "2"
+      f('button[data-testid="group-set-save"]').click
       wait_for_ajax_requests # initiates job request
       run_jobs
       wait_for_ajaximations # finishes calculations and repopulates list

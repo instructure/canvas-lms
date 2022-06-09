@@ -1062,7 +1062,7 @@ module Lti
           )
         end
 
-        it "copies the report to all other submissions in the group" do
+        def post_to_endpoint
           post create_endpoint,
                params: {
                  originality_report: {
@@ -1071,22 +1071,38 @@ module Lti
                  submission_id: submission_one.id
                },
                headers: request_headers
+        end
 
+        it "copies the report to all other submissions in the group" do
+          post_to_endpoint
           run_jobs
 
           expect(submission_two.originality_reports.first.originality_score).to eq originality_score
         end
 
-        it "does not copy the report to submissions outside the group" do
-          post create_endpoint,
-               params: {
-                 originality_report: {
-                   originality_score: originality_score,
-                 },
-                 submission_id: submission_one.id
-               },
-               headers: request_headers
+        it "calls OriginalityReport.copy_to_group_submissions_later! when creating" do
+          expect_any_instance_of(OriginalityReport).to \
+            receive(:copy_to_group_submissions_later!) do |instance|
+            expect(instance.submission_id).to eq(submission_one.id)
+            expect(instance.originality_score).to eq(originality_score)
+          end
 
+          post_to_endpoint
+        end
+
+        it "calls OriginalityReport.copy_to_group_submissions_later! when updating" do
+          post_to_endpoint
+          created_report_id = JSON.parse(response.body)["id"]
+
+          expect_any_instance_of(OriginalityReport).to \
+            receive(:copy_to_group_submissions_later!).at_least(:once) do |instance|
+            expect(instance.id).to eq(created_report_id)
+          end
+          post_to_endpoint
+        end
+
+        it "does not copy the report to submissions outside the group" do
+          post_to_endpoint
           run_jobs
 
           expect(submission_three.originality_reports).to be_blank

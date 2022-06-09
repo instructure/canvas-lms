@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "users/_logins.html.erb" do
+describe "users/_logins" do
   describe "sis_source_id edit box" do
     before do
       user_with_pseudonym

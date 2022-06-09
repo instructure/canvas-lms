@@ -22,7 +22,7 @@ class CreateToolConfigurations < ActiveRecord::Migration[5.1]
 
   def change
     create_table :lti_tool_configurations do |t|
-      t.references :developer_key, limit: 8, null: false, foreign_key: true, index: false
+      t.references :developer_key, null: false, foreign_key: true, index: false
       t.jsonb :settings, null: false
       t.timestamps null: false
     end

@@ -884,22 +884,16 @@ end
 describe ActiveRecord::ConnectionAdapters::ConnectionPool do
   # create a private pool, with the same config as the regular pool, but ensure
   # max_runtime is set
-  if Rails.version < "6.1"
-    let(:spec) do
-      ActiveRecord::ConnectionAdapters::ConnectionSpecification.new(
-        "spec",
-        ActiveRecord::Base.connection_pool.spec.config.merge(max_runtime: 30),
-        "postgresql_connection"
-      )
-    end
-  else
-    let(:spec) do
-      config = ActiveRecord::DatabaseConfigurations::HashConfig.new(
-        "test",
-        "primary",
-        ActiveRecord::Base.configurations.configs_for(env_name: "test", name: "primary").configuration_hash.merge(max_runtime: 30)
-      )
+  let(:spec) do
+    config = ActiveRecord::DatabaseConfigurations::HashConfig.new(
+      "test",
+      "primary",
+      ActiveRecord::Base.configurations.configs_for(env_name: "test", name: "primary").configuration_hash.merge(max_runtime: 30)
+    )
+    if Rails.version < "7.0"
       ActiveRecord::ConnectionAdapters::PoolConfig.new(ActiveRecord::Base, config)
+    else
+      ActiveRecord::ConnectionAdapters::PoolConfig.new(ActiveRecord::Base, config, :primary, :test)
     end
   end
   let(:pool) { ActiveRecord::ConnectionAdapters::ConnectionPool.new(spec) }

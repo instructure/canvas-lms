@@ -239,23 +239,55 @@ describe UserMerge do
       expect(o1.reload.user).to eq user1
     end
 
-    it "prefer submitted submissions by target user if assignment / submission conflict" do
-      course1.enroll_user(user1, "StudentEnrollment", enrollment_state: "creation_pending")
-      course1.enroll_user(user2, "StudentEnrollment", enrollment_state: "active")
-      assignment = course1.assignments.create!(
-        title: "upload_assignment",
-        points_possible: 10.0,
-        grading_type: "points",
-        workflow_state: "published",
-        context: course1,
-        submission_types: "online_upload"
-      )
-      attachment_model context: user1
-      submission = assignment.submit_homework user1, attachments: [@attachment]
-      UserMerge.from(user2).into(user1)
-      expect(user2.reload.submissions.length).to eql(0)
-      expect(user1.reload.submissions.length).to eql(1)
-      expect(user1.submissions.map(&:id)).to be_include(submission.id)
+    context "when from user and target user are enrolled in the same course" do
+      it "prefers submitted submissions by target user if assignment / submission conflict" do
+        course1.enroll_user(user1, "StudentEnrollment", enrollment_state: "creation_pending")
+        course1.enroll_user(user2, "StudentEnrollment", enrollment_state: "active")
+        assignment = course1.assignments.create!(
+          title: "upload_assignment",
+          points_possible: 10.0,
+          grading_type: "points",
+          workflow_state: "published",
+          context: course1,
+          submission_types: "online_upload"
+        )
+        attachment_model context: user1
+        submission = assignment.submit_homework user1, attachments: [@attachment]
+        UserMerge.from(user2).into(user1)
+        expect(user2.reload.submissions.length).to eql(0)
+        expect(user1.reload.submissions.length).to eql(1)
+        expect(user1.submissions.map(&:id)).to be_include(submission.id)
+      end
+
+      it "ignores scored unsubmitted submission belonging to from user" do
+        course_with_teacher_logged_in active_all: true
+        @course.enroll_user(user1, "StudentEnrollment", enrollment_state: "active")
+        @course.enroll_user(user2, "StudentEnrollment", enrollment_state: "active")
+        assignment = @course.assignments.create!(
+          title: "online_text_entry",
+          points_possible: 10.0,
+          grading_type: "points",
+          workflow_state: "published",
+          context: @course,
+          submission_types: "online_text_entry"
+        )
+        assignment2 = @course.assignments.create!(
+          title: "on_paper",
+          points_possible: 10.0,
+          grading_type: "points",
+          workflow_state: "published",
+          context: @course,
+          submission_types: "on_paper"
+        )
+        submission = assignment.submit_homework(user1, submission_type: "online_text_entry")
+        assignment2.grade_student(user2, grader: @teacher, grade: 10)
+        submission2 = Submission.where(user_id: user2, assignment_id: assignment2).graded.take
+        UserMerge.from(user2).into(user1)
+        expect(user2.reload.submissions.length).to eql(0)
+        expect(user1.reload.submissions.length).to eql(2)
+        expect(user1.submissions.map(&:id)).to be_include(submission.id)
+        expect(user1.submissions.map(&:id)).not_to be_include(submission2.id)
+      end
     end
 
     it "moves submissions to the new user (but only if they don't already exist)" do

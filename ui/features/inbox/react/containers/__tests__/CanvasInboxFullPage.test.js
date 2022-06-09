@@ -20,16 +20,12 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import CanvasInbox from '../CanvasInbox'
 import {ApolloProvider} from 'react-apollo'
 import React from 'react'
-import {render, fireEvent, waitFor} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 import {responsiveQuerySizes} from '../../../util/utils'
 import {mswClient} from '../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../shared/msw/mswServer'
 import {handlers} from '../../../graphql/mswHandlers'
 import waitForApolloLoading from '../../../util/waitForApolloLoading'
-import {graphql} from 'msw'
-import {ConversationParticipant} from '../../../graphql/ConversationParticipant'
-import {Conversation} from '../../../graphql/Conversation'
-import {PageInfo} from '../../../graphql/PageInfo'
 
 jest.mock('../../../util/utils', () => ({
   ...jest.requireActual('../../../util/utils'),
@@ -135,89 +131,6 @@ describe('CanvasInbox Full Page', () => {
       expect(await container.findByText('this is the first reply message')).toBeInTheDocument()
       expect(await container.findByText('this is a reply all')).toBeInTheDocument()
       expect(await container.findByText('testing 123')).toBeInTheDocument()
-    })
-
-    it('Successfully star selected conversation', async () => {
-      const {findAllByTestId, findByTestId, getByText} = setup()
-
-      const checkboxes = await findAllByTestId('conversationListItem-Checkbox')
-      expect(checkboxes.length).toBe(1)
-      fireEvent.click(checkboxes[0])
-
-      const settingsCog = await findByTestId('settings')
-      fireEvent.click(settingsCog)
-
-      const star = getByText('Star')
-      fireEvent.click(star)
-
-      await waitFor(() =>
-        expect(setOnSuccess).toHaveBeenCalledWith('The conversation has been successfully starred.')
-      )
-    })
-
-    it('Successfully star selected conversations', async () => {
-      server.use(
-        graphql.query('GetConversationsQuery', (req, res, ctx) => {
-          const data = {
-            legacyNode: {
-              _id: '9',
-              id: 'VXNlci05',
-              conversationsConnection: {
-                nodes: [
-                  {
-                    ...ConversationParticipant.mock({
-                      _id: '256',
-                      id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU2',
-                      workflowState: 'unread'
-                    }),
-                    conversation: Conversation.mock({
-                      _id: '197',
-                      id: 'Q29udmVyc2F0aW9uLTE5Mz==',
-                      subject: 'This is an inbox conversation'
-                    })
-                  },
-                  {
-                    ...ConversationParticipant.mock({
-                      _id: '258',
-                      id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU6',
-                      workflowState: 'unread'
-                    }),
-                    conversation: Conversation.mock({
-                      _id: '1',
-                      id: 'Q29udmVyc2F0aW9uLTE5Nw==',
-                      subject: 'This is an inbox conversation'
-                    })
-                  }
-                ],
-                pageInfo: PageInfo.mock({hasNextPage: false}),
-                __typename: 'ConversationParticipantConnection'
-              },
-              __typename: 'User'
-            }
-          }
-
-          return res.once(ctx.data(data))
-        })
-      )
-
-      const container = setup()
-
-      const checkboxes = await container.findAllByTestId('conversationListItem-Checkbox')
-      expect(checkboxes.length).toBe(2)
-      fireEvent.click(checkboxes[0])
-      fireEvent.click(checkboxes[1])
-
-      const settingsCog = await container.findByTestId('settings')
-      fireEvent.click(settingsCog)
-
-      const star = container.getByText('Star')
-      fireEvent.click(star)
-
-      await waitFor(() =>
-        expect(setOnSuccess).toHaveBeenCalledWith(
-          'The conversations has been successfully starred.'
-        )
-      )
     })
 
     it('should check then uncheck a checkbox', async () => {

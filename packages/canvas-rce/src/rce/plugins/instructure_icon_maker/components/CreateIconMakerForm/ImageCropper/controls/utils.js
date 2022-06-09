@@ -16,20 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import round from 'round'
 import {BUTTON_ROTATION_DEGREES, MAX_SCALE_RATIO, MIN_SCALE_RATIO} from '../constants'
 
+export const round = (number, digits = 2) => parseFloat(number.toFixed(digits))
+
 export const calculateScaleRatio = scaleRatio => {
-  if (scaleRatio > MAX_SCALE_RATIO) {
-    return MAX_SCALE_RATIO
-  } else if (scaleRatio < MIN_SCALE_RATIO) {
-    return MIN_SCALE_RATIO
-  }
-  return round(scaleRatio, 3)
+  let result = round(scaleRatio)
+  result = result > MAX_SCALE_RATIO ? MAX_SCALE_RATIO : result
+  result = result < MIN_SCALE_RATIO ? MIN_SCALE_RATIO : result
+  return result
+}
+
+export const calculateScalePercentage = scalePercentage => {
+  const result = calculateScaleRatio(scalePercentage / 100)
+  return round(result * 100, 0)
 }
 
 export const calculateRotation = rotationAngle => {
-  const simplifiedRotationAngle = round(rotationAngle % 360, 2)
+  const simplifiedRotationAngle = round(rotationAngle % 360)
   if (Math.abs(rotationAngle) >= 360) {
     return simplifiedRotationAngle
   }

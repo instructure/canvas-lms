@@ -18,12 +18,12 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import Backbone from '@canvas/backbone'
 import _ from 'underscore'
-import $ from 'jquery'
 import template from '../../jst/GroupCategorySelector.handlebars'
 import '@canvas/assignments/jquery/toggleAccessibly'
+import awaitElement from '@canvas/await-element'
+import {renderCreateDialog} from '@canvas/groups/react/CreateOrEditSetModal'
 import StudentGroupStore from '@canvas/due-dates/react/StudentGroupStore'
-import GroupCategoryCreateView from './GroupCategoryCreateView.coffee'
-import GroupCategory from '../models/GroupCategory.coffee'
+import GroupCategory from '@canvas/groups/backbone/models/GroupCategory.coffee'
 
 I18n = useI18nScope('assignment_group_category')
 
@@ -81,18 +81,18 @@ export default class GroupCategorySelector extends Backbone.View
     StudentGroupStore.setSelectedGroupSet(newSelectedId)
 
   showGroupCategoryCreateDialog: =>
-    groupCategory = new GroupCategory()
-    view = new GroupCategoryCreateView({model: groupCategory})
-    view.on 'success', (group) =>
-      $newCategory = $('<option>')
-      $newCategory.val(group.id)
-      $newCategory.text(group.name)
-      $newCategory.prop('selected', true)
-      @$groupCategoryID.append $newCategory
-      @$groupCategoryID.val(group.id)
-      @groupCategories.push(group)
-      @$groupCategory.toggleAccessibly true
-    view.open()
+    awaitElement 'create-group-set-modal-mountpoint'
+    .then renderCreateDialog
+    .then (result) =>
+      if result
+        $newCategory = document.createElement('option')
+        $newCategory.value = result.id
+        $newCategory.text = result.name
+        $newCategory.setAttribute('selected', true)
+        @$groupCategoryID.append $newCategory
+        @$groupCategoryID.val(result.id)
+        @groupCategories.push(result)
+        @$groupCategory.toggleAccessibly = true
 
   groupDiscussionChecked: =>
     @$hasGroupCategory.prop('checked')

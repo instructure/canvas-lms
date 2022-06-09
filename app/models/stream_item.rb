@@ -332,9 +332,9 @@ class StreamItem < ActiveRecord::Base
   def self.prepare_object_for_unread(object)
     case object
     when DiscussionEntry
-      ActiveRecord::Associations::Preloader.new.preload(object, :discussion_entry_participants)
+      ActiveRecord::Associations.preload(object, :discussion_entry_participants)
     when DiscussionTopic
-      ActiveRecord::Associations::Preloader.new.preload(object, :discussion_topic_participants)
+      ActiveRecord::Associations.preload(object, :discussion_topic_participants)
     end
   end
 
@@ -400,11 +400,7 @@ class StreamItem < ActiveRecord::Base
         StreamItem.vacuum
         StreamItemInstance.vacuum
         unless Rails.env.test?
-          if Rails.version < "6.1"
-            ActiveRecord::Base.connection_pool.current_pool.disconnect!
-          else
-            ActiveRecord::Base.connection_pool.disconnect!
-          end
+          ActiveRecord::Base.connection_pool.disconnect!
         end
       end
     end

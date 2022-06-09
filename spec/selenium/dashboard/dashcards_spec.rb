@@ -85,7 +85,7 @@ describe "dashcards" do
 
     it "redirects to files index", priority: "1" do
       # Icon will not display unless there is a file.
-      add_file(fixture_file_upload("files/example.pdf", "application/pdf"), @course, "example.pdf")
+      add_file(fixture_file_upload("example.pdf", "application/pdf"), @course, "example.pdf")
       get "/"
 
       f("a.files").click
@@ -103,7 +103,7 @@ describe "dashcards" do
       @course.discussion_topics.create!(title: "discussion 1", message: "This is a message.")
       @course.assignments.create!(title: "assignment 1", name: "assignment 1")
       create_announcement
-      add_file(fixture_file_upload("files/example.pdf", "application/pdf"), @course, "example.pdf")
+      add_file(fixture_file_upload("example.pdf", "application/pdf"), @course, "example.pdf")
       get "/"
 
       expect(f("a.announcements")).to be_present

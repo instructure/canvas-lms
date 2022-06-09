@@ -68,12 +68,12 @@ module Api::V1
     def versions_json(course, versions, api_context, opts = {})
       # preload for efficiency
       unless opts[:submission]
-        ActiveRecord::Associations::Preloader.new.preload(versions, :versionable)
+        ActiveRecord::Associations.preload(versions, :versionable)
         submissions = versions.map(&:versionable)
-        ActiveRecord::Associations::Preloader.new.preload(versions.map(&:model), :originality_reports)
-        ActiveRecord::Associations::Preloader.new.preload(submissions, :assignment) unless opts[:assignment]
-        ActiveRecord::Associations::Preloader.new.preload(submissions, :user) unless opts[:student]
-        ActiveRecord::Associations::Preloader.new.preload(submissions, :grader)
+        ActiveRecord::Associations.preload(versions.map(&:model), :originality_reports)
+        ActiveRecord::Associations.preload(submissions, :assignment) unless opts[:assignment]
+        ActiveRecord::Associations.preload(submissions, :user) unless opts[:student]
+        ActiveRecord::Associations.preload(submissions, :grader)
         ::Submission.bulk_load_versioned_attachments(versions.map(&:model))
       end
 

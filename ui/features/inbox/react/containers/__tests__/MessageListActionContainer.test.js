@@ -172,6 +172,18 @@ describe('MessageListActionContainer', () => {
       expect(replyButton).not.toBeDisabled()
       expect(replyAllButton).not.toBeDisabled()
     })
+
+    it('should disable replying when canReply is false', async () => {
+      const component = setup({
+        selectedConversations: [{}],
+        canReply: false
+      })
+
+      const replyButton = await component.findByTestId('reply')
+      const replyAllButton = await component.findByTestId('reply-all')
+      expect(replyButton).toBeDisabled()
+      expect(replyAllButton).toBeDisabled()
+    })
   })
 
   it('should have buttons disabled when their disabled states are true', async () => {
@@ -199,9 +211,11 @@ describe('MessageListActionContainer', () => {
   })
 
   it('should have archive disabled when activeMailbox is sent', async () => {
+    const archiveMock = jest.fn()
     const component = setup({
       archiveDisabled: false,
-      activeMailbox: 'sent'
+      activeMailbox: 'sent',
+      onArchive: archiveMock
     })
 
     const archBtn = await component.findByTestId('archive')
@@ -209,26 +223,29 @@ describe('MessageListActionContainer', () => {
   })
 
   it('should show unarchive button when displayUnarchiveButton is true', async () => {
+    const unArchiveMock = jest.fn()
     const component = setup({
       archiveDisabled: false,
-      displayUnarchiveButton: true
+      displayUnarchiveButton: true,
+      onUnarchive: unArchiveMock
     })
 
     const unarchBtn = await component.findByTestId('unarchive')
     expect(unarchBtn).toBeTruthy()
   })
 
-  it('should trigger confirm when unarchiving', async () => {
-    window.confirm = jest.fn(() => true)
+  it('should trigger archive function when unarchiving', async () => {
+    const unArchiveMock = jest.fn()
     const component = setup({
       archiveDisabled: false,
       displayUnarchiveButton: true,
-      selectedConversations: [{test1: 'test1'}, {test2: 'test2'}]
+      selectedConversations: [{test1: 'test1'}, {test2: 'test2'}],
+      onUnarchive: unArchiveMock
     })
 
     const unarchBtn = await component.findByTestId('unarchive')
     fireEvent.click(unarchBtn)
-    expect(window.confirm).toHaveBeenCalled()
+    expect(unArchiveMock).toHaveBeenCalled()
   })
 
   it('should trigger delete function', async () => {

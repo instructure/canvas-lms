@@ -171,7 +171,7 @@ module UserSearch
     def id_sql(users_scope, params)
       users_scope.select("users.*, MAX(current_login_at) as last_login")
                  .joins("LEFT JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id
-          AND pseudonyms.account_id = #{User.connection.quote(params[:account])}
+          AND pseudonyms.account_id = #{User.connection.quote(params[:account].id_for_database)}
           AND pseudonyms.workflow_state = 'active'")
                  .where(id: params[:db_id])
                  .group(:id)
@@ -180,7 +180,7 @@ module UserSearch
     def name_sql(users_scope, params)
       users_scope.select("users.*, MAX(current_login_at) as last_login")
                  .joins("LEFT JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id
-          AND pseudonyms.account_id = #{User.connection.quote(params[:account])}
+          AND pseudonyms.account_id = #{User.connection.quote(params[:account].id_for_database)}
           AND pseudonyms.workflow_state = 'active'")
                  .where(like_condition("users.name"), pattern: params[:pattern])
     end
@@ -189,7 +189,7 @@ module UserSearch
       users_scope.select("users.*, MAX(logins.current_login_at) as last_login")
                  .joins(:pseudonyms)
                  .joins("LEFT JOIN #{Pseudonym.quoted_table_name} AS logins ON logins.user_id = users.id
-          AND logins.account_id = #{User.connection.quote(params[:account])}
+          AND logins.account_id = #{User.connection.quote(params[:account].id_for_database)}
           AND logins.workflow_state = 'active'")
                  .where(pseudonyms: { account_id: params[:account], workflow_state: "active" })
                  .where(like_condition("pseudonyms.unique_id"), pattern: params[:pattern])
@@ -199,7 +199,7 @@ module UserSearch
       users_scope.select("users.*, MAX(logins.current_login_at) as last_login")
                  .joins(:pseudonyms)
                  .joins("LEFT JOIN #{Pseudonym.quoted_table_name} AS logins ON logins.user_id = users.id
-          AND logins.account_id = #{User.connection.quote(params[:account])}
+          AND logins.account_id = #{User.connection.quote(params[:account].id_for_database)}
           AND logins.workflow_state = 'active'")
                  .where(pseudonyms: { account_id: params[:account], workflow_state: ["active", "suspended"] })
                  .where(like_condition("pseudonyms.sis_user_id"), pattern: params[:pattern])
@@ -209,7 +209,7 @@ module UserSearch
       users_scope.select("users.*, MAX(current_login_at) as last_login")
                  .joins(:communication_channels)
                  .joins("LEFT JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id
-          AND pseudonyms.account_id = #{User.connection.quote(params[:account])}
+          AND pseudonyms.account_id = #{User.connection.quote(params[:account].id_for_database)}
           AND pseudonyms.workflow_state = 'active'")
                  .where(communication_channels: { workflow_state: ["active", "unconfirmed"], path_type: params[:path_type] })
                  .where(like_condition("communication_channels.path"), pattern: params[:pattern])

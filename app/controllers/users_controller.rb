@@ -236,7 +236,7 @@ class UsersController < ApplicationController
       @grades = grades_for_presenter(@presenter, @grading_periods)
       js_env grades_for_student_url: grades_for_student_url
 
-      ActiveRecord::Associations::Preloader.new.preload(@observed_enrollments, :course)
+      ActiveRecord::Associations.preload(@observed_enrollments, :course)
 
       @page_title = t(:page_title, "Grades")
       js_bundle :user_grades
@@ -1158,7 +1158,7 @@ class UsersController < ApplicationController
       includes = Array(params[:include])
       planner_overrides = includes.include?("planner_overrides")
       include_course = includes.include?("course")
-      ActiveRecord::Associations::Preloader.new.preload(assignments, :context) if include_course
+      ActiveRecord::Associations.preload(assignments, :context) if include_course
 
       json = assignments.map do |as|
         assmt_json = assignment_json(as, user, session, include_planner_override: planner_overrides)
@@ -1393,7 +1393,7 @@ class UsersController < ApplicationController
             require_sis: false,
             include_all_pseudonyms: true
           )
-        @user.last_login = pseudonyms&.max_by(&:current_login_at)&.current_login_at
+        @user.last_login = pseudonyms&.filter_map(&:current_login_at)&.max
       end
 
       render json: user_json(@user, @current_user, session, includes, @domain_root_account),
@@ -2052,7 +2052,6 @@ class UsersController < ApplicationController
       user_params.delete(:avatar_image)
 
       managed_attributes << :avatar_image
-      user_params[:avatar_image] = {}
       if (token = avatar.try(:[], :token))
         if (av_json = avatar_for_token(@user, token))
           user_params[:avatar_image] = { type: av_json["type"],
@@ -2061,7 +2060,10 @@ class UsersController < ApplicationController
       elsif (url = avatar.try(:[], :url))
         user_params[:avatar_image] = { url: url }
       end
-      user_params[:avatar_image][:state] = avatar.try(:[], :state)
+
+      if (state = avatar.try(:[], :state))
+        user_params[:avatar_image] = { state: state }
+      end
     end
 
     if managed_attributes.empty? || !user_params.except(*managed_attributes).empty?

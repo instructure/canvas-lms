@@ -16,13 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import PropTypes from 'prop-types'
+import {useScope as useI18nScope} from '@canvas/i18n'
+import {initializeReaderButton} from '@canvas/immersive-reader/ImmersiveReader'
 
-export const alignmentShape = PropTypes.shape({
-  id: PropTypes.string.isRequired,
-  type: PropTypes.oneOf(['Assignment', 'Rubric']).isRequired,
-  title: PropTypes.string.isRequired,
-  url: PropTypes.string.isRequired,
-  moduleTitle: PropTypes.string,
-  moduleUrl: PropTypes.string
-})
+const I18n = useI18nScope('syllabus')
+
+export function attachImmersiveReaderButton(mountPoints) {
+  const title = I18n.t('Course Syllabus')
+  const content = () => document.querySelector('#course_syllabus').innerHTML
+  mountPoints.forEach(node => {
+    initializeReaderButton(node, {content, title})
+  })
+}

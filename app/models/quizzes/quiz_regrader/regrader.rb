@@ -35,7 +35,7 @@ module Quizzes::QuizRegrader
       Quizzes::QuizRegradeRun.perform(regrade) do
         submissions.each do |submission|
           Quizzes::QuizRegrader::Submission.new(
-            submission: submission,
+            submission: submission.untaken? ? submission.submitted_attempts.last : submission,
             question_regrades: question_regrades
           ).regrade!
         end
@@ -50,7 +50,7 @@ module Quizzes::QuizRegrader
       # Using a class level scope here because if a restored "model" from a quiz
       # version is passed (e.g. during the grade_submission method on SubmissionGrader
       # submissions), the association will always be empty.
-      @submissions ||= Quizzes::QuizSubmission.where(quiz_id: quiz.id).select(&:completed?)
+      @submissions ||= Quizzes::QuizSubmission.where(quiz_id: quiz.id).select { |qs| qs.completed? || qs.untaken? }
     end
 
     private
@@ -67,7 +67,7 @@ module Quizzes::QuizRegrader
 
     # quiz question regrades keyed by question id
     def question_regrades
-      @questions ||= @quiz.current_quiz_question_regrades.index_by(&:quiz_question_id)
+      @question_regrades ||= @quiz.current_quiz_question_regrades.index_by(&:quiz_question_id)
     end
   end
 end

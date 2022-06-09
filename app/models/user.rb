@@ -1941,7 +1941,7 @@ class User < ActiveRecord::Base
         end
         pending_enrollments = temporary_invitations
         unless pending_enrollments.empty?
-          ActiveRecord::Associations::Preloader.new.preload(pending_enrollments, :course)
+          ActiveRecord::Associations.preload(pending_enrollments, :course)
           res.concat(pending_enrollments.map do |e|
             c = e.course
             c.primary_enrollment_type = e.type
@@ -2004,7 +2004,7 @@ class User < ActiveRecord::Base
         Canvas::Builders::EnrollmentDateBuilder.preload_state(enrollments)
       end
       if opts[:preload_courses]
-        ActiveRecord::Associations::Preloader.new.preload(enrollments, :course)
+        ActiveRecord::Associations.preload(enrollments, :course)
       end
       enrollments
     end
@@ -2020,7 +2020,10 @@ class User < ActiveRecord::Base
       enrollments << pending_enrollment
     end
     enrollments += temporary_invitations
-    ActiveRecord::Associations::Preloader.new.preload(enrollments, :course) if opts[:preload_course]
+
+    if opts[:preload_course]
+      ActiveRecord::Associations.preload(enrollments, :course)
+    end
     enrollments
   end
 
@@ -2190,7 +2193,7 @@ class User < ActiveRecord::Base
           submissions = submissions.uniq
           submissions.first(limit)
 
-          ActiveRecord::Associations::Preloader.new.preload(submissions, [{ assignment: :context }, :user, :submission_comments])
+          ActiveRecord::Associations.preload(submissions, [{ assignment: :context }, :user, :submission_comments])
           submissions
         end
       end
@@ -2744,7 +2747,7 @@ class User < ActiveRecord::Base
                     else
                       favorites + courses.reject { |c| can_favorite.call(c) }
                     end
-    ActiveRecord::Associations::Preloader.new.preload(@menu_courses, :enrollment_term)
+    ActiveRecord::Associations.preload(@menu_courses, :enrollment_term)
     @menu_courses
   end
 

@@ -449,4 +449,19 @@ describe ContextModuleProgression do
       @progression.save!
     end
   end
+
+  describe "for_course" do
+    before do
+      @course1 = @course
+      @course2 = course_factory(active_all: true)
+      @course2.context_modules.create!(name: "another module")
+    end
+
+    it "returns only progressions for the provided course" do
+      cmp1 = ContextModuleProgression.create!(user: @user, context_module: @course1.context_modules.first)
+      cmp2 = ContextModuleProgression.create!(user: @user, context_module: @course2.context_modules.first)
+      expect(ContextModuleProgression.for_course(@course1).first.id).to be(cmp1.id)
+      expect(ContextModuleProgression.for_course(@course2).first.id).to be(cmp2.id)
+    end
+  end
 end

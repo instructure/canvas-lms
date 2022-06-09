@@ -26,8 +26,11 @@ import {mswServer} from '../../../../../../shared/msw/mswServer'
 import React from 'react'
 import waitForApolloLoading from '../../../../util/waitForApolloLoading'
 import {responsiveQuerySizes} from '../../../../util/utils'
-import {render, fireEvent, waitFor} from '@testing-library/react'
-import {ConversationContext} from '../../../../util/constants'
+import {render, fireEvent, waitFor, waitForElementToBeRemoved} from '@testing-library/react'
+import {
+  ConversationContext,
+  CONVERSATION_ID_WHERE_CAN_REPLY_IS_FALSE
+} from '../../../../util/constants'
 
 jest.mock('../../../../util/utils', () => ({
   ...jest.requireActual('../../../../util/utils'),
@@ -73,6 +76,7 @@ describe('MessageDetailContainer', () => {
     onDelete = jest.fn(),
     onForward = jest.fn(),
     setOnSuccess = jest.fn(),
+    setCanReply = jest.fn(),
     overrideProps = {}
   } = {}) =>
     render(
@@ -85,6 +89,7 @@ describe('MessageDetailContainer', () => {
               onReplyAll={onReplyAll}
               onDelete={onDelete}
               onForward={onForward}
+              setCanReply={setCanReply}
               {...overrideProps}
             />
           </ConversationContext.Provider>
@@ -99,6 +104,17 @@ describe('MessageDetailContainer', () => {
         const container = setup()
         expect(container).toBeTruthy()
         expect(container.queryByTestId('submission-comment-header-line')).toBeNull()
+      })
+
+      it('should not render the reply or reply_all option in header if student lacks permission', async () => {
+        const container = setup({
+          conversation: {...Conversation.mock({_id: CONVERSATION_ID_WHERE_CAN_REPLY_IS_FALSE})}
+        })
+        await waitForApolloLoading()
+        await waitForElementToBeRemoved(() => container.queryByTestId('conversation-loader'))
+
+        expect(container.queryByTestId('message-detail-header-reply-btn')).not.toBeInTheDocument()
+        expect(container.queryByTestId('message-reply')).not.toBeInTheDocument()
       })
 
       it('should render conversation information correctly', async () => {

@@ -31,3 +31,5 @@ const conversationContextDefaultValues = {
   setIsSubmissionCommentsType: () => {}
 }
 export const ConversationContext = React.createContext(conversationContextDefaultValues)
+
+export const CONVERSATION_ID_WHERE_CAN_REPLY_IS_FALSE = '129'

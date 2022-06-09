@@ -25,8 +25,8 @@ class CreatePostPolicies < ActiveRecord::Migration[5.1]
     create_table :post_policies do |t|
       t.column :post_manually, :boolean, null: false, default: false
 
-      t.references :course, limit: 8, foreign_key: true
-      t.references :assignment, limit: 8, foreign_key: true, index: true
+      t.references :course, foreign_key: true
+      t.references :assignment, foreign_key: true, index: true
 
       t.index [:course_id, :assignment_id], unique: true
       t.timestamps

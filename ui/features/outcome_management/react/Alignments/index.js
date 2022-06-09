@@ -16,42 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import AlignmentSummaryHeader from './AlignmentSummaryHeader'
-import AlignmentOutcomeItem from './AlignmentOutcomeItem'
+import AlignmentOutcomeItemList from './AlignmentOutcomeItemList'
 import useSearch from '@canvas/outcomes/react/hooks/useSearch'
+
+// Sample data - remove after integration with graphql
+import {
+  totalOutcomes,
+  alignedOutcomes,
+  totalAlignments,
+  totalArtifacts,
+  alignedArtifacts,
+  generateOutcomes
+} from './__tests__/testData'
 
 const AlignmentSummary = () => {
   const {search, onChangeHandler, onClearHandler} = useSearch()
-
-  // Sample data; remove after integration with backend
-  const totalOutcomes = 4200
-  const alignedOutcomes = 3900
-  const totalAlignments = 6800
-  const totalArtifacts = 2400
-  const alignedArtifacts = 2000
-  const title = 'Outcome 123'
-  const description = 'Long outcome description '.repeat(10)
-  const alignments = [
-    {
-      id: '1',
-      type: 'Assignment',
-      title: 'Assignment 1',
-      url: '/courses/1/outcomes/1/alignments/3',
-      moduleTitle: 'Module 1',
-      moduleUrl: '/courses/1/modules/1'
-    },
-    {
-      id: '2',
-      type: 'Rubric',
-      title: 'Rubric 1',
-      url: '/courses/1/outcomes/1/alignments/5',
-      moduleTitle: null,
-      moduleUrl: null
-    }
-  ]
+  const [scrollContainer, setScrollContainer] = useState(null)
 
   return (
     <View data-testid="outcome-alignment-summary">
@@ -71,8 +55,20 @@ const AlignmentSummary = () => {
           </Flex.Item>
         </Flex>
       </View>
-      <View as="div">
-        <AlignmentOutcomeItem title={title} description={description} alignments={alignments} />
+      <View
+        as="div"
+        overflowY="visible"
+        overflowX="auto"
+        width="100%"
+        display="inline-block"
+        position="relative"
+        height="40vh"
+        elementRef={el => setScrollContainer(el)}
+      >
+        <AlignmentOutcomeItemList
+          outcomes={generateOutcomes(5)}
+          scrollContainer={scrollContainer}
+        />
       </View>
     </View>
   )

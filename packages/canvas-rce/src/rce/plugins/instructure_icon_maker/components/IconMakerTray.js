@@ -28,18 +28,24 @@ import {CreateIconMakerForm} from './CreateIconMakerForm'
 import {Footer} from './CreateIconMakerForm/Footer'
 import {buildStylesheet, buildSvg} from '../svg'
 import {statuses, useSvgSettings} from '../svg/settings'
+import {defaultState} from '../reducers/svgSettings'
 import {ICON_MAKER_ATTRIBUTE, ICON_MAKER_DOWNLOAD_URL_ATTR} from '../svg/constants'
 import {FixedContentTray} from '../../shared/FixedContentTray'
 import {useStoreProps} from '../../shared/StoreContext'
 import formatMessage from '../../../../format-message'
 import buildDownloadUrl from '../../shared/buildDownloadUrl'
 import {validIcon} from '../utils/iconValidation'
+import {hasChanges} from '../utils/iconMakerFormHasChanges'
 
 const INVALID_MESSAGE = formatMessage(
   'One of the following styles must be added to save an icon: Icon Color, Outline Size, Icon Text, or Image'
 )
 
-function renderHeader(title, settings, setIsOpen, onKeyDown, isInvalid, onAlertDismissal) {
+const UNSAVED_CHANGES_MESSAGE = formatMessage(
+  'You have unsaved changes in the Icon Maker tray. Do you want to continue without saving these changes?'
+)
+
+function renderHeader(title, settings, onKeyDown, isInvalid, onAlertDismissal, onClose) {
   return (
     <View as="div" background="primary">
       {isInvalid && (
@@ -63,7 +69,7 @@ function renderHeader(title, settings, setIsOpen, onKeyDown, isInvalid, onAlertD
               <CloseButton
                 placement="static"
                 variant="icon"
-                onClick={() => setIsOpen(false)}
+                onClick={onClose}
                 onKeyDown={onKeyDown}
                 data-testid="icon-maker-close-button"
               >
@@ -109,6 +115,18 @@ function renderFooter(status, onClose, handleSubmit, editing, replaceAll, setRep
     </View>
   )
 }
+
+const closeTrayFromCancel = (initialSettings, currentSettings) => {
+  let shouldCloseTray = true
+  if (hasChanges(initialSettings, currentSettings)) {
+    // RCE already uses browser's confirm dialog for unsaved changes
+    // Its use here in the Icon Maker tray keeps that consistency
+    // eslint-disable-next-line no-restricted-globals, no-alert
+    shouldCloseTray = confirm(UNSAVED_CHANGES_MESSAGE)
+  }
+
+  return shouldCloseTray
+}
 export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
   const nameRef = useRef()
   const applyRef = useRef()
@@ -122,7 +140,13 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
   const [settings, settingsStatus, dispatch] = useSvgSettings(editor, editing, rcsConfig)
   const [status, setStatus] = useState(statuses.IDLE)
   const storeProps = useStoreProps()
-  const onClose = () => setIsOpen(false)
+  const onClose = () => {
+    if (closeTrayFromCancel(initialSettings, settings)) {
+      setIsOpen(false)
+    }
+  }
+
+  const [initialSettings, setInitialSettings] = useState({defaultState})
 
   const onKeyDown = event => {
     if (event.keyCode !== 9) return
@@ -174,7 +198,7 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
         )
       })
       .then(writeIconToRCE)
-      .then(onClose)
+      .then(() => setIsOpen(false))
       .catch(() => setStatus(statuses.ERROR))
   }
 
@@ -198,8 +222,47 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
     editor.insertContent(img.outerHTML)
   }
 
+  const defaultImageSettings = () => {
+    return {
+      mode: '',
+      image: '',
+      imageName: '',
+      icon: '',
+      iconFillColor: '#000000',
+      cropperSettings: null
+    }
+  }
+
+  const replaceInitialSettings = () => {
+    const name = editing ? settings.name : ''
+    const textPosition = editing ? settings.textPosition : defaultState.textPosition
+    const imageSettings =
+      settings.imageSettings && !!settings.imageSettings.mode
+        ? settings.imageSettings
+        : defaultImageSettings()
+
+    setInitialSettings({
+      name,
+      alt: editing ? settings.alt : defaultState.alt,
+      shape: editing ? settings.shape : defaultState.shape,
+      size: settings.size,
+      color: settings.color,
+      outlineSize: settings.outlineSize,
+      outlineColor: settings.outlineColor,
+      text: settings.text,
+      textSize: settings.textSize,
+      textColor: settings.textColor,
+      textBackgroundColor: settings.textBackgroundColor,
+      textPosition,
+      imageSettings
+    })
+  }
+
   useEffect(() => {
     setStatus(settingsStatus)
+    replaceInitialSettings()
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settingsStatus])
 
   const handleAlertDismissal = () => setIsInvalid(false)
@@ -211,7 +274,7 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
       onDismiss={onClose}
       onUnmount={onUnmount}
       renderHeader={() =>
-        renderHeader(title, settings, setIsOpen, onKeyDown, isInvalid, handleAlertDismissal)
+        renderHeader(title, settings, onKeyDown, isInvalid, handleAlertDismissal, onClose)
       }
       renderBody={() =>
         renderBody(settings, dispatch, editor, editing, !replaceAll, nameRef, rcsConfig)

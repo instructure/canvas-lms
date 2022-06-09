@@ -129,12 +129,28 @@ RSpec.describe Mutations::CreateConversation do
     enrollment = @course.enroll_student(new_user)
     enrollment.workflow_state = "active"
     enrollment.save
-    result = run_mutation(recipients: [new_user.id.to_s], body: "yo")
+    result = run_mutation(recipients: [new_user.id.to_s], body: "yo", context_code: @course.asset_string)
 
-    expect(result["errors"]).to be nil
+    expect(result.dig("data", "createConversation", "errors")).to be_nil
     expect(
       result.dig("data", "createConversation", "conversations", 0, "conversation", "conversationMessagesConnection", "nodes", 0, "body")
     ).to eq "yo"
+  end
+
+  it "does not allow creating conversations without context without read_roster permission (the normal case)" do
+    new_user = User.create
+    enrollment = @course.enroll_student(new_user)
+    enrollment.workflow_state = "active"
+    enrollment.save
+    result = run_mutation(recipients: [new_user.id.to_s], body: "yo")
+
+    error = result.dig("data", "createConversation", "errors")[0]
+    expected_result = {
+      attribute: "context_code",
+      message: "Context cannot be blank"
+    }.stringify_keys
+
+    expect(error).to eq(expected_result)
   end
 
   it "does not allow creating conversations in concluded courses for students" do
@@ -255,7 +271,7 @@ RSpec.describe Mutations::CreateConversation do
     end
 
     it "creates a conversation shared by all recipients" do
-      result = run_mutation(recipients: [@new_user1.id.to_s, @new_user2.id.to_s], body: "yo", group_conversation: true)
+      result = run_mutation(recipients: [@new_user1.id.to_s, @new_user2.id.to_s], body: "yo", group_conversation: true, context_code: @course.asset_string)
 
       expect(
         result.dig("data", "createConversation", "conversations", 0, "conversation", "conversationParticipantsConnection", "nodes")
@@ -266,7 +282,7 @@ RSpec.describe Mutations::CreateConversation do
     end
 
     it "creates one conversation per recipient" do
-      result = run_mutation(recipients: [@new_user1.id.to_s, @new_user2.id.to_s], body: "yo", group_conversation: false)
+      result = run_mutation(recipients: [@new_user1.id.to_s, @new_user2.id.to_s], body: "yo", group_conversation: false, context_code: @course.asset_string)
 
       expect(
         result.dig("data", "createConversation", "conversations").count
@@ -275,7 +291,7 @@ RSpec.describe Mutations::CreateConversation do
     end
 
     it "sets the root account id to the participants for group conversations" do
-      result = run_mutation(recipients: [@new_user1.id.to_s, @new_user2.id.to_s], body: "yo", group_conversation: true)
+      result = run_mutation(recipients: [@new_user1.id.to_s, @new_user2.id.to_s], body: "yo", group_conversation: true, context_code: @course.asset_string)
 
       participant_ids = result.dig("data", "createConversation", "conversations", 0, "conversation", "conversationParticipantsConnection", "nodes")
                               .pluck("_id")
@@ -303,12 +319,12 @@ RSpec.describe Mutations::CreateConversation do
     end
 
     it "creates user notes" do
-      run_mutation({ recipients: @students.map(&:id).map(&:to_s), body: "yo", subject: "greetings", user_note: true }, @teacher)
+      run_mutation({ recipients: @students.map(&:id).map(&:to_s), body: "yo", subject: "greetings", user_note: true, context_code: @course.asset_string }, @teacher)
       @students.each { |x| expect(x.user_notes.size).to be(1) }
     end
 
     it "includes the domain root account in the user note" do
-      run_mutation({ recipients: @students.map(&:id).map(&:to_s), body: "hi there", subject: "hi there", user_note: true }, @teacher)
+      run_mutation({ recipients: @students.map(&:id).map(&:to_s), body: "hi there", subject: "hi there", user_note: true, context_code: @course.asset_string }, @teacher)
       note = UserNote.last
       expect(note.root_account_id).to eql Account.default.id
     end
@@ -324,7 +340,7 @@ RSpec.describe Mutations::CreateConversation do
       ).to eql "Invalid recipients"
     end
 
-    it "succeeds for siteadmins with send_messages grants" do
+    it "succeeds for siteadmins with send_messages and read_roster grants" do
       result = run_mutation({ recipients: [User.create.id.to_s], body: "foo" }, site_admin_user)
 
       expect(

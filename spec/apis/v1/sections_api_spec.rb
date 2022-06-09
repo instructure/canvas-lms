@@ -146,6 +146,22 @@ describe SectionsController, type: :request do
       json = api_call(:get, endpoint, params, {})
       expect(json.size).to eq @course2.course_sections.count
     end
+
+    it "returns permissions if specified" do
+      section1 = @course1.default_section
+      section2 = @course1.course_sections.create!(name: "Section 2")
+      enrollment = @user.enrollments.active.where(course: @course1).first
+      enrollment.limit_privileges_to_course_section = true
+      enrollment.save!
+
+      json = api_call(:get, "/api/v1/courses/#{@course1.id}/sections",
+                      { controller: "sections", action: "index", course_id: @course1.id, format: "json" }, { include: "permissions" })
+      expect(json.length).to eq 2
+      section1_json = json.detect { |s| s["id"] == section1.id }
+      section2_json = json.detect { |s| s["id"] == section2.id }
+      expect(section1_json["permissions"]["manage_calendar"]).to be_truthy
+      expect(section2_json["permissions"]["manage_calendar"]).to be_falsey
+    end
   end
 
   describe "#show" do

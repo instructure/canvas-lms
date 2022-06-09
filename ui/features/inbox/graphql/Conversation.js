@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {arrayOf, shape, string} from 'prop-types'
+import {arrayOf, bool, shape, string} from 'prop-types'
 import {ConversationMessage} from './ConversationMessage'
 import {ConversationParticipant} from './ConversationParticipant'
 import gql from 'graphql-tag'
+import {PageInfo} from './PageInfo'
 import {User} from './User'
 
 export const Conversation = {
@@ -31,6 +32,7 @@ export const Conversation = {
       contextType
       contextName
       subject
+      canReply
       conversationParticipantsConnection {
         nodes {
           ...ConversationParticipant
@@ -47,6 +49,7 @@ export const Conversation = {
     contextType: string,
     contextName: string,
     subject: string,
+    canReply: bool,
     conversationMessagesConnection: shape({
       nodes: arrayOf(ConversationMessage.shape)
     }),
@@ -62,6 +65,7 @@ export const Conversation = {
     contextType = 'Course',
     contextName = 'XavierSchool',
     subject = 'testing 123',
+    canReply = true,
     conversationMessagesConnection = {
       nodes: [
         ConversationMessage.mock(),
@@ -88,6 +92,7 @@ export const Conversation = {
           ]
         })
       ],
+      pageInfo: PageInfo.mock({hasNextPage: false}),
       __typename: 'ConversationMessageConnection'
     },
     conversationParticipantsConnection = {
@@ -122,6 +127,7 @@ export const Conversation = {
     subject,
     conversationMessagesConnection,
     conversationParticipantsConnection,
+    canReply,
     __typename: 'Conversation'
   })
 }

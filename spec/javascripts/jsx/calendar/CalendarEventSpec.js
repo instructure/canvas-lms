@@ -57,6 +57,9 @@ QUnit.module('Calendar', () => {
         await fetch()
         const requests = server.filterRequests('/sections')
         strictEqual(requests.length, 2)
+        requests.forEach(r => {
+          ok(r.url.includes('include[]=permissions'))
+        })
       })
 
       test('hides spinner when all requests succeed', async () => {

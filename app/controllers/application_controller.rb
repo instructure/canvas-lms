@@ -318,7 +318,7 @@ class ApplicationController < ActionController::Base
     product_tours files_dnd usage_rights_discussion_topics
     granular_permissions_manage_users create_course_subaccount_picker
     lti_deep_linking_module_index_menu_modal lti_multiple_assignment_deep_linking buttons_and_icons_root_account
-    extended_submission_state
+    extended_submission_state wrap_calendar_event_titles
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes
@@ -637,7 +637,8 @@ class ApplicationController < ActionController::Base
   # Let's just not use the new math handling there.
   def use_new_math_equation_handling?
     !(params[:controller] == "quizzes/quizzes" && params[:action] == "edit") &&
-      params[:controller] != "question_banks"
+      params[:controller] != "question_banks" &&
+      params[:controller] != "eportfolio_entries"
   end
 
   def user_url(*opts)

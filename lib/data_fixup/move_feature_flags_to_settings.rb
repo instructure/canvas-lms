@@ -44,13 +44,13 @@ module DataFixup::MoveFeatureFlagsToSettings
     return if account.settings.dig(setting_name, :locked)
 
     account.sub_accounts.find_in_batches do |sub_accounts|
-      ActiveRecord::Associations::Preloader.new.preload(sub_accounts, :feature_flags, FeatureFlag.where(feature: feature_flag_name))
+      ActiveRecord::Associations.preload(sub_accounts, :feature_flags, FeatureFlag.where(feature: feature_flag_name))
       sub_accounts.each do |sub_account|
         migrate_ff_overrides_to_inherited_recurse(sub_account, feature_flag_name, setting_name)
       end
     end
     account.courses.find_in_batches do |courses|
-      ActiveRecord::Associations::Preloader.new.preload(courses, :feature_flags, FeatureFlag.where(feature: feature_flag_name))
+      ActiveRecord::Associations.preload(courses, :feature_flags, FeatureFlag.where(feature: feature_flag_name))
       courses.each do |course|
         figure_setting_from_override(course, feature_flag_name, setting_name, inherited: false)
       end

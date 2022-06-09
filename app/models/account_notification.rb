@@ -127,8 +127,8 @@ class AccountNotification < ActiveRecord::Base
             announcement.enrollment_role_ids(user, account_ids: sub_account_ids_map[global_account_id])
           end
           # preload role objects for those enrollments and account users
-          ActiveRecord::Associations::Preloader.new.preload(enrollments, [:role])
-          ActiveRecord::Associations::Preloader.new.preload(account_users, [:role])
+          ActiveRecord::Associations.preload(enrollments, [:role])
+          ActiveRecord::Associations.preload(account_users, [:role])
 
           # map to role ids. user role.id instead of role_id to trigger Role#id
           # magic for built in roles. announcements intended for users not

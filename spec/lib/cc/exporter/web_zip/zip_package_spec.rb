@@ -663,7 +663,7 @@ describe "ZipPackage" do
       end
 
       it "exports files" do
-        add_file(fixture_file_upload("files/amazing_file.txt", "plain/txt"), @course, "amazing_file.txt")
+        add_file(fixture_file_upload("amazing_file.txt", "plain/txt"), @course, "amazing_file.txt")
         zip_package = create_zip_package
         course_data = zip_package.parse_course_data
         expect(course_data[:files]).to eq [{ type: "file", name: "amazing_file.txt", size: 26, files: nil }]
@@ -683,8 +683,8 @@ describe "ZipPackage" do
 
       it "does not export items not linked elsewhere" do
         @course.assignments.create!(title: "Assignment 1")
-        add_file(fixture_file_upload("files/amazing_file.txt", "plain/txt"), @course, "amazing_file.txt")
-        file = add_file(fixture_file_upload("files/cn_image.jpg", "image/jpg"), @course, "cn_image.jpg")
+        add_file(fixture_file_upload("amazing_file.txt", "plain/txt"), @course, "amazing_file.txt")
+        file = add_file(fixture_file_upload("cn_image.jpg", "image/jpg"), @course, "cn_image.jpg")
         @module.content_tags.create!(content: file, context: @course, indent: 0)
         zip_package = create_zip_package
         course_data = zip_package.parse_course_data
@@ -694,7 +694,7 @@ describe "ZipPackage" do
 
       it "exports items that are module items" do
         assign = @course.assignments.create!(title: "Assignment 1", description: "<p>Hi</p>")
-        file = add_file(fixture_file_upload("files/amazing_file.txt", "plain/txt"), @course, "amazing_file.txt")
+        file = add_file(fixture_file_upload("amazing_file.txt", "plain/txt"), @course, "amazing_file.txt")
         @module.content_tags.create!(content: assign, context: @course, indent: 0)
         @module.content_tags.create!(content: file, context: @course, indent: 0)
         zip_package = create_zip_package
@@ -766,7 +766,7 @@ describe "ZipPackage" do
       end
 
       it "exports files linked from module items" do
-        file = add_file(fixture_file_upload("files/amazing_file.txt", "plain/txt"), @course, "amazing_file.txt")
+        file = add_file(fixture_file_upload("amazing_file.txt", "plain/txt"), @course, "amazing_file.txt")
         assign = @course.assignments.create!(title: "Assignment 1",
                                              description: "<a href=\"/courses/#{@course.id}/files/#{file.id}/download?wrap=1\">Link</a>")
         @module.content_tags.create!(content: assign, context: @course, indent: 0)
@@ -779,7 +779,7 @@ describe "ZipPackage" do
       end
 
       it "exports items linked from other linked items" do
-        file = add_file(fixture_file_upload("files/amazing_file.txt", "plain/txt"), @course, "amazing_file.txt")
+        file = add_file(fixture_file_upload("amazing_file.txt", "plain/txt"), @course, "amazing_file.txt")
         assign = @course.assignments.create!(title: "Assignment 1",
                                              description: "<a href=\"/courses/#{@course.id}/files/#{file.id}\">Link</a>")
         page = @course.wiki_pages.create!(title: "Page 1", wiki: @course.wiki,
@@ -797,12 +797,12 @@ describe "ZipPackage" do
       end
 
       it "exports media files linked from other linked items" do
-        media = add_file(fixture_file_upload("files/292.mp3", "audio/mpeg"), @course, "292.mp3")
+        media = add_file(fixture_file_upload("292.mp3", "audio/mpeg"), @course, "292.mp3")
         image =
-          add_file(fixture_file_upload("files/cn_image.jpg", "image/jpg"), @course, "cn_image.jpg")
+          add_file(fixture_file_upload("cn_image.jpg", "image/jpg"), @course, "cn_image.jpg")
         text =
           add_file(
-            fixture_file_upload("files/amazing_file.txt", "plain/txt"),
+            fixture_file_upload("amazing_file.txt", "plain/txt"),
             @course,
             "amazing_file.txt"
           )
@@ -880,7 +880,7 @@ describe "ZipPackage" do
       end
 
       it "doesn't blow up when content is exported with a special reference without a path" do
-        media = add_file(fixture_file_upload("files/292.mp3", "audio/mpeg"), @course, "292.mp3")
+        media = add_file(fixture_file_upload("292.mp3", "audio/mpeg"), @course, "292.mp3")
         page =
           @course.wiki_pages.create!(
             title: "Home Page",
@@ -920,7 +920,7 @@ describe "ZipPackage" do
 
       it "exports items linked as images" do
         due_at = 1.day.ago
-        file = add_file(fixture_file_upload("files/cn_image.jpg", "image/jpg"), @course, "cn_image.jpg")
+        file = add_file(fixture_file_upload("cn_image.jpg", "image/jpg"), @course, "cn_image.jpg")
         survey = @course.quizzes.create!(title: "Survey 1", due_at: due_at, quiz_type: "survey",
                                          description: "<img src=\"/courses/#{@course.id}/files/#{file.id}\" />")
         survey.publish!
@@ -964,7 +964,7 @@ describe "ZipPackage" do
 
       it "exports linked file items in sub-folders" do
         folder = @course.folders.create!(name: "folder#1", parent_folder: Folder.root_folders(@course).first)
-        file = add_file(fixture_file_upload("files/cn_image.jpg", "image/jpg"), @course, "cn_image.jpg", folder)
+        file = add_file(fixture_file_upload("cn_image.jpg", "image/jpg"), @course, "cn_image.jpg", folder)
         disc = @course.discussion_topics.create!(title: "Discussion 1",
                                                  message: "<img src=\"/courses/#{@course.id}/files/#{file.id}\" />")
         @module.content_tags.create!(content: disc, context: @course, indent: 0)
@@ -989,8 +989,8 @@ describe "ZipPackage" do
       end
 
       it "does not mark locked items as exported" do
-        file = add_file(fixture_file_upload("files/amazing_file.txt", "plain/txt"), @course, "amazing_file.txt")
-        file2 = add_file(fixture_file_upload("files/cn_image.jpg", "image/jpg"), @course, "cn_image.jpg")
+        file = add_file(fixture_file_upload("amazing_file.txt", "plain/txt"), @course, "amazing_file.txt")
+        file2 = add_file(fixture_file_upload("cn_image.jpg", "image/jpg"), @course, "cn_image.jpg")
         page = @course.wiki_pages.create!(title: "Page 1", wiki: @course.wiki,
                                           body: "<p>stuff</p>")
         @module.content_tags.create!(content: file2, context: @course)

@@ -685,7 +685,7 @@ class Course < ActiveRecord::Base
     else
       if courses_or_course_ids.first.is_a? Course
         courses = courses_or_course_ids
-        ActiveRecord::Associations::Preloader.new.preload(courses, course_sections: :nonxlist_course)
+        ActiveRecord::Associations.preload(courses, course_sections: :nonxlist_course)
         course_ids = courses.map(&:id)
       else
         course_ids = courses_or_course_ids
@@ -2130,7 +2130,7 @@ class Course < ActiveRecord::Base
   end
 
   def generate_grade_publishing_csv_output(enrollments, publishing_user, publishing_pseudonym, include_final_grade_overrides: false)
-    ActiveRecord::Associations::Preloader.new.preload(enrollments, { user: :pseudonyms })
+    ActiveRecord::Associations.preload(enrollments, { user: :pseudonyms })
 
     enrollment_ids = []
 
@@ -3842,7 +3842,7 @@ class Course < ActiveRecord::Base
   end
 
   def self.preload_menu_data_for(courses, user, preload_favorites: false)
-    ActiveRecord::Associations::Preloader.new.preload(courses, :enrollment_term)
+    ActiveRecord::Associations.preload(courses, :enrollment_term)
     # preload favorites and nicknames
     favorite_ids = preload_favorites && user.favorite_context_ids("Course")
     nicknames = user.all_course_nicknames(courses)

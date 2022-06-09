@@ -48,6 +48,7 @@ import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import 'jquery-tinypubsub'
 import 'jqueryui/button'
+import 'jqueryui/tooltip'
 
 const I18n = useI18nScope('calendar')
 
@@ -350,6 +351,12 @@ export default class Calendar {
     }
     this.closeEventPopups()
     this.drawNowLine()
+    if (ENV.FEATURES.wrap_calendar_event_titles && _view.name === 'month') {
+      // add a delay to wait until the calendar elements get resized
+      setTimeout(() => {
+        $.each($('.fc-event'), (i, e) => this.renderTooltipIfNeeded($(e)))
+      }, 1000)
+    }
   }
 
   eventRender = (event, element, _view) => {
@@ -385,14 +392,16 @@ export default class Calendar {
       }
     }
 
-    $element.attr(
-      'title',
-      $.trim(
-        `${timeString}\n${$element.find('.fc-title').text()}\n\n${I18n.t('Calendar:')} ${htmlEscape(
-          event.contextInfo.name
-        )} ${htmlEscape(reservedText)}`
-      )
-    )
+    const newTitle =
+      ENV.FEATURES.wrap_calendar_event_titles && _view.name === 'month'
+        ? $.trim(element.find('.fc-title').text())
+        : $.trim(
+            `${timeString}\n${$element.find('.fc-title').text()}\n\n${I18n.t(
+              'Calendar:'
+            )} ${htmlEscape(event.contextInfo.name)} ${htmlEscape(reservedText)}`
+          )
+
+    $element.attr('title', newTitle)
     $element
       .find('.fc-content')
       .prepend(
@@ -451,6 +460,30 @@ export default class Calendar {
         },
         view
       )
+    }
+
+    if (ENV.FEATURES.wrap_calendar_event_titles && view.name === 'month') {
+      this.renderTooltipIfNeeded(element)
+    }
+  }
+
+  renderTooltipIfNeeded = element => {
+    const availableWidth = element.find('.fc-content').width()
+    const iconWidth = element.find('i').width()
+    const timeWidth = element.find('.fc-time').width()
+    const titleWidth = element.find('.fc-title').width()
+    const requiredRowWidth = titleWidth + iconWidth + timeWidth
+    if (requiredRowWidth > availableWidth) {
+      element.tooltip({
+        position: {my: 'center bottom', at: 'center top-10', collision: 'fit fit'},
+        tooltipClass: 'center bottom vertical',
+        show: {delay: 300}
+      })
+      element.data('title', element.attr('title'))
+    } else if (element.data('ui-tooltip')) {
+      element.tooltip('destroy')
+      // sometimes unbinding the tooltip clears the title attribute of the element, let's add it back
+      element.attr('title', element.data('title'))
     }
   }
 

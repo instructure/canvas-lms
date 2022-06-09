@@ -94,7 +94,7 @@ describe('Preview', () => {
       const event = {deltaY: -25}
       fireEvent.wheel(container.firstChild, event)
       await waitFor(() => {
-        expect(dispatch).toHaveBeenCalledWith({type: 'SetScaleRatio', payload: 1.125})
+        expect(dispatch).toHaveBeenCalledWith({type: 'SetScaleRatio', payload: 1.13})
       })
     })
 
@@ -104,7 +104,7 @@ describe('Preview', () => {
       const event = {deltaY: 25}
       fireEvent.wheel(container.firstChild, event)
       await waitFor(() => {
-        expect(dispatch).toHaveBeenCalledWith({type: 'SetScaleRatio', payload: 1.875})
+        expect(dispatch).toHaveBeenCalledWith({type: 'SetScaleRatio', payload: 1.88})
       })
     })
   })
@@ -116,7 +116,7 @@ describe('Preview', () => {
       fireEvent.wheel(container.firstChild, event)
       await waitFor(() => {
         const img = container.querySelector('img')
-        expect(img.style.transform).toEqual('scale(1.125)')
+        expect(img.style.transform).toEqual('scale(1.13)')
       })
     })
 
@@ -127,7 +127,7 @@ describe('Preview', () => {
       fireEvent.wheel(container.firstChild, event)
       await waitFor(() => {
         const img = container.querySelector('img')
-        expect(img.style.transform).toEqual('scale(1.875)')
+        expect(img.style.transform).toEqual('scale(1.88)')
       })
     })
   })

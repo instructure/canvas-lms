@@ -23,6 +23,8 @@ require_relative "../graphql_spec_helper"
 describe Types::ConversationType do
   before(:once) do
     student_in_course(active_all: true)
+    @student2 = @student
+    student_in_course(active_all: true)
     @student.update!(name: "Morty Smith")
     @teacher.update!(name: "Rick Sanchez")
     conversation(@student, @teacher, { body: "You sold a gun to a murderer so you could play video games?" })
@@ -41,9 +43,48 @@ describe Types::ConversationType do
         media_comment: media_object
       }
     )
+    @student_conversation = Conversation.initiate([@student2, @student], false, context_type: "Course", context_id: @course.id)
   end
 
   let(:conversation_type) { GraphQLTypeTester.new(@conversation.conversation, current_user: @teacher) }
+
+  context "conversation can_reply permission" do
+    let(:conversation_students_type) { GraphQLTypeTester.new(@student_conversation, current_user: @student2) }
+
+    context "student message permission is off" do
+      before do
+        @course.account.role_overrides.create!(permission: :send_messages, role: student_role, enabled: false)
+        @course.account.role_overrides.create!(permission: :send_messages_all, role: student_role, enabled: false)
+      end
+
+      it "returns false when conversation is between students" do
+        result = conversation_students_type.resolve("canReply")
+        expect(result).to eq(false)
+      end
+
+      it "returns true when conversation is between teacher and student" do
+        result = conversation_type.resolve("canReply")
+        expect(result).to eq(true)
+      end
+    end
+
+    context "student message permission is on" do
+      before do
+        @course.account.role_overrides.create!(permission: :send_messages, role: student_role, enabled: true)
+        @course.account.role_overrides.create!(permission: :send_messages_all, role: student_role, enabled: true)
+      end
+
+      it "returns true when conversation is between students" do
+        result = conversation_students_type.resolve("canReply")
+        expect(result).to eq(true)
+      end
+
+      it "returns true when conversation is between teacher and student" do
+        result = conversation_type.resolve("canReply")
+        expect(result).to eq(true)
+      end
+    end
+  end
 
   context "conversationMessages" do
     it "returns conversation messages" do

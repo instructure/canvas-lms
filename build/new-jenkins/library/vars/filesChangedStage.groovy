@@ -75,6 +75,4 @@ def call(stageConfig) {
   if (env.GERRIT_PROJECT != 'canvas-lms') {
     sh "rm -vrf $LOCAL_WORKDIR@tmp"
   }
-
-  distribution.stashBuildScripts()
 }

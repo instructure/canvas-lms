@@ -20,11 +20,13 @@
 require_relative "../common"
 require_relative "../helpers/calendar2_common"
 require_relative "../../helpers/k5_common"
+require_relative "./pages/calendar_page"
 
 describe "calendar2" do
   include_context "in-process server selenium tests"
   include Calendar2Common
   include K5Common
+  include CalendarPage
 
   before(:once) do
     Account.find_or_create_by!(id: 0).update(name: "Dummy Root Account", workflow_state: "deleted", root_account_id: nil)
@@ -272,6 +274,41 @@ describe "calendar2" do
         event_content = fj(".event-details-content:visible")
         expect(event_content.find_element(:css, ".event-details-timestring").text)
           .to eq "#{format_date_for_view(new_date, "%b %d")}, #{start_time} - #{end_time}"
+      end
+
+      it "lets teachers set a date for each section where they have permission" do
+        section1 = @course.default_section
+        section2 = @course.course_sections.create!
+
+        limited_teacher_role = custom_teacher_role("Limited teacher", account: Account.default)
+        RoleOverride.create!(context: Account.default, permission: "manage_calendar", role: limited_teacher_role, enabled: false)
+        @course.enroll_teacher(@user, enrollment_state: :active, section: section1)
+        @course.enroll_teacher(@user, role: limited_teacher_role, enrollment_state: :active, section: section2)
+        @user.enrollments.update_all(limit_privileges_to_course_section: true)
+
+        now = Time.zone.now.beginning_of_day
+        event = @course.calendar_events.build title: "Today Event",
+                                              child_event_data: [
+                                                { start_at: now, end_at: 5.minutes.from_now(now), context_code: section1.asset_string },
+                                                { start_at: 5.minutes.from_now(now), end_at: 10.minutes.from_now(now), context_code: section2.asset_string }
+                                              ]
+        event.updating_user = account_admin_user
+        event.save!
+
+        get "/courses/#{@course.id}/calendar_events/#{event.id}/edit"
+        expect(use_section_dates_checkbox.attribute("checked")).to be_truthy
+        expect(use_section_dates_checkbox.attribute("disabled")).to be_truthy
+        expect(f("#section_#{section1.id}_start_date").attribute("disabled")).to be_falsey
+        expect(f("#section_#{section2.id}_start_date").attribute("disabled")).to be_truthy
+        expect(f("#section_#{section1.id}_start_date+button").attribute("disabled")).to be_falsey
+        expect(f("#section_#{section2.id}_start_date+button").attribute("disabled")).to be_truthy
+
+        replace_content(f("#section_#{section1.id}_start_date"), "")
+        f("#editCalendarEventFull button[type=submit]").click
+        wait_for_ajaximations
+        wait_for_new_page_load { f(".ui-dialog .ui-dialog-buttonset .btn-primary").click }
+        wait_for_ajaximations
+        expect(event.reload.child_events.length).to be 1
       end
     end
   end

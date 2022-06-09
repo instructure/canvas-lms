@@ -110,7 +110,7 @@ const Divider = () => (
   </View>
 )
 
-export const CreateGroupSetModal = ({
+export const CreateOrEditSetModal = ({
   closed,
   onDismiss,
   studentSectionCount,
@@ -341,7 +341,7 @@ export const CreateGroupSetModal = ({
 
 // TODO: I think allowSelfSignup and context are both conveying the same information...
 // check this and remove the redundant prop if true
-CreateGroupSetModal.propTypes = {
+CreateOrEditSetModal.propTypes = {
   closed: bool,
   onDismiss: func,
   studentSectionCount: number,
@@ -351,7 +351,7 @@ CreateGroupSetModal.propTypes = {
   mockApi: func
 }
 
-CreateGroupSetModal.defaultProps = {
+CreateOrEditSetModal.defaultProps = {
   closed: false,
   onDismiss: Function.prototype
 }
@@ -366,14 +366,14 @@ export function renderCreateDialog(div, mockApi) {
   return new Promise(resolve => {
     function onDismiss(result) {
       ReactDOM.render(
-        <CreateGroupSetModal allowSelfSignup={ENV.allow_self_signup} mockApi={mockApi} closed />,
+        <CreateOrEditSetModal allowSelfSignup={ENV.allow_self_signup} mockApi={mockApi} closed />,
         div
       )
       resolve(result)
     }
     const context = ENV.context_asset_string.split('_')
     ReactDOM.render(
-      <CreateGroupSetModal
+      <CreateOrEditSetModal
         studentSectionCount={ENV.student_section_count}
         context={context[0]}
         contextId={context[1]}

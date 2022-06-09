@@ -1120,7 +1120,7 @@ class Account < ActiveRecord::Base
       end
     end
     unless (preload_values = all.preload_values).empty?
-      ActiveRecord::Associations::Preloader.new.preload(result, preload_values)
+      ActiveRecord::Associations.preload(result, preload_values)
     end
     result
   end

@@ -58,83 +58,6 @@ const MessageListActionContainer = props => {
 
   const hasSelectedConversations = () => props.selectedConversations.length > 0
 
-  const removeOutOfScopeConversationsFromCache = (cache, result) => {
-    if (result.data.updateConversationParticipants.errors) {
-      return
-    }
-
-    const conversationsFromCache = JSON.parse(
-      JSON.stringify(cache.readQuery(props.conversationsQueryOptions))
-    )
-    const conversationParticipantIDsFromResult =
-      result.data.updateConversationParticipants.conversationParticipants.map(cp => cp._id)
-
-    const updatedCPs = conversationsFromCache.legacyNode.conversationsConnection.nodes.filter(
-      conversationParticipant =>
-        !conversationParticipantIDsFromResult.includes(conversationParticipant._id)
-    )
-    conversationsFromCache.legacyNode.conversationsConnection.nodes = updatedCPs
-    cache.writeQuery({...props.conversationsQueryOptions, data: conversationsFromCache})
-  }
-
-  const handleArchiveComplete = data => {
-    const archiveSuccessMsg = I18n.t(
-      {
-        one: 'Message Archived!',
-        other: 'Messages Archived!'
-      },
-      {count: props.selectedConversations.length}
-    )
-    if (data.updateConversationParticipants.errors) {
-      // keep delete button enabled since deletion returned errors
-      props.archiveToggler(false)
-      setOnFailure(I18n.t('Archive operation failed'))
-    } else {
-      props.archiveToggler(true)
-      props.onConversationRemove(props.selectedConversations)
-      setOnSuccess(archiveSuccessMsg) // screenReaderOnly
-    }
-  }
-
-  const handleUnarchiveComplete = data => {
-    const unarchiveSuccessMsg = I18n.t(
-      {
-        one: 'Message Unarchived!',
-        other: 'Messages Unarchived!'
-      },
-      {count: props.selectedConversations.length}
-    )
-    if (data.updateConversationParticipants.errors) {
-      // keep delete button enabled since deletion returned errors
-      props.archiveToggler(true)
-      setOnFailure(I18n.t('Unarchive operation failed'))
-    } else {
-      props.archiveToggler(false)
-      props.onConversationRemove(props.selectedConversations)
-      setOnSuccess(unarchiveSuccessMsg) // screenReaderOnly
-    }
-  }
-
-  const [archiveConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
-    update: removeOutOfScopeConversationsFromCache,
-    onCompleted(data) {
-      handleArchiveComplete(data)
-    },
-    onError() {
-      setOnFailure(I18n.t('Archive operation failed'))
-    }
-  })
-
-  const [unarchiveConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
-    update: removeOutOfScopeConversationsFromCache,
-    onCompleted(data) {
-      handleUnarchiveComplete(data)
-    },
-    onError() {
-      setOnFailure(I18n.t('Unarchive operation failed'))
-    }
-  })
-
   const [readStateChangeConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
     onCompleted(data) {
       if (data.updateConversationParticipants.errors) {
@@ -153,43 +76,6 @@ const MessageListActionContainer = props => {
     },
     onError() {
       setOnFailure(I18n.t('Read state change failed'))
-    }
-  })
-
-  const firstConversation =
-    props.selectedConversations.length > 0 ? props.selectedConversations[0] : {}
-
-  const myConversationParticipant = firstConversation?.participants?.find(
-    node => node.user._id === ENV.current_user_id
-  )
-  const firstConversationIsStarred = myConversationParticipant?.label === 'starred'
-
-  const [starConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
-    onCompleted: () => {
-      if (firstConversationIsStarred) {
-        setOnSuccess(
-          I18n.t(
-            {
-              one: 'The conversation has been successfully unstarred.',
-              other: 'The conversations has been successfully unstarred.'
-            },
-            {count: props.selectedConversations.length}
-          )
-        )
-      } else {
-        setOnSuccess(
-          I18n.t(
-            {
-              one: 'The conversation has been successfully starred.',
-              other: 'The conversations has been successfully starred.'
-            },
-            {count: props.selectedConversations.length}
-          )
-        )
-      }
-    },
-    onError: () => {
-      setOnFailure(I18n.t('There was an unexpected error updating the conversation participants.'))
     }
   })
 
@@ -239,61 +125,6 @@ const MessageListActionContainer = props => {
 
   if (error) {
     setOnFailure(I18n.t('Unable to load courses menu.'))
-  }
-
-  const handleArchive = () => {
-    const archiveConfirmMsg = I18n.t(
-      {
-        one: 'Are you sure you want to archive your copy of this conversation?',
-        other: 'Are you sure you want to archive your copy of these conversations?'
-      },
-      {count: props.selectedConversations.length}
-    )
-
-    const confirmResult = window.confirm(archiveConfirmMsg) // eslint-disable-line no-alert
-    if (confirmResult) {
-      archiveConversationParticipants({
-        variables: {
-          conversationIds: props.selectedConversations.map(convo => convo._id),
-          workflowState: 'archived'
-        }
-      })
-    } else {
-      // confirm message was cancelled by user
-      props.archiveToggler(false)
-    }
-  }
-
-  const handleUnarchive = () => {
-    const unarchiveConfirmMsg = I18n.t(
-      {
-        one: 'Are you sure you want to unarchive your copy of this conversation?',
-        other: 'Are you sure you want to unarchive your copy of these conversations?'
-      },
-      {count: props.selectedConversations.length}
-    )
-
-    const confirmResult = window.confirm(unarchiveConfirmMsg) // eslint-disable-line no-alert
-    if (confirmResult) {
-      unarchiveConversationParticipants({
-        variables: {
-          conversationIds: props.selectedConversations.map(convo => convo._id),
-          workflowState: 'read'
-        }
-      })
-    } else {
-      // confirm message was cancelled by user
-      props.archiveToggler(false)
-    }
-  }
-
-  const handleStar = starred => {
-    starConversationParticipants({
-      variables: {
-        conversationIds: props.selectedConversations.map(convo => convo._id),
-        starred
-      }
-    })
   }
 
   const handleMarkAsUnread = () => {
@@ -410,8 +241,8 @@ const MessageListActionContainer = props => {
               padding={responsiveProps.messageActionButtons.padding}
             >
               <MessageActionButtons
-                archive={props.displayUnarchiveButton ? undefined : handleArchive}
-                unarchive={props.displayUnarchiveButton ? handleUnarchive : undefined}
+                archive={props.displayUnarchiveButton ? undefined : props.onArchive}
+                unarchive={props.displayUnarchiveButton ? props.onUnarchive : undefined}
                 archiveDisabled={props.archiveDisabled || props.activeMailbox === 'sent'}
                 compose={props.onCompose}
                 delete={() => props.onDelete()}
@@ -421,9 +252,9 @@ const MessageListActionContainer = props => {
                 markAsRead={handleMarkAsRead}
                 reply={props.onReply}
                 replyAll={props.onReplyAll}
-                replyDisabled={!hasSelectedConversations()}
-                star={!firstConversationIsStarred ? () => handleStar(true) : null}
-                unstar={firstConversationIsStarred ? () => handleStar(false) : null}
+                replyDisabled={!hasSelectedConversations() || !props.canReply}
+                star={!props.firstConversationIsStarred ? () => props.onStar(true) : null}
+                unstar={props.firstConversationIsStarred ? () => props.onStar(false) : null}
                 settingsDisabled={!hasSelectedConversations()}
                 shouldRenderMarkAsRead={shouldRenderMarkAsRead()}
                 shouldRenderMarkAsUnread={shouldRenderMarkAsUnread()}
@@ -449,17 +280,19 @@ MessageListActionContainer.propTypes = {
   onReply: PropTypes.func,
   onReplyAll: PropTypes.func,
   onForward: PropTypes.func,
+  onArchive: PropTypes.func,
+  onUnarchive: PropTypes.func,
   deleteDisabled: PropTypes.bool,
-  archiveToggler: PropTypes.func,
   archiveDisabled: PropTypes.bool,
-  onConversationRemove: PropTypes.func,
   displayUnarchiveButton: PropTypes.bool,
-  conversationsQueryOptions: PropTypes.object,
+  firstConversationIsStarred: PropTypes.bool,
+  onStar: PropTypes.func,
   onDelete: PropTypes.func,
-  activeCourseFilter: PropTypes.string
+  activeCourseFilter: PropTypes.string,
+  canReply: PropTypes.bool
 }
 
 MessageListActionContainer.defaultProps = {
   selectedConversations: [],
-  conversationsQueryOptions: {}
+  canReply: true
 }

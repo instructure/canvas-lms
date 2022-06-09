@@ -44,7 +44,8 @@ const defaultMediaObject = (overrides = {}) => ({
 })
 
 describe('CanvasMediaPlayer', () => {
-  describe('rendering', () => {
+  // MAT-885
+  describe.skip('rendering', () => {
     beforeAll(() => {
       // put the flash_screenreader_holder into the dom
       let d = document.createElement('div')

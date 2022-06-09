@@ -35,11 +35,7 @@ class StudentEnrollment < Enrollment
   end
 
   def evaluate_modules
-    ContextModuleProgression.for_user(user_id)
-                            .joins(:context_module)
-                            .readonly(false)
-                            .where(context_modules: { context_type: "Course", context_id: course_id })
-                            .each(&:mark_as_outdated!)
+    ContextModuleProgression.for_user(user_id).for_course(course_id).each(&:mark_as_outdated!)
   end
 
   def update_override_score(override_score:, grading_period_id: nil, updating_user:, record_grade_change: true)

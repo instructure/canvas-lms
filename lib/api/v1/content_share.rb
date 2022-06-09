@@ -50,14 +50,14 @@ module Api::V1::ContentShare
   end
 
   def preload_content_exports(content_shares, additional_associations)
-    ActiveRecord::Associations::Preloader.new.preload(content_shares, [
-                                                        { content_export: %i[
-                                                          context
-                                                          job_progress
-                                                          attachment
-                                                        ] },
-                                                        *additional_associations
-                                                      ])
+    ActiveRecord::Associations.preload(content_shares, [
+                                         { content_export: %i[
+                                           context
+                                           job_progress
+                                           attachment
+                                         ] },
+                                         *additional_associations
+                                       ])
   end
 
   def sent_content_shares_json(content_shares, user, session, opts = {})

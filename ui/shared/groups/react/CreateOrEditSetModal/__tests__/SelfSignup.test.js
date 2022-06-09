@@ -32,7 +32,7 @@ function Wrapper({state, props}) {
 const defaultProps = {onChange: Function.prototype}
 const both = [true, false]
 
-describe('CreateGroupSetModal::SelfSignup::', () => {
+describe('CreateOrEditSetModal::SelfSignup::', () => {
   describe('checkboxes', () => {
     both.forEach(checked => {
       const v = checked ? 'checked' : 'unchecked'

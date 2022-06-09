@@ -22,7 +22,7 @@
 
   {{#if course_sections}}
     <label class="label_with_checkbox" for="use_section_dates">
-      {{checkbox "use_section_dates"}}
+      {{checkbox "use_section_dates" disabled=disableSectionDates}}
       {{#t "different_date_for_each_section"}}Use a different date for each section{{/t}}
     </label>
 
@@ -34,30 +34,48 @@
       {{#each course_sections}}
       <label class="row_header" for="section_{{id}}_start_date">{{name}}</label>
       <div class="date_start_end_row">
-        <div class="date_field_container">
+        <div class="date_field_container"
+             {{#unless this.permissions.manage_calendar}}
+                data-tooltip
+                title="{{#t}}You don't have permission to edit this section.{{/t}}"
+                tabindex="0"
+             {{/unless}}>
           <input type="text"
                  id="section_{{id}}_start_date"
                  name="child_event_data[{{id}}][start_date]"
                  class="date_field start_date"
                  value="{{tDateToString event.start_at "medium"}}"
+                 {{#unless this.permissions.manage_calendar}}disabled{{/unless}}
                  aria-label="{{#t "date"}}Date{{/t}}"
                  placeholder="{{#t "date"}}Date{{/t}}" />
         </div>
         <div class="time_range_container">
-          <div class='date_field_container'>
+          <div class='date_field_container'
+               {{#unless this.permissions.manage_calendar}}
+                  data-tooltip
+                  title="{{#t}}You don't have permission to edit this section.{{/t}}"
+                  tabindex="0"
+               {{/unless}}>
             <input type="text"
                    name="child_event_data[{{id}}][start_time]"
                    class="time_field start_time"
                    {{#unless all_day}} value="{{tTimeToString event.start_at "tiny"}}" {{/unless}}
+                   {{#unless this.permissions.manage_calendar}}disabled{{/unless}}
                    aria-label="{{#t "start_time"}}Start Time{{/t}}"
                    placeholder="{{#t "start_time"}}Start Time{{/t}}" />
           </div>
           <span class="time_separator">-</span>
-          <div class='date_field_container'>
-            <input type="text"
+          <div class='date_field_container'
+               {{#unless this.permissions.manage_calendar}}
+                   data-tooltip
+                   title="{{#t}}You don't have permission to edit this section.{{/t}}"
+                   tabindex="0"
+               {{/unless}}>
+          <input type="text"
                    name="child_event_data[{{id}}][end_time]"
                    class="time_field end_time"
                    {{#unless all_day}} value="{{tTimeToString event.end_at "tiny"}}" {{/unless}}
+                   {{#unless this.permissions.manage_calendar}}disabled{{/unless}}
                    aria-label="{{#t "end_time"}}End Time{{/t}}"
                    placeholder="{{#t "end_time"}}End Time{{/t}}" />
             <input type="hidden"

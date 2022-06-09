@@ -23,7 +23,7 @@ class CreateOutcomeProficiencies < ActiveRecord::Migration[5.1]
 
   def change
     create_table :outcome_proficiencies do |t|
-      t.belongs_to :account, index: { unique: true }, foreign_key: true, limit: 8, null: false
+      t.belongs_to :account, index: { unique: true }, foreign_key: true, null: false
 
       t.timestamps
     end

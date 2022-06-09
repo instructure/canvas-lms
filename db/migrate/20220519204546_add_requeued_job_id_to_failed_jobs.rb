@@ -17,14 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class ExampleCountRecorder
-  RSpec::Core::Formatters.register self, :dump_summary
+class AddRequeuedJobIdToFailedJobs < ActiveRecord::Migration[6.0]
+  tag :predeploy
 
-  def initialize(output)
-    @output = output
-  end
-
-  def dump_summary(output)
-    @output << output.examples.count
+  def change
+    add_column :failed_jobs, :requeued_job_id, :integer, limit: 8
   end
 end

@@ -22,9 +22,7 @@ require "folio/core_ext/enumerable"
 module Folio::WillPaginate::ActiveRecord::Pagination
   def paginate(options = {})
     unless options.key?(:total_entries)
-      scope = if ::Rails.version < "4"
-                scoped
-              elsif is_a?(::ActiveRecord::Relation)
+      scope = if is_a?(::ActiveRecord::Relation)
                 self
               elsif self < ::ActiveRecord::Base
                 all
@@ -40,13 +38,9 @@ module Folio::WillPaginate::ActiveRecord::Pagination
             # total_entries left to an auto-count, but the relation being
             # paginated has a grouping. we need to do a special count, lest
             # self.count give us a hash instead of the integer we expect.
-            having_clause_empty = Rails.version < "5" ? scope.having_values.empty? : scope.having_clause.empty?
+            having_clause_empty = scope.having_clause.empty?
             options[:total_entries] = if having_clause_empty && group_values.length == 1 # multi-column distinct counts are broken right now (as of rails 4.2.5) :(
-                                        if Rails.version < "5"
-                                          except(:group, :select).select(group_values).uniq.count
-                                        else
-                                          except(:group, :select).select(group_values).distinct.count
-                                        end
+                                        except(:group, :select).select(group_values).distinct.count
                                       else
                                         unscoped.from("(#{to_sql}) a").count
                                       end

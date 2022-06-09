@@ -30,10 +30,10 @@ module Lti
 
       def memberships
         @memberships ||= begin
-          ActiveRecord::Associations::Preloader.new.preload(users, :pseudonym)
-          ActiveRecord::Associations::Preloader.new.preload(users, :communication_channels, CommunicationChannel.email.unretired)
-          ActiveRecord::Associations::Preloader.new.preload(users, :not_ended_enrollments, Enrollment.where(course_id: context))
-          ActiveRecord::Associations::Preloader.new.preload(users, :past_lti_ids, UserPastLtiId.where(context: context))
+          ActiveRecord::Associations.preload(users, :pseudonym)
+          ActiveRecord::Associations.preload(users, :communication_channels, CommunicationChannel.email.unretired)
+          ActiveRecord::Associations.preload(users, :not_ended_enrollments, Enrollment.where(course_id: context))
+          ActiveRecord::Associations.preload(users, :past_lti_ids, UserPastLtiId.where(context: context))
           users.map do |user|
             generate_membership(user)
           end

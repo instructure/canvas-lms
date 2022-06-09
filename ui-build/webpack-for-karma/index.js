@@ -43,6 +43,7 @@ module.exports = {
     noParse: [
       path.join(canvasDir, 'node_modules/tinymce/'),
       path.join(canvasDir, 'node_modules/i18nliner/dist/lib/i18nliner.js'),
+      path.join(canvasDir, 'node_modules/@instructure/i18nliner/dist/lib/i18nliner.js'),
     ],
     rules: [
       {

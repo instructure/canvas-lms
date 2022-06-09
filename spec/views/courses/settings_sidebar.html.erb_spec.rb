@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "courses/_settings_sidebar.html.erb" do
+describe "courses/_settings_sidebar" do
   before do
     course_with_teacher(active_all: true)
     @course.sis_source_id = "so_special_sis_id"

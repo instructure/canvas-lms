@@ -1146,6 +1146,7 @@ describe "Users API", type: :request do
             p4 = @u.pseudonyms.create!(account: @account, unique_id: "p4")
             p4.current_login_at = 4.minutes.ago
             p4.save!
+            @u.pseudonyms.create!(account: @account, unique_id: "p5") # never logged in
           end
           @shard2.activate do
             account = Account.create!
@@ -1740,7 +1741,7 @@ describe "Users API", type: :request do
         user = User.find(json["id"])
         json.delete("avatar_url")
         expect(json).to eq({
-                             "avatar_state" => "approved",
+                             "avatar_state" => "none",
                              "name" => "Tobias Funke",
                              "sortable_name" => "Funke, Tobias",
                              "sis_user_id" => "sis-user-id",
@@ -1956,7 +1957,6 @@ describe "Users API", type: :request do
       it "sets avatar state manually by an admin" do
         @student.avatar_state = "approved"
         @student.save!
-
         json = api_call(:put, @path, @path_options, {
                           user: {
                             avatar: {
@@ -1966,6 +1966,22 @@ describe "Users API", type: :request do
                         })
         user = User.find(json["id"])
         expect(user.avatar_state).to eql :locked
+      end
+
+      it "retains avatar image_url on user update" do
+        image_url = "http://localhost/images/thumbnails/27/wRx60Hn9sqs6OJMaEndzKz62hatAJSC7BNanraCD"
+        image_source = "attachment"
+        state = :approved
+        @student.avatar_image_url = image_url
+        @student.avatar_image_source = image_source
+        @student.avatar_state = state
+        @student.avatar_image_updated_at = Time.now.utc
+        @student.save!
+        json = api_call(:put, @path, @path_options, { user: { name: "New Name", email: "somenewemail@example.com" } })
+        user = User.find(json["id"])
+        expect(user.avatar_state).to eq state
+        expect(user.avatar_image_url).to eq image_url
+        expect(user.avatar_image_source).to eq image_source
       end
 
       it "does not allow the user's avatar to be set to an external url" do

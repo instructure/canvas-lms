@@ -17,7 +17,11 @@
 
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import template from '../../jst/WikiPageRevision.handlebars'
+import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
+
+const I18n = useI18nScope('pages')
 
 export default class WikiPageRevisionView extends Backbone.View {
   static initClass() {
@@ -75,7 +79,15 @@ export default class WikiPageRevisionView extends Backbone.View {
     return window.location
   }
 
-  restore(ev) {
+  async restore(ev) {
+    const restore = await showConfirmationDialog({
+      label: I18n.t('Confirm Restore'),
+      body: I18n.t('Are you sure you want to restore this revision?'),
+      confirmText: I18n.t('Restore')
+    })
+
+    if (!restore) return
+
     if ((ev != null ? ev.type : undefined) === 'keydown') {
       if (ev.keyCode !== 13) return
     }
