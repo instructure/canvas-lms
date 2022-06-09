@@ -167,6 +167,17 @@ describe ObserverEnrollmentsHelper do
     expect(observed_users(nil, nil)).to eq []
   end
 
+  it "returns up to MAX_OBSERVED_USERS users" do
+    stub_const("ObserverEnrollmentsHelper::MAX_OBSERVED_USERS", 2)
+    @course1.enroll_teacher(@observer) # non-observer enrollment not counted toward limit of 2
+    enroll_observer(@course1, @observer, @student1)
+    enroll_observer(@course1, @observer, @student2)
+    enroll_observer(@course2, @observer, @student1)
+
+    users = observed_users(@observer, nil)
+    expect(users.length).to be(3)
+  end
+
   context "sharding" do
     specs_require_sharding
 
