@@ -34,7 +34,7 @@ class SkippedSpecsManager
 
   def determine_settings
     @path_to_specs = if @mode == "ruby"
-                       "/tmp/rspec_results"
+                       "/tmp/*_rspec_results"
                      else
                        "/tmp/js-results"
                      end

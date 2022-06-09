@@ -51,18 +51,20 @@ def redisUrl() {
 def generateSkippedSpecsReport() {
   try{
     copyArtifacts(
-      filter: 'tmp/*_rspec_results/**',
+      filter: 'tmp/*/rspec_results.tgz',
       optional: false,
       projectName: env.JOB_NAME,
       selector: specific(env.BUILD_NUMBER),
     )
+
+    sh "ls tmp/*/rspec_results.tgz | xargs -n1 tar xvf"
 
     withEnv(['COMPOSE_FILE=docker-compose.new-jenkins.yml']) {
       withCredentials([usernamePassword(credentialsId: 'INSENG_CANVAS_CI_AWS_ACCESS', usernameVariable: 'INSENG_AWS_ACCESS_KEY_ID', passwordVariable: 'INSENG_AWS_SECRET_ACCESS_KEY')]) {
         def awsCreds = "AWS_DEFAULT_REGION=us-west-2 AWS_ACCESS_KEY_ID=${INSENG_AWS_ACCESS_KEY_ID} AWS_SECRET_ACCESS_KEY=${INSENG_AWS_SECRET_ACCESS_KEY}"
         sh "$awsCreds aws s3 cp s3://instructure-canvas-ci/skipped_specs_ruby.json skipped_specs.json"
         sh """
-          docker-compose run -v \$(pwd)/\$LOCAL_WORKDIR/tmp/rspec_results/:/tmp/rspec_results \
+          docker-compose run -v \$(pwd)/\$LOCAL_WORKDIR/tmp/:/tmp \
           -v \$(pwd)/\$LOCAL_WORKDIR/skipped_specs.json/:/usr/src/app/skipped_specs.json \
           --name skipped-spec-collator canvas bash -c \
           "bundle install; ruby build/new-jenkins/skipped_specs_manager.rb ruby"

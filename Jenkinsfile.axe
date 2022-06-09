@@ -108,11 +108,13 @@ pipeline {
         }
 
         copyArtifacts(
-          filter: 'tmp/*_rspec_results/**',
+          filter: 'tmp/*/rspec_results.tgz',
           optional: false,
           projectName: env.JOB_NAME,
           selector: specific(env.BUILD_NUMBER),
         )
+
+        sh "ls tmp/*/rspec_results.tgz | xargs -n1 tar xvf"
 
         withEnv(['COMPOSE_FILE=docker-compose.new-jenkins.yml']) {
           sh """
