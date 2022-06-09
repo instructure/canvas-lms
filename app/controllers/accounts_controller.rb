@@ -410,7 +410,7 @@ class AccountsController < ApplicationController
   #       -H 'Authorization: Bearer <token>'
   #
   # @example_response
-  #   {"usage_rights_required": true, "lock_all_announcements": true, "restrict_student_past_view": true}
+  #   {"microsoft_sync_enabled": true, "microsoft_sync_login_attribute_suffix": false}
   def show_settings
     return render_unauthorized_action unless @account.grants_right?(@current_user, session, :manage_account_settings)
 
