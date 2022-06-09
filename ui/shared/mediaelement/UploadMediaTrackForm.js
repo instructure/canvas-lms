@@ -40,6 +40,7 @@ export default class UploadMediaTrackForm {
     this.$dialog = $(template(templateVars))
       .appendTo('body')
       .dialog({
+        close: () => this.$dialog.remove(),
         width: 650,
         resizable: false,
         buttons: [
