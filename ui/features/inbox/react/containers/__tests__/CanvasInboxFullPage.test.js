@@ -144,18 +144,6 @@ describe('CanvasInbox Full Page', () => {
       expect(checkbox.checked).toBeFalsy()
     })
 
-    it('should trigger confirm when deleting from MessageListActions', async () => {
-      window.confirm = jest.fn(() => true)
-      const container = setup()
-
-      const conversation = await container.findByTestId('conversationListItem-Checkbox')
-      fireEvent.click(conversation)
-
-      const deleteBtn = await container.findByTestId('delete')
-      fireEvent.click(deleteBtn)
-      expect(window.confirm).toHaveBeenCalled()
-    })
-
     it('should trigger confirm when deleting from message kebab menu', async () => {
       window.confirm = jest.fn(() => true)
       const container = setup()
