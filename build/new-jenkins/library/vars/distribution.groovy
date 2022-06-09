@@ -17,13 +17,11 @@
  */
 
 def stashBuildScripts() {
-  stash name: 'build-dir', includes: 'build/**/*'
-  stash name: 'build-docker-compose', includes: 'docker-compose.*.yml'
+  stash name: 'build-files', includes: 'build/**/*,docker-compose.*.yml'
 }
 
 def unstashBuildScripts() {
-  unstash name: 'build-dir'
-  unstash name: 'build-docker-compose'
+  unstash name: 'build-files'
 }
 
 return this
