@@ -349,6 +349,7 @@ describe "context modules" do
       end
 
       it "shows the nav when going straight to the item if there's only one tag" do
+        skip("LS-3185 - footer not always showing up")
         @assignment = @course.assignments.create!(title: "some assignment")
         @atag1 = @module_1.add_item(id: @assignment.id, type: "assignment")
         @after1 = @module_1.add_item(type: "external_url", title: "url1", url: "http://example.com/1")
