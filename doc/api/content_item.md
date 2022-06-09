@@ -71,12 +71,12 @@ with LTI 1.1 tools:
 > **institution through your CSM.**
 
 * course_assignments_menu:
-Appears in the dropdown menu in the top left of the assignments page. Allows users that
+Appears in the dropdown menu in the top right of the assignments page. Allows users that
 have permission to create module items to launch to a tool, select one or many deep
 links, and return them as module items or assignments.
 
 * module_index_menu_modal:
-Appears in the dropdown menu in the top left of the modules page. Allows users that
+Appears in the dropdown menu in the top right of the modules page. Allows users that
 have permission to create module items to launch to a tool, select one or many deep
 links, and return them as module items or assignments. Adds all returned deep links
 to a newly created module.
