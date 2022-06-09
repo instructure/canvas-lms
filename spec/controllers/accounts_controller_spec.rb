@@ -1301,6 +1301,14 @@ describe AccountsController do
       expect(response.headers.to_a.find { |a| a.first == "Link" }.last).to_not include("last")
     end
 
+    it "sets pagination total_pages/last page link if includes total entries is set" do
+      admin_logged_in(@account)
+      get "courses_api", params: { account_id: @account.id, per_page: 1, include: ["total_entries"] }
+
+      expect(response).to be_successful
+      expect(response.headers.to_a.find { |a| a.first == "Link" }.last).to include("last")
+    end
+
     it "properly removes sections from includes" do
       @s1 = @course.course_sections.create!
       @course.enroll_student(user_factory(active_all: true), section: @s1, allow_multiple_enrollments: true)
