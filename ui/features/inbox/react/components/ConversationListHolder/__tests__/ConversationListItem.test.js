@@ -125,20 +125,15 @@ describe('ConversationListItem', () => {
       expect(checkbox.checked).toBe(false)
     })
 
-    it('shows and hides the star button correctly', () => {
+    it('calls onStar on not-starred click', () => {
       const onStarMock = jest.fn()
 
       const props = createProps({onStar: onStarMock})
 
-      const {queryByTestId, getByText} = render(<ConversationListItem {...props} />)
+      const {queryByTestId} = render(<ConversationListItem {...props} />)
 
-      // star not shown by default
-      expect(queryByTestId('visible-not-starred')).not.toBeInTheDocument()
-      // star shown when conversation is moused over
-      const subjectLine = getByText('This is the subject line')
-      fireEvent.mouseOver(subjectLine)
+      // star unstarred by default
       expect(queryByTestId('visible-not-starred')).toBeInTheDocument()
-
       fireEvent.click(queryByTestId('visible-not-starred'))
       expect(onStarMock).toHaveBeenLastCalledWith(true, props.conversation._id)
     })
