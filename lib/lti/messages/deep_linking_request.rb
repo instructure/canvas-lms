@@ -128,7 +128,7 @@ module Lti::Messages
 
     def add_deep_linking_request_claims!
       lti_assignment_id = Lti::Security.decoded_lti_assignment_id(@expander.controller&.params&.[]("secure_params"))
-      assignment = Assignment.find_by(lti_context_id: lti_assignment_id)
+      assignment = Assignment.find_by(lti_context_id: lti_assignment_id) if lti_assignment_id
       @message.deep_linking_settings.deep_link_return_url = assignment ? assignment_return_url(assignment) : return_url
       @message.deep_linking_settings.accept_types = DEEP_LINKING_DETAILS.dig(placement, :accept_types)
       @message.deep_linking_settings.accept_presentation_document_targets = DEEP_LINKING_DETAILS.dig(placement, :document_targets)
