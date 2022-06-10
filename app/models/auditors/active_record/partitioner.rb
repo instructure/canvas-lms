@@ -25,7 +25,8 @@ module Auditors::ActiveRecord
       AuthenticationRecord,
       CourseRecord,
       GradeChangeRecord,
-      FeatureFlagRecord
+      FeatureFlagRecord,
+      PseudonymRecord
     ].freeze
 
     def self.precreate_tables

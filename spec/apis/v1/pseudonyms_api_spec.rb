@@ -434,23 +434,34 @@ describe PseudonymsController, type: :request do
     end
 
     context "an authorized user" do
-      it "is able to delete a pseudonym" do
-        pseudonym = @student.pseudonym
-        @student.pseudonyms.create!(unique_id: "student1@example.com")
-        json = api_call(:delete, @path, @path_options)
-        expect(@student.pseudonyms.active.count).to eql 1
-        expect(json).to eq({
-                             "unique_id" => "student@example.com",
-                             "sis_user_id" => nil,
-                             "integration_id" => nil,
-                             "account_id" => Account.default.id,
-                             "authentication_provider_id" => nil,
-                             "id" => pseudonym.id,
-                             "user_id" => @student.id,
-                             "created_at" => pseudonym.created_at.iso8601,
-                             "workflow_state" => "deleted",
-                             "declared_user_type" => nil
-                           })
+      context "on a user with multiple pseudonyms" do
+        let(:pseudonym) { @student.pseudonym }
+
+        before do
+          @student.pseudonyms.create!(unique_id: "student1@example.com")
+        end
+
+        it "is able to delete a pseudonym" do
+          json = api_call(:delete, @path, @path_options)
+          expect(@student.pseudonyms.active.count).to eql 1
+          expect(json).to eq({
+                               "unique_id" => "student@example.com",
+                               "sis_user_id" => nil,
+                               "integration_id" => nil,
+                               "account_id" => Account.default.id,
+                               "authentication_provider_id" => nil,
+                               "id" => pseudonym.id,
+                               "user_id" => @student.id,
+                               "created_at" => pseudonym.created_at.iso8601,
+                               "workflow_state" => "deleted",
+                               "declared_user_type" => nil
+                             })
+        end
+
+        it "audits the deletion by the performing user" do
+          api_call(:delete, @path, @path_options)
+          expect(pseudonym.auditor_records.where(performing_user: @user)).to exist
+        end
       end
 
       it "receives an error when trying to delete the user's last pseudonym" do

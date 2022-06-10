@@ -637,6 +637,7 @@ describe "API Authentication", type: :request do
     end
 
     it "requires an active pseudonym" do
+      CanvasPartman::PartitionManager.create(Auditors::ActiveRecord::PseudonymRecord).ensure_partitions
       @user.pseudonym.destroy
       get "/api/v1/courses", headers: {
         "HTTP_AUTHORIZATION" => "Bearer #{wrapped_jwt_from_service}"
