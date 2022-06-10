@@ -623,6 +623,16 @@ describe('sources/api', () => {
         })
       })
 
+      it('does not include credentials in a local cross-origin upload', () => {
+        preflightProps.upload_params.success_url = undefined
+        const crossOriginUploadUrl = 'cross-origin.site/files_api'
+        preflightProps.upload_url = crossOriginUploadUrl
+        fetchMock.mock(crossOriginUploadUrl, file)
+        return apiSource.uploadFRD(fileDomObject, preflightProps).then(() => {
+          assert.strictEqual(fetchMock.lastOptions(crossOriginUploadUrl).credentials, undefined)
+        })
+      })
+
       it('handles s3 post-flight', async () => {
         preflightProps.upload_params.success_url = 'success-url'
         const s3File = {url: 's3-file-url'}
