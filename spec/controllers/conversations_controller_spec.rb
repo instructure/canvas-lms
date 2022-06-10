@@ -235,6 +235,8 @@ describe ConversationsController do
     before :once do
       course_with_teacher(active_all: true)
       student_in_course(active_all: true)
+      @student2 = @student
+      student_in_course(active_all: true)
     end
 
     it "creates the conversation" do
@@ -651,6 +653,38 @@ describe ConversationsController do
       @course.update!({ workflow_state: "completed" })
 
       post "add_message", params: { conversation_id: @conversation.conversation_id, body: "hello world", recipients: [@teacher.id.to_s] }
+      expect(response).to be_successful
+      expect(assigns[:conversation]).not_to be_nil
+    end
+
+    it "allows a student to reply to a teacher in a soft-concluded course" do
+      course_with_student_logged_in(active_all: true)
+
+      teacher_convo = @teacher.initiate_conversation([@student])
+      teacher_convo.add_message("test")
+      teacher_convo.conversation.update_attribute(:context, @course)
+
+      @course.conclude_at = 1.day.ago
+      @course.start_at = 2.days.ago
+      @course.restrict_enrollments_to_course_dates = true
+      @course.restrict_student_past_view = true
+      @course.save!
+      post "add_message", params: { conversation_id: teacher_convo.conversation_id, body: "hello world", recipients: [@teacher.id.to_s] }
+      expect(response).to be_successful
+      expect(assigns[:conversation]).not_to be_nil
+    end
+
+    it "allows a teacher to reply to a student in a soft-concluded course" do
+      student_in_course(active_all: true)
+      course_with_teacher_logged_in(active_all: true)
+      conversation
+      @course.conclude_at = 1.day.ago
+      @course.start_at = 2.days.ago
+      @course.restrict_enrollments_to_course_dates = true
+      @course.restrict_student_past_view = true
+      @course.save!
+
+      post "add_message", params: { conversation_id: @conversation.conversation_id, body: "hello world", recipients: [@student.id.to_s] }
       expect(response).to be_successful
       expect(assigns[:conversation]).not_to be_nil
     end
