@@ -6976,6 +6976,22 @@ describe Submission do
         sub = @assignment.submit_homework(@user, attachments: [@attachment])
         expect(sub.attachments).to eq [@attachment]
       end
+
+      it "bulk_load_versioned_attachments works with attachments in a different shard" do
+        course_factory(active_all: true)
+        student = user_factory(active_user: true)
+        attachment = attachment_model(filename: "submission.doc", context: student)
+
+        @course.enroll_user(student, "StudentEnrollment").accept!
+        assignment = @course.assignments.create!
+        submission = assignment.submit_homework(student, attachments: [attachment])
+        submission.update_attribute(:attachment_ids, attachment.id.to_s)
+
+        @shard1.activate do
+          submission_with_attachments = Submission.bulk_load_versioned_attachments([submission]).first
+          expect(submission_with_attachments.versioned_attachments).to eq [attachment]
+        end
+      end
     end
   end
 
