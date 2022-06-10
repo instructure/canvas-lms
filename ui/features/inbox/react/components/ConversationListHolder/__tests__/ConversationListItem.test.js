@@ -86,6 +86,7 @@ describe('ConversationListItem', () => {
       onSelect: jest.fn(),
       onOpen: jest.fn(),
       onStar: jest.fn(),
+      readStateChangeConversationParticipants: jest.fn(),
       ...overrides
     }
   }
@@ -145,6 +146,21 @@ describe('ConversationListItem', () => {
 
       expect(container.getByText('Unread')).toBeInTheDocument()
       expect(container.getByTestId('unread-badge')).toBeInTheDocument()
+    })
+
+    it('should call stopPropagation when clicking the unread badge', () => {
+      const props = createProps({isUnread: true})
+      const container = render(<ConversationListItem {...props} />)
+      const unreadBadge = container.getByTestId('unread-badge')
+
+      const clickEvent = new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true
+      })
+      Object.assign(clickEvent, {stopPropagation: jest.fn()})
+      fireEvent(unreadBadge, clickEvent)
+
+      expect(clickEvent.stopPropagation).toHaveBeenCalledTimes(1)
     })
 
     it('renders the read badge when the conversation is read', () => {
