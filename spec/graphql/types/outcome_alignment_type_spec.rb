@@ -34,6 +34,9 @@ describe Types::OutcomeAlignmentType do
                                    })
     @outcome = outcome_model(context: @course, title: "outcome")
     @outcome_alignment = @outcome.align(@assignment, @course)
+    @module = @course.context_modules.create!(name: "module", workflow_state: "unpublished")
+    @module.add_item type: "assignment", id: @assignment.id
+
     @course.account.enable_feature!(:outcome_alignment_summary)
   end
 
@@ -41,58 +44,76 @@ describe Types::OutcomeAlignmentType do
   let(:outcome_type) { GraphQLTypeTester.new(@outcome, graphql_context) }
 
   describe "returns correct values for alignment fields" do
-    it "_id" do
+    it "returns _id" do
       expect(
         outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { _id }")[0]
       ).to eq @outcome_alignment.id.to_s
     end
 
-    it "learning_outcome_id" do
+    it "returns learning_outcome_id" do
       expect(
         outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { learningOutcomeId }")[0]
       ).to eq @outcome.id.to_s
     end
 
-    it "context_id" do
+    it "returns context_id" do
       expect(
         outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { contextId }")[0]
       ).to eq @course.id.to_s
     end
 
-    it "context_type" do
+    it "returns context_type" do
       expect(
         outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { contextType }")[0]
       ).to eq "Course"
     end
 
-    it "content_id" do
+    it "returns content_id" do
       expect(
         outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { contentId }")[0]
       ).to eq @outcome_alignment.content_id.to_s
     end
 
-    it "content_type" do
+    it "returns content_type" do
       expect(
         outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { contentType }")[0]
       ).to eq "Assignment"
     end
 
-    it "title" do
+    it "returns title" do
       expect(
         outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { title }")[0]
       ).to eq @assignment.title
     end
 
-    it "url" do
+    it "returns url" do
       expect(
         outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { url }")[0]
       ).to eq "/courses/#{@course.id}/outcomes/#{@outcome.id}/alignments/#{@outcome_alignment.id}"
     end
 
-    it "workflowState" do
+    it "returns module_id" do
       expect(
-        outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { workflowState }")[0]
-      ).to eq "active"
+        outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { moduleId }")[0]
+      ).to eq @module.id.to_s
+    end
+
+    it "returns module_name" do
+      expect(
+        outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { moduleName }")[0]
+      ).to eq @module.name
+    end
+
+    it "returns module_url" do
+      expect(
+        outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { moduleUrl }")[0]
+      ).to eq "/courses/#{@course.id}/modules/#{@module.id}"
+    end
+
+    it "returns module_workflow_state" do
+      expect(
+        outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { moduleWorkflowState }")[0]
+      ).to eq @module.workflow_state
     end
   end
 end
