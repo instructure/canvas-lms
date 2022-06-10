@@ -151,14 +151,15 @@ export const ConversationListItem = ({...props}) => {
                     color="primary"
                     data-testid={props.isUnread ? 'unread-badge' : 'read-badge'}
                     margin="x-small"
-                    onClick={() =>
+                    onClick={e => {
+                      e.stopPropagation()
                       props.readStateChangeConversationParticipants({
                         variables: {
                           conversationIds: [props.conversation._id],
                           workflowState: props.isUnread ? 'read' : 'unread'
                         }
                       })
-                    }
+                    }}
                     screenReaderLabel={props.isUnread ? I18n.t('Unread') : I18n.t('Read')}
                     size="small"
                     withBackground={false}
