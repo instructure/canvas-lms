@@ -1072,6 +1072,8 @@ describe "Speedgrader" do
     end
 
     it "opens and closes keyboard shortcut modal via blue info icon", priority: "2" do
+      skip 'EVAL-2497 (6/10/22)'
+
       Speedgrader.click_settings_link
       expect(Speedgrader.keyboard_shortcuts_link).to be_displayed
 
