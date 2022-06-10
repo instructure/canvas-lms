@@ -1808,10 +1808,12 @@ class Submission < ActiveRecord::Base
     attachment_ids_by_submission_and_index = group_attachment_ids_by_submission_and_index(submissions)
     bulk_attachment_ids = attachment_ids_by_submission_and_index.values.flatten
 
-    attachments_by_id = if bulk_attachment_ids.empty?
+    attachments_by_id = if bulk_attachment_ids.empty? || submissions.none?
                           {}
                         else
-                          Attachment.where(id: bulk_attachment_ids).preload(preloads).group_by(&:id)
+                          submissions.first.shard.activate do
+                            Attachment.where(id: bulk_attachment_ids).preload(preloads).group_by(&:id)
+                          end
                         end
 
     submissions.each_with_index do |s, index|
