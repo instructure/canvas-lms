@@ -110,6 +110,12 @@ def postFn(status) {
         gerrit.submitVerified((status == 'SUCCESS' ? '+1' : '-1'), "${env.BUILD_URL}/build-summary-report/")
       }
     }
+
+    build(job: "/Canvas/helpers/junit-uploader", parameters: [
+      string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
+      string(name: 'GERRIT_EVENT_TYPE', value: "${env.GERRIT_EVENT_TYPE}"),
+      string(name: 'SOURCE', value: "${env.JOB_NAME}/${env.BUILD_NUMBER}"),
+    ], propagate: false, wait: false)
   } finally {
     if (status == 'SUCCESS') {
       maybeSlackSendSuccess()
