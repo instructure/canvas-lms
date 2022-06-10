@@ -20,22 +20,35 @@
 
 module Types
   class OutcomeAlignmentType < ApplicationObjectType
-    graphql_name "OutcomeAlignmentType"
+    graphql_name "OutcomeAlignment"
 
-    implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
     implements Interfaces::LegacyIDInterface
 
     global_id_field :id
 
-    field :id, ID, null: false
     field :title, String, null: false
     field :content_id, ID, null: false
     field :content_type, String, null: false
     field :context_id, ID, null: false
     field :context_type, String, null: false
     field :learning_outcome_id, ID, null: false
-    field :workflow_state, String, null: false
     field :url, String, null: false
+    def url
+      [base_context_url.to_s, "outcomes", object.learning_outcome_id, "alignments", object.id].join("/")
+    end
+    field :module_id, String, null: true
+    field :module_name, String, null: true
+    field :module_url, String, null: true
+    def module_url
+      [base_context_url.to_s, "modules", object.module_id].join("/") if object.module_id
+    end
+    field :module_workflow_state, String, null: true
+
+    private
+
+    def base_context_url
+      ["/#{object.context_type.downcase.pluralize}", object.context_id].join("/")
+    end
   end
 end

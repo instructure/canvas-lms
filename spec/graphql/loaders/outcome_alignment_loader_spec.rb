@@ -19,25 +19,30 @@
 #
 
 describe Loaders::OutcomeAlignmentLoader do
-  before do
+  before :once do
     course_model
-    @assignment1 = assignment_model({
-                                      course: @course,
-                                      name: "Assignment 1",
-                                      due_at: nil,
-                                      points_possible: 10,
-                                      submission_types: "online_text_entry,online_upload",
-                                    })
-    @assignment2 = assignment_model({
-                                      course: @course,
-                                      name: "Assignment 2",
-                                      due_at: nil,
-                                      points_possible: 20,
-                                      submission_types: "online_text_entry",
-                                    })
-    @outcome = outcome_model(context: @course, title: "outcome")
-    @alignment1 = @outcome.align(@assignment1, @course)
-    @alignment2 = @outcome.align(@assignment2, @course)
+    outcome_with_rubric
+    # create assignment, discussion assignment and quiz assignment
+    @quiz_item = assignment_quiz([], course: @course, title: "quiz item")
+    @quiz_assignment = @assignment
+    @assignment = @course.assignments.create!(title: "regular assignment")
+    @discussion_assignment = @course.assignments.create!(title: "discussion assignment")
+    @discussion_item = @course.discussion_topics.create!(
+      user: @teacher,
+      title: "discussion item",
+      assignment: @discussion_assignment
+    )
+    # create modules and assignments
+    @module1 = @course.context_modules.create!(name: "module1")
+    @module2 = @course.context_modules.create!(name: "module2", workflow_state: "unpublished")
+    @module1.add_item type: "assignment", id: @assignment.id
+    @module1.add_item type: "discussion_topic", id: @discussion_item.id
+    @module2.add_item type: "quiz", id: @quiz_item.id
+    # align rubric with different assignment types
+    @rubric.associate_with(@assignment, @course, purpose: "grading")
+    @rubric.associate_with(@discussion_assignment, @course, purpose: "grading")
+    @rubric.associate_with(@quiz_assignment, @course, purpose: "grading")
+
     @course.account.enable_feature!(:outcome_alignment_summary)
   end
 
@@ -73,31 +78,58 @@ describe Loaders::OutcomeAlignmentLoader do
     end
   end
 
-  it "resolves alignments properly" do
+  it "resolves to correct number of alignments" do
     GraphQL::Batch.batch do
       Loaders::OutcomeAlignmentLoader.for(
         @course.id, "Course"
-      ).load(@outcome).then do |alignment|
-        expect(alignment.is_a?(Array)).to be_truthy
-        expect(alignment.length).to eq 2
+      ).load(@outcome).then do |alignments|
+        expect(alignments.is_a?(Array)).to be_truthy
+        expect(alignments.length).to eq 4
+      end
+    end
+  end
 
-        expect(alignment[0].id).to eq @alignment1.id
-        expect(alignment[0].content_type).to eq "Assignment"
-        expect(alignment[0].content_id).to eq @assignment1.id
-        expect(alignment[0].context_type).to eq "Course"
-        expect(alignment[0].context_id).to eq @course.id
-        expect(alignment[0].learning_outcome_id).to eq @outcome.id
-        expect(alignment[0].title).to eq @assignment1.title
-        expect(alignment[0].url).to eq "/courses/#{@course.id}/outcomes/#{@outcome.id}/alignments/#{@alignment1.id}"
+  it "resolves outcome alignments to assignment, rubric, quiz and discussion" do
+    GraphQL::Batch.batch do
+      Loaders::OutcomeAlignmentLoader.for(
+        @course.id, "Course"
+      ).load(@outcome).then do |alignments|
+        alignments.each do |alignment|
+          if alignment.content_type == "Assignment"
+            content_id = @assignment.id
+            content_type = "Assignment"
+            module_id = @module1.id
+            module_name = @module1.name
+            module_workflow_state = "active"
+            title = @assignment.title
+            if alignment.title == "discussion item"
+              content_id = @discussion_assignment.id
+              title = @discussion_item.title
+            end
+            if alignment.title == "quiz item"
+              content_id = @quiz_assignment.id
+              module_id = @module2.id
+              module_name = @module2.name
+              module_workflow_state = "unpublished"
+              title = @quiz_item.title
+            end
+          else
+            content_id = @rubric.id
+            content_type = "Rubric"
+            title = @rubric.title
+          end
 
-        expect(alignment[1].id).to eq @alignment2.id
-        expect(alignment[1].content_type).to eq "Assignment"
-        expect(alignment[1].content_id).to eq @assignment2.id
-        expect(alignment[1].context_type).to eq "Course"
-        expect(alignment[1].context_id).to eq @course.id
-        expect(alignment[1].learning_outcome_id).to eq @outcome.id
-        expect(alignment[1].title).to eq @assignment2.title
-        expect(alignment[1].url).to eq "/courses/#{@course.id}/outcomes/#{@outcome.id}/alignments/#{@alignment2.id}"
+          expect(alignment.id).not_to be_nil
+          expect(alignment.content_id).to eq content_id
+          expect(alignment.content_type).to eq content_type
+          expect(alignment.context_id).to eq @course.id
+          expect(alignment.context_type).to eq "Course"
+          expect(alignment.title).to eq title
+          expect(alignment.learning_outcome_id).to eq @outcome.id
+          expect(alignment.module_id).to eq module_id
+          expect(alignment.module_name).to eq module_name
+          expect(alignment.module_workflow_state).to eq module_workflow_state
+        end
       end
     end
   end
