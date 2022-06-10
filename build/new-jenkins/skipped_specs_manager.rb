@@ -83,8 +83,8 @@ class SkippedSpecsManager
   end
 
   def write_to_file
-    puts "writing #{@updated_map.keys.count} spec(s) to '/tmp/#{FILENAME}'"
-    File.write("/tmp/#{FILENAME}", @updated_map.sort_by { |_spec_key, attrs| -attrs[:duration] }.to_h.to_json)
+    puts "writing #{@updated_map.keys.count} spec(s) to '/usr/src/app/out/#{FILENAME}'"
+    File.write("/usr/src/app/out/#{FILENAME}", @updated_map.sort_by { |_spec_key, attrs| -attrs[:duration] }.to_h.to_json)
   end
 end
 

@@ -67,9 +67,9 @@ def generateSkippedSpecsReport() {
           docker-compose run -v \$(pwd)/\$LOCAL_WORKDIR/tmp/:/tmp \
           -v \$(pwd)/\$LOCAL_WORKDIR/skipped_specs.json/:/usr/src/app/skipped_specs.json \
           --name skipped-spec-collator canvas bash -c \
-          "bundle install; ruby build/new-jenkins/skipped_specs_manager.rb ruby"
+          "mkdir -p /usr/src/app/out; bundle install; ruby build/new-jenkins/skipped_specs_manager.rb ruby"
         """
-        sh 'docker cp skipped-spec-collator:/tmp/skipped_specs.json skipped_specs.json'
+        sh 'docker cp skipped-spec-collator:/usr/src/app/out/skipped_specs.json skipped_specs.json'
         sh "$awsCreds aws s3 cp skipped_specs.json s3://instructure-canvas-ci/skipped_specs_ruby.json"
       }
       sendSkippedSpecsSlackReport()
