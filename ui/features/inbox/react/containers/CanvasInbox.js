@@ -519,7 +519,11 @@ const CanvasInbox = () => {
                     {selectedConversations.length > 0 ? (
                       <>
                         {matches.includes('mobile') && (
-                          <View as="div" borderWidth="none none small none">
+                          <View
+                            as="div"
+                            borderWidth="none none small none"
+                            padding="none none none xx-small"
+                          >
                             <Flex>
                               <Flex.Item shouldGrow border>
                                 <CondensedButton
