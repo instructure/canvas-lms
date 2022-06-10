@@ -347,8 +347,11 @@ class RceApiSource {
     })
     data.append('file', fileDomObject)
     const fetchOptions = {method: 'POST', body: data}
-    if (!preflightProps.upload_params['x-amz-signature']) {
-      // _not_ an S3 upload, include the credentials in the upload POST
+
+    if (!preflightProps.upload_params['x-amz-signature'] &&
+        !preflightProps.upload_url.includes('files_api')) {
+         // _not_ an S3 upload, include the credentials in the upload POST
+         // local uploads can include crendentials for same-origin requests
       fetchOptions.credentials = 'include'
     }
     return fetch(preflightProps.upload_url, fetchOptions)
