@@ -161,11 +161,12 @@ module UserSearch
       queries = [name_sql(users_scope, params)]
       if complex_search_enabled?
         queries << id_sql(users_scope, params) if @is_id
+        queries << ids_sql(users_scope, params) unless @is_id
         queries << login_sql(users_scope, params) if @include_login
         queries << sis_sql(users_scope, params) if @include_sis
         queries << email_sql(users_scope, params) if @include_email
       end
-      queries.map(&:to_sql).join("\nUNION\n")
+      queries.compact.map(&:to_sql).join("\nUNION\n")
     end
 
     def id_sql(users_scope, params)
@@ -175,6 +176,22 @@ module UserSearch
           AND pseudonyms.workflow_state = 'active'")
                  .where(id: params[:db_id])
                  .group(:id)
+    end
+
+    def ids_sql(users_scope, params)
+      ids = specific_ids(users_scope, params)
+      return nil unless ids.length.positive?
+
+      users_scope.select("users.*, MAX(current_login_at) as last_login")
+                 .joins("LEFT JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id
+          AND pseudonyms.account_id = #{User.connection.quote(params[:account].id_for_database)}
+          AND pseudonyms.workflow_state = 'active'")
+                 .where(id: ids)
+    end
+
+    # Plugin extension point
+    def specific_ids(_users_scope, _params)
+      []
     end
 
     def name_sql(users_scope, params)
