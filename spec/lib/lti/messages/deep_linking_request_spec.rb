@@ -53,6 +53,17 @@ describe Lti::Messages::DeepLinkingRequest do
       expect(subject["deep_link_return_url"]).to eq assignment_return_url
     end
 
+    context "when assignment with nil lti_context_id exists" do
+      before do
+        a = Assignment.create!(name: "no lti_context_id", context: course)
+        a.update_attribute(:lti_context_id, nil)
+      end
+
+      it "does not use assignment return url" do
+        expect(subject["deep_link_return_url"]).to eq deep_linking_return_url
+      end
+    end
+
     shared_examples_for "sets deep linking attributes" do
       it 'sets the correct "accept_types"' do
         expect(subject["accept_types"]).to match_array accept_types
