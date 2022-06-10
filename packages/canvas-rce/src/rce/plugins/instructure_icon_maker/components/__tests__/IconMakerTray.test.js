@@ -430,7 +430,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
       fetchMock.restore()
     })
 
-    it('renders the create view', () => {
+    it('renders the edit view', () => {
       expect(subject().getByRole('heading', {name: /edit icon/i})).toBeInTheDocument()
     })
 
@@ -456,6 +456,26 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
         expect(getByTestId('colorPreview-#009606')).toBeInTheDocument() // text color
         expect(getByTestId('colorPreview-#E71F63')).toBeInTheDocument() // text background color
         expect(getByLabelText('Text Position').value).toEqual('Below')
+      })
+    })
+
+    describe('when loading the tray', () => {
+      let isLoading
+
+      beforeAll(() => {
+        isLoading = IconMakerTray.isLoading
+        IconMakerTray.isLoading = jest.fn()
+      })
+
+      afterAll(() => {
+        IconMakerTray.isLoading = isLoading
+      })
+
+      it('renders a spinner', () => {
+        IconMakerTray.isLoading.mockReturnValueOnce(true)
+        const {getByText} = subject()
+        const spinner = getByText('Loading...')
+        expect(spinner).toBeInTheDocument()
       })
     })
   })
