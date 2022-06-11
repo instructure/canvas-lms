@@ -3987,6 +3987,7 @@ fa:
   back_to_app_center_95420d83: "بازگشت به مرکز برنامه"
   back_to_assignment_1df86a69: "بازگشت به تکلیف"
   back_to_ref_title_377ea1f0: "بازگشت به %{ref_title}"
+  back_to_subject_80a1eb: "بازگشت به موضوع"
   back_to_table_of_contents_d878b315: "بازگشت به فهرست محتوا"
   back_to_title_39e7a8f4: "بازگشت به %{title}"
   background_color_b92b52ac: "رنگ پس زمینه"
@@ -4019,7 +4020,9 @@ fa:
   behind_31e4e0fe: پشت
   belarusian_b2f19c76: بلاروسی
   belgium_32_e5f5b598: "بلژیک (+32)"
+  below_min_rating_78a742c3: "امتیاز کمتر از حداقل"
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "در زیر این قسمت جستجو، فهرستی از %{content_type} آمده است. وقتی تایپ می کنید، این فهرست برای مطابقت با جستجوی شما فهرست خواهد شد. پیام های گفتگو بر اساس هر گزینه ای که انتخاب می کنید فیلتر خواهد شد."
+  beta_cb5f307e: بتا
   beta_url_3c7b88ec: "نشانی اینترنتی نسخه آزمایشی:"
   better_file_browsing_description: |-
       یک واسط ساده تر و کاربرپسندتر برای مرور فایل ها. اگر آن را در سطح درس
@@ -4032,6 +4035,7 @@ fa:
   between_1_and_99_d421a4c0: "بین یک و ۹۹ درصد"
   between_2_and_5_c34f5152: "بین ۲ تا ۵"
   big_blue_button_conference: 
+    create_time: "زمان ایجاد کنید"
     recording_setting: "در حال ضبط"
     recording_setting_enabled_description: "فعالسازی ضبط برای این کنفرانس"
   blackboard: 
@@ -4127,7 +4131,10 @@ fa:
   bucket_name_must_be_one_of_the_following_bucket_na_81c1be40: "نام سطل باید یکی از موارد زیر باشد: %{bucket_names}"
   bucks_zero_activity_6f9b5ee3: "فعالیت صفر به دست می دهد"
   build_78955b82: ساخت
+  build_name_41ba9e7a: "ساخت %{name}"
   build_pages_containing_content_and_educational_res_6474319f: "صفحات شامل محتوا و منابع آموزشی که به یادگیری دانشجویان کمک می‌کند اما تکلیف نیست، بسازید. صفحات می‌تواند شامل متن، فایل های چندرسانه ای و پیوند به فایل ها و منابع بیرونی باشد."
+  build_quiz_7f4cdc74: "ساخت آزمون"
+  build_quiz_df7e734a: "ساخت آزمون"
   bulgarian_feccab7e: بلغاری
   bulk_course_migration: 
     export_failed: "در هنگام صدور درس با bb_lc٪ {id} از Blackboard خطایی رخ داد"
@@ -4202,6 +4209,7 @@ fa:
       find_outcomes: "یافتن نتایج"
   button: 
     submit_assignment: "ارسال تکلیف"
+  button_a1577211: دکمه
   buttons: 
     add_item: "افزودن مورد"
     apply: اعمال
@@ -4238,6 +4246,7 @@ fa:
     update: "بهنگام سازی"
     view_account_roster: "مشاهده فهرست حساب"
     view_course_roster: "مشاهده فهرست درس"
+  by_b90c6b6f: با
   by_client_id_4f2fe02c: "توسط  شناسه سرویس گیرنده"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "به طور پیش فرض، همه پیوندها برای یک درس فعال هستند. دانشجویان پیوند بخش هایی که محتوا ندارند را نخواهند دید. برای مثال، اگر هیچ آزمونی ایجاد نکرده اید، آنها پیوند آزمون ها را نخواهند دید. اگر نمی خواهید دانشجویان به قسمت هایی از درس دسترسی داشته باشند، می توانید این پیوندها را مرتب کنید و به طور آشکار غیر فعال سازید."
   by_default_students_are_able_to_create_groups_to_r_ba7f2450: |-
@@ -4250,6 +4259,7 @@ fa:
   c_modal_form: 
     close: بستن
   cache_cleared_successfully_9ab84d5a: "حافظه نهان با موفقیت پاک شد"
+  calculation_d82f6181: محاسبه
   calculation_int_is_not_a_valid_value_for_this_calc_1de6e060: "'%{calculation_int}' یک مقدار معتبر برای روش محاسبه است. مقدار باید  بین '%{valid_calculation_ints_min}' و  '%{valid_calculation_ints_max}' باشد"
   calculation_method_fe281f9: "روش محاسبه"
   calculation_method_must_be_one_of_the_following_ca_d8ae5dac: "روش_محاسبه باید یکی از موارد زیر باشد: %{calc_methods}"
@@ -4612,6 +4622,7 @@ fa:
     ics_description_user: "رویداد های تقویم برای کاربر %{user_name}"
     ics_title: "تقویم %{course_or_group_name} (کانواس)"
     invalid_date_or_time: "تاریخ یا تاریخ و زمان برای %{attr} معتبر نیست"
+  calendar_series_e1b7a4bc: "سری های تقویم"
   calendars: 
     event: 
       due: مهلت
@@ -4668,14 +4679,19 @@ fa:
   campusvue_grade_export_b8140422: "صدور نمره CampusVue"
   can_create_and_update_submission_results_for_assig_51e7033d: "می توانید نتایج مورد ارسالی را برای تکالیف مربوط به ابزار ایجاد و به‌هنگام سازی کنید."
   can_create_and_view_assignment_data_in_the_gradebo_ab56f20: "می توانید اطلاعات تکلیف را در دفتر نمره گذاری مربوط به ابزار،  ایجاد و مشاهده کنید."
+  can_create_external_tools_4c293044: "می تواند ابزارهای خارجی ایجاد کند."
   can_create_rename_and_edit_course_pages_by_default_f9ad4253: "می تواند صفحات درس را به طور پیش فرض ایجاد کند، تغییر نام دهد و ویرایش کند"
   can_create_subscription_to_data_service_data_bb2874f2: "می‌تواند در داده سرویس داده پیکربندی ایجاد کند."
+  can_destroy_external_tools_cdb0e734: "می تواند ابزارهای خارجی را از بین ببرد."
   can_destroy_subscription_to_data_service_data_b8dfca27: "می‌تواند در داده سرویس داده پیکربندی را از بین ببرد."
   can_edit_this_page_role_selection_6ccec3c7: "می توان انتخاب نقش این صفحه را ویرایش کرد"
   can_interact_with_users_in_their_section_only_48cb8c43: "فقط می توانید با کاربران در بخش خود تعامل کنید"
   can_list_categorized_event_types_52596f7: "می توانید انواع رویدادهای طبقه بندی شده را لیست کنید."
+  can_list_external_tools_9132ad0f: "می تواند ابزارهای خارجی را فهرست کند."
   can_list_subscriptions_to_data_service_data_b52d5e37: "می‌تواند در داده سرویس داده پیکربندی را لیست کند."
+  can_lookup_account_information_13d69520: "می تواند اطلاعات حساب را جستجو کند"
   can_retrieve_user_data_associated_with_the_context_c5ec482c: "می توانید اطلاعات کاربر را که با زمینه ای که ابزار در آن نصب شده مرتبط است،  بازیابی کنید."
+  can_show_external_tools_bb4988c5: "می تواند ابزارهای خارجی را نشان دهد."
   can_show_subscription_to_data_service_data_688ce3: "می‌تواند در داده سرویس داده پیکربندی را نشان دهد."
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "تا زمانی که یک تکلیف نمره های ممکن داشته باشد، نمره قابل محاسبه نیست"
   can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: "\n\
@@ -4687,15 +4703,21 @@ fa:
   can_t_unpublish_if_there_are_student_submissions_2d7cd742: "اگر موردهای ارسالی دانشجو وجود داشته باشد، نمی توان انتشار را لغو کرد"
   can_t_unpublish_item_name_if_there_are_student_sub_b83c7a9f: "اگر موردهای ارسالی دانشجو وجود داشته باشد، نمی توان انتشار %{item_name} را لغو کرد"
   can_t_unpublish_name_if_there_are_student_submissi_8ab8086c: "اگر موردهای ارسالی دانشجو وجود داشته باشد، نمی توان انتشار %{name} را لغو کرد"
+  can_update_external_tools_168c1abe: "می تواند ابزارهای خارجی را به روز کند."
   can_update_public_jwk_for_lti_services_26037129: "می توانید jwk عمومی را برای خدمات LTI به‌هنگام سازی کنید."
   can_update_subscription_to_data_service_data_374a0c89: "می‌تواند در داده سرویس داده پیکربندی را به‌هنگام سازی کند."
   can_view_assignment_data_in_the_gradebook_associat_36ab163c: "می توانید اطلاعات تکلیف را در دفتر نمره گذاری مربوط به ابزار، مشاهده کنید."
+  can_view_feature_flags_c92e0aa9: "می تواند پرچم های ویژگی را مشاهده کند"
   can_view_submission_data_for_assignments_associate_dd06f583: "می توانید اطلاعات مورد ارسالی را برای تکالیف مربوط به ابزار مشاهده کنید."
   canada_1_921df67a: "کانادا (+1)"
+  cancel_attempt_attempt_aab8c2a9: "لغو تلاش %{attempt}"
   cancel_caeb1e68: لغو
   cancel_custom_link_creation_39ec70bd: "لغو  ایجاد پیوند سفارشی "
+  cancel_duplicating_original_assignment_name_e974c534: "لغو تکرار \"%{original_assignment_name}\""
   cancel_duplicating_originalassignmentname_fd7ee1d8: "کپی کردن را لغو کنید \"%{originalAssignmentName}\""
   cancel_importing_name_a0b6f3e1: "لغو ورود %{name}"
+  cancel_migrating_name_cfc745c2: "لغو مهاجرت \"%{name}\""
+  cancel_rename_aa60a881: "تغییر نام را لغو کنید"
   cancel_submitting_comment_2666e98b: "لغو ارسال نظر"
   cancel_updating_comment_6816d855: "لغو به‌روز رسانی نظر"
   cannot_access_group_in_concluded_course_90a8db52: "امکان دسترسی به گروه در درس خاتمه یافته وجود ندارد"
@@ -4713,6 +4735,7 @@ fa:
   cannot_be_present_when_account_id_is_present_f7d9b51f: "وقتی شناسه_حساب موجود باشد، نمی تواند موجود باشد"
   cannot_be_present_when_course_id_is_present_785e6a59: "وقتی شناسه_حساب موجود باشد، نمی تواند موجود باشد"
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "دوره نمره گذاری با تاریخ مهلت جایگزین قابل تغییر نیست"
+  cannot_change_locked_status_on_granular_permission_6f13bf4f: "تغییر وضعیت قفل در مجوز گرانول امکان پذیر نیست"
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "نمی توان نام نقش را تغییر داد به %{label}: درحال استفاده است."
   cannot_change_the_default_term_name_edc2279b: "نمی‌توانید نام نیمسال پیش فرض را تغییر دهید. "
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "نمی‌توان تاریخ مهلت یک جایگزینی در دوره نمره گذاری بسته شده را تغییر داد."
@@ -4725,8 +4748,11 @@ fa:
   cannot_give_outcomes_extra_credit_696208f0: "نمی تواند نتایج اضافی را بدست بیاورد"
   cannot_grade_at_this_time_489744b0: "اکنون امکان نمره گذاری وجود ندارد"
   cannot_have_a_blueprint_course_with_students_248e3e76: "نمی‌تواند یک دوره طرح با دانشجویان داشته باشد"
+  cannot_import_a_root_group_d4654def: "نمی تواند یک گروه ریشه را وارد کند"
+  cannot_import_to_other_courses_af885742: "نمی توان به دوره های دیگر وارد کرد"
   cannot_modify_outcome_from_another_context_changes_a80561a4: "نمی توان نتیجه را از متن دیگر تغییر داد:%{changes}; نتیجه باید تغییر یابد%{context}"
   cannot_move_assignments_due_to_closed_grading_peri_59fc3c4: "امکان انتقال تکالیف در دوره نمره گذاری بسته شده وجود ندارد"
+  cannot_remove_c0fd581d: "نمی توان حذف کرد:"
   cannot_restrict_by_section_unless_groups_are_empty_662d3144: "نمی‌تواند با توجه به بخش، محدود شود مگر اینکه گروه خالی نباشد و یا اندازه آن محدود نباشد"
   cannot_save_new_assignment_3bda0792: "آزمون جدید نمی‌تواند ذخیره شود"
   cannot_set_only_visible_to_overrides_when_due_in_a_fac518ce: "اگر مهلت جایگزینی ها در یک دوره نمره گذاری بسته شده گذشته باشد، نمی توان روی فقط قابل مشاهده برای جایگزینی ها قرار داد."
@@ -4782,23 +4808,31 @@ fa:
   canvas_cloud_information_fdd404f2: "اطلاعات ابر کانواس"
   canvas_content_security_policy_c3d7bf2b: "سیاست امنیتی محتوا کانواس"
   canvas_course_id_db4de2b8: شناسه_درس_کانواس
+  canvas_course_tutorial_video_5205c1c1: "فیلم آموزشی دوره ی کانواس"
   canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: "پیوندهای داشبورد کانواس به داشبورد کاتالوگ هدایت خواهند شد"
   canvas_demo_7a005cf3: "نسخه نمایشی کانواس"
   canvas_did_not_recognize_your_identity_provider_cb0e50fc: "کانواس ارائه دهنده هویت شما را به رسمیت نشناخت"
   canvas_doesn_t_have_an_account_for_user_user_5bcae0dd: "کانواس برای کاربر %{user} حساب ندارد"
+  canvas_elementary_theming_a42fa76f: "پوسته ی ابتدایی کانواس"
   canvas_enrollment_id_d0e8b9a4: "شناسه_ثبت نام_کانواس"
   canvas_error_report_ff678539: "گزارش خطای کانواس"
   canvas_failed_to_complete_the_upload_864a4c0f: "کانواس نتوانست بارگذاری را انجام دهد."
   canvas_failed_to_initiate_the_upload_8e3824d5: "کانواس موفق به آپلود نشد"
+  canvas_files_889a274f: "فایل های کانواس"
+  canvas_for_elementary_analytics_15dc1e07: "کانواس برای تجزیه و تحلیل ابتدایی"
+  canvas_for_elementary_e6f5a06f: "کانواس برای ابتدایی ها"
   canvas_group_category_id_38d8cfd7: شنناسه_رده_گروه_کانواس
+  canvas_guides_d65431: "راهنمای کانواس"
   canvas_id_f42f6ad: "شناسه کانواس"
   canvas_introduction_video_2d81f3ad: "فیلم معرفی کانواس"
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "کانواس  برای دریافت ورودها  از %{issuer}  پیکربندی نشده است."
   canvas_login_failure_message_4c922f2f: "پیام خطای ورود به کانواس"
   canvas_multi_factor_authentication_backup_codes_4bd08f93: "کدهای پشتیبان اعتبارسنجی چند عاملی کانواس"
+  canvas_notifications_tutorial_video_79b8e768: "فیلم آموزشی اطلاعیه ی کانواس"
   canvas_observer_id_59db0918: شناسه_بیننده_کانواس
   canvas_parent_description: "این تنظیم بازبینی می کند که آیا والدین می توانند با استفاده از برنامه همراه Canvas Parent به دانشجویان دانشگاه شما متصل شوند یا خیر."
   canvas_parent_improved_description: "این تنظیمات کنترل می‌کند که آیا والدینی که Canvas Parent خود را ایجاد می‌کنند، می‌توانند با استفاده از نرم‌افزار تلفن همراه Canvas Parent به دانشجویان دانشگاه شما متصل شوند. نکته: والدین ثبت شده به عنوان بیننده های کانواس می‌توانند از برنامه تلفن همراه Canvas Parent حتی زمانی که پرچم این ویژگی غیرفعال شده است، استفاده کنند."
+  canvas_release_notes_f3dc5359: "یادداشت های انتشار کانواس"
   canvas_revision_unknown: ناشناس
   canvas_student_id_c74f57bf: شناسه_دانشجو_کانواس
   canvas_thinks_response_is_valid_8cc4a67d: "به نظر کانواس، پاسخ معتبر است"
@@ -4808,6 +4842,7 @@ fa:
   canvas_will_regrade_all_your_submissions_after_you_2d68694a: "کانواس همه موردهای ارسالی شما را پس از اینکه آزمون را ذخیره کردید، دوباره نمره گذاری می کند. این کار ممکن است چند دقیقه طول بکشد."
   canvas_will_remove_keys_with_null_values_from_live_6d7e3091: " اگر این ویژگی فعال شود ، کانواس، کلیدهایی با مقادیر تهی را از بارهای رویدادهای زنده حذف می کنیم."
   captions_subtitles_af2c47e: "عنوان‌ها / زیرنویس‌ها"
+  captured_image_91838f78: "تصویر گرفته شده"
   card_view_eaf73185: "نمای کارتی"
   careful_changes_to_group_membership_will_apply_to__19a9089c: "مراقب باشید! تغییر در عضویت گروه درباره گروه هایی اعمال خواهد شد که تکلیف های ارسالی داشته باشند. تکلیف های ارسالی گروهی ممکن است به عنوان نتیجه قرار نگیرند. مایلید یک مجموعه گروه جدید برای تکلیف های آتی ایجاد شود؟"
   cas_server_rejected_ticket_5dc2a0bc: "سرور CAS بلیت را رد کرد"
@@ -4837,6 +4872,7 @@ fa:
   certificate_fingerprint_b376df90: "اثر انگشت گواهی"
   change_applied_89d1aa5a: "تغییرات اعمال شد"
   change_beginning_date_to_39dbd06e: "تغییر تاریخ شروع به"
+  change_course_visibility_eaa2ffc: "تغییر وضعیت دیده شدن دوره"
   change_dcaa253a: "تغییر دادن"
   change_description_34c49853: "شرح را تغییر دهید"
   change_ending_date_to_d2cebd54: "تغییر تاریخ پایان به"
@@ -4845,6 +4881,7 @@ fa:
   change_image_14ad465b: "تغییر دادن تصویر"
   change_image_d56c695f: "تغییر دادن تصویر"
   change_mastery_f4d43c07: "تسلط را تغییر دهید"
+  change_mastery_points_c4f68a36: "تغییر امتیازهای تسلط"
   change_name_c8cce76c: "تغییر دادن نام"
   change_name_to_568374c8: "تغییر دادن \"%{name}\" به"
   change_points_9e5104ac: "امتیازها را تغییر دهید"
@@ -4874,6 +4911,7 @@ fa:
   check_to_select_all_98e484f1: "برای انتخاب همه گزینه ها انتخاب کنید"
   check_to_skip_adding_a_user_for_loginid_5fa643da: "برای پرش از اضافه کردن کاربر برای %{loginid} انتخاب کنید"
   checked_883b93fd: "انتخاب شده"
+  cheerful_panda_holding_a_map_17ba47ee: "پاندای شاد نقشه در دست دارد"
   child_course_must_belong_to_the_same_root_account__66ed7b8e: "درس فرعی باید متعلق به حساب ریشه‌ یکسانی با درس اصلی باشد"
   child_s_username_dde3aa9: "نام کاربری فرزند"
   chile_56_88238b47: "شیلی (+56)"
@@ -4883,8 +4921,14 @@ fa:
   chinese_traditional_8a7f759d: "چینی سنتی"
   choose_a_color_or_course_nickname_for_course_2585e42c: "انتخاب رنگ یا نام مستعار درس برای %{course}"
   choose_a_color_or_course_nickname_or_move_course_c_dd23f754: " یک رنگ یا نام مستعار درس انتخاب کنید یا  کارت درس را برای %{course} منتقل کنید"
+  choose_a_course_85ef72b9: "یک دوره را انتخاب کنید"
   choose_a_course_home_page_8059c7b: "انتخاب صفحه خانگی یک درس"
   choose_a_csv_file_to_upload_9644480c: "انتخاب یک فایل CSV برای بارگذاری:"
+  choose_a_date_cd0263fe: "تاریخ را انتخاب کنید"
+  choose_a_file_to_upload_a63bac0f: "فایلی را برای آپلود انتخاب کنید"
+  choose_a_file_to_upload_from_your_device_d1b50d4c: "فایلی را برای آپلود از دستگاه خود انتخاب کنید"
+  choose_a_quiz_engine_8820d521: "یک موتور مسابقه انتخاب کنید"
+  choose_a_submission_type_8f45651a: "نوع ارسال را انتخاب کنید"
   choose_a_timezone_d9c52998: "انتخاب منطقه زمانی"
   choose_an_authentication_service_47dc8875: "انتخاب سرویس اعتبارسنجی"
   choose_and_publish_980812cb: "انتخاب و منتشر کنید"
@@ -4893,6 +4937,7 @@ fa:
   choose_assignment_path_8ea55f3a: "مسیر تکلیف را انتخاب کنید"
   choose_assignment_set_415f1b3: "مجموعه تکلیف را انتخاب کنید"
   choose_attribute_to_add_866e128d: "ویژگی را برای افزودن انتخاب کنید"
+  choose_canvas_account_ec2f0279: "حساب کانواس را انتخاب کنید…"
   choose_course_home_page_d8642f9e: "انتخاب صفحه اصلی درس"
   choose_file_8d89ccab: "انتخاب فایل"
   choose_home_page_80cef4ee: "انتخاب صفحه اصلی"
@@ -4902,22 +4947,35 @@ fa:
   choose_student_1513fcd1: "-- انتخاب دانشجو --"
   choose_the_next_mastery_path_b035b727: "مسیر تسلط بعدی را انتخاب کنید"
   choose_usage_rights_33683854: "انتخاب حقوق استفاده..."
+  choose_your_default_skin_tone_f09bf0bd: "رنگ پوسته ی پیش فرض خود را انتخاب کنید"
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' یک رنگ معتبر نیست."
+  classic_quizzes_dee3c7b7: "آزمون های کلاسیک"
+  classic_view_33f29576: "نمای کلاسیک"
   clear_2084585f: "پاک کردن"
+  clear_all_da755751: "همه را پاک کن"
+  clear_search_field_75f595c7: "قسمت جستجو را پاک کنید"
   clear_selected_file_82388e50: "پاک کردن فایل انتخاب شده"
   clear_user_cache_ef079f7f: "پاک کردن حافظه نهان کاربر"
+  click_cancel_if_you_don_t_want_the_code_displayed_ff7b1846: "اگر نمی‌خواهید کد نمایش داده شود، روی «لغو» کلیک کنید."
   click_for_more_details_on_this_outcome_8c018d2f: "برای اطلاعات بیشتر درباره این نتیجه، کلیک کنید"
   click_here_for_an_account_9536cb36: "برای یک حساب، اینجا کلیک کنید"
   click_here_it_s_free_eeccb9cb: "اینجا کلیک کنید، رایگان است!"
   click_here_to_add_a_discussion_f17c4260: "برای افزودن گفتگو  اینجا را کلیک کنید"
   click_here_to_download_size_of_file_74443988: "برای بارگیری %{size_of_file} اینجا کلیک کنید"
+  click_here_to_find_it_5ad1543b: "برای یافتن آن اینجا را کلیک کنید."
+  click_here_to_fix_the_issue_fc75f5bf: "*اینجا کیلک کنید* را بزنید تا مشکل برطرف شود"
   click_here_to_log_in_again_4a6055de: "برای ورود مجدد، اینجا کلیک کنید"
   click_here_to_review_the_submission_ae017c01: "برای بازبینی مورد ارسالی، اینجا کلیک کنید"
   click_here_to_see_the_file_79e2b366: "برای مشاهده فایل، اینجا کلیک کنید."
   click_here_to_view_ec8cb2fd: "برای مشاهده اینجا کلیک کنید"
   click_here_to_view_the_submission_24777a69: "برای مشاهده مورد ارسالی، اینجا کلیک کنید"
+  click_here_to_visit_your_assignment_and_get_it_in__75111d7e: "برای بازدید از تکلیف خود و دریافت به موقع آن اینجا را کلیک کنید!"
   click_ok_to_continue_deleting_this_role_baa9d9e2: "برای ادامه حذف این نقش ، روی \"ok\" کلیک کنید."
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "برای بازگشت به نسخه آزمایشی خود که این تصویر لحظه‌ای گرفته شده بود، روی تصویر لحظه‌ای کلیک کنید. توجه: هر کاری که بعد از گرفتن این تصویر لحظه‌ای انجام شده، از دست خواهید داد و نمی‌توانید آن را لغو کرد!"
+  click_on_the_account_navigation_button_to_access_n_fbe82181: "برای دسترسی به تنظیمات برگزیده اعلان، روی دکمه ناوبری حساب کلیک کنید."
+  click_on_the_courses_navigation_button_to_access_y_138d4dfb: "برای دسترسی به دوره های خود روی دکمه ناوبری دوره ها کلیک کنید."
+  click_proceed_to_continue_b6eeffc6: "برای ادامه روی \"ادامه دادن\" کلیک کنید."
+  click_the_admin_navigation_button_to_access_accoun_38d881bf: "برای دسترسی به تنظیمات حساب روی دکمه ناوبری مدیریت کلیک کنید."
   click_the_button_above_to_add_content_4c7024a: "برای افزودن محتوا روی دکمه بالا کلیک کنید"
   click_to_add_a_name_6cf551b0: "برای افزودن یک نام کلیک کنید"
   click_to_change_profile_picture_for_display_name_6a4b41db: "برای تغییر دادن عکس رخ نما برای %{display_name} کلیک کنید"
@@ -4928,7 +4986,9 @@ fa:
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "اگر دانشجو این پاسخ را انتخاب کند، برای وارد کردن نظر کلیک کنید"
   click_to_expand_outcome_details_74a2a967: "برای گسترش جزئیات نتیجه کلیک کنید"
   click_to_hide_details_f7d353d9: "برای مخفی کردن اطلاعات بیشتر کلیک کنید"
+  click_to_launch_assessment_9434b1fd: "برای راه اندازی ارزیابی کلیک کنید"
   click_to_load_a020891b: "(برای بارگذاری کلیک کنید)"
+  click_to_merge_sets_here_638fcac7: "برای ادغام مجموعه ها در اینجا کلیک کنید"
   click_to_modify_89fa26aa: "برای اصلاح، کلیک کنید"
   click_to_report_profile_picture_370f9625: "برای گزارش تصویر رخ نما کلیک کنید"
   click_to_report_profile_picture_for_display_name_9ffbcc86: "برای گزارش تصویر رخ نما کلیک کنید برای %{display_name}"
@@ -4956,17 +5016,23 @@ fa:
   click_to_sort_by_term_ascending_c3ef1eb7: "برای مرتب‌سازی صعودی بر اساس نیمسال، کلیک کنید"
   click_to_sort_by_term_descending_199c48c0: "برای مرتب‌سازی نزولی بر اساس نیمسال، کلیک کنید"
   click_to_sort_c81ff8c8: "برای مرتب ‌سازی کلیک کنید."
+  click_to_split_set_here_9c35462a: "برای تقسیم مجموعه اینجا کلیک کنید"
   click_to_test_a_different_score_2e0bb6f0: "برای آزمایش نمره دیگر، کلیک کنید"
   click_to_test_dropdown_b950974d: "برای آزمایش منوی بازشونده کلیک کنید"
+  click_to_view_calendar_feed_2944b4c0: "برای مشاهده فید تقویم کلیک کنید"
   click_to_view_event_details_b25dc1f3: "برای مشاهده اطلاعات رویداد کلیک کنید"
   clicking_on_the_column_headers_will_sort_the_rows__3a6e9573: "با کلیک کردن روی عنوان ستون ها، ردیف ها بر اساس آن ستون مرتب خواهند شد."
   clicking_the_checkbox_will_cause_scopes_table_to_a_fba5886a: "با کلیک بر روی کادر بررسی، جدول محدوده‌ها در زیر آشکار می شود."
   clicking_the_checkbox_will_cause_scopes_table_to_d_dbdbffd3: "با کلیک بر روی کادر بررسی، جدول محدوده‌ها در زیر ناپدید می شود."
+  client_credentials_audience_218f2d93: "اعتبار مشتری مخاطب"
   client_id_cb2502af: "شناسه سرویس گیرنده"
   client_id_is_required_1afd54d1: "شناسه سرویس گیرنده لازم است"
   clone_group_set_c2a40e15: "کپی کردن مجموعه گروه"
+  clone_groupcategoryname_ef85ddb8: "(کپی کردن) %{groupCategoryName}"
+  cloning_group_set_813b06f5: "کپی کردن مجموعه گروه"
   close_17f50799: بستن
   close_and_return_to_canvas_80544344: "بستن و بازگشتن به کانواس"
+  close_comment_library_cdcc2dde: "کتابخانه نظرات را ببندید"
   close_d634289d: بستن
   close_date_a2f617b3: "تاریخ اختتام"
   close_details_sidebar_ff8f663d: "بستن نوار کناری جزئیات"
@@ -4978,9 +5044,12 @@ fa:
   close_sidebar_10b0fbb4: "بستن نوار کناری"
   close_student_details_2f6900: "بستن جزئیات دانشجو"
   close_submission_tray_c4988fa8: "بستن سینی موارد ارسالی"
+  close_suggestions_6fcb4985: "بستن پیشنهادات"
+  close_the_window_and_try_again_7353f8e: "پنجره را ببندید و دوباره امتحان کنید."
   close_warning_d61daf2c: "بستن هشدار"
   closed_for_comments_e395b42f: "امکان ارسال نظر وجود ندارد"
   closes_5c6b4367: "بستن:"
+  code_93e9abbb: کد
   code_is_case_sensitive_d8175cad: "رمز نسبت به حروف بزرگ و کوچک حساس است."
   cog_icon_69bdffd5: "نماد چرخ دنده"
   col_is_sorted_ascending_cc5152cc: "%{col} به صورت صعودی مرتب شده است"
@@ -5102,7 +5171,7 @@ fa:
       started_by: "شروع شده توسط *%{user}*، %{at}"
       titles: 
         current: "همکاری های فعلی"
-    lti_collaborations: "همکاری های LTI"
+    lti_collaborations: "همکاری های خارجی"
     show: 
       error_cause_1: "حساب Google Drive ایجاد کننده با حساب استفاده شده برای ایجاد همکاری متفاوت است."
       error_cause_2: "ایجاد کننده همکاری دیگر در google doc نویسنده نیست."
@@ -5115,10 +5184,14 @@ fa:
     titles: 
       delete: "همکاری حذف شود؟"
   collaborations_5c56c15f: "همکاری ها"
+  collaborations_9132b987: "همکاری ها"
   collaborations_are_web_based_tools_to_work_collabo_6e9f7b3f: "همکاری ها ابزارهای تحت وب برای همکاری در انجام اموری مانند یادداشت برداری یا نگارش مقاله های گروهی هستند. با کلیک کردن روی دکمه «+ همکاری» شروع به کار کنید."
   collaborations_are_web_based_tools_to_work_collabo_8ae6dd38: "همکاری ها ابزارهای تحت وب برای همکاری در انجام اموری مانند یادداشت برداری یا نگارش مقاله های گروهی هستند. با افزودن یک برنامه همکاری شروع به کار کنید."
   collaborations_tutorial_tray_9219d9d: "سینی خودآموز همکاری"
   collapse_all_50275533: "جمع کردن همه"
+  collapse_all_modules_e092807c: "همه ماژول ها را جمع کنید"
+  collapse_description_for_outcome_title_bcd9b8c9: "برای نتیجه، توضیحات را جمع کنید %{title}"
+  collapse_discussion_thread_52bab65a: "جمع کردن موضوع بحث"
   collapse_group_c2af7cad: "جمع کردن گروه"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "جمع کردن اعضای گروه برای %{groupName}"
   collapse_replies_ef4fc36b: "جمع کردن پاسخ ها"
@@ -5127,20 +5200,29 @@ fa:
   collapsed_510aa02a: "جمع شده"
   colombia_57_c6c75620: "کلمبیا (+57)"
   color_a363e1b0: رنگ
+  color_color_for_mastery_level_position_35079de: "رنگ %{color} برای سطح کارشناسی ارشد %{position}"
   color_overlay_fb5ecce7: "پوشش رنگی"
   columns_464bd055: ستون‌ها
+  come_back_later_5eab7dba: "بعدا بررسی کنید!"
   coming_soon_79d46687: "به زودی"
   coming_up_4348b0bd: "در حال نمایش"
   comm_messages: 
     from_beginning: آغاز
     to_now: اکنون
+  comment_added_33ab70d9: "نظر اضافه شد"
   comment_by_replying_to_this_message_or_join_the_co_26d42fde: "با پاسخ دادن به این پیام، نظر دهید، یا با استفاده از این پیوند: %{link} به گفتگو بپیوندید."
   comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: " شما می‌توانید  با پاسخ دادن به این پیام نظر دهید و یا با استفاده از پیوند %{link}  به مکالمه ملحق شوید. هنگامی که مجاز است، اگر نیاز به یک ضمیمه دارید، لطفا به کانواس وارد شوید و به بحث پاسخ دهید."
   comment_by_replying_to_this_message_or_join_the_co_886bc612: " شما می‌توانید  با پاسخ دادن به این پیام نظر دهید و یا با استفاده از پیوند %{link}  به مکالمه ملحق شوید. هنگامی که مجاز است، اگر نیاز به یک ضمیمه دارید، لطفا به کانواس وارد شوید و به اطلاعیه پاسخ دهید."
+  comment_destroyed_5cfc922d: "کامنت نابود شد"
   comment_failed_to_post_please_try_again_later_e2d19a0a: "اظهار نظر درج نشد!لطفا دوباره تلاش کنید."
   comment_input_box_b8c7e58b: "کادر ورودی نظر"
+  comment_library_84735835: "کتابخانه نظرات"
+  comment_library_suggestions_disabled_ae04eb77: "کتابخانه نظرات (پیشنهادات غیرفعال)"
   comment_submitted_d9934b: "نظر ارسال شده!"
+  comment_suggestions_554a0dc6: "پیشنهادات را کامنت کنید"
+  comment_updated_2cd56fe2: "نظر به روز شد"
   comments_e07bcbe3: نظرها
+  comments_for_this_attempt_a5fae61f: "نظرات برای این تلاش"
   commmessages_9fa33faa: CommMessages
   common_cartridge_description: "امکان تبدیل بسته های متداول کارتریج به قالب واسط  json را برای وارد شدن فراهم می کند"
   common_cartridge_display: "کارتریج رایج"
@@ -5149,6 +5231,8 @@ fa:
   common_cartridge_name: "وارد کننده متداول کارتریج"
   common_timezones_2b00baba: "منطقه های زمانی رایج"
   commons_ed0252fb: رایج
+  communicate_course_objectives_f457158c: "ارتباط اهداف دوره"
+  communicate_grading_expectations_484a1f01: "با انتظارات درجه بندی ارتباط برقرار کنید"
   communicate_to_your_students_exactly_what_will_be__7312d45d: |-
       با دانشجویان در مورد اینکه دقیقا چه چیزی در طول
       دوره به ترتیب زمانی مورد نیاز است گفتگو کنید.  یک سرفصل
@@ -5217,6 +5301,123 @@ fa:
       notices: 
         contact_registered: "شیوه تماس ثبت شد!"
   communication_channels_a9abd037: "شبکه‌های ارتباطی"
+  community: 
+    admin_add_course: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-add-a-course-in-an-account-as-an-admin/ta-p/158"
+    admin_add_users: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-add-users-to-an-account/ta-p/90"
+    admin_app_center_allowlist: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-manage-a-whitelist-in-the-Edu-App-Center/ta-p/203"
+    admin_beta_access: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-access-the-Canvas-beta-environment-as-an-admin/ta-p/111"
+    admin_custom_js_css: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-upload-custom-JavaScript-and-CSS-files-to-an-account/ta-p/253"
+    admin_hangouts_meet_lti: "https://community.canvaslms.com/t5/Admin-Group/Google-Hangouts-Meet-LTI/ba-p/257649"
+    admin_import_sis: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-import-SIS-data-to-a-Canvas-account/ta-p/98"
+    admin_teams_meetings: "https://community.canvaslms.com/t5/Admin-Group/Microsoft-Teams-Meetings-in-Canvas/ba-p/256340"
+    admin_test_access: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-access-the-Canvas-test-environment-as-an-admin/ta-p/180"
+    admin_training_services_portal: "https://community.canvaslms.com/t5/Admin-Guide/How-do-I-use-the-Training-Services-Portal-as-an-admin/ta-p/198"
+    admin_zoom_meetings_faq: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826"
+    admin_zoom_meetings_faq_add: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1295024148"
+    admin_zoom_meetings_faq_camera: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1619578790"
+    admin_zoom_meetings_faq_invite: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--361560439"
+    admin_zoom_meetings_faq_mute: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--810232164"
+    admin_zoom_meetings_faq_participants: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--237443356"
+    admin_zoom_meetings_faq_record: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1980253691"
+    admin_zoom_meetings_faq_schedule: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId-447786187"
+    admin_zoom_meetings_faq_screenshare: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId-123231545"
+    admin_zoom_meetings_faq_share_record: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId-1866041880"
+    admin_zoom_meetings_faq_start: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1170907065"
+    admin_zoom_meetings_faq_storage: "https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1387179659"
+    basics_announcements: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-Announcements/ta-p/39"
+    basics_browser_requirements: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-the-browser-and-computer-requirements-for-Canvas/ta-p/66"
+    basics_collaborations: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-Collaborations/ta-p/61"
+    basics_find_url: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/Where-do-I-find-my-institution-s-URL-to-access-Canvas/ta-p/82"
+    basics_speedgrader: "https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-is-SpeedGrader/ta-p/13"
+    canvas_for_elementary: "https://community.canvaslms.com/t5/Canvas-for-Elementary/tkb-p/k5tkb-board"
+    contingency_30_minute_quickstart: "https://community.canvaslms.com/t5/Contingency-Planning/Set-Up-Your-Canvas-Course-in-30-minutes-or-Less/ba-p/258437"
+    contingency_covid: "https://community.canvaslms.com/t5/Contingency-Planning/gh-p/contingency"
+    contingency_web_conferencing: "https://community.canvaslms.com/t5/Contingency-Planning/Web-Conferencing-Resources/ba-p/262674"
+    guides_by_product: "https://community.canvaslms.com/t5/Guides/ct-p/guides"
+    guides_home: "https://community.canvaslms.com/t5/Canvas/ct-p/canvas"
+    idea_conversations: "https://community.canvaslms.com/t5/Idea-Conversations/idb-p/ideas"
+    instructor_add_announcement: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-an-announcement-in-a-course/ta-p/1194"
+    instructor_add_dashboard_image: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-an-image-to-a-course-card-in-the-Dashboard/ta-p/624"
+    instructor_add_module: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-a-module/ta-p/1151"
+    instructor_add_module_items: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-course-content-as-module-items/ta-p/1157"
+    instructor_add_rubric_assignment: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-a-rubric-to-an-assignment/ta-p/1058"
+    instructor_add_rubric_course: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-a-rubric-in-a-course/ta-p/842"
+    instructor_add_users: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-users-to-a-course/ta-p/1119"
+    instructor_adjust_dates_on_import: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-adjust-events-and-due-dates-in-a-course-import/ta-p/1090"
+    instructor_align_outcome_rubric: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-align-an-outcome-with-a-rubric-in-a-course/ta-p/1130"
+    instructor_assignment_details: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-or-edit-details-in-an-assignment/ta-p/971"
+    instructor_assignment_types: "https://community.canvaslms.com/t5/Instructor-Guide/What-assignment-types-can-I-create-in-a-course/ta-p/627"
+    instructor_beta_access: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-access-the-Canvas-beta-environment-as-an-instructor/ta-p/727"
+    instructor_bulk_upload: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-bulk-upload-files-to-a-course/ta-p/623"
+    instructor_change_course_dates: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-change-the-start-and-end-dates-for-a-course/ta-p/452354"
+    instructor_change_course_home: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-change-the-Course-Home-Page/ta-p/1035"
+    instructor_change_name_code: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-change-a-course-name-and-course-code/ta-p/1234"
+    instructor_conclude_conference: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-conclude-a-conference/ta-p/606"
+    instructor_copy_course: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-copy-a-Canvas-course-into-a-new-course-shell/ta-p/712"
+    instructor_create_assignment: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-an-assignment/ta-p/740"
+    instructor_create_conference: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-conference-in-a-course/ta-p/1156"
+    instructor_create_discussion: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-discussion-as-an-instructor/ta-p/1029"
+    instructor_create_gdrive_collaboration: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-Google-Drive-collaboration-as-an-instructor/ta-p/632"
+    instructor_create_new_quiz: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-an-assessment-using-New-Quizzes/ta-p/1173"
+    instructor_create_o365_collaboration: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-Microsoft-Office-365-collaboration-as-an/ta-p/629"
+    instructor_create_outcome: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-an-outcome-for-a-course/ta-p/862"
+    instructor_create_outcome_group: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-outcome-groups-for-a-course/ta-p/1128"
+    instructor_create_page: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-new-page-in-a-course/ta-p/1031"
+    instructor_create_quiz_questions: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-quiz-with-individual-questions/ta-p/1248"
+    instructor_edit_announcement: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-edit-an-announcement-in-a-course/ta-p/1190"
+    instructor_edit_gradebook: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-enter-and-edit-grades-in-the-Gradebook/ta-p/724"
+    instructor_edit_syllabus: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-edit-the-Syllabus-in-a-course/ta-p/1178"
+    instructor_gradebook_individual_view: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-assignments-or-students-individually-in-the/ta-p/1247"
+    instructor_guide: "https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor"
+    instructor_guide_speedgrader: "https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor#SpeedGrader"
+    instructor_homepage_layout_options: "https://community.canvaslms.com/t5/Instructor-Guide/What-layout-options-are-available-in-the-Course-Home-Page-as-an/ta-p/1291"
+    instructor_import_grades: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-import-grades-in-the-Gradebook/ta-p/807"
+    instructor_import_outcomes: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-import-outcomes-for-a-course/ta-p/702"
+    instructor_import_package: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-import-a-Canvas-course-export-package/ta-p/795"
+    instructor_individual_new_analytics: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-analytics-for-an-individual-student-in-New/ta-p/801"
+    instructor_manage_new_quizzes_settings: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-manage-settings-for-an-assessment-in-New-Quizzes/ta-p/581"
+    instructor_manage_rubrics: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-manage-rubrics-in-a-course/ta-p/1017"
+    instructor_message_all_criteria_new_analytics: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-send-a-message-to-all-students-based-on-specific-course/ta-p/1162"
+    instructor_message_individual_new_analytics: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-send-a-message-to-an-individual-student-in-New/ta-p/1187"
+    instructor_notification_preferences: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-set-my-Canvas-notification-preferences-as-an-instructor/ta-p/1222"
+    instructor_organize_files: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-move-and-organize-my-files-as-an-instructor/ta-p/622"
+    instructor_post_grades: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-post-grades-for-an-assignment-in-the-Gradebook/ta-p/576"
+    instructor_publish_assignment: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-an-assignment-as-an-instructor/ta-p/585"
+    instructor_publish_discussion: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-a-discussion-as-an-instructor/ta-p/590"
+    instructor_publish_module: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-a-module-as-an-instructor/ta-p/571"
+    instructor_publish_page: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-a-page-as-an-instructor/ta-p/592"
+    instructor_quiz_options: "https://community.canvaslms.com/t5/Instructor-Guide/What-options-can-I-set-in-a-quiz/ta-p/683"
+    instructor_quiz_statistics: "https://community.canvaslms.com/t5/Instructor-Guide/Once-I-publish-a-quiz-what-kinds-of-quiz-statistics-are/ta-p/659"
+    instructor_record_conference: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-record-a-conference/ta-p/840"
+    instructor_reorder_module: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-move-or-reorder-a-module/ta-p/1150"
+    instructor_reply_discussion: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-reply-to-a-discussion-as-an-instructor/ta-p/1110"
+    instructor_select_import_content: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-select-specific-content-as-part-of-a-course-import/ta-p/1091"
+    instructor_set_course_details: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-set-details-for-a-course/ta-p/1037"
+    instructor_set_front_page: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-set-a-Front-Page-in-a-course/ta-p/797"
+    instructor_speedgrader_submission_details: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-the-details-of-a-submission-for-a-student-in/ta-p/762"
+    instructor_start_conference: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-start-a-conference/ta-p/1074"
+    instructor_test_access: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-access-the-Canvas-test-environment-as-an-instructor/ta-p/739"
+    instructor_upload_course_file: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-upload-a-file-to-a-course/ta-p/618"
+    instructor_use_announcements_index: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Announcements-Index-Page/ta-p/1113"
+    instructor_use_collaborations_index: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Collaborations-Index-Page/ta-p/922"
+    instructor_use_course_homepage: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Course-Home-Page-as-an-instructor/ta-p/1250"
+    instructor_use_course_settings: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-course-settings/ta-p/1267"
+    instructor_use_files: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-Files-as-an-instructor/ta-p/929"
+    instructor_use_gradebook: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Gradebook/ta-p/701"
+    instructor_use_mastery_gradebook: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Learning-Mastery-Gradebook-to-view-outcome/ta-p/775"
+    instructor_use_outcomes: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-outcomes-page-in-a-course/ta-p/645"
+    instructor_use_pages_index: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Pages-Index-Page/ta-p/1005"
+    instructor_use_people_page: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-People-page-in-a-course-as-an-instructor/ta-p/667"
+    instructor_use_quizzes_index: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Quizzes-Index-Page/ta-p/1104"
+    instructor_use_syllabus: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Syllabus-as-an-instructor/ta-p/638"
+    instructor_view_discussion_replies: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-and-sort-discussion-replies-as-an-instructor/ta-p/908"
+    instructor_view_enrollment_details: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-user-details-for-an-enrollment-in-a-course/ta-p/1216"
+    instructor_view_student_context_card: "https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-a-context-card-for-a-student-in-a-course/ta-p/608"
+    new_quizzes_feature_comparison: "https://community.canvaslms.com/t5/New-Quizzes-Users/New-Quizzes-Feature-Comparison/ta-p/243761"
+    pace_plans: "https://community.canvaslms.com/t5/Pace-Plans/gh-p/Pace-Plans"
+    releases_beta_test_schedule: "https://community.canvaslms.com/docs/DOC-14787-what-is-the-canvas-release-schedule-for-beta-production-and-test-environments"
+    resource_course_content_distribution_comparison: "https://community.canvaslms.com/t5/Resource-Documents/Blueprint-Courses-and-Canvas-Commons-Comparison-PDF/ta-p/387051"
+    resource_pairing_codes_faq: "https://community.canvaslms.com/t5/Resource-Documents/Pairing-Codes-FAQ-PDF/ta-p/388738"
   complete_4f4efbc: کامل
   complete_all_items_e1779257: "تکمیل همه موردها"
   complete_fd828dea: کامل
@@ -5228,17 +5429,33 @@ fa:
   completed_9b809e44: "کامل شد"
   compose_a_new_message_db3a68ed: "نوشتن پیام جدید"
   compose_message_8abd180a: "پیام جدید بنویسید"
+  compressing_f4a35c08: "فشرده سازی..."
   computer_1d7dfa6f: کامپیوتر
+  conclude_courses_a7ed8a8: "دوره ها را به پایان برسانید"
+  conclude_delete_publish_reset_35b64f0f: "نتیجه گیری / حذف / انتشار / تنظیم مجدد"
   concluded_63150003: "خاتمه یافته"
   concluded_conferences_cdbe53f9: "کنفرانس های خاتمه یافته"
   concluded_courses_94782e21: "درس های خاتمه یافته"
+  concluded_enrollments_8f460271: "ثبت نام های پایان یافته"
   concluded_enrollments_9da8da6: "ثبت نام‌های پایان یافته"
+  condition_9e5fc8ca: وضعیت
+  condition_type_a04d30d3: "نوع شرایط"
+  conditional_release: 
+    and: و
   conduct_virtual_lectures_virtual_office_hours_and__cc05907b: |-
       سخنرانی‌های مجازی، ساعت‌های اداری مجازی و گروه‌های
       دانشجویی را اداره کنید. فایل های صوتی و تصویری بلادرنگ پخش کنید،
       اسلایدهای سخنرانی به اشتراک بگذارید، نمایش برنامه ها و منابع آنلاین و سایر موارد را
       ارائه دهید.
   conference_36b50fda: کنفرانس
+  conference_created_date_7ef1e8d4: "تاریخ ایجاد کنفرانس"
+  conference_has_been_removed_f771cb11: "کنفرانس حذف شد"
+  conference_has_been_updated_title_2bacc5fa: "کنفرانس به روز شد: %{title}"
+  conference_participant_count_87e86c5c: "تعداد شرکت کنندگان در کنفرانس"
+  conference_recorded_7e776ec2: "کنفرانس ضبط شد"
+  conference_selection_ea4050bb: "انتخاب کنفرانس"
+  conference_type_7bd581e: "نوع کنفرانس"
+  conference_type_names_bcdeb3ad: "%{conference_type_names}"
   conference_was_deleted_30869390: "کنفرانس حذف شد"
   conferences: 
     concluded_conference: 
@@ -5304,8 +5521,11 @@ fa:
         close: "اکنون به آن پایان داده شود"
         join: "اکنون به آن بپیوندید"
     type_disabled_error: "این نوع کنفرانس دیگر برای این تارنمای کانواس فعال نیست"
+  conferences_2634179c: "همایش ها"
   conferences_a0a8984b: کنفرانس‌ها
   conferences_tutorial_tray_6f071ce2: "سینی خودآموز کنفرانس‌ها"
+  conferencing_b69e2537: "کنفرانس کردن:"
+  conferencing_in_planner_2e7a24f0: "کنفرانس در برنامه ریز"
   config_url_e96ceaf3: "نشانی اینترنتی پیکربندی"
   configuration_location_ee0f6592: "محل پیکربندی"
   configuration_type_25a084a4: "نوع پیکربندی"
@@ -5314,6 +5534,7 @@ fa:
   configure_tool_app_3b1bb50b: "برنامه %{tool} پیکربندی شود؟"
   configure_toolname_app_651371be: "پیکربندی برنامه %{toolName}"
   confirm_6556b3a6: تأیید
+  confirm_as_spam_2f8b7105: "به عنوان هرزنامه تایید کنید"
   confirm_communication_channel_81c48d08: "تایید کانال ارتباطی"
   confirm_contact_method_29d6fe4b: "تأیید روش تماس"
   confirm_delete_6febeafb: "تائید حذف"
@@ -5325,9 +5546,14 @@ fa:
   confirm_dialog_component: 
     ok: تأیید
   confirm_edit_outcome_a9746c99: "ویرایش نتیجه را تأیید کنید"
+  confirm_qr_code_display_49664fa3: "نمایش کد QR را تأیید کنید"
+  confirm_reactivation_ec0f30c6: "فعال سازی مجدد را تایید کنید"
   confirm_removal_a9bb889: "تأیید حذف"
   confirm_reservation_removal_e6350e7c: "تأیید حذف رزرو"
+  confirm_submission_e3b43f1: "تایید ارسال"
+  confirm_suspension_18cc1fd2: "تایید تعلیق"
   confirm_unenrollment_64333263: " تأیید لغو ثبت نام"
+  confirm_unfavorite_course_fa01966d: "دوره نامطلوب را تأیید کنید"
   confirmation_code_required_22984955: "رمز تأیید (لازم)"
   confirmation_failed_please_try_again_ae566d37: "تأیید انجام نشد. لطفا دوباره تلاش کنید."
   consumer_key_57d9fcf1: "کلید مصرف کننده"
@@ -5393,6 +5619,8 @@ fa:
       importing_button: "در حال وارد کردن... ممکن است مدتی طول بکشد"
     titles: 
       home_page: "صفحه اصلی"
+  content_item_title_96079d16: "عنوان آیتم محتوا"
+  content_items_with_errors_a9438fdb: "موارد محتوای دارای خطا"
   content_link_error_assignment_name_course_name_b8be789a: "خطای پیوند محتوا - %{assignment_name}، %{course_name}"
   content_locks: 
     buttons: 
@@ -5578,6 +5806,7 @@ fa:
       options: گزینه‌ها
       skip_all_files: "فایل‌ها از درس بارگیری نشوند"
   content_migrations_c2841e9f: "انتقال محتوا"
+  content_name_4607507c: "نام محتوا"
   content_not_available_7b2e004: "مخاطب در دسترس نیست"
   content_on_this_page_violates_the_security_policy__25685d8a: "محتوای این صفحه سیاست امنیتی را نقض می کند، برای راهنمایی با مدیر خود تماس بگیرید."
   content_security_policy_3bb8d922: "سیاست امنیت محتوا"
@@ -5996,11 +6225,14 @@ fa:
   context_nav_link_8d15d95: "پیوند پیمایش زمینه"
   context_nav_link_active_78adb0fa: "پیوند پیمایش زمینه فعال است"
   context_navigation_menu_514c5889: "منوی پیمایش زمینه"
+  context_not_found_613bb24a: "زمینه پیدا نشد"
   context_type_eb76a7b9: نوع_زمینه
   contextname_and_count_others_9dda769b: 
     one: "%{contextName} و %{count} نفر دیگر"
     other: "%{contextName} و %{count} نفر دیگر"
+  contextname_selected_59de1002: "%{contextName} انتخاب شده"
   continue_ac067716: ادامه
+  continue_draft_6166ea79: "ادامه پیش نویس"
   continue_typing_to_find_additional_sections_or_stu_49786085: "تایپ کردن برای یافتن بخش ها یا دانشجویان دیگر را ادامه دهید."
   contributed_to_this_module_item_and_is_complete_2799d5c: "در این مورد ماژول مشارکت کرد و تکمیل شده است"
   conversation_dialog: 
@@ -6069,6 +6301,7 @@ fa:
     course_options: 
       course_options: 
         concluded: "خاتمه یافته"
+        favorite: "دوره های مورد علاقه"
         groups: "گروه ها"
         more_courses: "درس های دیگر"
     hide: "مخفی کردن"
@@ -6188,6 +6421,7 @@ fa:
   copy_operation_started_successfully_b2f236a1: "عملیات کپی با موفقیت شروع شد"
   copy_page_to_another_course_405cc07c: "کپی صفحه به دوره دیگر"
   copy_quiz_to_course_74f9c8c1: "کپی امتحان به دوره"
+  copy_the_video_url_dd509606: "آدرس ویدیو را کپی کنید"
   copy_this_module_item_to_a_course_790a0cf4: "این مورد ماژول را به یک درس کپی کنید..."
   copy_this_module_to_a_course_ddd12cc7: "کپی این ماژول به یک درس دیگر..."
   copy_title_to_course_2a41a2f4: "کپی کردن %{title} در درس"
@@ -6231,6 +6465,8 @@ fa:
     one: "1 تکلیف دارای خطا"
     other: "%{count} تکلیف دارای خطا"
     zero: "هیچ تکلیف دارای خطا موجود نیست، روی ادامه کلیک کنید"
+  count_attempts_allowed_d65a014c: 
+    one: "1 تلاش مجاز است"
   count_attempts_d23c69a0: 
     one: "1 تلاش"
     other: "%{count} تلاش"
@@ -6688,13 +6924,19 @@ fa:
   course_storage_391e1bd: "ذخیره درس"
   course_syllabus_5de1b0af: "سرفصل درس"
   course_template_84f504be: "الگوی دوره"
+  course_templates_create_eb00e263: "دوره های نمونه - ایجاد"
+  course_templates_ddd579e6: "دوره های نمونه "
   course_templates_delete_5ec47e1f: "فایل های دوره - حذف"
+  course_templates_edit_fd44b74c: "دوره های نمونه - ویرایش"
   course_usage_report_2e9d9da9: "گزارش استفاده از درس"
   course_users: 
     greater_than_three: "لطفا یک عبارت جستجو با سه یا چند نویسه وارد نمایید"
     unknown_error: "جستجوی شما با اشکال مواجه شد، لطفا دوباره سعی کنید."
   course_visibility_options_ca8ab3a8: "گزینه‌های قابلیت دید درس"
+  course_with_canvas_id_id_not_found_1ff06bec: "دوره با شناسه ی %{id} کانواس یافت نشد"
   course_wizard_31c87552: "راهنمای گام به گام درس"
+  coursecontext_label_d563be4c: "%{courseContext}%{label}"
+  coursename_total_grade_5b3f3564: "%{courseName} کلا: %{grade}"
   courses: 
     assignments_needing_grading: 
       headings: 
@@ -6997,6 +7239,7 @@ fa:
         sections: "بخش های درس"
       help: 
         edit_navigation: "برای مرتب کردن دوباره مورد ها در پیمایش درس، آنها را بکشید و رها کنید."
+        edit_navigation_k5: "موارد را بکشید و رها کنید تا آنها را در پیمایش موضوع مجدداً مرتب کنید."
       images: 
         alt: 
           delete: حذف
@@ -7011,10 +7254,11 @@ fa:
         toggle_navigation_dragging: Space
       labels: 
         account_id: زیرحساب
-        allow_student_discussion_editing: "اجازه دادن به دانشجویان برای ویرایش یا حذف ارسال های مربوط به بحث خود"
+        allow_student_discussion_editing: "به دانش آموزان اجازه دهید پاسخ های بحث خود را ویرایش یا حذف کنند"
         allow_student_discussion_topics: "اجازه دادن به دانشجویان برای ایجاد موضوع های بحث"
         allow_student_forum_attachments: "اجازه دادن به دانشجویان برای پیوست کردن فایل ها به بحث ها"
         allow_student_organized_groups: "اجازه دادن به دانشجویان برای سازماندهی گروه های خود"
+        banner_image: "تصویر بنر عریض"
         blueprint_course: "دوره طرح"
         card_image: "تصویر کارت"
         conclude_at: "پایان در"
@@ -7033,6 +7277,7 @@ fa:
         course_template: "الگوی دوره"
         course_visibility: "قابلیت مشاهده"
         custom_course_visibility: "سفارشی کردن"
+        default_due_time: "زمان مقرر پیش فرض"
         enrollment_term_id: نیمسال
         enrollments_from_homeroom: "ثبت نام ها"
         friendly_name: "نام دوستانه"
@@ -7040,7 +7285,10 @@ fa:
         grading_standard_enabled: "فعال کردن طرح نمره گذاری درس"
         hide_distribution_graphs: "مخفی کردن نمودارهای توزیع نمره از دید دانشجویان"
         hide_final_grades: "مخفی کردن نمره های کل در خلاصه نمره های دانشجو"
+        hide_sections_on_course_users_page: "بخش هایی را در صفحه افراد از دانش آموزان پنهان کنید"
         home_page_announcement_limit: "تعداد اطلاعیه های نشان داده شده در صفحه اصلی"
+        homeroom_course: "فعال کردن به عنوان دوره خانه"
+        homeroom_course_header: "دوره خانگی"
         image: تصویر
         indexed: "شامل سازی این درس در فهرست عمومی درس"
         is_public_to_auth_users: "قابل مشاهده ساختن این درس برای کاربران اعتبارسنجی شده"
@@ -7089,6 +7337,7 @@ fa:
       tab_cant_disable: "این صفحه را نمی توان غیر فعال کرد، فقط می توان مخفی نمود"
       tab_disabled: "صفحه غیر فعال شد، به صفحه اصلی درس هدایت خواهد شد"
       tab_hidden_if_disabled: "صفحه غیر فعال شد، در پیمایش ظاهر نخواهد شد"
+      tab_hidden_if_disabled_k5: "برگه غیرفعال است، در پیمایش موضوع ظاهر نمی شود"
       tabs: 
         alerts: هشدارها
         details: "اطلاعات درس"
@@ -7248,11 +7497,15 @@ fa:
   courses_43204aae: "درس ها"
   courses_account_72e4fca7: "درسها(حساب کاربری)"
   courses_account_navigation_f84fdec3: "دروس (پیمایش حساب)"
+  courses_account_navigations_a60c71db: "دوره ها - ناوبری حساب"
+  courses_account_settings_79e2f748: "دوره ها - تنظیمات حساب"
   courses_add_20891f99: "دوره ها - اضافه"
   courses_add_edit_delete_aa2b55d3: "درس‌ها - افزودن / ویرایش / حذف"
   courses_change_visibility_9150ff1b: "درس ها - تغییر قابلیت مشاهده"
   courses_conclude_7bf4ce68: "درس‌ها - نتیجه گیری"
+  courses_course_templates_5a3fbafd: "دوره ها - الگوهای دوره"
   courses_delete_20c9beb2: "درس‌ها - حذف"
+  courses_from_the_selected_term_will_be_considered_6d682c77: "دروس از ترم انتخابی در نظر گرفته خواهد شد"
   courses_manage_3ea9687f: "درس ها - پیام"
   courses_manage_update_d3e9263e: "درس ها - مدیریت / بروزرسانی"
   courses_navigation_menu_b3638384: "منوی پیمایش درس‌ها"
@@ -7265,16 +7518,21 @@ fa:
   courses_view_change_logs_25af6a45: "درس‌ها - مشاهده تغییرات گزارش‌ها "
   courses_view_list_47885585: "درس‌ها - مشاهده لیست"
   courses_view_usage_reports_3daed8fe: "درس ها- گزارش های مفیدرا مشاهده کنید"
+  courses_with_enrollments_can_t_become_templates_64aeadf5: "دوره های دارای ثبت نام نمی توانند به نمونه دوره تبدیل شوند"
   create_132b3be1: ایجاد
   create_14873ed7: ایجاد
   create_a_64f6f82: "ایجاد یک"
+  create_a_friendly_display_name_c1036ed: "یک نام نمایشی دوستانه ایجاد کنید"
   create_a_new_account_4cf7c0f9: "ایجاد حساب جدید"
+  create_a_new_announcement_for_coursename_8dede2d0: "ایجاد یک اطلاعیه ی جدید برای %{courseName}"
+  create_a_new_domain_lookup_1830a512: "یک جستجوی دامنه جدید ایجاد کنید"
   create_a_new_module_6f31b0fe: "یک ماژول جدید ایجاد کنید"
   create_a_new_user_for_address_7487e9c9: "یک کاربر جدید برای ‍‍%{address} ایجاد کنید"
   create_account_263ec6: "ایجاد حساب"
   create_an_ba36d171: "ایجاد یک"
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: "ایجاد و اجرای آزمون‌ها و نظرسنجی‌های آنلاین نمره گذاری شده یا نمره گذاری نشده."
   create_announcements_above_1c36202b: "اطلاعیه‌ها را در بالا ایجاد کنید."
+  create_anonymous_discussion_topics_d573e88e: "موضوعات بحث ناشناس ایجاد را کنید"
   create_as_many_discussion_topics_as_needed_as_assi_45ec1df: |-
       هر تعداد مورد نیاز موضوع بحث، تکلیف برای نمره‌گذاری یا
       نشست برای اطلاعات و ایده های مشترک ایجاد کنید.
@@ -7284,10 +7542,13 @@ fa:
   create_content_for_your_course_500a7032: "برای درس خود محتوا ایجاد کنید"
   create_course_9a69b32c: "ایجاد درس"
   create_criterion_6df4d4ad: "ایجاد معیار"
+  create_delete_edit_157bb1a3: "ایجاد / حذف / ویرایش"
+  create_delete_update_4ff115bf: "ایجاد / حذف / به روز رسانی"
   create_developer_key_78de8510: "ایجاد کلیدهای توسعه دهنده"
   create_discussion_topics_8330d52b: "ایجاد موضوع های بحث"
   create_educational_resources_8219326e: "منابع آموزشی ایجاد کنید"
   create_failed_15d07ad4: "ایجاد انجام نشد"
+  create_file_s_188549e6: "[ایجاد فایل(ها)]"
   create_item_base: 
     there_was_an_error: "در هنگام ذخیره سازی \"%{title}\" خطایی رخ داد، لطفا دوباره سعی کنید."
   create_lookup_7ceb6d90: "ایجاد جستجو"
@@ -7340,6 +7601,7 @@ fa:
   creating_conference_95b59116: "ایجاد کنفرانس"
   creating_key_8a026e61: "در حال ایجاد کردن کلید"
   creating_new_course_62cd27bb: "ایجاد درس جدید..."
+  creating_new_subject_35fe8d13: "ایجاد موضوع جدید..."
   creative_commons_714a065f: "کریتیو کامنز"
   creative_commons_license_725584ae: "مجوز کریتیو کامنز:"
   creative_commons_licenses_7d557d9a: "مجوزهای کریتیو کامنز"
@@ -7351,6 +7613,7 @@ fa:
   criterion_ratings_3eed22e2: "رتبه بندی های معیار"
   criterion_updated_36c0b3dc: "معیار به روز شد"
   croatian_d713d655: کرواسی
+  cross_listing_3318526a: "مقایسه ی لیست متقابل هم"
   crowdsourced: true
   crumbs: 
     access_report: "گزارش دسترسی"
@@ -7443,8 +7706,10 @@ fa:
   csv_or_json_formats_only_d8ba36d: "تنها فرمت‌های CSV یا JSON "
   current_367624e9: فعلی
   current_courses_d5287d50: "درس های فعلی"
+  current_folder_path_e094d59: "مسیر پوشه فعلی"
   current_grade_1fb4ea06: "نمره ی فعلی"
   current_grade_6d0b8ef7: "نمره فعلی"
+  current_grading_period_b85226c2: "دوره نمره دهی فعلی"
   current_grading_scheme_for_this_assignment_d525463e: "طرح نمره گذاری فعلی برای این درس"
   current_letter_grade_50f4ebb1: "نمره الفبایی فعلی"
   current_mastery_score_score_out_of_mastery_points_fedd343f: "نمره تسلط فعلی: %{score} از %{mastery_points}"
@@ -7458,6 +7723,7 @@ fa:
   current_total_67bf5f72: "مجموع فعلی:"
   current_volume_level_c55ab825: "سطح حجم فعلی"
   currently_assigned_to_tokenname_click_to_remove_5a853a84: "در حال حاضر به %{tokenName} مرتبط شده است، برای حذف کلیک کنید"
+  currently_visible_to_e2f85345: "در حال حاضر قابل مشاهده برای"
   curso_f0ee9b5: درس
   curve_grades_b7a75443: "روی منحنی بردن نمره ها"
   curve_grades_dialog: 
@@ -9515,6 +9781,7 @@ fa:
   fall_grading_period_final_score_56d96a8f: "نمره فعلی دوره نمره گذاری پاییز"
   fall_grading_period_id_74ef68e: "شناسه دوره نمره گذاری پاییز"
   favicon_6e658914: فاوآیکن
+  favorite_courses_fbd356f0: "دوره های مورد علاقه"
   favorite_d720d310: "مورد دلخواه"
   favorites_c7e0207c: "موارد دلخواه"
   feature_f5526584: "ویژگی ها"
