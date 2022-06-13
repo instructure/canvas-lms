@@ -49,12 +49,12 @@ const START_DATE_CAPTIONS = {
   // because the course does whether it's bounded
   // by the term or course dates
   term: I18n.t('Determined by course start date'),
-  section: I18n.t('Determined by section stat date'),
+  section: I18n.t('Determined by section start date'),
   hypothetical: I18n.t("Determined by today's date")
 }
 
 const END_DATE_CAPTIONS = {
-  hard: I18n.t('Reqired end date'),
+  hard: I18n.t('Required end date'),
   user: I18n.t('Determined by course pace'),
   course: I18n.t('Determined by course end date'),
   term: I18n.t('Determined by course end date'),

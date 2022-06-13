@@ -21,7 +21,7 @@ import {renderConnected} from '../../../__tests__/utils'
 import {Header} from '../header'
 
 const defaultProps = {
-  context_type: 'course',
+  context_type: 'Course',
   context_id: '17',
   newPace: false
 }
@@ -39,13 +39,37 @@ describe('Course paces header', () => {
     expect(getByText('All changes published')).toBeInTheDocument()
   })
 
-  it('renders the the alert for new paces', () => {
-    const {getByText} = renderConnected(<Header {...defaultProps} newPace />)
-    expect(
-      getByText(
-        'This is a new course pace and all changes are unpublished. Publish to save any changes and create the pace.'
+  describe('new paces alert', () => {
+    it('renders an alert for new course paces', () => {
+      const {getByText} = renderConnected(<Header {...defaultProps} newPace />)
+      expect(
+        getByText(
+          'This is a new course pace and all changes are unpublished. Publish to save any changes and create the pace.'
+        )
+      ).toBeInTheDocument()
+    })
+
+    it('renders an alert for new section paces', () => {
+      const {getByText} = renderConnected(
+        <Header {...defaultProps} context_type="Section" newPace />
       )
-    ).toBeInTheDocument()
+      expect(
+        getByText(
+          'This is a new section pace and all changes are unpublished. Publish to save any changes and create the pace.'
+        )
+      ).toBeInTheDocument()
+    })
+
+    it('renders an alert for new student paces', () => {
+      const {getByText} = renderConnected(
+        <Header {...defaultProps} context_type="Enrollment" newPace />
+      )
+      expect(
+        getByText(
+          'This is a new student pace and all changes are unpublished. Publish to save any changes and create the pace.'
+        )
+      ).toBeInTheDocument()
+    })
   })
 
   it('renders the unpublished changes message for a new pace', () => {

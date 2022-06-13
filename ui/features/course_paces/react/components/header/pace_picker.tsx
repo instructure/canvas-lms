@@ -209,6 +209,7 @@ export const PacePicker: React.FC<ComponentProps> = ({
           setSelectedPaceContext(...parseContextKey(pendingContext))
           setPendingContext('')
         }}
+        contextType={selectedContextType}
       />
     </ApplyTheme>
   )
