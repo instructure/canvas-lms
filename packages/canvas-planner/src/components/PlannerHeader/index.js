@@ -18,8 +18,8 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {themeable} from '@instructure/ui-themeable'
-import {Button, CloseButton} from '@instructure/ui-buttons'
-import {ScreenReaderContent, AccessibleContent} from '@instructure/ui-a11y-content'
+import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {View} from '@instructure/ui-view'
 import {Portal} from '@instructure/ui-portal'
 import {IconPlusLine, IconAlertsLine, IconGradebookLine} from '@instructure/ui-icons'
@@ -321,7 +321,7 @@ export class PlannerHeader extends Component {
           direction="up"
           onClick={this.handleNewActivityClick}
           zIndex={this.props.stickyZIndex}
-          buttonRef={ref => (this.newActivityButtonRef = ref)}
+          elementRef={ref => (this.newActivityButtonRef = ref)}
           className="StickyButton-styles__newActivityButton"
           description={formatMessage('Scrolls up to the previous item with new activity.')}
         >
@@ -339,7 +339,7 @@ export class PlannerHeader extends Component {
       return (
         <Button
           id="planner-today-btn"
-          variant="light"
+          color="primary-inverse"
           margin={buttonMargin}
           onClick={this.handleTodayClick}
         >
@@ -365,19 +365,19 @@ export class PlannerHeader extends Component {
 
     return (
       <Badge {...badgeProps}>
-        <Button
+        <IconButton
+          renderIcon={IconAlertsLine}
+          screenReaderLabel={formatMessage('opportunities popup')}
+          withBorder={false}
+          withBackground={false}
           onClick={this.toggleOpportunitiesDropdown}
-          variant="icon"
-          icon={IconAlertsLine}
           ref={b => {
             this.opportunitiesButton = b
           }}
-          buttonRef={b => {
+          elementRef={b => {
             this.opportunitiesHtmlButton = b
           }}
-        >
-          <ScreenReaderContent>{formatMessage('opportunities popup')}</ScreenReaderContent>
-        </Button>
+        />
       </Badge>
     )
   }
@@ -410,49 +410,47 @@ export class PlannerHeader extends Component {
       <div className={`${styles.root} PlannerHeader`} data-testid="PlannerHeader">
         {this.renderToday(buttonMargin)}
         {!this.props.isObserving && (
-          <Button
-            variant="icon"
-            icon={IconPlusLine}
+          <IconButton
+            renderIcon={IconPlusLine}
+            screenReaderLabel={formatMessage('Add To Do')}
+            withBorder={false}
+            withBackground={false}
             margin={buttonMargin}
             onClick={this.handleToggleTray}
             ref={b => {
               this.addNoteBtn = b
             }}
-          >
-            <ScreenReaderContent>{formatMessage('Add To Do')}</ScreenReaderContent>
-          </Button>
+          />
         )}
-        <Button
-          variant="icon"
-          icon={IconGradebookLine}
+        <IconButton
+          renderIcon={IconGradebookLine}
+          screenReaderLabel={formatMessage('Show My Grades')}
+          withBorder={false}
+          withBackground={false}
           margin={buttonMargin}
           onClick={this.toggleGradesTray}
-        >
-          <ScreenReaderContent>{formatMessage('Show My Grades')}</ScreenReaderContent>
-        </Button>
+        />
         <Popover
           onHideContent={this.closeOpportunitiesDropdown}
           isShowingContent={this.state.opportunitiesOpen}
           on="click"
+          renderTrigger={this.renderOpportunitiesButton(buttonMargin)}
           withArrow={withArrow}
           positionTarget={positionTarget}
           constrain="window"
           placement={placement}
           offsetY={offsetY}
         >
-          <Popover.Trigger>{this.renderOpportunitiesButton(buttonMargin)}</Popover.Trigger>
-          <Popover.Content>
-            <Opportunities
-              togglePopover={this.closeOpportunitiesDropdown}
-              newOpportunities={this.state.newOpportunities}
-              dismissedOpportunities={this.state.dismissedOpportunities}
-              courses={this.props.courses}
-              timeZone={this.props.timeZone}
-              dismiss={this.props.dismissOpportunity}
-              maxHeight={verticalRoom}
-              isObserving={this.props.isObserving}
-            />
-          </Popover.Content>
+          <Opportunities
+            togglePopover={this.closeOpportunitiesDropdown}
+            newOpportunities={this.state.newOpportunities}
+            dismissedOpportunities={this.state.dismissedOpportunities}
+            courses={this.props.courses}
+            timeZone={this.props.timeZone}
+            dismiss={this.props.dismissOpportunity}
+            maxHeight={verticalRoom}
+            isObserving={this.props.isObserving}
+          />
         </Popover>
         <Tray
           open={this.state.trayOpen}
@@ -462,9 +460,11 @@ export class PlannerHeader extends Component {
           shouldReturnFocus={false}
           onDismiss={this.handleCloseTray}
         >
-          <CloseButton placement="start" variant="icon" onClick={this.handleCloseTray}>
-            {formatMessage('Close')}
-          </CloseButton>
+          <CloseButton
+            placement="start"
+            onClick={this.handleCloseTray}
+            screenReaderLabel={formatMessage('Close')}
+          />
           <UpdateItemTray
             locale={this.props.locale}
             timeZone={this.props.timeZone}
@@ -483,9 +483,11 @@ export class PlannerHeader extends Component {
           onDismiss={this.toggleGradesTray}
         >
           <View as="div" padding="large large medium">
-            <CloseButton placement="start" variant="icon" onClick={this.toggleGradesTray}>
-              {formatMessage('Close')}
-            </CloseButton>
+            <CloseButton
+              placement="start"
+              onClick={this.toggleGradesTray}
+              screenReaderLabel={formatMessage('Close')}
+            />
             <GradesDisplay
               courses={this.props.courses}
               loading={this.props.loading.loadingGrades}

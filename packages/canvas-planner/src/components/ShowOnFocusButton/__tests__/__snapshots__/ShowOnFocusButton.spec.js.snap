@@ -4,22 +4,18 @@ exports[`renders a ScreenReaderContent by default 1`] = `
 <ScreenReaderContent
   as="span"
 >
-  <Button
+  <CondensedButton
     as="button"
-    buttonRef={[Function]}
+    color="primary"
     cursor="pointer"
-    display="inline-block"
     elementRef={[Function]}
     margin="0"
     onBlur={[Function]}
     onFocus={[Function]}
     size="medium"
-    textAlign="center"
     type="button"
-    variant="link"
-    withBackground={true}
   >
     Button
-  </Button>
+  </CondensedButton>
 </ScreenReaderContent>
 `;

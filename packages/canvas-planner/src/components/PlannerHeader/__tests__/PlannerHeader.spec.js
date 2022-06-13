@@ -166,7 +166,7 @@ describe('when component is mounted', () => {
 it('toggles aria-hidden on the ariaHideElement when opening the opportunities popover', () => {
   const fakeElement = document.createElement('div')
   const wrapper = mount(<PlannerHeader {...defaultProps()} ariaHideElement={fakeElement} />)
-  const button = wrapper.find('PopoverTrigger').find('Button')
+  const button = wrapper.find('Popover').find('IconButton')
   button.simulate('click')
   expect(fakeElement.getAttribute('aria-hidden')).toBe('true')
   button.simulate('click')

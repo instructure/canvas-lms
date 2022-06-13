@@ -28,16 +28,16 @@ it('renders a ScreenReaderContent by default', () => {
 it('renders a Button when it has focus', () => {
   const wrapper = mount(<ShowOnFocusButton>Button</ShowOnFocusButton>)
 
-  wrapper.find('Button').simulate('focus')
+  wrapper.find('CondensedButton').simulate('focus')
   expect(wrapper.find('ScreenReaderContent').exists()).toBe(false)
 })
 
 it('renders ScreeenReaderContent after blur', () => {
   const wrapper = mount(<ShowOnFocusButton>Button</ShowOnFocusButton>)
 
-  wrapper.find('Button').simulate('focus')
+  wrapper.find('CondensedButton').simulate('focus')
   expect(wrapper.find('ScreenReaderContent').exists()).toBe(false)
 
-  wrapper.find('Button').simulate('blur')
+  wrapper.find('CondensedButton').simulate('blur')
   expect(wrapper.find('ScreenReaderContent').exists()).toBe(true)
 })

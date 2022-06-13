@@ -64,24 +64,12 @@ exports[`does not render caveat if no courses have grading periods 1`] = `
         }
       }
     >
-      <Button
-        as="button"
-        cursor="pointer"
-        display="inline-block"
-        elementRef={[Function]}
+      <Link
+        color="link"
         href="/courses/1/grades"
-        margin="0"
+        iconPlacement="start"
+        isWithinText={false}
         size="small"
-        textAlign="center"
-        theme={
-          Object {
-            "smallHeight": "normal",
-            "smallPaddingHorizontal": "0",
-          }
-        }
-        type="button"
-        variant="link"
-        withBackground={true}
       >
         <Text
           as="span"
@@ -92,7 +80,7 @@ exports[`does not render caveat if no courses have grading periods 1`] = `
         >
           Ticket to Ride 101
         </Text>
-      </Button>
+      </Link>
     </div>
     <Text
       as="div"
@@ -285,24 +273,12 @@ exports[`renders some course grades 1`] = `
         }
       }
     >
-      <Button
-        as="button"
-        cursor="pointer"
-        display="inline-block"
-        elementRef={[Function]}
+      <Link
+        color="link"
         href="/courses/1/grades"
-        margin="0"
+        iconPlacement="start"
+        isWithinText={false}
         size="small"
-        textAlign="center"
-        theme={
-          Object {
-            "smallHeight": "normal",
-            "smallPaddingHorizontal": "0",
-          }
-        }
-        type="button"
-        variant="link"
-        withBackground={true}
       >
         <Text
           as="span"
@@ -313,7 +289,7 @@ exports[`renders some course grades 1`] = `
         >
           Ticket to Ride 101
         </Text>
-      </Button>
+      </Link>
     </div>
     <Text
       as="div"
@@ -348,24 +324,12 @@ exports[`renders some course grades 1`] = `
         }
       }
     >
-      <Button
-        as="button"
-        cursor="pointer"
-        display="inline-block"
-        elementRef={[Function]}
+      <Link
+        color="link"
         href="/courses/2/grades"
-        margin="0"
+        iconPlacement="start"
+        isWithinText={false}
         size="small"
-        textAlign="center"
-        theme={
-          Object {
-            "smallHeight": "normal",
-            "smallPaddingHorizontal": "0",
-          }
-        }
-        type="button"
-        variant="link"
-        withBackground={true}
       >
         <Text
           as="span"
@@ -376,7 +340,7 @@ exports[`renders some course grades 1`] = `
         >
           Ingenious 101
         </Text>
-      </Button>
+      </Link>
     </div>
     <Text
       as="div"
@@ -411,24 +375,12 @@ exports[`renders some course grades 1`] = `
         }
       }
     >
-      <Button
-        as="button"
-        cursor="pointer"
-        display="inline-block"
-        elementRef={[Function]}
+      <Link
+        color="link"
         href="/courses/3/grades"
-        margin="0"
+        iconPlacement="start"
+        isWithinText={false}
         size="small"
-        textAlign="center"
-        theme={
-          Object {
-            "smallHeight": "normal",
-            "smallPaddingHorizontal": "0",
-          }
-        }
-        type="button"
-        variant="link"
-        withBackground={true}
       >
         <Text
           as="span"
@@ -439,7 +391,7 @@ exports[`renders some course grades 1`] = `
         >
           Settlers of Catan 201
         </Text>
-      </Button>
+      </Link>
     </div>
     <Text
       as="div"

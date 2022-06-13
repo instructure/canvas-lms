@@ -37,7 +37,7 @@ it('renders all future items loaded regardless of other props', () => {
 it('invokes the callback when the load more button is clicked', () => {
   const mockLoad = jest.fn()
   const wrapper = shallow(<LoadingFutureIndicator onLoadMore={mockLoad} />)
-  wrapper.find('Button').simulate('click')
+  wrapper.find('CondensedButton').simulate('click')
   expect(mockLoad).toHaveBeenCalledWith({loadMoreButtonClicked: true})
 })
 
