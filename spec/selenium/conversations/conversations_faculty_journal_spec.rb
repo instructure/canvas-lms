@@ -145,25 +145,6 @@ describe "conversations new" do
         Account.default.enable_feature! :react_inbox
       end
 
-      it "successfully faculty journalizes a message", priority: "1" do
-        skip("flakey spec, will be fixed with VICE-2945")
-        user_session(@teacher)
-        get conversations_path
-
-        f("button[data-testid='compose']").click
-        # select the only course option
-        f("input[placeholder='Select Course']").click
-        fj("li:contains('#{@course.name}')").click
-        ff("input[aria-label='Address Book']")[1].send_keys @s1.name
-        wait_for_ajaximations
-        fj("li:contains('#{@s1.name}')").click
-        fj("label:contains('Add as a Faculty Journal entry')").click
-        f("textarea[data-testid='message-body']").send_keys "hallo!"
-        fj("button:contains('Send')").click
-        wait_for_ajaximations
-        expect(@s1.user_notes.last.note).to eq "hallo!"
-      end
-
       it "can faculty journalize a message sent to a group" do
         user_session(@teacher)
         get conversations_path
@@ -179,7 +160,8 @@ describe "conversations new" do
         f("textarea[data-testid='message-body']").send_keys "this is a group message!"
         fj("button:contains('Send')").click
         wait_for_ajaximations
-        expect(@s1.user_notes.last.note).to eq "this is a group message!"
+        get "/users/#{@s1.id}/user_notes"
+        expect(fj(".user_note_content:contains('this is a group message!')")).to be_present
       end
 
       it "does not show faculty journal option if sender is a student" do
