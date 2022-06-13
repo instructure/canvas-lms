@@ -251,7 +251,7 @@ describe "Moderated Marking" do
       end
 
       it "selects the custom grade", priority: "1" do
-        skip("unskip this in GRADE-1615 once this is not flaky using using the most recent InstUI")
+        skip("unskip this in EVAL-2500 once this is not flaky using using the most recent InstUI")
         # the aria-activedescendant will be the id of the selected option
         selected_id = ModeratePage.grade_input(@student1).attribute("aria-activedescendant")
 

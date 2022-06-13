@@ -95,19 +95,6 @@ module RubricsCommon
     fj(".rubric .edit_rubric_link:visible").click
   end
 
-  # should be in editing mode before calling
-  def split_ratings(idx)
-    rating = ffj(".rubric .criterion:visible .rating")[idx]
-    driver.action.move_to(rating).perform
-
-    driver.execute_script <<~JS
-      var $rating = $('.rubric .criterion:visible .rating:eq(#{idx})');
-      $rating.addClass('add_column add_left');
-      $rating.prev().addClass('add_right');
-      $rating.click();
-    JS
-  end
-
   def should_delete_a_rubric
     create_rubric_with_criterion_points "5"
     f(".delete_rubric_link").click
@@ -151,17 +138,6 @@ module RubricsCommon
     wait_for_ajaximations
     expect(ffj(".rubric .criterion:visible .rating .points").count).to eq 3
     expect(ffj(".rubric .criterion:visible .rating .points")[1].text).to eq "3"
-  end
-
-  def should_pick_the_lower_value_when_splitting_without_room_for_an_integer
-    create_rubric_with_criterion_points "0.5"
-    edit_rubric_after_updating
-
-    split_ratings(1)
-    wait_for_ajaximations
-    wait_for_dom_ready
-    expect(ffj(".rubric .criterion:visible .rating .points").count).to eq 3
-    expect(ffj(".rubric .criterion:visible .rating .points")[1].text).to eq "0"
   end
 
   def import_outcome

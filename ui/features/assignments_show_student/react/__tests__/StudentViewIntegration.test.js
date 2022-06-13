@@ -126,6 +126,7 @@ describe('student view integration tests', () => {
     // displayed happens as a result of a cache write and these higher level
     // components re-rendering
     it.skip('displays the new file after it has been uploaded', async () => {
+      // unskip in EVAL-2503
       window.URL.createObjectURL = jest.fn()
       uploadFileModule.uploadFile = jest.fn()
       uploadFileModule.uploadFile.mockReturnValueOnce({id: '1', name: 'test.jpg'})
@@ -236,6 +237,7 @@ describe('student view integration tests', () => {
   // Skipping these tests as logged out user is not currently handled
   // properly in Assignments2 due to graphql issues
   describe.skip('logged out user on a public assignment', () => {
+    // unskip in EVAL-2503
     async function createPublicAssignmentMocks(overrides = {}) {
       const query = LOGGED_OUT_STUDENT_VIEW_QUERY
       const variables = {assignmentLid: '1'}

@@ -212,7 +212,7 @@ describe "speed grader" do
     end
 
     it "sorts by submission status when eg_sort_by is submission_status" do
-      skip "update => update! made this spec fail GRADE-1086"
+      skip "update => update! made this spec fail EVAL-2502"
       @submission1 = @assignment.submit_homework(@student1, submission_type: "online_text_entry", body: "student one")
       @submission2 = @assignment.submit_homework(@student2, submission_type: "online_text_entry", body: "student three")
       @submission2.update!(
