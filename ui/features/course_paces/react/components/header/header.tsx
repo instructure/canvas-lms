@@ -50,6 +50,18 @@ type PassedProps = {
 
 export type HeaderProps = PassedProps & StoreProps
 
+const NEW_PACE_ALERT_MESSAGES = {
+  Course: I18n.t(
+    'This is a new course pace and all changes are unpublished. Publish to save any changes and create the pace.'
+  ),
+  Section: I18n.t(
+    'This is a new section pace and all changes are unpublished. Publish to save any changes and create the pace.'
+  ),
+  Enrollment: I18n.t(
+    'This is a new student pace and all changes are unpublished. Publish to save any changes and create the pace.'
+  )
+}
+
 export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
   const [newPaceAlertDismissed, setNewPaceAlertDismissed] = useState(false)
   const handleNewPaceAlertDismissed = useCallback(() => setNewPaceAlertDismissed(true), [])
@@ -66,9 +78,7 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
             hasShadow={false}
             margin="0 0 medium"
           >
-            {I18n.t(
-              'This is a new course pace and all changes are unpublished. Publish to save any changes and create the pace.'
-            )}
+            {NEW_PACE_ALERT_MESSAGES[props.context_type]}
           </Alert>
         )}
         <Flex as="section" alignItems="end" wrapItems>

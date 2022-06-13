@@ -37,7 +37,8 @@ const defaultProps = {
   selectedContextId: COURSE.id,
   selectedContextType: 'Course' as const,
   setSelectedPaceContext: selectPaceContextFn,
-  changeCount: 0
+  changeCount: 0,
+  responsiveSize: 'large' as const
 }
 
 beforeAll(() => {
@@ -122,7 +123,19 @@ describe('PacePicker', () => {
       act(() => picker.click())
       act(() => screen.getByRole('button', {name: 'Students'}).click())
       act(() => screen.getByRole('menuitem', {name: 'Molly Millions'}).click())
-      expect(getByText(/You have unpublished changes to your Course Pace./)).toBeInTheDocument()
+      expect(getByText(/You have unpublished changes to your course pace./)).toBeInTheDocument()
+    })
+
+    it('shows a message for changes in section paces', () => {
+      const {getByText, getByLabelText} = render(
+        <PacePicker {...defaultProps} selectedContextType="Section" changeCount={1} />
+      )
+      const picker = getByLabelText('Course Pacing') as HTMLInputElement
+
+      act(() => picker.click())
+      act(() => screen.getByRole('button', {name: 'Students'}).click())
+      act(() => screen.getByRole('menuitem', {name: 'Molly Millions'}).click())
+      expect(getByText(/You have unpublished changes to your section pace./)).toBeInTheDocument()
     })
 
     it('aborts context change on cancel', () => {
