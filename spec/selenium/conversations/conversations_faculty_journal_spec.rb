@@ -146,6 +146,7 @@ describe "conversations new" do
       end
 
       it "successfully faculty journalizes a message", priority: "1" do
+        skip("flakey spec, will be fixed with VICE-2945")
         user_session(@teacher)
         get conversations_path
 
