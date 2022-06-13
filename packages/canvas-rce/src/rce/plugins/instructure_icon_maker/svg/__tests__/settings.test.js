@@ -21,7 +21,6 @@ import {renderHook, act} from '@testing-library/react-hooks/dom'
 import {useSvgSettings, svgFromUrl, statuses} from '../settings'
 import Editor from '../../../shared/__tests__/FakeEditor'
 import RceApiSource from '../../../../../rcs/api'
-import {TYPE} from '../constants'
 
 jest.mock('../../../../../rcs/api')
 
@@ -54,31 +53,32 @@ describe('useSvgSettings()', () => {
     it('initializes settings to the default', () => {
       const [settings, ,] = subject().current
 
-      expect(settings).toEqual({
-        type: TYPE,
-        alt: '',
-        shape: 'square',
-        size: 'small',
-        color: null,
-        encodedImage: '',
-        encodedImageType: '',
-        encodedImageName: '',
-        outlineColor: '#000000',
-        outlineSize: 'none',
-        text: '',
-        textSize: 'small',
-        textColor: '#000000',
-        textBackgroundColor: null,
-        textPosition: 'below',
-        x: 0,
-        y: 0,
-        translateX: 0,
-        translateY: 0,
-        width: 0,
-        height: 0,
-        imageSettings: null,
-        transform: ''
-      })
+      expect(settings).toMatchInlineSnapshot(`
+        Object {
+          "color": null,
+          "encodedImage": "",
+          "encodedImageName": "",
+          "encodedImageType": "",
+          "height": 0,
+          "imageSettings": null,
+          "outlineColor": "#000000",
+          "outlineSize": "none",
+          "shape": "square",
+          "size": "small",
+          "text": "",
+          "textBackgroundColor": null,
+          "textColor": "#000000",
+          "textPosition": "below",
+          "textSize": "small",
+          "transform": "",
+          "translateX": 0,
+          "translateY": 0,
+          "type": "image/svg+xml-icon-maker-icons",
+          "width": 0,
+          "x": 0,
+          "y": 0,
+        }
+      `)
     })
 
     it('sets status to "IDLE"', () => {
@@ -105,32 +105,33 @@ describe('useSvgSettings()', () => {
       it('updates the relevant settings', async () => {
         const result = subject()
         act(() => result.current[2](settingsUpdate))
-        expect(result.current[0]).toEqual({
-          type: TYPE,
-          name: 'Banana',
-          alt: '',
-          shape: 'square',
-          size: 'large',
-          color: null,
-          encodedImage: '',
-          encodedImageType: '',
-          encodedImageName: '',
-          outlineColor: '#000000',
-          outlineSize: 'none',
-          text: '',
-          textSize: 'small',
-          textColor: '#000000',
-          textBackgroundColor: null,
-          textPosition: 'below',
-          x: 0,
-          y: 0,
-          translateX: 0,
-          translateY: 0,
-          width: 0,
-          height: 0,
-          imageSettings: null,
-          transform: ''
-        })
+        expect(result.current[0]).toMatchInlineSnapshot(`
+          Object {
+            "color": null,
+            "encodedImage": "",
+            "encodedImageName": "",
+            "encodedImageType": "",
+            "height": 0,
+            "imageSettings": null,
+            "name": "Banana",
+            "outlineColor": "#000000",
+            "outlineSize": "none",
+            "shape": "square",
+            "size": "large",
+            "text": "",
+            "textBackgroundColor": null,
+            "textColor": "#000000",
+            "textPosition": "below",
+            "textSize": "small",
+            "transform": "",
+            "translateX": 0,
+            "translateY": 0,
+            "type": "image/svg+xml-icon-maker-icons",
+            "width": 0,
+            "x": 0,
+            "y": 0,
+          }
+        `)
       })
     })
   })
@@ -150,7 +151,7 @@ describe('useSvgSettings()', () => {
       ed.setSelectedNode(ed.dom.select('#test-image')[0])
 
       //
-      // NOTE: 'name' is no longer a valid property in embedded metadata
+      // NOTE: 'name' and 'alt' are no longer valid properties in embedded metadata
       // But we're leaving it here to test what happens with pre-existing
       // Icon Maker icons that have it
       //
@@ -269,33 +270,35 @@ describe('useSvgSettings()', () => {
         return result.current[0]
       })
 
-      expect(result.current[0]).toEqual({
-        type: TYPE,
-        alt: 'a test image',
-        shape: 'triangle',
-        size: 'large',
-        color: '#FF2717',
-        encodedImage: '',
-        encodedImageType: '',
-        encodedImageName: '',
-        outlineColor: '#06A3B7',
-        outlineSize: 'small',
-        text: 'Some Text',
-        textSize: 'medium',
-        textColor: '#009606',
-        textBackgroundColor: '#06A3B7',
-        imageSettings: null,
-        textPosition: 'below',
-        x: 0,
-        y: 0,
-        translateX: 0,
-        translateY: 0,
-        width: 0,
-        height: 0,
-        name: 'Test Icon',
-        originalName: 'Test Icon',
-        transform: ''
-      })
+      expect(result.current[0]).toMatchInlineSnapshot(`
+        Object {
+          "alt": "a red circle",
+          "color": "#FF2717",
+          "encodedImage": "",
+          "encodedImageName": "",
+          "encodedImageType": "",
+          "height": 0,
+          "imageSettings": null,
+          "name": "Test Icon",
+          "originalName": "Test Icon",
+          "outlineColor": "#06A3B7",
+          "outlineSize": "small",
+          "shape": "triangle",
+          "size": "large",
+          "text": "Some Text",
+          "textBackgroundColor": "#06A3B7",
+          "textColor": "#009606",
+          "textPosition": "below",
+          "textSize": "medium",
+          "transform": "",
+          "translateX": 0,
+          "translateY": 0,
+          "type": "image/svg+xml-icon-maker-icons",
+          "width": 0,
+          "x": 0,
+          "y": 0,
+        }
+      `)
     })
 
     describe('parses the SVG settings from a legacy SVG metadata structure', () => {
@@ -353,39 +356,41 @@ describe('useSvgSettings()', () => {
           return result.current[0]
         })
 
-        expect(result.current[0]).toEqual({
-          type: 'image/svg+xml-icon-maker-icons',
-          alt: 'a test image',
-          shape: 'triangle',
-          size: 'large',
-          color: '#FF2717',
-          encodedImage: '',
-          encodedImageType: '',
-          encodedImageName: '',
-          outlineColor: '#06A3B7',
-          outlineSize: 'small',
-          text: 'Some Text',
-          textSize: 'medium',
-          textColor: '#009606',
-          textBackgroundColor: '#06A3B7',
-          imageSettings: {
-            cropperSettings: null,
-            icon: 'art',
-            iconFillColor: '#FFFFFF',
-            image: 'Art Icon',
-            mode: 'SingleColor'
-          },
-          textPosition: 'below',
-          x: 0,
-          y: 0,
-          translateX: 0,
-          translateY: 0,
-          width: 0,
-          height: 0,
-          name: 'Test Icon',
-          originalName: 'Test Icon',
-          transform: ''
-        })
+        expect(result.current[0]).toMatchInlineSnapshot(`
+          Object {
+            "alt": "a red circle",
+            "color": "#FF2717",
+            "encodedImage": "",
+            "encodedImageName": "",
+            "encodedImageType": "",
+            "height": 0,
+            "imageSettings": Object {
+              "cropperSettings": null,
+              "icon": "art",
+              "iconFillColor": "#FFFFFF",
+              "image": "Art Icon",
+              "mode": "SingleColor",
+            },
+            "name": "Test Icon",
+            "originalName": "Test Icon",
+            "outlineColor": "#06A3B7",
+            "outlineSize": "small",
+            "shape": "triangle",
+            "size": "large",
+            "text": "Some Text",
+            "textBackgroundColor": "#06A3B7",
+            "textColor": "#009606",
+            "textPosition": "below",
+            "textSize": "medium",
+            "transform": "",
+            "translateX": 0,
+            "translateY": 0,
+            "type": "image/svg+xml-icon-maker-icons",
+            "width": 0,
+            "x": 0,
+            "y": 0,
+          }
+        `)
       })
 
       it('replaces icon type from object to string for single-color images even using another language', async () => {
@@ -409,39 +414,41 @@ describe('useSvgSettings()', () => {
           return result.current[0]
         })
 
-        expect(result.current[0]).toEqual({
-          type: 'image/svg+xml-icon-maker-icons',
-          alt: 'a test image',
-          shape: 'triangle',
-          size: 'large',
-          color: '#FF2717',
-          encodedImage: '',
-          encodedImageType: '',
-          encodedImageName: '',
-          outlineColor: '#06A3B7',
-          outlineSize: 'small',
-          text: 'Some Text',
-          textSize: 'medium',
-          textColor: '#009606',
-          textBackgroundColor: '#06A3B7',
-          imageSettings: {
-            cropperSettings: null,
-            icon: 'art',
-            iconFillColor: '#FFFFFF',
-            image: 'Art Icon',
-            mode: 'SingleColor'
-          },
-          textPosition: 'below',
-          x: 0,
-          y: 0,
-          translateX: 0,
-          translateY: 0,
-          width: 0,
-          height: 0,
-          name: 'Test Icon',
-          originalName: 'Test Icon',
-          transform: ''
-        })
+        expect(result.current[0]).toMatchInlineSnapshot(`
+          Object {
+            "alt": "a red circle",
+            "color": "#FF2717",
+            "encodedImage": "",
+            "encodedImageName": "",
+            "encodedImageType": "",
+            "height": 0,
+            "imageSettings": Object {
+              "cropperSettings": null,
+              "icon": "art",
+              "iconFillColor": "#FFFFFF",
+              "image": "Art Icon",
+              "mode": "SingleColor",
+            },
+            "name": "Test Icon",
+            "originalName": "Test Icon",
+            "outlineColor": "#06A3B7",
+            "outlineSize": "small",
+            "shape": "triangle",
+            "size": "large",
+            "text": "Some Text",
+            "textBackgroundColor": "#06A3B7",
+            "textColor": "#009606",
+            "textPosition": "below",
+            "textSize": "medium",
+            "transform": "",
+            "translateX": 0,
+            "translateY": 0,
+            "type": "image/svg+xml-icon-maker-icons",
+            "width": 0,
+            "x": 0,
+            "y": 0,
+          }
+        `)
       })
 
       it('sets image settings to null when label is not found', async () => {
@@ -465,33 +472,35 @@ describe('useSvgSettings()', () => {
           return result.current[0]
         })
 
-        expect(result.current[0]).toEqual({
-          type: 'image/svg+xml-icon-maker-icons',
-          alt: 'a test image',
-          shape: 'triangle',
-          size: 'large',
-          color: '#FF2717',
-          encodedImage: '',
-          encodedImageType: '',
-          encodedImageName: '',
-          outlineColor: '#06A3B7',
-          outlineSize: 'small',
-          text: 'Some Text',
-          textSize: 'medium',
-          textColor: '#009606',
-          textBackgroundColor: '#06A3B7',
-          imageSettings: null,
-          textPosition: 'below',
-          x: 0,
-          y: 0,
-          translateX: 0,
-          translateY: 0,
-          width: 0,
-          height: 0,
-          name: 'Test Icon',
-          originalName: 'Test Icon',
-          transform: ''
-        })
+        expect(result.current[0]).toMatchInlineSnapshot(`
+          Object {
+            "alt": "a red circle",
+            "color": "#FF2717",
+            "encodedImage": "",
+            "encodedImageName": "",
+            "encodedImageType": "",
+            "height": 0,
+            "imageSettings": null,
+            "name": "Test Icon",
+            "originalName": "Test Icon",
+            "outlineColor": "#06A3B7",
+            "outlineSize": "small",
+            "shape": "triangle",
+            "size": "large",
+            "text": "Some Text",
+            "textBackgroundColor": "#06A3B7",
+            "textColor": "#009606",
+            "textPosition": "below",
+            "textSize": "medium",
+            "transform": "",
+            "translateX": 0,
+            "translateY": 0,
+            "type": "image/svg+xml-icon-maker-icons",
+            "width": 0,
+            "x": 0,
+            "y": 0,
+          }
+        `)
       })
     })
 
@@ -519,31 +528,32 @@ describe('useSvgSettings()', () => {
 
       it('uses the default settings', () => {
         const result = subject()
-        expect(result.current[0]).toEqual({
-          type: TYPE,
-          alt: '',
-          shape: 'square',
-          size: 'small',
-          color: null,
-          encodedImage: '',
-          encodedImageType: '',
-          encodedImageName: '',
-          outlineColor: '#000000',
-          outlineSize: 'none',
-          text: '',
-          textSize: 'small',
-          textColor: '#000000',
-          textBackgroundColor: null,
-          textPosition: 'below',
-          x: 0,
-          y: 0,
-          translateX: 0,
-          translateY: 0,
-          width: 0,
-          height: 0,
-          imageSettings: null,
-          transform: ''
-        })
+        expect(result.current[0]).toMatchInlineSnapshot(`
+          Object {
+            "color": null,
+            "encodedImage": "",
+            "encodedImageName": "",
+            "encodedImageType": "",
+            "height": 0,
+            "imageSettings": null,
+            "outlineColor": "#000000",
+            "outlineSize": "none",
+            "shape": "square",
+            "size": "small",
+            "text": "",
+            "textBackgroundColor": null,
+            "textColor": "#000000",
+            "textPosition": "below",
+            "textSize": "small",
+            "transform": "",
+            "translateX": 0,
+            "translateY": 0,
+            "type": "image/svg+xml-icon-maker-icons",
+            "width": 0,
+            "x": 0,
+            "y": 0,
+          }
+        `)
       })
     })
 
@@ -552,31 +562,32 @@ describe('useSvgSettings()', () => {
 
       it('uses the default settings', async () => {
         const result = subject()
-        expect(result.current[0]).toEqual({
-          type: TYPE,
-          alt: '',
-          shape: 'square',
-          size: 'small',
-          color: null,
-          encodedImage: '',
-          encodedImageType: '',
-          encodedImageName: '',
-          outlineColor: '#000000',
-          outlineSize: 'none',
-          text: '',
-          textSize: 'small',
-          textColor: '#000000',
-          textBackgroundColor: null,
-          imageSettings: null,
-          textPosition: 'below',
-          x: 0,
-          y: 0,
-          translateX: 0,
-          translateY: 0,
-          width: 0,
-          height: 0,
-          transform: ''
-        })
+        expect(result.current[0]).toMatchInlineSnapshot(`
+          Object {
+            "color": null,
+            "encodedImage": "",
+            "encodedImageName": "",
+            "encodedImageType": "",
+            "height": 0,
+            "imageSettings": null,
+            "outlineColor": "#000000",
+            "outlineSize": "none",
+            "shape": "square",
+            "size": "small",
+            "text": "",
+            "textBackgroundColor": null,
+            "textColor": "#000000",
+            "textPosition": "below",
+            "textSize": "small",
+            "transform": "",
+            "translateX": 0,
+            "translateY": 0,
+            "type": "image/svg+xml-icon-maker-icons",
+            "width": 0,
+            "x": 0,
+            "y": 0,
+          }
+        `)
       })
     })
   })

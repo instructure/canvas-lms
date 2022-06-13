@@ -23,8 +23,6 @@ import RceApiSource from '../../../../rcs/api'
 import {modes} from '../reducers/imageSection'
 import iconsLabels from '../utils/iconsLabels'
 
-const TYPE = SVG_XML_TYPE
-
 export const statuses = {
   ERROR: 'error',
   LOADING: 'loading',
@@ -81,7 +79,9 @@ export function useSvgSettings(editor, editing, rcsConfig) {
   const [settings, dispatch] = useReducer(svgSettingsReducer, defaultState)
   const [status, setStatus] = useState(statuses.IDLE)
 
-  const urlFromNode = getImageNode(editor, editing)?.getAttribute(ICON_MAKER_DOWNLOAD_URL_ATTR)
+  const imgNode = getImageNode(editor, editing)
+  const urlFromNode = imgNode?.getAttribute(ICON_MAKER_DOWNLOAD_URL_ATTR)
+  const altText = imgNode?.getAttribute('alt')
 
   useEffect(() => {
     const fetchSvgSettings = async () => {
@@ -115,6 +115,10 @@ export function useSvgSettings(editor, editing, rcsConfig) {
         metadataJson.name = fileName
         metadataJson.originalName = fileName
 
+        if (altText) {
+          metadataJson.alt = altText
+        }
+
         processMetadataForBackwardCompatibility(metadataJson)
 
         // settings found, return parsed results
@@ -127,7 +131,7 @@ export function useSvgSettings(editor, editing, rcsConfig) {
 
     // If we are editing rather than creating, fetch existing settings
     if (editing) fetchSvgSettings()
-  }, [editor, editing, urlFromNode, rcsConfig, buildFilesUrl])
+  }, [editor, editing, urlFromNode, rcsConfig, altText])
 
   return [settings, status, dispatch]
 }
@@ -136,7 +140,7 @@ export async function svgFromUrl(url) {
   const response = await fetch(url)
 
   const data = await response.text()
-  return new DOMParser().parseFromString(data, TYPE)
+  return new DOMParser().parseFromString(data, SVG_XML_TYPE)
 }
 
 function processMetadataForBackwardCompatibility(metadataJson) {
