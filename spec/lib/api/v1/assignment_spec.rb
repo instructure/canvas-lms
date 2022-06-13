@@ -328,8 +328,10 @@ describe "Api::V1::Assignment" do
         expect(json).not_to have_key "rubric"
       end
 
-      it "excludes rubric when no active rubric" do
-        @rubric.update!(workflow_state: "deleted")
+      it "excludes rubric when rubric association is not active" do
+        ra = assignment.rubric_association
+        ra.workflow_state = "deleted"
+        ra.save!
         json = api.assignment_json(assignment, user, session)
         expect(json).not_to have_key "rubric"
       end
