@@ -66,6 +66,7 @@ module SIS
           short_name: row["short_name"],
           full_name: row["full_name"],
           sortable_name: row["sortable_name"],
+          home_account: row["home_account"],
           lineno: row["lineno"],
           csv: csv,
           row: row,

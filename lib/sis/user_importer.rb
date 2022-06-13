@@ -171,7 +171,12 @@ module SIS
               next
             end
 
-            user = pseudo.user
+            user = if force_new_user?(user_row, pseudo)
+                     new_user(user_row)
+                   else
+                     pseudo.user
+                   end
+
             unless user.stuck_sis_fields.include?(:name)
               user.name = infer_user_name(user_row, user.name)
             end
@@ -205,12 +210,7 @@ module SIS
             user = nil
             pseudo = Pseudonym.new
             user = other_user(user_row, pseudo) if user_row.integration_id.present?
-            unless user
-              user = User.new
-              user.name = infer_user_name(user_row)
-              user.sortable_name = infer_sortable_name(user_row)
-              user.short_name = user_row.short_name if user_row.short_name.present?
-            end
+            user = new_user(user_row) if user.blank? || force_new_user?(user_row, pseudo)
           end
 
           is_new_user_with_password_notification = user.new_record? && user_row.email.present? && user_row.canvas_password_notification.present? && user_row.authentication_provider_id == "canvas"
@@ -448,6 +448,16 @@ module SIS
           login
         end
       end
+
+      def new_user(user_row)
+        User.new.tap do |user|
+          user.name = infer_user_name(user_row)
+          user.sortable_name = infer_sortable_name(user_row)
+          user.short_name = user_row.short_name if user_row.short_name.present?
+        end
+      end
+
+      def force_new_user?(_user_row, _pseudo); end
 
       def other_user(_user_row, _pseudo); end
 
