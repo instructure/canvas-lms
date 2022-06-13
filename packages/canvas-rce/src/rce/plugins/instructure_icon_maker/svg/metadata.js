@@ -21,6 +21,11 @@ import {createSvgElement} from './utils'
 export function buildMetadata(settings) {
   const {name, originalName, ...embedSettings} = settings
 
+  // Strip out alt text as it is instance specific
+  if ('alt' in embedSettings) {
+    delete embedSettings.alt
+  }
+
   const metadata = createSvgElement('metadata')
   metadata.textContent = JSON.stringify(embedSettings)
   return metadata
