@@ -43,6 +43,16 @@ RSpec.describe Submissions::AnonymousPreviewsController do
       expect(assigns[:anonymize_students]).to be true
     end
 
+    it "does not throw an error when an admin without an enrollment in the course views the preview" do
+      assignment = @course.assignments.create!(title: "shhh", anonymous_grading: true)
+      admin = account_admin_user(active_all: true, account: Account.site_admin)
+      user_session(admin)
+
+      submission = assignment.submission_for_student(@student)
+      get :show, params: { course_id: @course.id, assignment_id: assignment.id, anonymous_id: submission.anonymous_id, preview: true }
+      expect(response).to be_successful
+    end
+
     it "anonymizes student information when the viewer is a peer reviewer and anonymous peer reviews are enabled" do
       assignment = @course.assignments.create!(title: "ok", peer_reviews: true, anonymous_peer_reviews: true)
       reviewer = @course.enroll_student(User.create!, enrollment_state: "active").user
