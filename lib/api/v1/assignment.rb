@@ -299,7 +299,7 @@ module Api::V1::Assignment
         end
       end
 
-      if assignment.rubric && !assignment.rubric.deleted?
+      if assignment.active_rubric_association?
         rubric = assignment.rubric
         hash["rubric"] = rubric.data.map do |row|
           row_hash = row.slice(:id, :points, :description, :long_description, :ignore_for_scoring)
