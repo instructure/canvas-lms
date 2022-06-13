@@ -43,7 +43,7 @@ module PlannerPageObject
   end
 
   def dismiss_opportunity_button_selector(item_name)
-    "button[title='Dismiss #{item_name}']"
+    "button:contains('Dismiss #{item_name}')"
   end
 
   def no_new_opportunity_msg_selector
@@ -210,7 +210,7 @@ module PlannerPageObject
   end
 
   def dismiss_opportunity_button(item_name)
-    f(dismiss_opportunity_button_selector(item_name))
+    fj(dismiss_opportunity_button_selector(item_name))
   end
 
   # finds planner item by any unique text within it (header is usually good)

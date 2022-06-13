@@ -21,9 +21,9 @@ import {themeable} from '@instructure/ui-themeable'
 import {func, bool, string} from 'prop-types'
 
 import {Heading} from '@instructure/ui-heading'
-import {Link} from '@instructure/ui-link'
-import {Button} from '@instructure/ui-buttons'
+import {CondensedButton} from '@instructure/ui-buttons'
 
+import {InlineList} from '@instructure/ui-list'
 import formatMessage from '../../format-message'
 import DesertSvg from './empty-desert.svg' // Currently uses react-svg-loader
 import BalloonsSvg from './balloons.svg'
@@ -52,9 +52,9 @@ class PlannerEmptyState extends Component {
 
   renderAddToDoButton() {
     return (
-      <Button id="PlannerEmptyState_AddToDo" variant="link" onClick={this.props.onAddToDo}>
+      <CondensedButton id="PlannerEmptyState_AddToDo" onClick={this.props.onAddToDo}>
         {formatMessage('Add To-Do')}
-      </Button>
+      </CondensedButton>
     )
   }
 
@@ -75,15 +75,21 @@ class PlannerEmptyState extends Component {
           <div className={styles.subtitle}>
             {formatMessage("Looks like there isn't anything here")}
           </div>
-          {!this.props.isWeekly && this.props.changeDashboardView && (
-            <>
-              <Link id="PlannerEmptyState_CardView" onClick={this.handleDashboardCardLinkClick}>
-                {formatMessage('Go to Card View Dashboard')}
-              </Link>
-              |
-            </>
+          {!this.props.isWeekly && (
+            <InlineList delimiter="pipe">
+              {this.props.changeDashboardView && (
+                <InlineList.Item>
+                  <CondensedButton
+                    id="PlannerEmptyState_CardView"
+                    onClick={this.handleDashboardCardLinkClick}
+                  >
+                    {formatMessage('Go to Card View Dashboard')}
+                  </CondensedButton>
+                </InlineList.Item>
+              )}
+              <InlineList.Item>{this.renderAddToDoButton()}</InlineList.Item>
+            </InlineList>
           )}
-          {!this.props.isWeekly && this.renderAddToDoButton()}
         </div>
       </div>
     )

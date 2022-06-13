@@ -7,6 +7,7 @@ exports[`new activity button does not show when there is no new activity 1`] = `
 >
   <Button
     as="button"
+    color="primary-inverse"
     cursor="pointer"
     display="inline-block"
     elementRef={[Function]}
@@ -16,51 +17,40 @@ exports[`new activity button does not show when there is no new activity 1`] = `
     size="medium"
     textAlign="center"
     type="button"
-    variant="light"
     withBackground={true}
   >
     Today
   </Button>
-  <Button
+  <IconButton
     as="button"
+    color="secondary"
     cursor="pointer"
-    display="inline-block"
     elementRef={[Function]}
-    icon={[Function]}
     margin="0 medium 0 0"
     onClick={[Function]}
+    renderIcon={[Function]}
+    screenReaderLabel="Add To Do"
+    shape="rectangle"
     size="medium"
-    textAlign="center"
     type="button"
-    variant="icon"
-    withBackground={true}
-  >
-    <ScreenReaderContent
-      as="span"
-    >
-      Add To Do
-    </ScreenReaderContent>
-  </Button>
-  <Button
+    withBackground={false}
+    withBorder={false}
+  />
+  <IconButton
     as="button"
+    color="secondary"
     cursor="pointer"
-    display="inline-block"
     elementRef={[Function]}
-    icon={[Function]}
     margin="0 medium 0 0"
     onClick={[Function]}
+    renderIcon={[Function]}
+    screenReaderLabel="Show My Grades"
+    shape="rectangle"
     size="medium"
-    textAlign="center"
     type="button"
-    variant="icon"
-    withBackground={true}
-  >
-    <ScreenReaderContent
-      as="span"
-    >
-      Show My Grades
-    </ScreenReaderContent>
-  </Button>
+    withBackground={false}
+    withBorder={false}
+  />
   <Popover
     color="primary"
     constrain="window"
@@ -84,20 +74,7 @@ exports[`new activity button does not show when there is no new activity 1`] = `
     onShowContent={[Function]}
     placement="bottom end"
     positionTarget={null}
-    renderTrigger={null}
-    shadow="resting"
-    shouldAlignArrow={false}
-    shouldCloseOnDocumentClick={true}
-    shouldCloseOnEscape={true}
-    shouldContainFocus={false}
-    shouldFocusContentOnTriggerBlur={false}
-    shouldRenderOffscreen={false}
-    shouldReturnFocus={true}
-    shouldTrackPosition={true}
-    stacking="topmost"
-    withArrow={true}
-  >
-    <PopoverTrigger>
+    renderTrigger={
       <Badge
         count={1}
         countUntil={100}
@@ -111,71 +88,75 @@ exports[`new activity button does not show when there is no new activity 1`] = `
         type="count"
         variant="primary"
       >
-        <Button
+        <IconButton
           as="button"
-          buttonRef={[Function]}
+          color="secondary"
           cursor="pointer"
-          display="inline-block"
           elementRef={[Function]}
-          icon={[Function]}
           margin="0"
           onClick={[Function]}
+          renderIcon={[Function]}
+          screenReaderLabel="opportunities popup"
+          shape="rectangle"
           size="medium"
-          textAlign="center"
           type="button"
-          variant="icon"
-          withBackground={true}
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            opportunities popup
-          </ScreenReaderContent>
-        </Button>
+          withBackground={false}
+          withBorder={false}
+        />
       </Badge>
-    </PopoverTrigger>
-    <PopoverContent>
-      <Animatable(Opportunities)
-        courses={
-          Array [
-            Object {
-              "id": "1",
-              "longName": "Course Long Name",
-              "shortName": "Course Short Name",
+    }
+    shadow="resting"
+    shouldAlignArrow={false}
+    shouldCloseOnDocumentClick={true}
+    shouldCloseOnEscape={true}
+    shouldContainFocus={false}
+    shouldFocusContentOnTriggerBlur={false}
+    shouldRenderOffscreen={false}
+    shouldReturnFocus={true}
+    shouldTrackPosition={true}
+    stacking="topmost"
+    withArrow={true}
+  >
+    <Animatable(Opportunities)
+      courses={
+        Array [
+          Object {
+            "id": "1",
+            "longName": "Course Long Name",
+            "shortName": "Course Short Name",
+          },
+        ]
+      }
+      dismiss={[Function]}
+      dismissedOpportunities={
+        Array [
+          Object {
+            "course_id": "1",
+            "due_at": "2017-03-09T20:40:35Z",
+            "html_url": "http://www.non_default_url.com",
+            "id": "2",
+            "name": "learning object title",
+            "planner_override": Object {
+              "dismissed": true,
             },
-          ]
-        }
-        dismiss={[Function]}
-        dismissedOpportunities={
-          Array [
-            Object {
-              "course_id": "1",
-              "due_at": "2017-03-09T20:40:35Z",
-              "html_url": "http://www.non_default_url.com",
-              "id": "2",
-              "name": "learning object title",
-              "planner_override": Object {
-                "dismissed": true,
-              },
-            },
-          ]
-        }
-        maxHeight="none"
-        newOpportunities={
-          Array [
-            Object {
-              "course_id": "1",
-              "due_at": "2017-03-09T20:40:35Z",
-              "html_url": "http://www.non_default_url.com",
-              "id": "1",
-              "name": "learning object title",
-            },
-          ]
-        }
-        timeZone="America/Denver"
-        togglePopover={[Function]}
-      />
-    </PopoverContent>
+          },
+        ]
+      }
+      maxHeight="none"
+      newOpportunities={
+        Array [
+          Object {
+            "course_id": "1",
+            "due_at": "2017-03-09T20:40:35Z",
+            "html_url": "http://www.non_default_url.com",
+            "id": "1",
+            "name": "learning object title",
+          },
+        ]
+      }
+      timeZone="America/Denver"
+      togglePopover={[Function]}
+    />
   </Popover>
   <Tray
     border={false}
@@ -209,12 +190,10 @@ exports[`new activity button does not show when there is no new activity 1`] = `
       offset="x-small"
       onClick={[Function]}
       placement="start"
+      screenReaderLabel="Close"
       size="small"
       type="button"
-      variant="icon"
-    >
-      Close
-    </CloseButton>
+    />
     <UpdateItemTray
       courses={
         Array [
@@ -276,12 +255,10 @@ exports[`new activity button does not show when there is no new activity 1`] = `
         offset="x-small"
         onClick={[Function]}
         placement="start"
+        screenReaderLabel="Close"
         size="small"
         type="button"
-        variant="icon"
-      >
-        Close
-      </CloseButton>
+      />
       <GradesDisplay
         courses={
           Array [
@@ -305,10 +282,10 @@ exports[`new activity button does not show when there is no new activity 1`] = `
     open={false}
   >
     <StickyButton
-      buttonRef={[Function]}
       className="StickyButton-styles__newActivityButton"
       description="Scrolls up to the previous item with new activity."
       direction="up"
+      elementRef={[Function]}
       id="new_activity_button"
       onClick={[Function]}
       zIndex={3}
@@ -326,6 +303,7 @@ exports[`new activity button shows when there is new activity 1`] = `
 >
   <Button
     as="button"
+    color="primary-inverse"
     cursor="pointer"
     display="inline-block"
     elementRef={[Function]}
@@ -335,51 +313,40 @@ exports[`new activity button shows when there is new activity 1`] = `
     size="medium"
     textAlign="center"
     type="button"
-    variant="light"
     withBackground={true}
   >
     Today
   </Button>
-  <Button
+  <IconButton
     as="button"
+    color="secondary"
     cursor="pointer"
-    display="inline-block"
     elementRef={[Function]}
-    icon={[Function]}
     margin="0 medium 0 0"
     onClick={[Function]}
+    renderIcon={[Function]}
+    screenReaderLabel="Add To Do"
+    shape="rectangle"
     size="medium"
-    textAlign="center"
     type="button"
-    variant="icon"
-    withBackground={true}
-  >
-    <ScreenReaderContent
-      as="span"
-    >
-      Add To Do
-    </ScreenReaderContent>
-  </Button>
-  <Button
+    withBackground={false}
+    withBorder={false}
+  />
+  <IconButton
     as="button"
+    color="secondary"
     cursor="pointer"
-    display="inline-block"
     elementRef={[Function]}
-    icon={[Function]}
     margin="0 medium 0 0"
     onClick={[Function]}
+    renderIcon={[Function]}
+    screenReaderLabel="Show My Grades"
+    shape="rectangle"
     size="medium"
-    textAlign="center"
     type="button"
-    variant="icon"
-    withBackground={true}
-  >
-    <ScreenReaderContent
-      as="span"
-    >
-      Show My Grades
-    </ScreenReaderContent>
-  </Button>
+    withBackground={false}
+    withBorder={false}
+  />
   <Popover
     color="primary"
     constrain="window"
@@ -403,20 +370,7 @@ exports[`new activity button shows when there is new activity 1`] = `
     onShowContent={[Function]}
     placement="bottom end"
     positionTarget={null}
-    renderTrigger={null}
-    shadow="resting"
-    shouldAlignArrow={false}
-    shouldCloseOnDocumentClick={true}
-    shouldCloseOnEscape={true}
-    shouldContainFocus={false}
-    shouldFocusContentOnTriggerBlur={false}
-    shouldRenderOffscreen={false}
-    shouldReturnFocus={true}
-    shouldTrackPosition={true}
-    stacking="topmost"
-    withArrow={true}
-  >
-    <PopoverTrigger>
+    renderTrigger={
       <Badge
         count={1}
         countUntil={100}
@@ -430,71 +384,75 @@ exports[`new activity button shows when there is new activity 1`] = `
         type="count"
         variant="primary"
       >
-        <Button
+        <IconButton
           as="button"
-          buttonRef={[Function]}
+          color="secondary"
           cursor="pointer"
-          display="inline-block"
           elementRef={[Function]}
-          icon={[Function]}
           margin="0"
           onClick={[Function]}
+          renderIcon={[Function]}
+          screenReaderLabel="opportunities popup"
+          shape="rectangle"
           size="medium"
-          textAlign="center"
           type="button"
-          variant="icon"
-          withBackground={true}
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            opportunities popup
-          </ScreenReaderContent>
-        </Button>
+          withBackground={false}
+          withBorder={false}
+        />
       </Badge>
-    </PopoverTrigger>
-    <PopoverContent>
-      <Animatable(Opportunities)
-        courses={
-          Array [
-            Object {
-              "id": "1",
-              "longName": "Course Long Name",
-              "shortName": "Course Short Name",
+    }
+    shadow="resting"
+    shouldAlignArrow={false}
+    shouldCloseOnDocumentClick={true}
+    shouldCloseOnEscape={true}
+    shouldContainFocus={false}
+    shouldFocusContentOnTriggerBlur={false}
+    shouldRenderOffscreen={false}
+    shouldReturnFocus={true}
+    shouldTrackPosition={true}
+    stacking="topmost"
+    withArrow={true}
+  >
+    <Animatable(Opportunities)
+      courses={
+        Array [
+          Object {
+            "id": "1",
+            "longName": "Course Long Name",
+            "shortName": "Course Short Name",
+          },
+        ]
+      }
+      dismiss={[Function]}
+      dismissedOpportunities={
+        Array [
+          Object {
+            "course_id": "1",
+            "due_at": "2017-03-09T20:40:35Z",
+            "html_url": "http://www.non_default_url.com",
+            "id": "2",
+            "name": "learning object title",
+            "planner_override": Object {
+              "dismissed": true,
             },
-          ]
-        }
-        dismiss={[Function]}
-        dismissedOpportunities={
-          Array [
-            Object {
-              "course_id": "1",
-              "due_at": "2017-03-09T20:40:35Z",
-              "html_url": "http://www.non_default_url.com",
-              "id": "2",
-              "name": "learning object title",
-              "planner_override": Object {
-                "dismissed": true,
-              },
-            },
-          ]
-        }
-        maxHeight="none"
-        newOpportunities={
-          Array [
-            Object {
-              "course_id": "1",
-              "due_at": "2017-03-09T20:40:35Z",
-              "html_url": "http://www.non_default_url.com",
-              "id": "1",
-              "name": "learning object title",
-            },
-          ]
-        }
-        timeZone="America/Denver"
-        togglePopover={[Function]}
-      />
-    </PopoverContent>
+          },
+        ]
+      }
+      maxHeight="none"
+      newOpportunities={
+        Array [
+          Object {
+            "course_id": "1",
+            "due_at": "2017-03-09T20:40:35Z",
+            "html_url": "http://www.non_default_url.com",
+            "id": "1",
+            "name": "learning object title",
+          },
+        ]
+      }
+      timeZone="America/Denver"
+      togglePopover={[Function]}
+    />
   </Popover>
   <Tray
     border={false}
@@ -528,12 +486,10 @@ exports[`new activity button shows when there is new activity 1`] = `
       offset="x-small"
       onClick={[Function]}
       placement="start"
+      screenReaderLabel="Close"
       size="small"
       type="button"
-      variant="icon"
-    >
-      Close
-    </CloseButton>
+    />
     <UpdateItemTray
       courses={
         Array [
@@ -595,12 +551,10 @@ exports[`new activity button shows when there is new activity 1`] = `
         offset="x-small"
         onClick={[Function]}
         placement="start"
+        screenReaderLabel="Close"
         size="small"
         type="button"
-        variant="icon"
-      >
-        Close
-      </CloseButton>
+      />
       <GradesDisplay
         courses={
           Array [
@@ -624,10 +578,10 @@ exports[`new activity button shows when there is new activity 1`] = `
     open={true}
   >
     <StickyButton
-      buttonRef={[Function]}
       className="StickyButton-styles__newActivityButton"
       description="Scrolls up to the previous item with new activity."
       direction="up"
+      elementRef={[Function]}
       id="new_activity_button"
       onClick={[Function]}
       zIndex={3}
@@ -645,6 +599,7 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
 >
   <Button
     as="button"
+    color="primary-inverse"
     cursor="pointer"
     display="inline-block"
     elementRef={[Function]}
@@ -654,51 +609,40 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
     size="medium"
     textAlign="center"
     type="button"
-    variant="light"
     withBackground={true}
   >
     Today
   </Button>
-  <Button
+  <IconButton
     as="button"
+    color="secondary"
     cursor="pointer"
-    display="inline-block"
     elementRef={[Function]}
-    icon={[Function]}
     margin="0 medium 0 0"
     onClick={[Function]}
+    renderIcon={[Function]}
+    screenReaderLabel="Add To Do"
+    shape="rectangle"
     size="medium"
-    textAlign="center"
     type="button"
-    variant="icon"
-    withBackground={true}
-  >
-    <ScreenReaderContent
-      as="span"
-    >
-      Add To Do
-    </ScreenReaderContent>
-  </Button>
-  <Button
+    withBackground={false}
+    withBorder={false}
+  />
+  <IconButton
     as="button"
+    color="secondary"
     cursor="pointer"
-    display="inline-block"
     elementRef={[Function]}
-    icon={[Function]}
     margin="0 medium 0 0"
     onClick={[Function]}
+    renderIcon={[Function]}
+    screenReaderLabel="Show My Grades"
+    shape="rectangle"
     size="medium"
-    textAlign="center"
     type="button"
-    variant="icon"
-    withBackground={true}
-  >
-    <ScreenReaderContent
-      as="span"
-    >
-      Show My Grades
-    </ScreenReaderContent>
-  </Button>
+    withBackground={false}
+    withBorder={false}
+  />
   <Popover
     color="primary"
     constrain="window"
@@ -722,20 +666,7 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
     onShowContent={[Function]}
     placement="bottom end"
     positionTarget={null}
-    renderTrigger={null}
-    shadow="resting"
-    shouldAlignArrow={false}
-    shouldCloseOnDocumentClick={true}
-    shouldCloseOnEscape={true}
-    shouldContainFocus={false}
-    shouldFocusContentOnTriggerBlur={false}
-    shouldRenderOffscreen={false}
-    shouldReturnFocus={true}
-    shouldTrackPosition={true}
-    stacking="topmost"
-    withArrow={true}
-  >
-    <PopoverTrigger>
+    renderTrigger={
       <Badge
         count={1}
         countUntil={100}
@@ -749,71 +680,75 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
         type="count"
         variant="primary"
       >
-        <Button
+        <IconButton
           as="button"
-          buttonRef={[Function]}
+          color="secondary"
           cursor="pointer"
-          display="inline-block"
           elementRef={[Function]}
-          icon={[Function]}
           margin="0"
           onClick={[Function]}
+          renderIcon={[Function]}
+          screenReaderLabel="opportunities popup"
+          shape="rectangle"
           size="medium"
-          textAlign="center"
           type="button"
-          variant="icon"
-          withBackground={true}
-        >
-          <ScreenReaderContent
-            as="span"
-          >
-            opportunities popup
-          </ScreenReaderContent>
-        </Button>
+          withBackground={false}
+          withBorder={false}
+        />
       </Badge>
-    </PopoverTrigger>
-    <PopoverContent>
-      <Animatable(Opportunities)
-        courses={
-          Array [
-            Object {
-              "id": "1",
-              "longName": "Course Long Name",
-              "shortName": "Course Short Name",
+    }
+    shadow="resting"
+    shouldAlignArrow={false}
+    shouldCloseOnDocumentClick={true}
+    shouldCloseOnEscape={true}
+    shouldContainFocus={false}
+    shouldFocusContentOnTriggerBlur={false}
+    shouldRenderOffscreen={false}
+    shouldReturnFocus={true}
+    shouldTrackPosition={true}
+    stacking="topmost"
+    withArrow={true}
+  >
+    <Animatable(Opportunities)
+      courses={
+        Array [
+          Object {
+            "id": "1",
+            "longName": "Course Long Name",
+            "shortName": "Course Short Name",
+          },
+        ]
+      }
+      dismiss={[Function]}
+      dismissedOpportunities={
+        Array [
+          Object {
+            "course_id": "1",
+            "due_at": "2017-03-09T20:40:35Z",
+            "html_url": "http://www.non_default_url.com",
+            "id": "2",
+            "name": "learning object title",
+            "planner_override": Object {
+              "dismissed": true,
             },
-          ]
-        }
-        dismiss={[Function]}
-        dismissedOpportunities={
-          Array [
-            Object {
-              "course_id": "1",
-              "due_at": "2017-03-09T20:40:35Z",
-              "html_url": "http://www.non_default_url.com",
-              "id": "2",
-              "name": "learning object title",
-              "planner_override": Object {
-                "dismissed": true,
-              },
-            },
-          ]
-        }
-        maxHeight="none"
-        newOpportunities={
-          Array [
-            Object {
-              "course_id": "1",
-              "due_at": "2017-03-09T20:40:35Z",
-              "html_url": "http://www.non_default_url.com",
-              "id": "1",
-              "name": "learning object title",
-            },
-          ]
-        }
-        timeZone="America/Denver"
-        togglePopover={[Function]}
-      />
-    </PopoverContent>
+          },
+        ]
+      }
+      maxHeight="none"
+      newOpportunities={
+        Array [
+          Object {
+            "course_id": "1",
+            "due_at": "2017-03-09T20:40:35Z",
+            "html_url": "http://www.non_default_url.com",
+            "id": "1",
+            "name": "learning object title",
+          },
+        ]
+      }
+      timeZone="America/Denver"
+      togglePopover={[Function]}
+    />
   </Popover>
   <Tray
     border={false}
@@ -847,12 +782,10 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
       offset="x-small"
       onClick={[Function]}
       placement="start"
+      screenReaderLabel="Close"
       size="small"
       type="button"
-      variant="icon"
-    >
-      Close
-    </CloseButton>
+    />
     <UpdateItemTray
       courses={
         Array [
@@ -914,12 +847,10 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
         offset="x-small"
         onClick={[Function]}
         placement="start"
+        screenReaderLabel="Close"
         size="small"
         type="button"
-        variant="icon"
-      >
-        Close
-      </CloseButton>
+      />
       <GradesDisplay
         courses={
           Array [
@@ -943,10 +874,10 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
     open={false}
   >
     <StickyButton
-      buttonRef={[Function]}
       className="StickyButton-styles__newActivityButton"
       description="Scrolls up to the previous item with new activity."
       direction="up"
+      elementRef={[Function]}
       id="new_activity_button"
       onClick={[Function]}
       zIndex={3}

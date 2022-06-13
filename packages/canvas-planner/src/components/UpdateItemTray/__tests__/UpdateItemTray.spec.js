@@ -106,8 +106,8 @@ it('shows details inputs', () => {
 it('disables the save button when title is empty', () => {
   const item = simpleItem()
   const wrapper = shallow(<UpdateItemTray {...defaultProps} noteItem={item} />)
-  const button = wrapper.find('Button[variant="primary"]')
-  expect(button.props().disabled).toBe(true)
+  const button = wrapper.find('Button[color="primary"]')
+  expect(button.props().interaction).toBe('disabled')
 })
 
 it('handles courseid being none', () => {
@@ -146,8 +146,8 @@ it('sets default datetime to 11:50pm today when no date is provided', () => {
 it('enables the save button when title and date are present', () => {
   const item = simpleItem({title: 'an item'})
   const wrapper = shallow(<UpdateItemTray {...defaultProps} noteItem={item} />)
-  const button = wrapper.find('Button[variant="primary"]')
-  expect(button.props().disabled).toBe(false)
+  const button = wrapper.find('Button[color="primary"]')
+  expect(button.props().interaction).toBe('enabled')
 })
 
 it('does not set an initial error message on title', () => {
@@ -204,10 +204,7 @@ it.skip('clears the error message when a date is typed in', () => {
 it('respects the provided timezone', () => {
   const item = simpleItem({date: moment('2017-04-25 12:00:00-0300')})
   const wrapper = mount(<UpdateItemTray {...defaultProps} noteItem={item} />)
-  const d = wrapper
-    .find('DateInput')
-    .find('TextInput')
-    .props().value
+  const d = wrapper.find('DateInput').find('TextInput').props().value
   expect(d).toEqual('April 26, 2017') // timezone shift from -3 to +9 pushes it to the next day
 })
 
@@ -283,7 +280,7 @@ it('does render the delete button if an item is specified', () => {
   const wrapper = shallow(
     <UpdateItemTray {...defaultProps} noteItem={{uniqueId: '1', title: 'some note'}} />
   )
-  const deleteButton = wrapper.find('Button[variant="light"]')
+  const deleteButton = wrapper.find('Button[color="primary-inverse"]')
   expect(deleteButton).toHaveLength(1)
 })
 
@@ -293,10 +290,7 @@ it('renders just an optional option when no courses', () => {
   // options are rendered into the DOM
   const courseSelect = wrapper.find('SimpleSelect')
   courseSelect.simulate('click')
-  const optListId = courseSelect
-    .getDOMNode()
-    .querySelector('input')
-    .getAttribute('aria-owns')
+  const optListId = courseSelect.getDOMNode().querySelector('input').getAttribute('aria-owns')
   const optList = document.getElementById(optListId)
   expect(optList.querySelectorAll('li')).toHaveLength(1)
 })
@@ -313,10 +307,7 @@ it('renders course options plus an optional option when provided with courses', 
   )
   const courseSelect = wrapper.find('SimpleSelect')
   courseSelect.simulate('click')
-  const optListId = courseSelect
-    .getDOMNode()
-    .querySelector('input')
-    .getAttribute('aria-owns')
+  const optListId = courseSelect.getDOMNode().querySelector('input').getAttribute('aria-owns')
   const optList = document.getElementById(optListId)
   expect(optList.querySelectorAll('li')).toHaveLength(3)
 })

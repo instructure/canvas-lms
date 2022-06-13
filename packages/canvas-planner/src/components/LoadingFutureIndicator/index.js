@@ -17,7 +17,7 @@
  */
 import React, {Component} from 'react'
 import {bool, func, string} from 'prop-types'
-import {Button} from '@instructure/ui-buttons'
+import {CondensedButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
@@ -46,9 +46,9 @@ export default class LoadingFutureIndicator extends Component {
   renderLoadMore() {
     if (!this.props.loadingFuture && !this.props.allFutureItemsLoaded) {
       return (
-        <Button variant="link" onClick={this.handleLoadMoreButton}>
+        <CondensedButton onClick={this.handleLoadMoreButton}>
           {formatMessage('Load more')}
-        </Button>
+        </CondensedButton>
       )
     }
   }

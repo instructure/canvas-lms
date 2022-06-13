@@ -147,7 +147,7 @@ it('invokes change dashboard view when link is clicked', () => {
   const wrapper = shallow(
     <ToDoSidebar {...defaultProps} items={items} changeDashboardView={changeDashboardView} />
   )
-  wrapper.find('Button').simulate('click')
+  wrapper.find('CondensedButton').simulate('click')
   expect(changeDashboardView).toHaveBeenCalledWith('planner')
 })
 
