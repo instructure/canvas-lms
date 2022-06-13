@@ -97,7 +97,7 @@ describe "filter speed grader by student group" do
     end
 
     it "loads speedgrader when group selected" do
-      skip("Unskip in GRADE-2245")
+      skip("Unskip in EVAL-2501")
       # select group from gradebook setting
       @teacher.preferences[:gradebook_settings] = {
         @course.id => {

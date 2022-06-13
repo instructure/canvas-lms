@@ -41,16 +41,15 @@ test('student names are hidden', () => {
   const selection = '#student_select option[value=1]'
   equal($(selection).text(), 'Barnes, Bob')
   return click('#hide_names_checkbox').then(() => {
-    $(selection)
-      .text()
-      .search('Student') !== -1
+    $(selection).text().search('Student') !== -1
     return click('#hide_names_checkbox').then(() => {
       equal($(selection).text(), 'Barnes, Bob')
     })
   })
 })
 
-QUnit.skip('secondary id says hidden', function() {
+// unskip in EVAL-2505
+QUnit.skip('secondary id says hidden', function () {
   Ember.run(() => {
     const student = this.controller.get('students.firstObject')
     Ember.setProperties(student, {
@@ -67,7 +66,8 @@ QUnit.skip('secondary id says hidden', function() {
   })
 })
 
-QUnit.skip('view concluded enrollments', function() {
+// unskip in EVAL-2505
+QUnit.skip('view concluded enrollments', function () {
   let enrollments = this.controller.get('enrollments')
   ok(enrollments.content.length > 1)
   enrollments.content.forEach(enrollment => ok(enrollment.workflow_state === undefined))

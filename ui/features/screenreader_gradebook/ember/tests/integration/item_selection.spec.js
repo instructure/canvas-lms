@@ -28,12 +28,7 @@ const buttonDisabled = (trigger, expectedBoolean) =>
 const checkSelection = (id, selection) => equal(id, find(selection).val())
 
 const checkSelectedText = (text, selection) =>
-  equal(
-    text,
-    find(selection)
-      .find('option:selected')
-      .text()
-  )
+  equal(text, find(selection).find('option:selected').text())
 
 const checkText = (selector, expectedText) =>
   equal(Ember.$.trim(find(`.assignmentsPanel ${selector}`).text()), expectedText)
@@ -105,7 +100,7 @@ test('Previous buttons are disabled', () => {
 })
 
 // compares & checks before/after objects
-test('clicking Next Student button displays next student', function() {
+test('clicking Next Student button displays next student', function () {
   const before = this.controller.get('selectedStudent')
   checkSelection(before.id, '#student_select')
   return click('.student_navigation .next_object:first').then(() => {
@@ -118,7 +113,7 @@ test('clicking Next Student button displays next student', function() {
 })
 
 // compares & checks before/after objects
-test('clicking Next Assignment button displays next assignment', function() {
+test('clicking Next Assignment button displays next assignment', function () {
   const before = this.controller.get('selectedAssignment')
   checkSelection(before.id, '#assignment_select')
   return click('.assignment_navigation .next_object').then(() => {
@@ -206,7 +201,7 @@ test('Next Assignment button is disabled', () =>
   buttonDisabled('.assignment_navigation .next_object', true))
 
 // compares & checks before/after objects
-test('clicking Previous Student button displays previous student', function() {
+test('clicking Previous Student button displays previous student', function () {
   const before = this.controller.get('selectedStudent')
   checkSelection(before.id, '#student_select')
   return click('.student_navigation .previous_object:first').then(() => {
@@ -219,7 +214,7 @@ test('clicking Previous Student button displays previous student', function() {
 })
 
 // compares & checks before/after objects
-test('clicking Previous Assignment button displays previous assignment', function() {
+test('clicking Previous Assignment button displays previous assignment', function () {
   const before = this.controller.get('selectedAssignment')
   checkSelection(before.id, '#assignment_select')
   return click('.assignment_navigation .previous_object').then(() => {
@@ -265,7 +260,7 @@ QUnit.module('screenreader_gradebook assignment navigation: display update', {
   }
 })
 
-test('screenreader_gradebook assignment selection: grade for field updates', function() {
+test('screenreader_gradebook assignment selection: grade for field updates', function () {
   const assignment_name_selector = "label[for='student_and_assignment_grade']"
 
   const selectedAssigName = this.controller.get('selectedAssignment.name')
@@ -299,7 +294,7 @@ QUnit.module('screenreader_gradebook assignment navigation: assignment sorting',
   }
 })
 
-test('alphabetical', function() {
+test('alphabetical', function () {
   const before = this.controller.get('assignments.firstObject')
   Ember.run(() =>
     this.controller.set(
@@ -316,7 +311,7 @@ test('alphabetical', function() {
   )
 })
 
-test('due date', function() {
+test('due date', function () {
   const before = this.controller.get('assignments.firstObject')
   Ember.run(() =>
     this.controller.set(
@@ -333,7 +328,7 @@ test('due date', function() {
   )
 })
 
-test('changing sorting option with selectedAssignment', function() {
+test('changing sorting option with selectedAssignment', function () {
   // SORT BY: alphabetical
   Ember.run(() =>
     this.controller.set(
@@ -403,7 +398,7 @@ QUnit.module('screenreader_gradebook student navigation: section selection', {
   }
 })
 
-test('prev/next still work', function() {
+test('prev/next still work', function () {
   buttonDisabled('.student_navigation .previous_object:first', true)
   buttonDisabled('.student_navigation .next_object:first', false)
 
@@ -430,7 +425,7 @@ test('prev/next still work', function() {
   })
 })
 
-test('resets selectedStudent when student is not in both sections', function() {
+test('resets selectedStudent when student is not in both sections', function () {
   return click('.student_navigation .next_object:first').then(() => {
     const firstStudent = this.controller.get('selectedStudent')
 
@@ -449,7 +444,7 @@ test('resets selectedStudent when student is not in both sections', function() {
   })
 })
 
-test('maintains selectedStudent when student is in both sections and updates navigation points', function() {
+test('maintains selectedStudent when student is in both sections and updates navigation points', function () {
   Ember.run(() =>
     // requires a fixture for a student with enrollment in 2 sections
     // and a previous/next option for all sections
@@ -511,7 +506,8 @@ QUnit.module(
   }
 )
 
-QUnit.skip('aria-announcer', function() {
+// unskip in EVAL-2505
+QUnit.skip('aria-announcer', function () {
   equal(Ember.$.trim(find('.aria-announcer').text()), '')
 
   click('.student_navigation .next_object:first').then(() => {
