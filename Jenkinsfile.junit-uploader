@@ -45,7 +45,7 @@ try {
           ls tmp/*/rspec_results.tgz | xargs -n1 tar xvf
           touch tmp/*_rspec_results/**/*.xml
           """
-          junit allowEmptyResults: true, testResults: "tmp/*_rspec_results/**/*.xml", skipMarkingBuildUnstable: true
+          junit allowEmptyResults: true, testResults: "tmp/*_rspec_results/results/*.xml", skipMarkingBuildUnstable: true
         }
       }
     }
