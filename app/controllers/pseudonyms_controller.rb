@@ -406,6 +406,7 @@ class PseudonymsController < ApplicationController
     return unless get_user
 
     @pseudonym = Pseudonym.active.find(params[:id])
+    @pseudonym.current_user = @current_user
     raise ActiveRecord::RecordNotFound unless @pseudonym.user_id == @user.id
     return unless authorized_action(@pseudonym, @current_user, :delete)
 
