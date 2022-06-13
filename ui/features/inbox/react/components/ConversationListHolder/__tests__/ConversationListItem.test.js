@@ -146,6 +146,7 @@ describe('ConversationListItem', () => {
 
       expect(container.getByText('Unread')).toBeInTheDocument()
       expect(container.getByTestId('unread-badge')).toBeInTheDocument()
+      expect(container.getByText('Mark as Read')).toBeInTheDocument()
     })
 
     it('should call stopPropagation when clicking the unread badge', () => {
@@ -170,6 +171,7 @@ describe('ConversationListItem', () => {
 
       expect(container.getByText('Read')).toBeInTheDocument()
       expect(container.getByTestId('read-badge')).toBeInTheDocument()
+      expect(container.getByText('Mark as Unread')).toBeInTheDocument()
     })
 
     it('update read state called with correct parameters', () => {

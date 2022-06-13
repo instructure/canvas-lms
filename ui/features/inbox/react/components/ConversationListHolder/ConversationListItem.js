@@ -37,6 +37,7 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {colors} from '@instructure/canvas-theme'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 const I18n = useI18nScope('conversations_2')
 
@@ -147,26 +148,31 @@ export const ConversationListItem = ({...props}) => {
             <Grid.Row>
               <Grid.Col width="auto">
                 <View textAlign="center" as="div" width={30} height={30} margin="0 small 0 0">
-                  <IconButton
-                    color="primary"
-                    data-testid={props.isUnread ? 'unread-badge' : 'read-badge'}
-                    margin="x-small"
-                    onClick={e => {
-                      e.stopPropagation()
-                      props.readStateChangeConversationParticipants({
-                        variables: {
-                          conversationIds: [props.conversation._id],
-                          workflowState: props.isUnread ? 'read' : 'unread'
-                        }
-                      })
-                    }}
-                    screenReaderLabel={props.isUnread ? I18n.t('Unread') : I18n.t('Read')}
-                    size="small"
-                    withBackground={false}
-                    withBorder={false}
+                  <Tooltip
+                    renderTip={props.isUnread ? I18n.t('Mark as Read') : I18n.t('Mark as Unread')}
+                    placement="bottom"
                   >
-                    {props.isUnread ? <IconEmptySolid /> : <IconEmptyLine />}
-                  </IconButton>
+                    <IconButton
+                      color="primary"
+                      data-testid={props.isUnread ? 'unread-badge' : 'read-badge'}
+                      margin="x-small"
+                      onClick={e => {
+                        e.stopPropagation()
+                        props.readStateChangeConversationParticipants({
+                          variables: {
+                            conversationIds: [props.conversation._id],
+                            workflowState: props.isUnread ? 'read' : 'unread'
+                          }
+                        })
+                      }}
+                      screenReaderLabel={props.isUnread ? I18n.t('Unread') : I18n.t('Read')}
+                      size="small"
+                      withBackground={false}
+                      withBorder={false}
+                    >
+                      {props.isUnread ? <IconEmptySolid /> : <IconEmptyLine />}
+                    </IconButton>
+                  </Tooltip>
                 </View>
               </Grid.Col>
               <Grid.Col>
