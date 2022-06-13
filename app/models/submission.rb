@@ -524,7 +524,7 @@ class Submission < ActiveRecord::Base
   def observer?(user)
     assignment.context.observer_enrollments.where(
       user_id: user.id,
-      associated_user_id: self.user.id,
+      associated_user_id: user_id,
       workflow_state: "active"
     ).exists?
   end
@@ -541,7 +541,7 @@ class Submission < ActiveRecord::Base
     return false unless grants_right?(user, :read)
     return true unless assignment.anonymize_students?
 
-    user == self.user || peer_reviewer?(user) || Account.site_admin.grants_right?(user, :update)
+    user == self.user || peer_reviewer?(user) || observer?(user) || Account.site_admin.grants_right?(user, :update)
   end
 
   def can_view_plagiarism_report(type, user, session)

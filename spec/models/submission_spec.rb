@@ -7026,6 +7026,27 @@ describe Submission do
       @submission = @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "a body")
     end
 
+    context "for observers" do
+      let(:observer) do
+        course_with_observer(
+          course: @assignment.course,
+          associated_user_id: @submission.user_id,
+          active_all: true
+        ).user
+      end
+
+      it "allows observers of the submission's owner to view details" do
+        expect(@submission).to be_can_view_details(observer)
+      end
+
+      it "does not allow observers to view details if they're not observing the submission's owner" do
+        new_student = User.create!
+        @context.enroll_student(new_student, enrollment_state: "active")
+        new_student_submission = @assignment.submissions.find_by(user: new_student)
+        expect(new_student_submission).not_to be_can_view_details(observer)
+      end
+    end
+
     context "for peer reviewers" do
       let(:reviewer) { @context.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
       let(:reviewer_sub) { @assignment.submissions.find_by!(user: reviewer) }
