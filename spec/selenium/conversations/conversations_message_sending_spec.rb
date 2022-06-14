@@ -239,14 +239,30 @@ describe "conversations new" do
           end
 
           context "soft concluded course" do
-            it "shows course after end date", priority: "1" do
+            before do
               @course.conclude_at = 1.day.ago
               @course.start_at = 2.days.ago
               @course.save!
+            end
 
+            it "shows course after end date", priority: "1" do
               get "/conversations"
               move_to_click(".icon-compose")
               expect(f("#compose-message-course")).to contain_jqcss("option:contains('#{@course.name}')")
+            end
+
+            it "shows other students as recipient options after end date", priority: "1" do
+              get "/conversations"
+              f("#compose-btn").click
+              wait_for_ajaximations
+
+              select_message_course(@course)
+              wait_for_ajaximations
+
+              message_recipients_input.send_keys("student")
+              wait_for_ajaximations
+
+              expect(ffj(".ac-result").count).to eq(@course.students.count)
             end
           end
 
