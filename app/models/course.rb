@@ -1649,6 +1649,9 @@ class Course < ActiveRecord::Base
       can permission
     end
 
+    given { |user| active_and_soft_concluded_enrollment_allows(user, :send_messages) }
+    can :send_messages
+
     given { |_user, session| session && session[:enrollment_uuid] && (hash = Enrollment.course_user_state(self, session[:enrollment_uuid]) || {}) && (hash[:enrollment_state] == "invited" || (hash[:enrollment_state] == "active" && hash[:user_state].to_s == "pre_registered")) && (available? || completed? || (claimed? && hash[:is_admin])) }
     can :read and can :read_outcomes
 
@@ -1861,6 +1864,17 @@ class Course < ActiveRecord::Base
     end
     active_enrollments.each { |e| e.course = self } # set association so we don't requery
     active_enrollments.any? { |e| (allow_future || e.date_based_state_in_db == "active") && e.has_permission_to?(permission) }
+  end
+
+  def active_and_soft_concluded_enrollment_allows(user, permission)
+    return false unless user && permission && !deleted?
+
+    is_unpublished = created? || claimed?
+    active_enrollments = enrollments.for_user(user).active_or_soft_concluded.select("enrollments.*, enrollment_states.state AS date_based_state_in_db")
+    active_enrollments = active_enrollments.where(type: %w[TeacherEnrollment TaEnrollment DesignerEnrollment StudentViewEnrollment]) if is_unpublished
+    active_enrollments.to_a.each(&:clear_association_cache)
+    active_enrollments.each { |e| e.course = self } # set association so we don't requery
+    active_enrollments.any? { |e| e.has_permission_to?(permission) && !e.course.completed? && e.workflow_state != "completed" }
   end
 
   def self.find_all_by_context_code(codes)
