@@ -110,7 +110,16 @@ const AlignmentOutcomeItem = ({title, description, alignments}) => {
             {!truncated && alignmentsCount > 0 && (
               <View as="div" padding="small 0 small">
                 {alignments.map(
-                  ({id, type, title: alignmentTitle, url, moduleTitle, moduleUrl}) => (
+                  ({
+                    id,
+                    type,
+                    title: alignmentTitle,
+                    url,
+                    moduleTitle,
+                    moduleUrl,
+                    moduleWorkflowState,
+                    assignmentContentType
+                  }) => (
                     <AlignmentItem
                       id={id}
                       key={id}
@@ -119,6 +128,8 @@ const AlignmentOutcomeItem = ({title, description, alignments}) => {
                       url={url}
                       moduleTitle={moduleTitle}
                       moduleUrl={moduleUrl}
+                      moduleWorkflowState={moduleWorkflowState}
+                      assignmentContentType={assignmentContentType}
                     />
                   )
                 )}

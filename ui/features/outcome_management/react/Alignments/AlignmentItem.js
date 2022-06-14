@@ -19,20 +19,38 @@
 import React, {memo} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
-import {IconAssignmentLine, IconRubricLine} from '@instructure/ui-icons'
+import {
+  IconAssignmentLine,
+  IconRubricLine,
+  IconQuizLine,
+  IconDiscussionLine
+} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {alignmentShape} from './propTypeShapes'
 
 const I18n = useI18nScope('AlignmentSummary')
 
-const AlignmentItem = ({id, type, title, url, moduleTitle, moduleUrl}) => {
-  const renderIcon = alignmentType =>
-    String(alignmentType).toLowerCase() === 'rubric' ? (
-      <IconRubricLine data-testid="alignment-item-rubric-icon" />
-    ) : (
-      <IconAssignmentLine data-testid="alignment-item-assignment-icon" />
-    )
+const AlignmentItem = ({
+  id,
+  type,
+  title,
+  url,
+  moduleTitle,
+  moduleUrl,
+  moduleWorkflowState,
+  assignmentContentType
+}) => {
+  const renderIcon = (alignmentType, assignmentContentType) => {
+    if (alignmentType === 'Rubric')
+      return <IconRubricLine data-testid="alignment-item-rubric-icon" />
+    if (assignmentContentType === 'Quizzes::Quiz')
+      return <IconQuizLine data-testid="alignment-item-quiz-icon" />
+    if (assignmentContentType === 'DiscussionTopic')
+      return <IconDiscussionLine data-testid="alignment-item-discussion-icon" />
+    // by default we show Assignment icon
+    return <IconAssignmentLine data-testid="alignment-item-assignment-icon" />
+  }
 
   return (
     <Flex key={id} as="div" alignItems="start" padding="x-small 0 0" data-testid="alignment-item">
@@ -45,7 +63,7 @@ const AlignmentItem = ({id, type, title, url, moduleTitle, moduleUrl}) => {
             padding: '0.5rem 0 0'
           }}
         >
-          {renderIcon(type)}
+          {renderIcon(type, assignmentContentType)}
         </div>
       </Flex.Item>
       <Flex.Item size="50%" shouldGrow>
@@ -60,7 +78,11 @@ const AlignmentItem = ({id, type, title, url, moduleTitle, moduleUrl}) => {
             <span style={{paddingLeft: '0.375rem'}}>
               {moduleTitle && moduleUrl ? (
                 <Link interaction="enabled" isWithinText={false} href={moduleUrl} target="_blank">
-                  <Text size="small">{moduleTitle}</Text>
+                  <Text size="small">
+                    {moduleWorkflowState === 'unpublished'
+                      ? I18n.t('%{moduleTitle} (unpublished)', {moduleTitle})
+                      : moduleTitle}
+                  </Text>
                 </Link>
               ) : (
                 <Text size="small" color="secondary">
