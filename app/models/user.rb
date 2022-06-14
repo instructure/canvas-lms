@@ -2412,7 +2412,7 @@ class User < ActiveRecord::Base
     Rails.cache.fetch_with_batched_keys(["course_ids_for_observed_user", self, observed_user].cache_key, batch_object: self, batched_keys: :enrollments, expires_in: 1.day) do
       enrollments
         .shard(in_region_associated_shards)
-        .active_by_date
+        .active_or_pending_by_date
         .of_observer_type
         .where(associated_user_id: observed_user)
         .pluck(:course_id)
