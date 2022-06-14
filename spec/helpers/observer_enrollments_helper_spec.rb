@@ -187,6 +187,16 @@ describe ObserverEnrollmentsHelper do
     expect(users.length).to be(3)
   end
 
+  it "does not consider concluded enrollments" do
+    enroll_observer(@course1, @observer, @student1)
+    @course1.conclude_at = 1.week.ago
+    @course1.restrict_enrollments_to_course_dates = true
+    @course1.save!
+
+    users = observed_users(@observer, nil)
+    expect(users.length).to be(0)
+  end
+
   context "sharding" do
     specs_require_sharding
 

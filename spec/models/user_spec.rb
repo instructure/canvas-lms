@@ -3168,7 +3168,7 @@ describe User do
       expect(course_ids).to contain_exactly(@course2.id)
     end
 
-    it "does not include inactive enrollments" do
+    it "does not include completed enrollments" do
       @course1.enroll_student(@student1)
       @course2.enroll_student(@student1)
       @course1.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @student1.id, enrollment_state: :completed)
@@ -3176,6 +3176,14 @@ describe User do
 
       course_ids = @observer.cached_course_ids_for_observed_user(@student1)
       expect(course_ids).to contain_exactly(@course2.id)
+    end
+
+    it "includes pending enrollments" do
+      @course1.enroll_student(@student1, enrollment_state: :invited)
+      @course1.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @student1.id, enrollment_state: :invited)
+
+      course_ids = @observer.cached_course_ids_for_observed_user(@student1)
+      expect(course_ids).to contain_exactly(@course1.id)
     end
 
     context "with sharding" do
