@@ -28,6 +28,8 @@ describe('AlignmentItem', () => {
     url: '/courses/1/outcomes/1/alignments/3',
     moduleTitle: 'Module 1',
     moduleUrl: '/courses/1/modules/1',
+    moduleWorkflowState: 'active',
+    assignmentContentType: 'Assignment',
     ...props
   })
 
@@ -46,6 +48,13 @@ describe('AlignmentItem', () => {
     expect(getByText('Module 1')).toBeInTheDocument()
   })
 
+  it('displays module title appended with (unpublished) if module is unpublished', () => {
+    const {getByText} = render(
+      <AlignmentItem {...defaultProps({moduleWorkflowState: 'unpublished'})} />
+    )
+    expect(getByText('Module 1 (unpublished)')).toBeInTheDocument()
+  })
+
   it('displays module title None if module title missing', () => {
     const {getByText} = render(<AlignmentItem {...defaultProps({moduleTitle: null})} />)
     expect(getByText('None')).toBeInTheDocument()
@@ -56,14 +65,33 @@ describe('AlignmentItem', () => {
     expect(getByText('None')).toBeInTheDocument()
   })
 
-  it('displays assignment icon if alignment type is assignment', () => {
+  it('displays assignment icon if assignment content type is assignment', () => {
     const {getByTestId} = render(<AlignmentItem {...defaultProps()} />)
     expect(getByTestId('alignment-item-assignment-icon')).toBeInTheDocument()
+  })
+
+  it('displays quiz icon if assignment content type is quiz', () => {
+    const {getByTestId} = render(
+      <AlignmentItem {...defaultProps({assignmentContentType: 'Quizzes::Quiz'})} />
+    )
+    expect(getByTestId('alignment-item-quiz-icon')).toBeInTheDocument()
+  })
+
+  it('displays discussion icon if assignment content type is discussion', () => {
+    const {getByTestId} = render(
+      <AlignmentItem {...defaultProps({assignmentContentType: 'DiscussionTopic'})} />
+    )
+    expect(getByTestId('alignment-item-discussion-icon')).toBeInTheDocument()
   })
 
   it('displays rubric icon if alignment type is rubric', () => {
     const {getByTestId} = render(<AlignmentItem {...defaultProps({type: 'Rubric'})} />)
     expect(getByTestId('alignment-item-rubric-icon')).toBeInTheDocument()
+  })
+
+  it('displays assignment icon by default if assignment content type not matched', () => {
+    const {getByTestId} = render(<AlignmentItem {...defaultProps({assignmentContentType: null})} />)
+    expect(getByTestId('alignment-item-assignment-icon')).toBeInTheDocument()
   })
 
   it('links alignment title correctly', () => {

@@ -24,7 +24,9 @@ export const alignmentShape = PropTypes.shape({
   title: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
   moduleTitle: PropTypes.string,
-  moduleUrl: PropTypes.string
+  moduleUrl: PropTypes.string,
+  moduleWorkflowState: PropTypes.string,
+  assignmentContentType: PropTypes.string
 })
 
 export const outcomeWithAlignmentShape = PropTypes.shape({
