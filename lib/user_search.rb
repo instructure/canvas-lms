@@ -179,7 +179,7 @@ module UserSearch
     end
 
     def ids_sql(users_scope, params)
-      ids = specific_ids(users_scope, params)
+      ids = specific_ids(params)
       return nil unless ids.length.positive?
 
       users_scope.select("users.*, MAX(current_login_at) as last_login")
@@ -190,7 +190,7 @@ module UserSearch
     end
 
     # Plugin extension point
-    def specific_ids(_users_scope, _params)
+    def specific_ids(_params)
       []
     end
 
