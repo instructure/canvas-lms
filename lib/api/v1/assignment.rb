@@ -159,6 +159,7 @@ module Api::V1::Assignment
     end
 
     hash["grades_published"] = assignment.grades_published? if opts[:include_grades_published]
+    hash["graded_submissions_exist"] = assignment.graded_submissions_exist?
 
     if opts[:overrides].present?
       hash["overrides"] = assignment_overrides_json(opts[:overrides], user)
