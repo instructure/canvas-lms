@@ -70,7 +70,7 @@
         name="points_possible"
         value="{{n pointsPossible}}"
         type="text"
-        {{#ifAny inClosedGradingPeriod lockedItems.points}}
+        {{#ifAny inClosedGradingPeriod lockedItems.points cannotEditGrades}}
           readonly
         {{/ifAny}}
         {{disabledIfIncludes frozenAttributes "points_possible"}}

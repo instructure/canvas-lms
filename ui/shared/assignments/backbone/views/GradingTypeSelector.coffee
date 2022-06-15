@@ -51,6 +51,7 @@ export default class GradingTypeSelector extends Backbone.View
   @optionProperty 'nested'
   @optionProperty 'preventNotGraded'
   @optionProperty 'lockedItems'
+  @optionProperty 'canEditGrades'
 
   handleGradingTypeChange: (ev) =>
     gradingType = @$gradingType.val()
@@ -99,5 +100,5 @@ export default class GradingTypeSelector extends Backbone.View
     nested: @nested
     preventNotGraded: @preventNotGraded || (@lockedItems?.points && !@parentModel.isNotGraded())
     freezeGradingType: _.includes(@parentModel.frozenAttributes(), 'grading_type') ||
-                        @parentModel.inClosedGradingPeriod() || (@lockedItems?.points && @parentModel.isNotGraded())
+                        @parentModel.inClosedGradingPeriod() || (@lockedItems?.points && @parentModel.isNotGraded()) || !@canEditGrades && @parentModel.gradedSubmissionsExist()
     gradingTypeMap: @gradingTypeMap()

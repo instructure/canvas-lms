@@ -1582,6 +1582,11 @@ describe AssignmentsController do
         get :show, params: { course_id: @course.id, id: @assignment.id }
         expect(assigns[:js_env][:PERMISSIONS]).to include can_manage_groups: true
       end
+
+      it "does not sets can_edit_grades permissions in the ENV for students" do
+        get :show, params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:PERMISSIONS]).not_to include :can_edit_grades
+      end
     end
   end
 
@@ -1954,7 +1959,13 @@ describe AssignmentsController do
     it "sets can_manage_groups permissions in the ENV" do
       user_session(@teacher)
       get "edit", params: { course_id: @course.id, id: @assignment.id }
-      expect(assigns[:js_env][:PERMISSIONS]).to eq can_manage_groups: true
+      expect(assigns[:js_env][:PERMISSIONS]).to include can_manage_groups: true
+    end
+
+    it "sets can_edit_grades permissions in the ENV for teachers" do
+      user_session(@teacher)
+      get "edit", params: { course_id: @course.id, id: @assignment.id }
+      expect(assigns[:js_env][:PERMISSIONS]).to include can_edit_grades: true
     end
 
     it "requires authorization" do
