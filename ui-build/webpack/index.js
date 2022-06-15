@@ -120,6 +120,10 @@ module.exports = {
   // In prod build, don't attempt to continue if there are any errors.
   bail: process.env.NODE_ENV === 'production',
 
+  experiments: {
+    backCompat: false,
+  },
+
   devtool: skipSourcemaps
     ? false
     : process.env.NODE_ENV === 'production' ||
@@ -129,24 +133,37 @@ module.exports = {
 
   entry: {main: path.resolve(canvasDir, 'ui/index.js')},
 
+  watchOptions: {
+    ignored: ['**/node_modules/'],
+  },
+
   output: {
     publicPath: '',
     clean: true,
     path: path.join(canvasDir, 'public', webpackPublicPath),
+    hashFunction: 'xxhash64',
 
     // Add /* filename */ comments to generated require()s in the output.
-    pathinfo: true,
+    pathinfo: process.env.NODE_ENV !== 'production',
 
     // "e" is for "entry" and "c" is for "chunk"
-    filename: '[name]-e-[chunkhash:10].js',
-    chunkFilename: '[name]-c-[chunkhash:10].js',
+    filename: process.env.NODE_ENV === 'production' ?
+      '[name]-e-[chunkhash:10].js' :
+      '[name]-e.js'
+    ,
+    chunkFilename: process.env.NODE_ENV === 'production' ?
+      '[name]-c-[chunkhash:10].js' :
+      '[name]-c.js'
+    ,
   },
 
-  resolveLoader: {
-    modules: ['node_modules', path.resolve(__dirname)]
-  },
+  parallelism: 5,
 
   resolve: {
+    alias: {
+      'underscore$': path.resolve(canvasDir, 'ui/shims/underscore.js'),
+    },
+
     fallback: {
       // for minimatch module; it can work without path so let webpack know
       // instead of trying to resolve node's "path"
@@ -154,13 +171,11 @@ module.exports = {
     },
 
     modules: [
-      path.resolve(canvasDir, 'ui/shims'),
       path.resolve(canvasDir, 'public/javascripts'),
-      path.resolve(canvasDir, 'gems/plugins'),
       'node_modules'
     ],
 
-    extensions: ['.mjs', '.js', '.ts', '.tsx']
+    extensions: ['.js', '.ts', '.tsx']
   },
 
   module: {
