@@ -51,7 +51,7 @@ class AccountReportRunner < ActiveRecord::Base
 
   def start
     # remove any account report rows created during a previously failed job
-    account_report_rows.destroy_all if account_report.account.root_account.feature_enabled?(:custom_report_experimental)
+    AccountReportRow.where(account_report_runner: self).delete_all if account_report.account.root_account.feature_enabled?(:custom_report_experimental)
     @rows ||= []
     update!(workflow_state: "running", started_at: Time.now.utc)
   end
