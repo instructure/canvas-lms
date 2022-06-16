@@ -40,14 +40,6 @@ class DeveloperKeyAccountBinding < ApplicationRecord
     where(account_id: account.account_chain_ids, workflow_state: "on")
   }
 
-  # run this once on the local shard and again on site_admin to get all avaiable dev_keys with
-  # tool configurations
-  scope :lti_1_3_tools, lambda { |bindings|
-    bindings.joins(developer_key: :tool_configuration)
-            .where(developer_keys: { visible: true, workflow_state: "active" })
-            .eager_load(developer_key: :tool_configuration)
-  }
-
   # Find a DeveloperKeyAccountBinding in order of accounts. The search for a binding will
   # be prioritized by the order of accounts. If a binding is found for the first account
   # that binding will be returned, otherwise the next account will be searched and so on.

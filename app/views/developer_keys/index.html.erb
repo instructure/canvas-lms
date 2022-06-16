@@ -19,44 +19,6 @@
 <% provide :page_title do %><%= t :title, "Developer Keys" %><% end %>
 
 <% css_bundle :developer_keys %>
-<% js_bundle(:developer_keys) %>
+<% js_bundle :developer_keys_v2 %>
 
-<div class="ic-Action-header">
-  <div class="ic-Action-header__Primary">
-    <h2 class="ic-Action-header__Heading"><%= t :developer_keys, "Developer Keys" %></h2>
-  </div>
-  <div class="ic-Action-header__Secondary">
-    <button
-      type="button"
-      class="Button Button--primary add_key"
-      title="<%= t :add_developer_key, "Add Developer Key" %>"
-      aria-label="<%= t :add_developer_key, "Add Developer Key" %>"
-    >
-      <i class="icon-plus" aria-hidden="true"></i>&nbsp;
-      <%= t('Developer Key') %>
-    </button>
-  </div>
-</div>
-
-<table id="keys" class="ic-Table">
-  <thead>
-    <tr>
-      <th><%= t :name, "Name" %></th>
-      <th><%= t :user, "User" %></th>
-      <th><%= t :details, "Details" %></th>
-      <th><%= t :stats, "Stats" %></th>
-      <th><%= t :notes, "Notes" %></th>
-      <th>&nbsp;</th>
-    </tr>
-  </thead>
-  <tbody>
-  </tbody>
-</table>
-<div id="loading">
-  <button class='btn show_all' type="button"><%= t :show_all, "Show All %{count} Keys", :count => @keys.total_entries %></button>
-  <img src="/images/ajax-loader-medium-444.gif" class="loader">
-</div>
-
-
-<div id='edit_dialog' title='<%= t :key_settings, "Key Settings" %>'>
-</div>
+<div id="reactContent"></div>

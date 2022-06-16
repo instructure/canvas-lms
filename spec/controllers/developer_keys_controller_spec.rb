@@ -99,7 +99,7 @@ describe DeveloperKeysController do
 
           it "includes developer_keys" do
             get "index", params: { account_id: Account.site_admin.id }
-            expect(response).to render_template(:index_react)
+            expect(response).to render_template(:index)
             expect(response).to be_successful
           end
         end
