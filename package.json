@@ -11,12 +11,8 @@
     "packages": [
       "gems/canvas_i18nliner",
       "gems/plugins/*",
-      "ui/shared/*",
-      "packages/*"
-    ],
-    "nohoist": [
-      "**/tinymce",
-      "**/tinymce/**"
+      "packages/*",
+      "ui/shared/*"
     ]
   },
   "dependencies": {

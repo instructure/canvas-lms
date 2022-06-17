@@ -123,10 +123,10 @@ export const editorOptionsPropType = PropTypes.shape({
 // see https://gerrit.instructure.com/c/canvas-lms/+/263299/2/packages/canvas-rce/src/rce/RCEWrapper.js#50
 // for an `import` style solution
 const styles = require('../skins/skin-delta.css')
-const skinCSS = require('../../node_modules/tinymce/skins/ui/oxide/skin.min.css')
+const skinCSS = require('../../../../node_modules/tinymce/skins/ui/oxide/skin.min.css')
   .template()
   .replace(/tinymce__oxide--/g, '')
-const contentCSS = require('../../node_modules/tinymce/skins/ui/oxide/content.css')
+const contentCSS = require('../../../../node_modules/tinymce/skins/ui/oxide/content.css')
   .template()
   .replace(/tinymce__oxide--/g, '')
 
