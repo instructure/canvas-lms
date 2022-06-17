@@ -46,6 +46,7 @@ const ManageOutcomesView = ({
   onSearchClearHandler,
   loading,
   loadMore,
+  removeOutcomesStatus,
   scrollContainer,
   isRootGroup,
   hideOutcomesView
@@ -175,6 +176,7 @@ const ManageOutcomesView = ({
                 outcomeContextId={contextId}
                 canUnlink={canUnlink}
                 isChecked={!!selectedOutcomes[linkId]}
+                removeOutcomeStatus={removeOutcomesStatus[linkId]}
                 onMenuHandler={onOutcomeMenuHandler}
                 onCheckboxHandler={onSelectOutcomesHandler}
               />
@@ -230,6 +232,7 @@ ManageOutcomesView.propTypes = {
   onSearchChangeHandler: PropTypes.func.isRequired,
   onSearchClearHandler: PropTypes.func.isRequired,
   loadMore: PropTypes.func.isRequired,
+  removeOutcomesStatus: PropTypes.object.isRequired,
   scrollContainer: PropTypes.instanceOf(Element),
   isRootGroup: PropTypes.bool.isRequired,
   hideOutcomesView: PropTypes.func

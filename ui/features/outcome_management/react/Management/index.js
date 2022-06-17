@@ -44,6 +44,7 @@ import GroupActionDrillDown from '../shared/GroupActionDrillDown'
 import useLhsTreeBrowserSelectParentGroup from '@canvas/outcomes/react/hooks/useLhsTreeBrowserSelectParentGroup'
 import FindOutcomesModal from '../FindOutcomesModal'
 import {showImportOutcomesModal} from '@canvas/outcomes/react/ImportOutcomesModal'
+import useOutcomesRemove from '@canvas/outcomes/react/hooks/useOutcomesRemove'
 
 const I18n = useI18nScope('OutcomeManagement')
 
@@ -106,6 +107,8 @@ const OutcomeManagementPanel = ({
     searchString: debouncedSearchString,
     rhsGroupIdsToRefetch
   })
+
+  const {removeOutcomes, removeOutcomesStatus} = useOutcomesRemove()
 
   const selectedOutcomes = readLearningOutcomes(selectedOutcomeIds)
   const [showOutcomesView, setShowOutcomesView] = useState(false)
@@ -313,6 +316,7 @@ const OutcomeManagementPanel = ({
               onSearchChangeHandler={onSearchChangeHandler}
               onSearchClearHandler={onSearchClearHandler}
               loadMore={loadMore}
+              removeOutcomesStatus={removeOutcomesStatus}
               scrollContainer={scrollContainer}
               isRootGroup={collections[selectedGroupId]?.isRootGroup}
               hideOutcomesView={hideOutcomesViewHandler}
@@ -419,6 +423,7 @@ const OutcomeManagementPanel = ({
                   key={selectedGroupId}
                   outcomeGroup={group}
                   loading={loading}
+                  removeOutcomesStatus={removeOutcomesStatus}
                   selectedOutcomes={selectedOutcomes}
                   searchString={searchString}
                   onSelectOutcomesHandler={toggleSelectedOutcomes}
@@ -464,6 +469,7 @@ const OutcomeManagementPanel = ({
                 isOpen={isOutcomeRemoveModalOpen}
                 onCloseHandler={onCloseOutcomeRemoveModal}
                 onCleanupHandler={onCloseOutcomeRemoveModal}
+                removeOutcomes={removeOutcomes}
                 onRemoveLearningOutcomesHandler={onRemoveLearningOutcome}
               />
               <OutcomeEditModal
@@ -518,6 +524,7 @@ const OutcomeManagementPanel = ({
             isOpen={isOutcomesRemoveModalOpen}
             onCloseHandler={closeOutcomesRemoveModal}
             onCleanupHandler={onCloseOutcomesRemoveModal}
+            removeOutcomes={removeOutcomes}
             onRemoveLearningOutcomesHandler={removeLearningOutcomes}
           />
           <OutcomeMoveModal
