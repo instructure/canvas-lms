@@ -30,10 +30,10 @@ import {DELETE_CONVERSATIONS, UPDATE_CONVERSATION_PARTICIPANTS} from '../../grap
 import {CONVERSATIONS_QUERY} from '../../graphql/Queries'
 import {decodeQueryString} from 'query-string-encoding'
 import {responsiveQuerySizes} from '../../util/utils'
-import {CondensedButton, IconButton} from '@instructure/ui-buttons'
+import {CondensedButton} from '@instructure/ui-buttons'
 
 import {Flex} from '@instructure/ui-flex'
-import {IconArrowOpenStartLine, IconXSolid} from '@instructure/ui-icons'
+import {IconArrowOpenStartLine} from '@instructure/ui-icons'
 import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -525,7 +525,7 @@ const CanvasInbox = () => {
                             padding="none none none xx-small"
                           >
                             <Flex>
-                              <Flex.Item shouldGrow border>
+                              <Flex.Item shouldGrow border padding="medium none medium none">
                                 <CondensedButton
                                   data-testid="message-detail-back-button"
                                   renderIcon={<IconArrowOpenStartLine size="x-small" />}
@@ -535,20 +535,6 @@ const CanvasInbox = () => {
                                 >
                                   <Text>{I18n.t('Back')}</Text>
                                 </CondensedButton>
-                              </Flex.Item>
-                              <Flex.Item>
-                                <IconButton
-                                  shape="rectangle"
-                                  screenReaderLabel="Delete tag"
-                                  margin="small"
-                                  withBorder={false}
-                                  withBackground={false}
-                                  onClick={() => {
-                                    setSelectedConversations([])
-                                  }}
-                                >
-                                  <IconXSolid />
-                                </IconButton>
                               </Flex.Item>
                             </Flex>
                           </View>
