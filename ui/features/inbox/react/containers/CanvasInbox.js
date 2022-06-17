@@ -158,6 +158,10 @@ const CanvasInbox = () => {
   }
 
   const removeOutOfScopeConversationsFromCache = (cache, result) => {
+    if (scope === 'starred') {
+      return
+    }
+
     if (result.data.updateConversationParticipants.errors) {
       return
     }
@@ -225,8 +229,8 @@ const CanvasInbox = () => {
   const handleArchiveComplete = data => {
     const archiveSuccessMsg = I18n.t(
       {
-        one: 'Message Archived!',
-        other: 'Messages Archived!'
+        one: 'Message archived!',
+        other: 'Messages archived!'
       },
       {count: selectedConversations.length}
     )
@@ -235,16 +239,18 @@ const CanvasInbox = () => {
       setOnFailure(I18n.t('Archive operation failed'))
     } else {
       setArchiveDisabled(true)
-      removeFromSelectedConversations(selectedConversations)
-      setOnSuccess(archiveSuccessMsg) // screenReaderOnly
+      if (scope !== 'Starred') {
+        removeFromSelectedConversations(selectedConversations)
+      }
+      setOnSuccess(archiveSuccessMsg, false)
     }
   }
 
   const handleUnarchiveComplete = data => {
     const unarchiveSuccessMsg = I18n.t(
       {
-        one: 'Message Unarchived!',
-        other: 'Messages Unarchived!'
+        one: 'Message unarchived!',
+        other: 'Messages unarchived!'
       },
       {count: selectedConversations.length}
     )
@@ -253,8 +259,10 @@ const CanvasInbox = () => {
       setOnFailure(I18n.t('Unarchive operation failed'))
     } else {
       setArchiveDisabled(false)
-      removeFromSelectedConversations(selectedConversations)
-      setOnSuccess(unarchiveSuccessMsg) // screenReaderOnly
+      if (scope !== 'Starred') {
+        removeFromSelectedConversations(selectedConversations)
+      }
+      setOnSuccess(unarchiveSuccessMsg, false)
     }
   }
 
