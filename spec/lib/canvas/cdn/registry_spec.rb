@@ -74,10 +74,9 @@ describe ::Canvas::Cdn::Registry do
     end
 
     it "is true given the path to a javascript produced by webpack" do
-      @webpack_manifest = { "main" => ["a-1234.js", "b-1234.js"] }
+      @webpack_manifest = { "main" => "a-1234.js" }
 
       expect(subject.include?("/dist/webpack-dev/a-1234.js")).to eq(true)
-      expect(subject.include?("/dist/webpack-dev/b-1234.js")).to eq(true)
       expect(subject.include?("a-1234.js")).to eq(false)
       expect(subject.include?("main")).to eq(false)
     end
@@ -85,12 +84,11 @@ describe ::Canvas::Cdn::Registry do
 
   describe ".scripts_for" do
     it "returns realpaths to files within the bundle" do
-      @webpack_manifest = { "main" => ["a-1234.js", "b-1234.js"] }
+      @webpack_manifest = { "main" => "a-1234.js" }
 
       expect(subject.scripts_for("main")).to eq(
         [
-          "/dist/webpack-dev/a-1234.js",
-          "/dist/webpack-dev/b-1234.js",
+          "/dist/webpack-dev/a-1234.js"
         ]
       )
     end
