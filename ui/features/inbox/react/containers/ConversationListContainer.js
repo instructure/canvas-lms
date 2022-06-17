@@ -90,7 +90,7 @@ const ConversationListContainer = ({
   })
 
   const submissionCommentsQuery = useQuery(VIEWABLE_SUBMISSIONS_QUERY, {
-    variables: {userID, sort: 'desc'},
+    variables: {userID, sort: 'desc', filter: [userFilter, course]},
     fetchPolicy: 'cache-and-network',
     skip: !isSubmissionCommentsType || !(scope === 'submission_comments')
   })
@@ -133,6 +133,7 @@ const ConversationListContainer = ({
           _id: inboxItemData[inboxItemData.length - 1]._node_id,
           userID,
           sort: 'desc',
+          filter: [userFilter, course],
           afterSubmission:
             submissionCommentsQuery.data?.legacyNode?.viewableSubmissionsConnection?.pageInfo
               .endCursor
