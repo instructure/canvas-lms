@@ -754,13 +754,18 @@ class AccountsController < ApplicationController
     # We only want to return the permissions for single courses and not lists of courses.
     # sections, needs_grading_count, and total_score not valid as enrollments are needed
     includes -= %w[permissions sections needs_grading_count total_scores]
-
-    # don't calculate a total count for this endpoint. total_entries: nil
     all_precalculated_permissions = nil
-    GuardRail.activate(:secondary) do
-      @courses = Api.paginate(@courses, self, api_v1_account_courses_url, { total_entries: nil })
 
-      ActiveRecord::Associations.preload(@courses, [:account, :root_account, course_account_associations: :account])
+    page_opts = { total_entries: nil }
+    if includes.include?("ui_invoked") && Setting.get("ui_invoked_count_pages", "true") == "true"
+      page_opts = {} # let Folio calculate total entries
+      includes.delete("ui_invoked")
+    end
+
+    GuardRail.activate(:secondary) do
+      @courses = Api.paginate(@courses, self, api_v1_account_courses_url, page_opts)
+
+      ActiveRecord::Associations.preload(@courses, [:account, :root_account, { course_account_associations: :account }])
       preload_teachers(@courses) if includes.include?("teachers")
       preload_teachers(@courses) if includes.include?("active_teachers")
       ActiveRecord::Associations.preload(@courses, [:enrollment_term]) if includes.include?("term") || includes.include?("concluded")
