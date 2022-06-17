@@ -160,7 +160,7 @@ export const PacePicker: React.FC<ComponentProps> = ({
     />
   )
 
-  if (enrollments.length === 0) {
+  if (sections.length === 0 && enrollments.length === 0) {
     return (
       <Heading level="h2" margin="0 x-large 0 0">
         {I18n.t('Course Pacing')}
@@ -187,6 +187,7 @@ export const PacePicker: React.FC<ComponentProps> = ({
       >
         {renderOption(createContextKey('Course', course.id), I18n.t('Course'))}
         {ENV.FEATURES.course_paces_for_sections &&
+          sections.length > 0 &&
           renderSubMenu(
             sections.map(s =>
               renderOption(createContextKey('Section', s.id), s.name, `section-${s.id}`)
@@ -194,11 +195,12 @@ export const PacePicker: React.FC<ComponentProps> = ({
             'course_paces_for_sections',
             I18n.t('Sections')
           )}
-        {renderSubMenu(
-          enrollments.map(e => renderStudentOption(e)),
-          'course-pace-student-menu',
-          I18n.t('Students')
-        )}
+        {enrollments.length > 0 &&
+          renderSubMenu(
+            enrollments.map(e => renderStudentOption(e)),
+            'course-pace-student-menu',
+            I18n.t('Students')
+          )}
       </Menu>
       <UnpublishedWarningModal
         open={!!pendingContext}
