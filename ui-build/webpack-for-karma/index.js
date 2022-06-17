@@ -41,9 +41,9 @@ module.exports = {
   mode: 'development',
   module: {
     noParse: [
-      path.join(canvasDir, 'node_modules/tinymce/'),
-      path.join(canvasDir, 'node_modules/i18nliner/dist/lib/i18nliner.js'),
-      path.join(canvasDir, 'node_modules/@instructure/i18nliner/dist/lib/i18nliner.js'),
+      require.resolve('@instructure/i18nliner/dist/lib/i18nliner.js'),
+      require.resolve('jquery'),
+      require.resolve('tinymce'),
     ],
     rules: [
       {
