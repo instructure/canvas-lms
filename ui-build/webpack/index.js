@@ -24,11 +24,11 @@ const MomentTimezoneDataPlugin = require('moment-timezone-data-webpack-plugin')
 const path = require('path')
 const glob = require('glob')
 const webpack = require('webpack')
-const {CleanWebpackPlugin} = require('clean-webpack-plugin')
-const StatsWriterPlugin = require('webpack-stats-plugin').StatsWriterPlugin
+const {WebpackManifestPlugin} = require('webpack-manifest-plugin')
 const WebpackHooks = require('./webpackHooks')
 const SourceFileExtensionsPlugin = require('./SourceFileExtensionsPlugin')
-const EncapsulationPlugin = require('webpack-encapsulation-plugin')
+// TODO: upgrade to webpack 5
+// const EncapsulationPlugin = require('webpack-encapsulation-plugin')
 const IgnoreErrorsPlugin = require('./IgnoreErrorsPlugin')
 const webpackPublicPath = require('./webpackPublicPath')
 const {canvasDir} = require('#params')
@@ -55,6 +55,7 @@ const createBundleAnalyzerPlugin = (...args) => {
 
 module.exports = {
   mode: process.env.NODE_ENV,
+  target: ['web', 'es2021'],
   performance: skipSourcemaps
     ? false
     : {
@@ -72,13 +73,10 @@ module.exports = {
         maxAssetSize: 1400000
       },
   optimization: {
-    // concatenateModules: false, // uncomment if you want to get more accurate stuff from `yarn webpack:analyze`
-    moduleIds: 'hashed',
+    moduleIds: 'deterministic',
     minimizer: [
       new TerserPlugin({
-        cache: true,
         parallel: true,
-        sourceMap: !skipSourcemaps,
         terserOptions: {
           compress: {
             sequences: false, // prevents it from combining a bunch of statements with ","s so it is easier to set breakpoints
@@ -109,6 +107,7 @@ module.exports = {
         }
       })
     ],
+
     splitChunks: {
       name: false,
 
@@ -117,8 +116,8 @@ module.exports = {
       maxInitialRequests: 10,
 
       chunks: 'all',
-      cacheGroups: {vendors: false} // don't split out node_modules and app code in different chunks
-    }
+      cacheGroups: {defaultVendors: false} // don't split out node_modules and app code in different chunks
+    },
   },
   // In prod build, don't attempt to continue if there are any errors.
   bail: process.env.NODE_ENV === 'production',
@@ -133,11 +132,8 @@ module.exports = {
   entry: {main: path.resolve(canvasDir, 'ui/index.js')},
 
   output: {
-    // NOTE: hashSalt was added when HashedModuleIdsPlugin was installed, since
-    // chunkhashes are insensitive to moduleid changes. It should be changed again
-    // if this plugin is reconfigured or removed, or if there is another reason to
-    // prevent previously cached assets from being mixed with those from the new build
-    hashSalt: '2019-04-19',
+    publicPath: '',
+    clean: true,
     path: path.join(canvasDir, 'public', webpackPublicPath),
 
     // Add /* filename */ comments to generated require()s in the output.
@@ -146,7 +142,6 @@ module.exports = {
     // "e" is for "entry" and "c" is for "chunk"
     filename: '[name]-e-[chunkhash:10].js',
     chunkFilename: '[name]-c-[chunkhash:10].js',
-    jsonpFunction: 'canvasWebpackJsonp'
   },
 
   resolveLoader: {
@@ -154,6 +149,12 @@ module.exports = {
   },
 
   resolve: {
+    fallback: {
+      // for minimatch module; it can work without path so let webpack know
+      // instead of trying to resolve node's "path"
+      path: false
+    },
+
     modules: [
       path.resolve(canvasDir, 'ui/shims'),
       path.resolve(canvasDir, 'public/javascripts'),
@@ -165,6 +166,14 @@ module.exports = {
   },
 
   module: {
+    parser: {
+      javascript: {
+        exportsPresence: 'error',
+        importExportsPresence: 'error',
+        reexportExportsPresence: 'error',
+      },
+    },
+
     // This can boost the performance when ignoring big libraries.
     // The files are expected to have no call to require, define or similar.
     // They are allowed to use exports and module.exports.
@@ -175,23 +184,66 @@ module.exports = {
       require.resolve('tinymce'),
     ],
     rules: [
+      // packages that do specify "type": "module" for their package but are
+      // still using non-fully qualified relative imports (e.g. "./foo"
+      // instead of "./foo.js") are rejected by webpack 5, and this works
+      // around it in the meantime
+      //
+      // to reproduce in the future, disable this rule block and verify that
+      // webpack compiles successfully without errors like:
+      //
+      //     BREAKING CHANGE: The request '../jsutils/inspect' failed to
+      //     resolve only because it was resolved as fully specified
+      //
+      // refs: https://github.com/webpack/webpack/issues/11467#issuecomment-691873586
+      //       https://github.com/babel/babel/issues/12058
+      //       https://github.com/graphql/graphql-js/issues/2721
+      {
+        test: /\.m?js$/,
+        type: 'javascript/auto',
+        include: [
+          path.resolve(canvasDir, 'node_modules/graphql'),
+          path.resolve(canvasDir, 'packages/datetime-moment-parser/index.js'),
+          path.resolve(canvasDir, 'packages/datetime/index.js'),
+        ],
+        resolve: {
+          fullySpecified: false
+        }
+      },
+      // remove when you no longer get an error from @instructure/ui* around
+      // import/export with a package not marked as ESM:
+      //
+      //     ERROR in ./node_modules/@instructure/ui-view/es/index.js 24:0
+      //     Module parse failed: 'import' and 'export' may appear only with 'sourceType: module' (24:0)
+      //     You may need an appropriate loader to handle this file type, currently no loaders are configured to process this file. See https://webpack.js.org/concepts#loaders
+      //
+      {
+        test: /\.js$/,
+        type: 'javascript/auto',
+        include: [
+          path.resolve(canvasDir, 'node_modules/@instructure'),
+        ]
+      },
       {
         test: /\.(js|ts|tsx)$/,
         include: [
           path.resolve(canvasDir, 'ui'),
           path.resolve(canvasDir, 'packages/jquery-kyle-menu'),
-          path.resolve(canvasDir, 'packages/jquery-sticky'),
           path.resolve(canvasDir, 'packages/jquery-popover'),
           path.resolve(canvasDir, 'packages/jquery-selectmenu'),
+          path.resolve(canvasDir, 'packages/jquery-sticky'),
           path.resolve(canvasDir, 'packages/mathml'),
           path.resolve(canvasDir, 'packages/persistent-array'),
           path.resolve(canvasDir, 'packages/slickgrid'),
           path.resolve(canvasDir, 'packages/with-breakpoints'),
           path.resolve(canvasDir, 'spec/javascripts/jsx'),
           path.resolve(canvasDir, 'spec/coffeescripts'),
-          /gems\/plugins\/.*\/app\/(jsx|coffeescripts)\//
+          ...globPlugins('app/{jsx,coffeescripts}/'),
         ],
-        exclude: [/bower\//, /node_modules/],
+        exclude: [/node_modules/],
+        parser: {
+          requireInclude: 'allow'
+        },
         use: {
           loader: 'babel-loader',
           options: {
@@ -240,14 +292,17 @@ module.exports = {
           path.resolve(canvasDir, 'spec/coffeescripts'),
           path.resolve(canvasDir, 'packages/backbone-input-filter-view/src'),
           path.resolve(canvasDir, 'packages/backbone-input-view/src'),
-          /gems\/plugins\/.*\/(app|spec_canvas)\/coffeescripts\//
+          ...globPlugins('{app,spec_canvas}/coffeescripts/')
         ],
-        loaders: ['coffee-loader']
+        use: ['coffee-loader']
       },
       {
         test: /\.handlebars$/,
-        include: [path.resolve(canvasDir, 'ui'), /gems\/plugins\/.*\/app\/views\/jst\//],
-        loaders: [
+        include: [
+          path.resolve(canvasDir, 'ui'),
+          ...globPlugins('app/views/jst/'),
+        ],
+        use: [
           {
             loader: require.resolve('./i18nLinerHandlebars'),
             options: {
@@ -260,7 +315,7 @@ module.exports = {
       {
         test: /\.hbs$/,
         include: [path.join(canvasDir, 'ui/features/screenreader_gradebook/jst')],
-        loaders: [require.resolve('./emberHandlebars')]
+        use: [require.resolve('./emberHandlebars')]
       },
       {
         test: /\.css$/,
@@ -303,25 +358,18 @@ module.exports = {
 
     new WebpackHooks(),
 
-    // avoids warnings caused by
-    // https://github.com/graphql/graphql-language-service/issues/111, should
-    // be removed when that issue is fixed
-    new webpack.IgnorePlugin(/\.flow$/),
-
-    new CleanWebpackPlugin(),
-
-    new EncapsulationPlugin({
-      test: /\.[tj]sx?$/,
-      include: [
-        path.resolve(canvasDir, 'ui'),
-        path.resolve(canvasDir, 'packages'),
-        path.resolve(canvasDir, 'public/javascripts'),
-        path.resolve(canvasDir, 'gems/plugins')
-      ],
-      exclude: [/\/node_modules\//],
-      formatter: require('./encapsulation/ErrorFormatter'),
-      rules: require('./encapsulation/moduleAccessRules')
-    }),
+    // new EncapsulationPlugin({
+    //   test: /\.[tj]sx?$/,
+    //   include: [
+    //     path.resolve(canvasDir, 'ui'),
+    //     path.resolve(canvasDir, 'packages'),
+    //     path.resolve(canvasDir, 'public/javascripts'),
+    //     path.resolve(canvasDir, 'gems/plugins')
+    //   ],
+    //   exclude: [/\/node_modules\//],
+    //   formatter: require('./encapsulation/ErrorFormatter'),
+    //   rules: require('./encapsulation/moduleAccessRules')
+    // }),
 
     new IgnoreErrorsPlugin({
       errors: require('./encapsulation/errorsPendingRemoval.json'),
@@ -329,7 +377,15 @@ module.exports = {
     }),
 
     new webpack.DefinePlugin({
-      CANVAS_WEBPACK_PUBLIC_PATH: JSON.stringify(webpackPublicPath)
+      CANVAS_WEBPACK_PUBLIC_PATH: JSON.stringify(webpackPublicPath),
+      NODE_ENV: null,
+      // webpack5 stopped providing a polyfill for process.env and its use in
+      // web code is discouraged but a number of our dependencies still rely on
+      // this, so we either selectively shim every property that they may be
+      // referencing through the EnvironmentPlugin (below) and risk a hard
+      // runtime error in case we didn't cover them all, or provide a sink like
+      // this, which i'm gonna go with for now:
+      process: { env: {} },
     })
   ]
     .concat(
@@ -368,24 +424,22 @@ module.exports = {
       process.env.NODE_ENV === 'test'
         ? []
         : [
-            // don't include any of the moment locales in the common bundle (otherwise it is huge!)
-            // we load them explicitly onto the page in include_js_bundles from rails.
-            new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+            // don't include any of the moment locales in the common bundle
+            // (otherwise it is huge!) we load them explicitly onto the page in
+            // include_js_bundles from rails.
+            new webpack.IgnorePlugin({
+              resourceRegExp: /^\.\/locale$/,
+              contextRegExp: /moment$/
+            }),
 
             // outputs a json file so Rails knows which hash fingerprints to add
             // to each script url and so it knows which split chunks to make a
             // <link rel=preload ... /> for for each `js_bundle`
-            new StatsWriterPlugin({
-              filename: 'webpack-manifest.json',
-              fields: ['namedChunkGroups'],
-              transform(data) {
-                const res = {}
-                Object.entries(data.namedChunkGroups).forEach(([key, value]) => {
-                  res[key] = value.assets.filter(a => a.endsWith('.js'))
-                })
-                return JSON.stringify(res, null, 2)
-              }
-            })
+            new WebpackManifestPlugin({
+              fileName: 'webpack-manifest.json',
+              publicPath: '',
+              useEntryKeys: true
+            }),
           ]
     )
 }
@@ -406,7 +460,7 @@ if (process.env.CRYSTALBALL_MAP === '1') {
       path.resolve(canvasDir, 'packages/with-breakpoints'),
       path.resolve(canvasDir, 'spec/javascripts/jsx'),
       path.resolve(canvasDir, 'spec/coffeescripts'),
-      /gems\/plugins\/.*\/app\/(jsx|coffeescripts)\//
+      ...globPlugins('app/{jsx,coffeescripts}/'),
     ],
     exclude: [/test\//, /spec/],
     use: {
@@ -414,5 +468,12 @@ if (process.env.CRYSTALBALL_MAP === '1') {
       options: {esModules: true, produceSourceMap: true}
     },
     enforce: 'post'
+  })
+}
+
+function globPlugins(pattern) {
+  return glob.sync(`gems/plugins/*/${pattern}`, {
+    absolute: true,
+    cwd: canvasDir
   })
 }

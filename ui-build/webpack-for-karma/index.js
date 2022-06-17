@@ -18,7 +18,7 @@
 
 const path = require('path')
 const glob = require('glob')
-const { DefinePlugin, EnvironmentPlugin } = require('webpack')
+const { DefinePlugin, EnvironmentPlugin, ProvidePlugin } = require('webpack')
 const partitioning = require('./partitioning')
 const PluginSpecsRunner = require('./PluginSpecsRunner')
 const { canvasDir } = require('#params')
@@ -47,6 +47,25 @@ module.exports = {
     ],
     rules: [
       {
+        test: /\.m?js$/,
+        type: 'javascript/auto',
+        include: [
+          path.resolve(canvasDir, 'node_modules/graphql'),
+          path.resolve(canvasDir, 'packages/datetime-moment-parser/index.js'),
+          path.resolve(canvasDir, 'packages/datetime/index.js'),
+        ],
+        resolve: {
+          fullySpecified: false
+        }
+      },
+      {
+        test: /\.js$/,
+        type: 'javascript/auto',
+        include: [
+          path.resolve(canvasDir, 'node_modules/@instructure'),
+        ]
+      },
+      {
         test: /\.(js|ts|tsx)$/,
         include: [
           path.join(canvasDir, 'ui'),
@@ -63,6 +82,9 @@ module.exports = {
           /gems\/plugins\/.*\/app\/(jsx|coffeescripts)\//
         ],
         exclude: [/node_modules/],
+        parser: {
+          requireInclude: 'allow'
+        },
         use: {
           loader: 'babel-loader',
           options: {
@@ -166,6 +188,18 @@ module.exports = {
       [CONTEXT_COFFEESCRIPT_SPEC]: path.join(canvasDir, CONTEXT_COFFEESCRIPT_SPEC),
       [CONTEXT_EMBER_GRADEBOOK_SPEC]: path.join(canvasDir, CONTEXT_EMBER_GRADEBOOK_SPEC),
       [CONTEXT_JSX_SPEC]: path.join(canvasDir, CONTEXT_JSX_SPEC),
+
+      // need to explicitly point this out for whatwg-url otherwise you get an
+      // error like:
+      //
+      //     TypeError: Cannot read properties of undefined (reading 'decode')
+      //
+      // I suspect it's trying to use node's native impl and that doesn't work
+      // when run through webpack
+      ['punycode']: path.join(canvasDir, 'node_modules/punycode/punycode.js'),
+    },
+    fallback: {
+      path: false, // for minimatch
     },
     extensions: ['.mjs', '.js', '.ts', '.tsx', '.coffee'],
     modules: [
@@ -189,7 +223,8 @@ module.exports = {
       RESOURCE_COFFEESCRIPT_SPEC,
       RESOURCE_EMBER_GRADEBOOK_SPEC,
       RESOURCE_JSX_SPEC,
-      WEBPACK_PLUGIN_SPECS: JSON.stringify(WEBPACK_PLUGIN_SPECS)
+      WEBPACK_PLUGIN_SPECS: JSON.stringify(WEBPACK_PLUGIN_SPECS),
+      process: { env: {} },
     }),
 
     new EnvironmentPlugin({
@@ -204,6 +239,12 @@ module.exports = {
     new PluginSpecsRunner({
       pattern: 'gems/plugins/*/spec_canvas/coffeescripts/**/*Spec.js',
       outfile: WEBPACK_PLUGIN_SPECS
+    }),
+
+    // needed for modules that expect Buffer to be present like fetch-mock (or
+    // whatwg-url, its dependency)
+    new ProvidePlugin({
+      'Buffer': ['buffer', 'Buffer']
     }),
   ].concat(
     process.env.JSPEC_GROUP ? [
