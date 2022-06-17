@@ -430,7 +430,9 @@ describe "new groups" do
 
       click_add_group_set
       replace_and_proceed f("#new-group-set-name"), "Test Group Set"
-      fxpath("//input[@data-testid='radio-button-split-groups']/..").click
+
+      force_click('[data-testid="group-structure-selector"]')
+      force_click('[data-testid="group-structure-num-groups"]')
 
       expect(f('span[data-testid="group-leadership-controls"] input[data-testid="first"]')).not_to be_enabled
       expect(f('span[data-testid="group-leadership-controls"] input[data-testid="random"]')).not_to be_enabled
@@ -440,7 +442,9 @@ describe "new groups" do
       expect(f('span[data-testid="group-leadership-controls"] input[data-testid="first"]')).to be_enabled
       expect(f('span[data-testid="group-leadership-controls"] input[data-testid="random"]')).to be_enabled
 
-      replace_and_proceed f("#textinput-create-groups-count"), "2"
+      force_click('[data-testid="split-groups"]')
+
+      f('[data-testid="split-groups"]').send_keys("2")
       f(%(button[data-testid="group-set-save"])).click
       # Need to run delayed jobs for the random group assignments to work, and then refresh the page
       run_jobs

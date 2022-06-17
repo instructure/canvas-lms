@@ -271,11 +271,11 @@ describe "people" do
       end
       open_student_group_dialog
       replace_and_proceed f("#new-group-set-name"), "new group"
-      fxpath("//input[@data-testid='radio-button-split-groups']/..").click
-      replace_and_proceed f("#textinput-create-groups-count"), group_count
+      force_click('[data-testid="group-structure-selector"]')
+      force_click('[data-testid="group-structure-num-groups"]')
+      f('[data-testid="split-groups"]').send_keys(group_count)
       expect(@course.groups.count).to eq 0
       f(%(button[data-testid="group-set-save"])).click
-      wait_for_ajaximations
       run_jobs
       wait_for_ajaximations
       expect(@course.groups.count).to eq group_count.to_i
@@ -286,12 +286,12 @@ describe "people" do
       enroll_more_students
       get "/courses/#{@course.id}/groups#new"
       replace_and_proceed f("#new-group-set-name"), "Groups of 2"
-      fxpath("//input[@data-testid='radio-button-group-members']/..").click
-      replace_and_proceed f("#textinput-create-members-count"), "2"
+      force_click('[data-testid="group-structure-selector"]')
+      force_click('[data-testid="group-structure-students-per-group"]')
+      f('[data-testid="num-students-per-group"]').send_keys("2")
       f('button[data-testid="group-set-save"]').click
-      wait_for_ajax_requests # initiates job request
       run_jobs
-      wait_for_ajaximations # finishes calculations and repopulates list
+      wait_for_ajaximations
       expect(ff("li.group").size).to eq 3
     end
 
