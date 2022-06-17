@@ -68,7 +68,7 @@ const AssignmentMuterComponent = Ember.Component.extend({
     let assignment
     if ((assignment = this.get('assignment'))) {
       const url = `${ENV.GRADEBOOK_OPTIONS.context_url}/assignments/${assignment.id}/mute`
-      this.muter = new AssignmentMuter(null, assignment, url, Em.set)
+      this.muter = new AssignmentMuter(null, assignment, url, Ember.set)
       this.muter.show()
     }
   }

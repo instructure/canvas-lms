@@ -24,10 +24,7 @@ var objectCreate = Object.create || function(parent) {
   return new F();
 };
 
-var Handlebars = (Ember.imports && Ember.imports.Handlebars) || (this && this.Handlebars);
-if (!Handlebars && typeof require === 'function') {
-  Handlebars = require('handlebars');
-}
+var Handlebars = require('handlebars')
 
 Ember.assert("Ember Handlebars requires Handlebars version 1.0 or 1.1. Include " +
              "a SCRIPT tag in the HTML HEAD linking to the Handlebars file " +
