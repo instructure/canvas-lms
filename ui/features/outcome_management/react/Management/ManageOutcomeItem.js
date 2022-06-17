@@ -23,6 +23,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {IconButton} from '@instructure/ui-buttons'
+import {Spinner} from '@instructure/ui-spinner'
 import {IconArrowOpenEndLine, IconArrowOpenDownLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -31,6 +32,7 @@ import OutcomeDescription from './OutcomeDescription'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {ratingsShape} from './shapes'
+import {REMOVE_PENDING} from '@canvas/outcomes/react/hooks/useOutcomesRemove'
 
 const I18n = useI18nScope('OutcomeManagement')
 
@@ -46,6 +48,7 @@ const ManageOutcomeItem = ({
   outcomeContextType,
   outcomeContextId,
   isChecked,
+  removeOutcomeStatus,
   onMenuHandler,
   onCheckboxHandler,
   canUnlink
@@ -72,6 +75,7 @@ const ManageOutcomeItem = ({
     (outcomeContextType === contextType && outcomeContextId === contextId) ||
     allowAdminEdit
   const shouldShowDescription = description || friendlyDescription || !accountLevelMasteryScalesFF
+  const shouldShowSpinner = removeOutcomeStatus === REMOVE_PENDING
 
   if (!title) return null
 
@@ -135,6 +139,13 @@ const ManageOutcomeItem = ({
         </Flex.Item>
         {canManage && (
           <Flex.Item>
+            {shouldShowSpinner && (
+              <Spinner
+                renderTitle={I18n.t('Loading')}
+                size="x-small"
+                data-testid="outcome-spinner"
+              />
+            )}
             <OutcomeKebabMenu
               canDestroy={canUnlink}
               canEdit={canEdit}
@@ -178,6 +189,7 @@ ManageOutcomeItem.propTypes = {
   outcomeContextType: PropTypes.string,
   outcomeContextId: PropTypes.string,
   isChecked: PropTypes.bool.isRequired,
+  removeOutcomeStatus: PropTypes.string,
   onMenuHandler: PropTypes.func.isRequired,
   onCheckboxHandler: PropTypes.func.isRequired,
   canUnlink: PropTypes.bool.isRequired

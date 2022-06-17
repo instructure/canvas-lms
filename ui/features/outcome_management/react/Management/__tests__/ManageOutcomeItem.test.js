@@ -69,6 +69,7 @@ describe('ManageOutcomeItem', () => {
     outcomeContextType: 'Account',
     outcomeContextId: '1',
     isChecked: false,
+    removeOutcomeStatus: 'REMOVE_NOT_STARTED',
     canUnlink: true,
     onMenuHandler: onMenuHandlerMock,
     onCheckboxHandler: onCheckboxHandlerMock,
@@ -144,6 +145,13 @@ describe('ManageOutcomeItem', () => {
       accountLevelMasteryScalesFF: false
     })
     expect(queryByTestId('icon-arrow-right').closest('button')).toBeEnabled()
+  })
+
+  it('displays spinner when a remove action is pending', () => {
+    const {getByTestId} = render(
+      <ManageOutcomeItem {...defaultProps({removeOutcomeStatus: 'REMOVE_PENDING'})} />
+    )
+    expect(getByTestId('outcome-spinner')).toBeInTheDocument()
   })
 
   it('handles click on individual outcome -> kebab menu -> remove option', () => {
