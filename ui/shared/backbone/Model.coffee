@@ -17,7 +17,7 @@
 
 import mixin from './mixin.coffee'
 import _ from 'underscore'
-import Backbone from 'node_modules-version-of-backbone'
+import Backbone from 'backbone'
 import './Model/computedAttributes'
 import './Model/dateAttributes'
 import './Model/errors'

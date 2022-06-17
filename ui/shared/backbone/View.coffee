@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import Backbone from 'node_modules-version-of-backbone'
+import Backbone from 'backbone'
 import _ from 'underscore'
 import htmlEscape from 'html-escape'
 import mixin from './mixin.coffee'

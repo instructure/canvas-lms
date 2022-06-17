@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import _ from 'underscore'
-import Backbone from 'node_modules-version-of-backbone'
+import Backbone from 'backbone'
 
 // normalize (i.e. I18n) and filter errors we get from the API
 Backbone.Model.prototype.normalizeErrors = function(errors, validationPolicy) {

@@ -31,7 +31,7 @@ import '@canvas/forms/jquery/jquery.instructure_forms' // formSubmit, getFormDat
 import '@canvas/jquery/jquery.instructure_misc_helpers' // replaceTags
 import '@canvas/jquery/jquery.instructure_misc_plugins' // confirmDelete, showIf, /\.log/
 import '@canvas/loading-image'
-import 'date' // Date.parse
+import 'date-js' // Date.parse
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 
 const I18n = useI18nScope('account_settings')

@@ -56,7 +56,7 @@ import '@canvas/jquery/jquery.instructure_misc_plugins' /* .dim, confirmDelete, 
 import '@canvas/keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
-import 'date' /* Date.parse */
+import 'date-js' /* Date.parse */
 import 'jqueryui/sortable'
 import '@canvas/rails-flash-notifications'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
