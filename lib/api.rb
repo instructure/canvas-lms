@@ -433,19 +433,6 @@ module Api
     wrap_pagination_args!(pagination_args, controller)
     begin
       paginated = collection.paginate(pagination_args)
-      # If we aren't told the last page (because the AR .count was suppressed), then see if we
-      # can figure it out based on the contents of the next page. if it is short, then that's
-      # definitely the last page. Notice that we can only do this trick if we can perform
-      # arithmetic on the page numbers vs the page size, so if the pages are bookmark: urls
-      # then we just can't do this. TODO: the real fix for this is in the Folio gem
-      if paginated.ordinal_pages? && paginated.last_page.nil?
-        page_size = paginated.per_page
-        look_ahead = collection.paginate(pagination_args.merge({ page: paginated.next_page }))
-        next_page_len = look_ahead.length
-        if next_page_len < page_size # the next page (or possibly even this one) is the very last one
-          paginated.total_entries = (look_ahead.current_page.pred * page_size) + next_page_len
-        end # if the next page is full-sized, then we still don't know what the last page is
-      end
     rescue Folio::InvalidPage
       # Have to .try(:build_page) because we use some collections (like
       # PaginatedCollection) that do not conform to the full will_paginate API.
