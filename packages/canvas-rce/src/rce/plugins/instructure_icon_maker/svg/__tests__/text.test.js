@@ -380,14 +380,13 @@ describe('getContainerHeight()', () => {
   beforeEach(() => {
     settings = DEFAULT_SETTINGS
   })
-
   it('returns base size if is greater', () => {
-    expect(getContainerHeight({...settings, text: 'Hello World!'})).toBe(162)
+    expect(getContainerHeight({...settings, text: 'Hello World!'})).toBe(152)
   })
 
   it('returns text background height if is greater', () => {
     const text =
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua.'
-    expect(getContainerHeight({...settings, text})).toBe(218)
+    expect(getContainerHeight({...settings, text})).toBe(208)
   })
 })

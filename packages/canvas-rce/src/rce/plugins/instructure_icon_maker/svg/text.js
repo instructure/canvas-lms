@@ -86,10 +86,9 @@ export function getContainerWidth({text, textSize, size}) {
 
 export function getContainerHeight({text, textPosition, textSize, shape, size}) {
   const base = BASE_SIZE[size]
-  const textBackgroundHeight =
-    getTextYValue(textPosition, textSize, shape, size) +
-    getTextHeight(text, textSize) +
-    TEXT_BACKGROUND_PADDING
+  const textYValue = getTextYValue(textPosition, textSize, shape, size)
+  const extraTextHeight = getTextHeight(text, textSize) - TEXT_SIZE[textSize]
+  const textBackgroundHeight = textYValue + extraTextHeight + TEXT_BACKGROUND_PADDING * 2
   return Math.max(base, textBackgroundHeight)
 }
 

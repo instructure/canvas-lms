@@ -190,8 +190,8 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
           Object {
             "domElement": <svg
               fill="none"
-              height="148px"
-              viewBox="0 0 122 148"
+              height="138px"
+              viewBox="0 0 122 138"
               width="122px"
               xmlns="http://www.w3.org/2000/svg"
             >
