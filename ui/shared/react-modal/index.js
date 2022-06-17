@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ReactModal from 'node_modules-version-of-react-modal'
+import ReactModal from 'react-modal'
 
 const appElement = document.getElementById('application')
 

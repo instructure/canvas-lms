@@ -154,12 +154,6 @@ module.exports = {
   },
 
   resolve: {
-    alias: {
-      d3: 'd3/d3',
-      'node_modules-version-of-backbone$': require.resolve('backbone'),
-      'node_modules-version-of-react-modal$': require.resolve('react-modal')
-    },
-
     modules: [
       path.resolve(canvasDir, 'ui/shims'),
       path.resolve(canvasDir, 'public/javascripts'),

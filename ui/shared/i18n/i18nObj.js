@@ -23,7 +23,7 @@ import extend from '@instructure/i18nliner/dist/lib/extensions/i18n_js'
 import logEagerLookupViolations from './logEagerLookupViolations'
 
 import htmlEscape from 'html-escape'
-import 'date'
+import 'date-js'
 // add i18nliner's runtime extensions to the global I18n object
 extend(I18n)
 

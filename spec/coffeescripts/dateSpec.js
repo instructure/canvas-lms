@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'date'
+import 'date-js'
 
 QUnit.module('Date')
 

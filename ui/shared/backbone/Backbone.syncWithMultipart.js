@@ -17,7 +17,7 @@
 
 // copied from: https://gist.github.com/1998897
 
-import Backbone from 'node_modules-version-of-backbone'
+import Backbone from 'backbone'
 import _ from 'underscore'
 import $ from 'jquery'
 import authenticity_token from '@canvas/authenticity-token'
