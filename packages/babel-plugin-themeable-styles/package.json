@@ -12,8 +12,7 @@
   "homepage": "https://instructure.github.io/instructure-ui/",
   "bugs": "https://github.com/instructure/instructure-ui/issues",
   "scripts": {
-    "lint": "ui-test --lint",
-    "lint:fix": "ui-test --lint --fix"
+    "test": "NODE_PATH=./test/fixture:$NODE_PATH mocha test"
   },
   "license": "MIT",
   "dependencies": {
@@ -27,6 +26,10 @@
     "postcss": "^7",
     "postcss-modules": "^1.4.1",
     "postcss-reporter": "^6.0.1"
+  },
+  "devDependencies": {
+    "chai": "^4",
+    "mocha": "^10"
   },
   "peerDependencies": {
     "@babel/core": "^7",

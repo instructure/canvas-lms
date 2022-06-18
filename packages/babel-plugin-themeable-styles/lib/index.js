@@ -279,13 +279,18 @@ module.exports = function transformThemeableStyles({ types: t }) {
   function resolveStylesheetPath(filepath, stylesheetPath) {
     let filePathOrModuleName = stylesheetPath
 
-    // only resolve path to file when we have a file path
-    if (!/^\w/i.test(filePathOrModuleName)) {
-      const from = resolveModulePath(filepath)
-      filePathOrModuleName = resolve(from, filePathOrModuleName)
+    if (isBare(filePathOrModuleName)) {
+      return require.resolve(filePathOrModuleName, {
+        paths: [dirname(filepath)]
+      })
     }
-
-    return filePathOrModuleName
+    // only resolve path to file when we have a file path
+    else if (!/^\w/i.test(filePathOrModuleName)) {
+      return resolve(resolveModulePath(filepath), filePathOrModuleName)
+    }
+    else {
+      return filePathOrModuleName
+    }
   }
 
   function requireCssFile(stylesheetPath) {
@@ -309,4 +314,8 @@ module.exports = function transformThemeableStyles({ types: t }) {
 
     return plugins
   }
+}
+
+function isBare(source) {
+  return !source.startsWith('.')
 }

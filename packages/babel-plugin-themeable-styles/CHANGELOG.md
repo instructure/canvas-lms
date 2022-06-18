@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [7.19.0-canvas] (2022-06-18)
+
+- CSS files can now be transformed when imported using a bare specifier through
+  either "import" in ESM or "require" in CommonJS
+
 # [7.19.0](https://github.com/instructure/instructure-ui/compare/v7.18.0...v7.19.0) (2022-06-03)
 
 **Note:** Version bump only for package @instructure/babel-plugin-themeable-styles
