@@ -69,6 +69,7 @@ docker-compose/api-gateway.override.yml
 /packages/*/node_modules
 /packages/*/es
 /packages/*/lib
+!/packages/babel-plugin-themeable-styles/lib
 /packages/*/coverage/
 /packages/*/coverage-js/
 /packages/canvas-planner/.babel-cache

@@ -1,0 +1,38 @@
+{
+  "name": "@instructure/babel-plugin-themeable-styles",
+  "version": "7.19.0-canvas",
+  "description": "A babel plugin to transform CSS imports for themeable components",
+  "author": "Instructure, Inc. Engineering and Product Design",
+  "type": "commonjs",
+  "main": "./lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/instructure/instructure-ui.git"
+  },
+  "homepage": "https://instructure.github.io/instructure-ui/",
+  "bugs": "https://github.com/instructure/instructure-ui/issues",
+  "scripts": {
+    "lint": "ui-test --lint",
+    "lint:fix": "ui-test --lint --fix"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@babel/template": "^7.8.6",
+    "@instructure/config-loader": "^7.19.0",
+    "@instructure/pkg-utils": "^7.19.0",
+    "@instructure/postcss-themeable-styles": "^7.19.0",
+    "@instructure/ui-postcss-config": "^7.19.0",
+    "css-modules-require-hook": "^4.2.3",
+    "loader-utils": "^1.2.3",
+    "postcss": "^7",
+    "postcss-modules": "^1.4.1",
+    "postcss-reporter": "^6.0.1"
+  },
+  "peerDependencies": {
+    "@babel/core": "^7",
+    "webpack": "^3 || ^4"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
