@@ -29,6 +29,8 @@ import mathml from 'mathml'
 import preventDefault from 'prevent-default'
 import loadBundle from 'bundles-generated'
 import {isolate} from '@canvas/sentry'
+import { useTranslations } from '@canvas/i18n'
+import CoreTranslations from 'translations/en.json'
 
 // these are all things that either define global $.whatever or $.fn.blah
 // methods or set something up that other code expects to exist at runtime.
@@ -39,6 +41,8 @@ import './boot/initializers/ajax_errors'
 import './boot/initializers/activateKeyClicks'
 import './boot/initializers/activateTooltips'
 import './boot/initializers/injectAuthTokenIntoForms'
+
+useTranslations('en', CoreTranslations)
 
 window.canvasReadyState = 'loading'
 window.dispatchEvent(new CustomEvent('canvasReadyStateChange'))
@@ -160,7 +164,9 @@ function noNativeSupport(sys) {
 }
 
 async function maybePolyfillLocaleThenGo() {
-  await import(`../public/javascripts/translations/${ENV.LOCALE}`)
+  await import(`../public/javascripts/translations/${ENV.LOCALE}.json`).then(module => {
+    useTranslations(ENV.LOCALE, module.default)
+  })
   advanceReadiness('localeFiles')
 
   // If any Intl subsystem has no native support for the current locale, start
