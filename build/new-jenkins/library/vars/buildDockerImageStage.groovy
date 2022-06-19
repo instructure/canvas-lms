@@ -201,7 +201,7 @@ def patchsetImage() {
   }
 }
 
-def i18nGenerate() {
+def i18nExtract() {
   def dest = 's3://instructure-translations/sources/canvas-lms/en/en.yml'
   def roleARN = 'arn:aws:iam::307761260553:role/translations-jenkins'
 
@@ -215,7 +215,7 @@ def i18nGenerate() {
         -e COMPILE_ASSETS_BRAND_CONFIGS=0 \
         -e COMPILE_ASSETS_BUILD_JS=0 \
         $PATCHSET_TAG \
-          bundle exec rake canvas:compile_assets i18n:generate
+          bundle exec rake canvas:compile_assets i18n:extract
     """
   )
 
