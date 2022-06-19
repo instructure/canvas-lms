@@ -28,14 +28,8 @@ QUnit.module('Number Helper Parse and Validate', {
     separator = ','
     I18nStubber.pushFrame()
     I18nStubber.stub('foo', {
-      number: {
-        format: {
-          delimiter,
-          separator,
-          precision: 3,
-          strip_insignificant_zeros: false
-        }
-      }
+      'number.format.delimiter': delimiter,
+      'number.format.separator': separator,
     })
     I18nStubber.setLocale('foo')
 
