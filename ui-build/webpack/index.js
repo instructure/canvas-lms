@@ -167,7 +167,10 @@ module.exports = {
     fallback: {
       // for minimatch module; it can work without path so let webpack know
       // instead of trying to resolve node's "path"
-      path: false
+      path: false,
+      // for parse-link-header, which requires "querystring" which is a node
+      // module. btw we have at least 3 implementations of "parse-link-header"!
+      querystring: require.resolve('querystring-es3')
     },
 
     modules: [
@@ -191,8 +194,6 @@ module.exports = {
     // The files are expected to have no call to require, define or similar.
     // They are allowed to use exports and module.exports.
     noParse: [
-      // i18nLiner has a `require('fs')` that it doesn't actually need, ignore it.
-      require.resolve('@instructure/i18nliner/dist/lib/i18nliner.js'),
       require.resolve('jquery'),
       require.resolve('tinymce'),
     ],

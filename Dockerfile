@@ -74,7 +74,6 @@ RUN set -eux; \
     app/stylesheets/brandable_css_brands \
     app/views/info \
     config/locales/generated \
-    gems/canvas_i18nliner/node_modules \
     log \
     node_modules \
     packages/canvas-media/es \
