@@ -83,7 +83,7 @@ namespace :i18n do
   # in-memory when we run the "check" task and combine that directly with the
   # translations extracted from JS, which are stored on disk
   desc "Extract translations from source code into a YAML file"
-  task generate: [:check_rb, :extract_js] do
+  task extract: [:check_rb, :extract_js] do
     combined_translations = I18nTasks::Extract.new(
       rb_translations: @check.translations,
       js_translations: JSON.parse(File.read(js_translations_file))["en"].flatten_keys
@@ -251,7 +251,7 @@ namespace :i18n do
 
       puts "Extracting current en translations..."
       `git checkout #{current_branch || "master"}` if last_export[:type] == :commit || current_branch != prevgit[:branch]
-      Rake::Task["i18n:generate"].invoke
+      Rake::Task["i18n:extract"].invoke
 
       puts "Exporting #{last_export[:data] ? "new/changed" : "all"} en translations..."
       current_strings = YAML.safe_load(File.read(base_filename)).flatten_keys

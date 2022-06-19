@@ -527,10 +527,10 @@ pipeline {
                       .hooks(buildSummaryReportHooks.call())
                       .queue(stages, buildDockerImageStage.&lintersImage)
 
-                    extendedStage('Run i18n:generate')
+                    extendedStage('Run i18n:extract')
                       .hooks(buildSummaryReportHooks.call())
                       .required(configuration.isChangeMerged())
-                      .queue(stages, buildDockerImageStage.&i18nGenerate)
+                      .queue(stages, buildDockerImageStage.&i18nExtract)
 
                     parallel(stages)
                   }
