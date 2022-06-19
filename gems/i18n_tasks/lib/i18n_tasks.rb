@@ -24,11 +24,14 @@ require "ruby_parser"
 require "json"
 
 module I18nTasks
+  require "i18n_tasks/csv_backend"
+  require "i18n_tasks/environment"
+  require "i18n_tasks/extract"
+  require "i18n_tasks/generate_js"
   require "i18n_tasks/hash_extensions"
+  require "i18n_tasks/i18n_import"
   require "i18n_tasks/lolcalize"
   require "i18n_tasks/utils"
-  require "i18n_tasks/i18n_import"
-  require "i18n_tasks/csv_backend"
 
   require_relative "i18n_tasks/railtie" if defined?(Rails)
 end
