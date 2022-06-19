@@ -4,9 +4,58 @@ require "i18n_tasks"
 require "i18n_extraction"
 require "shellwords"
 
+# There are five high-level operations provided by these tasks:
+#
+#    check: validate the translate calls across the Ruby and JS codebases
+#  extract: extract all translatable strings into a single .yml file
+# generate: generate runtime files that make use of the translations
+#   export: compile all strings that need translation into a format that can
+#           be consumed by the translators
+#   import: fetch new translations from the translators and persist them to disk
+#
 namespace :i18n do
-  desc "Verifies all translation calls"
-  task check: :i18n_environment do
+  # All translations that were extracted from source code - Ruby, JavaScript,
+  # TypeScript, and Handlebars.
+  #
+  # This file is hierarchical in structure. Keys may be defined by the user and
+  # are otherwise inferred. The values are the English strings that are
+  # hard-coded in the source code.
+  #
+  # This is the product of running I18nliner on the Ruby side and
+  # @instructure/i18nliner on the frontend.
+  source_translations_file = Rails.root.join("config/locales/generated/en.yml").to_s
+
+  js_i18nliner_path = Rails.root.join("gems/canvas_i18nliner/bin/i18nliner").to_s
+
+  # Translations extracted from the frontend source code.
+  #
+  # This file has a hierarchical structure, unlike the "index" one. It looks
+  # similar to what the Ruby I18nliner exports.
+  js_translations_file = Rails.root.join("config/locales/generated/en.javascript.json").to_s
+
+  # Directory to contain the auto-generated translation files for the frontend.
+  js_translation_modules_dir = Rails.root.join("public/javascripts/translations").to_s
+
+  # like the top-level :environment, but just the i18n-y stuff we need.
+  # also it's faster and doesn't require a db \o/
+  #
+  # This is intentionally requiring things individually rather than just loading
+  # the rails+canvas environment, because that environment isn't available
+  # during the deploy process. Don't change this out for a call to the
+  # `environment` rake task.
+  task :i18n_environment do
+    I18nTasks::Environment.apply
+  end
+
+  desc "Validate translation calls everywhere"
+  task check: [] do
+    Parallel.each(["i18n:check_js", "i18n:check_rb"], in_processes: 2) do |task|
+      Rake::Task[task].invoke
+    end
+  end
+
+  desc "Validate translation calls in Ruby source code"
+  task check_rb: :i18n_environment do
     Hash.include I18nTasks::HashExtensions unless {}.is_a?(I18nTasks::HashExtensions)
 
     def I18nliner.manual_translations
@@ -14,115 +63,51 @@ namespace :i18n do
       I18n.backend.send(:translations)[:en]
     end
 
-    puts "\nJS/HBS..."
-    js_pid = spawn "./gems/canvas_i18nliner/bin/i18nliner export"
+    puts "Ruby..."
 
-    puts "\nRuby..."
     require "i18nliner/commands/check"
 
-    options = { only: ENV["ONLY"] }
-    @command = I18nliner::Commands::Check.run(options)
-    @command.success? or exit 1
-    @translations = @command.translations
-    remove_unwanted_translations(@translations)
+    @check = I18nliner::Commands::Check.run({ only: ENV["ONLY"] })
 
-    Process.wait js_pid
-    if $?.exitstatus > 0
-      warn "Error extracting JS/HBS translations; confirm that `./gems/canvas_i18nliner/bin/i18nliner export` works"
-      exit $?.exitstatus
-    end
-    js_translations = JSON.parse(File.read("config/locales/generated/en.json"))["en"].flatten_keys
-    # merge js in
-    js_translations.each do |key, value|
-      @translations[key] = value
-    end
+    exit 1 unless @check.success?
   end
 
-  desc "Generates a new en.yml file for all translations"
-  task generate: :check do
-    def deep_sort_hash_by_keys(value)
-      sort = lambda do |node|
-        case node
-        when Hash
-          node.keys.sort.index_with do |key|
-            sort[node[key]]
-          end
-        else
-          node
-        end
-      end
-
-      sort[value]
-    end
-
-    yaml_dir = "./config/locales/generated"
-    FileUtils.mkdir_p(File.join(yaml_dir))
-    yaml_file = File.join(yaml_dir, "en.yml")
-    special_keys = %w[
-      locales
-      crowdsourced
-      custom
-      bigeasy_locale
-      fullcalendar_locale
-      moment_locale
-    ].freeze
-
-    Rails.root.join(yaml_file).open("w") do |file|
-      file.write(
-        {
-          "en" => deep_sort_hash_by_keys(
-            remove_dynamic_translations(
-              @translations.except(*special_keys)
-            )
-          )
-        }.to_yaml(line_width: -1)
-      )
-    end
-    print "Wrote new #{yaml_file}\n\n"
+  desc "Validate translation calls in JavaScript/HBS source code"
+  task check_js: [] do
+    puts "JS/HBS..."
+    exit 1 unless system(js_i18nliner_path, "check")
   end
 
-  # like the top-level :environment, but just the i18n-y stuff we need.
-  # also it's faster and doesn't require a db \o/
-  task :i18n_environment do
-    # This is intentionally requiring things individually rather than just
-    # loading the rails+canvas environment, because that environment isn't
-    # available during the deploy process. Don't change this out for a call to
-    # the `environment` rake task.
-    require "bundler"
-    Bundler.setup
-    # for consistency in how canvas does json ... this way our specs can
-    # verify _core_en is up to date
-    require "config/initializers/json"
+  # there is no explicit "extract_rb" step because we don't store the EXCLUSIVE
+  # Ruby-sourced translations on disk, instead we use what I18nliner has
+  # in-memory when we run the "check" task and combine that directly with the
+  # translations extracted from JS, which are stored on disk
+  desc "Extract translations from source code into a YAML file"
+  task generate: [:check_rb, :extract_js] do
+    combined_translations = I18nTasks::Extract.new(
+      rb_translations: @check.translations,
+      js_translations: JSON.parse(File.read(js_translations_file))["en"].flatten_keys
+    ).apply
 
-    # set up rails i18n paths ... normally rails env does this for us :-/
-    require "action_controller"
-    require "active_record"
-    require "will_paginate"
-    I18n.load_path.unshift(*WillPaginate::I18n.load_path)
-    I18n.load_path += Dir[Rails.root.join("gems/plugins/*/config/locales/*.{rb,yml}")]
-    I18n.load_path += Dir[Rails.root.join("config/locales/*.{rb,yml}")]
-    I18n.load_path += Dir[Rails.root.join("config/locales/locales.yml")]
-    I18n.load_path += Dir[Rails.root.join("config/locales/community.csv")]
+    FileUtils.mkdir_p(File.dirname(source_translations_file))
 
-    I18n::Backend::Simple.include I18nTasks::CsvBackend
-    I18n::Backend::Simple.include I18n::Backend::Fallbacks
+    File.write(source_translations_file, {
+      "en" => combined_translations
+    }.to_yaml(line_width: -1))
 
-    require "i18nliner/extractors/translation_hash"
-    I18nliner::Extractors::TranslationHash.class_eval do
-      def encode_with(coder)
-        coder.represent_map nil, self # make translation hashes encode to yaml like a regular hash
-      end
-    end
+    print "Wrote new #{source_translations_file}\n\n"
+  end
+
+  task extract_js: [] do
+    exit 1 unless system(
+      js_i18nliner_path, "export",
+      "--translationsFile", js_translations_file
+    )
   end
 
   desc "Generates JS bundle i18n files (non-en) and adds them to assets.yml"
   task generate_js: :i18n_environment do
-    Hash.include I18nTasks::HashExtensions unless {}.is_a?(I18nTasks::HashExtensions)
-
     locales = I18n.available_locales
-    all_translations = I18n.backend.send(:translations)
-
-    flat_translations = all_translations.flatten_keys
 
     if locales.empty?
       puts "Nothing to do, there are no non-en translations"
@@ -130,115 +115,26 @@ namespace :i18n do
     end
 
     system "./gems/canvas_i18nliner/bin/i18nliner generate_js"
+
     if $?.exitstatus > 0
       warn "Error extracting JS translations; confirm that `./gems/canvas_i18nliner/bin/i18nliner generate_js` works"
       exit $?.exitstatus
     end
-    file_translations = JSON.parse(File.read("config/locales/generated/js_bundles.json"))
 
-    dump_translations = lambda do |filename, content|
-      file = "public/javascripts/translations/#{filename}.js"
+    I18nTasks::GenerateJs.new.apply(
+      locales: locales,
+      translations: I18n.backend.send(:translations),
+      scope_keys: JSON.parse(File.read("config/locales/generated/js_bundles.json"))
+    ).each do |(filename, content)|
+      file = "#{js_translation_modules_dir}/#{filename}.js"
       if !File.exist?(file) || File.read(file) != content
         File.open(file, "w") { |f| f.write content }
-      end
-    end
-
-    translation_for_key = lambda do |locale, key|
-      try_locales = [locale.to_s, locale.to_s.split('-')[0], 'en'].uniq
-
-      try_locales.each do |try_locale|
-        return [key, flat_translations["#{try_locale}.#{key}"]] if flat_translations.has_key?("#{try_locale}.#{key}")
-      end
-
-      # puts "key #{key} not found for locale #{locale} or possible fallbacks #{try_locales.to_sentence}"
-      nil
-    end
-
-    # Compute common metadata for all locales
-    key_counts = {}
-    scopes = {}
-    unique_key_scopes = {}
-    file_translations.map do |scope, keys|
-      stripped_scope = scope.split('.')[0]
-      keys.each do |key|
-        key_counts[key] = (key_counts[key] || 0) + 1
-        unique_key_scopes[key] = stripped_scope
-        scopes[stripped_scope] = true
-        scopes[key.split('.')[0]] = true if key.count('.') > 0
-      end
-    end
-
-    flat_translations.map do |key, translation|
-      I18nTasks::Utils::CORE_KEYS.map do |scope|
-        stripped_key = key.split(".", 2)[1] # remove the language prefix
-
-        next unless stripped_key.start_with?(scope.to_s)
-
-        key_counts[stripped_key] = (key_counts[stripped_key] || 0) + 1
-        unique_key_scopes[stripped_key] = scope
-        scopes[scope.to_s] = true
-      end
-    end
-
-    # 1. Find all of the keys that are used more than once, they will be stored at the root-level and always loaded.
-    # 2. Find the best translation for the given key.
-    common_keys, unique_keys = I18nTasks::Utils.partition_hash(key_counts) { |k, v| v > 1 }
-
-    puts "Common Keys: #{common_keys.count}"
-    puts "Unique Keys: #{unique_keys.count}"
-
-    eager_common_keys, lazy_common_keys = I18nTasks::Utils.partition_hash(common_keys) { |k, v| k.count('.') == 0 }
-    lazy_unique_root_keys, lazy_unique_nested_keys = I18nTasks::Utils.partition_hash(unique_keys) { |k, v| k.count('.') == 0 }
-
-    # 3. All common, non-nested translations will be loaded immediately.
-    # 4. All other translations will be loaded when their scope is first accessed.
-
-    eager_root_keys = eager_common_keys
-    lazy_nested_keys = lazy_common_keys.merge(lazy_unique_nested_keys)
-    lazy_root_keys = lazy_unique_root_keys
-    lazy_root_keys_by_scope = lazy_root_keys.each_with_object(Hash.new { |hash, k| hash[k] = [] }) { |(k, v), obj| obj[unique_key_scopes[k]] << k }
-
-    puts "Eager-Loaded Keys: #{eager_root_keys.count}"
-    puts "Lazy-Loaded Root Keys: #{lazy_root_keys.count}"
-    puts "Lazy-Loaded Nested Keys: #{lazy_nested_keys.count}"
-
-    base_translations_js_start = "import { setRootTranslations, setLazyTranslations } from '@canvas/i18n/mergeI18nTranslations.js'; (function(setRootTranslations, setLazyTranslations) {"
-    base_translations_js_end = "})(setRootTranslations, setLazyTranslations)"
-
-    locales.each do |locale|
-      puts "Generating JS for #{locale}"
-
-      eager_root_translations = eager_root_keys.filter_map { |k, v| translation_for_key.call(locale, k) }.to_h
-      lazy_nested_translations_by_scope = I18nTasks::Utils.flat_keys_to_nested(lazy_nested_keys.filter_map { |k, v| translation_for_key.call(locale, k) }.to_h)
-      lazy_root_translations_by_scope = lazy_root_keys_by_scope.map { |scope, keys| [scope, keys.filter_map { |k| translation_for_key.call(locale, k) }.to_h] }.to_h
-
-      common_translations_js = I18nTasks::Utils.eager_translations_js(locale, eager_root_translations)
-
-      translations_js = scopes.map do |scope, _unused|
-        lazy_root_translations = lazy_root_translations_by_scope.fetch(scope, {})
-        lazy_scoped_translations = lazy_nested_translations_by_scope.fetch(scope.to_sym, {})
-
-        I18nTasks::Utils.lazy_translations_js(locale, scope, lazy_root_translations, lazy_scoped_translations)
-      end
-
-      dump_translations.call locale, [base_translations_js_start, common_translations_js, *translations_js, base_translations_js_end].compact.join("\n\n")
-
-      if locale == :en
-        puts "Generating Default JS"
-
-        core_translations_js = I18nTasks::Utils::CORE_KEYS.map do |scope|
-          lazy_scoped_translations = lazy_nested_translations_by_scope.fetch(scope.to_sym, {})
-
-          I18nTasks::Utils.lazy_translations_js(locale, scope, {}, lazy_scoped_translations)
-        end
-
-        dump_translations.call '_core_en', [base_translations_js_start, core_translations_js, base_translations_js_end].compact.join("\n\n")
       end
     end
   end
 
   desc "Generate the pseudo-translation file lolz"
-  task generate_lolz: [:generate, :environment] do
+  task generate_lolz: [:extract, :environment] do
     strings_processed = 0
     process_lolz = proc do |val|
       case val
@@ -261,7 +157,7 @@ namespace :i18n do
     end
 
     t = Time.now
-    translations = YAML.safe_load(open("config/locales/generated/en.yml"))
+    translations = YAML.safe_load(open(source_translations_file))
 
     I18n.extend I18nTasks::Lolcalize
     lolz_translations = {}
@@ -295,7 +191,7 @@ namespace :i18n do
     Hash.include I18nTasks::HashExtensions unless {}.is_a?(I18nTasks::HashExtensions)
 
     begin
-      base_filename = "config/locales/generated/en.yml"
+      base_filename = source_translations_file
       export_filename = "en.yml"
       current_branch = nil
 
@@ -454,29 +350,10 @@ namespace :i18n do
     source_translations = if args[:source_file].present?
                             YAML.safe_load(File.read(args[:source_file]))
                           else
-                            YAML.safe_load(File.read("config/locales/generated/en.yml"))
+                            YAML.safe_load(File.read(source_translations_file))
                           end
     new_translations = YAML.safe_load(File.read(args[:translated_file]))
     autoimport(source_translations, new_translations)
-  end
-
-  def remove_unwanted_translations(translations)
-    translations["date"].delete("order")
-  end
-
-  def remove_dynamic_translations(translations)
-    process = lambda do |node|
-      case node
-      when Hash
-        node.delete_if { |_k, v| process.call(v).nil? }
-      when Proc
-        nil
-      else
-        node
-      end
-    end
-
-    process.call(translations)
   end
 
   def autoimport(source_translations, new_translations)
@@ -530,7 +407,7 @@ namespace :i18n do
   def import_languages(import_type, args)
     require "json"
     languages = parsed_languages(args[:languages])
-    source_file = args[:source_file] || "config/locales/generated/en.yml"
+    source_file = args[:source_file] || source_translations_file
     source_translations = YAML.safe_load(File.read(source_file))
 
     languages.each do |lang|
