@@ -114,18 +114,23 @@ I18n.localize = function(scope, value) {
 
 I18n.n = I18n.localizeNumber = (value, options = {}) => {
   const format = {
-    ...(I18n.lookup('number.format') || {}),
+    delimiter: I18n.lookup('number.format.delimiter'),
+    separator: I18n.lookup('number.format.separator'),
     // use a high precision and strip zeros if no precision is provided
     // 5 is as high as we want to go without causing precision issues
     // when used with toFixed() and large numbers
     strip_insignificant_zeros: options.strip_insignificant_zeros || options.precision == null,
     precision: options.precision != null ? options.precision : 5
   }
-  const method = options.percentage ? 'toPercentage' : 'toNumber'
+
   if (value && value.toString().match(/e/)) {
     return value.toString()
-  } else {
-    return I18n[method](value, format)
+  }
+  else if (options.percentage) {
+    return I18n.toPercentage(value, format)
+  }
+  else {
+    return I18n.toNumber(value, format)
   }
 }
 
@@ -135,9 +140,12 @@ const padding = (n, pad = '00', len = 2) => {
 }
 
 I18n.strftime = function(date, format) {
-  const options = this.lookup('date')
-  if (options) {
-    options.meridian = options.meridian || ['AM', 'PM']
+  const options = {
+    abbr_day_names: I18n.lookup('date.abbr_day_names'),
+    abbr_month_names: I18n.lookup('date.abbr_month_names'),
+    day_names: I18n.lookup('date.day_names'),
+    meridian: I18n.lookup('date.meridian', { defaultValue: ['AM', 'PM'] }),
+    month_names: I18n.lookup('date.month_names'),
   }
 
   const weekDay = date.getDay()

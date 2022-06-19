@@ -545,7 +545,7 @@ test('renders due dates with locale-appropriate format string', function () {
   I18nStubber.setLocale('fr_FR')
   I18nStubber.stub('fr_FR', {
     'date.formats.short': '%-d %b',
-    'date.abbr_month_names.8': 'août'
+    'date.abbr_month_names': [0,1,2,3,4,5,6,7,'août',9,10,11,12],
   })
   const view = createView(this.assignment1)
   equal(view.$('#vdd_tooltip_assign_1 div dd').first().text().trim(), '28 août')
@@ -561,7 +561,7 @@ test('renders due dates in appropriate time zone', function () {
 
   I18nStubber.stub('en', {
     'date.formats.short': '%b %-d',
-    'date.abbr_month_names.8': 'Aug'
+    'date.abbr_month_names': [0,1,2,3,4,5,6,7,'Aug',9,10,11,12],
   })
   const view = createView(this.assignment1)
   equal(view.$('#vdd_tooltip_assign_1 div dd').first().text().trim(), 'Aug 27')
