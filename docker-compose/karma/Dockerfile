@@ -23,7 +23,6 @@ USER docker
 RUN set -eux; \
   mkdir -p \
     app/stylesheets/brandable_css_brands \
-    gems/canvas_i18nliner/node_modules \
     log \
     node_modules \
     tmp \

@@ -1,6 +1,6 @@
 {
   "plugins": [
-    "@instructure/i18nliner-handlebars"
+    "@instructure/i18nliner-canvas"
   ],
 
   "include": [

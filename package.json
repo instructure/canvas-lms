@@ -9,7 +9,6 @@
   "private": true,
   "workspaces": {
     "packages": [
-      "gems/canvas_i18nliner",
       "gems/plugins/*",
       "packages/*",
       "ui/shared/*"
@@ -152,6 +151,7 @@
     "parse-link-header": "^1",
     "prop-types": "^15",
     "qs": "^6.6.0",
+    "querystring": "0.2.1",
     "react": "^16.13.1",
     "react-apollo": "~3.0.1",
     "react-dnd": "^2.5.2",
@@ -205,6 +205,10 @@
     "@babel/preset-react": "7.14.5",
     "@babel/preset-typescript": "^7.14.5",
     "@instructure/browserslist-config-canvas-lms": ">=2",
+    "@instructure/i18nliner": "^3",
+    "@instructure/i18nliner-canvas": "^1.2",
+    "@instructure/i18nliner-handlebars": "^2",
+    "@instructure/i18nliner-runtime": "^1",
     "@prettier/plugin-ruby": "^1.5.2",
     "@sentry/webpack-plugin": "^1.5.2",
     "@sheerun/mutationobserver-shim": "0.3.2",
