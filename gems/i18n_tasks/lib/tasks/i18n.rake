@@ -40,7 +40,7 @@ namespace :i18n do
   js_index_file = Rails.root.join("config/locales/generated/en-js-index.json").to_s
 
   # Directory to contain the auto-generated translation files for the frontend.
-  js_translation_modules_dir = Rails.root.join("public/javascripts/translations").to_s
+  js_translation_files_dir = Rails.root.join("public/javascripts/translations").to_s
 
   # like the top-level :environment, but just the i18n-y stuff we need.
   # also it's faster and doesn't require a db \o/
@@ -117,39 +117,21 @@ namespace :i18n do
   desc 'Alias for i18n:extract'
   task generate: [:extract]
 
-  desc "Generates JS bundle i18n files (non-en) and adds them to assets.yml"
+  desc "generate JavaScript translation files"
   task generate_js: [:i18n_environment, :extract_js] do
-    locales = I18n.available_locales
+    generator = I18nTasks::GenerateJs.new(
+      index: JSON.parse(File.read(js_index_file))
+    )
 
-    if locales.empty?
-      puts "Nothing to do, there are no non-en translations"
-      exit 0
-    end
+    FileUtils.mkdir_p(js_translation_files_dir)
 
-    FileUtils.mkdir_p(js_translation_modules_dir)
+    I18n.available_locales.map(&:to_s).sort.each do |locale|
+      puts "Generating JS for #{locale}"
 
-    # emulate the old "js_bundles.json" file, which was a mapping of each scope
-    # to the phrases it uses + defines
-    scope_keys = JSON.parse(File.read(js_index_file)).each_with_object({}) do |phrase, acc|
-      acc[phrase["scope"]] ||= []
-      acc[phrase["scope"]].push(phrase["key"]) unless acc[phrase["scope"]].include?(phrase["key"])
-
-      if phrase.key?("used_in")
-        acc[phrase["used_in"]] ||= []
-        acc[phrase["used_in"]].push(phrase["key"])
-        acc[phrase["used_in"]].push(phrase["key"]) unless acc[phrase["used_in"]].include?(phrase["key"])
-      end
-    end
-
-    I18nTasks::GenerateJs.new.apply(
-      locales: locales,
-      translations: I18n.backend.send(:translations),
-      scope_keys: scope_keys
-    ).each do |(filename, content)|
-      file = "#{js_translation_modules_dir}/#{filename}.js"
-      if !File.exist?(file) || File.read(file) != content
-        File.open(file, "w") { |f| f.write content }
-      end
+      File.write(
+        "#{js_translation_files_dir}/#{locale}.json",
+        generator.translations(locale).to_json
+      )
     end
   end
 

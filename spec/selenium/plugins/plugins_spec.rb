@@ -27,6 +27,7 @@ describe "plugins ui" do
   end
 
   it "has plugins default to disabled when no plugin_setting exits", priority: "1" do
+    skip("06/2022 FOO-2980")
     get "/plugins/etherpad"
     expect(is_checked("#plugin_setting_disabled")).to be_truthy
 
@@ -42,6 +43,7 @@ describe "plugins ui" do
   end
 
   it "has plugin settings not disabled when set", priority: "1" do
+    skip("06/2022 FOO-2980")
     get "/plugins/etherpad"
     expect(is_checked("#plugin_setting_disabled")).to be_truthy
     multiple_accounts_select
@@ -59,6 +61,7 @@ describe "plugins ui" do
   end
 
   it "does not overwrite settings that are not shown" do
+    skip("06/2022 FOO-2980")
     get "/plugins/etherpad"
 
     multiple_accounts_select

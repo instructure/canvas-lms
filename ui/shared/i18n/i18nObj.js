@@ -43,13 +43,10 @@ activateI18nliner(I18n, {
   // call), signal to normalizeKey that it shouldn't be scoped.
   normalizeKey: (key, options) => {
     if (key[0] === '#') {
-      delete options.scope
       return key.slice(1)
     }
     else if (options.scope) {
-      const { scope } = options
-      delete options.scope
-      return `${scope}.${key}`
+      return `${options.scope}.${key}`
     }
     else {
       return key
@@ -84,60 +81,11 @@ I18n.interpolate = function(message, origOptions) {
 
 I18n.locale = document.documentElement.getAttribute('lang')
 
-I18n.lookup = logEagerLookupViolations(function(scope, options = {}) {
-  const translations = I18n.translations
-  const locales = I18n.getLocaleAndFallbacks(options.locale || I18n.currentLocale())
-  if (typeof scope === 'object') {
-    scope = scope.join(this.defaultSeparator)
-  }
-
-  if (options.scope) {
-    scope = `${options.scope}${this.defaultSeparator}${scope}`
-  }
-
-  const scopes = scope.split(this.defaultSeparator)
-
-  let messages
-  for (let i = 0; !messages && i < locales.length; i++) {
-    messages = translations[locales[i]]
-    for (let j = 0; messages && j < scopes.length; j++) {
-      const currentScope = scopes[j]
-      messages = messages[currentScope]
-    }
-  }
-
-  if (!messages && options.defaultValue != null) {
-    messages = options.defaultValue
-  }
-
-  return messages
+I18n.lookup = logEagerLookupViolations(function(key, options = {}) {
+  const locale = options.locale || I18n.currentLocale()
+  const localeTranslations = I18n.translations[locale] || {}
+  return localeTranslations[key] || options.defaultValue || null
 })
-
-I18n.getLocaleAndFallbacks = function(locale) {
-  if (!I18n.fallbacksMap) {
-    I18n.fallbacksMap = I18n.computeFallbacks()
-  }
-  return I18n.fallbacksMap[locale] || [I18n.defaultLocale]
-}
-
-I18n.computeFallbacks = function() {
-  const map = {}
-  Object.keys(I18n.translations).forEach(locale => {
-    const locales = []
-    const parts = locale.split(/-/)
-    for (let i = parts.length; i > 0; i--) {
-      const candidateLocale = parts.slice(0, i).join('-')
-      if (candidateLocale in I18n.translations) {
-        locales.push(candidateLocale)
-      }
-    }
-    if (locales.indexOf(I18n.defaultLocale) === -1) {
-      locales.push(I18n.defaultLocale)
-    }
-    map[locale] = locales
-  })
-  return map
-}
 
 const _localize = I18n.localize.bind(I18n)
 I18n.localize = function(scope, value) {
@@ -368,13 +316,6 @@ I18n.pluralize = function(count, scope, options) {
   return this.interpolate(message, options)
 }
 
-I18n.scoped = I18n.useScope = (scope, callback) => {
-  const preloadLocale = window.ENV && window.ENV.LOCALE ? window.ENV.LOCALE : 'en'
-  const i18n_scope = new I18n.scope(scope)
-  if (callback) callback(i18n_scope)
-  I18n.translations[preloadLocale] && I18n.translations[preloadLocale][scope.split('.')[0]]; // SIDE EFFECT: Actually Load Translations (incl. Root Keys)
-  return i18n_scope
-}
 class Scope {
   constructor(scope) {
     this.scope = scope
@@ -424,7 +365,6 @@ class Scope {
 }
 I18n.scope = Scope
 
-Scope.prototype.HtmlSafeString = I18n.HtmlSafeString
 Scope.prototype.lookup = I18n.lookup.bind(I18n)
 Scope.prototype.toTime = I18n.toTime.bind(I18n)
 Scope.prototype.toNumber = I18n.toNumber.bind(I18n)
@@ -440,11 +380,9 @@ Scope.prototype.l = Scope.prototype.localize
 Scope.prototype.n = Scope.prototype.localizeNumber
 Scope.prototype.p = Scope.prototype.pluralize
 
-if (I18n.translations) {
-  $.extend(true, I18n.translations, {en: {}})
-} else {
-  I18n.translations = {en: {}}
-}
-
 export default I18n
-export const useScope = I18n.useScope
+export const useScope = scope => new Scope(scope)
+export const useTranslations = (locale, translations) => {
+  I18n.translations[locale] = I18n.translations[locale] || {}
+  Object.assign(I18n.translations[locale], translations)
+}
