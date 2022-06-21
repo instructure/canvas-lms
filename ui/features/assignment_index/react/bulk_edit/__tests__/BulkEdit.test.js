@@ -544,6 +544,33 @@ describe('Assignment Bulk Edit Dates', () => {
       ])
     })
 
+    it('maintains defaultDueTime on new dates for due_at on blur', async () => {
+      const {getByText, getAllByLabelText} = await renderBulkEditAndWait({
+        defaultDueTime: '16:00:00'
+      })
+      const dueAtInput = getAllByLabelText('Due At')[2]
+      const dueAtDate = '2020-04-01'
+
+      changeAndBlurInput(dueAtInput, dueAtDate)
+      fireEvent.blur(dueAtInput) // Force blur to trigger handleSelectedDateChange
+      expect(dueAtInput.value).toMatch('Wed, Apr 1, 2020, 4:00 PM')
+      fireEvent.click(getByText('Save'))
+      await flushPromises()
+      const body = JSON.parse(fetch.mock.calls[1][1].body)
+      expect(body).toMatchObject([
+        {
+          id: 'assignment_2',
+          all_dates: [
+            {
+              base: true,
+              due_at: '2020-04-01T07:00:00.000Z', // 16:00 in Tokyo is 07:00 UTC
+              unlock_at: null
+            }
+          ]
+        }
+      ])
+    })
+
     it('preserves the existing time on existing dates', async () => {
       const {assignments, getByText, getAllByLabelText} = await renderBulkEditAndWait()
       const dueAtInput = getAllByLabelText('Due At')[0]

@@ -108,7 +108,9 @@ export default function BulkEditTable({
         assignmentId={assignmentId}
         overrideId={overrideId}
         updateAssignmentDate={updateAssignmentDate}
-        fancyMidnight={DATE_INPUT_META[dateKey].fancyMidnight}
+        fancyMidnight={
+          dateKey === 'due_at' && defaultDueTime ? false : DATE_INPUT_META[dateKey].fancyMidnight
+        }
         defaultTime={dateKey === 'due_at' ? defaultDueTime : null}
         interaction={dates.can_edit ? 'enabled' : 'disabled'}
         width={calculatedWidth}
