@@ -50,7 +50,7 @@ export default class CoursesListRow extends React.Component {
         size: UserLink.propTypes.size,
         href: UserLink.propTypes.href,
         display_name: UserLink.propTypes.name,
-        avatar_url: UserLink.propTypes.src
+        avatar_url: UserLink.propTypes.avatar_url
       })
     ),
     teacher_count: number,

@@ -20,7 +20,7 @@ import PropTypes from 'prop-types'
 export const pointShape = {
   text: PropTypes.string,
   value: PropTypes.number,
-  valid: PropTypes.boolean
+  valid: PropTypes.bool
 }
 
 export const tierShape = {
