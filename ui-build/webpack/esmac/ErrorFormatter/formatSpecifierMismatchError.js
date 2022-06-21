@@ -25,7 +25,6 @@ module.exports = error => {
 
   let message = ''
 
-  message += `<${error.name}>`
   message += `\nImport violates encapsulation integrity:`
   message += `\n \n`
   message += `    ${request}`

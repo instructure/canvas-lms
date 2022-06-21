@@ -27,9 +27,7 @@ const webpack = require('webpack')
 const {WebpackManifestPlugin} = require('webpack-manifest-plugin')
 const WebpackHooks = require('./webpackHooks')
 const SourceFileExtensionsPlugin = require('./SourceFileExtensionsPlugin')
-// TODO: upgrade to webpack 5
-// const EncapsulationPlugin = require('webpack-encapsulation-plugin')
-const IgnoreErrorsPlugin = require('./IgnoreErrorsPlugin')
+const esmacPlugin = require('webpack-esmac-plugin')
 const webpackPublicPath = require('./webpackPublicPath')
 const {canvasDir} = require('#params')
 
@@ -358,22 +356,22 @@ module.exports = {
 
     new WebpackHooks(),
 
-    // new EncapsulationPlugin({
-    //   test: /\.[tj]sx?$/,
-    //   include: [
-    //     path.resolve(canvasDir, 'ui'),
-    //     path.resolve(canvasDir, 'packages'),
-    //     path.resolve(canvasDir, 'public/javascripts'),
-    //     path.resolve(canvasDir, 'gems/plugins')
-    //   ],
-    //   exclude: [/\/node_modules\//],
-    //   formatter: require('./encapsulation/ErrorFormatter'),
-    //   rules: require('./encapsulation/moduleAccessRules')
-    // }),
-
-    new IgnoreErrorsPlugin({
-      errors: require('./encapsulation/errorsPendingRemoval.json'),
-      warnOnUnencounteredErrors: process.env.WEBPACK_ENCAPSULATION_DEBUG === '1'
+    new esmacPlugin({
+      test: /\.[tj]sx?$/,
+      include: [
+        path.resolve(canvasDir, 'ui'),
+        path.resolve(canvasDir, 'packages'),
+        path.resolve(canvasDir, 'public/javascripts'),
+        path.resolve(canvasDir, 'gems/plugins')
+      ],
+      exclude: [/\/node_modules\//],
+      formatter: require('./esmac/ErrorFormatter'),
+      rules: require('./esmac/moduleAccessRules'),
+      permit: process.env.WEBPACK_ENCAPSULATION_DEBUG === '1' ? (
+        []
+      ) : (
+        require('./esmac/errorsPendingRemoval.json')
+      )
     }),
 
     new webpack.DefinePlugin({

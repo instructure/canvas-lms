@@ -24,7 +24,6 @@ module.exports = (error) => {
   let message = ''
   let hint = ''
 
-  message += `<${error.name}>`
   message += `\n`
   message += t.wordWrap(
     `Access to the following module is not allowed from this layer:`,
