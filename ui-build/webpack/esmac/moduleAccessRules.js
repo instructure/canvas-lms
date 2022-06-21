@@ -32,6 +32,26 @@ module.exports = [
   },
 
   {
+    rule: 'Allow engine entrypoints to source everything there',
+    source: 'ui/engine/{index.ts,capabilities/index.ts}',
+    target: 'ui/engine/**',
+    specifier: 'relative'
+  },
+
+  {
+    rule: 'Allow capabilities to depend on each other',
+    source: 'ui/engine/capabilities/*/**',
+    target: 'ui/engine/capabilities/*/**',
+    specifier: 'relative'
+  },
+  
+  {
+    source: 'ui/features/*/index.js',
+    target: 'ui/engine/**',
+    specifier: 'bare'
+  },
+
+  {
     rule: 'Let shims do whatever they need to',
     source: 'ui/shims/*',
     target: '**',

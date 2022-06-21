@@ -11,6 +11,7 @@
     "packages": [
       "gems/plugins/*",
       "packages/*",
+      "ui/engine",
       "ui/shared/*"
     ]
   },
@@ -84,7 +85,7 @@
     "@instructure/ui-tree-browser": "^7",
     "@instructure/ui-view": "^7",
     "@instructure/uid": "^7",
-    "@instructure/updown": "^1.1",
+    "@instructure/updown": "^1.2",
     "@microsoft/immersive-reader-sdk": "^1.1.0",
     "@popperjs/core": "^2.9.2",
     "@sentry/cli": "^1.72.2",

@@ -1,0 +1,39 @@
+{
+  "name": "@canvas/engine",
+  "version": "1.0.0",
+  "description": "Provides boot-up capabilities to front-end bundles",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  },
+  "scripts": {
+    "lint": "eslint . --ext .ts,.js",
+    "check": "tsc -p ./tsconfig.json",
+    "build:canvas": "yarn run check && yarn run lint"
+  },
+  "dependencies": {
+    "@instructure/updown": "^1.2"
+  },
+  "eslintConfig": {
+    "env": {
+      "es6": true,
+      "browser": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 2020,
+      "sourceType": "module"
+    },
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+      "@typescript-eslint"
+    ],
+    "rules": {
+      "react-hooks/rules-of-hooks": "off",
+      "prettier/prettier": "off",
+      "semi": "off",
+      "@typescript-eslint/semi": [1, "always"],
+      "quotes": [1, "single"]
+    }
+  }
+}

@@ -3661,10 +3661,10 @@
   dependencies:
     "@babel/runtime" "^7.9.2"
 
-"@instructure/updown@^1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@instructure/updown/-/updown-1.1.1.tgz#2bfd1edc5eacc9b1cdbd6e7c5a3217edb054ea74"
-  integrity sha512-fFJ9s0fe8D99cqVwu+iPFUXMzyrUC/kwvi81TgMPUeoEAxiZ1bXnY/Rf64cSIxL69j1haRzgB5Gved6Tb50+PQ==
+"@instructure/updown@^1.2":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@instructure/updown/-/updown-1.2.2.tgz#f3797561326f1ff89f455a01f1e5322e391d1413"
+  integrity sha512-OL+dAYnfM2Ye9KF3QqdntmE5rWB8k292LjIW7J2ZbQLaDdp/VUfd9xeWmq4e9x3OCQc+K0Hu3xH6LJ9dbta73A==
 
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"
