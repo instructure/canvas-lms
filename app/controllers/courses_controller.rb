@@ -1672,6 +1672,14 @@ class CoursesController < ApplicationController
       @course.default_due_time = normalize_due_time(default_due_time)
     end
 
+    if params.key?(:conditional_release)
+      if !value_to_boolean(params[:conditional_release])
+        @course.disable_conditional_release
+      elsif @course.account.conditional_release?
+        @course.conditional_release = true
+      end
+    end
+
     @course.attributes = params.permit(
       :allow_final_grade_override,
       :allow_student_discussion_topics,
@@ -1697,12 +1705,9 @@ class CoursesController < ApplicationController
       :homeroom_course_id,
       :course_color,
       :friendly_name,
-      :enable_course_paces,
-      :conditional_release
+      :enable_course_paces
     )
     changes = changed_settings(@course.changes, @course.settings, old_settings)
-
-    conditional_release_after_change_hook if changes[:conditional_release]&.last == false
 
     @course.delay_if_production(priority: Delayed::LOW_PRIORITY)
            .touch_content_if_public_visibility_changed(changes)

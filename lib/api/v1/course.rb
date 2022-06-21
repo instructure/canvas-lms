@@ -60,6 +60,7 @@ module Api::V1::Course
     settings[:course_color] = course.course_color
     settings[:friendly_name] = course.friendly_name
     settings[:default_due_time] = course.default_due_time || "23:59:59"
+    settings[:conditional_release] = course.conditional_release?
 
     settings
   end
