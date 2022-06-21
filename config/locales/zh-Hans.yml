@@ -2,6 +2,9 @@
 # Do not edit it by hand, your changes will be overwritten.
 --- 
 zh-Hans: 
+  1_hour_and_count_minutes_27533c1b: 
+    one: "1 小时 %{count} 分钟"
+    other: "1 小时 %{count} 分钟"
   1_item_scores_5512cd03: "1- 项目分数"
   1_item_scores_example_item_scores_7345479: "1- 项目评分：项目评分示例："
   1_item_scores_examplescores_9736236: "1- 项目评分：%{exampleScores}"
@@ -197,6 +200,7 @@ zh-Hans:
   a_locked_file_named_name_already_exists_in_this_fo_33ca9a0c: "该文件夹中已存在名称为“%{name}”的锁定文件。请输入新名称。"
   a_locked_file_named_name_already_exists_please_ent_3b2e65a: "已存在名称为“%{name}”的锁定文件。请输入新名称。"
   a_locked_item_named_name_already_exists_in_this_lo_ab03ee39: "此位置已经存在名称为“%{name}”的锁定项目。请输入新名称。"
+  a_maximum_of_limit_events_may_be_created_b08f97d2: "最多可创建 %{limit} 个事件"
   a_message_is_required_129e1814: 需要消息
   a_microsoft_365_group_must_have_owners_and_no_user_96f91864: "Microsoft 365 Group 必须有负责人，并且在 Microsoft 端找不到与 Canvas 课程讲师对应的用户。如果您最近添加和移除了课程负责人，重新同步可能会解决问题。"
   a_microsoft_365_group_must_have_owners_and_no_user_e06865a: "Microsoft 365 Group 必须有负责人，并且在 Microsoft 端找不到与 Canvas 课程讲师对应的用户。"
@@ -3536,6 +3540,7 @@ zh-Hans:
   are_you_sure_you_want_to_remove_this_user_8d1a8295: 您确定要删除此用户吗？
   are_you_sure_you_want_to_remove_this_user_s_profil_6d703c4: 是否确定要删除此用户的头像?
   are_you_sure_you_want_to_report_this_profile_pictu_e22c2210: 您确定要报告该档案图片吗？
+  are_you_sure_you_want_to_restore_this_revision_2f3aaabe: 是否确实要恢复此修订？
   are_you_sure_you_want_to_resync_these_grades_to_th_e509cb9e: 您确定要将这些评分重新同步到学生信息系统吗？
   are_you_sure_you_want_to_stop_observing_name_b040e7ab: "是否确定要停止观察 %{name}？"
   are_you_sure_you_want_to_submit_this_comment_fbe76ba6: 您确定要提交此评论吗？
@@ -6567,6 +6572,7 @@ zh-Hans:
   confirm_reactivation_ec0f30c6: 确认重新激活
   confirm_removal_a9bb889: 确认移除
   confirm_reservation_removal_e6350e7c: 确认预订删除
+  confirm_restore_5997203d: 确认恢复
   confirm_setting_deletion_ccd62cb6: 确认删除设置
   confirm_submission_e3b43f1: 确认提交
   confirm_suspension_18cc1fd2: 确认暂停
@@ -7003,6 +7009,7 @@ zh-Hans:
         restore_items: 请注意，有些项目在被删除时可能会丢失其关联的数据。确保您已确认所执行的任何恢复的结果。
       restore_failed: 恢复失败
       restoring: 正在恢复...
+  context_cannot_be_blank_e0124d79: 上下文不能为空
   context_contextname_24d82846: "（%{context}：%{contextName}）"
   context_external_tool: 
     url_or_domain_no_valid: "%{url} 的 URL 不正确"
@@ -7565,6 +7572,9 @@ zh-Hans:
     one: "%{count} 个“%{groupTitle}”结果"
     other: "%{count} 个“%{groupTitle}”结果"
   count_hidden_e8d2c57c: "%{count} 已隐藏"
+  count_hours_1bd03883: 
+    one: "%{count} 小时"
+    other: "%{count} 小时"
   count_images_found_for_term_a93635ed: "找到%{term}的%{count}个图像"
   count_items_deleted_successfully_a287aa53: 
     one: "%{count} 项已成功删除。"
@@ -7589,6 +7599,8 @@ zh-Hans:
     other: "%{count} 分钟"
     zero: "少于 1 分钟"
   count_more_beba6428: "增加 %{count} 个"
+  count_must_be_greater_than_0_f8f88358: "COUNT 必须大于 0"
+  count_must_be_limit_or_less_ac5c64b3: "COUNT 必须等于或小于 %{limit}"
   count_of_max_maximum_characters_fcb6ddf8: "%{count} %{max}最大字符数"
   count_of_submissions_for_day_83a88e68: 当日提交项数量
   count_of_submissions_per_day_c1f6ae32: 每日提交项数量
@@ -10064,6 +10076,7 @@ zh-Hans:
   dismiss_dacdb625: 撤销
   dismiss_itemtitle_c5020a4c: "撤销%{itemTitle}"
   dismiss_this_5c74dddc: 放弃
+  display_a_tooltip_for_calendar_events_if_the_title_ad21648f: 如果标题无法单行显示，则显示日历事件的工具提示
   display_all_text_links_in_canvas_as_underlined_tex_e698e714: "在 Canvas 以*下划线的文本*显示所有的文字链接。"
   display_as_e2a5c383: 显示为
   display_as_percentage_3e755dc: 显示为百分比
@@ -10576,6 +10589,7 @@ zh-Hans:
   enable_the_security_tab_on_the_settings_page_to_ad_eab7c954: "启用设置页上的安全标签，以调整 CSP 设置"
   enable_toolname_b06257b7: "启用%{toolName}"
   enable_toolname_dc64c25a: "启用%{toolName}"
+  enable_unique_course_paces_for_course_sections_adebf96f: 为课程班次启用唯一的课程进度。
   enable_webcam_on_submissions_2e6bfcd4: 对提交项启用网络摄像头
   enabled_and_locked_49ff3de4: 已启用并锁定
   enabled_ba7cab66: 已启用
@@ -10595,6 +10609,7 @@ zh-Hans:
   enables_support_for_observers_within_canvas_for_el_c5e31b5b: "在 Canvas for Elementary 中启用观察者支持。"
   enables_the_course_templates_feature_globally_79d5302f: 全局启用课程模板功能
   enables_the_microsoft_immersive_reader_button_in_s_ab4af0cd: "在 Canvas 中受支持的区域启用 Microsoft 沉浸式阅读器按钮。进行此设置后，如果帐户管理员已经为所有用户启用该按钮，它可能仍然会在课程中启用。"
+  enables_ui_features_for_managing_extended_submissi_841f45bc: "启用用于管理“扩展”提交项的 UI 功能。"
   enabling_the_elementary_theme_will_change_the_font_c944b619: "启用基本主题将更改 Canvas 界面中的字体并简化您的课程中的所有用户的“课程导航菜单”。"
   encourage_class_participation_4e069479: 鼓励课堂参与
   encourage_student_discourse_7836b9f7: 鼓励学生多说
@@ -11200,6 +11215,7 @@ zh-Hans:
   event_title_57a50568: 事件标题：
   event_title_7f1051a6: 事件标题
   event_title_course_name_changed_to_37510fbb: "%{event_title}，%{course_name} 改变到"
+  event_title_tooltips_in_calendar_month_view_82f592e0: 日历月视图中的事件标题工具提示
   event_update_failed_b6116651: 更新事件失败
   everthing_updated_after_start_date_f3be8ba: 所有在开始日期之后更新的内容
   every_665d821e: 每个
@@ -11270,6 +11286,8 @@ zh-Hans:
   exported_package_history_bfca44b9: 导出文件包历史
   exporting_b1eab154: 正在导出
   extend_due_date_20651e76: 展开截止日期
+  extended_632ebee0: 扩展
+  extended_9a58dcb6: 扩展
   external_apps_account_course_settings_78de2b2f: "外部应用程序（帐户 (Account)、课程设置 (Course Settings)）"
   external_apps_account_course_settings_c44af5ef: 外部应用程序（帐户/课程设置）
   external_apps_course_settings_1f045644: 外部应用程序（课程设置）
@@ -11454,6 +11472,7 @@ zh-Hans:
   failed_loading_sync_history_component_is_your_netw_2d04fc10: 加载同步历史记录组件失败。你的网络连接正常吗？
   failed_loading_unsynced_changes_component_is_your__89f863d6: 加载未同步更改组件失败。你的网络连接正常吗？
   failed_pairing_student_c9f0863b: 学生配对失败。
+  failed_parsing_the_event_s_recurrance_rule_e_c984126a: "无法分析事件的重复规则：%{e}"
   failed_please_report_the_following_error_code_to_y_42248d60: "失败，请向系统管理员报告以下错误代码：ErrorReport:%{error}；"
   failed_publishing_pace_40f87d0e: 发布进度失败
   failed_publishing_plan_edc45557: 发布计划失败
@@ -13732,6 +13751,9 @@ zh-Hans:
   hour_34d02553: 小时
   hour_s_b6e8d238: 小时
   hours_from_due_date_before_students_are_alerted_6584bae6: 向学生发出提醒前的等待小时数（从到期日期开始）
+  hours_hours_and_count_minutes_4c65278f: 
+    one: "%{hours} 小时 %{count} 分钟"
+    other: "%{hours} 小时 %{count} 分钟"
   hours_late_989e9081: 延迟小时数
   hover_over_me_496521b9: 将鼠标悬停在我之上。
   how_do_i_add_a_module_65f5bf13: 如何添加模块？
@@ -14793,6 +14815,7 @@ zh-Hans:
   language_6b3e2c7c: 语言
   languages_835813f0: 语言
   large_course_db3d58b: 大型课程：
+  last_7_days_bd411f1f: "过去的 7 天"
   last_assessment_cd5659b6: 最后一次评估：
   last_attempt_7258ebd7: 最后一次尝试
   last_bounced_after_76f9ce30: "...之后的最后一次退信"
@@ -14958,6 +14981,7 @@ zh-Hans:
   length_notifications_found_25276610: "%{length} 已发现通知"
   length_results_found_3afd01e5: "%{length} 找到的结果"
   less_than_a_minute_ago_9f45e2a5: 不到一分钟前
+  less_than_a_minute_f938af3a: "不到 1 分钟"
   let_students_see_the_correct_answers_dacc2faf: 让学生们查看正确答案
   let_students_see_their_quiz_responses_fbc07d14: 让学生们查看他们的测验回应
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: 让学生看到他们在测验中的回答（学生反馈中将标记错误的问题）
@@ -15456,6 +15480,7 @@ zh-Hans:
   lti_add_e3bc0049: "LTI - 添加"
   lti_add_edit_delete_15905170: "LTI - 添加/编辑/删除"
   lti_advantage_services_c1746cb4: "LTI Advantage Services"
+  lti_context_id_should_be_unique_7437a74d: "lti_context_id 应为唯一"
   lti_deep_linking_for_module_index_menu_881feeee: "LTI 单元索引菜单深度链接"
   lti_deep_linking_line_items_5e0079f7: "LTI 深度链接行项目"
   lti_deep_linking_line_items_on_assignment_edit_pag_c0e2561e: "“作业编辑”页面上的 LTI 深层链接行项目"
@@ -18128,6 +18153,7 @@ zh-Hans:
   must_belong_to_an_active_root_account_d59a05af: 必须属于一个活跃的母帐户
   must_contribute_to_the_page_fff632c: 必须有助于页面
   must_contribute_to_this_module_item_to_complete_it_84ed571c: 必须完成此单元项目
+  must_either_enter_a_start_and_end_date_or_check_th_ddfbbca: "必须输入开始和结束日期或选中“最近 7 天”复选框"
   must_have_at_least_1_grader_d4a54e85: "至少须有 1 个评分人"
   must_have_at_least_1_group_per_section_9809e708: "每个班级至少要有 1 个组"
   must_have_at_least_as_many_groups_as_sections_to_a_af2a9dfb: 小组数量至少要与班级分配的班级数量相同
@@ -18343,6 +18369,7 @@ zh-Hans:
   new_quizzes_migration_enabled_by_default_5f9bcc81: 默认启用新测验迁移
   new_quizzes_migration_required_7854aa1a: 要求新测验迁移
   new_quizzes_on_the_quizzes_page_b21f338d: 测验(Quizzes)页面上的新测验
+  new_quizzes_submission_274b5c57: 新测验提交
   new_quizzes_submission_history_d81b477b: "New Quizzes 提交记录"
   new_quizzes_support_for_modules_7b81eee9: 单元新测验支持
   new_quizzes_third_party_importing_1e1b696d: 新测验第三方导入
@@ -18563,6 +18590,7 @@ zh-Hans:
   not_available_assignment_is_anonymous_94e77edf: 不可用；作业是匿名的
   not_available_at_the_subaccount_level_3fc74ab: 在子帐户级别不可用。
   not_available_at_the_subaccount_level_6ee9b41f: 在子帐户级别不可用
+  not_available_ca8cb4eb: 不可用
   not_available_during_sync_ae645e8c: 在同步期间不可用
   not_available_until_date_3c1c73c2: "可供使用的开始时间%{date}"
   not_available_until_next_submission_2175158: 不可用，直到下次提交
@@ -19632,6 +19660,7 @@ zh-Hans:
   people_options_cfb419a6: 人员选项
   people_tutorial_tray_a87a6c48: 人员教程托盘
   people_will_see_this_name_in_discussions_messages__fca9ebb2: 人们将在讨论、留言和评论中看到这个名称。
+  per_section_course_paces_4ce20ab7: 每班次课程进度
   percent_448ea947: 百分比
   percent_af88d1b1: "%{percent}%"
   percent_complete_3a7edc20: "%{percent}完成"
@@ -19747,6 +19776,7 @@ zh-Hans:
   please_reach_out_in_slack_at_canvas_sre_if_this_ke_bfa853d7: "如果仍然发生这种事情，请在 Slack 中的 #canvas-sre 中联系相关人员。"
   please_reach_out_in_slack_at_canvas_sre_the_region_85440d71: "请在 Slack 中联系 #canvas-sre。该客户的 Canvas 实例所在的地区不支持 SFTP。"
   please_reach_out_in_slack_at_canvas_sre_to_create__7ae1850c: "请在 Slack 中的 #canvas-sre 中联系相关人员，以便为此帐户创建 SFTP。"
+  please_select_a_course_e06d8015: 请选择一个课程
   please_select_a_group_set_for_this_assignment_e1da63d3: 请为此作业选择小组集
   please_select_a_reason_for_reporting_this_reply_51719e8d: 请选择举报此回复的原因
   please_select_a_user_role_for_this_link_9fb4e655: 请为此链接选择一个用户角色。
@@ -20343,6 +20373,7 @@ zh-Hans:
   powered_by_instructure_504d676d: "由 Instructure 提供支持"
   powerschool_a30f0bfc: PowerSchool
   ppt_534cb87: PPT
+  ppt_9393890d: ppt
   practice_quiz_19a8505d: 练习测验
   pre_processing_92865c1d: 预处理
   prefetch_user_ids_in_gradebook_b96521b0: 预读取评分册中的用户名
@@ -22608,6 +22639,7 @@ zh-Hans:
   recording_98da6bda: 录制
   recording_was_deleted_b989eaff: 已删除录制文件
   recurring_calendar_events_c940b6b8: 反复出现的日历事件
+  recurring_events_cannot_have_child_events_9de3b41d: 定期事件不能有子事件
   red_8258edf3: 红色
   redirect_uri_legacy_b32323d3: "重新定向 URI (传统)："
   redirect_uris_79534b60: "* 重定向 URI："
@@ -22866,6 +22898,8 @@ zh-Hans:
   request_that_docviewer_use_cloudfront_for_serving__b569aca9: "请求 DocViewer 使用 CloudFront 提供 pdf 资源。"
   request_values_89976f2c: 请求值
   requested_bbdb5b26: 已请求
+  requeue_job_98b20240: 重排作业
+  requeued_job_id_367324e9: "重排的作业 ID"
   require_an_access_code_600e06e8: 需要一个访问代码
   require_assignment_due_date_778b200d: 要求作业截止日期
   require_authentication_provider_on_logins_2aeb580e: 要求登录时进行身份验证
@@ -22885,6 +22919,7 @@ zh-Hans:
   required_email_address_379b2392: 要求填写电子邮箱地址
   required_fields_include_key_name_owner_email_tool__b8e42174: 必填字段包括密钥名称、所有者电子邮件、工具ID、重定向URL和图标URL。
   required_input_message_all_unassigned_students_1e721442: 要求输入。向所有未分配的学生发送消息。
+  required_peer_review_index_b186729c: "要求的同伴互评 %{index}"
   required_to_view_quiz_results_dba7368b: 需要查看测验结果
   required_values_1eb5841f: 必填值
   requirement_f5b75da1: 要求
@@ -22919,6 +22954,7 @@ zh-Hans:
   responsive_misc_dc572cc0: 响应性杂项
   responsive_student_grades_page_324e9c8b: 响应的学生评分页面
   restart_link_validation_b61286fc: 重新启动链接验证
+  restore_6d523f1d: 恢复
   restore_courses_182e162e: 恢复课程
   restored_course_association_course_c9e16045: "还原的课程关联%{course}"
   restrict_access_84ba6bb8: 限制访问
@@ -23243,6 +23279,7 @@ zh-Hans:
   russian_1e3e197: 俄语
   rwanda_250_1a6b344b: "卢旺达 (+250)"
   safety_drill_scheduling_e8f980e1: 安全演习预定
+  saint_marys_student_missing_activity_report_c55865df: "Saint Marys 学生缺失活动报告"
   salesforce_account_id_d0325865: "销售人员帐户 ID"
   salesforce_account_id_eb5c78ad: "Salesforce 帐户 ID"
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: 销售团队有一个与它的产品帐户不同的登录主机砂盒的帐户，因此，如果您使用的是销售团队的砂盒帐户，而您又没有勾选此复选框，那将无法进行身份验证（相反，这也同样起作用，如果您有一个产品帐户，以及勾选了不会验证的复选框）。
@@ -26287,6 +26324,7 @@ zh-Hans:
   the_selected_date_is_too_early_6173fe43: 所选日期太早。
   the_selected_date_is_too_late_cbe184a1: 所选日期太晚。
   the_selected_group_was_cleared_because_the_student_656e4f1c: 选中的小组已清除，因为您请求的学生不属于任何小组。您可以在评分册中选择一个小组。
+  the_series_recurrance_rule_must_include_a_count_or_46c2f76f: "系列重复规则必须包含 COUNT 或 UNTIL"
   the_settings_for_this_plugin_will_be_automatically_6069ba88: 该插件的设置将自动继承到非生产性环境，除非在非生产性环境特定的设置中被覆盖。非生产性设置将在该环境下次刷新时生效。
   the_settings_for_this_plugin_will_not_be_inherited_a16e6119: 该插件的设置不会继承到非生产性环境。要在非生产性环境中启用，请定义非生产性特定的环境。非生产性设置将在该环境下次刷新时生效。
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: 问题的严重程度，通过从下拉菜单的用户中作出选择。
@@ -27867,6 +27905,7 @@ zh-Hans:
   uc_irvine_quiz_adoption_report_9279da8e: "UC Irvine 测验采用报告"
   uc_merced_student_activity_report_4a9a1eb8: "UC Merced 学生活动报告"
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "嗳哟！联系您的友好目录开发人员。错误消息：%{message}"
+  ui_features_for_extended_submissions_b319ea5b: "“扩展”提交项的 UI 功能。"
   ukrainian_945b00b7: 乌克兰语
   unable_to_accept_update_fd53a7e2: 无法接受更新
   unable_to_access_specific_student_go_to_assignment_585e05e9: "无法访问特定学生。转到 SpeedGrader 中的作业？"
@@ -29483,6 +29522,7 @@ zh-Hans:
   you_don_t_have_any_grades_yet_373f731f: 您暂时没有评分。
   you_don_t_have_permission_to_access_sftp_user_sett_53de0dc7: "您没有访问 SFTP 用户设置的权限。"
   you_don_t_have_permission_to_access_this_resource_447d3a5e: 你无权访问该资源。
+  you_don_t_have_permission_to_edit_this_section_bbd28f92: 您没有编辑此班次的权限。
   you_don_t_have_permission_to_manage_grades_for_thi_a9a1be3a: 您没有权限管理此课程的评分
   you_have_been_given_extra_time_on_this_attempt_9d8bff6c: 在此次尝试，您已被给予额外的时间
   you_have_changed_the_progression_requirements_for__6772bc89: 您已更改某个活动课程的进度要求。可能有些学生的进度已达到此单元以及依赖此单元的其他单元。
@@ -29684,6 +29724,7 @@ zh-Hans:
   your_search_encountered_the_following_errors_fc3e5e7f: 
     one: 您的搜索遇到了以下错误：
     other: 您的搜索遇到了以下错误：
+  your_search_returned_no_results_383a30cf: 您的搜索未返回任何结果。
   your_submission_has_not_been_graded_yet_d6963e53: 您的提交尚未评分。
   your_time_for_this_quiz_has_been_reduced_394652e9: 您在此次测验的时间已被减少。
   your_webcam_may_already_be_in_use_6cd64c25: 您的网络摄像头可能正在使用中。
