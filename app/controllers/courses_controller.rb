@@ -1610,7 +1610,7 @@ class CoursesController < ApplicationController
   # @argument allow_student_discussion_reporting [Boolean]
   #   Let students report offensive discussion content
   #
-  # @argument allow_student_anonymous_discussion_topics
+  # @argument allow_student_anonymous_discussion_topics [Boolean]
   #   Let students create anonymous discussion topics
   #
   # @argument filter_speed_grader_by_student_group [Boolean]
