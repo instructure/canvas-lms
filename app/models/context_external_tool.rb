@@ -1030,8 +1030,11 @@ class ContextExternalTool < ActiveRecord::Base
         # prefer tools with more subdomains
         precedence_sql_string
       ]
-      # move preferred tool to the front when requested
-      order_clauses << sort_by_sql_string("#{quoted_table_name}.id = #{preferred_tool_id}") if preferred_tool_id
+      # move preferred tool to the front when requested, and only if the id
+      # is in an actual id format
+      if preferred_tool_id && Shard.integral_id_for(preferred_tool_id)
+        order_clauses << sort_by_sql_string("#{quoted_table_name}.id = #{preferred_tool_id}")
+      end
 
       query = ContextExternalTool.where(context: contexts).active
       query = query.where.not(developer_key_id: nil) if only_1_3
@@ -1040,7 +1043,7 @@ class ContextExternalTool < ActiveRecord::Base
 
       query.joins(sanitize_sql("INNER JOIN (values #{context_order}) as context_order (context_id, class, ordering)
         ON #{quoted_table_name}.context_id = context_order.context_id AND #{quoted_table_name}.context_type = context_order.class"))
-           .order(Arel.sql(sanitize_sql(order_clauses.join(","))))
+           .order(Arel.sql(sanitize_sql_for_order(order_clauses.join(","))))
     end
   end
 
