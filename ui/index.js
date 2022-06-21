@@ -29,8 +29,7 @@ import mathml from 'mathml'
 import preventDefault from 'prevent-default'
 import loadBundle from 'bundles-generated'
 import {isolate} from '@canvas/sentry'
-import { useTranslations } from '@canvas/i18n'
-import CoreTranslations from 'translations/en.json'
+import {Capabilities as C, up} from '@canvas/engine'
 
 // these are all things that either define global $.whatever or $.fn.blah
 // methods or set something up that other code expects to exist at runtime.
@@ -42,19 +41,26 @@ import './boot/initializers/activateKeyClicks'
 import './boot/initializers/activateTooltips'
 import './boot/initializers/injectAuthTokenIntoForms'
 
-useTranslations('en', CoreTranslations)
-
 window.canvasReadyState = 'loading'
 window.dispatchEvent(new CustomEvent('canvasReadyStateChange'))
 
-// Backfill LOCALE from LOCALES
-if (!ENV.LOCALE && ENV.LOCALES instanceof Array) ENV.LOCALE = ENV.LOCALES[0]
+// Let's just fire these off right now, so anything that might block
+// on them can resume as quickly as possible.
+up({
+  up: () => {
+    advanceReadiness('capabilities')
+    if (!window.bundles) window.bundles = []
+    window.bundles.push = loadBundle
+    window.bundles.forEach(loadBundle)
+    ready(afterDocumentReady)
+  },
+  requires: [C.I18n]
+})
 
 const readinessTargets = [
   ['asyncInitializers', false],
   ['deferredBundles', false],
-  ['localeFiles', false],
-  ['localePolyfills', false]
+  ['capabilities', false]
 ]
 const advanceReadiness = target => {
   const entry = readinessTargets.find(x => x[0] === target)
@@ -66,7 +72,7 @@ const advanceReadiness = target => {
   }
 
   entry[1] = true
-  window.dispatchEvent(new CustomEvent('canvasReadyStateChange', { detail: target }))
+  window.dispatchEvent(new CustomEvent('canvasReadyStateChange', {detail: target}))
 
   if (readinessTargets.every(x => x[1])) {
     window.canvasReadyState = 'complete'
@@ -143,72 +149,9 @@ function setupMathML() {
   })
 }
 
-if (!window.bundles) window.bundles = []
-
-// If you add to this be sure there is support for it in the intl-polyfills package!
-const intlSubsystemsInUse = ['DateTimeFormat', 'RelativeTimeFormat', 'NumberFormat']
-
-// Do we have native support in the given Intl subsystem for one of the current
-// locale fallbacks?
-function noNativeSupport(sys) {
-  const locales = [...ENV.LOCALES]
-  // 'en' is the final fallback, don't settle for that unless it's the only
-  // available locale, in which case there is obviously native support.
-  if (locales.length < 1 || (locales.length === 1 && locales[0] === 'en')) return false
-  if (locales.slice(-1)[0] === 'en') locales.pop()
-  for (const locale of locales) {
-    const native = Intl[sys].supportedLocalesOf([locale])
-    if (native.length > 0) return false
-  }
-  return true
-}
-
-async function maybePolyfillLocaleThenGo() {
-  await import(`../public/javascripts/translations/${ENV.LOCALE}.json`).then(module => {
-    useTranslations(ENV.LOCALE, module.default)
-  })
-  advanceReadiness('localeFiles')
-
-  // If any Intl subsystem has no native support for the current locale, start
-  // trying to polyfill that locale from @formatjs. Note that this (possibly slow)
-  // process only executes at all if polyfilling was detected to be necessary.
-  if (intlSubsystemsInUse.some(noNativeSupport)) {
-    /* eslint-disable no-console */
-    try {
-      const im = await import('intl-polyfills')
-      const result = await im.loadAllLocalePolyfills(ENV.LOCALES, intlSubsystemsInUse)
-      result.forEach(r => {
-        if (r.error)
-          console.error(`${r.subsys} polyfill for locale "${r.locale}" failed: ${r.error}`)
-        if (r.source === 'polyfill')
-          console.info(`${r.subsys} polyfilled "${r.loaded}" for locale "${r.locale}"`)
-      })
-    } catch (e) {
-      console.error(`Locale polyfill load failed: ${e.message}`)
-    }
-    /* eslint-enable no-console */
-  }
-
-  // After possible polyfilling has completed, now we can start evaluating any
-  // queueud JS bundles, arrange for tasks to run after the document is fully ready,
-  // and advance the readiness state.
-  advanceReadiness('localePolyfills')
-
-  window.bundles.push = loadBundle
-  window.bundles.forEach(loadBundle)
-  ready(afterDocumentReady)
-}
-
-maybePolyfillLocaleThenGo().catch(e =>
-  // eslint-disable-next-line no-console
-  console.error(`Front-end bundles did not successfully start! (${e.message})`)
-)
-
 if (ENV.csp) {
   // eslint-disable-next-line promise/catch-or-return
-  import('./boot/initializers/setupCSP').then(({default: setupCSP}) =>
-    setupCSP(window.document)
-  )
+  import('./boot/initializers/setupCSP').then(({default: setupCSP}) => setupCSP(window.document))
 }
 
 if (ENV.INCOMPLETE_REGISTRATION) {
@@ -227,7 +170,9 @@ function doRandomThingsToDOM() {
   $('.help_dialog_trigger').click(event => {
     event.preventDefault()
     // eslint-disable-next-line promise/catch-or-return
-    import('./boot/initializers/enableHelpDialog').then(({default: helpDialog}) => helpDialog.open())
+    import('./boot/initializers/enableHelpDialog').then(({default: helpDialog}) =>
+      helpDialog.open()
+    )
   })
 
   // Backbone routes
@@ -247,17 +192,15 @@ async function loadNewUserTutorials() {
     window.ENV.context_asset_string &&
     splitAssetString(window.ENV.context_asset_string)[0] === 'courses'
   ) {
-    // eslint-disable-next-line promise/catch-or-return
-    const {
-      default: initializeNewUserTutorials
-    } = await import('./features/new_user_tutorial/index')
+    const {default: initializeNewUserTutorials} = await import('./features/new_user_tutorial/index')
 
     initializeNewUserTutorials()
   }
 }
 
-;(window.requestIdleCallback || window.setTimeout)(isolate(async () => {
-  // eslint-disable-next-line promise/catch-or-return
-  await import('./boot/initializers/runOnEveryPageButDontBlockAnythingElse')
-  advanceReadiness('asyncInitializers')
-}))
+;(window.requestIdleCallback || window.setTimeout)(
+  isolate(async () => {
+    await import('./boot/initializers/runOnEveryPageButDontBlockAnythingElse')
+    advanceReadiness('asyncInitializers')
+  })
+)
