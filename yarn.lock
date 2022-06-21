@@ -25722,10 +25722,10 @@ webpack-dev-middleware@^3.7.3:
     range-parser "^1.2.1"
     webpack-log "^2.0.0"
 
-webpack-encapsulation-plugin@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/webpack-encapsulation-plugin/-/webpack-encapsulation-plugin-2.0.0.tgz#c0b5a3ca7d938bfb6fba7d1afaf2fe98ef0acf69"
-  integrity sha512-M9OLCSHbD+TUCLHzPNuh0VdjLgqNAR5SnLymnjGUhkQrPGCA5tYc7woIU4+9r7rkm6UqzuPz5X96WA3jAImzvA==
+webpack-esmac-plugin@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/webpack-esmac-plugin/-/webpack-esmac-plugin-4.0.0.tgz#05d650adcf3bdccd3fb4679888d047be7900a264"
+  integrity sha512-DPh5CbZUMuaJfjzyg8sNrirD81TjMUfHTG0cALij3njnvohhMDsBQMzOOaOUoyd+qwfgC6jgSzA0hXDyzsbFLQ==
   dependencies:
     esmac "^3.0.0"
     invariant "^2.2.4"
