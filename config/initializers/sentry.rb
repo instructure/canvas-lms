@@ -25,20 +25,19 @@
 settings = ConfigFile.load("raven")
 
 if settings.present?
-  require "raven/base"
-  Raven.configure do |config|
-    config.logger = Rails.logger
-    config.silence_ready = true
+
+  Sentry.init do |config|
     config.dsn = settings[:dsn]
-    config.tags = settings.fetch(:tags, {}).merge(
-      'canvas_revision' => Canvas.revision,
-      'canvas_domain' => ENV['CANVAS_DOMAIN'],
-      'node_id' => ENV['NODE']
-     )
+    config.transport.ssl_verification = false
+    # config.tags = settings.fetch(:tags, {}).merge(
+    #  'canvas_revision' => Canvas.revision,
+    #  'canvas_domain' => ENV['CANVAS_DOMAIN'],
+    #  'node_id' => ENV['NODE']
+    # )
     config.release = Canvas.revision
-    config.sanitize_fields += Rails.application.config.filter_parameters.map(&:to_s)
-    config.sanitize_credit_cards = false
-    config.environments = %w[ production ]
+    #config.sanitize_fields += Rails.application.config.filter_parameters.map(&:to_s)
+    #config.sanitize_credit_cards = false
+    config.enabled_environments = %w[ production development ]
     config.excluded_exceptions += %w{
       AuthenticationMethods::AccessTokenError
       AuthenticationMethods::LoggedOutError
