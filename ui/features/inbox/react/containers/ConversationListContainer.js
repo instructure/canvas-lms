@@ -186,42 +186,44 @@ const ConversationListContainer = ({course, scope, onSelectConversation, userFil
   }
 
   return (
-    <Responsive
-      match="media"
-      query={responsiveQuerySizes({mobile: true, tablet: true, desktop: true})}
-      props={{
-        mobile: {
-          textSize: 'x-small',
-          datatestid: 'list-items-mobile'
-        },
-        tablet: {
-          textSize: 'x-small',
-          datatestid: 'list-items-tablet'
-        },
-        desktop: {
-          textSize: 'small',
-          datatestid: 'list-items-desktop'
-        }
-      }}
-      render={responsiveProps => (
-        <ConversationListHolder
-          conversations={inboxItemData}
-          onSelect={onSelectConversation}
-          onStar={handleStar}
-          textSize={responsiveProps.textSize}
-          datatestid={responsiveProps.datatestid}
-          hasMoreMenuData={
-            conversationsQuery.data?.legacyNode?.conversationsConnection?.pageInfo?.hasNextPage ||
-            submissionCommentsQuery.data?.legacyNode?.viewableSubmissionsConnection?.pageInfo
-              ?.hasNextPage
+    <span id="inbox-conversation-holder">
+      <Responsive
+        match="media"
+        query={responsiveQuerySizes({mobile: true, tablet: true, desktop: true})}
+        props={{
+          mobile: {
+            textSize: 'x-small',
+            datatestid: 'list-items-mobile'
+          },
+          tablet: {
+            textSize: 'x-small',
+            datatestid: 'list-items-tablet'
+          },
+          desktop: {
+            textSize: 'small',
+            datatestid: 'list-items-desktop'
           }
-          fetchMoreMenuData={fetchMoreMenuData}
-          isLoadingMoreMenuData={isLoadingMoreData}
-          isLoading={conversationsQuery.loading || submissionCommentsQuery.loading}
-          isError={conversationsQuery.error || submissionCommentsQuery.error}
-        />
-      )}
-    />
+        }}
+        render={responsiveProps => (
+          <ConversationListHolder
+            conversations={inboxItemData}
+            onSelect={onSelectConversation}
+            onStar={handleStar}
+            textSize={responsiveProps.textSize}
+            datatestid={responsiveProps.datatestid}
+            hasMoreMenuData={
+              conversationsQuery.data?.legacyNode?.conversationsConnection?.pageInfo?.hasNextPage ||
+              submissionCommentsQuery.data?.legacyNode?.viewableSubmissionsConnection?.pageInfo
+                ?.hasNextPage
+            }
+            fetchMoreMenuData={fetchMoreMenuData}
+            isLoadingMoreMenuData={isLoadingMoreData}
+            isLoading={conversationsQuery.loading || submissionCommentsQuery.loading}
+            isError={conversationsQuery.error || submissionCommentsQuery.error}
+          />
+        )}
+      />
+    </span>
   )
 }
 
