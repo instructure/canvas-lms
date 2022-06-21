@@ -120,44 +120,6 @@ describe('CanvasInbox Full Page', () => {
       expect(sentConversationNodes[1]).toHaveTextContent('this is the second reply message')
     })
 
-    it('renders the conversation messages', async () => {
-      const container = setup()
-      await waitForApolloLoading()
-
-      const conversation = await container.findByTestId('conversationListItem-Checkbox')
-      fireEvent.click(conversation)
-      await waitForApolloLoading()
-
-      expect(await container.findByText('this is the first reply message')).toBeInTheDocument()
-      expect(await container.findByText('this is a reply all')).toBeInTheDocument()
-      expect(await container.findByText('testing 123')).toBeInTheDocument()
-    })
-
-    it('should check then uncheck a checkbox', async () => {
-      const container = setup()
-
-      const checkbox = await container.findByTestId('conversationListItem-Checkbox')
-      expect(checkbox.checked).toBeFalsy()
-      fireEvent.click(checkbox)
-      expect(checkbox.checked).toBeTruthy()
-      fireEvent.click(checkbox)
-      expect(checkbox.checked).toBeFalsy()
-    })
-
-    it('should trigger confirm when deleting from message kebab menu', async () => {
-      window.confirm = jest.fn(() => true)
-      const container = setup()
-
-      const conversation = await container.findByTestId('conversationListItem-Checkbox')
-      fireEvent.click(conversation)
-
-      const moreOptionsButtons = await container.findAllByTestId('message-more-options')
-      fireEvent.click(moreOptionsButtons[1])
-      const deleteOption = await container.findByTestId('message-delete')
-      fireEvent.click(deleteOption)
-      expect(window.confirm).toHaveBeenCalled()
-    })
-
     it('should find desktop message list container', () => {
       const container = setup()
 
@@ -172,16 +134,6 @@ describe('CanvasInbox Full Page', () => {
 
         const mailboxDropdown = await container.findByLabelText('Mailbox Selection')
         expect(mailboxDropdown.getAttribute('value')).toBe('Inbox')
-      })
-
-      it('should respect the initial loading url hash', async () => {
-        window.location.hash = '#filter=type=sent'
-        const container = setup()
-        await waitForApolloLoading()
-        expect(window.location.hash).toBe('#filter=type=sent')
-
-        const mailboxDropdown = await container.findByLabelText('Mailbox Selection')
-        expect(mailboxDropdown.getAttribute('value')).toBe('Sent')
       })
 
       describe('scope select', () => {

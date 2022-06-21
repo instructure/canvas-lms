@@ -86,6 +86,8 @@ describe('ConversationListItem', () => {
       onSelect: jest.fn(),
       onOpen: jest.fn(),
       onStar: jest.fn(),
+      onMarkAsRead: jest.fn(),
+      onMarkAsUnRead: jest.fn(),
       readStateChangeConversationParticipants: jest.fn(),
       ...overrides
     }
@@ -175,21 +177,18 @@ describe('ConversationListItem', () => {
     })
 
     it('update read state called with correct parameters', () => {
-      const changeReadState = jest.fn()
+      const onMarkAsUnread = jest.fn()
 
-      const props = createProps({readStateChangeConversationParticipants: changeReadState})
+      const props = createProps({
+        onMarkAsUnread
+      })
 
       const container = render(<ConversationListItem {...props} />)
 
       const unreadBadge = container.queryByTestId('read-badge')
       fireEvent.click(unreadBadge)
 
-      expect(changeReadState).toHaveBeenCalledWith({
-        variables: {
-          conversationIds: ['1'],
-          workflowState: 'unread'
-        }
-      })
+      expect(onMarkAsUnread).toHaveBeenCalledWith('1')
     })
   })
 
