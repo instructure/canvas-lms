@@ -47,12 +47,12 @@ describe('MessageBody', () => {
     const props = createProps({
       messages: [
         {
-          text: 'The message body is required',
+          text: 'Please insert a message body.',
           type: 'error'
         }
       ]
     })
     const {getByText} = render(<MessageBody {...props} />)
-    expect(getByText('The message body is required')).toBeInTheDocument()
+    expect(getByText(props.messages[0].text)).toBeInTheDocument()
   })
 })
