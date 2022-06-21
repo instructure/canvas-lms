@@ -36,10 +36,6 @@ class DeveloperKeyAccountBinding < ApplicationRecord
   after_update :update_tools!
   before_save :set_root_account
 
-  scope :active_in_account, lambda { |account|
-    where(account_id: account.account_chain_ids, workflow_state: "on")
-  }
-
   # Find a DeveloperKeyAccountBinding in order of accounts. The search for a binding will
   # be prioritized by the order of accounts. If a binding is found for the first account
   # that binding will be returned, otherwise the next account will be searched and so on.
