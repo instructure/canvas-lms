@@ -152,16 +152,18 @@ const ComposeModalContainer = props => {
   const validMessageFields = () => {
     let isValid = true
     if (!body) {
-      setBodyMessages([{text: I18n.t('Message body is required'), type: 'error'}])
+      setBodyMessages([{text: I18n.t('Please insert a message body.'), type: 'error'}])
       isValid = false
     }
 
     if (!isSubmissionCommentsType && !props.isReply) {
       if (addressBookInputValue !== '') {
-        setAddressBookMessages([{text: I18n.t('Invalid recipient'), type: 'error'}])
+        setAddressBookMessages([
+          {text: I18n.t('No matches found. Please insert a valid recipient.'), type: 'error'}
+        ])
         isValid = false
       } else if (props.selectedIds.length === 0) {
-        setAddressBookMessages([{text: I18n.t('You must choose a recipient'), type: 'error'}])
+        setAddressBookMessages([{text: I18n.t('Please select a recipient.'), type: 'error'}])
         isValid = false
       }
     }
