@@ -33,7 +33,13 @@ import {Responsive} from '@instructure/ui-responsive'
 
 const I18n = useI18nScope('conversations_2')
 
-const ConversationListContainer = ({course, scope, onSelectConversation, userFilter}) => {
+const ConversationListContainer = ({
+  course,
+  scope,
+  onSelectConversation,
+  onReadStateChange,
+  userFilter
+}) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const {isSubmissionCommentsType} = useContext(ConversationContext)
   const [isLoadingMoreData, setIsLoadingMoreData] = useState(false)
@@ -67,6 +73,14 @@ const ConversationListContainer = ({course, scope, onSelectConversation, userFil
         starred
       }
     })
+  }
+
+  const handleMarkAsUnread = conversationId => {
+    onReadStateChange('unread', [conversationId])
+  }
+
+  const handleMarkAsRead = conversationId => {
+    onReadStateChange('read', [conversationId])
   }
 
   const conversationsQuery = useQuery(CONVERSATIONS_QUERY, {
@@ -209,6 +223,8 @@ const ConversationListContainer = ({course, scope, onSelectConversation, userFil
             conversations={inboxItemData}
             onSelect={onSelectConversation}
             onStar={handleStar}
+            onMarkAsRead={handleMarkAsRead}
+            onMarkAsUnread={handleMarkAsUnread}
             textSize={responsiveProps.textSize}
             datatestid={responsiveProps.datatestid}
             hasMoreMenuData={
@@ -233,7 +249,8 @@ ConversationListContainer.propTypes = {
   course: PropTypes.string,
   userFilter: PropTypes.number,
   scope: PropTypes.string,
-  onSelectConversation: PropTypes.func
+  onSelectConversation: PropTypes.func,
+  onReadStateChange: PropTypes.func
 }
 
 ConversationListContainer.defaultProps = {

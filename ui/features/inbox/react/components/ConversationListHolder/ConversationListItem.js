@@ -161,12 +161,9 @@ export const ConversationListItem = ({...props}) => {
                       margin="x-small"
                       onClick={e => {
                         e.stopPropagation()
-                        props.readStateChangeConversationParticipants({
-                          variables: {
-                            conversationIds: [props.conversation._id],
-                            workflowState: props.isUnread ? 'read' : 'unread'
-                          }
-                        })
+                        props.isUnread
+                          ? props.onMarkAsRead(props.conversation._id)
+                          : props.onMarkAsUnread(props.conversation._id)
                       }}
                       screenReaderLabel={props.isUnread ? I18n.t('Unread') : I18n.t('Read')}
                       size="small"
@@ -276,6 +273,7 @@ ConversationListItem.propTypes = {
   isUnread: PropTypes.bool,
   onSelect: PropTypes.func,
   onStar: PropTypes.func,
-  readStateChangeConversationParticipants: PropTypes.func,
+  onMarkAsRead: PropTypes.func,
+  onMarkAsUnread: PropTypes.func,
   textSize: PropTypes.string
 }

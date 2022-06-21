@@ -409,6 +409,36 @@ const CanvasInbox = () => {
     })
   }
 
+  const [readStateChangeConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
+    onCompleted(data) {
+      if (data.updateConversationParticipants.errors) {
+        setOnFailure(I18n.t('Read state change operation failed'))
+      } else {
+        setOnSuccess(
+          I18n.t(
+            {
+              one: 'Read state Changed!',
+              other: 'Read states Changed!'
+            },
+            {count: '1000'}
+          )
+        )
+      }
+    },
+    onError() {
+      setOnFailure(I18n.t('Read state change failed'))
+    }
+  })
+
+  const handleReadState = (markAsRead, conversationIds = null) => {
+    readStateChangeConversationParticipants({
+      variables: {
+        conversationIds: conversationIds || selectedConversations.map(convo => convo._id),
+        workflowState: markAsRead
+      }
+    })
+  }
+
   const onReply = ({conversationMessage = null, replyAll = false} = {}) => {
     conversationMessage = isSubmissionCommentsType ? {} : conversationMessage
     setSelectedConversationMessage(conversationMessage)
@@ -495,6 +525,7 @@ const CanvasInbox = () => {
                   onStar={handleStar}
                   firstConversationIsStarred={firstConversationIsStarred}
                   onDelete={handleDelete}
+                  onReadStateChange={handleReadState}
                   canReply={canReply}
                 />
               </Flex.Item>
@@ -510,6 +541,7 @@ const CanvasInbox = () => {
                       userFilter={userFilter}
                       scope={scope}
                       onSelectConversation={updateSelectedConversations}
+                      onReadStateChange={handleReadState}
                     />
                   </Flex.Item>
                 )}
@@ -572,6 +604,7 @@ const CanvasInbox = () => {
                                 }
                               : null
                           }
+                          onReadStateChange={handleReadState}
                           scope={scope}
                         />
                       </>

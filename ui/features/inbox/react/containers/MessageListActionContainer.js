@@ -18,14 +18,13 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {COURSES_QUERY} from '../../graphql/Queries'
-import {UPDATE_CONVERSATION_PARTICIPANTS} from '../../graphql/Mutations'
 import {CourseSelect, ALL_COURSES_ID} from '../components/CourseSelect/CourseSelect'
 import {Flex} from '@instructure/ui-flex'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {MailboxSelectionDropdown} from '../components/MailboxSelectionDropdown/MailboxSelectionDropdown'
 import {MessageActionButtons} from '../components/MessageActionButtons/MessageActionButtons'
 import PropTypes from 'prop-types'
-import {useQuery, useMutation} from 'react-apollo'
+import {useQuery} from 'react-apollo'
 import React, {useContext, useEffect} from 'react'
 import {reduceDuplicateCourses} from '../../util/courses_helper'
 import {View} from '@instructure/ui-view'
@@ -37,7 +36,7 @@ const I18n = useI18nScope('conversations_2')
 
 const MessageListActionContainer = props => {
   const LIMIT_TAG_COUNT = 1
-  const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+  const {setOnFailure} = useContext(AlertManagerContext)
   const userID = ENV.current_user_id?.toString()
 
   const selectedReadStates = () => {
@@ -57,27 +56,6 @@ const MessageListActionContainer = props => {
   const hasMultipleSelectedMessages = () => selectedReadStates().length > 1
 
   const hasSelectedConversations = () => props.selectedConversations.length > 0
-
-  const [readStateChangeConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
-    onCompleted(data) {
-      if (data.updateConversationParticipants.errors) {
-        setOnFailure(I18n.t('Read state change operation failed'))
-      } else {
-        setOnSuccess(
-          I18n.t(
-            {
-              one: 'Read state Changed!',
-              other: 'Read states Changed!'
-            },
-            {count: props.selectedConversations.length}
-          )
-        )
-      }
-    },
-    onError() {
-      setOnFailure(I18n.t('Read state change failed'))
-    }
-  })
 
   const {loading, error, data} = useQuery(COURSES_QUERY, {
     variables: {userID}
@@ -128,21 +106,11 @@ const MessageListActionContainer = props => {
   }
 
   const handleMarkAsUnread = () => {
-    readStateChangeConversationParticipants({
-      variables: {
-        conversationIds: props.selectedConversations.map(convo => convo._id),
-        workflowState: 'unread'
-      }
-    })
+    props.onReadStateChange('unread')
   }
 
   const handleMarkAsRead = () => {
-    readStateChangeConversationParticipants({
-      variables: {
-        conversationIds: props.selectedConversations.map(convo => convo._id),
-        workflowState: 'read'
-      }
-    })
+    props.onReadStateChange('read')
   }
 
   return (
@@ -288,6 +256,7 @@ MessageListActionContainer.propTypes = {
   firstConversationIsStarred: PropTypes.bool,
   onStar: PropTypes.func,
   onDelete: PropTypes.func,
+  onReadStateChange: PropTypes.func,
   activeCourseFilter: PropTypes.string,
   canReply: PropTypes.bool
 }
