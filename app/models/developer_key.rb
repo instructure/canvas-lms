@@ -385,18 +385,42 @@ class DeveloperKey < ActiveRecord::Base
   def manage_external_tools(enqueue_args, method, affected_account)
     return if tool_configuration.blank?
 
+    start_time = Time.zone.now.to_i
     if affected_account.blank? || affected_account.site_admin?
       # Cleanup tools across all shards
       delay(**enqueue_args)
-        .manage_external_tools_multi_shard(enqueue_args, method, affected_account)
+        .manage_external_tools_multi_shard(enqueue_args, method, affected_account, start_time)
     else
-      delay(**enqueue_args).__send__(method, affected_account)
+      delay(**enqueue_args).manage_external_tools_on_shard(method, affected_account, start_time)
     end
   end
 
-  def manage_external_tools_multi_shard(enqueue_args, method, affected_account)
+  def manage_external_tools_multi_shard(enqueue_args, method, affected_account, start_time)
     Shard.with_each_shard do
-      delay(**enqueue_args).__send__(method, affected_account)
+      delay(**enqueue_args).manage_external_tools_on_shard(method, affected_account, start_time)
+    end
+  end
+
+  def manage_external_tools_on_shard(method, account, start_time)
+    __send__(method, account)
+    instrument_tool_management(method, start_time)
+  rescue => e
+    instrument_tool_management(method, start_time, e)
+    raise e
+  end
+
+  def instrument_tool_management(method, start_time, exception = nil)
+    stat_prefix = "developer_key.manage_external_tools"
+    stat_prefix += ".error" if exception
+
+    tags = { method: method }
+    latency = (Time.zone.now.to_i - start_time) * 1000 # ms for DD
+
+    InstStatsd::Statsd.increment("#{stat_prefix}.count", tags: tags)
+    InstStatsd::Statsd.timing("#{stat_prefix}.latency", latency, tags: tags)
+
+    if exception
+      Canvas::Errors.capture_exception(:developer_keys, exception, :error)
     end
   end
 
