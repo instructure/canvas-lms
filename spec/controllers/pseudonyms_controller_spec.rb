@@ -440,6 +440,19 @@ describe PseudonymsController do
       expect(bob.pseudonym.reload.unique_id).to eq "new_username"
     end
 
+    it "is not able to change unique_id if override_sis_stickiness set to false" do
+      bob = user_with_pseudonym(username: "old_username")
+      sally = account_admin_user
+      user_session(sally)
+      put "update",
+          params: { id: bob.pseudonym.id,
+                    user_id: bob.id,
+                    override_sis_stickiness: false,
+                    pseudonym: { unique_id: "new_username" } }
+      expect(response).to be_redirect
+      expect(bob.pseudonym.reload.unique_id).to eq "old_username"
+    end
+
     it "is not able to change unique_id without permission" do
       bob = user_with_pseudonym(username: "old_username")
       user_session(bob)

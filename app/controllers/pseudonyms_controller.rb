@@ -335,6 +335,10 @@ class PseudonymsController < ApplicationController
   #     * student_other
   #     * teacher
   #
+  # @argument override_sis_stickiness [boolean]
+  #   By default and when the value is true it updates all the fields
+  #   when the value is false then fields which in stuck_sis_fields will not be updated
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/accounts/:account_id/logins/:login_id \
   #     -H "Authorization: Bearer <ACCESS-TOKEN>" \
@@ -463,16 +467,24 @@ class PseudonymsController < ApplicationController
     # note: make sure sis_user_id is updated (if happening)
     # before password, since it may affect the :change_password permissions
 
+    @override_sis_stickiness = !params[:override_sis_stickiness] || value_to_boolean(params[:override_sis_stickiness]) || params[:action] != "update"
+
     has_right_if_requests_change(:unique_id, :update) do
-      @pseudonym.unique_id = params[:pseudonym][:unique_id]
+      if can_modify_field(@override_sis_stickiness, @pseudonym.stuck_sis_fields, :unique_id)
+        @pseudonym.unique_id = params[:pseudonym][:unique_id]
+      end
     end or return false
 
     has_right_if_requests_change(:authentication_provider, :update) do
-      @pseudonym.authentication_provider = params[:pseudonym][:authentication_provider]
+      if can_modify_field(@override_sis_stickiness, @pseudonym.stuck_sis_fields, :authentication_provider)
+        @pseudonym.authentication_provider = params[:pseudonym][:authentication_provider]
+      end
     end or return false
 
     has_right_if_requests_change(:declared_user_type, :update) do
-      @pseudonym.declared_user_type = params[:pseudonym][:declared_user_type]
+      if can_modify_field(@override_sis_stickiness, @pseudonym.stuck_sis_fields, :declared_user_type)
+        @pseudonym.declared_user_type = params[:pseudonym][:declared_user_type]
+      end
     end or return false
 
     has_right_if_requests_change(:sis_user_id, :manage_sis) do
@@ -496,8 +508,10 @@ class PseudonymsController < ApplicationController
     end
 
     has_right_if_requests_change(:password, :change_password) do
-      @pseudonym.password = params[:pseudonym][:password]
-      @pseudonym.password_confirmation = params[:pseudonym][:password_confirmation]
+      if can_modify_field(@override_sis_stickiness, @pseudonym.stuck_sis_fields, :password)
+        @pseudonym.password = params[:pseudonym][:password]
+        @pseudonym.password_confirmation = params[:pseudonym][:password_confirmation]
+      end
     end or return false
 
     # give a 400 instead of a 401 if the workflow_state doesn't make sense
@@ -511,7 +525,9 @@ class PseudonymsController < ApplicationController
     end
 
     has_right_if_requests_change(:workflow_state, :delete) do
-      @pseudonym.workflow_state = params[:pseudonym][:workflow_state]
+      if can_modify_field(@override_sis_stickiness, @pseudonym.stuck_sis_fields, :workflow_state)
+        @pseudonym.workflow_state = params[:pseudonym][:workflow_state]
+      end
     end or return false
   end
 
@@ -527,5 +543,9 @@ class PseudonymsController < ApplicationController
       render_unauthorized_action
       false
     end
+  end
+
+  def can_modify_field(override_sis_stickiness, stick_fields_set, key)
+    override_sis_stickiness || !stick_fields_set.include?(key)
   end
 end
