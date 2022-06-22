@@ -44,9 +44,25 @@ describe Types::ConversationType do
       }
     )
     @student_conversation = Conversation.initiate([@student2, @student], false, context_type: "Course", context_id: @course.id)
+    @private_conversation = Conversation.initiate([@teacher, @student], true, context_type: "Course", context_id: @course.id)
+    @not_private_conversation = Conversation.initiate([@teacher, @student], false, context_type: "Course", context_id: @course.id)
   end
 
   let(:conversation_type) { GraphQLTypeTester.new(@conversation.conversation, current_user: @teacher) }
+  let(:private_conversation_type) { GraphQLTypeTester.new(@private_conversation, current_user: @teacher) }
+  let(:not_private_conversation_type) { GraphQLTypeTester.new(@not_private_conversation, current_user: @teacher) }
+
+  context "conversation properties" do
+    it "is_private returns true when conversation is private" do
+      result = not_private_conversation_type.resolve("isPrivate")
+      expect(result).to eq(false)
+    end
+
+    it "is_private returns false when conversation is not private" do
+      result = private_conversation_type.resolve("isPrivate")
+      expect(result).to eq(true)
+    end
+  end
 
   context "conversation can_reply permission" do
     let(:conversation_students_type) { GraphQLTypeTester.new(@student_conversation, current_user: @student2) }

@@ -36,6 +36,10 @@ module Types
       audience = other_users.map(&:id)
       !object.replies_locked_for?(current_user, audience)
     end
+    field :is_private, Boolean, null: true
+    def is_private
+      object.private?
+    end
 
     field :conversation_messages_connection, Types::ConversationMessageType.connection_type, null: true do
       argument :participants, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User")
