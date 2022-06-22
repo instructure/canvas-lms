@@ -156,7 +156,7 @@ const ComposeModalContainer = props => {
       isValid = false
     }
 
-    if (!isSubmissionCommentsType && !props.isReply) {
+    if (!isSubmissionCommentsType) {
       if (addressBookInputValue !== '') {
         setAddressBookMessages([
           {text: I18n.t('No matches found. Please insert a valid recipient.'), type: 'error'}
@@ -318,6 +318,7 @@ const ComposeModalContainer = props => {
                   addressBookMessages={addressBookMessages}
                   courseMessages={courseMessages}
                   data-testid="compose-modal-inputs"
+                  isPrivateConversation={props.isPrivateConversation}
                 />
               )}
             </ModalBody>
@@ -391,5 +392,6 @@ ComposeModalContainer.propTypes = {
   onSelectedIdsChange: PropTypes.func,
   selectedIds: PropTypes.array,
   submissionCommentsHeader: PropTypes.string,
-  modalError: PropTypes.string
+  modalError: PropTypes.string,
+  isPrivateConversation: PropTypes.bool
 }

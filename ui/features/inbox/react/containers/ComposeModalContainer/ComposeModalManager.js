@@ -325,6 +325,7 @@ const ComposeModalManager = props => {
       selectedIds={props.selectedIds}
       submissionCommentsHeader={isSubmissionCommentsType ? props?.conversation?.subject : null}
       modalError={modalError}
+      isPrivateConversation={!!props?.conversation?.isPrivate}
     />
   )
 }

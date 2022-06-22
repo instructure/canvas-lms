@@ -69,6 +69,7 @@ export const inboxConversationsWrapper = (data, isSubmissionComments = false) =>
           isSubmissionComments,
           inboxConversation?.messages[inboxConversation.messages.length - 1].author.name
         )
+        inboxConversation.isPrivate = conversation?.conversation?.isPrivate
       }
       inboxConversations.push(inboxConversation)
     })
