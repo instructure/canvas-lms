@@ -50,6 +50,11 @@ test('renders the CourseItemRow component', () => {
   ok(tree.exists())
 })
 
+test("renders the CourseItemRow component when author doesn't exist", () => {
+  const tree = mount(<CourseItemRow {...props} author={null} />)
+  ok(tree.exists())
+})
+
 test('renders children inside content column', () => {
   const tree = mount(
     <CourseItemRow
