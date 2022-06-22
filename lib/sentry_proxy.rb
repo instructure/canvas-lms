@@ -15,14 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'raven/base'
-
 class SentryProxy
   def self.capture(exception, data)
     if exception.is_a?(String) || exception.is_a?(Symbol)
-      Raven.capture_message(exception.to_s, data)
+      Sentry.capture_message(exception.to_s, data)
     else
-      Raven.capture_exception(exception, data) if reportable?(exception)
+      Sentry.capture_exception(exception, data) if reportable?(exception)
     end
   end
 

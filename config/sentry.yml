@@ -1,4 +1,5 @@
 development:
   dsn: 'https://d97d51e75ca844d9a89c9f08eea6123a@o1169445.ingest.sentry.io/6262567'
+
 production:
   dsn: 'https://d97d51e75ca844d9a89c9f08eea6123a@o1169445.ingest.sentry.io/6262567'
