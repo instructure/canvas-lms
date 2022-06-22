@@ -143,7 +143,7 @@ const HeaderInputs = props => {
           />
         </Flex.Item>
       )}
-      {!props.isReply && (
+      {(!props.isReply || (props.isReply && !props?.isPrivateConversation)) && (
         <Flex.Item>
           <ComposeInputWrapper
             title={
@@ -232,7 +232,8 @@ HeaderInputs.propTypes = {
    */
   addressBookContainerOpen: PropTypes.bool,
   addressBookMessages: PropTypes.array,
-  courseMessages: PropTypes.array
+  courseMessages: PropTypes.array,
+  isPrivateConversation: PropTypes.bool
 }
 
 export default HeaderInputs
