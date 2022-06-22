@@ -107,8 +107,7 @@
              use_range = (criterion.try(:criterion_use_range) && rating_min.try(:to_f) != rating.points.try(:to_f) && range_rating_enabled);
              selected = rating_match || (assessment_rating && assessment_rating[:points] && use_range ? ((assessment_rating[:points] > rating_min && assessment_rating[:points] < rating.points)) : false)
           %>
-          <td id="rating_<%= rating.id %>"
-              class="rating <%= "edge_rating" if rating.edge %>
+          <td class="rating <%= "edge_rating" if rating.edge %>
                 <%= "infinitesimal" if rating_min.try(:to_f) == rating.points.try(:to_f) %>
                 <%= "selected" if selected %>"
           >
