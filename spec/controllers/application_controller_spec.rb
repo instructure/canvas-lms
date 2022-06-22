@@ -203,13 +203,35 @@ RSpec.describe ApplicationController do
           expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
         end
 
-        it "sets the env var to false when the user can't use it in a course context" do
-          course_with_student(active_all: true)
-          course = @course
-          course_with_teacher(active_all: true, user: @student)
-          controller.instance_variable_set(:@current_user, @student)
-          controller.instance_variable_set(:@context, course)
-          expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
+        describe "with manage_content permission disabled" do
+          before do
+            course_with_teacher(active_all: true, user: @teacher)
+            RoleOverride.create!(context: @course.account, permission: "manage_content", role: teacher_role, enabled: false)
+          end
+
+          it "sets the env var to false if the course is active" do
+            controller.instance_variable_set(:@current_user, @teacher)
+            controller.instance_variable_set(:@context, @course)
+            expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
+          end
+
+          describe "when the course is concluded" do
+            before do
+              @course.complete!
+            end
+
+            it "sets the env var to true when the user can use it" do
+              controller.instance_variable_set(:@current_user, @teacher)
+              controller.instance_variable_set(:@context, @course)
+              expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_truthy
+            end
+
+            it "sets the env var to false when the user can't use it" do
+              controller.instance_variable_set(:@current_user, @student)
+              controller.instance_variable_set(:@context, @course)
+              expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
+            end
+          end
         end
       end
 
