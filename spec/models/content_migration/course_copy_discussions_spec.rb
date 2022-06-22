@@ -48,18 +48,6 @@ describe ContentMigration do
       expect(new_topic.todo_date.to_i).to eq todo_date.to_i
     end
 
-    it "copies discussion topic full_anonymity anonymous_state" do
-      topic = @copy_from.discussion_topics.create!(title: "full_anonymity topic", message: "<p>bloop</p>",
-                                                   anonymous_state: "full_anonymity")
-
-      run_course_copy
-
-      new_topic = @copy_to.discussion_topics.where(migration_id: mig_id(topic)).first
-
-      expect(topic.anonymous_state).to eq new_topic.anonymous_state
-      expect(topic.is_anonymous_author).to eq new_topic.is_anonymous_author
-    end
-
     it "copies locked state for announcements" do
       @copy_from.announcements.create!(title: "topic", message: "<p>bloop</p>", locked: true)
 
