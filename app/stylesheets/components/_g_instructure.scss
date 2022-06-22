@@ -65,7 +65,7 @@
   margin: 0;
   padding: 0;
 
-  li {
+  .flash-message-container {
     // when the flash message is first child of the message_holder,
     // add margin at the top of the screen per design team
     &.ic-flash-info:first-child,
@@ -76,11 +76,11 @@
     }
   }
 
-  li:not(.ic-flash-info):not(.ic-flash-success):not(.ic-flash-warning):not(.ic-flash-error),
+  .flash-message-container:not(.ic-flash-info):not(.ic-flash-success):not(.ic-flash-warning):not(.ic-flash-error),
   .ui-effects-wrapper {
     margin: 0 auto !important;
   }
-  li:not(.ic-flash-info):not(.ic-flash-success):not(.ic-flash-warning):not(.ic-flash-error) {
+  .flash-message-container:not(.ic-flash-info):not(.ic-flash-success):not(.ic-flash-warning):not(.ic-flash-error) {
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
     border-bottom-color: rgba(0, 0, 0, 0.5);
     padding: direction-sides(4px 40px 4px 8px);
