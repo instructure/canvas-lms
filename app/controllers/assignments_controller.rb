@@ -121,17 +121,24 @@ class AssignmentsController < ApplicationController
   end
 
   def render_a2_student_view(student:)
+    current_user_submission = @assignment.submissions.find_by(user: student)
     submission = if @context.feature_enabled?(:peer_reviews_for_a2)
                    if params[:reviewee_id].present? && !@assignment.anonymize_students?
                      @assignment.submissions.find_by(user_id: params[:reviewee_id])
                    elsif params[:anonymous_asset_id].present?
                      @assignment.submissions.find_by(anonymous_id: params[:anonymous_asset_id])
                    else
-                     @assignment.submissions.find_by(user: student)
+                     current_user_submission
                    end
                  else
-                   @assignment.submissions.find_by(user: student)
+                   current_user_submission
                  end
+
+    peer_review_mode_enabled = @context.feature_enabled?(:peer_reviews_for_a2) && (params[:reviewee_id].present? || params[:anonymous_asset_id].present?)
+    js_env({
+             peer_review_mode_enabled: submission.present? && peer_review_mode_enabled,
+             peer_review_available: submission.present? && submission.submitted? && current_user_submission.present? && current_user_submission.submitted?
+           })
 
     graphql_submission_id = nil
     if submission
