@@ -1497,7 +1497,7 @@ describe Assignment do
       end
     end
 
-    context "with an assignment that uses an external tool" do
+    context "with an assignment that uses an external tool allowed to be duplicated" do
       let_once(:assignment) do
         @course.assignments.create!(
           submission_types: "external_tool",
@@ -1521,6 +1521,25 @@ describe Assignment do
 
       it "sets duplication_started_at to the current time" do
         expect(assignment.duplicate.duplication_started_at).to be_within(5).of(Time.zone.now)
+      end
+    end
+
+    context "with an assignment that uses an external tool" do
+      let_once(:assignment) do
+        @course.assignments.create!(
+          submission_types: "external_tool",
+          external_tool_tag_attributes: { url: "http://example.com/launch" },
+          **assignment_valid_attributes
+        )
+      end
+
+      it "does not allow duplacation when submission type is external tool" do
+        expect(assignment.can_duplicate?).to be false
+      end
+
+      it "does allow duplication if the submission type is changed from external tool" do
+        assignment.update!(submission_types: "online_text_entry")
+        expect(assignment.can_duplicate?).to be true
       end
     end
 
