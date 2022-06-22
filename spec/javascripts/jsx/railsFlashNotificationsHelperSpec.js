@@ -90,7 +90,7 @@ QUnit.module('RailsFlashNotificationsHelper#generateNodeHTML', {
 test('properly injects type, icon, and content into html', () => {
   const result = helper.generateNodeHTML('success', 'Some Data')
 
-  notStrictEqual(result.search('class="ic-flash-success"'), -1)
+  notStrictEqual(result.search('ic-flash-success'), -1)
   notStrictEqual(result.search('class="icon-check"'), -1)
   notStrictEqual(result.search('Some Data'), -1)
 })
@@ -121,7 +121,8 @@ test('creates a node', () => {
 
   const holder = document.getElementById('flash_message_holder')
 
-  equal(holder.firstChild.tagName, 'LI')
+  equal(holder.firstChild.tagName, 'DIV')
+  ok(holder.firstChild.className.includes('flash-message-container'))
 })
 
 test('properly adds css options when creating a node', () => {
@@ -184,7 +185,7 @@ test('closes when the alert is clicked', () => {
   helper.createNode('success', 'Closable Alert')
 
   const holder = document.getElementById('flash_message_holder')
-  const alert = holder.getElementsByTagName('LI')
+  const alert = holder.getElementsByClassName('flash-message-container')
 
   equal(alert.length, 1)
 

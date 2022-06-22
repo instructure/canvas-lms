@@ -666,7 +666,7 @@ module CustomSeleniumActions
   end
 
   def flash_message_selector
-    "#flash_message_holder li"
+    "#flash_message_holder .flash-message-container"
   end
 
   def dismiss_flash_messages
