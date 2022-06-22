@@ -181,15 +181,11 @@ module Types
     def anonymous_author
       if object.anonymous_state == "full_anonymity" || (object.anonymous_state == "partial_anonymity" && object.is_anonymous_author)
         Loaders::DiscussionTopicParticipantLoader.for(object.id).load(object.user_id).then do |participant|
-          if participant.nil?
-            nil
-          else
-            {
-              id: participant.id.to_s(36),
-              short_name: object.user_id == current_user.id ? "current_user" : participant.id.to_s(36),
-              avatar_url: nil
-            }
-          end
+          {
+            id: participant.id.to_s(36),
+            short_name: object.user_id == current_user.id ? "current_user" : participant.id.to_s(36),
+            avatar_url: nil
+          }
         end
       else
         nil
