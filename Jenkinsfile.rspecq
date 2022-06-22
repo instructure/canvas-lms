@@ -27,6 +27,8 @@ def rspecqNodeTotal = 50
 def summaryMessage = ''
 @groovy.transform.Field
 def crystalballColor = 'danger'
+@groovy.transform.Field
+def specUnique = []
 
 def computeTestCountNecessary() {
   copyArtifacts filter: 'tmp/crystalball_spec_list.txt', projectName: "${env.UPSTREAM}", selector: upstream()
@@ -34,7 +36,7 @@ def computeTestCountNecessary() {
 
   def specs = readFile(file: 'tmp/crystalball_spec_list.txt')
   def mapVersion = readFile(file: 'tmp/crystalball_map_version.txt')
-  def specUnique = specs.tokenize(',').unique()
+  specUnique = specs.tokenize(',').unique()
   env.CRYSTALBALL_SPEC = specUnique.join(' ')
 
   summaryMessage = "Map: $mapVersion\n"
