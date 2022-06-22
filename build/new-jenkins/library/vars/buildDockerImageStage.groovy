@@ -154,7 +154,7 @@ def premergeCacheImage() {
   }
 }
 
-def patchsetImage() {
+def patchsetImage(asyncStepsStr) {
   credentials.withStarlordCredentials {
     def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
 
@@ -175,7 +175,13 @@ def patchsetImage() {
         "YARN_RUNNER_PREFIX=${env.YARN_RUNNER_PREFIX}",
       ]) {
         try {
-          sh "build/new-jenkins/docker-build.sh $PATCHSET_TAG"
+          sh """#!/bin/bash
+          set -ex
+
+          build/new-jenkins/docker-build.sh $PATCHSET_TAG
+
+          $asyncStepsStr
+          """
         } catch (e) {
           handleDockerBuildFailure(PATCHSET_TAG, e)
         }
