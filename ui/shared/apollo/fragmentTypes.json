@@ -153,7 +153,7 @@
             "name": "NotificationPolicy"
           },
           {
-            "name": "OutcomeAlignmentType"
+            "name": "OutcomeAlignment"
           },
           {
             "name": "OutcomeCalculationMethod"
@@ -351,9 +351,6 @@
             "name": "NotificationPolicy"
           },
           {
-            "name": "OutcomeAlignmentType"
-          },
-          {
             "name": "OutcomeCalculationMethod"
           },
           {
@@ -510,7 +507,7 @@
             "name": "NotificationPolicy"
           },
           {
-            "name": "OutcomeAlignmentType"
+            "name": "OutcomeAlignment"
           },
           {
             "name": "OutcomeFriendlyDescriptionType"
