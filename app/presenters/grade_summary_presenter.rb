@@ -213,7 +213,7 @@ class GradeSummaryPresenter
                    .where(user_id: student).to_a
 
       if vericite_enabled? || turnitin_enabled?
-        ActiveRecord::Associations::Preloader.new.preload(ss, :originality_reports)
+        ActiveRecord::Associations.preload(ss, :originality_reports)
       end
 
       assignments_index = assignments.index_by(&:id)
@@ -290,9 +290,7 @@ class GradeSummaryPresenter
 
   def unread_submission_ids
     @unread_submission_ids ||= if student_is_user?
-                                 # remember unread submissions and then mark all as read
                                  subs = submissions.select { |s| s.unread?(@current_user) }
-                                 subs.each { |s| s.change_read_state("read", @current_user) }
                                  subs.map(&:id)
                                else
                                  []

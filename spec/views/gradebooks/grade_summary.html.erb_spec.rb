@@ -105,16 +105,154 @@ describe "/gradebooks/grade_summary" do
     before do
       course_with_teacher
       student_in_course(active_all: true)
+      observer_in_course(course: @course, associated_user_id: @student, active_all: true)
+
+      @assignment = @course.assignments.create!(title: "Random Assignment")
+      @assignment.ensure_post_policy(post_manually: true)
+      @assignment.submit_homework @student, submission_type: "online_text_entry", body: "o hai there"
+      @assignment.grade_student(@student, score: 10, grader: @teacher)
+
+      @assignment_url = context_url(@course, :context_assignment_url, @assignment)
+      @speed_grader_url = speed_grader_course_gradebook_url({ course_id: @assignment.context_id, assignment_id: @assignment }.merge({ student_id: @student.id }))
+      @submission_details_url = context_url(@course, :context_assignment_submission_url, @assignment, @student.id)
+    end
+
+    context "when the assignment enhancements flag is enabled" do
+      before do
+        @course.enable_feature!(:assignments_2_student)
+        Setting.set("assignments_2_observer_view", "true")
+      end
+
+      it "takes the submitting student to A2 flow" do
+        @user = @student
+        assign(:presenter, GradeSummaryPresenter.new(@course, @student, @student.id))
+        view_context
+        render "gradebooks/grade_summary"
+        expect(response).to have_tag("a[href='#{@assignment_url}']")
+      end
+
+      it "takes the observer to A2 flow" do
+        @user = @observer
+        assign(:presenter, GradeSummaryPresenter.new(@course, @observer, @student.id))
+        view_context
+        render "gradebooks/grade_summary"
+        expect(response).to have_tag("a[href='#{@assignment_url}']")
+      end
+
+      it "takes the teacher to Speedgrader link" do
+        @user = @teacher
+        assign(:presenter, GradeSummaryPresenter.new(@course, @teacher, @student.id))
+        view_context
+        render "gradebooks/grade_summary"
+        expect(response).to have_tag("a[href='#{@speed_grader_url}']")
+      end
+
+      it "takes the admin to Speedgrader link" do
+        @user = account_admin_user
+        assign(:presenter, GradeSummaryPresenter.new(@course, @user, @student.id))
+        view_context
+        render "gradebooks/grade_summary"
+        expect(response).to have_tag("a[href='#{@speed_grader_url}']")
+      end
+
+      it "takes the site admin to Speedgrader link" do
+        @user = site_admin_user
+        assign(:presenter, GradeSummaryPresenter.new(@course, @user, @student.id))
+        view_context
+        render "gradebooks/grade_summary"
+        expect(response).to have_tag("a[href='#{@speed_grader_url}']")
+      end
+    end
+
+    context "when the assignment enhancements flag is disabled" do
+      it "takes the submitting student to submission details page" do
+        @user = @student
+        assign(:presenter, GradeSummaryPresenter.new(@course, @student, @student.id))
+        view_context
+        render "gradebooks/grade_summary"
+        expect(response).to have_tag("a[href='#{@submission_details_url}']")
+      end
+
+      it "takes the teacher to submission details page" do
+        @user = @teacher
+        assign(:presenter, GradeSummaryPresenter.new(@course, @teacher, @student.id))
+        view_context
+        render "gradebooks/grade_summary"
+        expect(response).to have_tag("a[href='#{@submission_details_url}']")
+      end
+
+      it "takes the admin to submission details page" do
+        @user = account_admin_user
+        assign(:presenter, GradeSummaryPresenter.new(@course, @user, @student.id))
+        view_context
+        render "gradebooks/grade_summary"
+        expect(response).to have_tag("a[href='#{@submission_details_url}']")
+      end
+
+      it "takes the site admin to submission details page" do
+        @user = site_admin_user
+        assign(:presenter, GradeSummaryPresenter.new(@course, @user, @student.id))
+        view_context
+        render "gradebooks/grade_summary"
+        expect(response).to have_tag("a[href='#{@submission_details_url}']")
+      end
+    end
+  end
+
+  describe "submission details link for anonymous moderated assignment" do
+    before do
+      course_with_teacher
+      student_in_course(active_all: true)
 
       @assignment = @course.assignments.create!(title: "Moderated Assignment", anonymous_grading: true)
       @assignment.ensure_post_policy(post_manually: true)
       @assignment.submit_homework @student, submission_type: "online_text_entry", body: "o hai"
       @assignment.grade_student(@student, score: 10, grader: @teacher)
 
+      @assignment_url = context_url(@course, :context_assignment_url, @assignment)
+      @speed_grader_url = speed_grader_course_gradebook_url({ course_id: @assignment.context_id, assignment_id: @assignment }.merge({ student_id: @student.id }))
       @submission_details_url = context_url(@course, :context_assignment_submission_url, @assignment, @student.id)
     end
 
-    context "when the assignment is anonymously graded" do
+    context "when the assignment enhancements flag is enabled" do
+      before do
+        @course.enable_feature!(:assignments_2_student)
+      end
+
+      it "takes the submitting student to A2 flow" do
+        @user = @student
+        assign(:presenter, GradeSummaryPresenter.new(@course, @student, @student.id))
+        view_context
+        render "gradebooks/grade_summary"
+        expect(response).to have_tag("a[href='#{@assignment_url}']")
+      end
+
+      it "is hidden for a teacher" do
+        @user = @teacher
+        assign(:presenter, GradeSummaryPresenter.new(@course, @teacher, @student.id))
+        view_context
+        render "gradebooks/grade_summary"
+        expect(response).not_to have_tag("a[href='#{@speed_grader_url}']")
+      end
+
+      it "is hidden for an admin" do
+        @user = account_admin_user
+        assign(:presenter, GradeSummaryPresenter.new(@course, @user, @student.id))
+        view_context
+        render "gradebooks/grade_summary"
+        expect(response).not_to have_tag("a[href='#{@speed_grader_url}']")
+      end
+
+      it "takes the site admin to Speedgrader link" do
+        @user = site_admin_user
+        assign(:presenter, GradeSummaryPresenter.new(@course, @user, @student.id))
+        view_context
+        render "gradebooks/grade_summary"
+        expect(response).to have_tag("a[href='#{@speed_grader_url}']")
+      end
+    end
+
+    context "when the assignment enhancements flag is disabled" do
       it "is shown for the submitting student" do
         @user = @student
         assign(:presenter, GradeSummaryPresenter.new(@course, @student, @student.id))
@@ -611,6 +749,113 @@ describe "/gradebooks/grade_summary" do
         course.assignments.create!
         render "gradebooks/grade_summary"
         expect(response).to have_tag("#grades_summary th.possible")
+      end
+    end
+  end
+
+  describe "visibility feedback student grades page" do
+    let(:course) { Course.create! }
+    let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
+    let(:student) { course.enroll_student(User.create!, active_all: true).user }
+    let(:assignment) { course.assignments.create!(peer_reviews: true) }
+    let(:submission) { assignment.submission_for_student(student) }
+
+    before do
+      view_context(course, student)
+      assign(:presenter, GradeSummaryPresenter.new(course, student, nil))
+    end
+
+    context "when the feature flag is enabled" do
+      before do
+        Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+      end
+
+      context "submission has unread comments" do
+        before do
+          submission.add_comment(author: teacher, comment: "hello")
+        end
+
+        it "displays the region surrounding the icon" do
+          render "gradebooks/grade_summary"
+          expect(response).to have_tag("#submission_#{submission.assignment_id} .visibility_feedback_ff .toggle_comments_link")
+        end
+
+        it "displays the number of comments" do
+          render "gradebooks/grade_summary"
+          expect(response).to have_tag("#submission_#{submission.assignment_id} .visibility_feedback_ff .comment_count")
+        end
+
+        it "displays the blue dot" do
+          render "gradebooks/grade_summary"
+          expect(response).to have_tag("#submission_#{submission.assignment_id} .visibility_feedback_ff .unread_comment_dot")
+        end
+      end
+
+      context "rubric comments" do
+        before do
+          rubric = rubric_model(
+            user: teacher,
+            context: course,
+            data: larger_rubric_data
+          )
+          assignment.create_rubric_association(
+            rubric: rubric,
+            purpose: "grading",
+            use_for_grading: true,
+            context: course
+          )
+        end
+
+        context "when rubric has comments" do
+          before do
+            assignment.rubric_association.assess(
+              assessor: teacher,
+              user: student,
+              artifact: submission,
+              assessment: {
+                assessment_type: "grading",
+                criterion_crit1: { points: 2, comments: "Hmm" }
+              }
+            )
+            student.reload
+          end
+
+          it "shows a blue dot" do
+            render "gradebooks/grade_summary"
+            expect(response).to have_tag("#submission_#{submission.assignment_id} .visibility_feedback_ff .unread_rubric_dot")
+          end
+        end
+
+        context "when rubric has no comment" do
+          before do
+            assignment.rubric_association.assess(
+              assessor: teacher,
+              user: student,
+              artifact: submission,
+              assessment: {
+                assessment_type: "grading",
+                criterion_crit1: { points: 2 }
+              }
+            )
+            student.reload
+          end
+
+          it "does not show a blue dot" do
+            render "gradebooks/grade_summary"
+            expect(response).not_to have_tag("#submission_#{submission.assignment_id} .visibility_feedback_ff .unread_rubric_dot")
+          end
+        end
+      end
+    end
+
+    context "when the feature flag is disabled" do
+      before do
+        Account.site_admin.disable_feature!(:visibility_feedback_student_grades_page)
+        submission.add_comment(author: teacher, comment: "hello")
+      end
+
+      it "does not have the visibility_feedback_ff class" do
+        expect(response).not_to have_tag("#submission_#{submission.assignment_id} .visibility_feedback_ff")
       end
     end
   end

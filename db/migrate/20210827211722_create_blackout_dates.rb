@@ -27,7 +27,7 @@ class CreateBlackoutDates < ActiveRecord::Migration[6.0]
       t.date :start_date, :end_date, null: false
       t.string :event_title, limit: 255, null: false
       t.timestamps
-      t.references :root_account, foreign_key: { to_table: "accounts" }, limit: 8, null: false, index: false
+      t.references :root_account, foreign_key: { to_table: "accounts" }, null: false, index: false
     end
     add_replica_identity "BlackoutDate", :root_account_id, 0
   end

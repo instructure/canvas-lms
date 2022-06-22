@@ -380,7 +380,7 @@ class ContextModulesController < ApplicationController
       all_tags = GuardRail.activate(:secondary) { @context.module_items_visible_to(@current_user).to_a }
       user_is_admin = @context.grants_right?(@current_user, session, :read_as_admin)
 
-      ActiveRecord::Associations::Preloader.new.preload(all_tags, :content)
+      ActiveRecord::Associations.preload(all_tags, :content)
 
       preload_assignments_and_quizzes(all_tags, user_is_admin)
 
@@ -774,7 +774,7 @@ class ContextModulesController < ApplicationController
 
     content_with_assignments = assignment_tags
                                .select { |ct| ct.content_type != "Assignment" && ct.content.assignment_id }.map(&:content)
-    ActiveRecord::Associations::Preloader.new.preload(content_with_assignments, :assignment) if content_with_assignments.any?
+    ActiveRecord::Associations.preload(content_with_assignments, :assignment) if content_with_assignments.any?
 
     if user_is_admin && should_preload_override_data?
       assignments = assignment_tags.filter_map(&:assignment)
@@ -785,7 +785,7 @@ class ContextModulesController < ApplicationController
       overrideables = (assignments + plain_quizzes).reject(&:has_too_many_overrides)
 
       if overrideables.any?
-        ActiveRecord::Associations::Preloader.new.preload(overrideables, :assignment_overrides)
+        ActiveRecord::Associations.preload(overrideables, :assignment_overrides)
         overrideables.each { |o| o.has_no_overrides = true if o.assignment_overrides.empty? }
       end
     end

@@ -511,6 +511,36 @@ describe Assignment do
         }.from(@teacher)
       end
     end
+
+    describe "mark_module_progressions_outdated" do
+      before :once do
+        @assignment = @course.assignments.create!(assignment_valid_attributes)
+        @module = @course.context_modules.create!(name: "a module")
+        @module.publish
+        tag = @module.add_item({ id: @assignment.id, type: "assignment" })
+        @module.completion_requirements = { tag.id => { type: "must_view" } }
+        @module.save!
+        @module.evaluate_for(@initial_student)
+      end
+
+      it "updates course's modules' progressions and associated users when dates are updated" do
+        progression = ContextModuleProgression.for_course(@course).for_user(@initial_student).first
+        expect(progression.current).to be_truthy
+        initial_timestamp = @initial_student.updated_at
+        @assignment.due_at = 5.days.from_now
+        @assignment.save!
+        expect(progression.reload.current).to be_falsey
+        expect(@initial_student.reload.updated_at > initial_timestamp).to be_truthy
+      end
+
+      it "does not update progressions if due date info is unchanged" do
+        progression = ContextModuleProgression.for_course(@course).for_user(@initial_student).first
+        expect(progression.current).to be_truthy
+        @assignment.title = "hello!"
+        @assignment.save!
+        expect(progression.reload.current).to be_truthy
+      end
+    end
   end
 
   describe "scope: expects_submissions" do

@@ -4133,24 +4133,54 @@ describe "Submissions API", type: :request do
     expect(json["message"]).to eq "invalid rubric_assessment"
   end
 
-  it "allows posting a comment on a submission" do
-    student = user_factory(active_all: true)
-    course_with_teacher(active_all: true)
-    @course.enroll_student(student).accept!
-    @assignment = @course.assignments.create!(title: "assignment1", grading_type: "points", points_possible: 12)
-    submit_homework(@assignment, student)
+  context "posting comments" do
+    before do
+      @student = user_factory(active_all: true)
+      course_with_teacher(active_all: true)
+      @course.enroll_student(@student).accept!
+      @assignment = @course.assignments.create!(title: "assignment1", grading_type: "points", points_possible: 12)
+      submit_homework(@assignment, @student)
+    end
 
-    json = api_call(:put,
-                    "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{student.id}.json",
-                    { controller: "submissions_api", action: "update",
-                      format: "json", course_id: @course.id.to_s,
-                      assignment_id: @assignment.id.to_s, user_id: student.id.to_s },
-                    { comment:                       { text_comment: "ohai!" } })
+    it "allows posting a comment on a submission" do
+      json = api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+        {
+          controller: "submissions_api",
+          action: "update",
+          format: "json",
+          course_id: @course.id.to_s,
+          assignment_id: @assignment.id.to_s,
+          user_id: @student.id.to_s
+        },
+        { comment: { text_comment: "ohai!" } }
+      )
 
-    expect(Submission.count).to eq 1
-    @submission = Submission.first
-    expect(json["submission_comments"].size).to eq 1
-    expect(json["submission_comments"].first["comment"]).to eq "ohai!"
+      expect(Submission.count).to eq 1
+      @submission = Submission.first
+      expect(json["submission_comments"].size).to eq 1
+      expect(json["submission_comments"].first["comment"]).to eq "ohai!"
+    end
+
+    it "allows a comment to be associated with a submission attempt" do
+      api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+        {
+          controller: "submissions_api",
+          action: "update",
+          format: "json",
+          course_id: @course.id.to_s,
+          assignment_id: @assignment.id.to_s,
+          user_id: @student.id.to_s
+        },
+        { comment: { text_comment: "ohai!", attempt: 1 } }
+      )
+
+      comment = SubmissionComment.find_by(author: @teacher, comment: "ohai!")
+      expect(comment.attempt).to eq 1
+    end
   end
 
   it "allows posting a group comment on a submission" do

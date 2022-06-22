@@ -73,21 +73,32 @@ module TextHelper
   # more precise than distance_of_time_in_words, and takes a number of seconds,
   # rather than two times. also assumes durations on the scale of hours or
   # less, so doesn't bother with days, months, or years
-  def readable_duration(seconds)
-    # keys stolen from ActionView::Helpers::DateHelper#distance_of_time_in_words
-    case seconds
-    when  0...60
-      I18n.t("datetime.distance_in_words.x_seconds",
-             { one: "1 second", other: "%{count} seconds" },
-             count: seconds.round)
-    when 60...3600
-      I18n.t("datetime.distance_in_words.x_minutes",
-             { one: "1 minute", other: "%{count} minutes" },
-             count: (seconds / 60.0).round)
+  def readable_duration(total_seconds)
+    hours, remainder = total_seconds.divmod(3600)
+    minutes = remainder.div(60)
+
+    if hours >= 1 && minutes.zero?
+      I18n.t(
+        { one: "1 hour", other: "%{count} hours" },
+        count: hours
+      )
+    elsif hours > 1
+      I18n.t(
+        { one: "%{hours} hours and 1 minute", other: "%{hours} hours and %{count} minutes" },
+        hours: hours, count: minutes
+      )
+    elsif hours == 1
+      I18n.t(
+        { one: "1 hour and 1 minute", other: "1 hour and %{count} minutes" },
+        count: minutes
+      )
+    elsif minutes >= 1
+      I18n.t(
+        { one: "1 minute", other: "%{count} minutes" },
+        count: minutes
+      )
     else
-      I18n.t("datetime.distance_in_words.about_x_hours",
-             { one: "about 1 hour", other: "about %{count} hours" },
-             count: (seconds / 3600.0).round)
+      I18n.t("less than a minute")
     end
   end
 

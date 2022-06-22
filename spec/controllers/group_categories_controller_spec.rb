@@ -345,7 +345,7 @@ describe GroupCategoriesController do
       post "import", params: {
         course_id: @course.id,
         group_category_id: @category.id,
-        attachment: fixture_file_upload("files/group_categories/test_group_categories.csv", "text/csv")
+        attachment: fixture_file_upload("group_categories/test_group_categories.csv", "text/csv")
       }
       assert_unauthorized
     end
@@ -355,7 +355,7 @@ describe GroupCategoriesController do
       post "import", params: {
         course_id: @course.id,
         group_category_id: @category.id,
-        attachment: fixture_file_upload("files/group_categories/test_group_categories.csv", "text/csv")
+        attachment: fixture_file_upload("group_categories/test_group_categories.csv", "text/csv")
       }
       expect(response).to be_successful
       json = JSON.parse(response.body)
@@ -370,7 +370,7 @@ describe GroupCategoriesController do
       post "import", params: {
         course_id: @course.id,
         group_category_id: @category.id,
-        attachment: fixture_file_upload("files/group_categories/test_group_categories.csv", "text/csv")
+        attachment: fixture_file_upload("group_categories/test_group_categories.csv", "text/csv")
       }
       expect(response).to be_successful
       json = JSON.parse(response.body)
@@ -390,7 +390,7 @@ describe GroupCategoriesController do
       post "import", params: {
         course_id: @course.id,
         group_category_id: @category.id,
-        attachment: fixture_file_upload("files/group_categories/test_group_categories.csv", "text/csv")
+        attachment: fixture_file_upload("group_categories/test_group_categories.csv", "text/csv")
       }
       assert_unauthorized
     end
@@ -400,7 +400,7 @@ describe GroupCategoriesController do
       post "import", params: {
         course_id: @course.id,
         group_category_id: @category.id,
-        attachment: fixture_file_upload("files/group_categories/test_group_categories.csv", "text/csv")
+        attachment: fixture_file_upload("group_categories/test_group_categories.csv", "text/csv")
       }
       expect(response).to be_successful
 

@@ -19,10 +19,11 @@ import $ from 'jquery'
 import {View} from '@canvas/backbone'
 import CollectionView from '@canvas/backbone-collection-view'
 import GroupCategoryView from './GroupCategoryView'
-import GroupCategoryCreateView from '@canvas/groups/backbone/views/GroupCategoryCreateView.coffee'
 import GroupCategory from '@canvas/groups/backbone/models/GroupCategory.coffee'
 import groupCategoriesTemplate from '../../jst/groupCategories.handlebars'
 import tabTemplate from '../../jst/groupCategoryTab.handlebars'
+import awaitElement from '@canvas/await-element'
+import {renderCreateDialog} from '@canvas/groups/react/CreateOrEditSetModal'
 import 'jqueryui/tabs'
 
 export default class GroupCategoriesView extends CollectionView {
@@ -100,10 +101,11 @@ export default class GroupCategoriesView extends CollectionView {
   }
 
   loadTabFromUrl() {
-    if (location.hash === '#new') {
+    if (window.location.hash === '#new' && !this.pendingCreation) {
       return this.addGroupSet()
     } else {
-      const id = location.hash.split('-')[1]
+      this.pendingCreation = false
+      const id = window.location.hash.split('-')[1]
       if (id != null) {
         const model = this.collection.get(id)
         if (model) {
@@ -158,25 +160,20 @@ export default class GroupCategoriesView extends CollectionView {
     return this.refreshTabs()
   }
 
-  addGroupSet(e) {
-    if (e != null) e.preventDefault()
-    if (this.createView == null) {
-      this.createView = new GroupCategoryCreateView({
-        collection: this.collection,
-        trigger: this.$addGroupSetButton
-      })
-    }
-    const cat = new GroupCategory()
-    cat.once('sync', () => {
-      window.location.hash = `tab-${cat.id}`
+  async addGroupSet(e) {
+    e?.preventDefault?.()
+    this.pendingCreation = true
+    const mountPoint = await awaitElement('create-group-set-modal-mountpoint')
+    const createResult = await renderCreateDialog(mountPoint)
+    if (createResult) {
+      const cat = new GroupCategory()
+      cat.set(createResult)
       this.collection.add(cat)
+      window.location.hash = `tab-${createResult.id}`
       this.reorder()
       this.refreshTabs()
       this.$tabs.tabs({active: this.tabOffsetOfModel(cat)})
-      return cat.set('create_group_count', null)
-    })
-    this.createView.model = cat
-    return this.createView.open()
+    }
   }
 
   activatedTab(event, ui) {

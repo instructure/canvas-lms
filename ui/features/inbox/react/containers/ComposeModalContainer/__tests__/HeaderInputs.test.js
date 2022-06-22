@@ -18,7 +18,7 @@
 
 import {Course} from '../../../../graphql/Course'
 import {Enrollment} from '../../../../graphql/Enrollment'
-import {fireEvent, render, screen} from '@testing-library/react'
+import {act, fireEvent, render, screen} from '@testing-library/react'
 import {Group} from '../../../../graphql/Group'
 import HeaderInputs from '../HeaderInputs'
 import {responsiveQuerySizes} from '../../../../util/utils'
@@ -238,11 +238,14 @@ describe('HeaderInputs', () => {
   })
 
   it('calls onSelectedIdsChange when using the Address Book component', async () => {
+    jest.useFakeTimers()
     const props = defaultProps({addressBookContainerOpen: true})
     const container = setup(props)
     const input = await container.findByTestId('address-book-input')
     fireEvent.change(input, {target: {value: 'Fred'}})
 
+    // for debouncing
+    act(() => jest.advanceTimersByTime(1000))
     const items = await screen.findAllByTestId('address-book-item')
     fireEvent.mouseDown(items[1])
 

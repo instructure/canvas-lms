@@ -324,7 +324,7 @@ describe Rubric do
     expect(r3.title).to eql "rubric"
   end
 
-  context "#update_with_association group 1" do
+  describe "#update_with_association group 1" do
     before :once do
       course_with_teacher
       assignment_model(points_possible: 20)
@@ -705,10 +705,11 @@ describe Rubric do
         (opts[:association_count] || 1).times do
           assignment = assignment_model(course: @course)
           association = rubric_association_model(**opts, rubric: rubric, association_object: assignment, purpose: "grading")
+
+          if attributes.include? :assessed
+            rubric_assessment_model(**opts, rubric: rubric, rubric_association: association)
+          end
         end
-      end
-      if attributes.include? :assessed
-        rubric_assessment_model(**opts, rubric: rubric, rubric_association: association)
       end
 
       rubric
@@ -809,6 +810,13 @@ describe Rubric do
           aligned_associated_once
         )
         expect(Rubric.with_at_most_one_association.unassessed.aligned_to_outcomes).to contain_exactly(aligned_not_associated, aligned_associated_once)
+        expect(Rubric.unassessed_and_with_at_most_one_association).to contain_exactly(
+          not_associated,
+          associated_once,
+          aligned_not_associated,
+          aligned_associated_once
+        )
+        expect(Rubric.unassessed_and_with_at_most_one_association.aligned_to_outcomes).to contain_exactly(aligned_not_associated, aligned_associated_once)
       end
 
       it "works for rubrics with multiple alignments" do

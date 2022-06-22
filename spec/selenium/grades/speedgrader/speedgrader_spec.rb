@@ -396,6 +396,32 @@ describe "Speedgrader" do
         expect(f('tr[data-testid="rubric-criterion"]:nth-of-type(2) .rating-tier.selected')).to include_text("0 pts")
       end
     end
+
+    context "submission status" do
+      before do
+        Account.site_admin.enable_feature!(:edit_submission_status_from_speedgrader)
+        assignment = @course.assignments.create!(points_possible: 20)
+        @submission = assignment.submissions.find_by!(user: @students[0])
+        @submission.update!(late_policy_status: "missing")
+        @submission = assignment.submissions.find_by!(user: @students[1])
+        @submission.update!(late_policy_status: "extended")
+        @submission = assignment.submissions.find_by!(user: @students[2])
+        @submission.update!(late_policy_status: "late")
+        assignment.grade_student(@students[3], grader: @teacher, excused: true)
+        user_session(@teacher)
+        Speedgrader.visit(@course.id, assignment.id)
+      end
+
+      it "displays correct missing status pill for each student submission" do
+        expect(f(".submission-missing-pill")).to be_displayed
+        Speedgrader.click_next_student_btn
+        expect(f(".submission-extended-pill")).to be_displayed
+        Speedgrader.click_next_student_btn
+        expect(f(".submission-late-pill")).to be_displayed
+        Speedgrader.click_next_student_btn
+        expect(f(".submission-excused-pill")).to be_displayed
+      end
+    end
   end
 
   context "reassigning" do

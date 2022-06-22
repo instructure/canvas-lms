@@ -39,13 +39,13 @@ module Canvas::Builders
       preload_state(enrollments)
 
       courses_loaded = enrollments.first.association(:course).loaded?
-      ActiveRecord::Associations::Preloader.new.preload(enrollments, :course) unless courses_loaded
+      ActiveRecord::Associations.preload(enrollments, :course) unless courses_loaded
 
       to_preload = use_cache ? enrollments.reject { |e| fetch(e) } : enrollments
       return if to_preload.empty?
 
-      ActiveRecord::Associations::Preloader.new.preload(to_preload, :course_section)
-      ActiveRecord::Associations::Preloader.new.preload(to_preload.map(&:course).uniq, :enrollment_term)
+      ActiveRecord::Associations.preload(to_preload, :course_section)
+      ActiveRecord::Associations.preload(to_preload.map(&:course).uniq, :enrollment_term)
       to_preload.each { |e| build(e, use_cache) }
     end
 
@@ -54,7 +54,7 @@ module Canvas::Builders
       return if enrollments.empty?
 
       unless enrollments.first.association(:enrollment_state).loaded?
-        ActiveRecord::Associations::Preloader.new.preload(enrollments, :enrollment_state)
+        ActiveRecord::Associations.preload(enrollments, :enrollment_state)
       end
     end
 

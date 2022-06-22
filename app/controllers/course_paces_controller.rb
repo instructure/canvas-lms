@@ -255,7 +255,9 @@ class CoursePacesController < ApplicationController
   end
 
   def update_params
-    params.require(:course_pace).permit(
+    @permitted_params = params.require(:course_pace).permit(
+      :context_id,
+      :context_type,
       :course_section_id,
       :user_id,
       :end_date,
@@ -264,10 +266,14 @@ class CoursePacesController < ApplicationController
       :workflow_state,
       course_pace_module_items_attributes: %i[id duration module_item_id root_account_id]
     )
+    set_context_ids
+    @permitted_params
   end
 
   def create_params
-    params.require(:course_pace).permit(
+    @permitted_params = params.require(:course_pace).permit(
+      :context_id,
+      :context_type,
       :course_id,
       :course_section_id,
       :user_id,
@@ -277,6 +283,20 @@ class CoursePacesController < ApplicationController
       :workflow_state,
       course_pace_module_items_attributes: %i[duration module_item_id root_account_id]
     )
+    set_context_ids
+    @permitted_params
+  end
+
+  # Converts the context_id and context_type params to the database column required for that context
+  def set_context_ids
+    return unless @permitted_params[:context_id].present? && @permitted_params[:context_type].present?
+
+    if @permitted_params[:context_type] == "Section"
+      @permitted_params[:course_section_id] = @permitted_params[:context_id]
+    elsif @permitted_params[:context_type] == "User"
+      @permitted_params[:user_id] = @permitted_params[:context_id]
+    end
+    @permitted_params = @permitted_params.except(:context_id, :context_type)
   end
 
   def publish_course_pace

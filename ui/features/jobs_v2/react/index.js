@@ -286,7 +286,11 @@ export default function JobsIndex() {
           />
         </Flex.Item>
       </Flex>
-      <JobDetails job={state.job} timeZone={state.time_zone} />
+      <JobDetails
+        job={state.job}
+        timeZone={state.time_zone}
+        onRequeue={() => dispatch({type: 'REFRESH_JOBS'})}
+      />
     </>
   )
 }

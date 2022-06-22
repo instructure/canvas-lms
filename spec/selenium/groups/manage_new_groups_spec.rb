@@ -34,18 +34,18 @@ describe "manage groups" do
         get "/courses/#{@course.id}/groups"
 
         f("#add-group-set").click
-        set_value f("#new_category_name"), "zomg"
-        f("[name=split_groups]").click
-        driver.execute_script("$('[name=create_group_count]:enabled').val(2)")
-        submit_form f(".group-category-create")
+        replace_and_proceed f("#new-group-set-name"), "zomg"
+        fxpath("//input[@data-testid='radio-button-split-groups']/..").click
+        replace_and_proceed f("#textinput-create-groups-count"), "2"
+        f(%(button[data-testid="group-set-save"])).click
 
-        wait_for_ajaximations
+        wait_for_ajax_requests
+        run_jobs
+        wait_for(method: nil, timeout: 3) { f("#group_categories_tabs .collectionViewItems").displayed? }
 
         # yay, added
         expect(f("#group_categories_tabs .collectionViewItems").text).to include("Everyone")
         expect(f("#group_categories_tabs .collectionViewItems").text).to include("zomg")
-
-        run_jobs
 
         groups = ff(".collectionViewItems > .group")
         expect(groups.size).to eq 2
@@ -62,8 +62,8 @@ describe "manage groups" do
 
       f("#add-group-set").click
       wait_for_animations
-      f("#new_category_name").send_keys("Group Set 1")
-      f("form.group-category-create").submit
+      replace_and_proceed f("#new-group-set-name"), "Group Set 1"
+      f(%(button[data-testid="group-set-save"])).click
       wait_for_ajaximations
 
       # verify the group set tab is created

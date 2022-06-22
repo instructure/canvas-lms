@@ -113,6 +113,53 @@ describe "conversations new" do
         expect(messages[0].text).not_to include @s[0].name.to_s
         expect(messages[0].text).not_to include @s[2].name.to_s
       end
+
+      it "archives and unarchives a conversation via conversation header menu" do
+        get "/conversations"
+        f("div[data-testid='conversation']").click
+        wait_for_ajaximations
+        f("button[data-testid='more-options']").click
+        fj("li:contains('Archive')").click
+        driver.switch_to.alert.accept
+        wait_for_ajaximations
+        expect(f("body")).not_to contain_jqcss "div[data-testid='conversation']"
+
+        f("input[title='Inbox']").click
+        fj("li:contains('Archived')").click
+        f("div[data-testid='conversation']").click
+        wait_for_ajaximations
+        f("button[data-testid='more-options']").click
+        fj("li:contains('Unarchive')").click
+        driver.switch_to.alert.accept
+        wait_for_ajaximations
+        expect(f("body")).not_to contain_jqcss "div[data-testid='conversation']"
+      end
+
+      it "does not have archive options button when in sent scope" do
+        get "/conversations#filter=type=sent"
+        f("div[data-testid='conversation']").click
+        expect(f("button[data-testid='archive']")).to be_disabled
+        f("button[data-testid='more-options']").click
+        expect(f("body")).not_to contain_jqcss("li:contains('Archive')")
+      end
+
+      it "stars and unstars a conversation via conversation header menu" do
+        get "/conversations"
+        f("div[data-testid='conversation']").click
+        wait_for_ajaximations
+        expect(f("button[data-testid='visible-not-starred']")).to be_present
+
+        f("button[data-testid='more-options']").click
+        fj("li:contains('Star')").click
+        wait_for_ajaximations
+        expect(f("button[data-testid='visible-starred']")).to be_present
+
+        f("button[data-testid='more-options']").click
+        fj("li:contains('Unstar')").click
+        wait_for_ajaximations
+        # verify that convo is unastarred by making sure button is no present
+        expect(f("body")).not_to contain_jqcss("button[data-testid*='starred']")
+      end
     end
   end
 

@@ -53,6 +53,15 @@ module AssignmentsHelper
     link_to text, href, options
   end
 
+  def student_peer_review_url_in_a2_for(context, assignment, assessment)
+    query_params = if assignment.anonymous_peer_reviews?
+                     { anonymous_asset_id: assessment.asset.anonymous_id }
+                   else
+                     { reviewee_id: assessment.asset.user_id }
+                   end
+    context_url(context, :context_assignment_url, { id: assignment.id }.merge(query_params))
+  end
+
   def due_at(assignment, user)
     if assignment.multiple_due_dates_apply_to?(user)
       multiple_due_dates

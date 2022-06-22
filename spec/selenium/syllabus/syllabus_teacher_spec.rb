@@ -41,6 +41,28 @@ describe "course syllabus" do
       user_session @teacher1
     end
 
+    context "immersive reader button" do
+      it "contains a button for immersive reader when enabled" do
+        @teacher1.enable_feature!(:user_immersive_reader_wiki_pages)
+        Account.site_admin.enable_feature!(:more_immersive_reader)
+
+        visit_syllabus_page(@course1.id)
+        wait_for_dom_ready
+
+        expect(immersive_reader_btn).to be_displayed
+      end
+
+      it "does not contain a button for immersive reader when disabled" do
+        @teacher1.disable_feature!(:user_immersive_reader_wiki_pages)
+        Account.site_admin.disable_feature!(:more_immersive_reader)
+
+        visit_syllabus_page(@course1.id)
+        wait_for_dom_ready
+
+        expect(page_main_content).not_to contain_css(immersive_reader_css)
+      end
+    end
+
     it "shows course-summary-option checkbox that is pre-checked" do
       visit_syllabus_page(@course1.id)
 

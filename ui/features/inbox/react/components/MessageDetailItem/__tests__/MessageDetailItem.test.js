@@ -85,6 +85,30 @@ describe('MessageDetailItem', () => {
     expect(getByText('attachment1.jpeg')).toBeInTheDocument()
   })
 
+  it('does not render the reply or reply all options when function is not provided', () => {
+    const props = {
+      conversationMessage: {
+        author: {name: 'Tom Thompson'},
+        recipients: [{name: 'Tom Thompson'}, {name: 'Billy Harris'}],
+        createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
+        body: 'This is the body text for the message.'
+      },
+      contextName: 'Fake Course 1',
+      onReply: null,
+      onReplyAll: null
+    }
+
+    const {getByRole, queryByText, queryByTestId} = render(<MessageDetailItem {...props} />)
+
+    const moreOptionsButton = getByRole(
+      (role, element) => role === 'button' && element.textContent === 'More options'
+    )
+
+    fireEvent.click(moreOptionsButton)
+    expect(queryByText('Reply All')).not.toBeInTheDocument()
+    expect(queryByTestId('message-reply')).not.toBeInTheDocument()
+  })
+
   it('sends the selected option to the provided callback function', () => {
     const props = {
       conversationMessage: {

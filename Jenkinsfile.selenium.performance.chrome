@@ -115,7 +115,7 @@ pipeline {
       script {
         try {
           // [JIRA CCI-168]: need to handle canvas container never being spun up
-          sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ ./tmp canvas_ --clean-dir'
+          sh "rm -rf tmp && mkdir -p tmp/ && docker cp test-queue_canvas_1:/usr/src/app/log/spec_failures tmp/ || true"
           script {
             def htmlFiles
             // find all results files

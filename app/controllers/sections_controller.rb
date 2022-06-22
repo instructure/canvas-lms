@@ -96,7 +96,7 @@ class SectionsController < ApplicationController
   # @API List course sections
   # A paginated list of the list of sections for this course.
   #
-  # @argument include[] [String, "students"|"avatar_url"|"enrollments"|"total_students"|"passback_status"]
+  # @argument include[] [String, "students"|"avatar_url"|"enrollments"|"total_students"|"passback_status"|"permissions"]
   #   - "students": Associations to include with the group. Note: this is only
   #     available if you have permission to view users or grades in the course
   #   - "avatar_url": Include the avatar URLs for students returned.
@@ -105,6 +105,8 @@ class SectionsController < ApplicationController
   #   - "total_students": Returns the total amount of active and invited students
   #     for the course section
   #   - "passback_status": Include the grade passback status.
+  #   - "permissions": Include whether section grants :manage_calendar permission
+  #     to the caller
   #
   # @returns [Section]
   def index
@@ -300,7 +302,7 @@ class SectionsController < ApplicationController
   # @API Get section information
   # Gets details about a specific section
   #
-  # @argument include[] [String, "students"|"avatar_url"|"enrollments"|"total_students"|"passback_status"]
+  # @argument include[] [String, "students"|"avatar_url"|"enrollments"|"total_students"|"passback_status"|"permissions"]
   #   - "students": Associations to include with the group. Note: this is only
   #     available if you have permission to view users or grades in the course
   #   - "avatar_url": Include the avatar URLs for students returned.
@@ -309,6 +311,8 @@ class SectionsController < ApplicationController
   #   - "total_students": Returns the total amount of active and invited students
   #     for the course section
   #   - "passback_status": Include the grade passback status.
+  #   - "permissions": Include whether section grants :manage_calendar permission
+  #     to the caller
   #
   # @returns Section
   def show

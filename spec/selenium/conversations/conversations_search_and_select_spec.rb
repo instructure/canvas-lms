@@ -114,6 +114,22 @@ describe "conversations index page" do
         # change this to 3 when VICE-2801 is fixed
         expect(ff("[data-testid='conversation']").count).to eq 2
       end
+
+      it "unarchives multiple conversations using shift+click" do
+        2.times do |i|
+          conversation(@teacher, @s1, @s2, workflow_state: "archived", body: "archived #{i}")
+        end
+        get "/conversations"
+        f("input[title='Inbox']").click
+        fj("li:contains('Archived')").click
+        convos = ff("[data-testid='conversation']")
+        convos[0].click
+        driver.action.key_down(:shift).move_to(convos[1]).click.key_up(:shift).perform
+        f("[data-testid='unarchive']").click
+        driver.switch_to.alert.accept
+        wait_for_ajaximations
+        expect(f("body")).not_to contain_jqcss "div[data-testid='conversation']"
+      end
     end
   end
 

@@ -22,7 +22,7 @@ class CreateCspDomains < ActiveRecord::Migration[5.1]
 
   def change
     create_table :csp_domains do |t|
-      t.references :account, limit: 8, null: false, foreign_key: true, index: false
+      t.references :account, null: false, foreign_key: true, index: false
       t.string :domain, null: false, limit: 255
       t.string :workflow_state, null: false, limit: 255
       t.timestamps null: false

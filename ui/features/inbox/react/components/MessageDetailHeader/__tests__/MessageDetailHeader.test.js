@@ -62,6 +62,21 @@ describe('MessageDetailHeader', () => {
     expect(queryByTestId('message-more-options')).not.toBeInTheDocument()
   })
 
+  it('does not render the forward or reply all options when function is not provided', () => {
+    const props = {text: 'Message Header Text'}
+    props.onReplyAll = null
+    props.onForward = null
+
+    const {getByRole, queryByText, queryByTestId} = render(<MessageDetailHeader {...props} />)
+    const moreOptionsButton = getByRole(
+      (role, element) => role === 'button' && element.textContent === 'More options'
+    )
+
+    fireEvent.click(moreOptionsButton)
+    expect(queryByText('Reply All')).not.toBeInTheDocument()
+    expect(queryByTestId('message-detail-header-reply-btn')).not.toBeInTheDocument()
+  })
+
   describe('sends the selected option to the provided callback function', () => {
     const props = {
       text: 'Button Test'
@@ -114,6 +129,54 @@ describe('MessageDetailHeader', () => {
 
       expect(props.onForward).toHaveBeenCalled()
       expect(props.onForward.mock.calls[0][0]).toBe(undefined)
+    })
+
+    it('sends the selected option to the onStar callback function', () => {
+      props.onStar = jest.fn()
+      const {getByRole, getByText} = render(<MessageDetailHeader {...props} />)
+      const moreOptionsButton = getByRole(
+        (role, element) => role === 'button' && element.textContent === 'More options'
+      )
+      fireEvent.click(moreOptionsButton)
+      fireEvent.click(getByText('Star'))
+
+      expect(props.onStar).toHaveBeenCalled()
+    })
+
+    it('sends the selected option to the onUnstar callback function', () => {
+      props.onUnstar = jest.fn()
+      const {getByRole, getByText} = render(<MessageDetailHeader {...props} />)
+      const moreOptionsButton = getByRole(
+        (role, element) => role === 'button' && element.textContent === 'More options'
+      )
+      fireEvent.click(moreOptionsButton)
+      fireEvent.click(getByText('Unstar'))
+
+      expect(props.onUnstar).toHaveBeenCalled()
+    })
+
+    it('sends the selected option to the onArchive callback function', () => {
+      props.onArchive = jest.fn()
+      const {getByRole, getByText} = render(<MessageDetailHeader {...props} />)
+      const moreOptionsButton = getByRole(
+        (role, element) => role === 'button' && element.textContent === 'More options'
+      )
+      fireEvent.click(moreOptionsButton)
+      fireEvent.click(getByText('Archive'))
+
+      expect(props.onArchive).toHaveBeenCalled()
+    })
+
+    it('sends the selected option to the onUnarchive callback function', () => {
+      props.onUnarchive = jest.fn()
+      const {getByRole, getByText} = render(<MessageDetailHeader {...props} />)
+      const moreOptionsButton = getByRole(
+        (role, element) => role === 'button' && element.textContent === 'More options'
+      )
+      fireEvent.click(moreOptionsButton)
+      fireEvent.click(getByText('Unarchive'))
+
+      expect(props.onUnarchive).toHaveBeenCalled()
     })
   })
 

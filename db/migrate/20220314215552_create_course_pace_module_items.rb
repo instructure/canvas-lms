@@ -26,7 +26,7 @@ class CreateCoursePaceModuleItems < ActiveRecord::Migration[6.0]
       t.belongs_to :course_pace, foreign_key: true, index: true
       t.integer :duration, null: false, default: 0
       t.references :module_item, foreign_key: { to_table: :content_tags }
-      t.references :root_account, foreign_key: { to_table: :accounts }, limit: 8, null: false, index: false
+      t.references :root_account, foreign_key: { to_table: :accounts }, null: false, index: false
       t.timestamps
     end
 

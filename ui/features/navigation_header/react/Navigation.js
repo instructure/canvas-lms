@@ -32,12 +32,40 @@ import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
 
 const I18n = useI18nScope('Navigation')
 
-const CoursesTray = React.lazy(() => import('./trays/CoursesTray'))
-const GroupsTray = React.lazy(() => import('./trays/GroupsTray'))
-const AccountsTray = React.lazy(() => import('./trays/AccountsTray'))
-const ProfileTray = React.lazy(() => import('./trays/ProfileTray'))
-const HistoryTray = React.lazy(() => import('./trays/HistoryTray'))
-const HelpTray = React.lazy(() => import('./trays/HelpTray'))
+const CoursesTray = React.lazy(() =>
+  import(
+    /* webpackChunkName: "[request]" */
+    './trays/CoursesTray'
+  )
+)
+const GroupsTray = React.lazy(() =>
+  import(/* webpackChunkName: "[request]" */ './trays/GroupsTray')
+)
+
+const AccountsTray = React.lazy(() =>
+  import(
+    /* webpackChunkName: "[request]" */
+    './trays/AccountsTray'
+  )
+)
+const ProfileTray = React.lazy(() =>
+  import(
+    /* webpackChunkName: "[request]" */
+    './trays/ProfileTray'
+  )
+)
+const HistoryTray = React.lazy(() =>
+  import(
+    /* webpackChunkName: "[request]" */
+    './trays/HistoryTray'
+  )
+)
+const HelpTray = React.lazy(() =>
+  import(
+    /* webpackChunkName: "[request]" */
+    './trays/HelpTray'
+  )
+)
 
 const EXTERNAL_TOOLS_REGEX = /^\/accounts\/[^\/]*\/(external_tools)/
 const ACTIVE_ROUTE_REGEX =

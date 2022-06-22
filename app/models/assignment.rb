@@ -593,6 +593,7 @@ class Assignment < ActiveRecord::Base
 
   after_save  :start_canvadocs_render, if: :saved_change_to_annotatable_attachment_id?
   after_save  :update_due_date_smart_alerts, if: :update_cached_due_dates?
+  after_save  :mark_module_progressions_outdated, if: :update_cached_due_dates?
 
   after_commit :schedule_do_auto_peer_review_job_if_automatic_peer_review
 
@@ -1592,13 +1593,13 @@ class Assignment < ActiveRecord::Base
         :context_module_tags
       end
 
-    ActiveRecord::Associations::Preloader.new.preload(assignments, [
-                                                        module_tags_include,
-                                                        :context, # necessary while wiki_page assignments behind feature flag
-                                                        { discussion_topic: :context_module_tags },
-                                                        { wiki_page: :context_module_tags },
-                                                        { quiz: :context_module_tags }
-                                                      ])
+    ActiveRecord::Associations.preload(assignments, [
+                                         module_tags_include,
+                                         :context, # necessary while wiki_page assignments behind feature flag
+                                         { discussion_topic: :context_module_tags },
+                                         { wiki_page: :context_module_tags },
+                                         { quiz: :context_module_tags }
+                                       ])
   end
 
   def self.preload_unposted_anonymous_submissions(assignments)
@@ -2916,7 +2917,7 @@ class Assignment < ActiveRecord::Base
     from("(SELECT s.cached_due_date AS user_due_date, a.*
           FROM #{Assignment.quoted_table_name} a
           INNER JOIN #{Submission.quoted_table_name} AS s ON s.assignment_id = a.id
-          WHERE s.user_id = #{User.connection.quote(user)} AND s.workflow_state <> 'deleted') AS assignments")
+          WHERE s.user_id = #{User.connection.quote(user.id_for_database)} AND s.workflow_state <> 'deleted') AS assignments")
   }
 
   scope :with_latest_due_date, lambda {
@@ -3986,5 +3987,11 @@ class Assignment < ActiveRecord::Base
     provisional_grades.each_with_object({}) do |provisional_grade, hash|
       hash[provisional_grade.id] = active_user_ids.include?(provisional_grade.scorer_id)
     end
+  end
+
+  def mark_module_progressions_outdated
+    progressions = ContextModuleProgression.for_course(context).where(current: true)
+    progressions.update_all(current: false)
+    User.where(id: progressions.pluck(:user_id)).touch_all
   end
 end

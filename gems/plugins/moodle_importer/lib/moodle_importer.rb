@@ -19,5 +19,5 @@
 
 require "moodle_importer/engine"
 
-module Moodle
+module MoodleImporter
 end

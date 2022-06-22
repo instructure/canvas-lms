@@ -26,7 +26,7 @@ import {NoSelectedConversation} from '../components/NoSelectedConversation/NoSel
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {useMutation} from 'react-apollo'
-import {DELETE_CONVERSATIONS} from '../../graphql/Mutations'
+import {DELETE_CONVERSATIONS, UPDATE_CONVERSATION_PARTICIPANTS} from '../../graphql/Mutations'
 import {CONVERSATIONS_QUERY} from '../../graphql/Queries'
 import {decodeQueryString} from 'query-string-encoding'
 import {responsiveQuerySizes} from '../../util/utils'
@@ -49,6 +49,7 @@ const CanvasInbox = () => {
   const [composeModal, setComposeModal] = useState(false)
   const [deleteDisabled, setDeleteDisabled] = useState(true)
   const [archiveDisabled, setArchiveDisabled] = useState(true)
+  const [canReply, setCanReply] = useState(true)
   const [isReply, setIsReply] = useState(false)
   const [isReplyAll, setIsReplyAll] = useState(false)
   const [isForward, setIsForward] = useState(false)
@@ -156,6 +157,127 @@ const CanvasInbox = () => {
     }
   }
 
+  const removeOutOfScopeConversationsFromCache = (cache, result) => {
+    if (result.data.updateConversationParticipants.errors) {
+      return
+    }
+
+    const conversationsFromCache = JSON.parse(
+      JSON.stringify(cache.readQuery(conversationsQueryOption))
+    )
+    const conversationParticipantIDsFromResult =
+      result.data.updateConversationParticipants.conversationParticipants.map(cp => cp._id)
+
+    const updatedCPs = conversationsFromCache.legacyNode.conversationsConnection.nodes.filter(
+      conversationParticipant =>
+        !conversationParticipantIDsFromResult.includes(conversationParticipant._id)
+    )
+    conversationsFromCache.legacyNode.conversationsConnection.nodes = updatedCPs
+    cache.writeQuery({...conversationsQueryOption, data: conversationsFromCache})
+  }
+
+  const handleArchive = () => {
+    const archiveConfirmMsg = I18n.t(
+      {
+        one: 'Are you sure you want to archive your copy of this conversation?',
+        other: 'Are you sure you want to archive your copy of these conversations?'
+      },
+      {count: selectedConversations.length}
+    )
+
+    const confirmResult = window.confirm(archiveConfirmMsg) // eslint-disable-line no-alert
+    if (confirmResult) {
+      archiveConversationParticipants({
+        variables: {
+          conversationIds: selectedConversations.map(convo => convo._id),
+          workflowState: 'archived'
+        }
+      })
+    } else {
+      // confirm message was cancelled by user
+      setArchiveDisabled(false)
+    }
+  }
+
+  const handleUnarchive = () => {
+    const unarchiveConfirmMsg = I18n.t(
+      {
+        one: 'Are you sure you want to unarchive your copy of this conversation?',
+        other: 'Are you sure you want to unarchive your copy of these conversations?'
+      },
+      {count: selectedConversations.length}
+    )
+
+    const confirmResult = window.confirm(unarchiveConfirmMsg) // eslint-disable-line no-alert
+    if (confirmResult) {
+      unarchiveConversationParticipants({
+        variables: {
+          conversationIds: selectedConversations.map(convo => convo._id),
+          workflowState: 'read'
+        }
+      })
+    } else {
+      // confirm message was cancelled by user
+      setArchiveDisabled(false)
+    }
+  }
+
+  const handleArchiveComplete = data => {
+    const archiveSuccessMsg = I18n.t(
+      {
+        one: 'Message Archived!',
+        other: 'Messages Archived!'
+      },
+      {count: selectedConversations.length}
+    )
+    if (data.updateConversationParticipants.errors) {
+      setArchiveDisabled(false)
+      setOnFailure(I18n.t('Archive operation failed'))
+    } else {
+      setArchiveDisabled(true)
+      removeFromSelectedConversations(selectedConversations)
+      setOnSuccess(archiveSuccessMsg) // screenReaderOnly
+    }
+  }
+
+  const handleUnarchiveComplete = data => {
+    const unarchiveSuccessMsg = I18n.t(
+      {
+        one: 'Message Unarchived!',
+        other: 'Messages Unarchived!'
+      },
+      {count: selectedConversations.length}
+    )
+    if (data.updateConversationParticipants.errors) {
+      setArchiveDisabled(true)
+      setOnFailure(I18n.t('Unarchive operation failed'))
+    } else {
+      setArchiveDisabled(false)
+      removeFromSelectedConversations(selectedConversations)
+      setOnSuccess(unarchiveSuccessMsg) // screenReaderOnly
+    }
+  }
+
+  const [archiveConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
+    update: removeOutOfScopeConversationsFromCache,
+    onCompleted(data) {
+      handleArchiveComplete(data)
+    },
+    onError() {
+      setOnFailure(I18n.t('Archive operation failed'))
+    }
+  })
+
+  const [unarchiveConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
+    update: removeOutOfScopeConversationsFromCache,
+    onCompleted(data) {
+      handleUnarchiveComplete(data)
+    },
+    onError() {
+      setOnFailure(I18n.t('Unarchive operation failed'))
+    }
+  })
+
   const handleDelete = individualConversation => {
     const conversationsToDeleteByID =
       individualConversation || selectedConversations.map(convo => convo._id)
@@ -234,6 +356,51 @@ const CanvasInbox = () => {
     }
   })
 
+  const firstConversation = selectedConversations.length > 0 ? selectedConversations[0] : {}
+
+  const myConversationParticipant = firstConversation?.participants?.find(
+    node => node.user._id === ENV.current_user_id
+  )
+  const firstConversationIsStarred = myConversationParticipant?.label === 'starred'
+
+  const [starConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
+    onCompleted: () => {
+      if (firstConversationIsStarred) {
+        setOnSuccess(
+          I18n.t(
+            {
+              one: 'The conversation has been successfully unstarred.',
+              other: 'The conversations has been successfully unstarred.'
+            },
+            {count: selectedConversations.length}
+          )
+        )
+      } else {
+        setOnSuccess(
+          I18n.t(
+            {
+              one: 'The conversation has been successfully starred.',
+              other: 'The conversations has been successfully starred.'
+            },
+            {count: selectedConversations.length}
+          )
+        )
+      }
+    },
+    onError: () => {
+      setOnFailure(I18n.t('There was an unexpected error updating the conversation participants.'))
+    }
+  })
+
+  const handleStar = starred => {
+    starConversationParticipants({
+      variables: {
+        conversationIds: selectedConversations.map(convo => convo._id),
+        starred
+      }
+    })
+  }
+
   const onReply = ({conversationMessage = null, replyAll = false} = {}) => {
     conversationMessage = isSubmissionCommentsType ? {} : conversationMessage
     setSelectedConversationMessage(conversationMessage)
@@ -308,6 +475,8 @@ const CanvasInbox = () => {
                   onReply={() => onReply()}
                   onReplyAll={() => onReply({replyAll: true})}
                   onForward={() => onForward()}
+                  onArchive={displayUnarchiveButton ? undefined : handleArchive}
+                  onUnarchive={displayUnarchiveButton ? handleUnarchive : undefined}
                   deleteDisabled={deleteDisabled}
                   deleteToggler={setDeleteDisabled}
                   archiveDisabled={archiveDisabled}
@@ -315,7 +484,10 @@ const CanvasInbox = () => {
                   onConversationRemove={removeFromSelectedConversations}
                   displayUnarchiveButton={displayUnarchiveButton}
                   conversationsQueryOptions={conversationsQueryOption}
+                  onStar={handleStar}
+                  firstConversationIsStarred={firstConversationIsStarred}
                   onDelete={handleDelete}
+                  canReply={canReply}
                 />
               </Flex.Item>
             )}
@@ -378,13 +550,30 @@ const CanvasInbox = () => {
                           </View>
                         )}
                         <MessageDetailContainer
+                          setCanReply={setCanReply}
                           conversation={selectedConversations[0]}
                           onReply={conversationMessage => onReply({conversationMessage})}
                           onReplyAll={conversationMessage =>
                             onReply({conversationMessage, replyAll: true})
                           }
+                          onArchive={displayUnarchiveButton ? undefined : handleArchive}
+                          onUnarchive={displayUnarchiveButton ? handleUnarchive : undefined}
                           onDelete={handleDelete}
                           onForward={conversationMessage => onForward({conversationMessage})}
+                          onStar={
+                            !firstConversationIsStarred
+                              ? () => {
+                                  handleStar(true)
+                                }
+                              : null
+                          }
+                          onUnstar={
+                            firstConversationIsStarred
+                              ? () => {
+                                  handleStar(false)
+                                }
+                              : null
+                          }
                           scope={scope}
                         />
                       </>

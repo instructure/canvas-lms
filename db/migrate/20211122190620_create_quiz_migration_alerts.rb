@@ -23,8 +23,8 @@ class CreateQuizMigrationAlerts < ActiveRecord::Migration[6.0]
   def change
     create_table :quiz_migration_alerts do |t|
       t.belongs_to :migration, polymorphic: true
-      t.references :user, null: false, foreign_key: true, limit: 8
-      t.references :course, null: false, foreign_key: true, limit: 8
+      t.references :user, null: false, foreign_key: true
+      t.references :course, null: false, foreign_key: true
       t.timestamps
     end
 

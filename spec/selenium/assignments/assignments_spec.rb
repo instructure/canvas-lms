@@ -331,7 +331,7 @@ describe "assignments" do
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
       f("#has_group_category").click
-      close_visible_dialog
+      f(%(span[data-testid="group-set-close"])).click
       f(".btn-primary[type=submit]").click
       wait_for_ajaximations
       error_box = f(".errorBox[role=alert]")

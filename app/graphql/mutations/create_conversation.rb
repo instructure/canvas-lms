@@ -49,6 +49,8 @@ class Mutations::CreateConversation < Mutations::BaseMutation
     context_id = context ? context.id : nil
     shard = context ? context.shard : Shard.current
 
+    # TODO: Refactor this, it doesnt work anymore. recipient =~ /\A(course_\d+)(?:_([a-z]+))?$/  returns nil
+    # It was also built with recipient = User object instead of MessagbleUser
     recipients.each do |recipient|
       if recipient =~ /\A(course_\d+)(?:_([a-z]+))?$/ && [nil, "students", "observers"].include?(Regexp.last_match(2)) &&
          !Context.find_by_asset_string(Regexp.last_match(1)).try(:grants_right?, @current_user, session, :send_messages_all)
@@ -57,6 +59,13 @@ class Mutations::CreateConversation < Mutations::BaseMutation
           attribute: "recipients"
         )
       end
+    end
+
+    if context.blank? && !@current_user.associated_root_accounts.first.try(:grants_right?, @current_user, session, :read_roster)
+      return validation_error(
+        I18n.t("Context cannot be blank"),
+        attribute: "context_code"
+      )
     end
 
     group_conversation = input[:group_conversation]

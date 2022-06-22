@@ -40,6 +40,7 @@ describe GradebooksHelper do
                           :grade,
                           :submission_type,
                           :workflow_state,
+                          :cached_quiz_lti,
                           :excused?))
 
     stub_const("FakeQuiz",
@@ -229,6 +230,20 @@ describe GradebooksHelper do
         it "must output a dash" do
           submission.submission_type = "bogus_type"
           expect(score_display).to eq "-"
+        end
+      end
+
+      context "and the submission is a pending new quiz" do
+        before do
+          submission.cached_quiz_lti = true
+          submission.workflow_state = Submission.workflow_states.pending_review
+          submission.submission_type = "basic_lti_launch"
+        end
+
+        it "uses the new quizzes icon" do
+          expect(score_display).to eq(
+            "<i class=\"submission_icon icon-quiz icon-Solid\" aria-hidden=\"true\"></i><span class=\"screenreader-only\">New Quizzes Submission</span>"
+          )
         end
       end
 

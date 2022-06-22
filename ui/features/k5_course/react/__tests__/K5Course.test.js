@@ -153,8 +153,7 @@ const createModulesPartial = () => {
   contextModules.appendChild(moduleItem)
   return modulesContainer
 }
-/* for some reason appending this to the DOM causes the build to fail in an unrelated test file
-, even if the tests cases are skepped, so it will be commented for now
+
 const createStudentView = () => {
   const resetStudentBtn = document.createElement('a')
   resetStudentBtn.className = 'reset_test_student'
@@ -173,7 +172,7 @@ const createStudentView = () => {
   studentViewBarContainer.appendChild(resetStudentBtn)
   studentViewBarContainer.appendChild(leaveStudentViewBtn)
   return studentViewBarContainer
-} */
+}
 
 let fakeXhrServer
 
@@ -370,9 +369,8 @@ describe('K-5 Subject Course', () => {
       expect(studentViewBtn.href).toBe('http://localhost/courses/30/student_view/1#grades')
     })
 
-    /* describe.skip('Student View mode enable', () => {
+    describe('Student View mode enable', () => {
       beforeEach(() => {
-        // this seems to be affecting an unrelated test, so it will be skipped for now
         document.body.appendChild(createStudentView())
       })
       afterEach(() => {
@@ -393,7 +391,7 @@ describe('K-5 Subject Course', () => {
         getByRole('tab', {name: 'Arts and Crafts Grades'}).click()
         expect(leaveStudentViewBtn.href).toBe('http://localhost/courses/30/student_view#grades')
       })
-    }) */
+    })
   })
 
   describe('Self-enrollment buttons', () => {

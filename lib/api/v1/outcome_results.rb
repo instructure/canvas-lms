@@ -66,7 +66,7 @@ module Api::V1::OutcomeResults
   def outcome_results_include_outcomes_json(outcomes, context, percents = {})
     alignment_asset_string_map = {}
     outcomes.each_slice(50).each do |outcomes_slice|
-      ActiveRecord::Associations::Preloader.new.preload(outcomes_slice, [:context])
+      ActiveRecord::Associations.preload(outcomes_slice, [:context])
       ContentTag.learning_outcome_alignments.not_deleted.where(learning_outcome_id: outcomes_slice)
                 .pluck(:learning_outcome_id, :content_type, :content_id).each do |lo_id, content_type, content_id|
         (alignment_asset_string_map[lo_id] ||= []) << "#{content_type.underscore}_#{content_id}"

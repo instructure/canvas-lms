@@ -54,6 +54,7 @@ const ComposeModalContainer = props => {
   const [sendIndividualMessages, setSendIndividualMessages] = useState(false)
   const [userNote, setUserNote] = useState(false)
   const [selectedContext, setSelectedContext] = useState()
+  const [courseMessages, setCourseMessages] = useState([])
   const [mediaUploadOpen, setMediaUploadOpen] = useState(false)
   const [uploadingMediaFile, setUploadingMediaFile] = useState(false)
   const [mediaUploadFile, setMediaUploadFile] = useState(null)
@@ -141,6 +142,10 @@ const ComposeModalContainer = props => {
   }
 
   const onContextSelect = context => {
+    if (context && context?.contextID) {
+      setCourseMessages([])
+    }
+
     setSelectedContext({contextID: context.contextID, contextName: context.contextName})
   }
 
@@ -157,6 +162,16 @@ const ComposeModalContainer = props => {
         isValid = false
       } else if (props.selectedIds.length === 0) {
         setAddressBookMessages([{text: I18n.t('You must choose a recipient'), type: 'error'}])
+        isValid = false
+      }
+    }
+
+    if (!isSubmissionCommentsType && !props.isReply && !props.isForward) {
+      if (
+        !ENV.CONVERSATIONS.CAN_MESSAGE_ACCOUNT_CONTEXT &&
+        (!selectedContext || !selectedContext?.contextID)
+      ) {
+        setCourseMessages([{text: I18n.t('Please select a course'), type: 'error'}])
         isValid = false
       }
     }
@@ -230,6 +245,7 @@ const ComposeModalContainer = props => {
     setBodyMessages([])
     setAddressBookMessages([])
     setSelectedContext(null)
+    setCourseMessages([])
     props.onSelectedIdsChange([])
     props.setSendingMessage(false)
     setSubject(null)
@@ -298,6 +314,7 @@ const ComposeModalContainer = props => {
                   mediaAttachmentTitle={mediaUploadFile?.uploadedFile.name}
                   onRemoveMediaComment={onRemoveMedia}
                   addressBookMessages={addressBookMessages}
+                  courseMessages={courseMessages}
                   data-testid="compose-modal-inputs"
                 />
               )}

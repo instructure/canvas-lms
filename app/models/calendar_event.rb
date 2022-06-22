@@ -32,7 +32,7 @@ class CalendarEvent < ActiveRecord::Base
 
   include MasterCourses::Restrictor
   restrict_columns :content, [:title, :description]
-  restrict_columns :settings, %i[location_name location_address start_at end_at all_day all_day_date]
+  restrict_columns :settings, %i[location_name location_address start_at end_at all_day all_day_date series_id rrule]
 
   attr_accessor :cancel_reason, :imported
 
@@ -43,7 +43,7 @@ class CalendarEvent < ActiveRecord::Base
 
   PERMITTED_ATTRIBUTES = %i[title description start_at end_at location_name
                             location_address time_zone_edited cancel_reason participants_per_appointment
-                            remove_child_events all_day comments important_dates].freeze
+                            remove_child_events all_day comments important_dates series_id rrule].freeze
   def self.permitted_attributes
     PERMITTED_ATTRIBUTES
   end
@@ -92,9 +92,17 @@ class CalendarEvent < ActiveRecord::Base
     next record.errors.add(attr, t("errors.duplicate_child_event_contexts", "Duplicate child event contexts")) if context_codes != context_codes.uniq
 
     contexts = find_all_by_asset_string(context_codes).group_by(&:asset_string)
+    section_level_calendar_permissions = Account.site_admin.feature_enabled?(:section_level_calendar_permissions)
     context_codes.each do |code|
       context = contexts[code] && contexts[code][0]
-      next if context&.grants_right?(record.updating_user, :manage_calendar) && context.try(:parent_event_context) == record.context
+      if section_level_calendar_permissions
+        new_event = events.detect { |e| e[:context_code] == context&.asset_string }
+        existing_event = record.child_events.where(context: context).first
+        event_unchanged = new_event && existing_event && DateTime.parse(new_event[:start_at]) == existing_event.start_at && DateTime.parse(new_event[:end_at]) == existing_event.end_at
+        next if (context&.grants_right?(record.updating_user, :manage_calendar) || event_unchanged) && context.try(:parent_event_context) == record.context
+      elsif context&.grants_right?(record.updating_user, :manage_calendar) && context.try(:parent_event_context) == record.context
+        next
+      end
 
       break record.errors.add(attr, t("errors.invalid_child_event_context", "Invalid child event context"))
     end
@@ -701,7 +709,7 @@ class CalendarEvent < ActiveRecord::Base
       event.dtend = Icalendar::Values::DateTime.new(end_at.utc_datetime, "tzid" => "UTC") if end_at
 
       if @event.all_day && @event.all_day_date
-        event.dtstart = Date.new(@event.all_day_date.year, @event.all_day_date.month, @event.all_day_date.day)
+        event.dtstart = Icalendar::Values::Date.new(@event.all_day_date)
         event.dtstart.ical_params = { "VALUE" => ["DATE"] }
         # per rfc5545 3.6.12, DTEND for all day events can omit DTEND
         event.dtend = nil

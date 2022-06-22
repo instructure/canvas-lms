@@ -22,7 +22,7 @@ class CreateUserPastLtiId < ActiveRecord::Migration[5.1]
 
   def change
     create_table :user_past_lti_ids do |t|
-      t.references :user, limit: 8, foreign_key: true, index: true, null: false
+      t.references :user, foreign_key: true, index: true, null: false
       t.integer :context_id, null: false, limit: 8
       t.string :context_type, null: false, limit: 255
       t.string :user_uuid, null: false, limit: 255

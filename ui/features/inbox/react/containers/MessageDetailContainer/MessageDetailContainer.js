@@ -28,7 +28,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {MessageDetailHeader} from '../../components/MessageDetailHeader/MessageDetailHeader'
 import {MessageDetailItem} from '../../components/MessageDetailItem/MessageDetailItem'
 import PropTypes from 'prop-types'
-import React, {useContext, useEffect, useState, useMemo} from 'react'
+import React, {useContext, useEffect, useState, useMemo, useCallback} from 'react'
 import {Spinner} from '@instructure/ui-spinner'
 import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
@@ -44,6 +44,13 @@ export const MessageDetailContainer = props => {
   const variables = {
     conversationID: props.conversation._id
   }
+  const [isLoadingMoreData, setIsLoadingMoreData] = useState(false)
+
+  const [lastMessageItem, setLastMessageItem] = useState(null)
+
+  const onItemRefSet = useCallback(refCurrent => {
+    setLastMessageItem(refCurrent)
+  }, [])
 
   const [readStateChangeConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
     onCompleted(data) {
@@ -131,25 +138,196 @@ export const MessageDetailContainer = props => {
   }, [conversationMessagesQuery.data])
 
   const inboxMessageData = useMemo(() => {
+    if (
+      (conversationMessagesQuery.loading && !conversationMessagesQuery.data) ||
+      (submissionCommentsQuery.loading && !submissionCommentsQuery.data)
+    ) {
+      return []
+    }
+
     const data = isSubmissionCommentsType
       ? submissionCommentsQuery.data?.legacyNode
       : conversationMessagesQuery.data?.legacyNode
 
-    return inboxMessagesWrapper(data, isSubmissionCommentsType)
-  }, [conversationMessagesQuery.data, isSubmissionCommentsType, submissionCommentsQuery.data])
+    if (data) {
+      const canReply = isSubmissionCommentsType ? true : data?.canReply
+      props.setCanReply(canReply)
+    }
 
-  if (conversationMessagesQuery?.loading || submissionCommentsQuery?.loading) {
-    return (
-      <View as="div" textAlign="center" margin="large none">
-        <Spinner renderTitle={() => I18n.t('Loading Conversation Messages')} variant="inverse" />
-      </View>
-    )
+    const messageData = inboxMessagesWrapper(data, isSubmissionCommentsType)
+
+    if (
+      messageData.inboxMessages.length > 0 &&
+      !conversationMessagesQuery.loading &&
+      !submissionCommentsQuery.loading
+    ) {
+      messageData.inboxMessages[messageData.inboxMessages.length - 1].isLast = true
+    }
+
+    return messageData
+  }, [
+    conversationMessagesQuery.data,
+    conversationMessagesQuery.loading,
+    isSubmissionCommentsType,
+    props,
+    submissionCommentsQuery.data,
+    submissionCommentsQuery.loading
+  ])
+
+  const fetchMoreMenuData = () => {
+    setIsLoadingMoreData(true)
+    if (!isSubmissionCommentsType) {
+      conversationMessagesQuery.fetchMore({
+        variables: {
+          _id: inboxMessageData.inboxMessages[inboxMessageData.inboxMessages.length - 1]._id,
+          variables,
+          afterMessage:
+            conversationMessagesQuery.data?.legacyNode?.conversationMessagesConnection?.pageInfo
+              ?.endCursor
+        },
+        updateQuery: (previousResult, {fetchMoreResult}) => {
+          setIsLoadingMoreData(false)
+
+          const prev_nodes = previousResult?.legacyNode?.conversationMessagesConnection?.nodes
+          const fetchMore_nodes = fetchMoreResult?.legacyNode?.conversationMessagesConnection?.nodes
+          const fetchMore_pageInfo =
+            fetchMoreResult?.legacyNode?.conversationMessagesConnection?.pageInfo
+          return {
+            legacyNode: {
+              _id: fetchMoreResult?.legacyNode?._id,
+              id: fetchMoreResult?.legacyNode?.id,
+              conversationMessagesConnection: {
+                nodes: [...prev_nodes, ...fetchMore_nodes],
+                pageInfo: fetchMore_pageInfo,
+                __typename: 'ConversationMessageConnection'
+              },
+              __typename: 'Conversation'
+            }
+          }
+        }
+      })
+    } else {
+      submissionCommentsQuery.fetchMore({
+        variables: {
+          _id: inboxMessageData.inboxMessages[inboxMessageData.inboxMessages.length - 1]._id,
+          submissionID: props.conversation._id,
+          sort: 'desc',
+          afterComment:
+            submissionCommentsQuery.data?.legacyNode?.commentsConnection?.pageInfo?.endCursor
+        },
+        updateQuery: (previousResult, {fetchMoreResult}) => {
+          setIsLoadingMoreData(false)
+
+          const prev_nodes = previousResult.legacyNode.commentsConnection.nodes
+          const fetchMore_nodes = fetchMoreResult.legacyNode.commentsConnection.nodes
+          const fetchMore_pageInfo = fetchMoreResult?.legacyNode?.commentsConnection?.pageInfo
+          return {
+            legacyNode: {
+              _id: fetchMoreResult?.legacyNode?._id,
+              id: fetchMoreResult?.legacyNode?.id,
+              commentsConnection: {
+                nodes: [...prev_nodes, ...fetchMore_nodes],
+                pageInfo: fetchMore_pageInfo,
+                __typename: 'SubmissionCommentConnection'
+              },
+              user: {
+                ...fetchMoreResult?.legacyNode?.user
+              },
+              __typename: 'Submission'
+            }
+          }
+        }
+      })
+    }
   }
+
+  const hasMoreMenuData =
+    conversationMessagesQuery.data?.legacyNode?.conversationMessagesConnection?.pageInfo
+      ?.hasNextPage ||
+    submissionCommentsQuery.data?.legacyNode?.commentsConnection?.pageInfo?.hasNextPage
+
+  const isLoading = conversationMessagesQuery.loading || submissionCommentsQuery.loading
+
+  // Creates an oberserver on the last scroll item to fetch more data when it becomes visible
+  useEffect(() => {
+    if (lastMessageItem && hasMoreMenuData) {
+      const observer = new IntersectionObserver(
+        ([menuItem]) => {
+          if (menuItem.isIntersecting) {
+            observer.unobserve(lastMessageItem)
+            setLastMessageItem(null)
+            fetchMoreMenuData()
+          }
+        },
+        {
+          root: null,
+          rootMargin: '0px',
+          threshold: 0.4
+        }
+      )
+
+      if (lastMessageItem) {
+        observer.observe(lastMessageItem)
+      }
+
+      return () => {
+        if (lastMessageItem) observer.unobserve(lastMessageItem)
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasMoreMenuData, isSubmissionCommentsType, lastMessageItem])
 
   if (conversationMessagesQuery?.error || submissionCommentsQuery?.error) {
     setOnFailure(I18n.t('Failed to load conversation messages.'))
     return
   }
+
+  const renderLoading = () => {
+    return (
+      <View as="div" textAlign="center" margin="large none" data-testid="conversation-loader">
+        <Spinner renderTitle={() => I18n.t('Loading Conversation Messages')} variant="inverse" />
+      </View>
+    )
+  }
+
+  // Render individual menu items
+  const renderMenuItem = (message, isLast) => (
+    <View
+      as="div"
+      borderWidth="small none none none"
+      padding="small"
+      key={message.id}
+      elementRef={el => {
+        if (isLast) {
+          onItemRefSet(el)
+        }
+      }}
+    >
+      <MessageDetailItem
+        conversationMessage={message}
+        contextName={inboxMessageData?.contextName}
+        onReply={inboxMessageData?.canReply ? () => props.onReply(message) : null}
+        onReplyAll={inboxMessageData?.canReply ? () => props.onReplyAll(message) : null}
+        onDelete={() => handleDeleteConversationMessage(message._id)}
+        onForward={() => props.onForward(message)}
+      />
+    </View>
+  )
+
+  // Memo which returns array of ConversationListItem's
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const renderedItems = useMemo(() => {
+    const menuData = inboxMessageData?.inboxMessages
+
+    if (isLoading && !isLoadingMoreData) {
+      return renderLoading()
+    }
+
+    return menuData.map(message => {
+      return renderMenuItem(message, message?.isLast)
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inboxMessageData?.inboxMessages])
 
   return (
     <>
@@ -157,23 +335,23 @@ export const MessageDetailContainer = props => {
         focusRef={setMessageRef}
         text={props.conversation.subject}
         onForward={props.onForward}
-        onReply={props.onReply}
-        onReplyAll={props.onReplyAll}
+        onReply={inboxMessageData?.canReply ? props.onReply : null}
+        onReplyAll={inboxMessageData?.canReply ? props.onReplyAll : null}
+        onArchive={props.onArchive}
+        onUnarchive={props.onUnarchive}
+        onStar={props.onStar}
+        onUnstar={props.onUnstar}
         onDelete={() => props.onDelete([props.conversation._id])}
         submissionCommentURL={inboxMessageData?.submissionCommentURL}
+        scope={props.scope}
       />
-      {inboxMessageData?.inboxMessages.map(message => (
-        <View as="div" borderWidth="small none none none" padding="small" key={message.id}>
-          <MessageDetailItem
-            conversationMessage={message}
-            contextName={inboxMessageData?.contextName}
-            onReply={() => props.onReply(message)}
-            onReplyAll={() => props.onReplyAll(message)}
-            onDelete={() => handleDeleteConversationMessage(message._id)}
-            onForward={() => props.onForward(message)}
-          />
+      {isLoading && !isLoadingMoreData && renderLoading()}
+      {(!isLoading || isLoadingMoreData) && (
+        <View as="div" height="100%" overflowX="hidden" overflowY="auto" borderWidth="small">
+          {renderedItems}
+          {isLoadingMoreData && renderLoading()}
         </View>
-      ))}
+      )}
     </>
   )
 }
@@ -182,6 +360,12 @@ MessageDetailContainer.propTypes = {
   conversation: Conversation.shape,
   onReply: PropTypes.func,
   onReplyAll: PropTypes.func,
+  onArchive: PropTypes.func,
+  onUnarchive: PropTypes.func,
   onDelete: PropTypes.func,
-  onForward: PropTypes.func
+  onForward: PropTypes.func,
+  onStar: PropTypes.func,
+  onUnstar: PropTypes.func,
+  setCanReply: PropTypes.func,
+  scope: PropTypes.string
 }

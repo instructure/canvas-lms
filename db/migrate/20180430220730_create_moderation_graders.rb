@@ -25,8 +25,8 @@ class CreateModerationGraders < ActiveRecord::Migration[5.1]
     create_table :moderation_graders do |t|
       t.column :anonymous_id, :string, limit: 5, null: false
 
-      t.references :assignment, limit: 8, null: false, foreign_key: true, index: false
-      t.references :user, limit: 8, null: false, foreign_key: true, index: false
+      t.references :assignment, null: false, foreign_key: true, index: false
+      t.references :user, null: false, foreign_key: true, index: false
 
       t.index [:assignment_id, :anonymous_id], unique: true
       t.index [:user_id, :assignment_id], unique: true

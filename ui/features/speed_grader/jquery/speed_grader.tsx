@@ -2499,15 +2499,12 @@ EG = {
           grade = GradeFormatHelper.formatGrade(s.grade)
         }
 
-        const late_policy_status =
-          (s.late && 'late') || (s.missing && 'missing') || s.late_policy_status
-
         return {
           value: i,
-          late: s.late,
-          missing: s.missing,
-          excused: s.excused,
-          late_policy_status,
+          late_policy_status: EG.currentStudent.submission.late_policy_status,
+          late: EG.currentStudent.submission.late,
+          missing: EG.currentStudent.submission.missing,
+          excused: EG.currentStudent.submission.excused,
           selected: selectedIndex === i,
           submittedAt: $.datetimeString(s.submitted_at) || noSubmittedAt,
           grade
@@ -2563,7 +2560,10 @@ EG = {
       const late =
         currentSubmission.submission_history[index].submission?.late ||
         currentSubmission.submission_history[index]?.late
-      if (missing || late) {
+      const extended =
+        currentSubmission.submission_history[index].submission?.late_policy_status === 'extended' ||
+        currentSubmission.submission_history[index]?.late_policy_status === 'extended'
+      if (missing || late || extended) {
         this.refreshSubmissionsToView()
         $submission_details.show()
       } else {

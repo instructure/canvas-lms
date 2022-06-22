@@ -20,10 +20,26 @@ import React from 'react'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconZoomInLine, IconZoomOutLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
-import {calculateScaleRatio} from './utils'
+import {calculateScaleRatio, calculateScalePercentage, round} from './utils'
 import {MAX_SCALE_RATIO, MIN_SCALE_RATIO, BUTTON_SCALE_STEP} from '../constants'
 import formatMessage from '../../../../../../../format-message'
 import PropTypes from 'prop-types'
+import {CustomNumberInput} from './CustomNumberInput'
+
+const parseZoomText = value => {
+  // Matches a positive/negative integer/decimal followed by %" symbol
+  const matches = value.match(/([-|+]?\d+(?:\.\d+)?)%?/)
+  if (!matches) {
+    return null
+  }
+  const result = parseInt(matches[1], 10)
+  if (Number.isNaN(result)) {
+    return null
+  }
+  return result
+}
+
+const formatZoomText = value => `${value}%`
 
 export const ZoomControls = ({scaleRatio, onChange}) => {
   const zoomOutCallback = () => {
@@ -38,6 +54,16 @@ export const ZoomControls = ({scaleRatio, onChange}) => {
 
   return (
     <>
+      <Flex.Item margin="0 small 0 0">
+        <CustomNumberInput
+          value={round(scaleRatio * 100)}
+          parseValueCallback={parseZoomText}
+          formatValueCallback={formatZoomText}
+          processValueCallback={calculateScalePercentage}
+          placeholder={formatMessage('Zoom')}
+          onChange={value => onChange(round(value / 100))}
+        />
+      </Flex.Item>
       <Flex.Item margin="0 small 0 0">
         <IconButton
           onClick={zoomOutCallback}

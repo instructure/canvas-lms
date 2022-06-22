@@ -98,9 +98,11 @@ export default class CalendarEvent extends Backbone.Model {
       syncDfd = (this.sync || Backbone.sync).call(this, 'read', this, options)
     }
 
-    if (this.get('sections_url')) {
+    let sectionsUrl = this.get('sections_url')
+    if (sectionsUrl) {
+      sectionsUrl += '?include[]=permissions'
       const dispatch = new NaiveRequestDispatch()
-      sectionsDfd = dispatch.getDepaginated(this.get('sections_url'))
+      sectionsDfd = dispatch.getDepaginated(sectionsUrl)
     }
 
     const combinedSuccess = (syncArgs = [], sectionsResp = []) => {

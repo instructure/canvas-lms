@@ -170,7 +170,7 @@ class GradeCalculator
 
   def create_course_grade_alerts_and_live_events(scores)
     @course.shard.activate do
-      ActiveRecord::Associations::Preloader.new.preload(scores, :enrollment)
+      ActiveRecord::Associations.preload(scores, :enrollment)
       # Make only one alert per user even if they have multiple enrollments (sections in same course)
       scores = scores.uniq { |s| s.enrollment.user_id }
 

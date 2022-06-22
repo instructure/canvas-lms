@@ -19,18 +19,18 @@
 
 require "socket"
 
-require_dependency "canvas/apm"
-
 # If this is not a clustered environment, don't worry about providing
 # this global variable
 
-# rubocop:disable Style/GlobalVars
-Canvas::Apm.canvas_cluster = $canvas_cluster if $canvas_cluster.present?
-# rubocop:enable Style/GlobalVars
+Rails.configuration.to_prepare do
+  # rubocop:disable Style/GlobalVars
+  Canvas::Apm.canvas_cluster = $canvas_cluster if $canvas_cluster.present?
+  # rubocop:enable Style/GlobalVars
 
-# set this to "true" in your docker-compose override file or in your .env
-# or whatever you use in order to see logging output containing all the
-# APM traces.
-Canvas::Apm.enable_debug_mode = ENV.fetch("DATADOG_APM_DEBUG_MODE", "false").casecmp?("true")
-Canvas::Apm.hostname = Socket.gethostname
-Canvas::Apm.configure_apm!
+  # set this to "true" in your docker-compose override file or in your .env
+  # or whatever you use in order to see logging output containing all the
+  # APM traces.
+  Canvas::Apm.enable_debug_mode = ENV.fetch("DATADOG_APM_DEBUG_MODE", "false").casecmp?("true")
+  Canvas::Apm.hostname = Socket.gethostname
+  Canvas::Apm.configure_apm!
+end

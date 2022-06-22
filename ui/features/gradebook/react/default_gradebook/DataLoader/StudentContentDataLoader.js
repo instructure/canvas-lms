@@ -29,6 +29,7 @@ const submissionsParams = {
   response_fields: [
     'assignment_id',
     'attachments',
+    'attempt',
     'cached_due_date',
     'entered_grade',
     'entered_score',

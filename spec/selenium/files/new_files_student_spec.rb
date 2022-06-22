@@ -42,7 +42,7 @@ describe "better_file_browsing" do
       before :once do
         txt_files = ["a_file.txt", "b_file.txt", "c_file.txt"]
         @files = txt_files.map do |text_file|
-          add_file(fixture_file_upload("files/#{text_file}", "text/plain"), @course, text_file)
+          add_file(fixture_file_upload(text_file.to_s, "text/plain"), @course, text_file)
         end
       end
 
@@ -108,7 +108,7 @@ describe "better_file_browsing" do
     context "in course with folders" do
       before :once do
         @folder = folder_model(name: "restricted_folder", context: @course)
-        @file = add_file(fixture_file_upload("files/example.pdf", "application/pdf"),
+        @file = add_file(fixture_file_upload("example.pdf", "application/pdf"),
                          @course, "example.pdf", @folder)
       end
 

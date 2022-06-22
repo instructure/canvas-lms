@@ -867,7 +867,7 @@ class AssignmentsApiController < ApplicationController
       override_param = params[:override_assignment_dates] || true
       override_dates = value_to_boolean(override_param)
       if override_dates || include_all_dates || include_override_objects
-        ActiveRecord::Associations::Preloader.new.preload(assignments, :assignment_overrides)
+        ActiveRecord::Associations.preload(assignments, :assignment_overrides)
         assignments.select { |a| a.assignment_overrides.empty? }
                    .each { |a| a.has_no_overrides = true }
 
@@ -896,7 +896,7 @@ class AssignmentsApiController < ApplicationController
       preloaded_attachments = api_bulk_load_user_content_attachments(assignments.map(&:description), @context)
 
       if include_params.include?("score_statistics")
-        ActiveRecord::Associations::Preloader.new.preload(assignments, :score_statistic)
+        ActiveRecord::Associations.preload(assignments, :score_statistic)
       end
 
       mc_status = setup_master_course_restrictions(assignments, context)

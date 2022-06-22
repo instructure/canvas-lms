@@ -20,34 +20,31 @@ import $ from 'jquery'
 import WikiPageRevision from '@canvas/wiki/backbone/models/WikiPageRevision.coffee'
 import WikiPageRevisionsCollection from 'ui/features/wiki_page_revisions/backbone/collections/WikiPageRevisionsCollection.js'
 import WikiPageRevisionView from 'ui/features/wiki_page_revisions/backbone/views/WikiPageRevisionView.js'
+import {waitFor} from '@testing-library/react'
 
 QUnit.module('WikiPageRevisionView')
 
 test('binds to model change triggers', () => {
   const revision = new WikiPageRevision()
   const view = new WikiPageRevisionView({model: revision})
-  sandbox
-    .mock(view)
-    .expects('render')
-    .atLeast(1)
+  sandbox.mock(view).expects('render').atLeast(1)
   revision.set('body', 'A New Body')
 })
 
-test('restore delegates to model.restore', () => {
+test('restore delegates to model.restore', async () => {
   const revision = new WikiPageRevision()
   const view = new WikiPageRevisionView({model: revision})
+  sandbox.spy(view.model, 'restore')
   sandbox.stub(view, 'windowLocation').returns({
     href: '',
     reload() {
       return true
     }
   })
-  sandbox
-    .mock(revision)
-    .expects('restore')
-    .atLeast(1)
-    .returns($.Deferred().resolve())
   view.restore()
+  $('button[data-testid="confirm-button"]').trigger('click')
+  await waitFor(() => view.model.restore.called)
+  equal(view.model.restore.callCount, 1)
 })
 
 test('toJSON serializes expected values', () => {

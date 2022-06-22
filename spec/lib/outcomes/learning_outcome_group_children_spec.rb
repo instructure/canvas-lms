@@ -178,6 +178,28 @@ describe Outcomes::LearningOutcomeGroupChildren do
         expect(subject.total_outcomes(global_group.id)).to eq 2
       end
     end
+
+    context "when filter arg is used" do
+      before do
+        course.account.enable_feature!(:outcome_alignment_summary)
+        o3.align(assignment_model, course)
+      end
+
+      it "returns the total outcomes based on filter argument" do
+        expect(subject.total_outcomes(cg1.id, { filter: "WITH_ALIGNMENTS" })).to eq 1
+        expect(subject.total_outcomes(cg1.id, { filter: "NO_ALIGNMENTS" })).to eq 1
+      end
+
+      it "returns the total outcomes if filter arg isn't passed in" do
+        expect(subject.total_outcomes(cg1.id, {})).to eq 2
+      end
+
+      it "returns the total outcomes without filtering if the FF is disabled" do
+        course.account.disable_feature!(:outcome_alignment_summary)
+        expect(subject.total_outcomes(cg1.id, { filter: "WITH_ALIGNMENTS" })).to eq 2
+        expect(subject.total_outcomes(cg1.id, { filter: "NO_ALIGNMENTS" })).to eq 2
+      end
+    end
   end
 
   describe "#not_imported_outcomes" do
@@ -460,6 +482,45 @@ describe Outcomes::LearningOutcomeGroupChildren do
                                     "will bring too"
                                   ])
         end
+      end
+    end
+
+    context "filter" do
+      before do
+        course.account.enable_feature!(:outcome_alignment_summary)
+        o3.align(assignment_model, course)
+        cg1.add_outcome o4
+      end
+
+      it "filters out outcomes with alignments" do
+        outcomes = subject.suboutcomes_by_group_id(cg1.id, { filter: "NO_ALIGNMENTS" })
+                          .map(&:learning_outcome_content).map(&:id)
+        expect(outcomes).to eql([o4.id, o8.id])
+      end
+
+      it "filters out outcomes with no alignments" do
+        outcomes = subject.suboutcomes_by_group_id(cg1.id, { filter: "WITH_ALIGNMENTS" })
+                          .map(&:learning_outcome_content).map(&:id)
+        expect(outcomes).to eql([o3.id])
+      end
+
+      it "filters out outcomes with no alignments and with search" do
+        outcomes = subject.suboutcomes_by_group_id(cg1.id, { search_query: "4.1", filter: "NO_ALIGNMENTS" })
+                          .map(&:learning_outcome_content).map(&:id)
+        expect(outcomes).to eql([o4.id])
+      end
+
+      it "doesn't filter when the FF is disabled" do
+        course.account.disable_feature!(:outcome_alignment_summary)
+        outcomes = subject.suboutcomes_by_group_id(cg1.id, { filter: "WITH_ALIGNMENTS" })
+                          .map(&:learning_outcome_content).map(&:id)
+        expect(outcomes).to eql([o3.id, o4.id, o8.id])
+      end
+
+      it "doesn't filter if an invalid arg is passed" do
+        outcomes = subject.suboutcomes_by_group_id(cg1.id, { filter: "INVALID" })
+                          .map(&:learning_outcome_content).map(&:id)
+        expect(outcomes).to eql([o3.id, o4.id, o8.id])
       end
     end
   end

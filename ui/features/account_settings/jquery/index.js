@@ -258,7 +258,10 @@ $(document).ready(function () {
           .get(`/api/v1/${splitContext[0]}s/${splitContext[1]}/csp_settings`)
           .then(() => {
             // Bring in the actual bundle of files to use
-            import('../react/index')
+            import(
+              /* webpackChunkName: "[request]" */
+              '../react/index'
+            )
               .then(({start}) => {
                 start(document.getElementById('tab-security'), {
                   context: splitContext[0],

@@ -2527,7 +2527,7 @@ class CoursesController < ApplicationController
                        current_user: @current_user)
         end
       if !@context.concluded? && (@enrollments = EnrollmentsFromUserList.process(list, @context, enrollment_options))
-        ActiveRecord::Associations::Preloader.new.preload(@enrollments, [:course_section, { user: [:communication_channel, :pseudonym] }])
+        ActiveRecord::Associations.preload(@enrollments, [:course_section, { user: [:communication_channel, :pseudonym] }])
         json = @enrollments.map do |e|
           { "enrollment" =>
             { "associated_user_id" => e.associated_user_id,
@@ -3766,7 +3766,7 @@ class CoursesController < ApplicationController
       enrollments = enrollments.to_a
     elsif params[:enrollment_state] == "active"
       enrollments = user.participating_enrollments
-      ActiveRecord::Associations::Preloader.new.preload(enrollments, :course)
+      ActiveRecord::Associations.preload(enrollments, :course)
     else
       enrollments = user.cached_currentish_enrollments(preload_courses: true)
     end
@@ -3779,7 +3779,7 @@ class CoursesController < ApplicationController
 
     # we always output the role in the JSON, but we need it now in case we're
     # running the condition below
-    ActiveRecord::Associations::Preloader.new.preload(enrollments, :role)
+    ActiveRecord::Associations.preload(enrollments, :role)
     # these are all duplicated in the params[:state] block above in SQL. but if
     # used the cached ones, or we added include_observed, we have to re-run them
     # in pure ruby
@@ -3845,14 +3845,14 @@ class CoursesController < ApplicationController
     end
     preloads << { context_modules: :content_tags } if includes.include?("course_progress")
     preloads << :enrollment_term if includes.include?("term") || includes.include?("concluded")
-    ActiveRecord::Associations::Preloader.new.preload(courses, preloads)
+    ActiveRecord::Associations.preload(courses, preloads)
     MasterCourses::MasterTemplate.preload_is_master_course(courses)
 
     preloads = []
     preloads << :course_section if includes.include?("sections")
     preloads << { scores: :course } if includes.include?("total_scores") || includes.include?("current_grading_period_scores")
 
-    ActiveRecord::Associations::Preloader.new.preload(enrollments, preloads) unless preloads.empty?
+    ActiveRecord::Associations.preload(enrollments, preloads) unless preloads.empty?
     if includes.include?("course_progress")
       progressions = ContextModuleProgression.joins(:context_module).where(user: user, context_modules: { course: courses }).select("context_module_progressions.*, context_modules.context_id AS course_id").to_a.group_by { |cmp| cmp["course_id"] }
     end

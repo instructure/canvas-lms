@@ -519,5 +519,21 @@ describe "Jobs V2 API", type: :request do
                  {}, { expected_status: 401 })
       end
     end
+
+    describe "requeue" do
+      before :once do
+        ::Kernel.delay.raise "uh oh"
+        run_jobs
+      end
+
+      it "requeues a failed job" do
+        fj = Delayed::Job::Failed.last
+        json = api_call(:post, "/api/v1/jobs2/#{fj.id}/requeue",
+                        { controller: "jobs_v2", action: "requeue", format: "json", id: fj.to_param })
+        job = Delayed::Job.find(json["id"])
+        expect(job.handler).to eq fj.handler
+        expect(fj.reload.requeued_job_id).to eq job.id
+      end
+    end
   end
 end

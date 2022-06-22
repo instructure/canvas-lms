@@ -24,7 +24,7 @@ class CreateNotificationPolicyOverrides < ActiveRecord::Migration[5.2]
   def change
     create_table :notification_policy_overrides do |t|
       t.belongs_to :context, polymorphic: { default: "Course" },
-                             limit: 8, null: false, index: { name: "index_notification_policy_overrides_on_context" }
+                             null: false, index: { name: "index_notification_policy_overrides_on_context" }
       t.belongs_to :communication_channel, null: false, foreign_key: true
       t.belongs_to :notification, index: true
       t.string :workflow_state, default: "active", null: false, index: true

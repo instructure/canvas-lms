@@ -50,6 +50,10 @@ module CourseSyllabusPage
     "[data-testid='CoursePacingNotice']"
   end
 
+  def immersive_reader_css
+    "#immersive_reader_mount_point [type='button']"
+  end
+
   #------------------------------ Elements ------------------------------
   def edit_syllabus_button
     f("a.edit_syllabus_link")
@@ -97,6 +101,10 @@ module CourseSyllabusPage
 
   def course_pacing_notice
     f(course_pacing_notice_selector)
+  end
+
+  def immersive_reader_btn
+    fj(immersive_reader_css)
   end
 
   #------------------------------ Actions -------------------------------

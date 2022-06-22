@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-#
-# Copyright (C) 2021 - present Instructure, Inc.
+# Copyright (C) 2022 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,12 +15,12 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-# TODO: CANVAS_RAILS="6.0" remove this whole class since we will always get it from switchman
-class UnshardedRecord < ::ActiveRecord::Base
-  self.abstract_class = true
+class AddIndexOnAssignmentsWorkflowState < ActiveRecord::Migration[6.1]
+  tag :predeploy
+  disable_ddl_transaction!
 
-  # This line is conditional just so if it is eager-loaded nothing breaks
-  self.shard_category = :unsharded if Rails.version < "6.1"
+  def change
+    add_index :assignments, :workflow_state, algorithm: :concurrently, if_not_exists: true
+  end
 end

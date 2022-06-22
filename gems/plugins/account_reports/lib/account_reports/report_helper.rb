@@ -235,7 +235,7 @@ module AccountReports::ReportHelper
       p.account = root_account if p.account_id == root_account.id
     end
     preloads = Account.reflections["role_links"] ? { account: :role_links } : :account
-    ActiveRecord::Associations::Preloader.new.preload(pseudonyms, preloads)
+    ActiveRecord::Associations.preload(pseudonyms, preloads)
     pseudonyms.group_by(&:user_id)
   end
 

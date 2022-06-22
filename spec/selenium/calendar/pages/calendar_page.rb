@@ -33,6 +33,10 @@ module CalendarPage
     "#edit_calendar_event_form button.event_button"
   end
 
+  def use_section_dates_checkbox_selector
+    "#use_section_dates"
+  end
+
   #------------------------- Elements ---------------------------
   def create_new_event_btn
     f(create_new_event_btn_selector)
@@ -44,6 +48,10 @@ module CalendarPage
 
   def edit_event_modal_submit_btn
     f(edit_event_modal_submit_btn_selector)
+  end
+
+  def use_section_dates_checkbox
+    f(use_section_dates_checkbox_selector)
   end
 
   #----------------------- Actions/Methods ----------------------

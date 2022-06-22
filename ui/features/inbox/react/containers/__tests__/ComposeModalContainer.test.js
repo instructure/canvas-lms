@@ -28,7 +28,6 @@ import {mswServer} from '../../../../../shared/msw/mswServer'
 import React from 'react'
 import {responsiveQuerySizes} from '../../../util/utils'
 import {ConversationContext} from '../../../util/constants'
-import {useScope as useI18nScope} from '@canvas/i18n'
 
 jest.mock('../../../util/utils', () => ({
   ...jest.requireActual('../../../util/utils'),
@@ -74,7 +73,8 @@ describe('ComposeModalContainer', () => {
     window.ENV = {
       current_user_id: '1',
       CONVERSATIONS: {
-        ATTACHMENTS_FOLDER_ID: 1
+        ATTACHMENTS_FOLDER_ID: 1,
+        CAN_MESSAGE_ACCOUNT_CONTEXT: false
       }
     }
   })
@@ -221,30 +221,6 @@ describe('ComposeModalContainer', () => {
   })
 
   describe('Create Conversation', () => {
-    it('allows creating conversations', async () => {
-      const I18n = useI18nScope('conversations_2')
-
-      const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
-
-      const component = setup({setOnSuccess: mockedSetOnSuccess})
-
-      // Set subject
-      const subjectInput = await component.findByTestId('subject-input')
-      fireEvent.change(subjectInput, {target: {value: 'Potato Subject'}})
-
-      // Set body
-      const bodyInput = component.getByTestId('message-body')
-      fireEvent.change(bodyInput, {target: {value: 'Potato'}})
-
-      // Hit send
-      const button = component.getByTestId('send-button')
-      fireEvent.click(button)
-
-      await waitFor(() =>
-        expect(mockedSetOnSuccess).toHaveBeenCalledWith(I18n.t('Message sent!'), false)
-      )
-    })
-
     it('does not close modal when an error occurs', async () => {
       const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
 
@@ -522,5 +498,18 @@ describe('ComposeModalContainer', () => {
     fireEvent.click(button)
 
     expect(component.findByText('Invalid recipient')).toBeTruthy()
+  })
+
+  it('validates course', async () => {
+    const component = setup()
+
+    // Wait for modal to load
+    await component.findByTestId('message-body')
+
+    // Hit send
+    const button = component.getByTestId('send-button')
+    fireEvent.click(button)
+
+    expect(component.findByText('Please select a course')).toBeTruthy()
   })
 })

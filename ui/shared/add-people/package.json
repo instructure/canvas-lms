@@ -3,5 +3,8 @@
   "private": true,
   "version": "1.0.0",
   "author": "neme",
-  "main": "./react/index.js"
+  "main": "./react/index.js",
+  "canvas": {
+    "component": "enrollments"
+  }
 }

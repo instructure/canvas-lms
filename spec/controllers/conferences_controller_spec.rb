@@ -336,6 +336,20 @@ describe ConferencesController do
     end
   end
 
+  describe "DELETE 'destroy'" do
+    it "removes participants and the calendar event association" do
+      user_session(@teacher)
+      @conference = @course.web_conferences.create!(conference_type: "Wimba", duration: 60, user: @teacher)
+      @conference.users << @student
+      @conference.calendar_event = calendar_event_model
+      @conference.save!
+      delete "destroy", params: { course_id: @course.id, id: @conference.id }
+      expect(response).to be_redirect
+      expect(WebConference.exists?(@conference.id)).to eq(false)
+      expect(@event.reload.web_conference_id).to be_nil
+    end
+  end
+
   context "LTI conferences" do
     before(:once) do
       Account.site_admin.enable_feature! :conference_selection_lti_placement

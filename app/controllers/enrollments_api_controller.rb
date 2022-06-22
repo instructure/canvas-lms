@@ -501,7 +501,7 @@ class EnrollmentsApiController < ApplicationController
         self, send("api_v1_#{endpoint_scope}_enrollments_url")
       )
 
-      ActiveRecord::Associations::Preloader.new.preload(enrollments, %i[user course course_section root_account sis_pseudonym])
+      ActiveRecord::Associations.preload(enrollments, %i[user course course_section root_account sis_pseudonym])
 
       include_group_ids = Array(params[:include]).include?("group_ids")
       includes = [:user] + Array(params[:include])
@@ -925,10 +925,9 @@ class EnrollmentsApiController < ApplicationController
         # if current user is requesting enrollments for themselves or a specific user
         # with params[:user_id] in a course context we want to follow the
         # course_index_enrollments construct
-        if course.user_has_been_observer?(@current_user) ||
-           authorized_action(course, @current_user, %i[read_roster view_all_grades manage_grades])
-          enrollments = user.enrollments.where(enrollment_index_conditions).where(course_id: course)
-        end
+        render_unauthorized_action and return false unless course.user_has_been_observer?(@current_user) || course.grants_any_right?(@current_user, session, :read_roster, :view_all_grades, :manage_grades)
+
+        enrollments = user.enrollments.where(enrollment_index_conditions).where(course_id: course)
       else
         is_approved_parent = user.grants_right?(@current_user, :read_as_parent)
         # otherwise check for read_roster rights on all of the requested

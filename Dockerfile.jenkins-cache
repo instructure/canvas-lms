@@ -114,7 +114,7 @@ RUN --mount=target=/tmp/src \
     lib/request_cache.rb \
     lib/temp_cache.rb \
     lib/canvas/cdn.rb \
-    lib/canvas/reloader.rb \
+    lib/base/canvas/reloader.rb \
     .i18nignore \
     .i18nrc \
     Rakefile \

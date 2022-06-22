@@ -42,7 +42,7 @@ module TestDatabaseUtils
       # this won't create/migrate them, but it will let us with_each_shard any
       # persistent ones that already exist
       require "switchman/test_helper"
-      ::Switchman::TestHelper.recreate_persistent_test_shards(dont_create: true)
+      ::Switchman::TestHelper.recreate_persistent_test_shards(dont_create: ENV["CREATE_SHARDS"] != "1")
 
       truncate_all_tables! if truncate_all_tables?
       randomize_sequences! if randomize_sequences?
@@ -73,9 +73,9 @@ module TestDatabaseUtils
     private
 
     def each_connection(&block)
-      ::Shard.with_each_shard(Rails.version < "6.1" ? ::Shard.categories : ::Shard.sharded_models) do
+      ::Shard.with_each_shard(::Shard.sharded_models) do
         models = ::ActiveRecord::Base.descendants
-        models.reject! { |m| Rails.version < "6.1" ? m.shard_category == :unsharded : m.connection_classes == [::Switchman::UnshardedRecord] } unless ::Shard.current.default?
+        models.reject! { |m| m.connection_class_for_self == [::Switchman::UnshardedRecord] } unless ::Shard.current.default?
         model_connections = models.map(&:connection).uniq
         model_connections.each(&block)
       end

@@ -54,7 +54,7 @@ describe OutcomeImportsApiController, type: :request do
                       { controller: "outcome_imports_api", action: "create",
                         format: "json", account_id: @account.id.to_s },
                       { import_type: "instructure_csv",
-                        attachment: fixture_file_upload("files/outcomes/test_outcomes_1.csv", "text/csv") })
+                        attachment: fixture_file_upload("outcomes/test_outcomes_1.csv", "text/csv") })
     end.to change { Delayed::Job.strand_size(strand) }.by(1)
 
     remaining_json = expect_keys(json, %w[created_at updated_at ended_at user])
@@ -97,7 +97,7 @@ describe OutcomeImportsApiController, type: :request do
                { controller: "outcome_imports_api", action: "create", format: "json",
                  account_id: @account.id.to_s, learning_outcome_group_id: group.id.to_s },
                { import_type: "instructure_csv",
-                 attachment: fixture_file_upload("files/outcomes/test_outcomes_no_groups.csv", "text/csv") })
+                 attachment: fixture_file_upload("outcomes/test_outcomes_no_groups.csv", "text/csv") })
 
       run_jobs
     end
@@ -118,7 +118,7 @@ describe OutcomeImportsApiController, type: :request do
                { controller: "outcome_imports_api", action: "create", format: "json",
                  account_id: @account.id.to_s },
                { import_type: "instructure_csv",
-                 attachment: fixture_file_upload("files/outcomes/test_outcomes_with_errors.csv", "text/csv") })
+                 attachment: fixture_file_upload("outcomes/test_outcomes_with_errors.csv", "text/csv") })
     end
 
     it "if import is still being processed" do
@@ -150,7 +150,7 @@ describe OutcomeImportsApiController, type: :request do
                { controller: "outcome_imports_api", action: "create", format: "json",
                  account_id: @account.id.to_s },
                { import_type: "instructure_csv",
-                 attachment: fixture_file_upload("files/outcomes/test_outcomes_1.csv", "text/csv") })
+                 attachment: fixture_file_upload("outcomes/test_outcomes_1.csv", "text/csv") })
 
       run_jobs
 
@@ -222,7 +222,7 @@ describe OutcomeImportsApiController, type: :request do
              { controller: "outcome_imports_api", action: "create",
                format: "json", account_id: @account.id.to_s },
              { import_type: "instructure_csv",
-               attachment: fixture_file_upload("files/outcomes/test_outcomes_1.csv", "text/csv") },
+               attachment: fixture_file_upload("outcomes/test_outcomes_1.csv", "text/csv") },
              {},
              expected_status: 401)
   end
@@ -234,7 +234,7 @@ describe OutcomeImportsApiController, type: :request do
              { controller: "outcome_imports_api", action: "create",
                format: "json", account_id: @account.id.to_s },
              { import_type: "instructure_csv",
-               attachment: fixture_file_upload("files/outcomes/test_outcomes_1.csv", "text/csv") },
+               attachment: fixture_file_upload("outcomes/test_outcomes_1.csv", "text/csv") },
              {},
              expected_status: 200)
   end

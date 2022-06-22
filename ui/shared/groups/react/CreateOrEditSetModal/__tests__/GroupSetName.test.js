@@ -32,7 +32,7 @@ function Wrapper({state, props}) {
 const defaultProps = {onChange: Function.prototype, errormsg: undefined}
 const state = {name: 'Satanaa!'}
 
-describe('CreateGroupSetModal::GroupSetName::', () => {
+describe('CreateOrEditSetModal::GroupSetName::', () => {
   it('sets the ref', () => {
     const elementRef = jest.fn()
     render(<Wrapper state={state} props={{...defaultProps, elementRef}} />)

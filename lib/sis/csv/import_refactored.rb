@@ -392,7 +392,7 @@ module SIS
       def process_file(base, file, att)
         csv = { base: base, file: file, fullpath: File.join(base, file), attachment: att }
         if File.file?(csv[:fullpath]) && File.extname(csv[:fullpath]).casecmp?(".csv")
-          unless Attachment.valid_utf8?(File.open(csv[:fullpath]))
+          unless Attachment.valid_utf8?(File.open(csv[:fullpath])) || Attachment.convert_to_utf8?(File.open(csv[:fullpath]))
             SisBatch.add_error(csv, I18n.t("Invalid UTF-8"), sis_batch: @batch, failure: true)
             return
           end

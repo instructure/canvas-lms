@@ -42,9 +42,12 @@ if (!('require' in window)) {
   const thingsWeStillAllowThemToRequire = {
     jquery: () => jQuery,
     // load these asynchronously so they are not downloaded unless asked for
-    i18nObj: () => import('@canvas/i18n').then(getDefaultExport),
+    i18nObj: () =>
+      import(/* webpackChunkName: "[request]" */ '@canvas/i18n').then(getDefaultExport),
+
     underscore: () => import('underscore').then(getDefaultExport),
-    'jsx/course_wizard/ListItems': () => import('../../features/course_wizard/react/ListItems').then(getDefaultExport)
+    'jsx/course_wizard/ListItems': () =>
+      import('../../features/course_wizard/react/ListItems').then(getDefaultExport)
   }
 
   const getModule = module => {

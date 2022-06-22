@@ -945,6 +945,43 @@ describe CalendarEvent do
         end.to raise_error(/Duplicate child event contexts/)
       end
 
+      it "allows user to update child_events only where they have permissions" do
+        section1 = @course.default_section
+        section2 = @course.course_sections.create!
+        admin = account_admin_user
+
+        event = @course.calendar_events.build title: "ohai",
+                                              child_event_data: [
+                                                { start_at: "2012-01-01 12:00:00", end_at: "2012-01-01 13:00:00", context_code: section1.asset_string },
+                                                { start_at: "2012-01-01 13:00:00", end_at: "2012-01-01 14:00:00", context_code: section2.asset_string }
+                                              ]
+        event.updating_user = admin
+        event.save!
+
+        teacher = user_factory(active_all: true)
+        limited_teacher_role = custom_teacher_role("Limited teacher", account: Account.default)
+        RoleOverride.create!(context: Account.default, permission: "manage_calendar", role: limited_teacher_role, enabled: false)
+        @course.enroll_teacher(teacher, enrollment_state: :active, section: section1)
+        @course.enroll_teacher(teacher, role: limited_teacher_role, enrollment_state: :active, section: section2)
+        teacher.enrollments.update_all(limit_privileges_to_course_section: true)
+
+        event.child_event_data = [
+          { start_at: "2012-01-02 12:00:00", end_at: "2012-01-02 13:00:00", context_code: section1.asset_string },
+          { start_at: "2012-01-01 13:00:00", end_at: "2012-01-01 14:00:00", context_code: section2.asset_string }
+        ]
+        event.updating_user = teacher
+        event.save!
+
+        expect do
+          event.child_event_data = [
+            { start_at: "2012-01-02 12:00:00", end_at: "2012-01-02 13:00:00", context_code: section1.asset_string },
+            { start_at: "2012-01-02 13:00:00", end_at: "2012-01-02 14:00:00", context_code: section2.asset_string }
+          ]
+          event.updating_user = teacher
+          event.save!
+        end.to raise_error(/Invalid child event context/)
+      end
+
       it "creates child events" do
         s2 = @course.course_sections.create!
         e1 = @course.calendar_events.build title: "ohai",

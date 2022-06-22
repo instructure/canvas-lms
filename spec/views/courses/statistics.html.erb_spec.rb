@@ -20,7 +20,7 @@
 
 require_relative "../views_helper"
 
-describe "courses/statistics.html.erb" do
+describe "courses/statistics" do
   before do
     course_with_teacher(active_all: true)
     assign(:range_start, Date.parse("Jan 1 2000"))

@@ -28,6 +28,63 @@ describe TextHelper do
     end
   end
 
+  context "readable_duration" do
+    context "when more than an hour" do
+      it "includes hours and minutes" do
+        duration = (2.days + 3.hours + 44.minutes + 58.23.seconds).to_f
+        expect(th.readable_duration(duration)).to eq "51 hours and 44 minutes"
+      end
+
+      it "includes the singular form 'minute' when there is 1 minute" do
+        duration = (2.days + 3.hours + 1.minute + 58.23.seconds).to_f
+        expect(th.readable_duration(duration)).to eq "51 hours and 1 minute"
+      end
+
+      it "includes hours only when it's on the hour" do
+        duration = (2.days + 3.hours + 58.23.seconds).to_f
+        expect(th.readable_duration(duration)).to eq "51 hours"
+      end
+    end
+
+    context "when one hour" do
+      it "includes the singular form 'hour'" do
+        duration = (1.hour + 44.minutes + 58.23.seconds).to_f
+        expect(th.readable_duration(duration)).to eq "1 hour and 44 minutes"
+      end
+
+      it "includes the singular form 'minute' when there is 1 minute" do
+        duration = (1.hour + 1.minute + 58.23.seconds).to_f
+        expect(th.readable_duration(duration)).to eq "1 hour and 1 minute"
+      end
+
+      it "includes the hour only when it's on the hour" do
+        duration = (1.hour + 58.23.seconds).to_f
+        expect(th.readable_duration(duration)).to eq "1 hour"
+      end
+    end
+
+    context "when less than an hour and more than a minute" do
+      it "includes minutes" do
+        duration = (44.minutes + 58.23.seconds).to_f
+        expect(th.readable_duration(duration)).to eq "44 minutes"
+      end
+    end
+
+    context "when one minute" do
+      it "includes the singluar form 'minute'" do
+        duration = (1.minute + 58.23.seconds).to_f
+        expect(th.readable_duration(duration)).to eq "1 minute"
+      end
+    end
+
+    context "when less than a minute" do
+      it "returns 'less than a minute'" do
+        duration = 58.23.seconds.to_f
+        expect(th.readable_duration(duration)).to eq "less than a minute"
+      end
+    end
+  end
+
   context "datetime_string" do
     it "formats datetimes" do
       datetime = Time.zone.parse("#{Time.zone.now.year}-01-01 12:00:00")

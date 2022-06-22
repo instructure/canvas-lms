@@ -1250,11 +1250,22 @@ Only available when launched as an assignment with a `lock_at` set.
 Returns the `due_at` date of the assignment that was launched.
 Only available when launched as an assignment with a `due_at` set.
 
-**Availability**: *always*  
+**Availability**: *always*
 
 
 ```
 2018-02-19:00:00Z
+```
+## Canvas.assignment.allDueAts.iso8601
+In Canvas, users, sections and groups can have distinct due dates for the same assignment.
+This returns all possible `due_at` dates of the assignment that was launched.
+
+If one due date is not set, an empty string is provided in the list.
+
+**Availability**: *when launched as an assignment*
+
+```
+2018-02-19:00:00Z,,2018-02-19:00:00Z
 ```
 ## Canvas.assignment.published
 Returns true if the assignment that was launched is published.

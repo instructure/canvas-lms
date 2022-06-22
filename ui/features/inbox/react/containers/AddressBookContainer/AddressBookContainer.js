@@ -30,12 +30,23 @@ export const AddressBookContainer = props => {
     }
   ])
   const [inputValue, setInputValue] = useState('')
+  const [searchTerm, setSearchTerm] = useState('')
   const [isLoadingMoreData, setIsLoadingMoreData] = useState(false)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (inputValue !== searchTerm) {
+        setSearchTerm(inputValue)
+      }
+    }, 500)
+
+    return () => clearInterval(interval)
+  }, [inputValue, searchTerm, setSearchTerm])
 
   const addressBookRecipientsQuery = useQuery(ADDRESS_BOOK_RECIPIENTS, {
     variables: {
       context: filterHistory[filterHistory.length - 1]?.context?.contextID,
-      search: inputValue,
+      search: searchTerm,
       userID
     },
     notifyOnNetworkStatusChange: true
@@ -57,16 +68,16 @@ export const AddressBookContainer = props => {
   }, [props.activeCourseFilter])
 
   useEffect(() => {
-    props.onInputValueChange(inputValue)
+    props.onInputValueChange(searchTerm)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inputValue])
+  }, [searchTerm])
 
   const fetchMoreMenuData = () => {
     setIsLoadingMoreData(true)
     addressBookRecipientsQuery.fetchMore({
       variables: {
         context: filterHistory[filterHistory.length - 1]?.context?.contextID,
-        search: inputValue,
+        search: searchTerm,
         userID,
         afterUser: data?.legacyNode?.recipients?.usersConnection?.pageInfo.endCursor,
         afterContext: data?.legacyNode?.recipients?.contextsConnection?.pageInfo.endCursor
@@ -178,7 +189,7 @@ export const AddressBookContainer = props => {
       contextData[contextData.length - 1].isLast = true
     }
 
-    if (filterHistory[filterHistory.length - 1]?.subMenuSelection && inputValue === '') {
+    if (filterHistory[filterHistory.length - 1]?.subMenuSelection && searchTerm === '') {
       const selection = filterHistory[filterHistory.length - 1]?.subMenuSelection
       const filteredMenuData = selection.includes('Course')
         ? {contextData, userData: []}
@@ -187,7 +198,7 @@ export const AddressBookContainer = props => {
     }
 
     return {contextData, userData}
-  }, [loading, data, filterHistory, inputValue])
+  }, [loading, data, filterHistory, searchTerm])
 
   const handleSelect = (item, isContext, isBackButton, isSubmenu) => {
     if (isContext) {

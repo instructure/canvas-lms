@@ -42,7 +42,7 @@ export const Leadership = ({onChange}) => {
   if (!selfSignup && splitGroups === SPLIT.off) return null
 
   return (
-    <Flex>
+    <Flex data-testid="group-leadership-controls">
       <Flex.Item padding="none medium none none">
         <Text>{I18n.t('Leadership')}</Text>
       </Flex.Item>
@@ -50,6 +50,7 @@ export const Leadership = ({onChange}) => {
         <Flex direction="column">
           <Flex.Item padding="x-small">
             <Checkbox
+              data-testid="enable-auto"
               checked={enableAutoLeader}
               label={I18n.t('Automatically assign a student group leader')}
               onChange={handleEnableChange}
@@ -67,9 +68,14 @@ export const Leadership = ({onChange}) => {
             >
               <RadioInput
                 value="FIRST"
+                data-testid="first"
                 label={I18n.t('Set first student to join as group leader')}
               />
-              <RadioInput value="RANDOM" label={I18n.t('Set a random student as group leader')} />
+              <RadioInput
+                value="RANDOM"
+                data-testid="random"
+                label={I18n.t('Set a random student as group leader')}
+              />
             </RadioInputGroup>
           </Flex.Item>
         </Flex>

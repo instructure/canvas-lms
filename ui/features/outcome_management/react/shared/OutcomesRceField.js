@@ -25,7 +25,12 @@ import {Spinner} from '@instructure/ui-spinner'
 
 const I18n = useI18nScope('OutcomeManagement')
 
-const CanvasRce = React.lazy(() => import('@canvas/rce/react/CanvasRce'))
+const CanvasRce = React.lazy(() =>
+  import(
+    /* webpackChunkName: "[request]" */
+    '@canvas/rce/react/CanvasRce'
+  )
+)
 
 const OutcomesRceField = ({onChangeHandler, defaultContent}) => {
   const [isLoadingRce, setIsLoadingRce] = useState(true)

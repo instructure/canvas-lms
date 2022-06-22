@@ -222,6 +222,8 @@ class FilesController < ApplicationController
       # if this was set we really just wanted to set the session on the files domain and return back to what we were doing before
       if access_verifier[:return_url]
         return redirect_to access_verifier[:return_url]
+      else
+        return redirect_to url_for(params.to_unsafe_h.except(:sf_verifier))
       end
     end
     # These sessions won't get deleted when the user logs out since this

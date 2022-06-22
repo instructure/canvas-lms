@@ -19,22 +19,26 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import SyllabusBehaviors from '@canvas/syllabus/backbone/behaviors/SyllabusBehaviors'
-import {useScope as useI18nScope} from '@canvas/i18n'
 import SyllabusCollection from './backbone/collections/SyllabusCollection'
 import SyllabusCalendarEventsCollection from './backbone/collections/SyllabusCalendarEventsCollection'
 import SyllabusAppointmentGroupsCollection from './backbone/collections/SyllabusAppointmentGroupsCollection'
 import SyllabusPlannerCollection from './backbone/collections/SyllabusPlannerCollection'
 import SyllabusView from './backbone/views/SyllabusView'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
+import {attachImmersiveReaderButton} from './util/utils'
 import ready from '@instructure/ready'
 
-const I18n = useI18nScope('syllabus')
+const immersive_reader_mount_point = () => document.getElementById('immersive_reader_mount_point')
+const immersive_reader_mobile_mount_point = () =>
+  document.getElementById('immersive_reader_mobile_mount_point')
+const showCourseSummary = !!document.getElementById('syllabusContainer')
 
 let collections = []
 let deferreds
 // If we're in a paced course, we're not showing the assignments
 // so skip retrieving them.
-if (!(ENV.IN_PACED_COURSE && !ENV.current_user_is_student)) {
+// Also, ensure 'Show Course Summary' is checked otherwise don't bother.
+if (!(ENV.IN_PACED_COURSE && !ENV.current_user_is_student) && showCourseSummary) {
   // Setup the collections
   collections = [
     new SyllabusCalendarEventsCollection([ENV.context_asset_string], 'event'),
@@ -81,6 +85,22 @@ if (!(ENV.IN_PACED_COURSE && !ENV.current_user_is_student)) {
 }
 
 ready(() => {
+  // Attach the immersive reader button if enabled
+  const activeMountPoints = [
+    immersive_reader_mount_point(),
+    immersive_reader_mobile_mount_point()
+  ].filter(node => !!node)
+
+  if (activeMountPoints.length > 0) {
+    attachImmersiveReaderButton(activeMountPoints)
+  }
+
+  // Finish early if we don't need show summary content
+  if (!showCourseSummary) {
+    SyllabusBehaviors.bindToEditSyllabus(false)
+    return
+  }
+
   let view
   if (ENV.IN_PACED_COURSE && !ENV.current_user_is_student) {
     renderCoursePacingNotice()
@@ -93,42 +113,6 @@ ready(() => {
       can_read: ENV.CAN_READ,
       is_valid_user: !!ENV.current_user_id
     })
-  }
-
-  // Attach the immersive reader button if enabled
-  const immersive_reader_mount_point = document.getElementById('immersive_reader_mount_point')
-  const immersive_reader_mobile_mount_point = document.getElementById(
-    'immersive_reader_mobile_mount_point'
-  )
-  if (immersive_reader_mount_point || immersive_reader_mobile_mount_point) {
-    import('@canvas/immersive-reader/ImmersiveReader')
-      .then(ImmersiveReader => {
-        const courseSyllabusText = () => document.querySelector('#course_syllabus').innerHTML
-        const title = I18n.t('Course Syllabus')
-        let content
-
-        // We display a default message in #course_syllabus_details when the user
-        // hasn't set any text in the syllabus.
-        if ($.trim(courseSyllabusText())) {
-          content = courseSyllabusText
-        } else {
-          content = () => document.querySelector('#course_syllabus_details').innerHTML
-        }
-
-        if (immersive_reader_mount_point) {
-          ImmersiveReader.initializeReaderButton(immersive_reader_mount_point, {content, title})
-        }
-
-        if (immersive_reader_mobile_mount_point) {
-          ImmersiveReader.initializeReaderButton(immersive_reader_mobile_mount_point, {
-            content,
-            title
-          })
-        }
-      })
-      .catch(e => {
-        console.log('Error loading immersive readers.', e) // eslint-disable-line no-console
-      })
   }
 
   // When all of the fetches have completed, render the view and bind behaviors
@@ -159,7 +143,7 @@ function renderCoursePacingNotice() {
   const $mountPoint = document.getElementById('syllabusContainer')
   if ($mountPoint) {
     // replace the table with the notice
-    import('@canvas/due-dates/react/CoursePacingNotice')
+    import(/* webpackChunkName: "[request]" */ '@canvas/due-dates/react/CoursePacingNotice')
       .then(CoursePacingNoticeModule => {
         const renderNotice = CoursePacingNoticeModule.renderCoursePacingNotice
         renderNotice($mountPoint, courseId)

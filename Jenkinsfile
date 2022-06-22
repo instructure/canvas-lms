@@ -161,7 +161,7 @@ def maybeSlackSendFailure() {
   slackSend(
     channel: '#canvas_builds-noisy',
     color: 'danger',
-    message: "${env.JOB_NAME} <${getSummaryUrl()}|#${env.BUILD_NUMBER}> failed. Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}>."
+    message: "${env.JOB_NAME} <${getSummaryUrl()}|#${env.BUILD_NUMBER}> failed. Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}>. (${currentBuild.durationString})"
   )
 }
 
@@ -177,7 +177,7 @@ def maybeSlackSendSuccess() {
   slackSend(
     channel: '#canvas_builds-noisy',
     color: 'good',
-    message: "${env.JOB_NAME} <${getSummaryUrl()}|#${env.BUILD_NUMBER}> succeeded. Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}>."
+    message: "${env.JOB_NAME} <${getSummaryUrl()}|#${env.BUILD_NUMBER}> succeeded. Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}>. (${currentBuild.durationString})"
   )
 }
 
@@ -499,12 +499,6 @@ pipeline {
                         gerrit.submitLintReview('-2', 'This commit contains only changes to config/locales/, this could be a bad sign!')
                       }
 
-                  extendedStage('Webpack ES-Check')
-                    .hooks(buildSummaryReportHooks.call())
-                    .obeysAllowStages(false)
-                    .required(env.GERRIT_CHANGE_ID != '0')
-                    .execute { webpackStage.&runESCheck() }
-
                   extendedStage('Webpack Bundle Size Check')
                     .hooks(buildSummaryReportHooks.call())
                     .obeysAllowStages(false)
@@ -551,7 +545,7 @@ pipeline {
                   def nestedStages = [:]
 
                   extendedStage('Javascript')
-                    .hooks(buildSummaryReportHooks.call())
+                    .hooks(buildSummaryReportHooks.withRunManifest(true))
                     .queue(nestedStages, jobName: '/Canvas/test-suites/JS', buildParameters: buildParameters + [
                       string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
                     ])
