@@ -31,7 +31,7 @@ namespace :i18n do
   #
   # This file has a hierarchical structure, unlike the "index" one. It looks
   # similar to what the Ruby I18nliner exports.
-  js_translations_file = Rails.root.join("config/locales/generated/en.javascript.json").to_s
+  js_translations_file = Rails.root.join("config/locales/generated/en.json").to_s
 
   # Directory to contain the auto-generated translation files for the frontend.
   js_translation_modules_dir = Rails.root.join("public/javascripts/translations").to_s
