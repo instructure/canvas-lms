@@ -925,7 +925,8 @@ describe AssignmentsController do
         context "peer reviews" do
           before do
             @assignment.update_attribute(:peer_reviews, true)
-            @reviewee = student_in_course(course: @course, active_enrollment: true).user
+            @reviewee = User.create!
+            @course.enroll_user(@reviewee, "StudentEnrollment", enrollment_state: "active")
             @assignment.assign_peer_review(@student, @reviewee)
 
             @student_submission = @assignment.submission_for_student(@student)
@@ -988,6 +989,58 @@ describe AssignmentsController do
             user_session(@student)
             get "show", params: { course_id: @course.id, id: @assignment.id, anonymous_asset_id: @reviewee_submission.anonymous_id }
             expect(assigns[:js_env][:SUBMISSION_ID]).to eq @student_submission.id
+          end
+
+          it "sets the peer_review_mode_enabled to true when peer_reviews_for_a2 FF is ON and reviewee_id is present" do
+            user_session(@student)
+            get "show", params: { course_id: @course.id, id: @assignment.id, reviewee_id: @reviewee.id }
+            expect(assigns[:js_env][:peer_review_mode_enabled]).to eq true
+          end
+
+          it "sets the peer_review_mode_enabled to true when peer_reviews_for_a2 FF is ON and anonymous_asset_id is present" do
+            user_session(@student)
+            get "show", params: { course_id: @course.id, id: @assignment.id, anonymous_asset_id: @reviewee_submission.anonymous_id }
+            expect(assigns[:js_env][:peer_review_mode_enabled]).to eq true
+          end
+
+          it "sets the peer_review_mode_enabled to false when peer_reviews_for_a2 FF is ON with no presence of reviewee_id and anonymous_asset_id" do
+            user_session(@student)
+            get "show", params: { course_id: @course.id, id: @assignment.id }
+            expect(assigns[:js_env][:peer_review_mode_enabled]).to eq false
+          end
+
+          it "sets peer_review_available to false when reviewee_id is present and one of the submissions have not been submitted" do
+            @assignment.submit_homework(@student, submission_type: "online_url", url: "http://www.google.com")
+
+            user_session(@student)
+            get "show", params: { course_id: @course.id, id: @assignment.id, reviewee_id: @reviewee.id }
+            expect(assigns[:js_env][:peer_review_available]).to eq false
+          end
+
+          it "sets peer_review_available to false when anonymous_asset_id is present and one of the submissions have not been submitted" do
+            @assignment.submit_homework(@student, submission_type: "online_url", url: "http://www.google.com")
+
+            user_session(@student)
+            get "show", params: { course_id: @course.id, id: @assignment.id, anonymous_asset_id: @reviewee_submission.anonymous_id }
+            expect(assigns[:js_env][:peer_review_available]).to eq false
+          end
+
+          it "sets peer_review_available to true when reviewee_id is present and both submissions have been submitted" do
+            @assignment.submit_homework(@student, submission_type: "online_url", url: "http://www.google.com")
+            @assignment.submit_homework(@reviewee, submission_type: "online_url", url: "http://www.google.com")
+
+            user_session(@student)
+            get "show", params: { course_id: @course.id, id: @assignment.id, reviewee_id: @reviewee.id }
+            expect(assigns[:js_env][:peer_review_available]).to eq true
+          end
+
+          it "sets peer_review_available to true when anonymous_asset_id is present and both submissions have been submitted" do
+            @assignment.submit_homework(@student, submission_type: "online_url", url: "http://www.google.com")
+            @assignment.submit_homework(@reviewee, submission_type: "online_url", url: "http://www.google.com")
+
+            user_session(@student)
+            get "show", params: { course_id: @course.id, id: @assignment.id, anonymous_asset_id: @reviewee_submission.anonymous_id }
+            expect(assigns[:js_env][:peer_review_available]).to eq true
           end
         end
       end

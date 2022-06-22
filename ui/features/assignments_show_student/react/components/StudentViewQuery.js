@@ -45,7 +45,10 @@ function getAssignmentEnvVariables() {
     enrollmentState: ENV.enrollment_state,
     unlockDate: null,
     modulePrereq: null,
-    moduleUrl: `${baseUrl}/modules`
+    moduleUrl: `${baseUrl}/modules`,
+    belongsToUnpublishedModule: ENV.belongs_to_unpublished_module,
+    peerReviewModeEnabled: ENV.peer_review_mode_enabled,
+    peerReviewAvailable: ENV.peer_review_available
   }
 
   if (ENV.PREREQS?.items?.[0]?.prev) {
