@@ -371,7 +371,7 @@ class Assignment < ActiveRecord::Base
 
   def can_duplicate?
     return false if quiz?
-    return false if external_tool_tag.present? && !quiz_lti?
+    return false if external_tool_tag.present? && submission_types.include?("external_tool") && !quiz_lti?
 
     true
   end
