@@ -126,6 +126,18 @@ const CanvasInbox = () => {
     setIsSubmissionCommentsType(scope === 'submission_comments')
   }, [scope])
 
+  // clear conversationsManuallyMarkedUnread when
+  // selectedConversations is not the same
+  useEffect(() => {
+    if (
+      !JSON.parse(sessionStorage.getItem('conversationsManuallyMarkedUnread'))?.includes(
+        selectedConversations[0]
+      )
+    ) {
+      sessionStorage.removeItem('conversationsManuallyMarkedUnread')
+    }
+  }, [selectedConversations])
+
   const conversationContext = {
     multiselect,
     setMultiselect,
@@ -431,12 +443,22 @@ const CanvasInbox = () => {
   })
 
   const handleReadState = (markAsRead, conversationIds = null) => {
+    const conversationIdsToChange = conversationIds || selectedConversations.map(convo => convo._id)
+
     readStateChangeConversationParticipants({
       variables: {
-        conversationIds: conversationIds || selectedConversations.map(convo => convo._id),
+        conversationIds: conversationIdsToChange,
         workflowState: markAsRead
       }
     })
+
+    // always change this to whatever was just changed
+    if (markAsRead === 'unread') {
+      sessionStorage.setItem(
+        'conversationsManuallyMarkedUnread',
+        JSON.stringify(conversationIdsToChange)
+      )
+    }
   }
 
   const onReply = ({conversationMessage = null, replyAll = false} = {}) => {

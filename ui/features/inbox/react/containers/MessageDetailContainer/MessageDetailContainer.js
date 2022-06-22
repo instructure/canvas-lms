@@ -107,7 +107,12 @@ export const MessageDetailContainer = props => {
 
   // Set Conversation to read when the conversationMessages are loaded
   useEffect(() => {
+    const idIsStoredInSessionStorage = JSON.parse(
+      sessionStorage.getItem('conversationsManuallyMarkedUnread')
+    )?.includes(props.conversation._id)
+
     if (
+      !idIsStoredInSessionStorage &&
       conversationMessagesQuery.data?.legacyNode &&
       props.conversation.workflowState === 'unread'
     ) {
