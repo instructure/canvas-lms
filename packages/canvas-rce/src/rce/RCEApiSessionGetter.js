@@ -18,16 +18,25 @@
 
 import RceApiSource from '../rcs/api'
 
-export async function getCanvasUrl(props) {
+export async function getRCEApiSession(props) {
   if (!props || !props.jwt || !props.host) {
     return null
   }
 
   const source = new RceApiSource(props)
   try {
-    const session = await source.getSession()
-    return session.canvasUrl
+    return await source.getSession()
   } catch (e) {
     return null
   }
+}
+
+export async function getCanvasUrl(props) {
+  const session = await getRCEApiSession(props)
+  return session ? session.canvasUrl : null
+}
+
+export async function getCanUploadFiles(props) {
+  const session = await getRCEApiSession(props)
+  return session?.canUploadFiles
 }

@@ -135,7 +135,6 @@ function Demo() {
   function getRcsPropsFromOpts() {
     return canvas_exists
       ? {
-          canUploadFiles: true,
           contextId,
           contextType,
           containingContext: {

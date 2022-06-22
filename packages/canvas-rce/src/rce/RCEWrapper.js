@@ -35,7 +35,7 @@ import indicatorRegion from './indicatorRegion'
 import editorLanguage from './editorLanguage'
 import normalizeLocale from './normalizeLocale'
 import {sanitizePlugins} from './sanitizePlugins'
-import {getCanvasUrl} from './getCanvasUrl'
+import {getCanvasUrl} from './RCEApiSessionGetter'
 
 import indicate from '../common/indicate'
 import bridge from '../bridge'
@@ -524,7 +524,7 @@ class RCEWrapper extends React.Component {
 
   insertImage(image) {
     const editor = this.mceInstance()
-    let element = contentInsertion.insertImage(editor, image)
+    const element = contentInsertion.insertImage(editor, image)
 
     // Removes TinyMCE's caret &nbsp; text if exists.
     if (element?.nextSibling?.data?.trim() === '') {
@@ -936,12 +936,12 @@ class RCEWrapper extends React.Component {
     if (event.code === 'F9' && event.altKey) {
       event.preventDefault()
       event.stopPropagation()
-      this.setFocusAbilityForHeader(true);
+      this.setFocusAbilityForHeader(true)
       focusFirstMenuButton(this._elementRef.current)
     } else if (event.code === 'F10' && event.altKey) {
       event.preventDefault()
       event.stopPropagation()
-      this.setFocusAbilityForHeader(true);
+      this.setFocusAbilityForHeader(true)
       focusToolbar(this._elementRef.current)
     } else if ((event.code === 'F8' || event.code === 'Digit0') && event.altKey) {
       event.preventDefault()
@@ -1014,7 +1014,7 @@ class RCEWrapper extends React.Component {
         if (leavingHeader) {
           this.setFocusAbilityForHeader(false)
         }
-      });
+      })
     }
     this.setFocusAbilityForHeader(false)
 
@@ -1044,8 +1044,10 @@ class RCEWrapper extends React.Component {
     // Not using iframe_aria_text because compatibility issues.
     // Not using iframe_attrs because library overwriting.
     if (this.iframe) {
-      this.iframe.setAttribute('title', formatMessage(
-        'Rich Text Area. Press ALT+0 for Rich Content Editor shortcuts.'))
+      this.iframe.setAttribute(
+        'title',
+        formatMessage('Rich Text Area. Press ALT+0 for Rich Content Editor shortcuts.')
+      )
     }
 
     this.props.onInitted?.(editor)
@@ -1392,7 +1394,7 @@ class RCEWrapper extends React.Component {
     }
   }
 
-  setFocusAbilityForHeader = (focusable) => {
+  setFocusAbilityForHeader = focusable => {
     // Sets aria-hidden to prevent screen readers focus in RCE menus and toolbar
     const header = this._elementRef.current.querySelector('.tox-editor-header')
     if (header) {

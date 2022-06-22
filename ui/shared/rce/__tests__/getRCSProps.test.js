@@ -21,19 +21,6 @@ describe('getRCSProps', () => {
     expect(getRCSProps()).toBeNull()
   })
 
-  it('returns user context if cannot upload files', () => {
-    ENV = {
-      ...ENV,
-      current_user_id: 'user_id',
-      RICH_CONTENT_CAN_UPLOAD_FILES: false,
-      context_asset_string: 'course_1'
-    }
-    expect(getRCSProps()).toMatchObject({
-      contextId: 'user_id',
-      contextType: 'user'
-    })
-  })
-
   it('returns user context contextType is "account"', () => {
     ENV = {
       ...ENV,
@@ -94,7 +81,6 @@ describe('getRCSProps', () => {
       }
     }
     expect(getRCSProps()).toMatchObject({
-      canUploadFiles: true,
       filesTabDisabled: false,
       themeUrl: 'http://the.theme.here/',
       canvasUrl: 'https://canvas.instructure.com',
