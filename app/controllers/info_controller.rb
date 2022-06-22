@@ -47,12 +47,6 @@ class InfoController < ApplicationController
   end
 
   def health_check
-    begin
-      1 / 0
-    rescue ZeroDivisionError => exception
-      Sentry.capture_exception(exception)
-    end
-    Sentry.capture_message("test message")
     # This action should perform checks on various subsystems, and raise an exception on failure.
     Account.connection.select_value("SELECT 1")
     if Delayed::Job == Delayed::Backend::ActiveRecord::Job

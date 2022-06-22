@@ -29,14 +29,7 @@ if settings.present?
   Sentry.init do |config|
     config.dsn = settings[:dsn]
     config.transport.ssl_verification = false
-    # config.tags = settings.fetch(:tags, {}).merge(
-    #  'canvas_revision' => Canvas.revision,
-    #  'canvas_domain' => ENV['CANVAS_DOMAIN'],
-    #  'node_id' => ENV['NODE']
-    # )
     config.release = Canvas.revision
-    #config.sanitize_fields += Rails.application.config.filter_parameters.map(&:to_s)
-    #config.sanitize_credit_cards = false
     config.enabled_environments = %w[ production development ]
     config.excluded_exceptions += %w{
       AuthenticationMethods::AccessTokenError
@@ -46,6 +39,12 @@ if settings.present?
       Turnitin::Errors::SubmissionNotScoredError
     }
   end
+
+  Sentry.set_tags(settings.fetch(:tags, {}).merge(
+    'canvas_revision' => Canvas.revision,
+    'canvas_domain' => ENV['CANVAS_DOMAIN'],
+    'node_id' => ENV['NODE']
+  ))
 
   Rails.configuration.to_prepare do
     Canvas::Errors.register!(:sentry_notification) do |exception, data|
