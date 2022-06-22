@@ -452,7 +452,18 @@ pipeline {
                     .hooks(buildSummaryReportHooks.call())
                     .obeysAllowStages(false)
                     .timeout(20)
-                    .execute(buildDockerImageStage.&patchsetImage)
+                    .execute {
+                      buildDockerImageStage.patchsetImage('''
+                        diffFrom=$(git --git-dir $LOCAL_WORKDIR/.git rev-parse $GERRIT_PATCHSET_REVISION^1)
+                        docker run -dt --name general-build-container --volume $(pwd)/$LOCAL_WORKDIR/.git:$DOCKER_WORKDIR/.git -e RAILS_ENV=test $PATCHSET_TAG bash -c "bin/rails runner \"true\" && sleep infinity"
+                        docker exec -dt \
+                                      -e CRYSTALBALL_DIFF_FROM=$diffFrom \
+                                      -e CRYSTALBALL_DIFF_TO=$GERRIT_PATCHSET_REVISION \
+                                      -e CRYSTALBALL_REPO_PATH=$DOCKER_WORKDIR \
+                                      general-build-container bundle exec crystalball --dry-run
+                        docker exec -t general-build-container ps aww
+                      ''')
+                    }
 
                   extendedStage(RUN_MIGRATIONS_STAGE)
                     .hooks(buildSummaryReportHooks.call())
@@ -468,14 +479,14 @@ pipeline {
                     .execute {
                       try {
                         /* groovylint-disable-next-line GStringExpressionWithinString */
-                        sh '''
-                          diffFrom=\$(git --git-dir $LOCAL_WORKDIR/.git rev-parse ${GERRIT_PATCHSET_REVISION}^1)
-                          docker run --name=crystal --volume \$(pwd)/$LOCAL_WORKDIR/.git:$DOCKER_WORKDIR/.git \
-                                     -e CRYSTALBALL_DIFF_FROM=${diffFrom} \
-                                     -e CRYSTALBALL_DIFF_TO=${GERRIT_PATCHSET_REVISION} \
-                                     -e CRYSTALBALL_REPO_PATH=$DOCKER_WORKDIR \
-                                     $PATCHSET_TAG bundle exec crystalball --dry-run
-                          docker cp \$(docker ps -qa -f name=crystal):/usr/src/app/crystalball_spec_list.txt ./tmp/crystalball_spec_list.txt
+                        sh '''#!/bin/bash
+                          set -ex
+
+                          while docker exec -t general-build-container ps aww | grep crystalball; do
+                            sleep 0.1
+                          done
+
+                          docker cp \$(docker ps -qa -f name=general-build-container):/usr/src/app/crystalball_spec_list.txt ./tmp/crystalball_spec_list.txt
                         '''
                         archiveArtifacts allowEmptyArchive: true, artifacts: 'tmp/crystalball_spec_list.txt'
 
