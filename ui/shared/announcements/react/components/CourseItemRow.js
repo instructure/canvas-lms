@@ -237,9 +237,9 @@ export default class CourseItemRow extends Component {
             <div className="ic-item-row__author-col">
               <Avatar
                 size="small"
-                alt={this.props.author.display_name || I18n.t('Unknown')}
-                name={this.props.author.display_name || I18n.t('Unknown')}
-                src={this.props.author.avatar_image_url}
+                alt={this.props.author?.display_name || I18n.t('Unknown')}
+                name={this.props.author?.display_name || I18n.t('Unknown')}
+                src={this.props.author?.avatar_image_url}
                 data-fs-exclude
               />
             </div>
