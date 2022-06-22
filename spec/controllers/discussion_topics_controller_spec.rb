@@ -274,28 +274,6 @@ describe DiscussionTopicsController do
       expect(parsed_topic["lock_at"].to_json).to eq lock_at_time.to_json
     end
 
-    it "sets DIRECT_SHARE_ENABLED when allowed" do
-      user_session(@teacher)
-      get "index", params: { course_id: @course.id }
-      expect(response).to be_successful
-      expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to be(true)
-    end
-
-    it "does not set DIRECT_SHARE_ENABLED if the user does not have manage_content" do
-      user_session(@student)
-      get "index", params: { course_id: @course.id }
-      expect(response).to be_successful
-      expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to be(false)
-    end
-
-    it "does not set DIRECT_SHARE_ENABLED when viewing a group" do
-      user_session(@teacher)
-      group = @course.groups.create!
-      get "index", params: { group_id: group.id }
-      expect(response).to be_successful
-      expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to be(false)
-    end
-
     it "sets discussions reporting and anonymity when their flags are enabled" do
       Account.site_admin.enable_feature! :react_discussions_post
 
@@ -304,6 +282,59 @@ describe DiscussionTopicsController do
       expect(assigns[:js_env][:student_reporting_enabled]).to be(true)
       expect(assigns[:js_env][:discussion_anonymity_enabled]).to be(true)
       expect(assigns[:js_env][:FEATURE_FLAGS_URL]).to eq("/courses/#{@course.id}/settings#tab-features")
+    end
+
+    context "DIRECT_SHARE_ENABLED" do
+      it "sets DIRECT_SHARE_ENABLED when allowed" do
+        user_session(@teacher)
+        get "index", params: { course_id: @course.id }
+        expect(response).to be_successful
+        expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to be(true)
+      end
+
+      it "does not set DIRECT_SHARE_ENABLED when viewing a group" do
+        user_session(@teacher)
+        group = @course.groups.create!
+        get "index", params: { group_id: group.id }
+        expect(response).to be_successful
+        expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to be(false)
+      end
+
+      describe "with manage_content permission disabled" do
+        before do
+          RoleOverride.create!(context: @course.account, permission: "manage_content", role: teacher_role, enabled: false)
+        end
+
+        it "does not set DIRECT_SHARE_ENABLED if the course is active" do
+          user_session(@teacher)
+
+          get "index", params: { course_id: @course.id }
+          expect(response).to be_successful
+          expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to be(false)
+        end
+
+        describe "when the course is concluded" do
+          before do
+            @course.complete!
+          end
+
+          it "sets DIRECT_SHARE_ENABLED when the user can use it" do
+            user_session(@teacher)
+
+            get "index", params: { course_id: @course.id }
+            expect(response).to be_successful
+            expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to be(true)
+          end
+
+          it "does not set DIRECT_SHARE_ENABLED when the user can't use it" do
+            user_session(@student)
+
+            get "index", params: { course_id: @course.id }
+            expect(response).to be_successful
+            expect(assigns[:js_env][:DIRECT_SHARE_ENABLED]).to be(false)
+          end
+        end
+      end
     end
 
     describe "Metrics for the index page" do

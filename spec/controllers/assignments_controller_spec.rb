@@ -619,10 +619,44 @@ describe AssignmentsController do
       expect(assigns[:js_env][:SUBMISSION_ID]).to be_nil
     end
 
-    it "shows direct share options" do
-      user_session(@teacher)
-      get "show", params: { course_id: @course.id, id: @assignment.id }
-      expect(assigns[:can_direct_share]).to eq true
+    context "direct share options" do
+      it "shows direct share options when the user can use it" do
+        user_session(@teacher)
+        get "show", params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:can_direct_share]).to eq true
+      end
+
+      describe "with manage_content permission disabled" do
+        before do
+          RoleOverride.create!(context: @course.account, permission: "manage_content", role: teacher_role, enabled: false)
+        end
+
+        it "does not show direct share options if the course is active" do
+          user_session(@teacher)
+          get "show", params: { course_id: @course.id, id: @assignment.id }
+          expect(assigns[:can_direct_share]).to eq false
+        end
+
+        describe "when the course is concluded" do
+          before do
+            @course.complete!
+          end
+
+          it "shows direct share options when the user can use it" do
+            user_session(@teacher)
+
+            get "show", params: { course_id: @course.id, id: @assignment.id }
+            expect(assigns[:can_direct_share]).to eq true
+          end
+
+          it "does not show direct share options when the user can't use it" do
+            user_session(@student)
+
+            get "show", params: { course_id: @course.id, id: @assignment.id }
+            expect(assigns[:can_direct_share]).to eq false
+          end
+        end
+      end
     end
 
     context "when the assignment is an external tool" do

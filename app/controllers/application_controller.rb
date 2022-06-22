@@ -266,7 +266,8 @@ class ApplicationController < ActionController::Base
 
         direct_share_enabled = !@context.is_a?(Group) && @current_user&.can_content_share?
         if @context.is_a?(Course)
-          direct_share_enabled = @context.grants_right?(@current_user, :read_as_admin)
+          direct_share_enabled = @context.grants_right?(@current_user, session, :manage_content) ||
+                                 (@context.concluded? && @context.grants_right?(@current_user, :read_as_admin))
         end
         @js_env[:DIRECT_SHARE_ENABLED] = direct_share_enabled
         @js_env[:FEATURES] = cached_features.merge(

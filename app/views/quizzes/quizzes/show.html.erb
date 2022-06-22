@@ -35,6 +35,7 @@
   admin_show_rubric_title = t('links.show_assignment_rubric', "Show Rubric")
   is_locked = !!js_env.dig(:MASTER_COURSE_DATA, "is_master_course_child_content") &&
               !!js_env.dig(:MASTER_COURSE_DATA, "restricted_by_master_course")
+  can_direct_share = can_do(@context, @current_user, :manage_content) || (@context.concluded? && can_do(@context, @current_user, :read_as_admin))
 %>
 
 <% if @headers %>
@@ -248,7 +249,7 @@
               </li>
             <% end %>
 
-            <% if can_do(@quiz, @current_user, :manage) %>
+            <% if can_direct_share %>
               <%= render :partial => 'direct_share_buttons' %>
             <% end %>
 
@@ -261,7 +262,7 @@
     </div>
   </div>
 
-  <% elsif can_do(@context, @current_user, :read_as_admin) %>
+  <% elsif can_direct_share %>
   <div class="header-bar">
     <div class="header-bar-right">
         <div class="header-group-right">
