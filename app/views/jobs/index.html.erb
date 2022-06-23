@@ -72,7 +72,7 @@
 </style>
 
 <% css_bundle :slickgrid %>
-<% js_bundle :jobs %>
+<% deferred_js_bundle :jobs %>
 
 <div id="running-wrapper" style="float:<%= direction('left') %>">
   <h2><%= t 'headings.running_jobs', "Running Jobs" %></h2>
