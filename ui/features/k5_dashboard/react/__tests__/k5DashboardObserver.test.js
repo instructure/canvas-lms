@@ -301,4 +301,42 @@ describe('K5Dashboard Parent Support', () => {
       expect(reloadMock).not.toHaveBeenCalled()
     })
   })
+
+  describe('grades tab', () => {
+    it('is visible to observers who have student enrollments', async () => {
+      clearObservedId(defaultProps.currentUser.id)
+      const {findByRole} = render(
+        <K5Dashboard
+          {...defaultProps}
+          currentUserRoles={['student', 'observer']}
+          observedUsersList={[defaultProps.currentUser, ...MOCK_OBSERVED_USERS_LIST]}
+        />
+      )
+      expect(await findByRole('tab', {name: 'Grades'})).toBeInTheDocument()
+    })
+
+    it('is visible to observers who have selected a student', async () => {
+      const {findByRole} = render(
+        <K5Dashboard
+          {...defaultProps}
+          currentUserRoles={['observer']}
+          observedUsersList={MOCK_OBSERVED_USERS_LIST}
+        />
+      )
+      expect(await findByRole('tab', {name: 'Grades'})).toBeInTheDocument()
+    })
+
+    it('is not visible to observers who have themself selected (and no student/teacher enrollments)', async () => {
+      clearObservedId(defaultProps.currentUser.id)
+      const {findByRole, queryByRole} = render(
+        <K5Dashboard
+          {...defaultProps}
+          currentUserRoles={['observer']}
+          observedUsersList={[defaultProps.currentUser, ...MOCK_OBSERVED_USERS_LIST]}
+        />
+      )
+      await findByRole('tab', {name: 'Homeroom'})
+      expect(queryByRole('tab', {name: 'Grades'})).not.toBeInTheDocument()
+    })
+  })
 })

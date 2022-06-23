@@ -23,7 +23,7 @@ module SIS
       attr_accessor :user_id, :login_id, :status, :first_name, :last_name,
                     :email, :password, :ssha_password, :integration_id, :row,
                     :short_name, :full_name, :sortable_name, :lineno, :csv, :pronouns,
-                    :declared_user_type, :canvas_password_notification,
+                    :declared_user_type, :canvas_password_notification, :home_account,
                     :authentication_provider_id, :sis_batch_id, :existing_user_id,
                     :existing_integration_id, :existing_canvas_user_id, :root_account_id
 
@@ -32,9 +32,9 @@ module SIS
                      declared_user_type: nil, canvas_password_notification: nil,
                      integration_id: nil, short_name: nil, full_name: nil,
                      sortable_name: nil, authentication_provider_id: nil,
-                     sis_batch_id: nil, lineno: nil, csv: nil, existing_user_id: nil,
-                     existing_integration_id: nil, existing_canvas_user_id: nil,
-                     root_account_id: nil, row: nil)
+                     home_account: nil, sis_batch_id: nil, lineno: nil, csv: nil,
+                     existing_user_id: nil, existing_integration_id: nil,
+                     existing_canvas_user_id: nil, root_account_id: nil, row: nil)
         self.user_id = user_id
         self.login_id = login_id
         self.status = status
@@ -51,6 +51,7 @@ module SIS
         self.sortable_name = sortable_name
         self.authentication_provider_id = authentication_provider_id
         self.canvas_password_notification = Canvas::Plugin.value_to_boolean(canvas_password_notification)
+        self.home_account = Canvas::Plugin.value_to_boolean(home_account)
         self.lineno = lineno
         self.csv = csv
         self.sis_batch_id = sis_batch_id
@@ -84,7 +85,7 @@ module SIS
          full_name: full_name, sortable_name: sortable_name,
          canvas_password_notification: canvas_password_notification,
          authentication_provider_id: authentication_provider_id,
-         declared_user_type: declared_user_type].to_s
+         declared_user_type: declared_user_type, home_account: home_account].to_s
       end
     end
   end

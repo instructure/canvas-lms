@@ -594,9 +594,8 @@ describe Types::AssignmentType do
     end
 
     it "works for Noop tags" do
-      account = course.account
-      account.settings[:conditional_release] = { value: true }
-      account.save!
+      course.conditional_release = true
+      course.save!
       assignment.assignment_overrides.create!(set_type: "Noop", set_id: 555)
       expect(
         assignment_type.resolve(<<~GQL, current_user: teacher)

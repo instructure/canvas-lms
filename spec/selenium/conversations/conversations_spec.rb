@@ -157,8 +157,25 @@ describe "conversations new" do
         f("button[data-testid='more-options']").click
         fj("li:contains('Unstar')").click
         wait_for_ajaximations
-        # verify that convo is unastarred by making sure button is no present
-        expect(f("body")).not_to contain_jqcss("button[data-testid*='starred']")
+        expect(f("button[data-testid='visible-not-starred']")).to be_present
+      end
+
+      it "archives / unarchives a convo properly in the starred scope" do
+        @participant.starred = true
+        @participant.save!
+
+        get "/conversations"
+        f("input[title='Inbox']").click
+        fj("li:contains('Starred')").click
+        f("div[data-testid='conversation']").click
+        f("button[data-testid='more-options']").click
+        fj("li:contains('Archive')").click
+        driver.switch_to.alert.accept
+        expect(fj("span:contains('Message archived!')")).to be_present
+        f("button[data-testid='more-options']").click
+        fj("li:contains('Unarchive')").click
+        driver.switch_to.alert.accept
+        expect(fj("span:contains('Message unarchived!')")).to be_present
       end
     end
   end

@@ -32,10 +32,10 @@ export default function AccountNotificationSettingsView({accountId, userId}) {
       <NotificationPreferencesContextProvider>
         <NotificationPreferencesContext.Consumer>
           {({currentContext}) =>
-            currentContext === 'account' ? (
+            currentContext.value === 'account' ? (
               <AccountNotificationSettingsQuery accountId={accountId} userId={userId} />
             ) : (
-              <CourseNotificationSettingsQuery courseId={currentContext} userId={userId} />
+              <CourseNotificationSettingsQuery courseId={currentContext.value} userId={userId} />
             )
           }
         </NotificationPreferencesContext.Consumer>

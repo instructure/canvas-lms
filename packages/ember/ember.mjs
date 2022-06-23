@@ -8,6 +8,12 @@
  * @version   1.4.0
  */
 
+import HandlebarsExports from 'handlebars/runtime.js'
+import jQuery from 'jquery'
+
+const Handlebars = HandlebarsExports.default;
+const Ember = window.Ember = {};
+const MetamorphENV = Ember.MetamorphENV = {};
 
 (function() {
 /*global __fail__*/
@@ -22,14 +28,6 @@ Ember Debug
 /**
 @class Ember
 */
-
-if ('undefined' === typeof Ember) {
-  Ember = {};
-
-  if ('undefined' !== typeof window) {
-    window.Em = window.Ember = Em = Ember;
-  }
-}
 
 // This needs to be kept in sync with the logic in
 // `packages/ember-metal/lib/core.js`.
@@ -295,19 +293,8 @@ var define, requireModule, require, requirejs;
   @version 1.4.0
 */
 
-if ('undefined' === typeof Ember) {
-  // Create core object. Make it act like an instance of Ember.Namespace so that
-  // objects assigned to it are given a sane string representation.
-  Ember = {};
-}
-
 // Default imports, exports and lookup to the global object;
-var imports = Ember.imports = Ember.imports || this;
-var exports = Ember.exports = Ember.exports || this;
-var lookup  = Ember.lookup  = Ember.lookup  || this;
-
-// aliases needed to keep minifiers from removing the global context
-exports.Em = exports.Ember = Em = Ember;
+var lookup = Ember.lookup = window;
 
 // Make sure these are set whether Ember was already defined or not
 
@@ -352,10 +339,6 @@ Ember.config = Ember.config || {};
 // We disable the RANGE API by default for performance reasons
 if ('undefined' === typeof Ember.ENV.DISABLE_RANGE_API) {
   Ember.ENV.DISABLE_RANGE_API = true;
-}
-
-if ("undefined" === typeof MetamorphENV) {
-  exports.MetamorphENV = {};
 }
 
 MetamorphENV.DISABLE_RANGE_API = Ember.ENV.DISABLE_RANGE_API;
@@ -3445,12 +3428,8 @@ MapWithDefault.prototype.copy = function() {
 
 (function() {
 function consoleMethod(name) {
-  var consoleObj, logToConsole;
-  if (Ember.imports.console) {
-    consoleObj = Ember.imports.console;
-  } else if (typeof console !== 'undefined') {
-    consoleObj = console;
-  }
+  var consoleObj = console;
+  var logToConsole;
 
   var method = typeof consoleObj === 'object' ? consoleObj[name] : null;
 
@@ -6139,7 +6118,7 @@ define("backburner",
         index = findThrottler(target, method);
         if (index > -1) { return throttlers[index]; } // throttled
 
-        timer = global.setTimeout(function() {
+        timer = setTimeout(function() {
           self.run.apply(self, args);
 
           var index = findThrottler(target, method);
@@ -6179,7 +6158,7 @@ define("backburner",
           clearTimeout(debouncee[2]);
         }
 
-        timer = global.setTimeout(function() {
+        timer = setTimeout(function() {
           if (!immediate) {
             self.run.apply(self, args);
           }
@@ -6279,7 +6258,7 @@ define("backburner",
 
     function createAutorun(backburner) {
       backburner.begin();
-      autorun = global.setTimeout(function() {
+      autorun = setTimeout(function() {
         autorun = null;
         backburner.end();
       });
@@ -6290,7 +6269,7 @@ define("backburner",
         if (laterTimer) {
           clearTimeout(laterTimer);
         }
-        laterTimer = global.setTimeout(function() {
+        laterTimer = setTimeout(function() {
           laterTimer = null;
           laterTimerExpiresAt = null;
           executeTimers(self);
@@ -21018,11 +20997,6 @@ Ember Runtime
 @submodule ember-views
 */
 
-var jQuery = (this && this.jQuery) || (Ember.imports && Ember.imports.jQuery);
-if (!jQuery && typeof require === 'function') {
-  jQuery = require('jquery');
-}
-
 Ember.assert("Ember Views require jQuery between 1.7 and 2.1", jQuery && (jQuery().jquery.match(/^((1\.(7|8|9|10|11))|(2\.(0|1)))(\.\d+)?(pre|rc\d?)?/) || Ember.ENV.FORCE_JQUERY));
 
 /**
@@ -26679,11 +26653,6 @@ var objectCreate = Object.create || function(parent) {
   F.prototype = parent;
   return new F();
 };
-
-var Handlebars = (Ember.imports && Ember.imports.Handlebars) || (this && this.Handlebars);
-if (!Handlebars && typeof require === 'function') {
-  Handlebars = require('handlebars');
-}
 
 Ember.assert("Ember Handlebars requires Handlebars version 1.0 or 1.1. Include " +
              "a SCRIPT tag in the HTML HEAD linking to the Handlebars file " +
@@ -41801,3 +41770,5 @@ Ember.State = generateRemovedClass("Ember.State");
 
 
 })();
+
+export default Ember

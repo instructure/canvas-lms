@@ -282,6 +282,7 @@ recommended to omit this field over using fake email addresses for testing.</td>
 student, student_other, or teacher. Can pass "&lt;delete>" to remove the
 declared user type from the user.</td>
 </tr>
+<tr>
 <td>canvas_password_notification</td>
 <td>boolean</td>
 <td></td>
@@ -290,6 +291,15 @@ declared user type from the user.</td>
 the authentication_provider_id is canvas</td>
 </tr>
 <tr>
+<td>home_account</td>
+<td>boolean</td>
+<td></td>
+<td></td>
+<td>Setting this to true will create a new user in the target account for the
+SIS import and merge in another existing user from another account within the
+consortium with a matching integration_id. Will be ignored unless the target
+account is associated with an auto-merge consortium.</td>
+</tr>
 <tr>
 <td>status</td>
 <td>enum</td>

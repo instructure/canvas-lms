@@ -17,7 +17,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect} from 'react'
+import React, {useRef, useState, useEffect} from 'react'
+import useBoolean from '@canvas/outcomes/react/hooks/useBoolean'
 import PropTypes from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {TextInput} from '@instructure/ui-text-input'
@@ -57,11 +58,13 @@ const I18n = useI18nScope('OutcomeManagement')
 const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId}) => {
   const {contextType, contextId, friendlyDescriptionFF, isMobileView, accountLevelMasteryScalesFF} =
     useCanvasContext()
+  const createButtonRef = useRef()
   const [title, titleChangeHandler] = useInput()
   const [displayName, displayNameChangeHandler] = useInput()
   const [friendlyDescription, friendlyDescriptionChangeHandler] = useInput()
   const [description, setDescription] = useState('')
   const [showTitleError, setShowTitleError] = useState(false)
+  const [groupCreated, setGroupCreated, setGroupNotCreated] = useBoolean(false)
   const [setOutcomeFriendlyDescription] = useMutation(SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION)
   const [createLearningOutcome] = useMutation(CREATE_LEARNING_OUTCOME)
   const {rootId, collections} = useManageOutcomes({
@@ -104,6 +107,13 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
       setSelectedGroupAncestorIds([rootId])
     }
   }, [collections, rootId, selectedGroup, selectedGroupAncestorIds])
+
+  useEffect(() => {
+    if (groupCreated) {
+      createButtonRef.current?.focus()
+      setGroupNotCreated()
+    }
+  }, [groupCreated, setGroupNotCreated])
 
   const invalidTitle = titleValidator(title)
   const invalidDisplayName = displayNameValidator(displayName)
@@ -319,6 +329,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
                 setSelectedGroup(targetGroup)
               }}
               starterGroupId={starterGroupId}
+              notifyGroupCreated={setGroupCreated}
             />
           </View>
         </Modal.Body>
@@ -332,6 +343,8 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
             margin="0 x-small 0 0"
             interaction="enabled"
             onClick={onCreateHandler}
+            ref={createButtonRef}
+            data-testid="create-button"
           >
             {I18n.t('Create')}
           </Button>

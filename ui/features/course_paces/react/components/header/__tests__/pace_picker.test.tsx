@@ -37,7 +37,8 @@ const defaultProps = {
   selectedContextId: COURSE.id,
   selectedContextType: 'Course' as const,
   setSelectedPaceContext: selectPaceContextFn,
-  changeCount: 0
+  changeCount: 0,
+  responsiveSize: 'large' as const
 }
 
 beforeAll(() => {
@@ -108,10 +109,30 @@ describe('PacePicker', () => {
     expect(picker.value).toBe('Henry Dorsett Case')
   })
 
-  it('displays a message when there are no enrolled students', () => {
-    const {getByRole} = render(<PacePicker {...defaultProps} enrollments={[]} />)
+  it('displays a heading when there are no enrolled students or sections', () => {
+    const {getByRole} = render(<PacePicker {...defaultProps} sections={[]} enrollments={[]} />)
     const heading = getByRole('heading', {name: 'Course Pacing'})
     expect(heading).toBeInTheDocument()
+  })
+
+  it('renders a drop-down with course and sections only if no enrolled students', () => {
+    const {getByLabelText} = render(<PacePicker {...defaultProps} enrollments={[]} />)
+    const picker = getByLabelText('Course Pacing') as HTMLInputElement
+    act(() => picker.click())
+
+    expect(screen.getByRole('menuitem', {name: 'Course'})).toBeInTheDocument()
+    expect(screen.getByRole('button', {name: 'Sections'})).toBeInTheDocument()
+    expect(screen.queryByRole('button', {name: 'Students'})).not.toBeInTheDocument()
+  })
+
+  it('renders a drop-down with course and students only if no sections exist', () => {
+    const {getByLabelText} = render(<PacePicker {...defaultProps} sections={[]} />)
+    const picker = getByLabelText('Course Pacing') as HTMLInputElement
+    act(() => picker.click())
+
+    expect(screen.getByRole('menuitem', {name: 'Course'})).toBeInTheDocument()
+    expect(screen.getByRole('button', {name: 'Students'})).toBeInTheDocument()
+    expect(screen.queryByRole('button', {name: 'Sections'})).not.toBeInTheDocument()
   })
 
   describe('warning modal', () => {
@@ -122,7 +143,19 @@ describe('PacePicker', () => {
       act(() => picker.click())
       act(() => screen.getByRole('button', {name: 'Students'}).click())
       act(() => screen.getByRole('menuitem', {name: 'Molly Millions'}).click())
-      expect(getByText(/You have unpublished changes to your Course Pace./)).toBeInTheDocument()
+      expect(getByText(/You have unpublished changes to your course pace./)).toBeInTheDocument()
+    })
+
+    it('shows a message for changes in section paces', () => {
+      const {getByText, getByLabelText} = render(
+        <PacePicker {...defaultProps} selectedContextType="Section" changeCount={1} />
+      )
+      const picker = getByLabelText('Course Pacing') as HTMLInputElement
+
+      act(() => picker.click())
+      act(() => screen.getByRole('button', {name: 'Students'}).click())
+      act(() => screen.getByRole('menuitem', {name: 'Molly Millions'}).click())
+      expect(getByText(/You have unpublished changes to your section pace./)).toBeInTheDocument()
     })
 
     it('aborts context change on cancel', () => {

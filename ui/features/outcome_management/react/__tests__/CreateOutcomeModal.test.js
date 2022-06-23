@@ -27,7 +27,8 @@ import {
   accountMocks,
   smallOutcomeTree,
   setFriendlyDescriptionOutcomeMock,
-  createLearningOutcomeMock
+  createLearningOutcomeMock,
+  createOutcomeGroupMocks
 } from '@canvas/outcomes/mocks/Management'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
@@ -431,6 +432,35 @@ describe('CreateOutcomeModal', () => {
         expect(friendlyDescription).not.toBe(document.activeElement)
         expect(friendlyName).not.toBe(document.activeElement)
         expect(name).toBe(document.activeElement)
+      })
+
+      it('sets focus on create button after creation of a new group', async () => {
+        const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+        const {getByText, getByLabelText, getByTestId} = render(
+          <CreateOutcomeModal {...defaultProps()} />,
+          {
+            friendlyDescriptionFF: false,
+            mocks: [
+              ...accountMocks({childGroupsCount: 0}),
+              ...createOutcomeGroupMocks({
+                parentOutcomeGroupId: '1',
+                title: 'test'
+              })
+            ]
+          }
+        )
+        await act(async () => jest.runOnlyPendingTimers())
+        fireEvent.click(getByText('Create New Group'))
+        fireEvent.change(getByLabelText('Enter new group name'), {target: {value: 'test'}})
+        fireEvent.click(getByText('Create new group'))
+        await waitFor(() => {
+          expect(showFlashAlertSpy).toHaveBeenCalledWith({
+            message: '"test" was successfully created.',
+            type: 'success'
+          })
+        })
+        await act(async () => jest.runOnlyPendingTimers())
+        expect(getByTestId('create-button')).toHaveFocus()
       })
 
       describe('with Friendly Description Feature Flag disabled', () => {

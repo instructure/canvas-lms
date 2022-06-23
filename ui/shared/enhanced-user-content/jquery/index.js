@@ -43,7 +43,7 @@ import '@canvas/rails-flash-notifications'
 import '@canvas/util/templateData'
 import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/media-comments/jquery/mediaCommentThumbnail'
-import 'date'
+import 'date-js'
 import 'jquery-tinypubsub' /* /\.publish\(/ */
 import 'jqueryui/resizable'
 import 'jqueryui/sortable'

@@ -10,8 +10,9 @@ exports[`renders Pill components as list items 1`] = `
   >
     <Pill
       color="primary"
-      text="Pill 1"
-    />
+    >
+      Pill 1
+    </Pill>
   </li>
   <li
     className="BadgeList-styles__item"
@@ -19,8 +20,9 @@ exports[`renders Pill components as list items 1`] = `
   >
     <Pill
       color="primary"
-      text="Pill 2"
-    />
+    >
+      Pill 2
+    </Pill>
   </li>
   <li
     className="BadgeList-styles__item"
@@ -28,8 +30,9 @@ exports[`renders Pill components as list items 1`] = `
   >
     <Pill
       color="primary"
-      text="Pill 3"
-    />
+    >
+      Pill 3
+    </Pill>
   </li>
 </ul>
 `;

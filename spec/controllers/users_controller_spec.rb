@@ -2189,6 +2189,22 @@ describe UsersController do
       expect(response.body).not_to include "secret"
       expect(response.status).to eq 401
     end
+
+    it "overwrites stuck sis fields" do
+      user_with_pseudonym
+      user_session(@user)
+      put "update", params: { id: @user.id, "user[sortable_name]": "overwritten@example.com" }, format: "json"
+      expect(response.body).to include "overwritten@example.com"
+      expect(response.status).to eq 200
+    end
+
+    it "doesn't overwrite stuck sis fields" do
+      user_with_pseudonym
+      user_session(@user)
+      put "update", params: { id: @user.id, "user[sortable_name]": "overwritten@example.com", override_sis_stickiness: false }, format: "json"
+      expect(response.body).not_to include "overwritten@example.com"
+      expect(response.status).to eq 200
+    end
   end
 
   describe "POST 'masquerade'" do
@@ -2280,13 +2296,13 @@ describe UsersController do
 
   describe "GET media_download" do
     let(:kaltura_client) do
-      kaltura_client = instance_double("CanvasKaltura::ClientV3")
+      kaltura_client = instance_double(CanvasKaltura::ClientV3)
       allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kaltura_client)
       kaltura_client
     end
 
     let(:media_source_fetcher) do
-      media_source_fetcher = instance_double("MediaSourceFetcher")
+      media_source_fetcher = instance_double(MediaSourceFetcher)
       expect(MediaSourceFetcher).to receive(:new).with(kaltura_client).and_return(media_source_fetcher)
       media_source_fetcher
     end
@@ -2565,8 +2581,8 @@ describe UsersController do
         @user.favorites.where(context_type: "Course", context_id: @course1).first_or_create!
         get "user_dashboard"
         course_data = assigns[:js_env][:STUDENT_PLANNER_COURSES]
-        expect(course_data.detect { |h| h[:id] == @course1.id }[:isFavorited]).to eq true
-        expect(course_data.detect { |h| h[:id] == @course2.id }[:isFavorited]).to eq false
+        expect(course_data.detect { |h| h[:id] == @course1.id }[:isFavorited]).to be true
+        expect(course_data.detect { |h| h[:id] == @course2.id }[:isFavorited]).to be false
       end
 
       it "loads nicknames" do

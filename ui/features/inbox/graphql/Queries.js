@@ -90,7 +90,7 @@ export const CONVERSATIONS_QUERY = gql`
         id
         conversationsConnection(
           scope: $scope # e.g. archived
-          filter: $filter # e.g. [course_1, user_1]
+          filter: $filter # e.g. [user_1, course_1]
           first: 20
           after: $afterConversation
         ) {
@@ -196,12 +196,13 @@ export const VIEWABLE_SUBMISSIONS_QUERY = gql`
     $sort: SubmissionCommentsSortOrderType
     $allComments: Boolean = true
     $afterSubmission: String
+    $filter: [String!]
   ) {
     legacyNode(_id: $userID, type: User) {
       ... on User {
         _id
         id
-        viewableSubmissionsConnection(first: 20, after: $afterSubmission) {
+        viewableSubmissionsConnection(first: 20, after: $afterSubmission, filter: $filter) {
           nodes {
             _id
             commentsConnection(sortOrder: $sort, filter: {allComments: $allComments}) {

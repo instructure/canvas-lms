@@ -157,14 +157,16 @@ module MicrosoftSync
 
       def add_users_special_cases(group_id)
         ADD_USERS_SPECIAL_CASES + [
+          SpecialCase.new(
+            404, /does not exist or one of its queried reference/,
+            result: Errors::GroupNotFound
+          ) { |response| response.body.include?(group_id) },
           # 404 referencing some ID which is NOT the group ID. Probably one of
           # the user(s) don't exist. Fallback to batch to deal with each user
           # separately, in case multiple do not exist.
-          # If the group doesn't exist, we won't match here, so we'll.
-          # raise an HTTPNotFound as normal.
           SpecialCase.new(
             404, /does not exist or one of its queried reference/, result: :fallback_to_batch
-          ) { |response| !response.body.include?(group_id) }
+          )
         ]
       end
 

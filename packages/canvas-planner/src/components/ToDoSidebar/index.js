@@ -25,7 +25,7 @@ import {List} from '@instructure/ui-list'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
-import {Button} from '@instructure/ui-buttons'
+import {CondensedButton} from '@instructure/ui-buttons'
 import {IconWarningLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 import formatMessage from '../../format-message'
@@ -111,9 +111,9 @@ export class ToDoSidebar extends Component {
     if (this.props.changeDashboardView && this.state.visibleToDos.length > 0) {
       return (
         <View as="div" textAlign="center">
-          <Button variant="link" onClick={() => this.props.changeDashboardView('planner')}>
+          <CondensedButton onClick={() => this.props.changeDashboardView('planner')}>
             {formatMessage('Show All')}
-          </Button>
+          </CondensedButton>
         </View>
       )
     }
@@ -128,7 +128,7 @@ export class ToDoSidebar extends Component {
     }
 
     return (
-      <List id="planner-todosidebar-item-list" variant="unstyled">
+      <List id="planner-todosidebar-item-list" isUnstyled>
         {this.state.visibleToDos.map((item, itemIndex) => (
           <List.Item key={item.uniqueId}>
             <ToDoItem

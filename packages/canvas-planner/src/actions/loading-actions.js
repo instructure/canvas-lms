@@ -56,7 +56,8 @@ export const {
   jumpToThisWeek,
   gotWayPastItemDate,
   gotWayFutureItemDate,
-  gotCourseList
+  gotCourseList,
+  clearLoading
 } = createActions(
   'START_LOADING_ITEMS',
   'CONTINUE_LOADING_INITIAL_ITEMS',
@@ -83,7 +84,8 @@ export const {
   'JUMP_TO_THIS_WEEK',
   'GOT_WAY_FUTURE_ITEM_DATE',
   'GOT_WAY_PAST_ITEM_DATE',
-  'GOT_COURSE_LIST'
+  'GOT_COURSE_LIST',
+  'CLEAR_LOADING'
 )
 
 export const gettingPastItems = createAction(

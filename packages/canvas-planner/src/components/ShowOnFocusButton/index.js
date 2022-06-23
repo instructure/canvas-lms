@@ -20,7 +20,7 @@ import {findDOMNode} from 'react-dom'
 import {node, object, func} from 'prop-types'
 
 import {themeable} from '@instructure/ui-themeable'
-import {Button} from '@instructure/ui-buttons'
+import {CondensedButton} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import styles from './styles.css'
@@ -31,11 +31,11 @@ class ShowOnFocusButton extends Component {
     buttonProps: object,
     srProps: object,
     children: node.isRequired,
-    buttonRef: func
+    elementRef: func
   }
 
   static defaultProps = {
-    buttonRef: () => {}
+    elementRef: () => {}
   }
 
   constructor(props) {
@@ -65,18 +65,17 @@ class ShowOnFocusButton extends Component {
   renderButton() {
     const {buttonProps, children} = this.props
     return (
-      <Button
-        variant="link"
-        buttonRef={btn => {
+      <CondensedButton
+        elementRef={btn => {
           this.btnRef = btn
-          this.props.buttonRef(btn)
+          this.props.elementRef(btn)
         }}
         onFocus={this.handleFocus}
         onBlur={this.handleBlur}
         {...buttonProps}
       >
         {children}
-      </Button>
+      </CondensedButton>
     )
   }
 

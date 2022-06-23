@@ -282,6 +282,7 @@ describe "course rubrics" do
     assignment_model
     rubric_model(context: @course)
     course_with_student(course: @course, active_all: true)
+    @course.offer!
     @association = @rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
     @assessment = @association.assess({
                                         user: @student,
@@ -306,6 +307,7 @@ describe "course rubrics" do
     assignment_model
     rubric_model(context: @course)
     course_with_student(course: @course, active_all: true)
+    @course.offer!
     @association = @rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
     @assessment = @association.assess({
                                         user: @student,

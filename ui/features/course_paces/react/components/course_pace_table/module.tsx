@@ -25,7 +25,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {
   IconMiniArrowDownLine,
-  IconMiniArrowRightLine,
+  IconMiniArrowEndLine,
   IconWarningLine,
   IconInfoLine
 } from '@instructure/ui-icons'
@@ -176,7 +176,7 @@ export const Module: React.FC<ComponentProps> = props => {
       >
         <ToggleDetails
           summary={renderModuleHeader()}
-          icon={() => <IconMiniArrowRightLine />}
+          icon={() => <IconMiniArrowEndLine />}
           iconExpanded={() => <IconMiniArrowDownLine />}
           variant="filled"
           defaultExpanded

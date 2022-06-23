@@ -23,7 +23,7 @@ import configureAxios from '../utilities/configureAxios'
 import {alert} from '../utilities/alertUtils'
 import formatMessage from '../format-message'
 import {maybeUpdateTodoSidebar} from './sidebar-actions'
-import {getPlannerItems, getWeeklyPlannerItems} from './loading-actions'
+import {getPlannerItems, getWeeklyPlannerItems, clearLoading} from './loading-actions'
 import {
   transformInternalToApiItem,
   transformInternalToApiOverride,
@@ -314,6 +314,7 @@ export const clearItems = () => {
     dispatch(clearOpportunities())
     dispatch(clearDays())
     dispatch(clearSidebar())
+    dispatch(clearLoading())
   }
 }
 

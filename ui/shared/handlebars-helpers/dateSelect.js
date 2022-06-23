@@ -36,8 +36,8 @@ const builders = {
     }
     return $result
   },
-  month(options, htmlOptions, dateSettings) {
-    const months = dateSettings.month_names
+  month(options, htmlOptions) {
+    const months = I18n.lookup('date.month_names')
     const $result = $('<select />', htmlOptions)
     if (options.includeBlank) $result.append('<option />')
     for (let i = 1; i <= 12; i++) {
@@ -70,7 +70,10 @@ export default function dateSelect(name, options, htmlOptions = _.clone(options)
     month: 2,
     day: 3
   }
-  const dateSettings = I18n.lookup('date')
+
+  const order = I18n.lookup('date.order', {
+    defaultValue: ['year', 'month', 'day']
+  })
 
   if (options.type === 'birthdate') {
     _.defaults(options, {
@@ -83,7 +86,7 @@ export default function dateSelect(name, options, htmlOptions = _.clone(options)
   _.defaults(options, {
     startYear: year - 5,
     endYear: year + 5,
-    order: dateSettings.order || ['year', 'month', 'day']
+    order
   })
 
   const $result = $('<span>')
@@ -95,7 +98,7 @@ export default function dateSelect(name, options, htmlOptions = _.clone(options)
   ) {
     const type = options.order[i]
     const tName = name.replace(/(\]?)$/, `(${position[type]}i)$1`)
-    const html = builders[type](options, {name: tName, ...htmlOptions}, dateSettings)
+    const html = builders[type](options, {name: tName, ...htmlOptions})
     $result.append(html)
     delete htmlOptions.id
   }

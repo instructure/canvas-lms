@@ -82,6 +82,30 @@ describe BrandConfigRegenerator do
     expect(@second_shared_config.reload.brand_config.parent).to eq(@child_account.brand_config)
   end
 
+  it "handles changes in subaccounts" do
+    setup_account_family_with_configs
+
+    second_config = BrandConfig.for(variables: { "ic-brand-primary" => "orange" }, parent_md5: @child_config.md5)
+    second_config.save!
+    @second_shared_config = @grand_child_account.shared_brand_configs.create!(
+      name: "second theme",
+      brand_config_md5: second_config.md5
+    )
+
+    BrandConfigRegenerator.process(@child_account, user_factory, new_brand_config)
+
+    Delayed::Testing.drain
+
+    # make sure the same for the grandchild account.
+    # (that all of it's configs point to the new one made for the child account)
+    expect(@grand_child_account.reload.brand_config.parent).to eq(new_brand_config)
+    expect(@grand_child_shared_config.reload.brand_config.parent).to eq(new_brand_config)
+    expect(@grand_child_shared_config.brand_config).to eq(@grand_child_account.brand_config)
+
+    # check the extra SavedBrandConfig in the grandchild to make sure it got regerated too
+    expect(@second_shared_config.reload.brand_config.parent).to eq(@child_account.reload.brand_config)
+  end
+
   it "handles orphan themes that were not decendant of @parent_account" do
     setup_account_family_with_configs
 

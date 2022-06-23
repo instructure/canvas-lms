@@ -40,6 +40,29 @@ describe('<Header />', () => {
     await waitFor(() => expect(onChange).toHaveBeenCalledWith({alt: 'A descriptive text'}))
   })
 
+  describe('when the decorative icon box is checked', () => {
+    it('changes the icon isDecorative field', async () => {
+      const onChange = jest.fn()
+      const {getByRole} = render(<Header settings={DEFAULT_SETTINGS} onChange={onChange} />)
+      const checkBox = getByRole('checkbox', {name: /Decorative Icon/})
+      fireEvent.click(checkBox)
+      await waitFor(() => expect(onChange).toHaveBeenCalledWith({isDecorative: true}))
+    })
+  })
+
+  describe('when the isDecorative setting is true', () => {
+    let settings
+
+    beforeAll(() => (settings = {...DEFAULT_SETTINGS, isDecorative: true}))
+
+    it('disables the alt text input', () => {
+      const header = <Header settings={settings} onChange={jest.fn()} />
+      const {getByRole} = render(header)
+      const textArea = getByRole('textbox', {name: /Alt Text/})
+      expect(textArea).toBeDisabled()
+    })
+  })
+
   describe('when the name contains html entities', () => {
     let settings
 

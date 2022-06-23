@@ -18,12 +18,10 @@
 
 import ResourceLinkContentItem from '../ResourceLinkContentItem'
 
-const url = 'https://www.test.com/launch'
 const endpoint = 'http://test.canvas.com/accounts/1/external_tools/retrieve'
 const title = 'Tool Title'
 const lookup_uuid = '0b8fbc86-fdd7-4950-852d-ffa789b37ff2'
 const json = {
-  url,
   title,
   lookup_uuid,
 }
@@ -36,7 +34,7 @@ const resourceLinkContentItem = (overrides, launchEndpoint) => {
 describe('constructor', () => {
   it('sets the url to the canvas launch endpoint', () => {
     expect(resourceLinkContentItem({}, endpoint).url).toEqual(
-      `${endpoint}?display=borderless&resource_link_lookup_uuid=0b8fbc86-fdd7-4950-852d-ffa789b37ff2&url=${encodeURIComponent(url)}`
+      `${endpoint}?display=borderless&resource_link_lookup_uuid=0b8fbc86-fdd7-4950-852d-ffa789b37ff2`
     )
   })
 })
@@ -50,7 +48,7 @@ describe('when the iframe property is specified', () => {
 
   it('returns markup for an iframe', () => {
     expect(resourceLinkContentItem({iframe}).toHtmlString()).toEqual(
-      '<iframe src="undefined?display=borderless&amp;resource_link_lookup_uuid=0b8fbc86-fdd7-4950-852d-ffa789b37ff2&amp;url=https%3A%2F%2Fwww.test.com%2Flaunch" title="Tool Title" allowfullscreen="true" allow="" style="width: 500px; height: 200px;"></iframe>'
+      '<iframe src="undefined?display=borderless&amp;resource_link_lookup_uuid=0b8fbc86-fdd7-4950-852d-ffa789b37ff2" title="Tool Title" allowfullscreen="true" allow="" style="width: 500px; height: 200px;"></iframe>'
     )
   })
 })

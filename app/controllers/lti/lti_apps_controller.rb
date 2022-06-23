@@ -67,24 +67,6 @@ module Lti
 
     private
 
-    def dev_keys
-      @dev_keys ||= begin
-        context = @context.is_a?(Account) ? @context : @context.account
-        developer_key_ids = nil
-        active_bindings = nil
-
-        context.shard.activate do
-          active_bindings = DeveloperKeyAccountBinding.active_in_account(context)
-          developer_key_ids = active_bindings.pluck(:developer_key_id)
-        end
-
-        local_keys = DeveloperKeyAccountBinding.lti_1_3_tools(active_bindings).map(&:developer_key)
-        site_admin_keys = DeveloperKey.site_admin_lti(developer_key_ids)
-
-        (local_keys + site_admin_keys).uniq.select(&:usable?)
-      end
-    end
-
     def app_collator
       @app_collator ||= AppCollator.new(@context, method(:reregistration_url_builder))
     end

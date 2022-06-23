@@ -99,11 +99,13 @@ module Lti::IMS
       context "when line_item is an assignment and instfs is enabled" do
         let(:folder) { Folder.create!(name: "test", context: user) }
         let(:progress) { Progress.create!(context: assignment, user: user, tag: :upload_via_url) }
+        let(:submitted_at) { 5.minutes.ago.iso8601(3) }
 
         before do
           allow(InstFS).to receive(:enabled?).and_return(true)
           allow(InstFS).to receive(:jwt_secrets).and_return(["jwt signing key"])
           @token = Canvas::Security.create_jwt({}, nil, InstFS.jwt_secret)
+          Account.root_accounts.first.enable_feature! :ags_scores_file_error_improvements
         end
 
         it "creates a new submission" do
@@ -111,7 +113,7 @@ module Lti::IMS
           attempt = result.submission.assignment.submit_homework(user, submission_body).attempt
           expect(result.submission.attachments.count).to eq 0
 
-          line_item_params[Lti::Result::AGS_EXT_SUBMISSION] = { content_items: content_items }
+          line_item_params[Lti::Result::AGS_EXT_SUBMISSION] = { content_items: content_items, submitted_at: submitted_at }
           upload_url = nil
           upload_params = nil
           # get params sent to instfs for easier mocking of the instfs return request
@@ -124,6 +126,7 @@ module Lti::IMS
 
           expect(result.submission.reload.attempt).to eq attempt + 1
           expect(result.submission.attachments.count).to eq 1
+          expect(result.submission.submitted_at).to eq submitted_at
           attachment = result.submission.attachments.first
           expect(attachment.display_name).to eq content_items.first[:title]
           expect(attachment.content_type).to eq content_items.first[:media_type]

@@ -209,7 +209,7 @@ export default class ProgressingContentMigrationView extends Backbone.View
     @selectContentView ||= new SelectContentView
                             model: @model
                             el: @$selectContentDialog
-                            title: I18n.t('#select_content', 'Select Content')
+                            title: I18n.t('Select Content')
                             width: 900
                             height: 700
 

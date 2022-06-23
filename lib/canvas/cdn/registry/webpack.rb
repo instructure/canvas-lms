@@ -42,7 +42,11 @@ module Canvas
         end
 
         def scripts_for(bundle)
-          @manifest.fetch(bundle, []).map { |s| realpath(s) }
+          if @manifest.key?(bundle)
+            [realpath(@manifest[bundle])]
+          else
+            []
+          end
         end
 
         private

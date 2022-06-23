@@ -674,7 +674,8 @@ describe "Common Cartridge exporting" do
         Lti::ResourceLink.create!(
           context: @course,
           context_external_tool: tool,
-          custom: custom_params
+          custom: custom_params,
+          url: "http://www.example.com/launch"
         )
       end
 

@@ -2747,7 +2747,8 @@ class ApplicationController < ActionController::Base
                      "assignments",
                      "discussion_topic",
                      (permissions[:manage] || current_user_has_been_observer_in_this_course) && "all_dates",
-                     permissions[:manage] && "module_ids"
+                     permissions[:manage] && "module_ids",
+                     peer_reviews_for_a2_enabled? && "assessment_requests"
                    ].reject(&:blank?),
                    exclude_response_fields: ["description", "rubric"],
                    exclude_assignment_submission_types: ["wiki_page"],
@@ -2927,6 +2928,11 @@ class ApplicationController < ActionController::Base
     DynamicSettings.find(tree: :private)["recaptcha_server_key"].present? && @domain_root_account.self_registration_captcha?
   end
 
+  def peer_reviews_for_a2_enabled?
+    current_user_is_student = @context.respond_to?(:user_is_student?) && @context.user_is_student?(@current_user)
+    current_user_is_student && @context.respond_to?(:feature_enabled?) && @context.feature_enabled?(:peer_reviews_for_a2)
+  end
+
   # Show Student View button on the following controller/action pages, as long as defined tabs are not hidden
   STUDENT_VIEW_PAGES = {
     "courses#show" => nil,
@@ -3005,9 +3011,10 @@ class ApplicationController < ActionController::Base
         provided_account_chain_ids = Account.multi_account_chain_ids(provided_account_ids)
         break true if (provided_account_chain_ids & k5_account_ids).any?
       else
-        # If course_ids isn't passed, check all their (non-observer) enrollments and account_users
+        # If course_ids isn't passed, check all their (non-observer and unlinked observer) enrollments and account_users
+        # i.e., ignore observer enrollments with a linked student - the observer picker filters out these courses
         enrolled_courses_scope = user.enrollments.shard(Shard.current).new_or_active_by_date
-        enrolled_courses_scope = enrolled_courses_scope.not_of_observer_type if Account.site_admin.feature_enabled?(:observer_picker)
+        enrolled_courses_scope = enrolled_courses_scope.not_of_observer_type.or(enrolled_courses_scope.of_observer_type.where(associated_user_id: nil)) if Account.site_admin.feature_enabled?(:observer_picker)
         enrolled_course_ids = enrolled_courses_scope.select(:course_id)
         enrolled_account_ids = Course.where(id: enrolled_course_ids).distinct.pluck(:account_id)
         break true if (enrolled_account_ids & k5_account_ids).any?
@@ -3058,7 +3065,7 @@ class ApplicationController < ActionController::Base
       end
 
       # This key is also invalidated when the k5 setting is toggled at the account level or when enrollments change
-      Rails.cache.fetch_with_batched_keys(["k5_user2", course_ids].cache_key, batch_object: user, batched_keys: %i[k5_user enrollments account_users], expires_in: 12.hours) do
+      Rails.cache.fetch_with_batched_keys(["k5_user3", course_ids, Account.site_admin.feature_enabled?(:observer_picker)].cache_key, batch_object: user, batched_keys: %i[k5_user enrollments account_users], expires_in: 12.hours) do
         uncached_k5_user?(user, course_ids: course_ids)
       end
     end

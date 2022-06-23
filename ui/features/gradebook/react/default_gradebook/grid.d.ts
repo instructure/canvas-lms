@@ -54,8 +54,9 @@ export type GridDisplaySettings = {
     contextModuleId: null | string
     gradingPeriodId: null | string
     submissions: null | 'has-ungraded-submissions' | 'has-submissions'
+    startDate: null | string
+    endDate: null | string
   }
-  filterColumnsBy: {assignmentGroupId: null; contextModuleId: null; gradingPeriodId: null}
   filterRowsBy: {sectionId: null; studentGroupId: null}
   hideTotal: boolean
   selectedPrimaryInfo: string

@@ -19,7 +19,7 @@ import _ from 'underscore'
 import Backbone from '@canvas/backbone'
 import I18n from '@canvas/i18n'
 import OutcomeResultCollection from '../collections/OutcomeResultCollection.coffee'
-import d3 from 'd3'
+import d3 from 'd3/d3'
 import accessibleTemplate from '../../jst/accessibleLineGraph.handlebars'
 import '../../sum'
 

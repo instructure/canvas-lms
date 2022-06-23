@@ -196,7 +196,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
               xmlns="http://www.w3.org/2000/svg"
             >
               <metadata>
-                {"type":"image/svg+xml-icon-maker-icons","alt":"","shape":"square","size":"small","color":"#000000","outlineColor":"#000000","outlineSize":"none","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"below","encodedImage":"","encodedImageType":"","encodedImageName":"","x":"50%","y":"50%","translateX":-54,"translateY":-54,"width":108,"height":108,"transform":"translate(-54,-54)","imageSettings":{"mode":"","image":"","imageName":"","icon":"","iconFillColor":"#000000","cropperSettings":null}}
+                {"type":"image/svg+xml-icon-maker-icons","shape":"square","size":"small","color":"#000000","outlineColor":"#000000","outlineSize":"none","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"below","encodedImage":"","encodedImageType":"","encodedImageName":"","x":"50%","y":"50%","translateX":-54,"translateY":-54,"width":108,"height":108,"transform":"translate(-54,-54)","imageSettings":{"mode":"","image":"","imageName":"","icon":"","iconFillColor":"#000000","cropperSettings":null}}
               </metadata>
               <svg
                 fill="none"
@@ -282,7 +282,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
     await waitFor(() => expect(defaults.onUnmount).toHaveBeenCalled())
   })
 
-  it('writes the content to the editor without alt attribute', async () => {
+  it('writes the content to the editor without alt attribute when no alt text entered', async () => {
     render(<IconMakerTray {...defaults} />)
 
     setIconColor('#000000')
@@ -295,6 +295,19 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
     `)
 
     await waitFor(() => expect(defaults.onUnmount).toHaveBeenCalled())
+  })
+
+  it('writes the content to the editor with alt="" if is decorative', async () => {
+    render(<IconMakerTray {...defaults} />)
+    setIconColor('#000000')
+    userEvent.click(screen.getByRole('checkbox', {name: /Decorative Icon/}))
+    userEvent.click(screen.getByRole('button', {name: /apply/i}))
+    await waitFor(() => expect(editor.insertContent).toHaveBeenCalled())
+    expect(editor.insertContent.mock.calls[0]).toMatchInlineSnapshot(`
+      Array [
+        "<img src=\\"https://uploaded.url\\" alt=\\"\\" data-inst-icon-maker-icon=\\"true\\" data-download-url=\\"https://uploaded.url/?icon_maker_icon=1\\">",
+      ]
+    `)
   })
 
   describe('the "replace all instances" checkbox', () => {

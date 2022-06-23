@@ -23,7 +23,9 @@ export const alignments = [
     title: 'Assignment 1',
     url: '/courses/1/outcomes/1/alignments/3',
     moduleTitle: 'Module 1',
-    moduleUrl: '/courses/1/modules/1'
+    moduleUrl: '/courses/1/modules/1',
+    moduleWorkflowState: 'unpublished',
+    assignmentContentType: 'Assignment'
   },
   {
     id: '2',
@@ -31,7 +33,29 @@ export const alignments = [
     title: 'Rubric 1',
     url: '/courses/1/outcomes/1/alignments/5',
     moduleTitle: null,
-    moduleUrl: null
+    moduleUrl: null,
+    moduleWorkflowState: null,
+    assignmentContentType: null
+  },
+  {
+    id: '3',
+    type: 'Assignment',
+    title: 'Quiz Assignment 1',
+    url: '/courses/1/outcomes/1/alignments/4',
+    moduleTitle: 'Module 1',
+    moduleUrl: '/courses/1/modules/1',
+    moduleWorkflowState: 'unpublished',
+    assignmentContentType: 'Quizzes::Quiz'
+  },
+  {
+    id: '4',
+    type: 'Assignment',
+    title: 'Discussion Assignment 1',
+    url: '/courses/1/outcomes/1/alignments/6',
+    moduleTitle: 'Module 2',
+    moduleUrl: '/courses/1/modules/2',
+    moduleWorkflowState: 'active',
+    assignmentContentType: 'DiscussionTopic'
   }
 ]
 

@@ -19,7 +19,7 @@
 const karmaConfig = {
   basePath: '',
 
-  frameworks: ['qunit'],
+  frameworks: ['qunit', 'webpack'],
 
   proxies: {
     '/dist/brandable_css/': '/base/public/dist/brandable_css/',

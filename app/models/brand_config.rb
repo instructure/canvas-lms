@@ -58,9 +58,10 @@ class BrandConfig < ActiveRecord::Base
 
   def self.for(attrs)
     attrs = attrs.with_indifferent_access.slice(*ATTRS_TO_INCLUDE_IN_MD5)
-    return default if attrs.values.all?(&:blank?)
-
     new_config = new(attrs)
+
+    return default if new_config.default?
+
     new_config.parent_md5 = attrs[:parent_md5]
     existing_config = where(md5: new_config.generate_md5).first
     existing_config || new_config

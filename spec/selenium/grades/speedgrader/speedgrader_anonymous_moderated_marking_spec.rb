@@ -82,6 +82,8 @@ describe "SpeedGrader" do
       end
 
       it "when their submission is selected and page reloaded", priority: "1" do
+        skip "EVAL-2497 (6/10/22)"
+
         expect { refresh_page }.not_to change { Speedgrader.selected_student.text }.from("Student 2")
       end
     end

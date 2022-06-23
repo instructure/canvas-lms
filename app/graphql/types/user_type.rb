@@ -30,6 +30,7 @@ module Types
     graphql_name "User"
 
     include SearchHelper
+    include Api::V1::StreamItem
 
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
@@ -304,22 +305,51 @@ module Types
 
     field :viewable_submissions_connection, Types::SubmissionType.connection_type, null: true do
       description "All submissions with comments that the current_user is able to view"
+      argument :filter, [String], required: false
     end
-    def viewable_submissions_connection
+    def viewable_submissions_connection(filter: nil)
       return unless object == current_user
 
+      @current_user = current_user
       submissions = []
 
-      ssi_scope = current_user.visible_stream_item_instances(only_active_courses: true)
-      ssi_scope = ssi_scope.eager_load(:stream_item).where("stream_items.asset_type=?", "Submission")
-      ssi_scope = ssi_scope.joins("INNER JOIN #{Submission.quoted_table_name} ON submissions.id=asset_id")
-      ssi_scope = ssi_scope.where("submissions.workflow_state <> 'deleted' AND submissions.submission_comments_count>0")
+      opts = {
+        only_active_courses: true,
+        asset_type: "Submission"
+      }
+
+      filter&.each do |f|
+        matches = f.match(/.*(course|user)_(\d+)/)
+        if matches.present?
+          case matches[1]
+          when "course"
+            opts[:context] = Context.find_by_asset_string(matches[0])
+          when "user"
+            opts[:submission_user_id] = matches[2].to_i
+          end
+        end
+        next
+      end
+
+      ssi_scope = current_user.visible_stream_item_instances(opts).preload(:stream_item)
+      is_cross_shard = current_user.visible_stream_item_instances(opts).where("stream_item_id > ?", Shard::IDS_PER_SHARD).exists?
+      if is_cross_shard
+        # the old join doesn't work for cross-shard stream items, so we basically have to pre-calculate everything
+        ssi_scope = ssi_scope.where(stream_item_id: filtered_stream_item_ids(opts))
+      else
+        ssi_scope = ssi_scope.eager_load(:stream_item).where("stream_items.asset_type=?", "Submission")
+        ssi_scope = ssi_scope.joins("INNER JOIN #{Submission.quoted_table_name} ON submissions.id=asset_id")
+        ssi_scope = ssi_scope.where("submissions.workflow_state <> 'deleted' AND submissions.submission_comments_count>0")
+        ssi_scope = ssi_scope.where("submissions.user_id=?", opts[:submission_user_id]) if opts.key?(:submission_user_id)
+      end
 
       Shard.partition_by_shard(ssi_scope, ->(sii) { sii.stream_item_id }) do |shard_stream_items|
         submission_ids = StreamItem.where(id: shard_stream_items.map(&:stream_item_id)).pluck(:asset_id)
         submissions += Submission.where(id: submission_ids)
       end
       submissions.sort_by { |t| t.last_comment_at || t.created_at }.reverse
+    rescue
+      []
     end
 
     field :comment_bank_items_connection, Types::CommentBankItemType.connection_type, null: true do

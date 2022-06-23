@@ -49,7 +49,7 @@ $app_height: 143px;
 }
 
 #external_tools {
-  .AddExternalToolButton{
+  .AddExternalToolButton {
     display: flex;
   }
 
@@ -156,7 +156,8 @@ $app_height: 143px;
           height: $app_height;
           background-color: black;
           color: white;
-          display: none;
+          opacity: 0;
+          transition: opacity 200ms;
           .content {
             padding: 15px;
             .name {
@@ -168,6 +169,11 @@ $app_height: 143px;
               @include fontSize(11px);
               line-height: $ic-line-height;
             }
+          }
+        }
+        &:focus, &:hover {
+          .details {
+            opacity: 0.85;
           }
         }
       }
@@ -287,7 +293,8 @@ fieldset.rate_app_wrapper {
   }
 }
 
-.ExternalAppsRoot, .ReactModal__Content--canvas {
+.ExternalAppsRoot,
+.ReactModal__Content--canvas {
   .control-group {
     margin-bottom: 2px;
   }

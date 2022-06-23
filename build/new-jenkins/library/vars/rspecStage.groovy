@@ -114,6 +114,8 @@ def tearDownNode() {
     docker cp ${srcDir}/log/results ${destDir}_rspec_results/ || true
     docker cp ${srcDir}/log/spec_failures ${destDir}/spec_failures/ || true
 
+    tar cvfz ${destDir}/rspec_results.tgz ${destDir}_rspec_results/
+
     if [[ "\$COVERAGE" == "1" ]]; then
       docker cp ${srcDir}/coverage ${destDir}/coverage/ || true
     fi
@@ -134,10 +136,6 @@ def tearDownNode() {
   """
 
   archiveArtifacts allowEmptyArchive: true, artifacts: "$destDir/**/*"
-
-  if (env.ENABLE_AXE_SELENIUM == '1' || env.COVERAGE == '1') {
-    archiveArtifacts allowEmptyArchive: true, artifacts: "${destDir}_rspec_results/**/*"
-  }
 
   findFiles(glob: "$destDir/spec_failures/**/index.html").each { file ->
     // tmp/node_18/spec_failures/Initial/spec/selenium/force_failure_spec.rb:20/index

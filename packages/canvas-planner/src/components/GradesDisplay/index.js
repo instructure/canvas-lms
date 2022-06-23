@@ -23,7 +23,7 @@ import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
-import {Button} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {courseShape} from '../plannerPropTypes'
 import formatMessage from '../../format-message'
 import ErrorAlert from '../ErrorAlert'
@@ -81,14 +81,9 @@ export class GradesDisplay extends React.Component {
       return (
         <View key={course.id} as="div" margin="0 0 large 0">
           <div className={styles.course} style={courseNameStyles}>
-            <Button
-              variant="link"
-              size="small"
-              theme={{smallPaddingHorizontal: '0', smallHeight: 'normal'}}
-              href={`${course.href}/grades`}
-            >
+            <Link isWithinText={false} size="small" href={`${course.href}/grades`}>
               <Text transform="uppercase">{course.shortName}</Text>
-            </Button>
+            </Link>
           </div>
           <Text as="div" size="large" weight="light">
             {this.scoreString(course.score)}

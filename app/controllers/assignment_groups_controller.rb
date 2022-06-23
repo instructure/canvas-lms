@@ -353,8 +353,12 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def index_groups_json(context, current_user, groups, assignments, submissions = [])
+    current_user_is_student = context.respond_to?(:user_is_student?) && context.user_is_student?(current_user)
+    can_include_assessment_requests = current_user_is_student && context.respond_to?(:feature_enabled?) && context.feature_enabled?(:peer_reviews_for_a2)
+
     include_overrides = include_params.include?("overrides")
     include_score_statistics = include_params.include?("score_statistics")
+    include_assessment_requests = can_include_assessment_requests && include_params.include?("assessment_requests")
 
     assignments_by_group = assignments.group_by(&:assignment_group_id)
     preloaded_attachments = user_content_attachments(assignments, context)
@@ -366,6 +370,9 @@ class AssignmentGroupsController < ApplicationController
     if assignments.any? && context.grants_any_right?(current_user, session, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
       mc_status = setup_master_course_restrictions(assignments, context)
     end
+
+    overwritten_includes = params[:include] || []
+    overwritten_includes -= ["assessment_requests"] unless can_include_assessment_requests
 
     groups.map do |group|
       group.context = context
@@ -382,10 +389,11 @@ class AssignmentGroupsController < ApplicationController
         include_score_statistics: include_score_statistics,
         submissions: submissions,
         closed_grading_period_hash: closed_grading_period_hash,
-        master_course_status: mc_status
+        master_course_status: mc_status,
+        include_assessment_requests: include_assessment_requests
       }
 
-      assignment_group_json(group, current_user, session, params[:include], options)
+      assignment_group_json(group, current_user, session, overwritten_includes, options)
     end
   end
 

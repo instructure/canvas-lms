@@ -194,11 +194,11 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
       it_behaves_like "a fallback to the batch api"
     end
 
-    context "when the group (or something else) cannot be found on the microsoft side" do
+    context "when the group cannot be found on the microsoft side" do
       let(:response) { json_response_from_sample(:add_nonexistent_group) }
 
-      it "raises a HTTPNotFound" do
-        expect { subject }.to raise_error(MicrosoftSync::Errors::HTTPNotFound)
+      it "raises a GroupNotFound error" do
+        expect { subject }.to raise_error(MicrosoftSync::Errors::GroupNotFound)
       end
     end
   end

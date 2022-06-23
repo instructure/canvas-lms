@@ -18,9 +18,11 @@
 
 import $ from 'jquery'
 import {Table} from '@instructure/ui-table'
+import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import React from 'react'
-import {arrayOf, bool, func, shape, string} from 'prop-types'
+import {arrayOf, func, shape, string} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import DeveloperKey from './DeveloperKey'
@@ -29,77 +31,69 @@ import '@canvas/rails-flash-notifications'
 
 const I18n = useI18nScope('react_developer_keys')
 
-class DeveloperKeysTable extends React.Component {
-  createSetFocusCallback = developerKeyId => {
-    const {developerKeysList, setFocus, inherited} = this.props
-    const position = developerKeyId
-      ? developerKeysList.findIndex(key => key.id === developerKeyId) - 1
-      : undefined
-    const devKey = developerKeysList[position]
-    let ref = devKey ? this.developerKeyRef(devKey) : undefined
-    // developerKeys will be populated when show more keys is resolved
-    return developerKeys => {
-      // if position is undefined it means that we are loading more keys
-      // and we want to calculate the end of the list after the promise
-      // resolves
-      if (position === undefined) {
-        const reversedList = developerKeysList.concat(developerKeys).reverse()
-        const developerKey = reversedList.find(key => {
-          const component = this.developerKeyRef(key)
-          return !component.isDisabled()
-        })
-        ref = developerKey ? this.developerKeyRef(developerKey) : undefined
-      }
-      let srMsg
-      // If ref is undefined it means that position was -1 and we deleted
-      // the first key in the list and focus should go to something other than
-      // a dev key
-      if (ref === undefined) {
-        // When INSTUI-1202 is completed and the fix in canvas this should be used
-        // when inherited keys are loaded
-        srMsg = I18n.t(
-          'Developer key %{developerKeyId} deleted. Focus moved to add developer key button.',
-          {developerKeyId}
-        )
-        setFocus()
-      } else if (inherited) {
-        srMsg = I18n.t(
-          'Loaded more developer keys. Focus moved to the name of the last loaded developer key in the list.'
-        )
-        if (ref) {
-          ref.focusToggleGroup()
-        }
-      } else {
-        if (position === undefined) {
-          srMsg = I18n.t(
-            'Loaded more developer keys. Focus moved to the delete button of the last loaded developer key in the list.'
-          )
-        } else {
-          srMsg = I18n.t(
-            'Developer key %{developerKeyId} deleted. Focus moved to the delete button of the previous developer key in the list.',
-            {developerKeyId}
-          )
-        }
-        ref.focusDeleteLink()
-      }
-      $.screenReaderFlashMessageExclusive(srMsg)
-      return ref
-    }
+// extracted for shared use by InheritedTable
+const createSetFocusCallback =
+  ({developerKeysList, developerKeyRef, srMsg, handleRef}) =>
+  developerKeys => {
+    $.screenReaderFlashMessageExclusive(srMsg)
+    const developerKey = developerKeysList
+      .concat(developerKeys)
+      .reverse()
+      .find(key => {
+        const keyRef = developerKeyRef(key)
+        return keyRef && !keyRef.isDisabled()
+      })
+    const ref = developerKey ? developerKeyRef(developerKey) : undefined
+    handleRef(ref)
+    return ref
   }
 
-  developerKeyRef(key) {
+class AdminTable extends React.Component {
+  onDelete = developerKeyId => {
+    const {developerKeysList, setFocus} = this.props
+    const position = developerKeysList.findIndex(key => key.id === developerKeyId)
+    const previousDeveloperKey = developerKeysList[position - 1]
+    const ref = previousDeveloperKey ? this.developerKeyRef(previousDeveloperKey) : undefined
+    let srMsg
+    // If ref is undefined it means that position was -1 and we deleted
+    // the first key in the list and focus should go to something other than
+    // a dev key
+    if (ref === undefined) {
+      srMsg = I18n.t(
+        'Developer key %{developerKeyId} deleted. Focus moved to add developer key button.',
+        {developerKeyId}
+      )
+      setFocus()
+    } else {
+      srMsg = I18n.t(
+        'Developer key %{developerKeyId} deleted. Focus moved to the delete button of the previous developer key in the list.',
+        {developerKeyId}
+      )
+      ref.focusDeleteLink()
+    }
+    $.screenReaderFlashMessageExclusive(srMsg)
+    return ref
+  }
+
+  // this should be called when more keys are loaded,
+  // and only handles the screenreader callout
+  setFocusCallback = () =>
+    createSetFocusCallback({
+      developerKeysList: this.props.developerKeysList,
+      developerKeyRef: this.developerKeyRef,
+      srMsg: I18n.t(
+        'Loaded more developer keys. Focus moved to the delete button of the last loaded developer key in the list.'
+      ),
+      handleRef: ref => ref && ref.focusDeleteLink()
+    })
+
+  developerKeyRef = key => {
     return this[`developerKey-${key.id}`]
   }
 
   render() {
-    const {inherited, developerKeysList} = this.props
-    if (developerKeysList.length === 0) {
-      return null
-    }
-    let srcontent = I18n.t('Developers Keys Table')
-    if (inherited) {
-      srcontent = I18n.t('Inherited Developer Keys Table')
-    }
+    const {developerKeysList} = this.props
+    const srcontent = I18n.t('Developer Keys')
     return (
       <div>
         <Table
@@ -110,22 +104,16 @@ class DeveloperKeysTable extends React.Component {
           <Table.Head>
             <Table.Row>
               <Table.ColHeader id="keystable-name">{I18n.t('Name')}</Table.ColHeader>
-              {!inherited && (
-                <Table.ColHeader id="keystable-owneremail">{I18n.t('Owner Email')}</Table.ColHeader>
-              )}
+              <Table.ColHeader id="keystable-owneremail">{I18n.t('Owner Email')}</Table.ColHeader>
               <Table.ColHeader id="keystable-details">{I18n.t('Details')}</Table.ColHeader>
-              {!inherited && (
-                <Table.ColHeader id="keystable-stats">{I18n.t('Stats')}</Table.ColHeader>
-              )}
+              <Table.ColHeader id="keystable-stats">{I18n.t('Stats')}</Table.ColHeader>
               <Table.ColHeader id="keystable-type">{I18n.t('Type')}</Table.ColHeader>
               <Table.ColHeader id="keystable-state">{I18n.t('State')}</Table.ColHeader>
-              {!inherited && (
-                <Table.ColHeader id="keystable-actions">{I18n.t('Actions')}</Table.ColHeader>
-              )}
+              <Table.ColHeader id="keystable-actions">{I18n.t('Actions')}</Table.ColHeader>
             </Table.Row>
           </Table.Head>
           <Table.Body>
-            {this.props.developerKeysList.map(developerKey => (
+            {developerKeysList.map(developerKey => (
               <DeveloperKey
                 ref={key => {
                   this[`developerKey-${developerKey.id}`] = key
@@ -135,18 +123,23 @@ class DeveloperKeysTable extends React.Component {
                 store={this.props.store}
                 actions={this.props.actions}
                 ctx={this.props.ctx}
-                inherited={this.props.inherited}
-                onDelete={this.createSetFocusCallback}
+                inherited={false}
+                onDelete={this.onDelete}
               />
             ))}
           </Table.Body>
         </Table>
+        {developerKeysList.length === 0 && (
+          <View as="div" margin="medium" textAlign="center">
+            <Text size="large">{I18n.t('Nothing here yet')}</Text>
+          </View>
+        )}
       </div>
     )
   }
 }
 
-DeveloperKeysTable.propTypes = {
+AdminTable.propTypes = {
   store: shape({
     dispatch: func.isRequired
   }).isRequired,
@@ -157,10 +150,10 @@ DeveloperKeysTable.propTypes = {
       contextId: string.isRequired
     })
   }).isRequired,
-  inherited: bool,
   setFocus: func
 }
 
-DeveloperKeysTable.defaultProps = {inherited: false, setFocus: () => {}}
+AdminTable.defaultProps = {setFocus: () => {}}
 
-export default DeveloperKeysTable
+export default AdminTable
+export {createSetFocusCallback}

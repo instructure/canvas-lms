@@ -31,6 +31,10 @@ import '@canvas/rails-flash-notifications'
 import fetchToolConfiguration from '../lib/fetchToolConfiguration'
 import toolConfigurationError from '../lib/toolConfigurationError'
 import install13Tool from '../lib/install13Tool'
+import {IconAddLine} from '@instructure/ui-icons'
+import {View} from '@instructure/ui-view'
+import {Button} from '@instructure/ui-buttons'
+import {AccessibleContent} from '@instructure/ui-a11y-content'
 
 const I18n = useI18nScope('external_tools')
 
@@ -297,16 +301,10 @@ export default class AddExternalToolButton extends React.Component {
 
   render() {
     return (
-      <span className="AddExternalToolButton">
-        <a
-          href="#"
-          role="button"
-          aria-label={I18n.t('Add App')}
-          className="Button Button--primary add_tool_link lm icon-plus"
-          onClick={this.openModal}
-        >
-          {I18n.t('App')}
-        </a>
+      <View>
+        <Button color="primary" margin="x-small" renderIcon={IconAddLine} onClick={this.openModal}>
+          <AccessibleContent alt={I18n.t('Add App')}>{I18n.t('App')}</AccessibleContent>
+        </Button>
         <Modal
           open={this.state.modalIsOpen}
           onDismiss={this.closeModal}
@@ -315,7 +313,7 @@ export default class AddExternalToolButton extends React.Component {
         >
           <Modal.Body>{this.renderForm()}</Modal.Body>
         </Modal>
-      </span>
+      </View>
     )
   }
 }

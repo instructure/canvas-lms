@@ -565,7 +565,7 @@ class Submission < ActiveRecord::Base
     end
     plagData &&
       (user_can_read_grade?(user, session, for_plagiarism: true) || (type_can_peer_review && user_can_peer_review_plagiarism?(user))) &&
-      (assignment.context.grants_right?(user, session, :manage_grades) ||
+      (assignment.context.grants_any_right?(user, session, :manage_grades, :view_all_grades) ||
         case settings[:originality_report_visibility]
         when "immediate" then true
         when "after_grading" then current_submission_graded?

@@ -1825,7 +1825,7 @@ class RoleOverride < ActiveRecord::Base
     account.shard.activate do
       result = Hash.new { |h, k| h[k] = Hash.new { |h2, k2| h2[k2] = {} } }
 
-      account_root_id = account.root_account_id&.nonzero? ? account.root_account_id : account.id
+      account_root_id = account.root_account_id&.nonzero? ? account.global_root_account_id : account.global_id
 
       # skip loading from site admin if the role is not from site admin
       Shard.partition_by_shard(account.account_chain(include_federated_parent: true, include_site_admin: role_context == Account.site_admin)) do |shard_accounts|
@@ -1840,7 +1840,7 @@ class RoleOverride < ActiveRecord::Base
           ret = [[r.global_id, r.global_id]]
           # If and only if we are supposed to inherit permissions cross root account, match up the built-in roles
           # since the ids won't match between root accounts
-          if r.built_in? && r.root_account_id != account_root_id && !account.root_account.primary_settings_root_account?
+          if r.built_in? && r.global_root_account_id != account_root_id && !account.root_account.primary_settings_root_account?
             # These will all be built-in role copies
             ret << [r.global_id, roles.detect { |local| local.built_in? && local.base_role_type == r.base_role_type }.global_id]
           end

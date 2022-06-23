@@ -95,6 +95,7 @@ class Assignment < ActiveRecord::Base
   # and an actual Hash to set custom params to, which could be an empty hash.
   serialize :lti_resource_link_custom_params, JSON
   attribute :lti_resource_link_lookup_uuid, :string, default: nil
+  attribute :lti_resource_link_url, :string, default: nil
 
   has_many :submissions, -> { active.preload(:grading_period) }, inverse_of: :assignment
   has_many :all_submissions, class_name: "Submission", dependent: :delete_all
@@ -1142,7 +1143,8 @@ class Assignment < ActiveRecord::Base
           context_external_tool: ContextExternalTool.from_content_tag(
             external_tool_tag,
             context
-          )
+          ),
+          url: lti_resource_link_url
         )
 
         li = line_items.create!(label: title, score_maximum: points_possible, resource_link: rl, coupled: true)

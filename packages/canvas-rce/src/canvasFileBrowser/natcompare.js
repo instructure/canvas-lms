@@ -15,16 +15,18 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from './i18nObj'
+let activeLocale = 'en-US'
+
+export const setLocale = locale => {
+  const locale_map = {zh_Hant: 'zh-Hant'}
+  activeLocale = locale_map[locale] || locale
+}
 
 export default {
   strings(x, y) {
-    let locale = I18n.locale || 'en-US'
-    const locale_map = {zh_Hant: 'zh-Hant'}
-    locale = locale_map[locale] || locale
     // if you change these settings, also match the settings in best_unicode_collation_key
     // and Canvas::ICU.collator
-    return x.localeCompare(y, locale, {
+    return x.localeCompare(y, activeLocale, {
       sensitivity: 'variant',
       ignorePunctuation: false,
       numeric: true

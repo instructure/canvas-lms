@@ -17,9 +17,10 @@
  */
 
 import React from 'react'
-import {Button, CloseButton} from '@instructure/ui-buttons'
+import {CloseButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
-import {List} from '@instructure/ui-list'
+import {InlineList} from '@instructure/ui-list'
 
 import {
   IconAssignmentLine,
@@ -95,13 +96,15 @@ export default class ToDoItem extends React.Component {
     const toDisplay = []
     if (points) {
       toDisplay.push(
-        <List.Item key="points">
+        <InlineList.Item key="points">
           {formatMessage('{numPoints} points', {numPoints: points})}
-        </List.Item>
+        </InlineList.Item>
       )
     }
 
-    toDisplay.push(<List.Item key="date">{dateTimeString(dueAt, this.props.timeZone)}</List.Item>)
+    toDisplay.push(
+      <InlineList.Item key="date">{dateTimeString(dueAt, this.props.timeZone)}</InlineList.Item>
+    )
     return toDisplay
   }
 
@@ -119,16 +122,14 @@ export default class ToDoItem extends React.Component {
       </Text>
     )
     const titleComponent = this.props.item.html_url ? (
-      <Button
-        variant="link"
-        theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
-        buttonRef={elt => {
+      <Link
+        elementRef={elt => {
           this.linkRef = elt
         }}
         href={this.props.item.html_url}
       >
         {title}
-      </Button>
+      </Link>
     ) : (
       <Text>{title}</Text>
     )
@@ -141,22 +142,22 @@ export default class ToDoItem extends React.Component {
           <Text color="secondary" size="small" weight="bold" lineHeight="fit">
             {getContextShortName(this.props.courses, this.props.item.course_id)}
           </Text>
-          <List variant="inline" delimiter="pipe" size="small">
+          <InlineList delimiter="pipe" size="small">
             {this.getInformationRow(this.props.item.date, this.props.item.points)}
-          </List>
+          </InlineList>
         </div>
         {!this.props.isObserving && (
           <div className="ToDoSidebarItem__Close">
             <CloseButton
-              variant="icon"
               size="small"
               onClick={this.handleClick}
-              buttonRef={elt => {
+              screenReaderLabel={formatMessage('Dismiss {itemTitle}', {
+                itemTitle: this.props.item.title
+              })}
+              elementRef={elt => {
                 this.buttonRef = elt
               }}
-            >
-              {formatMessage('Dismiss {itemTitle}', {itemTitle: this.props.item.title})}
-            </CloseButton>
+            />
           </div>
         )}
       </div>

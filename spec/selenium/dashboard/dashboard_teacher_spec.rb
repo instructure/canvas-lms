@@ -205,6 +205,7 @@ describe "dashboard" do
       end
 
       it "focuses on the previous ignore link after ignoring a todo item", priority: "1" do
+        skip "Flaky spec to be addressed in LS-3215"
         assignment2 = assignment_model({ submission_types: "online_text_entry", course: @course })
         assignment2.submit_homework(@student, { submission_type: "online_text_entry", body: "Number2" })
         enable_cache do
@@ -219,6 +220,7 @@ describe "dashboard" do
       end
 
       it "focuses on the 'To Do' header if there are no other todo items", priority: "1" do
+        skip "Flaky spec to be addressed in LS-3215"
         enable_cache do
           get "/"
 

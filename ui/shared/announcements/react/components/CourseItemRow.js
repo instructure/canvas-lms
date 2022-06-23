@@ -30,7 +30,7 @@ import {Heading} from '@instructure/ui-heading'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import {IconMoreLine, IconDragHandleLine, IconPeerReviewLine} from '@instructure/ui-icons'
 import LockIconView from '@canvas/lock-icon'
@@ -237,9 +237,9 @@ export default class CourseItemRow extends Component {
             <div className="ic-item-row__author-col">
               <Avatar
                 size="small"
-                alt={this.props.author.display_name || I18n.t('Unknown')}
-                name={this.props.author.display_name || I18n.t('Unknown')}
-                src={this.props.author.avatar_image_url}
+                alt={this.props.author?.display_name || I18n.t('Unknown')}
+                name={this.props.author?.display_name || I18n.t('Unknown')}
+                src={this.props.author?.avatar_image_url}
                 data-fs-exclude
               />
             </div>
@@ -279,12 +279,16 @@ export default class CourseItemRow extends Component {
                     onSelect={this.props.onManageMenuSelect}
                     onToggle={this.toggleManageMenuShown}
                     trigger={
-                      <Button variant="icon" size="small">
+                      <IconButton
+                        withBorder={false}
+                        withBackground={false}
+                        size="small"
+                        screenReaderLabel={I18n.t('Manage options for %{name}', {
+                          name: this.props.title
+                        })}
+                      >
                         <IconMoreLine />
-                        <ScreenReaderContent>
-                          {I18n.t('Manage options for %{name}', {name: this.props.title})}
-                        </ScreenReaderContent>
-                      </Button>
+                      </IconButton>
                     }
                   >
                     {this.state.manageMenuShown ? this.props.manageMenuOptions() : null}

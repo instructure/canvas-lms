@@ -42,6 +42,7 @@ export const DEFAULT_SETTINGS = {
   // Basic  icon maker settings
   type: TYPE,
   alt: '',
+  isDecorative: false,
   shape: 'square',
   size: Size.Small,
   color: null,

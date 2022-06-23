@@ -17,16 +17,40 @@
  */
 
 const path = require('path')
-const sharedConfig = require('./webpack.shared.config')
+const webpack = require('webpack')
 
 module.exports = {
-  ...sharedConfig,
+  module: {
+    rules: [
+      // this has been broken for a while and babel needs to be reconfigured for
+      // it without depending on @instructure/ui-babel-preset
+      {
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader',
+        include: [path.resolve(__dirname, 'src'), path.resolve(__dirname, 'demo')]
+      },
+      {test: /(\.css$)/, include: /node_modules/, loaders: ['style-loader', 'css-loader']},
+      {test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000'}
+    ],
+    noParse: [
+      /i18nliner\/dist\/lib\/i18nliner/ // i18nLiner has a `require('fs')` that it doesn't actually need, ignore it.
+    ]
+  },
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+      'process.env.DEBUG': JSON.stringify(process.env.DEBUG),
+      ENV: JSON.stringify(process.env.NODE_ENV)
+    })
+  ],
   mode: 'development',
   entry: {
     testcafe: [path.join(__dirname, 'testcafe', 'entry.js')]
   },
   output: {
     path: path.join(__dirname, 'testcafe/build'),
-    filename: '[name].js'
+    filename: '[name].js',
+    publicPath: path.join(__dirname, 'testcafe/build/')
   }
 }

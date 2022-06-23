@@ -28,7 +28,7 @@ RSpec.shared_context "cdn registry stubs" do
             "images/apple-touch-icon.png" => "images/apple-touch-icon-1234.png"
           },
           webpack: {
-            "main" => ["main-1234.js"]
+            "main" => "main-1234.js"
           }
         )
       )

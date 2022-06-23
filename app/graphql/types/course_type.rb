@@ -122,6 +122,11 @@ module Types
       course.resolved_outcome_calculation_method
     end
 
+    field :outcome_alignment_stats, CourseOutcomeAlignmentStatsType, null: false
+    def outcome_alignment_stats
+      Loaders::CourseOutcomeAlignmentStatsLoader.load(course)
+    end
+
     field :sections_connection, SectionType.connection_type, null: true
     def sections_connection
       course.active_course_sections

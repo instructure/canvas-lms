@@ -110,9 +110,7 @@ describe "conversations index page" do
         f("input[title='Inbox']").click
         fj("li:contains('Unread')").click
         wait_for_ajaximations
-        # this should be 3. but the bug in VICE-2801 limits it to 2
-        # change this to 3 when VICE-2801 is fixed
-        expect(ff("[data-testid='conversation']").count).to eq 2
+        expect(ff("[data-testid='conversation']").count).to eq 3
       end
 
       it "unarchives multiple conversations using shift+click" do

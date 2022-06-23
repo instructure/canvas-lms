@@ -31,32 +31,57 @@ exports[`renders desert when completely empty 1`] = `
     >
       Looks like there isn't anything here
     </div>
-    <Link
-      color="link"
-      iconPlacement="start"
-      id="PlannerEmptyState_CardView"
-      isWithinText={true}
-      onClick={[Function]}
-    >
-      Go to Card View Dashboard
-    </Link>
-    |
-    <Button
-      as="button"
-      cursor="pointer"
-      display="inline-block"
+    <InlineList
+      as="ul"
+      delimiter="pipe"
       elementRef={[Function]}
-      id="PlannerEmptyState_AddToDo"
-      margin="0"
-      onClick={[Function]}
+      itemSpacing="none"
+      margin="none"
       size="medium"
-      textAlign="center"
-      type="button"
-      variant="link"
-      withBackground={true}
     >
-      Add To-Do
-    </Button>
+      <InlineListItem
+        delimiter="none"
+        elementRef={[Function]}
+        padding="none"
+        size="medium"
+        spacing="none"
+      >
+        <CondensedButton
+          as="button"
+          color="primary"
+          cursor="pointer"
+          elementRef={[Function]}
+          id="PlannerEmptyState_CardView"
+          margin="0"
+          onClick={[Function]}
+          size="medium"
+          type="button"
+        >
+          Go to Card View Dashboard
+        </CondensedButton>
+      </InlineListItem>
+      <InlineListItem
+        delimiter="none"
+        elementRef={[Function]}
+        padding="none"
+        size="medium"
+        spacing="none"
+      >
+        <CondensedButton
+          as="button"
+          color="primary"
+          cursor="pointer"
+          elementRef={[Function]}
+          id="PlannerEmptyState_AddToDo"
+          margin="0"
+          onClick={[Function]}
+          size="medium"
+          type="button"
+        >
+          Add To-Do
+        </CondensedButton>
+      </InlineListItem>
+    </InlineList>
   </div>
 </div>
 `;

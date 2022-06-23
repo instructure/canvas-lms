@@ -146,14 +146,10 @@ QUnit.module('I18n localize number', {
     this.separator = ','
     I18nStubber.pushFrame()
     I18nStubber.stub('foo', {
-      number: {
-        format: {
-          delimiter: this.delimiter,
-          separator: this.separator,
-          precision: 3,
-          strip_insignificant_zeros: false
-        }
-      }
+      'number.format.delimiter': this.delimiter,
+      'number.format.precision': 3,
+      'number.format.separator': this.separator,
+      'number.format.strip_insignificant_zeros': false,
     })
     return I18nStubber.setLocale('foo')
   },
