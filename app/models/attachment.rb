@@ -1582,19 +1582,18 @@ class Attachment < ActiveRecord::Base
   # object. It will replace the attachment content with a file_removed file.
   def destroy_content_and_replace(deleted_by_user = nil)
     shard.activate do
+      file_removed_path = self.class.file_removed_path
+      new_name = File.basename(file_removed_path)
       att = root_attachment_id? ? root_attachment : self
-      return true if Purgatory.where(attachment_id: att).active.exists?
+      return true if att.display_name == new_name
 
-      att.send_to_purgatory(deleted_by_user)
+      att.send_to_purgatory(deleted_by_user) unless Purgatory.where(attachment_id: att).active.exists?
       att.destroy_content
       att.thumbnail&.destroy
 
-      file_removed_path = self.class.file_removed_path
-      new_name = File.basename(file_removed_path)
-
       if att.instfs_hosted? && InstFS.enabled?
-        # dupliciate the base file_removed file to a unique uuid
-        att.instfs_uuid = InstFS.duplicate_file(self.class.file_removed_base_instfs_uuid)
+        # duplicate the base file_removed file to a unique uuid
+        att.instfs_uuid = InstFS.duplicate_file(Attachment.file_removed_base_instfs_uuid)
       else
         Attachments::Storage.store_for_attachment(att, File.open(file_removed_path))
       end
@@ -1637,7 +1636,7 @@ class Attachment < ActiveRecord::Base
   def send_to_purgatory(deleted_by_user = nil)
     make_rootless
     new_instfs_uuid = nil
-    if instfs_hosted? && InstFS.enabled? && instfs_uuid
+    if instfs_hosted? && InstFS.enabled?
       # copy to a new instfs file
       new_instfs_uuid = InstFS.duplicate_file(instfs_uuid)
     elsif Attachment.s3_storage? && s3object.exists?
@@ -1718,7 +1717,7 @@ class Attachment < ActiveRecord::Base
       self.instfs_uuid = nil
     elsif Attachment.s3_storage?
       s3object.delete unless ApplicationController.test_cluster?
-    else
+    elsif File.exist?(full_filename)
       FileUtils.rm full_filename
     end
   end
