@@ -121,7 +121,7 @@ def queueJestDistribution(index) {
       'CI=1',
     ]
 
-    callableWithDelegate(queueTestStage())(stages, "jest${index}", jestEnvVars, 'bundle exec rails graphql:schema && yarn test:jest:build')
+    callableWithDelegate(queueTestStage())(stages, "jest${index}", jestEnvVars, 'yarn test:jest:build')
   }
 }
 
