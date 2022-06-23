@@ -453,17 +453,31 @@ pipeline {
                     .obeysAllowStages(false)
                     .timeout(20)
                     .execute {
-                      buildDockerImageStage.patchsetImage('''
-                        diffFrom=$(git --git-dir $LOCAL_WORKDIR/.git rev-parse $GERRIT_PATCHSET_REVISION^1)
+                      def startStep = '''
                         docker run -dt --name general-build-container --volume $(pwd)/$LOCAL_WORKDIR/.git:$DOCKER_WORKDIR/.git -e RAILS_ENV=test $PATCHSET_TAG bash -c "sleep infinity"
-                        docker exec -dt \
-                                      -e CRYSTALBALL_DIFF_FROM=$diffFrom \
-                                      -e CRYSTALBALL_DIFF_TO=$GERRIT_PATCHSET_REVISION \
-                                      -e CRYSTALBALL_REPO_PATH=$DOCKER_WORKDIR \
-                                      general-build-container bundle exec crystalball --dry-run
                         docker exec -dt general-build-container bin/rails graphql:schema
+                      '''
+
+                      def crystalballStep = '''
+                        diffFrom=$(git --git-dir $LOCAL_WORKDIR/.git rev-parse $GERRIT_PATCHSET_REVISION^1)
+                        docker exec -dt \
+                                        -e CRYSTALBALL_DIFF_FROM=$diffFrom \
+                                        -e CRYSTALBALL_DIFF_TO=$GERRIT_PATCHSET_REVISION \
+                                        -e CRYSTALBALL_REPO_PATH=$DOCKER_WORKDIR \
+                                        general-build-container bundle exec crystalball --dry-run
+                      '''
+
+                      def finalStep = '''
                         docker exec -t general-build-container ps aww
-                      ''')
+                      '''
+
+                      def asyncSteps = [
+                        startStep,
+                        !configuration.isChangeMerged() && env.GERRIT_REFSPEC != 'refs/heads/master' ? crystalballStep : '',
+                        finalStep
+                      ]
+
+                      buildDockerImageStage.patchsetImage(asyncSteps.join("\n"))
                     }
 
                   extendedStage(RUN_MIGRATIONS_STAGE)
