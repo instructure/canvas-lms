@@ -514,6 +514,20 @@ describe AccountsController do
               @student.reload.dashboard_view(@subaccount)]).to match_array(Array.new(3, "planner"))
     end
 
+    it "doesn't overwrite stuck sis fields" do
+      account_with_admin_logged_in
+      @account = @account.sub_accounts.create!
+      name = "update the name to mark it as stuck"
+      @account.update({ name: name })
+
+      new_account_name = "updated account name"
+      put "update", params: { id: @account.id, "account[name]": new_account_name, override_sis_stickiness: false }, format: "json"
+      @account.reload
+
+      expect(response.status).to eq 200
+      expect(@account.name).to eq name
+    end
+
     describe "k5 settings" do
       def toggle_k5_params(account_id, enable)
         { id: account_id,
@@ -783,9 +797,9 @@ describe AccountsController do
 
       it "is able to configure the 'passive' setting" do
         post "update", params: { id: @account.id, account: { terms_of_service: { passive: "0" } } }
-        expect(@account.reload.terms_of_service.passive).to eq false
+        expect(@account.reload.terms_of_service.passive).to be false
         post "update", params: { id: @account.id, account: { terms_of_service: { passive: "1" } } }
-        expect(@account.reload.terms_of_service.passive).to eq true
+        expect(@account.reload.terms_of_service.passive).to be true
       end
     end
 
@@ -862,7 +876,7 @@ describe AccountsController do
       post "update", params: { id: @account.id, account: {
         settings: { outgoing_email_default_name_option: "default" }
       } }
-      expect(@account.reload.settings[:outgoing_email_default_name]).to eq nil
+      expect(@account.reload.settings[:outgoing_email_default_name]).to be_nil
     end
 
     context "course_template_id" do
@@ -1004,7 +1018,7 @@ describe AccountsController do
     it "orders desc announcements" do
       account_with_admin_logged_in
       Timecop.freeze do
-        account_notification(account: @account, message: "Announcement 1", created_at: Time.zone.now - 1.minute)
+        account_notification(account: @account, message: "Announcement 1", created_at: 1.minute.ago)
         @a1 = @announcement
         account_notification(account: @account, message: "Announcement 2", created_at: Time.zone.now)
         @a2 = @announcement
