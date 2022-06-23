@@ -118,7 +118,7 @@ CanvasRails::Application.routes.draw do
         get :quota
         post :reorder
       end
-      get ":file_path" => "files#show_relative", :as => :relative_path, :file_path => /.+/ # needs to stay below react_files route
+      get "*file_path" => "files#show_relative", :as => :relative_path, :file_path => /.+/ # needs to stay below react_files route
     end
   end
 
@@ -127,7 +127,7 @@ CanvasRails::Application.routes.draw do
   end
 
   concern :relative_files do
-    get "file_contents/:file_path" => "files#show_relative", :as => :relative_file_path, :file_path => /.+/
+    get "file_contents/*file_path" => "files#show_relative", :as => :relative_file_path, :file_path => /.+/
   end
 
   concern :folders do
@@ -153,7 +153,7 @@ CanvasRails::Application.routes.draw do
 
   concern :discussions do
     resources :discussion_topics, only: %i[index new show edit destroy]
-    get "discussion_topics/:id/:extras" => "discussion_topics#show", :as => :map, :extras => /.+/
+    get "discussion_topics/:id/*extras" => "discussion_topics#show", :as => :map, :extras => /.+/
     resources :discussion_entries
   end
 
@@ -960,7 +960,7 @@ CanvasRails::Application.routes.draw do
 
   resources :jobs_v2, only: [:index]
 
-  get "equation_images/:id" => "equation_images#show", :as => :equation_images, :id => /.+/
+  get "equation_images/*id" => "equation_images#show", :as => :equation_images, :id => /.+/
 
   # assignments at the top level (without a context) -- we have some specs that
   # assert these routes exist, but just 404 unless it is a download from local
