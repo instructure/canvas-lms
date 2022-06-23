@@ -139,12 +139,12 @@ class FilesController < ApplicationController
     api_show api_index destroy api_update api_file_status public_url api_capture reset_verifier
   ]
 
-  before_action :check_file_access_flags, only: [:show_relative, :show]
+  before_action :open_limited_cors, only: [:show]
   before_action :open_cors, only: %i[
     api_create api_create_success api_create_success_cors show_thumbnail
   ]
 
-  before_action :open_limited_cors, only: [:show]
+  before_action :check_file_access_flags, only: [:show_relative, :show]
 
   skip_before_action :verify_authenticity_token, only: :api_create
   before_action :verify_api_id, only: %i[
