@@ -48,7 +48,7 @@ class JobsV2Controller < ApplicationController
         @page_title = t("Jobs Control Panel v2")
 
         css_bundle :jobs_v2
-        js_bundle :jobs_v2
+        deferred_js_bundle :jobs_v2
 
         jobs_server = @domain_root_account.shard.delayed_jobs_shard&.database_server_id
         cluster = @domain_root_account.shard&.database_server_id

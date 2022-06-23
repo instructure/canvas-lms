@@ -2305,7 +2305,7 @@ class CoursesController < ApplicationController
           css_bundle :new_assignments
           add_body_class("hide-content-while-scripts-not-loaded", "with_item_groups")
         when "syllabus"
-          js_bundle :syllabus
+          deferred_js_bundle :syllabus
           css_bundle :syllabus, :tinymce
         when "k5_dashboard"
           embed_mode = value_to_boolean(params[:embed])
