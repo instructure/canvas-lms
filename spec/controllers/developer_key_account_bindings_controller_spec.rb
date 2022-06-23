@@ -109,44 +109,6 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
     end
   end
 
-  shared_examples "the developer key index endpoint" do
-    let(:authorized_admin) { raise "set in example" }
-    let(:unauthorized_admin) { raise "set in example" }
-    let(:params) { raise "set in example" }
-    let(:site_admin_key) { DeveloperKey.create!(account: nil) }
-    let(:binding_index) { DeveloperKeyAccountBinding.where(id: json_parse.map { |b| b["id"] }) }
-    let(:expected_binding_index) { DeveloperKeyAccountBinding.where(account_id: account.account_chain_ids.concat([Account.site_admin.id])) }
-
-    it 'renders unauthorized if the user does not have "manage_developer_keys"' do
-      user_session(unauthorized_admin)
-      get :index, params: params, format: :json
-      expect(response).to be_unauthorized
-    end
-
-    it "renders all developer key account bindings in the specified account" do
-      user_session(authorized_admin)
-      get :index, params: params, format: :json
-      expect(binding_index).to match_array(expected_binding_index)
-    end
-
-    it "includes bindings from the site admin account" do
-      site_admin_binding = site_admin_key.developer_key_account_bindings.find_by(
-        account: Account.site_admin
-      )
-
-      user_session(authorized_admin)
-      get :index, params: params, format: :json
-      expect(binding_index).to include site_admin_binding
-    end
-
-    it "renders properly formatted developer key account bindings" do
-      expected_keys = %w[id account_id developer_key_id workflow_state account_owns_binding]
-      user_session(authorized_admin)
-      get :index, params: params, format: :json
-      expect(json_parse.first.keys).to match_array(expected_keys)
-    end
-  end
-
   context "when the account is a parent account" do
     describe "POST #create_or_edit" do
       let(:binding_to_edit) do
@@ -184,45 +146,6 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
         user_session(account_admin_user(account: Account.site_admin))
         post :create_or_update, params: site_admin_params
         expect(response).to be_successful
-      end
-    end
-
-    describe "GET #index" do
-      let(:on_binding) do
-        b = root_account_developer_key.developer_key_account_bindings.find_by(
-          account: root_account
-        )
-        b.update!(workflow_state: "on")
-        b
-      end
-
-      let(:off_binding) do
-        off_dev_key = DeveloperKey.create!(account: root_account)
-        b = off_dev_key.developer_key_account_bindings.find_by(
-          account: root_account
-        )
-        b.update!(workflow_state: "off")
-        b
-      end
-
-      let(:allow_binding) do
-        allow_dev_key = DeveloperKey.create!(account: root_account)
-        allow_dev_key.developer_key_account_bindings.find_by(
-          account: root_account
-        )
-      end
-
-      before do
-        off_binding
-        allow_binding
-        on_binding
-      end
-
-      it_behaves_like "the developer key index endpoint" do
-        let(:authorized_admin) { root_account_admin }
-        let(:unauthorized_admin) { sub_account_admin }
-        let(:params) { valid_parameters.except(:developer_key_account_binding) }
-        let(:account) { root_account }
       end
     end
   end
@@ -279,37 +202,6 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
         let(:authorized_admin) { sub_account_admin }
         let(:unauthorized_admin) { invalid_admin }
         let(:params) { sub_account_params }
-      end
-    end
-
-    describe "GET #index" do
-      let(:allow_binding) do
-        allow_dev_key = DeveloperKey.create!(account: root_account)
-        DeveloperKeyAccountBinding.create!(
-          account: sub_account,
-          developer_key: allow_dev_key
-        )
-      end
-
-      before do
-        allow_binding
-      end
-
-      it_behaves_like "the developer key index endpoint" do
-        let(:authorized_admin) { sub_account_admin }
-        let(:unauthorized_admin) { invalid_admin }
-        let(:params) { sub_account_params.except(:developer_key_account_binding) }
-        let(:account) { sub_account }
-      end
-
-      it "includes bindings from the parent account" do
-        root_account_binding = root_account_developer_key.developer_key_account_bindings.find_by(
-          account: root_account
-        )
-
-        user_session(sub_account_admin)
-        get :index, params: sub_account_params.except(:developer_key_account_binding)
-        expect(json_parse.map { |b| DeveloperKeyAccountBinding.find(b["id"]) }).to include root_account_binding
       end
     end
   end

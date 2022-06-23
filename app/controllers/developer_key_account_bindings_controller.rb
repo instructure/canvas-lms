@@ -81,35 +81,7 @@ class DeveloperKeyAccountBindingsController < ApplicationController
            status: existing_binding.present? ? :ok : :created
   end
 
-  # @API List Developer Key Account Binding
-  # List all Developer Key Account Bindings in the requested account
-  #
-  # @returns List of DeveloperKeyAccountBinding
-  def index
-    account_chain_bindings = DeveloperKeyAccountBinding.where(
-      account_id: account.account_chain_ids.concat([Account.site_admin.id])
-    ).eager_load(:account, :developer_key)
-
-    paginated_bindings = Api.paginate(
-      account_chain_bindings,
-      self,
-      url_for(action: :index, account_id: account.id),
-      pagination_args
-    )
-    render json: index_serializer(paginated_bindings)
-  end
-
   private
-
-  def index_serializer(bindings)
-    bindings.map do |b|
-      DeveloperKeyAccountBindingSerializer.new(b, @context)
-    end
-  end
-
-  def pagination_args
-    params[:limit] ? { per_page: params[:limit] } : {}
-  end
 
   def account
     @_account ||= api_find(Account, params[:account_id])

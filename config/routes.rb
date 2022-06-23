@@ -1716,7 +1716,6 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :developer_key_account_bindings) do
       post "accounts/:account_id/developer_keys/:developer_key_id/developer_key_account_bindings", action: :create_or_update
-      get "accounts/:account_id/developer_key_account_bindings", action: :index
     end
 
     scope(controller: :developer_keys) do
