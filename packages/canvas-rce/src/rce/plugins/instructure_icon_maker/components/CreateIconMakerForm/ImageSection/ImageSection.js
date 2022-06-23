@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useReducer, useEffect, Suspense} from 'react'
+import React, {useReducer, useEffect, useRef, Suspense} from 'react'
+import _ from 'lodash'
 
 import formatMessage from '../../../../../../format-message'
 import reducer, {actions, initialState, modes} from '../../../reducers/imageSection'
@@ -68,6 +69,8 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig}) =
   }
 
   const metadata = filterSectionStateMetadata(state)
+
+  const isMetadataLoaded = useRef(false)
 
   useEffect(() => {
     const transform = transformForShape(settings.shape, settings.size)
@@ -162,8 +165,10 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig}) =
   useEffect(() => {
     if (
       settings.imageSettings &&
-      JSON.stringify(settings.imageSettings) !== JSON.stringify(filterSectionStateMetadata(state))
+      !isMetadataLoaded.current &&
+      !_.isEqual(settings.imageSettings, metadata)
     ) {
+      isMetadataLoaded.current = true
       dispatch({
         type: actions.UPDATE_SETTINGS.type,
         payload: settings.imageSettings
@@ -173,7 +178,7 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig}) =
   }, [settings.imageSettings])
 
   useEffect(() => {
-    if (JSON.stringify(metadata) !== JSON.stringify(settings.imageSettings)) {
+    if (!_.isEqual(metadata, settings.imageSettings)) {
       onChange({
         type: svgActions.SET_IMAGE_SETTINGS,
         payload: metadata
