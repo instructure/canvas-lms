@@ -253,7 +253,8 @@ describe "people" do
       open_student_group_dialog
       replace_and_proceed f("#new-group-set-name"), "new group"
       fxpath("//input[@data-testid='checkbox-allow-self-signup']/..").click
-      replace_and_proceed f("#textinput-create-groups-now"), group_count
+      force_click('[data-testid="initial-group-count"]')
+      f('[data-testid="initial-group-count"]').send_keys("4")
       f(%(button[data-testid="group-set-save"])).click
       wait_for_ajaximations
       expect(@course.groups.count).to eq 4
