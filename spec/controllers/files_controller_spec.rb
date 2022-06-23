@@ -1240,8 +1240,9 @@ describe FilesController do
 
     it "opens up cors headers" do
       params = @attachment.ajax_upload_params("", "")
+      request.headers["Origin"] = "canvas.local"
       post "api_create", params: params[:upload_params].merge(file: @content)
-      expect(response.header["Access-Control-Allow-Origin"]).to eq "*"
+      expect(response.header["Access-Control-Allow-Origin"]).to eq "canvas.local"
     end
 
     it "has a preflight point for options requests (mostly safari)" do
