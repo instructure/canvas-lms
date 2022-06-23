@@ -22,6 +22,7 @@ export const User = {
   fragment: gql`
     fragment User on User {
       _id
+      id
       avatarUrl
       pronouns
       name
@@ -30,6 +31,7 @@ export const User = {
 
   shape: shape({
     _id: string,
+    id: string,
     avatarUrl: string,
     pronouns: string,
     name: string
@@ -39,12 +41,14 @@ export const User = {
     avatarUrl = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
     name = 'Hank Mccoy',
     pronouns = 'They/Them',
-    _id = '9'
+    _id = '9',
+    id = 'DVSDF'
   } = {}) => ({
     avatarUrl,
     name,
     pronouns,
     __typename: 'User',
-    _id
+    _id,
+    id
   })
 }

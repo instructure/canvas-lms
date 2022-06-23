@@ -35,7 +35,7 @@ import {
 import {useScope as useI18nScope} from '@canvas/i18n'
 import ModalSpinner from './ModalSpinner'
 import PropTypes from 'prop-types'
-import React, {useContext, useState} from 'react'
+import React, {useContext, useState, useEffect} from 'react'
 import {useMutation, useQuery} from 'react-apollo'
 import {ConversationContext} from '../../../util/constants'
 
@@ -54,27 +54,29 @@ const ComposeModalManager = props => {
     skip: props.isReply || props.isReplyAll || props.isForward
   })
 
-  const getParticipants = () => {
+  const getReplyRecipients = () => {
     if (isSubmissionCommentsType) return
-
-    const lastAuthorId = props.conversationMessage
-      ? props.conversationMessage?.author._id.toString()
-      : props.conversation?.messages[0].author._id.toString()
-
-    if (props.isReply && lastAuthorId !== ENV.current_user_id.toString()) {
-      return [lastAuthorId]
+    const lastAuthor = props.conversationMessage
+      ? props.conversationMessage?.author
+      : props.conversation?.messages[0].author
+    if (lastAuthor && props.isReply && lastAuthor !== ENV.current_user_id.toString()) {
+      return [lastAuthor]
     } else {
       const recipients = props.conversationMessage
         ? props.conversationMessage?.recipients
         : props.conversation?.messages[0]?.recipients
-      return recipients?.map(r => r._id.toString())
+      return recipients || []
     }
+  }
+
+  const getReplyRecipientIDs = () => {
+    return getReplyRecipients()?.map(r => r._id.toString())
   }
 
   const replyConversationQuery = useQuery(REPLY_CONVERSATION_QUERY, {
     variables: {
       conversationID: props.conversation?._id,
-      participants: getParticipants(),
+      participants: getReplyRecipientIDs(),
       ...(props.conversationMessage && {createdBefore: props.conversationMessage.createdAt})
     },
     skip: !(props.isReply || props.isReplyAll || props.isForward) || isSubmissionCommentsType
@@ -119,7 +121,7 @@ const ComposeModalManager = props => {
             query: REPLY_CONVERSATION_QUERY,
             variables: {
               conversationID: props.conversation?._id,
-              participants: getParticipants(),
+              participants: getReplyRecipientIDs(),
               ...(props.conversationMessage && {createdBefore: props.conversationMessage.createdAt})
             }
           })
@@ -134,7 +136,7 @@ const ComposeModalManager = props => {
         query: REPLY_CONVERSATION_QUERY,
         variables: {
           conversationID: props.conversation?._id,
-          participants: getParticipants(),
+          participants: getReplyRecipientIDs(),
           ...(props.conversationMessage && {createdBefore: props.conversationMessage.createdAt})
         },
         data: {legacyNode: replyQueryResult.legacyNode}
@@ -253,6 +255,23 @@ const ComposeModalManager = props => {
     onError: () => onConversationCreateComplete(false)
   })
 
+  // Keep selectedIDs updated with the correct recipients when replying
+  useEffect(() => {
+    if ((props.isReply || props.isReplyAll) && !isSubmissionCommentsType) {
+      const recipients = getReplyRecipients()
+      const selectedUsers = recipients.map(u => {
+        return {
+          _id: u._id,
+          id: u.id,
+          name: u.name,
+          itemType: 'user'
+        }
+      })
+      props.onSelectedIdsChange(selectedUsers)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSubmissionCommentsType, props.isReply, props.isReplyAll])
+
   if (!props.open) {
     return null
   }
@@ -279,7 +298,9 @@ const ComposeModalManager = props => {
           variables: {
             ...data.variables,
             conversationId: props.conversation?._id,
-            recipients: data.variables.recipients ? data.variables.recipients : getParticipants()
+            recipients: data.variables.recipients
+              ? data.variables.recipients
+              : props.selectedIds.map(rec => rec?._id || rec.id)
           }
         })
       }}
