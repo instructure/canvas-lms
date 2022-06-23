@@ -79,6 +79,17 @@ gulp.task('rev', () => {
       .pipe(jsFilter.restore)
   }
 
+  stream = stream.pipe(
+    gulp.src([
+      './node_modules/@formatjs/intl-datetimeformat/add-all-tz.js',
+      './node_modules/@formatjs/intl-datetimeformat/locale-data/*.js',
+      './node_modules/@formatjs/intl-numberformat/locale-data/*.js',
+      './node_modules/@formatjs/intl-relativetimeformat/locale-data/*.js',
+    ], {
+      base: './node_modules'
+    })
+  )
+
   return stream
     .pipe(gulp.dest(DIST))
     .pipe(gulpPlugins.rev.manifest())

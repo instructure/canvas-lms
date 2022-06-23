@@ -42,16 +42,16 @@ const shouldPolyfill = {
 const polyfillImports = {
   DateTimeFormat: async () => {
     await import('@formatjs/intl-datetimeformat/polyfill-force')
-    return import('@formatjs/intl-datetimeformat/add-all-tz')
+    return import(/* webpackIgnore: true */ '/dist/@formatjs/intl-datetimeformat/add-all-tz.js')
   },
   NumberFormat: () => import('@formatjs/intl-numberformat/polyfill-force'),
   RelativeTimeFormat: () => import('@formatjs/intl-relativetimeformat/polyfill-force')
 }
 
 const localeImports = {
-  DateTimeFormat: l => import(`@formatjs/intl-datetimeformat/locale-data/${l}`),
-  NumberFormat: l => import(`@formatjs/intl-numberformat/locale-data/${l}`),
-  RelativeTimeFormat: l => import(`@formatjs/intl-relativetimeformat/locale-data/${l}`)
+  DateTimeFormat: l => import(/* webpackIgnore: true */ `/dist/@formatjs/intl-datetimeformat/locale-data/${l}.js` ),
+  NumberFormat: l => import(/* webpackIgnore: true */ `/dist/@formatjs/intl-numberformat/locale-data/${l}.js`),
+  RelativeTimeFormat: l => import(/* webpackIgnore: true */ `/dist/@formatjs/intl-relativetimeformat/locale-data/${l}.js`),
 }
 
 // Check to see if there is native support in the specified Intl subsystem for
