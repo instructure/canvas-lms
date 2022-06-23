@@ -19,7 +19,6 @@
 import React, {useContext, useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
-import {TextInput} from '@instructure/ui-text-input'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -32,8 +31,6 @@ import {GroupContext, formatMessages, SPLIT} from './context'
 import {handleKeyPress} from './utils'
 
 const I18n = useI18nScope('groups')
-
-const I18NSPLIT_PATTERN = /(.+)\s+ZZZ\s(.+)/
 
 const options = [
   {id: '0', label: I18n.t('Create groups later'), dataTestid: 'group-structure-create-later'},
@@ -50,15 +47,18 @@ const options = [
 ]
 
 const GroupStructureSelfSignup = ({onChange, errormsg}) => {
-  const {createGroupCount, groupLimit} = useContext(GroupContext)
+  const [initialGroupCount, setInitialGroupCount] = useState(0)
+  const [groupMemberLimit, setGroupMemberLimit] = useState(0)
 
-  // Split up the I18n strings so we can put TextInputs in the middle of them
-  const createGroups = I18n.t('Create %{number_of_groups} groups now', {
-    number_of_groups: 'ZZZ'
-  }).match(I18NSPLIT_PATTERN)
-  const limitGroupSize = I18n.t('Limit groups to %{group_limit} members', {
-    group_limit: 'ZZZ'
-  }).match(I18NSPLIT_PATTERN)
+  useEffect(() => {
+    onChange('createGroupCount', initialGroupCount)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialGroupCount]) // ignoring rule for onChange func which causes infinite rerenders
+
+  useEffect(() => {
+    onChange('groupLimit', groupMemberLimit || '')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupMemberLimit]) // ignoring rule for onChange func which causes infinite rerenders
 
   return (
     <FormFieldGroup
@@ -68,45 +68,39 @@ const GroupStructureSelfSignup = ({onChange, errormsg}) => {
       messages={formatMessages(errormsg)}
       rowSpacing="small"
     >
-      <View>
-        <Text>{createGroups[1]}</Text>
-        &nbsp;
-        <TextInput
-          display="inline-block"
-          width="3rem"
-          size="x-small"
-          id="textinput-create-groups-now"
-          value={createGroupCount}
-          renderLabel={
-            <ScreenReaderContent>{I18n.t('Number of groups to create')}</ScreenReaderContent>
-          }
-          onChange={(_e, val) => {
-            onChange('createGroupCount', val)
-          }}
-        />
-        &nbsp;
-        <Text>{createGroups[2]}</Text>
-      </View>
-      <View>
-        <Text>{limitGroupSize[1]}</Text>
-        &nbsp;
-        <TextInput
-          display="inline-block"
-          width="3rem"
-          size="x-small"
-          id="textinput-limit-group-size"
-          value={groupLimit}
-          renderLabel={<ScreenReaderContent>{I18n.t('Group Size Limit')}</ScreenReaderContent>}
-          onChange={(_e, val) => {
-            onChange('groupLimit', val)
-          }}
-        />
-        &nbsp;
-        <Text>{limitGroupSize[2]}</Text>
-        &nbsp;
-        <Text size="small" color="secondary">
-          ({I18n.t('Leave blank for no limit')})
-        </Text>
+      <View as="span">
+        <View as="div" padding="small">
+          <NumberInput
+            data-testid="initial-group-count"
+            renderLabel={I18n.t('Create groups now')}
+            min={0}
+            value={initialGroupCount}
+            onIncrement={() => {
+              setInitialGroupCount(initialGroupCount + 1)
+            }}
+            onDecrement={() => {
+              if (initialGroupCount) {
+                setInitialGroupCount(initialGroupCount - 1)
+              }
+            }}
+            onKeyDown={keyPressed => {
+              handleKeyPress(keyPressed, setInitialGroupCount, initialGroupCount)
+            }}
+          />
+        </View>
+        <View as="div" padding="small">
+          <NumberInput
+            data-testid="group-member-limit"
+            renderLabel={I18n.t('Limit group members to (leave blank for no limit)')}
+            min={0}
+            value={groupMemberLimit}
+            onIncrement={() => setGroupMemberLimit(groupMemberLimit + 1)}
+            onDecrement={() => setGroupMemberLimit(groupMemberLimit - 1)}
+            onKeyDown={keyPressed => {
+              handleKeyPress(keyPressed, setGroupMemberLimit, groupMemberLimit)
+            }}
+          />
+        </View>
       </View>
     </FormFieldGroup>
   )

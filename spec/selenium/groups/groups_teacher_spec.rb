@@ -180,7 +180,8 @@ describe "new groups" do
       click_add_group_set
       replace_and_proceed f("#new-group-set-name"), "Test Group Set"
       fxpath("//input[@data-testid='checkbox-allow-self-signup']/..").click
-      replace_and_proceed f("#textinput-limit-group-size"), "2"
+      force_click('[data-testid="group-member-limit"]')
+      f('[data-testid="group-member-limit"]').send_keys("2")
       f(%(button[data-testid="group-set-save"])).click
       wait_for_ajaximations
 
