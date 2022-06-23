@@ -105,6 +105,11 @@ namespace :i18n do
     )
   end
 
+  # TODO: remove once we're sure all places that called i18n:generate are now
+  # calling i18n:extract (e.g. caturday)
+  desc 'Alias for i18n:extract'
+  task generate: [:extract]
+
   desc "Generates JS bundle i18n files (non-en) and adds them to assets.yml"
   task generate_js: :i18n_environment do
     locales = I18n.available_locales
