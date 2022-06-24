@@ -431,12 +431,18 @@ describe MicrosoftSync::SyncerSteps do
     it_behaves_like "a step that returns retry on intermittent error"
 
     context "when Microsoft's API returns success" do
+      let(:mock_users_uluvs_to_aads) do
+        # ULUV "abc@def.com" -> AAD "abc-mail-aad"
+        lambda do |remote_attr, uluvs|
+          uluvs.index_with { |uluv| uluv.gsub(/@.*/, "-#{remote_attr}-aad") }
+        end
+      end
+
       before do
         allow(graph_service_helpers).to receive(:users_uluvs_to_aads) do |remote_attr, uluvs|
           raise "max batchsize stubbed at #{batch_size}" if uluvs.length > batch_size
 
-          # ULUV "abc@def.com" -> AAD "abc-mail-aad"
-          uluvs.index_with { |uluv| uluv.gsub(/@.*/, "-#{remote_attr}-aad") }
+          mock_users_uluvs_to_aads.call(remote_attr, uluvs)
         end
       end
 
@@ -459,7 +465,38 @@ describe MicrosoftSync::SyncerSteps do
             .at_least(:once).and_return({})
           expect { subject }.to_not \
             change { MicrosoftSync::UserMapping.count }.from(0)
+        end
+      end
+
+      context "when some users don't have ULUVs and some don't have Microsoft AADs" do
+        let(:mock_users_uluvs_to_aads) do
+          # ULUV "abc@def.com" -> AAD "abc-mail-aad"
+          lambda do |remote_attr, uluvs|
+            uluvs
+              .grep(/[12]/)
+              .index_with { |uluv| uluv.gsub(/@.*/, "-#{remote_attr}-aad") }
+          end
+        end
+
+        before do
+          students[1].communication_channels.delete_all
+        end
+
+        it "adds only mappings for those who have ULUVs and AADs for those ULUVs" do
           expect_next_step(subject, :step_generate_diff)
+          expect(mappings.pluck(:user_id, :aad_id).sort).to contain_exactly(
+            [students[2].id, "student2-mail-aad"],
+            [teachers[1].id, "teacher1-mail-aad"]
+          )
+        end
+
+        it "removes any possible stale mappings for those without ULUVs or AADs" do
+          expected_user_ids = course.enrollments.map(&:user_id) - [students[2].id, teachers[1].id]
+          expect(MicrosoftSync::UserMapping).to receive(:delete_if_needs_updating).with(
+            course.root_account.id,
+            a_collection_containing_exactly(*expected_user_ids)
+          )
+          subject
         end
       end
 
