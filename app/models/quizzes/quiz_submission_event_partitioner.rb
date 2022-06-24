@@ -39,7 +39,7 @@ class Quizzes::QuizSubmissionEventPartitioner
         log "Done. Bye!"
         log "*" * 80
         unless in_migration || Rails.env.test?
-          ActiveRecord::Base.connection_pool.current_pool.disconnect!
+          ActiveRecord::Base.connection_pool.disconnect!
         end
       end
     end
