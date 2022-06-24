@@ -21,6 +21,7 @@ import React, {useEffect, useRef} from 'react'
 import {View} from '@instructure/ui-view'
 
 import {buildSvg} from '../../svg'
+import CheckerboardStyle from '../../../shared/CheckerboardStyling'
 
 export const Preview = ({settings}) => {
   const wrapper = useRef(null)
@@ -34,6 +35,7 @@ export const Preview = ({settings}) => {
     <View as="div">
       <div
         style={{
+          ...CheckerboardStyle,
           display: 'flex',
           justifyContent: 'center'
         }}

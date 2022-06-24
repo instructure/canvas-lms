@@ -18,7 +18,7 @@
  */
 
 import {buildGroup, buildSvg, buildSvgWrapper, buildStylesheet} from '../index'
-import {DEFAULT_OPTIONS, DEFAULT_SETTINGS} from '../constants'
+import {DEFAULT_SETTINGS} from '../constants'
 
 let settings, options
 
@@ -32,7 +32,7 @@ describe('buildSvg()', () => {
       outlineColor: '#fff',
       outlineSize: 'large'
     }
-    options = {...DEFAULT_OPTIONS}
+    options = {}
   })
 
   it('builds the icon svg', () => {
@@ -86,6 +86,7 @@ describe('buildSvg()', () => {
       <svg
         fill="none"
         height="244px"
+        style="padding: 16px"
         viewBox="0 0 218 244"
         width="218px"
         xmlns="http://www.w3.org/2000/svg"
@@ -97,31 +98,8 @@ describe('buildSvg()', () => {
           width="218px"
           x="0"
         >
-          <pattern
-            height="16"
-            id="checkerboard"
-            patternUnits="userSpaceOnUse"
-            width="16"
-            x="0"
-            y="0"
-          >
-            <rect
-              fill="#d9d9d9"
-              height="8"
-              width="8"
-              x="0"
-              y="0"
-            />
-            <rect
-              fill="#d9d9d9"
-              height="8"
-              width="8"
-              x="8"
-              y="8"
-            />
-          </pattern>
           <g
-            fill="url(#checkerboard)"
+            fill="none"
             stroke="#fff"
             stroke-width="8"
           >
@@ -295,7 +273,7 @@ describe('buildGroup()', () => {
     options = {...options, isPreview: true}
     expect(buildGroup(settings, options)).toMatchInlineSnapshot(`
       <g
-        fill="url(#checkerboard)"
+        fill="none"
         stroke="#0f0"
         stroke-width="2"
       />
