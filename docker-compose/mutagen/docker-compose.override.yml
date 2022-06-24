@@ -71,6 +71,7 @@ x-mutagen:
           - "/packages/*/node_modules/*"
           - "/packages/*/es/*"
           - "!/packages/canvas-rce/es/*"
+          - "!/packages/babel-plugin-themeable-styles/lib/*"
           - "/packages/*/lib/*"
           - "!/packages/translations/lib/*"
           - "!/gems/**/node_modules/"
