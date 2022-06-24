@@ -133,6 +133,19 @@ module CoursePacesPageObject
     "[data-position-target='course-pace-student-menu']"
   end
 
+  def course_pace_section_option_selector
+    "button[data-position-target='course_paces_for_sections']"
+  end
+
+  def course_pace_option_selector(option_type:)
+    case option_type
+    when :student
+      course_pace_student_option_selector
+    when :section
+      course_pace_section_option_selector
+    end
+  end
+
   def course_paces_page_selector
     "#course_paces"
   end
@@ -197,12 +210,33 @@ module CoursePacesPageObject
     "ul[aria-label='Students']"
   end
 
+  def section_menu_selector
+    "ul[aria-label='Sections']"
+  end
+
+  def menu_selector(menu_type:)
+    case menu_type
+    when :student
+      student_menu_selector
+    when :section
+      section_menu_selector
+    end
+  end
+
   def student_course_pace_selector(student_name)
     "span[role=menuitem]:contains(#{student_name})"
   end
 
-  def student_pp_xpath_selector(student_name)
+  def section_course_pace_selector(section_name)
+    "span[role=menuitem]:contains(#{section_name})"
+  end
+
+  def student_cp_xpath_selector(student_name)
     "//ul[@aria-label = 'Students']//span[text() = '#{student_name}']"
+  end
+
+  def section_cp_xpath_selector(section_name)
+    "//ul[@aria-label = 'Sections']//span[text() = '#{section_name}']"
   end
 
   def students_menu_item_selector
@@ -339,6 +373,14 @@ module CoursePacesPageObject
     f(course_pace_student_option_selector)
   end
 
+  def course_pace_section_option
+    f(course_pace_section_option_selector)
+  end
+
+  def course_pace_option(option_type:)
+    f(course_pace_option_selector(option_type: option_type))
+  end
+
   def course_paces_page
     f(course_paces_page_selector)
   end
@@ -393,6 +435,10 @@ module CoursePacesPageObject
 
   def student_course_pace(student_name)
     fj(student_course_pace_selector(student_name))
+  end
+
+  def section_course_pace(section_name)
+    fj(section_course_pace_selector(section_name))
   end
 
   def students_menu_item
@@ -458,10 +504,36 @@ module CoursePacesPageObject
     skip_weekends_checkbox.click
   end
 
+  def force_main_menu_clicked(selector_to_verify)
+    unless element_exists?(selector_to_verify)
+      puts "retrying the main menu click"
+      click_main_course_pace_menu
+    end
+  end
+
+  def force_click_pace_option(option_type:)
+    course_pace_option(option_type: option_type).click
+    # Reducing the flakiness of this menu
+    unless element_exists?(menu_selector(menu_type: option_type))
+      course_pace_option(option_type: option_type).click
+    end
+  end
+
+  def click_section_course_pace(section_name)
+    # This check reduces the flakiness of the clicking in this menu.  Keeping
+    # the puts line for verification in the logs
+    unless element_exists?(section_cp_xpath_selector(section_name), true)
+      puts "Section course pace selector didn't exist so retrying click"
+      click_section_menu_item
+    end
+
+    section_course_pace(section_name).click
+  end
+
   def click_student_course_pace(student_name)
     # This check reduces the flakiness of the clicking in this menu.  Keeping
     # the puts line for verification in the logs
-    unless element_exists?(student_pp_xpath_selector(student_name), true)
+    unless element_exists?(student_cp_xpath_selector(student_name), true)
       puts "Student course pace selector didn't exist so retrying click"
       click_students_menu_item
     end
@@ -469,16 +541,14 @@ module CoursePacesPageObject
     student_course_pace(student_name).click
   end
 
+  def click_section_menu_item
+    force_main_menu_clicked(course_pace_section_option_selector)
+    force_click_pace_option(option_type: :section)
+  end
+
   def click_students_menu_item
-    unless element_exists?(course_pace_student_option_selector)
-      puts "retrying the main menu click"
-      click_main_course_pace_menu
-    end
-    course_pace_student_option.click
-    # Reducing the flakiness of this menu
-    unless element_exists?(student_menu_selector)
-      course_pace_student_option.click
-    end
+    force_main_menu_clicked(course_pace_student_option_selector)
+    force_click_pace_option(option_type: :student)
   end
 
   def click_unpublished_changes_button
