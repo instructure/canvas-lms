@@ -250,22 +250,7 @@ describe('HeaderInputs', () => {
     fireEvent.mouseDown(items[1])
 
     expect(container.findAllByTestId('address-book-tag')).toBeTruthy()
-
-    expect(props.onSelectedIdsChange).toHaveBeenCalledWith([
-      {
-        _id: '1',
-        id: 'TWVzc2FnZWFibGVVc2VyLTQx',
-        itemType: 'user',
-        name: 'Frederick Dukes',
-        commonCoursesInfo: [
-          {
-            courseID: '196',
-            courseRole: 'StudentEnrollment'
-          }
-        ],
-        isLast: true
-      }
-    ])
+    expect(props.onSelectedIdsChange.mock.calls[0][0][0]._id).toBe('1')
   })
 
   describe('Media Comments', () => {
