@@ -139,12 +139,12 @@ class FilesController < ApplicationController
     api_show api_index destroy api_update api_file_status public_url api_capture reset_verifier
   ]
 
-  before_action :check_file_access_flags, only: [:show_relative, :show]
+  before_action :open_limited_cors, only: [:show]
   before_action :open_cors, only: %i[
     api_create api_create_success api_create_success_cors show_thumbnail
   ]
 
-  before_action :open_limited_cors, only: [:show]
+  before_action :check_file_access_flags, only: [:show_relative, :show]
 
   skip_before_action :verify_authenticity_token, only: :api_create
   before_action :verify_api_id, only: %i[
@@ -1400,14 +1400,16 @@ class FilesController < ApplicationController
   end
 
   def open_cors
-    headers["Access-Control-Allow-Origin"] = "*"
+    headers["Access-Control-Allow-Origin"] = request.headers["origin"]
+    headers["Access-Control-Allow-Credentials"] = "true"
     headers["Access-Control-Allow-Methods"] = "POST, PUT, DELETE, GET, OPTIONS"
     headers["Access-Control-Request-Method"] = "*"
     headers["Access-Control-Allow-Headers"] = "Origin, X-Requested-With, Content-Type, Accept, Authorization, Accept-Encoding"
   end
 
   def open_limited_cors
-    headers["Access-Control-Allow-Origin"] = "*"
+    headers["Access-Control-Allow-Origin"] = request.headers["origin"]
+    headers["Access-Control-Allow-Credentials"] = "true"
     headers["Access-Control-Allow-Methods"] = "GET, HEAD"
   end
 
