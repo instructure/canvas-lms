@@ -119,7 +119,7 @@ export const UnpublishedChangesIndicator = ({
   if (newPace && changeCount === 0) {
     return (
       <View margin={margin}>
-        <Text>{I18n.t('Pace is new and unpublished')}</Text>
+        <Text data-testid="publish-status-button">{I18n.t('Pace is new and unpublished')}</Text>
       </View>
     )
   }
