@@ -2900,6 +2900,10 @@ class CoursesController < ApplicationController
   # @argument course[conditional_release] [Boolean]
   #   Enable or disable individual learning paths for students based on assessment
   #
+  # @argument override_sis_stickiness [boolean]
+  #   By default and when the value is true it updates all the fields
+  #   when the value is false then fields which in stuck_sis_fields will not be updated
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id> \
   #     -X PUT \
@@ -3136,14 +3140,14 @@ class CoursesController < ApplicationController
         end
 
         if (mc_restrictions = params[:course][:blueprint_restrictions])
-          template.default_restrictions = mc_restrictions.to_unsafe_h.map { |k, v| [k.to_sym, value_to_boolean(v)] }.to_h
+          template.default_restrictions = mc_restrictions.to_unsafe_h.to_h { |k, v| [k.to_sym, value_to_boolean(v)] }
         end
 
         if (mc_restrictions_by_type = params[:course][:blueprint_restrictions_by_object_type])
           parsed_restrictions_by_type = {}
           mc_restrictions_by_type.to_unsafe_h.each do |type, restrictions|
             class_name = type == "quiz" ? "Quizzes::Quiz" : type.camelcase
-            parsed_restrictions_by_type[class_name] = restrictions.map { |k, v| [k.to_sym, value_to_boolean(v)] }.to_h
+            parsed_restrictions_by_type[class_name] = restrictions.to_h { |k, v| [k.to_sym, value_to_boolean(v)] }
           end
           template.default_restrictions_by_type = parsed_restrictions_by_type
         end
@@ -3153,6 +3157,10 @@ class CoursesController < ApplicationController
 
           @course.errors.add(:master_course_restrictions, t("Invalid restrictions")) unless template.save
         end
+      end
+
+      if params[:override_sis_stickiness] && !value_to_boolean(params[:override_sis_stickiness])
+        params_for_update -= [*@course.stuck_sis_fields]
       end
 
       @course.attributes = params_for_update
