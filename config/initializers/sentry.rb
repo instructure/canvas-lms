@@ -29,9 +29,10 @@ if settings.present?
   Sentry.init do |config|
     config.dsn = settings[:dsn]
     config.breadcrumbs_logger = [:sentry_logger, :http_logger]
+    config.capture_exception_frame_locals = true
     config.transport.ssl_verification = false
     config.release = Canvas.revision
-    config.enabled_environments = %w[ production development ]
+    config.enabled_environments = %w[ production ]
     config.excluded_exceptions += %w{
       AuthenticationMethods::AccessTokenError
       AuthenticationMethods::LoggedOutError
