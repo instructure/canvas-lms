@@ -4,9 +4,7 @@ source script/common/utils/dinghy_proxy_setup.sh
 source script/common/utils/dory_setup.sh
 source script/common/utils/docker_desktop_setup.sh
 
-dependencies='docker,docker-compose 1.20.0,mutagen 0.13.0,mutagen-compose'
-DOCKER_COMMAND="mutagen-compose"
-IS_MUTAGEN=true
+dependencies='docker,docker-compose 1.20.0'
 
 function dory_or_dinghy() {
   if $(installed dory) && $(! [[ "$(docker ps -aq --filter ancestor=codekitchen/dinghy-http-proxy)" == "" ]]); then
@@ -30,7 +28,6 @@ function dory_or_dinghy() {
 }
 
 message "It looks like you're using a Mac. Let's set that up."
-print_mutagen_intro
 check_dependencies
 check_for_docker_desktop
 docker_running &> /dev/null || attempt_start_docker
