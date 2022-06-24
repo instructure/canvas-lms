@@ -17,7 +17,7 @@
  */
 
 import PropTypes from 'prop-types'
-import React, {useEffect, useRef} from 'react'
+import React, {useEffect, useMemo, useRef} from 'react'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {TruncateText} from '@instructure/ui-truncate-text'
@@ -47,51 +47,55 @@ export const AddressBookItem = ({
     }
   }, [isKeyboardFocus, isSelected, menuRef])
 
-  return (
-    <View
-      as="div"
-      background={isSelected ? 'brand' : null}
-      padding="xx-small"
-      onMouseEnter={() => {
-        onHover(true)
-      }}
-      onMouseLeave={() => {
-        onHover(false)
-      }}
-      onMouseDown={() => {
-        onSelect()
-      }}
-      elementRef={el => {
-        itemRef.current = el
-      }}
-      data-testid="address-book-item"
-    >
-      <li
-        role="menuitem"
-        id={id}
-        style={{listStyle: 'none'}}
-        aria-haspopup={hasPopup}
-        data-selected={isSelected}
+  return useMemo(
+    () => (
+      <View
+        as="div"
+        background={isSelected ? 'brand' : null}
+        padding="xx-small"
+        onMouseEnter={() => {
+          onHover(true)
+        }}
+        onMouseLeave={() => {
+          onHover(false)
+        }}
+        onMouseDown={() => {
+          onSelect()
+        }}
+        elementRef={el => {
+          itemRef.current = el
+        }}
+        data-testid="address-book-item"
       >
-        <Flex as="div" width="100%" margin="xxx-small none xxx-small xxx-small">
-          {iconBefore && (
-            <Flex.Item align="start" margin="0 small 0 0">
-              {iconBefore}
+        <li
+          role="menuitem"
+          id={id}
+          style={{listStyle: 'none'}}
+          aria-haspopup={hasPopup}
+          data-selected={isSelected}
+        >
+          <Flex as="div" width="100%" margin="xxx-small none xxx-small xxx-small">
+            {iconBefore && (
+              <Flex.Item align="start" margin="0 small 0 0">
+                {iconBefore}
+              </Flex.Item>
+            )}
+            <Flex.Item align="center" shouldGrow shouldShrink>
+              <TruncateText>
+                <Text color={isSelected ? 'primary-inverse' : null}>{children}</Text>
+              </TruncateText>
             </Flex.Item>
-          )}
-          <Flex.Item align="center" shouldGrow shouldShrink>
-            <TruncateText>
-              <Text color={isSelected ? 'primary-inverse' : null}>{children}</Text>
-            </TruncateText>
-          </Flex.Item>
-          {iconAfter && (
-            <Flex.Item align="center" margin="0 0 0 small">
-              {iconAfter}
-            </Flex.Item>
-          )}
-        </Flex>
-      </li>
-    </View>
+            {iconAfter && (
+              <Flex.Item align="center" margin="0 0 0 small">
+                {iconAfter}
+              </Flex.Item>
+            )}
+          </Flex>
+        </li>
+      </View>
+    ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [children, hasPopup, iconAfter, iconBefore, id, isSelected]
   )
 }
 
