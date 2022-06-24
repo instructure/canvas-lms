@@ -153,22 +153,13 @@ function copy_docker_config {
   confirm_command 'cp docker-compose/config/*.yml config/' || true
 }
 
-function copy_mutagen_override {
-  message "Copying default configuration from docker-compose/mutagen/docker-compose.override.yml to docker-compose.override.yml"
-  cp docker-compose/mutagen/docker-compose.override.yml docker-compose.override.yml
-}
-
 function setup_docker_compose_override {
   message 'Setup override yaml and .env...'
   if [ -f "docker-compose.override.yml" ]; then
     message "docker-compose.override.yml already exists, skipping copy of default configuration!"
   else
-    if [ "${IS_MUTAGEN:-false}" = true ]; then
-      copy_mutagen_override
-    else
-      message "Copying default configuration from config/docker-compose.override.yml.example to docker-compose.override.yml"
-      cp config/docker-compose.override.yml.example docker-compose.override.yml
-    fi
+    message "Copying default configuration from config/docker-compose.override.yml.example to docker-compose.override.yml"
+    cp config/docker-compose.override.yml.example docker-compose.override.yml
   fi
 
   if [ -f ".env" ]; then
