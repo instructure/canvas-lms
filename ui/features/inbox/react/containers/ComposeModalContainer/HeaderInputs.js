@@ -45,19 +45,16 @@ const HeaderInputs = props => {
 
   const canAllRecipientsHaveNotes = (recipients, selectedCourseID) => {
     if (!recipients.length) return false
-
     for (const recipient of recipients) {
       if (recipient.hasOwnProperty('commonCoursesInfo')) {
         let recipientCourseRoles = []
 
         if (recipient.commonCoursesInfo) {
-          const selectedCourseEnrollments = recipient.commonCoursesInfo.filter(
-            courseEnrollment => courseEnrollment.courseID === selectedCourseID
-          )
-
-          recipientCourseRoles = selectedCourseEnrollments.map(
-            courseEnrollment => courseEnrollment.courseRole
-          )
+          recipientCourseRoles = ENV.CONVERSATIONS.CAN_ADD_NOTES_FOR_ACCOUNT
+            ? recipient.commonCoursesInfo.map(courseEnrollment => courseEnrollment.courseRole)
+            : recipient.commonCoursesInfo
+                .filter(courseEnrollment => courseEnrollment.courseID === selectedCourseID)
+                .map(courseEnrollment => courseEnrollment.courseRole)
         }
 
         if (!recipientCourseRoles.includes('StudentEnrollment')) {
@@ -78,7 +75,6 @@ const HeaderInputs = props => {
       : ''
 
     if (
-      props.activeCourseFilter &&
       ENV.CONVERSATIONS.NOTES_ENABLED &&
       (ENV.CONVERSATIONS.CAN_ADD_NOTES_FOR_ACCOUNT ||
         ENV.CONVERSATIONS.CAN_ADD_NOTES_FOR_COURSES[selectedCourseID])

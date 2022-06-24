@@ -150,7 +150,21 @@ describe('HeaderInputs', () => {
       expect(container.queryByTestId('faculty-message-checkbox')).not.toBeInTheDocument()
     })
 
-    it('does not render if no course is chosen', async () => {
+    it('renders if no course is chosen', async () => {
+      const recipientPropInfo = defaultRecipientProps()
+      recipientPropInfo.activeCourseFilter = undefined
+      const props = defaultProps(recipientPropInfo)
+      const container = setup(props)
+
+      expect(container.queryByTestId('faculty-message-checkbox')).toBeInTheDocument()
+    })
+
+    it('does not render if CAN_AND_NOTES_FOR_ACCOUNT is false', async () => {
+      window.ENV = {
+        CONVERSATIONS: {
+          CAN_ADD_NOTES_FOR_ACCOUNT: false
+        }
+      }
       const recipientPropInfo = defaultRecipientProps()
       recipientPropInfo.activeCourseFilter = undefined
       const props = defaultProps(recipientPropInfo)
