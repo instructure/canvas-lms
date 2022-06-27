@@ -232,6 +232,7 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig}) =
               name="single-color-image-fill"
               onChange={color => dispatch({type: actions.SET_ICON_FILL_COLOR.type, payload: color})}
               popoverMountNode={getImageSection}
+              requireColor
             />
           </Flex.Item>
         )}

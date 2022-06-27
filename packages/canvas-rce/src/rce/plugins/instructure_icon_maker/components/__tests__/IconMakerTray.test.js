@@ -499,6 +499,18 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
         const noneColorOption = getNoneColorOptionFor('icon-text-color-popover')
         expect(noneColorOption).not.toBeInTheDocument()
       })
+
+      it('they represent single color image', async () => {
+        const {getByText, getByTestId} = renderComponent()
+        const addImageButton = getByText('Add Image')
+        userEvent.click(addImageButton)
+        const singleColorOption = getByText('Single Color Image')
+        userEvent.click(singleColorOption)
+        const artIcon = await waitFor(() => getByTestId('icon-maker-art'))
+        userEvent.click(artIcon)
+        const noneColorOption = getNoneColorOptionFor('single-color-image-fill-popover')
+        expect(noneColorOption).not.toBeInTheDocument()
+      })
     })
 
     describe('have a none option when', () => {
