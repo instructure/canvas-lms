@@ -19,72 +19,72 @@
 import _ from 'underscore'
 import MessageStudentsWhoHelper from '@canvas/grading/messageStudentsWhoHelper'
 
-QUnit.module('messageStudentsWhoHelper#options', function(hooks) {
-  hooks.beforeEach(function() {
+QUnit.module('messageStudentsWhoHelper#options', function (hooks) {
+  hooks.beforeEach(function () {
     this.assignment = {id: '1', name: 'Shootbags'}
   })
-  test("Includes the 'Haven't been graded' option if there are submissions", function() {
+  test("Includes the 'Haven't been graded' option if there are submissions", function () {
     sinon.stub(MessageStudentsWhoHelper, 'hasSubmission').returns(true)
     const options = MessageStudentsWhoHelper.options(this.assignment)
     deepEqual(options[1].text, "Haven't been graded")
     MessageStudentsWhoHelper.hasSubmission.restore()
   })
-  test("Does not include the 'Haven't been graded' option if there are no submissions", function() {
+  test("Does not include the 'Haven't been graded' option if there are no submissions", function () {
     sinon.stub(MessageStudentsWhoHelper, 'hasSubmission').returns(false)
     const options = MessageStudentsWhoHelper.options(this.assignment)
     deepEqual(options[1].text, 'Scored less than')
     MessageStudentsWhoHelper.hasSubmission.restore()
   })
 
-  QUnit.module("'Haven't Submitted Yet' criteria function", function(hooks) {
-    hooks.beforeEach(function() {
+  QUnit.module("'Haven't Submitted Yet' criteria function", function (hooks) {
+    hooks.beforeEach(function () {
       const assignment = {id: '1', name: 'Homework', submissionTypes: ['online_text_entry']}
       const options = MessageStudentsWhoHelper.options(assignment)
       const option = options.find(option => option.text === "Haven't submitted yet")
       this.hasNotSubmitted = option.criteriaFn
     })
 
-    test('returns true if the submission has not been submitted', function() {
+    test('returns true if the submission has not been submitted', function () {
       const submission = {excused: false, latePolicyStatus: null, submittedAt: null}
       strictEqual(this.hasNotSubmitted(submission), true)
     })
 
-    test('returns true if the submission has not been submitted (with snake-cased key)', function() {
+    test('returns true if the submission has not been submitted (with snake-cased key)', function () {
       const submission = {excused: false, latePolicyStatus: null, submitted_at: null}
       strictEqual(this.hasNotSubmitted(submission), true)
     })
 
-    test('returns false if the submission has been submitted', function() {
+    test('returns false if the submission has been submitted', function () {
       const submission = {excused: false, latePolicyStatus: null, submittedAt: new Date()}
       strictEqual(this.hasNotSubmitted(submission), false)
     })
 
-    test('returns false if the submission has been submitted (with snake-cased key)', function() {
+    test('returns false if the submission has been submitted (with snake-cased key)', function () {
       const submission = {excused: false, latePolicyStatus: null, submitted_at: new Date()}
       strictEqual(this.hasNotSubmitted(submission), false)
     })
 
-    test("returns true if the submission status has been set to 'Missing'", function() {
+    test("returns true if the submission status has been set to 'Missing'", function () {
       const submission = {excused: false, latePolicyStatus: 'missing', submittedAt: null}
       strictEqual(this.hasNotSubmitted(submission), true)
     })
 
-    test("returns false if the submission status has been set to anything other than 'Missing'", function() {
+    test("returns false if the submission status has been set to anything other than 'Missing'", function () {
       const submission = {excused: false, latePolicyStatus: 'late', submittedAt: null}
       strictEqual(this.hasNotSubmitted(submission), false)
     })
 
-    test("returns true if the submission status has been set to 'Missing' and the student has submitted", function() {
+    test("returns true if the submission status has been set to 'Missing' and the student has submitted", function () {
       const submission = {excused: false, latePolicyStatus: 'missing', submittedAt: new Date()}
       strictEqual(this.hasNotSubmitted(submission), true)
     })
 
-    test('returns false if the submission is excused', function() {
+    test('returns false if the submission is excused', function () {
       const submission = {excused: true, latePolicyStatus: null, submittedAt: null}
       strictEqual(this.hasNotSubmitted(submission), false)
     })
 
-    test('returns false if the submission is excused and the student has not submitted', function() {
+    test('returns false if the submission is excused and the student has not submitted', function () {
       const submission = {excused: true, latePolicyStatus: null, submittedAt: null}
       strictEqual(this.hasNotSubmitted(submission), false)
     })
@@ -181,9 +181,10 @@ test('returns false if the student score is null or undefined', () => {
 
 test('returns false if the cutoff is null or undefined', () => {
   const student = {score: 5}
+  let cutoff
   let scoreWithCutoff = MessageStudentsWhoHelper.scoreWithCutoff(student, cutoff)
   deepEqual(scoreWithCutoff, false)
-  var cutoff = null
+  cutoff = null
   scoreWithCutoff = MessageStudentsWhoHelper.scoreWithCutoff(student, cutoff)
   deepEqual(scoreWithCutoff, false)
 })
@@ -262,4 +263,98 @@ test('returns an object with the expected settings and courseId is camelCase', (
     'subjectCallback'
   ]
   deepEqual(settingsKeys, expectedKeys)
+})
+
+QUnit.module('messageStudentsWhoHelper#messageStudentsWho', hooks => {
+  const recipientsIds = [1, 2, 3, 4]
+  const subject = 'foo'
+  const body = 'bar'
+  const contextCode = '1'
+  const sendMessageStudentsWhoUrl = `/api/v1/conversations`
+  const data = {}
+  let server
+
+  hooks.beforeEach(() => {
+    server = sinon.fakeServer.create({respondImmediately: true})
+    const responseBody = JSON.stringify(data)
+    server.respondWith('POST', sendMessageStudentsWhoUrl, [
+      200,
+      {'Content-Type': 'application/json'},
+      responseBody
+    ])
+  })
+
+  hooks.afterEach(() => {
+    server.restore()
+  })
+
+  function getRequest() {
+    // filter requests to eliminate spec pollution from unrelated specs
+    return _.find(server.requests, request => request.url.includes(sendMessageStudentsWhoUrl))
+  }
+
+  test('sends a post request to the "conversations" url', () =>
+    MessageStudentsWhoHelper.sendMessageStudentsWho(recipientsIds, subject, body, contextCode).then(
+      () => {
+        const request = getRequest()
+        strictEqual(request.method, 'POST')
+        strictEqual(request.url, sendMessageStudentsWhoUrl)
+      }
+    ))
+
+  test('sends async for mode parameter', () =>
+    MessageStudentsWhoHelper.sendMessageStudentsWho(recipientsIds, subject, body, contextCode)
+      .then(() => {})
+      .then(() => {
+        const bodyData = JSON.parse(getRequest().requestBody)
+        deepEqual(bodyData.mode, 'async')
+      }))
+
+  test('sends true for group_conversation parameter', () =>
+    MessageStudentsWhoHelper.sendMessageStudentsWho(recipientsIds, subject, body, contextCode).then(
+      () => {
+        const bodyData = JSON.parse(getRequest().requestBody)
+        deepEqual(bodyData.group_conversation, true)
+      }
+    ))
+
+  test('sends true for bulk_message parameter', () =>
+    MessageStudentsWhoHelper.sendMessageStudentsWho(recipientsIds, subject, body, contextCode).then(
+      () => {
+        const bodyData = JSON.parse(getRequest().requestBody)
+        deepEqual(bodyData.bulk_message, true)
+      }
+    ))
+
+  test('includes media comment params if passed a media file', () =>
+    MessageStudentsWhoHelper.sendMessageStudentsWho(recipientsIds, subject, body, contextCode, {
+      id: '123',
+      type: 'video'
+    }).then(() => {
+      const bodyData = JSON.parse(getRequest().requestBody)
+      strictEqual(bodyData.media_comment_id, '123')
+      strictEqual(bodyData.media_comment_type, 'video')
+    }))
+
+  test('includes attachment_ids param if passed attachment ids', () =>
+    MessageStudentsWhoHelper.sendMessageStudentsWho(
+      recipientsIds,
+      subject,
+      body,
+      contextCode,
+      null,
+      ['4', '8']
+    ).then(() => {
+      const bodyData = JSON.parse(getRequest().requestBody)
+      deepEqual(bodyData.attachment_ids, ['4', '8'])
+    }))
+
+  test('does not include media comment params if not passed a media file', () =>
+    MessageStudentsWhoHelper.sendMessageStudentsWho(recipientsIds, subject, body, contextCode).then(
+      () => {
+        const bodyData = JSON.parse(getRequest().requestBody)
+        notOk(Object.keys(bodyData).includes('media_comment_id'))
+        notOk(Object.keys(bodyData).includes('media_comment_type'))
+      }
+    ))
 })

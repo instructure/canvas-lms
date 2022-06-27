@@ -90,36 +90,6 @@ function updateGradebookFilter(courseId, filter) {
   })
 }
 
-function sendMessageStudentsWho(
-  recipientsIds,
-  subject,
-  body,
-  contextCode,
-  mediaFile,
-  attachmentIds
-) {
-  const params = {
-    recipients: recipientsIds,
-    subject,
-    body,
-    context_code: contextCode,
-    mode: 'async',
-    group_conversation: true,
-    bulk_message: true
-  }
-
-  if (mediaFile) {
-    params.media_comment_id = mediaFile.id
-    params.media_comment_type = mediaFile.type
-  }
-
-  if (attachmentIds) {
-    params.attachment_ids = attachmentIds
-  }
-
-  return axios.post('/api/v1/conversations', params)
-}
-
 export default {
   applyScoreToUngradedSubmissions,
   createGradebookFilter,
@@ -129,6 +99,5 @@ export default {
   updateColumnOrder,
   updateGradebookFilter,
   updateSubmission,
-  updateTeacherNotesColumn,
-  sendMessageStudentsWho
+  updateTeacherNotesColumn
 }
