@@ -1938,13 +1938,15 @@ class Assignment < ActiveRecord::Base
     # grading a student results in a teacher occupying a grader slot for that assignment if it is moderated.
     ensure_grader_can_adjudicate(grader: opts[:grader], provisional: opts[:provisional], occupy_slot: true) do
       if grade_group_students
-        find_or_create_submissions(students, Submission.preload(:grading_period, :stream_item)) do |submission|
+        find_or_create_submissions(students, Submission.preload(:grading_period, :stream_item, :lti_result)) do |submission|
           submission.skip_grader_check = true if opts[:skip_grader_check]
+          submission&.lti_result&.mark_reviewed!
           submissions << save_grade_to_submission(submission, original_student, group, opts)
         end
       else
         submission = find_or_create_submission(original_student, skip_grader_check: opts[:skip_grader_check])
         submission.skip_grader_check = true if opts[:skip_grader_check]
+        submission&.lti_result&.mark_reviewed!
         submissions << save_grade_to_submission(submission, original_student, group, opts)
       end
     end
