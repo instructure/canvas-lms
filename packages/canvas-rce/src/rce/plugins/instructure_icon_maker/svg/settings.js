@@ -139,7 +139,7 @@ export function useSvgSettings(editor, editing, rcsConfig) {
 }
 
 export async function svgFromUrl(url) {
-  const response = await fetch(url, {credentials: 'include'})
+  const response = await fetch(url)
 
   const data = await response.text()
   return new DOMParser().parseFromString(data, SVG_XML_TYPE)
