@@ -26,7 +26,7 @@ import {
 import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import {createCourseGradesWithGradingPeriods as createGrades} from './GradeCalculatorSpecHelper'
-import GradebookApi from 'ui/features/gradebook/react/default_gradebook/apis/GradebookApi'
+import MessageStudentsWhoHelper from '@canvas/grading/messageStudentsWhoHelper'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
 const $fixtures = document.getElementById('fixtures')
@@ -1307,7 +1307,7 @@ QUnit.module('Gradebook#sendMessageStudentsWho', hooks => {
     sandbox.stub(FlashAlert, 'showFlashSuccess')
     sandbox.stub(FlashAlert, 'showFlashError')
 
-    apiRequestStub = sinon.stub(GradebookApi, 'sendMessageStudentsWho').resolves()
+    apiRequestStub = sinon.stub(MessageStudentsWhoHelper, 'sendMessageStudentsWho').resolves()
   })
 
   hooks.afterEach(() => {
