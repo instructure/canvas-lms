@@ -76,7 +76,8 @@ const previousExportProps = () => ({
   attachment: {
     id: '691',
     downloadUrl: 'http://downloadUrl',
-    updatedAt: '2009-01-20T17:00:00Z'
+    updatedAt: '2009-01-20T17:00:00Z',
+    createdAt: '2009-01-20T17:00:00Z'
   }
 })
 
@@ -173,6 +174,16 @@ describe('EnhancedActionMenu', () => {
       })
       const specificMenuItem = component.getByRole('menuitem', {
         name: 'Previous Export (May 12, 2021 at 1pm)'
+      })
+      expect(specificMenuItem).toBeInTheDocument()
+    })
+
+    it('previous export date stays the same after updatedAt is changed', async () => {
+      props.attachment.updatedAt = '2021-05-12T13:00:00Z'
+      component = renderComponent(props)
+      clickOnDropdown('Export')
+      const specificMenuItem = component.getByRole('menuitem', {
+        name: 'Previous Export (Jan 20, 2009 at 5pm)'
       })
       expect(specificMenuItem).toBeInTheDocument()
     })

@@ -2035,7 +2035,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         actionMenuProps.attachment = {
           id: `${attachmentData.attachment.id}`,
           downloadUrl: this.options.attachment_url,
-          updatedAt: attachmentData.attachment.updated_at
+          updatedAt: attachmentData.attachment.updated_at,
+          createdAt: attachmentData.attachment.created_at
         }
       }
     }

@@ -403,6 +403,7 @@ export type AttachmentData = {
 export type Attachment = {
   id: string
   updated_at: string
+  created_at: string
 }
 
 export type Lti = {
