@@ -273,7 +273,7 @@ module Lti::IMS
             end
           end
 
-          context "with gradingProgress set to FullyGraded or PendingManual" do
+          context "with gradingProgress set to FullyGraded" do
             let(:params_overrides) do
               super().merge(scoreGiven: 10, scoreMaximum: line_item.score_maximum)
             end
@@ -283,13 +283,11 @@ module Lti::IMS
               expect(result.submission.reload.score).to eq 10.0
             end
 
-            context do
-              let(:params_overrides) { super().merge(gradingProgress: "PendingManual") }
-
-              it "updates submission with PendingManual" do
-                send_request
-                expect(result.submission.reload.score).to eq 10.0
-              end
+            it "doesn't mark the submission and result as needing review with FullyGraded" do
+              send_request
+              result.reload
+              expect(result.submission.needs_review?).to be false
+              expect(result.needs_review?).to be false
             end
 
             context "with comment in payload" do
@@ -314,6 +312,45 @@ module Lti::IMS
                 send_request
                 expect(result.submission.reload.score).to eq 10.0
               end
+            end
+          end
+
+          context "with gradingProgress set to PendingManual" do
+            let(:params_overrides) do
+              super().merge(gradingProgress: "PendingManual", scoreGiven: 10, scoreMaximum: line_item.score_maximum)
+            end
+
+            it "updates the submission" do
+              send_request
+              expect(result.submission.reload.score).to eq 10.0
+            end
+
+            it "marks the result and submission as needing review" do
+              send_request
+              result.reload
+              expect(result.needs_review?).to be true
+              expect(result.submission.needs_review?).to be true
+            end
+          end
+
+          context "a submission that needs review already exists" do
+            let(:params_overrides) { super().merge(scoreGiven: line_item.score_maximum, scoreMaximum: line_item.score_maximum) }
+
+            before do
+              result.grading_progress = "PendingManual"
+              result.submission.workflow_state = Submission.workflow_states.pending_review
+              result.save!
+            end
+
+            it "let's the tool mark the submission as FullyGraded" do
+              expect(result.needs_review?).to be true
+              expect(result.submission.needs_review?).to be true
+
+              send_request
+
+              result.reload
+              expect(result.needs_review?).to be false
+              expect(result.submission.needs_review?).to be false
             end
           end
 

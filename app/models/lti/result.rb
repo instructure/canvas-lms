@@ -107,6 +107,14 @@ class Lti::Result < ApplicationRecord
     connection.execute(update_query)
   end
 
+  def needs_review?
+    grading_progress == "PendingManual"
+  end
+
+  def mark_reviewed!
+    update!(grading_progress: "FullyGraded")
+  end
+
   private
 
   def set_root_account

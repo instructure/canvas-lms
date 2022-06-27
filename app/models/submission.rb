@@ -1425,6 +1425,10 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  def infer_review_needed?
+    (submission_type == "online_quiz" && quiz_submission.try(:latest_submitted_attempt).try(:pending_review?)) || lti_result&.reload&.needs_review?
+  end
+
   def inferred_workflow_state
     inferred_state = workflow_state
 
@@ -1434,7 +1438,7 @@ class Submission < ActiveRecord::Base
     inferred_state = Submission.workflow_states.submitted if unsubmitted? && submitted_at
     inferred_state = Submission.workflow_states.unsubmitted if submitted? && !has_submission?
     inferred_state = Submission.workflow_states.graded if grade && score && grade_matches_current_submission
-    inferred_state = Submission.workflow_states.pending_review if submission_type == "online_quiz" && quiz_submission.try(:latest_submitted_attempt).try(:pending_review?)
+    inferred_state = Submission.workflow_states.pending_review if infer_review_needed?
 
     inferred_state
   end

@@ -392,6 +392,9 @@ module Lti::IMS
         else
           result.update!(scores_params.merge(updated_at: timestamp))
         end
+        # An update to a result might require updating a submission's workflow_state.
+        # The submission will infer that for us.
+        submission&.save!
       end
     end
 

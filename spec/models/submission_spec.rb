@@ -101,14 +101,39 @@ describe Submission do
         it { is_expected.to eq Submission.workflow_states.pending_review }
       end
 
-      context "when workflow state is pending_review and submission was graded by quizzes" do
+      context "when workflow state is pending_review" do
         before do
           submission.workflow_state = Submission.workflow_states.pending_review
-          submission.grader_id = -1
-          submission.cached_quiz_lti = true
         end
 
-        it { is_expected.to eq Submission.workflow_states.pending_review }
+        context "and the submission was graded by quizzes" do
+          before do
+            submission.grader_id = -1
+            submission.cached_quiz_lti = true
+          end
+
+          it { is_expected.to eq Submission.workflow_states.pending_review }
+        end
+      end
+
+      context "the submission's Lti::Result was marked as PendingManual by an external tool" do
+        let(:tool) { external_tool_1_3_model }
+        let(:result) { lti_result_model(result_overrides) }
+        let(:submission) { result.submission }
+        let(:result_overrides) do
+          {
+            assignment: assignment,
+            grading_progress: "PendingManual",
+            result_score: assignment.points_possible,
+            result_maximum: assignment.points_possible,
+            tool: tool
+          }
+        end
+
+        it "marks the submission as needing review" do
+          submission.infer_values
+          expect(submission.workflow_state).to eq Submission.workflow_states.pending_review
+        end
       end
     end
   end
