@@ -62,10 +62,14 @@ module Lti::Messages
       )
     end
 
+    def tag_from_resource_link
+      ContentTag.find_by(associated_asset: resource_link) if resource_link
+    end
+
     def add_resource_link_request_claims!
       @message.resource_link.id = launch_resource_link_id
       @message.resource_link.description = @assignment&.description
-      @message.resource_link.title = @assignment&.title
+      @message.resource_link.title = @assignment&.title || tag_from_resource_link&.title || @context.name
     end
 
     def add_lti1p1_claims!

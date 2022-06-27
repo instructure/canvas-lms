@@ -542,7 +542,7 @@ class ExternalToolsController < ApplicationController
 
   # As `resource_link_lookup_id` was renamed to `resource_link_lookup_uuid` we
   # have to support both names because, there are cases like RCE editor, that a
-  # resource link was previously-created and the genererated links couldn't stop
+  # resource link was previously-created and the generated links couldn't stop
   # working.
   def resource_link_lookup_uuid
     params[:resource_link_lookup_id] || params[:resource_link_lookup_uuid]
@@ -555,7 +555,6 @@ class ExternalToolsController < ApplicationController
   # determine resource_link_id to send to tool.
   def lookup_resource_link(tool)
     return nil unless resource_link_lookup_uuid
-    return nil unless params[:url]
 
     resource_link = Lti::ResourceLink.where(
       lookup_uuid: resource_link_lookup_uuid,
@@ -570,8 +569,12 @@ class ExternalToolsController < ApplicationController
 
     # Verify the resource link was intended for the domain it's being
     # launched from
-    resource_link if resource_link&.current_external_tool(@context)
+    if params[:url] && !resource_link&.current_external_tool(@context)
       &.matches_host?(params[:url])
+      nil
+    else
+      resource_link
+    end
   end
 
   def basic_lti_launch_request(tool, selection_type = nil, opts = {})
