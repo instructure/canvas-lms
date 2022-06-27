@@ -57,6 +57,10 @@ describe FilesController do
     @file = factory_with_protected_attributes(@user.attachments, uploaded_data: io)
   end
 
+  def user_html_file
+    @file = factory_with_protected_attributes(@user.attachments, uploaded_data: fixture_file_upload("test.html", "text/html", false))
+  end
+
   def account_js_file
     @file = factory_with_protected_attributes(@account.attachments, uploaded_data: fixture_file_upload("test.js", "text/javascript", false))
   end
@@ -330,7 +334,7 @@ describe FilesController do
       # first verifier
       user_session(user1)
       get "show", params: verifier1.merge(id: file1.id)
-      expect(response).to be_redirect
+      expect(response).to be_successful
 
       expect(session[:file_access_user_id]).to eq user1.global_id
       expect(session[:file_access_expiration]).not_to be_nil
@@ -339,7 +343,7 @@ describe FilesController do
 
       # second verifier, should update session
       get "show", params: verifier2.merge(id: file2.id)
-      expect(response).to be_redirect
+      expect(response).to be_successful
 
       expect(session[:file_access_user_id]).to eq user2.global_id
       expect(session[:file_access_expiration]).not_to be_nil
@@ -355,6 +359,17 @@ describe FilesController do
       expect(session[:permissions_key]).not_to eq permissions_key
     end
 
+    it "redirects without sf_verifier for inline_content files" do
+      user = user_factory(active_all: true)
+      file = user_html_file
+      verifier = Users::AccessVerifier.generate(user: user)
+
+      get "show", params: verifier.merge(id: file.id)
+      expect(response).to be_redirect
+
+      expect(response.headers["Location"]).to eq "http://test.host/files/#{file.id}"
+    end
+
     it "ignores invalid sf_verifiers" do
       user = user_factory(active_all: true)
       file = user_file
@@ -362,7 +377,7 @@ describe FilesController do
 
       # first use to establish session
       get "show", params: verifier.merge(id: file.id)
-      expect(response).to be_redirect
+      expect(response).to be_successful
       permissions_key = session[:permissions_key]
 
       # second use after verifier expiration but before session expiration.
@@ -814,8 +829,6 @@ describe FilesController do
         user_verifier = Users::AccessVerifier.generate(user: @teacher)
         other_params = { download: 1, inline: 1, verifier: file_verifier, account_id: @account.id, file_id: @file.id, file_path: @file.full_path }
         get "show_relative", params: user_verifier.merge(other_params)
-        expect(response).to be_redirect
-        get "show_relative", params: other_params
         assert_unauthorized
       end
     end
@@ -1240,9 +1253,8 @@ describe FilesController do
 
     it "opens up cors headers" do
       params = @attachment.ajax_upload_params("", "")
-      request.headers["Origin"] = "canvas.local"
       post "api_create", params: params[:upload_params].merge(file: @content)
-      expect(response.header["Access-Control-Allow-Origin"]).to eq "canvas.local"
+      expect(response.header["Access-Control-Allow-Origin"]).to eq "*"
     end
 
     it "has a preflight point for options requests (mostly safari)" do
