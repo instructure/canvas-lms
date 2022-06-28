@@ -231,6 +231,7 @@ const GroupStructureNoSelfSignup = ({onChange, errormsg}) => {
       {splitGroups !== SPLIT.off && (
         <Checkbox
           checked={bySection}
+          data-testid="require-same-section-auto-assign"
           label={I18n.t('Require group members to be in the same section')}
           onChange={e => {
             onChange('bySection', e.target.checked)
