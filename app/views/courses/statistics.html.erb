@@ -197,11 +197,13 @@
           <td style="padding-<%= direction('left') %>: 10px; text-align: <%= direction('right') %>;"><%= t 'file_count', 'file', :count => @file_count %></td>
         </tr>
 
+        <% if @media_file_count && @media_file_count > 0 %>
         <tr>
           <td><%= before_label('media_files', 'Media Files') %></td>
           <td style="padding-<%= direction('left') %>: 10px; text-align: <%= direction('right') %>;"><%= number_to_human_size(@media_files_size) %></td>
           <td style="padding-<%= direction('left') %>: 10px; text-align: <%= direction('right') %>;"><%= t 'file_count', 'file', :count => @media_file_count %></td>
         </tr>
+        <% end %>
       </table>
     </div>
   </div>
