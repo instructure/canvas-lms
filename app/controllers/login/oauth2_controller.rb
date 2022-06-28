@@ -22,6 +22,7 @@ class Login::OAuth2Controller < Login::OAuthBaseController
   skip_before_action :verify_authenticity_token
 
   rescue_from Canvas::Security::TokenExpired, with: :handle_expired_token
+  rescue_from Canvas::TimeoutCutoff, with: :handle_external_timeout
 
   def new
     super
@@ -80,6 +81,12 @@ class Login::OAuth2Controller < Login::OAuthBaseController
   def handle_expired_token
     flash[:delegated_message] = t("It took too long to login. Please try again")
     redirect_to login_url
+  end
+
+  def handle_external_timeout
+    flash[:delegated_message] = t("A timeout occurred contacting external authentication service")
+    redirect_to login_url
+    false
   end
 
   def validate_request
