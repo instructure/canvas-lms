@@ -53,6 +53,9 @@ class DeveloperKeysController < ApplicationController
         )
       end
     end
+  rescue => e
+    report_error(e)
+    raise e
   end
 
   def create
@@ -61,8 +64,12 @@ class DeveloperKeysController < ApplicationController
     if @key.save
       render json: developer_key_json(@key, @current_user, session, account_context)
     else
+      report_error(nil, 400)
       render json: @key.errors, status: :bad_request
     end
+  rescue => e
+    report_error(e)
+    raise e
   end
 
   def update
@@ -71,13 +78,20 @@ class DeveloperKeysController < ApplicationController
     if @key.save
       render json: developer_key_json(@key, @current_user, session, account_context)
     else
+      report_error(nil, 400)
       render json: @key.errors, status: :bad_request
     end
+  rescue => e
+    report_error(e)
+    raise e
   end
 
   def destroy
     @key.destroy
     render json: developer_key_json(@key, @current_user, session, account_context)
+  rescue => e
+    report_error(e)
+    raise e
   end
 
   protected
@@ -130,6 +144,9 @@ class DeveloperKeysController < ApplicationController
 
   def set_key
     @key = DeveloperKey.nondeleted.find(params[:id])
+  rescue ActiveRecord::RecordNotFound => e
+    report_error(e)
+    raise e
   end
 
   def account_context
@@ -150,6 +167,9 @@ class DeveloperKeysController < ApplicationController
 
   def require_manage_developer_keys
     require_context_with_permission(account_context, :manage_developer_keys)
+  rescue ActiveRecord::RecordNotFound => e
+    report_error(e)
+    raise e
   end
 
   def developer_key_params
@@ -169,5 +189,10 @@ class DeveloperKeysController < ApplicationController
       :allow_includes,
       scopes: []
     )
+  end
+
+  def report_error(exception, code = nil)
+    code ||= response_code_for_rescue(exception) if exception
+    InstStatsd::Statsd.increment("canvas.developer_keys_controller.request_error", tags: { action: action_name, code: code })
   end
 end
