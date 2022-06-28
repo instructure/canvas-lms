@@ -32,6 +32,7 @@ export const AddressBookContainer = props => {
   const [inputValue, setInputValue] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
   const [isLoadingMoreData, setIsLoadingMoreData] = useState(false)
+  const [canSendAllMessage, setCanSendAllMessage] = useState(false)
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -87,6 +88,7 @@ export const AddressBookContainer = props => {
         return {
           legacyNode: {
             recipients: {
+              sendMessagesAll: previousResult.legacyNode?.recipients?.sendMessagesAll,
               contextsConnection: {
                 nodes: [
                   ...previousResult.legacyNode?.recipients?.contextsConnection?.nodes,
@@ -187,6 +189,7 @@ export const AddressBookContainer = props => {
     if (contextData.length > 0 && !loading) {
       contextData[contextData.length - 1].isLast = true
     }
+    setCanSendAllMessage(!!data?.legacyNode?.recipients?.sendMessagesAll)
 
     // since we have an array of objects, we use the id field to make sure it's unique.
     // The id field is safe to use, because its the field we use as a key.
@@ -243,7 +246,7 @@ export const AddressBookContainer = props => {
       limitTagCount={props.limitTagCount}
       width={props.width}
       open={props.open}
-      hasSelectAllFilterOption={props.hasSelectAllFilterOption}
+      hasSelectAllFilterOption={props.hasSelectAllFilterOption && canSendAllMessage}
       currentFilter={filterHistory[filterHistory.length - 1]}
       activeCourseFilter={props.activeCourseFilter}
       addressBookMessages={props.addressBookMessages}

@@ -38,6 +38,7 @@ export const ADDRESS_BOOK_RECIPIENTS = gql`
       ... on User {
         id
         recipients(context: $context, search: $search) {
+          sendMessagesAll
           contextsConnection(first: 20, after: $afterContext) {
             nodes {
               id

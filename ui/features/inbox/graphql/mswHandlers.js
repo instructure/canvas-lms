@@ -386,6 +386,7 @@ export const handlers = [
 
     if (req.variables.context) {
       const recipients = {
+        sendMessagesAll: true,
         contextsConnection: {
           nodes: [],
           pageInfo: PageInfo.mock({hasNextPage: false}),
@@ -426,6 +427,7 @@ export const handlers = [
       data.legacyNode.recipients = recipients
     } else if (req.variables.search === 'Fred') {
       const recipients = {
+        sendMessagesAll: true,
         contextsConnection: {
           nodes: [],
           pageInfo: PageInfo.mock({hasNextPage: false}),
@@ -466,6 +468,7 @@ export const handlers = [
       data.legacyNode.recipients = recipients
     } else {
       const recipients = {
+        sendMessagesAll: true,
         contextsConnection: {
           nodes: [
             {
