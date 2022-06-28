@@ -336,6 +336,34 @@ QUnit.module('GradebookGrid TotalGradeColumnHeaderRenderer', suiteHooks => {
       render()
       notOk(component.props.onApplyScoreToUngraded)
     })
+
+    test('does validate the absence of scrollable columns', () => {
+      gradebook = createGradebook()
+      sinon.stub(gradebook, 'saveSettings')
+      columns = {
+        frozen: [{id: 'student'}],
+        scrollable: []
+      }
+
+      gridSupport = {
+        columns: {
+          getColumns() {
+            return columns
+          }
+        }
+      }
+
+      column = {id: 'total_grade'}
+      renderer = new TotalGradeColumnHeaderRenderer(gradebook)
+
+      let errorFound = false
+      try {
+        render()
+      } catch (error) {
+        errorFound = true
+      }
+      notOk(errorFound, 'Exception thrown')
+    })
   })
 
   QUnit.module('#destroy()', () => {

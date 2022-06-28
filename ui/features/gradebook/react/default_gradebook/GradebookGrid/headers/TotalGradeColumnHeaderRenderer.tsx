@@ -32,7 +32,7 @@ function getProps(_column, gradebook, gridSupport, options) {
 
   const columns = gridSupport.columns.getColumns()
 
-  const isInBack = columns.scrollable[columns.scrollable.length - 1].id === 'total_grade'
+  const isInBack = columns.scrollable[columns.scrollable.length - 1]?.id === 'total_grade'
   const isInFront = columns.frozen.some(frozenColumn => frozenColumn.id === 'total_grade')
 
   let onApplyScoreToUngraded
