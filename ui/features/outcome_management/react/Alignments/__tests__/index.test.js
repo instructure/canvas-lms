@@ -17,12 +17,51 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render as realRender, act} from '@testing-library/react'
 import AlignmentSummary from '../index'
+import {createCache} from '@canvas/apollo'
+import {MockedProvider} from '@apollo/react-testing'
+import {courseAlignmentStatsMocks} from '@canvas/outcomes/mocks/Management'
+import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 
 describe('AlignmentSummary', () => {
+  let cache
+
+  beforeEach(() => {
+    jest.useFakeTimers()
+    cache = createCache()
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
+  const render = (
+    children,
+    {contextType = 'Course', contextId = '1', mocks = courseAlignmentStatsMocks()} = {}
+  ) => {
+    return realRender(
+      <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
+        <MockedProvider cache={cache} mocks={mocks}>
+          {children}
+        </MockedProvider>
+      </OutcomesContext.Provider>
+    )
+  }
+
   it('renders component', () => {
     const {getByTestId} = render(<AlignmentSummary />)
     expect(getByTestId('outcome-alignment-summary')).toBeTruthy()
+  })
+
+  it('shows loader while loading alignment summary data', () => {
+    const {getByTestId} = render(<AlignmentSummary />)
+    expect(getByTestId('outcome-alignment-summary-loading')).toBeInTheDocument()
+  })
+
+  it('shows alignment summary header after alignment summary data is loaded', async () => {
+    const {getByTestId} = render(<AlignmentSummary />)
+    await act(async () => jest.runOnlyPendingTimers())
+    expect(getByTestId('outcome-alignment-summary-header')).toBeInTheDocument()
   })
 })
