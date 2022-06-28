@@ -24,4 +24,11 @@
   <% else %>
     <%= t('from_to_time', 'from %{start_date_time} to %{end_date_time}', :start_date_time => datetime_string(force_zone(asset.start_at)), :end_date_time => datetime_string(force_zone(asset.end_at))) %>
   <% end %>
-</em></p>
+</em>
+  <% if asset.series_uuid %>
+    <div>
+      <%= rrule_to_natural_language(asset.rrule) %>
+    </div>
+  <% end %>
+</p>
+

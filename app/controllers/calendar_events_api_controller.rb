@@ -292,6 +292,7 @@ require "rrule"
 class CalendarEventsApiController < ApplicationController
   include Api::V1::CalendarEvent
   include CalendarConferencesHelper
+  include ::RruleHelper
 
   before_action :require_user, except: %w[public_feed index]
   before_action :get_calendar_context, only: :create
@@ -1716,13 +1717,15 @@ class CalendarEventsApiController < ApplicationController
 
     InstStatsd::Statsd.gauge("calendar_events_api.recurring.count", dtstart_list.length)
 
-    dtstart_list.map do |dtstart|
+    events = dtstart_list.map do |dtstart|
       event_attributes = set_series_params(event_attributes, dtstart, duration)
       event = @context.calendar_events.build(event_attributes)
       event.validate_context! if @context.is_a?(AppointmentGroup)
       event.updating_user = @current_user
       event
     end
+    events[0][:series_head] = true
+    events
   end
 
   def set_series_params(event_attributes, dtstart, duration)
@@ -1750,7 +1753,7 @@ class CalendarEventsApiController < ApplicationController
     # Let's do a quick check here first and abandon the request if too large.
     # We still need to check later because the RRULE could be "until some date"
     # and not an explicit count.
-    rrule_fields = Hash[*rrule.split(/[;=]/)]
+    rrule_fields = rrule_parse(rrule)
     count = rrule_fields.fetch("COUNT", 1).to_i
 
     if count <= 0
