@@ -343,6 +343,20 @@ export const CREATE_LEARNING_OUTCOME_GROUP = gql`
   }
 `
 
+export const COURSE_ALIGNMENT_STATS = gql`
+  query GetCourseAlignmentStatsQuery($id: ID!) {
+    course(id: $id) {
+      outcomeAlignmentStats {
+        totalOutcomes
+        alignedOutcomes
+        totalAlignments
+        totalArtifacts
+        alignedArtifacts
+      }
+    }
+  }
+`
+
 export const removeOutcomeGroup = (contextType, contextId, groupId) =>
   axios.delete(
     `/api/v1/${pluralize(contextType).toLowerCase()}/${contextId}/outcome_groups/${groupId}`
