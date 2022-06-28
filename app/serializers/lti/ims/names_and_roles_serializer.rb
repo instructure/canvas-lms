@@ -53,6 +53,11 @@ module Lti::IMS
     end
 
     def variable_expander(enrollment)
+      # the variables substitution in the whitelist have the following guards:
+      # - @current_user
+      # - @context.is_a?(Course)
+      # - @tool
+
       Lti::VariableExpander.new(
         page[:context].root_account,
         Lti::IMS::Providers::MembershipsProvider.unwrap(page[:context]),
@@ -62,29 +67,42 @@ module Lti::IMS
           tool: page[:tool],
           enrollment: enrollment,
           variable_whitelist: %w[
-            Person.name.full
-            Person.name.display
-            Person.name.family
-            Person.name.given
-            User.image
-            User.id
-            Canvas.user.id
-            vnd.instructure.User.uuid
-            com.instructure.User.sectionNames
+            Caliper.url
+            Canvas.course.endAt
+            Canvas.course.gradePassbackSetting
+            Canvas.course.hideDistributionGraphs
+            Canvas.course.id
+            Canvas.course.name
+            Canvas.course.previousContextIds
+            Canvas.course.previousContextIds.recursive
+            Canvas.course.previousCourseIds
+            Canvas.course.sectionIds
+            Canvas.course.sectionRestricted
+            Canvas.course.sectionSisSourceIds
+            Canvas.course.sisSourceId
+            Canvas.course.startAt
+            Canvas.course.workflowState
+            Canvas.group.contextIds
             Canvas.user.globalId
-            Canvas.user.sisSourceId
-            Person.sourcedId
-            Message.locale
-            vnd.Canvas.Person.email.sis
-            Person.email.primary
-            Person.address.timezone
-            User.username
+            Canvas.user.id
             Canvas.user.loginId
             Canvas.user.sisIntegrationId
-            Canvas.course.sectionIds
-            Canvas.group.contextIds
+            Canvas.user.sisSourceId
             Canvas.xapi.url
-            Caliper.url
+            Message.locale
+            Person.address.timezone
+            Person.email.primary
+            Person.name.display
+            Person.name.family
+            Person.name.full
+            Person.name.given
+            Person.sourcedId
+            User.id
+            User.image
+            User.username
+            com.instructure.User.sectionNames
+            vnd.Canvas.Person.email.sis
+            vnd.instructure.User.uuid
           ]
         }
       )
