@@ -541,6 +541,24 @@ describe Types::UserType do
       expect(result[0]).to eq(@course.name)
     end
 
+    it "returns false for sendMessagesAll if no context is given" do
+      result = type.resolve("recipients { sendMessagesAll }")
+      expect(result).to eq(false)
+    end
+
+    it "returns false for sendMessagesAll if not allowed" do
+      # Students do not have the sendMessagesAll permission by default
+      result = type.resolve("recipients(context: \"course_#{@course.id}_students\") { sendMessagesAll }")
+      expect(result).to eq(false)
+    end
+
+    it "returns true for sendMessagesAll if allowed" do
+      @random_person.account.role_overrides.create!(permission: :send_messages_all, role: student_role, enabled: true)
+
+      result = type.resolve("recipients(context: \"course_#{@course.id}_students\") { sendMessagesAll }")
+      expect(result).to eq(true)
+    end
+
     it "searches users" do
       known_users = @student.address_book.search_users.paginate(per_page: 3)
       User.find(known_users.first.id).update!(name: "Matthew Lemon")
