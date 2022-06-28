@@ -238,7 +238,7 @@ export default function CanvasContentTray(props) {
   // should we close the tray after the user clicks on something in it?
   const [hidingTrayOnAction, setHidingTrayOnAction] = useState(true)
 
-  const [canUploadFiles] = useState(getCanUploadFiles(props))
+  const [canUploadFiles, setCanUploadFiles] = useState(false)
 
   const trayRef = useRef(null)
   const scrollingAreaRef = useRef(null)
@@ -255,6 +255,12 @@ export default function CanvasContentTray(props) {
     onTrayClosing && onTrayClosing(CanvasContentTray.globalOpenCount) // tell RCEWrapper we're closing if we're open
     setIsOpen(false)
   }, [bridge, onTrayClosing])
+
+  useEffect(() => {
+    // eslint-disable-next-line promise/catch-or-return
+    getCanUploadFiles(props).then(result => setCanUploadFiles(result))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     const controller = {
