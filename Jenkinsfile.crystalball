@@ -176,7 +176,7 @@ pipeline {
               .hooks(buildSummaryReportHooks.call())
               .obeysAllowStages(false)
               .timeout(20)
-              .execute(buildDockerImageStage.&patchsetImage)
+              .execute{ buildDockerImageStage.patchsetImage() }
 
             extendedStage('Run Migrations')
               .hooks(buildSummaryReportHooks.call())
