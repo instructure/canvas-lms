@@ -86,7 +86,6 @@ export const AddressBookContainer = props => {
         setIsLoadingMoreData(false)
         return {
           legacyNode: {
-            ...previousResult.legacyNode,
             recipients: {
               contextsConnection: {
                 nodes: [
@@ -188,6 +187,11 @@ export const AddressBookContainer = props => {
     if (contextData.length > 0 && !loading) {
       contextData[contextData.length - 1].isLast = true
     }
+
+    // since we have an array of objects, we use the id field to make sure it's unique.
+    // The id field is safe to use, because its the field we use as a key.
+    contextData = [...new Map(contextData.map(item => [item.id, item])).values()]
+    userData = [...new Map(userData.map(item => [item.id, item])).values()]
 
     if (filterHistory[filterHistory.length - 1]?.subMenuSelection && searchTerm === '') {
       const selection = filterHistory[filterHistory.length - 1]?.subMenuSelection
