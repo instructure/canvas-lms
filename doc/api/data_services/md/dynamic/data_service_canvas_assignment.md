@@ -478,3 +478,6 @@ Assignment
 | **unlock_at** | The unlock date (assignment is unlocked after this date), or null if not applicable. |
 | **updated_at** | The time at which this assignment was last modified in any way. |
 | **workflow_state** | Workflow state of the assignment (deleted, duplicating, failed_to_import, failed_to_duplicate, failed_to_migrate, importing, published, unpublished). |
+
+
+
