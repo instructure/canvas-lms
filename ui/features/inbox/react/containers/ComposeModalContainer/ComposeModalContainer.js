@@ -227,12 +227,13 @@ const ComposeModalContainer = props => {
       await props.createConversation({
         variables: {
           attachmentIds: attachments.map(a => a.id),
+          bulkMessage: sendIndividualMessages,
           body,
           userNote,
           contextCode: selectedContext?.contextID,
           recipients: props.selectedIds.map(rec => rec?._id || rec.id),
           subject,
-          groupConversation: !sendIndividualMessages,
+          groupConversation: true,
           mediaCommentId: mediaUploadFile?.mediaObject?.media_object?.media_id,
           mediaCommentType: mediaUploadFile?.mediaObject?.media_object?.media_type
         }

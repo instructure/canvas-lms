@@ -282,12 +282,27 @@ RSpec.describe Mutations::CreateConversation do
     end
 
     it "creates one conversation per recipient" do
-      result = run_mutation(recipients: [@new_user1.id.to_s, @new_user2.id.to_s], body: "yo", group_conversation: false, context_code: @course.asset_string)
+      user_type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
 
-      expect(
-        result.dig("data", "createConversation", "conversations").count
-      ).to eql 2
-      expect(Conversation.count).to eql(@old_count + 2)
+      run_mutation(recipients: [@new_user1.id.to_s, @new_user2.id.to_s], subject: "yo 1", group_conversation: true, bulk_message: true, context_code: @course.asset_string)
+      run_mutation(recipients: [@new_user1.id.to_s, @new_user2.id.to_s], subject: "yo 2", group_conversation: true, bulk_message: true, context_code: @course.asset_string)
+
+      expect(Conversation.count).to eql(@old_count + 4)
+      result = user_type.resolve("conversationsConnection(scope: \"sent\") { nodes { conversation { subject } } }")
+      expect(result).to match(["yo 2", "yo 2", "yo 1", "yo 1"])
+    end
+
+    context "private conversation" do
+      it "returns one private conversation per user-recipient pair" do
+        user_type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
+
+        run_mutation(recipients: [@new_user1.id.to_s, @new_user2.id.to_s], subject: "yo 1", group_conversation: false, bulk_message: true, context_code: @course.asset_string)
+        run_mutation(recipients: [@new_user1.id.to_s, @new_user2.id.to_s], subject: "yo 2", group_conversation: false, bulk_message: true, context_code: @course.asset_string)
+
+        expect(Conversation.count).to eql(@old_count + 2)
+        result = user_type.resolve("conversationsConnection(scope: \"sent\") { nodes { conversation { subject } } }")
+        expect(result).to match(["yo 1", "yo 1"])
+      end
     end
 
     it "sets the root account id to the participants for group conversations" do
