@@ -438,6 +438,7 @@ Assignment
     "context_id": "21070000001279362",
     "context_type": "Course",
     "context_uuid": "a1b2c3c4z9x8a1s2q5w6p9o8i7u6y5t6a2s3d4f5",
+    "created_on_blueprint_sync": false,
     "description": "<h3>Assignment Description<h3/> This is your tasks, students:...",
     "due_at": "2019-11-05T13:38:00.218Z",
     "lock_at": "2019-11-05T13:38:00.218Z",
@@ -466,6 +467,7 @@ Assignment
 | **context_id** | The Canvas id for the context the assignment is used in. |
 | **context_type** | The type of context the assignment is used in (usually Course). |
 | **context_uuid** | The uuid of the context associated with the assignment. |
+| **created_on_blueprint_sync** | Whether or not the assignment was created in the context of a blueprint sync. |
 | **description** | The description of the assignment. NOTE: This field will be truncated to only include the first 8192 characters. |
 | **due_at** | The due date for the assignment. |
 | **lock_at** | The lock date (assignment is locked after this date). |
