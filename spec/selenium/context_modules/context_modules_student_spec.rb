@@ -309,11 +309,13 @@ describe "context modules" do
       end
 
       it "shows previous and next buttons for external tools", priority: "2" do
+        skip "LS-3185 (6/29/2022)"
         get "/courses/#{@course.id}/modules/items/#{@external_tool_tag.id}"
         verify_next_and_previous_buttons_display
       end
 
       it "shows previous and next buttons for external urls" do
+        skip "LS-3185 (6/29/2022)"
         get "/courses/#{@course.id}/modules/items/#{@external_url_tag.id}"
         verify_next_and_previous_buttons_display
       end
