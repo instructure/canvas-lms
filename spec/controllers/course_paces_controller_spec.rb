@@ -370,6 +370,29 @@ describe CoursePacesController, type: :controller do
         expect(JSON.parse(response.body)["course_pace"]["user_id"]).to eq(@student.id)
       end
 
+      it "returns an instantiated section pace if one is already published and the user is in that section" do
+        @course_section.enrollments << @student_enrollment
+        course_section_pace = course_pace_model(course: @course, course_section: @course_section)
+        course_section_pace.publish
+        get :new, { params: { course_id: @course.id, enrollment_id: @course.student_enrollments.first.id } }
+        expect(response).to be_successful
+        json_response = JSON.parse(response.body)
+        expect(json_response["course_pace"]["id"]).to eq(nil)
+        expect(json_response["course_pace"]["published_at"]).to eq(nil)
+        expect(json_response["course_pace"]["section_id"]).to eq(nil)
+        expect(json_response["course_pace"]["user_id"]).to eq(@student.id)
+        m1 = json_response["course_pace"]["modules"].first
+        expect(m1["items"].count).to eq(1)
+        expect(m1["items"].first["duration"]).to eq(0)
+        expect(m1["items"].first["published"]).to eq(true)
+        m2 = json_response["course_pace"]["modules"].second
+        expect(m2["items"].count).to eq(2)
+        expect(m2["items"].first["duration"]).to eq(0)
+        expect(m2["items"].first["published"]).to eq(true)
+        expect(m2["items"].second["duration"]).to eq(0)
+        expect(m2["items"].second["published"]).to eq(true)
+      end
+
       it "returns an instantiated course pace if one is not already available" do
         expect(@course.course_paces.unpublished.for_user(@student).count).to eq(0)
         get :new, { params: { course_id: @course.id, enrollment_id: @student_enrollment.id } }
