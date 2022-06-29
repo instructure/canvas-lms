@@ -165,7 +165,10 @@ function bindToMiniCalendar() {
       const dateString = $(this).find('.day_date').attr('data-date')
 
       if (dateString) {
-        if (dateString > todayString) return false
+        if (dateString > todayString) {
+          if (!$lastBefore) $lastBefore = dateString
+          return false
+        }
         $lastBefore = dateString
       }
     })
@@ -173,10 +176,10 @@ function bindToMiniCalendar() {
     changeMonth($mini_month, $.datepicker.formatDate('mm/dd/yy', new Date()))
     highlightDaysWithEvents()
 
-    if (!$lastBefore) $lastBefore = $('tr.date:first')
-
     selectDate(todayString)
-    selectRow($(htmlEscape(`tr.date.events_${$lastBefore}`)))
+
+    const rowToSelect = $lastBefore ? `tr.date.events_${$lastBefore}` : 'tr.syllabus_assignment'
+    selectRow($(htmlEscape(rowToSelect)))
   })
 }
 
