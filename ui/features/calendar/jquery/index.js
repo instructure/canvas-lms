@@ -180,7 +180,9 @@ export default class Calendar {
   subscribeToEvents() {
     $.subscribe({
       'CommonEvent/eventDeleting': this.eventDeleting,
+      'CommonEvent/eventsDeletingFromSeries': this.eventsDeletingFromSeries,
       'CommonEvent/eventDeleted': this.eventDeleted,
+      'CommonEvent/eventsDeletedFromSeries': this.eventsDeletedFromSeries,
       'CommonEvent/eventSaving': this.eventSaving,
       'CommonEvent/eventSaved': this.eventSaved,
       'CommonEvent/eventSaveFailed': this.eventSaveFailed,
@@ -775,11 +777,56 @@ export default class Calendar {
     return this.updateEvent(event)
   }
 
+  // given the event selected by the user, and which
+  // events in the series are being deleted (one, following, all)
+  // find them all and handle it
+  eventsDeletingFromSeries = ({selectedEvent, which}) => {
+    const seriesId = selectedEvent.calendarEvent.series_uuid
+    const eventSeries = this.calendar
+      .fullCalendar('getEventCache')
+      .filter(c => c.eventType === 'calendar_event' && c.calendarEvent.series_uuid === seriesId)
+
+    let candidateEvents
+    switch (which) {
+      case 'one':
+        candidateEvents = [selectedEvent]
+        break
+      case 'following':
+        candidateEvents = eventSeries
+          .sort((a, b) => a.calendarEvent.start_at.localeCompare(b.calendarEvent.start_at, 'en'))
+          .filter(e => e.calendarEvent.start_at >= selectedEvent.calendarEvent.start_at)
+        break
+      case 'all':
+        candidateEvents = eventSeries
+        break
+    }
+    candidateEvents.forEach(e => {
+      $.publish('CommonEvent/eventDeleting', e)
+    })
+  }
+
   eventDeleted = event => {
     if (event.isAppointmentGroupEvent() && event.calendarEvent.parent_event_id) {
       this.handleUnreserve(event)
     }
     return this.calendar.fullCalendar('removeEvents', event.id)
+  }
+
+  // given the response from the delete api,
+  // which is an array of calendar event objects,
+  // remove the corresponding events from the calendar
+  eventsDeletedFromSeries = ({deletedEvents}) => {
+    const eventIds = deletedEvents.map(e => e.id)
+    const eventsInContext = this.dataSource.cache.contexts[deletedEvents[0].context_code].events
+    const deletedEventsFromSeries = []
+    Object.keys(eventsInContext).forEach(key => {
+      const e = eventsInContext[key]
+      if (eventIds.includes(e.object.id)) {
+        deletedEventsFromSeries.push(e)
+      }
+    })
+
+    deletedEventsFromSeries.forEach(e => $.publish('CommonEvent/eventDeleted', e))
   }
 
   // when an appointment event was deleted, clear the reserved flag and increment the available slot count on the parent
