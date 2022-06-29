@@ -219,7 +219,7 @@ export function showFlashAlert({message, err, type = err ? 'error' : 'info', srO
         }
         error={err}
         variant={type}
-        onClose={closeAlert.bind(null, parent)} // eslint-disable-line react/jsx-no-bind
+        onClose={closeAlert.bind(null, parent)}
         screenReaderOnly={srOnly}
       />,
       parent

@@ -989,6 +989,7 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def find_which_series_events(target_event:, which:, for_update:)
+    which ||= "one"
     #  from the model: locked events may only be deleted, they cannot be edited directly
     workflow_state_not = for_update ? ["deleted", "locked"] : ["deleted"]
     events = nil
