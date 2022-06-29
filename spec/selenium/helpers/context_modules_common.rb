@@ -386,6 +386,19 @@ module ContextModulesCommon
     move_to_click("label[for=unlock_module_at]")
   end
 
+  # Ugly page retrieval for when footer doesn't show up in flakey_spec_catcher mode
+  def get_page_with_footer(url)
+    max_attempts = 20
+    num_attempts = 1
+    get url
+    wait_for_ajaximations
+    until element_exists?(".module-sequence-footer-button--previous") || num_attempts == max_attempts
+      get url
+      wait_for_ajaximations
+      num_attempts += 1
+    end
+  end
+
   # so terrible
   def get(url)
     @already_waited_for_modules_ui = false

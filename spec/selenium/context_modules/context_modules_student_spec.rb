@@ -308,22 +308,19 @@ describe "context modules" do
         verify_next_and_previous_buttons_display
       end
 
-      it "shows previous and next buttons for external tools", priority: "2" do
-        skip "LS-3185 (6/29/2022)"
-        get "/courses/#{@course.id}/modules/items/#{@external_tool_tag.id}"
+      it "shows previous and next buttons for external tools", custom_timeout: 25, priority: "2" do
+        get_page_with_footer("/courses/#{@course.id}/modules/items/#{@external_tool_tag.id}")
         verify_next_and_previous_buttons_display
       end
 
-      it "shows previous and next buttons for external urls" do
-        skip "LS-3185 (6/29/2022)"
-        get "/courses/#{@course.id}/modules/items/#{@external_url_tag.id}"
+      it "shows previous and next buttons for external urls", custom_timeout: 25 do
+        get_page_with_footer("/courses/#{@course.id}/modules/items/#{@external_url_tag.id}")
         verify_next_and_previous_buttons_display
       end
     end
 
     describe "sequence footer" do
-      it "shows the right nav when an item is in modules multiple times" do
-        skip "LS-3185 (5/19/2022)"
+      it "shows the right nav when an item is in modules multiple times", custom_timeout: 30 do
         @assignment = @course.assignments.create!(title: "some assignment")
         @atag1 = @module_1.add_item(id: @assignment.id, type: "assignment")
         @after1 = @module_1.add_item(type: "external_url", title: "url1", url: "http://example.com/1")
@@ -331,13 +328,16 @@ describe "context modules" do
         @atag2 = @module_2.add_item(id: @assignment.id, type: "assignment")
         @after2 = @module_2.add_item(type: "external_url", title: "url2", url: "http://example.com/2")
         @after2.publish!
-        get "/courses/#{@course.id}/modules/items/#{@atag1.id}"
+
+        get_page_with_footer("/courses/#{@course.id}/modules/items/#{@atag1.id}")
+
         prev = f(".module-sequence-footer-button--previous a")
         expect(prev).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@tag_1.id}")
         nxt = f(".module-sequence-footer-button--next a")
         expect(nxt).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@after1.id}")
 
-        get "/courses/#{@course.id}/modules/items/#{@atag2.id}"
+        get_page_with_footer("/courses/#{@course.id}/modules/items/#{@atag2.id}")
+
         prev = f(".module-sequence-footer-button--previous a")
         expect(prev).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@tag_2.id}")
         nxt = f(".module-sequence-footer-button--next a")
@@ -350,13 +350,14 @@ describe "context modules" do
         expect(f("#content")).not_to contain_css(".module-sequence-footer-button--next")
       end
 
-      it "shows the nav when going straight to the item if there's only one tag" do
-        skip("LS-3185 - footer not always showing up")
+      it "shows the nav when going straight to the item if there's only one tag", custom_timeout: 25 do
         @assignment = @course.assignments.create!(title: "some assignment")
         @atag1 = @module_1.add_item(id: @assignment.id, type: "assignment")
         @after1 = @module_1.add_item(type: "external_url", title: "url1", url: "http://example.com/1")
         @after1.publish!
-        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+
+        get_page_with_footer("/courses/#{@course.id}/assignments/#{@assignment.id}")
+
         prev = f(".module-sequence-footer-button--previous a")
         expect(prev).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@tag_1.id}")
         nxt = f(".module-sequence-footer-button--next a")
