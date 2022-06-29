@@ -112,3 +112,78 @@ test('shows student view button again after done editing', () => {
   $('#edit_course_syllabus_form').trigger('hide_edit')
   equal($('#easy_student_view').is(':hidden'), false)
 })
+
+test('jumps to the events when events have no dates and user clicks "Jump to Today"', () => {
+  // Create an event without a due date
+  fixtures.create(
+    '<tr id="testTr" class="date detail_list  syllabus_assignment  related-assignment_4" data-workflow-state="published"></tr>'
+  )
+  fixtures.create('<a id="testLink" href="#" class="jump_to_today_link">Jump to Today</a>')
+  SyllabusBehaviors.bindToMiniCalendar()
+  ok(!$('#testTr').hasClass('selected'))
+  $('#testLink').trigger('click')
+  ok($('#testTr').hasClass('selected'))
+})
+
+test('jumps to the first event when all events are future and user clicks "Jump to Today"', () => {
+  fixtures.create(
+    '<tr id="test4" class="date detail_list events_4000_07_28 syllabus_assignment related-assignment_4" data-workflow-state="published"><td scope="row" rowspan="1" valign="top" class="day_date" data-date="4000_07_28">Thu Jul 28, 4000</td></tr>'
+  )
+  fixtures.create(
+    '<tr id="test9" class="date detail_list events_4000_09_09 syllabus_assignment related-assignment_9" data-workflow-state="published"><td scope="row" rowspan="1" valign="top" class="day_date" data-date="4000_09_09">Fri Sep 9, 4000</td></tr>'
+  )
+  fixtures.create('<a id="testLink" href="#" class="jump_to_today_link">Jump to Today</a>')
+  SyllabusBehaviors.bindToMiniCalendar()
+  ok(!$('#test4').hasClass('selected'))
+  ok(!$('#test9').hasClass('selected'))
+  $('#testLink').trigger('click')
+  ok($('#test4').hasClass('selected'))
+  ok(!$('#test9').hasClass('selected'))
+})
+
+test('jumps to most recent past event when there are past, future, and dateless events and user clicks "Jump to Today"', () => {
+  fixtures.create(
+    '<tr id="test0" class="date detail_list  syllabus_assignment  related-assignment_4" data-workflow-state="published"></tr>'
+  )
+  fixtures.create(
+    '<tr id="test1" class="date detail_list events_2000_07_28 syllabus_assignment related-assignment_4" data-workflow-state="published"><td scope="row" rowspan="1" valign="top" class="day_date" data-date="2000_07_28">Thu Jul 28, 2000</td></tr>'
+  )
+  fixtures.create(
+    '<tr id="test2" class="date detail_list events_2000_09_09 syllabus_assignment related-assignment_9" data-workflow-state="published"><td scope="row" rowspan="1" valign="top" class="day_date" data-date="2000_09_09">Fri Sep 9, 2000</td></tr>'
+  )
+  fixtures.create(
+    '<tr id="test3" class="date detail_list events_4000_07_28 syllabus_assignment related-assignment_4" data-workflow-state="published"><td scope="row" rowspan="1" valign="top" class="day_date" data-date="4000_07_28">Thu Jul 28, 4000</td></tr>'
+  )
+  fixtures.create(
+    '<tr id="test4" class="date detail_list events_4000_09_09 syllabus_assignment related-assignment_9" data-workflow-state="published"><td scope="row" rowspan="1" valign="top" class="day_date" data-date="4000_09_09">Fri Sep 9, 4000</td></tr>'
+  )
+  fixtures.create('<a id="testLink" href="#" class="jump_to_today_link">Jump to Today</a>')
+  SyllabusBehaviors.bindToMiniCalendar()
+  ok(!$('#test0').hasClass('selected'))
+  ok(!$('#test1').hasClass('selected'))
+  ok(!$('#test2').hasClass('selected'))
+  ok(!$('#test3').hasClass('selected'))
+  ok(!$('#test4').hasClass('selected'))
+  $('#testLink').trigger('click')
+  ok(!$('#test0').hasClass('selected'))
+  ok(!$('#test1').hasClass('selected'))
+  ok($('#test2').hasClass('selected'))
+  ok(!$('#test3').hasClass('selected'))
+  ok(!$('#test4').hasClass('selected'))
+})
+
+test('jumps to most recent past event when there are only past events and user clicks "Jump to Today"', () => {
+  fixtures.create(
+    '<tr id="test1" class="date detail_list events_2000_07_28 syllabus_assignment related-assignment_4" data-workflow-state="published"><td scope="row" rowspan="1" valign="top" class="day_date" data-date="2000_07_28">Thu Jul 28, 2000</td></tr>'
+  )
+  fixtures.create(
+    '<tr id="test2" class="date detail_list events_2000_09_09 syllabus_assignment related-assignment_9" data-workflow-state="published"><td scope="row" rowspan="1" valign="top" class="day_date" data-date="2000_09_09">Fri Sep 9, 2000</td></tr>'
+  )
+  fixtures.create('<a id="testLink" href="#" class="jump_to_today_link">Jump to Today</a>')
+  SyllabusBehaviors.bindToMiniCalendar()
+  ok(!$('#test1').hasClass('selected'))
+  ok(!$('#test2').hasClass('selected'))
+  $('#testLink').trigger('click')
+  ok(!$('#test1').hasClass('selected'))
+  ok($('#test2').hasClass('selected'))
+})
