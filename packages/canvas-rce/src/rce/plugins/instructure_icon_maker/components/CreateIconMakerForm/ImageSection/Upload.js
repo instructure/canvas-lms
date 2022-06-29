@@ -29,7 +29,7 @@ export const onSubmit = dispatch => (_editor, _accept, _selectedPanel, uploadDat
   dispatch({...actions.SET_IMAGE, payload: theFile.preview})
   dispatch({...actions.SET_IMAGE_NAME, payload: theFile.name})
   dispatch({...actions.SET_IMAGE_COLLECTION_OPEN, payload: false})
-  dispatch(actions.CLEAR_MODE)
+  dispatch({...actions.SET_CROPPER_OPEN, payload: true})
 }
 
 const Upload = ({editor, dispatch}) => {
