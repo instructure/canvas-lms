@@ -62,7 +62,7 @@
     "jshint-stylish-ex": "0.2.0",
     "canvas_react_i18n": "1.1.1",
     "glob": "7.0.5",
-    "grunt": "0.4.5",
+    "grunt": "1.5.3",
     "grunt-cli": "1.2.0",
     "lodash": "4.17.21",
     "requirejs": "~2.2.0",
