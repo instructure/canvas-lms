@@ -142,22 +142,40 @@ describe('Course()', () => {
       fetchMock.restore()
     })
 
-    it('dispatches a "loading" action', () => {
-      expect(props.dispatch.mock.calls[2][0]).toEqual({
-        type: 'StartLoading'
-      })
-    })
-
     it('dispatches a "stop loading" action', () => {
       expect(props.dispatch.mock.calls[0][0]).toEqual({
         type: 'StopLoading'
       })
     })
 
-    it('dispatches a "set image" action', () => {
+    it('dispatches a "set image name" action', () => {
       expect(props.dispatch.mock.calls[1][0]).toEqual({
         type: 'SetImageName',
         payload: 'grid.png'
+      })
+    })
+
+    it('dispatches a "loading" action', () => {
+      expect(props.dispatch.mock.calls[2][0]).toEqual({
+        type: 'StartLoading'
+      })
+    })
+
+    it('dispatches a "set image" action', async () => {
+      await waitFor(() => {
+        expect(props.dispatch).toHaveBeenCalledWith({
+          type: 'SetImage',
+          payload: 'data:text/png;base64,SGVsbG8sIFdvcmxkIQ=='
+        })
+      })
+    })
+
+    it('dispatches a "open cropper" action', async () => {
+      await waitFor(() => {
+        expect(props.dispatch).toHaveBeenCalledWith({
+          type: 'SetCropperOpen',
+          payload: true
+        })
       })
     })
 

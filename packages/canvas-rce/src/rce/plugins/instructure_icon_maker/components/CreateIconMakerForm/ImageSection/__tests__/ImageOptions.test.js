@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {fireEvent, render, screen, waitFor, act} from '@testing-library/react'
+import {fireEvent, render, waitFor, act} from '@testing-library/react'
 import {ImageOptions} from '../ImageOptions'
 import {actions} from '../../../../reducers/imageSection'
 
@@ -37,6 +37,7 @@ describe('ImageOptions', () => {
       imageName: null,
       mode: null,
       collectionOpen: false,
+      cropperOpen: false,
       loading: false
     },
     dispatch: dispatchFn
@@ -69,12 +70,59 @@ describe('ImageOptions', () => {
     })
   })
 
+  describe('cropper modal', () => {
+    beforeEach(() => {
+      subject({
+        state: {
+          image: 'data:image/png;base64,asdfasdfjksdf==',
+          imageName: 'banana.jpg',
+          mode: 'Course',
+          collectionOpen: false,
+          cropperOpen: true,
+          loading: false
+        }
+      })
+    })
+
+    it('renders', async () => {
+      await waitFor(() => {
+        expect(document.querySelector('[data-cid="Modal"] [type="submit"]')).toBeInTheDocument()
+      })
+    })
+
+    it('sets state image when submitting', async () => {
+      await waitFor(() => {
+        fireEvent.click(document.querySelector('[data-cid="Modal"] [type="submit"]'))
+        expect(dispatchFn.mock.calls[0][0]).toEqual({
+          type: 'SetImage',
+          payload: 'data:image/svg+xml;base64,bnVsbA=='
+        })
+      })
+    })
+
+    it('sets state cropper settings when submitting', async () => {
+      await waitFor(() => {
+        fireEvent.click(document.querySelector('[data-cid="Modal"] [type="submit"]'))
+        expect(dispatchFn.mock.calls[1][0]).toEqual({
+          type: 'SetCropperSettings',
+          payload: {
+            image: 'data:image/png;base64,asdfasdfjksdf==',
+            rotation: 0,
+            scaleRatio: 1,
+            shape: 'square'
+          }
+        })
+      })
+    })
+  })
+
   describe('focus management', () => {
     const state = {
       image: null,
       imageName: 'banana.jpg',
       mode: 'Course',
       collectionOpen: false,
+      cropperOpen: false,
       loading: false
     }
 
@@ -106,22 +154,24 @@ describe('ImageOptions', () => {
   })
 
   describe('when image is set', () => {
-    let getByText, getByTestId, queryByTestId, rerender
+    let getByText, getByTestId, queryByText, rerender
+    const initialState = {
+      image: 'data:image/png;base64,asdfasdfjksdf==',
+      imageName: 'banana.jpg',
+      mode: 'Course',
+      collectionOpen: false,
+      cropperOpen: false,
+      loading: false
+    }
 
     beforeEach(() => {
       const component = subject({
-        state: {
-          image: 'data:image/png;base64,asdfasdfjksdf==',
-          imageName: 'banana.jpg',
-          mode: 'Course',
-          collectionOpen: false,
-          loading: false
-        }
+        state: initialState
       })
       getByText = component.getByText
       getByTestId = component.getByTestId
-      queryByTestId = component.queryByTestId
       rerender = component.rerender
+      queryByText = component.queryByText
     })
 
     it('sets the image name', () => {
@@ -135,66 +185,36 @@ describe('ImageOptions', () => {
     })
 
     describe('crop button', () => {
-      it('is rendered', () => {
-        expect(getByText(/crop image/i)).toBeInTheDocument()
+      it('is rendered for course images', () => {
+        rerender(<ImageOptions {...{...defaultProps, state: {...initialState, mode: 'Course'}}} />)
+        expect(queryByText(/crop image/i)).toBeInTheDocument()
       })
 
-      it('is not rendered', () => {
+      it('is rendered for upload images', () => {
+        rerender(<ImageOptions {...{...defaultProps, state: {...initialState, mode: 'Upload'}}} />)
+        expect(queryByText(/crop image/i)).toBeInTheDocument()
+      })
+
+      it('is not rendered for single color images', () => {
         rerender(
-          <ImageOptions
-            dispatch={dispatchFn}
-            state={{
-              image: 'data:image/png;base64,asdfasdfjksdf==',
-              imageName: 'banana.jpg',
-              mode: 'Upload',
-              collectionOpen: false,
-              loading: false
-            }}
-          />
+          <ImageOptions {...{...defaultProps, state: {...initialState, mode: 'SingleColor'}}} />
         )
-        expect(queryByTestId('crop-image-button')).not.toBeInTheDocument()
+        expect(queryByText(/crop image/i)).not.toBeInTheDocument()
       })
 
-      it('opens crop modal', () => {
-        fireEvent.click(getByText(/crop image/i))
-
-        expect(screen.getByText('Crop Image')).toBeInTheDocument()
+      it('is not rendered for multi color images', () => {
+        rerender(
+          <ImageOptions {...{...defaultProps, state: {...initialState, mode: 'MultiColor'}}} />
+        )
+        expect(queryByText(/crop image/i)).not.toBeInTheDocument()
       })
 
-      it('opens crop modal and sets state image', async () => {
+      it('calls dispatch callback', () => {
         fireEvent.click(getByText(/crop image/i))
 
-        await waitFor(() => {
-          expect(document.querySelector('[data-cid="Modal"] [type="submit"]')).toBeInTheDocument()
-        })
-
-        fireEvent.click(document.querySelector('[data-cid="Modal"] [type="submit"]'))
-        await waitFor(() => {
-          expect(dispatchFn.mock.calls[0][0]).toEqual({
-            type: 'SetImage',
-            payload: 'data:image/svg+xml;base64,bnVsbA=='
-          })
-        })
-      })
-
-      it('opens crop modal and sets state cropper settings', async () => {
-        fireEvent.click(getByText(/crop image/i))
-
-        await waitFor(() => {
-          expect(document.querySelector('[data-cid="Modal"] [type="submit"]')).toBeInTheDocument()
-        })
-
-        fireEvent.click(document.querySelector('[data-cid="Modal"] [type="submit"]'))
-        await waitFor(() => {
-          expect(dispatchFn.mock.calls[1][0]).toEqual({
-            type: 'SetCropperSettings',
-            payload: {
-              image: 'data:image/png;base64,asdfasdfjksdf==',
-              rotation: 0,
-              scaleRatio: 1,
-              shape: 'square'
-            }
-          })
+        expect(dispatchFn.mock.calls[0][0]).toEqual({
+          type: 'SetCropperOpen',
+          payload: true
         })
       })
     })

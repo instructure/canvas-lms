@@ -206,7 +206,7 @@ describe('ImageSection', () => {
   })
 
   describe('calls onChange passing metadata when state prop changes', () => {
-    let getByTestId, getByText, getByTitle, container
+    let getByTestId, getByText, getByTitle, getByRole, container
 
     const flushPromises = () => new Promise(setImmediate)
     const lastPayloadOfActionType = (mockFn, type) =>
@@ -220,6 +220,7 @@ describe('ImageSection', () => {
       getByTestId = rendered.getByTestId
       getByText = rendered.getByText
       getByTitle = rendered.getByTitle
+      getByRole = rendered.getByRole
       container = rendered.container
     })
 
@@ -277,7 +278,7 @@ describe('ImageSection', () => {
         fireEvent.click(getByText('Course Images'))
         fireEvent.click(getByTitle('Click to embed image_one.png'))
         await flushPromises()
-        fireEvent.click(getByText(/crop image/i))
+        fireEvent.click(getByRole('button', {name: /crop image/i}))
         await flushPromises()
         // Zooms in just to change cropper settings
         fireEvent.click(

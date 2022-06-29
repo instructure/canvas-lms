@@ -27,6 +27,7 @@ export const initialState = {
   collectionOpen: false,
   loading: false,
   error: undefined,
+  cropperOpen: false,
   cropperSettings: null
 }
 
@@ -42,6 +43,7 @@ export const actions = {
   STOP_LOADING: {type: 'StopLoading'},
   CLEAR_MODE: {type: 'ClearMode'},
   UPDATE_SETTINGS: {type: 'UpdateSettings'},
+  SET_CROPPER_OPEN: {type: 'SetCropperOpen'},
   SET_CROPPER_SETTINGS: {type: 'SetCropperSettings'}
 }
 
@@ -84,6 +86,8 @@ const imageSection = (state, action) => {
       return {...state, mode: modes.courseImages.type}
     case actions.UPDATE_SETTINGS.type:
       return {...state, ...action.payload}
+    case actions.SET_CROPPER_OPEN.type:
+      return {...state, cropperOpen: action.payload}
     case actions.SET_CROPPER_SETTINGS.type:
       return {...state, cropperSettings: action.payload}
     default:
