@@ -1400,9 +1400,9 @@ module Lti
                        -> { @assignment.due_at.utc.iso8601 },
                        -> { @assignment && @assignment.due_at.present? }
 
-    # Returns a comma-separated list of all due dates of
-    # the assignment that was launched. If the assignment is
-    # assigned to anyone without a due date, an empty string
+    # In Canvas, users, sections and groups can have distinct due dates for the same assignment.
+    # This returns all possible `due_at` dates of the assignment that was launched.
+    # If the assignment is assigned to anyone without a due date, an empty string
     # will be present in the list (hence the ",," in the example)
     #
     # Only available when launched as an assignment.
