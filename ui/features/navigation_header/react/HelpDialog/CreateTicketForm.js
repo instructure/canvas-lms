@@ -91,6 +91,7 @@ class CreateTicketForm extends React.Component {
               ref={c => (this.subject = c)}
               type="text"
               required
+              maxLength="200"
               aria-required="true"
               className="ic-Input"
               name="error[subject]"
