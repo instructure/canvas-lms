@@ -70,7 +70,7 @@ class Mutations::CreateConversation < Mutations::BaseMutation
 
     group_conversation = input[:group_conversation]
     batch_private_messages = !group_conversation && recipients.size > 1
-    batch_group_messages = (group_conversation && input[:bulk_message] && input[:force_new])
+    batch_group_messages = (group_conversation && input[:bulk_message]) || input[:force_new]
     message = Conversation.build_message(*build_message_args(
       body: input[:body],
       attachment_ids: input[:attachment_ids],
