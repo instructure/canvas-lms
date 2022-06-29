@@ -43,7 +43,7 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          extendedStage('Runner').nodeRequirements(label: 'canvas-docker', podTemplate: contractTestsStage.nodeRequirementsTemplate()).obeysAllowStages(false).execute {
+          extendedStage('Runner').nodeRequirements(label: configuration.nodeLabel(), podTemplate: contractTestsStage.nodeRequirementsTemplate()).obeysAllowStages(false).execute {
             def stages = [:]
 
             def consumerEnvVars = [
