@@ -37,7 +37,7 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          protectedNode('canvas-docker') {
+          protectedNode(configuration.nodeLabel()) {
             stage('Setup') {
               // always pull from gerrit refspec to test the changed docker dev code
               checkoutRepo('canvas-lms', env.GERRIT_REFSPEC, 1)

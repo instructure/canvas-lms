@@ -145,7 +145,7 @@ pipeline {
     stage('Environment') {
       steps {
         script {
-          def rspecNodeRequirements = [label: 'canvas-docker']
+          def rspecNodeRequirements = [label: configuration.nodeLabel()]
           env.CRYSTALBALL_SPEC = '.'
 
           def postRunnerHandler = [
