@@ -26,6 +26,10 @@ describe DeveloperKeysController do
     DeveloperKey.create!(name: "Root Account Key", account: test_domain_root_account, visible: true)
   end
 
+  let(:error_metric_name) do
+    "canvas.developer_keys_controller.request_error"
+  end
+
   context "Site admin" do
     before do
       account_admin_user(account: Account.site_admin)
@@ -176,25 +180,77 @@ describe DeveloperKeysController do
             end
           end
         end
+
+        context "when request fails" do
+          before do
+            allow(InstStatsd::Statsd).to receive(:increment)
+          end
+
+          it "reports error metric" do
+            get :index, params: { account_id: Account.last.id + 2, format: "json" }
+            expect(InstStatsd::Statsd).to have_received(:increment).with(error_metric_name, tags: { action: "index", code: 404 })
+            expect(response).to be_not_found
+          end
+        end
       end
     end
 
     describe "POST 'create'" do
-      it "returns the list of developer keys" do
-        user_session(@admin)
-        create_params = {
+      let(:create_params) do
+        {
           account_id: Account.site_admin.id,
           developer_key: {
             redirect_uri: "http://example.com/sdf"
           }
         }
+      end
 
+      before do
+        user_session(@admin)
+      end
+
+      it "returns the newly created key" do
         post "create", params: create_params
 
         json_data = JSON.parse(response.body)
         expect(response).to be_successful
         key = DeveloperKey.find(json_data["id"])
         expect(key.account).to be nil
+      end
+
+      context "when request errors" do
+        before do
+          allow(InstStatsd::Statsd).to receive(:increment)
+        end
+
+        context "when request fails" do
+          before do
+            # kind of weird trying to find _something_ that could fail during a key creation or serialization
+            allow(DeveloperKey).to receive(:test_cluster_checks_enabled?).and_raise(ActiveRecord::StatementInvalid)
+          end
+
+          it "reports error metric with code 500" do
+            post :create, params: create_params
+            expect(InstStatsd::Statsd).to have_received(:increment).with(error_metric_name, tags: { action: "create", code: 500 })
+          end
+        end
+
+        context "when key validation fails" do
+          let(:create_params) do
+            {
+              account_id: Account.site_admin.id,
+              developer_key: {
+                redirect_uri: "http://example.com/sdf",
+                scopes: ["bad_scope"]
+              }
+            }
+          end
+
+          it "reports error metric with code 400" do
+            post :create, params: create_params
+            expect(InstStatsd::Statsd).to have_received(:increment).with(error_metric_name, tags: { action: "create", code: 400 })
+          end
+        end
       end
 
       describe "scopes" do
@@ -204,10 +260,6 @@ describe DeveloperKeysController do
         end
         let(:invalid_scopes) { ["url:POST/banana", "url:POST/invalid/scope"] }
         let(:root_account) { account_model }
-
-        before do
-          user_session(@admin)
-        end
 
         it 'allows setting "allow_includes"' do
           post "create", params: { account_id: root_account.id, developer_key: { scopes: valid_scopes, allow_includes: true } }
@@ -233,23 +285,56 @@ describe DeveloperKeysController do
     end
 
     describe "PUT 'update'" do
-      it "deactivates a key" do
-        user_session(@admin)
+      let(:dk) { DeveloperKey.create! }
 
-        dk = DeveloperKey.create!
+      before do
+        user_session(@admin)
+      end
+
+      it "deactivates a key" do
         put "update", params: { id: dk.id, developer_key: { event: :deactivate }, account_id: Account.site_admin.id }
         expect(response).to be_successful
         expect(dk.reload.state).to eq :inactive
       end
 
       it "reactivates a key" do
-        user_session(@admin)
-
-        dk = DeveloperKey.create!
         dk.deactivate!
         put "update", params: { id: dk.id, developer_key: { event: :activate }, account_id: Account.site_admin.id }
         expect(response).to be_successful
         expect(dk.reload.state).to eq :active
+      end
+
+      context "when request errors" do
+        before do
+          allow(InstStatsd::Statsd).to receive(:increment)
+        end
+
+        context "when key is not found" do
+          it "reports error metric with code 404" do
+            put :update, params: { id: dk.id + 1, developer_key: { name: "update key" }, account_id: Account.site_admin.id }
+            expect(response).to be_not_found
+            expect(InstStatsd::Statsd).to have_received(:increment).with(error_metric_name, tags: { action: "update", code: 404 })
+          end
+        end
+
+        context "when request fails" do
+          before do
+            # kind of weird trying to find _something_ that could fail during a key update or serialization
+            allow(DeveloperKey).to receive(:test_cluster_checks_enabled?).and_raise(ActiveRecord::StatementInvalid)
+          end
+
+          it "reports error metric with code 500" do
+            put :update, params: { id: dk.id, developer_key: { name: "update key" }, account_id: Account.site_admin.id }
+            expect(InstStatsd::Statsd).to have_received(:increment).with(error_metric_name, tags: { action: "update", code: 500 })
+          end
+        end
+
+        context "when key validation fails" do
+          it "reports error metric with code 400" do
+            put :update, params: { id: dk.id, developer_key: { scopes: ["bad_scope"] }, account_id: Account.site_admin.id }
+            expect(InstStatsd::Statsd).to have_received(:increment).with(error_metric_name, tags: { action: "update", code: 400 })
+          end
+        end
       end
 
       describe "scopes" do
@@ -299,13 +384,42 @@ describe DeveloperKeysController do
     end
 
     describe "DELETE 'destroy'" do
-      it "softs delete a key" do
-        user_session(@admin)
+      let(:dk) { DeveloperKey.create! }
 
-        dk = DeveloperKey.create!
-        delete "destroy", params: { id: dk.id, account_id: Account.site_admin.id }
+      before do
+        user_session(@admin)
+      end
+
+      it "softs delete a key" do
+        delete :destroy, params: { id: dk.id, account_id: Account.site_admin.id }
         expect(response).to be_successful
         expect(dk.reload.state).to eq :deleted
+      end
+
+      context "when request errors" do
+        before do
+          allow(InstStatsd::Statsd).to receive(:increment)
+        end
+
+        context "when key is not found" do
+          it "reports error metric with code 404" do
+            delete :destroy, params: { id: dk.id + 1, account_id: Account.site_admin.id }
+            expect(response).to be_not_found
+            expect(InstStatsd::Statsd).to have_received(:increment).with(error_metric_name, tags: { action: "destroy", code: 404 })
+          end
+        end
+
+        context "when request fails" do
+          before do
+            # kind of weird trying to find _something_ that could fail during a key deletion or serialization
+            allow(DeveloperKey).to receive(:test_cluster_checks_enabled?).and_raise(ActiveRecord::StatementInvalid)
+          end
+
+          it "reports error metric with code 500" do
+            delete :destroy, params: { id: dk.id, account_id: Account.site_admin.id }
+            expect(InstStatsd::Statsd).to have_received(:increment).with(error_metric_name, tags: { action: "destroy", code: 500 })
+          end
+        end
       end
     end
   end

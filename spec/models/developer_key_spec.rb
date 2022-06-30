@@ -131,6 +131,70 @@ describe DeveloperKey do
       tool
     end
 
+    describe "instrumentation" do
+      subject do
+        developer_key.enable_external_tools!(account)
+        Timecop.travel(10.seconds) do
+          run_jobs
+        end
+      end
+
+      before do
+        developer_key
+        @shard1.activate { tool_configuration }
+        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:timing)
+      end
+
+      around do |example|
+        Timecop.freeze(Time.zone.now, &example)
+      end
+
+      after do
+        Timecop.return
+      end
+
+      context "when method succeeds" do
+        it "increments success count" do
+          subject
+          expect(InstStatsd::Statsd).to have_received(:increment).with("developer_key.manage_external_tools.count", any_args)
+        end
+
+        it "tracks success timing" do
+          subject
+          expect(InstStatsd::Statsd).to have_received(:timing).with("developer_key.manage_external_tools.latency", be_within(5000).of(10_000), any_args)
+        end
+      end
+
+      context "when method raises an exception" do
+        subject do
+          developer_key.send(:manage_external_tools, developer_key.send(:tool_management_enqueue_args), :nonexistent_method, account)
+          Timecop.travel(10.seconds) do
+            run_jobs
+          end
+        end
+
+        before do
+          allow(Canvas::Errors).to receive(:capture_exception)
+        end
+
+        it "increments error count" do
+          subject
+          expect(InstStatsd::Statsd).to have_received(:increment).with("developer_key.manage_external_tools.error.count", any_args)
+        end
+
+        it "tracks success timing" do
+          subject
+          expect(InstStatsd::Statsd).to have_received(:timing).with("developer_key.manage_external_tools.error.latency", be_within(5000).of(10_000), any_args)
+        end
+
+        it "sends error to sentry" do
+          subject
+          expect(Canvas::Errors).to have_received(:capture_exception).with(:developer_keys, instance_of(NoMethodError), :error)
+        end
+      end
+    end
+
     describe "#restore_external_tools!" do
       before do
         developer_key
