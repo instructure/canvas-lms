@@ -23,13 +23,17 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
 import formatMessage from '../../../format-message'
 
-const PreviewIcon = ({color, testId, variant, image, loading}) => {
+import checkerboardStyle from './CheckerboardStyling'
+
+const SQUARE_SIZE = 4
+
+const PreviewIcon = ({color, testId, variant, image, loading, checkered}) => {
   const variantSettings = PreviewIcon.variants[variant]
 
   const background = () => {
     if (loading) return {}
 
-    if (!!image) {
+    if (image) {
       return {
         backgroundImage: `url(${image})`,
         backgroundSize: 'contain',
@@ -55,23 +59,25 @@ const PreviewIcon = ({color, testId, variant, image, loading}) => {
   }
 
   return (
-    <span
-      data-testid={testId}
-      style={{
-        display: 'block',
-        height: variantSettings.width,
-        width: variantSettings.width,
-        ...background()
-      }}
-    >
-      {loading && (
-        <Flex as="div" direction="column">
-          <Flex.Item textAlign="center">
-            <Spinner renderTitle={formatMessage('Loading preview')} size="small" />
-          </Flex.Item>
-        </Flex>
-      )}
-    </span>
+    <div id="preview-background-wrapper" style={checkered ? checkerboardStyle(SQUARE_SIZE) : {}}>
+      <span
+        data-testid={testId}
+        style={{
+          display: 'block',
+          height: variantSettings.width,
+          width: variantSettings.width,
+          ...background()
+        }}
+      >
+        {loading && (
+          <Flex as="div" direction="column">
+            <Flex.Item textAlign="center">
+              <Spinner renderTitle={formatMessage('Loading preview')} size="small" />
+            </Flex.Item>
+          </Flex>
+        )}
+      </span>
+    </div>
   )
 }
 
@@ -93,7 +99,8 @@ PreviewIcon.propTypes = {
   testId: PropTypes.string,
   variant: PropTypes.string,
   image: PropTypes.string,
-  loading: PropTypes.bool
+  loading: PropTypes.bool,
+  checkered: PropTypes.bool
 }
 
 PreviewIcon.defaultProps = {
@@ -101,7 +108,8 @@ PreviewIcon.defaultProps = {
   color: null,
   testId: null,
   image: '',
-  loading: false
+  loading: false,
+  checkered: false
 }
 
 export default PreviewIcon
