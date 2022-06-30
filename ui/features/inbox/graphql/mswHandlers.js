@@ -611,13 +611,32 @@ export const handlers = [
   }),
 
   graphql.mutation('AddConversationMessage', (req, res, ctx) => {
-    const data = {
+    const CONV_ID_WITH_CONCLUDED_TEACHER_ERROR = '3'
+    let data = {
       addConversationMessage: {
         conversationMessage: ConversationMessage.mock({body: req.variables.body}),
         errors: null,
         __typename: 'AddConversationMessagePayload'
       }
     }
+
+    if (req.variables.conversationId === CONV_ID_WITH_CONCLUDED_TEACHER_ERROR) {
+      data = {
+        addConversationMessage: {
+          conversationMessage: ConversationMessage.mock({body: req.variables.body}),
+          errors: [
+            {
+              attribute: 'message',
+              message:
+                'The following recipients have no active enrollment in the course, ["Student 2"], unable to send messages',
+              __typename: 'ValidationError'
+            }
+          ],
+          __typename: 'AddConversationMessagePayload'
+        }
+      }
+    }
+
     return res(ctx.data(data))
   }),
 
