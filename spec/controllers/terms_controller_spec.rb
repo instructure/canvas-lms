@@ -48,6 +48,24 @@ describe TermsController do
     expect(error).to eq "Cannot change the default term name"
   end
 
+  it "doesn't overwrite stuck sis fields" do
+    account = Account.default
+    user = user_factory(active_all: true)
+    account.account_users.create!(user: user)
+    user_session(@user)
+
+    term = account.default_enrollment_term
+    start_at = 5.days.ago
+    term.update_attribute(:start_at, start_at)
+
+    put "update", params: { account_id: account.id, id: term.id, override_sis_stickiness: false, enrollment_term: { start_at: 1.day.ago } }
+
+    term.reload
+
+    expect(response).to be_successful
+    expect(term.start_at).to eq start_at
+  end
+
   it "is not able to delete a default term" do
     account_model
     account_admin_user(account: @account)
