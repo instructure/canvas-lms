@@ -4,9 +4,13 @@
   <div class="controls selectContent"></div>
 </div>
 <div class="control-group options">
-  <label class="control-label"><strong>{{#t "options"}}Options{{/t}}</strong></label>
+  {{#ifAll (not ENV.DISABLE_DATE_SHIFTING) new_quizzes_migration }}
+    <label class="control-label"><strong>{{#t "options"}}Options{{/t}}</strong></label>
+  {{/ifAll}}
   {{#if new_quizzes_migration}}
       <div class="controls importQuizzesNext"></div>
   {{/if}}
-  <div class="dateShift"></div>
+  {{#unless ENV.DISABLE_DATE_SHIFTING}}
+    <div class="dateShift"></div>
+  {{/unless}}
 </div>
