@@ -23,6 +23,10 @@ class TermsController < ApplicationController
   before_action :require_context, :require_root_account_management
   include Api::V1::EnrollmentTerm
 
+  def permitted_enrollment_term_attributes
+    %i[name start_at end_at]
+  end
+
   def index
     @root_account = @context.root_account
     @context.default_enrollment_term
@@ -91,6 +95,10 @@ class TermsController < ApplicationController
   #   The day/time the term ends, overridden for the given enrollment type.
   #   *enrollment_type* can be one of StudentEnrollment, TeacherEnrollment, TaEnrollment, or DesignerEnrollment
   #
+  # @argument override_sis_stickiness [boolean]
+  #   By default and when the value is true it updates all the fields
+  #   when the value is false then fields which in stuck_sis_fields will not be updated
+  #
   # @returns EnrollmentTerm
   #
   def update
@@ -135,7 +143,12 @@ class TermsController < ApplicationController
 
     handle_sis_id_param(sis_id)
 
-    term_params = params.require(:enrollment_term).permit(:name, :start_at, :end_at)
+    term_params = if request.request_method.downcase == "put" && params[:override_sis_stickiness] && !value_to_boolean(params[:override_sis_stickiness])
+                    params.require(:enrollment_term).permit(*(permitted_enrollment_term_attributes - @term.stuck_sis_fields.to_a))
+                  else
+                    params.require(:enrollment_term).permit(*permitted_enrollment_term_attributes)
+                  end
+
     DueDateCacher.with_executing_user(@current_user) do
       if validate_dates(@term, term_params, overrides) && @term.update(term_params)
         @term.set_overrides(@context, overrides)
