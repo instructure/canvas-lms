@@ -95,24 +95,6 @@ describe CalendarsController do
       expect(assigns[:js_env][:MAX_NAME_LENGTH]).to eq(15)
     end
 
-    specs_require_sharding
-
-    it "sets permissions using contexts from the correct shard" do
-      # non-shard-aware code could use a shard2 id on shard1. this could grab the wrong course,
-      # or no course at all. this sort of aliasing used to break a permission check in show
-      invalid_shard1_course_id = (Course.maximum(:id) || 0) + 1
-      @shard2.activate do
-        account = Account.create!
-        @course = account.courses.build
-        @course.id = invalid_shard1_course_id
-        @course.save!
-        @course.offer!
-        student_in_course(active_all: true, user: @user)
-      end
-      get "show", params: { user_id: @user.id }
-      expect(response).to be_successful
-    end
-
     it "sets context.course_sections.can_create_ag based off :manage_calendar permission" do
       @section1 = @course.default_section
       @section2 = @course.course_sections.create!(name: "Section 2")
@@ -128,6 +110,55 @@ describe CalendarsController do
           expect(section[:can_create_ag]).to be_truthy
         else
           expect(section[:can_create_ag]).to be_falsey
+        end
+      end
+    end
+
+    context "with sharding" do
+      specs_require_sharding
+
+      it "sets permissions using contexts from the correct shard" do
+        # non-shard-aware code could use a shard2 id on shard1. this could grab the wrong course,
+        # or no course at all. this sort of aliasing used to break a permission check in show
+        invalid_shard1_course_id = (Course.maximum(:id) || 0) + 1
+        @shard2.activate do
+          account = Account.create!
+          @course = account.courses.build
+          @course.id = invalid_shard1_course_id
+          @course.save!
+          @course.offer!
+          student_in_course(active_all: true, user: @user)
+        end
+        get "show", params: { user_id: @user.id }
+        expect(response).to be_successful
+      end
+
+      it "sets context.course_sections.can_create_ag for users in sections on multiple shards" do
+        # ensure we're shard aware by picking a section id that is guaranteed to not exist on shard1
+        invalid_shard1_section_id = (CourseSection.maximum(:id) || 0) + 1
+        @user.enrollments.destroy_all
+        @shard2.activate do
+          account2 = Account.create!
+          course_with_student(account: account2, user: @user)
+          @section = @course.course_sections.build
+          @section.id = invalid_shard1_section_id
+          @section.name = "Teacher Section"
+          @section.save!
+          @course.enroll_teacher(@user, enrollment_state: :active, section: @section)
+          @user.enrollments.shard(Shard.current).update_all(limit_privileges_to_course_section: true)
+        end
+
+        get "show", params: { user_id: @user.id }
+        expect(response).to be_successful
+
+        contexts = assigns(:contexts_json)
+        sections = contexts[1][:course_sections]
+        sections.each do |section|
+          if section[:name] == "Teacher Section"
+            expect(section[:can_create_ag]).to be_truthy
+          else
+            expect(section[:can_create_ag]).to be_falsey
+          end
         end
       end
     end
