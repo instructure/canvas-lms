@@ -220,14 +220,19 @@ const ComposeModalManager = props => {
     }
   }
 
-  const onConversationCreateComplete = success => {
+  const onConversationCreateComplete = data => {
     setSendingMessage(false)
+    // success is true if there is no error message or if data === true
+    const errorMessage = data?.addConversationMessage?.errors
+    const success = errorMessage ? false : !!data
 
     if (success) {
       props.onDismiss()
       setOnSuccess(I18n.t('Message sent!'), false)
     } else {
-      if (isSubmissionCommentsType) {
+      if (errorMessage[0]?.message) {
+        setModalError(errorMessage[0].message)
+      } else if (isSubmissionCommentsType) {
         setModalError(I18n.t('Error creating Submission Comment'))
       } else if (props.isReply || props.isReplyAll || props.isForward) {
         setModalError(I18n.t('Error occurred while adding message to conversation'))
@@ -243,19 +248,19 @@ const ComposeModalManager = props => {
 
   const [createConversation] = useMutation(CREATE_CONVERSATION, {
     update: updateCache,
-    onCompleted: data => onConversationCreateComplete(!data.createConversation.errors),
+    onCompleted: data => onConversationCreateComplete(data),
     onError: () => onConversationCreateComplete(false)
   })
 
   const [addConversationMessage] = useMutation(ADD_CONVERSATION_MESSAGE, {
     update: updateCache,
-    onCompleted: data => onConversationCreateComplete(!data.addConversationMessage.errors),
+    onCompleted: data => onConversationCreateComplete(data),
     onError: () => onConversationCreateComplete(false)
   })
 
   const [createSubmissionComment] = useMutation(CREATE_SUBMISSION_COMMENT, {
     update: updateCache,
-    onCompleted: data => onConversationCreateComplete(!data.createSubmissionComment.errors),
+    onCompleted: data => onConversationCreateComplete(data),
     onError: () => onConversationCreateComplete(false)
   })
 
