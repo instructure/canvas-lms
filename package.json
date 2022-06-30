@@ -261,7 +261,6 @@
     "eslint-plugin-react": "^7",
     "eslint-plugin-react-hooks": "^1",
     "exports-loader": "^0.7",
-    "expose-loader": "^0.7",
     "fast-glob": "^3.2.4",
     "fetch-mock": "^7",
     "file-loader": "^4",
