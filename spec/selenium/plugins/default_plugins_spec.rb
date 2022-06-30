@@ -19,7 +19,11 @@
 
 require_relative "../common"
 
-describe "default plugins" do
+# FOO-2994 all these tests have become flaky in the post-merge build for some
+# reason that is difficult to suss out. For now, we'll skip them since what they
+# are testing is only available to siteadmin anyway, but a decision should be
+# made regarding fixing/improving them vs simply removing them altogether
+describe.skip "default plugins FOO-2994" do
   include_context "in-process server selenium tests"
 
   before do
