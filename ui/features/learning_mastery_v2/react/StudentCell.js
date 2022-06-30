@@ -28,16 +28,15 @@ const StudentCell = ({courseId, student}) => {
   return (
     <>
       <Flex height="100%" alignItems="center" justifyItems="start">
-        <Flex.Item as="div">
-          {student.avatar_url && (
-            <Avatar
-              alt={student.display_name}
-              as="div"
-              size="x-small"
-              name={student.display_name}
-              src={student.avatar_url}
-            />
-          )}
+        <Flex.Item as="div" padding="0 0 0 small">
+          <Avatar
+            alt={student.display_name}
+            as="div"
+            size="x-small"
+            name={student.display_name}
+            src={student.avatar_url}
+            data-testid="student-avatar"
+          />
         </Flex.Item>
         <Flex.Item as="div" padding="0 small 0 small">
           <Link isWithinText={false} href={student_grades_url}>
