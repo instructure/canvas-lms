@@ -147,14 +147,8 @@ module.exports = {
     pathinfo: process.env.NODE_ENV !== 'production',
 
     // "e" is for "entry" and "c" is for "chunk"
-    filename: process.env.NODE_ENV === 'production' ?
-      '[name]-e-[chunkhash:10].js' :
-      '[name]-e.js'
-    ,
-    chunkFilename: process.env.NODE_ENV === 'production' ?
-      '[name]-c-[chunkhash:10].js' :
-      '[name]-c.js'
-    ,
+    filename: '[name]-e-[chunkhash:10].js',
+    chunkFilename: '[name]-c-[chunkhash:10].js',
   },
 
   parallelism: 5,
