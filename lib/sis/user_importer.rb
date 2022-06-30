@@ -147,70 +147,74 @@ module SIS
             next
           end
 
-          if pseudo
-            if login_only
-              message = I18n.t("An existing Canvas user with the SIS ID %{user_id} or login of %{login} already exists, skipping", user_id: user_row.user_id, login: user_row.login_id)
-              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
-              next
-            end
-            if pseudo.sis_user_id && pseudo.sis_user_id != user_row.user_id
-              if @batch.options[:update_sis_id_if_login_claimed]
-                pseudo.sis_user_id = user_row.user_id
-              else
-                message = I18n.t("An existing Canvas user with the SIS ID %{user_id} has already claimed %{other_user_id}'s user_id requested login information, skipping", user_id: pseudo.sis_user_id, other_user_id: user_row.user_id)
+          begin
+            if pseudo
+              if login_only
+                message = I18n.t("An existing Canvas user with the SIS ID %{user_id} or login of %{login} already exists, skipping", user_id: user_row.user_id, login: user_row.login_id)
                 @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
                 next
               end
-            end
-            if pseudo_by_login && ((pseudo != pseudo_by_login && status != "deleted") ||
-              !Pseudonym.where("LOWER(?)=LOWER(?)", pseudo.unique_id, user_row.login_id).exists?)
-              id_message = pseudo_by_login.sis_user_id ? "SIS ID" : "Canvas ID"
-              user_id = pseudo_by_login.sis_user_id || pseudo_by_login.user_id
-              message = I18n.t("An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s user_id requested login information, skipping", user_id: "#{id_message} #{user_id}", other_user_id: user_row.user_id)
-              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
-              next
-            end
+              if pseudo.sis_user_id && pseudo.sis_user_id != user_row.user_id
+                if @batch.options[:update_sis_id_if_login_claimed]
+                  pseudo.sis_user_id = user_row.user_id
+                else
+                  message = I18n.t("An existing Canvas user with the SIS ID %{user_id} has already claimed %{other_user_id}'s user_id requested login information, skipping", user_id: pseudo.sis_user_id, other_user_id: user_row.user_id)
+                  @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
+                  next
+                end
+              end
+              if pseudo_by_login && ((pseudo != pseudo_by_login && status != "deleted") ||
+                !Pseudonym.where("LOWER(?)=LOWER(?)", pseudo.unique_id, user_row.login_id).exists?)
+                id_message = pseudo_by_login.sis_user_id ? "SIS ID" : "Canvas ID"
+                user_id = pseudo_by_login.sis_user_id || pseudo_by_login.user_id
+                message = I18n.t("An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s user_id requested login information, skipping", user_id: "#{id_message} #{user_id}", other_user_id: user_row.user_id)
+                @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
+                next
+              end
+              user = if force_new_user?(user_row, pseudo)
+                       new_user(user_row)
+                     else
+                       pseudo.user
+                     end
 
-            user = if force_new_user?(user_row, pseudo)
-                     new_user(user_row)
-                   else
-                     pseudo.user
-                   end
-
-            unless user.stuck_sis_fields.include?(:name)
-              user.name = infer_user_name(user_row, user.name)
-            end
-            unless user.stuck_sis_fields.include?(:sortable_name)
-              user.sortable_name = infer_sortable_name(user_row, user.sortable_name)
-            end
-            if !user.stuck_sis_fields.include?(:short_name) && user_row.short_name.present?
-              user.short_name = user_row.short_name
-            end
-          elsif login_only
-            if user_row.root_account_id.present?
-              root_account = root_account_from_id(user_row.root_account_id, user_row)
-              next unless root_account
+              unless user.stuck_sis_fields.include?(:name)
+                user.name = infer_user_name(user_row, user.name)
+              end
+              unless user.stuck_sis_fields.include?(:sortable_name)
+                user.sortable_name = infer_sortable_name(user_row, user.sortable_name)
+              end
+              if !user.stuck_sis_fields.include?(:short_name) && user_row.short_name.present?
+                user.short_name = user_row.short_name
+              end
+            elsif login_only
+              if user_row.root_account_id.present?
+                root_account = root_account_from_id(user_row.root_account_id, user_row)
+                next unless root_account
+              else
+                root_account = @root_account
+              end
+              pseudo = existing_login(user_row, root_account)
+              if pseudo.nil?
+                message = I18n.t("Could not find the existing user for login with SIS ID %{user_id}, skipping", user_id: user_row.user_id)
+                @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
+                next
+              elsif pseudo.attributes.slice(*user_row.login_hash.keys) != user_row.login_hash
+                message = I18n.t("An existing user does not match existing user ids provided for login with SIS ID %{user_id}, skipping", user_id: user_row.user_id)
+                @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
+                next
+              else
+                user = pseudo.user
+                pseudo = Pseudonym.new
+              end
             else
-              root_account = @root_account
-            end
-            pseudo = existing_login(user_row, root_account)
-            if pseudo.nil?
-              message = I18n.t("Could not find the existing user for login with SIS ID %{user_id}, skipping", user_id: user_row.user_id)
-              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
-              next
-            elsif pseudo.attributes.slice(*user_row.login_hash.keys) != user_row.login_hash
-              message = I18n.t("An existing user does not match existing user ids provided for login with SIS ID %{user_id}, skipping", user_id: user_row.user_id)
-              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
-              next
-            else
-              user = pseudo.user
+              user = nil
               pseudo = Pseudonym.new
+              user = other_user(user_row, pseudo) if user_row.integration_id.present?
+              user = new_user(user_row) if user.blank? || force_new_user?(user_row, pseudo)
             end
-          else
-            user = nil
-            pseudo = Pseudonym.new
-            user = other_user(user_row, pseudo) if user_row.integration_id.present?
-            user = new_user(user_row) if user.blank? || force_new_user?(user_row, pseudo)
+          rescue ImportError => e
+            @messages << SisBatch.build_error(user_row.csv, e.message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
+            next
           end
 
           is_new_user_with_password_notification = user.new_record? && user_row.email.present? && user_row.canvas_password_notification.present? && user_row.authentication_provider_id == "canvas"
