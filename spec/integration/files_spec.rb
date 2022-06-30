@@ -89,8 +89,6 @@ describe FilesController do
       remove_user_session
 
       get location
-      expect(response).to be_redirect
-      follow_redirect!
       expect(response).to be_successful
       expect(response.media_type).to eq "image/png"
       # ensure that the user wasn't logged in by the normal means
@@ -337,8 +335,6 @@ describe FilesController do
       remove_user_session
 
       get location
-      expect(response).to be_redirect
-      follow_redirect!
       expect(response).to be_successful
       expect(response.media_type).to eq "image/png"
       # ensure that the user wasn't logged in by the normal means
@@ -454,8 +450,6 @@ describe FilesController do
     expect(response["Location"]).to include("files/#{attachment.id}")
 
     get response["Location"]
-    expect(response).to be_redirect
-    follow_redirect!
     expect(response).to be_successful
   end
 

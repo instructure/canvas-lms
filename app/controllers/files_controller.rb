@@ -222,8 +222,6 @@ class FilesController < ApplicationController
       # if this was set we really just wanted to set the session on the files domain and return back to what we were doing before
       if access_verifier[:return_url]
         return redirect_to access_verifier[:return_url]
-      else
-        return redirect_to url_for(params.to_unsafe_h.except(:sf_verifier))
       end
     end
     # These sessions won't get deleted when the user logs out since this
@@ -524,6 +522,7 @@ class FilesController < ApplicationController
       render json: { errors: [{ message: "The specified resource does not exist." }] }, status: :not_found
       return
     end
+
     params[:include] = Array(params[:include])
     if read_allowed(@attachment, @current_user, session, params)
       json = attachment_json(@attachment, @current_user, {}, { include: params[:include], omit_verifier_in_app: !value_to_boolean(params[:use_verifiers]) })
@@ -579,6 +578,10 @@ class FilesController < ApplicationController
         @skip_crumb = true unless @context
       else
         @attachment ||= attachment_or_replacement(@context, params[:id])
+      end
+
+      if @attachment.inline_content? && params[:sf_verifier]
+        return redirect_to url_for(params.to_unsafe_h.except(:sf_verifier))
       end
 
       params[:download] ||= params[:preview]
@@ -1400,7 +1403,7 @@ class FilesController < ApplicationController
   end
 
   def open_cors
-    headers["Access-Control-Allow-Origin"] = request.headers["origin"]
+    headers["Access-Control-Allow-Origin"] = "*"
     headers["Access-Control-Allow-Credentials"] = "true"
     headers["Access-Control-Allow-Methods"] = "POST, PUT, DELETE, GET, OPTIONS"
     headers["Access-Control-Request-Method"] = "*"
@@ -1408,7 +1411,7 @@ class FilesController < ApplicationController
   end
 
   def open_limited_cors
-    headers["Access-Control-Allow-Origin"] = request.headers["origin"]
+    headers["Access-Control-Allow-Origin"] = "*"
     headers["Access-Control-Allow-Credentials"] = "true"
     headers["Access-Control-Allow-Methods"] = "GET, HEAD"
   end
