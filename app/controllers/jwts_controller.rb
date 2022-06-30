@@ -48,13 +48,13 @@ class JwtsController < ApplicationController
   # @argument workflows[] [String]
   #   Adds additional data to the JWT to be used by the consuming service workflow
   #
-  # @argument context_type [Optional, String, "Course"|"User"]
+  # @argument context_type [Optional, String, "Course"|"User"|"Account"]
   #   The type of the context in case a specified workflow uses it to consuming the service. Case insensitive.
   #
   # @argument context_id [Optional, Integer]
   #   The id of the context in case a specified workflow uses it to consuming the service.
   #
-  # @argument context_uuid [Optional, Integer]
+  # @argument context_uuid [Optional, String]
   #   The uuid of the context in case a specified workflow uses it to consuming the service.
   #
   # @example_request
@@ -150,6 +150,7 @@ class JwtsController < ApplicationController
 
     context_class = Course if context_type.casecmp("Course").zero?
     context_class = User if context_type.casecmp("User").zero?
+    context_class = Account if context_type.casecmp("Account").zero?
     return @error = "Invalid context_type parameter." if context_class.nil?
 
     begin
