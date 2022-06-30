@@ -538,6 +538,11 @@ describe DiscussionTopicsController do
         user_session(user)
       end
 
+      it "sets @page_title to Topic: @topic.title" do
+        subject
+        expect(assigns(:page_title)).to eq "Topic: #{discussion.title}"
+      end
+
       it 'sets "rce_mentions_in_discussions" to true in the JS ENV' do
         subject
         expect(assigns.dig(:js_env, :rce_mentions_in_discussions)).to be true

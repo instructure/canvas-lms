@@ -673,6 +673,7 @@ class DiscussionTopicsController < ApplicationController
     @sequence_asset = @context_module_tag.try(:content)
     add_discussion_or_announcement_crumb
     add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
+    @page_title = join_title(t("#titles.topic", "Topic"), @topic.title)
 
     if @topic.deleted?
       flash[:notice] = I18n.t :deleted_topic_notice, "That topic has been deleted"
