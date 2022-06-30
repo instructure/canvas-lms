@@ -506,36 +506,47 @@ describe ContentMigration do
     end
 
     context "with prevent_course_availability_editing_by_teachers on" do
-      it "does not copy restrict_enrollments_to_course_dates for teachers" do
+      before do
         @copy_from.root_account.settings[:prevent_course_availability_editing_by_teachers] = true
         @copy_from.root_account.save!
-
-        @copy_to.restrict_enrollments_to_course_dates = false
-        @copy_to.save!
-
-        @copy_from.restrict_enrollments_to_course_dates = true
-        @copy_from.save!
-
-        run_course_copy
-
-        expect(@copy_to.restrict_enrollments_to_course_dates).to eq false
+        @shift_copy_options = {
+          everything: true,
+          shift_dates: true,
+          new_start_date: "Aug 5, 2012",
+          new_end_date: "Aug 15, 2012"
+        }
+        @copy_from.update! restrict_enrollments_to_course_dates: true
+        @copy_to.update! restrict_enrollments_to_course_dates: false
       end
 
-      it "does copy restrict_enrollments_to_course_dates for admins" do
-        account_admin_user(user: @cm.user, account: @copy_to.account)
+      context "for teacher" do
+        it "does not copy restrict_enrollments_to_course_dates" do
+          run_course_copy
+          expect(@copy_to.reload.restrict_enrollments_to_course_dates).to eq false
+        end
 
-        @copy_from.root_account.settings[:prevent_course_availability_editing_by_teachers] = true
-        @copy_from.root_account.save!
+        it "does not shift dates" do
+          @cm.copy_options = @shift_copy_options
+          run_course_copy
+          expect(@copy_to.reload.start_at).to eq @copy_from.start_at
+          expect(@copy_to.reload.conclude_at).to eq @copy_from.conclude_at
+        end
+      end
 
-        @copy_to.restrict_enrollments_to_course_dates = false
-        @copy_to.save!
+      context "for admins" do
+        before { account_admin_user(user: @cm.user, account: @copy_to.account) }
 
-        @copy_from.restrict_enrollments_to_course_dates = true
-        @copy_from.save!
+        it "copies restrict_enrollments_to_course_dates setting" do
+          run_course_copy
+          expect(@copy_to.reload.restrict_enrollments_to_course_dates).to eq true
+        end
 
-        run_course_copy
-
-        expect(@copy_to.restrict_enrollments_to_course_dates).to eq true
+        it "shifts dates" do
+          @cm.copy_options = @shift_copy_options
+          run_course_copy
+          expect(@copy_to.reload.start_at).to eq DateTime.new(2012, 8, 5)
+          expect(@copy_to.reload.conclude_at).to eq DateTime.new(2012, 8, 15)
+        end
       end
     end
 

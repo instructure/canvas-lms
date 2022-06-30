@@ -385,7 +385,7 @@ module Importers
           event.save_without_broadcasting
         end
 
-        course.set_course_dates_if_blank(shift_options)
+        course.set_course_dates_if_blank(shift_options) unless course.root_account.settings[:prevent_course_availability_editing_by_teachers] && !course.account.grants_right?(migration.user, :read_as_admin)
       else
         (migration.imported_migration_items_by_class(Announcement) +
           migration.imported_migration_items_by_class(DiscussionTopic)).each do |event|

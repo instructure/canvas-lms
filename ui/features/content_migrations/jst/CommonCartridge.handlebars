@@ -10,5 +10,7 @@
       <div class="controls importQuizzesNext"></div>
   {{/if}}
   <div class="controls overwriteAssessmentContent"></div>
-  <div class="dateShift"></div>
+  {{#unless ENV.DISABLE_DATE_SHIFTING}}
+    <div class="dateShift"></div>
+  {{/unless}}
 </div>
