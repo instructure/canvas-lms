@@ -436,6 +436,7 @@ class ConversationsController < ApplicationController
                                            subject: params[:subject], context_type: context_type,
                                            context_id: context_id, tags: @tags, group: batch_group_messages)
 
+        InstStatsd::Statsd.count("inbox.conversation.created.legacy", batch.recipient_count)
         if mode == :async
           headers["X-Conversation-Batch-Id"] = batch.id.to_s
           return render json: [], status: :accepted
@@ -450,6 +451,7 @@ class ConversationsController < ApplicationController
       else
         @conversation = @current_user.initiate_conversation(@recipients, !group_conversation, subject: params[:subject], context_type: context_type, context_id: context_id)
         @conversation.add_message(message, tags: @tags, update_for_sender: false, cc_author: true)
+        InstStatsd::Statsd.increment("inbox.conversation.created.legacy")
         render json: [conversation_json(@conversation.reload, @current_user, session, include_indirect_participants: true, messages: [message])], status: :created
       end
     end
