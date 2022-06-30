@@ -16,11 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const checkerboardStyle = squareSize => {
-  return {
-    backgroundImage: `url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" fill-opacity=".15"><rect x="200" width="200" height="200"/><rect y="200" width="200" height="200"/></svg>')`,
-    backgroundSize: `${squareSize}px ${squareSize}px`
-  }
-}
+import checkerboardStyle from '../CheckerboardStyling'
 
-export default checkerboardStyle
+describe('checkerboardStyle', () => {
+  it('creates 4px squares when passed squareSize 4', () => {
+    const checkerboard = checkerboardStyle(4)
+    expect(checkerboard.backgroundSize).toBe('4px 4px')
+  })
+
+  it('creates 8px squares when passed squareSize 8', () => {
+    const checkerboard = checkerboardStyle(8)
+    expect(checkerboard.backgroundSize).toBe('8px 8px')
+  })
+})

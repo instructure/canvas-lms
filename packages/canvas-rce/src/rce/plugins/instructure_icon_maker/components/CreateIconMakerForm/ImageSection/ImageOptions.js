@@ -34,7 +34,13 @@ import {ImageCropperSettingsPropTypes} from '../ImageCropper/propTypes'
 
 function renderImagePreview({image, loading}) {
   return (
-    <PreviewIcon variant="large" testId="selected-image-preview" image={image} loading={loading} />
+    <PreviewIcon
+      variant="large"
+      testId="selected-image-preview"
+      image={image}
+      loading={loading}
+      checkered
+    />
   )
 }
 
