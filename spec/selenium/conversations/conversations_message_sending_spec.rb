@@ -603,6 +603,19 @@ describe "conversations new" do
         wait_for_ajaximations
         expect(@s2.conversations.last.conversation.conversation_messages.last.body).to eq "sent to everyone in the account level group"
       end
+
+      context "sent scope" do
+        it "defaults to reply to recipients", ignore_js_errors: true do
+          conversation(@teacher, @s1, @s2, body: "hi there", workflow_state: "unread")
+          user_session(@teacher)
+          get "/conversations#filter=type=sent"
+          f("div[data-testid='conversation']").click
+          wait_for_ajaximations
+          f("button[data-testid='message-reply']").click
+          wait_for_ajaximations
+          expect(ff("[data-testid='address-book-tag']").count).to eq 2
+        end
+      end
     end
   end
 
