@@ -25,7 +25,6 @@ module Qti
     WEBCT_REL_REGEX = "/webct/RelativeResourceManager/Template/"
 
     def sanitize_html_string(string, remove_extraneous_nodes = false)
-      string = escape_unmatched_brackets(string)
       sanitize_html!(Nokogiri::HTML5.fragment(string), remove_extraneous_nodes)
     end
 
@@ -104,37 +103,6 @@ module Qti
 
     def find_best_path_match(path)
       @path_map[path] || @path_map[@sorted_paths.find { |k| k.end_with?(path) }]
-    end
-
-    # try to escape unmatched '<' and '>' characters because some people don't format their QTI correctly...
-    def escape_unmatched_brackets(string)
-      unmatched = false
-      lcount = 0
-      string.scan(/[<>]/) do |s|
-        if s == ">"
-          if lcount == 0
-            unmatched = true
-          else
-            lcount -= 1
-          end
-        else
-          lcount += 1
-        end
-      end
-      return string unless unmatched || lcount > 0
-
-      if string.include?("data-equation-content")
-        # try to fix a weird issue with unescaped brackets inside html attribute values
-        string = Nokogiri::HTML5.fragment(string).to_xml rescue string
-      end
-
-      string.split(/(<[^<>]*>)/m).map do |sub|
-        if sub.strip.start_with?("<") && sub.strip.end_with?(">")
-          sub
-        else
-          sub.gsub("<", "&lt;").gsub(">", "&gt;")
-        end
-      end.join
     end
 
     # returns a tuple of [text, html]
