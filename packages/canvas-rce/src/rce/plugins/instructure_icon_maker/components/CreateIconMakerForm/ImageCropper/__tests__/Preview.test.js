@@ -28,7 +28,10 @@ describe('Preview', () => {
     settings = {
       image: 'https://www.fillmurray.com/640/480',
       shape: 'square',
-      scaleRatio: 1
+      scaleRatio: 1,
+      rotation: 0,
+      translateX: 0,
+      translateY: 0
     }
     dispatch = jest.fn()
   })
@@ -128,6 +131,89 @@ describe('Preview', () => {
       await waitFor(() => {
         const img = container.querySelector('img')
         expect(img.style.transform).toEqual('scale(1.88)')
+      })
+    })
+  })
+
+  describe('listens arrow keys', () => {
+    let container, event
+
+    beforeEach(() => {
+      const component = render(<Preview settings={settings} dispatch={dispatch} />)
+      document.querySelector('#cropper-preview').focus()
+      container = component.container
+      event = {preventDefault: jest.fn()}
+    })
+
+    describe('calls dispatch', () => {
+      it('left', async () => {
+        event.keyCode = 37
+        fireEvent.keyDown(container.firstChild, event)
+        await waitFor(() => {
+          expect(dispatch).toHaveBeenCalledWith({type: 'SetTranslateX', payload: -1})
+        })
+      })
+
+      it('up', async () => {
+        event.keyCode = 38
+        fireEvent.keyDown(container.firstChild, event)
+        await waitFor(() => {
+          expect(dispatch).toHaveBeenCalledWith({type: 'SetTranslateY', payload: -1})
+        })
+      })
+
+      it('right', async () => {
+        event.keyCode = 39
+        fireEvent.keyDown(container.firstChild, event)
+        await waitFor(() => {
+          expect(dispatch).toHaveBeenCalledWith({type: 'SetTranslateX', payload: 1})
+        })
+      })
+
+      it('down', async () => {
+        event.keyCode = 40
+        fireEvent.keyDown(container.firstChild, event)
+        await waitFor(() => {
+          expect(dispatch).toHaveBeenCalledWith({type: 'SetTranslateY', payload: 1})
+        })
+      })
+    })
+
+    describe('sets translate style', () => {
+      it('left', async () => {
+        event.keyCode = 37
+        fireEvent.keyDown(container.firstChild, event)
+        await waitFor(() => {
+          const img = container.querySelector('img')
+          expect(img.style.transform).toEqual('translateX(-1px)')
+        })
+      })
+
+      it('up', async () => {
+        event.keyCode = 38
+        fireEvent.keyDown(container.firstChild, event)
+        await waitFor(() => {
+          const img = container.querySelector('img')
+          expect(img.style.transform).toEqual('translateY(-1px)')
+        })
+      })
+
+      it('right', async () => {
+        event.keyCode = 39
+        fireEvent.keyDown(container.firstChild, event)
+        await waitFor(() => {
+          const img = container.querySelector('img')
+          expect(img.style.transform).toEqual('translateX(1px)')
+        })
+      })
+
+      it('down', async () => {
+        event.keyCode = 40
+        fireEvent.keyDown(container.firstChild, event)
+        await waitFor(() => {
+          const img = container.querySelector('img')
+          expect(img.style.transform).toEqual('translateY(1px)')
+        })
       })
     })
   })

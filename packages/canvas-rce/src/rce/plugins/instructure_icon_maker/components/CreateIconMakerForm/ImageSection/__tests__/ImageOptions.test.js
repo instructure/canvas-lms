@@ -109,7 +109,9 @@ describe('ImageOptions', () => {
             image: 'data:image/png;base64,asdfasdfjksdf==',
             rotation: 0,
             scaleRatio: 1,
-            shape: 'square'
+            shape: 'square',
+            translateX: 0,
+            translateY: 0
           }
         })
       })

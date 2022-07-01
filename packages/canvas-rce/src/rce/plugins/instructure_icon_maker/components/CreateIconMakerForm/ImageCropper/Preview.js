@@ -23,6 +23,7 @@ import {ImageCropperSettingsPropTypes} from './propTypes'
 import {buildSvg} from './svg'
 import {PREVIEW_WIDTH, PREVIEW_HEIGHT} from './constants'
 import {useMouseWheel} from './useMouseWheel'
+import {useArrowKeys} from './useArrowKeys'
 
 /**
  * Remove the node contents and append the svg element.
@@ -35,27 +36,36 @@ function replaceSvg(svg, node) {
   node.appendChild(svg)
 }
 
+function getTransformValue({translateX, translateY, rotation, scaleRatio}) {
+  const values = []
+  if (translateX !== 0) values.push(`translateX(${translateX}px)`)
+  if (translateY !== 0) values.push(`translateY(${translateY}px)`)
+  if (rotation && rotation % 360 !== 0) values.push(`rotate(${rotation}deg)`)
+  if (scaleRatio > 1) values.push(`scale(${scaleRatio})`)
+  return values.join(' ')
+}
+
 export const Preview = ({settings, dispatch}) => {
   const shapeRef = useRef(null)
-  const {image, shape, rotation, scaleRatio} = settings
+  const {image, shape, rotation, scaleRatio, translateX, translateY} = settings
   const [tempScaleRatio, onWheelCallback] = useMouseWheel(scaleRatio, dispatch)
+  const [tempTranslateX, tempTranslateY] = useArrowKeys(translateX, translateY, dispatch)
 
   useEffect(() => {
     const svg = buildSvg(shape)
     replaceSvg(svg, shapeRef.current)
   })
 
-  let transformValue = ''
-  if (rotation && rotation % 360 !== 0) {
-    transformValue += `rotate(${rotation}deg)`
-  }
-  if (tempScaleRatio !== 1.0) {
-    const scale = `scale(${tempScaleRatio})`
-    transformValue += transformValue ? ' ' + scale : scale
-  }
+  const transformValue = getTransformValue({
+    translateX: tempTranslateX,
+    translateY: tempTranslateY,
+    rotation,
+    scaleRatio: tempScaleRatio
+  })
 
   return (
     <div
+      id="cropper-preview"
       style={{
         position: 'relative',
         width: `${PREVIEW_WIDTH}px`,
