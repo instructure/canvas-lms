@@ -132,6 +132,11 @@ class StudentEnrollment < Enrollment
     return unless saved_change_to_id? || saved_change_to_start_at? || (saved_change_to_workflow_state? && workflow_state == "invited")
     return unless course.enable_course_paces?
 
+    section_pace = course.course_paces.published.where(course_section_id: course_section_id).take
+    if section_pace
+      section_pace&.create_publish_progress
+      return
+    end
     course_pace = course.course_paces.published.for_user(user).take || course.course_paces.published.primary.take
     course_pace&.create_publish_progress
   end
