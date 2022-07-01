@@ -66,7 +66,7 @@ const variants: VariantMap = {
     menuLabel: I18n.t('Gradebook…')
   },
   DefaultGradebookLearningMastery: {
-    activeLabel: I18n.t('Learning Mastery'),
+    activeLabel: I18n.t('Learning Mastery Grade Book'),
     activeOptions: ['DefaultGradebook', 'IndividualGradebook', 'Separator', 'GradebookHistory'],
     href: courseUrl => `${courseUrl}/gradebook?view=learning_mastery`,
     key: 'learning-mastery',
