@@ -2650,8 +2650,11 @@ class User < ActiveRecord::Base
   end
 
   def eportfolios_enabled?
-    accounts = associated_root_accounts.reject(&:site_admin?)
-    accounts.empty? || accounts.any? { |a| a.settings[:enable_eportfolios] != false }
+    # For jobs/rails consoles/specs where domain root account is not set
+    return true unless Account.current_domain_root_account
+
+    associated_root_accounts.empty? ||
+      (associated_root_accounts.include?(Account.current_domain_root_account) && Account.current_domain_root_account.settings[:enable_eportfolios] != false)
   end
 
   def initiate_conversation(users, private = nil, options = {})
