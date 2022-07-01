@@ -61,7 +61,7 @@ RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
        postgresql-client-$POSTGRES_CLIENT \
        unzip \
        pbzip2 \
-       fontforge \
+       <% if development? -%>fontforge <% end -%>\
        git \
        build-essential \
   && rm -rf /var/lib/apt/lists/* \
