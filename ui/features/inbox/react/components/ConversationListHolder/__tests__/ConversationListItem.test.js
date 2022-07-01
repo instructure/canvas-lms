@@ -228,5 +228,15 @@ describe('ConversationListItem', () => {
 
       expect(getByText('Hey!')).toBeTruthy()
     })
+
+    it('renders read state', () => {
+      const props = createProps({
+        conversation: submissionsCommentsMock(),
+        isUnread: true
+      })
+      const {getByTestId} = render(<ConversationListItem {...props} />)
+
+      expect(getByTestId('unread-badge')).toBeTruthy()
+    })
   })
 })

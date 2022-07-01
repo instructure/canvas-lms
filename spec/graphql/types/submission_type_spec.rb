@@ -49,6 +49,18 @@ describe Types::SubmissionType do
     end
   end
 
+  describe "read state" do
+    it "returns unread when user has not read the submission" do
+      @submission.change_read_state("unread", @teacher)
+      expect(submission_type.resolve("readState")).to eq "unread"
+    end
+
+    it "returns read when user has read the submission" do
+      @submission.change_read_state("read", @teacher)
+      expect(submission_type.resolve("readState")).to eq "read"
+    end
+  end
+
   describe "posted_at" do
     it "returns the posted_at of the submission" do
       now = Time.zone.now.change(usec: 0)
