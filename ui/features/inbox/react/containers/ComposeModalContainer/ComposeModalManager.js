@@ -59,7 +59,11 @@ const ComposeModalManager = props => {
     const lastAuthor = props.conversationMessage
       ? props.conversationMessage?.author
       : props.conversation?.messages[0].author
-    if (lastAuthor && props.isReply && lastAuthor !== ENV.current_user_id.toString()) {
+    if (
+      lastAuthor &&
+      props.isReply &&
+      lastAuthor._id.toString() !== ENV.current_user_id.toString()
+    ) {
       return [lastAuthor]
     } else {
       const recipients = props.conversationMessage
