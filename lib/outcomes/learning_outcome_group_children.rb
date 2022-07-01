@@ -112,11 +112,7 @@ module Outcomes
 
     def outcome_links(learning_outcome_group_id)
       group_ids = children_ids_with_self(learning_outcome_group_id)
-      relation = ContentTag.active.learning_outcome_links
-                           .where(associated_asset_id: group_ids)
-      # Check that the LearningOutcome the content tag is aligned to is not deleted
-      tag_ids = relation.reject { |tag| LearningOutcome.find(tag.content_id).workflow_state == "deleted" }.map(&:id)
-      ContentTag.where(id: tag_ids)
+      ContentTag.active.learning_outcome_links.where(associated_asset_id: group_ids)
     end
 
     def filter_outcomes(relation, filter)
