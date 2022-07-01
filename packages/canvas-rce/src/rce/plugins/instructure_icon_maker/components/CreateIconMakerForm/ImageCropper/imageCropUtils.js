@@ -19,6 +19,7 @@
 import round from 'round'
 import {buildShapeMask} from './svg/shape'
 import {createSvgElement} from './svg/utils'
+import {PREVIEW_HEIGHT} from './constants'
 
 const CLIP_PATH_ID = 'clip-path-for-cropped-image'
 
@@ -67,6 +68,10 @@ const createDefsElement = ({shape, squareDimension}) => {
   return defs
 }
 
+const convertTranslationUnits = (translationPixels, imageHeight) => {
+  return (imageHeight * translationPixels) / PREVIEW_HEIGHT
+}
+
 const createMainSvgGroup = ({imageWidth, imageHeight, squareDimension, settings}) => {
   const mainGroup = createSvgElement('g', {
     'clip-path': `url(#${CLIP_PATH_ID})`
@@ -94,11 +99,13 @@ export const setTransformAttribute = ({
   squareDimension,
   settings
 }) => {
-  const {rotation = 0, scaleRatio = 1.0} = settings
+  const {rotation = 0, scaleRatio = 1.0, translateX = 0, translateY = 0} = settings
   const horizontalCenter = (scaleRatio * imageWidth) / 2
   const verticalCenter = (scaleRatio * imageHeight) / 2
-  const x = round(-horizontalCenter + squareDimension / 2, 2)
-  const y = round(-verticalCenter + squareDimension / 2, 2)
+  const convertedTranslateX = convertTranslationUnits(translateX, imageHeight)
+  const convertedTranslateY = convertTranslationUnits(translateY, imageHeight)
+  const x = round(-horizontalCenter + convertedTranslateX + squareDimension / 2, 2)
+  const y = round(-verticalCenter + convertedTranslateY + squareDimension / 2, 2)
   let value = `translate(${x}, ${y})`
   if (rotation !== 0) {
     // Rotates image using its center as pivot

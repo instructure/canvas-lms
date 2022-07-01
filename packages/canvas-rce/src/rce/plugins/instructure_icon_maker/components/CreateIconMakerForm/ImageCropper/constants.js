@@ -26,11 +26,15 @@ export const MAX_SCALE_RATIO = 2.0
 export const BUTTON_SCALE_STEP = 0.1
 export const WHEEL_SCALE_STEP = 0.005
 export const WHEEL_EVENT_DELAY = 100
+export const KEY_EVENT_DELAY = 100
+export const KEY_EVENT_STEP = 3
 export const BUTTON_ROTATION_DEGREES = 90
 
 export const DEFAULT_CROPPER_SETTINGS = {
   image: null,
   shape: 'square',
   rotation: 0,
-  scaleRatio: MIN_SCALE_RATIO
+  scaleRatio: MIN_SCALE_RATIO,
+  translateX: 0,
+  translateY: 0
 }

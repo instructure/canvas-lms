@@ -293,7 +293,9 @@ describe('ImageSection', () => {
           image: 'data:image/png;base64,asdfasdfjksdf==',
           shape: 'square',
           rotation: 0,
-          scaleRatio: 1.1
+          scaleRatio: 1.1,
+          translateX: 0,
+          translateY: 0
         })
       })
     })
