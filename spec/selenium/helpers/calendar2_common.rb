@@ -271,7 +271,6 @@ module Calendar2Common
   def load_week_view
     get "/calendar2"
     f("#week").click
-    wait_for_ajaximations
   end
 
   def load_month_view
@@ -289,8 +288,18 @@ module Calendar2Common
   # This checks the date in the edit modal, since Week View and Month view events are placed via absolute
   # positioning and there is no other way to verify the elements are on the right date
   def assert_edit_modal_date(due_at)
-    move_to_click(".fc-event")
-    wait_for_ajaximations
+    scroll_to(f(".fc-event"))
+    f(".fc-event").click
+
+    max_attempts = 8
+    num_attempts = 1
+
+    until element_exists?(".event-details-timestring") || num_attempts == max_attempts
+      puts "Attempt #{num_attempts} looking for event element"
+      scroll_to(f(".fc-event"))
+      f(".fc-event").click
+      num_attempts += 1
+    end
     expect(f(".event-details-timestring")).to include_text(format_date_for_view(due_at))
   end
 

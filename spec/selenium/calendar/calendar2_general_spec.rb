@@ -290,8 +290,6 @@ describe "calendar2" do
     end
 
     it "graded discussion appears on all calendars", priority: "1" do
-      skip("LS-1257 - 7/29/2020")
-
       create_graded_discussion
 
       # Even though graded discussion overwrites its assignment's title, less fragile to grab discussion's title
@@ -299,8 +297,6 @@ describe "calendar2" do
     end
 
     it "event appears on all calendars", priority: "1" do
-      skip("LS-1257 - 7/29/2020")
-
       title = "loom"
       due_time = 5.minutes.from_now
       @course.calendar_events.create!(title: title, start_at: due_time)
@@ -309,8 +305,6 @@ describe "calendar2" do
     end
 
     it "assignment appears on all calendars", priority: "1" do
-      skip("LS-1257 - 7/29/2020")
-
       title = "Zak McKracken"
       due_time = 5.minutes.from_now
       @assignment = @course.assignments.create!(name: title, due_at: due_time)
@@ -319,8 +313,6 @@ describe "calendar2" do
     end
 
     it "quiz appears on all calendars", priority: "1" do
-      skip("LS-1257 - 7/29/2020")
-
       create_quiz
 
       assert_views(@quiz.title, @quiz.due_at)
