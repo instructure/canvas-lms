@@ -531,6 +531,17 @@ describe SectionsController, type: :request do
         expect(json["id"]).to eq @section.id
       end
 
+      it "does not update sis sticky fields if override_sis_stickiness set to false" do
+        json = api_call(:put, "#{@path_prefix}/#{@section.id}", @path_params.merge(id: @section.to_param), { course_section: { name: "New Name", start_at: "2012-01-01T01:00Z", end_at: "2012-07-01T01:00Z", restrict_enrollments_to_section_dates: "1" }, override_sis_stickiness: false })
+        expect(json["id"]).to eq @section.id
+        @section.reload
+        expect(@section.name).to eq "Test Section"
+        expect(@section.sis_source_id).to eq "SISsy"
+        expect(@section.start_at).to be_nil
+        expect(@section.end_at).to be_nil
+        expect(@section.restrict_enrollments_to_section_dates).to be_truthy
+      end
+
       it "fails if the section is deleted" do
         @section.destroy
         api_call(:put, "#{@path_prefix}/#{@section.id}", @path_params.merge(id: @section.to_param),
