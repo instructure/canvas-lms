@@ -268,6 +268,10 @@ class SectionsController < ApplicationController
   # @argument course_section[restrict_enrollments_to_section_dates] [Boolean]
   #   Set to true to restrict user enrollments to the start and end dates of the section.
   #
+  # @argument override_sis_stickiness [boolean]
+  #   By default and when the value is true it updates all the fields
+  #   when the value is false then fields which in stuck_sis_fields will not be updated
+  #
   # @returns Section
   def update
     params[:course_section] ||= {}
@@ -359,6 +363,14 @@ class SectionsController < ApplicationController
   protected
 
   def course_section_params
-    params[:course_section] ? params[:course_section].permit(:name, :start_at, :end_at, :restrict_enrollments_to_section_dates) : {}
+    if params[:course_section]
+      if params[:override_sis_stickiness] && !value_to_boolean(params[:override_sis_stickiness])
+        params[:course_section].permit(:restrict_enrollments_to_section_dates)
+      else
+        params[:course_section].permit(:name, :start_at, :end_at, :restrict_enrollments_to_section_dates)
+      end
+    else
+      {}
+    end
   end
 end
