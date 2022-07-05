@@ -30,6 +30,8 @@ import genericSelectOptionsTemplate from '../../jst/genericSelectOptions.handleb
 import datePickerFormat from '@canvas/datetime/datePickerFormat'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import withinMomentDates from '../../momentDateHelper'
+import tz from '@canvas/timezone'
+import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
 import '@canvas/datetime'
 import '@canvas/forms/jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
@@ -50,7 +52,7 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
       postToSISName: ENV.SIS_NAME,
       postToSIS:
         this.event.eventType === 'assignment' ? this.event.assignment.post_to_sis : undefined,
-      datePickerFormat: this.event.allDay ? 'medium_with_weekday' : 'full_with_weekday',
+      datePickerFormat: 'medium_with_weekday',
       important_dates: this.event.important_dates
     })
     this.currentContextInfo = null
@@ -133,6 +135,18 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
       .html(genericSelectOptionsTemplate(assignmentGroupsSelectOptionsInfo))
     // Only show important date checkbox if selected context is k5 subject
     this.$el.find('#important_dates').toggle(this.currentContextInfo.k5_course)
+    // Set default due time if a value is set
+    if (this.currentContextInfo.default_due_time) {
+      const currentDate = moment(this.$el.find('#assignment_due_at').val())
+      const [hour, minute, second] = this.currentContextInfo.default_due_time.split(':')
+      currentDate.set({hour, minute, second})
+      if (currentDate.isValid()) {
+        this.$el
+          .find('#assignment_due_at')
+          .val(tz.format(fcUtil.unwrap(currentDate), 'date.formats.full_with_weekday'))
+          .change()
+      }
+    }
 
     // Update the edit and more options links with the new context
     this.$el.attr('action', this.currentContextInfo.create_assignment_url)
@@ -300,11 +314,7 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
     const $field = this.$el.find('.datetime_field')
     return $field.datetime_field({
       datepicker: {
-        dateFormat: datePickerFormat(
-          this.event.allDay
-            ? I18n.t('#date.formats.medium_with_weekday')
-            : I18n.t('#date.formats.full_with_weekday')
-        )
+        dateFormat: datePickerFormat(I18n.t('#date.formats.medium_with_weekday'))
       }
     })
   }
