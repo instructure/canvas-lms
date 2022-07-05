@@ -143,7 +143,7 @@ const isScored = (assignment: Assignment) =>
   ['points', 'percent', 'letter_grade', 'gpa_scale'].includes(assignment.gradingType)
 
 const isReassignable = (assignment: Assignment) =>
-  (assignment.allowedAttempts == -1 || assignment.allowedAttempts > 1) &&
+  (assignment.allowedAttempts === -1 || assignment.allowedAttempts > 1) &&
   assignment.dueDate != null &&
   !assignment.submissionTypes.includes(
     'on_paper' || 'external_tool' || 'none' || 'discussion_topic' || 'online_quiz'
@@ -218,7 +218,7 @@ function filterStudents(criterion, students, cutoff) {
         }
         break
       case 'marked_incomplete':
-        if (student.grade == 'incomplete') {
+        if (student.grade === 'incomplete') {
           newfilteredStudents.push(student)
         }
         break
@@ -232,6 +232,32 @@ function filterStudents(criterion, students, cutoff) {
   return newfilteredStudents
 }
 
+function defaultSubject(criterion, assignment, cutoff) {
+  if (cutoff === '') {
+    cutoff = 0
+  }
+  switch (criterion) {
+    case 'unsubmitted':
+      return I18n.t('No submission for %{assignment}', {assignment: assignment.name})
+    case 'ungraded':
+      return I18n.t('No grade for %{assignment}', {assignment: assignment.name})
+    case 'scored_more_than':
+      return I18n.t('Scored more than %{cutoff} on %{assignment}', {
+        cutoff,
+        assignment: assignment.name
+      })
+    case 'scored_less_than':
+      return I18n.t('Scored less than %{cutoff} on %{assignment}', {
+        cutoff,
+        assignment: assignment.name
+      })
+    case 'marked_incomplete':
+      return I18n.t('%{assignment} is incomplete', {assignment: assignment.name})
+    case 'reassigned':
+      return I18n.t('%{assignment} is reassigned', {assignment: assignment.name})
+  }
+}
+
 const MessageStudentsWhoDialog: React.FC<Props> = ({
   assignment,
   onClose,
@@ -243,7 +269,6 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [open, setOpen] = useState(true)
   const [sending, setSending] = useState(false)
-  const [subject, setSubject] = useState('')
   const [message, setMessage] = useState('')
 
   const initializeSelectedObservers = studentCollection =>
@@ -294,6 +319,9 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
   const sortedStudents = [...students].sort((a, b) => a.sortableName.localeCompare(b.sortableName))
   const [filteredStudents, setFilteredStudents] = useState(
     filterStudents(availableCriteria[0], sortedStudents, cutoff)
+  )
+  const [subject, setSubject] = useState(
+    defaultSubject(availableCriteria[0].value, assignment, cutoff)
   )
   const [observersDisplayed, setObserversDisplayed] = useState(0.0)
 
@@ -372,6 +400,7 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
       setObserversDisplayed(
         observerCount(filterStudents(newCriterion, sortedStudents, cutoff), observersByStudentID)
       )
+      setSubject(defaultSubject(newCriterion.value, assignment, cutoff))
     }
   }
 
@@ -533,6 +562,7 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
                     setCutoff(value)
                     if (value !== '') {
                       setFilteredStudents(filterStudents(selectedCriterion, sortedStudents, value))
+                      setSubject(defaultSubject(selectedCriterion.value, assignment, value))
                     }
                   }}
                   showArrows={false}

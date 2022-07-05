@@ -169,7 +169,7 @@ function expectToBeUnselected(cell) {
   expect(unselectedElement).toBeInTheDocument()
 }
 
-describe.skip('MessageStudentsWhoDialog', () => {
+describe('MessageStudentsWhoDialog', () => {
   it('hides the list of students and observers initially', async () => {
     const mocks = await makeMocks()
 
@@ -227,8 +227,8 @@ describe.skip('MessageStudentsWhoDialog', () => {
     expect(observerCells[0]).toHaveTextContent('Observers')
     expect(observerCells[1]).toHaveTextContent('Observer0')
     expect(observerCells[2]).toHaveTextContent('Observer1')
-    expect(observerCells[3]).toBeNull()
-    expect(observerCells[4]).toBeNull()
+    expect(observerCells[3]).toHaveTextContent('')
+    expect(observerCells[4]).toHaveTextContent('')
   })
 
   it('shows observers in the same cell sorted by the sortable name when observing the same student', async () => {
@@ -249,9 +249,9 @@ describe.skip('MessageStudentsWhoDialog', () => {
     expect(observerCells).toHaveLength(5)
     expect(observerCells[0]).toHaveTextContent('Observers')
     expect(observerCells[1]).toHaveTextContent('Observer0Observer1')
-    expect(observerCells[2]).toBeNull()
-    expect(observerCells[3]).toBeNull()
-    expect(observerCells[4]).toBeNull()
+    expect(observerCells[2]).toHaveTextContent('')
+    expect(observerCells[3]).toHaveTextContent('')
+    expect(observerCells[4]).toHaveTextContent('')
   })
 
   it('includes the total number of students in the checkbox label', async () => {
@@ -641,6 +641,62 @@ describe.skip('MessageStudentsWhoDialog', () => {
     })
   })
 
+  describe('default subject', () => {
+    it('is set to the first criteria that is listed upon opening the modal', async () => {
+      const mocks = await makeMocks()
+      const {findByTestId} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <MessageStudentsWhoDialog {...makeProps()} />
+        </MockedProvider>
+      )
+
+      const subjectInput = await findByTestId('subject-input')
+      expect(subjectInput).toHaveValue('No submission for A pointed assignment')
+    })
+
+    it('is updated when a new criteria is selected', async () => {
+      const mocks = await makeMocks()
+      const {findByLabelText, getByText, findByTestId} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <MessageStudentsWhoDialog {...makeProps()} />
+        </MockedProvider>
+      )
+
+      const button = await findByLabelText(/For students who/)
+      fireEvent.click(button)
+      fireEvent.click(getByText(/Have not been graded/))
+
+      const subjectInput = await findByTestId('subject-input')
+      expect(subjectInput).toHaveValue('No grade for A pointed assignment')
+    })
+
+    it('is updated to represent the cutoff input when scored more/less than criteria is selected', async () => {
+      const mocks = await makeMocks()
+      const {findByLabelText, getByText, findByTestId, getByLabelText} = render(
+        <MockedProvider mocks={mocks} cache={createCache()}>
+          <MessageStudentsWhoDialog {...makeProps()} />
+        </MockedProvider>
+      )
+
+      const button = await findByLabelText(/For students who/)
+      fireEvent.click(button)
+      fireEvent.click(getByText(/Scored more than/))
+
+      const subjectInput = await findByTestId('subject-input')
+      expect(subjectInput).toHaveValue('Scored more than 0 on A pointed assignment')
+
+      const cutoffInput = await getByLabelText('Enter score cutoff')
+      fireEvent.change(cutoffInput, {target: {value: '5'}})
+
+      expect(subjectInput).toHaveValue('Scored more than 5 on A pointed assignment')
+
+      fireEvent.click(button)
+      fireEvent.click(getByText(/Scored less than/))
+
+      expect(subjectInput).toHaveValue('Scored less than 5 on A pointed assignment')
+    })
+  })
+
   describe('students selection', () => {
     beforeEach(() => {
       students[0].submittedAt = undefined
@@ -978,7 +1034,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       fireEvent.change(messageTextArea, {target: {value: ''}})
 
       const sendButton = await findByRole('button', {name: 'Send'})
-      expect(sendButton.disabled).toBe(true)
+      expect(sendButton).toBeDisabled()
     })
 
     it('is disabled when the message body has only whitespaces', async () => {
@@ -997,7 +1053,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       fireEvent.change(messageTextArea, {target: {value: '   '}})
 
       const sendButton = await findByRole('button', {name: 'Send'})
-      expect(sendButton.disabled).toBe(true)
+      expect(sendButton).toBeDisabled()
     })
 
     it('is disabled when there are no students/observers selected', async () => {
@@ -1016,7 +1072,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       fireEvent.click(checkbox)
 
       const sendButton = await findByRole('button', {name: 'Send'})
-      expect(sendButton.disabled).toBe(true)
+      expect(sendButton).toBeDisabled()
     })
 
     it('is enabled when the message body is not empty and there is at least one student/observer selected', async () => {
@@ -1035,7 +1091,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       fireEvent.change(messageTextArea, {target: {value: 'FOO BAR'}})
 
       const sendButton = await findByRole('button', {name: 'Send'})
-      expect(sendButton.disabled).toBe(false)
+      expect(sendButton).not.toBeDisabled()
     })
   })
 
@@ -1156,7 +1212,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const sendButton = await findByRole('button', {name: 'Send'})
       fireEvent.click(sendButton)
 
-      const observerIds = mocks[0].result.data.course.enrollmentsConnection.nodes.map(
+      const observerIds = mocks[0].result.data?.course.enrollmentsConnection.nodes.map(
         node => node.user._id
       )
       expect(onSend).toHaveBeenCalledWith(expect.objectContaining({recipientsIds: observerIds}))
