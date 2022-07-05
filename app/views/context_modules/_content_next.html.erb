@@ -66,7 +66,7 @@
           <%= t('#context_modules.buttons.add_module', 'Module') %>
         </button>
       <% end %>
-      <% if @menu_tools[:module_index_menu].present? || @menu_tools[:module_index_menu_modal].present? %>
+      <% if @context.grants_right?(@current_user, session, :manage_content) && (@menu_tools[:module_index_menu].present? || @menu_tools[:module_index_menu_modal].present?) %>
         <div class="inline-block module_index_tools">
           <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
             <i class="icon-more" aria-hidden="true"></i>
@@ -151,7 +151,7 @@
         <tr>
           <td><label for="content_tag_indent_select"><%= before_label('indent', %{Indent}) %></label></td>
           <td>
-            <select name="content_tag[indent]" id="content_tag_indent_select"">
+            <select name="content_tag[indent]" id="content_tag_indent_select">
               <% 0.upto(3) do |i| %>
                 <option value="<%= i %>"><%= t('indent.n', { :zero => %{Don't Indent}, :one => %{Indent 1 Level}, :other => %{Indent %{count} Levels} }, :count => i) %></option>
               <% end %>

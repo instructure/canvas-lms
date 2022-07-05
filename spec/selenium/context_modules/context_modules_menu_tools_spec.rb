@@ -231,5 +231,68 @@ describe "context modules" do
       link = f("#context_module_item_#{new_tag.id} li.ui-menu-item a.menu_tool_link")
       expect(link).not_to be_displayed
     end
+
+    context "visibility for roles" do
+      before do
+        @tool.module_index_menu_modal = { enabled: true, message_type: "LtiResourceLinkRequest" }
+        @tool.save!
+      end
+
+      shared_examples "does not show the module_index_tools menu" do
+        it "in the modules Page" do
+          get "/courses/#{@course.id}/modules"
+          expect(f(".header-bar-right__buttons")).not_to contain_css(".module_index_tools")
+        end
+
+        it "in the course home page" do
+          get "/courses/#{@course.id}"
+          expect(f(".header-bar-right__buttons")).not_to contain_css(".module_index_tools")
+        end
+      end
+
+      shared_examples "shows the module_index_tools menu" do
+        it "in the modules Page" do
+          get "/courses/#{@course.id}/modules"
+          expect(f(".header-bar-right__buttons")).to contain_css(".module_index_tools")
+          expect(f(".module_index_tools")).to be_displayed
+        end
+
+        it "in the course home page" do
+          get "/courses/#{@course.id}"
+          expect(f(".header-bar-right__buttons")).to contain_css(".module_index_tools")
+          expect(f(".module_index_tools")).to be_displayed
+        end
+      end
+
+      context "when the user is a student" do
+        before { user_session(student_in_course(course: @course, name: "student", active_all: true).user) }
+
+        it_behaves_like "does not show the module_index_tools menu"
+      end
+
+      context "when the user is a observer" do
+        before { user_session(observer_in_course(course: @course, name: "observer", active_all: true).user) }
+
+        it_behaves_like "does not show the module_index_tools menu"
+      end
+
+      context "when the user is a teacher" do
+        before { user_session(teacher_in_course(course: @course, name: "teacher", active_all: true).user) }
+
+        it_behaves_like "shows the module_index_tools menu"
+      end
+
+      context "when the user is a ta" do
+        before { user_session(ta_in_course(course: @course, name: "ta", active_all: true).user) }
+
+        it_behaves_like "shows the module_index_tools menu"
+      end
+
+      context "when the user is a designer" do
+        before { user_session(designer_in_course(course: @course, name: "designer", active_all: true).user) }
+
+        it_behaves_like "shows the module_index_tools menu"
+      end
+    end
   end
 end
