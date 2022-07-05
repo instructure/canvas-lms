@@ -24,13 +24,7 @@ import OutcomeHeader from './OutcomeHeader'
 import StudentHeader from './StudentHeader'
 import ScoresGrid from './ScoresGrid'
 import {studentShape, outcomeShape, studentRollupsShape} from './shapes'
-import {
-  MAX_GRID_WIDTH,
-  COLUMN_WIDTH,
-  STUDENT_COLUMN_RIGHT_PADDING,
-  COLUMN_PADDING,
-  CELL_HEIGHT
-} from './constants'
+import {COLUMN_WIDTH, STUDENT_COLUMN_RIGHT_PADDING, COLUMN_PADDING, CELL_HEIGHT} from './constants'
 
 const Gradebook = ({courseId, students, outcomes, rollups}) => {
   const headerRow = useRef(null)
@@ -55,7 +49,6 @@ const Gradebook = ({courseId, students, outcomes, rollups}) => {
           as="div"
           display="flex"
           id="outcomes-header"
-          maxWidth={MAX_GRID_WIDTH}
           overflowX="hidden"
           elementRef={el => (headerRow.current = el)}
         >
@@ -89,8 +82,6 @@ const Gradebook = ({courseId, students, outcomes, rollups}) => {
           overflowY="auto"
           elementRef={el => (gridRef.current = el)}
           width={outcomes.length * COLUMN_WIDTH}
-          maxWidth={MAX_GRID_WIDTH}
-          maxHeight={CELL_HEIGHT * students.length}
         >
           <ScoresGrid students={students} outcomes={outcomes} rollups={rollups} />
         </View>
