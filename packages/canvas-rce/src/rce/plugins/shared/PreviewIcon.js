@@ -38,8 +38,7 @@ const PreviewIcon = ({color, testId, variant, image, loading, checkered}) => {
         backgroundImage: `url(${image})`,
         backgroundSize: 'contain',
         backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center',
-        borderRadius: '8px'
+        backgroundPosition: 'center'
       }
     }
 
