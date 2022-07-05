@@ -95,7 +95,7 @@ export default function generator({borders, colors, forms, shadows, spacing, typ
   return vars
 }
 
-generator.canvas = function(variables) {
+generator.canvas = function (variables) {
   return {
     canvasLinkColor: variables['ic-link-color'],
     canvasLinkDecoration: variables['ic-link-decoration'],
@@ -116,11 +116,12 @@ generator.canvas = function(variables) {
   }
 }
 
-generator['canvas-a11y'] = generator['canvas-high-contrast'] = function({colors}) {
+generator['canvas-a11y'] = generator['canvas-high-contrast'] = function ({colors}) {
   return {
     canvasButtonBackground: colors.backgroundLight,
     canvasSecondaryButtonBorderColor: colors.borderMedium,
     canvasLinkDecoration: 'underline',
+    canvasFocusBorderColor: colors.borderBrand,
     canvasFocusBoxShadow: `0 0 0 2px ${colors.brand}`,
     canvasBrandColor: colors.brand
   }
