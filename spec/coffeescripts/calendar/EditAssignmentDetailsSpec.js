@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import EditAssignmentDetails from 'ui/features/calendar/backbone/views/EditAssignmentDetails.js'
 import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
@@ -100,9 +99,9 @@ const nameLengthHelper = function (
     []
   )
 }
-test('should initialize input with start date and time', function () {
+test('should initialize input with start date', function () {
   const view = createView(commonEvent(), this.event)
-  equal(view.$('.datetime_field').val(), 'Fri Aug 7, 2015 5:00pm')
+  equal(view.$('.datetime_field').val(), 'Fri Aug 7, 2015')
 })
 
 test('should have blank input when no start date', function () {
@@ -126,7 +125,7 @@ test('should treat start date as fudged', function () {
     formats: getI18nFormats()
   })
   const view = createView(commonEvent(), this.event)
-  equal(view.$('.datetime_field').val(), 'Fri Aug 7, 2015 1:00pm')
+  equal(view.$('.datetime_field').val(), 'Fri Aug 7, 2015')
 })
 
 test('should localize start date', function () {
@@ -135,13 +134,13 @@ test('should localize start date', function () {
     momentLocale: 'fr',
     formats: {
       'date.formats.full_with_weekday': '%a %-d %b %Y %-k:%M',
-      'date.formats.medium': '%a %-d %b %Y %-k:%M',
+      'date.formats.medium_with_weekday': '%a %-d %b %Y',
       'date.month_names': ['août'],
       'date.abbr_month_names': ['août']
     }
   })
   const view = createView(commonEvent(), this.event)
-  equal(view.$('.datetime_field').val(), 'ven. 7 août 2015 17:00')
+  equal(view.$('.datetime_field').val(), 'ven. 7 août 2015')
 })
 
 test('requires name to save assignment event', function () {
