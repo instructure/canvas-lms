@@ -876,4 +876,57 @@ describe "/gradebooks/grade_summary" do
       end
     end
   end
+
+  describe "update submission unread count when student enters grade summary page" do
+    before do
+      course_with_teacher active_all: true
+      student_in_course active_all: true
+    end
+
+    context "when Assignment Enhancement - Student feature flag is enabled" do
+      before do
+        @course.enable_feature!(:assignments_2_student)
+        view_context(@course, @student)
+        assign(:presenter, GradeSummaryPresenter.new(@course, @student, @student.id))
+      end
+
+      it "unread count goes to 0 when student enters grade summary page" do
+        assignment1 = @course.assignments.create!(title: "Assignment 1")
+        assignment2 = @course.assignments.create!(title: "Assignment 2")
+        assignment1.grade_student(@student, grade: 10, grader: @teacher)
+        assignment2.grade_student(@student, grade: 10, grader: @teacher)
+        render "gradebooks/grade_summary"
+        cpc = ContentParticipationCount.create_or_update(context: @course, user: @student, content_type: "Submission")
+        expect(cpc.unread_count).to eq 0
+      end
+
+      it "unread count increments after student views grade summary page and followed by the teacher grading an existing assignment" do
+        assignment1 = @course.assignments.create!(title: "Assignment 1")
+        assignment2 = @course.assignments.create!(title: "Assignment 2")
+        assignment1.grade_student(@student, grade: 10, grader: @teacher)
+        assignment2.grade_student(@student, grade: 10, grader: @teacher)
+        render "gradebooks/grade_summary"
+        assignment1.grade_student(@student, grade: 60, grader: @teacher)
+        cpc = ContentParticipationCount.create_or_update(context: @course, user: @student, content_type: "Submission")
+        expect(cpc.unread_count).to eq 1
+      end
+    end
+
+    context "when Assignment Enhancement - Student feature flag is disabled" do
+      before do
+        view_context(@course, @student)
+        assign(:presenter, GradeSummaryPresenter.new(@course, @student, @student.id))
+      end
+
+      it "unread count is 2 when student enters grade summary page" do
+        assignment1 = @course.assignments.create!(title: "Assignment 1")
+        assignment2 = @course.assignments.create!(title: "Assignment 2")
+        assignment1.grade_student(@student, grade: 10, grader: @teacher)
+        assignment2.grade_student(@student, grade: 10, grader: @teacher)
+        render "gradebooks/grade_summary"
+        cpc = ContentParticipationCount.create_or_update(context: @course, user: @student, content_type: "Submission")
+        expect(cpc.unread_count).to eq 2
+      end
+    end
+  end
 end
