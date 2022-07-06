@@ -33,6 +33,7 @@ module BroadcastPolicies
         allow(a).to receive(:context).and_return(course)
         allow(a).to receive(:published?).and_return(true)
         allow(a).to receive(:context_id).and_return(course.id)
+        allow(a).to receive(:quiz_lti?).and_return(false)
       end
     end
     let(:enrollment) do
@@ -117,6 +118,41 @@ module BroadcastPolicies
       specify { wont_send_when { allow(submission).to receive(:submitted?).and_return false } }
       specify { wont_send_when { allow(submission).to receive(:late?).and_return true } }
       specify { wont_send_when { allow(policy).to receive(:is_a_resubmission?).and_return true } }
+
+      context "with a new quizzes assignment" do
+        subject { policy.should_dispatch_assignment_submitted? }
+
+        before do
+          allow(assignment).to receive(:quiz_lti?).and_return(true)
+          allow(submission).to receive(:saved_change_to_url?).and_return(false)
+        end
+
+        context "and the submission transitions from 'unsubmitted' -> 'submitted'" do
+          before do
+            allow(submission).to receive(:saved_change_to_workflow_state).and_return(
+              [
+                Submission.workflow_states.unsubmitted,
+                Submission.workflow_states.submitted
+              ]
+            )
+          end
+
+          it { is_expected.to eq true }
+        end
+
+        context "and the submissions does not transition from 'unsubmitted' -> 'submitted'" do
+          before do
+            allow(submission).to receive(:saved_change_to_workflow_state).and_return(
+              [
+                Submission.workflow_states.pending_review,
+                Submission.workflow_states.submitted
+              ]
+            )
+          end
+
+          it { is_expected.to eq false }
+        end
+      end
     end
 
     describe "#should_dispatch_assignment_resubmitted" do
@@ -138,6 +174,75 @@ module BroadcastPolicies
       specify { wont_send_when { allow(submission).to receive(:submitted?).and_return false } }
       specify { wont_send_when { allow(submission).to receive(:has_submission?).and_return false } }
       specify { wont_send_when { allow(submission).to receive(:late?).and_return true } }
+
+      context "with a new quizzes assignment" do
+        subject { policy.should_dispatch_assignment_resubmitted? }
+
+        before do
+          allow(assignment).to receive(:quiz_lti?).and_return(true)
+        end
+
+        context "when no changes were made to the URL" do
+          before { allow(submission).to receive(:saved_change_to_url?).and_return(false) }
+
+          it { is_expected.to eq false }
+        end
+
+        context "when a change was made to the URL" do
+          before do
+            allow(submission).to receive(:saved_change_to_url?).and_return(true)
+
+            allow(submission).to receive(:url).and_return(
+              "http://quiz-lti.docker/lti/launch?participant_session_id=85&quiz_session_id=53"
+            )
+          end
+
+          context "and the submission is the first submission" do
+            before do
+              allow(submission).to receive(:saved_change_to_url).and_return(
+                [
+                  nil,
+                  submission.url
+                ]
+              )
+            end
+
+            it { is_expected.to eq false }
+          end
+
+          context "and the submission is a re-submission" do
+            before do
+              allow(submission).to receive(:saved_change_to_url).and_return(
+                ["http://quiz-lti.docker/lti/launch?participant_session_id=84&quiz_session_id=52", submission.url]
+              )
+            end
+
+            context "and the URL has been used in submission history" do
+              before do
+                allow(submission).to receive(:submission_history).and_return(
+                  [
+                    double("Submission", url: submission.url)
+                  ]
+                )
+              end
+
+              it { is_expected.to eq false }
+            end
+
+            context "and the URL has not been used in submission history" do
+              before do
+                allow(submission).to receive(:submission_history).and_return(
+                  [
+                    double("Submission", url: "http://quiz-lti.docker/lti/launch?participant_session_id=83&quiz_session_id=51")
+                  ]
+                )
+              end
+
+              it { is_expected.to eq true }
+            end
+          end
+        end
+      end
     end
 
     describe "#should_dispatch_group_assignment_submitted_late?" do
