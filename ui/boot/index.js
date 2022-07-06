@@ -29,6 +29,12 @@ import {up as activateCourseMenuToggler} from './initializers/activateCourseMenu
 import {up as enhanceUserContent} from './initializers/enhanceUserContent'
 import {isolate} from '@canvas/sentry'
 
+// Import is required, workaround for ARC-8398
+// eslint-disable-next-line import/no-nodejs-modules
+import {Buffer} from 'buffer'
+
+window.Buffer = Buffer
+
 try {
   initSentry()
 } catch (e) {
