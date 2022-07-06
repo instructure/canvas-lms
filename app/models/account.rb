@@ -480,6 +480,19 @@ class Account < ActiveRecord::Base
     conditional_release[:value]
   end
 
+  def update_conditional_release(conditional_release_params = conditional_release)
+    # We can optionally pass in a hash of conditional_release_params that are being used to update the account to
+    # properly trigger events during account updates or controller actions. Without the hash we default to the
+    # current settings values
+    enabled = Canvas::Plugin.value_to_boolean(conditional_release_params[:value])
+    courses.find_each(&:disable_conditional_release) unless enabled
+    # We need to have the subaccounts update their conditional release statuses as well because of the inheritance
+    # from the root account can change the state of the subaccount
+    sub_accounts.find_each do |sub_account|
+      sub_account.delay_if_production(priority: Delayed::LOW_PRIORITY).update_conditional_release
+    end
+  end
+
   def open_registration?
     !!settings[:open_registration] && canvas_authentication?
   end
@@ -1003,7 +1016,7 @@ class Account < ActiveRecord::Base
     chain
   end
 
-  def self.account_chain_ids(starting_account_id)
+  def self.account_chain_ids(starting_account_id, include_federated_parent_id: false)
     block = lambda do |_name|
       original_shard = Shard.current
       Shard.shard_for(starting_account_id).activate do
@@ -1030,7 +1043,9 @@ class Account < ActiveRecord::Base
       end
     end
     key = Account.cache_key_for_id(starting_account_id, :account_chain)
-    key ? Rails.cache.fetch(["account_chain_ids", key], &block) : block.call(nil)
+    result = key ? Rails.cache.fetch(["account_chain_ids", key], &block) : block.call(nil)
+    Account.add_federated_parent_id_to_chain!(result) if include_federated_parent_id
+    result
   end
 
   def self.multi_account_chain_ids(starting_account_ids)
@@ -1049,6 +1064,10 @@ class Account < ActiveRecord::Base
   end
 
   def self.add_federated_parent_to_chain!(chain)
+    chain
+  end
+
+  def self.add_federated_parent_id_to_chain!(chain)
     chain
   end
 
@@ -1078,8 +1097,8 @@ class Account < ActiveRecord::Base
     @account_chain
   end
 
-  def account_chain_ids
-    @cached_account_chain_ids ||= Account.account_chain_ids(self)
+  def account_chain_ids(include_federated_parent_id: false)
+    @cached_account_chain_ids ||= Account.account_chain_ids(self, include_federated_parent_id: include_federated_parent_id)
   end
 
   def account_chain_loop

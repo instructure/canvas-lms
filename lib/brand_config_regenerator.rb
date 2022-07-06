@@ -72,7 +72,11 @@ class BrandConfigRegenerator
           result.concat(SharedBrandConfig.where(account_id: root_scope).preload(:brand_config))
         end
 
-        sub_scope = Account.active.where(root_account_id: [root_scope&.pluck(:id), Shard.current == @account.shard ? @account.id : nil].compact.flatten).preload(:brand_config)
+        sub_scope = if @account.root_account?
+                      Account.active.where(root_account_id: [root_scope&.pluck(:id), Shard.current == @account.shard ? @account.id : nil].compact.flatten).preload(:brand_config)
+                    else
+                      Account.active.where(id: Account.sub_account_ids_recursive(@account.id))
+                    end
         result.concat(sub_scope.where.not(brand_config_md5: nil))
         result.concat(SharedBrandConfig.where(account_id: sub_scope).preload(:brand_config))
       end

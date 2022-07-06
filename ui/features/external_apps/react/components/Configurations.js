@@ -22,6 +22,8 @@ import PropTypes from 'prop-types'
 import Header from './Header'
 import ExternalToolsTable from './ExternalToolsTable'
 import AddExternalToolButton from './AddExternalToolButton'
+import {Button} from '@instructure/ui-buttons'
+import {View} from '@instructure/ui-view'
 import page from 'page'
 
 const I18n = useI18nScope('external_tools')
@@ -55,9 +57,11 @@ export default class Configurations extends React.Component {
       }
       const baseUrl = page.base()
       return (
-        <a ref="appCenterLink" href={baseUrl} className="btn view_tools_link lm">
-          {I18n.t('View App Center')}
-        </a>
+        <View>
+          <Button margin="x-small" href={baseUrl}>
+            {I18n.t('View App Center')}
+          </Button>
+        </View>
       )
     }
 

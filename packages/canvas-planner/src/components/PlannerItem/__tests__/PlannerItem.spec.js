@@ -722,7 +722,7 @@ describe('with simplifiedControls', () => {
 
   it('renders the title link in licorice', () => {
     const wrapper = shallow(<PlannerItem {...props} />)
-    const titleLink = wrapper.find('.PlannerItem-styles__title Button')
+    const titleLink = wrapper.find('Link')
     expect(titleLink.prop('theme').linkColor).toBe('#2D3B45')
   })
 

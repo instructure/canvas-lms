@@ -23,7 +23,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {CondensedButton, IconButton} from '@instructure/ui-buttons'
 import {Table} from '@instructure/ui-table'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {IconTrashLine} from '@instructure/ui-icons'
@@ -186,12 +186,12 @@ export default class ProficiencyRating extends React.Component {
               isShowingContent={this.state.showColorPopover}
               onToggle={this.handleMenuToggle}
               renderTrigger={
-                <Button ref={this.setColorRef} variant="link">
+                <CondensedButton ref={this.setColorRef}>
                   <div>
                     <span className="colorPickerIcon" style={{background: formatColor(color)}} />
                     {I18n.t('Change')}
                   </div>
-                </Button>
+                </CondensedButton>
               }
             >
               <ColorPicker

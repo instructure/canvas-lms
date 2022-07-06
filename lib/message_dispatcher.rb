@@ -19,6 +19,9 @@
 #
 
 class MessageDispatcher < Delayed::PerformableMethod
+  class MessagesInBatchNotFound < StandardError
+  end
+
   DeliverWorker = Struct.new(:message) do
     def perform
       message.for_queue.deliver
@@ -88,12 +91,13 @@ class MessageDispatcher < Delayed::PerformableMethod
         message_ids << m.id
         previous_time = m.created_at
       end
-      raise ActiveRecord::RecordNotFound unless messages.length == queued.length
+      raise MessagesInBatchNotFound, "IDs not found: #{queued.map(&:id) - messages.map(&:id)}" unless messages.length == queued.length
     end
     messages.each do |message|
       message.deliver
     rescue
       # this delivery failed, we'll have to make an individual job to retry
+
       dispatch(message)
     end
   end

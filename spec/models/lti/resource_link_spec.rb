@@ -23,7 +23,8 @@ RSpec.describe Lti::ResourceLink, type: :model do
   let(:course) { Course.create!(name: "Course") }
   let(:assignment) { Assignment.create!(course: course, name: "Assignment") }
   let(:resource_link) do
-    Lti::ResourceLink.create!(context_external_tool: tool, context: assignment)
+    Lti::ResourceLink.create!(context_external_tool: tool, context: assignment,
+                              url: "http://www.example.com/launch")
   end
 
   context "relationships" do
@@ -131,14 +132,17 @@ RSpec.describe Lti::ResourceLink, type: :model do
   describe ".find_or_initialize_for_context_and_lookup_uuid" do
     subject do
       described_class.find_or_initialize_for_context_and_lookup_uuid(
-        context: context, context_external_tool: tool, lookup_uuid: lookup_uuid, custom: { "a" => "b" }
+        context: context, context_external_tool: tool,
+        lookup_uuid: lookup_uuid, custom: { "a" => "b" },
+        url: "http://www.example.com/launch"
       )
     end
 
     let(:context) { course }
     let(:tool) { external_tool_1_3_model(context: context) }
     let(:resource_link) do
-      Lti::ResourceLink.create!(context_external_tool: tool, context: course)
+      Lti::ResourceLink.create!(context_external_tool: tool, context: course,
+                                url: "http://www.example.com/launch")
     end
 
     before { resource_link }
@@ -163,6 +167,7 @@ RSpec.describe Lti::ResourceLink, type: :model do
         subject do
           described_class.find_or_initialize_for_context_and_lookup_uuid(
             context: context, context_external_tool_launch_url: tool.url,
+            url: tool.url,
             lookup_uuid: lookup_uuid, custom: { "a" => "b" }
           )
         end

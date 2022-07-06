@@ -35,7 +35,7 @@ export const FieldRequired = Template.bind({})
 FieldRequired.args = {
   messages: [
     {
-      text: 'A message body is required',
+      text: 'Please insert a message body.',
       type: 'error'
     }
   ]

@@ -43,6 +43,8 @@ class GradebookSettingsController < ApplicationController
           grading_period_id
           assignment_group_id
           submissions
+          start_date
+          end_date
         ],
         filter_rows_by: [
           :section_id,

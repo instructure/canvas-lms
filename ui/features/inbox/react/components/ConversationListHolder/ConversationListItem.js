@@ -37,12 +37,16 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {colors} from '@instructure/canvas-theme'
+import {Tooltip} from '@instructure/ui-tooltip'
 
 const I18n = useI18nScope('conversations_2')
 
 export const ConversationListItem = ({...props}) => {
   const [isHovering, setIsHovering] = useState(false)
   const {setMessageOpenEvent, isSubmissionCommentsType} = useContext(ConversationContext)
+  // The TruncateText Component doesn't perform well with more than a few paragraphs of words.
+  // This text length keeps the component working fast
+  const MAX_TEXT_LENGTH = 180
 
   const handleConversationClick = e => {
     e.nativeEvent.stopImmediatePropagation()
@@ -147,25 +151,28 @@ export const ConversationListItem = ({...props}) => {
             <Grid.Row>
               <Grid.Col width="auto">
                 <View textAlign="center" as="div" width={30} height={30} margin="0 small 0 0">
-                  <IconButton
-                    color="primary"
-                    data-testid={props.isUnread ? 'unread-badge' : 'read-badge'}
-                    margin="x-small"
-                    onClick={() =>
-                      props.readStateChangeConversationParticipants({
-                        variables: {
-                          conversationIds: [props.conversation._id],
-                          workflowState: props.isUnread ? 'read' : 'unread'
-                        }
-                      })
-                    }
-                    screenReaderLabel={props.isUnread ? I18n.t('Unread') : I18n.t('Read')}
-                    size="small"
-                    withBackground={false}
-                    withBorder={false}
+                  <Tooltip
+                    renderTip={props.isUnread ? I18n.t('Mark as Read') : I18n.t('Mark as Unread')}
+                    placement="bottom"
                   >
-                    {props.isUnread ? <IconEmptySolid /> : <IconEmptyLine />}
-                  </IconButton>
+                    <IconButton
+                      color="primary"
+                      data-testid={props.isUnread ? 'unread-badge' : 'read-badge'}
+                      margin="x-small"
+                      onClick={e => {
+                        e.stopPropagation()
+                        props.isUnread
+                          ? props.onMarkAsRead(props.conversation._id)
+                          : props.onMarkAsUnread(props.conversation._id)
+                      }}
+                      screenReaderLabel={props.isUnread ? I18n.t('Unread') : I18n.t('Read')}
+                      size="small"
+                      withBackground={false}
+                      withBorder={false}
+                    >
+                      {props.isUnread ? <IconEmptySolid /> : <IconEmptyLine />}
+                    </IconButton>
+                  </Tooltip>
                 </View>
               </Grid.Col>
               <Grid.Col>
@@ -180,7 +187,9 @@ export const ConversationListItem = ({...props}) => {
               </Grid.Col>
               <Grid.Col>
                 <Text weight="normal" size={props.textSize}>
-                  <TruncateText>{props.conversation.subject}</TruncateText>
+                  <TruncateText>
+                    {props.conversation.subject?.slice(0, MAX_TEXT_LENGTH)}
+                  </TruncateText>
                 </Text>
               </Grid.Col>
             </Grid.Row>
@@ -190,48 +199,27 @@ export const ConversationListItem = ({...props}) => {
               </Grid.Col>
               <Grid.Col>
                 <Text color="secondary" size={props.textSize}>
-                  <TruncateText>{props.conversation.lastMessageContent}</TruncateText>
+                  <TruncateText>
+                    {props.conversation.lastMessageContent?.slice(0, MAX_TEXT_LENGTH)}
+                  </TruncateText>
                 </Text>
               </Grid.Col>
               <Grid.Col width="auto">
                 {!isSubmissionCommentsType && (
                   <View textAlign="center" as="div" width={30} height={30} margin="0 small 0 0">
-                    <Focusable>
-                      {({focused}) => {
-                        return (
-                          <div>
-                            {focused || isHovering || props.isStarred ? (
-                              <IconButton
-                                size="small"
-                                withBackground={false}
-                                withBorder={false}
-                                renderIcon={props.isStarred ? IconStarSolid : IconStarLightLine}
-                                screenReaderLabel={
-                                  props.isStarred ? I18n.t('starred') : I18n.t('not starred')
-                                }
-                                onClick={handleConversationStarClick}
-                                data-testid={
-                                  props.isStarred ? 'visible-starred' : 'visible-not-starred'
-                                }
-                              />
-                            ) : (
-                              <ScreenReaderContent>
-                                <IconButton
-                                  size="small"
-                                  withBackground={false}
-                                  withBorder={false}
-                                  renderIcon={props.isStarred ? IconStarSolid : IconStarLightLine}
-                                  screenReaderLabel={
-                                    props.isStarred ? I18n.t('starred') : I18n.t('not starred')
-                                  }
-                                  onClick={handleConversationStarClick}
-                                />
-                              </ScreenReaderContent>
-                            )}
-                          </div>
-                        )
-                      }}
-                    </Focusable>
+                    <div>
+                      <IconButton
+                        size="small"
+                        withBackground={false}
+                        withBorder={false}
+                        renderIcon={props.isStarred ? IconStarSolid : IconStarLightLine}
+                        screenReaderLabel={
+                          props.isStarred ? I18n.t('starred') : I18n.t('not starred')
+                        }
+                        onClick={handleConversationStarClick}
+                        data-testid={props.isStarred ? 'visible-starred' : 'visible-not-starred'}
+                      />
+                    </div>
                   </View>
                 )}
               </Grid.Col>
@@ -285,6 +273,7 @@ ConversationListItem.propTypes = {
   isUnread: PropTypes.bool,
   onSelect: PropTypes.func,
   onStar: PropTypes.func,
-  readStateChangeConversationParticipants: PropTypes.func,
+  onMarkAsRead: PropTypes.func,
+  onMarkAsUnread: PropTypes.func,
   textSize: PropTypes.string
 }

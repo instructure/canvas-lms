@@ -121,7 +121,7 @@ def queueJestDistribution(index) {
       'CI=1',
     ]
 
-    callableWithDelegate(queueTestStage())(stages, "jest${index}", jestEnvVars, 'bundle exec rails graphql:schema && yarn test:jest:build')
+    callableWithDelegate(queueTestStage())(stages, "jest${index}", jestEnvVars, 'yarn test:jest:build')
   }
 }
 
@@ -145,7 +145,7 @@ def queueKarmaDistribution() {
 
 def queuePackagesDistribution() {
   { stages ->
-    callableWithDelegate(queueTestStage())(stages, 'packages', [], 'TEST_RESULT_OUTPUT_DIR=/usr/src/app/$TEST_RESULT_OUTPUT_DIR yarn test:packages:parallel')
+    callableWithDelegate(queueTestStage())(stages, 'packages', ["CANVAS_RCE_PARALLEL=1"], 'TEST_RESULT_OUTPUT_DIR=/usr/src/app/$TEST_RESULT_OUTPUT_DIR yarn test:packages:parallel')
   }
 }
 

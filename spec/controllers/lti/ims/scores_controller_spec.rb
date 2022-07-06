@@ -386,8 +386,9 @@ module Lti::IMS
                 }
               ]
             end
+            let(:submitted_at) { 5.minutes.ago.iso8601(3) }
             let(:params_overrides) do
-              super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items: content_items, new_submission: false })
+              super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items: content_items, new_submission: false, submitted_at: submitted_at }, :scoreGiven => 10, :scoreMaximum => line_item.score_maximum)
             end
             let(:expected_progress_url) do
               "http://test.host/api/lti/courses/#{context_id}/progress/"
@@ -401,13 +402,6 @@ module Lti::IMS
             it "uses submission_type online_upload" do
               send_request
               expect(result.submission.reload.submission_type).to eq "online_upload"
-            end
-
-            it "only submits assignment once" do
-              submission_body = { submitted_at: 1.hour.ago, submission_type: "external_tool" }
-              attempt = result.submission.assignment.submit_homework(user, submission_body).attempt
-              send_request
-              expect(result.submission.reload.attempt).to eq attempt + 1
             end
 
             context "for assignment with attempt limit" do
@@ -453,6 +447,13 @@ module Lti::IMS
             end
 
             shared_examples_for "a file submission" do
+              it "only submits assignment once" do
+                submission_body = { submitted_at: 1.hour.ago, submission_type: "external_tool" }
+                attempt = result.submission.assignment.submit_homework(user, submission_body).attempt
+                send_request
+                expect(result.submission.reload.attempt).to eq attempt + 1
+              end
+
               it "creates an attachment" do
                 send_request
                 attachment = Attachment.last
@@ -471,6 +472,28 @@ module Lti::IMS
               it "calculates content_type from extension" do
                 send_request
                 expect(Attachment.last.content_type).to eq "text/plain"
+              end
+
+              context "with FF on" do
+                before do
+                  Account.root_accounts.first.enable_feature! :ags_scores_file_error_improvements
+                end
+
+                it "sets submitted_at correctly" do
+                  send_request
+                  expect(result.submission.reload.submitted_at).to eq submitted_at
+                end
+              end
+
+              context "with FF off" do
+                before do
+                  Account.root_accounts.first.disable_feature! :ags_scores_file_error_improvements
+                end
+
+                it "ignores submitted_at" do
+                  send_request
+                  expect(result.submission.reload.submitted_at).not_to eq submitted_at
+                end
               end
 
               context "with valid explicit media_type" do
@@ -527,11 +550,65 @@ module Lti::IMS
                 expect(progress_url).to include expected_progress_url
               end
 
+              shared_examples_for "no updates are made with FF on" do
+                before do
+                  Account.root_accounts.first.enable_feature! :ags_scores_file_error_improvements
+                end
+
+                it "does not update submission" do
+                  score = result.submission.score
+                  send_request
+                  expect(result.submission.reload.score).to eq score
+                end
+
+                it "does not update result" do
+                  score = result.result_score
+                  send_request
+                  expect(result.result_score).to eq score
+                end
+
+                it "does not submit assignment" do
+                  submission_body = { submitted_at: 1.hour.ago, submission_type: "external_tool" }
+                  attempt = result.submission.assignment.submit_homework(user, submission_body).attempt
+                  send_request
+                  expect(result.submission.reload.attempt).to eq attempt
+                end
+              end
+
+              shared_examples_for "updates are made with FF off" do
+                before do
+                  Account.root_accounts.first.disable_feature! :ags_scores_file_error_improvements
+                end
+
+                it "updates submission" do
+                  result
+                  send_request
+                  expect(result.submission.reload.score).to eq 10
+                end
+
+                it "updates result" do
+                  result
+                  send_request
+                  expect(result.reload.result_score).to eq 10
+                end
+
+                # since the file upload process submits the assignment when content items are present
+                it "does not submit assignment" do
+                  submission_body = { submitted_at: 1.hour.ago, submission_type: "external_tool" }
+                  attempt = result.submission.assignment.submit_homework(user, submission_body).attempt
+                  send_request
+                  expect(result.submission.reload.attempt).to eq attempt
+                end
+              end
+
               shared_examples_for "a 400" do
                 it "returns bad request" do
                   send_request
                   expect(response).to be_bad_request
                 end
+
+                it_behaves_like "no updates are made with FF on"
+                it_behaves_like "updates are made with FF off"
               end
 
               shared_examples_for "a 500" do
@@ -539,6 +616,9 @@ module Lti::IMS
                   send_request
                   expect(response).to be_server_error
                 end
+
+                it_behaves_like "no updates are made with FF on"
+                it_behaves_like "updates are made with FF off"
               end
 
               context "when InstFS is unreachable" do
@@ -567,6 +647,68 @@ module Lti::IMS
                 end
 
                 it_behaves_like "a 400"
+              end
+
+              context "when file upload url times out" do
+                context "and FF is on" do
+                  before do
+                    Account.root_accounts.first.enable_feature! :ags_scores_file_error_improvements
+                  end
+
+                  context "and InstFS responds with a 502" do
+                    before do
+                      allow(CanvasHttp).to receive(:post).and_return(
+                        double(class: Net::HTTPBadRequest, code: 502, body: {})
+                      )
+                    end
+
+                    it "returns 504 and specific error message" do
+                      send_request
+                      expect(response.code).to eq "504"
+                      expect(response.body).to include("file url timed out")
+                    end
+                  end
+
+                  context "and InstFS responds with a 400" do
+                    before do
+                      allow(CanvasHttp).to receive(:post).and_return(
+                        double(class: Net::HTTPBadRequest, code: 400, body: "The service received no request body and has timed-out")
+                      )
+                    end
+
+                    it "returns 504 and specific error message" do
+                      send_request
+                      expect(response.code).to eq "504"
+                      expect(response.body).to include("file url timed out")
+                    end
+                  end
+                end
+
+                context "and FF is off" do
+                  before do
+                    Account.root_accounts.first.disable_feature! :ags_scores_file_error_improvements
+                  end
+
+                  context "and InstFS responds with a 502" do
+                    before do
+                      allow(CanvasHttp).to receive(:post).and_return(
+                        double(class: Net::HTTPBadRequest, code: 502, body: {})
+                      )
+                    end
+
+                    it_behaves_like "a 500"
+                  end
+
+                  context "and InstFS responds with a 400" do
+                    before do
+                      allow(CanvasHttp).to receive(:post).and_return(
+                        double(class: Net::HTTPBadRequest, code: 400, body: "The service received no request body and has timed-out")
+                      )
+                    end
+
+                    it_behaves_like "a 400"
+                  end
+                end
               end
             end
           end

@@ -34,56 +34,6 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
   let(:root_account_key) { DeveloperKey.create!(account: account, **params) }
   let(:root_account_binding) { root_account_key.developer_key_account_bindings.first }
 
-  describe "#lti_1_3_tools" do
-    subject do
-      expect(DeveloperKey.count > 1).to be true
-      described_class.lti_1_3_tools(
-        described_class.active_in_account(account)
-      )
-    end
-
-    let(:params) { { visible: true } }
-    let(:workflow_state) { "on" }
-
-    before do
-      dev_keys = []
-      3.times { dev_keys << DeveloperKey.create!(account: account, **params) }
-      dev_keys.each do |dk|
-        dk.developer_key_account_bindings.first.update! workflow_state: workflow_state
-      end
-    end
-
-    context "with no visible dev keys" do
-      let(:params) { { visible: false } }
-
-      it { is_expected.to be_empty }
-    end
-
-    context 'with visible dev keys but no "on" keys' do
-      let(:workflow_state) { "allow" }
-
-      it { is_expected.to be_empty }
-    end
-
-    context 'with visible dev keys in "on" but no tool_configurations' do
-      it { is_expected.to be_empty }
-    end
-
-    context 'with visible dev keys in "on" and tool_configurations' do
-      let(:first_key) { DeveloperKey.first }
-
-      before do
-        first_key.create_tool_configuration! settings: settings
-      end
-
-      it { is_expected.not_to be_empty }
-
-      it "returns only the visible, turned on, with tool configuration key" do
-        expect(first_key).to eq subject.first.developer_key
-      end
-    end
-  end
-
   describe "validations and callbacks" do
     it "requires an account" do
       dev_key_binding.account = nil

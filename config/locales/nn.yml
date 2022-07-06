@@ -2123,6 +2123,7 @@ nn:
   alerts_6b871b71: Varsel
   alerts_add_edit_delete_d71091c6: "Varsel - legg til / rediger / slett"
   alerts_course_settings_53551794: "Varsel (Emneinnstillingar)"
+  alerts_must_be_configured_for_the_institution_aler_43bbacb1: "Varslingar må konfigureras for institusjonen. Varslingar er ein lite brukt funksjon designa for å sende eit varsel til studentar, lærarar eller administratorar for spesifikke utløysarar (f.eks. ingen lærar-student-interaksjon i løpet av 7 dagar). Dei sjekkast kvar dag og varslingar vil sendast ut til studenten og/eller læraren fram til det utløysande problemet er løyst."
   align_outcomes_to_this_page_7d055196: "Samle læringsmål på denne sida"
   all_4321c3a1: Alle
   all_account_types_e83c1516: "Alle kontoar"
@@ -2199,6 +2200,7 @@ nn:
   allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "Tillat at kvar brukar kan reorganisere dashbordkorta sine. "
   allow_final_grade_override_8cf4336b: "Tillat å overstyre sluttvurdering"
   allow_final_grade_override_a21a79ee: "Tillat å overstyre sluttvurdering"
+  allow_gradebook_users_to_view_and_export_student_f_68a8084b: "Tillat brukarane av vurderingsoversikta å sjå og eksportera studentanes fornavn og etternavn i adskilde kolonne"
   allow_importing_of_qti_and_common_cartridge_into_n_4380a7a2: "Tillat import av QTI og Common Cartridge til New Quizzes."
   allow_importing_of_qti_and_common_cartridge_into_q_81b657cd: "Tillat import av QTI og Common Cartridge til Quizzes.Next."
   allow_importing_of_third_party_packages_into_new_q_f6b8b1c7: "Tillat import av tredjepartspakkar til nye quizar"
@@ -2216,6 +2218,7 @@ nn:
   allow_outcome_extra_credit_57c1e84e: "Tillat ekstra utbytte for læringsmålet "
   allow_pages_to_be_deleted_in_bulk_199d3d3b: "Tillat massesletting av sider "
   allow_passive_acceptance_of_terms_of_service_63ef5994: "Tillat passivt samtykke av bruksvilkår"
+  allow_push_notification_opt_out_827f288b: "Tillat å velje vekk pushvarsel"
   allow_reorder_dashboard_cards_78215947: "Tillat reorganisering av dashbordkorta"
   allow_searching_grade_change_audit_logs_by_multipl_4aaa0110: "Tillat søk på revisjonslogg for vurderingsendring etter fleire kriterier"
   allow_students_to_download_course_content_and_view_810e66ec: "Tillat at studentane kan laste ned emneinnhaldet og lese det når dei ikkje er på nett "
@@ -2223,6 +2226,7 @@ nn:
   allow_students_to_see_who_has_signed_up_for_time_s_7eb1d0ef: "Tillat studentar å sjå kven som har registrert seg for tidsluker som framleis er ledige. "
   allow_students_to_see_who_was_signed_up_for_time_s_160ba252: "Tillat studentar å sjå kven som var registrert for tidsluker."
   allow_students_to_see_who_was_signed_up_for_time_s_37f5cb01: "Tillat studentar å sjå kven som var registrert til tidsluker som framleis er ledige"
+  allow_sub_account_selection_when_users_manually_cr_d0a6e2e6: "Tillat å velje underkonto når brukarar oppretter emner manuelt"
   allow_switching_to_the_enhanced_rce_317e746f: "Tillat å byte til forbedra redigeringsprogram"
   allow_switching_to_the_new_assignments_page_9ac0ad93: "Tillat å byte til den nye oppgåvesida"
   allow_teachers_to_change_the_dates_on_a_set_of_ass_4d48baec: "Tillat lærarar å endre datoane til eit sett med oppgåver i eitt trinn"

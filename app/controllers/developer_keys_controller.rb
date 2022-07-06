@@ -38,7 +38,7 @@ class DeveloperKeysController < ApplicationController
           includesFeatureFlagEnabled: Account.site_admin.feature_enabled?(:developer_key_support_includes)
         )
 
-        render :index_react
+        render :index
       end
 
       format.json do

@@ -16,10 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Ember from 'ember'
-import HandlebarsRuntime from '@canvas/handlebars-helpers'
-import Handlebars from 'handlebars/dist/cjs/handlebars'
-
-Handlebars.helpers = HandlebarsRuntime.helpers
+import '@canvas/handlebars-helpers'
 
 export default Ember.Application.extend({
   rootElement: '#content'

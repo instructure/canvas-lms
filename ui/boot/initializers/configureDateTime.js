@@ -49,15 +49,25 @@ export function down() {
 }
 
 export function getI18nFormats() {
-  const phrases = I18n.translations[I18n.locale || 'en']
-
-  return ['date','time'].reduce((acc, target) => {
-    const formats = phrases && phrases[target] && phrases[target].formats || {}
-
-    for (const [format, v] of Object.entries(formats)) {
-      acc[`${target}.formats.${format}`] = v
-    }
-
-    return acc
-  }, {})
+  return {
+    'date.formats.date_at_time': I18n.lookup('date.formats.date_at_time'),
+    'date.formats.default': I18n.lookup('date.formats.default'),
+    'date.formats.full': I18n.lookup('date.formats.full'),
+    'date.formats.full_with_weekday': I18n.lookup('date.formats.full_with_weekday'),
+    'date.formats.long': I18n.lookup('date.formats.long'),
+    'date.formats.long_with_weekday': I18n.lookup('date.formats.long_with_weekday'),
+    'date.formats.medium': I18n.lookup('date.formats.medium'),
+    'date.formats.medium_month': I18n.lookup('date.formats.medium_month'),
+    'date.formats.medium_with_weekday': I18n.lookup('date.formats.medium_with_weekday'),
+    'date.formats.short': I18n.lookup('date.formats.short'),
+    'date.formats.short_month': I18n.lookup('date.formats.short_month'),
+    'date.formats.short_weekday': I18n.lookup('date.formats.short_weekday'),
+    'date.formats.short_with_weekday': I18n.lookup('date.formats.short_with_weekday'),
+    'date.formats.weekday': I18n.lookup('date.formats.weekday'),
+    'time.formats.default': I18n.lookup('time.formats.default'),
+    'time.formats.long': I18n.lookup('time.formats.long'),
+    'time.formats.short': I18n.lookup('time.formats.short'),
+    'time.formats.tiny': I18n.lookup('time.formats.tiny'),
+    'time.formats.tiny_on_the_hour': I18n.lookup('time.formats.tiny_on_the_hour'),
+  }
 }

@@ -20,7 +20,8 @@ import React from 'react'
 import {bool, func, shape, string} from 'prop-types'
 import {momentObj} from 'react-moment-proptypes'
 
-import {Button, CloseButton} from '@instructure/ui-buttons'
+import {CloseButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {Heading} from '@instructure/ui-heading'
 import {List} from '@instructure/ui-list'
 import {Text} from '@instructure/ui-text'
@@ -115,18 +116,15 @@ export default class CalendarEventModal extends React.Component {
       >
         <Modal.Header>
           <Heading>
-            <Button
-              variant="link"
-              size="large"
-              theme={{largePadding: '0', largeHeight: 'normal'}}
-              href={this.props.html_url}
-            >
+            <Link isWithinText={false} size="large" href={this.props.html_url}>
               {this.props.title}
-            </Button>
+            </Link>
           </Heading>
-          <CloseButton placement="end" onClick={this.props.requestClose}>
-            {formatMessage('Close')}
-          </CloseButton>
+          <CloseButton
+            placement="end"
+            onClick={this.props.requestClose}
+            screenReaderLabel={formatMessage('Close')}
+          />
         </Modal.Header>
         <Modal.Body padding="medium">
           <List variant="unstyled" itemSpacing="small">

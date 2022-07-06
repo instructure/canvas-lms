@@ -27,7 +27,8 @@ describe CC::LtiResourceLinks do
     Lti::ResourceLink.create!(
       context: tool.context,
       context_external_tool: tool,
-      custom: custom
+      custom: custom,
+      url: "http://www.example.com/launch"
     )
   end
 

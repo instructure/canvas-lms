@@ -415,6 +415,9 @@ class UsersController < ApplicationController
     get_context
     return unless authorized_action(@context, @current_user, :read_roster)
 
+    includes = (params[:include] || []) & %w[avatar_url email last_login time_zone uuid ui_invoked]
+    includes << "last_login" if params[:sort] == "last_login" && !includes.include?("last_login")
+
     search_term = params[:search_term].presence
     if search_term
       users = UserSearch.for_user_in_context(search_term, @context, @current_user, session,
@@ -424,15 +427,22 @@ class UsersController < ApplicationController
                                              })
     else
       users = UserSearch.scope_for(@context, @current_user,
-                                   { order: params[:order], sort: params[:sort], enrollment_role_id: params[:role_filter_id],
-                                     enrollment_type: params[:enrollment_type] })
+                                   {
+                                     order: params[:order], sort: params[:sort], enrollment_role_id: params[:role_filter_id],
+                                     enrollment_type: params[:enrollment_type], ui_invoked: includes.include?("ui_invoked")
+                                   })
       users = users.with_last_login if params[:sort] == "last_login"
     end
 
-    includes = (params[:include] || []) & %w[avatar_url email last_login time_zone uuid]
-    includes << "last_login" if params[:sort] == "last_login" && !includes.include?("last_login")
+    page_opts = { total_entries: nil }
+    if includes.include?("ui_invoked") && Setting.get("ui_invoked_count_pages", "true") == "true"
+      page_opts = {} # let Folio calculate total entries
+      includes.delete("ui_invoked")
+    end
+
     GuardRail.activate(:secondary) do
-      users = Api.paginate(users, self, api_v1_account_users_url, { total_entries: nil })
+      users = Api.paginate(users, self, api_v1_account_users_url, page_opts)
+
       user_json_preloads(users, includes.include?("email"))
       User.preload_last_login(users, @context.resolved_root_account_id) if includes.include?("last_login") && params[:sort] != "last_login"
       render json: users.map { |u| user_json(u, @current_user, session, includes) }
@@ -2002,9 +2012,13 @@ class UsersController < ApplicationController
   #   suspends or unsuspends all logins for this user that the calling user
   #   has permission to
   #
+  # @argument override_sis_stickiness [boolean]
+  #   by default and when the value is true it updates all the fields
+  #   when the value is false then fields which in stuck_sis_fields will not be updated
+  #
   # @example_request
   #
-  #   curl 'https://<canvas>/api/v1/users/133.json' \
+  #   curl 'https://<canvas>/api/v1/users/133' \
   #        -X PUT \
   #        -F 'user[name]=Sheldon Cooper' \
   #        -F 'user[short_name]=Shelly' \
@@ -2071,6 +2085,11 @@ class UsersController < ApplicationController
     end
 
     managed_attributes << { avatar_image: strong_anything } if managed_attributes.delete(:avatar_image)
+
+    if params[:override_sis_stickiness] && !value_to_boolean(params[:override_sis_stickiness])
+      managed_attributes -= [*@user.stuck_sis_fields]
+    end
+
     user_params = user_params.permit(*managed_attributes)
     new_email = user_params.delete(:email)
     # admins can update avatar images even if they are locked

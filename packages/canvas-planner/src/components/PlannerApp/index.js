@@ -244,7 +244,7 @@ export class PlannerApp extends Component {
     return (
       <View as="div" textAlign="center" margin="x-small 0 0 0">
         <ShowOnFocusButton
-          buttonRef={ref => (this.loadPriorButton = ref)}
+          elementRef={ref => (this.loadPriorButton = ref)}
           buttonProps={{
             onClick: this.props.loadPastButtonClicked
           }}

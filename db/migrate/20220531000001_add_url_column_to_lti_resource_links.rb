@@ -1,5 +1,6 @@
-<%
-# Copyright (C) 2012 - present Instructure, Inc.
+# frozen_string_literal: true
+
+# Copyright (C) 2020 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,11 +15,10 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-%>
+class AddUrlColumnToLtiResourceLinks < ActiveRecord::Migration[6.0]
+  tag :predeploy
 
-<% provide :page_title do %><%= t :title, "Developer Keys" %><% end %>
-
-<% css_bundle :developer_keys %>
-<% js_bundle :developer_keys_v2 %>
-
-<div id="reactContent"></div>
+  def change
+    add_column :lti_resource_links, :url, :string, if_not_exists: true
+  end
+end

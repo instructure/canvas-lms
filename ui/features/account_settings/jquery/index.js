@@ -31,7 +31,7 @@ import '@canvas/forms/jquery/jquery.instructure_forms' // formSubmit, getFormDat
 import '@canvas/jquery/jquery.instructure_misc_helpers' // replaceTags
 import '@canvas/jquery/jquery.instructure_misc_plugins' // confirmDelete, showIf, /\.log/
 import '@canvas/loading-image'
-import 'date' // Date.parse
+import 'date-js' // Date.parse
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 
 const I18n = useI18nScope('account_settings')
@@ -508,6 +508,10 @@ $(document).ready(function () {
       $('#k5_account_warning_message').toggleClass('shown', this.checked)
     })
     .trigger('change')
+
+  $('#account_settings_conditional_release_value').change(function () {
+    $('#conditional_release_caution_text').toggleClass('shown', !this.checked)
+  })
 
   const $rce_container = $('#custom_tos_rce_container')
   $('#terms_of_service_modal').hide()

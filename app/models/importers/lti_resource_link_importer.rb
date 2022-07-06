@@ -49,6 +49,7 @@ module Importers
       resource_link_for_course = Lti::ResourceLink.find_or_initialize_for_context_and_lookup_uuid(
         context: migration.context,
         lookup_uuid: lti_resource_link["lookup_uuid"],
+        url: lti_resource_link["launch_url"],
         context_external_tool_launch_url: lti_resource_link["launch_url"]
       )
       resource_link_for_course.custom =

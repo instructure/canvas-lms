@@ -393,12 +393,20 @@ module MicrosoftSync
       retries = retries_by_step[retry_step.to_s] || 0
 
       if retries >= steps_object.max_retries
-        update_state_record_to_errored_and_cleanup(
-          error: retry_object.error, step: current_step,
-          capture: RetriesExhaustedError.new(retry_object.error)
-        )
-        statsd_increment(:final_retry, current_step, retry_object.error)
-        raise retry_object.error
+        e = retry_object.error
+
+        if e.is_a?(Errors::GracefulCancelError)
+          statsd_increment(:cancel, current_step, e)
+          update_state_record_to_errored_and_cleanup(error: e, step: current_step)
+          return
+        else
+          statsd_increment(:final_retry, current_step, e)
+          update_state_record_to_errored_and_cleanup(
+            error: e, step: current_step,
+            capture: RetriesExhaustedError.new(e)
+          )
+          raise e
+        end
       end
 
       statsd_increment("retry", current_step, retry_object.error)

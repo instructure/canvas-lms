@@ -60,6 +60,17 @@ describe "MessageDispatcher" do
       @messages = (0...3).map { message_model(dispatch_at: Time.now, workflow_state: "staged", to: "somebody", updated_at: Time.now.utc - 11.minutes, user: user_factory, path_type: "email") }
     end
 
+    it "shows message ids not found in batch process" do
+      messages = @messages
+      messages.push(Message.new(id: -1, created_at: Time.zone.now))
+      track_jobs { MessageDispatcher.batch_dispatch(messages) }
+      expect(created_jobs.size).to eq 1
+      job = created_jobs.first
+      run_jobs
+      job.reload
+      expect(job.last_error).to include("IDs not found: [-1]")
+    end
+
     it "reschedules on Mailer delivery error, but not on canceled Message" do
       track_jobs { MessageDispatcher.batch_dispatch(@messages) }
       expect(created_jobs.size).to eq 1

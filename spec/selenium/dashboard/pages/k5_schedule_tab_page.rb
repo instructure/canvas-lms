@@ -38,7 +38,7 @@ module K5ScheduleTabPageObject
   end
 
   def missing_assignments_selector
-    ".MissingAssignments-styles__root .PlannerItem-styles__title"
+    ".MissingAssignments-styles__root .PlannerItem-styles__details"
   end
 
   def missing_data_selector
@@ -58,7 +58,7 @@ module K5ScheduleTabPageObject
   end
 
   def schedule_item_selector
-    ".PlannerItem-styles__title a"
+    ".PlannerItem-styles__details a"
   end
 
   def teacher_preview_selector

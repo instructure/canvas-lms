@@ -489,7 +489,7 @@ describe('ComposeModalContainer', () => {
     const button = component.getByTestId('send-button')
     fireEvent.click(button)
 
-    expect(component.findByText('You must choose a recipient')).toBeTruthy()
+    expect(component.findByText('Please select a recipient.')).toBeTruthy()
 
     // Write something...
     fireEvent.change(component.getByTestId('address-book-input'), {target: {value: 'potato'}})
@@ -497,7 +497,7 @@ describe('ComposeModalContainer', () => {
     // Hit send
     fireEvent.click(button)
 
-    expect(component.findByText('Invalid recipient')).toBeTruthy()
+    expect(component.findByText('No matches found. Please insert a valid recipient.')).toBeTruthy()
   })
 
   it('validates course', async () => {

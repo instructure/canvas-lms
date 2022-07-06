@@ -110,6 +110,12 @@ def postFn(status) {
         gerrit.submitVerified((status == 'SUCCESS' ? '+1' : '-1'), "${env.BUILD_URL}/build-summary-report/")
       }
     }
+
+    build(job: "/Canvas/helpers/junit-uploader", parameters: [
+      string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
+      string(name: 'GERRIT_EVENT_TYPE', value: "${env.GERRIT_EVENT_TYPE}"),
+      string(name: 'SOURCE', value: "${env.JOB_NAME}/${env.BUILD_NUMBER}"),
+    ], propagate: false, wait: false)
   } finally {
     if (status == 'SUCCESS') {
       maybeSlackSendSuccess()
@@ -446,7 +452,33 @@ pipeline {
                     .hooks(buildSummaryReportHooks.call())
                     .obeysAllowStages(false)
                     .timeout(20)
-                    .execute(buildDockerImageStage.&patchsetImage)
+                    .execute {
+                      def startStep = '''
+                        docker run -dt --name general-build-container --volume $(pwd)/$LOCAL_WORKDIR/.git:$DOCKER_WORKDIR/.git -e RAILS_ENV=test $PATCHSET_TAG bash -c "sleep infinity"
+                        docker exec -dt general-build-container bin/rails graphql:schema
+                      '''
+
+                      def crystalballStep = '''
+                        diffFrom=$(git --git-dir $LOCAL_WORKDIR/.git rev-parse $GERRIT_PATCHSET_REVISION^1)
+                        docker exec -dt \
+                                        -e CRYSTALBALL_DIFF_FROM=$diffFrom \
+                                        -e CRYSTALBALL_DIFF_TO=$GERRIT_PATCHSET_REVISION \
+                                        -e CRYSTALBALL_REPO_PATH=$DOCKER_WORKDIR \
+                                        general-build-container bundle exec crystalball --dry-run
+                      '''
+
+                      def finalStep = '''
+                        docker exec -t general-build-container ps aww
+                      '''
+
+                      def asyncSteps = [
+                        startStep,
+                        !configuration.isChangeMerged() && env.GERRIT_REFSPEC != 'refs/heads/master' ? crystalballStep : '',
+                        finalStep
+                      ]
+
+                      buildDockerImageStage.patchsetImage(asyncSteps.join("\n"))
+                    }
 
                   extendedStage(RUN_MIGRATIONS_STAGE)
                     .hooks(buildSummaryReportHooks.call())
@@ -462,14 +494,14 @@ pipeline {
                     .execute {
                       try {
                         /* groovylint-disable-next-line GStringExpressionWithinString */
-                        sh '''
-                          diffFrom=\$(git --git-dir $LOCAL_WORKDIR/.git rev-parse ${GERRIT_PATCHSET_REVISION}^1)
-                          docker run --name=crystal --volume \$(pwd)/$LOCAL_WORKDIR/.git:$DOCKER_WORKDIR/.git \
-                                     -e CRYSTALBALL_DIFF_FROM=${diffFrom} \
-                                     -e CRYSTALBALL_DIFF_TO=${GERRIT_PATCHSET_REVISION} \
-                                     -e CRYSTALBALL_REPO_PATH=$DOCKER_WORKDIR \
-                                     $PATCHSET_TAG bundle exec crystalball --dry-run
-                          docker cp \$(docker ps -qa -f name=crystal):/usr/src/app/crystalball_spec_list.txt ./tmp/crystalball_spec_list.txt
+                        sh '''#!/bin/bash
+                          set -ex
+
+                          while docker exec -t general-build-container ps aww | grep crystalball; do
+                            sleep 0.1
+                          done
+
+                          docker cp \$(docker ps -qa -f name=general-build-container):/usr/src/app/crystalball_spec_list.txt ./tmp/crystalball_spec_list.txt
                         '''
                         archiveArtifacts allowEmptyArchive: true, artifacts: 'tmp/crystalball_spec_list.txt'
 
@@ -521,10 +553,10 @@ pipeline {
                       .hooks(buildSummaryReportHooks.call())
                       .queue(stages, buildDockerImageStage.&lintersImage)
 
-                    extendedStage('Run i18n:generate')
+                    extendedStage('Run i18n:extract')
                       .hooks(buildSummaryReportHooks.call())
                       .required(configuration.isChangeMerged())
-                      .queue(stages, buildDockerImageStage.&i18nGenerate)
+                      .queue(stages, buildDockerImageStage.&i18nExtract)
 
                     parallel(stages)
                   }

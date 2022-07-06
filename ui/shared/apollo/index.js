@@ -84,7 +84,10 @@ function createCache() {
       // objects) may be represented by the same ID and type. Add the
       // artifactAttempt field to the cache key to assessments for different
       // attempts don't collide.
-      if (object.__typename === 'RubricAssessment' && object.artifactAttempt != null) {
+      if (
+        ['RubricAssessment', 'RubricAssessmentRating'].includes(object.__typename) &&
+        object.artifactAttempt != null
+      ) {
         cacheKey = `${cacheKey}:${object.artifactAttempt}`
       }
       return cacheKey

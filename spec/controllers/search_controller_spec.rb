@@ -75,6 +75,30 @@ describe SearchController do
       expect(response.body).to include("billy")
     end
 
+    context "date restricted course" do
+      before do
+        course_with_student_logged_in(active_all: true)
+        @user.update_attribute(:name, "billy")
+        @other = User.create(name: "bob")
+        @course.enroll_student(@other).accept
+        @course.restrict_enrollments_to_course_dates = true
+        @course.restrict_student_past_view = true
+        @course.conclude_at = 1.day.ago
+        @course.start_at = 2.days.ago
+        @course.save!
+      end
+
+      it "shows students other students in a soft-concluded course" do
+        get "recipients", params: {
+          search: "b", type: "user",
+          synthetic_contexts: true, context: "course_#{@course.id}_students"
+        }
+        expect(response).to be_successful
+        expect(response.body).to include("bob")
+        expect(response.body).to include("billy")
+      end
+    end
+
     it "allows filtering out non-messageable courses" do
       course_with_student_logged_in(active_all: true)
       @course.update_attribute(:name, "course1")
@@ -83,6 +107,7 @@ describe SearchController do
       @course2.update_attribute(:name, "course2")
       term = @course2.root_account.enrollment_terms.create! name: "Fall", end_at: 1.day.ago
       @course2.update! enrollment_term: term
+      @course2.complete!
       get "recipients", params: { search: "course", messageable_only: true }
       expect(response.body).to include("course1")
       expect(response.body).not_to include("course2")

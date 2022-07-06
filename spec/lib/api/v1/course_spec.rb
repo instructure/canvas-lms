@@ -46,6 +46,11 @@ describe Api::V1::Course do
       course_settings = course_settings_json(@course)
       expect(course_settings).to have_key :filter_speed_grader_by_student_group
     end
+
+    it "includes conditional_release value in the settings hash" do
+      course_settings = course_settings_json(@course)
+      expect(course_settings).to have_key :conditional_release
+    end
   end
 
   describe "#course_json" do

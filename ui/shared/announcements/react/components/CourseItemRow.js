@@ -30,7 +30,7 @@ import {Heading} from '@instructure/ui-heading'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import {IconMoreLine, IconDragHandleLine, IconPeerReviewLine} from '@instructure/ui-icons'
 import LockIconView from '@canvas/lock-icon'
@@ -279,12 +279,16 @@ export default class CourseItemRow extends Component {
                     onSelect={this.props.onManageMenuSelect}
                     onToggle={this.toggleManageMenuShown}
                     trigger={
-                      <Button variant="icon" size="small">
+                      <IconButton
+                        withBorder={false}
+                        withBackground={false}
+                        size="small"
+                        screenReaderLabel={I18n.t('Manage options for %{name}', {
+                          name: this.props.title
+                        })}
+                      >
                         <IconMoreLine />
-                        <ScreenReaderContent>
-                          {I18n.t('Manage options for %{name}', {name: this.props.title})}
-                        </ScreenReaderContent>
-                      </Button>
+                      </IconButton>
                     }
                   >
                     {this.state.manageMenuShown ? this.props.manageMenuOptions() : null}

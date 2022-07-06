@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { configure } from './'
+import { configure } from 'datetime'
 import timezone from 'timezone'
 
 const snapshots = []

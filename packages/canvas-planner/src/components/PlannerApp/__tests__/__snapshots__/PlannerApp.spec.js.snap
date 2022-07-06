@@ -25,7 +25,7 @@ exports[`PlannerApp always renders today and tomorrow when only items are in the
           "onClick": undefined,
         }
       }
-      buttonRef={[Function]}
+      elementRef={[Function]}
     >
       Load prior dates
     </ShowOnFocusButton>
@@ -121,7 +121,7 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
           "onClick": undefined,
         }
       }
-      buttonRef={[Function]}
+      elementRef={[Function]}
     >
       Load prior dates
     </ShowOnFocusButton>
@@ -247,7 +247,7 @@ exports[`PlannerApp empty day calculation does not render an empty tomorrow when
           "onClick": undefined,
         }
       }
-      buttonRef={[Function]}
+      elementRef={[Function]}
     >
       Load prior dates
     </ShowOnFocusButton>
@@ -311,7 +311,7 @@ exports[`PlannerApp empty day calculation merges 3 consecutive empty days in the
           "onClick": undefined,
         }
       }
-      buttonRef={[Function]}
+      elementRef={[Function]}
     >
       Load prior dates
     </ShowOnFocusButton>
@@ -419,7 +419,7 @@ exports[`PlannerApp empty day calculation only renders days with items in the pa
           "onClick": undefined,
         }
       }
-      buttonRef={[Function]}
+      elementRef={[Function]}
     >
       Load prior dates
     </ShowOnFocusButton>
@@ -525,7 +525,7 @@ exports[`PlannerApp empty day calculation renders 2 consecutive empty days in th
           "onClick": undefined,
         }
       }
-      buttonRef={[Function]}
+      elementRef={[Function]}
     >
       Load prior dates
     </ShowOnFocusButton>
@@ -649,7 +649,7 @@ exports[`PlannerApp only renders today when the only item is today 1`] = `
           "onClick": undefined,
         }
       }
-      buttonRef={[Function]}
+      elementRef={[Function]}
     >
       Load prior dates
     </ShowOnFocusButton>
@@ -713,7 +713,7 @@ exports[`PlannerApp renders base component 1`] = `
           "onClick": undefined,
         }
       }
-      buttonRef={[Function]}
+      elementRef={[Function]}
     >
       Load prior dates
     </ShowOnFocusButton>
@@ -813,7 +813,7 @@ exports[`PlannerApp renders empty component with no assignments 1`] = `
           "onClick": undefined,
         }
       }
-      buttonRef={[Function]}
+      elementRef={[Function]}
     >
       Load prior dates
     </ShowOnFocusButton>
@@ -852,7 +852,7 @@ exports[`PlannerApp renders loading past spinner when loading past and there are
           "onClick": undefined,
         }
       }
-      buttonRef={[Function]}
+      elementRef={[Function]}
     >
       Load prior dates
     </ShowOnFocusButton>
@@ -892,7 +892,7 @@ exports[`PlannerApp shows only the loading component when the isLoading prop is 
           "onClick": undefined,
         }
       }
-      buttonRef={[Function]}
+      elementRef={[Function]}
     >
       Load prior dates
     </ShowOnFocusButton>
@@ -949,7 +949,7 @@ exports[`PlannerApp shows the loading past indicator when loadingPast prop is tr
           "onClick": undefined,
         }
       }
-      buttonRef={[Function]}
+      elementRef={[Function]}
     >
       Load prior dates
     </ShowOnFocusButton>

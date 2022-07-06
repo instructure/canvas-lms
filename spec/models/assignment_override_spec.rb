@@ -110,6 +110,26 @@ describe AssignmentOverride do
     expect(@override2.set).to eq [@student]
   end
 
+  describe "#adhoc?" do
+    let(:override) { AssignmentOverride.new }
+
+    it "returns true if the override is an ad hoc override" do
+      override.set_type = "ADHOC"
+      expect(override).to be_adhoc
+    end
+
+    it "returns false if the override is not an ad hoc override" do
+      aggregate_failures do
+        override.set_type = "CourseSection"
+        expect(override).not_to be_adhoc
+        override.set_type = "Group"
+        expect(override).not_to be_adhoc
+        override.set_type = "Noop"
+        expect(override).not_to be_adhoc
+      end
+    end
+  end
+
   context "#mastery_paths?" do
     let(:override) do
       described_class.new({
@@ -598,7 +618,33 @@ describe AssignmentOverride do
           override.lock_at = 10.minutes.ago
         end
 
-        it { is_expected.to be(true) }
+        context "with prioritize_individual_overrides enabled" do
+          it "returns false if the override is ad hoc" do
+            override.set_type = "ADHOC"
+            expect(subject).to be(false)
+          end
+
+          it "returns true if the override is not ad hoc" do
+            override.set_type = "CourseSection"
+            expect(subject).to be(true)
+          end
+        end
+
+        context "with prioritize_individual_overrides disabled" do
+          before do
+            Account.site_admin.disable_feature!(:prioritize_individual_overrides)
+          end
+
+          it "returns true if the override is ad hoc" do
+            override.set_type = "ADHOC"
+            expect(subject).to be(true)
+          end
+
+          it "returns true if the override is not ad hoc" do
+            override.set_type = "CourseSection"
+            expect(subject).to be(true)
+          end
+        end
       end
     end
   end

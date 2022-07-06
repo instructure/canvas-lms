@@ -789,11 +789,15 @@ describe Attachment do
         a = attachment_model(uploaded_data: default_uploaded_data)
         old_filename = a.filename
         old_content_type = a.content_type
+        old_file_state = a.file_state
+        old_workflow_state = a.workflow_state
         a.destroy_content_and_replace
         purgatory = Purgatory.where(attachment_id: a).take
         expect(purgatory.old_filename).to eq old_filename
         expect(purgatory.old_display_name).to eq old_filename
         expect(purgatory.old_content_type).to eq old_content_type
+        expect(purgatory.old_file_state).to eq old_file_state
+        expect(purgatory.old_workflow_state).to eq old_workflow_state
         a.reload
         expect(a.filename).to eq "file_removed.pdf"
         expect(a.display_name).to eq "file_removed.pdf"
@@ -802,6 +806,8 @@ describe Attachment do
         expect(a.filename).to eq old_filename
         expect(a.display_name).to eq old_filename
         expect(a.content_type).to eq old_content_type
+        expect(a.file_state).to eq old_file_state
+        expect(a.workflow_state).to eq old_workflow_state
         expect(purgatory.reload.workflow_state).to eq "restored"
         a.destroy_content_and_replace
         expect(purgatory.reload.workflow_state).to eq "active"
@@ -1135,6 +1141,52 @@ describe Attachment do
       quiz.publish!
       expect(aq_att1.grants_right?(student, :download)).to eq true
       expect(aq_att2.grants_right?(student, :download)).to eq false
+    end
+
+    context "group assignment" do
+      before :once do
+        group_category = @course.group_categories.create!(name: "Group Category")
+        group_1 = group_model(context: @course, group_category: group_category)
+        group_2 = group_model(context: @course, group_category: group_category)
+
+        @user_1 = user_model
+        @user_2 = user_model
+        @user_3 = user_model
+        @user_4 = user_model
+
+        course.enroll_student(@user_1).accept
+        course.enroll_student(@user_2).accept
+        course.enroll_student(@user_3).accept
+        course.enroll_student(@user_4).accept
+
+        group_1.add_user(@user_1)
+        group_1.add_user(@user_2)
+
+        group_2.add_user(@user_3)
+        group_2.add_user(@user_4)
+
+        assignment = assignment_model(course: @course, submission_types: "online_upload")
+        assignment.group_category = group_category
+        assignment.save!
+
+        @attachment = attachment_model(context: @user_1)
+
+        submission_1 = assignment.find_or_create_submission(@user_1)
+        submission_2 = assignment.find_or_create_submission(@user_2)
+
+        @attachment.attachment_associations.create!(context: submission_1)
+        @attachment.attachment_associations.create!(context: submission_2)
+      end
+
+      it "does allow read attachments for users in the same group" do
+        expect(@attachment.grants_right?(@user_1, :read)).to eql(true)
+        expect(@attachment.grants_right?(@user_2, :read)).to eql(true)
+      end
+
+      it "does not allow read attachments for users in another group" do
+        expect(@attachment.grants_right?(@user_3, :read)).to eql(false)
+        expect(@attachment.grants_right?(@user_4, :read)).to eql(false)
+      end
     end
   end
 

@@ -75,6 +75,7 @@ describe('MessageDetailContainer', () => {
     onReplyAll = jest.fn(),
     onDelete = jest.fn(),
     onForward = jest.fn(),
+    onReadStateChange = jest.fn(),
     setOnSuccess = jest.fn(),
     setCanReply = jest.fn(),
     overrideProps = {}
@@ -89,6 +90,7 @@ describe('MessageDetailContainer', () => {
               onReplyAll={onReplyAll}
               onDelete={onDelete}
               onForward={onForward}
+              onReadStateChange={onReadStateChange}
               setCanReply={setCanReply}
               {...overrideProps}
             />
@@ -180,16 +182,19 @@ describe('MessageDetailContainer', () => {
       })
 
       it('should mark loaded conversation as read', async () => {
-        const mockSetOnSuccess = jest.fn()
+        const mockReadStateChange = jest.fn()
         const container = setup({
-          setOnSuccess: mockSetOnSuccess,
-          conversation: {...Conversation.mock(), workflowState: 'unread'}
+          conversation: {
+            ...Conversation.mock(),
+            workflowState: 'unread'
+          },
+          onReadStateChange: mockReadStateChange
         })
         // wait for query to load
         await container.findAllByTestId('message-more-options')
 
         await waitForApolloLoading()
-        expect(mockSetOnSuccess).toHaveBeenCalled()
+        expect(mockReadStateChange).toHaveBeenCalled()
       })
     })
   })

@@ -21,7 +21,7 @@
 // back a Backbone with all of our instructure specific patches to it.
 
 // Get the unpatched Backbone
-const Backbone = require('node_modules-version-of-backbone')
+const Backbone = require('backbone')
 
 // Apply all of our patches
 require('./Backbone.syncWithMultipart')

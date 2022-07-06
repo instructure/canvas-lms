@@ -28,12 +28,16 @@ describe('buildMetadata() / parseMetadata()', () => {
     const metadata = buildMetadata(settings)
     expect(metadata).toMatchInlineSnapshot(`
       <metadata>
-        {"type":"image/svg+xml-icon-maker-icons","alt":"","shape":"triangle","size":"small","color":"#f0f","outlineColor":"#000000","outlineSize":"none","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"below","encodedImage":"","encodedImageType":"","encodedImageName":"","x":0,"y":0,"translateX":0,"translateY":0,"width":0,"height":0,"transform":"","imageSettings":null}
+        {"type":"image/svg+xml-icon-maker-icons","shape":"triangle","size":"small","color":"#f0f","outlineColor":"#000000","outlineSize":"none","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"below","encodedImage":"","encodedImageType":"","encodedImageName":"","x":0,"y":0,"translateX":0,"translateY":0,"width":0,"height":0,"transform":"","imageSettings":null}
       </metadata>
     `)
 
     const svg = createSvgElement('svg')
     svg.appendChild(metadata)
-    expect(parseMetadata(svg)).toEqual(settings)
+
+    // Remove the instance specific attributes
+    // that aren't included in the embedded metadata
+    const {alt, isDecorative, ...embeddedMetadata} = settings
+    expect(parseMetadata(svg)).toEqual(embeddedMetadata)
   })
 })

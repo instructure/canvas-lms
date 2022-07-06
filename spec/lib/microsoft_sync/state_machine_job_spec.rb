@@ -85,15 +85,17 @@ module MicrosoftSync
   end
 
   class StateMachineJobTestSteps2 < StateMachineJobTestStepsBase
-    def initialize(step_initial_retries, step_second_delay_amounts = [1, 2, 3])
+    def initialize(step_initial_retries, step_second_delay_amounts = [1, 2, 3],
+                   error_class: Errors::PublicError)
       super()
+      @error_class = error_class
       @step_initial_retries = step_initial_retries
       @step_second_delay_amounts = step_second_delay_amounts
     end
 
     def step_initial(_mem_data, _job_state_data)
       if (@step_initial_retries -= 1) >= 0
-        StateMachineJob::Retry.new(error: Errors::PublicError.new("foo")) { steps_run << :stash }
+        StateMachineJob::Retry.new(error: @error_class.new("foo")) { steps_run << :stash }
       else
         StateMachineJob::NextStep.new(:step_second)
       end
@@ -101,7 +103,7 @@ module MicrosoftSync
 
     def step_second(_mem_data, _job_state_data)
       StateMachineJob::Retry.new(
-        error: Errors::PublicError.new("foo"),
+        error: @error_class.new("foo"),
         delay_amount: @step_second_delay_amounts
       )
     end
@@ -267,26 +269,31 @@ module MicrosoftSync
 
       describe "retry counting" do
         let(:steps_object) { StateMachineJobTestSteps2.new(5) }
+        let(:error_name_underscored) { "MicrosoftSync__Errors__PublicError" }
 
-        it "counts retries for each step and stores in job_state" do
-          subject.send(:run, nil, nil)
-          expect(state_record.reload.job_state[:retries_by_step]["step_initial"]).to eq(1)
-          subject.send(:run, :step_initial, nil)
-          expect(state_record.reload.job_state[:retries_by_step]["step_initial"]).to eq(2)
-          subject.send(:run, :step_initial, nil)
-          expect(state_record.reload.job_state[:retries_by_step]["step_initial"]).to eq(3)
+        shared_examples_for "a non-final retry" do
+          it "counts retries for each step and stores in job_state" do
+            subject.send(:run, nil, nil)
+            expect(state_record.reload.job_state[:retries_by_step]["step_initial"]).to eq(1)
+            subject.send(:run, :step_initial, nil)
+            expect(state_record.reload.job_state[:retries_by_step]["step_initial"]).to eq(2)
+            subject.send(:run, :step_initial, nil)
+            expect(state_record.reload.job_state[:retries_by_step]["step_initial"]).to eq(3)
+          end
+
+          it 'increments the "retry" statsd counter' do
+            allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+            subject.send(:run, nil, nil)
+            expect(InstStatsd::Statsd).to have_received(:increment).with(
+              "microsoft_sync.smj.retry",
+              tags: {
+                microsoft_sync_step: "step_initial", category: error_name_underscored,
+              }
+            )
+          end
         end
 
-        it 'increments the "retry" statsd counter' do
-          allow(InstStatsd::Statsd).to receive(:increment).and_call_original
-          subject.send(:run, nil, nil)
-          expect(InstStatsd::Statsd).to have_received(:increment).with(
-            "microsoft_sync.smj.retry",
-            tags: {
-              microsoft_sync_step: "step_initial", category: "MicrosoftSync__Errors__PublicError"
-            }
-          )
-        end
+        it_behaves_like "a non-final retry"
 
         context "when the number of retries for a step is exceeded" do
           before do
@@ -308,11 +315,11 @@ module MicrosoftSync
           end
 
           it "doesn't run the stash block on the last failure" do
-            expect { subject.send(:run, :step_initial, nil) }.to \
-              raise_error(Errors::PublicError, "foo")
             expect(steps_object.steps_run.count(:stash)).to eq(4)
             steps_object.steps_run.clear
-            expect(steps_object.steps_run).to be_empty
+            expect { subject.send(:run, :step_initial, nil) }.to \
+              raise_error(Errors::PublicError, "foo")
+            expect(steps_object.steps_run.count(:stash)).to eq(0)
           end
 
           it 'increments the "final_retry" statsd counter' do
@@ -337,6 +344,54 @@ module MicrosoftSync
             expect { subject.send(:run, :step_initial, nil) }.to \
               raise_error(Errors::PublicError)
             expect(state_record.last_error_report_id).to eq(456)
+          end
+        end
+
+        context "when the retrying error is a GracefulCancelError" do
+          let(:steps_object) do
+            StateMachineJobTestSteps2.new(5, error_class: Errors::GracefulCancelError)
+          end
+          let(:error_name_underscored) { "MicrosoftSync__Errors__GracefulCancelError" }
+
+          it_behaves_like "a non-final retry"
+
+          context "when the number of retries for a step is exceeded" do
+            before do
+              subject.send(:run, nil, nil)
+              3.times { subject.send(:run, :step_initial, nil) }
+            end
+
+            it "sets the record state but does not bubble up the error" do
+              subject.send(:run, :step_initial, nil)
+              expect(state_record.reload.job_state).to eq(nil)
+              expect(state_record.workflow_state).to eq("errored")
+              expect(state_record.last_error).to \
+                eq(Errors.serialize(Errors::GracefulCancelError.new("foo"), step: "step_initial"))
+            end
+
+            it 'increments a "canceled" statsd metric' do
+              allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+              subject.send(:run, :step_initial, nil)
+              expect(InstStatsd::Statsd).to have_received(:increment).with(
+                "microsoft_sync.smj.cancel",
+                tags: {
+                  microsoft_sync_step: "step_initial",
+                  category: "MicrosoftSync__Errors__GracefulCancelError"
+                }
+              )
+            end
+
+            it "doesn't run the stash block on the last failure" do
+              expect(steps_object.steps_run.count(:stash)).to eq(4)
+              steps_object.steps_run.clear
+              subject.send(:run, :step_initial, nil)
+              expect(steps_object.steps_run.count(:stash)).to eq(0)
+            end
+
+            it "does not send anything to Canvas::Errors" do
+              expect(Canvas::Errors).to_not receive(:capture)
+              subject.send(:run, :step_initial, nil)
+            end
           end
         end
 
@@ -502,7 +557,7 @@ module MicrosoftSync
       context "when an unhandled error occurs" do
         let(:error) { Errors::PublicError.new("uhoh") }
 
-        context "when the error doesn't include GracefulCancelTestError" do
+        context "when the error is not a GracefulCancelError" do
           before do
             subject.send(:run, nil, nil)
             subject.send(:run, :step_initial, nil)

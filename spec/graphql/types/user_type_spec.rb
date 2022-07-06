@@ -795,11 +795,18 @@ describe Types::UserType do
 
   describe "submission comments" do
     before(:once) do
-      @course = Course.create! name: "TEST"
+      course = Course.create! name: "TEST"
+      course_2 = Course.create! name: "TEST 2"
 
-      @teacher = course_with_user("TeacherEnrollment", course: @course, name: "Mr Teacher", active_all: true).user
-      @student = course_with_user("StudentEnrollment", course: @course, name: "Mr Student 1", active_all: true).user
+      # these 'course_with_user' will  reassign @course
+      @teacher = course_with_user("TeacherEnrollment", course: course, name: "Mr Teacher", active_all: true).user
+      @teacher = course_with_user("TeacherEnrollment", course: course_2, user: @teacher, active_all: true).user
+      @student = course_with_user("StudentEnrollment", course: course, name: "Mr Student 1", active_all: true).user
+      @student_2 = course_with_user("StudentEnrollment", course: course, name: "Mr Student 2", active_all: true).user
+      @student_2 = course_with_user("StudentEnrollment", course: course_2, user: @student_2, active_all: true).user
 
+      @course = course
+      @course_2 = course_2
       assignment = @course.assignments.create!(
         name: "Test Assignment",
         moderated_grading: true,
@@ -812,9 +819,17 @@ describe Types::UserType do
         grader_count: 10,
         final_grader: @teacher
       )
+      @assignment3 = @course_2.assignments.create!(
+        name: "Assignment without Comments 2",
+        moderated_grading: true,
+        grader_count: 10,
+        final_grader: @teacher
+      )
 
       assignment.grade_student(@student, grade: 1, grader: @teacher, provisional: true)
       @assignment2.grade_student(@student, grade: 1, grader: @teacher, provisional: true)
+      @assignment2.grade_student(@student_2, grade: 1, grader: @teacher, provisional: true)
+      @assignment3.grade_student(@student_2, grade: 1, grader: @teacher, provisional: true)
 
       @student_submission_1 = assignment.submissions.find_by(user: @student)
 
@@ -862,6 +877,31 @@ describe Types::UserType do
 
       it "can get course names" do
         expect(teacher_type.resolve("viewableSubmissionsConnection { nodes { commentsConnection { nodes { course { name } } }  }  }")[0]).to match_array %w[TEST TEST TEST]
+      end
+
+      describe "filter" do
+        before(:once) do
+          # add_comments by user 2 to course 1 and 2
+          student_submission_2 = @assignment2.submissions.find_by(user: @student_2)
+          @student_submission_3 = @assignment3.submissions.find_by(user: @student_2)
+
+          student_submission_2.add_comment(author: @student_2, comment: "Fourth comment")
+          student_submission_2.add_comment(author: @teacher, comment: "Fifth comment")
+          @student_submission_3.add_comment(author: @student_2, comment: "sixth comment")
+          @student_submission_3.add_comment(author: @teacher, comment: "seventh comment")
+        end
+
+        it "submissions by course" do
+          query_result = teacher_type.resolve("viewableSubmissionsConnection(filter: [\"course_#{@course_2.id}\"]) { nodes { _id }  }")
+          expect(query_result.count).to eq 1
+          expect(query_result[0].to_i).to eq @student_submission_3.id
+        end
+
+        it "submissions by user" do
+          query_result = teacher_type.resolve("viewableSubmissionsConnection(filter: [\"user_#{@student_2.id}\"]) { nodes { _id }  }")
+          expect(query_result.count).to eq 2
+          expect(query_result[0].to_i).to eq @student_submission_3.id
+        end
       end
     end
   end

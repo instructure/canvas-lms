@@ -49,7 +49,7 @@ class Lti::TokenController < ApplicationController
       }, status: :bad_request
     end
     token = Lti::OAuth2::AccessToken.create_jwt(aud: request.host, sub: tool_proxy.guid)
-    render json: token.to_s
+    render plain: token.to_s
   end
 
   private

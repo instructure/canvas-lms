@@ -13,18 +13,16 @@ exports[`renders nothing if no opportunities 1`] = `
 >
   <CloseButton
     as="button"
-    buttonRef={[Function]}
     cursor="pointer"
+    elementRef={[Function]}
     margin="0"
     offset="x-small"
     onClick={[Function]}
     placement="end"
+    screenReaderLabel="Close Opportunity Center popup"
     size="small"
     type="button"
-    variant="icon"
-  >
-    Close Opportunity Center popup
-  </CloseButton>
+  />
   <Tabs
     elementRef={[Function]}
     id="Opportunities-styles__tabs_container"
@@ -94,18 +92,16 @@ exports[`renders the base component correctly with one of each kind of opportuni
 >
   <CloseButton
     as="button"
-    buttonRef={[Function]}
     cursor="pointer"
+    elementRef={[Function]}
     margin="0"
     offset="x-small"
     onClick={[Function]}
     placement="end"
+    screenReaderLabel="Close Opportunity Center popup"
     size="small"
     type="button"
-    variant="icon"
-  >
-    Close Opportunity Center popup
-  </CloseButton>
+  />
   <Tabs
     elementRef={[Function]}
     id="Opportunities-styles__tabs_container"
@@ -207,18 +203,16 @@ exports[`renders the right course with the right opportunity 1`] = `
 >
   <CloseButton
     as="button"
-    buttonRef={[Function]}
     cursor="pointer"
+    elementRef={[Function]}
     margin="0"
     offset="x-small"
     onClick={[Function]}
     placement="end"
+    screenReaderLabel="Close Opportunity Center popup"
     size="small"
     type="button"
-    variant="icon"
-  >
-    Close Opportunity Center popup
-  </CloseButton>
+  />
   <Tabs
     elementRef={[Function]}
     id="Opportunities-styles__tabs_container"

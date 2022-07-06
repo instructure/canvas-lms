@@ -805,7 +805,7 @@ describe User do
         observer_enrollment2.associated_user_id = @student.id
         observer_enrollment2.save!
 
-        @teacher_course = course_factory(course_name: "English ", active_course: true)
+        @teacher_course = course_factory(course_name: "English", active_course: true)
         @teacher_enrollment = @teacher_course.enroll_user(@user, "TeacherEnrollment", enrollment_state: "active")
         @teacher_enrollment.save!
 
@@ -845,6 +845,16 @@ describe User do
          .map { |c| [c.id, c.primary_enrollment_type] }).to eq [
            [@student_course.id, "StudentEnrollment"]
          ]
+      end
+
+      it "includes only unlinked observer enrollments if the associated_user is the current user" do
+        user_factory(active_all: true)
+        @observer_course.enroll_user(@user, "ObserverEnrollment", enrollment_state: :active)
+        @observer_course2.enroll_user(@user, "ObserverEnrollment", enrollment_state: :active, associated_user_id: @student.id)
+
+        expect(@user
+                 .courses_with_primary_enrollment(:current_and_invited_courses, nil, observee_user: @user)
+                 .pluck(:id)).to eq([@observer_course.id])
       end
 
       describe "with cross sharding" do
@@ -3158,7 +3168,7 @@ describe User do
       expect(course_ids).to contain_exactly(@course2.id)
     end
 
-    it "does not include inactive enrollments" do
+    it "does not include completed enrollments" do
       @course1.enroll_student(@student1)
       @course2.enroll_student(@student1)
       @course1.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @student1.id, enrollment_state: :completed)
@@ -3166,6 +3176,14 @@ describe User do
 
       course_ids = @observer.cached_course_ids_for_observed_user(@student1)
       expect(course_ids).to contain_exactly(@course2.id)
+    end
+
+    it "includes pending enrollments" do
+      @course1.enroll_student(@student1, enrollment_state: :invited)
+      @course1.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @student1.id, enrollment_state: :invited)
+
+      course_ids = @observer.cached_course_ids_for_observed_user(@student1)
+      expect(course_ids).to contain_exactly(@course1.id)
     end
 
     context "with sharding" do

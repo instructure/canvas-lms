@@ -52,12 +52,18 @@ renderIntoDiv(document.getElementById('content'), {
         'instructure_links',
         'instructure_html_view'
       ],
-      menubar: true
+      menubar: true,
+      screenReaderOnly: false
     }
   },
   trayProps: {
     contextType: 'course',
     contextId: '17',
-    containingContext: {type: 'course', contextId: '17', userId: '3'}
+    containingContext: {type: 'course', contextId: '17', userId: '3', contextType: 'course'},
+    canUploadFiles: true,
+    host: 'someOtherHost',
+    jwt: 'someJWT',
+    liveRegion: () => {},
+    screenReaderOnly: false
   }
 })

@@ -105,6 +105,10 @@ class Course < ActiveRecord::Base
     where("enrollments.workflow_state NOT IN ('rejected', 'deleted') AND enrollments.type<>'ObserverEnrollment'")
       .preload(:user)
   }, class_name: "Enrollment"
+  has_many :enrollments_excluding_linked_observers, lambda {
+    where("enrollments.workflow_state NOT IN ('rejected', 'deleted') AND NOT (enrollments.type = 'ObserverEnrollment' AND enrollments.associated_user_id IS NOT NULL)")
+      .preload(:user)
+  }, class_name: "Enrollment"
   has_many :participating_observers, -> { where(enrollments: { workflow_state: "active" }) }, through: :observer_enrollments, source: :user
   has_many :participating_observers_by_date, lambda {
                                                where(enrollments: { type: "ObserverEnrollment", workflow_state: "active" })
@@ -1645,6 +1649,9 @@ class Course < ActiveRecord::Base
       can permission
     end
 
+    given { |user| active_and_soft_concluded_enrollment_allows(user, :send_messages) }
+    can :send_messages
+
     given { |_user, session| session && session[:enrollment_uuid] && (hash = Enrollment.course_user_state(self, session[:enrollment_uuid]) || {}) && (hash[:enrollment_state] == "invited" || (hash[:enrollment_state] == "active" && hash[:user_state].to_s == "pre_registered")) && (available? || completed? || (claimed? && hash[:is_admin])) }
     can :read and can :read_outcomes
 
@@ -1857,6 +1864,17 @@ class Course < ActiveRecord::Base
     end
     active_enrollments.each { |e| e.course = self } # set association so we don't requery
     active_enrollments.any? { |e| (allow_future || e.date_based_state_in_db == "active") && e.has_permission_to?(permission) }
+  end
+
+  def active_and_soft_concluded_enrollment_allows(user, permission)
+    return false unless user && permission && !deleted?
+
+    is_unpublished = created? || claimed?
+    active_enrollments = enrollments.for_user(user).active_or_soft_concluded.select("enrollments.*, enrollment_states.state AS date_based_state_in_db")
+    active_enrollments = active_enrollments.where(type: %w[TeacherEnrollment TaEnrollment DesignerEnrollment StudentViewEnrollment]) if is_unpublished
+    active_enrollments.to_a.each(&:clear_association_cache)
+    active_enrollments.each { |e| e.course = self } # set association so we don't requery
+    active_enrollments.any? { |e| e.has_permission_to?(permission) && !e.course.completed? && e.workflow_state != "completed" }
   end
 
   def self.find_all_by_context_code(codes)
@@ -3426,7 +3444,7 @@ class Course < ActiveRecord::Base
   add_setting :alt_name
 
   add_setting :default_due_time, inherited: true
-  add_setting :conditional_release, default: false, boolean: true, inherited: true
+  add_setting :conditional_release, default: false, boolean: true
 
   def elementary_enabled?
     account.enable_as_k5_account?
@@ -4041,6 +4059,16 @@ class Course < ActiveRecord::Base
 
   def can_stop_being_template?
     !templated_accounts.exists?
+  end
+
+  def disable_conditional_release
+    return unless conditional_release?
+
+    self.conditional_release = false
+    save
+    ConditionalRelease::Service.delay_if_production(priority: Delayed::LOW_PRIORITY,
+                                                    n_strand: ["conditional_release_unassignment", global_root_account_id])
+                               .release_mastery_paths_content_in_course(self)
   end
 
   private

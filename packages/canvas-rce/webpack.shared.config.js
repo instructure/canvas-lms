@@ -25,32 +25,20 @@ module.exports = {
       // this has been broken for a while and babel needs to be reconfigured for
       // it without depending on @instructure/ui-babel-preset
       {
-        test: /\.jsx?$/,
-        use: [{
-          loader: 'babel-loader',
-          options: {
-            configFile: false,
-          }
-        }],
-        include: [
-          path.resolve(__dirname, 'src'),
-          path.resolve(__dirname, 'demo'),
-        ],
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader',
+        include: [path.resolve(__dirname, 'src'), path.resolve(__dirname, 'demo')]
       },
-      {
-        test: /\.(woff(2)?|otf|ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        use: 'file-loader'
-      }
-    ],
-    noParse: [
-      /i18nliner\/dist\/lib\/i18nliner/ // i18nLiner has a `require('fs')` that it doesn't actually need, ignore it.
+      {test: /(\.css$)/, include: /node_modules/, loaders: ['style-loader', 'css-loader']},
+      {test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000'}
     ]
   },
   plugins: [
     new webpack.DefinePlugin({
-      'process.env': {
-        NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'development')
-      }
+      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
+      'process.env.DEBUG': JSON.stringify(process.env.DEBUG),
+      ENV: JSON.stringify(process.env.NODE_ENV)
     })
   ]
 }

@@ -340,7 +340,7 @@ module MicrosoftSync
       StateMachineJob::COMPLETE
     rescue MicrosoftSync::Errors::TeamAlreadyExists
       StateMachineJob::COMPLETE
-    rescue MicrosoftSync::Errors::GroupHasNoOwners, MicrosoftSync::Errors::HTTPNotFound => e
+    rescue MicrosoftSync::Errors::GroupHasNoOwners, *MicrosoftSync::Errors::NOT_FOUND => e
       # API is eventually consistent: We often have to wait a couple minutes
       # after creating the group and adding owners for the Teams API to see the
       # group and owners.
@@ -432,6 +432,12 @@ module MicrosoftSync
                         "full sync in #{full_sync_after}"
       InstStatsd::Statsd.increment("#{STATSD_NAME}.partial_into_full_throttled")
       StateMachineJob::DelayedNextStep.new(:step_full_sync_prerequisites, full_sync_after)
+    rescue Errors::GroupNotFound
+      # If the MS group doesn't exist, it's possible (though unlikely) the API
+      # just hasn't settled. But more likely it's because someone else has
+      # deleted the MS group, which is an expected (graceful cancel) error. So
+      # retry but treat as an expected the error the last time.
+      retry_object_for_error(Errors::GroupNotFoundGracefulCancelError.new)
     rescue *Errors::INTERMITTENT_AND_NOTFOUND => e
       retry_object_for_error(e)
     end

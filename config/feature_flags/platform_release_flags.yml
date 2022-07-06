@@ -101,3 +101,12 @@ variable_substitution_numeric_to_string:
   description: |-
     If enabled, variable substitutions will return string values instead of numeric values
   applies_to: RootAccount
+ags_scores_file_error_improvements:
+  state: hidden
+  display_name: Better error handling for file uploads in the AGS Scores API
+  description: |-
+    If enabled, AGS Scores API requests that include a file upload from a URL that times out
+    will now return a more clear error than "500 Internal Server Error", and will also
+    refrain from saving any data or making any changes to submissions based on the request data,
+    letting tools retry these requests more easily.
+  applies_to: RootAccount

@@ -62,8 +62,7 @@ export default class DeveloperKeyStateControl extends React.Component {
     const devKeyBinding = this.props.developerKey.developer_key_account_binding
     if (devKeyBinding) {
       return devKeyBinding.workflow_state || 'allow'
-    }
-    else if (!this.isSiteAdmin()) {
+    } else if (!this.isSiteAdmin()) {
       return 'off'
     } else {
       return 'allow'
@@ -92,6 +91,10 @@ export default class DeveloperKeyStateControl extends React.Component {
     this.offToggle = node
   }
 
+  getKeyName() {
+    return this.props.developerKey.name || I18n.t('Unnamed Key')
+  }
+
   render() {
     return (
       <RadioInputGroup
@@ -106,18 +109,49 @@ export default class DeveloperKeyStateControl extends React.Component {
         name={this.props.developerKey.id}
         value={this.radioGroupValue()}
       >
-        <RadioInput ref={this.refOnToggle} label={I18n.t('On')} value="on" context="success" />
+        <RadioInput
+          ref={this.refOnToggle}
+          label={
+            <div>
+              {I18n.t('On')}
+              <ScreenReaderContent>
+                {I18n.t('On for key: %{keyName}', {keyName: this.getKeyName()})}
+              </ScreenReaderContent>
+            </div>
+          }
+          value="on"
+          context="success"
+        />
         {this.isSiteAdmin() && (
           <RadioInput
             ref={node => {
               this.allowToggle = node
             }}
-            label={I18n.t('Allow')}
+            label={
+              <div>
+                {I18n.t('Allow')}
+                <ScreenReaderContent>
+                  {I18n.t('Allow for key: %{keyName}', {keyName: this.getKeyName()})}
+                </ScreenReaderContent>
+              </div>
+            }
             value="allow"
             context="off"
           />
         )}
-        <RadioInput ref={this.refOffToggle} label={I18n.t('Off')} value="off" context="danger" />
+        <RadioInput
+          ref={this.refOffToggle}
+          label={
+            <div>
+              {I18n.t('Off')}
+              <ScreenReaderContent>
+                {I18n.t('Off for key: %{keyName}', {keyName: this.getKeyName()})}
+              </ScreenReaderContent>
+            </div>
+          }
+          value="off"
+          context="danger"
+        />
       </RadioInputGroup>
     )
   }

@@ -90,6 +90,16 @@ describe "Screenreader Gradebook grading" do
       expect(srgb_page.main_grade_input).to have_value("-")
     end
 
+    it "excuses student when grade input is 'Excused'" do
+      srgb_page.select_assignment(assignment_2)
+      srgb_page.main_grade_input.clear
+      srgb_page.grade_srgb_assignment(srgb_page.main_grade_input, "Excused")
+      srgb_page.tab_out_of_input(srgb_page.main_grade_input)
+
+      expect(srgb_page.excuse_checkbox.attribute("checked")).to be_truthy
+      expect(srgb_page.main_grade_input).to have_value("Excused")
+    end
+
     it "displays correct points for graded by Percent", prority: "1" do
       srgb_page.select_assignment(assignment_2)
       srgb_page.grade_srgb_assignment(srgb_page.main_grade_input, 8)

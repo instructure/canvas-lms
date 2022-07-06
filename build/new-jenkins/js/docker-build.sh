@@ -41,6 +41,12 @@ fi
 
 tag_many $KARMA_BUILDER_SELECTED_TAG local/karma-builder ${KARMA_BUILDER_TAGS[SAVE_TAG]}
 
+while docker exec -t general-build-container ps aww | grep graphql; do
+  sleep 0.1
+done
+
+docker cp $(docker ps -qa -f name=general-build-container):/usr/src/app/schema.graphql ./schema.graphql
+
 docker build \
   --build-arg PATCHSET_TAG="$PATCHSET_TAG" \
   --file Dockerfile.jenkins.karma-runner \

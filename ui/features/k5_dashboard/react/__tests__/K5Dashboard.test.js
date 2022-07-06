@@ -323,10 +323,22 @@ describe('K-5 Dashboard', () => {
 
   describe('Grades Section', () => {
     it('does not show the grades tab to students if hideGradesTabForStudents is set', async () => {
-      const {queryByRole} = render(
+      const {findByRole, queryByRole} = render(
         <K5Dashboard {...defaultProps} currentUserRoles={['student']} hideGradesTabForStudents />
       )
+      await findByRole('tab', {name: 'Homeroom'})
       expect(queryByRole('tab', {name: 'Grades'})).not.toBeInTheDocument()
+    })
+
+    it('shows the grades tab to teachers even if hideGradesTabForStudents is set', async () => {
+      const {findByRole} = render(
+        <K5Dashboard
+          {...defaultProps}
+          currentUserRoles={['student', 'teacher']}
+          hideGradesTabForStudents
+        />
+      )
+      expect(await findByRole('tab', {name: 'Grades'})).toBeInTheDocument()
     })
 
     it('displays a score summary for each non-homeroom course', async () => {

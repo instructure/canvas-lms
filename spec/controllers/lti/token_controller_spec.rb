@@ -219,6 +219,11 @@ describe Lti::TokenController do
         decoded_jwt = Canvas::Security.decode_jwt(response.body).with_indifferent_access
         expect(decoded_jwt[:sub]).to eq tool_proxy.guid
       end
+
+      it "returns plain text" do
+        send_request
+        expect(response.headers["Content-Type"]).to start_with("text/plain")
+      end
     end
 
     context "when basic_launch_lti2_id is provided" do

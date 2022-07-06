@@ -186,14 +186,12 @@ export class Opportunities extends Component {
       <CloseButton
         placement="end"
         offset="x-small"
-        variant="icon"
         onClick={this.props.togglePopover}
-        buttonRef={el => {
+        screenReaderLabel={formatMessage('Close Opportunity Center popup')}
+        elementRef={el => {
           this.closeButtonRef = el
         }}
-      >
-        {formatMessage('Close Opportunity Center popup')}
-      </CloseButton>
+      />
     )
   }
 

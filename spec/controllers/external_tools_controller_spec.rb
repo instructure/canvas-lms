@@ -772,7 +772,8 @@ describe ExternalToolsController do
           Lti::ResourceLink.create!(
             context_external_tool: lti_1_3_tool,
             context: @course,
-            custom: { abc: "def", expans: "$Canvas.user.id" }
+            custom: { abc: "def", expans: "$Canvas.user.id" },
+            url: "http://www.example.com/launch"
           )
         end
 
@@ -844,7 +845,7 @@ describe ExternalToolsController do
           tool2 = @course.account.context_external_tools.create!(
             name: "test", consumer_key: "key", shared_secret: "secret",
             url: "http://www.example.com/launch", use_1_3: true,
-            developer_key: tool.developer_key
+            developer_key: lti_1_3_tool.developer_key
           )
           rl.update(context_external_tool: tool2)
           get_page
@@ -912,6 +913,38 @@ describe ExternalToolsController do
       expect(response).to be_successful
       expect(assigns[:tool]).to eq tool
       expect(assigns[:lti_launch].params).not_to be_nil
+    end
+
+    it "finds tools matching by resource_link_id" do
+      user_session(@teacher)
+
+      tool = new_valid_tool(@course) # this tool has a url and no domain
+      resource_link = Lti::ResourceLink.create_with(@course, tool, nil, "http://www.example.com/basiclti/url_from_resource_link")
+
+      # provide no url parameter
+      get "retrieve", params: { course_id: @course.id, resource_link_lookup_uuid: resource_link.lookup_uuid }
+      expect(response).to be_successful
+      expect(assigns[:tool]).to eq tool
+
+      expect(assigns[:lti_launch].resource_url).to eq "http://www.example.com/basiclti/url_from_resource_link"
+    end
+
+    it "finds tools matching by resource_link_id, ignoring the url parameter" do
+      user_session(@teacher)
+      new_valid_tool(@course, {
+                       url: "http://tool1.com"
+                     })
+      tool2 = new_valid_tool(@course, {
+                               url: "http://tool2.com"
+                             })
+      resource_link = Lti::ResourceLink.create_with(@course, tool2, nil, "http://tool2.com/testing")
+
+      puts "getting the retrieve endpoint.... #{@course.id} with lookup_id: #{resource_link.lookup_uuid}"
+      # supply a different url to the endpoint
+      get "retrieve", params: { course_id: @course.id, resource_link_lookup_uuid: resource_link.lookup_uuid, url: "http://tool1.com" }
+      expect(response).to be_successful
+      expect(assigns[:tool]).to eq tool2
+      expect(assigns[:lti_launch].resource_url).to eq "http://tool2.com/testing"
     end
 
     it "sets a breadcrumb with the tool name" do

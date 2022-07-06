@@ -71,6 +71,62 @@ describe BrandConfig do
     end
   end
 
+  describe ".for" do
+    before :once do
+      setup_subaccount_with_config
+    end
+
+    it "returns default with empty config" do
+      new_bc = BrandConfig.for(
+        variables: {},
+        parent_md5: nil,
+        js_overrides: nil,
+        css_overrides: nil,
+        mobile_js_overrides: nil,
+        mobile_css_overrides: nil
+      )
+      expect(new_bc.md5).to be_nil
+    end
+
+    it "returns default with only parent_md5" do
+      new_bc = BrandConfig.for(
+        variables: {},
+        parent_md5: @parent_config.md5,
+        js_overrides: nil,
+        css_overrides: nil,
+        mobile_js_overrides: nil,
+        mobile_css_overrides: nil
+      )
+      expect(new_bc.md5).to be_nil
+    end
+
+    it "returns unsaved record for new config" do
+      new_bc = BrandConfig.for(
+        variables: { "ic-brand-global-nav-bgd" => "#456" },
+        parent_md5: @parent_config.md5,
+        js_overrides: nil,
+        css_overrides: nil,
+        mobile_js_overrides: nil,
+        mobile_css_overrides: nil
+      )
+      expect(new_bc.md5).not_to be_nil
+      expect(new_bc.new_record?).to be(true)
+    end
+
+    it "returns existing record if it exists" do
+      new_bc = BrandConfig.for(
+        variables: { "ic-brand-global-nav-bgd" => "#123" },
+        parent_md5: @parent_config.md5,
+        js_overrides: nil,
+        css_overrides: nil,
+        mobile_js_overrides: nil,
+        mobile_css_overrides: nil
+      )
+      expect(new_bc.md5).not_to be_nil
+      expect(new_bc.new_record?).to be(false)
+    end
+  end
+
   describe "chain_of_ancestor_configs" do
     before :once do
       setup_subaccount_with_config

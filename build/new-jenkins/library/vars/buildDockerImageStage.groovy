@@ -154,7 +154,7 @@ def premergeCacheImage() {
   }
 }
 
-def patchsetImage() {
+def patchsetImage(asyncStepsStr) {
   credentials.withStarlordCredentials {
     def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
 
@@ -175,7 +175,13 @@ def patchsetImage() {
         "YARN_RUNNER_PREFIX=${env.YARN_RUNNER_PREFIX}",
       ]) {
         try {
-          sh "build/new-jenkins/docker-build.sh $PATCHSET_TAG"
+          sh """#!/bin/bash
+          set -ex
+
+          build/new-jenkins/docker-build.sh $PATCHSET_TAG
+
+          $asyncStepsStr
+          """
         } catch (e) {
           handleDockerBuildFailure(PATCHSET_TAG, e)
         }
@@ -201,7 +207,7 @@ def patchsetImage() {
   }
 }
 
-def i18nGenerate() {
+def i18nExtract() {
   def dest = 's3://instructure-translations/sources/canvas-lms/en/en.yml'
   def roleARN = 'arn:aws:iam::307761260553:role/translations-jenkins'
 
@@ -215,7 +221,7 @@ def i18nGenerate() {
         -e COMPILE_ASSETS_BRAND_CONFIGS=0 \
         -e COMPILE_ASSETS_BUILD_JS=0 \
         $PATCHSET_TAG \
-          bundle exec rake canvas:compile_assets i18n:generate
+          bundle exec rake canvas:compile_assets i18n:extract
     """
   )
 

@@ -20,10 +20,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Conversation} from '../../../graphql/Conversation'
 import {ConversationContext} from '../../../util/constants'
 import {CONVERSATION_MESSAGES_QUERY, SUBMISSION_COMMENTS_QUERY} from '../../../graphql/Queries'
-import {
-  DELETE_CONVERSATION_MESSAGES,
-  UPDATE_CONVERSATION_PARTICIPANTS
-} from '../../../graphql/Mutations'
+import {DELETE_CONVERSATION_MESSAGES} from '../../../graphql/Mutations'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {MessageDetailHeader} from '../../components/MessageDetailHeader/MessageDetailHeader'
 import {MessageDetailItem} from '../../components/MessageDetailItem/MessageDetailItem'
@@ -51,19 +48,6 @@ export const MessageDetailContainer = props => {
   const onItemRefSet = useCallback(refCurrent => {
     setLastMessageItem(refCurrent)
   }, [])
-
-  const [readStateChangeConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
-    onCompleted(data) {
-      if (data.updateConversationParticipants.errors) {
-        setOnFailure(I18n.t('Read state change operation failed'))
-      } else {
-        setOnSuccess(I18n.t('Read state Changed!'))
-      }
-    },
-    onError() {
-      setOnFailure(I18n.t('Read state change failed'))
-    }
-  })
 
   const removeConversationMessagesFromCache = (cache, result) => {
     const options = {
@@ -123,16 +107,16 @@ export const MessageDetailContainer = props => {
 
   // Set Conversation to read when the conversationMessages are loaded
   useEffect(() => {
+    const idIsStoredInSessionStorage = JSON.parse(
+      sessionStorage.getItem('conversationsManuallyMarkedUnread')
+    )?.includes(props.conversation._id)
+
     if (
+      !idIsStoredInSessionStorage &&
       conversationMessagesQuery.data?.legacyNode &&
       props.conversation.workflowState === 'unread'
     ) {
-      readStateChangeConversationParticipants({
-        variables: {
-          conversationIds: [props.conversation._id],
-          workflowState: 'read'
-        }
-      })
+      props.onReadStateChange('read', props.conversation._id)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversationMessagesQuery.data])
@@ -366,6 +350,7 @@ MessageDetailContainer.propTypes = {
   onForward: PropTypes.func,
   onStar: PropTypes.func,
   onUnstar: PropTypes.func,
+  onReadStateChange: PropTypes.func,
   setCanReply: PropTypes.func,
   scope: PropTypes.string
 }

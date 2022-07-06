@@ -550,8 +550,8 @@ test('renders lockAt/unlockAt with locale-appropriate format string', function (
   I18nStubber.setLocale('fr_FR')
   I18nStubber.stub('fr_FR', {
     'date.formats.short': '%-d %b',
-    'date.abbr_month_names.8': 'août',
-    'date.formats.date_at_time': '%-d %b à %k:%M'
+    'date.abbr_month_names': [0,1,2,3,4,5,6,7,'août',9,10,11,12],
+    'date.formats.date_at_time': '%-d %b à %k:%M',
   })
   const model = buildAssignment({
     id: 1,
@@ -583,7 +583,7 @@ test('renders lockAt/unlockAt in appropriate time zone', function () {
   I18nStubber.stub('en', {
     'date.formats.short': '%b %-d',
     'date.formats.date_at_time': '%b %-d at %l:%M%P',
-    'date.abbr_month_names.8': 'Aug'
+    'date.abbr_month_names': [0,1,2,3,4,5,6,7,'Aug',9,10,11,12],
   })
   const model = buildAssignment({
     id: 1,
@@ -662,7 +662,7 @@ test('renders due date column with locale-appropriate format string', function (
   I18nStubber.setLocale('fr_FR')
   I18nStubber.stub('fr_FR', {
     'date.formats.short': '%-d %b',
-    'date.abbr_month_names.8': 'août'
+    'date.abbr_month_names': [0,1,2,3,4,5,6,7,'août',9,10,11,12],
   })
   const view = createView(this.model, {canManage: true})
   equal(
@@ -680,7 +680,7 @@ test('renders due date column in appropriate time zone', function () {
   })
   I18nStubber.stub('en', {
     'date.formats.short': '%b %-d',
-    'date.abbr_month_names.8': 'Aug'
+    'date.abbr_month_names': [0,1,2,3,4,5,6,7,'Aug',9,10,11,12],
   })
   const view = createView(this.model, {canManage: true})
   equal(

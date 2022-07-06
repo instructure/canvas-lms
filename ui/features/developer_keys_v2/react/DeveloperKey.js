@@ -265,7 +265,7 @@ DeveloperKey.propTypes = {
   }).isRequired,
   developerKey: shape({
     id: string.isRequired,
-    access_token_count: number.isRequired,
+    access_token_count: number,
     api_key: string,
     created_at: string.isRequired,
     visible: bool,

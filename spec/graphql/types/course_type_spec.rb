@@ -185,6 +185,17 @@ describe Types::CourseType do
     end
   end
 
+  describe "outcomeAlignmentStats" do
+    it "resolves to outcome alignment stats" do
+      account_admin_user
+      outcome_alignment_stats_model
+      @course.account.enable_feature!(:outcome_alignment_summary)
+      course_type = GraphQLTypeTester.new(@course, { current_user: @admin })
+      expect(course_type.resolve("outcomeAlignmentStats { totalOutcomes }")).to eq 2
+      expect(course_type.resolve("outcomeAlignmentStats { alignedOutcomes }")).to eq 1
+    end
+  end
+
   describe "sectionsConnection" do
     it "only includes active sections" do
       section1 = course.course_sections.create!(name: "Delete Me")

@@ -86,6 +86,9 @@ describe('ConversationListItem', () => {
       onSelect: jest.fn(),
       onOpen: jest.fn(),
       onStar: jest.fn(),
+      onMarkAsRead: jest.fn(),
+      onMarkAsUnRead: jest.fn(),
+      readStateChangeConversationParticipants: jest.fn(),
       ...overrides
     }
   }
@@ -125,20 +128,15 @@ describe('ConversationListItem', () => {
       expect(checkbox.checked).toBe(false)
     })
 
-    it('shows and hides the star button correctly', () => {
+    it('calls onStar on not-starred click', () => {
       const onStarMock = jest.fn()
 
       const props = createProps({onStar: onStarMock})
 
-      const {queryByTestId, getByText} = render(<ConversationListItem {...props} />)
+      const {queryByTestId} = render(<ConversationListItem {...props} />)
 
-      // star not shown by default
-      expect(queryByTestId('visible-not-starred')).not.toBeInTheDocument()
-      // star shown when conversation is moused over
-      const subjectLine = getByText('This is the subject line')
-      fireEvent.mouseOver(subjectLine)
+      // star unstarred by default
       expect(queryByTestId('visible-not-starred')).toBeInTheDocument()
-
       fireEvent.click(queryByTestId('visible-not-starred'))
       expect(onStarMock).toHaveBeenLastCalledWith(true, props.conversation._id)
     })
@@ -150,6 +148,22 @@ describe('ConversationListItem', () => {
 
       expect(container.getByText('Unread')).toBeInTheDocument()
       expect(container.getByTestId('unread-badge')).toBeInTheDocument()
+      expect(container.getByText('Mark as Read')).toBeInTheDocument()
+    })
+
+    it('should call stopPropagation when clicking the unread badge', () => {
+      const props = createProps({isUnread: true})
+      const container = render(<ConversationListItem {...props} />)
+      const unreadBadge = container.getByTestId('unread-badge')
+
+      const clickEvent = new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true
+      })
+      Object.assign(clickEvent, {stopPropagation: jest.fn()})
+      fireEvent(unreadBadge, clickEvent)
+
+      expect(clickEvent.stopPropagation).toHaveBeenCalledTimes(1)
     })
 
     it('renders the read badge when the conversation is read', () => {
@@ -159,24 +173,22 @@ describe('ConversationListItem', () => {
 
       expect(container.getByText('Read')).toBeInTheDocument()
       expect(container.getByTestId('read-badge')).toBeInTheDocument()
+      expect(container.getByText('Mark as Unread')).toBeInTheDocument()
     })
 
     it('update read state called with correct parameters', () => {
-      const changeReadState = jest.fn()
+      const onMarkAsUnread = jest.fn()
 
-      const props = createProps({readStateChangeConversationParticipants: changeReadState})
+      const props = createProps({
+        onMarkAsUnread
+      })
 
       const container = render(<ConversationListItem {...props} />)
 
       const unreadBadge = container.queryByTestId('read-badge')
       fireEvent.click(unreadBadge)
 
-      expect(changeReadState).toHaveBeenCalledWith({
-        variables: {
-          conversationIds: ['1'],
-          workflowState: 'unread'
-        }
-      })
+      expect(onMarkAsUnread).toHaveBeenCalledWith('1')
     })
   })
 
