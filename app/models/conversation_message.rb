@@ -42,6 +42,7 @@ class ConversationMessage < ActiveRecord::Base
 
   before_create :set_root_account_ids
   after_create :generate_user_note!
+  after_create :log_conversation_message_metrics
   after_save :update_attachment_associations
 
   scope :human, -> { where("NOT generated") }
@@ -250,6 +251,11 @@ class ConversationMessage < ActiveRecord::Base
       note = format_message(body).first
       recipient.user_notes.create(creator: author, title: title, note: note, root_account_id: root_account_id)
     end
+  end
+
+  def log_conversation_message_metrics
+    stat = (context || Account.site_admin).root_account.feature_enabled?(:react_inbox) ? "inbox.message.created.react" : "inbox.message.created.legacy"
+    InstStatsd::Statsd.increment(stat)
   end
 
   attr_accessor :cc_author
