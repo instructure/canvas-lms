@@ -25,6 +25,7 @@ class UserService < ActiveRecord::Base
   attr_reader :password
 
   validates :user_id, :service, :service_user_id, :workflow_state, presence: true
+  validates :service_user_id, :service_user_name, length: { maximum: maximum_string_length }
 
   before_save :infer_defaults
   after_save :assert_relations
