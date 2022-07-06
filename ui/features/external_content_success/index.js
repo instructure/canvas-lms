@@ -174,9 +174,8 @@ ExternalContentSuccess.start = async function () {
     )
   } else if (ExternalContentSuccess.getLaunchType() === 'assignment_index_menu') {
     parentWindow.location.reload()
-  } else if (parentWindow.$(parentWindow).data('events')?.externalContentReady) {
-    ExternalContentSuccess.dataReady(data, service_id)
   } else {
+    ExternalContentSuccess.dataReady(data, service_id)
     ExternalContentSuccess.a2DataReady(data)
   }
 }
