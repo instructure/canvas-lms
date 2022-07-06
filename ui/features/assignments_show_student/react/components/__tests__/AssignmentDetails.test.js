@@ -59,3 +59,21 @@ it('does not render a due date if there is no dueAt set', async () => {
   const {queryAllByText} = render(<AssignmentDetails assignment={assignment} />)
   expect(queryAllByText('Available Jul 11, 2016 7:00pm')).toHaveLength(0)
 })
+
+it('renders the peer name when peer review mode is ON', async () => {
+  const assignment = await mockAssignment()
+
+  assignment.env.peerReviewModeEnabled = true
+  assignment.env.peerDisplayName = 'John Connor'
+  const {getByText} = render(<AssignmentDetails assignment={assignment} />)
+  expect(getByText(/John Connor/)).toBeInTheDocument()
+})
+
+it('does not render the peer name when peer review mode is OFF', async () => {
+  const assignment = await mockAssignment()
+
+  assignment.env.peerReviewModeEnabled = false
+  assignment.env.peerDisplayName = 'John Connor'
+  const {queryByText} = render(<AssignmentDetails assignment={assignment} />)
+  expect(queryByText(/John Connor/)).not.toBeInTheDocument()
+})

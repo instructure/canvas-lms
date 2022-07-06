@@ -101,6 +101,26 @@ async function makeProps(opts = {}) {
 }
 
 describe('RubricTab', () => {
+  describe('general', () => {
+    it('contains "View Rubric" when peer review mode is OFF', async () => {
+      const props = await makeProps({graded: false})
+      props.peerReviewModeEnabled = false
+      const {findByText, queryByText} = render(<RubricTab {...props} />)
+
+      expect(await findByText('View Rubric')).toBeInTheDocument()
+      expect(await queryByText('Fill Out Rubric')).not.toBeInTheDocument()
+    })
+
+    it('contains "Fill Out Rubric" when peer review mode is ON', async () => {
+      const props = await makeProps({graded: false})
+      props.peerReviewModeEnabled = true
+      const {findByText, queryByText} = render(<RubricTab {...props} />)
+
+      expect(await findByText('Fill Out Rubric')).toBeInTheDocument()
+      expect(await queryByText('View Rubric')).not.toBeInTheDocument()
+    })
+  })
+
   describe('ungraded rubric', () => {
     it('contains the rubric ratings heading', async () => {
       const props = await makeProps({graded: false})
