@@ -85,7 +85,7 @@ export default function LinkOptionsDialog(props) {
       onExited={props.onExited}
       onSubmit={handleSave}
       open={props.open}
-      shouldCloseOnDocumentClick
+      shouldCloseOnDocumentClick={false}
       shouldReturnFocus={false}
       size="medium"
     >
