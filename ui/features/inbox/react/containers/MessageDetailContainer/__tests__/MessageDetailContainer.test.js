@@ -112,9 +112,8 @@ describe('MessageDetailContainer', () => {
         const container = setup({
           conversation: {...Conversation.mock({_id: CONVERSATION_ID_WHERE_CAN_REPLY_IS_FALSE})}
         })
-        await waitForApolloLoading()
+        await waitForElementToBeRemoved(() => container.queryByTestId('conversation-loader'))
 
-        expect(container.queryByTestId('conversation-loader')).not.toBeInTheDocument()
         expect(container.queryByTestId('message-detail-header-reply-btn')).not.toBeInTheDocument()
         expect(container.queryByTestId('message-reply')).not.toBeInTheDocument()
       })
@@ -200,7 +199,7 @@ describe('MessageDetailContainer', () => {
   })
 
   describe('submission comments', () => {
-    const mockSubmissionComment = {subject: 'mySubject', _id: '1'}
+    const mockSubmissionComment = {subject: 'mySubject', _id: '1', workflowState: 'unread'}
     describe('rendering', () => {
       it('should render', () => {
         const container = setup({
@@ -249,6 +248,19 @@ describe('MessageDetailContainer', () => {
         })
         await waitForApolloLoading()
         expect(container.queryByTestId('message-more-options')).not.toBeInTheDocument()
+      })
+
+      it('should mark loaded submission comments as read', async () => {
+        const mockReadStateChange = jest.fn()
+        const container = setup({
+          conversation: mockSubmissionComment,
+          onReadStateChange: mockReadStateChange
+        })
+        // wait for query to load
+        await container.findAllByTestId('message-more-options')
+
+        await waitForApolloLoading()
+        expect(mockReadStateChange).toHaveBeenCalled()
       })
     })
   })
