@@ -26,7 +26,11 @@ import {NoSelectedConversation} from '../components/NoSelectedConversation/NoSel
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {useMutation} from 'react-apollo'
-import {DELETE_CONVERSATIONS, UPDATE_CONVERSATION_PARTICIPANTS} from '../../graphql/Mutations'
+import {
+  DELETE_CONVERSATIONS,
+  UPDATE_CONVERSATION_PARTICIPANTS,
+  UPDATE_SUBMISSIONS_READ_STATE
+} from '../../graphql/Mutations'
 import {CONVERSATIONS_QUERY} from '../../graphql/Queries'
 import {decodeQueryString} from 'query-string-encoding'
 import {responsiveQuerySizes} from '../../util/utils'
@@ -421,6 +425,27 @@ const CanvasInbox = () => {
     })
   }
 
+  const [readStateChangeSubmission] = useMutation(UPDATE_SUBMISSIONS_READ_STATE, {
+    onCompleted(data) {
+      if (data.updateSubmissionsReadState.errors) {
+        setOnFailure(I18n.t('Read state change operation failed'))
+      } else {
+        setOnSuccess(
+          I18n.t(
+            {
+              one: 'Read state Changed!',
+              other: 'Read states Changed!'
+            },
+            {count: '1000'}
+          )
+        )
+      }
+    },
+    onError() {
+      setOnFailure(I18n.t('Read state change failed'))
+    }
+  })
+
   const [readStateChangeConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
     onCompleted(data) {
       if (data.updateConversationParticipants.errors) {
@@ -444,13 +469,21 @@ const CanvasInbox = () => {
 
   const handleReadState = (markAsRead, conversationIds = null) => {
     const conversationIdsToChange = conversationIds || selectedConversations.map(convo => convo._id)
-
-    readStateChangeConversationParticipants({
-      variables: {
-        conversationIds: conversationIdsToChange,
-        workflowState: markAsRead
-      }
-    })
+    if (scope === 'submission_comments') {
+      readStateChangeSubmission({
+        variables: {
+          submissionIds: conversationIds,
+          read: markAsRead === 'read'
+        }
+      })
+    } else {
+      readStateChangeConversationParticipants({
+        variables: {
+          conversationIds: conversationIdsToChange,
+          workflowState: markAsRead
+        }
+      })
+    }
 
     // always change this to whatever was just changed
     if (markAsRead === 'unread') {

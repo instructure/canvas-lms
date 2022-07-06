@@ -113,13 +113,13 @@ export const MessageDetailContainer = props => {
 
     if (
       !idIsStoredInSessionStorage &&
-      conversationMessagesQuery.data?.legacyNode &&
+      (conversationMessagesQuery.data?.legacyNode || submissionCommentsQuery.data?.legacyNode) &&
       props.conversation.workflowState === 'unread'
     ) {
       props.onReadStateChange('read', props.conversation._id)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [conversationMessagesQuery.data])
+  }, [conversationMessagesQuery.data, submissionCommentsQuery.data])
 
   const inboxMessageData = useMemo(() => {
     if (

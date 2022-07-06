@@ -225,8 +225,8 @@ export const ConversationListHolder = ({
           onSelect={handleItemSelection}
           onStar={props.onStar}
           key={conversation._id}
-          onMarkAsRead={isSubmissionCommentsType ? () => {} : props.onMarkAsRead}
-          onMarkAsUnread={isSubmissionCommentsType ? () => {} : props.onMarkAsUnread}
+          onMarkAsRead={props.onMarkAsRead}
+          onMarkAsUnread={props.onMarkAsUnread}
           textSize={props.textSize}
         />
       </View>
