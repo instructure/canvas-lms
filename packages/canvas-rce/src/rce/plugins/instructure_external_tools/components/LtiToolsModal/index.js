@@ -60,7 +60,7 @@ export function LtiToolsModal(props) {
       label={formatMessage('Apps')}
       onDismiss={props.onDismiss}
       open
-      shouldCloseOnDocumentClick
+      shouldCloseOnDocumentClick={false}
     >
       <Modal.Header theme={{padding: '0.5rem'}}>
         <CloseButton placement="end" offset="medium" onClick={props.onDismiss}>
