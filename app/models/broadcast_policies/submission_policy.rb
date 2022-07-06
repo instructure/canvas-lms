@@ -35,22 +35,31 @@ module BroadcastPolicies
     end
 
     def should_dispatch_assignment_submitted?
-      course.available? &&
-        just_submitted? &&
-        submission.submitted? &&
-        submission.has_submission? &&
-        # don't send a submitted message because we already sent an :assignment_submitted_late message
-        !submission.late? &&
-        !is_a_resubmission?
+      dispatch = course.available? &&
+                 just_submitted? &&
+                 submission.submitted? &&
+                 submission.has_submission? &&
+                 # don't send a submitted message because we already sent
+                 # an :assignment_submitted_late message
+                 !submission.late? &&
+                 !is_a_resubmission?
+
+      dispatch &&= new_quiz_submission? if assignment.quiz_lti?
+
+      dispatch
     end
 
     def should_dispatch_assignment_resubmitted?
-      course.available? &&
-        submission.submitted? &&
-        is_a_resubmission? &&
-        submission.has_submission? &&
-        # don't send a resubmitted message because we already sent a :assignment_submitted_late message.
-        !submission.late?
+      dispatch = course.available? &&
+                 is_a_resubmission? &&
+                 submission.has_submission? &&
+                 # don't send a resubmitted message because we already sent an
+                 # :assignment_submitted_late message.
+                 !submission.late?
+
+      dispatch &&= submission.submitted? unless assignment.quiz_lti?
+
+      dispatch
     end
 
     def should_dispatch_group_assignment_submitted_late?
@@ -113,8 +122,31 @@ module BroadcastPolicies
     end
 
     def is_a_resubmission?
+      return new_quiz_resubmission? if assignment.quiz_lti?
+
       submission.submitted_at_before_last_save &&
         submission.saved_change_to_submitted_at?
+    end
+
+    def new_quiz_submission?
+      # New quizzes updates Submission records in several
+      # ways. The most reliable way to check if a submission
+      # was submitted for the first time is seeing if the
+      # workflow state transitioned from unsubmitted -> submitted.
+      submission.saved_change_to_workflow_state == [
+        Submission.workflow_states.unsubmitted,
+        Submission.workflow_states.submitted
+      ]
+    end
+
+    def new_quiz_resubmission?
+      is_resubmission = submission.saved_change_to_url?
+
+      # If the previous url value was blank it indicates a submission, not resubmission
+      is_resubmission &&= submission.saved_change_to_url.first.present?
+
+      # Make sure the new URL value was not used previously. If it was, this is not a resubmission
+      is_resubmission && submission.submission_history.none? { |s| s.url == submission.saved_change_to_url.last }
     end
 
     def grade_updated?
