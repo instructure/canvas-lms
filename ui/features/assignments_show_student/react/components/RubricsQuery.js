@@ -64,6 +64,7 @@ export default function RubricsQuery(props) {
       }
       rubric={transformRubricData(data.assignment.rubric)}
       rubricAssociation={data.assignment.rubricAssociation}
+      peerReviewModeEnabled={props.assignment.env.peerReviewModeEnabled}
     />
   )
 }

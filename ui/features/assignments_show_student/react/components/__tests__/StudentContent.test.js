@@ -355,6 +355,19 @@ describe('Assignment Student Content View', () => {
       expect(queryByText('3 Attempts Allowed')).not.toBeInTheDocument()
     })
 
+    it('does not render the number of attempts if peer review mode is enabled', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {allowedAttempts: 3}
+      })
+      props.assignment.env.peerReviewModeEnabled = true
+      const {queryByText} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(queryByText('3 Attempts Allowed')).not.toBeInTheDocument()
+    })
+
     it('takes into account extra attempts awarded to the student', async () => {
       const props = await mockAssignmentAndSubmission({
         Assignment: {allowedAttempts: 3},

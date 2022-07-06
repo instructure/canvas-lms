@@ -34,14 +34,18 @@ export default function AssignmentDetails({assignment}) {
           {assignment.name}
         </TruncateText>
       </Heading>
-      {assignment.dueAt && (
+      {(assignment.env.peerReviewModeEnabled || assignment.dueAt) && (
         <Text size="small" weight="bold" data-test-id="due-date-display">
-          <FriendlyDatetime
-            data-test-id="due-date"
-            prefix={I18n.t('Due:')}
-            format={I18n.t('#date.formats.full_with_weekday')}
-            dateTime={assignment.dueAt}
-          />
+          {assignment.env.peerReviewModeEnabled &&
+            `${I18n.t('Peer:')} ${assignment.env.peerDisplayName} | `}
+          {assignment.dueAt && (
+            <FriendlyDatetime
+              data-test-id="due-date"
+              prefix={I18n.t('Due:')}
+              format={I18n.t('#date.formats.full_with_weekday')}
+              dateTime={assignment.dueAt}
+            />
+          )}
         </Text>
       )}
     </>

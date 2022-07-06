@@ -65,7 +65,10 @@ function LoggedOutContentTabs(props) {
         <Tabs variant="default">
           <Tabs.Panel renderTitle={I18n.t('Rubric')} selected>
             <Suspense fallback={<LoadingIndicator />}>
-              <RubricTab rubric={props.assignment.rubric} />
+              <RubricTab
+                rubric={props.assignment.rubric}
+                peerReviewModeEnabled={props.assignment.env.peerReviewModeEnabled}
+              />
             </Suspense>
           </Tabs.Panel>
         </Tabs>

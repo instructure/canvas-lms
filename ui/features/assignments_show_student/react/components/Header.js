@@ -56,8 +56,13 @@ class Header extends React.Component {
     onChangeSubmission: () => {}
   }
 
+  isPeerReviewModeEnabled = () => {
+    return this.props.assignment.env.peerReviewModeEnabled
+  }
+
   state = {
-    commentsTrayOpen: !!this.props.submission?.unreadCommentCount
+    commentsTrayOpen:
+      !!this.props.submission?.unreadCommentCount || !!this.isPeerReviewModeEnabled()
   }
 
   isSubmissionLate = () => {
@@ -178,7 +183,7 @@ class Header extends React.Component {
               )
 
               const unreadCount = this.props.submission?.unreadCommentCount
-              if (!unreadCount) return button
+              if (this.isPeerReviewModeEnabled() || !unreadCount) return button
 
               return (
                 <div data-testid="unread_comments_badge">
@@ -243,7 +248,9 @@ class Header extends React.Component {
                       submissionStatus={this.props.submission.submissionStatus}
                     />
                   </Flex.Item>
-                  <Flex.Item>{this.renderLatestGrade()}</Flex.Item>
+                  {!this.isPeerReviewModeEnabled() && (
+                    <Flex.Item>{this.renderLatestGrade()}</Flex.Item>
+                  )}
                 </Flex>
 
                 <CommentsTray
@@ -259,7 +266,7 @@ class Header extends React.Component {
             <Flex.Item shouldGrow>
               {this.props.submission && !this.props.assignment.nonDigitalSubmission && (
                 <Flex wrap="wrap">
-                  {this.props.allSubmissions && (
+                  {this.props.allSubmissions && !this.isPeerReviewModeEnabled() && (
                     <Flex.Item>
                       <AttemptSelect
                         allSubmissions={this.props.allSubmissions}
@@ -269,17 +276,20 @@ class Header extends React.Component {
                     </Flex.Item>
                   )}
 
-                  {this.props.assignment.env.currentUser && !lockAssignment && (
-                    <Flex.Item>
-                      <SubmissionWorkflowTracker submission={this.props.submission} />
-                    </Flex.Item>
-                  )}
+                  {this.props.assignment.env.currentUser &&
+                    !lockAssignment &&
+                    !this.isPeerReviewModeEnabled() && (
+                      <Flex.Item>
+                        <SubmissionWorkflowTracker submission={this.props.submission} />
+                      </Flex.Item>
+                    )}
                 </Flex>
               )}
             </Flex.Item>
             <Flex.Item shouldShrink>
               <Flex as="div" wrap="wrap">
-                {this.props.submission &&
+                {!this.isPeerReviewModeEnabled() &&
+                  this.props.submission &&
                   (this.props.submission.state === 'graded' ||
                     this.props.submission.state === 'submitted') && (
                     <Flex.Item margin="0 small 0 0">{this.selectedSubmissionGrade()}</Flex.Item>
