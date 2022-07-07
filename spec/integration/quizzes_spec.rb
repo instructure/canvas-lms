@@ -37,6 +37,12 @@ describe Quizzes::QuizzesController do
       @cs2 = @course.course_sections.create!
     end
 
+    it "renders page title as Quizzes: Course Name" do
+      get "/courses/#{@course.id}/quizzes"
+
+      expect(Nokogiri::HTML5(response.body).title).to eq("Quizzes: #{@course.name}")
+    end
+
     context "with overridden due dates" do
       include TextHelper
 

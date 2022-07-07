@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% provide :page_title, t(:page_titles, "Quizzes") %>
+<% provide :page_title, t(:page_titles, "Quizzes") + ": #{@context.name}" %>
 
 <% css_bundle :quizzes %>
 <% js_bundle :quizzes_index %>
