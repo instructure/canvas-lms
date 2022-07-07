@@ -759,7 +759,6 @@ class Quizzes::QuizzesController < ApplicationController
                   !check_lockdown_browser(:medium, named_context_url(@context, "context_quiz_history_url", @quiz.to_param, viewing: "1", version: params[:version]))
 
         js_bundle :quiz_history
-        @google_analytics_page_title = @quiz.survey? ? "User's Survey History" : "User's Quiz History"
         render stream: can_stream_template?
       end
     end
