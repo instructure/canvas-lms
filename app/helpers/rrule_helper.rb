@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class RruleToNaturalLanguageFailure < StandardError
+class RruleValidationError < StandardError
   def initialize(msg = "Failed converting an RRULE to natural language")
     super
   end
@@ -26,28 +26,50 @@ end
 
 # rubocop:disable Style/IfInsideElse
 module RruleHelper
+  RECURRING_EVENT_LIMIT = 200
+
   def rrule_to_natural_language(rrule)
     rropts = rrule_parse(rrule)
-    begin
-      case rropts["FREQ"]
-      when "DAILY"
-        parse_daily(rropts)
-      when "WEEKLY"
-        parse_weekly(rropts)
-      when "MONTHLY"
-        parse_monthly(rropts)
-      when "YEARLY"
-        parse_yearly(rropts)
-      else
-        raise RruleToNaturalLanguageFailure, "Invalid RRULE frequency"
-      end
-    rescue RruleToNaturalLanguageFailure
-      nil
+    rrule_validate_common_opts(rropts)
+    case rropts["FREQ"]
+    when "DAILY"
+      parse_daily(rropts)
+    when "WEEKLY"
+      parse_weekly(rropts)
+    when "MONTHLY"
+      parse_monthly(rropts)
+    when "YEARLY"
+      parse_yearly(rropts)
+    else
+      raise RruleValidationError, I18n.t("Invalid FREQ '%{freq}'", freq: rropts["FREQ"])
     end
+  rescue => e
+    logger.error "RRULE to natural language failure: #{e}"
+    nil
   end
 
   def rrule_parse(rrule)
     Hash[*rrule.sub(/^RRULE:/, "").split(/[;=]/)]
+  end
+
+  def rrule_validate_common_opts(rropts)
+    raise RruleValidationError, I18n.t("Missing INTERVAL") unless rropts.key?("INTERVAL")
+    raise RruleValidationError, I18n.t("INTERVAL must be > 0") unless rropts["INTERVAL"].to_i > 0
+
+    # We do not support never ending series because each event in the series
+    # must get created in the db to support the paginated calendar_events api
+    raise RruleValidationError, I18n.t("Missing COUNT or UNTIL") unless rropts.key?("COUNT") || rropts.key?("UNTIL")
+
+    if rropts.key?("COUNT")
+      raise RruleValidationError, I18n.t("COUNT must be > 0") unless rropts["COUNT"].to_i > 0
+      raise RruleValidationError, I18n.t("COUNT must be <= %{limit}", limit: RruleHelper::RECURRING_EVENT_LIMIT) unless rropts["COUNT"].to_i <= RruleHelper::RECURRING_EVENT_LIMIT
+    else
+      begin
+        format_date(rropts["UNTIL"])
+      rescue
+        raise RruleValidationError, I18n.t("Invalid UNTIL '%{until_date}'", until_date: rropts["UNTIL"])
+      end
+    end
   end
 
   private
@@ -83,13 +105,14 @@ module RruleHelper
     4 => I18n.t("4th"),
     5 => I18n.t("5th")
   }.freeze
+  DAYS_IN_MONTH = [nil, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31].freeze
 
   def byday_to_days(byday)
     byday.split(/\s*,\s*/).map { |d| DAYS_OF_WEEK[d] }.join(", ")
   end
 
   def bymonth_to_month(bymonth)
-    MONTHS[bymonth.to_i]
+    MONTHS[bymonth]
   end
 
   # days is array of string digits
@@ -102,7 +125,7 @@ module RruleHelper
   def parse_byday(byday)
     byday.split(",").map do |d|
       match = /\A([-+]?\d+)?([A-Z]{2})\z/.match(d)
-      raise RruleToNaturalLanguageFailure, "Invalid BYDAY" unless match
+      raise RruleValidationError, I18n.t("Invalid BYDAY '%{byday}'", byday: byday) unless match
 
       {
         occurence: match[1].to_i,
@@ -111,10 +134,22 @@ module RruleHelper
     end
   end
 
-  def parse_bymonthday(bymonthday)
-    raise RruleToNaturalLanguageFailure, "Unsupported BYMONTHDAY value" unless bymonthday.split(",").length == 1
+  def parse_bymonth(bymonth)
+    month = bymonth.to_i
+    raise RruleValidationError, I18n.t("Invalid BYMONTH '%{bymonth}'", bymonth: bymonth) unless month >= 1 && month <= 12
 
-    bymonthday
+    month
+  end
+
+  def parse_bymonthday(bymonthday, month)
+    raise RruleValidationError, I18n.t("Unsupported BYMONTHDAY, only a single day is permitted.") unless bymonthday.split(",").length == 1
+
+    monthday = bymonthday.to_i
+
+    # not validating if we're in a leap year
+    raise RruleValidationError, I18n.t("Invalid BYMONTHDAY '%{bymonthday}'", bymonthday: bymonthday) unless monthday >= 1 && monthday <= DAYS_IN_MONTH[month]
+
+    monthday
   end
 
   def format_date(date_str)
@@ -193,7 +228,7 @@ module RruleHelper
     elsif rropts["BYMONTHDAY"]
       parse_monthly_bymonthday(rropts)
     else
-      raise RruleToNaturalLanguageFailure, "Invalid monthly RRULE"
+      parse_generic_monthly(rropts)
     end
   end
 
@@ -274,13 +309,33 @@ module RruleHelper
     end
   end
 
+  def parse_generic_monthly(rropts)
+    interval = rropts["INTERVAL"]
+    count = rropts["COUNT"]
+    until_date = rropts["UNTIL"]
+
+    if interval == "1"
+      if count
+        I18n.t("Monthly, %{count} times", count: count)
+      else
+        I18n.t("Monthly until %{until}", until: format_date(until_date))
+      end
+    else
+      if count
+        I18n.t("Every %{interval} month, %{count} times", interval: interval, count: count)
+      else
+        I18.t("Every %{interval} month until %{until}", interval: interval, until: format_date(until_date))
+      end
+    end
+  end
+
   def parse_yearly(rropts)
     if rropts["BYDAY"]
       parse_yearly_byday(rropts)
     elsif rropts["BYMONTHDAY"]
       parse_yearly_bymonthday(rropts)
     else
-      raise RruleToNaturalLanguageFailure, "Invalid yearly RRULE"
+      raise RruleValidationError, I18n.t("A yearly RRULE must include BYDAY or BYMONTHDAY")
     end
   end
 
@@ -288,7 +343,7 @@ module RruleHelper
     count = rropts["COUNT"]
     interval = rropts["INTERVAL"]
     until_date = rropts["UNTIL"]
-    month = bymonth_to_month(rropts["BYMONTH"])
+    month = bymonth_to_month(parse_bymonth(rropts["BYMONTH"]))
     by_days = parse_byday(rropts["BYDAY"])
     days_of_week = by_days.pluck(:day_of_week).join(", ")
     occurence = by_days.first[:occurence]
@@ -329,8 +384,8 @@ module RruleHelper
     count = rropts["COUNT"]
     interval = rropts["INTERVAL"]
     until_date = rropts["UNTIL"]
-    month = rropts["BYMONTH"].to_i
-    day = parse_bymonthday(rropts["BYMONTHDAY"]).to_i
+    month = parse_bymonth(rropts["BYMONTH"])
+    day = parse_bymonthday(rropts["BYMONTHDAY"], month)
     date = format_month_day(month, day)
 
     if interval == "1"

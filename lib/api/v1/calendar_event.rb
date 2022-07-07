@@ -27,6 +27,7 @@ module Api::V1::CalendarEvent
   include Api::V1::Course
   include Api::V1::Group
   include Api::V1::Conferences
+  include ::RruleHelper
 
   def event_json(event, user, session, options = {})
     if event.is_a?(::CalendarEvent)
@@ -42,7 +43,7 @@ module Api::V1::CalendarEvent
     include ||= excludes.include?("child_events") ? [] : ["child_events"]
 
     context = (options[:context] || event.context)
-    duplicates = options[:duplicates] || []
+    duplicates = options.delete(:duplicates) || []
     participant = nil
 
     hash = api_json(
@@ -174,8 +175,14 @@ module Api::V1::CalendarEvent
 
     hash["url"] = api_v1_calendar_event_url(event) if options.key?(:url_override) ? options[:url_override] || hash["own_reservation"] : event.grants_right?(user, session, :read)
     hash["html_url"] = calendar_url_for(options[:effective_context] || event.effective_context, event: event)
-    hash["duplicates"] = duplicates
+    if duplicates
+      hash["duplicates"] = duplicates.map { |dupe| { "calendar_event" => calendar_event_json(dupe, user, session, options) } }
+    end
     hash["important_dates"] = event.important_dates
+    if event[:series_uuid] && event[:rrule] && include.include?("series_natural_language") && Account.site_admin.feature_enabled?(:calendar_series)
+      series_nat_lang = rrule_to_natural_language(event[:rrule])
+      hash["series_natural_language"] = series_nat_lang
+    end
     hash
   end
 

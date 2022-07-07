@@ -39,6 +39,7 @@ describe CalendarEventsApiController, type: :request do
     expected_reservation_event_fields = (expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group effective_context_code participant_type])
     expected_reserved_fields = (expected_slot_fields + ["reserved", "reserve_comments"])
     expected_reservation_fields = expected_reservation_event_fields - ["child_events"]
+    expected_series_fields = expected_fields + ["series_natural_language"]
 
     it "returns events within the given date range" do
       @course.calendar_events.create(title: "1", start_at: "2012-01-07 12:00:00")
@@ -1225,7 +1226,7 @@ describe CalendarEventsApiController, type: :request do
             }
           )
           assert_status(201)
-          expect(json.keys).to match_array expected_fields
+          expect(json.keys).to match_array expected_series_fields
           expect(json["title"]).to eq "many me"
           expect(json["series_uuid"]).not_to be_nil
 
@@ -1448,7 +1449,7 @@ describe CalendarEventsApiController, type: :request do
           json = api_call(:put, "/api/v1/calendar_events/#{target_event_id}",
                           { controller: "calendar_events_api", action: "update", id: target_event_id.to_s, format: "json" },
                           { calendar_event: { start_at: new_start_at, title: "this is different" } })
-          expect(json.keys).to match_array expected_fields
+          expect(json.keys).to match_array expected_series_fields
           expect(json["title"]).to eql "this is different"
           expect(json["start_at"]).to eql new_start_at
         end
@@ -1467,7 +1468,7 @@ describe CalendarEventsApiController, type: :request do
           assert_status(200)
           expect(json.length).to eql 3
           json.each_with_index do |event, i|
-            expect(event.keys).to match_array expected_fields
+            expect(event.keys).to match_array expected_series_fields
             expect(event["id"]).to eql orig_events[i]["id"]
             expect(event["title"]).to eql new_title
             expect(event["start_at"]).to eql (Time.parse(orig_events[i]["start_at"]) + 15.minutes).iso8601
@@ -1490,7 +1491,7 @@ describe CalendarEventsApiController, type: :request do
           expect(json.length).to eql 2
           orig_events.shift
           json.each_with_index do |event, i|
-            expect(event.keys).to match_array expected_fields
+            expect(event.keys).to match_array expected_series_fields
             expect(event["id"]).to eql orig_events[i]["id"]
             expect(event["title"]).to eql new_title
             expect(event["start_at"]).to eql (Time.parse(orig_events[i]["start_at"]) + 15.minutes).iso8601
@@ -1538,7 +1539,7 @@ describe CalendarEventsApiController, type: :request do
           expect(json.length).to eql 4
           orig_events.shift # we didn't update the first event in teh series
           orig_events.each_with_index do |event, i|
-            expect(json[i].keys).to match_array expected_fields
+            expect(json[i].keys).to match_array expected_series_fields
             expect(json[i]["id"]).to eql event["id"]
             expect(json[i]["title"]).to eql new_title
             expect(json[i]["start_at"]).to eql (Time.parse(event["start_at"]) + 15.minutes).iso8601
@@ -1567,7 +1568,7 @@ describe CalendarEventsApiController, type: :request do
           assert_status(200)
           expect(json.length).to eql 2
           json.each_with_index do |event, i|
-            expect(json[i].keys).to match_array expected_fields
+            expect(json[i].keys).to match_array expected_series_fields
             expect(json[i]["id"]).to eql orig_events[i]["id"]
             expect(json[i]["title"]).to eql new_title
             expect(json[i]["start_at"]).to eql (Time.parse(orig_events[i]["start_at"]) + 15.minutes).iso8601
