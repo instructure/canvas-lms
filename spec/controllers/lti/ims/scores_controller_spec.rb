@@ -257,6 +257,40 @@ module Lti::IMS
             end
           end
 
+          context 'when "prioritize_non_tool_grade" is present' do
+            let(:params_overrides) do
+              super().merge({
+                              :scoreGiven => score_given,
+                              :scoreMaximum => assignment.points_possible,
+                              Lti::Result::AGS_EXT_SUBMISSION => {
+                                prioritize_non_tool_grade: true
+                              }
+                            })
+            end
+            let(:score_given) { 0.5 }
+            let(:submission) { assignment.find_or_create_submission(user) }
+
+            context "a scored submission already exists" do
+              before do
+                assignment.submit_homework(user, { submitted_at: 1.hour.ago, submission_type: "external_tool" })
+                assignment.grade_student(user, { score: assignment.points_possible, grader: admin })
+              end
+
+              it "does not overwrite the score" do
+                expect { send_request }.not_to change { submission.reload.score }
+              end
+            end
+
+            context "no graded submission exists" do
+              it_behaves_like "creates a new submission"
+
+              it "scores the submission properly" do
+                send_request
+                expect(submission.reload.score).to eq params_overrides[:scoreGiven]
+              end
+            end
+          end
+
           context "with no scoreGiven" do
             it "does not update submission" do
               send_request
