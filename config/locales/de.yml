@@ -7315,7 +7315,7 @@ de:
     course_options: 
       course_options: 
         concluded: Abgeschlossen
-        favorite: Lieblingskurse
+        favorite: Favoriten
         groups: Gruppen
         more_courses: "Weitere Kurse"
     hide: Ausblenden
@@ -12547,7 +12547,7 @@ de:
       student_mute_notification: "Der Dozent arbeitet an der Benotung."
       submission_score: "*%{score}* von insgesamt %{possible}"
       titles: 
-        enter_score: "Punktestand zum Testen eingeben"
+        enter_score: "Testeingabe einer Punktzahl"
         revert_score: "Zu ursprünglicher Punktzahl zurückkehren"
         turnitin_score: "Turnitin-similarity-score -- weitere Informationen"
         vericite_score: "VeriCite-Similarity-Score – weitere Informationen"
@@ -15146,7 +15146,7 @@ de:
   list_of_pseudonyms_to_get_report_for_af38e1c6: "Liste von Pseudonymen, für die ein Bericht abzurufen ist"
   list_of_students_and_observers_f7f1a58a: "Liste der Teilnehmer und Beobachter"
   list_of_the_currently_attainable_trophies_959b2518: "Liste der derzeit erreichbaren Trophäe"
-  list_view_430aecce: Listenansicht
+  list_view_430aecce: ToDos
   lithuanian_5adcbe24: Litauisch
   little_lost_try_here_first_9e24e575: "Wissen Sie nicht weiter? Versuchen Sie dies!"
   live_event_subscription_webhooks_1dae83bb: "Webhooks für Abonnements von Live-Ereignissen"
@@ -19516,7 +19516,7 @@ de:
   page_views_service_is_temporarily_unavailable_2eb4818: "Der Dienst Seitenansichten ist vorübergehend nicht verfügbar"
   pages: 
     cancel_button: Abbrechen
-    cannot_unpublish_front_page: "Veröffentlichung der Startseite kann nicht rückgängig gemacht werden."
+    cannot_unpublish_front_page: "Startseite muss veröffentlicht bleiben."
     delete_button: Löschen
     delete_confirmation: "Möchten Sie diese Seite wirklich löschen?"
     delete_dialog_title: "Seite löschen"
@@ -20002,7 +20002,7 @@ de:
         tier_1_key: "Schlüssel (Tier 1-Support)"
     ims_es_importer_settings: 
       labels: 
-        course_long_name_selection: "Langer Name für Kursauswahl"
+        course_long_name_selection: "Vollständiger Kursname"
         course_short_name_selection: "Kurzer Name für Kursauswahl"
         course_sourcedid_name_prefix: "Ignoriertes Präfix für Kurs „sourcedid“"
         default_email_domain: Standard-E-Mail-Domäne
