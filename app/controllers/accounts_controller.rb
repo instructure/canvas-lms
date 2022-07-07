@@ -970,6 +970,10 @@ class AccountsController < ApplicationController
   # @argument account[settings][conditional_release][locked] [Boolean]
   #   Lock this setting for sub-accounts and courses
   #
+  # @argument override_sis_stickiness [boolean]
+  #   By default and when the value is true it updates all the fields
+  #   when the value is false then fields which in stuck_sis_fields will not be updated
+  #
   # @argument account[settings][lock_outcome_proficiency][value] [Boolean]
   #   [DEPRECATED] Restrict instructors from changing mastery scale
   #
@@ -1806,7 +1810,11 @@ class AccountsController < ApplicationController
   def strong_account_params
     # i'm doing this instead of normal params because we do too much hackery to the weak params, especially in plugins
     # and it breaks when we enforce inherited weak parameters (because we're not actually editing request.parameters anymore)
-    params.require(:account).permit(*permitted_account_attributes)
+    if params[:override_sis_stickiness] && !value_to_boolean(params[:override_sis_stickiness])
+      params.require(:account).permit(*permitted_account_attributes - [*@account.stuck_sis_fields])
+    else
+      params.require(:account).permit(*permitted_account_attributes)
+    end
   end
 
   def edit_help_links_env

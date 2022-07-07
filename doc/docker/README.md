@@ -35,7 +35,7 @@ For everyone now, this command should get you going:
 
 Be sure to pay attention to any `Next Steps` output from the script that you may need to run.
 
-Now you can do `mutagen-compose up -d` and you should be good to go. If you're
+Now you can do `docker-compose up -d` and you should be good to go. If you're
 using Dinghy-http-proxy or Dory you should be able to access Canvas by going to: [http://canvas.docker/](http://canvas.docker/)
 
 For more information checkout [Developing with Docker](developing_with_docker.md)

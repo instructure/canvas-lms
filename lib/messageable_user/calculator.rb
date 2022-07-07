@@ -429,10 +429,18 @@ class MessageableUser
         # make sure the course is recognized
         return unless options[:admin_context] || (course = course_index[course.id])
 
-        scope = enrollment_scope(options.merge(
-                                   include_concluded_students: false,
-                                   course_workflow_state: course.workflow_state
-                                 ))
+        scope = if (options[:admin_context] || course.user_is_instructor?(@user)) || !course.available?
+                  enrollment_scope(options.merge(
+                                     include_concluded_students: false,
+                                     course_workflow_state: course.workflow_state
+                                   ))
+                else
+                  enrollment_scope(options.merge(
+                                     include_concluded: false,
+                                     course_workflow_state: course.workflow_state
+                                   ))
+                end
+
         scope =
           case course_visibility(course)
           when :full then scope.where(full_visibility_clause([course]))

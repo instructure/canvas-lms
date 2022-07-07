@@ -235,7 +235,16 @@ module Types
         end
       end
 
+      can_send_all = if search_context.nil?
+                       false
+                     elsif search_context.is_a?(Course)
+                       search_context.grants_any_right?(object, :send_messages_all)
+                     elsif !search_context.course.nil?
+                       search_context.course.grants_any_right?(object, :send_messages_all)
+                     end
+
       {
+        sendMessagesAll: !!can_send_all,
         contexts_connection: contexts,
         users_connection: users
       }

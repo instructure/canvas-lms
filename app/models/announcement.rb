@@ -29,7 +29,7 @@ class Announcement < DiscussionTopic
 
   before_save :infer_content
   before_save :respect_context_lock_rules
-  after_save :create_alert
+  after_save :create_observer_alerts_job
   validates :context_id, presence: true
   validates :context_type, presence: true
   validates :message, presence: true
@@ -160,12 +160,15 @@ class Announcement < DiscussionTopic
     nil
   end
 
-  def create_alert
+  def create_observer_alerts_job
     return if !saved_changes.key?("workflow_state") || saved_changes["workflow_state"][1] != "active"
     return if context_type != "Course"
 
-    observer_enrollments = course.enrollments.active.of_observer_type.where.not(associated_user_id: nil)
-    observer_enrollments.each do |enrollment|
+    create_observer_alerts if course.enrollments.active.of_observer_type.where.not(associated_user_id: nil).exists?
+  end
+
+  def create_observer_alerts
+    course.enrollments.active.of_observer_type.where.not(associated_user_id: nil).find_each do |enrollment|
       observer = enrollment.user
       student = enrollment.associated_user
       next unless visible_for?(student)
@@ -181,4 +184,5 @@ class Announcement < DiscussionTopic
                                           }))
     end
   end
+  handle_asynchronously :create_observer_alerts, priority: Delayed::LOW_PRIORITY, max_attempts: 1
 end

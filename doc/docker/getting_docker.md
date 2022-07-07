@@ -18,22 +18,16 @@ Docker has lots of info getting up and running [here](https://www.docker.com/pro
 Make sure you have the following installed:
 
 * Docker Desktop
-* Mutagen
-* Mutagen-Compose
+* Docker Compose
 
 ### Via Homebrew
 
 ```
 brew install --cask docker
+brew install docker-compose
 ```
 Once the install has completed, launch Docker Desktop to finalize the setup.
 Navigate to Docker Desktop preferences → Resources and set the Memory to at least 8GB.
-
-Now install Mutagen and Mutagen-Compose
-
-```
-brew install mutagen-io/mutagen/mutagen mutagen-io/mutagen/mutagen-compose
-```
 
 ## Linux
 

@@ -31,6 +31,7 @@ import RichContentEditor from '@canvas/rce/RichContentEditor'
 import unflatten from 'obj-unflatten'
 import deparam from 'deparam'
 import coupleTimeFields from '@canvas/calendar/jquery/coupleTimeFields'
+import {renderDeleteCalendarEventDialog} from '@canvas/calendar/react/DeleteCalendarEventDialog'
 import datePickerFormat from '@canvas/datetime/datePickerFormat'
 import CalendarConferenceWidget from '@canvas/calendar-conferences/react/CalendarConferenceWidget'
 import filterConferenceTypes from '@canvas/calendar-conferences/filterConferenceTypes'
@@ -180,21 +181,47 @@ export default class EditCalendarEventView extends Backbone.View {
   }
 
   destroyModel() {
-    const msg = I18n.t(
-      'confirm_delete_calendar_event',
-      'Are you sure you want to delete this calendar event?'
-    )
-    if (confirm(msg)) {
-      return this.$el.disableWhileLoading(
-        this.model.destroy({
-          success: () =>
-            this.redirectWithMessage(
-              I18n.t('event_deleted', '%{event_title} deleted successfully', {
-                event_title: this.model.get('title')
-              })
-            )
-        })
+    if (ENV.FEATURES.calendar_series) {
+      let delModalContainer = document.getElementById('delete_modal_container')
+      if (!delModalContainer) {
+        delModalContainer = document.createElement('div')
+        delModalContainer.id = 'delete_modal_container'
+        document.body.appendChild(delModalContainer)
+      }
+      renderDeleteCalendarEventDialog(delModalContainer, {
+        isOpen: true,
+        onCancel: () => {
+          ReactDOM.unmountComponentAtNode(delModalContainer)
+        },
+        onDeleting: () => {},
+        onDeleted: () => {
+          ReactDOM.unmountComponentAtNode(delModalContainer)
+          this.redirectWithMessage(
+            I18n.t('event_deleted', '%{event_title} deleted successfully', {
+              event_title: this.model.get('title')
+            })
+          )
+        },
+        delUrl: this.model.url(),
+        isRepeating: !!this.model.get('series_uuid')
+      })
+    } else {
+      const msg = I18n.t(
+        'confirm_delete_calendar_event',
+        'Are you sure you want to delete this calendar event?'
       )
+      if (window.confirm(msg)) {
+        return this.$el.disableWhileLoading(
+          this.model.destroy({
+            success: () =>
+              this.redirectWithMessage(
+                I18n.t('event_deleted', '%{event_title} deleted successfully', {
+                  event_title: this.model.get('title')
+                })
+              )
+          })
+        )
+      }
     }
   }
 

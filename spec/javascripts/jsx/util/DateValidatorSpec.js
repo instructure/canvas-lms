@@ -73,22 +73,24 @@ function createValidator({
   userIsAdmin,
   hasGradingPeriods = true,
   postToSIS = null,
-  dueDateRequiredForAccount = false
+  dueDateRequiredForAccount = false,
+  termStart,
+  termEnd
 }) {
   ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT = dueDateRequiredForAccount
 
   const params = {
     date_range: {
       start_at: {
-        date: '2015-03-02T07:00:00Z',
+        date: termStart === undefined ? '2015-03-02T07:00:00Z' : termStart,
         date_context: 'term'
       },
       end_at: {
-        date: '2016-03-31T06:00:00Z',
+        date: termEnd === undefined ? '2016-03-31T06:00:00Z' : termEnd,
         date_context: 'term'
       }
     },
-    hasGradingPeriods: true,
+    hasGradingPeriods,
     userIsAdmin,
     gradingPeriods,
     postToSIS
@@ -375,6 +377,12 @@ QUnit.module('section dates', hooks => {
           start_at: '2020-03-01T00:00:00Z',
           end_at: '2020-07-01T00:00:00Z',
           override_course_and_term_dates: true
+        },
+        {
+          id: 234,
+          start_at: null,
+          end_at: null,
+          override_course_and_term_dates: null
         }
       ]
     })
@@ -394,6 +402,28 @@ QUnit.module('section dates', hooks => {
     })
     const validator = makeIndividualValidator()
     ok(isValid(validator, data))
+  })
+
+  test('allows date outside of one section range to be assigned to another, not-limited section', () => {
+    const firstSectionDueDateData = generateData({
+      unlock_at: '2020-03-03T00:00:00Z',
+      due_at: '2020-03-04T00:00:00Z',
+      lock_at: '2020-03-05T00:00:00Z',
+      student_ids: null,
+      course_section_id: 123
+    })
+
+    const secondSectionDueDateData = generateData({
+      unlock_at: null,
+      due_at: '2020-08-01T00:00:00Z',
+      lock_at: null,
+      student_ids: null,
+      course_section_id: 234
+    })
+
+    const validator = makeIndividualValidator({termStart: null, termEnd: null})
+    ok(isValid(validator, firstSectionDueDateData))
+    ok(isValid(validator, secondSectionDueDateData))
   })
 
   test('accepts all_dates format for section overrides', () => {

@@ -113,7 +113,7 @@ class CoursePace < ActiveRecord::Base
               assignment = content_tag.assignment
               next unless assignment
 
-              due_at = dates[course_pace_module_item.id]
+              due_at = CanvasTime.fancy_midnight(dates[course_pace_module_item.id].in_time_zone).in_time_zone("UTC")
               user_id = enrollment.user_id
 
               # Check for an old override
@@ -124,11 +124,10 @@ class CoursePace < ActiveRecord::Base
                 .where(set_type: "ADHOC", due_at_overridden: true)
                 .joins(:assignment_override_students)
                 .find_by(assignment_override_students: { user_id: user_id })
-              next if current_override&.due_at&.to_date == due_at
+              next if current_override&.due_at == due_at
 
               # See if there is already an assignment override with the correct date
-              due_time = CanvasTime.fancy_midnight(due_at.to_datetime).to_time
-              due_range = (due_time - 1.second).round..due_time.round
+              due_range = (due_at - 1.second).round..due_at.round
               correct_date_override =
                 assignment.assignment_overrides.active.find_by(
                   set_type: "ADHOC",
@@ -144,13 +143,13 @@ class CoursePace < ActiveRecord::Base
                   no_enrollment: false
                 )
               elsif current_override&.assignment_override_students&.size == 1
-                current_override.update(due_at: due_time.to_s)
+                current_override.update(due_at: due_at)
               else
                 AssignmentOverrideStudent.where(assignment: assignment, user_id: user_id).destroy_all
                 assignment.assignment_overrides.create!(
                   set_type: "ADHOC",
                   due_at_overridden: true,
-                  due_at: due_time.to_s,
+                  due_at: due_at,
                   assignment_override_students: [
                     AssignmentOverrideStudent.new(
                       assignment: assignment,

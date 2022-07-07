@@ -36,6 +36,8 @@ class AccessToken < ActiveRecord::Base
   has_one :account, through: :developer_key
 
   serialize :scopes, Array
+
+  validates :purpose, length: { maximum: maximum_string_length }
   validate :must_only_include_valid_scopes, unless: :deleted?
 
   has_many :notification_endpoints, -> { where(workflow_state: "active") }, dependent: :destroy

@@ -243,6 +243,7 @@ describe.skip('CommentsTrayBody', () => {
   // https://instructure.atlassian.net/browse/USERS-379
   // eslint-disable-next-line jest/no-disabled-tests
   it.skip('renders error alert when data returned from mutation fails', async () => {
+    // To be unskipped in EVAL-2477
     const mocks = await Promise.all([mockSubmissionCommentQuery(), mockCreateSubmissionComment()])
     mocks[1].error = new Error('aw shucks')
     const props = await mockAssignmentAndSubmission()

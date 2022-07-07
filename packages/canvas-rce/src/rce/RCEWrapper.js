@@ -35,7 +35,7 @@ import indicatorRegion from './indicatorRegion'
 import editorLanguage from './editorLanguage'
 import normalizeLocale from './normalizeLocale'
 import {sanitizePlugins} from './sanitizePlugins'
-import {getCanvasUrl} from './getCanvasUrl'
+import {getCanvasUrl} from './RCEApiSessionGetter'
 
 import indicate from '../common/indicate'
 import bridge from '../bridge'
@@ -53,6 +53,10 @@ import {
   VIDEO_SIZE_DEFAULT,
   AUDIO_PLAYER_SIZE
 } from './plugins/instructure_record/VideoOptionsTray/TrayController'
+
+import styles from '../skins/skin-delta.css'
+import skinCSSBinding from 'tinymce/skins/ui/oxide/skin.min.css'
+import contentCSSBinding from 'tinymce/skins/ui/oxide/content.css'
 
 const RestoreAutoSaveModal = React.lazy(() => import('./RestoreAutoSaveModal'))
 const RceHtmlEditor = React.lazy(() => import('./RceHtmlEditor'))
@@ -118,17 +122,8 @@ export const editorOptionsPropType = PropTypes.shape({
   readonly: PropTypes.bool
 })
 
-// we  `require` instead of `import` because the ui-themeable babel require hook only works with `require`
-// 2021-04-21: This is no longer true, but I didn't want to make a gratutious change when I found this out.
-// see https://gerrit.instructure.com/c/canvas-lms/+/263299/2/packages/canvas-rce/src/rce/RCEWrapper.js#50
-// for an `import` style solution
-const styles = require('../skins/skin-delta.css')
-const skinCSS = require('../../../../node_modules/tinymce/skins/ui/oxide/skin.min.css')
-  .template()
-  .replace(/tinymce__oxide--/g, '')
-const contentCSS = require('../../../../node_modules/tinymce/skins/ui/oxide/content.css')
-  .template()
-  .replace(/tinymce__oxide--/g, '')
+const skinCSS = skinCSSBinding.template().replace(/tinymce__oxide--/g, '')
+const contentCSS = contentCSSBinding.template().replace(/tinymce__oxide--/g, '')
 
 // If we ever get our jest tests configured so they can handle importing real esModules,
 // we can move this to plugins/instructure-ui-icons/plugin.js like the rest.
@@ -529,7 +524,7 @@ class RCEWrapper extends React.Component {
 
   insertImage(image) {
     const editor = this.mceInstance()
-    let element = contentInsertion.insertImage(editor, image)
+    const element = contentInsertion.insertImage(editor, image)
 
     // Removes TinyMCE's caret &nbsp; text if exists.
     if (element?.nextSibling?.data?.trim() === '') {
@@ -941,12 +936,12 @@ class RCEWrapper extends React.Component {
     if (event.code === 'F9' && event.altKey) {
       event.preventDefault()
       event.stopPropagation()
-      this.setFocusAbilityForHeader(true);
+      this.setFocusAbilityForHeader(true)
       focusFirstMenuButton(this._elementRef.current)
     } else if (event.code === 'F10' && event.altKey) {
       event.preventDefault()
       event.stopPropagation()
-      this.setFocusAbilityForHeader(true);
+      this.setFocusAbilityForHeader(true)
       focusToolbar(this._elementRef.current)
     } else if ((event.code === 'F8' || event.code === 'Digit0') && event.altKey) {
       event.preventDefault()
@@ -1019,7 +1014,7 @@ class RCEWrapper extends React.Component {
         if (leavingHeader) {
           this.setFocusAbilityForHeader(false)
         }
-      });
+      })
     }
     this.setFocusAbilityForHeader(false)
 
@@ -1049,8 +1044,10 @@ class RCEWrapper extends React.Component {
     // Not using iframe_aria_text because compatibility issues.
     // Not using iframe_attrs because library overwriting.
     if (this.iframe) {
-      this.iframe.setAttribute('title', formatMessage(
-        'Rich Text Area. Press ALT+0 for Rich Content Editor shortcuts.'))
+      this.iframe.setAttribute(
+        'title',
+        formatMessage('Rich Text Area. Press ALT+0 for Rich Content Editor shortcuts.')
+      )
     }
 
     this.props.onInitted?.(editor)
@@ -1397,7 +1394,7 @@ class RCEWrapper extends React.Component {
     }
   }
 
-  setFocusAbilityForHeader = (focusable) => {
+  setFocusAbilityForHeader = focusable => {
     // Sets aria-hidden to prevent screen readers focus in RCE menus and toolbar
     const header = this._elementRef.current.querySelector('.tox-editor-header')
     if (header) {

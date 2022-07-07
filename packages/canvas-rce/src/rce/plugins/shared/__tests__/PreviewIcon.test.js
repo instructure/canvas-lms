@@ -19,6 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import PreviewIcon from '../PreviewIcon'
+import checkerboardStyle from '../CheckerboardStyling'
 
 describe('PreviewIcon()', () => {
   let props = {testId: 'preview-icon'}
@@ -40,6 +41,13 @@ describe('PreviewIcon()', () => {
     const {queryByText} = subject(props)
 
     expect(queryByText('Loading preview')).not.toBeInTheDocument()
+  })
+
+  it('does not have a checkered background by default', () => {
+    subject(props)
+    const wrapper = document.getElementById('preview-background-wrapper')
+
+    expect(wrapper).not.toHaveAttribute('style')
   })
 
   describe('when an image data URL is provided', () => {
@@ -112,6 +120,21 @@ describe('PreviewIcon()', () => {
       const {getByText} = subject(props)
 
       expect(getByText('Loading preview')).toBeInTheDocument()
+    })
+  })
+
+  describe('when "checkered" is true', () => {
+    beforeEach(() => {
+      props = {
+        checkered: true
+      }
+    })
+
+    it('has a checkered background', () => {
+      subject(props)
+      const wrapper = document.getElementById('preview-background-wrapper')
+
+      expect(wrapper).toHaveStyle(checkerboardStyle(4))
     })
   })
 })

@@ -38,6 +38,7 @@ export const ADDRESS_BOOK_RECIPIENTS = gql`
       ... on User {
         id
         recipients(context: $context, search: $search) {
+          sendMessagesAll
           contextsConnection(first: 20, after: $afterContext) {
             nodes {
               id
@@ -205,6 +206,7 @@ export const VIEWABLE_SUBMISSIONS_QUERY = gql`
         viewableSubmissionsConnection(first: 20, after: $afterSubmission, filter: $filter) {
           nodes {
             _id
+            readState
             commentsConnection(sortOrder: $sort, filter: {allComments: $allComments}) {
               nodes {
                 ...SubmissionComment

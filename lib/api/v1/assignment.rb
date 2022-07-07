@@ -299,7 +299,7 @@ module Api::V1::Assignment
         end
       end
 
-      if assignment.rubric && !assignment.rubric.deleted?
+      if assignment.active_rubric_association?
         rubric = assignment.rubric
         hash["rubric"] = rubric.data.map do |row|
           row_hash = row.slice(:id, :points, :description, :long_description, :ignore_for_scoring)
@@ -573,7 +573,11 @@ module Api::V1::Assignment
       response = if prepared_update[:overrides]
                    update_api_assignment_with_overrides(prepared_update, user)
                  else
-                   prepared_update[:assignment].save!
+                   if assignment_params["force_updated_at"] && !prepared_update[:assignment].changed?
+                     prepared_update[:assignment].touch
+                   else
+                     prepared_update[:assignment].save!
+                   end
                    :ok
                  end
     end

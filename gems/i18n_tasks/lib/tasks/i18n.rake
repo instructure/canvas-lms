@@ -25,16 +25,22 @@ namespace :i18n do
   # @instructure/i18nliner on the frontend.
   source_translations_file = Rails.root.join("config/locales/generated/en.yml").to_s
 
-  js_i18nliner_path = Rails.root.join("gems/canvas_i18nliner/bin/i18nliner").to_s
+  js_i18nliner_path = Rails.root.join("node_modules/@instructure/i18nliner-canvas/bin/i18nliner").to_s
 
   # Translations extracted from the frontend source code.
   #
   # This file has a hierarchical structure, unlike the "index" one. It looks
   # similar to what the Ruby I18nliner exports.
-  js_translations_file = Rails.root.join("config/locales/generated/en.json").to_s
+  js_translations_file = Rails.root.join("config/locales/generated/en-js.json").to_s
+
+  # Input to the routine that generates JS modules for every locale, that are
+  # then loaded at runtime by the frontend.
+  #
+  # See @instructure/i18nliner-canvas for the structure of this file.
+  js_index_file = Rails.root.join("config/locales/generated/en-js-index.json").to_s
 
   # Directory to contain the auto-generated translation files for the frontend.
-  js_translation_modules_dir = Rails.root.join("public/javascripts/translations").to_s
+  js_translation_files_dir = Rails.root.join("public/javascripts/translations").to_s
 
   # like the top-level :environment, but just the i18n-y stuff we need.
   # also it's faster and doesn't require a db \o/
@@ -101,7 +107,8 @@ namespace :i18n do
   task extract_js: [] do
     exit 1 unless system(
       js_i18nliner_path, "export",
-      "--translationsFile", js_translations_file
+      "--translationsFile", js_translations_file,
+      "--indexFile", js_index_file
     )
   end
 
@@ -110,31 +117,21 @@ namespace :i18n do
   desc 'Alias for i18n:extract'
   task generate: [:extract]
 
-  desc "Generates JS bundle i18n files (non-en) and adds them to assets.yml"
-  task generate_js: :i18n_environment do
-    locales = I18n.available_locales
+  desc "generate JavaScript translation files"
+  task generate_js: [:i18n_environment, :extract_js] do
+    generator = I18nTasks::GenerateJs.new(
+      index: JSON.parse(File.read(js_index_file))
+    )
 
-    if locales.empty?
-      puts "Nothing to do, there are no non-en translations"
-      exit 0
-    end
+    FileUtils.mkdir_p(js_translation_files_dir)
 
-    system "./gems/canvas_i18nliner/bin/i18nliner generate_js"
+    I18n.available_locales.map(&:to_s).sort.each do |locale|
+      puts "Generating JS for #{locale}"
 
-    if $?.exitstatus > 0
-      warn "Error extracting JS translations; confirm that `./gems/canvas_i18nliner/bin/i18nliner generate_js` works"
-      exit $?.exitstatus
-    end
-
-    I18nTasks::GenerateJs.new.apply(
-      locales: locales,
-      translations: I18n.backend.send(:translations),
-      scope_keys: JSON.parse(File.read("config/locales/generated/js_bundles.json"))
-    ).each do |(filename, content)|
-      file = "#{js_translation_modules_dir}/#{filename}.js"
-      if !File.exist?(file) || File.read(file) != content
-        File.open(file, "w") { |f| f.write content }
-      end
+      File.write(
+        "#{js_translation_files_dir}/#{locale}.json",
+        generator.translations(locale).to_json
+      )
     end
   end
 

@@ -27,9 +27,7 @@ const webpack = require('webpack')
 const {WebpackManifestPlugin} = require('webpack-manifest-plugin')
 const WebpackHooks = require('./webpackHooks')
 const SourceFileExtensionsPlugin = require('./SourceFileExtensionsPlugin')
-// TODO: upgrade to webpack 5
-// const EncapsulationPlugin = require('webpack-encapsulation-plugin')
-const IgnoreErrorsPlugin = require('./IgnoreErrorsPlugin')
+const esmacPlugin = require('webpack-esmac-plugin')
 const webpackPublicPath = require('./webpackPublicPath')
 const {canvasDir} = require('#params')
 
@@ -122,6 +120,10 @@ module.exports = {
   // In prod build, don't attempt to continue if there are any errors.
   bail: process.env.NODE_ENV === 'production',
 
+  experiments: {
+    backCompat: false,
+  },
+
   devtool: skipSourcemaps
     ? false
     : process.env.NODE_ENV === 'production' ||
@@ -131,38 +133,46 @@ module.exports = {
 
   entry: {main: path.resolve(canvasDir, 'ui/index.js')},
 
+  watchOptions: {
+    ignored: ['**/node_modules/'],
+  },
+
   output: {
     publicPath: '',
     clean: true,
     path: path.join(canvasDir, 'public', webpackPublicPath),
+    hashFunction: 'xxhash64',
 
     // Add /* filename */ comments to generated require()s in the output.
-    pathinfo: true,
+    pathinfo: process.env.NODE_ENV !== 'production',
 
     // "e" is for "entry" and "c" is for "chunk"
     filename: '[name]-e-[chunkhash:10].js',
     chunkFilename: '[name]-c-[chunkhash:10].js',
   },
 
-  resolveLoader: {
-    modules: ['node_modules', path.resolve(__dirname)]
-  },
+  parallelism: 5,
 
   resolve: {
+    alias: {
+      'underscore$': path.resolve(canvasDir, 'ui/shims/underscore.js'),
+    },
+
     fallback: {
       // for minimatch module; it can work without path so let webpack know
       // instead of trying to resolve node's "path"
-      path: false
+      path: false,
+      // for parse-link-header, which requires "querystring" which is a node
+      // module. btw we have at least 3 implementations of "parse-link-header"!
+      querystring: require.resolve('querystring-es3')
     },
 
     modules: [
-      path.resolve(canvasDir, 'ui/shims'),
       path.resolve(canvasDir, 'public/javascripts'),
-      path.resolve(canvasDir, 'gems/plugins'),
       'node_modules'
     ],
 
-    extensions: ['.mjs', '.js', '.ts', '.tsx']
+    extensions: ['.js', '.ts', '.tsx']
   },
 
   module: {
@@ -178,8 +188,6 @@ module.exports = {
     // The files are expected to have no call to require, define or similar.
     // They are allowed to use exports and module.exports.
     noParse: [
-      // i18nLiner has a `require('fs')` that it doesn't actually need, ignore it.
-      require.resolve('@instructure/i18nliner/dist/lib/i18nliner.js'),
       require.resolve('jquery'),
       require.resolve('tinymce'),
     ],
@@ -358,22 +366,22 @@ module.exports = {
 
     new WebpackHooks(),
 
-    // new EncapsulationPlugin({
-    //   test: /\.[tj]sx?$/,
-    //   include: [
-    //     path.resolve(canvasDir, 'ui'),
-    //     path.resolve(canvasDir, 'packages'),
-    //     path.resolve(canvasDir, 'public/javascripts'),
-    //     path.resolve(canvasDir, 'gems/plugins')
-    //   ],
-    //   exclude: [/\/node_modules\//],
-    //   formatter: require('./encapsulation/ErrorFormatter'),
-    //   rules: require('./encapsulation/moduleAccessRules')
-    // }),
-
-    new IgnoreErrorsPlugin({
-      errors: require('./encapsulation/errorsPendingRemoval.json'),
-      warnOnUnencounteredErrors: process.env.WEBPACK_ENCAPSULATION_DEBUG === '1'
+    new esmacPlugin({
+      test: /\.[tj]sx?$/,
+      include: [
+        path.resolve(canvasDir, 'ui'),
+        path.resolve(canvasDir, 'packages'),
+        path.resolve(canvasDir, 'public/javascripts'),
+        path.resolve(canvasDir, 'gems/plugins')
+      ],
+      exclude: [/\/node_modules\//],
+      formatter: require('./esmac/ErrorFormatter'),
+      rules: require('./esmac/moduleAccessRules'),
+      permit: process.env.WEBPACK_ENCAPSULATION_DEBUG === '1' ? (
+        []
+      ) : (
+        require('./esmac/errorsPendingRemoval.json')
+      )
     }),
 
     new webpack.DefinePlugin({

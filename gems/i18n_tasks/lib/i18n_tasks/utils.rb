@@ -40,34 +40,5 @@ module I18nTasks
 
       [true_hash, false_hash]
     end
-
-    def self.eager_translations_js(locale, root_translations)
-      return nil unless root_translations.count > 0
-
-      <<~JS
-        setRootTranslations("#{locale}", function() { return #{root_translations.to_ordered.to_json} })
-      JS
-    end
-
-    def self.lazy_translations_js(locale, scope, root_translations, nested_translations)
-      return nil unless root_translations.count > 0 || nested_translations.count > 0
-
-      root_translations_arg = root_translations.count > 0 ?
-        "function() { return #{root_translations.to_ordered.to_json} }" :
-        "null"
-
-      nested_translations_arg = nested_translations.count > 0 ?
-        "function() { return #{nested_translations.to_ordered.to_json} }" :
-        "null"
-
-      <<~JS
-        setLazyTranslations(
-          "#{locale}",
-          "#{scope}",
-          #{root_translations_arg},
-          #{nested_translations_arg}
-        )
-      JS
-    end
   end
 end

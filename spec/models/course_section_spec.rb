@@ -585,6 +585,19 @@ describe CourseSection, "moving to new course" do
         expect(@section1.grants_right?(@user, :manage_calendar)).to be_falsey
         expect(@section2.grants_right?(@user, :manage_calendar)).to be_falsey
       end
+
+      context "with sharding" do
+        specs_require_sharding
+
+        it "returns true for a section on another shard than the user (if the user has permission)" do
+          @shard2.activate do
+            account2 = Account.create!
+            course_with_teacher(account: account2, user: @user, active_all: true)
+          end
+          section = @course.course_sections.first
+          expect(section.grants_right?(@user, :manage_calendar)).to be_truthy
+        end
+      end
     end
   end
 

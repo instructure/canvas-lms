@@ -33,6 +33,7 @@ export const Conversation = {
       contextName
       subject
       canReply
+      isPrivate
       conversationParticipantsConnection {
         nodes {
           ...ConversationParticipant
@@ -50,6 +51,7 @@ export const Conversation = {
     contextName: string,
     subject: string,
     canReply: bool,
+    isPrivate: bool,
     conversationMessagesConnection: shape({
       nodes: arrayOf(ConversationMessage.shape)
     }),
@@ -66,6 +68,7 @@ export const Conversation = {
     contextName = 'XavierSchool',
     subject = 'testing 123',
     canReply = true,
+    isPrivate = false,
     conversationMessagesConnection = {
       nodes: [
         ConversationMessage.mock(),
@@ -128,6 +131,7 @@ export const Conversation = {
     conversationMessagesConnection,
     conversationParticipantsConnection,
     canReply,
+    isPrivate,
     __typename: 'Conversation'
   })
 }

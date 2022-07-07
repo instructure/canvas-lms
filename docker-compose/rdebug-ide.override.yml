@@ -6,3 +6,4 @@ services:
       - 1234:1234
     environment:
       - REMOTE_DEBUGGING_ENABLED=1
+      - VIRTUAL_PORT=80

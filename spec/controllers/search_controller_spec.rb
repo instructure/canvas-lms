@@ -227,6 +227,76 @@ describe SearchController do
         expect(response.body).not_to include("Student2")
       end
     end
+
+    context "concluded user enrollment" do
+      before do
+        course_factory(active_all: true)
+        @student1 = User.create(name: "bob")
+        @concluded_student = User.create(name: "billy")
+        @teacher1 = User.create(name: "Mr. Teacher")
+        @concluded_teacher = User.create(name: "Mr. Professor")
+        @course.enroll_student(@student1).accept
+        @course.enroll_student(@concluded_student).accept
+        @course.enroll_teacher(@teacher1).accept
+        @course.enroll_teacher(@concluded_teacher).accept
+        @course.save!
+
+        @concluded_teacher.enrollments.each(&:conclude)
+        @concluded_student.enrollments.each(&:conclude)
+      end
+
+      context "current user is active teacher" do
+        before do
+          user_session(@teacher1)
+        end
+
+        it "returns concluded teachers" do
+          get "recipients", params: {
+            search: "m", type: "user",
+            synthetic_contexts: true, context: "course_#{@course.id}_teachers"
+          }
+          expect(response).to be_successful
+          expect(response.body).to include("Mr. Teacher")
+          expect(response.body).to include("Mr. Professor")
+        end
+
+        it "does not return concluded students" do
+          get "recipients", params: {
+            search: "b", type: "user",
+            synthetic_contexts: true, context: "course_#{@course.id}_students"
+          }
+          expect(response).to be_successful
+          expect(response.body).to include("bob")
+          expect(response.body).not_to include("billy")
+        end
+      end
+
+      context "current user is active student" do
+        before do
+          user_session(@student1)
+        end
+
+        it "does not return concluded teachers" do
+          get "recipients", params: {
+            search: "m", type: "user",
+            synthetic_contexts: true, context: "course_#{@course.id}_teachers"
+          }
+          expect(response).to be_successful
+          expect(response.body).to include("Mr. Teacher")
+          expect(response.body).not_to include("Mr. Professor")
+        end
+
+        it "does not return concluded students" do
+          get "recipients", params: {
+            search: "b", type: "user",
+            synthetic_contexts: true, context: "course_#{@course.id}_students"
+          }
+          expect(response).to be_successful
+          expect(response.body).to include("bob")
+          expect(response.body).not_to include("billy")
+        end
+      end
+    end
   end
 
   describe "GET 'all_courses'" do

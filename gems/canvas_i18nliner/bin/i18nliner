@@ -1,3 +1,0 @@
-#!/usr/bin/env node
-
-require('../js/main').runCommand(process.argv.slice(2));

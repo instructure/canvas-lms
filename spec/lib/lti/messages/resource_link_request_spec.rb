@@ -57,6 +57,29 @@ describe Lti::Messages::ResourceLinkRequest do
         expect(jws.dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "id")).to eq resource_link.resource_link_uuid
       end
 
+      it "uses context title for rlid title" do
+        expect(jws.dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "title")).to eq course.name
+      end
+
+      context "when resource_link is associated with a content tag" do
+        let(:content_tag) do
+          ContentTag.create!(
+            context: course,
+            title: "fake title",
+            url: "https://example.com",
+            associated_asset: resource_link
+          )
+        end
+
+        before do
+          content_tag
+        end
+
+        it "uses content_tag_title for rlid title" do
+          expect(jws.dig("https://purl.imsglobal.org/spec/lti/claim/resource_link", "title")).to eq content_tag.title
+        end
+      end
+
       context "when link-level custom params are given in resource_link" do
         it "merges them in with tool/placement parameters" do
           expect(jws["https://purl.imsglobal.org/spec/lti/claim/custom"]).to eq(

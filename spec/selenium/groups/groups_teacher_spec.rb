@@ -180,7 +180,8 @@ describe "new groups" do
       click_add_group_set
       replace_and_proceed f("#new-group-set-name"), "Test Group Set"
       fxpath("//input[@data-testid='checkbox-allow-self-signup']/..").click
-      replace_and_proceed f("#textinput-limit-group-size"), "2"
+      force_click('[data-testid="group-member-limit"]')
+      f('[data-testid="group-member-limit"]').send_keys("2")
       f(%(button[data-testid="group-set-save"])).click
       wait_for_ajaximations
 
@@ -430,7 +431,9 @@ describe "new groups" do
 
       click_add_group_set
       replace_and_proceed f("#new-group-set-name"), "Test Group Set"
-      fxpath("//input[@data-testid='radio-button-split-groups']/..").click
+
+      force_click('[data-testid="group-structure-selector"]')
+      force_click('[data-testid="group-structure-num-groups"]')
 
       expect(f('span[data-testid="group-leadership-controls"] input[data-testid="first"]')).not_to be_enabled
       expect(f('span[data-testid="group-leadership-controls"] input[data-testid="random"]')).not_to be_enabled
@@ -440,7 +443,9 @@ describe "new groups" do
       expect(f('span[data-testid="group-leadership-controls"] input[data-testid="first"]')).to be_enabled
       expect(f('span[data-testid="group-leadership-controls"] input[data-testid="random"]')).to be_enabled
 
-      replace_and_proceed f("#textinput-create-groups-count"), "2"
+      force_click('[data-testid="split-groups"]')
+
+      f('[data-testid="split-groups"]').send_keys("2")
       f(%(button[data-testid="group-set-save"])).click
       # Need to run delayed jobs for the random group assignments to work, and then refresh the page
       run_jobs
@@ -449,6 +454,45 @@ describe "new groups" do
         expect(ffj(".toggle-group.group-summary:visible")[n]).to include_text("2 students")
       end
       expect(ffj(".group-name:visible").size).to eq 2
+    end
+
+    it "auto-splits students into groups by section" do
+      course = Course.create!(name: "Group by section")
+
+      course.enroll_teacher(@teacher)
+
+      course.course_sections.create!(name: "section 1")
+      course.course_sections.create!(name: "section 2")
+      course.course_sections.create!(name: "section 3")
+
+      s1 = User.create!(name: "First Student")
+      s2 = User.create!(name: "Second Student")
+      s3 = User.create!(name: "Third Student")
+      s4 = User.create!(name: "Fourth Student")
+      s5 = User.create!(name: "Fifth Student")
+
+      course.course_sections[0].enroll_user(s1, "StudentEnrollment")
+      course.course_sections[1].enroll_user(s2, "StudentEnrollment")
+      course.course_sections[2].enroll_user(s3, "StudentEnrollment")
+      course.course_sections[2].enroll_user(s4, "StudentEnrollment")
+      course.course_sections[2].enroll_user(s5, "StudentEnrollment")
+
+      Enrollment.last(6).each { |e| e.update!(workflow_state: "active") }
+
+      get "/courses/#{course.id}/groups"
+
+      f("#add-group-set").click
+      replace_and_proceed f("#new-group-set-name"), "auto_split"
+      force_click('[data-testid="group-structure-selector"]')
+      force_click('[data-testid="group-structure-num-groups"]')
+      f('[data-testid="split-groups"]').send_keys("3")
+      force_click(%(input[data-testid="require-same-section-auto-assign"]))
+      f(%(button[data-testid="group-set-save"])).click
+      run_jobs
+      wait_for_ajaximations
+      expect(GroupCategory.last.name).to eq "auto_split"
+      expect(Group.last(3).pluck(:name)).to match_array ["auto_split 1", "auto_split 2", "auto_split 3"]
+      expect(Group.last(3).map(&:members_count)).to match_array [3, 1, 1]
     end
 
     it "respects individual group member limits when randomly assigning", priority: "1" do

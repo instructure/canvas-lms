@@ -1358,6 +1358,9 @@ class AssignmentsApiController < ApplicationController
   #
   #   Only applies when submission_types includes "student_annotation".
   #
+  # @argument assignment[force_updated_at] [Boolean]
+  #   If true, updated_at will be set even if no changes were made.
+  #
   # @returns Assignment
   def update
     @assignment = api_find(@context.active_assignments, params[:id])

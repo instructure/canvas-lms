@@ -23,6 +23,7 @@ import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Alert} from '@instructure/ui-alerts'
+import {Spinner} from '@instructure/ui-spinner'
 import {Preview} from './CreateIconMakerForm/Preview'
 import {CreateIconMakerForm} from './CreateIconMakerForm'
 import {Footer} from './CreateIconMakerForm/Footer'
@@ -86,8 +87,21 @@ function renderHeader(title, settings, onKeyDown, isInvalid, onAlertDismissal, o
   )
 }
 
-function renderBody(settings, dispatch, editor, editing, allowNameChange, nameRef, rcsConfig) {
-  return (
+function renderBody(
+  settings,
+  dispatch,
+  editor,
+  editing,
+  allowNameChange,
+  nameRef,
+  rcsConfig,
+  isLoading
+) {
+  return editing && isLoading() ? (
+    <Flex justifyItems="center">
+      <Spinner renderTitle={formatMessage('Loading...')} size="large" />
+    </Flex>
+  ) : (
     <CreateIconMakerForm
       settings={settings}
       dispatch={dispatch}
@@ -127,6 +141,7 @@ const closeTrayFromCancel = (initialSettings, currentSettings) => {
 
   return shouldCloseTray
 }
+
 export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
   const nameRef = useRef()
   const applyRef = useRef()
@@ -147,6 +162,8 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
   }
 
   const [initialSettings, setInitialSettings] = useState({defaultState})
+
+  const isLoading = () => status === statuses.LOADING
 
   const onKeyDown = event => {
     if (event.keyCode !== 9) return
@@ -279,7 +296,7 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
         renderHeader(title, settings, onKeyDown, isInvalid, handleAlertDismissal, onClose)
       }
       renderBody={() =>
-        renderBody(settings, dispatch, editor, editing, !replaceAll, nameRef, rcsConfig)
+        renderBody(settings, dispatch, editor, editing, !replaceAll, nameRef, rcsConfig, isLoading)
       }
       renderFooter={() =>
         renderFooter(status, onClose, handleSubmit, editing, replaceAll, setReplaceAll, applyRef)

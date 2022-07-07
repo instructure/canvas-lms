@@ -52,7 +52,8 @@ class CalendarsController < ApplicationController
           ag_permission = { all_sections: true }
         else
           section_ids = if Account.site_admin.feature_enabled?(:section_level_calendar_permissions)
-                          CourseSection.find(context.section_visibilities_for(@current_user).pluck(:course_section_id)).select { |cs| cs.grants_right?(@current_user, session, :manage_calendar) }.pluck(:id)
+                          all_course_sections = CourseSection.find(context.section_visibilities_for(@current_user).pluck(:course_section_id).map { |cs_id| Shard.global_id_for(cs_id, context.shard) })
+                          all_course_sections.select { |cs| cs.grants_right?(@current_user, session, :manage_calendar) }.pluck(:id)
                         else
                           context.section_visibilities_for(@current_user).pluck(:course_section_id)
                         end

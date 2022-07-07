@@ -106,23 +106,23 @@ export class CourseSelect extends React.Component {
 
   static getDerivedStateFromProps(props, state) {
     if (props.options !== state.options) {
-      const activeCourseInputValue = getCourseName(props.activeCourseFilterID, props.options)
       return {
-        filteredOptions: filterOptions(activeCourseInputValue, props.options),
-        inputValue: activeCourseInputValue,
-        selectedOptionId: props.activeCourseFilterID ? props.activeCourseFilterID : null
+        filteredOptions: filterOptions(state.inputValue, props.options)
       }
     }
     return null
   }
 
   state = {
-    inputValue: '',
+    inputValue: getCourseName(this.props.activeCourseFilterID, this.props.options),
     isShowingOptions: false,
     options: this.props.options,
-    filteredOptions: this.props.options,
+    filteredOptions: filterOptions(
+      getCourseName(this.props.activeCourseFilterID, this.props.options),
+      this.props.options
+    ),
     highlightedOptionId: null,
-    selectedOptionId: null
+    selectedOptionId: this.props.activeCourseFilterID ? this.props.activeCourseFilterID : null
   }
 
   getDefaultHighlightedOption = (newOptions = []) => {

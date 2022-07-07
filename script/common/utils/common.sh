@@ -138,13 +138,6 @@ function confirm_command {
 }
 
 function docker_compose_up {
-  if [ "${IS_MUTAGEN:-false}" = true ]; then
-    start_spinner "Starting mutagen containers..."
-    _canvas_lms_track_with_log mutagen-compose up --no-start web
-    _canvas_lms_track_with_log mutagen-compose run -u root --rm web chown docker:docker /usr/src/app
-    stop_spinner
-  fi
-
   start_spinner "Starting docker containers..."
   _canvas_lms_track_with_log $DOCKER_COMMAND up -d web
   stop_spinner
@@ -236,17 +229,4 @@ function print_canvas_intro {
 
 Welcome! This script will guide you through the process of setting up a
 Canvas development environment.'
-}
-
-function print_mutagen_intro {
-  # shellcheck disable=2016
-  echo '
-______  ___      _____
-___   |/  /___  ___  /______ _______ ____________
-__  /|_/ /_  / / /  __/  __ `/_  __ `/  _ \_  __ \
-_  /  / / / /_/ // /_ / /_/ /_  /_/ //  __/  / / /
-/_/  /_/  \__,_/ \__/ \__,_/ _\__, / \___//_/ /_/
-                             /____/
-
-'
 }

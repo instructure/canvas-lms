@@ -16,33 +16,49 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useContext} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
-import {TextInput} from '@instructure/ui-text-input'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
-import {RadioInput} from '@instructure/ui-radio-input'
 import {Checkbox} from '@instructure/ui-checkbox'
+import {NumberInput} from '@instructure/ui-number-input'
+import {Select} from '@instructure/ui-select'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {func, string} from 'prop-types'
 import {GroupContext, formatMessages, SPLIT} from './context'
+import {handleKeyPress} from './utils'
 
 const I18n = useI18nScope('groups')
 
-const I18NSPLIT_PATTERN = /(.+)\s+ZZZ\s(.+)/
+const options = [
+  {id: '0', label: I18n.t('Create groups later'), dataTestid: 'group-structure-create-later'},
+  {
+    id: '1',
+    label: I18n.t('Split students by number of groups'),
+    dataTestid: 'group-structure-num-groups'
+  },
+  {
+    id: '2',
+    label: I18n.t('Split number of students per group'),
+    dataTestid: 'group-structure-students-per-group'
+  }
+]
 
 const GroupStructureSelfSignup = ({onChange, errormsg}) => {
-  const {createGroupCount, groupLimit} = useContext(GroupContext)
+  const [initialGroupCount, setInitialGroupCount] = useState(0)
+  const [groupMemberLimit, setGroupMemberLimit] = useState(0)
 
-  // Split up the I18n strings so we can put TextInputs in the middle of them
-  const createGroups = I18n.t('Create %{number_of_groups} groups now', {
-    number_of_groups: 'ZZZ'
-  }).match(I18NSPLIT_PATTERN)
-  const limitGroupSize = I18n.t('Limit groups to %{group_limit} members', {
-    group_limit: 'ZZZ'
-  }).match(I18NSPLIT_PATTERN)
+  useEffect(() => {
+    onChange('createGroupCount', initialGroupCount)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialGroupCount]) // ignoring rule for onChange func which causes infinite rerenders
+
+  useEffect(() => {
+    onChange('groupLimit', groupMemberLimit || '')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupMemberLimit]) // ignoring rule for onChange func which causes infinite rerenders
 
   return (
     <FormFieldGroup
@@ -52,64 +68,132 @@ const GroupStructureSelfSignup = ({onChange, errormsg}) => {
       messages={formatMessages(errormsg)}
       rowSpacing="small"
     >
-      <View>
-        <Text>{createGroups[1]}</Text>
-        &nbsp;
-        <TextInput
-          display="inline-block"
-          width="3rem"
-          size="x-small"
-          id="textinput-create-groups-now"
-          value={createGroupCount}
-          renderLabel={
-            <ScreenReaderContent>{I18n.t('Number of groups to create')}</ScreenReaderContent>
-          }
-          onChange={(_e, val) => {
-            onChange('createGroupCount', val)
-          }}
-        />
-        &nbsp;
-        <Text>{createGroups[2]}</Text>
-      </View>
-      <View>
-        <Text>{limitGroupSize[1]}</Text>
-        &nbsp;
-        <TextInput
-          display="inline-block"
-          width="3rem"
-          size="x-small"
-          id="textinput-limit-group-size"
-          value={groupLimit}
-          renderLabel={<ScreenReaderContent>{I18n.t('Group Size Limit')}</ScreenReaderContent>}
-          onChange={(_e, val) => {
-            onChange('groupLimit', val)
-          }}
-        />
-        &nbsp;
-        <Text>{limitGroupSize[2]}</Text>
-        &nbsp;
-        <Text size="small" color="secondary">
-          ({I18n.t('Leave blank for no limit')})
-        </Text>
+      <View as="span">
+        <View as="div" padding="small">
+          <NumberInput
+            data-testid="initial-group-count"
+            renderLabel={I18n.t('Create groups now')}
+            min={0}
+            value={initialGroupCount}
+            onIncrement={() => {
+              setInitialGroupCount(initialGroupCount + 1)
+            }}
+            onDecrement={() => {
+              if (initialGroupCount) {
+                setInitialGroupCount(initialGroupCount - 1)
+              }
+            }}
+            onKeyDown={keyPressed => {
+              handleKeyPress(keyPressed, setInitialGroupCount, initialGroupCount)
+            }}
+          />
+        </View>
+        <View as="div" padding="small">
+          <NumberInput
+            data-testid="group-member-limit"
+            renderLabel={I18n.t('Limit group members to (leave blank for no limit)')}
+            min={0}
+            value={groupMemberLimit}
+            onIncrement={() => setGroupMemberLimit(groupMemberLimit + 1)}
+            onDecrement={() => setGroupMemberLimit(groupMemberLimit - 1)}
+            onKeyDown={keyPressed => {
+              handleKeyPress(keyPressed, setGroupMemberLimit, groupMemberLimit)
+            }}
+          />
+        </View>
       </View>
     </FormFieldGroup>
   )
 }
 
 const GroupStructureNoSelfSignup = ({onChange, errormsg}) => {
-  const {splitGroups, bySection, createGroupCount, createGroupMemberCount} =
-    useContext(GroupContext)
+  const {splitGroups, bySection} = useContext(GroupContext)
+  const [isShowingOptions, setIsShowingOptions] = useState(false)
+  const [highlightedOptionId, setHighlightedOptionId] = useState(null)
+  const [inputId, setInputId] = useState(options[0].id)
+  const [inputValue, setInputValue] = useState(options[0].label)
+  const [groupNumber, setGroupNumber] = useState(0)
+  const [studentNumber, setStudentNumber] = useState(0)
 
-  // Split up the I18n strings so we can put TextInputs in the middle of them
-  const createGroups = I18n.t('Split students into %{num_groups} groups', {
-    num_groups: 'ZZZ'
-  }).match(I18NSPLIT_PATTERN)
-  const createMemberGroups = I18n.t(
-    'Split students into groups with %{num_members} students per group',
-    {
-      num_members: 'ZZZ'
+  useEffect(() => {
+    onChange('createGroupCount', groupNumber)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupNumber]) // ignoring rule for onChange func which causes infinite rerenders
+
+  useEffect(() => {
+    onChange('createGroupMemberCount', studentNumber)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [studentNumber]) // ignoring rule for onChange func which causes infinite rerenders
+
+  useEffect(() => {
+    if (inputId === '0') {
+      setStudentNumber(0)
+      setGroupNumber(0)
+    } else if (inputId === '1' && studentNumber) {
+      setStudentNumber(0)
+    } else if (inputId === '2' && groupNumber) {
+      setGroupNumber(0)
     }
-  ).match(I18NSPLIT_PATTERN)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inputId]) // ignoring for causing unnecessary rerenders
+
+  const handleHighlightOption = (event, {id}) => {
+    setHighlightedOptionId(id)
+  }
+
+  const getOptionById = queryId => {
+    return options.find(({id}) => id === queryId)
+  }
+
+  const handleSelectOption = (event, {id}) => {
+    const option = getOptionById(id)
+    setInputValue(option.label)
+    setInputId(id)
+    setIsShowingOptions(false)
+    onChange('splitGroups', id)
+  }
+
+  const showSupplementalSelect = () => {
+    if (inputId === '1') {
+      return (
+        <NumberInput
+          data-testid="split-groups"
+          min={0}
+          value={groupNumber}
+          renderLabel={<ScreenReaderContent>{I18n.t('Number of groups')}</ScreenReaderContent>}
+          onIncrement={() => setGroupNumber(groupNumber + 1)}
+          onDecrement={() => {
+            if (groupNumber > 0) {
+              setGroupNumber(groupNumber - 1)
+            }
+          }}
+          onKeyDown={keyPressed => {
+            handleKeyPress(keyPressed, setGroupNumber, groupNumber)
+          }}
+        />
+      )
+    } else if (inputId === '2') {
+      return (
+        <NumberInput
+          data-testid="num-students-per-group"
+          min={0}
+          value={studentNumber}
+          renderLabel={
+            <ScreenReaderContent>{I18n.t('Number of students per group')}</ScreenReaderContent>
+          }
+          onIncrement={() => setStudentNumber(studentNumber + 1)}
+          onDecrement={() => {
+            if (studentNumber > 0) {
+              setStudentNumber(studentNumber - 1)
+            }
+          }}
+          onKeyDown={keyPressed => {
+            handleKeyPress(keyPressed, setStudentNumber, studentNumber)
+          }}
+        />
+      )
+    }
+  }
 
   return (
     <FormFieldGroup
@@ -117,85 +201,43 @@ const GroupStructureNoSelfSignup = ({onChange, errormsg}) => {
       messages={formatMessages(errormsg)}
       rowSpacing="small"
     >
-      <RadioInput
-        label={
-          <div display="inline-block">
-            <Text>{createGroups[1]}</Text>
-            &nbsp;
-            <TextInput
-              display="inline-block"
-              width="3rem"
-              size="x-small"
-              value={createGroupCount}
-              id="textinput-create-groups-count"
-              renderLabel={<ScreenReaderContent>{I18n.t('Number of groups')}</ScreenReaderContent>}
-              disabled={splitGroups !== SPLIT.byGroupCount}
-              onChange={(_e, val) => {
-                onChange('createGroupCount', val)
-              }}
-            />
-            &nbsp;
-            <Text>{createGroups[2]}</Text>
-          </div>
+      <Select
+        data-testid="group-structure-selector"
+        renderLabel={
+          <ScreenReaderContent>{I18n.t('Group structure for self-signup')}</ScreenReaderContent>
         }
-        value={SPLIT.byGroupCount}
-        data-testid="radio-button-split-groups"
-        checked={splitGroups === SPLIT.byGroupCount}
-        onChange={e => {
-          onChange('splitGroups', e.target.value)
-        }}
-      />
-
-      <RadioInput
-        label={
-          <div display="inline-block">
-            <Text>{createMemberGroups[1]}</Text>
-            &nbsp;
-            <TextInput
-              display="inline-block"
-              width="3rem"
-              size="x-small"
-              value={createGroupMemberCount}
-              id="textinput-create-members-count"
-              renderLabel={
-                <ScreenReaderContent>{I18n.t('Number of members per group')}</ScreenReaderContent>
-              }
-              disabled={splitGroups !== SPLIT.byMemberCount}
-              onChange={(_e, val) => {
-                onChange('createGroupMemberCount', val)
-              }}
-            />
-            &nbsp;
-            <Text>{createMemberGroups[2]}</Text>
-          </div>
-        }
-        value={SPLIT.byMemberCount}
-        data-testid="radio-button-group-members"
-        checked={splitGroups === SPLIT.byMemberCount}
-        onChange={e => {
-          onChange('splitGroups', e.target.value)
-        }}
-      />
-
+        assistiveText="Use arrow keys to navigate options."
+        inputValue={inputValue}
+        isShowingOptions={isShowingOptions}
+        onBlur={() => setHighlightedOptionId(null)}
+        onRequestShowOptions={() => setIsShowingOptions(true)}
+        onRequestHideOptions={() => setIsShowingOptions(false)}
+        onRequestHighlightOption={handleHighlightOption}
+        onRequestSelectOption={handleSelectOption}
+      >
+        {options.map(option => (
+          <Select.Option
+            data-testid={option.dataTestid}
+            id={option.id}
+            key={option.id}
+            isHighlighted={highlightedOptionId === option.id}
+            isSelected={inputId === option.id}
+          >
+            {option.label}
+          </Select.Option>
+        ))}
+      </Select>
+      {showSupplementalSelect()}
       {splitGroups !== SPLIT.off && (
         <Checkbox
           checked={bySection}
+          data-testid="require-same-section-auto-assign"
           label={I18n.t('Require group members to be in the same section')}
           onChange={e => {
             onChange('bySection', e.target.checked)
           }}
         />
       )}
-
-      <RadioInput
-        label={I18n.t('I’ll create groups later')}
-        value={SPLIT.off}
-        data-testid="radio-button-create-later"
-        checked={splitGroups === SPLIT.off}
-        onChange={e => {
-          onChange('splitGroups', e.target.value)
-        }}
-      />
     </FormFieldGroup>
   )
 }

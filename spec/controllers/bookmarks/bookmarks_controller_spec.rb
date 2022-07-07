@@ -112,5 +112,34 @@ describe Bookmarks::BookmarksController do
         expect(response).to be_successful
       end
     end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "does not asplode when creating a bookmark from a cross-shard institution" do
+        @shard1.activate do
+          cs_course = Course.create!(name: "cs_course", account: Account.create!)
+          cs_course.enroll_user(@user, "TeacherEnrollment", enrollment_state: "active")
+
+          post "create", params: { name: "chem 101", url: "/courses/2" }, format: "json"
+
+          expect(response).to be_successful
+        end
+      end
+
+      it "is created relative to the user's home shard" do
+        @shard1.activate do
+          cs_course = Course.create!(name: "cs_course", account: Account.create!)
+          cs_course.enroll_user(@user, "TeacherEnrollment", enrollment_state: "active")
+
+          post "create", params: { name: "chem 101", url: "/courses/2" }, format: "json"
+
+          expect(response).to be_successful
+          @json = JSON.parse(response.body)
+        end
+        bookmark = Bookmarks::Bookmark.find(@json["id"])
+        expect(bookmark.user_id).to eq @user.id
+      end
+    end
   end
 end

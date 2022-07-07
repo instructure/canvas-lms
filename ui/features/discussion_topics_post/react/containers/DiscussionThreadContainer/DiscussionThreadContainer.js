@@ -25,7 +25,6 @@ import {
   getDisplayName
 } from '../../utils'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {CollapseReplies} from '../../components/CollapseReplies/CollapseReplies'
 import {
   CREATE_DISCUSSION_ENTRY,
   DELETE_DISCUSSION_ENTRY,
@@ -464,7 +463,6 @@ export const DiscussionThreadContainer = props => {
               <View
                 display="block"
                 background="primary"
-                borderWidth="none none small none"
                 padding="none none small none"
                 margin="none none x-small none"
               >
@@ -487,25 +485,6 @@ export const DiscussionThreadContainer = props => {
               markAsRead={props.markAsRead}
               parentRefCurrent={threadRefCurrent}
             />
-          )}
-          {expandReplies && props.depth === 0 && props.discussionEntry.lastReply && (
-            <View
-              as="div"
-              margin="none none none xx-large"
-              width="100%"
-              key={`discussion-thread-collapse-${props.discussionEntry.id}`}
-            >
-              <View
-                background="primary"
-                borderWidth="none none small none"
-                padding="none none small none"
-                display="block"
-                width="100%"
-                margin="none none medium none"
-              >
-                <CollapseReplies onClick={() => setExpandReplies(false)} />
-              </View>
-            </View>
           )}
         </>
       )}

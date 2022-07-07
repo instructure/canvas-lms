@@ -48,6 +48,49 @@ describe "conversations new" do
         Account.default.set_feature_flag! :react_inbox, "on"
       end
 
+      it "doesn't allow replying with no recipients", ignore_js_errors: true do
+        get "/conversations"
+        f("div[data-testid='conversation']").click
+        wait_for_ajaximations
+        f("button[data-testid='message-reply']").click
+        f("span[data-testid='address-book-tag']").click
+        f("textarea[data-testid='message-body']").send_keys("no recipient")
+        f("button[data-testid='send-button']").click
+        wait_for_ajaximations
+        expect(fj("span:contains('Please select a recipient.')")).to be_displayed
+      end
+
+      it "allows adding a new recipient", ignore_js_errors: true do
+        get "/conversations"
+        f("div[data-testid='conversation']").click
+        wait_for_ajaximations
+        f("button[data-testid='message-reply']").click
+
+        # The second compose modal addressbook should appear
+        expect(ff("input[aria-label='Address Book']").count).to eq(2)
+
+        f("textarea[data-testid='message-body']").send_keys("new recipient")
+        ff("input[aria-label='Address Book']")[1].click
+        fj("div[data-testid='address-book-item']:contains('Students')").click
+        fj("div[data-testid='address-book-item']:contains('first student')").click
+        f("button[data-testid='send-button']").click
+        wait_for_ajaximations
+
+        expect(ConversationMessage.last.body).to eq "new recipient"
+        participants = ConversationMessage.last.conversation_message_participants
+        expect(participants.collect(&:user_id)).to match_array [@s1.id, @s2.id, @teacher.id]
+      end
+
+      it "does not allow adding recipients to private messages", ignore_js_errors: true do
+        @convo.update_attribute(:private_hash, "12345")
+        get "/conversations"
+        f("div[data-testid='conversation']").click
+        wait_for_ajaximations
+        f("button[data-testid='message-reply']").click
+        # There should only be one addressbook, which controls the inbox filter
+        expect(ff("input[aria-label='Address Book']").count).to eq(1)
+      end
+
       it "replies to most recent author using the individual message reply button", ignore_js_errors: true do
         get "/conversations"
         f("div[data-testid='conversation']").click

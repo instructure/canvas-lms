@@ -94,12 +94,14 @@ describe('MediaAttempt', () => {
     })
 
     it.skip('renders the current submission draft', async () => {
+      // unskip in EVAL-2504
       const props = await makeProps(submissionDraftOverrides)
       const {getByTestId} = render(<MediaAttempt {...props} />)
       expect(getByTestId('media-recording')).toBeInTheDocument()
     })
 
     it.skip('removes the current submission draft when the media is removed', async () => {
+      // unskip in EVAL-2504
       const props = await makeProps(submissionDraftOverrides)
       const {getByTestId} = render(<MediaAttempt {...props} />)
       const trashButton = getByTestId('remove-media-recording')
@@ -116,6 +118,7 @@ describe('MediaAttempt', () => {
   })
 
   describe.skip('submitted', () => {
+    // unskip in EVAL-2504
     it('renders the current submission', async () => {
       const props = await makeProps({
         Submission: {

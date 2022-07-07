@@ -177,7 +177,7 @@ class CourseSection < ActiveRecord::Base
     given do |user, session|
       if Account.site_admin.feature_enabled?(:section_level_calendar_permissions)
         if user
-          enrollments = user.enrollments.active_by_date.where(course: course)
+          enrollments = user.enrollments.shard(self).active_by_date.where(course: course)
           enrollments.where(limit_privileges_to_course_section: false).or(enrollments.where(course_section: self)).any? { |e| e.has_permission_to?(:manage_calendar) }
         end
       else

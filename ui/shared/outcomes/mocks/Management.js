@@ -1907,6 +1907,127 @@ export const deleteOutcomeMock = ({
   }
 }
 
+export const deleteOutcomeMocks = ({
+  ids = ['1'],
+  failResponse = false,
+  failAlignedContentMutation = false,
+  failMutation = false,
+  failMutationNoErrMsg = false,
+  partialSuccess = false
+} = {}) => {
+  const successfulResponse = {
+    data: {
+      deleteOutcomeLinks: {
+        __typename: 'DeleteOutcomeLinksPayload',
+        deletedOutcomeLinkIds: ids,
+        errors: []
+      }
+    }
+  }
+
+  const failedResponse = {
+    __typename: 'ErrorResponse',
+    data: null,
+    errors: [
+      {
+        attribute: ids[0],
+        message: 'Could not find associated outcome in this context',
+        __typename: 'Error'
+      }
+    ]
+  }
+
+  const failedAlignedContentMutation = {
+    data: {
+      deleteOutcomeLinks: {
+        __typename: 'DeleteOutcomeLinksPayload',
+        deletedOutcomeLinkIds: [],
+        errors: [
+          {
+            attribute: [],
+            message: 'cannot be deleted because it is aligned to content',
+            __typename: 'Error'
+          }
+        ]
+      }
+    }
+  }
+  const failedMutation = {
+    data: {
+      deleteOutcomeLinks: {
+        __typename: 'DeleteOutcomeLinksPayload',
+        deletedOutcomeLinkIds: [],
+        errors: [
+          {
+            attribute: 'message',
+            message: '',
+            __typename: 'Error'
+          }
+        ]
+      }
+    }
+  }
+
+  const failedMutationNoErrMsg = {
+    data: {
+      deleteOutcomeLinks: {
+        __typename: 'DeleteOutcomeLinksPayload',
+        deletedOutcomeLinkIds: [],
+        errors: [
+          {
+            attribute: 'message',
+            message: '',
+            __typename: 'Error'
+          }
+        ]
+      }
+    }
+  }
+
+  const partialSuccessResponse = {
+    data: {
+      deleteOutcomeLinks: {
+        __typename: 'DeleteOutcomeLinksPayload',
+        deletedOutcomeLinkIds: ids.filter((_id, idx) => idx !== 0),
+        errors: [
+          {
+            attribute: ids[0],
+            message: 'Could not find associated outcome in this context',
+            __typename: 'Error'
+          }
+        ]
+      }
+    }
+  }
+
+  let result = successfulResponse
+  if (failResponse) {
+    result = failedResponse
+  } else if (failAlignedContentMutation) {
+    result = failedAlignedContentMutation
+  } else if (failMutation) {
+    result = failedMutation
+  } else if (failMutationNoErrMsg) {
+    result = failedMutationNoErrMsg
+  } else if (partialSuccess) {
+    result = partialSuccessResponse
+  }
+
+  return [
+    {
+      request: {
+        query: DELETE_OUTCOME_LINKS,
+        variables: {
+          input: {
+            ids
+          }
+        }
+      },
+      result
+    }
+  ]
+}
+
 export const moveOutcomeMock = ({
   groupId = '101',
   outcomeLinkIds = ['1', '2'],

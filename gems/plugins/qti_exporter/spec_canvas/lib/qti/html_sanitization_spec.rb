@@ -37,6 +37,12 @@ if Qti.migration_executable
         hash = Qti::AssessmentItemConverter.create_instructure_question(qti_data: qti_data, interaction_type: "essay_question", custom_type: "angel")
         expect(hash[:question_text]).to eq "<div>Rhode Island is neither a road nor an island. Discuss. </div>"
       end
+
+      it "is not confused by angle brackets in HTML attributes" do
+        manifest_node = get_manifest_node("bracket_attribute")
+        hash = Qti::AssessmentItemConverter.create_instructure_question(manifest_node: manifest_node, base_dir: html_sanitization_question_dir("escaped"))
+        expect(hash[:question_text]).to match_ignoring_whitespace %(<img alt="1 < 2">)
+      end
     end
 
     describe "multiple choice text" do

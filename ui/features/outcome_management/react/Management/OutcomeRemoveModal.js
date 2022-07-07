@@ -18,7 +18,6 @@
  */
 
 import React from 'react'
-import {useMutation} from 'react-apollo'
 import PropTypes from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
@@ -30,8 +29,6 @@ import {Heading} from '@instructure/ui-heading'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {DELETE_OUTCOME_LINKS} from '@canvas/outcomes/graphql/Management'
 import {outcomeShape} from './shapes'
 import {IconCheckMarkIndeterminateLine} from '@instructure/ui-icons'
 
@@ -42,6 +39,7 @@ const OutcomeRemoveModal = ({
   isOpen,
   onCloseHandler,
   onCleanupHandler,
+  removeOutcomes,
   onRemoveLearningOutcomesHandler
 }) => {
   const {isCourse} = useCanvasContext()
@@ -50,51 +48,11 @@ const OutcomeRemoveModal = ({
   const removableCount = removableLinkIds.length
   const nonRemovableCount = nonRemovableLinkIds.length
   const totalCount = removableCount + nonRemovableCount
-  const [deleteOutcomeLinks] = useMutation(DELETE_OUTCOME_LINKS)
 
   const onRemoveOutcomesHandler = () => {
     ;(async () => {
-      try {
-        const result = await deleteOutcomeLinks({
-          variables: {
-            input: {
-              ids: removableLinkIds
-            }
-          }
-        })
-
-        const deletedOutcomeLinkIds = result.data?.deleteOutcomeLinks?.deletedOutcomeLinkIds
-        const errorMessage = result.data?.deleteOutcomeLinks?.errors?.[0]?.message
-        if (deletedOutcomeLinkIds?.length === 0) throw new Error(errorMessage)
-        if (deletedOutcomeLinkIds?.length !== removableCount) throw new Error()
-        onRemoveLearningOutcomesHandler(removableLinkIds)
-
-        showFlashAlert({
-          message: I18n.t(
-            {
-              one: 'This outcome was successfully removed.',
-              other: '%{count} outcomes were successfully removed.'
-            },
-            {
-              count: removableCount
-            }
-          ),
-          type: 'success'
-        })
-      } catch (err) {
-        showFlashAlert({
-          message: I18n.t(
-            {
-              one: 'An error occurred while removing this outcome. Please try again.',
-              other: 'An error occurred while removing these outcomes. Please try again.'
-            },
-            {
-              count: removableCount
-            }
-          ),
-          type: 'error'
-        })
-      }
+      await removeOutcomes(outcomes)
+      onRemoveLearningOutcomesHandler(removableLinkIds)
     })()
     onCleanupHandler()
   }
@@ -300,6 +258,7 @@ OutcomeRemoveModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onCloseHandler: PropTypes.func.isRequired,
   onCleanupHandler: PropTypes.func.isRequired,
+  removeOutcomes: PropTypes.func.isRequired,
   onRemoveLearningOutcomesHandler: PropTypes.func
 }
 

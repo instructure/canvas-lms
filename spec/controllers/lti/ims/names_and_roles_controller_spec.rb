@@ -291,6 +291,38 @@ describe Lti::IMS::NamesAndRolesController do
           expect_member_count(1)
         end
       end
+
+      context "when the rlid param specifies a non-assignment resource link" do
+        let(:resource_link) do
+          Lti::ResourceLink.create!(
+            context: course,
+            context_external_tool: tool,
+            url: "https://www.example.com/launch"
+          )
+        end
+
+        let(:course_module) { ContextModule.create!(context: course) }
+
+        let(:rlid_param) { resource_link.resource_link_uuid }
+
+        before do
+          course_module.content_tags.create!(
+            context: course,
+            context_module: course_module,
+            tag_type: "context_module",
+            content_type: "ContextExternalTool",
+            title: "Test Title",
+            url: tool.url,
+            content: tool,
+            associated_asset: resource_link
+          )
+        end
+
+        it "responds a NRPS course membership lookup" do
+          send_request
+          expect_single_member(enrollment)
+        end
+      end
     end
 
     context "when the rlid param does not specify the course context LTI ID" do

@@ -20,14 +20,14 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
 import signupDialog from '@canvas/signup-dialog'
-import 'jquery-fancy-placeholder'/* fancyPlaceholder */
-import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit, getFormData, formErrors, errorBox */
+import 'jquery-fancy-placeholder' /* fancyPlaceholder */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, getFormData, formErrors, errorBox */
 import '@canvas/loading-image'
 import '@canvas/rails-flash-notifications'
 
 const I18n = useI18nScope('pseudonyms.login')
 
-$('#coenrollment_link').click(function(event) {
+$('#coenrollment_link').click(function (event) {
   event.preventDefault()
   const template = $(this).data('template')
   const path = $(this).data('path')
@@ -49,23 +49,21 @@ $('#forgot_password_form').formSubmit({
           'Your password recovery instructions will be sent to *%{email_address}*. This may take up to 30 minutes. Make sure to check your spam box.',
           {
             wrappers: ['<b>$1</b>'],
-            email_address: $(this)
-              .find('.email_address')
-              .val()
+            email_address: $(this).find('.email_address').val()
           }
         )
       ),
       15 * 60 * 1000 // fifteen minutes isn't forever but should be plenty
     )
     // Focus on the close button of the alert we just put up, per a11y
-    $('ul#flash_message_holder button.close_link').focus()
+    $('#flash_message_holder button.close_link').focus()
   },
   error(_data) {
     $(this).loadingImage('remove')
   }
 })
 
-$('#login_form').submit(function(_event) {
+$('#login_form').submit(function (_event) {
   const data = $(this).getFormData({object_name: 'pseudonym_session'})
   let success = true
   if (!data.unique_id || data.unique_id.length < 1) {

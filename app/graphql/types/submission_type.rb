@@ -47,6 +47,11 @@ module Types
 
     global_id_field :id
 
+    field :read_state, String, null: true
+    def read_state
+      object.read_state(current_user)
+    end
+
     field :submission_histories_connection, SubmissionHistoryType.connection_type, null: true do
       argument :filter, SubmissionHistoryFilterInputType, required: false, default_value: {}
     end
