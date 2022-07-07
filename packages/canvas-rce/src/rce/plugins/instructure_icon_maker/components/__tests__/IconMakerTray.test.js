@@ -266,48 +266,52 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
     })
   })
 
-  it('writes the content to the editor', async () => {
-    render(<IconMakerTray {...defaults} />)
+  describe('alt text handling', () => {
+    describe('writes content to the editor', () => {
+      it('with alt text when it is present', async () => {
+        render(<IconMakerTray {...defaults} />)
 
-    fireEvent.change(document.querySelector('#icon-alt-text'), {target: {value: 'banana'}})
-    setIconColor('#000000')
-    userEvent.click(screen.getByRole('button', {name: /apply/i}))
-    await waitFor(() => expect(editor.insertContent).toHaveBeenCalled())
-    expect(editor.insertContent.mock.calls[0]).toMatchInlineSnapshot(`
-      Array [
-        "<img src=\\"https://uploaded.url\\" alt=\\"banana\\" data-inst-icon-maker-icon=\\"true\\" data-download-url=\\"https://uploaded.url/?icon_maker_icon=1\\">",
-      ]
-    `)
+        fireEvent.change(document.querySelector('#icon-alt-text'), {target: {value: 'banana'}})
+        setIconColor('#000000')
+        userEvent.click(screen.getByRole('button', {name: /apply/i}))
+        await waitFor(() => expect(editor.insertContent).toHaveBeenCalled())
+        expect(editor.insertContent.mock.calls[0]).toMatchInlineSnapshot(`
+          Array [
+            "<img src=\\"https://uploaded.url\\" alt=\\"banana\\" data-inst-icon-maker-icon=\\"true\\" data-download-url=\\"https://uploaded.url/?icon_maker_icon=1\\">",
+          ]
+        `)
 
-    await waitFor(() => expect(defaults.onUnmount).toHaveBeenCalled())
-  })
+        await waitFor(() => expect(defaults.onUnmount).toHaveBeenCalled())
+      })
 
-  it('writes the content to the editor without alt attribute when no alt text entered', async () => {
-    render(<IconMakerTray {...defaults} />)
+      it('without alt attribute when no alt text entered', async () => {
+        render(<IconMakerTray {...defaults} />)
 
-    setIconColor('#000000')
-    userEvent.click(screen.getByRole('button', {name: /apply/i}))
-    await waitFor(() => expect(editor.insertContent).toHaveBeenCalled())
-    expect(editor.insertContent.mock.calls[0]).toMatchInlineSnapshot(`
-      Array [
-        "<img src=\\"https://uploaded.url\\" data-inst-icon-maker-icon=\\"true\\" data-download-url=\\"https://uploaded.url/?icon_maker_icon=1\\">",
-      ]
-    `)
+        setIconColor('#000000')
+        userEvent.click(screen.getByRole('button', {name: /apply/i}))
+        await waitFor(() => expect(editor.insertContent).toHaveBeenCalled())
+        expect(editor.insertContent.mock.calls[0]).toMatchInlineSnapshot(`
+          Array [
+            "<img src=\\"https://uploaded.url\\" data-inst-icon-maker-icon=\\"true\\" data-download-url=\\"https://uploaded.url/?icon_maker_icon=1\\">",
+          ]
+        `)
 
-    await waitFor(() => expect(defaults.onUnmount).toHaveBeenCalled())
-  })
+        await waitFor(() => expect(defaults.onUnmount).toHaveBeenCalled())
+      })
 
-  it('writes the content to the editor with alt="" if is decorative', async () => {
-    render(<IconMakerTray {...defaults} />)
-    setIconColor('#000000')
-    userEvent.click(screen.getByRole('checkbox', {name: /Decorative Icon/}))
-    userEvent.click(screen.getByRole('button', {name: /apply/i}))
-    await waitFor(() => expect(editor.insertContent).toHaveBeenCalled())
-    expect(editor.insertContent.mock.calls[0]).toMatchInlineSnapshot(`
-      Array [
-        "<img src=\\"https://uploaded.url\\" alt=\\"\\" data-inst-icon-maker-icon=\\"true\\" data-download-url=\\"https://uploaded.url/?icon_maker_icon=1\\">",
-      ]
-    `)
+      it('with alt="" if is decorative', async () => {
+        render(<IconMakerTray {...defaults} />)
+        setIconColor('#000000')
+        userEvent.click(screen.getByRole('checkbox', {name: /Decorative Icon/}))
+        userEvent.click(screen.getByRole('button', {name: /apply/i}))
+        await waitFor(() => expect(editor.insertContent).toHaveBeenCalled())
+        expect(editor.insertContent.mock.calls[0]).toMatchInlineSnapshot(`
+          Array [
+            "<img src=\\"https://uploaded.url\\" alt=\\"\\" data-inst-icon-maker-icon=\\"true\\" data-download-url=\\"https://uploaded.url/?icon_maker_icon=1\\">",
+          ]
+        `)
+      })
+    })
   })
 
   describe('the "replace all instances" checkbox', () => {
@@ -332,16 +336,29 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
     })
   })
 
-  it('disables footer while submiting', async () => {
-    render(<IconMakerTray {...defaults} />)
+  describe('when submitting', () => {
+    it('disables the footer', async () => {
+      render(<IconMakerTray {...defaults} />)
 
-    setIconColor('#000000')
-    const button = screen.getByRole('button', {name: /apply/i})
-    userEvent.click(button)
+      setIconColor('#000000')
+      const button = screen.getByRole('button', {name: /apply/i})
+      userEvent.click(button)
 
-    await waitFor(() => expect(button).toBeDisabled())
-    await waitFor(() => expect(defaults.onUnmount).toHaveBeenCalled(), {
-      timeout: 3000
+      await waitFor(() => expect(button).toBeDisabled())
+      await waitFor(() => expect(defaults.onUnmount).toHaveBeenCalled(), {
+        timeout: 3000
+      })
+    })
+
+    it('shows a spinner', async () => {
+      const {getByText, getByRole} = render(<IconMakerTray {...defaults} />)
+
+      setIconColor('#000000')
+      const button = getByRole('button', {name: /apply/i})
+      userEvent.click(button)
+
+      const spinner = await waitFor(() => getByText('Loading...'))
+      expect(spinner).toBeInTheDocument()
     })
   })
 
