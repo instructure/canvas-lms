@@ -27,11 +27,11 @@ import {Button} from '@instructure/ui-buttons'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
+import {Tooltip} from '@instructure/ui-tooltip'
+import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 
 const I18n = useI18nScope('calendar_event')
-
-const {Item: FlexItem} = Flex as any
 
 type Event = {
   id: string
@@ -88,15 +88,28 @@ const DeleteCalendarEventDialog: React.FC<Props> = ({
   }, [delUrl, onDeleted, onDeleting, which])
 
   const renderFooter = useCallback((): JSX.Element => {
+    const tiptext = I18n.t('Wait for delete to complete')
     return (
-      <>
-        <Button onClick={handleCancel}>{I18n.t('Cancel')}</Button>
-        <Button onClick={handleDelete} color="danger" margin="0 0 0 x-small">
-          {I18n.t('Delete')}
-        </Button>
-      </>
+      <Flex as="section" justifyItems="end">
+        <Tooltip renderTip={isDeleting && tiptext} on={isDeleting ? ['hover', 'focus'] : []}>
+          <Button color="secondary" margin="0 small 0" onClick={() => isDeleting || handleCancel()}>
+            {I18n.t('Cancel')}
+          </Button>
+        </Tooltip>
+        <Tooltip renderTip={isDeleting && tiptext} on={isDeleting ? ['hover', 'focus'] : []}>
+          <Button color="primary" onClick={() => isDeleting || handleDelete()}>
+            {isDeleting ? (
+              <div style={{display: 'inline-block', margin: '-0.5rem 0.9rem'}}>
+                <Spinner size="x-small" renderTitle={I18n.t('Deleting')} />
+              </div>
+            ) : (
+              I18n.t('Delete')
+            )}
+          </Button>
+        </Tooltip>
+      </Flex>
     )
-  }, [handleCancel, handleDelete])
+  }, [handleCancel, handleDelete, isDeleting])
 
   const renderRepeating = (): JSX.Element => {
     return (
@@ -128,12 +141,9 @@ const DeleteCalendarEventDialog: React.FC<Props> = ({
       label={I18n.t('Confirm Deletion')}
       footer={renderFooter}
     >
-      <Flex as="div">
-        <FlexItem shouldGrow>{isRepeating ? renderRepeating() : renderOne()}</FlexItem>
-        <FlexItem shouldShrink>
-          {isDeleting && <Spinner title={I18n.t('deleting')} size="small" />}
-        </FlexItem>
-      </Flex>
+      <View as="div" margin="0 small">
+        {isRepeating ? renderRepeating() : renderOne()}
+      </View>
     </CanvasModal>
   )
 }
