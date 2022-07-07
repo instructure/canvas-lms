@@ -45,7 +45,7 @@ export default class DueDateOverrideView extends Backbone.View
     return unless div
 
     DueDatesElement =
-    if @options && @options.inPacedCourse
+    if @options && @options.inPacedCourse && @options.isModuleItem
       React.createElement(CoursePacingNotice, {courseId: @options.courseId})
     else
       React.createElement(DueDates, {
