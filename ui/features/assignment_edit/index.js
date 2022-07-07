@@ -91,6 +91,7 @@ ready(() => {
         dueDatesReadonly: !!lockedItems.due_dates,
         availabilityDatesReadonly: !!lockedItems.availability_dates,
         inPacedCourse: assignment.inPacedCourse(),
+        isModuleItem: ENV.IS_MODULE_ITEM,
         courseId: assignment.courseID()
       })
     },
