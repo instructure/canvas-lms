@@ -585,7 +585,6 @@ describe "accounts/settings" do
     let(:account_admin) { account_admin_user(account: account) }
     let(:dom) { Nokogiri::HTML5(response) }
     let(:enable_fullstory) { dom.at_css("#account_settings_enable_fullstory") }
-    let(:enable_google_analytics) { dom.at_css("#account_settings_enable_google_analytics") }
     let(:site_admin) { site_admin_user }
     let(:sub_account) { account_model(root_account: account) }
 
@@ -618,21 +617,6 @@ describe "accounts/settings" do
     it "is not available for sub accounts" do
       render_for(sub_account, site_admin) do
         expect(response).not_to have_tag("#tab-privacy")
-      end
-    end
-
-    it "opts in to Google Analytics by default" do
-      render_for(account, site_admin) do
-        expect(enable_google_analytics).to be_checked
-      end
-    end
-
-    it "allows opting out of Google Analytics" do
-      account.settings[:enable_google_analytics] = false
-      account.save!
-
-      render_for(account, site_admin) do
-        expect(enable_google_analytics).not_to be_checked
       end
     end
 

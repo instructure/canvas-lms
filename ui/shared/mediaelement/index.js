@@ -30,7 +30,6 @@ import 'mediaelement/src/js/mep-feature-volume'
 import 'mediaelement/src/js/mep-feature-fullscreen'
 import 'mediaelement/src/js/mep-feature-speed'
 import 'mediaelement/src/js/mep-feature-sourcechooser'
-import 'mediaelement/src/js/mep-feature-googleanalytics'
 
 // Import stylesheet and override
 import 'mediaelement/build/mediaelementplayer.min.css'

@@ -955,11 +955,6 @@ acknowledge that you have read and agreed to the
       %>
         <%= f.fields_for :settings do |settings| %>
           <div>
-            <%= settings.check_box :enable_google_analytics, checked: @account.settings.fetch(:enable_google_analytics, true) %>
-            <%= settings.label :enable_google_analytics, en: "Allow tracking with Google Analytics" %>
-          </div>
-
-          <div>
             <%= settings.check_box :enable_fullstory, checked: @account.settings.fetch(:enable_fullstory, true) %>
             <%= settings.label :enable_fullstory, en: "Allow tracking with FullStory" %>
           </div>

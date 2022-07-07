@@ -22,7 +22,6 @@ import $ from 'jquery'
 import _ from 'underscore'
 import htmlEscape from 'html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
-import {trackEvent} from '@canvas/google-analytics'
 import '@canvas/jquery/jquery.instructure_misc_helpers'/*  /\$\.uniq/, capitalize */
 import '@canvas/loading-image'
 import sanitizeUrl from 'sanitize-url'
@@ -89,17 +88,6 @@ $.fn.loadDocPreview = function(options) {
           {},
           () => {},
           () => {}
-        )
-        trackEvent(
-          'Doc Previews',
-          serviceUsed,
-          JSON.stringify(opts, [
-            'attachment_id',
-            'submission_id',
-            'mimetype',
-            'crocodoc_session_url',
-            'canvadoc_session_url'
-          ])
         )
       }
     }

@@ -485,7 +485,6 @@ class ProfileController < ApplicationController
     add_crumb(@user.short_name, profile_path)
     add_crumb(t("crumbs.observees", "Observing"))
 
-    @google_analytics_page_title = "Students Being Observed"
     join_title(t(:page_title, "Students Being Observed"), @user.name)
     js_bundle :user_observees
 

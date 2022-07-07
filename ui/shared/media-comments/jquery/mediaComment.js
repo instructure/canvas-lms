@@ -82,9 +82,6 @@ mejs.MepDefaults.success = function(mediaElement, domObject) {
   return mediaElement.play()
 }
 
-// track events in google analytics
-mejs.MepDefaults.features.push('googleanalytics')
-
 const positionAfterSubtitleSelector = mejs.MepDefaults.features.indexOf('tracks') + 1
 
 // enable the source chooser
@@ -196,7 +193,6 @@ const mediaCommentActions = {
           const mediaPlayerOptions = {
             can_add_captions: sourcesAndTracks.can_add_captions,
             mediaCommentId: id,
-            googleAnalyticsTitle: id,
             menuTimeoutMouseLeave: 50,
             success(media) {
               holder.focus()
@@ -317,8 +313,7 @@ const mediaCommentActions = {
           if (sourcesAndTracks.sources.length) {
             const mediaPlayerOptions = {
               can_add_captions: sourcesAndTracks.can_add_captions,
-              mediaCommentId: id,
-              googleAnalyticsTitle: id
+              mediaCommentId: id
             }
 
             const $mediaTag = createMediaTag({

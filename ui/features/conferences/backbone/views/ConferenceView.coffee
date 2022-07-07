@@ -19,7 +19,6 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import {View} from '@canvas/backbone'
 import template from '../../jst/newConference.handlebars'
-import '@canvas/google-analytics'
 import '@canvas/rails-flash-notifications'
 
 I18n = useI18nScope('conferences')

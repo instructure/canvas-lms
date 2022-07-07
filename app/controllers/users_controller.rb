@@ -474,7 +474,6 @@ class UsersController < ApplicationController
       css_bundle :act_as_modal
 
       @page_title = t("Act as %{user_name}", user_name: @user.short_name)
-      @google_analytics_page_title = t("Act as user")
       js_env act_as_user_data: {
         user: {
           name: @user.name,
@@ -1348,7 +1347,6 @@ class UsersController < ApplicationController
       status = @user.deleted? ? 404 : 200
       respond_to do |format|
         format.html do
-          @google_analytics_page_title = "User"
           @body_classes << "full-width"
           js_env(CONTEXT_USER_DISPLAY_NAME: @user.short_name,
                  USER_ID: @user.id)

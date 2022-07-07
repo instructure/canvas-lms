@@ -71,7 +71,6 @@ class GradebooksController < ApplicationController
     js_bundle :grade_summary, :rubric_assessment
     css_bundle :grade_summary
 
-    @google_analytics_page_title = t("Grades for Student")
     load_grade_summary_data
     render stream: can_stream_template?
   end

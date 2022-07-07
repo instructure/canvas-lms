@@ -255,7 +255,6 @@ class ContextController < ApplicationController
 
       js_bundle :user_name, "context_roster_user"
       css_bundle :roster_user, :pairing_code
-      @google_analytics_page_title = "#{@context.name} People"
 
       if @domain_root_account.enable_profiles?
         @user_data = profile_data(
