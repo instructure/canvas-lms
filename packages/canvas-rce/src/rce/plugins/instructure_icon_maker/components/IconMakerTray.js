@@ -248,6 +248,15 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
       img.setAttribute('alt', settings.alt)
     }
 
+    // Set additional attributes if defined
+    if (settings.externalStyle) {
+      img.setAttribute('style', settings.externalStyle)
+    }
+    if (settings.externalWidth && settings.externalHeight) {
+      img.setAttribute('width', settings.externalWidth)
+      img.setAttribute('height', settings.externalHeight)
+    }
+
     // Mark the image as an icon maker icon.
     img.setAttribute(ICON_MAKER_ATTRIBUTE, true)
 

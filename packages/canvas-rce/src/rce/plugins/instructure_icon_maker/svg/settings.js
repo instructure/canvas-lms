@@ -83,6 +83,10 @@ export function useSvgSettings(editor, editing, rcsConfig) {
   const urlFromNode = imgNode?.getAttribute(ICON_MAKER_DOWNLOAD_URL_ATTR)
   const altText = imgNode?.getAttribute('alt')
 
+  const customStyle = imgNode?.getAttribute('style')
+  const customWidth = imgNode?.getAttribute('width')
+  const customHeight = imgNode?.getAttribute('height')
+
   useEffect(() => {
     const fetchSvgSettings = async () => {
       if (!urlFromNode) return
@@ -121,6 +125,16 @@ export function useSvgSettings(editor, editing, rcsConfig) {
           metadataJson.alt = altText
         }
 
+        // Include external details on metadata
+        if (customWidth && customHeight) {
+          metadataJson.externalWidth = customWidth
+          metadataJson.externalHeight = customHeight
+        }
+
+        if (customStyle) {
+          metadataJson.externalStyle = customStyle
+        }
+
         processMetadataForBackwardCompatibility(metadataJson)
 
         // settings found, return parsed results
@@ -133,7 +147,7 @@ export function useSvgSettings(editor, editing, rcsConfig) {
 
     // If we are editing rather than creating, fetch existing settings
     if (editing) fetchSvgSettings()
-  }, [editor, editing, urlFromNode, rcsConfig, altText])
+  }, [editor, editing, urlFromNode, rcsConfig, altText, customWidth, customHeight, customStyle])
 
   return [settings, status, dispatch]
 }

@@ -396,7 +396,6 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
 
     beforeEach(() => {
       ed = new FakeEditor()
-
       // Add an image to the editor and select it
       ed.setContent(
         '<img id="test-image" src="https://canvas.instructure.com/svg" data-inst-icon-maker-icon="true" data-download-url="https://canvas.instructure.com/files/1/download" alt="a red circle" />'
@@ -473,6 +472,26 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
         expect(getByTestId('colorPreview-#009606')).toBeInTheDocument() // text color
         expect(getByTestId('colorPreview-#E71F63')).toBeInTheDocument() // text background color
         expect(getByLabelText('Text Position').value).toEqual('Below')
+      })
+    })
+
+    describe('when an icon has styling from RCE', () => {
+      beforeEach(() => {
+        // Add an image to the editor and select it
+        ed.setContent(
+          '<img style="display:block; margin-left:auto; margin-right:auto;" width="156" height="134" id="test-image" src="https://canvas.instructure.com/svg" data-inst-icon-maker-icon="true" data-download-url="https://canvas.instructure.com/files/1/download" alt="one blue pine" />'
+        )
+        ed.setSelectedNode(ed.dom.select('#test-image')[0])
+      })
+
+      it('checks that the icon keeps attributes from RCE', async () => {
+        const {getByRole, getByAltText} = subject()
+        userEvent.click(getByRole('button', {name: /save/i}))
+        await waitFor(() =>
+          expect(getByAltText('one blue pine').outerHTML).toContain(
+            'style="display:block; margin-left:auto; margin-right:auto;" width="156" height="134"'
+          )
+        )
       })
     })
 
