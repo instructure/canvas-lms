@@ -193,6 +193,10 @@ require "rrule"
 #         "rrule": {
 #           "description": "An iCalendar RRULE for defining how events in a recurring event series repeat.",
 #           "type": "string"
+#         },
+#         "series_natural_language": {
+#            "description": "A natural language expression of how events occur in the series. (e.g. Daily, 2 times)",
+#            "type": "string"
 #         }
 #       }
 #     }
@@ -299,7 +303,7 @@ class CalendarEventsApiController < ApplicationController
   before_action :require_user_or_observer, only: [:user_index]
   before_action :require_authorization, only: %w[index user_index]
 
-  RECURRING_EVENT_LIMIT = 200
+  RECURRING_EVENT_LIMIT = RruleHelper::RECURRING_EVENT_LIMIT
 
   DEFAULT_INCLUDES = %w[child_events].freeze
 
@@ -330,6 +334,8 @@ class CalendarEventsApiController < ApplicationController
   #   underscore, followed by the context id. For example: course_42
   # @argument excludes[] [Array]
   #   Array of attributes to exclude. Possible values are "description", "child_events" and "assignment"
+  # @argument includes[] [Array]
+  #   Array of optional attributes to include. Possible values are "web_conferenes" and "series_natural_language"
   # @argument important_dates [Boolean]
   #   Defaults to false.
   #   If true, only events with important dates set to true will be returned.
@@ -374,6 +380,8 @@ class CalendarEventsApiController < ApplicationController
   # @argument exclude_submission_types[] [Array]
   #   When type is "assignment", specifies the submission types to be excluded from the returned
   #   assignments. Ignored if type is not "assignment".
+  # @argument includes[] [Array]
+  #   Array of optional attributes to include. Possible values are "web_conferenes" and "series_natural_language"
   # @argument important_dates [Boolean]
   #   Defaults to false
   #   If true, only events with important dates set to true will be returned.
@@ -559,7 +567,7 @@ class CalendarEventsApiController < ApplicationController
           render json: event_json(
             original_event,
             @current_user,
-            session, { duplicates: events, include: includes("web_conference") }
+            session, { duplicates: events, include: includes(["web_conference", "series_natural_language"]) }
           ), status: :created
         end
       end
@@ -870,7 +878,7 @@ class CalendarEventsApiController < ApplicationController
         render json: { message: t("You may not update a locked event") }, status: :bad_request
         return
       elsif target_event.update(params_for_update)
-        render json: event_json(target_event, @current_user, session, include: includes("web_conference"))
+        render json: event_json(target_event, @current_user, session, include: includes(["web_conference", "series_natural_language"]))
       else
         render json: { message: t("Update failed") }, status: bad_request
       end
@@ -985,7 +993,7 @@ class CalendarEventsApiController < ApplicationController
         event,
         @current_user,
         session,
-        { include: includes("web_conference") }
+        { include: includes(["web_conference", "series_natural_language"]) }
       )
     end
     render json: json
@@ -1754,30 +1762,10 @@ class CalendarEventsApiController < ApplicationController
     # We still need to check later because the RRULE could be "until some date"
     # and not an explicit count.
     rrule_fields = rrule_parse(rrule)
-    count = rrule_fields.fetch("COUNT", 1).to_i
-
-    if count <= 0
-      render json: { message: t("COUNT must be greater than 0") }, status: :bad_request
-      return nil
-    end
-
-    if count > RECURRING_EVENT_LIMIT
-      InstStatsd::Statsd.gauge("calendar_events_api.recurring.count_exceeding_limit", count)
-      render json: {
-        message: t("COUNT must be %{limit} or less",
-                   limit: RECURRING_EVENT_LIMIT)
-      }, status: :bad_request
-      return nil
-    end
-
-    # We do not support never ending series because each event in the series
-    # must get created in the db to support the paginated calendar_events api
-    bounded = rrule_fields.fetch("UNTIL", false) || rrule_fields.fetch("COUNT", false)
-    unless bounded
-      render json: {
-        message: t("The series recurrence rule must include a %{COUNT} or %{UNTIL}",
-                   COUNT: "COUNT", UNTIL: "UNTIL")
-      }, status: :bad_request
+    begin
+      rrule_validate_common_opts(rrule_fields)
+    rescue RruleValidationError => e
+      render json: { message: e.message }, status: :bad_request
       return nil
     end
 

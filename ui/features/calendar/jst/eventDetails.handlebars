@@ -11,7 +11,12 @@
     </h2>
   </div>
   <div class="event-details-content">
-    <div class="event-details-timestring">{{{displayTimeString}}}</div>
+    <div class="event-details-timestring">
+      {{{displayTimeString}}}
+      {{#if series_natural_language}}
+        <div class="series-natural-language">{{series_natural_language}}</div>
+      {{/if}}
+    </div>
     <table cellspacing="0" role="presentation">
       {{#if contextInfo}}
         <tr>

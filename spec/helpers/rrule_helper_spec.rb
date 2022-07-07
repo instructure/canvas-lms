@@ -44,10 +44,12 @@ describe RruleHelper do
       "FREQ=WEEKLY;INTERVAL=2;UNTIL=20220729T000000Z" => "Every 2 weeks until Jul 29, 2022",
       "FREQ=WEEKLY;INTERVAL=3;BYDAY=TU,TH;COUNT=3" => "Every 3 weeks on Tue, Thu, 3 times",
       "FREQ=WEEKLY;INTERVAL=3;BYDAY=TU,TH;UNTIL=20220729T000000Z" => "Every 3 weeks on Tue, Thu until Jul 29, 2022",
+      "FREQ=MONTHLY;INTERVAL=1;COUNT=3" => "Monthly, 3 times",
       "FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=15;COUNT=3" => "Monthly on day 15, 3 times",
       "FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=3,5;COUNT=3" => "Monthly on days 3,5, 3 times",
       "FREQ=MONTHLY;INTERVAL=2;BYMONTHDAY=15;COUNT=3" => "Every 2 months on day 15, 3 times",
       "FREQ=MONTHLY;INTERVAL=2;BYMONTHDAY=3,5;COUNT=3" => "Every 2 months on days 3,5, 3 times",
+      "FREQ=MONTHLY;INTERVAL=1;UNTIL=20220729T000000Z" => "Monthly until Jul 29, 2022",
       "FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=5;UNTIL=20220729T000000Z" => "Monthly on day 5 until Jul 29, 2022",
       "FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=3,5;UNTIL=20220729T000000Z" => "Monthly on days 3,5 until Jul 29, 2022",
       "FREQ=MONTHLY;INTERVAL=2;BYMONTHDAY=5;UNTIL=20220729T000000Z" => "Every 2 months on day 5 until Jul 29, 2022",
@@ -83,6 +85,33 @@ describe RruleHelper do
       expect(rrule["FREQ"]).to eql("DAILY")
       expect(rrule["INTERVAL"]).to eql("1")
       expect(rrule["COUNT"]).to eql("3")
+    end
+  end
+
+  describe "rrule_validate_common_opts" do
+    it "catches missing INTERVAL" do
+      expect { rrule_validate_common_opts(rrule_parse("FREQ=DAILY;COUNT=3")) }.to raise_error(RruleValidationError, "Missing INTERVAL")
+    end
+
+    it "catches an invalid INTERVAL" do
+      expect { rrule_validate_common_opts(rrule_parse("FREQ=DAILY;INTERVAL=0;COUNT=3")) }.to raise_error(RruleValidationError, "INTERVAL must be > 0")
+      expect { rrule_validate_common_opts(rrule_parse("FREQ=DAILY;INTERVAL=X;COUNT=3")) }.to raise_error(RruleValidationError, "INTERVAL must be > 0")
+    end
+
+    it "catches missing COUNT and UNTIl" do
+      expect { rrule_validate_common_opts(rrule_parse("FREQ=DAILY;INTERVAL=1")) }.to raise_error(RruleValidationError, "Missing COUNT or UNTIL")
+    end
+
+    it "catches invalid COUNT" do
+      max_count = RruleHelper::RECURRING_EVENT_LIMIT
+      expect { rrule_validate_common_opts(rrule_parse("FREQ=DAILY;INTERVAL=1;COUNT=0")) }.to raise_error(RruleValidationError, "COUNT must be > 0")
+      expect { rrule_validate_common_opts(rrule_parse("FREQ=DAILY;INTERVAL=1;COUNT=X")) }.to raise_error(RruleValidationError, "COUNT must be > 0")
+      expect { rrule_validate_common_opts(rrule_parse("FREQ=DAILY;INTERVAL=1;COUNT=#{max_count + 1}")) }.to raise_error(RruleValidationError, "COUNT must be <= #{max_count}")
+    end
+
+    it "catches invalid UNTIL" do
+      expect { rrule_validate_common_opts(rrule_parse("FREQ=DAILY;INTERVAL=1;UNTIL=20220931")) }.to raise_error(RruleValidationError, "Invalid UNTIL '20220931'")
+      expect { rrule_validate_common_opts(rrule_parse("FREQ=DAILY;INTERVAL=1;UNTIL=X")) }.to raise_error(RruleValidationError, "Invalid UNTIL 'X'")
     end
   end
 end
