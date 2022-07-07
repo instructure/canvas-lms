@@ -138,6 +138,9 @@ module Lti::IMS
     # @argument https://canvas.instructure.com/lti/submission[new_submission] [Optional, Boolean]
     #   (EXTENSION field) flag to indicate that this is a new submission. Defaults to true unless submission_type is none.
     #
+    # @argument https://canvas.instructure.com/lti/submission[prioritize_non_tool_grade] [Optional, Boolean]
+    #   (EXTENSION field) flag to prevent a request from overwriting an existing grade for a submission. Defaults to false.
+    #
     # @argument https://canvas.instructure.com/lti/submission[submission_type] [Optional, String]
     #   (EXTENSION field) permissible values are: none, basic_lti_launch, online_text_entry, external_tool, online_upload, or online_url. Defaults to external_tool. Ignored if content_items are provided.
     #
@@ -255,6 +258,7 @@ module Lti::IMS
     EXTENSION_PARAMS = [
       :new_submission,
       :submission_type,
+      :prioritize_non_tool_grade,
       :submission_data,
       :submitted_at,
       content_items: %i[type url title media_type]
@@ -344,12 +348,22 @@ module Lti::IMS
       render_error("The maximum number of allowed attempts has been reached for this submission", :unprocessable_entity)
     end
 
+    def prioritize_non_tool_grade?
+      ActiveRecord::Type::Boolean.new.cast(scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :prioritize_non_tool_grade))
+    end
+
+    def submission_has_score?
+      line_item.assignment.find_or_create_submission(user)&.score&.present?
+    end
+
     def score_submission
       return unless line_item.assignment_line_item?
 
       if ignore_score?
         submission = line_item.assignment.find_or_create_submission(user)
         submission.update(score: nil)
+      elsif prioritize_non_tool_grade? && submission_has_score?
+        submission = line_item.assignment.find_or_create_submission(user)
       else
         submission_hash = { grader_id: -tool.id }
         if line_item.assignment.grading_type == "pass_fail"
