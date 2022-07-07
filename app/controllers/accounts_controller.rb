@@ -1712,7 +1712,7 @@ class AccountsController < ApplicationController
   def update_conditional_release
     # If the account is changing its settings for mastery path we need to update the courses and any subaccounts
     # that may be affected
-    conditional_release_params = params.dig(:account, :settings, :conditional_release)&.permit(:value, :locked)
+    conditional_release_params = params.dig(:account, :settings, :conditional_release)&.permit(:value, :locked)&.to_hash&.with_indifferent_access
     @account.delay_if_production(priority: Delayed::LOW_PRIORITY).update_conditional_release(conditional_release_params) if conditional_release_params.present?
   end
 
