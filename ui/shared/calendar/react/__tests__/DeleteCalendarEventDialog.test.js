@@ -18,8 +18,8 @@
 
 import React from 'react'
 import fetchMock from 'fetch-mock'
-import {render, act} from '@testing-library/react'
-import {getByText} from '@testing-library/dom'
+import {render, act, within} from '@testing-library/react'
+import {getByText as domGetByText} from '@testing-library/dom'
 
 import {
   DeleteCalendarEventDialog,
@@ -109,12 +109,29 @@ describe('DeleteCalendarEventDialog', () => {
     expect(which).toEqual('all')
   })
 
+  describe('while delete is in flight', () => {
+    it('shows cancel and delete tooltip', () => {
+      const {getByRole, getAllByText} = renderDialog()
+      const deleteButton = getByRole('button', {name: 'Delete'})
+      act(() => deleteButton.click())
+      expect(getAllByText('Wait for delete to complete').length).toEqual(2)
+    })
+
+    it('renders a spinner inside the delete button', () => {
+      const {getByRole} = renderDialog()
+      const deleteButton = getByRole('button', {name: 'Delete'})
+      act(() => deleteButton.click())
+      const spinner = within(deleteButton).getByRole('img', {name: 'Deleting'})
+      expect(spinner).toBeInTheDocument()
+    })
+  })
+
   describe('render function', () => {
     it('renders', () => {
       const container = document.createElement('div')
       document.body.appendChild(container)
       renderDeleteCalendarEventDialog(container, defaultProps)
-      expect(getByText(document.body, 'Confirm Deletion')).toBeInTheDocument()
+      expect(domGetByText(document.body, 'Confirm Deletion')).toBeInTheDocument()
     })
   })
 })
