@@ -97,7 +97,7 @@ function renderBody(
   rcsConfig,
   isLoading
 ) {
-  return editing && isLoading() ? (
+  return isLoading() ? (
     <Flex justifyItems="center">
       <Spinner renderTitle={formatMessage('Loading...')} size="large" />
     </Flex>

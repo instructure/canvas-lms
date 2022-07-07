@@ -19,7 +19,7 @@
 import React from 'react'
 
 import {View} from '@instructure/ui-view'
-import ImageList from '../../instructure_image/Images'
+import Images from '../../instructure_image/Images'
 import {useStoreProps} from '../../shared/StoreContext'
 import {ICON_MAKER_ICONS} from '../svg/constants'
 
@@ -29,7 +29,7 @@ const SavedIconMakerList = ({onImageEmbed}) => {
 
   return (
     <View>
-      <ImageList
+      <Images
         fetchInitialImages={() => storeProps.fetchInitialImages({category: ICON_MAKER_ICONS})}
         fetchNextImages={() => storeProps.fetchNextImages({category: ICON_MAKER_ICONS})}
         contextType={storeProps.contextType}
