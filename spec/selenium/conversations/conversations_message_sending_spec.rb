@@ -158,57 +158,17 @@ describe "conversations new" do
           @course.restrict_student_past_view = true
           @course.restrict_student_future_view = true
           @course.save!
+          user_logged_in(user: @s1)
         end
 
-        context "teacher inbox" do
-          before do
-            user_logged_in(user: @teacher)
-          end
+        it "shows course when in valid dates", priority: "1" do
+          @course.conclude_at = 1.day.from_now
+          @course.start_at = 1.day.ago
+          @course.save!
 
-          it "shows course when in valid dates", priority: "1" do
-            @course.conclude_at = 1.day.from_now
-            @course.start_at = 1.day.ago
-            @course.save!
-
-            get "/conversations"
-            move_to_click(".icon-compose")
-            expect(fj("#compose-message-course option:contains('#{@course.name}')")).to be_present
-          end
-
-          context "before course start date" do
-            it "shows course before begin date", priority: "1" do
-              @course.conclude_at = 2.days.from_now
-              @course.start_at = 1.day.from_now
-              @course.save!
-
-              get "/conversations"
-              move_to_click(".icon-compose")
-              expect(f("#compose-message-course")).to contain_jqcss("option:contains('#{@course.name}')")
-            end
-          end
-
-          context "soft concluded course" do
-            it "shows course after end date", priority: "1" do
-              @course.conclude_at = 1.day.ago
-              @course.start_at = 2.days.ago
-              @course.save!
-
-              get "/conversations"
-              move_to_click(".icon-compose")
-              expect(f("#compose-message-course")).to contain_jqcss("option:contains('#{@course.name}')")
-            end
-          end
-
-          context "hard concluded course" do
-            it "does not show course after Hard Conclusion", priority: "1" do
-              @course.complete!
-              @course.save!
-
-              get "/conversations"
-              move_to_click(".icon-compose")
-              expect(f("#compose-message-course")).not_to contain_jqcss("option:contains('#{@course.name}')")
-            end
-          end
+          get "/conversations"
+          move_to_click(".icon-compose")
+          expect(fj("#compose-message-course option:contains('#{@course.name}')")).to be
         end
 
         context "student inbox" do
@@ -246,12 +206,14 @@ describe "conversations new" do
             end
 
             it "shows course after end date", priority: "1" do
+              skip
               get "/conversations"
               move_to_click(".icon-compose")
               expect(f("#compose-message-course")).to contain_jqcss("option:contains('#{@course.name}')")
             end
 
             it "shows other students as recipient options after end date", priority: "1" do
+              skip
               get "/conversations"
               f("#compose-btn").click
               wait_for_ajaximations
@@ -265,17 +227,26 @@ describe "conversations new" do
               expect(ffj(".ac-result").count).to eq(@course.students.count)
             end
           end
+        end
 
-          context "hard concluded course" do
-            it "does not show course after Hard Conclusion", priority: "1" do
-              @course.complete!
-              @course.save!
+        it "does not show course before begin date", priority: "1" do
+          @course.conclude_at = 2.days.from_now
+          @course.start_at = 1.day.from_now
+          @course.save!
 
-              get "/conversations"
-              move_to_click(".icon-compose")
-              expect(f("#compose-message-course")).not_to contain_jqcss("option:contains('#{@course.name}')")
-            end
-          end
+          get "/conversations"
+          move_to_click(".icon-compose")
+          expect(f("#compose-message-course")).not_to contain_jqcss("option:contains('#{@course.name}')")
+        end
+
+        it "does not show course after end date", priority: "1" do
+          @course.conclude_at = 1.day.ago
+          @course.start_at = 2.days.ago
+          @course.save!
+
+          get "/conversations"
+          move_to_click(".icon-compose")
+          expect(f("#compose-message-course")).not_to contain_jqcss("option:contains('#{@course.name}')")
         end
       end
 
