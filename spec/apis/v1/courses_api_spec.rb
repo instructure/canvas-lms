@@ -1251,10 +1251,16 @@ describe CoursesController, type: :request do
         end
 
         it "applies a course template" do
-          template = @account.courses.create!(name: "Template", template: true)
+          settings_hash = { filter_speed_grader_by_student_group: true }
+          template = @account.courses.create!(
+            name: "Template",
+            settings: settings_hash,
+            template: true
+          )
           template.assignments.create!(title: "my assignment")
 
           @account.root_account.enable_feature!(:course_templates)
+          @account.root_account.enable_feature!(:filter_speed_grader_by_student_group)
           @account.update!(course_template: template)
 
           post_params = {
@@ -1271,6 +1277,7 @@ describe CoursesController, type: :request do
           expect(new_course.name).to eq "Test Course"
           expect(new_course.assignments.length).to eq 1
           expect(new_course.assignments.first.title).to eq "my assignment"
+          expect(new_course.settings[:filter_speed_grader_by_student_group]).to be true
         end
 
         it "removes start and end dates when restrict_enrollments_to_course_dates is false and an enrollment_term is present" do
