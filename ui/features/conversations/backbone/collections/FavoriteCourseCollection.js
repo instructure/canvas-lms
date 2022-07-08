@@ -18,5 +18,4 @@
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection.coffee'
 
 export default class FavoriteCourseCollection extends PaginatedCollection {}
-FavoriteCourseCollection.prototype.url =
-  '/api/v1/users/self/favorites/courses?include_completed_courses=true&exclude_restricted_inactivated_courses=true'
+FavoriteCourseCollection.prototype.url = '/api/v1/users/self/favorites/courses/'
