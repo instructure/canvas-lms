@@ -814,7 +814,7 @@ describe "/gradebooks/grade_summary" do
               artifact: submission,
               assessment: {
                 assessment_type: "grading",
-                criterion_crit1: { points: 2, comments: "Hmm" }
+                criterion_crit1: { comments: "Hmm" }
               }
             )
             student.reload
@@ -826,7 +826,7 @@ describe "/gradebooks/grade_summary" do
           end
         end
 
-        context "when rubric has no comment" do
+        context "when rubric has been graded" do
           before do
             assignment.rubric_association.assess(
               assessor: teacher,
@@ -834,8 +834,25 @@ describe "/gradebooks/grade_summary" do
               artifact: submission,
               assessment: {
                 assessment_type: "grading",
-                criterion_crit1: { points: 2 }
+                criterion_crit1: { points: 5 }
               }
+            )
+            student.reload
+          end
+
+          it "shows a blue dot" do
+            render "gradebooks/grade_summary"
+            expect(response).to have_tag("#submission_#{submission.assignment_id} .visibility_feedback_ff .unread_rubric_dot")
+          end
+        end
+
+        context "when rubric has no comment or has not been graded" do
+          before do
+            assignment.rubric_association.assess(
+              assessor: teacher,
+              user: student,
+              artifact: submission,
+              assessment: { assessment_type: "grading" }
             )
             student.reload
           end
