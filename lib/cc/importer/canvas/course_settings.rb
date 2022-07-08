@@ -71,12 +71,11 @@ module CC::Importer::Canvas
       end
       %w[is_public is_public_to_auth_users
          public_syllabus public_syllabus_to_auth syllabus_course_summary
-         indexed allow_student_wiki_edits
-         allow_student_assignment_edits show_public_context_messages
-         allow_student_forum_attachments allow_student_organized_groups lock_all_announcements
-         open_enrollment allow_wiki_comments
-         self_enrollment hide_final_grade grading_standard_enabled
-         hide_distribution_graphs allow_student_discussion_topics
+         indexed allow_student_wiki_edits allow_student_assignment_edits
+         show_public_context_messages allow_student_forum_attachments
+         allow_student_organized_groups lock_all_announcements open_enrollment allow_wiki_comments
+         self_enrollment hide_final_grade filter_speed_grader_by_student_group
+         grading_standard_enabled hide_distribution_graphs allow_student_discussion_topics
          allow_student_discussion_editing show_announcements_on_home_page usage_rights_required
          restrict_student_future_view restrict_student_past_view show_total_grade_as_points
          organize_epub_by_content_type enable_offline_web_export restrict_enrollments_to_course_dates
