@@ -184,14 +184,14 @@
         %>
           <% unread_comments =
                @context.root_account.feature_enabled?(:submission_feedback_indicators) &&
-               @current_user.unread_rubric_comments?(@submission) %>
+               @current_user.unread_rubric_assessments?(@submission) %>
           <div class="submission-details-header__rubric <% if can_do(@assignment, @current_user, :grade) %>submission-details-header__rubric--can-grade<% end %>">
             <a href="#" class="assess_submission_link Button Button--small Button--link" tabindex='0' title="<%= unread_comments ? t('There are unread rubric comments.') : '' %>">
               <i class="icon-rubric" aria-hidden="true"></i><%= t('show_rubric', 'Show Rubric') %>
             </a>
             <% if unread_comments %>
               <span class="rubric_comment unread_indicator" aria-hidden="true"></span>
-              <% js_env mark_rubric_comments_read_url: api_v1_course_submission_rubric_comments_mark_read_url(@context.id, @assignment.id, @submission.user.id) %>
+              <% js_env mark_rubric_comments_read_url: api_v1_course_submission_rubric_assessments_mark_read_url(@context.id, @assignment.id, @submission.user.id) %>
             <% end %>
           </div>
         <% end %>

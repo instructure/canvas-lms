@@ -330,10 +330,10 @@
             </span>
             <i class="icon-rubric"></i>
             <% if @visibility_feedback_enabled %>
-              <% if @current_user.unread_rubric_comments?(submission) %>
+              <% if @current_user.unread_rubric_assessments?(submission) %>
                 <div
                   class="unread_rubric_dot"
-                  data-href="<%= api_v1_course_submission_rubric_comments_mark_read_url(@context.id, assignment.id, submission.user.id) %>">&nbsp;</div>
+                  data-href="<%= api_v1_course_submission_rubric_assessments_mark_read_url(@context.id, assignment.id, submission.user.id) %>">&nbsp;</div>
               <% end %>
             <% end %>
           </a>

@@ -1765,15 +1765,15 @@ class User < ActiveRecord::Base
     set_preference(:unread_submission_annotations, submission.global_id, nil)
   end
 
-  def unread_rubric_comments?(submission)
+  def unread_rubric_assessments?(submission)
     !!get_preference(:unread_rubric_comments, submission.global_id)
   end
 
-  def mark_rubric_comments_unread!(submission)
+  def mark_rubric_assessments_unread!(submission)
     set_preference(:unread_rubric_comments, submission.global_id, true)
   end
 
-  def mark_rubric_comments_read!(submission)
+  def mark_rubric_assessments_read!(submission)
     # this will delete the user_preference_value
     set_preference(:unread_rubric_comments, submission.global_id, nil)
   end
