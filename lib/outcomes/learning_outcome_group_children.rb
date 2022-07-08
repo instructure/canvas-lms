@@ -112,7 +112,13 @@ module Outcomes
 
     def outcome_links(learning_outcome_group_id)
       group_ids = children_ids_with_self(learning_outcome_group_id)
-      ContentTag.active.learning_outcome_links.where(associated_asset_id: group_ids)
+      relation = ContentTag.active.learning_outcome_links.where(associated_asset_id: group_ids)
+      # Exclude tags for which the aligned outcome is deleted
+      valid_outcome_ids = relation
+                          .select("content_tags.content_id")
+                          .joins("LEFT OUTER JOIN #{LearningOutcome.quoted_table_name} AS outcomes ON content_tags.content_id = outcomes.id")
+                          .where("outcomes.workflow_state<>'deleted'")
+      relation.where(content_id: valid_outcome_ids)
     end
 
     def filter_outcomes(relation, filter)
