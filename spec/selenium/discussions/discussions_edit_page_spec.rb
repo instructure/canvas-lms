@@ -374,6 +374,8 @@ describe "discussions" do
         before do
           course.enable_course_paces = true
           course.save!
+          context_module = course.context_modules.create! name: "M"
+          assignment_topic.context_module_tags.create! context_module: context_module, context: @course, tag_type: "context_module"
         end
 
         it "shows the course pacing notice on a graded discussion" do
