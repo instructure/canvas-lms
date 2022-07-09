@@ -4944,7 +4944,7 @@ sv:
   blueprint_courses_must_be_enabled_for_an_account_b_edd8f7d3: "Administratören måste aktivera Blueprint-kurser i ett konto."
   blueprint_courses_must_be_enabled_for_an_account_b_fa574265: "Administratören måste aktivera blueprint-kurser i ett konto. Kursroller kan endast hantera blueprint-kursinnehåll om de läggs till i blueprint-kursen med lärar-, TA- eller designerroll. För att redigera låsinställningarna från indexsidan Diskussioner måste även Diskussioner – moderera aktiveras."
   blueprint_courses_must_be_enabled_for_an_account_b_ffb3ac4b: "Administratören måste aktivera Blueprint-kurser i ett konto. Kursroller kan endast hantera Blueprint-kursinnehåll om de läggs till i Blueprint-kursen med lärar-, TA- eller designerroll."
-  blueprint_information_95dcef55: Modellinformation
+  blueprint_information_95dcef55: Blueprint-information
   blueprint_settings_233e909a: Modellinställningar
   blueprint_sync_90d0dfd5: "Synkronisering av blueprint"
   bmp_e297149c: BMP
@@ -8596,7 +8596,7 @@ sv:
         after: Efter
         before: Före
         or: ELLER
-      nav_items_keyboard_drag_and_drop: "Varning! För förbättrad tillgång vid omorganisering av element i kursnavigeringen kan du använda alternativet Flytta till dialog som finns i menyn."
+      nav_items_keyboard_drag_and_drop: "OBS! För bättre tillgänglighet när du ändrar ordningen i navigeringen, kan du använda alternativet Flytta till som du hittar i dialogmenyn."
       no_language_preference: "Inte inställt (användarkonfigurering, standard %{language})"
       none: Ingen
       page_title: Kursinformation
@@ -14564,7 +14564,7 @@ sv:
       teacher: "Du har tillfälligt fått byta roll i den här kursen, du ser den just nu som en lärare.  Du kan få tillbaka din roll och dina behörigheter från kursens startsida."
     titles: 
       equella_content_preview: "Equella förhandsvisning av innehåll"
-      external_link: "Länkar till en externa sida."
+      external_link: "Länkar till en extern sida."
       preview_document: "Förhandsgranska dokumentet"
   instructure_legacy_a2cacda7: "Instructure, äldre"
   instructure_misc_plugins: 
@@ -18543,7 +18543,7 @@ sv:
   no_first_name_4b772708: "<Förnamn saknas>"
   no_grade_3fa326c: "inget omdöme"
   no_grade_assigned_90e531f5: "Inga betyg tilldelade."
-  no_grade_for_assignment_97c9bc75: "Ingen omdöme för %{assignment}"
+  no_grade_for_assignment_97c9bc75: "Inget omdöme för %{assignment}"
   no_grade_for_assignmenttitle_83baad53: "Inget omdöme för %{assignmentTitle}"
   no_graded_submissions_e40c957a: "Inga bedömda inlämningar"
   no_graders_with_that_name_found_d8204d90: "Inga bedömare med det namnet hittades"
@@ -23563,7 +23563,7 @@ sv:
   search: 
     all_courses: 
       name: Namn
-      open_enrollment_only: "Öppna endast registreringskurser"
+      open_enrollment_only: "Endast kurser med öppen registrering"
       public_only: "Endast offentliga kurser"
       search: Sök
       titles: 
@@ -25741,7 +25741,7 @@ sv:
       see_vericite_results: "Se VeriCite resultat"
       show_entire_discussion: "Visa hela diskussionen"
       titles: 
-        external_link: "Länkar till en externa sida."
+        external_link: "Länkar till en extern sida."
       url_preview: "URL förhandsvisning"
       view_feedback_button: "Visa feedback"
       view_in_a_new_tab: "(Visa i ny flik)"
@@ -25820,8 +25820,8 @@ sv:
   success_grades_have_been_hidden_for_assignmentname_4ed03c00: "Klart! Omdömen har dolts för %{assignmentName}."
   success_grades_have_been_hidden_for_the_selected_s_3ad5692: "Klart! Omdömen har dolts för de valda sektionerna av %{assignmentName}."
   success_grades_have_been_posted_for_the_selected_s_54c73ef0: "Klart! Omdömena för %{assignmentName} har publicerats för de utvalda sektionerna."
-  success_grades_have_been_posted_to_everyone_for_as_f37ea031: "Lyckades! Omdömen har publicerats till samtliga för %{assignmentName}."
-  success_grades_have_been_posted_to_everyone_graded_70d15d1a: "Lyckades! Omdömen har publicerats till samtliga som bedömts för %{assignmentName}."
+  success_grades_have_been_posted_to_everyone_for_as_f37ea031: "Klart! Omdömen har publicerats till samtliga för %{assignmentName}."
+  success_grades_have_been_posted_to_everyone_graded_70d15d1a: "Klart! Omdömen har publicerats till samtliga som bedömts för %{assignmentName}."
   success_grades_have_been_posted_to_postedto_for_as_255bc974: "Klart! Omdömena för %{assignmentName} har publicerats för %{postedTo}."
   success_grades_were_published_to_the_grade_book_da3b4fba: "Lycka! Omdömena har publicerats i omdömesboken"
   success_the_post_policy_for_name_has_been_updated_ea92283f: "Klart! Publiceringspolicyn för %{name} har uppdaterats."
@@ -26457,7 +26457,7 @@ sv:
   their_grade_for_the_assignment_c36a60ef: "Sitt omdöme för uppgiften"
   theme_52404e51: Tema
   theme_editor_b7b00f6b: Temaredigerare
-  theme_editor_changes_have_been_cancelled_2af5cc5f: "Ändringar i teamredigeraren har avbrutits."
+  theme_editor_changes_have_been_cancelled_2af5cc5f: "Ändringar i temaredigeraren har avbrutits."
   theme_editor_refactor_f8d8bdfa: "Theme Editor Refactor"
   theme_name_68f46e09: Temanamn
   themes_89bfe9c4: Teman
@@ -26875,7 +26875,7 @@ sv:
   this_permission_should_only_be_assigned_to_users_t_231c182e: "Den här behörigheten bör endast tilldelas användare som ditt lärosäte har godkänt för att agera som andra användare i hela ditt Canvas-konto."
   this_placement_requires_deep_link_support_by_the_v_702d554f: "Den här placeringen kräver djuplänkssupport från leverantören. Kontrollera med din verktygsleverantör för att säkerställa att de stöder den här funktionen"
   this_pronoun_appears_after_last_name_bf5c0bf5: "Det här pronomenet visar efter efternamnet."
-  this_pronoun_will_appear_after_your_name_when_enab_473d8e1d: "Detta pronome visas efter ditt namn när det är aktiverat"
+  this_pronoun_will_appear_after_your_name_when_enab_473d8e1d: "Detta pronomen visas efter ditt namn när det är aktiverat"
   this_question_group_is_set_to_pick_more_questions__2e3552c4: "Denna frågegruppen ska välja fler frågor än de som finns tillgängliga."
   this_question_will_show_a_checkbox_next_to_each_an_169cd6d9: "Frågan kommer visa en checkruta bredvid svaret."
   this_quiz_has_been_excused_d89d2b74: "Detta quiz har ursäktats."
@@ -29456,7 +29456,7 @@ sv:
   without_alignments_c5193f9a: "Utan justeringar"
   wmv_1119d032: WMV
   woops_looks_like_nothing_is_here_ce69ad5: "Hoppsan... Här verkar inte finnas något!"
-  word_count_c77fe3a6: Ordräkning
+  word_count_c77fe3a6: "Antal ord"
   work_and_create_together_c65f358b: "Arbeta och skapa tillsammans"
   workflow_state_3a5c99d2: workflow_state
   working_b1f63edf: "arbetar ..."
