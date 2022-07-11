@@ -341,6 +341,11 @@ module Api::V1::Attachment
       # when the attachment record is created
       additional_capture_params[:category] = params[:category] if params[:category].present?
 
+      if opts[:precreate_attachment]
+        @attachment = create_new_attachment(context, params, current_user, opts, folder)
+        additional_capture_params[:precreated_attachment_id] = @attachment.global_id
+      end
+
       json = InstFS.upload_preflight_json(
         context: context,
         root_account: context.try(:root_account) || @domain_root_account,
@@ -359,20 +364,7 @@ module Api::V1::Attachment
         additional_capture_params: additional_capture_params
       )
     else
-      @attachment = Attachment.new
-      @attachment.shard = context.shard
-      @attachment.context = context
-      @attachment.user = current_user
-      @attachment.filename = infer_upload_filename(params)
-      @attachment.content_type = infer_upload_content_type(params, "unknown/unknown")
-      @attachment.folder = folder
-      @attachment.set_publish_state_for_usage_rights
-      @attachment.file_state = "deleted"
-      @attachment.workflow_state = opts[:temporary] ? "unattached_temporary" : "unattached"
-      @attachment.modified_at = Time.now.utc
-      @attachment.category = params[:category] if params[:category].present?
-      @attachment.save!
-
+      @attachment = create_new_attachment(context, params, current_user, opts, folder)
       on_duplicate = infer_on_duplicate(params)
       if params[:url]
         progress = ::Progress.new(context: progress_context, user: current_user, tag: :upload_via_url)
@@ -411,11 +403,34 @@ module Api::V1::Attachment
       end
     end
 
-    if opts[:return_json]
+    # return json and the attachment if the attachment is to be precreated
+    if opts[:precreate_attachment] && opts[:return_json]
+      {
+        json: json,
+        attachment: @attachment
+      }
+    elsif opts[:return_json]
       json
     else
       render json: json
     end
+  end
+
+  def create_new_attachment(context, params, current_user, opts, folder)
+    attachment = Attachment.new
+    attachment.shard = context.shard
+    attachment.context = context
+    attachment.user = current_user
+    attachment.filename = infer_upload_filename(params)
+    attachment.content_type = infer_upload_content_type(params, "unknown/unknown")
+    attachment.folder = folder
+    attachment.set_publish_state_for_usage_rights
+    attachment.file_state = "deleted"
+    attachment.workflow_state = opts[:temporary] ? "unattached_temporary" : "unattached"
+    attachment.modified_at = Time.now.utc
+    attachment.category = params[:category] if params[:category].present?
+    attachment.save!
+    attachment
   end
 
   def api_attachment_preflight_json(context, request, opts = {})
