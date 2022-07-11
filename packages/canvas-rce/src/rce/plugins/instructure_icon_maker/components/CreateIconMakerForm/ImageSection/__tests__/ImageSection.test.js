@@ -208,7 +208,7 @@ describe('ImageSection', () => {
   describe('calls onChange passing metadata when state prop changes', () => {
     let getByTestId, getByText, getByTitle, getByRole, container
 
-    const flushPromises = () => new Promise(setImmediate)
+    const flushPromises = () => new Promise(setTimeout)
     const lastPayloadOfActionType = (mockFn, type) =>
       mockFn.mock.calls.reverse().find(call => call[0].type === type)[0].payload
 
@@ -387,7 +387,7 @@ describe('ImageSection', () => {
 
     describe('and an image is clicked', () => {
       let originalFileReader
-      const flushPromises = () => new Promise(setImmediate)
+      const flushPromises = () => new Promise(setTimeout)
 
       beforeEach(() => {
         fetchMock.mock('http://canvas.docker/files/722/download?download_frd=1', {})
