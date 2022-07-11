@@ -262,19 +262,6 @@ describe ConversationsController do
       expect(response.body).to include("Unable to send messages")
     end
 
-    it "allows creating conversations in soft-concluded courses between students" do
-      user_session(@student)
-      @course.conclude_at = 1.day.ago
-      @course.start_at = 2.days.ago
-      @course.restrict_enrollments_to_course_dates = true
-      @course.restrict_student_past_view = true
-      @course.save!
-
-      post "create", params: { recipients: [@student2.id.to_s], body: "yo", context_code: @course.asset_string }
-      expect(response).to be_successful
-      expect(assigns[:conversation]).not_to be_nil
-    end
-
     it "allows creating conversations in concluded courses for teachers" do
       user_session(@teacher)
       teacher2 = teacher_in_course(active_all: true).user
@@ -576,13 +563,6 @@ describe ConversationsController do
   end
 
   describe "POST 'add_message'" do
-    before :once do
-      course_with_teacher(active_all: true)
-      student_in_course(active_all: true)
-      @student2 = @student
-      student_in_course(active_all: true)
-    end
-
     it "adds a message" do
       course_with_student_logged_in(active_all: true)
       conversation
@@ -682,48 +662,36 @@ describe ConversationsController do
       expect(assigns[:conversation]).not_to be_nil
     end
 
-    context "soft concluded courses" do
-      before do
-        @course.conclude_at = 1.day.ago
-        @course.start_at = 2.days.ago
-        @course.restrict_enrollments_to_course_dates = true
-        @course.restrict_student_past_view = true
-        @course.save!
-      end
+    it "allows a student to reply to a teacher in a soft-concluded course" do
+      course_with_student_logged_in(active_all: true)
 
-      it "allows a student to reply to another student in a soft-concluded course" do
-        user_session(@student)
-        student_convo = @student2.initiate_conversation([@student])
-        student_convo.add_message("test")
-        student_convo.conversation.update_attribute(:context, @course)
+      teacher_convo = @teacher.initiate_conversation([@student])
+      teacher_convo.add_message("test")
+      teacher_convo.conversation.update_attribute(:context, @course)
 
-        post "add_message", params: { conversation_id: student_convo.conversation_id, body: "hello world", recipients: [@student2.id.to_s] }
-        expect(response).to be_successful
-        expect(assigns[:conversation]).not_to be_nil
-      end
+      @course.conclude_at = 1.day.ago
+      @course.start_at = 2.days.ago
+      @course.restrict_enrollments_to_course_dates = true
+      @course.restrict_student_past_view = true
+      @course.save!
+      post "add_message", params: { conversation_id: teacher_convo.conversation_id, body: "hello world", recipients: [@teacher.id.to_s] }
+      expect(response).to be_successful
+      expect(assigns[:conversation]).not_to be_nil
+    end
 
-      it "allows a student to reply to a teacher in a soft-concluded course" do
-        user_session(@student)
+    it "allows a teacher to reply to a student in a soft-concluded course" do
+      student_in_course(active_all: true)
+      course_with_teacher_logged_in(active_all: true)
+      conversation
+      @course.conclude_at = 1.day.ago
+      @course.start_at = 2.days.ago
+      @course.restrict_enrollments_to_course_dates = true
+      @course.restrict_student_past_view = true
+      @course.save!
 
-        teacher_convo = @teacher.initiate_conversation([@student])
-        teacher_convo.add_message("test")
-        teacher_convo.conversation.update_attribute(:context, @course)
-
-        post "add_message", params: { conversation_id: teacher_convo.conversation_id, body: "hello world", recipients: [@teacher.id.to_s] }
-        expect(response).to be_successful
-        expect(assigns[:conversation]).not_to be_nil
-      end
-
-      it "allows a teacher to reply to a student in a soft-concluded course" do
-        user_session(@teacher)
-        student_convo_to_teacher = @student.initiate_conversation([@teacher])
-        student_convo_to_teacher.add_message("test")
-        student_convo_to_teacher.conversation.update_attribute(:context, @course)
-
-        post "add_message", params: { conversation_id: student_convo_to_teacher.conversation_id, body: "hello world", recipients: [@student.id.to_s] }
-        expect(response).to be_successful
-        expect(assigns[:conversation]).not_to be_nil
-      end
+      post "add_message", params: { conversation_id: @conversation.conversation_id, body: "hello world", recipients: [@student.id.to_s] }
+      expect(response).to be_successful
+      expect(assigns[:conversation]).not_to be_nil
     end
 
     it "refrains from duplicating the RCE-created media_comment" do
