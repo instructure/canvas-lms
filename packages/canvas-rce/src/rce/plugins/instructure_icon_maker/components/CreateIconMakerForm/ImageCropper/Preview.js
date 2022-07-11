@@ -21,9 +21,10 @@ import PropTypes from 'prop-types'
 import formatMessage from '../../../../../../format-message'
 import {ImageCropperSettingsPropTypes} from './propTypes'
 import {buildSvg} from './svg'
-import {PREVIEW_WIDTH, PREVIEW_HEIGHT} from './constants'
+import {PREVIEW_WIDTH, PREVIEW_HEIGHT, BACKGROUND_SQUARE_SIZE} from './constants'
 import {useMouseWheel} from './useMouseWheel'
 import {useArrowKeys} from './useArrowKeys'
+import checkerboardStyle from '../../../../shared/CheckerboardStyling'
 
 /**
  * Remove the node contents and append the svg element.
@@ -72,7 +73,8 @@ export const Preview = ({settings, dispatch}) => {
         height: `${PREVIEW_HEIGHT}px`,
         top: 0,
         left: 0,
-        overflow: 'hidden'
+        overflow: 'hidden',
+        ...checkerboardStyle(BACKGROUND_SQUARE_SIZE)
       }}
       onWheel={onWheelCallback}
     >

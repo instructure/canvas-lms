@@ -29,6 +29,7 @@ export const WHEEL_EVENT_DELAY = 100
 export const KEY_EVENT_DELAY = 100
 export const KEY_EVENT_STEP = 3
 export const BUTTON_ROTATION_DEGREES = 90
+export const BACKGROUND_SQUARE_SIZE = 16
 
 export const DEFAULT_CROPPER_SETTINGS = {
   image: null,
