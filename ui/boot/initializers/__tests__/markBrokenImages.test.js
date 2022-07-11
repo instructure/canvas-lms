@@ -24,7 +24,7 @@ function setAttrs(elem, id, src, alt) {
   elem.alt = alt
 }
 
-const flushPromises = () => new Promise(setImmediate)
+const flushPromises = () => new Promise(setTimeout)
 
 describe('markBrokenImages::', () => {
   let div
