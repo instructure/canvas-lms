@@ -641,12 +641,24 @@ export const handlers = [
   }),
 
   graphql.mutation('CreateSubmissionComment', (req, res, ctx) => {
+    const SUBMISSION_ID_THAT_RETURNS_ERROR = '440'
     const data = {
       createSubmissionComment: {
         submissionComment: SubmissionComment.mock({comment: req.variables.body}),
         errors: null,
         __typename: 'CreateSubmissionCommentPayload'
       }
+    }
+
+    if (req.variables.submissionId === SUBMISSION_ID_THAT_RETURNS_ERROR) {
+      data.submissionComment = null
+      data.errors = [
+        {
+          attribute: 'message',
+          message: 'Some Generic Submission reply error',
+          __typename: 'ValidationError'
+        }
+      ]
     }
     return res(ctx.data(data))
   }),
