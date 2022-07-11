@@ -49,9 +49,4 @@ describe('isolate', () => {
     })()
     expect(console.error).toHaveBeenCalledWith(new Error('nope'))
   })
-
-  it('cannot isolate rejections that were not returned', async () => {
-    await isolate(() => { Promise.reject(new Error('nope')) })()
-    expect(console.error).not.toHaveBeenCalled()
-  })
 })

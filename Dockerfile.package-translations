@@ -1,4 +1,4 @@
-FROM instructure/node:14
+FROM instructure/node:16
 
 ARG NPM_PRIVATE_SCOPE
 ARG NPM_PRIVATE_REGISTRY
