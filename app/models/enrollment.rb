@@ -1314,11 +1314,6 @@ class Enrollment < ActiveRecord::Base
                                 }
 
   scope :currently_online, -> { joins(:pseudonyms).where("pseudonyms.last_request_at>?", 5.minutes.ago) }
-
-  scope :active_or_soft_concluded, lambda {
-    joins(:enrollment_state).where("enrollment_states.restricted_access <> 'true' OR enrollment_states.state NOT IN ('invited', 'pending_invited', 'pending_active')")
-  }
-
   # this returns enrollments for creation_pending users; should always be used in conjunction with the invited scope
   scope :for_email, lambda { |email|
     joins(user: :communication_channels)
