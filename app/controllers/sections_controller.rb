@@ -216,9 +216,18 @@ class SectionsController < ApplicationController
   # Move the Section to another course.  The new course may be in a different account (department),
   # but must belong to the same root account (institution).
   #
+  # @argument override_sis_stickiness [boolean]
+  # By default and when the value is true it moves section to another course
+  # when the value is false then no update should be made
+  #
   # @returns Section
   def crosslist
     @new_course = api_find(@section.root_account.all_courses.not_deleted, params[:new_course_id])
+
+    if params[:override_sis_stickiness] && !value_to_boolean(params[:override_sis_stickiness])
+      return render json: (api_request? ? section_json(@section, @current_user, session, []) : @section)
+    end
+
     if authorized_action(@section, @current_user, :update) && authorized_action(@new_course, @current_user, :manage)
       @section.crosslist_to_course(@new_course, updating_user: @current_user)
       respond_to do |format|
