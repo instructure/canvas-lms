@@ -69,10 +69,8 @@ module UserSearch
         if options[:enrollment_role_id].present? && options[:ui_invoked].present?
           # specifically don't use multishard scope for enrollments
           # filter to the appropriate account where the enrollment role resides
-          User.joins(:enrollments)
-              .where.not(enrollments: { workflow_state: %w[rejected deleted inactive] })
-              .joins(:all_courses)
-              .where(courses: { account_id: context.id })
+          User.joins(:all_courses_for_active_or_pending_enrollments)
+              .where(courses: { account_id: [context.id] + Account.sub_account_ids_recursive(context.id) })
               .distinct
         else
           User.of_account(context).active

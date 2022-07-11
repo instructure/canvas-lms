@@ -1085,15 +1085,32 @@ describe "Users API", type: :request do
       expect(json.map { |r| r["id"] }).to eq [@student.id]
     end
 
-    it "sets pagination total_pages/last page link if includes ui_invoked is set" do
-      Setting.set("ui_invoked_count_pages", "true")
-      @account = Account.default
-      @user = @admin
-      api_call(:get, "/api/v1/accounts/#{@account.id}/users",
-               { controller: "users", action: "api_index", format: "json", account_id: @account.id.to_param },
-               { role_filter_id: student_role.id.to_s, include: ["ui_invoked"] })
-      expect(response).to be_successful
-      expect(response.headers["Link"]).to include("last")
+    context "includes ui_invoked" do
+      before(:once) { Setting.set("ui_invoked_count_pages", "true") }
+
+      let(:root_account) { Account.default }
+
+      it "sets pagination total_pages/last page link" do
+        user_session(@admin)
+        api_call(:get, "/api/v1/accounts/#{root_account.id}/users",
+                 { controller: "users", action: "api_index", format: "json", account_id: root_account.id.to_param },
+                 { role_filter_id: student_role.id.to_s, include: ["ui_invoked"] })
+        expect(response).to be_successful
+        expect(response.headers["Link"]).to include("last")
+      end
+
+      it "includes context account and sub-accounts when filtering by role" do
+        subaccount = Account.create!(parent_account: root_account)
+        course_with_student(account: subaccount, active_all: true)
+        account_admin_user
+        user_session(@user)
+        json = api_call(:get, "/api/v1/accounts/#{root_account.id}/users",
+                        { controller: "users", action: "api_index", format: "json", account_id: root_account.id.to_param },
+                        { role_filter_id: student_role.id.to_s, include: ["ui_invoked"] })
+        expect(response).to be_successful
+        # includes the first describe block student and the new subaccount student user
+        expect(json.count).to eq 2
+      end
     end
 
     context "includes last login info" do
