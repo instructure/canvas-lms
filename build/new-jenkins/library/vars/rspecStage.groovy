@@ -154,8 +154,6 @@ def tearDownNode() {
       buildSummaryReport.setFailureCategoryUnlessExists(specTitle, buildSummaryReport.FAILURE_TYPE_TEST_PASSED_ON_RETRY)
     }
   }
-
-  junit allowEmptyResults: true, testResults: "${destDir}_rspec_results/**/*.xml", skipMarkingBuildUnstable: true
 }
 
 def runRspecqSuite() {
