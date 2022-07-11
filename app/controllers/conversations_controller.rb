@@ -915,7 +915,7 @@ class ConversationsController < ApplicationController
       media_comment_type: params[:media_comment_type],
       user_note: params[:user_note]
     )
-
+    InstStatsd::Statsd.increment("inbox.message.sent.isReply.legacy")
     render json: message[:message].nil? ? [] : conversation_json(@conversation.reload, @current_user, session, messages: [message[:message]]), status: message[:status]
   rescue ConversationsHelper::RepliesLockedForUser
     render_unauthorized_action

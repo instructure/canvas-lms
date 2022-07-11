@@ -570,7 +570,10 @@ describe ConversationsController do
       @conversation.last_message_at = expected_lma
       @conversation.save!
 
+      allow(InstStatsd::Statsd).to receive(:increment)
       post "add_message", params: { conversation_id: @conversation.conversation_id, body: "hello world" }
+
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.isReply.legacy")
       expect(response).to be_successful
       expect(@conversation.messages.size).to eq 2
       expect(@conversation.reload.last_message_at).to eql expected_lma
