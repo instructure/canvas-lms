@@ -786,6 +786,20 @@ describe SectionsController, type: :request do
         expect(@dest_course.reload.active_course_sections).to be_include(@section)
       end
 
+      it "doesn't cross-lists a section if override_sis_stickiness set to false" do
+        expect(@course.active_course_sections).to be_include(@section)
+        expect(@dest_course.active_course_sections).not_to be_include(@section)
+
+        json = api_call(:post, "/api/v1/sections/#{@section.id}/crosslist/#{@dest_course.id}",
+                        @params.merge(id: @section.to_param, new_course_id: @dest_course.to_param, override_sis_stickiness: false))
+        expect(json["id"]).to eq @section.id
+        expect(json["course_id"]).to eq @course.id
+        expect(json["nonxlist_course_id"]).to be_nil
+
+        expect(@course.reload.active_course_sections).to be_include(@section)
+        expect(@dest_course.reload.active_course_sections).not_to be_include(@section)
+      end
+
       it "works with sis IDs" do
         @dest_course.update_attribute(:sis_source_id, "dest_course")
         @section.update_attribute(:sis_source_id, "the_section")
