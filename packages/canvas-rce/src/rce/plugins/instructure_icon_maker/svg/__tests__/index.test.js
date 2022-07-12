@@ -39,8 +39,8 @@ describe('buildSvg()', () => {
     expect(buildSvg(settings)).toMatchInlineSnapshot(`
       <svg
         fill="none"
-        height="234px"
-        viewBox="0 0 218 234"
+        height="218px"
+        viewBox="0 0 218 218"
         width="218px"
         xmlns="http://www.w3.org/2000/svg"
       >
@@ -85,9 +85,9 @@ describe('buildSvg()', () => {
     expect(buildSvg(settings, options)).toMatchInlineSnapshot(`
       <svg
         fill="none"
-        height="234px"
+        height="218px"
         style="padding: 16px"
-        viewBox="0 0 218 234"
+        viewBox="0 0 218 218"
         width="218px"
         xmlns="http://www.w3.org/2000/svg"
       >
