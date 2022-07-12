@@ -471,6 +471,7 @@ export const AddressBook = ({
 
     setSelectedMenuItems([...newSelectedMenuItems])
     onSelectedIdsChange([...newSelectedMenuItems])
+    setIsMenuOpen(false)
   }
 
   const removeTag = removeMenuItem => {
