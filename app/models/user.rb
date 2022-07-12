@@ -97,7 +97,6 @@ class User < ActiveRecord::Base
 
   has_many :all_courses, source: :course, through: :enrollments
   has_many :all_courses_for_active_enrollments, -> { Enrollment.active }, source: :course, through: :enrollments
-  has_many :all_courses_for_active_or_pending_enrollments, -> { Enrollment.active_or_pending }, source: :course, through: :enrollments
   has_many :group_memberships, -> { preload(:group) }, dependent: :destroy
   has_many :groups, -> { where("group_memberships.workflow_state<>'deleted'") }, through: :group_memberships
   has_many :polls, class_name: "Polling::Poll"

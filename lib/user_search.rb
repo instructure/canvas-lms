@@ -66,15 +66,7 @@ module UserSearch
       include_inactive_enrollments = !!options[:include_inactive_enrollments]
       case context
       when Account
-        if options[:enrollment_role_id].present? && options[:ui_invoked].present?
-          # specifically don't use multishard scope for enrollments
-          # filter to the appropriate account where the enrollment role resides
-          User.joins(:all_courses_for_active_or_pending_enrollments)
-              .where(courses: { account_id: [context.id] + Account.sub_account_ids_recursive(context.id) })
-              .distinct
-        else
-          User.of_account(context).active
-        end
+        User.of_account(context).active
       when Course
         context.users_visible_to(searcher, include_prior_enrollments,
                                  enrollment_state: enrollment_states, include_inactive: include_inactive_enrollments).distinct
@@ -121,21 +113,27 @@ module UserSearch
       exclude_groups = Array(options[:exclude_groups]) if options[:exclude_groups]
 
       if enrollment_role_ids || enrollment_roles
-        if context.is_a?(Account) && options[:ui_invoked].blank?
-          users_scope = users_scope.joins(:not_removed_enrollments).distinct
+        role_ids =
+          if enrollment_role_ids
+            enrollment_role_ids.filter_map { |id| Role.get_role_by_id(id).id }
+          else
+            enrollment_roles.filter_map do |name|
+              if context.is_a?(Account)
+                context.get_course_role_by_name(name).id
+              else
+                context.account.get_course_role_by_name(name).id
+              end
+            end
+          end
+        if context.is_a?(Account)
+          users_scope =
+            if options[:enrollment_role_id].present? && options[:ui_invoked].present?
+              users_scope.joins(:enrollments).active
+            else
+              users_scope.joins(:not_removed_enrollments)
+            end
         end
-        role_ids = if enrollment_role_ids
-                     enrollment_role_ids.filter_map { |id| Role.get_role_by_id(id).id }
-                   else
-                     enrollment_roles.filter_map do |name|
-                       if context.is_a?(Account)
-                         context.get_course_role_by_name(name).id
-                       else
-                         context.account.get_course_role_by_name(name).id
-                       end
-                     end
-                   end
-        users_scope = users_scope.where(enrollments: { role_id: role_ids })
+        users_scope = users_scope.where(enrollments: { role_id: role_ids }).distinct
       elsif enrollment_types
         enrollment_types = enrollment_types.map do |e|
           ce = e.camelize
