@@ -46,12 +46,12 @@ describe('MultiSelectSearchInput', () => {
   })
 
   it('displays a removable tag for selected options', () => {
-    const {getByLabelText, getByRole} = render(<MultiSelectSearchInput {...props} />)
+    const {getByLabelText, getByRole, getByTitle} = render(<MultiSelectSearchInput {...props} />)
     const menu = getByLabelText('Delicious Vegetables')
     fireEvent.click(menu)
     const broccoliOption = getByRole('option', {name: 'Broccoli'})
     fireEvent.click(broccoliOption)
-    const tag = getByRole('button', {name: 'Remove Broccoli'})
+    const tag = getByTitle('Remove Broccoli')
     expect(tag).toBeInTheDocument()
   })
 
@@ -65,7 +65,7 @@ describe('MultiSelectSearchInput', () => {
   })
 
   it('calls onChange when an option is deselected', () => {
-    const {getByLabelText, getByRole} = render(<MultiSelectSearchInput {...props} />)
+    const {getByLabelText, getByRole, getByTitle} = render(<MultiSelectSearchInput {...props} />)
     const menu = getByLabelText('Delicious Vegetables')
     fireEvent.click(menu)
     const broccoliOption = getByRole('option', {name: 'Broccoli'})
@@ -73,7 +73,7 @@ describe('MultiSelectSearchInput', () => {
     fireEvent.click(menu)
     const cucumberOption = getByRole('option', {name: 'Cucumber'})
     fireEvent.click(cucumberOption)
-    const tag = getByRole('button', {name: 'Remove Broccoli'})
+    const tag = getByTitle('Remove Broccoli')
     fireEvent.click(tag)
     expect(props.onChange).toHaveBeenLastCalledWith(['2'])
   })

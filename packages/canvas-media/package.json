@@ -69,8 +69,8 @@
     "react-dom": "^16"
   },
   "devDependencies": {
-    "@testing-library/dom": "^7",
-    "@testing-library/react": "^11",
+    "@testing-library/dom": "^8",
+    "@testing-library/react": "^12",
     "@testing-library/user-event": "^5",
     "moxios": "^0.4",
     "shelljs": "^0.8.4",
