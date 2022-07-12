@@ -19,7 +19,7 @@
 import sinon from 'sinon'
 
 import {buildText, buildTextBackground, getContainerWidth, getContainerHeight} from '../text'
-import {DEFAULT_SETTINGS} from '../constants'
+import {BASE_SIZE, DEFAULT_SETTINGS} from '../constants'
 
 let settings
 
@@ -380,13 +380,20 @@ describe('getContainerHeight()', () => {
   beforeEach(() => {
     settings = DEFAULT_SETTINGS
   })
-  it('returns base size if is greater', () => {
-    expect(getContainerHeight({...settings, text: 'Hello World!'})).toBe(152)
+  it('returns base size for default settings of text empty and textPosition below', () => {
+    const expectedHeight = BASE_SIZE[settings.size]
+    expect(getContainerHeight({...settings})).toBe(expectedHeight)
   })
 
-  it('returns text background height if is greater', () => {
+  it('returns text background height calculation for non-empty string', () => {
     const text =
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua.'
     expect(getContainerHeight({...settings, text})).toBe(208)
+  })
+
+  it('returns base size if text field only contains white space', () => {
+    const expectedHeight = BASE_SIZE[settings.size]
+    const text = '      '
+    expect(getContainerHeight({...settings, text})).toBe(expectedHeight)
   })
 })
