@@ -331,7 +331,7 @@ export const MessageDetailContainer = props => {
       />
       {isLoading && !isLoadingMoreData && renderLoading()}
       {(!isLoading || isLoadingMoreData) && (
-        <View as="div" height="100%" overflowX="hidden" overflowY="auto" borderWidth="small">
+        <View as="div" height="100%" overflowX="hidden" overflowY="auto" display="inline">
           {renderedItems}
           {isLoadingMoreData && renderLoading()}
         </View>
