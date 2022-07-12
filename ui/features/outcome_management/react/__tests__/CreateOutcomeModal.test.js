@@ -453,12 +453,6 @@ describe('CreateOutcomeModal', () => {
         fireEvent.click(getByText('Create New Group'))
         fireEvent.change(getByLabelText('Enter new group name'), {target: {value: 'test'}})
         fireEvent.click(getByText('Create new group'))
-        await waitFor(() => {
-          expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: '"test" was successfully created.',
-            type: 'success'
-          })
-        })
         await act(async () => jest.runOnlyPendingTimers())
         expect(getByTestId('create-button')).toHaveFocus()
       })
