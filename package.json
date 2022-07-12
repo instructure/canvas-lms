@@ -311,7 +311,7 @@
     "mockdate": "^2.0.2",
     "moment-timezone-data-webpack-plugin": "^1.5.0",
     "moxios": "^0.4",
-    "msw": "^0.27.2",
+    "msw": "^0.43.1",
     "nyc": "^13",
     "prettier": "^2.2.1",
     "qunitjs": "^1.23.0",

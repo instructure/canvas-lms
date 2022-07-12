@@ -113,8 +113,8 @@ describe('MessageDetailContainer', () => {
           conversation: {...Conversation.mock({_id: CONVERSATION_ID_WHERE_CAN_REPLY_IS_FALSE})}
         })
         await waitForApolloLoading()
-        await waitForElementToBeRemoved(() => container.queryByTestId('conversation-loader'))
 
+        expect(container.queryByTestId('conversation-loader')).not.toBeInTheDocument()
         expect(container.queryByTestId('message-detail-header-reply-btn')).not.toBeInTheDocument()
         expect(container.queryByTestId('message-reply')).not.toBeInTheDocument()
       })
