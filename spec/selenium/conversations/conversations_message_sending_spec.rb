@@ -509,6 +509,8 @@ describe "conversations new" do
         wait_for_ajaximations
         fj("li:contains('Students')").click
         fj("li:contains('#{@s1.name}')").click
+        ff("input[aria-label='Address Book']")[1].click
+        wait_for_ajaximations
         fj("li:contains('#{@s2.name}')").click
         f("textarea[data-testid='message-body']").send_keys "sent to both of you"
         fj("button:contains('Send')").click
