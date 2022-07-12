@@ -90,7 +90,7 @@ gem "inst_statsd", "2.2.0"
   gem "statsd-ruby", "1.4.0", require: false
   gem "aroi", "0.0.7", require: false
   gem "dogstatsd-ruby", "4.8.2"
-gem_override "inst-jobs", "3.1.3"
+gem_override "inst-jobs", "3.1.5"
   gem "fugit", "1.4.0", require: false
     gem "et-orbi", "1.2.4", require: false
 gem "inst-jobs-autoscaling", "2.1.1"
