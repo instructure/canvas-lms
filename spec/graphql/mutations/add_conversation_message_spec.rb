@@ -98,9 +98,12 @@ RSpec.describe Mutations::AddConversationMessage do
   end
 
   it "adds a message" do
+    allow(InstStatsd::Statsd).to receive(:increment)
+
     conversation
     result = run_mutation(conversation_id: @conversation.conversation_id, body: "This is a neat message", recipients: [@teacher.id.to_s])
 
+    expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.isReply.react")
     expect(result["errors"]).to be nil
     expect(result.dig("data", "addConversationMessage", "errors")).to be nil
     expect(
