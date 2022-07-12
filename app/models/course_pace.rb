@@ -213,6 +213,7 @@ class CoursePace < ActiveRecord::Base
           .where
           .not(course_section_id: course_section_course_pace_section_ids)
       end
+    @student_enrollments.where.not(workflow_state: "deleted")
   end
 
   def start_date(with_context: false)

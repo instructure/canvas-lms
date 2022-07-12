@@ -178,7 +178,7 @@ describe StudentEnrollment do
 
       it "queues an update for a student enrollment that goes from deleted to invited" do
         @enrollment.destroy
-        expect(Delayed::Job.where(singleton: "course_pace_publish:#{@course_pace.id}")).not_to exist
+        Delayed::Job.where(singleton: "course_pace_publish:#{@course_pace.id}").last.destroy
         @enrollment.update(workflow_state: "invited")
         expect(Delayed::Job.where(singleton: "course_pace_publish:#{@course_pace.id}")).to exist
       end
@@ -214,25 +214,35 @@ describe StudentEnrollment do
         expect(Delayed::Job.where(singleton: "course_pace_publish:#{@course_pace.id}")).not_to exist
       end
 
-      describe "section pace" do
+      describe "section paces" do
         before :once do
           @section1 = @course.course_sections.create! name: "section 1"
           @section2 = @course.course_sections.create! name: "section 2"
-          @published_section_course_pace = @course.course_paces.create!(course_section_id: @section1.id)
-          @unpublished_section_course_pace = @course.course_paces.create!(course_section_id: @section2.id)
-          @published_section_course_pace.publish
+          @published_section_pace = @course.course_paces.create!(course_section_id: @section1.id)
+          @published_section_pace.publish
+          @unpublished_section_pace = @course.course_paces.create!(course_section_id: @section2.id)
         end
 
         it "queue an update for the section pace if it is published" do
           student_in_section(@section1)
           expect(Delayed::Job.where(singleton: "course_pace_publish:#{@course_pace.id}")).not_to exist
-          expect(Delayed::Job.where(singleton: "course_pace_publish:#{@published_section_course_pace.id}")).to exist
+          expect(Delayed::Job.where(singleton: "course_pace_publish:#{@published_section_pace.id}")).to exist
         end
 
         it "queue an update for the default course pace if the section pace isn't published" do
           student_in_section(@section2)
-          expect(Delayed::Job.where(singleton: "course_pace_publish:#{@unpublished_section_course_pace.id}")).not_to exist
+          expect(Delayed::Job.where(singleton: "course_pace_publish:#{@unpublished_section_pace.id}")).not_to exist
           expect(Delayed::Job.where(singleton: "course_pace_publish:#{@course_pace.id}")).to exist
+        end
+
+        it "queue a proper publish in the case of deletions" do
+          @unpublished_section_pace.publish
+          student = student_in_section(@section1)
+          @course.enroll_user(student, "StudentEnrollment", section: @section2, allow_multiple_enrollments: true)
+          Delayed::Job.where(singleton: "course_pace_publish:#{@published_section_pace.id}").last.destroy
+          expect(Delayed::Job.where(singleton: "course_pace_publish:#{@published_section_pace.id}")).not_to exist
+          StudentEnrollment.find_by(course_section_id: @section2.id).update! workflow_state: "deleted"
+          expect(Delayed::Job.where(singleton: "course_pace_publish:#{@published_section_pace.id}")).to exist
         end
       end
     end
