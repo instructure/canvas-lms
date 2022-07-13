@@ -53,7 +53,8 @@ module.exports = {
   setupFiles: ['jest-localstorage-mock', 'jest-canvas-mock', '<rootDir>/jest/jest-setup.js'],
   setupFilesAfterEnv: [
     '@testing-library/jest-dom/extend-expect',
-    './packages/validated-apollo/src/ValidatedApolloCleanup.js'
+    './packages/validated-apollo/src/ValidatedApolloCleanup.js',
+    '<rootDir>/jest/stubRecursiveTimers.js'
   ],
   testMatch: ['**/__tests__/**/?(*.)(spec|test).[jt]s?(x)'],
 
