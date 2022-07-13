@@ -29,7 +29,7 @@ class EagerLookupViolationError extends Error {
 }
 
 const trackReadiness = ({detail}) => {
-  if (detail === 'localeFiles') {
+  if (detail === 'capabilities') {
     translationsAvailable = true
     window.removeEventListener('canvasReadyStateChange', trackReadiness)
   }

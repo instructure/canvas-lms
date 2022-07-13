@@ -17,3 +17,8 @@
  */
 
 declare module '@canvas/i18n';
+declare module '@canvas/do-fetch-api-effect';
+declare module '*.json' {
+  const value: {[key: string]: string};
+  export default value;
+}
