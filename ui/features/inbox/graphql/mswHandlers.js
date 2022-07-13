@@ -47,9 +47,17 @@ export const handlers = [
         _id: '9',
         id: 'VXNlci05',
         conversationsConnection: {
-          nodes: [],
+          nodes: [
+            {
+              ...ConversationParticipant.mock(),
+              conversation: Conversation.mock()
+            }
+          ],
           pageInfo: PageInfo.mock({hasNextPage: false}),
           __typename: 'ConversationParticipantConnection'
+        },
+        conversationParticipantsConnection: {
+          nodes: []
         },
         __typename: 'User'
       }
