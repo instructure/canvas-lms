@@ -693,7 +693,7 @@
                 <%= services.check_box key, :checked => @account.service_enabled?(key) %>
                 <%= services.label key, service[:name] + " " %>
               </div>
-              <% if key == :avatars %>
+              <% if key == :avatars && @account.primary_settings_root_account? %>
                 <div id="account_settings_gravatar_checkbox">
                   <%= hidden_field_tag "account[settings][enable_gravatar]", "0", id: "hidden_account_settings_enable_gravatar" %>
                   <%= check_box_tag "account[settings][enable_gravatar]", "1", @account.enable_gravatar? %>

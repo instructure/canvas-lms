@@ -1059,7 +1059,7 @@ class AccountsController < ApplicationController
 
         emoji_deny_list = params[:account][:settings].try(:delete, :emoji_deny_list)
         if @account.feature_allowed?(:submission_comment_emojis) &&
-           @account.root_account? &&
+           @account.primary_settings_root_account? &&
            !@account.site_admin?
           @account.settings[:emoji_deny_list] = emoji_deny_list
         end
