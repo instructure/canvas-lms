@@ -627,6 +627,8 @@ describe('Add Comment/View Feedback button', () => {
         attempt: 2
       }
     })
+    props.assignment.env.peerReviewModeEnabled = false
+    props.assignment.env.peerReviewAvailable = false
     const {getByText} = render(<Header {...props} />)
     expect(getByText('Add Comment').closest('button')).toBeDisabled()
   })
@@ -638,6 +640,8 @@ describe('Add Comment/View Feedback button', () => {
         attempt: 2
       }
     })
+    props.assignment.env.peerReviewModeEnabled = false
+    props.assignment.env.peerReviewAvailable = false
     const {getByRole} = render(<Header {...props} />)
     expect(
       getByRole('button', {
@@ -698,6 +702,36 @@ describe('Add Comment/View Feedback button', () => {
     props.assignment.env.peerReviewModeEnabled = false
     const {getByTestId} = render(<Header {...props} />)
     expect(getByTestId('unread_comments_badge')).toBeInTheDocument()
+  })
+
+  it('renders as "Add Comment" and disabled if peer review is not available', async () => {
+    const props = await mockAssignmentAndSubmission()
+    props.assignment.env.peerReviewModeEnabled = true
+    props.assignment.env.peerReviewAvailable = false
+    props.reviewerSubmission = {
+      ...props.submission,
+      assignedAssessments: [
+        {
+          anonymousUser: null,
+          anonymousId: 'xaU9cd',
+          workflowState: 'assigned'
+        }
+      ]
+    }
+    const {getByText} = render(<Header {...props} />)
+    expect(getByText('Add Comment').closest('button')).toBeDisabled()
+  })
+
+  it('renders additional info button if peer review is not available', async () => {
+    const props = await mockAssignmentAndSubmission()
+    props.assignment.env.peerReviewModeEnabled = true
+    props.assignment.env.peerReviewAvailable = false
+    const {getByRole} = render(<Header {...props} />)
+    expect(
+      getByRole('button', {
+        name: /You cannot leave comments until reviewer and reviewee submits the assignment./
+      })
+    ).toBeInTheDocument()
   })
 })
 

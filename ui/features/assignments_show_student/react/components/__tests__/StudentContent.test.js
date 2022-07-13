@@ -359,6 +359,7 @@ describe('Assignment Student Content View', () => {
         Assignment: {allowedAttempts: 3}
       })
       props.assignment.env.peerReviewModeEnabled = true
+      props.assignment.env.peerReviewAvailable = true
       props.reviewerSubmission = {
         ...props.submission,
         assignedAssessments: [

@@ -15,16 +15,18 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
+import {Alert} from '@instructure/ui-alerts'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {arrayOf} from 'prop-types'
+import {bool, arrayOf} from 'prop-types'
 import CommentRow from './CommentRow'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {MARK_SUBMISSION_COMMENT_READ} from '@canvas/assignments/graphql/student/Mutations'
 import noComments from '../../../images/NoComments.svg'
+import noCommentsPeerReview from '../../../images/noCommentsPeerReview.svg'
 import React, {useContext, useEffect} from 'react'
 import StudentViewContext from '../Context'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
+import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {
   SUBMISSION_COMMENT_QUERY,
   SUBMISSION_HISTORIES_QUERY
@@ -140,15 +142,36 @@ export default function CommentContent(props) {
     }
   }, [data, mutationCalled, mutationError, setOnFailure, setOnSuccess])
 
+  const defaultText = I18n.t(
+    "This is where you can leave a comment and view your instructor's feedback."
+  )
+  const peerReviewText = I18n.t(
+    'Add a comment to complete your peer review. You will only see comments written by you.'
+  )
+
+  const peerReviewReadyText = I18n.t('You are now able to submit your peer review')
+
+  let placeholder
+  if (!props.comments.length) {
+    if (props.isPeerReviewEnabled) {
+      placeholder = <SVGWithTextPlaceholder text={peerReviewText} url={noCommentsPeerReview} />
+    } else if (!props.submission.gradeHidden) {
+      placeholder = <SVGWithTextPlaceholder text={defaultText} url={noComments} />
+    }
+  }
+
   return (
     <>
-      {!props.submission.gradeHidden && !props.comments.length && (
-        <SVGWithTextPlaceholder
-          text={I18n.t(
-            "This is where you can leave a comment and view your instructor's feedback."
-          )}
-          url={noComments}
-        />
+      {placeholder}
+      {props.isPeerReviewEnabled && !props.assignment.rubric && !!props.comments.length && (
+        <Alert
+          variant="success"
+          renderCloseButtonLabel="Close"
+          margin="0 medium medium"
+          transition="none"
+        >
+          {peerReviewReadyText}
+        </Alert>
       )}
       {props.comments
         .sort((a, b) => new Date(a.updatedAt) - new Date(b.updatedAt))
@@ -164,5 +187,11 @@ export default function CommentContent(props) {
 
 CommentContent.propTypes = {
   comments: arrayOf(SubmissionComment.shape).isRequired,
-  submission: Submission.shape.isRequired
+  assignment: Assignment.shape.isRequired,
+  submission: Submission.shape.isRequired,
+  isPeerReviewEnabled: bool
+}
+
+CommentContent.defaultProps = {
+  isPeerReviewEnabled: false
 }
