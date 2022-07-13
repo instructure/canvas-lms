@@ -25,13 +25,13 @@ import ConversationListContainer from './ConversationListContainer'
 import {NoSelectedConversation} from '../components/NoSelectedConversation/NoSelectedConversation'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {useMutation} from 'react-apollo'
+import {useMutation, useQuery} from 'react-apollo'
 import {
   DELETE_CONVERSATIONS,
   UPDATE_CONVERSATION_PARTICIPANTS,
   UPDATE_SUBMISSIONS_READ_STATE
 } from '../../graphql/Mutations'
-import {CONVERSATIONS_QUERY} from '../../graphql/Queries'
+import {CONVERSATIONS_QUERY, VIEWABLE_SUBMISSIONS_QUERY} from '../../graphql/Queries'
 import {decodeQueryString} from 'query-string-encoding'
 import {responsiveQuerySizes} from '../../util/utils'
 import {CondensedButton} from '@instructure/ui-buttons'
@@ -134,8 +134,9 @@ const CanvasInbox = () => {
   // selectedConversations is not the same
   useEffect(() => {
     if (
+      selectedConversations.length > 0 &&
       !JSON.parse(sessionStorage.getItem('conversationsManuallyMarkedUnread'))?.includes(
-        selectedConversations[0]
+        selectedConversations[0]._id
       )
     ) {
       sessionStorage.removeItem('conversationsManuallyMarkedUnread')
@@ -164,14 +165,34 @@ const CanvasInbox = () => {
 
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
 
+  const commonQueryVariables = {
+    userID: ENV.current_user_id?.toString(),
+    filter: [userFilter, courseFilter]
+  }
+
   const conversationsQueryOption = {
     query: CONVERSATIONS_QUERY,
     variables: {
-      userID: ENV.current_user_id?.toString(),
-      scope,
-      filter: [userFilter, courseFilter]
+      ...commonQueryVariables,
+      scope
     }
   }
+
+  const conversationsQuery = useQuery(CONVERSATIONS_QUERY, {
+    variables: {...commonQueryVariables, scope},
+    fetchPolicy: 'cache-and-network',
+    skip: isSubmissionCommentsType || scope === 'submission_comments'
+  })
+
+  const submissionCommentsQuery = useQuery(VIEWABLE_SUBMISSIONS_QUERY, {
+    variables: {...commonQueryVariables, sort: 'desc'},
+    fetchPolicy: 'cache-and-network',
+    skip: !isSubmissionCommentsType || !(scope === 'submission_comments')
+  })
+  const submissionCommentLength =
+    submissionCommentsQuery.data?.legacyNode?.viewableSubmissionsConnection?.nodes?.length || 0
+  const conversationLength =
+    conversationsQuery.data?.legacyNode?.conversationsConnection?.nodes?.length || 0
 
   const removeOutOfScopeConversationsFromCache = (cache, result) => {
     if (scope === 'starred') {
@@ -590,13 +611,23 @@ const CanvasInbox = () => {
                 {(matches.includes('desktop') ||
                   (matches.includes('mobile') && !selectedConversations.length) ||
                   multiselect) && (
-                  <Flex.Item width={responsiveProps.conversationListWidth} height="100%">
+                  <Flex.Item
+                    width={
+                      conversationLength || submissionCommentLength
+                        ? responsiveProps.conversationListWidth
+                        : '100%'
+                    }
+                    height="100%"
+                  >
                     <ConversationListContainer
                       course={courseFilter}
                       userFilter={userFilter}
                       scope={scope}
                       onSelectConversation={updateSelectedConversations}
                       onReadStateChange={handleReadState}
+                      commonQueryVariables={commonQueryVariables}
+                      conversationsQuery={conversationsQuery}
+                      submissionCommentsQuery={submissionCommentsQuery}
                     />
                   </Flex.Item>
                 )}
