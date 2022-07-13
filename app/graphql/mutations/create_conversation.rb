@@ -94,7 +94,7 @@ class Mutations::CreateConversation < Mutations::BaseMutation
         batch = ConversationBatch.generate(
           message,
           recipients,
-          :sync,
+          recipients.size > Conversation.max_group_conversation_size ? :async : :sync,
           subject: input[:subject],
           context_type: context_type,
           context_id: context_id,
