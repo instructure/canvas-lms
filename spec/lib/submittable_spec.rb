@@ -162,6 +162,28 @@ describe "section specific topic" do
     expect(vis_hash[student.id].first).to eq(section_specific_topic1.id)
   end
 
+  it "filters section specific topics properly for multiple users" do
+    course = course_factory(active_all: true)
+    section1 = course.course_sections.create!(name: "section 1")
+    section2 = course.course_sections.create!(name: "section 2")
+    topic1 = course.discussion_topics.create!(title: "topic 1 (for section 1)")
+    topic2 = course.discussion_topics.create!(title: "topic 2 (for section 2)")
+    topic3 = course.discussion_topics.create!(title: "topic 3 (for all sections)")
+    topic4 = course.discussion_topics.create!(title: "topic 4 (for section 2)")
+    add_section_to_topic(topic1, section1)
+    add_section_to_topic(topic2, section2)
+    add_section_to_topic(topic4, section2)
+    student = user_factory(active_all: true)
+    teacher = user_factory(active_all: true)
+    course.enroll_student(student, section: section2)
+    course.enroll_teacher(teacher, section: section1)
+    course.reload
+
+    vis_hash = DiscussionTopic.visible_ids_by_user(course_id: course.id, user_id: [student.id, teacher.id], item_type: :discussion)
+    expect(vis_hash[student.id]).to contain_exactly(topic2.id, topic3.id, topic4.id)
+    expect(vis_hash[teacher.id]).to contain_exactly(topic1.id, topic3.id)
+  end
+
   it "properly filters section specific topics for deleted section visibilities" do
     course = course_factory(active_course: true)
     section1 = course.course_sections.create!(name: "section for student")
@@ -173,5 +195,31 @@ describe "section specific topic" do
     section_specific_topic1.destroy
     vis_hash = DiscussionTopic.visible_ids_by_user(course_id: course.id, user_id: [student.id], item_type: :discussion)
     expect(vis_hash[student.id].length).to eq(0)
+  end
+
+  it "handles sections that don't have any discussion topics" do
+    course = course_factory(active_all: true)
+    section1 = course.course_sections.create!(name: "section 1")
+    section2 = course.course_sections.create!(name: "section 2")
+    topic1 = course.discussion_topics.create!(title: "topic 1 (for section 1)")
+    add_section_to_topic(topic1, section1)
+    student = user_factory(active_all: true)
+    course.enroll_student(student, section: section2)
+    course.reload
+
+    vis_hash = DiscussionTopic.visible_ids_by_user(course_id: course.id, user_id: [student.id], item_type: :discussion)
+    expect(vis_hash[student.id].length).to be(0)
+  end
+
+  it "handles user not enrolled in any sections" do
+    course = course_factory(active_all: true)
+    section1 = course.course_sections.create!(name: "section 1")
+    topic1 = course.discussion_topics.create!(title: "topic 1 (for section 1)")
+    add_section_to_topic(topic1, section1)
+    student = user_factory(active_all: true)
+    course.reload
+
+    vis_hash = DiscussionTopic.visible_ids_by_user(course_id: course.id, user_id: [student.id], item_type: :discussion)
+    expect(vis_hash[student.id].length).to be(0)
   end
 end
