@@ -31,6 +31,7 @@ module Types
 
     include SearchHelper
     include Api::V1::StreamItem
+    include ConversationsHelper
 
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
@@ -204,6 +205,17 @@ module Types
           conversations_scope
         end
       end
+    end
+
+    field :total_recipients, Integer, null: false do
+      argument :context, String, required: false
+    end
+    def total_recipients(context: nil)
+      return nil unless object == self.context[:current_user]
+
+      @current_user = object
+
+      normalize_recipients(recipients: context, context_code: context)&.count || 0
     end
 
     field :recipients, RecipientsType, null: true do

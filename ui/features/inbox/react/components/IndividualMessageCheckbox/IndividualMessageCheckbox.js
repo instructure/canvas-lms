@@ -25,7 +25,7 @@ import {responsiveQuerySizes} from '../../../util/utils'
 
 const I18n = useI18nScope('conversations_2')
 
-export const IndividualMessageCheckbox = props => {
+export const IndividualMessageCheckbox = ({checked, maxGroupRecipientsMet, ...props}) => {
   return (
     <Responsive
       match="media"
@@ -47,6 +47,8 @@ export const IndividualMessageCheckbox = props => {
           size="small"
           variant={responsiveProps.variant}
           {...props}
+          checked={checked || maxGroupRecipientsMet}
+          disabled={maxGroupRecipientsMet}
         />
       )}
     />
@@ -55,7 +57,8 @@ export const IndividualMessageCheckbox = props => {
 
 IndividualMessageCheckbox.propTypes = {
   onChange: PropTypes.func.isRequired,
-  checked: PropTypes.bool
+  checked: PropTypes.bool,
+  maxGroupRecipientsMet: PropTypes.bool
 }
 
 IndividualMessageCheckbox.defaultProps = {

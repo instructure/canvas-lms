@@ -584,6 +584,22 @@ describe Types::UserType do
     end
   end
 
+  context "total_recipients" do
+    let(:type) do
+      GraphQLTypeTester.new(
+        @student,
+        current_user: @student,
+        domain_root_account: @course.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+    end
+
+    it "returns total_recipients for given context (excluding current_user)" do
+      result = type.resolve("totalRecipients(context: \"course_#{@course.id}\")")
+      expect(result).to eq(@course.enrollments.count - 1)
+    end
+  end
+
   context "favorite_courses" do
     before(:once) do
       @course1 = @course

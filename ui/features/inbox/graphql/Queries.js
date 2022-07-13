@@ -78,6 +78,17 @@ export const ADDRESS_BOOK_RECIPIENTS = gql`
   ${PageInfo.fragment}
 `
 
+export const TOTAL_RECIPIENTS = gql`
+  query GetTotalRecipients($userID: ID!, $context: String) {
+    legacyNode(_id: $userID, type: User) {
+      ... on User {
+        id
+        totalRecipients(context: $context)
+      }
+    }
+  }
+`
+
 export const CONVERSATIONS_QUERY = gql`
   query GetConversationsQuery(
     $userID: ID!
