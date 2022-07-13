@@ -50,6 +50,7 @@ describe RruleHelper do
       "FREQ=MONTHLY;INTERVAL=2;BYMONTHDAY=15;COUNT=3" => "Every 2 months on day 15, 3 times",
       "FREQ=MONTHLY;INTERVAL=2;BYMONTHDAY=3,5;COUNT=3" => "Every 2 months on days 3,5, 3 times",
       "FREQ=MONTHLY;INTERVAL=1;UNTIL=20220729T000000Z" => "Monthly until Jul 29, 2022",
+      "FREQ=MONTHLY;INTERVAL=2;UNTIL=20220729T000000Z" => "Every 2 months until Jul 29, 2022",
       "FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=5;UNTIL=20220729T000000Z" => "Monthly on day 5 until Jul 29, 2022",
       "FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=3,5;UNTIL=20220729T000000Z" => "Monthly on days 3,5 until Jul 29, 2022",
       "FREQ=MONTHLY;INTERVAL=2;BYMONTHDAY=5;UNTIL=20220729T000000Z" => "Every 2 months on day 5 until Jul 29, 2022",

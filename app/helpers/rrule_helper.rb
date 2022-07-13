@@ -362,7 +362,7 @@ module RruleHelper
     else
       I18n.t({
                one: "Monthly until %{until}",
-               other: "Every %{interval} months until %{until}"
+               other: "Every %{count} months until %{until}"
              }, {
                count: interval,
                until: format_date(until_date)
