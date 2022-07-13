@@ -41,6 +41,7 @@ describe ConversationsController do
     end
 
     it "assigns variables" do
+      allow(InstStatsd::Statsd).to receive(:increment)
       user_session(@student)
       conversation
 
@@ -50,6 +51,7 @@ describe ConversationsController do
       get "index"
       expect(response).to be_successful
       expect(assigns[:js_env]).not_to be_nil
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.legacy")
     end
 
     it "assigns variables for json" do
