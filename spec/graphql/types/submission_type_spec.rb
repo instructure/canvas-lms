@@ -579,4 +579,20 @@ describe Types::SubmissionType do
       ).to eq "online_text_entry"
     end
   end
+
+  describe "assignedAssessments" do
+    before(:once) do
+      @assignment.update_attribute(:peer_reviews, true)
+      reviewee = User.create!
+      @course.enroll_user(reviewee, "StudentEnrollment", enrollment_state: "active")
+      @assignment.assign_peer_review(@student, reviewee)
+    end
+
+    let(:submission_type) { GraphQLTypeTester.new(@submission, current_user: @student) }
+
+    it "works" do
+      result = submission_type.resolve("assignedAssessments { workflowState }")
+      expect(result.count).to eq 1
+    end
+  end
 end

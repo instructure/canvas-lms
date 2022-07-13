@@ -87,6 +87,7 @@ class CanvasSchema < GraphQL::Schema
       end
     when ContextExternalTool then Types::ExternalToolType
     when Setting then Types::InternalSettingType
+    when AssessmentRequest then Types::AssessmentRequestType
     end
   end
 
