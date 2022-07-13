@@ -97,10 +97,6 @@ const MessageListActionContainer = props => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.activeCourseFilter])
 
-  if (loading) {
-    return <span />
-  }
-
   if (error) {
     setOnFailure(I18n.t('Unable to load courses menu.'))
   }
@@ -166,6 +162,7 @@ const MessageListActionContainer = props => {
           margin="none"
           padding="small"
           background="secondary"
+          data-testid="tool-bar"
         >
           <Flex wrap="wrap">
             <Flex.Item
