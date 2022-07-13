@@ -207,6 +207,34 @@ describe ConversationsController do
         expect(assigns[:conversations_json].size).to be 1
       end
     end
+
+    context "react-inbox" do
+      before do
+        Account.default.enable_feature! :react_inbox
+      end
+
+      context "metrics" do
+        before do
+          allow(InstStatsd::Statsd).to receive(:increment)
+        end
+
+        it "does not increment visit count if not authorized to open inbox" do
+          get "index"
+          assert_require_login
+          expect(InstStatsd::Statsd).not_to have_received(:increment).with("inbox.visit.react")
+        end
+
+        it "increments react counter when visited" do
+          account_admin_user
+          user_session(@user)
+          conversation
+
+          get "index"
+          expect(response).to be_successful
+          expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.react")
+        end
+      end
+    end
   end
 
   describe "GET 'show'" do
