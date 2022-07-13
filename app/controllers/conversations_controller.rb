@@ -316,6 +316,7 @@ class ConversationsController < ApplicationController
         return
       end
 
+      InstStatsd::Statsd.increment("inbox.visit.legacy")
       render :index_new
     end
   end
