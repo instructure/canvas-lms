@@ -41,6 +41,8 @@ import {nanoid} from 'nanoid'
 import {AddressBookItem} from './AddressBookItem'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useEffect, useMemo, useState, useRef, useCallback} from 'react'
+import {TOTAL_RECIPIENTS} from '../../../graphql/Queries'
+import {useQuery} from 'react-apollo'
 
 const I18n = useI18nScope('conversations_2')
 
@@ -85,6 +87,7 @@ export const AddressBook = ({
   const [isLimitReached, setLimitReached] = useState(false)
   const [popoverWidth, setPopoverWidth] = useState('200px')
   const menuRef = useRef(null)
+  const userID = ENV.current_user_id?.toString()
   const [focusType, setFocusType] = useState(KEYBOARD_FOCUS_TYPE) // Options are 'keyboard' and 'mouse'
   const backButtonArray = isSubMenu
     ? [{id: 'backButton', name: I18n.t('Back'), itemType: BACK_BUTTON_TYPE}]
@@ -105,6 +108,11 @@ export const AddressBook = ({
   const ariaAddressBookLabel = I18n.t('Address Book')
   const [menuItemCurrent, setMenuItemCurrent] = useState(null)
   const [isSubMenuSelection, setIsSubMenuSelection] = useState(true)
+
+  const {refetch: refetchTotalRecipients} = useQuery(TOTAL_RECIPIENTS, {
+    skip: true
+  })
+  const [isloadingRecipientsTotal, setIsloadingRecipientsTotal] = useState(false)
 
   const showContextSelect = useMemo(() => {
     // Legacy discussions don't allow messages to all groups/sections
@@ -435,7 +443,7 @@ export const AddressBook = ({
 
   // Handler for selecting an item
   // Controls callback + tag addition
-  const selectHandler = (menuItem, isContext, isBackButton, isSubmenu) => {
+  const selectHandler = async (menuItem, isContext, isBackButton, isSubmenu) => {
     // If information is not available, quickly find it from data state
     if (isContext === undefined && isBackButton === undefined && isSubmenu === undefined) {
       const selectedMenuItem = data.find(u => u.id === selectedItem?.id)
@@ -446,6 +454,14 @@ export const AddressBook = ({
 
     // Only add tags for users
     if (!isBackButton && !isContext && !isSubmenu) {
+      let totalRecipients = 1
+      if (menuItem.itemType === 'selectContext') {
+        setIsloadingRecipientsTotal(true)
+        const result = await refetchTotalRecipients({userID, context: menuItem.id})
+        totalRecipients = result?.data?.legacyNode?.totalRecipients || 1
+        setIsloadingRecipientsTotal(false)
+      }
+      menuItem.totalRecipients = totalRecipients
       addTag(menuItem)
       onSelect(menuItem)
       if (onUserFilterSelect) {
@@ -546,8 +562,9 @@ export const AddressBook = ({
                 />
               }
             >
-              {isLoading && !isLoadingMoreMenuData && renderLoading()}
-              {(!isLoading || isLoadingMoreMenuData) && (
+              {(isloadingRecipientsTotal || (isLoading && !isLoadingMoreMenuData)) &&
+                renderLoading()}
+              {!isloadingRecipientsTotal && (!isLoading || isLoadingMoreMenuData) && (
                 <View
                   elementRef={el => {
                     menuRef.current = el
