@@ -61,7 +61,7 @@ describe RruleHelper do
       "FREQ=MONTHLY;INTERVAL=1;BYDAY=TU,TH;UNTIL=20220729T000000Z" => "Monthly every Tue, Thu until Jul 29, 2022",
       "FREQ=MONTHLY;INTERVAL=2;BYDAY=TU,TH;UNTIL=20220729T000000Z" => "Every 2 months on Tue, Thu until Jul 29, 2022",
       "FREQ=MONTHLY;INTERVAL=1;BYDAY=2TU;UNTIL=20220729T000000Z" => "Monthly on the 2nd Tue until Jul 29, 2022",
-      "FREQ=MONTHLY;INTERVAL=2;BYDAY=2TU,2TH;UNTIL=20220729T000000Z" => "Every 2 months on 2nd Tue, Thu until Jul 29, 2022",
+      "FREQ=MONTHLY;INTERVAL=2;BYDAY=2TU,2TH;UNTIL=20220729T000000Z" => "Every 2 months on the 2nd Tue, Thu until Jul 29, 2022",
       "FREQ=YEARLY;INTERVAL=1;BYMONTH=07;BYDAY=TU;COUNT=3" => "Annually on the first Tue of July, 3 times",
       "FREQ=YEARLY;INTERVAL=2;BYMONTH=07;BYDAY=2TU;COUNT=3" => "Every 2 years on the 2nd Tue of July, 3 times",
       "FREQ=YEARLY;INTERVAL=1;BYMONTH=07;BYDAY=TU;UNTIL=20220729T000000Z" => "Annually on the first Tue of July until Jul 29, 2022",
