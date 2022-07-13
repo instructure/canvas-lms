@@ -98,13 +98,6 @@ module RruleHelper
     I18n.t("November"),
     I18n.t("December"),
   ].freeze
-  ORDINALS = {
-    1 => I18n.t("1st"),
-    2 => I18n.t("2nd"),
-    3 => I18n.t("3rd"),
-    4 => I18n.t("4th"),
-    5 => I18n.t("5th")
-  }.freeze
   DAYS_IN_MONTH = [nil, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31].freeze
 
   def byday_to_days(byday)
@@ -116,8 +109,7 @@ module RruleHelper
   end
 
   # days is array of string digits
-  #  e.g. ["1,15"]
-  # todo: in canvas, use .ordinalize ?
+  #  e.g. ["1","15"]
   def join_month_dys(days)
     days.join(",")
   end
@@ -128,7 +120,7 @@ module RruleHelper
       raise RruleValidationError, I18n.t("Invalid BYDAY '%{byday}'", byday: byday) unless match
 
       {
-        occurence: match[1].to_i,
+        occurrence: match[1].to_i,
         day_of_week: DAYS_OF_WEEK[match[2]]
       }
     end
@@ -166,59 +158,79 @@ module RruleHelper
   end
 
   def parse_daily(rropts)
-    interval = rropts["INTERVAL"]
-    count = rropts["COUNT"]
+    interval = rropts["INTERVAL"].to_i
+    times = rropts["COUNT"]
     until_date = rropts["UNTIL"]
 
-    if interval == "1"
-      if count
-        I18n.t("Daily, %{count} times", count: count)
-      else # until
-        I18n.t("Daily until %{until}", until: format_date(until_date))
-      end
-    else # interval > 1
-      if count
-        I18n.t("Every %{interval} days, %{count} times", interval: interval, count: count)
-      else
-        I18n.t("Every %{interval} days until %{until}", interval: interval, until: format_date(until_date))
-      end
+    if times
+      I18n.t({
+               one: "Daily, %{times} times",
+               other: "Every %{count} days, %{times} times"
+             }, {
+               count: interval,
+               times: times
+             })
+    else
+      I18n.t({
+               one: "Daily until %{until}",
+               other: "Every %{count} days until %{until}"
+             }, {
+               count: interval,
+               until: format_date(until_date)
+             })
     end
   end
 
   def parse_weekly(rropts)
-    interval = rropts["INTERVAL"]
-    count = rropts["COUNT"]
+    return parse_weekly_byday(rropts) if rropts["BYDAY"]
+
+    interval = rropts["INTERVAL"].to_i
+    times = rropts["COUNT"]
+    until_date = rropts["UNTIL"]
+
+    if times
+      I18n.t({
+               one: "Weekly, %{times} times",
+               other: "Every %{count} weeks, %{times} times"
+             }, {
+               count: interval,
+               times: times
+             })
+    else
+      I18n.t({
+               one: "Weekly until %{until}",
+               other: "Every %{count} weeks until %{until}"
+             }, {
+               count: interval,
+               until: format_date(until_date)
+             })
+    end
+  end
+
+  def parse_weekly_byday(rropts)
+    interval = rropts["INTERVAL"].to_i
+    times = rropts["COUNT"]
     until_date = rropts["UNTIL"]
     by_day = byday_to_days(rropts["BYDAY"]) if rropts["BYDAY"]
 
-    if interval == "1"
-      if by_day
-        if count
-          I18n.t("Weekly on %{byday}, %{count} times", byday: by_day, count: count)
-        else # until
-          I18n.t("Weekly on %{byday} until %{until}", byday: by_day, until: format_date(until_date))
-        end
-      else
-        if count
-          I18n.t("Weekly, %{count} times", count: count)
-        else # until
-          I18n.t("Weekly until %{until}", until: format_date(until_date))
-        end
-      end
-    else # interval > 1
-      if by_day
-        if count
-          I18n.t("Every %{interval} weeks on %{byday}, %{count} times", interval: interval, byday: by_day, count: count)
-        else
-          I18n.t("Every %{interval} weeks on %{byday} until %{until}", interval: interval, byday: by_day, until: format_date(until_date))
-        end
-      else
-        if count
-          I18n.t("Every %{interval} weeks, %{count} times", interval: interval, count: count)
-        else
-          I18n.t("Every %{interval} weeks until %{until}", interval: interval, until: format_date(until_date))
-        end
-      end
+    if times
+      I18n.t({
+               one: "Weekly on %{byday}, %{times} times",
+               other: "Every %{count} weeks on %{byday}, %{times} times"
+             }, {
+               count: interval,
+               byday: by_day,
+               times: times
+             })
+    else
+      I18n.t({
+               one: "Weekly on %{byday} until %{until}",
+               other: "Every %{count} weeks on %{byday} until %{until}"
+             }, {
+               count: interval,
+               byday: by_day,
+               until: format_date(until_date)
+             })
     end
   end
 
@@ -233,99 +245,128 @@ module RruleHelper
   end
 
   def parse_monthly_byday(rropts)
-    interval = rropts["INTERVAL"]
-    count = rropts["COUNT"]
+    interval = rropts["INTERVAL"].to_i
+    times = rropts["COUNT"]
     until_date = rropts["UNTIL"]
     by_days = parse_byday(rropts["BYDAY"])
     days_of_week = by_days.pluck(:day_of_week).join(", ")
-    occurence = by_days.first[:occurence]
-    occurence_ordinal = ORDINALS[occurence]
+    occurrence = by_days.first[:occurrence]
 
-    if interval == "1"
-      if count
-        if occurence == 0
-          I18n.t("Monthly every %{days}, %{count} times", days: days_of_week, count: count)
-        else
-          I18n.t("Monthly on the %{ord} %{days}, %{count} times", ord: occurence_ordinal, days: days_of_week, count: count)
-        end
-      else # until
-        if occurence == 0
-          I18n.t("Monthly every %{days} until %{until}", days: days_of_week, until: format_date(until_date))
-        else
-          I18n.t("Monthly on the %{ord} %{days} until %{until}", ord: occurence_ordinal, days: days_of_week, until: format_date(until_date))
-        end
+    if times
+      if occurrence == 0
+        I18n.t({
+                 one: "Monthly every %{days}, %{times} times",
+                 other: "Every %{count} months on %{days}, %{times} times"
+               }, {
+                 count: interval,
+                 days: days_of_week,
+                 times: times
+               })
+      else
+        I18n.t({
+                 one: "Monthly on the %{ord} %{days}, %{times} times",
+                 other: "Every %{count} months on the %{ord} %{days}, %{times} times"
+               }, {
+                 count: interval,
+                 ord: occurrence.ordinalize,
+                 days: days_of_week,
+                 times: times
+               })
       end
-    else # interval > 1
-      if count
-        if occurence == 0
-          I18n.t("Every %{interval} months on %{days}, %{count} times", interval: interval, days: days_of_week, count: count)
-        else
-          I18n.t("Every %{interval} months on the %{ord} %{days}, %{count} times", interval: interval, ord: occurence_ordinal, days: days_of_week, count: count)
-        end
-      else # until
-        if occurence == 0
-          I18n.t("Every %{interval} months on %{days} until %{until}", interval: interval, days: days_of_week, until: format_date(until_date))
-        else
-          I18n.t("Every %{interval} months on %{ord} %{days} until %{until}", interval: interval, ord: occurence_ordinal, days: days_of_week, until: format_date(until_date))
-        end
+    else
+      if occurrence == 0
+        I18n.t({
+                 one: "Monthly every %{days} until %{until}",
+                 other: "Every %{count} months on %{days} until %{until}"
+               }, {
+                 count: interval,
+                 days: days_of_week,
+                 until: format_date(until_date)
+               })
+      else
+        I18n.t({
+                 one: "Monthly on the %{ord} %{days} until %{until}",
+                 other: "Every %{count} months on the %{ord} %{days} until %{until}"
+               }, {
+                 count: interval,
+                 ord: occurrence.ordinalize,
+                 days: days_of_week,
+                 until: format_date(until_date)
+               })
       end
     end
   end
 
   def parse_monthly_bymonthday(rropts)
-    interval = rropts["INTERVAL"]
-    count = rropts["COUNT"]
+    interval = rropts["INTERVAL"].to_i
+    times = rropts["COUNT"]
     until_date = rropts["UNTIL"]
     days_of_month = rropts["BYMONTHDAY"].split(",")
 
-    if interval == "1"
-      if count
-        if days_of_month.length == 1
-          I18n.t("Monthly on day %{days}, %{count} times", days: days_of_month[0], count: count)
-        else
-          I18n.t("Monthly on days %{days}, %{count} times", days: join_month_dys(days_of_month), count: count)
-        end
-      else # until
-        if days_of_month.length == 1
-          I18n.t("Monthly on day %{days} until %{until}", days: days_of_month[0], until: format_date(until_date))
-        else
-          I18n.t("Monthly on days %{days} until %{until}", days: join_month_dys(days_of_month), until: format_date(until_date))
-        end
+    if times
+      if days_of_month.length == 1
+        I18n.t({
+                 one: "Monthly on day %{days}, %{times} times",
+                 other: "Every %{count} months on day %{days}, %{times} times"
+               }, {
+                 count: interval,
+                 days: days_of_month[0],
+                 times: times
+               })
+      else
+        I18n.t({
+                 one: "Monthly on days %{days}, %{times} times",
+                 other: "Every %{count} months on days %{days}, %{times} times"
+               }, {
+                 count: interval,
+                 days: join_month_dys(days_of_month),
+                 times: times
+               })
       end
-    else # interval > 1
-      if count
-        if days_of_month.length == 1
-          I18n.t("Every %{interval} months on day %{days}, %{count} times", interval: interval, days: days_of_month[0], count: count)
-        else
-          I18n.t("Every %{interval} months on days %{days}, %{count} times", interval: interval, days: join_month_dys(days_of_month), count: count)
-        end
-      else # until
-        if days_of_month.length == 1
-          I18n.t("Every %{interval} months on day %{days} until %{until}", interval: interval, days: days_of_month[0], until: format_date(until_date))
-        else
-          I18n.t("Every %{interval} months on days %{days} until %{until}", interval: interval, days: join_month_dys(days_of_month), until: format_date(until_date))
-        end
+    else
+      if days_of_month.length == 1
+        I18n.t({
+                 one: "Monthly on day %{days} until %{until}",
+                 other: "Every %{count} months on day %{days} until %{until}"
+               }, {
+                 count: interval,
+                 days: days_of_month[0],
+                 until: format_date(until_date)
+               })
+      else
+        I18n.t({
+                 one: "Monthly on days %{days} until %{until}",
+                 other: "Every %{count} months on days %{days} until %{until}",
+               }, {
+                 count: interval,
+                 days: join_month_dys(days_of_month),
+                 until: format_date(until_date)
+               })
       end
     end
   end
 
   def parse_generic_monthly(rropts)
-    interval = rropts["INTERVAL"]
-    count = rropts["COUNT"]
+    interval = rropts["INTERVAL"].to_i
+    times = rropts["COUNT"]
     until_date = rropts["UNTIL"]
 
-    if interval == "1"
-      if count
-        I18n.t("Monthly, %{count} times", count: count)
-      else
-        I18n.t("Monthly until %{until}", until: format_date(until_date))
-      end
+    if times
+      I18n.t({
+               one: "Monthly, %{times} times",
+               other: "Every %{count} months, %{times} times"
+             }, {
+               count: interval,
+               times: times
+             })
     else
-      if count
-        I18n.t("Every %{interval} month, %{count} times", interval: interval, count: count)
-      else
-        I18.t("Every %{interval} month until %{until}", interval: interval, until: format_date(until_date))
-      end
+      I18n.t({
+               one: "Monthly until %{until}",
+               other: "Every %{interval} months until %{until}"
+             }, {
+               count: interval,
+               until: format_date(until_date)
+             })
     end
   end
 
@@ -340,66 +381,89 @@ module RruleHelper
   end
 
   def parse_yearly_byday(rropts)
-    count = rropts["COUNT"]
-    interval = rropts["INTERVAL"]
+    times = rropts["COUNT"]
+    interval = rropts["INTERVAL"].to_i
     until_date = rropts["UNTIL"]
     month = bymonth_to_month(parse_bymonth(rropts["BYMONTH"]))
     by_days = parse_byday(rropts["BYDAY"])
     days_of_week = by_days.pluck(:day_of_week).join(", ")
-    occurence = by_days.first[:occurence]
-    occurence_ordinal = ORDINALS[occurence]
+    occurrence = by_days.first[:occurrence]
 
-    if interval == "1"
-      if count
-        if [0, 1].include?(occurence)
-          I18n.t("Annually on the first %{days} of %{month}, %{count} times", days: days_of_week, month: month, count: count)
-        else
-          I18n.t("Annualy on the %{ord} %{days} of %{month}, %{count} times", ord: occurence_ordinal, days: days_of_week, month: month, count: count)
-        end
-      else # until
-        if [0, 1].include?(occurence)
-          I18n.t("Annually on the first %{days} of %{month} until %{until}", days: days_of_week, month: month, until: format_date(until_date))
-        else
-          I18n.t("Annually on the %{ord} %{days} of %{month} until %{until}", ord: occurence_ordinal, days: days_of_week, month: month, until: format_date(until_date))
-        end
+    if times
+      if [0, 1].include?(occurrence)
+        I18n.t({
+                 one: "Annually on the first %{days} of %{month}, %{times} times",
+                 other: "Every %{count} years on the first %{days} of %{month}, %{times} times"
+               }, {
+                 count: interval,
+                 days: days_of_week,
+                 month: month,
+                 times: times
+               })
+      else
+        I18n.t({
+                 one: "Annualy on the %{ord} %{days} of %{month}, %{times} times",
+                 other: "Every %{count} years on the %{ord} %{days} of %{month}, %{times} times"
+               }, {
+                 count: interval,
+                 ord: occurrence.ordinalize,
+                 days: days_of_week,
+                 month: month,
+                 times: times
+               })
       end
-    else # interval > 1
-      if count
-        if [0, 1].include?(occurence)
-          I18n.t("Every %{interval} years on the first %{days} of %{month}, %{count} times", interval: interval, days: days_of_week, month: month, count: count)
-        else
-          I18n.t("Every %{interval} years on the %{ord} %{days} of %{month}, %{count} times", interval: interval, ord: occurence_ordinal, days: days_of_week, month: month, count: count)
-        end
-      else # until
-        if [0, 1].include?(occurence)
-          I18n.t("Every %{interval} years on the first %{days} of %{month} until %{until}", interval: interval, days: days_of_week, month: month, until: format_date(until_date))
-        else
-          I18n.t("Every %{interval} years on the %{ord} %{days} of %{month} until %{until}", interval: interval, ord: occurence_ordinal, days: days_of_week, month: month, until: format_date(until_date))
-        end
+    else
+      if [0, 1].include?(occurrence)
+        I18n.t({
+                 one: "Annually on the first %{days} of %{month} until %{until}",
+                 other: "Every %{count} years on the first %{days} of %{month} until %{until}"
+               }, {
+                 count: interval,
+                 days: days_of_week,
+                 month: month,
+                 until: format_date(until_date)
+               })
+      else
+        I18n.t({
+                 one: "Annually on the %{ord} %{days} of %{month} until %{until}",
+                 other: "Every %{count} years on the %{ord} %{days} of %{month} until %{until}"
+               }, {
+                 count: interval,
+                 ord: occurrence.ordinalize,
+                 days: days_of_week,
+                 month: month,
+                 until: format_date(until_date)
+               })
       end
     end
   end
 
   def parse_yearly_bymonthday(rropts)
-    count = rropts["COUNT"]
-    interval = rropts["INTERVAL"]
+    times = rropts["COUNT"]
+    interval = rropts["INTERVAL"].to_i
     until_date = rropts["UNTIL"]
     month = parse_bymonth(rropts["BYMONTH"])
     day = parse_bymonthday(rropts["BYMONTHDAY"], month)
     date = format_month_day(month, day)
 
-    if interval == "1"
-      if count
-        I18n.t("Annually on %{date}, %{count} times", date: date, month: month, count: count)
-      else # until
-        I18n.t("Annually on %{date} until %{until}", date: date, month: month, until: format_date(until_date))
-      end
-    else # interval > 1
-      if count
-        I18n.t("Every %{interval} years on %{date}, %{count} times", interval: interval, date: date, month: month, count: count)
-      else # until
-        I18n.t("Every %{interval} years on %{date} until %{until}", interval: interval, date: date, month: month, until: format_date(until_date))
-      end
+    if times
+      I18n.t({
+               one: "Annually on %{date}, %{times} times",
+               other: "Every %{count} years on %{date}, %{times} times"
+             }, {
+               count: interval,
+               date: date,
+               times: times
+             })
+    else
+      I18n.t({
+               one: "Annually on %{date} until %{until}",
+               other: "Every %{count} years on %{date} until %{until}"
+             }, {
+               count: interval,
+               date: date,
+               until: format_date(until_date)
+             })
     end
   end
 end
