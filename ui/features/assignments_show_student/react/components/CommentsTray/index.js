@@ -54,23 +54,35 @@ function TrayContent(props) {
 
   return (
     <Suspense fallback={<LoadingIndicator />}>
-      <CommentsTrayBody assignment={props.assignment} submission={props.submission} />
+      <CommentsTrayBody
+        assignment={props.assignment}
+        submission={props.submission}
+        isPeerReviewEnabled={props.isPeerReviewEnabled}
+      />
     </Suspense>
   )
 }
 
 TrayContent.propTypes = {
   assignment: Assignment.shape.isRequired,
-  submission: Submission.shape.isRequired
+  submission: Submission.shape.isRequired,
+  isPeerReviewEnabled: bool
+}
+
+TrayContent.defaultProps = {
+  isPeerReviewEnabled: false
 }
 
 export default function CommentsTray(props) {
   // attempts 0 and 1 get combined into a single attempt
   const attempt = props.submission?.attempt || 1
+  const label = props.isPeerReviewEnabled
+    ? I18n.t('Peer Review Comments')
+    : I18n.t('Attempt %{attempt} Feedback', {attempt})
 
   return (
     <Tray
-      label={I18n.t('Attempt %{attempt} Feedback', {attempt})}
+      label={label}
       open={props.open}
       onDismiss={props.closeTray}
       size="regular"
@@ -82,7 +94,7 @@ export default function CommentsTray(props) {
             <View as="div" padding="medium">
               <Flex>
                 <Flex.Item shouldGrow={true} shouldShrink={true}>
-                  <Heading>{I18n.t('Attempt %{attempt} Feedback', {attempt})}</Heading>
+                  <Heading>{label}</Heading>
                 </Flex.Item>
 
                 <Flex.Item>
@@ -100,7 +112,11 @@ export default function CommentsTray(props) {
           </Flex.Item>
 
           <Flex.Item shouldGrow={true}>
-            <TrayContent assignment={props.assignment} submission={props.submission} />
+            <TrayContent
+              isPeerReviewEnabled={props.isPeerReviewEnabled}
+              assignment={props.assignment}
+              submission={props.submission}
+            />
           </Flex.Item>
         </Flex>
       </div>
@@ -112,5 +128,10 @@ CommentsTray.propTypes = {
   assignment: Assignment.shape.isRequired,
   submission: Submission.shape.isRequired,
   closeTray: func.isRequired,
-  open: bool.isRequired
+  open: bool.isRequired,
+  isPeerReviewEnabled: bool
+}
+
+CommentsTray.defaultProps = {
+  isPeerReviewEnabled: false
 }

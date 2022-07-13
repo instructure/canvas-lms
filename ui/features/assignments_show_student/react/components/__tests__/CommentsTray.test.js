@@ -53,7 +53,7 @@ describe('CommentsTray', () => {
 
   beforeEach(async () => {
     const {assignment, submission} = await mockAssignmentAndSubmission()
-    props = {closeTray() {}, open: true, assignment, submission}
+    props = {closeTray() {}, open: true, assignment, submission, isPeerReviewEnabled: false}
     mocks = await Promise.all([mockSubmissionCommentQuery()])
   })
 
@@ -92,5 +92,15 @@ describe('CommentsTray', () => {
     const {getByText} = renderComponent()
     const message = getByText('You cannot leave comments until you submit the assignment.')
     expect(message).toBeInTheDocument()
+  })
+
+  it('displays "Peer Review Comments" in the tray heading when peer review mode is enabled', async () => {
+    const {rerender, getByRole} = renderComponent()
+    rerender(
+      <MockedProvider mocks={mocks}>
+        <CommentsTray {...props} isPeerReviewEnabled={true} />
+      </MockedProvider>
+    )
+    expect(getByRole('heading', {type: 'h2'})).toHaveTextContent('Peer Review Comments')
   })
 })

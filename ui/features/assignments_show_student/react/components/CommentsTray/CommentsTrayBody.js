@@ -34,6 +34,7 @@ import StudentViewContext from '../Context'
 import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {useQuery} from 'react-apollo'
+import {bool} from 'prop-types'
 
 const I18n = useI18nScope('assignments_2')
 
@@ -102,7 +103,7 @@ export default function CommentsTrayBody(props) {
     >
       <Flex as="div" direction="column" height="100%" data-testid="comments-container">
         <Flex.Item shouldGrow={true}>
-          {props.submission.gradeHidden && comments.length === 0 && (
+          {!props.isPeerReviewEnabled && props.submission.gradeHidden && comments.length === 0 && (
             <SVGWithTextPlaceholder
               text={hiddenCommentsMessage}
               url={ClosedDiscussionSVG}
@@ -110,7 +111,7 @@ export default function CommentsTrayBody(props) {
             />
           )}
 
-          {props.submission.gradeHidden && comments.length > 0 && (
+          {!props.isPeerReviewEnabled && props.submission.gradeHidden && comments.length > 0 && (
             <Alert variant="info" margin="small small x-large">
               {hiddenCommentsMessage}
             </Alert>
@@ -126,7 +127,12 @@ export default function CommentsTrayBody(props) {
               )}
           </div>
 
-          <CommentContent comments={comments} submission={props.submission} />
+          <CommentContent
+            comments={comments}
+            assignment={props.assignment}
+            submission={props.submission}
+            isPeerReviewEnabled={props.isPeerReviewEnabled}
+          />
         </Flex.Item>
 
         {allowChangesToSubmission && (
@@ -149,5 +155,10 @@ export default function CommentsTrayBody(props) {
 
 CommentsTrayBody.propTypes = {
   assignment: Assignment.shape.isRequired,
-  submission: Submission.shape.isRequired
+  submission: Submission.shape.isRequired,
+  isPeerReviewEnabled: bool
+}
+
+CommentsTrayBody.defaultProps = {
+  isPeerReviewEnabled: false
 }

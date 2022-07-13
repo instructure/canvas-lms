@@ -67,7 +67,10 @@ class Header extends React.Component {
 
   state = {
     commentsTrayOpen:
-      !!this.props.submission?.unreadCommentCount || !!this.isPeerReviewModeEnabled()
+      !!this.props.submission?.unreadCommentCount ||
+      (!!this.isPeerReviewModeEnabled() &&
+        this.props.assignment.env.peerReviewAvailable &&
+        !this.props.assignment.rubric)
   }
 
   isSubmissionLate = () => {
@@ -83,14 +86,14 @@ class Header extends React.Component {
   currentAssessmentIndex = () => {
     const userId = this.props.assignment.env.revieweeId
     const anonymousId = this.props.assignment.env.anonymousAssetId
-    return (
-      this.props.reviewerSubmission.assignedAssessments.findIndex(assessment => {
+    const value =
+      this.props.reviewerSubmission?.assignedAssessments?.findIndex(assessment => {
         return (
           (userId && userId === assessment.anonymizedUser._id) ||
           (anonymousId && assessment.anonymousId === anonymousId)
         )
-      }) + 1
-    )
+      }) || 0
+    return value + 1
   }
 
   openCommentsTray = () => {
@@ -178,10 +181,7 @@ class Header extends React.Component {
     )
   }
 
-  renderViewFeedbackButton = addCommentsDisabled => {
-    const popoverMessage = I18n.t(
-      'After the first attempt, you cannot leave comments until you submit the assignment.'
-    )
+  renderViewFeedbackButton = (addCommentsDisabled, popoverMessage) => {
     return (
       <>
         <div>
@@ -234,11 +234,27 @@ class Header extends React.Component {
     const lockAssignment =
       this.props.assignment.env.modulePrereq || this.props.assignment.env.unlockDate
 
+    const {peerReviewModeEnabled, peerReviewAvailable} = this.props.assignment.env
+    const shouldDisplayPeerReviewEmptyState = peerReviewModeEnabled && !peerReviewAvailable
+
     /* In the case where the current attempt is backed by a submission draft after the first,
      students are not able to leave comments. Disabling the add comments button and adding
      an info button will help make this clear. */
     const addCommentsDisabled =
-      this.props.submission?.attempt > 1 && this.props.submission.state === 'unsubmitted'
+      shouldDisplayPeerReviewEmptyState ||
+      (!peerReviewModeEnabled &&
+        this.props.submission?.attempt > 1 &&
+        this.props.submission.state === 'unsubmitted')
+
+    const unsubmittedDraftMessage = I18n.t(
+      'After the first attempt, you cannot leave comments until you submit the assignment.'
+    )
+    const unavailablePeerReviewMessage = I18n.t(
+      'You cannot leave comments until reviewer and reviewee submits the assignment.'
+    )
+    const popoverMessage = shouldDisplayPeerReviewEmptyState
+      ? unavailablePeerReviewMessage
+      : unsubmittedDraftMessage
 
     let topRightComponent
     if (this.isPeerReviewModeEnabled()) {
@@ -246,7 +262,7 @@ class Header extends React.Component {
         <Flex.Item margin="0 small 0 0">
           <PeerReviewsCounter
             current={this.currentAssessmentIndex()}
-            total={this.props.reviewerSubmission.assignedAssessments.length}
+            total={this.props.reviewerSubmission?.assignedAssessments?.length || 0}
           />
         </Flex.Item>
       )
@@ -288,6 +304,7 @@ class Header extends React.Component {
                   assignment={this.props.assignment}
                   open={this.state.commentsTrayOpen}
                   closeTray={this.closeCommentsTray}
+                  isPeerReviewEnabled={this.isPeerReviewModeEnabled()}
                 />
               </Flex.Item>
             )}
@@ -339,7 +356,7 @@ class Header extends React.Component {
                     <Flex.Item margin="0 small 0 0">{this.selectedSubmissionGrade()}</Flex.Item>
                   )}
                 <Flex.Item margin="0 small 0 0">
-                  {this.renderViewFeedbackButton(addCommentsDisabled)}
+                  {this.renderViewFeedbackButton(addCommentsDisabled, popoverMessage)}
                 </Flex.Item>
               </Flex>
             </Flex.Item>
