@@ -754,6 +754,20 @@ class DiscussionTopicsController < ApplicationController
         )
       end
 
+      unless can_read_and_visible
+        return render_unauthorized_action unless @current_user
+
+        respond_to do |format|
+          if @topic.is_announcement
+            flash[:error] = t "You do not have access to the requested announcement."
+            format.html { redirect_to named_context_url(@context, :context_announcements_url) }
+          else
+            flash[:error] = t "You do not have access to the requested discussion."
+            format.html { redirect_to named_context_url(@context, :context_discussion_topics_url) }
+          end
+        end
+      end
+
       js_env({
                course_id: params[:course_id] || @context.course&.id,
                EDIT_URL: context_url(@topic.context, :edit_context_discussion_topic_url, @topic),

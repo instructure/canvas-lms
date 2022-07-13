@@ -610,5 +610,36 @@ describe "context modules" do
       get "/courses/#{public_course.id}/modules"
       validate_selector_displayed(".item-group-container")
     end
+
+    context "when :react_discussions_post ff is ON" do
+      before do
+        Account.default.enable_feature!(:react_discussions_post)
+      end
+
+      context "when visiting a graded discussion in a module" do
+        before do
+          @module = public_course.context_modules.create!(name: "module 1")
+          @assignment = @course.assignments.create!(name: "assignemnt")
+          @discussion = @course.discussion_topics.create!(title: "Graded Discussion", assignment: @assignment)
+          @module.add_item(type: "discussion_topic", id: @discussion.id)
+        end
+
+        it "redirects unauthenticated users to login page" do
+          get "/courses/#{public_course.id}/modules"
+          f("a[title='Graded Discussion']").click
+          expect(f("#pseudonym_session_unique_id")).to be_present
+        end
+
+        it "lets users with access see the discussion" do
+          student = user_factory(active_all: true, active_state: "active")
+          public_course.enroll_user(student, "StudentEnrollment", enrollment_state: "active")
+          user_session student
+          get "/courses/#{public_course.id}/modules"
+          f("a[title='Graded Discussion']").click
+          wait_for_ajaximations
+          expect(fj("[data-testid='discussion-topic-container']:contains('Graded Discussion')")).to be_present
+        end
+      end
+    end
   end
 end
