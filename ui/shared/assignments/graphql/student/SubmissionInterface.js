@@ -20,6 +20,7 @@ import gql from 'graphql-tag'
 import {MediaObject} from './MediaObject'
 import {SubmissionDraft} from './SubmissionDraft'
 import {SubmissionFile} from './File'
+import {AssessmentRequest} from './AssessmentRequest'
 
 export const SubmissionInterface = {
   fragment: gql`
@@ -54,10 +55,14 @@ export const SubmissionInterface = {
       feedbackForCurrentAttempt
       unreadCommentCount
       url
+      assignedAssessments {
+        ...AssessmentRequest
+      }
     }
     ${MediaObject.fragment}
     ${SubmissionFile.fragment}
     ${SubmissionDraft.fragment}
+    ${AssessmentRequest.fragment}
   `,
 
   shape: shape({
@@ -81,7 +86,8 @@ export const SubmissionInterface = {
     submittedAt: string,
     feedbackForCurrentAttempt: bool.isRequired,
     unreadCommentCount: number.isRequired,
-    url: string
+    url: string,
+    assignedAssessments: arrayOf(AssessmentRequest.shape)
   })
 }
 
@@ -107,6 +113,7 @@ export const DefaultMocks = {
     submittedAt: null,
     feedbackForCurrentAttempt: false,
     unreadCommentCount: 0,
-    url: null
+    url: null,
+    assignedAssessments: () => []
   })
 }

@@ -334,4 +334,9 @@ module Interfaces::SubmissionInterface
   field :resource_link_lookup_uuid, String, null: true
 
   field :extra_attempts, Integer, null: true
+
+  field :assigned_assessments, [Types::AssessmentRequestType], null: true
+  def assigned_assessments
+    load_association(:assigned_assessments)
+  end
 end
