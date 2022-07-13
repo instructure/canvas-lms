@@ -2664,6 +2664,11 @@ class User < ActiveRecord::Base
     end
   end
 
+  def root_admin_for?(root_account)
+    root_ids = [root_account.id, Account.site_admin.id]
+    account_users.any? { |au| root_ids.include?(au.account_id) }
+  end
+
   def eportfolios_enabled?
     # For jobs/rails consoles/specs where domain root account is not set
     return true unless Account.current_domain_root_account
@@ -3216,8 +3221,7 @@ class User < ActiveRecord::Base
 
     if account_users.any?
       roles << "admin"
-      root_ids = [root_account.id, Account.site_admin.id]
-      roles << "root_admin" if account_users.any? { |au| root_ids.include?(au.account_id) }
+      roles << "root_admin" if root_admin_for?(root_account)
       roles << "consortium_admin" if account_users.any? { |au| au.shard != root_account.shard }
     end
     roles
