@@ -17,7 +17,6 @@
  */
 
 import 'date-js'
-import $ from 'jquery'
 import i18nLolcalize from './i18nLolcalize'
 import I18n from 'i18n-js'
 import {
