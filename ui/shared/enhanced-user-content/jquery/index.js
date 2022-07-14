@@ -260,7 +260,11 @@ export function enhanceUserContent(visibilityMod) {
       )
 
       if ($link.hasClass('instructure_scribd_file')) {
-        if ($link.hasClass('inline_disabled')) {
+        if ($link.hasClass('no_preview')) {
+          // link downloads
+          $link.attr('href', download_url)
+          $link.removeAttr('target')
+        } else if ($link.hasClass('inline_disabled')) {
           // link opens in overlay
           $link.addClass('preview_in_overlay')
         } else {

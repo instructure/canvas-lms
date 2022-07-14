@@ -38,9 +38,44 @@ describe('enhanceUserContent()', () => {
 
   describe('when the link has no href attribute', () => {
     const bodyHTML = '<a class="instructure_file_link instructure_scribd_file">file</a>'
-
     it('does not enhance the link', () => {
       expect(subject(bodyHTML).querySelector('.instructure_file_holder')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('when the link has inline_disabled class', () => {
+    const bodyHTML =
+      '<a class="instructure_file_link instructure_scribd_file inline_disabled" href="/courses/1/files/1" target="_blank">file</a>'
+
+    it('has the preview_in_overlay class and the target attribute', () => {
+      const aTag = subject(bodyHTML).querySelector('a')
+      expect(aTag.classList.value).toEqual('inline_disabled preview_in_overlay')
+      expect(aTag).toHaveAttribute('target')
+    })
+  })
+
+  describe('when the link has no_preview class', () => {
+    const bodyHTML =
+      '<a class="instructure_file_link instructure_scribd_file no_preview" href="/courses/1/files/1" target="_blank">file</a>'
+
+    it('has href attribute as the download link and does not have the target atrribute.', () => {
+      const aTag = subject(bodyHTML).querySelector('a')
+      expect(aTag.classList.value).toEqual('no_preview')
+      expect(aTag.getAttribute('href')).toEqual(
+        'http://localhost/courses/1/files/1/download?download_frd=1'
+      )
+      expect(aTag).not.toHaveAttribute('target')
+    })
+  })
+
+  describe('when the link has neither inline_disabled class or no_preview class', () => {
+    const bodyHTML =
+      '<a class="instructure_file_link instructure_scribd_file" href="/courses/1/files/1" target="_blank">file</a>'
+
+    it('has the preview_in_overlay class and the target attribute', () => {
+      const aTag = subject(bodyHTML).querySelector('a')
+      expect(aTag.classList.value).toEqual('file_preview_link')
+      expect(aTag).toHaveAttribute('target')
     })
   })
 })

@@ -70,6 +70,10 @@ export default class LinkOptionsTrayDriver {
     return queryHelpers.queryByAttribute('value', this.$element, 'inline')
   }
 
+  get $previewOptionDisableRadioInput() {
+    return queryHelpers.queryByAttribute('value', this.$element, 'disable')
+  }
+
   get doneButtonIsDisabled() {
     return this.$doneButton.getAttribute('disabled') !== null
   }
@@ -93,8 +97,10 @@ export default class LinkOptionsTrayDriver {
   get previewOption() {
     const $overlay = this.$previewOptionOverlayRadioInput
     const $inline = this.$previewOptionInlineRadioInput
+    const $disable = this.$previewOptionDisableRadioInput
     if ($overlay.checked) return 'overlay'
     if ($inline.checked) return 'inline'
+    if ($disable.checked) return 'disable'
     throw new Error('something is wrong')
   }
 

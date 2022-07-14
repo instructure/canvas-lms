@@ -32,6 +32,7 @@ export const NONE_TYPE = 'none'
 export const DISPLAY_AS_LINK = 'link'
 export const DISPLAY_AS_EMBED = 'embed'
 export const DISPLAY_AS_EMBED_DISABLED = 'embed-disabled'
+export const DISPLAY_AS_DOWNLOAD_LINK = 'download-link'
 
 export function asImageEmbed($element) {
   const nodeName = $element.nodeName.toLowerCase()
@@ -61,7 +62,9 @@ export function asLink($element, editor) {
   const {pathname} = url.parse($link.href)
   const type = FILE_DOWNLOAD_PATH_REGEX.test(pathname) ? FILE_LINK_TYPE : LINK_TYPE
   let displayAs = DISPLAY_AS_LINK
-  if ($link.classList.contains('auto_open')) {
+  if ($link.classList.contains('no_preview')) {
+    displayAs = DISPLAY_AS_DOWNLOAD_LINK
+  }  else if ($link.classList.contains('auto_open')) {
     displayAs = DISPLAY_AS_EMBED
   } else if ($link.classList.contains('inline_disabled')) {
     displayAs = DISPLAY_AS_EMBED_DISABLED
