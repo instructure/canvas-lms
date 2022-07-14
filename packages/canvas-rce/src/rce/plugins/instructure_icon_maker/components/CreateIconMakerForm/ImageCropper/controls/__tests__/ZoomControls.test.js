@@ -19,6 +19,16 @@
 import React from 'react'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import {ZoomControls} from '../ZoomControls'
+import {BUTTON_SCALE_STEP} from '../../constants'
+import {round} from '../utils'
+import {showFlashAlert} from '../../../../../../../../canvasFileBrowser/FlashAlert'
+
+jest.mock('../../../../../../../../canvasFileBrowser/FlashAlert')
+jest.mock('@instructure/debounce', () => ({
+  debounce: fn => {
+    return fn
+  }
+}))
 
 describe('ZoomControls', () => {
   it('renders buttons with min scale ratio', () => {
@@ -358,6 +368,59 @@ describe('ZoomControls', () => {
           {timeout}
         )
       })
+    })
+  })
+
+  describe('fires off screenreader alerts', () => {
+    let scaleRatio, props
+
+    const expectedMessage = ratio => {
+      return {
+        message: `${round(ratio) * 100}% Zoom`,
+        type: 'info',
+        srOnly: true
+      }
+    }
+
+    beforeAll(() => {
+      scaleRatio = 1.5
+
+      props = {
+        scaleRatio,
+        onChange: () => {}
+      }
+    })
+
+    it('when zoom in button is pressed', () => {
+      const {getByRole} = render(<ZoomControls {...props} />)
+      const zoomInButton = getByRole('button', {name: /zoom in image/i})
+      fireEvent.click(zoomInButton)
+      expect(showFlashAlert).toHaveBeenLastCalledWith(
+        expectedMessage(scaleRatio + BUTTON_SCALE_STEP)
+      )
+    })
+
+    it('when zoom out button is pressed', () => {
+      const {getByRole} = render(<ZoomControls {...props} />)
+      const zoomOutButton = getByRole('button', {name: /zoom out image/i})
+      fireEvent.click(zoomOutButton)
+      expect(showFlashAlert).toHaveBeenLastCalledWith(
+        expectedMessage(scaleRatio - BUTTON_SCALE_STEP)
+      )
+    })
+
+    it('when zoom input is mutated with arrow keys', () => {
+      const {container} = render(<ZoomControls {...props} />)
+      const input = container.querySelector('label input[type="text"]')
+      fireEvent.keyDown(input, {keyCode: 38}) // up arrow
+      expect(showFlashAlert).toHaveBeenLastCalledWith(expectedMessage(1.51))
+    })
+
+    it('when zoom input is mutated by direct entry', () => {
+      const {container} = render(<ZoomControls {...props} />)
+      const input = container.querySelector('label input[type="text"]')
+      fireEvent.change(input, {target: {value: '125'}})
+      expect(showFlashAlert).toHaveBeenLastCalledWith(expectedMessage(1.25))
     })
   })
 })
