@@ -617,6 +617,7 @@ class GradebooksController < ApplicationController
                settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
                IMPROVED_LMGB: root_account.feature_enabled?(:improved_lmgb)
              },
+             OUTCOME_AVERAGE_CALCULATION: root_account.feature_enabled?(:outcome_average_calculation),
              outcome_service_results_to_canvas: outcome_service_results_to_canvas_enabled?
            })
   end
