@@ -79,7 +79,7 @@ outcome_alignment_summary:
   display_name: Outcome Alignment Summary Tab
   description: Provides a list of alignments for each outcome in a course.
 outcome_average_calculation:
-  state: hidden
+  state: allowed_on
   applies_to: RootAccount
   display_name: Outcome Average Calculation Method
   description: Allows users to use average as a calulcation method for a given outcome.
