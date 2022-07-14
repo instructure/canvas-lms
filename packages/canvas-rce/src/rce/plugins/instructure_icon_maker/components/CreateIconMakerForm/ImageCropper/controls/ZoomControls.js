@@ -25,6 +25,8 @@ import {MAX_SCALE_RATIO, MIN_SCALE_RATIO, BUTTON_SCALE_STEP} from '../constants'
 import formatMessage from '../../../../../../../format-message'
 import PropTypes from 'prop-types'
 import {CustomNumberInput} from './CustomNumberInput'
+import {showFlashAlert} from '../../../../../../../canvasFileBrowser/FlashAlert'
+import {debounce} from '@instructure/debounce'
 
 const parseZoomText = value => {
   // Matches a positive/negative integer/decimal followed by %" symbol
@@ -41,15 +43,27 @@ const parseZoomText = value => {
 
 const formatZoomText = value => `${value}%`
 
+const debouncedAlert = debounce(showFlashAlert, 1000)
+
 export const ZoomControls = ({scaleRatio, onChange}) => {
+  const onZoomChange = value => {
+    const message = {
+      message: `${round(value * 100)}% Zoom`,
+      type: 'info',
+      srOnly: true
+    }
+    debouncedAlert(message)
+    onChange(value)
+  }
+
   const zoomOutCallback = () => {
     const newScaleRatio = calculateScaleRatio(scaleRatio - BUTTON_SCALE_STEP)
-    onChange(newScaleRatio)
+    onZoomChange(newScaleRatio)
   }
 
   const zoomInCallback = () => {
     const newScaleRatio = calculateScaleRatio(scaleRatio + BUTTON_SCALE_STEP)
-    onChange(newScaleRatio)
+    onZoomChange(newScaleRatio)
   }
 
   return (
@@ -61,7 +75,7 @@ export const ZoomControls = ({scaleRatio, onChange}) => {
           formatValueCallback={formatZoomText}
           processValueCallback={calculateScalePercentage}
           placeholder={formatMessage('Zoom')}
-          onChange={value => onChange(round(value / 100))}
+          onChange={value => onZoomChange(round(value / 100))}
         />
       </Flex.Item>
       <Flex.Item margin="0 small 0 0">
