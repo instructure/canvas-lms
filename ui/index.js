@@ -55,6 +55,9 @@ up({
     ready(afterDocumentReady)
   },
   requires: [C.I18n]
+}).catch(e => {
+  // eslint-disable-next-line no-console
+  console.error(`Canvas front-end did not successfully start! (${e.message})`)
 })
 
 const readinessTargets = [

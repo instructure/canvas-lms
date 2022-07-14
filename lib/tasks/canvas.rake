@@ -50,7 +50,8 @@ unless $canvas_tasks_loaded
         task "doc:api" if build_api_docs
         task "js:yarn_install" if npm_install
         task "js:gulp_rev" => [
-          ("js:yarn_install" if npm_install)
+          ("js:yarn_install" if npm_install),
+          ("i18n:generate_js" if build_i18n)
         ].compact
 
         if build_i18n
@@ -60,17 +61,11 @@ unless $canvas_tasks_loaded
         end
 
         if build_js && build_dev_js
-          task "js:webpack_development" => [
-            "js:gulp_rev",
-            ("i18n:generate_js" if build_i18n),
-          ]
+          task "js:webpack_development" => ["js:gulp_rev"]
         end
 
         if build_js && build_prod_js
-          task "js:webpack_production" => [
-            "js:gulp_rev",
-            ("i18n:generate_js" if build_i18n),
-          ]
+          task "js:webpack_production" => ["js:gulp_rev"]
         end
       end
 

@@ -18,6 +18,7 @@
 
 import IntlPolyfills from '../IntlPolyfills';
 import type { Capability } from '@instructure/updown';
+import { oncePerPage } from '@instructure/updown';
 import { useTranslations } from '@canvas/i18n';
 
 declare const ENV: {
@@ -42,11 +43,11 @@ const LocaleBackfill: Capability = {
 };
 
 // load the string translation file for this locale
-const Translations = {
-  up: async () => {
+const Translations: Capability = {
+  up: oncePerPage('translations', async () => {
     const {default: translations} = await import(`translations/${ENV.LOCALE}.json`);
     useTranslations(ENV.LOCALE, translations);
-  },
+  }),
   requires: [LocaleBackfill]
 };
 
