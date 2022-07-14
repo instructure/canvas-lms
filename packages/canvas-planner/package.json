@@ -121,7 +121,6 @@
     "identity-obj-proxy": "^3.0.0",
     "jest": "^26",
     "jest-canvas-mock": "^2",
-    "jest-environment-jsdom-fourteen": "^0.1.0",
     "jest-junit": "^7",
     "jest-moxios-utils": "^1",
     "lint-staged": "^9",

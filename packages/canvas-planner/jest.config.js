@@ -48,5 +48,5 @@ module.exports = {
       statements: 80
     }
   },
-  testEnvironment: 'jest-environment-jsdom-fourteen'
+  testEnvironment: 'jsdom'
 }
