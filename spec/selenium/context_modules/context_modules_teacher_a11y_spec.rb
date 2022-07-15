@@ -192,11 +192,11 @@ describe "context modules" do
       end
 
       before do
-        skip_if_chrome("skipped - research find html")
         get "/courses/#{@course.id}/modules"
 
         # focus the first item
         f("html").send_keys("j")
+        @active_element = driver.execute_script("return document.activeElement")
       end
 
       let(:context_modules) { ff(".context_module .collapse_module_link") }
@@ -217,48 +217,48 @@ describe "context modules" do
         # Navigate through modules and module items
         check_element_has_focus(context_modules[0])
 
-        send_keys(:arrow_down)
+        @active_element.send_keys(:arrow_down)
         check_element_has_focus(context_module_items[0])
 
-        send_keys("j")
+        @active_element.send_keys("j")
         check_element_has_focus(context_module_items[1])
 
-        send_keys("k")
+        @active_element.send_keys("k")
         check_element_has_focus(context_module_items[0])
 
-        send_keys(:arrow_up)
+        @active_element.send_keys(:arrow_up)
         check_element_has_focus(context_modules[0])
       end
 
       it "edits modules" do
-        send_keys("e")
+        @active_element.send_keys("e")
         expect(f("#add_context_module_form")).to be_displayed
       end
 
       it "creates a module" do
-        send_keys("n")
+        @active_element.send_keys("n")
         expect(f("#add_context_module_form")).to be_displayed
       end
 
       it "indents / outdent" do
-        send_keys(:arrow_down)
+        @active_element.send_keys(:arrow_down)
         check_element_has_focus(context_module_items[0])
 
         # Test Indent / Outdent
         expect(f(".context_module_item")).to have_class("indent_0")
 
-        send_keys("i")
+        @active_element.send_keys("i")
         wait_for_ajax_requests
         expect(f(".context_module_item")).to have_class("indent_1")
 
-        send_keys("o")
+        @active_element.send_keys("o")
         wait_for_ajax_requests
         expect(f(".context_module_item")).to have_class("indent_0")
       end
 
       it "deletes" do
         # Test Delete key
-        send_keys("d")
+        @active_element.send_keys("d")
         driver.switch_to.alert.accept
         expect(context_module_items).to have_size(2)
       end
