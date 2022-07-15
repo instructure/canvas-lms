@@ -88,7 +88,7 @@ describe('OutcomeManagementPanel', () => {
   })
 
   beforeAll(() => {
-    jest.setTimeout(10000)
+    jest.setTimeout(15000)
   })
 
   afterAll(() => {
