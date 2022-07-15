@@ -24,7 +24,13 @@ import OutcomeHeader from './OutcomeHeader'
 import StudentHeader from './StudentHeader'
 import ScoresGrid from './ScoresGrid'
 import {studentShape, outcomeShape, studentRollupsShape} from './shapes'
-import {COLUMN_WIDTH, STUDENT_COLUMN_RIGHT_PADDING, COLUMN_PADDING, CELL_HEIGHT} from './constants'
+import {
+  COLUMN_WIDTH,
+  STUDENT_COLUMN_WIDTH,
+  STUDENT_COLUMN_RIGHT_PADDING,
+  COLUMN_PADDING,
+  CELL_HEIGHT
+} from './constants'
 
 const Gradebook = ({courseId, students, outcomes, rollups}) => {
   const headerRow = useRef(null)
@@ -61,7 +67,7 @@ const Gradebook = ({courseId, students, outcomes, rollups}) => {
         </View>
       </Flex>
       <View display="flex">
-        <View as="div" minWidth={COLUMN_WIDTH + STUDENT_COLUMN_RIGHT_PADDING}>
+        <View as="div" minWidth={STUDENT_COLUMN_WIDTH + STUDENT_COLUMN_RIGHT_PADDING}>
           {students.map(student => (
             <View
               key={student.id}
@@ -70,7 +76,7 @@ const Gradebook = ({courseId, students, outcomes, rollups}) => {
               background="primary"
               borderWidth="0 0 small 0"
               height={CELL_HEIGHT}
-              width={COLUMN_WIDTH}
+              width={STUDENT_COLUMN_WIDTH}
             >
               <StudentCell courseId={courseId} student={student} />
             </View>
