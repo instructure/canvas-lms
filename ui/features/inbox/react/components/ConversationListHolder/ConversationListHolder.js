@@ -272,17 +272,16 @@ export const ConversationListHolder = ({
   }
 
   return (
-    <View
-      as="div"
-      height="100%"
-      overflowX="hidden"
-      overflowY="auto"
-      borderWidth="small"
-      data-testid={props.datatestid}
-    >
+    <View as="div" height="100%" overflowX="hidden" overflowY="auto" data-testid={props.datatestid}>
       {isLoading && !isLoadingMoreMenuData && renderLoading()}
       {(!isLoading || isLoadingMoreMenuData) && (
-        <View as="div" height="100%" overflowX="hidden" overflowY="auto" borderWidth="small">
+        <View
+          as="div"
+          height="100%"
+          overflowX="hidden"
+          overflowY="auto"
+          borderWidth="0 small small small"
+        >
           {renderedItems}
           {isLoadingMoreMenuData && renderLoading()}
         </View>

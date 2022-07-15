@@ -157,6 +157,7 @@ const MessageListActionContainer = props => {
       render={(responsiveProps, matches) => (
         <View
           as="div"
+          borderWidth="0 0 small 0"
           display="inline-block"
           width="100%"
           margin="none"
