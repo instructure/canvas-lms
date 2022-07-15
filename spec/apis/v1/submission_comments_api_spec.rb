@@ -74,6 +74,14 @@ describe "Submissions Comment API", type: :request do
       expect(response).not_to be_successful
     end
 
+    it "checks permissions for an assignment with a type of no submission and with the Assignment Enhancement - Student flag enabled" do
+      @assignment = @course.assignments.create! name: "Hello",
+                                                submission_types: "none"
+      @course.enable_feature!(:assignments_2_student)
+      preflight(name: "Hello World")
+      expect(response).to be_successful
+    end
+
     it "creates an attachment with the right the user_id" do
       preflight(name: "blah blah blah")
       expect(response).to be_successful
