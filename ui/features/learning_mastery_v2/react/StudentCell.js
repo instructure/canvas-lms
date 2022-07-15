@@ -21,6 +21,7 @@ import PropTypes from 'prop-types'
 import {Avatar} from '@instructure/ui-avatar'
 import {Flex} from '@instructure/ui-flex'
 import {Link} from '@instructure/ui-link'
+import {TruncateText} from '@instructure/ui-truncate-text'
 import {studentShape} from './shapes'
 
 const StudentCell = ({courseId, student}) => {
@@ -28,7 +29,7 @@ const StudentCell = ({courseId, student}) => {
   return (
     <>
       <Flex height="100%" alignItems="center" justifyItems="start">
-        <Flex.Item as="div" padding="0 0 0 small">
+        <Flex.Item as="div" padding="0 0 0 small" maxWidth="25%">
           <Avatar
             alt={student.display_name}
             as="div"
@@ -38,9 +39,9 @@ const StudentCell = ({courseId, student}) => {
             data-testid="student-avatar"
           />
         </Flex.Item>
-        <Flex.Item as="div" padding="0 small 0 small">
-          <Link isWithinText={false} href={student_grades_url}>
-            {student.display_name}
+        <Flex.Item as="div" padding="0 small 0 small" maxWidth="75%">
+          <Link isWithinText={false} href={student_grades_url} data-testid="student-cell-link">
+            <TruncateText>{student.display_name}</TruncateText>
           </Link>
         </Flex.Item>
       </Flex>

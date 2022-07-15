@@ -47,8 +47,8 @@ describe('StudentCell', () => {
 
   it('renders a link to the student learning mastery gradebook', () => {
     const props = defaultProps()
-    const {getByText} = render(<StudentCell {...props} />)
-    expect(getByText('Student Test').href).toMatch(
+    const {getByTestId} = render(<StudentCell {...props} />)
+    expect(getByTestId('student-cell-link').href).toMatch(
       `/courses/${props.courseId}/grades/${props.student.id}#tab-outcomes`
     )
   })

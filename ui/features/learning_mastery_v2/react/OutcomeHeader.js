@@ -32,7 +32,7 @@ const I18n = useI18nScope('learning_mastery_gradebook')
 const OutcomeHeader = ({title}) => (
   <View background="secondary" as="div" width={COLUMN_WIDTH} borderWidth="large 0 medium 0">
     <Flex alignItems="center" justifyItems="space-between" height={CELL_HEIGHT}>
-      <Flex.Item size="120px" padding="0 0 0 small">
+      <Flex.Item size="80%" padding="0 0 0 small">
         <TruncateText>
           <Text weight="bold">{title}</Text>
         </TruncateText>
