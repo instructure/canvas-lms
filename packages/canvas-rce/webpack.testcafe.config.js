@@ -22,13 +22,13 @@ const webpack = require('webpack')
 module.exports = {
   module: {
     rules: [
-      // this has been broken for a while and babel needs to be reconfigured for
-      // it without depending on @instructure/ui-babel-preset
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
         loader: 'babel-loader',
-        include: [path.resolve(__dirname, 'src'), path.resolve(__dirname, 'demo')]
+        options: {
+          "plugins": ["@babel/plugin-proposal-class-properties"]
+        }
       },
       {test: /(\.css$)/, include: /node_modules/, loaders: ['style-loader', 'css-loader']},
       {test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000'}

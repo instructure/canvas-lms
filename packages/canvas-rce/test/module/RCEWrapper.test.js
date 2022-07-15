@@ -21,7 +21,7 @@ import sinon from 'sinon'
 import Bridge from '../../src/bridge'
 import * as indicateModule from '../../src/common/indicate'
 import * as contentInsertion from '../../src/rce/contentInsertion'
-import {getCanvasUrl} from '../../src/rce/RCEApiSessionGetter'
+import * as RCEApiSessionGetter from '../../src/rce/RCEApiSessionGetter'
 
 import RCEWrapper, {
   mergeMenuItems,
@@ -102,7 +102,7 @@ describe('RCEWrapper', () => {
   //   SETUP & TEARDOWN
   // ====================
   before(() => {
-    sinon.stub(getCanvasUrl, 'getCanvasUrl').returns(Promise.resolve('http://canvas.docker'))
+    sinon.stub(RCEApiSessionGetter, 'getCanvasUrl').returns(Promise.resolve('http://canvas.docker'))
   })
 
   beforeEach(() => {
