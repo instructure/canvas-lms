@@ -125,15 +125,19 @@ module UserSearch
               end
             end
           end
-        if context.is_a?(Account)
-          users_scope =
-            if options[:enrollment_role_id].present? && options[:ui_invoked].present?
-              users_scope.joins(:enrollments).active
-            else
-              users_scope.joins(:not_removed_enrollments)
-            end
-        end
-        users_scope = users_scope.where(enrollments: { role_id: role_ids }).distinct
+        users_scope =
+          if context.is_a?(Account)
+            users_scope.where(
+              "users.id IN (
+                SELECT e.user_id
+                FROM #{Enrollment.quoted_table_name} e
+                WHERE e.role_id=?
+                AND e.workflow_state NOT IN ('rejected', 'inactive', 'deleted')
+              )", role_ids
+            )
+          else
+            users_scope.where(enrollments: { role_id: role_ids }).distinct
+          end
       elsif enrollment_types
         enrollment_types = enrollment_types.map do |e|
           ce = e.camelize
