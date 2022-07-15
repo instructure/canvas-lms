@@ -2162,6 +2162,7 @@ describe ConversationsController, type: :request do
       expect(@me.reload.unread_conversations_count).to eql(1)
 
       conversation_ids = conversations.map { |c| c.conversation.id }
+      allow(InstStatsd::Statsd).to receive(:count)
       json = api_call(:put, "/api/v1/conversations",
                       { controller: "conversations", action: "batch_update", format: "json" },
                       { event: "archive", conversation_ids: conversation_ids })
@@ -2171,6 +2172,8 @@ describe ConversationsController, type: :request do
       conversations.each do |c|
         expect(c.reload).to be_archived
       end
+      expect(InstStatsd::Statsd).to have_received(:count).with("inbox.conversation.archived.legacy", 3)
+      expect(InstStatsd::Statsd).not_to have_received(:count).with("inbox.conversation.archived.react")
       expect(@me.reload.unread_conversations_count).to eql(0)
     end
 

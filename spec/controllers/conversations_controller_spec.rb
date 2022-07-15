@@ -583,12 +583,16 @@ describe ConversationsController do
       course_with_student_logged_in(active_all: true)
       conversation(num_other_users: 2).update_attribute(:workflow_state, "unread")
 
+      allow(InstStatsd::Statsd).to receive(:increment)
       post "update", params: { id: @conversation.conversation_id, conversation: { subscribed: "0", workflow_state: "archived", starred: "1" } }
+
       expect(response).to be_successful
       @conversation.reload
       expect(@conversation.subscribed?).to be_falsey
       expect(@conversation).to be_archived
       expect(@conversation.starred).to be_truthy
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.archived.legacy")
+      expect(InstStatsd::Statsd).not_to have_received(:increment).with("inbox.conversation.archived.react")
     end
   end
 
