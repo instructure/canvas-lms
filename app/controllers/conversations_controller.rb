@@ -668,6 +668,7 @@ class ConversationsController < ApplicationController
   #   }
   def update
     if @conversation.update(params.require(:conversation).permit(*API_ALLOWED_FIELDS))
+      InstStatsd::Statsd.increment("inbox.conversation.archived.legacy") if params.require(:conversation)["workflow_state"] == "archived"
       render json: conversation_json(@conversation, @current_user, session)
     else
       render json: @conversation.errors, status: :bad_request

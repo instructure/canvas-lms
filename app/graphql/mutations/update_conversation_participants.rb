@@ -46,7 +46,7 @@ class Mutations::UpdateConversationParticipants < Mutations::BaseMutation
     # extends the methods used for updating attributes due to the
     # storage of data differing from what ActiveRecord expects
     conversation_participants.map { |cp| cp.update(update_params) }
-
+    InstStatsd::Statsd.count("inbox.conversation.archived.react", conversation_participants.count) if update_params[:workflow_state] == "archived"
     response = {}
     response[:conversation_participants] = conversation_participants if conversation_participants.any?
     response[:errors] = errors if errors.any?
