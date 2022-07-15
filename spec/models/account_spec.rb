@@ -738,7 +738,7 @@ describe Account do
 
     limited_access = %i[read read_as_admin manage update delete read_outcomes read_terms]
     conditional_access = RoleOverride.permissions.select { |_, v| v[:account_allows] }.map(&:first)
-    conditional_access += [:view_bounced_emails] # since this depends on :view_notifications
+    conditional_access += [:view_bounced_emails, :view_account_calendar_details] # since this depends on :view_notifications
     disabled_by_default = RoleOverride.permissions.select { |_, v| v[:true_for].empty? }.map(&:first)
     full_access = RoleOverride.permissions.keys +
                   limited_access - disabled_by_default - conditional_access +
@@ -779,8 +779,8 @@ describe Account do
       next unless k == :site_admin || k == :root
 
       account = v[:account]
-      expect(account.check_policy(hash[:sub][:admin])).to match_array(k == :site_admin ? [:read_global_outcomes] : [:read_outcomes, :read_terms])
-      expect(account.check_policy(hash[:sub][:user])).to match_array(k == :site_admin ? [:read_global_outcomes] : [:read_outcomes, :read_terms])
+      expect(account.check_policy(hash[:sub][:admin])).to match_array(k == :site_admin ? [:read_global_outcomes] : %i[read_outcomes read_terms])
+      expect(account.check_policy(hash[:sub][:user])).to match_array(k == :site_admin ? [:read_global_outcomes] : %i[read_outcomes read_terms])
     end
     hash.each do |k, v|
       next if k == :site_admin || k == :root
@@ -831,8 +831,8 @@ describe Account do
       next unless k == :site_admin || k == :root
 
       account = v[:account]
-      expect(account.check_policy(hash[:sub][:admin])).to match_array(k == :site_admin ? [:read_global_outcomes] : [:read_outcomes, :read_terms])
-      expect(account.check_policy(hash[:sub][:user])).to match_array(k == :site_admin ? [:read_global_outcomes] : [:read_outcomes, :read_terms])
+      expect(account.check_policy(hash[:sub][:admin])).to match_array(k == :site_admin ? [:read_global_outcomes] : %i[read_outcomes read_terms])
+      expect(account.check_policy(hash[:sub][:user])).to match_array(k == :site_admin ? [:read_global_outcomes] : %i[read_outcomes read_terms])
     end
     hash.each do |k, v|
       next if k == :site_admin || k == :root
@@ -1319,6 +1319,67 @@ describe Account do
       student_in_course
       expect(Account.default.grants_right?(@teacher, :read_outcomes)).to be_truthy
       expect(Account.default.grants_right?(@student, :read_outcomes)).to be_truthy
+    end
+
+    context "view_account_calendar_details permission" do
+      before :once do
+        Account.site_admin.enable_feature! :account_calendar_events
+        @account = Account.default
+      end
+
+      it "is true for an account admin on a visible calendar" do
+        @account.account_calendar_visible = true
+        @account.save!
+        account_admin_user(active_all: true, account: @account)
+        expect(@account.grants_right?(@admin, :view_account_calendar_details)).to be_truthy
+      end
+
+      it "is true for an account admin with :manage_account_calendar_visibility on a hidden calendar" do
+        account_admin_user(active_all: true, account: @account)
+        expect(@account.grants_right?(@admin, :view_account_calendar_details)).to be_truthy
+      end
+
+      it "is true for an account admin without :manage_account_calendar_visibility on a visible calendar" do
+        @account.account_calendar_visible = true
+        @account.save!
+        account_admin_user_with_role_changes(active_all: true, account: @account,
+                                             role_changes: { manage_account_calendar_visibility: false })
+        expect(@account.grants_right?(@admin, :view_account_calendar_details)).to be_truthy
+      end
+
+      it "is false for an account admin without :manage_account_calendar_visibility on a hidden calendar" do
+        account_admin_user_with_role_changes(active_all: true, account: @account,
+                                             role_changes: { manage_account_calendar_visibility: false })
+        expect(@account.grants_right?(@admin, :view_account_calendar_details)).to be_falsey
+      end
+
+      it "is true for an account admin on a random subaccount" do
+        subaccount = @account.sub_accounts.create!
+        account_admin_user(active_all: true, account: @account)
+        expect(subaccount.grants_right?(@admin, :view_account_calendar_details)).to be_truthy
+      end
+
+      it "is true for a student only on associated accounts with a visible calendar" do
+        subaccount1 = @account.sub_accounts.create!
+        subaccount2 = @account.sub_accounts.create!
+        [@account, subaccount1, subaccount2].each do |a|
+          a.account_calendar_visible = true
+          a.save!
+        end
+        course_with_student(active_all: true, account: subaccount1)
+        expect(@account.grants_right?(@student, :view_account_calendar_details)).to be_truthy
+        expect(subaccount1.grants_right?(@student, :view_account_calendar_details)).to be_truthy
+        expect(subaccount2.grants_right?(@student, :view_account_calendar_details)).to be_falsey
+      end
+
+      it "is false for a student on associated accounts with hidden calendars" do
+        @account.account_calendar_visible = true
+        @account.save!
+        subaccount = @account.sub_accounts.create!
+        course_with_student(active_all: true, account: subaccount)
+        expect(@account.grants_right?(@student, :view_account_calendar_details)).to be_truthy
+        expect(subaccount.grants_right?(@student, :view_account_calendar_details)).to be_falsey
+      end
     end
   end
 

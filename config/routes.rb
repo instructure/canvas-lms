@@ -1052,6 +1052,13 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/student_view_student", action: :student_view_student
     end
 
+    scope(controller: :account_calendars_api) do
+      get "account_calendars", action: :index, as: :account_calendars
+      get "account_calendars/:account_id", action: :show, as: :account_calendar
+      put "account_calendars/:account_id", action: :update, as: :update_account_calendar
+      get "accounts/:account_id/account_calendars", action: :all_calendars, as: :all_account_calendars
+    end
+
     scope(controller: :account_notifications) do
       post "accounts/:account_id/account_notifications", action: :create, as: "account_notification"
       put "accounts/:account_id/account_notifications/:id", action: :update, as: "account_notification_update"
