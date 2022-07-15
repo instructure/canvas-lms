@@ -221,6 +221,7 @@ module.exports = function transformThemeableStyles({ types: t }) {
   function nodeHasRenderMethod(node) {
     if (node.callee && node.callee.name === '_createClass') {
       return (
+        node.arguments[1] &&
         node.arguments[1].elements &&
         node.arguments[1].elements.some((el) => isRenderProperty(el))
       )
@@ -232,6 +233,7 @@ module.exports = function transformThemeableStyles({ types: t }) {
   function nodeIsMissingDisplayName(node) {
     if (node.callee && node.callee.name === '_createClass') {
       return (
+        node.arguments[1] &&
         node.arguments[1].elements &&
         !node.arguments[1].elements.some((el) => isDisplayName(el))
       )
