@@ -217,6 +217,7 @@ ca:
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "Una taula de respostes y estadístiques breus sobre les respostes triades pels estudiants."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Una taula que conté les dades de l'esquema de qualificació. Cada fila conté un nom, un percentatge màxim i un percentatge mínim. A més, cada fila conté un botó per afegir una fila nova a sota i un botó per suprimir la fila actual."
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "Una taula que conté les dades de l'esquema de qualificació. Primer hi ha un nom de l'esquema de qualificació i els botons per editar o suprimir l'esquema. Cada fila conté un nom, un percentatge màxim i un percentatge mínim. A més, cada fila conté un botó per afegir una fila nova a sota i un botó per suprimir la fila actual."
+  a_timeout_occurred_contacting_external_authenticat_c064ea48: "S’ha superat el temps d'espera en contactar amb el servei d’autenticació extern"
   a_z_243c3301: A–Z
   a_z_29d8e67c: "A - Z"
   ability_to_submit_annotatable_document_assignments_5bc5edd3: "Capacitat per entregar tasques de documents amb anotacions."
@@ -1008,6 +1009,10 @@ ca:
                 check_box: "CSV de grups"
               pseudonyms: 
                 check_box: "CSV de pseudònims"
+              question_bank_questions: 
+                check_box: "Preguntes del banc de preguntes"
+              question_banks: 
+                check_box: "Bancs de preguntes"
               sections: 
                 check_box: "CSV de seccions"
               terms: 
@@ -1869,6 +1874,7 @@ ca:
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Tots els camps de dates han de ser en el present i tenir el format correcte"
   all_day_fb42c4fc: "Tot el dia"
   all_discussion_entries_report_c1e02906: "Informe de totes les entrades en fòrums"
+  all_events_6ae4331b: "Tots els esdeveniments"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Heu acabat?  És hora de publicar l'assignatura!  Feu clic al botó següent per fer-ho oficial! En publicar l'assignatura, els usuaris hi podran començar a participar."
   all_gradeable_student_submissions_report_d11ee705: "Informe de totes les entregues d’estudiants qualificables"
   all_grades_hidden_3092d5b5: "Totes les notes estan amagades"
@@ -1893,6 +1899,7 @@ ca:
   all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "Tots els resultats de %{groupTitle} s'han afegit correctament a l'assignatura."
   all_outcomes_from_grouptitle_have_been_successfull_6267efe4: "Tots els resultats de %{groupTitle} s’han afegit correctament a %{targetGroupTitle}."
   all_outcomes_from_grouptitle_have_been_successfull_cb6ad008: "Tots els resultats de %{groupTitle} s'han afegit correctament a l'usuari."
+  all_quiz_submissions_9519d342: "Totes les entregues de proves"
   all_quiz_submissions_report_72a6d2fa: "Informe de totes les entregues de proves"
   all_roles_f3bba14d: "Tots els rols"
   all_rubrics_5114c466: "Totes les rúbriques"
@@ -2829,6 +2836,7 @@ ca:
   appointment_groups_bd225e60: "Grups de cites"
   appointments_dcb41d23: Cites
   approved_c3b285d4: Aprovat
+  approximate_quiz_sessions_e522a3a1: "Sessions de proves aproximades"
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} amb precisió %{precision}"
   apps_54d24a47: Aplicacions
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Les aplicacions són una manera fàcil d'afegir noves característiques al Canvas. Es poden afegir en assignatures individuals o a totes les assignatures d'un usuari. Un cop configurades, hi podeu enllaçar a través dels continguts de l'assignatura i crear activitats per a les eines d'avaluació."
@@ -3839,6 +3847,7 @@ ca:
   back_to_title_39e7a8f4: "Torna a %{title}"
   background_color_b92b52ac: "Color del fons"
   background_image_1a401e1a: "Imatge de fons"
+  bank_grouped_quiz_submissions_479ad830: "Entregues de proves agrupades per bancs"
   banner_image_id_is_not_a_valid_id_21ecc6: "banner_image_id no és un ID vàlid"
   banner_image_url_and_banner_image_id_cannot_both_b_955615f5: "banner_image_url i banner_image_id no es poden establir a la vegada."
   banner_image_url_is_not_a_valid_url_830d7926: "banner_image_url no és un URL vàlid"
@@ -7123,6 +7132,8 @@ ca:
   create_file_s_188549e6: "[ Crea fitxer(s) ]"
   create_files_after_rce_media_upload_recording_77d75a96: "Crear fitxers després de carregar/enregistrar elements multimèdia a l’RCE"
   create_group_set_7fe1cd53: "Crea un conjunt de grups"
+  create_groups_later_6ce36058: "Crea els grups més endavant"
+  create_groups_now_d59bf70b: "Crea grups ara"
   create_interactive_course_content_76665336: "Creeu contingut de l'assignatura interactiu"
   create_live_event_subscriptions_on_toolproxy_7c8378b1: "Crear subscripcions a esdeveniments en directe a ToolProxy"
   create_lookup_7ceb6d90: "Crea una consulta"
@@ -7559,6 +7570,7 @@ ca:
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Definiu el text que ha d'anar abans i després del desplegable i creeu un conjunt de possibles respostes."
   delay_posting_this_topic_until_aa483eec: "Endarrereix la publicació d'aquest tema fins al"
   delayed_until_58b7af4b: "Retardat fins a:"
+  delete_8d6d2222: "Suprimeix: "
   delete_a6efa79d: Suprimeix
   delete_account_name_96aee330: "Suprimeix %{account_name}"
   delete_alignment_f33c97d5: "Suprimeix l'alineació"
@@ -7586,6 +7598,7 @@ ca:
   delete_domain_5ba75b7c: "Suprimeix el domini"
   delete_domain_domain_c5b68f5: "Suprimeix el domini %{domain}"
   delete_entry_title_5e59727b: "Suprimeix l'entrada %{title}"
+  delete_failed_6285e600: "No s'ha pogut suprimir"
   delete_feedname_1ac9a4a4: "Suprimeix %{feedName}"
   delete_filter_83ca1a6a: "Suprimeix el filtre"
   delete_from_all_accounts_a1c5e621: "Suprimeix de TOTS els comptes"
@@ -7654,6 +7667,7 @@ ca:
       Aquesta acció és irreversible. Segur que voleu suprimir %{file}?
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "La supressió d'un usuari destruirà tots els seus ePortfolios. Alternativament, els ePortfolios es poden marcar individualment com a \"correu brossa\" o com a \"segurs\" per modificar-ne la visibilitat."
   deleting_assignment_22d5851d: "s'està suprimint l'activitat"
+  deleting_b896f5f: "s'està suprimint"
   delicious_7f9ac66f: Delicious
   denmark_45_929d5d34: "Dinamarca (+45)"
   deployment_id_fc270280: "ID d'implementació"
@@ -9097,6 +9111,7 @@ ca:
   example_https_schoolofrock_edu_d4326f03: "exemple: “https://schoolofrock.edu”\""
   example_item_scores_6726c689: "Puntuacions dels elements d'exemple"
   example_school_of_rock_41f32c31: "exemple: “School of Rock”\""
+  exceeded_the_maximum_length_number_characters_2d25611e: "S’ha superat la longitud màxima (%{number} caràcters)"
   exceeds_expectations_5910fc3a: "Supera les expectatives"
   exceeds_mastery_1f995dce: "Supera el domini"
   excelsior_student_activity_tracking_7a1ba44d: "Seguiment de l’activitat dels estudiants d’Excelsior"
@@ -11775,6 +11790,7 @@ ca:
   limit_course_participation_to_term_or_custom_cours_67797a86: "Voleu limitar la participació a l'assignatura al període acadèmic o a dates de l'assignatura personalitzades?"
   limit_each_time_slot_to_input_value_user_s_47461538: "Limita cada interval de temps a %{input_value} usuari(s). "
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "Limita cada interval de temps a %{num_participants} *grups.* **usuaris.**"
+  limit_group_members_to_leave_blank_for_no_limit_c341e248: "Limiteu els membres del grup a (deixeu el camp en blanc si no hi ha cap límit)"
   limit_groups_to_group_limit_members_40651ea7: "Limita els grups a %{group_limit} membres"
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "Limita l'assistència dels participants a %{num_appointments} cita(es)."
   limit_search_to_activity_after_c1ac2449: "Limita la cerca a l'activitat després de"
@@ -15059,6 +15075,7 @@ ca:
   number_of_members_per_group_6beaef7b: "Nombre de membres per grup"
   number_of_respondents_e1e7e8b: "Número d'usuaris que han respost"
   number_of_scores_to_ignore_for_each_student_fb94e818: "Número de puntuacions per ignorar de cada estudiant"
+  number_of_students_per_group_8abe7189: "Nombre d'estudiants per grup"
   numerical_answer_ec7120bf: "Resposta numèrica"
   nummastered_of_numgroup_mastered_b8113c9c: "%{numMastered} de %{numGroup} han assolit el domini"
   o_224cf405: o
@@ -19928,7 +19945,9 @@ ca:
   speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Divideix
   split_merged_users_6b81c595: "Divideix els usuaris fusionats"
+  split_number_of_students_per_group_4a05f76f: "Dividiu el nombre d'estudiants per grup"
   split_student_names_df0ef806: "Divideix els noms dels estudiants"
+  split_students_by_number_of_groups_5ace5a6a: "Dividiu els estudiants per nombre de grups"
   split_students_into_groups_with_num_members_studen_c49d5136: "Dividiu els estudiants en grups amb %{num_members} estudiants per grup"
   split_students_into_num_groups_groups_e9854f16: "Dividiu els estudiants en %{num_groups} grups"
   splitting_disabled_reached_maximum_of_three_assign_716acb13: "Desactivada la funció de divisió: s'ha arribat al màxim de tres grups d'activitats en un interval de puntuació"
@@ -20861,6 +20880,7 @@ ca:
   the_following_outcomes_cannot_be_removed_because_t_1c4b8ef9: 
     one: "El resultat següent no es pot suprimir perquè està alineat amb el contingut. Anul·leu-ne la selecció i torneu-ho a provar."
     other: "Els resultats següents no es poden suprimir perquè estan alineats amb el contingut. Anul·leu-ne la selecció i torneu-ho a provar."
+  the_following_recipients_have_no_active_enrollment_17395ab4: "Els destinataris següents no tenen cap inscripció activa a l’assignatura, %{invalid_recipients}, no s’ha pogut enviar cap missatge"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
       Els usuaris següents tenen canvis no desats a les seves entregues de la prova: 
       
@@ -21168,6 +21188,7 @@ ca:
   this_account_does_not_allow_for_microsoft_teams_sy_266f11c7: "Aquest usuari no permet que s’habiliti la sincronització de Microsoft Teams. Habiliteu la marca de la característica «Sincronització de la inscripció al grup de Microsoft» abans d’editar la configuració."
   this_account_doesn_t_allow_for_microsoft_teams_syn_744dbd76: "Aquest compte no permet habilitar la sincronització per a Microsoft Teams. Habiliteu la marca de característica “Sincronització de la inscripció al grup de Microsoft” abans d’editar la configuració"
   this_allows_the_user_to_unfavorite_a_course_direct_828d0587: "Permet a l'usuari suprimir un curs dels preferits directament des de la targeta del tauler."
+  this_and_all_following_events_4b4b283: "Aquest i tots els esdeveniments següents"
   this_announcement_will_not_be_visible_until_delaye_88f7f5c: "Aquest anunci no serà visible fins al %{delayedPostAt}."
   this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: "Aquesta àrea la utilitzarà l'avaluador per deixar comentaris sobre aquest criteri."
   this_assignment_does_not_count_toward_the_final_gr_a5c238e2: "Aquesta activitat només compta per a la nota final."
@@ -21220,6 +21241,7 @@ ca:
   this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Aquest ePortfolio s'ha identificat com a possible correu brossa. Actualment només ho poden veure els administradors i l'autor. Si esteu segur que aquest contingut no és correu brossa, podeu marcar-lo com a segur. Altrament, el podeu confirmar com a correu brossa."
   this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Aquest ePortfolio s'ha identificat com a correu brossa i només és visible per a vós. Poseu-vos en contacte amb l'administrador si teniu alguna pregunta."
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Aquest ePortfolio s'ha identificat com a correu brossa. Actualment només ho poden veure els administradors i l'autor. Si esteu segur que aquest contingut no és correu brossa, podeu marcar-lo com a segur."
+  this_event_b437db90: "Aquest esdeveniment"
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: "Aquesta característica afecta les dades existents de totes les assignatures de l'usuari."
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: "Aquesta característica afecta les dades existents d’un usuari sencer."
   this_feature_allows_teachers_to_create_anonymous_d_ea364dca: "Aquesta característica permet als professors crear fòrums anònims i habilitar una configuració a l'assignatura perquè els estudiants creïn fòrums anònims"
@@ -21598,6 +21620,7 @@ ca:
     new_caledonia: "Nova Caledònia"
     new_delhi: "Nova Dehli"
     newfoundland: Terranova
+    norfolk_island: "Illa Norfolk"
     noronha: Noronha
     novosibirsk: Novossibirsk
     nukualofa: Nuku'alofa
@@ -21716,6 +21739,7 @@ ca:
     learning_outcomes: "Resultats d'aprenentatge"
     messages: Missatges
     outcome_artifacts: "Artefactes de resultats"
+    topic: Tema
     view_in_separate_window: "Mostra en una finestra independent"
   tls_7a2eaba5: TLS
   to_1126ab55: " al"
