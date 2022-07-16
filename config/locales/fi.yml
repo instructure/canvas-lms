@@ -226,6 +226,7 @@ fi:
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "Vastaustaulukko ja lyhyt tilasto opiskelijan vastausten perusteella."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Taulukko, jossa on arviointiasteikon tiedot. Jokainen rivi sisältää nimen, maksimiprosenttiosuuden ja minimiprosenttiosuuden. Lisäksi jokainen rivi sisältää painikkeen, jolla voi lisätä uuden rivin nykyisen alapuolelle sekä painikkeen nykyisen rivin poistamiseen."
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "Taulukko, jossa on arviointiasteikon tiedot. Ensin on arvosanojen antomallin nimi ja painikkeet mallin muokkaukseen tai poistoon. Jokainen rivi sisältää nimen, maksimiprosenttiosuuden ja minimiprosenttiosuuden. Lisäksi jokainen rivi sisältää painikkeen, jolla voi lisätä uuden rivin nykyisen alapuolelle sekä painikkeen nykyisen rivin poistamiseen."
+  a_timeout_occurred_contacting_external_authenticat_c064ea48: "Ilmeni aikakatkaisu yhdistettäessä ulkoiseen todennuspalveluun"
   a_z_243c3301: A–Ö
   a_z_29d8e67c: A-Ö
   ability_to_submit_annotatable_document_assignments_5bc5edd3: "Mahdollisuus lähettää asiakirjatehtäviä, joihin voidaan lisätä huomautuksia."
@@ -1023,6 +1024,10 @@ fi:
                 check_box: "Ryhmät CSV"
               pseudonyms: 
                 check_box: "Salanimien CSV"
+              question_bank_questions: 
+                check_box: "Kysymyspankin kysymykset"
+              question_banks: 
+                check_box: Kysymyspankit
               sections: 
                 check_box: "Osiot CSV"
               terms: 
@@ -1910,6 +1915,7 @@ fi:
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Kaikkien päivämääräkenttien täytyy olla läsnä ja muotoiltu oikein"
   all_day_fb42c4fc: "Koko päivä"
   all_discussion_entries_report_c1e02906: "Kaikkien keskustelumerkintöjen raportti"
+  all_events_6ae4331b: "Kaikki tapahtumat"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Onko kaikki valmista?  Aika julkaista kurssisi!  Julkaise kurssi napsauttamalla alla olevaa painiketta! Julkaisun jälkeen käyttäjät pääsevät osallistumaan kurssille."
   all_gradeable_student_submissions_report_d11ee705: "Kaikkien opiskelijan arvosteltavissa olevien palautusten raportti"
   all_grades_hidden_3092d5b5: "Kaikki arvosanat piilotettu"
@@ -1934,6 +1940,7 @@ fi:
   all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "Kaikki %{groupTitle} tulosta on lisätty onnistuneesti tähän kurssiin."
   all_outcomes_from_grouptitle_have_been_successfull_6267efe4: "Kaikki tulokset kohteesta %{groupTitle} on lisätty onnistuneesti kohteeseen %{targetGroupTitle}."
   all_outcomes_from_grouptitle_have_been_successfull_cb6ad008: "Kaikki %{groupTitle} tulosta on lisätty onnistuneesti tälle tilille."
+  all_quiz_submissions_9519d342: "Kaikki testin lähetykset"
   all_quiz_submissions_report_72a6d2fa: "Kaikkien testin palautusten raportti"
   all_roles_f3bba14d: "Kaikki roolit"
   all_rubrics_5114c466: "Kaikki arviointitaulukot"
@@ -3046,6 +3053,7 @@ fi:
   appointment_groups_bd225e60: Tapaamisryhmät
   appointments_dcb41d23: Tapaamiset
   approved_c3b285d4: Hyväksytty
+  approximate_quiz_sessions_e522a3a1: "Arvioidut testi-istunnot"
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} tarkkuudella %{precision}"
   apps_54d24a47: Sovellukset
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Sovellukset ovat helppo tapa lisätä uusia ominaisuuksia Canvasiin. Niitä voidaan lisätä yksittäisille kursseille tai kaikille tilin kursseille. Kun ne on määritetty, voit linkittää ne kurssimoduuleihin ja luoda arviointityökaluilla tehtäviä."
@@ -4151,6 +4159,7 @@ fi:
   back_to_title_39e7a8f4: "Takaisin kohteeseen %{title}"
   background_color_b92b52ac: Taustaväri
   background_image_1a401e1a: Taustakuva
+  bank_grouped_quiz_submissions_479ad830: "Pankin mukaan ryhmitellyt testin lähetykset"
   banner_image_id_is_not_a_valid_id_21ecc6: "banner_image_id ei ole voimassa oleva tunnus"
   banner_image_url_and_banner_image_id_cannot_both_b_955615f5: "banner_image_url ja banner_image_id eivät voi olla valittuina samanaikaisesti."
   banner_image_url_is_not_a_valid_url_830d7926: "banner_image_url ei ole voimassa oleva URL"
@@ -7603,6 +7612,8 @@ fi:
   create_file_s_188549e6: "[ Luo tiedosto(t) ]"
   create_files_after_rce_media_upload_recording_77d75a96: "Luo tiedostot RCE Media -latauksen/nauhoituksen jälkeen"
   create_group_set_7fe1cd53: "Luo ryhmäjoukko"
+  create_groups_later_6ce36058: "Luo ryhmät myöhemmin"
+  create_groups_now_d59bf70b: "Luo ryhmät heti"
   create_interactive_course_content_76665336: "Luo interaktiivista kurssisisältöä"
   create_live_event_subscriptions_on_toolproxy_7c8378b1: "Luo live-tapahtuman tilaukset on ToolProxyssa"
   create_lookup_7ceb6d90: "Luo haku"
@@ -8052,6 +8063,7 @@ fi:
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Määritä pudotusvalikon edellä ja perässä oleva teksti ja määritä eri vastausvaihtoehdot."
   delay_posting_this_topic_until_aa483eec: "Lähetä tämä aihe viiveellä, ajankohtana: "
   delayed_until_58b7af4b: "Viivästetty tähän asti:"
+  delete_8d6d2222: "Poista: "
   delete_a143a2ab: poista
   delete_a6efa79d: Poista
   delete_account_name_96aee330: "Poista %{account_name}"
@@ -8080,6 +8092,7 @@ fi:
   delete_domain_5ba75b7c: "Poista verkkotunnus"
   delete_domain_domain_c5b68f5: "Poista verkkotunnus %{domain}"
   delete_entry_title_5e59727b: "Poista merkintä %{title}"
+  delete_failed_6285e600: "Poisto epäonnistunut"
   delete_feedname_1ac9a4a4: "Poista %{feedName}"
   delete_filter_83ca1a6a: "Poista suodatin"
   delete_from_all_accounts_a1c5e621: "Poista KAIKISTA tileistä"
@@ -8150,6 +8163,7 @@ fi:
       Tätä toimintoa ei voi peruuttaa. Haluatko varmasti poistaa kohteen %{file}?
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "Käyttäjän poistaminen poistaa kaikki hänen ePortfolionsa. Vaihtoehtoisesti ePortfoliot voidaan merkitä yksilöllisesti joko ’roskapostiksi’ tai ’turvalliseksi’ jolloin niiden näkyvyyttä saadaan muutettua."
   deleting_assignment_22d5851d: "Tehtävää poistetaan"
+  deleting_b896f5f: poistetaan
   delicious_7f9ac66f: Delicious
   denmark_45_929d5d34: "Tanska (+45)"
   deployment_id_fc270280: "Käyttöönoton tunnus"
@@ -9664,6 +9678,7 @@ fi:
   example_https_schoolofrock_edu_d4326f03: "Esimerkki: \"https://schoolofrock.edu\""
   example_item_scores_6726c689: "Esimerkkikohteen pistemäärät"
   example_school_of_rock_41f32c31: "Esimerkki: \"School of Rock\""
+  exceeded_the_maximum_length_number_characters_2d25611e: "Maksimipituus ylitetty (%{number} merkkiä)"
   exceeds_expectations_5910fc3a: "On ylittänyt odotukset"
   exceeds_mastery_1f995dce: "Erinomainen osaaminen"
   excelsior_student_activity_tracking_7a1ba44d: "Excelsior Student Activity Tracking"
@@ -12669,6 +12684,7 @@ fi:
   limit_course_participation_to_term_or_custom_cours_67797a86: "Rajoitetaanko kurssin osallistuminen jaksoon tai mukautettuihin kurssipäiviin?"
   limit_each_time_slot_to_input_value_user_s_47461538: "Rajoita jokaisen tapaamisajan osallistujamäärä %{input_value} henkilöön. "
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "Rajoita jokainen ajankohta %{num_participants} *ryhmälle.* **käyttäjää.**"
+  limit_group_members_to_leave_blank_for_no_limit_c341e248: "Rajoita ryhmän jäsenet (jätä tyhjäksi, jos rajaa ei ole)"
   limit_groups_to_group_limit_members_40651ea7: "Rajoita ryhmät %{group_limit} jäseneen"
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "Rajoita osallistujien osallistumista %{num_appointments} tapaamiseen."
   limit_search_to_activity_after_c1ac2449: "Rajoita hakua aktiviteettiin jälkeen"
@@ -16057,6 +16073,7 @@ fi:
   number_of_members_per_group_6beaef7b: "Jäsenien määrä ryhmää kohti"
   number_of_respondents_e1e7e8b: "Vastaajien määrä"
   number_of_scores_to_ignore_for_each_student_fb94e818: "Pistemäärien määrä, joita ei oteta huomioon kullakin opiskelijalla"
+  number_of_students_per_group_8abe7189: "Opiskelijoiden määrä ryhmää kohti"
   number_to_grade_661b05dd: "%{number} arvosanaan"
   number_unsubmitted_145fefae: "%{number} lähetys kumottu"
   numerical_answer_ec7120bf: "Numeerinen vastaus"
@@ -21340,7 +21357,9 @@ fi:
   speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Jaa
   split_merged_users_6b81c595: "Jaa yhdistetyt käyttäjät"
+  split_number_of_students_per_group_4a05f76f: "Jaa opiskelijoiden määrä ryhmää kohti"
   split_student_names_df0ef806: "Jaa opiskelijoiden nimet"
+  split_students_by_number_of_groups_5ace5a6a: "Jaa opiskelijat ryhmien määrän perusteella"
   split_students_into_groups_with_num_members_studen_c49d5136: "Jaa opiskelijat %{num_members} opiskelijan ryhmiin."
   split_students_into_num_groups_groups_e9854f16: "Jaa opiskelijat %{num_groups} ryhmään"
   splitting_disabled_reached_maximum_of_three_assign_716acb13: "Jako poistettu käytöstä: saavutettu kolmen tehtäväryhmän maksimi pistemäärävälillä"
@@ -22307,6 +22326,7 @@ fi:
   the_following_outcomes_cannot_be_removed_because_t_1c4b8ef9: 
     one: "Seuraavaa tulosta ei voida poistaa, koska se on linjattu sisältöön. Poista valinta ja yritä uudelleen."
     other: "Seuraavia tuloksia ei voida poistaa, koska se on linjattu sisältöön. Poista niiden valinta ja yritä uudelleen."
+  the_following_recipients_have_no_active_enrollment_17395ab4: "Seuraavilla vastaanottajilla ei ole aktiivista ilmoittautumista kurssille, %{invalid_recipients}, viestien lähettäminen ei onnistu"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
       Seuraavilla opiskelijoilla on tallentamattomia muutoksia testin palautuksessa: 
       
@@ -22626,6 +22646,7 @@ fi:
   this_account_does_not_allow_for_microsoft_teams_sy_266f11c7: "Tämä tili ei salli Microsoft Teams -synkronisaation ottamista käyttöön. Ota \"Microsoft Group -rekisteröinnin synkronisaatio” -ominaisuus käyttöön ennen kuin muokkaat asetuksia"
   this_account_doesn_t_allow_for_microsoft_teams_syn_744dbd76: "Tämä tili ei salli Microsoft Teams -synkronisaation ottamista käyttöön. Ota \"Microsoft Group -rekisteröinnin synkronisaatio” -ominaisuus käyttöön ennen kuin muokkaat asetuksia"
   this_allows_the_user_to_unfavorite_a_course_direct_828d0587: "Tämän avulla käyttäjä voi poistaa kurssin suosikkikursseistaan suoraan koontinäytön kortista."
+  this_and_all_following_events_4b4b283: "Tämä ja kaikki seuraavat tapahtumat"
   this_announcement_will_not_be_visible_until_delaye_88f7f5c: "Tämä teksti ei ole näkyvissä ennen %{delayedPostAt}."
   this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: "Arvioija käyttää tätä aluetta jättääkseen tähän kriteeriin liittyviä kommentteja."
   this_assignment_does_not_count_toward_the_final_gr_a5c238e2: "Tätä tehtävää ei oteta huomioon lopullisessa arvosanassa."
@@ -22678,6 +22699,7 @@ fi:
   this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Tämä ePortfolio on tunnistettu mahdolliseksi roskapostiksi. Se on parhaillaan näkyvissä vain pääkäyttäjille ja sen tekijälle. Jos olet varma siitä, että sisältö ei ole roskapostia, voit merkitä sen turvalliseksi. Muuten voit vahvistaa sen roskapostiksi."
   this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Tämä ePortfolio on tunnistettu roskapostiksi, ja se on näkyvissä vain sinulle. Jos sinulla on kysyttävää, ota yhteyttä pääkäyttäjään."
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Tämä ePortfolio on tunnistettu roskapostiksi. Se näkyy tällä hetkellä vain pääkäyttäjille ja sen tekijälle. Jos olet varma siitä, että sisältö ei ole roskapostia, voit merkitä sen turvalliseksi."
+  this_event_b437db90: "Tämä tapahtuma"
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: "Tämä ominaisuus vaikuttaa kaikkien tilien olemassa oleviin tietoihin."
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: "Tämä ominaisuus vaikuttaa koko tilin olemassa oleviin tietoihin."
   this_feature_allows_teachers_to_create_anonymous_d_ea364dca: "Tämän ominaisuuden avulla opettajat voivat luoda nimettömiä keskusteluita ja ottaa käyttöön kurssitason asetuksia opiskelijoille, jotta nämä voivat luoda nimettömiä keskusteluita"
@@ -23076,6 +23098,7 @@ fi:
     new_caledonia: Uusi-Kaledonia
     new_delhi: "New Delhi"
     newfoundland: Newfoundland
+    norfolk_island: Norfolkinsaari
     noronha: Noronha
     novosibirsk: Novosibirsk
     nukualofa: Nuku'alofa
@@ -23194,6 +23217,7 @@ fi:
     learning_outcomes: Osaamistulokset
     messages: Viestit
     outcome_artifacts: "Arvioinnin kohteet"
+    topic: Aihe
     view_in_separate_window: "Tarkastele erillisessä ikkunassa"
   tls_7a2eaba5: TLS
   to_1126ab55: " -"
