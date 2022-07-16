@@ -236,6 +236,7 @@ is:
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "Tafla með svörum og töluágripi varðandi svör nemenda."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Tafla með einkunnakvarðai.  Í hverri línu er nafn, hámarkshlutfall og lágmarkshlutfall. Að auki er í hverri línu hnappur til að bæta við nýrri röð fyrir neðan og hnappur til að eyða núverandi röð."
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "Tafla sem inniheldur gögn um einkunnakvarða. Fyrst er heiti einkunnakvarðans og hnappar til að breyta og eyða kvarðanum. Hver lína inniheldur heiti, hámarksprósentu og lágmarksprósentu. Að auki inniheldur hver lína hnapp til að bæta við nýrri línu fyrir neðan og hnapp til að eyða fyrirliggjandi línu."
+  a_timeout_occurred_contacting_external_authenticat_c064ea48: "Tímalokun kom upp við að hafa samband við ytri staðfestingarþjónustu"
   a_z_243c3301: A–Ö
   a_z_29d8e67c: A-Ö
   ability_to_submit_annotatable_document_assignments_5bc5edd3: "Hægt að skila verkefnaskjölum með útskýringum."
@@ -1227,6 +1228,10 @@ is:
                 check_box: "CSV hópa"
               pseudonyms: 
                 check_box: "CSV dulnefna"
+              question_bank_questions: 
+                check_box: "Spurningar úr spurningabanka"
+              question_banks: 
+                check_box: Spurningabankar
               sections: 
                 check_box: "CSV hluta"
               terms: 
@@ -2150,6 +2155,7 @@ is:
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Allir dagsetningareitir þurfa að vera til staðar og rétt sniðnir"
   all_day_fb42c4fc: "Allan dag"
   all_discussion_entries_report_c1e02906: "Skýrsla yfir allar umræðufærslur"
+  all_events_6ae4331b: "Allir viðburðir"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Allt búið? Tímabært að birta námskeiðið! Smelltu á hnappinn fyrir neðan til að opinbera það! Birting gerir notendum kleift að hefja þátttöku í námskeiðinu."
   all_get_scopes_59a54304: "Öll GET umföng"
   all_gradeable_student_submissions_report_d11ee705: "Skýrsla yfir öll skil nemenda sem fá einkunnir"
@@ -2176,6 +2182,7 @@ is:
   all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "Öllum niðurstöðum úr %{groupTitle} hefur verið bætt við þetta námskeið."
   all_outcomes_from_grouptitle_have_been_successfull_6267efe4: "Öllum niðurstöðum úr %{groupTitle} hefur verið bætt við %{targetGroupTitle}."
   all_outcomes_from_grouptitle_have_been_successfull_cb6ad008: "Öllum niðurstöðum úr %{groupTitle} hefur verið bætt við þennan reikning."
+  all_quiz_submissions_9519d342: "Allar tilraunir til próftöku"
   all_quiz_submissions_report_72a6d2fa: "Skýrsla yfir öll prófskil"
   all_roles_f3bba14d: "Öll hlutverk"
   all_rubrics_5114c466: "Öll matsviðmið"
@@ -3353,6 +3360,7 @@ is:
   appointment_groups_bd225e60: Fundahópar
   appointments_dcb41d23: Fundir
   approved_c3b285d4: Samþykkt
+  approximate_quiz_sessions_e522a3a1: "Áætlaðir próftímar"
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value}með nákvæmninni %{precision}"
   apps_54d24a47: Smáforrit
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Smáforrit eru auðveld leið til að bæta við nýjum þáttum í Canvas. Þeim má bæta við einstök námskeið eða öll námskeið á reikningi. Eftir samstillingu er hægt að tengja á þá gegnum námskeiðs námsefni og stofna verkefni fyrir matstæki."
@@ -4556,6 +4564,7 @@ is:
   back_to_title_39e7a8f4: "Aftur í %{title}"
   background_color_b92b52ac: Bakgrunnslitur
   background_image_1a401e1a: Bakgrunnsmynd
+  bank_grouped_quiz_submissions_479ad830: "Tilraunir til próftöku eftir bönkum"
   banner_image_id_is_not_a_valid_id_21ecc6: "banner_image_id er ekki gilt auðkenni"
   banner_image_url_and_banner_image_id_cannot_both_b_955615f5: "banner_image_url og banner_image_id geta ekki verið stillt samtímis."
   banner_image_url_is_not_a_valid_url_830d7926: "banner_image_url er ekki gild vefslóð"
@@ -8229,6 +8238,8 @@ is:
   create_file_s_188549e6: "[ Búa til skrá(r) ]"
   create_files_after_rce_media_upload_recording_77d75a96: "Býr til skrár eftir upphleðslu/upptöku á RCE-miðli"
   create_group_set_7fe1cd53: "Búa til hópasett"
+  create_groups_later_6ce36058: "Búa til hópa síðar"
+  create_groups_now_d59bf70b: "Búa til hópa núna"
   create_interactive_course_content_76665336: "Búðu til gagnvirkt námskeiðsefni"
   create_live_event_subscriptions_on_toolproxy_7c8378b1: "Búa til áskrift að viðburðum í beinni á ToolProxy"
   create_lookup_7ceb6d90: "Búa til uppflettingu"
@@ -8676,6 +8687,7 @@ is:
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Skilgreina texta til að fara á fyrir og eftir fellingu og búa til sett af mögulegum svörum."
   delay_posting_this_topic_until_aa483eec: "Seinka birtingu umræðuefnis þar til"
   delayed_until_58b7af4b: "Frestað þar til:"
+  delete_8d6d2222: "Eyða: "
   delete_a143a2ab: eyða
   delete_a6efa79d: Eyða
   delete_account_name_96aee330: "Eyða %{account_name}"
@@ -8704,6 +8716,7 @@ is:
   delete_domain_5ba75b7c: "Eyða léni"
   delete_domain_domain_c5b68f5: "Eyða léni %{domain}"
   delete_entry_title_5e59727b: "Eyða færslu %{title}"
+  delete_failed_6285e600: "Ekki tókst að eyða"
   delete_feedname_1ac9a4a4: "Eyða %{feedName}"
   delete_filter_83ca1a6a: "Eyða síu"
   delete_from_all_accounts_a1c5e621: "Eyða af ÖLLUM reikningum"
@@ -8778,6 +8791,7 @@ is:
       Ekki er hægt að afturkalla þessa aðgerð. Viltu örugglega eyða %{file}?
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "Ef notanda er eytt eyðast öll ePortfolio hans. Annars er hægt að merkja ePortfolio sem „amaefni“ eða „örugg“ til að breyta sýnileika þeirra."
   deleting_assignment_22d5851d: "eyði verkefni"
+  deleting_b896f5f: eyðir
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Sýnissvæði krefjast endurstillingar á Recaptcha. Ráðgastu við svæðisstjórnandann þinn varðandi þetta tilvik í Canvas."
   demos: 
@@ -10484,6 +10498,7 @@ is:
   example_https_schoolofrock_edu_d4326f03: "dæmi: \"https://schoolofrock.edu\""
   example_item_scores_6726c689: "Dæmi um atriðiseinkunnir"
   example_school_of_rock_41f32c31: "dæmi: \"School of Rock\""
+  exceeded_the_maximum_length_number_characters_2d25611e: "Fór yfir hámarkslengd (%{number} stafi)"
   exceeds_expectations_5910fc3a: "Fer fram úr væntingum"
   exceeds_mastery_1f995dce: "Fer fram úr tileinkun"
   excelsior_student_activity_tracking_7a1ba44d: "Excelsior rakning virkni nemanda"
@@ -13691,6 +13706,7 @@ is:
   limit_course_participation_to_term_or_custom_cours_67797a86: "Takmarka þátttöku í námskeiðinu við önn eða sérsniðnar námskeiðsdagsetningar?"
   limit_each_time_slot_to_input_value_user_s_47461538: "Takmarka hverja tímarauf við %{input_value} notanda (notendur). "
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "Takmarka hverja tímarauf við %{num_participants} *hópa.* **notendur.**"
+  limit_group_members_to_leave_blank_for_no_limit_c341e248: "Takmarka meðlimi hóps við (skilja eftir autt fyrir engin takmörk)"
   limit_groups_to_group_limit_members_40651ea7: "Takmarka hópa við %{group_limit} meðlimi"
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "Takmarka þátttakendur við mætingu á %{num_appointments} fund(i)."
   limit_search_to_activity_after_c1ac2449: "Takmarka leit við virkni eftir"
@@ -17228,6 +17244,7 @@ is:
   number_of_members_per_group_6beaef7b: "Fjöldi meðlima í hverjum hóp"
   number_of_respondents_e1e7e8b: "Fjöldi svarenda"
   number_of_scores_to_ignore_for_each_student_fb94e818: "Fjöldi einkunna sem á að hunsa fyrir hvern nemanda"
+  number_of_students_per_group_8abe7189: "Fjöldi nemenda í hverjum hóp"
   number_to_grade_661b05dd: "%{number} til að gefa einkunn"
   number_unsubmitted_145fefae: "%{number} óframlagt"
   numerical_answer_ec7120bf: "Tölulegt svar"
@@ -22810,7 +22827,9 @@ is:
   speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Skipta
   split_merged_users_6b81c595: "Skipta sameinuðum notendum"
+  split_number_of_students_per_group_4a05f76f: "Skipta fjölda nemenda í hverjum hóp"
   split_student_names_df0ef806: "Skipta nöfnum nemenda"
+  split_students_by_number_of_groups_5ace5a6a: "Skipta fjölda nemenda eftir fjölda hópa"
   split_students_into_groups_with_num_members_studen_c49d5136: "Skipta nemendum í hópa með %{num_members} nemendum í hverjum hópi"
   split_students_into_num_groups_groups_e9854f16: "Skipta nemendum í %{num_groups} hópa"
   splitting_disabled_reached_maximum_of_three_assign_716acb13: "Skipting óvirk: hámarki þriggja verkefnahópa í sviði einkunna náð"
@@ -23810,6 +23829,7 @@ is:
   the_following_outcomes_cannot_be_removed_because_t_1c4b8ef9: 
     one: "Eftirfarandi niðurstöðu er ekki hægt að fjarlægja af því að hún er samstillt við efni. Vinsamlegast afveldu hana og reyndu aftur."
     other: "Eftirfarandi niðurstöður er ekki hægt að fjarlægja af því að þær eru samstilltar við efni. Vinsamlegast afveldu þær og reyndu aftur."
+  the_following_recipients_have_no_active_enrollment_17395ab4: "Eftirfarandi viðtakendur hafa enga virka skráningu á námskeiðið, %{invalid_recipients}, geta ekki sent skilaboð"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
       Eftirfarandi nemendur eru með óvistaðar breytingar á innsendingu skyndiprófs: 
       
@@ -24148,6 +24168,7 @@ is:
                      Þetta verður virkjað með uppfærðri efnisöryggisstefnu (CSP).
                      Lénum verður bætt við hvítlista þinn með getunni á að bæta lénum við handvirkt.
                      Það er 100 léna hámark á hvítlistanum.
+  this_and_all_following_events_4b4b283: "Þessi og allir eftirfarandi viðburðir"
   this_announcement_will_not_be_visible_until_delaye_88f7f5c: "Þessi tilkynning verður ekki sýnileg fyrr en %{delayedPostAt}."
   this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: "Þetta svæði verður notað af prófdómara til að gera athugasemdir tengdar þessari viðmiðun."
   this_assignment_does_not_count_toward_the_final_gr_29ede05f: "Þetta verkefni er ekki með í lokaeinkunn"
@@ -24203,6 +24224,7 @@ is:
   this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Þessi ePortfolio var einangruð sem mögulegt amaefni. Núna er hún aðeins sýnileg stjórnendum og höfundi. Ef þú ert viss um að efnið sé ekki amaefni, getur þú merkt hana örugga. Annars getur þú staðfest hana sem amaefni."
   this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Þessi ePortfolio var merkt sem amaefni og aðeins þú sérð hana. Hafðu samband við stjórnanda ef þú hefur einhverjar spurningar."
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Þessi ePortfolio var einangruð sem amaefni. Núna er hún aðeins sýnileg stjórnendum og höfundi. Ef þú ert viss um að efnið sé ekki amaefni, getur þú merkt hana örugga."
+  this_event_b437db90: "Þessi viðburður"
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: "Þessi eiginleiki hefur áhrif á fyrirliggjandi gögn fyrir öll námskeið í reikningnum."
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: "Þessi eiginleiki hefur áhrif á fyrirliggjandi gögn fyrir heilan reikning."
   this_feature_allows_teachers_to_create_anonymous_d_ea364dca: "Þessi eiginleiki leyfir kennurum að búa til nafnlausar umræður og gerir kennurum kleift að virkja námskeiðsstigsstillingu fyrir nemendur til að búa til nafnlausar umræður"
@@ -24620,6 +24642,7 @@ is:
     new_caledonia: "Nýja Kaledónía"
     new_delhi: "Nýja Delí"
     newfoundland: Nýfundnaland
+    norfolk_island: "Norfolk eyja"
     noronha: Noronha
     novosibirsk: Novosibirsk
     nukualofa: Nuku'alofa
@@ -24738,6 +24761,7 @@ is:
     learning_outcomes: Námsniðurstöður
     messages: Skilaboð
     outcome_artifacts: Niðurstöðugripir
+    topic: Efni
     view_in_separate_window: "Skoða í öðrum glugga"
   tls_7a2eaba5: TLS
   to_1126ab55: " til"
