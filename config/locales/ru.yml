@@ -254,6 +254,7 @@ ru:
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "Таблица, содержащая данные схемы оценок. Каждая строка содержит имя, минимальное и максимальное процентное значение. Кроме того, каждая строка содержит значок добавления новой строки снизу и значок удаления текущей строки."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Таблица, содержащая данные схемы оценок. Каждая строка содержит имя, минимальное и максимальное процентное значение. Кроме того, каждая строка содержит кнопку для добавления новой строки снизу и кнопку для удаления текущей строки."
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "Таблица, которая содержит данные схем выставления оценок. Сначала следует имя схемы выставления оценок и кнопки для редактирования и удаления схемы. Каждый ряд содержит имя, максимальное и минимальное процентное значение. Кроме того, каждый ряд содержит кнопку для добавления нового ряда ниже и кнопку для удаления текущего ряда."
+  a_timeout_occurred_contacting_external_authenticat_c064ea48: "Произошел тайм-аут при обращении к внешней службе аутентификации"
   a_z_243c3301: A–Z
   a_z_29d8e67c: "A - Z"
   ability_to_submit_annotatable_document_assignments_5bc5edd3: "Возможность отправки заданий аннотированных документов."
@@ -1272,6 +1273,10 @@ ru:
                 check_box: "CSV групп"
               pseudonyms: 
                 check_box: "CSV псевдонимов"
+              question_bank_questions: 
+                check_box: "Вопрос из банка вопросов"
+              question_banks: 
+                check_box: "Банки вопросов"
               sections: 
                 check_box: "CSV разделов"
               terms: 
@@ -2271,6 +2276,7 @@ ru:
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Все поля с датами должны присутствовать и быть правильно отформатированными"
   all_day_fb42c4fc: "Весь день"
   all_discussion_entries_report_c1e02906: "Отчет обо всех записях для обсуждения"
+  all_events_6ae4331b: "Все события"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Все закончили? Пришло время опубликовать ваш курс! Нажмите кнопку ниже, чтобы сделать его официальным! После публикации другие пользователи смогут принимать участие в вашем курсе."
   all_get_scopes_59a54304: "Все рамки GET"
   all_gradeable_student_submissions_report_d11ee705: "Отчет обо всех оцениваемых представленных данных студентов"
@@ -2298,6 +2304,7 @@ ru:
   all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "Все результаты от %{groupTitle} были успешно добавлены в этот курс."
   all_outcomes_from_grouptitle_have_been_successfull_6267efe4: "Все результаты от %{groupTitle} были успешно добавлены в %{targetGroupTitle}."
   all_outcomes_from_grouptitle_have_been_successfull_cb6ad008: "Все результаты от %{groupTitle} были успешно добавлены в эту учетную от запись."
+  all_quiz_submissions_9519d342: "Все отправки тестов"
   all_quiz_submissions_report_72a6d2fa: "Отчет обо всех сведениях о сданных контрольных работах"
   all_roles_f3bba14d: "Все роли"
   all_rubrics_5114c466: "Все рубрики"
@@ -3507,6 +3514,7 @@ ru:
   appointment_groups_bd225e60: "Группы должностей"
   appointments_dcb41d23: "Назначенные встречи"
   approved_c3b285d4: Утверждено
+  approximate_quiz_sessions_e522a3a1: "Примерные сессии тестов"
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} с точностью %{precision}"
   apps_54d24a47: Приложения
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Приложения являются простым способом добавления новых функций в Canvas. Они могут добавляться к отдельному курсу, либо ко всем курсам учетной записи. После настройки вы можете связать их с помощью модулей курса и создать задания для инструментов проверки знаний."
@@ -4898,6 +4906,7 @@ ru:
   back_to_title_39e7a8f4: "Вернуться к %{title}"
   background_color_b92b52ac: "Цвет фона"
   background_image_1a401e1a: "Фоновая картинка"
+  bank_grouped_quiz_submissions_479ad830: "Сгруппированные по банкам отправки тестов"
   banner_image_id_is_not_a_valid_id_21ecc6: "banner_image_id не является верным ID"
   banner_image_url_and_banner_image_id_cannot_both_b_955615f5: "banner_image_url и banner_image_id не могут быть заданы."
   banner_image_url_is_not_a_valid_url_830d7926: "banner_image_url не является верным URL"
@@ -9067,6 +9076,8 @@ ru:
   create_file_s_188549e6: "[ Создать файл(-ы) ]"
   create_files_after_rce_media_upload_recording_77d75a96: "Создать файлы после загрузки/записи RCE Media"
   create_group_set_7fe1cd53: "Создать набор групп"
+  create_groups_later_6ce36058: "Создать группы позднее"
+  create_groups_now_d59bf70b: "Создать группы сейчас"
   create_interactive_course_content_76665336: "Создайте интерактивный контент для учебного курса"
   create_item_base: 
     there_was_an_error: "Произошла ошибка при сохранении \"%{title}\". Пожалуйста, повторите попытку."
@@ -9586,6 +9597,7 @@ ru:
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Определите текст перед и после раскрывающегося списка си создайте набор возможных ответов."
   delay_posting_this_topic_until_aa483eec: "Отложить размещение этой темы до"
   delayed_until_58b7af4b: "Отложено до:"
+  delete_8d6d2222: "Удалить: "
   delete_a143a2ab: удалить
   delete_a6efa79d: Удалить
   delete_account_name_96aee330: "Удалить %{account_name}"
@@ -9615,6 +9627,7 @@ ru:
   delete_domain_5ba75b7c: "Удалить домен"
   delete_domain_domain_c5b68f5: "Удалить домен %{domain}"
   delete_entry_title_5e59727b: "Удалить запись %{title}"
+  delete_failed_6285e600: "Ошибка удаления"
   delete_feedname_1ac9a4a4: "Удалить %{feedName}"
   delete_filter_83ca1a6a: "Удалить фильтр"
   delete_from_all_accounts_a1c5e621: "Удалить из ВСЕХ учетных записей"
@@ -9694,6 +9707,7 @@ ru:
       Данное действие является необратимым. Вы действительно хотите удалить %{file}?
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "Удаление пользователя приведет к удалению всех его ePortfolio. В качестве альтернативы ePortfolio можно индивидуально отметить как «спам» или «безопасное» для изменения режима доступа к ним для просмотра."
   deleting_assignment_22d5851d: "удаление задания"
+  deleting_b896f5f: удаление
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Демонстрационные сайты требуют определения настроек Recaptcha. Обратитесь к администратору сайта с вопросами о данных настройках Canvas."
   demos: 
@@ -11557,6 +11571,7 @@ ru:
   example_https_schoolofrock_edu_d4326f03: "пример: \"https://schoolofrock.edu\""
   example_item_scores_6726c689: "Пример оценок за элемент"
   example_school_of_rock_41f32c31: "пример: «Школа рока»"
+  exceeded_the_maximum_length_number_characters_2d25611e: "Превышена максимальная длина (%{number} символа(-ов))"
   exceeds_expectations_5910fc3a: "Превышает ожидания"
   exceeds_mastery_1f995dce: "Превышает проходной балл"
   excelsior_student_activity_tracking_7a1ba44d: "Отслеживание активности студентов Excelsior"
@@ -15506,6 +15521,7 @@ ru:
   limit_each_time_slot_to_input_value_user_s_47461538: "Ограничить каждый временной интервал %{input_value} пользователями. "
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "Ограничить каждый временной интервал до %{num_participants} *групп.* **пользователи.**"
   limit_file_size_limit_per_file_b336c0d8: "лимит %{file_size_limit} для одного файла"
+  limit_group_members_to_leave_blank_for_no_limit_c341e248: "Ограничить количество членов группы до (оставьте поле пустым, если ограничение не требуется)"
   limit_groups_to_group_limit_members_40651ea7: "Ограничить группы до %{group_limit} членов"
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "Ограничить участников для участия в %{num_appointments} мероприятии (мероприятиях)."
   limit_search_to_activity_after_c1ac2449: "Ограничить поиск до событий после"
@@ -19478,6 +19494,7 @@ ru:
   number_of_members_per_group_6beaef7b: "Количество участников в группе"
   number_of_respondents_e1e7e8b: "Количество респондентов"
   number_of_scores_to_ignore_for_each_student_fb94e818: "Число игнорируемых оценок для каждого учащегося"
+  number_of_students_per_group_8abe7189: "Количество студентов в группе"
   number_to_grade_661b05dd: "%{number} оценить"
   number_unsubmitted_145fefae: "%{number} не отправлено"
   numerical_answer_ec7120bf: "Числовой ответ"
@@ -25811,7 +25828,9 @@ ru:
   speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Разделение
   split_merged_users_6b81c595: "Разделить объединенных пользователей"
+  split_number_of_students_per_group_4a05f76f: "Разделить количество студентов на группу"
   split_student_names_df0ef806: "Разделить имена студентов"
+  split_students_by_number_of_groups_5ace5a6a: "Разделить студентов по количеству групп"
   split_students_into_groups_with_num_members_studen_c49d5136: "Разделить студентов на группы по %{num_members} студента(-ов) в группе"
   split_students_into_num_groups_groups_e9854f16: "Разбить учащихся на %{num_groups} групп(ы)"
   splitting_disabled_reached_maximum_of_three_assign_716acb13: "Разбивка на группы невозможна: количество групп заданий в диапазоне оценок достигло максимально допустимого значения (3)"
@@ -26884,6 +26903,7 @@ ru:
     many: "Следующие результаты не могут быть удалены, так как они согласованы с содержанием. Уберите флажок выбора для них и попробуйте еще раз."
     one: "Следующий результат не может быть удален, так как он согласован с содержанием. Уберите флажок выбора и попробуйте еще раз."
     other: "Следующие результаты не могут быть удалены, так как они согласованы с содержанием. Уберите флажок выбора для них и попробуйте еще раз."
+  the_following_recipients_have_no_active_enrollment_17395ab4: "Следующие получатели не имеют действующего зачисления на курс, %{invalid_recipients}, невозможно отправить сообщения"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
       Следующие студенты имеют несохраненные изменения в отправленных контрольных работах: 
       
@@ -27248,6 +27268,7 @@ ru:
                      Он будет включен после обновления политики защиты информации.
                      Домены будут добавлены к вашему белому списку с возможностью ручного добавления доменов.
                      В белый список можно добавить максимум 100 доменов.
+  this_and_all_following_events_4b4b283: "Это и все последующие события"
   this_announcement_will_not_be_visible_until_delaye_88f7f5c: "Данное объявление будет отображаться только после %{delayedPostAt}."
   this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: "Эта область будет использоваться экспертом для создания комментариев, относящихся к этому критерию."
   this_assignment_does_not_count_toward_the_final_gr_29ede05f: "Это задание не учитывается при определении итоговой оценке успеваемости"
@@ -27307,6 +27328,7 @@ ru:
   this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Это ePortfolio было идентифицировано как «возможный спам». В настоящее время оно доступно для просмотра только для администраторов и автора. Если вы уверены, в том, что данный контент не является спамом, вы можете пометить его как «безопасное». Либо вы можете подтвердить, что это спам."
   this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Это ePortfolio было идентифицировано как «спам», доступ к его просмотру имеется только у вас. При наличии вопросов обращайтесь к администратору."
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Это ePortfolio было идентифицировано как « спам». В настоящее время оно доступно для просмотра только для администраторов и автора. Если вы уверены, в том, что данный контент не является спамом, вы можете пометить его как «безопасное»."
+  this_event_b437db90: "Это событие"
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: "Эта функция влияет на существующие данные для всех курсов в учетной записи."
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: "Эта функция влияет на существующие данные для всей учетной записи."
   this_feature_allows_teachers_to_create_anonymous_d_ea364dca: "Эта функция позволяет преподавателям создавать анонимные обсуждения и включить настройку на уровне курса, чтобы учащиеся могли создавать анонимные обсуждения."
@@ -27734,6 +27756,7 @@ ru:
     new_caledonia: "Новая Каледония"
     new_delhi: Нью-Дели
     newfoundland: Ньюфаундленд
+    norfolk_island: "Остров Норфолк"
     noronha: Норонха
     novosibirsk: Новосибирск
     nukualofa: Нукуалофа
@@ -27853,6 +27876,7 @@ ru:
     messages: Сообщения
     outcome_artifacts: "Искажения результата"
     people: Пользователи
+    topic: Тема
     view_in_separate_window: "Просмотреть в отдельном окне"
   tls_7a2eaba5: TLS
   to_1126ab55: " к"
