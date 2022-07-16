@@ -245,6 +245,7 @@ cy:
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "Tabl sy’n cynnwys atebion ac ystadegau cryno ynghylch yr atebion mae myfyrwyr wedi’u dewis."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Tabl sy’n cynnwys data’r cynllun graddau. Mae pob rhes yn cynnwys enw, canran fwyaf a chanran isaf. Hefyd, mae pob rhes yn cynnwys botwm i ychwanegu rhes newydd oddi tanodd, a botwm i ddileu’r rhes bresennol."
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "Tabl sy’n cynnwys data’r cynllun graddau. Y cyntaf yw enw’r cynllun graddau a botymau i olygu a dileu’r cynllun. Mae pob rhes yn cynnwys enw, canran fwyaf a chanran isaf. Hefyd, mae pob rhes yn cynnwys botwm i ychwanegu rhes newydd oddi tanodd, a botwm i ddileu’r rhes bresennol."
+  a_timeout_occurred_contacting_external_authenticat_c064ea48: "Wedi cyrraedd y terfyn amser wrth gysylltu â’r gwasanaeth awdurdodi allanol"
   a_z_243c3301: A–Z
   a_z_29d8e67c: "A - Z"
   ability_to_submit_annotatable_document_assignments_5bc5edd3: "Y gallu i gyflwyno aseiniadau dogfennau mae modd eu hanodi."
@@ -1086,6 +1087,10 @@ cy:
                 check_box: "CSV Grwpiau"
               pseudonyms: 
                 check_box: "CSV Ffugenw"
+              question_bank_questions: 
+                check_box: "Cwestiynau Banc Cwestiynau"
+              question_banks: 
+                check_box: "Banciau Cwestiynau"
               sections: 
                 check_box: "CSV Adrannau"
               terms: 
@@ -2004,6 +2009,7 @@ cy:
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Mae’n rhaid i bob maes dyddiad fod yn bresennol a chael ei fformatio’n gywir"
   all_day_fb42c4fc: "Drwy’r Dydd"
   all_discussion_entries_report_c1e02906: "Adroddiad o Bob Cofnod Trafodaeth"
+  all_events_6ae4331b: "Pob digwyddiad"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Wedi gorffen?  Mae’n bryd cyhoeddi’ch cwrs!  Cliciwch y botwm isod i’w wneud yn swyddogol! Yn sgil ei gyhoeddi, bydd y defnyddwyr yn gallu dechrau cymryd rhan yn y cwrs."
   all_get_scopes_59a54304: "Pob cwmpas GET"
   all_gradeable_student_submissions_report_d11ee705: "Adroddiad o Bob Cyflwyniad Myfyriwr y mae modd eu graddio"
@@ -2029,6 +2035,7 @@ cy:
   all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "Mae pob deilliant o %{groupTitle} wedi’u hychwanegu’n llwyddiannus at y cwrs hwn."
   all_outcomes_from_grouptitle_have_been_successfull_6267efe4: "Mae pob deilliant o %{groupTitle} wedi’u hychwanegu’n llwyddiannus at %{targetGroupTitle}."
   all_outcomes_from_grouptitle_have_been_successfull_cb6ad008: "Mae pob deilliant o %{groupTitle} wedi’u hychwanegu’n llwyddiannus at y cyfrif hwn."
+  all_quiz_submissions_9519d342: "Pob Cyflwyniad Cwis"
   all_quiz_submissions_report_72a6d2fa: "Adroddiad o Bob Cyflwyniad Cwis"
   all_roles_f3bba14d: "Pob Rôl"
   all_rubrics_5114c466: "Pob cyfarwyddyd sgorio"
@@ -3208,6 +3215,7 @@ cy:
   appointment_groups_bd225e60: "Grwpiau Apwyntiad"
   appointments_dcb41d23: Apwyntiadau
   approved_c3b285d4: "Wedi cymeradwyo"
+  approximate_quiz_sessions_e522a3a1: "Sesiynau Cwis Bras"
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} yn fanwl %{precision}"
   apps_54d24a47: Apiau
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Mae apiau’n ffordd hawdd o ychwanegu nodweddion newydd at Canvas. Mae modd eu hychwanegu at gyrsiau unigol, neu at bob cwrs mewn cyfrif. Ar ôl eu ffurfweddu, gallwch eu cysylltu â modiwlau cyrsiau a chreu aseiniadau ar gyfer adnoddau asesu."
@@ -4414,6 +4422,7 @@ cy:
   back_to_title_39e7a8f4: "Yn ôl i’r %{title}"
   background_color_b92b52ac: "Lliw'r Cefndir"
   background_image_1a401e1a: "Delwedd y Cefndir"
+  bank_grouped_quiz_submissions_479ad830: "Cyflwyniadau Cwis wedi’u Grwpio yn ôl Banc"
   banner_image_id_is_not_a_valid_id_21ecc6: "Dydy banner_image_id ddim yn ID dilys"
   banner_image_url_and_banner_image_id_cannot_both_b_955615f5: "Dydy banner_image_url a banner_image_id ddim yn gallu cael eu gosod gyda’i gilydd."
   banner_image_url_is_not_a_valid_url_830d7926: "Dydy banner_image_url ddim yn URL dilys"
@@ -8086,6 +8095,8 @@ cy:
   create_file_s_188549e6: "[ Creu Ffeiliau ]"
   create_files_after_rce_media_upload_recording_77d75a96: "Creu Ffeiliau ar ôl Llwytho i Fyny/Recordio Cyfryngau RCE"
   create_group_set_7fe1cd53: "Creu Set Grwpiau"
+  create_groups_later_6ce36058: "Creu grwpiau yn nes ymlaen"
+  create_groups_now_d59bf70b: "Creu grwpiau nawr"
   create_interactive_course_content_76665336: "Creu cynnwys cwrs rhyngweithiol"
   create_live_event_subscriptions_on_toolproxy_7c8378b1: "Creu tanysgrifiadau digwyddiadau byw ar ToolProxy"
   create_lookup_7ceb6d90: "Creu Chwilio am Barth"
@@ -8568,6 +8579,7 @@ cy:
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Diffiniwch y testun a fydd yn ymddangos cyn ac ar ôl y gwymplen, a chreu set o atebion posib."
   delay_posting_this_topic_until_aa483eec: "Peidio â phostio’r pwnc hwn tan"
   delayed_until_58b7af4b: "Dal yn ôl tan:"
+  delete_8d6d2222: "Dileu: "
   delete_a143a2ab: dileu
   delete_a6efa79d: Dileu
   delete_account_name_96aee330: "Dileu %{account_name}"
@@ -8596,6 +8608,7 @@ cy:
   delete_domain_5ba75b7c: "Dileu parth"
   delete_domain_domain_c5b68f5: "Dileu parth %{domain}"
   delete_entry_title_5e59727b: "Dileu cofnod %{title}"
+  delete_failed_6285e600: "Wedi methu dileu"
   delete_feedname_1ac9a4a4: "Dileu %{feedName}"
   delete_filter_83ca1a6a: "Dileu hidlydd"
   delete_from_all_accounts_a1c5e621: "Dileu o BOB cyfrif"
@@ -8669,6 +8682,7 @@ cy:
       Nid oes modd dadwneud hyn. Ydych chi’n siŵr eich bod eisiau dileu %{file}?
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "Bydd dileu defnyddiwr yn dinistrio eu e-Bortffolios. Neu, mae modd marcio e-Bortffolios fel 'sbam' neu 'diogel' i newid a ydynt yn weladwy ai peidio."
   deleting_assignment_22d5851d: "Wrthi'n dileu aseiniad"
+  deleting_b896f5f: "wrthi’n dileu"
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Mae angen ffurfweddu gosodiadau ReCAPTCHA ar gyfer safleoedd enghreifftiol. Holwch weinyddwr eich safle ynghylch y fersiwn hon o Canvas."
   demos: 
@@ -10379,6 +10393,7 @@ cy:
   example_https_schoolofrock_edu_d4326f03: "enghraifft: \"https://schoolofrock.edu\""
   example_item_scores_6726c689: "Sgoriau eitem enghreifftiol"
   example_school_of_rock_41f32c31: "enghraifft: \"School of Rock\""
+  exceeded_the_maximum_length_number_characters_2d25611e: "Yn hirach na’r hyd hiraf (%{number} nod)"
   exceeds_expectations_5910fc3a: "Mwy na Bodloni Disgwyliadau"
   exceeds_mastery_1f995dce: "Yn well na’r lefel meistroli"
   excelsior_student_activity_tracking_7a1ba44d: "Tracio Gweithgareddau Myfyrwyr Excelsior"
@@ -13511,6 +13526,7 @@ cy:
   limit_course_participation_to_term_or_custom_cours_67797a86: "Cyfyngu cymryd rhan mewn cwrs i dymor neu ddyddiadau cwrs penodol?"
   limit_each_time_slot_to_input_value_user_s_47461538: "Cyfyngu pob slot amser i %{input_value} defnyddiwr. "
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "Cyfyngu pob slot amser i %{num_participants} *grŵp.* **defnyddiwr.**"
+  limit_group_members_to_leave_blank_for_no_limit_c341e248: "Cyfyngu aelodau grŵp i (gadael yn wag i beidio â rhoi terfyn)"
   limit_groups_to_group_limit_members_40651ea7: "Cyfyngu grwpiau i %{group_limit} aelod"
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "Rhwystro rhag mynd i fwy na %{num_appointments} apwyntiad."
   limit_search_to_activity_after_c1ac2449: "Cyfyngu’r broses chwilio i weithgarwch ar ôl"
@@ -17056,6 +17072,7 @@ cy:
   number_of_members_per_group_6beaef7b: "Nifer yr aelodau ym mhob grŵp"
   number_of_respondents_e1e7e8b: "Nifer yr ymatebwyr"
   number_of_scores_to_ignore_for_each_student_fb94e818: "Nifer y sgoriau i'w hanwybyddu ar gyfer pob myfyriwr"
+  number_of_students_per_group_8abe7189: "Nifer y myfyrwyr ym mhob grŵp"
   number_to_grade_661b05dd: "%{number} i raddio"
   number_unsubmitted_145fefae: "%{number} heb eu cyflwyno"
   numerical_answer_ec7120bf: "Ateb Rhifol"
@@ -22612,7 +22629,9 @@ cy:
   speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Hollti
   split_merged_users_6b81c595: "Hollti Defnyddwyr wedi’u Cyfuno"
+  split_number_of_students_per_group_4a05f76f: "Rhannu nifer y myfyrwyr ym mhob grŵp"
   split_student_names_df0ef806: "Hollti Enwau Myfyrwyr"
+  split_students_by_number_of_groups_5ace5a6a: "Rhannu myfyrwyr yn ôl nifer y grwpiau"
   split_students_into_groups_with_num_members_studen_c49d5136: "Rhannu myfyrwyr yn grwpiau gyda %{num_members} myfyriwr ymhob grŵp"
   split_students_into_num_groups_groups_e9854f16: "Rhannu myfyrwyr yn %{num_groups} grŵp"
   splitting_disabled_reached_maximum_of_three_assign_716acb13: "Nodwedd hollti wedi'i hanalluogi: wedi cyrraedd uchafswm o dri grŵp o aseiniadau mewn ystod sgorio"
@@ -23624,6 +23643,7 @@ cy:
     one: "Does dim modd tynnu’r deilliant canlynol oherwydd mae wedi’i alinio i’r cynnwys. Dad-ddewiswch y deilliant a rhowch gynnig arall arni."
     other: "Does dim modd tynnu’r deilliannau canlynol oherwydd maen nhw wedi’i alinio i’r cynnwys. Dad-ddewiswch y deilliannau a rhowch gynnig arall arni."
     two: "Does dim modd tynnu’r deilliannau canlynol oherwydd maen nhw wedi’i alinio i’r cynnwys. Dad-ddewiswch y deilliannau a rhowch gynnig arall arni."
+  the_following_recipients_have_no_active_enrollment_17395ab4: "Does gan y derbynwyr canlynol ddim ymrestriadau gweithredol ar y cwrs, %{invalid_recipients},doedd dim modd anfon y neges"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
       Mae gan y myfyrwyr canlynol newidiadau heb eu cadw i’r cwisiau maen nhw am eu cyflwyno.
       
@@ -23969,6 +23989,7 @@ cy:
                      Bydd hyn yn cael ei alluogi gan Bolisi Diogelwch Cynnwys wedi'i ddiweddaru.
                      Bydd parthau'n cael eu hychwanegu at eich rhestr o gyfeiriadau wedi’u caniatáu gyda'r gallu i ychwanegu parthau eich hun.
                      Mae 100 parth y rhestr.
+  this_and_all_following_events_4b4b283: "Y digwyddiad hwn a phob digwyddiad canlynol"
   this_announcement_will_not_be_visible_until_delaye_88f7f5c: "Ni fydd y cyhoeddiad hwn yn weladwy tan %{delayedPostAt}."
   this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: "Bydd yr aseswr yn defnyddio’r ardal hon i wneud sylwadau ynghylch y maen prawf hwn."
   this_assignment_does_not_count_toward_the_final_gr_a5c238e2: "Dydy’r aseiniad hwn ddim yn cael ei ystyried yn y radd derfynol."
@@ -24023,6 +24044,7 @@ cy:
   this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Mae'r e-Bortffolio hwn wedi'i nodi fel sbam posib. Dim ond gweinyddwyr a'r awdur sy'n gallu ei weld ar hyn o bryd. Os ydych chi'n siŵr nad sbam yw'r cynnwys hwn, gallwch ei farcio yn ddiogel. Fel arall, gallwch ei gadarnhau fel sbam."
   this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Mae'r e-Bortffolio hwn wedi cael ei farcio fel sbam, a dim ond chi sy'n gallu ei weld. Cysylltwch â gweinyddwr os oes gennych chi unrhyw gwestiynau."
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Mae'r e-Bortffolio hwn wedi'i nodi fel sbam. Dim ond gweinyddwyr a'r awdur sy'n gallu ei weld ar hyn o bryd. Os ydych chi'n siŵr nad sbam yw'r cynnwys hwn, gallwch ei farcio yn ddiogel."
+  this_event_b437db90: "Y digwyddiad hwn"
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: "Mae’r nodwedd hon yn effeithio ar y data sy’n bodoli ar gyfer cyrsiau yn y cyfrif."
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: "Mae’r nodwedd hon yn effeithio ar y data sy’n bodoli ar gyfer cyfrif cyfan."
   this_feature_allows_teachers_to_create_anonymous_d_ea364dca: "Mae’r nodwedd hon yn gadael i Athrawon greu trafodaethau dienw ac mae’n gadael i athrawon alluoogi gosodiad lefel cwrs i fyfyrwyr grey trafodaethau dienw."
@@ -24435,6 +24457,7 @@ cy:
     new_caledonia: "Caledonia Newydd"
     new_delhi: "Delhi Newydd"
     newfoundland: Newfoundland
+    norfolk_island: "Ynys Norfolk"
     noronha: Noronha
     novosibirsk: Novosibirsk
     nukualofa: Nuku'alofa
@@ -24553,6 +24576,7 @@ cy:
     learning_outcomes: "Deilliannau Dysgu"
     messages: Negeseuon
     outcome_artifacts: "Arteffactau Deilliant"
+    topic: Pwnc
     view_in_separate_window: "Gweld mewn ffenestr ar wahân"
   tls_7a2eaba5: TLS
   to_1126ab55: " i"
