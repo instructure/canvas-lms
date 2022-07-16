@@ -135,6 +135,7 @@ describe "student k5 dashboard schedule" do
     end
 
     it "clicking list twice hides missing assignments" do
+      skip("LS-3285")
       create_dated_assignment(@subject_course, "missing assignment1", 1.day.ago(@now))
 
       get "/#schedule"
