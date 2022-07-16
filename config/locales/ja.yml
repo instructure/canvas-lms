@@ -239,6 +239,7 @@ ja:
   a_table_that_contains_the_grading_scheme_data_each_d461c205: 採点スキームのデータを含む表です。各行には、名前、最大のパーセンテージ、最低のパーセンテージが含まれています。さらに、下に行を追加するためのアイコンと現在の行を削除するアイコンも含まれています。
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: 採点スキームのデータを含む表です。各行には、名前、最大のパーセンテージ、最低のパーセンテージが含まれています。さらに、下に行を追加するためのアイコンと現在の行を削除するボタンも含まれています。
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: 採点スキームデータを含む表。1つ目は、採点スキームの名前と、スキームを編集・削除するためのボタンです。各行には、名前、最大パーセンテージ、最小パーセンテージが含まれます。さらに、各行には、下に新しい行を追加するためのボタンと、現在の行を削除するためのボタンが含まれています。
+  a_timeout_occurred_contacting_external_authenticat_c064ea48: 外部認証サービスへの問い合わせ中にタイムアウトが発生しました
   a_z_243c3301: A–Z
   a_z_29d8e67c: "A - Z"
   ability_to_submit_annotatable_document_assignments_5bc5edd3: 注釈可能なドキュメントの課題を送信する機能。
@@ -1251,6 +1252,10 @@ ja:
                 check_box: "グループ CSV"
               pseudonyms: 
                 check_box: "仮名 CSV"
+              question_bank_questions: 
+                check_box: 問題バンクの質問
+              question_banks: 
+                check_box: 問題バンク
               sections: 
                 check_box: "セクション CSV"
               terms: 
@@ -2242,6 +2247,7 @@ ja:
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: すべての日付け欄は現在の日付けで、正しいフォーマットである必要があります
   all_day_fb42c4fc: 全日
   all_discussion_entries_report_c1e02906: すべてのディスカッションエントリレポート
+  all_events_6ae4331b: すべてのイベント
   all_finished_time_to_publish_your_course_click_the_b6f07217: すべて完了したら、コースを公開しましょう。下のボタンをクリックすると、公式に公開されます。公開すると、ユーザがコースに参加できるようになります。
   all_get_scopes_59a54304: すべてのGET範囲
   all_gradeable_student_submissions_report_d11ee705: すべての採点可能な受講者の提出物レポート
@@ -2269,6 +2275,7 @@ ja:
   all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "%{groupTitle}からのすべてのアウトカムがこのコースに追加されました。"
   all_outcomes_from_grouptitle_have_been_successfull_6267efe4: "%{groupTitle}からのすべてのアウトカムが、正常に%{targetGroupTitle}に追加されました。"
   all_outcomes_from_grouptitle_have_been_successfull_cb6ad008: "%{groupTitle}からのすべてのアウトカムがこのアカウントに追加されました。"
+  all_quiz_submissions_9519d342: すべての小テスト提出
   all_quiz_submissions_report_72a6d2fa: すべての小テスト提出レポート
   all_roles_f3bba14d: すべてのロール
   all_rubrics_5114c466: すべてのルーブリック
@@ -3459,6 +3466,7 @@ ja:
   appointment_groups_bd225e60: 予約グループ
   appointments_dcb41d23: 予約
   approved_c3b285d4: 承認
+  approximate_quiz_sessions_e522a3a1: 小テストセッションの概算
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value}と正確な %{precision}"
   apps_54d24a47: アプリ
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "アプリを利用すると、Canvas に新しい機能を簡単に追加できます。アプリは、個別のコースに追加することも、アカウントのすべてのコースに追加することもできます。アプリを設定すると、コース モジュールからアプリにリンクして、アセスメント ツール用の課題を作成できます。"
@@ -4806,6 +4814,7 @@ ja:
   back_to_title_39e7a8f4: "%{title}に戻る"
   background_color_b92b52ac: 背景の色
   background_image_1a401e1a: 背景の画像
+  bank_grouped_quiz_submissions_479ad830: バンクグループ化された小テストの提出
   banner_image_id_is_not_a_valid_id_21ecc6: banner_image_idは無効なIDです
   banner_image_url_and_banner_image_id_cannot_both_b_955615f5: banner_image_urlとbanner_image_idの両方を設定することはできません。
   banner_image_url_is_not_a_valid_url_830d7926: banner_image_urlは有効なURLではありません
@@ -8839,6 +8848,8 @@ ja:
   create_file_s_188549e6: "[ ファイルを作成 ]"
   create_files_after_rce_media_upload_recording_77d75a96: RCEメディアのアップロード/記録後にファイルを作成する
   create_group_set_7fe1cd53: "グループ セットの作成"
+  create_groups_later_6ce36058: グループを後で作成する
+  create_groups_now_d59bf70b: 今すぐグループを作成する
   create_interactive_course_content_76665336: インタラクティブなコースコンテンツを作成する
   create_item_base: 
     there_was_an_error: "「%{title}」の保存中にエラーが発生しました。もう一度やり直してください。"
@@ -9319,6 +9330,7 @@ ja:
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: ドロップダウンの前後に入るテキストを定義し、考えられる答えのセットを組み立ててください。
   delay_posting_this_topic_until_aa483eec: このトピックの投稿を先送り
   delayed_until_58b7af4b: まで遅れる：
+  delete_8d6d2222: 削除：
   delete_a143a2ab: 削除
   delete_a6efa79d: 削除
   delete_account_name_96aee330: "削除%{account_name}"
@@ -9348,6 +9360,7 @@ ja:
   delete_domain_5ba75b7c: ドメインを削除する
   delete_domain_domain_c5b68f5: "ドメイン%{domain}を削除する"
   delete_entry_title_5e59727b: "エントリを削除する%{title}"
+  delete_failed_6285e600: 削除に失敗しました
   delete_feedname_1ac9a4a4: "削除%{feedName}"
   delete_filter_83ca1a6a: フィルターを削除
   delete_from_all_accounts_a1c5e621: すべてのアカウントから削除する
@@ -9427,6 +9440,7 @@ ja:
       このアクションは元に戻せません。%{file}をほんとうに削除しますか?
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: ユーザーを削除すると、ePortfolioがすべて破棄されます。代わりに、ePortfolioを「スパム」または「安全」として個別にマークして、可視性を変更することができます。
   deleting_assignment_22d5851d: 課題を削除中
+  deleting_b896f5f: 削除中
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "デモ サイトでは Recaptcha 設定を行う必要があります。この Canvas インスタンスのサイト管理者に連絡してください。"
   demos: 
@@ -11260,6 +11274,7 @@ ja:
   example_https_schoolofrock_edu_d4326f03: "例：「https://schoolofrock.edu」"
   example_item_scores_6726c689: アイテムのスコアの例
   example_school_of_rock_41f32c31: 例：「ロックスクール」
+  exceeded_the_maximum_length_number_characters_2d25611e: "最大長 (%{number} 文字) を超えました"
   exceeds_expectations_5910fc3a: 期待値を超えている
   exceeds_mastery_1f995dce: 十分熟達している
   excelsior_student_activity_tracking_7a1ba44d: 優秀な受講者アクティビティの追跡
@@ -15136,6 +15151,7 @@ ja:
   limit_each_time_slot_to_input_value_user_s_47461538: "各タイムスロットを%{input_value}ユーザーに制限する。"
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "%{num_participants} *グループ* **ユーザ**への各タイムスロットを制限。"
   limit_file_size_limit_per_file_b336c0d8: "ファイルあたり %{file_size_limit} に制限する"
+  limit_group_members_to_leave_blank_for_no_limit_c341e248: グループのメンバーを制限する（制限しない場合は空白にすること）
   limit_groups_to_group_limit_members_40651ea7: "グループを%{group_limit}人に限定する"
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "%{num_appointments}予定への参加者の出席を制限。"
   limit_search_to_activity_after_c1ac2449: 後のアクティビティーに絞って検索
@@ -19055,6 +19071,7 @@ ja:
   number_of_members_per_group_6beaef7b: グループごとのメンバー数
   number_of_respondents_e1e7e8b: 回答者の数
   number_of_scores_to_ignore_for_each_student_fb94e818: 書く受講者の無視するスコア数
+  number_of_students_per_group_8abe7189: グループあたりの受講者数
   number_to_grade_661b05dd: "%{number}未採点"
   number_unsubmitted_145fefae: "%{number}未提出"
   numerical_answer_ec7120bf: 数による回答
@@ -25228,7 +25245,9 @@ ja:
   speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: 分割
   split_merged_users_6b81c595: マージされたユーザーを分割
+  split_number_of_students_per_group_4a05f76f: グループあたりで受講者数を割る
   split_student_names_df0ef806: 受講者の名前の分割
+  split_students_by_number_of_groups_5ace5a6a: グループ数あたりで分割受講者を割る
   split_students_into_groups_with_num_members_studen_c49d5136: "グループにつき%{num_members}名のグループで、受講者をグループに分ける"
   split_students_into_num_groups_groups_e9854f16: "受講者を %{num_groups} グループに分割する"
   splitting_disabled_reached_maximum_of_three_assign_716acb13: 分割無効：採点範囲内の最大3つの割り当てグループ数に達しています
@@ -26274,6 +26293,7 @@ ja:
   the_following_outcomes_cannot_be_removed_because_t_1c4b8ef9: 
     one: コンテンツと合わせているため、以下の成果は削除できません。選択解除してもう一度やり直してください。
     other: コンテンツと合わせているため、以下の成果は削除できません。選択解除してもう一度やり直してください。
+  the_following_recipients_have_no_active_enrollment_17395ab4: "次の受信者はコースに登録していないため、%{invalid_recipients}、メッセージを送信できません"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
       次の時効性は、小テストの送信に変更を保存していません。
       
@@ -26627,6 +26647,7 @@ ja:
                       これは、更新されたコンテンツセキュリティポリシー（CSP）によって有効になります。
                      手動でドメインを追加する機能により、ドメインがホワイトリストに追加されます。
                         ホワイトリストにはドメイン100の制限があります。
+  this_and_all_following_events_4b4b283: このイベントと次のすべてのイベント
   this_announcement_will_not_be_visible_until_delaye_88f7f5c: "この発表は、%{delayedPostAt}まで表示されません。"
   this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: このエリアは、この基準に関するコメントを残すために査定人が使用します。
   this_assignment_does_not_count_toward_the_final_gr_29ede05f: この課題は最終的な成績には影響しません
@@ -26684,6 +26705,7 @@ ja:
   this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "この ePortfolio は、スパムの可能性があると識別されています。現在、管理者と作成者にのみ表示されています。このコンテンツがスパムではない確信がある場合は、「安全」としてマークできます。それ以外の場合は、スパムとして確認してください。"
   this_eportfolio_has_been_identified_as_spam_and_is_8430467: "この ePortfolio はスパムとして識別されており、あなただけに表示されています。ご質問がある場合は、管理者にお問い合わせください。"
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "この ePortfolio は、スパムとして識別されています。現在、管理者と作成者にのみ表示されています。このコンテンツがスパムではない確信がある場合は、「安全」としてマークできます。"
+  this_event_b437db90: このイベント
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: この機能は、アカウント内のすべてのコースの既存データに影響します。
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: この機能は、アカウント全体の既存のデータに影響します。
   this_feature_allows_teachers_to_create_anonymous_d_ea364dca: この機能では、教員が匿名のディスカッションを作成したり、コースレベルの設定で教員が学生が匿名のディスカッションを作成できるようにすることができます。
@@ -27105,6 +27127,7 @@ ja:
     new_caledonia: ニューカレドニア
     new_delhi: ニューデリー
     newfoundland: ニューファンドランド島
+    norfolk_island: ノーフォーク島
     noronha: Noronha
     novosibirsk: ノヴォシビルスク
     nukualofa: ヌクアロファ
@@ -27224,6 +27247,7 @@ ja:
     messages: メッセージ
     outcome_artifacts: アウトカム物
     people: メンバー
+    topic: トピック
     view_in_separate_window: 別のウィンドウで表示
   tls_7a2eaba5: TLS
   to_1126ab55: ～へ
