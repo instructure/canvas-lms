@@ -218,6 +218,7 @@ sl:
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "Preglednica z odgovori in s kratkim statističnim pregledom glede študentovega izbora odgovorov."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Preglednica, ki vsebuje podatke o ocenjevalni shemi. V vsaki vrstici so ime ter največji in najmanjši odstotek. Poleg tega sta v vsaki vrstici gumb za dodajanje nove vrstice spodaj in gumb za brisanje trenutne vrstice."
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "Preglednica, ki vsebuje podatke o ocenjevalni shemi. Na prvem mestu je ime ocenjevalne sheme in gumbe za urejanje in odstranjevanje sheme. V vsaki vrstici so ime ter največji in najmanjši odstotek. Poleg tega sta v vsaki vrstici gumb za dodajanje nove vrstice spodaj in gumb za brisanje trenutne vrstice."
+  a_timeout_occurred_contacting_external_authenticat_c064ea48: "Potekla časovna omejitev pri vzpostavljanju stika z zunanjo storitvijo za preverjanje pristnosti"
   a_z_243c3301: A–Z
   a_z_29d8e67c: A–Z
   ability_to_submit_student_annotation_assignments_9ee47e3f: "Možnost predložitve nalog z opombami študentov."
@@ -1009,6 +1010,10 @@ sl:
                 check_box: "Datoteka CSV skupin"
               pseudonyms: 
                 check_box: "Datoteka CSV psevdonimov"
+              question_bank_questions: 
+                check_box: "Vprašanja v zbirki vprašanj"
+              question_banks: 
+                check_box: "Zbirke vprašanj"
               sections: 
                 check_box: "Datoteka CSV sekcij"
               terms: 
@@ -1865,6 +1870,7 @@ sl:
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Vsa polja datumov morajo biti prisotna in pravilno oblikovana."
   all_day_fb42c4fc: "Ves dan"
   all_discussion_entries_report_c1e02906: "Poročilo o vseh vnosih v razpravo"
+  all_events_6ae4331b: "Vsi dogodki"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Ali je vse dokončano?  Čas je, da objavite svoj predmet.  Kliknite spodnji gumb, da bo objava uradna. Z objavo bodo uporabniki lahko začeli sodelovati pri predmetu."
   all_get_scopes_59a54304: "Vsi obsegi GET"
   all_gradeable_student_submissions_report_d11ee705: "Poročilo o vseh oddajah študentov, ki jih je mogoče oceniti"
@@ -1889,6 +1895,7 @@ sl:
   all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "Vsi izidi %{groupTitle} so bili uspešno dodani temu predmetu."
   all_outcomes_from_grouptitle_have_been_successfull_6267efe4: "Vsi učni izidi iz %{groupTitle} so bili uspešno dodani v %{targetGroupTitle}."
   all_outcomes_from_grouptitle_have_been_successfull_cb6ad008: "Vsi izidi %{groupTitle} so bili uspešno dodani temu računu."
+  all_quiz_submissions_9519d342: "Vse oddaje kvizov"
   all_quiz_submissions_report_72a6d2fa: "Poročilo o vseh oddajah kviza"
   all_roles_f3bba14d: "Vse vloge"
   all_rubrics_5114c466: "Vsi ocenjevalni vodniki"
@@ -2799,6 +2806,7 @@ sl:
   appointment_groups_bd225e60: "Skupine sestankov"
   appointments_dcb41d23: Sestanki
   approved_c3b285d4: Odobreno
+  approximate_quiz_sessions_e522a3a1: "Približno število sej kviza"
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} na decimalke %{precision}"
   apps_54d24a47: Aplikacije
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Aplikacije so enostaven način dodajanja novih funkcionalnosti v Canvas. Dodane so lahko v posamezne predmete ali v vse predmete v računu. Ko so ustrezno nastavljene, jih lahko dodate kot module pri predmetu."
@@ -3896,6 +3904,7 @@ sl:
   back_to_title_39e7a8f4: "Nazaj na %{title}"
   background_color_b92b52ac: "Barva ozadja"
   background_image_1a401e1a: "Slika ozadja"
+  bank_grouped_quiz_submissions_479ad830: "Oddaje kviza, združene v zbirko"
   banner_image_id_is_not_a_valid_id_21ecc6: "banner_image_id ni veljaven ID"
   banner_image_url_and_banner_image_id_cannot_both_b_955615f5: "banner_image_url in banner_image_id ne moreta biti nastavljeni hkrati."
   banner_image_url_is_not_a_valid_url_830d7926: "banner_image_url ni veljaven URL"
@@ -7248,6 +7257,8 @@ sl:
   create_failed_15d07ad4: "Ustvarjanje ni uspelo."
   create_file_s_188549e6: "[ Ustvari datoteko(-e) ]"
   create_group_set_7fe1cd53: "Ustvari nabor skupin"
+  create_groups_later_6ce36058: "Skupine ustvari kasneje"
+  create_groups_now_d59bf70b: "Skupine ustvari zdaj"
   create_interactive_course_content_76665336: "Ustvarite interaktivno vsebino v predmetu"
   create_lookup_7ceb6d90: "Ustvari iskanje"
   create_new_course_e3ef9cd0: "Ustvari nov predmet"
@@ -7678,6 +7689,7 @@ sl:
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Določi besedilo, ki bo pred in za spustnim menijem, in pripravite nabor možnih odgovorov."
   delay_posting_this_topic_until_aa483eec: "Zakasni objavo te teme do"
   delayed_until_58b7af4b: "Zakasnjeno do:"
+  delete_8d6d2222: "Izbriši: "
   delete_a143a2ab: izbriši
   delete_a6efa79d: Odstrani
   delete_account_name_96aee330: "Izbriši %{account_name}"
@@ -7705,6 +7717,7 @@ sl:
   delete_domain_5ba75b7c: "Izbriši domeno"
   delete_domain_domain_c5b68f5: "Odstrani domeno %{domain}"
   delete_entry_title_5e59727b: "Izbriši vnos %{title}"
+  delete_failed_6285e600: "Brisanje ni uspelo."
   delete_feedname_1ac9a4a4: "Izbriši %{feedName}"
   delete_filter_83ca1a6a: "Izbriši filter"
   delete_from_all_accounts_a1c5e621: "Izbriši iz VSEH računov"
@@ -7773,6 +7786,7 @@ sl:
       To dejanje je nepovratno. Ali ste prepričani, da želite izbrisati %{file}?
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "Če uporabnika izbrišete, uničite vse njegove ePortfelje. Namesto tega lahko ePortfelje posamezno označite kot »neželene« ali »varne«, da spremenite njihovo vidnost."
   deleting_assignment_22d5851d: "odstranjujem nalogo"
+  deleting_b896f5f: brišem
   delicious_7f9ac66f: Delicious
   denmark_45_929d5d34: "Danska (+45)"
   deployment_id_fc270280: "ID uvajanja"
@@ -9159,6 +9173,7 @@ sl:
   example_https_schoolofrock_edu_d4326f03: "primer: »https://schoolofrock.edu«"
   example_item_scores_6726c689: "Primer rezultata elementa"
   example_school_of_rock_41f32c31: "primer: »School of Rock«"
+  exceeded_the_maximum_length_number_characters_2d25611e: "Presežena največja dolžina (%{number} znakov)"
   exceeds_expectations_5910fc3a: "Presega pričakovanja"
   exceeds_mastery_1f995dce: "Presega učne cilje."
   excelsior_student_activity_tracking_7a1ba44d: "Sledenje dejavnosti študentov Excelsior"
@@ -11966,6 +11981,7 @@ sl:
   limit_course_participation_to_term_or_custom_cours_67797a86: "Ali želite omejiti udeležbo pri predmetih na semester ali posebne datume predmeta?"
   limit_each_time_slot_to_input_value_user_s_47461538: "Omeji vsak termin na %{input_value} uporabnikov. "
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "Omeji vsak termin na %{num_participants} * skupin.* **uporabnikov.**"
+  limit_group_members_to_leave_blank_for_no_limit_c341e248: "Število članov skupine omeji na (pustite prazno, če ni omejitve)"
   limit_groups_to_group_limit_members_40651ea7: "Omeji skupine na %{group_limit} članov."
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "Omeji udeležbo udeležencev na %{num_appointments} sestankov."
   limit_search_to_activity_after_c1ac2449: "Omeji iskanje na aktivnost po"
@@ -15370,6 +15386,7 @@ sl:
   number_of_members_per_group_6beaef7b: "Število članov na skupino"
   number_of_respondents_e1e7e8b: "Število anketirancev"
   number_of_scores_to_ignore_for_each_student_fb94e818: "Število rezultatov, ki jih je treba pri posameznem študentu prezreti"
+  number_of_students_per_group_8abe7189: "Število študentov na skupino"
   number_to_grade_661b05dd: "%{number} za oceno"
   number_unsubmitted_145fefae: "%{number} neposlano"
   numerical_answer_ec7120bf: "Številčni odgovor"
@@ -20533,7 +20550,9 @@ sl:
   speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Porazdeljeno
   split_merged_users_6b81c595: "Razdeli združene uporabnike"
+  split_number_of_students_per_group_4a05f76f: "Razdeli število študentov na skupino"
   split_student_names_df0ef806: "Razdeli imena študentov"
+  split_students_by_number_of_groups_5ace5a6a: "Študente po številu razredlite na skupine"
   split_students_into_groups_with_num_members_studen_c49d5136: "Razdeli študente v skupine, tako da bo v skupini %{num_members} študentov"
   split_students_into_num_groups_groups_e9854f16: "Razdeli študente v %{num_groups} skupin"
   splitting_disabled_reached_maximum_of_three_assign_716acb13: "Razdeljevanje je omogočeno: doseženo je največje število treh skupin nalog v obsegu točkovanja."
@@ -21435,6 +21454,7 @@ sl:
       Iz orodij, ki že obstajajo v vašem računu, so naslednje domene že samodejno pridobile dovoljenje.
                        Če želite te domene odstraniti, odstranite z njimi povezana orodja.
   the_following_fields_are_invalid_fields_b3565800: "Naslednja polja so neveljavna: %{fields}"
+  the_following_recipients_have_no_active_enrollment_17395ab4: "Naslednji prejemniki nimajo aktivnega vpisa v predmet %{invalid_recipients}; sporočil ni mogoče pošiljati"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
       Pri naslednjih študentih so v njihovih oddajah kvizov neshranjene spremembe: 
       
@@ -21729,6 +21749,7 @@ sl:
   they_them_f4d17a04: Oni/Njih
   they_were_merged_into_other_user_64758f01: "Združeni so bili v *%{other_user}*."
   this_account_does_not_allow_for_microsoft_teams_sy_266f11c7: "Ta račun ne omogoča vklopa sinhronizacije Microsoft Teams. Pred urejanjem nastavitev omogočite zastavico funkcije »Sinhronizacija vpisa v Microsoft Group«."
+  this_and_all_following_events_4b4b283: "Ta in vsi naslednji dogodki"
   this_announcement_will_not_be_visible_until_delaye_88f7f5c: "To obvestilo ne bo vodno do %{delayedPostAt}."
   this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: "To območje bo uporabil ocenjevalec za podajanje komentarjev, povezanih s tem merilom."
   this_assignment_does_not_count_toward_the_final_gr_a5c238e2: "Ta naloga ne velja za končno oceno."
@@ -21780,6 +21801,7 @@ sl:
   this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Ta ePortfelj je bil prepoznan kot verjetno neželen. Trenutno je na voljo samo skrbnikom in avtorju. Če ste prepričani, da ta vsebina ni neželena, jo lahko označite kot varno. Sicer jo lahko potrdite kot neželeno."
   this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Ta ePortfelj je bil prepoznan kot neželen in je viden samo vam. Če imate vprašanja, se obrnite na skrbnika."
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Ta ePortfelj je bil prepoznan kot neželen. Trenutno je na voljo samo skrbnikom in avtorju. Če ste prepričani, da ta vsebina ni neželena, jo lahko označite kot varno."
+  this_event_b437db90: "Ta dogodek"
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: "Ta funkcija vpliva na obstoječe podatke za vse predmete v računu."
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: "Ta funkcija vpliva na obstoječe podatke za celoten račun."
   this_feature_allows_teachers_to_create_anonymous_d_ea364dca: "Ta funkcija omogoča izvajalcem ustvarjanje anonimnih razprav in to, da omogočijo nastavitev ravni predmeta, da bi lahko študenti ustvarjali anonimne razprave."
@@ -22125,6 +22147,7 @@ sl:
     new_caledonia: "Nova Kaledonija"
     new_delhi: "New Delhi"
     newfoundland: "Nova Fundlandija"
+    norfolk_island: "Otok Norfolk"
     noronha: "Otočje Fernando de Noronha"
     novosibirsk: Novosibirsk
     nukualofa: Nuku'alofa
@@ -22240,6 +22263,7 @@ sl:
     learning_outcomes: "Učni cilji"
     messages: Sporočila
     outcome_artifacts: "Izdelki izida"
+    topic: Tema
     view_in_separate_window: "Ogled v ločenem oknu"
   tls_7a2eaba5: "Protokol TLS"
   to_1126ab55: " naslovnik"
