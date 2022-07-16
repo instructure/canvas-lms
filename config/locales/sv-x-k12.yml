@@ -229,6 +229,7 @@ sv-x-k12:
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "En tabell över svar och sammanfattande statistik om elevers svarsalternativ."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "En tabell som innehåller data för bedömningsschema. Varje rad innehåller ett namn, ett maximalt procenttal och ett minsta procenttal. Dessutom innehåller varje rad en knapp för att lägga till en ny rad nedan, och en knapp för att ta bort nuvarande rad."
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "En tabell som innehåller data för bedömningsschema. Först visas bedömningsschemats namn och knappar för redigering och borttagning av schemat. Varje rad innehåller ett namn, ett maximalt procenttal och ett minsta procenttal. Dessutom innehåller varje rad en knapp för att lägga till en ny rad nedan, och en knapp för att ta bort nuvarande rad."
+  a_timeout_occurred_contacting_external_authenticat_c064ea48: "En timeout inträffade när den externa autentiseringstjänsten kontaktades."
   a_z_243c3301: A–Ö
   a_z_29d8e67c: A–Z
   ability_to_submit_annotatable_document_assignments_5bc5edd3: "Möjlighet att lämna in kommenterade dokumentuppgifter."
@@ -1155,6 +1156,10 @@ sv-x-k12:
                 check_box: "Grupp CSV"
               pseudonyms: 
                 check_box: "Pseudonym CSV"
+              question_bank_questions: 
+                check_box: Frågebanks-frågor
+              question_banks: 
+                check_box: Frågebanker
               sections: 
                 check_box: "Sektion CSV"
               terms: 
@@ -2068,6 +2073,7 @@ sv-x-k12:
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Alla datumfält måste vara inkluderade och formateras korrekt"
   all_day_fb42c4fc: "Hela dagen"
   all_discussion_entries_report_c1e02906: "Rapport över alla diskussionsposter"
+  all_events_6ae4331b: "Alla händelser"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Färdig?  Då är det dags att publicera din kurs!  Klicka på knappen nedan för att göra kursen officiell! Efter publicering kommer användare att kunna börja delta i kursen."
   all_get_scopes_59a54304: "Alla GET-områden"
   all_gradeable_student_submissions_report_d11ee705: "Rapport över alla bedömningsbara elevinlämningar"
@@ -2094,6 +2100,7 @@ sv-x-k12:
   all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "Alla lärandemål från %{groupTitle} har lagts till i den här kursen."
   all_outcomes_from_grouptitle_have_been_successfull_6267efe4: "Alla lärandemål från %{groupTitle} har lagts till i %{targetGroupTitle}."
   all_outcomes_from_grouptitle_have_been_successfull_cb6ad008: "Alla lärandemål från %{groupTitle} har lagts till i det här kontot."
+  all_quiz_submissions_9519d342: "Alla quizinlämningar"
   all_quiz_submissions_report_72a6d2fa: "Rapport över alla quizinlämningar"
   all_roles_f3bba14d: "Alla roller"
   all_rubrics_5114c466: "Alla matriser"
@@ -3238,6 +3245,7 @@ sv-x-k12:
   appointment_groups_bd225e60: Mötesgrupper
   appointments_dcb41d23: Möten
   approved_c3b285d4: Tillåten
+  approximate_quiz_sessions_e522a3a1: "Ungefärliga quizsessioner"
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} med precision %{precision}"
   apps_54d24a47: Appar
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Appar är ett enkelt sätt att lägga till nya funktioner i Canvas. De kan läggas till i enskilda kurser eller till alla kurser i ett konto. När de har konfigurerats kan du länka dem genom kursmoduler och skapa uppgifter för bedömningsverktyg."
@@ -4404,6 +4412,7 @@ sv-x-k12:
   back_to_title_39e7a8f4: "Tillbaka till %{title}"
   background_color_b92b52ac: Bakgrundsfärg
   background_image_1a401e1a: Bakgrundsbild
+  bank_grouped_quiz_submissions_479ad830: "Bankgrupperade quizinlämningar"
   banner_image_id_is_not_a_valid_id_21ecc6: "banner_image_id är inte ett giltigt ID"
   banner_image_url_and_banner_image_id_cannot_both_b_955615f5: "banner_image_url och banner_image_id kan inte båda ställas in."
   banner_image_url_is_not_a_valid_url_830d7926: "banner_image_url är inte en giltig URL."
@@ -7974,6 +7983,8 @@ sv-x-k12:
   create_file_s_188549e6: "[ Skapa filer ]"
   create_files_after_rce_media_upload_recording_77d75a96: "Skapa filer efter RCE-medieuppladdning eller -inspelning"
   create_group_set_7fe1cd53: "Skapa gruppuppsättning"
+  create_groups_later_6ce36058: "Skapa grupper senare"
+  create_groups_now_d59bf70b: "Skapa grupper nu"
   create_interactive_course_content_76665336: "Skapa interaktivt kursinnehåll"
   create_live_event_subscriptions_on_toolproxy_7c8378b1: "Skapa prenumerationer på livehändelser på ToolProxy"
   create_lookup_7ceb6d90: "Skapa uppslag"
@@ -8417,6 +8428,7 @@ sv-x-k12:
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Definiera texten för att föregå/eftergå rullgardningsmenyn och bygg en samling möjliga svar."
   delay_posting_this_topic_until_aa483eec: "Senarelägg publicering av det här ämnet tills"
   delayed_until_58b7af4b: "Fördröjd till:"
+  delete_8d6d2222: "Radera: "
   delete_a143a2ab: "ta bort"
   delete_a6efa79d: "Ta bort"
   delete_account_name_96aee330: "Radera %{account_name}"
@@ -8445,6 +8457,7 @@ sv-x-k12:
   delete_domain_5ba75b7c: "Radera domän"
   delete_domain_domain_c5b68f5: "Radera domän %{domain}"
   delete_entry_title_5e59727b: "Ta bort inlägg %{title}"
+  delete_failed_6285e600: "Radering misslyckades"
   delete_feedname_1ac9a4a4: "Radera %{feedName}"
   delete_filter_83ca1a6a: "Ta bort filter"
   delete_from_all_accounts_a1c5e621: "Ta bort från ALLA konton"
@@ -8518,6 +8531,7 @@ sv-x-k12:
       Åtgärden kan inte ångras. Vill du ta bort %{file}?
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "Om du raderar användare förstörs alla deras e-portföljer. E-portföljer kan antingen märkas som skräppost eller som säkra för att modifiera deras synlighet."
   deleting_assignment_22d5851d: "tar bort uppgiften"
+  deleting_b896f5f: raderar
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Demo sidor kräver att Recaptcha-inställningarna konfigureras. Vänligen kontakta din hemsidans administratör den här instansen på Canvas."
   demos: 
@@ -10196,6 +10210,7 @@ sv-x-k12:
   example_https_schoolofrock_edu_d4326f03: "exempel: https://schoolofrock.edu"
   example_item_scores_6726c689: "Exempel på resultatpoäng"
   example_school_of_rock_41f32c31: "exempel: School of Rock"
+  exceeded_the_maximum_length_number_characters_2d25611e: "Överskred maxlängden (%{number} tecken)"
   exceeds_expectations_5910fc3a: "Överträffar förväntningarna"
   exceeds_mastery_1f995dce: "Överträffar måluppfyllelse"
   excelsior_student_activity_tracking_7a1ba44d: "Elevaktivitetsspårning för Excelsior"
@@ -13284,6 +13299,7 @@ sv-x-k12:
   limit_course_participation_to_term_or_custom_cours_67797a86: "Begränsa kursdeltagande till terminer eller anpassa kursdatum?"
   limit_each_time_slot_to_input_value_user_s_47461538: "Begränsa varje tid till %{input_value} användare. "
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "Begränsa varje tid till %{num_participants} *grupper.* **användare.**"
+  limit_group_members_to_leave_blank_for_no_limit_c341e248: "Begränsa gruppmedlemmar till (lämna tom om utan begränsning)"
   limit_groups_to_group_limit_members_40651ea7: "Begränsa grupper till %{group_limit} medlemmar"
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "Begränsa antalet möten som deltagare kan delta i till %{num_appointments} möten."
   limit_search_to_activity_after_c1ac2449: "Begränsa sökning till aktivitet efter"
@@ -16778,6 +16794,7 @@ sv-x-k12:
   number_of_members_per_group_6beaef7b: "Antal medlemmar per grupp"
   number_of_respondents_e1e7e8b: "Antal respondenter"
   number_of_scores_to_ignore_for_each_student_fb94e818: "Antal resultat att ignorera för varje elev"
+  number_of_students_per_group_8abe7189: "Antal elever per grupp"
   numerical_answer_ec7120bf: "Numeriskt svar"
   nummastered_of_numgroup_mastered_b8113c9c: "%{numMastered} av %{numGroup} uppfyllda mål"
   numpoints_points_b1f0666a: "%{numPoints} resultat"
@@ -22204,7 +22221,9 @@ sv-x-k12:
   speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Dela
   split_merged_users_6b81c595: "Dela sammanfogade användare"
+  split_number_of_students_per_group_4a05f76f: "Dela antal elever per grupp"
   split_student_names_df0ef806: "Dela elevnamn"
+  split_students_by_number_of_groups_5ace5a6a: "Dela upp elever efter antalet grupper"
   split_students_into_groups_with_num_members_studen_c49d5136: "Dela upp elever i grupper med %{num_members} elever per grupp"
   split_students_into_num_groups_groups_e9854f16: "Dela upp elever i %{num_groups} grupper"
   splitting_disabled_reached_maximum_of_three_assign_716acb13: "Delning inaktiverad: nått maximum av tre uppgiftsgrupper i poängintervallet"
@@ -23179,6 +23198,7 @@ sv-x-k12:
   the_following_outcomes_cannot_be_removed_because_t_1c4b8ef9: 
     one: "Det går inte att ta bort följande lärandemål eftersom det är kopplat till innehåll. Avmarkera det och försök igen."
     other: "Det går inte att ta bort följande lärandemål eftersom de är kopplade till innehåll. Avmarkera dem och försök igen."
+  the_following_recipients_have_no_active_enrollment_17395ab4: "Följande mottagare har ingen aktiv registrering i kursen, %{invalid_recipients}, det gick inte att skicka meddelanden"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
       Följande elever har osparade ändringar i sina quiz-inlämningar: 
       
@@ -23498,6 +23518,7 @@ sv-x-k12:
   this_account_does_not_allow_for_microsoft_teams_sy_266f11c7: "Det går inte att aktivera Microsoft Teams Sync för det här kontot. Aktivera funktionsflaggan för synkronisering av registreringar i Microsoft Group innan du redigerar några inställningar."
   this_account_doesn_t_allow_for_microsoft_teams_syn_744dbd76: "Det går inte att aktivera Microsoft Teams Sync för det här kontot. Aktivera funktionsflaggan för synkronisering av registreringar i Microsoft Group innan du redigerar några inställningar."
   this_allows_the_user_to_unfavorite_a_course_direct_828d0587: "Låter användare avmarkera en kursfavorit direkt från dess översiktskort."
+  this_and_all_following_events_4b4b283: "Denna och alla följande händelser"
   this_announcement_will_not_be_visible_until_delaye_88f7f5c: "Det här meddelandet kommer inte att vara synligt förrän %{delayedPostAt}."
   this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: "Det här området kommer användas av utvärderaren för kommentarer relaterade till det här kriteriet."
   this_assignment_does_not_count_toward_the_final_gr_a5c238e2: "Den här uppgiften räknas inte till slutbedömningen."
@@ -23550,6 +23571,7 @@ sv-x-k12:
   this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Den här e-portföljen har identifierats som potentiell skräppost. För närvarande visas den endast för administratörer och författaren. Om du är säker på att innehållet inte är skräppost kan du markera det som säkert. I annat fall kan du markera det som skräppost."
   this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Den här e-portföljen har identifierats som skräppost och visas endast för dig. Kontakta en administratör om du har några frågor."
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Den här e-portföljen har identifierats som skräppost. För närvarande visas den endast för administratörer och författaren. Om du är säker på att innehållet inte är skräppost kan du markera det som säkert."
+  this_event_b437db90: "Denna händelse"
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: "Funktionen påverkar befintliga data för alla kurser i kontot."
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: "Funktionen påverkar befintliga data för hela kontot."
   this_feature_allows_teachers_to_create_anonymous_d_ea364dca: "Med den här funktionen kan lärare skapa anonyma diskussioner och låta lärare aktivera en inställning på kursnivå för elever så att de kan skapa anonyma diskussioner."
@@ -23957,6 +23979,7 @@ sv-x-k12:
     new_caledonia: "Nya Kaledonien"
     new_delhi: "New Delhi"
     newfoundland: Newfoundland
+    norfolk_island: "Norfolk Island"
     noronha: Noronha
     novosibirsk: Novosibrisk
     nukualofa: Nuku'alofa
@@ -24075,6 +24098,7 @@ sv-x-k12:
     learning_outcomes: Lärandemål
     messages: Meddelanden
     outcome_artifacts: "Artefakter för lärandemål"
+    topic: Ämne
     view_in_separate_window: "Visa i separat fönster"
   tls_7a2eaba5: TLS
   to_1126ab55: " till"
