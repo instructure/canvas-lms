@@ -239,6 +239,7 @@ pt-BR:
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "Uma tabela que contém dados do esquema de avaliação. Cada linha contém um nome, uma porcentagem máxima e uma porcentagem mínima. Além disso, cada linha contém um ícone para adicionar uma nova linha abaixo e um ícone para excluir a linha atual."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Uma tabela que contém dados do esquema de avaliação. Cada linha contém um nome, uma porcentagem máxima e uma porcentagem mínima. Além disso, cada linha contém um botão para adicionar uma nova linha abaixo e um botão para excluir a linha atual."
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "Uma tabela que contém dados do esquema de avaliação. O primeiro é o nome do esquema de avaliação e botões para editar e excluir o esquema. Cada linha contém um nome, uma porcentagem máxima e uma porcentagem mínima. Além disso, cada linha contém um botão para adicionar uma nova linha abaixo e um botão para excluir a linha atual."
+  a_timeout_occurred_contacting_external_authenticat_c064ea48: "Ocorreu um tempo limite ao entrar em contato com o serviço de autenticação externo"
   a_z_243c3301: A–Z
   a_z_29d8e67c: "A - Z"
   ability_to_submit_annotatable_document_assignments_5bc5edd3: "Capacidade de enviar atribuições de documentos anotáveis."
@@ -1251,6 +1252,10 @@ pt-BR:
                 check_box: "Grupos CSV"
               pseudonyms: 
                 check_box: "Pseudônimos CSV"
+              question_bank_questions: 
+                check_box: "Perguntas do banco de perguntas"
+              question_banks: 
+                check_box: "Bancos de perguntas"
               sections: 
                 check_box: "Seções CSV"
               terms: 
@@ -2242,6 +2247,7 @@ pt-BR:
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Todos os campos de data devem estar presente e formatados corretamente"
   all_day_fb42c4fc: "Dia inteiro"
   all_discussion_entries_report_c1e02906: "Relatório de todas as entradas de discussão"
+  all_events_6ae4331b: "Todos os eventos"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Tudo finalizado?  Tempo para publicar seu curso!  Clique no botão abaixo para torna-lo oficial! A publicação permitirá que os usuários comecem a participar do curso."
   all_get_scopes_59a54304: "Todos os escopos GET"
   all_gradeable_student_submissions_report_d11ee705: "Relatório de todos os envios de alunos que podem ser avaliados"
@@ -2269,6 +2275,7 @@ pt-BR:
   all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "Todos os resultados de %{groupTitle} foram adicionados com sucesso a este curso."
   all_outcomes_from_grouptitle_have_been_successfull_6267efe4: "Todos os resultados %{groupTitle} de foram adicionados a %{targetGroupTitle}."
   all_outcomes_from_grouptitle_have_been_successfull_cb6ad008: "Todos os resultados de %{groupTitle} foram adicionados com sucesso a esta conta."
+  all_quiz_submissions_9519d342: "Todos os envios de teste"
   all_quiz_submissions_report_72a6d2fa: "Relatório de todos os envios de testes"
   all_roles_f3bba14d: "Todos os papéis"
   all_rubrics_5114c466: "Todas as rubricas"
@@ -3459,6 +3466,7 @@ pt-BR:
   appointment_groups_bd225e60: "Grupos de compromissos"
   appointments_dcb41d23: Compromissos
   approved_c3b285d4: Aprovado
+  approximate_quiz_sessions_e522a3a1: "Sessões de teste aproximadas"
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} com precisão %{precision}"
   apps_54d24a47: Aplicativos
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Os aplicativos são uma maneira fácil de adicionar novas funcionalidades ao Canvas. Eles podem ser adicionados aos cursos individuais ou a todos os cursos de uma conta. Uma vez configurado, você pode conectar-se a eles através dos módulos dos cursos e criar tarefas para as ferramentas de avaliação."
@@ -4808,6 +4816,7 @@ pt-BR:
   back_to_title_39e7a8f4: "Voltar para %{title}"
   background_color_b92b52ac: "Cor de Fundo"
   background_image_1a401e1a: "Imagem de Fundo"
+  bank_grouped_quiz_submissions_479ad830: "Envios de testes agrupados por bancos"
   banner_image_id_is_not_a_valid_id_21ecc6: "banner_image_id não é uma ID válida"
   banner_image_url_and_banner_image_id_cannot_both_b_955615f5: "banner_image_url e banner_image_id não podem ser configuradas."
   banner_image_url_is_not_a_valid_url_830d7926: "banner_image_url não é um URL válido"
@@ -8833,6 +8842,8 @@ pt-BR:
   create_file_s_188549e6: "[ Criar arquivo(s) ]"
   create_files_after_rce_media_upload_recording_77d75a96: "Criar arquivos após carregamento/gravação de mídia RCE"
   create_group_set_7fe1cd53: "Criar conjunto de grupo"
+  create_groups_later_6ce36058: "Criar grupos mais tarde"
+  create_groups_now_d59bf70b: "Criar grupos agora"
   create_interactive_course_content_76665336: "Criar conteúdo do curso interativo"
   create_item_base: 
     there_was_an_error: "Houve um erro ao salvar \"%{title}\", tente novamente."
@@ -9313,6 +9324,7 @@ pt-BR:
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Defina o texto que vai antes e depois do menu suspenso e crie um conjunto de respostas possíveis."
   delay_posting_this_topic_until_aa483eec: "Adiar a postagem deste assunto até"
   delayed_until_58b7af4b: "Atrasado até:"
+  delete_8d6d2222: "Excluir: "
   delete_a143a2ab: excluir
   delete_a6efa79d: Excluir
   delete_account_name_96aee330: "Excluir %{account_name}"
@@ -9342,6 +9354,7 @@ pt-BR:
   delete_domain_5ba75b7c: "Excluir domínio"
   delete_domain_domain_c5b68f5: "Excluir domínio %{domain}"
   delete_entry_title_5e59727b: "Excluir entrada %{title}"
+  delete_failed_6285e600: "Falhou ao excluir"
   delete_feedname_1ac9a4a4: "Excluir %{feedName}"
   delete_filter_83ca1a6a: "Excluir filtro"
   delete_from_all_accounts_a1c5e621: "Excluir de TODAS as contas"
@@ -9421,6 +9434,7 @@ pt-BR:
       Esta ação é irreversível. Tem certeza que deseja excluir %{file}?
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "Excluir um usuário destruirá todos os seus ePortfolios. De outra forma, ePortfolios podem ser individualmente marcados como ‘spam’ ou ‘safe’ para modificar a visibilidade."
   deleting_assignment_22d5851d: "excluindo tarefa"
+  deleting_b896f5f: excluindo
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Sites demo requerem que configurações Recaptcha sejam definidas. Consulte o administrador do seu site para esta instância do Canvas."
   demos: 
@@ -11250,6 +11264,7 @@ pt-BR:
   example_https_schoolofrock_edu_d4326f03: "exemplo: \"https://schoolofrock.edu\""
   example_item_scores_6726c689: "Exemplo de pontuações do item"
   example_school_of_rock_41f32c31: "exemplo: \"School of Rock\""
+  exceeded_the_maximum_length_number_characters_2d25611e: "Excedeu o tamanho máximo (%{number} caracteres)"
   exceeds_expectations_5910fc3a: "Excede às expectativas"
   exceeds_mastery_1f995dce: "Excede Domínio"
   excelsior_student_activity_tracking_7a1ba44d: "Acompanhamento de atividade de alunos Excelsior"
@@ -15132,6 +15147,7 @@ pt-BR:
   limit_each_time_slot_to_input_value_user_s_47461538: "Limitar cada horário para %{input_value} usuário(s). "
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "Limitar cada horário a %{num_participants} *grupos.* **usuários.**"
   limit_file_size_limit_per_file_b336c0d8: "limite %{file_size_limit} por arquivo"
+  limit_group_members_to_leave_blank_for_no_limit_c341e248: "Limitar os membros do grupo a (deixe em branco sem limite)"
   limit_groups_to_group_limit_members_40651ea7: "Limitar grupos a %{group_limit} membros"
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "Limitar participantes a frequentarem %{num_appointments} compromisso(s)."
   limit_search_to_activity_after_c1ac2449: "Limitar pesquisa a atividade após"
@@ -19051,6 +19067,7 @@ pt-BR:
   number_of_members_per_group_6beaef7b: "Número de membros por grupo"
   number_of_respondents_e1e7e8b: "Número de Respondentes"
   number_of_scores_to_ignore_for_each_student_fb94e818: "Número de pontuações a ignorar para cada aluno"
+  number_of_students_per_group_8abe7189: "Número de alunos por grupo"
   number_to_grade_661b05dd: "%{number} para avaliar"
   number_unsubmitted_145fefae: "%{number} não enviado"
   numerical_answer_ec7120bf: "Resposta numérica"
@@ -25230,7 +25247,9 @@ pt-BR:
   speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Dividir
   split_merged_users_6b81c595: "Dividir usuários mesclados"
+  split_number_of_students_per_group_4a05f76f: "Dividir o número de alunos por grupo"
   split_student_names_df0ef806: "Dividir os nomes dos alunos"
+  split_students_by_number_of_groups_5ace5a6a: "Dividir os alunos por número de grupos"
   split_students_into_groups_with_num_members_studen_c49d5136: "Divida os alunos em grupos com %{num_members} alunos por grupo"
   split_students_into_num_groups_groups_e9854f16: "Dividir alunos em %{num_groups} grupos"
   splitting_disabled_reached_maximum_of_three_assign_716acb13: "Divisão desabilitado: número máximo de três grupos de tarefas em uma escala de pontuação alcançado."
@@ -26273,6 +26292,7 @@ pt-BR:
   the_following_outcomes_cannot_be_removed_because_t_1c4b8ef9: 
     one: "O resultado a seguir não pode ser removido porque está alinhado ao conteúdo. Remova a seleção e tente novamente."
     other: "Os resultados a seguir não podem ser removidos porque estão alinhados ao conteúdo. Remova a seleção e tente novamente."
+  the_following_recipients_have_no_active_enrollment_17395ab4: "Os seguintes destinatários não têm matrícula ativa no curso, %{invalid_recipients}, não podem enviar mensagens"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
       Os seguintes alunos têm alterações não salvas em seus testes enviados: 
       
@@ -26626,6 +26646,7 @@ pt-BR:
                      Isso será habilitado por uma Política de Segurança de Conteúdo (CSP).
                      Domínios serão adicionados à sua lista branca com a capacidade de manualmente adicionar domínios.
                      Há um limite de 100 domínios na lista branca.
+  this_and_all_following_events_4b4b283: "Este e todos os eventos seguintes"
   this_announcement_will_not_be_visible_until_delaye_88f7f5c: "Este anúncio não estará visível até %{delayedPostAt}."
   this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: "Esta área será usada pelo assessor para deixar comentários relacionados a este critério."
   this_assignment_does_not_count_toward_the_final_gr_29ede05f: "Essa tarefa não irá contar para sua nota final"
@@ -26683,6 +26704,7 @@ pt-BR:
   this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Este ePortfolio foi identificado como possível spam. Ele está visível apenas para administradores e o autor. Se tiver certeza de que este conteúdo não é spam, é possível marcá-lo como seguro. Caso contrário, é possível confirmá-lo como spam."
   this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Este ePortfolio foi identificado como spam e só está visível para você. Contate um administrador se tiver quaisquer perguntas."
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Este ePortfolio foi identificado como spam. Ele está visível apenas para administradores e o autor. Se tiver certeza de que este conteúdo não é spam, é possível marcá-lo como seguro."
+  this_event_b437db90: "Este evento"
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: "Este recurso afeta os dados existentes para todos os cursos da conta."
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: "Este recurso afeta os dados existentes para toda uma conta."
   this_feature_allows_teachers_to_create_anonymous_d_ea364dca: "Este recurso permite que os professores criem discussões anônimas e permite que os professores habilitem uma configuração de nível de curso para que os alunos criem discussões anônimas"
@@ -27103,6 +27125,7 @@ pt-BR:
     new_caledonia: "Nova Caledónia"
     new_delhi: "Nova Deli"
     newfoundland: "Terra Nova"
+    norfolk_island: "Ilha Norfolk"
     noronha: Noronha
     novosibirsk: Novosibirsk
     nukualofa: Nuku'alofa
@@ -27222,6 +27245,7 @@ pt-BR:
     messages: Mensagens
     outcome_artifacts: "Artefatos de objetivo"
     people: Pessoas
+    topic: Assunto
     view_in_separate_window: "Visualizar em uma janela separada"
   tls_7a2eaba5: TLS
   to_1126ab55: " a"
