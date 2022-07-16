@@ -239,6 +239,7 @@ es:
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "Una tabla que contiene información sobre el esquema de calificación. Cada fila incluye un nombre, un porcentaje máximo y un porcentaje mínimo. Además, cada fila incorpora un icono para añadir más filas debajo y otro icono para borrar la línea actual."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Una tabla que contiene información sobre el esquema de calificaciones. Cada fila incluye un nombre, un porcentaje máximo y un porcentaje mínimo. Además, cada fila incorpora un botón para agregar más filas debajo y otro botón para eliminar la fila actual."
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "Una tabla que contiene información sobre el esquema de calificaciones. Primero aparece un nombre del esquema de calificaciones y luego botones para editar y eliminar el esquema. Cada fila incluye un nombre, un porcentaje máximo y un porcentaje mínimo. Además, cada fila incorpora un botón para agregar más filas debajo y otro botón para eliminar la fila actual."
+  a_timeout_occurred_contacting_external_authenticat_c064ea48: "Se agotó el tiempo de espera para comunicarse con el servicio de autenticación externo"
   a_z_243c3301: A–Z
   a_z_29d8e67c: A-Z
   ability_to_submit_annotatable_document_assignments_5bc5edd3: "Capacidad para entregar tareas de documentos con anotaciones."
@@ -1251,6 +1252,10 @@ es:
                 check_box: "CSV de los grupos"
               pseudonyms: 
                 check_box: "CSV de los seudónimos"
+              question_bank_questions: 
+                check_box: "Preguntas del Banco de preguntas"
+              question_banks: 
+                check_box: "Bancos de preguntas"
               sections: 
                 check_box: "CSV de las secciones"
               terms: 
@@ -2242,6 +2247,7 @@ es:
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Todos los campos de fechas deben estar presentes y formateados correctamente"
   all_day_fb42c4fc: "Todo el día"
   all_discussion_entries_report_c1e02906: "Reporte de todas las entradas de discusión"
+  all_events_6ae4331b: "Todos los eventos"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "¿Ha terminado?  ¡Ahora hay que publicar su curso!  Haga clic en el botón que aparece a continuación para hacerlo oficial. La publicación permitirá que los usuarios comiencen a participar del curso."
   all_get_scopes_59a54304: "Todos los alcances OBTENER"
   all_gradeable_student_submissions_report_d11ee705: "Reporte de todas las entregas calificables de los estudiantes"
@@ -2269,6 +2275,7 @@ es:
   all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "Todos los resultados de %{groupTitle} se agregaron correctamente a este curso."
   all_outcomes_from_grouptitle_have_been_successfull_6267efe4: "Todos los resultados de %{groupTitle} se añadieron correctamente a %{targetGroupTitle}."
   all_outcomes_from_grouptitle_have_been_successfull_cb6ad008: "Todos los resultados de %{groupTitle} se agregaron correctamente a esta cuenta."
+  all_quiz_submissions_9519d342: "Todas las entregas de exámenes"
   all_quiz_submissions_report_72a6d2fa: "Reporte de todas las entregas de examen"
   all_roles_f3bba14d: "Todos los roles"
   all_rubrics_5114c466: "Todas las rúbricas"
@@ -3459,6 +3466,7 @@ es:
   appointment_groups_bd225e60: "Grupos de citas"
   appointments_dcb41d23: Turnos
   approved_c3b285d4: Aprobado
+  approximate_quiz_sessions_e522a3a1: "Sesiones de examen aproximadas"
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} con precisión %{precision}"
   apps_54d24a47: Aplicaciones
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Las aplicaciones permiten agregar nuevas funciones a Canvas de manera sencilla. Se pueden incorporar a cursos individuales o a todos los cursos de una cuenta. Una vez configuradas, puede enlazarlas a través de los módulos del curso y crear tareas para las herramientas de evaluación."
@@ -4809,6 +4817,7 @@ es:
   back_to_title_39e7a8f4: "Regresar a %{title}"
   background_color_b92b52ac: "Color de fondo"
   background_image_1a401e1a: "Imagen de fondo"
+  bank_grouped_quiz_submissions_479ad830: "Entregas de examenes agrupadas por banco"
   banner_image_id_is_not_a_valid_id_21ecc6: "banner_image_id no es una ID válida"
   banner_image_url_and_banner_image_id_cannot_both_b_955615f5: "banner_image_url y banner_image_id ambos no pudieron ser establecidos."
   banner_image_url_is_not_a_valid_url_830d7926: "banner_image_url no es una URL válida"
@@ -8846,6 +8855,8 @@ es:
   create_file_s_188549e6: "[ Crear archivo(s) ]"
   create_files_after_rce_media_upload_recording_77d75a96: "Crear archivos luego de la grabación/carga de elementos multimedia mediante el RCE"
   create_group_set_7fe1cd53: "Crear grupos establecidos"
+  create_groups_later_6ce36058: "Crear grupos más tarde"
+  create_groups_now_d59bf70b: "Crear grupos ahora"
   create_interactive_course_content_76665336: "Cree contenido interactivo del curso"
   create_item_base: 
     there_was_an_error: "Se produjo un error al guardar \"%{title}\". Inténtelo de nuevo."
@@ -9326,6 +9337,7 @@ es:
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Defina el texto que puede ir antes y después de la lista desplegable, y construya una serie de respuestas posibles."
   delay_posting_this_topic_until_aa483eec: "Retrasar la publicación de este tema hasta"
   delayed_until_58b7af4b: "Retrasado hasta:"
+  delete_8d6d2222: "Eliminar: "
   delete_a143a2ab: eliminar
   delete_a6efa79d: Eliminar
   delete_account_name_96aee330: "Eliminar %{account_name}"
@@ -9355,6 +9367,7 @@ es:
   delete_domain_5ba75b7c: "Eliminar dominio"
   delete_domain_domain_c5b68f5: "Eliminar dominio %{domain}"
   delete_entry_title_5e59727b: "Borrar entrada %{title}"
+  delete_failed_6285e600: "La eliminación ha fallado"
   delete_feedname_1ac9a4a4: "Eliminar %{feedName}"
   delete_filter_83ca1a6a: "Eliminar filtro"
   delete_from_all_accounts_a1c5e621: "Eliminar de TODAS las cuentas"
@@ -9434,6 +9447,7 @@ es:
       Esta acción no se puede deshacer. ¿Está seguro de que desea eliminar %{file}?
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "Eliminar un usuario destruirá todos su ePortfolios. Alternativamente, los ePortfolios se pueden marcar individualmente como ‘correo no deseado’ o ‘seguros’ para modificar su visibilidad."
   deleting_assignment_22d5851d: "eliminando tarea"
+  deleting_b896f5f: eliminando
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Es necesario configurar los ajustes de Recaptcha en los sitios de demostración. Póngase en contacto con el administrador de su sitio para esta opción de Canvas."
   demos: 
@@ -11262,6 +11276,7 @@ es:
   example_https_schoolofrock_edu_d4326f03: "ejemplo: \"https://schoolofrock.edu\""
   example_item_scores_6726c689: "Ejemplo de calificaciones de items"
   example_school_of_rock_41f32c31: "ejemplo: \"School of Rock\""
+  exceeded_the_maximum_length_number_characters_2d25611e: "Se excedió la longitud máxima (%{number} caracteres)"
   exceeds_expectations_5910fc3a: "Excede las expectativas"
   exceeds_mastery_1f995dce: "Excede el dominio"
   excelsior_student_activity_tracking_7a1ba44d: "Control de actividad de estudiantes de Excelsior"
@@ -13975,7 +13990,7 @@ es:
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "Si está habilitado, el acceso a LTI 1.3 y LTI Advantage se activará."
   if_enabled_ags_scores_api_requests_that_include_a__4f0e6bec: |-
       Si están habilitadas, las solicitudes de la API de los puntajes de AGS que incluyen una carga de archivo desde una URL que expira
-      ahora devolverán un error más claro que “Error interno del servidor 500” y también
+      ahora devolverán un error más claro que “Error interno del servidor 500” y también
       se abstendrá de guardar datos o realizar cambios en las entregas en función de los datos de la solicitud,
       lo que permitirá que las herramientas vuelvan a intentar estas solicitudes con mayor facilidad.
   if_enabled_allows_deep_linking_from_the_module_ind_632bb221: "Si esta opción está habilitada, permite enlaces profundos desde el índice del módulo mediante un modal."
@@ -15136,6 +15151,7 @@ es:
   limit_each_time_slot_to_input_value_user_s_47461538: "Limitar cada franja horaria a %{input_value} usuario(s). "
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "Limitar cada franja horaria a %{num_participants} *grupos.* **usuarios.**"
   limit_file_size_limit_per_file_b336c0d8: "limite %{file_size_limit} por archivo"
+  limit_group_members_to_leave_blank_for_no_limit_c341e248: "Limitar los miembros del grupo a (dejar en blanco si no hay límite)"
   limit_groups_to_group_limit_members_40651ea7: "Limitar grupos a %{group_limit} miembros"
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "Limitar participantes para que participen en %{num_appointments} cita(s)"
   limit_search_to_activity_after_c1ac2449: "Limitar la búsqueda a la actividad después"
@@ -19057,6 +19073,7 @@ es:
   number_of_members_per_group_6beaef7b: "Cantidad de miembros por grupo"
   number_of_respondents_e1e7e8b: "Número de respuestas"
   number_of_scores_to_ignore_for_each_student_fb94e818: "Número de puntajes ignorados para cada estudiante"
+  number_of_students_per_group_8abe7189: "Número de estudiantes por grupo"
   number_to_grade_661b05dd: "%{number} calificar"
   number_unsubmitted_145fefae: "%{number} no presentado"
   numerical_answer_ec7120bf: "Respuesta numérica"
@@ -25229,7 +25246,9 @@ es:
   speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Dividir
   split_merged_users_6b81c595: "Dividir usuarios agrupados"
+  split_number_of_students_per_group_4a05f76f: "Dividir el número de estudiantes por grupo"
   split_student_names_df0ef806: "Dividir nombres de los alumnos"
+  split_students_by_number_of_groups_5ace5a6a: "Dividir los estudiantes por número de grupos"
   split_students_into_groups_with_num_members_studen_c49d5136: "Dividir a los estudiantes en grupos con %{num_members} estudiantes por grupo"
   split_students_into_num_groups_groups_e9854f16: "Dividir a los estudiantes en %{num_groups} grupos"
   splitting_disabled_reached_maximum_of_three_assign_716acb13: "División deshabilitada: se alcanzó el máximo de tres grupos de tareas en un rango de calificación"
@@ -26272,6 +26291,7 @@ es:
   the_following_outcomes_cannot_be_removed_because_t_1c4b8ef9: 
     one: "La competencia siguiente no puede ser eliminada porque está alineada con el contenido. Cancele la selección y vuelva a intentarlo."
     other: "Las siguientes competencias no pueden eliminarse porque están alineadas con el contenido. Cancele la selección y vuelva a intentarlo."
+  the_following_recipients_have_no_active_enrollment_17395ab4: "Los siguientes destinatarios no tienen ninguna inscripción activa en el curso, %{invalid_recipients}, no pueden enviar mensajes"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
       Los siguientes estudiantes tienen cambios sin guardar en las entregas de sus exámenes: 
       
@@ -26623,6 +26643,7 @@ es:
                      Esto se activará a través de una Política de seguridad de contenido (CSP, por sus siglas en inglés) actualizada.
                      Se agregarán dominios en la lista blanca con la capacidad de agregar dominios manualmente.
                      Existe un límite de 100 dominios en la lista blanca.
+  this_and_all_following_events_4b4b283: "Este y todos los siguientes eventos"
   this_announcement_will_not_be_visible_until_delaye_88f7f5c: "Este anuncio no estará visible hasta el %{delayedPostAt}."
   this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: "Esta área será usada por el evaluador para que pueda dejar comentarios relacionados al criterio."
   this_assignment_does_not_count_toward_the_final_gr_29ede05f: "Esta tarea no se puede contar hacia la calificación final"
@@ -26680,6 +26701,7 @@ es:
   this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Este ePortfolio se ha identificado como posible correo no deseado. Actualmente solo es visible para los administradores y el autor. Si está seguro de que este contenido no constituye correo no deseado, puede marcarlo como seguro. De lo contrario, puede confirmarlo como correo no deseado."
   this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Este ePortfolio ha sido identificado como correo no deseado, solo es visible para usted. Contacte a un administrador si tiene alguna pregunta."
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Este ePortfolio se ha identificado como correo no deseado. Actualmente solo es visible para los administradores y el autor. Si está seguro de que este contenido no constituye correo no deseado, puede marcarlo como seguro."
+  this_event_b437db90: "Este evento"
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: "Esta funcionalidad afecta los datos existentes para todos los cursos en la cuenta."
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: "Esta funcionalidad afecta los datos existentes para toda la cuenta."
   this_feature_allows_teachers_to_create_anonymous_d_ea364dca: "Esta funcionalidad les permite a los profesores crear foros de discusión anónimos y habilitar una configuración de nivel de curso para que los alumnos creen foros de discusión anónimos"
@@ -27099,6 +27121,7 @@ es:
     new_caledonia: "Nueva Caledonia"
     new_delhi: "Nueva Delhi"
     newfoundland: Terranova
+    norfolk_island: "Isla Norfolk"
     noronha: Noronha
     novosibirsk: Novosibirsk
     nukualofa: Nukualofa
@@ -27218,6 +27241,7 @@ es:
     messages: Mensajes
     outcome_artifacts: "Artefactos de competencia"
     people: Personas
+    topic: Tema
     view_in_separate_window: "Ver en una ventana separada"
   tls_7a2eaba5: TLS
   to_1126ab55: " para"
