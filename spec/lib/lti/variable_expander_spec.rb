@@ -65,6 +65,7 @@ module Lti
     let(:controller) do
       request_mock = double("request")
       allow(request_mock).to receive(:url).and_return("https://localhost")
+      allow(request_mock).to receive(:host_with_port).and_return("https://localhost")
       allow(request_mock).to receive(:host).and_return("/my/url")
       allow(request_mock).to receive(:scheme).and_return("https")
       allow(request_mock).to receive(:parameters).and_return(
@@ -1211,6 +1212,35 @@ module Lti
             end
 
             it { is_expected.to eq app_host }
+          end
+        end
+
+        describe "$com.instructure.RCS.service_jwt" do
+          subject do
+            exp_hash = { test: "$com.instructure.RCS.service_jwt" }
+            variable_expander.expand_variables!(exp_hash)
+            exp_hash[:test]
+          end
+
+          context "when tool is an internal service" do
+            before do
+              allow(tool).to receive(:internal_service?).with(any_args).and_return(true)
+              allow(Services::RichContent).to receive(:env_for).with(any_args).and_return(JWT: "service-jwt")
+            end
+
+            it { is_expected.to eq("service-jwt") }
+
+            context "when controller is not set" do
+              let(:variable_expander) { VariableExpander.new(root_account, course, nil, tool: tool) }
+
+              it { is_expected.to eq("") }
+            end
+          end
+
+          context "when tool is NOT an internal service" do
+            before { allow(tool).to receive(:internal_service?).with(any_args).and_return(false) }
+
+            it { is_expected.to eq("$com.instructure.RCS.service_jwt") }
           end
         end
 
