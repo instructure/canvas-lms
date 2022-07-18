@@ -150,7 +150,10 @@ const MessageListActionContainer = props => {
             itemSize: '45%'
           },
           messageActionButtons: {
-            padding: 'none x-small none x-small'
+            padding:
+              props.activeMailbox === 'submission_comments'
+                ? 'none none none x-small'
+                : 'none x-small none x-small'
           }
         }
       }}
@@ -202,10 +205,7 @@ const MessageListActionContainer = props => {
                 limitTagCount={LIMIT_TAG_COUNT}
               />
             </Flex.Item>
-            <Flex.Item
-              shouldGrow={matches.includes('mobile')}
-              padding={responsiveProps.messageActionButtons.padding}
-            >
+            <Flex.Item padding={responsiveProps.messageActionButtons.padding}>
               <MessageActionButtons
                 archive={props.displayUnarchiveButton ? undefined : props.onArchive}
                 unarchive={props.displayUnarchiveButton ? props.onUnarchive : undefined}
