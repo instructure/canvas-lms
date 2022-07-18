@@ -19,6 +19,11 @@
 
 import {buildGroup, buildSvg, buildSvgWrapper, buildStylesheet} from '../index'
 import {DEFAULT_SETTINGS} from '../constants'
+import base64EncodedFont from '../font'
+
+// The real font is massive so lets avoid it in snapshots
+jest.mock('../../svg/font')
+base64EncodedFont.mockReturnValue('data:;base64,')
 
 let settings, options
 
@@ -337,14 +342,8 @@ describe('buildGroup()', () => {
 })
 
 describe('buildStylesheet()', () => {
-  it('builds the <style /> element', async () => {
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        blob: () => Promise.resolve(new Blob())
-      })
-    )
-
-    expect(await buildStylesheet()).toMatchInlineSnapshot(`
+  it('builds the <style /> element', () => {
+    expect(buildStylesheet()).toMatchInlineSnapshot(`
       <style
         type="text/css"
       >
