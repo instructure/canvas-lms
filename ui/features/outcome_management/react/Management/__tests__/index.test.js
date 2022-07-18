@@ -38,8 +38,9 @@ import * as api from '@canvas/outcomes/graphql/Management'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import * as useGroupDetail from '@canvas/outcomes/react/hooks/useGroupDetail'
 
+jest.setTimeout(15000)
 jest.mock('@canvas/rce/RichContentEditor')
-jest.useFakeTimers()
+jest.useFakeTimers('legacy')
 
 describe('OutcomeManagementPanel', () => {
   let cache
@@ -87,13 +88,8 @@ describe('OutcomeManagementPanel', () => {
     jest.clearAllMocks()
   })
 
-  beforeAll(() => {
-    jest.setTimeout(15000)
-  })
-
   afterAll(() => {
     window.ENV = null
-    jest.setTimeout(5000)
   })
 
   const render = (

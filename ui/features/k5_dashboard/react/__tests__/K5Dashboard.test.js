@@ -32,6 +32,8 @@ import {MOCK_ASSIGNMENTS, MOCK_CARDS, MOCK_EVENTS} from '@canvas/k5/react/__test
 import K5Dashboard from '../K5Dashboard'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 
+jest.setTimeout(20000)
+
 const ASSIGNMENTS_URL = /\/api\/v1\/calendar_events\?type=assignment&important_dates=true&.*/
 const announcements = [
   {
@@ -126,13 +128,6 @@ const staff = [
     ]
   }
 ]
-beforeAll(() => {
-  jest.setTimeout(20000)
-})
-
-afterAll(() => {
-  jest.setTimeout(5000)
-})
 
 beforeEach(() => {
   moxios.install()

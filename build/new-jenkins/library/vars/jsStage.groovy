@@ -20,7 +20,7 @@ import groovy.transform.Field
 
 @Field static final COFFEE_NODE_COUNT = 4
 @Field static final JSG_NODE_COUNT = 3
-@Field static final JEST_NODE_COUNT = 4
+@Field static final JEST_NODE_COUNT = 6
 
 def jestNodeRequirementsTemplate(index) {
   def baseTestContainer = [

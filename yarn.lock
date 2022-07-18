@@ -15584,7 +15584,7 @@ jest-cli@^27.5.1:
     prompts "^2.0.1"
     yargs "^16.2.0"
 
-jest-config@^26, jest-config@^26.6.3:
+jest-config@^26.6.3:
   version "26.6.3"
   resolved "https://registry.yarnpkg.com/jest-config/-/jest-config-26.6.3.tgz#64f41444eef9eb03dc51d5c53b75c8c71f645349"
   integrity sha512-t5qdIj/bCj2j7NFVHb2nFB4aUdfucDn3JRKgrZnplb8nieAirAzRSHP8uDEd+qV6ygzg9Pz4YG7UTJf94LPSyg==
@@ -15608,7 +15608,7 @@ jest-config@^26, jest-config@^26.6.3:
     micromatch "^4.0.2"
     pretty-format "^26.6.2"
 
-jest-config@^27.5.1:
+jest-config@^27, jest-config@^27.5.1:
   version "27.5.1"
   resolved "https://registry.yarnpkg.com/jest-config/-/jest-config-27.5.1.tgz#5c387de33dca3f99ad6357ddeccd91bf3a0e4a41"
   integrity sha512-5sAsjm6tGdsVbW9ahcChPAFCk4IlkQUknH5AvKjuLTSlcO/wCZKyFdn7Rg0EkC+OGgWODEy2hDpWB1PgzH0JNA==
