@@ -92,6 +92,7 @@ module Lti
     USAGE_RIGHTS_GUARD = -> { @attachment&.usage_rights }
     MEDIA_OBJECT_ID_GUARD = -> { @attachment && (@attachment.media_object || @attachment.media_entry_id) }
     LTI1_GUARD = -> { @tool.is_a?(ContextExternalTool) }
+    INTERNAL_TOOL_GUARD = -> { @tool.internal_service?(@launch_url) }
     MASQUERADING_GUARD = -> { !!@controller && @controller.logged_in_user != @current_user }
     MESSAGE_TOKEN_GUARD = -> { @post_message_token.present? || @launch.instance_of?(Lti::Launch) }
     ORIGINALITY_REPORT_GUARD = -> { @originality_report.present? }
@@ -265,6 +266,24 @@ module Lti
                          Services::RichContent.env_for[:RICH_CONTENT_APP_HOST]
                        },
                        default_name: "com_instructure_rcs_app_host"
+
+    # Returns the RCS Service JWT for the current user
+    #
+    # @example
+    #   ```
+    #   "base64-encoded-service-jwt"
+    #   ```
+    register_expansion "com.instructure.RCS.service_jwt", [],
+                       lambda {
+                         return "" if @request.nil?
+
+                         Services::RichContent.env_for(user: @current_user,
+                                                       domain: @request.host_with_port,
+                                                       real_user: @controller.logged_in_user,
+                                                       context: @context)[:JWT]
+                       },
+                       INTERNAL_TOOL_GUARD,
+                       default_name: "com_instructure_rcs_service_jwt"
 
     # returns all observee ids linked to this observer as an String separated by `,`
     # @launch_parameter com_instructure_observee_ids
