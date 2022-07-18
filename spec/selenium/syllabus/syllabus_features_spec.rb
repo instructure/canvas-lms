@@ -65,9 +65,6 @@ describe "course syllabus" do
     end
 
     it "edits the description", priority: "1" do
-      skip("weird issue where text does not show up on submit")
-      # skip_if_firefox('known issue with firefox https://bugzilla.mozilla.org/show_bug.cgi?id=1335085')
-
       new_description = "new syllabus description"
       wait_for_new_page_load { f(".edit_syllabus_link").click }
       edit_form = f("#edit_course_syllabus_form")
@@ -97,12 +94,9 @@ describe "course syllabus" do
       expect(f(".mini_month .today")).to have_attribute("id", "mini_day_#{Time.zone.now.strftime("%Y_%m_%d")}")
     end
 
-    describe "Accessibility" do
-      it "sets focus to the Jump to Today link after clicking Edit the Description", priority: "2" do
-        skip("see CNVS-39931")
-        f(".edit_syllabus_link").click
-        check_element_has_focus(f(".jump_to_today_link"))
-      end
+    it "sets focus to the Jump to Today link after clicking Edit the Description", priority: "2" do
+      f(".edit_syllabus_link").click
+      check_element_has_focus(f(".jump_to_today_link"))
     end
   end
 
