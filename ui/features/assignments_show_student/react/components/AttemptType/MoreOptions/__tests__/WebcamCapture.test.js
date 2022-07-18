@@ -39,7 +39,7 @@ describe('WebcamCapture', () => {
   })
 
   afterEach(async () => {
-    await act(async() => { jest.runOnlyPendingTimers() })
+    await act(async() => { jest.runAllTimers() })
     delete navigator.mediaDevices
   })
 

@@ -26,7 +26,7 @@ import {render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/extend-expect'
 
-jest.setTimeout(20000)
+jest.setTimeout(25000)
 
 const originalState = store.getState()
 

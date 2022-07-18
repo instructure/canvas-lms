@@ -40,7 +40,7 @@ import * as useGroupDetail from '@canvas/outcomes/react/hooks/useGroupDetail'
 
 jest.setTimeout(15000)
 jest.mock('@canvas/rce/RichContentEditor')
-jest.useFakeTimers('legacy')
+jest.useFakeTimers({ legacyFakeTimers: true })
 
 describe('OutcomeManagementPanel', () => {
   let cache

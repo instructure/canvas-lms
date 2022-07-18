@@ -38,7 +38,7 @@ import {clickEl} from '@canvas/outcomes/react/helpers/testHelpers'
 import resolveProgress from '@canvas/progress/resolve_progress'
 
 jest.mock('@canvas/progress/resolve_progress')
-jest.useFakeTimers('legacy')
+jest.useFakeTimers({ legacyFakeTimers: true })
 
 const delayImportOutcomesProgress = () => {
   let realResolve
