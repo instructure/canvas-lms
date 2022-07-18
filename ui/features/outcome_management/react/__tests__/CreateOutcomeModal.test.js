@@ -32,6 +32,7 @@ import {
 } from '@canvas/outcomes/mocks/Management'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
+jest.setTimeout(10000)
 jest.useFakeTimers()
 
 describe('CreateOutcomeModal', () => {

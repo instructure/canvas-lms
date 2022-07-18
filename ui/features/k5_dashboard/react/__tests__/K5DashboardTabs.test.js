@@ -21,15 +21,9 @@ import {act, render, waitFor} from '@testing-library/react'
 import K5Dashboard from '../K5Dashboard'
 import {defaultK5DashboardProps as defaultProps} from './mocks'
 
+jest.setTimeout(20000)
+
 describe('K5Dashboard Tabs', () => {
-  beforeAll(() => {
-    jest.setTimeout(20000)
-  })
-
-  afterAll(() => {
-    jest.setTimeout(5000)
-  })
-
   afterEach(() => {
     window.location.hash = ''
   })

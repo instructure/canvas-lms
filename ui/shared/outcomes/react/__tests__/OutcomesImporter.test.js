@@ -29,7 +29,7 @@ import * as apiClient from '../apiClient'
 jest.mock('@canvas/alerts/react/FlashAlert')
 jest.mock('../apiClient')
 
-jest.useFakeTimers()
+jest.useFakeTimers('legacy')
 
 const file = sinon.createStubInstance(File)
 const defaultProps = (props = {}) =>

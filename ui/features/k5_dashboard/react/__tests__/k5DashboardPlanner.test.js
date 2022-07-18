@@ -31,22 +31,16 @@ import {
 } from './mocks'
 import {fetchShowK5Dashboard} from '@canvas/observer-picker/react/utils'
 
+jest.setTimeout(15000)
 jest.mock('@canvas/observer-picker/react/utils', () => ({
   ...jest.requireActual('@canvas/observer-picker/react/utils'),
   fetchShowK5Dashboard: jest.fn()
 }))
 
 const currentUserId = defaultProps.currentUser.id
+const moxiosWait = () => new Promise((r) => moxios.wait(r));
 
 describe('K5Dashboard Schedule Section', () => {
-  beforeAll(() => {
-    jest.setTimeout(15000)
-  })
-
-  afterAll(() => {
-    jest.setTimeout(5000)
-  })
-
   beforeEach(() => {
     moxios.install()
     createPlannerMocks()
@@ -132,20 +126,18 @@ describe('K5Dashboard Schedule Section', () => {
     expect(getByText('Exciting discussion')).toBeInTheDocument()
   })
 
-  it('preloads surrounding weeks only once schedule tab is visible', async done => {
+  it('preloads surrounding weeks only once schedule tab is visible', async () => {
     const {findByText, getByRole} = render(
       <K5Dashboard {...defaultProps} currentUserRoles={['user', 'student']} plannerEnabled />
     )
     expect(await findByText('Assignment 15')).toBeInTheDocument()
     expect(moxios.requests.count()).toBe(6)
     act(() => getByRole('tab', {name: 'Schedule'}).click())
-    moxios.wait(() => {
-      expect(moxios.requests.count()).toBe(8) // 2 more requests for prev and next week preloads
-      done()
-    })
+    await moxiosWait()
+    expect(moxios.requests.count()).toBe(8) // 2 more requests for prev and next week preloads
   })
 
-  it('reloads the planner with correct data when the selected observee is updated', async done => {
+  it('reloads the planner with correct data when the selected observee is updated', async () => {
     moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=1', {
       status: 200,
       response: MOCK_CARDS
@@ -204,10 +196,8 @@ describe('K5Dashboard Schedule Section', () => {
         timeout: 10000
       })
     ).toBeInTheDocument()
-    moxios.wait(() => {
-      const request = moxios.requests.mostRecent()
-      expect(request.url).toContain('observed_user_id=2')
-      done()
-    })
+    await moxiosWait()
+    const request = moxios.requests.mostRecent()
+    expect(request.url).toContain('observed_user_id=2')
   })
 })

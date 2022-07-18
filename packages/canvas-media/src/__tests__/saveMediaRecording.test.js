@@ -52,7 +52,7 @@ describe('saveMediaRecording', () => {
   afterEach(() => {
     moxios.uninstall()
   })
-  it('fails if request for kaltura session fails', async done => {
+  it('fails if request for kaltura session fails', async () => {
     moxios.stubRequest('http://host:port/api/v1/services/kaltura_session?include_upload_config=1', {
       status: 500,
       response: {error: 'womp womp'}
@@ -62,7 +62,6 @@ describe('saveMediaRecording', () => {
     await saveMediaRecording({}, rcsConfig, doneFunction)
     expect(doneFunction).toHaveBeenCalledTimes(1)
     expect(doneFunction.mock.calls[0][0].message).toBe('Request failed with status code 500')
-    done()
   })
 
   it('returns error if k5.fileError is dispatched', () => {
