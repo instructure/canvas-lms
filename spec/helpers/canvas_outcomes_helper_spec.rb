@@ -21,6 +21,17 @@ require_relative "../spec_helper"
 require "webmock/rspec"
 
 describe CanvasOutcomesHelper do
+  def stub_get_lmgb_results(params)
+    stub_request(:get, "http://domain/api/authoritative_results?#{params}").with({
+                                                                                   headers: {
+                                                                                     Authorization: /\+*/,
+                                                                                     Accept: "*/*",
+                                                                                     "Accept-Encoding": /\+*/,
+                                                                                     "User-Agent": "Ruby"
+                                                                                   }
+                                                                                 })
+  end
+
   subject { Object.new.extend CanvasOutcomesHelper }
 
   around do |example|
@@ -219,17 +230,6 @@ describe CanvasOutcomesHelper do
       end
 
       context "with outcomes provision settings" do
-        def stub_get_lmgb_results(params)
-          stub_request(:get, "http://domain/api/authoritative_results?#{params}").with({
-                                                                                         headers: {
-                                                                                           Authorization: /\+*/,
-                                                                                           Accept: "*/*",
-                                                                                           "Accept-Encoding": /\+*/,
-                                                                                           "User-Agent": "Ruby"
-                                                                                         }
-                                                                                       })
-        end
-
         context "with outcome_service_results_to_canvas FF on" do
           let(:user1) { User.create! }
           let(:user2) { User.create! }
@@ -313,6 +313,37 @@ describe CanvasOutcomesHelper do
           it "returns nil when FF is off" do
             expect(subject.get_lmgb_results(@course, "1", "assign.type", "1", one_user_uuid)).to eq nil
           end
+        end
+      end
+    end
+  end
+
+  describe "#get_lmgb_results by account" do
+    context "with outcomes provision settings" do
+      let(:user1) { User.create! }
+      let(:one_user_uuid) { user1.uuid }
+
+      before do
+        settings = { consumer_key: "key", jwt_secret: "secret", domain: "domain" }
+        account.settings[:provision] = { "outcomes" => settings }
+        account.save!
+      end
+
+      context "with outcome_service_results_to_canvas FF off" do
+        it "returns nil when FF is off" do
+          expect(subject.get_lmgb_results(account, "1", "assign.type", "1", one_user_uuid)).to eq nil
+        end
+      end
+
+      context "with outcome_service_results_to_canvas FF on" do
+        before do
+          account.enable_feature!(:outcome_service_results_to_canvas)
+        end
+
+        it "returns results with one assignment id" do
+          expected_json = { "results" => [{ "result" => "stuff" }] }.to_json
+          stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}").to_return(status: 200, body: '{"results":[{"result":"stuff"}]}')
+          expect(subject.get_lmgb_results(account, "1", "assign.type", "1", one_user_uuid)).to eq expected_json
         end
       end
     end
