@@ -234,6 +234,7 @@ it:
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "Tabella di risposte e brevi statistiche relative alla scelta delle risposte degli studenti."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Tabella contenente i dati dello schema di valutazione. Ciascuna riga contiene un nome, una percentuale massima e una percentuale minima. Inoltre, ciascuna riga contiene un pulsante per aggiungere una nuova riga sotto e un pulsante per eliminare la riga corrente."
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "Tabella contenente i dati dello schema di valutazione. Il primo è il nome dello schema di valutazione e i pulsanti per la modifica e l'eliminazione dello schema. Ciascuna riga contiene un nome, una percentuale massima e una percentuale minima. Inoltre, ciascuna riga contiene un pulsante per aggiungere una nuova riga sotto e un pulsante per eliminare la riga corrente."
+  a_timeout_occurred_contacting_external_authenticat_c064ea48: "Si è verificato un timeout durante il contatto del servizio di autenticazione esterno"
   a_z_243c3301: A–Z
   a_z_29d8e67c: "A - Z"
   ability_to_submit_annotatable_document_assignments_5bc5edd3: "Capacità di inviare compiti con documenti annotabili."
@@ -1181,6 +1182,10 @@ it:
                 check_box: "CSV gruppi"
               pseudonyms: 
                 check_box: "CSV pseudonimi"
+              question_bank_questions: 
+                check_box: "Domande banca di domande"
+              question_banks: 
+                check_box: "Banche di domande"
               sections: 
                 check_box: "CSV sezioni"
               terms: 
@@ -2096,6 +2101,7 @@ it:
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Tutti i campi delle date devono essere presenti e formattati correttamente"
   all_day_fb42c4fc: "Tutto il giorno"
   all_discussion_entries_report_c1e02906: "Report su tutte le voci discussione"
+  all_events_6ae4331b: "Tutti gli eventi"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Tutto terminato?  È ora di pubblicare il tuo corso.  Fai clic sul pulsante sotto per renderlo ufficiale. La pubblicazione consentirà agli utenti di iniziare a partecipare al corso."
   all_get_scopes_59a54304: "Tutti gli ambiti GET"
   all_gradeable_student_submissions_report_d11ee705: "Report su tutti gli invii studente valutabili"
@@ -2122,6 +2128,7 @@ it:
   all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "Tutti i risultati di %{groupTitle} sono stati aggiunti correttamente a questo corso."
   all_outcomes_from_grouptitle_have_been_successfull_6267efe4: "Tutti i risultati di %{groupTitle} sono stati aggiunti correttamente a %{targetGroupTitle}."
   all_outcomes_from_grouptitle_have_been_successfull_cb6ad008: "Tutti i risultati di %{groupTitle} sono stati aggiunti correttamente a questo account."
+  all_quiz_submissions_9519d342: "Tutte le consegne quiz"
   all_quiz_submissions_report_72a6d2fa: "Report su tutti gli invii di quiz"
   all_roles_f3bba14d: "Tutti i ruoli"
   all_rubrics_5114c466: "Tutte le rubriche"
@@ -3294,6 +3301,7 @@ it:
   appointment_groups_bd225e60: "Gruppi di appuntamenti"
   appointments_dcb41d23: Appuntamenti
   approved_c3b285d4: Approvato
+  approximate_quiz_sessions_e522a3a1: "Sessioni quiz approssimative"
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} con precisione %{precision}"
   apps_54d24a47: App
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Le app offrono un modo semplice per aggiungere nuove funzioni a Canvas. Puoi aggiungerle ai corsi individuali oppure a tutti i corsi in un account. Una volta completata la configurazione, puoi collegarti alle app tramite i moduli dei corsi e creare compiti per gli strumenti di valutazione."
@@ -4487,6 +4495,7 @@ it:
   back_to_title_39e7a8f4: "Torna a %{title}"
   background_color_b92b52ac: "Colore di sfondo"
   background_image_1a401e1a: "Immagine sfondo"
+  bank_grouped_quiz_submissions_479ad830: "Invii quiz raggruppati per banca"
   banner_image_id_is_not_a_valid_id_21ecc6: "banner_image_id non è un ID valido"
   banner_image_url_and_banner_image_id_cannot_both_b_955615f5: "banner_image_url e banner_image_id non possono essere impostati entrambi."
   banner_image_url_is_not_a_valid_url_830d7926: "banner_image_url non è un URL valido"
@@ -8136,6 +8145,8 @@ it:
   create_file_s_188549e6: "[ Carica file ]"
   create_files_after_rce_media_upload_recording_77d75a96: "Crea file dopo caricamento/registrazione supporti multimediali RCE"
   create_group_set_7fe1cd53: "Crea set di gruppi"
+  create_groups_later_6ce36058: "Crea gruppi successivamente"
+  create_groups_now_d59bf70b: "Crea gruppi ora"
   create_interactive_course_content_76665336: "Crea contenuto interattivo del corso"
   create_live_event_subscriptions_on_toolproxy_7c8378b1: "Crea iscrizioni a eventi live su ToolProxy"
   create_lookup_7ceb6d90: "Crea ricerca"
@@ -8582,6 +8593,7 @@ it:
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Definisci il testo da inserire prima e dopo l'elenco a discesa e crea un set di possibili domande."
   delay_posting_this_topic_until_aa483eec: "Ritarda la pubblicazione di questo argomento fino al"
   delayed_until_58b7af4b: "Rinviato fino al:"
+  delete_8d6d2222: "Elimina: "
   delete_a143a2ab: elimina
   delete_a6efa79d: Elimina
   delete_account_name_96aee330: "Elimina %{account_name}"
@@ -8610,6 +8622,7 @@ it:
   delete_domain_5ba75b7c: "Elimina dominio"
   delete_domain_domain_c5b68f5: "Elimina dominio %{domain}"
   delete_entry_title_5e59727b: "Elimina voce %{title}"
+  delete_failed_6285e600: "Eliminazione non riuscita"
   delete_feedname_1ac9a4a4: "Elimina %{feedName}"
   delete_filter_83ca1a6a: "Elimina filtro"
   delete_from_all_accounts_a1c5e621: "Elimina da TUTTI gli account"
@@ -8684,6 +8697,7 @@ it:
       Questa azione è irreversibile. Vuoi eliminare %{file}?
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "L’eliminazione di un utente distruggerà tutti i suoi ePortfolio. In alternativa, è possibile contrassegnare singolarmente gli ePortfolio come “spam” o “sicuri” per modificarne la visibilità."
   deleting_assignment_22d5851d: "eliminazione assegnazione"
+  deleting_b896f5f: eliminazione
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "I siti demo richiedono la configurazione delle impostazioni reCAPTCHA. Contatta l'amministratore del sito per questa istanza di Canvas."
   demos: 
@@ -10389,6 +10403,7 @@ it:
   example_https_schoolofrock_edu_d4326f03: "esempio: \"https://schoolofrock.edu\""
   example_item_scores_6726c689: "Esempio punteggi elementi"
   example_school_of_rock_41f32c31: "esempio: \"School of Rock\""
+  exceeded_the_maximum_length_number_characters_2d25611e: "Superata la lunghezza massima (%{number} caratteri)"
   exceeds_expectations_5910fc3a: "Supera le aspettative"
   exceeds_mastery_1f995dce: "Supera il livello di padronanza"
   excelsior_student_activity_tracking_7a1ba44d: "Monitoraggio delle attività studenti Excelsior"
@@ -13542,6 +13557,7 @@ it:
   limit_course_participation_to_term_or_custom_cours_67797a86: "Limitare la partecipazione al corso alle date del trimestre o del corso personalizzato?"
   limit_each_time_slot_to_input_value_user_s_47461538: "Limita ciascuna fascia oraria a %{input_value} utente/i. "
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "Limita ciascuna fascia oraria a %{num_participants} *gruppi.* **utenti.**"
+  limit_group_members_to_leave_blank_for_no_limit_c341e248: "Limita membri del gruppo a (lascia vuoto per nessun limite)"
   limit_groups_to_group_limit_members_40651ea7: "Limita gruppi a %{group_limit} membri"
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "Limita partecipanti a prendere parte a %{num_appointments} appuntamento/i."
   limit_search_to_activity_after_c1ac2449: "Limita la ricerca all'attività dopo"
@@ -17071,6 +17087,7 @@ it:
   number_of_members_per_group_6beaef7b: "Numero di membri per gruppo"
   number_of_respondents_e1e7e8b: "Numero di rispondenti"
   number_of_scores_to_ignore_for_each_student_fb94e818: "Numero di punteggi da ignorare per ciascuno studente"
+  number_of_students_per_group_8abe7189: "Numero di studenti per gruppo"
   number_to_grade_661b05dd: "%{number} da valutare"
   number_unsubmitted_145fefae: "%{number} non inviato"
   numerical_answer_ec7120bf: "Risposta numerica"
@@ -22605,7 +22622,9 @@ it:
   speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Dividi
   split_merged_users_6b81c595: "Dividi utenti uniti"
+  split_number_of_students_per_group_4a05f76f: "Dividi numero di studenti per gruppo"
   split_student_names_df0ef806: "Dividi nomi studenti"
+  split_students_by_number_of_groups_5ace5a6a: "Dividi studenti per numero di gruppi"
   split_students_into_groups_with_num_members_studen_c49d5136: "Dividi gli studenti in gruppi con %{num_members} studenti per gruppo"
   split_students_into_num_groups_groups_e9854f16: "Dividi gli studenti in %{num_groups} gruppi"
   splitting_disabled_reached_maximum_of_three_assign_716acb13: "Divisione disabilitata: raggiunto il massimo di tre gruppi di compiti in un intervallo punteggio"
@@ -23595,6 +23614,7 @@ it:
   the_following_outcomes_cannot_be_removed_because_t_1c4b8ef9: 
     one: "Il seguente risultato non può essere rimosso perché è allineato al contenuto. Deselezionarlo e riprovare."
     other: "I seguenti risultati non possono essere rimossi perché sono allineati al contenuto. Deselezionarli e riprovare."
+  the_following_recipients_have_no_active_enrollment_17395ab4: "I seguenti destinatari non hanno alcuna iscrizione attiva al corso, %{invalid_recipients}, impossibile inviare i messaggi"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
       Gli studenti seguenti hanno modifiche non salvate nelle consegne dei quiz: 
       
@@ -23932,6 +23952,7 @@ it:
                      Ciò sarà abilitato da un aggiornamento della  Politica sulla sicurezza dei contenuti (CSP).
                      I domini saranno aggiunti all’elenco dei domini consentiti con la possibilità di aggiungere i domini manualmente.
                      L’elenco dei domini consentiti ha un limite di 100 domini.
+  this_and_all_following_events_4b4b283: "Questo evento e tutti gli eventi successivi"
   this_announcement_will_not_be_visible_until_delaye_88f7f5c: "Questo annuncio non sarà visibile fino al %{delayedPostAt}."
   this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: "Questa area verrà utilizzata dall'esaminatore per lasciare commenti relativi a questo criterio."
   this_assignment_does_not_count_toward_the_final_gr_29ede05f: "Questo compito non viene conteggiato nel calcolo del voto finale"
@@ -23987,6 +24008,7 @@ it:
   this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Questo ePortfolio è stato identificato come possibile spam. Attualmente è visibile solo agli amministratori e all’autore. Se sei sicuro che questo contenuto non sia spam, puoi contrassegnarlo come sicuro. Diversamente, puoi confermarlo come spam."
   this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Questo ePortfolio è stato identificato come spam ed è visibile solo a te. Se hai delle domande, contatta un amministratore."
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Questo ePortfolio è stato identificato come spam. Attualmente è visibile solo agli amministratori e all’autore. Se sei sicuro che questo contenuto non sia spam, puoi contrassegnarlo come sicuro."
+  this_event_b437db90: "Questo evento"
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: "Questa funzione interessa i dati esistenti per tutti i corsi nell’account."
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: "Questa funzione interessa i dati esistenti per account intero."
   this_feature_allows_teachers_to_create_anonymous_d_ea364dca: "Questa funzione consente agli insegnanti di creare discussioni anonime e di attivare un’impostazione di livello corso per gli studenti al fine di creare discussioni anonime"
@@ -24402,6 +24424,7 @@ it:
     new_caledonia: "Nuova Caledonia"
     new_delhi: "Nuova Delhi"
     newfoundland: Terranova
+    norfolk_island: "Isola Norfolk"
     noronha: Noronha
     novosibirsk: Novosibirsk
     nukualofa: Nuku'alofa
@@ -24520,6 +24543,7 @@ it:
     learning_outcomes: "Esiti dell'apprendimento"
     messages: Messaggi
     outcome_artifacts: "Elementi esito"
+    topic: Argomento
     view_in_separate_window: "Visualizza in un'altra finestra"
   tls_7a2eaba5: TLS
   to_1126ab55: " a"

@@ -235,6 +235,7 @@ fr-CA:
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "Un tableau regroupant réponses et brèves statistiques concernant les choix de réponse des étudiants."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Un tableau qui contient les données du système de notation. Chaque ligne comporte un nom, un pourcentage maximum et un pourcentage minimum. De plus, chaque ligne possède un bouton d'ajout de nouvelle ligne au dessous, ainsi qu'un bouton de suppression de la ligne actuelle."
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "Un tableau qui contient les données du système de notation. Tout d’abord, il y a le nom du système de notation et les boutons permettant de modifier et de supprimer le système. Chaque ligne comporte un nom, un pourcentage maximum et un pourcentage minimum. De plus, chaque ligne possède un bouton d’ajout de nouvelle ligne au-dessous, ainsi qu’un bouton de suppression de la ligne actuelle."
+  a_timeout_occurred_contacting_external_authenticat_c064ea48: "Un délai d’inactivité s’est produit en contactant le service d’authentification externe"
   a_z_243c3301: A-Z
   a_z_29d8e67c: "A - Z"
   ability_to_submit_annotatable_document_assignments_5bc5edd3: "Possibilité de soumettre des tâches de documents annotables."
@@ -1237,6 +1238,10 @@ fr-CA:
                 check_box: "CSV groupes"
               pseudonyms: 
                 check_box: "Pseudonymes CSV"
+              question_bank_questions: 
+                check_box: "Questions de la banque de questions"
+              question_banks: 
+                check_box: "Banques de questions"
               sections: 
                 check_box: "CSV sections"
               terms: 
@@ -2172,6 +2177,7 @@ fr-CA:
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Tous les champs des dates doivent être présents et mis en forme correctement"
   all_day_fb42c4fc: "Toute la journée."
   all_discussion_entries_report_c1e02906: "Rapport sur toutes les entrées de discussion"
+  all_events_6ae4331b: "Tous les événements"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Vous avez terminé? Il est temps de publier votre cours! Cliquez sur le bouton ci-dessous pour que ce soit officiel! La publication permettra aux utilisateurs de commencer à participer à ce cours."
   all_get_scopes_59a54304: "Toutes les portées GET"
   all_gradeable_student_submissions_report_d11ee705: "Rapport sur tous les envois d'élèves qui peuvent être noté"
@@ -2198,6 +2204,7 @@ fr-CA:
   all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "Tous les acquis de %{groupTitle} ont été ajoutés avec succès à ce cours."
   all_outcomes_from_grouptitle_have_been_successfull_6267efe4: "Tous les acquis de %{groupTitle} ont été ajoutés avec succès à %{targetGroupTitle}."
   all_outcomes_from_grouptitle_have_been_successfull_cb6ad008: "Tous les acquis de %{groupTitle} ont été ajoutés avec succès à ce compte."
+  all_quiz_submissions_9519d342: "Envois de tous les questionnaires"
   all_quiz_submissions_report_72a6d2fa: "Rapport sur tous les envois de questionnaire"
   all_roles_f3bba14d: "Tous les rôles"
   all_rubrics_5114c466: "Toutes les rubriques"
@@ -2238,7 +2245,7 @@ fr-CA:
   allow_final_grade_override_8cf4336b: "Autoriser le surclassement de la note finale"
   allow_final_grade_override_a21a79ee: "Autoriser le surclassement de la note finale"
   allow_for_apollo_to_cache_graphql_queries_on_a_use_bda8210d: "Permettre à Apollo de mettre en cache les requêtes graphQL sur un navigateur d’utilisateur pour accélérer leur expérience"
-  allow_for_key_keyname_b973f769: "Prévoyez une clé : %{keyName}"
+  allow_for_key_keyname_b973f769: "Prévoyez une clé : %{keyName}"
   allow_gradebook_users_to_view_and_export_student_f_68a8084b: "Permettre aux utilisateurs du carnet de notes de visualiser et d’exporter les noms et prénoms des étudiants dans des colonnes séparées"
   allow_importing_of_qti_and_common_cartridge_into_n_4380a7a2: "Permet l’importation de QTI et de Common Cartridge dans de nouveaux questionnaires."
   allow_importing_of_qti_and_common_cartridge_into_q_81b657cd: "Permet l’importation de QTI et de Common Cartridge dans Quizzes.Next."
@@ -3372,6 +3379,7 @@ fr-CA:
   appointment_groups_bd225e60: "Groupes de rendez-vous"
   appointments_dcb41d23: Rendez-vous
   approved_c3b285d4: Approuvé
+  approximate_quiz_sessions_e522a3a1: "Sessions de questionnaire approximatives"
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} avec une précision de %{precision}"
   apps_54d24a47: Applications
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Les applications permettent d’ajouter facilement de nouvelles fonctionnalités à Canvas. Elles peuvent être ajoutées à des cours individuels ou à tous les cours d’un compte. Une fois qu’elles sont configurées, vous pouvez créer un lien vers elles via les modules des cours et créer des activités pour les outils d’évaluation."
@@ -4605,6 +4613,7 @@ fr-CA:
   back_to_title_39e7a8f4: "Retour à %{title}"
   background_color_b92b52ac: "Couleur de fond"
   background_image_1a401e1a: "Image de fond"
+  bank_grouped_quiz_submissions_479ad830: "Envois de questionnaires groupés par banque"
   banner_image_id_is_not_a_valid_id_21ecc6: "banner_image_id n’est pas un ID valide"
   banner_image_url_and_banner_image_id_cannot_both_b_955615f5: "banner_image_url et banner_image_id ne peuvent pas être définis ensemble."
   banner_image_url_is_not_a_valid_url_830d7926: "banner_image_url n'est pas une URL valide"
@@ -8426,6 +8435,8 @@ fr-CA:
   create_file_s_188549e6: "[Créer fichier(s)]"
   create_files_after_rce_media_upload_recording_77d75a96: "Créer des fichiers après le téléversement/enregistrement de supports RCE"
   create_group_set_7fe1cd53: "Créer un ensemble de groupes"
+  create_groups_later_6ce36058: "Créer des groupes plus tard"
+  create_groups_now_d59bf70b: "Créer des groupes maintenant"
   create_interactive_course_content_76665336: "Créer du contenu de cours interactif"
   create_live_event_subscriptions_on_toolproxy_7c8378b1: "Créer des abonnements à des événements en direct sur ToolProxy"
   create_lookup_7ceb6d90: "Créer une recherche"
@@ -8874,6 +8885,7 @@ fr-CA:
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Définissez le texte qui s’affichera avant et après le déroulant et créez un ensemble de réponses possibles."
   delay_posting_this_topic_until_aa483eec: "Retarder la publication de ce sujet jusqu'à"
   delayed_until_58b7af4b: "Retardé jusqu'à :"
+  delete_8d6d2222: "Supprimer : "
   delete_a143a2ab: supprimer
   delete_a6efa79d: Supprimer
   delete_account_name_96aee330: "Supprimer %{account_name}"
@@ -8902,6 +8914,7 @@ fr-CA:
   delete_domain_5ba75b7c: "Supprimer un domaine"
   delete_domain_domain_c5b68f5: "Supprimer domaine %{domain}"
   delete_entry_title_5e59727b: "Supprimer l’entrée %{title}"
+  delete_failed_6285e600: "Échec de la suppression"
   delete_feedname_1ac9a4a4: "Supprimer %{feedName}"
   delete_filter_83ca1a6a: "Supprimer le filtre"
   delete_from_all_accounts_a1c5e621: "Supprimer DE TOUS les comptes"
@@ -8979,6 +8992,7 @@ fr-CA:
       Cette action est irréversible. Voulez-vous vraiment supprimer %{file}?
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "La suppression d’un utilisateur détruira tous ses ePortfolios. Alternativement, les ePortfolios peuvent être individuellement marqués comme « pourriel » ou « sécuritaire » pour modifier leur visibilité."
   deleting_assignment_22d5851d: "suppression de la tâche en cours..."
+  deleting_b896f5f: "suppression en cours…"
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Les paramètres Recaptcha doivent être configurés pour les sites de démonstration. Adressez-vous à l’administrateur de votre site pour cette instance de Canvas."
   demos: 
@@ -9239,7 +9253,7 @@ fr-CA:
   disabling_the_assignments_and_quizzes_edit_permiss_529f9360: "La désactivation de l’autorisation « Tâches et questionnaires — modifier » annulera (si activée) l’autorisation « Rubriques — ajouter/modifier/supprimer », empêchant l’utilisateur de modifier les rubriques à partir d’une tâche individuelle."
   disabling_the_elementary_theme_will_change_the_fon_d7f31a3b: "La désactivation du thème élémentaire modifiera la police de l’interface Canvas pour tous les utilisateurs de votre cours."
   disabling_the_mastery_paths_feature_will_release_c_4b96c86d: "La désactivation de la fonction « Parcours de maîtrise » libérera les tâches et le contenu configurés pour tous les étudiants. Si la fonction est réactivée, ces tâches devront être configurées à nouveau pour les Parcours de maîtrise."
-  disabling_the_mastery_paths_feature_will_release_c_8a001169: "La désactivation de la fonction « Parcours de maîtrise » libérera les tâches et le contenu configurés pour tous les étudiants. %{br} Si la fonction est réactivée, ces tâches devront être configurées à nouveau pour les Parcours de maîtrise."
+  disabling_the_mastery_paths_feature_will_release_c_8a001169: "La désactivation de la fonction « Parcours de maîtrise » libérera les tâches et le contenu configurés pour tous les étudiants. %{br} Si la fonction est réactivée, ces tâches devront être configurées à nouveau pour les Parcours de maîtrise."
   disabling_this_permission_will_override_if_enabled_59c2b5c9: "La désactivation de cette autorisation annulera (si activée) l’autorisation « Rubriques — ajouter/modifier/supprimer », empêchant l’utilisateur de créer ou de modifier les rubriques à partir d’une tâche individuelle."
   disabling_this_permission_will_override_if_enabled_6481b015: "La désactivation de cette autorisation annulera (si activée) l’autorisation « Rubriques — ajouter/modifier/supprimer », empêchant l’utilisateur de créer ou de modifier les rubriques à partir d’une tâche individuelle. Toutefois, si « Acquis - ajouter/modifier/supprimer » est activé, l’utilisateur peut encore ajouter des rubriques par l’intermédiaire d’Acquis (Bouton « Gérer les rubriques »)."
   disabling_this_permission_will_override_if_enabled_7f2a87cc: "La désactivation de cette autorisation annulera (si activée) l’autorisation « Rubriques — ajouter/modifier/supprimer », empêchant l’utilisateur de créer ou de modifier les rubriques à partir d’une tâche individuelle. Toutefois, si « Acquis - ajouter/modifier/supprimer » est activé, l’utilisateur peut encore ajouter des rubriques par l’intermédiaire d’Acquis (bouton « Gérer les rubriques »)."
@@ -10721,6 +10735,7 @@ fr-CA:
   example_https_schoolofrock_edu_d4326f03: "exemples : https://schoolofrock.edu"
   example_item_scores_6726c689: "Exemple de note d’élément"
   example_school_of_rock_41f32c31: "exemples : School of Rock (école de rock)"
+  exceeded_the_maximum_length_number_characters_2d25611e: "Dépasse la longueur maximale (%{number} caractères)"
   exceeds_expectations_5910fc3a: "Dépasse les attentes"
   exceeds_mastery_1f995dce: "Surpasse le niveau de Maîtrise"
   excelsior_student_activity_tracking_7a1ba44d: "Suivi des activités des étudiants d'Excelsior"
@@ -10871,7 +10886,7 @@ fr-CA:
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Échec lors du chargement de composant des modifications non synchronisées. Est-ce que votre connexion réseau est OK?"
   failed_pairing_student_c9f0863b: "Échec du jumelage de l’étudiant."
   failed_parsing_the_event_s_recurrance_rule_e_c984126a: "L’analyse de la règle de récurrence de l’événement a échoué : %{e}"
-  failed_parsing_the_event_s_recurrence_rule_e_43f87709: "L’analyse de la règle de récurrence de l’événement a échoué : %{e}"
+  failed_parsing_the_event_s_recurrence_rule_e_43f87709: "L’analyse de la règle de récurrence de l’événement a échoué : %{e}"
   failed_please_report_the_following_error_code_to_y_42248d60: "Échec; veuillez communiquer le code d’erreur suivant à votre administrateur système : ErrorReport :%{error};"
   failed_publishing_pace_40f87d0e: "Échec de publication de rythme"
   failed_publishing_plan_edc45557: "Échec de publication de plan"
@@ -13123,7 +13138,7 @@ fr-CA:
   if_enabled_ags_scores_api_requests_that_include_a__4f0e6bec: |-
       
       Si cette option est activée, les requêtes de l’API des scores AGS qui comprennent un téléversement de fichier à partir d’une URL dont le délai d’attente est dépassé
-      renverront désormais une erreur plus claire que « 500 Internal Server Error », et s’abstiendront également d’enregistrer les données ou d’apporter des modifications aux envois basés sur les données de la requête,
+      renverront désormais une erreur plus claire que « 500 Internal Server Error », et s’abstiendront également d’enregistrer les données ou d’apporter des modifications aux envois basés sur les données de la requête,
       permettant ainsi aux outils de réessayer ces requêtes plus facilement.
   if_enabled_allows_deep_linking_from_the_module_ind_632bb221: "Si cette option est activée, permet un lien profond à partir de l’index du module vers un modal."
   if_enabled_allows_deep_linking_from_the_module_ind_f2dcbddb: "Si cette option est activée, permet un lien profond à partir de l’index du module."
@@ -14247,6 +14262,7 @@ fr-CA:
   limit_course_participation_to_term_or_custom_cours_67797a86: "Limiter la participation au cours aux dates du trimestre ou du cours personnalisé?"
   limit_each_time_slot_to_input_value_user_s_47461538: "Limiter chaque créneau à %{input_value} utilisateur(s). "
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "Limiter chaque créneau horaire à %{num_participants} *groups.* **users.**"
+  limit_group_members_to_leave_blank_for_no_limit_c341e248: "Limiter les membres du groupe à (laisser vide pour aucune limite)"
   limit_groups_to_group_limit_members_40651ea7: "Limiter les groupes à %{group_limit} membres"
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "Limiter à %{num_appointments} le nombre de rendez-vous au(x)quel(s) les participants peuvent assister ."
   limit_search_to_activity_after_c1ac2449: "Limiter la recherche d'activité postérieure à"
@@ -17817,6 +17833,7 @@ fr-CA:
   number_of_members_per_group_6beaef7b: "Nombre de membres par groupe"
   number_of_respondents_e1e7e8b: "Nombre de répondants"
   number_of_scores_to_ignore_for_each_student_fb94e818: "Nombre de notes à ignorer pour chaque étudiant"
+  number_of_students_per_group_8abe7189: "Nombre d’étudiants par groupe"
   number_to_grade_661b05dd: "%{number} à noter"
   number_unsubmitted_145fefae: "%{number} non envoyé"
   numerical_answer_ec7120bf: "Réponse numérique"
@@ -17876,7 +17893,7 @@ fr-CA:
   of_students_5d1af0d2: "Nbre d’étudiants"
   of_times_1018baab: "# de fois"
   off_5385ef3f: Désactiver
-  off_for_key_keyname_24b0f366: "« Off » pour la clé : %{keyName}"
+  off_for_key_keyname_24b0f366: "« Off » pour la clé : %{keyName}"
   off_policy_will_not_apply_to_this_sub_account_8b12386b: "Désactivé - la politique ne s’applique pas à ce sous-compte"
   off_student_names_and_profile_pictures_will_be_vis_6891e2cf: "Inactf : les noms des étudiants et les photos de profil seront visibles par les autres membres de ce cours"
   offensive_abusive_c41dcb08: "Offensant, abusif"
@@ -17905,7 +17922,7 @@ fr-CA:
   oman_968_46f8d901: "Oman (+968)"
   on_8f7190e5: Activer
   on_courses_with_usage_rights_enabled_enforces_usag_8b8072a3: "Sur les cours avec les droits d’utilisation activés, applique la sélection des droits d’utilisation sur les pièces jointes des fichiers de sujet de discussion"
-  on_for_key_keyname_bbac4e1b: "« On » pour la clé : %{keyName}"
+  on_for_key_keyname_bbac4e1b: "« On » pour la clé : %{keyName}"
   on_paper_46d0ba36: "Sur papier"
   on_time_17ca5ad9: "À temps"
   on_time_percent_eebffe38: "À temps (On Time) : %{percent}"
@@ -23513,7 +23530,9 @@ fr-CA:
   speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Réparti
   split_merged_users_6b81c595: "Diviser les utilisateurs fusionnés"
+  split_number_of_students_per_group_4a05f76f: "Répartir le nombre d’étudiants par groupe"
   split_student_names_df0ef806: "Séparer les noms des étudiants"
+  split_students_by_number_of_groups_5ace5a6a: "Répartir les étudiants en fonction du nombre de groupes"
   split_students_into_groups_with_num_members_studen_c49d5136: "Séparer les étudiants en groupes avec %{num_members} étudiants par groupe"
   split_students_into_num_groups_groups_e9854f16: "Partager les étudiants en %{num_groups} groupes"
   splitting_disabled_reached_maximum_of_three_assign_716acb13: "Fractionnement désactivé : il ne peut y avoir qu’un maximum de trois groupes de tâches assignées par échelle de notation"
@@ -24523,6 +24542,7 @@ fr-CA:
   the_following_outcomes_cannot_be_removed_because_t_1c4b8ef9: 
     one: "L’acquis suivant ne peut pas être supprimé parce qu’il est aligné sur le contenu. Veuillez le désélectionner et réessayer."
     other: "Les acquis suivants ne peuvent être retirés parce qu’ils sont alignés au contenu. Veuillez les désélectionner et réessayer."
+  the_following_recipients_have_no_active_enrollment_17395ab4: "Les destinataires suivants n’ont pas d’inscription active dans le cours, %{invalid_recipients}, incapable d’envoyer des messages"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
       Les étudiants suivants ont apporté des changements non sauvegardés à leurs soumissions de questionnaire : 
       
@@ -24588,7 +24608,7 @@ fr-CA:
                   
                   Merci,
                   L’assistance technique Canvas
-  the_microsoft_365_group_created_by_sync_no_longer__106b74a7: "Le groupe Microsoft 365 créé par la synchronisation n’existe plus. En général, cela signifie que le groupe a été supprimé du côté de Microsoft (par un administrateur, par exemple). Une resynchronisation manuelle devrait résoudre le problème et recréer le groupe si nécessaire."
+  the_microsoft_365_group_created_by_sync_no_longer__106b74a7: "Le groupe Microsoft 365 créé par la synchronisation n’existe plus. En général, cela signifie que le groupe a été supprimé du côté de Microsoft (par un administrateur, par exemple). Une resynchronisation manuelle devrait résoudre le problème et recréer le groupe si nécessaire."
   the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "Le client Microsoft 365 fourni dans les paramètres du compte n’est pas un client Éducation, il ne peut donc pas être utilisé avec l’intégration Microsoft Teams Sync."
   the_module_item_is_locked_27fe420b: "L’élément de module est verrouillé."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Les notes les plus récentes pour l'utilisateur %{current_user_name} et le résultat %{outcome_name}."
@@ -24862,6 +24882,7 @@ fr-CA:
                      Cela sera activé par une politique de sécurité du contenu actualisée (CSP).
                      Les domaines seront ajoutés à votre liste blanche avec la possibilité d'ajouter manuellement des domaines.
                      Il y a une limite de 100 domaines sur la liste blanche.
+  this_and_all_following_events_4b4b283: "Cet événement et tous les suivants"
   this_announcement_will_not_be_visible_until_delaye_88f7f5c: "Cette annonce ne sera pas visible avant le %{delayedPostAt}."
   this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: "Cette zone est utilisée par l’évaluateur pour ajouter des commentaires associés aux critères."
   this_assignment_does_not_count_toward_the_final_gr_29ede05f: "Cette tâche ne compte pas dans le calcul de la note finale"
@@ -24918,6 +24939,7 @@ fr-CA:
   this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Cet ePortfolio a été identifié comme un pourriel possible. Il n’est actuellement visible que par les administrateurs et l’auteur. Si vous êtes sûr que ce contenu n’est pas du pourriel, vous pouvez le marquer comme sécuritaire. Sinon, vous pouvez le confirmer comme pourriel."
   this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Cet ePortfolio a été identifié comme pourriel et n’est visible que par vous. Veuillez contacter un administrateur si vous avez des questions."
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Cet ePortfolio a été identifié comme pourriel. Il n'est actuellement visible que par les administrateurs et l'auteur. Si vous êtes sûr que ce contenu n’est pas du pourriel, vous pouvez le marquer comme sécuritaire."
+  this_event_b437db90: "Cet événement"
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: "Cette fonctionnalité affecte les données existantes pour tous les cours dans le compte."
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: "Cette fonctionnalité affecte les données existantes pour l’ensemble d’un compte."
   this_feature_allows_teachers_to_create_anonymous_d_ea364dca: "Cette fonctionnalité permet aux enseignants de créer des discussions anonymes et permet aux enseignants d’activer un paramètre de niveau de cours pour que les étudiants puissent créer des discussions anonymes"
@@ -25334,6 +25356,7 @@ fr-CA:
     new_caledonia: Nouvelle-Calédonie
     new_delhi: "New Delhi"
     newfoundland: Terre-Neuve
+    norfolk_island: "Île Norfolk"
     noronha: Noronha
     novosibirsk: Novossibirsk
     nukualofa: Nuku'alofa
@@ -25452,6 +25475,7 @@ fr-CA:
     learning_outcomes: Acquis
     messages: Messages
     outcome_artifacts: "Artefacts d'acquis"
+    topic: Rubrique
     view_in_separate_window: "Afficher dans une fenêtre séparée"
   tls_7a2eaba5: TLS
   to_1126ab55: " à"

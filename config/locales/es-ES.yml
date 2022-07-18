@@ -209,6 +209,7 @@ es-ES:
   a_sync_is_currently_running_please_wait_for_curren_55ccf501: "Hay una sincronización en curso. Espera a que la sincronización actual termine antes de comenzar otra."
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "Una tabla de respuestas y breves estadísticas con respecto a las opciones de respuesta del estudiante."
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "Una tabla que contiene información sobre el esquema de evaluaciones. Primero aparece un nombre del esquema de evaluaciones y luego, botones para editar y eliminar el esquema. Cada fila incluye un nombre, un porcentaje máximo y un porcentaje mínimo. Además, cada fila incorpora un botón para añadir más filas debajo y otro botón para eliminar la fila actual."
+  a_timeout_occurred_contacting_external_authenticat_c064ea48: "Se ha agotado el tiempo para contactar con el servicio externo de autentificación"
   a_z_243c3301: A–Z
   ability_to_submit_student_annotation_assignments_9ee47e3f: "Capacidad para enviar las actividades con anotaciones del alumno."
   about_this_service_b10bc808: "Acerca de este servicio"
@@ -947,6 +948,10 @@ es-ES:
                 check_box: "CSV de los grupos"
               pseudonyms: 
                 check_box: "CSV de los pseudónimos"
+              question_bank_questions: 
+                check_box: "Preguntas del banco de preguntas"
+              question_banks: 
+                check_box: "Bancos de preguntas"
               sections: 
                 check_box: "CSV de las secciones"
               terms: 
@@ -1764,6 +1769,7 @@ es-ES:
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Todos los campos con fechas deben estar presentes y con el formato correcto"
   all_day_fb42c4fc: "Todo el día"
   all_discussion_entries_report_c1e02906: "Informe de todas las entradas en el foro de discusión"
+  all_events_6ae4331b: "Todos los eventos"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "¿Has terminado?  Ahora, por supuesto, hay que publicar la asignatura. Haz clic en el botón que aparece a continuación para hacerlo oficial. La publicación permitirá que los usuarios comiencen a participar en la asignatura."
   all_gradeable_student_submissions_report_d11ee705: "Informe de todas las entregas evaluables del estudiante"
   all_grades_hidden_3092d5b5: "Se han ocultado todas las notas"
@@ -1787,6 +1793,7 @@ es-ES:
   all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "Todas las competencias de %{groupTitle} se han añadido correctamente a esta asignatura."
   all_outcomes_from_grouptitle_have_been_successfull_6267efe4: "Todas las competencias de %{groupTitle} se han añadido correctamente a %{targetGroupTitle}."
   all_outcomes_from_grouptitle_have_been_successfull_cb6ad008: "Todas las competencias de %{groupTitle} se han añadido correctamente a esta cuenta."
+  all_quiz_submissions_9519d342: "Todas las entregas de pruebas"
   all_quiz_submissions_report_72a6d2fa: "Informe de todas las entregas de prueba"
   all_roles_f3bba14d: "Todos los roles"
   all_rubrics_5114c466: "Todas las rúbricas"
@@ -2542,6 +2549,7 @@ es-ES:
   appointment_groups_bd225e60: "Grupos de la cita"
   appointments_dcb41d23: Citas
   approved_c3b285d4: Aprobado
+  approximate_quiz_sessions_e522a3a1: "Sesiones de pruebas aproximadas"
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} con precisión %{precision}"
   apps_54d24a47: Aplicaciones
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Las aplicaciones permiten añadir nuevas funcionalidades a Canvas de manera sencilla. Se pueden incorporar a asignaturas individuales o a todas las asignaturas de una cuenta. Una vez configuradas, puedes enlazarlas a través de los contenidos de la asignatura y crear actividades para las herramientas de evaluación."
@@ -3512,6 +3520,7 @@ es-ES:
   back_to_title_39e7a8f4: "Volver a %{title}"
   background_color_b92b52ac: "Color de fondo"
   background_image_1a401e1a: "Imagen de fondo"
+  bank_grouped_quiz_submissions_479ad830: "Entregas de pruebas agrupadas por banco"
   banner_image_id_is_not_a_valid_id_21ecc6: "banner_image_id no es una identificación correcta"
   banner_image_url_and_banner_image_id_cannot_both_b_955615f5: "No han podido establecerse banner_image_url y banner_image_id."
   banner_image_url_is_not_a_valid_url_830d7926: "banner_image_url no es una URL correcta"
@@ -6619,6 +6628,8 @@ es-ES:
   create_failed_15d07ad4: "Ha habido un error al crear"
   create_file_s_188549e6: "[ Crear archivo(s) ]"
   create_group_set_7fe1cd53: "Crear conjunto de grupos"
+  create_groups_later_6ce36058: "Crear grupos más adelante"
+  create_groups_now_d59bf70b: "Crear grupos ahora"
   create_interactive_course_content_76665336: "Crear contenido interactivo de la asignatura"
   create_lookup_7ceb6d90: "Crear búsqueda"
   create_new_course_e3ef9cd0: "Crear nueva asignatura"
@@ -7045,6 +7056,7 @@ es-ES:
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Definir el texto que puede ir antes y después de la lista desplegable, y crear una serie de respuestas posibles."
   delay_posting_this_topic_until_aa483eec: "Retrasar la publicación de este tema hasta"
   delayed_until_58b7af4b: "Retrasado hasta:"
+  delete_8d6d2222: "Eliminar: "
   delete_a6efa79d: Eliminar
   delete_account_name_96aee330: "Eliminar %{account_name}"
   delete_alignment_f33c97d5: "Eliminar ajuste"
@@ -7071,6 +7083,7 @@ es-ES:
   delete_domain_5ba75b7c: "Eliminar dominio"
   delete_domain_domain_c5b68f5: "Eliminar dominio %{domain}"
   delete_entry_title_5e59727b: "Eliminar entrada %{title}"
+  delete_failed_6285e600: "Ha habido un error al eliminar"
   delete_feedname_1ac9a4a4: "Eliminar %{feedName}"
   delete_filter_83ca1a6a: "Eliminar filtro"
   delete_from_all_accounts_a1c5e621: "Eliminar de TODAS las cuentas"
@@ -7138,6 +7151,7 @@ es-ES:
       Esta acción no se puede deshacer. ¿Estás seguro de que quieres eliminar %{file}?
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "Eliminar un usuario destruirá todos su ePortfolios. Alternativamente, los ePortfolios se pueden marcar individualmente como “correo no deseado“ o “seguros” para modificar su visibilidad."
   deleting_assignment_22d5851d: "eliminando actividad"
+  deleting_b896f5f: eliminando
   delicious_7f9ac66f: Delicious
   denmark_45_929d5d34: "Dinamarca (+45)"
   deployment_id_fc270280: "Identificación de implementación"
@@ -8453,6 +8467,7 @@ es-ES:
   example_https_schoolofrock_edu_d4326f03: "Ejemplo: \"https://schoolofrock.edu\""
   example_item_scores_6726c689: "Ejemplo de calificaciones de ítems"
   example_school_of_rock_41f32c31: "Ejemplo: \"School of Rock\""
+  exceeded_the_maximum_length_number_characters_2d25611e: "Se ha superado la longitud máxima (%{number} caracteres)"
   exceeds_expectations_5910fc3a: "Excede las expectativas"
   exceeds_mastery_1f995dce: "Excede el dominio"
   excelsior_student_activity_tracking_7a1ba44d: "Seguimiento de actividad del estudiante de Excelsior"
@@ -10953,6 +10968,7 @@ es-ES:
   limit_course_participation_to_term_or_custom_cours_67797a86: "¿Limitar la participación en la asignatura al período o personalizar las fechas de la asignatura?"
   limit_each_time_slot_to_input_value_user_s_47461538: "Limitar cada intervalo de tiempo a %{input_value} usuario(s). "
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "Limitar cada intervalo a %{num_participants} *grupos.* **usuarios.**"
+  limit_group_members_to_leave_blank_for_no_limit_c341e248: "Limitar los miembros del grupo a (el campo en blanco significa que no hay límite)"
   limit_groups_to_group_limit_members_40651ea7: "Limitar grupos a %{group_limit} miembros"
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "Limitar participantes para que participen en %{num_appointments} cita(s)"
   limit_search_to_activity_after_c1ac2449: "Limitar la búsqueda a la actividad después"
@@ -14166,6 +14182,7 @@ es-ES:
   number_of_members_per_group_6beaef7b: "Número de miembros por grupo"
   number_of_respondents_e1e7e8b: "Número de respuestas"
   number_of_scores_to_ignore_for_each_student_fb94e818: "Número de puntuaciones ignoradas para cada estudiante"
+  number_of_students_per_group_8abe7189: "Número de estudiantes por grupo"
   numerical_answer_ec7120bf: "Respuesta numérica"
   nummastered_of_numgroup_mastered_b8113c9c: "%{numMastered} de %{numGroup} dominados"
   o_224cf405: o
@@ -18889,7 +18906,9 @@ es-ES:
   speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Dividir
   split_merged_users_6b81c595: "Dividir usuarios agrupados"
+  split_number_of_students_per_group_4a05f76f: "Dividir el número de estudiantes por grupo"
   split_student_names_df0ef806: "Dividir los nombres de los estudiantes"
+  split_students_by_number_of_groups_5ace5a6a: "Dividir los estudiantes por número de grupos"
   split_students_into_groups_with_num_members_studen_c49d5136: "Dividir a los estudiantes en grupos con %{num_members} estudiantes por grupo"
   split_students_into_num_groups_groups_e9854f16: "Dividir a los estudiantes en %{num_groups} grupos"
   splitting_disabled_reached_maximum_of_three_assign_716acb13: "División deshabilitada: se ha alcanzado el máximo de tres grupos de actividades en un intervalo de puntuación"
@@ -19767,6 +19786,7 @@ es-ES:
       Los siguientes dominios han sido autorizados automáticamente por herramientas que ya existen en tu cuenta.
                        Para eliminar estos dominios, elimina las herramientas asociadas.
   the_following_fields_are_invalid_fields_b3565800: "Los siguientes campos son incorrectos: %{fields}"
+  the_following_recipients_have_no_active_enrollment_17395ab4: "No se han podido enviar algunos mensajes porque los siguientes destinatarios, %{invalid_recipients}, no tienen ninguna inscripción activa en el curso"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
       Los siguientes estudiantes tienen cambios sin guardar en las entregas de sus pruebas: 
       
@@ -20050,6 +20070,7 @@ es-ES:
   they_them_f4d17a04: Ellos/Sus
   they_were_merged_into_other_user_64758f01: "Se fusionaron en *%{other_user}*."
   this_account_does_not_allow_for_microsoft_teams_sy_266f11c7: "Esta cuenta no permite que se habilite la sincronización para Microsoft Teams. Habilitar la marca de la funcionalidad “Sincronización de la inscripción del grupo de Microsoft” antes de editar cualquier configuración."
+  this_and_all_following_events_4b4b283: "Este y todos los eventos siguientes"
   this_announcement_will_not_be_visible_until_delaye_88f7f5c: "Este anuncio no podrá verse hasta el %{delayedPostAt}."
   this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: "Esta área la utilizará el evaluador para que pueda dejar comentarios relacionados con este criterio."
   this_assignment_does_not_count_toward_the_final_gr_a5c238e2: "Esta actividad no cuenta para la nota final."
@@ -20100,6 +20121,7 @@ es-ES:
   this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Este ePortfolio se ha identificado como posible correo no deseado. Actualmente solo lo pueden ver los administradores y el autor. Si estás seguro de que este contenido no es correo no deseado, puedes marcarlo como seguro. De lo contrario, puedes confirmarlo como correo no deseado."
   this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Este ePortfolio ha sido identificado como correo no deseado, solo lo puedes ver tú. Ponte en contacto con un administrador si tienes alguna pregunta."
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Este ePortfolio se ha identificado como correo no deseado. Actualmente solo lo pueden ver los administradores y el autor. Si estás seguro de que este contenido no es correo no deseado, puedes marcarlo como seguro."
+  this_event_b437db90: "Este evento"
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: "Esta funcionalidad afecta a los datos existentes de todas las asignaturas en una cuenta."
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: "Esta funcionalidad afecta a los datos existentes de una cuenta."
   this_feature_allows_teachers_to_create_anonymous_d_ea364dca: "Esta funcionalidad permite a los profesores crear foros de discusión anónimos y habilitar una configuración a nivel de la asignatura para que los estudiantes puedan crear foros de discusión anónimos"
@@ -20436,6 +20458,7 @@ es-ES:
     new_caledonia: "Nueva Caledonia"
     new_delhi: "Nueva Delhi"
     newfoundland: Terranova
+    norfolk_island: "Isla Norfolk"
     noronha: Noronha
     novosibirsk: Novosibirsk
     nukualofa: Nukualofa
@@ -20550,6 +20573,7 @@ es-ES:
     learning_outcomes: "Competencias del aprendizaje"
     messages: Mensajes
     outcome_artifacts: "Artefactos de competencias"
+    topic: Tema
     view_in_separate_window: "Ver en una ventana separada"
   tls_7a2eaba5: TLS
   to_1126ab55: " hasta"
