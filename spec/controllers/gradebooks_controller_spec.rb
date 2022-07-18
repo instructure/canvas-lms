@@ -1670,6 +1670,22 @@ describe GradebooksController do
             expect(js_env[:outcome_service_results_to_canvas]).to eq false
           end
         end
+
+        describe "outcome_average_calculation feature flag" do
+          it "is set to true if outcome_average_calculation ff is enabled" do
+            @course.root_account.enable_feature!(:outcome_average_calculation)
+            get :show, params: { course_id: @course.id }
+            js_env = assigns[:js_env]
+            expect(js_env[:OUTCOME_AVERAGE_CALCULATION]).to eq true
+          end
+
+          it "is set to false if outcome_average_calculation ff is disabled" do
+            @course.root_account.disable_feature!(:outcome_average_calculation)
+            get :show, params: { course_id: @course.id }
+            js_env = assigns[:js_env]
+            expect(js_env[:OUTCOME_AVERAGE_CALCULATION]).to eq false
+          end
+        end
       end
     end
   end
