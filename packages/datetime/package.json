@@ -9,8 +9,8 @@
     "transform": {}
   },
   "scripts": {
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest __tests__/*.test.js",
-    "test:debug": "NODE_OPTIONS=--experimental-vm-modules node --inspect-brk node_modules/.bin/jest --runInBand --watch __tests__/*.test.js"
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest --env jsdom __tests__/*.test.js",
+    "test:debug": "NODE_OPTIONS=--experimental-vm-modules node --inspect-brk node_modules/.bin/jest --env jsdom--runInBand --watch __tests__/*.test.js"
   },
   "license": "MIT",
   "dependencies": {
@@ -20,6 +20,6 @@
     "timezone": "https://registry.npmjs.org/@brentburgoyne/timezone/-/timezone-1.0.24.tgz"
   },
   "devDependencies": {
-    "jest": "^26.6.3"
+    "jest": "^27"
   }
 }
