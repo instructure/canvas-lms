@@ -169,7 +169,8 @@ function expectToBeUnselected(cell) {
   expect(unselectedElement).toBeInTheDocument()
 }
 
-describe('MessageStudentsWhoDialog', () => {
+// unskip in EVAL-2535
+describe.skip('MessageStudentsWhoDialog', () => {
   it('hides the list of students and observers initially', async () => {
     const mocks = await makeMocks()
 
