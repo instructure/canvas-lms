@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,14 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const {compile} = require('coffee-script')
-const {transform} = require('@babel/core')
-
-exports.process = (coffee, path) => {
-  const esm = compile(coffee, {bare: true})
-
-  return transform(esm, {
-    filename: path,
-    plugins: ['@babel/plugin-transform-modules-commonjs']
-  })
+module.exports = {
+  process: (data) => {
+    return {
+      code: `module.exports = ${JSON.stringify(data)}`
+    }
+  }
 }

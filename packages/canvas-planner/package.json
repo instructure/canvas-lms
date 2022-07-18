@@ -119,7 +119,7 @@
     "esm": "^3.2.25",
     "format-message-cli": "^6",
     "identity-obj-proxy": "^3.0.0",
-    "jest": "^27",
+    "jest": "^28",
     "jest-canvas-mock": "^2",
     "jest-junit": "^7",
     "jest-moxios-utils": "^1",

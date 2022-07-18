@@ -25,9 +25,7 @@
   "license": "MIT",
   "devDependencies": {
     "@babel/preset-typescript": "^7.15.0",
-    "@jest/globals": "^27.1.0",
-    "babel-jest": "^27.1.0",
-    "jest": "^27",
+    "jest": "^28",
     "jest-localstorage-mock": "^2.4.17"
   }
 }

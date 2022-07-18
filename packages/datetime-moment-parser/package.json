@@ -13,6 +13,6 @@
   "author": "Ahmad Amireh <ahmad@instructure.com>",
   "license": "MIT",
   "devDependencies": {
-    "jest": "^27"
+    "jest": "^28"
   }
 }
