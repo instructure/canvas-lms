@@ -16,7 +16,6 @@
  */
 
 import React from 'react'
-import MockDate from 'mockdate'
 import fetchMock from 'fetch-mock'
 import {render, act, fireEvent} from '@testing-library/react'
 import {QRMobileLogin} from '../QRMobileLogin'
@@ -65,15 +64,14 @@ describe('QRMobileLogin', () => {
 
     afterEach(() => {
       fetchMock.restore()
-      MockDate.reset()
     })
 
     // advances both global time and the jest timers by the given time duration
     function advance(delay) {
       act(() => {
         const now = Date.now()
-        MockDate.set(now + delay)
-        jest.advanceTimersByTime(delay)
+        jest.setSystemTime(now + delay)
+        jest.runOnlyPendingTimers()
       })
     }
 
