@@ -37,6 +37,7 @@ import formatMessage from '../../../../format-message'
 import buildDownloadUrl from '../../shared/buildDownloadUrl'
 import {validIcon} from '../utils/iconValidation'
 import {hasChanges} from '../utils/iconMakerFormHasChanges'
+import bridge from '../../../../bridge'
 
 const INVALID_MESSAGE = formatMessage(
   'One of the following styles must be added to save an icon: Icon Color, Outline Size, Icon Text, or Image'
@@ -219,53 +220,47 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
     }
 
     const svg = buildSvg(settings, {isPreview: false})
-    buildStylesheet()
-      .then(stylesheet => {
-        svg.appendChild(stylesheet)
-        return storeProps.startIconMakerUpload(
-          {
-            name: `${settings.name || formatMessage('untitled')}.svg`,
-            domElement: svg
-          },
-          {
-            onDuplicate: replaceFile && 'overwrite'
-          }
-        )
-      })
+    svg.appendChild(buildStylesheet())
+    return storeProps
+      .startIconMakerUpload(
+        {
+          name: `${settings.name || formatMessage('untitled')}.svg`,
+          domElement: svg
+        },
+        {
+          onDuplicate: replaceFile && 'overwrite'
+        }
+      )
       .then(writeIconToRCE)
       .then(() => setIsOpen(false))
       .catch(() => setStatus(statuses.ERROR))
   }
 
-  const writeIconToRCE = ({url}) => {
-    const img = editor.dom.create('img')
+  const writeIconToRCE = ({url, display_name}) => {
+    const {alt, isDecorative, externalStyle, externalWidth, externalHeight} = settings
 
-    img.setAttribute('src', url)
-
-    if (settings.isDecorative) {
-      img.setAttribute('alt', '')
-    } else if (settings.alt) {
-      img.setAttribute('alt', settings.alt)
-    }
-
-    // Set additional attributes if defined
-    if (settings.externalStyle) {
-      img.setAttribute('style', settings.externalStyle)
-    }
-    if (settings.externalWidth && settings.externalHeight) {
-      img.setAttribute('width', settings.externalWidth)
-      img.setAttribute('height', settings.externalHeight)
+    const imageAttributes = {
+      alt_text: alt,
+      display_name,
+      height: externalHeight,
+      isDecorativeImage: isDecorative,
+      src: url,
+      // React wants this to be an object but we are just
+      // passing along a string here. Using the style attribute
+      // with all caps makes React ignore this fact
+      STYLE: externalStyle,
+      width: externalWidth
     }
 
     // Mark the image as an icon maker icon.
-    img.setAttribute(ICON_MAKER_ATTRIBUTE, true)
+    imageAttributes[ICON_MAKER_ATTRIBUTE] = true
 
     // URL to fetch the SVG from when loading the Edit tray.
     // We can't use the 'src' because Canvas will re-write the
     // source attribute to a URL that is not cross-origin friendly.
-    img.setAttribute(ICON_MAKER_DOWNLOAD_URL_ATTR, buildDownloadUrl(url))
+    imageAttributes[ICON_MAKER_DOWNLOAD_URL_ATTR] = buildDownloadUrl(url)
 
-    editor.insertContent(img.outerHTML)
+    bridge.embedImage(imageAttributes)
   }
 
   const defaultImageSettings = () => {
