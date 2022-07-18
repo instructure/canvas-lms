@@ -462,6 +462,30 @@ describe "Outcome Reports" do
         expect(report[0]["learning outcome rating"]).to eq "Does Not Meet Expectations"
       end
 
+      context ":outcome_service_results_to_canvas feature flag" do
+        let(:outcome_reports) do
+          account_report = AccountReport.new(report_type: "outcome_export_csv", account: @root_account, user: @user1)
+          AccountReports::OutcomeReports.new(account_report)
+        end
+
+        it "does call OS when FF is on" do
+          @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
+          assignment_ids = ""
+          outcome_ids = @outcome.id.to_s
+          uuids = "#{@user1.uuid},#{@user2.uuid}"
+          expect(outcome_reports).to receive(:get_lmgb_results).with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+
+          outcome_reports.send(:outcomes_lmgb_results)
+        end
+
+        it "does not call OS when FF is off" do
+          @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "off")
+          expect(outcome_reports).to_not receive(:get_lmgb_results)
+
+          outcome_reports.send(:outcomes_lmgb_results)
+        end
+      end
+
       context "With Account Level Mastery" do
         before(:once) do
           user1_values[:outcome_result]
