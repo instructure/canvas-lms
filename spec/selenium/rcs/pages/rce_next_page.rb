@@ -406,15 +406,15 @@ module RCENextPage
   end
 
   def align_left_button
-    f('[role="menuitemcheckbox"][title="Align left"]')
+    f('[role="menuitemcheckbox"][title="Left Align"]')
   end
 
   def align_center_button
-    f('[role="menuitemcheckbox"][title="Align center"]')
+    f('[role="menuitemcheckbox"][title="Center Align"]')
   end
 
   def align_right_button
-    f('[role="menuitemcheckbox"][title="Align right"]')
+    f('[role="menuitemcheckbox"][title="Right Align"]')
   end
 
   def formatting_dropdown
