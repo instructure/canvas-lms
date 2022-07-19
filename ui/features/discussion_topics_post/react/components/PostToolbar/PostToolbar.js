@@ -50,6 +50,20 @@ import {Text} from '@instructure/ui-text'
 const I18n = useI18nScope('discussion_posts')
 
 export function PostToolbar({repliesCount, unreadCount, ...props}) {
+  const showSubscribe = useMemo(() => {
+    if (
+      !ENV.current_user_roles?.includes('teacher') &&
+      !ENV.current_user_roles?.includes('designer') &&
+      !ENV.current_user_roles?.includes('ta')
+    ) {
+      return props.discussionTopic?.groupSet
+        ? !!props.discussionTopic?.groupSet?.currentGroup
+        : true
+    }
+    return !props.discussionTopic?.groupSet
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.discussionTopic?.groupSet]) // disabling to use safe nav in dependencies
+
   return (
     <Responsive
       match="media"
@@ -92,7 +106,7 @@ export function PostToolbar({repliesCount, unreadCount, ...props}) {
                   </span>
                 </Flex.Item>
               )}
-              {props.onToggleSubscription && (
+              {props.onToggleSubscription && showSubscribe && (
                 <Flex.Item>
                   <span className="discussion-post-subscribe">
                     <ToggleButton
@@ -361,7 +375,11 @@ PostToolbar.propTypes = {
   /**
    * The id of the discussion topic
    */
-  discussionTopicId: PropTypes.string
+  discussionTopicId: PropTypes.string,
+  /**
+   * The discussion topic
+   */
+  discussionTopic: PropTypes.object
 }
 
 PostToolbar.defaultProps = {
