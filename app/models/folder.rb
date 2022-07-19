@@ -50,7 +50,6 @@ class Folder < ActiveRecord::Base
   before_create :populate_root_account_id
   before_save :infer_full_name
   after_save :update_sub_folders
-  after_destroy :clean_up_children
   after_save :touch_context
   before_save :infer_hidden_state
   validates :context_id, :context_type, presence: true
@@ -125,11 +124,28 @@ class Folder < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
 
   def destroy
-    self.workflow_state = "deleted"
-    active_file_attachments.each(&:destroy)
-    active_sub_folders.each(&:destroy)
-    self.deleted_at = Time.now.utc
-    save
+    shard.activate do
+      loop do
+        folder_count = 1000
+        Folder.transaction do
+          associated_folders = Folder.find_by_sql(<<~SQL.squish)
+            WITH RECURSIVE associated_folders AS (
+              SELECT * FROM #{Folder.quoted_table_name} WHERE id=#{id}
+              UNION
+              SELECT folders.* FROM #{Folder.quoted_table_name} INNER JOIN associated_folders ON folders.parent_folder_id=associated_folders.id
+            )
+            SELECT id FROM associated_folders WHERE associated_folders.workflow_state <> 'deleted' LIMIT 1000 FOR UPDATE
+          SQL
+          Attachment.batch_destroy(Attachment.active.where(folder_id: associated_folders))
+          delete_time = Time.now.utc
+          Folder.where(id: associated_folders).update_all(workflow_state: "deleted", deleted_at: delete_time, updated_at: delete_time)
+          folder_count = associated_folders.length
+        end
+        break if folder_count < 1000
+      end
+      touch_context
+    end
+    reload
   end
 
   scope :active, -> { where("folders.workflow_state<>'deleted'") }
@@ -218,10 +234,6 @@ class Folder < ActiveRecord::Base
       f.full_name = f.full_name(true)
       f.save
     end
-  end
-
-  def clean_up_children
-    Attachment.where(folder_id: @folder_id).each(&:destroy)
   end
 
   def subcontent(opts = {})
