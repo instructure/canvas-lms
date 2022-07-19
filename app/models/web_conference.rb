@@ -204,9 +204,11 @@ class WebConference < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :web_conference_invitation
     p.to do
-      @new_participants.select do |participant|
+      notification_recipients = @new_participants.select do |participant|
         context.membership_for_user(participant).try(:active?)
       end
+      @new_participants = []
+      notification_recipients
     end
     p.whenever { context_is_available? && @new_participants && !@new_participants.empty? }
     p.data { course_broadcast_data }
