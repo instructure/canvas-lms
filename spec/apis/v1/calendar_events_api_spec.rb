@@ -1822,6 +1822,30 @@ describe CalendarEventsApiController, type: :request do
                                        web_conference: conference)
       end
 
+      context "notifications" do
+        before do
+          Notification.create!(name: "Web Conference Invitation",
+                               category: "TestImmediately")
+          course_with_teacher(active_all: true, user: user_with_communication_channel(active_all: true))
+        end
+
+        it "sends only one conference invite notification for created web conference" do
+          api_call(:post, "/api/v1/calendar_events.json", {
+                     controller: "calendar_events_api", action: "create", format: "json"
+                   }, {
+                     calendar_event: {
+                       context_code: "course_#{@course.id}",
+                       title: "API Test",
+                       web_conference: { conference_type: "BigBlueButton", title: "BBB Conference" }
+                     }
+                   })
+
+          expect(Message.count).to eq 1
+          expect(Message.last.user_id).to eq @user.id
+          expect(Message.last.notification_name).to eq "Web Conference Invitation"
+        end
+      end
+
       it "does not show web conferences by default" do
         json = api_call(:get, "/api/v1/calendar_events/#{event_with_conference.id}", {
                           controller: "calendar_events_api", action: "show", format: "json", id: event_with_conference.id
