@@ -857,7 +857,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.destroy_files(ids)
-    Attachment.where(id: ids).each(&:destroy)
+    Attachment.batch_destroy(Attachment.active.where(id: ids))
   end
 
   before_save :assign_uuid
@@ -1520,18 +1520,48 @@ class Attachment < ActiveRecord::Base
   # file_state is like workflow_state, which was already taken
   # possible values are: available, deleted
   def destroy
-    return if new_record?
+    shard.activate do
+      return if new_record?
 
-    self.file_state = "deleted" # destroy
-    self.deleted_at = Time.now.utc
-    ContentTag.delete_for(self)
-    MediaObject.where(attachment_id: id).update_all(attachment_id: nil, updated_at: Time.now.utc)
-    save!
+      Attachment.batch_destroy([self])
+      touch_context_if_appropriate
+    end
+    reload
+  end
+
+  def self.batch_destroy(attachments)
+    ContentTag.active.where(content_type: "Attachment", content_id: attachments)
+              .union(ContentTag.active.where(context_type: "Attachment", context_id: attachments))
+              .find_each(&:destroy)
+    while MediaObject.where(attachment_id: attachments).limit(1000).update_all(attachment_id: nil, updated_at: Time.now.utc) > 0 do end
     # if the attachment being deleted belongs to a user and the uuid (hash of file) matches the avatar_image_url
     # then clear the avatar_image_url value.
-    context.clear_avatar_image_url_with_uuid(self.uuid) if context_type == "User" && self.uuid.present?
-    remove_attachments_from_drafts
-    true
+    User.joins("INNER JOIN #{Attachment.quoted_table_name} ON attachments.context_id = users.id
+                                                          AND users.avatar_image_url like '%' || attachments.uuid || '%'")
+        .where(attachments: { id: attachments, context_type: "User" })
+        .where.not(attachments: { uuid: nil })
+        .in_batches do |batch|
+      batch_ids = batch.pluck(:id)
+      batch.update_all(avatar_image_url: nil)
+      Canvas::LiveEvents.delay_if_production.users_bulk_updated(batch_ids)
+    end
+    while SubmissionDraftAttachment.where(attachment_id: attachments).limit(1000).destroy_all.count > 0 do end
+
+    delete_time = Time.now.utc
+    loop do
+      if attachments.is_a? ActiveRecord::Relation
+        batch = attachments.limit(1000)
+        array_batch = batch.to_a
+      else
+        batch = Attachment.where(id: attachments)
+        array_batch = attachments
+      end
+      batch.update_all(file_state: "deleted", deleted_at: delete_time, updated_at: delete_time, modified_at: delete_time)
+      array_batch.each { |attach| attach.mark_downstream_changes(%w[manually_deleted deleted_at updated_at modified_at]) }
+      Canvas::LiveEvents.delay_if_production.attachments_bulk_deleted(array_batch.map(&:id))
+      break if array_batch.length < 1000
+    end
+    attachments
   end
 
   # this will delete the content of the attachment but not delete the attachment

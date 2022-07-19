@@ -587,8 +587,9 @@ describe Attachment do
   end
 
   context "destroy" do
+    let(:a) { attachment_model(uploaded_data: default_uploaded_data) }
+
     it "does not actually destroy" do
-      a = attachment_model(uploaded_data: default_uploaded_data)
       expect(a.filename).to eql("doc.doc")
       a.destroy
       expect(a).not_to be_frozen
@@ -596,7 +597,6 @@ describe Attachment do
     end
 
     it "is probably not possible to actually destroy... somehow" do
-      a = attachment_model(uploaded_data: default_uploaded_data)
       expect(a.filename).to eql("doc.doc")
       a.destroy
       expect(a).not_to be_frozen
@@ -608,7 +608,6 @@ describe Attachment do
     it "does not show up in the context list after being destroyed" do
       @course = course_factory
       expect(@course).not_to be_nil
-      a = attachment_model(uploaded_data: default_uploaded_data, context: @course)
       expect(a.filename).to eql("doc.doc")
       expect(a.context).to eql(@course)
       a.destroy
@@ -619,14 +618,12 @@ describe Attachment do
     end
 
     it "still destroys without error if file data is lost" do
-      a = attachment_model(uploaded_data: default_uploaded_data)
       allow(a).to receive(:downloadable?).and_return(false)
       a.destroy
       expect(a).to be_deleted
     end
 
     it "replaces uploaded data on destroy_content_and_replace" do
-      a = attachment_model(uploaded_data: default_uploaded_data)
       expect(a.content_type).to eq "application/msword"
       a.destroy_content_and_replace
       expect(a.content_type).to eq "application/pdf"
@@ -641,7 +638,6 @@ describe Attachment do
     end
 
     it "destroys content and record on destroy_permanently_plus" do
-      a = attachment_model
       a2 = attachment_model(root_attachment: a)
       expect(a).to receive(:make_childless).once
       expect(a).to receive(:destroy_content).once
@@ -672,7 +668,6 @@ describe Attachment do
     end
 
     it "does not do destroy_content_and_replace twice" do
-      a = attachment_model(uploaded_data: default_uploaded_data)
       a.destroy_content_and_replace # works
       expect(a).not_to receive(:send_to_purgatory)
       a.destroy_content_and_replace # returns because it already happened
@@ -696,7 +691,6 @@ describe Attachment do
     end
 
     it "allows destroy_content_and_replace on children attachments" do
-      a = attachment_model(uploaded_data: default_uploaded_data)
       a2 = attachment_model(root_attachment: a)
       a2.destroy_content_and_replace
       purgatory = Purgatory.where(attachment_id: [a.id, a2.id])
@@ -705,7 +699,6 @@ describe Attachment do
     end
 
     it "destroys all associated submission_draft_attachments on destroy" do
-      a = attachment_model(uploaded_data: default_uploaded_data)
       submission = submission_model
       submission_draft = SubmissionDraft.create!(
         submission: submission,
@@ -720,7 +713,6 @@ describe Attachment do
     end
 
     it "does not destroy any submission_draft_attachments associated to other attachments on destroy" do
-      a = attachment_model(uploaded_data: default_uploaded_data)
       a2 = attachment_model(uploaded_data: default_uploaded_data)
       submission = submission_model
       submission_draft = SubmissionDraft.create!(
@@ -733,6 +725,13 @@ describe Attachment do
       )
       a.destroy
       expect(a2.submission_draft_attachments.count).to eq 1
+    end
+
+    it "removes avatars from the destroyed file" do
+      user_model(avatar_image_url: a.public_url)
+      a.update(context: @user)
+      a.destroy
+      expect(@user.reload.avatar_image_url).to be_nil
     end
 
     shared_examples_for "destroy_content_and_replace" do

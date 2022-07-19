@@ -294,11 +294,19 @@ module Canvas::LiveEvents
   end
 
   def self.assignments_bulk_updated(assignment_ids)
-    Assignment.where(id: assignment_ids).each { |a| assignment_updated(a) }
+    Assignment.where(id: assignment_ids).find_each { |a| assignment_updated(a) }
   end
 
   def self.submissions_bulk_updated(submissions)
     Submission.where(id: submissions).preload(:assignment).find_each { |submission| submission_updated(submission) }
+  end
+
+  def self.attachments_bulk_deleted(attachment_ids)
+    Attachment.where(id: attachment_ids).find_each { |a| attachment_deleted(a) }
+  end
+
+  def self.users_bulk_updated(user_ids)
+    User.where(id: user_ids).find_each { |u| user_updated(u) }
   end
 
   def self.get_assignment_override_data(override)

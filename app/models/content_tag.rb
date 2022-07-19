@@ -369,7 +369,7 @@ class ContentTag < ActiveRecord::Base
       outcome = content
       other_link = ContentTag.learning_outcome_links.active
                              .where(context_type: context_type, context_id: context_id, content_id: outcome)
-                             .where("id<>?", self).first
+                             .where.not(id: self).take
       unless other_link
         # and there are alignments to the outcome (in the link's context for
         # foreign links, in any context for native links)
