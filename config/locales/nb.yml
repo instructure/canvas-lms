@@ -11278,6 +11278,7 @@ nb:
   example_https_schoolofrock_edu_d4326f03: "eksempel: «https://schoolofrock.edu»\""
   example_item_scores_6726c689: "Eksempel element resultat"
   example_school_of_rock_41f32c31: "eksempel: «School of Rock»\""
+  exceeded_the_maximum_length_number_characters_2d25611e: "Overskredet maksimal lengde (%{number} tegn)"
   exceeds_expectations_5910fc3a: "Overgår forventningene"
   exceeds_mastery_1f995dce: "Overgår mestring"
   excelsior_student_activity_tracking_7a1ba44d: "Excelsior studentaktivitetssporing"
