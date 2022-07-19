@@ -435,12 +435,15 @@ class UsersController < ApplicationController
     end
 
     page_opts = { total_entries: nil }
-    if includes.include?("ui_invoked") && Setting.get("ui_invoked_count_pages", "true") == "true"
-      page_opts = {} # let Folio calculate total entries
-      includes.delete("ui_invoked")
-    end
 
     GuardRail.activate(:secondary) do
+      if includes.include?("ui_invoked") && Setting.get("ui_invoked_count_pages", "true") == "true"
+        # explicitly load the records, as the query in current form is much
+        # more efficient than calling the aggregate of this relation
+        users.load
+        page_opts[:total_entries] = users.size
+        includes.delete("total_entries")
+      end
       users = Api.paginate(users, self, api_v1_account_users_url, page_opts)
 
       user_json_preloads(users, includes.include?("email"))
