@@ -101,7 +101,7 @@ module Importers
 
       %i[migration_id title discussion_type position pinned
          require_initial_post allow_rating only_graders_can_rate
-         sort_by_rating].each do |attr|
+         sort_by_rating anonymous_state is_anonymous_author].each do |attr|
         next if options[attr].nil? && item.class.columns_hash[attr.to_s].type == :boolean
 
         item.send("#{attr}=", options[attr])
@@ -197,7 +197,7 @@ module Importers
     class DiscussionTopicOptions
       attr_reader :options
 
-      BOOLEAN_KEYS = %i[pinned require_initial_post locked].freeze
+      BOOLEAN_KEYS = %i[pinned require_initial_post locked is_anonymous_author].freeze
 
       def initialize(options = {})
         @options = options.with_indifferent_access
