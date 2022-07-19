@@ -316,17 +316,6 @@
                   <tr>
                     <td colspan="2"><%= r.check_box :value, :checked => hash[:value], :disabled => disabled %>
                       <%= r.label :value, t("Mastery Paths") %>
-                      <div id="conditional_release_caution_text" class="aside palign caution-text">
-                        <div>
-                          <p>
-                            <i class='icon-warning-borderless'></i>
-                            <%= t do %>
-                              Disabling the Mastery Paths feature will release configured assignments and content to all students. <br>
-                              If the feature is re-enabled, these assignments will need to be configured for Mastery Paths again.
-                            <% end %>
-                          </p>
-                        </div>
-                      </div>
                     </td>
                   </tr>
                   <% unless disabled %>

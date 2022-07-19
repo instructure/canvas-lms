@@ -1161,7 +1161,6 @@ class AccountsController < ApplicationController
         set_course_template
 
         if @account.update(strong_account_params)
-          update_conditional_release
           update_user_dashboards
           format.html { redirect_to account_settings_url(@account) }
           format.json { render json: @account }
@@ -1707,13 +1706,6 @@ class AccountsController < ApplicationController
       @account.course_template = course
     end
     nil
-  end
-
-  def update_conditional_release
-    # If the account is changing its settings for mastery path we need to update the courses and any subaccounts
-    # that may be affected
-    conditional_release_params = params.dig(:account, :settings, :conditional_release)&.permit(:value, :locked)&.to_hash&.with_indifferent_access
-    @account.delay_if_production(priority: Delayed::LOW_PRIORITY).update_conditional_release(conditional_release_params) if conditional_release_params.present?
   end
 
   def update_user_dashboards
