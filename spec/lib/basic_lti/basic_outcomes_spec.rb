@@ -133,10 +133,26 @@ describe BasicLTI::BasicOutcomes do
       expect(e.response_status).to be 401
     end
 
+    it "sends unauthorized request metrics to datadog" do
+      expect(InstStatsd::Statsd).to receive(:increment)
+        .with("lti.1_1.basic_outcomes.bad_requests",
+              tags: { error_code: "Unauthorized" })
+      expect { raise BasicLTI::BasicOutcomes::Unauthorized, "some unauthorized reason" }
+        .to raise_error(BasicLTI::BasicOutcomes::Unauthorized)
+    end
+
     it "BasicLTI::BasicOutcomes::InvalidRequest should have 415 status" do
       raise BasicLTI::BasicOutcomes::InvalidRequest, "Invalid request"
     rescue BasicLTI::BasicOutcomes::InvalidRequest => e
       expect(e.response_status).to be 415
+    end
+
+    it "sends invalid request metrics to datadog" do
+      expect(InstStatsd::Statsd).to receive(:increment)
+        .with("lti.1_1.basic_outcomes.bad_requests",
+              tags: { error_code: "InvalidRequest" })
+      expect { raise BasicLTI::BasicOutcomes::InvalidRequest, "some invalid request reason" }
+        .to raise_error(BasicLTI::BasicOutcomes::InvalidRequest)
     end
   end
 
