@@ -116,6 +116,10 @@ describe CalendarEvent do
       expect(@event.zoned_start_at.strftime("%H:%M")).to eq "00:00"
       expect(@event.end_at).to eql(@event.zoned_start_at)
     end
+
+    it "sets blackout_date to false by default" do
+      expect(@event.blackout_date).to be_falsey
+    end
   end
 
   describe "default_values during update" do
