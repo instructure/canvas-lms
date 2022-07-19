@@ -54,8 +54,8 @@ describe "calendar2" do
 
         # Clicks plus button, saves event, and verifies a row has been added
         expect(fj(".agenda-wrapper:visible")).to be_present
-        f("#create_new_event_link").click
-        fj(".ui-dialog:visible .btn-primary").click
+        calendar_create_event_button.click
+        edit_calendar_event_form_submit_button.click
         wait_for_ajaximations
         expect(all_agenda_items.length).to eq 1
       end
@@ -316,7 +316,7 @@ describe "calendar2" do
           # Open More Options window
           agenda_item.click
           wait_for_ajaximations
-          f(".edit_event_link").click
+          calendar_edit_event_link.click
           wait_for_ajaximations
           f(".event_button").click
           wait_for_ajaximations
