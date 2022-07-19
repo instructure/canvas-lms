@@ -115,3 +115,9 @@ section_level_calendar_permissions:
   display_name: Section-level calendar permissions
   description: |-
     Allow permissions to manage the calendar to be granted at a section-level.
+account_level_blackout_dates:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Account-level course pacing blackout dates
+  description: |-
+    Allow course pacing blackout dates to be set for accounts instead of just courses.
