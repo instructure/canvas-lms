@@ -472,7 +472,7 @@ if (process.env.CRYSTALBALL_MAP === '1') {
     ],
     exclude: [/test\//, /spec/],
     use: {
-      loader: 'istanbul-instrumenter-loader',
+      loader: 'coverage-istanbul-loader',
       options: {esModules: true, produceSourceMap: true}
     },
     enforce: 'post'
