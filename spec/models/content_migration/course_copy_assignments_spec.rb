@@ -796,8 +796,9 @@ describe ContentMigration do
       end
 
       it "copies only noop overrides" do
-        @course.conditional_release = true
-        @course.save!
+        account = Account.default
+        account.settings[:conditional_release] = { value: true }
+        account.save!
         assignment_override_model(assignment: @assignment, set_type: "ADHOC")
         assignment_override_model(assignment: @assignment, set_type: AssignmentOverride::SET_TYPE_NOOP,
                                   set_id: AssignmentOverride::NOOP_MASTERY_PATHS, title: "Tag 1")
@@ -827,8 +828,9 @@ describe ContentMigration do
       end
 
       it "copies dates" do
-        @course.conditional_release = true
-        @course.save!
+        account = Account.default
+        account.settings[:conditional_release] = { value: true }
+        account.save!
         due_at = 1.hour.from_now.round
         assignment_override_model(assignment: @assignment, set_type: "Noop",
                                   set_id: 1, title: "Tag 1", due_at: due_at)
@@ -841,8 +843,9 @@ describe ContentMigration do
       end
 
       it "preserves only_visible_to_overrides for page assignments" do
-        @course.conditional_release = true
-        @course.save!
+        account = Account.default
+        account.settings[:conditional_release] = { value: true }
+        account.save!
         a1 = assignment_model(context: @copy_from, title: "a1", submission_types: "wiki_page", only_visible_to_overrides: true)
         a1.build_wiki_page(title: a1.title, context: a1.context).save!
         a2 = assignment_model(context: @copy_from, title: "a2", submission_types: "wiki_page", only_visible_to_overrides: false)

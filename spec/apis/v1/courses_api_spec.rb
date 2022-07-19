@@ -4224,6 +4224,9 @@ describe CoursesController, type: :request do
         end
 
         it "does not enable conditional_release unless the account allows it" do
+          account = @course.account
+          account.settings[:conditional_release] = { value: false, locked: true }
+          account.save!
           json = api_call(:put, "/api/v1/courses/#{@course.id}/settings", {
                             controller: "courses",
                             action: "update_settings",
@@ -4233,8 +4236,7 @@ describe CoursesController, type: :request do
           expect(json["conditional_release"]).to eq false
           expect(@course.reload.conditional_release?).to eq false
 
-          account = @course.account
-          account.settings[:conditional_release] = { value: true, locked: false }
+          account.settings[:conditional_release] = { value: false, locked: false }
           account.save!
           json = api_call(:put, "/api/v1/courses/#{@course.id}/settings", {
                             controller: "courses",

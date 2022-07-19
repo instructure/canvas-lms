@@ -479,19 +479,6 @@ class Account < ActiveRecord::Base
     conditional_release[:value]
   end
 
-  def update_conditional_release(conditional_release_params = conditional_release)
-    # We can optionally pass in a hash of conditional_release_params that are being used to update the account to
-    # properly trigger events during account updates or controller actions. Without the hash we default to the
-    # current settings values
-    enabled = Canvas::Plugin.value_to_boolean(conditional_release_params[:value])
-    courses.find_each(&:disable_conditional_release) unless enabled
-    # We need to have the subaccounts update their conditional release statuses as well because of the inheritance
-    # from the root account can change the state of the subaccount
-    sub_accounts.find_each do |sub_account|
-      sub_account.delay_if_production(priority: Delayed::LOW_PRIORITY).update_conditional_release
-    end
-  end
-
   def open_registration?
     !!settings[:open_registration] && canvas_authentication?
   end
