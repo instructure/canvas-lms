@@ -971,8 +971,8 @@ class AccountsController < ApplicationController
   #   Lock this setting for sub-accounts and courses
   #
   # @argument override_sis_stickiness [boolean]
-  #   By default and when the value is true it updates all the fields
-  #   when the value is false then fields which in stuck_sis_fields will not be updated
+  #   Default is true. If false, any fields containing “sticky” changes will not be updated.
+  #   See SIS CSV Format documentation for information on which fields can have SIS stickiness
   #
   # @argument account[settings][lock_outcome_proficiency][value] [Boolean]
   #   [DEPRECATED] Restrict instructors from changing mastery scale

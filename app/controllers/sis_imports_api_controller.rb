@@ -505,11 +505,8 @@ class SisImportsApiController < ApplicationController
   #   objects that are deleted during the batch mode cleanup process.
   #
   # @argument override_sis_stickiness [Boolean]
-  #   Many fields on records in Canvas can be marked "sticky," which means that
-  #   when something changes in the UI apart from the SIS, that field gets
-  #   "stuck." In this way, by default, SIS imports do not override UI changes.
-  #   If this field is present, however, it will tell the SIS import to ignore
-  #   "stickiness" and override all fields.
+  #   Default is true. If false, any fields containing “sticky” changes will not be updated.
+  #   See SIS CSV Format documentation for information on which fields can have SIS stickiness
   #
   # @argument add_sis_stickiness [Boolean]
   #   This option, if present, will process all changes as if they were UI

@@ -217,8 +217,8 @@ class SectionsController < ApplicationController
   # but must belong to the same root account (institution).
   #
   # @argument override_sis_stickiness [boolean]
-  # By default and when the value is true it moves section to another course
-  # when the value is false then no update should be made
+  #   Default is true. If false, any fields containing “sticky” changes will not be updated.
+  #   See SIS CSV Format documentation for information on which fields can have SIS stickiness
   #
   # @returns Section
   def crosslist
@@ -242,9 +242,8 @@ class SectionsController < ApplicationController
   # Undo cross-listing of a Section, returning it to its original course.
   #
   # @argument override_sis_stickiness [boolean]
-  #   By default and when the value is true it updates all the fields
-  #   when the value is false then fields which in stuck_sis_fields will not be updated
-  #
+  #   Default is true. If false, any fields containing “sticky” changes will not be updated.
+  #   See SIS CSV Format documentation for information on which fields can have SIS stickiness
   #
   # @returns Section
   def uncrosslist
@@ -283,8 +282,8 @@ class SectionsController < ApplicationController
   #   Set to true to restrict user enrollments to the start and end dates of the section.
   #
   # @argument override_sis_stickiness [boolean]
-  #   By default and when the value is true it updates all the fields
-  #   when the value is false then fields which in stuck_sis_fields will not be updated
+  #   Default is true. If false, any fields containing “sticky” changes will not be updated.
+  #   See SIS CSV Format documentation for information on which fields can have SIS stickiness
   #
   # @returns Section
   def update

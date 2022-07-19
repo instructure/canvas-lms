@@ -564,8 +564,8 @@ class GroupsController < ApplicationController
   #   The sis ID of the group. Must have manage_sis permission to set.
   #
   # @argument override_sis_stickiness [boolean]
-  #   By default and when the value is true it updates all the fields
-  #   when the value is false then fields which in stuck_sis_fields will not be updated
+  #   Default is true. If false, any fields containing “sticky” changes will not be updated.
+  #   See SIS CSV Format documentation for information on which fields can have SIS stickiness
   #
   # @example_request
   #     curl https://<canvas>/api/v1/groups/<group_id> \
