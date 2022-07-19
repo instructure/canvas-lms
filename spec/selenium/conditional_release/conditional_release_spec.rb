@@ -34,8 +34,6 @@ describe "native canvas conditional release" do
 
   before do
     course_with_teacher_logged_in
-    @course.conditional_release = true
-    @course.save!
   end
 
   context "Pages as part of Mastery Paths" do
@@ -45,8 +43,9 @@ describe "native canvas conditional release" do
     end
 
     it "does not show Allow in Mastery Paths when feature disabled" do
-      @course.conditional_release = false
-      @course.save!
+      account = Account.default
+      account.settings[:conditional_release] = { value: false }
+      account.save!
       get "/courses/#{@course.id}/pages/new/edit"
       expect(ConditionalReleaseObjects.conditional_content_exists?).to eq(false)
     end

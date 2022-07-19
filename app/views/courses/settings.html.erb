@@ -488,7 +488,7 @@
         </div>
         <div id="conditional_release">
           <div class="checkbox-flex-container">
-            <%= f.check_box :conditional_release, :class => "conditional_release_checkbox", :disabled => !can_manage || !@context.account.conditional_release? %>
+            <%= f.check_box :conditional_release, :class => "conditional_release_checkbox", :disabled => !can_manage || @context.account.conditional_release[:locked] %>
             <%= f.label :conditional_release, t("Enable individual learning paths for students based on assessment") %>
           </div>
           <div id="conditional_release_caution_text" class="aside palign caution-text">
