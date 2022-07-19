@@ -94,16 +94,18 @@ class Reply {
   //
   // @api public
   edit() {
-    this.form.addClass('replying')
-    this.discussionEntry.addClass('replying')
-    RichContentEditor.loadNewEditor(this.textArea, {
-      focus: true,
-      manageParent: true,
-      tinyOptions: {
-        width: '100%'
-      }
-    })
-    this.editing = true
+    if (!this.editing) {
+      this.form.addClass('replying')
+      this.discussionEntry.addClass('replying')
+      RichContentEditor.loadNewEditor(this.textArea, {
+        focus: true,
+        manageParent: true,
+        tinyOptions: {
+          width: '100%'
+        }
+      })
+      this.editing = true
+    }
     return this.trigger('edit', this)
   }
 
