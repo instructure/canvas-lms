@@ -51,7 +51,7 @@ describe "calendar2" do
 
       it "shows manual assignment event due saturday after 6pm", priority: "1" do
         load_week_view
-        f("#create_new_event_link").click
+        calendar_create_event_button.click
         wait_for_ajaximations
         event_dialog = f("#edit_event_tabs")
         event_dialog.find(".edit_assignment_option").click

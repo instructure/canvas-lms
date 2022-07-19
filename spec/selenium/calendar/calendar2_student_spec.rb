@@ -182,14 +182,12 @@ describe "calendar2" do
         move_to_click_element(fj(".calendar .fc-week .fc-today"))
         edit_event_dialog = f("#edit_event_tabs")
         expect(edit_event_dialog).to be_displayed
-        edit_event_form = edit_event_dialog.find("#edit_calendar_event_form")
-        title = edit_event_form.find("#calendar_event_title")
+        title = edit_calendar_event_form_title
         replace_content(title, "Test Event")
-        replace_content(fj("input[type=text][name= 'start_time']"), "6:00am")
-        replace_content(fj("input[type=text][name= 'end_time']"), "6:00pm")
-        expect(get_options(".context_id").map(&:text)).to include(group.name)
-        click_option(f(".context_id"), group.name)
-        submit_form(f("#edit_calendar_event_form"))
+        replace_content(edit_calendar_event_start_input, "6:00am")
+        replace_content(edit_calendar_event_end_input, "6:00pm")
+        click_option(edit_calendar_event_form_context, group.name)
+        edit_calendar_event_form_submit_button.click
         wait_for_ajaximations
         expect(CalendarEvent.last.title).to eq("Test Event")
       end

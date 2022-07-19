@@ -97,8 +97,8 @@ module Calendar2Common
 
   def open_edit_event_dialog
     f(".fc-event").click
-    expect(f(".edit_event_link")).to be_displayed
-    f(".edit_event_link").click
+    expect(calendar_edit_event_link).to be_displayed
+    calendar_edit_event_link.click
     wait_for_ajaximations
   end
 
@@ -203,27 +203,26 @@ module Calendar2Common
     find_middle_day.click
     edit_event_dialog = f("#edit_event_tabs")
     expect(edit_event_dialog).to be_displayed
-    edit_event_form = edit_event_dialog.find("#edit_calendar_event_form")
-    title = edit_event_form.find("#calendar_event_title")
+    title = edit_calendar_event_form_title
     keep_trying_until { title.displayed? }
     replace_content(title, event_title)
-    click_option(".context_id", @course.name) if use_current_course_calendar
+    click_option(edit_calendar_event_form_context, @course.name) if use_current_course_calendar
     date = middle_number if date.nil?
     add_date(date) if should_add_date
-    replace_content(f("#calendar_event_location_name"), "location title") if should_add_location
+    replace_content(f("input[placeHolder='Input Event Location...'"), "location title") if should_add_location
 
     if should_duplicate
       f("#duplicate_event").click
-      duplicate_options = edit_event_form.find("#duplicate_interval")
+      duplicate_options = edit_calendar_event_form.find("#duplicate_interval")
       keep_trying_until { duplicate_options.displayed? }
-      duplicate_interval = edit_event_form.find("#duplicate_interval")
-      duplicate_count = edit_event_form.find("#duplicate_count")
+      duplicate_interval = edit_calendar_event_form.find("#duplicate_interval")
+      duplicate_count = edit_calendar_event_form.find("#duplicate_count")
       replace_content(duplicate_interval, "1")
       replace_content(duplicate_count, "3")
       f("#append_iterator").click
     end
 
-    submit_form(edit_event_form)
+    submit_form(edit_calendar_event_form)
     wait_for_ajax_requests
     if should_duplicate
       4.times do |i|
@@ -234,17 +233,92 @@ module Calendar2Common
     end
   end
 
+  def input_timed_calendar_event_fields(new_date, start_time, end_time)
+    get "/calendar2"
+    find_middle_day.click
+    replace_content(edit_calendar_event_form_title, "Timed Event")
+    replace_content(edit_calendar_event_form_date, format_date_for_view(new_date, :medium))
+    edit_calendar_event_start_input.click
+    replace_content(edit_calendar_event_start_input, start_time)
+    edit_calendar_event_start_input.send_keys :return
+    edit_calendar_event_end_input.click
+    replace_content(edit_calendar_event_end_input, end_time)
+    edit_calendar_event_end_input.send_keys :return
+  end
+
+  def create_timed_calendar_event(new_date, start_time, end_time)
+    input_timed_calendar_event_fields(new_date, start_time, end_time)
+    edit_calendar_event_form_submit_button.click
+    wait_for_ajaximations
+    refresh_page
+  end
+
+  def time_to_lower(time_string)
+    time_string.gsub(/\s+/, "").gsub(":00", "").downcase
+  end
+
+  def test_timed_calendar_event_in_tz(time_zone, start_time = "6:30 AM", end_time = "6:30 PM")
+    @user.time_zone = time_zone
+    @user.save!
+    @date = Time.zone.now.beginning_of_day
+    new_date = @date
+    new_date = if new_date.to_date.mday == "15"
+                 new_date.change({ day: 20 })
+               else
+                 new_date.change({ day: 15 })
+               end
+    create_timed_calendar_event(new_date, start_time, end_time)
+    event_title_on_calendar.click
+    event_content = fj(".event-details-content:visible")
+    expect(event_content.find_element(:css, ".event-details-timestring").text)
+      .to eq "#{format_date_for_view(new_date, "%b %d")}, #{time_to_lower(start_time)} - #{time_to_lower(end_time)}"
+
+    calendar_edit_event_link.click
+    edit_calendar_event_form_submit_button.click
+    wait_for_ajaximations
+    refresh_page
+    event_title_on_calendar.click
+    event_content = fj(".event-details-content:visible")
+    expect(event_content.find_element(:css, ".event-details-timestring").text)
+      .to eq "#{format_date_for_view(new_date, "%b %d")}, #{time_to_lower(start_time)} - #{time_to_lower(end_time)}"
+  end
+
+  def test_timed_calendar_event_in_tz_more_options(time_zone, start_time = "6:30 AM", end_time = "6:30 PM")
+    @user.time_zone = time_zone
+    @user.save!
+    @date = Time.zone.now.beginning_of_day
+    new_date = @date
+    new_date = if new_date.to_date.mday == "15"
+                 new_date.change({ day: 20 })
+               else
+                 new_date.change({ day: 15 })
+               end
+    input_timed_calendar_event_fields(new_date, start_time, end_time)
+    expect_new_page_load { edit_calendar_event_form_more_options.click }
+    expect(more_options_date_field.property("value")).to eq(format_date_for_view(new_date, "%Y-%m-%d"))
+    expect(more_options_start_time_field.property("value")).to eq(start_time)
+    expect(more_options_end_time_field.property("value")).to eq(end_time)
+
+    more_options_submit_button.click
+    wait_for_ajaximations
+    refresh_page
+
+    event_title_on_calendar.click
+    event_content = fj(".event-details-content:visible")
+    expect(event_content.find_element(:css, ".event-details-timestring").text)
+      .to eq "#{format_date_for_view(new_date, "%b %d")}, #{time_to_lower(start_time)} - #{time_to_lower(end_time)}"
+  end
+
   # Creates event from the 'edit event' modal
   def event_from_modal(event_title, should_add_date = false, should_add_location = false)
     edit_event_dialog = f("#edit_event_tabs")
     expect(edit_event_dialog).to be_displayed
-    edit_event_form = edit_event_dialog.find("#edit_calendar_event_form")
-    title = edit_event_form.find("#calendar_event_title")
+    title = edit_calendar_event_form_title
     keep_trying_until { title.displayed? }
     replace_content(title, event_title)
     add_date(middle_number) if should_add_date
-    replace_content(f("#calendar_event_location_name"), "location title") if should_add_location
-    submit_form(edit_event_form)
+    replace_content(f("input[placeHolder='Input Event Location...'"), "location title") if should_add_location
+    edit_calendar_event_form_submit_button.click
     wait_for_ajax_requests
   end
 
@@ -337,14 +411,14 @@ module Calendar2Common
   end
 
   def edit_new_event_in_more_options_page
-    f("#create_new_event_link").click
-    replace_content(f("#calendar_event_title"), "blackout event")
-    expect_new_page_load { f(".more_options_link").click }
+    calendar_create_event_button.click
+    replace_content(edit_calendar_event_form_title, "blackout event")
+    expect_new_page_load { edit_calendar_event_form_more_options.click }
   end
 
   def check_blackout_date_and_submit
-    f("#calendar_event_blackout_date").click
-    f('button[type="submit"]').click
+    more_options_blackout_date_checkbox.click
+    edit_calendar_event_form_submit_button.click
     wait_for_ajaximations
   end
 
@@ -354,9 +428,21 @@ module Calendar2Common
   end
 
   def edit_calendar_event_in_more_options_page
-    f(".fc-content .fc-title").click
-    f(".edit_event_link").click
-    expect_new_page_load { f(".more_options_link").click }
+    event_title_on_calendar.click
+    calendar_edit_event_link.click
+    expect_new_page_load { edit_calendar_event_form_more_options.click }
+  end
+
+  def event_title_on_calendar
+    f(".fc-content .fc-title")
+  end
+
+  def calendar_edit_event_link
+    f(".edit_event_link")
+  end
+
+  def calendar_create_event_button
+    f("#create_new_event_link")
   end
 
   def calendar_event_is_blackout_date
@@ -402,5 +488,61 @@ module Calendar2Common
 
   def event_series_delete_button
     fj('button:contains("Delete")')
+  end
+
+  def edit_calendar_event_form
+    f("[data-testid='calendar-event-form']")
+  end
+
+  def edit_calendar_event_form_title
+    f("[placeHolder='Input Event Title...']")
+  end
+
+  def edit_calendar_event_form_context
+    f("[data-testid='edit-calendar-event-form-context']")
+  end
+
+  def edit_calendar_event_form_date
+    f("input[data-testid='edit-calendar-event-form-date']")
+  end
+
+  def edit_calendar_event_start_input
+    f("[data-testid='event-form-start-time']")
+  end
+
+  def edit_calendar_event_end_input
+    f("[data-testid='event-form-end-time']")
+  end
+
+  def edit_calendar_event_important_date_checkbox
+    f("label[for='k5-field'] div")
+  end
+
+  def edit_calendar_event_form_more_options
+    f("a[data-testid='edit-calendar-event-more-options-button']")
+  end
+
+  def edit_calendar_event_form_submit_button
+    f("button[type='submit']")
+  end
+
+  def more_options_date_field
+    f("input[placeHolder='Date']")
+  end
+
+  def more_options_start_time_field
+    f("input[placeHolder='Start Time']")
+  end
+
+  def more_options_end_time_field
+    f("input[placeHolder='End Time']")
+  end
+
+  def more_options_blackout_date_checkbox
+    f("#calendar_event_blackout_date")
+  end
+
+  def more_options_submit_button
+    f("button[type='submit']")
   end
 end

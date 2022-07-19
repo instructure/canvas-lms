@@ -68,11 +68,10 @@ describe "calendar2" do
         find_middle_day.click
         edit_event_dialog = f("#edit_event_tabs")
         expect(edit_event_dialog).to be_displayed
-        edit_event_form = edit_event_dialog.find("#edit_calendar_event_form")
-        title = edit_event_form.find("#calendar_event_title")
+        title = edit_calendar_event_form_title
         expect(title).to be_displayed
         replace_content(title, event_title)
-        expect_new_page_load { f(".more_options_link").click }
+        expect_new_page_load { edit_calendar_event_form_more_options.click }
         expect(driver.current_url).to match(/start_date=\d\d\d\d-\d\d-\d\d/) # passed in ISO format, not localized
         expect(f(".title")).to have_value event_title
         expect(f("#editCalendarEventFull .btn-primary").text).to eq "Create Event"
@@ -162,8 +161,8 @@ describe "calendar2" do
         move_to_click_element(f(".calendar .fc-week .fc-today"))
         wait_for_ajaximations
         f("#edit_event #edit_event_tabs") # using implicit wait for element to be displayed
-        click_option(f(".context_id"), @course.name)
-        expect_new_page_load { f(".more_options_link").click }
+        click_option(edit_calendar_event_form_context, @course.name)
+        expect_new_page_load { edit_calendar_event_form_more_options.click }
 
         # tiny can steal focus from one of the date inputs when it initializes
         wait_for_tiny(f("#calendar-description"))
@@ -215,11 +214,11 @@ describe "calendar2" do
 
         get "/calendar2"
         wait_for_ajaximations
-        f("#create_new_event_link").click
-        replace_content(f("#calendar_event_title"), "important event")
-        click_option(f(".context_id"), @course.name)
-        f("#calendar_event_important_dates").click
-        f('.event-details-footer button[type="submit"]').click
+        calendar_create_event_button.click
+        replace_content(edit_calendar_event_form_title, "important event")
+        click_option(edit_calendar_event_form_context, @course.name)
+        edit_calendar_event_important_date_checkbox.click
+        edit_calendar_event_form_submit_button.click
         wait_for_ajaximations
         expect(@course.calendar_events.last.important_dates).to be_truthy
       end
@@ -256,14 +255,14 @@ describe "calendar2" do
                    end
 
         get "/calendar2"
-        f(".fc-content .fc-title").click
-        f(".edit_event_link").click
-        replace_content(f("input#calendar_event_title"), "An all day event edited")
-        replace_content(f("input#calendar_event_date"), format_date_for_view(new_date, :short))
-        f("button[type=submit]").click
+        event_title_on_calendar.click
+        calendar_edit_event_link.click
+        replace_content(edit_calendar_event_form_title, "An all day event edited")
+        replace_content(edit_calendar_event_form_date, format_date_for_view(new_date, :medium))
+        edit_calendar_event_form_submit_button.click
         wait_for_ajaximations
         refresh_page
-        f(".fc-content .fc-title").click
+        event_title_on_calendar.click
         event_content = fj(".event-details-content:visible")
         expect(event_content.find_element(:css, ".event-details-timestring").text)
           .to eq format_date_for_view(new_date, "%b %d")
@@ -273,27 +272,55 @@ describe "calendar2" do
 
       it "can create timed events in calendar" do
         @date = Time.zone.now.beginning_of_day
-        start_time = "6:30am"
-        end_time = "6:30pm"
+        start_time = "6:30 AM"
+        end_time = "6:30 PM"
         new_date = @date
         new_date = if new_date.to_date.mday == "15"
                      new_date.change({ day: 20 })
                    else
                      new_date.change({ day: 15 })
                    end
-        get "/calendar2"
-        find_middle_day.click
-        replace_content(f("input#calendar_event_title"), "Timed Event")
-        replace_content(f("input#calendar_event_date"), format_date_for_view(new_date, :short))
-        replace_content(f("input[type=text][name= 'start_time']"), start_time)
-        replace_content(f("input[type=text][name= 'end_time']"), end_time)
-        f("button[type=submit]").click
-        wait_for_ajaximations
-        refresh_page
-        f(".fc-content .fc-title").click
+        create_timed_calendar_event(new_date, start_time, end_time)
+        event_title_on_calendar.click
         event_content = fj(".event-details-content:visible")
         expect(event_content.find_element(:css, ".event-details-timestring").text)
-          .to eq "#{format_date_for_view(new_date, "%b %d")}, #{start_time} - #{end_time}"
+          .to eq "#{format_date_for_view(new_date, "%b %d")}, 6:30am - 6:30pm"
+      end
+
+      it "can edit timed events in calendar" do
+        test_timed_calendar_event_in_tz("Etc/UTC")
+      end
+
+      it "can edit timed events in calendar in Denver" do
+        test_timed_calendar_event_in_tz("America/Denver")
+      end
+
+      it "can edit timed events in calendar in Tokyo" do
+        test_timed_calendar_event_in_tz("Asia/Tokyo")
+      end
+
+      it "can edit timed events in calendar in Hawaii" do
+        test_timed_calendar_event_in_tz("Pacific/Honolulu")
+      end
+
+      it "can create timed events in calendar More Options screen" do
+        test_timed_calendar_event_in_tz_more_options("Etc/UTC")
+      end
+
+      it "can create timed events in calendar More Options screen in Denver" do
+        test_timed_calendar_event_in_tz_more_options("America/Denver")
+      end
+
+      it "can create timed events in calendar More Options screen in Tokyo" do
+        test_timed_calendar_event_in_tz_more_options("Asia/Tokyo")
+      end
+
+      it "can create timed events in calendar More Options screen in Hawaii" do
+        test_timed_calendar_event_in_tz_more_options("Pacific/Honolulu", "12:00 AM", "11:30 PM")
+      end
+
+      it "can create timed events in calendar More Options screen in Tonga" do
+        test_timed_calendar_event_in_tz_more_options("Pacific/Apia", "11:00 PM", "11:30 PM")
       end
 
       it "lets teachers set a date for each section where they have permission" do
@@ -339,7 +366,7 @@ describe "calendar2" do
         course_with_teacher(user: @teacher, active_enrollment: true, course_name: "Time")
         get "/calendar2"
         wait_for_ajaximations
-        f("#create_new_event_link").click
+        calendar_create_event_button.click
         f("[aria-controls=\"edit_assignment_form_holder\"]").click
         today = untitled_course.time_zone.today
         expect(f("#assignment_due_at").attribute(:value)).to eq(I18n.l(today, format: :medium_with_weekday))
@@ -373,12 +400,12 @@ describe "calendar2" do
 
       it "shows student to-do events in the calendar", priority: "1" do
         get "/calendar2"
-        expect(f(".fc-content .fc-title")).to include_text(@student_to_do.title)
+        expect(event_title_on_calendar).to include_text(@student_to_do.title)
       end
 
       it "shows the correct date and context for student to-do item in calendar", priority: "1" do
         get "/calendar2"
-        f(".fc-content .fc-title").click
+        event_title_on_calendar.click
         event_content = fj(".event-details-content:visible")
         expect(event_content.find_element(:css, ".event-details-timestring").text)
           .to eq format_time_for_view(@todo_date, :short)
@@ -395,12 +422,12 @@ describe "calendar2" do
 
       it "shows course to do events in the calendar", priority: "1" do
         get "/calendar2"
-        expect(f(".fc-content .fc-title")).to include_text(@course_to_do.title)
+        expect(event_title_on_calendar).to include_text(@course_to_do.title)
       end
 
       it "shows the correct date and context for courseto-do item in calendar", priority: "1" do
         get "/calendar2"
-        f(".fc-content .fc-title").click
+        event_title_on_calendar.click
         event_content = fj(".event-details-content:visible")
         expect(event_content.find_element(:css, ".event-details-timestring").text)
           .to eq format_time_for_view(@todo_date, :short)
@@ -449,8 +476,8 @@ describe "calendar2" do
 
       it "edits the event in calendar", priority: "1" do
         get "/calendar2"
-        f(".fc-content .fc-title").click
-        f(".edit_event_link").click
+        event_title_on_calendar.click
+        calendar_edit_event_link.click
         replace_content(f("input[name=title]"), "new to-do edited")
         datetime = @todo_date
         datetime = if datetime.to_date.mday == "15"
@@ -459,10 +486,10 @@ describe "calendar2" do
                      datetime.change({ day: 15 })
                    end
         replace_content(f("input[name=date]"), format_date_for_view(datetime, :short))
-        f("button[type=submit]").click
+        edit_calendar_event_form_submit_button.click
         wait_for_ajaximations
         refresh_page
-        f(".fc-content .fc-title").click
+        event_title_on_calendar.click
         event_content = fj(".event-details-content:visible")
         expect(event_content.find_element(:css, ".event-details-timestring").text)
           .to eq format_time_for_view(datetime, :short)

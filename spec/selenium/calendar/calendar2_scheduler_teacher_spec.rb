@@ -47,9 +47,9 @@ describe "scheduler" do
       student_in_course(course: @course, active_all: true)
       ag.appointments.first.reserve_for(@user, @user, comments: "this is important")
       load_month_view
-      expect(f(".fc-content .fc-title").text).to include("new appointment group")
+      expect(event_title_on_calendar.text).to include("new appointment group")
       f("#week").click
-      expect(f(".fc-content .fc-title").text).to include("new appointment group")
+      expect(event_title_on_calendar.text).to include("new appointment group")
       f("#agenda").click
       expect(agenda_item.text).to include("new appointment group")
     end

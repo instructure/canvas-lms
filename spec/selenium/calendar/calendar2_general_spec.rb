@@ -188,8 +188,8 @@ describe "calendar2" do
         event = @user.calendar_events.create! title: "blah", start_at: Date.today
         get "/calendar2"
         open_edit_event_dialog
-        f("option[value=course_#{@course.id}]").click
-        submit_form("#edit_calendar_event_form")
+        click_option(edit_calendar_event_form_context, @course.name)
+        edit_calendar_event_form_submit_button.click
         wait_for_ajaximations
         expect(event.reload.context).to eq @course
         expect(f(".fc-event")).to have_class "group_course_#{@course.id}"
