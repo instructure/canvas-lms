@@ -87,6 +87,11 @@ class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
     # check for the presence of one of the arguments needed to update notification policies
     if input[:communication_channel_id]
       communication_channel = CommunicationChannel.find(input[:communication_channel_id])
+
+      if communication_channel.user_id != current_user.id
+        raise GraphQL::ExecutionError, "not found"
+      end
+
       if input[:is_policy_override]
         NotificationPolicyOverride.create_or_update_for(communication_channel, input[:notification_category].tr("_", " "), input[:frequency], context)
       else
