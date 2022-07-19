@@ -2012,12 +2012,12 @@ class UsersController < ApplicationController
   #   Adding and changing pronouns must be enabled on the root account.
   #
   # @argument user[event] [String, "suspend"|"unsuspend"]
-  #   suspends or unsuspends all logins for this user that the calling user
+  #   Suspends or unsuspends all logins for this user that the calling user
   #   has permission to
   #
   # @argument override_sis_stickiness [boolean]
-  #   by default and when the value is true it updates all the fields
-  #   when the value is false then fields which in stuck_sis_fields will not be updated
+  #   Default is true. If false, any fields containing “sticky” changes will not be updated.
+  #   See SIS CSV Format documentation for information on which fields can have SIS stickiness
   #
   # @example_request
   #

@@ -2906,8 +2906,8 @@ class CoursesController < ApplicationController
   #   Enable or disable individual learning paths for students based on assessment
   #
   # @argument override_sis_stickiness [boolean]
-  #   By default and when the value is true it updates all the fields
-  #   when the value is false then fields which in stuck_sis_fields will not be updated
+  #   Default is true. If false, any fields containing “sticky” changes will not be updated.
+  #   See SIS CSV Format documentation for information on which fields can have SIS stickiness
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id> \
