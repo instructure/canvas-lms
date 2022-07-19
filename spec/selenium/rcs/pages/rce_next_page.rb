@@ -150,15 +150,15 @@ module RCENextPage
   end
 
   def course_links
-    f('[role^="menuitem"][title="Course Links"]')
+    f('[role^="menuitem"][title="Course Link"]')
   end
 
   def group_links
-    f('[role^="menuitem"][title="Group Links"]')
+    f('[role^="menuitem"][title="Group Link"]')
   end
 
   def external_links
-    f('[role^="menuitem"][title="External Links"]')
+    f('[role^="menuitem"][title="External Link"]')
   end
 
   def remove_link
@@ -592,7 +592,7 @@ module RCENextPage
   end
 
   def external_link_menubar_button
-    menu_option_by_name("External Links")
+    menu_option_by_name("External Link")
   end
 
   def image_menubar_button
