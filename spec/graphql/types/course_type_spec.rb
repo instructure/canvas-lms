@@ -409,6 +409,38 @@ describe Types::CourseType do
           GQL
         ).to match_array [@teacher, @student1, @student2, @concluded_user].map(&:to_param)
       end
+
+      context "loginId" do
+        def pseud_params(unique_id, account = Account.default)
+          {
+            account: account,
+            unique_id: unique_id,
+          }
+        end
+
+        before do
+          users = [@teacher, @student1, other_teacher, @student2, @inactive_user]
+          @pseudonyms = users.map { |user| user.pseudonyms.create!(pseud_params("#{user.id}@example.com")).unique_id }
+        end
+
+        it "returns loginId for all users when requested by a teacher" do
+          expect(
+            course_type.resolve(
+              "usersConnection { edges { node { loginId } } }",
+              current_user: @teacher
+            )
+          ).to eq @pseudonyms
+        end
+
+        it "does not return loginId for any users when requested by a student" do
+          expect(
+            course_type.resolve(
+              "usersConnection { edges { node { loginId } } }",
+              current_user: @student1
+            )
+          ).to eq [nil, nil, nil, nil, nil]
+        end
+      end
     end
 
     describe "enrollmentsConnection" do

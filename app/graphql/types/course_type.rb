@@ -156,6 +156,7 @@ module Types
         :read_roster, :view_all_grades, :manage_grades
       )
 
+      context.scoped_merge!(course: course)
       scope = UserSearch.scope_for(course, current_user,
                                    include_inactive_enrollments: true,
                                    enrollment_state: filter[:enrollment_states])
