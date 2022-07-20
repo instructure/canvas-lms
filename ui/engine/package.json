@@ -13,7 +13,7 @@
     "build:canvas": "yarn run check && yarn run lint"
   },
   "dependencies": {
-    "@instructure/updown": "^1.2"
+    "@instructure/updown": "^1.3"
   },
   "eslintConfig": {
     "env": {
