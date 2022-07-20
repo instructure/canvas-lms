@@ -279,6 +279,7 @@ describe ConversationsController do
       enrollment.save
       post "create", params: { recipients: [new_user.id.to_s], body: "yo" }
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.created.legacy")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.legacy")
       expect(response).to be_successful
       expect(assigns[:conversation]).not_to be_nil
     end
@@ -416,9 +417,11 @@ describe ConversationsController do
       [nil, "", "0", "false", "no", "off", "wat"].each do |falsish|
         it "creates one conversation per recipient if group_conversation=#{falsish.inspect}" do
           allow(InstStatsd::Statsd).to receive(:count)
+          allow(InstStatsd::Statsd).to receive(:increment)
           post "create", params: { recipients: [@new_user1.id.to_s, @new_user2.id.to_s], body: "yo", group_conversation: falsish }
 
           expect(InstStatsd::Statsd).to have_received(:count).with("inbox.conversation.created.legacy", 2)
+          expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.legacy")
           expect(response).to be_successful
 
           expect(Conversation.count).to eql(@old_count + 2)
