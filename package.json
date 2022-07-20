@@ -358,7 +358,7 @@
     "test:jest:coverage": "NODE_OPTIONS=\"--max_old_space_size=5120\" jest --color --coverage --testTimeout=30000",
     "test:jest:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "test:jest:watch": "jest --color --watch",
-    "test:jest:build": "if [ \"$COVERAGE\" = \"1\" ]; then yarn test:jest:coverage --maxWorkers=3; else yarn test:jest --maxWorkers=3; fi",
+    "test:jest:build": "if [ \"$COVERAGE\" = \"1\" ]; then yarn test:jest:coverage --maxWorkers=3 --shard=$CI_NODE_INDEX/$CI_NODE_TOTAL; else yarn test:jest --maxWorkers=3 --shard=$CI_NODE_INDEX/$CI_NODE_TOTAL; fi",
     "test:karma": "yarn run test:karma:watch --single-run",
     "test:karma:concurrently": "concurrently --names \"coffee,jsa,jsg,jsh\" \"JSPEC_GROUP=coffee yarn test:karma:headless\" \"JSPEC_GROUP=jsa yarn test:karma:headless\" \"JSPEC_GROUP=jsg yarn test:karma:headless\" \"JSPEC_GROUP=jsh yarn test:karma:headless\"",
     "test:karma:headless": "yarn run test:karma --browsers ChromeHeadlessNoSandbox",

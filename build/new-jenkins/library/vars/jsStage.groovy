@@ -20,7 +20,7 @@ import groovy.transform.Field
 
 @Field static final COFFEE_NODE_COUNT = 4
 @Field static final JSG_NODE_COUNT = 3
-@Field static final JEST_NODE_COUNT = 6
+@Field static final JEST_NODE_COUNT = 4
 
 def jestNodeRequirementsTemplate(index) {
   def baseTestContainer = [
@@ -116,9 +116,8 @@ def queueCoffeeDistribution() {
 def queueJestDistribution(index) {
   { stages ->
     def jestEnvVars = [
-      "CI_NODE_INDEX=${index}",
+      "CI_NODE_INDEX=${index.toInteger() + 1}",
       "CI_NODE_TOTAL=${JEST_NODE_COUNT}",
-      'CI=1',
     ]
 
     callableWithDelegate(queueTestStage())(stages, "jest${index}", jestEnvVars, 'yarn test:jest:build')
