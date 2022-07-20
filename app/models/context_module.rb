@@ -632,12 +632,18 @@ class ContextModule < ActiveRecord::Base
   end
 
   def confirm_valid_requirements(do_save=false)
+    puts "#@#@#@#@#@#@#@#@#@#"
+    puts "self.completion_requirements: #{self.completion_requirements}"
+    puts "#@#@#@#@#@#@#@#@#@#"
     return if @already_confirmed_valid_requirements
     @already_confirmed_valid_requirements = true
     # the write accessor validates for us
     self.completion_requirements = self.completion_requirements || []
     self.save if do_save && self.completion_requirements_changed?
     self.completion_requirements
+    puts "#@#@#@#@#@#@#@#@#@#"
+    puts "self.completion_requirements after save: #{self.completion_requirements}"
+    puts "#@#@#@#@#@#@#@#@#@#"
   end
 
   def find_or_create_progressions(users)
