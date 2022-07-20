@@ -152,6 +152,44 @@ describe "calendar2" do
         end
       end
 
+      describe "other calendars section" do
+        before :once do
+          Account.site_admin.enable_feature!(:account_calendar_events)
+        end
+
+        it "displays an empty state if there are no enabled accounts" do
+          @user.set_preference(:enabled_account_calendars, nil)
+
+          get "/calendar2"
+          expect(f("#other-calendars-list-holder")).to be_displayed
+          expect(f(".accounts-empty-state")).to be_displayed
+        end
+
+        it "displays accounts if the user has enabled them" do
+          @user.set_preference(:enabled_account_calendars, @course.account.id)
+          get "/calendar2"
+
+          account_calendar = ff("#other-calendars-context-list > .context_list_context > label")
+          expect(f("#other-calendars-list-holder")).to be_displayed
+          expect(account_calendar.first.text).to eq @course.account.name
+        end
+
+        it "removes the account if the delete button is clicked" do
+          @user.set_preference(:enabled_account_calendars, @course.account.id)
+          get "/calendar2"
+
+          account_calendar = ff("#other-calendars-context-list > .context_list_context > label")
+          expect(account_calendar.first.text).to eq @course.account.name
+
+          account_calendar_delete_btn = ff("#other-calendars-context-list > .context_list_context > .buttons-wrapper > .ContextList__DeleteBtn")
+          account_calendar_delete_btn.first.click
+
+          expect(f(".accounts-empty-state")).to be_displayed
+          driver.navigate.refresh
+          expect(f(".accounts-empty-state")).to be_displayed
+        end
+      end
+
       describe "undated calendar items" do
         it "shows undated events after clicking link", priority: "1" do
           e = make_event start: nil, title: "pizza party"

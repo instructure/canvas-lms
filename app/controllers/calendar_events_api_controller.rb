@@ -1192,6 +1192,26 @@ class CalendarEventsApiController < ApplicationController
     render json: { status: "ok" }
   end
 
+  # @API Save enabled account calendars
+  #
+  #  Creates and updates the enabled_account_calendars and mark_feature_as_seen user preferences
+  #  @argument mark_feature_as_seen [Optional, Boolean]
+  #    Flag to mark account calendars feature as seen
+  #  @argument enabled_account_calendars[] [Optional, Array]
+  #    An array of account Ids to remember in the calendars list of the user
+  #   curl 'https://<canvas>/api/v1/calendar_events/save_enabled_account_calendars' \
+  #        -X POST \
+  #        -F 'mark_feature_as_seen=true' \
+  #        -F 'enabled_account_calendars[]=1' \
+  #        -F 'enabled_account_calendars[]=2' \
+  #        -H "Authorization: Bearer <token>"
+  def save_enabled_account_calendars
+    @current_user.set_preference(:account_calendar_events_seen, value_to_boolean(params[:mark_feature_as_seen])) if params.key?(:mark_feature_as_seen)
+    @current_user.set_preference(:enabled_account_calendars, params[:enabled_account_calendars]) if params.key?(:enabled_account_calendars)
+
+    render json: { status: "ok" }
+  end
+
   # @API Set a course timetable
   #
   # Creates and updates "timetable" events for a course.
@@ -1405,6 +1425,7 @@ class CalendarEventsApiController < ApplicationController
       joined_codes = codes&.join(",")
       get_all_pertinent_contexts(
         include_groups: true,
+        include_accounts: Account.site_admin.feature_enabled?(:account_calendar_events),
         cross_shard: true,
         only_contexts: joined_codes,
         include_contexts: joined_codes

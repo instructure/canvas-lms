@@ -3475,6 +3475,30 @@ describe CalendarEventsApiController, type: :request do
     end
   end
 
+  context "save_enabled_account_calendars" do
+    it "persists enabled accounts" do
+      api_call(:post, "/api/v1/calendar_events/save_enabled_account_calendars", {
+                 controller: "calendar_events_api",
+                 action: "save_enabled_account_calendars",
+                 format: "json",
+                 enabled_account_calendars: %w[Account.default.id]
+               })
+
+      expect(@user.reload.get_preference(:enabled_account_calendars)).to eq(%w[Account.default.id])
+    end
+
+    it "marks feature as seen" do
+      api_call(:post, "/api/v1/calendar_events/save_enabled_account_calendars", {
+                 controller: "calendar_events_api",
+                 action: "save_enabled_account_calendars",
+                 format: "json",
+                 mark_feature_as_seen: true
+               })
+
+      expect(@user.reload.get_preference(:account_calendar_events_seen)).to eq(true)
+    end
+  end
+
   context "visible_contexts" do
     it "includes custom colors" do
       @user.set_preference(:custom_colors, { @course.asset_string => "#0099ff" })
