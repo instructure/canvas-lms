@@ -18,11 +18,8 @@
 
 import fetchMock from 'fetch-mock'
 import {renderHook, act} from '@testing-library/react-hooks/dom'
-import {useSvgSettings, svgFromUrl, statuses} from '../settings'
+import {useSvgSettings, statuses} from '../settings'
 import Editor from '../../../shared/__tests__/FakeEditor'
-import RceApiSource from '../../../../../rcs/api'
-
-jest.mock('../../../../../rcs/api')
 
 describe('useSvgSettings()', () => {
   let editing, ed, rcs
@@ -30,15 +27,11 @@ describe('useSvgSettings()', () => {
   beforeEach(() => {
     ed = new Editor()
     rcs = {
-      getFile: jest.fn(() => Promise.resolve({name: 'Test Icon.svg'})),
       contextType: 'course',
       contextId: 1,
       canvasUrl: 'https://domain.from.env'
     }
-    RceApiSource.mockImplementation(() => rcs)
   })
-
-  afterEach(() => RceApiSource.mockClear())
 
   const subject = () => renderHook(() => useSvgSettings(ed, editing, rcs)).result
 
@@ -166,10 +159,8 @@ describe('useSvgSettings()', () => {
       // Icon Maker icons that have it
       //
       body = `
-        <svg height="100" width="100">
-        <metadata>
           {
-            "name":"Test Image",
+            "name":"Test Icon",
             "alt":"a test image",
             "shape":"triangle",
             "size":"large",
@@ -181,14 +172,11 @@ describe('useSvgSettings()', () => {
             "textColor":"#009606",
             "textBackgroundColor":"#06A3B7",
             "textPosition":"below"
-          }
-        </metadata>
-        <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/>
-      </svg>`
+          }`
 
       // Stub fetch to return an SVG file
       mock = fetchMock.mock({
-        name: 'download-url',
+        name: 'icon_metadata',
         matcher: '*',
         response: () => ({body})
       })
@@ -199,12 +187,12 @@ describe('useSvgSettings()', () => {
       fetchMock.restore()
     })
 
-    it('fetches the SVG file, specifying the course ID and timestamp', () => {
+    it('fetches the icon metadata, specifying the course ID and timestamp', () => {
       subject()
 
-      expect(mock.called('download-url')).toBe(true)
-      expect(mock.calls('download-url')[0][0]).toMatch(
-        /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=1&ts=\d+&download_frd=1/
+      expect(mock.called('icon_metadata')).toBe(true)
+      expect(mock.calls('icon_metadata')[0][0]).toMatch(
+        /https:\/\/domain.from.env\/api\/v1\/files\/1\/icon_metadata/
       )
     })
 
@@ -216,12 +204,12 @@ describe('useSvgSettings()', () => {
         ed.setSelectedNode(ed.dom.select('#test-image')[0])
       })
 
-      it('fetches the SVG file using the /files/:file_id/download endpoint', () => {
+      it('fetches the icon metadata using the /files/:file_id/icon_metadata endpoint', () => {
         subject()
 
-        expect(mock.called('download-url')).toBe(true)
-        expect(mock.calls('download-url')[0][0]).toMatch(
-          /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=1&ts=\d+&download_frd=1/
+        expect(mock.called('icon_metadata')).toBe(true)
+        expect(mock.calls('icon_metadata')[0][0]).toMatch(
+          /https:\/\/domain.from.env\/api\/v1\/files\/1\/icon_metadata/
         )
       })
     })
@@ -234,12 +222,10 @@ describe('useSvgSettings()', () => {
         ed.setSelectedNode(ed.dom.select('#test-image')[0])
       })
 
-      it('fetches the SVG file, specifying the course ID and timestamp', () => {
+      it('fetches the icon metadata, specifying the course ID and timestamp', () => {
         subject()
-        const calledUrl = mock.calls('download-url')[0][0]
-        expect(calledUrl).toMatch(
-          /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=1&ts=\d+&download_frd=1/
-        )
+        const calledUrl = mock.calls('icon_metadata')[0][0]
+        expect(calledUrl).toMatch(/https:\/\/domain.from.env\/api\/v1\/files\/1\/icon_metadata/)
       })
     })
 
@@ -251,29 +237,14 @@ describe('useSvgSettings()', () => {
         ed.setSelectedNode(ed.dom.select('#containing')[0])
       })
 
-      it('fetches the SVG file, specifying the course ID and timestamp', () => {
+      it('fetches the icon metadata, specifying the course ID and timestamp', () => {
         subject()
-        const calledUrl = mock.calls('download-url')[0][0]
-        expect(calledUrl).toMatch(
-          /https:\/\/domain.from.env\/files\/1\/download\?replacement_chain_context_type=course&replacement_chain_context_id=1&ts=\d+&download_frd=1/
-        )
+        const calledUrl = mock.calls('icon_metadata')[0][0]
+        expect(calledUrl).toMatch(/https:\/\/domain.from.env\/api\/v1\/files\/1\/icon_metadata/)
       })
     })
 
-    it('uses replacement chain context info in request for file name', async () => {
-      const {result, waitForValueToChange} = renderHook(() => useSvgSettings(ed, editing, rcs))
-
-      await waitForValueToChange(() => {
-        return result.current[0]
-      })
-
-      expect(rcs.getFile).toHaveBeenCalledWith('1', {
-        replacement_chain_context_id: 1,
-        replacement_chain_context_type: 'course'
-      })
-    })
-
-    it('parses the SVG settings from the SVG metadata', async () => {
+    it('parses the SVG settings from the icon metadata', async () => {
       const {result, waitForValueToChange} = renderHook(() => useSvgSettings(ed, editing, rcs))
 
       await waitForValueToChange(() => {
@@ -317,41 +288,36 @@ describe('useSvgSettings()', () => {
 
     describe('parses the SVG settings from a legacy SVG metadata structure', () => {
       const bodyGenerator = overrideParams => `
-          <svg height="100" width="100">
-          <metadata>
-            ${JSON.stringify({
-              ...{
-                name: 'Test Image',
-                alt: 'a test image',
-                shape: 'triangle',
-                size: 'large',
-                color: '#FF2717',
-                outlineColor: '#06A3B7',
-                outlineSize: 'small',
-                text: 'Some Text',
-                textSize: 'medium',
-                textColor: '#009606',
-                textBackgroundColor: '#06A3B7',
-                textPosition: 'below',
-                imageSettings: {
-                  cropperSettings: null,
-                  icon: {
-                    label: 'Art Icon'
-                  },
-                  iconFillColor: '#FFFFFF',
-                  image: 'Art Icon',
-                  mode: 'SingleColor'
-                }
+        ${JSON.stringify({
+          ...{
+            name: 'Test Icon',
+            alt: 'a test image',
+            shape: 'triangle',
+            size: 'large',
+            color: '#FF2717',
+            outlineColor: '#06A3B7',
+            outlineSize: 'small',
+            text: 'Some Text',
+            textSize: 'medium',
+            textColor: '#009606',
+            textBackgroundColor: '#06A3B7',
+            textPosition: 'below',
+            imageSettings: {
+              cropperSettings: null,
+              icon: {
+                label: 'Art Icon'
               },
-              ...overrideParams
-            })}
-          </metadata>
-          <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/>
-        </svg>`
+              iconFillColor: '#FFFFFF',
+              image: 'Art Icon',
+              mode: 'SingleColor'
+            }
+          },
+          ...overrideParams
+        })}`
 
       const overwriteUrl = () =>
         (mock = fetchMock.mock({
-          name: 'download-url',
+          name: 'icon_metadata',
           matcher: '*',
           response: () => ({body}),
           overwriteRoutes: true
@@ -642,48 +608,40 @@ describe('useSvgSettings()', () => {
           data-download-url="https://canvas.instructure.com/files/2/download" />
       `)
 
-      fetchMock.mock('begin:https://domain.from.env/files/1/download', {
+      fetchMock.mock('begin:https://domain.from.env/api/v1/files/1/icon_metadata', {
         body: `
-          <svg height="100" width="100">
-            <metadata>
-              {
-                "alt":"the first test image",
-                "shape":"triangle",
-                "size":"large",
-                "color":"#FF2717",
-                "outlineColor":"#06A3B7",
-                "outlineSize":"small",
-                "text":"Some Text",
-                "textSize":"medium",
-                "textColor":"#009606",
-                "textBackgroundColor":"#06A3B7",
-                "textPosition":"below"
-              }
-            </metadata>
-            <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/>
-          </svg>`
+          {
+            "name":"Test Icon.svg",
+            "alt":"the first test image",
+            "shape":"triangle",
+            "size":"large",
+            "color":"#FF2717",
+            "outlineColor":"#06A3B7",
+            "outlineSize":"small",
+            "text":"Some Text",
+            "textSize":"medium",
+            "textColor":"#009606",
+            "textBackgroundColor":"#06A3B7",
+            "textPosition":"below"
+          }`
       })
 
-      fetchMock.mock('begin:https://domain.from.env/files/2/download', {
+      fetchMock.mock('begin:https://domain.from.env/api/v1/files/2/icon_metadata', {
         body: `
-          <svg height="100" width="100">
-            <metadata>
-              {
-                "alt":"the second test image",
-                "shape":"square",
-                "size":"medium",
-                "color":"#FF2717",
-                "outlineColor":"#06A3B7",
-                "outlineSize":"small",
-                "text":"Some Text",
-                "textSize":"medium",
-                "textColor":"#009606",
-                "textBackgroundColor":"#06A3B7",
-                "textPosition":"below"
-              }
-            </metadata>
-            <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/>
-          </svg>`
+          {
+            "name":"Test Icon.svg",
+            "alt":"the second test image",
+            "shape":"square",
+            "size":"medium",
+            "color":"#FF2717",
+            "outlineColor":"#06A3B7",
+            "outlineSize":"small",
+            "text":"Some Text",
+            "textSize":"medium",
+            "textColor":"#009606",
+            "textBackgroundColor":"#06A3B7",
+            "textPosition":"below"
+          }`
       })
     })
 
@@ -704,50 +662,6 @@ describe('useSvgSettings()', () => {
 
       expect(result.current[0].name).toEqual('Test Icon')
       expect(result.current[0].shape).toEqual('square')
-    })
-  })
-})
-
-describe('svgFromUrl()', () => {
-  let svgResponse
-
-  const subject = () => svgFromUrl('https://www.instructure.com/svg')
-
-  beforeEach(() => {
-    fetchMock.mock('https://www.instructure.com/svg', () => ({
-      body: svgResponse,
-      sendAsJson: false
-    }))
-  })
-
-  afterEach(() => {
-    fetchMock.restore()
-    jest.resetAllMocks()
-  })
-
-  describe('when the url points to an SVG file', () => {
-    beforeEach(() => {
-      svgResponse = `
-        <svg height="100" width="100">
-          <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/>
-        </svg>
-      `
-    })
-
-    it('returns the parsed SVG document', async () => {
-      const svgDoc = await subject()
-      expect(svgDoc.querySelector('svg').innerHTML).toContain(
-        '<circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/>'
-      )
-    })
-  })
-
-  describe('when the url points to a document that is not parsable', () => {
-    beforeEach(() => (svgResponse = 'asdf'))
-
-    it('returns an empty document', async () => {
-      const doc = await subject()
-      expect(doc.firstChild.toString.innerHTML).toEqual(undefined)
     })
   })
 })

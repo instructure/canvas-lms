@@ -19,7 +19,6 @@
 import {useState, useEffect, useReducer} from 'react'
 import {svgSettings as svgSettingsReducer, defaultState} from '../reducers/svgSettings'
 import {ICON_MAKER_ATTRIBUTE, ICON_MAKER_DOWNLOAD_URL_ATTR, SVG_XML_TYPE} from './constants'
-import RceApiSource from '../../../../rcs/api'
 import {modes} from '../reducers/imageSection'
 import iconsLabels from '../utils/iconsLabels'
 
@@ -56,22 +55,10 @@ const getImageNode = (editor, editing) => {
   return iconMaker
 }
 
-const buildFilesUrl = (fileId, rcsConfig) => {
-  // http://canvas.docker/files/2169/download?download_frd=1&amp;icon_maker_icon=1
+const buildMetadataUrl = (fileId, rcsConfig) => {
+  // http://canvas.docker/api/v1/files/2169/icon_metadata
 
-  const downloadURL = new URL(`${rcsConfig.canvasUrl}/files/${fileId}/download`)
-
-  // Adding the Course ID to the request causes Canvas to follow the chain
-  // of files that were uploaded and "replaced" previous versions of the file.
-  downloadURL.searchParams.append('replacement_chain_context_type', 'course')
-  downloadURL.searchParams.append('replacement_chain_context_id', rcsConfig.contextId)
-
-  // Prevent the browser from using an old cached SVGs
-  downloadURL.searchParams.append('ts', Date.now())
-
-  // Yes, we want do download for real dude
-  downloadURL.searchParams.append('download_frd', 1)
-
+  const downloadURL = new URL(`${rcsConfig.canvasUrl}/api/v1/files/${fileId}/icon_metadata`)
   return downloadURL.toString()
 }
 
@@ -97,25 +84,15 @@ export function useSvgSettings(editor, editing, rcsConfig) {
         // Parse out the file ID from something like
         // /courses/1/files/3/preview?...
         const fileId = urlFromNode.split('files/')[1]?.split('/')[0]
-        const downloadUrl = buildFilesUrl(fileId, rcsConfig)
+        const downloadUrl = buildMetadataUrl(fileId, rcsConfig)
 
-        // Parse SVG. If no SVG found, return defaults
-        const svg = await svgFromUrl(downloadUrl)
-        if (!svg) return
-
-        // Parse metadata. If no metadata found, return defaults
-        const metadata = svg.querySelector('metadata')?.innerHTML
+        // Download icon metadata. If no metadata found, return defaults
+        const response = await fetch(downloadUrl)
+        const metadata = await response.text()
         if (!metadata) return
 
-        const rcs = new RceApiSource(rcsConfig)
-
-        const fileData = await rcs.getFile(fileId, {
-          replacement_chain_context_type: rcsConfig.contextType,
-          replacement_chain_context_id: rcsConfig.contextId
-        })
-        const fileName = fileData.name.replace(/\.[^\.]+$/, '')
-
         const metadataJson = JSON.parse(metadata)
+        const fileName = metadataJson.name.replace(/\.[^\.]+$/, '')
         metadataJson.name = fileName
         metadataJson.originalName = fileName
 
@@ -150,13 +127,6 @@ export function useSvgSettings(editor, editing, rcsConfig) {
   }, [editor, editing, urlFromNode, rcsConfig, altText, customWidth, customHeight, customStyle])
 
   return [settings, status, dispatch]
-}
-
-export async function svgFromUrl(url) {
-  const response = await fetch(url)
-
-  const data = await response.text()
-  return new DOMParser().parseFromString(data, SVG_XML_TYPE)
 }
 
 function processMetadataForBackwardCompatibility(metadataJson) {

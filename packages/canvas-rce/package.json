@@ -158,6 +158,7 @@
     "@testing-library/dom": "^8",
     "@testing-library/jest-dom": "^5",
     "@testing-library/react": "^12",
+    "@testing-library/react-hooks": "^5",
     "@testing-library/user-event": "^12",
     "axe-testcafe": "^3",
     "babel-loader": "^8.0.0",
