@@ -132,6 +132,7 @@ RSpec.describe Mutations::CreateConversation do
     enrollment.save
     result = run_mutation(recipients: [new_user.id.to_s], body: "yo", context_code: @course.asset_string)
     expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.created.react")
+    expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.react")
     expect(result.dig("data", "createConversation", "errors")).to be_nil
     expect(
       result.dig("data", "createConversation", "conversations", 0, "conversation", "conversationMessagesConnection", "nodes", 0, "body")
@@ -284,9 +285,11 @@ RSpec.describe Mutations::CreateConversation do
 
     it "creates one conversation per recipient" do
       allow(InstStatsd::Statsd).to receive(:count)
+      allow(InstStatsd::Statsd).to receive(:increment)
       user_type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
 
       run_mutation(recipients: [@new_user1.id.to_s, @new_user2.id.to_s], subject: "yo 1", group_conversation: true, bulk_message: true, context_code: @course.asset_string)
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.react")
       run_mutation(recipients: [@new_user1.id.to_s, @new_user2.id.to_s], subject: "yo 2", group_conversation: true, bulk_message: true, context_code: @course.asset_string)
       expect(InstStatsd::Statsd).to have_received(:count).with("inbox.conversation.created.react", 2).at_least(:twice)
       expect(Conversation.count).to eql(@old_count + 4)

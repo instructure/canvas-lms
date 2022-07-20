@@ -109,6 +109,7 @@ class Mutations::CreateConversation < Mutations::BaseMutation
         Conversation.preload_participants(conversations.map(&:conversation))
         ConversationParticipant.preload_latest_messages(conversations, @current_user)
         InstStatsd::Statsd.count("inbox.conversation.created.react", conversations.count)
+        InstStatsd::Statsd.increment("inbox.conversation.sent.react")
         return { conversations: conversations }
       else
         conversation = @current_user.initiate_conversation(
@@ -125,6 +126,7 @@ class Mutations::CreateConversation < Mutations::BaseMutation
           cc_author: true
         )
         InstStatsd::Statsd.increment("inbox.conversation.created.react")
+        InstStatsd::Statsd.increment("inbox.conversation.sent.react")
         return { conversations: [conversation] }
       end
     end
