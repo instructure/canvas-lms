@@ -444,9 +444,17 @@ describe "quizzes" do
 
       it "shows the course pacing notice" do
         create_quiz_with_due_date
+        add_quiz_to_module
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
         expect(f("[data-testid='CoursePacingNotice']")).to be_displayed
         expect(f("#content")).not_to contain_css("table.assignment_dates")
+      end
+
+      it "does not show course pacing notice if quiz is not a module item" do
+        create_quiz_with_due_date
+        get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+        expect(f("#content")).not_to contain_css("[data-testid='CoursePacingNotice']")
+        expect(f("table.assignment_dates")).to be_displayed
       end
     end
   end

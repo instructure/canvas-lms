@@ -361,7 +361,8 @@ class Quizzes::QuizzesController < ApplicationController
         VALID_DATE_RANGE: CourseDateRange.new(@context),
         HAS_GRADING_PERIODS: @context.grading_periods?,
         MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT: max_name_length_required_for_account,
-        MAX_NAME_LENGTH: max_name_length
+        MAX_NAME_LENGTH: max_name_length,
+        IS_MODULE_ITEM: @quiz.is_module_item?
       }
 
       if @context.grading_periods?
