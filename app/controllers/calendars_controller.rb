@@ -123,5 +123,8 @@ class CalendarsController < ApplicationController
 
     calendar_contexts = (@contexts + [@domain_root_account]).uniq
     add_conference_types_to_js_env(calendar_contexts)
+
+    enrollment_types_tags = @current_user.participating_enrollments.pluck(:type).uniq.map { |type| "enrollment_type:#{type}" }
+    InstStatsd::Statsd.increment("calendar.visit", tags: enrollment_types_tags)
   end
 end
