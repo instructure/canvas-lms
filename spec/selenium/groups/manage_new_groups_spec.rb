@@ -35,20 +35,14 @@ describe "manage groups" do
 
         f("#add-group-set").click
         replace_and_proceed f("#new-group-set-name"), "zomg"
-        fxpath("//input[@data-testid='radio-button-split-groups']/..").click
-        replace_and_proceed f("#textinput-create-groups-count"), "2"
+        force_click('[data-testid="group-structure-selector"]')
+        force_click('[data-testid="group-structure-num-groups"]')
+        f('[data-testid="split-groups"]').send_keys("2")
         f(%(button[data-testid="group-set-save"])).click
-
-        wait_for_ajax_requests
         run_jobs
-        wait_for(method: nil, timeout: 3) { f("#group_categories_tabs .collectionViewItems").displayed? }
-
-        # yay, added
-        expect(f("#group_categories_tabs .collectionViewItems").text).to include("Everyone")
-        expect(f("#group_categories_tabs .collectionViewItems").text).to include("zomg")
-
-        groups = ff(".collectionViewItems > .group")
-        expect(groups.size).to eq 2
+        wait_for_ajaximations
+        expect(GroupCategory.last.name).to eq "zomg"
+        expect(Group.last(2).pluck(:name)).to match_array ["zomg 1", "zomg 2"]
       end
     end
 

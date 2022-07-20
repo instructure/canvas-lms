@@ -31,6 +31,7 @@ import Filter, {useFilterSettings} from './Filter'
 import {StoreProvider} from './StoreContext'
 import {getTrayHeight} from './trayUtils'
 import {ICON_MAKER_ICONS} from '../instructure_icon_maker/svg/constants'
+import {getCanUploadFiles} from '../../RCEApiSessionGetter'
 
 /**
  * Returns the translated tray label
@@ -237,6 +238,8 @@ export default function CanvasContentTray(props) {
   // should we close the tray after the user clicks on something in it?
   const [hidingTrayOnAction, setHidingTrayOnAction] = useState(true)
 
+  const [canUploadFiles, setCanUploadFiles] = useState(false)
+
   const trayRef = useRef(null)
   const scrollingAreaRef = useRef(null)
   const [filterSettings, setFilterSettings] = useFilterSettings()
@@ -252,6 +255,12 @@ export default function CanvasContentTray(props) {
     onTrayClosing && onTrayClosing(CanvasContentTray.globalOpenCount) // tell RCEWrapper we're closing if we're open
     setIsOpen(false)
   }, [bridge, onTrayClosing])
+
+  useEffect(() => {
+    // eslint-disable-next-line promise/catch-or-return
+    getCanUploadFiles(props).then(result => setCanUploadFiles(result))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     const controller = {
@@ -448,6 +457,7 @@ export default function CanvasContentTray(props) {
                     host={props.host}
                     refreshToken={props.refreshToken}
                     context={{type: props.contextType, id: props.contextId}}
+                    canUploadFiles={canUploadFiles}
                     {...contentProps}
                   />
                 </ErrorBoundary>
@@ -471,7 +481,6 @@ function requiredWithoutSource(props, propName, componentName) {
 }
 
 const trayPropsMap = {
-  canUploadFiles: bool.isRequired,
   contextId: string.isRequired, // initial value indicating the user's context (e.g. student v teacher), not the tray's
   contextType: string.isRequired, // initial value indicating the user's context, not the tray's
   containingContext: shape({
@@ -501,7 +510,6 @@ CanvasContentTray.propTypes = {
 // the way we define trayProps, eslint doesn't recognize the following as props
 /* eslint-disable react/default-props-match-prop-types */
 CanvasContentTray.defaultProps = {
-  canUploadFiles: false,
   filesTabDisabled: false,
   refreshToken: null,
   source: null,

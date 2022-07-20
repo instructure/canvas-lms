@@ -28,7 +28,6 @@ services:
       - canvas-rce_canvas:/usr/src/app/packages/canvas-rce/canvas
       - canvas-rce_lib:/usr/src/app/packages/canvas-rce/lib
       - canvas-rce_node_modules:/usr/src/app/packages/canvas-rce/node_modules
-      - i18nliner_node_modules:/usr/src/app/gems/canvas_i18nliner/node_modules
       - jest-moxios-utils_node_modules:/usr/src/app/packages/jest-moxios-utils/node_modules
       - js-utils_es:/usr/src/app/packages/js-utils/es
       - js-utils_lib:/usr/src/app/packages/js-utils/lib

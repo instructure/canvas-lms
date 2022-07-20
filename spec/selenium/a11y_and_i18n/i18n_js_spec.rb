@@ -41,31 +41,6 @@ describe "i18n js" do
     end
   end
 
-  context "locales" do
-    it "pulls in core translations for all locales" do
-      skip("USE_OPTIMIZED_JS=true") unless ENV["USE_OPTIMIZED_JS"]
-      skip("RAILS_LOAD_ALL_LOCALES=true") unless ENV["RAILS_LOAD_ALL_LOCALES"]
-      core_keys = I18nTasks::Utils::CORE_KEYS
-      core_translations = I18n.available_locales.map do |locale|
-        [locale.to_s, I18n.backend.send(:translations)[locale].slice(*core_keys)]
-      end.to_h.deep_stringify_keys
-
-      expect(driver.execute_script(<<~JS)).to eq core_translations
-        var core = {};
-        var coreKeys = #{core_keys.map(&:to_s).inspect};
-        Object.keys(I18n.translations).forEach(function(locale) {
-          core[locale] = {};
-          coreKeys.forEach(function(key) {
-            if (I18n.translations[locale][key]) {
-              core[locale][key] = I18n.translations[locale][key];
-            }
-          });
-        });
-        return core;
-      JS
-    end
-  end
-
   context "scoped" do
     it "uses the scoped translations" do
       skip("USE_OPTIMIZED_JS=true") unless ENV["USE_OPTIMIZED_JS"]

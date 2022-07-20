@@ -55,6 +55,8 @@ ActiveSupport::TimeZone::MAPPING["Fortaleza"] = "America/Fortaleza"
 ActiveSupport::TimeZone::MAPPING["Manaus"] = "America/Manaus"
 ActiveSupport::TimeZone::MAPPING["Cuiaba"] = "America/Cuiaba"
 ActiveSupport::TimeZone::MAPPING["Eirunepe"] = "America/Eirunepe"
+# Additional Australian zones
+ActiveSupport::TimeZone::MAPPING["Norfolk Island"] = "Pacific/Norfolk"
 
 ActiveSupport::TimeZone.instance_variable_set(:@zones, nil)
 ActiveSupport::TimeZone.instance_variable_set(:@zones_map, nil)

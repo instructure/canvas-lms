@@ -70,7 +70,7 @@ class Mutations::CreateConversation < Mutations::BaseMutation
 
     group_conversation = input[:group_conversation]
     batch_private_messages = !group_conversation && recipients.size > 1
-    batch_group_messages = (group_conversation && input[:bulk_message] && input[:force_new])
+    batch_group_messages = (group_conversation && input[:bulk_message]) || input[:force_new]
     message = Conversation.build_message(*build_message_args(
       body: input[:body],
       attachment_ids: input[:attachment_ids],
@@ -108,6 +108,7 @@ class Mutations::CreateConversation < Mutations::BaseMutation
                                                .order("visible_last_authored_at DESC, last_message_at DESC, id DESC")
         Conversation.preload_participants(conversations.map(&:conversation))
         ConversationParticipant.preload_latest_messages(conversations, @current_user)
+        InstStatsd::Statsd.count("inbox.conversation.created.react", conversations.count)
         return { conversations: conversations }
       else
         conversation = @current_user.initiate_conversation(
@@ -123,6 +124,7 @@ class Mutations::CreateConversation < Mutations::BaseMutation
           update_for_sender: false,
           cc_author: true
         )
+        InstStatsd::Statsd.increment("inbox.conversation.created.react")
         return { conversations: [conversation] }
       end
     end

@@ -42,7 +42,6 @@ RUN --mount=target=/tmp/src \
     \
     /tmp/dst && \
   find \
-    gems/canvas_i18nliner \
     gems/plugins/* \
     ui/shared/* \
     packages/* \
@@ -68,11 +67,6 @@ RUN --mount=target=/tmp/src \
     -not -path "gems/plugins" \
     -maxdepth 2 \
     -path "gems/*/lib" \
-    -exec cp -rf --parents {} /tmp/dst \; && \
-  find gems/canvas_i18nliner \
-    -not -path "gems/canvas_i18nliner" \
-    -not -path "gems/canvas_i18nliner/spec" \
-    -not -path "gems/canvas_i18nliner/spec/*" \
     -exec cp -rf --parents {} /tmp/dst \; && \
   find gems/plugins \( \
     -path "*/app/coffeescripts" -o \

@@ -41,7 +41,6 @@ module.exports = {
   mode: 'development',
   module: {
     noParse: [
-      require.resolve('@instructure/i18nliner/dist/lib/i18nliner.js'),
       require.resolve('jquery'),
       require.resolve('tinymce'),
     ],

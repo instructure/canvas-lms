@@ -45,7 +45,7 @@
     "fmt:check": "prettier -l '**/*.js'",
     "fmt:fix": "prettier --write '**/*.js'",
     "clean": "rm -rf lib && rm -rf es && rm -rf coverage && yarn demo:clean",
-    "generate-svgs": "yarn build:cjs && scripts/generateSvgs.js"
+    "generate-svgs": "yarn build:cjs && scripts/generateSvgs.js && prettier --write src/rce/plugins/instructure_equation/MathIcon/svgs.js"
   },
   "author": "Instructure, Inc",
   "license": "AGPL-3.0",
@@ -149,6 +149,7 @@
     "@babel/cli": "^7",
     "@babel/core": "^7",
     "@babel/register": "7",
+    "@instructure/babel-plugin-themeable-styles": "7.19.0-canvas",
     "@instructure/browserslist-config-canvas-lms": ">=2",
     "@instructure/translations": ">=1",
     "@testing-library/dom": "^7",

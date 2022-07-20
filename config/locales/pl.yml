@@ -254,6 +254,7 @@ pl:
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "Tabela, która zawiera dane schematu oceniania. Każdy rząd zawiera nazwę, maksymalną wartość procentową i minimalną wartość procentową. Ponadto każdy rząd zawiera ikonę pozwalającą dodać nowy rząd poniżej, a także ikonę pozwalającą usunąć bieżący rząd."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Tabela, która zawiera dane schematu oceniania. Każdy rząd zawiera nazwę, maksymalną wartość procentową i minimalną wartość procentową. Ponadto każdy rząd zawiera ikonę pozwalającą dodać nowy rząd poniżej, a także ikonę pozwalającą usunąć bieżący rząd."
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "Tabela zawierająca dane schematu oceniania. Najpierw są nazwa schematu oceniana i przyciski do edytowania lub usuwania schematu. Każdy wiersz zawiera nazwę, maksymalny odsetek i minimalny odsetek. Co więcej, w każdym wierszu znajduje się przycisk, który pozwala dodać nowy wiersz poniżej, oraz przycisk, który pozwala usunąć bieżący wiersz."
+  a_timeout_occurred_contacting_external_authenticat_c064ea48: "Przekroczono limit czasu podczas kontaktowania się z zewnętrzną usługą uwierzytelnienia"
   a_z_243c3301: A–Z
   a_z_29d8e67c: "A - Z"
   ability_to_submit_annotatable_document_assignments_5bc5edd3: "Możliwość przesyłania zadań z adnotacjami"
@@ -1272,6 +1273,10 @@ pl:
                 check_box: "Grupy CSV"
               pseudonyms: 
                 check_box: "Pseudonimy CSV"
+              question_bank_questions: 
+                check_box: "Pytania z banku pytań"
+              question_banks: 
+                check_box: "Banki pytań"
               sections: 
                 check_box: "Sekcje CSV"
               terms: 
@@ -2271,6 +2276,7 @@ pl:
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Wszystkie pola zawierające daty muszą być aktualne i poprawnie sformatowane"
   all_day_fb42c4fc: "Cały dzień"
   all_discussion_entries_report_c1e02906: "Raport wszystkich wpisów w dyskusji"
+  all_events_6ae4331b: "Wszystkie zdarzenia"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Wszystko skończone? Czas opublikować kurs! Kliknij przycisk poniżej, aby dokonać tego oficjalnie! Opublikowanie pozwoli użytkownikom rozpocząć udział w kursie."
   all_get_scopes_59a54304: "Wszystkie zakresy GET"
   all_gradeable_student_submissions_report_d11ee705: "Raport wszystkich ocenianych przesyłek uczestników"
@@ -2298,6 +2304,7 @@ pl:
   all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "Pomyślnie dodano wszystkie wyniki z %{groupTitle} do tego kursu."
   all_outcomes_from_grouptitle_have_been_successfull_6267efe4: "Pomyślnie dodano wszystkie wyniki z %{groupTitle} do %{targetGroupTitle}."
   all_outcomes_from_grouptitle_have_been_successfull_cb6ad008: "Pomyślnie dodano wszystkie wyniki z %{groupTitle} do tego konta."
+  all_quiz_submissions_9519d342: "Wszystkie przesłane testy"
   all_quiz_submissions_report_72a6d2fa: "Raport wszystkich przesłanych testów"
   all_roles_f3bba14d: "Wszystkie role"
   all_rubrics_5114c466: "Wszystkie kryteria ocen"
@@ -3502,6 +3509,7 @@ pl:
   appointment_groups_bd225e60: "Grupy przydziałów"
   appointments_dcb41d23: Przydziały
   approved_c3b285d4: Zatwierdzono
+  approximate_quiz_sessions_e522a3a1: "Przybliżona liczba sesji testowych"
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} z precyzją %{precision}"
   apps_54d24a47: Aplikacje
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Dzięki aplikacjom można w łatwy sposób dodawać nowe funkcje do systemu Canvas. Można je dodawać do indywidualnych kursów lub do wszystkich kursów w koncie. Po skonfigurowaniu można je połączyć dzięki modułom kursu i utworzyć zadania dla narzędzi do oceny."
@@ -4889,6 +4897,7 @@ pl:
   back_to_title_39e7a8f4: "Powrót do %{title}"
   background_color_b92b52ac: "Kolor tła"
   background_image_1a401e1a: "Zdjęcie w tle"
+  bank_grouped_quiz_submissions_479ad830: "Przesłane testy pogrupowane w banku"
   banner_image_id_is_not_a_valid_id_21ecc6: "banner_image_id nie jest prawidłowym identyfikatorem"
   banner_image_url_and_banner_image_id_cannot_both_b_955615f5: "banner_image_url i banner_image_id nie można ustawić jednocześnie."
   banner_image_url_is_not_a_valid_url_830d7926: "banner_image_url nie jest prawidłowym adresem URL"
@@ -9071,6 +9080,8 @@ pl:
   create_file_s_188549e6: "[ Utwórz plik(i) ]"
   create_files_after_rce_media_upload_recording_77d75a96: "Utwórz pliki po przesłaniu/zapisaniu multimediów RCE"
   create_group_set_7fe1cd53: "Utwórz zestaw grup"
+  create_groups_later_6ce36058: "Utwórz grupy później"
+  create_groups_now_d59bf70b: "Utwórz grupy teraz"
   create_interactive_course_content_76665336: "Twórz interaktywną zawartość kursu"
   create_item_base: 
     there_was_an_error: "Podczas zapisywania \"%{title}\" pojawił się błąd. Spróbuj ponownie."
@@ -9589,6 +9600,7 @@ pl:
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Określ tekst wyświetlany przed listą rozwijaną i po niej jak również utwórz zestaw możliwych odpowiedzi ."
   delay_posting_this_topic_until_aa483eec: "Opóźnij publikację tego tematu do"
   delayed_until_58b7af4b: "Przeniesiono na:"
+  delete_8d6d2222: "Usuń: "
   delete_a143a2ab: usuń
   delete_a6efa79d: Usuń
   delete_account_name_96aee330: "Usuń %{account_name}"
@@ -9618,6 +9630,7 @@ pl:
   delete_domain_5ba75b7c: "Usuń domenę"
   delete_domain_domain_c5b68f5: "Usuń domenę %{domain}"
   delete_entry_title_5e59727b: "Usuń zapis %{title}"
+  delete_failed_6285e600: "Usunięcie nie powiodło się"
   delete_feedname_1ac9a4a4: "Usuń %{feedName}"
   delete_filter_83ca1a6a: "Usuń filtr"
   delete_from_all_accounts_a1c5e621: "Usuń ze wszystkich kont"
@@ -9697,6 +9710,7 @@ pl:
       To działanie jest nieodwracalne. Czy na pewno chcesz usunąć %{file}?
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "Usunięcie użytkownika spowoduje skasowanie jego wszystkich ePortfolio. ePortfolia można osobno oznaczyć jako spam lub bezpieczne, aby zmienić ich widoczność."
   deleting_assignment_22d5851d: "usuwanie zadania"
+  deleting_b896f5f: usuwanie
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Strony demonstacyjne wymagają skonfigurowania ustawień Recaptcha. Należy skontaktować się z administatorem strony, aby otrzymać dostęp do systemu Canvas."
   demos: 
@@ -11555,6 +11569,7 @@ pl:
   example_https_schoolofrock_edu_d4326f03: "Przykład: \"https://schoolofrock.edu\""
   example_item_scores_6726c689: "Przykładowe wyniki punktowe elementów"
   example_school_of_rock_41f32c31: "Przykład: \"Szkoła Rocka\""
+  exceeded_the_maximum_length_number_characters_2d25611e: "Przekroczono maksymalną długość (%{number} znaków)"
   exceeds_expectations_5910fc3a: "Przekracza wymagania"
   exceeds_mastery_1f995dce: "Przekracza poziom biegłości"
   excelsior_student_activity_tracking_7a1ba44d: "Śledzenie aktywności uczestników Excelsior"
@@ -15486,6 +15501,7 @@ pl:
   limit_each_time_slot_to_input_value_user_s_47461538: "Ogranicz każdy przedział czasowy do %{input_value} użytkowników. "
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "Ogranicz każdy przedział czasowy do %{num_participants} *grup.* **użytkowników.**"
   limit_file_size_limit_per_file_b336c0d8: "ograniczenie %{file_size_limit} w jednym pliku"
+  limit_group_members_to_leave_blank_for_no_limit_c341e248: "Ogranicz członków grupy do (pozostaw puste, aby nie obowiązywał limit)"
   limit_groups_to_group_limit_members_40651ea7: "Ogranicz grupy do następującej liczby członków: %{group_limit}"
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "Ogranicz uczestników do udziału w %{num_appointments} spotkaniach."
   limit_search_to_activity_after_c1ac2449: "Ogranicz wyszukiwanie do zadań po"
@@ -19459,6 +19475,7 @@ pl:
   number_of_members_per_group_6beaef7b: "Liczba członków w grupie"
   number_of_respondents_e1e7e8b: "Ilość respondentów"
   number_of_scores_to_ignore_for_each_student_fb94e818: "Liczba wyników do zignorowania dla każdego uczestnika"
+  number_of_students_per_group_8abe7189: "Liczba uczestników w grupie"
   number_to_grade_661b05dd: "%{number} do oceny"
   number_unsubmitted_145fefae: "%{number} nieprzesłane"
   numerical_answer_ec7120bf: "Odpowiedź liczbowa"
@@ -25770,7 +25787,9 @@ pl:
   speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Dziel
   split_merged_users_6b81c595: "Dziel scalonych użytkowników"
+  split_number_of_students_per_group_4a05f76f: "Podziel liczbę uczestników w grupie"
   split_student_names_df0ef806: "Podziel nazwiska uczestników"
+  split_students_by_number_of_groups_5ace5a6a: "Podziel uczestników wg liczby grup"
   split_students_into_groups_with_num_members_studen_c49d5136: "Podziel uczestników na grupy z %{num_members} uczestnikami na grupę"
   split_students_into_num_groups_groups_e9854f16: "Podziel uczestników na %{num_groups} grup(y)"
   splitting_disabled_reached_maximum_of_three_assign_716acb13: "Wyłączono dzielenie: osiągnięto maksymalną liczbę trzech grup zadań w przedziale ocen"
@@ -26842,6 +26861,7 @@ pl:
     many: "Nie można usunąć następujących wyników z powodu dostosowania do zawartości. Usuń zaznaczenia i spróbuj ponownie."
     one: "Nie można usunąć wyników z powodu dostosowania do zawartości. Usuń zaznaczenia i spróbuj ponownie."
     other: "Nie można usunąć następujących wyników z powodu dostosowania do zawartości. Usuń zaznaczenia i spróbuj ponownie."
+  the_following_recipients_have_no_active_enrollment_17395ab4: "Następujący odbiorcy nie mają aktywnej rejestracji w kursie, %{invalid_recipients}, nie można przesłać wiadomości"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
       Następujący uczestnicy nie zapisali zmian w rozwiązanych testach: 
       
@@ -27206,6 +27226,7 @@ pl:
                    Jego aktywacja nastąpi w wyniku aktualizacji Polityki bezpieczeństwa treści (ang. Content Security Policy, CSP).
                      Domeny zostaną dodane do białej listy (użytkownik będzie mógł je dodawać także ręcznie).
                      Biała lista ma limit 100 domen.
+  this_and_all_following_events_4b4b283: "To i wszystkie następne zdarzenia"
   this_announcement_will_not_be_visible_until_delaye_88f7f5c: "To ogłoszenie nie będzie widoczne do %{delayedPostAt}."
   this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: "Obszar służy oceniającemu do umieszczania komentarzy dotyczących tego kryterium."
   this_assignment_does_not_count_toward_the_final_gr_29ede05f: "To zadanie nie jest uwzględniane w ocenie końcowej"
@@ -27265,6 +27286,7 @@ pl:
   this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "To ePortfolio zidentyfikowano jako potencjalny spam. Jest obecnie widoczne tylko dla administratorów i autora. Jeśli masz pewność, że ta zawartość nie jest spamem, możesz ją oznaczyć jako bezpieczną. Można ją także oznaczyć jako spam."
   this_eportfolio_has_been_identified_as_spam_and_is_8430467: "To ePortfolio zidentyfikowano jako spam i jest widoczne tylko dla Ciebie. W razie pytań skontaktuj się z administratorem."
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "To ePortfolio zidentyfikowano jako spam. Jest obecnie widoczne tylko dla administratorów i autora. Jeśli masz pewność, że ta zawartość nie jest spamem, możesz ją oznaczyć jako bezpieczną."
+  this_event_b437db90: "To zdarzenie"
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: "Funkcja ta wpływa na istniejące dane dla wszystkich kursów na koncie."
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: "Funkcja ta wpływa na istniejące dane na całym koncie."
   this_feature_allows_teachers_to_create_anonymous_d_ea364dca: "Funkcja ta pozwala nauczycielom tworzyć anonimowe dyskusje i włączać ustawienia poziomu kursu dla uczestników, tak aby mogli tworzyć anonimowe dyskusje."
@@ -27692,6 +27714,7 @@ pl:
     new_caledonia: "Nowa Kaledonia"
     new_delhi: "Nowe Delhi"
     newfoundland: "Nowa Fundlandia"
+    norfolk_island: "Wyspa Norfolk"
     noronha: Noronha
     novosibirsk: Nowosybirsk
     nukualofa: Nuku'alofa
@@ -27811,6 +27834,7 @@ pl:
     messages: Wiadomości
     outcome_artifacts: "Artefakty wynikowe"
     people: Osoby
+    topic: Temat
     view_in_separate_window: "Pokaż w osobnym oknie"
   tls_7a2eaba5: TLS
   to_1126ab55: " do"

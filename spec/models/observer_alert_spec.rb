@@ -145,8 +145,10 @@ describe ObserverAlert do
       @observer = observer
     end
 
-    it "creates an alert when a user has a threshold for course announcements" do
+    it "creates an alert in a job when a user has a threshold for course announcements" do
       a = announcement_model(context: @course)
+      run_jobs
+
       alert1 = ObserverAlert.where(student: @student, observer: @observer)
       expect(alert1.count).to eq 1
       alert = alert1.first
@@ -165,6 +167,7 @@ describe ObserverAlert do
 
       a.workflow_state = "active"
       a.save!
+      run_jobs
 
       alert = ObserverAlert.where(student: @student, observer: @observer, context: a).first
       expect(alert).not_to be_nil
@@ -179,6 +182,7 @@ describe ObserverAlert do
       ObserverAlertThreshold.create!(student: student2, observer: observer, alert_type: "course_announcement")
 
       a = announcement_model(context: @course)
+      run_jobs
 
       alert1 = ObserverAlert.where(student: student1, observer: observer, context: a)
       alert2 = ObserverAlert.where(student: student2, observer: observer, context: a)
@@ -190,6 +194,7 @@ describe ObserverAlert do
     it "does not create an alert if the course is unpublished" do
       @course.claim!
       announcement_model(context: @course)
+      run_jobs
       alerts = ObserverAlert.where(student: @student, observer: @observer)
       expect(alerts.count).to eq 0
     end
@@ -205,6 +210,7 @@ describe ObserverAlert do
         is_section_specific: true,
         course_sections: [@section2]
       )
+      run_jobs
       alerts = ObserverAlert.where(student: @student, observer: @observer)
       expect(alerts.count).to eq 0
 
@@ -215,6 +221,7 @@ describe ObserverAlert do
         is_section_specific: true,
         course_sections: [@section1]
       )
+      run_jobs
       expect(alerts.count).to eq 1
     end
   end

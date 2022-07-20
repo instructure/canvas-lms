@@ -53,10 +53,11 @@ describe "submissions" do
       create_assignment_preparation
       f("#has_group_category").click
       replace_and_proceed f("#new-group-set-name"), "canv"
-      fxpath("//input[@data-testid='radio-button-split-groups']/..").click
-      replace_and_proceed f("#textinput-create-groups-count"), "1"
+      force_click('[data-testid="group-structure-selector"]')
+      force_click('[data-testid="group-structure-num-groups"]')
+      force_click('[data-testid="split-groups"]')
+      f('[data-testid="split-groups"]').send_keys("1")
       f(%(button[data-testid="group-set-save"])).click
-      wait_for_ajaximations
       run_jobs
       wait_for_ajaximations
       submit_assignment_form

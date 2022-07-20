@@ -134,6 +134,7 @@ describe('Assignment Student Content View', () => {
     })
 
     it.skip('renders the rubric if the assignment has one', async () => {
+      // unskip in EVAL-1679
       window.ENV.ASSIGNMENT_ID = 1
       window.ENV.COURSE_ID = 1
       props.assignment.rubric = {}
@@ -239,6 +240,7 @@ describe('Assignment Student Content View', () => {
     // https://instructure.atlassian.net/browse/USERS-385
     // eslint-disable-next-line jest/no-disabled-tests
     it.skip('renders Comments', async () => {
+      // To be unskipped in EVAL-1679
       const mocks = await makeMocks()
       const props = await mockAssignmentAndSubmission()
       const {getByText} = render(

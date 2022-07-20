@@ -88,20 +88,22 @@ class CoursePacesController < ApplicationController
                      @course.course_paces.for_user(@context.user).not_deleted.take
                    end
     if @course_pace.nil?
-      params = case @context
-               when Course
-                 { course_section_id: nil, user_id: nil }
-               when CourseSection
-                 { course_section_id: @context }
-               when Enrollment
-                 { user_id: @context.user }
-               end
+      pace_params = case @context
+                    when Course
+                      { course_section_id: nil, user_id: nil }
+                    when CourseSection
+                      { course_section_id: @context }
+                    when Enrollment
+                      { user_id: @context.user }
+                    end
       # Duplicate a published plan if one exists for the plan or for the course
-      published_course_pace = @course.course_paces.published.where(params).take || @course.course_paces.primary.published.take
+      published_course_pace = @course.course_paces.published.where(pace_params).take
+      published_course_pace ||= @course.course_paces.published.where(course_section_id: @context.course_section_id).take if @context.is_a?(Enrollment)
+      published_course_pace ||= @course.course_paces.primary.published.take
       if published_course_pace
-        @course_pace = published_course_pace.duplicate(params)
+        @course_pace = published_course_pace.duplicate(pace_params)
       else
-        @course_pace = @course.course_paces.new(params)
+        @course_pace = @course.course_paces.new(pace_params)
         @course.context_module_tags.can_have_assignment.not_deleted.each do |module_item|
           @course_pace.course_pace_module_items.new module_item: module_item, duration: 0
         end

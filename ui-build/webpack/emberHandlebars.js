@@ -25,8 +25,9 @@
 const path = require('path')
 const Handlebars = require('handlebars')
 const EmberHandlebars = require('ember-template-compiler').EmberHandlebars
-const ScopedHbsExtractor = require('i18nliner-canvas/js/scoped_hbs_extractor')
-const PreProcessor = require('@instructure/i18nliner-handlebars/dist/lib/pre_processor').default
+const {readI18nScopeFromJSONFile} = require('@instructure/i18nliner-canvas/scoped_hbs_resolver')
+const ScopedHbsExtractor = require('@instructure/i18nliner-canvas/scoped_hbs_extractor')
+const ScopedHbsPreProcessor = require('@instructure/i18nliner-canvas/scoped_hbs_pre_processor')
 const { canvasDir } = require('#params')
 
 function compileHandlebars(data) {
@@ -34,10 +35,9 @@ function compileHandlebars(data) {
   try {
     let translationCount = 0
     const ast = Handlebars.parse(source)
-    const extractor = new ScopedHbsExtractor(ast, {path})
-    const scope = extractor.scope
-    PreProcessor.scope = scope
-    PreProcessor.process(ast)
+    const scope = readI18nScopeFromJSONFile(path)
+    const extractor = new ScopedHbsExtractor(ast, {path, scope})
+    ScopedHbsPreProcessor.processWithScope(scope, ast)
     extractor.forEach(() => translationCount++)
 
     const precompiler = data.ember ? EmberHandlebars : Handlebars
@@ -55,11 +55,12 @@ function resourceName(path) {
   return path.replace(/^.+?\/templates\//, '').replace(/\.hbs$/, '')
 }
 
-function emitTemplate(path, name, result, dependencies) {
+function emitTemplate({ name, template, dependencies }) {
   return `
     import Ember from 'ember';
     ${dependencies.map(d => `import ${JSON.stringify(d)};`).join('\n')}
-    const template = Ember.Handlebars.template(${result.template});
+
+    const template = Ember.Handlebars.template(${template});
     Ember.TEMPLATES['${name}'] = template;
     export default template;
   `
@@ -91,6 +92,6 @@ module.exports = function(source) {
   if (result.translationCount > 0) {
     dependencies.push('@canvas/i18n')
   }
-  const compiledTemplate = emitTemplate(this.resourcePath, name, result, dependencies)
-  return compiledTemplate
+
+  return emitTemplate({ name, template: result.template, dependencies })
 }

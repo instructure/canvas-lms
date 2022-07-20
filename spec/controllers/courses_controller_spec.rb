@@ -673,20 +673,20 @@ describe CoursesController do
       it "sets the 'update' attribute to true when user is the final grader" do
         user_session(@teacher)
         get "show", params: { id: @course.id }
-        expect(assignment_permissions[@assignment.id][:update]).to eq(true)
+        expect(assignment_permissions[@assignment.id][:update]).to be(true)
       end
 
       it "sets the 'update' attribute to true when user has the Select Final Grade permission" do
         user_session(@ta)
         get "show", params: { id: @course.id }
-        expect(assignment_permissions[@assignment.id][:update]).to eq(true)
+        expect(assignment_permissions[@assignment.id][:update]).to be(true)
       end
 
       it "sets the 'update' attribute to false when user does not have the Select Final Grade permission" do
         @course.account.role_overrides.create!(permission: :select_final_grade, enabled: false, role: ta_role)
         user_session(@ta)
         get "show", params: { id: @course.id }
-        expect(assignment_permissions[@assignment.id][:update]).to eq(false)
+        expect(assignment_permissions[@assignment.id][:update]).to be(false)
       end
     end
 
@@ -786,7 +786,7 @@ describe CoursesController do
 
     it "sets MSFT enabled in the JS ENV" do
       subject
-      expect(controller.js_env[:MSFT_SYNC_ENABLED]).to eq false
+      expect(controller.js_env[:MSFT_SYNC_ENABLED]).to be false
     end
 
     it "sets MSFT enrollment limits in the JS ENV" do
@@ -801,7 +801,7 @@ describe CoursesController do
 
     it "sets MSFT_SYNC_CAN_BYPASS_COOLDOWN in the JS ENV" do
       subject
-      expect(controller.js_env[:MSFT_SYNC_CAN_BYPASS_COOLDOWN]).to eq false
+      expect(controller.js_env[:MSFT_SYNC_CAN_BYPASS_COOLDOWN]).to be false
     end
 
     it "sets the external tools create url" do
@@ -823,7 +823,7 @@ describe CoursesController do
     it "sets tool creation permissions true for roles that are granted rights" do
       user_session(@teacher)
       get "settings", params: { course_id: @course.id }
-      expect(controller.js_env[:PERMISSIONS][:create_tool_manually]).to eq(true)
+      expect(controller.js_env[:PERMISSIONS][:create_tool_manually]).to be(true)
     end
 
     it "does not set tool creation permissions for roles not granted rights" do
@@ -903,7 +903,7 @@ describe CoursesController do
       get "settings", params: { course_id: @course.id }
       assert_status(401)
       expect(assigns[:unauthorized_reason]).to eq(:unpublished)
-      expect(@enrollment.reload.last_activity_at).to be(nil)
+      expect(@enrollment.reload.last_activity_at).to be_nil
     end
 
     it "assigns active course_settings_sub_navigation external tools" do
@@ -1021,7 +1021,7 @@ describe CoursesController do
       expect(response).to redirect_to(course_url(@course))
       @enrollment.reload
       expect(@enrollment.workflow_state).to eq("active")
-      expect(@enrollment.last_activity_at).to be(nil)
+      expect(@enrollment.last_activity_at).to be_nil
     end
   end
 
@@ -2090,7 +2090,7 @@ describe CoursesController do
       expect(response).to be_successful
       run_jobs
       enrollment = @course.reload.teachers.find { |t| t.name == "Sam" }.enrollments.first
-      expect(enrollment.limit_privileges_to_course_section).to eq true
+      expect(enrollment.limit_privileges_to_course_section).to be true
     end
 
     it "alsoes accept a list of user tokens (instead of ye old UserList)" do
@@ -3030,6 +3030,16 @@ describe CoursesController do
       json = JSON.parse response.body
       expect(json["errors"].keys).to include "unparsable_content"
     end
+
+    it "doesn't overwrite stuck sis fields" do
+      user_session(@teacher)
+      init_course_name = @course.name
+
+      put "update", params: { id: @course.id, course: { name: "123456" }, override_sis_stickiness: false, format: :json }
+
+      @course.reload
+      expect(@course.name).to eq init_course_name
+    end
   end
 
   describe "POST 'unconclude'" do
@@ -3426,30 +3436,30 @@ describe CoursesController do
       controller.visibility_configuration({ course_visibility: "public" })
       course = controller.instance_variable_get(:@course)
 
-      expect(course.is_public).to eq true
+      expect(course.is_public).to be true
 
       controller.visibility_configuration({ course_visibility: "institution" })
-      expect(course.is_public).to eq false
-      expect(course.is_public_to_auth_users).to eq true
+      expect(course.is_public).to be false
+      expect(course.is_public_to_auth_users).to be true
 
       controller.visibility_configuration({ course_visibility: "course" })
-      expect(course.is_public).to eq false
-      expect(course.is_public).to eq false
+      expect(course.is_public).to be false
+      expect(course.is_public).to be false
     end
 
     it "allows setting syllabus visibility with flag" do
       controller.visibility_configuration({ course_visibility: "course", syllabus_visibility_option: "public" })
       course = controller.instance_variable_get(:@course)
 
-      expect(course.public_syllabus).to eq true
+      expect(course.public_syllabus).to be true
 
       controller.visibility_configuration({ course_visibility: "course", syllabus_visibility_option: "institution" })
-      expect(course.public_syllabus).to eq false
-      expect(course.public_syllabus_to_auth).to eq true
+      expect(course.public_syllabus).to be false
+      expect(course.public_syllabus_to_auth).to be true
 
       controller.visibility_configuration({ course_visibility: "course", syllabus_visibility_option: "course" })
-      expect(course.public_syllabus).to eq false
-      expect(course.public_syllabus_to_auth).to eq false
+      expect(course.public_syllabus).to be false
+      expect(course.public_syllabus_to_auth).to be false
     end
   end
 
@@ -4039,8 +4049,8 @@ describe CoursesController do
                                course: { course_visibility: "public", indexed: true } }
 
       course.reload
-      expect(course.is_public).to eq true
-      expect(course.indexed).to eq true
+      expect(course.is_public).to be true
+      expect(course.indexed).to be true
     end
 
     it "allows the teacher to change visibility" do
@@ -4052,8 +4062,8 @@ describe CoursesController do
                                course: { course_visibility: "public", indexed: true } }
 
       course.reload
-      expect(course.is_public).to eq true
-      expect(course.indexed).to eq true
+      expect(course.is_public).to be true
+      expect(course.indexed).to be true
     end
 
     it "does not allow a teacher without the permission to change visibility" do
@@ -4066,8 +4076,8 @@ describe CoursesController do
                                course: { course_visibility: "public", indexed: true } }
 
       course.reload
-      expect(course.is_public).not_to eq true
-      expect(course.indexed).not_to eq true
+      expect(course.is_public).not_to be true
+      expect(course.indexed).not_to be true
     end
 
     it "does not allow an account admin without the permission to change visibility" do
@@ -4079,8 +4089,8 @@ describe CoursesController do
                                course: { course_visibility: "public", indexed: true } }
 
       course.reload
-      expect(course.is_public).not_to eq true
-      expect(course.indexed).not_to eq true
+      expect(course.is_public).not_to be true
+      expect(course.indexed).not_to be true
     end
 
     it "allows a site admin to change visibility even if account admins cannot" do
@@ -4094,8 +4104,8 @@ describe CoursesController do
                                course: { course_visibility: "public", indexed: true } }
 
       course.reload
-      expect(course.is_public).to eq true
-      expect(course.indexed).to eq true
+      expect(course.is_public).to be true
+      expect(course.indexed).to be true
     end
   end
 

@@ -22,7 +22,7 @@ library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
 
 try {
   stage('Upload Junit Results') {
-    protectedNode('canvas-docker') {
+    protectedNode(configuration.nodeLabel()) {
       def buildLinks = buildSummaryReport.getSubBuildLinks(env.SOURCE)
 
       buildLinks.each { buildLink ->

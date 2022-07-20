@@ -24,20 +24,13 @@
 const Handlebars = require('handlebars')
 const {pick} = require('lodash')
 const {EmberHandlebars} = require('ember-template-compiler')
-const ScopedHbsExtractor = require('i18nliner-canvas/js/scoped_hbs_extractor')
-const PreProcessor = require('@instructure/i18nliner-handlebars/dist/lib/pre_processor').default
+const ScopedHbsExtractor = require('@instructure/i18nliner-canvas/scoped_hbs_extractor')
+const ScopedHbsPreProcessor = require('@instructure/i18nliner-canvas/scoped_hbs_pre_processor')
+const {readI18nScopeFromJSONFile} = require('@instructure/i18nliner-canvas/scoped_hbs_resolver')
 const nodePath = require('path')
 const loaderUtils = require('loader-utils')
 const { canvasDir } = require('#params')
 const { contriveId, config: brandableCSSConfig } = requireBrandableCSS()
-require('i18nliner-canvas/js/scoped_hbs_pre_processor')
-
-// In this main file, we do a bunch of stuff to monkey-patch the default behavior of
-// i18nliner's HbsProcessor (specifically, we set the the `directories` and define a
-// `normalizePath` function so that translation keys stay relative to canvas root dir).
-// By requiring it here the code here will use that monkeypatched behavior.
-require('i18nliner-canvas/js/main')
-
 
 const compileHandlebars = data => {
   const path = data.path
@@ -45,10 +38,9 @@ const compileHandlebars = data => {
   try {
     let translationCount = 0
     const ast = Handlebars.parse(source)
-    const extractor = new ScopedHbsExtractor(ast, {path})
-    const scope = extractor.scope
-    PreProcessor.scope = scope
-    PreProcessor.process(ast)
+    const scope = readI18nScopeFromJSONFile(path)
+    const extractor = new ScopedHbsExtractor(ast, {path, scope})
+    ScopedHbsPreProcessor.processWithScope(scope, ast)
     extractor.forEach(() => translationCount++)
 
     const precompiler = data.ember ? EmberHandlebars : Handlebars
@@ -60,15 +52,22 @@ const compileHandlebars = data => {
   }
 }
 
-const emitTemplate = (path, name, result, dependencies, cssRegistration, partialRegistration) => {
+const emitTemplate = ({
+  name,
+  template,
+  dependencies,
+  cssRegistration,
+  partialRegistration,
+}) => {
   return `
     import _Handlebars from 'handlebars/runtime';
+
     var Handlebars = _Handlebars.default;
     ${dependencies.map(d => `import ${JSON.stringify(d)};`).join('\n')}
 
     var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
     var name = '${name}';
-    templates[name] = template(${result.template});
+    templates[name] = template(${template});
     ${partialRegistration};
     ${cssRegistration};
     export default templates[name];
@@ -169,15 +168,13 @@ function i18nLinerHandlebarsLoader(source) {
   // make sure the template has access to all our handlebars helpers
   dependencies.push('@canvas/handlebars-helpers/index.coffee')
 
-  const compiledTemplate = emitTemplate(
-    this.resourcePath,
+  return emitTemplate({
     name,
-    result,
+    template: result.template,
     dependencies,
     cssRegistration,
-    partialRegistration
-  )
-  return compiledTemplate
+    partialRegistration,
+  })
 }
 
 function requireBrandableCSS() {

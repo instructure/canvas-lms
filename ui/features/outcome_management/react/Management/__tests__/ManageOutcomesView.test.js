@@ -29,6 +29,7 @@ describe('ManageOutcomesView', () => {
   let onSearchChangeHandler
   let onSearchClearHandler
   let loadMore
+  let removeOutcomesStatus
   const defaultProps = (props = {}) => ({
     outcomeGroup: {
       _id: '1',
@@ -45,6 +46,7 @@ describe('ManageOutcomesView', () => {
     onSearchChangeHandler,
     onSearchClearHandler,
     loadMore,
+    removeOutcomesStatus,
     isRootGroup: false,
     ...props
   })
@@ -56,6 +58,7 @@ describe('ManageOutcomesView', () => {
     onSearchChangeHandler = jest.fn()
     onSearchClearHandler = jest.fn()
     loadMore = jest.fn()
+    removeOutcomesStatus = {}
   })
 
   afterEach(() => {

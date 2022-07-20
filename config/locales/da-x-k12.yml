@@ -229,6 +229,7 @@ da-x-k12:
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "En tabel over svar og korte statistiske oplysninger vedrørende elevernes svarmuligheder."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "En tabel, som indeholder vurderingsordningens data. Hver række indeholder et navn, en maksimal procentdel og en minimal procentdel. Derudover indeholder hver række en knap til at tilføje en række nedenfor, og en knap til at slette den aktuelle række."
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "En tabel, der indeholder data fra vurderingssystemet. Først gives navnet på vurderingssystemet og knapper til at redigere eller slette systemet. Hver række indeholder et navn, en maksimal procentdel og en minimal procentdel. Derudover indeholder hver række en knap til at tilføje en ny række nedenfor og en knap til at slette den aktuelle række."
+  a_timeout_occurred_contacting_external_authenticat_c064ea48: "Der opstod en timeout ved kontakt til ekstern godkendelsestjeneste"
   a_z_243c3301: A–Z
   a_z_29d8e67c: "A - Z"
   ability_to_submit_annotatable_document_assignments_5bc5edd3: "Evne til at indsende dokumentopgaver, der kan gives anmærkninger."
@@ -1158,6 +1159,10 @@ da-x-k12:
                 check_box: "Grupper CSV"
               pseudonyms: 
                 check_box: "Pseudonymer CSV"
+              question_bank_questions: 
+                check_box: "Spørgsmål i spørgsmålsbank"
+              question_banks: 
+                check_box: Spørgsmålsbanker
               sections: 
                 check_box: "Sektioner CSV"
               terms: 
@@ -2071,6 +2076,7 @@ da-x-k12:
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Alle datafelter skal være til stede og korrekt formateret"
   all_day_fb42c4fc: "Hele dagen"
   all_discussion_entries_report_c1e02906: "Rapport om alle diskussionsindlæg"
+  all_events_6ae4331b: "Alle begivenheder"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Helt færdig? Tiden er inde til at offentliggøre dit fag. Klik på nedenstående knap for at gøre det officielt! Offentliggørelse giver brugerne mulighed for at begynde deres deltagelse i faget."
   all_get_scopes_59a54304: "Alle GET-områder"
   all_gradeable_student_submissions_report_d11ee705: "Rapport om alle bedømte elevers afleveringer"
@@ -2097,6 +2103,7 @@ da-x-k12:
   all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "Alle læringsudbytter fra %{groupTitle} er blevet tilføjet til dette fag."
   all_outcomes_from_grouptitle_have_been_successfull_6267efe4: "Alle læringsudbytter fra %{groupTitle} er blevet tilføjet til %{targetGroupTitle}."
   all_outcomes_from_grouptitle_have_been_successfull_cb6ad008: "Alle læringsudbytter fra %{groupTitle} er blevet tilføjet til denne konto."
+  all_quiz_submissions_9519d342: "Alle quizafleveringer"
   all_quiz_submissions_report_72a6d2fa: "Rapport om alle quizindsendelser"
   all_roles_f3bba14d: "Alle roller"
   all_rubrics_5114c466: "Alle vurderingskriterier"
@@ -3241,6 +3248,7 @@ da-x-k12:
   appointment_groups_bd225e60: Aftalegrupper
   appointments_dcb41d23: Aftaler
   approved_c3b285d4: Godkendt
+  approximate_quiz_sessions_e522a3a1: "Omtrentlige quiz-sessioner"
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} med præcision %{precision}"
   apps_54d24a47: Apps
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "App'er er en nem måde til at føje nye funktioner til Canvas. De kan føjes til individuelle fag, eller til fag i en konto. Når de er konfigureret, kan du linke til dem via fagforløb, og oprette opgaver til bedømmelsesværktøjer."
@@ -4407,6 +4415,7 @@ da-x-k12:
   back_to_title_39e7a8f4: "Tilbage til %{title}"
   background_color_b92b52ac: Baggrundsfarve
   background_image_1a401e1a: Baggrundsbillede
+  bank_grouped_quiz_submissions_479ad830: "Bankgrupperede quizindsendelser"
   banner_image_id_is_not_a_valid_id_21ecc6: "banner_image_id er ikke et gyldigt id"
   banner_image_url_and_banner_image_id_cannot_both_b_955615f5: "banner_image_url og banner_image_id kan ikke begge blive indstillet."
   banner_image_url_is_not_a_valid_url_830d7926: "banner_image_url er ikke et gyldigt URL"
@@ -7977,6 +7986,8 @@ da-x-k12:
   create_file_s_188549e6: "[ Opret fil(er) ]"
   create_files_after_rce_media_upload_recording_77d75a96: "Opret filer efter RCE-medieopload/-optagelse"
   create_group_set_7fe1cd53: "Opret gruppesæt"
+  create_groups_later_6ce36058: "Opret grupper senere"
+  create_groups_now_d59bf70b: "Opret grupper nu"
   create_interactive_course_content_76665336: "Opret interaktivt fagindhold"
   create_live_event_subscriptions_on_toolproxy_7c8378b1: "Opret abonnementer på live-begivenheder på ToolProxy"
   create_lookup_7ceb6d90: "Opret opslag"
@@ -8420,6 +8431,7 @@ da-x-k12:
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Definer tekst, som skal stilles før og efter dropdown-menuen, og opret et sæt med mulige svar."
   delay_posting_this_topic_until_aa483eec: "Forsink offentliggørelse af dette emne indtil"
   delayed_until_58b7af4b: "Forsinket indtil:"
+  delete_8d6d2222: "Slet: "
   delete_a143a2ab: slet
   delete_a6efa79d: Slet
   delete_account_name_96aee330: "Slet %{account_name}"
@@ -8448,6 +8460,7 @@ da-x-k12:
   delete_domain_5ba75b7c: "Slet domæne"
   delete_domain_domain_c5b68f5: "Slet domæne %{domain}"
   delete_entry_title_5e59727b: "Slet indtastning %{title}"
+  delete_failed_6285e600: "Sletning mislykkedes"
   delete_feedname_1ac9a4a4: "Slet %{feedName}"
   delete_filter_83ca1a6a: "Slet filter"
   delete_from_all_accounts_a1c5e621: "Slet fra ALLE konti"
@@ -8521,6 +8534,7 @@ da-x-k12:
       Denne handling er irreversibel. Er du sikker på, at du vil slette %{file}?
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "Sletning af en bruger sletter alle deres ePortfolios. Alternativt kan ePortfolios markeres individuelt som 'spam' eller 'sikker' for at ændre deres synlighed."
   deleting_assignment_22d5851d: "sletter en opgave"
+  deleting_b896f5f: sletter
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Demonstrationswebsteder kræver, at indstillinger til Recaptcha konfigureres. Kontakt din webstedsadministrator for denne Canvas-instans."
   demos: 
@@ -10199,6 +10213,7 @@ da-x-k12:
   example_https_schoolofrock_edu_d4326f03: "eksempel: \"https://schoolofrock.edu\""
   example_item_scores_6726c689: "Eksempel på elementresultater"
   example_school_of_rock_41f32c31: "eksempel: \"School of Rock\""
+  exceeded_the_maximum_length_number_characters_2d25611e: "Overskredet den maksimale længde (%{number} tegn)"
   exceeds_expectations_5910fc3a: "Overstiger forventningerne"
   exceeds_mastery_1f995dce: "Overstiger opfyldelse af læringsmål"
   excelsior_student_activity_tracking_7a1ba44d: "Excelsior aktivitetssporing for elever"
@@ -13287,6 +13302,7 @@ da-x-k12:
   limit_course_participation_to_term_or_custom_cours_67797a86: "Begræns fagdeltagelse til skoleår eller tilpassede fagdatoer?"
   limit_each_time_slot_to_input_value_user_s_47461538: "Begræns hvert tidsrum til %{input_value} bruger(e). "
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "Begræns hver tidsrum til %{num_participants} *grupper.* **brugere.**"
+  limit_group_members_to_leave_blank_for_no_limit_c341e248: "Begræns gruppemedlemmer til (tom for ingen grænse)"
   limit_groups_to_group_limit_members_40651ea7: "Begræns grupper til %{group_limit} medlemmer"
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "Begræns deltagere til %{num_appointments} aftale(r)."
   limit_search_to_activity_after_c1ac2449: "Begræns søgning til aktivitet efter"
@@ -16781,6 +16797,7 @@ da-x-k12:
   number_of_members_per_group_6beaef7b: "Antal medlemmer pr. gruppe"
   number_of_respondents_e1e7e8b: "Antal respondenter"
   number_of_scores_to_ignore_for_each_student_fb94e818: "Antal resultater, der skal ignoreres for hver elev"
+  number_of_students_per_group_8abe7189: "Antal elever pr. gruppe"
   numerical_answer_ec7120bf: "Numerisk svar"
   nummastered_of_numgroup_mastered_b8113c9c: "%{numMastered} af %{numGroup} behersket"
   numpoints_points_b1f0666a: "%{numPoints} point"
@@ -22210,7 +22227,9 @@ da-x-k12:
   speedgrader_tm_44688790: SpeedGrader
   split_74c03348: Opdel
   split_merged_users_6b81c595: "Opdel flettede brugere"
+  split_number_of_students_per_group_4a05f76f: "Opdel antal elever pr. gruppe"
   split_student_names_df0ef806: "Opdel elevernes navne"
+  split_students_by_number_of_groups_5ace5a6a: "Opdel elever efter antal grupper"
   split_students_into_groups_with_num_members_studen_c49d5136: "Opdel elever i grupper med %{num_members} elever pr. gruppe"
   split_students_into_num_groups_groups_e9854f16: "Opdel elever i %{num_groups} grupper"
   splitting_disabled_reached_maximum_of_three_assign_716acb13: "Opdeling deaktiveret: nået maksimalt tre opgavegrupper i et resultatområde"
@@ -23187,6 +23206,7 @@ da-x-k12:
   the_following_outcomes_cannot_be_removed_because_t_1c4b8ef9: 
     one: "Følgende læringsudbytte kan ikke fjernes, fordi det er tilpasset til indholdet. Fjern markeringen af det, og prøv igen."
     other: "Følgende læringsudbytter kan ikke fjernes, fordi de er tilpasset til indholdet. Fjern markeringen af dem, og prøv igen."
+  the_following_recipients_have_no_active_enrollment_17395ab4: "Følgende modtagere har ingen aktiv tilmelding til faget, %{invalid_recipients}, ude af stand til at sende beskeder"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
       Følgende elever har ikke-gemte ændringer i deres afleverede quiz: 
       
@@ -23506,6 +23526,7 @@ da-x-k12:
   this_account_does_not_allow_for_microsoft_teams_sy_266f11c7: "Denne konto tillader ikke at aktivere Microsoft Teams-synkronisering. Aktivér funktionen \"Microsoft gruppetilmeldingssynkronisering\", inden du redigerer eventuelle indstillinger."
   this_account_doesn_t_allow_for_microsoft_teams_syn_744dbd76: "Denne konto tillader ikke at aktivere Microsoft Teams-synkronisering. Aktivér funktionen \"Microsoft gruppetilmeldingssynkronisering\", inden du redigerer eventuelle indstillinger"
   this_allows_the_user_to_unfavorite_a_course_direct_828d0587: "Dette gør det muligt for brugeren at fjerne et fag fra favoritter direkte fra oversigts-kortet."
+  this_and_all_following_events_4b4b283: "Denne og alle efterfølgende begivenheder"
   this_announcement_will_not_be_visible_until_delaye_88f7f5c: "Denne meddelelse er ikke synlig før %{delayedPostAt}."
   this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: "Dette område bruges af bedømmeren til at efterlade kommentarer i forbindelse med dette kriterie."
   this_assignment_does_not_count_toward_the_final_gr_a5c238e2: "Denne opgave tæller ikke med i den endelige vurdering."
@@ -23558,6 +23579,7 @@ da-x-k12:
   this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Denne ePortfolio er identificeret som mulig spam. Den er i øjeblikket kun synlig for administratorer og forfatter. Hvis du er sikker på, at dette indhold ikke er spam, kan du markere det som sikkert. Ellers kan du bekræfte det som spam."
   this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Denne ePortfolio er identificeret som spam og er kun synlig for dig. Kontakt en administrator, hvis du har spørgsmål."
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Denne ePortfolio er identificeret som spam. Den er i øjeblikket kun synlig for administratorer og forfatter. Hvis du er sikker på, at dette indhold ikke er spam, kan du markere det som sikkert."
+  this_event_b437db90: "Denne begivenhed"
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: "Denne funktion påvirker eksisterende data for alle fag på kontoen."
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: "Denne funktion påvirker eksisterende data for en hel konto."
   this_feature_allows_teachers_to_create_anonymous_d_ea364dca: "Denne funktion giver lærere mulighed for at oprette anonyme diskussioner og aktivere en indstilling på fagniveau, hvorved eleverne kan oprette anonyme diskussioner."
@@ -23966,6 +23988,7 @@ da-x-k12:
     new_caledonia: "Ny Kaledonien"
     new_delhi: "New Delhi"
     newfoundland: Newfoundland
+    norfolk_island: "Norfolk Island"
     noronha: Noronha
     novosibirsk: Novosibirsk
     nukualofa: Nuku'alofa
@@ -24084,6 +24107,7 @@ da-x-k12:
     learning_outcomes: Læringsudbytter
     messages: Beskeder
     outcome_artifacts: "Læringsudbytte artefakter"
+    topic: Emne
     view_in_separate_window: "Vis i et separat vindue"
   tls_7a2eaba5: TLS
   to_1126ab55: " til"

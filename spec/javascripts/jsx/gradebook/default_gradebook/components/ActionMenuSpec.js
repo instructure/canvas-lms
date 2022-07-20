@@ -62,7 +62,8 @@ const previousExportProps = () => ({
   attachment: {
     id: '691',
     downloadUrl: 'http://downloadUrl',
-    updatedAt: '2009-01-20T17:00:00Z'
+    updatedAt: '2009-01-20T17:00:00Z',
+    createdAt: '2009-01-20T17:00:00Z'
   }
 })
 
@@ -106,6 +107,23 @@ test('renders the Previous export menu item', () => {
     '[role="menuitem"] [data-menu-id="previous-export"]'
   )
 
+  equal(specificMenuItem.textContent, 'Previous Export (Jan 20, 2009 at 5pm)')
+})
+
+test('previous export date stays the same after updatedAt is changed', function () {
+  const propsWithPreviousExport = {
+    ...workingMenuProps(),
+    ...previousExportProps()
+  }
+
+  propsWithPreviousExport.attachment.updatedAt = '2021-05-12T13:00:00Z'
+  this.wrapper = mount(<ActionMenu {...propsWithPreviousExport} />)
+
+  this.wrapper.find('button').simulate('click')
+
+  const specificMenuItem = document.querySelector(
+    '[role="menuitem"] [data-menu-id="previous-export"]'
+  )
   equal(specificMenuItem.textContent, 'Previous Export (Jan 20, 2009 at 5pm)')
 })
 

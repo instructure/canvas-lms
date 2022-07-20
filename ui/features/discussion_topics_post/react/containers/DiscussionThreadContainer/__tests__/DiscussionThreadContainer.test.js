@@ -330,32 +330,6 @@ describe('DiscussionThreadContainer', () => {
       expect(getByTestId('expand-button')).toBeInTheDocument()
     })
 
-    it('should expand replies when expand button is clicked', () => {
-      const {getByTestId} = setup(defaultProps())
-      fireEvent.click(getByTestId('expand-button'))
-      expect(getByTestId('collapse-replies')).toBeInTheDocument()
-    })
-
-    it('should collapse replies when expand button is clicked', () => {
-      const {getByTestId, queryByTestId} = setup(defaultProps())
-      fireEvent.click(getByTestId('expand-button'))
-      expect(getByTestId('collapse-replies')).toBeInTheDocument()
-
-      fireEvent.click(getByTestId('expand-button'))
-
-      expect(queryByTestId('collapse-replies')).not.toBeInTheDocument()
-    })
-
-    it('should collapse replies when collapse button is clicked', () => {
-      const {getByTestId, queryByTestId} = setup(defaultProps())
-      fireEvent.click(getByTestId('expand-button'))
-      expect(getByTestId('collapse-replies')).toBeInTheDocument()
-
-      fireEvent.click(getByTestId('collapse-replies'))
-
-      expect(queryByTestId('collapse-replies')).not.toBeInTheDocument()
-    })
-
     it('pluralizes reply message correctly when there is only a single reply', () => {
       const {getAllByText} = setup(
         defaultProps({

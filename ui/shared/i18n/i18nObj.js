@@ -16,16 +16,47 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'date-js'
 import $ from 'jquery'
 import i18nLolcalize from './i18nLolcalize'
 import I18n from 'i18n-js'
-import extend from '@instructure/i18nliner/dist/lib/extensions/i18n_js'
+import {
+  extend as activateI18nliner,
+  inferKey,
+  normalizeDefault
+} from '@instructure/i18nliner-runtime'
 import logEagerLookupViolations from './logEagerLookupViolations'
-
 import htmlEscape from 'html-escape'
-import 'date-js'
-// add i18nliner's runtime extensions to the global I18n object
-extend(I18n)
+
+activateI18nliner(I18n, {
+  // this is what we use elsewhere in canvas, so make i18nliner use it too
+  HtmlSafeString: htmlEscape.SafeString,
+
+  // handle our absolute keys
+  keyPattern: /^\#?\w+(\.\w+)+$/,
+
+  inferKey: (defaultValue, translateOptions) => (
+    `#${inferKey(defaultValue, translateOptions)}`
+  ),
+
+  // when inferring the key at runtime (i.e. js/coffee or inline hbs `t`
+  // call), signal to normalizeKey that it shouldn't be scoped.
+  normalizeKey: (key, options) => {
+    if (key[0] === '#') {
+      return key.slice(1)
+    }
+    else if (options.scope) {
+      return `${options.scope}.${key}`
+    }
+    else {
+      return key
+    }
+  },
+
+  normalizeDefault: (window.ENV && window.ENV.lolcalize) ?
+    i18nLolcalize :
+    normalizeDefault
+})
 
 /*
  * Overridden interpolator that localizes any interpolated numbers.
@@ -37,10 +68,10 @@ const interpolate = I18n.interpolate.bind(I18n)
 
 I18n.interpolate = function(message, origOptions) {
   const options = {...origOptions}
-  const matches = message.match(this.PLACEHOLDER) || []
+  const matches = message.match(I18n.placeholder) || []
 
   matches.forEach(placeholder => {
-    const name = placeholder.replace(this.PLACEHOLDER, '$1')
+    const name = placeholder.replace(I18n.placeholder, '$1')
     if (typeof options[name] === 'number') {
       options[name] = this.localizeNumber(options[name])
     }
@@ -50,60 +81,11 @@ I18n.interpolate = function(message, origOptions) {
 
 I18n.locale = document.documentElement.getAttribute('lang')
 
-I18n.lookup = logEagerLookupViolations(function(scope, options = {}) {
-  const translations = I18n.translations
-  const locales = I18n.getLocaleAndFallbacks(options.locale || I18n.currentLocale())
-  if (typeof scope === 'object') {
-    scope = scope.join(this.defaultSeparator)
-  }
-
-  if (options.scope) {
-    scope = `${options.scope}${this.defaultSeparator}${scope}`
-  }
-
-  const scopes = scope.split(this.defaultSeparator)
-
-  let messages
-  for (let i = 0; !messages && i < locales.length; i++) {
-    messages = translations[locales[i]]
-    for (let j = 0; messages && j < scopes.length; j++) {
-      const currentScope = scopes[j]
-      messages = messages[currentScope]
-    }
-  }
-
-  if (!messages && options.defaultValue != null) {
-    messages = options.defaultValue
-  }
-
-  return messages
+I18n.lookup = logEagerLookupViolations(function(key, options = {}) {
+  const locale = options.locale || I18n.currentLocale()
+  const localeTranslations = I18n.translations[locale] || {}
+  return localeTranslations[key] || options.defaultValue || null
 })
-
-I18n.getLocaleAndFallbacks = function(locale) {
-  if (!I18n.fallbacksMap) {
-    I18n.fallbacksMap = I18n.computeFallbacks()
-  }
-  return I18n.fallbacksMap[locale] || [I18n.defaultLocale]
-}
-
-I18n.computeFallbacks = function() {
-  const map = {}
-  Object.keys(I18n.translations).forEach(locale => {
-    const locales = []
-    const parts = locale.split(/-/)
-    for (let i = parts.length; i > 0; i--) {
-      const candidateLocale = parts.slice(0, i).join('-')
-      if (candidateLocale in I18n.translations) {
-        locales.push(candidateLocale)
-      }
-    }
-    if (locales.indexOf(I18n.defaultLocale) === -1) {
-      locales.push(I18n.defaultLocale)
-    }
-    map[locale] = locales
-  })
-  return map
-}
 
 const _localize = I18n.localize.bind(I18n)
 I18n.localize = function(scope, value) {
@@ -334,36 +316,6 @@ I18n.pluralize = function(count, scope, options) {
   return this.interpolate(message, options)
 }
 
-I18n.Utils.HtmlSafeString = htmlEscape.SafeString // this is what we use elsewhere in canvas, so make i18nliner use it too
-I18n.CallHelpers.keyPattern = /^\#?\w+(\.\w+)+$/ // handle our absolute keys
-
-// when inferring the key at runtime (i.e. js/coffee or inline hbs `t`
-// call), signal to normalizeKey that it shouldn't be scoped.
-// TODO: make i18nliner-js set i18n_inferred_key, which will DRY things up
-// slightly
-const inferKey = I18n.CallHelpers.inferKey.bind(I18n.CallHelpers)
-I18n.CallHelpers.inferKey = (defaultValue, translateOptions) =>
-  `#${inferKey(defaultValue, translateOptions)}`
-
-I18n.CallHelpers.normalizeKey = (key, options) => {
-  if (key[0] === '#') {
-    key = key.slice(1)
-    delete options.scope
-  }
-  return key
-}
-
-if (window.ENV && window.ENV.lolcalize) {
-  I18n.CallHelpers.normalizeDefault = i18nLolcalize
-}
-
-I18n.scoped = I18n.useScope = (scope, callback) => {
-  const preloadLocale = window.ENV && window.ENV.LOCALE ? window.ENV.LOCALE : 'en'
-  const i18n_scope = new I18n.scope(scope)
-  if (callback) callback(i18n_scope)
-  I18n.translations[preloadLocale] && I18n.translations[preloadLocale][scope.split('.')[0]]; // SIDE EFFECT: Actually Load Translations (incl. Root Keys)
-  return i18n_scope
-}
 class Scope {
   constructor(scope) {
     this.scope = scope
@@ -413,7 +365,6 @@ class Scope {
 }
 I18n.scope = Scope
 
-Scope.prototype.HtmlSafeString = I18n.HtmlSafeString
 Scope.prototype.lookup = I18n.lookup.bind(I18n)
 Scope.prototype.toTime = I18n.toTime.bind(I18n)
 Scope.prototype.toNumber = I18n.toNumber.bind(I18n)
@@ -429,11 +380,9 @@ Scope.prototype.l = Scope.prototype.localize
 Scope.prototype.n = Scope.prototype.localizeNumber
 Scope.prototype.p = Scope.prototype.pluralize
 
-if (I18n.translations) {
-  $.extend(true, I18n.translations, {en: {}})
-} else {
-  I18n.translations = {en: {}}
-}
-
 export default I18n
-export const useScope = I18n.useScope
+export const useScope = scope => new Scope(scope)
+export const useTranslations = (locale, translations) => {
+  I18n.translations[locale] = I18n.translations[locale] || {}
+  Object.assign(I18n.translations[locale], translations)
+}

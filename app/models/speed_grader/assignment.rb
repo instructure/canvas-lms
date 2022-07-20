@@ -216,6 +216,7 @@ module SpeedGrader
         }
 
         if url_opts[:enable_annotations]
+          url_opts[:disable_annotation_notifications] = assignment.post_manually? && !sub.posted?
           url_opts[:enrollment_type] = canvadocs_user_role(course, current_user)
         end
 

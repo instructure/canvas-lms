@@ -239,6 +239,7 @@ zh-Hant:
   a_table_that_contains_the_grading_scheme_data_each_d461c205: 一個包含評分配置數據的表格。每一行均包含一個名稱、一個最大百分比以及一個最小百分比。此外，每一行均包含一個用於在下方添加新的一行的圖示以及一個用於刪除當前行的圖示。
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: 一個包含評分方案數據的表格。每一行均包含一個名稱、一個最大百分比以及一個最小百分比。此外，每一行均包含一個用於在下方添加新一行的按鈕以及一個用於刪除當前行的按鈕。
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: 包含等級評分方式資料的表格。首先是一個等級評分方式的名稱，以及用於編輯或刪除方案的按钮。每一列都有一個名稱、一個最大百分比和最小百分比。此外，每列都有一個按鈕，可以添加以下的新列，以及一個刪除目前列的按鈕。
+  a_timeout_occurred_contacting_external_authenticat_c064ea48: 聯絡外部驗證服務時發生逾時
   a_z_243c3301: A–Z
   a_z_29d8e67c: "A - Z"
   ability_to_submit_annotatable_document_assignments_5bc5edd3: 提交可註釋的文件作業列表的能力。
@@ -1251,6 +1252,10 @@ zh-Hant:
                 check_box: "群組 CSV"
               pseudonyms: 
                 check_box: "假名 CSV"
+              question_bank_questions: 
+                check_box: 題庫問題
+              question_banks: 
+                check_box: 題庫
               sections: 
                 check_box: "分班 CSV"
               terms: 
@@ -2242,6 +2247,7 @@ zh-Hant:
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: 所有日期字段必須存在並且格式正確
   all_day_fb42c4fc: 全日
   all_discussion_entries_report_c1e02906: 所有討論區條目報告
+  all_events_6ae4331b: 所有活動
   all_finished_time_to_publish_your_course_click_the_b6f07217: 全部完成？現在該發佈您的課程了！按一下下方的按鈕正式發佈！發佈課程將允許使用者開始參與該課程。
   all_get_scopes_59a54304: "所有 GET 範圍"
   all_gradeable_student_submissions_report_d11ee705: 所有可評分的學生提交項目報告
@@ -2269,6 +2275,7 @@ zh-Hant:
   all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "來自 %{groupTitle} 的所有成果已成功添加至此課程。"
   all_outcomes_from_grouptitle_have_been_successfull_6267efe4: "來自 %{groupTitle} 的所有學習成果已成功添加到 %{targetGroupTitle} 中。"
   all_outcomes_from_grouptitle_have_been_successfull_cb6ad008: "來自 %{groupTitle} 的所有成果已成功添加至此帳戶。"
+  all_quiz_submissions_9519d342: 所有測驗提交項目
   all_quiz_submissions_report_72a6d2fa: 所有測驗提交項目報告
   all_roles_f3bba14d: 所有角色
   all_rubrics_5114c466: 所有評分標準
@@ -3459,6 +3466,7 @@ zh-Hant:
   appointment_groups_bd225e60: 預約見面小組
   appointments_dcb41d23: 預約
   approved_c3b285d4: 批准
+  approximate_quiz_sessions_e522a3a1: 大概的測驗工作階段
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} 數值採用 %{precision} 的準確度"
   apps_54d24a47: 應用程式
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "應用程式是添加新功能至 Canvas 的簡便方法。您可以添加應用程式到單獨課程中，又或者帳戶中內所有課程。完成配置之後，就可以透過課程單元連接到應用程式，並創建評估工具作業。"
@@ -4806,6 +4814,7 @@ zh-Hant:
   back_to_title_39e7a8f4: "返回至 %{title}"
   background_color_b92b52ac: 背景顏色
   background_image_1a401e1a: 背景影像
+  bank_grouped_quiz_submissions_479ad830: 題庫小組測驗提交項目
   banner_image_id_is_not_a_valid_id_21ecc6: "banner_image_id 是一個無效的 ID"
   banner_image_url_and_banner_image_id_cannot_both_b_955615f5: "banner_image_url 和 banner_image_id 無法同時設定。"
   banner_image_url_is_not_a_valid_url_830d7926: "banner_image_url 是一個無效的 URL"
@@ -8846,6 +8855,8 @@ zh-Hant:
   create_file_s_188549e6: "[ 創建檔案 ]"
   create_files_after_rce_media_upload_recording_77d75a96: "上傳/錄製 RCE 媒體後建立檔案"
   create_group_set_7fe1cd53: 建立小組
+  create_groups_later_6ce36058: 稍後建立小組
+  create_groups_now_d59bf70b: 立即建立小組
   create_interactive_course_content_76665336: 創建互動課程內容
   create_item_base: 
     there_was_an_error: "儲存『%{title}』時出現錯誤，請再試一次。"
@@ -9326,6 +9337,7 @@ zh-Hant:
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: 定義下拉式清單前後的文字，並創建一組可能的答案。
   delay_posting_this_topic_until_aa483eec: 延遲公佈本話題，直至
   delayed_until_58b7af4b: 延遲至：
+  delete_8d6d2222: 刪除：
   delete_a143a2ab: 刪除
   delete_a6efa79d: 刪除
   delete_account_name_96aee330: "刪除%{account_name}"
@@ -9355,6 +9367,7 @@ zh-Hant:
   delete_domain_5ba75b7c: 刪除網域
   delete_domain_domain_c5b68f5: "刪除網域 %{domain}"
   delete_entry_title_5e59727b: "刪除條目%{title}"
+  delete_failed_6285e600: 刪除失敗
   delete_feedname_1ac9a4a4: "刪除%{feedName}"
   delete_filter_83ca1a6a: 刪除篩選器
   delete_from_all_accounts_a1c5e621: 從所有帳戶刪除
@@ -9434,6 +9447,7 @@ zh-Hant:
       此行動不能逆轉。是否確定要刪除 %{file}？
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: 刪除使用者將銷毀他們所有的電子學習檔案。此外，可以將電子學習檔案個別標記為「垃圾郵件」或「安全」以修改它們的可見度。
   deleting_assignment_22d5851d: 正在刪除作業
+  deleting_b896f5f: 正在刪除
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "展示網站要求對 Recaptcha 設置進行配置。請參考您網站管理，以獲得 Canvas 實例的說明。"
   demos: 
@@ -11261,6 +11275,7 @@ zh-Hant:
   example_https_schoolofrock_edu_d4326f03: "範例：\"https://schoolofrock.edu\""
   example_item_scores_6726c689: 項目分數範例
   example_school_of_rock_41f32c31: "範例：\"Rock 的學校\""
+  exceeded_the_maximum_length_number_characters_2d25611e: "已超過最大長度（%{number} 個字元）"
   exceeds_expectations_5910fc3a: 超出預期
   exceeds_mastery_1f995dce: 超過掌握程度
   excelsior_student_activity_tracking_7a1ba44d: "Excelsior 學生活動追蹤"
@@ -15132,6 +15147,7 @@ zh-Hant:
   limit_each_time_slot_to_input_value_user_s_47461538: "限制每個時段有 %{input_value} 位用戶。"
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "將每個時閒段限定給 %{num_participants} *群組* **使用者**使用"
   limit_file_size_limit_per_file_b336c0d8: "每個檔案限制為 %{file_size_limit} "
+  limit_group_members_to_leave_blank_for_no_limit_c341e248: 限制小組成員（保留空白表示沒有限制）
   limit_groups_to_group_limit_members_40651ea7: "限制群組為 %{group_limit} 個成員"
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "僅限申請人參與 %{num_appointments} 個預約項目。"
   limit_search_to_activity_after_c1ac2449: 在以下時間后將搜索僅限於活動：
@@ -19051,6 +19067,7 @@ zh-Hant:
   number_of_members_per_group_6beaef7b: 每個群組的成員數目
   number_of_respondents_e1e7e8b: 回應的數量
   number_of_scores_to_ignore_for_each_student_fb94e818: 每個學生忽略的分數
+  number_of_students_per_group_8abe7189: 每個小組的學生人數
   number_to_grade_661b05dd: "%{number}以評分"
   number_unsubmitted_145fefae: "%{number}未提交"
   numerical_answer_ec7120bf: 數字答案
@@ -25225,7 +25242,9 @@ zh-Hant:
   speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: 分拆
   split_merged_users_6b81c595: 分拆已合併的使用者
+  split_number_of_students_per_group_4a05f76f: 分拆每個小組的學生人數
   split_student_names_df0ef806: 分拆學生姓名
+  split_students_by_number_of_groups_5ace5a6a: 依小組數量分拆學生
   split_students_into_groups_with_num_members_studen_c49d5136: "將學生分組，一組 %{num_members} 個學生"
   split_students_into_num_groups_groups_e9854f16: "將學生分到 %{num_groups} 組"
   splitting_disabled_reached_maximum_of_three_assign_716acb13: 不可分拆：在評分範圍內最多達到三個作業小組
@@ -26268,6 +26287,7 @@ zh-Hant:
   the_following_outcomes_cannot_be_removed_because_t_1c4b8ef9: 
     one: 由於已對齊內容，因此無法移除以下的成果請取消選擇並重試。
     other: 由於已對齊內容，因此無法移除以下的成果請取消選擇並重試。
+  the_following_recipients_have_no_active_enrollment_17395ab4: "下列收件人在課程中沒有活躍的註冊學生：%{invalid_recipients}，且無法發送訊息"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
       以下的學生還未保存自己的測驗提交項目的變更：
       
@@ -26622,6 +26642,7 @@ zh-Hant:
                      這將會由更新後的內容安全政策 (CSP) 啟用。
                      網域將新增至您的白名單，您可以手動新增網域。
                      白名單的網域數量上限為 100。
+  this_and_all_following_events_4b4b283: 此活動和所有後續活動
   this_announcement_will_not_be_visible_until_delaye_88f7f5c: "此通告將到 %{delayedPostAt} 才可以看到。"
   this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: 此區域將被評估者用於留下與此標準相關的評論。
   this_assignment_does_not_count_toward_the_final_gr_29ede05f: 此作業不計入最終評分
@@ -26679,6 +26700,7 @@ zh-Hant:
   this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: 此電子學習檔案已識別為可能的垃圾郵件。目前僅管理員和作者才可看到。如果您確定此內容不是垃圾郵件，您可以將其標記為安全。此外，您可以將其確認為垃圾郵件。
   this_eportfolio_has_been_identified_as_spam_and_is_8430467: 此電子學習檔案已識別為垃圾郵件，而且只有您可以看到。如有任何疑問，請聯絡管理員。
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: 此電子學習檔案已識別為垃圾郵件。目前僅管理員和作者才可看到。如果您確定此內容不是垃圾郵件，您可以將其標記為安全。
+  this_event_b437db90: 此活動
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: 此功能將影響帳戶中所有課程的現有日期。
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: 此功能將影響整個帳戶的現有資料。
   this_feature_allows_teachers_to_create_anonymous_d_ea364dca: 此功能允許教師建立匿名討論區和啟用學生的課程級別設定以建立匿名討論區。
@@ -27100,6 +27122,7 @@ zh-Hant:
     new_caledonia: 新喀里多尼亞
     new_delhi: 新德里
     newfoundland: 紐芬蘭
+    norfolk_island: 諾福克島
     noronha: 迪諾羅尼亞
     novosibirsk: 新西伯利亞
     nukualofa: 努瓜婁發
@@ -27219,6 +27242,7 @@ zh-Hant:
     messages: 訊息
     outcome_artifacts: 成果項目
     people: 人員
+    topic: 主題
     view_in_separate_window: 在單獨的視窗中檢視
   tls_7a2eaba5: TLS
   to_1126ab55: 至

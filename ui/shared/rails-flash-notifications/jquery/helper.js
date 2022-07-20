@@ -52,7 +52,7 @@ class RailsFlashNotificationsHelper {
         event.preventDefault()
       })
 
-      $(this.holder).on('click', 'li', event => {
+      $(this.holder).on('click', '.flash-message-container', event => {
         if ($(event.currentTarget).hasClass('no_close')) {
           return
         }
@@ -91,7 +91,7 @@ class RailsFlashNotificationsHelper {
 
     // See generateScreenreaderNodeHtml for SR features
     return `
-        <li class="ic-flash-${htmlEscape(type)}" aria-hidden="true">
+        <div class="ic-flash-${htmlEscape(type)} flash-message-container" aria-hidden="true">
           <div class="ic-flash__icon">
             <i class="icon-${htmlEscape(icon)}"></i>
           </div>
@@ -101,7 +101,7 @@ class RailsFlashNotificationsHelper {
           )}">
             <i class="icon-x"></i>
           </button>
-        </li>
+        </div>
       `
   }
 

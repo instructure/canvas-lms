@@ -3430,7 +3430,7 @@ class Course < ActiveRecord::Base
   add_setting :alt_name
 
   add_setting :default_due_time, inherited: true
-  add_setting :conditional_release, default: false, boolean: true
+  add_setting :conditional_release, default: false, boolean: true, inherited: true
 
   def elementary_enabled?
     account.enable_as_k5_account?
@@ -4045,16 +4045,6 @@ class Course < ActiveRecord::Base
 
   def can_stop_being_template?
     !templated_accounts.exists?
-  end
-
-  def disable_conditional_release
-    return unless conditional_release?
-
-    self.conditional_release = false
-    save
-    ConditionalRelease::Service.delay_if_production(priority: Delayed::LOW_PRIORITY,
-                                                    n_strand: ["conditional_release_unassignment", global_root_account_id])
-                               .release_mastery_paths_content_in_course(self)
   end
 
   private

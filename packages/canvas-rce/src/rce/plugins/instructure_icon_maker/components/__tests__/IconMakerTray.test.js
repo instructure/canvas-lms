@@ -430,7 +430,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
       fetchMock.restore()
     })
 
-    it('renders the create view', () => {
+    it('renders the edit view', () => {
       expect(subject().getByRole('heading', {name: /edit icon/i})).toBeInTheDocument()
     })
 
@@ -458,6 +458,26 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
         expect(getByLabelText('Text Position').value).toEqual('Below')
       })
     })
+
+    describe('when loading the tray', () => {
+      let isLoading
+
+      beforeAll(() => {
+        isLoading = IconMakerTray.isLoading
+        IconMakerTray.isLoading = jest.fn()
+      })
+
+      afterAll(() => {
+        IconMakerTray.isLoading = isLoading
+      })
+
+      it('renders a spinner', () => {
+        IconMakerTray.isLoading.mockReturnValueOnce(true)
+        const {getByText} = subject()
+        const spinner = getByText('Loading...')
+        expect(spinner).toBeInTheDocument()
+      })
+    })
   })
 
   describe('color inputs', () => {
@@ -477,6 +497,18 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
 
       it('they represent text color', () => {
         const noneColorOption = getNoneColorOptionFor('icon-text-color-popover')
+        expect(noneColorOption).not.toBeInTheDocument()
+      })
+
+      it('they represent single color image', async () => {
+        const {getByText, getByTestId} = renderComponent()
+        const addImageButton = getByText('Add Image')
+        userEvent.click(addImageButton)
+        const singleColorOption = getByText('Single Color Image')
+        userEvent.click(singleColorOption)
+        const artIcon = await waitFor(() => getByTestId('icon-maker-art'))
+        userEvent.click(artIcon)
+        const noneColorOption = getNoneColorOptionFor('single-color-image-fill-popover')
         expect(noneColorOption).not.toBeInTheDocument()
       })
     })

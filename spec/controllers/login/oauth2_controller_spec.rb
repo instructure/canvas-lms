@@ -162,5 +162,17 @@ describe Login::OAuth2Controller do
       get :create, params: { state: jwt }
       expect(response).to redirect_to(login_url)
     end
+
+    it "redirects to login any time an external timeout is noticed" do
+      session[:oauth2_nonce] = "fred"
+      expect_any_instantiation_of(aac).to receive(:get_token).and_raise(Canvas::TimeoutCutoff)
+      user_with_pseudonym(username: "user", active_all: 1)
+      @pseudonym.authentication_provider = aac
+      @pseudonym.save!
+      session[:sentinel] = true
+      jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: "fred")
+      get :create, params: { state: jwt }
+      expect(response).to redirect_to(login_url)
+    end
   end
 end

@@ -509,6 +509,17 @@ describe GroupsController do
       expect(@group.reload.leader).to be_nil
     end
 
+    it "doesn't overwrite stuck sis fields" do
+      user_session(@teacher)
+      original_name = "some group"
+      @group = @course.groups.create!(name: original_name)
+      put "update", params: { course_id: @course.id, id: @group.id, override_sis_stickiness: false, group: { name: "new name" } }
+
+      expect(response).to be_redirect
+      expect(assigns[:group]).to eql(@group)
+      expect(assigns[:group].name).to eql(original_name)
+    end
+
     describe "quota" do
       before :once do
         @group = @course.groups.build(name: "teh gruop")

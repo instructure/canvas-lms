@@ -17823,6 +17823,7 @@ fa:
         password: "رمز عبور"
         password_for: "رمز عبور برای"
         permanent_expires_at: "منقضی می شود در"
+        pronouns: ضمیرها
         purpose: هدف
         short_name: "نام قابل مشاهده"
         show_user_services: "اجازه داده شود اعضای هم کلاسی/هم گروهی ببینند کدام خدمات را به رخ نمای خود پیوند داده ام"
@@ -18011,6 +18012,8 @@ fa:
   progress_for_account_name_ef203250: "پیشرفت برای %{account_name}"
   progress_loading_bar_a26b8861: "نوار پیشرفت/بارگذاری"
   project_groups_1fa0320b: "گروه های پروژه"
+  pronouns_28bbef86: ضمیرها
+  pronouns_d1cd8dd0: ضمیرها
   provide_a_space_for_users_to_work_on_a_single_goog_8edec82b: |-
       برای کار روی یک سند گوگل به طور همزمان از درون
       درس کانواس، فضایی برای کاربران ایجاد کنید.
@@ -18124,6 +18127,7 @@ fa:
   published_click_to_unpublish_module_name_eddd07bb: "منتشر شده. برای لغو انتشار  %{module_name} کلیک کنید."
   published_click_to_unpublish_name_9bdd66cf: "منتشر شده. برای لغو انتشار %{name} کلیک کنید"
   published_click_to_unpublish_title_358122a: "منتشر شده است. برای لغو انتشار %{title} کلیک کنید."
+  publishing_error_bdfb3390: "خطای در حال انتشار"
   publishing_is_disabled_for_this_item_efa7803f: "انتشار برای این مورد غیر فعال شده است"
   publishing_item_name_is_disabled_8207a9e7: "انتشار %{item_name} غیر فعال شده است"
   pumpkin_904428d5: کدوتنبل
@@ -18239,6 +18243,7 @@ fa:
       show_details: "نمایش اطلاعات پرسش"
   question_banks_45bdf347: "مخزن های پرسش"
   question_banks_account_navigation_9a7ab7c2: "بانک های سوال (پیمایش حساب)"
+  question_banks_courses_dd907ecf: "کتابچه سوال‌ها (درس‌ها)"
   question_banks_view_and_link_e6d9cde2: "مخزن پرسش - مشاهده و پیوند"
   question_f06476d1: پرسش
   question_group_837b8014: "گروه پرسش"
@@ -18246,6 +18251,7 @@ fa:
   question_unanswered: "هنوز پاسخ داده نشده است"
   questions_a955145c: "پرسش ها"
   queued_d0e45c4b: "صف شده"
+  queued_jobs_9a7a923e: "کارهای صف شده"
   quiz: 
     regrade: 
       give_everyone_full_credit: "دادن امتیاز کامل به همه برای این پرسش"
@@ -18732,6 +18738,7 @@ fa:
         not_yet_graded: "هنوز نمره گذاری نشده"
         original_score: "نمره اصلی:"
         points_possible: "%{points_possible} امتیاز"
+        question_score: "امتیاز پرسش"
         regraded_score: "نمره تجدید نظر شده:"
         show_ansers_for_variable: "نمایش پاسخ ها برای %{variable}"
         skip_question_text: "به متن پرسش بروید."
@@ -19374,7 +19381,7 @@ fa:
           time_elapsed: "زمان سپری شده"
           time_running: "زمان در حال اجرا"
         links: 
-          hide_time_running: "مخفی کردن"
+          hide_time_running: "مخفی کردن زمان"
           keep_editing_quiz: "ویرایش این آزمون ادامه یابد"
           keep_editing_survey: "ویرایش این نظرسنجی ادامه یابد"
     retrieving_filters: "در حال بازیابی فیلترها..."
@@ -19432,7 +19439,7 @@ fa:
       errors: 
         connection_lost: "اتصال به %{host} انجام نشد. لطفا مطمئن شوید که قبل از ادامه به اینترنت وصل شده اید."
         only_numerical_values: "فقط مقادیر عددی قابل قبول است"
-      hide_time_link: "مخفی کردن"
+      hide_time_link: "مخفی کردن زمان"
       hours_count: 
         one: "%{count} ساعت"
         other: "%{count} ساعت"
@@ -19463,7 +19470,7 @@ fa:
       seconds_count: 
         one: "%{count} ثانیه"
         other: "%{count} ثانیه"
-      show_time_link: نمایش
+      show_time_link: "نمایش دادن زمان"
       titles: 
         come_back_later: "شما این پرسش را علامت زده اید تا دوباره به آن بازگردید"
         times_up: "وقت تمام شد!"

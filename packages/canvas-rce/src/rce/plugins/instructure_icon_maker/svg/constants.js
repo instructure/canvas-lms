@@ -67,10 +67,6 @@ export const DEFAULT_SETTINGS = {
   imageSettings: null
 }
 
-export const DEFAULT_OPTIONS = {
-  isPreview: false
-}
-
 export const BASE_SIZE = {
   [Size.ExtraSmall]: 74,
   [Size.Small]: 122,

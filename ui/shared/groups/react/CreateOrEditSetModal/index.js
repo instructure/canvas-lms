@@ -242,7 +242,12 @@ export const CreateOrEditSetModal = ({
       if (body.assign_async) {
         step = I18n.t('assigning members to the new groups')
         const assignPath = `/api/v1/group_categories/${json.id}/assign_unassigned_members`
-        const {json: assignJson} = await apiCall({path: assignPath, method: 'POST'})
+        const assignBody = {group_by_section: body.group_by_section}
+        const {json: assignJson} = await apiCall({
+          path: assignPath,
+          body: assignBody,
+          method: 'POST'
+        })
         if (ASYNC_ACTIVE_STATES.includes(assignJson.workflow_state)) {
           creationJSON.current = assignJson
           dispatch({ev: 'api-change', to: 'assigning'})

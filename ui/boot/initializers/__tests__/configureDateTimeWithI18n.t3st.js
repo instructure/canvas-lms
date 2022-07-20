@@ -25,8 +25,7 @@
 //
 // =~*~=~=*!=~=~!!~=+!+!fv....................................~=+!+!13333333333.
 
-import '../../../../public/javascripts/translations/_core'
-import '../../../../public/javascripts/translations/_core_en'
+import CoreTranslations from '../../../../public/javascripts/translations/en.json'
 
 import '../../../ext/custom_moment_locales/ca'
 import '../../../ext/custom_moment_locales/de'
@@ -44,7 +43,7 @@ import $ from '@canvas/datetime'
 import * as configureDateTime from '../configureDateTime'
 import * as configureDateTimeMomentParser from '../configureDateTimeMomentParser'
 import fs from 'fs'
-import I18n from '@canvas/i18n'
+import I18n, {useTranslations} from '@canvas/i18n'
 import path from 'path'
 import timezone from 'timezone'
 import YAML from 'yaml'
@@ -91,6 +90,8 @@ const tzLocales = [
   tr_TR,
   uk_UA,
 ]
+
+useTranslations(CoreTranslations)
 
 const locales = loadAvailableLocales()
 const tzLocaleData = tzLocales.reduce((acc, locale) => {

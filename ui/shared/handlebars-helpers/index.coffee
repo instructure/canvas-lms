@@ -47,6 +47,8 @@ Handlebars.registerHelper name, fn for name, fn of {
     options.wrapper = wrappers if wrappers['*']
     unless (typeof this == 'undefined') || (this instanceof Window)
       options[key] = this[key] for key in this
+    if options.i18n_scope
+      useI18nScope(options.i18n_scope)
     new Handlebars.SafeString htmlEscape(I18nObj.t(args..., options))
 
   __i18nliner_escape: (val) ->

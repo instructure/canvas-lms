@@ -359,7 +359,7 @@ module AttachmentFu # :nodoc:
         # If we're overwriting an existing file, we need to take serious
         # precautions, since other Attachment records could be using this file.
         # We first remove any root references for this file, and then we generate
-        # a new unique filename for this file so anybody children of this attachment
+        # a new unique filename for this file so any children of this attachment
         # will still be able to get at the original.
         unless new_record?
           self.root_attachment = nil

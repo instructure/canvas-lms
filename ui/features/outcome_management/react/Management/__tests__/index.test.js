@@ -448,6 +448,20 @@ describe('OutcomeManagementPanel', () => {
     expect(queryByText('0 Outcomes Selected')).toBeInTheDocument()
   })
 
+  it('Displays spinner in document when a single outcome is removed', async () => {
+    const {getByText, getByTestId, getByRole} = render(<OutcomeManagementPanel />, {
+      ...groupDetailDefaultProps
+    })
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Course folder 0'))
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Menu for outcome Outcome 1 - Course folder 0'))
+    fireEvent.click(within(getByRole('menu')).getByText('Remove'))
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Remove Outcome'))
+    expect(getByTestId('outcome-spinner')).toBeInTheDocument()
+  })
+
   it('clears selected outcome when move outcome modal is closed', async () => {
     const {getByText, queryByText, getByRole} = render(<OutcomeManagementPanel />, {
       ...groupDetailDefaultProps
@@ -648,6 +662,22 @@ describe('OutcomeManagementPanel', () => {
       expect(await within(removeModal).findByText('Remove Outcomes?')).toBeInTheDocument()
       expect(await within(removeModal).findByText(itemOneTitle)).toBeInTheDocument()
       expect(await within(removeModal).findByText(itemTwoTitle)).toBeInTheDocument()
+    })
+
+    it('spinners show in the document when a bulk remove is pending', async () => {
+      const {getByText, getByRole, getAllByTestId} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(getByText('Course folder 0'))
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(getByText('Select outcome Outcome 1 - Course folder 0'))
+      fireEvent.click(getByText('Select outcome Outcome 2 - Course folder 0'))
+      fireEvent.click(getByRole('button', {name: /remove/i}))
+      await act(async () => jest.runOnlyPendingTimers())
+      fireEvent.click(getByText('Remove Outcomes'))
+      const spinners = getAllByTestId('outcome-spinner')
+      expect(spinners.length).toBe(2)
     })
 
     it('updated group names are passed to the remove modal if a selected outcome is moved', async () => {

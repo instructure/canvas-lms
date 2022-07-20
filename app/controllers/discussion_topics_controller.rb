@@ -440,7 +440,7 @@ class DiscussionTopicsController < ApplicationController
         append_sis_data(hash)
         js_env(hash)
         js_env({
-                 DIRECT_SHARE_ENABLED: @context.is_a?(Course) && hash[:permissions][:read_as_admin]
+                 DIRECT_SHARE_ENABLED: @context.is_a?(Course) && (hash[:permissions][:manage_content] || (@context.concluded? && hash[:permissions][:read_as_admin]))
                }, true)
         set_tutorial_js_env
 
@@ -673,6 +673,7 @@ class DiscussionTopicsController < ApplicationController
     @sequence_asset = @context_module_tag.try(:content)
     add_discussion_or_announcement_crumb
     add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
+    @page_title = join_title(t("#titles.topic", "Topic"), @topic.title)
 
     if @topic.deleted?
       flash[:notice] = I18n.t :deleted_topic_notice, "That topic has been deleted"

@@ -23,6 +23,7 @@ describe JwtsController do
   include_context "JWT setup"
   let(:token_user) { user_with_pseudonym }
   let(:other_user) { user_with_pseudonym }
+  let(:admin_user) { site_admin_user }
   let(:translate_token) do
     lambda do |resp|
       utf8_token_string = json_parse(resp.body)["token"]
@@ -105,6 +106,27 @@ describe JwtsController do
         expect(decrypted_token_body[:context_type]).to eq("User")
       end
 
+      it "generates a token that has account context_id" do
+        user_session(admin_user)
+        post "create", params: params.merge(context_type: "Account", context_id: Account.last.id), format: "json"
+        decrypted_token_body = translate_token.call(response)
+        expect(decrypted_token_body[:context_id].to_i).to eq(Account.last.id)
+      end
+
+      it "generates a token by account context_uuid" do
+        user_session(admin_user)
+        post "create", params: params.except(:context_id).merge(context_type: "Account", context_uuid: Account.last.uuid), format: "json"
+        decrypted_token_body = translate_token.call(response)
+        expect(decrypted_token_body[:context_id].to_i).to eq(Account.last.id)
+      end
+
+      it "generates a token that has account context_type" do
+        user_session(admin_user)
+        post "create", params: params.merge(context_type: "Account", context_id: Account.last.id), format: "json"
+        decrypted_token_body = translate_token.call(response)
+        expect(decrypted_token_body[:context_type]).to eq("Account")
+      end
+
       context "returns error when" do
         it "context_type param is missing" do
           post "create", params: params.except(:context_type), format: "json"
@@ -146,6 +168,13 @@ describe JwtsController do
           generic_user = user_factory
           user_session(generic_user)
           post "create", params: params, format: "json"
+          assert_unauthorized
+        end
+
+        it "generic user is unauthorized for Account context type" do
+          generic_user = user_factory
+          user_session(generic_user)
+          post "create", params: params.merge(context_type: "Account", context_id: Account.last.id), format: "json"
           assert_unauthorized
         end
       end

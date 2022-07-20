@@ -64,6 +64,7 @@ export const CREATE_CONVERSATION = gql`
   mutation CreateConversation(
     $attachmentIds: [ID!]
     $body: String!
+    $bulkMessage: Boolean
     $contextCode: String
     $conversationId: ID
     $groupConversation: Boolean
@@ -78,6 +79,7 @@ export const CREATE_CONVERSATION = gql`
       input: {
         attachmentIds: $attachmentIds
         body: $body
+        bulkMessage: $bulkMessage
         contextCode: $contextCode
         conversationId: $conversationId
         groupConversation: $groupConversation

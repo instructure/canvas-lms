@@ -230,6 +230,7 @@ nb-x-k12:
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "En tabell med svar og kort statistikk vedrørende elevenes valg av svar."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "En tabell som inneholder data fra vurderingsoversikten. Hver rad inneholder et navn, en maksimum prosentandel, og en minimum prosentandel. I tillegg inneholder hver rad en knapp for å legge til en ny rad nedenfor, og en knapp for å slette gjeldende rad."
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "En tabell som inneholder data for vurderingsskala. Først er et navn på vurderingsskalaen og knapper for redigering og sletting av skalaen. Hver rad inneholder et navn, en maksimal prosentandel og en minste prosentandel. I tillegg inneholder hver rad en knapp for å legge til en ny rad nedenfor, og en knapp for å slette gjeldende rad."
+  a_timeout_occurred_contacting_external_authenticat_c064ea48: "Det oppsto et tidsavbrudd ved kontakt med ekstern autentiseringstjeneste"
   a_z_243c3301: A–Z
   a_z_29d8e67c: "A - Å"
   ability_to_submit_annotatable_document_assignments_5bc5edd3: "Evne til å sende inn annoterte dokumentoppgaver."
@@ -1172,6 +1173,10 @@ nb-x-k12:
                 check_box: "CSV for grupper"
               pseudonyms: 
                 check_box: "CSV for pseudonymer"
+              question_bank_questions: 
+                check_box: Spørsmålsbank-spørsmål
+              question_banks: 
+                check_box: Spørsmålsbanker
               sections: 
                 check_box: "CSV for seksjoner"
               terms: 
@@ -2085,6 +2090,7 @@ nb-x-k12:
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Alle datafelt må være til stede og formatert riktig"
   all_day_fb42c4fc: "Hele dagen"
   all_discussion_entries_report_c1e02906: "Rapport for alle diskusjonsoppføringer"
+  all_events_6ae4331b: "Alle hendelser"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Alt ferdig?  Tid for å publisere faget!  Klikk på knappen under for å gjøre det offisielt! Publisering vil tillate brukerne å begynne og delta i faget."
   all_get_scopes_59a54304: "Alle GET-omfang"
   all_gradeable_student_submissions_report_d11ee705: "Rapport for alle elevinnleveringer som kan vurderes"
@@ -2111,6 +2117,7 @@ nb-x-k12:
   all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "Alle mål fra %{groupTitle} ble lagt til dette faget."
   all_outcomes_from_grouptitle_have_been_successfull_6267efe4: "Alle mål fra %{groupTitle} ble lagt til %{targetGroupTitle}."
   all_outcomes_from_grouptitle_have_been_successfull_cb6ad008: "Alle mål fra %{groupTitle} ble lagt til denne kontoen."
+  all_quiz_submissions_9519d342: "Alle quizinnleveringer"
   all_quiz_submissions_report_72a6d2fa: "Rapport for alle quizinnleveringer"
   all_roles_f3bba14d: "Alle roller"
   all_rubrics_5114c466: "Samtlige vurderingskriterier"
@@ -3259,6 +3266,7 @@ nb-x-k12:
   appointment_groups_bd225e60: Gruppeavtaler
   appointments_dcb41d23: Avtaler
   approved_c3b285d4: Godkjent
+  approximate_quiz_sessions_e522a3a1: "Omtrentlige quizøkter"
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} med presisjon %{precision}"
   apps_54d24a47: Apper
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Apper er en enkel måte å legge til funksjoner i Canvas. Appene kan legges til individuelle fag, eller til alle fagene tilgjengelig i en konto. Når de er satt opp kan du lenke til dem fra fagmodulene og opprette oppgaver for vurderingsverktøy."
@@ -4430,6 +4438,7 @@ nb-x-k12:
   back_to_title_39e7a8f4: "Tilbake til %{title}"
   background_color_b92b52ac: Bakgrunnsfarge
   background_image_1a401e1a: Bakgrunnsbilde
+  bank_grouped_quiz_submissions_479ad830: "Bankgrupperte quizinnleveringer"
   banner_image_id_is_not_a_valid_id_21ecc6: "banner_image_id er ikke en gyldig ID"
   banner_image_url_and_banner_image_id_cannot_both_b_955615f5: "banner_image_url og banner_image_id kan ikke begge settes."
   banner_image_url_is_not_a_valid_url_830d7926: "banner_image_url er ikke en gyldig URL"
@@ -8002,6 +8011,8 @@ nb-x-k12:
   create_file_s_188549e6: "[ Opprett fil(er) ]"
   create_files_after_rce_media_upload_recording_77d75a96: "Opprett filter etter RCE medieopplasting/-opptak"
   create_group_set_7fe1cd53: "Opprett gruppesett"
+  create_groups_later_6ce36058: "Opprett grupper senere"
+  create_groups_now_d59bf70b: "Opprett grupper nå"
   create_interactive_course_content_76665336: "Opprette interaktivt faginnhold"
   create_live_event_subscriptions_on_toolproxy_7c8378b1: "Opprett abonnement på live-arrangement på ToolProxy"
   create_lookup_7ceb6d90: "Opprett oppslag"
@@ -8445,6 +8456,7 @@ nb-x-k12:
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Skriv inn teksten som skal stå før og etter rullegardinen og sett sammen et knippe mulige svar."
   delay_posting_this_topic_until_aa483eec: "Avvent publisering av dette temaet til"
   delayed_until_58b7af4b: "Forsinket til:"
+  delete_8d6d2222: "Slett: "
   delete_a143a2ab: slett
   delete_a6efa79d: Slett
   delete_account_name_96aee330: "Slett %{account_name}"
@@ -8473,6 +8485,7 @@ nb-x-k12:
   delete_domain_5ba75b7c: "Slett domene"
   delete_domain_domain_c5b68f5: "Slett domene %{domain}"
   delete_entry_title_5e59727b: "Slett oppføring %{title}"
+  delete_failed_6285e600: "Sletting mislyktes"
   delete_feedname_1ac9a4a4: "Slett %{feedName}"
   delete_filter_83ca1a6a: "Slett filter"
   delete_from_all_accounts_a1c5e621: "Slett fra ALLE kontoer"
@@ -8546,6 +8559,7 @@ nb-x-k12:
       Denne handlingen er irreversibel. Er du sikker på at du ønsker å slette %{file}?
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "Å slette en bruker vil ødelegg alle deres ePortfolioer. Alternativt kan ePortfolioer indivuelt markeres som “spam” eller “sikker” for å endre synligheten deres."
   deleting_assignment_22d5851d: "sletter oppgave"
+  deleting_b896f5f: sletter
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Demo områder krever Recaptcha innstillinger som skal konfigureres. Vennligst se nettstedets admin for denne instansen i Canvas."
   demos: 
@@ -10228,6 +10242,7 @@ nb-x-k12:
   example_https_schoolofrock_edu_d4326f03: "eksempel: «https://schoolofrock.edu»\""
   example_item_scores_6726c689: "Eksempel element resultat"
   example_school_of_rock_41f32c31: "eksempel: «School of Rock»\""
+  exceeded_the_maximum_length_number_characters_2d25611e: "Overskredet maksimal lengde (%{number} tegn)"
   exceeds_expectations_5910fc3a: "Overgår forventningene"
   exceeds_mastery_1f995dce: "Overgår mestring"
   excelsior_student_activity_tracking_7a1ba44d: "Excelsior elevaktivitetssporing"
@@ -13323,6 +13338,7 @@ nb-x-k12:
   limit_course_participation_to_term_or_custom_cours_67797a86: "Begrense fagdeltakelse til termin eller tilpassede fagdatoer?"
   limit_each_time_slot_to_input_value_user_s_47461538: "Begrens hver tidsluke til %{input_value} bruker(e). "
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "Begrens hver timeavtale til %{num_participants} *grupper.* **brukere.**"
+  limit_group_members_to_leave_blank_for_no_limit_c341e248: "Begrens gruppemedlemer til (la stå tomt for ingen grense)"
   limit_groups_to_group_limit_members_40651ea7: "Begrens grupper til %{group_limit} medlemmer"
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "Begrens deltakere til å delta i %{num_appointments} møter."
   limit_search_to_activity_after_c1ac2449: "Begrens søk til aktivitet etter"
@@ -16821,6 +16837,7 @@ nb-x-k12:
   number_of_members_per_group_6beaef7b: "Antall medlemmer per gruppe"
   number_of_respondents_e1e7e8b: "Antall respondenter"
   number_of_scores_to_ignore_for_each_student_fb94e818: "Antall poeng som skal ignoreres for hver elev"
+  number_of_students_per_group_8abe7189: "Antall elever per gruppe"
   number_to_grade_661b05dd: "%{number} Å karaktersette"
   number_unsubmitted_145fefae: "%{number} ikke levert"
   numerical_answer_ec7120bf: "Numerisk svar"
@@ -22267,7 +22284,9 @@ nb-x-k12:
   speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Del
   split_merged_users_6b81c595: "Splitt sammenslåtte brukere"
+  split_number_of_students_per_group_4a05f76f: "Del antall elever per gruppe"
   split_student_names_df0ef806: "Delt elevnavn"
+  split_students_by_number_of_groups_5ace5a6a: "Del elevene etter antall grupper"
   split_students_into_groups_with_num_members_studen_c49d5136: "Del elevene inn i grupper med %{num_members} elever per gruppe"
   split_students_into_num_groups_groups_e9854f16: "Del elevene opp i %{num_groups} grupper"
   splitting_disabled_reached_maximum_of_three_assign_716acb13: "Deling er deaktivert: Nådde et maksimum på tre oppgavegrupper innenfor et resultatområde"
@@ -23244,6 +23263,7 @@ nb-x-k12:
   the_following_outcomes_cannot_be_removed_because_t_1c4b8ef9: 
     one: "Følgende mål kan ikke fjernes fordi det er tildelt et innhold. Fjern markeringen og prøv igjen."
     other: "Følgende mål kan ikke fjernes fordi de er tildelt et innhold. Fjern markeringen og prøv igjen."
+  the_following_recipients_have_no_active_enrollment_17395ab4: "Følgende mottakere har ingen aktiv påmelding i faget, %{invalid_recipients}, kan ikke sende meldinger"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
       Følgende elever har ulagrede endringer i quizinnleveringene deres: 
       
@@ -23563,6 +23583,7 @@ nb-x-k12:
   this_account_does_not_allow_for_microsoft_teams_sy_266f11c7: "Denne kontoen tillater ikke at Microsoft Teams synk. er aktivert. Aktiver funksjonsflagget «Synkronisering av Microsoft Grupper-påmeldinger» før du redigerer noen innstillinger."
   this_account_doesn_t_allow_for_microsoft_teams_syn_744dbd76: "Denne kontoen tillater ikke at Microsoft Teams synk. er aktivert. Aktiver funksjonsflagget «Synkronisering av Microsoft Grupper-påmeldinger» før du redigerer noen innstillinger"
   this_allows_the_user_to_unfavorite_a_course_direct_828d0587: "Dette gjør at bruker kan gjøre et fag ikke favoritt direkte fra oversikt-kortet sitt."
+  this_and_all_following_events_4b4b283: "Denne og følgende hendelser"
   this_announcement_will_not_be_visible_until_delaye_88f7f5c: "Denne beskjeden vil ikke være synlig før %{delayedPostAt}."
   this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: "Dette området vil benyttes av den som vurderer for å gi kommentarer relatert til dette kriteriet."
   this_assignment_does_not_count_toward_the_final_gr_a5c238e2: "Denne oppgaven teller ikke mot sluttvurdering."
@@ -23615,6 +23636,7 @@ nb-x-k12:
   this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Denne ePortfolioen er identifisert som mulig spam. Den er for øyeblikket kun synlig for administratorer og forfatteren. Hvis du er sikker på at innholdet ikke er spam kan du merke den som sikker. Hvis ikke kan du bekrefte at det er spam."
   this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Denne ePortfolioen er identifisert som spam og er bare synlig for deg. Vennligst kontakt en administrator hvis du har spørsmål."
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Denne ePortfolioen er identifisert som spam. Den er for øyeblikket kun synlig for administratorer og forfatteren. Hvis du er sikker på at innholdet ikke er spam kan du merke den som sikker."
+  this_event_b437db90: "Denne hendelsen"
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: "Denne funksjonen påvirker eksisterende data for alle åpne fag i kontoen."
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: "Denne funksjonen påvirker eksisterende data for en hel konto."
   this_feature_allows_teachers_to_create_anonymous_d_ea364dca: "Denne funksjonen lar lærere opprette anonyme diskusjoner og lar lærere aktivere innstillinger på fagnivå slik at elever kan opprette anonyme diskusjoner"
@@ -24024,6 +24046,7 @@ nb-x-k12:
     new_caledonia: "Ny Caledonia"
     new_delhi: "Ny Delhi"
     newfoundland: Newfoundland
+    norfolk_island: Norfolkøyene
     noronha: Noronha
     novosibirsk: Novosibirsk
     nukualofa: Nuku'alofa
@@ -24142,6 +24165,7 @@ nb-x-k12:
     learning_outcomes: Læringsutbytte
     messages: Meldinger
     outcome_artifacts: "Artefakter for mål"
+    topic: Tema
     view_in_separate_window: "Vis i eget vindu"
   tls_7a2eaba5: TLS
   to_1126ab55: " til"

@@ -328,8 +328,10 @@ describe "Api::V1::Assignment" do
         expect(json).not_to have_key "rubric"
       end
 
-      it "excludes rubric when no active rubric" do
-        @rubric.update!(workflow_state: "deleted")
+      it "excludes rubric when rubric association is not active" do
+        ra = assignment.rubric_association
+        ra.workflow_state = "deleted"
+        ra.save!
         json = api.assignment_json(assignment, user, session)
         expect(json).not_to have_key "rubric"
       end
@@ -756,6 +758,50 @@ describe "Api::V1::Assignment" do
 
         expect(assignment.duplicate_of.workflow_state).to eq "unpublished"
         expect(assignment.workflow_state).to eq "published"
+      end
+    end
+  end
+
+  describe "#update_api_assignment" do
+    subject { api.update_api_assignment(assignment, assignment_update_params, user) }
+
+    let(:user) { user_model }
+
+    context "when param[force_updated_at] is true" do
+      let(:assignment_update_params) do
+        ActionController::Parameters.new(
+          force_updated_at: true
+        )
+      end
+
+      context "and no assignment changes are made" do
+        it "sets updated_at" do
+          expect { subject }.to change { assignment.updated_at }
+        end
+      end
+    end
+
+    context "when param[force_updated_at] is false" do
+      let(:assignment_update_params) do
+        ActionController::Parameters.new(
+          force_updated_at: false
+        )
+      end
+
+      context "and no assignment changes are made" do
+        it "does not set updated_at" do
+          expect { subject }.not_to change { assignment.updated_at }
+        end
+      end
+
+      context "and assignment changes are made" do
+        before do
+          assignment_update_params.merge!(name: "new-name62183")
+        end
+
+        it "sets updated_at" do
+          expect { subject }.to change { assignment.updated_at }
+        end
       end
     end
   end

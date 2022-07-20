@@ -288,6 +288,42 @@ describe('ComposeModalContainer', () => {
       await waitFor(() => expect(mockedSetOnSuccess).toHaveBeenCalled())
     })
 
+    it('displays specific error message for reply errors', async () => {
+      const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
+
+      const mockConversationWithError = {
+        _id: '3',
+        messages: [
+          {
+            author: {
+              _id: '1337'
+            }
+          }
+        ]
+      }
+
+      const component = setup({
+        setOnSuccess: mockedSetOnSuccess,
+        isReply: true,
+        conversation: mockConversationWithError
+      })
+
+      // Set body
+      const bodyInput = await component.findByTestId('message-body')
+      fireEvent.change(bodyInput, {target: {value: 'Potato'}})
+
+      // Hit send
+      const button = component.getByTestId('send-button')
+      fireEvent.click(button)
+      await waitFor(() =>
+        expect(
+          component.queryByText(
+            'The following recipients have no active enrollment in the course, ["Student 2"], unable to send messages'
+          )
+        ).toBeInTheDocument()
+      )
+    })
+
     describe('Submission Comments', () => {
       const mockSubmission = {
         _id: '1',

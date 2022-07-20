@@ -45,8 +45,8 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - \
        nodejs \
        yarn="$YARN_VERSION" \
        libxmlsec1-dev \
-       python-lxml \
        python3-lxml \
+       python-is-python3 \
        libicu-dev \
        parallel \
        postgresql-client-$POSTGRES_CLIENT \
@@ -55,8 +55,6 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - \
        fontforge \
        git \
        build-essential \
-       python2 \
-       python-is-python2 \
   && rm -rf /var/lib/apt/lists/* \
   && mkdir -p /home/docker/.gem/ruby/$RUBY_MAJOR.0
 
@@ -74,7 +72,6 @@ RUN set -eux; \
     app/stylesheets/brandable_css_brands \
     app/views/info \
     config/locales/generated \
-    gems/canvas_i18nliner/node_modules \
     log \
     node_modules \
     packages/canvas-media/es \

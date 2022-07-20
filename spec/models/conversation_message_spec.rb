@@ -320,6 +320,52 @@ describe ConversationMessage do
     end
   end
 
+  context "log_conversation_message_metrics" do
+    it "logs inbox.message.created.react when react_inbox is ON in root account" do
+      Account.default.enable_feature! :react_inbox
+      allow(InstStatsd::Statsd).to receive(:increment)
+
+      course_with_teacher(active_all: true)
+      student1 = student_in_course(active_all: true).user
+      conversation = @teacher.initiate_conversation([student1])
+      conversation.add_message("hello", generate_user_note: false, root_account_id: Account.default.id)
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.created.react").at_least(:once)
+    end
+
+    it "logs inbox.message.created.legacy when react_inbox is OFF in root account" do
+      Account.default.disable_feature! :react_inbox
+      allow(InstStatsd::Statsd).to receive(:increment)
+
+      course_with_teacher(active_all: true)
+      student1 = student_in_course(active_all: true).user
+      conversation = @teacher.initiate_conversation([student1])
+      conversation.add_message("hello", generate_user_note: false, root_account_id: Account.default.id)
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.created.legacy").at_least(:once)
+    end
+
+    it "logs inbox.message.created.react when react_inbox is ON in site admin" do
+      Account.site_admin.enable_feature! :react_inbox
+      allow(InstStatsd::Statsd).to receive(:increment)
+
+      course_with_teacher(active_all: true)
+      student1 = student_in_course(active_all: true).user
+      conversation = @teacher.initiate_conversation([student1])
+      conversation.add_message("hello", generate_user_note: false, root_account_id: Account.default.id)
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.created.react").at_least(:once)
+    end
+
+    it "logs inbox.message.created.legacy when react_inbox is OFF in site admin" do
+      Account.site_admin.disable_feature! :react_inbox
+      allow(InstStatsd::Statsd).to receive(:increment)
+
+      course_with_teacher(active_all: true)
+      student1 = student_in_course(active_all: true).user
+      conversation = @teacher.initiate_conversation([student1])
+      conversation.add_message("hello", generate_user_note: false, root_account_id: Account.default.id)
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.created.legacy").at_least(:once)
+    end
+  end
+
   describe "reply_from" do
     before :once do
       course_with_teacher

@@ -123,6 +123,7 @@ class Folder < ActiveRecord::Base
   end
 
   alias_method :destroy_permanently!, :destroy
+
   def destroy
     self.workflow_state = "deleted"
     active_file_attachments.each(&:destroy)
@@ -134,11 +135,11 @@ class Folder < ActiveRecord::Base
   scope :active, -> { where("folders.workflow_state<>'deleted'") }
   scope :not_hidden, -> { where("folders.workflow_state<>'hidden'") }
   scope :not_locked, lambda {
-                       where("(folders.locked IS NULL OR folders.locked=?) AND ((folders.lock_at IS NULL) OR
+    where("(folders.locked IS NULL OR folders.locked=?) AND ((folders.lock_at IS NULL) OR
     (folders.lock_at>? OR (folders.unlock_at IS NOT NULL AND folders.unlock_at<?)))", false, Time.now.utc, Time.now.utc)
-                     }
+  }
   scope :by_position, -> { ordered }
-  scope :by_name, -> { order(name_order_by_clause("folders")) }
+  scope :by_name, -> { order(name_order_by_clause("folders"), :id) }
 
   def display_name
     name
@@ -159,6 +160,7 @@ class Folder < ActiveRecord::Base
   def infer_hidden_state
     self.workflow_state ||= parent_folder.workflow_state if parent_folder && !deleted?
   end
+
   protected :infer_hidden_state
 
   def infer_full_name
@@ -176,6 +178,7 @@ class Folder < ActiveRecord::Base
     end
     @folder_id = id
   end
+
   protected :infer_full_name
 
   def prevent_duplicate_name
@@ -204,6 +207,7 @@ class Folder < ActiveRecord::Base
     usable_iterator ||= existing_folders.size + 1
     self.name = "#{name} #{usable_iterator}"
   end
+
   protected :prevent_duplicate_name
 
   def update_sub_folders
@@ -460,15 +464,14 @@ class Folder < ActiveRecord::Base
   end
 
   def self.resolve_path(context, path, include_hidden_and_locked = true)
-    path_components =
-      case path
-      when Array
-        path
-      when String
-        path.split("/")
-      else
-        []
-      end
+    path_components = case path
+                      when Array
+                        path
+                      when String
+                        path.split("/")
+                      else
+                        []
+                      end
 
     Folder.root_folders(context).each do |root_folder|
       folders = root_folder.get_folders_by_component(path_components, include_hidden_and_locked)
@@ -497,6 +500,7 @@ class Folder < ActiveRecord::Base
   def currently_locked
     locked || (lock_at && Time.zone.now > lock_at) || (unlock_at && Time.zone.now < unlock_at) || self.workflow_state == "hidden"
   end
+
   alias_method :currently_locked?, :currently_locked
 
   set_policy do

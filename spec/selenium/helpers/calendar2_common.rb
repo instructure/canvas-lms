@@ -72,6 +72,29 @@ module Calendar2Common
     ag.title
   end
 
+  def create_calendar_event_series(context, title, start_at, duration = 1.hour, rrule = "FREQ=DAILY;INTERVAL=1;COUNT=3")
+    rr = RRule::Rule.new(
+      rrule,
+      dtstart: start_at,
+      tzid: Time.zone.tzinfo.name
+    )
+    event_attributes = {
+      title: title,
+      rrule: rrule,
+      series_uuid: SecureRandom.uuid
+    }
+    dtstart_list = rr.all
+
+    dtstart_list.map do |dtstart|
+      event_attributes["start_at"] = dtstart.iso8601
+      event_attributes["end_at"] = (dtstart + duration).iso8601
+      event_attributes["context_code"] = context.asset_string
+      event = context.calendar_events.build(event_attributes)
+      event.updating_user = @teacher
+      event.save!
+    end
+  end
+
   def open_edit_event_dialog
     f(".fc-event").click
     expect(f(".edit_event_link")).to be_displayed
@@ -326,5 +349,22 @@ module Calendar2Common
 
   def find_appointment_button
     f("#FindAppointmentButton")
+  end
+
+  # return the parent of the <input> since you can't click the input
+  def event_series_this_event
+    f("[name='which'][value='one']").find_element(xpath: "./..")
+  end
+
+  def event_series_following_events
+    f("[name='which'][value='following']").find_element(xpath: "./..")
+  end
+
+  def event_series_all_events
+    f("[name='which'][value='all']").find_element(xpath: "./..")
+  end
+
+  def event_series_delete_button
+    fj('button:contains("Delete")')
   end
 end

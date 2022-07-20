@@ -28,11 +28,6 @@ die () {
 }
 
 _canvas_lms_opt_in_telemetry "$SCRIPT_NAME" "$LOG"
-if installed mutagen; then
-  print_mutagen_intro
-  DOCKER_COMMAND="mutagen-compose"
-  IS_MUTAGEN=true
-fi
 
 while :; do
   case $1 in

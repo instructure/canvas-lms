@@ -239,6 +239,7 @@ zh-Hans:
   a_table_that_contains_the_grading_scheme_data_each_d461c205: 一个表格，包含评分方案数据。每行包含名称、最大百分比和最小百分比。此外，每行包含一个用于在下面添加新行的图标，以及一个用于删除当前行的图标。
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: 一份包含评分方案数据的表格。每行包含一个名称，一个最大百分比和最小百分比。此外，每行还包含一个在下方添加新行的按钮，以及一个删除当前行的按钮。
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: 含有评分方案数据的表格。首先是评分方案的名称以及用于编辑和删除该方案的按钮。每一行含有一个名称、一个最大百分比值以及一个最小百分比值。此外，每一行还含有一个用于在下面添加新行的按钮，以及一个用于删除当前行的按钮。
+  a_timeout_occurred_contacting_external_authenticat_c064ea48: 联系外部身份验证服务时超时
   a_z_243c3301: A–Z
   a_z_29d8e67c: "A - Z"
   ability_to_submit_annotatable_document_assignments_5bc5edd3: 提交注释文档作业的功能。
@@ -1251,6 +1252,10 @@ zh-Hans:
                 check_box: "小组 CSV"
               pseudonyms: 
                 check_box: "假名 CSV"
+              question_bank_questions: 
+                check_box: 题库问题
+              question_banks: 
+                check_box: 题库
               sections: 
                 check_box: "班级 CSV"
               terms: 
@@ -2242,6 +2247,7 @@ zh-Hans:
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: 所有日期栏必须以正确的格式呈现
   all_day_fb42c4fc: 全天
   all_discussion_entries_report_c1e02906: 所有讨论条目报告
+  all_events_6ae4331b: 所有事件
   all_finished_time_to_publish_your_course_click_the_b6f07217: 全部完成？该发布您的课程了！单击下面的按钮使其成为正式课程！通过发布，学生将可以开始参加该课程。
   all_get_scopes_59a54304: "所有 GET 范围"
   all_gradeable_student_submissions_report_d11ee705: 所有可评分的学生提交项报告
@@ -2269,6 +2275,7 @@ zh-Hans:
   all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "来自 %{groupTitle} 的所有结果已成功添加到此课程。"
   all_outcomes_from_grouptitle_have_been_successfull_6267efe4: "来自 %{groupTitle} 的所有结果已成功添加到 %{targetGroupTitle}。"
   all_outcomes_from_grouptitle_have_been_successfull_cb6ad008: "来自 %{groupTitle} 的所有结果已成功添加到此帐户。"
+  all_quiz_submissions_9519d342: 所有测验提交项
   all_quiz_submissions_report_72a6d2fa: 所有测验提交项报告
   all_roles_f3bba14d: 所有身份
   all_rubrics_5114c466: 所有评分标准说明
@@ -3459,6 +3466,7 @@ zh-Hans:
   appointment_groups_bd225e60: 约会组
   appointments_dcb41d23: 预约
   approved_c3b285d4: 已批准
+  approximate_quiz_sessions_e522a3a1: 估计测验课程
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} 精确到 %{precision}"
   apps_54d24a47: 应用程序
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "应用程序是向 Canvas 添加新功能的简单方式。这些功能可添加到帐户中的各个课程或所有课程。配置完毕后，您可以通过课程单元与其链接，并为测验工具创建作业。"
@@ -4804,6 +4812,7 @@ zh-Hans:
   back_to_title_39e7a8f4: "回到%{title}"
   background_color_b92b52ac: 背景颜色
   background_image_1a401e1a: 背景图像
+  bank_grouped_quiz_submissions_479ad830: 题库分组的测验提交项
   banner_image_id_is_not_a_valid_id_21ecc6: "banner_image_id 不是有效的 ID"
   banner_image_url_and_banner_image_id_cannot_both_b_955615f5: "banner_image_url 和 banner_image_id 无法同时设置"
   banner_image_url_is_not_a_valid_url_830d7926: "banner_image_url 不是有效的 URL"
@@ -8830,6 +8839,8 @@ zh-Hans:
   create_file_s_188549e6: "[创建文件]"
   create_files_after_rce_media_upload_recording_77d75a96: "在上传/录制 RCE 媒体后创建文件"
   create_group_set_7fe1cd53: 创建小组集
+  create_groups_later_6ce36058: 稍后创建组
+  create_groups_now_d59bf70b: 立即创建组
   create_interactive_course_content_76665336: 创建互动式课程内容
   create_item_base: 
     there_was_an_error: "保存 \"%{title}\" 时出错，请重试。"
@@ -9310,6 +9321,7 @@ zh-Hans:
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: 在定义文本之前，以及在下拉和设立一组可能的答案之后。
   delay_posting_this_topic_until_aa483eec: 延迟发布此话题直到
   delayed_until_58b7af4b: 延期至：
+  delete_8d6d2222: 删除：
   delete_a143a2ab: 删除
   delete_a6efa79d: 删除
   delete_account_name_96aee330: "删除%{account_name}"
@@ -9339,6 +9351,7 @@ zh-Hans:
   delete_domain_5ba75b7c: 删除域
   delete_domain_domain_c5b68f5: "删除域 %{domain}"
   delete_entry_title_5e59727b: "删除条目%{title}"
+  delete_failed_6285e600: 删除失败
   delete_feedname_1ac9a4a4: "删除%{feedName}"
   delete_filter_83ca1a6a: 删除过滤器
   delete_from_all_accounts_a1c5e621: 从所有帐户中删除
@@ -9418,6 +9431,7 @@ zh-Hans:
       该操作无法撤回。是否确定要删除 %{file}？
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: 删除用户会销毁其所有ePortfolios。或者，可以单独将ePortfolios标注为‘垃圾邮件’或‘安全’，以更改其可见性。
   deleting_assignment_22d5851d: 正在删除作业
+  deleting_b896f5f: 正在删除
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "演示站点要求配置 Recaptcha 设置。请联系您的站点管理员获取此 Canvas 实例。"
   demos: 
@@ -11249,6 +11263,7 @@ zh-Hans:
   example_https_schoolofrock_edu_d4326f03: "示例：\"https://schoolofrock.edu\""
   example_item_scores_6726c689: 项目分数示例
   example_school_of_rock_41f32c31: 示例：“摇滚教室”
+  exceeded_the_maximum_length_number_characters_2d25611e: "超过最大长度（%{number} 个字符）"
   exceeds_expectations_5910fc3a: 超出预期
   exceeds_mastery_1f995dce: 超过掌握
   excelsior_student_activity_tracking_7a1ba44d: "Excelsior 学生活动记录"
@@ -15120,6 +15135,7 @@ zh-Hans:
   limit_each_time_slot_to_input_value_user_s_47461538: "把每个时段限制为%{input_value}个用户。"
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "对*小组。* **用户。**限制每个时段 %{num_participants}"
   limit_file_size_limit_per_file_b336c0d8: "每个文件限制%{file_size_limit}"
+  limit_group_members_to_leave_blank_for_no_limit_c341e248: 将组成员限制为（无限制则留空）
   limit_groups_to_group_limit_members_40651ea7: "限制小组不超过 %{group_limit} 个成员"
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "限制参与者出席%{num_appointments} 的预约。"
   limit_search_to_activity_after_c1ac2449: 限制搜索活动后
@@ -19039,6 +19055,7 @@ zh-Hans:
   number_of_members_per_group_6beaef7b: 每个小组的人数
   number_of_respondents_e1e7e8b: 应答者的数量
   number_of_scores_to_ignore_for_each_student_fb94e818: 为每位学生忽略的分数数量
+  number_of_students_per_group_8abe7189: 每组学生人数
   number_to_grade_661b05dd: "%{number}评分"
   number_unsubmitted_145fefae: "%{number}未提交"
   numerical_answer_ec7120bf: 数值答案
@@ -25205,7 +25222,9 @@ zh-Hans:
   speedgrader_tm_44688790: 快速评分器™
   split_74c03348: 拆分
   split_merged_users_6b81c595: 拆分合并的用户
+  split_number_of_students_per_group_4a05f76f: 每组划分学生人数
   split_student_names_df0ef806: 拆分学生姓名
+  split_students_by_number_of_groups_5ace5a6a: 按组数划分学生
   split_students_into_groups_with_num_members_studen_c49d5136: "将学生分组，每组 %{num_members} 人"
   split_students_into_num_groups_groups_e9854f16: "把学生分入%{num_groups}小组内"
   splitting_disabled_reached_maximum_of_three_assign_716acb13: 禁用分割：已达到分数范围内的最多三个作业组
@@ -26248,6 +26267,7 @@ zh-Hans:
   the_following_outcomes_cannot_be_removed_because_t_1c4b8ef9: 
     one: 无法删除以下结果，原因是它们已经与内容对齐。请取消选择并重试。
     other: 无法删除以下结果，原因是它们已经与内容对齐。请取消选择并重试。
+  the_following_recipients_have_no_active_enrollment_17395ab4: "以下收件人没有当前课程注册信息：%{invalid_recipients}，无法发送消息"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
       以下学生具有未保存的测验提交项变更：
       
@@ -26601,6 +26621,7 @@ zh-Hans:
                      这将通过更新的内容安全策略 (CSP) 启用。
                      域将通过手动添加域的功能添加到您的白名单。
                      白名单中最多可添加 100 个域。
+  this_and_all_following_events_4b4b283: 此事件和所有后续事件
   this_announcement_will_not_be_visible_until_delaye_88f7f5c: "该公告直到 %{delayedPostAt} 才可见。"
   this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: 此区域将供评估人员留下有关此标准的评论。
   this_assignment_does_not_count_toward_the_final_gr_29ede05f: 此作业无法计入最终评分。
@@ -26658,6 +26679,7 @@ zh-Hans:
   this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: 此ePortfolio已被识别为潜在垃圾邮件。目前仅管理员和作者可见。若您确定此内容不是垃圾邮件，您可标记为安全。否则，您可确认其为垃圾邮件。
   this_eportfolio_has_been_identified_as_spam_and_is_8430467: 此ePortfolio已被识别为垃圾邮件，仅您可见。若有问题，请联系管理员。
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: 此ePortfolio已被识别为垃圾邮件。目前仅管理员和作者可见。若您确定此内容不是垃圾邮件，您可标记为安全。
+  this_event_b437db90: 此事件
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: 此功能影响帐户中所有课程的现有数据。
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: 此功能影响整个帐户中的现有数据。
   this_feature_allows_teachers_to_create_anonymous_d_ea364dca: 该功能允许教师创建匿名讨论，并允许教师为学生启用课程级设置以创建匿名讨论
@@ -27079,6 +27101,7 @@ zh-Hans:
     new_caledonia: 新喀里多尼亚
     new_delhi: 新德里
     newfoundland: 纽芬兰
+    norfolk_island: 诺福克岛
     noronha: Noronha
     novosibirsk: 诺沃西比尔斯克
     nukualofa: 努库阿洛法
@@ -27198,6 +27221,7 @@ zh-Hans:
     messages: 消息
     outcome_artifacts: 结果产物
     people: 人员
+    topic: 主题
     view_in_separate_window: 在单独的窗口中查看
   tls_7a2eaba5: TLS
   to_1126ab55: 截止日期

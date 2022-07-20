@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -22,7 +22,6 @@ import {MockedProvider} from '@apollo/react-testing'
 import {render as realRender, fireEvent, waitFor} from '@testing-library/react'
 import OutcomeRemoveModal from '../OutcomeRemoveModal'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
-import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import {accountMocks, deleteOutcomeMock} from '@canvas/outcomes/mocks/Management'
 
 const outcomesGenerator = (startId, count, canUnlink = true, sameGroup = false, title = '') =>
@@ -44,8 +43,8 @@ const outcomesGenerator = (startId, count, canUnlink = true, sameGroup = false, 
 describe('OutcomeRemoveModal', () => {
   let onCloseHandlerMock
   let onCleanupHandlerMock
-  let showFlashAlertSpy
   let onRemoveLearningOutcomesHandlerMock
+  let removeOutcomes
   let cache
 
   const defaultProps = (props = {}) => ({
@@ -54,6 +53,7 @@ describe('OutcomeRemoveModal', () => {
     onCloseHandler: onCloseHandlerMock,
     onCleanupHandler: onCleanupHandlerMock,
     onRemoveLearningOutcomesHandler: onRemoveLearningOutcomesHandlerMock,
+    removeOutcomes,
     ...props
   })
 
@@ -62,7 +62,7 @@ describe('OutcomeRemoveModal', () => {
     onCloseHandlerMock = jest.fn()
     onCleanupHandlerMock = jest.fn()
     onRemoveLearningOutcomesHandlerMock = jest.fn()
-    showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+    removeOutcomes = jest.fn()
   })
 
   afterEach(() => {
@@ -137,71 +137,6 @@ describe('OutcomeRemoveModal', () => {
 
         await waitFor(() => {
           expect(onRemoveLearningOutcomesHandlerMock).toHaveBeenCalledWith(['1'])
-        })
-      })
-
-      it('displays flash confirmation with proper message if delete request succeeds', async () => {
-        const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
-          mocks: [deleteOutcomeMock()]
-        })
-        fireEvent.click(getByText('Remove Outcome'))
-        await waitFor(() => {
-          expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: 'This outcome was successfully removed.',
-            type: 'success'
-          })
-        })
-      })
-
-      it('displays flash confirmation with proper message if delete request fails', async () => {
-        const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
-          mocks: [deleteOutcomeMock({failResponse: true})]
-        })
-        fireEvent.click(getByText('Remove Outcome'))
-        await waitFor(() => {
-          expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: 'An error occurred while removing this outcome. Please try again.',
-            type: 'error'
-          })
-        })
-      })
-
-      it('displays flash confirmation with proper message if delete request fails because it is aligned with content', async () => {
-        const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
-          mocks: [deleteOutcomeMock({failAlignedContentMutation: true})]
-        })
-        fireEvent.click(getByText('Remove Outcome'))
-        await waitFor(() => {
-          expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: 'An error occurred while removing this outcome. Please try again.',
-            type: 'error'
-          })
-        })
-      })
-
-      it('displays flash confirmation with proper message if delete mutation fails', async () => {
-        const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
-          mocks: [deleteOutcomeMock({failMutation: true})]
-        })
-        fireEvent.click(getByText('Remove Outcome'))
-        await waitFor(() => {
-          expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: 'An error occurred while removing this outcome. Please try again.',
-            type: 'error'
-          })
-        })
-      })
-
-      it('displays flash confirmation with proper message if delete request fails with no error message', async () => {
-        const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
-          mocks: [deleteOutcomeMock({failMutationNoErrMsg: true})]
-        })
-        fireEvent.click(getByText('Remove Outcome'))
-        await waitFor(() => {
-          expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: 'An error occurred while removing this outcome. Please try again.',
-            type: 'error'
-          })
         })
       })
     })
@@ -424,106 +359,6 @@ describe('OutcomeRemoveModal', () => {
 
         await waitFor(() => {
           expect(onRemoveLearningOutcomesHandlerMock).toHaveBeenCalledWith(['1', '2'])
-        })
-      })
-
-      it('displays flash confirmation with proper message if delete request succeeds', async () => {
-        const {getByText} = render(
-          <OutcomeRemoveModal
-            {...defaultProps({
-              outcomes: outcomesGenerator(1, 2, true)
-            })}
-          />,
-          {
-            mocks: [deleteOutcomeMock({ids: ['1', '2']})]
-          }
-        )
-        fireEvent.click(getByText('Remove Outcomes'))
-        await waitFor(() => {
-          expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: '2 outcomes were successfully removed.',
-            type: 'success'
-          })
-        })
-      })
-
-      it('displays flash confirmation with proper message if delete request fails', async () => {
-        const {getByText} = render(
-          <OutcomeRemoveModal
-            {...defaultProps({
-              outcomes: outcomesGenerator(1, 2, true)
-            })}
-          />,
-          {
-            mocks: [deleteOutcomeMock({ids: ['1', '2'], failResponse: true})]
-          }
-        )
-        fireEvent.click(getByText('Remove Outcomes'))
-        await waitFor(() => {
-          expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: 'An error occurred while removing these outcomes. Please try again.',
-            type: 'error'
-          })
-        })
-      })
-
-      it('displays flash confirmation with proper message if delete mutation fails', async () => {
-        const {getByText} = render(
-          <OutcomeRemoveModal
-            {...defaultProps({
-              outcomes: outcomesGenerator(1, 2, true)
-            })}
-          />,
-          {
-            mocks: [deleteOutcomeMock({ids: ['1', '2'], failMutation: true})]
-          }
-        )
-        fireEvent.click(getByText('Remove Outcomes'))
-        await waitFor(() => {
-          expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: 'An error occurred while removing these outcomes. Please try again.',
-            type: 'error'
-          })
-        })
-      })
-
-      it('displays flash confirmation with proper message if delete request fails with no error message', async () => {
-        const {getByText} = render(
-          <OutcomeRemoveModal
-            {...defaultProps({
-              outcomes: outcomesGenerator(1, 2, true)
-            })}
-          />,
-          {
-            mocks: [deleteOutcomeMock({ids: ['1', '2'], failMutationNoErrMsg: true})]
-          }
-        )
-        fireEvent.click(getByText('Remove Outcomes'))
-        await waitFor(() => {
-          expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: 'An error occurred while removing these outcomes. Please try again.',
-            type: 'error'
-          })
-        })
-      })
-
-      it('displays flash generic error if remove outcomes mutation partially succeeds', async () => {
-        const {getByText} = render(
-          <OutcomeRemoveModal
-            {...defaultProps({
-              outcomes: outcomesGenerator(1, 2, true)
-            })}
-          />,
-          {
-            mocks: [deleteOutcomeMock({ids: ['1', '2'], partialSuccess: true})]
-          }
-        )
-        fireEvent.click(getByText('Remove Outcomes'))
-        await waitFor(() => {
-          expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: 'An error occurred while removing these outcomes. Please try again.',
-            type: 'error'
-          })
         })
       })
     })

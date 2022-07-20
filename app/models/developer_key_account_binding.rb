@@ -32,9 +32,9 @@ class DeveloperKeyAccountBinding < ApplicationRecord
 
   validates :account, :developer_key, presence: true
 
+  before_save :set_root_account
   after_update :clear_cache_if_site_admin
   after_update :update_tools!
-  before_save :set_root_account
 
   # Find a DeveloperKeyAccountBinding in order of accounts. The search for a binding will
   # be prioritized by the order of accounts. If a binding is found for the first account

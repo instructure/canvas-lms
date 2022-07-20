@@ -181,10 +181,10 @@ export default function EnhancedActionMenu(props) {
 
     if (!completedLastExport || !attachment) return undefined
 
-    const updatedAt = tz.parse(attachment.updatedAt)
+    const createdAt = tz.parse(attachment.createdAt)
 
     return {
-      label: `${I18n.t('Previous Export')} (${DateHelper.formatDatetimeForDisplay(updatedAt)})`,
+      label: `${I18n.t('Previous Export')} (${DateHelper.formatDatetimeForDisplay(createdAt)})`,
       attachmentUrl: attachment.downloadUrl
     }
   }
@@ -339,7 +339,8 @@ EnhancedActionMenu.propTypes = {
   attachment: shape({
     id: string.isRequired,
     downloadUrl: string.isRequired,
-    updatedAt: string.isRequired
+    updatedAt: string.isRequired,
+    createdAt: string.isRequired
   }),
 
   postGradesLtis: arrayOf(

@@ -150,7 +150,21 @@ describe('HeaderInputs', () => {
       expect(container.queryByTestId('faculty-message-checkbox')).not.toBeInTheDocument()
     })
 
-    it('does not render if no course is chosen', async () => {
+    it('renders if no course is chosen', async () => {
+      const recipientPropInfo = defaultRecipientProps()
+      recipientPropInfo.activeCourseFilter = undefined
+      const props = defaultProps(recipientPropInfo)
+      const container = setup(props)
+
+      expect(container.queryByTestId('faculty-message-checkbox')).toBeInTheDocument()
+    })
+
+    it('does not render if CAN_AND_NOTES_FOR_ACCOUNT is false', async () => {
+      window.ENV = {
+        CONVERSATIONS: {
+          CAN_ADD_NOTES_FOR_ACCOUNT: false
+        }
+      }
       const recipientPropInfo = defaultRecipientProps()
       recipientPropInfo.activeCourseFilter = undefined
       const props = defaultProps(recipientPropInfo)
@@ -250,22 +264,7 @@ describe('HeaderInputs', () => {
     fireEvent.mouseDown(items[1])
 
     expect(container.findAllByTestId('address-book-tag')).toBeTruthy()
-
-    expect(props.onSelectedIdsChange).toHaveBeenCalledWith([
-      {
-        _id: '1',
-        id: 'TWVzc2FnZWFibGVVc2VyLTQx',
-        itemType: 'user',
-        name: 'Frederick Dukes',
-        commonCoursesInfo: [
-          {
-            courseID: '196',
-            courseRole: 'StudentEnrollment'
-          }
-        ],
-        isLast: true
-      }
-    ])
+    expect(props.onSelectedIdsChange.mock.calls[0][0][0]._id).toBe('1')
   })
 
   describe('Media Comments', () => {

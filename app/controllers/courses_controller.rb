@@ -1672,13 +1672,8 @@ class CoursesController < ApplicationController
       @course.default_due_time = normalize_due_time(default_due_time)
     end
 
-    if params.key?(:conditional_release)
-      if !value_to_boolean(params[:conditional_release])
-        @course.disable_conditional_release
-      elsif @course.account.conditional_release?
-        @course.conditional_release = true
-      end
-    end
+    # Remove the conditional release param if the account is locking the feature
+    params[:conditional_release] = nil if params.key?(:conditional_release) && @course.account.conditional_release[:locked]
 
     @course.attributes = params.permit(
       :allow_final_grade_override,
@@ -1705,12 +1700,15 @@ class CoursesController < ApplicationController
       :homeroom_course_id,
       :course_color,
       :friendly_name,
-      :enable_course_paces
+      :enable_course_paces,
+      :conditional_release
     )
     changes = changed_settings(@course.changes, @course.settings, old_settings)
 
     @course.delay_if_production(priority: Delayed::LOW_PRIORITY)
            .touch_content_if_public_visibility_changed(changes)
+
+    disable_conditional_release if changes[:conditional_release]&.last == false
 
     DueDateCacher.with_executing_user(@current_user) do
       if @course.save
@@ -2305,7 +2303,7 @@ class CoursesController < ApplicationController
           css_bundle :new_assignments
           add_body_class("hide-content-while-scripts-not-loaded", "with_item_groups")
         when "syllabus"
-          js_bundle :syllabus
+          deferred_js_bundle :syllabus
           css_bundle :syllabus, :tinymce
         when "k5_dashboard"
           embed_mode = value_to_boolean(params[:embed])
@@ -2900,6 +2898,10 @@ class CoursesController < ApplicationController
   # @argument course[conditional_release] [Boolean]
   #   Enable or disable individual learning paths for students based on assessment
   #
+  # @argument override_sis_stickiness [boolean]
+  #   By default and when the value is true it updates all the fields
+  #   when the value is false then fields which in stuck_sis_fields will not be updated
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id> \
   #     -X PUT \
@@ -3136,14 +3138,14 @@ class CoursesController < ApplicationController
         end
 
         if (mc_restrictions = params[:course][:blueprint_restrictions])
-          template.default_restrictions = mc_restrictions.to_unsafe_h.map { |k, v| [k.to_sym, value_to_boolean(v)] }.to_h
+          template.default_restrictions = mc_restrictions.to_unsafe_h.to_h { |k, v| [k.to_sym, value_to_boolean(v)] }
         end
 
         if (mc_restrictions_by_type = params[:course][:blueprint_restrictions_by_object_type])
           parsed_restrictions_by_type = {}
           mc_restrictions_by_type.to_unsafe_h.each do |type, restrictions|
             class_name = type == "quiz" ? "Quizzes::Quiz" : type.camelcase
-            parsed_restrictions_by_type[class_name] = restrictions.map { |k, v| [k.to_sym, value_to_boolean(v)] }.to_h
+            parsed_restrictions_by_type[class_name] = restrictions.to_h { |k, v| [k.to_sym, value_to_boolean(v)] }
           end
           template.default_restrictions_by_type = parsed_restrictions_by_type
         end
@@ -3153,6 +3155,10 @@ class CoursesController < ApplicationController
 
           @course.errors.add(:master_course_restrictions, t("Invalid restrictions")) unless template.save
         end
+      end
+
+      if params[:override_sis_stickiness] && !value_to_boolean(params[:override_sis_stickiness])
+        params_for_update -= [*@course.stuck_sis_fields]
       end
 
       @course.attributes = params_for_update
@@ -3167,7 +3173,7 @@ class CoursesController < ApplicationController
       if @course.account.feature_enabled?(:course_paces) && (changes.keys & %w[start_at conclude_at restrict_enrollments_to_course_dates]).present?
         @course.course_paces.find_each(&:create_publish_progress)
       end
-      @course.disable_conditional_release if changes[:conditional_release]&.last == false
+      disable_conditional_release if changes[:conditional_release]&.last == false
 
       # RUBY 3.0 - **{} can go away, because data won't implicitly convert to kwargs
       @course.delay_if_production(priority: Delayed::LOW_PRIORITY).touch_content_if_public_visibility_changed(changes, **{})
@@ -3980,5 +3986,11 @@ class CoursesController < ApplicationController
       :show_announcements_on_home_page, :home_page_announcement_limit, :allow_final_grade_override, :filter_speed_grader_by_student_group, :homeroom_course,
       :template, :course_color, :homeroom_course_id, :sync_enrollments_from_homeroom, :friendly_name, :enable_course_paces, :default_due_time, :conditional_release
     )
+  end
+
+  def disable_conditional_release
+    ConditionalRelease::Service.delay_if_production(priority: Delayed::LOW_PRIORITY,
+                                                    n_strand: ["conditional_release_unassignment", @course.global_root_account_id])
+                               .release_mastery_paths_content_in_course(@course)
   end
 end

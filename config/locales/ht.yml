@@ -235,6 +235,7 @@ ht:
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "Yon tablo repons kout ak estatistik konsènan chwa repons elèv la."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Yon tablo ki genyen done sistèn notasyon. Chak liy gen yon non, yon pousantaj maksimòm e yon pousantaj minimòm. Anplis de sa, chak liy gen yon touch pou ajoute yon lòt liy anba li, epi yon lòt touch pou efase liy sa a."
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "Yon tablo ki gen done sistèm klasman an. Toudabò gen non sistèm klasman an ak bouton ki pèmèt chanje oswa efase sistèm nan. chak liy gen yon non, yon pousantaj maksimòm ak yon pousantaj minimòm. Anplis de sa, chak liy gen yon bouton pou ajoute yon nouvo liy anba, epi yon lòt bouton pou efase liy sa a."
+  a_timeout_occurred_contacting_external_authenticat_c064ea48: "Gen yon reta ki pwodui pandan kontak ap fèt avèk sèvis otantifikasyon ekstèn nan."
   a_z_243c3301: A–Z
   a_z_29d8e67c: "A - Z"
   ability_to_submit_annotatable_document_assignments_5bc5edd3: "Posibilite pou soumèt devwa de dokiman anotab"
@@ -1232,6 +1233,10 @@ ht:
                 check_box: "CSV Gwoup"
               pseudonyms: 
                 check_box: "Sedomin CSV"
+              question_bank_questions: 
+                check_box: "Kesyon nan Bank Kesyon"
+              question_banks: 
+                check_box: "Bank Kesyon"
               sections: 
                 check_box: "CSV Seksyon"
               terms: 
@@ -2161,6 +2166,7 @@ ht:
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Tout espas dat yo dwe prezan e byen fòmate"
   all_day_fb42c4fc: "Tout Jounen"
   all_discussion_entries_report_c1e02906: "Rapò sou Tout Antre Diskisyon yo"
+  all_events_6ae4331b: "Tout evènman yo"
   all_finished_time_to_publish_your_course_click_the_b6f07217: "Tout fini? Lè a rive pou pibliye kou ou a! Klike sou touch pi ba a pou rann li ofisyèl! Piblikasyon an ap pèmèt itilizatè yo patisipe nan kou a."
   all_get_scopes_59a54304: "Tout JWENN pòte"
   all_gradeable_student_submissions_report_d11ee705: "Rapò sou Tout Soumisyon Elèv ki ka Note"
@@ -2187,6 +2193,7 @@ ht:
   all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "Tout rezilta %{groupTitle} yo te ajoute nan kou sa a avèk siksè."
   all_outcomes_from_grouptitle_have_been_successfull_6267efe4: "Tout rezilta de %{groupTitle} rive ajoute avèk siksè nan %{targetGroupTitle}."
   all_outcomes_from_grouptitle_have_been_successfull_cb6ad008: "Tout rezilta %{groupTitle} yo te ajoute sou kont sa a avèk siksè."
+  all_quiz_submissions_9519d342: "Tout Soumisyon Quiz yo"
   all_quiz_submissions_report_72a6d2fa: "Rapò Soumisyon Tout Quiz"
   all_roles_f3bba14d: "Tout Wòl"
   all_rubrics_5114c466: "Tout Ribrik"
@@ -3361,6 +3368,7 @@ ht:
   appointment_groups_bd225e60: "Gwoup Randenvou"
   appointments_dcb41d23: Randevou
   approved_c3b285d4: Apwouve
+  approximate_quiz_sessions_e522a3a1: "Sesyon Quiz Apwoksimatif"
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} ak presizyon %{precision}"
   apps_54d24a47: Apps
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Apps yo se yon mwayen fasil pou ajoute nouvo fonksyonalite nan Canvas. Ou ka ajoute yo nan yon kou oswa nan tout kou ki nan yon kont. Kou li fin konfigire, ou ka lye avèk yo atravè modil kou epi kreye sesyon pou zouti evalyasyon yo."
@@ -4588,6 +4596,7 @@ ht:
   back_to_title_39e7a8f4: "Retounen nan %{title}"
   background_color_b92b52ac: "Koulè Fon"
   background_image_1a401e1a: "Imaj de Fon"
+  bank_grouped_quiz_submissions_479ad830: "Soumisyon Quiz Gwoupe pa Bank"
   banner_image_id_is_not_a_valid_id_21ecc6: "banner_image_id pa yon ID valid"
   banner_image_url_and_banner_image_id_cannot_both_b_955615f5: "banner_image_url ak banner_image_id paka defini ansanm."
   banner_image_url_is_not_a_valid_url_830d7926: "banner_image_url pa yon URL valid"
@@ -8418,6 +8427,8 @@ ht:
   create_file_s_188549e6: "[ Kreye Fichye ]"
   create_files_after_rce_media_upload_recording_77d75a96: "Kreye Fichye aprè Transfè/Anrejistreman Medya RCE"
   create_group_set_7fe1cd53: "Kreye Ansanm Gwoup"
+  create_groups_later_6ce36058: "Kreye gwoup yo apre"
+  create_groups_now_d59bf70b: "Kreye gwoup yo kounye a"
   create_interactive_course_content_76665336: "Kreye kontni kou entèaktif"
   create_live_event_subscriptions_on_toolproxy_7c8378b1: "Kreye abònman nan aktivite an dirèk sou ToolProxy"
   create_lookup_7ceb6d90: "Kreye Rechèch"
@@ -8866,6 +8877,7 @@ ht:
   define_text_to_go_before_and_after_the_dropdown_an_be8d16e2: "Defini tèks ki prale anvan e aprè lis dewoulan an epi etabli yon seri repons posib."
   delay_posting_this_topic_until_aa483eec: "Retade piblikasyon sijè sa a jiska"
   delayed_until_58b7af4b: "Retade Jiska:"
+  delete_8d6d2222: "Elimine: "
   delete_a143a2ab: efase
   delete_a6efa79d: Efase
   delete_account_name_96aee330: "Efase %{account_name}"
@@ -8894,6 +8906,7 @@ ht:
   delete_domain_5ba75b7c: "Elimine domèn"
   delete_domain_domain_c5b68f5: "Elimine domèn %{domain}"
   delete_entry_title_5e59727b: "Elimine tèks %{title}"
+  delete_failed_6285e600: "Echèk sipresyon"
   delete_feedname_1ac9a4a4: "Efase %{feedName}"
   delete_filter_83ca1a6a: "Efase filtè"
   delete_from_all_accounts_a1c5e621: "Efase sou TOUT kont yo"
@@ -8970,6 +8983,7 @@ ht:
       Aksyon sa a kapa defèt. Ou swete efase tout bon %{file}?
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "Eliminasyon yon itilizatè ap detwi tout ePortfolio yo. Konsa tou, ePortfolio yo kapab make separeman kòm \"spam\" oswa \"sekirize\" pou ka chanje vizibilite yo."
   deleting_assignment_22d5851d: "Eliminasyon afektasyon"
+  deleting_b896f5f: Eliminasyon
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Sit demonstrasyon yo bezwen pou reglaj Recaptcha yo konfigire. Tanpri wè administratè sit ou a pou pwosesis Canvas sa a."
   demos: 
@@ -10698,6 +10712,7 @@ ht:
   example_https_schoolofrock_edu_d4326f03: "example: \"https://schoolofrock.edu\""
   example_item_scores_6726c689: "Egzanp nòt atik"
   example_school_of_rock_41f32c31: "example: \"School of Rock\""
+  exceeded_the_maximum_length_number_characters_2d25611e: "Depase kantite maksimòm (%{number} karaktè)"
   exceeds_expectations_5910fc3a: "Depase Esperans"
   exceeds_mastery_1f995dce: "Depase Metriz"
   excelsior_student_activity_tracking_7a1ba44d: "Kontwòl aktivite Elèv Excelsior"
@@ -14021,6 +14036,7 @@ ht:
   limit_course_participation_to_term_or_custom_cours_67797a86: "Limite patisipasyon nan kou yo nan dat trimès yo oswa kou pèsonalize yo?"
   limit_each_time_slot_to_input_value_user_s_47461538: "Limite chak entèval tan a %{input_value} itilizatè. "
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "Limite chak entèval tan a %{num_participants} *gwoup.* **itilizatè.**"
+  limit_group_members_to_leave_blank_for_no_limit_c341e248: "Limite manm gwoup yo a (kite vid pou okenn limit)"
   limit_groups_to_group_limit_members_40651ea7: "Limite gwoup a %{group_limit} manm"
   limit_participants_to_attend_num_appointments_appo_dd3fd62f: "Limite patisipan yo pou asiste %{num_appointments} rankont."
   limit_search_to_activity_after_c1ac2449: "Limite rechèch yo a aktivite aprè"
@@ -17593,6 +17609,7 @@ ht:
   number_of_members_per_group_6beaef7b: "Kantite manm pa gwoup"
   number_of_respondents_e1e7e8b: "Kantite Repondan"
   number_of_scores_to_ignore_for_each_student_fb94e818: "Kantite nòt ki inyore pou chak elèv"
+  number_of_students_per_group_8abe7189: "Kantite elèv pa gwoup"
   number_to_grade_661b05dd: "%{number} o nivo"
   number_unsubmitted_145fefae: "%{number} non soumèt"
   numerical_answer_ec7120bf: "Repons nimerik"
@@ -23240,7 +23257,9 @@ ht:
   speedgrader_tm_44688790: SpeedGrader™
   split_74c03348: Separe
   split_merged_users_6b81c595: "Fizyon Itilizatè Divize"
+  split_number_of_students_per_group_4a05f76f: "Divize kantite elèv yo pa gwoup"
   split_student_names_df0ef806: "Divize Non Elèv yo"
+  split_students_by_number_of_groups_5ace5a6a: "Divize elèv yo an fonksyon de kantite gwoup yo"
   split_students_into_groups_with_num_members_studen_c49d5136: "Divize elèv yo an gwoup de %{num_members} elèv pa gwoup"
   split_students_into_num_groups_groups_e9854f16: "Divize elèv yo an %{num_groups} gwoup"
   splitting_disabled_reached_maximum_of_three_assign_716acb13: "Fransyonman dezaktive: rive nan yon maksimpom de twa gwoup sesyon nan yon gam notasyon"
@@ -24248,6 +24267,7 @@ ht:
   the_following_outcomes_cannot_be_removed_because_t_1c4b8ef9: 
     one: "rezilta annapre a paka elimine paske li aliyen sou kontni an. Deseleksyone li epi eseye ankò."
     other: "Rezilta annapre a paka elimine paske li aliyen sou kontni an. Deseleksyone yo epi eseye ankò."
+  the_following_recipients_have_no_active_enrollment_17395ab4: "Destinatè sa yo pa gen enskripsyon aktif nan kou %{invalid_recipients}a, ni yo paka voye mesaj."
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
       Elèv annapre yo gen chanjman ki pa anrejistre nan soumisyon quiz yo a: 
       
@@ -24588,6 +24608,7 @@ ht:
                      Sa ap posib gras a yon mizajou Politik Sekirite Kontni (sig an Anglè CSP).
                      Y ap ajoute domèn yo nan lis blanch ou a epi w ap gen posibilite pou ajoute domèn manyèlman.
                      Gen yon limit 100 domèn nan lis blanch lan.
+  this_and_all_following_events_4b4b283: "Sa a ak tout pwochen aktivite yo"
   this_announcement_will_not_be_visible_until_delaye_88f7f5c: "Anons sa a pa p vizib anvan %{delayedPostAt}"
   this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: "Evalyatè a ap itilize espas sa a pou kite kòmantè ki gen rapò ak kritè sa a."
   this_assignment_does_not_count_toward_the_final_gr_29ede05f: "Sesyon sa a pa konte nan nòt final la"
@@ -24643,6 +24664,7 @@ ht:
   this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Yo idantifye ePortfolio sa a kòm posib pou li se spam. Pou kounye a li vizib sèlman pou otè a ak administratè yo. Si w asire w kontni sa a pa spam, ou gendwa make li sekirize. Osinon, ou ka konfime li se spam."
   this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Yo idantifye ePortfolio sa a kòm spam, sèlman ou menm k ap kapab wè li. Tanpri kontakte yon administratè si w ta gen kesyon."
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Yo idantifye ePortfolio sa a kòm spam. Pou kounye a li vizib sèlman pou otè a ak administratè yo. Si w asire w kontni sa a pa spam, ou gendwa make li sekirize."
+  this_event_b437db90: "Aktivite sa a"
   this_feature_affects_existing_data_for_all_courses_4fc75fe1: "Opsyon sa a afekte done ki egziste pou tout kou ki sou kont lan."
   this_feature_affects_existing_data_for_an_entire_a_2372dc52: "Opsyon sa a afekte done ki egziste pou yon kont an antye."
   this_feature_allows_teachers_to_create_anonymous_d_ea364dca: "Fonksyon sa a pèmèt pwofesè yo kreye diskisyon anonim epi li pèmèt pwofesè yo aktive yon paramèt onivo kou a pou etidyan yo kapab kreye diskisyon anonim."
@@ -25060,6 +25082,7 @@ ht:
     new_caledonia: "Nouvèl Kaledoni"
     new_delhi: "New Delhi"
     newfoundland: Tènèv
+    norfolk_island: "Zile Norfolk"
     noronha: Noronha
     novosibirsk: Novosibirsk
     nukualofa: Nuku'alofa
@@ -25178,6 +25201,7 @@ ht:
     learning_outcomes: "Rezilta Aprantisaj"
     messages: Mesaj
     outcome_artifacts: "Atefè Rezilta yo"
+    topic: Sijè
     view_in_separate_window: "Afiche nan Fenèt Separe"
   tls_7a2eaba5: TLS
   to_1126ab55: " pou"

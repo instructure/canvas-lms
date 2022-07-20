@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assessmentItem
+    xmlns="http://www.imsglobal.org/xsd/imsqti_v2p1"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqti_v2p1 http://www.imsglobal.org/xsd/imsqti_v2p1.xsd" identifier="QUE_1049"
+    title="Media Wizard"
+    adaptive="false"
+    timeDependent="false">
+  <instructureMetadata>
+    <instructureField name="max_score" value="1.00" />
+  </instructureMetadata>
+  <itemBody>
+    <div class="html">&lt;img alt="1 &lt; 2"&gt;</div>
+  </itemBody>
+  <responseProcessing>
+    <responseCondition>
+      <responseIf><member><baseValue baseType="identifier">QUE_1051_A1</baseValue><variable identifier="QUE_1050_RL"/></member>
+        <setOutcomeValue identifier="QUE_SCORE"><sum><variable identifier="QUE_SCORE"/><baseValue baseType="integer">50.00</baseValue></sum></setOutcomeValue>
+      </responseIf>
+    </responseCondition>
+    <responseCondition>
+      <responseIf><gt><variable identifier="QUE_SCORE"/><baseValue baseType="integer">100</baseValue></gt>
+        <setOutcomeValue identifier="QUE_SCORE"><baseValue baseType="integer">100</baseValue></setOutcomeValue>
+      </responseIf>
+    </responseCondition>
+  </responseProcessing>
+</assessmentItem>

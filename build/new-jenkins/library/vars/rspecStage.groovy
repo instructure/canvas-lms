@@ -21,7 +21,6 @@ import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
 @Field static final SUCCESS_NOT_BUILT = [buildResult: 'SUCCESS', stageResult: 'NOT_BUILT']
 @Field static final SUCCESS_UNSTABLE = [buildResult: 'SUCCESS', stageResult: 'UNSTABLE']
-@Field static final RSPEC_NODE_REQUIREMENTS = [label: 'canvas-docker']
 
 def createDistribution(nestedStages) {
   def rspecqNodeTotal = configuration.getInteger('rspecq-ci-node-total')
@@ -57,7 +56,7 @@ def createDistribution(nestedStages) {
   extendedStage('RSpecQ Reporter for Rspec')
     .envVars(rspecqEnvVars)
     .hooks(buildSummaryReportHooks.call() + [onNodeAcquired: setupNodeHook])
-    .nodeRequirements(RSPEC_NODE_REQUIREMENTS)
+    .nodeRequirements([label: configuration.nodeLabel()])
     .timeout(15)
     .queue(nestedStages, this.&runReporter)
 
@@ -65,7 +64,7 @@ def createDistribution(nestedStages) {
     extendedStage("RSpecQ Test Set ${(index + 1).toString().padLeft(2, '0')}")
       .envVars(rspecqEnvVars + ["CI_NODE_INDEX=$index"])
       .hooks(buildSummaryReportHooks.call() + [onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode() }])
-      .nodeRequirements(RSPEC_NODE_REQUIREMENTS)
+      .nodeRequirements([label: configuration.nodeLabel()])
       .timeout(15)
       .queue(nestedStages, this.&runRspecqSuite)
   }

@@ -110,6 +110,27 @@ describe AssignmentOverride do
     expect(@override2.set).to eq [@student]
   end
 
+  describe "#notify_change?" do
+    before :once do
+      course_factory(active_all: true)
+      student_in_course(course: @course, active_all: true)
+    end
+
+    it "does not notify of change for deleted assignment override due to enrollment removal" do
+      due_date_timestamp = DateTime.now.iso8601
+      assignment = assignment_model(course: @course)
+      override = assignment.assignment_overrides.create!(
+        due_at: due_date_timestamp,
+        due_at_overridden: true
+      )
+      override.assignment_override_students.create!(user: @student)
+      assignment.update(due_at: nil, only_visible_to_overrides: true, created_at: Time.now - 4.hours)
+      expect(override.notify_change?).to be true
+      @student.destroy
+      expect(override.reload.notify_change?).to be false
+    end
+  end
+
   describe "#adhoc?" do
     let(:override) { AssignmentOverride.new }
 

@@ -109,7 +109,7 @@
   "devDependencies": {
     "@babel/cli": "^7",
     "@babel/core": "^7",
-    "@instructure/babel-plugin-themeable-styles": "7",
+    "@instructure/babel-plugin-themeable-styles": "7.19.0-canvas",
     "@instructure/browserslist-config-canvas-lms": ">=2",
     "@sheerun/mutationobserver-shim": "^0.3.2",
     "babel-jest": "^26",

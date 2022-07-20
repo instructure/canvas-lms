@@ -60,7 +60,6 @@ renderIntoDiv(document.getElementById('content'), {
     contextType: 'course',
     contextId: '17',
     containingContext: {type: 'course', contextId: '17', userId: '3', contextType: 'course'},
-    canUploadFiles: true,
     host: 'someOtherHost',
     jwt: 'someJWT',
     liveRegion: () => {},
