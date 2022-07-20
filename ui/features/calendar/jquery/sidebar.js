@@ -64,6 +64,8 @@ class VisibleContextManager {
       this.contexts = availableContexts
     }
 
+    this.enabledAccounts = contexts.filter(c => c.type === 'account').map(dC => dC.asset_string)
+
     this.contexts = _.intersection(this.contexts, availableContexts)
     this.contexts = this.contexts.slice(0, ENV.CALENDAR.VISIBLE_CONTEXTS_LIMIT)
 
@@ -118,6 +120,35 @@ class VisibleContextManager {
     })
   }
 
+  toggleAccount(context, calendarElement) {
+    const wrapper = calendarElement.closest('.editable-list-holder')
+    const index = $.inArray(context, this.enabledAccounts)
+    if (index >= 0) {
+      this.enabledAccounts.splice(index, 1)
+      $(calendarElement).remove()
+      if (this.contexts.includes(context)) {
+        this.toggle(context)
+      }
+    } else {
+      this.enabledAccounts.push(context)
+      if (!this.contexts.includes(context)) {
+        this.toggle(context)
+      }
+    }
+    return this.saveEnabledAccountContexts(wrapper)
+  }
+
+  saveEnabledAccountContexts = wrapper => {
+    const enabledAccountIds = this.enabledAccounts.map(a => a.split('_')[1])
+
+    if (enabledAccountIds.length === 0) {
+      wrapper[0].appendChild(generateEmptyState())
+    }
+    return $.ajaxJSON('/api/v1/calendar_events/save_enabled_account_calendars', 'POST', {
+      enabled_account_calendars: enabledAccountIds.length > 0 ? enabledAccountIds : ''
+    })
+  }
+
   notify = () => {
     $.publish('Calendar/visibleContextListChanged', [this.contexts])
 
@@ -157,6 +188,13 @@ class VisibleContextManager {
   }
 }
 
+function generateEmptyState() {
+  const emptyStateContainer = document.createElement('div')
+  emptyStateContainer.classList.add('accounts-empty-state')
+  emptyStateContainer.innerHTML = I18n.t('Click the "+" icon to add a calendar')
+  return emptyStateContainer
+}
+
 function setupCalendarFeedsWithSpecialAccessibilityConsiderationsForNVDA() {
   const $calendarFeedModalContent = $('#calendar_feed_box')
   const $calendarFeedModalOpener = $('.dialog_opener[aria-controls="calendar_feed_box"]')
@@ -181,9 +219,13 @@ function setupCalendarFeedsWithSpecialAccessibilityConsiderationsForNVDA() {
 }
 
 export default function sidebar(contexts, selectedContexts, dataSource) {
-  const $holder = $('#context-list-holder')
   const $skipLink = $('.skip-to-calendar')
   const $colorPickerBtn = $('.ContextList__MoreBtn')
+  const $calendarHolder = $('#calendar-list-holder')
+  const $otherCalendarsHolder = $('#other-calendars-list-holder')
+  const $combineHolder = $($calendarHolder).add($otherCalendarsHolder)
+  const calendars = contexts.filter(c => c.type !== 'account')
+  const otherCalendars = contexts.filter(c => c.type === 'account')
 
   $skipLink.focus(() => {
     $skipLink.removeClass('screenreader-only')
@@ -195,16 +237,45 @@ export default function sidebar(contexts, selectedContexts, dataSource) {
 
   setupCalendarFeedsWithSpecialAccessibilityConsiderationsForNVDA()
 
-  $holder.html(contextListTemplate({contexts}))
+  $calendarHolder.html(
+    contextListTemplate({contexts: calendars, type: 'calendars', includeRemoveOption: 'calendars'})
+  )
 
-  const visibleContexts = new VisibleContextManager(contexts, selectedContexts, $holder)
+  if ($otherCalendarsHolder.length) {
+    if (otherCalendars.length > 0) {
+      $otherCalendarsHolder.html(
+        contextListTemplate({
+          contexts: otherCalendars,
+          type: 'other-calendars',
+          includeRemoveOption: 'calendars'
+        })
+      )
+    } else {
+      $otherCalendarsHolder[0].appendChild(generateEmptyState())
+    }
+    $('.manage-accounts-btn').on('click keyclick', function () {
+      if (!ENV.CALENDAR.ACCOUNT_CALENDAR_EVENTS_SEEN) {
+        $.ajaxJSON('/api/v1/calendar_events/save_enabled_account_calendars', 'POST', {
+          mark_feature_as_seen: true
+        })
+      }
+    })
+  }
 
-  $holder.on('click keyclick', '.context-list-toggle-box', function (event) {
+  const visibleContexts = new VisibleContextManager(contexts, selectedContexts, $combineHolder)
+
+  $combineHolder.on('click keyclick', '.context-list-toggle-box', function (event) {
     const parent = $(this).closest('.context_list_context')
     visibleContexts.toggle($(parent).data('context'))
   })
 
-  $holder.on('click keyclick', '.ContextList__MoreBtn', function (event) {
+  $otherCalendarsHolder.on('click keyclick', '.ContextList__DeleteBtn', function (event) {
+    const parent = $(this).closest('.context_list_context')
+    visibleContexts.toggleAccount($(parent).data('context'), parent)
+  })
+
+
+  $combineHolder.on('click keyclick', '.ContextList__MoreBtn', function (event) {
     const positions = {
       top: $(this).offset().top - $(window).scrollTop(),
       left: $(this).offset().left - $(window).scrollLeft()
@@ -213,7 +284,7 @@ export default function sidebar(contexts, selectedContexts, dataSource) {
     const assetString = $(this).closest('li').data('context')
 
     // ensures previously picked color clears
-    ReactDOM.unmountComponentAtNode($('#color_picker_holder')[0])
+    ReactDOM.unmountComponentAtNode($(`#calendars_color_picker_holder`)[0])
 
     ReactDOM.render(
       <ColorPicker
@@ -237,7 +308,7 @@ export default function sidebar(contexts, selectedContexts, dataSource) {
           $existingStyles.append($newStyles)
         }}
       />,
-      $('#color_picker_holder')[0]
+      $(`#calendars_color_picker_holder`)[0]
     )
   })
 

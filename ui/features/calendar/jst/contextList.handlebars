@@ -1,21 +1,28 @@
-<ul id="context-list">
+<ul id="{{type}}-context-list">
   {{#each contexts}}
-    <li data-context="{{asset_string}}"
-        class="context_list_context hover-container">
-      <span class="context-list-toggle-box group_{{asset_string}}"
-            aria-labelledby="group_{{asset_string}}_checkbox_label"
-            tabindex="0"
-            role="checkbox"></span>
-      <label id="group_{{asset_string}}_checkbox_label">
-        {{name}}
-      </label>
-      <button type="button" tabindex="0" class="Button Button--icon-action ContextList__MoreBtn">
-        <i class="icon-more" aria-hidden="true"></i>
-        <span class="screenreader-only">
-          {{#t}}Open {{name}} Color Picker{{/t}}
-        </span>
-      </button>
-    </li>
+  <li data-context="{{asset_string}}" class="context_list_context hover-container">
+    <span class="context-list-toggle-box group_{{asset_string}}" aria-labelledby="group_{{asset_string}}_checkbox_label"
+      tabindex="0" role="checkbox"></span>
+    <label id="group_{{asset_string}}_checkbox_label">
+      {{name}}
+    </label>
+    <div class="buttons-wrapper">
+    {{#ifEqual type 'account'}}
+    <button type="button" tabindex="0" class="Button Button--icon-action ContextList__DeleteBtn">
+      <span aria-hidden="true">X</span>
+      <span class="screenreader-only">
+        {{#t}}Delete {{name}} Calendar{{/t}}
+      </span>
+    </button>
+    {{/ifEqual}}
+    <button type="button" tabindex="0" class="Button Button--icon-action ContextList__MoreBtn">
+      <i class="icon-more" aria-hidden="true"></i>
+      <span class="screenreader-only">
+        {{#t}}Open {{name}} Color Picker{{/t}}
+      </span>
+    </button>
+    </div>
+  </li>
   {{/each}}
 </ul>
-<div id="color_picker_holder"></div>
+<div id="{{type}}_color_picker_holder"></div>

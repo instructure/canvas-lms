@@ -315,8 +315,7 @@ class ApplicationController < ActionController::Base
   JS_ENV_SITE_ADMIN_FEATURES = %i[
     featured_help_links feature_flag_filters conferencing_in_planner word_count_in_speed_grader observer_picker
     lti_platform_storage scale_equation_images new_equation_editor buttons_and_icons_cropper course_paces_for_sections
-    calendar_series
-    account_level_blackout_dates
+    calendar_series account_level_blackout_dates account_calendar_events
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours files_dnd usage_rights_discussion_topics
@@ -1182,6 +1181,11 @@ class ApplicationController < ActionController::Base
       end
       groups = @context.filter_visible_groups_for_user(groups)
 
+      if opts[:include_accounts]
+        account_ids = @current_user.get_preference(:enabled_account_calendars) || []
+        accounts = Account.where(id: account_ids)
+      end
+
       if opts[:favorites_first]
         favorite_course_ids = @context.favorite_context_ids("Course")
         courses = courses.sort_by { |c| [favorite_course_ids.include?(c.id) ? 0 : 1, Canvas::ICU.collation_key(c.name)] }
@@ -1189,6 +1193,7 @@ class ApplicationController < ActionController::Base
 
       @contexts.concat courses
       @contexts.concat groups
+      @contexts.concat(accounts || [])
     end
 
     include_contexts = opts[:include_contexts] || params[:include_contexts]

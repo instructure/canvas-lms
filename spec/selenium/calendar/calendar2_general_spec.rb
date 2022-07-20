@@ -273,9 +273,9 @@ describe "calendar2" do
       f("#course_calendar_link").click
 
       # only the explicit context should be selected
-      expect(f("#context-list li[data-context=course_#{unrelated_course.id}].checked")).to be
-      expect(f("#context-list li[data-context=course_#{@course.id}].not-checked")).to be
-      expect(f("#context-list li[data-context=user_#{@user.id}].not-checked")).to be
+      expect(f("#calendars-context-list li[data-context=course_#{unrelated_course.id}].checked")).to be_truthy
+      expect(f("#calendars-context-list li[data-context=course_#{@course.id}].not-checked")).to be_truthy
+      expect(f("#calendars-context-list li[data-context=user_#{@user.id}].not-checked")).to be_truthy
     end
 
     it "only considers active enrollments for upcoming events list", priority: "2" do

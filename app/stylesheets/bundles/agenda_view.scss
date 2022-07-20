@@ -303,18 +303,24 @@ span.agendaView--no-assignments {
   &:last-of-type { margin-bottom: 0; }
 }
 
-#context-list-holder, #undated-events {
+#calendar-list-holder, #other-calendars-list-holder, #undated-events {
   background-color: #fff;
   max-height: 300px;
   overflow-y: auto;
+  min-height: 100px;
 
   ul {
     margin-bottom: 10px;
     &:last-of-type { margin-bottom: 0; }
   }
+  .accounts-empty-state {
+    @include fontSize(13px);
+    color: #888;
+    margin: $ic-sp*1;
+  }
 }
 
-#context-list {
+#calendars-context-list, #other-calendars-context-list {
   padding: 0;
   max-height: none;
   .context_list_context {
@@ -333,11 +339,48 @@ span.agendaView--no-assignments {
     @include fontSize(13px);
     font-weight: bold;
   }
+  .buttons-wrapper{
+    float: direction(right);
+  }
 }
 
 #calendar-toggle-button,
-#undated-events-button {
+#undated-events-button,
+#other-calendars-toggle-button {
   text-transform: uppercase;
+}
+
+#other-calendar-actions-row {
+  .element_toggler {
+    float: direction(left);
+  }
+  div.manage-accounts-wrapper{
+    float: direction(right);
+    max-width: 24rem;
+    line-height: 1;
+    .new-feature-pill{
+      max-width: 12rem;
+      float: direction(left);
+      color: var(--ic-brand-primary);
+      border-radius: 0.5rem;
+      border: 1px solid var(--ic-brand-primary);
+      font-size:0.8rem;
+      text-transform: uppercase;
+      padding: 0.1rem 0.25rem;
+    }
+    .manage-accounts-btn{
+      float: direction(right);
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
+      width: 1.5rem;
+      height: 1rem;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 400;
+      line-height: 1rem;
+    }
+  }
 }
 
 #undated-events {

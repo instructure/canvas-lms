@@ -26,7 +26,8 @@ class CalendarsController < ApplicationController
 
   def show
     get_context
-    get_all_pertinent_contexts(include_groups: true, favorites_first: true, cross_shard: true)
+    @account_calendar_events_enabled = Account.site_admin.feature_enabled?(:account_calendar_events)
+    get_all_pertinent_contexts(include_groups: true, include_accounts: @account_calendar_events_enabled, favorites_first: true, cross_shard: true)
     @manage_contexts = @contexts.select do |c|
       c.grants_right?(@current_user, session, :manage_calendar)
     end.map(&:asset_string)
@@ -37,6 +38,7 @@ class CalendarsController < ApplicationController
                            @current_user.get_preference(:selected_calendar_contexts)
                          end
     @inline_titles = @domain_root_account&.feature_enabled?(:wrap_calendar_event_titles)
+    @account_calendar_events_seen = @current_user.get_preference(:account_calendar_events_seen)
     # somewhere there's a bad link that doesn't separate parameters properly.
     # make sure we don't do a find on a non-numeric id.
     if params[:event_id] && params[:event_id] =~ Api::ID_REGEX && (event = CalendarEvent.where(id: params[:event_id]).first) && event.start_at
@@ -64,6 +66,7 @@ class CalendarsController < ApplicationController
         name: context.nickname_for(@current_user),
         asset_string: context.asset_string,
         id: context.id,
+        type: context.class.to_s.downcase,
         url: named_context_url(context, :context_url),
         create_calendar_event_url: context.respond_to?("calendar_events") ? named_context_url(context, :context_calendar_events_url) : "",
         create_assignment_url: context.respond_to?("assignments") ? named_context_url(context, :api_v1_context_assignments_url) : "",
