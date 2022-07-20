@@ -1452,6 +1452,10 @@ class Quizzes::Quiz < ActiveRecord::Base
     assignment&.submission_for_student(student)&.excused?
   end
 
+  def is_module_item?
+    context_module_tags.present?
+  end
+
   def due_for_any_student_in_closed_grading_period?(periods = nil)
     return false unless due_at || has_overrides?
 

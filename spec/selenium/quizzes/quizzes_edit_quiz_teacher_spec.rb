@@ -20,11 +20,13 @@
 require_relative "../common"
 require_relative "../helpers/quizzes_common"
 require_relative "../helpers/assignment_overrides"
+require_relative "page_objects/quizzes_edit_page"
 
 describe "editing a quiz" do
   include_context "in-process server selenium tests"
   include QuizzesCommon
   include AssignmentOverridesSeleniumHelper
+  include QuizzesEditPage
 
   def delete_quiz
     expect_new_page_load do
@@ -203,6 +205,23 @@ describe "editing a quiz" do
     it "doesn't allow XSS via :redirect_to query param" do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit?return_to=javascript%3Aalert(document.cookie)"
       expect(f("#quiz_edit_actions #cancel_button").attribute("href")).to eq(course_quiz_url(@course, @quiz))
+    end
+
+    context "in a paced course" do
+      before(:once) do
+        Account.site_admin.enable_feature!(:course_paces)
+        @course.enable_course_paces = true
+        @course.save!
+      end
+
+      it "displays the course pacing notice in place of due dates" do
+        @quiz = create_quiz_with_due_date
+        item = add_quiz_to_module
+
+        get "/courses/#{@course.id}/quizzes/#{item.content_id}/edit"
+        expect(f(quiz_edit_form)).not_to contain_css(due_date_container)
+        expect(f(quiz_edit_form)).to contain_css(course_pacing_notice)
+      end
     end
   end
 end
