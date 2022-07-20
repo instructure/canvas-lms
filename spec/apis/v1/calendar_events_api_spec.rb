@@ -1168,6 +1168,49 @@ describe CalendarEventsApiController, type: :request do
       end
     end
 
+    describe "statsd metrics" do
+      it "emits calendar.calendar_event.create with single tag when creating a new event" do
+        course_with_student(course: @course, user: @user, active_all: true)
+        allow(InstStatsd::Statsd).to receive(:increment)
+        api_call(:post, "/api/v1/calendar_events",
+                 { controller: "calendar_events_api", action: "create", format: "json" },
+                 { calendar_event: { context_code: @course.asset_string, title: "single event" } })
+        expect(InstStatsd::Statsd).to have_received(:increment).once.with("calendar.calendar_event.create", tags: %w[enrollment_type:TeacherEnrollment enrollment_type:StudentEnrollment calendar_event_type:single])
+      end
+
+      it "emits calendar.calendar_event.create with recurring tag when creating a new recurring event" do
+        start_at = Time.zone.now.utc.change(hour: 0, min: 1)
+        end_at = Time.zone.now.utc.change(hour: 23)
+        allow(InstStatsd::Statsd).to receive(:increment)
+        api_call(:post, "/api/v1/calendar_events",
+                 { controller: "calendar_events_api", action: "create", format: "json" },
+                 { calendar_event: { context_code: @course.asset_string, title: "recurring event",
+                                     start_at: start_at.iso8601,
+                                     end_at: end_at.iso8601,
+                                     duplicate: {
+                                       count: "3",
+                                       interval: "1",
+                                       frequency: "weekly"
+                                     } } })
+        expect(InstStatsd::Statsd).to have_received(:increment).once.with("calendar.calendar_event.create", tags: %w[enrollment_type:TeacherEnrollment calendar_event_type:recurring])
+      end
+
+      it "emits calendar.calendar_event.create with series tag when creating a new event series" do
+        Account.site_admin.enable_feature!(:calendar_series)
+        start_at = Time.zone.now.utc.change(hour: 0, min: 1)
+        end_at = Time.zone.now.utc.change(hour: 23)
+        allow(InstStatsd::Statsd).to receive(:increment)
+        api_call(:post, "/api/v1/calendar_events",
+                 { controller: "calendar_events_api", action: "create", format: "json" },
+                 { calendar_event: { context_code: @course.asset_string,
+                                     title: "series",
+                                     start_at: start_at.iso8601,
+                                     end_at: end_at.iso8601,
+                                     rrule: "FREQ=WEEKLY;INTERVAL=1;COUNT=3" } })
+        expect(InstStatsd::Statsd).to have_received(:increment).once.with("calendar.calendar_event.create", tags: %w[enrollment_type:TeacherEnrollment calendar_event_type:series])
+      end
+    end
+
     it "updates an event" do
       event = @course.calendar_events.create(title: "event", start_at: "2012-01-08 12:00:00")
 
