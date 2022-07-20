@@ -113,6 +113,24 @@ module Types
                required: false
     end
 
+    field :login_id, String, null: true
+    def login_id
+      course = context[:course]
+      return nil unless course
+
+      pseudonym = SisPseudonym.for(
+        object,
+        course,
+        type: :implicit,
+        require_sis: false,
+        root_account: context[:domain_root_account],
+        in_region: true
+      )
+      return nil unless pseudonym && course.grants_right?(context[:current_user], context[:session], :view_user_logins)
+
+      pseudonym.unique_id
+    end
+
     def enrollments(course_id: nil, current_only: false, order_by: [])
       course_ids = [course_id].compact
       Loaders::UserCourseEnrollmentLoader.for(
