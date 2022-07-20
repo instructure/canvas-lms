@@ -50,10 +50,13 @@ const renderLoader = () => (
 )
 
 const LearningMastery = ({courseId}) => {
-  const {isLoading, students, outcomes, rollups} = useRollups({courseId})
   const options = ENV.GRADEBOOK_OPTIONS
   const accountLevelMasteryScalesFF = options.ACCOUNT_LEVEL_MASTERY_SCALES
 
+  const {isLoading, students, outcomes, rollups} = useRollups({
+    courseId,
+    accountLevelMasteryScalesFF
+  })
   const [visibleRatings, setVisibleRatings] = useState([])
 
   useEffect(() => {

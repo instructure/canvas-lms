@@ -55,15 +55,18 @@ const rollupsByUser = (rollups, outcomes) => {
   }))
 }
 
-export default function useRollups({courseId}) {
+export default function useRollups({courseId, accountMasteryScalesEnabled}) {
   const [isLoading, setIsLoading] = useState(true)
   const [students, setStudents] = useState([])
   const [outcomes, setOutcomes] = useState([])
   const [rollups, setRollups] = useState([])
+
+  const needMasteryAndColorDefaults = !accountMasteryScalesEnabled
+
   useEffect(() => {
     ;(async () => {
       try {
-        const {data} = await loadRollups(courseId)
+        const {data} = await loadRollups(courseId, needMasteryAndColorDefaults)
         const {users: fetchedUsers, outcomes: fetchedOutcomes} = data.linked
         setStudents(fetchedUsers)
         setOutcomes(fetchedOutcomes)
@@ -76,7 +79,7 @@ export default function useRollups({courseId}) {
         })
       }
     })()
-  }, [courseId])
+  }, [courseId, needMasteryAndColorDefaults])
 
   return {
     isLoading,

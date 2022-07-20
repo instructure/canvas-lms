@@ -281,11 +281,7 @@ describe "Outcomes API", type: :request do
                              "calculation_int" => 65,
                              "calculation_method" => "decaying_average",
                              "assessed" => false,
-                             "ratings" => [
-                               { "points" => 5, "description" => "Exceeds Expectations" },
-                               { "points" => 3, "description" => "Meets Expectations" },
-                               { "points" => 0, "description" => "Does Not Meet Expectations" }
-                             ]
+                             "ratings" => @outcome.rubric_criterion[:ratings].map(&:stringify_keys)
                            })
       end
 

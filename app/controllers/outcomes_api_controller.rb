@@ -173,6 +173,11 @@ class OutcomesApiController < ApplicationController
   #
   # Returns the details of the outcome with the given id.
   #
+  # @argument add_defaults [Boolean]
+  #   If defaults are requested, then color and mastery level defaults will be
+  #   added to outcome ratings in the result. This will only take effect if
+  #   the Account Level Mastery Scales FF is DISABLED
+  #
   # @returns Outcome
   #
   def show
@@ -224,6 +229,11 @@ class OutcomesApiController < ApplicationController
   #
   # @argument calculation_int [Integer]
   #   The new calculation int.  Only applies if the calculation_method is "decaying_average" or "n_mastery"
+  #
+  # @argument add_defaults [Boolean]
+  #   If defaults are requested, then color and mastery level defaults will be
+  #   added to outcome ratings in the result. This will only take effect if
+  #   the Account Level Mastery Scales FF is DISABLED
   #
   # @returns Outcome
   #

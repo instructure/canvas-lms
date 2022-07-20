@@ -133,6 +133,9 @@ describe('LearningMastery', () => {
   it('calls useRollups with the provided courseId', () => {
     const props = defaultProps()
     render(<LearningMastery {...props} />)
-    expect(useRollups).toHaveBeenCalledWith({courseId: props.courseId})
+    expect(useRollups).toHaveBeenCalledWith({
+      courseId: props.courseId,
+      accountLevelMasteryScalesFF: true
+    })
   })
 })
