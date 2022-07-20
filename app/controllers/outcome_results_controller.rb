@@ -287,6 +287,11 @@ class OutcomeResultsController < ApplicationController
   #   If sorting requested, then this allows changing the default sort order of
   #   ascending to descending.
   #
+  # @argument add_defaults [Boolean]
+  #   If defaults are requested, then color and mastery level defaults will be
+  #   added to outcome ratings in the rollup. This will only take effect if
+  #   the Account Level Mastery Scales FF is DISABLED
+  #
   # @example_response
   #    {
   #      "rollups": [OutcomeRollup],

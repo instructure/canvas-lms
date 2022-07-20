@@ -23,6 +23,52 @@ describe LearningOutcome do
     @outcome.errors[prop].map(&:to_s)
   end
 
+  # rubocop:disable Lint/DuplicateBranch
+  def generate_rubric_criterion(outcome, num_ratings)
+    criterion = {}
+    criterion[:description] = "default description"
+    criterion[:ratings] = Array.new(num_ratings, {})
+
+    case num_ratings
+    when 1
+      criterion[:ratings][0] = { description: "best", points: 5 }
+      criterion[:mastery_points] = 5
+    when 2
+      criterion[:ratings][0] = { description: "best", points: 5 }
+      criterion[:ratings][1] = { description: "worst", points: 0 }
+      criterion[:mastery_points] = 5
+    when 3
+      criterion[:ratings][0] = { description: "best", points: 5 }
+      criterion[:ratings][1] = { description: "okay", points: 3 }
+      criterion[:ratings][2] = { description: "worst", points: 0 }
+      criterion[:mastery_points] = 5
+    when 4
+      criterion[:ratings][0] = { description: "best", points: 5 }
+      criterion[:ratings][1] = { description: "good", points: 3 }
+      criterion[:ratings][2] = { description: "okay", points: 2 }
+      criterion[:ratings][3] = { description: "worst", points: 0 }
+      criterion[:mastery_points] = 5
+    when 5
+      criterion[:ratings][0] = { description: "best", points: 5 }
+      criterion[:ratings][1] = { description: "good", points: 3 }
+      criterion[:ratings][2] = { description: "okay", points: 2 }
+      criterion[:ratings][3] = { description: "not good", points: 1 }
+      criterion[:ratings][4] = { description: "worst", points: 0 }
+      criterion[:mastery_points] = 3
+    when 6
+      criterion[:ratings][0] = { description: "best", points: 5 }
+      criterion[:ratings][1] = { description: "good", points: 4 }
+      criterion[:ratings][2] = { description: "okay", points: 3 }
+      criterion[:ratings][3] = { description: "not good", points: 2 }
+      criterion[:ratings][3] = { description: "bad", points: 1 }
+      criterion[:ratings][5] = { description: "worst", points: 0 }
+      criterion[:mastery_points] = 4
+    end
+
+    outcome.rubric_criterion = criterion
+  end
+  # rubocop:enable Lint/DuplicateBranch
+
   let(:calc_method_no_int) { %w[highest latest average] }
 
   context "validations" do
@@ -967,6 +1013,100 @@ describe LearningOutcome do
         @outcome.reload
         expect(@outcome.description).to eq("foo bar baz qux")
         expect(@outcome.calculation_method).to eq("decaying_average")
+      end
+
+      context "color and mastery defaults" do
+        before do
+          @outcome = LearningOutcome.create!(title: "outcome")
+        end
+
+        it "1 rating" do
+          generate_rubric_criterion(@outcome, 1)
+          @outcome.find_or_set_rating_defaults(@outcome.rubric_criterion[:ratings], @outcome.rubric_criterion[:mastery_points])
+          ratings = @outcome.rubric_criterion[:ratings]
+          expect(ratings.pluck(:mastery)).to eq [true]
+          expect(ratings.pluck(:color)).to eq %w[0B874B]
+        end
+
+        it "2 ratings" do
+          generate_rubric_criterion(@outcome, 2)
+          @outcome.find_or_set_rating_defaults(@outcome.rubric_criterion[:ratings], @outcome.rubric_criterion[:mastery_points])
+          ratings = @outcome.rubric_criterion[:ratings]
+          expect(ratings.pluck(:mastery)).to eq [true, false]
+          expect(ratings.pluck(:color)).to eq %w[0B874B 555555]
+        end
+
+        it "3 ratings" do
+          generate_rubric_criterion(@outcome, 3)
+          @outcome.find_or_set_rating_defaults(@outcome.rubric_criterion[:ratings], @outcome.rubric_criterion[:mastery_points])
+          ratings = @outcome.rubric_criterion[:ratings]
+          expect(ratings.pluck(:mastery)).to eq [true, false, false]
+          expect(ratings.pluck(:color)).to eq %w[0B874B FAB901 555555]
+        end
+
+        it "4 ratings" do
+          generate_rubric_criterion(@outcome, 4)
+          @outcome.find_or_set_rating_defaults(@outcome.rubric_criterion[:ratings], @outcome.rubric_criterion[:mastery_points])
+          ratings = @outcome.rubric_criterion[:ratings]
+          expect(ratings.pluck(:mastery)).to eq [true, false, false, false]
+          expect(ratings.pluck(:color)).to eq %w[0B874B FAB901 E0061F 555555]
+        end
+
+        it "5 ratings" do
+          generate_rubric_criterion(@outcome, 5)
+          @outcome.find_or_set_rating_defaults(@outcome.rubric_criterion[:ratings], @outcome.rubric_criterion[:mastery_points])
+          ratings = @outcome.rubric_criterion[:ratings]
+          expect(ratings.pluck(:mastery)).to eq [false, true, false, false, false]
+          expect(ratings.pluck(:color)).to eq %w[0374B5 0B874B FAB901 E0061F 555555]
+        end
+
+        it "6 ratings" do
+          generate_rubric_criterion(@outcome, 6)
+          @outcome.find_or_set_rating_defaults(@outcome.rubric_criterion[:ratings], @outcome.rubric_criterion[:mastery_points])
+          ratings = @outcome.rubric_criterion[:ratings]
+          expect(ratings.pluck(:mastery)).to eq [false, true, false, false, false, false]
+          expect(ratings.pluck(:color)).to eq %w[0374B5 0B874B FAB901 D97900 E0061F 555555]
+        end
+
+        context "mastery points do not exactly match ratings" do
+          it "3 ratings" do
+            generate_rubric_criterion(@outcome, 3)
+            @outcome.rubric_criterion[:mastery_points] = 1.5
+            @outcome.find_or_set_rating_defaults(@outcome.rubric_criterion[:ratings], @outcome.rubric_criterion[:mastery_points])
+            ratings = @outcome.rubric_criterion[:ratings]
+            expect(ratings.pluck(:mastery)).to eq [true, false, false]
+            expect(ratings.pluck(:color)).to eq %w[0B874B FAB901 555555]
+          end
+
+          it "5 ratings" do
+            generate_rubric_criterion(@outcome, 5)
+            @outcome.rubric_criterion[:mastery_points] = 3.5
+            @outcome.find_or_set_rating_defaults(@outcome.rubric_criterion[:ratings], @outcome.rubric_criterion[:mastery_points])
+            ratings = @outcome.rubric_criterion[:ratings]
+            expect(ratings.pluck(:mastery)).to eq [false, true, false, false, false]
+            expect(ratings.pluck(:color)).to eq %w[0374B5 0B874B FAB901 E0061F 555555]
+          end
+        end
+
+        context "default colors not added to outcome" do
+          it "4 ratings" do
+            generate_rubric_criterion(@outcome, 4)
+            @outcome.rubric_criterion[:mastery_points] = 2
+            @outcome.find_or_set_rating_defaults(@outcome.rubric_criterion[:ratings], @outcome.rubric_criterion[:mastery_points])
+            ratings = @outcome.rubric_criterion[:ratings]
+            expect(ratings.pluck(:mastery)).to eq [false, false, true, false]
+            expect(ratings.pluck(:color)).to eq [nil, nil, nil, nil]
+          end
+
+          it "5 ratings" do
+            generate_rubric_criterion(@outcome, 5)
+            @outcome.rubric_criterion[:mastery_points] = 1
+            @outcome.find_or_set_rating_defaults(@outcome.rubric_criterion[:ratings], @outcome.rubric_criterion[:mastery_points])
+            ratings = @outcome.rubric_criterion[:ratings]
+            expect(ratings.pluck(:mastery)).to eq [false, false, false, true, false]
+            expect(ratings.pluck(:color)).to eq [nil, nil, nil, nil, nil]
+          end
+        end
       end
     end
   end
