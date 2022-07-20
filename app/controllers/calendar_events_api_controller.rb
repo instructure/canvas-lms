@@ -525,6 +525,7 @@ class CalendarEventsApiController < ApplicationController
     @event.validate_context! if @context.is_a?(AppointmentGroup)
 
     if authorized_action(@event, @current_user, :create)
+      event_type_tag = nil
       rrule = params_for_create[:rrule]
       # Create multiple events if necessary
       if rrule.present? && Account.site_admin.feature_enabled?(:calendar_series)
@@ -537,6 +538,7 @@ class CalendarEventsApiController < ApplicationController
         return false if rr.nil?
 
         events = create_event_series(params_for_create, rr)
+        event_type_tag = "series"
       else
         events = []
         dup_options = get_duplicate_params(params[:calendar_event])
@@ -550,8 +552,10 @@ class CalendarEventsApiController < ApplicationController
         elsif dup_options[:count] > 0
           InstStatsd::Statsd.gauge("calendar_events_api.recurring.count", dup_options[:count])
           events += create_event_and_duplicates(dup_options)
+          event_type_tag = "recurring"
         else
           events = [@event]
+          event_type_tag = "single"
         end
       end
 
@@ -563,6 +567,9 @@ class CalendarEventsApiController < ApplicationController
           render json: error.errors, status: :bad_request
           raise ActiveRecord::Rollback
         else
+          statsd_event_create_tags = @current_user.participating_enrollments.pluck(:type).uniq.map { |type| "enrollment_type:#{type}" }.append("calendar_event_type:#{event_type_tag}")
+          InstStatsd::Statsd.increment("calendar.calendar_event.create", tags: statsd_event_create_tags)
+
           original_event = events.shift
           render json: event_json(
             original_event,
