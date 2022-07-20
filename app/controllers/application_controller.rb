@@ -316,6 +316,7 @@ class ApplicationController < ActionController::Base
     featured_help_links feature_flag_filters conferencing_in_planner word_count_in_speed_grader observer_picker
     lti_platform_storage scale_equation_images new_equation_editor buttons_and_icons_cropper course_paces_for_sections
     calendar_series
+    account_level_blackout_dates
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours files_dnd usage_rights_discussion_topics

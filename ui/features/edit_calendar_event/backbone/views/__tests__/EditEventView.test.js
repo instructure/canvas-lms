@@ -169,4 +169,24 @@ describe('EditEventView', () => {
       expect(checkbox).toHaveAttribute('checked')
     })
   })
+
+  describe('blackout date checkbox', () => {
+    it('is not shown when account level blackout dates are disabled', () => {
+      window.ENV.FEATURES = {account_level_blackout_dates: false}
+      render()
+      expect(
+        within(document.body).queryByText('Extend assignment due dates in course pacing')
+      ).toBeNull()
+    })
+
+    it('is shown when account level blackout dates are enabled', () => {
+      window.ENV.FEATURES = {account_level_blackout_dates: true}
+      render()
+      expect(
+        within(document.body).getByLabelText('Extend assignment due dates in course pacing', {
+          exact: false
+        })
+      ).toBeInTheDocument()
+    })
+  })
 })
