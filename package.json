@@ -296,7 +296,6 @@
     "karma": "^3",
     "karma-chrome-launcher": "^2",
     "karma-coverage-istanbul-reporter": "^2",
-    "karma-firework-reporter": "~0.2.4",
     "karma-junit-reporter": "^1",
     "karma-qunit": "~1.2.1",
     "karma-sourcemap-loader": "^0.3",
