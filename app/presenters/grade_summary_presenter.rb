@@ -247,7 +247,7 @@ class GradeSummaryPresenter
       res = ScoreStatistic.where(assignment: @context.assignments.active.except(:order)).index_by(&:assignment_id)
       # We must have encountered an *old* assignment; enqueue a refresh
       if res.any? { |_, stat| stat.median.nil? }
-        ScoreStatisticsGenerator.update_score_statistics_in_singleton(@context.id)
+        ScoreStatisticsGenerator.update_score_statistics_in_singleton(@context)
       end
       res
     end
