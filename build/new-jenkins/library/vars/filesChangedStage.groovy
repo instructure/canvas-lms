@@ -40,6 +40,10 @@ def hasYarnFiles(buildConfig) {
   return buildConfig[STAGE_NAME].value('yarnFiles')
 }
 
+def hasGraphqlFiles(buildConfig) {
+  return buildConfig[STAGE_NAME].value('graphqlFiles')
+}
+
 def hasNewDeletedSpecFiles(buildConfig) {
   return buildConfig[STAGE_NAME].value('addedOrDeletedSpecFiles')
 }
@@ -59,6 +63,7 @@ def call(stageConfig) {
   stageConfig.value('featureFlagFiles', git.changedFiles(['config/feature_flags'], 'HEAD^'))
   stageConfig.value('groovyFiles', git.changedFiles(['.*.groovy', 'Jenkinsfile.*'], 'HEAD^'))
   stageConfig.value('yarnFiles', git.changedFiles(['package.json', 'yarn.lock'], 'HEAD^'))
+  stageConfig.value('graphqlFiles', git.changedFiles(['app/graphql'], 'HEAD^'))
   stageConfig.value('migrationFiles', sh(script: 'build/new-jenkins/check-for-migrations.sh', returnStatus: true) == 0)
   stageConfig.value('addedOrDeletedSpecFiles', sh(script: 'git diff --name-only --diff-filter=AD HEAD^..HEAD | grep "_spec.rb"', returnStatus: true) == 0)
 
