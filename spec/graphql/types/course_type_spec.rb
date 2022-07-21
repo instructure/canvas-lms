@@ -433,6 +433,15 @@ describe Types::CourseType do
         ]
       end
 
+      it "returns zero for each user's initial totalActivityTime" do
+        expect(
+          course_type.resolve(
+            "enrollmentsConnection { nodes { totalActivityTime } }",
+            current_user: @teacher
+          )
+        ).to eq [0, 0, 0, 0, 0, 0]
+      end
+
       describe "filtering" do
         it "returns only enrollments of the specified types if included" do
           ta_enrollment = course.enroll_ta(User.create!, enrollment_state: :active)
