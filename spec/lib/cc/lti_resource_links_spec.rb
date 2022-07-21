@@ -28,7 +28,7 @@ describe CC::LtiResourceLinks do
       context: tool.context,
       context_external_tool: tool,
       custom: custom,
-      url: "http://www.example.com/launch"
+      url: resource_link_url
     )
   end
 
@@ -37,12 +37,13 @@ describe CC::LtiResourceLinks do
       opts: {
         use_1_3: true,
         description: "test tool",
-        url: url
+        url: tool_url
       }
     )
   end
 
-  let(:url) { "https://www.test-tool.com/launch" }
+  let(:tool_url) { "https://www.test-tool.com/launch" }
+  let(:resource_link_url) { "https://www.test-tool.com/launch?foo=bar" }
   let(:custom) { { foo: "bar", fiz: "buzz" } }
   let(:document) { Builder::XmlMarkup.new(target: xml, indent: 2) }
   let(:xml) { +"" }
@@ -76,7 +77,7 @@ describe CC::LtiResourceLinks do
     end
 
     it "sets the secure launch url" do
-      expect(subject.at_xpath("//blti:secure_launch_url").text).to eq tool.url
+      expect(subject.at_xpath("//blti:secure_launch_url").text).to eq resource_link_url
     end
 
     it "does not set the launch url" do
@@ -91,15 +92,23 @@ describe CC::LtiResourceLinks do
       ).to eq(custom.stringify_keys)
     end
 
-    context "when the tool URL uses HTTP" do
-      let(:url) { "http://www.test-tool.com/launch" }
+    context "when the resource link URL uses HTTP" do
+      let(:resource_link_url) { "http://www.test-tool.com/launch?foo=bar" }
 
       it "does set the launch url" do
-        expect(subject.at_xpath("//blti:launch_url").text).to eq tool.url
+        expect(subject.at_xpath("//blti:launch_url").text).to eq resource_link.url
       end
 
       it "does not set the secure launch url" do
         expect(subject.at_xpath("//blti:secure_launch_url")).to be_blank
+      end
+    end
+
+    context "when the resource link URL is nil" do
+      let(:resource_link_url) { nil }
+
+      it "defaults to the tool url" do
+        expect(subject.at_xpath("//blti:secure_launch_url").text).to eq tool_url
       end
     end
   end
