@@ -30,7 +30,7 @@ module DataFixup::RecalculateIndividualOverrideDates
     Shard.with_each_shard(Shard.in_current_region) do
       delay_if_production(
         n_strand: ["RecalculateIndividualOverrideDates.run_for_shard", Shard.current.database_server.id],
-        priority: Delayed::LOW_PRIORITY
+        priority: Delayed::LOWER_PRIORITY
       ).run_for_shard
     end
   end
@@ -64,7 +64,7 @@ module DataFixup::RecalculateIndividualOverrideDates
         DueDateCacher.recompute_course(
           course,
           assignments: recalc_assignment_ids.to_a,
-          inst_jobs_opts: { priority: Delayed::LOW_PRIORITY, strand: ["recalc_adhoc_override_dates", Shard.current.database_server.id] }
+          inst_jobs_opts: { priority: Delayed::LOWER_PRIORITY, strand: ["recalc_adhoc_override_dates", Shard.current.database_server.id] }
         )
       end
     end
