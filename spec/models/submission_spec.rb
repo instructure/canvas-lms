@@ -372,6 +372,29 @@ describe Submission do
     end
   end
 
+  describe "update_quiz_submission" do
+    before do
+      submission.workflow_state = Submission.workflow_states.pending_review
+      submission.submission_type = "online_quiz"
+    end
+
+    it "does not set_final_score if kept_score equals score without deductions" do
+      quiz_submission_mock = double("QuizSubmission", "kept_score" => 123)
+      allow(submission).to receive(:quiz_submission).and_return(quiz_submission_mock)
+      submission.update(score: 100, points_deducted: 23, quiz_submission_id: 1)
+      expect(quiz_submission_mock).not_to receive(:set_final_score)
+      submission.update_quiz_submission
+    end
+
+    it "does set_final_score if kept_score differs from score without deductions" do
+      quiz_submission_mock = double("QuizSubmission", "kept_score" => 100)
+      allow(submission).to receive(:quiz_submission).and_return(quiz_submission_mock)
+      submission.update(score: 100, points_deducted: 23, quiz_submission_id: 1)
+      expect(quiz_submission_mock).to receive(:set_final_score)
+      submission.update_quiz_submission
+    end
+  end
+
   describe "entered_score" do
     let(:submission) { @assignment.submissions.find_by!(user_id: @student) }
 
