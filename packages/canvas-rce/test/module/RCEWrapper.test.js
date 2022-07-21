@@ -21,7 +21,7 @@ import sinon from 'sinon'
 import Bridge from '../../src/bridge'
 import * as indicateModule from '../../src/common/indicate'
 import * as contentInsertion from '../../src/rce/contentInsertion'
-import * as RCEApiSessionGetter from '../../src/rce/RCEApiSessionGetter'
+import * as getCanvasUrl from '../../src/rce/getCanvasUrl'
 
 import RCEWrapper, {
   mergeMenuItems,
@@ -60,6 +60,7 @@ function createdMountedElement(additionalProps = {}) {
       tinymce: fakeTinyMCE,
       editorOptions: {},
       liveRegion: () => document.getElementById('flash_screenreader_holder'),
+      canUploadFiles: false,
       ...trayProps(),
       ...additionalProps
     })
@@ -70,6 +71,7 @@ function createdMountedElement(additionalProps = {}) {
 function trayProps() {
   return {
     trayProps: {
+      canUploadFiles: true,
       host: 'rcs.host',
       jwt: 'donotlookatme',
       contextType: 'course',
