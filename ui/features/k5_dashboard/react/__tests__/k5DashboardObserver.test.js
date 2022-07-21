@@ -32,7 +32,7 @@ import {resetCardCache} from '@canvas/dashboard-card'
 import {MOCK_CARDS, MOCK_CARDS_2} from '@canvas/k5/react/__tests__/fixtures'
 import {fetchShowK5Dashboard} from '@canvas/observer-picker/react/utils'
 
-jest.setTimeout(15000)
+jest.useFakeTimers()
 jest.mock('@canvas/observer-picker/react/utils', () => ({
   ...jest.requireActual('@canvas/observer-picker/react/utils'),
   fetchShowK5Dashboard: jest.fn()
@@ -68,7 +68,7 @@ describe('K5Dashboard Parent Support', () => {
   ]
 
   it('shows picker when user is an observer', () => {
-    const {getByRole} = render(
+    const {getByTestId} = render(
       <K5Dashboard
         {...defaultProps}
         canAddObservee
@@ -76,7 +76,7 @@ describe('K5Dashboard Parent Support', () => {
         observedUsersList={MOCK_OBSERVED_USERS_LIST}
       />
     )
-    const select = getByRole('combobox', {name: 'Select a student to view'})
+    const select = getByTestId('observed-student-dropdown')
     expect(select).toBeInTheDocument()
     expect(select.value).toBe('Student 4')
   })
@@ -116,7 +116,7 @@ describe('K5Dashboard Parent Support', () => {
       status: 200,
       response: MOCK_CARDS_2
     })
-    const {findByText, getByRole, getByText, queryByText} = render(
+    const {findByText, getByTestId, getByText, queryByText} = render(
       <K5Dashboard
         {...defaultProps}
         currentUserRoles={['user', 'observer', 'teacher']}
@@ -126,7 +126,7 @@ describe('K5Dashboard Parent Support', () => {
     )
     expect(await findByText('Economics 101')).toBeInTheDocument()
     expect(queryByText('Economics 203')).not.toBeInTheDocument()
-    const select = getByRole('combobox', {name: 'Select a student to view'})
+    const select = getByTestId('observed-student-dropdown')
     expect(select.value).toBe('Student 4')
     expect(moxios.requests.mostRecent().url).toBe(
       '/api/v1/dashboard/dashboard_cards?observed_user_id=4'
@@ -173,7 +173,7 @@ describe('K5Dashboard Parent Support', () => {
     })
     createPlannerMocks()
 
-    const {getByText, findByRole, getByRole} = render(
+    const {getByText, findByTestId, getByTestId} = render(
       <K5Dashboard
         {...defaultProps}
         currentUserRoles={['user', 'observer', 'teacher']}
@@ -189,43 +189,41 @@ describe('K5Dashboard Parent Support', () => {
       },
       {timeout: 5000}
     )
-    expect(
-      await findByRole('link', {
-        name: 'View 2 missing items for course Economics 101',
-        timeout: 5000,
-        exact: false
-      })
-    ).toBeInTheDocument()
-    const observerSelect = getByRole('combobox', {name: 'Select a student to view'})
+
+    const missingItemsLink = await findByTestId('number-missing')
+    expect(missingItemsLink).toBeInTheDocument()
+    expect(missingItemsLink).toHaveTextContent('View 2 missing items for course Economics 1012 missing')
+
+    const observerSelect = getByTestId('observed-student-dropdown')
     act(() => observerSelect.click())
     act(() => getByText('Student 2').click())
-    expect(
-      await findByRole('link', {
-        name: 'View 1 missing items for course Economics 203',
-        timeout: 5000,
-        exact: false
-      })
-    ).toBeInTheDocument()
+
+    await waitFor(
+      () => {
+        expect(getByTestId('number-missing')).toHaveTextContent('View 1 missing items for course Economics 203')
+      }
+    )
+    expect(getByTestId('number-missing')).toBeInTheDocument()
   })
 
   it('does not show options to disable k5 dashboard if student is selected', async () => {
     clearObservedId(defaultProps.currentUser.id)
-    const {getByRole, findByRole, getByText, queryByRole} = render(
+    const {getByTestId, findByTestId, getByText, queryByTestId} = render(
       <K5Dashboard
         {...defaultProps}
         currentUserRoles={['user', 'observer', 'teacher']}
         observedUsersList={[defaultProps.currentUser, ...MOCK_OBSERVED_USERS_LIST]}
       />
     )
-    const select = getByRole('combobox', {name: 'Select a student to view'})
+    const select = getByTestId('observed-student-dropdown')
     expect(select.value).toBe('Geoffrey Jellineck')
-    expect(await findByRole('button', {name: 'Dashboard Options'})).toBeInTheDocument()
+    expect(await findByTestId('k5-dashboard-options')).toBeInTheDocument()
 
     act(() => select.click())
     act(() => getByText('Student 4').click())
     expect(select.value).toBe('Student 4')
     await waitFor(() =>
-      expect(queryByRole('button', {name: 'Dashboard Options'})).not.toBeInTheDocument()
+      expect(queryByTestId('k5-dashboard-options')).not.toBeInTheDocument()
     )
   })
 
