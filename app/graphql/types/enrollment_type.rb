@@ -137,5 +137,6 @@ module Types
     private :load_grades
 
     field :last_activity_at, DateTimeType, null: true
+    field :total_activity_time, Integer, null: true
   end
 end
