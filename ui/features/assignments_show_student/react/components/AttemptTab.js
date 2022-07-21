@@ -300,7 +300,7 @@ export default class AttemptTab extends Component {
             url: file.url,
             name: file.text,
             content_type: file.mediaType,
-            submit_assignment: false
+            submit_assignment: true
           },
           null,
           axios,
@@ -311,7 +311,8 @@ export default class AttemptTab extends Component {
           uploadUrl,
           {
             name: file.name,
-            content_type: file.type
+            content_type: file.type,
+            submit_assignment: true
           },
           file,
           axios,
