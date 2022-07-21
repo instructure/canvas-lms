@@ -97,10 +97,6 @@ const MessageListActionContainer = props => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.activeCourseFilter])
 
-  if (loading) {
-    return <span />
-  }
-
   if (error) {
     setOnFailure(I18n.t('Unable to load courses menu.'))
   }
@@ -154,18 +150,23 @@ const MessageListActionContainer = props => {
             itemSize: '45%'
           },
           messageActionButtons: {
-            padding: 'none x-small none x-small'
+            padding:
+              props.activeMailbox === 'submission_comments'
+                ? 'none none none x-small'
+                : 'none x-small none x-small'
           }
         }
       }}
       render={(responsiveProps, matches) => (
         <View
           as="div"
+          borderWidth="0 0 small 0"
           display="inline-block"
           width="100%"
           margin="none"
           padding="small"
           background="secondary"
+          data-testid="tool-bar"
         >
           <Flex wrap="wrap">
             <Flex.Item
@@ -204,10 +205,7 @@ const MessageListActionContainer = props => {
                 limitTagCount={LIMIT_TAG_COUNT}
               />
             </Flex.Item>
-            <Flex.Item
-              shouldGrow={matches.includes('mobile')}
-              padding={responsiveProps.messageActionButtons.padding}
-            >
+            <Flex.Item padding={responsiveProps.messageActionButtons.padding}>
               <MessageActionButtons
                 archive={props.displayUnarchiveButton ? undefined : props.onArchive}
                 unarchive={props.displayUnarchiveButton ? props.onUnarchive : undefined}

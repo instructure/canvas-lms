@@ -39,6 +39,7 @@ describe CalendarEventsApiController, type: :request do
     expected_reservation_event_fields = (expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group effective_context_code participant_type])
     expected_reserved_fields = (expected_slot_fields + ["reserved", "reserve_comments"])
     expected_reservation_fields = expected_reservation_event_fields - ["child_events"]
+    expected_series_fields = expected_fields + ["series_natural_language"]
 
     it "returns events within the given date range" do
       @course.calendar_events.create(title: "1", start_at: "2012-01-07 12:00:00")
@@ -901,127 +902,156 @@ describe CalendarEventsApiController, type: :request do
       end
 
       context "participants" do
-        before do
-          course_with_teacher(active_all: true)
-          @ag = AppointmentGroup.create!(title: "something", participants_per_appointment: 4, contexts: [@course],
-                                         participant_visibility: "protected", new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"],
-                                                                                                 ["2012-01-01 13:00:00", "2012-01-01 14:00:00"]])
-          @ag.publish!
-          @event = @ag.appointments.first
-          course_with_student(course: @course, active_all: true)
-          @student1 = @student
-          @event.reserve_for(@student1, @student1)
-          course_with_student(course: @course, active_all: true)
-          @student2 = @student
-          @event.reserve_for(@student2, @student2)
-        end
-
-        it "returns participants in the same appointment group slot for a student" do
-          json = api_call_as_user(@student1, :get, "/api/v1/calendar_events/#{@event.id}/participants",
-                                  { controller: "calendar_events_api", action: "participants", id: @event.id.to_s, format: "json" })
-          expect(json).to eq [
-            {
-              "id" => @student1.id,
-              "anonymous_id" => @student1.id.to_s(36),
-              "display_name" => @student1.short_name,
-              "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
-              "html_url" => "http://www.example.com/about/#{@student1.id}",
-              "pronouns" => nil
-            },
-            {
-              "id" => @student2.id,
-              "anonymous_id" => @student2.id.to_s(36),
-              "display_name" => @student2.short_name,
-              "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
-              "html_url" => "http://www.example.com/users/#{@student2.id}",
-              "pronouns" => nil
-            }
-          ]
-        end
-
-        it "returns participants in the same appointment group slot for a teacher" do
-          json = api_call_as_user(@teacher, :get, "/api/v1/calendar_events/#{@event.id}/participants",
-                                  { controller: "calendar_events_api", action: "participants", id: @event.id.to_s, format: "json" })
-          expect(json).to eq [
-            {
-              "id" => @student1.id,
-              "anonymous_id" => @student1.id.to_s(36),
-              "display_name" => @student1.short_name,
-              "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
-              "html_url" => "http://www.example.com/users/#{@student1.id}",
-              "pronouns" => nil
-            },
-            {
-              "id" => @student2.id,
-              "anonymous_id" => @student2.id.to_s(36),
-              "display_name" => @student2.short_name,
-              "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
-              "html_url" => "http://www.example.com/users/#{@student2.id}",
-              "pronouns" => nil
-            }
-          ]
-        end
-
-        it "paginates participants" do
-          @ag.participants_per_appointment = 15
-          @ag.save!
-          students = create_users_in_course(@course, 10, active_all: true)
-          students.each do |student_id|
-            student = User.find(student_id)
-            @event.reserve_for(student, student)
+        describe "calendar events" do
+          before do
+            course_with_teacher(active_all: true)
+            add_section("test section")
+            @parent_event = CalendarEvent.create!(title: "parent event", context: @course, start_at: 1.day.from_now, end_at: 2.days.from_now)
+            @child_event = CalendarEvent.create!(title: "child event", context: @course_section, start_at: 1.day.from_now, end_at: 2.days.from_now, parent_event: @parent_event)
+            course_with_student(course: @course, active_all: true)
+            @student1 = @student
+            multiple_student_enrollment(@student1, @course_section)
+            course_with_student(course: @course, active_all: true)
+            @student2 = @student
+            multiple_student_enrollment(@student2, @course_section)
           end
-          json = api_call(:get, "/api/v1/calendar_events/#{@event.id}/participants",
-                          { controller: "calendar_events_api", action: "participants", id: @event.id.to_s, format: "json" })
-          expect(json.length).to eq 10
-          json = api_call(:get, "/api/v1/calendar_events/#{@event.id}/participants?page=2",
-                          { controller: "calendar_events_api", action: "participants", id: @event.id.to_s, format: "json", page: 2 })
-          expect(json.length).to eq 2
+
+          it "returns a permission error for students accessing participants" do
+            api_call_as_user(@student1, :get, "/api/v1/calendar_events/#{@parent_event.id}/participants",
+                             { controller: "calendar_events_api", action: "participants", id: @parent_event.id.to_s, format: "json" })
+            expect(response.code).to eq "401"
+          end
+
+          it "returns empty participants for a teacher" do
+            json = api_call_as_user(@teacher, :get, "/api/v1/calendar_events/#{@parent_event.id}/participants",
+                                    { controller: "calendar_events_api", action: "participants", id: @parent_event.id.to_s, format: "json" })
+            expect(json).to eq []
+          end
         end
 
-        it "does not list users participating in other appointment group slots" do
-          course_with_student(course: @course, active_all: true)
-          event2 = @ag.appointments.last
-          event2.reserve_for(@student, @student)
-          json = api_call_as_user(@student1, :get, "/api/v1/calendar_events/#{@event.id}/participants",
-                                  { controller: "calendar_events_api", action: "participants", id: @event.id.to_s, format: "json" })
-          expect(json).to eq [
-            {
-              "id" => @student1.id,
-              "anonymous_id" => @student1.id.to_s(36),
-              "display_name" => @student1.short_name,
-              "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
-              "html_url" => "http://www.example.com/about/#{@student1.id}",
-              "pronouns" => nil
-            },
-            {
-              "id" => @student2.id,
-              "anonymous_id" => @student2.id.to_s(36),
-              "display_name" => @student2.short_name,
-              "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
-              "html_url" => "http://www.example.com/users/#{@student2.id}",
-              "pronouns" => nil
-            }
-          ]
-          json = api_call(:get, "/api/v1/calendar_events/#{event2.id}/participants",
-                          { controller: "calendar_events_api", action: "participants", id: event2.id.to_s, format: "json" })
-          expect(json).to eq [
-            {
-              "id" => @student.id,
-              "anonymous_id" => @student.id.to_s(36),
-              "display_name" => @student.short_name,
-              "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
-              "html_url" => "http://www.example.com/about/#{@student.id}",
-              "pronouns" => nil
-            }
-          ]
-        end
+        describe "appointment groups" do
+          before do
+            course_with_teacher(active_all: true)
+            @ag = AppointmentGroup.create!(title: "something", participants_per_appointment: 4, contexts: [@course],
+                                           participant_visibility: "protected", new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"],
+                                                                                                   ["2012-01-01 13:00:00", "2012-01-01 14:00:00"]])
+            @ag.publish!
+            @event = @ag.appointments.first
+            course_with_student(course: @course, active_all: true)
+            @student1 = @student
+            @event.reserve_for(@student1, @student1)
+            course_with_student(course: @course, active_all: true)
+            @student2 = @student
+            @event.reserve_for(@student2, @student2)
+          end
 
-        it "returns 401 if not allowed to view participants" do
-          @ag.participant_visibility = "private"
-          @ag.save!
-          api_call_as_user(@student1, :get, "/api/v1/calendar_events/#{@event.id}/participants",
-                           { controller: "calendar_events_api", action: "participants", id: @event.id.to_s, format: "json" })
-          expect(response.code).to eq "401"
+          it "returns participants in the same appointment group slot for a student" do
+            json = api_call_as_user(@student1, :get, "/api/v1/calendar_events/#{@event.id}/participants",
+                                    { controller: "calendar_events_api", action: "participants", id: @event.id.to_s, format: "json" })
+            expect(json).to eq [
+              {
+                "id" => @student1.id,
+                "anonymous_id" => @student1.id.to_s(36),
+                "display_name" => @student1.short_name,
+                "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
+                "html_url" => "http://www.example.com/about/#{@student1.id}",
+                "pronouns" => nil
+              },
+              {
+                "id" => @student2.id,
+                "anonymous_id" => @student2.id.to_s(36),
+                "display_name" => @student2.short_name,
+                "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
+                "html_url" => "http://www.example.com/users/#{@student2.id}",
+                "pronouns" => nil
+              }
+            ]
+          end
+
+          it "returns participants in the same appointment group slot for a teacher" do
+            json = api_call_as_user(@teacher, :get, "/api/v1/calendar_events/#{@event.id}/participants",
+                                    { controller: "calendar_events_api", action: "participants", id: @event.id.to_s, format: "json" })
+            expect(json).to eq [
+              {
+                "id" => @student1.id,
+                "anonymous_id" => @student1.id.to_s(36),
+                "display_name" => @student1.short_name,
+                "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
+                "html_url" => "http://www.example.com/users/#{@student1.id}",
+                "pronouns" => nil
+              },
+              {
+                "id" => @student2.id,
+                "anonymous_id" => @student2.id.to_s(36),
+                "display_name" => @student2.short_name,
+                "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
+                "html_url" => "http://www.example.com/users/#{@student2.id}",
+                "pronouns" => nil
+              }
+            ]
+          end
+
+          it "paginates participants" do
+            @ag.participants_per_appointment = 15
+            @ag.save!
+            students = create_users_in_course(@course, 10, active_all: true)
+            students.each do |student_id|
+              student = User.find(student_id)
+              @event.reserve_for(student, student)
+            end
+            json = api_call(:get, "/api/v1/calendar_events/#{@event.id}/participants",
+                            { controller: "calendar_events_api", action: "participants", id: @event.id.to_s, format: "json" })
+            expect(json.length).to eq 10
+            json = api_call(:get, "/api/v1/calendar_events/#{@event.id}/participants?page=2",
+                            { controller: "calendar_events_api", action: "participants", id: @event.id.to_s, format: "json", page: 2 })
+            expect(json.length).to eq 2
+          end
+
+          it "does not list users participating in other appointment group slots" do
+            course_with_student(course: @course, active_all: true)
+            event2 = @ag.appointments.last
+            event2.reserve_for(@student, @student)
+            json = api_call_as_user(@student1, :get, "/api/v1/calendar_events/#{@event.id}/participants",
+                                    { controller: "calendar_events_api", action: "participants", id: @event.id.to_s, format: "json" })
+            expect(json).to eq [
+              {
+                "id" => @student1.id,
+                "anonymous_id" => @student1.id.to_s(36),
+                "display_name" => @student1.short_name,
+                "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
+                "html_url" => "http://www.example.com/about/#{@student1.id}",
+                "pronouns" => nil
+              },
+              {
+                "id" => @student2.id,
+                "anonymous_id" => @student2.id.to_s(36),
+                "display_name" => @student2.short_name,
+                "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
+                "html_url" => "http://www.example.com/users/#{@student2.id}",
+                "pronouns" => nil
+              }
+            ]
+            json = api_call(:get, "/api/v1/calendar_events/#{event2.id}/participants",
+                            { controller: "calendar_events_api", action: "participants", id: event2.id.to_s, format: "json" })
+            expect(json).to eq [
+              {
+                "id" => @student.id,
+                "anonymous_id" => @student.id.to_s(36),
+                "display_name" => @student.short_name,
+                "avatar_image_url" => "http://www.example.com/images/messages/avatar-50.png",
+                "html_url" => "http://www.example.com/about/#{@student.id}",
+                "pronouns" => nil
+              }
+            ]
+          end
+
+          it "returns 401 if not allowed to view participants" do
+            @ag.participant_visibility = "private"
+            @ag.save!
+            api_call_as_user(@student1, :get, "/api/v1/calendar_events/#{@event.id}/participants",
+                             { controller: "calendar_events_api", action: "participants", id: @event.id.to_s, format: "json" })
+            expect(response.code).to eq "401"
+          end
         end
       end
     end
@@ -1196,7 +1226,7 @@ describe CalendarEventsApiController, type: :request do
             }
           )
           assert_status(201)
-          expect(json.keys).to match_array expected_fields
+          expect(json.keys).to match_array expected_series_fields
           expect(json["title"]).to eq "many me"
           expect(json["series_uuid"]).not_to be_nil
 
@@ -1291,6 +1321,26 @@ describe CalendarEventsApiController, type: :request do
             }
           )
           assert_status(400)
+        end
+
+        it "copes with a leading 'RRULE:' in the rrule" do
+          start_at = Time.zone.now.utc.change(hour: 0, min: 1)
+          end_at = Time.zone.now.utc.change(hour: 23)
+          api_call(
+            :post,
+            "/api/v1/calendar_events",
+            { controller: "calendar_events_api", action: "create", format: "json" },
+            {
+              calendar_event: {
+                context_code: @course.asset_string,
+                title: "ohai",
+                start_at: start_at.iso8601,
+                end_at: end_at.iso8601,
+                rrule: "RRULE:FREQ=WEEKLY;INTERVAL=1;COUNT=2"
+              }
+            }
+          )
+          assert_status(201)
         end
       end
 
@@ -1399,7 +1449,7 @@ describe CalendarEventsApiController, type: :request do
           json = api_call(:put, "/api/v1/calendar_events/#{target_event_id}",
                           { controller: "calendar_events_api", action: "update", id: target_event_id.to_s, format: "json" },
                           { calendar_event: { start_at: new_start_at, title: "this is different" } })
-          expect(json.keys).to match_array expected_fields
+          expect(json.keys).to match_array expected_series_fields
           expect(json["title"]).to eql "this is different"
           expect(json["start_at"]).to eql new_start_at
         end
@@ -1418,7 +1468,7 @@ describe CalendarEventsApiController, type: :request do
           assert_status(200)
           expect(json.length).to eql 3
           json.each_with_index do |event, i|
-            expect(event.keys).to match_array expected_fields
+            expect(event.keys).to match_array expected_series_fields
             expect(event["id"]).to eql orig_events[i]["id"]
             expect(event["title"]).to eql new_title
             expect(event["start_at"]).to eql (Time.parse(orig_events[i]["start_at"]) + 15.minutes).iso8601
@@ -1441,7 +1491,7 @@ describe CalendarEventsApiController, type: :request do
           expect(json.length).to eql 2
           orig_events.shift
           json.each_with_index do |event, i|
-            expect(event.keys).to match_array expected_fields
+            expect(event.keys).to match_array expected_series_fields
             expect(event["id"]).to eql orig_events[i]["id"]
             expect(event["title"]).to eql new_title
             expect(event["start_at"]).to eql (Time.parse(orig_events[i]["start_at"]) + 15.minutes).iso8601
@@ -1489,7 +1539,7 @@ describe CalendarEventsApiController, type: :request do
           expect(json.length).to eql 4
           orig_events.shift # we didn't update the first event in teh series
           orig_events.each_with_index do |event, i|
-            expect(json[i].keys).to match_array expected_fields
+            expect(json[i].keys).to match_array expected_series_fields
             expect(json[i]["id"]).to eql event["id"]
             expect(json[i]["title"]).to eql new_title
             expect(json[i]["start_at"]).to eql (Time.parse(event["start_at"]) + 15.minutes).iso8601
@@ -1518,7 +1568,7 @@ describe CalendarEventsApiController, type: :request do
           assert_status(200)
           expect(json.length).to eql 2
           json.each_with_index do |event, i|
-            expect(json[i].keys).to match_array expected_fields
+            expect(json[i].keys).to match_array expected_series_fields
             expect(json[i]["id"]).to eql orig_events[i]["id"]
             expect(json[i]["title"]).to eql new_title
             expect(json[i]["start_at"]).to eql (Time.parse(orig_events[i]["start_at"]) + 15.minutes).iso8601
@@ -1770,6 +1820,30 @@ describe CalendarEventsApiController, type: :request do
       let_once(:event_with_conference) do
         @course.calendar_events.create(title: "event with conference", workflow_state: "active",
                                        web_conference: conference)
+      end
+
+      context "notifications" do
+        before do
+          Notification.create!(name: "Web Conference Invitation",
+                               category: "TestImmediately")
+          course_with_teacher(active_all: true, user: user_with_communication_channel(active_all: true))
+        end
+
+        it "sends only one conference invite notification for created web conference" do
+          api_call(:post, "/api/v1/calendar_events.json", {
+                     controller: "calendar_events_api", action: "create", format: "json"
+                   }, {
+                     calendar_event: {
+                       context_code: "course_#{@course.id}",
+                       title: "API Test",
+                       web_conference: { conference_type: "BigBlueButton", title: "BBB Conference" }
+                     }
+                   })
+
+          expect(Message.count).to eq 1
+          expect(Message.last.user_id).to eq @user.id
+          expect(Message.last.notification_name).to eq "Web Conference Invitation"
+        end
       end
 
       it "does not show web conferences by default" do

@@ -140,6 +140,14 @@ class CalendarEvent < ActiveRecord::Base
     !appointment_group? && !child_events.empty?
   end
 
+  def in_a_series?
+    !!series_uuid
+  end
+
+  def series_tail?
+    in_a_series? && !series_head
+  end
+
   def effective_context
     (effective_context_code && ActiveRecord::Base.find_all_by_asset_string(effective_context_code).first) || context
   end
@@ -452,7 +460,7 @@ class CalendarEvent < ActiveRecord::Base
     dispatch :new_event_created
     to { participants(include_observers: true) - [@updating_user] }
     whenever do
-      !appointment_group && context.available? && just_created && !hidden?
+      !appointment_group && context.available? && just_created && !hidden? && !series_tail?
     end
     data { course_broadcast_data }
 

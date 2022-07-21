@@ -31,6 +31,7 @@ import {
 } from './mocks'
 import LibraryManager from '../LibraryManager'
 
+jest.setTimeout(10000)
 jest.useFakeTimers()
 jest.mock('@canvas/do-fetch-api-effect')
 

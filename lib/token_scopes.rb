@@ -112,13 +112,12 @@ class TokenScopes
         controller: route.defaults[:controller]&.to_sym,
         action: route.defaults[:action]&.to_sym,
         verb: route.verb,
-        path: route.path.spec.to_s.gsub(/\(\.:format\)$/, ""),
+        path: TokenScopesHelper.path_without_format(route),
         scope: TokenScopesHelper.scope_from_route(route).freeze,
       }
     end
     @_api_routes = routes.uniq { |route| route[:scope] }.freeze
   end
-  private_class_method :api_routes
 
   def self.reset!
     @_api_routes = nil

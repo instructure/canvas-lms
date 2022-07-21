@@ -26,7 +26,6 @@ import authenticity_token from '@canvas/authenticity-token'
 import htmlEscape from 'html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'/* ajaxJSON, defaultAjaxError */
 import '@canvas/jquery/jquery.disableWhileLoading'
-import {trackEvent} from '@canvas/google-analytics'
 import '@canvas/datetime'/* date_field, time_field, datetime_field */
 import '@canvas/jquery/jquery.instructure_misc_helpers'/* /\$\.uniq/ */
 import '@canvas/rails-flash-notifications'
@@ -994,11 +993,6 @@ $.fn.validateForm = function (options) {
   }
   if (hasErrors) {
     $form.formErrors(errors, options)
-    trackEvent(
-      'Form Errors',
-      this.attr('id') || this.attr('class') || document.title,
-      JSON.stringify(errors)
-    )
     return false
   }
   return true

@@ -524,7 +524,7 @@ class Submission < ActiveRecord::Base
   def observer?(user)
     assignment.context.observer_enrollments.where(
       user_id: user.id,
-      associated_user_id: self.user.id,
+      associated_user_id: user_id,
       workflow_state: "active"
     ).exists?
   end
@@ -541,7 +541,7 @@ class Submission < ActiveRecord::Base
     return false unless grants_right?(user, :read)
     return true unless assignment.anonymize_students?
 
-    user == self.user || peer_reviewer?(user) || Account.site_admin.grants_right?(user, :update)
+    user == self.user || peer_reviewer?(user) || observer?(user) || Account.site_admin.grants_right?(user, :update)
   end
 
   def can_view_plagiarism_report(type, user, session)
@@ -1425,6 +1425,10 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  def infer_review_needed?
+    (submission_type == "online_quiz" && quiz_submission.try(:latest_submitted_attempt).try(:pending_review?)) || lti_result&.reload&.needs_review?
+  end
+
   def inferred_workflow_state
     inferred_state = workflow_state
 
@@ -1434,7 +1438,7 @@ class Submission < ActiveRecord::Base
     inferred_state = Submission.workflow_states.submitted if unsubmitted? && submitted_at
     inferred_state = Submission.workflow_states.unsubmitted if submitted? && !has_submission?
     inferred_state = Submission.workflow_states.graded if grade && score && grade_matches_current_submission
-    inferred_state = Submission.workflow_states.pending_review if submission_type == "online_quiz" && quiz_submission.try(:latest_submitted_attempt).try(:pending_review?)
+    inferred_state = Submission.workflow_states.pending_review if infer_review_needed?
 
     inferred_state
   end
@@ -1808,10 +1812,12 @@ class Submission < ActiveRecord::Base
     attachment_ids_by_submission_and_index = group_attachment_ids_by_submission_and_index(submissions)
     bulk_attachment_ids = attachment_ids_by_submission_and_index.values.flatten
 
-    attachments_by_id = if bulk_attachment_ids.empty?
+    attachments_by_id = if bulk_attachment_ids.empty? || submissions.none?
                           {}
                         else
-                          Attachment.where(id: bulk_attachment_ids).preload(preloads).group_by(&:id)
+                          submissions.first.shard.activate do
+                            Attachment.where(id: bulk_attachment_ids).preload(preloads).group_by(&:id)
+                          end
                         end
 
     submissions.each_with_index do |s, index|

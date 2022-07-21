@@ -68,7 +68,8 @@ export default class EditCalendarEventView extends Backbone.View {
         'location_address',
         'duplicate',
         'web_conference',
-        'important_dates'
+        'important_dates',
+        'blackout_date'
       )
       if (picked_params.start_at) {
         picked_params.start_date = tz.format(
@@ -114,6 +115,11 @@ export default class EditCalendarEventView extends Backbone.View {
         if (key === 'important_dates') {
           this.$el
             .find('#calendar_event_important_dates')
+            .prop('checked', picked_params[key] === 'true')
+        }
+        if (key === 'blackout_date') {
+          this.$el
+            .find('#calendar_event_blackout_date')
             .prop('checked', picked_params[key] === 'true')
         }
         return $e.change()
@@ -338,6 +344,7 @@ export default class EditCalendarEventView extends Backbone.View {
     const result = super.toJSON(...arguments)
     result.recurringEventLimit = 200
     result.k5_course = ENV.K5_SUBJECT_COURSE || ENV.K5_HOMEROOM_COURSE
+    result.account_level_blackout_dates = ENV.FEATURES?.account_level_blackout_dates
     result.disableSectionDates =
       result.use_section_dates &&
       result.course_sections.filter(
@@ -389,6 +396,7 @@ export default class EditCalendarEventView extends Backbone.View {
     }
 
     data.important_dates = this.$el.find('#calendar_event_important_dates').prop('checked')
+    data.blackout_date = this.$el.find('#calendar_event_blackout_date').prop('checked')
     return data
   }
 

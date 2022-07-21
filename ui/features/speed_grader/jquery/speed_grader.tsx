@@ -216,6 +216,7 @@ let $comment_saved_message
 let $reassignment_complete
 let $selectmenu
 let $word_count
+let originalRubric
 let browserableCssClasses
 let snapshotCache
 let sectionToShow
@@ -1547,6 +1548,7 @@ EG = {
       rubricFull.fadeIn()
       $('#grading').hide()
       this.refreshFullRubric()
+      originalRubric = EG.getOriginalRubricInfo()
       rubricFull.find('.rubric_title .title').focus()
     }
   },
@@ -1554,9 +1556,6 @@ EG = {
   refreshFullRubric() {
     const rubricFull = selectors.get('#rubric_full')
     if (!window.jsonData.rubric_association) {
-      return
-    }
-    if (!rubricFull.filter(':visible').length) {
       return
     }
 
@@ -1567,6 +1566,24 @@ EG = {
       window.jsonData.rubric_association
     )
     $('#grading').height(rubricFull.height())
+  },
+
+  getOriginalRubricInfo(){
+    if(window.jsonData.rubric_association){
+      const $originalRubric = $('.save_rubric_button').parents('#rubric_holder').find('.rubric')
+      return rubricAssessment.assessmentData($originalRubric)
+    }
+    return null
+  },
+
+  hasUnsubmittedRubric(originalRubric){
+    const $rubricFull = $('#rubric_full')
+    if ($rubricFull.filter(':visible').length){
+      const $unSavedRubric = $('.save_rubric_button').parents('#rubric_holder').find('.rubric')
+      const unSavedData = rubricAssessment.assessmentData($unSavedRubric)
+      return !_.isEqual(unSavedData,originalRubric)
+    }
+    return false
   },
 
   handleStatePopped(event) {
@@ -1690,6 +1707,7 @@ EG = {
       this.showStudent()
     }
 
+    originalRubric = EG.getOriginalRubricInfo()
     this.setCurrentStudentAvatar()
   },
 
@@ -3734,6 +3752,12 @@ EG = {
       event.preventDefault()
       event.returnValue = I18n.t(
         'If you would like to keep your unsubmitted comments, please save them before navigating away from this page.'
+      )
+      return event.returnValue
+    } else if (EG.hasUnsubmittedRubric(originalRubric)) {
+      event.preventDefault()
+      event.returnValue = I18n.t(
+        'If you would like to keep your unsubmitted rubric, please save them before navigating away from this page.'
       )
       return event.returnValue
     }

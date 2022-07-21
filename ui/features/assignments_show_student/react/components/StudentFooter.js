@@ -35,10 +35,16 @@ import api from '../apis/ContextModuleApi'
 const I18n = useI18nScope('assignments_2_file_upload')
 
 function buildFooterStyle() {
-  return {
+  const footerStyle = {
     backgroundColor: theme.variables.colors.white,
     borderColor: theme.variables.colors.borderMedium
   }
+
+  if (document.querySelector('.with-embedded-chat')) {
+    footerStyle.bottom = '20px'
+  }
+
+  return footerStyle
 }
 
 const NextItem = ({compact, tooltipText, url}) => (

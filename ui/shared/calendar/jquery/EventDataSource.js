@@ -535,7 +535,7 @@ export default class EventDataSource {
     if (ag_ids.length > 0) {
       p.appointment_group_ids = ag_ids.join(',')
     }
-    p.include = ['web_conference']
+    p.include = ['web_conference', 'series_natural_language']
     return p
   }
 
@@ -615,7 +615,7 @@ export default class EventDataSource {
   // header, will fetch that link too (with the same params). At the end of every
   // request it will call cb(data, isDone). isDone will be true on the last request.
   fetchNextBatch(url, params, cb, options = {}) {
-    const parseLinkHeader = function(header) {
+    const parseLinkHeader = function (header) {
       if (!header) {
         // TODO: Write a real Link header parser. This will only work with what we output,
         // and might be fragile.

@@ -1059,7 +1059,7 @@ class AccountsController < ApplicationController
 
         emoji_deny_list = params[:account][:settings].try(:delete, :emoji_deny_list)
         if @account.feature_allowed?(:submission_comment_emojis) &&
-           @account.root_account? &&
+           @account.primary_settings_root_account? &&
            !@account.site_admin?
           @account.settings[:emoji_deny_list] = emoji_deny_list
         end
@@ -1105,7 +1105,7 @@ class AccountsController < ApplicationController
 
         # privacy settings
         unless @account.grants_right?(@current_user, :manage_privacy_settings)
-          %w[enable_fullstory enable_google_analytics].each do |setting|
+          %w[enable_fullstory].each do |setting|
             params[:account][:settings].try(:delete, setting)
           end
         end
@@ -1775,7 +1775,7 @@ class AccountsController < ApplicationController
                                    :turnitin_host, :turnitin_account_id, :users_can_edit_name,
                                    { usage_rights_required: [:value, :locked] }.freeze,
                                    :app_center_access_token, :default_dashboard_view, :force_default_dashboard_view,
-                                   :smart_alerts_threshold, :enable_fullstory, :enable_google_analytics,
+                                   :smart_alerts_threshold, :enable_fullstory,
                                    { enable_as_k5_account: [:value, :locked] }.freeze,
                                    :enable_push_notifications, :teachers_can_create_courses_anywhere,
                                    :students_can_create_courses_anywhere,

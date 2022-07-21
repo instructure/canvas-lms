@@ -24,6 +24,8 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import ProficiencyFilter from './ProficiencyFilter'
 import Gradebook from './Gradebook'
 import useRollups from './hooks/useRollups'
+import GradebookMenu from '@canvas/gradebook-menu/react/gradebook_menu'
+import {Flex} from '@instructure/ui-flex'
 
 const I18n = useI18nScope('LearningMasteryGradebook')
 
@@ -49,10 +51,25 @@ const renderLoader = () => (
 
 const LearningMastery = ({courseId}) => {
   const {isLoading, students, outcomes, rollups} = useRollups({courseId})
-
+  const options = ENV.GRADEBOOK_OPTIONS
   return (
     <>
-      <ProficiencyFilter ratings={getRatings()} />
+      <View
+        width="100%"
+        display="block"
+        padding="medium small medium small"
+        borderWidth="0 0 small 0"
+        data-testid="lmgb-gradebook-menu"
+      >
+        <GradebookMenu
+          courseUrl={options.context_url}
+          learningMasteryEnabled
+          variant="DefaultGradebookLearningMastery"
+        />
+      </View>
+      <Flex.Item as="div" width="100%" padding="small 0 0 0">
+        <ProficiencyFilter ratings={getRatings()} />
+      </Flex.Item>
       {isLoading ? (
         renderLoader()
       ) : (

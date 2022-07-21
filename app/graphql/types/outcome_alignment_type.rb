@@ -44,6 +44,12 @@ module Types
       [base_context_url.to_s, "modules", object.module_id].join("/") if object.module_id
     end
     field :module_workflow_state, String, null: true
+    field :assignment_content_type, String, null: true
+    def assignment_content_type
+      return "quiz" unless object.quizzes_id.nil?
+      return "discussion" unless object.discussion_id.nil?
+      return "assignment" unless object.assignment_id.nil?
+    end
 
     private
 

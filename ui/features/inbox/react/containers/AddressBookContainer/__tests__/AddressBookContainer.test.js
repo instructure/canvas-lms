@@ -161,7 +161,7 @@ describe('Should load <AddressBookContainer> normally', () => {
       fireEvent.change(container.querySelector('input'), {target: {value: 'Fred'}})
 
       // for debouncing
-      act(() => jest.advanceTimersByTime(1000))
+      await act(async () => jest.advanceTimersByTime(1000))
       const items = await screen.findAllByTestId('address-book-item')
       // Expects The user Fred and a back button
       expect(items.length).toBe(2)
@@ -179,13 +179,13 @@ describe('Should load <AddressBookContainer> normally', () => {
       fireEvent.change(container.querySelector('input'), {target: {value: 'Fred'}})
 
       // for debouncing
-      act(() => jest.advanceTimersByTime(1000))
+      await act(async () => jest.advanceTimersByTime(1000))
       items = await screen.findAllByTestId('address-book-item')
       // search results
       expect(items.length).toBe(2)
       fireEvent.mouseDown(items[0])
 
-      act(() => jest.advanceTimersByTime(1000))
+      await act(async () => jest.advanceTimersByTime(1000))
       items = await screen.findAllByTestId('address-book-item')
       // the student sub-menu
       expect(items.length).toBe(4)
@@ -199,7 +199,7 @@ describe('Should load <AddressBookContainer> normally', () => {
       expect(input.value).toBe('Fred')
 
       // for debouncing
-      act(() => jest.advanceTimersByTime(1000))
+      await act(async () => jest.advanceTimersByTime(1000))
 
       const items = await screen.findAllByTestId('address-book-item')
       // Expects Fred and a back button

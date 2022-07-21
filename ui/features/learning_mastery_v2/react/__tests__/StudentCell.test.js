@@ -41,14 +41,14 @@ describe('StudentCell', () => {
   })
 
   it("renders an image with the student's avatar_url", () => {
-    const {getByAltText} = render(<StudentCell {...defaultProps()} />)
-    expect(getByAltText('Student Test').src).toMatch(/avatar-url/)
+    const {getByTestId} = render(<StudentCell {...defaultProps()} />)
+    expect(getByTestId('student-avatar')).toBeInTheDocument()
   })
 
   it('renders a link to the student learning mastery gradebook', () => {
     const props = defaultProps()
-    const {getByText} = render(<StudentCell {...props} />)
-    expect(getByText('Student Test').href).toMatch(
+    const {getByTestId} = render(<StudentCell {...props} />)
+    expect(getByTestId('student-cell-link').href).toMatch(
       `/courses/${props.courseId}/grades/${props.student.id}#tab-outcomes`
     )
   })

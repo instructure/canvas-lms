@@ -309,12 +309,14 @@ class ConversationsController < ApplicationController
                conversation_cache_key: Base64.encode64("#{@current_user.uuid}jamDN74lLSmfnmo74Hb6snyBnmc6q")
              })
       if @domain_root_account.feature_enabled?(:react_inbox)
+        InstStatsd::Statsd.increment("inbox.visit.react")
         css_bundle :canvas_inbox
         js_bundle :inbox
         render html: "", layout: true
         return
       end
 
+      InstStatsd::Statsd.increment("inbox.visit.legacy")
       render :index_new
     end
   end
@@ -666,6 +668,7 @@ class ConversationsController < ApplicationController
   #   }
   def update
     if @conversation.update(params.require(:conversation).permit(*API_ALLOWED_FIELDS))
+      InstStatsd::Statsd.increment("inbox.conversation.archived.legacy") if params.require(:conversation)["workflow_state"] == "archived"
       render json: conversation_json(@conversation, @current_user, session)
     else
       render json: @conversation.errors, status: :bad_request
@@ -915,7 +918,7 @@ class ConversationsController < ApplicationController
       media_comment_type: params[:media_comment_type],
       user_note: params[:user_note]
     )
-
+    InstStatsd::Statsd.increment("inbox.message.sent.isReply.legacy")
     render json: message[:message].nil? ? [] : conversation_json(@conversation.reload, @current_user, session, messages: [message[:message]]), status: message[:status]
   rescue ConversationsHelper::RepliesLockedForUser
     render_unauthorized_action

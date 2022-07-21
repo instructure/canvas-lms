@@ -114,12 +114,6 @@
         "request": "../../../shared/graphql/Error"
     },
     {
-        "name": "AccessViolationError",
-        "source": "ui/features/navigation_header/jquery/instructure.js",
-        "target": "ui/boot/initializers/trackGoogleAnalyticsEventsOnClick.js",
-        "request": "../../../boot/initializers/trackGoogleAnalyticsEventsOnClick"
-    },
-    {
         "name": "SpecifierMismatchError",
         "source": "ui/shared/apollo/index.js",
         "target": "ui/shared/encrypted-forage/index.js",

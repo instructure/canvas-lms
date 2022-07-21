@@ -166,7 +166,7 @@ describe RubricAssessment do
     t.extend HtmlTextHelper
     expected = t.format_message(comment).first
     expect(assessment.data.first[:comments_html]).to eq expected
-    expect(@student.reload.unread_rubric_comments?(@assignment.submission_for_student(@student))).to eq true
+    expect(@student.reload.unread_rubric_assessments?(@assignment.submission_for_student(@student))).to eq true
   end
 
   context "grading" do

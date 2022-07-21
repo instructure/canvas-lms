@@ -490,7 +490,7 @@ describe('api actions', () => {
       })
     })
 
-    it('filters requests to specific contexts if in singleCourse mode', async done => {
+    it('filters requests to specific contexts if in singleCourse mode', async () => {
       const today = moment.tz('UTC').startOf('day')
       moxios.stubRequest(/\/api\/v1\/planner\/items/, {
         status: 200,
@@ -516,10 +516,9 @@ describe('api actions', () => {
       expect(moxios.requests.at(0).url).toMatch(expectedContextCodes)
       expect(moxios.requests.at(1).url).toMatch(expectedContextCodes)
       expect(moxios.requests.at(2).url).toMatch(expectedContextCodes)
-      done()
     })
 
-    it('adds observee id and context codes to request if state contains selected observee', async done => {
+    it('adds observee id and context codes to request if state contains selected observee', async () => {
       const today = moment.tz('UTC').startOf('day')
       moxios.stubRequest(/\/api\/v1\/planner\/items/, {
         status: 200,
@@ -553,10 +552,9 @@ describe('api actions', () => {
       expect(moxios.requests.at(1).url).toMatch(expectedParams)
       expect(moxios.requests.at(2).url).toMatch(expectedParams)
       expect(moxios.requests.at(3).url).toMatch(expectedParams)
-      done()
     })
 
-    it('does not add observee id if observee id is the current user id', async done => {
+    it('does not add observee id if observee id is the current user id', async () => {
       const today = moment.tz('UTC').startOf('day')
       moxios.stubRequest(/\/api\/v1\/planner\/items/, {
         status: 200,
@@ -585,7 +583,6 @@ describe('api actions', () => {
       expect(moxios.requests.at(1).url).not.toContain('observed_user_id')
       expect(moxios.requests.at(2).url).not.toContain('observed_user_id')
       expect(moxios.requests.at(3).url).not.toContain('observed_user_id')
-      done()
     })
   })
 })

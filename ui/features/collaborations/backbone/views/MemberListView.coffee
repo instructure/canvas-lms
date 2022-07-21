@@ -151,5 +151,6 @@ export default class MemberListView extends View
       $.when(@currentXHR).then(@onFetch)
 
   getNextPage: (header) ->
-    nextPage = filter(header.split(','), (l) -> l.match(/next/))[0]
+    if header
+      nextPage = filter(header.split(','), (l) -> l.match(/next/))[0]
     return if nextPage then nextPage.match(/http[^>]+/)[0] else false

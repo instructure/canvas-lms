@@ -2150,28 +2150,31 @@ describe Assignment do
 
     describe "grade_posting_in_progress" do
       let(:submission) { instance_double("Submission") }
+      let(:result) { instance_double("Lti::Result") }
 
       before do
         allow(assignment).to receive(:find_or_create_submissions)
           .with([student], Submission.preload(:grading_period, :stream_item))
-          .and_yield([submission])
+          .and_yield(submission)
+        allow(result).to receive(:mark_reviewed!)
+        allow(submission).to receive(:lti_result).and_return(result)
       end
 
       it "sets grade_posting_in_progress to false when absent" do
         expect(assignment).to receive(:save_grade_to_submission)
-          .with([submission], student, nil, grade: 10, grader: teacher)
+          .with(submission, student, nil, grade: 10, grader: teacher)
         assignment.grade_student(student, grade: 10, grader: teacher)
       end
 
       it "sets grade_posting_in_progress to true when present" do
         expect(assignment).to receive(:save_grade_to_submission)
-          .with([submission], student, nil, grade: 10, grader: teacher, grade_posting_in_progress: true)
+          .with(submission, student, nil, grade: 10, grader: teacher, grade_posting_in_progress: true)
         assignment.grade_student(student, grade: 10, grader: teacher, grade_posting_in_progress: true)
       end
 
       it "sets grade_posting_in_progress to false when present" do
         expect(assignment).to receive(:save_grade_to_submission)
-          .with([submission], student, nil, grade: 10, grader: teacher, grade_posting_in_progress: false)
+          .with(submission, student, nil, grade: 10, grader: teacher, grade_posting_in_progress: false)
         assignment.grade_student(student, grade: 10, grader: teacher, grade_posting_in_progress: false)
       end
     end
@@ -2234,6 +2237,44 @@ describe Assignment do
 
         it "has a version length of one" do
           expect(submission.versions.length).to eq 1
+        end
+      end
+
+      context "and the submission is associated with an LTI::Result marked PendingManual" do
+        let(:tool) { external_tool_1_3_model }
+        let(:submission) { assignment.find_or_create_submission(student) }
+        let(:result) do
+          lti_result_model({
+                             assignment: assignment,
+                             submission: submission,
+                             user: student,
+                             grading_progress: "PendingManual",
+                             result_score: 10,
+                             result_maximum: 10
+                           })
+        end
+        let(:grading_params) do
+          {
+            grade: 10,
+            grader: teacher
+          }
+        end
+
+        before do
+          # Force an update to make the submission infer its values. Basically,
+          # we're trying to emulate a request from the lti/scores_controller here.
+          result
+          submission.update!(updated_at: Time.now)
+        end
+
+        it "marks the submission and result as fully graded" do
+          expect(result.needs_review?).to be true
+          expect(submission.needs_review?).to be true
+
+          updated_submission = assignment.grade_student(student, grading_params).first
+
+          expect(updated_submission.needs_review?).to be false
+          expect(updated_submission.lti_result.needs_review?).to be false
         end
       end
     end

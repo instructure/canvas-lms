@@ -27,7 +27,7 @@ import {actions} from '../../../reducers/imageSection'
 const Course = ({dispatch, onLoading, onLoaded}) => {
   const storeProps = useStoreProps()
   const {files, bookmark, isLoading, hasMore} = storeProps.images[storeProps.contextType]
-  const {setUrl, dataUrl, dataLoading, dataError} = useDataUrl()
+  const {setUrl, dataUrl, dataLoading} = useDataUrl()
 
   const category = 'uncategorized'
 
@@ -37,6 +37,8 @@ const Course = ({dispatch, onLoading, onLoaded}) => {
     if (!dataUrl) return
 
     dispatch({...actions.SET_IMAGE, payload: dataUrl})
+    dispatch({...actions.SET_CROPPER_OPEN, payload: true})
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataUrl])
 
   // Handle loading states
@@ -46,11 +48,13 @@ const Course = ({dispatch, onLoading, onLoaded}) => {
     if (dataUrl) {
       dispatch({...actions.SET_IMAGE_COLLECTION_OPEN, payload: false})
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataLoading])
 
   useEffect(() => {
     if (isLoading) onLoading && onLoading()
     else onLoaded && onLoaded()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading])
 
   return (

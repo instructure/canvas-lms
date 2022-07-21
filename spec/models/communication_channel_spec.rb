@@ -587,6 +587,7 @@ describe CommunicationChannel do
           consider_building_pseudonym
           set_confirmation_code
           set_root_account_ids
+          after_save_flag_old_microsoft_sync_user_mappings
         ]
         expect(CommunicationChannel._save_callbacks.collect(&:filter).select { |k| k.is_a? Symbol } - accounted_for_callbacks).to eq []
       end
@@ -724,6 +725,75 @@ describe CommunicationChannel do
           expect(@cc3.bounce_count).to eq 3
           expect(@cc3.bouncing?).to be_truthy
         end
+      end
+    end
+  end
+
+  describe "flagging old microsoft sync user mappings" do
+    context "when there is a root account with microsoft sync enabled" do
+      let(:enrollment) { student_in_course(active_all: true) }
+      let(:account) do
+        ra = enrollment.root_account
+        ra.settings[:microsoft_sync_enabled] = true
+        ra.settings[:microsoft_sync_login_attribute] = "email"
+        ra.save
+        ra
+      end
+      let(:user) { enrollment.user }
+      let(:cc) { communication_channel_model(user: user) }
+      let(:mapping) do
+        MicrosoftSync::UserMapping.create!(root_account: account, user: user, aad_id: "abc123")
+      end
+
+      describe "destroying the communication channel" do
+        it "flags the user's mapping" do
+          expect { cc.destroy_permanently! }.to change { mapping.reload.needs_updating }
+            .from(false).to(true)
+        end
+      end
+
+      describe "updating the communication channel" do
+        it "flags the user's mapping" do
+          expect do
+            cc.update(workflow_state: :retired)
+          end.to change { mapping.reload.needs_updating }.from(false).to(true)
+        end
+      end
+    end
+
+    context "when destroying a communication channel" do
+      it "flags old mappings when destroying a communication channel" do
+        cc = communication_channel_model
+        expect(MicrosoftSync::UserMapping).to \
+          receive(:flag_as_needs_updating_if_using_email).with(cc.user)
+        cc.destroy_permanently!
+      end
+    end
+
+    describe "#after_save_flag_old_microsoft_sync_user_mappings" do
+      let!(:cc) { communication_channel_model(path_type: described_class::TYPE_EMAIL) }
+
+      it "flags old mappings if path/path_type/position/workflow_state is changed" do
+        expect(MicrosoftSync::UserMapping).to \
+          receive(:flag_as_needs_updating_if_using_email).with(cc.user).exactly(5).times
+        cc.update!(path: "foo" + cc.path)
+        cc.update!(position: cc.position + 1)
+        expect(cc.workflow_state).to_not eq("active")
+        cc.update!(workflow_state: "active")
+        cc.update!(path_type: described_class::TYPE_PUSH)
+        cc.update!(path_type: described_class::TYPE_EMAIL)
+      end
+
+      it "doesn't flag old mappings if path type is not email" do
+        cc.update!(path_type: described_class::TYPE_SMS, path: "8005551212")
+        expect(MicrosoftSync::UserMapping).to_not receive(:flag_as_needs_updating_if_using_email)
+        cc.update!(path_type: described_class::TYPE_TWITTER)
+        cc.update!(path: "instructure")
+      end
+
+      it "doesn't flag old mappings if nothing relevant has changed" do
+        expect(MicrosoftSync::UserMapping).to_not receive(:flag_as_needs_updating_if_using_email)
+        cc.update!(updated_at: cc.updated_at + 1, last_bounce_at: Time.now)
       end
     end
   end

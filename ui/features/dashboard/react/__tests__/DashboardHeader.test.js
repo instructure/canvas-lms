@@ -26,6 +26,8 @@ import {
   showK5DashboardResponse
 } from '@canvas/observer-picker/react/__tests__/fixtures'
 
+jest.useFakeTimers()
+
 const defaultEnv = {
   current_user: {id: '1'},
   current_user_roles: ['user', 'student', 'observer'],
@@ -69,7 +71,9 @@ describe('DashboardHeader', () => {
       fetchMock.get(SHOW_K5_DASHBOARD_ROUTE, JSON.stringify(showK5DashboardResponse(false)))
     })
 
-    afterEach(() => {
+    afterEach(async () => {
+      await act(async () => jest.runOnlyPendingTimers())
+
       fetchMock.restore()
     })
 
@@ -82,8 +86,8 @@ describe('DashboardHeader', () => {
       const {findByRole, getByText, findByText} = render(<FakeDashboardHeader {...defaultProps} />)
       const select = await findByRole('combobox', {name: 'Select a student to view'})
       expect(loadPlannerSpy).toHaveBeenCalledTimes(1)
-      act(() => select.click())
-      act(() => getByText('Student 3').click())
+      await act(async () => select.click())
+      await act(async () => getByText('Student 3').click())
       await findByText('Loading planner items')
       expect(loadPlannerSpy).toHaveBeenCalledTimes(1)
     })

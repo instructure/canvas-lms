@@ -204,28 +204,51 @@ describe "dashboard" do
         assignment.submit_homework(@student, { submission_type: "online_text_entry", body: "ABC" })
       end
 
-      it "focuses on the previous ignore link after ignoring a todo item", priority: "1" do
-        skip "Flaky spec to be addressed in LS-3215"
+      def all_todo_links
+        ff(".to-do-list .disable_item_link")
+      end
+
+      it "focuses on the previous ignore link after ignoring a todo item", custom_timeout: 25, priority: "1" do
         assignment2 = assignment_model({ submission_types: "online_text_entry", course: @course })
         assignment2.submit_homework(@student, { submission_type: "online_text_entry", body: "Number2" })
         enable_cache do
           get "/"
 
-          all_todo_links = ff(".to-do-list .disable_item_link")
           all_todo_links.last.click
           wait_for_ajaximations
 
+          max_attempts = 5
+          num_attempts = 1
+
+          until all_todo_links.count == 1 || num_attempts == max_attempts
+            puts "Getting all todo links count attempt #{num_attempts}"
+            all_todo_links.last.click
+            wait_for_ajaximations
+
+            num_attempts += 1
+          end
+
+          expect(all_todo_links.count).to eq(1)
           check_element_has_focus(all_todo_links.first)
         end
       end
 
-      it "focuses on the 'To Do' header if there are no other todo items", priority: "1" do
-        skip "Flaky spec to be addressed in LS-3215"
+      it "focuses on the 'To Do' header if there are no other todo items", custom_timeout: 25, priority: "1" do
         enable_cache do
           get "/"
 
           f(".to-do-list .disable_item_link").click
-          wait_for_ajaximations
+          wait_for_animations
+
+          max_attempts = 5
+          num_attempts = 1
+
+          until element_exists?(".to-do-list .disable_item_link") == false || num_attempts == max_attempts
+            puts "Getting all todo links count attempt #{num_attempts}"
+            f(".to-do-list .disable_item_link").click
+            wait_for_animations
+            num_attempts += 1
+          end
 
           check_element_has_focus(f(".todo-list-header"))
         end

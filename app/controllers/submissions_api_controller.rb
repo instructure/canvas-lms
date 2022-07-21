@@ -215,8 +215,8 @@ class SubmissionsApiController < ApplicationController
   before_action :ensure_submission, only: %i[show
                                              document_annotations_read_state
                                              mark_document_annotations_read
-                                             rubric_comments_read_state
-                                             mark_rubric_comments_read]
+                                             rubric_assessments_read_state
+                                             mark_rubric_assessments_read]
   include Api::V1::Progress
   include Api::V1::Submission
   include Submissions::ShowHelper
@@ -1316,13 +1316,18 @@ class SubmissionsApiController < ApplicationController
     change_topic_read_state("unread")
   end
 
-  # @API Get rubric comments read state
+  # @API Get rubric assessments read state
   #
-  # Return whether new rubric comments made on a submission have been seen by the student being assessed.
+  # Return whether new rubric comments/grading made on a submission have been seen by the student being assessed.
   #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/courses/<course_id>/assignments/<assignment_id>/submissions/<user_id>/rubric_comments/read' \
+  #        -H "Authorization: Bearer <token>"
+  #
+  #   # or
+  #
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/assignments/<assignment_id>/submissions/<user_id>/rubric_assessments/read' \
   #        -H "Authorization: Bearer <token>"
   #
   # @example_response
@@ -1330,22 +1335,29 @@ class SubmissionsApiController < ApplicationController
   #     "read": false
   #   }
   #
-  def rubric_comments_read_state
+  def rubric_assessments_read_state
     if authorized_action(@submission, @current_user, :read)
-      render json: { read: !@user.unread_rubric_comments?(@submission) }
+      render json: { read: !@user.unread_rubric_assessments?(@submission) }
     end
   end
 
-  # @API Mark rubric comments as read
+  # @API Mark rubric assessments as read
   #
-  # Indicate that rubric comments made on a submission have been read by the student being assessed.
+  # Indicate that rubric comments/grading made on a submission have been read by the student being assessed.
   # Only the student who owns the submission can use this endpoint.
   #
-  # NOTE: Rubric comments will be marked as read automatically when they are viewed in Canvas web.
+  # NOTE: Rubric assessments will be marked as read automatically when they are viewed in Canvas web.
   #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/courses/<course_id>/assignments/<assignment_id>/submissions/<user_id>/rubric_comments/read' \
+  #        -X PUT \
+  #        -H "Authorization: Bearer <token>" \
+  #        -H "Content-Length: 0"
+  #
+  #   # or
+  #
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/assignments/<assignment_id>/submissions/<user_id>/rubric_assessments/read' \
   #        -X PUT \
   #        -H "Authorization: Bearer <token>" \
   #        -H "Content-Length: 0"
@@ -1355,10 +1367,10 @@ class SubmissionsApiController < ApplicationController
   #     "read": true
   #   }
   #
-  def mark_rubric_comments_read
+  def mark_rubric_assessments_read
     return render_unauthorized_action unless @user == @current_user
 
-    @user.mark_rubric_comments_read!(@submission)
+    @user.mark_rubric_assessments_read!(@submission)
     render json: { read: true }
   end
 

@@ -74,6 +74,8 @@ function studentsUniqByEnrollments(...args) {
       if (!student.role) {
         student.role = enrollment.role
       }
+      student.isInactive = enrollment.enrollment_state === 'inactive'
+      student.isTestStudent = enrollment.type === 'StudentViewEnrollment'
       if (iMeta.students[student.id]) {
         return array
       }

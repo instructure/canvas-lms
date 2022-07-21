@@ -45,8 +45,10 @@ class CommunicationChannel < ActiveRecord::Base
   validate :uniqueness_of_path
   validate :validate_email, if: ->(cc) { cc.path_type == TYPE_EMAIL && cc.new_record? }
   validate :not_otp_communication_channel, if: ->(cc) { cc.path_type == TYPE_SMS && cc.retired? && !cc.new_record? }
+  after_destroy :after_destroy_flag_old_microsoft_sync_user_mappings
   after_commit :check_if_bouncing_changed
   after_save :clear_user_email_cache, if: -> { workflow_state_before_last_save != workflow_state }
+  after_save :after_save_flag_old_microsoft_sync_user_mappings
 
   acts_as_list scope: :user
 
@@ -612,6 +614,24 @@ class CommunicationChannel < ActiveRecord::Base
     return nil unless (carrier = CommunicationChannel.sms_carriers[match[:domain]])
 
     "+#{carrier["country_code"]}#{match[:number]}"
+  end
+
+  def after_save_flag_old_microsoft_sync_user_mappings
+    # We might be able to refine this check to ignore irrelevant changes to
+    # non-primary email addresses but the conditions are complicated (for
+    # instance, if the comm chammenl with the lowest priority number is not in
+    # an "active" state, changes to other comm channels may be relevant), so
+    # it's safer just to do this.
+    if %i[path path_type position workflow_state].any? { |attr| saved_change_to_attribute(attr) } &&
+       (path_type == TYPE_EMAIL || path_type_before_last_save == TYPE_EMAIL)
+      MicrosoftSync::UserMapping.delay_if_production.flag_as_needs_updating_if_using_email(user)
+    end
+  end
+
+  def after_destroy_flag_old_microsoft_sync_user_mappings
+    if path_type == TYPE_EMAIL
+      MicrosoftSync::UserMapping.delay_if_production.flag_as_needs_updating_if_using_email(user)
+    end
   end
 
   class << self

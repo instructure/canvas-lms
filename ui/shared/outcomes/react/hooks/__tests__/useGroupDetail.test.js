@@ -28,6 +28,12 @@ import {FIND_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 
 jest.mock('@canvas/alerts/react/FlashAlert')
 
+const flushAllTimersAndPromises = async () => {
+  while(jest.getTimerCount() > 0) {
+    await act(async () => { jest.runAllTimers() })
+  }
+}
+
 const outcomeTitles = result => result.current.group.outcomes.edges.map(edge => edge.node.title)
 const outcomeFriendlyDescriptions = result =>
   result.current.group.outcomes.edges.map(edge => edge.node.friendlyDescription?.description || '')
@@ -176,7 +182,7 @@ describe('groupDetailHook', () => {
     expect(outcomeTitles(result)).toEqual(['Outcome 1 - Group 1', 'Outcome 2 - Group 1'])
     expect(outcomeFriendlyDescriptions(result)).toEqual(['', ''])
     act(() => rerender('200'))
-    await act(async () => jest.runAllTimers())
+    await flushAllTimersAndPromises()
     expect(result.current.group.title).toBe('Refetched Group 200')
     expect(outcomeTitles(result)).toEqual([
       'Refetched Outcome 1 - Group 200',

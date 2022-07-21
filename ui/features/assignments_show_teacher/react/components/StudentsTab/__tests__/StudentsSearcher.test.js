@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
-import MockDate from 'mockdate'
 import CanvasValidatedMockedProvider from '@canvas/validated-apollo-mocked-provider'
 import {STUDENT_SEARCH_QUERY} from '../../../assignmentData'
 import {mockAssignment, mockSubmission, mockUser, closest} from '../../../test-utils'
@@ -184,43 +183,34 @@ describe('StudentsSearcher', () => {
     expect(queryByTestId('attemptFilter')).toBeNull()
     expect(queryByTestId('assignToFilter')).toBeNull()
   })
-  // _.debounce requires time to actually advance
-  describe('with MockDate', () => {
-    afterEach(() => {
-      MockDate.reset()
-    })
 
-    it('runs the userSearch query with a delay', () => {
-      const {getByText, queryByText, getByLabelText} = renderStudentsSearcher([
-        {},
-        {users: [mockUser({shortName: 'searched user'})], variables: {userSearch: 'search'}}
-      ])
-      jest.runOnlyPendingTimers()
-      const searchInput = getByLabelText('Search by student name')
-      const startNow = Date.now()
-      fireEvent.change(searchInput, {target: {value: 'search'}})
+  it('runs the userSearch query with a delay', () => {
+    const {getByText, queryByText, getByLabelText} = renderStudentsSearcher([
+      {},
+      {users: [mockUser({shortName: 'searched user'})], variables: {userSearch: 'search'}}
+    ])
+    jest.runOnlyPendingTimers()
+    const searchInput = getByLabelText('Search by student name')
+    const startNow = Date.now()
+    fireEvent.change(searchInput, {target: {value: 'search'}})
 
-      // initially hasn't searched yet
-      MockDate.set(startNow + 500)
-      jest.advanceTimersByTime(500)
-      expect(getByText(mockUser().shortName)).toBeInTheDocument()
-      expect(queryByText('searched user')).toBeNull()
+    // initially hasn't searched yet
+    jest.advanceTimersByTime(500)
+    expect(getByText(mockUser().shortName)).toBeInTheDocument()
+    expect(queryByText('searched user')).toBeNull()
 
-      // then does the search after the delay
-      MockDate.set(startNow + 1000)
-      jest.advanceTimersByTime(500)
-      expect(getByText('searched user')).toBeInTheDocument()
-    })
+    // then does the search after the delay
+    jest.advanceTimersByTime(500)
+    expect(getByText('searched user')).toBeInTheDocument()
+  })
 
-    it('displays a message and does not load when 0 < search characters < 3', () => {
-      const {getByText, getByLabelText} = renderStudentsSearcher()
-      jest.runOnlyPendingTimers()
-      const searchInput = getByLabelText('Search by student name')
-      const startNow = Date.now()
-      fireEvent.change(searchInput, {target: {value: '12'}})
-      MockDate.set(startNow + 1000)
-      jest.runOnlyPendingTimers()
-      expect(getByText(/at least 3 characters/)).toBeInTheDocument()
-    })
+  it('displays a message and does not load when 0 < search characters < 3', () => {
+    const {getByText, getByLabelText} = renderStudentsSearcher()
+    jest.runOnlyPendingTimers()
+    const searchInput = getByLabelText('Search by student name')
+    const startNow = Date.now()
+    fireEvent.change(searchInput, {target: {value: '12'}})
+    jest.advanceTimersByTime(1000)
+    expect(getByText(/at least 3 characters/)).toBeInTheDocument()
   })
 })

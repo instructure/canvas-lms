@@ -23,6 +23,7 @@ module.exports = {
     '\\.svg$': '<rootDir>/jest/imageMock.js',
     'node_modules-version-of-backbone': require.resolve('backbone'),
     'node_modules-version-of-react-modal': require.resolve('react-modal'),
+    'underscore$': require.resolve('lodash-underscore'),
     '^Backbone$': '<rootDir>/public/javascripts/Backbone.js',
     // jest can't import the icons
     '@instructure/ui-icons/es/svg': '<rootDir>/packages/canvas-rce/src/rce/__tests__/_mockIcons.js',
@@ -33,7 +34,9 @@ module.exports = {
       '<rootDir>/packages/canvas-rce/lib/rce/plugins/shared/Upload/CategoryProcessor',
     // mock the tinymce-react Editor react component
     '@tinymce/tinymce-react': '<rootDir>/packages/canvas-rce/src/rce/__mocks__/tinymceReact.js',
-    'decimal.js/decimal.mjs': 'decimal.js/decimal.js'
+    'decimal.js/decimal.mjs': 'decimal.js/decimal.js',
+    // https://github.com/ai/nanoid/issues/363
+    "^nanoid(/(.*)|$)": "nanoid$1",
   },
   roots: ['<rootDir>/ui', 'gems/plugins', 'public/javascripts'],
   moduleDirectories: ['ui/shims', 'public/javascripts', 'node_modules'],
@@ -53,7 +56,8 @@ module.exports = {
   setupFiles: ['jest-localstorage-mock', 'jest-canvas-mock', '<rootDir>/jest/jest-setup.js'],
   setupFilesAfterEnv: [
     '@testing-library/jest-dom/extend-expect',
-    './packages/validated-apollo/src/ValidatedApolloCleanup.js'
+    './packages/validated-apollo/src/ValidatedApolloCleanup.js',
+    '<rootDir>/jest/stubInstUi.js'
   ],
   testMatch: ['**/__tests__/**/?(*.)(spec|test).[jt]s?(x)'],
 
@@ -70,14 +74,12 @@ module.exports = {
   moduleFileExtensions: [...defaults.moduleFileExtensions, 'coffee', 'handlebars'],
   restoreMocks: true,
 
-  testEnvironment: 'jest-environment-jsdom-fourteen',
-
-  testSequencer: '<rootDir>/jest/test-sequencer.js',
+  testEnvironment: 'jsdom',
 
   transform: {
     '\\.coffee$': '<rootDir>/jest/coffeeTransformer.js',
     '\\.handlebars$': '<rootDir>/jest/handlebarsTransformer.js',
-    '\\.graphql$': 'jest-raw-loader',
+    '\\.graphql$': '<rootDir>/jest/rawLoader.js',
     '\\.[jt]sx?$': [
       'babel-jest',
       {

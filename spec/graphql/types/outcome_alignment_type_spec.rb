@@ -22,98 +22,119 @@ require_relative "../../spec_helper"
 require_relative "../graphql_spec_helper"
 
 describe Types::OutcomeAlignmentType do
-  before(:once) do
+  before :once do
     account_admin_user
-    course_with_teacher
-    @assignment = assignment_model({
-                                     course: @course,
-                                     name: "Assignment",
-                                     due_at: nil,
-                                     points_possible: 10,
-                                     submission_types: "online_text_entry",
-                                   })
-    @outcome = outcome_model(context: @course, title: "outcome")
-    @outcome_alignment = @outcome.align(@assignment, @course)
-    @module = @course.context_modules.create!(name: "module", workflow_state: "unpublished")
-    @module.add_item type: "assignment", id: @assignment.id
-
+    course_model
+    outcome_with_rubric
+    @quiz_item = assignment_quiz([], course: @course, title: "BBB Quiz")
+    @quiz = @assignment
+    @assignment = @course.assignments.create!(title: "AAA Assignment")
+    @discussion = @course.assignments.create!(title: "CCC Discussion")
+    @discussion_item = @course.discussion_topics.create!(
+      user: @teacher,
+      title: "discussion item",
+      assignment: @discussion
+    )
+    @module = @course.context_modules.create!(name: "module")
     @course.account.enable_feature!(:outcome_alignment_summary)
   end
 
   let(:graphql_context) { { current_user: @admin } }
   let(:outcome_type) { GraphQLTypeTester.new(@outcome, graphql_context) }
 
-  describe "returns correct values for alignment fields" do
+  def resolve_field(field_name)
+    outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { #{field_name} }")[0]
+  end
+
+  describe "for each outcome alignment" do
+    before do
+      @module.add_item type: "assignment", id: @assignment.id
+      @rubric.associate_with(@assignment, @course, purpose: "grading")
+      @outcome_alignment = ContentTag.last
+    end
+
     it "returns _id" do
-      expect(
-        outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { _id }")[0]
-      ).to eq @outcome_alignment.id.to_s
+      expect(resolve_field("_id")).to eq @outcome_alignment.id.to_s
     end
 
     it "returns learning_outcome_id" do
-      expect(
-        outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { learningOutcomeId }")[0]
-      ).to eq @outcome.id.to_s
+      expect(resolve_field("learningOutcomeId")).to eq @outcome.id.to_s
     end
 
     it "returns context_id" do
-      expect(
-        outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { contextId }")[0]
-      ).to eq @course.id.to_s
+      expect(resolve_field("contextId")).to eq @course.id.to_s
     end
 
     it "returns context_type" do
-      expect(
-        outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { contextType }")[0]
-      ).to eq "Course"
+      expect(resolve_field("contextType")).to eq "Course"
     end
 
     it "returns content_id" do
-      expect(
-        outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { contentId }")[0]
-      ).to eq @outcome_alignment.content_id.to_s
+      expect(resolve_field("contentId")).to eq @outcome_alignment.content_id.to_s
     end
 
     it "returns content_type" do
-      expect(
-        outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { contentType }")[0]
-      ).to eq "Assignment"
+      expect(resolve_field("contentType")).to eq "Assignment"
     end
 
     it "returns title" do
-      expect(
-        outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { title }")[0]
-      ).to eq @assignment.title
+      expect(resolve_field("title")).to eq @assignment.title
     end
 
     it "returns url" do
-      expect(
-        outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { url }")[0]
-      ).to eq "/courses/#{@course.id}/outcomes/#{@outcome.id}/alignments/#{@outcome_alignment.id}"
+      expect(resolve_field("url")).to eq "/courses/#{@course.id}/outcomes/#{@outcome.id}/alignments/#{@outcome_alignment.id}"
     end
 
     it "returns module_id" do
-      expect(
-        outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { moduleId }")[0]
-      ).to eq @module.id.to_s
+      expect(resolve_field("moduleId")).to eq @module.id.to_s
     end
 
     it "returns module_name" do
-      expect(
-        outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { moduleName }")[0]
-      ).to eq @module.name
+      expect(resolve_field("moduleName")).to eq @module.name
     end
 
     it "returns module_url" do
-      expect(
-        outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { moduleUrl }")[0]
-      ).to eq "/courses/#{@course.id}/modules/#{@module.id}"
+      expect(resolve_field("moduleUrl")).to eq "/courses/#{@course.id}/modules/#{@module.id}"
     end
 
     it "returns module_workflow_state" do
-      expect(
-        outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { moduleWorkflowState }")[0]
-      ).to eq @module.workflow_state
+      expect(resolve_field("moduleWorkflowState")).to eq @module.workflow_state
+    end
+  end
+
+  describe "for outcome alignment to an Assignment" do
+    before do
+      @rubric.associate_with(@assignment, @course, purpose: "grading")
+    end
+
+    it "returns assignment_content_type 'assignment'" do
+      expect(resolve_field("assignmentContentType")).to eq "assignment"
+    end
+  end
+
+  describe "for outcome alignment to a Quiz" do
+    before do
+      @rubric.associate_with(@quiz, @course, purpose: "grading")
+    end
+
+    it "returns assignment_content_type 'quiz'" do
+      expect(resolve_field("assignmentContentType")).to eq "quiz"
+    end
+  end
+
+  describe "for outcome alignment to a Discussion" do
+    before do
+      @rubric.associate_with(@discussion, @course, purpose: "grading")
+    end
+
+    it "returns assignment_content_type 'discussion'" do
+      expect(resolve_field("assignmentContentType")).to eq "discussion"
+    end
+  end
+
+  describe "for outcome alignment to a Rubric" do
+    it "returns null assignment_content_type" do
+      expect(resolve_field("assignmentContentType")).to be_nil
     end
   end
 end

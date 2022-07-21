@@ -56,6 +56,10 @@ export const DEFAULT_SETTINGS = {
   encodedImage: '',
   encodedImageType: '',
   encodedImageName: '',
+  // Additional external attributes
+  externalStyle: null,
+  externalWidth: null,
+  externalHeight: null,
   // Embedded image crop settings
   x: 0,
   y: 0,

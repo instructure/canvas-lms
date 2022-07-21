@@ -53,6 +53,7 @@ class Mutations::AddConversationMessage < Mutations::BaseMutation
       media_comment_type: input[:media_comment_type],
       user_note: input[:user_note]
     )
+    InstStatsd::Statsd.increment("inbox.message.sent.isReply.react")
 
     { conversation_message: message[:message] }
   rescue ActiveRecord::RecordNotFound

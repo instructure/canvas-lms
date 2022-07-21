@@ -430,9 +430,6 @@ describe "course settings" do
       wait_for_ajaximations
       expect(ff("#sections > .section")[0]).to include_text(edit_text)
     end
-
-    # TODO: reimplement per CNVS-29605, but make sure we're testing at the right level
-    it "should move a nav item to disabled"
   end
 
   context "right sidebar" do

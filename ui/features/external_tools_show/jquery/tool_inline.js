@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import {trackEvent} from '@canvas/google-analytics'
 import '@canvas/module-sequence-footer'
 import MarkAsDone from '@canvas/util/jquery/markAsDone'
 import ToolLaunchResizer from '@canvas/lti/jquery/tool_launch_resizer'
@@ -86,12 +85,6 @@ ready(() => {
       }, 3 * 1000)
       break
   }
-
-  // Google analytics tracking code
-  const toolName = $toolForm.data('tool-id') || 'unknown'
-  const toolPath = $toolForm.data('tool-path')
-  const messageType = $toolForm.data('message-type') || 'tool_launch'
-  trackEvent(messageType, toolName, toolPath)
 
   // Iframe resize handler
   const $tool_content_wrapper = $('.tool_content_wrapper')

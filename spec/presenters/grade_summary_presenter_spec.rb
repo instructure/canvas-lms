@@ -193,6 +193,9 @@ describe GradeSummaryPresenter do
       expect(assignment_stats.maximum.to_f).to eq 10
       expect(assignment_stats.minimum.to_f).to eq 0
       expect(assignment_stats.mean.to_f).to eq 5
+      expect(assignment_stats.median.to_f).to eq 5
+      expect(assignment_stats.lower_q.to_f).to eq 2.5
+      expect(assignment_stats.upper_q.to_f).to eq 7.5
     end
 
     it "filters out test students and inactive enrollments" do

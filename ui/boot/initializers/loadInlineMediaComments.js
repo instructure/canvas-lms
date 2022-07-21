@@ -17,7 +17,6 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import {trackEvent} from '@canvas/google-analytics'
 import preventDefault from 'prevent-default'
 import htmlEscape from 'html-escape'
 import '@canvas/media-comments/jquery/mediaComment'
@@ -46,7 +45,6 @@ const inlineMediaComment = {
   collapseComment($holder) {
     __guard__($holder.find('video,audio').data('mediaelementplayer'), x => x.pause())
     $holder.remove()
-    trackEvent('hide_embedded_content', 'hide_media')
   }
 }
 
@@ -126,7 +124,6 @@ $(document).on(
       })
     )
 
-    trackEvent('show_embedded_content', 'show_media')
     $holder.find('.innerholder').css('outline', 'none')
     $holder.find('.innerholder').on('focus', initialFocusInnerhold)
   })

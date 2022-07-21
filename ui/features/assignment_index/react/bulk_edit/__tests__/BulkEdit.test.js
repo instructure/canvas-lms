@@ -26,9 +26,9 @@ import moment from 'moment-timezone'
 import BulkEdit from '../BulkEdit'
 
 // grab this before fake timers replace it
-const realSetImmediate = setImmediate
+const realSetTimeout = setTimeout
 async function flushPromises() {
-  await act(() => new Promise(realSetImmediate))
+  await act(() => new Promise(realSetTimeout))
 }
 
 function standardAssignmentResponse() {

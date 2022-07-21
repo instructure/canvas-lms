@@ -141,17 +141,23 @@ describe GradeSummaryAssignmentPresenter do
           count: 3,
           minimum: 1.3333333,
           maximum: 2.6666666,
-          mean: 2
+          mean: 2,
+          lower_q: 1,
+          median: 2.011111,
+          upper_q: 2.5
         )
         presenter = GradeSummaryPresenter.new(@course, @student, @student.id)
         assignment_presenter = GradeSummaryAssignmentPresenter.new(presenter, @student, @assignment, @submission)
 
-        maximum, minimum, mean = assignment_presenter.grade_distribution
+        maximum, minimum, mean, median, lower_q, upper_q = assignment_presenter.grade_distribution
 
         aggregate_failures do
           expect(minimum).to eq 1.33
           expect(maximum).to eq 2.67
           expect(mean).to eq 2
+          expect(median).to eq 2.01
+          expect(lower_q).to eq 1
+          expect(upper_q).to eq 2.5
         end
       end
     end

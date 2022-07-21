@@ -187,7 +187,7 @@ describe('load items', () => {
         ]
       })
     )
-    return moxiosRespond([], fetchPromise, {headers: {link: '</>; rel="next"'}}).then(_response => {
+    moxiosRespond([], fetchPromise, {headers: {link: '</>; rel="next"'}}).then(_response => {
       expect(fakeDispatch).toHaveBeenCalledWith({type: 'SIDEBAR_ENOUGH_ITEMS_LOADED'})
       expect(fakeDispatch).toHaveBeenCalledTimes(6)
       const secondCallThunk = fakeDispatch.mock.calls[5][0]

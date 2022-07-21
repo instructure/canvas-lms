@@ -123,6 +123,24 @@ describe Mutations::UpdateConversationParticipants do
         participant2 = participant2.reload
         expect(participant2.starred).to be_truthy
       end
+
+      it "archives each conversation" do
+        allow(InstStatsd::Statsd).to receive(:count)
+        query = <<~GQL
+          conversationIds: [#{conv.id}, #{conv2.id}],
+          workflowState: "archived"
+        GQL
+
+        result = execute_with_input(query)
+        expect(result["errors"]).to be_nil
+        expect(result.dig("data", "updateConversationParticipants", "errors")).to be_nil
+
+        expect(InstStatsd::Statsd).to have_received(:count).with("inbox.conversation.archived.react", 2)
+        expect(InstStatsd::Statsd).not_to have_received(:count).with("inbox.conversation.archived.legacy", 2)
+
+        updated_attrs = result.dig("data", "updateConversationParticipants", "conversationParticipants")
+        expect(updated_attrs.map { |i| i["workflowState"] }).to match_array %w[archived archived]
+      end
     end
 
     context "some ids are invalid" do

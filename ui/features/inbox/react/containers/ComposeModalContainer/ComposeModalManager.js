@@ -83,6 +83,7 @@ const ComposeModalManager = props => {
       participants: getReplyRecipientIDs(),
       ...(props.conversationMessage && {createdBefore: props.conversationMessage.createdAt})
     },
+    notifyOnNetworkStatusChange: true,
     skip: !(props.isReply || props.isReplyAll || props.isForward) || isSubmissionCommentsType
   })
 
@@ -223,7 +224,7 @@ const ComposeModalManager = props => {
   const onConversationCreateComplete = data => {
     setSendingMessage(false)
     // success is true if there is no error message or if data === true
-    const errorMessage = data?.addConversationMessage?.errors
+    const errorMessage = data?.errors
     const success = errorMessage ? false : !!data
 
     if (success) {
@@ -248,19 +249,19 @@ const ComposeModalManager = props => {
 
   const [createConversation] = useMutation(CREATE_CONVERSATION, {
     update: updateCache,
-    onCompleted: data => onConversationCreateComplete(data),
+    onCompleted: data => onConversationCreateComplete(data?.createConversation),
     onError: () => onConversationCreateComplete(false)
   })
 
   const [addConversationMessage] = useMutation(ADD_CONVERSATION_MESSAGE, {
     update: updateCache,
-    onCompleted: data => onConversationCreateComplete(data),
+    onCompleted: data => onConversationCreateComplete(data?.addConversationMessage),
     onError: () => onConversationCreateComplete(false)
   })
 
   const [createSubmissionComment] = useMutation(CREATE_SUBMISSION_COMMENT, {
     update: updateCache,
-    onCompleted: data => onConversationCreateComplete(data),
+    onCompleted: data => onConversationCreateComplete(data?.createSubmissionComment),
     onError: () => onConversationCreateComplete(false)
   })
 

@@ -129,8 +129,6 @@ class SubmissionsController < SubmissionsBaseController
     # via this controller's anonymous counterpart
     return render_unauthorized_action if @assignment.anonymous_peer_reviews? && @submission.peer_reviewer?(@current_user)
 
-    @google_analytics_page_title = "#{@assignment.title} Submission Details"
-
     super
   end
 

@@ -238,5 +238,18 @@ describe('ConversationListItem', () => {
 
       expect(getByTestId('unread-badge')).toBeTruthy()
     })
+
+    it('sends correct submission id to be marked as read', () => {
+      const onMarkAsRead = jest.fn()
+      const props = createProps({
+        conversation: submissionsCommentsMock(),
+        isUnread: true,
+        onMarkAsRead
+      })
+      const {getByTestId} = render(<ConversationListItem {...props} />)
+      const unreadBadge = getByTestId('unread-badge')
+      fireEvent.click(unreadBadge)
+      expect(onMarkAsRead).toHaveBeenCalledWith(submissionsCommentsMock()._id)
+    })
   })
 })

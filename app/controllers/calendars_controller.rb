@@ -85,7 +85,8 @@ class CalendarsController < ApplicationController
         concluded: (context.is_a? Course) ? context.concluded? : false,
         k5_course: context.is_a?(Course) && context.elementary_enabled?,
         course_pacing_enabled: context.is_a?(Course) && @domain_root_account.feature_enabled?(:course_paces) && context.enable_course_paces,
-        user_is_observer: context.is_a?(Course) && context.enrollments.where(user_id: @current_user).first&.observer?
+        user_is_observer: context.is_a?(Course) && context.enrollments.where(user_id: @current_user).first&.observer?,
+        default_due_time: context.is_a?(Course) && context.default_due_time,
       }
       if context.respond_to?("course_sections")
         info[:course_sections] = context.course_sections.active.pluck(:id, :name).map do |id, name|

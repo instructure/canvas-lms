@@ -24,9 +24,9 @@ exports.process = (source, path) => {
     // brandable_css assets are not available in test
     injectBrandableStylesheet: false
   })
-  const cjs = transform(amd, {
+
+  return transform(amd, {
     filename: path,
     plugins: ['@babel/plugin-transform-modules-commonjs']
-  }).code
-  return cjs
+  })
 }

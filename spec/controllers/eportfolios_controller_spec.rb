@@ -44,9 +44,12 @@ describe EportfoliosController do
       a = Account.default
       a.settings[:enable_eportfolios] = false
       a.save
+      Account.current_domain_root_account = a
       course_with_student_logged_in(active_all: true, user: @user)
       get "user_index"
       expect(response).to be_redirect
+    ensure
+      Account.current_domain_root_account = nil
     end
 
     describe "with logged in user" do
@@ -126,19 +129,25 @@ describe EportfoliosController do
         a = Account.default
         a.settings[:enable_eportfolios] = false
         a.save
+        Account.current_domain_root_account = a
         @portfolio.public = true
         @portfolio.save!
         get "show", params: { id: @portfolio.id }
         assert_unauthorized
+      ensure
+        Account.current_domain_root_account = nil
       end
 
       it "complains if portfolio is not public and eportfolios are disabled" do
         a = Account.default
         a.settings[:enable_eportfolios] = false
         a.save
+        Account.current_domain_root_account = a
         course_with_student_logged_in(active_all: true, user: @user)
         get "show", params: { id: @portfolio.id }
         assert_unauthorized
+      ensure
+        Account.current_domain_root_account = nil
       end
     end
 

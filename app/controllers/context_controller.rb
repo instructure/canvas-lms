@@ -142,6 +142,13 @@ class ContextController < ApplicationController
       end
     end
 
+    # Render upgraded People page if feature flag is enabled
+    if @domain_root_account.feature_enabled?(:react_people_page)
+      add_crumb t("People")
+      js_bundle :course_people
+      render html: "", layout: true
+    end
+
     @secondary_users ||= {}
     @groups = @context.groups.active rescue []
   end
@@ -255,7 +262,6 @@ class ContextController < ApplicationController
 
       js_bundle :user_name, "context_roster_user"
       css_bundle :roster_user, :pairing_code
-      @google_analytics_page_title = "#{@context.name} People"
 
       if @domain_root_account.enable_profiles?
         @user_data = profile_data(

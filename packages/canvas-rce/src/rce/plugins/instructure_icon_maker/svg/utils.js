@@ -25,11 +25,12 @@ export function createSvgElement(tag, attributes = {}) {
 }
 
 export function splitTextIntoLines(text, maxChars) {
-  if (!text.trim() || maxChars <= 0) {
+  const trimmedText = text.trim()
+  if (!text || trimmedText.length === 0 || maxChars <= 0) {
     return []
   }
   const lines = []
-  const words = text.split(' ')
+  const words = trimmedText.split(' ')
   while (words.length) {
     let newLineNeeded = false
     let line = ''

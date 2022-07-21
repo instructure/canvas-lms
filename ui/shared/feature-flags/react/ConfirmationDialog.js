@@ -43,7 +43,7 @@ export default function ConfirmationDialog({
       size="medium"
       footer={
         <>
-          <Button onClick={onReject}>{I18n.t('Cancel')}</Button>
+          <Button data-testid="cancel-button" onClick={onReject}>{I18n.t('Cancel')}</Button>
           <Button
             data-testid="confirm-button"
             margin="0 0 0 small"

@@ -124,12 +124,21 @@ const AlignmentSummaryHeader = ({
   )
 }
 
+AlignmentSummaryHeader.defaultProps = {
+  totalOutcomes: 0,
+  alignedOutcomes: 0,
+  totalAlignments: 0,
+  totalArtifacts: 0,
+  alignedArtifacts: 0,
+  searchString: ''
+}
+
 AlignmentSummaryHeader.propTypes = {
-  totalOutcomes: PropTypes.number.isRequired,
-  alignedOutcomes: PropTypes.number.isRequired,
-  totalAlignments: PropTypes.number.isRequired,
-  totalArtifacts: PropTypes.number.isRequired,
-  alignedArtifacts: PropTypes.number.isRequired,
+  totalOutcomes: PropTypes.number,
+  alignedOutcomes: PropTypes.number,
+  totalAlignments: PropTypes.number,
+  totalArtifacts: PropTypes.number,
+  alignedArtifacts: PropTypes.number,
   searchString: PropTypes.string,
   updateSearchHandler: PropTypes.func.isRequired,
   clearSearchHandler: PropTypes.func.isRequired

@@ -58,8 +58,15 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
     end
   end
 
-  # Get the IDs of users enrolled in a course which do not have UserMappings
-  # for the Course's root account. Works in batches, yielding arrays of user ids.
+  # Get the IDs of users enrolled in a course which do NOT have valid
+  # UserMappings for the Course's root account. Works in batches, yielding
+  # arrays of user ids.
+  #
+  # For our purposes here, UserMappings with needs_updating=TRUE are ignored,
+  # so later in the sync process they will be refreshed. (These UserMapping
+  # rows are not deleted so they can be used while they are waiting to be
+  # refreshed, which is better than the users being removed from the Microsoft
+  # 365 group, in case the mapping being refreshed is not actually incorrect.)
   def self.find_enrolled_user_ids_without_mappings(course:, batch_size:)
     user_ids = GuardRail.activate(:secondary) do
       Enrollment
@@ -69,6 +76,7 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
           LEFT JOIN #{quoted_table_name} AS mappings
           ON mappings.user_id=enrollments.user_id
           AND mappings.root_account_id=#{course.root_account_id.to_i}
+          AND mappings.needs_updating = FALSE
         SQL
         .where(mappings: { id: nil })
         .select(:user_id).distinct.limit(MAX_ENROLLMENT_MEMBERS)
@@ -87,8 +95,9 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
 
   # Example: bulk_insert_for_root_account_id(course.root_account_id,
   #                                          user1.id => 'aad1', user1.id => 'aad2')
-  # Uses Rails 6's insert_all, which unlike our bulk_insert(), ignores
-  # duplicates. (Don't need the partition support that bulk_insert provides.)
+  # Uses Rails 6's upsert_all, which unlike our bulk_insert(), overrides
+  # duplicates (including any possible needs_updating rows). (Don't need the
+  # partition support that bulk_insert provides.)
   #
   # This method also refetches the Account settings after adding to make sure
   # the ULUV settings (login_attribute, login_attribute_suffix,
@@ -107,14 +116,19 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
         root_account_id: root_account.id,
         created_at: now, updated_at: now,
         user_id: user_id, aad_id: aad_id,
+        needs_updating: false
       }
     end
 
-    result = insert_all(records)
+    result = upsert_all(records, unique_by: [:user_id, :root_account_id])
 
+    # In rare circumstances during account settings, this could end up deleting
+    # valid rows (if they were just added by another process after an account
+    # settings changed), but it doesn't matter too much as a full sync will
+    # re-create them.
     if account_microsoft_sync_settings_changed?(root_account)
-      ids_added = result.rows.map(&:first)
-      where(id: ids_added).delete_all if ids_added.present?
+      ids_upserted = result.rows.map(&:first)
+      where(id: ids_upserted).delete_all if ids_upserted.present?
       raise AccountSettingsChanged
     end
   end
@@ -149,5 +163,34 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
 
   def self.delete_user_mappings_for_account(account, batch_size)
     while where(root_account: account).limit(batch_size).delete_all > 0; end
+  end
+
+  # Finds mappings in all accounts with possible enrollments. Mirrors logic in
+  # User#update_root_account_ids (but here we only care about strong
+  # associations as we require enrollments, and just reading root_account_ids
+  # may be less reliable than looking up again here)
+  def self.flag_as_needs_updating_if_using_email(user)
+    GuardRail.activate(:secondary) do
+      Shard.with_each_shard(user.associated_shards(:strong)) do
+        ra_ids = UserAccountAssociation.for_root_accounts.for_user_id(user.id).select(:account_id)
+        # Seems to be some weird spec failures if we use "find_each" here. There shouldn't be
+        # too many (definitely less than 1000) accounts for a user on a shard anyway
+        Account.where(id: ra_ids).each do |acct|
+          next unless acct.settings[:microsoft_sync_enabled] &&
+                      acct.settings[:microsoft_sync_login_attribute] == "email"
+
+          GuardRail.activate(:primary) do
+            where(user: user, root_account: acct)
+              .update_all(updated_at: Time.now, needs_updating: true)
+          end
+        end
+      end
+    end
+  end
+
+  def self.delete_if_needs_updating(root_account_id, user_ids)
+    user_ids.each_slice(1000) do |batch|
+      where(root_account_id: root_account_id, user_id: batch, needs_updating: true).delete_all
+    end
   end
 end

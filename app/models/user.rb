@@ -1765,15 +1765,15 @@ class User < ActiveRecord::Base
     set_preference(:unread_submission_annotations, submission.global_id, nil)
   end
 
-  def unread_rubric_comments?(submission)
+  def unread_rubric_assessments?(submission)
     !!get_preference(:unread_rubric_comments, submission.global_id)
   end
 
-  def mark_rubric_comments_unread!(submission)
+  def mark_rubric_assessments_unread!(submission)
     set_preference(:unread_rubric_comments, submission.global_id, true)
   end
 
-  def mark_rubric_comments_read!(submission)
+  def mark_rubric_assessments_read!(submission)
     # this will delete the user_preference_value
     set_preference(:unread_rubric_comments, submission.global_id, nil)
   end
@@ -2650,8 +2650,11 @@ class User < ActiveRecord::Base
   end
 
   def eportfolios_enabled?
-    accounts = associated_root_accounts.reject(&:site_admin?)
-    accounts.empty? || accounts.any? { |a| a.settings[:enable_eportfolios] != false }
+    # For jobs/rails consoles/specs where domain root account is not set
+    return true unless Account.current_domain_root_account
+
+    associated_root_accounts.empty? ||
+      (associated_root_accounts.include?(Account.current_domain_root_account) && Account.current_domain_root_account.settings[:enable_eportfolios] != false)
   end
 
   def initiate_conversation(users, private = nil, options = {})

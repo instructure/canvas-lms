@@ -259,7 +259,7 @@ describe('HeaderInputs', () => {
     fireEvent.change(input, {target: {value: 'Fred'}})
 
     // for debouncing
-    act(() => jest.advanceTimersByTime(1000))
+    await act(async () => jest.advanceTimersByTime(1000))
     const items = await screen.findAllByTestId('address-book-item')
     fireEvent.mouseDown(items[1])
 

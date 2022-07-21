@@ -182,6 +182,7 @@ export default function ({
       <Flex>
         {(items.length > 0 || itemGroups.length > 0) && (
           <SimpleSelect
+            data-testid="select-condition"
             key={condition.type} // resets dropdown when condition type is changed
             renderLabel={<ScreenReaderContent>{I18n.t('Condition')}</ScreenReaderContent>}
             size="small"
@@ -258,6 +259,7 @@ export default function ({
           </SimpleSelect>
         )}
         <IconButton
+          data-testid="delete-condition"
           onClick={() => onDelete(condition, divRef)}
           screenReaderLabel={I18n.t('Delete condition')}
           withBackground={false}

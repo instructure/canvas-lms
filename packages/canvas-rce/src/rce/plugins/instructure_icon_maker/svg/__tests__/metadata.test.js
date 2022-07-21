@@ -37,7 +37,8 @@ describe('buildMetadata() / parseMetadata()', () => {
 
     // Remove the instance specific attributes
     // that aren't included in the embedded metadata
-    const {alt, isDecorative, ...embeddedMetadata} = settings
+    const {alt, isDecorative, externalStyle, externalWidth, externalHeight, ...embeddedMetadata} =
+      settings
     expect(parseMetadata(svg)).toEqual(embeddedMetadata)
   })
 })

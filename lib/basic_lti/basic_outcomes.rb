@@ -68,13 +68,15 @@ module BasicLTI
     end
 
     def self.process_request(tool, xml)
-      res = (quizzes_next_tool?(tool) ? BasicLTI::QuizzesNextLtiResponse : LtiResponse).new(xml)
+      InstStatsd::Statsd.time("lti.1_1.basic_outcomes.process_request_time") do
+        res = (quizzes_next_tool?(tool) ? BasicLTI::QuizzesNextLtiResponse : LtiResponse).new(xml)
 
-      unless res.handle_request(tool)
-        res.code_major = "unsupported"
-        res.description = "Request could not be handled. ¯\\_(ツ)_/¯"
+        unless res.handle_request(tool)
+          res.code_major = "unsupported"
+          res.description = "Request could not be handled. ¯\\_(ツ)_/¯"
+        end
+        res
       end
-      res
     end
 
     def self.quizzes_next_tool?(tool)

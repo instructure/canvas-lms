@@ -149,7 +149,7 @@ describe('DiscussionsIsolatedView', () => {
     await waitFor(() =>
       expect(setOnSuccess).toHaveBeenCalledWith('The reply was successfully updated.')
     )
-  })
+  }, 10000)
 
   it('should not render go to reply button with single character search term', async () => {
     const mocks = [

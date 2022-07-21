@@ -114,6 +114,11 @@ describe('LearningMastery', () => {
     expect(getByText('Loading')).toBeInTheDocument()
   })
 
+  it('renders the gradebook menu on the page', async () => {
+    const {getByTestId} = render(<LearningMastery {...defaultProps()} />)
+    expect(getByTestId('lmgb-gradebook-menu')).toBeInTheDocument()
+  })
+
   it('renders each student, outcome, rollup from the response', async () => {
     useRollups.mockReturnValue({isLoading: false, students: users, outcomes, rollups})
     const {getByText} = render(<LearningMastery {...defaultProps()} />)

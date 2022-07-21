@@ -402,8 +402,8 @@ describe('Assignment Student Content View', () => {
 
   describe('Unpublished module', () => {
     it('renders UnpublishedModule', async () => {
-      window.ENV = {belongs_to_unpublished_module: true}
       const props = await mockAssignmentAndSubmission()
+      props.assignment.env.belongsToUnpublishedModule = true
       const {getByText} = render(
         <MockedProvider>
           <StudentContent {...props} />
@@ -412,6 +412,52 @@ describe('Assignment Student Content View', () => {
       expect(
         getByText('This assignment is part of an unpublished module and is not available yet.')
       ).toBeInTheDocument()
+    })
+  })
+
+  describe('Unavailable peer review', () => {
+    it('is rendered when peerReviewModeEnabled is true and peerReviewAvailable is false', async () => {
+      const props = await mockAssignmentAndSubmission()
+      props.assignment.env.peerReviewModeEnabled = true
+      props.assignment.env.peerReviewAvailable = false
+      const {getByText} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(
+        getByText('There are no submissions available to review just yet.')
+      ).toBeInTheDocument()
+      expect(getByText('Please check back soon.')).toBeInTheDocument()
+    })
+
+    it('is not rendered when peerReviewModeEnabled is true and peerReviewAvailable is true', async () => {
+      const props = await mockAssignmentAndSubmission()
+      props.assignment.env.peerReviewModeEnabled = false
+      props.assignment.env.peerReviewAvailable = true
+      const {queryByText} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(
+        queryByText('There are no submissions available to review just yet.')
+      ).not.toBeInTheDocument()
+      expect(queryByText('Please check back soon.')).not.toBeInTheDocument()
+    })
+
+    it('is not rendered when peerReviewModeEnabled is false', async () => {
+      const props = await mockAssignmentAndSubmission()
+      props.assignment.env.peerReviewModeEnabled = false
+      const {queryByText} = render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+      expect(
+        queryByText('There are no submissions available to review just yet.')
+      ).not.toBeInTheDocument()
+      expect(queryByText('Please check back soon.')).not.toBeInTheDocument()
     })
   })
 

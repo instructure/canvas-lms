@@ -189,6 +189,15 @@ describe('Address Book Component', () => {
   })
 
   describe('Tags', () => {
+    it('Should close popover after selecting one item', async () => {
+      setup({...defaultProps, open: true, isSubMenu: true})
+      const popover = await screen.findByTestId('address-book-popover')
+      const items = popover.querySelectorAll('li')
+      fireEvent.mouseDown(items[4])
+
+      expect(screen.queryByTestId('address-book-popover')).not.toBeInTheDocument()
+    })
+
     it('Should render tag when item is selected', async () => {
       const onSelectSpy = jest.fn()
       setup({...defaultProps, open: true, isSubMenu: true, onSelect: onSelectSpy})
@@ -201,10 +210,15 @@ describe('Address Book Component', () => {
 
     it('Should be able to select 2 tags when no limit is set', async () => {
       setup({...defaultProps, open: true, isSubMenu: true})
-      const popover = await screen.findByTestId('address-book-popover')
-      const items = popover.querySelectorAll('li')
-      fireEvent.mouseDown(items[4])
-      fireEvent.mouseDown(items[5])
+      const popover1 = await screen.findByTestId('address-book-popover')
+      const items1 = popover1.querySelectorAll('li')
+      fireEvent.mouseDown(items1[4])
+
+      setup({...defaultProps, open: true, isSubMenu: true})
+      const popover2 = await screen.findByTestId('address-book-popover')
+      const items2 = popover2.querySelectorAll('li')
+      fireEvent.mouseDown(items2[5])
+
       const tags = await screen.findAllByTestId('address-book-tag')
       expect(tags.length).toBe(2)
     })

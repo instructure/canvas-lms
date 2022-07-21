@@ -104,7 +104,7 @@ describe('RCEWrapper', () => {
   //   SETUP & TEARDOWN
   // ====================
   before(() => {
-    sinon.stub(getCanvasUrl, 'getCanvasUrl').returns(Promise.resolve('http://canvas.docker'))
+    sinon.stub(RCEApiSessionGetter, 'getCanvasUrl').returns(Promise.resolve('http://canvas.docker'))
   })
 
   beforeEach(() => {

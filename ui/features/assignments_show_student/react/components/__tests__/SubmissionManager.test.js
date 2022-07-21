@@ -137,14 +137,14 @@ describe('SubmissionManager', () => {
     const props = await mockAssignmentAndSubmission({
       Submission: SubmissionMocks.onlineUploadReadyToSubmit
     })
-    const {queryByRole} = renderInContext(
+    const {queryByText} = renderInContext(
       {allowChangesToSubmission: false, isObserver: true},
       <MockedProvider>
         <SubmissionManager {...props} />
       </MockedProvider>
     )
 
-    expect(queryByRole('button', {name: 'Submit Button'})).not.toBeInTheDocument()
+    expect(queryByText('Submit Assignment')).not.toBeInTheDocument()
   })
 
   it('does not render the submit button if we are not on the latest submission', async () => {
@@ -193,13 +193,13 @@ describe('SubmissionManager', () => {
       Submission: {...SubmissionMocks.excused}
     })
 
-    const {queryByRole} = renderInContext(
+    const {queryByText} = renderInContext(
       {lastSubmittedSubmission: props.submission},
       <MockedProvider>
         <SubmissionManager {...props} />
       </MockedProvider>
     )
-    expect(queryByRole('button', {name: 'Submit Assignment'})).not.toBeInTheDocument()
+    expect(queryByText('Submit Assignment')).not.toBeInTheDocument()
   })
 
   function testConfetti(testName, {enabled, dueDate, inDocument}) {
@@ -253,7 +253,7 @@ describe('SubmissionManager', () => {
           }
         ]
 
-        const {getByRole, queryByTestId} = render(
+        const {getByTestId, queryByTestId} = render(
           <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
             <MockedProvider mocks={mocks}>
               <SubmissionManager {...props} />
@@ -262,11 +262,11 @@ describe('SubmissionManager', () => {
         )
 
         act(() => {
-          const submitButton = getByRole('button', {name: 'Submit Assignment'})
+          const submitButton = getByTestId('submit-button')
           fireEvent.click(submitButton)
         })
         await waitFor(() =>
-          expect(getByRole('button', {name: 'Submit Assignment'})).not.toBeDisabled()
+          expect(getByTestId('submit-button')).not.toBeDisabled()
         )
         if (inDocument) {
           expect(queryByTestId('confetti-canvas')).toBeInTheDocument()
@@ -351,20 +351,26 @@ describe('SubmissionManager', () => {
         }
       })
 
-      const {getByRole} = render(
+      const {getByTestId} = render(
         <MockedProvider>
           <SubmissionManager {...props} />
         </MockedProvider>
       )
 
-      const submitButton = getByRole('button', {name: /Submit Assignment/})
+      const submitButton = getByTestId('submit-button')
       fireEvent.click(submitButton)
 
       const confirmationDialog = await screen.findByRole('dialog', {label: 'Delete your work?'})
       expect(confirmationDialog).toHaveTextContent('You are submitting a Text submission')
-      expect(within(confirmationDialog).getByRole('button', {name: /Cancel/})).toBeInTheDocument()
-      expect(within(confirmationDialog).getByRole('button', {name: /Okay/})).toBeInTheDocument()
-      fireEvent.click(within(confirmationDialog).getByRole('button', {name: /Cancel/}))
+
+      const cancelButton = within(confirmationDialog).getByTestId('cancel-button')
+      const confirmButton = within(confirmationDialog).getByTestId('confirm-button')
+
+      expect(cancelButton).toBeInTheDocument()
+      expect(cancelButton).toHaveTextContent('Cancel')
+      expect(confirmButton).toBeInTheDocument()
+      expect(confirmButton).toHaveTextContent('Okay')
+      fireEvent.click(cancelButton)
     })
   })
 
@@ -404,27 +410,27 @@ describe('SubmissionManager', () => {
       })
 
       it('is rendered as "Mark as done" if the value of "done" is false', async () => {
-        const {getByRole} = render(
+        const {getByTestId} = render(
           <MockedProvider>
             <SubmissionManager {...props} />
           </MockedProvider>
         )
 
-        const button = getByRole('button', {name: 'Mark as done'})
-        expect(button).toBeInTheDocument()
+        const markAsDoneButton = getByTestId('set-module-item-completion-button')
+        expect(markAsDoneButton).toHaveTextContent('Mark as done')
       })
 
       it('is rendered as "Done" if the value of "done" is true', async () => {
         window.ENV.CONTEXT_MODULE_ITEM.done = true
 
-        const {getByRole} = render(
+        const {getByTestId} = render(
           <MockedProvider>
             <SubmissionManager {...props} />
           </MockedProvider>
         )
 
-        const button = getByRole('button', {name: 'Done'})
-        expect(button).toBeInTheDocument()
+        const markAsDoneButton = getByTestId('set-module-item-completion-button')
+        expect(markAsDoneButton).toHaveTextContent('Done')
       })
 
       it('sends a request when clicked', async () => {
@@ -441,7 +447,7 @@ describe('SubmissionManager', () => {
           }
         ]
 
-        const {getByRole} = render(
+        const {getByTestId} = render(
           <AlertManagerContext.Provider
             value={{...StudentViewContextDefaults, setOnFailure: jest.fn()}}
           >
@@ -451,12 +457,14 @@ describe('SubmissionManager', () => {
           </AlertManagerContext.Provider>
         )
 
-        const markAsDoneButton = getByRole('button', {name: 'Mark as done'})
+        const markAsDoneButton = getByTestId('set-module-item-completion-button')
+        expect(markAsDoneButton).toHaveTextContent('Mark as done')
         act(() => {
           fireEvent.click(markAsDoneButton)
         })
 
-        await waitFor(() => expect(getByRole('button', {name: 'Done'})).toBeInTheDocument())
+        await act(async () => { jest.runOnlyPendingTimers() })
+        expect(getByTestId('set-module-item-completion-button')).toHaveTextContent('Done')
       })
 
       it('updates itself to the opposite appearance when the request succeeds', async () => {
@@ -473,7 +481,7 @@ describe('SubmissionManager', () => {
           }
         ]
 
-        const {getByRole} = render(
+        const {getByTestId} = render(
           <AlertManagerContext.Provider value={{...StudentViewContextDefaults}}>
             <MockedProvider mocks={mocks}>
               <SubmissionManager {...props} />
@@ -481,12 +489,14 @@ describe('SubmissionManager', () => {
           </AlertManagerContext.Provider>
         )
 
-        const markAsDoneButton = getByRole('button', {name: 'Mark as done'})
+        const markAsDoneButton = getByTestId('set-module-item-completion-button')
+        expect(markAsDoneButton).toHaveTextContent('Mark as done')
         act(() => {
           fireEvent.click(markAsDoneButton)
         })
 
-        await waitFor(() => expect(getByRole('button', {name: 'Done'})).toBeInTheDocument())
+        await act(async () => { jest.runOnlyPendingTimers() })
+        expect(getByTestId('set-module-item-completion-button')).toHaveTextContent('Done')
       })
 
       it('does not update its appearance when the request fails', async () => {
@@ -503,7 +513,7 @@ describe('SubmissionManager', () => {
           }
         ]
 
-        const {queryByRole, getByRole} = render(
+        const {getByTestId} = render(
           <AlertManagerContext.Provider value={{setOnFailure: jest.fn()}}>
             <MockedProvider mocks={mocks}>
               <SubmissionManager {...props} />
@@ -511,12 +521,14 @@ describe('SubmissionManager', () => {
           </AlertManagerContext.Provider>
         )
 
-        const markAsDoneButton = getByRole('button', {name: 'Mark as done'})
+        const markAsDoneButton = getByTestId('set-module-item-completion-button')
+        expect(markAsDoneButton).toHaveTextContent('Mark as done')
         act(() => {
           fireEvent.click(markAsDoneButton)
         })
 
-        await waitFor(() => expect(queryByRole('button', {name: 'Done'})).not.toBeInTheDocument())
+        await act(async () => { jest.runOnlyPendingTimers() })
+        expect(markAsDoneButton).toHaveTextContent('Mark as done')
       })
     })
 
@@ -541,13 +553,13 @@ describe('SubmissionManager', () => {
           Submission: {...SubmissionMocks.submitted}
         })
 
-        const {getByRole} = render(
+        const {getByTestId} = render(
           <MockedProvider>
             <SubmissionManager {...props} />
           </MockedProvider>
         )
 
-        expect(getByRole('button', {name: 'Try Again'})).toBeInTheDocument()
+        expect(getByTestId('try-again-button')).toBeInTheDocument()
       })
 
       it('is not rendered for observers', async () => {
@@ -557,33 +569,33 @@ describe('SubmissionManager', () => {
           },
           Submission: {...SubmissionMocks.submitted}
         })
-        const {queryByRole} = renderInContext(
+        const {queryByTestId} = renderInContext(
           {allowChangesToSubmission: false, isObserver: true},
           <SubmissionManager {...props} />
         )
-        expect(queryByRole('button', {name: 'Try Again'})).not.toBeInTheDocument()
+        expect(queryByTestId('try-again-button')).not.toBeInTheDocument()
       })
 
       it('is not rendered if changes cannot be made to the submission', async () => {
         const props = await mockAssignmentAndSubmission({
           Submission: {...SubmissionMocks.submitted}
         })
-        const {queryByRole} = renderInContext(
+        const {queryByTestId} = renderInContext(
           {allowChangesToSubmission: false},
           <SubmissionManager {...props} />
         )
-        expect(queryByRole('button', {name: 'Try Again'})).not.toBeInTheDocument()
+        expect(queryByTestId('try-again-button')).not.toBeInTheDocument()
       })
     })
 
     it('is not rendered if nothing has been submitted', async () => {
       const props = await mockAssignmentAndSubmission()
-      const {queryByRole} = render(
+      const {queryByTestId} = render(
         <MockedProvider>
           <SubmissionManager {...props} />
         </MockedProvider>
       )
-      expect(queryByRole('button', {name: 'Try Again'})).not.toBeInTheDocument()
+      expect(queryByTestId('try-again-button')).not.toBeInTheDocument()
     })
 
     it('is not rendered if the student has been graded before submitting', async () => {
@@ -593,24 +605,24 @@ describe('SubmissionManager', () => {
           attempt: 0
         }
       })
-      const {queryByRole} = render(
+      const {queryByTestId} = render(
         <MockedProvider>
           <SubmissionManager {...props} />
         </MockedProvider>
       )
-      expect(queryByRole('button', {name: 'Try Again'})).not.toBeInTheDocument()
+      expect(queryByTestId('try-again-button')).not.toBeInTheDocument()
     })
 
     it('is not rendered if excused', async () => {
       const props = await mockAssignmentAndSubmission({
         Submission: {...SubmissionMocks.excused}
       })
-      const {queryByRole} = render(
+      const {queryByTestId} = render(
         <MockedProvider>
           <SubmissionManager {...props} />
         </MockedProvider>
       )
-      expect(queryByRole('button', {name: 'Try Again'})).not.toBeInTheDocument()
+      expect(queryByTestId('try-again-button')).not.toBeInTheDocument()
     })
 
     it('is not rendered if the assignment is locked', async () => {
@@ -618,8 +630,8 @@ describe('SubmissionManager', () => {
         Assignment: {lockInfo: {isLocked: true}},
         Submission: {...SubmissionMocks.submitted}
       })
-      const {queryByRole} = render(<SubmissionManager {...props} />)
-      expect(queryByRole('button', {name: 'Try Again'})).not.toBeInTheDocument()
+      const {queryByTestId} = render(<SubmissionManager {...props} />)
+      expect(queryByTestId('try-again-button')).not.toBeInTheDocument()
     })
 
     it('is not rendered if there are no more attempts', async () => {
@@ -627,8 +639,8 @@ describe('SubmissionManager', () => {
         Assignment: {allowedAttempts: 1},
         Submission: {...SubmissionMocks.submitted}
       })
-      const {queryByRole} = render(<SubmissionManager {...props} />)
-      expect(queryByRole('button', {name: 'Try Again'})).not.toBeInTheDocument()
+      const {queryByTestId} = render(<SubmissionManager {...props} />)
+      expect(queryByTestId('try-again-button')).not.toBeInTheDocument()
     })
 
     it('accounts for any extra attempts awarded to the student', async () => {
@@ -636,8 +648,8 @@ describe('SubmissionManager', () => {
         Assignment: {allowedAttempts: 1},
         Submission: {...SubmissionMocks.submitted, extraAttempts: 2}
       })
-      const {queryByRole} = render(<SubmissionManager {...props} />)
-      expect(queryByRole('button', {name: 'Try Again'})).toBeInTheDocument()
+      const {queryByTestId} = render(<SubmissionManager {...props} />)
+      expect(queryByTestId('try-again-button')).toBeInTheDocument()
     })
   })
 
@@ -648,9 +660,9 @@ describe('SubmissionManager', () => {
       })
       const latestSubmission = {attempt: 2, state: 'unsubmitted'}
 
-      const {getByRole} = renderInContext({latestSubmission}, <SubmissionManager {...props} />)
+      const {getByTestId} = renderInContext({latestSubmission}, <SubmissionManager {...props} />)
 
-      expect(getByRole('button', {name: /Back to Attempt/})).toBeInTheDocument()
+      expect(getByTestId('back-to-attempt-button')).toBeInTheDocument()
     })
 
     it('includes the current attempt number', async () => {
@@ -659,8 +671,8 @@ describe('SubmissionManager', () => {
       })
       const latestSubmission = {attempt: 2, state: 'unsubmitted'}
 
-      const {getByRole} = renderInContext({latestSubmission}, <SubmissionManager {...props} />)
-      const button = getByRole('button', {name: /Back to Attempt/})
+      const {getByTestId} = renderInContext({latestSubmission}, <SubmissionManager {...props} />)
+      const button = getByTestId('back-to-attempt-button')
       expect(button).toHaveTextContent('Back to Attempt 2')
     })
 
@@ -669,12 +681,12 @@ describe('SubmissionManager', () => {
         Submission: {...SubmissionMocks.submitted}
       })
 
-      const {queryByRole} = render(
+      const {queryByTestId} = render(
         <MockedProvider>
           <SubmissionManager {...props} />
         </MockedProvider>
       )
-      expect(queryByRole('button', {name: /Back to Attempt/})).not.toBeInTheDocument()
+      expect(queryByTestId('back-to-attempt-button')).not.toBeInTheDocument()
     })
 
     it('is not rendered if the current draft is selected', async () => {
@@ -683,8 +695,8 @@ describe('SubmissionManager', () => {
       })
       const latestSubmission = props.submission
 
-      const {queryByRole} = renderInContext({latestSubmission}, <SubmissionManager {...props} />)
-      expect(queryByRole('button', {name: /Back to Attempt/})).not.toBeInTheDocument()
+      const {queryByTestId} = renderInContext({latestSubmission}, <SubmissionManager {...props} />)
+      expect(queryByTestId('back-to-attempt-button')).not.toBeInTheDocument()
     })
 
     it('calls the showDraftAction function supplied by the context when clicked', async () => {
@@ -699,13 +711,13 @@ describe('SubmissionManager', () => {
       }
       const showDraftAction = jest.fn()
 
-      const {getByRole} = renderInContext(
+      const {getByTestId} = renderInContext(
         {latestSubmission, showDraftAction},
         <SubmissionManager {...props} />
       )
 
       act(() => {
-        fireEvent.click(getByRole('button', {name: /Back to Attempt/}))
+        fireEvent.click(getByTestId('back-to-attempt-button'))
       })
       expect(showDraftAction).toHaveBeenCalled()
     })
@@ -717,13 +729,13 @@ describe('SubmissionManager', () => {
         Submission: {...SubmissionMocks.onlineUploadReadyToSubmit, attempt: 2}
       })
 
-      const {getByRole} = renderInContext(
+      const {getByTestId} = renderInContext(
         {latestSubmission: props.submission},
         <MockedProvider>
           <SubmissionManager {...props} />
         </MockedProvider>
       )
-      expect(getByRole('button', {name: /Cancel Attempt/})).toBeInTheDocument()
+      expect(getByTestId('cancel-attempt-button')).toBeInTheDocument()
     })
 
     it('is not rendered when working on the initial attempt', async () => {
@@ -731,13 +743,13 @@ describe('SubmissionManager', () => {
         Submission: {...SubmissionMocks.onlineUploadReadyToSubmit, attempt: 1}
       })
 
-      const {queryByRole} = renderInContext(
+      const {queryByTestId} = renderInContext(
         {latestSubmission: props.submission},
         <MockedProvider>
           <SubmissionManager {...props} />
         </MockedProvider>
       )
-      expect(queryByRole('button', {name: /Cancel Attempt/})).not.toBeInTheDocument()
+      expect(queryByTestId('cancel-attempt-button')).not.toBeInTheDocument()
     })
 
     it('includes the attempt number in the button text', async () => {
@@ -745,14 +757,14 @@ describe('SubmissionManager', () => {
         Submission: {...SubmissionMocks.onlineUploadReadyToSubmit, attempt: 2}
       })
 
-      const {getByRole} = renderInContext(
+      const {getByTestId} = renderInContext(
         {latestSubmission: props.submission},
         <MockedProvider>
           <SubmissionManager {...props} />
         </MockedProvider>
       )
 
-      const button = getByRole('button', {name: /Cancel Attempt/})
+      const button = getByTestId('cancel-attempt-button')
       expect(button).toHaveTextContent('Cancel Attempt 2')
     })
 
@@ -761,13 +773,13 @@ describe('SubmissionManager', () => {
         Submission: {...SubmissionMocks.submitted, attempt: 2}
       })
 
-      const {queryByRole} = render(
+      const {queryByTestId} = render(
         <MockedProvider>
           <SubmissionManager {...props} />
         </MockedProvider>
       )
 
-      expect(queryByRole('button', {name: /Cancel Attempt/})).not.toBeInTheDocument()
+      expect(queryByTestId('cancel-attempt-button')).not.toBeInTheDocument()
     })
 
     it('is not rendered if a draft exists but is not shown', async () => {
@@ -775,14 +787,14 @@ describe('SubmissionManager', () => {
         Submission: {...SubmissionMocks.submitted, attempt: 1}
       })
 
-      const {queryByRole} = renderInContext(
+      const {queryByTestId} = renderInContext(
         {latestSubmission: {attempt: 2, state: 'unsubmitted'}},
         <MockedProvider>
           <SubmissionManager {...props} />
         </MockedProvider>
       )
 
-      expect(queryByRole('button', {name: /Cancel Attempt/})).not.toBeInTheDocument()
+      expect(queryByTestId('cancel-attempt-button')).not.toBeInTheDocument()
     })
 
     describe('when clicked', () => {
@@ -849,17 +861,17 @@ describe('SubmissionManager', () => {
         }
 
         it('shows a confirmation modal if the current draft has any actual content', async () => {
-          const {getByRole} = await renderDraft()
+          const {getByTestId} = await renderDraft()
 
           act(() => {
-            fireEvent.click(getByRole('button', {name: /Cancel Attempt/}))
+            fireEvent.click(getByTestId('cancel-attempt-button'))
           })
           expect(await confirmationDialog()).toBeInTheDocument()
         })
 
         it('calls the cancelDraftAction function if the user confirms the modal', async () => {
-          const {getByRole} = await renderDraft()
-          fireEvent.click(getByRole('button', {name: /Cancel Attempt/}))
+          const {getByTestId} = await renderDraft()
+          fireEvent.click(getByTestId('cancel-attempt-button'))
           fireEvent.click(await confirmButton())
           await waitFor(() => {
             expect(cancelDraftAction).toHaveBeenCalled()
@@ -867,9 +879,9 @@ describe('SubmissionManager', () => {
         })
 
         it('does nothing if the user cancels the modal', async () => {
-          const {getByRole} = await renderDraft()
+          const {getByTestId} = await renderDraft()
 
-          fireEvent.click(getByRole('button', {name: /Cancel Attempt/}))
+          fireEvent.click(getByTestId('cancel-attempt-button'))
           fireEvent.click(await cancelButton())
 
           expect(cancelDraftAction).not.toHaveBeenCalled()
@@ -895,19 +907,19 @@ describe('SubmissionManager', () => {
         }
 
         it('does not show a confirmation', async () => {
-          const {getByRole} = await renderDraft()
+          const {getByTestId} = await renderDraft()
 
           act(() => {
-            fireEvent.click(getByRole('button', {name: /Cancel Attempt/}))
+            fireEvent.click(getByTestId('cancel-attempt-button'))
           })
           expect(screen.queryByRole('dialog', {label: 'Delete your work?'})).not.toBeInTheDocument()
         })
 
         it('calls the cancelDraftAction function', async () => {
-          const {getByRole} = await renderDraft()
+          const {getByTestId} = await renderDraft()
 
           act(() => {
-            fireEvent.click(getByRole('button', {name: /Cancel Attempt/}))
+            fireEvent.click(getByTestId('cancel-attempt-button'))
           })
           expect(cancelDraftAction).toHaveBeenCalled()
         })
@@ -990,13 +1002,13 @@ describe('SubmissionManager', () => {
     })
 
     it('disables the Submit Assignment button while allegedly saving the draft', async () => {
-      const {getByRole} = await renderTextAttempt()
+      const {getByTestId} = await renderTextAttempt()
       act(() => {
         fakeEditor.setContent('some edited draft text')
         jest.advanceTimersByTime(500)
       })
 
-      expect(getByRole('button', {name: 'Submit Assignment'})).toBeDisabled()
+      expect(getByTestId('submit-button')).toBeDisabled()
     })
 
     it('shows a "Draft Saved" label when a text draft has been successfully saved', async () => {
@@ -1120,8 +1132,8 @@ describe('SubmissionManager', () => {
 
         await waitFor(() => expect(ContextModuleApi.getContextModuleData).toHaveBeenCalled())
         const footer = getByTestId('student-footer')
-        expect(within(footer).getByRole('link', {name: /Previous/})).toBeInTheDocument()
-        expect(within(footer).getByRole('link', {name: /Next/})).toBeInTheDocument()
+        expect(within(footer).getByTestId('previous-assignment-btn', {name: /Previous/})).toBeInTheDocument()
+        expect(within(footer).getByTestId('next-assignment-btn', {name: /Next/})).toBeInTheDocument()
       })
 
       it('does not render module buttons if no next/previous modules exist for the assignment', async () => {
@@ -1178,53 +1190,51 @@ describe('SubmissionManager', () => {
     })
 
     it('is rendered if pledge settings are provided', () => {
-      const {getByRole} = render(
+      const {getByLabelText} = render(
         <MockedProvider>
           <SubmissionManager {...props} />
         </MockedProvider>
       )
 
-      const agreementCheckbox = getByRole('checkbox', {name: /I agree to the tool's/})
-      expect(agreementCheckbox).toBeInTheDocument()
+      expect(getByLabelText(/I agree to the tool's/)).toBeInTheDocument()
     })
 
     it('is not rendered if no pledge settings are provided', () => {
       delete window.ENV.SIMILARITY_PLEDGE
 
-      const {queryByRole} = render(
+      const {queryByLabelText} = render(
         <MockedProvider>
           <SubmissionManager {...props} />
         </MockedProvider>
       )
 
-      const agreementCheckbox = queryByRole('checkbox', {name: /I agree to the tool's/})
-      expect(agreementCheckbox).not.toBeInTheDocument()
+      expect(queryByLabelText(/I agree to the tool's/)).not.toBeInTheDocument()
     })
 
     it('disables the "Submit" button if rendered and the user has not agreed to the pledge', () => {
-      const {getByRole} = render(
+      const {getByTestId} = render(
         <MockedProvider>
           <SubmissionManager {...props} />
         </MockedProvider>
       )
 
-      const submitButton = getByRole('button', {name: 'Submit Assignment'})
+      const submitButton = getByTestId('submit-button')
       expect(submitButton).toBeDisabled()
     })
 
     it('enables the "Submit" button after the user agrees to the pledge', () => {
-      const {getByRole} = render(
+      const {getByLabelText, getByTestId} = render(
         <MockedProvider>
           <SubmissionManager {...props} />
         </MockedProvider>
       )
 
-      const agreementCheckbox = getByRole('checkbox', {name: /I agree to the tool's/})
+      const agreementCheckbox = getByLabelText(/I agree to the tool's/)
       act(() => {
         fireEvent.click(agreementCheckbox)
       })
 
-      const submitButton = getByRole('button', {name: 'Submit Assignment'})
+      const submitButton = getByTestId('submit-button')
       expect(submitButton).not.toBeDisabled()
     })
   })

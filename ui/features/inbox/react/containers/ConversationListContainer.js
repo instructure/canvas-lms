@@ -18,7 +18,6 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {ConversationContext} from '../../util/constants'
-import {CONVERSATIONS_QUERY, VIEWABLE_SUBMISSIONS_QUERY} from '../../graphql/Queries'
 import {UPDATE_CONVERSATION_PARTICIPANTS} from '../../graphql/Mutations'
 import {ConversationListHolder} from '../components/ConversationListHolder/ConversationListHolder'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -26,7 +25,7 @@ import {Mask} from '@instructure/ui-overlays'
 import PropTypes from 'prop-types'
 import React, {useContext, useMemo, useState} from 'react'
 import {Spinner} from '@instructure/ui-spinner'
-import {useQuery, useMutation} from 'react-apollo'
+import {useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 import {inboxConversationsWrapper, responsiveQuerySizes} from '../../util/utils'
 import {Responsive} from '@instructure/ui-responsive'
@@ -34,17 +33,16 @@ import {Responsive} from '@instructure/ui-responsive'
 const I18n = useI18nScope('conversations_2')
 
 const ConversationListContainer = ({
-  course,
   scope,
   onSelectConversation,
   onReadStateChange,
-  userFilter
+  commonQueryVariables,
+  conversationsQuery,
+  submissionCommentsQuery
 }) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const {isSubmissionCommentsType} = useContext(ConversationContext)
   const [isLoadingMoreData, setIsLoadingMoreData] = useState(false)
-
-  const userID = ENV.current_user_id?.toString()
 
   const [starChangeConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
     onCompleted(data) {
@@ -83,27 +81,14 @@ const ConversationListContainer = ({
     onReadStateChange('read', [conversationId])
   }
 
-  const conversationsQuery = useQuery(CONVERSATIONS_QUERY, {
-    variables: {userID, scope, filter: [userFilter, course]},
-    fetchPolicy: 'cache-and-network',
-    skip: isSubmissionCommentsType || scope === 'submission_comments'
-  })
-
-  const submissionCommentsQuery = useQuery(VIEWABLE_SUBMISSIONS_QUERY, {
-    variables: {userID, sort: 'desc', filter: [userFilter, course]},
-    fetchPolicy: 'cache-and-network',
-    skip: !isSubmissionCommentsType || !(scope === 'submission_comments')
-  })
-
   const fetchMoreMenuData = () => {
     setIsLoadingMoreData(true)
     if (!isSubmissionCommentsType) {
       conversationsQuery.fetchMore({
         variables: {
+          ...commonQueryVariables,
           _id: inboxItemData[inboxItemData.length - 1]._node_id,
-          userID,
           scope,
-          filter: [userFilter, course],
           afterConversation:
             conversationsQuery.data?.legacyNode?.conversationsConnection?.pageInfo.endCursor
         },
@@ -130,10 +115,9 @@ const ConversationListContainer = ({
     } else {
       submissionCommentsQuery.fetchMore({
         variables: {
+          ...commonQueryVariables,
           _id: inboxItemData[inboxItemData.length - 1]._node_id,
-          userID,
           sort: 'desc',
-          filter: [userFilter, course],
           afterSubmission:
             submissionCommentsQuery.data?.legacyNode?.viewableSubmissionsConnection?.pageInfo
               .endCursor
@@ -247,11 +231,12 @@ const ConversationListContainer = ({
 export default ConversationListContainer
 
 ConversationListContainer.propTypes = {
-  course: PropTypes.string,
-  userFilter: PropTypes.number,
   scope: PropTypes.string,
   onSelectConversation: PropTypes.func,
-  onReadStateChange: PropTypes.func
+  onReadStateChange: PropTypes.func,
+  commonQueryVariables: PropTypes.object,
+  conversationsQuery: PropTypes.object,
+  submissionCommentsQuery: PropTypes.object
 }
 
 ConversationListContainer.defaultProps = {

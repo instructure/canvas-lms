@@ -845,7 +845,6 @@ describe "Accounts API", type: :request do
           account: {
             settings: {
               enable_fullstory: false,
-              enable_google_analytics: false,
             }
           }
         }
@@ -863,8 +862,6 @@ describe "Accounts API", type: :request do
                    }, payload)
         end.to change { response&.status }.to(200).and not_change {
           account.reload.settings.fetch(:enable_fullstory, true)
-        }.and not_change {
-          account.reload.settings.fetch(:enable_google_analytics, true)
         }
       end
     end

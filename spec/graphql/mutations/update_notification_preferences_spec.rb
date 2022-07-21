@@ -333,6 +333,22 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
         result.dig(:data, :updateNotificationPreferences, :user, :notificationPreferences, :channels, 0, :notificationPolicies, 0, :frequency)
       ).to eq("immediately")
     end
+
+    it "throw not found when communication channel doesn't belong to current_user" do
+      Notification.create!(name: "Discussion Mention", subject: "Test", category: "DiscussionMention")
+      result = CanvasSchema.execute(mutation_str(context_type: "Account",
+                                                 account_id: @account.id,
+                                                 communication_channel_id: @teacher.communication_channels.first.id,
+                                                 notification_category: "DiscussionMention",
+                                                 frequency: "immediately"), context: {
+                                                   current_user: @student,
+                                                   request: ActionDispatch::TestRequest.create,
+                                                   domain_root_account: @account
+                                                 })
+      result = result.to_h.with_indifferent_access
+
+      expect(result[:errors][0][:message]).to be "not found"
+    end
   end
 
   describe "invalid input" do

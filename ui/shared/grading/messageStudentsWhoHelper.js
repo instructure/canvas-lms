@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import axios from '@canvas/axios'
 import _ from 'underscore'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -60,6 +61,29 @@ const MessageStudentsWhoHelper = {
       callback: this.callbackFn.bind(this),
       subjectCallback: this.generateSubjectCallbackFn(assignment)
     }
+  },
+
+  sendMessageStudentsWho(recipientsIds, subject, body, contextCode, mediaFile, attachmentIds) {
+    const params = {
+      recipients: recipientsIds,
+      subject,
+      body,
+      context_code: contextCode,
+      mode: 'async',
+      group_conversation: true,
+      bulk_message: true
+    }
+
+    if (mediaFile) {
+      params.media_comment_id = mediaFile.id
+      params.media_comment_type = mediaFile.type
+    }
+
+    if (attachmentIds) {
+      params.attachment_ids = attachmentIds
+    }
+
+    return axios.post('/api/v1/conversations', params)
   },
 
   options(assignment) {

@@ -26,7 +26,8 @@ import {
   MOVE_OUTCOME_LINKS,
   UPDATE_LEARNING_OUTCOME_GROUP,
   IMPORT_OUTCOMES,
-  CREATE_LEARNING_OUTCOME_GROUP
+  CREATE_LEARNING_OUTCOME_GROUP,
+  COURSE_ALIGNMENT_STATS
 } from '../graphql/Management'
 import {defaultRatings, defaultMasteryPoints} from '../react/hooks/useRatings'
 import {pick, uniq, flattenDeep} from 'lodash'
@@ -2469,3 +2470,38 @@ export const smallOutcomeTree = ({group100childCounts = 1} = {}) => [
   ...groupDetailMocks({groupId: '101'}),
   ...groupDetailMocks({groupId: '400'})
 ]
+
+export const courseAlignmentStatsMocks = ({
+  id = '1',
+  totalOutcomes = 2,
+  alignedOutcomes = 1,
+  totalAlignments = 4,
+  totalArtifacts = 5,
+  alignedArtifacts = 4
+} = {}) => {
+  const result = {
+    data: {
+      course: {
+        outcomeAlignmentStats: {
+          totalOutcomes,
+          alignedOutcomes,
+          totalAlignments,
+          totalArtifacts,
+          alignedArtifacts,
+          __typename: 'CourseOutcomeAlignmentStats'
+        },
+        __typename: 'Course'
+      }
+    }
+  }
+
+  return [
+    {
+      request: {
+        query: COURSE_ALIGNMENT_STATS,
+        variables: {id}
+      },
+      result
+    }
+  ]
+}

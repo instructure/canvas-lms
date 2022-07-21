@@ -24,6 +24,12 @@ import DirectShareUserModal from '../DirectShareUserModal'
 
 jest.mock('../../effects/useContentShareUserSearchApi')
 
+const flushAllTimersAndPromises = async () => {
+  while(jest.getTimerCount() > 0) {
+    await act(async () => { jest.runAllTimers() })
+  }
+}
+
 describe('DirectShareUserModal', () => {
   let ariaLive
 
@@ -51,13 +57,14 @@ describe('DirectShareUserModal', () => {
     })
   })
 
-  afterEach(() => {
+  afterEach(async () => {
+    await flushAllTimersAndPromises()
     fetchMock.restore()
   })
 
-  function selectUser(getByText, getByLabelText, name = 'abc') {
-    fireEvent.change(getByLabelText(/send to:/i), {target: {value: name}})
-    act(() => jest.runAllTimers()) // let the debounce happen
+  async function selectUser(getByText, findByLabelText, name = 'abc') {
+    fireEvent.change(await findByLabelText(/send to:/i), {target: {value: name}})
+    await act(async () => jest.runAllTimers()) // let the debounce happen
     fireEvent.click(getByText(name))
   }
 
@@ -66,30 +73,30 @@ describe('DirectShareUserModal', () => {
     expect(getByText('Send').closest('button').getAttribute('disabled')).toBe('')
   })
 
-  it('enables the send button only when a user is selected', () => {
-    const {getByText, getAllByText, getByLabelText} = render(
+  it('enables the send button only when a user is selected UNDER TEST', async () => {
+    const {getByText, getAllByText, findByLabelText} = render(
       <DirectShareUserModal open courseId="1" />
     )
-    selectUser(getByText, getByLabelText)
+    await selectUser(getByText, findByLabelText)
     expect(getByText('Send').closest('button').getAttribute('disabled')).toBe(null)
     // remove the selected user from the list
     fireEvent.click(getAllByText('abc')[1]) // first one is SR alert
     expect(getByText('Send').closest('button').getAttribute('disabled')).toBe('')
   })
 
-  it('disables the send button when a search has started', () => {
-    const {getByText, getByLabelText} = render(
+  it('disables the send button when a search has started UNDER TEST', async () => {
+    const {getByText, findByLabelText} = render(
       <DirectShareUserModal open courseId="1" onDismiss={Function.prototype} />
     )
-    selectUser(getByText, getByLabelText)
+    await selectUser(getByText, findByLabelText)
     fireEvent.click(getByText('Send'))
     expect(getByText('Send').closest('button').getAttribute('disabled')).toBe('')
   })
 
-  it('starts a share operation and reports status', async () => {
+  it('starts a share operation and reports status UNDER TEST', async () => {
     fetchMock.postOnce('path:/api/v1/users/self/content_shares', 200)
     const onDismiss = jest.fn()
-    const {getByText, getAllByText, getByLabelText} = render(
+    const {getByText, getAllByText, findByLabelText} = render(
       <DirectShareUserModal
         open
         courseId="1"
@@ -97,7 +104,7 @@ describe('DirectShareUserModal', () => {
         onDismiss={onDismiss}
       />
     )
-    selectUser(getByText, getByLabelText)
+    await selectUser(getByText, findByLabelText)
     fireEvent.click(getByText('Send'))
     const [, fetchOptions] = fetchMock.lastCall()
     expect(fetchOptions.method).toBe('POST')
@@ -114,10 +121,10 @@ describe('DirectShareUserModal', () => {
 
   it('clears user selection when the modal is closed', async () => {
     fetchMock.get('*', [{id: 'abc', name: 'abc'}])
-    const {queryByText, getByText, getByLabelText, rerender} = render(
+    const {queryByText, getByText, findByLabelText, rerender} = render(
       <DirectShareUserModal open courseId="1" />
     )
-    selectUser(getByText, getByLabelText)
+    await selectUser(getByText, findByLabelText)
     rerender(<DirectShareUserModal open={false} courseId="1" />)
     rerender(<DirectShareUserModal open courseId="1" />)
     expect(queryByText('abc')).toBeNull()
@@ -134,14 +141,14 @@ describe('DirectShareUserModal', () => {
 
     it('reports an error if the fetch fails', async () => {
       fetchMock.postOnce('path:/api/v1/users/self/content_shares', 400)
-      const {getByText, getByLabelText} = render(
+      const {getByText, findByLabelText} = render(
         <DirectShareUserModal
           open
           courseId="1"
           contentShare={{content_type: 'discussion_topic', content_id: '42'}}
         />
       )
-      selectUser(getByText, getByLabelText)
+      await selectUser(getByText, findByLabelText)
       fireEvent.click(getByText('Send'))
       await act(() => fetchMock.flush(true))
       expect(getByText(/error/i)).toBeInTheDocument()

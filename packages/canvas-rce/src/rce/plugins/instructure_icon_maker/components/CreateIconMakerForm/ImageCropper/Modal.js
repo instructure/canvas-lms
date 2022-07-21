@@ -48,7 +48,7 @@ export const ImageCropperModal = ({open, onClose, onSubmit, image, cropSettings}
 
   return (
     <Modal size="large" open={open} onDismiss={onClose} shouldCloseOnDocumentClick={false}>
-      <Modal.Header>
+      <Modal.Header id="imageCropperHeader">
         <CloseButton placement="end" offset="small" onClick={onClose} screenReaderLabel="Close" />
         <Heading>{formatMessage('Crop Image')}</Heading>
       </Modal.Header>
@@ -62,7 +62,7 @@ export const ImageCropperModal = ({open, onClose, onSubmit, image, cropSettings}
           </Flex.Item>
         </Flex>
       </Modal.Body>
-      <Modal.Footer>
+      <Modal.Footer id="imageCropperFooter">
         <Button onClick={onClose} margin="0 x-small 0 0">
           {formatMessage('Cancel')}
         </Button>

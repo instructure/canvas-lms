@@ -138,6 +138,19 @@ describe CC::CCHelper do
       expect(translated).to include %(src="$IMS-CC-FILEBASE$/something/lolcats.mp4")
     end
 
+    it "links media to proper file via related_attachment links" do
+      disposable_course = Course.create!
+      folder = folder_model(name: "something", context: disposable_course)
+      att = attachment_model(display_name: "lolcats.mp4", context: disposable_course, folder: folder, uploaded_data: stub_file_data("lolcats_.mp4", "...", "video/mp4"))
+      @obj.attachment = att
+      @obj.save!
+      attachment_model(root_attachment: att, display_name: "lolcats.mp4", context: @course, folder: folder, uploaded_data: stub_file_data("lolcats_.mp4", "...", "video/mp4"))
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+      html = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="http://example.com/media_objects_iframe/abcde?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde"></iframe>)
+      translated = @exporter.html_content(html)
+      expect(translated).to include %(src="$IMS-CC-FILEBASE$/unfiled/lolcats.mp4")
+    end
+
     it "does not link media to file in another course" do
       temp = @course
       other_course = course_factory

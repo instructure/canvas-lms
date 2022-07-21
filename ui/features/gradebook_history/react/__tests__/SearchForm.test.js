@@ -16,7 +16,6 @@
  */
 
 import React from 'react'
-import MockDate from 'mockdate'
 import {render, act, fireEvent} from '@testing-library/react'
 import {SearchFormComponent as Subject} from '../SearchForm'
 
@@ -70,18 +69,6 @@ describe('GradebookHistory::SearchFormComponent', () => {
     jest.useFakeTimers()
   })
 
-  afterEach(() => {
-    MockDate.reset()
-  })
-
-  function advance(msec) {
-    act(() => {
-      const now = Date.now()
-      MockDate.set(now + msec)
-      jest.advanceTimersByTime(msec)
-    })
-  }
-
   it('displays a flash alert on fetch failure', () => {
     const {rerender} = mountSubject()
     let flash = document.getElementById('flashalert_message_holder')
@@ -108,7 +95,7 @@ describe('GradebookHistory::SearchFormComponent', () => {
         const input = container.querySelector(`input#${field}`)
         fireEvent.click(input)
         fireEvent.input(input, {target: {id: field, value: 'onetwo'}})
-        advance(1000) // wait for debounce
+        act(() => { jest.advanceTimersByTime(500) }) // wait for debounce
         expect(getSearchOptions).toHaveBeenCalledWith(field, 'onetwo')
       })
     })

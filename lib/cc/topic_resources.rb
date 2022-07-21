@@ -138,6 +138,8 @@ module CC
           AssignmentResources.create_canvas_assignment(a, topic.assignment, @manifest)
         end
       end
+      doc.anonymous_state topic.anonymous_state unless topic.anonymous_state.nil?
+      doc.is_anonymous_author "true" if topic.is_anonymous_author
     end
   end
 end
