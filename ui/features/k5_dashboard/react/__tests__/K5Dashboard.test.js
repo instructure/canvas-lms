@@ -32,8 +32,6 @@ import {MOCK_ASSIGNMENTS, MOCK_CARDS, MOCK_EVENTS} from '@canvas/k5/react/__test
 import K5Dashboard from '../K5Dashboard'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 
-jest.setTimeout(20000)
-
 const ASSIGNMENTS_URL = /\/api\/v1\/calendar_events\?type=assignment&important_dates=true&.*/
 const announcements = [
   {
@@ -223,20 +221,16 @@ describe('K-5 Dashboard', () => {
     })
 
     it('shows due today and missing items links pointing to the schedule tab of the course', async () => {
-      const {findByRole} = render(<K5Dashboard {...defaultProps} plannerEnabled />)
-      const dueTodayLink = await findByRole('link', {
-        name: 'View 1 items due today for course Economics 101',
-        timeout: 5000
-      })
+      const {findByTestId} = render(<K5Dashboard {...defaultProps} plannerEnabled />)
+      const dueTodayLink = await findByTestId('number-due-today')
       expect(dueTodayLink).toBeInTheDocument()
+      expect(dueTodayLink).toHaveTextContent('View 1 items due today for course Economics 101')
       expect(dueTodayLink.getAttribute('href')).toMatch('/courses/1?focusTarget=today#schedule')
 
-      const misingItemsLink = await findByRole('link', {
-        name: 'View 2 missing items for course Economics 101',
-        timeout: 5000
-      })
-      expect(misingItemsLink).toBeInTheDocument()
-      expect(misingItemsLink.getAttribute('href')).toMatch(
+      const missingItemsLink = await findByTestId('number-missing')
+      expect(missingItemsLink).toBeInTheDocument()
+      expect(missingItemsLink).toHaveTextContent('View 2 missing items for course Economics 101')
+      expect(missingItemsLink.getAttribute('href')).toMatch(
         '/courses/1?focusTarget=missing-items#schedule'
       )
     })
@@ -259,14 +253,14 @@ describe('K-5 Dashboard', () => {
         status: 200,
         response: []
       })
-      const {getByRole, getByTestId, getByText} = render(
+      const {getByTestId, getByText} = render(
         <K5Dashboard {...defaultProps} plannerEnabled />
       )
       await waitFor(() =>
         expect(getByText("You don't have any active courses yet.")).toBeInTheDocument()
       )
       expect(getByTestId('empty-dash-panda')).toBeInTheDocument()
-      const scheduleTab = getByRole('tab', {name: 'Schedule'})
+      const scheduleTab = getByText('Schedule')
       act(() => scheduleTab.click())
       expect(getByText("You don't have any active courses yet.")).toBeInTheDocument()
       expect(getByTestId('empty-dash-panda')).toBeInTheDocument()
@@ -357,7 +351,11 @@ describe('K-5 Dashboard', () => {
 
     it("shows apps installed in the user's courses", async () => {
       const wrapper = render(<K5Dashboard {...defaultProps} defaultTab="tab-resources" />)
-      expect(await wrapper.findByRole('button', {name: 'Google Apps'})).toBeInTheDocument()
+
+      const button = await wrapper.findByTestId('k5-app-button')
+      expect(button).toBeInTheDocument()
+      expect(button).toHaveTextContent('Google Apps')
+
       const icon = wrapper.getByTestId('renderedIcon')
       expect(icon).toBeInTheDocument()
       expect(icon.src).toContain('google.png')
@@ -375,11 +373,13 @@ describe('K-5 Dashboard', () => {
 
   describe('Todos Section', () => {
     it('displays todo tab to teachers', async () => {
-      const {findByRole} = render(<K5Dashboard {...defaultProps} currentUserRoles={['teacher']} />)
-      const todoTab = await findByRole('tab', {name: 'To Do'})
+      const {findByText} = render(<K5Dashboard {...defaultProps} currentUserRoles={['teacher']} />)
+      const todoTab = await findByText('To Do')
       expect(todoTab).toBeInTheDocument()
       act(() => todoTab.click())
-      expect(await findByRole('link', {name: 'Grade Plant a plant'})).toBeInTheDocument()
+
+      const gradeButton = await findByText('Grade Plant a plant')
+      expect(gradeButton).toBeInTheDocument()
     })
 
     it('does not show the todos tab to students or admins', async () => {
@@ -409,7 +409,7 @@ describe('K-5 Dashboard', () => {
       })
       // Only return assignments associated with course_1 on next call
       fetchMock.get(ASSIGNMENTS_URL, MOCK_ASSIGNMENTS.slice(0, 1), {overwriteRoutes: true})
-      const {getByRole, getByText, queryByText} = render(
+      const {getByLabelText, getByTestId, getByText, queryByText} = render(
         <K5Dashboard
           {...defaultProps}
           selectedContextsLimit={1}
@@ -426,11 +426,18 @@ describe('K-5 Dashboard', () => {
       // Only return assignments associated with course_3 on next call
       fetchMock.get(ASSIGNMENTS_URL, MOCK_ASSIGNMENTS.slice(1, 3), {overwriteRoutes: true})
       act(() =>
-        getByRole('button', {name: 'Select calendars to retrieve important dates from'}).click()
+        getByTestId('filter-important-dates-button').click()
       )
-      act(() => getByRole('checkbox', {name: 'Economics 101', checked: true}).click())
-      act(() => getByRole('checkbox', {name: 'The Maths', checked: false}).click())
-      act(() => getByRole('button', {name: 'Submit'}).click())
+
+      const subjectCalendarEconomics = getByLabelText('Economics 101', { selector: 'input' })
+      expect(subjectCalendarEconomics).toBeChecked()
+
+      const subjectCalendarMaths = getByLabelText('The Maths', { selector: 'input' })
+      expect(subjectCalendarMaths).not.toBeChecked()
+
+      act(() => subjectCalendarEconomics.click())
+      act(() => subjectCalendarMaths.click())
+      act(() => getByText('Submit').click())
       await waitFor(() => {
         expect(queryByText('Algebra 2')).not.toBeInTheDocument()
         expect(getByText('History Discussion')).toBeInTheDocument()
