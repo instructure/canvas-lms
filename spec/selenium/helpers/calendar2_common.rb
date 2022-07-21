@@ -336,6 +336,33 @@ module Calendar2Common
     assert_month_view(title, due)
   end
 
+  def edit_new_event_in_more_options_page
+    f("#create_new_event_link").click
+    replace_content(f("#calendar_event_title"), "blackout event")
+    expect_new_page_load { f(".more_options_link").click }
+  end
+
+  def check_blackout_date_and_submit
+    f("#calendar_event_blackout_date").click
+    f('button[type="submit"]').click
+    wait_for_ajaximations
+  end
+
+  def create_blackout_date_through_more_options_page
+    edit_new_event_in_more_options_page
+    check_blackout_date_and_submit
+  end
+
+  def edit_calendar_event_in_more_options_page
+    f(".fc-content .fc-title").click
+    f(".edit_event_link").click
+    expect_new_page_load { f(".more_options_link").click }
+  end
+
+  def calendar_event_is_blackout_date
+    f("#calendar_event_blackout_date").attribute("checked")
+  end
+
   def agenda_item
     f(".agenda-event__item-container")
   end

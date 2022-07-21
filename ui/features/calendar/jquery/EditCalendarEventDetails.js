@@ -194,6 +194,7 @@ export default class EditCalendarEventDetails {
     if (data.end_time) params.end_time = data.end_time
     if (data.duplicate) params.duplicate = data.duplicate
     if (data.important != null) params.important_dates = data.important
+    params.blackout_date = this.event.blackout_date
 
     if (this.canUpdateConference()) {
       if (this.conference) {
