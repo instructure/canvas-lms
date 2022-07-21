@@ -224,6 +224,26 @@ describe "calendar2" do
         expect(@course.calendar_events.last.important_dates).to be_truthy
       end
 
+      it "creates a blackout calendar event in more options screen when feature is enabled" do
+        Account.site_admin.enable_feature! :account_level_blackout_dates
+        get "/calendar2"
+        wait_for_ajaximations
+        create_blackout_date_through_more_options_page
+        edit_calendar_event_in_more_options_page
+        expect(calendar_event_is_blackout_date).to be_truthy
+        check_blackout_date_and_submit
+        edit_calendar_event_in_more_options_page
+        expect(calendar_event_is_blackout_date).to be_falsey
+      end
+
+      it "cannot create a blackout date when the blackout date feature is disabled" do
+        Account.site_admin.disable_feature! :account_level_blackout_dates
+        get "/calendar2"
+        wait_for_ajaximations
+        edit_new_event_in_more_options_page
+        expect(f("body")).not_to contain_css("#calendar_event_blackout_date")
+      end
+
       it "can edit an all_day event in calendar", priority: "1" do
         @date = Time.zone.now.beginning_of_day
         @event = make_event(start: @date, end: @date, title: "An all day event")

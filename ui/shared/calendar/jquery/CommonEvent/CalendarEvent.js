@@ -18,7 +18,6 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import htmlEscape from 'html-escape'
 import fcUtil from '../fcUtil.coffee'
 import semanticDateRange from '@canvas/datetime/semanticDateRange'
 import CommonEvent from './CommonEvent'
@@ -79,6 +78,7 @@ Object.assign(CalendarEvent.prototype, {
     this.webConference = data.web_conference
     this.important_dates = data.important_dates
     this.series_natural_language = data.series_natural_language
+    this.blackout_date = data.blackout_date
     return CalendarEvent.__super__.copyDataFromObject.apply(this, arguments)
   },
 

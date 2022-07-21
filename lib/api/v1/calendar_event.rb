@@ -183,6 +183,7 @@ module Api::V1::CalendarEvent
       series_nat_lang = rrule_to_natural_language(event[:rrule])
       hash["series_natural_language"] = series_nat_lang
     end
+    hash["blackout_date"] = event.blackout_date
     hash
   end
 
