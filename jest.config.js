@@ -57,7 +57,7 @@ module.exports = {
   setupFilesAfterEnv: [
     '@testing-library/jest-dom/extend-expect',
     './packages/validated-apollo/src/ValidatedApolloCleanup.js',
-    '<rootDir>/jest/stubRecursiveTimers.js'
+    '<rootDir>/jest/stubInstUi.js'
   ],
   testMatch: ['**/__tests__/**/?(*.)(spec|test).[jt]s?(x)'],
 
