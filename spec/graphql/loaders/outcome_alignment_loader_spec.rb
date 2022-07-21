@@ -35,7 +35,7 @@ describe Loaders::OutcomeAlignmentLoader do
     # create modules and assignments
     @module1 = @course.context_modules.create!(name: "module1")
     @module2 = @course.context_modules.create!(name: "module2", workflow_state: "unpublished")
-    @module1.add_item type: "assignment", id: @assignment.id
+    @tag1 = @module1.add_item type: "assignment", id: @assignment.id
     @module1.add_item type: "discussion_topic", id: @discussion_item.id
     @module2.add_item type: "quiz", id: @quiz_item.id
     # align rubric with different assignment types
@@ -129,6 +129,35 @@ describe Loaders::OutcomeAlignmentLoader do
           expect(alignment.module_id).to eq module_id
           expect(alignment.module_name).to eq module_name
           expect(alignment.module_workflow_state).to eq module_workflow_state
+        end
+      end
+    end
+  end
+
+  context "when assignment with aligned outcome is first added to a module and then removed from it" do
+    before do
+      @tag1.destroy!
+    end
+
+    it "resolves outcome alignment to assignment with nil module id, module name and module workflow_state" do
+      GraphQL::Batch.batch do
+        Loaders::OutcomeAlignmentLoader.for(
+          @course.id, "Course"
+        ).load(@outcome).then do |alignments|
+          alignments.each do |alignment|
+            next unless alignment.content_type == "Assignment" && alignment.title == "regular assignment"
+
+            expect(alignment.id).not_to be_nil
+            expect(alignment.content_id).to eq @assignment.id
+            expect(alignment.content_type).to eq "Assignment"
+            expect(alignment.context_id).to eq @course.id
+            expect(alignment.context_type).to eq "Course"
+            expect(alignment.title).to eq "regular assignment"
+            expect(alignment.learning_outcome_id).to eq @outcome.id
+            expect(alignment.module_id).to be_nil
+            expect(alignment.module_name).to be_nil
+            expect(alignment.module_workflow_state).to be_nil
+          end
         end
       end
     end
