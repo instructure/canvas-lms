@@ -67,6 +67,6 @@
     "lodash": "2.4.1",
     "requirejs": "~2.2.0",
     "react-tools": "0.11.2",
-    "shelljs": "0.8.5"
+    "shelljs": "0.7.0"
   }
 }
