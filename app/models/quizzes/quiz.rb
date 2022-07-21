@@ -285,6 +285,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
 
   def destroy
+    ContentTag.delete_for(self)
     self.workflow_state = "deleted"
     self.deleted_at = Time.now.utc
     res = save!
