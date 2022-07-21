@@ -578,6 +578,11 @@ pipeline {
                     .required(configuration.isChangeMerged())
                     .execute(dependencyCheckStage.queueTestStage())
 
+                  extendedStage('GraphQL Post-Merge Schema Check')
+                    .nodeRequirements(label: configuration.nodeLabel(), podTemplate: graphqlSchemaCheckStage.nodeRequirementsTemplate(), container: 'graphql-schema-check')
+                    .required(configuration.isChangeMerged() && filesChangedStage.hasGraphqlFiles(buildConfig))
+                    .execute(graphqlSchemaCheckStage.queueTestStage())
+
                   extendedStage('Linters')
                     .hooks([onNodeReleasing: lintersStage.tearDownNode()])
                     .nodeRequirements(label: configuration.nodeLabel(), podTemplate: lintersStage.nodeRequirementsTemplate())
