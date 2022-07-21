@@ -35,9 +35,10 @@ const AlignmentSummaryHeader = ({
   alignedArtifacts,
   searchString,
   updateSearchHandler,
-  clearSearchHandler
+  clearSearchHandler,
+  updateFilterHandler
 }) => {
-  const [selectedFilter, setSelectedFilter] = useState('all_outcomes')
+  const [selectedFilter, setSelectedFilter] = useState('ALL_OUTCOMES')
   const percentCoverage = totalOutcomes !== 0 ? alignedOutcomes / totalOutcomes : 0
   const avgPerOutcome = totalOutcomes !== 0 ? totalAlignments / totalOutcomes : 0
   const percentWithAlignments = totalArtifacts !== 0 ? alignedArtifacts / totalArtifacts : 0
@@ -45,19 +46,22 @@ const AlignmentSummaryHeader = ({
   const withAlignments = totalOutcomes !== 0 ? alignedOutcomes : 0
   const withoutAlignments = totalOutcomes !== 0 ? totalOutcomes - alignedOutcomes : 0
 
-  const handleFilterChange = (_event, {id}) => setSelectedFilter(id)
+  const handleFilterChange = (_event, {id}) => {
+    setSelectedFilter(id)
+    updateFilterHandler(id)
+  }
 
   const renderFilter = () => {
     const filterOptions = {
-      all_outcomes: {
+      ALL_OUTCOMES: {
         label: I18n.t('All Outcomes'),
         value: totalOutcomes || 0
       },
-      with_alignments: {
+      WITH_ALIGNMENTS: {
         label: I18n.t('With Alignments'),
         value: withAlignments
       },
-      without_alignments: {
+      NO_ALIGNMENTS: {
         label: I18n.t('Without Alignments'),
         value: withoutAlignments
       }
@@ -141,7 +145,8 @@ AlignmentSummaryHeader.propTypes = {
   alignedArtifacts: PropTypes.number,
   searchString: PropTypes.string,
   updateSearchHandler: PropTypes.func.isRequired,
-  clearSearchHandler: PropTypes.func.isRequired
+  clearSearchHandler: PropTypes.func.isRequired,
+  updateFilterHandler: PropTypes.func.isRequired
 }
 
 export default AlignmentSummaryHeader

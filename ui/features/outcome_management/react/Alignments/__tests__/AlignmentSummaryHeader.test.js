@@ -23,6 +23,7 @@ import AlignmentSummaryHeader from '../AlignmentSummaryHeader'
 describe('AlignmentSummaryHeader', () => {
   let updateSearchHandlerMock
   let clearSearchHandlerMock
+  let updateFilterHandlerMock
 
   const defaultProps = (props = {}) => ({
     totalOutcomes: 100,
@@ -33,12 +34,14 @@ describe('AlignmentSummaryHeader', () => {
     searchString: 'search value',
     updateSearchHandler: updateSearchHandlerMock,
     clearSearchHandler: clearSearchHandlerMock,
+    updateFilterHandler: updateFilterHandlerMock,
     ...props
   })
 
   beforeEach(() => {
     updateSearchHandlerMock = jest.fn()
     clearSearchHandlerMock = jest.fn()
+    updateFilterHandlerMock = jest.fn()
   })
 
   afterEach(() => {
