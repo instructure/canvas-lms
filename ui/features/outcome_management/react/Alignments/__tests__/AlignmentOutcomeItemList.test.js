@@ -19,14 +19,13 @@
 import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
 import AlignmentOutcomeItemList from '../AlignmentOutcomeItemList'
-import {generateOutcomes} from './testData'
+import {generateRootGroup} from './testData'
 
 describe('AlignmentOutcomeItemList', () => {
   let loadMore
   const defaultProps = (props = {}) => ({
-    outcomes: generateOutcomes(5),
+    rootGroup: generateRootGroup(5),
     loading: false,
-    hasMore: false,
     loadMore,
     ...props
   })
@@ -59,7 +58,7 @@ describe('AlignmentOutcomeItemList', () => {
 
   it('render icon and message when no outcome alignments', () => {
     const {getByText, getByTestId} = render(
-      <AlignmentOutcomeItemList {...defaultProps({outcomes: null})} />
+      <AlignmentOutcomeItemList {...defaultProps({rootGroup: generateRootGroup(0)})} />
     )
     expect(getByTestId('no-outcomes-icon')).toBeInTheDocument()
     expect(getByText('Your search returned no results.')).toBeInTheDocument()
@@ -71,7 +70,11 @@ describe('AlignmentOutcomeItemList', () => {
     mockContainer(scrollContainer, 'clientHeight', 400)
     mockContainer(scrollContainer, 'scrollTop', 0)
 
-    render(<AlignmentOutcomeItemList {...defaultProps({hasMore: true, scrollContainer})} />)
+    render(
+      <AlignmentOutcomeItemList
+        {...defaultProps({rootGroup: generateRootGroup(5, true), scrollContainer})}
+      />
+    )
 
     mockContainer(scrollContainer, 'scrollTop', 600)
     fireEvent.scroll(scrollContainer)

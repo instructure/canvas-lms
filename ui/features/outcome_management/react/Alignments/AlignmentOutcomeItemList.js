@@ -26,13 +26,14 @@ import {Spinner} from '@instructure/ui-spinner'
 import AlignmentOutcomeItem from './AlignmentOutcomeItem'
 import InfiniteScroll from '@canvas/infinite-scroll'
 import SVGWrapper from '@canvas/svg-wrapper'
-import {outcomeWithAlignmentShape} from './propTypeShapes'
+import {groupDataShape} from './propTypeShapes'
 
 const I18n = useI18nScope('AlignmentSummary')
 
-const AlignmentOutcomeItemList = ({outcomes, loading, hasMore, loadMore, scrollContainer}) => {
-  const outcomesCount = outcomes?.length || 0
-
+const AlignmentOutcomeItemList = ({rootGroup, loading, loadMore, scrollContainer}) => {
+  const outcomes = rootGroup?.outcomes
+  const outcomesCount = rootGroup?.outcomesCount
+  const hasMore = outcomes?.pageInfo?.hasNextPage
   const renderSearchLoader = () => (
     <div style={{textAlign: 'center'}} data-testid="loading">
       <Spinner renderTitle={I18n.t('Loading')} size="large" />
@@ -72,9 +73,9 @@ const AlignmentOutcomeItemList = ({outcomes, loading, hasMore, loadMore, scrollC
           scrollContainer={scrollContainer}
         >
           <View as="div" data-testid="alignment-items-list">
-            {outcomes?.map(({id, title, description, alignments}) => (
+            {(outcomes?.edges || []).map(({node: {_id, title, description, alignments}}) => (
               <AlignmentOutcomeItem
-                key={id}
+                key={_id}
                 title={title}
                 description={description}
                 alignments={alignments}
@@ -88,14 +89,12 @@ const AlignmentOutcomeItemList = ({outcomes, loading, hasMore, loadMore, scrollC
 }
 
 AlignmentOutcomeItemList.defaultProps = {
-  hasMore: true,
   loadMore: () => {}
 }
 
 AlignmentOutcomeItemList.propTypes = {
-  outcomes: PropTypes.arrayOf(outcomeWithAlignmentShape),
+  rootGroup: groupDataShape,
   scrollContainer: PropTypes.instanceOf(Element),
-  hasMore: PropTypes.bool,
   loading: PropTypes.bool,
   loadMore: PropTypes.func
 }
