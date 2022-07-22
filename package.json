@@ -94,7 +94,7 @@
     "lodash": "^4.16.4",
     "md5": "^2.2.1",
     "merge-stream": "^1.0.1",
-    "moment": "~2.10.6",
+    "moment": "~2.29.4",
     "moxios": "^0.3.0",
     "page": "visionmedia/page.js#1.6.4",
     "parse-decimal-number": "0.1.1",
