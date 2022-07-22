@@ -54,6 +54,7 @@ class Mutations::AddConversationMessage < Mutations::BaseMutation
       user_note: input[:user_note]
     )
     InstStatsd::Statsd.increment("inbox.message.sent.isReply.react")
+    InstStatsd::Statsd.count("inbox.message.sent.recipients.react", message[:recipients_count])
 
     { conversation_message: message[:message] }
   rescue ActiveRecord::RecordNotFound
