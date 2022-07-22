@@ -672,6 +672,23 @@ describe MediaObjectsController do
     end
   end
 
+  describe "GET /media_objects_iframe/:id" do
+    before do
+      allow(MediaObject).to receive(:media_id_exists?).and_return(true)
+      allow_any_instance_of(MediaObject).to receive(:media_sources).and_return(
+        [{ url: "whatever man", bitrate: 12_345 }]
+      )
+    end
+
+    it "does not include content-security-policy headers" do
+      course_with_teacher_logged_in
+      get "iframe_media_player", params: { media_object_id: "the-video" }
+
+      assert_status(200)
+      expect(response.headers["content-security-policy"]).to be_nil
+    end
+  end
+
   describe "GET '/media_objects/:id/thumbnail" do
     it "redirects to kaltura even if the MediaObject does not exist" do
       allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
