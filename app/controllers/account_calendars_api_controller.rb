@@ -133,7 +133,7 @@ class AccountCalendarsApiController < ApplicationController
   def update
     account = api_find(Account.active, params[:account_id])
     return unless authorized_action(account, @current_user, :manage_account_calendar_visibility)
-    return render json: { errors: "Missing param: `visible`" }, status: :bad_request if params[:visible].nil?
+    return render json: { errors: t("Missing param: `%{param}`", { param: "visible" }) }, status: :bad_request if params[:visible].nil?
 
     account.account_calendar_visible = value_to_boolean(params[:visible])
     account.save!
@@ -161,8 +161,8 @@ class AccountCalendarsApiController < ApplicationController
     return unless authorized_action(account, @current_user, :manage_account_calendar_visibility)
 
     data = params.permit(_json: [:id, :visible]).to_h[:_json]
-    return render json: { errors: "Expected array of objects" }, status: :bad_request unless data.is_a?(Array) && !data.empty?
-    return render json: { errors: "Missing key(s)" }, status: :bad_request unless data.all? { |c| c.key?("id") && c.key?("visible") }
+    return render json: { errors: t("Expected array of objects") }, status: :bad_request unless data.is_a?(Array) && !data.empty?
+    return render json: { errors: t("Missing key(s)") }, status: :bad_request unless data.all? { |c| c.key?("id") && c.key?("visible") }
 
     account_ids = data.map { |c| c["id"].to_i }
     allowed_account_ids = [account.id] + Account.sub_account_ids_recursive(account.id)
@@ -170,11 +170,11 @@ class AccountCalendarsApiController < ApplicationController
 
     account_ids_to_enable = data.select { |c| value_to_boolean(c["visible"]) }.map { |c| c["id"] }
     account_ids_to_disable = data.reject { |c| value_to_boolean(c["visible"]) }.map { |c| c["id"] }
-    return render json: { errors: "Unexpected value" }, status: :bad_request unless account_ids_to_enable.length + account_ids_to_disable.length == data.length && account_ids_to_enable.intersection(account_ids_to_disable).empty?
+    return render json: { errors: t("Unexpected value") }, status: :bad_request unless account_ids_to_enable.length + account_ids_to_disable.length == data.length && account_ids_to_enable.intersection(account_ids_to_disable).empty?
 
     updated_accounts = Account.active.where(id: account_ids_to_enable).update_all(account_calendar_visible: true)
     updated_accounts += Account.active.where(id: account_ids_to_disable).update_all(account_calendar_visible: false)
-    render json: { message: "Updated #{updated_accounts} accounts" }
+    render json: { message: t({ one: "Updated 1 account", other: "Updated %{count} accounts" }, { count: updated_accounts }) }
   end
 
   # @API List all account calendars
