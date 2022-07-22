@@ -138,5 +138,16 @@ module Types
 
     field :last_activity_at, DateTimeType, null: true
     field :total_activity_time, Integer, null: true
+
+    field :html_url, UrlType, null: true
+    def html_url
+      return nil unless context[:course]
+
+      GraphQLHelpers::UrlHelpers.course_user_url(
+        course_id: context[:course].id,
+        id: enrollment.user.id,
+        host: context[:request].host_with_port
+      )
+    end
   end
 end
