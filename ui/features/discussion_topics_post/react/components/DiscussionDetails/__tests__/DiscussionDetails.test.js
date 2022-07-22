@@ -137,6 +137,11 @@ describe('DiscussionDetails', () => {
         expect(queryByText('1 point possible')).toBeTruthy()
       })
 
+      it('displays points possible with 2 decimal places', () => {
+        const {queryByText} = setup({}, [], 4.333)
+        expect(queryByText('4.33 points possible')).toBeTruthy()
+      })
+
       it('displays due date when there are no overrides', () => {
         const {queryByText} = setup()
         expect(queryByText('Everyone')).toBeTruthy()
@@ -207,6 +212,11 @@ describe('DiscussionDetails', () => {
       it('displays correct pluralization', () => {
         const {queryByText} = setup({}, [], 1)
         expect(queryByText('1 point')).toBeTruthy()
+      })
+
+      it('displays points possible with 2 decimal places', () => {
+        const {queryByText} = setup({}, [], 4.333333)
+        expect(queryByText('4.33 points')).toBeTruthy()
       })
 
       it('displays "Show due dates" button when there are overrides', () => {
