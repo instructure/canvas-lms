@@ -40,8 +40,9 @@ function EquationEditorToolbar(props) {
 
   const renderTabPanel = section => (
     <Tabs.Panel
+      id={section.name}
       key={section.name}
-      padding="small none"
+      padding="small small"
       renderTitle={section.name}
       isSelected={selectedTab === section.name}
     >
@@ -67,7 +68,14 @@ function EquationEditorToolbar(props) {
   )
 
   return (
-    <Tabs variant="secondary" size="medium" onRequestTabChange={handleTabChange}>
+    <Tabs
+      variant="secondary"
+      size="medium"
+      onRequestTabChange={handleTabChange}
+      minHeight="10rem"
+      maxHeight="10rem"
+      maxWidth="42rem"
+    >
       {buttons.map(renderTabPanel)}
     </Tabs>
   )
