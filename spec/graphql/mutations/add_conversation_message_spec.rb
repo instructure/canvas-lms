@@ -21,6 +21,11 @@
 require_relative "../graphql_spec_helper"
 
 RSpec.describe Mutations::AddConversationMessage do
+  before do
+    allow(InstStatsd::Statsd).to receive(:count)
+    allow(InstStatsd::Statsd).to receive(:increment)
+  end
+
   before(:once) do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
@@ -98,12 +103,11 @@ RSpec.describe Mutations::AddConversationMessage do
   end
 
   it "adds a message" do
-    allow(InstStatsd::Statsd).to receive(:increment)
-
     conversation
     result = run_mutation(conversation_id: @conversation.conversation_id, body: "This is a neat message", recipients: [@teacher.id.to_s])
 
     expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.isReply.react")
+    expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.react", 1)
     expect(result["errors"]).to be nil
     expect(result.dig("data", "addConversationMessage", "errors")).to be nil
     expect(
@@ -112,6 +116,19 @@ RSpec.describe Mutations::AddConversationMessage do
     cm = ConversationMessage.find(result.dig("data", "addConversationMessage", "conversationMessage", "_id"))
     expect(cm).to_not be nil
     expect(cm.conversation_id).to eq @conversation.conversation_id
+  end
+
+  it "inbox.message.sent.recipients.react count decomposed recipients" do
+    user_session(@student)
+    @other_course = course_factory(active_all: true)
+    enrollment = @other_course.enroll_student(@user)
+    enrollment.workflow_state = "active"
+    enrollment.save!
+    @user.reload
+    conversation = conversation(num_other_users: 5, course: @other_course)
+
+    run_mutation(conversation_id: conversation.conversation_id, body: "This is a neat message", recipients: ["course_" + @other_course.id.to_s])
+    expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.react", 6)
   end
 
   it "when context is nil, still able to add a message" do
