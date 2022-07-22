@@ -57,6 +57,11 @@
 #           "description": "whether this calendar is visible to users",
 #           "example": true,
 #           "type": "boolean"
+#         },
+#         "has_subaccounts": {
+#           "description": "whether this account has any sub-accounts",
+#           "example": false,
+#           "type": "boolean"
 #         }
 #       }
 #     }
@@ -66,19 +71,54 @@ class AccountCalendarsApiController < ApplicationController
   before_action :require_user
   before_action :require_feature_flag # remove once :account_calendar_events FF is gone
 
-  # @API List available account calendars
+  # @API List account calendars
   #
   # Returns a paginated list of account calendars available to the current user.
-  # Includes visible account calendars where the user has an account association.
+  # (i.e., visible account calendars where the user has an account association).
+  # Only includes calendars for the requested account and its first level of
+  # sub-accounts.
+  #
+  # @argument search_term [Optional, String]
+  #   When included, searches all sub_accounts and descendants of provided account
+  #   for the term. Returns matching results. Term must be at least 2 characters.
+  #
+  # @argument include[] [String, "all_calendars"]
+  #   - "all_calendars": When included, return all account calendars, including
+  #     hidden calendars and calendars where the user doesn't have an account
+  #     association. Requires the `manage_account_calendar_visibility` permission.
   #
   # @example_request
-  #   curl https://<canvas>/api/v1/account_calendars \
+  #   curl https://<canvas>/api/v1/accounts/1/account_calendars \
   #     -H 'Authorization: Bearer <token>'
   #
   # @returns [AccountCalendar]
   def index
     GuardRail.activate(:secondary) do
-      accounts = @current_user.associated_accounts.active.where(account_calendar_visible: true)
+      account = api_find(Account.active, params[:account_id])
+      includes = Array(params[:include])
+      search_term = params[:search_term]
+
+      if includes.include? "all_calendars"
+        return unless authorized_action(account, @current_user, :manage_account_calendar_visibility)
+
+        accounts = if search_term.present?
+                     searchable_account_ids = [account.id] + Account.sub_account_ids_recursive(account.id)
+                     Account.search_by_attribute(Account.active.where(id: searchable_account_ids), :name, params[:search_term])
+                   else
+                     [account] + account.sub_accounts
+                   end
+      else
+        return render_unauthorized_action unless @current_user.associated_accounts.active.where(id: account).exists?
+
+        associated_accounts_scope = @current_user.associated_accounts.active.where(account_calendar_visible: true)
+        accounts = if search_term.present?
+                     searchable_account_ids = [account.id] + Account.sub_account_ids_recursive(account.id)
+                     Account.search_by_attribute(associated_accounts_scope.where(id: searchable_account_ids), :name, params[:search_term])
+                   else
+                     associated_accounts_scope.where("accounts.id = :account_id OR parent_account_id = :account_id", account_id: account.id)
+                   end
+      end
+
       paginated_accounts = Api.paginate(accounts, self, api_v1_account_calendars_url)
       render json: account_calendars_json(paginated_accounts, @current_user, session)
     end
@@ -127,28 +167,6 @@ class AccountCalendarsApiController < ApplicationController
     account.account_calendar_visible = value_to_boolean(params[:visible])
     account.save!
     render json: account_calendar_json(account, @current_user, session)
-  end
-
-  # @API List all account calendars
-  #
-  # Returns a paginated list of all account calendars for the provided account and
-  # all of its sub-accounts. Includes hidden calendars in the response. Requires the
-  # `manage_account_calendar_visibility` permission.
-  #
-  # @example_request
-  #   curl https://<canvas>/api/v1/accounts/1/account_calendars \
-  #     -H 'Authorization: Bearer <token>'
-  #
-  # @returns [AccountCalendar]
-  def all_calendars
-    GuardRail.activate(:secondary) do
-      account = api_find(Account.active, params[:account_id])
-      return unless authorized_action(account, @current_user, :manage_account_calendar_visibility)
-
-      all_accounts = [account] + Account.sub_accounts_recursive(account.id)
-      paginated_accounts = Api.paginate(all_accounts, self, api_v1_all_account_calendars_url)
-      render json: account_calendars_json(paginated_accounts, @current_user, session)
-    end
   end
 
   private

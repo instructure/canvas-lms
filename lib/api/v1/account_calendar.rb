@@ -30,6 +30,7 @@ module Api::V1::AccountCalendar
   def account_calendar_json(account, user, session)
     json = api_json(account, user, session, only: ACCOUNT_ATTRIBUTES)
     json["visible"] = account.account_calendar_visible
+    json["has_subaccounts"] = account.sub_accounts.exists?
     json
   end
 end
