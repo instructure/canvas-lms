@@ -445,6 +445,9 @@ class ConversationsController < ApplicationController
 
         InstStatsd::Statsd.count("inbox.conversation.created.legacy", batch.recipient_count)
         InstStatsd::Statsd.increment("inbox.conversation.sent.legacy")
+        if message.has_media_objects || params[:media_comment_id]
+          InstStatsd::Statsd.count("inbox.message.sent.media.legacy", batch.recipient_count)
+        end
         if mode == :async
           headers["X-Conversation-Batch-Id"] = batch.id.to_s
           return render json: [], status: :accepted
@@ -461,6 +464,9 @@ class ConversationsController < ApplicationController
         @conversation.add_message(message, tags: @tags, update_for_sender: false, cc_author: true)
         InstStatsd::Statsd.increment("inbox.conversation.created.legacy")
         InstStatsd::Statsd.increment("inbox.conversation.sent.legacy")
+        if message.has_media_objects || params[:media_comment_id]
+          InstStatsd::Statsd.increment("inbox.message.sent.media.legacy")
+        end
         render json: [conversation_json(@conversation.reload, @current_user, session, include_indirect_participants: true, messages: [message])], status: :created
       end
     end
@@ -926,6 +932,9 @@ class ConversationsController < ApplicationController
       user_note: params[:user_note]
     )
     InstStatsd::Statsd.increment("inbox.message.sent.isReply.legacy")
+    if params[:media_comment_id] || ConversationMessage.where(id: message[:message]&.id).first&.has_media_objects
+      InstStatsd::Statsd.increment("inbox.message.sent.media.legacy")
+    end
     render json: message[:message].nil? ? [] : conversation_json(@conversation.reload, @current_user, session, messages: [message[:message]]), status: message[:status]
   rescue ConversationsHelper::RepliesLockedForUser
     render_unauthorized_action

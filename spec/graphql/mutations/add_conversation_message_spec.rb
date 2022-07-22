@@ -104,10 +104,12 @@ RSpec.describe Mutations::AddConversationMessage do
 
   it "adds a message" do
     conversation
-    result = run_mutation(conversation_id: @conversation.conversation_id, body: "This is a neat message", recipients: [@teacher.id.to_s])
+    @student.media_objects.where(media_id: "m-whatever", media_type: "video/mp4").first_or_create!
+    result = run_mutation(conversation_id: @conversation.conversation_id, body: "This is a neat message", recipients: [@teacher.id.to_s], media_comment_id: "m-whatever", media_comment_type: "video")
 
     expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.isReply.react")
     expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.react", 1)
+    expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.media.react")
     expect(result["errors"]).to be nil
     expect(result.dig("data", "addConversationMessage", "errors")).to be nil
     expect(

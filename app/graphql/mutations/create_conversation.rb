@@ -111,6 +111,9 @@ class Mutations::CreateConversation < Mutations::BaseMutation
         InstStatsd::Statsd.count("inbox.conversation.created.react", conversations.count)
         InstStatsd::Statsd.increment("inbox.conversation.sent.react")
         InstStatsd::Statsd.count("inbox.message.sent.recipients.react", recipients.count)
+        if message.has_media_objects || input[:media_comment_id]
+          InstStatsd::Statsd.count("inbox.message.sent.media.react", conversations.count)
+        end
         return { conversations: conversations }
       else
         conversation = @current_user.initiate_conversation(
@@ -129,6 +132,9 @@ class Mutations::CreateConversation < Mutations::BaseMutation
         InstStatsd::Statsd.increment("inbox.conversation.created.react")
         InstStatsd::Statsd.increment("inbox.conversation.sent.react")
         InstStatsd::Statsd.count("inbox.message.sent.recipients.react", recipients.count)
+        if message.has_media_objects || input[:media_comment_id]
+          InstStatsd::Statsd.increment("inbox.message.sent.media.react")
+        end
         return { conversations: [conversation] }
       end
     end
