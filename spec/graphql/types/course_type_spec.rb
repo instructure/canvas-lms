@@ -474,6 +474,17 @@ describe Types::CourseType do
         ).to eq [0, 0, 0, 0, 0, 0]
       end
 
+      it "returns an htmlUrl for each enrollment" do
+        expect(
+          course_type.resolve(
+            "enrollmentsConnection { nodes { htmlUrl } }",
+            current_user: @teacher,
+            request: ActionDispatch::TestRequest.create
+          )
+        ).to eq([@teacher, @student1, other_teacher, @student2, @inactive_user, @concluded_user]
+          .map { |user| "http://test.host/courses/#{@course.id}/users/#{user.id}" })
+      end
+
       describe "filtering" do
         it "returns only enrollments of the specified types if included" do
           ta_enrollment = course.enroll_ta(User.create!, enrollment_state: :active)
