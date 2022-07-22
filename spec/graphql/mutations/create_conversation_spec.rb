@@ -134,10 +134,12 @@ RSpec.describe Mutations::CreateConversation do
     enrollment = @course.enroll_student(new_user)
     enrollment.workflow_state = "active"
     enrollment.save
-    result = run_mutation(recipients: [new_user.id.to_s], body: "yo", context_code: @course.asset_string)
+    @student.media_objects.where(media_id: "m-whatever", media_type: "video/mp4").first_or_create!
+    result = run_mutation(recipients: [new_user.id.to_s], body: "yo", context_code: @course.asset_string, media_comment_id: "m-whatever", media_comment_type: "video")
     expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.created.react")
     expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.react")
     expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.react", 1)
+    expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.media.react")
     expect(result.dig("data", "createConversation", "errors")).to be_nil
     expect(
       result.dig("data", "createConversation", "conversations", 0, "conversation", "conversationMessagesConnection", "nodes", 0, "body")
@@ -290,13 +292,16 @@ RSpec.describe Mutations::CreateConversation do
 
     it "creates one conversation per recipient" do
       user_type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
+      @student.media_objects.where(media_id: "m-whatever", media_type: "video/mp4").first_or_create!
 
-      run_mutation(recipients: [@new_user1.id.to_s, @new_user2.id.to_s], subject: "yo 1", group_conversation: true, bulk_message: true, context_code: @course.asset_string)
+      run_mutation(recipients: [@new_user1.id.to_s, @new_user2.id.to_s], subject: "yo 1", group_conversation: true, bulk_message: true, context_code: @course.asset_string, media_comment_id: "m-whatever", media_comment_type: "video")
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.react")
       expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.react", 2)
-      run_mutation(recipients: [@new_user1.id.to_s, @new_user2.id.to_s], subject: "yo 2", group_conversation: true, bulk_message: true, context_code: @course.asset_string)
+      expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.media.react", 2)
+      run_mutation(recipients: [@new_user1.id.to_s, @new_user2.id.to_s], subject: "yo 2", group_conversation: true, bulk_message: true, context_code: @course.asset_string, media_comment_id: "m-whatever", media_comment_type: "video")
       expect(InstStatsd::Statsd).to have_received(:count).with("inbox.conversation.created.react", 2).at_least(:twice)
       expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.react", 2).at_least(:twice)
+      expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.media.react", 2).at_least(:twice)
       expect(Conversation.count).to eql(@old_count + 4)
       result = user_type.resolve("conversationsConnection(scope: \"sent\") { nodes { conversation { subject } } }")
       expect(result).to match(["yo 2", "yo 2", "yo 1", "yo 1"])
