@@ -20,26 +20,44 @@ import formatMessage from '../../../../format-message'
 
 export default function register(editor) {
   const baseIndentButton = {
-    tooltip: formatMessage('Increase indent'),
+    tooltip: formatMessage('Increase Indent'),
     icon: 'indent',
     onAction: () => editor.execCommand('indent')
   }
+
+  const indentButtons = [
+    {
+      name: 'indent',
+      text: formatMessage('Increase Indent'),
+      cmd: 'indent'
+    },
+    {
+      name: 'outdent',
+      text: formatMessage('Decrease Indent'),
+      cmd: 'outdent'
+    }
+  ]
   editor.ui.registry.addButton('inst_indent', baseIndentButton)
 
   editor.ui.registry.addSplitButton('inst_outdent', {
     ...baseIndentButton,
-    presets: 'listpreview',
-    columns: 3,
     fetch: callback => {
-      callback([
-        {
+      const items = indentButtons.map(button => {
+        return {
           type: 'choiceitem',
-          icon: 'outdent',
-          text: formatMessage('Decrease indent')
+          value: button.cmd,
+          icon: button.name,
+          text: button.text
         }
-      ])
+      })
+      callback(items)
     },
-    onItemAction: () => editor.execCommand('outdent'),
+    onAction: () => {
+      const activeIndent = indentButtons.find(b => editor.formatter.match(b.name))
+      const cmd = activeIndent ? activeIndent.cmd : 'indent'
+      editor.execCommand(cmd)
+    },
+    onItemAction: (splitButtonApi, value) => editor.execCommand(value),
     onSetup: () => {
       function showHideButtons(canOutdent) {
         editor
