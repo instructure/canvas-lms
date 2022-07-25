@@ -312,6 +312,7 @@ describe ConversationsController do
 
     it "creates the conversation" do
       allow(InstStatsd::Statsd).to receive(:increment)
+      allow(InstStatsd::Statsd).to receive(:count)
       user_session(@student)
 
       new_user = User.create
@@ -321,7 +322,7 @@ describe ConversationsController do
       post "create", params: { recipients: [new_user.id.to_s], body: "yo" }
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.created.legacy")
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.legacy")
-
+      expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.legacy", 1)
       expect(response).to be_successful
       expect(assigns[:conversation]).not_to be_nil
     end
@@ -465,8 +466,8 @@ describe ConversationsController do
 
           expect(InstStatsd::Statsd).to have_received(:count).with("inbox.conversation.created.legacy", 2)
           expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.legacy")
-
           expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.media.legacy", 2)
+          expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.legacy", 2)
           expect(response).to be_successful
 
           expect(Conversation.count).to eql(@old_count + 2)
@@ -653,9 +654,11 @@ describe ConversationsController do
       @conversation.save!
 
       allow(InstStatsd::Statsd).to receive(:increment)
+      allow(InstStatsd::Statsd).to receive(:count)
       post "add_message", params: { conversation_id: @conversation.conversation_id, body: "hello world" }
 
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.isReply.legacy")
+      expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.legacy", 0)
       expect(response).to be_successful
       expect(@conversation.messages.size).to eq 2
       expect(@conversation.reload.last_message_at).to eql expected_lma
@@ -742,7 +745,9 @@ describe ConversationsController do
       conversation
       @course.update!({ workflow_state: "completed" })
 
+      allow(InstStatsd::Statsd).to receive(:count)
       post "add_message", params: { conversation_id: @conversation.conversation_id, body: "hello world", recipients: [@teacher.id.to_s] }
+      expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.legacy", 1)
       expect(response).to be_successful
       expect(assigns[:conversation]).not_to be_nil
     end
