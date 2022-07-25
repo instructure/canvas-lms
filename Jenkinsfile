@@ -151,24 +151,11 @@ def maybeRetrigger() {
 
 def maybeSlackSendFailure() {
   if (configuration.isChangeMerged()) {
-    def branchSegment = env.GERRIT_BRANCH ? "[$env.GERRIT_BRANCH]" : ''
-    def authorSlackId = env.GERRIT_EVENT_ACCOUNT_EMAIL ? slackUserIdFromEmail(email: env.GERRIT_EVENT_ACCOUNT_EMAIL, botUser: true, tokenCredentialId: 'slack-user-id-lookup') : ''
-    def authorSlackMsg = authorSlackId ? "<@$authorSlackId>" : env.GERRIT_EVENT_ACCOUNT_NAME
-    def authorSegment = "Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> by ${authorSlackMsg} failed against ${branchSegment}"
     def extra = 'Oh no! Your build failed the post-merge checks. If you have a test failure not related to your build, please reach out to the owning team and ask them to skip or fix the failed test. Spec flakiness can be investigated <https://inst.splunkcloud.com/en-US/app/search/canvas_spec_tracker|here>. Otherwise, tag our @ oncall for help in diagnosing the build issue if it is unclear.'
-
-    slackSend(
-      channel: getSlackChannel(),
-      color: 'danger',
-      message: "${authorSegment}. Build <${getSummaryUrl()}|#${env.BUILD_NUMBER}>\n\n$extra"
-    )
+    slackHelpers.sendSlackFailureWithMsg(getSlackChannel(), extra, true)
+  } else {
+    slackHelpers.sendSlackFailureWithDuration('#canvas_builds-noisy')
   }
-
-  slackSend(
-    channel: '#canvas_builds-noisy',
-    color: 'danger',
-    message: "${env.JOB_NAME} <${getSummaryUrl()}|#${env.BUILD_NUMBER}> failed. Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}>. (${currentBuild.durationString})"
-  )
 }
 
 def maybeSlackSendSuccess() {
