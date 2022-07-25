@@ -61,6 +61,7 @@ module Api::V1::DeveloperKey
 
       if inherited
         hash["inherited_from"] = key.account_id.present? ? "federated_parent" : "global"
+        hash["inherited_to"] = "child_account" unless context.primary_settings_root_account?
       else
         hash["account_name"] = key.account_name
         hash["visible"] = key.visible

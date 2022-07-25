@@ -156,13 +156,14 @@ describe('InheritanceStateControl', () => {
     }
   }
 
-  function mockDevKey(workflowState, isOwnedByAccount) {
+  function mockDevKey(workflowState, isOwnedByAccount, inheritedTo) {
     return {
       id: '10000000000123',
       developer_key_account_binding: {
-        workflow_state: workflowState || 'off'
+        workflow_state: workflowState || 'off',
+        account_owns_binding: isOwnedByAccount || false
       },
-      account_owns_binding: isOwnedByAccount || false
+      inherited_to: inheritedTo
     }
   }
 
@@ -183,13 +184,20 @@ describe('InheritanceStateControl', () => {
     expect(radioGroup.disabled).toBe(true)
   })
 
-  it('enables the radio group if the account does not own the binding and it is not set', () => {
+  it('disabled the radio group if the account does not own the binding and it is not set and the account is a child account', () => {
+    const radioGroup = componentNode(mockDevKey('allow', false, 'child_account')).querySelector(
+      'input[type="radio"]'
+    )
+    expect(radioGroup.disabled).toBe(true)
+  })
+
+  it('enables the radio group if the account does not own the binding and it is not set and the account is not a child account', () => {
     const radioGroup = componentNode(mockDevKey('allow')).querySelector('input[type="radio"]')
     expect(radioGroup.disabled).toBeFalsy()
   })
 
   it('enables the radio group if the account does the binding', () => {
-    const radioGroup = componentNode(mockDevKey('allow', true)).querySelector('input[type="radio"]')
+    const radioGroup = componentNode(mockDevKey('on', true)).querySelector('input[type="radio"]')
     expect(radioGroup.disabled).toBeFalsy()
   })
 

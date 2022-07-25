@@ -21,11 +21,7 @@
 RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
   let(:root_account) { account_model }
   let(:root_account_admin) { account_admin_user(account: root_account) }
-  let(:sub_account) do
-    account = account_model
-    account.update!(parent_account: root_account)
-    account
-  end
+  let(:sub_account) { account_model(parent_account: root_account) }
   let(:sub_account_admin) { account_admin_user(account: sub_account) }
   let(:root_account_developer_key) { DeveloperKey.create!(account: root_account) }
 
@@ -150,8 +146,7 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
     end
   end
 
-  context "when the account is a child account" do
-    let(:invalid_admin) { account_admin_user(account: account_model) }
+  context "when the account is a subaccount" do
     let(:sub_account_params) do
       {
         account_id: sub_account.id,
@@ -162,47 +157,12 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
       }
     end
 
-    describe "POST #create_or_edit" do
-      let(:binding_to_edit) do
-        DeveloperKeyAccountBinding.create!(
-          account: sub_account,
-          developer_key: root_account_developer_key,
-          workflow_state: "off"
-        )
-      end
-
-      it_behaves_like "the developer key account binding create endpoint" do
-        let(:authorized_admin) { sub_account_admin }
-        let(:unauthorized_admin) { invalid_admin }
-        let(:params) { sub_account_params }
-        let(:expected_account) { sub_account }
-      end
-
-      # test when the account id is 'self'
-      it_behaves_like "the developer key account binding create endpoint" do
-        let(:authorized_admin) { account_admin_user(account: Account.default) }
-        let(:unauthorized_admin) { invalid_admin }
-        let(:expected_account) { Account.default }
-        let(:params) do
-          sub_account_params.merge({
-                                     account_id: "self",
-                                     developer_key_id: DeveloperKey.create!(account: Account.default).id,
-                                   })
-        end
-      end
-
-      it "only allows creating bindings for keys in the context account chain" do
-        sub_account.update!(parent_account: account_model)
-        user_session(sub_account_admin)
-        post :create_or_update, params: sub_account_params
-        expect(response).to be_not_found
-      end
-
-      it_behaves_like "the developer key update endpoint" do
-        let(:authorized_admin) { sub_account_admin }
-        let(:unauthorized_admin) { invalid_admin }
-        let(:params) { sub_account_params }
-      end
+    # There were tests here before describing some behavior, if we ever want to revive work on
+    # sub-account dev keys we can restore them
+    it "returns a 404 when trying to create a binding" do
+      user_session(sub_account_admin)
+      post :create_or_update, params: sub_account_params
+      expect(response).to be_not_found
     end
   end
 end

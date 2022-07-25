@@ -42,20 +42,15 @@ export default class DeveloperKeyStateControl extends React.Component {
     )
   }
 
-  disabled() {
+  isDisabled() {
+    if (this.props.developerKey.inherited_to === 'child_account') {
+      return true
+    }
     const devKeyBinding = this.props.developerKey.developer_key_account_binding
     if (!devKeyBinding || this.radioGroupValue() === 'allow') {
       return false
     }
     return !this.props.developerKey.developer_key_account_binding.account_owns_binding
-  }
-
-  isDisabled = () => {
-    const devKeyBinding = this.props.developerKey.developer_key_account_binding
-    if (!devKeyBinding || devKeyBinding.workflow_state === 'allow') {
-      return false
-    }
-    return !devKeyBinding.account_owns_binding
   }
 
   radioGroupValue() {
@@ -105,7 +100,7 @@ export default class DeveloperKeyStateControl extends React.Component {
           <ScreenReaderContent>{I18n.t('Key state for the current account')}</ScreenReaderContent>
         }
         onChange={(e, val) => this.setBindingState(val)}
-        disabled={this.disabled()}
+        disabled={this.isDisabled()}
         name={this.props.developerKey.id}
         value={this.radioGroupValue()}
       >
@@ -166,7 +161,9 @@ DeveloperKeyStateControl.propTypes = {
   }).isRequired,
   developerKey: PropTypes.shape({
     id: PropTypes.string.isRequired,
+    inherited_to: PropTypes.string,
     workflow_state: PropTypes.string,
+    name: PropTypes.string,
     developer_key_account_binding: PropTypes.shape({
       workflow_state: PropTypes.string.isRequired,
       account_owns_binding: PropTypes.bool

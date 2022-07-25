@@ -59,6 +59,8 @@ class DeveloperKeyAccountBindingsController < ApplicationController
   before_action :require_context
   before_action :require_manage_developer_keys
   before_action :developer_key_in_account, only: :create_or_update
+  before_action :require_root_account
+  before_action :restrict_federated_child_accounts
 
   # @API Create a Developer Key Account Binding
   # Create a new Developer Key Account Binding. The developer key specified
@@ -131,5 +133,17 @@ class DeveloperKeyAccountBindingsController < ApplicationController
 
   def require_manage_developer_keys
     require_context_with_permission(account, :manage_developer_keys)
+  end
+
+  def require_root_account
+    raise ActiveRecord::RecordNotFound unless account.root_account?
+  end
+
+  def restrict_federated_child_accounts
+    # Federated children can make their own keys, but for now, we are not letting
+    # them turn on/off site admin account keys
+    if !account.primary_settings_root_account? && developer_key.account != account
+      raise ActiveRecord::RecordNotFound
+    end
   end
 end
