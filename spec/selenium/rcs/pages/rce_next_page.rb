@@ -357,44 +357,36 @@ module RCENextPage
 
   def indent_toggle_button
     possibly_hidden_toolbar_button(
-      '[role="button"][aria-label="Increase indent"] .tox-split-button__chevron'
+      '[role="button"][aria-label="Increase Indent"] .tox-split-button__chevron'
     )
   end
 
   def indent_button
-    possibly_hidden_toolbar_button('button[aria-label="Increase indent"')
+    possibly_hidden_toolbar_button('button[aria-label="Increase Indent"')
   end
 
   def outdent_button
-    f('[role="menuitemcheckbox"][title="Decrease indent"]')
-  end
-
-  def superscript_toggle_button
-    f('[role="button"][aria-label="Superscript"] .tox-split-button__chevron')
-  end
-
-  def superscript_button_selector
-    '[role="button"][aria-label="Superscript"]'
-  end
-
-  def subscript_button_selector
-    '[role="button"][aria-label="Subscript"]'
+    possibly_hidden_toolbar_button('[role="menuitemcheckbox"][title="Decrease Indent"]')
   end
 
   def superscript_button
-    possibly_hidden_toolbar_button(superscript_button_selector)
-  end
-
-  def subscript_menu_button_selector
-    '[role="menuitemcheckbox"][title="Subscript"]'
-  end
-
-  def subscript_menu_button
-    f(subscript_menu_button_selector)
+    possibly_hidden_toolbar_button('[role="button"][aria-label="Superscript and Subscript"]')
   end
 
   def subscript_button
-    f(subscript_button_selector)
+    f('[role="button"][aria-label="Superscript and Subscript"]')
+  end
+
+  def superscript_toggle_button
+    f('[role="button"][aria-label="Superscript and Subscript"] .tox-split-button__chevron')
+  end
+
+  def superscript_menu_button
+    f('[role="menuitemcheckbox"][title="Superscript"]')
+  end
+
+  def subscript_menu_button
+    f('[role="menuitemcheckbox"][title="Subscript"]')
   end
 
   def align_button
@@ -865,6 +857,14 @@ module RCENextPage
 
   def click_superscript_button
     superscript_button.click
+  end
+
+  def click_subscript_button
+    subscript_button.click
+  end
+
+  def click_superscript_menu_button
+    superscript_menu_button.click
   end
 
   def click_subscript_menu_button

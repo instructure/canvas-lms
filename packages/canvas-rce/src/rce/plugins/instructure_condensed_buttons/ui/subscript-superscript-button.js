@@ -19,44 +19,66 @@
 import formatMessage from '../../../../format-message'
 
 export default function register(editor) {
-  const superAndSub = {
-    superscript: formatMessage('Superscript'),
-    subscript: formatMessage('Subscript')
-  }
+  const superAndSub = [
+    {
+      name: 'superscript',
+      text: formatMessage('Superscript'),
+      cmd: 'Superscript'
+    },
+    {
+      name: 'subscript',
+      text: formatMessage('Subscript'),
+      cmd: 'Subscript'
+    }
+  ]
+  const buttonLabel = formatMessage('Superscript and Subscript')
 
-  Object.keys(superAndSub).forEach(key => {
-    const oppositeKey = key === 'superscript' ? 'subscript' : 'superscript'
-    editor.ui.registry.addSplitButton(`inst_${key}`, {
-      presets: 'listpreview',
-      columns: 3,
-      tooltip: superAndSub[key],
-      icon: key,
-      fetch: cb => {
-        cb([
-          {
-            type: 'choiceitem',
-            icon: oppositeKey,
-            text: superAndSub[oppositeKey]
-          }
-        ])
-      },
-
-      onAction: () => editor.execCommand('mceToggleFormat', false, key),
-      onItemAction: () => editor.execCommand('mceToggleFormat', false, oppositeKey),
-      onSetup(api) {
-        const $button = editor.$(`.tox-split-button[aria-label="${superAndSub[key]}"]`, document)
-        function onNodeChange() {
-          const iMatch = editor.formatter.match(key)
-          const showButton =
-            iMatch || (key === 'superscript' && !editor.formatter.match(oppositeKey))
-          $button[showButton ? 'show' : 'hide']()
-          api.setActive(iMatch)
+  editor.ui.registry.addSplitButton('inst_superscript', {
+    tooltip: buttonLabel,
+    icon: 'superscript',
+    fetch: callback => {
+      const items = superAndSub.map(button => {
+        return {
+          type: 'choiceitem',
+          value: button.cmd,
+          icon: button.name,
+          text: button.text
         }
+      })
+      callback(items)
+    },
 
-        onNodeChange()
-        editor.on('NodeChange', onNodeChange)
-        return () => editor.off('NodeChange', onNodeChange)
+    onAction: () => {
+      const activeSetting = superAndSub.find(b => editor.formatter.match(b.name))
+      const cmd = activeSetting ? activeSetting.cmd : 'Superscript'
+      editor.execCommand(cmd)
+    },
+
+    onItemAction: (splitButtonApi, value) => editor.execCommand(value),
+
+    select: value => {
+      const button = superAndSub.find(b => b.cmd === value)
+      return editor.formatter.match(button.name)
+    },
+
+    onSetup: api => {
+      const $svgContainer = editor.$(
+        `.tox-split-button[aria-label="${buttonLabel}"] .tox-icon`,
+        document
+      )
+      const allIcons = editor.ui.registry.getAll().icons
+      function nodeChangeHandler() {
+        const activeButton = superAndSub.find(b => editor.formatter.match(b.name))
+        const icon = activeButton ? activeButton.name : 'superscript'
+
+        const svg = allIcons[icon]
+        api.setActive(!!activeButton)
+        $svgContainer.html(svg)
       }
-    })
+
+      nodeChangeHandler()
+      editor.on('NodeChange', nodeChangeHandler)
+      return () => editor.off('NodeChange', nodeChangeHandler)
+    }
   })
 }
