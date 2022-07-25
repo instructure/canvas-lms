@@ -149,5 +149,19 @@ module Types
         host: context[:request].host_with_port
       )
     end
+
+    field :can_be_removed, Boolean, null: true
+    def can_be_removed
+      return nil unless context[:course]
+
+      (!enrollment.defined_by_sis? ||
+        context[:domain_root_account].grants_any_right?(
+          current_user,
+          context[:session],
+          :manage_account_settings,
+          :manage_sis
+        )
+      ) && enrollment.can_be_deleted_by(current_user, context[:course], context[:session])
+    end
   end
 end
