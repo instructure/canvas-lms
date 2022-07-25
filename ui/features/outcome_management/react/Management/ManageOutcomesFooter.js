@@ -117,10 +117,10 @@ const ManageOutcomesFooter = ({
               </>
             ) : (
               <>
-                <Button margin="x-small" {...deleteButtonProps}>
+                <Button margin="x-small" {...deleteButtonProps} data-testid="bulk-remove-outcomes">
                   {I18n.t('Remove')}
                 </Button>
-                <Button margin="x-small" {...moveButtonProps}>
+                <Button margin="x-small" {...moveButtonProps} data-testid="bulk-move-outcomes">
                   {I18n.t('Move')}
                 </Button>
               </>
