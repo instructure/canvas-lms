@@ -135,6 +135,14 @@ describe SplitUsers do
         expect(source_user.reload).not_to be_deleted
       end
 
+      it "ignores user merge data items that are in a failed state" do
+        UserMerge.from(restored_user).into(source_user)
+        UserMerge.from(user3).into(source_user)
+        UserMergeData.where(user_id: source_user).take.update(workflow_state: "failed")
+        expect_any_instance_of(SplitUsers).to receive(:split_users).once
+        SplitUsers.split_db_users(source_user)
+      end
+
       it "moves lti_id to the new user" do
         course1.enroll_user(source_user)
         course2.enroll_user(restored_user)
