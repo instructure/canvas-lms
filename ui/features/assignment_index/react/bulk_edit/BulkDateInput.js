@@ -79,6 +79,8 @@ function BulkDateInput({
         // preserve the existing selected time
         const selectedMoment = moment.tz(selectedDateString, timezone)
         const newMoment = moment.tz(newDate, timezone)
+        const isMidnight =
+          newMoment.hour() === 0 && newMoment.minute() === 0 && newMoment.second() === 0
         if (!newMoment.isSame(selectedMoment, 'day')) {
           const [h, m, s, ms] = [
             selectedMoment.hour(),
@@ -90,7 +92,8 @@ function BulkDateInput({
           newMoment.minute(m)
           newMoment.second(s)
           newMoment.millisecond(ms)
-        } else if (fancyMidnight) {
+        } else if (fancyMidnight && isMidnight) {
+          // If the date is midnight and the field wants fancy midnight we change it to the end of day
           setDate(newMoment.endOf('day'))
         }
         setDate(newMoment.toDate())

@@ -571,6 +571,29 @@ describe('Assignment Bulk Edit Dates', () => {
       ])
     })
 
+    it('preserves the existing time on existing available until dates', async () => {
+      const {assignments, getByText, getAllByLabelText} = await renderBulkEditAndWait()
+      const lockAtInput = getAllByLabelText('Available Until')[0]
+      const lockAtDate = '2020-04-01'
+      const originalLockAtMoment = moment.tz(assignments[0].all_dates[0].lock_at, 'Asia/Tokyo')
+      const localTimeOffset = originalLockAtMoment.diff(originalLockAtMoment.clone().startOf('day'))
+      changeAndBlurInput(lockAtInput, lockAtDate)
+      fireEvent.click(getByText('Save'))
+      await flushPromises()
+      const body = JSON.parse(fetch.mock.calls[1][1].body)
+      expect(body).toMatchObject([
+        {
+          id: 'assignment_1',
+          all_dates: [
+            {
+              base: true,
+              lock_at: moment.tz(lockAtDate, 'Asia/Tokyo').add(localTimeOffset, 'ms').toISOString()
+            }
+          ]
+        }
+      ])
+    })
+
     it('preserves the existing time on existing dates', async () => {
       const {assignments, getByText, getAllByLabelText} = await renderBulkEditAndWait()
       const dueAtInput = getAllByLabelText('Due At')[0]
