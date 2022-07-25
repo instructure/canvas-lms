@@ -197,6 +197,11 @@ require "rrule"
 #         "series_natural_language": {
 #            "description": "A natural language expression of how events occur in the series. (e.g. Daily, 2 times)",
 #            "type": "string"
+#         },
+#         "blackout_date": {
+#           "description": "Boolean indicating whether this has blackout date.",
+#           "example": true,
+#           "type": "boolean"
 #         }
 #       }
 #     }
@@ -339,6 +344,9 @@ class CalendarEventsApiController < ApplicationController
   # @argument important_dates [Boolean]
   #   Defaults to false.
   #   If true, only events with important dates set to true will be returned.
+  # @argument blackout_date [Boolean]
+  #   Defaults to false.
+  #   If true, only events with blackout date set to true will be returned.
   #
   # @returns [CalendarEvent]
   def index
@@ -385,6 +393,9 @@ class CalendarEventsApiController < ApplicationController
   # @argument important_dates [Boolean]
   #   Defaults to false
   #   If true, only events with important dates set to true will be returned.
+  # @argument blackout_date [Boolean]
+  #   Defaults to false
+  #   If true, only events with blackout date set to true will be returned.
   #
   # @returns [CalendarEvent]
   def user_index
@@ -497,6 +508,9 @@ class CalendarEventsApiController < ApplicationController
   #   create a series of recurring events.
   #   Its value is the {https://icalendar.org/iCalendar-RFC-5545/3-8-5-3-recurrence-rule.html iCalendar RRULE}
   #   defining how the event repeats, though unending series not supported.
+  # @argument calendar_event[blackout_date] [Boolean]
+  #   If the blackout_date is true, this event represents a holiday or some
+  #   other special day that does not count in course pacing.
   #
   # @example_request
   #
@@ -700,6 +714,9 @@ class CalendarEventsApiController < ApplicationController
   #   ID is in the URL is part of a series.
   #   Update just the event whose ID is in in the URL, all events
   #   in the series, or the given event and all those following.
+  # @argument calendar_event[blackout_date] [Boolean]
+  #   If the blackout_date is true, this event represents a holiday or some
+  #   other special day that does not count in course pacing.
   #
   # @example_request
   #
@@ -1409,6 +1426,7 @@ class CalendarEventsApiController < ApplicationController
     @all_events = value_to_boolean(params[:all_events])
     @undated = value_to_boolean(params[:undated])
     @important_dates = value_to_boolean(params[:important_dates])
+    @blackout_date = value_to_boolean(params[:blackout_date])
     if !@all_events && !@undated
       validate_dates
       @start_date ||= Time.zone.now.beginning_of_day
@@ -1565,6 +1583,7 @@ class CalendarEventsApiController < ApplicationController
         relation = yield relation if block_given?
         relation = relation.send(*date_scope_and_args) unless @all_events
         relation = relation.with_important_dates if @important_dates
+        relation = relation.with_blackout_date if @blackout_date
         if includes.include?("web_conference")
           relation = relation.preload(:web_conference)
         end
@@ -1574,6 +1593,7 @@ class CalendarEventsApiController < ApplicationController
       scope = scope.for_context_codes(@context_codes)
       scope = scope.send(*date_scope_and_args) unless @all_events
       scope = scope.with_important_dates if @important_dates
+      scope = scope.with_blackout_date if @blackout_date
     end
     scope
   end

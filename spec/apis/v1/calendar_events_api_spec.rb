@@ -29,11 +29,11 @@ describe CalendarEventsApiController, type: :request do
 
   context "events" do
     expected_fields = %w[
-      all_context_codes all_day all_day_date child_events child_events_count comments
-      context_code created_at description duplicates end_at hidden html_url
+      all_context_codes all_day all_day_date blackout_date child_events child_events_count
+      comments context_code created_at description duplicates end_at hidden html_url
       id location_address location_name parent_event_id start_at
       title type updated_at url workflow_state context_name context_color important_dates
-      series_uuid rrule blackout_date
+      series_uuid rrule
     ]
     expected_slot_fields = (expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group available_slots participants_per_appointment reserve_url participant_type effective_context_code])
     expected_reservation_event_fields = (expected_fields + %w[appointment_group_id appointment_group_url can_manage_appointment_group effective_context_code participant_type])
@@ -2034,6 +2034,23 @@ describe CalendarEventsApiController, type: :request do
                         })
         expect(json.size).to be 1
         expect(json[0]["important_dates"]).to be true
+      end
+    end
+
+    context "blackout date" do
+      before :once do
+        @course.calendar_events.create(title: "blackout date", start_at: Time.zone.today, blackout_date: true)
+        @course.calendar_events.create(title: "not blackout date", start_at: Time.zone.today)
+        @course.calendar_events.create(title: "undated blackout", blackout_date: true)
+      end
+
+      it "returns calendar events that have a date with blackout date if the param is sent" do
+        json = api_call(:get, "/api/v1/calendar_events?blackout_date=true&context_codes[]=course_#{@course.id}", {
+                          controller: "calendar_events_api", action: "index", format: "json",
+                          context_codes: ["course_#{@course.id}"], blackout_date: true
+                        })
+        expect(json.size).to be 1
+        expect(json[0]["blackout_date"]).to be true
       end
     end
   end

@@ -44,10 +44,10 @@ class CalendarEvent < ActiveRecord::Base
 
   include Workflow
 
-  PERMITTED_ATTRIBUTES = %i[title description start_at end_at location_name
-                            location_address time_zone_edited cancel_reason participants_per_appointment
-                            remove_child_events all_day comments important_dates series_uuid rrule
-                            blackout_date].freeze
+  PERMITTED_ATTRIBUTES = %i[title description start_at end_at location_name location_address
+                            time_zone_edited cancel_reason participants_per_appointment
+                            remove_child_events all_day comments important_dates series_uuid
+                            rrule blackout_date].freeze
   def self.permitted_attributes
     PERMITTED_ATTRIBUTES
   end
@@ -237,6 +237,7 @@ class CalendarEvent < ActiveRecord::Base
   scope :for_timetable, -> { where.not(timetable_code: nil) }
 
   scope :with_important_dates, -> { where(important_dates: true) }
+  scope :with_blackout_date, -> { where(blackout_date: true) }
 
   def validate_context!
     @validate_context = true
