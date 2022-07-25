@@ -24,10 +24,6 @@ def hasDockerDevFiles(buildConfig) {
   return buildConfig[STAGE_NAME].value('dockerDevFiles')
 }
 
-def hasFeatureFlagFiles(buildConfig) {
-  return buildConfig[STAGE_NAME].value('featureFlagFiles')
-}
-
 def hasGroovyFiles(buildConfig) {
   return buildConfig[STAGE_NAME].value('groovyFiles')
 }
