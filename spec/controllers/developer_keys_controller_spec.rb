@@ -21,6 +21,7 @@
 describe DeveloperKeysController do
   let(:test_domain_root_account) { Account.create! }
   let(:site_admin_key) { DeveloperKey.create!(name: "Site Admin Key", visible: false) }
+  let(:sub_account) { test_domain_root_account.sub_accounts.create!(parent_account: test_domain_root_account, root_account: test_domain_root_account) }
 
   let(:root_account_key) do
     DeveloperKey.create!(name: "Root Account Key", account: test_domain_root_account, visible: true)
@@ -216,6 +217,11 @@ describe DeveloperKeysController do
         expect(response).to be_successful
         key = DeveloperKey.find(json_data["id"])
         expect(key.account).to be nil
+      end
+
+      it "cannot create keys for a subaccount" do
+        post "create", params: create_params.merge(account_id: sub_account.id)
+        expect(response).to be_not_found
       end
 
       context "when request errors" do
@@ -426,7 +432,6 @@ describe DeveloperKeysController do
 
   context "Account admin (not site admin)" do
     let(:test_domain_root_account_admin) { account_admin_user(account: test_domain_root_account) }
-    let(:sub_account) { test_domain_root_account.sub_accounts.create!(parent_account: test_domain_root_account, root_account: test_domain_root_account) }
 
     before do
       user_session(test_domain_root_account_admin)
@@ -442,7 +447,7 @@ describe DeveloperKeysController do
         allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
       end
 
-      it "responds with not found if the account is a sub account" do
+      it "responds with not found if the account is a subaccount" do
         allow(controller).to receive(:require_context_with_permission).and_return nil
         get "index", params: { account_id: sub_account.id }
         expect(response).to be_not_found

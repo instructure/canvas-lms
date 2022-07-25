@@ -21,12 +21,11 @@
 class DeveloperKeysController < ApplicationController
   before_action :set_key, only: [:update, :destroy]
   before_action :require_manage_developer_keys
+  before_action :require_root_account, only: [:index, :create]
 
   include Api::V1::DeveloperKey
 
   def index
-    raise ActiveRecord::RecordNotFound unless @context.root_account?
-
     respond_to do |format|
       format.html do
         set_navigation
@@ -170,6 +169,10 @@ class DeveloperKeysController < ApplicationController
   rescue ActiveRecord::RecordNotFound => e
     report_error(e)
     raise e
+  end
+
+  def require_root_account
+    raise ActiveRecord::RecordNotFound unless @context.root_account?
   end
 
   def developer_key_params
