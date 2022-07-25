@@ -295,6 +295,7 @@ export class WeeklyPlannerHeader extends Component {
           onKeyDown={this.handleKey}
         >
           <IconButton
+            data-testid="view-previous-week-button"
             id={this.getButtonId('prev')}
             onClick={this.handlePrev}
             screenReaderLabel={formatMessage('View previous week')}
@@ -305,6 +306,7 @@ export class WeeklyPlannerHeader extends Component {
             <IconArrowOpenStartLine />
           </IconButton>
           <Button
+            data-testid="jump-to-today-button"
             id={this.getButtonId('today')}
             margin="0 xx-small"
             onClick={this.handleToday}
@@ -316,6 +318,7 @@ export class WeeklyPlannerHeader extends Component {
             </AccessibleContent>
           </Button>
           <IconButton
+            data-testid="view-next-week-button"
             id={this.getButtonId('next')}
             onClick={this.handleNext}
             screenReaderLabel={formatMessage('View next week')}
