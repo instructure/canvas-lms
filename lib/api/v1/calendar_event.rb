@@ -50,7 +50,8 @@ module Api::V1::CalendarEvent
       event,
       user,
       session,
-      only: %w[id created_at updated_at start_at end_at all_day all_day_date title workflow_state comments series_uuid rrule]
+      only: %w[id created_at updated_at start_at end_at all_day all_day_date title workflow_state
+               comments series_uuid rrule blackout_date]
     )
 
     if user
@@ -179,6 +180,7 @@ module Api::V1::CalendarEvent
       hash["duplicates"] = duplicates.map { |dupe| { "calendar_event" => calendar_event_json(dupe, user, session, options) } }
     end
     hash["important_dates"] = event.important_dates
+    hash["blackout_date"] = event.blackout_date
     if event[:series_uuid] && event[:rrule] && include.include?("series_natural_language") && Account.site_admin.feature_enabled?(:calendar_series)
       series_nat_lang = rrule_to_natural_language(event[:rrule])
       hash["series_natural_language"] = series_nat_lang
