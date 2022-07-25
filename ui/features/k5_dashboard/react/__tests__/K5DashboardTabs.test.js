@@ -17,14 +17,43 @@
  */
 
 import React from 'react'
+import moxios from 'moxios'
 import {act, render, waitFor} from '@testing-library/react'
 import K5Dashboard from '../K5Dashboard'
 import {defaultK5DashboardProps as defaultProps} from './mocks'
 
-jest.setTimeout(20000)
+jest.useFakeTimers()
+
+// getByRole() causes these tests to be very slow, so provide a much faster helper
+// function that does the same thing
+function findTabByName(tabName, opts) {
+  const tabElement = document.getElementById(`tab-tab-${tabName.toLowerCase()}`)
+
+  if (!tabElement) {
+    throw new Error(`tab ${tabName} not found in DOM`)
+  }
+
+  const actualSelectedValue = tabElement.getAttribute('aria-selected') || 'false'
+  const expectedSelectedValue = opts?.selected ? 'true' : 'false'
+
+  if (actualSelectedValue !== expectedSelectedValue) {
+    throw new Error(`tab ${tabName} found in DOM, but had incorrect selected state of ${expectedSelectedValue} (was: ${actualSelectedValue})`)
+  }
+
+  return tabElement
+}
 
 describe('K5Dashboard Tabs', () => {
+  beforeEach(() => {
+    moxios.install()
+    moxios.stubRequest('/api/v1/dashboard/dashboard_cards', {
+      status: 200,
+      response: []
+    })
+  })
+
   afterEach(() => {
+    moxios.uninstall()
     window.location.hash = ''
   })
 
@@ -38,8 +67,8 @@ describe('K5Dashboard Tabs', () => {
   })
 
   it('default to the Homeroom tab', async () => {
-    const {findByRole} = render(<K5Dashboard {...defaultProps} />)
-    expect(await findByRole('tab', {name: 'Homeroom', selected: true})).toBeInTheDocument()
+    render(<K5Dashboard {...defaultProps} />)
+    expect(findTabByName('Homeroom', { selected: true })).toBeInTheDocument()
   })
   describe('store current tab ID to URL', () => {
     afterEach(() => {
@@ -48,24 +77,28 @@ describe('K5Dashboard Tabs', () => {
 
     it('and start at that tab if it is valid', async () => {
       window.location.hash = '#grades'
-      const {findByRole} = render(<K5Dashboard {...defaultProps} />)
-      expect(await findByRole('tab', {name: 'Grades', selected: true})).toBeInTheDocument()
+      render(<K5Dashboard {...defaultProps} />)
+      expect(findTabByName('Grades', { selected: true })).toBeInTheDocument()
     })
 
     it('and start at the default tab if it is invalid', async () => {
       window.location.hash = 'tab-not-a-real-tab'
-      const {findByRole} = render(<K5Dashboard {...defaultProps} />)
-      expect(await findByRole('tab', {name: 'Homeroom', selected: true})).toBeInTheDocument()
+      render(<K5Dashboard {...defaultProps} />)
+      expect(findTabByName('Homeroom', { selected: true })).toBeInTheDocument()
     })
 
     it('and update the current tab as tabs are changed', async () => {
-      const {findByRole, getByRole, queryByRole} = render(<K5Dashboard {...defaultProps} />)
-      const gradesTab = await findByRole('tab', {name: 'Grades'})
-      act(() => gradesTab.click())
-      expect(await findByRole('tab', {name: 'Grades', selected: true})).toBeInTheDocument()
-      act(() => getByRole('tab', {name: 'Resources'}).click())
-      expect(await findByRole('tab', {name: 'Resources', selected: true})).toBeInTheDocument()
-      expect(queryByRole('tab', {name: 'Grades', selected: true})).not.toBeInTheDocument()
+      render(<K5Dashboard {...defaultProps} />)
+
+      act(() => findTabByName('Grades', { selected: false }).click())
+      await act(async () => jest.runAllTimers())
+      expect(findTabByName('Grades', { selected: true })).toBeInTheDocument()
+
+      act(() => findTabByName('Resources', { selected: false }).click())
+      await act(async () => jest.runAllTimers())
+
+      expect(findTabByName('Grades', { selected: false })).toBeInTheDocument()
+      expect(findTabByName('Resources', { selected: true })).toBeInTheDocument()
     })
   })
 })
