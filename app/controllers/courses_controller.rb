@@ -2052,8 +2052,15 @@ class CoursesController < ApplicationController
   def check_for_xlist
     return false unless @current_user.present? && @context_enrollment.blank?
 
-    xlist_enrollment = @current_user.enrollments.active.joins(:course_section)
-                                    .where(course_sections: { nonxlist_course_id: @context }).first
+    xlist_enrollment_scope = @current_user.enrollments.active.joins(:course_section)
+                                          .where(course_sections: { nonxlist_course_id: @context })
+
+    if observee_selected?
+      xlist_enrollment_scope = xlist_enrollment_scope.where(associated_user_id: @selected_observed_user)
+    end
+
+    xlist_enrollment = xlist_enrollment_scope.first
+
     if xlist_enrollment.present?
       redirect_params = {}
       redirect_params[:invitation] = params[:invitation] if params[:invitation].present?
@@ -2135,9 +2142,11 @@ class CoursesController < ApplicationController
       if @context && @current_user
         if Account.site_admin.feature_enabled?(:observer_picker) && Setting.get("assignments_2_observer_view", "false") == "true"
           observed_users(@current_user, session, @context.id) # sets @selected_observed_user
-          @context_enrollment = @context.enrollments
-                                        .where(user_id: @current_user, associated_user_id: @selected_observed_user)
-                                        .first
+          context_enrollment_scope = @context.enrollments.where(user_id: @current_user)
+          if observee_selected?
+            context_enrollment_scope = context_enrollment_scope.where(associated_user_id: @selected_observed_user)
+          end
+          @context_enrollment = context_enrollment_scope.first
           js_env({ OBSERVER_OPTIONS: {
                    OBSERVED_USERS_LIST: observed_users(@current_user, session, @context.id),
                    CAN_ADD_OBSERVEE: @current_user
@@ -3952,6 +3961,10 @@ class CoursesController < ApplicationController
   helper_method :visible_self_enrollment_option
 
   private
+
+  def observee_selected?
+    @selected_observed_user.present? && @selected_observed_user != @current_user
+  end
 
   def update_grade_passback_setting(grade_passback_setting)
     valid_states = Setting.get("valid_grade_passback_settings", "nightly_sync,disabled").split(",")
