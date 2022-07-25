@@ -485,6 +485,15 @@ describe Types::CourseType do
           .map { |user| "http://test.host/courses/#{@course.id}/users/#{user.id}" })
       end
 
+      it "returns canBeRemoved boolean value for each enrollment" do
+        expect(
+          course_type.resolve(
+            "enrollmentsConnection { nodes { canBeRemoved } }",
+            current_user: @teacher
+          )
+        ).to eq [false, true, true, true, true, true]
+      end
+
       describe "filtering" do
         it "returns only enrollments of the specified types if included" do
           ta_enrollment = course.enroll_ta(User.create!, enrollment_state: :active)
