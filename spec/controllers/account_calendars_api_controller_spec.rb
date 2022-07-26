@@ -34,208 +34,110 @@ describe AccountCalendarsApiController do
   end
 
   describe "GET 'index'" do
-    context "without the all_calendars include" do
-      it "returns only 1 level of calendars where the user has an association" do
+    it "returns only calendars where the user has an association" do
+      course_with_student_logged_in(user: @user, account: @subaccount1a)
+      get :index
+
+      expect(response).to be_successful
+      json = json_parse(response.body)
+      expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@root_account.id, @subaccount1.id, @subaccount1a.id)
+    end
+
+    it "returns only visible calendars" do
+      course_with_student_logged_in(user: @user, account: @subaccount1a)
+      course_with_student_logged_in(user: @user, account: @subaccount2)
+      @subaccount1a.account_calendar_visible = false
+      @subaccount1a.save!
+      @subaccount1.account_calendar_visible = false
+      @subaccount1.save!
+      get :index
+
+      expect(response).to be_successful
+      json = json_parse(response.body)
+      expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@root_account.id, @subaccount2.id)
+    end
+
+    context "with a search term" do
+      it "includes matching results from all accounts if a search term is provided" do
         course_with_student_logged_in(user: @user, account: @subaccount1a)
+        course_with_student_logged_in(user: @user, account: @subaccount2)
+        user_session(@user)
+        get :index, params: { search_term: "sa-1" }
 
-        get :index, params: { account_id: @root_account.id }
-        expect(response).to be_successful
-        json = json_parse(response.body)
-        expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@root_account.id, @subaccount1.id)
-
-        get :index, params: { account_id: @subaccount1.id }
         expect(response).to be_successful
         json = json_parse(response.body)
         expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1.id, @subaccount1a.id)
       end
 
-      it "returns only visible calendars" do
-        course_with_student_logged_in(user: @user, account: @subaccount1)
-        course_with_student_logged_in(user: @user, account: @subaccount2)
+      it "does not include hidden calendars in the search results" do
+        course_with_student_logged_in(user: @user, account: @subaccount1a)
+        user_session(@user)
         @subaccount1.account_calendar_visible = false
         @subaccount1.save!
-        get :index, params: { account_id: @root_account.id }
+        get :index, params: { search_term: "sa-1" }
 
         expect(response).to be_successful
         json = json_parse(response.body)
-        expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@root_account.id, @subaccount2.id)
+        expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1a.id)
       end
 
-      context "with a search term" do
-        it "includes matching results from all accounts if a search term is provided" do
-          course_with_student_logged_in(user: @user, account: @subaccount1a)
-          course_with_student_logged_in(user: @user, account: @subaccount2)
-          user_session(@user)
-          get :index, params: { account_id: @root_account.id, search_term: "sa-1" }
-
-          expect(response).to be_successful
-          json = json_parse(response.body)
-          expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1.id, @subaccount1a.id)
-        end
-
-        it "does not search a parent of the provided account" do
-          course_with_student_logged_in(user: @user, account: @subaccount1)
-          user_session(@user)
-
-          get :index, params: { account_id: @subaccount1.id, search_term: "Root" }
-          expect(response).to be_successful
-          json = json_parse(response.body)
-          expect(json).to eq([])
-
-          get :index, params: { account_id: @root_account.id, search_term: "Root" }
-          expect(response).to be_successful
-          json = json_parse(response.body)
-          expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@root_account.id)
-        end
-
-        it "does not include hidden calendars in the search results" do
-          course_with_student_logged_in(user: @user, account: @subaccount1a)
-          user_session(@user)
-          @subaccount1.account_calendar_visible = false
-          @subaccount1.save!
-          get :index, params: { account_id: @root_account.id, search_term: "sa-1" }
-
-          expect(response).to be_successful
-          json = json_parse(response.body)
-          expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1a.id)
-        end
-
-        it "does not include accounts without an association" do
-          course_with_student_logged_in(user: @user, account: @subaccount1)
-          user_session(@user)
-          get :index, params: { account_id: @root_account.id, search_term: "sa-1" }
-
-          expect(response).to be_successful
-          json = json_parse(response.body)
-          expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1.id)
-        end
-      end
-
-      it "returns unauthorized if querying an account where the user doesn't have an active association" do
+      it "does not include accounts without an association" do
+        course_with_student_logged_in(user: @user, account: @subaccount1)
         user_session(@user)
-        get :index, params: { account_id: @root_account.id }
+        get :index, params: { search_term: "sa-1" }
 
-        expect(response).to be_unauthorized
-      end
-
-      it "requires the user to be logged in" do
-        get :index, params: { account_id: @root_account.id }
-
-        expect(response).to be_redirect
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1.id)
       end
     end
 
-    context "with all_calendars include" do
-      it "returns provided account calendar and first level of sub-accounts" do
-        account_admin_user(active_all: true, account: @root_account, user: @user)
-        user_session(@user)
-        get :index, params: { account_id: @root_account.id, include: ["all_calendars"] }
+    it "does not include a value for has_subaccounts" do
+      course_with_student_logged_in(user: @user, account: @subaccount1a)
+      get :index
 
-        expect(response).to be_successful
-        json = json_parse(response.body)
-        expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@root_account.id, @subaccount1.id, @subaccount2.id)
-      end
+      expect(response).to be_successful
+      expect(response.body).not_to match(/has_subaccounts/)
+    end
 
-      it "returns hidden calendars" do
-        account_admin_user(active_all: true, account: @subaccount1, user: @user)
-        @subaccount1.account_calendar_visible = false
-        @subaccount1.save!
-        user_session(@user)
-        get :index, params: { account_id: @subaccount1.id, include: ["all_calendars"] }
+    it "sorts the results by account name" do
+      course_with_student_logged_in(user: @user, account: @subaccount1a)
+      course_with_student_logged_in(user: @user, account: @subaccount2)
+      @root_account.name = "zzzz"
+      @root_account.save!
+      get :index
 
-        expect(response).to be_successful
-        json = json_parse(response.body)
-        expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1.id, @subaccount1a.id)
-      end
+      expect(response).to be_successful
+      json = json_parse(response.body)
+      expect(json.map { |calendar| calendar["id"] }).to eq([@subaccount1.id, @subaccount1a.id, @subaccount2.id, @root_account.id])
+    end
 
-      it "returns only one account if provided account doesn't have subaccounts" do
-        account_admin_user(active_all: true, account: @root_account, user: @user)
-        user_session(@user)
-        get :index, params: { account_id: @subaccount2.id, include: ["all_calendars"] }
+    it "returns an empty array for a user without any enrollments" do
+      user_session(@user)
+      get :index
 
-        expect(response).to be_successful
-        json = json_parse(response.body)
-        expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount2.id)
-      end
+      expect(response).to be_successful
+      json = json_parse(response.body)
+      expect(json).to eq []
+    end
 
-      context "with a search term" do
-        it "includes matching results if a search term is provided" do
-          account_admin_user(active_all: true, account: @root_account, user: @user)
-          user_session(@user)
-          get :index, params: { account_id: @root_account.id, search_term: "sa-1", include: ["all_calendars"] }
+    it "requires the user to be logged in" do
+      get :index
 
-          expect(response).to be_successful
-          json = json_parse(response.body)
-          expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1.id, @subaccount1a.id)
-        end
-
-        it "returns SearchTermTooShortError if search term is less than 2 characters" do
-          account_admin_user(active_all: true, account: @root_account, user: @user)
-          user_session(@user)
-          get :index, params: { account_id: @root_account.id, search_term: "a", include: ["all_calendars"] }
-
-          expect(response).to be_bad_request
-          json = json_parse(response.body)
-          expect(json["errors"][0]["message"]).to eq("2 or more characters is required")
-        end
-      end
-
-      it "returns not found for a fake account id" do
-        account_admin_user(active_all: true, account: @root_account, user: @user)
-        user_session(@user)
-        get :index, params: { account_id: (Account.maximum(:id) || 0) + 1, include: ["all_calendars"] }
-
-        expect(response).to be_not_found
-      end
-
-      it "returns unauthorized for an admin without :manage_account_calendar_visibility" do
-        account_admin_user_with_role_changes(active_all: true, account: @root_account, user: @user,
-                                             role_changes: { manage_account_calendar_visibility: false })
-        user_session(@user)
-        get :index, params: { account_id: @root_account.id, include: ["all_calendars"] }
-
-        expect(response).to be_unauthorized
-      end
-
-      it "returns unauthorized for a subaccount admin requesting a parent account's calendars" do
-        account_admin_user(active_all: true, account: @subaccount1a, user: @user)
-        user_session(@user)
-        get :index, params: { account_id: @subaccount1.id, include: ["all_calendars"] }
-
-        expect(response).to be_unauthorized
-      end
-
-      it "limits admin's permissions to accounts with :manage_account_calendar_visibility" do
-        limited_admin_role = custom_account_role("no calendar permissions", account: @root_account)
-        account_admin_user_with_role_changes(active_all: true,
-                                             account: @root_account,
-                                             user: @user,
-                                             role: limited_admin_role,
-                                             role_changes: { manage_account_calendar_visibility: false })
-        account_admin_user(active_all: true, account: @subaccount2, user: @user)
-        user_session(@user)
-
-        get :index, params: { account_id: @root_account.id, include: ["all_calendars"] }
-        expect(response).to be_unauthorized
-
-        get :index, params: { account_id: @subaccount2.id, include: ["all_calendars"] }
-        expect(response).to be_successful
-        json = json_parse(response.body)
-        expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount2.id)
-      end
+      expect(response).to be_redirect
     end
 
     it "returns not found if the flag is disabled" do
       Account.site_admin.disable_feature! :account_calendar_events
       course_with_student_logged_in(user: @user, account: @subaccount1a)
-      get :index, params: { account_id: @subaccount1a.id }
+      get :index
 
       expect(response).to be_not_found
     end
   end
 
   describe "GET 'show'" do
-    it "returns the calendar with id, name, parent_account_id, root_account_id, visible, and has_subaccounts attributes" do
+    it "returns the calendar with id, name, parent_account_id, root_account_id, and visible attributes" do
       course_with_student_logged_in(user: @user, account: @subaccount1a)
       user_session(@user)
       get :show, params: { account_id: @subaccount1a.id }
@@ -248,16 +150,6 @@ describe AccountCalendarsApiController do
       expect(json["root_account_id"]).to be @root_account.id
       expect(json["visible"]).to be_truthy
       expect(json["has_subaccounts"]).to be_falsey
-    end
-
-    it "sets has_subaccounts to true if the account has any subaccounts" do
-      course_with_student_logged_in(user: @user, account: @subaccount1)
-      user_session(@user)
-      get :show, params: { account_id: @subaccount1.id }
-
-      expect(response).to be_successful
-      json = json_parse(response.body)
-      expect(json["has_subaccounts"]).to be_truthy
     end
 
     it "returns a hidden calendar for an admin with :manage_account_calendar_visibility" do
@@ -345,6 +237,137 @@ describe AccountCalendarsApiController do
       put :update, params: { account_id: @root_account.id, visible: false }
 
       expect(response).to be_unauthorized
+    end
+  end
+
+  describe "GET 'all_calendars'" do
+    it "returns provided account calendar and first level of sub-accounts" do
+      account_admin_user(active_all: true, account: @root_account, user: @user)
+      user_session(@user)
+      get :all_calendars, params: { account_id: @root_account.id }
+
+      expect(response).to be_successful
+      json = json_parse(response.body)
+      expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@root_account.id, @subaccount1.id, @subaccount2.id)
+    end
+
+    it "returns hidden calendars" do
+      account_admin_user(active_all: true, account: @subaccount1, user: @user)
+      @subaccount1.account_calendar_visible = false
+      @subaccount1.save!
+      user_session(@user)
+      get :all_calendars, params: { account_id: @subaccount1.id }
+
+      expect(response).to be_successful
+      json = json_parse(response.body)
+      expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1.id, @subaccount1a.id)
+    end
+
+    it "returns only one account if provided account doesn't have subaccounts" do
+      account_admin_user(active_all: true, account: @root_account, user: @user)
+      user_session(@user)
+      get :all_calendars, params: { account_id: @subaccount2.id }
+
+      expect(response).to be_successful
+      json = json_parse(response.body)
+      expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount2.id)
+    end
+
+    context "with a search term" do
+      it "includes matching results if a search term is provided" do
+        account_admin_user(active_all: true, account: @root_account, user: @user)
+        user_session(@user)
+        get :all_calendars, params: { account_id: @root_account.id, search_term: "sa-1" }
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1.id, @subaccount1a.id)
+      end
+
+      it "returns SearchTermTooShortError if search term is less than 2 characters" do
+        account_admin_user(active_all: true, account: @root_account, user: @user)
+        user_session(@user)
+        get :all_calendars, params: { account_id: @root_account.id, search_term: "a" }
+
+        expect(response).to be_bad_request
+        json = json_parse(response.body)
+        expect(json["errors"][0]["message"]).to eq("2 or more characters is required")
+      end
+    end
+
+    it "returns not found for a fake account id" do
+      account_admin_user(active_all: true, account: @root_account, user: @user)
+      user_session(@user)
+      get :all_calendars, params: { account_id: (Account.maximum(:id) || 0) + 1 }
+
+      expect(response).to be_not_found
+    end
+
+    it "returns unauthorized for an admin without :manage_account_calendar_visibility" do
+      account_admin_user_with_role_changes(active_all: true, account: @root_account, user: @user,
+                                           role_changes: { manage_account_calendar_visibility: false })
+      user_session(@user)
+      get :all_calendars, params: { account_id: @root_account.id }
+
+      expect(response).to be_unauthorized
+    end
+
+    it "returns unauthorized for a subaccount admin requesting a parent account's calendars" do
+      account_admin_user(active_all: true, account: @subaccount1a, user: @user)
+      user_session(@user)
+      get :all_calendars, params: { account_id: @subaccount1.id }
+
+      expect(response).to be_unauthorized
+    end
+
+    it "limits admin's permissions to accounts with :manage_account_calendar_visibility" do
+      limited_admin_role = custom_account_role("no calendar permissions", account: @root_account)
+      account_admin_user_with_role_changes(active_all: true,
+                                           account: @root_account,
+                                           user: @user,
+                                           role: limited_admin_role,
+                                           role_changes: { manage_account_calendar_visibility: false })
+      account_admin_user(active_all: true, account: @subaccount2, user: @user)
+      user_session(@user)
+
+      get :all_calendars, params: { account_id: @root_account.id }
+      expect(response).to be_unauthorized
+
+      get :all_calendars, params: { account_id: @subaccount2.id }
+      expect(response).to be_successful
+      json = json_parse(response.body)
+      expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount2.id)
+    end
+
+    it "includes appropriate value for has_subaccounts in the response" do
+      account_admin_user(active_all: true, account: @root_account, user: @user)
+      user_session(@user)
+      get :all_calendars, params: { account_id: @root_account.id }
+
+      expect(response).to be_successful
+      json = json_parse(response.body)
+      expect(json.length).to be 3
+      json.each do |calendar|
+        if [@root_account.id, @subaccount1.id].include? calendar["id"]
+          expect(calendar["has_subaccounts"]).to be_truthy
+        else
+          expect(calendar["has_subaccounts"]).to be_falsey
+        end
+      end
+    end
+
+    it "sorts response by account name, but includes requested account first" do
+      account_admin_user(active_all: true, account: @root_account, user: @user)
+      user_session(@user)
+      @root_account.name = "zzzz"
+      @root_account.save!
+      @subaccount2.name = "aaaa"
+      @subaccount2.save!
+      get :all_calendars, params: { account_id: @root_account.id }
+
+      expect(response).to be_successful
+      json = json_parse(response.body)
+      expect(json.map { |calendar| calendar["id"] }).to eq([@root_account.id, @subaccount2.id, @subaccount1.id])
     end
   end
 end
