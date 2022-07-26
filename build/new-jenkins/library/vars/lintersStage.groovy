@@ -78,27 +78,6 @@ def masterBouncerStage(stages) {
   }
 }
 
-def featureFlagStage(stages, buildConfig) {
-  { ->
-    extendedStage('Linters - feature-flag')
-      .hooks(buildSummaryReportHooks.call())
-      .nodeRequirements(container: 'feature-flag')
-      .obeysAllowStages(false)
-      .required(filesChangedStage.hasFeatureFlagFiles(buildConfig) && env.GERRIT_CHANGE_ID != "0")
-      .queue(stages) {
-        slackSend(
-          channel: configuration.getString('feature-flag-report-channel'),
-          color: 'warning',
-          message: "Patchset <${env.GERRIT_CHANGE_URL}|${env.GERRIT_CHANGE_SUBJECT}> by ${env.GERRIT_EVENT_ACCOUNT_NAME} is changing a feature flag"
-        )
-
-        node('master') {
-          gerrit.addReviewers(Arrays.asList(configuration.getString('feature-flag-report-emails').split(',')))
-        }
-      }
-  }
-}
-
 def yarnStage(stages, buildConfig) {
   { ->
     def yarnEnvVars = [
