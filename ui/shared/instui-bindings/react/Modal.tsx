@@ -48,7 +48,7 @@ type Props = {
   [key: string]: any
 }
 
-export default function CanvasModal({
+function CanvasModal({
   padding = 'small',
   errorSubject,
   errorCategory,
@@ -98,3 +98,5 @@ export default function CanvasModal({
     </Modal>
   )
 }
+
+export default CanvasModal
