@@ -19,7 +19,7 @@
 import React from 'react'
 import useCourseAlignments from '../useCourseAlignments'
 import {createCache} from '@canvas/apollo'
-import {renderHook, act, cleanup} from '@testing-library/react-hooks'
+import {renderHook, act} from '@testing-library/react-hooks'
 import {courseAlignmentMocks} from '../../../mocks/Management'
 import {MockedProvider} from '@apollo/react-testing'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
@@ -27,7 +27,8 @@ import OutcomesContext from '../../contexts/OutcomesContext'
 
 jest.mock('@canvas/alerts/react/FlashAlert')
 
-const outcomeTitles = result => result.current.rootGroup.outcomes.edges.map(edge => edge.node.title)
+const outcomeTitles = result =>
+  (result?.current?.rootGroup?.outcomes?.edges || []).map(edge => edge.node.title)
 
 describe('useCourseAlignments', () => {
   let cache, mocks, showFlashAlertSpy
@@ -42,7 +43,6 @@ describe('useCourseAlignments', () => {
 
   afterEach(() => {
     jest.clearAllMocks()
-    cleanup()
   })
 
   const wrapper = ({children}) => (
@@ -190,5 +190,37 @@ describe('useCourseAlignments', () => {
       'Outcome 4 with alignments'
     ])
     expect(hook.result.current.rootGroup.outcomes.pageInfo.hasNextPage).toBe(false)
+  })
+
+  it('should refetch data if search with same keyword is run a second time', async () => {
+    mocks = [
+      ...courseAlignmentMocks({searchQuery: 'abc'}),
+      ...courseAlignmentMocks({searchQuery: 'def'})
+    ]
+    const hook = renderHook(() => useCourseAlignments(), {wrapper})
+
+    // original search
+    hook.result.current.onSearchChangeHandler({target: {value: 'abc'}})
+    expect(hook.result.current.loading).toBe(true)
+    await act(async () => jest.runAllTimers())
+    expect(hook.result.current.loading).toBe(false)
+    expect(outcomeTitles(hook.result)).toEqual(['Outcome 1 with alignments', 'Outcome 2'])
+
+    // run a different search to force hook rerender
+    hook.result.current.onSearchChangeHandler({target: {value: 'def'}})
+    expect(hook.result.current.loading).toBe(true)
+    await act(async () => jest.runAllTimers())
+    expect(hook.result.current.loading).toBe(false)
+    expect(outcomeTitles(hook.result)).toEqual(['Outcome 1 with alignments', 'Outcome 2'])
+
+    // repeat original search to test refetch
+    hook.result.current.onSearchChangeHandler({target: {value: 'abc'}})
+    expect(hook.result.current.loading).toBe(true)
+    await act(async () => jest.runAllTimers())
+    expect(hook.result.current.loading).toBe(false)
+    expect(outcomeTitles(hook.result)).toEqual([
+      'Outcome 1 with alignments - Refetched',
+      'Outcome 2 - Refetched'
+    ])
   })
 })

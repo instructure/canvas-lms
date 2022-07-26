@@ -39,9 +39,8 @@ const useCourseAlignments = () => {
     return searchStore.current
   }
 
-  const id = rootOutcomeGroup.id
   const variables = {
-    id,
+    id: rootOutcomeGroup.id,
     outcomesContextType: contextType,
     outcomesContextId: contextId,
     searchFilter
@@ -49,7 +48,10 @@ const useCourseAlignments = () => {
   const debouncedString = debounceSearchString(searchString)
   if (debouncedString) variables.searchQuery = debouncedString
 
-  const {loading, error, data, fetchMore} = useQuery(SEARCH_OUTCOME_ALIGNMENTS, {variables})
+  const {loading, error, data, fetchMore} = useQuery(SEARCH_OUTCOME_ALIGNMENTS, {
+    variables,
+    fetchPolicy: 'network-only'
+  })
 
   useEffect(() => {
     if (error) {

@@ -32,8 +32,9 @@ const I18n = useI18nScope('AlignmentSummary')
 
 const AlignmentOutcomeItemList = ({rootGroup, loading, loadMore, scrollContainer}) => {
   const outcomes = rootGroup?.outcomes
-  const outcomesCount = rootGroup?.outcomesCount
-  const hasMore = outcomes?.pageInfo?.hasNextPage
+  const hasOutcomes = outcomes?.edges?.length > 0
+  const hasMoreOutcomes = outcomes?.pageInfo?.hasNextPage
+
   const renderSearchLoader = () => (
     <div style={{textAlign: 'center'}} data-testid="loading">
       <Spinner renderTitle={I18n.t('Loading')} size="large" />
@@ -63,11 +64,9 @@ const AlignmentOutcomeItemList = ({rootGroup, loading, loadMore, scrollContainer
 
   return (
     <View as="div" minWidth="300px" data-testid="alignment-items-list-container">
-      {outcomesCount === 0 ? (
-        renderNoSearchResults()
-      ) : (
+      {hasOutcomes ? (
         <InfiniteScroll
-          hasMore={hasMore}
+          hasMore={hasMoreOutcomes}
           loadMore={loadMore}
           loader={renderInfiniteScrollLoader()}
           scrollContainer={scrollContainer}
@@ -83,6 +82,8 @@ const AlignmentOutcomeItemList = ({rootGroup, loading, loadMore, scrollContainer
             ))}
           </View>
         </InfiniteScroll>
+      ) : (
+        renderNoSearchResults()
       )}
     </View>
   )
