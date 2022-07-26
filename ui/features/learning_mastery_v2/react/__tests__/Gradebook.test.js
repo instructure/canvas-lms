@@ -64,9 +64,14 @@ describe('Gradebook', () => {
         }
       ],
       courseId: '100',
+      visibleRatings: [true, true, true, true, true, true],
       ...props
     }
   }
+
+  beforeEach(() => {
+    window.ENV = {GRADEBOOK_OPTIONS: {ACCOUNT_LEVEL_MASTERY_SCALES: true}}
+  })
 
   it('renders each student', () => {
     const props = defaultProps()

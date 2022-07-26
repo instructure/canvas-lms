@@ -26,23 +26,38 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('learning_mastery_gradebook')
 
-const StudentOutcomeScore = ({outcome, rollup}) => (
-  <Flex width="100%" height="100%" alignItems="center" justifyItems="center">
-    <div style={{display: 'flex', transform: 'scale(2.0)'}}>
-      <SVGWrapper
-        fillColor={rollup?.rating?.color}
-        url={svgUrl(rollup?.rating?.points, outcome.mastery_points)}
-      />
-      <ScreenReaderContent>
-        {rollup?.rating?.description || I18n.t('Unassessed')}
-      </ScreenReaderContent>
-    </div>
-  </Flex>
-)
+const StudentOutcomeScore = ({outcome, rollup, visibleRatings}) => {
+  let isVisible
+
+  // If account level mastery scales are disabled, then always
+  // show the icons in the outcome score box
+  if (!ENV.GRADEBOOK_OPTIONS.ACCOUNT_LEVEL_MASTERY_SCALES) {
+    isVisible = true
+  } else {
+    isVisible = rollup ? visibleRatings[rollup.rating.points + 1] : visibleRatings[0]
+  }
+
+  return (
+    <Flex width="100%" height="100%" alignItems="center" justifyItems="center">
+      {isVisible && (
+        <div style={{display: 'flex', transform: 'scale(2.0)'}}>
+          <SVGWrapper
+            fillColor={rollup?.rating?.color}
+            url={svgUrl(rollup?.rating?.points, outcome.mastery_points)}
+          />
+          <ScreenReaderContent>
+            {rollup?.rating?.description || I18n.t('Unassessed')}
+          </ScreenReaderContent>
+        </div>
+      )}
+    </Flex>
+  )
+}
 
 StudentOutcomeScore.propTypes = {
   outcome: PropTypes.shape(outcomeShape).isRequired,
-  rollup: PropTypes.shape(outcomeRollupShape)
+  rollup: PropTypes.shape(outcomeRollupShape),
+  visibleRatings: PropTypes.arrayOf(PropTypes.bool).isRequired
 }
 
 export default StudentOutcomeScore

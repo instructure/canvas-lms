@@ -42,12 +42,6 @@ describe('ProficiencyRating', () => {
     jest.clearAllMocks()
   })
 
-  it('disables the rating after it is clicked', () => {
-    const {getByText} = render(<ProficiencyRating {...defaultProps()} />)
-    fireEvent.click(getByText('great'))
-    expect(getByText('great').closest('button')).toBeDisabled()
-  })
-
   it('calls svgUrl to find the right icon', () => {
     const {points, masteryAt} = defaultProps()
     render(<ProficiencyRating {...defaultProps()} />)
