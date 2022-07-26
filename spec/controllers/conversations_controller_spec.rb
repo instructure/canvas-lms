@@ -259,6 +259,7 @@ describe ConversationsController do
       context "metrics" do
         before do
           allow(InstStatsd::Statsd).to receive(:increment)
+          allow(InstStatsd::Statsd).to receive(:count)
         end
 
         it "does not increment visit count if not authorized to open inbox" do
@@ -267,14 +268,32 @@ describe ConversationsController do
           expect(InstStatsd::Statsd).not_to have_received(:increment).with("inbox.visit.react")
         end
 
-        it "increments react counter when visited" do
-          account_admin_user
-          user_session(@user)
-          conversation
+        it "tallies react inbox stats" do
+          user_session(@student)
+          # counts toward inbox and sent, and unread
+          c1 = conversation
+          c1.update_attribute :workflow_state, "unread"
+
+          # counts toward inbox, sent, and starred
+          c2 = conversation
+          c2.update(starred: true)
+
+          # counts toward sent, and archived
+          c3 = conversation
+          c3.update_attribute :workflow_state, "archived"
+
+          term = @course.root_account.enrollment_terms.create! name: "Fall"
+          @course.update! enrollment_term: term
 
           get "index"
           expect(response).to be_successful
+
           expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.react")
+          expect(InstStatsd::Statsd).to have_received(:count).with("inbox.visit.scope.inbox.count.react", 2).once
+          expect(InstStatsd::Statsd).to have_received(:count).with("inbox.visit.scope.sent.count.react", 3).once
+          expect(InstStatsd::Statsd).to have_received(:count).with("inbox.visit.scope.unread.count.react", 1).once
+          expect(InstStatsd::Statsd).to have_received(:count).with("inbox.visit.scope.starred.count.react", 1).once
+          expect(InstStatsd::Statsd).to have_received(:count).with("inbox.visit.scope.archived.count.react", 1).once
         end
       end
     end
