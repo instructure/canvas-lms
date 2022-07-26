@@ -116,6 +116,7 @@ export default function ({
           data-testid="select-condition"
           key={condition.type} // resets dropdown when condition type is changed
           renderLabel={conditionTypeLabels[condition.type || 'assignment-group']}
+          placeholder="--"
           size="small"
           value={condition.value || '_'}
           onChange={(_event, {value}) => {
@@ -170,7 +171,7 @@ export default function ({
           renderLabel={I18n.t('Submissions')}
           size="small"
           data-testid="submissions-input"
-          placeholder={I18n.t('Select condition')}
+          placeholder="--"
           value={condition.value || '_'}
           onChange={(_event, {value}) => {
             onChange({
