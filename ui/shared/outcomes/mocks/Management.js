@@ -2478,23 +2478,24 @@ export const courseAlignmentStatsMocks = ({
   alignedOutcomes = 1,
   totalAlignments = 4,
   totalArtifacts = 5,
-  alignedArtifacts = 4
+  alignedArtifacts = 4,
+  refetchIncrement = 10
 } = {}) => {
-  const result = {
+  const returnResult = (inc = 0) => ({
     data: {
       course: {
         outcomeAlignmentStats: {
-          totalOutcomes,
-          alignedOutcomes,
-          totalAlignments,
-          totalArtifacts,
-          alignedArtifacts,
+          totalOutcomes: totalOutcomes + inc,
+          alignedOutcomes: alignedOutcomes + inc,
+          totalAlignments: totalAlignments + inc,
+          totalArtifacts: totalArtifacts + inc,
+          alignedArtifacts: alignedArtifacts + inc,
           __typename: 'CourseOutcomeAlignmentStats'
         },
         __typename: 'Course'
       }
     }
-  }
+  })
 
   return [
     {
@@ -2502,7 +2503,9 @@ export const courseAlignmentStatsMocks = ({
         query: COURSE_ALIGNMENT_STATS,
         variables: {id}
       },
-      result
+      result: returnResult(),
+      // for testing data refetch
+      newData: () => returnResult(refetchIncrement)
     }
   ]
 }
@@ -2542,18 +2545,20 @@ export const courseAlignmentMocks = ({
       generateAlignment({id: `${el + 1}`, title: `Alignment ${el + 1}`})
     )
 
-  const generateOutcomeNode = (outcomeId, withAlignments = true) => ({
+  const generateOutcomeNode = (outcomeId, withAlignments = true, isRefetch = false) => ({
     _id: outcomeId,
-    title: `Outcome ${outcomeId}${withAlignments ? ' with alignments' : ''}`,
+    title: `Outcome ${outcomeId}${withAlignments ? ' with alignments' : ''}${
+      isRefetch ? ' - Refetched' : ''
+    }`,
     description: `Outcome ${outcomeId} description`,
     __typename: 'LearningOutcome',
     alignments: withAlignments ? generateAlignments() : null
   })
 
-  const generateEdges = outcomeIds => {
+  const generateEdges = (outcomeIds, isRefetch = false) => {
     const edges = (testSearch = false) =>
       (outcomeIds || []).map(id => ({
-        node: generateOutcomeNode(id, !!(id % 2 !== 0 || testSearch)),
+        node: generateOutcomeNode(id, !!(id % 2 !== 0 || testSearch), isRefetch),
         __typename: 'ContentTag'
       }))
     if (searchFilter === 'WITH_ALIGNMENTS')
@@ -2572,30 +2577,34 @@ export const courseAlignmentMocks = ({
   }
   if (searchQuery) variables.searchQuery = searchQuery
 
+  const returnResult = (isRefetch = false) => ({
+    data: {
+      group: {
+        _id: groupId,
+        outcomesCount: numOfOutcomes,
+        __typename: 'LearningOutcomeGroup',
+        outcomes: {
+          pageInfo: {
+            hasNextPage: true,
+            endCursor: 'Mg',
+            __typename: 'PageInfo'
+          },
+          edges: generateEdges([1, 2], isRefetch),
+          __typename: 'ContentTagConnection'
+        }
+      }
+    }
+  })
+
   return [
     {
       request: {
         query: SEARCH_OUTCOME_ALIGNMENTS,
         variables
       },
-      result: {
-        data: {
-          group: {
-            _id: groupId,
-            outcomesCount: numOfOutcomes,
-            __typename: 'LearningOutcomeGroup',
-            outcomes: {
-              pageInfo: {
-                hasNextPage: true,
-                endCursor: 'Mg',
-                __typename: 'PageInfo'
-              },
-              edges: generateEdges([1, 2]),
-              __typename: 'ContentTagConnection'
-            }
-          }
-        }
-      }
+      result: returnResult(),
+      // for testing data refetch
+      newData: () => returnResult(true)
     },
     {
       request: {
