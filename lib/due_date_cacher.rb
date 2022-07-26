@@ -210,7 +210,7 @@ class DueDateCacher
 
         student_due_dates.each_key do |student_id|
           submission_info = student_due_dates[student_id]
-          due_date = submission_info[:due_at] ? "'#{submission_info[:due_at].iso8601}'::timestamptz" : "NULL"
+          due_date = submission_info[:due_at] ? "'#{ActiveRecord::Base.connection.quoted_date(submission_info[:due_at].change(usec: 0))}'::timestamptz" : "NULL"
           grading_period_id = submission_info[:grading_period_id] || "NULL"
 
           anonymous_id = Anonymity.generate_id(existing_ids: existing_anonymous_ids)
