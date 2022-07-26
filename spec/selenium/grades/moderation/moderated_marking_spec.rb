@@ -115,7 +115,6 @@ describe "Moderated Marking" do
     end
 
     it "allows viewing provisional grades and releasing final grade", priority: "1" do
-      skip("FOO-2695, probably relates to having to implement browser confirms asynchronously")
       # # select a provisional grade for each student
       ModeratePage.select_provisional_grade_for_student_by_position(@student1, 0)
       ModeratePage.select_provisional_grade_for_student_by_position(@student2, 1)
@@ -134,7 +133,6 @@ describe "Moderated Marking" do
     end
 
     it "post to student allows viewing final grade as student", priority: "1" do
-      skip("FOO-2695, probably relates to having to implement browser confirms asynchronously")
       # select a provisional grade for each student
       ModeratePage.select_provisional_grade_for_student_by_position(@student1, 0)
       ModeratePage.select_provisional_grade_for_student_by_position(@student2, 1)
@@ -161,8 +159,6 @@ describe "Moderated Marking" do
     end
 
     it "displays comments from chosen grader", priority: "1" do
-      skip("FOO-2695, probably relates to having to implement browser confirms asynchronously")
-
       @submissions2.each do |submission|
         submission.submission_comments.create!(comment: "Just a comment by teacher 2", author: @teacher2)
         submission.save!
@@ -251,13 +247,7 @@ describe "Moderated Marking" do
       end
 
       it "selects the custom grade", priority: "1" do
-        skip("unskip this in EVAL-2500 once this is not flaky using using the most recent InstUI")
-        # the aria-activedescendant will be the id of the selected option
-        selected_id = ModeratePage.grade_input(@student1).attribute("aria-activedescendant")
-
-        expect(selected_id).to be_present
-        ModeratePage.grade_input(@student1).click
-        expect(f("##{selected_id}").text).to eq "4 (Custom)"
+        expect(ModeratePage.selected_grade).to eq "4 (Custom)"
       end
 
       it "adds the custom grade as an option in the dropdown", priority: "1" do
