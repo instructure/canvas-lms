@@ -222,24 +222,24 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
     end
 
     it "returns the first binding found in order of accounts" do
-      found_binding = DeveloperKeyAccountBinding.find_in_account_priority(accounts, site_admin_key.id, explicitly_set: false)
+      found_binding = DeveloperKeyAccountBinding.find_in_account_priority(accounts, site_admin_key, explicitly_set: false)
       expect(found_binding.account).to eq accounts.first
     end
 
     it 'does not return "allow" bindings if explicitly_set is true' do
       root_account_binding.update!(workflow_state: "on")
-      found_binding = DeveloperKeyAccountBinding.find_in_account_priority(accounts, site_admin_key.id)
+      found_binding = DeveloperKeyAccountBinding.find_in_account_priority(accounts, site_admin_key)
       expect(found_binding.account).to eq accounts.second
     end
 
     it 'does return "allow" bindings if explicitly_set is false' do
       root_account_binding.update!(workflow_state: "on")
-      found_binding = DeveloperKeyAccountBinding.find_in_account_priority(accounts, site_admin_key.id, explicitly_set: false)
+      found_binding = DeveloperKeyAccountBinding.find_in_account_priority(accounts, site_admin_key, explicitly_set: false)
       expect(found_binding.account).to eq accounts.first
     end
 
     it "does not return bindings from accounts not in the list" do
-      found_binding = DeveloperKeyAccountBinding.find_in_account_priority(accounts[1..2], site_admin_key.id, explicitly_set: false)
+      found_binding = DeveloperKeyAccountBinding.find_in_account_priority(accounts[1..2], site_admin_key, explicitly_set: false)
       expect(found_binding.account).to eq accounts.second
     end
   end
@@ -249,114 +249,52 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
 
     let(:root_account_shard) { @shard1 }
     let(:root_account) { root_account_shard.activate { account_model } }
-    let(:sa_developer_key) { Account.site_admin.shard.activate { DeveloperKey.create!(name: "SA Key") } }
-    let(:root_account_binding) do
-      root_account_shard.activate do
-        DeveloperKeyAccountBinding.create!(
-          account_id: root_account.id,
-          developer_key_id: sa_developer_key.global_id
-        )
-      end
-    end
-    let(:sa_account_binding) { sa_developer_key.developer_key_account_bindings.find_by(account: Account.site_admin) }
-
-    context "when on a root account shard" do
-      it 'finds root account binding when it is set to "on"' do
-        root_account_binding.update!(workflow_state: "on")
-        sa_account_binding.update!(workflow_state: "off")
-
-        found_binding = root_account_shard.activate do
-          DeveloperKeyAccountBinding.find_in_account_priority([Account.site_admin, root_account], sa_developer_key.id)
-        end
-
-        expect(found_binding.account).to eq root_account
-      end
-
-      it 'finds root account binding when it is set to "off"' do
-        root_account_binding.update!(workflow_state: "off")
-        sa_account_binding.update!(workflow_state: "on")
-
-        found_binding = root_account_shard.activate do
-          DeveloperKeyAccountBinding.find_in_account_priority([Account.site_admin, root_account], sa_developer_key.id)
-        end
-
-        expect(found_binding.account).to eq root_account
-      end
-    end
-
-    context "when on the site admin shard" do
-      it 'finds site admin binding when it is set to "on"' do
-        root_account_binding.update!(workflow_state: "off")
-        sa_account_binding.update!(workflow_state: "on")
-
-        found_binding = Account.site_admin.shard.activate do
-          DeveloperKeyAccountBinding.find_in_account_priority([Account.site_admin, root_account], sa_developer_key.id)
-        end
-
-        expect(found_binding.account).to eq Account.site_admin
-      end
-
-      it 'finds site admin binding when it is set to "off"' do
-        root_account_binding.update!(workflow_state: "on")
-        sa_account_binding.update!(workflow_state: "off")
-
-        found_binding = Account.site_admin.shard.activate do
-          DeveloperKeyAccountBinding.find_in_account_priority([Account.site_admin, root_account], sa_developer_key.id)
-        end
-
-        expect(found_binding.account).to eq Account.site_admin
-      end
-    end
 
     context "when account chain includes cross-shard accounts" do
-      let(:account1) { account_model }
-      let(:account2) { @shard1.activate { account_model } }
-      let(:account3) { account_model }
-      let(:dk) { DeveloperKey.create!(account: account3) }
-      let(:account_chain) { [] }
+      let(:account_s0) { account_model }
+      let(:account_s1) { @shard1.activate { account_model } }
+      let(:account_s2) { @shard2.activate { account_model } }
+      let(:another_account_s0) { account_model }
+      let!(:dk_s1) do
+        account_s1.shard.activate { DeveloperKey.create!(account: account_s1, workflow_state: "off") }
+      end
 
       before do
-        account_chain
-        dk
+        DeveloperKeyAccountBinding.create!(account: account_s0, developer_key: dk_s1, workflow_state: "on")
+        DeveloperKeyAccountBinding.create!(account: another_account_s0, developer_key: dk_s1, workflow_state: "on")
       end
 
-      context "when cross-shard account is first in the chain" do
-        let(:account_chain) { [account2, account1, account3] }
-
-        context "with binding for cross-shard account" do
-          before do
-            @shard1.activate { DeveloperKeyAccountBinding.create!(account: account2, developer_key: dk) }
+      def expect_binding_on_each_shard(account, state)
+        [Shard.current, @shard1, @shard2].each do |shard|
+          shard.activate do
+            b = DeveloperKeyAccountBinding.find_in_account_priority(account_chain, dk_s1)
+            expect(b.account).to eq(account)
+            expect(b.state).to eq(state)
           end
-
-          it "finds binding local to cross-shard account" do
-            binding = @shard1.activate { DeveloperKeyAccountBinding.find_in_account_priority(account_chain, dk.id) }
-            expect(binding.account).to eq account2
-          end
-        end
-
-        it "finds binding from parent account" do
-          binding = @shard1.activate { DeveloperKeyAccountBinding.find_in_account_priority(account_chain, dk.id) }
-          expect(binding.account).to eq account3
         end
       end
 
-      context "when cross-shard account is later in the chain" do
-        let(:account_chain) { [account1, account2, account3] }
+      context "when the first matching binding is on the DK's shard" do
+        let!(:account_chain) { [account_s1, account_s0, account_s2, another_account_s0] }
 
-        context "with binding for cross-shard account" do
-          before do
-            @shard1.activate { DeveloperKeyAccountBinding.create!(account: account2, developer_key: dk) }
-          end
-
-          it "finds binding local to cross-shard account" do
-            binding = @shard1.activate { DeveloperKeyAccountBinding.find_in_account_priority(account_chain, dk.id) }
-            expect(binding.account).to eq account2
-          end
+        it "finds the first matching binding no matter the current shard" do
+          expect_binding_on_each_shard(account_s1, :off)
         end
+      end
 
-        it "finds binding from parent account" do
-          binding = @shard1.activate { DeveloperKeyAccountBinding.find_in_account_priority(account_chain, dk.id) }
-          expect(binding.account).to eq account3
+      context "when the first matching binding is not on the DK's shard" do
+        let!(:account_chain) { [account_s0, account_s1, account_s2, another_account_s0] }
+
+        it "finds the first matching binding no matter the current shard" do
+          expect_binding_on_each_shard(account_s0, :on)
+        end
+      end
+
+      context "when there is a matching binding on the first account's shard but it is not the first matching binding" do
+        let!(:account_chain) { [account_model, account_s1, account_s2, account_s0] }
+
+        it "finds the first matching binding no matter the current shard" do
+          expect_binding_on_each_shard(account_s1, :off)
         end
       end
     end
