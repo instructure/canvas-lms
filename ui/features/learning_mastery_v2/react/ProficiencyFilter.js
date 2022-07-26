@@ -24,7 +24,19 @@ import {proficiencyRatingShape} from './shapes'
 
 const I18n = useI18nScope('LearningMasteryGradebook')
 
-const ProficiencyFilter = ({ratings}) => {
+const ProficiencyFilter = ({ratings, visibleRatings, setVisibleRatings}) => {
+  const onClickPill = (isVisible, visibleIndex) => {
+    let index
+    if (visibleIndex === null) {
+      index = 0
+    } else {
+      index = visibleIndex + 1
+    }
+    const visible = [...visibleRatings]
+    visible[index] = isVisible
+    setVisibleRatings(visible)
+  }
+
   return (
     <View display="flex" padding="small">
       <View>{I18n.t('Showing:')}</View>
@@ -35,6 +47,7 @@ const ProficiencyFilter = ({ratings}) => {
             masteryAt={masteryAt}
             color={color}
             description={description}
+            onClick={onClickPill}
             key={points}
           />
         ))}
@@ -44,6 +57,8 @@ const ProficiencyFilter = ({ratings}) => {
 }
 
 ProficiencyFilter.propTypes = {
-  ratings: PropTypes.arrayOf(PropTypes.shape(proficiencyRatingShape)).isRequired
+  ratings: PropTypes.arrayOf(PropTypes.shape(proficiencyRatingShape)).isRequired,
+  visibleRatings: PropTypes.arrayOf(PropTypes.bool).isRequired,
+  setVisibleRatings: PropTypes.func.isRequired
 }
 export default ProficiencyFilter

@@ -41,12 +41,14 @@ describe('StudentOutcomeScore', () => {
           mastery: false
         }
       },
+      visibleRatings: [true, true, true, true, true, true],
       ...props
     }
   }
 
   beforeEach(() => {
     svgUrlSpy = jest.spyOn(SVGUrl, 'svgUrl')
+    window.ENV = {GRADEBOOK_OPTIONS: {ACCOUNT_LEVEL_MASTERY_SCALES: true}}
   })
 
   afterEach(() => {
@@ -75,5 +77,16 @@ describe('StudentOutcomeScore', () => {
       />
     )
     expect(getByText('Unassessed')).toBeInTheDocument()
+  })
+
+  it('does not render score if rating is not visible', () => {
+    const {queryByText} = render(
+      <StudentOutcomeScore
+        {...defaultProps({
+          visibleRatings: [true, true, true, true, false, true]
+        })}
+      />
+    )
+    expect(queryByText('great!')).toBeNull()
   })
 })

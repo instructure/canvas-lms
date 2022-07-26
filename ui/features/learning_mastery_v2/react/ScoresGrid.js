@@ -24,7 +24,7 @@ import StudentOutcomeScore from './StudentOutcomeScore'
 import {studentShape, outcomeShape, studentRollupsShape} from './shapes'
 import {COLUMN_WIDTH, COLUMN_PADDING, CELL_HEIGHT} from './constants'
 
-const ScoresGrid = ({students, outcomes, rollups}) => {
+const ScoresGrid = ({students, outcomes, rollups, visibleRatings}) => {
   const rollupsByStudentAndOutcome = useMemo(() => {
     const outcomeRollups = rollups.flatMap(r =>
       r.outcomeRollups.map(or => ({
@@ -55,6 +55,7 @@ const ScoresGrid = ({students, outcomes, rollups}) => {
                 <StudentOutcomeScore
                   rollup={rollupsByStudentAndOutcome[`${student.id}_${outcome.id}`]}
                   outcome={outcome}
+                  visibleRatings={visibleRatings}
                 />
               </View>
             </Flex.Item>
@@ -68,7 +69,8 @@ const ScoresGrid = ({students, outcomes, rollups}) => {
 ScoresGrid.propTypes = {
   students: PropTypes.arrayOf(PropTypes.shape(studentShape)).isRequired,
   outcomes: PropTypes.arrayOf(PropTypes.shape(outcomeShape)).isRequired,
-  rollups: PropTypes.arrayOf(PropTypes.shape(studentRollupsShape)).isRequired
+  rollups: PropTypes.arrayOf(PropTypes.shape(studentRollupsShape)).isRequired,
+  visibleRatings: PropTypes.arrayOf(PropTypes.bool).isRequired
 }
 
 export default ScoresGrid

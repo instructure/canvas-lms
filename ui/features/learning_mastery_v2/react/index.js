@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
@@ -52,6 +52,16 @@ const renderLoader = () => (
 const LearningMastery = ({courseId}) => {
   const {isLoading, students, outcomes, rollups} = useRollups({courseId})
   const options = ENV.GRADEBOOK_OPTIONS
+  const accountLevelMasteryScalesFF = options.ACCOUNT_LEVEL_MASTERY_SCALES
+
+  const [visibleRatings, setVisibleRatings] = useState([])
+
+  useEffect(() => {
+    if (accountLevelMasteryScalesFF) {
+      setVisibleRatings([true, true, true, true, true, true])
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <>
       <View
@@ -67,13 +77,25 @@ const LearningMastery = ({courseId}) => {
           variant="DefaultGradebookLearningMastery"
         />
       </View>
-      <Flex.Item as="div" width="100%" padding="small 0 0 0">
-        <ProficiencyFilter ratings={getRatings()} />
-      </Flex.Item>
+      {accountLevelMasteryScalesFF && (
+        <Flex.Item as="div" width="100%" padding="small 0 0 0">
+          <ProficiencyFilter
+            ratings={getRatings()}
+            visibleRatings={visibleRatings}
+            setVisibleRatings={setVisibleRatings}
+          />
+        </Flex.Item>
+      )}
       {isLoading ? (
         renderLoader()
       ) : (
-        <Gradebook courseId={courseId} outcomes={outcomes} students={students} rollups={rollups} />
+        <Gradebook
+          courseId={courseId}
+          outcomes={outcomes}
+          students={students}
+          rollups={rollups}
+          visibleRatings={visibleRatings}
+        />
       )}
     </>
   )
