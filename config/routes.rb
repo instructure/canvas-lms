@@ -1053,9 +1053,10 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :account_calendars_api) do
-      get "accounts/:account_id/account_calendars", action: :index, as: :account_calendars
+      get "account_calendars", action: :index, as: :account_calendars
       get "account_calendars/:account_id", action: :show, as: :account_calendar
       put "account_calendars/:account_id", action: :update, as: :update_account_calendar
+      get "accounts/:account_id/account_calendars", action: :all_calendars, as: :all_account_calendars
     end
 
     scope(controller: :account_notifications) do
