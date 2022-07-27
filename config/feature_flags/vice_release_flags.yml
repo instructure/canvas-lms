@@ -55,6 +55,13 @@ discussion_create:
     discussion create/edit page
   applies_to: RootAccount
 
+bbb_modal_update:
+  state: hidden
+  display_name: BBB Modal Update
+  description: |-
+    This update will allow more options for BBB conferences
+  applies_to: SiteAdmin
+
 react_inbox:
   state: hidden
   display_name: Update Inbox page to use react/instui
