@@ -99,12 +99,15 @@ module CC
         cartridge_basiclti_link.blti :title, tool.name
         cartridge_basiclti_link.blti :description, tool.description
 
+        # Prefer the url on the resource_link
+        url = resource_link.url || tool.url
+
         # URL element (choose secure or not based on protocol)
-        case tool.url
+        case url
         when %r{^http://}
-          cartridge_basiclti_link.blti :launch_url, tool.url
+          cartridge_basiclti_link.blti :launch_url, url
         when %r{^https://}
-          cartridge_basiclti_link.blti :secure_launch_url, tool.url
+          cartridge_basiclti_link.blti :secure_launch_url, url
         end
 
         # Custom parameters from the resource link
