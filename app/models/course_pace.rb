@@ -144,6 +144,11 @@ class CoursePace < ActiveRecord::Base
                   due_at: due_range
                 )
 
+              # If the assignment has already been submitted we are going to log that and continue
+              if assignment.submissions.find_by(user_id: user_id).submitted?
+                InstStatsd::Statsd.increment("course_pacing.submitted_assignment_date_change")
+              end
+
               # If it exists let's just add the student to it and remove them from the other
               if correct_date_override
                 AssignmentOverrideStudent.where(assignment: assignment, user_id: user_id).destroy_all

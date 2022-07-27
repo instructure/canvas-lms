@@ -244,6 +244,15 @@ describe StudentEnrollment do
           StudentEnrollment.find_by(course_section_id: @section2.id).update! workflow_state: "deleted"
           expect(Delayed::Job.where(singleton: "course_pace_publish:#{@published_section_pace.id}")).to exist
         end
+
+        it "logs a stat if a student is added to multiple sections that have published paces" do
+          @unpublished_section_pace.publish
+          allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+          student = student_in_section(@section1)
+          expect(InstStatsd::Statsd).not_to have_received(:increment).with("course_pacing.student_with_multiple_sections_with_paces")
+          student_in_section(@section2, user: student, allow_multiple_enrollments: true)
+          expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.student_with_multiple_sections_with_paces").at_least(:once)
+        end
       end
     end
   end
