@@ -43,13 +43,6 @@ test('it should be accessible', function(assert) {
   assertions.isAccessible(this.copyCourseView, done, {a11yReport: true})
 })
 
-test('does not show date shifting for unallowed teachers ', function () {
-  window.ENV = {DISABLE_DATE_SHIFTING: true}
-  $('#fixtures').html(this.copyCourseView.render().el)
-  equal(this.copyCourseView.dateShift.$el[0], undefined, 'date shifting suppressed')
-  window.ENV = {DISABLE_DATE_SHIFTING: false}
-})
-
 test('after init, calls updateNewDates when @courseFindSelect.triggers "course_changed" event', function () {
   $('#fixtures').html(this.copyCourseView.render().el)
   const sinonSpy = sandbox.spy(this.copyCourseView.dateShift, 'updateNewDates')
