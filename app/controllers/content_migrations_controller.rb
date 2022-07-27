@@ -174,7 +174,6 @@ class ContentMigrationsController < ApplicationController
       js_env CONTENT_MIGRATIONS: content_migration_json_hash
       js_env(OLD_START_DATE: datetime_string(@context.start_at, :verbose))
       js_env(OLD_END_DATE: datetime_string(@context.conclude_at, :verbose))
-      js_env(DISABLE_DATE_SHIFTING: @domain_root_account.settings[:prevent_course_availability_editing_by_teachers] && !@domain_root_account.grants_right?(@current_user, :read_as_admin))
 
       js_env(SHOW_SELECT: should_show_course_copy_dropdown)
       js_env(CONTENT_MIGRATIONS_EXPIRE_DAYS: ContentMigration.expire_days)
