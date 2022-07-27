@@ -89,10 +89,12 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
             <Settings margin="0 0 0 small" />
           </FlexItem>
           <FlexItem textAlign="end" margin="0 0 small small">
-            <UnpublishedChangesIndicator
-              newPace={props.newPace}
-              onClick={props.handleDrawerToggle}
-            />
+            {props.context_type !== 'Enrollment' && (
+              <UnpublishedChangesIndicator
+                newPace={props.newPace}
+                onClick={props.handleDrawerToggle}
+              />
+            )}
           </FlexItem>
         </Flex>
       </View>
