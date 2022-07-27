@@ -6920,7 +6920,7 @@ nb:
         user_only_view_section: "begrens denne brukeren til kun å se brukere i samme klasse"
         user_outcomes: "Resultater for %{user}"
         user_view_all_sections: "la denne brukeren se alle emnedeltagere"
-      user_only_view_section: "denne brukeren kan kun vise studenter i deres tildelte emne(r)"
+      user_only_view_section: "denne brukeren kan kun vise studenter i deres tildelte seksjoner(r)"
       user_view_all_sections: "denne brukeren kan vise studenter i hele emnet"
     no_user: 
       course: "Brukeren eksisterer ikke eller er ikke påmeldt i emnet"
@@ -6990,7 +6990,7 @@ nb:
       no_messages: "Ingen meldinger"
       no_services: "%{user} har ikke koblet noen eksterne tjenester til sin brukerkonto enda."
       services_not_visible: "%{user}'s registrerte tjenester er for tiden ikke synlig for deg."
-      user_only_view_section: "denne brukeren kan kun vise studenter i deres tildelte emne(r)"
+      user_only_view_section: "denne brukeren kan kun vise studenter i deres tildelte seksjoner(r)"
       user_view_all_sections: "denne brukeren kan vise studenter i hele emnet"
     roster_user_services: 
       headings: 
