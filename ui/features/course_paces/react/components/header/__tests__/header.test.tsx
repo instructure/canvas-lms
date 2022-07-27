@@ -70,6 +70,11 @@ describe('Course paces header', () => {
         )
       ).toBeInTheDocument()
     })
+
+    it('does not render publishing changes for student paces', () => {
+      const {queryByText} = renderConnected(<Header {...defaultProps} context_type="Enrollment" />)
+      expect(queryByText('All changes published')).not.toBeInTheDocument()
+    })
   })
 
   it('renders the unpublished changes message for a new pace', () => {
