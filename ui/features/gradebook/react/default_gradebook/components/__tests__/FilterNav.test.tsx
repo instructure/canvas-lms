@@ -235,7 +235,9 @@ describe('FilterNav (save)', () => {
     )
     userEvent.click(getByText('Filters'))
     userEvent.click(getByTestId('new-filter-button'))
-    userEvent.type(getByPlaceholderText('Give this filter a name'), 'Sample filter name')
+    // https://github.com/testing-library/user-event/issues/577
+    // type() is very slow, so use paste() instead since we don't need to test anything specific to typing
+    userEvent.paste(getByPlaceholderText('Give this filter a name'), 'Sample filter name')
     expect(getByTestId('save-filter-button')).toBeVisible()
     userEvent.click(getByTestId('save-filter-button'))
     await waitFor(() => expect(queryByTestId('save-filter-button')).toBeNull())
