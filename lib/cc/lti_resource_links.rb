@@ -99,15 +99,12 @@ module CC
         cartridge_basiclti_link.blti :title, tool.name
         cartridge_basiclti_link.blti :description, tool.description
 
-        # Prefer the url on the resource_link
-        url = resource_link.url || tool.url
-
         # URL element (choose secure or not based on protocol)
-        case url
+        case tool.url
         when %r{^http://}
-          cartridge_basiclti_link.blti :launch_url, url
+          cartridge_basiclti_link.blti :launch_url, tool.url
         when %r{^https://}
-          cartridge_basiclti_link.blti :secure_launch_url, url
+          cartridge_basiclti_link.blti :secure_launch_url, tool.url
         end
 
         # Custom parameters from the resource link
@@ -124,6 +121,15 @@ module CC
             resource_link.lookup_uuid,
             name: "lookup_uuid"
           )
+          unless resource_link.url.nil?
+            extensions.lticm(
+              :property,
+              # 'url' refers to the actual target_link_uri, whereas 'launch_url'
+              #   is only used to look up the tool
+              resource_link.url,
+              name: "resource_link_url"
+            )
+          end
         end
       end
     end
