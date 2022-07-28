@@ -69,6 +69,9 @@ Rails.configuration.to_prepare do
         Rack::QueryParser::InvalidParameterError
         PG::UnableToSend
       ]
+
+      # Add some dirs to the the default (db, engines, gems, script)-this is combined with the base dir so vendored gems won't be included
+      config.app_dirs_pattern = /(app|bin|config|db|engines|gems|lib|script)/
     end
   end
 
