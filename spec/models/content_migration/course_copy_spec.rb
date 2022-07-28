@@ -469,10 +469,19 @@ describe ContentMigration do
       @copy_from.alt_name = "drama"
       @copy_from.save!
 
+      tool = external_tool_1_3_model(context: @copy_from)
+
       @copy_from.lti_resource_links.create!(
-        context_external_tool: external_tool_1_3_model(context: @copy_from),
+        context_external_tool: tool,
         custom: nil,
-        lookup_uuid: "1b302c1e-c0a2-42dc-88b6-c029699a7c7a"
+        lookup_uuid: "1b302c1e-c0a2-42dc-88b6-c029699a7c7a",
+        url: "http://example.com/resource-link-url"
+      )
+      @copy_from.lti_resource_links.create!(
+        context_external_tool: tool,
+        custom: nil,
+        lookup_uuid: "1b302c1e-c0a2-42dc-88b6-c029699a7c7b",
+        url: nil
       )
 
       run_course_copy
@@ -501,8 +510,12 @@ describe ContentMigration do
       end
       expect(@copy_to.tab_configuration).to eq @copy_from.tab_configuration
 
-      expect(@copy_to.lti_resource_links.size).to eq 1
-      expect(@copy_to.lti_resource_links.first.lookup_uuid).to eq "1b302c1e-c0a2-42dc-88b6-c029699a7c7a"
+      expect(@copy_to.lti_resource_links.size).to eq 2
+      rla = @copy_to.lti_resource_links.find { |rl| rl.lookup_uuid == "1b302c1e-c0a2-42dc-88b6-c029699a7c7a" }
+      expect(rla.url).to eq "http://example.com/resource-link-url"
+
+      rlb = @copy_to.lti_resource_links.find { |rl| rl.lookup_uuid == "1b302c1e-c0a2-42dc-88b6-c029699a7c7b" }
+      expect(rlb.url).to eq nil
     end
 
     context "with prevent_course_availability_editing_by_teachers on" do
