@@ -24,22 +24,13 @@ module Api::V1::AccountCalendar
   ACCOUNT_ATTRIBUTES = %w[id name parent_account_id root_account_id].freeze
 
   def account_calendars_json(accounts, user, session, include: [])
-    # collect parent account ids in a list in-memory to avoid querying the db
-    # for account.sub_accounts.exists? for every account
-    parent_account_ids = Account.active.distinct.pluck(:parent_account_id) if include.include? "has_subaccounts"
-    accounts.map { |account| account_calendar_json(account, user, session, include: include, parent_account_ids: parent_account_ids) }
+    accounts.map { |account| account_calendar_json(account, user, session, include: include) }
   end
 
-  def account_calendar_json(account, user, session, include: [], parent_account_ids: nil)
+  def account_calendar_json(account, user, session, include: [])
     json = api_json(account, user, session, only: ACCOUNT_ATTRIBUTES)
     json["visible"] = account.account_calendar_visible
-    if include.include? "has_subaccounts"
-      json["has_subaccounts"] = if parent_account_ids.present?
-                                  parent_account_ids.include? account.id
-                                else
-                                  account.sub_accounts.exists?
-                                end
-    end
+    json["sub_account_count"] = account.sub_accounts.count if include.include? "sub_account_count"
     json
   end
 end

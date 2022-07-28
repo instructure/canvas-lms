@@ -92,12 +92,12 @@ describe AccountCalendarsApiController do
       end
     end
 
-    it "does not include a value for has_subaccounts" do
+    it "does not include a value for sub_account_count" do
       course_with_student_logged_in(user: @user, account: @subaccount1a)
       get :index
 
       expect(response).to be_successful
-      expect(response.body).not_to match(/has_subaccounts/)
+      expect(response.body).not_to match(/sub_account_count/)
     end
 
     it "sorts the results by account name" do
@@ -149,7 +149,6 @@ describe AccountCalendarsApiController do
       expect(json["parent_account_id"]).to be @subaccount1.id
       expect(json["root_account_id"]).to be @root_account.id
       expect(json["visible"]).to be_truthy
-      expect(json["has_subaccounts"]).to be_falsey
     end
 
     it "returns a hidden calendar for an admin with :manage_account_calendar_visibility" do
@@ -237,6 +236,76 @@ describe AccountCalendarsApiController do
       put :update, params: { account_id: @root_account.id, visible: false }
 
       expect(response).to be_unauthorized
+    end
+  end
+
+  describe "PUT 'bulk_update'" do
+    it "updates all specified calendars" do
+      account_admin_user(active_all: true, account: @root_account, user: @user)
+      user_session(@user)
+      @subaccount1.account_calendar_visible = false
+      @subaccount1.save!
+      put :bulk_update, params: {
+        account_id: @root_account,
+        _json: [{ id: @root_account.id, visible: false }, { id: @subaccount1a.id, visible: false }, { id: @subaccount1.id, visible: true }]
+      }
+
+      expect(response).to be_successful
+      json = json_parse(response.body)
+      expect(json["message"]).to eq "Updated 3 accounts"
+      expect(@root_account.reload.account_calendar_visible).to be_falsey
+      expect(@subaccount1.reload.account_calendar_visible).to be_truthy
+      expect(@subaccount1a.reload.account_calendar_visible).to be_falsey
+      expect(@subaccount2.reload.account_calendar_visible).to be_truthy # unchanged
+    end
+
+    it "returns unauthorized for an admin without :manage_account_calendar_visibility on provided account" do
+      account_admin_user_with_role_changes(active_all: true, account: @subaccount2, user: @user,
+                                           role_changes: { manage_account_calendar_visibility: false })
+      user_session(@user)
+      put :bulk_update, params: { account_id: @subaccount2.id, _json: [{ id: @subaccount2.id, visible: false }] }
+
+      expect(response).to be_unauthorized
+    end
+
+    it "returns unauthorized for an admin attempting to change accounts at a higher level" do
+      account_admin_user(active_all: true, account: @subaccount1, user: @user)
+      user_session(@user)
+      put :bulk_update, params: {
+        account_id: @subaccount1.id,
+        _json: [{ id: @subaccount1.id, visible: false }, { id: @root_account.id, visible: false }]
+      }
+
+      expect(response).to be_unauthorized
+    end
+
+    it "returns bad_request for malformed data" do
+      account_admin_user(active_all: true, account: @root_account, user: @user)
+      user_session(@user)
+
+      put :bulk_update, params: { account_id: @root_account.id }
+      expect(response).to be_bad_request
+
+      put :bulk_update, params: { account_id: @root_account.id, _json: [] }
+      expect(response).to be_bad_request
+
+      put :bulk_update, params: { account_id: @root_account.id, _json: [{}] }
+      expect(response).to be_bad_request
+
+      put :bulk_update, params: { account_id: @root_account.id, _json: [{ id: @root_account.id }] }
+      expect(response).to be_bad_request
+
+      put :bulk_update, params: {
+        account_id: @root_account.id,
+        _json: [{ id: @root_account.id, visible: true }, { id: @root_account.id, visible: false }]
+      }
+      expect(response).to be_bad_request
+
+      put :bulk_update, params: {
+        account_id: @root_account.id,
+        _json: [{ id: @root_account.id, visible: true }, { id: @subaccount2.id }]
+      }
+      expect(response).to be_bad_request
     end
   end
 
@@ -339,7 +408,7 @@ describe AccountCalendarsApiController do
       expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount2.id)
     end
 
-    it "includes appropriate value for has_subaccounts in the response" do
+    it "includes appropriate value for sub_account_count in the response" do
       account_admin_user(active_all: true, account: @root_account, user: @user)
       user_session(@user)
       get :all_calendars, params: { account_id: @root_account.id }
@@ -347,13 +416,9 @@ describe AccountCalendarsApiController do
       expect(response).to be_successful
       json = json_parse(response.body)
       expect(json.length).to be 3
-      json.each do |calendar|
-        if [@root_account.id, @subaccount1.id].include? calendar["id"]
-          expect(calendar["has_subaccounts"]).to be_truthy
-        else
-          expect(calendar["has_subaccounts"]).to be_falsey
-        end
-      end
+      expect(json.find { |c| c["id"] == @root_account.id }["sub_account_count"]).to be 2
+      expect(json.find { |c| c["id"] == @subaccount1.id }["sub_account_count"]).to be 1
+      expect(json.find { |c| c["id"] == @subaccount2.id }["sub_account_count"]).to be 0
     end
 
     it "sorts response by account name, but includes requested account first" do
