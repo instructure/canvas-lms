@@ -26,6 +26,7 @@ describe CC::LtiResourceLinks do
   let(:resource_link) do
     Lti::ResourceLink.create!(
       context: tool.context,
+      lookup_uuid: lookup_uuid,
       context_external_tool: tool,
       custom: custom,
       url: resource_link_url
@@ -42,6 +43,7 @@ describe CC::LtiResourceLinks do
     )
   end
 
+  let(:lookup_uuid) { "90cfe684-0f4f-11ed-861d-0242ac120002" }
   let(:tool_url) { "https://www.test-tool.com/launch" }
   let(:resource_link_url) { "https://www.test-tool.com/launch?foo=bar" }
   let(:custom) { { foo: "bar", fiz: "buzz" } }
@@ -77,7 +79,7 @@ describe CC::LtiResourceLinks do
     end
 
     it "sets the secure launch url" do
-      expect(subject.at_xpath("//blti:secure_launch_url").text).to eq resource_link_url
+      expect(subject.at_xpath("//blti:secure_launch_url").text).to eq tool_url
     end
 
     it "does not set the launch url" do
@@ -92,11 +94,11 @@ describe CC::LtiResourceLinks do
       ).to eq(custom.stringify_keys)
     end
 
-    context "when the resource link URL uses HTTP" do
-      let(:resource_link_url) { "http://www.test-tool.com/launch?foo=bar" }
+    context "when the tool URL uses HTTP" do
+      let(:tool_url) { "http://www.test-tool.com/launch?foo=bar" }
 
       it "does set the launch url" do
-        expect(subject.at_xpath("//blti:launch_url").text).to eq resource_link.url
+        expect(subject.at_xpath("//blti:launch_url").text).to eq tool_url
       end
 
       it "does not set the secure launch url" do
@@ -104,11 +106,31 @@ describe CC::LtiResourceLinks do
       end
     end
 
+    def find_extension(document, extension_name)
+      (document.xpath("//blti:extensions/lticm:property").map do |el|
+        if el.attribute("name").text == extension_name
+          el.text
+        end
+      end).compact.first
+    end
+
     context "when the resource link URL is nil" do
       let(:resource_link_url) { nil }
 
-      it "defaults to the tool url" do
-        expect(subject.at_xpath("//blti:secure_launch_url").text).to eq tool_url
+      it "does not include the resource_link_url property" do
+        expect(find_extension(subject, "resource_link_url")).to eq nil
+      end
+    end
+
+    context "when the resource link URL is populated" do
+      it "includes the resource_link_url extension property" do
+        expect(find_extension(subject, "resource_link_url")).to eq resource_link_url
+      end
+    end
+
+    context "when the lookup uuid is populated" do
+      it "includes the lookup_uuid extension property" do
+        expect(find_extension(subject, "lookup_uuid")).to eq lookup_uuid
       end
     end
   end
