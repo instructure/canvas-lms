@@ -638,8 +638,10 @@ describe ConversationsController do
 
       context "as a siteadmin user with send_messages grants" do
         it "succeeds" do
+          allow(InstStatsd::Statsd).to receive(:increment)
           user_session(site_admin_user)
           post "create", params: { recipients: [User.create.id.to_s], body: "foo" }
+          expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.account_context.legacy")
           expect(response.status).to eq 201
         end
       end
