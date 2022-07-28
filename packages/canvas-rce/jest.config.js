@@ -34,7 +34,7 @@ module.exports = {
     '<rootDir>/../../jest/stubInstUi.js',
   ],
   testPathIgnorePatterns: ['<rootDir>/node_modules', '<rootDir>/lib', '<rootDir>/canvas'],
-  testMatch: ['**/__tests__/**/?(*.)(spec|test).js'],
+  testMatch: ['**/__tests__/**/?(*.)(spec|test).[jt]s?(x)'],
   modulePathIgnorePatterns: ['<rootDir>/es', '<rootDir>/lib', '<rootDir>/canvas'],
   testEnvironment: '<rootDir>../../jest/strictTimeLimitEnvironment.js',
   moduleNameMapper: {
@@ -47,11 +47,15 @@ module.exports = {
   },
 
   transform: {
-    '\\.jsx?$': [
+    '\\.[jt]sx?$': [
       'babel-jest',
       {
         configFile: false,
-        presets: [['@babel/preset-env'], ['@babel/preset-react', {}]],
+        presets: [
+          ['@babel/preset-env'],
+          ['@babel/preset-react', {}],
+          ['@babel/preset-typescript', {}]
+        ],
         plugins: [
           ['@babel/plugin-proposal-decorators', {legacy: true}],
           [

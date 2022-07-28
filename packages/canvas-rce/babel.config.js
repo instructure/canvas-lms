@@ -21,6 +21,9 @@ module.exports = {
   },
 
   env: {
+    development: {
+      plugins: ['babel-plugin-typescript-to-proptypes']
+    },
     production: {
       plugins: [
         '@babel/plugin-transform-react-constant-elements',
@@ -28,47 +31,63 @@ module.exports = {
         'minify-constant-folding',
         'minify-dead-code-elimination',
         'minify-guarded-expressions',
-        'transform-react-remove-prop-types',
+        'transform-react-remove-prop-types'
       ]
     }
   },
 
   presets: [
-    ['@babel/preset-env', {
-      useBuiltIns: 'entry',
-      corejs: '3.20',
-      modules: false,
-      // This is needed to fix a Safari < 16 bug
-      // https://github.com/babel/babel/issues/14289
-      // https://bugs.webkit.org/show_bug.cgi?id=236843
-      include: ['@babel/plugin-proposal-class-properties'],
-    }],
-    ['@babel/preset-react', { useBuiltIns: true }],
-    ['@instructure/babel-preset-pretranslated-translations-package-format-message', {
-      translationsDir: 'lib/canvas-rce',
-      extractDefaultTranslations: false
-    }]
+    '@babel/preset-typescript',
+    [
+      '@babel/preset-env',
+      {
+        useBuiltIns: 'entry',
+        corejs: '3.20',
+        modules: false,
+        // This is needed to fix a Safari < 16 bug
+        // https://github.com/babel/babel/issues/14289
+        // https://bugs.webkit.org/show_bug.cgi?id=236843
+        include: ['@babel/plugin-proposal-class-properties']
+      }
+    ],
+    ['@babel/preset-react', {useBuiltIns: true}],
+    [
+      '@instructure/babel-preset-pretranslated-translations-package-format-message',
+      {
+        translationsDir: 'lib/canvas-rce',
+        extractDefaultTranslations: false
+      }
+    ]
   ],
 
   plugins: [
-    ['transform-inline-environment-variables', {
-      include: ['BUILD_LOCALE']
-    }],
+    [
+      'transform-inline-environment-variables',
+      {
+        include: ['BUILD_LOCALE']
+      }
+    ],
 
-    ['@babel/plugin-transform-runtime', {
-      corejs: 3,
-      helpers: true,
-      useESModules: true,
-      regenerator: true
-    }],
+    [
+      '@babel/plugin-transform-runtime',
+      {
+        corejs: 3,
+        helpers: true,
+        useESModules: true,
+        regenerator: true
+      }
+    ],
 
     ['@babel/plugin-proposal-decorators', {legacy: true}],
 
-    ['@instructure/babel-plugin-themeable-styles', {
-      ignore: () => false,
-      postcssrc: require('@instructure/ui-postcss-config')()(),
-      themeablerc: {},
-    }]
+    [
+      '@instructure/babel-plugin-themeable-styles',
+      {
+        ignore: () => false,
+        postcssrc: require('@instructure/ui-postcss-config')()(),
+        themeablerc: {}
+      }
+    ]
   ],
 
   targets: {
