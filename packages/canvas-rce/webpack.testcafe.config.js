@@ -23,11 +23,11 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(js|jsx)$/,
+        test: /\.(js|ts|jsx)$/,
         exclude: /node_modules/,
         loader: 'babel-loader',
         options: {
-          "plugins": ["@babel/plugin-proposal-class-properties"]
+          plugins: ['@babel/plugin-proposal-class-properties']
         }
       },
       {test: /(\.css$)/, include: /node_modules/, loaders: ['style-loader', 'css-loader']},
@@ -36,6 +36,9 @@ module.exports = {
     noParse: [
       /i18nliner\/dist\/lib\/i18nliner/ // i18nLiner has a `require('fs')` that it doesn't actually need, ignore it.
     ]
+  },
+  resolve: {
+    extensions: ['.ts', '.js']
   },
   plugins: [
     new webpack.DefinePlugin({

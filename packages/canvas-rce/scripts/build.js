@@ -41,10 +41,14 @@ shell.exec('scripts/installTranslations.js')
 const npm_bin_path = shell.exec('npm bin').trim()
 
 shell.echo('Building CommonJS version')
-shell.exec(`JEST_WORKER_ID=1 ${npm_bin_path}/babel --out-dir lib src --ignore '**/__tests__'`)
+shell.exec(
+  `JEST_WORKER_ID=1 ${npm_bin_path}/babel --out-dir lib src --ignore '**/__tests__' --extensions '.ts,.tsx,.js,.jsx'`
+)
 
 shell.echo('Building ES Modules version')
-shell.exec(`${npm_bin_path}/babel --out-dir es src --ignore '**/__tests__'`)
+shell.exec(
+  `${npm_bin_path}/babel --out-dir es src --ignore '**/__tests__' --extensions '.ts,.tsx,.js,.jsx'`
+)
 
 shell.echo(`building pretranslated output in lib/translated in mulitple processes`)
 getTranslationList('canvas-rce')
@@ -52,7 +56,7 @@ getTranslationList('canvas-rce')
     const locales = translationFiles.map(tf => tf.split('.')[0])
     const processPromises = locales.map(locale => {
       return exec(
-        `BUILD_LOCALE=${locale} ${npm_bin_path}/babel --out-dir lib/translated/${locale}/modules --ignore locales* src`
+        `BUILD_LOCALE=${locale} ${npm_bin_path}/babel --out-dir lib/translated/${locale}/modules --ignore locales* src --extensions '.ts,.tsx,.js'`
       )
     })
     Promise.all(processPromises)

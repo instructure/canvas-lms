@@ -1578,9 +1578,9 @@
     sass "^1.35.1"
 
 "@instructure/browserslist-config-instui@^7.19.0":
-  version "7.19.0"
-  resolved "https://registry.yarnpkg.com/@instructure/browserslist-config-instui/-/browserslist-config-instui-7.19.0.tgz#64886881a73f60d5594e8163d0cb00bcf94a7b3d"
-  integrity sha512-qtvHsot5QvQNT6VyC7v/CWNwwSQryTGZOK9vVOB4onLS4EADG95XmLDe9Bg+VKHmBICMm68z64WTV/F0OqthtA==
+  version "7.20.2"
+  resolved "https://registry.yarnpkg.com/@instructure/browserslist-config-instui/-/browserslist-config-instui-7.20.2.tgz#2ee31145ce3519c4c10d0d6d8fe2522f3c517137"
+  integrity sha512-wwZDC5hlhObz0Gce5wEylCuuQhpr521amlJtGk7vnLMFizCe2kqfxrGVJ4LUZ2kgDZD+FvpuG+YeNMVEuL5HEQ==
 
 "@instructure/canvas-high-contrast-theme@8.26.3":
   version "8.26.3"
@@ -1632,9 +1632,9 @@
     which "^1.3.1"
 
 "@instructure/config-loader@^7.19.0":
-  version "7.19.0"
-  resolved "https://registry.yarnpkg.com/@instructure/config-loader/-/config-loader-7.19.0.tgz#15365edc7296fc2a97b3fd5c36d3f55663797bea"
-  integrity sha512-v7glzEn6dfQoiQRogNT0hWhkCEOuUmuOEMzJOMrH5/HgYJN55AKXiw9P+Nj5po1UqbVaPo1yWJOdKtKWU7pdrw==
+  version "7.20.2"
+  resolved "https://registry.yarnpkg.com/@instructure/config-loader/-/config-loader-7.20.2.tgz#d42d0d60aace3743dc1e36ea716019aa9093ce40"
+  integrity sha512-Jay8ibPr7UdrObnHtIjoXaK+1Pi6sfUIkwCKr7iEgcLRg7aQlQa65y7ND9KhAk8H+Qf/j4XQ9DdbF8Qdj3Fvuw==
 
 "@instructure/console@8.26.3":
   version "8.26.3"
@@ -3348,7 +3348,7 @@
     classnames "^2"
     prop-types "^15"
 
-"@instructure/ui-postcss-config@^7.19.0":
+"@instructure/ui-postcss-config@^7.19.0", "@instructure/ui-postcss-config@^7.5.1":
   version "7.19.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-postcss-config/-/ui-postcss-config-7.19.0.tgz#b90931b350a71a34957c0a44dbead20d5c7d00d0"
   integrity sha512-EWNNE+57g4XIOQdaaljvAAzb5uwAOfGIKa1rpXj+CNoDXLS+prWYf5uilQFOJjkGFCwJPUBYqrT2Jt1rfCr9gQ==

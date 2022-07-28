@@ -36,7 +36,7 @@ import {useStoreProps} from '../../shared/StoreContext'
 import formatMessage from '../../../../format-message'
 import buildDownloadUrl from '../../shared/buildDownloadUrl'
 import {validIcon} from '../utils/iconValidation'
-import {hasChanges} from '../utils/iconMakerFormHasChanges'
+import {IconMakerFormHasChanges} from '../utils/IconMakerFormHasChanges'
 import bridge from '../../../../bridge'
 
 const INVALID_MESSAGE = formatMessage(
@@ -133,7 +133,8 @@ function renderFooter(status, onClose, handleSubmit, editing, replaceAll, setRep
 
 const checkIfAnyUnsavedChanges = (initialSettings, currentSettings) => {
   let shouldCloseTray = true
-  if (hasChanges(initialSettings, currentSettings)) {
+  const imFormHasChanges = new IconMakerFormHasChanges(initialSettings, currentSettings)
+  if (imFormHasChanges.hasChanges()) {
     // RCE already uses browser's confirm dialog for unsaved changes
     // Its use here in the Icon Maker tray keeps that consistency
     // eslint-disable-next-line no-restricted-globals, no-alert
