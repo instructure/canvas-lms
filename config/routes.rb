@@ -1056,6 +1056,7 @@ CanvasRails::Application.routes.draw do
       get "account_calendars", action: :index, as: :account_calendars
       get "account_calendars/:account_id", action: :show, as: :account_calendar
       put "account_calendars/:account_id", action: :update, as: :update_account_calendar
+      put "accounts/:account_id/account_calendars", action: :bulk_update, as: :bulk_update_account_calendars
       get "accounts/:account_id/account_calendars", action: :all_calendars, as: :all_account_calendars
     end
 
