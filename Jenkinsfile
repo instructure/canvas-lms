@@ -425,7 +425,7 @@ pipeline {
                     .hooks(buildSummaryReportHooks.call())
                     .obeysAllowStages(false)
                     .timeout(2)
-                    .execute(filesChangedStage.&call)
+                    .execute(filesChangedStage.&preBuild)
 
                   extendedStage('Build Docker Image (Pre-Merge)')
                     .hooks(buildSummaryReportHooks.call())
@@ -465,6 +465,12 @@ pipeline {
 
                       buildDockerImageStage.patchsetImage(asyncSteps.join("\n"))
                     }
+
+                  extendedStage(filesChangedStage.STAGE_NAME_POST_BUILD)
+                    .hooks(buildSummaryReportHooks.call())
+                    .obeysAllowStages(false)
+                    .timeout(2)
+                    .execute(filesChangedStage.&postBuild)
 
                   extendedStage(RUN_MIGRATIONS_STAGE)
                     .hooks(buildSummaryReportHooks.call())
@@ -531,8 +537,12 @@ pipeline {
                       sh 'build/new-jenkins/consumer-smoke-test.sh'
                     }
 
+                    def shouldRunJS = configuration.isChangeMerged() ||
+                      (!configuration.isChangeMerged() && (filesChangedStage.hasGraphqlFiles(buildConfig) || filesChangedStage.hasJsFiles(buildConfig)))
+
                     extendedStage(JS_BUILD_IMAGE_STAGE)
                       .hooks(buildSummaryReportHooks.call())
+                      .required(shouldRunJS)
                       .queue(stages, buildDockerImageStage.&jsImage)
 
                     extendedStage(LINTERS_BUILD_IMAGE_STAGE)

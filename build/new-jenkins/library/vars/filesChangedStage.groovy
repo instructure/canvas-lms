@@ -18,7 +18,8 @@
 
 import groovy.transform.Field
 
-@Field final static STAGE_NAME = 'Detect Files Changed'
+@Field final static STAGE_NAME = 'Detect Files Changed (Pre-Build)'
+@Field final static STAGE_NAME_POST_BUILD = 'Detect Files Changed (Post-Build)'
 
 def hasDockerDevFiles(buildConfig) {
   return buildConfig[STAGE_NAME].value('dockerDevFiles')
@@ -44,11 +45,15 @@ def hasGraphqlFiles(buildConfig) {
   return buildConfig[STAGE_NAME].value('graphqlFiles')
 }
 
+def hasJsFiles(buildConfig) {
+  return buildConfig[STAGE_NAME_POST_BUILD].value('jsFiles')
+}
+
 def hasNewDeletedSpecFiles(buildConfig) {
   return buildConfig[STAGE_NAME].value('addedOrDeletedSpecFiles')
 }
 
-def call(stageConfig) {
+def preBuild(stageConfig) {
   def dockerDevFiles = [
     '^docker-compose/',
     '^script/common/',
@@ -75,5 +80,11 @@ def call(stageConfig) {
   // https://issues.jenkins.io/browse/JENKINS-52750
   if (env.GERRIT_PROJECT != 'canvas-lms') {
     sh "rm -vrf $LOCAL_WORKDIR@tmp"
+  }
+}
+
+def postBuild(stageConfig) {
+  dir(env.LOCAL_WORKDIR) {
+    stageConfig.value('jsFiles', sh(script: "${WORKSPACE}/build/new-jenkins/js-changes.sh", returnStatus: true) == 0)
   }
 }
