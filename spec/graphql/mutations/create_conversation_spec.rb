@@ -376,6 +376,7 @@ RSpec.describe Mutations::CreateConversation do
       expect(
         result.dig("data", "createConversation", "conversations", 0, "conversation", "conversationMessagesConnection", "nodes", 0, "body")
       ).to eql "foo"
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.account_context.react")
     end
   end
 end
