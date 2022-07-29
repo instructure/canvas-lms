@@ -2320,6 +2320,14 @@ describe CoursesController do
            }
     end
 
+    it "correctly checks a sub-account admin's permission" do
+      @sub_account = Account.create!(name: "sub_account", parent_account: @account)
+      @sub_admin = account_admin_user(account: @sub_account)
+      user_session @sub_admin
+      expect(Auditors::Course).to receive(:record_created)
+      post "create", params: { course: { name: "whatever" } }
+    end
+
     it "sets the visibility settings when we have permission" do
       post "create",
            params: {

@@ -1905,6 +1905,12 @@ class User < ActiveRecord::Base
     pseudonym.account rescue Account.default
   end
 
+  def sub_account_for_course_creation(domain_root_account)
+    Rails.cache.fetch_with_batched_keys(["sub_account_for_course_creation", domain_root_account].cache_key, batch_object: self, batched_keys: %i[account_users]) do
+      account_users.active.detect { |au| break au if au.root_account_id == domain_root_account.id }&.account || domain_root_account.manually_created_courses_account
+    end
+  end
+
   def courses_with_primary_enrollment(association = :current_and_invited_courses, enrollment_uuid = nil, options = {})
     cache_key = [association, enrollment_uuid, options].cache_key
     @courses_with_primary_enrollment ||= {}
