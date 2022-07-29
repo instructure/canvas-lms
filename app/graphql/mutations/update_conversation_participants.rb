@@ -47,6 +47,8 @@ class Mutations::UpdateConversationParticipants < Mutations::BaseMutation
     # storage of data differing from what ActiveRecord expects
     conversation_participants.map { |cp| cp.update(update_params) }
     InstStatsd::Statsd.count("inbox.conversation.archived.react", conversation_participants.count) if update_params[:workflow_state] == "archived"
+    InstStatsd::Statsd.count("inbox.conversation.starred.react", conversation_participants.count) if update_params[:starred] == true
+    InstStatsd::Statsd.count("inbox.conversation.unstarred.react", conversation_participants.count) if update_params[:starred] == false
     response = {}
     response[:conversation_participants] = conversation_participants if conversation_participants.any?
     response[:errors] = errors if errors.any?

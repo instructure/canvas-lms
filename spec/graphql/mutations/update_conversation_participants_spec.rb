@@ -103,6 +103,7 @@ describe Mutations::UpdateConversationParticipants do
       let(:conv2) { conversation(sender, user_model).conversation }
 
       it "updates each view" do
+        allow(InstStatsd::Statsd).to receive(:count)
         query = <<~GQL
           conversationIds: [#{conv.id}, #{conv2.id}],
           starred: true
@@ -122,6 +123,30 @@ describe Mutations::UpdateConversationParticipants do
         expect(participant1.starred).to be_truthy
         participant2 = participant2.reload
         expect(participant2.starred).to be_truthy
+        expect(InstStatsd::Statsd).to have_received(:count).with("inbox.conversation.starred.react", 2)
+      end
+
+      it "unstars each conversation" do
+        allow(InstStatsd::Statsd).to receive(:count)
+        query = <<~GQL
+          conversationIds: [#{conv.id}, #{conv2.id}],
+          starred: false
+        GQL
+
+        participant1 = sender.all_conversations.find_by(conversation: conv)
+        participant2 = sender.all_conversations.find_by(conversation: conv2)
+
+        result = execute_with_input(query)
+        expect(result["errors"]).to be_nil
+        expect(result.dig("data", "updateConversationParticipants", "errors")).to be_nil
+        updated_attrs = result.dig("data", "updateConversationParticipants", "conversationParticipants")
+        expect(updated_attrs.map { |i| i["label"] }).to match_array [nil, nil]
+
+        participant1 = participant1.reload
+        expect(participant1.starred).to be_falsey
+        participant2 = participant2.reload
+        expect(participant2.starred).to be_falsey
+        expect(InstStatsd::Statsd).to have_received(:count).with("inbox.conversation.unstarred.react", 2)
       end
 
       it "archives each conversation" do
