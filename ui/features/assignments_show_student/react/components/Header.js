@@ -19,6 +19,7 @@
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import AttemptSelect from './AttemptSelect'
 import AssignmentDetails from './AssignmentDetails'
+import PeerReviewsCounter from './PeerReviewsCounter'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import GradeDisplay from './GradeDisplay'
@@ -50,11 +51,13 @@ class Header extends React.Component {
     allSubmissions: arrayOf(Submission.shape),
     assignment: Assignment.shape,
     onChangeSubmission: func,
-    submission: Submission.shape
+    submission: Submission.shape,
+    reviewerSubmission: Submission.shape
   }
 
   static defaultProps = {
-    onChangeSubmission: () => {}
+    onChangeSubmission: () => {},
+    reviewerSubmission: null
   }
 
   isPeerReviewModeEnabled = () => {
@@ -73,6 +76,19 @@ class Header extends React.Component {
     return (
       this.props.submission.latePolicyStatus === 'late' ||
       this.props.submission.submissionStatus === 'late'
+    )
+  }
+
+  currentAssessmentIndex = () => {
+    const userId = this.props.assignment.env.revieweeId
+    const anonymousId = this.props.assignment.env.anonymousAssetId
+    return (
+      this.props.reviewerSubmission.assignedAssessments.findIndex(assessment => {
+        return (
+          (userId && userId === assessment.anonymizedUser._id) ||
+          (anonymousId && assessment.anonymousId === anonymousId)
+        )
+      }) + 1
     )
   }
 
@@ -223,6 +239,20 @@ class Header extends React.Component {
     const addCommentsDisabled =
       this.props.submission?.attempt > 1 && this.props.submission.state === 'unsubmitted'
 
+    let topRightComponent
+    if (this.isPeerReviewModeEnabled()) {
+      topRightComponent = (
+        <Flex.Item margin="0 small 0 0">
+          <PeerReviewsCounter
+            current={this.currentAssessmentIndex()}
+            total={this.props.reviewerSubmission.assignedAssessments.length}
+          />
+        </Flex.Item>
+      )
+    } else {
+      topRightComponent = <Flex.Item>{this.renderLatestGrade()}</Flex.Item>
+    }
+
     return (
       <>
         <div
@@ -249,9 +279,7 @@ class Header extends React.Component {
                       submissionStatus={this.props.submission.submissionStatus}
                     />
                   </Flex.Item>
-                  {!this.isPeerReviewModeEnabled() && (
-                    <Flex.Item>{this.renderLatestGrade()}</Flex.Item>
-                  )}
+                  {topRightComponent}
                 </Flex>
 
                 <CommentsTray

@@ -50,6 +50,7 @@ export default function renderAssignmentsApp(env, elt) {
           <StudentViewQuery
             assignmentLid={ENV.ASSIGNMENT_ID.toString()}
             submissionID={ENV.SUBMISSION_ID?.toString()}
+            reviewerSubmissionID={ENV.REVIEWER_SUBMISSION_ID?.toString()}
           />
         </AlertManager>
       </ErrorBoundary>
