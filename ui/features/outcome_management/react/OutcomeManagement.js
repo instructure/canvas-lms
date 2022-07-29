@@ -188,7 +188,7 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
           lhsGroupId={lhsGroupId}
         />
       )}
-      <Tabs onRequestTabChange={handleTabChange}>
+      <Tabs onRequestTabChange={handleTabChange} tabOverflow={isMobileView ? 'scroll' : 'stack'}>
         <Tabs.Panel
           padding="0"
           renderTitle={I18n.t('Manage')}
@@ -229,6 +229,7 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
             renderTitle={I18n.t('Alignments')}
             isSelected={selectedIndex === alignmentTabIndex}
             id="alignments"
+            padding={isMobileView ? 'small none none' : 'small'}
           >
             <AlignmentSummary />
           </Tabs.Panel>

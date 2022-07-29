@@ -23,6 +23,7 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import AlignmentStatItem from './AlignmentStatItem'
 import OutcomeSearchBar from '../Management/OutcomeSearchBar'
+import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('AlignmentSummary')
@@ -39,6 +40,7 @@ const AlignmentSummaryHeader = ({
   updateFilterHandler
 }) => {
   const [selectedFilter, setSelectedFilter] = useState('ALL_OUTCOMES')
+  const {isMobileView} = useCanvasContext()
   const percentCoverage = totalOutcomes !== 0 ? alignedOutcomes / totalOutcomes : 0
   const avgPerOutcome = totalOutcomes !== 0 ? totalAlignments / totalOutcomes : 0
   const percentWithAlignments = totalArtifacts !== 0 ? alignedArtifacts / totalArtifacts : 0
@@ -90,8 +92,15 @@ const AlignmentSummaryHeader = ({
       data-testid="outcome-alignment-summary-header"
     >
       <Flex.Item as="div">
-        <Flex as="div" wrap="wrap">
-          <Flex.Item size="28rem" padding="x-small small x-small x-small">
+        <div
+          style={{display: 'flex', flexWrap: isMobileView ? 'nowrap' : 'wrap', overflow: 'auto'}}
+          className="alignment-summary-stats"
+        >
+          <Flex.Item
+            as="div"
+            size={isMobileView ? '17.5rem' : '31rem'}
+            padding={isMobileView ? 'xx-small x-small x-small' : 'x-small small x-small x-small'}
+          >
             <AlignmentStatItem
               type="outcome"
               count={totalOutcomes}
@@ -99,7 +108,13 @@ const AlignmentSummaryHeader = ({
               average={avgPerOutcome}
             />
           </Flex.Item>
-          <Flex.Item size="28rem" padding="x-small small x-small x-small">
+          <Flex.Item
+            as="div"
+            size={isMobileView ? '17.5rem' : '31rem'}
+            padding={
+              isMobileView ? 'xx-small x-small x-small small' : 'x-small small x-small x-small'
+            }
+          >
             <AlignmentStatItem
               type="artifact"
               count={totalArtifacts}
@@ -107,14 +122,23 @@ const AlignmentSummaryHeader = ({
               average={avgPerArtifact}
             />
           </Flex.Item>
-        </Flex>
+        </div>
       </Flex.Item>
-      <Flex.Item as="div" padding="small 0 0">
-        <Flex as="div" wrap="wrap">
-          <Flex.Item padding="x-small small x-small x-small" size="17rem">
+      <Flex.Item as="div" padding="xx-small 0 0">
+        <Flex as="div" wrap="wrap" direction={isMobileView ? 'column' : 'row'}>
+          <Flex.Item
+            as="div"
+            padding={isMobileView ? 'xx-small xx-small xx-small' : 'x-small small x-small x-small'}
+            size={isMobileView ? '100%' : '17rem'}
+          >
             {renderFilter()}
           </Flex.Item>
-          <Flex.Item padding="x-small" size="28rem" shouldGrow>
+          <Flex.Item
+            as="div"
+            padding={isMobileView ? 'xx-small xx-small small' : 'x-small'}
+            size={isMobileView ? '100%' : '17rem'}
+            shouldGrow
+          >
             <OutcomeSearchBar
               placeholder={I18n.t('Search...')}
               searchString={searchString}
