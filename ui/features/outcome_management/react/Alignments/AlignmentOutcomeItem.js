@@ -28,6 +28,7 @@ import {IconArrowOpenEndLine, IconArrowOpenDownLine} from '@instructure/ui-icons
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
+import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import AlignmentItem from './AlignmentItem'
 import {alignmentShape} from './propTypeShapes'
 
@@ -38,11 +39,17 @@ const AlignmentOutcomeItem = ({title, description, alignments}) => {
   const onClickHandler = () => setTruncated(prevState => !prevState)
   const truncatedDescription = stripHtmlTags(description || '')
   const alignmentsCount = alignments?.length || 0
+  const {isMobileView} = useCanvasContext()
 
   return (
-    <View as="div" padding="x-small 0" borderWidth="0 0 small" data-testid="alignment-outcome-item">
+    <View
+      as="div"
+      padding={isMobileView ? 'x-small x-small 0 0' : 'x-small 0'}
+      borderWidth="0 0 small"
+      data-testid="alignment-outcome-item"
+    >
       <Flex as="div" alignItems="start">
-        <Flex.Item as="div" size="3rem">
+        <Flex.Item as="div" size={isMobileView ? '2.5rem' : '3rem'}>
           <Flex as="div" alignItems="start" justifyItems="center">
             <Flex.Item>
               <div style={{padding: '0.3125rem 0'}}>
@@ -108,7 +115,7 @@ const AlignmentOutcomeItem = ({title, description, alignments}) => {
             )}
 
             {!truncated && alignmentsCount > 0 && (
-              <View as="div" padding="small 0 small">
+              <View as="div" padding="0 small small 0">
                 {alignments.map(
                   ({
                     _id,
@@ -137,22 +144,24 @@ const AlignmentOutcomeItem = ({title, description, alignments}) => {
             )}
           </div>
         </Flex.Item>
-        <Flex.Item size="9rem" alignSelf="end">
-          <div
-            style={{
-              padding: '0.4375rem 0.5rem 0 0',
-              display: 'flex',
-              flexFlow: 'row-reverse nowrap'
-            }}
-          >
-            <Text size="medium" weight="bold">
-              {alignmentsCount}
-            </Text>
-            <View padding="0 xxx-small 0 0">
-              <Text size="medium">{`${I18n.t('Alignments')}:`}</Text>
-            </View>
-          </div>
-        </Flex.Item>
+        {!isMobileView && (
+          <Flex.Item size="9rem" alignSelf="end">
+            <div
+              style={{
+                padding: '0.4375rem 0.5rem 0 0',
+                display: 'flex',
+                flexFlow: 'row-reverse nowrap'
+              }}
+            >
+              <Text size="medium" weight="bold">
+                {alignmentsCount}
+              </Text>
+              <View padding="0 xxx-small 0 0">
+                <Text size="medium">{`${I18n.t('Alignments')}:`}</Text>
+              </View>
+            </div>
+          </Flex.Item>
+        )}
       </Flex>
     </View>
   )
