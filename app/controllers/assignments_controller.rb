@@ -135,12 +135,30 @@ class AssignmentsController < ApplicationController
                  end
 
     peer_review_mode_enabled = @context.feature_enabled?(:peer_reviews_for_a2) && (params[:reviewee_id].present? || params[:anonymous_asset_id].present?)
+    peer_review_available = submission.present? && submission.submitted? && current_user_submission.present? && current_user_submission.submitted?
+
     js_env({
              peer_review_mode_enabled: submission.present? && peer_review_mode_enabled,
-             peer_review_available: submission.present? && submission.submitted? && current_user_submission.present? && current_user_submission.submitted?,
+             peer_review_available: peer_review_available,
              peer_display_name: @assignment.anonymous_peer_reviews? ? I18n.t("Anonymous student") : submission&.user&.name,
              originality_reports_for_a2_enabled: Account.site_admin.feature_enabled?(:originality_reports_for_a2)
            })
+
+    if peer_review_mode_enabled
+      graphql_reviewer_submission_id = nil
+      if current_user_submission
+        graphql_reviewer_submission_id = CanvasSchema.id_from_object(
+          current_user_submission,
+          CanvasSchema.resolve_type(nil, current_user_submission, nil),
+          nil
+        )
+      end
+      js_env({
+               reviewee_id: @assignment.anonymous_peer_reviews? ? nil : params[:reviewee_id],
+               anonymous_asset_id: params[:anonymous_asset_id],
+               REVIEWER_SUBMISSION_ID: graphql_reviewer_submission_id
+             })
+    end
 
     graphql_submission_id = nil
     if submission

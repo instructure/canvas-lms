@@ -101,6 +101,26 @@ export const STUDENT_VIEW_QUERY = gql`
   ${Submission.fragment}
 `
 
+export const STUDENT_VIEW_QUERY_WITH_REVIEWER_SUBMISSION = gql`
+  query GetAssignment($assignmentLid: ID!, $submissionID: ID!, $reviewerSubmissionID: ID!) {
+    assignment(id: $assignmentLid) {
+      ...Assignment
+      rubric {
+        ...Rubric
+      }
+    }
+    submission(id: $submissionID) {
+      ...Submission
+    }
+    reviewerSubmission: submission(id: $reviewerSubmissionID) {
+      ...Submission
+    }
+  }
+  ${Assignment.fragment}
+  ${Rubric.fragment}
+  ${Submission.fragment}
+`
+
 export const LOGGED_OUT_STUDENT_VIEW_QUERY = gql`
   query GetAssignment($assignmentLid: ID!) {
     assignment(id: $assignmentLid) {

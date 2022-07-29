@@ -335,6 +335,16 @@ it('does not render the attempt select if peerReviewModeEnabled is set to true',
   })
   props.assignment.env.peerReviewModeEnabled = true
   props.allSubmissions = [props.submission]
+  props.reviewerSubmission = {
+    ...props.submission,
+    assignedAssessments: [
+      {
+        anonymousUser: null,
+        anonymousId: 'xaU9cd',
+        workflowState: 'assigned'
+      }
+    ]
+  }
   const {queryByTestId} = render(<Header {...props} />)
   expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()
 })
@@ -394,6 +404,16 @@ describe('submission workflow tracker', () => {
   it('is not rendered if peerReviewModeEnabled is set to true', async () => {
     const props = await mockAssignmentAndSubmission()
     props.assignment.env.peerReviewModeEnabled = true
+    props.reviewerSubmission = {
+      ...props.submission,
+      assignedAssessments: [
+        {
+          anonymousUser: null,
+          anonymousId: 'xaU9cd',
+          workflowState: 'assigned'
+        }
+      ]
+    }
     const {queryByTestId} = render(<Header {...props} />)
     expect(queryByTestId('submission-workflow-tracker')).not.toBeInTheDocument()
   })
@@ -655,17 +675,169 @@ describe('Add Comment/View Feedback button', () => {
     ).not.toBeInTheDocument()
   })
 
-  it('does not show the unread comments badge if peerReviewModeEnabled is set to true ', async () => {
+  it('does not show the unread comments badge if peerReviewModeEnabled is set to true', async () => {
     const props = await mockAssignmentAndSubmission({Submission: {unreadCommentCount: 1}})
     props.assignment.env.peerReviewModeEnabled = true
+    props.reviewerSubmission = {
+      ...props.submission,
+      assignedAssessments: [
+        {
+          anonymousUser: null,
+          anonymousId: 'xaU9cd',
+          workflowState: 'assigned'
+        }
+      ]
+    }
     const {queryByTestId} = render(<Header {...props} />)
     expect(queryByTestId('unread_comments_badge')).not.toBeInTheDocument()
   })
 
-  it('shows the unread comments badge if peerReviewModeEnabled is set to false ', async () => {
+  it('shows the unread comments badge if peerReviewModeEnabled is set to false', async () => {
     const props = await mockAssignmentAndSubmission({Submission: {unreadCommentCount: 1}})
     props.assignment.env.peerReviewModeEnabled = false
     const {getByTestId} = render(<Header {...props} />)
     expect(getByTestId('unread_comments_badge')).toBeInTheDocument()
+  })
+})
+
+describe('Peer reviews counter', () => {
+  it('is displayed when peerReviewModeEnabled is set to true', async () => {
+    const props = await mockAssignmentAndSubmission()
+    props.assignment.env.peerReviewModeEnabled = true
+    props.reviewerSubmission = {
+      ...props.submission,
+      assignedAssessments: [
+        {
+          anonymousUser: null,
+          anonymousId: 'xaU9cd',
+          workflowState: 'assigned'
+        }
+      ]
+    }
+    const {queryByTestId} = render(<Header {...props} />)
+    expect(queryByTestId('current-counter')).toBeInTheDocument()
+    expect(queryByTestId('total-counter')).toBeInTheDocument()
+  })
+
+  it('is not displayed when peerReviewModeEnabled is set to false', async () => {
+    const props = await mockAssignmentAndSubmission()
+    props.assignment.env.peerReviewModeEnabled = false
+    const {queryByTestId} = render(<Header {...props} />)
+    expect(queryByTestId('current-counter')).not.toBeInTheDocument()
+    expect(queryByTestId('total-counter')).not.toBeInTheDocument()
+  })
+
+  describe('with anonymous peer reviews enabled', () => {
+    let props
+    beforeAll(async () => {
+      props = await mockAssignmentAndSubmission()
+      props.assignment.env.peerReviewModeEnabled = true
+      props.reviewerSubmission = {
+        ...props.submission,
+        assignedAssessments: [
+          {
+            anonymousId: 'xaU9cd',
+            workflowState: 'assigned'
+          },
+          {
+            anonymousId: 'maT9fd',
+            workflowState: 'assigned'
+          },
+          {
+            anonymousId: 'vaN9fd',
+            workflowState: 'assigned'
+          }
+        ]
+      }
+    })
+
+    it('sets 1 as "current-counter" when anonymousId matches the first assigned assessment"', async () => {
+      props.assignment.env.anonymousAssetId =
+        props.reviewerSubmission.assignedAssessments[0].anonymousId
+      const {queryByTestId} = render(<Header {...props} />)
+      expect(queryByTestId('current-counter')).toHaveTextContent('1')
+    })
+
+    it('sets assigned assessments count as "current-counter" when anonymousId matches the last assigned assessment"', async () => {
+      props.assignment.env.anonymousAssetId =
+        props.reviewerSubmission.assignedAssessments[2].anonymousId
+      const {queryByTestId} = render(<Header {...props} />)
+      expect(queryByTestId('current-counter')).toHaveTextContent('3')
+    })
+
+    it('sets 0 as "current-counter when there are no matches for the anonymousId"', async () => {
+      props.assignment.env.anonymousAssetId = '0baCxm'
+      const {queryByTestId} = render(<Header {...props} />)
+      expect(queryByTestId('current-counter')).toHaveTextContent('0')
+    })
+  })
+
+  describe('with anonymous peer reviews disabled', () => {
+    let props
+    beforeAll(async () => {
+      props = await mockAssignmentAndSubmission()
+      props.assignment.env.peerReviewModeEnabled = true
+      props.reviewerSubmission = {
+        ...props.submission,
+        assignedAssessments: [
+          {
+            anonymizedUser: {_id: '1'},
+            anonymousId: null,
+            workflowState: 'assigned'
+          },
+          {
+            anonymizedUser: {_id: '2'},
+            anonymousId: null,
+            workflowState: 'assigned'
+          },
+          {
+            anonymizedUser: {_id: '3'},
+            anonymousId: null,
+            workflowState: 'assigned'
+          }
+        ]
+      }
+    })
+
+    it('sets 1 as "current-counter" when reviewerId matches the first assigned assessment"', async () => {
+      props.assignment.env.revieweeId =
+        props.reviewerSubmission.assignedAssessments[0].anonymizedUser._id
+      const {queryByTestId} = render(<Header {...props} />)
+      expect(queryByTestId('current-counter')).toHaveTextContent('1')
+    })
+
+    it('sets assigned assessments count as "current-counter" when reviewerId matches the last assigned assessment"', async () => {
+      props.assignment.env.revieweeId =
+        props.reviewerSubmission.assignedAssessments[2].anonymizedUser._id
+      const {queryByTestId} = render(<Header {...props} />)
+      expect(queryByTestId('current-counter')).toHaveTextContent('3')
+    })
+
+    it('sets 0 as "current-counter when there are no matches for the reviewerId"', async () => {
+      props.assignment.env.revieweeId = '4'
+      const {queryByTestId} = render(<Header {...props} />)
+      expect(queryByTestId('current-counter')).toHaveTextContent('0')
+    })
+  })
+
+  it('uses the assigned assessments array length as "total counter"', async () => {
+    const props = await mockAssignmentAndSubmission()
+    props.assignment.env.peerReviewModeEnabled = true
+    props.reviewerSubmission = {
+      ...props.submission,
+      assignedAssessments: [
+        {
+          anonymousId: 'xaU9cd',
+          workflowState: 'assigned'
+        },
+        {
+          anonymousId: 'maT9fd',
+          workflowState: 'assigned'
+        }
+      ]
+    }
+    const {queryByTestId} = render(<Header {...props} />)
+    const assessmentsCount = props.reviewerSubmission.assignedAssessments.length
+    expect(queryByTestId('total-counter')).toHaveTextContent(assessmentsCount.toString())
   })
 })
