@@ -64,8 +64,7 @@ module DiscussionsCommon
   def delete_entry(entry)
     wait_for_ajaximations
     click_entry_option(entry, ".al-options:visible li:last-child a")
-    confirm_dialog = driver.switch_to.alert
-    confirm_dialog.accept
+    driver.switch_to.alert.accept
     wait_for_ajax_requests
     entry.reload
     expect(entry.workflow_state).to eq "deleted"

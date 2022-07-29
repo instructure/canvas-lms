@@ -229,14 +229,12 @@ describe "threaded discussions" do
     it "displays editor name and timestamp after delete", priority: "2" do
       user_session(@teacher)
 
-      entry_text = "new entry"
+      delete_me = @topic.discussion_entries.create!(user: @student, message: "new threaded reply from student")
       Discussion.visit(@course, @topic)
-
       fj('label[for="showDeleted"]').click
-      add_reply(entry_text)
-      entry = DiscussionEntry.last
-      delete_entry(entry)
-      expect(f("#entry-#{entry.id} .discussion-title").text).to match("Deleted by #{@teacher.name} on")
+
+      delete_entry(delete_me)
+      expect(f("#entry-#{delete_me.id} .discussion-title").text).to match("Deleted by #{@teacher.name} on")
     end
 
     context "student tray" do
