@@ -259,6 +259,36 @@ module Lti
           end
         end
 
+        context "when existing_tool is provided" do
+          subject { tool_configuration.new_external_tool(context, existing_tool: existing_tool) }
+
+          let(:existing_tool) { tool_configuration.new_external_tool(context) }
+
+          context "and existing tool is disabled" do
+            let(:state) { "disabled" }
+
+            before do
+              existing_tool.update!(workflow_state: state)
+            end
+
+            it "uses the existing workflow_state" do
+              expect(subject.workflow_state).to eq state
+            end
+          end
+
+          context "and tool state is different from configuration state" do
+            let(:state) { "anonymous" }
+
+            before do
+              existing_tool.update!(workflow_state: state)
+            end
+
+            it "overwrites existing workflow_state" do
+              expect(subject.workflow_state).to eq extensions["privacy_level"]
+            end
+          end
+        end
+
         it "sets the correct workflow_state" do
           expect(subject.workflow_state).to eq "public"
         end
@@ -363,7 +393,7 @@ module Lti
         end
       end
 
-      context "when context is a cousre" do
+      context "when context is a course" do
         it_behaves_like "a new context external tool" do
           let(:context) { course_model }
         end

@@ -41,6 +41,10 @@ module Lti
     alias_attribute :configuration_url, :settings_url
 
     def new_external_tool(context, existing_tool: nil)
+      # disabled tools should stay disabled while getting updated
+      # deleted tools are never updated during a dev key update so can be safely ignored
+      tool_is_disabled = existing_tool&.workflow_state == ContextExternalTool::DISABLED_STATE
+
       tool = existing_tool || ContextExternalTool.new(context: context)
       Importers::ContextExternalToolImporter.import_from_migration(
         importable_configuration,
@@ -50,7 +54,7 @@ module Lti
         false
       )
       tool.developer_key = developer_key
-      tool.workflow_state = canvas_extensions["privacy_level"] || DEFAULT_PRIVACY_LEVEL
+      tool.workflow_state = (tool_is_disabled && ContextExternalTool::DISABLED_STATE) || canvas_extensions["privacy_level"] || DEFAULT_PRIVACY_LEVEL
       tool.use_1_3 = true
       tool
     end

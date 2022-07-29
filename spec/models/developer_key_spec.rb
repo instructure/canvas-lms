@@ -348,6 +348,11 @@ describe DeveloperKey do
         it "updates tools on shard 2" do
           expect(shard_2_tool.reload.name).to eq new_title
         end
+
+        it "respects tool workflow_state" do
+          expect(shard_1_tool.reload.workflow_state).to eq "disabled"
+          expect(shard_2_tool.reload.workflow_state).to eq "disabled"
+        end
       end
 
       context "when non-site admin key" do
@@ -363,6 +368,10 @@ describe DeveloperKey do
 
         it "does not update tools on shard 2" do
           expect(shard_2_tool.reload.name).to eq "shard 2 tool"
+        end
+
+        it "respects tool workflow_state" do
+          expect(shard_1_tool.reload.workflow_state).to eq "disabled"
         end
       end
     end
