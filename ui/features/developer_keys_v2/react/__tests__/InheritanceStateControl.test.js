@@ -20,7 +20,7 @@ import _ from 'lodash'
 
 import {screen, render, fireEvent} from '@testing-library/react'
 import React from 'react'
-import {mount, shallow} from 'enzyme'
+import {mount} from 'enzyme'
 import InheritanceStateControl from '../InheritanceStateControl'
 import actions from '../actions/developerKeysActions'
 import storeCreator from '../store/store'
@@ -28,7 +28,7 @@ import storeCreator from '../store/store'
 const sampleDeveloperKey = (defaults = {}) => {
   return _.merge(_.clone(defaults), {
     id: '1',
-    workflow_state: 'on',
+    workflow_state: 'on'
   })
 }
 
@@ -44,11 +44,11 @@ const getProps = (developerKey, store = false) => {
     developerKey,
     ctx: {
       params: {
-        contextId: '1',
-      },
+        contextId: '1'
+      }
     },
     store,
-    actions,
+    actions
   }
 }
 
@@ -64,46 +64,34 @@ describe('InheritanceStateControl', () => {
   })
 
   it('uses the "off" state from the store', () => {
-    let key = sampleDeveloperKey({
+    const key = sampleDeveloperKey({
       developer_key_account_binding: {
-        'developer_key_id': '1',
-        'workflow_state': 'off',
-        'account_owns_binding': true,
+        developer_key_id: '1',
+        workflow_state: 'off',
+        account_owns_binding: true
       }
     })
-    const wrapper = mount(
-      <InheritanceStateControl
-        {...getProps(key)}
-      />
-    )
+    const wrapper = mount(<InheritanceStateControl {...getProps(key)} />)
     const checkedBtn = wrapper.find('input[checked=true]').getDOMNode()
     expect(checkedBtn.value).toBe('off')
   })
-  
+
   it('uses the "on" state from the store', () => {
-    let key = sampleDeveloperKey({
+    const key = sampleDeveloperKey({
       developer_key_account_binding: {
-        'developer_key_id': '1',
-        'workflow_state': 'on',
-        'account_owns_binding': true,
+        developer_key_id: '1',
+        workflow_state: 'on',
+        account_owns_binding: true
       }
     })
-    const wrapper = mount(
-      <InheritanceStateControl
-        {...getProps(key)}
-      />
-    )
+    const wrapper = mount(<InheritanceStateControl {...getProps(key)} />)
     const checkedBtn = wrapper.find('input[checked=true]').getDOMNode()
     expect(checkedBtn.value).toBe('on')
   })
-  
+
   it('renders "off" if "allow" is set as the workflow state for root account', () => {
     const key = sampleDeveloperKey()
-    const wrapper = mount(
-      <InheritanceStateControl
-      {...getProps(key)}
-      />
-    )
+    const wrapper = mount(<InheritanceStateControl {...getProps(key)} />)
     const domNode = wrapper.find('input[checked=true]').getDOMNode()
     expect(domNode.value).toBe('off')
   })
@@ -127,14 +115,14 @@ describe('InheritanceStateControl', () => {
     render(<InheritanceStateControl {...getProps(key, store)} />)
     const item = screen.getByText('Off')
     fireEvent.click(item)
-    const updatedDevKey = store.getState()['listDeveloperKeys']['list'][0]
-  
+    const updatedDevKey = store.getState().listDeveloperKeys.list[0]
+
     expect(updatedDevKey.developer_key_account_binding.workflow_state).toBe('off')
   })
-  
+
   it('does nothing if cancel is clicked in the confirmation modal', () => {
     window.confirm = jest.fn(() => false)
-  
+
     const key = sampleDeveloperKey({
       developer_key_account_binding: {
         developer_key_id: '1',
@@ -147,12 +135,102 @@ describe('InheritanceStateControl', () => {
         list: [key]
       }
     })
-  
+
     render(<InheritanceStateControl {...getProps(key, store)} />)
     const item = screen.getByText('Off')
     fireEvent.click(item)
-    const devKeyFromStore = store.getState()['listDeveloperKeys']['list'][0]
-  
+    const devKeyFromStore = store.getState().listDeveloperKeys.list[0]
+
     expect(devKeyFromStore.developer_key_account_binding.workflow_state).toBe('on')
+  })
+
+  const rootAccountCTX = {
+    params: {
+      contextId: '1'
+    }
+  }
+
+  const siteAdminCTX = {
+    params: {
+      contextId: 'site_admin'
+    }
+  }
+
+  function mockDevKey(workflowState, isOwnedByAccount) {
+    return {
+      id: '10000000000123',
+      developer_key_account_binding: {
+        workflow_state: workflowState || 'off'
+      },
+      account_owns_binding: isOwnedByAccount || false
+    }
+  }
+
+  function componentNode(key, context = rootAccountCTX) {
+    const component = mount(
+      <InheritanceStateControl
+        developerKey={key}
+        ctx={context}
+        store={{dispatch: () => {}}}
+        actions={{setBindingWorkflowState: () => {}}}
+      />
+    )
+    return component.getDOMNode()
+  }
+
+  it('disables the radio group if the account does not own the binding and it is set', () => {
+    const radioGroup = componentNode(mockDevKey('off')).querySelector('input[type="radio"]')
+    expect(radioGroup.disabled).toBe(true)
+  })
+
+  it('enables the radio group if the account does not own the binding and it is not set', () => {
+    const radioGroup = componentNode(mockDevKey('allow')).querySelector('input[type="radio"]')
+    expect(radioGroup.disabled).toBeFalsy()
+  })
+
+  it('enables the radio group if the account does the binding', () => {
+    const radioGroup = componentNode(mockDevKey('allow', true)).querySelector('input[type="radio"]')
+    expect(radioGroup.disabled).toBeFalsy()
+  })
+
+  it('the correct state for the developer key', () => {
+    const offRadioInput = componentNode(mockDevKey()).querySelector('input[value="off"]')
+    expect(offRadioInput.checked).toBe(true)
+  })
+
+  it('renders "allow" if no binding is sent only for site_admin', () => {
+    const modifiedKey = mockDevKey()
+    modifiedKey.developer_key_account_binding = undefined
+    const allowRadioInput = componentNode(modifiedKey, siteAdminCTX).querySelector(
+      'input[value="allow"]'
+    )
+    expect(allowRadioInput.checked).toBe(true)
+  })
+
+  it('renders an "on" option', () => {
+    expect(componentNode({id: '123'}).querySelector('input[value="on"]')).toBeTruthy()
+  })
+
+  it('renders an "off" option', () => {
+    expect(componentNode({id: '123'}).querySelector('input[value="off"]')).toBeTruthy()
+  })
+
+  it('renders an "allow" option only for site_admin', () => {
+    expect(
+      componentNode(mockDevKey(), siteAdminCTX).querySelector('input[value="allow"]')
+    ).toBeTruthy()
+  })
+
+  it('do not render an "allow" option only for root-account', () => {
+    expect(
+      componentNode(mockDevKey(), rootAccountCTX).querySelector('input[value="allow"]')
+    ).toBeFalsy()
+  })
+
+  it('renders "allow" if "allow" is set as the workflow state for site admin', () => {
+    const allowRadioInput = componentNode(mockDevKey('allow'), siteAdminCTX).querySelector(
+      'input[value="allow"]'
+    )
+    expect(allowRadioInput.checked).toBe(true)
   })
 })
