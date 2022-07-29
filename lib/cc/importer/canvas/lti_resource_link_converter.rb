@@ -40,6 +40,7 @@ module CC::Importer::Canvas
 
         custom = {}
         lookup_uuid = nil
+        resource_link_url = nil
 
         document.xpath("//blti:custom//lticm:property").each do |el|
           key = el.attributes["name"].value
@@ -66,6 +67,7 @@ module CC::Importer::Canvas
 
         document.xpath("//blti:extensions//lticm:property").each do |el|
           lookup_uuid = el.content if el.attributes["name"].value == "lookup_uuid"
+          resource_link_url = el.content if el.attributes["name"].value == "resource_link_url"
         end
 
         launch_url = (document.xpath("//blti:launch_url").first || document.xpath("//blti:secure_launch_url").first)&.content
@@ -75,7 +77,8 @@ module CC::Importer::Canvas
         resource_links << {
           custom: custom,
           launch_url: launch_url,
-          lookup_uuid: lookup_uuid
+          lookup_uuid: lookup_uuid,
+          resource_link_url: resource_link_url
         }
       end
 
