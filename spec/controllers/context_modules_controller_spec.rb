@@ -508,6 +508,28 @@ describe ContextModulesController do
       post "reorder", params: { course_id: @course.id, order: "#{m2.id},#{m1.id},#{m3.id}" }
       expect(response).to be_successful
     end
+
+    context "course pacing" do
+      before :once do
+        course_with_teacher(active_all: true)
+        @m1 = @course.context_modules.create!
+        @m2 = @course.context_modules.create!
+        time = 1.minute.ago
+        ContextModule.where(id: [@m1, @m2]).update_all(updated_at: time)
+        @course.account.enable_feature!(:course_paces)
+        @course.enable_course_paces = true
+        @course.save!
+        @primary_pace = course_pace_model(course: @course)
+        @section_pace = course_pace_model(course: @course, course_section: @course.course_sections.create!)
+      end
+
+      it "republishes all course paces when moving module items" do
+        user_session(@teacher)
+        post "reorder", params: { course_id: @course.id, order: "#{@m2.id},#{@m1.id}" }
+        expect(Progress.find_by(context: @primary_pace)).to be_queued
+        expect(Progress.find_by(context: @section_pace)).to be_queued
+      end
+    end
   end
 
   describe "POST 'reorder_items'" do
