@@ -457,6 +457,9 @@ class ConversationsController < ApplicationController
         if context_type == "Account" || context_type.nil?
           InstStatsd::Statsd.increment("inbox.conversation.sent.account_context.legacy")
         end
+        if params[:user_note] == "1"
+          InstStatsd::Statsd.increment("inbox.conversation.sent.faculty_journal.legacy")
+        end
         if mode == :async
           headers["X-Conversation-Batch-Id"] = batch.id.to_s
           return render json: [], status: :accepted
@@ -478,6 +481,9 @@ class ConversationsController < ApplicationController
         end
         if message.has_media_objects || params[:media_comment_id]
           InstStatsd::Statsd.increment("inbox.message.sent.media.legacy")
+        end
+        if params[:user_note] == "1"
+          InstStatsd::Statsd.increment("inbox.conversation.sent.faculty_journal.legacy")
         end
         InstStatsd::Statsd.count("inbox.message.sent.recipients.legacy", @recipients.count)
         render json: [conversation_json(@conversation.reload, @current_user, session, include_indirect_participants: true, messages: [message])], status: :created

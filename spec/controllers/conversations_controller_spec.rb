@@ -19,6 +19,11 @@
 #
 
 describe ConversationsController do
+  before do
+    allow(InstStatsd::Statsd).to receive(:count)
+    allow(InstStatsd::Statsd).to receive(:increment)
+  end
+
   def conversation(opts = {})
     num_other_users = opts[:num_other_users] || 1
     course = opts[:course] || @course
@@ -33,11 +38,6 @@ describe ConversationsController do
   describe "GET 'index'" do
     before :once do
       course_with_student(active_all: true)
-    end
-
-    before do
-      allow(InstStatsd::Statsd).to receive(:increment)
-      allow(InstStatsd::Statsd).to receive(:count)
     end
 
     it "requires login" do
@@ -257,11 +257,6 @@ describe ConversationsController do
       end
 
       context "metrics" do
-        before do
-          allow(InstStatsd::Statsd).to receive(:increment)
-          allow(InstStatsd::Statsd).to receive(:count)
-        end
-
         it "does not increment visit count if not authorized to open inbox" do
           get "index"
           assert_require_login
@@ -330,8 +325,6 @@ describe ConversationsController do
     end
 
     it "creates the conversation" do
-      allow(InstStatsd::Statsd).to receive(:increment)
-      allow(InstStatsd::Statsd).to receive(:count)
       user_session(@student)
 
       new_user = User.create
@@ -478,8 +471,6 @@ describe ConversationsController do
 
       [nil, "", "0", "false", "no", "off", "wat"].each do |falsish|
         it "creates one conversation per recipient if group_conversation=#{falsish.inspect}" do
-          allow(InstStatsd::Statsd).to receive(:count)
-          allow(InstStatsd::Statsd).to receive(:increment)
           @teacher.media_objects.where(media_id: "m-whatever", media_type: "video/mp4").first_or_create!
           post "create", params: { recipients: [@new_user1.id.to_s, @new_user2.id.to_s], body: "yo", group_conversation: falsish, media_comment_id: "m-whatever", media_comment_type: "video" }
 
@@ -615,11 +606,13 @@ describe ConversationsController do
       it "creates user notes" do
         post "create", params: { recipients: @students.map(&:id), body: "yo", subject: "greetings", user_note: "1" }
         @students.each { |x| expect(x.user_notes.size).to be(1) }
+        expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.faculty_journal.legacy")
       end
 
       it "_not_s create user notes if asked not to" do
         post "create", params: { recipients: @students.map(&:id), body: "yolo", subject: "salutations", user_note: "0" }
         @students.each { |x| expect(x.user_notes.size).to be(0) }
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with("inbox.conversation.sent.faculty_journal.legacy")
       end
 
       it "includes the domain root account in the user note" do
@@ -674,8 +667,6 @@ describe ConversationsController do
       @conversation.last_message_at = expected_lma
       @conversation.save!
 
-      allow(InstStatsd::Statsd).to receive(:increment)
-      allow(InstStatsd::Statsd).to receive(:count)
       post "add_message", params: { conversation_id: @conversation.conversation_id, body: "hello world" }
 
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.isReply.legacy")
@@ -766,7 +757,6 @@ describe ConversationsController do
       conversation
       @course.update!({ workflow_state: "completed" })
 
-      allow(InstStatsd::Statsd).to receive(:count)
       post "add_message", params: { conversation_id: @conversation.conversation_id, body: "hello world", recipients: [@teacher.id.to_s] }
       expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.legacy", 1)
       expect(response).to be_successful
