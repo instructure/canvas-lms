@@ -123,19 +123,18 @@ export const CreateCourseModal = ({
     }, [])
   }
 
-  const useTeacherStudentOpts =
-    ['teacher', 'student'].includes(permissions) && !restrictToMCCAccount
-  const useNoEnrollmentsOpts =
-    permissions === 'no_enrollments' ||
-    (['teacher', 'student'].includes(permissions) && restrictToMCCAccount)
+  let fetchOpts = {}
+
+  if (permissions === 'admin') fetchOpts = adminFetchOpts
+  else if (permissions === 'no_enrollments') fetchOpts = noEnrollmentsFetchOpts
+  else if (['teacher', 'student'].includes(permissions))
+    fetchOpts = restrictToMCCAccount ? noEnrollmentsFetchOpts : teacherStudentFetchOpts
 
   useFetchApi({
     loading: setLoading,
     error: useCallback(err => showFlashError(I18n.t('Unable to get accounts'))(err), []),
     fetchAllPages: true,
-    ...(permissions === 'admin' && adminFetchOpts),
-    ...(useTeacherStudentOpts && teacherStudentFetchOpts),
-    ...(useNoEnrollmentsOpts && noEnrollmentsFetchOpts)
+    ...fetchOpts
   })
 
   const handleAccountSelected = id => {
