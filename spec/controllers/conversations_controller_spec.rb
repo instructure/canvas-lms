@@ -647,7 +647,7 @@ describe ConversationsController do
       conversation(num_other_users: 2).update_attribute(:workflow_state, "unread")
 
       allow(InstStatsd::Statsd).to receive(:increment)
-      post "update", params: { id: @conversation.conversation_id, conversation: { subscribed: "0", workflow_state: "archived", starred: "1" } }
+      post "update", params: { id: @conversation.conversation_id, conversation: { subscribed: "0", workflow_state: "archived", starred: true } }
 
       expect(response).to be_successful
       @conversation.reload
@@ -655,7 +655,36 @@ describe ConversationsController do
       expect(@conversation).to be_archived
       expect(@conversation.starred).to be_truthy
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.archived.legacy")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.starred.legacy")
       expect(InstStatsd::Statsd).not_to have_received(:increment).with("inbox.conversation.archived.react")
+
+      post "update", params: { id: @conversation.conversation_id, conversation: { starred: false } }
+      expect(response).to be_successful
+      @conversation.reload
+      expect(@conversation.starred).to be_falsey
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.unstarred.legacy")
+    end
+  end
+
+  describe "PUT 'batch_update'" do
+    it "calls batch update with star event" do
+      course_with_student_logged_in(active_all: true)
+      conversation(num_other_users: 2).update_attribute(:workflow_state, "unread")
+
+      allow(InstStatsd::Statsd).to receive(:count)
+      put "batch_update", params: { conversation_ids: [@conversation.id], event: "star" }
+
+      expect(InstStatsd::Statsd).to have_received(:count).with("inbox.conversation.starred.legacy", 1).once
+    end
+
+    it "calls batch update with unstar event" do
+      course_with_student_logged_in(active_all: true)
+      conversation(num_other_users: 2).update_attribute(:workflow_state, "unread")
+
+      allow(InstStatsd::Statsd).to receive(:count)
+      put "batch_update", params: { conversation_ids: [@conversation.id], event: "unstar" }
+
+      expect(InstStatsd::Statsd).to have_received(:count).with("inbox.conversation.unstarred.legacy", 1).once
     end
   end
 

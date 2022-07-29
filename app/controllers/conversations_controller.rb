@@ -699,8 +699,11 @@ class ConversationsController < ApplicationController
   #     "participants": [{"id": 1, "name": "Joe", "full_name": "Joe TA"}]
   #   }
   def update
+    prev_star_state = @conversation.starred
     if @conversation.update(params.require(:conversation).permit(*API_ALLOWED_FIELDS))
       InstStatsd::Statsd.increment("inbox.conversation.archived.legacy") if params.require(:conversation)["workflow_state"] == "archived"
+      InstStatsd::Statsd.increment("inbox.conversation.starred.legacy") if ActiveModel::Type::Boolean.new.cast(params[:conversation][:starred]) && !prev_star_state
+      InstStatsd::Statsd.increment("inbox.conversation.unstarred.legacy") if !ActiveModel::Type::Boolean.new.cast(params[:conversation][:starred]) && prev_star_state
       render json: conversation_json(@conversation, @current_user, session)
     else
       render json: @conversation.errors, status: :bad_request
@@ -1021,6 +1024,10 @@ class ConversationsController < ApplicationController
     return render(json: { message: "conversation batch size limit (500) exceeded" }, status: :bad_request) unless params[:conversation_ids].size <= 500
     return render(json: { message: "event not specified" }, status: :bad_request) unless update_params[:event]
     return render(json: { message: "invalid event" }, status: :bad_request) unless allowed_events.include? update_params[:event]
+
+    conversation_count = params[:conversation_ids].length
+    InstStatsd::Statsd.count("inbox.conversation.starred.legacy", conversation_count) if params[:event] == "star"
+    InstStatsd::Statsd.count("inbox.conversation.unstarred.legacy", conversation_count) if params[:event] == "unstar"
 
     progress = ConversationParticipant.batch_update(@current_user, conversation_ids, update_params)
     render json: progress_json(progress, @current_user, session)
