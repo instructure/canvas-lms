@@ -351,6 +351,7 @@ RSpec.describe Mutations::CreateConversation do
     it "creates user notes" do
       run_mutation({ recipients: @students.map(&:id).map(&:to_s), body: "yo", subject: "greetings", user_note: true, context_code: @course.asset_string }, @teacher)
       @students.each { |x| expect(x.user_notes.size).to be(1) }
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.faculty_journal.react")
     end
 
     it "includes the domain root account in the user note" do
