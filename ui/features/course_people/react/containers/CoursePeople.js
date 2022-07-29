@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,10 +17,15 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
-import ready from '@instructure/ready'
-import {CoursePeopleApp} from './react/index'
+import RosterTable from './RosterTable/RosterTable'
 
-ready(() => {
-  ReactDOM.render(<CoursePeopleApp />, document.getElementById('content'))
-})
+const CoursePeople = () => {
+  return (
+    <>
+      {/* Additional People page containers/components will go here */}
+      <RosterTable />
+    </>
+  )
+}
+
+export default CoursePeople
