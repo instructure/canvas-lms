@@ -124,8 +124,9 @@ sends a partial or an empty file, diffing would see that all users not included
 should be removed. Using `change_threshold=10` will then not perform diffing if
 the files being compared are greater than 10% different. The threshold can be
 set to help prevent removing objects unintentionally. When set and the file is
-over 10% different it will be the same as if `diffing_remaster_data_set=true`.
-The change_threshold can be set to any integer between 1 and 100.
+over 10% different, the entire import file will be applied instead of diffing
+against a previous batch and this batch will not be used for diffing any future
+batches. The change_threshold can be set to any integer between 1 and 100.
 
 change_threshold also impacts batch mode.
 
