@@ -29,6 +29,40 @@ class ImmersiveReaderController < ApplicationController
 
   class ServiceError < StandardError; end
 
+  def authenticate
+    response = CanvasHttp.post(service_url, headers, form_data: form)
+
+    if response && response.code == "200"
+      parsed = JSON.parse(response.body)
+      render json: {
+        token: parsed["access_token"],
+        subdomain: ir_config[:ir_subdomain]
+      }
+    else
+      body = begin
+        JSON.parse(response.body)
+      rescue JSON::ParserError
+        {}
+      end
+
+      increment_error_count(response)
+
+      message = "Error connecting to cognitive services #{body["error_description"]}"
+      raise ServiceError, message
+    end
+  rescue ServiceError => e
+    Canvas::Errors.capture_exception(:immersive_reader, e, :warn)
+  end
+
+  private
+
+  def increment_error_count(response)
+    InstStatsd::Statsd.increment(
+      "immersive_reader.authentication_failure",
+      tags: { status: response.code }
+    )
+  end
+
   def ir_config
     @ir_config ||= YAML.safe_load(DynamicSettings.find(tree: :private)["immersive_reader.yml"] || "{}").with_indifferent_access
   end
@@ -52,28 +86,5 @@ class ImmersiveReaderController < ApplicationController
       client_secret: ir_config[:ir_client_secret],
       resource: "https://cognitiveservices.azure.com/"
     }
-  end
-
-  def authenticate
-    response = CanvasHttp.post(service_url, headers, form_data: form)
-
-    if response && response.code == "200"
-      parsed = JSON.parse(response.body)
-      render json: {
-        token: parsed["access_token"],
-        subdomain: ir_config[:ir_subdomain]
-      }
-    else
-      body = begin
-        JSON.parse(response.body)
-      rescue JSON::ParserError
-        {}
-      end
-
-      message = "Error connecting to cognitive services #{body["error_description"]}"
-      raise ServiceError, message
-    end
-  rescue ServiceError => e
-    Canvas::Errors.capture_exception(:immersive_reader, e, :warn)
   end
 end
