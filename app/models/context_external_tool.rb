@@ -304,6 +304,7 @@ class ContextExternalTool < ActiveRecord::Base
       selection_height
       selection_width
       text
+      labels
       windowTarget
       url
       target_link_uri
