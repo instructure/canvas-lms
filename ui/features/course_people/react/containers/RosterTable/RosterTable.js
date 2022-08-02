@@ -24,6 +24,7 @@ import {ROSTER_QUERY} from '../../../graphql/Queries'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {readableRoleName} from '@canvas/k5/react/utils'
 import AvatarLink from '../../components/AvatarLink/AvatarLink'
+import NameLink from '../../components/NameLink/NameLink'
 
 const I18n = useI18nScope('course_people')
 
@@ -74,7 +75,11 @@ const RosterTable = () => {
         <Table.Cell>
           <AvatarLink avatarUrl={avatarUrl} name={name} href={htmlUrl} />
         </Table.Cell>
-        <Table.Cell>{name}</Table.Cell>
+        <Table.Cell>
+          <NameLink _id={_id} htmlUrl={htmlUrl}>
+            {name}
+          </NameLink>
+        </Table.Cell>
         <Table.Cell>{loginId}</Table.Cell>
         <Table.Cell>{sisId}</Table.Cell>
         <Table.Cell>{sectionNames}</Table.Cell>

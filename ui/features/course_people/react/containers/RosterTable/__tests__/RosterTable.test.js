@@ -114,9 +114,10 @@ describe('RosterTable', () => {
     )
   }
 
-  beforeAll(() => {
+  beforeEach(() => {
     window.ENV = {
-      course: {id: '1'}
+      course: {id: '1'},
+      current_user: {id: '999'}
     }
   })
 
@@ -154,5 +155,36 @@ describe('RosterTable', () => {
     expect(within(rows[2]).getByText('Teaching Assistant')).toBeInTheDocument()
     expect(within(rows[6]).getByText('Observing: Observed Student 1')).toBeInTheDocument()
     expect(within(rows[6]).getByText('Observing: Observed Student 2')).toBeInTheDocument()
+  })
+
+  it('should wrap the name of each user in a button', async () => {
+    const container = setup(getRosterQueryMock({mockUsers}))
+    const rows = await container.findAllByTestId('roster-table-data-row')
+    const names = [designer1, teacher1, ta1, student1, student2, student3, observer1].map(
+      user => user.name
+    )
+    rows.forEach((row, index) => {
+      const button = within(row).getByRole('button', {name: names[index]})
+      expect(button).toBeInTheDocument()
+    })
+  })
+
+  it('should link the current_user to their user detail page when clicking their own name', async () => {
+    window.ENV = {...window.ENV, current_user: {id: '1'}}
+    const container = setup(getRosterQueryMock({mockUsers}))
+    const link = await container.findByRole('link', {name: teacher1.name})
+    expect(link).toHaveAttribute('href', mockUsers[1].node.enrollments.htmlUrl)
+  })
+
+  it('should not link the current_user to the user detail page when clicking a name that is not their own', async () => {
+    const container = setup(getRosterQueryMock({mockUsers}))
+    const rows = await container.findAllByTestId('roster-table-data-row')
+    const names = [designer1, teacher1, ta1, student1, student2, student3, observer1].map(
+      user => user.name
+    )
+    rows.forEach((row, index) => {
+      const button = within(row).getByRole('button', {name: names[index]})
+      expect(button).not.toHaveAttribute('href')
+    })
   })
 })
