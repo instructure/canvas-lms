@@ -12,11 +12,9 @@ export default function checkNode(
   }
   const errors = []
   const childNodeCheck = child => {
+    if (child.hasAttribute("data-ignore-a11y-check")) return
     const composedRules = rules.concat(additionalRules)
     for (let rule of composedRules) {
-      if (child.hasAttribute("data-ignore-a11y-check")) {
-        continue
-      }
       const promise = Promise.resolve(rule.test(child, config)).then(result => {
         if (!result) {
           errors.push({ node: child, rule })
