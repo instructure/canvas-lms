@@ -4084,6 +4084,7 @@ nn:
   automatically_dff02416: Automatisk
   automatically_disable_post_to_sis_on_assignments_w_dd7e873a: "Automatisk slå av \"Post til SIS\" på oppgåver når vurderingsperioden stenger"
   automatically_post_grades_29a7eff5: "Post vurderingar automatisk"
+  availability_8942cde6: Tilgjengelegheit
   availability_dates_438d71e0: "Tilgjengelege datoar"
   availability_dates_changed_exceptions_465ba375: "Unntak: tilgjengelege datoar endra:"
   available_2ed9f226: "Tilgjengeleg:"
@@ -4883,6 +4884,7 @@ nn:
   cancel_migrating_name_cfc745c2: "Avbryt migrering av \"%{name}\""
   cancel_submitting_comment_2666e98b: "Avbryt sending av kommentar"
   cancel_updating_comment_6816d855: "Avbryt oppdatering av kommentar"
+  canceling_this_attempt_will_permanently_delete_any_21ce850c: "Viss du angrar på dette forsøket, vil arbeidet som vart gjort under forsøket bli permanent sletta. Ønsker du å fortsetje og sletta arbeidet ditt?"
   cannot_access_group_in_concluded_course_90a8db52: "Får ikkje tilgang til gruppe i avslutta emne"
   cannot_add_role_name_name_already_in_use_a523639c: "Kan ikkje legge til rollenamnet %{name}: det er allereie i bruk"
   cannot_add_section_to_a_non_section_specific_discu_d2a7f263: "Kan ikkje legge til seksjon i ein diskusjon som ikkje er seksjonspesifikk"
@@ -4995,6 +4997,7 @@ nn:
   canvas_is_not_configured_to_receive_logins_from_is_502a4491: "Canvas er ikkje sett opp til å ta imot innloggingar frå %{issuer}."
   canvas_login_failure_message_4c922f2f: "Feilmelding frå Canvas-pålogging"
   canvas_multi_factor_authentication_backup_codes_4bd08f93: "Backup-kodar for fleirfaktorautentisering"
+  canvas_needs_acccess_to_your_camera_16db6502: "Canvas treng tilgang til kameraet ditt. "
   canvas_notifications_tutorial_video_79b8e768: "Opplæringsvideo for Canvas-varsel"
   canvas_now_has_two_quiz_engines_please_choose_whic_4aa9821: |-
       Canvas har to quiz-verktøy. Vel det du
@@ -5096,10 +5099,14 @@ nn:
   chinese_traditional_8a7f759d: "Kinesisk, tradisjonell"
   choose_a_color_or_course_nickname_for_course_2585e42c: "Vel ein farge eller eit alias for %{course}"
   choose_a_color_or_course_nickname_or_move_course_c_dd23f754: "Vel ein farge eller eit alias eller flytt emnekort for %{course}"
+  choose_a_course_85ef72b9: "Vel eit emne"
   choose_a_course_home_page_8059c7b: "Vel ei startside for emnet"
   choose_a_csv_file_to_upload_9644480c: "Vel ei CSV-fil å laste opp:"
   choose_a_date_cd0263fe: "Vel dato"
+  choose_a_file_to_upload_a63bac0f: "Vel ei fil å laste opp"
+  choose_a_file_to_upload_from_your_device_d1b50d4c: "Vel ei fil å laste opp frå disken din"
   choose_a_quiz_engine_8820d521: "Vel eit quizverktøy"
+  choose_a_submission_type_8f45651a: "Vel ein innleveringstype"
   choose_a_timezone_d9c52998: "Vel tidssone"
   choose_an_authentication_service_47dc8875: "Vel ei godkjenningsteneste"
   choose_and_publish_980812cb: "Vel og publiser"
@@ -5125,6 +5132,7 @@ nn:
   classic_quizzes_dee3c7b7: "Orinære quizar"
   classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "Ordinære quizar for tidsstyrte quizar utan innlevering"
   clear_2084585f: Fjern
+  clear_search_field_75f595c7: "Tøm søkefeltet"
   clear_selected_file_82388e50: "Fjern vald fil"
   clear_user_cache_ef079f7f: "Tøm brukarcache"
   click_cancel_if_you_don_t_want_the_code_displayed_ff7b1846: "Klikk \"Avbryt\" dersom du ikkje vil at koden skal vise."
@@ -5213,6 +5221,8 @@ nn:
   close_sidebar_10b0fbb4: "Lukk sidestolpe"
   close_student_details_2f6900: "Lukk studentdetaljar"
   close_submission_tray_c4988fa8: "Lukk innleveringsmeny"
+  close_suggestions_6fcb4985: "Lukk forslag"
+  close_the_window_and_try_again_7353f8e: "Lukk vindauget og prøv igjen. "
   close_warning_d61daf2c: "Lukk åtvaring"
   closed_for_comments_e395b42f: "Stengt for kommentarar"
   closes_5c6b4367: "Lukkar: "
@@ -5323,7 +5333,7 @@ nn:
       page_title: Samarbeid
       titles: 
         current: "Gjeldande samarbeid"
-    lti_collaborations: LTISamarbeid
+    lti_collaborations: "Eksterne samarbeider "
     show: 
       error_cause_1: "Opprettaren sin Google Drive-konto er ulik  kontoen som er brukt til å opprette samarbeidet."
       error_cause_2: "Opprettaren av samarbeidet er ikkje lenger forfattar i Google Docs."
@@ -5362,12 +5372,15 @@ nn:
     from_beginning: starten
     to_now: "no"
   comma_separated_list_of_users_sis_id_332c98f1: "Kommaseparert liste over brukarar sine SIS-ID-ar"
+  comment_added_33ab70d9: "Kommentar lagt til"
   comment_by_replying_to_this_message_or_join_the_co_26d42fde: "Kommentér ved å svare på denne meldinga, eller delta i samtalen ved å bruke linken: %{link}."
   comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: "Kommentér ved å svare på denne meldinga, eller delta i samtalen ved å bruke linken: %{link}. Om du vil sende med eit vedlegg, må du logge inn i Canvas og svare på diskusjonen der. "
   comment_by_replying_to_this_message_or_join_the_co_886bc612: "Kommentér ved å svare på denne meldinga, eller delta i samtalen ved å bruke linken: %{link}. Om du vil inkludere eit vedlegg i svarmeldnga, må du logge inn i Canvas og svare på kunngjeringa der. "
+  comment_destroyed_5cfc922d: "Kommentar slettet"
   comment_failed_to_post_please_try_again_later_e2d19a0a: "Kunne ikkje poste kommentar. Prøv på nytt seinare."
   comment_input_box_b8c7e58b: Kommentarfelt
   comment_submitted_d9934b: "Kommentar er send!"
+  comment_updated_2cd56fe2: "Kommentar oppdatert "
   comments_e07bcbe3: Kommentarar
   comments_for_this_attempt_a5fae61f: "Merknadar for dette forsøket"
   commmessages_9fa33faa: CommMessages
@@ -5456,6 +5469,7 @@ nn:
   completed_9b809e44: fullført
   compose_a_new_message_db3a68ed: "Skriv ei ny melding"
   compose_message_8abd180a: "Skriv ei melding"
+  compressing_f4a35c08: Komprimerer...
   computer_1d7dfa6f: Datamaskin
   concluded_63150003: fullført
   concluded_conferences_cdbe53f9: "Ferdige konferansar"
@@ -5580,6 +5594,7 @@ nn:
   confirm_qr_code_display_49664fa3: "Bekreft QR-kode visning"
   confirm_removal_a9bb889: "Stadfest fjerning"
   confirm_reservation_removal_e6350e7c: "Stadfest fjerning av reservasjon"
+  confirm_submission_e3b43f1: "Stadfest innlevering"
   confirm_unenrollment_64333263: "Stadfest utmelding"
   confirm_unfavorite_course_fa01966d: "Bekreft fjerning av favoritt-merke"
   confirmation_code_required_22984955: "Kode for stadfesting (obligatorisk)"
@@ -6449,6 +6464,8 @@ nn:
     one: "1 oppgåve med feil"
     other: "%{count} oppgåver med feil"
     zero: "Ingen oppgåver med feil. Klikk på Hald fram"
+  count_attempts_allowed_d65a014c: 
+    zero: "Uavgrensa forsøk tillatne "
   count_attempts_d23c69a0: 
     one: "1 forsøk"
     other: "%{count} forsøk"
@@ -6656,6 +6673,7 @@ nn:
   course_audit_log_77407457: "Endringslogg for emne"
   course_calendar_7d3cba7b: Emnekalender
   course_calendar_add_edit_delete_events_76b97c04: "Emnekalender - legg til / endre / slett hendingar"
+  course_cannot_be_deleted_ee11256c: "Kan ikkje slette emne"
   course_canvas_id_9e36b24c: "Canvas emne-ID"
   course_card_color_region_for_course_c356a69c: "Fargeområde for emnekort for %{course}"
   course_card_image_5285f1bf: Emnekortbilde
@@ -6678,6 +6696,7 @@ nn:
   course_course_d1c78210: "Emne: %{course}"
   course_details_25cdf103: Emnedetaljar
   course_discussions_38c0b74f: Emnediskusjonar
+  course_end_date_4c797823: "Sluttdatoen til emnet"
   course_end_date_on_after_a6bbb0b7: "Emne sluttdato den/etter"
   course_ends_at_e8b166df: "Emnet sluttar"
   course_enrollments_are_in_85eb1e6b: "Emnepåmeldingar er klare"
@@ -6727,7 +6746,10 @@ nn:
   course_external_tools_query_error_d5110efe: "Det oppstod ein feil under spørring etter emne med eksterne verktøy"
   course_files_62deb8f8: Emnefiler
   course_files_a31f97fc: Emnefiler
+  course_files_add_2eede390: "Emnefiler - legg til"
   course_files_add_edit_delete_24678a2f: "Emnefilar - legg til / endre / slett"
+  course_files_delete_fae0effe: "Emnefiler - slett"
+  course_files_edit_d05d4e8b: "Emnefiler - rediger"
   course_found_f5a40cd3: "Emne funne"
   course_found_not_deleted_a20f72f0: "Emne funne (ikkje sletta)"
   course_grade_grade_in_course_code_9fa854db: "Vurdring i emne: %{grade}% i%{course_code}"
@@ -6735,6 +6757,7 @@ nn:
   course_grading_schemes_can_be_enabled_disabled_in__26b298b3: "Vurderingskjema for emne kan slåast på/av i emneinnstillingar."
   course_groups_e8239a1e: Emnegrupper
   course_has_no_active_instructors_with_this_id_74f1d8a: "Emnet har ingen aktive undervisarar med denne ID"
+  course_has_not_started_yet_ed525dcc: "Emnet har ikkje starta endå "
   course_home_4c4c0107: "Heimeside for emne"
   course_home_page_5c61dba7: Emneforside
   course_home_sub_navigation_b1ee6b03: "Navigering på emneforsida"
@@ -6922,6 +6945,7 @@ nn:
   course_sis_df8b379: Emne-SIS
   course_sis_id_bbed1a60: emne-SIS-ID
   course_sis_id_sis_id_or_canvas_id_4d323f5c: "Emne-SIS-ID (SIS_ID:####) ELLER Canvas-ID: (###)"
+  course_start_date_daae16ae: "Startdatoen til emnet"
   course_start_date_on_before_a3a32883: "Emne startdato den/før"
   course_starts_at_3a01f9da: "Emnet startar den"
   course_state_manage_2edd46dc: "Emnestatus - administrer"
@@ -6934,6 +6958,9 @@ nn:
   course_syllabus_report_becker_92173e15: "Rapport av emneoversikt - Becker"
   course_syllabus_report_johnson_county_cc_32ed83a6: "Rapport av emneoversikt - Johnson County CC"
   course_syllabus_report_molloy_19e0a3b0: "Rapport over emneoversikt - Molloy"
+  course_template_84f504be: Emnemal
+  course_templates_delete_5ec47e1f: "Emnemalar - slett"
+  course_templates_edit_fd44b74c: "Emnemalar - rediger"
   course_usage_report_2e9d9da9: "Rapport over bruk av emnet"
   course_users: 
     greater_than_three: "Oppgi eit søkeord med tre eller fleire teikn"
@@ -7204,6 +7231,7 @@ nn:
         sections: "Seksjonar i emnet"
       help: 
         edit_navigation: "Dra og slepp elementa for å omorganisere dei i emnenavigasjonen."
+        edit_navigation_k5: "Dra og slepp elementa for å omorganisere dei i emnenavigasjonen."
       images: 
         alt: 
           delete: Slett
@@ -7236,6 +7264,7 @@ nn:
         course_section_name: "Legg til ei ny seksjon"
         course_status_published: "Emnet er publisert"
         course_status_unpublished: "Emnet er ikkje publisert"
+        course_template: Emnemal
         course_visibility: Synlegheit
         custom_course_visibility: Tilpass
         enrollment_term_id: Semester
@@ -7452,11 +7481,21 @@ nn:
   courses_43204aae: Emne
   courses_account_72e4fca7: "Emne (konto)"
   courses_account_navigation_f84fdec3: "Emne (kontonavigasjon)"
+  courses_account_navigations_a60c71db: "Emne - kontonavigasjonar"
+  courses_account_settings_79e2f748: "Emne - kontoinnstillingar"
+  courses_add_20891f99: "Emne - legg til"
   courses_add_edit_delete_aa2b55d3: "Emner - legg til / endre / slett"
   courses_change_visibility_9150ff1b: "Emne - endre synlegheit"
+  courses_conclude_7bf4ce68: "Emne - fullfør"
+  courses_course_templates_5a3fbafd: "Emne - emnemalar "
+  courses_delete_20c9beb2: "Emne - slett"
   courses_from_the_selected_term_will_be_considered_6d682c77: "Emner frå det valde semesteret vil bli vurdert"
+  courses_manage_3ea9687f: "Emne - administrer"
+  courses_manage_update_d3e9263e: "Emne - administrer/oppdater"
   courses_navigation_menu_b3638384: "Meny for emnenavigasjon"
   courses_over_time_41dc0428: "emner over tid"
+  courses_publish_39df53f8: "Emne - publiser"
+  courses_reset_211acdd: "Emne - rette opp igjen"
   courses_tray_cec46d6e: Emnemeny
   courses_undelete_1f689a97: "Emner - gjenopprett"
   courses_view_change_logs_25af6a45: "Emner - vis endringslogg"
@@ -7527,6 +7566,8 @@ nn:
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Dersom du opprettar innleveringseksport kan du laste ned ei ZIP-fil med alle innleveringane dine i noverande og tidlegare emne. Fila kan vere stor, så det kan ta ei stund. Du kan forlate sida og kome tilbake seinare."
   creating_conference_95b59116: "Sett opp konferanse"
   creating_key_8a026e61: "Opprettar nøkkel"
+  creating_new_course_62cd27bb: "Opprettar nytt emne..."
+  creating_new_subject_35fe8d13: "Opprettar nytt emne..."
   creative_commons_714a065f: "Creative Commons"
   creative_commons_license_725584ae: "Creative Commons-lisens:"
   creative_commons_licenses_7d557d9a: "Creative Commons-lisensar"
@@ -7538,6 +7579,7 @@ nn:
   criterion_ratings_3eed22e2: Kriterievurderingar
   criterion_updated_36c0b3dc: "Kriterium er oppdatert"
   croatian_d713d655: Kroatisk
+  cross_listing_3318526a: Krysslisting
   crowdsourced: true
   crumbs: 
     access_report: Tilgangsrapport
@@ -18921,17 +18963,23 @@ nn:
   registration_url_60e0eaaa: Registrerings-URL
   regular_style_checkbox_ee3d71c1: "Vanleg avmerkingsboks"
   reinforce_student_understanding_304d18a6: "Styrk studentane sin forståing og læring"
+  relax_and_take_a_break_there_s_nothing_to_do_yet_fde1d2ef: "Slapp av og ta ei pause. Det er ingenting å gjere enno. "
   release_grades_c68fbcc: "Send ut vurderingsresultat"
+  release_notes_12ca833c: versjonsnotatar
+  release_notes_could_not_be_loaded_b4246d49: "Versjonsnotatar kunne ikkje lastas"
   released_by_mastery_path_cyoe_releasedlabel_14c67a92: "Kunngjort frå meistringssti: %{cyoe.releasedLabel}"
   released_by_mastery_path_path_b562d741: "Kunngjort frå meistringssti: %{path}"
   releasing_grades_31a57dde: "Send ut vurderingsresultat"
   reload_the_page_or_navigate_to_a_new_page_for_this_e6335972: "Last inn sida på ny"
+  remember_course_navigation_collapsed_state_60fe6c95: "Hugs emnenavigasjon i samenklappa tilstand"
   remember_my_choice_for_this_course_5a3b7206: "Hugs valet mitt for dette emnet"
+  remember_whether_module_links_load_in_new_tab_91fccb4f: "Hugs om modullenkar lastar i nytt vindu"
   reminder_ffd21289: Påminning
   remove_account_from_this_profile_c3095eb2: "Fjern konto frå denne profilen"
   remove_all_course_observer_members_4622c70d: "Fjern alle emneobservatørar"
   remove_all_group_observer_members_af5675f3: "Fjern alle gruppeobservatørmedlem"
   remove_as_front_page_2698aa12: "Fjern som startside"
+  remove_as_frontpagetext_133cdaee: "Fjern som %{frontPageText}"
   remove_association_1412eabf: "Fjern forbindelse"
   remove_attachment_ceae0973: "Fjern vedlegget"
   remove_attendee_name_55165070: "Fjern påmeld %{name}"
@@ -18939,53 +18987,76 @@ nn:
   remove_avatar_picture_aba765eb: "Fjern avatarbilde"
   remove_c_name_section_d8eabd3a: "Fjern klassa %{c.name}"
   remove_collaborationtitle_c3e81adb: "Fjern \"%{collaborationTitle}\"?"
+  remove_condition_9cf94f7f: "Fjern krav"
   remove_conference_title_207d32c0: "Fjern konferanse: %{title}"
   remove_contact_method_ca890ba3: "Fjern kontaktmåte"
   remove_course_association_name_b760c502: "Fjern emneforbindelse %{name}"
+  remove_d83a966c: "Fjern:"
   remove_dates_9b9ba2f6: "Fjern datoar"
   remove_designers_from_courses_42332a57: "Fjern designarar frå emner"
+  remove_displayname_a2f31aa3: "Fjern %{displayName}"
   remove_domain_as_an_allowed_domain_c510a69e: "Fjern %{domain} som eit tillate domene"
   remove_domain_from_the_whitelist_14c7d5e9: "Fjern %{domain} frå kvitelista"
   remove_due_dates_and_assignment_availability_dates_608cd97b: "Fjern innleveringsfristar og datoar oppgåva er tilgjengeleg"
+  remove_edf2b8a7: (Fjern)
   remove_email_address_b1820820: "Fjern e-postadresse"
+  remove_emoji_emojiname_cb388de9: "Fjern emoji \"%{emojiName}\""
   remove_empty_attachment_b2aea632: "fjern tomt vedlegg"
   remove_f47dc62a: Fjern
+  remove_file_cbf3f40f: "Fjern fil"
   remove_filename_87f3781e: "fjern %{filename}"
   remove_filename_dab5c02e: "Fjern %{filename}"
+  remove_filter_6f7204e2: "Fjern filter"
   remove_grading_scheme_title_d3942a08: "Fjern vurderingsskjema %{title}"
+  remove_group_5d2f2f2d: "Fjern gruppe"
+  remove_group_981d6a02: "Fjern gruppe?"
   remove_icon_a4646413: "fjern ikon"
   remove_image_341340b3: "Fjern bilde"
   remove_label_11d96b8f: "Fjern %{label}"
   remove_linked_student_name_52dc7fce: "Fjern tilknytta student %{name}"
   remove_mastery_level_b1e8dcb0: "Fjern ekspertisenivå"
+  remove_media_attachment_d2926f1e: "Fjern mediavedlegg"
   remove_name_624e06be: "Fjern %{name}"
   remove_name_as_an_admin_c296cf49: "Fjern %{name} som administrator"
   remove_null_values_from_live_event_payloads_3c826f: "Fjern null-verdiar frå live event payloads"
   remove_observers_from_courses_703edc34: "Fjern observatørar frå emna"
+  remove_outcomes_5f8b601c: 
+    one: "Fjern Læringsmål"
+    other: "Fjern Læringsmål"
+  remove_outcomes_9abcc8fd: 
+    one: "Fjern Læringsmål? "
+    other: "Fjern Læringsmål?"
   remove_placement_90862c13: "Fjern %{placement}"
   remove_points_from_rubric_dcd4b585: "Fjern poeng frå vurderingskategori"
   remove_recipient_name_a6b83cef: "Fjern mottakar %{name}"
+  remove_removablecount_out_of_totalcount_outcomes_3270d9c0: "Fjern %{removableCount} ut av %{totalCount}Læringsmål?"
   remove_role_filter_label_a27b6797: "Fjern rollefilter %{label}"
   remove_row_c198da5a: "Fjern rad"
   remove_row_in_edit_mode_49c4dc07: "Fjern rad i redigeringsmodus"
   remove_row_name_c053f5ae: "Fjern rad %{name}"
   remove_row_row_167c424a: "Fjern rad %{row}"
   remove_safari_mobile_banner_suggesting_user_downlo_b4251078: "Fjern Safari-mobilbanner som foreslår at brukar kan laste ned applikasjonen frå app store."
+  remove_selected_attachment_61f81ee4: "Fjern det valgte vedlegget"
   remove_student_from_recipients_4b206e35: "Fjern %{student} frå mottakarar"
   remove_studentname_16ba8c3a: "Fjern %{studentName}"
+  remove_students_from_courses_a8e024fd: "Fjern studentar frå emne"
   remove_submission_draft_f5c7f58b: "Fjern innleveringsutkast."
   remove_tas_from_courses_13ade851: "Fjern undervisingassistentar frå emne"
+  remove_teachers_from_courses_353d5217: "Fjern lærarar i emne"
   remove_text_8e485c41: "Fjern %{text}"
   remove_these_dates_48453a81: "Fjern desse datoane"
   remove_this_item_from_the_module_4b2ceab7: "Fjern elementet frå modulen"
   remove_this_rubric_from_my_list_c7d80704: "Fjern dette vurderingsskjemaet frå lista"
   remove_this_section_9a88ca43: "Fjern denne klassa"
   remove_user_from_section_5556f465: "Fjern brukaren frå klassa"
+  remove_webcam_image_count_efee4a11: "Fjern bilde frå webkamera %{count}"
   removed_assignment_assignment_name_835cc776: "Fjern oppgåve %{assignment_name}"
   removed_course_association_course_a233342c: "Fjerna emneforbindelse %{course}"
+  removed_filename_a8634af3: "fjerna %{filename}"
   removed_user_as_group_leader_bb69330f: "Fjern %{user} som gruppeleiar"
   rename_45608f54: "Gi nytt namn"
   rename_c_name_section_e0e92c97: "Gi nytt namn til klassa %{c.name}"
+  rename_filter_c6cc8efc: "Gje filter nytt navn"
   rename_or_reorder_a_page_via_the_settings_menu_nex_f4aff39f: "Gi nytt namn eller endre rekkefølgja til ei side via menyen ved sida av sidetittelen. Alternativt kan ein klikke på sidetittelen for å endre namnet eller dra og slippe sida der ein vil plassere ho. "
   rename_this_page_554f0583: "Endre sidenamnet"
   rename_this_section_73065edd: "Gi nytt namn til denne klassa"
@@ -19014,10 +19085,20 @@ nn:
   reply_to_conversation_text_cd45c48f: "Svar til samtale %{text}"
   reply_to_current_message_55391f5b: "Svar til denne meldinga"
   reply_to_main_discussion_29823888: "Svar til diskusjon"
+  reply_to_post_from_author_116cedd5: "Svar på innlegg frå %{author}"
   reply_to_this_message_in_canvas_2542e450: "svar på denne meldinga i Canvas."
   reply_to_this_message_in_canvas_7ec72dce: "svar på denne meldinga i Canvas."
   reply_to_title_f227303f: "Svar til %{title}"
   reply_to_topic_12412b0f: "Svar til emne"
+  replycount_replies_2775aca1: 
+    one: "%{replyCount}svar"
+    other: "%{replyCount} svar"
+  replycount_replies_unreadcount_c79e6060: 
+    one: "%{replyCount}svar (%{unreadCount})"
+    other: "%{replyCount}svar (%{unreadCount})"
+  replycount_replies_unreadcount_unread_a85c0bc8: 
+    one: "%{replyCount}svar, %{unreadCount}uleste"
+    other: "%{replyCount}svar, %{unreadCount}uleste"
   report_end_date_bce94160: "Sluttdato for rapport"
   report_has_been_aborted_2b5763ed: "Rapporten er avbroten"
   report_inappropriate_picture_af4eefeb: "Rapporter upassande bilde"
