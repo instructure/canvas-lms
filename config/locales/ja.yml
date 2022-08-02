@@ -240,6 +240,7 @@ ja:
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: 採点スキームのデータを含む表です。各行には、名前、最大のパーセンテージ、最低のパーセンテージが含まれています。さらに、下に行を追加するためのアイコンと現在の行を削除するボタンも含まれています。
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: 採点スキームデータを含む表。1つ目は、採点スキームの名前と、スキームを編集・削除するためのボタンです。各行には、名前、最大パーセンテージ、最小パーセンテージが含まれます。さらに、各行には、下に新しい行を追加するためのボタンと、現在の行を削除するためのボタンが含まれています。
   a_timeout_occurred_contacting_external_authenticat_c064ea48: 外部認証サービスへの問い合わせ中にタイムアウトが発生しました
+  a_yearly_rrule_must_include_byday_or_bymonthday_b56649f4: 年間RRULEには、BYDAYまたはBYMONTHDAYを含む必要があります。
   a_z_243c3301: A–Z
   a_z_29d8e67c: "A - Z"
   ability_to_submit_annotatable_document_assignments_5bc5edd3: 注釈可能なドキュメントの課題を送信する機能。
@@ -450,6 +451,7 @@ ja:
   account_id_2c3b4f15: "アカウント ID"
   account_id_73966078: account_id
   account_id_f6e26867: "アカウント ID"
+  account_level_course_pacing_blackout_dates_ce944dfb: アカウントレベルのコースペーシングのブラックアウト日
   account_level_mastery_scales_a5bdff29: アカウントレベルの習熟度スケール
   account_level_notification_preferences_require_an__66467cd7: "アカウントレベルの通知設定を更新するには account_id が必要です。"
   account_level_notification_preferences_ui_update_f5e189a4: アカウントレベルの通知設定UIの更新
@@ -2311,6 +2313,7 @@ ja:
   allow_course_content_to_be_downloaded_and_viewed_o_48a0d252: コースのコンテンツをオフラインでダウンロードおよび表示できるようにする
   allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: コース画像をコースに配置し、ダッシュカードに使うことを許可します。
   allow_course_images_to_be_assigned_to_a_course_and_adb906f4: コース画像をコースに配置し、ダッシュカードに使うことを許可する
+  allow_course_pacing_blackout_dates_to_be_set_for_a_d4d597d5: コースペーシングのブラックアウト日を、コースだけでなくアカウントに設定できるようにします。
   allow_creation_anywhere_the_user_has_active_enroll_13c84fc2: ユーザがアクティブな登録を行っている場所であればどこでも作成可能
   allow_creation_only_in_the_manually_created_course_69f37f2e: 「手動で作成したコース」サブアカウントでのみ作成可能
   allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "ダッシュボードカードをユーザーごとに並べ替えることができます。\n"
@@ -3110,6 +3113,7 @@ ja:
   an_error_occurred_while_loading_account_proficienc_d38554c8: アカウント熟練度評価を読み込み中にエラーが起こりました
   an_error_occurred_while_loading_associations_9699b3ee: 関連付けの読み込み中にエラーが発生しました
   an_error_occurred_while_loading_changes_9851b56f: 変更内容の読み込み中にエラーが発生しました
+  an_error_occurred_while_loading_course_alignment_s_c1b9c33a: コースアライメント統計の読み込み中にエラーが発生しました。
   an_error_occurred_while_loading_course_learning_ou_c4053b06: コースの学習アウトカムグループの読み込み中にエラーが発生しました。
   an_error_occurred_while_loading_course_outcomes_320ccc44: コース成果の読み込み中にエラーが発生しました
   an_error_occurred_while_loading_course_outcomes_er_accefe77: "コースアウトカムの読み込み中にエラーが発生しました%{error}"
@@ -3475,6 +3479,7 @@ ja:
     title: "%{name} の編集"
     update: 更新
   april_2020_responsiveness_54028e36: "2020 年 4 月のレスポンス性"
+  april_6b34e186: ４月
   arabic_c5c87acd: アラビア語
   arc_a935e585: ARC
   arc_media_recorder_in_rce_cf900c6: "RCEの Arc ディアレコーダー"
@@ -3690,11 +3695,14 @@ ja:
     grading_statistics_for_assignment: "評定統計対象: %{assignment.name}"
     high_score: "高スコア:"
     low_score: "低スコア:"
+    lower_quartile: 下位四分位値：
+    median: スコアの中央値：
     no_one_scored_higher: "%{max} を上回るスコアの受講者はいませんでした"
     no_one_scored_lower: "%{min} を下回るスコアの受講者はいませんでした"
     scores_higher_than_the_average: "平均点 %{average} を上回るスコア"
     scores_lower_than_the_average: "平均点 %{average} を下回るスコア"
     total_graded_submissions: "採点済みの提出物合計:"
+    upper_quartile: 上位四分位値：
   assignment_details_expanded_20c6f0c7: 課題詳細が拡張されました
   assignment_details_updated_493f410b: 課題詳細更新しました
   assignment_does_not_accept_this_submission_type_38a55c27: 課題はこの送信タイプを受け入れません
@@ -3771,7 +3779,9 @@ ja:
   assignment_has_been_graded_for_name_4384f9b: "%{assignment}は %{name}と採点されました。"
   assignment_id_96baa1b7: "課題 ID"
   assignment_id_b040cee0: "課題 ID"
+  assignment_is_incomplete_ff55e07c: "%{assignment}は未完了"
   assignment_is_reassigned_dd6b6ef2: 課題が再割り当てされます。
+  assignment_is_reassigned_ebb31807: "%{assignment}は再割り当て"
   assignment_locked_a6233228: 課題ロック
   assignment_locked_until_future_date_80cd0df2: 課題は将来の日付までロックされます
   assignment_locked_with_prerequisite_5b8cb148: 前提条件でロックされた課題
@@ -4601,6 +4611,7 @@ ja:
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: オーディオコンテンツは、デバイス、またはアプリでサポートされていません。
   audio_dd489fcc: オーディオ
   audio_player_for_label_dd9a6819: "%{label}のオーディオプレーヤー"
+  august_781433e8: ８月
   australia_61_eb9bb701: "オーストラリア (+61)"
   australia_e8d44bf8: オーストラリア
   austria_43_7bc58b34: "オーストリア (+43)"
@@ -7622,7 +7633,9 @@ ja:
     other: "%{count} 分"
     zero: "1 分未満"
   count_more_beba6428: "%{count} より多く"
+  count_must_be_0_4abb84b3: "カウント数は　> 0でなければなりません"
   count_must_be_greater_than_0_f8f88358: "COUNT（数）は 0 より大きくなければなりません"
+  count_must_be_limit_8536ff23: "カウント数は　<=%{limit}でなければなりません"
   count_must_be_limit_or_less_ac5c64b3: "COUNT（数）は %{limit} 以下でなければなりません"
   count_of_max_maximum_characters_fcb6ddf8: "%{count} %{max}最大文字数より"
   count_of_submissions_for_day_83a88e68: 一日の投稿数
@@ -9300,6 +9313,7 @@ ja:
   debugging_f98fcd74: デバッグ
   decaying_average_8bf6a0dd: 低下平均
   decaying_average_recentint_remainderint_ab0636cc: "減衰する平均値 - %{recentInt}%/%{remainderInt}%"
+  december_acc47508: 12月
   decorative_image_3c28aa7d: 装飾的なイメージ
   decrease_indent_d9cf469d: インデントを減らす
   decrease_indent_de6343ab: インデントを戻す
@@ -9441,6 +9455,7 @@ ja:
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: ユーザーを削除すると、ePortfolioがすべて破棄されます。代わりに、ePortfolioを「スパム」または「安全」として個別にマークして、可視性を変更することができます。
   deleting_assignment_22d5851d: 課題を削除中
   deleting_b896f5f: 削除中
+  deleting_f2ff0d09: 削除
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "デモ サイトでは Recaptcha 設定を行う必要があります。この Canvas インスタンスのサイト管理者に連絡してください。"
   demos: 
@@ -10643,6 +10658,7 @@ ja:
   enables_the_microsoft_immersive_reader_button_in_s_ab4af0cd: "Canvas のサポートされているエリアで Microsoft Immersive Reader ボタンを有効にします。アカウント管理者がすべてのユーザに対してオンにしている場合、この設定に関わらず、ボタンはコース内で有効になることがあります。"
   enables_ui_features_for_managing_extended_submissi_841f45bc: "「拡張」された[提出]を管理するためのUI機能を有効にします。"
   enabling_the_elementary_theme_will_change_the_font_c944b619: 初級用のテーマを有効にすると、キャンバスインターフェイスのフォントが変更され、コースのすべてのユーザーのコースナビゲーションメニューが簡素化されます。
+  enabling_this_option_automatically_moves_course_pa_6ded6d4d: このオプションを有効にすると、コースペーシング課題の期限は自動的に終了日以降に移動します。
   encourage_class_participation_4e069479: クラスへの参加を促す
   encourage_student_discourse_7836b9f7: 受講者同士の会話を促す
   encrypted_sourcedids_for_basic_outcomes_87fa11ea: "基本的なアウトカム用の暗号化された Sourcedids"
@@ -11253,6 +11269,72 @@ ja:
   event_update_failed_b6116651: イベント更新に失敗しました
   everthing_updated_after_start_date_f3be8ba: 開始日以降のすべての更新
   every_665d821e: それぞれの
+  every_count_days_times_times_6271ab22: 
+    one: "%{count}日ごとに、%{times}回"
+    other: "%{count}日ごとに、%{times}回"
+  every_count_days_until_until_4f2203f1: 
+    one: "%{until}まで%{count}日ごとに"
+    other: "%{until}まで%{count}日ごとに"
+  every_count_months_on_day_days_times_times_7fd6d4d7: 
+    one: "%{days}日に、%{count}ヶ月ごとに、%{times}回"
+    other: "%{days}日に、%{count}ヶ月ごとに、%{times}回"
+  every_count_months_on_day_days_until_until_495496b7: 
+    one: "%{days}日に、%{count}ヶ月ごとに、%{until}まで"
+    other: "%{days}日に、%{count}ヶ月ごとに、%{until}まで"
+  every_count_months_on_days_days_times_times_ae0816fb: 
+    one: "%{days}日に、%{count}ヶ月ごとに、%{times}回"
+    other: "%{days}日に、%{count}ヶ月ごとに、%{times}回"
+  every_count_months_on_days_days_until_until_ae3d3266: 
+    one: "%{days}日に、%{count}ヶ月ごとに、%{until}まで"
+    other: "%{days}日に、%{count}ヶ月ごとに、%{until}まで"
+  every_count_months_on_days_times_times_2a485144: 
+    one: "%{days}に、%{count}ヶ月ごとに、%{times}回"
+    other: "%{days}に、%{count}ヶ月ごとに、%{times}回"
+  every_count_months_on_days_until_until_ea135626: 
+    one: "%{days}に、%{count}ヶ月ごとに、%{until}まで"
+    other: "%{days}に、%{count}ヶ月ごとに、%{until}まで"
+  every_count_months_on_the_ord_days_times_times_ea3776de: 
+    one: "%{count}ヶ月ごとに、%{ord} %{days}日に、%{times}回"
+    other: "%{count}ヶ月ごとに、%{ord} %{days}日に、%{times}回"
+  every_count_months_on_the_ord_days_until_until_5e064333: 
+    one: "%{count}ヶ月ごとに、%{ord} %{days}日に、%{until}まで"
+    other: "%{count}ヶ月ごとに、%{ord} %{days}日に、%{until}まで"
+  every_count_months_times_times_742e638d: 
+    one: "%{count}ヶ月ごとに、%{times}回"
+    other: "%{count}ヶ月ごとに、%{times}回"
+  every_count_months_until_until_64ddc059: 
+    one: "%{count}ヶ月ごとに、%{until}まで"
+    other: "%{count}ヶ月ごとに、%{until}まで"
+  every_count_weeks_on_byday_times_times_26a6862b: 
+    one: "%{count}週ごとに、%{byday}に、%{times}回"
+    other: "%{count}週ごとに、%{byday}に、%{times}回"
+  every_count_weeks_on_byday_until_until_b2df01ed: 
+    one: "%{count}週ごとに、%{byday}に、%{until}まで"
+    other: "%{count}週ごとに、%{byday}に、%{until}まで"
+  every_count_weeks_times_times_cf37a00b: 
+    one: "%{count}週ごとに、%{times}回"
+    other: "%{count}週ごとに、%{times}回"
+  every_count_weeks_until_until_a1b0876e: 
+    one: "%{count}週ごとに、%{until}まで"
+    other: "%{count}週ごとに、%{until}まで"
+  every_count_years_on_date_times_times_c4894eac: 
+    one: "%{count}年ごとに、%{date}に、%{times}回"
+    other: "%{count}年ごとに、%{date}に、%{times}回"
+  every_count_years_on_date_until_until_a351d21d: 
+    one: "%{count}年ごとに、%{date}に、%{until}まで"
+    other: "%{count}年ごとに、%{date}に、%{until}まで"
+  every_count_years_on_the_first_days_of_month_times_34a59e5b: 
+    one: "%{count}年ごとに、%{month}の最初の%{days}に、%{times}回"
+    other: "%{count}年ごとに、%{month}の最初の%{days}に、%{times}回"
+  every_count_years_on_the_first_days_of_month_until_e4c5b53a: 
+    one: "%{count}年ごとに、%{month}の最初の%{days}に、%{until}まで"
+    other: "%{count}年ごとに、%{month}の最初の%{days}に、%{until}まで"
+  every_count_years_on_the_ord_days_of_month_times_t_59e822d0: 
+    one: "%{count}年ごとに、%{month}の%{ord}%{days}に、%{times}回"
+    other: "%{count}年ごとに、%{month}の%{ord}%{days}に、%{times}回"
+  every_count_years_on_the_ord_days_of_month_until_u_3eb2883d: 
+    one: "%{count}年ごとに、%{month}の%{ord}%{days}に、%{until}まで"
+    other: "%{count}年ごとに、%{month}の%{ord}%{days}に、%{until}まで"
   every_new_announcement_shows_up_in_this_area_creat_934a7a0c: すべての新しいお知らせがこのエリアに表示されます。今すぐ最初のものを作成してください。
   everyone_854554dd: 全員
   everyone_due_dueatdisplaydate_5c920f8b: "全員：%{dueAtDisplayDate}期限"
@@ -11322,6 +11404,7 @@ ja:
   export_to_quizzes_2_format_45b3ec25: クイズ2形式にエクスポートする
   exported_package_history_bfca44b9: パッケージ履歴をエクスポート
   exporting_b1eab154: エクスポート中
+  extend_assignment_due_dates_in_course_pacing_5ab23f52: コースペーシング内で課題の期日を延長する
   extend_due_date_20651e76: 締切日を延長する
   extended_632ebee0: 拡張
   extended_9a58dcb6: 拡張された
@@ -11678,6 +11761,7 @@ ja:
   features_2581da: 機能
   features_in_active_development_opting_in_includes__210f7720: "アクティブな開発中の機能 - この機能を選択すると、通常のリリーススケジュール以外の継続的なアップデートが含まれます。"
   features_no_longer_in_active_development_that_incl_74c3a739: アクティブな開発が終了している機能で、デフォルトでオンになる予定の日付が含まれているもの
+  february_f2c77675: 2月
   federated_attributes_5cbe6441: 連合した属性
   federated_attributes_are_information_sent_from_you_2116fb61: "連合された属性とはあなたの認証プロバイダから送信された情報で、ユーザーが Canvas にログインする度に該当する情報を自動的に更新するために使われます。"
   feed_url_8a433438: フィードURL
@@ -11998,6 +12082,7 @@ ja:
   french_33881544: フランス語
   french_canada_c3d92fa6: フランス語（カナダ）
   frequently_used_21a3eb8e: よく使われるもの
+  fri_e2451e74: 金曜
   friendly_description_57f7fdde: わかりやすい説明
   friendly_description_for_parent_student_display_e608ecf3: わかりやすい説明（親/生徒に表示用）
   friendly_name_601153fb: なじみやすい名前
@@ -12588,8 +12673,11 @@ ja:
       labels: 
         final_grade_hidden: 合計の計算が無効になっています
         high: 高
+        high_q: 上位四分位値
         low: 低
+        low_q: 下位四分位値
         mean: 平均
+        median: メジアン
         only_graded: 採点済みの課題のみに基づいて計算する
         total: 合計
         your_score: ご自分のスコア
@@ -14214,6 +14302,7 @@ ja:
   if_you_ve_been_using_another_course_management_sys_67edfab1: "別のコース管理システムをご利用になっていた場合は、そのシステム上のコンテンツを Canvas に移動したいとお考えでしょう。そのようなご希望をお持ちの方のために、コンテンツを簡単に Canvas に移行するためのプロセスを、順を追ってご説明します。"
   if_you_wish_you_can_rename_sis_to_something_more_f_ac9ef13b: ご希望の場合には、「SIS」の名前をスタッフにもっと馴染み深いものに変更することができます
   if_you_would_like_to_keep_your_unsubmitted_comment_b7e349ce: 未送信のコメントを保存したい場合、このページを出る前にそれらを保存して下さい。
+  if_you_would_like_to_keep_your_unsubmitted_rubric__1725d80d: 未提出のルーブリックを保存したい場合、このページから移動する前に保存してください。
   if_you_would_like_to_link_to_your_own_campus_suppo_85a94934: ヘルプダイアログの自分のCampusサポートウェブサイトにリンクしたい場合は、ここで設定できます。
   if_your_institution_is_likely_to_need_more_than_10_297382d: |-
       お客様の学校で BigBlueButton 駆動の Conferences を同時に 10 会議以上実行する必要が生じる可能性が
@@ -14600,9 +14689,13 @@ ja:
   international_sms_send_from_recipient_s_country_43881ea4: "インターナショナルSMS - 受信者の国から送信されます"
   international_text_messaging_rates_may_apply_d4b4a97a: インターナショナル・テキストメッセージ料金が適用される場合があります。
   internet2_254c6ca6: Internet2
+  interval_must_be_0_e7b8eb5: "インターバルは > 0 でなければなりません"
   invalid_address_book_strategy_904a7ada: 無効なアドレス帳の手順です。
   invalid_authenticity_token_b753558c: 無効な認証トークン
   invalid_aws_configuration_e8a6ae0f: "無効な AWS 設定"
+  invalid_byday_byday_6e361e78: "無効な日ごと '%{byday}'"
+  invalid_bymonth_bymonth_91f621b3: "無効な月ごと '%{bymonth}'"
+  invalid_bymonthday_bymonthday_87791c1b: "無効な月日ごと '%{bymonthday}'"
   invalid_content_type_utf_8_required_bd458b78: "無効なコンテンツ タイプです。UTF-8 である必要があります"
   invalid_context_for_group_f6cd268a: グループのコンテキストが無効
   invalid_context_type_68f40a61: 文脈種類が無効
@@ -14628,6 +14721,7 @@ ja:
   invalid_fields_for_a_group_invalid_f440b733: "グループに無効なフィールド：%{invalid}"
   invalid_fields_for_an_outcome_invalid_fafdf0df: "アウトカムに無効なフィールド：%{invalid}"
   invalid_file_type_881cc9b2: "無効なファイル タイプです"
+  invalid_freq_freq_84b0427d: "無効な頻度 '%{freq}'"
   invalid_grade_9726cbc6: 無効な評定
   invalid_grade_passback_setting_a1d209d1: "無効な grade_passback_setting"
   invalid_hexcode_9124519f: 無効な16進コード
@@ -14662,6 +14756,7 @@ ja:
   invalid_targetcontexttype_53b96e87: "無効な targetContextType"
   invalid_timestamp_timestamp_in_future_5bc855d7: "無効なタイムスタンプ - 未来のタイムスタンプ"
   invalid_timestamp_timestamp_not_parseable_dae79e92: "無効なタイムスタンプ - タイムスタンプを解析できません"
+  invalid_until_until_date_55f29c82: "無効な最終日 '%{until_date}'"
   invalid_url_in_xml: "xml 内の url が無効です。アンパサンドはエスケープする必要があります。"
   invalid_username_or_password_b60aa240: 無効なユーザ名またはパスワード
   invalid_username_or_password_trouble_logging_in_ch_7699399c: 無効なユーザー名またはパスワード。ログインできませんか？*ログインに関する「よくある質問」をご覧ください。*.
@@ -14724,6 +14819,7 @@ ja:
   items_items_selected_5b55e566: "%{items} アイテムが選択されました"
   items_selected_have_different_usage_rights_52b325cc: 選択されたアイテムは使用権が異なります。
   j_5226008a: j
+  january_9ca1eab1: 1月
   japan_81_d1832e9d: "日本 (+81)"
   japan_d112df27: 日本
   japanese_b5721ca7: 日本語
@@ -14827,6 +14923,8 @@ ja:
       play_comment: "メディア コメントの再生"
   json_is_not_valid_please_submit_properly_formatted_e3b2f88f: "Json が有効ではありません。適切にフォーマットされた json を提出してください。"
   json_url_adbee260: "JSON URL"
+  july_83babbee: ７月
+  june_a58d8523: ６月
   just_a_casual_question_comment_idea_or_suggestion_1579d069: 質問、コメント、アイデア、または提案など気軽にお寄せください。
   just_in_time_provisioning_382a0354: 時間通りのプロビジョニング
   jwk_method_6d5d0c84: "* JWK 方法"
@@ -14998,6 +15096,7 @@ ja:
   learning_mastery_5fc34276: 学習の達成度
   learning_mastery_6ed4fd63: 学習達成度表...
   learning_mastery_context_name_a0b70957: "学習の達成度 - %{context_name}"
+  learning_mastery_grade_book_59c90e6a: 学習達成度グレードブック
   learning_mastery_gradebook_description: |-
       学習達成度評定表を使用すると、教員はコースの学習アウトカムについて受講者とコースの
       進行状況を迅速に確認できるようになります。評定は評定表のような
@@ -15662,6 +15761,7 @@ ja:
   manually_post_grades_18248306: 手動で評定を投稿する
   maori_new_zealand_5380a95f: "マオリ語 (ニュージーランド)"
   march_2020_responsiveness_f810a65b: "2020 年 3 月のレスポンス性"
+  march_bbe310ee: ３月
   mark_all_as_read_8f3bdf57: すべて既読にする
   mark_all_as_read_a995ffbe: すべてを既読としてマークする
   mark_all_as_unread_10e7f0fe: すべてを未読としてマークする
@@ -15743,6 +15843,7 @@ ja:
   max_wait_time_dc158bf1: 最大待ち時間
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: 参加者が出席できる予定の最大数
   maximum_number_of_communication_channels_reached_70c4d2f9: 通信チャンネルの最大数に達しました
+  may_9248a063: ５月
   may_have_one_featured_link_and_one_new_link_at_a_t_21106efe: (ひとつの注目リンクとひとつの新規リンクを同時に使用できます)
   media_af190855: メディア
   media_comment_content_5c2341fb: メディアコメントの内容
@@ -15830,6 +15931,7 @@ ja:
   media_recordings_749aef6d: メディアの記録
   media_submission_464829f0: メディアの提出
   median_ed291842: メジアン
+  median_median_high_high_low_low_f356c5f1: "中央値 %{median}、高値 %{high}、低い値 %{low}"
   median_score_4657e907: "中点:%{score}"
   medium_dark_skin_tone_5134edbc: やや暗い肌の色
   medium_light_skin_tone_6c4a27fb: やや薄い肌の色
@@ -17830,8 +17932,10 @@ ja:
   minutes_4aee5a41: 分
   minutes_per_slot_5b7169e5: スロットあたりの分
   missing_1a256b3b: 欠落
+  missing_count_or_until_62ad480c: カウント数または期限の欠落
   missing_d59852a7: 欠如
   missing_eaddacbd: 欠如
+  missing_interval_70679242: インターバルの欠落
   missing_missing_c1010432: "%{missing}欠如"
   missing_percent_94534638: "欠如：%{percent}"
   missing_policies_4f195e0b: 不在のポリシー
@@ -18081,6 +18185,7 @@ ja:
   modules_settings_a7066f13: モジュール設定
   modules_tutorial_tray_d58ac3cb: モジュールブック.チュートリアルトレイ
   moduletitle_unpublished_8a70e0cd: "%{moduleTitle}（未公開）"
+  mon_8f18082a: 月曜
   month_s_5c17590e: 月
   monthandday_starting_at_time_769b12c8: "%{monthAndDay}開始地点%{time}"
   moodle_dropdown_many_warning_title: "このバンクの %{count} 件の複数ドロップダウン問題が、正しくインポートされていない可能性があります"
@@ -18526,6 +18631,7 @@ ja:
   no_date_set_25edf0c1: 日付が設定されていません
   no_description_c2554c25: 説明なし
   no_details_1ee29870: 詳細情報なし
+  no_details_d15fa1ec: 詳細なし
   no_directory_is_selected_please_select_a_directory_46ded46: "ディレクトリが選択されていません。[移動] をクリックする前に、ディレクトリを選択してください"
   no_domains_whitelisted_9dfb4960: ホワイトリストに登録されているドメインはありません
   no_due_date_1d63d13b: 期日なし
@@ -18992,6 +19098,7 @@ ja:
   notify_immediately_d1749c07: すぐに通知する
   notify_students_in_time_of_assignments_that_requir_332ef10e: 注意が必要な課題に間に合うよう、受講者に通知します。
   notify_users_this_quiz_has_changed_c5b05995: この問題が変更されたことをユーザに通知します
+  november_ca6fa5a6: 11月
   now_click_the_agenda_button_607fb40e: "*アジェンダ* ボタンをクリックします"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: コースが設定され、利用可能になりました。このチェックリストはもう必要ないかもしれませんが、後で新しいことをする場合や、コースのコンテンツを変更する際に参考情報として役に立つ可能性があるので、保存しておきます。
   now_viewing_attempt_current_attempt_918e616: "現在、試行%{current_attempt}を表示中"
@@ -19138,6 +19245,7 @@ ja:
   observing_observee_d31d5fa2: "観察中：%{observee}"
   observing_student_name_to_select_a_different_stude_e0466126: "%{student_name}を観察中。別の受講者を選択するには、ダッシュボードに戻ります。"
   occurrence_s_c12d1aad: 発生
+  october_6b2bf82: 10月
   of_students_5d1af0d2: 受講者数
   of_times_1018baab: "#回"
   off_5385ef3f: オフ
@@ -19730,6 +19838,7 @@ ja:
   people_course_ddd9a66: 人物（コース）
   people_groups_tab_b245a614: 人物（グループのタブ）
   people_options_cfb419a6: 人々のオプション
+  people_page_upgrade_4adc3c37: 人々のページの更新
   people_tutorial_tray_a87a6c48: ピープルのチュートリアルトレイ
   people_will_see_this_name_in_discussions_messages__fca9ebb2: ディスカッション、メッセージ、コメントで、他のユーザにはこの名前が表示されます。
   per_section_course_paces_4ce20ab7: セクションごとのコースペース
@@ -19822,6 +19931,7 @@ ja:
   please_allow_arc_to_access_your_webcam_e72e4be4: "Arc にあなたのウェブカムを許可してください。"
   please_allow_canvas_to_access_your_microphone_and__dc2c3079: "Canvas があなたのマイクとウェブカメラにアクセスできるようにしてください。"
   please_allow_canvas_to_access_your_webcam_f66bacb1: "Canvas があなたのウェブカメラにアクセスできるようにしてください。"
+  please_check_back_soon_37d45200: 後でもう一度ご確認ください。
   please_contact_your_lms_administrator_for_more_det_635afd97: 詳細は、LMS管理者にお問い合わせください。
   please_create_a_group_set_8db6e8fe: グループセットを作成してください
   please_do_not_reply_to_this_email_it_will_not_be_d_1e49982a: このメールに返信しないでください。配信されません。
@@ -23363,6 +23473,7 @@ ja:
   salesforce_ticketing_webtocase_connector_80f75716: "セールスフォース・チケット WebToCase コネクタ"
   same_value_as_canvas_url__c_will_probably_be_going_37027686: "'Canvas_URL__c'と同じ値は、おそらくすぐに消失するでしょう。"
   sample_data_e4fd01ff: サンプルデータ
+  sat_fa4152a4: 土曜
   saudi_arabia_1f0dcbdc: サウジアラビア
   saudi_arabia_966_d01ed717: "サウジアラビア (+966)"
   save_11a80ec3: 保存
@@ -23978,6 +24089,7 @@ ja:
   sent_fe0a1eb4: 送信済み
   separate_columns_for_first_last_names_in_gradebook_419126c3: 卒業アルバムで氏名を別の列に表示する
   separate_out_granular_add_and_delete_permissions_f_c63d37b6: 課題と小テストの詳細な追加と削除の権限を、3つすべてを管理する既存の管理権限から分離しました。
+  september_9d32dd4b: 9月
   sequence_footer: 
     next_module: "次のモジュール:"
     next_module_desc: "次のモジュール: *module*"
@@ -24465,6 +24577,7 @@ ja:
       add_link_field: 別のリンクを追加する
       bio: 経歴
       cancel: キャンセル
+      is_required: このフィールドは必須項目です
       know_this_person_as: このユーザの役割...
       links: リンク
       links_title: タイトル
@@ -24922,6 +25035,7 @@ ja:
       過去のアカウントレベルのお知らせをユーザーに表示します。
       ユーザーに、終了した、または却下されたアナウンスを表示できるようにします。
   show_projections_32a3756: プロジェクションの表示
+  show_quartiles_for_grades_and_use_them_for_box_and_e9be0a23: 成績の四分位を表示し、箱ひげ図に利用する
   show_question_details_b059df00: 問題の詳細情報の表示
   show_recent_activity_stream_2be4abc1: 最近のアクティビティストリームを表示
   show_report_to_students_a07888a6: 受講者にレポートを表示する
@@ -25852,6 +25966,7 @@ ja:
   suggestions_b8b03b9d: "提案:"
   sum_of_all_files_in_mb_2b705055: MBのすべてのファイルの合計
   summary_statistics_f74852a5: 統計概要
+  sun_298d7c8b: 日曜
   support: 
     array: 
       last_word_connector: 、および
@@ -26495,6 +26610,7 @@ ja:
   there_are_no_pending_changes_to_cancel_244389fe: キャンセルを保留中の変更はありません
   there_are_no_pending_changes_to_publish_b4ffc6a7: 公開を保留中の変更はありません
   there_are_no_reports_for_you_to_view_b716717a: 表示されるレポートはありません。
+  there_are_no_submissions_available_to_review_just__2149475c: レビュー可能な提出物はまだありません。
   there_are_no_unsaved_changes_9276e87c: 未保存の変更はありません。
   there_are_no_unsynced_changes_4e8f0838: 同期されていない変更はありません
   there_are_no_unsynched_changes_d208547c: 同期されていない変更はありません
@@ -26741,6 +26857,7 @@ ja:
   this_feature_flag_enables_isolated_view_inside_the_3db3f6f2: |-
       この機能フラグは新しい
       ディスカッションの中の孤立したビューを有効にします。
+  this_feature_flag_enables_the_react_instui_and_gra_ec5ad0da: "この機能フラグは、React/InstUIとGraphQL Peopleのページのアップグレードを可能にします。"
   this_feature_flag_enables_the_use_of_the_updated_d_b78aa2b8: |-
       この機能フラグは、更新された
       ディスカッション作成/編集ページが使用できるようにします。
@@ -26988,6 +27105,7 @@ ja:
   this_will_update_all_student_mastery_results_withi_934580d1: これにより、このコース内のすべての受講者の達成度の成果が更新されます。
   threshold_in_hours_to_notify_students_within_f33820aa: 受講生に通知するしきい値（時間単位）
   threshold_pts_45f0e5d8: "域値：%{pts}"
+  thu_59cbcffe: 木曜
   ticket_successfully_submitted_f6254460: チケットの提出が完了しました。
   ticketing_system_52205bff: チケットシステム
   ticketing_system_configurations_c4fecd96: チケットシステムの構成
@@ -27951,6 +28069,7 @@ ja:
   try_disabling_the_unread_filter_b8d9d77: "「未読」 フィルタを無効にしてみてください。"
   try_entering_your_institution_s_complete_name_2013abab: 教育機関の完全な名前を入力してみてください。
   try_out_canvas_for_free_e2265d30: "Canvas を無料でお試しください！"
+  tue_bb10b386: 火曜
   turkish_5b69578b: トルコ語
   turn_on_rtl_even_for_non_rtl_languages_8a1a8bc2: "RTL 以外の言語でも RTL を有効にする"
   turned_in_submission_date_e9180b8b: "提出：%{submission_date}"
@@ -28233,6 +28352,7 @@ ja:
   unsubscribe_from_title_c98461b3: "%{title} の定期購読をキャンセルする"
   unsubscribed_c93564a2: 登録解除済み
   unsubscribed_failed_2a176d2: 定期購読のキャンセルに失敗しました
+  unsupported_bymonthday_only_a_single_day_is_permit_76e60fc9: "サポートされていない 「月日ごと」、単一の日だけが許可されています。"
   unsupported_package: "サポートされていないコンテンツ パッケージ"
   unsyncable_4bf11ee6: 同期できない
   unsyncable_message_95faa75d: "同期できない：%{message}"
@@ -28294,6 +28414,7 @@ ja:
       アカウント通知設定UIを最新
       かつアップデートされたユーザーエクスペリエンスに更新します
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "[新しい成績表の割り当て]列ヘッダーの投稿ポリシーアイコンの表示を更新します。"
+  updates_the_student_facing_assignment_statistics_t_e1c9aecb: 受講者向けの課題統計に四分位を含むように更新し、箱ひげ図プロットを適切な箱ひげ図プロットにしました。
   updates_to_json_api_auth_error_http_code_and_json__5936d452: "JSON API認証エラーのHTTPコードとJSONステータスフィールドの更新"
   updates_to_oauth_2_0_flow_to_stop_redirecting_in_t_51c14b07: "OAuth 2.0フローのアップデートにより、「トークン」認証でのリダイレクトを停止しました。"
   updating_6edbab78: 更新しています
@@ -29075,6 +29196,7 @@ ja:
   visit_google_meet_ebdaf94f: "Google Meet にアクセスして、"
   visit_group_group_name_7a816081: "グループ %{group_name} にアクセス"
   visit_zoom_14636084: "Zoom にアクセスして、"
+  wait_for_delete_to_complete_2f6167c6: 削除が完了するまでお待ちください。
   wait_time_4c8f74a2: 待機時間
   waiting_for_attempted_login_6d00cb49: ログイン中です
   waiting_for_change_to_complete_b75b5e8b: 変更が完了するのを待機中
@@ -29161,6 +29283,7 @@ ja:
   website_url_b995c5b6: ウェブサイトURL
   website_url_input_1a3eab25: WebサイトのURL入力
   website_url_url_bd07233d: "ウェブサイトのURL%{url}"
+  wed_84932f18: 水曜
   week_s_cb1492ee: 週
   weekly_summary_56cd0c95: 毎週のサマリー
   weight_9b308e5b: 重み
