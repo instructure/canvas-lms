@@ -25,6 +25,7 @@ import LoadingIndicator from '@canvas/loading-indicator'
 import {readableRoleName} from '@canvas/k5/react/utils'
 import AvatarLink from '../../components/AvatarLink/AvatarLink'
 import NameLink from '../../components/NameLink/NameLink'
+import RosterTableRowMenuButton from '../../components/RosterTableRowMenuButton/RosterTableRowMenuButton'
 
 const I18n = useI18nScope('course_people')
 
@@ -86,7 +87,9 @@ const RosterTable = () => {
         <Table.Cell>{enrollmentRoles}</Table.Cell>
         <Table.Cell>{lastActivityAt}</Table.Cell>
         <Table.Cell>{totalActivityTime}</Table.Cell>
-        <Table.Cell>{/* Menu IconButton */}</Table.Cell>
+        <Table.Cell>
+          <RosterTableRowMenuButton name={name} />
+        </Table.Cell>
       </Table.Row>
     )
   })
