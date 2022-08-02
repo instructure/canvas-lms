@@ -23,6 +23,7 @@ import {Table} from '@instructure/ui-table'
 import {ROSTER_QUERY} from '../../../graphql/Queries'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {readableRoleName} from '@canvas/k5/react/utils'
+import AvatarLink from '../../components/AvatarLink/AvatarLink'
 
 const I18n = useI18nScope('course_people')
 
@@ -44,8 +45,8 @@ const RosterTable = () => {
   if (loading) return <LoadingIndicator />
 
   const tableRows = data.course.usersConnection.edges.map(edge => {
-    const {name, _id, sisId, enrollments, loginId} = edge.node
-    const {totalActivityTime} = enrollments[0]
+    const {name, _id, sisId, enrollments, loginId, avatarUrl} = edge.node
+    const {totalActivityTime, htmlUrl} = enrollments[0]
 
     const sectionNames = enrollments.map(enrollment => {
       if (enrollment.type === OBSERVER_ENROLLMENT) return null
@@ -70,7 +71,9 @@ const RosterTable = () => {
 
     return (
       <Table.Row key={_id} data-testid="roster-table-data-row">
-        <Table.Cell>{/* Avatar Component */}</Table.Cell>
+        <Table.Cell>
+          <AvatarLink avatarUrl={avatarUrl} name={name} href={htmlUrl} />
+        </Table.Cell>
         <Table.Cell>{name}</Table.Cell>
         <Table.Cell>{loginId}</Table.Cell>
         <Table.Cell>{sisId}</Table.Cell>
