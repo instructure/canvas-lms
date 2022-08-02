@@ -11,44 +11,43 @@ container.className = "tinymce-a11y-checker-container"
 document.body.appendChild(container)
 
 tinymce.create("tinymce.plugins.AccessibilityChecker", {
-  init: function(ed) {
-    ed.addCommand("openAccessibilityChecker", (...args) => {
+  init: function (ed) {
+    ed.addCommand("openAccessibilityChecker", function (
+      ui,
+      { done, config, additionalRules }
+    ) {
       ReactDOM.render(
-        <Checker getBody={ed.getBody.bind(ed)} editor={ed} />,
+        <Checker
+          getBody={ed.getBody.bind(ed)}
+          editor={ed}
+          additionalRules={additionalRules}
+        />,
         container,
-        function() {
+        function () {
           // this is a workaround for react 16 since ReactDOM.render is not
           // guaranteed to return the instance synchronously (especially if called
           // within another component's lifecycle method eg: componentDidMount). see:
           // https://github.com/facebook/react/issues/10309#issuecomment-318434635
           instance = this
+          if (config) getInstance(instance => instance.setConfig(config))
           pendingInstanceCallbacks.forEach(cb => cb(instance))
-          instance.check(...args)
+          instance.check(done)
         }
       )
     })
 
-    ed.addCommand("checkAccessibility", function(
+    ed.addCommand("checkAccessibility", function (
       ui,
-      { done, config, additional_rules }
+      { done, config, additionalRules }
     ) {
-      checkNode(ed.getBody(), done, config, additional_rules)
+      checkNode(ed.getBody(), done, config, additionalRules)
     })
 
-    if (tinymce.majorVersion === "4") {
-      // remove this branch when everything is on tinymce 5
-      ed.addButton("check_a11y", {
-        title: formatMessage("Check Accessibility"),
-        cmd: "openAccessibilityChecker",
-        icon: "a11y"
-      })
-    } else {
-      ed.ui.registry.addButton("check_a11y", {
-        title: formatMessage("Check Accessibility"),
-        onAction: _ => ed.execCommand("openAccessibilityChecker"),
-        icon: "a11y"
-      })
-    }
+    ed.ui.registry.addButton("check_a11y", {
+      title: formatMessage("Check Accessibility"),
+      onAction: _ => ed.execCommand("openAccessibilityChecker"),
+      icon: "a11y"
+    })
   }
 })
 
