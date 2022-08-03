@@ -2507,6 +2507,9 @@ class UsersController < ApplicationController
             :observee => {}
           }
         }
+        # Intent is to verify whether or not the user is actually getting saved
+        # when we send a 400.
+        puts ("User create attempted: @user.id: #{@user.id}")
         return render :json => errors, :status => :bad_request
       end
 
