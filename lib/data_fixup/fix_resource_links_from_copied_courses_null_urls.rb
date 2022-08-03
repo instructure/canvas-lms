@@ -19,7 +19,7 @@
 
 module DataFixup::FixResourceLinksFromCopiedCoursesNullUrls
   def self.resource_links_to_update
-    # '2022-06-06' is the day before the date of the original commit that added urls to resource links
+    # '2022-06-12' is the day before the date of the original commit that added urls to resource links
     ActiveRecord::Base.connection.execute(
       "WITH original_resource_links AS (
         SELECT lti_resource_links.id, lti_resource_links.root_account_id, lti_resource_links.lookup_uuid, lti_resource_links.url,
@@ -35,7 +35,7 @@ module DataFixup::FixResourceLinksFromCopiedCoursesNullUrls
                                         AND original_resource_links.url IS NULL
                                         AND copied_resource_links.url IS NOT NULL
                                         AND original_resource_links.rk = 1
-      WHERE copied_resource_links.created_at > '2022-07-26'
+      WHERE copied_resource_links.created_at > '2022-06-12'
         AND copied_resource_links.context_type = 'Course'"
     )
   end
