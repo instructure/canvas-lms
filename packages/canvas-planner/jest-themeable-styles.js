@@ -17,7 +17,7 @@
  */
 
 const proxy = require('identity-obj-proxy')
-const transform = require('@instructure/babel-plugin-themeable-styles/transform')
+const transform = require('@instructure/babel-plugin-themeable-styles/lib/transform')
 /*
   This is a babel transform to mock the themeable styles objects for the jest tests.
   See package.json for the jest config.

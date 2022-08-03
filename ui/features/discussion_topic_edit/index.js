@@ -114,6 +114,7 @@ ready(() => {
         dueDatesReadonly: !!lockedItems.due_dates,
         availabilityDatesReadonly: !!lockedItems.availability_dates,
         inPacedCourse: model.get('in_paced_course'),
+        isModuleItem: ENV.IS_MODULE_ITEM,
         courseId: assignment.courseID()
       })
     },

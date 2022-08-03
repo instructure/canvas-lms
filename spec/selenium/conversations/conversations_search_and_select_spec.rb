@@ -61,6 +61,7 @@ describe "conversations index page" do
       end
 
       it "archives conversation by clicking on checkbox" do
+        allow(InstStatsd::Statsd).to receive(:count)
         get "/conversations"
         convos = ff("[data-testid='conversation']")
         convos[0].find("input").find_element(:xpath, "..").click
@@ -72,6 +73,9 @@ describe "conversations index page" do
         f("input[title='Inbox']").click
         fj("li:contains('Archived')").click
         expect(ff("[data-testid='conversation']").count).to eq 1
+
+        expect(InstStatsd::Statsd).to have_received(:count).with("inbox.conversation.archived.react", 1)
+        expect(InstStatsd::Statsd).not_to have_received(:count).with("inbox.conversation.archived.legacy", 1)
       end
 
       it "deletes multiple individually selected conversations via ctrl(or command)+click" do
@@ -175,12 +179,16 @@ describe "conversations index page" do
       end
 
       it "archives multiple conversations", priority: "1" do
+        allow(InstStatsd::Statsd).to receive(:count)
         conversations
         select_conversations
         click_archive_button
         expect(f(".messages")).not_to contain_css("li")
         run_progress_job
         @conversations.each { |c| expect(c.reload).to be_archived }
+
+        expect(InstStatsd::Statsd).to have_received(:count).with("inbox.conversation.archived.legacy", 3)
+        expect(InstStatsd::Statsd).not_to have_received(:count).with("inbox.conversation.archived.react", 3)
       end
 
       it "deletes multiple conversations", priority: "1" do

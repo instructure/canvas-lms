@@ -39,6 +39,8 @@ const $profile_table = $('.profile_table'),
   $update_profile_form = $('#update_profile_form'),
   $default_email_id = $('#default_email_id')
 
+const maximumStringLength = 255
+
 $edit_settings_link.click(function () {
   $(this).hide()
   $profile_table
@@ -153,6 +155,15 @@ $('#unregistered_services li.service').click(function (event) {
 })
 $('.create_user_service_form').formSubmit({
   object_name: 'user_service',
+  property_validations: {
+    user_name(value) {
+      if (value && value.length > maximumStringLength) {
+        return I18n.t('Exceeded the maximum length (%{number} characters)', {
+          number: maximumStringLength
+        })
+      }
+    }
+  },
   beforeSubmit() {
     $(this).loadingImage()
   },
@@ -263,12 +274,11 @@ $('#access_token_form').formSubmit({
   object_name: 'access_token',
   property_validations: {
     purpose(value) {
-      const maximumStringLength = 255
       if (!value || value === '') {
         return I18n.t('purpose_required', 'Purpose is required')
       }
       if (value.length > maximumStringLength) {
-        return I18n.t('Max character length (%{number}) exceeded', {
+        return I18n.t('Exceeded the maximum length (%{number} characters)', {
           number: maximumStringLength
         })
       }

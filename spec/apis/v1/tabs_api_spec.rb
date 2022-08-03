@@ -29,7 +29,7 @@ describe TabsController, type: :request do
                { controller: "tabs", action: "index", course_id: @course.to_param, format: "json" },
                { include: ["external"] },
                {},
-               { expected_status: 401 })
+               { expected_status: 404 })
     end
 
     it "lists navigation tabs for a course" do
@@ -786,12 +786,24 @@ describe TabsController, type: :request do
       before { user_model }
 
       let(:tool) do
-        Account.default.context_external_tools.new({
-                                                     name: "Example",
-                                                     url: "http://www.example.com",
-                                                     consumer_key: "key",
-                                                     shared_secret: "secret",
-                                                   })
+        Account.default.context_external_tools.new(
+          {
+            name: "Example",
+            url: "http://www.example.com",
+            consumer_key: "key",
+            shared_secret: "secret",
+          }
+        )
+      end
+
+      it "returns 404 if current user is unauthorized" do
+        target = user_model
+        user_session(user_model)
+
+        api_call(:get, "/api/v1/users/#{target.id}/tabs",
+                 { controller: "tabs", action: "index", user_id: target.to_param, format: "json" })
+
+        expect(response).to have_http_status(:not_found)
       end
 
       it "includes external tools" do

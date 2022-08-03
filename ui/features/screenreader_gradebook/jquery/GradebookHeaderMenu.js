@@ -21,6 +21,7 @@ import $ from 'jquery'
 import messageStudents from '@canvas/message-students-dialog/jquery/message_students'
 import AssignmentDetailsDialog from './AssignmentDetailsDialog'
 import AssignmentMuter from './AssignmentMuter'
+import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import SetDefaultGradeDialog from '@canvas/grading/jquery/SetDefaultGradeDialog.coffee'
 import CurveGradesDialog from '@canvas/grading/jquery/CurveGradesDialog.coffee'
 import gradebookHeaderMenuTemplate from '../jst/GradebookHeaderMenu.handlebars'
@@ -180,10 +181,6 @@ export default class GradebookHeaderMenu {
     return dialog.show()
   }
 
-  handleSendMessageStudentsWho = args => {
-    this.gradebook.sendMessageStudentsWho(args)
-  }
-
   messageStudentsWho(
     opts = {
       assignment: this.assignment,
@@ -191,21 +188,21 @@ export default class GradebookHeaderMenu {
         this.gradebook.students,
         this.assignment
       ),
-      onSend: this.handleSendMessageStudentsWho,
-      userId: this.gradebook.options.currentUserId
+      messageAttachmentUploadFolderId: this.gradebook.options.message_attachment_upload_folder_id
     }
   ) {
     let {students} = opts
-    const {assignment} = opts
-    const {onSend, userId} = opts
+    const {assignment, messageAttachmentUploadFolderId} = opts
     students = _.filter(students, student => {
-      return !student.is_inactive
+      return !student.isInactive && !student.isTestStudent
     })
     students = _.map(students, student => {
       const sub = student[`assignment_${assignment.id}`]
       return {
+        excused: sub.excused,
         grade: sub.grade,
         id: student.id,
+        latePolicyStatus: sub.late_policy_status,
         name: student.name,
         redoRequest: sub.redo_request,
         score: sub != null ? sub.score : undefined,
@@ -221,6 +218,15 @@ export default class GradebookHeaderMenu {
       )
       const props = {
         assignment: {
+          allowedAttempts: assignment.allowed_attempts,
+          anonymizeStudents: assignment.anonymize_students,
+          courseId: assignment.course_id,
+          dueDate: assignment.due_at,
+          htmlUrl: assignment.html_url,
+          muted: assignment.muted,
+          pointsPossible: assignment.points_possible,
+          postManually: assignment.post_manually,
+          published: assignment.published,
           gradingType: assignment.grading_type,
           id: assignment.id,
           name: assignment.name,
@@ -229,9 +235,21 @@ export default class GradebookHeaderMenu {
         onClose: () => {
           ReactDOM.unmountComponentAtNode(mountPoint)
         },
-        onSend,
+        onSend: args => {
+          return MessageStudentsWhoHelper.sendMessageStudentsWho(
+            args.recipientsIds,
+            args.subject,
+            args.body,
+            `course_${assignment.course_id}`,
+            args.mediaFile,
+            args.attachmentIds
+          )
+            .then(FlashAlert.showFlashSuccess(I18n.t('Message sent successfully')))
+            .catch(FlashAlert.showFlashError(I18n.t('There was an error sending the message')))
+        },
+        messageAttachmentUploadFolderId,
         students,
-        userId
+        userId: opts.current_user_id
       }
       ReactDOM.render(
         <ApolloProvider client={createClient()}>

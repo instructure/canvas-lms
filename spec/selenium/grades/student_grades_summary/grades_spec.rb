@@ -169,13 +169,6 @@ describe "grades" do
       user_session(@student_1)
     end
 
-    it "does not send PII to google analytics" do
-      Setting.set("google_analytics_key", "testing123")
-      StudentGradesPage.visit_as_student(@course)
-      analytics_snippet_script = ff("script").find { |s| s.attribute("innerHTML").include? "ga('create', \"testing123\", 'auto');" }
-      expect(analytics_snippet_script.attribute("innerHTML")).to include("ga('set', 'title', \"Grades for Student\");")
-    end
-
     it "displays tooltip on focus", priority: "1" do
       StudentGradesPage.visit_as_student(@course)
 

@@ -24,7 +24,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 
 jest.mock('@canvas/do-fetch-api-effect')
 
-const flushPromises = () => new Promise(setImmediate)
+const flushPromises = () => new Promise(setTimeout)
 
 const fakeJob = {
   id: '1024',

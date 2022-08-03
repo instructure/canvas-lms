@@ -158,15 +158,17 @@ describe Outcomes::LearningOutcomeGroupChildren do
       before do
         o4.workflow_state = "deleted"
         o4.save!
+        o8.workflow_state = "deleted"
+        o8.save!
       end
 
       it "returns the total outcomes for a learning outcome group without the deleted outcomes" do
-        expect(subject.total_outcomes(g0.id)).to eq 11
+        expect(subject.total_outcomes(g0.id)).to eq 10
         expect(subject.total_outcomes(g1.id)).to eq 8
-        expect(subject.total_outcomes(g2.id)).to eq 2
+        expect(subject.total_outcomes(g2.id)).to eq 1
         expect(subject.total_outcomes(g3.id)).to eq 5
         expect(subject.total_outcomes(g4.id)).to eq 1
-        expect(subject.total_outcomes(g5.id)).to eq 1
+        expect(subject.total_outcomes(g5.id)).to eq 0
         expect(subject.total_outcomes(g6.id)).to eq 3
       end
     end

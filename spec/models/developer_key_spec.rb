@@ -19,6 +19,8 @@
 #
 
 require_relative "../lti_1_3_spec_helper"
+require_relative "../lib/token_scopes/last_known_accepted_scopes"
+require_relative "../lib/token_scopes/spec_helper"
 
 describe DeveloperKey do
   let(:account) { Account.create! }
@@ -515,6 +517,28 @@ describe DeveloperKey do
           scopes: ["not_a_valid_scope"]
         )
       end.to raise_exception ActiveRecord::RecordInvalid
+    end
+
+    it "rejects changes to routes.rb if it would break an existing scope" do
+      stub_const("CanvasRails::Application", TokenScopesHelper::SpecHelper::MockCanvasRails::Application)
+      all_routes = Set.new(TokenScopes.api_routes.map do |route|
+        { verb: route[:verb], path: route[:path] }
+      end)
+
+      modified_scopes = TokenScopesHelper::SpecHelper.last_known_accepted_scopes.reject do |scope|
+        all_routes.include? scope
+      end
+
+      error_message = <<~TEXT
+        These routes are used by developer key scopes, and have been changed:
+        #{modified_scopes.map { |scope| "- #{scope[:verb]}: #{scope[:path]}" }.join("\n")}
+
+        If these routes must be changed, it will require a data fixup to change
+        the scope attribute of any developer keys that refer to those routes.
+        The list of API routes used by developer keys can be changed in
+        spec/lib/token_scopes/last_known_accepted_scopes.rb.
+      TEXT
+      expect(modified_scopes).to be_empty, error_message
     end
 
     context "when api token scoping FF is enabled" do

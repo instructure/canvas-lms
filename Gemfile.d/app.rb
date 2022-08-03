@@ -29,7 +29,7 @@ end
 
 gem "rails", CANVAS_RAILS == "6.1" ? "6.1.4.6" : "7.0.3"
   gem "tzinfo", "2.0.4"
-gem_override "switchman", "3.1.1"
+gem_override "switchman", "3.1.3"
   gem "guardrail", "3.0.2"
 gem_override "switchman-inst-jobs", "4.0.8"
   gem "irb", "1.4.1"
@@ -81,7 +81,7 @@ gem "i18nliner", "0.1.2", github: "instructure/i18nliner", ref: "rails-61"
   gem "ruby2ruby", "2.4.4", require: false
   gem "ruby_parser", "3.18.1", require: false
 gem "icalendar", "2.7.0", require: false
-gem "diplomat", "2.5.1", require: false
+gem "diplomat", "2.6.3", require: false
 gem "ims-lti", "2.3.2", require: "ims"
 gem "rrule", "0.4.4", require: false
 

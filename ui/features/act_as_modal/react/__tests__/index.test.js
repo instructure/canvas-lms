@@ -91,8 +91,8 @@ describe('ActAsModal', () => {
     expect(tableText).toContain(user.email)
     user.pseudonyms.forEach(pseudonym => {
       expect(tableText).toContain(pseudonym.login_id)
-      expect(tableText).toContain(pseudonym.sis_id)
-      expect(tableText).toContain(pseudonym.integration_id)
+      expect(tableText).toContain('' + pseudonym.sis_id)
+      expect(tableText).toContain('' + pseudonym.integration_id)
     })
   })
 

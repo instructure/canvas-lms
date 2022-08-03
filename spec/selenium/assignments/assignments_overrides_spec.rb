@@ -210,19 +210,41 @@ describe "assignment groups" do
       before do
         @course.enable_course_paces = true
         @course.save!
+        @context_module = @course.context_modules.create! name: "M"
       end
 
-      it "shows the course pacing notice if in a paced course on show page" do
-        assignment = create_assignment!
-        get "/courses/#{@course.id}/assignments/#{assignment.id}"
-        expect(AssignmentPage.course_pacing_notice).to be_displayed
-        expect(f("#content")).not_to contain_css("table.assignment_dates")
+      context "on show page" do
+        it "shows the course pacing notice for a module item assignment" do
+          assignment = create_assignment!
+          assignment.context_module_tags.create! context_module: @context_module, context: @course, tag_type: "context_module"
+          get "/courses/#{@course.id}/assignments/#{assignment.id}"
+          expect(AssignmentPage.course_pacing_notice).to be_displayed
+          expect(f("#content")).not_to contain_css("table.assignment_dates")
+        end
+
+        it "does not show the course pacing notice for a non-moduled assignment" do
+          assignment = create_assignment!
+          get "/courses/#{@course.id}/assignments/#{assignment.id}"
+          expect(f("#content")).not_to contain_css("[data-testid='CoursePacingNotice']")
+          expect(f("#content")).to contain_css("table.assignment_dates")
+        end
       end
 
-      it "shows the course pacing notice if in a paced course on edit page" do
-        assignment = create_assignment!
-        get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
-        expect(AssignmentPage.course_pacing_notice).to be_displayed
+      context "on edit page" do
+        it "shows the course pacing notice for a module item assignment" do
+          assignment = create_assignment!
+          assignment.context_module_tags.create! context_module: @context_module, context: @course, tag_type: "context_module"
+          get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
+          expect(AssignmentPage.course_pacing_notice).to be_displayed
+          expect(f("#content")).not_to contain_css(".ContainerDueDate")
+        end
+
+        it "does not show the course pacing notice for a non-moduled assignment" do
+          assignment = create_assignment!
+          get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
+          expect(f("#content")).not_to contain_css("[data-testid='CoursePacingNotice']")
+          expect(f("#content")).to contain_css(".ContainerDueDate")
+        end
       end
 
       it "does not show availability or due dates on index page" do

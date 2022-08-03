@@ -26,7 +26,7 @@ import fetchMock from 'fetch-mock'
 jest.mock('../../../../../../../bridge', () => {
   return {
     trayProps: {
-      get: editor => ({foo: 'bar'})
+      get: () => ({foo: 'bar'})
     }
   }
 })
@@ -72,7 +72,7 @@ describe('Upload()', () => {
       name: 'Test Image.png'
     }
 
-    const subject = () =>
+    const onSubmitCall = () =>
       onSubmit(dispatch)(
         {},
         {},
@@ -85,23 +85,23 @@ describe('Upload()', () => {
     afterEach(() => jest.clearAllMocks())
 
     it('sets the selected image', () => {
-      subject()
+      onSubmitCall()
       expect(dispatch).toHaveBeenCalledWith({...actions.SET_IMAGE, payload: theFile.preview})
     })
 
     it('sets the selected image name', () => {
-      subject()
+      onSubmitCall()
       expect(dispatch).toHaveBeenCalledWith({...actions.SET_IMAGE_NAME, payload: theFile.name})
     })
 
     it('closes the collection', () => {
-      subject()
+      onSubmitCall()
       expect(dispatch).toHaveBeenCalledWith({...actions.SET_IMAGE_COLLECTION_OPEN, payload: false})
     })
 
-    it('clears the mode', () => {
-      subject()
-      expect(dispatch).toHaveBeenCalledWith(actions.CLEAR_MODE)
+    it('opens image cropper', () => {
+      onSubmitCall()
+      expect(dispatch).toHaveBeenCalledWith({...actions.SET_CROPPER_OPEN, payload: true})
     })
   })
 })

@@ -76,7 +76,10 @@ describe Eportfolio do
         account = Account.default
         account.settings[:enable_eportfolios] = false
         account.save!
+        Account.current_domain_root_account = account
         expect(@eportfolio.grants_right?(@student, :update)).to be false
+      ensure
+        Account.current_domain_root_account = nil
       end
 
       it "cannot update if the eportfolio is flagged as possible spam" do
@@ -110,7 +113,10 @@ describe Eportfolio do
         account = Account.default
         account.settings[:enable_eportfolios] = false
         account.save!
+        Account.current_domain_root_account = account
         expect(@eportfolio.grants_right?(@student, :manage)).to be false
+      ensure
+        Account.current_domain_root_account = nil
       end
 
       it "cannot manage if the eportfolio is flagged as possible spam" do
@@ -190,7 +196,10 @@ describe Eportfolio do
         account = Account.default
         account.settings[:enable_eportfolios] = false
         account.save!
+        Account.current_domain_root_account = account
         expect(Eportfolio.new.grants_right?(@student, :create)).to be false
+      ensure
+        Account.current_domain_root_account = nil
       end
 
       it "cannot create if the user has another eportfolio flagged as possible spam" do

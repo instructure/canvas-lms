@@ -33,6 +33,25 @@ jest.mock('../../../util/utils', () => ({
 
 describe('ConversationListContainer', () => {
   const server = mswServer(handlers)
+  const getConversationsQuery = (scope, course) => {
+    return handlers[0].resolver(
+      {
+        variables: {
+          scope,
+          course
+        }
+      },
+      res => {
+        return {...res}
+      },
+      {
+        data: data => {
+          return {data}
+        }
+      }
+    )
+  }
+
   beforeAll(() => {
     // eslint-disable-next-line no-undef
     fetchMock.dontMock()
@@ -72,9 +91,15 @@ describe('ConversationListContainer', () => {
   })
 
   const setup = conversationListContainerProps => {
+    const conversationsQuery = {data: getConversationsQuery().data, loading: false}
+    const submissionCommentsQuery = {data: null, loading: false}
     return render(
       <ApolloProvider client={mswClient}>
-        <ConversationListContainer {...conversationListContainerProps} />
+        <ConversationListContainer
+          conversationsQuery={conversationsQuery}
+          submissionCommentsQuery={submissionCommentsQuery}
+          {...conversationListContainerProps}
+        />
       </ApolloProvider>
     )
   }
@@ -87,12 +112,20 @@ describe('ConversationListContainer', () => {
 
     it('should change list of conversations when scope changes', async () => {
       const component = setup()
-
       expect(await component.findByText('This is an inbox conversation')).toBeInTheDocument()
+
+      // Change scope
+      const scope = 'sent'
+      const conversationsQuery = {data: getConversationsQuery(scope).data, loading: false}
+      const submissionCommentsQuery = {data: null, loading: false}
 
       component.rerender(
         <ApolloProvider client={mswClient}>
-          <ConversationListContainer scope="sent" />
+          <ConversationListContainer
+            scope={scope}
+            conversationsQuery={conversationsQuery}
+            submissionCommentsQuery={submissionCommentsQuery}
+          />
         </ApolloProvider>
       )
 
@@ -104,9 +137,19 @@ describe('ConversationListContainer', () => {
     it('should change list of conversations when course and scope changes', async () => {
       const component = setup()
 
+      // Select scope
+      const scope = 'inbox'
+      const course = 'course_123'
+      const conversationsQuery = {data: getConversationsQuery(scope).data, loading: false}
+      const submissionCommentsQuery = {data: null, loading: false}
+
       component.rerender(
         <ApolloProvider client={mswClient}>
-          <ConversationListContainer scope="inbox" />
+          <ConversationListContainer
+            scope={scope}
+            conversationsQuery={conversationsQuery}
+            submissionCommentsQuery={submissionCommentsQuery}
+          />
         </ApolloProvider>
       )
 
@@ -114,9 +157,16 @@ describe('ConversationListContainer', () => {
         expect(component.queryByText('This is an inbox conversation')).toBeInTheDocument()
       )
 
+      // Select course
+      conversationsQuery.data = getConversationsQuery(scope, course).data
+
       component.rerender(
         <ApolloProvider client={mswClient}>
-          <ConversationListContainer course="course_123" />
+          <ConversationListContainer
+            scope={scope}
+            conversationsQuery={conversationsQuery}
+            submissionCommentsQuery={submissionCommentsQuery}
+          />
         </ApolloProvider>
       )
 
@@ -136,30 +186,39 @@ describe('ConversationListContainer', () => {
     })
     it('should track when conversations are clicked', async () => {
       const mock = jest.fn()
-      const conversationList = await setup({
-        onSelectConversation: mock
+      const conversationsQuery = {
+        data: getConversationsQuery('multipleConversations').data,
+        loading: false
+      }
+
+      const conversationList = setup({
+        onSelectConversation: mock,
+        conversationsQuery
       })
 
       await waitForApolloLoading()
 
       const checkboxes = await conversationList.findAllByText('not selected')
-      fireEvent(
-        checkboxes[0],
-        new MouseEvent('click', {
-          bubbles: true,
-          cancelable: true
-        })
-      )
+      checkboxes.forEach(checkbox => {
+        fireEvent(
+          checkbox,
+          new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true
+          })
+        )
+      })
 
       expect(mock.mock.calls.length).toBe(4)
     })
 
     it('should be able to select range of conversations ASC', async () => {
-      const mock = jest.fn()
-      const conversationList = await setup({
-        onSelectConversation: mock,
-        scope: 'multipleConversations'
-      })
+      const conversationsQuery = {
+        data: getConversationsQuery('multipleConversations').data,
+        loading: false
+      }
+
+      const conversationList = setup({conversationsQuery})
       await waitForApolloLoading()
 
       const conversations = await conversationList.findAllByTestId('conversationListItem-Item')
@@ -172,11 +231,12 @@ describe('ConversationListContainer', () => {
     })
 
     it('should be able to select range of conversations DESC', async () => {
-      const mock = jest.fn()
-      const conversationList = await setup({
-        onSelectConversation: mock,
-        scope: 'multipleConversations'
-      })
+      const conversationsQuery = {
+        data: getConversationsQuery('multipleConversations').data,
+        loading: false
+      }
+
+      const conversationList = setup({conversationsQuery})
       await waitForApolloLoading()
 
       const conversations = await conversationList.findAllByTestId('conversationListItem-Item')

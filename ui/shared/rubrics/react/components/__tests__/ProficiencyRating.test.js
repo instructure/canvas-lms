@@ -56,15 +56,30 @@ it('mastery checkbox is checked if mastery', () => {
   expect(radio.props().checked).toBe(true)
 })
 
-it('mastery checkbox receives focus', () => {
-  const wrapper = mount(
-    <table>
-      <tbody>
-        <ProficiencyRating {...defaultProps({focusField: 'mastery'})} />
-      </tbody>
-    </table>
-  )
-  expect(wrapper.find('RadioInput').find('input').instance()).toBe(document.activeElement)
+describe('focus handling', () => {
+  let containerElement = null
+  let wrapper = null
+
+  beforeEach(() => {
+    containerElement = document.createElement('div')
+    document.body.appendChild(containerElement)
+  })
+
+  afterEach(() => {
+    if (wrapper) wrapper.unmount()
+    document.body.removeChild(containerElement)
+  })
+
+  it('mastery checkbox receives focus', () => {
+    wrapper = mount(
+      <table>
+        <tbody>
+          <ProficiencyRating {...defaultProps({focusField: 'mastery'})} />
+        </tbody>
+      </table>
+    , { attachTo: containerElement })
+    expect(wrapper.find('RadioInput').find('input').instance()).toBe(document.activeElement)
+  })
 })
 
 it('clicking mastery checkbox triggers change', () => {

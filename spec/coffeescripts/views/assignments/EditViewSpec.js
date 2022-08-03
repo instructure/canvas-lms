@@ -80,7 +80,10 @@ const editView = function (assignmentOpts = {}) {
     assignmentGroups:
       (typeof ENV !== 'undefined' && ENV !== null ? ENV.ASSIGNMENT_GROUPS : undefined) || []
   })
-  const gradingTypeSelector = new GradingTypeSelector({parentModel: assignment})
+  const gradingTypeSelector = new GradingTypeSelector({
+    parentModel: assignment,
+    canEditGrades: ENV == null || ENV.PERMISSIONS.can_edit_grades
+  })
   const groupCategorySelector = new GroupCategorySelector({
     parentModel: assignment,
     groupCategories:
@@ -99,7 +102,8 @@ const editView = function (assignmentOpts = {}) {
         model: dueDateList,
         views: {}
       })
-    }
+    },
+    canEditGrades: ENV.PERMISSIONS.can_edit_grades || !assignment.gradedSubmissionsExist()
   })
 
   return app.render()
@@ -471,6 +475,33 @@ test('disables fields when inClosedGradingPeriod', function () {
   equal(view.$el.find('input[name="grading_type"]').attr('type'), 'hidden')
   ok(view.$el.find('#has_group_category').attr('readonly'))
   equal(view.$el.find('#has_group_category').attr('aria-readonly'), 'true')
+})
+
+test('disables fields when user does not have Grade - edit permissions and submissions have already been graded', function () {
+  ENV.PERMISSIONS = {can_edit_grades: false}
+  const view = this.editView({graded_submissions_exist: true})
+  view.$el.appendTo($('#fixtures'))
+
+  ok(view.$el.find('#assignment_points_possible').attr('readonly'))
+  ok(view.$el.find('#assignment_grading_type').attr('readonly'))
+})
+
+test('does not disable fields when user does not have Grade - edit permissions and submissions have not been graded yet', function () {
+  ENV.PERMISSIONS = {can_edit_grades: false}
+  const view = this.editView({graded_submissions_exist: false})
+  view.$el.appendTo($('#fixtures'))
+
+  notOk(view.$el.find('#assignment_points_possible').attr('readonly'))
+  notOk(view.$el.find('#assignment_grading_type').attr('readonly'))
+})
+
+test('does not disable fields when user has Grade - edit permissions', function () {
+  ENV.PERMISSIONS = {can_edit_grades: true}
+  const view = this.editView({graded_submissions_exist: true})
+  view.$el.appendTo($('#fixtures'))
+
+  notOk(view.$el.find('#assignment_points_possible').attr('readonly'))
+  notOk(view.$el.find('#assignment_grading_type').attr('readonly'))
 })
 
 test('disables grading type field when frozen', function () {

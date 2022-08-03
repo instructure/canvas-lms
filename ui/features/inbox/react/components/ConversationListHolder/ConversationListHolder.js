@@ -21,7 +21,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
-import React, {useEffect, useState, useContext, useCallback, useMemo} from 'react'
+import React, {useEffect, useState, useContext, useCallback, useMemo, useRef} from 'react'
 import InboxEmpty from '../../../svg/inbox-empty.svg'
 import {ConversationContext} from '../../../util/constants'
 import {Text} from '@instructure/ui-text'
@@ -39,7 +39,7 @@ export const ConversationListHolder = ({
   ...props
 }) => {
   const [selectedMessages, setSelectedMessages] = useState([])
-  const [rangeClickStart, setRangeClickStart] = useState()
+  const rangeClickStartRef = useRef()
   const {setOnFailure} = useContext(AlertManagerContext)
   const {setMultiselect, isSubmissionCommentsType} = useContext(ConversationContext)
 
@@ -119,16 +119,16 @@ export const ConversationListHolder = ({
     if (e.shiftKey) {
       window.document.getSelection().removeAllRanges()
     }
-    if (e.shiftKey && rangeClickStart && multiple) {
+    if (e.shiftKey && rangeClickStartRef.current && multiple) {
       // Range Click
       rangeSelect(_id)
     } else if (multiple) {
       // MultiSelect
-      setRangeClickStart(_id)
+      rangeClickStartRef.current = _id
       updatedSelectedItems(_id)
     } else {
       // Single Select
-      setRangeClickStart(_id)
+      rangeClickStartRef.current = _id
       if (selectedMessages.includes(_id) && e.target.type === 'checkbox') {
         removeFromSelectedConversations(_id)
         return
@@ -152,7 +152,7 @@ export const ConversationListHolder = ({
     // Find position of start/ending messages
     for (let i = 0; i < props.conversations.length; i++) {
       const conversation = props.conversations[i]
-      if (conversation._id === rangeClickStart) {
+      if (conversation._id === rangeClickStartRef.current) {
         positionStart = i
       } else if (conversation._id === rangeClickEnd) {
         positionEnd = i
@@ -225,8 +225,8 @@ export const ConversationListHolder = ({
           onSelect={handleItemSelection}
           onStar={props.onStar}
           key={conversation._id}
-          onMarkAsRead={isSubmissionCommentsType ? () => {} : props.onMarkAsRead}
-          onMarkAsUnread={isSubmissionCommentsType ? () => {} : props.onMarkAsUnread}
+          onMarkAsRead={props.onMarkAsRead}
+          onMarkAsUnread={props.onMarkAsUnread}
           textSize={props.textSize}
         />
       </View>
@@ -272,17 +272,16 @@ export const ConversationListHolder = ({
   }
 
   return (
-    <View
-      as="div"
-      height="100%"
-      overflowX="hidden"
-      overflowY="auto"
-      borderWidth="small"
-      data-testid={props.datatestid}
-    >
+    <View as="div" height="100%" overflowX="hidden" overflowY="auto" data-testid={props.datatestid}>
       {isLoading && !isLoadingMoreMenuData && renderLoading()}
       {(!isLoading || isLoadingMoreMenuData) && (
-        <View as="div" height="100%" overflowX="hidden" overflowY="auto" borderWidth="small">
+        <View
+          as="div"
+          height="100%"
+          overflowX="hidden"
+          overflowY="auto"
+          borderWidth="0 small small small"
+        >
           {renderedItems}
           {isLoadingMoreMenuData && renderLoading()}
         </View>

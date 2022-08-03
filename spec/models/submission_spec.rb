@@ -101,14 +101,39 @@ describe Submission do
         it { is_expected.to eq Submission.workflow_states.pending_review }
       end
 
-      context "when workflow state is pending_review and submission was graded by quizzes" do
+      context "when workflow state is pending_review" do
         before do
           submission.workflow_state = Submission.workflow_states.pending_review
-          submission.grader_id = -1
-          submission.cached_quiz_lti = true
         end
 
-        it { is_expected.to eq Submission.workflow_states.pending_review }
+        context "and the submission was graded by quizzes" do
+          before do
+            submission.grader_id = -1
+            submission.cached_quiz_lti = true
+          end
+
+          it { is_expected.to eq Submission.workflow_states.pending_review }
+        end
+      end
+
+      context "the submission's Lti::Result was marked as PendingManual by an external tool" do
+        let(:tool) { external_tool_1_3_model }
+        let(:result) { lti_result_model(result_overrides) }
+        let(:submission) { result.submission }
+        let(:result_overrides) do
+          {
+            assignment: assignment,
+            grading_progress: "PendingManual",
+            result_score: assignment.points_possible,
+            result_maximum: assignment.points_possible,
+            tool: tool
+          }
+        end
+
+        it "marks the submission as needing review" do
+          submission.infer_values
+          expect(submission.workflow_state).to eq Submission.workflow_states.pending_review
+        end
       end
     end
   end
@@ -6976,6 +7001,22 @@ describe Submission do
         sub = @assignment.submit_homework(@user, attachments: [@attachment])
         expect(sub.attachments).to eq [@attachment]
       end
+
+      it "bulk_load_versioned_attachments works with attachments in a different shard" do
+        course_factory(active_all: true)
+        student = user_factory(active_user: true)
+        attachment = attachment_model(filename: "submission.doc", context: student)
+
+        @course.enroll_user(student, "StudentEnrollment").accept!
+        assignment = @course.assignments.create!
+        submission = assignment.submit_homework(student, attachments: [attachment])
+        submission.update_attribute(:attachment_ids, attachment.id.to_s)
+
+        @shard1.activate do
+          submission_with_attachments = Submission.bulk_load_versioned_attachments([submission]).first
+          expect(submission_with_attachments.versioned_attachments).to eq [attachment]
+        end
+      end
     end
   end
 
@@ -6983,6 +7024,27 @@ describe Submission do
     before do
       @assignment.update!(anonymous_grading: true)
       @submission = @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "a body")
+    end
+
+    context "for observers" do
+      let(:observer) do
+        course_with_observer(
+          course: @assignment.course,
+          associated_user_id: @submission.user_id,
+          active_all: true
+        ).user
+      end
+
+      it "allows observers of the submission's owner to view details" do
+        expect(@submission).to be_can_view_details(observer)
+      end
+
+      it "does not allow observers to view details if they're not observing the submission's owner" do
+        new_student = User.create!
+        @context.enroll_student(new_student, enrollment_state: "active")
+        new_student_submission = @assignment.submissions.find_by(user: new_student)
+        expect(new_student_submission).not_to be_can_view_details(observer)
+      end
     end
 
     context "for peer reviewers" do

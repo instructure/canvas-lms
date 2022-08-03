@@ -5,12 +5,17 @@ en:
     other: 1 hour and %{count} minutes
   1_item_scores_5512cd03: 1- Item scores
   1_item_scores_examplescores_9736236: '1- Item Scores: %{exampleScores}'
+  1st_c9e63d39: 1st
   25th_75th_ile_406a67bf: 25th-75th %ile
   25th_75th_percentile_aa4c11f2: 25th-75th Percentile
   2_final_score_7b0fd15e: 2- Final score
   2_final_score_exampleresult_922edf9c: '2- Final Score: %{exampleResult}'
+  2nd_297bff18: 2nd
+  3rd_cecec872: 3rd
+  4th_946d355a: 4th
   558x270_png_jpg_gif_c3faa839: 558x270 png, jpg, gif
   558x558_png_jpg_gif_1_8x_the_standard_tile_size_so_c56cc472: 558x558 png, jpg, gif (1.8x the standard tile size, so it can be scaled up or down as needed)
+  5th_95af5f6d: 5th
   AssignmentGroupCreateDialog:
     titles:
       add_assignment_group: Add Assignment Group
@@ -1099,7 +1104,6 @@ en:
         enable_course_catalog: Show a searchable list of courses in this root account with the "Include this course in the public course index" flag enabled.
         enable_eportfolios: ePortfolios
         enable_fullstory: Allow tracking with FullStory
-        enable_google_analytics: Allow tracking with Google Analytics
         enable_profiles: Enable Profiles
         enable_push_notifications: Enable push notifications to mobile devices
         enable_turnitin: Turnitin
@@ -1451,7 +1455,6 @@ en:
     other: Achieve mastery %{count} times
   act_as_is_essentially_logging_in_as_this_user_with_6244031c: '"Act as" is essentially logging in as this user without a password. You will be able to take any action as if you were this user, and from other users'' points of views, it will be as if this user performed them. However, audit logs record that you were the one who performed the actions on behalf of this user.'
   act_as_name_16d15bfa: Act as %{name}
-  act_as_user_77dda176: Act as user
   act_as_user_d7ef0e48: Act as User
   act_as_user_name_5581cdbb: Act as %{user_name}
   act_as_users_de7ee378: Act as users
@@ -2194,6 +2197,7 @@ en:
   an_error_occurred_while_loading_account_proficienc_d38554c8: An error occurred while loading account proficiency ratings
   an_error_occurred_while_loading_associations_9699b3ee: An error occurred while loading associations
   an_error_occurred_while_loading_changes_9851b56f: An error occurred while loading changes
+  an_error_occurred_while_loading_course_alignment_s_c1b9c33a: An error occurred while loading course alignment statistics.
   an_error_occurred_while_loading_course_learning_ou_c4053b06: An error occurred while loading course learning outcome groups.
   an_error_occurred_while_loading_course_outcomes_er_accefe77: 'An error occurred while loading course outcomes: %{error}'
   an_error_occurred_while_loading_courses_11d4571e: An error occurred while loading courses
@@ -2328,6 +2332,12 @@ en:
   announcements_tutorial_tray_994287d6: Announcements Tutorial Tray
   announcements_unlocked_successfully_1432da9d: Announcements unlocked successfully
   announcements_view_1019d00d: Announcements - view
+  annually_on_date_count_times_9c56eb6: Annually on %{date}, %{count} times
+  annually_on_date_until_until_95b0001f: Annually on %{date} until %{until}
+  annually_on_the_first_days_of_month_count_times_a43e5cb9: Annually on the first %{days} of %{month}, %{count} times
+  annually_on_the_first_days_of_month_until_until_d6bd9273: Annually on the first %{days} of %{month} until %{until}
+  annually_on_the_ord_days_of_month_until_until_82f5d237: Annually on the %{ord} %{days} of %{month} until %{until}
+  annualy_on_the_ord_days_of_month_count_times_2ca1ddf6: Annualy on the %{ord} %{days} of %{month}, %{count} times
   anonymize_all_annotations_made_by_instructors_on_s_5540bc09: Anonymize all annotations made by instructors on submissions for this assignment in DocViewer
   anonymize_all_instructor_comments_and_annotations__713924c9: Anonymize all instructor comments and annotations within DocViewer
   anonymous_assignments_are_hidden_by_default_and_wi_c8884e1e: Anonymous assignments are hidden by default and will need to be posted manually even if the course setting is set to Automatic.
@@ -2475,6 +2485,7 @@ en:
     invalid_participants: You must allow at least one user to attend
     title: Edit %{name}
     update: Update
+  april_6b34e186: April
   arabic_c5c87acd: Arabic
   arc_a935e585: ARC
   archive_3f794d7e: Archive
@@ -3262,6 +3273,7 @@ en:
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: Audio content is not supported by your device or app.
   audio_dd489fcc: Audio
   audio_player_for_label_dd9a6819: Audio player for %{label}
+  august_781433e8: August
   australia_61_eb9bb701: Australia (+61)
   austria_43_7bc58b34: Austria (+43)
   auth_failure_in_connecting_to_google_drive_a20aad43: Auth failure in connecting to Google Drive.
@@ -6641,8 +6653,10 @@ en:
   d2l_file_description: D2L export .zip format
   d2l_name: D2L Converter
   d_b59e2d8d: d
+  daily_count_times_7fa3171d: Daily, %{count} times
   daily_notifications_will_be_delivered_around_day_t_a2b49202: Daily notifications will be delivered around %{day_time}. Weekly notifications will be delivered %{weekday} between %{start_time} and %{end_time}.
   daily_summary_cf43f37c: Daily summary
+  daily_until_until_add08b0a: Daily until %{until}
   danish_c18cdac8: Danish
   dark_skin_tone_6c9e7c7c: Dark Skin Tone
   dashboard:
@@ -6841,6 +6855,7 @@ en:
   debugging_f98fcd74: Debugging
   decaying_average_8bf6a0dd: Decaying Average
   decaying_average_recentint_remainderint_ab0636cc: Decaying Average - %{recentInt}%/%{remainderInt}%
+  december_acc47508: December
   decrease_indent_d9cf469d: Decrease Indent
   decrease_indent_de6343ab: Decrease indent
   deduction_interval_e18bd51: Deduction interval
@@ -6961,7 +6976,7 @@ en:
     This action is irreversible. Are you sure you wish to delete %{file}?
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: Deleting a user will destroy all of their ePortfolios. Alternatively, ePortfolios can be individually marked as 'spam' or 'safe' to modify their visibility.
   deleting_assignment_22d5851d: deleting assignment
-  deleting_b896f5f: deleting
+  deleting_f2ff0d09: Deleting
   delicious_7f9ac66f: Delicious
   denmark_45_929d5d34: Denmark (+45)
   deployment_id_fc270280: Deployment Id
@@ -8182,6 +8197,26 @@ en:
   event_update_failed_b6116651: Event update failed
   everthing_updated_after_start_date_f3be8ba: Everthing updated after start date
   every_665d821e: Every
+  every_interval_days_count_times_1974b237: Every %{interval} days, %{count} times
+  every_interval_days_until_until_40736c85: Every %{interval} days until %{until}
+  every_interval_months_on_day_days_count_times_8b762df5: Every %{interval} months on day %{days}, %{count} times
+  every_interval_months_on_day_days_until_until_a6e2450b: Every %{interval} months on day %{days} until %{until}
+  every_interval_months_on_days_count_times_ac5f2d7c: Every %{interval} months on %{days}, %{count} times
+  every_interval_months_on_days_days_count_times_4f77a79: Every %{interval} months on days %{days}, %{count} times
+  every_interval_months_on_days_days_until_until_764153ac: Every %{interval} months on days %{days} until %{until}
+  every_interval_months_on_days_until_until_f9fa89a0: Every %{interval} months on %{days} until %{until}
+  every_interval_months_on_ord_days_until_until_5a2e9ee4: Every %{interval} months on %{ord} %{days} until %{until}
+  every_interval_months_on_the_ord_days_count_times_2d15e18d: Every %{interval} months on the %{ord} %{days}, %{count} times
+  every_interval_weeks_count_times_854fff05: Every %{interval} weeks, %{count} times
+  every_interval_weeks_on_byday_count_times_a0b1fa13: Every %{interval} weeks on %{byday}, %{count} times
+  every_interval_weeks_on_byday_until_until_a136de6b: Every %{interval} weeks on %{byday} until %{until}
+  every_interval_weeks_until_until_f6690693: Every %{interval} weeks until %{until}
+  every_interval_years_on_date_count_times_fbbc09c2: Every %{interval} years on %{date}, %{count} times
+  every_interval_years_on_date_until_until_5f17629a: Every %{interval} years on %{date} until %{until}
+  every_interval_years_on_the_first_days_of_month_co_8fa27859: Every %{interval} years on the first %{days} of %{month}, %{count} times
+  every_interval_years_on_the_first_days_of_month_un_77210d09: Every %{interval} years on the first %{days} of %{month} until %{until}
+  every_interval_years_on_the_ord_days_of_month_coun_e0e82d40: Every %{interval} years on the %{ord} %{days} of %{month}, %{count} times
+  every_interval_years_on_the_ord_days_of_month_unti_a969f6d7: Every %{interval} years on the %{ord} %{days} of %{month} until %{until}
   everyone_854554dd: Everyone
   everyone_else_6c6dc7b6: Everyone Else
   everyone_else_cc5f6888: Everyone else
@@ -8199,6 +8234,7 @@ en:
   example_https_schoolofrock_edu_d4326f03: 'example: "https://schoolofrock.edu"'
   example_item_scores_6726c689: Example item scores
   example_school_of_rock_41f32c31: 'example: "School of Rock"'
+  exceeded_the_maximum_length_number_characters_2d25611e: Exceeded the maximum length (%{number} characters)
   exceeds_expectations_5910fc3a: Exceeds Expectations
   exceeds_mastery_1f995dce: Exceeds Mastery
   excelsior_student_activity_tracking_7a1ba44d: Excelsior Student Activity Tracking
@@ -8412,6 +8448,7 @@ en:
       next: New Quizzes
     student_outcome_gradebook: Student Learning Mastery Gradebook
   features_2581da: Features
+  february_f2c77675: February
   federated_attributes_5cbe6441: Federated Attributes
   federated_attributes_are_information_sent_from_you_2116fb61: Federated attributes are information sent from your authentication provider that can be used to automatically update corresponding information for users in Canvas each time they log in.
   feed_url_8a433438: Feed url
@@ -8645,6 +8682,7 @@ en:
   french_33881544: French
   french_canada_c3d92fa6: French (Canada)
   frequently_used_21a3eb8e: Frequently Used
+  fri_e2451e74: Fri
   friendly_description_57f7fdde: Friendly Description
   friendly_description_for_parent_student_display_e608ecf3: Friendly description (for parent/student display)
   friendly_name_601153fb: Friendly Name
@@ -9030,7 +9068,6 @@ en:
   grades_edit_must_also_be_enabled_c025f45d: Grades - edit must also be enabled.
   grades_for_coursename_f5c92045: Grades for %{courseName}
   grades_for_student_aff00ba: Grades for %{student}
-  grades_for_student_d4adfb55: Grades for Student
   grades_for_this_assignment_are_now_visible_to_stud_623efda0: Grades for this assignment are now visible to students.
   grades_posted_c5d8dcce: Grades posted
   grades_posted_to_students_56b8cb2d: Grades Posted to Students
@@ -10215,6 +10252,7 @@ en:
   items_items_selected_5b55e566: "%{items} items selected"
   items_selected_have_different_usage_rights_52b325cc: Items selected have different usage rights.
   j_5226008a: j
+  january_9ca1eab1: January
   japan_81_d1832e9d: Japan (+81)
   japanese_b5721ca7: Japanese
   javascript_file_fc27c32b: JavaScript file
@@ -10313,6 +10351,8 @@ en:
       play_comment: Play Media Comment
   json_is_not_valid_please_submit_properly_formatted_e3b2f88f: Json is not valid. Please submit properly formatted json.
   json_url_adbee260: JSON URL
+  july_83babbee: July
+  june_a58d8523: June
   just_a_casual_question_comment_idea_or_suggestion_1579d069: Just a casual question, comment, idea, or suggestion
   just_in_time_provisioning_382a0354: Just in Time Provisioning
   jwk_method_6d5d0c84: "* JWK Method"
@@ -11014,6 +11054,7 @@ en:
   manually_mark_replies_as_read_580adc59: Manually mark replies as read
   manually_post_grades_18248306: Manually Post Grades
   maori_new_zealand_5380a95f: Māori (New Zealand)
+  march_bbe310ee: March
   mark_all_as_read_8f3bdf57: Mark All as Read
   mark_all_as_read_a995ffbe: Mark all as read
   mark_all_as_unread_10e7f0fe: Mark all as unread
@@ -11070,7 +11111,6 @@ en:
       operators: Operators
       relationships: Relationships
   max_attempts_ae7b90bc: Max Attempts
-  max_character_length_number_exceeded_279edfe4: Max character length (%{number}) exceeded
   max_concurrent_a6f135c: Max Concurrent
   max_dd02d615: max
   max_membership_bd0ddc68: max_membership
@@ -11079,6 +11119,7 @@ en:
   max_wait_time_dc158bf1: Max wait time
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: Maximum number of appointments a participant can attend
   maximum_number_of_communication_channels_reached_70c4d2f9: Maximum number of communication channels reached
+  may_9248a063: May
   may_have_one_featured_link_and_one_new_link_at_a_t_21106efe: "(May have one Featured link and one New link at a time)"
   media_af190855: Media
   media_comment_content_5c2341fb: Media comment content
@@ -12908,8 +12949,17 @@ en:
   modules_settings_a7066f13: Modules Settings
   modules_tutorial_tray_d58ac3cb: Modules Tutorial Tray
   moduletitle_unpublished_8a70e0cd: "%{moduleTitle} (unpublished)"
+  mon_8f18082a: Mon
   month_s_5c17590e: Month(s)
   monthandday_starting_at_time_769b12c8: "%{monthAndDay} starting at %{time}"
+  monthly_every_days_count_times_709a3c91: Monthly every %{days}, %{count} times
+  monthly_every_days_until_until_ea2aa61: Monthly every %{days} until %{until}
+  monthly_on_day_days_count_times_b251ba17: Monthly on day %{days}, %{count} times
+  monthly_on_day_days_until_until_b44615aa: Monthly on day %{days} until %{until}
+  monthly_on_days_days_count_times_7d945eae: Monthly on days %{days}, %{count} times
+  monthly_on_days_days_until_until_4f66c44e: Monthly on days %{days} until %{until}
+  monthly_on_the_ord_days_count_times_5c7ef87b: Monthly on the %{ord} %{days}, %{count} times
+  monthly_on_the_ord_days_until_until_c1b9adae: Monthly on the %{ord} %{days} until %{until}
   moodle_dropdown_many_warning_title: There are %{count} Multiple Dropdowns questions in this bank that may have been imported incorrectly
   moodle_dropdown_warning_title: Multiple Dropdowns question may have been imported incorrectly
   moodle_formula_many_warning_title: There are %{count} Formula questions in this bank that will need to have their possible answers regenerated
@@ -13673,6 +13723,7 @@ en:
   notify_immediately_d1749c07: Notify immediately
   notify_students_in_time_of_assignments_that_requir_332ef10e: Notify students in time of assignments that require their attention.
   notify_users_this_quiz_has_changed_c5b05995: Notify users this quiz has changed
+  november_ca6fa5a6: November
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: Now that your course is set up and available, you probably won't need this checklist anymore. But we'll keep it around in case you realize later you want to try something new, or you just want a little extra help as you make changes to your course content.
   now_viewing_attempt_current_attempt_918e616: Now viewing Attempt %{current_attempt}
   nuco_submission_data_ded12af8: Nuco Submission Data
@@ -13785,6 +13836,7 @@ en:
   observers_course_83850091: Observers (Course)
   observers_remove_ad508fbe: Observers - remove
   observing_observee_d31d5fa2: 'Observing: %{observee}'
+  october_6b2bf82: October
   of_students_5d1af0d2: "# of students"
   of_times_1018baab: "# of times"
   off_5385ef3f: 'Off'
@@ -14049,7 +14101,6 @@ en:
   outcomes_are_created_here_to_track_mastery_in_a_co_2f487549: Outcomes are created here to track mastery in a course. To get started, checkout the menu bar along the top. Click on the New Outcome button to create a new outcome, or the New Group button to create a new group to organize your outcomes into. The Find button will allow you to use outcomes that have been created by your state or institution. As you create and use outcomes you will be able to use the panel to the left to navigate through your outcomes. You can drag and drop outcomes between the different levels to create structure.
   outcomes_csv_format_9005acfb: Outcomes CSV Format
   outcomes_d1b18d33: Outcomes
-  outcomes_for_student_9f91d4d: Outcomes for Student
   outcomes_friendly_description_9792b2f3: Outcomes Friendly Description
   outcomes_import_completed_baff5cb0: Outcomes Import Completed
   outcomes_import_failed_77efcdf4: Outcomes Import Failed
@@ -17009,6 +17060,7 @@ en:
   salesforce_ticketing_webtocase_connector_80f75716: Salesforce Ticketing WebToCase Connector
   same_value_as_canvas_url__c_will_probably_be_going_37027686: Same value as 'Canvas_URL__c', will probably be going away soon
   sample_data_e4fd01ff: Sample Data
+  sat_fa4152a4: Sat
   saudi_arabia_966_d01ed717: Saudi Arabia (+966)
   save_11a80ec3: Save
   save_and_publish_1b765e7: Save and Publish
@@ -17540,6 +17592,7 @@ en:
   sent_fe0a1eb4: Sent
   separate_columns_for_first_last_names_in_gradebook_419126c3: Separate columns for first/last names in Gradebook
   separate_out_granular_add_and_delete_permissions_f_c63d37b6: Separate out granular add and delete permissions for assignments and quizzes from the existing manage permission that controls all three.
+  september_9d32dd4b: September
   sequence_footer:
     next_module: 'Next Module:'
     next_module_desc: 'Next Module: *module*'
@@ -18869,6 +18922,7 @@ en:
   suffix_294d5cc4: Suffix
   sum_of_all_files_in_mb_2b705055: sum of all files in MB
   summary_statistics_f74852a5: Summary Statistics
+  sun_298d7c8b: Sun
   support:
     array:
       last_word_connector: ", and "
@@ -19704,6 +19758,7 @@ en:
   this_will_update_all_student_mastery_results_tied__a52301e5: This will update all student mastery results tied to the account level mastery calculation.
   this_will_update_all_student_mastery_results_withi_934580d1: This will update all student mastery results within this course.
   threshold_pts_45f0e5d8: 'threshold: %{pts}'
+  thu_59cbcffe: Thu
   ticket_successfully_submitted_f6254460: Ticket successfully submitted.
   ticketing_system_52205bff: Ticketing System
   ticketing_system_configurations_c4fecd96: Ticketing system configurations
@@ -20216,6 +20271,7 @@ en:
   try_again_6ca44338: Try Again
   try_entering_your_institution_s_complete_name_2013abab: Try entering your institution’s complete name.
   try_out_canvas_for_free_e2265d30: Try out Canvas for Free!
+  tue_bb10b386: Tue
   turkish_5b69578b: Turkish
   turned_in_submission_date_e9180b8b: 'turned in: %{submission_date}'
   turning_off_this_tutorial_will_remove_the_tutorial_dfd81b3a: Turning off this tutorial will remove the tutorial tray from your view for all of your courses. It can be turned back on under Feature Options in your User Settings.
@@ -21104,6 +21160,7 @@ en:
   visit_google_meet_ebdaf94f: Visit Google Meet
   visit_group_group_name_7a816081: Visit group %{group_name}
   visit_zoom_14636084: Visit Zoom
+  wait_for_delete_to_complete_2f6167c6: Wait for delete to complete
   wait_time_4c8f74a2: Wait time
   waiting_for_attempted_login_6d00cb49: Waiting for attempted login
   waiting_for_change_to_complete_b75b5e8b: Waiting for change to complete
@@ -21175,8 +21232,13 @@ en:
   website_url_177fc1dc: Website URL
   website_url_input_1a3eab25: Website url input
   website_url_url_bd07233d: 'Website URL: %{url}'
+  wed_84932f18: Wed
   week_s_cb1492ee: Week(s)
+  weekly_count_times_b9fecd6c: Weekly, %{count} times
+  weekly_on_byday_count_times_c0b7164b: Weekly on %{byday}, %{count} times
+  weekly_on_byday_until_until_7dd1c242: Weekly on %{byday} until %{until}
   weekly_summary_56cd0c95: Weekly summary
+  weekly_until_until_9d1e15cd: Weekly until %{until}
   weight_9b308e5b: Weight
   weight_ff579a8e: 'Weight:'
   weight_final_grade_based_on_assignment_groups_3124161: Weight final grade based on assignment groups

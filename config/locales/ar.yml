@@ -268,6 +268,7 @@ ar:
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "جدول يحتوي على بيانات نظام التقييم. يحتوي كل صف على اسم وحدين أقصى وأدنى للنسبة المئوية. كما يحتوي كل صف على زر لإضافة صف جديد أسفل الصف الموجود وزر لحذف الصف الموجود."
   a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "جدول يحتوي على بيانات نظام التقييم. الأول هو اسم نظام التقييم والأزرار الخاصة بتحرير النظام وحذفه. يحتوي كل صف على اسم ونسبة مئوية قصوى ونسبة مئوية دنيا. وبالإضافة إلى ذلك، يحتوي كل صف على زر لإضافة صف جديد أدناه وزر لحذف الصف الحالي."
   a_timeout_occurred_contacting_external_authenticat_c064ea48: "حدثت مهلة أثناء الاتصال بخدمة مصادقة خارجية"
+  a_yearly_rrule_must_include_byday_or_bymonthday_b56649f4: "يجب أن تشتمل RRULE السنوي على BYDAY أو BYMONTHDAY"
   a_z_243c3301: "ترتيب أبجدي من الألف إلى الياء"
   a_z_29d8e67c: "ترتيب أبجدي من الألف إلى الياء"
   ability_to_submit_annotatable_document_assignments_5bc5edd3: "القدرة لإرسال مهام المستندات القابلة للتعليق التوضيحي."
@@ -478,6 +479,7 @@ ar:
   account_id_2c3b4f15: "معرف الحساب"
   account_id_73966078: account_id
   account_id_f6e26867: "معرف الحساب"
+  account_level_course_pacing_blackout_dates_ce944dfb: "تواريخ عدم إتاحة سرعة المساق على مستوى الحساب"
   account_level_mastery_scales_a5bdff29: "مقاييس الإتقان لمستوى الحساب"
   account_level_notification_preferences_require_an__66467cd7: "تتطلب تفضيلات الإعلامات على مستوى الحساب account_id للتحديث"
   account_level_notification_preferences_ui_update_f5e189a4: "تحديث واجهة المستخدم لتفضيلات الإعلامات على مستوى الحساب"
@@ -2367,6 +2369,7 @@ ar:
   allow_course_content_to_be_downloaded_and_viewed_o_48a0d252: "السماح بتنزيل محتوى المساق وعرضه بدون اتصال."
   allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "السماح بتعيين صور المساق لمساق ما واستعمالها على بطاقات لوحة المعلومات."
   allow_course_images_to_be_assigned_to_a_course_and_adb906f4: "السماح بتعيين صور المساق لمساق ما واستعمالها على بطاقات لوحة المعلومات."
+  allow_course_pacing_blackout_dates_to_be_set_for_a_d4d597d5: "للسماح بتعيين تواريخ عدم إتاحة سرعة المساق للحسابات بدلاً من المساقات فقط."
   allow_creation_anywhere_the_user_has_active_enroll_13c84fc2: "السماح بالإنشاء في أي مكان يمتلك المستخدم فيه تسجيلات نشطة"
   allow_creation_only_in_the_manually_created_course_69f37f2e: "السماح بالإنشاء في الحساب الفرعي المنشأ يدويًا فقط"
   allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "السماح بإعادة ترتيب بطاقات لوحة المعلومات لكل مستخدم."
@@ -3172,6 +3175,7 @@ ar:
   an_error_occurred_while_loading_account_proficienc_d38554c8: "حدث خطأ أثناء تحميل تصنيفات إجادة الحساب"
   an_error_occurred_while_loading_associations_9699b3ee: "حدث خطأ أثناء تحميل الاقترانات"
   an_error_occurred_while_loading_changes_9851b56f: "حدث خطأ أثناء تحميل التغييرات"
+  an_error_occurred_while_loading_course_alignment_s_c1b9c33a: "حدث خطأ أثناء تحميل إحصائيات توافق المساق."
   an_error_occurred_while_loading_course_learning_ou_c4053b06: "حدث خطأ أثناء تحميل مجموعات مخرجات تعلم المساق."
   an_error_occurred_while_loading_course_outcomes_320ccc44: "حدث خطأ أثناء تحميل مخرجات المساق."
   an_error_occurred_while_loading_course_outcomes_er_accefe77: "حدث خطأ أثناء تحميل مخرجات المساق: %{error}"
@@ -3557,6 +3561,7 @@ ar:
     title: "تحرير %{name}"
     update: تحديث
   april_2020_responsiveness_54028e36: "مدى الاستجابة لشهر أبريل 2020"
+  april_6b34e186: أبريل
   arabic_c5c87acd: العربية
   arc_a935e585: ARC
   arc_media_recorder_in_rce_cf900c6: "مسجل وسائط Arc في محرر المحتوى المنسق"
@@ -3809,11 +3814,14 @@ ar:
     grading_statistics_for_assignment: "إحصاءات الدرجة من أجل: %{assignment.name}"
     high_score: "مجموع نقاط مرتفع:"
     low_score: "مجموع نقاط منخفض:"
+    lower_quartile: "الربع الأدنى:"
+    median: "الدرجة الوسيطة:"
     no_one_scored_higher: "لم يحرز أحد نقاطًا أعلى من %{max}"
     no_one_scored_lower: "لم يحرز أحد نقاطًا أقل من %{min}"
     scores_higher_than_the_average: "النقاط الأعلى من متوسط %{average}"
     scores_lower_than_the_average: "النقاط الأقل من متوسط %{average}"
     total_graded_submissions: "إجمالي عمليات الإرسال التي تم تصحيحها:"
+    upper_quartile: "الربع الأعلى:"
   assignment_details_expanded_20c6f0c7: "تم توسيع تفاصيل المهمة"
   assignment_details_updated_493f410b: "تم تحديث تفاصيل المهمة"
   assignment_does_not_accept_this_submission_type_38a55c27: "المهمة لا تقبل هذا النوع من الإرسالات"
@@ -3891,7 +3899,9 @@ ar:
   assignment_has_been_graded_for_name_4384f9b: "%{assignment} تم تقدير الدرجة ل%{name}."
   assignment_id_96baa1b7: "معرف المهمة"
   assignment_id_b040cee0: "معرف المهمة"
+  assignment_is_incomplete_ff55e07c: "%{assignment} غير مكتمل"
   assignment_is_reassigned_dd6b6ef2: "تمت إعادة تعيين المهمة."
+  assignment_is_reassigned_ebb31807: "%{assignment} معاد تعيينه"
   assignment_locked_a6233228: "تم تأمين المهمة"
   assignment_locked_until_future_date_80cd0df2: "تم تأمين المهمة حتى التاريخ المستقبلي"
   assignment_locked_with_prerequisite_5b8cb148: "تم تأمين المهمة بمتطلبات أساسية"
@@ -4765,6 +4775,7 @@ ar:
   audio_content_is_not_supported_by_your_device_or_a_2f5037c6: "جهازك أو تطبيقك لا يدعم المحتويات الصوتية."
   audio_dd489fcc: صوت
   audio_player_for_label_dd9a6819: "مشغل الصوت لـ %{label}"
+  august_781433e8: أغسطس
   australia_61_eb9bb701: "أستراليا (+61)"
   australia_e8d44bf8: أستراليا
   austria_43_7bc58b34: "النمسا (+43)"
@@ -7893,7 +7904,9 @@ ar:
     other: "%{count} دقائق"
     zero: "أقل من 1 دقيقة"
   count_more_beba6428: "%{count} أكثر"
+  count_must_be_0_4abb84b3: "يجب أن يكون COUNT > 0"
   count_must_be_greater_than_0_f8f88358: "يجب أن يكون العدد أكبر من 0"
+  count_must_be_limit_8536ff23: "يجب أن يكون COUNT <= %{limit}"
   count_must_be_limit_or_less_ac5c64b3: "يجب أن يكون العدد %{limit} أو أقل"
   count_of_max_maximum_characters_fcb6ddf8: "%{count} من %{max} الحد الأقصى للأحرف"
   count_of_submissions_for_day_83a88e68: "عدد الإرسالات اليوم"
@@ -9824,6 +9837,7 @@ ar:
   debugging_f98fcd74: التصحيح
   decaying_average_8bf6a0dd: "متوسط متأخر"
   decaying_average_recentint_remainderint_ab0636cc: "متوسط التطور - %{recentInt}%/%{remainderInt}%"
+  december_acc47508: ديسمبر
   decorative_image_3c28aa7d: "صورة تزيين"
   decrease_indent_d9cf469d: "تقليل المسافة البادئة"
   decrease_indent_de6343ab: "تقليل المسافة البادئة"
@@ -9965,6 +9979,7 @@ ar:
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "سيؤدي حذف المستخدم إلى القضاء على جميع المحافظ الإلكترونية الخاصة به. بدلاً من ذلك، يمكن تمييز المحافظ الإلكترونية كل على حدا كـ \"بريد عشوائي\" أو \"آمنة\" لتعديل عرضها."
   deleting_assignment_22d5851d: "جارٍ حذف المهمة"
   deleting_b896f5f: "يتم الآن الحذف"
+  deleting_f2ff0d09: "جارٍ الحذف"
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "تتطلب المواقع التجريبية تكوين إعدادات Recaptcha. يرجى استشارة مسؤول الموقع لديك لمعرفة مثيل Canvas. "
   demos: 
@@ -11203,6 +11218,7 @@ ar:
   enables_the_microsoft_immersive_reader_button_in_s_ab4af0cd: "لتمكين زر Microsoft Immersive Reader في مساحات Canvas المدعومة. قد يستمر الزر ممكنّا في المساق بغض النظر عن هذا الإعداد إذا قام مسؤول الحساب بتشغيله لكافة المستخدمين."
   enables_ui_features_for_managing_extended_submissi_841f45bc: "لتمكين ميزات واجهة المستخدم لإدارة إرسالات \"موسعة\"."
   enabling_the_elementary_theme_will_change_the_font_c944b619: "سيؤدي تمكين نمط التعليم الابتدائي إلى تغيير الخط في واجهة Canvas وتبسيط قائمة تنقل المساق لجميع المستخدمين في مساقك."
+  enabling_this_option_automatically_moves_course_pa_6ded6d4d: "يؤدي تمكين هذا الخيار إلى نقل تواريخ استحقاق مهمة سرعة المساق تلقائيًا إلى بعد تاريخ الانتهاء."
   encourage_class_participation_4e069479: "التشجيع على المشاركة داخل الصفوف"
   encourage_student_discourse_7836b9f7: "شجع الطلاب على النقاش"
   encrypted_sourcedids_for_basic_outcomes_87fa11ea: "معرفات مصدر مشفرة للنواتج الأساسية"
@@ -11835,6 +11851,160 @@ ar:
   event_update_failed_b6116651: "تعذر تحديث الحدث"
   everthing_updated_after_start_date_f3be8ba: "كل ما تم تحديثه بعد تاريخ البدء"
   every_665d821e: كل
+  every_count_days_times_times_6271ab22: 
+    few: "كل %{count} من الأيام، %{times} من المرات"
+    many: "كل %{count} من الأيام، %{times} من المرات"
+    one: "يوميًا، %{times} من المرات"
+    other: "كل %{count} من الأيام، %{times} من المرات"
+    two: "كل %{count} من الأيام، %{times} من المرات"
+    zero: "كل %{count} من الأيام، %{times} من المرات"
+  every_count_days_until_until_4f2203f1: 
+    few: "كل %{count} من الأيام حتى %{until}"
+    many: "كل %{count} من الأيام حتى %{until}"
+    one: "يوميًا حتى %{until}"
+    other: "كل %{count} من الأيام حتى %{until}"
+    two: "كل %{count} من الأيام حتى %{until}"
+    zero: "كل %{count} من الأيام حتى %{until}"
+  every_count_months_on_day_days_times_times_7fd6d4d7: 
+    few: "كل %{count} من الأشهر يوم %{days}، %{times} من المرات"
+    many: "كل %{count} من الأشهر يوم %{days}، %{times} من المرات"
+    one: "شهريًا يوم %{days}، %{times} من المرات"
+    other: "كل %{count} من الأشهر يوم %{days}، %{times} من المرات"
+    two: "كل %{count} من الأشهر يوم %{days}، %{times} من المرات"
+    zero: "كل %{count} من الأشهر يوم %{days}، %{times} من المرات"
+  every_count_months_on_day_days_until_until_495496b7: 
+    few: "كل %{count} من الأشهر يوم %{days} حتى %{until}"
+    many: "كل %{count} من الأشهر يوم %{days} حتى %{until}"
+    one: "شهريًا يوم %{days} حتى %{until}"
+    other: "كل %{count} من الأشهر يوم %{days} حتى %{until}"
+    two: "كل %{count} من الأشهر يوم %{days} حتى %{until}"
+    zero: "كل %{count} من الأشهر يوم %{days} حتى %{until}"
+  every_count_months_on_days_days_times_times_ae0816fb: 
+    few: "كل %{count} من الأشهر أيام %{days}، %{times} من المرات"
+    many: "كل %{count} من الأشهر أيام %{days}، %{times} من المرات"
+    one: "شهريًا أيام %{days}، %{times} من المرات"
+    other: "كل %{count} من الأشهر أيام %{days}، %{times} من المرات"
+    two: "كل %{count} من الأشهر أيام %{days}، %{times} من المرات"
+    zero: "كل %{count} من الأشهر أيام %{days}، %{times} من المرات"
+  every_count_months_on_days_days_until_until_ae3d3266: 
+    few: "كل %{count} من الأشهر أيام %{days} حتى %{until}"
+    many: "كل %{count} من الأشهر أيام %{days} حتى %{until}"
+    one: "شهريًا أيام %{days} حتى %{until}"
+    other: "كل %{count} من الأشهر أيام %{days} حتى %{until}"
+    two: "كل %{count} من الأشهر أيام %{days} حتى %{until}"
+    zero: "كل %{count} من الأشهر أيام %{days} حتى %{until}"
+  every_count_months_on_days_times_times_2a485144: 
+    few: "كل %{count} من الأشهر في %{days}، %{times} من المرات"
+    many: "كل %{count} من الأشهر في %{days}، %{times} من المرات"
+    one: "شهريًا كل %{days}، %{times} من المرات"
+    other: "كل %{count} من الأشهر في %{days}، %{times} من المرات"
+    two: "كل %{count} من الأشهر في %{days}، %{times} من المرات"
+    zero: "كل %{count} من الأشهر في %{days}، %{times} من المرات"
+  every_count_months_on_days_until_until_ea135626: 
+    few: "كل %{count} من الأشهر في %{days} حتى %{until}"
+    many: "كل %{count} من الأشهر في %{days} حتى %{until}"
+    one: "شهريًا كل %{days} حتى %{until}"
+    other: "كل %{count} من الأشهر في %{days} حتى %{until}"
+    two: "كل %{count} من الأشهر في %{days} حتى %{until}"
+    zero: "كل %{count} من الأشهر في %{days} حتى %{until}"
+  every_count_months_on_the_ord_days_times_times_ea3776de: 
+    few: "كل %{count} من الأشهر في %{ord} %{days}، %{times} من المرات"
+    many: "كل %{count} من الأشهر في %{ord} %{days}، %{times} من المرات"
+    one: "شهريًا في %{ord} %{days}، %{times} من المرات"
+    other: "كل %{count} من الأشهر في %{ord} %{days}، %{times} من المرات"
+    two: "كل %{count} من الأشهر في %{ord} %{days}، %{times} من المرات"
+    zero: "كل %{count} من الأشهر في %{ord} %{days}، %{times} من المرات"
+  every_count_months_on_the_ord_days_until_until_5e064333: 
+    few: "كل %{count} من الأشهر في %{ord} %{days} حتى %{until}"
+    many: "كل %{count} من الأشهر في %{ord} %{days} حتى %{until}"
+    one: "شهريًا في %{ord} %{days} حتى %{until}"
+    other: "كل %{count} من الأشهر في %{ord} %{days} حتى %{until}"
+    two: "كل %{count} من الأشهر في %{ord} %{days} حتى %{until}"
+    zero: "كل %{count} من الأشهر في %{ord} %{days} حتى %{until}"
+  every_count_months_times_times_742e638d: 
+    few: "كل %{count} من الأشهر، %{times} من المرات"
+    many: "كل %{count} من الأشهر، %{times} من المرات"
+    one: "شهريًا، %{times} من المرات"
+    other: "كل %{count} من الأشهر، %{times} من المرات"
+    two: "كل %{count} من الأشهر، %{times} من المرات"
+    zero: "كل %{count} من الأشهر، %{times} من المرات"
+  every_count_months_until_until_64ddc059: 
+    few: "كل %{count} من الأشهر حتى %{until}"
+    many: "كل %{count} من الأشهر حتى %{until}"
+    one: "شهريًا حتى %{until}"
+    other: "كل %{count} من الأشهر حتى %{until}"
+    two: "كل %{count} من الأشهر حتى %{until}"
+    zero: "كل %{count} من الأشهر حتى %{until}"
+  every_count_weeks_on_byday_times_times_26a6862b: 
+    few: "كل %{count} من الأسابيع في %{byday}، %{times} من المرات"
+    many: "كل %{count} من الأسابيع في %{byday}، %{times} من المرات"
+    one: "أسبوعيًا في %{byday}، %{times} من المرات"
+    other: "كل %{count} من الأسابيع في %{byday}، %{times} من المرات"
+    two: "كل %{count} من الأسابيع في %{byday}، %{times} من المرات"
+    zero: "كل %{count} من الأسابيع في %{byday}، %{times} من المرات"
+  every_count_weeks_on_byday_until_until_b2df01ed: 
+    few: "كل %{count} من الأسابيع في %{byday} حتى %{until}"
+    many: "كل %{count} من الأسابيع في %{byday} حتى %{until}"
+    one: "أسبوعيًا في %{byday} حتى %{until}"
+    other: "كل %{count} من الأسابيع في %{byday} حتى %{until}"
+    two: "كل %{count} من الأسابيع في %{byday} حتى %{until}"
+    zero: "كل %{count} من الأسابيع في %{byday} حتى %{until}"
+  every_count_weeks_times_times_cf37a00b: 
+    few: "كل %{count} من الأسابيع، %{times} من المرات"
+    many: "كل %{count} من الأسابيع، %{times} من المرات"
+    one: "أسبوعيًا، %{times} من المرات"
+    other: "كل %{count} من الأسابيع، %{times} من المرات"
+    two: "كل %{count} من الأسابيع، %{times} من المرات"
+    zero: "كل %{count} من الأسابيع، %{times} من المرات"
+  every_count_weeks_until_until_a1b0876e: 
+    few: "كل %{count} من الأسابيع حتى %{until}"
+    many: "كل %{count} من الأسابيع حتى %{until}"
+    one: "أسبوعيًا حتى %{until}"
+    other: "كل %{count} من الأسابيع حتى %{until}"
+    two: "كل %{count} من الأسابيع حتى %{until}"
+    zero: "كل %{count} من الأسابيع حتى %{until}"
+  every_count_years_on_date_times_times_c4894eac: 
+    few: "كل %{count} من السنوات في %{date}، %{times} من المرات"
+    many: "كل %{count} من السنوات في %{date}، %{times} من المرات"
+    one: "سنويًا في %{date}، %{times} من المرات"
+    other: "كل %{count} من السنوات في %{date}، %{times} من المرات"
+    two: "كل %{count} من السنوات في %{date}، %{times} من المرات"
+    zero: "كل %{count} من السنوات في %{date}، %{times} من المرات"
+  every_count_years_on_date_until_until_a351d21d: 
+    few: "كل %{count} من السنوات في %{date} حتى %{until}"
+    many: "كل %{count} من السنوات في %{date} حتى %{until}"
+    one: "سنويًا في %{date} حتى %{until}"
+    other: "كل %{count} من السنوات في %{date} حتى %{until}"
+    two: "كل %{count} من السنوات في %{date} حتى %{until}"
+    zero: "كل %{count} من السنوات في %{date} حتى %{until}"
+  every_count_years_on_the_first_days_of_month_times_34a59e5b: 
+    few: "كل %{count} من السنوات في أول %{days} من %{month}، %{times} من المرات"
+    many: "كل %{count} من السنوات في أول %{days} من %{month}، %{times} من المرات"
+    one: "سنويًا في أول %{days} من %{month}، %{times} من المرات"
+    other: "كل %{count} من السنوات في أول %{days} من %{month}، %{times} من المرات"
+    two: "كل %{count} من السنوات في أول %{days} من %{month}، %{times} من المرات"
+    zero: "كل %{count} من السنوات في أول %{days} من %{month}، %{times} من المرات"
+  every_count_years_on_the_first_days_of_month_until_e4c5b53a: 
+    few: "كل %{count} من السنوات في أول %{days} من %{month} حتى %{until}"
+    many: "كل %{count} من السنوات في أول %{days} من %{month} حتى %{until}"
+    one: "سنويًا في أول %{days} من %{month} حتى %{until}"
+    other: "كل %{count} من السنوات في أول %{days} من %{month} حتى %{until}"
+    two: "كل %{count} من السنوات في أول %{days} من %{month} حتى %{until}"
+    zero: "كل %{count} من السنوات في أول %{days} من %{month} حتى %{until}"
+  every_count_years_on_the_ord_days_of_month_times_t_59e822d0: 
+    few: "كل %{count} من السنوات في %{ord} %{days} من %{month}، %{times} من المرات"
+    many: "كل %{count} من السنوات في %{ord} %{days} من %{month}، %{times} من المرات"
+    one: "سنويًا في %{ord} %{days} من %{month}، %{times} من المرات"
+    other: "كل %{count} من السنوات في %{ord} %{days} من %{month}، %{times} من المرات"
+    two: "كل %{count} من السنوات في %{ord} %{days} من %{month}، %{times} من المرات"
+    zero: "كل %{count} من السنوات في %{ord} %{days} من %{month}، %{times} من المرات"
+  every_count_years_on_the_ord_days_of_month_until_u_3eb2883d: 
+    few: "كل %{count} من السنوات في %{ord} %{days} من %{month} حتى %{until}"
+    many: "كل %{count} من السنوات في %{ord} %{days} من %{month} حتى %{until}"
+    one: "سنويًا في %{ord} %{days} من %{month} حتى %{until}"
+    other: "كل %{count} من السنوات في %{ord} %{days} من %{month} حتى %{until}"
+    two: "كل %{count} من السنوات في %{ord} %{days} من %{month} حتى %{until}"
+    zero: "كل %{count} من السنوات في %{ord} %{days} من %{month} حتى %{until}"
   every_new_announcement_shows_up_in_this_area_creat_934a7a0c: "يظهر كل إعلان جديد في هذا المكان. أنشئ أول إعلان لك الآن."
   everyone_854554dd: الجميع
   everyone_due_dueatdisplaydate_5c920f8b: "الجميع: تاريخ الاستحقاق %{dueAtDisplayDate}"
@@ -11904,6 +12074,7 @@ ar:
   export_to_quizzes_2_format_45b3ec25: "تصدير إلى تنسيق اختبارات موجزة 2"
   exported_package_history_bfca44b9: "سجل الحزم التن تم تصديرها"
   exporting_b1eab154: "يتم الآن التصدير"
+  extend_assignment_due_dates_in_course_pacing_5ab23f52: "تمديد تواريخ استحقاق المهمة في سرعة المساق"
   extend_due_date_20651e76: "تمديد تاريخ الاستحقاق"
   extended_632ebee0: توسيع
   extended_9a58dcb6: موسع
@@ -12261,6 +12432,7 @@ ar:
   features_2581da: الخواص
   features_in_active_development_opting_in_includes__210f7720: "الميزات في عملية النشر النشطة - يتضمن الاختيار التحديثات الجارية خارج جدول الإصدار الدوري"
   features_no_longer_in_active_development_that_incl_74c3a739: "الميزات لم تعد موجودة في عملية النشر النشطة التي تتضمن تاريخًا عندما سيتم تشغيلها بشكل افتراضي"
+  february_f2c77675: فبراير
   federated_attributes_5cbe6441: "السمات الموحدة"
   federated_attributes_are_information_sent_from_you_2116fb61: "السمات الموحدة عبارة عن معلومات يرسلها موفر المصادقة الخاص بك والتي يمكن استخدامها للتحديث التلقائي لمعلومات المستخدمين في Canvas كلما يقومون بتسجيل الدخول."
   feed_url_8a433438: "عنوان URL للموجز"
@@ -12593,6 +12765,7 @@ ar:
   french_33881544: الفرنسية
   french_canada_c3d92fa6: "الفرنسية (كندا)"
   frequently_used_21a3eb8e: "الأكثر استخدامًا"
+  fri_e2451e74: الجمعة
   friendly_description_57f7fdde: "الوصف اللطيف"
   friendly_description_for_parent_student_display_e608ecf3: "الوصف الودي (لعرض ولي الأمر/الطالب)"
   friendly_name_601153fb: "اسم لطيف"
@@ -13208,8 +13381,11 @@ ar:
       labels: 
         final_grade_hidden: "تم تعطيل حساب الإجماليات"
         high: مرتفعة
+        high_q: "الربع الأعلى"
         low: منخفضة
+        low_q: "الربع الأدنى"
         mean: متوسطة
+        median: الوسيط
         only_graded: "يعتمد الحساب فقط على المهام التي تم تقييم درجاتها"
         total: الإجمالي
         your_score: "الدرجة الخاصة بك"
@@ -14897,6 +15073,7 @@ ar:
   if_you_ve_been_using_another_course_management_sys_67edfab1: "إذا كنت تستخدم نظام إدارة مساق آخر، فربما يكون لديك بعض الأشياء تريد نقلها إلى Canvas. يمكننا إرشادك عبر عملية ترحيل المحتوى بسهولة إلى داخل موقع Canvas."
   if_you_wish_you_can_rename_sis_to_something_more_f_ac9ef13b: "يمكنك، إذا أردت، إعادة تسمية \"SIS\" إلى اسم يألفه موظفوك بشكل أكبر"
   if_you_would_like_to_keep_your_unsubmitted_comment_b7e349ce: "إذا كنت ترغب في الاحتفاظ بتعليقاتك غير المرسلة، يرجى حفظها قبل مغادرة هذه الصفحة."
+  if_you_would_like_to_keep_your_unsubmitted_rubric__1725d80d: "إذا كنت ترغب في الاحتفاظ بالروبرك غير المرسل، يرجى حفظها قبل مغادرة هذه الصفحة."
   if_you_would_like_to_link_to_your_own_campus_suppo_85a94934: "إذا رغبت في الارتباط بموقع ويب دعم الحرم الجامعي الخاص بك في مربع حوار التعليمات فيمكنك القيام بذلك من هنا."
   if_your_institution_is_likely_to_need_more_than_10_297382d: |-
       إذا كان من المرجح أن مؤسستك ستحتاج إلى أكثر من 10 مؤتمرات متزامنة بواسطة 
@@ -15283,9 +15460,13 @@ ar:
   international_sms_send_from_recipient_s_country_43881ea4: "رسالة SMS دولية - الإرسال من بلد المستلم"
   international_text_messaging_rates_may_apply_d4b4a97a: "يمكن أن تنطبق الأسعار الدولية للرسائل النصية."
   internet2_254c6ca6: Internet2
+  interval_must_be_0_e7b8eb5: "INTERVAL يجب أن يكون > 0"
   invalid_address_book_strategy_904a7ada: "طريقة دفتر العناوين غير صالحة."
   invalid_authenticity_token_b753558c: "رمز مصادقة غير صالح"
   invalid_aws_configuration_e8a6ae0f: "تكوين AWS غير صالح"
+  invalid_byday_byday_6e361e78: "BYDAY غير صالح '%{byday}'"
+  invalid_bymonth_bymonth_91f621b3: "BYMONTH غير صالح '%{bymonth}'"
+  invalid_bymonthday_bymonthday_87791c1b: "BYMONTHDAY غير صالح '%{bymonthday}'"
   invalid_content_type_utf_8_required_bd458b78: "نوع المحتوى غير صالح، تنسيق UTF-8 مطلوب"
   invalid_context_for_group_f6cd268a: "سياق غير صالح للمجموعة"
   invalid_context_type_68f40a61: "نوع سياق غير صالح"
@@ -15311,6 +15492,7 @@ ar:
   invalid_fields_for_a_group_invalid_f440b733: "الحقول غير الصالحة لمجموعة: %{invalid}"
   invalid_fields_for_an_outcome_invalid_fafdf0df: "الحقول غير الصالحة لمخرَج: %{invalid}"
   invalid_file_type_881cc9b2: "نوع ملف غير صالح"
+  invalid_freq_freq_84b0427d: "FREQ غير صالح '%{freq}'"
   invalid_grade_9726cbc6: "تقدير غير صالح"
   invalid_grade_passback_setting_a1d209d1: "grade_passback_setting غير صالح"
   invalid_hexcode_9124519f: "رمز سداسي غير صالح"
@@ -15345,6 +15527,7 @@ ar:
   invalid_targetcontexttype_53b96e87: "targetContextType غير صالح"
   invalid_timestamp_timestamp_in_future_5bc855d7: "طابع زمني غير صالح - طابع زمني مستقبلي"
   invalid_timestamp_timestamp_not_parseable_dae79e92: "طابع زمني غير صالح - طابع زمني غير قابل للتحليل"
+  invalid_until_until_date_55f29c82: "UNTIL غير صالح '%{until_date}'"
   invalid_url_in_xml: "عنوان url غير صالح في xml. يجب تجاوز علامات العطف."
   invalid_username_or_password_b60aa240: "اسم مستخدم غير صالح أو كلمة مرور غير صالحة"
   invalid_username_or_password_trouble_logging_in_ch_7699399c: "اسم مستخدم غير صالح أو كلمة مرور غير صالحة. تواجه مشكلة في تسجيل الدخول؟ *ألق نظرة على الأسئلة المتكررة حول تسجيل الدخول*."
@@ -15407,6 +15590,7 @@ ar:
   items_items_selected_5b55e566: "تم تحديد %{items} من العناصر"
   items_selected_have_different_usage_rights_52b325cc: "تختلف العناصر المحددة في حقوق الاستخدام."
   j_5226008a: j
+  january_9ca1eab1: يناير
   japan_81_d1832e9d: "اليابان (+81)"
   japan_d112df27: اليابان
   japanese_b5721ca7: اليابانية
@@ -15510,6 +15694,8 @@ ar:
       play_comment: "تعليق تشغيل الوسائط"
   json_is_not_valid_please_submit_properly_formatted_e3b2f88f: "Json غير صالح. يرجى إرسال json بتنسيق سليم."
   json_url_adbee260: "عنوان URL لـ JSON"
+  july_83babbee: يوليو
+  june_a58d8523: يونيو
   just_a_casual_question_comment_idea_or_suggestion_1579d069: "مجرد سؤال عابر، أو تعليق أو فكرة أو اقتراح"
   just_in_time_provisioning_382a0354: "التزويد في الوقت المناسب"
   jwk_method_6d5d0c84: "طريقة JWK *"
@@ -15688,6 +15874,7 @@ ar:
   learning_mastery_5fc34276: "إجادة التعلم"
   learning_mastery_6ed4fd63: "إجادة التعلم..."
   learning_mastery_context_name_a0b70957: "إجادة التعلم - %{context_name}"
+  learning_mastery_grade_book_59c90e6a: "دفتر درجات إجادة التعلم"
   learning_mastery_gradebook_description: |-
       يوفر دفتر درجات إجادة التعلم طريقة سريعة للمعلمين لعرض تقدم الطالب
       المساق على حصائل تعلم المساق. يتم عرض الحصائل بتنسيق
@@ -16362,6 +16549,7 @@ ar:
   manually_post_grades_18248306: "نشر الدرجات يدويًا"
   maori_new_zealand_5380a95f: "ماوري (نيوزلندا)"
   march_2020_responsiveness_f810a65b: "مدى الاستجابة لمارس 2020"
+  march_bbe310ee: مارس
   mark_all_as_read_8f3bdf57: "وضع علامة على الكل كمقروء"
   mark_all_as_read_a995ffbe: "وضع علامة مقروء على الكل"
   mark_all_as_unread_10e7f0fe: "وضع علامة غير مقروء على الكل"
@@ -16443,6 +16631,7 @@ ar:
   max_wait_time_dc158bf1: "الحد الأقصى لوقت الانتظار"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "الحد الأقصى لعدد المواعيد التي يمكن للمشارك حضورها"
   maximum_number_of_communication_channels_reached_70c4d2f9: "تم بلوغ الحد الأقصى من قنوات التواصل"
+  may_9248a063: مايو
   may_have_one_featured_link_and_one_new_link_at_a_t_21106efe: "(يمكن الحصول على ارتباط مميز واحد وارتباط جديد واحد في كل مرة)"
   media_af190855: الوسائط
   media_comment_content_5c2341fb: "محتوى تعليق الوسائط"
@@ -16530,6 +16719,7 @@ ar:
   media_recordings_749aef6d: "تسجيلات الوسائط"
   media_submission_464829f0: "إرسال الوسائط"
   median_ed291842: الوسيط
+  median_median_high_high_low_low_f356c5f1: "الوسيط %{median}، العالي %{high}، المنخفض %{low}"
   median_score_4657e907: "الوسيط: %{score}"
   medium_dark_skin_tone_5134edbc: "درجة لون داكنة متوسطة"
   medium_light_skin_tone_6c4a27fb: "درجة لون فاتحة متوسطة"
@@ -18590,8 +18780,10 @@ ar:
   minutes_4aee5a41: دقيقة/دقائق
   minutes_per_slot_5b7169e5: "الدقائق لكل فترة"
   missing_1a256b3b: مفقود
+  missing_count_or_until_62ad480c: "COUNT أو UNTIL مفقود"
   missing_d59852a7: مفقود
   missing_eaddacbd: مفقود
+  missing_interval_70679242: "INTERVAL مفقود"
   missing_missing_c1010432: "%{missing} مفقود"
   missing_percent_94534638: "مفقود: %{percent}"
   missing_policies_4f195e0b: "السياسات المفقودة"
@@ -18857,6 +19049,7 @@ ar:
   modules_settings_a7066f13: "إعدادات الوحدات النمطية"
   modules_tutorial_tray_d58ac3cb: "علبة برنامج الوحدات النمطية التعليمي"
   moduletitle_unpublished_8a70e0cd: "%{moduleTitle} (غير منشور)"
+  mon_8f18082a: الإثنين
   month_s_5c17590e: "شهر (أشهر)"
   monthandday_starting_at_time_769b12c8: "%{monthAndDay} يبدأ في %{time}"
   moodle_dropdown_many_warning_title: "يوجد في هذا البنك %{count} من الأسئلة ذات القوائم المنسدلة المتعددة والتي ربما تم استيرادها بطريقة غير صحيحة"
@@ -19310,6 +19503,7 @@ ar:
   no_date_set_25edf0c1: "لم يتم تعيين تاريخ"
   no_description_c2554c25: "بلا وصف"
   no_details_1ee29870: "لا توجد تفاصيل"
+  no_details_d15fa1ec: "لا توجد تفاصيل"
   no_directory_is_selected_please_select_a_directory_46ded46: "لم يتم تحديد دليل، الرجاء تحديد دليل قبل النقر فوق 'نقل'"
   no_domains_whitelisted_9dfb4960: "لا توجد قائمة بيضاء للمجالات"
   no_due_date_1d63d13b: "لا يوجد تاريخ استحقاق"
@@ -19774,6 +19968,7 @@ ar:
   notify_immediately_d1749c07: "الإعلام الفوري"
   notify_students_in_time_of_assignments_that_requir_332ef10e: "إعلام الطلاب في وقت المهام التي تستدعي اهتمامهم."
   notify_users_this_quiz_has_changed_c5b05995: "إعلام المستخدمين بأن هذا الاختبار قد تغير"
+  november_ca6fa5a6: نوفمبر
   now_click_the_agenda_button_607fb40e: "انقر فوق زر *جدول الأعمال*"
   now_that_your_course_is_set_up_and_available_you_p_c0c8635c: "تم الآن إعداد المساق الخاص بك وأصبح متاحًا، ربما لا تعد في حاجة إلى قائمة التحقق هذه ولكننا سنحتفظ بها لترجع إليها إذا رأيت فيما بعد أنك في حاجة إلى تجربة شيء جديد أو إن احتجت إلى مساعدة إضافية أثناء إجرائك تغييرات على محتوى المساق."
   now_viewing_attempt_current_attempt_918e616: "جارٍ الآن عرض المحاولة %{current_attempt}"
@@ -19936,6 +20131,7 @@ ar:
   observing_observee_d31d5fa2: "مراقبة: %{observee}"
   observing_student_name_to_select_a_different_stude_e0466126: "جارٍ مراقبة %{student_name}. لتحديد طالب مختلف، عد إلى لوحة المعلومات."
   occurrence_s_c12d1aad: "حدث (أحداث)"
+  october_6b2bf82: أكتوبر
   of_students_5d1af0d2: "# من الطلاب"
   of_times_1018baab: "# من المرات"
   off_5385ef3f: "إيقاف تشغيل"
@@ -20534,6 +20730,7 @@ ar:
   people_course_ddd9a66: "الأشخاص (المساق)"
   people_groups_tab_b245a614: "الأشخاص (علامة تبويب المجموعات)"
   people_options_cfb419a6: "خيارات الأشخاص"
+  people_page_upgrade_4adc3c37: "ترقية صفحة الأشخاص"
   people_tutorial_tray_a87a6c48: "علبة برنامج الأشخاص التعليمي"
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "سيشاهد الأشخاص هذا الاسم في المناقشات والرسائل والتعليقات."
   per_section_course_paces_4ce20ab7: "سرعات مساق لكل قسم"
@@ -20626,6 +20823,7 @@ ar:
   please_allow_arc_to_access_your_webcam_e72e4be4: "الرجاء السماح لـ Arc بالوصول إلى كاميرا الويب الخاصة بك."
   please_allow_canvas_to_access_your_microphone_and__dc2c3079: "يرجى السماح لـ Canvas بالوصول إلى الميكروفون وكاميرا الويب لديك."
   please_allow_canvas_to_access_your_webcam_f66bacb1: "الرجاء السماح لـ Canvas بالوصول إلى كاميرا الويب الخاصة بك."
+  please_check_back_soon_37d45200: "يرجى التحقق قريباً."
   please_contact_your_lms_administrator_for_more_det_635afd97: "الرجاء الاتصال بمسؤول LMS للمزيد من التفاصيل."
   please_create_a_group_set_8db6e8fe: "يُرجى إنشاء مجموعة."
   please_do_not_reply_to_this_email_it_will_not_be_d_1e49982a: "يرجى عدم الرد على هذا البريد الإلكتروني، لن يتم إرسالها."
@@ -24392,6 +24590,7 @@ ar:
   salesforce_ticketing_webtocase_connector_80f75716: "رابط تذاكر WebToCase لـ Salesforce"
   same_value_as_canvas_url__c_will_probably_be_going_37027686: "من المحتمل أن تختفي قريبًا القيمة المطابقة لـ 'Canvas_URL__c'"
   sample_data_e4fd01ff: "بيانات نموذجية"
+  sat_fa4152a4: السبت
   saudi_arabia_1f0dcbdc: "العربية السعودية"
   saudi_arabia_966_d01ed717: "العربية السعودية (+966)"
   save_11a80ec3: حفظ
@@ -25033,6 +25232,7 @@ ar:
   sent_fe0a1eb4: مرسَل
   separate_columns_for_first_last_names_in_gradebook_419126c3: "العمود المستقلة للأسماء الأولى/أسماء العائلة في Gradebook"
   separate_out_granular_add_and_delete_permissions_f_c63d37b6: "فصل أذونات الإضافة والحذف متعددة المستويات للمهام والاختبارات الموجزة من إذن الإدارة الحالي الذي يتحكم في الخيارات الثلاثة كلها."
+  september_9d32dd4b: سبتمبر
   sequence_footer: 
     next_module: "الوحدة التالية:"
     next_module_desc: "الوحدة التالية: *module*"
@@ -25527,6 +25727,7 @@ ar:
       add_link_field: "إضافة ارتباط آخر"
       bio: "السيرة الذاتية"
       cancel: إلغاء
+      is_required: "هذا الحقل مطلوب"
       know_this_person_as: "أنت تعرف هذا الشخص كـ..."
       links: ارتباطات
       links_title: العنوان
@@ -26004,6 +26205,7 @@ ar:
       إظهار إعلانات مستوى الحساب السابقة للمستخدمين السماح
       للمستخدم بمشاهدة الإعلانات التي انتهت أو تم تجاهلها.
   show_projections_32a3756: "إظهار التوقعات"
+  show_quartiles_for_grades_and_use_them_for_box_and_e9be0a23: "إظهار الأرباع للدرجات واستخدامها للمربع والفواصل الصغيرة"
   show_question_details_b059df00: "عرض تفاصيل السؤال"
   show_recent_activity_stream_2be4abc1: "عرض تدفق آخر أنشطة"
   show_report_to_students_a07888a6: "إظهار تقرير للطلاب"
@@ -26966,6 +27168,7 @@ ar:
   suggestions_b8b03b9d: "الاقتراحات:"
   sum_of_all_files_in_mb_2b705055: "حجم مجموع كل الملفات بالميجابايت"
   summary_statistics_f74852a5: "ملخص الإحصاءات"
+  sun_298d7c8b: الأحد
   support: 
     array: 
       last_word_connector: "، و "
@@ -27649,6 +27852,7 @@ ar:
   there_are_no_pending_changes_to_cancel_244389fe: "لا توجد تغييرات معلقة للإلغاء"
   there_are_no_pending_changes_to_publish_b4ffc6a7: "لا توجد تغييرات معلقة للنشر"
   there_are_no_reports_for_you_to_view_b716717a: "لا توجد تقارير خاصة بك للعرض."
+  there_are_no_submissions_available_to_review_just__2149475c: "لا توجد إرسالات متاحة للمراجعة حتى الآن."
   there_are_no_unsaved_changes_9276e87c: "لا توجد أي تغييرات غير محفوظة"
   there_are_no_unsynced_changes_4e8f0838: "لا توجد أي تغييرات غير متزامنة"
   there_are_no_unsynched_changes_d208547c: "لا توجد أي تغييرات غير متزامنة"
@@ -27899,6 +28103,7 @@ ar:
   this_feature_flag_enables_isolated_view_inside_the_3db3f6f2: |-
       تمكّن علامة الميزة هذه من العرض المعزول داخل
       عمل إعادة تصميم المناقشات الجديد.
+  this_feature_flag_enables_the_react_instui_and_gra_ec5ad0da: "تمكّن علامة الميزة هذه ترقية صفحة الأشخاص React/InstUI وGraphQL."
   this_feature_flag_enables_the_use_of_the_updated_d_b78aa2b8: |-
       يمكّن علامة الميزة هذه استخدام صفحة إنشاء/تحرير
       النقاش المحدّثة.
@@ -28150,6 +28355,7 @@ ar:
   this_will_update_all_student_mastery_results_withi_934580d1: "سيؤدي هذا إلى تحديث جميع نتائج إجادة الطالب داخل هذا المساق."
   threshold_in_hours_to_notify_students_within_f33820aa: "الحد (في الساعات) لإعلام الطلاب خلال"
   threshold_pts_45f0e5d8: "الحد %{pts}"
+  thu_59cbcffe: الخميس
   ticket_successfully_submitted_f6254460: "تم إرسال البطاقة بنجاح."
   ticketing_system_52205bff: "نظام التذاكر"
   ticketing_system_configurations_c4fecd96: "تكوينات نظام التذاكر"
@@ -29121,6 +29327,7 @@ ar:
   try_disabling_the_unread_filter_b8d9d77: "جرّب تعطيل عامل التصفية \"غير مقروءة\"."
   try_entering_your_institution_s_complete_name_2013abab: "جرب إدخال الاسم الكامل لمؤسستك التعليمية."
   try_out_canvas_for_free_e2265d30: "جرب Canvas مجانًا!"
+  tue_bb10b386: الثلاثاء
   turkish_5b69578b: التركية
   turn_on_rtl_even_for_non_rtl_languages_8a1a8bc2: "تشغيل واجهة من اليمين لليسار حتى للغات التي ليست ضمن لغات اليمين لليسار"
   turned_in_submission_date_e9180b8b: "تم التسليم: %{submission_date}"
@@ -29415,6 +29622,7 @@ ar:
   unsubscribe_from_title_c98461b3: "إلغاء الاشتراك من %{title}"
   unsubscribed_c93564a2: "غير مشترك"
   unsubscribed_failed_2a176d2: "فشل إلغاء الاشتراك"
+  unsupported_bymonthday_only_a_single_day_is_permit_76e60fc9: "BYMONTHDAY غير مدعوم، اليوم الفردي فقط هو المسموح به."
   unsupported_package: "حزمة محتوى غير مدعومة"
   unsyncable_4bf11ee6: "غير قابل للمزامنة"
   unsyncable_message_95faa75d: "غير قابل للمزامنة: %{message}"
@@ -29477,6 +29685,7 @@ ar:
       لتحديث واجهة مستخدم تفضيلات إعلامات الحساب لتصبح أكثر حداثةt
       وتجربة مستخدم محدثة
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "لتحديث عرض أيقونات سياسة النشر في عنوان عمود مهمة دفتر الدرجات الجديد."
+  updates_the_student_facing_assignment_statistics_t_e1c9aecb: "لتحديث إحصائيات المهام التي يواجهها الطالب لتضمين الأرباع ولجعل مخطط المربع والفواصل الصغيرة مربعًا صالحًا ومخطط فواصل صغيرة."
   updates_to_json_api_auth_error_http_code_and_json__5936d452: "للتحديث إلى كود HTTP لخطأ المصادقة لواجهة برمجة تطبيقات JSON وحقل حالة JSON"
   updates_to_oauth_2_0_flow_to_stop_redirecting_in_t_51c14b07: "تم التحديث إلى تدفق OAuth 2.0 لإيقاف إعادة التوجيه في مصادقة \"الرمز المميز\""
   updating_6edbab78: تحديث
@@ -30299,6 +30508,7 @@ ar:
   visit_google_meet_ebdaf94f: "زيارة Google Meet"
   visit_group_group_name_7a816081: "زيارة المجموعة %{group_name}"
   visit_zoom_14636084: "زيارة Zoom"
+  wait_for_delete_to_complete_2f6167c6: "انتظر اكتمال الحذف"
   wait_time_4c8f74a2: "وقت الانتظار"
   waiting_for_attempted_login_6d00cb49: "الانتظار لمحاولة تسجيل الدخول"
   waiting_for_change_to_complete_b75b5e8b: "جارٍ انتظار اكتمال التغيير"
@@ -30389,6 +30599,7 @@ ar:
   website_url_b995c5b6: "عنوان URL لموقع ويب"
   website_url_input_1a3eab25: "إدخال عنوان URL لموقع الويب"
   website_url_url_bd07233d: "عنوان URL لموقع الويب: %{url}"
+  wed_84932f18: الأربعاء
   week_s_cb1492ee: "أسبوع (أسابيع)"
   weekly_summary_56cd0c95: "الموجز الأسبوعي"
   weight_9b308e5b: الوزن

@@ -367,6 +367,17 @@ describe AssignmentGroupsController do
           expect(assignment_json).to have_key "in_closed_grading_period"
         end
 
+        it "deals with non-array include" do
+          api_call_as_user(@teacher, :get,
+                           "/api/v1/courses/#{@course.id}/assignment_groups", {
+                             controller: "assignment_groups",
+                             action: "index",
+                             format: "json",
+                             course_id: @course.id,
+                             include: "assignments"
+                           }, {}, {}, { expected_status: 200 })
+        end
+
         it "in_closed_grading_period is true when any submission is in a closed grading period" do
           @gp_group.grading_periods.create!(
             start_date: 4.days.ago,

@@ -384,6 +384,39 @@ describe('ComposeModalContainer', () => {
 
         await waitFor(() => expect(mockedSetOnSuccess).toHaveBeenCalled())
       })
+
+      it('does not display success message when submission reply has errors', async () => {
+        const SUBMISSION_ID_THAT_RETURNS_ERROR = '440'
+        const mockErrorSubmission = {
+          _id: SUBMISSION_ID_THAT_RETURNS_ERROR,
+          subject: 'submission1 - course',
+          messages: [
+            {
+              author: {
+                _id: '1337'
+              }
+            }
+          ]
+        }
+        const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
+
+        const component = setup({
+          setOnSuccess: mockedSetOnSuccess,
+          isReply: true,
+          conversation: mockErrorSubmission,
+          isSubmissionCommentsType: true
+        })
+
+        // Set body
+        const bodyInput = await component.findByTestId('message-body')
+        fireEvent.change(bodyInput, {target: {value: 'Potato'}})
+
+        // Hit send
+        const button = component.getByTestId('send-button')
+        fireEvent.click(button)
+
+        await waitFor(() => expect(mockedSetOnSuccess).not.toHaveBeenCalled())
+      })
     })
   })
 

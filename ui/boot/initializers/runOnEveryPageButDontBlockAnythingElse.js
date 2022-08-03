@@ -38,7 +38,6 @@ import './ping'
 import './markBrokenImages'
 import './activateLtiThumbnailLauncher'
 import './sanitizeCSSOverflow'
-import './trackGoogleAnalyticsEventsOnClick'
 
 if (ENV.page_view_update_url) {
   isolate(() => import(/* webpackChunkName: "[request]" */ './trackPageViews'))()

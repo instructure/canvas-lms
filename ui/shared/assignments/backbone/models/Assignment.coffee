@@ -157,6 +157,9 @@ export default class Assignment extends Model
     return false if isAdmin()
     @get('in_closed_grading_period')
 
+  gradedSubmissionsExist: =>
+    @get('graded_submissions_exist')
+
   gradingType: (gradingType) =>
     return @get('grading_type') || 'points' unless gradingType
     @set 'grading_type', gradingType

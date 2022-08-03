@@ -206,9 +206,9 @@ describe('ImageSection', () => {
   })
 
   describe('calls onChange passing metadata when state prop changes', () => {
-    let getByTestId, getByText, getByTitle, container
+    let getByTestId, getByText, getByTitle, getByRole, container
 
-    const flushPromises = () => new Promise(setImmediate)
+    const flushPromises = () => new Promise(setTimeout)
     const lastPayloadOfActionType = (mockFn, type) =>
       mockFn.mock.calls.reverse().find(call => call[0].type === type)[0].payload
 
@@ -220,6 +220,7 @@ describe('ImageSection', () => {
       getByTestId = rendered.getByTestId
       getByText = rendered.getByText
       getByTitle = rendered.getByTitle
+      getByRole = rendered.getByRole
       container = rendered.container
     })
 
@@ -277,7 +278,7 @@ describe('ImageSection', () => {
         fireEvent.click(getByText('Course Images'))
         fireEvent.click(getByTitle('Click to embed image_one.png'))
         await flushPromises()
-        fireEvent.click(getByText(/crop image/i))
+        fireEvent.click(getByRole('button', {name: /crop image/i}))
         await flushPromises()
         // Zooms in just to change cropper settings
         fireEvent.click(
@@ -292,7 +293,9 @@ describe('ImageSection', () => {
           image: 'data:image/png;base64,asdfasdfjksdf==',
           shape: 'square',
           rotation: 0,
-          scaleRatio: 1.1
+          scaleRatio: 1.1,
+          translateX: 0,
+          translateY: 0
         })
       })
     })
@@ -384,7 +387,7 @@ describe('ImageSection', () => {
 
     describe('and an image is clicked', () => {
       let originalFileReader
-      const flushPromises = () => new Promise(setImmediate)
+      const flushPromises = () => new Promise(setTimeout)
 
       beforeEach(() => {
         fetchMock.mock('http://canvas.docker/files/722/download?download_frd=1', {})

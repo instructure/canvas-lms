@@ -71,7 +71,6 @@ class GradebooksController < ApplicationController
     js_bundle :grade_summary, :rubric_assessment
     css_bundle :grade_summary
 
-    @google_analytics_page_title = t("Grades for Student")
     load_grade_summary_data
     render stream: can_stream_template?
   end
@@ -559,6 +558,7 @@ class GradebooksController < ApplicationController
       late_policy: @context.late_policy.as_json(include_root: false),
       login_handle_name: root_account.settings[:login_handle_name],
       has_modules: @context.has_modules?,
+      message_attachment_upload_folder_id: @current_user.conversation_attachments_folder.id.to_s,
       new_gradebook_development_enabled: new_gradebook_development_enabled?,
       outcome_gradebook_enabled: outcome_gradebook_enabled?,
       outcome_links_url: api_v1_course_outcome_group_links_url(@context, outcome_style: :full),

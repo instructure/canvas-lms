@@ -42,8 +42,9 @@ module Submittable
 
   module ClassMethods
     def visible_ids_by_user(opts)
-      # pluck id, assignment_id, and user_id from items joined with the SQL view
+      # Items with an assignment: pluck id, assignment_id, and user_id from items joined with the SQL view
       plucked_visibilities = pluck_visibilities(opts).group_by { |_, _, user_id| user_id }
+
       # Assignment-less items are *normally* visible to all -- the exception is
       # section-specific discussions, so here get the ones visible to everyone in the
       # course, and below get the ones that are visible to the right section.
@@ -55,18 +56,33 @@ module Submittable
 
       # Now get the section-specific discussions that are in the proper sections.
       ids_visible_to_sections = if opts[:item_type] == :discussion
-                                  user_sections = Enrollment.active.where(
-                                    course_id: opts[:course_id], user_id: opts[:user_id]
-                                  ).pluck(:course_section_id)
-                                  DiscussionTopicSectionVisibility.active.where(course_section_id: user_sections).pluck(:discussion_topic_id).uniq
+                                  # build hash of user_ids to array of section ids
+                                  sections_per_user = {}
+                                  Enrollment.active.where(course_id: opts[:course_id], user_id: opts[:user_id])
+                                            .pluck(:user_id, :course_section_id)
+                                            .each { |user_id, section_id| (sections_per_user[user_id] ||= Set.new) << section_id }
+
+                                  # build hash of section_ids to array of visible topic ids
+                                  all_section_ids = sections_per_user.values.reduce([]) { |all_ids, section_ids| all_ids.concat(section_ids.to_a) }
+                                  topic_ids_per_section = {}
+                                  DiscussionTopicSectionVisibility.active.where(course_section_id: all_section_ids)
+                                                                  .pluck(:course_section_id, :discussion_topic_id)
+                                                                  .each { |section_id, topic_id| (topic_ids_per_section[section_id] ||= Set.new) << topic_id }
+                                  topic_ids_per_section.each { |section_id, topic_ids| topic_ids_per_section[section_id] = topic_ids.to_a }
+
+                                  # finally, build hash of user_ids to array of visible topic ids
+                                  topic_ids_per_user = {}
+                                  opts[:user_id].each { |user_id| topic_ids_per_user[user_id] = sections_per_user[user_id]&.map { |section_id| topic_ids_per_section[section_id] }&.flatten&.uniq&.compact }
+                                  topic_ids_per_user
                                 else
                                   []
                                 end
 
       # build map of user_ids to array of item ids {1 => [2,3,4], 2 => [2,4]}
       opts[:user_id].index_with do |student_id|
-        ids_from_pluck = (plucked_visibilities[student_id] || []).map { |id, _, _| id }
-        ids_from_pluck.concat(ids_visible_to_all).concat(ids_visible_to_sections)
+        assignment_item_ids = (plucked_visibilities[student_id] || []).map { |id, _, _| id }
+        section_specific_ids = ids_visible_to_sections[student_id] || []
+        assignment_item_ids.concat(ids_visible_to_all).concat(section_specific_ids)
       end
     end
 

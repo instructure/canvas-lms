@@ -32,6 +32,7 @@ import {resetCardCache} from '@canvas/dashboard-card'
 import {MOCK_CARDS, MOCK_CARDS_2} from '@canvas/k5/react/__tests__/fixtures'
 import {fetchShowK5Dashboard} from '@canvas/observer-picker/react/utils'
 
+jest.setTimeout(15000)
 jest.mock('@canvas/observer-picker/react/utils', () => ({
   ...jest.requireActual('@canvas/observer-picker/react/utils'),
   fetchShowK5Dashboard: jest.fn()
@@ -41,14 +42,6 @@ const currentUserId = defaultProps.currentUser.id
 const observedUserCookieName = `${OBSERVER_COOKIE_PREFIX}${currentUserId}`
 
 describe('K5Dashboard Parent Support', () => {
-  beforeAll(() => {
-    jest.setTimeout(15000)
-  })
-
-  afterAll(() => {
-    jest.setTimeout(5000)
-  })
-
   beforeEach(() => {
     document.cookie = `${observedUserCookieName}=4;path=/`
     moxios.install()
@@ -88,7 +81,7 @@ describe('K5Dashboard Parent Support', () => {
     expect(select.value).toBe('Student 4')
   })
 
-  it('prefetches dashboard cards with the correct url param', async done => {
+  it('prefetches dashboard cards with the correct url param', async () => {
     moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=4', {
       status: 200,
       response: MOCK_CARDS
@@ -112,7 +105,6 @@ describe('K5Dashboard Parent Support', () => {
     const preFetchedRequest = moxios.requests.mostRecent()
     expect(preFetchedRequest.url).toBe('/api/v1/dashboard/dashboard_cards?observed_user_id=4')
     expect(moxios.requests.count()).toBe(1)
-    done()
   })
 
   it('does not make a request if the user has been already requested', async () => {

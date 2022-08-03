@@ -23,12 +23,14 @@ import router from '../router'
 const sleep = async ms => new Promise(resolve => setTimeout(resolve, ms))
 
 describe('router', () => {
+  const windowOrigin = window.origin || document.origin // TODO: JSDOM v16 Upgrade
+
   describe('LTI deep linking handlers', () => {
     let oldEnv
 
     beforeAll(() => {
       oldEnv = ENV
-      ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN = document.origin
+      ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN = windowOrigin
 
       // this is added before listeners are attached so that this listener comes before.
       // this adds an event.origin to all messages so that isValidDeepLinkingEvent doesn't break,
@@ -38,7 +40,7 @@ describe('router', () => {
           event.stopImmediatePropagation()
           const eventWithOrigin = new MessageEvent('message', {
             data: event.data,
-            origin: document.origin
+            origin: windowOrigin
           })
           window.dispatchEvent(eventWithOrigin)
         }

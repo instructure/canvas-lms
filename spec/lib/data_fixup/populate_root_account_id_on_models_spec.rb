@@ -659,7 +659,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       it_behaves_like "a datafixup that populates root_account_id" do
         let(:record) do
           ScoreStatistic.create!(
-            assignment: reference_record, maximum: 100, minimum: 5, mean: 60, count: 10
+            assignment: reference_record, maximum: 100, minimum: 5, mean: 60, count: 10, lower_q: 20, median: 50, upper_q: 80
           )
         end
         let(:reference_record) { assignment_model }

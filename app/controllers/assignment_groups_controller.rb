@@ -371,7 +371,7 @@ class AssignmentGroupsController < ApplicationController
       mc_status = setup_master_course_restrictions(assignments, context)
     end
 
-    overwritten_includes = params[:include] || []
+    overwritten_includes = Array(params[:include])
     overwritten_includes -= ["assessment_requests"] unless can_include_assessment_requests
 
     groups.map do |group|

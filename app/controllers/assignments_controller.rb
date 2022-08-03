@@ -121,7 +121,25 @@ class AssignmentsController < ApplicationController
   end
 
   def render_a2_student_view(student:)
-    submission = @assignment.submissions.find_by(user: student)
+    current_user_submission = @assignment.submissions.find_by(user: student)
+    submission = if @context.feature_enabled?(:peer_reviews_for_a2)
+                   if params[:reviewee_id].present? && !@assignment.anonymize_students?
+                     @assignment.submissions.find_by(user_id: params[:reviewee_id])
+                   elsif params[:anonymous_asset_id].present?
+                     @assignment.submissions.find_by(anonymous_id: params[:anonymous_asset_id])
+                   else
+                     current_user_submission
+                   end
+                 else
+                   current_user_submission
+                 end
+
+    peer_review_mode_enabled = @context.feature_enabled?(:peer_reviews_for_a2) && (params[:reviewee_id].present? || params[:anonymous_asset_id].present?)
+    js_env({
+             peer_review_mode_enabled: submission.present? && peer_review_mode_enabled,
+             peer_review_available: submission.present? && submission.submitted? && current_user_submission.present? && current_user_submission.submitted?
+           })
+
     graphql_submission_id = nil
     if submission
       graphql_submission_id = CanvasSchema.id_from_object(
@@ -718,7 +736,8 @@ class AssignmentsController < ApplicationController
         HAS_GRADING_PERIODS: @context.grading_periods?,
         MODERATED_GRADING_MAX_GRADER_COUNT: @assignment.moderated_grading_max_grader_count,
         PERMISSIONS: {
-          can_manage_groups: can_do(@context.groups.temp_record, @current_user, :create)
+          can_manage_groups: can_do(@context.groups.temp_record, @current_user, :create),
+          can_edit_grades: can_do(@context, @current_user, :manage_grades)
         },
         PLAGIARISM_DETECTION_PLATFORM: Lti::ToolProxy.capability_enabled_in_context?(
           @assignment.course,
@@ -743,6 +762,7 @@ class AssignmentsController < ApplicationController
       hash[:DUE_DATE_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.due_date_required_for_account?(@context)
       hash[:MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT] = AssignmentUtil.name_length_required_for_account?(@context)
       hash[:MAX_NAME_LENGTH] = try(:context).try(:account).try(:sis_assignment_name_length_input).try(:[], :value).to_i
+      hash[:IS_MODULE_ITEM] = !@assignment.context_module_tags.empty?
 
       selected_tool = @assignment.tool_settings_tool
       hash[:SELECTED_CONFIG_TOOL_ID] = selected_tool ? selected_tool.id : nil

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, waitFor} from '@testing-library/react'
+import {act, render, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {mockSubmission} from '@canvas/assignments/graphql/studentMocks'
 import React from 'react'
@@ -66,8 +66,8 @@ describe('TextEntry', () => {
     jest.useFakeTimers()
   })
 
-  afterEach(() => {
-    jest.runOnlyPendingTimers()
+  afterEach(async () => {
+    await act(async () => jest.runOnlyPendingTimers())
     jest.useRealTimers()
   })
 
@@ -335,6 +335,7 @@ describe('TextEntry', () => {
 
     it('inserts a link for each content item if the message is A2ExternalContentReady', async () => {
       window.postMessage(realEvent, '*')
+      await act(async () => jest.runOnlyPendingTimers())
       await waitFor(() => {
         expect(insertCode).toHaveBeenCalledTimes(2)
         expect(insertCode).toHaveBeenNthCalledWith(1, expect.stringContaining('first item'))

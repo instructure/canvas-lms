@@ -87,6 +87,7 @@ export const AddressBookContainer = props => {
         setIsLoadingMoreData(false)
         return {
           legacyNode: {
+            id: previousResult.legacyNode.id,
             recipients: {
               sendMessagesAll: previousResult.legacyNode?.recipients?.sendMessagesAll,
               contextsConnection: {
@@ -106,7 +107,8 @@ export const AddressBookContainer = props => {
                 __typename: 'MessageableUserConnection'
               },
               __typename: 'Recipients'
-            }
+            },
+            __typename: 'User'
           }
         }
       }

@@ -224,6 +224,7 @@ export default class EditView extends ValidatedFormView
       @gradingTypeSelector.on 'change:gradingType', @onChange
 
     @lockedItems = options.lockedItems || {};
+    @cannotEditGrades = !options.canEditGrades
 
   handleCancel: (ev) =>
     ev.preventDefault()
@@ -718,6 +719,7 @@ export default class EditView extends ValidatedFormView
       isLargeRoster: ENV?.IS_LARGE_ROSTER or false
       conditionalReleaseServiceEnabled: ENV?.CONDITIONAL_RELEASE_SERVICE_ENABLED or false
       lockedItems: @lockedItems
+      cannotEditGrades: @cannotEditGrades
       anonymousGradingEnabled: ENV?.ANONYMOUS_GRADING_ENABLED or false
       anonymousInstructorAnnotationsEnabled: ENV?.ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED or false
 

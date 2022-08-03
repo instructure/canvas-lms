@@ -41,6 +41,7 @@ describe ConversationsController do
     end
 
     it "assigns variables" do
+      allow(InstStatsd::Statsd).to receive(:increment)
       user_session(@student)
       conversation
 
@@ -50,6 +51,7 @@ describe ConversationsController do
       get "index"
       expect(response).to be_successful
       expect(assigns[:js_env]).not_to be_nil
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.legacy")
     end
 
     it "assigns variables for json" do
@@ -205,6 +207,34 @@ describe ConversationsController do
         get "index", params: { scope: "starred" }, format: "json"
         expect(response).to be_successful
         expect(assigns[:conversations_json].size).to be 1
+      end
+    end
+
+    context "react-inbox" do
+      before do
+        Account.default.enable_feature! :react_inbox
+      end
+
+      context "metrics" do
+        before do
+          allow(InstStatsd::Statsd).to receive(:increment)
+        end
+
+        it "does not increment visit count if not authorized to open inbox" do
+          get "index"
+          assert_require_login
+          expect(InstStatsd::Statsd).not_to have_received(:increment).with("inbox.visit.react")
+        end
+
+        it "increments react counter when visited" do
+          account_admin_user
+          user_session(@user)
+          conversation
+
+          get "index"
+          expect(response).to be_successful
+          expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.react")
+        end
       end
     end
   end
@@ -553,12 +583,16 @@ describe ConversationsController do
       course_with_student_logged_in(active_all: true)
       conversation(num_other_users: 2).update_attribute(:workflow_state, "unread")
 
+      allow(InstStatsd::Statsd).to receive(:increment)
       post "update", params: { id: @conversation.conversation_id, conversation: { subscribed: "0", workflow_state: "archived", starred: "1" } }
+
       expect(response).to be_successful
       @conversation.reload
       expect(@conversation.subscribed?).to be_falsey
       expect(@conversation).to be_archived
       expect(@conversation.starred).to be_truthy
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.archived.legacy")
+      expect(InstStatsd::Statsd).not_to have_received(:increment).with("inbox.conversation.archived.react")
     end
   end
 
@@ -570,7 +604,10 @@ describe ConversationsController do
       @conversation.last_message_at = expected_lma
       @conversation.save!
 
+      allow(InstStatsd::Statsd).to receive(:increment)
       post "add_message", params: { conversation_id: @conversation.conversation_id, body: "hello world" }
+
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.isReply.legacy")
       expect(response).to be_successful
       expect(@conversation.messages.size).to eq 2
       expect(@conversation.reload.last_message_at).to eql expected_lma

@@ -519,7 +519,7 @@ describe "/submissions/show" do
 
         it "adds an indicator if unread comments are present" do
           view_context(@course, @student)
-          @student.mark_rubric_comments_unread!(@submission)
+          @student.mark_rubric_assessments_unread!(@submission)
           assign(:assignment, @assignment)
           assign(:submission, @submission)
           render "submissions/show"
@@ -528,7 +528,7 @@ describe "/submissions/show" do
 
         it "does not show the indicator if unread comments aren't present" do
           view_context(@course, @student)
-          @student.mark_rubric_comments_read!(@submission)
+          @student.mark_rubric_assessments_read!(@submission)
           assign(:assignment, @assignment)
           assign(:submission, @submission)
           render "submissions/show"

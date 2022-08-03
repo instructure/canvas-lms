@@ -121,19 +121,29 @@ describe('PlannerApp', () => {
 
   describe('focus handling', () => {
     const dae = document.activeElement
+    let containerElement = null
+    let wrapper = null
+
+    beforeEach(() => {
+      containerElement = document.createElement('div')
+      document.body.appendChild(containerElement)
+    })
+
     afterEach(() => {
-      if (dae) dae.focus() // else ?
+      if (dae) dae.focus()
+      if (wrapper) wrapper.unmount()
+      document.body.removeChild(containerElement)
     })
 
     it('calls fallbackFocus when the load prior focus button disappears', () => {
       const focusFallback = jest.fn()
-      const wrapper = mount(
+      wrapper = mount(
         <PlannerApp
           {...getDefaultValues()}
           days={[]}
           allPastItemsLoaded={false}
           focusFallback={focusFallback}
-        />
+        />, { attachTo: containerElement }
       )
       const button = wrapper.find('ShowOnFocusButton button')
       button.getDOMNode().focus()

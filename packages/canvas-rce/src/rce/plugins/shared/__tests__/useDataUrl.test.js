@@ -20,7 +20,7 @@ import {act, renderHook} from '@testing-library/react-hooks/dom'
 import useDataUrl from '../useDataUrl'
 import fetchMock from 'fetch-mock'
 
-const flushPromises = () => new Promise(setImmediate)
+const flushPromises = () => new Promise(setTimeout)
 
 describe('useDataUrl()', () => {
   beforeEach(() => {

@@ -2005,7 +2005,10 @@ describe User do
 
       it "works for shadow records" do
         @shard1.activate do
-          @shadow = User.create!(id: @user.global_id)
+          @user.save_shadow_record
+          # rubocop:disable Rails/WhereEquals
+          @shadow = User.where("id = ?", @user.global_id).first
+          # rubocop:enable Rails/WhereEquals
         end
         expect(@shadow.favorites.exists?).to be_truthy
       end

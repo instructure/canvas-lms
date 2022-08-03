@@ -23,6 +23,8 @@ import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 import ExternalToolSubmission from '../ExternalToolSubmission'
 
 describe('ExternalToolSubmission', () => {
+  const windowOrigin = window.origin || document.origin // TODO: JSDOM v16 Upgrade
+
   let oldEnv
   let tool
 
@@ -31,7 +33,7 @@ describe('ExternalToolSubmission', () => {
 
     ENV = {
       ASSIGNMENT_ID: '200',
-      DEEP_LINKING_POST_MESSAGE_ORIGIN: document.origin,
+      DEEP_LINKING_POST_MESSAGE_ORIGIN: windowOrigin,
       COURSE_ID: '100'
     }
 
@@ -131,7 +133,7 @@ describe('ExternalToolSubmission', () => {
         subject,
         ...contents
       }
-      fireEvent(window, new MessageEvent('message', {origin: document.origin, data}))
+      fireEvent(window, new MessageEvent('message', {origin: windowOrigin, data}))
     }
 
     const renderComponent = submission =>

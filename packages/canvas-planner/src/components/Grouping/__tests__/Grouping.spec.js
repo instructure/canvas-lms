@@ -212,14 +212,27 @@ it('does not render the grouping image and title when using singleCourseView', (
 })
 
 describe('handleFacadeClick', () => {
+  let containerElement = null
+  let wrapper = null
+
+  beforeEach(() => {
+    containerElement = document.createElement('div')
+    document.body.appendChild(containerElement)
+  })
+
+  afterEach(() => {
+    if (wrapper) wrapper.unmount()
+    document.body.removeChild(containerElement)
+  })
+
   it('sets focus to the groupingLink when called', () => {
-    const wrapper = mount(<Grouping {...getDefaultProps()} />)
+    wrapper = mount(<Grouping {...getDefaultProps()} />, { attachTo: containerElement })
     wrapper.instance().handleFacadeClick()
     expect(document.activeElement).toBe(wrapper.instance().groupingLink)
   })
 
   it('calls preventDefault on an event if given one', () => {
-    const wrapper = mount(<Grouping {...getDefaultProps()} />)
+    wrapper = mount(<Grouping {...getDefaultProps()} />)
     const fakeEvent = {
       preventDefault: jest.fn()
     }

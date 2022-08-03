@@ -169,3 +169,18 @@ export const CREATE_SUBMISSION_COMMENT = gql`
   ${Error.fragment}
   ${SubmissionComment.fragment}
 `
+
+export const UPDATE_SUBMISSIONS_READ_STATE = gql`
+  mutation UpdateSubmissionsReadState($submissionIds: [ID!]!, $read: Boolean!) {
+    updateSubmissionsReadState(input: {submissionIds: $submissionIds, read: $read}) {
+      submissions {
+        _id
+        readState
+      }
+      errors {
+        ...Error
+      }
+    }
+  }
+  ${Error.fragment}
+`

@@ -23,7 +23,7 @@ require "aws-sdk-sns"
 class DeveloperKey < ActiveRecord::Base
   class CacheOnAssociation < ActiveRecord::Associations::BelongsToAssociation
     def find_target
-      DeveloperKey.find_cached(owner._read_attribute(reflection.foreign_key))
+      DeveloperKey.find_cached(owner.attribute(reflection.foreign_key))
     end
   end
 

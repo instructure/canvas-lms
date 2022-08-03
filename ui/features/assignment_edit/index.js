@@ -64,7 +64,8 @@ ready(() => {
   const gradingTypeSelector = new GradingTypeSelector({
     parentModel: assignment,
     preventNotGraded: assignment.submissionTypesFrozen(),
-    lockedItems
+    lockedItems,
+    canEditGrades: ENV.PERMISSIONS.can_edit_grades
   })
   const groupCategorySelector = new GroupCategorySelector({
     parentModel: assignment,
@@ -91,10 +92,12 @@ ready(() => {
         dueDatesReadonly: !!lockedItems.due_dates,
         availabilityDatesReadonly: !!lockedItems.availability_dates,
         inPacedCourse: assignment.inPacedCourse(),
+        isModuleItem: ENV.IS_MODULE_ITEM,
         courseId: assignment.courseID()
       })
     },
-    lockedItems: assignment.id ? lockedItems : {} // if no id, creating a new assignment
+    lockedItems: assignment.id ? lockedItems : {}, // if no id, creating a new assignment
+    canEditGrades: ENV.PERMISSIONS.can_edit_grades || !assignment.gradedSubmissionsExist()
   })
 
   const editHeaderView = new EditHeaderView({

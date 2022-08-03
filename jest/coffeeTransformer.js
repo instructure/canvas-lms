@@ -21,9 +21,9 @@ const {transform} = require('@babel/core')
 
 exports.process = (coffee, path) => {
   const esm = compile(coffee, {bare: true})
-  const cjs = transform(esm, {
+
+  return transform(esm, {
     filename: path,
     plugins: ['@babel/plugin-transform-modules-commonjs']
-  }).code
-  return cjs
+  })
 }

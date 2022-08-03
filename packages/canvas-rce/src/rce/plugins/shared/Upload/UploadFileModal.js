@@ -156,7 +156,7 @@ const UploadFileModal = React.forwardRef(
           )
         }}
         open
-        shouldCloseOnDocumentClick
+        shouldCloseOnDocumentClick={false}
         liveRegion={trayProps.liveRegion}
       >
         <Modal.Header>

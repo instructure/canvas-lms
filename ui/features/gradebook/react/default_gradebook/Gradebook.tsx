@@ -77,6 +77,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import * as EffectiveDueDates from '@canvas/grading/EffectiveDueDates'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
+import MessageStudentsWhoHelper from '@canvas/grading/messageStudentsWhoHelper'
 import AssignmentOverrideHelper from '@canvas/due-dates/AssignmentOverrideHelper'
 // @ts-ignore
 import UserSettings from '@canvas/user-settings'
@@ -4742,7 +4743,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   sendMessageStudentsWho = args => {
-    return GradebookApi.sendMessageStudentsWho(
+    return MessageStudentsWhoHelper.sendMessageStudentsWho(
       args.recipientsIds,
       args.subject,
       args.body,

@@ -55,7 +55,7 @@ let runOnceAfterLocaleFiles = () => {
 }
 
 window.addEventListener('canvasReadyStateChange', function ({detail}) {
-  if (detail === 'localeFiles' || window.canvasReadyState === 'complete') {
+  if (detail === 'capabilities' || window.canvasReadyState === 'complete') {
     runOnceAfterLocaleFiles()
     runOnceAfterLocaleFiles = () => {}
   }

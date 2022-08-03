@@ -213,6 +213,28 @@ describe StudentEnrollment do
         ta_in_course(active_all: true, user: user_with_pseudonym)
         expect(Delayed::Job.where(singleton: "course_pace_publish:#{@course_pace.id}")).not_to exist
       end
+
+      describe "section pace" do
+        before :once do
+          @section1 = @course.course_sections.create! name: "section 1"
+          @section2 = @course.course_sections.create! name: "section 2"
+          @published_section_course_pace = @course.course_paces.create!(course_section_id: @section1.id)
+          @unpublished_section_course_pace = @course.course_paces.create!(course_section_id: @section2.id)
+          @published_section_course_pace.publish
+        end
+
+        it "queue an update for the section pace if it is published" do
+          student_in_section(@section1)
+          expect(Delayed::Job.where(singleton: "course_pace_publish:#{@course_pace.id}")).not_to exist
+          expect(Delayed::Job.where(singleton: "course_pace_publish:#{@published_section_course_pace.id}")).to exist
+        end
+
+        it "queue an update for the default course pace if the section pace isn't published" do
+          student_in_section(@section2)
+          expect(Delayed::Job.where(singleton: "course_pace_publish:#{@unpublished_section_course_pace.id}")).not_to exist
+          expect(Delayed::Job.where(singleton: "course_pace_publish:#{@course_pace.id}")).to exist
+        end
+      end
     end
   end
 end

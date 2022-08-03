@@ -25,6 +25,8 @@ export const actions = {
   SET_SHAPE: 'SetShape',
   SET_ROTATION: 'SetRotation',
   SET_SCALE_RATIO: 'SetScaleRatio',
+  SET_TRANSLATE_X: 'SetTranslateX',
+  SET_TRANSLATE_Y: 'SetTranslateY',
   UPDATE_SETTINGS: 'UpdateSettings'
 }
 
@@ -38,6 +40,10 @@ export const cropperSettingsReducer = (state, action) => {
       return {...state, rotation: action.payload}
     case actions.SET_SCALE_RATIO:
       return {...state, scaleRatio: action.payload}
+    case actions.SET_TRANSLATE_X:
+      return {...state, translateX: action.payload}
+    case actions.SET_TRANSLATE_Y:
+      return {...state, translateY: action.payload}
     case actions.UPDATE_SETTINGS:
       return {...state, ...action.payload}
     default:

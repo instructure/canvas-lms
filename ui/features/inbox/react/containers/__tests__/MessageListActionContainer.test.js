@@ -83,6 +83,11 @@ describe('MessageListActionContainer', () => {
       expect(component.container).toBeTruthy()
     })
 
+    it('should render without waiting for queries to finish', () => {
+      const component = setup()
+      expect(component.queryByTestId('tool-bar')).toBeTruthy()
+    })
+
     it('should render All Courses option', async () => {
       const {findByTestId, queryByText} = setup()
       const courseDropdown = await findByTestId('course-select')

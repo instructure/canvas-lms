@@ -43,6 +43,7 @@ RUN --mount=target=/tmp/src \
     /tmp/dst && \
   find \
     gems/plugins/* \
+    ui/engine \
     ui/shared/* \
     packages/* \
     \
@@ -54,6 +55,7 @@ WORKDIR /tmp/src
 RUN --mount=target=/tmp/src \
   mkdir -p /tmp/dst && \
   cp --parents -rf \
+    ui/engine \
     packages \
     \
     /tmp/dst

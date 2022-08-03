@@ -197,8 +197,12 @@ beforeEach(() => {
 
 afterEach(() => {
   global.ENV = {}
+
+  // K5Course moves this element into the mounted React container, which gets auto-cleaned
+  // by RTL
   const modulesContainer = document.getElementById('k5-modules-container')
-  modulesContainer.remove()
+  modulesContainer?.remove()
+
   localStorage.clear()
   moxios.uninstall()
   fetchMock.restore()

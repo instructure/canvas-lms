@@ -456,15 +456,26 @@ QUnit.module('GradebookHeaderMenu#messageStudentsWho', () => {
 
       const [, elementProps] = createElementStub.firstCall.args
       deepEqual(elementProps.assignment, {
+        allowedAttempts: undefined,
+        anonymizeStudents: undefined,
+        courseId: undefined,
+        dueDate: undefined,
         gradingType: 'points',
+        htmlUrl: undefined,
         id: '1',
+        muted: undefined,
         name: 'some assignment',
+        pointsPossible: undefined,
+        postManually: undefined,
+        published: undefined,
         submissionTypes: 'online_text_entry'
       })
       deepEqual(elementProps.students, [
         {
+          excused: undefined,
           grade: '1',
           id: '100',
+          latePolicyStatus: undefined,
           name: 'Adam Jones',
           score: 1,
           redoRequest: false,
@@ -472,8 +483,10 @@ QUnit.module('GradebookHeaderMenu#messageStudentsWho', () => {
           submittedAt: undefined
         },
         {
+          excused: undefined,
           grade: '2',
           id: '101',
+          latePolicyStatus: undefined,
           name: 'Betty Ford',
           score: 2,
           redoRequest: false,
@@ -481,8 +494,10 @@ QUnit.module('GradebookHeaderMenu#messageStudentsWho', () => {
           submittedAt: undefined
         },
         {
+          excused: undefined,
           grade: '3',
           id: '102',
+          latePolicyStatus: undefined,
           name: 'Charlie Xi',
           score: 3,
           redoRequest: false,
@@ -490,8 +505,10 @@ QUnit.module('GradebookHeaderMenu#messageStudentsWho', () => {
           submittedAt: undefined
         },
         {
+          excused: undefined,
           grade: '4',
           id: '103',
+          latePolicyStatus: undefined,
           name: 'Dana Smith',
           score: 4,
           redoRequest: false,

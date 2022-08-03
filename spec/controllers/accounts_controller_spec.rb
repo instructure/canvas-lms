@@ -812,7 +812,6 @@ describe AccountsController do
           account: {
             settings: {
               enable_fullstory: "0",
-              enable_google_analytics: "0",
             }
           }
         }
@@ -825,8 +824,6 @@ describe AccountsController do
           post "update", format: "json", params: { id: account.id, **payload }
         end.to change {
           account.reload.settings.fetch(:enable_fullstory, true)
-        }.from(true).to(false).and change {
-          account.reload.settings.fetch(:enable_google_analytics, true)
         }.from(true).to(false)
       end
 
@@ -837,8 +834,6 @@ describe AccountsController do
           post "update", format: "json", params: { id: Account.site_admin.id, **payload }
         end.to not_change {
           account.reload.settings.fetch(:enable_fullstory, true)
-        }.and not_change {
-          account.reload.settings.fetch(:enable_google_analytics, true)
         }
       end
 
@@ -849,8 +844,6 @@ describe AccountsController do
           post "update", format: "json", params: { id: sub_account.id, **payload }
         end.to not_change {
           account.reload.settings.fetch(:enable_fullstory, true)
-        }.and not_change {
-          account.reload.settings.fetch(:enable_google_analytics, true)
         }
       end
 
@@ -861,8 +854,6 @@ describe AccountsController do
           post "update", format: "json", params: { id: account.id, **payload }
         end.to not_change {
           account.reload.settings.fetch(:enable_fullstory, true)
-        }.and not_change {
-          account.reload.settings.fetch(:enable_google_analytics, true)
         }
       end
     end

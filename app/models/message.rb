@@ -27,6 +27,7 @@ class Message < ActiveRecord::Base
   include TextHelper
   include HtmlTextHelper
   include Workflow
+  include RruleHelper
   include Messages::PeerReviewsHelper
   include Messages::SendStudentNamesHelper
 

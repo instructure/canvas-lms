@@ -150,7 +150,7 @@ QUnit.module('DueDateOverride#validateDatetimes', () => {
 
   QUnit.module('with course pacing', () => {
     test('shows notice when in a paced course', () => {
-      const view = new DueDateOverrideView({inPacedCourse: true})
+      const view = new DueDateOverrideView({inPacedCourse: true, isModuleItem: true})
       view.render()
       const el = view.$el
       ok(el[0].querySelector('[data-testid="CoursePacingNotice"]'))

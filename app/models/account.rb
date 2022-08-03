@@ -357,7 +357,6 @@ class Account < ActiveRecord::Base
 
   # privacy settings for root accounts
   add_setting :enable_fullstory, boolean: true, root_only: true, default: true
-  add_setting :enable_google_analytics, boolean: true, root_only: true, default: true
 
   add_setting :rce_favorite_tool_ids, inheritable: true
 

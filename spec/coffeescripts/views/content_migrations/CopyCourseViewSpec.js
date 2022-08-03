@@ -43,7 +43,7 @@ test('it should be accessible', function(assert) {
   assertions.isAccessible(this.copyCourseView, done, {a11yReport: true})
 })
 
-test('after init, calls updateNewDates when @courseFindSelect.triggers "course_changed" event', function() {
+test('after init, calls updateNewDates when @courseFindSelect.triggers "course_changed" event', function () {
   $('#fixtures').html(this.copyCourseView.render().el)
   const sinonSpy = sandbox.spy(this.copyCourseView.dateShift, 'updateNewDates')
   const course = {

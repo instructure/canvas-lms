@@ -601,6 +601,7 @@ class DiscussionTopicsController < ApplicationController
       ANNOUNCEMENTS_LOCKED: announcements_locked?,
       CREATE_ANNOUNCEMENTS_UNLOCKED: @current_user.create_announcements_unlocked?,
       USAGE_RIGHTS_REQUIRED: usage_rights_required,
+      IS_MODULE_ITEM: !@topic.context_module_tags.empty?,
       PERMISSIONS: {
         manage_files: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
       },
@@ -751,6 +752,26 @@ class DiscussionTopicsController < ApplicationController
             student_id: ":student_id"
           ) }
         )
+      end
+
+      unless can_read_and_visible
+        return render_unauthorized_action unless @current_user
+
+        respond_to do |format|
+          if @topic.is_announcement
+            flash[:error] = t "You do not have access to the requested announcement."
+            format.html do
+              redirect_to named_context_url(@context, :context_announcements_url)
+              return
+            end
+          else
+            flash[:error] = t "You do not have access to the requested discussion."
+            format.html do
+              redirect_to named_context_url(@context, :context_discussion_topics_url)
+              return
+            end
+          end
+        end
       end
 
       js_env({

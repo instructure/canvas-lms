@@ -23,12 +23,12 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {IconArrowOpenDownLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {View} from '@instructure/ui-view'
-import {CELL_HEIGHT, COLUMN_WIDTH} from './constants'
+import {CELL_HEIGHT, STUDENT_COLUMN_WIDTH} from './constants'
 
 const I18n = useI18nScope('learning_mastery_gradebook')
 
 const StudentHeader = () => (
-  <View background="secondary" as="div" width={COLUMN_WIDTH}>
+  <View background="secondary" as="div" width={STUDENT_COLUMN_WIDTH}>
     <Flex alignItems="center" justifyItems="space-between" height={CELL_HEIGHT}>
       <Flex.Item padding="0 0 0 small">
         <Text weight="bold">{I18n.t('Students')}</Text>

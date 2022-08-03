@@ -726,6 +726,16 @@ $discussion-dark-text: $ic-color-dark;
 }
 
 #discussion-toolbar {
+  #onlyUnread:focus +label[for="onlyUnread"] {
+    outline: 1px solid var(--ic-link-color);
+    outline-offset: 1px;
+  }
+
+  #showDeleted:focus +label[for="showDeleted"] {
+    outline: 1px solid var(--ic-link-color);
+    outline-offset: 1px;
+  }
+
   .topic-subscribe-button { display:none; }
   .topic-unsubscribe-button { display:none; }
 

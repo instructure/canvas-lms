@@ -24,7 +24,6 @@ describe "Gradebook frontend/backend calculators" do
   include_context "in-process server selenium tests"
 
   before :once do
-    skip("Unskip in EVAL-2496")
     @unlucky1 = [95.86, 66.62, 76.98, 87.85, 68.32, 94.32, 62.6, 81.59, 92.21, 90.31, 82.26, 70.88, 83.24, 90.83, 65.74, 73.05, 94.16, 65.3, 78.92, 87.11]
     @unlucky2 = [93.33, 88.32, 61.29, 83.57, 86.61, 77.36, 84.72, 63.51, 78.43, 82.44, 85.3, 65.51, 81.29, 76.52, 90.13, 71.1, 61.56, 90.05, 67.07, 96.76]
     @unlucky3 = [95.36, 90.12, 62.08, 91.67, 87.34, 77.01, 75.63, 64.18, 81.69, 65.87, 73.38, 91.17, 85.68, 72.33, 70.4, 74.86, 63.74, 96.16, 62.09, 97.29]
@@ -58,6 +57,7 @@ describe "Gradebook frontend/backend calculators" do
         assignments.each_with_index.map do |id, index|
           {
             assignment_id: id,
+            course_id: course.id,
             user_id: student_data.first.id,
             body: "hello",
             workflow_state: "graded",
@@ -66,6 +66,7 @@ describe "Gradebook frontend/backend calculators" do
             grade: grades[index].to_s,
             score: grades[index],
             graded_at: Time.zone.now,
+            posted_at: Time.zone.now,
             grade_matches_current_submission: true
           }
         end
@@ -77,6 +78,7 @@ describe "Gradebook frontend/backend calculators" do
           random = grades_sample.sample
           {
             assignment_id: id,
+            course_id: course.id,
             user_id: student_data.second.id,
             body: "hello",
             workflow_state: "graded",
@@ -85,6 +87,7 @@ describe "Gradebook frontend/backend calculators" do
             grade: random.to_s,
             score: random,
             graded_at: Time.zone.now,
+            posted_at: Time.zone.now,
             grade_matches_current_submission: true
           }
         end
@@ -96,12 +99,13 @@ describe "Gradebook frontend/backend calculators" do
 
   8.times do |i|
     it "final grades match with unlucky#{i} and course#{i}" do
-      # need to expand and bring all rows into view in order to scrape
-      driver.manage.window.resize_to(2000, 900)
       user_session(@teacher)
       Gradebook.visit(@courses[i])
+      course = @courses[i]
+      f("#assignments-filter").send_keys(course.id.to_s)
+      driver.action.send_keys(:enter).perform
       @frontend_grades = Gradebook.scores_scraped
-      @backend_grades = Gradebook.scores_api(@courses[i])
+      @backend_grades = Gradebook.scores_api(course)
       @diff = @frontend_grades - @backend_grades
 
       @diff.each do |entry|

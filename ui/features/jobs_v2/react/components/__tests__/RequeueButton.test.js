@@ -23,7 +23,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 
 jest.mock('@canvas/do-fetch-api-effect')
 
-const flushPromises = () => new Promise(setImmediate)
+const flushPromises = () => new Promise(setTimeout)
 
 function mockRequeueApi({path}) {
   if (path === '/api/v1/jobs2/1/requeue') {

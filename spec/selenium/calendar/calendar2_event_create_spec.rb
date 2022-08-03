@@ -311,6 +311,26 @@ describe "calendar2" do
         expect(event.reload.child_events.length).to be 1
       end
     end
+
+    context "assignment creation" do
+      it "uses the course default due time" do
+        untitled_course = @course
+        untitled_course.update(default_due_time: "17:30:00")
+        course_with_teacher(user: @teacher, active_enrollment: true, course_name: "Time")
+        get "/calendar2"
+        wait_for_ajaximations
+        f("#create_new_event_link").click
+        f("[aria-controls=\"edit_assignment_form_holder\"]").click
+        today = untitled_course.time_zone.today
+        expect(f("#assignment_due_at").attribute(:value)).to eq(I18n.l(today, format: :medium_with_weekday))
+        replace_content(f("#assignment_title"), "important assignment")
+        click_option(f("#assignment_context"), untitled_course.name)
+        expect(f("#assignment_due_at").attribute(:value)).to eq("#{I18n.l(today, format: :medium_with_weekday)} 5:30pm")
+        f("#edit_assignment_form_holder button[type=submit]").click
+        wait_for_ajaximations
+        expect(untitled_course.assignments.last.due_at).to eq(today.to_time(:utc).change(hour: 17, min: 30))
+      end
+    end
   end
 
   context "to-do dates" do

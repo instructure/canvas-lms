@@ -19,39 +19,51 @@
 import React, {useState} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
+import {Spinner} from '@instructure/ui-spinner'
+import {useScope as useI18nScope} from '@canvas/i18n'
 import AlignmentSummaryHeader from './AlignmentSummaryHeader'
 import AlignmentOutcomeItemList from './AlignmentOutcomeItemList'
 import useSearch from '@canvas/outcomes/react/hooks/useSearch'
+import useCourseAlignmentStats from '@canvas/outcomes/react/hooks/useCourseAlignmentStats'
 
 // Sample data - remove after integration with graphql
-import {
-  totalOutcomes,
-  alignedOutcomes,
-  totalAlignments,
-  totalArtifacts,
-  alignedArtifacts,
-  generateOutcomes
-} from './__tests__/testData'
+import {generateOutcomes} from './__tests__/testData'
+
+const I18n = useI18nScope('AlignmentSummary')
 
 const AlignmentSummary = () => {
   const {search, onChangeHandler, onClearHandler} = useSearch()
   const [scrollContainer, setScrollContainer] = useState(null)
+  const {data: alignmentStatsData, loading: alignmentStatsLoading} = useCourseAlignmentStats()
+  const courseAlignmentStats = alignmentStatsData?.course?.outcomeAlignmentStats || {}
+  const {totalOutcomes, alignedOutcomes, totalAlignments, totalArtifacts, alignedArtifacts} =
+    courseAlignmentStats
 
+  const renderAlignmentStatsLoader = () => (
+    <div style={{textAlign: 'center'}} data-testid="outcome-alignment-summary-loading">
+      <Spinner renderTitle={I18n.t('Loading')} size="large" />
+    </div>
+  )
+
+  const renderAlignmentSummaryHeader = () => (
+    <AlignmentSummaryHeader
+      totalOutcomes={totalOutcomes}
+      alignedOutcomes={alignedOutcomes}
+      totalAlignments={totalAlignments}
+      totalArtifacts={totalArtifacts}
+      alignedArtifacts={alignedArtifacts}
+      searchString={search}
+      updateSearchHandler={onChangeHandler}
+      clearSearchHandler={onClearHandler}
+      data-testid="outcome-alignment-summary-header"
+    />
+  )
   return (
     <View data-testid="outcome-alignment-summary">
       <View as="div" padding="0 0 small" borderWidth="0 0 small">
         <Flex>
           <Flex.Item as="div" size="100%" position="relative">
-            <AlignmentSummaryHeader
-              totalOutcomes={totalOutcomes}
-              alignedOutcomes={alignedOutcomes}
-              totalAlignments={totalAlignments}
-              totalArtifacts={totalArtifacts}
-              alignedArtifacts={alignedArtifacts}
-              searchString={search}
-              updateSearchHandler={onChangeHandler}
-              clearSearchHandler={onClearHandler}
-            />
+            {alignmentStatsLoading ? renderAlignmentStatsLoader() : renderAlignmentSummaryHeader()}
           </Flex.Item>
         </Flex>
       </View>

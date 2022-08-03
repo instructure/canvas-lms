@@ -118,10 +118,17 @@ describe('EquationEditorModal', () => {
         })
       }
     }
+    HTMLElement.prototype.setOptions = jest.fn()
   })
 
   afterEach(() => {
     jest.clearAllMocks()
+    delete HTMLElement.prototype.setOptions
+  })
+
+  it('disables all the basic editor macros', () => {
+    renderModal({editor})
+    expect(HTMLElement.prototype.setOptions).toHaveBeenCalledWith({macros: {}})
   })
 
   describe('loadExistingFormula', () => {

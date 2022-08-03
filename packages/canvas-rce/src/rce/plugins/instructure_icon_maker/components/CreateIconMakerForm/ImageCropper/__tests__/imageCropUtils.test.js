@@ -322,4 +322,216 @@ describe('createCroppedImageSvg()', () => {
       `)
     })
   })
+
+  describe('builds a <svg /> with translation units', () => {
+    it('negative translateX', async () => {
+      const svg = await subject({translateX: -50})
+      expect(svg).toMatchInlineSnapshot(`
+        <svg
+          height="100"
+          width="100"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <clippath
+              id="clip-path-for-cropped-image"
+            >
+              <rect
+                fill="black"
+                height="100"
+                width="100"
+                x="0"
+                y="0"
+              />
+            </clippath>
+          </defs>
+          <g
+            clip-path="url(#clip-path-for-cropped-image)"
+          >
+            <image
+              height="100"
+              href="data:image/png;base64,asdfasdfjksdf=="
+              transform="translate(-64.29, 0)"
+              width="200"
+            />
+          </g>
+        </svg>
+      `)
+    })
+
+    it('positive translateX', async () => {
+      const svg = await subject({translateX: 50})
+      expect(svg).toMatchInlineSnapshot(`
+        <svg
+          height="100"
+          width="100"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <clippath
+              id="clip-path-for-cropped-image"
+            >
+              <rect
+                fill="black"
+                height="100"
+                width="100"
+                x="0"
+                y="0"
+              />
+            </clippath>
+          </defs>
+          <g
+            clip-path="url(#clip-path-for-cropped-image)"
+          >
+            <image
+              height="100"
+              href="data:image/png;base64,asdfasdfjksdf=="
+              transform="translate(-35.71, 0)"
+              width="200"
+            />
+          </g>
+        </svg>
+      `)
+    })
+
+    it('negative translateY', async () => {
+      const svg = await subject({translateY: -50})
+      expect(svg).toMatchInlineSnapshot(`
+        <svg
+          height="100"
+          width="100"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <clippath
+              id="clip-path-for-cropped-image"
+            >
+              <rect
+                fill="black"
+                height="100"
+                width="100"
+                x="0"
+                y="0"
+              />
+            </clippath>
+          </defs>
+          <g
+            clip-path="url(#clip-path-for-cropped-image)"
+          >
+            <image
+              height="100"
+              href="data:image/png;base64,asdfasdfjksdf=="
+              transform="translate(-50, -14.29)"
+              width="200"
+            />
+          </g>
+        </svg>
+      `)
+    })
+
+    it('positive translateY', async () => {
+      const svg = await subject({translateY: 50})
+      expect(svg).toMatchInlineSnapshot(`
+        <svg
+          height="100"
+          width="100"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <clippath
+              id="clip-path-for-cropped-image"
+            >
+              <rect
+                fill="black"
+                height="100"
+                width="100"
+                x="0"
+                y="0"
+              />
+            </clippath>
+          </defs>
+          <g
+            clip-path="url(#clip-path-for-cropped-image)"
+          >
+            <image
+              height="100"
+              href="data:image/png;base64,asdfasdfjksdf=="
+              transform="translate(-50, 14.29)"
+              width="200"
+            />
+          </g>
+        </svg>
+      `)
+    })
+
+    it('negative translateX and translateY', async () => {
+      const svg = await subject({translateX: -50, translateY: -50})
+      expect(svg).toMatchInlineSnapshot(`
+        <svg
+          height="100"
+          width="100"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <clippath
+              id="clip-path-for-cropped-image"
+            >
+              <rect
+                fill="black"
+                height="100"
+                width="100"
+                x="0"
+                y="0"
+              />
+            </clippath>
+          </defs>
+          <g
+            clip-path="url(#clip-path-for-cropped-image)"
+          >
+            <image
+              height="100"
+              href="data:image/png;base64,asdfasdfjksdf=="
+              transform="translate(-64.29, -14.29)"
+              width="200"
+            />
+          </g>
+        </svg>
+      `)
+    })
+
+    it('positive translateX and translateY', async () => {
+      const svg = await subject({translateX: 50, translateY: 50})
+      expect(svg).toMatchInlineSnapshot(`
+        <svg
+          height="100"
+          width="100"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <clippath
+              id="clip-path-for-cropped-image"
+            >
+              <rect
+                fill="black"
+                height="100"
+                width="100"
+                x="0"
+                y="0"
+              />
+            </clippath>
+          </defs>
+          <g
+            clip-path="url(#clip-path-for-cropped-image)"
+          >
+            <image
+              height="100"
+              href="data:image/png;base64,asdfasdfjksdf=="
+              transform="translate(-35.71, 14.29)"
+              width="200"
+            />
+          </g>
+        </svg>
+      `)
+    })
+  })
 })

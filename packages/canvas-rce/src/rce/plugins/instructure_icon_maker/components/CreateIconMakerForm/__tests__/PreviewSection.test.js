@@ -35,12 +35,13 @@ describe('<Preview />', () => {
         }}
       />
     )
+
     expect(container.querySelector('svg')).toMatchInlineSnapshot(`
       <svg
         fill="none"
-        height="244px"
+        height="218px"
         style="padding: 16px"
-        viewBox="0 0 218 244"
+        viewBox="0 0 218 218"
         width="218px"
         xmlns="http://www.w3.org/2000/svg"
       >

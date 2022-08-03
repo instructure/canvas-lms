@@ -262,6 +262,21 @@
 #           "description": "Mean score",
 #           "example": 6,
 #           "type": "integer"
+#         },
+#         "upper_q": {
+#           "description": "Upper quartile score",
+#           "example": 10,
+#           "type": "integer"
+#         },
+#         "median": {
+#           "description": "Median score",
+#           "example": 6,
+#           "type": "integer"
+#         },
+#         "lower_q": {
+#           "description": "Lower quartile score",
+#           "example": 1,
+#           "type": "integer"
 #         }
 #       }
 #     }

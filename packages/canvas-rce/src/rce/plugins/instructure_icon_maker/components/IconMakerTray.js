@@ -97,7 +97,7 @@ function renderBody(
   rcsConfig,
   isLoading
 ) {
-  return editing && isLoading() ? (
+  return isLoading() ? (
     <Flex justifyItems="center">
       <Spinner renderTitle={formatMessage('Loading...')} size="large" />
     </Flex>
@@ -130,7 +130,7 @@ function renderFooter(status, onClose, handleSubmit, editing, replaceAll, setRep
   )
 }
 
-const closeTrayFromCancel = (initialSettings, currentSettings) => {
+const checkIfAnyUnsavedChanges = (initialSettings, currentSettings) => {
   let shouldCloseTray = true
   if (hasChanges(initialSettings, currentSettings)) {
     // RCE already uses browser's confirm dialog for unsaved changes
@@ -154,14 +154,32 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
 
   const [settings, settingsStatus, dispatch] = useSvgSettings(editor, editing, rcsConfig)
   const [status, setStatus] = useState(statuses.IDLE)
+
+  const [initialSettings, setInitialSettings] = useState({...defaultState})
+
+  // These useRef objects are needed because when the tray is closed using the escape key
+  // objects created by useState are not available, causing the comparison between
+  // initialSettings and settings to behave unexpectedly
+  const initialSettingsRef = useRef(initialSettings)
+  const settingsRef = useRef(settings)
+  useEffect(() => {
+    settingsRef.current = settings
+  }, [settings])
+  useEffect(() => {
+    initialSettingsRef.current = initialSettings
+  }, [initialSettings])
+
   const storeProps = useStoreProps()
+
   const onClose = () => {
-    if (closeTrayFromCancel(initialSettings, settings)) {
+    const shouldCloseTray = checkIfAnyUnsavedChanges(
+      initialSettingsRef.current,
+      settingsRef.current
+    )
+    if (shouldCloseTray) {
       setIsOpen(false)
     }
   }
-
-  const [initialSettings, setInitialSettings] = useState({defaultState})
 
   const isLoading = () => status === statuses.LOADING
 
@@ -228,6 +246,15 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
       img.setAttribute('alt', '')
     } else if (settings.alt) {
       img.setAttribute('alt', settings.alt)
+    }
+
+    // Set additional attributes if defined
+    if (settings.externalStyle) {
+      img.setAttribute('style', settings.externalStyle)
+    }
+    if (settings.externalWidth && settings.externalHeight) {
+      img.setAttribute('width', settings.externalWidth)
+      img.setAttribute('height', settings.externalHeight)
     }
 
     // Mark the image as an icon maker icon.
