@@ -1026,7 +1026,7 @@ class RCEWrapper extends React.Component {
     // This propagates click events on the editor out of the iframe to the parent
     // document. We need this so that click events get captured properly by instui
     // focus-trapping components, so they properly ignore trapping focus on click.
-    editor.on('click', () => window.top.document.body.click(), true)
+    editor.on('click', () => window.document.body.click(), true)
     editor.on('Cut Paste Change input Undo Redo', debounce(this.handleInputChange, 1000))
     this.announceContextToolbars(editor)
 
