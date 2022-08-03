@@ -421,6 +421,19 @@ describe DiscussionTopicsController do
       expect(response.location).to eq course_discussion_topics_url @course
     end
 
+    it "redirects to index when student is trying to access unpublished discussion when react_discussions_post is ON" do
+      unpub_topic = @course.discussion_topics.build(title: "some topic", workflow_state: "unpublished")
+      unpub_topic.save
+      unpub_topic.reload
+      user_session(@student)
+
+      Account.site_admin.enable_feature! :react_discussions_post
+      get("show", params: { course_id: @course.id, id: unpub_topic.id })
+      expect(flash[:error]).to match(/You do not have access to the requested discussion./)
+      expect(response).to be_redirect
+      expect(response.location).to eq course_discussion_topics_url @course
+    end
+
     it "js_env TOTAL_USER_COUNT and IS_ANNOUNCEMENT are set correctly for section specific announcements" do
       user_session(@teacher)
       section1 = @course.course_sections.create!(name: "Section 1")
