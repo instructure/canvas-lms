@@ -29,7 +29,7 @@ end
 
 gem "rails", CANVAS_RAILS == "6.1" ? "6.1.4.6" : "7.0.3"
   gem "tzinfo", "2.0.4"
-gem "switchman", "3.1.2"
+gem_override "switchman", "3.1.3"
   gem "guardrail", "3.0.2"
 gem_override "switchman-inst-jobs", "4.0.9"
   gem "irb", "1.4.1"

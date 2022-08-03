@@ -269,4 +269,7 @@ Rails.application.config.after_initialize do
     Shard.define_attribute_methods
     Shard.default.instance_variable_set(:@attributes, Shard.attributes_builder.build_from_database(Shard.default.attributes_before_type_cast))
   end
+
+  # TODO: fix canvas so we don't need this because this is not good
+  Switchman.config[:writable_shadow_records] = true
 end
