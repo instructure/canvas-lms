@@ -134,6 +134,7 @@ class LinkValidator extends React.Component {
           style={this.state.buttonMessageStyle}
           type="button"
           role="button"
+          data-testid="validate-button"
         >
           {this.state.buttonMessage}
         </button>
