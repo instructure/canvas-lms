@@ -126,6 +126,10 @@ export type CanvasDateInputProps = {
    * Specifies the display property of the container. One of: inline-block block
    */
   display?: DateInputDisplay
+  /**
+   * Passed on to `DateInput`. Text to show when input is empty.
+   */
+  placeholder?: string
 }
 
 /**
@@ -152,7 +156,8 @@ export default function CanvasDateInput({
   dateIsDisabled,
   dataTestid,
   size,
-  display
+  display,
+  placeholder
 }: CanvasDateInputProps) {
   const todayMoment = moment().tz(timezone)
   const selectedMoment = selectedDate ? moment.tz(selectedDate, timezone) : null
@@ -419,6 +424,7 @@ export default function CanvasDateInput({
       display={display}
       data-testid={dataTestid}
       size={size}
+      placeholder={placeholder}
     >
       {renderDays()}
     </DateInput>
