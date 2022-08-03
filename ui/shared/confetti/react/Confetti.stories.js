@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import {Button} from '@instructure/ui-buttons'
 
 import Confetti from './Confetti'
 
@@ -25,6 +26,14 @@ export default {
   component: Confetti
 }
 
-const Template = args => <Confetti {...args} />
+const Template = args => {
+  const [count, updateCount] = React.useState(0)
+  return (
+    <>
+      <Confetti {...args} triggerCount={count} />
+      <Button onClick={() => updateCount(count + 1)}>Splash Confetti!</Button>
+    </>
+  )
+}
 
 export const DefaultColors = Template.bind({})

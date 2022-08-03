@@ -24,8 +24,15 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('confetti')
 
-export default function Confetti() {
+export default function Confetti({triggerCount}) {
   const [visible, setVisible] = React.useState(true)
+  React.useEffect(() => {
+    if (!visible) {
+      setVisible(true)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [triggerCount])
+
   React.useEffect(() => {
     if (window.ENV.disable_celebrations || !visible) {
       return
