@@ -70,6 +70,11 @@ describe('clean input state', () => {
     expect(getInput().value).toBe('')
   })
 
+  it('renders placeholder text if provided', () => {
+    const {getByPlaceholderText} = renderInput({placeholder: 'some placeholder text'})
+    expect(getByPlaceholderText('some placeholder text')).toBeInTheDocument()
+  })
+
   it('displays the formatted date when the initial date is not null', () => {
     const now = new Date()
     const formatter = jest.fn(() => 'formatted date')

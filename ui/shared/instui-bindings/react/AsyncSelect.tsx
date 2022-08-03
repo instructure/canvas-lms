@@ -37,11 +37,11 @@ type Props = {
   selectedOptionId?: string
   noOptionsLabel: string
   noOptionsValue?: string
-  renderLabel?: string
+  renderLabel?: string | ReactNode
   onOptionSelected: (event, optionId: string) => void
   onInputChange: (event, value) => void
   onBlur?: (event) => void
-  onFocus: (event) => void
+  onFocus?: (event) => void
   children?: ReactElement | ReactElement[]
   options?: any[]
   [key: string]: any
