@@ -18,11 +18,16 @@
 import {render, fireEvent} from '@testing-library/react'
 import Confetti from '../Confetti'
 import React from 'react'
-import {mockRender, mockClear} from '../__mocks__/confetti-js'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
+const mockRender = jest.fn()
+const mockClear = jest.fn()
 jest.mock('@canvas/alerts/react/FlashAlert')
-jest.genMockFromModule('../__mocks__/confetti-js')
+jest.mock('../../javascript/ConfettiGenerator', () => {
+  return jest.fn().mockImplementation(() => {
+    return {render: mockRender, clear: mockClear}
+  })
+})
 jest.useFakeTimers()
 
 describe('Confetti', () => {
@@ -31,7 +36,7 @@ describe('Confetti', () => {
     mockClear.mockClear()
   })
 
-  it('renders confetti-js', () => {
+  it('renders confetti', () => {
     render(<Confetti />)
     expect(mockRender).toHaveBeenCalled()
   })

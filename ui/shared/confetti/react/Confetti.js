@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ConfettiGenerator from 'confetti-js'
+import ConfettiGenerator from '../javascript/ConfettiGenerator'
 import getRandomConfettiFlavor from './confettiFlavor'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -47,10 +47,6 @@ export default function Confetti() {
     }
 
     confetti = new ConfettiGenerator({
-      target: 'confetti-canvas',
-      max: 160,
-      clock: 50,
-      respawn: false,
       props: ['square', getRandomConfettiFlavor()].filter(p => p !== null)
     })
 

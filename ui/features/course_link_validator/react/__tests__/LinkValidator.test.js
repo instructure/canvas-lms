@@ -18,14 +18,12 @@
 
 import React from 'react'
 import {act} from 'react-dom/test-utils'
-import {mount} from 'enzyme'
+import {render, fireEvent} from '@testing-library/react'
 import LinkValidator from '../LinkValidator'
 import sinon from 'sinon'
 import $ from 'jquery'
 
 jest.useFakeTimers()
-// TODO: perhaps hoist mocks to ui/shared/jest-mocks ?
-jest.genMockFromModule('@canvas/confetti/react/__mocks__/confetti-js')
 
 describe('LinkValidator', () => {
   describe('confetti', () => {
@@ -55,17 +53,16 @@ describe('LinkValidator', () => {
       })
 
       it('renders confetti', () => {
-        const wrapper = mount(<LinkValidator pollTimeout={0} pollTimeoutInitial={0} />)
+        const {getByTestId} = render(<LinkValidator pollTimeout={0} pollTimeoutInitial={0} />)
         const promise = new Promise(resolve => {
           setTimeout(resolve, 1)
         })
         act(() => {
-          wrapper.find('button').simulate('click')
+          fireEvent.click(getByTestId('validate-button'))
           jest.advanceTimersByTime(2000)
         })
         return promise.then(() => {
-          wrapper.update()
-          expect(wrapper.exists('canvas')).toEqual(true)
+          expect(getByTestId('confetti-canvas')).toBeTruthy()
         })
       })
 
@@ -78,17 +75,18 @@ describe('LinkValidator', () => {
         })
 
         it('does not render confetti', () => {
-          const wrapper = mount(<LinkValidator pollTimeout={0} pollTimeoutInitial={0} />)
+          const {getByTestId, queryByTestId} = render(
+            <LinkValidator pollTimeout={0} pollTimeoutInitial={0} />
+          )
           const promise = new Promise(resolve => {
             setTimeout(resolve, 1)
           })
           act(() => {
-            wrapper.find('button').simulate('click')
+            fireEvent.click(getByTestId('validate-button'))
             jest.advanceTimersByTime(2000)
           })
           return promise.then(() => {
-            wrapper.update()
-            expect(wrapper.exists('canvas')).toEqual(false)
+            expect(queryByTestId('confetti-canvas')).toBeNull()
           })
         })
       })
@@ -138,39 +136,34 @@ describe('LinkValidator', () => {
       })
 
       it('does not render confetti', () => {
-        const wrapper = mount(<LinkValidator pollTimeout={0} pollTimeoutInitial={0} />)
+        const {getByTestId, queryByTestId} = render(
+          <LinkValidator pollTimeout={0} pollTimeoutInitial={0} />
+        )
         const promise = new Promise(resolve => {
           setTimeout(resolve, 1)
         })
         act(() => {
-          wrapper.find('button').simulate('click')
+          fireEvent.click(getByTestId('validate-button'))
           jest.advanceTimersByTime(2000)
         })
         return promise.then(() => {
-          wrapper.update()
-          expect(wrapper.exists('canvas')).toEqual(false)
+          expect(queryByTestId('confetti-canvas')).toBeNull()
         })
       })
 
       it('sanitizes URLs', () => {
-        const wrapper = mount(<LinkValidator pollTimeout={0} pollTimeoutInitial={0} />)
+        const {getByText, getByTestId} = render(
+          <LinkValidator pollTimeout={0} pollTimeoutInitial={0} />
+        )
         const promise = new Promise(resolve => {
           setTimeout(resolve, 1)
         })
         act(() => {
-          wrapper.find('button').simulate('click')
+          fireEvent.click(getByTestId('validate-button'))
           jest.advanceTimersByTime(2000)
         })
         return promise.then(() => {
-          wrapper.update()
-
-          expect(
-            wrapper.findWhere(x => x.text() === 'hehehh')
-              .hostNodes()
-              .first()
-              .getDOMNode()
-              .href
-          ).toEqual("about:blank")
+          expect(getByText('hehehh').href).toEqual('about:blank')
         })
       })
     })
