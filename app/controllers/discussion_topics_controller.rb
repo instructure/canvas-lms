@@ -760,10 +760,16 @@ class DiscussionTopicsController < ApplicationController
         respond_to do |format|
           if @topic.is_announcement
             flash[:error] = t "You do not have access to the requested announcement."
-            format.html { redirect_to named_context_url(@context, :context_announcements_url) }
+            format.html do
+              redirect_to named_context_url(@context, :context_announcements_url)
+              return
+            end
           else
             flash[:error] = t "You do not have access to the requested discussion."
-            format.html { redirect_to named_context_url(@context, :context_discussion_topics_url) }
+            format.html do
+              redirect_to named_context_url(@context, :context_discussion_topics_url)
+              return
+            end
           end
         end
       end
