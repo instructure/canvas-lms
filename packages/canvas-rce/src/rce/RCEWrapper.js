@@ -1054,25 +1054,21 @@ class RCEWrapper extends React.Component {
   }
 
   _toggleFullscreen = event => {
+    const isTinyFullscreen = event.state
+
+    const fullscreenState = {isTinyFullscreen}
+
     const header = document.getElementById('header')
     if (header) {
-      if (event.state) {
-        this.setState({
-          fullscreenState: {
-            headerDisp: header.style.display,
-            isTinyFullscreen: true
-          }
-        })
+      if (isTinyFullscreen) {
+        fullscreenState.headerDisp = header.style.display
         header.style.display = 'none'
       } else {
         header.style.display = this.state.fullscreenState.headerDisp
-        this.setState({
-          fullscreenState: {
-            isTinyFullscreen: false
-          }
-        })
       }
     }
+
+    this.setState({fullscreenState})
 
     // if we're leaving fullscreen, remove event listeners on the fullscreen element
     if (!document[FS_ELEMENT] && this.state.fullscreenElem) {
