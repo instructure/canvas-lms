@@ -37,8 +37,8 @@ function postMessageEvent(data, origin, source) {
   }
 }
 
-const expectMessage = async (data, wasProcessed, flagEnabled = true) => {
-  const wasCalled = await ltiMessageHandler(postMessageEvent(data), flagEnabled)
+const expectMessage = async (data, wasProcessed) => {
+  const wasCalled = await ltiMessageHandler(postMessageEvent(data))
   expect(wasCalled).toBe(wasProcessed)
 }
 
@@ -91,69 +91,29 @@ describe('ltiMessageHander', () => {
     })
   })
 
-  describe('when feature flag is disabled', () => {
-    const flagEnabled = false
-
-    describe('when subject contains org.imsglobal.lti', () => {
-      it('does not process message', async () => {
-        await expectMessage({subject: 'org.imsglobal.lti.capabilities'}, false, flagEnabled)
-      })
-    })
-
-    describe('when subject is in allow list', () => {
-      it('processes message', async () => {
-        await expectMessage({subject: 'lti.fetchWindowSize'}, true, flagEnabled)
-      })
+  describe('when subject contains org.imsglobal.lti', () => {
+    it('processes message', async () => {
+      await expectMessage({subject: 'org.imsglobal.lti.capabilities'}, true)
     })
   })
 
-  describe('when feature flag is enabled', () => {
-    const flagEnabled = true
-
-    describe('when subject contains org.imsglobal.lti', () => {
-      it('processes message', async () => {
-        await expectMessage({subject: 'org.imsglobal.lti.capabilities'}, true, flagEnabled)
-      })
-    })
-
-    describe('when subject is in allow list', () => {
-      it('processes message', async () => {
-        await expectMessage({subject: 'lti.fetchWindowSize'}, true, flagEnabled)
-      })
+  describe('when subject is in allow list', () => {
+    it('processes message', async () => {
+      await expectMessage({subject: 'lti.fetchWindowSize'}, true)
     })
   })
 
   describe('response messages', () => {
-    let platformStorageFeatureFlag
-
     describe('when message handler succeeds', () => {
       afterEach(() => {
         // reset from message handler effects
         delete ltiState.tray
       })
 
-      describe('when lti_platform_storage feature flag is disabled', () => {
-        beforeEach(() => {
-          platformStorageFeatureFlag = false
-        })
-
-        it('should not send response message', async () => {
-          const event = postMessageEvent({subject: 'lti.resourceImported'})
-          await ltiMessageHandler(event, platformStorageFeatureFlag)
-          expect(event.source.postMessage).not.toHaveBeenCalled()
-        })
-      })
-
-      describe('when lti_platform_storage feature flag is enabled', () => {
-        beforeEach(() => {
-          platformStorageFeatureFlag = true
-        })
-
-        it('should send response message', async () => {
-          const event = postMessageEvent({subject: 'lti.resourceImported'})
-          await ltiMessageHandler(event, platformStorageFeatureFlag)
-          expect(event.source.postMessage).toHaveBeenCalled()
-        })
+      it('should send response message', async () => {
+        const event = postMessageEvent({subject: 'lti.resourceImported'})
+        await ltiMessageHandler(event)
+        expect(event.source.postMessage).toHaveBeenCalled()
       })
     })
 
@@ -168,82 +128,27 @@ describe('ltiMessageHander', () => {
         console.error.mockRestore()
       })
 
-      describe('when lti_platform_storage feature flag is disabled', () => {
-        beforeEach(() => {
-          platformStorageFeatureFlag = false
-        })
-
-        it('should not send response message', async () => {
-          // this message handler fails when run without a DOM
-          const event = postMessageEvent({subject: 'lti.scrollToTop'})
-          await ltiMessageHandler(event, platformStorageFeatureFlag)
-          expect(event.source.postMessage).not.toHaveBeenCalled()
-        })
-      })
-
-      describe('when lti_platform_storage feature flag is enabled', () => {
-        beforeEach(() => {
-          platformStorageFeatureFlag = true
-        })
-
-        it('should send response message', async () => {
-          // this message handler fails when run without a DOM
-          const event = postMessageEvent({subject: 'lti.scrollToTop'})
-          await ltiMessageHandler(event, platformStorageFeatureFlag)
-          expect(event.source.postMessage).toHaveBeenCalled()
-        })
+      it('should send response message', async () => {
+        // this message handler fails when run without a DOM
+        const event = postMessageEvent({subject: 'lti.scrollToTop'})
+        await ltiMessageHandler(event)
+        expect(event.source.postMessage).toHaveBeenCalled()
       })
     })
 
     describe('when subject is not supported', () => {
-      describe('when lti_platform_storage feature flag is disabled', () => {
-        beforeEach(() => {
-          platformStorageFeatureFlag = false
-        })
-
-        it('should not send response message', async () => {
-          const event = postMessageEvent({subject: 'notSupported'})
-          await ltiMessageHandler(event, platformStorageFeatureFlag)
-          expect(event.source.postMessage).not.toHaveBeenCalled()
-        })
-      })
-
-      describe('when lti_platform_storage feature flag is enabled', () => {
-        beforeEach(() => {
-          platformStorageFeatureFlag = true
-        })
-
-        it('should send response message', async () => {
-          const event = postMessageEvent({subject: 'notSupported'})
-          await ltiMessageHandler(event, platformStorageFeatureFlag)
-          expect(event.source.postMessage).toHaveBeenCalled()
-        })
+      it('should send response message', async () => {
+        const event = postMessageEvent({subject: 'notSupported'})
+        await ltiMessageHandler(event)
+        expect(event.source.postMessage).toHaveBeenCalled()
       })
     })
 
     describe('when message handler sends a response message', () => {
-      describe('when lti_platform_storage feature flag is disabled', () => {
-        beforeEach(() => {
-          platformStorageFeatureFlag = false
-        })
-
-        it('should send response message', async () => {
-          const event = postMessageEvent({subject: 'lti.fetchWindowSize'})
-          await ltiMessageHandler(event, platformStorageFeatureFlag)
-          expect(event.source.postMessage).toHaveBeenCalled()
-        })
-      })
-
-      describe('when lti_platform_storage feature flag is enabled', () => {
-        beforeEach(() => {
-          platformStorageFeatureFlag = true
-        })
-
-        it('should send response message', async () => {
-          const event = postMessageEvent({subject: 'lti.fetchWindowSize'})
-          await ltiMessageHandler(event, platformStorageFeatureFlag)
-          expect(event.source.postMessage).toHaveBeenCalled()
-        })
+      it('should send response message', async () => {
+        const event = postMessageEvent({subject: 'lti.fetchWindowSize'})
+        await ltiMessageHandler(event)
+        expect(event.source.postMessage).toHaveBeenCalled()
       })
     })
   })
