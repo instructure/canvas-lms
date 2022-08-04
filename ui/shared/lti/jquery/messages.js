@@ -56,7 +56,7 @@ const SUBJECT_IGNORE_LIST = [
   MENTIONS_SELECTION_MESSAGE
 ]
 
-async function ltiMessageHandler(e, platformStorageFeatureFlag = false) {
+async function ltiMessageHandler(e) {
   if (e.data.source && e.data.source.includes('react-devtools')) {
     return false
   }
@@ -83,14 +83,7 @@ async function ltiMessageHandler(e, platformStorageFeatureFlag = false) {
     return false
   } else if (!SUBJECT_ALLOW_LIST.includes(subject)) {
     // Enforce subject allowlist -- unknown type
-    if (platformStorageFeatureFlag) {
-      responseMessages.sendUnsupportedSubjectError()
-    }
-    return false
-  }
-
-  // temporary: ignore LTI Platform Storage messages when feature flag is off
-  if (!platformStorageFeatureFlag && subject.includes('org.imsglobal.lti')) {
+    responseMessages.sendUnsupportedSubjectError()
     return false
   }
 
@@ -101,15 +94,13 @@ async function ltiMessageHandler(e, platformStorageFeatureFlag = false) {
       event: e,
       responseMessages
     })
-    if (!hasSentResponse && platformStorageFeatureFlag) {
+    if (!hasSentResponse) {
       responseMessages.sendSuccess()
     }
     return true
   } catch (error) {
     console.error(`Error loading or executing message handler for "${subject}": ${error}`)
-    if (platformStorageFeatureFlag) {
-      responseMessages.sendGenericError(error.message)
-    }
+    responseMessages.sendGenericError(error.message)
     return false
   }
 }
@@ -117,9 +108,8 @@ async function ltiMessageHandler(e, platformStorageFeatureFlag = false) {
 let hasListener = false
 
 function monitorLtiMessages() {
-  const platformStorageFeatureFlag = ENV?.FEATURES?.lti_platform_storage
   const cb = e => {
-    if (e.data !== '') ltiMessageHandler(e, platformStorageFeatureFlag)
+    if (e.data !== '') ltiMessageHandler(e)
   }
   if (!hasListener) {
     window.addEventListener('message', cb)
