@@ -74,17 +74,21 @@ export default class IndexHeader extends Component {
     searchInputRef: null
   }
 
-  onSearch = debounce(
-    () => {
-      const term = this.searchInput.value
-      this.props.searchAnnouncements({term})
-    },
-    SEARCH_TIME_DELAY,
-    {
-      leading: false,
-      trailing: true
-    }
-  )
+  constructor(props) {
+    super(props)
+
+    this.onSearch = debounce(
+      () => {
+        const term = this.searchInput.value
+        this.props.searchAnnouncements({term})
+      },
+      SEARCH_TIME_DELAY,
+      {
+        leading: false,
+        trailing: true
+      }
+    )
+  }
 
   onDelete = () => {
     showConfirmDelete({
