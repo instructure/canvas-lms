@@ -23,7 +23,9 @@ import {Header} from '../header'
 const defaultProps = {
   context_type: 'Course',
   context_id: '17',
-  newPace: false
+  newPace: false,
+  isBlueprintLocked: false,
+  setIsBlueprintLocked: () => {}
 }
 
 beforeAll(() => {
@@ -69,6 +71,11 @@ describe('Course paces header', () => {
           'This is a new student pace and all changes are unpublished. Publish to save any changes and create the pace.'
         )
       ).toBeInTheDocument()
+    })
+
+    it('does not render publishing changes for student paces', () => {
+      const {queryByText} = renderConnected(<Header {...defaultProps} context_type="Enrollment" />)
+      expect(queryByText('All changes published')).not.toBeInTheDocument()
     })
   })
 

@@ -31,7 +31,9 @@ LoggedOutTabs.propTypes = {
 export default function LoggedOutTabs(props) {
   return (
     <div>
-      {props.assignment.rubric && <RubricTab rubric={props.assignment.rubric} />}
+      {props.assignment.rubric && (
+        <RubricTab rubric={props.assignment.rubric} peerReviewModeEnabled={false} />
+      )}
 
       <Flex as="header" alignItems="center" justifyItems="center" direction="column">
         <Flex.Item>

@@ -27,7 +27,8 @@ import {
   UPDATE_LEARNING_OUTCOME_GROUP,
   IMPORT_OUTCOMES,
   CREATE_LEARNING_OUTCOME_GROUP,
-  COURSE_ALIGNMENT_STATS
+  COURSE_ALIGNMENT_STATS,
+  SEARCH_OUTCOME_ALIGNMENTS
 } from '../graphql/Management'
 import {defaultRatings, defaultMasteryPoints} from '../react/hooks/useRatings'
 import {pick, uniq, flattenDeep} from 'lodash'
@@ -2477,23 +2478,24 @@ export const courseAlignmentStatsMocks = ({
   alignedOutcomes = 1,
   totalAlignments = 4,
   totalArtifacts = 5,
-  alignedArtifacts = 4
+  alignedArtifacts = 4,
+  refetchIncrement = 10
 } = {}) => {
-  const result = {
+  const returnResult = (inc = 0) => ({
     data: {
       course: {
         outcomeAlignmentStats: {
-          totalOutcomes,
-          alignedOutcomes,
-          totalAlignments,
-          totalArtifacts,
-          alignedArtifacts,
+          totalOutcomes: totalOutcomes + inc,
+          alignedOutcomes: alignedOutcomes + inc,
+          totalAlignments: totalAlignments + inc,
+          totalArtifacts: totalArtifacts + inc,
+          alignedArtifacts: alignedArtifacts + inc,
           __typename: 'CourseOutcomeAlignmentStats'
         },
         __typename: 'Course'
       }
     }
-  }
+  })
 
   return [
     {
@@ -2501,7 +2503,135 @@ export const courseAlignmentStatsMocks = ({
         query: COURSE_ALIGNMENT_STATS,
         variables: {id}
       },
-      result
+      result: returnResult(),
+      // for testing data refetch
+      newData: () => returnResult(refetchIncrement)
+    }
+  ]
+}
+
+export const courseAlignmentMocks = ({
+  groupId = '1',
+  contextType = 'Course',
+  contextId = '1',
+  numOfOutcomes = 4,
+  searchFilter = 'ALL_OUTCOMES',
+  searchQuery = '',
+  testSearchQuery = 'TEST'
+} = {}) => {
+  const generateAlignment = ({
+    id = '1',
+    courseId = '1',
+    outcomeId = '3',
+    title = 'Alignment 1',
+    contentType = 'Assignment',
+    assignmentContentType = 'assignment',
+    moduleName = 'Module 1',
+    moduleWorkflowState = 'active'
+  } = {}) => ({
+    _id: id,
+    title,
+    contentType,
+    assignmentContentType,
+    url: `/courses/${courseId}/outcomes/${outcomeId}/alignments/${id}`,
+    moduleName,
+    moduleUrl: `/courses/${courseId}/modules/1`,
+    moduleWorkflowState,
+    __typename: 'Alignments'
+  })
+
+  const generateAlignments = (num = 2) =>
+    [...Array(num).keys()].map(el =>
+      generateAlignment({id: `${el + 1}`, title: `Alignment ${el + 1}`})
+    )
+
+  const generateOutcomeNode = (outcomeId, withAlignments = true, isRefetch = false) => ({
+    _id: outcomeId,
+    title: `Outcome ${outcomeId}${withAlignments ? ' with alignments' : ''}${
+      isRefetch ? ' - Refetched' : ''
+    }`,
+    description: `Outcome ${outcomeId} description`,
+    __typename: 'LearningOutcome',
+    alignments: withAlignments ? generateAlignments() : null
+  })
+
+  const generateEdges = (outcomeIds, isRefetch = false) => {
+    const edges = (testSearch = false) =>
+      (outcomeIds || []).map(id => ({
+        node: generateOutcomeNode(id, !!(id % 2 !== 0 || testSearch), isRefetch),
+        __typename: 'ContentTag'
+      }))
+    if (searchFilter === 'WITH_ALIGNMENTS')
+      return edges().filter(edgeNode => edgeNode.node.alignments !== null)
+    if (searchFilter === 'NO_ALIGNMENTS')
+      return edges().filter(edgeNode => edgeNode.node.alignments === null)
+    if (searchFilter === 'ALL_OUTCOMES' && searchQuery === testSearchQuery) return edges(true)
+    return edges()
+  }
+
+  const variables = {
+    id: groupId,
+    outcomesContextId: contextId,
+    outcomesContextType: contextType,
+    searchFilter
+  }
+  if (searchQuery) variables.searchQuery = searchQuery
+
+  const returnResult = (isRefetch = false) => ({
+    data: {
+      group: {
+        _id: groupId,
+        outcomesCount: numOfOutcomes,
+        __typename: 'LearningOutcomeGroup',
+        outcomes: {
+          pageInfo: {
+            hasNextPage: true,
+            endCursor: 'Mg',
+            __typename: 'PageInfo'
+          },
+          edges: generateEdges([1, 2], isRefetch),
+          __typename: 'ContentTagConnection'
+        }
+      }
+    }
+  })
+
+  return [
+    {
+      request: {
+        query: SEARCH_OUTCOME_ALIGNMENTS,
+        variables
+      },
+      result: returnResult(),
+      // for testing data refetch
+      newData: () => returnResult(true)
+    },
+    {
+      request: {
+        query: SEARCH_OUTCOME_ALIGNMENTS,
+        variables: {
+          ...variables,
+          outcomesCursor: 'Mg'
+        }
+      },
+      result: {
+        data: {
+          group: {
+            _id: groupId,
+            outcomesCount: numOfOutcomes,
+            __typename: 'LearningOutcomeGroup',
+            outcomes: {
+              pageInfo: {
+                hasNextPage: false,
+                endCursor: 'Mw',
+                __typename: 'PageInfo'
+              },
+              edges: generateEdges([3, 4]),
+              __typename: 'ContentTagConnection'
+            }
+          }
+        }
+      }
     }
   ]
 }

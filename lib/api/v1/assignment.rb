@@ -740,6 +740,10 @@ module Api::V1::Assignment
     end
 
     if assignment.context.grants_right?(user, :manage_sis)
+      if update_params.key?("sis_assignment_id") && update_params["sis_assignment_id"].blank?
+        update_params["sis_assignment_id"] = nil
+      end
+
       data = update_params["integration_data"]
       update_params["integration_data"] = JSON.parse(data) if data.is_a?(String)
     else

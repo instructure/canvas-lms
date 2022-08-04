@@ -1361,8 +1361,8 @@ describe "RCE next tests", ignore_js_errors: true do
 
         expect(menubar_menu_item("Link")).to be_displayed
         click_menubar_menu_item("Link")
-        expect(f("body")).to contain_css(menubar_menu_item_css("External Links"))
-        expect(f("body")).to contain_css(menubar_menu_item_css("Course Links"))
+        expect(f("body")).to contain_css(menubar_menu_item_css("External Link"))
+        expect(f("body")).to contain_css(menubar_menu_item_css("Course Link"))
 
         expect(menubar_menu_item("Image")).to be_displayed
         click_menubar_menu_item("Image")

@@ -467,6 +467,21 @@ describe Login::CanvasController do
       post :create, params: { pseudonym_session: { unique_id: @pseudonym.unique_id, password: "qwertyuiop" } }
       expect(response).to redirect_to dashboard_url(login_success: 1)
     end
+
+    it "does not ask for verification if mfa is required but disabled for the provider" do
+      Account.default.settings[:mfa_settings] = :required
+      Account.default.save!
+      user_with_pseudonym(active_all: 1, password: "qwertyuiop")
+      @user.otp_secret_key = ROTP::Base32.random
+      @user.save!
+      auth_provider = Account.default.canvas_authentication_provider
+      @pseudonym.update(authentication_provider: auth_provider)
+      auth_provider.skip_internal_mfa = true
+      auth_provider.save!
+
+      post :create, params: { pseudonym_session: { unique_id: @pseudonym.unique_id, password: "qwertyuiop" } }
+      expect(response).to redirect_to dashboard_url(login_success: 1)
+    end
   end
 
   context "otp login cookie" do

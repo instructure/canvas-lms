@@ -29,6 +29,7 @@ fi
 
 create_log_file
 init_log_file "Docker Dev Setup"
+detect_local_canvas
 os_setup
 message 'Now we can set up Canvas!'
 copy_docker_config

@@ -259,7 +259,7 @@ describe('DiscussionFullPage', () => {
 
     it('allows subscribing to the topic', async () => {
       const mocks = [
-        ...getDiscussionQueryMock(),
+        ...getDiscussionQueryMock({isGroup: false}),
         ...subscribeToDiscussionTopicMock({subscribed: true})
       ]
       mocks[0].result.data.legacyNode.subscribed = false
@@ -271,7 +271,7 @@ describe('DiscussionFullPage', () => {
 
     it('allows unsubscribing to the topic', async () => {
       const mocks = [
-        ...getDiscussionQueryMock(),
+        ...getDiscussionQueryMock({isGroup: false}),
         ...subscribeToDiscussionTopicMock({subscribed: false})
       ]
       const container = setup(mocks)

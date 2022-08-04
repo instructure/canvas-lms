@@ -101,6 +101,17 @@ const HeaderInputs = props => {
     props.onContextSelect(context)
   }
 
+  const maxGroupRecipientsMet = () => {
+    // TODO: squash course_3_students to course_3 if both present
+    let totalRecipients = 0
+
+    props.selectedRecipients?.forEach(recipient => {
+      totalRecipients += recipient.totalRecipients
+    })
+
+    return totalRecipients > ENV.CONVERSATIONS.MAX_GROUP_CONVERSATION_SIZE
+  }
+
   return (
     <Flex direction="column" width="100%" height="100%" padding="small">
       <Flex.Item>
@@ -138,6 +149,7 @@ const HeaderInputs = props => {
               <IndividualMessageCheckbox
                 onChange={props.onSendIndividualMessagesChange}
                 checked={props.sendIndividualMessages}
+                maxGroupRecipientsMet={maxGroupRecipientsMet()}
               />
             }
           />

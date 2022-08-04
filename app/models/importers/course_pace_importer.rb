@@ -37,6 +37,8 @@ module Importers
       course_pace = context.course_paces.primary.find_by(workflow_state: hash[:workflow_state])
       course_pace ||= context.course_paces.create
 
+      course_pace.migration_id = hash[:migration_id]
+      course_pace.mark_as_importing! migration
       course_pace.workflow_state = hash[:workflow_state]
       course_pace.end_date = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:end_date])
       course_pace.published_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:published_at])
@@ -49,13 +51,22 @@ module Importers
                                             .select(:id, :migration_id)
                                             .index_by(&:migration_id)
 
-      hash[:module_items].each do |pp_module_item|
-        module_item_id = module_items_by_migration_id[pp_module_item[:module_item_migration_id]]&.id
-        next unless module_item_id
+      skip_pace_items = migration.for_master_course_import? && # blueprint sync
+                        migration.master_course_subscription.content_tag_for(course_pace).downstream_changes.include?("duration") && # changed downstream
+                        !course_pace.child_content_restrictions[:content] # not locked
 
-        course_pace_module_item = course_pace.course_pace_module_items.find_or_create_by(module_item_id: module_item_id)
-        course_pace_module_item.duration = pp_module_item[:duration]
-        course_pace_module_item.save!
+      unless skip_pace_items
+        hash[:module_items].each do |pp_module_item|
+          module_item = module_items_by_migration_id[pp_module_item[:module_item_migration_id]]
+          next unless module_item
+
+          course_pace_module_item = course_pace.course_pace_module_items.find_or_create_by(module_item_id: module_item.id)
+          course_pace_module_item.migration_id = pp_module_item[:pace_item_migration_id]
+          course_pace_module_item.duration = pp_module_item[:duration]
+          course_pace_module_item.save!
+
+          migration.add_imported_item(course_pace_module_item)
+        end
       end
     end
   end

@@ -31,6 +31,7 @@ import {
   IconQuizLine,
   IconUnpublishedLine
 } from '@instructure/ui-icons'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {NumberInput} from '@instructure/ui-number-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
@@ -48,7 +49,7 @@ import {
 } from '../../reducers/course_paces'
 import {actions} from '../../actions/course_pace_items'
 import * as DateHelpers from '../../utils/date_stuff/date_helpers'
-import {getShowProjections, getSyncing} from '../../reducers/ui'
+import {getShowProjections, getSyncing, getSelectedContextType} from '../../reducers/ui'
 import {getBlackoutDates} from '../../shared/reducers/blackout_dates'
 
 const I18n = useI18nScope('course_paces_assignment_row')
@@ -63,6 +64,7 @@ interface PassedProps {
   readonly isStacked: boolean
   readonly coursePaceItem: CoursePaceItem
   readonly dueDate: string | moment.Moment
+  readonly blueprintLocked: boolean
 }
 
 interface StoreProps {
@@ -73,6 +75,7 @@ interface StoreProps {
   readonly isSyncing: boolean
   readonly showProjections: boolean
   readonly isStudentPace: boolean
+  readonly context_type: string
 }
 
 interface DispatchProps {
@@ -247,23 +250,32 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
       )
     }
 
+    const disabledByBlueprintLock =
+      this.props.blueprintLocked && this.props.context_type == 'Course'
     return (
-      <NumberInput
-        interaction={this.props.isSyncing ? 'disabled' : 'enabled'}
-        renderLabel={
-          <ScreenReaderContent>
-            Duration for module {this.props.coursePaceItem.assignment_title}
-          </ScreenReaderContent>
-        }
-        data-testid="duration-number-input"
-        display="inline-block"
-        width="5.5rem"
-        value={this.state.duration}
-        onChange={this.onChangeItemDuration}
-        onBlur={this.onBlur}
-        onDecrement={e => this.onDecrementOrIncrement(e, -1)}
-        onIncrement={e => this.onDecrementOrIncrement(e, 1)}
-      />
+      <Tooltip
+        placement="top"
+        color="primary"
+        renderTip={I18n.t('You cannot edit a locked pace')}
+        on={disabledByBlueprintLock ? ['hover', 'focus'] : []}
+      >
+        <NumberInput
+          interaction={this.props.isSyncing || disabledByBlueprintLock ? 'disabled' : 'enabled'}
+          renderLabel={
+            <ScreenReaderContent>
+              Duration for module {this.props.coursePaceItem.assignment_title}
+            </ScreenReaderContent>
+          }
+          data-testid="duration-number-input"
+          display="inline-block"
+          width="5.5rem"
+          value={this.state.duration}
+          onChange={this.onChangeItemDuration}
+          onBlur={this.onBlur}
+          onDecrement={e => this.onDecrementOrIncrement(e, -1)}
+          onIncrement={e => this.onDecrementOrIncrement(e, 1)}
+        />
+      </Tooltip>
     )
   }
 
@@ -350,7 +362,8 @@ const mapStateToProps = (state: StoreState, props: PassedProps): StoreProps => {
     blackoutDates: getBlackoutDates(state),
     isSyncing: getSyncing(state),
     showProjections: getShowProjections(state),
-    isStudentPace: isStudentPace(state)
+    isStudentPace: isStudentPace(state),
+    context_type: getSelectedContextType(state)
   }
 }
 

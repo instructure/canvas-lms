@@ -17,12 +17,13 @@
  */
 
 import {BASE_SIZE, DEFAULT_SETTINGS, STROKE_WIDTH} from './constants'
-import {createSvgElement, convertFileToBase64} from './utils'
+import {createSvgElement} from './utils'
 import {buildMetadata} from './metadata'
 import {buildShape} from './shape'
 import {buildImage} from './image'
 import {buildClipPath} from './clipPath'
 import {buildText, buildTextBackground, getContainerWidth, getContainerHeight} from './text'
+import base64EncodedFont from './font'
 
 export function buildSvg(settings, options = {}) {
   settings = {...DEFAULT_SETTINGS, ...settings}
@@ -62,17 +63,11 @@ export function buildSvg(settings, options = {}) {
 }
 
 export function buildStylesheet() {
-  const url = '/fonts/lato/extended/Lato-Bold.woff2'
-  return new Promise(resolve => resolve(fetch(url)))
-    .then(data => data.blob())
-    .then(blob => convertFileToBase64(blob))
-    .then(base64String => {
-      const stylesheet = document.createElement('style')
-      const css = `@font-face {font-family: "Lato Extended";font-weight: bold;src: url(${base64String});}`
-      stylesheet.setAttribute('type', 'text/css')
-      stylesheet.appendChild(document.createTextNode(css))
-      return stylesheet
-    })
+  const stylesheet = document.createElement('style')
+  const css = `@font-face {font-family: "Lato Extended";font-weight: bold;src: url(${base64EncodedFont()});}`
+  stylesheet.setAttribute('type', 'text/css')
+  stylesheet.appendChild(document.createTextNode(css))
+  return stylesheet
 }
 
 export function buildSvgWrapper(settings) {

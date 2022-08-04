@@ -46,11 +46,13 @@ module CC
             course_pace_node.published_at CCHelper.ims_datetime(course_pace.published_at) if course_pace.published_at
             course_pace_node.exclude_weekends course_pace.exclude_weekends
             course_pace_node.hard_end_dates course_pace.hard_end_dates
+            add_exported_asset(course_pace)
             course_pace_node.module_items do |module_items_node|
               course_pace.course_pace_module_items.ordered.each do |course_pace_module_item|
                 module_items_node.module_item do |module_item_node|
                   module_item_node.duration course_pace_module_item.duration
                   module_item_node.module_item_identifierref create_key(course_pace_module_item.module_item)
+                  module_item_node.pace_item_identifier create_key(course_pace_module_item)
                 end
               end
             end

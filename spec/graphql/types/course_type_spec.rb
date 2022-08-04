@@ -409,6 +409,38 @@ describe Types::CourseType do
           GQL
         ).to match_array [@teacher, @student1, @student2, @concluded_user].map(&:to_param)
       end
+
+      context "loginId" do
+        def pseud_params(unique_id, account = Account.default)
+          {
+            account: account,
+            unique_id: unique_id,
+          }
+        end
+
+        before do
+          users = [@teacher, @student1, other_teacher, @student2, @inactive_user]
+          @pseudonyms = users.map { |user| user.pseudonyms.create!(pseud_params("#{user.id}@example.com")).unique_id }
+        end
+
+        it "returns loginId for all users when requested by a teacher" do
+          expect(
+            course_type.resolve(
+              "usersConnection { edges { node { loginId } } }",
+              current_user: @teacher
+            )
+          ).to eq @pseudonyms
+        end
+
+        it "does not return loginId for any users when requested by a student" do
+          expect(
+            course_type.resolve(
+              "usersConnection { edges { node { loginId } } }",
+              current_user: @student1
+            )
+          ).to eq [nil, nil, nil, nil, nil]
+        end
+      end
     end
 
     describe "enrollmentsConnection" do
@@ -431,6 +463,35 @@ describe Types::CourseType do
           @teacher.enrollments.first.id.to_s,
           other_teacher.enrollments.first.id.to_s,
         ]
+      end
+
+      it "returns zero for each user's initial totalActivityTime" do
+        expect(
+          course_type.resolve(
+            "enrollmentsConnection { nodes { totalActivityTime } }",
+            current_user: @teacher
+          )
+        ).to eq [0, 0, 0, 0, 0, 0]
+      end
+
+      it "returns an htmlUrl for each enrollment" do
+        expect(
+          course_type.resolve(
+            "enrollmentsConnection { nodes { htmlUrl } }",
+            current_user: @teacher,
+            request: ActionDispatch::TestRequest.create
+          )
+        ).to eq([@teacher, @student1, other_teacher, @student2, @inactive_user, @concluded_user]
+          .map { |user| "http://test.host/courses/#{@course.id}/users/#{user.id}" })
+      end
+
+      it "returns canBeRemoved boolean value for each enrollment" do
+        expect(
+          course_type.resolve(
+            "enrollmentsConnection { nodes { canBeRemoved } }",
+            current_user: @teacher
+          )
+        ).to eq [false, true, true, true, true, true]
       end
 
       describe "filtering" do

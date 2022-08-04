@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {arrayOf} from 'prop-types'
+import {arrayOf, bool} from 'prop-types'
 import CanvasSelect from '@canvas/instui-bindings/react/Select'
 import {fillAssessment} from '@canvas/rubrics/react/helpers'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -61,7 +61,11 @@ export default function RubricTab(props) {
         <ToggleDetails
           defaultExpanded
           fluidWidth
-          summary={<Text weight="bold">{I18n.t('View Rubric')}</Text>}
+          summary={
+            <Text weight="bold">
+              {props.peerReviewModeEnabled ? I18n.t('Fill Out Rubric') : I18n.t('View Rubric')}
+            </Text>
+          }
         >
           {!!props.assessments?.length && (
             <div style={{marginBottom: '22px', width: '325px'}}>
@@ -99,5 +103,6 @@ RubricTab.propTypes = {
   assessments: arrayOf(RubricAssessment.shape),
   proficiencyRatings: arrayOf(ProficiencyRating.shape),
   rubric: Rubric.shape,
-  rubricAssociation: RubricAssociation.shape
+  rubricAssociation: RubricAssociation.shape,
+  peerReviewModeEnabled: bool
 }

@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useState} from 'react'
+import PropTypes from 'prop-types'
 import {Tag} from '@instructure/ui-tag'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -26,7 +27,8 @@ import {proficiencyRatingShape} from './shapes'
 
 const themeOverride = {
   [Tag.theme]: {
-    defaultBackground: 'white'
+    defaultBackground: 'white',
+    maxWidth: '12rem'
   }
 }
 
@@ -37,14 +39,19 @@ const iconStyle = {
   verticalAlign: 'middle'
 }
 
-const ProficiencyRating = ({points, masteryAt, color, description}) => {
+const ProficiencyRating = ({points, masteryAt, color, description, onClick}) => {
   const [disabled, setDisabled] = useState(false)
+
+  const onClickView = () => {
+    setDisabled(prevState => !prevState)
+    onClick(disabled, points)
+  }
   return (
     // disabled tags can't be clicked, so wrap the tag in a clickable view
     <View
       as="div"
       cursor="pointer"
-      onClick={() => setDisabled(!disabled)}
+      onClick={onClickView}
       withBackground="transparent"
       isWithinText={false}
       padding="0 small 0 small"
@@ -52,7 +59,6 @@ const ProficiencyRating = ({points, masteryAt, color, description}) => {
       <ApplyTheme theme={themeOverride}>
         <Tag
           size="medium"
-          disabled={disabled}
           text={
             <>
               <div style={iconStyle}>
@@ -76,7 +82,8 @@ const ProficiencyRating = ({points, masteryAt, color, description}) => {
 }
 
 ProficiencyRating.propTypes = {
-  ...proficiencyRatingShape
+  ...proficiencyRatingShape,
+  onClick: PropTypes.func.isRequired
 }
 
 export default ProficiencyRating

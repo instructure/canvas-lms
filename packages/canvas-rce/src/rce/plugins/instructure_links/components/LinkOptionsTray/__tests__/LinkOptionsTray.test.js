@@ -121,6 +121,13 @@ describe('RCE "Links" Plugin > LinkOptionsTray', () => {
       expect(tray.previewOption).toBe('inline')
     })
 
+    it('preview_option is "disable" and auto-preview is hidden if displayAs is "download-link"', () => {
+      props.content.displayAs = 'download-link'
+      renderComponent()
+      expect(tray.$previewCheckbox).toBeNull()
+      expect(tray.previewOption).toBe('disable')
+    })
+
     it('can be reset to "Display Text Link"', () => {
       props.content.displayAs = 'link'
       renderComponent()
@@ -205,7 +212,7 @@ describe('RCE "Links" Plugin > LinkOptionsTray', () => {
           const [{embed}] = props.onSave.mock.calls[0]
           expect(embed.type).toEqual('scribd')
           expect(embed.autoOpenPreview).toBeTruthy()
-          expect(embed.disablePreview).toBeFalsy()
+          expect(embed.disableInlinePreview).toBeFalsy()
         })
 
         it('includes the Link', () => {
@@ -217,7 +224,7 @@ describe('RCE "Links" Plugin > LinkOptionsTray', () => {
         })
       })
 
-      describe('sets disablePreview', () => {
+      describe('sets disableInlinePreview', () => {
         it('if preview_option is "overlay"', () => {
           props.content.isPreviewable = true
           renderComponent()
@@ -226,7 +233,20 @@ describe('RCE "Links" Plugin > LinkOptionsTray', () => {
           const [{embed}] = props.onSave.mock.calls[0]
           expect(embed.type).toEqual('scribd')
           expect(embed.autoOpenPreview).toBeFalsy()
-          expect(embed.disablePreview).toBeTruthy()
+          expect(embed.disableInlinePreview).toBeTruthy()
+          expect(embed.noPreview).toBeFalsy()
+        })
+
+        it('if preview_option is "disable"', () => {
+          props.content.isPreviewable = true
+          renderComponent()
+          tray.setPreviewOption('disable')
+          tray.$doneButton.click()
+          const [{embed}] = props.onSave.mock.calls[0]
+          expect(embed.type).toEqual('scribd')
+          expect(embed.autoOpenPreview).toBeFalsy()
+          expect(embed.disableInlinePreview).toBeTruthy()
+          expect(embed.noPreview).toBeTruthy()
         })
       })
     })

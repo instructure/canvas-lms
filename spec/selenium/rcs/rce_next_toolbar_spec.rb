@@ -216,7 +216,8 @@ describe "RCE Next toolbar features", ignore_js_errors: true do
       it "makes text superscript in rce" do
         rce_wysiwyg_state_setup(@course)
 
-        click_superscript_button
+        click_super_toggle_button
+        click_superscript_menu_button
 
         in_frame rce_page_body_ifr_id do
           expect(f("#tinymce sup")).to be_displayed
@@ -228,7 +229,7 @@ describe "RCE Next toolbar features", ignore_js_errors: true do
 
         rce_wysiwyg_state_setup(@course, text, html: true)
 
-        shift_click_button(superscript_button_selector)
+        click_superscript_button
 
         in_frame rce_page_body_ifr_id do
           expect(f("#tinymce")).not_to contain_css("sup")
@@ -250,7 +251,7 @@ describe "RCE Next toolbar features", ignore_js_errors: true do
         text = "<p><sub>This is my text</sub></p>"
         rce_wysiwyg_state_setup(@course, text, html: true)
         select_in_tiny(f("#wiki_page_body"), "sub")
-        shift_click_button(subscript_button_selector)
+        click_subscript_button
 
         in_frame rce_page_body_ifr_id do
           expect(f("#tinymce")).not_to contain_css("sub")

@@ -1052,6 +1052,14 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/student_view_student", action: :student_view_student
     end
 
+    scope(controller: :account_calendars_api) do
+      get "account_calendars", action: :index, as: :account_calendars
+      get "account_calendars/:account_id", action: :show, as: :account_calendar
+      put "account_calendars/:account_id", action: :update, as: :update_account_calendar
+      put "accounts/:account_id/account_calendars", action: :bulk_update, as: :bulk_update_account_calendars
+      get "accounts/:account_id/account_calendars", action: :all_calendars, as: :all_account_calendars
+    end
+
     scope(controller: :account_notifications) do
       post "accounts/:account_id/account_notifications", action: :create, as: "account_notification"
       put "accounts/:account_id/account_notifications/:id", action: :update, as: "account_notification_update"
@@ -1667,6 +1675,7 @@ CanvasRails::Application.routes.draw do
       post "calendar_events/:id/reservations/:participant_id", action: :reserve, as: "calendar_event_reserve"
       get "calendar_events/:id/participants", action: :participants, as: "calendar_event_participants"
       post "calendar_events/save_selected_contexts", action: :save_selected_contexts
+      post "calendar_events/save_enabled_account_calendars", action: :save_enabled_account_calendars
 
       get "courses/:course_id/calendar_events/timetable", action: :get_course_timetable
       post "courses/:course_id/calendar_events/timetable", action: :set_course_timetable

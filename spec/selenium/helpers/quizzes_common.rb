@@ -29,6 +29,12 @@ module QuizzesCommon
     @quiz
   end
 
+  def add_quiz_to_module
+    @course.context_modules.create! name: "Module 1"
+    mod = @course.context_modules.first
+    mod.add_item(type: "quiz", id: @quiz.id)
+  end
+
   # The default time for a quiz due date is 11:59pm
   def default_time_for_due_date(date)
     date.change({ hour: 23, min: 59 })

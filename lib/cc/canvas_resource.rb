@@ -194,6 +194,10 @@ module CC
         if @course.account.feature_enabled?(:final_grades_override)
           c.allow_final_grade_override(@course.allow_final_grade_override?)
         end
+
+        if @course.account.feature_enabled?(:course_paces)
+          c.enable_course_paces(@course.enable_course_paces)
+        end
       end
       course_file&.close
       rel_path

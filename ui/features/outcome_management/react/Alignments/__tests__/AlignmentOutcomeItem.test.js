@@ -26,12 +26,14 @@ describe('AlignmentOutcomeItem', () => {
     description: 'Outcome Description',
     alignments: [
       {
-        id: '1',
-        type: 'Assignment',
+        _id: '1',
+        contentType: 'Assignment',
         title: 'Assignment 1',
         url: '/courses/1/outcomes/1/alignments/3',
         moduleTitle: 'Module 1',
-        moduleUrl: '/courses/1/modules/1'
+        moduleUrl: '/courses/1/modules/1',
+        moduleWorkflowState: 'active',
+        assignmentContentType: 'assignment'
       }
     ],
     ...props

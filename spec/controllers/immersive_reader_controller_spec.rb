@@ -98,6 +98,17 @@ describe ImmersiveReaderController do
 
         get "authenticate"
       end
+
+      it "increments the error counter" do
+        allow(InstStatsd::Statsd).to receive(:increment)
+
+        expect(InstStatsd::Statsd).to receive(:increment).with(
+          "immersive_reader.authentication_failure",
+          tags: { status: "401" }
+        )
+
+        get "authenticate"
+      end
     end
 
     it_behaves_like "contexts_with_a_captured_exception"

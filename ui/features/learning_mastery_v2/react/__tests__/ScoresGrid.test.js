@@ -61,9 +61,14 @@ describe('ScoresGrid', () => {
           ]
         }
       ],
+      visibleRatings: [true, true, true, true, true, true],
       ...props
     }
   }
+
+  beforeEach(() => {
+    window.ENV = {GRADEBOOK_OPTIONS: {ACCOUNT_LEVEL_MASTERY_SCALES: true}}
+  })
 
   it('renders each outcome rollup', () => {
     const {getByText} = render(<ScoresGrid {...defaultProps()} />)

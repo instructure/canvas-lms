@@ -91,7 +91,7 @@ function CanvasSelectGroup({label}: GroupProps): ReactElement {
   return <div />
 }
 
-export default class CanvasSelect extends React.Component<Props, State> {
+class CanvasSelect extends React.Component<Props, State> {
   static Option = CanvasSelectOption
 
   static Group = CanvasSelectGroup
@@ -325,3 +325,5 @@ export default class CanvasSelect extends React.Component<Props, State> {
     return foundOpt
   }
 }
+
+export default CanvasSelect

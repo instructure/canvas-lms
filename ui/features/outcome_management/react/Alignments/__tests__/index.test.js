@@ -38,10 +38,15 @@ describe('AlignmentSummary', () => {
 
   const render = (
     children,
-    {contextType = 'Course', contextId = '1', mocks = courseAlignmentStatsMocks()} = {}
+    {
+      contextType = 'Course',
+      contextId = '1',
+      rootOutcomeGroup = {id: '1'},
+      mocks = courseAlignmentStatsMocks()
+    } = {}
   ) => {
     return realRender(
-      <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
+      <OutcomesContext.Provider value={{env: {contextType, contextId, rootOutcomeGroup}}}>
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
         </MockedProvider>

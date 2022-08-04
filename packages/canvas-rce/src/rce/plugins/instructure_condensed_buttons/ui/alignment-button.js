@@ -18,23 +18,23 @@
 
 import formatMessage from '../../../../format-message'
 
-export default function(editor) {
+export default function (editor) {
   const alignToolbarButtons = [
     {
       name: 'alignleft',
-      text: formatMessage('Align left'),
+      text: formatMessage('Left Align'),
       cmd: 'JustifyLeft',
       icon: 'align-left'
     },
     {
       name: 'aligncenter',
-      text: formatMessage('Align center'),
+      text: formatMessage('Center Align'),
       cmd: 'JustifyCenter',
       icon: 'align-center'
     },
     {
       name: 'alignright',
-      text: formatMessage('Align right'),
+      text: formatMessage('Right Align'),
       cmd: 'JustifyRight',
       icon: 'align-right'
     }
@@ -45,9 +45,6 @@ export default function(editor) {
   editor.ui.registry.addSplitButton('align', {
     tooltip: alignButtonLabel,
     icon: 'align-left',
-    presets: 'listpreview',
-    columns: 3,
-
     fetch: callback => {
       const items = alignToolbarButtons.map(button => {
         return {

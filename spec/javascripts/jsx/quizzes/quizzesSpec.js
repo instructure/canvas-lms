@@ -16,6 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* eslint-disable import/no-dynamic-require */
+/* eslint-disable import/no-amd */
+
 if (!Object.assign) {
   Object.assign = function assign(...args) {
     const first = args.shift()
@@ -45,7 +48,6 @@ define(['jquery'], $ => {
   QUnit.module('isChangeMultiFuncBound', {
     setup() {
       sandbox.stub($, '_data')
-      sandbox.stub($.fn, 'ready')
     }
   })
 
@@ -89,7 +91,6 @@ define(['jquery'], $ => {
     setup() {
       sandbox.stub($questionContent, 'bind')
       sandbox.stub($, '_data')
-      sandbox.stub($.fn, 'ready')
       $questionContent.bind.returns({change() {}})
     }
   })

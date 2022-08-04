@@ -1693,6 +1693,12 @@ describe Submission do
       expect(Canvas::LiveEvents).to receive(:grade_changed).once
       submission.grade_change_audit(force_audit: true)
     end
+
+    it "moves mastery path along on force audit if appropriate" do
+      expect(ConditionalRelease::Rule).to receive(:is_trigger_assignment?).with(submission.assignment).once
+      submission.update! score: 1, workflow_state: :graded, posted_at: Time.now
+      submission.grade_change_audit(force_audit: true)
+    end
   end
 
   context "#graded_anonymously" do

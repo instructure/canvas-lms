@@ -26,6 +26,7 @@ import $ from 'jquery'
 import calcCmd from './calcCmd'
 import htmlEscape from 'html-escape'
 import numberHelper from '@canvas/i18n/numberHelper'
+import ready from '@instructure/ready'
 import pluralize from 'str-pluralize'
 import Handlebars from '@canvas/handlebars-helpers'
 import DueDateOverrideView from '@canvas/due-dates'
@@ -122,6 +123,7 @@ const renderDueDates = lockedItems => {
       dueDatesReadonly: lockedItems.due_dates,
       availabilityDatesReadonly: lockedItems.availability_dates,
       inPacedCourse: ENV.QUIZ.in_paced_course,
+      isModuleItem: ENV.IS_MODULE_ITEM,
       courseId: ENV.COURSE_ID
     })
     overrideView.render()
@@ -1899,7 +1901,7 @@ function toggleConditionalReleaseTab(quizType) {
   }
 }
 
-$(document).ready(function () {
+ready(function () {
   const lockManager = new LockManager()
   lockManager.init({itemType: 'quiz', page: 'edit'})
   const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : {}

@@ -74,6 +74,13 @@ conferencing_in_planner:
   description: |-
     When enabled, this flag shows a "Join" button on Canvas calendar
     events in the student planner
+account_calendar_events:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Account-level calendars
+  description: |-
+    Allows admins to create events in root- and sub-account calendars that everyone in
+    the account can see.
 submission_feedback_indicators:
   state: allowed
   applies_to: RootAccount

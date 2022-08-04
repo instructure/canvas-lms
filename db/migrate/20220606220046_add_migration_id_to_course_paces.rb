@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2022 - present Instructure, Inc.
+# Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -18,10 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class FixResourceLinksFromCopiedCoursesNullUrls < ActiveRecord::Migration[6.0]
-  tag :postdeploy
+class AddMigrationIdToCoursePaces < ActiveRecord::Migration[4.2]
+  tag :predeploy
 
-  def up
-    DataFixup::FixResourceLinksFromCopiedCoursesNullUrls.delay_if_production(priority: Delayed::LOW_PRIORITY).run
+  def change
+    add_column :course_paces, :migration_id, :string, if_not_exists: true
+    add_column :course_pace_module_items, :migration_id, :string, if_not_exists: true
   end
 end

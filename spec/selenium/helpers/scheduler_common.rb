@@ -177,8 +177,8 @@ module SchedulerCommon
 
   def open_edit_appointment_group_event_dialog
     f(".agenda-event__item .agenda-event__item-container").click
-    expect(f(".edit_event_link")).to be_displayed
-    f(".edit_event_link").click
+    expect(calendar_edit_event_link).to be_displayed
+    calendar_edit_event_link.click
     wait_for_ajaximations
   end
 

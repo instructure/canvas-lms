@@ -384,6 +384,13 @@ describe CoursePace do
       assignment_override.reload
       expect(assignment_override.due_at).to eq(fancy_midnight_rounded_to_last_second("2021-09-06"))
     end
+
+    it "logs if the assignment being updated has been completed" do
+      @assignment.submit_homework(@student, body: "Test")
+      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      expect(@course_pace.publish).to eq(true)
+      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.submitted_assignment_date_change")
+    end
   end
 
   describe "default plan start_at" do

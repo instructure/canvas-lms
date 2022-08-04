@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {act, getByText} from '@testing-library/react'
+import {act} from '@testing-library/react'
 import moment from 'moment'
 
 import {PACE_MODULE_1, PRIMARY_PACE} from '../../../__tests__/fixtures'

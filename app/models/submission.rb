@@ -2016,7 +2016,6 @@ class Submission < ActiveRecord::Base
   def grade_change_audit(force_audit: false)
     # grade or graded status changed
     grade_changed = (saved_changes.keys & %w[grade score excused]).present? || (saved_change_to_workflow_state? && workflow_state == "graded")
-
     # any auditable conditions
     perform_audit = force_audit || grade_changed || assignment_changed_not_sub || saved_change_to_posted_at?
 
@@ -2026,7 +2025,7 @@ class Submission < ActiveRecord::Base
       end
       self.class.connection.after_transaction_commit do
         Auditors::GradeChange.record(submission: self, skip_insert: !grade_changed)
-        queue_conditional_release_grade_change_handler if grade_changed
+        queue_conditional_release_grade_change_handler if grade_changed || (force_audit && posted_at.present?)
       end
     end
   end

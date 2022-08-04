@@ -17,15 +17,22 @@
  */
 
 import React from 'react'
-import ConfettiGenerator from 'confetti-js'
+import ConfettiGenerator from '../javascript/ConfettiGenerator'
 import getRandomConfettiFlavor from './confettiFlavor'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('confetti')
 
-export default function Confetti() {
+export default function Confetti({triggerCount}) {
   const [visible, setVisible] = React.useState(true)
+  React.useEffect(() => {
+    if (!visible) {
+      setVisible(true)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [triggerCount])
+
   React.useEffect(() => {
     if (window.ENV.disable_celebrations || !visible) {
       return
@@ -47,10 +54,6 @@ export default function Confetti() {
     }
 
     confetti = new ConfettiGenerator({
-      target: 'confetti-canvas',
-      max: 160,
-      clock: 50,
-      respawn: false,
       props: ['square', getRandomConfettiFlavor()].filter(p => p !== null)
     })
 

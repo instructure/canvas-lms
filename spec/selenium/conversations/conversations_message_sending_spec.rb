@@ -516,6 +516,7 @@ describe "conversations new" do
         fj("button:contains('Send')").click
         wait_for_ajaximations
         expect(@s1.conversations.last.conversation.conversation_participants.collect(&:user_id).sort).to eq [@s1.id, @s2.id, @admin.id]
+        expect(@s1.conversations.last.conversation.context).to eq @admin.account
       end
 
       it "allows messages to be sent individually for account-level groups", priority: "2" do

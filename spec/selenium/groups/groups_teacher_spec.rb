@@ -520,41 +520,6 @@ describe "new groups" do
       expect(f(".group[data-id=\"#{@testgroup[1].id}\"] span.show-group-full").css_value("display")).to eq "none"
     end
 
-    it "creates a group with a given name and limit", priority: "2" do
-      skip("broken qa-729")
-      group_test_setup(5, 1, 1)
-      3.times do |n|
-        add_user_to_group(@students[n + 1], @testgroup.first, false)
-      end
-
-      get "/courses/#{@course.id}/groups"
-
-      f(".people.active").click
-      wait_for_ajaximations
-      fj('.btn.button-sidebar-wide:contains("View User Groups")').click
-      wait_for_ajaximations
-      fj('.ui-tabs-anchor:contains("Everyone")').click
-      wait_for_ajaximations
-      fj('.ui-tabs-anchor:contains("Test Group Set 1")').click
-      wait_for_ajaximations
-
-      2.times do |n|
-        f(".btn.add-group").click
-        wait_for_ajaximations
-        f("#group_name").send_keys("Test Group #{n + 2}")
-        wait_for_ajaximations
-        f("#group_max_membership").send_keys("2")
-        wait_for_ajaximations
-        f("#groupEditSaveButton").click
-        wait_for_ajaximations
-        @testgroup << Group.last
-      end
-
-      expect(f(".group[data-id=\"#{@testgroup[0].id}\"] .group-name")).to include_text("Test Group 1")
-      expect(f(".group[data-id=\"#{@testgroup[1].id}\"] .group-name")).to include_text("Test Group 2")
-      expect(f(".group[data-id=\"#{@testgroup[2].id}\"] .group-name")).to include_text("Test Group 3")
-    end
-
     it "adds students via drag and drop", priority: "1" do
       group_test_setup(2, 1, 2)
       get "/courses/#{@course.id}/groups"

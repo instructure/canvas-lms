@@ -925,7 +925,7 @@ describe AssignmentsController do
         context "peer reviews" do
           before do
             @assignment.update_attribute(:peer_reviews, true)
-            @reviewee = User.create!
+            @reviewee = User.create!(name: "John Connor")
             @course.enroll_user(@reviewee, "StudentEnrollment", enrollment_state: "active")
             @assignment.assign_peer_review(@student, @reviewee)
 
@@ -1041,6 +1041,25 @@ describe AssignmentsController do
             user_session(@student)
             get "show", params: { course_id: @course.id, id: @assignment.id, anonymous_asset_id: @reviewee_submission.anonymous_id }
             expect(assigns[:js_env][:peer_review_available]).to eq true
+          end
+
+          it "sets peer_review_available value to the reviewee name when anonymous_peer_reviews is false" do
+            @assignment.submit_homework(@student, submission_type: "online_url", url: "http://www.google.com")
+            @assignment.submit_homework(@reviewee, submission_type: "online_url", url: "http://www.google.com")
+
+            user_session(@student)
+            get "show", params: { course_id: @course.id, id: @assignment.id, anonymous_asset_id: @reviewee_submission.anonymous_id }
+            expect(assigns[:js_env][:peer_display_name]).to eq @reviewee.name
+          end
+
+          it "sets peer_review_available value to 'Anonymous student' when anonymous_peer_reviews is true" do
+            @assignment.update_attribute(:anonymous_peer_reviews, true)
+            @assignment.submit_homework(@student, submission_type: "online_url", url: "http://www.google.com")
+            @assignment.submit_homework(@reviewee, submission_type: "online_url", url: "http://www.google.com")
+
+            user_session(@student)
+            get "show", params: { course_id: @course.id, id: @assignment.id, anonymous_asset_id: @reviewee_submission.anonymous_id }
+            expect(assigns[:js_env][:peer_display_name]).to eq "Anonymous student"
           end
         end
       end

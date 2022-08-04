@@ -26,12 +26,14 @@ import {Spinner} from '@instructure/ui-spinner'
 import AlignmentOutcomeItem from './AlignmentOutcomeItem'
 import InfiniteScroll from '@canvas/infinite-scroll'
 import SVGWrapper from '@canvas/svg-wrapper'
-import {outcomeWithAlignmentShape} from './propTypeShapes'
+import {groupDataShape} from './propTypeShapes'
 
 const I18n = useI18nScope('AlignmentSummary')
 
-const AlignmentOutcomeItemList = ({outcomes, loading, hasMore, loadMore, scrollContainer}) => {
-  const outcomesCount = outcomes?.length || 0
+const AlignmentOutcomeItemList = ({rootGroup, loading, loadMore, scrollContainer}) => {
+  const outcomes = rootGroup?.outcomes
+  const hasOutcomes = outcomes?.edges?.length > 0
+  const hasMoreOutcomes = outcomes?.pageInfo?.hasNextPage
 
   const renderSearchLoader = () => (
     <div style={{textAlign: 'center'}} data-testid="loading">
@@ -62,19 +64,17 @@ const AlignmentOutcomeItemList = ({outcomes, loading, hasMore, loadMore, scrollC
 
   return (
     <View as="div" minWidth="300px" data-testid="alignment-items-list-container">
-      {outcomesCount === 0 ? (
-        renderNoSearchResults()
-      ) : (
+      {hasOutcomes ? (
         <InfiniteScroll
-          hasMore={hasMore}
+          hasMore={hasMoreOutcomes}
           loadMore={loadMore}
           loader={renderInfiniteScrollLoader()}
           scrollContainer={scrollContainer}
         >
           <View as="div" data-testid="alignment-items-list">
-            {outcomes?.map(({id, title, description, alignments}) => (
+            {(outcomes?.edges || []).map(({node: {_id, title, description, alignments}}) => (
               <AlignmentOutcomeItem
-                key={id}
+                key={_id}
                 title={title}
                 description={description}
                 alignments={alignments}
@@ -82,20 +82,20 @@ const AlignmentOutcomeItemList = ({outcomes, loading, hasMore, loadMore, scrollC
             ))}
           </View>
         </InfiniteScroll>
+      ) : (
+        renderNoSearchResults()
       )}
     </View>
   )
 }
 
 AlignmentOutcomeItemList.defaultProps = {
-  hasMore: true,
   loadMore: () => {}
 }
 
 AlignmentOutcomeItemList.propTypes = {
-  outcomes: PropTypes.arrayOf(outcomeWithAlignmentShape),
+  rootGroup: groupDataShape,
   scrollContainer: PropTypes.instanceOf(Element),
-  hasMore: PropTypes.bool,
   loading: PropTypes.bool,
   loadMore: PropTypes.func
 }

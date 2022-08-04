@@ -27,11 +27,13 @@ const I18n = useI18nScope('AlignmentSummary')
 
 const useCourseAlignmentStats = () => {
   const {contextId} = useCanvasContext()
+  const variables = {
+    id: contextId
+  }
 
   const {loading, error, data} = useQuery(COURSE_ALIGNMENT_STATS, {
-    variables: {
-      id: contextId
-    }
+    variables,
+    fetchPolicy: 'network-only'
   })
 
   useEffect(() => {

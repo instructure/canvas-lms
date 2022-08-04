@@ -45,7 +45,8 @@ export const getDiscussionQueryMock = ({
   rootEntries = true,
   searchTerm = '',
   sort = 'desc',
-  shouldError = false
+  shouldError = false,
+  isGroup = true
 } = {}) => [
   {
     request: {
@@ -93,6 +94,15 @@ export const getDiscussionQueryMock = ({
                 pageInfo: PageInfo.mock(),
                 __typename: 'DiscussionSubentriesConnection'
               }
+            })
+          }
+          if (!isGroup) {
+            return Discussion.mock({
+              author: User.mock({
+                courseRoles: ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'],
+                id: 'role-user'
+              }),
+              groupSet: null
             })
           }
           return Discussion.mock({
@@ -374,7 +384,8 @@ export const subscribeToDiscussionTopicMock = ({
           discussionTopic: Discussion.mock({
             id: btoa(`Discussion-${discussionTopicId}`),
             _id: discussionTopicId,
-            subscribed
+            subscribed,
+            groupSet: null
           }),
           __typename: 'SubscribeToDiscussionTopicPayload'
         }

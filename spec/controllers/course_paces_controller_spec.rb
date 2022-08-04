@@ -237,6 +237,61 @@ describe CoursePacesController, type: :controller do
       expect(response).to be_successful
       expect(JSON.parse(response.body)["progress"]).to be_nil
     end
+
+    # the show api returns all the paces with their assignable module items
+    # if the user deletes the underlying learning object (e.g. assignment, quiz, ...)
+    # it should get removed from the course_pace_module_items and
+    # no longer be in the pace. Let's test that.
+    describe "learning object deletion" do
+      it "handles assignments" do
+        a = @course.assignments.create! name: "Del this assn", workflow_state: "active"
+        @mod1.add_item id: a.id, type: "assignment"
+
+        get :api_show, params: { course_id: @course.id, id: @course_pace.id }
+        pace = JSON.parse(response.body)["course_pace"]
+        expect(pace["modules"][0]["items"].select { |item| item["assignment_title"] == "Del this assn" }.present?).to be_truthy
+
+        a.destroy!
+
+        get :api_show, params: { course_id: @course.id, id: @course_pace.id }
+        pace = JSON.parse(response.body)["course_pace"]
+        expect(pace["modules"][0]["items"].select { |item| item["assignment_title"] == "Del this assn" }.present?).to be_falsey
+      end
+
+      it "handles quizzes" do
+        q = @course.quizzes.create!({ title: "Del this quiz", quiz_type: "assignment" })
+        q.publish
+        q.save!
+        @mod1.add_item(type: "quiz", id: q.id)
+
+        get :api_show, params: { course_id: @course.id, id: @course_pace.id }
+        pace = JSON.parse(response.body)["course_pace"]
+        expect(pace["modules"][0]["items"].select { |item| item["assignment_title"] == "Del this quiz" }.present?).to be_truthy
+
+        q.destroy!
+
+        get :api_show, params: { course_id: @course.id, id: @course_pace.id }
+        pace = JSON.parse(response.body)["course_pace"]
+        expect(pace["modules"][0]["items"].select { |item| item["assignment_title"] == "Del this quiz" }.present?).to be_falsey
+      end
+
+      it "handles graded discussions" do
+        discussion_assignment = @course.assignments.create!(title: "Del this disc", workflow_state: "active")
+        d = @course.discussion_topics.create!(assignment: discussion_assignment, title: "Del this disc")
+        d.publish
+        @mod1.add_item id: d.id, type: "DiscussionTopic"
+
+        get :api_show, params: { course_id: @course.id, id: @course_pace.id }
+        pace = JSON.parse(response.body)["course_pace"]
+        expect(pace["modules"][0]["items"].select { |item| item["assignment_title"] == "Del this disc" }.present?).to be_truthy
+
+        d.destroy!
+
+        get :api_show, params: { course_id: @course.id, id: @course_pace.id }
+        pace = JSON.parse(response.body)["course_pace"]
+        expect(pace["modules"][0]["items"].select { |item| item["assignment_title"] == "Del this disc" }.present?).to be_falsey
+      end
+    end
   end
 
   describe "PUT #update" do

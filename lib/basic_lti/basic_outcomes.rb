@@ -42,12 +42,24 @@ module BasicLTI
   # that is coming from quizzes or from an external vendor.
   module BasicOutcomes
     class Unauthorized < StandardError
+      def initialize(msg)
+        InstStatsd::Statsd.increment("lti.1_1.basic_outcomes.bad_requests",
+                                     tags: { error_code: "Unauthorized" })
+        super(msg)
+      end
+
       def response_status
         401
       end
     end
 
     class InvalidRequest < StandardError
+      def initialize(msg)
+        InstStatsd::Statsd.increment("lti.1_1.basic_outcomes.bad_requests",
+                                     tags: { error_code: "InvalidRequest" })
+        super(msg)
+      end
+
       def response_status
         415
       end
