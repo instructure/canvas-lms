@@ -49,9 +49,7 @@ module Calendar2Common
     default_params = {
       title: "new appointment group",
       contexts: [@course],
-      new_appointments: [
-        [tomorrow + " 12:00:00", tomorrow + " 13:00:00"],
-      ]
+      new_appointments: [[tomorrow + " 12:00:00", tomorrow + " 13:00:00"]]
     }
     ag = AppointmentGroup.create!(default_params.merge(params))
     ag.publish!
@@ -63,26 +61,22 @@ module Calendar2Common
     default_params = {
       title: "new appointment group",
       contexts: [@course],
-      new_appointments: [
-        [tomorrow + " 7:00", tomorrow + " 11:00:00"],
-      ]
+      new_appointments: [[tomorrow + " 7:00", tomorrow + " 11:00:00"]]
     }
     ag = AppointmentGroup.create!(default_params.merge(params))
     ag.publish!
     ag.title
   end
 
-  def create_calendar_event_series(context, title, start_at, duration = 1.hour, rrule = "FREQ=DAILY;INTERVAL=1;COUNT=3")
-    rr = RRule::Rule.new(
-      rrule,
-      dtstart: start_at,
-      tzid: Time.zone.tzinfo.name
-    )
-    event_attributes = {
-      title: title,
-      rrule: rrule,
-      series_uuid: SecureRandom.uuid
-    }
+  def create_calendar_event_series(
+    context,
+    title,
+    start_at,
+    duration = 1.hour,
+    rrule = "FREQ=DAILY;INTERVAL=1;COUNT=3"
+  )
+    rr = RRule::Rule.new(rrule, dtstart: start_at, tzid: Time.zone.tzinfo.name)
+    event_attributes = { title: title, rrule: rrule, series_uuid: SecureRandom.uuid }
     dtstart_list = rr.all
 
     dtstart_list.map do |dtstart|
@@ -103,18 +97,17 @@ module Calendar2Common
   end
 
   def make_event(params = {})
-    opts = {
-      context: @user,
-      start: Time.zone.now,
-      description: "Test event"
-    }.with_indifferent_access.merge(params)
-    c = CalendarEvent.new description: opts[:description],
-                          start_at: opts[:start],
-                          end_at: opts[:end],
-                          title: opts[:title],
-                          location_name: opts[:location_name],
-                          location_address: opts[:location_address],
-                          all_day: opts[:all_day]
+    opts =
+      { context: @user, start: Time.zone.now, description: "Test event" }.with_indifferent_access
+                                                                         .merge(params)
+    c =
+      CalendarEvent.new description: opts[:description],
+                        start_at: opts[:start],
+                        end_at: opts[:end],
+                        title: opts[:title],
+                        location_name: opts[:location_name],
+                        location_address: opts[:location_address],
+                        all_day: opts[:all_day]
     c.context = opts[:context]
     c.save!
     c
@@ -137,13 +130,14 @@ module Calendar2Common
   end
 
   def create_graded_discussion
-    @assignment = @course.assignments.create!(
-      title: "assignment",
-      points_possible: 10,
-      due_at: Time.zone.now + 5.minutes,
-      submission_types: "online_text_entry",
-      only_visible_to_overrides: true
-    )
+    @assignment =
+      @course.assignments.create!(
+        title: "assignment",
+        points_possible: 10,
+        due_at: Time.zone.now + 5.minutes,
+        submission_types: "online_text_entry",
+        only_visible_to_overrides: true
+      )
     @gd = @course.discussion_topics.create!(title: "Graded Discussion", assignment: @assignment)
   end
 
@@ -152,16 +146,17 @@ module Calendar2Common
   end
 
   def change_calendar(direction = :next)
-    css_selector = case direction
-                   when :next
-                     ".navigate_next"
-                   when :prev
-                     ".navigate_prev"
-                   when :today
-                     ".navigate_today"
-                   else
-                     raise "unrecognized direction #{direction}"
-                   end
+    css_selector =
+      case direction
+      when :next
+        ".navigate_next"
+      when :prev
+        ".navigate_prev"
+      when :today
+        ".navigate_today"
+      else
+        raise "unrecognized direction #{direction}"
+      end
 
     f(".calendar_header " + css_selector).click
     wait_for_ajaximations
@@ -179,7 +174,13 @@ module Calendar2Common
     replace_content(f("input[type=text][id=calendar_event_date]"), middle_number)
   end
 
-  def create_assignment_event(assignment_title, should_add_date = false, publish = false, date = nil, use_current_course_calendar = false)
+  def create_assignment_event(
+    assignment_title,
+    should_add_date: false,
+    publish: false,
+    date: nil,
+    use_current_course_calendar: false
+  )
     middle_number = find_middle_day["data-date"]
     find_middle_day.click
     edit_event_dialog = f("#edit_event_tabs")
@@ -194,11 +195,20 @@ module Calendar2Common
     add_date(date) if should_add_date
     move_to_click("label[for=assignment_published]") if publish
     submit_form(edit_assignment_form)
-    expect(f(".fc-month-view .fc-event:not(.event_pending) .fc-title")).to include_text(assignment_title)
+    expect(f(".fc-month-view .fc-event:not(.event_pending) .fc-title")).to include_text(
+      assignment_title
+    )
   end
 
   # Creates event from clicking on the mini calendar
-  def create_calendar_event(event_title, should_add_date = false, should_add_location = false, should_duplicate = false, date = nil, use_current_course_calendar = false)
+  def create_calendar_event(
+    event_title,
+    should_add_date: false,
+    should_add_location: false,
+    should_duplicate: false,
+    date: nil,
+    use_current_course_calendar: false
+  )
     middle_number = find_middle_day["data-date"]
     find_middle_day.click
     edit_event_dialog = f("#edit_event_tabs")
@@ -209,7 +219,9 @@ module Calendar2Common
     click_option(edit_calendar_event_form_context, @course.name) if use_current_course_calendar
     date = middle_number if date.nil?
     add_date(date) if should_add_date
-    replace_content(f("input[placeHolder='Input Event Location...'"), "location title") if should_add_location
+    if should_add_location
+      replace_content(f("input[placeHolder='Input Event Location...'"), "location title")
+    end
 
     if should_duplicate
       f("#duplicate_event").click
@@ -262,40 +274,40 @@ module Calendar2Common
     @user.save!
     @date = Time.zone.now.beginning_of_day
     new_date = @date
-    new_date = if new_date.to_date.mday == "15"
-                 new_date.change({ day: 20 })
-               else
-                 new_date.change({ day: 15 })
-               end
+    new_date =
+      new_date.to_date.mday == "15" ? new_date.change({ day: 20 }) : new_date.change({ day: 15 })
     create_timed_calendar_event(new_date, start_time, end_time)
     event_title_on_calendar.click
-    event_content = fj(".event-details-content:visible")
-    expect(event_content.find_element(:css, ".event-details-timestring").text)
-      .to eq "#{format_date_for_view(new_date, "%b %d")}, #{time_to_lower(start_time)} - #{time_to_lower(end_time)}"
+    expect(
+      event_content.find_element(:css, ".event-details-timestring").text
+    ).to eq "#{format_date_for_view(new_date, "%b %d")}, #{time_to_lower(start_time)} - #{time_to_lower(end_time)}"
 
     calendar_edit_event_link.click
     edit_calendar_event_form_submit_button.click
     wait_for_ajaximations
     refresh_page
     event_title_on_calendar.click
-    event_content = fj(".event-details-content:visible")
-    expect(event_content.find_element(:css, ".event-details-timestring").text)
-      .to eq "#{format_date_for_view(new_date, "%b %d")}, #{time_to_lower(start_time)} - #{time_to_lower(end_time)}"
+    expect(
+      event_content.find_element(:css, ".event-details-timestring").text
+    ).to eq "#{format_date_for_view(new_date, "%b %d")}, #{time_to_lower(start_time)} - #{time_to_lower(end_time)}"
   end
 
-  def test_timed_calendar_event_in_tz_more_options(time_zone, start_time = "6:30 AM", end_time = "6:30 PM")
+  def test_timed_calendar_event_in_tz_more_options(
+    time_zone,
+    start_time = "6:30 AM",
+    end_time = "6:30 PM"
+  )
     @user.time_zone = time_zone
     @user.save!
     @date = Time.zone.now.beginning_of_day
     new_date = @date
-    new_date = if new_date.to_date.mday == "15"
-                 new_date.change({ day: 20 })
-               else
-                 new_date.change({ day: 15 })
-               end
+    new_date =
+      new_date.to_date.mday == "15" ? new_date.change({ day: 20 }) : new_date.change({ day: 15 })
     input_timed_calendar_event_fields(new_date, start_time, end_time)
     expect_new_page_load { edit_calendar_event_form_more_options.click }
-    expect(more_options_date_field.property("value")).to eq(format_date_for_view(new_date, "%Y-%m-%d"))
+    expect(more_options_date_field.property("value")).to eq(
+      format_date_for_view(new_date, "%Y-%m-%d")
+    )
     expect(more_options_start_time_field.property("value")).to eq(start_time)
     expect(more_options_end_time_field.property("value")).to eq(end_time)
 
@@ -304,9 +316,9 @@ module Calendar2Common
     refresh_page
 
     event_title_on_calendar.click
-    event_content = fj(".event-details-content:visible")
-    expect(event_content.find_element(:css, ".event-details-timestring").text)
-      .to eq "#{format_date_for_view(new_date, "%b %d")}, #{time_to_lower(start_time)} - #{time_to_lower(end_time)}"
+    expect(
+      event_content.find_element(:css, ".event-details-timestring").text
+    ).to eq "#{format_date_for_view(new_date, "%b %d")}, #{time_to_lower(start_time)} - #{time_to_lower(end_time)}"
   end
 
   # Creates event from the 'edit event' modal
@@ -317,7 +329,9 @@ module Calendar2Common
     keep_trying_until { title.displayed? }
     replace_content(title, event_title)
     add_date(middle_number) if should_add_date
-    replace_content(f("input[placeHolder='Input Event Location...'"), "location title") if should_add_location
+    if should_add_location
+      replace_content(f("input[placeHolder='Input Event Location...'"), "location title")
+    end
     edit_calendar_event_form_submit_button.click
     wait_for_ajax_requests
   end
@@ -327,9 +341,23 @@ module Calendar2Common
     header.text
   end
 
-  def create_middle_day_event(name = "new event", with_date = false, with_location = false, with_duplicates = false, date = nil, use_current_course_calendar = false)
+  def create_middle_day_event(
+    name = "new event",
+    with_date: false,
+    with_location: false,
+    with_duplicates: false,
+    date: nil,
+    use_current_course_calendar: false
+  )
     get "/calendar2"
-    create_calendar_event(name, with_date, with_location, with_duplicates, date, use_current_course_calendar)
+    create_calendar_event(
+      name,
+      should_add_date: with_date,
+      should_add_location: with_location,
+      should_duplicate: with_duplicates,
+      date: date,
+      use_current_course_calendar: use_current_course_calendar
+    )
   end
 
   def create_middle_day_assignment(name = "new assignment")
@@ -339,7 +367,7 @@ module Calendar2Common
 
   def create_published_middle_day_assignment
     get "/calendar2"
-    create_assignment_event("new assignment", false, true)
+    create_assignment_event("new assignment", publish: true)
   end
 
   def load_week_view
@@ -410,21 +438,22 @@ module Calendar2Common
     assert_month_view(title, due)
   end
 
-  def edit_new_event_in_more_options_page
+  def edit_new_event_in_more_options_page(context_name = nil)
     calendar_create_event_button.click
     replace_content(edit_calendar_event_form_title, "blackout event")
+    click_option(edit_calendar_event_form_context, context_name) unless context_name.nil?
     expect_new_page_load { edit_calendar_event_form_more_options.click }
   end
 
-  def check_blackout_date_and_submit
+  def check_more_options_blackout_date_and_submit
     more_options_blackout_date_checkbox.click
     edit_calendar_event_form_submit_button.click
     wait_for_ajaximations
   end
 
-  def create_blackout_date_through_more_options_page
-    edit_new_event_in_more_options_page
-    check_blackout_date_and_submit
+  def create_blackout_date_through_more_options_page(context_name)
+    edit_new_event_in_more_options_page(context_name)
+    check_more_options_blackout_date_and_submit
   end
 
   def edit_calendar_event_in_more_options_page
@@ -443,10 +472,6 @@ module Calendar2Common
 
   def calendar_create_event_button
     f("#create_new_event_link")
-  end
-
-  def calendar_event_is_blackout_date
-    f("#calendar_event_blackout_date").attribute("checked")
   end
 
   def agenda_item
@@ -518,6 +543,22 @@ module Calendar2Common
     f("label[for='k5-field'] div")
   end
 
+  def edit_calendar_event_form_blackout_date_checkbox_selector
+    "label[for='course-pacing-field'] div"
+  end
+
+  def edit_calendar_event_form_blackout_date_checkbox
+    f(edit_calendar_event_form_blackout_date_checkbox_selector)
+  end
+
+  def more_options_calendar_event_is_blackout_date
+    more_options_blackout_date_checkbox.attribute("checked")
+  end
+
+  def calendar_event_is_blackout_date
+    f("label[for='course-pacing-field'] input").attribute("checked")
+  end
+
   def edit_calendar_event_form_more_options
     f("a[data-testid='edit-calendar-event-more-options-button']")
   end
@@ -544,5 +585,9 @@ module Calendar2Common
 
   def more_options_submit_button
     f("button[type='submit']")
+  end
+
+  def event_content
+    fj(".event-details-content:visible")
   end
 end

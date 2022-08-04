@@ -70,7 +70,9 @@ export default class EditCalendarEventView extends Backbone.View {
         'duplicate',
         'web_conference',
         'important_dates',
-        'blackout_date'
+        'blackout_date',
+        'context_type',
+        'course_pacing_enabled'
       )
       if (picked_params.start_at) {
         picked_params.start_date = tz.format(
@@ -345,11 +347,21 @@ export default class EditCalendarEventView extends Backbone.View {
     )
   }
 
+  shouldShowBlackoutDatesCheckbox() {
+    const context_type = this.model.get('context_type')
+    const course_pacing_enabled = this.model.get('course_pacing_enabled') === 'true'
+    return (
+      ENV.FEATURES?.account_level_blackout_dates &&
+      ((context_type === 'account' && ENV.FEATURES?.account_calendar_events) ||
+        (context_type === 'course' && course_pacing_enabled))
+    )
+  }
+
   toJSON() {
     const result = super.toJSON(...arguments)
     result.recurringEventLimit = 200
     result.k5_course = ENV.K5_SUBJECT_COURSE || ENV.K5_HOMEROOM_COURSE
-    result.account_level_blackout_dates = ENV.FEATURES?.account_level_blackout_dates
+    result.should_show_blackout_dates = this.shouldShowBlackoutDatesCheckbox()
     result.disableSectionDates =
       result.use_section_dates &&
       result.course_sections.filter(

@@ -143,20 +143,20 @@
     <input id="calendar_event_location_address" name="location_address" size="30" maxlength="255" type="text" value="{{location_address}}"/>
   </fieldset>
 
-  {{#if account_level_blackout_dates}}
-  <fieldset>
-    <label class="label_with_checkbox">
-      <input type="checkbox" id="calendar_event_blackout_date" {{#if blackout_date}}checked{{/if}} />
-      {{#t}}Extend assignment due dates in Course Pacing{{/t}}
-      <i class="icon-info" style="margin-left: 10px;" data-tooltip title="{{#t}}Enabling this option automatically moves Course Pacing assignment due dates to after the end date.{{/t}}"></i>
-    </label>
-  </fieldset>
-  {{/if}}
-
   <fieldset>
     <label for="calendar_event_conference_selection">{{#t}}Conferencing:{{/t}}</label>
     <div id="calendar_event_conference_selection"></div>
   </fieldset>
+
+  {{#if should_show_blackout_dates}}
+  <fieldset>
+    <label class="label_with_checkbox">
+      <input type="checkbox" id="calendar_event_blackout_date" {{#if blackout_date}}checked{{/if}} />
+      {{#t}}Add to Course Pacing blackout dates{{/t}}
+      <i class="icon-info" style="margin-left: 10px;" data-tooltip title="{{#t}}Enabling this option automatically moves Course Pacing assignment due dates to after the end date.{{/t}}"></i>
+    </label>
+  </fieldset>
+  {{/if}}
 
   {{#if k5_course}}
     <fieldset>

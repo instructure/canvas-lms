@@ -63,6 +63,7 @@ const CalendarEventDetailsForm = ({
   const [webConference, setWebConference] = useState(event.webConference)
   const [shouldShowConferences, setShouldShowConferences] = useState(false)
   const [isImportant, setImportant] = useState(event.important_dates)
+  const [isBlackout, setBlackout] = useState(event.blackout_date)
   const [moreOptionsLink, setMoreOptionsLink] = useState('#')
   const [startMessages, setStartMessages] = useState([])
   const [endMessages, setEndMessages] = useState([])
@@ -180,6 +181,14 @@ const CalendarEventDetailsForm = ({
     if (canUpdateConference()) setWebConference(conference)
   }
 
+  const shouldShowBlackoutDateCheckbox = () => {
+    return (
+      ENV.FEATURES.account_level_blackout_dates &&
+      ((context.type === 'account' && ENV.FEATURES.account_calendar_events) ||
+        (context.type === 'course' && context.course_pacing_enabled))
+    )
+  }
+
   const moreOptionsClick = jsEvent => {
     jsEvent.preventDefault()
     const params = {return_to: window.location.href}
@@ -191,7 +200,9 @@ const CalendarEventDetailsForm = ({
     params.start_time = startTime ? moment.tz(startTime, timezone).format('LT') : ''
     params.end_time = endTime ? moment.tz(endTime, timezone).format('LT') : ''
     params.important_dates = isImportant
-    params.blackout_date = event.blackout_date // TODO: replace with isBlackout when checkbox task is merged
+    params.blackout_date = isBlackout
+    params.context_type = context.type
+    params.course_pacing_enabled = context.course_pacing_enabled
 
     if (canUpdateConference()) {
       if (webConference) {
@@ -228,7 +239,8 @@ const CalendarEventDetailsForm = ({
       'calendar_event[start_at]': startAt ? startAt.toISOString() : '',
       'calendar_event[end_at]': endAt ? endAt.toISOString() : '',
       'calendar_event[location_name]': location,
-      'calendar_event[important_dates]': isImportant
+      'calendar_event[important_dates]': isImportant,
+      'calendar_event[blackout_date]': isBlackout
     }
     if (canUpdateConference()) {
       if (webConference) {
@@ -268,7 +280,8 @@ const CalendarEventDetailsForm = ({
           location_name: location,
           context_code: context.asset_string,
           webConference,
-          important_info: isImportant
+          important_info: isImportant,
+          blackout_date: isBlackout
         }
       }
       const newEvent = commonEventFactory(objectData, event.possibleContexts())
@@ -285,6 +298,7 @@ const CalendarEventDetailsForm = ({
       event.location_name = location
       event.webConference = webConference
       event.important_info = isImportant
+      event.blackout_date = isBlackout
       if (event.can_change_context && context.asset_string !== event.object.context_code) {
         event.old_context_code = event.object.context_code
         event.removeClass(`group_${event.old_context_code}`)
@@ -404,6 +418,34 @@ const CalendarEventDetailsForm = ({
               <Flex.Item padding="none xxx-small" shouldShrink>
                 <Tooltip
                   renderTip={I18n.t('Show event on homeroom sidebar')}
+                  on={['click', 'hover', 'focus']}
+                >
+                  <IconButton
+                    renderIcon={IconInfoLine}
+                    withBackground={false}
+                    withBorder={false}
+                    screenReaderLabel={I18n.t('Toggle Tooltip')}
+                  />
+                </Tooltip>
+              </Flex.Item>
+            </Flex>
+          </FormField>
+        )}
+        {shouldShowBlackoutDateCheckbox() && (
+          <FormField id="course-pacing-field" label={I18n.t('Course Pacing:')}>
+            <Flex justifyItems="space-between">
+              <Flex.Item padding="none x-small" shouldShrink>
+                <Checkbox
+                  label={I18n.t('Add to Course Pacing blackout dates')}
+                  checked={isBlackout}
+                  onChange={e => setBlackout(e.currentTarget.checked)}
+                />
+              </Flex.Item>
+              <Flex.Item padding="none x-small" shouldShrink>
+                <Tooltip
+                  renderTip={I18n.t(
+                    'Enabling this option automatically moves Course Pacing assignment due dates to after the end date.'
+                  )}
                   on={['click', 'hover', 'focus']}
                 >
                   <IconButton
