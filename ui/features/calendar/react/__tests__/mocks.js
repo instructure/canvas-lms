@@ -18,37 +18,52 @@
 
 import moment from 'moment'
 
-const context = {
+export const userContext = {
   asset_string: 'user_1',
   name: 'user_1@instructure.com',
   new_calendar_event_url: '',
   k5_course: false,
-  can_create_calendar_events: true
+  can_create_calendar_events: true,
+  type: 'user',
+  course_pacing_enabled: false
 }
 
-const context2 = {
+export const courseContext = {
   asset_string: 'course_1',
   name: 'Geometry',
   new_calendar_event_url: '',
   k5_course: false,
-  can_create_calendar_events: true
+  can_create_calendar_events: true,
+  type: 'course',
+  course_pacing_enabled: true
+}
+
+export const accountContext = {
+  asset_string: 'account_1',
+  name: 'Boss',
+  new_calendar_event_url: '',
+  k5_course: false,
+  can_create_calendar_events: true,
+  type: 'account',
+  course_pacing_enabled: true
 }
 
 const formHolder = document.getElementById('edit_calendar_event_form_holder')
 
 const event = {
   title: 'title',
-  contextInfo: context,
-  allPossibleContexts: [context, context2],
+  contextInfo: userContext,
+  allPossibleContexts: [userContext, courseContext],
   location_name: '',
   date: new Date(),
   allDay: false,
   calendarEvent: {start_at: null, end_at: null},
   important_dates: false,
+  blackout_date: false,
   lockedTitle: false,
   fullDetailsURL: jest.fn(),
   isNewEvent: () => false,
-  possibleContexts: jest.fn(() => [context, context2]),
+  possibleContexts: jest.fn(() => [userContext, courseContext]),
   startDate: () => moment(),
   save: jest.fn(),
   removeClass: jest.fn(),

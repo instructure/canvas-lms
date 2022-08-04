@@ -29,7 +29,9 @@ describe "calendar2" do
   include CalendarPage
 
   before(:once) do
-    Account.find_or_create_by!(id: 0).update(name: "Dummy Root Account", workflow_state: "deleted", root_account_id: nil)
+    Account
+      .find_or_create_by!(id: 0)
+      .update(name: "Dummy Root Account", workflow_state: "deleted", root_account_id: nil)
   end
 
   before do
@@ -40,22 +42,20 @@ describe "calendar2" do
   end
 
   context "as a teacher" do
-    before do
-      course_with_teacher_logged_in
-    end
+    before { course_with_teacher_logged_in }
 
     context "event creation" do
       it "creates an event by hitting the '+' in the top bar" do
         get "/calendar2"
 
-        fj("#create_new_event_link").click
+        f("#create_new_event_link").click
         edit_event_dialog = f("#edit_event_tabs")
         expect(edit_event_dialog).to be_displayed
       end
 
       it "creates an event with a location name" do
         event_name = "event with location"
-        create_middle_day_event(event_name, false, true)
+        create_middle_day_event(event_name, with_location: true)
         fj(".fc-event:visible").click
         expect(fj(".event-details-content:visible")).to include_text("location title")
       end
@@ -77,6 +77,7 @@ describe "calendar2" do
         expect(f("#editCalendarEventFull .btn-primary").text).to eq "Create Event"
         replace_content(f("#calendar_event_location_name"), location_name)
         replace_content(f("#calendar_event_location_address"), location_address)
+
         # submit_form makes the spec fragile
         wait_for_new_page_load { f("#editCalendarEventFull").submit }
         expect(CalendarEvent.last.location_name).to eq location_name
@@ -94,13 +95,17 @@ describe "calendar2" do
 
         # verify it shows up right from the start
         expect(f(".ui-dialog #calendar_event_date").attribute(:value)).to eq("02/03/2018")
-        expect(fj(".date_field_container:has(#calendar_event_date) .datetime_suggest").text).to eq "ven. 2 Mar 2018"
+        expect(
+          fj(".date_field_container:has(#calendar_event_date) .datetime_suggest").text
+        ).to eq "ven. 2 Mar 2018"
 
         # verify it shows up right when set from the datepicker
         f("#calendar_event_date + .ui-datepicker-trigger").click
         fj(".ui-datepicker-current-day a:contains(2)").click
         expect(f(".ui-dialog #calendar_event_date").attribute(:value)).to eq("ven 2 Mars 2018")
-        expect(fj(".date_field_container:has(#calendar_event_date) .datetime_suggest").text).to eq "ven. 2 Mar 2018"
+        expect(
+          fj(".date_field_container:has(#calendar_event_date) .datetime_suggest").text
+        ).to eq "ven. 2 Mar 2018"
 
         f('#edit_calendar_event_form button[type="submit"]').click
         expect(CalendarEvent.last.start_at).to eq Time.utc(2018, 3, 2)
@@ -125,7 +130,7 @@ describe "calendar2" do
         get "/groups/#{@group.id}"
         expect_new_page_load { f(".event-list-view-calendar").click }
         event_name = "some name"
-        create_calendar_event(event_name, false, false, false)
+        create_calendar_event(event_name)
 
         event = @group.calendar_events.last
         expect(event.title).to eq event_name
@@ -136,7 +141,10 @@ describe "calendar2" do
         wait_for_tiny(f("iframe", f(".ic-RichContentEditor")))
 
         replace_content(f(".title"), "Test Event")
-        replace_content(f("input[type=text][name= 'start_date']"), Time.zone.now.strftime("%Y-%m-%d"))
+        replace_content(
+          f("input[type=text][name= 'start_date']"),
+          format_date_for_view(Time.zone.now, "%Y-%m-%d")
+        )
         replace_content(f("input[type=text][name= 'start_time']"), "6:00am")
         replace_content(f("input[type=text][name= 'end_time']"), "6:00pm")
         f("input[type=text][name= 'end_time']").send_keys(:tab)
@@ -172,12 +180,12 @@ describe "calendar2" do
         replace_and_proceed(f("#section_#{section1.id}_start_date"), day1.to_s)
         replace_and_proceed(f("#section_#{section2.id}_start_date"), day2.to_s)
 
-        ff(".date_start_end_row input.start_time").select(&:displayed?).each do |input|
-          replace_and_proceed(input, "11:30am")
-        end
-        ff(".date_start_end_row input.end_time").select(&:displayed?).each do |input|
-          replace_and_proceed(input, "1pm")
-        end
+        ff(".date_start_end_row input.start_time")
+          .select(&:displayed?)
+          .each { |input| replace_and_proceed(input, "11:30am") }
+        ff(".date_start_end_row input.end_time")
+          .select(&:displayed?)
+          .each { |input| replace_and_proceed(input, "1pm") }
 
         f("#duplicate_event").click
         replace_content(f("input[type=number][name='duplicate_count']"), 1)
@@ -186,12 +194,22 @@ describe "calendar2" do
         expect_new_page_load { form.submit }
 
         expect(CalendarEvent.count).to eq(6) # 2 parent events each with 2 child events
-        s1_events = CalendarEvent.where(context_code: section1.asset_string)
-                                 .where.not(parent_calendar_event_id: nil).order(:start_at).to_a
+        s1_events =
+          CalendarEvent
+          .where(context_code: section1.asset_string)
+          .where
+          .not(parent_calendar_event_id: nil)
+          .order(:start_at)
+          .to_a
         expect(s1_events[1].start_at.to_date).to eq(s1_events[0].start_at.to_date + 1.week)
 
-        s2_events = CalendarEvent.where(context_code: section2.asset_string)
-                                 .where.not(parent_calendar_event_id: nil).order(:start_at).to_a
+        s2_events =
+          CalendarEvent
+          .where(context_code: section2.asset_string)
+          .where
+          .not(parent_calendar_event_id: nil)
+          .order(:start_at)
+          .to_a
         expect(s2_events[1].start_at.to_date).to eq(s2_events[0].start_at.to_date + 1.week)
       end
 
@@ -241,24 +259,69 @@ describe "calendar2" do
         expect(@course.calendar_events.last.important_dates).to be_truthy
       end
 
-      it "creates a blackout calendar event in more options screen when feature is enabled" do
-        Account.site_admin.enable_feature! :account_level_blackout_dates
-        get "/calendar2"
-        wait_for_ajaximations
-        create_blackout_date_through_more_options_page
-        edit_calendar_event_in_more_options_page
-        expect(calendar_event_is_blackout_date).to be_truthy
-        check_blackout_date_and_submit
-        edit_calendar_event_in_more_options_page
-        expect(calendar_event_is_blackout_date).to be_falsey
-      end
+      context "with course pacing" do
+        before do
+          Account.site_admin.enable_feature! :account_level_blackout_dates
+          Account.site_admin.enable_feature! :course_paces
+          @course.enroll_student(@user).accept! # We need to use this case where the teacher is also a student until calendar events are reenabled for teachers for course pacing courses.
+          @course.enable_course_paces = true
+          @course.save!
+        end
 
-      it "cannot create a blackout date when the blackout date feature is disabled" do
-        Account.site_admin.disable_feature! :account_level_blackout_dates
-        get "/calendar2"
-        wait_for_ajaximations
-        edit_new_event_in_more_options_page
-        expect(f("body")).not_to contain_css("#calendar_event_blackout_date")
+        after do
+          Account.site_admin.disable_feature! :account_level_blackout_dates
+          Account.site_admin.disable_feature! :course_paces
+        end
+
+        it "creates a blackout calendar event in when feature is enabled" do
+          get "/calendar2"
+          wait_for_ajaximations
+          calendar_create_event_button.click
+          replace_content(edit_calendar_event_form_title, "blackout event")
+          click_option(edit_calendar_event_form_context, @course.name)
+          edit_calendar_event_form_blackout_date_checkbox.click
+          edit_calendar_event_form_submit_button.click
+          wait_for_ajaximations
+          event_title_on_calendar.click
+          calendar_edit_event_link.click
+          expect(calendar_event_is_blackout_date).to be_truthy
+          edit_calendar_event_form_blackout_date_checkbox.click
+          edit_calendar_event_form_submit_button.click
+          wait_for_ajaximations
+          event_title_on_calendar.click
+          calendar_edit_event_link.click
+          expect(calendar_event_is_blackout_date).to be_falsey
+        end
+
+        it "cannot create a blackout date when feature is disabled" do
+          Account.site_admin.disable_feature! :account_level_blackout_dates
+          get "/calendar2"
+          wait_for_ajaximations
+          calendar_create_event_button.click
+          click_option(edit_calendar_event_form_context, @course.name)
+          expect(f("body")).not_to contain_css(
+            edit_calendar_event_form_blackout_date_checkbox_selector
+          )
+        end
+
+        it "creates a blackout calendar event in more options screen when feature is enabled" do
+          get "/calendar2"
+          wait_for_ajaximations
+          create_blackout_date_through_more_options_page(@course.name)
+          edit_calendar_event_in_more_options_page
+          expect(more_options_calendar_event_is_blackout_date).to be_truthy
+          check_more_options_blackout_date_and_submit
+          edit_calendar_event_in_more_options_page
+          expect(more_options_calendar_event_is_blackout_date).to be_falsey
+        end
+
+        it "cannot create a blackout date in more options screen when feature is disabled" do
+          Account.site_admin.disable_feature! :account_level_blackout_dates
+          get "/calendar2"
+          wait_for_ajaximations
+          edit_new_event_in_more_options_page
+          expect(f("body")).not_to contain_css("#calendar_event_blackout_date")
+        end
       end
 
       it "can edit an all_day event in calendar", priority: "1" do
@@ -266,11 +329,12 @@ describe "calendar2" do
         @event = make_event(start: @date, end: @date, title: "An all day event")
 
         new_date = @date
-        new_date = if new_date.to_date.mday == "15"
-                     new_date.change({ day: 20 })
-                   else
-                     new_date.change({ day: 15 })
-                   end
+        new_date =
+          if new_date.to_date.mday == "15"
+            new_date.change({ day: 20 })
+          else
+            new_date.change({ day: 15 })
+          end
 
         get "/calendar2"
         event_title_on_calendar.click
@@ -281,9 +345,9 @@ describe "calendar2" do
         wait_for_ajaximations
         refresh_page
         event_title_on_calendar.click
-        event_content = fj(".event-details-content:visible")
-        expect(event_content.find_element(:css, ".event-details-timestring").text)
-          .to eq format_date_for_view(new_date, "%b %d")
+        expect(
+          event_content.find_element(:css, ".event-details-timestring").text
+        ).to eq format_date_for_view(new_date, "%b %d")
         @event.reload
         expect(@event.all_day).to eq true
       end
@@ -293,16 +357,17 @@ describe "calendar2" do
         start_time = "6:30 AM"
         end_time = "6:30 PM"
         new_date = @date
-        new_date = if new_date.to_date.mday == "15"
-                     new_date.change({ day: 20 })
-                   else
-                     new_date.change({ day: 15 })
-                   end
+        new_date =
+          if new_date.to_date.mday == "15"
+            new_date.change({ day: 20 })
+          else
+            new_date.change({ day: 15 })
+          end
         create_timed_calendar_event(new_date, start_time, end_time)
         event_title_on_calendar.click
-        event_content = fj(".event-details-content:visible")
-        expect(event_content.find_element(:css, ".event-details-timestring").text)
-          .to eq "#{format_date_for_view(new_date, "%b %d")}, 6:30am - 6:30pm"
+        expect(
+          event_content.find_element(:css, ".event-details-timestring").text
+        ).to eq "#{format_date_for_view(new_date, "%b %d")}, 6:30am - 6:30pm"
       end
 
       it "can edit timed events in calendar" do
@@ -346,17 +411,36 @@ describe "calendar2" do
         section2 = @course.course_sections.create!
 
         limited_teacher_role = custom_teacher_role("Limited teacher", account: Account.default)
-        RoleOverride.create!(context: Account.default, permission: "manage_calendar", role: limited_teacher_role, enabled: false)
+        RoleOverride.create!(
+          context: Account.default,
+          permission: "manage_calendar",
+          role: limited_teacher_role,
+          enabled: false
+        )
         @course.enroll_teacher(@user, enrollment_state: :active, section: section1)
-        @course.enroll_teacher(@user, role: limited_teacher_role, enrollment_state: :active, section: section2)
+        @course.enroll_teacher(
+          @user,
+          role: limited_teacher_role,
+          enrollment_state: :active,
+          section: section2
+        )
         @user.enrollments.update_all(limit_privileges_to_course_section: true)
 
         now = Time.zone.now.beginning_of_day
-        event = @course.calendar_events.build title: "Today Event",
-                                              child_event_data: [
-                                                { start_at: now, end_at: 5.minutes.from_now(now), context_code: section1.asset_string },
-                                                { start_at: 5.minutes.from_now(now), end_at: 10.minutes.from_now(now), context_code: section2.asset_string }
-                                              ]
+        event =
+          @course.calendar_events.build title: "Today Event",
+                                        child_event_data: [
+                                          {
+                                            start_at: now,
+                                            end_at: 5.minutes.from_now(now),
+                                            context_code: section1.asset_string
+                                          },
+                                          {
+                                            start_at: 5.minutes.from_now(now),
+                                            end_at: 10.minutes.from_now(now),
+                                            context_code: section2.asset_string
+                                          }
+                                        ]
         event.updating_user = account_admin_user
         event.save!
 
@@ -387,13 +471,19 @@ describe "calendar2" do
         calendar_create_event_button.click
         f("[aria-controls=\"edit_assignment_form_holder\"]").click
         today = untitled_course.time_zone.today
-        expect(f("#assignment_due_at").attribute(:value)).to eq(I18n.l(today, format: :medium_with_weekday))
+        expect(f("#assignment_due_at").attribute(:value)).to eq(
+          I18n.l(today, format: :medium_with_weekday)
+        )
         replace_content(f("#assignment_title"), "important assignment")
         click_option(f("#assignment_context"), untitled_course.name)
-        expect(f("#assignment_due_at").attribute(:value)).to eq("#{I18n.l(today, format: :medium_with_weekday)} 5:30pm")
+        expect(f("#assignment_due_at").attribute(:value)).to eq(
+          "#{I18n.l(today, format: :medium_with_weekday)} 5:30pm"
+        )
         f("#edit_assignment_form_holder button[type=submit]").click
         wait_for_ajaximations
-        expect(untitled_course.assignments.last.due_at).to eq(today.to_time(:utc).change(hour: 17, min: 30))
+        expect(untitled_course.assignments.last.due_at).to eq(
+          today.to_time(:utc).change(hour: 17, min: 30)
+        )
       end
     end
   end
@@ -406,14 +496,13 @@ describe "calendar2" do
       @course.enroll_student(@student1).accept!
     end
 
-    before do
-      user_session(@student1)
-    end
+    before { user_session(@student1) }
 
     context "student to-do event" do
       before :once do
         @todo_date = Time.zone.now
-        @student_to_do = @student1.planner_notes.create!(todo_date: @todo_date, title: "Student to do")
+        @student_to_do =
+          @student1.planner_notes.create!(todo_date: @todo_date, title: "Student to do")
       end
 
       it "shows student to-do events in the calendar", priority: "1" do
@@ -424,9 +513,9 @@ describe "calendar2" do
       it "shows the correct date and context for student to-do item in calendar", priority: "1" do
         get "/calendar2"
         event_title_on_calendar.click
-        event_content = fj(".event-details-content:visible")
-        expect(event_content.find_element(:css, ".event-details-timestring").text)
-          .to eq format_time_for_view(@todo_date, :short)
+        expect(
+          event_content.find_element(:css, ".event-details-timestring").text
+        ).to eq format_time_for_view(@todo_date, :short)
         expect(event_content).to contain_link("Student 1")
       end
     end
@@ -434,8 +523,12 @@ describe "calendar2" do
     context "course to-do event" do
       before :once do
         @todo_date = Time.zone.now
-        @course_to_do = @student1.planner_notes.create!(todo_date: @todo_date, title: "Course to do",
-                                                        course_id: @course.id)
+        @course_to_do =
+          @student1.planner_notes.create!(
+            todo_date: @todo_date,
+            title: "Course to do",
+            course_id: @course.id
+          )
       end
 
       it "shows course to do events in the calendar", priority: "1" do
@@ -446,9 +539,9 @@ describe "calendar2" do
       it "shows the correct date and context for courseto-do item in calendar", priority: "1" do
         get "/calendar2"
         event_title_on_calendar.click
-        event_content = fj(".event-details-content:visible")
-        expect(event_content.find_element(:css, ".event-details-timestring").text)
-          .to eq format_time_for_view(@todo_date, :short)
+        expect(
+          event_content.find_element(:css, ".event-details-timestring").text
+        ).to eq format_time_for_view(@todo_date, :short)
         expect(event_content).to contain_link("Course 1")
       end
     end
@@ -466,19 +559,24 @@ describe "calendar2" do
         # turn it off
         f("span.group_user_#{@student1.id}").click
         expect(f(".fc-view-container")).not_to contain_css(".fc-content .fc-title")
+
         # turn it back on
         f("span.group_user_#{@student1.id}").click
         expect(ff(".fc-view-container .fc-content .fc-title").length).to equal(1)
 
         # click to edit
         f(".fc-event-container a.group_user_#{@student1.id}").click
+
         # detial popup is displayed
         expect(f(".event-details .event-details-header h2")).to include_text(@to_do.title)
+
         # click edit button
         f("button.event_button.edit_event_link").click
         expect(f("#planner_note_context")).to be_displayed
+
         # change the calendar
         click_option("#planner_note_context", @course.name)
+
         # save
         f('#edit_planner_note_form_holder button[type="submit"]').click
         wait_for_ajaximations
@@ -487,6 +585,7 @@ describe "calendar2" do
         # turn it off
         f("span.group_course_#{@course.id}").click
         expect(f(".fc-view-container")).not_to contain_css(".fc-content .fc-title")
+
         # turn it back on
         f("span.group_course_#{@course.id}").click
         expect(ff(".fc-view-container .fc-content .fc-title").length).to equal(1)
@@ -498,21 +597,24 @@ describe "calendar2" do
         calendar_edit_event_link.click
         replace_content(f("input[name=title]"), "new to-do edited")
         datetime = @todo_date
-        datetime = if datetime.to_date.mday == "15"
-                     datetime.change({ day: 20 })
-                   else
-                     datetime.change({ day: 15 })
-                   end
+        datetime =
+          if datetime.to_date.mday == "15"
+            datetime.change({ day: 20 })
+          else
+            datetime.change({ day: 15 })
+          end
         replace_content(f("input[name=date]"), format_date_for_view(datetime, :short))
         edit_calendar_event_form_submit_button.click
         wait_for_ajaximations
         refresh_page
         event_title_on_calendar.click
-        event_content = fj(".event-details-content:visible")
-        expect(event_content.find_element(:css, ".event-details-timestring").text)
-          .to eq format_time_for_view(datetime, :short)
+        expect(
+          event_content.find_element(:css, ".event-details-timestring").text
+        ).to eq format_time_for_view(datetime, :short)
         @to_do.reload
-        expect(format_time_for_view(@to_do.todo_date, :short)).to eq(format_time_for_view(datetime, :short))
+        expect(format_time_for_view(@to_do.todo_date, :short)).to eq(
+          format_time_for_view(datetime, :short)
+        )
       end
     end
   end
