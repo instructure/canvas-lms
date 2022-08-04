@@ -44,7 +44,7 @@ describe('org.imsglobal.lti.put_data handler', () => {
 
   describe('when key is not present', () => {
     beforeEach(() => {
-      message = {}
+      message = {message_id: 'any', value: 'world'}
     })
 
     it('sends bad request error postMessage', () => {
@@ -55,9 +55,22 @@ describe('org.imsglobal.lti.put_data handler', () => {
     })
   })
 
+  describe('when message_id is not present', () => {
+    beforeEach(() => {
+      message = {key: 'hello', value: 'world'}
+    })
+
+    it('sends bad request error postMessage', () => {
+      handler({message, responseMessages, event})
+      expect(responseMessages.sendBadRequestError).toHaveBeenCalledWith(
+        "Missing required 'message_id' field"
+      )
+    })
+  })
+
   describe('when value is not present', () => {
     beforeEach(() => {
-      message = {key: 'hello'}
+      message = {key: 'hello', message_id: 'any'}
     })
 
     it('clears data from platform storage', () => {
@@ -67,13 +80,13 @@ describe('org.imsglobal.lti.put_data handler', () => {
 
     it('sends response postMessage with only key', () => {
       handler({message, responseMessages, event})
-      expect(responseMessages.sendResponse).toHaveBeenCalledWith(message)
+      expect(responseMessages.sendResponse).toHaveBeenCalledWith({key: 'hello'})
     })
   })
 
-  describe('when key and value are present', () => {
+  describe('with correct values', () => {
     beforeEach(() => {
-      message = {key: 'hello', value: 'world'}
+      message = {key: 'hello', value: 'world', message_id: 'any'}
     })
 
     it('puts data in platform storage', () => {
@@ -83,7 +96,7 @@ describe('org.imsglobal.lti.put_data handler', () => {
 
     it('sends response postMessage with key and value', () => {
       handler({message, responseMessages, event})
-      expect(responseMessages.sendResponse).toHaveBeenCalledWith(message)
+      expect(responseMessages.sendResponse).toHaveBeenCalledWith({key: 'hello', value: 'world'})
     })
   })
 

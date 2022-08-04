@@ -42,7 +42,7 @@ describe('org.imsglobal.lti.get_data handler', () => {
 
   describe('when key is not present', () => {
     beforeEach(() => {
-      message = {}
+      message = {message_id: 'any'}
     })
 
     it('sends bad request error postMessage', () => {
@@ -53,9 +53,22 @@ describe('org.imsglobal.lti.get_data handler', () => {
     })
   })
 
-  describe('when key is present', () => {
+  describe('when message_id is not present', () => {
     beforeEach(() => {
       message = {key: 'hello'}
+    })
+
+    it('sends bad request error postMessage', () => {
+      handler({message, responseMessages, event})
+      expect(responseMessages.sendBadRequestError).toHaveBeenCalledWith(
+        "Missing required 'message_id' field"
+      )
+    })
+  })
+
+  describe('when key is present', () => {
+    beforeEach(() => {
+      message = {key: 'hello', message_id: 'any'}
     })
 
     it('gets data from platform storage', () => {
