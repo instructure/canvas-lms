@@ -37,6 +37,10 @@ module.exports = {
       useBuiltIns: 'entry',
       corejs: '3.20',
       modules: false,
+      // This is needed to fix a Safari < 16 bug
+      // https://github.com/babel/babel/issues/14289
+      // https://bugs.webkit.org/show_bug.cgi?id=236843
+      include: ['@babel/plugin-proposal-class-properties'],
     }],
     ['@babel/preset-react', { useBuiltIns: true }],
   ],
