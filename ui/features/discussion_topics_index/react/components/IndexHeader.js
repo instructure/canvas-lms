@@ -73,6 +73,17 @@ export default class IndexHeader extends Component {
     filter: 'all'
   }
 
+  constructor(props) {
+    super(props)
+
+    // This is needed to make the search results do not keep cutting each
+    // other off when typing fasting and using a screen reader
+    this.filterDiscussions = debounce(() => this.props.searchDiscussions(this.state), SEARCH_DELAY, {
+      leading: false,
+      trailing: true
+    })
+  }
+
   componentDidMount() {
     this.props.fetchUserSettings()
     if (this.props.contextType === 'course' && this.props.permissions.change_settings) {
@@ -87,13 +98,6 @@ export default class IndexHeader extends Component {
   onFilterChange = e => {
     this.setState({filter: e.target.value}, this.filterDiscussions)
   }
-
-  // This is needed to make the search results do not keep cutting each
-  // other off when typing fasting and using a screen reader
-  filterDiscussions = debounce(() => this.props.searchDiscussions(this.state), SEARCH_DELAY, {
-    leading: false,
-    trailing: true
-  })
 
   renderTrayToolsMenu = () => {
     if (this.props.discussionTopicIndexMenuTools?.length > 0) {
