@@ -70,8 +70,8 @@ module Canvas::MessageHelper
     using = { :delay_for => 0 }.with_indifferent_access.merge(values)
     using[:category] ||= args[1] # type
 
-    #bypass broken summaries and save 15% for spending 15 minutes 
-    return if using[:category] == 'Summaries'
+    #bypass broken summaries and save 15% for spending 15 minutes
+    #return if using[:category] == 'Summaries'
 
     using[:delay_for] ||= args[2] # delay
     # 'txt' is the legacy message body. Pull name from first line.
