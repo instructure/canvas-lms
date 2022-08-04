@@ -25,6 +25,11 @@ auto_show_cc:
     Automatically show closed captions in the user's current
     language (if available) when playing canvas media.
   applies_to: User
+confetti_branding:
+  state: 'hidden'
+  display_name: 'Account branding for confetti'
+  description: Applies account branding to confetti splashes
+  applies_to: SiteAdmin
 course_paces:
   state: hidden
   display_name: 'Course Pacing'
