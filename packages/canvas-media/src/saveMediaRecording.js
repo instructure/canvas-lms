@@ -23,6 +23,10 @@ import FileSizeError from './shared/FileSizeError'
 export const VIDEO_SIZE_OPTIONS = {height: '432px', width: '768px'}
 const STARTING_PROGRESS_VALUE = 33
 
+function mediaObjectsUrl(rcsConfig) {
+  return rcsConfig.origin ? `${rcsConfig.origin}/api/media_objects` : '/api/v1/media_objects'
+}
+
 function generateUploadOptions(mediatypes, sessionData) {
   const sessionDataCopy = JSON.parse(JSON.stringify(sessionData))
   delete sessionDataCopy.kaltura_setting
@@ -58,10 +62,10 @@ function addUploaderFileErrorEventListeners(uploader, done, file) {
   })
 }
 
-function addUploaderFileCompleteEventListeners(uploader, context, file, done, onProgress) {
+function addUploaderFileCompleteEventListeners(uploader, rcsConfig, file, done, onProgress) {
   uploader.addEventListener('K5.complete', async mediaServerMediaObject => {
-    mediaServerMediaObject.contextCode = `${context.contextType}_${context.contextId}`
-    mediaServerMediaObject.type = `${context.contextType}_${context.contextId}`
+    mediaServerMediaObject.contextCode = `${rcsConfig.contextType}_${rcsConfig.contextId}`
+    mediaServerMediaObject.type = `${rcsConfig.contextType}_${rcsConfig.contextId}`
 
     const body = {
       id: mediaServerMediaObject.entryId,
@@ -84,9 +88,11 @@ function addUploaderFileCompleteEventListeners(uploader, context, file, done, on
           if (onProgress) {
             onProgress(startingValue + percentUploaded)
           }
-        }
+        },
+        headers: rcsConfig.headers
       }
-      const canvasMediaObject = await axios.post('/api/v1/media_objects', body, config)
+
+      const canvasMediaObject = await axios.post(mediaObjectsUrl(rcsConfig), body, config)
       uploader.destroy()
       doDone(done, null, {mediaObject: canvasMediaObject.data, uploadedFile: file})
     } catch (ex) {
@@ -168,9 +174,7 @@ export async function saveClosedCaptions(media_object_id, subtitles, rcsConfig, 
   const update_promise = new Promise((resolve, reject) => {
     Promise.all(file_promises)
       .then(closed_captions => {
-        const url = rcsConfig.origin
-          ? `${rcsConfig.origin}/api/media_objects/${media_object_id}/media_tracks`
-          : `/api/v1/media_objects/${media_object_id}/media_tracks`
+        const url = `${mediaObjectsUrl(rcsConfig)}/${media_object_id}/media_tracks`
         axios({
           method: rcsConfig.method || 'PUT',
           url,
