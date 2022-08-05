@@ -26,6 +26,8 @@ import {readableRoleName} from '@canvas/k5/react/utils'
 import AvatarLink from '../../components/AvatarLink/AvatarLink'
 import NameLink from '../../components/NameLink/NameLink'
 import RosterTableRowMenuButton from '../../components/RosterTableRowMenuButton/RosterTableRowMenuButton'
+import {secondsToStopwatchTime} from '../../../util/utils'
+import RosterTableLastActivity from '../../components/RosterTableLastActivity/RosterTableLastActivity'
 
 const I18n = useI18nScope('course_people')
 
@@ -66,11 +68,6 @@ const RosterTable = () => {
       return <div key={`role-${enrollment.id}`}>{readableRoleName(enrollment.type)}</div>
     })
 
-    const lastActivityAt = enrollments.map(enrollment => {
-      if (enrollment.type === OBSERVER_ENROLLMENT) return null
-      return <div key={`last-activity-${enrollment.id}`}>{enrollment.lastActivityAt}</div>
-    })
-
     return (
       <Table.Row key={_id} data-testid="roster-table-data-row">
         <Table.Cell>
@@ -85,8 +82,12 @@ const RosterTable = () => {
         <Table.Cell>{sisId}</Table.Cell>
         <Table.Cell>{sectionNames}</Table.Cell>
         <Table.Cell>{enrollmentRoles}</Table.Cell>
-        <Table.Cell>{lastActivityAt}</Table.Cell>
-        <Table.Cell>{totalActivityTime}</Table.Cell>
+        <Table.Cell>
+          <RosterTableLastActivity enrollments={enrollments} />
+        </Table.Cell>
+        <Table.Cell>
+          {totalActivityTime ? secondsToStopwatchTime(totalActivityTime) : null}
+        </Table.Cell>
         <Table.Cell>
           <RosterTableRowMenuButton name={name} />
         </Table.Cell>
