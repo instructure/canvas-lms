@@ -18,7 +18,7 @@
 
 import {MockedProvider} from '@apollo/react-testing'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {render, within} from '@testing-library/react'
+import {render, within, queryAllByText} from '@testing-library/react'
 import React from 'react'
 import RosterTable from '../RosterTable'
 import {mockUser, mockEnrollment, getRosterQueryMock} from '../../../../graphql/Mocks'
@@ -39,7 +39,7 @@ const teacher1 = {
   sisId: 'Teacher1-SIS-ID',
   loginId: 'teacher1@instructure.com',
   enrollmentType: 'TeacherEnrollment',
-  lastActivityAt: '2022-07-27T10:11:33-06:00',
+  lastActivityAt: '2022-07-27T10:21:33-06:00',
   totalActivityTime: 60708
 }
 
@@ -49,7 +49,9 @@ const ta1 = {
   pronouns: 'She/Her',
   sisId: 'TA1-SIS-ID',
   loginId: 'TA1@instructure.com',
-  enrollmentType: 'TaEnrollment'
+  enrollmentType: 'TaEnrollment',
+  lastActivityAt: '2022-08-16T14:08:13-06:00',
+  totalActivityTime: 407
 }
 
 const student1 = {
@@ -57,7 +59,9 @@ const student1 = {
   _id: '31',
   pronouns: 'They/Them',
   sisId: 'Student1-SIS-ID',
-  loginId: 'Student1@instructure.com'
+  loginId: 'Student1@instructure.com',
+  lastActivityAt: '2021-11-04T09:54:01-06:00',
+  totalActivityTime: 90
 }
 
 const student2 = {
@@ -185,6 +189,34 @@ describe('RosterTable', () => {
     rows.forEach((row, index) => {
       const button = within(row).getByRole('button', {name: names[index]})
       expect(button).not.toHaveAttribute('href')
+    })
+  })
+
+  it('should display users last activity (if any) unless user is an observer', async () => {
+    const datetimePattern = new RegExp(
+      /^[a-z]+ [0-3]?[0-9][, [0-9]*]? at [1]?[0-9]:[0-5][0-9](am|pm)$/, // Apr 16, 2021 at 12:34pm
+      'i'
+    )
+    const container = setup(getRosterQueryMock({mockUsers}))
+    const rows = await container.findAllByTestId('roster-table-data-row')
+    const lastActivityByUser = mockUsers.map(user => {
+      return user.node.enrollments[0].type === 'ObserverEnrollment'
+        ? null
+        : user.node.enrollments[0].lastActivityAt
+    })
+    rows.forEach((row, index) => {
+      const lastActivity = queryAllByText(row, datetimePattern)
+      expect(lastActivity).toHaveLength(lastActivityByUser[index] ? 1 : 0)
+    })
+  })
+
+  it('should display users total activity time only if total time is greater than zero', async () => {
+    const container = setup(getRosterQueryMock({mockUsers}))
+    const rows = await container.findAllByTestId('roster-table-data-row')
+    const totalActivityByUser = mockUsers.map(user => user.node.enrollments[0].totalActivityTime)
+    rows.forEach((row, index) => {
+      const totalActivity = queryAllByText(row, /^[0-9]+(:[0-5][0-9]){1,2}$/) // 00:00 or 00:00:00
+      expect(totalActivity).toHaveLength(totalActivityByUser[index] ? 1 : 0)
     })
   })
 })
