@@ -18,6 +18,7 @@
 
 import {AnonymousUser} from './AnonymousUser'
 import {Discussion} from './Discussion'
+import {Course} from './Course'
 import {DiscussionEntry} from './DiscussionEntry'
 import {DiscussionEntryDraft} from './DiscussionEntryDraft'
 import gql from 'graphql-tag'
@@ -33,6 +34,7 @@ export const DISCUSSION_QUERY = gql`
     $perPage: Int!
     $searchTerm: String
     $rootEntries: Boolean
+    $userSearchId: String
     $filter: DiscussionFilterType
     $sort: DiscussionSortOrderType
     $courseID: String
@@ -59,6 +61,7 @@ export const DISCUSSION_QUERY = gql`
           rootEntries: $rootEntries
           filter: $filter
           sortOrder: $sort
+          userSearchId: $userSearchId
         ) {
           nodes {
             ...DiscussionEntry
@@ -112,6 +115,41 @@ export const DISCUSSION_QUERY = gql`
   ${PageInfo.fragment}
   ${GroupSet.fragment}
   ${Group.fragment}
+`
+
+export const DISCUSSION_ENTRIES_BY_STUDENT_QUERY = gql`
+  query GetDiscussionEntriesByStudentQuery(
+    $discussionID: ID!
+    $userSearchId: String!
+    $courseID: String
+    $rolePillTypes: [String!] = ["TaEnrollment", "TeacherEnrollment", "DesignerEnrollment"]
+  ) {
+    legacyNode(_id: $discussionID, type: Discussion) {
+      ... on Discussion {
+        id
+        _id
+        discussionEntriesConnection(userSearchId: $userSearchId) {
+          nodes {
+            ...DiscussionEntry
+            editor(courseId: $courseID, roleTypes: $rolePillTypes) {
+              ...User
+              courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
+            }
+            author(courseId: $courseID, roleTypes: $rolePillTypes) {
+              ...User
+              courseRoles(courseId: $courseID, roleTypes: $rolePillTypes)
+            }
+            anonymousAuthor {
+              ...AnonymousUser
+            }
+          }
+        }
+      }
+    }
+  }
+  ${AnonymousUser.fragment}
+  ${User.fragment}
+  ${DiscussionEntry.fragment}
 `
 
 export const DISCUSSION_SUBENTRIES_QUERY = gql`
@@ -177,4 +215,41 @@ export const DISCUSSION_SUBENTRIES_QUERY = gql`
   ${AnonymousUser.fragment}
   ${DiscussionEntry.fragment}
   ${PageInfo.fragment}
+`
+
+export const COURSE_USER_QUERY = gql`
+  query GetCourseUserQuery($courseId: ID!) {
+    legacyNode(_id: $courseId, type: Course) {
+      ... on Course {
+        ...Course
+      }
+    }
+  }
+  ${Course.fragment}
+`
+
+export const SUBMISSION_BY_ASSIGNMENT_QUERY = gql`
+  query GetSubmissionByAssignmentQuery($assignmentId: ID!) {
+    legacyNode(type: Assignment, _id: $assignmentId) {
+      ... on Assignment {
+        id
+        name
+        _id
+        submissionsConnection {
+          nodes {
+            _id
+            id
+            grade
+            score
+            state
+            user {
+              id
+              _id
+              name
+            }
+          }
+        }
+      }
+    }
+  }
 `
