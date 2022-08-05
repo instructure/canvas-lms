@@ -27,6 +27,10 @@ export default {
 }
 
 const Template = args => {
+  window.ENV = {
+    confetti_branding_enabled: true,
+    ...args
+  }
   const [count, updateCount] = React.useState(0)
   return (
     <>
@@ -37,3 +41,22 @@ const Template = args => {
 }
 
 export const DefaultColors = Template.bind({})
+
+export const SingleCustomColor = Template.bind({})
+SingleCustomColor.args = {
+  active_brand_config: {
+    variables: {
+      'ic-brand-primary': '#0000ff'
+    }
+  }
+}
+
+export const MultipleCustomColors = Template.bind({})
+MultipleCustomColors.args = {
+  active_brand_config: {
+    variables: {
+      'ic-brand-primary': '#0000ff',
+      'ic-brand-global-nav-bgd': '#ff00ff'
+    }
+  }
+}

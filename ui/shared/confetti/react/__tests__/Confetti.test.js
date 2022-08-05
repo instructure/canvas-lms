@@ -19,6 +19,7 @@ import {render, fireEvent} from '@testing-library/react'
 import Confetti from '../Confetti'
 import React from 'react'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import ConfettiGenerator from '@canvas/confetti/javascript/ConfettiGenerator'
 
 const mockRender = jest.fn()
 const mockClear = jest.fn()
@@ -34,6 +35,7 @@ describe('Confetti', () => {
   beforeEach(() => {
     mockRender.mockClear()
     mockClear.mockClear()
+    ConfettiGenerator.mockClear()
   })
 
   it('renders confetti', () => {
@@ -46,6 +48,118 @@ describe('Confetti', () => {
     expect(mockClear).not.toHaveBeenCalled()
     jest.advanceTimersByTime(3000)
     expect(mockClear).toHaveBeenCalled()
+  })
+
+  it('provides square particles and a random emoji', () => {
+    render(<Confetti />)
+    expect(ConfettiGenerator).toHaveBeenCalledWith(
+      expect.objectContaining({
+        props: [
+          'square',
+          expect.objectContaining({
+            size: 40
+          })
+        ]
+      })
+    )
+  })
+
+  describe('when an branding config is present', () => {
+    let env
+    beforeEach(() => {
+      env = window.ENV
+      window.ENV = {
+        confetti_branding_enabled: true
+      }
+    })
+
+    afterEach(() => {
+      window.ENV = env
+    })
+    describe('colors', () => {
+      it('provides only the primary color when secondary is not specified', () => {
+        window.ENV = {
+          ...window.ENV,
+          active_brand_config: {
+            variables: {
+              'ic-brand-primary': '#000000'
+            }
+          }
+        }
+        render(<Confetti />)
+        expect(ConfettiGenerator).toHaveBeenCalledWith(
+          expect.objectContaining({
+            colors: [[0, 0, 0]]
+          })
+        )
+      })
+
+      it('provides only the secondary color when primary is not specified', () => {
+        window.ENV = {
+          ...window.ENV,
+          active_brand_config: {
+            variables: {
+              'ic-brand-global-nav-bgd': '#ffffff'
+            }
+          }
+        }
+        render(<Confetti />)
+        expect(ConfettiGenerator).toHaveBeenCalledWith(
+          expect.objectContaining({
+            colors: [[255, 255, 255]]
+          })
+        )
+      })
+
+      it('provides both colors when both are specified', () => {
+        window.ENV = {
+          ...window.ENV,
+          active_brand_config: {
+            variables: {
+              'ic-brand-primary': '#000000',
+              'ic-brand-global-nav-bgd': '#ffffff'
+            }
+          }
+        }
+        render(<Confetti />)
+        expect(ConfettiGenerator).toHaveBeenCalledWith(
+          expect.objectContaining({
+            colors: [
+              [0, 0, 0],
+              [255, 255, 255]
+            ]
+          })
+        )
+      })
+
+      it('does not provide any colors if none are specified', () => {
+        window.ENV = {
+          ...window.ENV,
+          active_brand_config: {
+            variables: {}
+          }
+        }
+        render(<Confetti />)
+        expect(ConfettiGenerator.mock.calls[0][0]).not.toHaveProperty('colors')
+      })
+
+      describe('confetti_branding flag is disabled', () => {
+        it('does not provide any custom colors', () => {
+          window.ENV = {
+            confetti_branding_enabled: false,
+            active_brand_config: {
+              variables: {
+                'ic-brand-primary': '#000000',
+                'ic-brand-global-nav-bgd': '#ffffff'
+              }
+            }
+          }
+
+          render(<Confetti />)
+          expect(ConfettiGenerator.mock.calls[0][0]).not.toHaveProperty('colors')
+        })
+      })
+    })
   })
 
   describe('screenreader content', () => {

@@ -202,6 +202,8 @@ class ApplicationController < ActionController::Base
         @js_env = {
           ASSET_HOST: Canvas::Cdn.config.host,
           active_brand_config_json_url: active_brand_config_url("json"),
+          active_brand_config: active_brand_config.as_json(include_root: false),
+          confetti_branding_enabled: Account.site_admin.feature_enabled?(:confetti_branding),
           url_to_what_gets_loaded_inside_the_tinymce_editor_css: editor_css,
           url_for_high_contrast_tinymce_editor_css: editor_hc_css,
           current_user_id: @current_user&.id,
