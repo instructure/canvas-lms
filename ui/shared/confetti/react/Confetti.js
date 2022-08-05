@@ -21,8 +21,26 @@ import ConfettiGenerator from '../javascript/ConfettiGenerator'
 import getRandomConfettiFlavor from './confettiFlavor'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import hex2Rgb from '@canvas/util/hex2rgb'
 
 const I18n = useI18nScope('confetti')
+
+const getBrandingColors = () => {
+  if (window.ENV.confetti_branding_enabled && window.ENV.active_brand_config) {
+    const colorVars = window.ENV.active_brand_config.variables
+    const primaryBrand = colorVars['ic-brand-primary']
+    const secondaryBrand = colorVars['ic-brand-global-nav-bgd']
+    const colors = []
+    if (primaryBrand) colors.push(Object.values(hex2Rgb(primaryBrand)))
+    if (secondaryBrand) colors.push(Object.values(hex2Rgb(secondaryBrand)))
+    if (colors.length > 0) {
+      return {
+        colors
+      }
+    }
+  }
+  return {}
+}
 
 export default function Confetti({triggerCount}) {
   const [visible, setVisible] = React.useState(true)
@@ -54,7 +72,8 @@ export default function Confetti({triggerCount}) {
     }
 
     confetti = new ConfettiGenerator({
-      props: ['square', getRandomConfettiFlavor()].filter(p => p !== null)
+      props: ['square', getRandomConfettiFlavor()].filter(p => p !== null),
+      ...getBrandingColors()
     })
 
     clearConfettiOnSpaceOrEscape = event => {
