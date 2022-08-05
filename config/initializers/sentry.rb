@@ -34,6 +34,7 @@ if settings.present?
     config.release = Canvas.revision
     config.enabled_environments = %w[ production ]
     config.excluded_exceptions += %w{
+      ActiveRecord::RecordInvalid
       AuthenticationMethods::AccessTokenError
       AuthenticationMethods::LoggedOutError
       ActionController::InvalidAuthenticityToken
