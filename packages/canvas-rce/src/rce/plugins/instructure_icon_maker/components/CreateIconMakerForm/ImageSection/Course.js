@@ -23,23 +23,40 @@ import ImageList from '../../../../instructure_image/Images'
 import {useStoreProps} from '../../../../shared/StoreContext'
 import useDataUrl from '../../../../shared/useDataUrl'
 import {actions} from '../../../reducers/imageSection'
+import {canCompressImage, compressImage, shouldCompressImage} from './compressionUtils'
+
+const dispatchImage = async (dispatch, dataUrl, dataBlob) => {
+  let image = dataUrl
+  dispatch({...actions.SET_IMAGE, payload: ''})
+  dispatch({...actions.SET_CROPPER_OPEN, payload: true})
+  if (canCompressImage() && shouldCompressImage(dataBlob)) {
+    try {
+      // If compression fails, use the original one
+      // TODO: We can show the user that compression failed in some way
+      image = await compressImage(dataUrl)
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e)
+    }
+    dispatch({...actions.SET_COMPRESSION_STATUS, payload: true})
+  }
+  dispatch({...actions.SET_IMAGE, payload: image})
+}
 
 const Course = ({dispatch, onLoading, onLoaded}) => {
   const storeProps = useStoreProps()
   const {files, bookmark, isLoading, hasMore} = storeProps.images[storeProps.contextType]
-  const {setUrl, dataUrl, dataLoading} = useDataUrl()
+  const {setUrl, dataUrl, dataLoading, dataBlob} = useDataUrl()
 
   const category = 'uncategorized'
 
   // Handle image selection
   useEffect(() => {
     // Don't clear the current image on re-render
-    if (!dataUrl) return
-
-    dispatch({...actions.SET_IMAGE, payload: dataUrl})
-    dispatch({...actions.SET_CROPPER_OPEN, payload: true})
+    if (!dataUrl || !dataBlob) return
+    dispatchImage(dispatch, dataUrl, dataBlob)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dataUrl])
+  }, [dataUrl, dataBlob])
 
   // Handle loading states
   useEffect(() => {

@@ -24,6 +24,7 @@ import {useState, useEffect} from 'react'
 const useDataUrl = () => {
   const [url, setUrl] = useState('')
   const [dataUrl, setDataUrl] = useState('')
+  const [dataBlob, setDataBlob] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState()
 
@@ -41,7 +42,11 @@ const useDataUrl = () => {
         // a data URL.
         return new Promise((resolve, reject) => {
           const reader = new FileReader()
-          reader.onloadend = () => resolve(reader.result)
+          reader.onloadend = () =>
+            resolve({
+              result: reader.result,
+              blob
+            })
 
           reader.onerror = reject
           reader.readAsDataURL(blob)
@@ -51,10 +56,11 @@ const useDataUrl = () => {
       }
     }
 
-    if (!!url) {
+    if (url) {
       fetchDataUrl()
-        .then(result => {
+        .then(({result, blob}) => {
           setDataUrl(result)
+          setDataBlob(blob)
         })
         .catch(e => {
           setError(e)
@@ -67,7 +73,8 @@ const useDataUrl = () => {
     setUrl,
     dataUrl,
     dataLoading: loading,
-    dataError: error
+    dataError: error,
+    dataBlob
   }
 }
 

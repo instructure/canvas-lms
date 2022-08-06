@@ -36,6 +36,28 @@ describe('ImageCropperModal', () => {
     })
   })
 
+  it('renders the message', () => {
+    const onSubmit = jest.fn()
+    render(
+      <ImageCropperModal
+        open
+        onSubmit={onSubmit}
+        image="data:image/png;base64,asdfasdfjksdf=="
+        message="Banana"
+      />
+    )
+    expect(screen.getByTestId('alert-message')).toBeInTheDocument()
+    expect(screen.getByText(/banana/i)).toBeInTheDocument()
+  })
+
+  it("doesn't render the message", () => {
+    const onSubmit = jest.fn()
+    render(
+      <ImageCropperModal open onSubmit={onSubmit} image="data:image/png;base64,asdfasdfjksdf==" />
+    )
+    expect(screen.queryByTestId('alert-message')).not.toBeInTheDocument()
+  })
+
   it('calls onSubmit function', async () => {
     const onSubmit = jest.fn()
     render(
