@@ -20,11 +20,33 @@ import React from 'react'
 
 import formatMessage from '../../../../../../format-message'
 import {actions} from '../../../reducers/imageSection'
-
 import {UploadFile} from '../../../../shared/Upload/UploadFile'
+import {canCompressImage, compressImage, shouldCompressImage} from './compressionUtils'
+
+function dispatchCompressedImage(theFile, dispatch) {
+  dispatch({...actions.SET_IMAGE, payload: ''})
+  dispatch({...actions.SET_CROPPER_OPEN, payload: true})
+  dispatch({...actions.SET_IMAGE_COLLECTION_OPEN, payload: false})
+  return compressImage(theFile.preview)
+    .then(blob => {
+      dispatch({...actions.SET_COMPRESSION_STATUS, payload: true})
+      dispatch({...actions.SET_IMAGE, payload: blob})
+      dispatch({...actions.SET_IMAGE_NAME, payload: theFile.name})
+    })
+    .catch(() => {
+      // If compression fails, use the original one
+      // TODO: We can show the user that compression failed in some way
+      dispatch({...actions.SET_IMAGE, payload: theFile.preview})
+      dispatch({...actions.SET_IMAGE_NAME, payload: theFile.name})
+    })
+}
 
 export const onSubmit = dispatch => (_editor, _accept, _selectedPanel, uploadData) => {
   const {theFile} = uploadData
+
+  if (canCompressImage() && shouldCompressImage(theFile)) {
+    return dispatchCompressedImage(theFile, dispatch)
+  }
 
   dispatch({...actions.SET_IMAGE, payload: theFile.preview})
   dispatch({...actions.SET_IMAGE_NAME, payload: theFile.name})
