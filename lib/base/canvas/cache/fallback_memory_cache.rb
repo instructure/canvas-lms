@@ -21,6 +21,17 @@ module Canvas
     class FallbackMemoryCache < ActiveSupport::Cache::MemoryStore
       include FallbackExpirationCache
 
+      def read_entry(key, *opts)
+        super
+      rescue TypeError => e
+        if Rails.env.development? && e.message.include?("can't be referred to")
+          Rails.logger.error("[LOCAL_CACHE] failed to deserialize value for key #{key}; deleting entry")
+          delete_entry(key)
+          return nil
+        end
+        raise
+      end
+
       def clear(force: false)
         super
       end

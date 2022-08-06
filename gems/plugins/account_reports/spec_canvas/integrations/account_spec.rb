@@ -47,7 +47,6 @@ describe "Account Reports", type: :request do
     @account.save
 
     get "/accounts/#{@account.id}/reports_tab"
-    # debugger
     expect(response).to be_successful
     expect(response.body).to match(/sometextgoeshere/)
   end
