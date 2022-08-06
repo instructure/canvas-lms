@@ -160,6 +160,60 @@ describe('Confetti', () => {
         })
       })
     })
+
+    describe('logo', () => {
+      it('provides the logo if one exists', () => {
+        window.ENV = {
+          ...window.ENV,
+          active_brand_config: {
+            variables: {
+              'ic-brand-header-image': '/public/images/canvas-logo.svg'
+            }
+          }
+        }
+        render(<Confetti />)
+        expect(ConfettiGenerator).toHaveBeenCalledWith(
+          expect.objectContaining({
+            props: expect.arrayContaining([expect.objectContaining({key: 'logo'})])
+          })
+        )
+      })
+
+      it('does not provide a logo if one does not exist', () => {
+        window.ENV = {
+          ...window.ENV,
+          active_brand_config: {
+            variables: {}
+          }
+        }
+        render(<Confetti />)
+        expect(ConfettiGenerator).toHaveBeenCalledWith(
+          expect.objectContaining({
+            props: expect.not.arrayContaining([expect.objectContaining({key: 'logo'})])
+          })
+        )
+      })
+
+      describe('confetti_branding flag is disabled', () => {
+        it('does not a logo', () => {
+          window.ENV = {
+            confetti_branding_enabled: false,
+            active_brand_config: {
+              variables: {
+                'ic-brand-header-image': '/public/images/canvas-logo.svg'
+              }
+            }
+          }
+
+          render(<Confetti />)
+          expect(ConfettiGenerator).toHaveBeenCalledWith(
+            expect.objectContaining({
+              props: expect.not.arrayContaining([expect.objectContaining({key: 'logo'})])
+            })
+          )
+        })
+      })
+    })
   })
 
   describe('screenreader content', () => {

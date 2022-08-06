@@ -42,6 +42,24 @@ const getBrandingColors = () => {
   return {}
 }
 
+const getProps = () => {
+  const props = ['square', getRandomConfettiFlavor()]
+  if (window.ENV.confetti_branding_enabled && window.ENV.active_brand_config) {
+    const variables = window.ENV.active_brand_config.variables
+    const logoUrl = variables['ic-brand-header-image']
+    if (logoUrl) {
+      props.push({
+        key: 'logo',
+        type: 'svg',
+        src: logoUrl,
+        weight: 0.05,
+        size: 40
+      })
+    }
+  }
+  return props.filter(p => p !== null)
+}
+
 export default function Confetti({triggerCount}) {
   const [visible, setVisible] = React.useState(true)
   React.useEffect(() => {
@@ -72,7 +90,7 @@ export default function Confetti({triggerCount}) {
     }
 
     confetti = new ConfettiGenerator({
-      props: ['square', getRandomConfettiFlavor()].filter(p => p !== null),
+      props: getProps(),
       ...getBrandingColors()
     })
 

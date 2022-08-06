@@ -60,3 +60,23 @@ MultipleCustomColors.args = {
     }
   }
 }
+
+export const CustomLogo = Template.bind({})
+CustomLogo.args = {
+  active_brand_config: {
+    variables: {
+      'ic-brand-header-image': '/favicon.ico'
+    }
+  }
+}
+
+export const FullyBranded = Template.bind({})
+FullyBranded.args = {
+  active_brand_config: {
+    variables: {
+      'ic-brand-primary': '#000000',
+      'ic-brand-global-nav-bgd': '#ff0000',
+      'ic-brand-header-image': '/favicon.ico'
+    }
+  }
+}
