@@ -1060,7 +1060,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/controllers/conversations_controller.rb",
-      "line": 1030,
+      "line": 1031,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "InstStatsd::Statsd.count(\"inbox.conversation.unstarred.legacy\", params[:conversation_ids].length)",
       "render_path": null,
@@ -1452,7 +1452,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/controllers/conversations_controller.rb",
-      "line": 1029,
+      "line": 1030,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "InstStatsd::Statsd.count(\"inbox.conversation.starred.legacy\", params[:conversation_ids].length)",
       "render_path": null,
@@ -1514,6 +1514,26 @@
       "render_path": null,
       "location": null,
       "user_input": "cursor",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "ded9e82288e144d1d531650c2d385aa95a6e3688d4d3ca04757c2c3a61db4119",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/controllers/conversations_controller.rb",
+      "line": 1032,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "InstStatsd::Statsd.count(\"inbox.conversation.unread.legacy\", params[:conversation_ids].length)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ConversationsController",
+        "method": "batch_update"
+      },
+      "user_input": "params[:conversation_ids].length",
       "confidence": "Medium",
       "note": ""
     },
@@ -1698,6 +1718,6 @@
       "note": ""
     }
   ],
-  "updated": "2022-08-04 16:39:33 -0600",
+  "updated": "2022-08-08 14:54:55 -0600",
   "brakeman_version": "5.2.3"
 }

@@ -699,11 +699,12 @@ class ConversationsController < ApplicationController
   #     "participants": [{"id": 1, "name": "Joe", "full_name": "Joe TA"}]
   #   }
   def update
-    prev_star_state = @conversation.starred
+    prev_conversation_state = @conversation.deep_dup
     if @conversation.update(params.require(:conversation).permit(*API_ALLOWED_FIELDS))
       InstStatsd::Statsd.increment("inbox.conversation.archived.legacy") if params.require(:conversation)["workflow_state"] == "archived"
-      InstStatsd::Statsd.increment("inbox.conversation.starred.legacy") if ActiveModel::Type::Boolean.new.cast(params[:conversation][:starred]) && !prev_star_state
-      InstStatsd::Statsd.increment("inbox.conversation.unstarred.legacy") if !ActiveModel::Type::Boolean.new.cast(params[:conversation][:starred]) && prev_star_state
+      InstStatsd::Statsd.increment("inbox.conversation.starred.legacy") if ActiveModel::Type::Boolean.new.cast(params[:conversation][:starred]) && !prev_conversation_state.starred
+      InstStatsd::Statsd.increment("inbox.conversation.unstarred.legacy") if !ActiveModel::Type::Boolean.new.cast(params[:conversation][:starred]) && prev_conversation_state.starred
+      InstStatsd::Statsd.increment("inbox.conversation.unread.legacy") if params.require(:conversation)["workflow_state"] == "unread" && prev_conversation_state.workflow_state == "read"
       render json: conversation_json(@conversation, @current_user, session)
     else
       render json: @conversation.errors, status: :bad_request
@@ -1028,6 +1029,7 @@ class ConversationsController < ApplicationController
     conversation_count = params[:conversation_ids].length
     InstStatsd::Statsd.count("inbox.conversation.starred.legacy", conversation_count) if params[:event] == "star"
     InstStatsd::Statsd.count("inbox.conversation.unstarred.legacy", conversation_count) if params[:event] == "unstar"
+    InstStatsd::Statsd.count("inbox.conversation.unread.legacy", conversation_count) if params[:event] == "mark_as_unread"
 
     progress = ConversationParticipant.batch_update(@current_user, conversation_ids, update_params)
     render json: progress_json(progress, @current_user, session)
