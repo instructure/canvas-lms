@@ -239,10 +239,10 @@ module Lti
     #
     # @example
     #   ```
-    #   [ "Section 1", "Section 5", "TA Section"]
+    #   ["Section 1, M-T", "Section 2, W-Th", "TA Section"]
     #   ```
     register_expansion "com.instructure.User.sectionNames", [],
-                       -> { @context.enrollments.active.joins(:course_section).where(user_id: @current_user.id).pluck(:name)&.join(",") },
+                       -> { @context.enrollments.active.joins(:course_section).where(user_id: @current_user.id).pluck(:name)&.to_json },
                        ENROLLMENT_GUARD,
                        default_name: "com_instructure_user_section_names"
 
