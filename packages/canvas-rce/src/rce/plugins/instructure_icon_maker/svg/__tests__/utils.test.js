@@ -75,7 +75,7 @@ describe('convertFileToBase64()', () => {
   it('executes readAsDataURL with correct arguments', async () => {
     const blob = new Blob()
     const readAsDataURLSpy = jest.spyOn(FileReader.prototype, 'readAsDataURL')
-    expect(await convertFileToBase64(blob)).toEqual('data:;base64,')
+    expect(await convertFileToBase64(blob)).toEqual('data:application/octet-stream;base64,')
     expect(readAsDataURLSpy).toHaveBeenCalledWith(blob)
   })
 })

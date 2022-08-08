@@ -24,24 +24,21 @@ import RceHtmlEditor from '../RceHtmlEditor'
 // provide and that will be prohibitive to meaningfully
 // mock. Let's just test that it renders and rely on INSTUI having
 // tested the CodeEditor component
-
-if (!document.createRange || !document.createRange().setStart) {
-  document.createRange = () => {
-    return {
-      setStart: () => {},
-      setEnd: () => {},
-      getBoundingClientRect: () => {
-        return {
-          left: 0,
-          right: 0,
-          width: 0,
-          height: 0
-        }
-      },
-      getClientRects: () => {
-        return {
-          length: 0
-        }
+document.createRange = () => {
+  return {
+    setStart: () => {},
+    setEnd: () => {},
+    getBoundingClientRect: () => {
+      return {
+        left: 0,
+        right: 0,
+        width: 0,
+        height: 0
+      }
+    },
+    getClientRects: () => {
+      return {
+        length: 0
       }
     }
   }

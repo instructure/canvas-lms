@@ -23,6 +23,8 @@ import ImageOptionsTray from '..'
 import ImageOptionsTrayDriver from './ImageOptionsTrayDriver'
 import {CUSTOM} from '../../ImageEmbedOptions'
 
+jest.useFakeTimers()
+
 describe('RCE "Images" Plugin > ImageOptionsTray', () => {
   let props
   let tray
