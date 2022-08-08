@@ -45,6 +45,8 @@ import useLhsTreeBrowserSelectParentGroup from '@canvas/outcomes/react/hooks/use
 import FindOutcomesModal from '../FindOutcomesModal'
 import {showImportOutcomesModal} from '@canvas/outcomes/react/ImportOutcomesModal'
 import useOutcomesRemove from '@canvas/outcomes/react/hooks/useOutcomesRemove'
+import {getOutcomeGroupAncestorsWithSelf} from '../../helpers/getOutcomeGroupAncestorsWithSelf'
+import {ROOT_GROUP} from '@canvas/outcomes/react/hooks/useOutcomesImport'
 
 const I18n = useI18nScope('OutcomeManagement')
 
@@ -52,7 +54,11 @@ const OutcomeManagementPanel = ({
   importNumber,
   createdOutcomeGroupIds,
   onLhsSelectedGroupIdChanged,
-  handleFileDrop
+  handleFileDrop,
+  targetGroupIdsToRefetch,
+  setTargetGroupIdsToRefetch,
+  importsTargetGroup,
+  setImportsTargetGroup
 }) => {
   const {isCourse, isMobileView, canManage} = useCanvasContext()
   const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef, onKeyDownHandler} =
@@ -94,6 +100,22 @@ const OutcomeManagementPanel = ({
   useEffect(() => {
     setRhsGroupIdsToRefetch(ids => [...new Set([...ids, ...createdOutcomeGroupIds])])
   }, [createdOutcomeGroupIds])
+
+  useEffect(() => {
+    if (targetGroupIdsToRefetch.length > 0) {
+      const groupIdsToRefetch = new Set(
+        targetGroupIdsToRefetch.reduce(
+          (acc, targetGroupId) =>
+            targetGroupId === ROOT_GROUP
+              ? [...acc, rootId]
+              : [...acc, ...getOutcomeGroupAncestorsWithSelf(collections, targetGroupId)],
+          []
+        )
+      )
+      setRhsGroupIdsToRefetch(ids => [...new Set([...ids, ...groupIdsToRefetch])])
+      setTargetGroupIdsToRefetch([])
+    }
+  }, [targetGroupIdsToRefetch]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const {
     group,
@@ -172,13 +194,7 @@ const OutcomeManagementPanel = ({
     clearSelectedOutcomes()
   }
 
-  const handleCloseFindOutcomesModal = hasAddedOutcomes => {
-    if (hasAddedOutcomes) {
-      // TODO: refetch the group in LHS and RHS.
-      // For RHS, we need OUT-4634 to set rhsGroupIdsToRefetch variable
-      // For LHS, we need to figure out the correct solution
-      // This will be handled in OUT-4798
-    }
+  const handleCloseFindOutcomesModal = _hasAddedOutcomes => {
     closeFindOutcomesModal()
   }
 
@@ -514,6 +530,9 @@ const OutcomeManagementPanel = ({
             open={isFindOutcomesModalOpen}
             onCloseHandler={handleCloseFindOutcomesModal}
             targetGroup={group}
+            setTargetGroupIdsToRefetch={setTargetGroupIdsToRefetch}
+            importsTargetGroup={importsTargetGroup}
+            setImportsTargetGroup={setImportsTargetGroup}
           />
         </>
       )}
@@ -549,7 +568,11 @@ OutcomeManagementPanel.propTypes = {
   createdOutcomeGroupIds: PropTypes.arrayOf(PropTypes.string),
   onLhsSelectedGroupIdChanged: PropTypes.func,
   importNumber: PropTypes.number,
-  handleFileDrop: PropTypes.func
+  handleFileDrop: PropTypes.func,
+  targetGroupIdsToRefetch: PropTypes.arrayOf(PropTypes.string).isRequired,
+  setTargetGroupIdsToRefetch: PropTypes.func.isRequired,
+  importsTargetGroup: PropTypes.object.isRequired,
+  setImportsTargetGroup: PropTypes.func.isRequired
 }
 
 export default OutcomeManagementPanel
