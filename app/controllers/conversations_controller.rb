@@ -460,6 +460,9 @@ class ConversationsController < ApplicationController
         if params[:user_note] == "1"
           InstStatsd::Statsd.increment("inbox.conversation.sent.faculty_journal.legacy")
         end
+        if params[:bulk_message] == "1"
+          InstStatsd::Statsd.increment("inbox.conversation.sent.individual_message_option.legacy")
+        end
         if mode == :async
           headers["X-Conversation-Batch-Id"] = batch.id.to_s
           return render json: [], status: :accepted
@@ -476,6 +479,9 @@ class ConversationsController < ApplicationController
         @conversation.add_message(message, tags: @tags, update_for_sender: false, cc_author: true)
         InstStatsd::Statsd.increment("inbox.conversation.created.legacy")
         InstStatsd::Statsd.increment("inbox.conversation.sent.legacy")
+        if params[:bulk_message] == "1"
+          InstStatsd::Statsd.increment("inbox.conversation.sent.individual_message_option.legacy")
+        end
         if context_type == "Account" || context_type.nil?
           InstStatsd::Statsd.increment("inbox.conversation.sent.account_context.legacy")
         end
