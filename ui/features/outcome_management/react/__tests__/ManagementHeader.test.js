@@ -63,9 +63,14 @@ const render = (
 
 describe('ManagementHeader', () => {
   let handleAddOutcomesMock
+  let setTargetGroupIdsToRefetchMock
+  let setImportsTargetGroupMock
   const defaultProps = (props = {}) => ({
     handleFileDrop: () => {},
     handleAddOutcomes: handleAddOutcomesMock,
+    setTargetGroupIdsToRefetch: setTargetGroupIdsToRefetchMock,
+    importsTargetGroup: {},
+    setImportsTargetGroup: setImportsTargetGroupMock,
     canManage: true,
     canImport: true,
     ...props
@@ -73,6 +78,8 @@ describe('ManagementHeader', () => {
 
   beforeEach(() => {
     handleAddOutcomesMock = jest.fn()
+    setTargetGroupIdsToRefetchMock = jest.fn()
+    setImportsTargetGroupMock = jest.fn()
     cache = createCache()
   })
 
@@ -83,9 +90,7 @@ describe('ManagementHeader', () => {
   })
 
   it('renders Outcomes title', () => {
-    const {getByText} = render(
-      <ManagementHeader handleFileDrop={jest.fn()} handleAddOutcomes={jest.fn()} />
-    )
+    const {getByText} = render(<ManagementHeader {...defaultProps()} />)
     expect(getByText('Outcomes')).toBeInTheDocument()
   })
 

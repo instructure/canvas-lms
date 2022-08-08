@@ -30,6 +30,7 @@ export const IMPORT_NOT_STARTED = 'IMPORT_NOT_STARTED'
 export const IMPORT_PENDING = 'IMPORT_PENDING'
 export const IMPORT_COMPLETED = 'IMPORT_COMPLETED'
 export const IMPORT_FAILED = 'IMPORT_FAILED'
+export const ROOT_GROUP = 'ROOT_GROUP'
 
 const getLocalStorageActiveImports = () => {
   try {

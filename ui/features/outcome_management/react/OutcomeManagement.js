@@ -64,6 +64,8 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
     const tabs = {'#mastery_scale': 1, '#mastery_calculation': 2}
     return window.location.hash in tabs ? tabs[window.location.hash] : 0
   })
+  const [targetGroupIdsToRefetch, setTargetGroupIdsToRefetch] = useState([])
+  const [importsTargetGroup, setImportsTargetGroup] = useState({})
   const isMobileView = !breakpoints?.tablet
   const contextValues = getContext(isMobileView)
   const {accountLevelMasteryScalesFF, outcomeAlignmentSummaryFF, canManage, contextType} =
@@ -186,6 +188,9 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
           handleFileDrop={onFileDrop}
           onSuccessfulCreateOutcome={onSuccessfulCreateOutcome}
           lhsGroupId={lhsGroupId}
+          setTargetGroupIdsToRefetch={setTargetGroupIdsToRefetch}
+          importsTargetGroup={importsTargetGroup}
+          setImportsTargetGroup={setImportsTargetGroup}
         />
       )}
       <Tabs onRequestTabChange={handleTabChange} tabOverflow={isMobileView ? 'scroll' : 'stack'}>
@@ -202,6 +207,10 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
                 createdOutcomeGroupIds={createdOutcomeGroupIds}
                 onLhsSelectedGroupIdChanged={setLhsGroupId}
                 handleFileDrop={onFileDrop}
+                targetGroupIdsToRefetch={targetGroupIdsToRefetch}
+                setTargetGroupIdsToRefetch={setTargetGroupIdsToRefetch}
+                importsTargetGroup={importsTargetGroup}
+                setImportsTargetGroup={setImportsTargetGroup}
               />
             )
           ) : (
