@@ -429,9 +429,7 @@ describe ApplicationHelper do
 //<![CDATA[
 
       ;[\"https://example.com/root/account.js\"].forEach(function(src) {
-        var s = document.createElement('script')
-        s.src = src
-        s.async = false
+        var s = document.createElement('script'); s.src = src; s.async = false;
         document.head.appendChild(s)
       });
 //]]>
@@ -446,9 +444,7 @@ describe ApplicationHelper do
 //<![CDATA[
 
       ;[\"https://example.com/root/account.js\"].forEach(function(src) {
-        var s = document.createElement('script')
-        s.src = src
-        s.async = false
+        var s = document.createElement('script'); s.src = src; s.async = false;
         document.head.appendChild(s)
       });
 //]]>
@@ -464,9 +460,7 @@ describe ApplicationHelper do
 //<![CDATA[
 
       ;[\"https://example.com/root/account.js\", \"https://example.com/child/account.js\", \"https://example.com/grandchild/account.js\"].forEach(function(src) {
-        var s = document.createElement('script')
-        s.src = src
-        s.async = false
+        var s = document.createElement('script'); s.src = src; s.async = false;
         document.head.appendChild(s)
       });
 //]]>
