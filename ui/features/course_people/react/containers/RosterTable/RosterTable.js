@@ -25,6 +25,7 @@ import LoadingIndicator from '@canvas/loading-indicator'
 import {readableRoleName} from '@canvas/k5/react/utils'
 import AvatarLink from '../../components/AvatarLink/AvatarLink'
 import NameLink from '../../components/NameLink/NameLink'
+import StatusPill from '../../components/StatusPill/StatusPill'
 import RosterTableRowMenuButton from '../../components/RosterTableRowMenuButton/RosterTableRowMenuButton'
 import {secondsToStopwatchTime} from '../../../util/utils'
 import RosterTableLastActivity from '../../components/RosterTableLastActivity/RosterTableLastActivity'
@@ -49,8 +50,8 @@ const RosterTable = () => {
   if (loading) return <LoadingIndicator />
 
   const tableRows = data.course.usersConnection.edges.map(edge => {
-    const {name, _id, sisId, enrollments, loginId, avatarUrl} = edge.node
-    const {totalActivityTime, htmlUrl} = enrollments[0]
+    const {name, _id, sisId, enrollments, loginId, avatarUrl, pronouns} = edge.node
+    const {totalActivityTime, htmlUrl, state} = enrollments[0]
 
     const sectionNames = enrollments.map(enrollment => {
       if (enrollment.type === OBSERVER_ENROLLMENT) return null
@@ -73,10 +74,9 @@ const RosterTable = () => {
         <Table.Cell>
           <AvatarLink avatarUrl={avatarUrl} name={name} href={htmlUrl} />
         </Table.Cell>
-        <Table.Cell>
-          <NameLink _id={_id} htmlUrl={htmlUrl}>
-            {name}
-          </NameLink>
+        <Table.Cell data-testid="roster-table-name-cell">
+          <NameLink _id={_id} htmlUrl={htmlUrl} pronouns={pronouns} name={name} />
+          <StatusPill state={state} />
         </Table.Cell>
         <Table.Cell>{loginId}</Table.Cell>
         <Table.Cell>{sisId}</Table.Cell>
