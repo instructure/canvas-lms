@@ -92,7 +92,8 @@ export default function ConfettiGenerator(opts) {
         ctx.restore()
         break
       }
-      case 'svg': {
+      case 'svg':
+      case 'image': {
         ctx.save()
         let image
         if (p.src in cachedImageAssets) {
@@ -103,8 +104,17 @@ export default function ConfettiGenerator(opts) {
           cachedImageAssets[p.src] = image
         }
         const size = p.size || 15
-        ctx.translate(p.x + size / 2, p.y + size / 2)
-        ctx.drawImage(image, -(size / 2), -(size / 2), size, size)
+        let scaledWidth
+        let scaledHeight
+        if (image.width > image.height) {
+          scaledWidth = size
+          scaledHeight = size * (image.height / image.width)
+        } else {
+          scaledWidth = size * (image.width / image.height)
+          scaledHeight = size
+        }
+        ctx.translate(p.x + scaledWidth / 2, p.y + scaledHeight / 2)
+        ctx.drawImage(image, -(size / 2), -(size / 2), scaledWidth, scaledHeight)
         ctx.restore()
         break
       }

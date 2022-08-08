@@ -80,3 +80,21 @@ FullyBranded.args = {
     }
   }
 }
+
+export const TallLogo = Template.bind({})
+TallLogo.args = {
+  active_brand_config: {
+    variables: {
+      'ic-brand-header-image': 'http://placekitten.com/200/300'
+    }
+  }
+}
+
+export const WideLogo = Template.bind({})
+WideLogo.args = {
+  active_brand_config: {
+    variables: {
+      'ic-brand-header-image': 'http://placekitten.com/300/200'
+    }
+  }
+}
