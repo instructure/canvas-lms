@@ -287,7 +287,6 @@
     "jest-config": "^28",
     "jest-environment-jsdom": "^28",
     "jest-fetch-mock": "^3.0.3",
-    "jest-html-reporter": "^3",
     "jest-junit": "^7",
     "jest-localstorage-mock": "^2",
     "jest-moxios-utils": "^1",
