@@ -27,6 +27,7 @@ import RceApiSource from '../../../../../rcs/api'
 import bridge from '../../../../../bridge'
 import base64EncodedFont from '../../svg/font'
 
+jest.useFakeTimers()
 jest.mock('../../../../../bridge')
 jest.mock('../../svg/font')
 jest.mock('../../../../../rcs/api')
@@ -81,6 +82,10 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+  })
+
+  afterEach(async () => {
+    await act(async() => { jest.runOnlyPendingTimers() })
   })
 
   it('renders the create view', () => {
