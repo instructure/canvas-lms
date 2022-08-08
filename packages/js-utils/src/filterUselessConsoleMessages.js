@@ -29,7 +29,8 @@ const consoleMessagesToIgnore = {
     /Error: Not implemented: navigation \(except hash changes\)/,
     // Until INSTUI updates FormPropTypes.message
     // see https://github.com/instructure/instructure-ui/issues/815
-    'Invalid prop `messages[0].text` of type `object` supplied to'
+    'Invalid prop `messages[0].text` of type `object` supplied to',
+    /unknown pseudo-class selector/
   ],
   warn: [
     // Uncomment the following line if all the react 16.9 deprecations are cluttering up
@@ -39,6 +40,7 @@ const consoleMessagesToIgnore = {
     // The build logs have grown to over 250MB so in an interest of being able to use
     // the build logs at all we're filtering out these general messages.
     /is deprecated and will be removed/,
+    /Translation for/,
 
     // '@instructure/ui-select' itself generates this warning, we assume they will figure it out themselves
     /is experimental and its API could change significantly in a future release/,
@@ -53,9 +55,6 @@ const consoleMessagesToIgnore = {
     /Please update the following components:[ (BaseTransition|Billboard|Button|Checkbox|CloseButton|Dialog|Expandable|FileDrop|Flex|FlexItem|FormFieldGroup|FormFieldLabel|FormFieldLayout|FormFieldMessage|FormFieldMessages|Grid|GridCol|GridRow|Heading|InlineSVG|Mask|ModalBody|ModalFooter|ModalHeader|NumberInput|Portal|Query|Responsive|SVGIcon|ScreenReaderContent|SelectOptionsList|SelectField|SelectMultiple|SelectOptionsList|SelectSingle|Spinner|Tab|Text|TextArea|TextInput|TinyMCE|ToggleDetails|ToggleFacade|Transition|TruncateText|View),?]+$/,
     // output of Pagination component substitutes the component name for the placeholder %s
     /Please update the following components: %s,Pagination/
-
-    // /is deprecated and will be removed/, // uncomment to remove instui deprecation messages
-    // /Translation for/ // uncomment to remove missing translation messages
   ]
 }
 
