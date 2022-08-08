@@ -469,6 +469,14 @@ describe ConversationsController do
         end
       end
 
+      it "Creates one conversation per recipients if bulk_message is true" do
+        post "create", params: { recipients: [@new_user1.id.to_s, @new_user2.id.to_s], body: "yo", group_conversation: true, bulk_message: "1" }
+        expect(response).to be_successful
+
+        expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.individual_message_option.legacy")
+        expect(Conversation.count).to eql(@old_count + 2)
+      end
+
       [nil, "", "0", "false", "no", "off", "wat"].each do |falsish|
         it "creates one conversation per recipient if group_conversation=#{falsish.inspect}" do
           @teacher.media_objects.where(media_id: "m-whatever", media_type: "video/mp4").first_or_create!
