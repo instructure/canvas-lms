@@ -63,7 +63,7 @@ export const Footer = ({
               {formatMessage('Cancel')}
             </Button>
             {editing ? (
-              <Button disabled={disabled} color="primary" onClick={onSubmit} margin="0 0 0 x-small">
+              <Button disabled={disabled} color="primary" onClick={onSubmit} margin="0 0 0 x-small" data-testid="icon-maker-save">
                 {formatMessage('Save')}
               </Button>
             ) : (
