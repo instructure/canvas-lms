@@ -1081,14 +1081,14 @@ module Lti
           it "has a substitution for com.instructure.User.sectionNames" do
             exp_hash = { test: "$com.instructure.User.sectionNames" }
             variable_expander.expand_variables!(exp_hash)
-            expect(exp_hash[:test]).to eq "section one"
+            expect(JSON.parse(exp_hash[:test])).to eq ["section one"]
           end
 
           it "works with a user enrolled in both sections" do
             create_enrollment(course, user, { section: course.course_sections.find_by(name: "section two") })
             exp_hash = { test: "$com.instructure.User.sectionNames" }
             variable_expander.expand_variables!(exp_hash)
-            expect(exp_hash[:test].split(",")).to match_array ["section one", "section two"]
+            expect(JSON.parse(exp_hash[:test])).to eq ["section one", "section two"]
           end
         end
 
@@ -1272,13 +1272,13 @@ module Lti
 
         it "has substitution for com.instructure.User.sectionNames" do
           course.save!
-          first_section = add_section("1", { course: course })
-          second_section = add_section("2", { course: course })
+          first_section = add_section("Section 1, M-T", { course: course })
+          second_section = add_section("Section 2, W-Th", { course: course })
           create_enrollment(course, user, { section: first_section })
           create_enrollment(course, user, { section: second_section })
           exp_hash = { test: "$com.instructure.User.sectionNames" }
           variable_expander.expand_variables!(exp_hash)
-          expect(exp_hash[:test].split(",")).to match_array ["1", "2"]
+          expect(JSON.parse(exp_hash[:test])).to eq ["Section 1, M-T", "Section 2, W-Th"]
         end
 
         it "has substitution for $Canvas.xapi.url" do
