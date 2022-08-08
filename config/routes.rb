@@ -648,6 +648,7 @@ CanvasRails::Application.routes.draw do
 
     resources :terms, except: %i[show new edit]
     resources :sub_accounts
+    resources :calendar_events
 
     get :avatars
     get :sis_import

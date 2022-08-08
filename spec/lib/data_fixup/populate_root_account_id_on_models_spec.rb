@@ -938,6 +938,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
                CalendarEvent, { context: :root_account_id }
              )).to eq(
                {
+                 context_account: "COALESCE(NULLIF(\"accounts\".root_account_id, 0), \"accounts\".\"id\")",
                  context_appointment_group: :root_account_id,
                  context_course: :root_account_id,
                  context_course_section: :root_account_id,

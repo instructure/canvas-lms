@@ -93,6 +93,29 @@ describe "course pace page" do
       blackout_date_delete(blackout_dates_table_items[1]).click
       expect(blackout_dates_table_items[1].text).to eq("No blackout dates")
     end
+
+    it "displays and deletes calendar event blackout dates" do
+      Account.site_admin.enable_feature! :account_level_blackout_dates
+      CalendarEvent.create!({
+                              title: "calendar event blackout event",
+                              start_at: Time.zone.now.beginning_of_day,
+                              end_at: Time.zone.now.beginning_of_day,
+                              context: @course,
+                              blackout_date: true
+                            })
+      expect(CalendarEvent.last.deleted_at).to be_nil
+      visit_course_paces_page
+      click_settings_button
+      click_manage_blackout_dates
+      table_text = blackout_dates_table_items[1].text
+      expect(table_text).to include("calendar event blackout event")
+      blackout_date_delete(blackout_dates_table_items[1]).click
+      expect(blackout_dates_table_items[1].text).to eq("No blackout dates")
+      click_blackout_dates_save_button
+      publish_button.click
+      wait_for_ajaximations
+      expect(CalendarEvent.last.deleted_at).not_to be_nil
+    end
   end
 
   context "just added blackout dates" do
