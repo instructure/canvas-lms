@@ -295,6 +295,7 @@ RSpec.describe Mutations::CreateConversation do
       @student.media_objects.where(media_id: "m-whatever", media_type: "video/mp4").first_or_create!
 
       run_mutation(recipients: [@new_user1.id.to_s, @new_user2.id.to_s], subject: "yo 1", group_conversation: true, bulk_message: true, context_code: @course.asset_string, media_comment_id: "m-whatever", media_comment_type: "video")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.individual_message_option.react")
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.react")
       expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.react", 2)
       expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.media.react", 2)

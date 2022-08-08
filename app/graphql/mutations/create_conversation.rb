@@ -120,6 +120,9 @@ class Mutations::CreateConversation < Mutations::BaseMutation
         if input[:user_note]
           InstStatsd::Statsd.increment("inbox.conversation.sent.faculty_journal.react")
         end
+        if input[:bulk_message]
+          InstStatsd::Statsd.increment("inbox.conversation.sent.individual_message_option.react")
+        end
         return { conversations: conversations }
       else
         conversation = @current_user.initiate_conversation(
@@ -146,6 +149,9 @@ class Mutations::CreateConversation < Mutations::BaseMutation
         end
         if input[:user_note]
           InstStatsd::Statsd.increment("inbox.conversation.sent.faculty_journal.react")
+        end
+        if input[:bulk_message]
+          InstStatsd::Statsd.increment("inbox.conversation.sent.individual_message_option.react")
         end
         return { conversations: [conversation] }
       end
