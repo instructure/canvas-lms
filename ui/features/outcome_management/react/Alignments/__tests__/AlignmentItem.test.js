@@ -23,7 +23,7 @@ import AlignmentItem from '../AlignmentItem'
 describe('AlignmentItem', () => {
   const defaultProps = (props = {}) => ({
     id: '1',
-    type: 'Assignment',
+    contentType: 'Assignment',
     title: 'Assignment 1',
     url: '/courses/1/outcomes/1/alignments/3',
     moduleTitle: 'Module 1',
@@ -72,20 +72,20 @@ describe('AlignmentItem', () => {
 
   it('displays quiz icon if assignment content type is quiz', () => {
     const {getByTestId} = render(
-      <AlignmentItem {...defaultProps({assignmentContentType: 'Quizzes::Quiz'})} />
+      <AlignmentItem {...defaultProps({assignmentContentType: 'quiz'})} />
     )
     expect(getByTestId('alignment-item-quiz-icon')).toBeInTheDocument()
   })
 
   it('displays discussion icon if assignment content type is discussion', () => {
     const {getByTestId} = render(
-      <AlignmentItem {...defaultProps({assignmentContentType: 'DiscussionTopic'})} />
+      <AlignmentItem {...defaultProps({assignmentContentType: 'discussion'})} />
     )
     expect(getByTestId('alignment-item-discussion-icon')).toBeInTheDocument()
   })
 
   it('displays rubric icon if alignment type is rubric', () => {
-    const {getByTestId} = render(<AlignmentItem {...defaultProps({type: 'Rubric'})} />)
+    const {getByTestId} = render(<AlignmentItem {...defaultProps({contentType: 'Rubric'})} />)
     expect(getByTestId('alignment-item-rubric-icon')).toBeInTheDocument()
   })
 

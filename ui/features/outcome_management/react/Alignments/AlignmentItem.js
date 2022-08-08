@@ -34,7 +34,7 @@ const I18n = useI18nScope('AlignmentSummary')
 
 const AlignmentItem = ({
   id,
-  type,
+  contentType,
   title,
   url,
   moduleTitle,
@@ -42,12 +42,11 @@ const AlignmentItem = ({
   moduleWorkflowState,
   assignmentContentType
 }) => {
-  const renderIcon = (alignmentType, assignmentContentType) => {
-    if (alignmentType === 'Rubric')
-      return <IconRubricLine data-testid="alignment-item-rubric-icon" />
-    if (assignmentContentType === 'Quizzes::Quiz')
+  const renderIcon = () => {
+    if (contentType === 'Rubric') return <IconRubricLine data-testid="alignment-item-rubric-icon" />
+    if (assignmentContentType === 'quiz')
       return <IconQuizLine data-testid="alignment-item-quiz-icon" />
-    if (assignmentContentType === 'DiscussionTopic')
+    if (assignmentContentType === 'discussion')
       return <IconDiscussionLine data-testid="alignment-item-discussion-icon" />
     // by default we show Assignment icon
     return <IconAssignmentLine data-testid="alignment-item-assignment-icon" />
@@ -64,7 +63,7 @@ const AlignmentItem = ({
             padding: '0.5rem 0 0'
           }}
         >
-          {renderIcon(type, assignmentContentType)}
+          {renderIcon()}
         </div>
       </Flex.Item>
       <Flex.Item size="50%" shouldGrow>

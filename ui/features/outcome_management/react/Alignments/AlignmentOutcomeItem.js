@@ -130,7 +130,7 @@ const AlignmentOutcomeItem = ({title, description, alignments}) => {
                     <AlignmentItem
                       id={_id}
                       key={_id}
-                      type={contentType}
+                      contentType={contentType}
                       title={alignmentTitle}
                       url={url}
                       moduleTitle={moduleTitle}
@@ -140,6 +140,14 @@ const AlignmentOutcomeItem = ({title, description, alignments}) => {
                     />
                   )
                 )}
+              </View>
+            )}
+
+            {!truncated && alignmentsCount === 0 && (
+              <View as="div" padding="small 0 small">
+                <Text size="small" color="secondary">
+                  {I18n.t('This outcome has not been aligned')}
+                </Text>
               </View>
             )}
           </div>
