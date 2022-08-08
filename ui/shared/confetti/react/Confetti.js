@@ -50,7 +50,7 @@ const getProps = () => {
     if (logoUrl) {
       props.push({
         key: 'logo',
-        type: 'svg',
+        type: 'image',
         src: logoUrl,
         weight: 0.05,
         size: 40
