@@ -35,10 +35,32 @@ initialBlackoutDates.sort((a, b) => {
   return 0
 })
 
+export const initialCalendarEventBlackoutDates: BlackoutDate[] = (window.ENV
+  .CALENDAR_EVENT_BLACKOUT_DATES || []) as BlackoutDate[]
+initialCalendarEventBlackoutDates.forEach(blackoutDate => {
+  blackoutDate.is_calendar_event = true
+  blackoutDate.event_title = blackoutDate.title || 'Untitled'
+  blackoutDate.start_date = moment(blackoutDate.start_at)
+  blackoutDate.end_date = moment(blackoutDate.end_at)
+})
+initialCalendarEventBlackoutDates.sort((a, b) => {
+  if (a.start_date.isBefore(b.start_date)) return -1
+  if (a.start_date.isAfter(b.start_date)) return 1
+  return 0
+})
+
 /* Selectors */
 
 // the initial values on load
-export const getInitialBlackoutDates = (): BlackoutDate[] => initialBlackoutDates
+export const getInitialBlackoutDates = (): BlackoutDate[] => {
+  const dates: BlackoutDate[] = initialBlackoutDates.concat(initialCalendarEventBlackoutDates)
+  dates.sort((a, b) => {
+    if (a.start_date.isBefore(b.start_date)) return -1
+    if (a.start_date.isAfter(b.start_date)) return 1
+    return 0
+  })
+  return dates
+}
 export const getInitialCoursePace = (): CoursePace => window.ENV.COURSE_PACE
 
 // the current reference values

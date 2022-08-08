@@ -69,6 +69,22 @@ describe CoursePacesController, type: :controller do
                                                  start_date: "2021-10-03",
                                                  end_date: "2021-10-03"
                                                })]
+    @account_level_blackout_date = @course.account.calendar_events.create!(
+      title: "blackout dates 2",
+      start_at: "2021-10-04",
+      end_at: "2021-10-04",
+      blackout_date: true
+    )
+
+    @calendar_event_blackout_dates = [@account_level_blackout_date,
+                                      CalendarEvent.create!({
+                                                              title: "blackout dates 3",
+                                                              start_at: "2021-10-05",
+                                                              end_at: "2021-10-05",
+                                                              context: @course,
+                                                              blackout_date: true
+                                                            })]
+
     @course.save!
     @course.account.enable_feature!(:course_paces)
 
@@ -109,7 +125,8 @@ describe CoursePacesController, type: :controller do
       expect(response).to be_successful
       expect(assigns[:js_bundles].flatten).to include(:course_paces)
       js_env = controller.js_env
-      expect(js_env[:BLACKOUT_DATES]).to eq(@course.blackout_dates.as_json(include_root: false))
+      expect(js_env[:BLACKOUT_DATES]).to eq((@course.blackout_dates).as_json(include_root: false))
+      expect(js_env[:CALENDAR_EVENT_BLACKOUT_DATES]).to eq((@calendar_event_blackout_dates).as_json(include_root: false))
       expect(js_env[:COURSE]).to match(hash_including({
                                                         id: @course.id,
                                                         name: @course.name,
