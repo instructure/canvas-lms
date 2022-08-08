@@ -4709,7 +4709,8 @@ QUnit.module('SpeedGrader', rootHooks => {
             course_id: '29',
             grading_role: 'moderator',
             help_url: 'example.com/support',
-            show_help_menu_item: false
+            show_help_menu_item: false,
+            RUBRIC_ASSESSMENT: {}
           })
           setupFixtures(`
           <img id="avatar_image" alt="" />
@@ -4768,7 +4769,8 @@ QUnit.module('SpeedGrader', rootHooks => {
             course_id: '29',
             grading_role: 'moderator',
             help_url: 'example.com/support',
-            show_help_menu_item: false
+            show_help_menu_item: false,
+            RUBRIC_ASSESSMENT: {}
           })
           setupFixtures()
           SpeedGrader.setup()
@@ -5149,7 +5151,8 @@ QUnit.module('SpeedGrader', rootHooks => {
             grading_role: 'moderator',
             help_url: 'example.com/support',
             show_help_menu_item: false,
-            RUBRIC_ASSESSMENT: {}
+            RUBRIC_ASSESSMENT: {'assessment_user_id': '123',
+            assessment_type: 'grading'}
           })
           setupFixtures()
           SpeedGrader.setup()
@@ -5200,7 +5203,8 @@ QUnit.module('SpeedGrader', rootHooks => {
             grading_role: 'moderator',
             help_url: 'example.com/support',
             show_help_menu_item: false,
-            RUBRIC_ASSESSMENT: {}
+            RUBRIC_ASSESSMENT: {'assessment_user_id': '123',
+            assessment_type: 'grading'}
           })
           setupFixtures(
             '<div id="comment_attachment_blank"><a id="submitter_id" href="{{submitter_id}}" /></a></div>'
@@ -5233,7 +5237,8 @@ QUnit.module('SpeedGrader', rootHooks => {
             grading_role: 'moderator',
             help_url: 'example.com/support',
             show_help_menu_item: false,
-            RUBRIC_ASSESSMENT: {}
+            RUBRIC_ASSESSMENT: {'assessment_user_id': '123',
+            assessment_type: 'grading'}
           })
           setupFixtures()
           SpeedGrader.setup()
@@ -5267,7 +5272,9 @@ QUnit.module('SpeedGrader', rootHooks => {
             course_id: '29',
             grading_role: 'moderator',
             help_url: 'example.com/support',
-            show_help_menu_item: false
+            show_help_menu_item: false,
+            RUBRIC_ASSESSMENT: {'assessment_user_id': '123',
+            assessment_type: 'grading'}
           })
           setupFixtures(`
           <a id="assignment_url" href=${assignmentURL}>Assignment 1<a>
@@ -5395,7 +5402,9 @@ QUnit.module('SpeedGrader', rootHooks => {
             course_id: '29',
             grading_role: 'moderator',
             help_url: 'example.com/support',
-            show_help_menu_item: false
+            show_help_menu_item: false,
+            RUBRIC_ASSESSMENT: {'assessment_user_id': '123',
+            assessment_type: 'grading'}
           })
           setupFixtures(`
           <div id="grade_container">
@@ -5519,7 +5528,9 @@ QUnit.module('SpeedGrader', rootHooks => {
             course_id: '29',
             grading_role: 'moderator',
             help_url: 'example.com/support',
-            show_help_menu_item: false
+            show_help_menu_item: false,
+            RUBRIC_ASSESSMENT: {'assessment_user_id': '123',
+            assessment_type: 'grading'}
           })
 
           setupFixtures('<div id="combo_box_container"></div>')
@@ -7896,5 +7907,81 @@ QUnit.module('SpeedGrader', rootHooks => {
         ok(avatarImageSrc.includes('/path/to/a/second/image'))
       })
     })
+  })
+
+  QUnit.module('SpeedGrader - warning when rubric not saved', function(hooks) {
+    hooks.beforeEach(() => {
+      fakeENV.setup({
+        ...ENV,
+        assignment_id: '17',
+        course_id: '29',
+        RUBRIC_ASSESSMENT: {},
+        rubric: {
+          criteria: [{points: 5,
+            id: '123',
+            ratings: [{points: 5, criterion_id: '123', id: '1'},{points: 0, criterion_id: '123', id: '2'}],
+            long_description: ""}],
+          points_possible: 5,
+          title: 'Homework 1',
+          free_form_criterion_comments: false
+        },
+        nonScoringRubrics: true
+      })
+      setupFixtures(`
+      <div id="rubric_full">
+      <div id="rubric_holder">
+        <div class="rubric assessing"></div>
+        <button class='save_rubric_button'></button>
+      </div>
+      </div>
+      `)
+      const windowJsonData = {
+        rubric_association: {}
+      }
+      window.jsonData = windowJsonData
+    })
+
+    test('hasUnSubmittedRubric returns true when user attempts to leave page and a change is made', function () {
+      let originalRubric = null
+      const assessment = {
+        data: [{criterion_id: '123', points: 4}]
+      }
+      $('#rubric_full').hide()
+      const $container = $('#rubric_full').find('.rubric')
+      window.rubricAssessment.populateNewRubric($container, assessment)
+
+      originalRubric = SpeedGrader.EG.getOriginalRubricInfo()
+
+      const changed_assessment = {
+        data: [{criterion_id: '123', points: 2}]
+      }
+
+      window.rubricAssessment.populateNewRubric($container, changed_assessment)
+      $('#rubric_full').show()
+      equal(SpeedGrader.EG.hasUnsubmittedRubric(originalRubric), true)
+    })
+
+    test('hasUnSubmittedRubric returns false when user attempts to leave page and no change is made', function () {
+      let originalRubric = null
+      const assessment = {
+        data: [{criterion_id: '123', points: 4}]
+      }
+      $('#rubric_full').hide()
+      const $container = $('#rubric_full').find('.rubric')
+      window.rubricAssessment.populateNewRubric($container, assessment)
+
+      originalRubric = SpeedGrader.EG.getOriginalRubricInfo()
+
+      const changed_assessment = {
+        data: [{criterion_id: '123', points: 4}]
+      }
+
+      window.rubricAssessment.populateNewRubric($container, changed_assessment)
+      $('#rubric_full').show()
+      equal(SpeedGrader.EG.hasUnsubmittedRubric(originalRubric), false)
+    })
+
+
+
   })
 })
