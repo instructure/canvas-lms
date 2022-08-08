@@ -45,7 +45,7 @@ useStoreProps.mockReturnValue({startIconMakerUpload})
 base64EncodedFont.mockReturnValue('data:;base64,')
 
 const setIconColor = hex => {
-  const input = screen.getByRole('textbox', {name: /icon color color picker/i})
+  const input = screen.getByTestId('icon-maker-color-input-icon-color')
   fireEvent.input(input, {target: {value: hex}})
 }
 
@@ -105,16 +105,16 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
   })
 
   it('inserts a placeholder when an icon is inserted', async () => {
-    const {getByRole} = renderComponent(defaults)
+    const {getByTestId} = renderComponent(defaults)
     setIconColor('#000000')
-    userEvent.click(getByRole('button', {name: /apply/i}))
+    userEvent.click(getByTestId('create-icon-button'))
     await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
   })
 
   describe('when the user has not created a valid icon', () => {
     beforeEach(() => {
       render(<IconMakerTray {...defaults} />)
-      userEvent.click(screen.getByRole('button', {name: /apply/i}))
+      userEvent.click(screen.getByTestId('create-icon-button'))
     })
 
     it('does not fire off the icon upload callback', () => {
@@ -174,7 +174,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
       render(<IconMakerTray {...defaults} />)
 
       setIconColor('#000000')
-      userEvent.click(screen.getByRole('button', {name: /apply/i}))
+      userEvent.click(screen.getByTestId('create-icon-button'))
       let firstCall
       await waitFor(() => {
         const result = startIconMakerUpload.mock.calls[0]
@@ -239,7 +239,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
     })
 
     it('with overwrite if "replace all" is checked', async () => {
-      const {getByTestId, getByRole} = render(<IconMakerTray {...defaults} editing />)
+      const {getByTestId} = render(<IconMakerTray {...defaults} editing />)
 
       setIconColor('#000000')
 
@@ -248,7 +248,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
       })
 
       act(() => {
-        getByRole('button', {name: /save/i}).click()
+        getByTestId('icon-maker-save').click()
       })
 
       await waitFor(() => {
@@ -266,7 +266,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
 
         fireEvent.change(document.querySelector('#icon-alt-text'), {target: {value: 'banana'}})
         setIconColor('#000000')
-        userEvent.click(screen.getByRole('button', {name: /apply/i}))
+        userEvent.click(screen.getByTestId('create-icon-button'))
         await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
         expect(bridge.embedImage.mock.calls[0][0]).toMatchInlineSnapshot(`
           Object {
@@ -289,7 +289,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
         render(<IconMakerTray {...defaults} />)
 
         setIconColor('#000000')
-        userEvent.click(screen.getByRole('button', {name: /apply/i}))
+        userEvent.click(screen.getByTestId('create-icon-button'))
         await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
         expect(bridge.embedImage.mock.calls[0][0]).toMatchInlineSnapshot(`
           Object {
@@ -312,7 +312,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
         render(<IconMakerTray {...defaults} />)
         setIconColor('#000000')
         userEvent.click(screen.getByRole('checkbox', {name: /Decorative Icon/}))
-        userEvent.click(screen.getByRole('button', {name: /apply/i}))
+        userEvent.click(screen.getByTestId('create-icon-button'))
         await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
         expect(bridge.embedImage.mock.calls[0][0]).toMatchInlineSnapshot(`
           Object {
@@ -358,7 +358,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
       render(<IconMakerTray {...defaults} />)
 
       setIconColor('#000000')
-      const button = screen.getByRole('button', {name: /apply/i})
+      const button = screen.getByTestId('create-icon-button')
       userEvent.click(button)
 
       await waitFor(() => expect(button).toBeDisabled())
@@ -368,10 +368,10 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
     })
 
     it('shows a spinner', async () => {
-      const {getByText, getByRole} = render(<IconMakerTray {...defaults} />)
+      const {getByText, getByTestId} = render(<IconMakerTray {...defaults} />)
 
       setIconColor('#000000')
-      const button = getByRole('button', {name: /apply/i})
+      const button = getByTestId('create-icon-button')
       userEvent.click(button)
 
       const spinner = getByText('Loading...')
@@ -468,10 +468,10 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
     })
 
     it('inserts a placeholder when an icon is saved', async () => {
-      const {getByRole} = subject()
-      await waitFor(() => getByRole('textbox', {name: /icon color color picker/i}))
+      const {getByTestId} = subject()
+      await waitFor(() => getByTestId('icon-maker-color-input-icon-color'))
       setIconColor('#000000')
-      userEvent.click(getByRole('button', {name: /save/i}))
+      userEvent.click(getByTestId('icon-maker-save'))
       await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
     })
 
@@ -510,11 +510,11 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
       })
 
       it('checks that the icon keeps attributes from RCE', async () => {
-        const {getByRole} = subject()
-        await waitFor(() => getByRole('textbox', {name: /icon color color picker/i}))
+        const {getByTestId} = subject()
+        await waitFor(() => getByTestId('icon-maker-color-input-icon-color'))
         setIconColor('#000000')
-        expect(getByRole('button', {name: /save/i})).toBeEnabled()
-        userEvent.click(getByRole('button', {name: /save/i}))
+        expect(getByTestId('icon-maker-save')).toBeEnabled()
+        userEvent.click(getByTestId('icon-maker-save'))
         await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
         expect(bridge.embedImage.mock.calls[0][0]).toMatchInlineSnapshot(`
           Object {
@@ -559,7 +559,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
       const dropdownArrow = getByTestId(`${popoverTestId}-trigger`)
       userEvent.click(dropdownArrow)
       const popover = getByTestId(popoverTestId)
-      return within(popover).queryByRole('button', {name: /none/i})
+      return within(popover).queryByText('None')
     }
 
     describe('have no none option when', () => {
