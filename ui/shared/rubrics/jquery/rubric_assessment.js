@@ -288,7 +288,7 @@ window.rubricAssessment = {
           criteriaAssessment.id
         )
         data[section('[points]')] = !Number.isNaN(points) ? points : undefined
-        data[section('[description]')] = criteriaAssessment.description
+        data[section('[description]')] = criteriaAssessment.description ? criteriaAssessment.description : I18n.t('No Details')
         data[section('[comments]')] = criteriaAssessment.comments || ''
         data[section('[save_comment]')] =
           criteriaAssessment.saveCommentsForLater === true ? '1' : '0'
