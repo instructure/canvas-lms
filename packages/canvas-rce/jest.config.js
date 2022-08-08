@@ -29,7 +29,10 @@ module.exports = {
       }
     ]
   ],
-  setupFilesAfterEnv: ['<rootDir>/jest/jest-setup-framework.js'],
+  setupFilesAfterEnv: [
+    '<rootDir>/jest/jest-setup-framework.js',
+    '<rootDir>/../../jest/stubInstUi.js',
+  ],
   testPathIgnorePatterns: ['<rootDir>/node_modules', '<rootDir>/lib', '<rootDir>/canvas'],
   testMatch: ['**/__tests__/**/?(*.)(spec|test).js'],
   modulePathIgnorePatterns: ['<rootDir>/es', '<rootDir>/lib', '<rootDir>/canvas'],
