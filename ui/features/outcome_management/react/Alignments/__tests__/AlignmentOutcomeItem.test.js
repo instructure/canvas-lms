@@ -55,40 +55,81 @@ describe('AlignmentOutcomeItem', () => {
     expect(getByText('1')).toBeInTheDocument()
   })
 
-  it('displays right pointing caret when description is collapsed', () => {
-    const {queryByTestId} = render(<AlignmentOutcomeItem {...defaultProps()} />)
-    expect(queryByTestId('alignment-summary-icon-arrow-right')).toBeInTheDocument()
-  })
-
-  it('displays down pointing caret when description is expanded', () => {
-    const {queryByTestId, getByText} = render(<AlignmentOutcomeItem {...defaultProps()} />)
-    fireEvent.click(getByText('Expand description for outcome Outcome Title'))
-    expect(queryByTestId('alignment-summary-icon-arrow-down')).toBeInTheDocument()
-  })
-
-  it('expands description when user clicks on right pointing caret', () => {
-    const {queryByTestId, getByText} = render(<AlignmentOutcomeItem {...defaultProps()} />)
-    fireEvent.click(getByText('Expand description for outcome Outcome Title'))
-    expect(queryByTestId('alignment-summary-description-expanded')).toBeInTheDocument()
-  })
-
-  it('collapses description when user clicks on downward pointing caret', () => {
-    const {queryByTestId, getByText} = render(<AlignmentOutcomeItem {...defaultProps()} />)
-    fireEvent.click(getByText('Expand description for outcome Outcome Title'))
-    fireEvent.click(getByText('Collapse description for outcome Outcome Title'))
-    expect(queryByTestId('alignment-summary-description-truncated')).toBeInTheDocument()
-  })
-
-  it('does not show description when user clicks on right pointing caret if no description', () => {
-    const {queryByTestId, getByText} = render(
-      <AlignmentOutcomeItem {...defaultProps({description: null})} />
-    )
-    fireEvent.click(getByText('Expand description for outcome Outcome Title'))
-    expect(queryByTestId('alignment-summary-description-expanded')).not.toBeInTheDocument()
-  })
-
   it('does not show truncated description if no description', () => {
     const {queryByTestId} = render(<AlignmentOutcomeItem {...defaultProps({description: null})} />)
     expect(queryByTestId('alignment-summary-description-truncated')).not.toBeInTheDocument()
+  })
+
+  describe('when user clicks on right pointing caret', () => {
+    it('displays down pointing caret', () => {
+      const {queryByTestId, getByText} = render(<AlignmentOutcomeItem {...defaultProps()} />)
+      fireEvent.click(getByText('Expand description for outcome Outcome Title'))
+      expect(queryByTestId('alignment-summary-icon-arrow-down')).toBeInTheDocument()
+    })
+
+    it('expands outcome description', () => {
+      const {queryByTestId, getByText} = render(<AlignmentOutcomeItem {...defaultProps()} />)
+      fireEvent.click(getByText('Expand description for outcome Outcome Title'))
+      expect(queryByTestId('alignment-summary-description-expanded')).toBeInTheDocument()
+    })
+
+    it('does not show description if no description', () => {
+      const {queryByTestId, getByText} = render(
+        <AlignmentOutcomeItem {...defaultProps({description: null})} />
+      )
+      fireEvent.click(getByText('Expand description for outcome Outcome Title'))
+      expect(queryByTestId('alignment-summary-description-expanded')).not.toBeInTheDocument()
+    })
+
+    it('displays list of alignments if outcomes has alignments', () => {
+      const {queryByTestId, getByText} = render(<AlignmentOutcomeItem {...defaultProps()} />)
+      fireEvent.click(getByText('Expand description for outcome Outcome Title'))
+      expect(queryByTestId('alignment-item')).toBeInTheDocument()
+    })
+
+    it('displays no alignments message if outcome has no alignments', () => {
+      const {getByText} = render(<AlignmentOutcomeItem {...defaultProps({alignments: []})} />)
+      fireEvent.click(getByText('Expand description for outcome Outcome Title'))
+      expect(getByText('This outcome has not been aligned')).toBeInTheDocument()
+    })
+  })
+
+  describe('user clicks on downward pointing caret', () => {
+    it('displays right pointing caret', () => {
+      const {queryByTestId} = render(<AlignmentOutcomeItem {...defaultProps()} />)
+      expect(queryByTestId('alignment-summary-icon-arrow-right')).toBeInTheDocument()
+    })
+
+    it('collapses outcome description', () => {
+      const {queryByTestId, getByText} = render(<AlignmentOutcomeItem {...defaultProps()} />)
+      fireEvent.click(getByText('Expand description for outcome Outcome Title'))
+      fireEvent.click(getByText('Collapse description for outcome Outcome Title'))
+      expect(queryByTestId('alignment-summary-description-truncated')).toBeInTheDocument()
+    })
+
+    it('does not show description if no description', () => {
+      const {queryByTestId, getByText} = render(
+        <AlignmentOutcomeItem {...defaultProps({description: null})} />
+      )
+      fireEvent.click(getByText('Expand description for outcome Outcome Title'))
+      fireEvent.click(getByText('Collapse description for outcome Outcome Title'))
+      expect(queryByTestId('alignment-summary-description-truncated')).not.toBeInTheDocument()
+    })
+
+    it('hides list of alignments if outcomes has alignments', () => {
+      const {queryByTestId, getByText} = render(<AlignmentOutcomeItem {...defaultProps()} />)
+      fireEvent.click(getByText('Expand description for outcome Outcome Title'))
+      fireEvent.click(getByText('Collapse description for outcome Outcome Title'))
+      expect(queryByTestId('alignment-item')).not.toBeInTheDocument()
+    })
+
+    it('hides no alignments message if outcome has no alignments', () => {
+      const {queryByText, getByText} = render(
+        <AlignmentOutcomeItem {...defaultProps({alignments: []})} />
+      )
+      fireEvent.click(getByText('Expand description for outcome Outcome Title'))
+      fireEvent.click(getByText('Collapse description for outcome Outcome Title'))
+      expect(queryByText('This outcome has not been aligned')).not.toBeInTheDocument()
+    })
   })
 })
