@@ -149,6 +149,24 @@ describe Mutations::UpdateConversationParticipants do
         expect(InstStatsd::Statsd).to have_received(:count).with("inbox.conversation.unstarred.react", 2)
       end
 
+      it "marks each conversation as unread" do
+        allow(InstStatsd::Statsd).to receive(:count)
+        query = <<~GQL
+          conversationIds: [#{conv.id}, #{conv2.id}],
+          workflowState: "unread"
+        GQL
+
+        result = execute_with_input(query)
+        expect(result["errors"]).to be_nil
+        expect(result.dig("data", "updateConversationParticipants", "errors")).to be_nil
+
+        expect(InstStatsd::Statsd).to have_received(:count).with("inbox.conversation.unread.react", 2)
+        expect(InstStatsd::Statsd).not_to have_received(:count).with("inbox.conversation.unread.legacy", 2)
+
+        updated_attrs = result.dig("data", "updateConversationParticipants", "conversationParticipants")
+        expect(updated_attrs.map { |i| i["workflowState"] }).to match_array %w[unread unread]
+      end
+
       it "archives each conversation" do
         allow(InstStatsd::Statsd).to receive(:count)
         query = <<~GQL
