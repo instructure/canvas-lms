@@ -48,5 +48,5 @@ module.exports = {
       statements: 80
     }
   },
-  testEnvironment: 'jsdom'
+  testEnvironment: '<rootDir>../../jest/strictTimeLimitEnvironment.js'
 }
