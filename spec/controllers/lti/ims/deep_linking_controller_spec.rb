@@ -27,13 +27,15 @@ module Lti
       describe "#deep_linking_response" do
         subject { post :deep_linking_response, params: params }
 
-        let(:params) { { JWT: deep_linking_jwt, account_id: account.id } }
+        let(:placement) { "editor_button" }
+        let(:params) { { JWT: deep_linking_jwt, account_id: account.id, placement: placement } }
 
         it { is_expected.to be_ok }
 
         it "sets the JS ENV" do
           expect(controller).to receive(:js_env).with(
             deep_link_response: {
+              placement: placement,
               content_items: content_items,
               msg: msg,
               log: log,

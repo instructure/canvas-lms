@@ -94,7 +94,7 @@ module Lti
           return
         end
 
-        # creating only assignments from the assigments page should:
+        # creating only assignments from the assignments page should:
         # * not create a new module
         # * reload the page
         if for_placement?(:course_assignments_menu) && allow_line_items? && lti_resource_links.all? { |item| item.key?(:lineItem) }
@@ -136,6 +136,7 @@ module Lti
       def render_content_items(items: content_items, reload_page: true)
         js_env({
                  deep_link_response: {
+                   placement: params[:placement],
                    content_items: items,
                    msg: messaging_value("msg"),
                    log: messaging_value("log"),
