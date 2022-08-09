@@ -174,8 +174,6 @@
     "jest": "^28",
     "jest-canvas-mock": "^2",
     "jest-junit": "^7",
-    "jsdom": "^13.0.0",
-    "jsdom-global": "^3.0.2",
     "mathjax": "^3.2.0",
     "mocha": "^6",
     "mocha-junit-reporter": "^1.18.0",

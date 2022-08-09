@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {JSDOM} from 'jsdom'
 import handleResponse from '../deepLinking'
 
 describe('handles DeepLinking responses', () => {
@@ -49,9 +48,6 @@ describe('handles DeepLinking responses', () => {
       '[link_settings][selection_width]': 'assignment_external_tool_tag_attributes_iframe_width',
       '[link_settings][selection_height]': 'assignment_external_tool_tag_attributes_iframe_height'
     }
-
-    // eslint-disable-next-line no-global-assign
-    document = new JSDOM('')
 
     for (const [attribute, html_id] of Object.entries(content_tag_attributes)) {
       const element = document.createElement('input')
