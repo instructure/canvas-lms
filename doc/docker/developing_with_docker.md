@@ -251,6 +251,13 @@ docker-compose exec js-tests yarn test:jest:watch app/jsx/actAs/__tests__/ActAsM
 
 To enable Selenium: Add `docker-compose/selenium.override.yml` to your `COMPOSE_FILE` var in `.env`.
 
+For M1 Mac users using Chrome, the official selenium images are not ARM compatible so a standalone chromium image must be used.
+In the selenium.override.yml file, replace the image with the following below.
+
+```sh
+image: seleniarm/standalone-chromium:latest
+```
+
 The container used to run the selenium browser is only started when spinning up
 all docker-compose containers, or when specified explicitly. The selenium
 container needs to be started before running any specs that require selenium.
