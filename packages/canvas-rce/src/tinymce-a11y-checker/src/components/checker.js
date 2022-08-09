@@ -18,6 +18,7 @@ import { TextArea } from "@instructure/ui-text-area"
 import { SimpleSelect } from "@instructure/ui-simple-select"
 import { IconQuestionLine } from "@instructure/ui-icons"
 import { ApplyTheme } from "@instructure/ui-themeable"
+import { Alert } from "@instructure/ui-alerts"
 import ColorField from "./color-field"
 import PlaceholderSVG from "./placeholder-svg"
 
@@ -500,6 +501,14 @@ export default class Checker extends React.Component {
             onChange={this.updateFormState}
             disabled={disabled}
           />
+        )
+      case f.alert:
+        return (
+          this.state.formState["action"] === "elem-only" && (
+            <Alert name={f.dataKey} variant={f.variant}>
+              {f.message}
+            </Alert>
+          )
         )
       default:
         return (

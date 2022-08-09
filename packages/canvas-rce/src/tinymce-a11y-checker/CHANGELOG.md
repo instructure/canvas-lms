@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.1.0] - 2022-08-09
+### Added
+- A new configurable rule that informs users to not use H1 headings
+
 ## [4.0.0] - 2022-08-02
 ### Added
 - A changelog to make changes clear
