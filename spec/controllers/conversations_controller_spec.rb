@@ -333,6 +333,7 @@ describe ConversationsController do
       enrollment.save
       post "create", params: { recipients: [new_user.id.to_s], body: "yo" }
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.created.legacy")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.legacy")
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.legacy")
       expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.legacy", 1)
       expect(response).to be_successful
@@ -483,6 +484,7 @@ describe ConversationsController do
           post "create", params: { recipients: [@new_user1.id.to_s, @new_user2.id.to_s], body: "yo", group_conversation: falsish, media_comment_id: "m-whatever", media_comment_type: "video" }
 
           expect(InstStatsd::Statsd).to have_received(:count).with("inbox.conversation.created.legacy", 2)
+          expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.legacy")
           expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.legacy")
           expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.media.legacy", 2)
           expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.legacy", 2)
@@ -732,6 +734,7 @@ describe ConversationsController do
 
       post "add_message", params: { conversation_id: @conversation.conversation_id, body: "hello world" }
 
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.legacy")
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.isReply.legacy")
       expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.legacy", 0)
       expect(response).to be_successful
