@@ -63,6 +63,7 @@ export default class EditCalendarEventView extends Backbone.View {
         'start_time',
         'end_time',
         'title',
+        'new_context_code',
         'description',
         'location_name',
         'location_address',
@@ -81,6 +82,10 @@ export default class EditCalendarEventView extends Backbone.View {
           $.fudgeDateForProfileTimezone(picked_params.start_date),
           'date.formats.default'
         )
+      }
+
+      if (picked_params.new_context_code) {
+        picked_params.context_code = picked_params.new_context_code
       }
 
       const attrs = this.model.parse(picked_params)
