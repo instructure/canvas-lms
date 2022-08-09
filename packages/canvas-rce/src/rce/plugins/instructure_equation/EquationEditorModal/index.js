@@ -290,10 +290,10 @@ export default class EquationEditorModal extends Component {
   // ******************* //
 
   renderFooter = () => {
-    const cancelButton = <Button onClick={this.handleModalCancel}>{formatMessage('Cancel')}</Button>
+    const cancelButton = <Button data-testid="equation-editor-modal-cancel" onClick={this.handleModalCancel}>{formatMessage('Cancel')}</Button>
 
     const doneButton = (
-      <Button margin="none none none xx-small" onClick={this.handleModalDone} variant="primary">
+      <Button data-testid="equation-editor-modal-done" margin="none none none xx-small" onClick={this.handleModalDone} variant="primary">
         {formatMessage('Done')}
       </Button>
     )
@@ -373,6 +373,7 @@ export default class EquationEditorModal extends Component {
       >
         <Modal.Header>
           <CloseButton
+            data-testid="equation-editor-modal-close"
             placement="end"
             offset="medium"
             variant="icon"
