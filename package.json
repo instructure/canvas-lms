@@ -212,8 +212,6 @@
     "@prettier/plugin-ruby": "^1.5.2",
     "@sentry/webpack-plugin": "^1.5.2",
     "@sheerun/mutationobserver-shim": "0.3.2",
-    "@storybook/builder-webpack5": "^6.5.9",
-    "@storybook/manager-webpack5": "^6.5.9",
     "@testing-library/dom": "^8",
     "@testing-library/jest-dom": "^5",
     "@testing-library/react": "^12",
@@ -342,6 +340,8 @@
     "@storybook/addon-essentials": "^6.5.9",
     "@storybook/addon-links": "^6.5.9",
     "@storybook/addon-storyshots": "^6.5.9",
+    "@storybook/builder-webpack5": "^6.5.9",
+    "@storybook/manager-webpack5": "^6.5.9",
     "@storybook/react": "^6.5.9",
     "inspect-process": "^0.5"
   },
