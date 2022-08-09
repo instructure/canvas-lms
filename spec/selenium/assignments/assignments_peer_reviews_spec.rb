@@ -72,6 +72,22 @@ describe "assignments" do
       expect(f("#intra_group_peer_reviews")).to be_displayed
     end
 
+    it "student list appears when the assignment is assigned to a subset of students and the assignment is unpublished" do
+      course_with_teacher_logged_in
+      @student1 = student_in_course.user
+      @student2 = student_in_course.user
+
+      @assignment = assignment_model({
+                                       course: @course,
+                                       peer_reviews: true,
+                                       workflow_state: "unpublished"
+                                     })
+
+      @assignment.only_visible_to_overrides = true
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}/peer_reviews"
+      expect(f(".no_students_message")).to_not be_displayed
+    end
+
     context "rubric assessments" do
       before :once do
         course_factory(active_course: true)

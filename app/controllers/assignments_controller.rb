@@ -557,13 +557,10 @@ class AssignmentsController < ApplicationController
         return
       end
 
-      student_scope = if @assignment.differentiated_assignments_applies?
-                        @context.students_visible_to(@current_user).able_to_see_assignment_in_course_with_da(@assignment.id, @context.id)
-                      else
-                        @context.students_visible_to(@current_user)
-                      end
+      visible_students = @context.students_visible_to(@current_user).not_fake_student
+      visible_students_assigned_to_assignment = visible_students.joins(:submissions).where(submissions: { assignment: @assignment }).merge(Submission.active)
 
-      @students = student_scope.not_fake_student.distinct.order_by_sortable_name
+      @students = visible_students_assigned_to_assignment.distinct.order_by_sortable_name
       @submissions = @assignment.submissions.include_assessment_requests
     end
   end
