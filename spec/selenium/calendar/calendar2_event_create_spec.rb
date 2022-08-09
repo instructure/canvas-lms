@@ -209,6 +209,24 @@ describe "calendar2" do
         expect(num_rows).to be_equal(num_sections)
       end
 
+      it "keeps the modal's context changes in the more options screen when editing" do
+        get "/calendar2"
+        wait_for_ajaximations
+        calendar_create_event_button.click
+        replace_content(edit_calendar_event_form_title, "Event in personal calendar")
+        edit_calendar_event_form_submit_button.click
+        wait_for_ajaximations
+        expect(@user.calendar_events.last.title).to eq("Event in personal calendar")
+        event_title_on_calendar.click
+        calendar_edit_event_link.click
+        replace_content(edit_calendar_event_form_title, "Event in course calendar")
+        click_option(edit_calendar_event_form_context, @course.name)
+        expect_new_page_load { edit_calendar_event_form_more_options.click }
+        more_options_submit_button.click
+        wait_for_ajaximations
+        expect(@course.calendar_events.last.title).to eq("Event in course calendar")
+      end
+
       it "creates an event with an important date in a k5 subject" do
         toggle_k5_setting(@course.account)
 
