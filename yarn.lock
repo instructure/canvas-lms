@@ -1714,10 +1714,10 @@
   resolved "https://registry.yarnpkg.com/@instructure/i18nliner-handlebars/-/i18nliner-handlebars-2.0.0.tgz#76d01fe4609d3247d4829b58f2439954f673399b"
   integrity sha512-y2QA1mWgYF4tg/EDmUFS74nfFo/TT6THzKtR82UFGOVxmuKz6ULCk3gH8P/o3bTgebyOdh+S9yKyzLSrZ18MbA==
 
-"@instructure/i18nliner-runtime@^1":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@instructure/i18nliner-runtime/-/i18nliner-runtime-1.0.0.tgz#22f3da94fcb9369deed21bf03a04b35e9469d452"
-  integrity sha512-BH5Ze6zkZG5mgKB8K4nlSla7Jfdxo5qRzgCIBRBQbnLHPayMpjRK7zAFDi6twxlOBF3Scn6JyeBT0XlMb930GQ==
+"@instructure/i18nliner-runtime@^1", "@instructure/i18nliner-runtime@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@instructure/i18nliner-runtime/-/i18nliner-runtime-1.0.1.tgz#2e826a56c8ed3e7448bd1efe1feec8070387a6ec"
+  integrity sha512-EaYu7UyhWs6FuVBq/XXLqxoBdhwvq3mQ4wFLvvZn7sGRhpjtyrFwKVvWpNhZf7G+jBtTnH579M0c1mCFcOa1Dg==
   dependencies:
     crc32 "^0.2.2"
     speakingurl "^13.0.0"
