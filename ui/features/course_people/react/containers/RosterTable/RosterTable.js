@@ -49,6 +49,8 @@ const RosterTable = () => {
 
   if (loading) return <LoadingIndicator />
 
+  const {view_user_logins} = ENV?.permissions || {}
+
   const tableRows = data.course.usersConnection.edges.map(edge => {
     const {name, _id, sisId, enrollments, loginId, avatarUrl, pronouns} = edge.node
     const {totalActivityTime, htmlUrl, state} = enrollments[0]
@@ -78,7 +80,7 @@ const RosterTable = () => {
           <NameLink _id={_id} htmlUrl={htmlUrl} pronouns={pronouns} name={name} />
           <StatusPill state={state} />
         </Table.Cell>
-        <Table.Cell>{loginId}</Table.Cell>
+        {view_user_logins && <Table.Cell>{loginId}</Table.Cell>}
         <Table.Cell>{sisId}</Table.Cell>
         <Table.Cell>{sectionNames}</Table.Cell>
         <Table.Cell>{enrollmentRoles}</Table.Cell>
@@ -101,7 +103,11 @@ const RosterTable = () => {
         <Table.Row>
           <Table.ColHeader {...idProps('colheader-avatar')}>{}</Table.ColHeader>
           <Table.ColHeader {...idProps('colheader-name')}>{I18n.t('Name')}</Table.ColHeader>
-          <Table.ColHeader {...idProps('colheader-login-id')}>{I18n.t('Login ID')}</Table.ColHeader>
+          {view_user_logins && (
+            <Table.ColHeader {...idProps('colheader-login-id')}>
+              {I18n.t('Login ID')}
+            </Table.ColHeader>
+          )}
           <Table.ColHeader {...idProps('colheader-sis-id')}>{I18n.t('SIS ID')}</Table.ColHeader>
           <Table.ColHeader {...idProps('colheader-section')}>{I18n.t('Section')}</Table.ColHeader>
           <Table.ColHeader {...idProps('colheader-role')}>{I18n.t('Role')}</Table.ColHeader>
