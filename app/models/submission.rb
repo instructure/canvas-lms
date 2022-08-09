@@ -2933,7 +2933,7 @@ class Submission < ActiveRecord::Base
   def update_provisional_grade(pg, scorer, attrs = {})
     # Adding a comment calls update_provisional_grade, but will not have the
     # grade or score keys included.
-    if (attrs.key?(:grade) || attrs.key?(:score)) && pg.selection.present?
+    if (attrs.key?(:grade) || attrs.key?(:score)) && pg.selection.present? && pg.scorer_id != assignment.final_grader_id
       raise Assignment::GradeError, error_code: Assignment::GradeError::PROVISIONAL_GRADE_MODIFY_SELECTED
     end
 
