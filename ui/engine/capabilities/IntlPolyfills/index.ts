@@ -43,7 +43,7 @@ type PolyfillerUpValue = {
 type PolyfillerArgs = {
   subsys: Function,
   should: (locale: string) => string | undefined,
-  polyfill: () => Promise<void>,
+  polyfill: () => Promise<unknown>,
   localeLoader: (locale: string) => Promise<void>
 };
 
@@ -111,18 +111,14 @@ const intlSubsystemsInUse: Capability[] = [
   polyfillerFactory({
     subsys: Intl.NumberFormat,
     should: spfNF,
-    polyfill: async () => {
-      import('@formatjs/intl-numberformat/polyfill-force');
-    },
+    polyfill: () => import('@formatjs/intl-numberformat/polyfill-force'),
     localeLoader: (l: string) => import(/* webpackIgnore: true */ localeDataFor('numberformat', l))
   }),
 
   polyfillerFactory({
     subsys: Intl.RelativeTimeFormat,
     should: spfRTF,
-    polyfill: async () => {
-      import('@formatjs/intl-relativetimeformat/polyfill-force');
-    },
+    polyfill: () => import('@formatjs/intl-relativetimeformat/polyfill-force'),
     localeLoader: (l: string) => import(/* webpackIgnore: true */ localeDataFor('relativetimeformat', l))
 
   })

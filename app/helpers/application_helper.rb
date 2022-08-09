@@ -175,15 +175,13 @@ module ApplicationHelper
     object.grants_any_right?(user, session, *actions)
   end
 
-  def load_scripts_async_in_order(script_urls)
+  def load_scripts_async_in_order(script_urls, cors_anonymous: false)
     # this is how you execute scripts in order, in a way that doesn’t block rendering,
     # and without having to use 'defer' to wait until the whole DOM is loaded.
     # see: https://www.html5rocks.com/en/tutorials/speed/script-loading/
     javascript_tag "
       ;#{script_urls.map { |url| javascript_path(url) }}.forEach(function(src) {
-        var s = document.createElement('script')
-        s.src = src
-        s.async = false
+        var s = document.createElement('script'); s.src = src; s.async = false;#{" s.crossOrigin = 'anonymous';" if cors_anonymous}
         document.head.appendChild(s)
       });"
   end
@@ -199,16 +197,15 @@ module ApplicationHelper
     paths << "/timezone/#{js_env[:CONTEXT_TIMEZONE]}.js" if js_env[:CONTEXT_TIMEZONE]
     paths << "/timezone/#{js_env[:BIGEASY_LOCALE]}.js" if js_env[:BIGEASY_LOCALE]
 
-    @script_chunks = []
-
     # if there is a moment locale besides english set, put a script tag for it
     # so it is loaded and ready before we run any of our app code
     if js_env[:MOMENT_LOCALE] && js_env[:MOMENT_LOCALE] != "en"
-      @script_chunks += ::Canvas::Cdn.registry.scripts_for(
+      paths += ::Canvas::Cdn.registry.scripts_for(
         "moment/locale/#{js_env[:MOMENT_LOCALE]}"
       )
     end
-    @script_chunks += ::Canvas::Cdn.registry.scripts_for("main")
+
+    @script_chunks = ::Canvas::Cdn.registry.scripts_for("main")
     @script_chunks.uniq!
 
     chunk_urls = @script_chunks
@@ -217,9 +214,10 @@ module ApplicationHelper
       # if we don't also put preload tags for these, the browser will prioritize and
       # download the bundle chunks we preload below before these scripts
       paths.each { |url| concat preload_link_tag(javascript_path(url)) }
-      chunk_urls.each { |url| concat preload_link_tag(url) }
+      chunk_urls.each { |url| concat preload_link_tag(url, crossorigin: "anonymous") }
 
-      concat load_scripts_async_in_order(paths + chunk_urls)
+      concat load_scripts_async_in_order(paths)
+      concat load_scripts_async_in_order(chunk_urls, cors_anonymous: true)
       concat include_js_bundles
     end
   end
