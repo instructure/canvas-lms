@@ -449,6 +449,7 @@ class ConversationsController < ApplicationController
                                            context_id: context_id, tags: @tags, group: batch_group_messages)
 
         InstStatsd::Statsd.count("inbox.conversation.created.legacy", batch.recipient_count)
+        InstStatsd::Statsd.increment("inbox.message.sent.legacy")
         InstStatsd::Statsd.increment("inbox.conversation.sent.legacy")
         if message.has_media_objects || params[:media_comment_id]
           InstStatsd::Statsd.count("inbox.message.sent.media.legacy", batch.recipient_count)
@@ -478,6 +479,7 @@ class ConversationsController < ApplicationController
         @conversation = @current_user.initiate_conversation(@recipients, !group_conversation, subject: params[:subject], context_type: context_type, context_id: context_id)
         @conversation.add_message(message, tags: @tags, update_for_sender: false, cc_author: true)
         InstStatsd::Statsd.increment("inbox.conversation.created.legacy")
+        InstStatsd::Statsd.increment("inbox.message.sent.legacy")
         InstStatsd::Statsd.increment("inbox.conversation.sent.legacy")
         if params[:bulk_message] == "1"
           InstStatsd::Statsd.increment("inbox.conversation.sent.individual_message_option.legacy")
@@ -960,6 +962,7 @@ class ConversationsController < ApplicationController
       media_comment_type: params[:media_comment_type],
       user_note: params[:user_note]
     )
+    InstStatsd::Statsd.increment("inbox.message.sent.legacy")
     InstStatsd::Statsd.increment("inbox.message.sent.isReply.legacy")
     if params[:media_comment_id] || ConversationMessage.where(id: message[:message]&.id).first&.has_media_objects
       InstStatsd::Statsd.increment("inbox.message.sent.media.legacy")
