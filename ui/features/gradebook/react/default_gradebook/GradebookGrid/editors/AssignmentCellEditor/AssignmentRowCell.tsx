@@ -72,6 +72,7 @@ export default class AssignmentRowCell extends Component {
       enteredGrade: string,
       enteredScore: number,
       excused: bool.isRequired,
+      late_policy_status: string || null,
       id: string,
       similarityInfo: shape({
         similarityScore: number,

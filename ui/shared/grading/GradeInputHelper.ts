@@ -30,6 +30,7 @@ const PERCENTAGES = /[%％﹪٪]/
 
 type PassFailResult = {
   enteredAs: null | string
+  late_policy_status: null | string
   excused: boolean
   grade: string
   score: null | number
@@ -56,6 +57,7 @@ function percentageFromPoints(points: number, pointsPossible: number) {
 function invalid(value) {
   return {
     enteredAs: null,
+    late_policy_status: null,
     excused: false,
     grade: value,
     score: null,
@@ -132,6 +134,7 @@ function parseForGradingScheme(value, options) {
   if (result) {
     return {
       enteredAs: result.enteredAs,
+      late_policy_status: null,
       excused: false,
       grade: result.schemeKey,
       score: result.points,
@@ -148,6 +151,7 @@ function parseForPercent(value, options) {
   if (result) {
     return {
       enteredAs: result.enteredAs,
+      late_policy_status: null,
       excused: false,
       grade: `${result.percent}%`,
       score: result.points,
@@ -167,6 +171,7 @@ function parseForPoints(value, options) {
   if (result) {
     return {
       enteredAs: result.enteredAs,
+      late_policy_status: null,
       excused: false,
       grade: `${result.points}`,
       score: result.points,
@@ -179,8 +184,10 @@ function parseForPoints(value, options) {
 
 function parseForPassFail(value: string, options: {pointsPossible: number}): PassFailResult {
   const cleanValue = value.toLowerCase()
+
   const result: PassFailResult = {
     enteredAs: 'passFail',
+    late_policy_status: null,
     excused: false,
     grade: cleanValue,
     valid: true,
@@ -250,15 +257,44 @@ export function parseEntryValue(value, gradingScheme): ParseResult {
   return result
 }
 
+export function isMissing(grade) {
+  return `${grade}`.trim().toLowerCase() === 'mi'
+}
+
 export function parseTextValue(value: string, options) {
   const trimmedValue = value != null ? `${value}`.trim() : ''
 
   if (trimmedValue === '') {
-    return {enteredAs: null, excused: false, grade: null, score: null, valid: true}
+    return {
+      enteredAs: null,
+      late_policy_status: null,
+      excused: false,
+      grade: null,
+      score: null,
+      valid: true,
+    }
   }
 
   if (isExcused(trimmedValue)) {
-    return {enteredAs: 'excused', excused: true, grade: null, score: null, valid: true}
+    return {
+      enteredAs: 'excused',
+      late_policy_status: null,
+      excused: true,
+      grade: null,
+      score: null,
+      valid: true,
+    }
+  }
+
+  if (ENV.GRADEBOOK_OPTIONS.assignment_missing_shortcut && isMissing(trimmedValue)) {
+    return {
+      enteredAs: 'missing',
+      late_policy_status: 'missing',
+      excused: false,
+      grade: null,
+      score: null,
+      valid: true,
+    }
   }
 
   switch (options.enterGradesAs) {
@@ -285,6 +321,15 @@ export function hasGradeChanged(submission, gradeInfo, options) {
 
   if (gradeInfo.excused !== submission.excused) {
     return true
+  }
+
+  if (ENV.GRADEBOOK_OPTIONS.assignment_missing_shortcut && 'late_policy_status' in submission) {
+    if (
+      gradeInfo.late_policy_status !== null &&
+      gradeInfo.late_policy_status !== submission.late_policy_status
+    ) {
+      return true
+    }
   }
 
   if (gradeInfo.enteredAs === 'gradingScheme') {

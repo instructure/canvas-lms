@@ -21,6 +21,7 @@ import {mount, shallow} from 'enzyme'
 
 import SubmissionTray from 'ui/features/gradebook/react/default_gradebook/components/SubmissionTray'
 import GradeInputDriver from './GradeInput/GradeInputDriver'
+import fakeENV from 'helpers/fakeENV'
 
 /* eslint qunit/no-identical-names: 0 */
 
@@ -31,6 +32,9 @@ QUnit.module('SubmissionTray', hooks => {
   let wrapper
 
   hooks.beforeEach(() => {
+    fakeENV.setup({
+      GRADEBOOK_OPTIONS: {assignment_missing_shortcut: true}
+    })
     const applicationElement = document.createElement('div')
     applicationElement.id = 'application'
     document.getElementById('fixtures').appendChild(applicationElement)
@@ -131,6 +135,7 @@ QUnit.module('SubmissionTray', hooks => {
     wrapper.unmount()
     document.getElementById('fixtures').innerHTML = ''
     clock.restore()
+    fakeENV.teardown()
   })
 
   function mountComponent(props) {

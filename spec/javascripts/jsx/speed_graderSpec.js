@@ -1108,6 +1108,7 @@ QUnit.module('SpeedGrader', rootHooks => {
         show_help_menu_item: false,
         RUBRIC_ASSESSMENT: {},
         update_submission_grade_url: 'my_url.com',
+        assignment_missing_shortcut: true,
       }
       fakeENV.setup(env)
       sandbox.spy($.fn, 'append')
@@ -5642,7 +5643,9 @@ QUnit.module('SpeedGrader', rootHooks => {
             grading_role: 'moderator',
             help_url: 'example.com/support',
             show_help_menu_item: false,
-            RUBRIC_ASSESSMENT: {assessment_user_id: '123', assessment_type: 'grading'},
+            RUBRIC_ASSESSMENT: {'assessment_user_id': '123',
+            assessment_type: 'grading'},
+            assignment_missing_shortcut: true,
           })
           setupFixtures(`
           <div id="grade_container">

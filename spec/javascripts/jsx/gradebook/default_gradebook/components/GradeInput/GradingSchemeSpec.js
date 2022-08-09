@@ -21,6 +21,7 @@ import {render} from '@testing-library/react'
 
 import GradeInput from 'ui/features/gradebook/react/default_gradebook/components/GradeInput'
 import GradeInputDriver from './GradeInputDriver'
+import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHooks => {
   let $container
@@ -29,6 +30,9 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
   let props
 
   suiteHooks.beforeEach(() => {
+    fakeENV.setup({
+      GRADEBOOK_OPTIONS: {assignment_missing_shortcut: true}
+    })
     const assignment = {
       anonymizeStudents: false,
       gradingType: 'letter_grade',
@@ -69,6 +73,7 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
   suiteHooks.afterEach(() => {
     component.unmount()
     $container.remove()
+    fakeENV.teardown()
   })
 
   function renderComponent() {
