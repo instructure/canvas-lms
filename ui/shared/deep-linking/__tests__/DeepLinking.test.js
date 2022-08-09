@@ -22,7 +22,10 @@ describe('isValidDeepLinkingEvent', () => {
   let data, event, env, parameters
 
   beforeEach(() => {
-    event = {data: {subject: 'LtiDeepLinkingResponse'}, origin: 'canvas.instructure.com'}
+    event = {
+      data: {subject: 'LtiDeepLinkingResponse', placement: 'not_editor_button'},
+      origin: 'canvas.instructure.com'
+    }
     env = {DEEP_LINKING_POST_MESSAGE_ORIGIN: 'canvas.instructure.com'}
     parameters = [event, env]
   })
@@ -58,6 +61,20 @@ describe('isValidDeepLinkingEvent', () => {
   describe('when the subject is incorrect', () => {
     beforeEach(() => {
       event = {data: {subject: 'WrongMessageType'}, origin: 'canvas.instructure.com'}
+      parameters = [event, env]
+    })
+
+    it('return false', () => {
+      expect(subject()).toEqual(false)
+    })
+  })
+
+  describe('when the placement is "editor-button"', () => {
+    beforeEach(() => {
+      event = {
+        data: {subject: 'LtiDeepLinkingResponse', placement: 'editor_button'},
+        origin: 'canvas.instructure.com'
+      }
       parameters = [event, env]
     })
 
