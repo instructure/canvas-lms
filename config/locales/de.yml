@@ -2389,7 +2389,7 @@ de:
   allows_user_to_access_and_edit_the_admin_settings__b3390b66: "Erlaubt dem Benutzer, auf die Admin-Einstellungen in Commons zuzugreifen und sie zu bearbeiten. Erlaubt dem Benutzer, Gruppen zu erstellen und zu verwalten. Erlaubt dem Benutzer, gemeinsam genutzte Ressourcen im Konto zu verwalten."
   allows_user_to_access_and_edit_the_admin_settings__e45da9d7: "Erlaubt dem Benutzer, auf die Admin-Einstellungen in Commons zuzugreifen und sie zu bearbeiten."
   allows_user_to_access_gradebook_history_9d599681: "Erlaubt dem Benutzer, auf den Notenbuchverlauf zuzugreifen."
-  allows_user_to_access_gradebook_history_allows_use_79dfddd: "Erlaubt dem Benutzer, auf den Notenbuchverlauf zuzugreifen. Ermöglicht dem Benutzer den Zugriff auf das Notenbuch der Lernleistungsziele (falls aktiviert)."
+  allows_user_to_access_gradebook_history_allows_use_79dfddd: "Erlaubt dem Benutzer\\*in, auf den Notenbuchverlauf zuzugreifen. Ermöglicht dem Benutzer\\*in den Zugriff auf das Notenbuch der Lernleistungsziele (falls aktiviert)."
   allows_user_to_access_speedgrader_from_an_assignme_3b908f7: "Erlaubt dem Benutzer, auf SpeedGrader von einer Aufgabe aus zuzugreifen."
   allows_user_to_access_student_view_test_student_co_35fbd387: "Ermöglicht dem Benutzer den Zugriff auf die Schaltflächen Studierendenansicht (Teststudent), Diesen Kurs kopieren und Kurs dauerhaft löschen."
   allows_user_to_access_student_view_test_student_co_8b57e87c: "Erlaubt dem Benutzer, auf die Schaltflächen „Studentenansicht“ (Teststudent), „Diesen Kurs kopieren“, „Kurs-Content zurücksetzen“ und „Kurs dauerhaft löschen“ zuzugreifen."
@@ -2531,7 +2531,7 @@ de:
   allows_user_to_add_teachers_to_a_course_from_the_a_afbe4c3d: "Erlaubt dem Benutzer, auf der Seite „Kurse“ des Kontos Lehrer zu einem Kurs hinzuzufügen."
   allows_user_to_add_teachers_to_the_course_from_the_dc03e973: "Erlaubt dem Benutzer, auf der Kurs-Seite des Kontos Lehrer zu einem Kurs hinzuzufügen. Erlaubt dem Benutzer, Lehrer zum Kurs hinzuzufügen. Erlaubt dem Benutzer, Anmelde-ID-Informationen für Lehrer einzusehen. Erlaubt dem Benutzer, die Benutzerdetails für Lehrer einzusehen. Erlaubt dem Benutzer, den Abschnitt oder die Rolle eines Lehrers zu ändern."
   allows_user_to_add_users_to_a_course_group_aa0df439: "Erlaubt dem Benutzer, Benutzer zu einer Kursgruppe hinzuzufügen."
-  allows_user_to_add_users_to_an_account_or_course_g_f2a3a2b8: "Erlaubt dem Benutzer, Benutzer zu einer Konto- oder Kursgruppe hinzuzufügen."
+  allows_user_to_add_users_to_an_account_or_course_g_f2a3a2b8: "Erlaubt dem Benutzer\\*in, Benutzer\\*in zu einer Konto- oder Kursgruppe hinzuzufügen."
   allows_user_to_assign_a_student_group_leader_in_a__6851d646: "Erlaubt dem Benutzer, einen Studenten zum Gruppenleitung in einem Kurs zu ernennen."
   allows_user_to_assign_a_student_group_leader_in_an_73e12cb6: "Erlaubt dem Benutzer, einen Studenten zum Gruppenleitung in einem Konto oder Kurs zu ernennen."
   allows_user_to_change_start_and_end_dates_for_cour_f437cee1: "Erlaubt dem Benutzer, das Start- und Enddatum für Kursabschnitte zu ändern."
@@ -2554,7 +2554,7 @@ de:
       Erlaubt dem Benutzer, Benutzer zu entfernen oder sie in einem Konto zusammenzuführen.
       Erlaubt dem Benutzer, Benutzerkontodetails wie Name, E-Mail und Zeitzone zu ändern. Erlaubt dem Benutzer, die Anmeldeinformationen eines Benutzers anzuzeigen und zu ändern.
   allows_user_to_create_and_manage_appointments_on_t_393e9e84: "Erlaubt dem Benutzer, mithilfe des Planers Termine im Kalender zu erstellen und zu verwalten."
-  allows_user_to_create_and_manage_groups_allows_use_562e0013: "Erlaubt dem Benutzer, Gruppen zu erstellen und zu verwalten. Erlaubt dem Benutzer, gemeinsam genutzte Ressourcen im Konto zu verwalten."
+  allows_user_to_create_and_manage_groups_allows_use_562e0013: "Erlaubt dem Benutzer\\*in, Gruppen zu erstellen und zu verwalten. Erlaubt dem Benutzer\\*in, gemeinsam genutzte Ressourcen im Konto zu verwalten."
   allows_user_to_create_and_modify_grading_schemes_e4433a19: "Erlaubt dem Benutzer, Benotungssysteme zu erstellen und zu ändern."
   allows_user_to_create_collaborations_allows_user_t_96f8c3be: "Erlaubt dem Benutzer, Kooperationen einzurichten. Erlaubt dem Benutzer, von ihnen erstellte Konferenzen anzuzeigen, zu bearbeiten und zu löschen."
   allows_user_to_create_collaborations_allows_user_t_eff2a175: "Erlaubt dem Benutzer, Kooperationen einzurichten. Erlaubt dem Benutzer, von ihnen erstellte Kooperationen anzuzeigen, zu bearbeiten und zu löschen."
