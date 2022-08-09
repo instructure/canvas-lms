@@ -7131,4 +7131,27 @@ describe Course do
       end
     end
   end
+
+  describe "#instructors_in_charge_of" do
+    it "excludes section-limited instructors from Section A when the student is concluded in Section B" do
+      course = Course.create!
+      section1 = course.course_sections.create!(name: "Section 1")
+      section2 = course.course_sections.create!(name: "Section 2")
+      student = User.create!
+      student_enrollment = course.enroll_student(
+        student,
+        section: section1,
+        enrollment_state: "active"
+      )
+      limited_teacher = User.create!
+      course.enroll_teacher(
+        limited_teacher,
+        limit_privileges_to_course_section: true,
+        section: section2,
+        enrollment_state: "active"
+      )
+      student_enrollment.conclude
+      expect(course.instructors_in_charge_of(student.id)).not_to include limited_teacher
+    end
+  end
 end
