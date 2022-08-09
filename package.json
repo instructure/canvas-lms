@@ -208,7 +208,7 @@
     "@instructure/i18nliner": "^3",
     "@instructure/i18nliner-canvas": "^1.2",
     "@instructure/i18nliner-handlebars": "^2",
-    "@instructure/i18nliner-runtime": "^1",
+    "@instructure/i18nliner-runtime": "^1.0.1",
     "@prettier/plugin-ruby": "^1.5.2",
     "@sentry/webpack-plugin": "^1.5.2",
     "@sheerun/mutationobserver-shim": "0.3.2",
