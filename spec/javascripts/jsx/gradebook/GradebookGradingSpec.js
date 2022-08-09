@@ -28,6 +28,7 @@ import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import {createCourseGradesWithGradingPeriods as createGrades} from './GradeCalculatorSpecHelper'
 import MessageStudentsWhoHelper from '@canvas/grading/messageStudentsWhoHelper'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
+import fakeENV from 'helpers/fakeENV'
 
 const $fixtures = document.getElementById('fixtures')
 
@@ -875,6 +876,9 @@ QUnit.module('Gradebook Grading', () => {
     let renderSubmissionTrayStub
 
     hooks.beforeEach(() => {
+      fakeENV.setup({
+        GRADEBOOK_OPTIONS: {assignment_missing_shortcut: true}
+      })
       const defaultGradingScheme = [
         ['A', 0.9],
         ['B', 0.8],
@@ -922,6 +926,7 @@ QUnit.module('Gradebook Grading', () => {
     hooks.afterEach(() => {
       $.flashWarning.restore()
       renderSubmissionTrayStub.restore()
+      fakeENV.teardown()
     })
 
     test('updates the submission via Gradebook.apiUpdateSubmission', () => {
@@ -937,6 +942,22 @@ QUnit.module('Gradebook Grading', () => {
       return apiPromise.then(() => {
         const [submissionData] = gradebook.apiUpdateSubmission.firstCall.args
         strictEqual(submissionData.excuse, true)
+      })
+    })
+
+    test('sets "submission.late_policy_status" to "missing" when the submission is missing', () => {
+      gradeInfo = {
+        enteredAs: 'missing',
+        late_policy_status: 'missing',
+        excused: false,
+        grade: null,
+        score: null,
+        valid: true
+      }
+      gradebook.gradeSubmission(submission, gradeInfo)
+      return apiPromise.then(() => {
+        const [submissionData] = gradebook.apiUpdateSubmission.firstCall.args
+        strictEqual(submissionData.late_policy_status, 'missing')
       })
     })
 

@@ -4349,6 +4349,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         }
         if (gradeInfo.excused) {
           submissionData.excuse = true
+        } else if (
+          ENV.GRADEBOOK_OPTIONS.assignment_missing_shortcut &&
+          gradeInfo.late_policy_status === 'missing'
+        ) {
+          submissionData.late_policy_status = gradeInfo.late_policy_status
         } else if (gradeInfo.enteredAs === null) {
           submissionData.posted_grade = ''
         } else if (['passFail', 'gradingScheme'].includes(gradeInfo.enteredAs)) {
