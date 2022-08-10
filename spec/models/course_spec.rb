@@ -7154,4 +7154,116 @@ describe Course do
       expect(course.instructors_in_charge_of(student.id)).not_to include limited_teacher
     end
   end
+
+  describe "statsd logging for course actions" do
+    context "timing when course is published" do
+      let(:publish_time) { 300_000 }
+
+      before :once do
+        Account.default.enable_feature!(:course_paces)
+      end
+
+      it "logs the timing of a course to statsd with course pacing enabled" do
+        allow(InstStatsd::Statsd).to receive(:timing)
+
+        Timecop.freeze(Time.utc(2022, 3, 1, 12, 0)) do
+          a_course = Course.create!
+          a_course.enable_course_paces = true
+          a_course.save!
+        end
+
+        new_course = Course.last
+
+        Timecop.freeze(Time.utc(2022, 3, 1, 12, 5)) do
+          new_course.offer!
+        end
+
+        expect(InstStatsd::Statsd).to have_received(:timing).with("course.paced.create_to_publish_time", publish_time).once
+      end
+
+      it "doesn't log timing if moving from concluded back to available in paced course" do
+        allow(InstStatsd::Statsd).to receive(:timing)
+
+        Timecop.freeze(Time.utc(2022, 3, 1, 12, 0)) do
+          a_course = Course.create!
+          a_course.update!(enable_course_paces: true, workflow_state: "completed")
+        end
+
+        new_course = Course.last
+
+        Timecop.freeze(Time.utc(2022, 3, 1, 12, 5)) do
+          new_course.offer!
+        end
+
+        expect(InstStatsd::Statsd).not_to have_received(:timing).with("course.paced.create_to_publish_time", publish_time)
+      end
+
+      it "log timing if moving publishing from claimed in paced course" do
+        allow(InstStatsd::Statsd).to receive(:timing)
+
+        Timecop.freeze(Time.utc(2022, 3, 1, 12, 0)) do
+          a_course = Course.create!
+          a_course.update!(enable_course_paces: true, workflow_state: "claimed")
+        end
+
+        new_course = Course.last
+
+        Timecop.freeze(Time.utc(2022, 3, 1, 12, 5)) do
+          new_course.offer!
+        end
+
+        expect(InstStatsd::Statsd).to have_received(:timing).with("course.paced.create_to_publish_time", publish_time).once
+      end
+
+      it "logs the timing of a course to statsd with course pacing not enabled" do
+        allow(InstStatsd::Statsd).to receive(:timing)
+
+        Timecop.freeze(Time.utc(2022, 3, 1, 12, 0)) do
+          Course.create!
+        end
+
+        new_course = Course.last
+
+        Timecop.freeze(Time.utc(2022, 3, 1, 12, 5)) do
+          new_course.offer!
+        end
+
+        expect(InstStatsd::Statsd).to have_received(:timing).with("course.unpaced.create_to_publish_time", publish_time).once
+      end
+
+      it "doesn't log timing if moving from concluded back to available in unpaced course" do
+        allow(InstStatsd::Statsd).to receive(:timing)
+
+        Timecop.freeze(Time.utc(2022, 3, 1, 12, 0)) do
+          a_course = Course.create!
+          a_course.update!(workflow_state: "completed")
+        end
+
+        new_course = Course.last
+
+        Timecop.freeze(Time.utc(2022, 3, 1, 12, 5)) do
+          new_course.offer!
+        end
+
+        expect(InstStatsd::Statsd).not_to have_received(:timing).with("course.unpaced.create_to_publish_time", publish_time)
+      end
+
+      it "log timing if moving publishing from claimed in unpaced course" do
+        allow(InstStatsd::Statsd).to receive(:timing)
+
+        Timecop.freeze(Time.utc(2022, 3, 1, 12, 0)) do
+          a_course = Course.create!
+          a_course.update!(workflow_state: "claimed")
+        end
+
+        new_course = Course.last
+
+        Timecop.freeze(Time.utc(2022, 3, 1, 12, 5)) do
+          new_course.offer!
+        end
+
+        expect(InstStatsd::Statsd).to have_received(:timing).with("course.unpaced.create_to_publish_time", publish_time).once
+      end
+    end
+  end
 end
