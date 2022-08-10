@@ -97,6 +97,21 @@ describe "dashboard" do
 
       expect(f("#content")).not_to contain_css("#planner-todosidebar-item-list")
     end
+
+    context "with additional non-student enrollments" do
+      before do
+        @student_course = @course
+        course_with_teacher(active_all: true, user: @user)
+        @teacher_course = @course
+      end
+
+      it "displays course announcements" do
+        announcement = @student_course.announcements.create!(title: "Announcement", message: "Message")
+        get "/"
+        wait_for_ajaximations
+        expect(f("#planner-todosidebar-item-list>li")).to include_text(announcement.title)
+      end
+    end
   end
 
   context "as an observer" do
