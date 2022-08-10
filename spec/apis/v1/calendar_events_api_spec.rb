@@ -2678,15 +2678,7 @@ describe CalendarEventsApiController, type: :request do
               )
             end
 
-            it "returns later override with prioritize_individual_overrides disabled" do
-              Account.site_admin.disable_feature!(:prioritize_individual_overrides)
-              aggregate_failures do
-                expect(json.size).to eq 1
-                expect(json.first["end_at"]).to eq "2012-01-14T12:00:00Z"
-              end
-            end
-
-            it "returns user override with prioritize_individual_overrides enabled" do
+            it "prioritizes user overrides" do
               aggregate_failures do
                 expect(json.size).to eq 1
                 expect(json.first["end_at"]).to eq "2012-01-12T12:00:00Z"

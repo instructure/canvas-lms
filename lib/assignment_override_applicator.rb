@@ -370,7 +370,7 @@ module AssignmentOverrideApplicator
     applicable_overrides = overrides.select(&:due_at_overridden)
     if applicable_overrides.empty?
       assignment_or_quiz
-    elsif Account.site_admin.feature_enabled?(:prioritize_individual_overrides) && (adhoc_override = applicable_overrides.detect(&:adhoc?))
+    elsif (adhoc_override = applicable_overrides.detect(&:adhoc?))
       adhoc_override
     elsif (override = applicable_overrides.detect { |o| o.due_at.nil? })
       override
@@ -399,7 +399,7 @@ module AssignmentOverrideApplicator
 
     if applicable_overrides.empty?
       assignment_or_quiz.unlock_at
-    elsif Account.site_admin.feature_enabled?(:prioritize_individual_overrides) && (adhoc_override = applicable_overrides.detect(&:adhoc?))
+    elsif (adhoc_override = applicable_overrides.detect(&:adhoc?))
       adhoc_override.unlock_at
     elsif applicable_overrides.any? { |o| o.unlock_at.nil? }
       nil
@@ -412,7 +412,7 @@ module AssignmentOverrideApplicator
     applicable_overrides = overrides.select(&:lock_at_overridden)
     if applicable_overrides.empty?
       assignment_or_quiz.lock_at
-    elsif Account.site_admin.feature_enabled?(:prioritize_individual_overrides) && (adhoc_override = applicable_overrides.detect(&:adhoc?))
+    elsif (adhoc_override = applicable_overrides.detect(&:adhoc?))
       adhoc_override.lock_at
     elsif applicable_overrides.detect { |o| o.lock_at.nil? }
       nil

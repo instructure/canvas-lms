@@ -157,18 +157,3 @@ peer_reviews_for_a2:
   display_name: Peer Review Support in Assignment Enhancements
   description: Students will be able to provide feedback on another student's assignment submission
     using the enhanced assignment view
-prioritize_individual_overrides:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Prioritize Individual Overrides
-  description: If multiple due date overrides apply to a student on a given assignment
-    and one of those overrides is an individual override, always use the date from the
-    individual override. Previous behavior was to always choose the date from the override
-    that granted the student the most amount of time to submit.
-  environments:
-    ci:
-      state: allowed_on # enable for automated testing builds and local testing
-    development:
-      state: allowed_on # enable for local development
-    test:
-      state: allowed_on # enable for the deployed 'test' environment

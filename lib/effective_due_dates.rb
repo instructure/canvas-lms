@@ -132,12 +132,6 @@ class EffectiveDueDates
 
   private
 
-  def prioritize_individual_overrides?
-    return @prioritize_individual_overrides if defined?(@prioritize_individual_overrides)
-
-    @prioritize_individual_overrides = Account.site_admin.feature_enabled?(:prioritize_individual_overrides)
-  end
-
   def any_student_in_closed_grading_period?(assignment_due_dates)
     return false unless assignment_due_dates
 
@@ -232,7 +226,7 @@ class EffectiveDueDates
               o.due_at,
               o.set_type AS override_type,
               o.due_at_overridden,
-              #{prioritize_individual_overrides? ? 1 : 2} AS priority
+              1 AS priority
             FROM
               overrides o
             INNER JOIN #{AssignmentOverrideStudent.quoted_table_name} os ON os.assignment_override_id = o.id AND

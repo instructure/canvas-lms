@@ -81,7 +81,6 @@ describe GradebookExporter do
         end
 
         it "returns assignments ordered by assignment group position when feature is disabled" do
-          expect(Account.site_admin).to receive(:feature_enabled?).and_call_original
           expect(Account.site_admin).to receive(:feature_enabled?).with(:gradebook_csv_export_order_matches_gradebook_grid).and_return(false)
 
           actual_assignment_headers = headers[4, 3]
@@ -126,7 +125,6 @@ describe GradebookExporter do
         end
 
         it "returns assignments ordered by assignment group position when feature is disabled" do
-          expect(Account.site_admin).to receive(:feature_enabled?).and_call_original
           expect(Account.site_admin).to receive(:feature_enabled?).with(:gradebook_csv_export_order_matches_gradebook_grid).and_return(false)
 
           actual_assignment_headers = headers[4, 3]

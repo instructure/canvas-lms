@@ -639,32 +639,14 @@ describe AssignmentOverride do
           override.lock_at = 10.minutes.ago
         end
 
-        context "with prioritize_individual_overrides enabled" do
-          it "returns false if the override is ad hoc" do
-            override.set_type = "ADHOC"
-            expect(subject).to be(false)
-          end
-
-          it "returns true if the override is not ad hoc" do
-            override.set_type = "CourseSection"
-            expect(subject).to be(true)
-          end
+        it "returns false if the override is ad hoc" do
+          override.set_type = "ADHOC"
+          expect(subject).to be(false)
         end
 
-        context "with prioritize_individual_overrides disabled" do
-          before do
-            Account.site_admin.disable_feature!(:prioritize_individual_overrides)
-          end
-
-          it "returns true if the override is ad hoc" do
-            override.set_type = "ADHOC"
-            expect(subject).to be(true)
-          end
-
-          it "returns true if the override is not ad hoc" do
-            override.set_type = "CourseSection"
-            expect(subject).to be(true)
-          end
+        it "returns true if the override is not ad hoc" do
+          override.set_type = "CourseSection"
+          expect(subject).to be(true)
         end
       end
     end

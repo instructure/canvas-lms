@@ -331,7 +331,7 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def availability_expired?
-    return false if adhoc? && Account.site_admin.feature_enabled?(:prioritize_individual_overrides)
+    return false if adhoc?
 
     lock_at_overridden &&
       lock_at.present? &&
