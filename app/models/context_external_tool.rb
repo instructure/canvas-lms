@@ -44,8 +44,29 @@ class ContextExternalTool < ActiveRecord::Base
   validates :lti_version, inclusion: { in: %w[1.1 1.3], message: "%{value} is not a valid LTI version" }
   validate :url_or_domain_is_set
   validate :validate_urls
-  serialize :settings
   attr_reader :config_type, :config_url, :config_xml
+
+  # handles both serialized Hashes and HashWithIndifferentAccesses
+  # and always returns a HashWithIndifferentAccess
+  #
+  # would LOVE to rip this out and not store everything in `settings`
+  class SettingsSerializer
+    def self.load(value)
+      return nil unless value
+
+      obj = YAML.safe_load(value)
+      if obj.respond_to? :with_indifferent_access
+        return obj.with_indifferent_access
+      end
+
+      obj
+    end
+
+    def self.dump(value)
+      YAML.dump(value)
+    end
+  end
+  serialize :settings, SettingsSerializer
 
   # add_identity_hash needs to calculate off of other data in the object, so it
   # should always be the last field change callback to run
@@ -440,7 +461,7 @@ class ContextExternalTool < ActiveRecord::Base
   private :validate_url
 
   def settings
-    read_or_initialize_attribute(:settings, {})
+    read_or_initialize_attribute(:settings, {}.with_indifferent_access)
   end
 
   def label_for(key, lang = nil)
