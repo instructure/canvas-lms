@@ -134,6 +134,12 @@ describe CC::BasicLTILinks do
         expect(xml_doc.at_xpath('//blti:extensions/lticm:property[@name="tool_id"]').text).to eq tool.tool_id
       end
 
+      it "adds the lti_version" do
+        subject.create_blti_link(tool, lti_doc)
+        xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
+        expect(xml_doc.at_xpath('//blti:extensions/lticm:property[@name="lti_version"]').text).to eq tool.lti_version
+      end
+
       it "adds the privacy level if there is a workflow_state on the tool" do
         tool.workflow_state = "email_only"
         subject.create_blti_link(tool, lti_doc)

@@ -2831,4 +2831,27 @@ describe ContextExternalTool do
       end
     end
   end
+
+  describe "lti_version" do
+    let(:tool) { external_tool_model }
+
+    it "can be 1.1" do
+      tool.lti_version = "1.1"
+      expect(tool.save).to eq true
+    end
+
+    it "can be 1.3" do
+      tool.lti_version = "1.3"
+      expect(tool.save).to eq true
+    end
+
+    it "can't be any other value" do
+      tool.lti_version = "2.0"
+      expect(tool.save).to eq false
+    end
+
+    it "defaults to 1.1" do
+      expect(tool.lti_version).to eq "1.1"
+    end
+  end
 end

@@ -86,12 +86,49 @@ describe Importers::ContextExternalToolImporter do
       {
         title: "LTI 1.3 Tool",
         url: "http://www.example.com",
+        lti_version: "1.3",
         settings: settings
       }
     end
 
     it "sets the developer key id" do
       expect(subject.developer_key).to eq developer_key
+    end
+
+    it "sets the lti_version" do
+      expect(subject.lti_version).to eq "1.3"
+    end
+
+    context "when lti_version isn't present in hash" do
+      before do
+        tool_hash.delete :lti_version
+      end
+
+      context "but developer_key is present" do
+        it "sets the lti_version" do
+          expect(subject.lti_version).to eq "1.3"
+        end
+      end
+
+      context "but use_1_3 is present in settings" do
+        before do
+          settings[:use_1_3] = true
+        end
+
+        it "sets the lti_version" do
+          expect(subject.lti_version).to eq "1.3"
+        end
+      end
+
+      context "without developer_key" do
+        before do
+          settings.delete :client_id
+        end
+
+        it "defaults lti_version to 1.1" do
+          expect(subject.lti_version).to eq "1.1"
+        end
+      end
     end
 
     it "does not show LTI 1 warnings" do
