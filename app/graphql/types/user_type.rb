@@ -187,6 +187,7 @@ module Types
         load_association(:all_conversations).then do
           conversations_scope = case scope
                                 when "unread"
+                                  InstStatsd::Statsd.increment("inbox.visit.scope.unread.pages_loaded.react")
                                   object.conversations.unread
                                 when "starred"
                                   object.starred_conversations
