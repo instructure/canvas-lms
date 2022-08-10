@@ -45,6 +45,29 @@ describe CoursePaceDueDatesCalculator do
       )
     end
 
+    it "respects calendar event blackout dates" do
+      @course.calendar_events.create! title: "Calendar Event Blackout test",
+                                      start_at: "Wed, 1 Sep 2021 06:00:00.000000000 UTC +00:00",
+                                      end_at: "Wed, 8 Sep 2021 06:00:00.000000000 UTC +00:00",
+                                      blackout_date: true
+      expect(@calculator.get_due_dates(@course_pace_module_items)).to eq(
+        { @course_pace_module_item.id => Date.parse("2021-09-09") }
+      )
+    end
+
+    it "respects calendar event blackout dates and regular blackout dates" do
+      @course.calendar_events.create! title: "Calendar Event Blackout test",
+                                      start_at: "Wed, 1 Sep 2021 06:00:00.000000000 UTC +00:00",
+                                      end_at: "Wed, 8 Sep 2021 06:00:00.000000000 UTC +00:00",
+                                      blackout_date: true
+      @course.blackout_dates.create! event_title: "Blackout test",
+                                     start_date: "2021-09-09",
+                                     end_date: "2021-09-12"
+      expect(@calculator.get_due_dates(@course_pace_module_items)).to eq(
+        { @course_pace_module_item.id => Date.parse("2021-09-13") }
+      )
+    end
+
     it "respects skipping weekends" do
       @course.blackout_dates.create! event_title: "Blackout test", start_date: "2021-09-01", end_date: "2021-09-03"
       expect(@calculator.get_due_dates(@course_pace_module_items)).to eq(
