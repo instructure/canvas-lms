@@ -27,5 +27,5 @@ group :development do
 
   gem "byebug", "11.1.3", platform: :mri
   gem "debase", "0.2.5.beta2", require: false
-  gem "ruby-debug-ide", "0.7.2", require: false
+  gem "ruby-debug-ide", "0.7.3", require: false
 end
