@@ -28,7 +28,7 @@ class CoursePaceDueDatesCalculator
     due_dates = {}
     # Ensure UTC for calculations against the database values
     enrollment_start_date = enrollment&.start_at || [enrollment&.effective_start_at, enrollment&.created_at].compact.max
-    start_date = start_date || enrollment_start_date&.utc&.to_date || course_pace.start_date
+    start_date = start_date || enrollment_start_date&.utc&.to_date || course_pace.start_date.to_date
     # We have to make sure we start counting on a day that is enabled
     unless CoursePacesDateHelpers.day_is_enabled?(start_date, course_pace.exclude_weekends, blackout_dates)
       start_date = CoursePacesDateHelpers.first_enabled_day(start_date, course_pace.exclude_weekends, blackout_dates)
@@ -55,6 +55,13 @@ class CoursePaceDueDatesCalculator
   private
 
   def blackout_dates
-    @blackout_dates ||= course_pace.course.blackout_dates
+    @blackout_dates ||= course_pace.course.blackout_dates + calendar_event_blackout_dates
+  end
+
+  def calendar_event_blackout_dates
+    account_codes =
+      Account.multi_account_chain_ids([course_pace.course.account.id]).map { |id| "account_#{id}" }
+    context_codes = account_codes.append("course_#{course_pace.course.id}")
+    CalendarEvent.with_blackout_date.active.for_context_codes(context_codes)
   end
 end

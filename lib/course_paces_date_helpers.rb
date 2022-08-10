@@ -57,10 +57,14 @@ module CoursePacesDateHelpers
 
     def business_time_config(exclude_weekends, blackout_dates)
       work_week = exclude_weekends ? %i[mon tue wed thu fri] : %i[sun mon tue wed thu fri sat]
-
-      holidays = blackout_dates.map do |blackout_date|
-        (blackout_date.start_date..blackout_date.end_date).to_a
-      end.flatten
+      holidays =
+        blackout_dates.map do |blackout_date|
+          if blackout_date.is_a?(CalendarEvent)
+            (blackout_date.start_at.to_date..blackout_date.end_at.to_date).to_a
+          else
+            (blackout_date.start_date..blackout_date.end_date).to_a
+          end
+        end.flatten
 
       {
         work_week: work_week,
