@@ -7265,5 +7265,32 @@ describe Course do
         expect(InstStatsd::Statsd).to have_received(:timing).with("course.unpaced.create_to_publish_time", publish_time).once
       end
     end
+
+    context "assignment count when course is published" do
+      before do
+        Account.default.enable_feature!(:course_paces)
+        allow(InstStatsd::Statsd).to receive(:count)
+        @course = Course.create!
+        create_assignments([@course.id], 2)
+      end
+
+      it "logs assignment count in the paced bucket if course pacing is enabled" do
+        @course.offer!
+        expect(InstStatsd::Statsd).to have_received(:count).with("course.unpaced.assignment_count", 2).once
+      end
+
+      it "only logs published assignments" do
+        @course.assignments.last.unpublish
+        @course.offer!
+        expect(InstStatsd::Statsd).to have_received(:count).with("course.unpaced.assignment_count", 1).once
+      end
+
+      it "logs assignment count in the unpaced bucket if course pacing is enabled" do
+        @course.enable_course_paces = true
+        @course.save!
+        @course.offer!
+        expect(InstStatsd::Statsd).to have_received(:count).with("course.paced.assignment_count", 2).once
+      end
+    end
   end
 end
