@@ -277,6 +277,7 @@ class ConversationsController < ApplicationController
       if params[:include_all_conversation_ids]
         @conversations_json = { conversations: @conversations_json, conversation_ids: @conversations_scope.conversation_ids }
       end
+      InstStatsd::Statsd.increment("inbox.visit.scope.unread.pages_loaded.legacy") if params[:scope] == "unread"
       render json: @conversations_json
     else
       return redirect_to conversations_path(scope: params[:redirect_scope]) if params[:redirect_scope]
