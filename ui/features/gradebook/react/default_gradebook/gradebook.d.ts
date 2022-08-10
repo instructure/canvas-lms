@@ -75,7 +75,6 @@ export type GradebookOptions = {
   grading_period_set: GradingPeriodSet
   grading_standard: boolean
   group_weighting_scheme: string
-  load_assignments_by_grading_period_enabled: boolean
   locale: string
   outcome_gradebook_enabled: boolean
   post_grades_feature: string

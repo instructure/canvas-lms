@@ -406,8 +406,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.dataLoader = new DataLoader({
       gradebook: this,
       dispatch: props.dispatch,
-      performanceControls: props.performanceControls,
-      loadAssignmentsByGradingPeriod: this.options.load_assignments_by_grading_period_enabled
+      performanceControls: props.performanceControls
     })
     if (this.courseFeatures.finalGradeOverrideEnabled) {
       this.finalGradeOverrides = new FinalGradeOverrides(this)

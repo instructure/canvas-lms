@@ -27,17 +27,15 @@ import StudentContentDataLoader from './StudentContentDataLoader'
 import StudentIdsLoader from './StudentIdsLoader'
 
 export default class DataLoader {
-  constructor({dispatch, gradebook, performanceControls, loadAssignmentsByGradingPeriod}) {
+  constructor({dispatch, gradebook, performanceControls}) {
     this._gradebook = gradebook
 
     const loaderConfig = {
       requestCharacterLimit: 8000, // apache limit
       dispatch,
       gradebook,
-      performanceControls,
-      loadAssignmentsByGradingPeriod
+      performanceControls
     }
-    this.loadAssignmentsByGradingPeriod = loadAssignmentsByGradingPeriod
     this.assignmentGroupsLoader = new AssignmentGroupsLoader(loaderConfig)
     this.customColumnsDataLoader = new CustomColumnsDataLoader(loaderConfig)
     this.customColumnsLoader = new CustomColumnsLoader(loaderConfig)
@@ -119,11 +117,7 @@ export default class DataLoader {
     }
 
     if (options.getAssignmentGroups) {
-      if (
-        this.loadAssignmentsByGradingPeriod &&
-        gotGradingPeriodAssignments &&
-        gradebook.gradingPeriodId !== '0'
-      ) {
+      if (gotGradingPeriodAssignments && gradebook.gradingPeriodId !== '0') {
         // eslint-disable-next-line promise/catch-or-return
         gotGradingPeriodAssignments.then(() => {
           dataLoader.assignmentGroupsLoader.loadAssignmentGroups()

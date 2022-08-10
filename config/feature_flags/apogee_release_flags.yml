@@ -41,13 +41,6 @@ view_ungraded_as_zero:
   description:
     The Gradebook will factor in ungraded submissions as if they were given a score of zero for
     calculations. This is just a view for the teacher, and does not affect actual scoring.
-gradebook_load_assignments_by_grading_period:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Load Gradebook Assignments by Grading Period
-  description:
-    If set, the Gradebook will chunk out loading of assignments, loading those for the selected
-    grading period first.
 grade_calc_ignore_unposted_anonymous:
   state: hidden
   applies_to: RootAccount

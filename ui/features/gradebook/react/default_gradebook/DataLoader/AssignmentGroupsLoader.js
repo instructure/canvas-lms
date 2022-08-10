@@ -17,17 +17,10 @@
  */
 
 export default class AssignmentGroupsLoader {
-  constructor({
-    dispatch,
-    gradebook,
-    performanceControls,
-    loadAssignmentsByGradingPeriod,
-    requestCharacterLimit
-  }) {
+  constructor({dispatch, gradebook, performanceControls, requestCharacterLimit}) {
     this._dispatch = dispatch
     this._gradebook = gradebook
     this._performanceControls = performanceControls
-    this.loadAssignmentsByGradingPeriod = loadAssignmentsByGradingPeriod
     this.requestCharacterLimit = requestCharacterLimit
     this.pathName = `/api/v1/courses/${this._gradebook.course.id}/assignment_groups`
   }
@@ -61,7 +54,7 @@ export default class AssignmentGroupsLoader {
     }
 
     const periodId = this._gradingPeriodId()
-    if (periodId && this.loadAssignmentsByGradingPeriod) {
+    if (periodId) {
       return this._loadAssignmentGroupsForGradingPeriods(params, periodId)
     }
 
@@ -77,9 +70,7 @@ export default class AssignmentGroupsLoader {
       return `${encodeURIComponent(key)}=${encodeURIComponent(val)}`
     }
 
-    const queryString = Object.entries(params)
-      .map(createQueryString)
-      .join('&')
+    const queryString = Object.entries(params).map(createQueryString).join('&')
     const currentURI = `${window.location.hostname}${this.pathName}?${queryString}`
     const charsAvailable = this.requestCharacterLimit - `${currentURI}&assignment_ids=`.length
     const globalIdLength = 8

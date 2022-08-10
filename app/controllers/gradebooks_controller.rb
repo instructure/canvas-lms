@@ -442,7 +442,6 @@ class GradebooksController < ApplicationController
       group_weighting_scheme: @context.group_weighting_scheme,
       has_modules: @context.has_modules?,
       late_policy: @context.late_policy.as_json(include_root: false),
-      load_assignments_by_grading_period_enabled: Account.site_admin.feature_enabled?(:gradebook_load_assignments_by_grading_period),
       login_handle_name: root_account.settings[:login_handle_name],
       message_attachment_upload_folder_id: @current_user.conversation_attachments_folder.id.to_s,
       new_gradebook_development_enabled: new_gradebook_development_enabled?,
