@@ -279,6 +279,7 @@ class Course < ActiveRecord::Base
   after_create :copy_from_course_template
 
   after_update :clear_cached_short_name, if: :saved_change_to_course_code?
+  after_update :log_create_to_publish_time, if: :saved_change_to_workflow_state?
 
   before_update :handle_syllabus_changes_for_master_migration
 
@@ -4086,5 +4087,14 @@ class Course < ActiveRecord::Base
       content_migration.save!
       content_migration.queue_migration
     end
+  end
+
+  def log_create_to_publish_time
+    valid_workflow_states = %w[created claimed]
+    return unless available? && valid_workflow_states.include?(workflow_state_before_last_save)
+
+    publish_time = ((updated_at - created_at) * 1000).round
+    statsd_bucket = account.feature_enabled?(:course_paces) && enable_course_paces? ? "paced" : "unpaced"
+    InstStatsd::Statsd.timing("course.#{statsd_bucket}.create_to_publish_time", publish_time)
   end
 end
