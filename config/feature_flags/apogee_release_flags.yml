@@ -76,12 +76,6 @@ gradebook_csv_export_order_matches_gradebook_grid:
   environments:
     ci:
       state: on # enable for automated testings builds and local testing
-edit_submission_status_from_speedgrader:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Edit Submission Status from Speedgrader
-  description: If set, allows submission status to be changed from inside of
-    Speedgrader
 enhanced_gradebook_filters:
   beta: true
   state: allowed

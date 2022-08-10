@@ -399,7 +399,6 @@ describe "Speedgrader" do
 
     context "submission status" do
       before do
-        Account.site_admin.enable_feature!(:edit_submission_status_from_speedgrader)
         assignment = @course.assignments.create!(points_possible: 20)
         @submission = assignment.submissions.find_by!(user: @students[0])
         @submission.update!(late_policy_status: "missing")
@@ -1072,7 +1071,7 @@ describe "Speedgrader" do
     end
 
     it "opens and closes keyboard shortcut modal via blue info icon", priority: "2" do
-      skip 'EVAL-2497 (6/10/22)'
+      skip "EVAL-2497 (6/10/22)"
 
       Speedgrader.click_settings_link
       expect(Speedgrader.keyboard_shortcuts_link).to be_displayed

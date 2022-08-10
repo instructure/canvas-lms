@@ -28,8 +28,6 @@ describe "speed grader" do
   include AssignmentsCommon
 
   before(:once) do
-    Account.site_admin.enable_feature!(:edit_submission_status_from_speedgrader)
-
     course_with_teacher(name: "Teacher1", active_user: true, active_enrollment: true, active_course: true).user
     student_in_course(name: "Student1", active_all: true).user
 
