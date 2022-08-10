@@ -4,6 +4,9 @@
     "BuilderMethodWithSideEffects": {
       "enabled": false
     },
+    "CatchException": {
+      "enabled": false
+    },
     "ClassJavadoc": {
       "enabled": false
     },
