@@ -515,4 +515,35 @@ describe CoursePace do
       expect(result[:end_date_context]).to eq("hypothetical")
     end
   end
+
+  context "course pace creates" do
+    before :once do
+      course_with_student active_all: true
+      @course.root_account.enable_feature!(:course_paces)
+      @course.enable_course_paces = true
+      @course.save!
+      @module = @course.context_modules.create!
+      @assignment = @course.assignments.create!
+      @tag = @assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
+    end
+
+    it "writes the number of course-type course paces to statsd" do
+      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      @course_pace = @course.course_paces.create! workflow_state: "active"
+      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.course_paces.count").once
+    end
+
+    it "writes the number of section-type course paces to statsd" do
+      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      @new_section = @course.course_sections.create! name: "new_section"
+      @section_plan = @course.course_paces.create! course_section: @new_section
+      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.section_paces.count").once
+    end
+
+    it "writes the number of user-type course paces to statsd" do
+      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      @course.course_paces.create!(user: @student, workflow_state: "active")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.user_paces.count").once
+    end
+  end
 end

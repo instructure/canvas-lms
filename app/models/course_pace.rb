@@ -39,6 +39,8 @@ class CoursePace < ActiveRecord::Base
   belongs_to :user
   belongs_to :root_account, class_name: "Account"
 
+  after_create :log_pace_counts
+
   validates :course_id, presence: true
   validate :valid_secondary_context
 
@@ -274,6 +276,16 @@ class CoursePace < ActiveRecord::Base
       { end_date: date&.in_time_zone(course.time_zone), end_date_context: context }
     else
       date&.in_time_zone(course.time_zone)
+    end
+  end
+
+  def log_pace_counts
+    if course_section_id.present?
+      InstStatsd::Statsd.increment("course_pacing.section_paces.count")
+    elsif user_id.present?
+      InstStatsd::Statsd.increment("course_pacing.user_paces.count")
+    else
+      InstStatsd::Statsd.increment("course_pacing.course_paces.count")
     end
   end
 end

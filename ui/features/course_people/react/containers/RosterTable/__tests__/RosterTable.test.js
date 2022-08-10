@@ -122,7 +122,10 @@ describe('RosterTable', () => {
   beforeEach(() => {
     window.ENV = {
       course: {id: '1'},
-      current_user: {id: '999'}
+      current_user: {id: '999'},
+      permissions: {
+        view_user_logins: true
+      }
     }
   })
 
@@ -245,6 +248,21 @@ describe('RosterTable', () => {
         const status = PILL_MAP[userStatus[index]].text
         expect(within(cell).getByText(status)).toBeInTheDocument()
       }
+    })
+  })
+
+  it('should not show the login ID column if the view_user_logins permission is false', async () => {
+    window.ENV.permissions.view_user_logins = false
+    const container = setup(getRosterQueryMock({mockUsers}))
+
+    // Check there is no column header
+    const rows = await container.findAllByTestId('roster-table-data-row')
+    expect(container.queryAllByTestId('colheader-login-id')).toHaveLength(0)
+
+    // Check there is no login id data
+    const loginIdByUser = mockUsers.map(user => user.node.enrollments[0].loginId)
+    rows.forEach((row, index) => {
+      loginIdByUser[index] && expect(queryAllByText(row, loginIdByUser[index])).toHaveLength(0)
     })
   })
 })
