@@ -40,6 +40,7 @@ class ContextExternalTool < ActiveRecord::Base
   validates :config_url, presence: { if: ->(t) { t.config_type == "by_url" } }
   validates :config_xml, presence: { if: ->(t) { t.config_type == "by_xml" } }
   validates :domain, length: { maximum: 253, allow_blank: true }
+  validates :lti_version, inclusion: { in: %w[1.1 1.3], message: "%{value} is not a valid LTI version" }
   validate :url_or_domain_is_set
   validate :validate_urls
   serialize :settings
