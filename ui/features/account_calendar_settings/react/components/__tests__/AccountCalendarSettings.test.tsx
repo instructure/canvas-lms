@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, act, waitFor} from '@testing-library/react'
+import {render, act, waitFor, fireEvent} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
@@ -65,5 +65,41 @@ describe('AccountCalendarSettings', () => {
     act(() => applyButton.click())
     await waitFor(() => expect(getByText('Loading accounts')).toBeInTheDocument())
     expect((await findAllByText('Updated 1 account'))[0]).toBeInTheDocument()
+  })
+
+  it('renders account tree when no filters are applied', async () => {
+    const {findByRole, getByLabelText} = render(<AccountCalendarSettings {...defaultProps} />)
+    await findByRole('button', {name: 'University (24)'})
+    expect(
+      getByLabelText(
+        'Accounts tree: navigate the accounts tree hierarchically to toggle account calendar visibility'
+      )
+    ).toBeInTheDocument()
+  })
+
+  it('renders account list when filters are applied', async () => {
+    const {findByRole, getByLabelText, findByText, getByPlaceholderText} = render(
+      <AccountCalendarSettings {...defaultProps} />
+    )
+    await findByRole('button', {name: 'University (24)'})
+    fetchMock.restore()
+    fetchMock.get('/api/v1/accounts/1/account_calendars?search_term=elemen', [
+      {
+        id: '134',
+        name: 'West Elementary School',
+        parent_account_id: '1',
+        root_account_id: '0',
+        visible: true,
+        sub_account_count: 0
+      }
+    ])
+    const search = getByPlaceholderText('Search Calendars')
+    fireEvent.change(search, {target: {value: 'elemen'}})
+    expect(await findByText('West Elementary School')).toBeInTheDocument()
+    expect(
+      getByLabelText(
+        'Accounts tree: navigate the accounts tree hierarchically to toggle account calendar visibility'
+      )
+    ).not.toBeVisible()
   })
 })

@@ -26,9 +26,11 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashError, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-import {FilterControls} from './FilterControls'
+import {AccountList} from './AccountList'
 import {AccountTree} from './AccountTree'
+import {FilterControls, FilterType} from './FilterControls'
 import {Footer} from './Footer'
+import {VisibilityChange} from '../types'
 
 const I18n = useI18nScope('account_calendar_settings')
 
@@ -39,8 +41,10 @@ type ComponentProps = {
 const BORDER_WIDTH = 'small'
 
 export const AccountCalendarSettings: React.FC<ComponentProps> = ({accountId}) => {
-  const [visibilityChanges, setVisibilityChanges] = useState<{id: number; visible: boolean}[]>([])
+  const [visibilityChanges, setVisibilityChanges] = useState<VisibilityChange[]>([])
   const [isLoading, setLoading] = useState(false)
+  const [searchValue, setSearchValue] = useState('')
+  const [filterValue, setFilterValue] = useState(FilterType.SHOW_ALL)
 
   const onAccountToggled = (id: number, visible: boolean) => {
     const existingChange = visibilityChanges.find(change => change.id === id)
@@ -55,7 +59,7 @@ export const AccountCalendarSettings: React.FC<ComponentProps> = ({accountId}) =
 
   const onApplyClicked = () => {
     setLoading(true)
-    doFetchApi<{message: string}>({
+    doFetchApi({
       path: `/api/v1/accounts/${accountId}/account_calendars`,
       method: 'PUT',
       body: visibilityChanges
@@ -70,6 +74,8 @@ export const AccountCalendarSettings: React.FC<ComponentProps> = ({accountId}) =
       })
   }
 
+  const showTree = searchValue === '' && filterValue === FilterType.SHOW_ALL
+
   return (
     <section>
       <Heading as="h1" level="h2" margin="small 0">
@@ -82,14 +88,31 @@ export const AccountCalendarSettings: React.FC<ComponentProps> = ({accountId}) =
       </Text>
 
       <View as="div" borderWidth={`${BORDER_WIDTH}`} margin="medium 0 0">
-        <FilterControls onSearchTextChanged={() => null} onFilterTypeChanged={() => null} />
+        <FilterControls
+          searchValue={searchValue}
+          filterValue={filterValue}
+          setSearchValue={setSearchValue}
+          setFilterValue={setFilterValue}
+        />
       </View>
       <View as="div" borderWidth={`0 ${BORDER_WIDTH} ${BORDER_WIDTH} ${BORDER_WIDTH}`}>
-        <AccountTree
-          originAccountId={accountId}
-          onAccountToggled={onAccountToggled}
-          showSpinner={isLoading}
-        />
+        <div style={{display: showTree ? 'block' : 'none'}}>
+          <AccountTree
+            originAccountId={accountId}
+            visibilityChanges={visibilityChanges}
+            onAccountToggled={onAccountToggled}
+            showSpinner={isLoading}
+          />
+        </div>
+        <div style={{display: showTree ? 'none' : 'block'}}>
+          <AccountList
+            originAccountId={accountId}
+            searchValue={searchValue}
+            filterValue={filterValue}
+            visibilityChanges={visibilityChanges}
+            onAccountToggled={onAccountToggled}
+          />
+        </div>
       </View>
       <View
         as="div"

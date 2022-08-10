@@ -25,6 +25,7 @@ import {RESPONSE_ACCOUNT_1, RESPONSE_ACCOUNT_4} from '../../__tests__/fixtures'
 
 const defaultProps = {
   originAccountId: 1,
+  visibilityChanges: [],
   onAccountToggled: jest.fn(),
   showSpinner: false
 }

@@ -22,7 +22,7 @@ import {Collection, AccountData, Account} from './types'
 
 const I18n = useI18nScope('account_calendar_settings_utils')
 
-const castIdsToInt = (accounts: AccountData[]): Account[] =>
+export const castIdsToInt = (accounts: AccountData[]): Account[] =>
   accounts.map(account => ({
     ...account,
     id: parseInt(account.id, 10),
@@ -52,7 +52,7 @@ export const addAccountsToTree = (
           subaccountCount: account.sub_account_count
         }),
         collections: [],
-        children: [{id: account.id, name: account.name, calendarVisible: account.visible}]
+        children: [{id: account.id, name: account.name, visible: account.visible}]
       }
       if (account.id !== originAccountId) {
         newCollections[account.parent_account_id!].collections.push(account.id)
@@ -69,7 +69,7 @@ export const addAccountsToTree = (
     ) {
       newCollections[account.parent_account_id!].children = [
         ...newCollections[account.parent_account_id!].children,
-        {id: account.id, name: account.name, calendarVisible: account.visible}
+        {id: account.id, name: account.name, visible: account.visible}
       ]
     }
   })

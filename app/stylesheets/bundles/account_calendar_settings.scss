@@ -19,6 +19,7 @@
 // These css overrides were required because the TreeBrowser component does not
 // support setting these attributes as theme overrides.
 #account-tree {
+  // Make the up/right arrows a consistent size
   svg[name='IconMiniArrowDown'], svg[name='IconMiniArrowEnd'] {
     width: 1.25rem !important;
     height: 1.25rem !important;
@@ -26,5 +27,12 @@
 
   button {
     font-weight: bold;
+  }
+
+  // Remove the bounce and fade animations
+  li[role="treeitem"] div, li[role="treeitem"] button {
+    transform: none;
+    animation: none;
+    opacity: 1;
   }
 }
