@@ -290,7 +290,7 @@
     "jest-moxios-utils": "^1",
     "jsdom-global": "^3.0.2",
     "json-loader": "^0.5.7",
-    "karma": "^3",
+    "karma": "^6",
     "karma-chrome-launcher": "^2",
     "karma-coverage-istanbul-reporter": "^2",
     "karma-junit-reporter": "^1",
