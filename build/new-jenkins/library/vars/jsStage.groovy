@@ -33,6 +33,36 @@ def jestNodeRequirementsTemplate(index) {
   ]
 }
 
+def getSeleniumGridContainers(count) {
+  def baseChromeContainer = [
+    image: "starlord.inscloudgate.net/jenkins/selenium-node-chrome:101.0",
+    ttyEnabled: true,
+  ]
+
+  def baseChromeEnvVars = [
+    SE_EVENT_BUS_HOST: "selenium-hub",
+    SE_EVENT_BUS_PUBLISH_PORT: 4442,
+    SE_EVENT_BUS_SUBSCRIBE_PORT: 4443,
+    HUB_PORT_4444_TCP_ADDR: "selenium-hub",
+    HUB_PORT_4444_TCP_PORT: 4444,
+    JAVA_OPTS: '-Dwebdriver.chrome.whitelistedIps='
+  ]
+
+  return (0..count).collect { index ->
+    baseChromeContainer + [name: "selenium-chrome${index}", envVars: baseChromeEnvVars + [SE_NODE_HOST: "selenium-chrome${index}"]]
+  } + [
+    [
+      name: 'selenium-hub',
+      image: "starlord.inscloudgate.net/jenkins/selenium-hub:4.1",
+      ttyEnabled: true,
+      envVars: [
+        GRID_BROWSER_TIMEOUT: 3000
+      ],
+      ports: [4442, 4443, 4444]
+    ]
+  ]
+}
+
 def coffeeNodeRequirementsTemplate() {
   def baseTestContainer = [
     image: env.KARMA_RUNNER_IMAGE,
@@ -40,7 +70,10 @@ def coffeeNodeRequirementsTemplate() {
   ]
 
   return [
-    containers: (0..COFFEE_NODE_COUNT).collect { index -> baseTestContainer + [name: "coffee${index}"] }
+    containers: (0..COFFEE_NODE_COUNT).collect { index ->
+      def portNumber = 9876 + index
+      baseTestContainer + [name: "coffee${index}", ports: [portNumber], envVars: [KARMA_BROWSER: 'ChromeSeleniumGridHeadless', KARMA_PORT: portNumber]]
+    } + getSeleniumGridContainers(COFFEE_NODE_COUNT)
   ]
 }
 
@@ -52,22 +85,34 @@ def karmaNodeRequirementsTemplate() {
 
   def karmaContainers = []
 
-  karmaContainers = karmaContainers + (0..JSG_NODE_COUNT).collect { index -> baseTestContainer + [name: "jsg${index}"] }
-  karmaContainers = karmaContainers + ['jsa', 'jsh'].collect { group -> baseTestContainer + [name: group] }
+  karmaContainers = karmaContainers + (0..JSG_NODE_COUNT).collect { index ->
+    def portNumber = 9876 + index
+    baseTestContainer + [name: "jsg${index}", ports: [portNumber], envVars: [KARMA_BROWSER: 'ChromeSeleniumGridHeadless', KARMA_PORT: portNumber]]
+  }
+
+  karmaContainers = karmaContainers + ['jsa', 'jsh'].collect { group ->
+    def portNumber = group == 'jsa' ? 9875 : 9874
+    baseTestContainer + [name: group, ports: [portNumber], envVars: [KARMA_BROWSER: 'ChromeSeleniumGridHeadless', KARMA_PORT: portNumber]]
+  }
 
   return [
-    containers: karmaContainers,
+    containers: karmaContainers + getSeleniumGridContainers(JSG_NODE_COUNT + 2),
   ]
 }
 
 def packagesNodeRequirementsTemplate() {
   def baseTestContainer = [
     image: env.KARMA_RUNNER_IMAGE,
-    command: 'cat'
+    command: 'cat',
+    ports: [9876],
+    envVars: [
+      SELENIUM_SERVER: 'http://selenium-hub:4444/wd/hub',
+      TESTCAFE_PROVIDER: 'selenium:chrome'
+    ]
   ]
 
   return [
-    containers: [baseTestContainer + [name: "packages"]],
+    containers: [baseTestContainer + [name: "packages"]] + getSeleniumGridContainers(1),
   ]
 }
 
