@@ -124,7 +124,8 @@ describe('RosterTable', () => {
       course: {id: '1'},
       current_user: {id: '999'},
       permissions: {
-        view_user_logins: true
+        view_user_logins: true,
+        read_sis: true
       }
     }
   })
@@ -263,6 +264,21 @@ describe('RosterTable', () => {
     const loginIdByUser = mockUsers.map(user => user.node.enrollments[0].loginId)
     rows.forEach((row, index) => {
       loginIdByUser[index] && expect(queryAllByText(row, loginIdByUser[index])).toHaveLength(0)
+    })
+  })
+
+  it('should not show the SIS ID column if the read_sis permission is false', async () => {
+    window.ENV.permissions.read_sis = false
+    const container = setup(getRosterQueryMock({mockUsers}))
+    const rows = await container.findAllByTestId('roster-table-data-row')
+    const sisIdByUser = mockUsers.map(user => user.node.enrollments[0].sisId)
+
+    // Check there is no column header
+    expect(container.queryAllByTestId('colheader-sis-id')).toHaveLength(0)
+
+    // Check there is no SIS ID data
+    rows.forEach((row, index) => {
+      sisIdByUser[index] && expect(queryAllByText(row, sisIdByUser[index])).toHaveLength(0)
     })
   })
 })
