@@ -1088,7 +1088,7 @@ class GradebooksController < ApplicationController
   def update_final_grade_overrides
     return unless authorized_action(@context, @current_user, :manage_grades)
 
-    unless @context.allow_final_grade_override? && Account.site_admin.feature_enabled?(:import_override_scores_in_gradebook)
+    unless @context.allow_final_grade_override?
       render_unauthorized_action and return
     end
 
