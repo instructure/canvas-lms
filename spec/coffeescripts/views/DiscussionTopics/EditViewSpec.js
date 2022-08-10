@@ -40,7 +40,8 @@ const editView = function (opts = {}, discussOpts = {}) {
   if (opts.withAssignment) {
     const assignmentOpts = extend({}, opts.assignmentOpts, {
       name: 'Test Assignment',
-      assignment_overrides: []
+      assignment_overrides: [],
+      graded_submissions_exist: true
     })
     discussOpts.assignment = assignmentOpts
   }
@@ -333,6 +334,22 @@ test('renders anonymous section with full_anonymity checked', function () {
     permissions: {CAN_MODERATE: true}
   })
   equal(view.$el.find('input[name=anonymous_state][value=full_anonymity]:checked').length, 1)
+})
+
+test("renders 'points' as editable when user has grade-edit permissions", function () {
+  const view = this.editView({
+    permissions: {CAN_EDIT_GRADES: true},
+    withAssignment: true
+  })
+  notOk(view.$el.find('#discussion_topic_assignment_points_possible').attr('readonly'))
+})
+
+test("renders 'points' as readonly when user has grade-edit permissions", function () {
+  const view = this.editView({
+    permissions: {CAN_EDIT_GRADES: false},
+    withAssignment: true
+  })
+  ok(view.$el.find('#discussion_topic_assignment_points_possible').attr('readonly'))
 })
 
 QUnit.module(
