@@ -1853,6 +1853,16 @@ describe ExternalToolsController do
       expect(json["errors"]["config_url"][0]["message"]).to eq "Invalid URL"
     end
 
+    it "stores placement config using string key" do
+      expect(CanvasHttp).to receive(:insecure_host?).with("localhost").and_return(true)
+      user_session(@teacher)
+
+      post "create", params: { course_id: @course.id, external_tool: { name: "tool name", url: "http://example.com",
+                                                                       consumer_key: "key", shared_secret: "secret", config_type: "by_url",
+                                                                       config_url: "http://localhost:9001", course_navigation: { enabled: true } } }, format: "json"
+      expect(assigns[:tool].settings).to have_key "course_navigation"
+    end
+
     context "navigation tabs caching" do
       it "does not clear the navigation tabs cache for non navigtaion tools" do
         enable_cache do

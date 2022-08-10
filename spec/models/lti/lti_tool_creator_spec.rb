@@ -19,12 +19,13 @@
 #
 
 describe(Lti::LtiToolCreator) do
+  let(:settings) { { url: "/some/url" }.with_indifferent_access }
   let(:context_external_tool) do
     ContextExternalTool.new.tap do |tool|
       tool.name = "tool"
       tool.consumer_key = "12345"
       tool.shared_secret = "secret"
-      tool.settings = { url: "/some/url" }
+      tool.settings = settings
     end
   end
 
@@ -33,7 +34,7 @@ describe(Lti::LtiToolCreator) do
     expect(lti_tool.name).to eq "tool"
     expect(lti_tool.consumer_key).to eq "12345"
     expect(lti_tool.shared_secret).to eq "secret"
-    expect(lti_tool.settings).to eq({ url: "/some/url" })
+    expect(lti_tool.settings).to eq(settings)
   end
 
   describe "privacy level" do

@@ -41,10 +41,10 @@ describe DataFixup::UpdateMasteryConnectToolConfig do
 
     it "does not modify settings if placement already exists" do
       settings = {
-        "submission_type_selection" => {
+        submission_type_selection: {
           foo: "bar"
         }
-      }
+      }.with_indifferent_access
       tool = external_tool_model(context: @course, opts: { domain: "app.masteryconnect.com", settings: settings })
       DataFixup::UpdateMasteryConnectToolConfig.run
       tool.reload

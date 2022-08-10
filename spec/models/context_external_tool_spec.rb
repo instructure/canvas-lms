@@ -2104,9 +2104,10 @@ describe ContextExternalTool do
     end
 
     it "ignores environments fields" do
-      tool.settings["environments"] = { launch_url: "http://www.google.com/" }
+      environments = { launch_url: "http://www.google.com/" }.with_indifferent_access
+      tool.settings["environments"] = environments
       tool.change_domain! new_host
-      expect(tool.settings["environments"]).to eq({ launch_url: "http://www.google.com/" })
+      expect(tool.settings["environments"]).to eq(environments)
     end
 
     it "ignores an existing invalid url" do
@@ -2959,6 +2960,50 @@ describe ContextExternalTool do
 
     context "with a correctly configured 1.3 tool" do
       it { is_expected.to eq true }
+    end
+  end
+
+  describe "settings serialization" do
+    let(:tool) do
+      t = @course.context_external_tools.create(
+        name: "a",
+        consumer_key: "12345",
+        shared_secret: "secret",
+        url: "http://example.com/launch"
+      )
+      t.save!
+      t
+    end
+
+    describe "during tool creation" do
+      it "defaults to indifferent access hash" do
+        tool.settings # read and initialize to default value
+        expect(tool.attributes_before_type_cast["settings"]).to include("!ruby/hash:ActiveSupport::HashWithIndifferentAccess")
+      end
+    end
+
+    describe "reading `settings`" do
+      context "when settings is serialized as a Hash" do
+        before do
+          tool.settings = { hello: "world" }
+          tool.save!
+        end
+
+        it "presents as a HashWithIndifferentAccess" do
+          expect(tool.reload.settings.class).to eq(ActiveSupport::HashWithIndifferentAccess)
+        end
+      end
+
+      context "when settings is serialized as a HashWithIndifferentAccess" do
+        before do
+          tool.settings = { hello: "world" }.with_indifferent_access
+          tool.save!
+        end
+
+        it "presents as a HashWithIndifferentAccess" do
+          expect(tool.reload.settings.class).to eq(ActiveSupport::HashWithIndifferentAccess)
+        end
+      end
     end
   end
 end
