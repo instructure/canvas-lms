@@ -89,11 +89,6 @@ enhanced_gradebook_filters:
       this flag is enabled, early access to ongoing improvements will be displayed
       automatically with every release. For full details, please see the *Gradebook
       Filters User Group* in the Canvas Community.
-remove_gradebook_student_search_delay:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Remove Delay for Gradebook Student Search
-  description: If set, removes the delay that normally occurs when searching for students.
 message_observers_of_students_who:
   state: hidden
   applies_to: SiteAdmin

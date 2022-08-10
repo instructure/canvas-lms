@@ -83,7 +83,6 @@ export type GradebookOptions = {
   publish_to_sis_enabled: boolean
   publish_to_sis_url: string
   re_upload_submissions_url: string
-  remove_gradebook_student_search_delay_enabled: boolean
   reorder_custom_columns_url: string
   sections: Section[]
   setting_update_url: string
