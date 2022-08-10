@@ -273,6 +273,7 @@ class Course < ActiveRecord::Base
   after_save :update_account_associations_if_changed
   after_save :update_enrollment_states_if_necessary
   after_save :clear_caches_if_necessary
+  after_save :log_published_assignment_count
   after_commit :update_cached_due_dates
 
   after_create :set_default_post_policy
@@ -4096,5 +4097,13 @@ class Course < ActiveRecord::Base
     publish_time = ((updated_at - created_at) * 1000).round
     statsd_bucket = account.feature_enabled?(:course_paces) && enable_course_paces? ? "paced" : "unpaced"
     InstStatsd::Statsd.timing("course.#{statsd_bucket}.create_to_publish_time", publish_time)
+  end
+
+  def log_published_assignment_count
+    valid_workflow_states = %w[created claimed]
+    return unless available? && valid_workflow_states.include?(workflow_state_before_last_save)
+
+    statsd_bucket = enable_course_paces? ? "paced" : "unpaced"
+    InstStatsd::Statsd.count("course.#{statsd_bucket}.assignment_count", assignments.published.size)
   end
 end
