@@ -305,9 +305,8 @@ class GradebookExporter
   end
 
   def sort_assignments(assignments)
-    feature_enabled = Account.site_admin.feature_enabled?(:gradebook_csv_export_order_matches_gradebook_grid)
     assignment_order = @options[:assignment_order]
-    if feature_enabled && assignment_order.present?
+    if assignment_order.present?
       id_to_index = assignment_order.each_with_object({}).with_index { |(id, hash), index| hash[id] = index }
       assignments.sort! do |a1, a2|
         index1 = id_to_index[a1.id]

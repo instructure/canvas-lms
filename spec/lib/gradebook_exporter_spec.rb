@@ -80,15 +80,6 @@ describe GradebookExporter do
           expect(actual_assignment_headers).to eq format_assignment_headers(custom_assignment_order)
         end
 
-        it "returns assignments ordered by assignment group position when feature is disabled" do
-          expect(Account.site_admin).to receive(:feature_enabled?).with(:gradebook_csv_export_order_matches_gradebook_grid).and_return(false)
-
-          actual_assignment_headers = headers[4, 3]
-          expected_assignment_headers = format_assignment_headers(@assignments)
-
-          expect(actual_assignment_headers).to eq expected_assignment_headers
-        end
-
         it "orders assignments not in the custom order after the assignments in the custom order" do
           custom_assignment_order = [@second_group_assignment, @first_group_assignment]
           @exporter_options[:assignment_order] = custom_assignment_order.map(&:id)
@@ -118,15 +109,6 @@ describe GradebookExporter do
 
       context "when assignment column order preferences do not exist" do
         it "returns assignments ordered by assignment group position" do
-          actual_assignment_headers = headers[4, 3]
-          expected_headers = format_assignment_headers @assignments
-
-          expect(actual_assignment_headers).to eq(expected_headers)
-        end
-
-        it "returns assignments ordered by assignment group position when feature is disabled" do
-          expect(Account.site_admin).to receive(:feature_enabled?).with(:gradebook_csv_export_order_matches_gradebook_grid).and_return(false)
-
           actual_assignment_headers = headers[4, 3]
           expected_headers = format_assignment_headers @assignments
 
