@@ -869,7 +869,7 @@ class GradebookImporter
   end
 
   def allow_override_scores?
-    @context.allow_final_grade_override? && Account.site_admin.feature_enabled?(:import_override_scores_in_gradebook)
+    @context.allow_final_grade_override?
   end
 
   def allow_student_last_first_names?
