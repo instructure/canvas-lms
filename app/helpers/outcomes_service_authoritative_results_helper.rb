@@ -102,6 +102,13 @@ module OutcomesServiceAuthoritativeResultsHelper
     learning_outcome_result
   end
 
+  # Transforms an OS' learning outcome results into a collection of rollups per user
+  def outcome_service_results_rollups(outcome_results)
+    outcome_results.group_by(&:user_id).map do |_, user_results|
+      Rollup.new(user_results.first.user, rollup_user_results(user_results))
+    end
+  end
+
   private
 
   def proficiency(context, outcome)
