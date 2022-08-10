@@ -20,6 +20,8 @@ import canvas from '@instructure/canvas-theme'
 import canvasHighContrast from '@instructure/canvas-high-contrast-theme'
 
 import {TreeBrowser} from '@instructure/ui-tree-browser'
+import {View} from '@instructure/ui-view'
+
 // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
 const {Node: TreeBrowserNode, Button: TreeBrowserButton} = TreeBrowser as any
 
@@ -42,5 +44,10 @@ export const treeBrowserTheme = {
     baseSpacingMedium: '2rem',
     nameFontSizeMedium: '1rem',
     focusOutlineStyle: 'none'
+  }
+}
+export const accountListTheme = {
+  [View.theme]: {
+    borderColorPrimary: colors.porcelain
   }
 }

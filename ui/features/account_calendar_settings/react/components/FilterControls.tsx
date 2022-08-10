@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React from 'react'
 
 import {IconButton} from '@instructure/ui-buttons'
 import {
@@ -45,8 +45,10 @@ export enum FilterType {
 }
 
 type ComponentProps = {
-  readonly onSearchTextChanged: (searchQuery: string) => void
-  readonly onFilterTypeChanged: (filterType: FilterType) => void
+  readonly searchValue: string
+  readonly filterValue: FilterType
+  readonly setSearchValue: (searchQuery: string) => void
+  readonly setFilterValue: (filterType: FilterType) => void
 }
 
 const FILTER_OPTIONS = [
@@ -64,22 +66,11 @@ const FILTER_OPTIONS = [
 ]
 
 export const FilterControls: React.FC<ComponentProps> = ({
-  onSearchTextChanged,
-  onFilterTypeChanged
+  searchValue,
+  filterValue,
+  setSearchValue,
+  setFilterValue
 }) => {
-  const [searchValue, setSearchValue] = useState('')
-  const [filterValue, setFilterValue] = useState(FilterType.SHOW_ALL)
-
-  const searchValueChanged = value => {
-    setSearchValue(value)
-    onSearchTextChanged(value)
-  }
-
-  const filterValueChanged = value => {
-    setFilterValue(value)
-    onFilterTypeChanged(value)
-  }
-
   const clearSearchButton = (
     <IconButton
       renderIcon={IconXLine}
@@ -88,7 +79,7 @@ export const FilterControls: React.FC<ComponentProps> = ({
       withBorder={false}
       size="small"
       screenReaderLabel={I18n.t('Clear search')}
-      onClick={() => searchValueChanged('')}
+      onClick={() => setSearchValue('')}
     />
   )
 
@@ -99,13 +90,13 @@ export const FilterControls: React.FC<ComponentProps> = ({
         type="search"
         placeholder={I18n.t('Search Calendars')}
         renderBeforeInput={IconSearchLine}
-        renderAfterInput={searchValue.length ? clearSearchButton : undefined}
+        renderAfterInput={searchValue?.length ? clearSearchButton : undefined}
         // @ts-ignore
         theme={{
           borderRadius: '2rem'
         }}
         value={searchValue}
-        onChange={(_, value) => searchValueChanged(value)}
+        onChange={(_, value) => setSearchValue(value)}
       />
 
       <View as="div" margin="small 0 0">
@@ -119,7 +110,7 @@ export const FilterControls: React.FC<ComponentProps> = ({
           size="small"
           width="18rem"
           isInline
-          onChange={(_, data) => filterValueChanged(data.value)}
+          onChange={(_, data) => setFilterValue(data.value)}
         >
           {FILTER_OPTIONS.map(option => (
             <SimpleSelectOption

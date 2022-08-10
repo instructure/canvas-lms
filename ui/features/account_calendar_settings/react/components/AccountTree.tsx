@@ -19,16 +19,9 @@
 import React, {useState, useEffect} from 'react'
 
 import {ApplyTheme} from '@instructure/ui-themeable'
-import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
-import {
-  IconCalendarMonthLine,
-  IconMiniArrowEndSolid,
-  IconMiniArrowDownSolid
-} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {IconMiniArrowEndSolid, IconMiniArrowDownSolid} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
-import {Text} from '@instructure/ui-text'
 import {TreeBrowser} from '@instructure/ui-tree-browser'
 import {View} from '@instructure/ui-view'
 
@@ -36,26 +29,26 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
-import {treeBrowserTheme} from '../theme'
 import {addAccountsToTree} from '../utils'
-import {CollectionChild, Collection, AccountData} from '../types'
+import {AccountCalendarItem} from './AccountCalendarItem'
+import {CollectionChild, Collection, AccountData, VisibilityChange} from '../types'
+import {treeBrowserTheme} from '../theme'
 
 const I18n = useI18nScope('account_calendar_settings_account_tree')
 
-const CALENDAR_ICON_SIZE = '1.25rem'
-
 type ComponentProps = {
   readonly originAccountId: number
+  readonly visibilityChanges: VisibilityChange[]
   readonly onAccountToggled: (id: number, visible: boolean) => void
   readonly showSpinner: boolean
 }
 
 // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-const {Item: FlexItem} = Flex as any
 const {Node: TreeBrowserNode} = TreeBrowser as any
 
 export const AccountTree: React.FC<ComponentProps> = ({
   originAccountId,
+  visibilityChanges,
   onAccountToggled,
   showSpinner
 }) => {
@@ -67,26 +60,12 @@ export const AccountTree: React.FC<ComponentProps> = ({
     <>
       {items.map(item => (
         <TreeBrowserNode variant="indent" key={`tree_item_${item.id}`}>
-          <Flex as="div" alignItems="center" margin="xx-small">
-            <FlexItem>
-              <Checkbox
-                label={
-                  <ScreenReaderContent>
-                    {I18n.t('Show account calendar for %{name}', {name: item.name})}
-                  </ScreenReaderContent>
-                }
-                inline
-                defaultChecked={item.calendarVisible}
-                onChange={e => onAccountToggled(item.id, e.target.checked)}
-              />
-            </FlexItem>
-            <FlexItem margin="0 small">
-              <IconCalendarMonthLine width={CALENDAR_ICON_SIZE} height={CALENDAR_ICON_SIZE} />
-            </FlexItem>
-            <FlexItem>
-              <Text>{item.name}</Text>
-            </FlexItem>
-          </Flex>
+          <AccountCalendarItem
+            item={item}
+            visibilityChanges={visibilityChanges}
+            onAccountToggled={onAccountToggled}
+            padding="xx-small"
+          />
         </TreeBrowserNode>
       ))}
     </>
@@ -112,7 +91,7 @@ export const AccountTree: React.FC<ComponentProps> = ({
     accumulatedResults: AccountData[] = []
   ) => {
     setLoadingCollectionIds([...loadingCollectionIds, accountId])
-    doFetchApi<AccountData>({
+    doFetchApi({
       path: nextLink || `/api/v1/accounts/${accountId}/account_calendars`,
       params: {
         ...(nextLink == null && {per_page: 100})

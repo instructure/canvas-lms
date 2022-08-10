@@ -96,12 +96,12 @@ export const COLLECTION_ACCOUNT_1 = {
     collections: [11, 4, 6],
     children: [
       {
-        calendarVisible: true,
+        visible: true,
         id: 1,
         name: 'University'
       },
       {
-        calendarVisible: false,
+        visible: false,
         id: 3,
         name: 'Manually-Created Courses'
       }
@@ -113,7 +113,7 @@ export const COLLECTION_ACCOUNT_1 = {
     collections: [],
     children: [
       {
-        calendarVisible: true,
+        visible: true,
         id: 4,
         name: 'CPMS'
       }
@@ -123,13 +123,13 @@ export const COLLECTION_ACCOUNT_1 = {
     id: 6,
     name: 'Elementary (1)',
     collections: [],
-    children: [{calendarVisible: true, id: 6, name: 'Elementary'}]
+    children: [{visible: true, id: 6, name: 'Elementary'}]
   },
   '11': {
     id: 11,
     name: 'Big Account (15)',
     collections: [],
-    children: [{calendarVisible: true, id: 11, name: 'Big Account'}]
+    children: [{visible: true, id: 11, name: 'Big Account'}]
   }
 }
 
@@ -140,12 +140,12 @@ export const COLLECTION_ACCOUNT_1_4 = {
     collections: [11, 4, 6],
     children: [
       {
-        calendarVisible: true,
+        visible: true,
         id: 1,
         name: 'University'
       },
       {
-        calendarVisible: false,
+        visible: false,
         id: 3,
         name: 'Manually-Created Courses'
       }
@@ -157,7 +157,7 @@ export const COLLECTION_ACCOUNT_1_4 = {
     collections: [5],
     children: [
       {
-        calendarVisible: true,
+        visible: true,
         id: 4,
         name: 'CPMS'
       }
@@ -167,19 +167,19 @@ export const COLLECTION_ACCOUNT_1_4 = {
     id: 5,
     name: 'CS (1)',
     collections: [],
-    children: [{calendarVisible: true, id: 5, name: 'CS'}]
+    children: [{visible: true, id: 5, name: 'CS'}]
   },
   '6': {
     id: 6,
     name: 'Elementary (1)',
     collections: [],
-    children: [{calendarVisible: true, id: 6, name: 'Elementary'}]
+    children: [{visible: true, id: 6, name: 'Elementary'}]
   },
   '11': {
     id: 11,
     name: 'Big Account (15)',
     collections: [],
-    children: [{calendarVisible: true, id: 11, name: 'Big Account'}]
+    children: [{visible: true, id: 11, name: 'Big Account'}]
   }
 }
 
@@ -188,6 +188,6 @@ export const COLLECTION_ACCOUNT_3 = {
     id: 3,
     name: 'Manually-Created Courses (0)',
     collections: [],
-    children: [{calendarVisible: true, id: 3, name: 'Manually-Created Courses'}]
+    children: [{visible: true, id: 3, name: 'Manually-Created Courses'}]
   }
 }

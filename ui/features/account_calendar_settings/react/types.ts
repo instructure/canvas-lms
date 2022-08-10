@@ -21,7 +21,7 @@ import {ReactElement} from 'react'
 export type CollectionChild = {
   id: number
   name: string
-  calendarVisible: boolean
+  visible: boolean
 }
 
 export type Collection = {
@@ -49,4 +49,9 @@ export type Account = {
   parent_account_id: number | null
   visible: boolean
   sub_account_count: number
+}
+
+export type VisibilityChange = {
+  id: number
+  visible: boolean
 }

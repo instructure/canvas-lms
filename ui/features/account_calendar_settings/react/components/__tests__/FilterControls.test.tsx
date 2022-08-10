@@ -22,27 +22,29 @@ import {render, fireEvent, act} from '@testing-library/react'
 import {FilterControls, FilterType} from '../FilterControls'
 
 const defaultProps = {
-  onSearchTextChanged: jest.fn(),
-  onFilterTypeChanged: jest.fn()
+  searchValue: '',
+  filterValue: FilterType.SHOW_ALL,
+  setSearchValue: jest.fn(),
+  setFilterValue: jest.fn()
 }
 
 describe('FilterControls', () => {
-  it('calls onSearchTextChanged when search text is changed', () => {
-    const onSearchTextChanged = jest.fn()
+  it('calls setSearchValue when search text is changed', () => {
+    const setSearchValue = jest.fn()
     const {getByPlaceholderText} = render(
-      <FilterControls {...defaultProps} onSearchTextChanged={onSearchTextChanged} />
+      <FilterControls {...defaultProps} setSearchValue={setSearchValue} />
     )
     const search = getByPlaceholderText('Search Calendars')
     expect(search).toBeInTheDocument()
-    expect(onSearchTextChanged).not.toHaveBeenCalled()
+    expect(setSearchValue).not.toHaveBeenCalled()
     fireEvent.change(search, {target: {value: 'hello'}})
-    expect(onSearchTextChanged).toHaveBeenCalledWith('hello')
+    expect(setSearchValue).toHaveBeenCalledWith('hello')
   })
 
-  it('calls onFilterTypeChanged when filter is used', () => {
-    const onFilterTypeChanged = jest.fn()
+  it('calls setFilterValue when filter is used', () => {
+    const setFilterValue = jest.fn()
     const {getByRole, getByText} = render(
-      <FilterControls {...defaultProps} onFilterTypeChanged={onFilterTypeChanged} />
+      <FilterControls {...defaultProps} setFilterValue={setFilterValue} />
     )
     const filter = getByRole('button', {name: 'Filter Calendars'})
     expect(filter).toBeInTheDocument()
@@ -51,8 +53,8 @@ describe('FilterControls', () => {
     expect(getByText('Show only enabled calendars')).toBeInTheDocument()
     const disabledCalendarsFilter = getByText('Show only disabled calendars')
     expect(disabledCalendarsFilter).toBeInTheDocument()
-    expect(onFilterTypeChanged).not.toHaveBeenCalled()
+    expect(setFilterValue).not.toHaveBeenCalled()
     act(() => disabledCalendarsFilter.click())
-    expect(onFilterTypeChanged).toHaveBeenCalledWith(FilterType.SHOW_HIDDEN)
+    expect(setFilterValue).toHaveBeenCalledWith(FilterType.SHOW_HIDDEN)
   })
 })
