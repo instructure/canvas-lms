@@ -23,11 +23,6 @@ disable_post_to_sis_when_grading_period_closed:
   description:
     If set, turns off post-to-SIS functionality for assignments when their grading period closes.
     Only applies if the "Enable new SIS integration settings" feature is enabled.
-final_grade_override_in_gradebook_history:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Final Grade Override in Gradebook History
-  description: Includes overridden course grades in the Gradebook History.
 responsive_student_grades_page:
   state: hidden
   applies_to: RootAccount

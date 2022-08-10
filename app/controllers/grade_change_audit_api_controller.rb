@@ -477,6 +477,6 @@ class GradeChangeAuditApiController < AuditorApiController
   end
 
   def include_override_grades?(course: nil)
-    Auditors::GradeChange.return_override_grades? && (course.blank? || course.allow_final_grade_override?)
+    course.blank? || course.allow_final_grade_override?
   end
 end
