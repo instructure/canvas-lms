@@ -27,6 +27,12 @@ module Types
 
     global_id_field :id
 
+    field :_id, ID, null: false
+    def _id
+      return [object.id, object.module_id].join("_") unless object.module_id.nil?
+
+      object.id
+    end
     field :title, String, null: false
     field :content_id, ID, null: false
     field :content_type, String, null: false
