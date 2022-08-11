@@ -28,7 +28,7 @@ class StrictTimeLimitEnvironment extends BaseEnvironment {
     } else if ((event.test?.duration || 0) > ABSOLUTE_TIMEOUT) {
       // Jest is supposed to enforce the CUSTOM_TIMEOUT_LIMIT, but it doesn't always for
       // async tests. The duration value is always accurate so just enforce it here.
-      throw new Error(`Exceeded the absolute ${ABSOLUTE_TIMEOUT}ms runtime limit for this spec!`)
+      throw new Error(`Exceeded the absolute ${ABSOLUTE_TIMEOUT}ms runtime limit for spec "${event.test?.name}"!`)
     }
   }
 }
