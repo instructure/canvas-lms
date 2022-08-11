@@ -121,6 +121,8 @@ Object.assign(CalendarEvent.prototype, {
   displayTimeString() {
     if (this.calendarEvent.all_day && this.calendarEvent.start_at === this.calendarEvent.end_at) {
       return this.formatTime(this.startDate(), true)
+    } else if (this.calendarEvent.blackout_date) {
+      return `${this.formatTime(this.startDate(), true)} - ${this.formatTime(this.endDate(), true)}`
     } else {
       return semanticDateRange(this.calendarEvent.start_at, this.calendarEvent.end_at)
     }

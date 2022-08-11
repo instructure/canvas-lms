@@ -367,7 +367,7 @@ export default class Calendar {
     const startDate = event.startDate()
     const endDate = event.endDate()
     const timeString = (() => {
-      if (!endDate || +startDate === +endDate) {
+      if (!endDate || +startDate === +endDate || event.blackout_date) {
         startDate.locale(calendarDefaults.lang)
         return startDate.format('LT')
       } else {
