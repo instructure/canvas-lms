@@ -2144,6 +2144,37 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe ".blueprint_restrictions_updated" do
+    before do
+      course_model
+      default_restrictions = { content: true, points: false, due_dates: false, availability_dates: false }
+      master_template =
+        MasterCourses::MasterTemplate.create!(course: @course, default_restrictions: default_restrictions)
+      assignment = @course.assignments.create!
+      master_content_tag_params = {
+        master_template_id: master_template.id,
+        content_type: "Assignment",
+        content_id: assignment.id,
+        restrictions: default_restrictions,
+        migration_id: "mastercourse_1_3_f9ca51a6679e4779d0d68ef2dc33bc0a",
+        use_default_restrictions: true
+      }
+      @master_content_tag =
+        MasterCourses::MasterContentTag.create!(master_content_tag_params)
+    end
+
+    it "triggers a blueprint_restrictions_updated live event" do
+      expect_event("blueprint_restrictions_updated", {
+                     canvas_assignment_id: @master_content_tag.content_id.to_s,
+                     canvas_course_id: @master_content_tag.master_template.course_id.to_s,
+                     canvas_course_uuid: @master_content_tag.master_template.course.uuid,
+                     restrictions: @master_content_tag.restrictions,
+                     use_default_restrictions: @master_content_tag.use_default_restrictions
+                   }).once
+      Canvas::LiveEvents.blueprint_restrictions_updated(@master_content_tag)
+    end
+  end
+
   describe "heartbeat" do
     context "when database region is not set (local/open source)" do
       it "sets region to not_configured" do
