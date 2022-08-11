@@ -22,6 +22,7 @@ import fcUtil from './fcUtil.coffee'
 import commonEventFactory from './CommonEvent/index'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jquery-tinypubsub'
+import moment from 'moment'
 
 export default class EventDataSource {
   constructor(contexts) {
@@ -420,6 +421,12 @@ export default class EventDataSource {
       data.forEach(e => {
         const event = commonEventFactory(e, this.contexts)
         if (event && event.object.workflow_state !== 'deleted') {
+          if (event.blackout_date && event.end && event.start !== event.end) {
+            // We need to add a day to the end of multiple day events on the calendar because fullcalendar
+            // treats event end dates as exclusive while Canvas blackout date calculations treat them as
+            // inclusive.
+            event.end = moment(event.end.toISOString()).add(1, 'days')
+          }
           newEvents.push(event)
           requestResult.events.push(event)
         }
