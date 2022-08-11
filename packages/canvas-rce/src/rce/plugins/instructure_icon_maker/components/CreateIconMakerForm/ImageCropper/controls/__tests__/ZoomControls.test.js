@@ -20,7 +20,7 @@ import React from 'react'
 import {fireEvent, render, waitFor} from '@testing-library/react'
 import {ZoomControls} from '../ZoomControls'
 import {BUTTON_SCALE_STEP} from '../../constants'
-import {round} from '../utils'
+import round from '../../../../../utils/round'
 import {showFlashAlert} from '../../../../../../../../canvasFileBrowser/FlashAlert'
 
 jest.mock('../../../../../../../../canvasFileBrowser/FlashAlert')
