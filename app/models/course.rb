@@ -281,7 +281,7 @@ class Course < ActiveRecord::Base
 
   after_update :clear_cached_short_name, if: :saved_change_to_course_code?
   after_update :log_create_to_publish_time, if: :saved_change_to_workflow_state?
-
+  after_update :track_end_date_stats
   before_update :handle_syllabus_changes_for_master_migration
 
   before_save :touch_root_folder_if_necessary
@@ -409,6 +409,22 @@ class Course < ActiveRecord::Base
     end
 
     @changed_settings = nil
+  end
+
+  def track_end_date_stats
+    return unless (saved_changes.keys & %w[restrict_enrollments_to_course_dates conclude_at enrollment_term_id settings workflow_state]).any? && published?
+
+    just_published = saved_change_to_workflow_state && workflow_state == "available"
+    has_end_date = restrict_enrollments_to_course_dates ? conclude_at.present? : enrollment_term&.end_at.present?
+    had_end_date = restrict_enrollments_to_course_dates_before_last_save ? conclude_at_before_last_save.present? : EnrollmentTerm.find(enrollment_term_id_before_last_save)&.end_at&.present?
+
+    return unless just_published || (has_end_date != had_end_date) || (settings_before_last_save[:enable_course_paces] != settings[:enable_course_paces])
+
+    InstStatsd::Statsd.increment(enable_course_paces ? "course.paced.has_end_date" : "course.unpaced.has_end_date") if has_end_date
+
+    return if just_published # Don't decrement on publish
+
+    InstStatsd::Statsd.decrement(settings_before_last_save[:enable_course_paces] ? "course.paced.has_end_date" : "course.unpaced.has_end_date") if had_end_date
   end
 
   def module_based?
