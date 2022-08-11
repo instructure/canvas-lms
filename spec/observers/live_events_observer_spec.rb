@@ -631,4 +631,75 @@ describe LiveEventsObserver do
       master_migration.update(workflow_state: "exports_failed")
     end
   end
+
+  describe "MasterCourses::MasterContentTag" do
+    before do
+      course_model
+      default_restrictions =
+        { content: true, points: false, due_dates: false, availability_dates: false }
+      assignment = @course.assignments.create!
+      master_template = MasterCourses::MasterTemplate.create!(course: @course)
+      @master_content_tag_params = {
+        master_template_id: master_template.id,
+        content_type: "Assignment",
+        content_id: assignment.id,
+        restrictions: default_restrictions,
+        migration_id: "mastercourse_1_3_f9ca51a6679e4779d0d68ef2dc33bc0a",
+        use_default_restrictions: true
+      }
+    end
+
+    context "when the master_content_tag is associated with a New Quiz" do
+      before do
+        allow_any_instance_of(Assignment).to receive(:quiz_lti?).and_return(true)
+      end
+
+      it "posts a blueprint_restrictions_updated event after create" do
+        expect(Canvas::LiveEvents).to receive(:blueprint_restrictions_updated).once
+        MasterCourses::MasterContentTag.create!(@master_content_tag_params)
+      end
+
+      context "when the restrictions field change" do
+        it "posts a blueprint_restrictions_updated event after update" do
+          expect(Canvas::LiveEvents).to receive(:blueprint_restrictions_updated).twice
+          master_content_tag = MasterCourses::MasterContentTag.create!(@master_content_tag_params)
+
+          updated_restrictions =
+            { content: false, points: true, due_dates: false, availability_dates: false }
+          master_content_tag.update!(restrictions: updated_restrictions)
+        end
+      end
+
+      context "when the use_default_restrictions field change" do
+        it "posts a blueprint_restrictions_updated event after update" do
+          expect(Canvas::LiveEvents).to receive(:blueprint_restrictions_updated).twice
+          master_content_tag = MasterCourses::MasterContentTag.create!(@master_content_tag_params)
+          master_content_tag.update!(use_default_restrictions: false)
+        end
+      end
+
+      context "when restriction-related fields do not change" do
+        it "does not post a blueprint_restrictions_updated event after update" do
+          expect(Canvas::LiveEvents).to receive(:blueprint_restrictions_updated).once
+          master_content_tag = MasterCourses::MasterContentTag.create!(@master_content_tag_params)
+          master_content_tag.update!(migration_id: "mastercourse_1_3_d0d68ef2dc33bc0af9ca51a6679e4779")
+        end
+      end
+    end
+
+    context "when the master_content_tag is not associated with a New Quiz" do
+      it "does not post a blueprint_restrictions_updated event after create" do
+        expect(Canvas::LiveEvents).not_to receive(:blueprint_restrictions_updated)
+        MasterCourses::MasterContentTag.create!(@master_content_tag_params)
+      end
+
+      it "does not post a blueprint_restrictions_updated event after update" do
+        expect(Canvas::LiveEvents).not_to receive(:blueprint_restrictions_updated)
+        master_content_tag = MasterCourses::MasterContentTag.create!(@master_content_tag_params)
+        updated_restrictions =
+          { content: false, points: true, due_dates: false, availability_dates: false }
+        master_content_tag.update!(restrictions: updated_restrictions)
+      end
+    end
+  end
 end
