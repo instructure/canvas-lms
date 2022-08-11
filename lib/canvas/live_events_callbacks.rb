@@ -194,6 +194,10 @@ module Canvas::LiveEventsCallbacks
       if changes["workflow_state"] && obj.workflow_state == "completed"
         Canvas::LiveEvents.master_migration_completed(obj)
       end
+    when MasterCourses::MasterTemplate
+      if %w[default_restrictions use_default_restrictions_by_type default_restrictions_by_type].any? { |field| changes[field] }
+        Canvas::LiveEvents.default_blueprint_restrictions_updated(obj)
+      end
     end
   end
 
