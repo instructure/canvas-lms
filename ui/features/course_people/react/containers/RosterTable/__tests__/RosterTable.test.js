@@ -169,7 +169,7 @@ describe('RosterTable', () => {
   it('should wrap the name of each user in a button', async () => {
     const container = setup(getRosterQueryMock({mockUsers}))
     const cells = await container.findAllByTestId('roster-table-name-cell')
-    const names = mockUsers.map(user => user.node.name)
+    const names = mockUsers.map(user => user.name)
     cells.forEach((cell, index) => {
       const nameMatch = new RegExp(names[index])
       const button = within(cell).getByRole('button', {name: nameMatch})
@@ -186,13 +186,13 @@ describe('RosterTable', () => {
     const container = setup(getRosterQueryMock({mockUsers: [mockSelf]}))
     const cells = await container.findByTestId('roster-table-name-cell')
     const link = within(cells).getByRole('link', {name: nameMatch})
-    expect(link).toHaveAttribute('href', mockSelf.node.enrollments.htmlUrl)
+    expect(link).toHaveAttribute('href', mockSelf.enrollments.htmlUrl)
   })
 
   it('should not link the current_user to the user detail page when clicking a name that is not their own', async () => {
     const container = setup(getRosterQueryMock({mockUsers}))
     const cells = await container.findAllByTestId('roster-table-name-cell')
-    const names = mockUsers.map(user => user.node.name)
+    const names = mockUsers.map(user => user.name)
     cells.forEach((cell, index) => {
       const nameMatch = new RegExp(names[index])
       const button = within(cell).getByRole('button', {name: nameMatch})
@@ -208,9 +208,9 @@ describe('RosterTable', () => {
     const container = setup(getRosterQueryMock({mockUsers}))
     const rows = await container.findAllByTestId('roster-table-data-row')
     const lastActivityByUser = mockUsers.map(user => {
-      return user.node.enrollments[0].type === 'ObserverEnrollment'
+      return user.enrollments[0].type === 'ObserverEnrollment'
         ? null
-        : user.node.enrollments[0].lastActivityAt
+        : user.enrollments[0].lastActivityAt
     })
     rows.forEach((row, index) => {
       const lastActivity = queryAllByText(row, datetimePattern)
@@ -221,7 +221,7 @@ describe('RosterTable', () => {
   it('should display users total activity time only if total time is greater than zero', async () => {
     const container = setup(getRosterQueryMock({mockUsers}))
     const rows = await container.findAllByTestId('roster-table-data-row')
-    const totalActivityByUser = mockUsers.map(user => user.node.enrollments[0].totalActivityTime)
+    const totalActivityByUser = mockUsers.map(user => user.enrollments[0].totalActivityTime)
     rows.forEach((row, index) => {
       const totalActivity = queryAllByText(row, /^[0-9]+(:[0-5][0-9]){1,2}$/) // 00:00 or 00:00:00
       expect(totalActivity).toHaveLength(totalActivityByUser[index] ? 1 : 0)
@@ -231,7 +231,7 @@ describe('RosterTable', () => {
   it('should list the user pronouns if available', async () => {
     const container = setup(getRosterQueryMock({mockUsers}))
     const cells = await container.findAllByTestId('roster-table-name-cell')
-    const userPronouns = mockUsers.map(user => user.node.pronouns)
+    const userPronouns = mockUsers.map(user => user.pronouns)
     cells.forEach((cell, index) => {
       if (userPronouns[index]) {
         const pronounMatch = new RegExp(userPronouns[index], 'i')
@@ -243,7 +243,7 @@ describe('RosterTable', () => {
   it('should list the user status if not active', async () => {
     const container = setup(getRosterQueryMock({mockUsers}))
     const cells = await container.findAllByTestId('roster-table-name-cell')
-    const userStatus = mockUsers.map(user => user.node.enrollments[0].state)
+    const userStatus = mockUsers.map(user => user.enrollments[0].state)
     cells.forEach((cell, index) => {
       if (userStatus[index] !== ACTIVE_STATE) {
         const status = PILL_MAP[userStatus[index]].text
@@ -261,7 +261,7 @@ describe('RosterTable', () => {
     expect(container.queryAllByTestId('colheader-login-id')).toHaveLength(0)
 
     // Check there is no login id data
-    const loginIdByUser = mockUsers.map(user => user.node.enrollments[0].loginId)
+    const loginIdByUser = mockUsers.map(user => user.enrollments[0].loginId)
     rows.forEach((row, index) => {
       loginIdByUser[index] && expect(queryAllByText(row, loginIdByUser[index])).toHaveLength(0)
     })
@@ -271,7 +271,7 @@ describe('RosterTable', () => {
     window.ENV.permissions.read_sis = false
     const container = setup(getRosterQueryMock({mockUsers}))
     const rows = await container.findAllByTestId('roster-table-data-row')
-    const sisIdByUser = mockUsers.map(user => user.node.enrollments[0].sisId)
+    const sisIdByUser = mockUsers.map(user => user.enrollments[0].sisId)
 
     // Check there is no column header
     expect(container.queryAllByTestId('colheader-sis-id')).toHaveLength(0)

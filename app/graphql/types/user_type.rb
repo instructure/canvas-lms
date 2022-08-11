@@ -112,6 +112,9 @@ module Types
       argument :order_by, [String],
                "The fields to order the results by",
                required: false
+      argument :exclude_concluded, Boolean,
+               "Whether or not to exclude `completed` enrollments",
+               required: false
     end
 
     field :login_id, String, null: true
@@ -132,12 +135,13 @@ module Types
       pseudonym.unique_id
     end
 
-    def enrollments(course_id: nil, current_only: false, order_by: [])
+    def enrollments(course_id: nil, current_only: false, order_by: [], exclude_concluded: false)
       course_ids = [course_id].compact
       Loaders::UserCourseEnrollmentLoader.for(
         course_ids: course_ids,
         order_by: order_by,
-        current_only: current_only
+        current_only: current_only,
+        exclude_concluded: exclude_concluded
       ).load(object.id).then do |enrollments|
         (enrollments || []).select do |enrollment|
           object == context[:current_user] ||
@@ -434,7 +438,7 @@ end
 
 module Loaders
   class UserCourseEnrollmentLoader < Loaders::ForeignKeyLoader
-    def initialize(course_ids:, order_by: [], current_only: false)
+    def initialize(course_ids:, order_by: [], current_only: false, exclude_concluded: false)
       scope = Enrollment.joins(:course)
 
       scope = if current_only
@@ -445,6 +449,8 @@ module Loaders
               end
 
       scope = scope.where(course_id: course_ids) if course_ids.present?
+
+      scope = scope.where.not(enrollments: { workflow_state: "completed" }) if exclude_concluded
 
       order_by.each { |o| scope = scope.order(o) }
 
