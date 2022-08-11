@@ -29,9 +29,6 @@ module Types
 
     field :name, String, null: true
 
-    # A simple test field to force a schema check. TODO: Remove once test of post-merge schema check works properly.
-    field :test_field, String, null: true
-
     field :outcome_proficiency, OutcomeProficiencyType, null: true
     def outcome_proficiency
       # This does a recursive lookup of parent accounts, not sure how we could

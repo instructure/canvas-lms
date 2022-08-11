@@ -16,33 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-def nodeRequirementsTemplate() {
-  def baseTestContainer = [
-    image: env.LINTERS_RUNNER_IMAGE,
-    command: 'cat'
-  ]
+@groovy.transform.Field final static SCHEMA_CHECK_CONTAINER_NAME = 'rover'
 
-  return [
-    containers: [baseTestContainer + [name: 'graphql-schema-check']]
-  ]
-}
+def call() {
+  withCredentials([string(credentialsId: 'apollo-key', variable: 'APOLLO_KEY'),
+      usernamePassword(
+        credentialsId: 'starlord',
+        usernameVariable: 'STARLORD_USERNAME',
+        passwordVariable: 'STARLORD_PASSWORD'
+    )]) {
+    sh """
+    ./build/new-jenkins/docker-with-flakey-network-protection.sh pull ${configuration.apolloImageName()}
+    """
 
-def queueTestStage() {
-  { ->
-    withCredentials([string(credentialsId: 'apollo-key', variable: 'APOLLO_KEY')]) {
-      try {
-        // Because this gets run inside a Docker container, we can't return the status, as it gets interpreted
-        // by our custom Docker execution library as being part of the shell command.
-        sh """
-        RAILS_ENV=test bundle exec rake graphql:schema
-        yarn rover subgraph check ${configuration.apolloGraphRef()} --name ${configuration.apolloSubgraphName()} --schema ${configuration.apolloSchemaPath()}
-        """
-      } catch (Exception e) {
-        // For now, if the schema check fails, simply alert the interop team, rather than fail the build.
-        // We're only collecting information for now.
-        def extra = 'The preceding patchset failed the GraphQL Post-Merge Schema Check. Please review the schema check to determine if this was a false positive or if the author needs to amend their changes. Note that a link to the schema check within Apollo Studio is output by Rover.'
-        slackHelpers.sendSlackFailureWithMsg('#interop-alerts', extra, false)
-      }
+    // Unfortunately, I don't know of a way to get the Apollo Key into the container without passing it as an env var. Jenkins *should* notice we're
+    // string interpolating a secret and omit it from the logs, but it's definitely not ideal.
+    def status = sh(returnStatus: true, script: """
+    docker run -t -v $WORKSPACE/${configuration.apolloSchemaPath()}:/usr/src/app/${configuration.apolloSchemaPath()} -e APOLLO_KEY=${APOLLO_KEY}  ${configuration.apolloImageName()} bash -lc "rover subgraph check ${configuration.apolloGraphRef()} --name ${configuration.apolloSubgraphName()} --schema /usr/src/app/${configuration.apolloSchemaPath()}"
+    """)
+
+    if (status != 0) {
+      def extra = 'The preceding patchset failed the GraphQL Post-Merge Schema Check. Please review the schema check to determine if this was a false positive or if the author needs to amend their changes. Note that a link to the schema check within Apollo Studio is output by Rover.'
+      slackHelpers.sendSlackFailureWithMsg('#interop-alerts', extra, false)
     }
   }
+}
+
+def shouldRun() {
+  return (configuration.isChangeMerged() && filesChangedStage.hasGraphqlFiles()) || configuration.apolloForceGraphqlSchemaCheck()
 }

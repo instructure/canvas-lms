@@ -544,6 +544,12 @@ pipeline {
                       .required(configuration.isChangeMerged())
                       .queue(stages, buildDockerImageStage.&i18nExtract)
 
+                    extendedStage('GraphQL Post-Merge Schema Check')
+                      .hooks(buildSummaryReportHooks.call())
+                      .required(graphqlSchemaCheckStage.shouldRun())
+                      .timeout(2)
+                      .queue(stages, graphqlSchemaCheckStage.&call)
+
                     parallel(stages)
                   }
                 }
@@ -576,11 +582,6 @@ pipeline {
                     .nodeRequirements(label: configuration.nodeLabel(), podTemplate: dependencyCheckStage.nodeRequirementsTemplate(), container: 'dependency-check')
                     .required(configuration.isChangeMerged())
                     .execute(dependencyCheckStage.queueTestStage())
-
-                  extendedStage('GraphQL Post-Merge Schema Check')
-                    .nodeRequirements(label: configuration.nodeLabel(), podTemplate: graphqlSchemaCheckStage.nodeRequirementsTemplate(), container: 'graphql-schema-check')
-                    .required(configuration.isChangeMerged() && filesChangedStage.hasGraphqlFiles(buildConfig))
-                    .execute(graphqlSchemaCheckStage.queueTestStage())
 
                   extendedStage('Linters')
                     .hooks([onNodeReleasing: lintersStage.tearDownNode()])
