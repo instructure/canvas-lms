@@ -53,8 +53,8 @@ describe Types::OutcomeAlignmentType do
       @outcome_alignment = ContentTag.last
     end
 
-    it "returns _id" do
-      expect(resolve_field("_id")).to eq @outcome_alignment.id.to_s
+    it "returns _id = alignment_id + '_' + module_id" do
+      expect(resolve_field("_id")).to eq [@outcome_alignment.id.to_s, @module.id.to_s].join("_")
     end
 
     it "returns learning_outcome_id" do
@@ -99,6 +99,17 @@ describe Types::OutcomeAlignmentType do
 
     it "returns module_workflow_state" do
       expect(resolve_field("moduleWorkflowState")).to eq @module.workflow_state
+    end
+  end
+
+  describe "for outcome alignment not included in module" do
+    before do
+      @rubric.associate_with(@assignment, @course, purpose: "grading")
+      @outcome_alignment = ContentTag.last
+    end
+
+    it "returns _id = alignment_id" do
+      expect(resolve_field("_id")).to eq @outcome_alignment.id.to_s
     end
   end
 
