@@ -51,8 +51,8 @@ const RosterTable = () => {
 
   const {view_user_logins, read_sis} = ENV?.permissions || {}
 
-  const tableRows = data.course.usersConnection.edges.map(edge => {
-    const {name, _id, sisId, enrollments, loginId, avatarUrl, pronouns} = edge.node
+  const tableRows = data.course.usersConnection.nodes.map(node => {
+    const {name, _id, sisId, enrollments, loginId, avatarUrl, pronouns} = node
     const {totalActivityTime, htmlUrl, state} = enrollments[0]
 
     const sectionNames = enrollments.map(enrollment => {

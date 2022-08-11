@@ -283,6 +283,12 @@ describe Types::UserType do
         user_type.resolve(%|enrollments(courseId: "#{@course2.id}") { _id }|)
       ).to eq []
     end
+
+    it "excludes concluded enrollments when excludeConcluded is true" do
+      expect(user_type.resolve("enrollments(excludeConcluded: true) { _id }").length).to eq 1
+      @student.enrollments.update_all workflow_state: "completed"
+      expect(user_type.resolve("enrollments(excludeConcluded: true) { _id }")).to eq []
+    end
   end
 
   context "email" do

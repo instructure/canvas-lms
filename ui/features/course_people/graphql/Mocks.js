@@ -35,37 +35,34 @@ export const mockUser = ({
   sectionName = 'Section 1',
   additionalEnrollments = []
 } = {}) => ({
-  node: {
-    name,
-    _id,
-    id: Buffer.from(`User-${_id}`).toString('base64'),
-    sisId,
-    avatarUrl,
-    pronouns,
-    loginId,
-    __typename: 'user',
-    enrollments: [
-      {
-        id: Buffer.from(`Enrollment-${_id}`).toString('base64'),
-        type: enrollmentType,
-        state: enrollmentStatus,
-        lastActivityAt,
-        htmlUrl: `http://test.host/courses/${courseID}/users/${_id}`,
-        totalActivityTime,
-        canBeRemoved,
-        associatedUser: null, // always null for user's own enrollment
-        __typename: 'enrollment',
-        section: {
-          _id: sectionID,
-          id: Buffer.from(`Section-${sectionID}`).toString('base64'),
-          name: sectionName,
-          __typename: 'section'
-        }
-      },
-      ...additionalEnrollments
-    ]
-  },
-  __typename: 'usersConnectionEdge'
+  name,
+  _id,
+  id: Buffer.from(`User-${_id}`).toString('base64'),
+  sisId,
+  avatarUrl,
+  pronouns,
+  loginId,
+  __typename: 'user',
+  enrollments: [
+    {
+      id: Buffer.from(`Enrollment-${_id}`).toString('base64'),
+      type: enrollmentType,
+      state: enrollmentStatus,
+      lastActivityAt,
+      htmlUrl: `http://test.host/courses/${courseID}/users/${_id}`,
+      totalActivityTime,
+      canBeRemoved,
+      associatedUser: null, // always null for user's own enrollment
+      __typename: 'enrollment',
+      section: {
+        _id: sectionID,
+        id: Buffer.from(`Section-${sectionID}`).toString('base64'),
+        name: sectionName,
+        __typename: 'section'
+      }
+    },
+    ...additionalEnrollments
+  ]
 })
 
 export const mockEnrollment = ({
@@ -115,7 +112,7 @@ export const getRosterQueryMock = ({mockUsers = [], courseID = '1', shouldError 
       data: {
         course: {
           usersConnection: {
-            edges: [...mockUsers],
+            nodes: [...mockUsers],
             __typename: 'usersConnection'
           },
           __typename: 'course'
