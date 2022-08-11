@@ -7292,5 +7292,55 @@ describe Course do
         expect(InstStatsd::Statsd).to have_received(:count).with("course.paced.assignment_count", 2).once
       end
     end
+
+    context "end date stats on date change or publishing" do
+      it "increments and decrements on end date existence change" do
+        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+
+        Course.create!(restrict_enrollments_to_course_dates: true, conclude_at: Time.now, settings: { enable_course_paces: true }).offer!
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.has_end_date").once
+
+        Course.last.update! restrict_enrollments_to_course_dates: false
+        expect(InstStatsd::Statsd).to have_received(:decrement).with("course.paced.has_end_date").once
+      end
+
+      it "increments and decrements on pace status change" do
+        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+
+        Course.create!(restrict_enrollments_to_course_dates: true, conclude_at: Time.now).offer!
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.has_end_date").once
+
+        Course.last.update! settings: { enable_course_paces: true }
+        expect(InstStatsd::Statsd).to have_received(:decrement).with("course.unpaced.has_end_date").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.has_end_date").once
+      end
+
+      it "increments and decrements on pace status and end date existence concurrently" do
+        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+        Course.create!(restrict_enrollments_to_course_dates: true, conclude_at: Time.now).offer!
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.has_end_date").once
+
+        Course.last.update! restrict_enrollments_to_course_dates: false, settings: { enable_course_paces: true }
+        expect(InstStatsd::Statsd).to have_received(:decrement).with("course.unpaced.has_end_date").once
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.paced.has_end_date")
+
+        Course.last.update! restrict_enrollments_to_course_dates: true, settings: { enable_course_paces: false }
+        expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course.paced.has_end_date")
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.has_end_date").twice
+      end
+
+      it "ignores unpublished date having changes" do
+        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+        Course.create!(restrict_enrollments_to_course_dates: true, conclude_at: Time.now)
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.unpaced.has_end_date")
+        Course.last.update! settings: { enable_course_paces: true }
+        expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course.unpaced.has_end_date")
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.paced.has_end_date")
+      end
+    end
   end
 end

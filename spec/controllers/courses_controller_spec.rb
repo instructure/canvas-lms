@@ -2173,6 +2173,26 @@ describe CoursesController do
       expect(@course.students).to include(u1)
       expect(@course.students).to include(u2)
     end
+
+    context "enrollment tracking" do
+      before do
+        user_session(@teacher)
+      end
+
+      it "tracks enrollments for unpaced courses" do
+        allow(InstStatsd::Statsd).to receive(:count)
+        post "enroll_users", params: { course_id: @course.id, user_list: "\"Sam\" <sam@yahoo.com>, \"Fred\" <fred@yahoo.com>" }
+        expect(InstStatsd::Statsd).to have_received(:count).with("course.unpaced.student_enrollment_count", ActiveRecord::Associations::CollectionProxy).once
+      end
+
+      it "tracks enrollments for paced courses" do
+        allow(InstStatsd::Statsd).to receive(:count)
+        @course.enable_course_paces = true
+        @course.save!
+        post "enroll_users", params: { course_id: @course.id, user_list: "\"Sam\" <sam@yahoo.com>, \"Fred\" <fred@yahoo.com>" }
+        expect(InstStatsd::Statsd).to have_received(:count).with("course.paced.student_enrollment_count", ActiveRecord::Associations::CollectionProxy).once
+      end
+    end
   end
 
   describe "POST create" do
