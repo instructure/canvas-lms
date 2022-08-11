@@ -1663,6 +1663,13 @@
     "@babel/helper-module-imports" "^7.8.3"
     babel-plugin-macros "^2.8.0"
 
+"@instructure/debounce@7", "@instructure/debounce@^7", "@instructure/debounce@^7.14.0", "@instructure/debounce@^7.20.2":
+  version "7.20.2"
+  resolved "https://registry.yarnpkg.com/@instructure/debounce/-/debounce-7.20.2.tgz#f73e8a44c1e785a93e30b1a6e49f1cc98075d263"
+  integrity sha512-UJiU/LcQpcJzt7q8IaM3hhKq5z+KlwxC8fQ9fTISmCs9H5pMIT76bMuuhWrrzU0xkNPzIkOAWK/UWfpR89v1aQ==
+  dependencies:
+    "@babel/runtime" "^7.9.2"
+
 "@instructure/debounce@8.26.3":
   version "8.26.3"
   resolved "https://registry.yarnpkg.com/@instructure/debounce/-/debounce-8.26.3.tgz#9dbe5dedec88587fbd60f817bafdf2a17d9cbdd4"
@@ -1674,13 +1681,6 @@
   version "6.27.1"
   resolved "https://registry.yarnpkg.com/@instructure/debounce/-/debounce-6.27.1.tgz#2509d22d66290ee1e23c442675818dfc7381a8e2"
   integrity sha512-zYN6r+ciASEgeHgUacpqaEkqfEfTjb2sEiqq8jga5BhltwWYwhHw68nEpc8gk6QTRL54Fa5NCXFE1zqARTrfQg==
-  dependencies:
-    "@babel/runtime" "^7.9.2"
-
-"@instructure/debounce@^7", "@instructure/debounce@^7.14.0", "@instructure/debounce@^7.20.2":
-  version "7.20.2"
-  resolved "https://registry.yarnpkg.com/@instructure/debounce/-/debounce-7.20.2.tgz#f73e8a44c1e785a93e30b1a6e49f1cc98075d263"
-  integrity sha512-UJiU/LcQpcJzt7q8IaM3hhKq5z+KlwxC8fQ9fTISmCs9H5pMIT76bMuuhWrrzU0xkNPzIkOAWK/UWfpR89v1aQ==
   dependencies:
     "@babel/runtime" "^7.9.2"
 
