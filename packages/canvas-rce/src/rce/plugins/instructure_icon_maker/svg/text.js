@@ -17,22 +17,29 @@
  */
 
 import {createSvgElement, splitTextIntoLines} from './utils'
-import {TEXT_BACKGROUND_PADDING, BASE_SIZE, TEXT_SIZE, MAX_CHAR_COUNT, Size} from './constants'
+import {
+  TEXT_BACKGROUND_PADDING,
+  BASE_SIZE,
+  TEXT_SIZE,
+  MAX_CHAR_COUNT,
+  Size,
+  TEXT_SIZE_FONT_DIFF
+} from './constants'
 import {Shape} from './shape'
 
 export function buildText({text, textPosition, textSize, textColor, shape, size}) {
   if (!text.trim()) return null
 
+  const lines = splitTextIntoLines(text, MAX_CHAR_COUNT[textSize])
   const textElement = createSvgElement('text', {
     x: Math.max(TEXT_BACKGROUND_PADDING, Math.floor(getTextXValue(text, textSize, size))),
-    y: getTextYValue(textPosition, textSize, shape, size),
+    y: getTextYValue(textPosition, textSize, shape, size, lines.length),
     fill: textColor || '',
     'font-family': 'Lato Extended',
     'font-size': TEXT_SIZE[textSize],
     'font-weight': 'bold'
   })
 
-  const lines = splitTextIntoLines(text, MAX_CHAR_COUNT[textSize])
   const containerWidth = getContainerWidth({text, textSize, size})
   lines.forEach((line, index) => {
     const subtextWidth = getTextWidth(line, textSize)
@@ -57,17 +64,22 @@ export function buildTextBackground({
 }) {
   if (!text.trim()) return null
 
+  const linesCount = splitTextIntoLines(text, MAX_CHAR_COUNT[textSize]).length
   const xValue = getTextXValue(text, textSize, size)
-  const yValue = getTextYValue(textPosition, textSize, shape, size)
+  const yValue = getTextYValue(textPosition, textSize, shape, size, linesCount)
   const textWidth = getTextWidth(text, textSize)
-  const textHeight = getTextHeight(text, textSize)
+  // An extra line is added due svg text baseline behavior the first line is not counted regularly.
+  const textHeight = getTextHeight(linesCount + 1, textSize)
+
   const paddingSize = TEXT_BACKGROUND_PADDING * 2
   const pathElement = createSvgElement('path')
 
   const radius = 4
   const fontWeight = 2
   const initialX = Math.max(0, Math.floor(xValue - TEXT_BACKGROUND_PADDING)) + radius
-  const initialY = Math.floor(yValue - TEXT_SIZE[textSize] - TEXT_BACKGROUND_PADDING / 2)
+  const initialY = Math.floor(
+    yValue - TEXT_SIZE[textSize] + TEXT_SIZE_FONT_DIFF[textSize] - TEXT_BACKGROUND_PADDING / 2
+  )
   const horizontalLineLength = Math.floor(textWidth + paddingSize + fontWeight) - radius * 2
   const verticalLineLength = Math.floor(textHeight + paddingSize + fontWeight) - radius * 2
   const d = `M${initialX},${initialY} h${horizontalLineLength} a${radius},${radius} 0 0 1 ${radius},${radius} v${verticalLineLength} a${radius},${radius} 0 0 1 ${-radius},${radius} h${-horizontalLineLength} a${radius},${radius} 0 0 1 ${-radius},${-radius} v${-verticalLineLength} a${radius},${radius} 0 0 1 ${radius},${-radius} z`
@@ -90,9 +102,10 @@ export function getContainerHeight({text, textPosition, textSize, shape, size}) 
     return base
   }
 
-  const textYValue = getTextYValue(textPosition, textSize, shape, size)
-  const extraTextHeight = getTextHeight(text, textSize) - TEXT_SIZE[textSize]
-  const textBackgroundHeight = textYValue + extraTextHeight + TEXT_BACKGROUND_PADDING * 2
+  const linesCount = splitTextIntoLines(text, MAX_CHAR_COUNT[textSize]).length
+  const textYValue = getTextYValue(textPosition, textSize, shape, size, linesCount)
+  const textHeight = getTextHeight(linesCount, textSize)
+  const textBackgroundHeight = textYValue + textHeight + TEXT_BACKGROUND_PADDING * 2
 
   return Math.max(base, textBackgroundHeight)
 }
@@ -106,9 +119,10 @@ function getTextWidth(text, textSize) {
   return Math.max(...widths)
 }
 
-function getTextHeight(text, textSize) {
-  const linesCount = splitTextIntoLines(text, MAX_CHAR_COUNT[textSize]).length
-  return linesCount * TEXT_SIZE[textSize]
+function getTextHeight(linesCount, textSize) {
+  // Since the svg text's initial Y position starts on the bottom of the first line
+  // one line is subtracted to the count
+  return (linesCount - 1) * TEXT_SIZE[textSize]
 }
 
 function getTextXValue(text, textSize, size) {
@@ -117,12 +131,20 @@ function getTextXValue(text, textSize, size) {
   return Math.floor((containerWidth - textWidth) * 0.5)
 }
 
-function getTextYValue(textPosition, textSize, shape, size) {
+function getTextYValue(textPosition, textSize, shape, size, linesCount) {
   switch (textPosition) {
-    case 'middle':
-      return getYMiddleText(textSize, shape, size)
-    case 'bottom-third':
-      return getYBottomThirdText(textSize, shape, size)
+    case 'middle': {
+      const baseline = getYMiddleText(textSize, shape, size)
+      // Represents the Y difference for multiline text to keep it vertically centered
+      const multilineDiff = ((linesCount - 1) * TEXT_SIZE[textSize]) / 2
+      return baseline - multilineDiff
+    }
+    case 'bottom-third': {
+      const baseline = getYBottomThirdText(textSize, shape, size)
+      // Represents the Y difference for multiline text to keep it vertically centered
+      const multilineDiff = ((linesCount - 1) * TEXT_SIZE[textSize]) / 2
+      return baseline - multilineDiff
+    }
     case 'below':
       return getYBelowText(textSize, shape, size)
     default:
@@ -194,19 +216,34 @@ function getYMiddleTextForShape(getYTextSizeCallback, shape, size) {
 function getYMiddleSmallTextForShape(size) {
   switch (size) {
     case Size.ExtraSmall:
-      return 44
+      return 43
     case Size.Small:
-      return 68
+      return 67
     case Size.Medium:
-      return 86
+      return 85
     case Size.Large:
-      return 116
+      return 115
     default:
       throw new Error(`Invalid size: ${size}`)
   }
 }
 
 function getYMiddleMediumTextForShape(size) {
+  switch (size) {
+    case Size.ExtraSmall:
+      return 43
+    case Size.Small:
+      return 67
+    case Size.Medium:
+      return 85
+    case Size.Large:
+      return 115
+    default:
+      throw new Error(`Invalid size: ${size}`)
+  }
+}
+
+function getYMiddleLargeTextForShape(size) {
   switch (size) {
     case Size.ExtraSmall:
       return 45
@@ -221,37 +258,67 @@ function getYMiddleMediumTextForShape(size) {
   }
 }
 
-function getYMiddleLargeTextForShape(size) {
-  switch (size) {
-    case Size.ExtraSmall:
-      return 48
-    case Size.Small:
-      return 72
-    case Size.Medium:
-      return 90
-    case Size.Large:
-      return 120
-    default:
-      throw new Error(`Invalid size: ${size}`)
-  }
-}
-
 function getYMiddleXLargeTextForShape(size) {
   switch (size) {
     case Size.ExtraSmall:
-      return 51
+      return 47
     case Size.Small:
-      return 75
+      return 71
     case Size.Medium:
-      return 93
+      return 89
     case Size.Large:
-      return 123
+      return 119
     default:
       throw new Error(`Invalid size: ${size}`)
   }
 }
 
 function getYBottomThirdSmallTextForShape(size) {
+  switch (size) {
+    case Size.ExtraSmall:
+      return 73
+    case Size.Small:
+      return 121
+    case Size.Medium:
+      return 157
+    case Size.Large:
+      return 217
+    default:
+      throw new Error(`Invalid size: ${size}`)
+  }
+}
+
+function getYBottomThirdMediumTextForShape(size) {
+  switch (size) {
+    case Size.ExtraSmall:
+      return 74
+    case Size.Small:
+      return 122
+    case Size.Medium:
+      return 158
+    case Size.Large:
+      return 218
+    default:
+      throw new Error(`Invalid size: ${size}`)
+  }
+}
+
+function getYBottomThirdLargeTextForShape(size) {
+  switch (size) {
+    case Size.ExtraSmall:
+      return 75
+    case Size.Small:
+      return 123
+    case Size.Medium:
+      return 159
+    case Size.Large:
+      return 219
+    default:
+      throw new Error(`Invalid size: ${size}`)
+  }
+}
+
+function getYBottomThirdXLargeTextForShape(size) {
   switch (size) {
     case Size.ExtraSmall:
       return 77
@@ -261,51 +328,6 @@ function getYBottomThirdSmallTextForShape(size) {
       return 161
     case Size.Large:
       return 221
-    default:
-      throw new Error(`Invalid size: ${size}`)
-  }
-}
-
-function getYBottomThirdMediumTextForShape(size) {
-  switch (size) {
-    case Size.ExtraSmall:
-      return 78
-    case Size.Small:
-      return 126
-    case Size.Medium:
-      return 162
-    case Size.Large:
-      return 222
-    default:
-      throw new Error(`Invalid size: ${size}`)
-  }
-}
-
-function getYBottomThirdLargeTextForShape(size) {
-  switch (size) {
-    case Size.ExtraSmall:
-      return 81
-    case Size.Small:
-      return 129
-    case Size.Medium:
-      return 165
-    case Size.Large:
-      return 225
-    default:
-      throw new Error(`Invalid size: ${size}`)
-  }
-}
-
-function getYBottomThirdXLargeTextForShape(size) {
-  switch (size) {
-    case Size.ExtraSmall:
-      return 84
-    case Size.Small:
-      return 132
-    case Size.Medium:
-      return 168
-    case Size.Large:
-      return 228
     default:
       throw new Error(`Invalid size: ${size}`)
   }
