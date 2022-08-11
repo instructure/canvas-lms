@@ -21,7 +21,7 @@ import type { Capability } from '@instructure/updown';
 import { oncePerPage } from '@instructure/updown';
 import { useTranslations } from '@canvas/i18n';
 import doFetchApi from '@canvas/do-fetch-api-effect';
-import fallbacks from '/public/javascripts/translations/en.json';
+import fallbacks from 'translations/en.json';
 
 declare const ENV: {
   RAILS_ENVIRONMENT: 'development' | 'test' | 'production';
