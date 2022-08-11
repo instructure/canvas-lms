@@ -69,21 +69,6 @@ describe CoursePacesController, type: :controller do
                                                  start_date: "2021-10-03",
                                                  end_date: "2021-10-03"
                                                })]
-    @account_level_blackout_date = @course.account.calendar_events.create!(
-      title: "blackout dates 2",
-      start_at: "2021-10-04",
-      end_at: "2021-10-04",
-      blackout_date: true
-    )
-
-    @calendar_event_blackout_dates = [@account_level_blackout_date,
-                                      CalendarEvent.create!({
-                                                              title: "blackout dates 3",
-                                                              start_at: "2021-10-05",
-                                                              end_at: "2021-10-05",
-                                                              context: @course,
-                                                              blackout_date: true
-                                                            })]
 
     @course.save!
     @course.account.enable_feature!(:course_paces)
@@ -117,6 +102,21 @@ describe CoursePacesController, type: :controller do
 
   describe "GET #index" do
     it "populates js_env with course, enrollment, sections, blackout_dates, and course_pace details" do
+      @account_level_blackout_date = @course.account.calendar_events.create!(
+        title: "blackout dates 2",
+        start_at: "2021-10-04",
+        end_at: "2021-10-04",
+        blackout_date: true
+      )
+
+      @calendar_event_blackout_dates = [@account_level_blackout_date,
+                                        CalendarEvent.create!({
+                                                                title: "blackout dates 3",
+                                                                start_at: "2021-10-05",
+                                                                end_at: "2021-10-05",
+                                                                context: @course,
+                                                                blackout_date: true
+                                                              })]
       @section = @course.course_sections.first
       @student_enrollment = @course.enrollments.find_by(user_id: @student.id)
       @progress = @course_pace.create_publish_progress
