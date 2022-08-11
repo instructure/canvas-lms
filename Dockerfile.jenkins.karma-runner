@@ -1,11 +1,7 @@
-FROM local/karma-builder
+FROM local/webpack-builder
+
+ENV APP_HOME /usr/src/app/
+ENV NODE_ENV test
 
 USER docker
 COPY --chown=docker:docker . /usr/src/app
-RUN cp -v docker-compose/config/redis.yml config && \
-  cp -v docker-compose/config/selenium.yml config/ && \
-  cp -vR docker-compose/config/new-jenkins/* config/ && \
-  cp -v config/delayed_jobs.yml.example config/delayed_jobs.yml && \
-  cp -v config/domain.yml.example config/domain.yml && \
-  cp -v config/external_migration.yml.example config/external_migration.yml && \
-  cp -v config/outgoing_mail.yml.example config/outgoing_mail.yml

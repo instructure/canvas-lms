@@ -282,7 +282,6 @@ pipeline {
     BASE_RUNNER_PREFIX = configuration.buildRegistryPath('base-runner')
     CASSANDRA_PREFIX = configuration.buildRegistryPath('cassandra-migrations')
     DYNAMODB_PREFIX = configuration.buildRegistryPath('dynamodb-migrations')
-    KARMA_BUILDER_PREFIX = configuration.buildRegistryPath('karma-builder')
     KARMA_RUNNER_PREFIX = configuration.buildRegistryPath('karma-runner')
     LINTERS_RUNNER_PREFIX = configuration.buildRegistryPath('linters-runner')
     POSTGRES_PREFIX = configuration.buildRegistryPath('postgres-migrations')
