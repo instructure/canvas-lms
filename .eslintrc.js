@@ -276,7 +276,7 @@ module.exports = {
         'import/extensions': 'off',
         'import/no-commonjs': 'off',
         'import/no-extraneous-dependencies': 'off',
-        'import/order': 'off',
+        'import/order': 'off'
       }
     },
     {
