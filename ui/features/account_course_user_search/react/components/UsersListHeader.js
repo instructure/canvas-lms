@@ -21,7 +21,8 @@ import {string, func, shape} from 'prop-types'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {Table} from '@instructure/ui-table'
 import {IconMiniArrowUpSolid, IconMiniArrowDownSolid} from '@instructure/ui-icons'
-import {CondensedButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
+import {Text} from '@instructure/ui-text'
 
 export default function UsersListHeader(props) {
   const {id, tipAsc, tipDesc, label, onUpdateFilters, columnHeaderRef} = props
@@ -33,25 +34,21 @@ export default function UsersListHeader(props) {
     onUpdateFilters({search_term, sort: id, order: newOrder, role_filter_id})
   }
 
+  const SortIcon = order === 'asc' ? IconMiniArrowUpSolid : IconMiniArrowDownSolid
+
   return (
     <Table.ColHeader id={id} data-testid="UsersListHeader">
       <Tooltip renderTip={sort === id && order === 'asc' ? tipAsc : tipDesc}>
-        <CondensedButton
+        <Link
+          isWithinText={false}
           id={`${id}-button`}
+          as="button"
+          renderIcon={sort === id ? SortIcon : undefined}
+          iconPlacement="end"
           onClick={handleFilterUpdate}
-          theme={{fontWeight: '700', mediumPaddingHorizontal: '0', mediumHeight: '1.5rem'}}
         >
-          {label}
-          {sort === id ? (
-            order === 'asc' ? (
-              <IconMiniArrowUpSolid />
-            ) : (
-              <IconMiniArrowDownSolid />
-            )
-          ) : (
-            ''
-          )}
-        </CondensedButton>
+          <Text weight="bold">{label}</Text>
+        </Link>
       </Tooltip>
     </Table.ColHeader>
   )
