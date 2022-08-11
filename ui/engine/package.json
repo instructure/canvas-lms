@@ -29,7 +29,6 @@
       "@typescript-eslint"
     ],
     "rules": {
-      "import/no-absolute-path": "off",
       "react-hooks/rules-of-hooks": "off",
       "prettier/prettier": "off",
       "semi": "off",
