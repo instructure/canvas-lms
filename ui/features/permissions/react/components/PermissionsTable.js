@@ -25,7 +25,8 @@ import {maxBy} from 'lodash'
 // For screenreaderFlashMessageExclusive  Maybe there's a better way
 import '@canvas/rails-flash-notifications'
 
-import {Button, CondensedButton, IconButton} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {IconArrowOpenEndSolid, IconArrowOpenDownSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -223,15 +224,14 @@ export default class PermissionsTable extends Component {
             )}
             {isGranular && <span style={{minWidth: '2.25rem'}} />}
             <View maxWidth="17rem" as="div" padding="small">
-              <CondensedButton
-                variant="link"
-                onClick={() => this.props.setAndOpenPermissionTray(perm)}
+              <Link
+                isWithinText={false}
+                as="button"
                 id={`permission_${name}`}
-                theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
-                fluidWidth
+                onClick={() => this.props.setAndOpenPermissionTray(perm)}
               >
-                {perm.label}
-              </CondensedButton>
+                <Text size="medium">{perm.label}</Text>
+              </Link>
               {hasGranulars && renderGroupDescription()}
             </View>
           </div>
