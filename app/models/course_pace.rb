@@ -40,6 +40,7 @@ class CoursePace < ActiveRecord::Base
   belongs_to :root_account, class_name: "Account"
 
   after_create :log_pace_counts
+  after_save :log_exclude_weekends_counts, if: :logging_for_weekends_required?
 
   validates :course_id, presence: true
   validate :valid_secondary_context
@@ -279,6 +280,10 @@ class CoursePace < ActiveRecord::Base
     end
   end
 
+  def logging_for_weekends_required?
+    saved_change_to_exclude_weekends? || (saved_change_to_id? && exclude_weekends)
+  end
+
   def log_pace_counts
     if course_section_id.present?
       InstStatsd::Statsd.increment("course_pacing.section_paces.count")
@@ -286,6 +291,15 @@ class CoursePace < ActiveRecord::Base
       InstStatsd::Statsd.increment("course_pacing.user_paces.count")
     else
       InstStatsd::Statsd.increment("course_pacing.course_paces.count")
+    end
+  end
+
+  def log_exclude_weekends_counts
+    if exclude_weekends
+      InstStatsd::Statsd.increment("course_pacing.weekends_excluded")
+    else
+      # Only decrementing during an update (not initial create)
+      InstStatsd::Statsd.decrement("course_pacing.weekends_excluded") unless saved_change_to_id?
     end
   end
 end
