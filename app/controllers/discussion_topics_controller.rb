@@ -662,7 +662,7 @@ class DiscussionTopicsController < ApplicationController
 
     set_master_course_js_env_data(@topic, @context)
     conditional_release_js_env(@topic.assignment)
-    render :edit
+    render :edit, layout: params[:embed] == "true" ? "mobile_embed" : true
   end
 
   def show
@@ -774,9 +774,12 @@ class DiscussionTopicsController < ApplicationController
         end
       end
 
+      edit_url = context_url(@topic.context, :edit_context_discussion_topic_url, @topic)
+      edit_url += "?embed=true" if params[:embed] == "true"
+
       js_env({
                course_id: params[:course_id] || @context.course&.id,
-               EDIT_URL: context_url(@topic.context, :edit_context_discussion_topic_url, @topic),
+               EDIT_URL: edit_url,
                PEER_REVIEWS_URL: @topic.assignment ? context_url(@topic.assignment.context, :context_assignment_peer_reviews_url, @topic.assignment.id) : nil,
                discussion_topic_id: params[:id],
                manual_mark_as_read: @current_user&.manual_mark_as_read?,
