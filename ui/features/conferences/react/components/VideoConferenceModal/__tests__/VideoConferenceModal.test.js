@@ -34,6 +34,16 @@ describe('VideoConferenceModal', () => {
   beforeEach(() => {
     onDismiss.mockClear()
     onSubmit.mockClear()
+    window.ENV.conference_type_details = [
+      {
+        name: 'BigBlueButton',
+        type: 'BigBlueButton',
+        settings: [],
+        free_trial: false,
+        lti_settings: null,
+        contexts: null
+      }
+    ]
   })
 
   it('should render', () => {
@@ -121,7 +131,8 @@ describe('VideoConferenceModal', () => {
       options: ['recording_enabled'],
       description: 'An introduction to PHP.',
       invitationOptions: [],
-      attendeesOptions: ['share_webcam']
+      attendeesOptions: ['share_webcam'],
+      type: 'BigBlueButton'
     })
 
     expect(container.getByText('Save')).toBeInTheDocument()

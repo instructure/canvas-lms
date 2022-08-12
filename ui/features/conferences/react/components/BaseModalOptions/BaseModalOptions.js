@@ -31,7 +31,7 @@ const BBBModalOptions = props => {
   return (
     <>
       <Flex margin="none none large" direction="column">
-        <Flex.Item padding="small">
+        <Flex.Item padding="medium">
           <TextInput
             renderLabel={I18n.t('Name')}
             placeholder={I18n.t('Conference Name')}
@@ -42,7 +42,7 @@ const BBBModalOptions = props => {
             isRequired
           />
         </Flex.Item>
-        <Flex.Item padding="small">
+        <Flex.Item padding="medium">
           <span data-testid="duration-input">
             <NumberInput
               renderLabel={I18n.t('Duration in Minutes')}
@@ -68,7 +68,7 @@ const BBBModalOptions = props => {
             />
           </span>
         </Flex.Item>
-        <Flex.Item padding="small">
+        <Flex.Item padding="medium">
           <CheckboxGroup
             name="options"
             onChange={value => {
@@ -83,7 +83,7 @@ const BBBModalOptions = props => {
             />
           </CheckboxGroup>
         </Flex.Item>
-        <Flex.Item padding="small">
+        <Flex.Item padding="medium">
           <CheckboxGroup
             name="invitation_options"
             onChange={value => {
@@ -99,7 +99,7 @@ const BBBModalOptions = props => {
             />
           </CheckboxGroup>
         </Flex.Item>
-        <Flex.Item padding="small">
+        <Flex.Item padding="medium">
           <TextArea
             label={I18n.t('Description')}
             placeholder={I18n.t('Conference Description')}

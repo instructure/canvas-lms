@@ -26,6 +26,25 @@ export default {
   argTypes: {}
 }
 
+window.ENV.conference_type_details = [
+  {
+    name: 'Adobe Connect',
+    type: 'AdobeConnect',
+    settings: [],
+    free_trial: false,
+    lti_settings: null,
+    contexts: null
+  },
+  {
+    name: 'BigBlueButton',
+    type: 'BigBlueButton',
+    settings: [],
+    free_trial: false,
+    lti_settings: null,
+    contexts: null
+  }
+]
+
 const Template = args => <VideoConferenceModal {...args} />
 
 export const Default = Template.bind({})
@@ -42,5 +61,6 @@ WhileEditing.args = {
   options: ['recording_enabled'],
   description: 'An introduction to PHP.',
   invitationOptions: [],
-  attendeesOptions: ['share_webcam']
+  attendeesOptions: ['share_webcam'],
+  type: 'BigBlueButton'
 }
