@@ -43,6 +43,7 @@ import React, {Component} from 'react'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
 import SimilarityPledge from './SimilarityPledge'
 import StudentFooter from './StudentFooter'
+import SubmissionCompletedModal from './SubmissionCompletedModal'
 import {
   STUDENT_VIEW_QUERY,
   SUBMISSION_HISTORIES_QUERY
@@ -167,7 +168,8 @@ export default class SubmissionManager extends Component {
     similarityPledgeChecked: false,
     showConfetti: false,
     submittingAssignment: false,
-    uploadingFiles: false
+    uploadingFiles: false,
+    submissionCompletedModalOpen: false
   }
 
   componentDidMount() {
@@ -403,6 +405,28 @@ export default class SubmissionManager extends Component {
       // Need to reset state after that in case they submit another attempt.
       this.setState({showConfetti: false})
     }, 4000)
+    if (this.props.submission.assignedAssessments.length > 0) {
+      this.handleOpenSubmissionCompletedModal()
+    }
+  }
+
+  handleOpenSubmissionCompletedModal() {
+    this.setState({submissionCompletedModalOpen: true})
+  }
+
+  handleCloseSubmissionCompletedModal() {
+    this.setState({submissionCompletedModalOpen: false})
+  }
+
+  handleRedirectToFirstPeerReview() {
+    const assessment = this.props.submission.assignedAssessments[0]
+    let url = `/courses/${ENV.COURSE_ID}/assignments/${ENV.ASSIGNMENT_ID}`
+    if (assessment.anonymizedUser) {
+      url += `?reviewee_id=${assessment.anonymizedUser._id}`
+    } else {
+      url += `?anonymous_asset_id=${assessment.anonymousId}`
+    }
+    window.location.assign(url)
   }
 
   renderAttemptTab(context) {
@@ -657,6 +681,12 @@ export default class SubmissionManager extends Component {
               {this.renderFooter(context)}
             </>
             {this.state.showConfetti ? <Confetti /> : null}
+            <SubmissionCompletedModal
+              count={this.props.submission.assignedAssessments.length}
+              open={this.state.submissionCompletedModalOpen}
+              onClose={() => this.handleCloseSubmissionCompletedModal()}
+              onRedirect={() => this.handleRedirectToFirstPeerReview()}
+            />
           </>
         )}
       </StudentViewContext.Consumer>
