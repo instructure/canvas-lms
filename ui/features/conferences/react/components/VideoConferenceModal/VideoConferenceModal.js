@@ -17,19 +17,28 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
 import {Button, CloseButton} from '@instructure/ui-buttons'
-
 import VideoConferenceTypeSelect from '../VideoConferenceTypeSelect/VideoConferenceTypeSelect'
 import BBBModalOptions from '../BBBModalOptions/BBBModalOptions'
 import BaseModalOptions from '../BaseModalOptions/BaseModalOptions'
 
 const I18n = useI18nScope('video_conference')
 
-export const VideoConferenceModal = ({open, onDismiss, onSubmit, isEditing, ...props}) => {
+export const VideoConferenceModal = ({
+  availableAttendeesList,
+  isEditing,
+  open,
+  onDismiss,
+  onSubmit,
+  ...props
+}) => {
+  const SETTINGS_TAB = 'settings'
+  const ATTENDEES_TAB = 'attendees'
+
   const OPTIONS_DEFAULT = ['recording_enabled', 'no_time_limit', 'enable_waiting_room']
   const INVITATION_OPTIONS_DEFAULT = ['invite_all']
   const ATTENDEES_OPTIONS_DEFAULT = [
@@ -53,6 +62,16 @@ export const VideoConferenceModal = ({open, onDismiss, onSubmit, isEditing, ...p
   const [attendeesOptions, setAttendeesOptions] = useState(
     isEditing ? props.attendeesOptions : ATTENDEES_OPTIONS_DEFAULT
   )
+  const [showAddressBook, setShowAddressBook] = useState(false)
+  const [selectedAttendees, setSelectedAttendees] = useState(
+    props.selectedAttendees ? props.selectedAttendees : []
+  )
+
+  // Detect initial state for address book display
+  useEffect(() => {
+    const inviteAll = invitationOptions.includes('invite_all')
+    inviteAll ? setShowAddressBook(false) : setShowAddressBook(true)
+  }, [invitationOptions])
 
   const renderCloseButton = () => {
     return (
@@ -83,6 +102,10 @@ export const VideoConferenceModal = ({open, onDismiss, onSubmit, isEditing, ...p
           onSetInvitationOptions={setInvitationOptions}
           attendeesOptions={attendeesOptions}
           onSetAttendeesOptions={setAttendeesOptions}
+          showAddressBook={showAddressBook}
+          onAttendeesChange={setSelectedAttendees}
+          availableAttendeesList={availableAttendeesList}
+          selectedAttendees={selectedAttendees}
         />
       )
     }
@@ -99,6 +122,10 @@ export const VideoConferenceModal = ({open, onDismiss, onSubmit, isEditing, ...p
         onSetDescription={setDescription}
         invitationOptions={invitationOptions}
         onSetInvitationOptions={setInvitationOptions}
+        showAddressBook={showAddressBook}
+        onAttendeesChange={setSelectedAttendees}
+        availableAttendeesList={availableAttendeesList}
+        selectedAttendees={selectedAttendees}
       />
     )
   }
@@ -157,7 +184,9 @@ VideoConferenceModal.propTypes = {
   description: PropTypes.string,
   invitationOptions: PropTypes.arrayOf(PropTypes.string),
   attendeesOptions: PropTypes.arrayOf(PropTypes.string),
-  type: PropTypes.string
+  type: PropTypes.string,
+  availableAttendeesList: PropTypes.arrayOf(PropTypes.object),
+  selectedAttendees: PropTypes.arrayOf(PropTypes.string)
 }
 
 VideoConferenceModal.defaultProps = {
