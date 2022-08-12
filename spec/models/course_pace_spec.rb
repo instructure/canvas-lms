@@ -546,4 +546,56 @@ describe CoursePace do
       expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.user_paces.count").once
     end
   end
+
+  context "course pace publish logs statsd for exclude weekends" do
+    before :once do
+      course_with_student active_all: true
+      @course.root_account.enable_feature!(:course_paces)
+      @course.enable_course_paces = true
+      @course.save!
+      @module = @course.context_modules.create!
+      @assignment = @course.assignments.create!
+      @tag = @assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
+    end
+
+    it "increments on initial publish when exclude_weekends set to true" do
+      allow(InstStatsd::Statsd).to receive(:increment)
+
+      @course_pace = @course.course_paces.create!(workflow_state: "active")
+
+      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+    end
+
+    it "does not decrement on initial publish when exclude_weekends set to false" do
+      allow(InstStatsd::Statsd).to receive(:decrement)
+
+      @course_pace = @course.course_paces.create!(workflow_state: "active", exclude_weekends: false)
+
+      expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course_pacing.weekends_excluded")
+    end
+
+    it "increments on subsequent publish when exclude_weekends initially false then set to true" do
+      allow(InstStatsd::Statsd).to receive(:increment)
+      allow(InstStatsd::Statsd).to receive(:decrement)
+
+      @course_pace = @course.course_paces.create!(workflow_state: "active", exclude_weekends: false)
+      @course_pace.update!(exclude_weekends: true)
+      @course_pace.publish
+
+      expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course_pacing.weekends_excluded")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+    end
+
+    it "decrements on subsequent publish when exclude_weekends initially true then set to false" do
+      allow(InstStatsd::Statsd).to receive(:increment)
+      allow(InstStatsd::Statsd).to receive(:decrement)
+
+      @course_pace = @course.course_paces.create!(workflow_state: "active")
+      @course_pace.update!(exclude_weekends: false)
+      @course_pace.publish
+
+      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+      expect(InstStatsd::Statsd).to have_received(:decrement).with("course_pacing.weekends_excluded")
+    end
+  end
 end
