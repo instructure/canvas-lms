@@ -647,4 +647,24 @@ describe CoursePace do
       expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.average_assignment_duration", 0)
     end
   end
+
+  describe "log_module_items_count" do
+    before do
+      rubric = @course.rubrics.create!(title: "rubric")
+      @course.context_module_tags.create!(content: rubric, context_module: @module, context: @course, workflow_state: "active")
+      allow(InstStatsd::Statsd).to receive(:count)
+    end
+
+    it "logs the number of module items to statsd" do
+      @course_pace.log_module_items_count
+      expect(InstStatsd::Statsd).to have_received(:count).with("course.paced.paced_module_item_count", 1)
+      expect(InstStatsd::Statsd).to have_received(:count).with("course.paced.all_module_item_count", 2)
+    end
+
+    it "logs during #publish" do
+      @course_pace.publish
+      expect(InstStatsd::Statsd).to have_received(:count).with("course.paced.paced_module_item_count", 1)
+      expect(InstStatsd::Statsd).to have_received(:count).with("course.paced.all_module_item_count", 2)
+    end
+  end
 end
