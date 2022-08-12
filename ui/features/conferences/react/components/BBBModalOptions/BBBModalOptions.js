@@ -20,6 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
+import {ConferenceAddressBook} from '../ConferenceAddressBook/ConferenceAddressBook'
 import {TextInput} from '@instructure/ui-text-input'
 import {NumberInput} from '@instructure/ui-number-input'
 import {Flex} from '@instructure/ui-flex'
@@ -126,7 +127,7 @@ const BBBModalOptions = props => {
             <CheckboxGroup
               name="invitation_options"
               onChange={value => {
-                props.onSetInvitationOptions(value)
+                props.onSetInvitationOptions([...value])
               }}
               defaultValue={props.invitationOptions}
               description={I18n.t('Invitation Options')}
@@ -138,6 +139,18 @@ const BBBModalOptions = props => {
               />
             </CheckboxGroup>
           </Flex.Item>
+          {props.showAddressBook && (
+            <Flex.Item padding="small">
+              <ConferenceAddressBook
+                data-testId="conference-address-book"
+                selectedIds={props.selectedAttendees}
+                userList={props.availableAttendeesList}
+                onChange={userList => {
+                  props.onAttendeesChange(userList.map(u => u.id))
+                }}
+              />
+            </Flex.Item>
+          )}
           <Flex.Item padding="small">
             <CheckboxGroup
               name="attendees_options"
@@ -172,7 +185,11 @@ BBBModalOptions.propTypes = {
   invitationOptions: PropTypes.array,
   onSetInvitationOptions: PropTypes.func,
   attendeesOptions: PropTypes.array,
-  onSetAttendeesOptions: PropTypes.func
+  onSetAttendeesOptions: PropTypes.func,
+  showAddressBook: PropTypes.bool,
+  onAttendeesChange: PropTypes.func,
+  availableAttendeesList: PropTypes.arrayOf(PropTypes.object),
+  selectedAttendees: PropTypes.arrayOf(PropTypes.string)
 }
 
 export default BBBModalOptions

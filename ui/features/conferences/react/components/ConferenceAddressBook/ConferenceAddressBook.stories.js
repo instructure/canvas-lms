@@ -18,7 +18,7 @@
 
 import React from 'react'
 
-import {VideoConferenceModal} from './VideoConferenceModal'
+import {ConferenceAddressBook} from './ConferenceAddressBook'
 
 const userList = [
   {displayName: 'Allison Pitler', id: '7'},
@@ -33,49 +33,17 @@ const userList = [
 ]
 
 export default {
-  title: 'Examples/Conferences/VideoConferenceModal',
-  component: VideoConferenceModal,
+  title: 'Examples/Conferences/ConferenceAddressBook',
+  component: ConferenceAddressBook,
   argTypes: {}
 }
 
-window.ENV.conference_type_details = [
-  {
-    name: 'Adobe Connect',
-    type: 'AdobeConnect',
-    settings: [],
-    free_trial: false,
-    lti_settings: null,
-    contexts: null
-  },
-  {
-    name: 'BigBlueButton',
-    type: 'BigBlueButton',
-    settings: [],
-    free_trial: false,
-    lti_settings: null,
-    contexts: null
-  }
-]
-
-const Template = args => <VideoConferenceModal {...args} />
+const Template = args => <ConferenceAddressBook userList={userList} {...args} />
 
 export const Default = Template.bind({})
-Default.args = {
-  open: true,
-  availableAttendeesList: userList
-}
+Default.args = {}
 
-export const WhileEditing = Template.bind({})
-WhileEditing.args = {
-  open: true,
-  isEditing: true,
-  name: 'PHP Introduction',
-  duration: 45,
-  options: ['recording_enabled'],
-  description: 'An introduction to PHP.',
-  invitationOptions: [],
-  attendeesOptions: ['share_webcam'],
-  type: 'BigBlueButton',
-  availableAttendeesList: userList,
-  selectedAttendees: ['2', '3', '7']
+export const SelectedUsers = Template.bind({})
+SelectedUsers.args = {
+  selectedIds: ['1', '2', '3']
 }
