@@ -65,6 +65,7 @@ const OutcomeManagementPanel = ({
     useResize()
   const [scrollContainer, setScrollContainer] = useState(null)
   const [rhsGroupIdsToRefetch, setRhsGroupIdsToRefetch] = useState([])
+  const [lhsGroupIdsToRefetch, setLhsGroupIdsToRefetch] = useState([])
   const {
     selectedOutcomeIds,
     selectedOutcomesCount,
@@ -88,7 +89,7 @@ const OutcomeManagementPanel = ({
     updateSearch: onSearchChangeHandler,
     clearSearch: onSearchClearHandler,
     clearCache
-  } = useManageOutcomes({collection: 'OutcomeManagementPanel', importNumber})
+  } = useManageOutcomes({collection: 'OutcomeManagementPanel', importNumber, lhsGroupIdsToRefetch})
 
   useEffect(() => {
     return () => {
@@ -112,6 +113,10 @@ const OutcomeManagementPanel = ({
           []
         )
       )
+      const lhsTargetGroupIdsToRefetch = targetGroupIdsToRefetch.map(gid =>
+        gid === ROOT_GROUP ? rootId : gid
+      )
+      setLhsGroupIdsToRefetch(lhsTargetGroupIdsToRefetch)
       setRhsGroupIdsToRefetch(ids => [...new Set([...ids, ...groupIdsToRefetch])])
       setTargetGroupIdsToRefetch([])
     }
