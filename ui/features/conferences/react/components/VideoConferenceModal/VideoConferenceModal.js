@@ -22,19 +22,14 @@ import PropTypes from 'prop-types'
 import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
 import {Button, CloseButton} from '@instructure/ui-buttons'
-import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
-import {TextInput} from '@instructure/ui-text-input'
-import {NumberInput} from '@instructure/ui-number-input'
-import {Flex} from '@instructure/ui-flex'
-import {TextArea} from '@instructure/ui-text-area'
-import {Tabs} from '@instructure/ui-tabs'
+
+import VideoConferenceTypeSelect from '../VideoConferenceTypeSelect/VideoConferenceTypeSelect'
+import BBBModalOptions from '../BBBModalOptions/BBBModalOptions'
+import BaseModalOptions from '../BaseModalOptions/BaseModalOptions'
 
 const I18n = useI18nScope('video_conference')
 
 export const VideoConferenceModal = ({open, onDismiss, onSubmit, isEditing, ...props}) => {
-  const SETTINGS_TAB = 'settings'
-  const ATTENDEES_TAB = 'attendees'
-
   const OPTIONS_DEFAULT = ['recording_enabled', 'no_time_limit', 'enable_waiting_room']
   const INVITATION_OPTIONS_DEFAULT = ['invite_all']
   const ATTENDEES_OPTIONS_DEFAULT = [
@@ -45,8 +40,10 @@ export const VideoConferenceModal = ({open, onDismiss, onSubmit, isEditing, ...p
     'send_private_chat'
   ]
 
-  const [tab, setTab] = useState(SETTINGS_TAB)
   const [name, setName] = useState(isEditing ? props.name : '')
+  const [conferenceType, setConferenceType] = useState(
+    isEditing ? props.type : window.ENV.conference_type_details[0].type
+  )
   const [duration, setDuration] = useState(isEditing ? props.duration : 60)
   const [options, setOptions] = useState(isEditing ? props.options : OPTIONS_DEFAULT)
   const [description, setDescription] = useState(isEditing ? props.description : '')
@@ -69,6 +66,42 @@ export const VideoConferenceModal = ({open, onDismiss, onSubmit, isEditing, ...p
   }
 
   const header = isEditing ? I18n.t('Edit Video Conference') : I18n.t('New Video Conference')
+
+  const renderModalOptions = () => {
+    if (conferenceType === 'BigBlueButton') {
+      return (
+        <BBBModalOptions
+          name={name}
+          onSetName={setName}
+          duration={duration}
+          onSetDuration={setDuration}
+          options={options}
+          onSetOptions={setOptions}
+          description={description}
+          onSetDescription={setDescription}
+          invitationOptions={invitationOptions}
+          onSetInvitationOptions={setInvitationOptions}
+          attendeesOptions={attendeesOptions}
+          onSetAttendeesOptions={setAttendeesOptions}
+        />
+      )
+    }
+
+    return (
+      <BaseModalOptions
+        name={name}
+        onSetName={setName}
+        duration={duration}
+        onSetDuration={setDuration}
+        options={options}
+        onSetOptions={setOptions}
+        description={description}
+        onSetDescription={setDescription}
+        invitationOptions={invitationOptions}
+        onSetInvitationOptions={setInvitationOptions}
+      />
+    )
+  }
 
   return (
     <Modal
@@ -95,134 +128,11 @@ export const VideoConferenceModal = ({open, onDismiss, onSubmit, isEditing, ...p
         <Heading>{header}</Heading>
       </Modal.Header>
       <Modal.Body padding="none" overflow="fit">
-        <Tabs
-          onRequestTabChange={(e, {id}) => {
-            setTab(id)
-          }}
-        >
-          <Tabs.Panel
-            id={SETTINGS_TAB}
-            renderTitle={I18n.t('Settings')}
-            selected={tab === SETTINGS_TAB}
-          >
-            <Flex margin="none none large" direction="column">
-              <Flex.Item padding="small">
-                <TextInput
-                  renderLabel={I18n.t('Name')}
-                  placeholder={I18n.t('Conference Name')}
-                  value={name}
-                  onChange={(e, value) => {
-                    setName(value)
-                  }}
-                  isRequired
-                />
-              </Flex.Item>
-              <Flex.Item padding="small">
-                <span data-testid="duration-input">
-                  <NumberInput
-                    renderLabel={I18n.t('Duration in Minutes')}
-                    display="inline-block"
-                    value={duration}
-                    onChange={(e, value) => {
-                      if (!Number.isInteger(Number(value))) return
-
-                      setDuration(Number(value))
-                    }}
-                    onIncrement={() => {
-                      if (!Number.isInteger(duration)) return
-
-                      setDuration(duration + 1)
-                    }}
-                    onDecrement={() => {
-                      if (!Number.isInteger(duration)) return
-                      if (duration === 0) return
-
-                      setDuration(duration - 1)
-                    }}
-                    isRequired
-                  />
-                </span>
-              </Flex.Item>
-              <Flex.Item padding="small">
-                <CheckboxGroup
-                  name="options"
-                  onChange={value => {
-                    setOptions(value)
-                  }}
-                  defaultValue={options}
-                  description={I18n.t('Options')}
-                >
-                  <Checkbox
-                    label={I18n.t('Enable recording for this conference')}
-                    value="recording_enabled"
-                  />
-                  <Checkbox
-                    label={I18n.t('No time limit (for long-running conferences)')}
-                    value="no_time_limit"
-                  />
-                  <Checkbox label={I18n.t('Enable waiting room')} value="enable_waiting_room" />
-                  <Checkbox label={I18n.t('Add to Calendar')} value="add_to_calendar" />
-                </CheckboxGroup>
-              </Flex.Item>
-              <Flex.Item padding="small">
-                <TextArea
-                  label={I18n.t('Description')}
-                  placeholder={I18n.t('Conference Description')}
-                  value={description}
-                  onChange={e => {
-                    setDescription(e.target.value)
-                  }}
-                />
-              </Flex.Item>
-            </Flex>
-          </Tabs.Panel>
-          <Tabs.Panel
-            id={ATTENDEES_TAB}
-            renderTitle={I18n.t('Attendees')}
-            selected={tab === ATTENDEES_TAB}
-          >
-            <Flex margin="none none large" direction="column">
-              <Flex.Item padding="small">
-                <CheckboxGroup
-                  name="invitation_options"
-                  onChange={value => {
-                    setInvitationOptions(value)
-                  }}
-                  defaultValue={invitationOptions}
-                  description={I18n.t('Invitation Options')}
-                >
-                  <Checkbox label={I18n.t('Invite all course members')} value="invite_all" />
-                  <Checkbox
-                    label={I18n.t('Remove all course observer members')}
-                    value="remove_observers"
-                  />
-                </CheckboxGroup>
-              </Flex.Item>
-              <Flex.Item padding="small">
-                <CheckboxGroup
-                  name="attendees_options"
-                  onChange={value => {
-                    setAttendeesOptions(value)
-                  }}
-                  defaultValue={attendeesOptions}
-                  description={I18n.t('Allow Attendees To...')}
-                >
-                  <Checkbox label={I18n.t('Share webcam')} value="share_webcam" />
-                  <Checkbox
-                    label={I18n.t('See other viewers webcams')}
-                    value="share_other_webcams"
-                  />
-                  <Checkbox label={I18n.t('Share microphone')} value="share_microphone" />
-                  <Checkbox label={I18n.t('Send public chat messages')} value="send_public_chat" />
-                  <Checkbox
-                    label={I18n.t('Send private chat messages')}
-                    value="send_private_chat"
-                  />
-                </CheckboxGroup>
-              </Flex.Item>
-            </Flex>
-          </Tabs.Panel>
-        </Tabs>
+        <VideoConferenceTypeSelect
+          conferenceTypes={window.ENV.conference_type_details}
+          onSetConferenceType={type => setConferenceType(type)}
+        />
+        {renderModalOptions()}
       </Modal.Body>
       <Modal.Footer>
         <Button onClick={onDismiss} margin="0 x-small 0 0" data-testid="cancel-button">
@@ -246,7 +156,8 @@ VideoConferenceModal.propTypes = {
   options: PropTypes.arrayOf(PropTypes.string),
   description: PropTypes.string,
   invitationOptions: PropTypes.arrayOf(PropTypes.string),
-  attendeesOptions: PropTypes.arrayOf(PropTypes.string)
+  attendeesOptions: PropTypes.arrayOf(PropTypes.string),
+  type: PropTypes.string
 }
 
 VideoConferenceModal.defaultProps = {
