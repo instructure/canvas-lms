@@ -191,6 +191,7 @@ class CoursePace < ActiveRecord::Base
       DueDateCacher.recompute_course(course, assignments: assignments_to_refresh, update_grades: true)
 
       # Mark as published
+      log_module_items_count
       update(workflow_state: "active", published_at: DateTime.current)
     end
   end
@@ -309,5 +310,12 @@ class CoursePace < ActiveRecord::Base
 
     average_duration = course_pace_module_items.pluck(:duration).sum / course_pace_module_items.length
     InstStatsd::Statsd.count("course_pacing.average_assignment_duration", average_duration)
+  end
+
+  def log_module_items_count
+    all_active_course_module_items = course.context_module_tags.active
+    paced_course_module_items = all_active_course_module_items.where(id: course_pace_module_items.pluck(:module_item_id))
+    InstStatsd::Statsd.count("course.paced.paced_module_item_count", paced_course_module_items.size)
+    InstStatsd::Statsd.count("course.paced.all_module_item_count", all_active_course_module_items.size)
   end
 end
