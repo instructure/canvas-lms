@@ -2420,6 +2420,7 @@ nn:
       Gir ein brukar løyve til å opprette, endre og slette emnegrupper som er oppretta av studentar.
   allows_user_to_create_edit_and_delete_course_rubri_493ac58f: "Tillet brukar å opprette, redigere, og slette vurderingsskjema."
   allows_user_to_create_edit_and_delete_course_rubri_92b58f29: "Gir ein brukar løyve til å opprette, endre og slette vurderingsskjema i eit emne via lenka for vurderingsskjema. "
+  allows_user_to_create_edit_and_delete_outcomes_and_162c9ece: "Lar brukaren opprette, redigere, og slette læringsmål og læringsmålgrupper på konto- og emnenivå."
   allows_user_to_create_edit_and_delete_outcomes_and_1cf52c38: "Gir ein brukar løyve til å opprette, endre og slette læringsmål og læringsmålgrupper på emnenivå."
   allows_user_to_create_edit_and_delete_rubrics_1c0acc08: "Gir ein brukar løyve til å opprette, endre og slette vurderingsskjema."
   allows_user_to_create_import_edit_and_delete_outco_472c842e: |-
@@ -2427,6 +2428,7 @@ nn:
       emnenivå.
   allows_user_to_create_new_conferences_allows_user__89cebec2: "Gir ein brukar løyve til å opprette nye konferansar. Gir ein brukar løyve til å starte konferansar dei har oppretta sjølve."
   allows_user_to_create_new_conferences_in_courses_a_80899f64: "Tillet brukar å opprette nye konferansar i emner og grupper."
+  allows_user_to_create_new_entries_in_the_faculty_j_2a280fec: "Lar brukaren opprette nye innlegg i lærarloggen"
   allows_user_to_cross_list_sections_f6726df2: "Lar brukaren kryssliste seksjonar."
   allows_user_to_deactivate_designers_in_a_course_e4ed0881: "Lar brukaren deaktivere designarar i eit emne."
   allows_user_to_deactivate_observers_in_a_course_d6e0fee2: "Lar brukaren deaktivere observatørar i eit emne."
@@ -2466,8 +2468,12 @@ nn:
   allows_user_to_edit_blueprint_content_lock_setting_cbbf55ee: "Lar brukar redigere låseinnstillingane for blåkopi på individuelle diskusjonar. "
   allows_user_to_edit_blueprint_content_lock_setting_fd580fab: "Gir ein brukar løyve til å endre låseinnstillingane for Blueprint-innhald på individuelle innstillingar dersom brukaren er påmeldt i eit Blueprint-masteremne."
   allows_user_to_edit_blueprint_course_lock_settings_c89e1787: "Lar brukar redigere låseinnstillingane for blåkopi i sideoversikta og for enkeltsider i eit blåkopi masteremne"
+  allows_user_to_edit_blueprint_lock_settings_for_in_95db0d27: "Lar brukaren redigere låseinnstillingane til individuelle sider i eit blueprint moderemne"
+  allows_user_to_edit_blueprint_lock_settings_in_the_a0a8d955: "Lar brukaren redigere låseinnstillingane til innhaldslista til Sider og for ei individuell side i eit blueprint moderemne."
   allows_user_to_edit_blueprint_lock_settings_on_the_371aeb2a: "Gir ein brukar løyve til å endre Blueprint-låseinnstillingar på sideoversikten i eit Blueprint-masteremne."
   allows_user_to_edit_blueprint_lock_settings_on_the_3a90958b: "Gir ein brukar løyve til å endre låseinnstillingane på oversiktssidene til oppgåver og quizer i eit  Blueprint-masteremne."
+  allows_user_to_edit_blueprint_lock_settings_on_the_43278a22: "Lar brukaren redigere blueprint-låseinnstillingane til innhaldslista til oppgåver og quizar i eit blueprint moderemne."
+  allows_user_to_edit_blueprint_lock_settings_on_the_5b5edb55: "Lar brukaren redigere blueprint-låseinnstillingane til innhaldslista til diskusjonar i eit blueprint moderemne."
   allows_user_to_edit_blueprint_lock_settings_on_the_94a44495: "Gir ein brukar løyve til å endre låseinnstillingane på diskusjonsoversikta i eit Blueprint-masteremne."
   allows_user_to_edit_blueprint_lock_settings_on_the_9f51663c: "Gir ein brukar løyve til å endre låseinnstillingane for filer i eit Blueprint-masteremne. "
   allows_user_to_edit_blueprint_lock_settings_on_the_a2534937: "Gir ein brukar løyve til å endre låseinnstillingane på oversiktssidene til oppgåver og quizer i eit  Blueprint-masteremne. "
@@ -2475,6 +2481,7 @@ nn:
   allows_user_to_edit_configurations_for_manually_ad_7e0f496c: "Gir ein brukar løyve til å endre konfigurasjonar for eksterne appar som er lagt til manuelt. "
   allows_user_to_edit_course_files_and_folders_7a3fc8c7: "Lar brukaren redigere emnefiler og mapper."
   allows_user_to_edit_course_groups_d459145d: "Lar brukaren redigere emnegrupper."
+  allows_user_to_edit_course_image_name_course_code__8a4681c8: "Lar brukaren redigere emnebilde, namn, emnekode, tidssone, underkonto, semester og andre alternativ i emnedetaljer-fana."
   allows_user_to_edit_course_pages_30f188b4: "Lar brukaren redigere emnesider."
   allows_user_to_edit_discussion_topics_5576aeb1: "Lar brukaren redigere diskusjonsemner."
   allows_user_to_edit_grades_and_add_comments_in_spe_dc18e3c0: "Gir ein brukar løyve til å endre vurderingar og legge til kommentarar i SpeedGrader."
@@ -2485,9 +2492,15 @@ nn:
       Gir ein brukar løyve til å sjå vurderingshistorikken.
       Gir ein brukar løyve til å sjå vurderingsoversikta for meistringslæring (dersom den er aktivert).
   allows_user_to_edit_grading_schemes_98c35117: "Gir ein brukar løyve til å endre oppsett for karaktersetjing."
+  allows_user_to_edit_lock_settings_on_individual_as_80ed188a: "Lar brukaren redigere låseinnstillingane for individuelle oppgåver, sider eller diskusjonar."
+  allows_user_to_edit_lock_settings_on_the_assignmen_4c347262: "Lar brukaren redigere låseinnstillingane for Oppgåver og innhaldslistesidene til quizar."
   allows_user_to_edit_question_banks_in_a_course_or__f72a39cf: "Lar brukaren redigere spørsmålsbankar i eit emne eller ein konto."
   allows_user_to_edit_the_course_sis_id_e1eccee3: "Gir ein brukar løyve til å endre SIS-ID for eit emne."
   allows_user_to_edit_the_course_syllabus_a28ff262: "Gir ein brukar løyve til å endre emneoversikta."
+  allows_user_to_edit_title_description_or_remove_co_483daae5: "Lar brukaren redigere tittel, skildring, eller fjerne samarbeidspartnar for alle samarbeider."
+  allows_user_to_enable_and_edit_assignment_group_we_87c09b9f: "Lar brukaren aktivere og endre vekting av oppgåvegrupper i eit emne."
+  allows_user_to_export_the_gradebook_to_a_comma_sep_e52259a3: "Lar brukaren eksportere vurderingsoversikta til ei fil (csv)."
+  allows_user_to_filter_for_blueprint_courses_as_the_2b3d864e: "Lar brukaren filtrere etter blueprint-emne som kontonivå. Lar brukaren fjerne tilknytta emne."
   allows_user_to_filter_for_blueprint_courses_as_the_45dc2c3d: "Gir ein brukar løyve til å filtrere på Blueprint-emne på kontonivå. Gir ein brukar løyve til å legge til tilknytte emne."
   allows_user_to_filter_for_blueprint_courses_as_the_a67832c8: |-
       Gir ein brukar løyve til å filtrere på Blueprint-emne på kontonivå.
@@ -2505,6 +2518,7 @@ nn:
       Gir ein brukar løyve til å importere ressursar frå Commons til eit emne.
       Gir ein brukar løyve til å eksportere oppgåver til Commons eller endre tidlegare delt innhald.
   allows_user_to_import_resources_from_commons_into__6e9d32e6: "Gir ein brukar løyve til å importere ressursar frå Commons til eit emne. Gir ein brukar løyve til å eksportere oppgåver til Commons eller endre tidlegare delt innhald. "
+  allows_user_to_import_resources_from_commons_into__79e8255e: "Lar brukaren importere ressursar frå Commons til eit emne."
   allows_user_to_import_sis_data_583b20a5: "Gir ein brukar løyve til å importere SIS-data."
   allows_user_to_like_discussion_posts_when_the_only_7390d91c: "Gir ein brukar løyve til å like diskusjonsinnlegg når valet \"Berre vurderarar kan like\" er slått på. "
   allows_user_to_manage_assignment_settings_35d94690: "Lar brukaren administrere oppgåveinnstillingar."
@@ -2592,6 +2606,7 @@ nn:
       Gir ein brukar løyve til å sjå lenke til faglærarprotokoll i brukardetaljar-sidemeny.
       Gir ein brukar løyve til å sjå faglærarprotokoll for individuelle studentar.
       Gir ein brukar løyve til legge inn nytt innhald i faglærarprotokollen.
+  allows_user_to_view_a_link_to_the_faculty_journal__61d71a94: "Lar brukaren sjå ei lenke til lærarloggen i sidefeltet på brukardetaljar-sida"
   allows_user_to_view_a_link_to_the_faculty_journal__61d9560e: |-
       Gir løyve til å sjå kopling til faglærarprotokoll i sidemenyen på brukardetaljsida.
       Gir løyve til å sjå informasjon om spesifikke studentar i faglærarprotokoll.
@@ -2599,6 +2614,7 @@ nn:
   allows_user_to_view_access_reports_f7be7a84: "Lar brukaren sjå tilgangsrapportar."
   allows_user_to_view_account_analytics_98fbc6ad: "Gir ein brukar løyve til å sjå kontostatistikk."
   allows_user_to_view_all_course_groups_not_just_tho_bad6d687: "Gir ein brukar løyve til å sjå alle emnegrupper i Samarbeid med-vindauget, ikkje berre grupper som dei er påmelde i."
+  allows_user_to_view_all_item_banks_in_a_course_3b603780: "Lar brukaren sjå alle spørsmålsbankar i eit emne."
   allows_user_to_view_all_item_banks_in_the_account_36f5f214: "Lar brukaren sjå alle spørsmålsbankar som høyrer til kontoen"
   allows_user_to_view_all_replies_within_a_discussio_fea861da: "Lar brukaren sjå alle svar i eit diskusjonstema"
   allows_user_to_view_analytics_link_in_the_user_set_56867782: "Tillet brukar å sjå analyselenka i menyen for brukarinnstillingar."
@@ -2650,6 +2666,8 @@ nn:
   allows_user_to_view_edit_and_delete_conferences_th_7c93c8e1: "Lar brukarane sjå, endra og slette konferansar som dei har oppretta."
   allows_user_to_view_enrollments_on_the_sections_ta_6279a03e: "Gir ein brukar løyve til å sjå påmeldingar under seksjonsfana."
   allows_user_to_view_faculty_journal_entries_in_the_3f58f09c: "Gir brukaren løyve til å sjå oppføringar frå faglærarprotokollen i studentsamhandlingsrapporten."
+  allows_user_to_view_faculty_journal_information_fo_3c725307: "Lar brukaren sjå lærarloggen for individuelle studentar."
+  allows_user_to_view_feature_options_in_account_set_befc6b83: "Lar brukaren sjå funksjonsval i kontoinnstillingar"
   allows_user_to_view_gradebook_9720b3e2: "Lar brukaren sjå Vurderingsoversikta"
   allows_user_to_view_gradebook_allows_user_to_expor_8ed9dfa8: |-
       Gir ein brukar løyve til å sjå vurderingsoversikta.
@@ -2657,6 +2675,7 @@ nn:
       Gir ein brukar løyve til å sjå vurderingsoversikta for meistringsbasert læring (dersom den er slått på).
   allows_user_to_view_grader_comments_on_a_rubric_in_2ac9f890: "Gir ein brukar løyve til å sjå kommentarar frå ein vurderar på eit vurderingskriterium i SpeedGrader."
   allows_user_to_view_groups_in_a_course_8a95805b: "Gir ein brukar løyve til å sjå grupper i eit emne."
+  allows_user_to_view_last_activity_and_total_activi_105b5bc3: "Lar brukaren sjå informasjon om siste og total aktivitet på Personar sida."
   allows_user_to_view_last_activity_and_total_activi_1455c521: "Tillet brukar å sjå informasjon om \"siste aktivitet\" og \"totale aktivitetar\"-rapportar"
   allows_user_to_view_last_activity_and_total_activi_786a7286: "Gir ein brukar løyve til å sjå informasjon om siste aktivitet og total aktivitet på personsida."
   allows_user_to_view_last_activity_total_activity_a_e0bee860: "Gir ein brukar løyve til å kjøre rapportar for siste aktivitet, total aktivitet og studentinteraksjonar."
@@ -2665,10 +2684,14 @@ nn:
       Gir ein brukar løyve til å sjå liste over brukarar på personsida i eit emne.
       Gir ein brukar løyve til å sjå knappen tidlegare påmeldingar på personsida i eit emne.
   allows_user_to_view_list_of_users_in_the_course_pe_9ab1309c: "Lar brukaren sjå lista over personar på personer-sida til emnet."
+  allows_user_to_view_login_id_information_for_stude_70930399: "Lar brukaren sjå login ID informasjonen til studentar."
+  allows_user_to_view_login_id_information_for_users_895256fb: "Lar brukaren sjå login ID informasjonen til brukarar."
   allows_user_to_view_login_ids_in_a_course_people_p_b2cfd83e: "Gir ein brukar løyve til å sjå innloggings-ID-ar frå personoversikta i eit emne."
   allows_user_to_view_login_logout_activity_of_users_9bf218f0: |-
       Gir ein brukar løyve til å sjå inn- og utloggingsaktivitet for brukarar i administrasjonsverktøyet.
       Gir ein brukar løyve til å søke i endringsloggar etter vurderar eller student i administrasjonsverktøyet.
+  allows_user_to_view_login_logout_activity_of_users_e11dd2de: "Lar brukaren sjå innloggings-/utloggingsaktivitet til brukarar i administratorverktøy."
+  allows_user_to_view_names_of_course_templates_in_t_12b87e7e: "Lar brukaren sjå namn på emnemalar i rotkontoen."
   allows_user_to_view_previously_created_collaborati_31f4cfe2: |-
       Gir ein brukar løyve til å sjå tidlegare oppretta samarbeid.
       Gir ein brukar løyve til å endre tittel og skildring eller fjerne samarbeidspartnarar for alle samarbeid.
@@ -4147,10 +4170,14 @@ nn:
   authnrequest_sent_to_idp_74e030fc: "AuthnRequest send til IdP"
   authnresponse_from_idp_185037e9: "AuthnResponse frå IdP"
   author_215203d2: Forfattar
+  author_id_570d3131: author_id
+  author_login_id_57aaec4f: author_login_id
+  author_name_12d871ff: author_name
   author_name_just_made_a_new_annotation_on_the_subm_a1b55e62: "%{author_name} har lagt til ein ny kommentar for %{assignment_title} for  %{user_name}."
   author_name_just_made_a_new_comment_on_the_submiss_cce9251b: "%{author_name}kommenterte nettopp på nytt på innleveringa frå %{user_name}for %{assignment_title}"
   author_name_just_made_a_new_comment_on_the_submiss_dcfad73: "%{author_name}kommenterte nettopp på nytt på innleveringa frå %{user_name}for %{assignment_title}"
   author_s_name_b35e905a: "Forfattaren sitt namn"
+  author_sis_id_b59b62af: author_sis_id
   authorize_e3f25bb4: Autoriser
   authorize_url_f28167a3: "Godkjenn URL"
   auto_leader_7791c30a: auto_leader
@@ -6662,6 +6689,7 @@ nn:
   couldn_t_find_valid_settings_for_this_link_resourc_24bd1e7a: "Kunne ikkje finne gyldige innstillingar for denne koplinga: Ressurslenke ikkje funne"
   couldn_t_generate_diff_message_a0528b20: "Kan ikkje generere diff: %{message}"
   couldn_t_update_standards_for_authority_auth_81206187: "Kan ikkje oppdatere standardar for autoriteten %{auth}"
+  count_40eced3b: Antal
   count_alignments_40fbc23c: 
     one: "%{count} justeringar"
     other: "%{count} justeringar"
@@ -6669,6 +6697,9 @@ nn:
   count_alignments_7d98ee41: "*%{count}* justeringar"
   count_announcements_found_b7b055b3: "%{count} kunngjeringar funne."
   count_apps_found_f4d86860: "%{count} appar funne"
+  count_assignments_bce378d7: 
+    one: "1 oppgåve"
+    other: "%{count} oppgåver"
   count_assignments_found_17520826: 
     one: "1 oppgåve funne"
     other: "%{count} oppgåver funne."
@@ -6685,8 +6716,8 @@ nn:
     other: "%{count}tillatne forsøk"
     zero: "Uavgrensa tillatne forsøk"
   count_attempts_d23c69a0: 
-    one: "1 forsøk"
-    other: "%{count} forsøk"
+    one: "1 Forsøk"
+    other: "%{count} Forsøk"
     zero: "Uavgrensa forsøk"
   count_changes_pushed_by_user_654aade2: "%{count} endringar sendt av %{user}"
   count_comments_cb137ab8: 
@@ -6695,6 +6726,9 @@ nn:
   count_criteria_22927713: 
     one: "1 kriterium"
     other: "%{count} kriterium"
+  count_days_de0c6a32: 
+    one: "1 dag"
+    other: "%{count} dager"
   count_discussions_found_fc326362: "%{count} diskusjonar funne."
   count_errors_prohibited_this_note_from_being_saved_fb546efe: 
     one: "1 feil forhindra lagring av notatet:"
@@ -6726,6 +6760,7 @@ nn:
   count_items_selected_91814713: 
     one: "%{count} element er valde"
     other: "%{count} element er valde"
+  count_less_e65e028b: "%{count} mindre"
   count_max_students_2db76773: "%{count} / %{max} studentar"
   count_max_users_bdebb537: "%{count} / %{max} brukarar"
   count_messages_4f8ff204: 
@@ -6742,7 +6777,22 @@ nn:
   count_options_190d6373: 
     one: "1 alternativ"
     other: "%{count} alternativ"
+  count_options_available_28794ede: 
+    one: "Eit val tilgjengeleg"
+    other: "%{count} val tilgjengeleg"
   count_options_loaded_cd59cc3b: "%{count} val lasta."
+  count_outcomes_3af5e3e: 
+    one: "%{count} læringsmål"
+    other: "%{count} læringsmål"
+  count_outcomes_have_been_moved_to_newgrouptitle_3018f532: 
+    one: "\"%{outcomeTitle}\" har blitt flytta til \"%{newGroupTitle}\"."
+    other: "%{count} har blitt flytta til \"%{newGroupTitle}\"."
+  count_outcomes_selected_55902958: 
+    one: "1 læringsmål vald"
+    other: "%{count} læringsmål vald"
+  count_outcomes_were_successfully_removed_ea0ca83e: 
+    one: "Læringsmålet vart fjerna"
+    other: "%{count} læringsmål fjerna"
   count_page_views_b40102b3: 
     one: "1 sidevising"
     other: "%{count} sidevisingar"
@@ -6761,11 +6811,17 @@ nn:
   count_points_4735a2e8: 
     one: "1 poeng"
     other: "%{count} poeng"
+  count_points_possible_aa76302d: 
+    one: "1 mogeleg poeng"
+    other: "%{count} mogelege poeng"
   count_posted_b92a9562: "%{count} publisert"
   count_posts_added_fa55ce4: 
     one: "%{count} innlegg lagt til"
     other: "%{count} innlegg lagt til"
     zero: "%{count} innlegg lagt til"
+  count_pts_e9de6268: 
+    one: "1 poeng"
+    other: "%{count} poeng"
   count_pushed_changes_6fe7fba: "%{count} endringar"
   count_quizzes_found_e5e29bb4: 
     one: "1 quiz er funnen."
@@ -6773,13 +6829,22 @@ nn:
     zero: "Finn ingen liknande quizar."
   count_recording_5ba8a655: "%{count} innspeling"
   count_recordings_9f8e4148: "%{count} innspelingar"
+  count_release_notes_6f50a89f: 
+    one: "Eitt ulest versjonsnotat."
+    other: "%{count} versjonsntoat."
   count_replies_a685c742: "%{count} svar"
+  count_respondents_fc4c2da4: 
+    one: "1 respondent"
+    other: "%{count} respondentar."
   count_results_9926447c: 
     one: "Eit resultat"
     other: "*%{count}* resultat"
   count_results_displayed_ed39a0f0: 
     one: "Eit resultat viser"
     other: "%{count} resultat viser"
+  count_results_found_da21e05c: 
+    one: "1 resultat funne"
+    other: "%{count} resultat funne"
   count_rows_added_dacc9daf: "%{count} rader lagt til"
   count_rows_removed_c6ff7bc: "%{count} rader fjerna"
   count_sections_466dcd5c: 
@@ -6792,6 +6857,7 @@ nn:
   count_shared_items_loaded_ef94ef6a: 
     one: "1 delt element lasta."
     other: "%{count} delte element lasta."
+  count_students_227cbe2: "(%{count} studentar)"
   count_students_30e46120: 
     one: "1 student"
     other: "%{count} studentar"
@@ -6812,6 +6878,9 @@ nn:
     one: "1 innlevering må karaktersetjast"
     other: "%{count} innleveringar må karaktersetjast"
   count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count} %{type} vil bli sletta og overstig grensa på %{change_threshold}%"
+  count_unpublished_changes_a366ed45: 
+    one: "1 upublisert endring"
+    other: "%{count} upubliserte endringar"
   count_unread_cff5855: "%{count} ulest."
   count_unread_messages_99d6bf17: 
     one: "1 ulest melding"
@@ -6825,6 +6894,12 @@ nn:
     other: "%{count} uleste delingar."
   count_unsynced_changes_1fc147e5: "%{count} usynkroniserte endringar"
   count_users_374d6e47: "(%{count} brukarar)"
+  count_weeks_11fbd2dc: 
+    one: "1 uke"
+    other: "%{count} uker"
+  count_words_e0b79b82: 
+    one: "1 ord"
+    other: "%{count} ord"
   country_is_required_b0afbf52: "Land er obligatorisk"
   country_or_region_26ea046c: "Land eller region"
   country_or_region_is_required_86917b39: "Land eller region er obligatorisk"
@@ -6936,6 +7011,7 @@ nn:
       file_meta: "Kan ikkje eksportere fila sine metadata"
       files: "Kan ikkje eksportere enkelte filer"
       grading_standards: "Kan ikkje eksportere standardar for karaktersetjing"
+      late_policy: "Kunne ikkje eksportere for sein-retningslinjer"
       learning_outcomes: "Kan ikkje eksportere læringsmål"
       lti_links: "Kan ikkje eksportere enkelte eksterne verktøykonfigurasjonar"
       media_file: "Eksport av ei mediefil mislukkast"
@@ -7079,6 +7155,9 @@ nn:
   course_option_links_a79d263d: Emnelenker
   course_outcome_mastery_bb12e292: "Læringsmålsekspertise for emne"
   course_outcomes_7dc1cbc7: Emneresultat
+  course_pace_4dfc7ef3: Emnetempo
+  course_paces_4396b508: Emnetempo
+  course_pacing_40c14b61: Emnetempo
   course_pages_449f1dd4: Emnesider
   course_participation_and_access_settings_7a3d6297: "Emnedeltaking og tilgangsinnstillingar"
   course_people_3058c948: Emnedeltakarar
@@ -7484,6 +7563,7 @@ nn:
         course_lock_all_announcements: "Slå av kommentering av kunngjeringar"
         course_name: Namn
         course_offline_export: "Fråkopla emne"
+        course_paces: Emnetempo
         course_section_name: "Legg til ei ny seksjon"
         course_status_published: "Emnet er publisert"
         course_status_unpublished: "Emnet er ikkje publisert"
@@ -7782,6 +7862,7 @@ nn:
   created_58b8a75a: Oppretta
   created_6ee36dff: "Oppretta:"
   created_ascending_cff48774: "Oppretta: i stigande rekkefølge"
+  created_at_6373bbea: created_at
   created_at_73839757: Oppretta
   created_by_b39b9c8b: "Oppretta av"
   created_by_sis_93fbb66b: created_by_sis
@@ -9495,7 +9576,9 @@ nn:
     click_through: "Klikk for å vise sideinnhald"
     default_content: "Det er ikkje lagt til innhald"
     default_name: Sidenamn
+  eportfolio_id_c69233c1: eportfolio_id
   eportfolio_moderation_feb0ffd3: "ePortfolio administrasjon"
+  eportfolio_name_fd4b9e13: eportfolio_name
   eportfolio_settings_75ba1f9a: Porteføljeinnstillingar
   eportfolios: 
     _page_section: 
@@ -12516,6 +12599,7 @@ nn:
   ireland_f7bb9899: Irland
   irish_567e109f: Irsk
   is_an_lti_1_3_tool_770480a1: "Er eit LTI 1.3-verktøy."
+  is_public_ca8561e8: is_public
   israel_972_e671df75: "Israel (+972)"
   it_looks_like_you_have_an_invalid_email_address_ad_67dec734: "Det ser ut som om du har ei ugyldig e-postadresse: \"%{addr}\""
   it_looks_like_your_content_might_not_load_you_can__dfb85860: "Det ser ut som innhaldet ditt ikkje lastar. Du kan bruke denne knappen og prøve å sende det til ei ny fane."
@@ -12524,6 +12608,8 @@ nn:
   it_took_too_long_to_login_please_try_again_c1ed2e28: "Det tok for lang tid å logge inn. Prøv på nytt seinare"
   italian_bd3c792d: Italiensk
   italy_39_cfad867a: "Italia (+39)"
+  item_banks_1db48044: Spørsmålsbankar
+  item_banks_manage_account_e8040580: "Spørsmålsbankar - administrer konto"
   item_cannot_be_duplicated_cebf3109: "Element kan ikkje dupliserast"
   item_category_category_icon_for_item_name_item_nam_ff2b97f0: "%{item_category} kategoriikon for elementnamn %{item_name}"
   item_complete_d334fd43: "(Element fullført)"
@@ -22426,6 +22512,7 @@ nn:
     conferences: Konferansar
     course_assignments: Emneoppgåver
     course_grades: Emnekarakterar
+    course_paces: Emnetempo
     course_settings: Emneinnstillingar
     discussions: Diskusjonar
     eportfolios: e-porteføljer
@@ -22433,6 +22520,7 @@ nn:
     grades: Vurderingar
     groups: Grupper
     home: Heim
+    item_banks: Spørsmålsbankar
     logout: "Logg av"
     modules: Modular
     observees: Observerer
@@ -24042,6 +24130,7 @@ nn:
   update_your_notification_settings_ed9564f3: "Oppdater varslingsinnstillingane"
   updated_2c1e8615: Oppdatert
   updated_after_3a81825c: "Oppdatert etter"
+  updated_at_ab9f625d: updated_at
   updated_group_group_name_727b1d98: "Oppdatert gruppe %{group_name}"
   updated_math_equation_handling_b84509d1: "Oppgradert handsaming av matematiske uttrykk"
   updated_terms_of_service_82f34148: "Oppdaterte vilkår for bruk"
@@ -25130,6 +25219,7 @@ nn:
   wmv_1119d032: WMV
   word_count_c77fe3a6: Ordtelling
   work_and_create_together_c65f358b: "Opprett og arbeid saman"
+  workflow_state_3a5c99d2: workflow_state
   working_b1f63edf: arbeider...
   would_you_like_to_accept_or_dismiss_this_update_9009d696: "Vil du godta eller avslå oppdateringa?"
   would_you_like_to_enable_this_app_ccdf735d: "Vil du aktivere denne appen?"
