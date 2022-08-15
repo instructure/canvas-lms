@@ -307,7 +307,7 @@ class StreamItem < ActiveRecord::Base
         end
 
         # touch all the users to invalidate the cache
-        User.where(id: sliced_user_ids).touch_all
+        User.where(id: sliced_user_ids).touch_all_skip_locked
       end
     end
 
