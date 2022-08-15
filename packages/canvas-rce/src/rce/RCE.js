@@ -56,6 +56,7 @@ const RCE = forwardRef(function RCE(props, rceRef) {
     textareaClassName,
     rcsProps,
     use_rce_icon_maker,
+    features,
     onFocus,
     onBlur,
     onInit,
@@ -96,6 +97,7 @@ const RCE = forwardRef(function RCE(props, rceRef) {
       textareaClassName,
       trayProps: rcsProps,
       use_rce_icon_maker,
+      features,
       editorOptions: Object.assign(editorOptions, {
         selector: `#${textareaId}`,
         height,
@@ -190,6 +192,12 @@ RCE.propTypes = {
   rcsProps: trayPropTypes,
   // enable the custom icon maker feature (temporary until the feature is forced on)
   use_rce_icon_maker: bool,
+  // record of feature statuses from containing page
+  features: objectOf(bool),
+  // configurable default timeout value for flash alerts
+  flashAlertTimeout: number,
+  // user's timezone
+  timezone: string.isRequired,
   // event handlers
   onFocus: func, // f(RCEWrapper component)
   onBlur: func, // f(event)

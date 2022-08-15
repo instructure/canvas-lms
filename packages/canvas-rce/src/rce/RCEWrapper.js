@@ -36,6 +36,7 @@ import editorLanguage from './editorLanguage'
 import normalizeLocale from './normalizeLocale'
 import {sanitizePlugins} from './sanitizePlugins'
 import {getCanvasUrl} from './getCanvasUrl'
+import RCEGlobals from './RCEGlobals'
 
 import indicate from '../common/indicate'
 import bridge from '../bridge'
@@ -269,7 +270,10 @@ class RCEWrapper extends React.Component {
     instRecordDisabled: PropTypes.bool,
     highContrastCSS: PropTypes.arrayOf(PropTypes.string),
     maxInitRenderedRCEs: PropTypes.number,
-    use_rce_icon_maker: PropTypes.bool
+    use_rce_icon_maker: PropTypes.bool,
+    features: PropTypes.objectOf(PropTypes.bool),
+    flashAlertTimeout: PropTypes.number,
+    timezone: PropTypes.string.isRequired
   }
 
   static defaultProps = {
@@ -285,6 +289,12 @@ class RCEWrapper extends React.Component {
 
   constructor(props) {
     super(props)
+
+    // Set up some limited global state that can be referenced
+    // as needed in RCE's components and function / plugin definitions
+    // Not intended to be dynamically changed!
+    RCEGlobals.setFeatures(this.getRequiredFeatureStatuses())
+    RCEGlobals.setConfig(this.getRequiredConfigValues())
 
     this.editor = null // my tinymce editor instance
     this.language = normalizeLocale(this.props.language)
@@ -361,6 +371,19 @@ class RCEWrapper extends React.Component {
         // eslint-disable-next-line no-console
         console.error('Failed initializing a11y checker', err)
       })
+  }
+
+  getRequiredFeatureStatuses() {
+    const {new_equation_editor, new_math_equation_handling} = this.props.features
+    return {new_equation_editor, new_math_equation_handling}
+  }
+
+  getRequiredConfigValues() {
+    return {
+      locale: normalizeLocale(this.props.language),
+      flashAlertTimeout: this.props.flashAlertTimeout,
+      timezone: this.props.timezone
+    }
   }
 
   getCanvasUrl() {

@@ -74,7 +74,8 @@ describe('OutcomeManagementPanel', () => {
     window.ENV = {
       PERMISSIONS: {
         manage_outcomes: true
-      }
+      },
+      TIMEZONE: 'America/Denver'
     }
 
     defaultMocks = [

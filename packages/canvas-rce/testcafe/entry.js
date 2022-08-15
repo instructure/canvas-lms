@@ -25,6 +25,11 @@ import {renderIntoDiv} from '../src'
 
 renderIntoDiv(document.getElementById('content'), {
   textareaId: 'textarea',
+  features: {
+    new_equation_editor: true,
+    new_math_equation_handling: true
+  },
+  timezone: 'America/Denver',
   editorOptions: () => {
     return {
       plugins: [

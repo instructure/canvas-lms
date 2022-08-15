@@ -16,10 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-//
-// TODO: remove dependency on ENV.url_for_high_contrast
-//
-
 import {setLocale} from 'tinymce-a11y-checker'
 
 export default function initA11yChecker(locale) {

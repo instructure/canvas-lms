@@ -21,6 +21,7 @@ import {act, fireEvent, render, screen, waitFor} from '@testing-library/react'
 import EquationEditorModal from '../index'
 import mathml from '../mathml'
 import advancedPreference from '../advancedPreference'
+import RCEGlobals from '../../../../RCEGlobals'
 
 jest.useFakeTimers()
 
@@ -78,11 +79,7 @@ describe('EquationEditorModal', () => {
   let editor, mockFn
 
   beforeAll(() => {
-    ENV = {
-      FEATURES: {
-        new_equation_editor: true
-      }
-    }
+    RCEGlobals.getFeatures = jest.fn().mockReturnValue({new_equation_editor: true})
 
     MathfieldElement.prototype.getValue = jest.fn().mockImplementation(function () {
       if (this.tagName === 'MATH-FIELD') {
@@ -96,6 +93,10 @@ describe('EquationEditorModal', () => {
         this.innerHTML = value
       }
     })
+  })
+
+  afterAll(() => {
+    jest.resetAllMocks()
   })
 
   beforeEach(() => {

@@ -20,6 +20,8 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import SearchResultsRow from '../SearchResultsRow'
 
+window.ENV = {}
+
 const item = {
   assignment: {
     anonymousGrading: false,
