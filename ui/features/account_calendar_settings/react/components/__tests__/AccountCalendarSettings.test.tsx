@@ -83,7 +83,7 @@ describe('AccountCalendarSettings', () => {
     )
     await findByRole('button', {name: 'University (24)'})
     fetchMock.restore()
-    fetchMock.get('/api/v1/accounts/1/account_calendars?search_term=elemen', [
+    fetchMock.get('/api/v1/accounts/1/account_calendars?search_term=elemen&filter=&per_page=20', [
       {
         id: '134',
         name: 'West Elementary School',

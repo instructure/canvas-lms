@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useCallback, useEffect} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 
 import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
@@ -37,6 +37,8 @@ import {castIdsToInt} from '../utils'
 const I18n = useI18nScope('account_calendar_settings_account_list')
 
 const MIN_SEARCH_TERM_LENGTH = 2
+const PAGE_LENGTH_SEARCH = 20
+const PAGE_LENGTH_FILTER = 100
 
 type ComponentProps = {
   readonly originAccountId: number
@@ -63,7 +65,7 @@ export const AccountList: React.FC<ComponentProps> = ({
     setSearchTerm: setDebouncedSearchTerm,
     searchTermIsPending
   } = useDebouncedSearchTerm('', {
-    isSearchableTerm: term => term.length >= MIN_SEARCH_TERM_LENGTH
+    isSearchableTerm: term => term.length >= MIN_SEARCH_TERM_LENGTH || term.length === 0
   })
 
   useEffect(() => {
@@ -74,7 +76,9 @@ export const AccountList: React.FC<ComponentProps> = ({
   useFetchApi({
     path: `/api/v1/accounts/${originAccountId}/account_calendars`,
     params: {
-      search_term: debouncedSearchTerm
+      search_term: debouncedSearchTerm,
+      filter: filterValue === FilterType.SHOW_ALL ? '' : filterValue,
+      per_page: debouncedSearchTerm ? PAGE_LENGTH_SEARCH : PAGE_LENGTH_FILTER
     },
     success: useCallback(accountData => setAccounts(castIdsToInt(accountData)), []),
     error: useCallback(() => showFlashError(I18n.t('Unable to load results')), []),
@@ -96,12 +100,12 @@ export const AccountList: React.FC<ComponentProps> = ({
           <Img src={SpacePandaUrl} />
         </FlexItem>
         <FlexItem>
-          <Text size="x-large">
-            {I18n.t('No results for "%{searchTerm}"', {searchTerm: debouncedSearchTerm})}
-          </Text>
+          <Text size="x-large">{I18n.t('No results found')}</Text>
         </FlexItem>
         <FlexItem>
-          <Text>{I18n.t('Please try another search term or search with fewer characters')}</Text>
+          <Text>
+            {I18n.t('Please try another search term, filter, or search with fewer characters')}
+          </Text>
         </FlexItem>
       </Flex>
     )
