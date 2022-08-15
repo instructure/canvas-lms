@@ -64,9 +64,9 @@ module QuizzesNext::Importers
     end
 
     def assignment_quiz_assignment(quiz)
-      return unless quiz.assignment?
+      return unless quiz.assignment? || quiz.survey?
 
-      quiz.build_assignment unless quiz.assignment
+      quiz.build_assignment(force: true) unless quiz.assignment
       quiz.assignment
     end
 
