@@ -82,7 +82,6 @@ export default function ConfettiGenerator(opts) {
 
     ctx.fillStyle = ctx.strokeStyle = 'rgba(' + p.color + ', 1)'
     ctx.beginPath()
-
     switch (p.prop) {
       case 'square': {
         ctx.save()
