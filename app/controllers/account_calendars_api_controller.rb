@@ -185,7 +185,12 @@ class AccountCalendarsApiController < ApplicationController
   #
   # @argument search_term [Optional, String]
   #   When included, searches all descendent accounts of provided account for the
-  #   term. Returns matching results. Term must be at least 2 characters.
+  #   term. Returns matching results. Term must be at least 2 characters. Can be
+  #   combined with a filter value.
+  #
+  # @argument filter [Optional, String, "visible"|"hidden"]
+  #   When included, only returns calendars that are either visible or hidden. Can
+  #   be combined with a search term.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/accounts/1/account_calendars \
@@ -198,10 +203,20 @@ class AccountCalendarsApiController < ApplicationController
       search_term = params[:search_term]
       return unless authorized_action(account, @current_user, :manage_account_calendar_visibility)
 
-      accounts = if search_term.present?
+      filter = params[:filter]
+      if filter.present? && !%w[visible hidden].include?(filter)
+        return render json: { errors: t("Expected %{filter} param to be one of: %{visible}, %{hidden}", filter: "filter", visible: "visible", hidden: "hidden") }, status: :bad_request
+      end
+
+      accounts = if search_term.present? || filter.present?
+                   # search all descendants of account
                    searchable_account_ids = [account.id] + Account.sub_account_ids_recursive(account.id)
-                   Account.search_by_attribute(Account.active.where(id: searchable_account_ids), :name, params[:search_term]).order(Account.best_unicode_collation_key("name"), :id)
+                   scope = Account.active.where(id: searchable_account_ids)
+                   scope = scope.where(account_calendar_visible: filter == "visible") if filter.present?
+                   scope = Account.search_by_attribute(scope, :name, params[:search_term]) if search_term.present?
+                   scope.order(Account.best_unicode_collation_key("name"), :id)
                  else
+                   # include only first-level sub-accounts of account
                    [account] + account.sub_accounts.order(Account.best_unicode_collation_key("name"), :id)
                  end
 

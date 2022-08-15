@@ -364,6 +364,53 @@ describe AccountCalendarsApiController do
       end
     end
 
+    context "with a filter" do
+      before :once do
+        @subaccount1.account_calendar_visible = false
+        @subaccount1.save!
+        account_admin_user(active_all: true, account: @root_account, user: @user)
+      end
+
+      before do
+        user_session(@user)
+      end
+
+      it "only returns visible calendars if filter is 'visible'" do
+        get :all_calendars, params: { account_id: @root_account.id, filter: "visible" }
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@root_account.id, @subaccount1a.id, @subaccount2.id)
+      end
+
+      it "only returns hidden calendars if filter is 'hidden'" do
+        get :all_calendars, params: { account_id: @root_account.id, filter: "hidden" }
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1.id)
+      end
+
+      it "returns bad_request if filter is not 'visible' or 'hidden'" do
+        get :all_calendars, params: { account_id: @root_account.id, filter: "rando" }
+        expect(response).to be_bad_request
+      end
+    end
+
+    context "with a search term and a filter" do
+      it "returns accounts matching the search term and filter" do
+        @subaccount1a.account_calendar_visible = false
+        @subaccount1a.save!
+        account_admin_user(active_all: true, account: @root_account, user: @user)
+        user_session(@user)
+        get :all_calendars, params: { account_id: @root_account.id, search_term: "sa-1", filter: "visible" }
+
+        expect(response).to be_successful
+        json = json_parse(response.body)
+        expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1.id)
+      end
+    end
+
     it "returns not found for a fake account id" do
       account_admin_user(active_all: true, account: @root_account, user: @user)
       user_session(@user)
