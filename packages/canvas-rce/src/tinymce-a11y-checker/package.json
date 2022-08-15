@@ -1,6 +1,6 @@
 {
   "name": "tinymce-a11y-checker",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "description": "An accessibility checker plugin for TinyMCE.",
   "main": "lib/plugin.js",
   "module": "lib/modules/plugin.js",
@@ -62,7 +62,7 @@
   "dependencies": {
     "@instructure/canvas-theme": "^7.6.0",
     "@instructure/ui-a11y-content": "^7.6.0",
-    "@instructure/ui-alerts": "7.6.0",
+    "@instructure/ui-alerts": "^7.6.0",
     "@instructure/ui-buttons": "^7.6.0",
     "@instructure/ui-checkbox": "^7.6.0",
     "@instructure/ui-grid": "^7.6.0",
