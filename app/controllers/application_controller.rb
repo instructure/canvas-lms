@@ -317,7 +317,7 @@ class ApplicationController < ActionController::Base
   JS_ENV_SITE_ADMIN_FEATURES = %i[
     featured_help_links word_count_in_speed_grader observer_picker
     lti_platform_storage scale_equation_images new_equation_editor buttons_and_icons_cropper course_paces_for_sections
-    calendar_series account_level_blackout_dates account_calendar_events rce_ux_improvements
+    calendar_series account_level_blackout_dates account_calendar_events rce_ux_improvements render_both_to_do_lists
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours files_dnd usage_rights_discussion_topics
