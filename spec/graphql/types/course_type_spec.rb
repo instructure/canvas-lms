@@ -410,6 +410,23 @@ describe Types::CourseType do
         ).to match_array [@teacher, @student1, @student2, @concluded_user].map(&:to_param)
       end
 
+      it "allows filtering by enrollment type" do
+        expect(
+          course_type.resolve(<<~GQL, current_user: @teacher)
+            usersConnection(
+              filter: {enrollmentTypes: [TeacherEnrollment]}
+            ) { edges { node { _id } } }
+          GQL
+        ).to match_array [@teacher, other_teacher].map(&:to_param)
+        expect(
+          course_type.resolve(<<~GQL, current_user: @teacher)
+            usersConnection(
+              filter: {enrollmentTypes: [StudentEnrollment]}
+            ) { edges { node { _id } } }
+          GQL
+        ).to match_array [@student1, @student2, @inactive_user].map(&:to_param)
+      end
+
       context "loginId" do
         def pseud_params(unique_id, account = Account.default)
           {
