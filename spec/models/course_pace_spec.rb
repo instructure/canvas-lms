@@ -547,7 +547,7 @@ describe CoursePace do
     end
   end
 
-  context "course pace publish logs statsd for exclude weekends" do
+  context "course pace publish logs statsd for various values" do
     before :once do
       course_with_student active_all: true
       @course.root_account.enable_feature!(:course_paces)
@@ -596,6 +596,55 @@ describe CoursePace do
 
       expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
       expect(InstStatsd::Statsd).to have_received(:decrement).with("course_pacing.weekends_excluded")
+    end
+
+    it "logs the average module item duration as a count" do
+      allow(InstStatsd::Statsd).to receive(:count)
+
+      course_pace = @course.course_paces.create!(workflow_state: "active")
+      course_pace_module_item = course_pace.course_pace_module_items.create! module_item: @tag
+      course_pace_module_item.update duration: 2
+      course_pace.publish
+
+      expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.average_assignment_duration", 2)
+    end
+
+    it "logs updated average module item duration as a count when new assignment added" do
+      allow(InstStatsd::Statsd).to receive(:count)
+
+      course_pace = @course.course_paces.create!(workflow_state: "active")
+      course_pace_module_item = course_pace.course_pace_module_items.create! module_item: @tag
+      course_pace_module_item.update duration: 2
+      course_pace.publish
+
+      assignment = @course.assignments.create!
+      new_tag = assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
+
+      new_course_pace_module_item = course_pace.course_pace_module_items.create! module_item: new_tag
+      new_course_pace_module_item.update duration: 4
+      course_pace.publish
+
+      expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.average_assignment_duration", 3)
+    end
+
+    it "doesn't log when no context modules exist" do
+      allow(InstStatsd::Statsd).to receive(:count)
+
+      course_pace = @course.course_paces.create!(workflow_state: "active")
+      course_pace.publish
+
+      expect(InstStatsd::Statsd).not_to have_received(:count).with("course_pacing.average_assignment_duration", 0)
+    end
+
+    it "logs when no context modules item duration is o" do
+      allow(InstStatsd::Statsd).to receive(:count)
+
+      course_pace = @course.course_paces.create!(workflow_state: "active")
+      course_pace_module_item = course_pace.course_pace_module_items.create! module_item: @tag
+      course_pace_module_item.update duration: 0
+      course_pace.publish
+
+      expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.average_assignment_duration", 0)
     end
   end
 end

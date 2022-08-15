@@ -41,6 +41,7 @@ class CoursePace < ActiveRecord::Base
 
   after_create :log_pace_counts
   after_save :log_exclude_weekends_counts, if: :logging_for_weekends_required?
+  after_save :log_average_item_duration
 
   validates :course_id, presence: true
   validate :valid_secondary_context
@@ -301,5 +302,12 @@ class CoursePace < ActiveRecord::Base
       # Only decrementing during an update (not initial create)
       InstStatsd::Statsd.decrement("course_pacing.weekends_excluded") unless saved_change_to_id?
     end
+  end
+
+  def log_average_item_duration
+    return if course_pace_module_items.empty?
+
+    average_duration = course_pace_module_items.pluck(:duration).sum / course_pace_module_items.length
+    InstStatsd::Statsd.count("course_pacing.average_assignment_duration", average_duration)
   end
 end
