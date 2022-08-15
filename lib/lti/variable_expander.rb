@@ -234,12 +234,12 @@ module Lti
                        COURSE_GUARD,
                        default_name: "com_instructure_user_observees"
 
-    # Returns an array of the section names that the user is enrolled in, if the
+    # Returns an array of the section names in a JSON-escaped format that the user is enrolled in, if the
     # context of the tool launch is within a course.
     #
     # @example
     #   ```
-    #   ["Section 1, M-T", "Section 2, W-Th", "TA Section"]
+    #   [\"Section 1, M-T\", \"Section 2, W-Th\", \"TA Section\"]
     #   ```
     register_expansion "com.instructure.User.sectionNames", [],
                        -> { @context.enrollments.active.joins(:course_section).where(user_id: @current_user.id).pluck(:name)&.to_json },

@@ -233,14 +233,14 @@ Returns an empty string otherwise.
  All Others: "c0ddd6c90cbe1ef0f32fbce5c3bf654204be186c"
 ```
 ## com.instructure.User.sectionNames
-Returns an array of the section names that the user is enrolled in, if the
+Returns an array of the section names in a JSON-escaped format that the user is enrolled in, if the
 context of the tool launch is within a course.
 
 **Availability**: *when launched from a course*  
 **Launch Parameter**: *com_instructure_user_section_names*  
 
 ```
-[ "Section 1", "Section 5", "TA Section"]
+[\"Section 1, M-T\", \"Section 2, W-Th\", \"TA Section\"]
 ```
 ## com.instructure.RCS.app_host
 Returns the host of the rich content service for the current region.
