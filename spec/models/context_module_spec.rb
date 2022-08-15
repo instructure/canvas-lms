@@ -396,7 +396,7 @@ describe ContextModule do
         @course.context_external_tools.create!(
           name: "tool", consumer_key: "1", shared_secret: "1",
           url: "http://example.com/", developer_key: DeveloperKey.create!,
-          settings: { use_1_3: true }
+          lti_version: "1.3"
         )
       end
 

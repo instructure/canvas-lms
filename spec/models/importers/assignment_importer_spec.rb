@@ -326,7 +326,6 @@ describe "Importing assignments" do
     context "and the tool uses LTI 1.3" do
       let(:tool_id) { tool.id }
       let(:tool_url) { tool.url }
-      let(:use_1_3) { true }
       let(:dev_key) { DeveloperKey.create! }
       let(:tool) do
         course.context_external_tools.create!(
@@ -334,7 +333,7 @@ describe "Importing assignments" do
           shared_secret: "secret",
           name: "test tool",
           url: "http://www.tool.com/launch",
-          settings: { use_1_3: use_1_3 },
+          lti_version: "1.3",
           workflow_state: "public",
           developer_key: dev_key
         )

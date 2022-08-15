@@ -1447,7 +1447,7 @@ module Lti
             shared_secret: "secret",
             url: "https://www.tool.com/launch",
             developer_key: developer_key,
-            settings: { use_1_3: true }
+            lti_version: "1.3"
           )
         end
 

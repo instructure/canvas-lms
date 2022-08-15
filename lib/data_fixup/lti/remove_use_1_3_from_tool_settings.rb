@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2017 - present Instructure, Inc.
+# Copyright (C) 2022 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,26 +16,16 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-module Factories
-  BASE_ATTRS = {
-    name: "a",
-    url: "http://google.com",
-    consumer_key: "12345",
-    shared_secret: "secret"
-  }.freeze
+module DataFixup::Lti::RemoveUse13FromToolSettings
+  def self.run
+    # limit by developer_key_id first since that has an index and *should* produce the same results
+    ContextExternalTool.where.not(developer_key_id: nil).where("settings LIKE ?", "%use_1_3%").find_each do |tool|
+      # account for both Hash and HashWithIndifferentAccess
+      tool.settings.delete :use_1_3
+      tool.settings.delete "use_1_3"
 
-  def external_tool_model(context: nil, opts: {})
-    context ||= course_model
-    context.context_external_tools.create(
-      BASE_ATTRS.merge(opts)
-    )
-  end
-
-  def external_tool_1_3_model(context: nil, opts: {}, developer_key: nil)
-    developer_key ||= DeveloperKey.create!
-    opts = { developer_key_id: developer_key.id, lti_version: "1.3" }.merge(opts)
-    external_tool_model(context: context, opts: opts)
+      tool.save!
+    end
   end
 end
