@@ -150,7 +150,7 @@ module Lti
     end
 
     def configuration_to_cet_settings_map
-      { url: configuration["target_link_uri"] }
+      { url: configuration["target_link_uri"], lti_version: "1.3" }
     end
 
     def canvas_extensions
