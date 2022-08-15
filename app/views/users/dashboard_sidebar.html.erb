@@ -23,10 +23,13 @@
 </div>
 <% end %>
 <%# Use the legacy to do list for non-students until it works for those roles %>
-<% if planner_enabled? && !@user.non_student_enrollment? %>
+<% render_student_to_do = Account.site_admin.feature_enabled?(:render_both_to_do_lists) ? @user.has_student_enrollment? : !@user.non_student_enrollment? %>
+<% render_teacher_to_do = Account.site_admin.feature_enabled?(:render_both_to_do_lists) ? @user.non_student_enrollment? : !(planner_enabled? && render_student_to_do) %>
+<% if planner_enabled? && render_student_to_do  %>
   <div class="Sidebar__TodoListContainer"></div>
-<% else %>
-  <%= render :partial => 'courses/to_do_list', :locals => {:contexts => nil, :show_legacy_todo_list => true} %>
+<% end %>
+<% if render_teacher_to_do %>
+  <%= render :partial => 'courses/to_do_list', :locals => {:contexts => nil, :show_legacy_todo_list => true, :additional_title_context => @user.has_student_enrollment?} %>
   <% locals = {
       :title => t('coming_up', "Coming Up"),
       :period => :one_week,

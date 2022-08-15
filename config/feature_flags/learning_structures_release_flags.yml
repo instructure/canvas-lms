@@ -126,3 +126,9 @@ account_level_blackout_dates:
   display_name: Account-level course pacing blackout dates
   description: |-
     Allow course pacing blackout dates to be set for accounts instead of just courses.
+render_both_to_do_lists:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Render both To Do lists for teachers with student enrollments
+  description: |-
+    Renders both To Do lists on the dashboard sidebar for teachers with student enrollments.
