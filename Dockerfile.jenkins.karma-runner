@@ -1,7 +1,0 @@
-FROM local/webpack-builder
-
-ENV APP_HOME /usr/src/app/
-ENV NODE_ENV test
-
-USER docker
-COPY --chown=docker:docker . /usr/src/app
