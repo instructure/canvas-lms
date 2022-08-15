@@ -16,44 +16,62 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import ConfettiGenerator from '../ConfettiGenerator'
-import assetFactory from '@canvas/confetti/react/assetFactory'
 
 jest.useFakeTimers()
 beforeAll(() => {
-  HTMLCanvasElement.prototype.getContext = () => ({})
+  HTMLCanvasElement.prototype.getContext = () => ({
+    clearRect: jest.fn(),
+    beginPath: jest.fn(),
+    save: jest.fn(),
+    translate: jest.fn(),
+    rotate: jest.fn(),
+    fillRect: jest.fn(),
+    restore: jest.fn(),
+    drawImage: jest.fn()
+  })
   const htmlCanvasElement = document.createElement('canvas')
   htmlCanvasElement.id = 'confetti-canvas'
   document.body.appendChild(htmlCanvasElement)
 })
-let confettiOpts
-let asset1
-let asset2
-let basicColors
+
+const asset1 = {
+  key: 'panda',
+  type: 'svg',
+  src: '/panda',
+  weight: 0.05,
+  size: 40
+}
+
+const asset2 = {
+  key: 'gnome',
+  type: 'svg',
+  src: '/gnome',
+  weight: 0.05,
+  size: 40
+}
+
+const basicColors = [
+  [165, 104, 246],
+  [230, 61, 135]
+]
+
+const confettiOpts = {
+  colors: basicColors,
+  props: ['square', asset1, asset2].filter(p => p !== null)
+}
+
+const imageCreation = jest.fn()
 
 describe('ConfettiGenerator', () => {
   beforeEach(() => {
-    basicColors = [
-      [165, 104, 246],
-      [230, 61, 135]
-    ]
-    asset1 = {
-      key: 'panda',
-      type: 'svg',
-      src: assetFactory('panda'),
-      weight: 0.05,
-      size: 40
-    }
-    asset2 = {
-      key: 'gnome',
-      type: 'svg',
-      src: assetFactory('gnome'),
-      weight: 0.05,
-      size: 40
-    }
-    confettiOpts = {
-      colors: basicColors,
-      props: ['square', asset1, asset2].filter(p => p !== null)
-    }
+    jest.spyOn(window, 'requestAnimationFrame').mockImplementation(cb => cb())
+    jest.spyOn(window, 'Image').mockImplementation(imageCreation)
+  })
+
+  afterEach(() => {
+    window.requestAnimationFrame.mockRestore()
+    window.Image.mockRestore()
+    imageCreation.mockClear()
   })
 
   it('calls the generator and returns the action', () => {
@@ -61,13 +79,14 @@ describe('ConfettiGenerator', () => {
     expect(confetti).toBeDefined()
   })
 
-  it('returns a number with the render command', () => {
-    const confetti = new ConfettiGenerator()
-    expect(typeof confetti.render()).toBe('number')
-  })
-
   it('returns a number with the clear command', () => {
     const confetti = new ConfettiGenerator()
     expect(typeof confetti.clear()).toBe('undefined')
+  })
+
+  it('only instantiates the needed images', () => {
+    const confetti = new ConfettiGenerator(confettiOpts)
+    confetti.render()
+    expect(imageCreation).toHaveBeenCalledTimes(2)
   })
 })
