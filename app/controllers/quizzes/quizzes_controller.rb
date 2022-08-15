@@ -1148,6 +1148,8 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def quiz_engine_selection
+    return "true" if new_quizzes_by_default?
+
     selection = nil
     if @context.is_a?(Course) && @context.settings.dig(:engine_selected, :user_id)
       selection_obj = @context.settings.dig(:engine_selected, :user_id)
@@ -1156,5 +1158,6 @@ class Quizzes::QuizzesController < ApplicationController
       end
       selection
     end
+    selection
   end
 end

@@ -178,4 +178,31 @@ describe NewQuizzesFeaturesHelper do
       expect(new_quizzes_bank_migrations_enabled?).to eq false
     end
   end
+
+  describe "#new_quizzes_by_default?" do
+    before do
+      allow(@context).to receive(:feature_enabled?).with(:quizzes_next).and_return(true)
+      allow(@context).to receive(:feature_enabled?).with(:new_quizzes_by_default).and_return(true)
+    end
+
+    it "returns true when new_quizzes and new_quizzes_by_default are enabled" do
+      expect(new_quizzes_by_default?).to eq true
+    end
+
+    it "returns false when new_quizzes and new_quizzes_by_default are disabled" do
+      allow(@context).to receive(:feature_enabled?).with(:quizzes_next).and_return(false)
+      allow(@context).to receive(:feature_enabled?).with(:new_quizzes_by_default).and_return(false)
+      expect(new_quizzes_by_default?).to eq false
+    end
+
+    it "returns false when new_quizzes enabled and new_quizzes_by_default disabled" do
+      allow(@context).to receive(:feature_enabled?).with(:new_quizzes_by_default).and_return(false)
+      expect(new_quizzes_by_default?).to eq false
+    end
+
+    it "returns false when new_quizzes disabled and new_quizzes_by_default enabled" do
+      allow(@context).to receive(:feature_enabled?).with(:quizzes_next).and_return(false)
+      expect(new_quizzes_by_default?).to eq false
+    end
+  end
 end
