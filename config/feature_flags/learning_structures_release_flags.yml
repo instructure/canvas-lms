@@ -72,13 +72,6 @@ create_course_subaccount_picker:
     "Manually Created Courses" sub-account, when enabled, this feature allows
     people who can manually create courses to put those courses into any sub-account
     where they have enrollments.
-conferencing_in_planner:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Conferencing in planner
-  description: |-
-    When enabled, this flag shows a "Join" button on Canvas calendar
-    events in the student planner
 account_calendar_events:
   applies_to: SiteAdmin
   state: hidden

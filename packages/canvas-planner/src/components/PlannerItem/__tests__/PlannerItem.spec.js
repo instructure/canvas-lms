@@ -675,46 +675,21 @@ describe('with isObserving', () => {
   })
 })
 
-describe('the "Join" button', () => {
-  it('does not show "Join" button for zoom calendar events', () => {
-    const wrapper = shallow(
-      <PlannerItem
-        {...defaultProps({
-          simplifiedControls: false, // not k5Mode
-          associated_item: 'Calendar Event',
-          completed: false,
-          title: 'I am a Calendar Event',
-          date: DEFAULT_DATE,
-          dateStyle: 'due',
-          onlineMeetingURL: 'https://foo.zoom.us/j/123456789'
-        })}
-      />
-    )
-    expect(wrapper.find('[data-testid="join-button"]').exists()).toBeFalsy()
-  })
-
-  it('does show "Join" button for zoom calendar events if the conferencing_in_planner flag is on', () => {
-    window.ENV ||= {FEATURES: {}}
-    window.ENV.FEATURES.conferencing_in_planner = true
-    try {
-      const wrapper = shallow(
-        <PlannerItem
-          {...defaultProps({
-            simplifiedControls: false, // not k5Mode
-            associated_item: 'Calendar Event',
-            completed: false,
-            title: 'I am a Calendar Event',
-            date: DEFAULT_DATE,
-            dateStyle: 'due',
-            onlineMeetingURL: 'https://foo.zoom.us/j/123456789'
-          })}
-        />
-      )
-      expect(wrapper.find('[data-testid="join-button"]').exists()).toBeTruthy()
-    } finally {
-      window.ENV.FEATURES.conferencing_in_planner = false
-    }
-  })
+it('shows the "Join" button for zoom calendar events', () => {
+  const wrapper = shallow(
+    <PlannerItem
+      {...defaultProps({
+        simplifiedControls: false, // not k5Mode
+        associated_item: 'Calendar Event',
+        completed: false,
+        title: 'I am a Calendar Event',
+        date: DEFAULT_DATE,
+        dateStyle: 'due',
+        onlineMeetingURL: 'https://foo.zoom.us/j/123456789'
+      })}
+    />
+  )
+  expect(wrapper.find('[data-testid="join-button"]').exists()).toBeTruthy()
 })
 
 describe('with simplifiedControls', () => {
