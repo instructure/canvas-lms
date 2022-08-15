@@ -24,7 +24,7 @@ import groovy.transform.Field
 
 def jestNodeRequirementsTemplate(index) {
   def baseTestContainer = [
-    image: env.KARMA_RUNNER_IMAGE,
+    image: 'local/karma-runner',
     command: 'cat'
   ]
 
@@ -35,7 +35,7 @@ def jestNodeRequirementsTemplate(index) {
 
 def getSeleniumGridContainers(count) {
   def baseChromeContainer = [
-    image: "starlord.inscloudgate.net/jenkins/selenium-node-chrome:101.0",
+    image: env.SELENIUM_NODE_IMAGE,
     ttyEnabled: true,
   ]
 
@@ -53,7 +53,7 @@ def getSeleniumGridContainers(count) {
   } + [
     [
       name: 'selenium-hub',
-      image: "starlord.inscloudgate.net/jenkins/selenium-hub:4.1",
+      image: env.SELENIUM_HUB_IMAGE,
       ttyEnabled: true,
       envVars: [
         GRID_BROWSER_TIMEOUT: 3000
@@ -65,7 +65,7 @@ def getSeleniumGridContainers(count) {
 
 def coffeeNodeRequirementsTemplate() {
   def baseTestContainer = [
-    image: env.KARMA_RUNNER_IMAGE,
+    image: 'local/karma-runner',
     command: 'cat'
   ]
 
@@ -79,7 +79,7 @@ def coffeeNodeRequirementsTemplate() {
 
 def karmaNodeRequirementsTemplate() {
   def baseTestContainer = [
-    image: env.KARMA_RUNNER_IMAGE,
+    image: 'local/karma-runner',
     command: 'cat'
   ]
 
@@ -102,7 +102,7 @@ def karmaNodeRequirementsTemplate() {
 
 def packagesNodeRequirementsTemplate() {
   def baseTestContainer = [
-    image: env.KARMA_RUNNER_IMAGE,
+    image: 'local/karma-runner',
     command: 'cat',
     ports: [9876],
     envVars: [
