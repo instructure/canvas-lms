@@ -369,9 +369,9 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def has_placement?(type)
-    # Only LTI 1.0 tools (no developer key) support default placements
+    # Only LTI 1.1 tools support default placements
     # (LTI 2 tools also, but those are not handled by this class)
-    if developer_key_id.blank? &&
+    if lti_version == "1.1" &&
        Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS.include?(type.to_s)
       !!(selectable && (domain || url))
     else
@@ -1025,7 +1025,7 @@ class ContextExternalTool < ActiveRecord::Base
 
       order_clauses = [
         # prefer 1.3 tools
-        sort_by_sql_string("developer_key_id IS NOT NULL"),
+        sort_by_sql_string("lti_version = '1.3'"),
         # prefer tools that are not duplicates
         sort_by_sql_string("identity_hash != 'duplicate'"),
         # prefer tools from closer contexts
@@ -1040,7 +1040,7 @@ class ContextExternalTool < ActiveRecord::Base
       end
 
       query = ContextExternalTool.where(context: contexts).active
-      query = query.where.not(developer_key_id: nil) if only_1_3
+      query = query.where(lti_version: "1.3") if only_1_3
       query = query.where(developer_key_id: preferred_client_id) if preferred_client_id
       query = query.where.not(id: exclude_tool_id) if exclude_tool_id
 
@@ -1099,17 +1099,15 @@ class ContextExternalTool < ActiveRecord::Base
 
   scope :placements, lambda { |*placements|
     if placements.present?
-      # Default placements are only applicable to LTI 1.0. Ignore
-      # LTI 1.3 tools with developer_key_id IS NULL
+      # Default placements are only applicable to LTI 1.1
       default_placement_sql = if (placements.map(&:to_s) & Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS).present?
-                                "(context_external_tools.developer_key_id IS NULL AND
+                                "(context_external_tools.lti_version = '1.1' AND
                            context_external_tools.not_selectable IS NOT TRUE AND
                            ((COALESCE(context_external_tools.url, '') <> '' ) OR
                            (COALESCE(context_external_tools.domain, '') <> ''))) OR "
                               else
                                 ""
                               end
-      return none unless placements
 
       where(default_placement_sql + "EXISTS (?)",
             ContextExternalToolPlacement.where(placement_type: placements)

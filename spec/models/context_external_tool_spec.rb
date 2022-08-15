@@ -2476,7 +2476,7 @@ describe ContextExternalTool do
 
       it "does not assume default placements for LTI 1.3 tools" do
         tool = @course.context_external_tools.create!(
-          name: "a", domain: "http://google.com", consumer_key: "12345", shared_secret: "secret", developer_key: DeveloperKey.create!
+          name: "a", domain: "http://google.com", consumer_key: "12345", shared_secret: "secret", lti_version: "1.3"
         )
         expect(tool.has_placement?(:link_selection)).to eq false
       end
