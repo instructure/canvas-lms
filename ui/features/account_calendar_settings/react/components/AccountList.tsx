@@ -81,7 +81,7 @@ export const AccountList: React.FC<ComponentProps> = ({
       per_page: debouncedSearchTerm ? PAGE_LENGTH_SEARCH : PAGE_LENGTH_FILTER
     },
     success: useCallback(accountData => setAccounts(castIdsToInt(accountData)), []),
-    error: useCallback(() => showFlashError(I18n.t('Unable to load results')), []),
+    error: useCallback(error => showFlashError(I18n.t('Unable to load results'))(error), []),
     loading: setLoading
   })
 

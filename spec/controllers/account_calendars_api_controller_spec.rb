@@ -482,4 +482,27 @@ describe AccountCalendarsApiController do
       expect(json.map { |calendar| calendar["id"] }).to eq([@root_account.id, @subaccount2.id, @subaccount1.id])
     end
   end
+
+  describe "GET 'visible_calendars_count'" do
+    it "returns the count of visible account calendars" do
+      @subaccount1.account_calendar_visible = false
+      @subaccount1.save!
+      account_admin_user(active_all: true, account: @root_account, user: @user)
+      user_session(@user)
+      get :visible_calendars_count, params: { account_id: @root_account.id }
+
+      expect(response).to be_successful
+      json = json_parse(response.body)
+      expect(json["count"]).to eq(3)
+    end
+
+    it "returns unauthorized for an admin without :manage_account_calendar_visibility" do
+      account_admin_user_with_role_changes(active_all: true, account: @root_account, user: @user,
+                                           role_changes: { manage_account_calendar_visibility: false })
+      user_session(@user)
+      get :visible_calendars_count, params: { account_id: @root_account.id }
+
+      expect(response).to be_unauthorized
+    end
+  end
 end

@@ -18,16 +18,35 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
+import fetchMock from 'fetch-mock'
+
+import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 
 import {Footer} from '../Footer'
 
+const VISIBLE_CALENDARS_COUNT_MATCHER = /\/api\/v1\/accounts\/1\/visible_calendars_count.*/
+
 const defaultProps = {
-  selectedCalendarCount: 3,
+  originAccountId: 1,
+  visibilityChanges: [
+    {id: 1, visible: true},
+    {id: 2, visible: false},
+    {id: 10, visible: true}
+  ],
   onApplyClicked: jest.fn(),
   enableSaveButton: true
 }
 
 describe('Footer', () => {
+  beforeEach(() => {
+    fetchMock.get(VISIBLE_CALENDARS_COUNT_MATCHER, {count: 27})
+  })
+
+  afterEach(() => {
+    fetchMock.restore()
+    destroyContainer()
+  })
+
   it('calls onApplyClicked when apply button is pressed', () => {
     const onApplyClicked = jest.fn()
     const {getByRole} = render(<Footer {...defaultProps} onApplyClicked={onApplyClicked} />)
@@ -43,8 +62,14 @@ describe('Footer', () => {
     expect(button).toBeDisabled()
   })
 
-  it('displays the number of calendars selected', () => {
-    const {getByText} = render(<Footer {...defaultProps} />)
-    expect(getByText('3 Account Calendars selected')).toBeInTheDocument()
+  it('displays the number of calendars selected', async () => {
+    const {findByText} = render(<Footer {...defaultProps} />)
+    expect(await findByText('28 Account Calendars selected')).toBeInTheDocument()
+  })
+
+  it('displays an error if the count fails to fetch', async () => {
+    fetchMock.get(VISIBLE_CALENDARS_COUNT_MATCHER, 500, {overwriteRoutes: true})
+    const {findAllByText} = render(<Footer {...defaultProps} />)
+    expect((await findAllByText('Unable to load calendar count'))[0]).toBeInTheDocument()
   })
 })

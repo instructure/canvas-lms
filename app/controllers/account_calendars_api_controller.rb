@@ -225,6 +225,25 @@ class AccountCalendarsApiController < ApplicationController
     end
   end
 
+  # @API Count of all visible account calendars
+  #
+  # Returns the number of visible account calendars.
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/accounts/1/visible_calendars_count \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @returns { "count": "integer" }
+  def visible_calendars_count
+    GuardRail.activate(:secondary) do
+      account = api_find(Account.active, params[:account_id])
+      return unless authorized_action(account, @current_user, :manage_account_calendar_visibility)
+
+      count = Account.active.where(id: [account.id] + Account.sub_account_ids_recursive(account.id)).where(account_calendar_visible: true).count
+      render json: { count: count }
+    end
+  end
+
   private
 
   def require_feature_flag
