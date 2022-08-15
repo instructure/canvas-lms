@@ -19,6 +19,7 @@
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import Link from '../Link'
+import RCEGlobals from '../../../../RCEGlobals'
 
 function renderComponent(props) {
   return render(
@@ -38,10 +39,12 @@ function queryIconByName(elem, name) {
 
 describe('RCE "Links" Plugin > Link', () => {
   beforeAll(() => {
-    ENV = {
-      // 	UTC/GMT -7 hours
-      TIMEZONE: 'America/Denver'
-    }
+    // UTC/GMT -7 hours
+    RCEGlobals.getConfig = jest.fn().mockReturnValue({timezone: 'America/Denver'})
+  })
+
+  afterAll(() => {
+    jest.resetAllMocks()
   })
 
   describe('object type variant', () => {

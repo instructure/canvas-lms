@@ -40,6 +40,7 @@ import {
   IconUnpublishedSolid,
   IconDocumentLine
 } from '@instructure/ui-icons'
+import RCEGlobals from '../../../RCEGlobals'
 
 function IconBlank() {
   return (
@@ -81,7 +82,8 @@ export default function Link(props) {
       dateString = formatMessage('Due: Multiple Dates')
     } else {
       // Uses user locale and timezone
-      const when = formatMessage.date(applyTimezoneOffsetToDate(date, ENV.TIMEZONE), 'long')
+      const configuredTimezone = RCEGlobals.getConfig()?.timezone
+      const when = formatMessage.date(applyTimezoneOffsetToDate(date, configuredTimezone), 'long')
       switch (date_type) {
         case 'todo':
           dateString = formatMessage('To Do: {when}', {when})

@@ -169,6 +169,10 @@ export default class EquationEditorModal extends Component {
     return sansDelimiters.replace(/&nbsp;/g, '').trim()
   }
 
+  usedInCanvas() {
+    return ENV && ENV.hasOwnProperty('disable_keyboard_shortcuts')
+  }
+
   // ********* //
   // Callbacks //
   // ********* //
@@ -201,7 +205,10 @@ export default class EquationEditorModal extends Component {
     if (isMathJaxEvent) {
       return
     }
-    ENV.disable_keyboard_shortcuts = this.hostPageDisablesShortcuts
+    if (this.usedInCanvas()) {
+      // restore the original value
+      ENV.disable_keyboard_shortcuts = this.hostPageDisablesShortcuts
+    }
     this.props.onModalDismiss?.()
   }
 
@@ -213,7 +220,10 @@ export default class EquationEditorModal extends Component {
       onEquationSubmit(output)
     }
 
-    ENV.disable_keyboard_shortcuts = this.hostPageDisablesShortcuts
+    if (this.usedInCanvas()) {
+      // restore the original value
+      ENV.disable_keyboard_shortcuts = this.hostPageDisablesShortcuts
+    }
     onModalDismiss()
   }
 
@@ -277,8 +287,14 @@ export default class EquationEditorModal extends Component {
 
   handleOpen = () => {
     this.originalFormula = null
-    this.hostPageDisablesShortcuts = ENV.disable_keyboard_shortcuts
-    ENV.disable_keyboard_shortcuts = true
+    if (this.usedInCanvas()) {
+      // store the original value (so it can be restored later)
+      this.hostPageDisablesShortcuts = ENV.disable_keyboard_shortcuts
+
+      // And disable keyboard shortcuts while we
+      // are inside the equation editor
+      ENV.disable_keyboard_shortcuts = true
+    }
   }
 
   handleFieldRef = node => {
@@ -290,10 +306,19 @@ export default class EquationEditorModal extends Component {
   // ******************* //
 
   renderFooter = () => {
-    const cancelButton = <Button data-testid="equation-editor-modal-cancel" onClick={this.handleModalCancel}>{formatMessage('Cancel')}</Button>
+    const cancelButton = (
+      <Button data-testid="equation-editor-modal-cancel" onClick={this.handleModalCancel}>
+        {formatMessage('Cancel')}
+      </Button>
+    )
 
     const doneButton = (
-      <Button data-testid="equation-editor-modal-done" margin="none none none xx-small" onClick={this.handleModalDone} variant="primary">
+      <Button
+        data-testid="equation-editor-modal-done"
+        margin="none none none xx-small"
+        onClick={this.handleModalDone}
+        variant="primary"
+      >
         {formatMessage('Done')}
       </Button>
     )

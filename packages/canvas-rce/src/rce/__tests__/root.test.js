@@ -37,7 +37,12 @@ describe('RceModule', () => {
       editorOptions: () => {
         return {}
       },
-      textareaId: 'textarea_id'
+      textareaId: 'textarea_id',
+      features: {
+        new_equation_editor: true,
+        new_math_equation_handling: true
+      },
+      timezone: 'America/Denver'
     }
   })
 
