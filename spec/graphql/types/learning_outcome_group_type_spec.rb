@@ -73,23 +73,29 @@ describe Types::LearningOutcomeGroupType do
                                                                                                                                       ])
   end
 
-  it "accepts filter in outcomes" do
-    course = Course.create!
-    course.account.enable_feature!(:outcome_alignment_summary)
-    @outcome2.align(assignment_model, course)
-    expect(outcome_group_type.resolve("outcomes(filter: \"WITH_ALIGNMENTS\") { nodes { ... on LearningOutcome { _id } } }")).to match_array([
-                                                                                                                                              @outcome2.id.to_s
-                                                                                                                                            ])
-  end
+  describe "within course context" do
+    before do
+      @course1 = Course.create!
+      @course_outcome1 = outcome_model(context: @course1, short_description: "CCC")
+      @course_outcome2 = outcome_model(context: @course1, short_description: "DDD")
+      @course_outcome2.align(assignment_model, @course1)
+      @course1.account.enable_feature!(:outcome_alignment_summary)
+    end
 
-  it "accepts both search_query and filter in outcomes" do
-    course = Course.create!
-    course.account.enable_feature!(:outcome_alignment_summary)
-    @outcome1.align(assignment_model, course)
-    @outcome2.align(assignment_model, course)
-    expect(outcome_group_type.resolve("outcomes(filter: \"WITH_ALIGNMENTS\", searchQuery: \"BBBB\") { nodes { ... on LearningOutcome { _id } } }")).to match_array([
-                                                                                                                                                                     @outcome1.id.to_s
-                                                                                                                                                                   ])
+    let(:course_outcome_group_type) { GraphQLTypeTester.new(@course1.root_outcome_group, current_user: @admin) }
+
+    it "accepts filter in outcomes" do
+      expect(course_outcome_group_type.resolve("outcomes(filter: \"WITH_ALIGNMENTS\") { nodes { ... on LearningOutcome { _id } } }")).to match_array([
+                                                                                                                                                       @course_outcome2.id.to_s
+                                                                                                                                                     ])
+    end
+
+    it "accepts both search_query and filter in outcomes" do
+      @course_outcome1.align(assignment_model, @course1)
+      expect(course_outcome_group_type.resolve("outcomes(filter: \"WITH_ALIGNMENTS\", searchQuery: \"CCC\") { nodes { ... on LearningOutcome { _id } } }")).to match_array([
+                                                                                                                                                                             @course_outcome1.id.to_s
+                                                                                                                                                                           ])
+    end
   end
 
   it "returns isImported for a given context" do
