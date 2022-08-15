@@ -64,7 +64,7 @@ module Lti
             name: "wrong tool",
             url: "http://www.wrong_tool.com/launch",
             developer_key: DeveloperKey.create!,
-            settings: { use_1_3: true },
+            lti_version: "1.3",
             workflow_state: "public"
           )
         end

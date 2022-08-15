@@ -35,6 +35,7 @@ describe ContextExternalTool do
         name: "test tool",
         url: "http://www.tool.com/launch",
         developer_key: developer_key,
+        lti_version: "1.3",
         root_account: @root_account
       )
     end
@@ -244,7 +245,7 @@ describe ContextExternalTool do
       let(:oidc_initiation_url) { "http://www.test.com/oidc/login" }
 
       before do
-        tool.settings["use_1_3"] = true
+        tool.lti_version = "1.3"
         developer_key.update!(oidc_initiation_url: oidc_initiation_url)
       end
 
@@ -713,7 +714,7 @@ describe ContextExternalTool do
 
     context "when the tool uses LTI 1.3" do
       before do
-        tool.use_1_3 = true
+        tool.lti_version = "1.3"
         tool.save!
       end
 
@@ -733,7 +734,7 @@ describe ContextExternalTool do
     let(:lti_1_3_tool) do
       t = tool.dup
       t.developer_key_id = developer_key.id
-      t.use_1_3 = true
+      t.lti_version = "1.3"
       t.save!
       t
     end
@@ -1037,7 +1038,7 @@ describe ContextExternalTool do
         developer_key = DeveloperKey.create!
         @tool1_1 = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
         @tool1_3 = @course.context_external_tools.create!(name: "b", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
-        @tool1_3.settings[:use_1_3] = true
+        @tool1_3.lti_version = "1.3"
         @tool1_3.developer_key = developer_key
         @tool1_3.save!
 
@@ -1050,7 +1051,7 @@ describe ContextExternalTool do
 
         @tool1_1 = @course.context_external_tools.create!(name: "a", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
         @tool1_3 = @course.context_external_tools.create!(name: "b", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-        @tool1_3.settings[:use_1_3] = true
+        @tool1_3.lti_version = "1.3"
         @tool1_3.developer_key = developer_key
         @tool1_3.save!
         @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @tool1_1.id)
@@ -1210,7 +1211,7 @@ describe ContextExternalTool do
 
       context "when duplicate is 1.3" do
         before do
-          duplicate.use_1_3 = true
+          duplicate.lti_version = "1.3"
           duplicate.developer_key = DeveloperKey.create!
           duplicate.save!
           duplicate.update_column :identity_hash, "duplicate"
@@ -1236,7 +1237,7 @@ describe ContextExternalTool do
 
       context "when the matching tool is 1.3" do
         before do
-          tool.use_1_3 = true
+          tool.lti_version = "1.3"
           tool.developer_key = DeveloperKey.create!
           tool.save!
         end
@@ -1357,7 +1358,7 @@ describe ContextExternalTool do
     context "with different LTI versions" do
       before do
         tool3.developer_key_id = key.id
-        tool3.use_1_3 = true
+        tool3.lti_version = "1.3"
         tool3.save!
       end
 
@@ -1395,17 +1396,17 @@ describe ContextExternalTool do
     context "with many tools that mix all ordering conditions" do
       before do
         tool3.developer_key_id = key.id
-        tool3.use_1_3 = true
+        tool3.lti_version = "1.3"
         tool3.domain = "c.com"
         tool3.save!
 
         tool1.developer_key_id = key.id
-        tool1.use_1_3 = true
+        tool1.lti_version = "1.3"
         tool1.domain = "a.b.c.com"
         tool1.save
 
         account_tool.developer_key_id = key.id
-        account_tool.use_1_3 = true
+        account_tool.lti_version = "1.3"
         account_tool.domain = "b.c.com"
         account_tool.save!
 
@@ -1418,7 +1419,7 @@ describe ContextExternalTool do
       let(:lti1tool) do
         t = tool1.dup
         t.developer_key_id = nil
-        t.use_1_3 = false
+        t.lti_version = "1.1"
         t.domain = "b.c.com"
         t.save!
         t
@@ -1600,7 +1601,7 @@ describe ContextExternalTool do
           name: "First Tool", url: "http://www.example.com", consumer_key: "key", shared_secret: "secret"
         )
         @course.context_external_tools.create!(
-          name: "First Tool", url: "http://www.example.com", consumer_key: "key", shared_secret: "secret", developer_key: DeveloperKey.create!
+          name: "First Tool", url: "http://www.example.com", consumer_key: "key", shared_secret: "secret", developer_key: DeveloperKey.create!, lti_version: "1.3"
         )
         expect(ContextExternalTool.all_tools_for(@course).placements(*Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS).to_a).to eql([tool1])
       end
@@ -2754,7 +2755,7 @@ describe ContextExternalTool do
     let(:old_tool) { external_tool_model(opts: { url: "https://special.url" }) }
     let(:tool) do
       t = old_tool.dup
-      t.use_1_3 = true
+      t.lti_version = "1.3"
       t.save!
       t
     end
@@ -2812,7 +2813,7 @@ describe ContextExternalTool do
         let(:old_tool) { external_tool_model(context: course, opts: { url: "https://special.url" }) }
         let(:tool) do
           t = old_tool.dup
-          t.use_1_3 = true
+          t.lti_version = "1.3"
           t.save!
           t
         end
@@ -2824,7 +2825,7 @@ describe ContextExternalTool do
         let(:old_tool) { external_tool_model(context: account, opts: { url: "https://special.url" }) }
         let(:tool) do
           t = old_tool.dup
-          t.use_1_3 = true
+          t.lti_version = "1.3"
           t.save!
           t
         end

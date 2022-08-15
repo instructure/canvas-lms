@@ -320,13 +320,13 @@ describe ContentMigration do
         # ContentMigrations change things that were nil to their default values,
         # like an empty array or hash. This changes the identity hash, so we
         # have to make everything *exactly* the same, very explicitly >:(
-        tool = external_tool_model(context: course,
-                                   opts: {
-                                     settings: { use_1_3: true, vendor_extensions: [], custom_fields: {},
-                                                 client_id: dev_key.global_id.to_s },
-                                     developer_key: dev_key,
-                                     name: "first tool"
-                                   })
+        tool = external_tool_1_3_model(context: course,
+                                       opts: {
+                                         settings: { vendor_extensions: [], custom_fields: {},
+                                                     client_id: dev_key.global_id.to_s },
+                                         developer_key: dev_key,
+                                         name: "first tool"
+                                       })
         tool.update!(description: "")
         tool
       end
@@ -365,12 +365,12 @@ describe ContentMigration do
 
       context "and the destination course has a similar tool installed" do
         let(:other_tool) do
-          external_tool_model(context: destination_course,
-                              opts: {
-                                settings: { use_1_3: true, icon_url: "icon.com", other_setting: "foobar" },
-                                developer_key: dev_key,
-                                name: "other tool"
-                              })
+          external_tool_1_3_model(context: destination_course,
+                                  opts: {
+                                    settings: { icon_url: "icon.com", other_setting: "foobar" },
+                                    developer_key: dev_key,
+                                    name: "other tool"
+                                  })
         end
 
         it_behaves_like "a migration that automatically copies over tools"
@@ -404,12 +404,11 @@ describe ContentMigration do
           assignments = []
           3.times do |i|
             dev_key = DeveloperKey.create!
-            tool = external_tool_model(context: course,
-                                       opts: {
-                                         settings: { use_1_3: true },
-                                         developer_key: dev_key,
-                                         name: "tool #{i}"
-                                       })
+            tool = external_tool_1_3_model(context: course,
+                                           opts: {
+                                             developer_key: dev_key,
+                                             name: "tool #{i}"
+                                           })
             assignments << assignment_model({ course: course,
                                               submission_types: "external_tool",
                                               external_tool_tag_attributes: { content: tool, url: tool.url } })

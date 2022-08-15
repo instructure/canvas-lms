@@ -551,11 +551,11 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def use_1_3?
-    settings.fetch(:use_1_3, settings["use_1_3"])
+    lti_version == "1.3"
   end
 
   def use_1_3=(bool)
-    settings[:use_1_3] = bool
+    self.lti_version = bool ? "1.3" : "1.1"
   end
 
   def uses_preferred_lti_version?
