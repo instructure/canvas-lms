@@ -360,6 +360,19 @@ class DeveloperKey < ActiveRecord::Base
     sessions_settings[:mobile_timeout]&.to_f&.minutes
   end
 
+  # In an OAuth context, setting this field to true means that access tokens
+  # from this key will not be displayed on the user profile page.
+  #
+  # In an LTI context, setting this field to true means that any tools associated
+  # with this key are considered "internal" tools (like Quizzes, etc) and are
+  # eligible for internal-only features. These features are opt-in only and not
+  # required, and internally-developed tools are not required to set this field
+  # to true if they don't need any of the features. These tools may be LTI 1.1
+  # or LTI 1.3 tools.
+  def internal_service?
+    internal_service
+  end
+
   private
 
   def validate_lti_fields
