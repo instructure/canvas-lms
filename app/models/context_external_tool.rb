@@ -1321,7 +1321,30 @@ class ContextExternalTool < ActiveRecord::Base
     directly_associated + indirectly_associated
   end
 
+  # Intended to return true only for Instructure-owned tools that have been
+  # properly configured as "internal" tools. Used for some custom variable substitutions.
+  # Will only return true if the launch_url's domain ends with a domain from the allowlist,
+  # or exactly matches a domain from the allowlist.
+  def internal_service?(launch_url)
+    return false unless developer_key&.internal_service?
+    return false unless launch_url
+
+    domain = URI.parse(launch_url).host rescue nil
+    return false unless domain
+
+    internal_tool_domain_allowlist.any? { |d| domain.end_with?(".#{d}") || domain == d }
+  end
+
   private
+
+  # Locally and in OSS installations, this can be configured in config/dynamic_settings.yml.
+  # Returns an array of strings, each listing a partial or full domain suffix that is considered "internal".
+  # Domains should not have a preceding ".".
+  # For example, ["instructure.com", "inscloudgate.net", "inseng.net"] in Instructure-deployed production Canvas.
+  def internal_tool_domain_allowlist
+    config = DynamicSettings.find("lti", default_ttl: 2.hours)["internal_tool_domain_allowlist"] || "[]"
+    @internal_tool_domain_allowlist ||= YAML.safe_load(config)
+  end
 
   def check_global_navigation_cache
     if context.is_a?(Account) && context.root_account?

@@ -2857,4 +2857,98 @@ describe ContextExternalTool do
       expect(tool.lti_version).to eq "1.1"
     end
   end
+
+  describe "#internal_tool_domain_allowlist" do
+    subject { tool.send :internal_tool_domain_allowlist }
+
+    let(:tool) { external_tool_model }
+
+    context "when config does not exist" do
+      it "returns an empty array" do
+        expect(subject).to eq []
+      end
+    end
+
+    context "when config exists" do
+      let(:allowlist) { [".docker", "localhost"] }
+
+      before do
+        allow(DynamicSettings).to receive(:find).and_return({ "internal_tool_domain_allowlist" => YAML.dump(allowlist) })
+      end
+
+      it "returns correct config value" do
+        expect(subject).to eq allowlist
+      end
+    end
+  end
+
+  describe "#internal_service?" do
+    subject { tool.internal_service?(launch_url) }
+
+    let(:tool) { external_tool_1_3_model }
+    let(:launch_url) { "http://tool.instructure.com/launch" }
+
+    before do
+      allow(tool).to receive(:internal_tool_domain_allowlist).and_return(["instructure.com", "localhost"])
+      tool.developer_key.update!(internal_service: true)
+    end
+
+    context "when tool has no developer key" do
+      before do
+        tool.update!(developer_key_id: nil)
+      end
+
+      it { is_expected.to eq false }
+    end
+
+    context "when developer key is not internal_service" do
+      before do
+        tool.developer_key.update!(internal_service: false)
+      end
+
+      it { is_expected.to eq false }
+    end
+
+    context "when launch url is nil" do
+      let(:launch_url) { nil }
+
+      it { is_expected.to eq false }
+    end
+
+    context "when launch url is malformed" do
+      let(:launch_url) { "in valid" }
+
+      it { is_expected.to eq false }
+    end
+
+    context "when launch url domain does not match allowlist" do
+      let(:launch_url) { "https://example.com/launch" }
+
+      it { is_expected.to eq false }
+    end
+
+    context "when launch url contains but does not end with domain in allowlist" do
+      let(:launch_url) { "https://instructure.com.l33thaxxors.net" }
+
+      it { is_expected.to eq false }
+    end
+
+    context "when launch_url exactly matches domain in allowlist" do
+      let(:launch_url) { "http://localhost/launch" }
+
+      it { is_expected.to eq true }
+    end
+
+    context "with a correctly configured 1.1 tool" do
+      before do
+        tool.update!(lti_version: "1.1")
+      end
+
+      it { is_expected.to eq true }
+    end
+
+    context "with a correctly configured 1.3 tool" do
+      it { is_expected.to eq true }
+    end
+  end
 end
