@@ -21,7 +21,17 @@ import gql from 'graphql-tag'
 export const ROSTER_QUERY = gql`
   query getRosterQuery($courseID: ID!) {
     course(id: $courseID) {
-      usersConnection {
+      usersConnection(
+        filter: {
+          enrollmentTypes: [
+            StudentEnrollment
+            TeacherEnrollment
+            TaEnrollment
+            DesignerEnrollment
+            ObserverEnrollment
+          ]
+        }
+      ) {
         nodes {
           name
           _id
