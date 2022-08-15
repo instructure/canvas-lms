@@ -342,6 +342,10 @@ module Lti
           expect(subject.developer_key).to eq developer_key
         end
 
+        it "sets the lti_version" do
+          expect(subject.lti_version).to eq "1.3"
+        end
+
         context "placements" do
           subject { tool_configuration.new_external_tool(context).settings["course_navigation"] }
 
