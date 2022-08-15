@@ -16,39 +16,63 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useCallback, useState} from 'react'
 
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import useFetchApi from '@canvas/use-fetch-api-hook'
 import {useScope as useI18nScope} from '@canvas/i18n'
+
+import {VisibilityChange} from '../types'
 
 const I18n = useI18nScope('account_calendar_settings_footer')
 
 type ComponentProps = {
-  readonly selectedCalendarCount: number
+  readonly originAccountId: number
+  readonly visibilityChanges: VisibilityChange[]
   readonly onApplyClicked: () => void
   readonly enableSaveButton: boolean
 }
 
 export const Footer: React.FC<ComponentProps> = ({
-  selectedCalendarCount,
+  originAccountId,
+  visibilityChanges,
   onApplyClicked,
   enableSaveButton
 }) => {
+  const [initialEnabledCalendarsCount, setInitialEnabledCalendarsCount] = useState<
+    number | undefined
+  >(undefined)
+
+  // @ts-ignore - this hook isn't ts-ified
+  useFetchApi({
+    path: `/api/v1/accounts/${originAccountId}/visible_calendars_count`,
+    success: useCallback(response => setInitialEnabledCalendarsCount(response.count), []),
+    error: useCallback(error => showFlashError(I18n.t('Unable to load calendar count'))(error), [])
+  })
+
   return (
     <Flex alignItems="center" justifyItems="end">
-      <Text>
-        {I18n.t(
-          {
-            zero: 'No Account Calendars selected',
-            one: '1 Account Calendar selected',
-            other: '%{count} Account Calendars selected'
-          },
-          {count: selectedCalendarCount}
-        )}
-      </Text>
+      {initialEnabledCalendarsCount !== undefined && (
+        <Text>
+          {I18n.t(
+            {
+              zero: 'No Account Calendars selected',
+              one: '1 Account Calendar selected',
+              other: '%{count} Account Calendars selected'
+            },
+            {
+              count:
+                initialEnabledCalendarsCount +
+                visibilityChanges.filter(c => c.visible).length -
+                visibilityChanges.filter(c => !c.visible).length
+            }
+          )}
+        </Text>
+      )}
       <Button
         color="primary"
         interaction={enableSaveButton ? 'enabled' : 'disabled'}

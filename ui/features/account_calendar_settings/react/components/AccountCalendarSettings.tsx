@@ -120,7 +120,8 @@ export const AccountCalendarSettings: React.FC<ComponentProps> = ({accountId}) =
         background="secondary"
       >
         <Footer
-          selectedCalendarCount={0}
+          originAccountId={accountId}
+          visibilityChanges={visibilityChanges}
           onApplyClicked={onApplyClicked}
           enableSaveButton={!isLoading && visibilityChanges.length > 0}
         />

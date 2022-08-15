@@ -1060,6 +1060,7 @@ CanvasRails::Application.routes.draw do
       put "account_calendars/:account_id", action: :update, as: :update_account_calendar
       put "accounts/:account_id/account_calendars", action: :bulk_update, as: :bulk_update_account_calendars
       get "accounts/:account_id/account_calendars", action: :all_calendars, as: :all_account_calendars
+      get "accounts/:account_id/visible_calendars_count", action: :visible_calendars_count, as: :visible_calendars_count
     end
 
     scope(controller: :account_notifications) do
