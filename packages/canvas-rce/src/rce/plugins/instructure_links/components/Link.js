@@ -35,6 +35,7 @@ import {
   IconDiscussionLine,
   IconModuleLine,
   IconQuizLine,
+  IconQuizSolid as IconNewQuiz,
   IconAnnouncementLine,
   IconPublishSolid,
   IconUnpublishedSolid,
@@ -42,9 +43,9 @@ import {
 } from '@instructure/ui-icons'
 import RCEGlobals from '../../../RCEGlobals'
 
-function IconBlank() {
+function IconBlank(props) {
   return (
-    <SVGIcon name="IconBlank" viewBox="0 0 1920 1920">
+    <SVGIcon name="IconBlank" viewBox="0 0 1920 1920" {...props}>
       <g role="presentation" />
     </SVGIcon>
   )
@@ -60,6 +61,8 @@ function getIcon(type) {
       return IconModuleLine
     case 'quizzes':
       return IconQuizLine
+    case 'quizzes.next':
+      return IconNewQuiz
     case 'announcements':
       return IconAnnouncementLine
     case 'wikiPages':
@@ -74,7 +77,11 @@ function getIcon(type) {
 export default function Link(props) {
   const [isHovering, setIsHovering] = useState(false)
   const {title, published, date, date_type} = props.link
-  const Icon = getIcon(props.type)
+  const type =
+    props.type === 'quizzes' && props.link.quiz_type === 'quizzes.next'
+      ? 'quizzes.next'
+      : props.type
+  const Icon = getIcon(type)
   const color = published ? 'success' : 'primary'
   let dateString = null
   if (date) {
@@ -170,7 +177,7 @@ export default function Link(props) {
                   <Flex>
                     <Flex.Item padding="0 x-small 0 0">
                       <Text color={color}>
-                        <Icon size="x-small" inline={false} />
+                        <Icon size="x-small" inline={false} data-type={type} />
                       </Text>
                     </Flex.Item>
                     <Flex.Item padding="0 x-small 0 0" grow shrink textAlign="start">
