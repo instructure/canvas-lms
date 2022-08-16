@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {FilterConditionType} from '../gradebook.d'
+import {FilterType} from '../gradebook.d'
 
-const conditionTypes: FilterConditionType[] = [
+const conditionTypes: FilterType[] = [
   'section',
   'module',
   'assignment-group',

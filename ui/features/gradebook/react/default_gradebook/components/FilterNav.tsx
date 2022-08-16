@@ -17,29 +17,26 @@
  */
 
 import React, {useState} from 'react'
-import {Button, CloseButton} from '@instructure/ui-buttons'
+import {CondensedButton} from '@instructure/ui-buttons'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import uuid from 'uuid'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {IconFilterSolid, IconFilterLine} from '@instructure/ui-icons'
-import {TextInput} from '@instructure/ui-text-input'
-import {View, ContextView} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Tag} from '@instructure/ui-tag'
-import {Tray} from '@instructure/ui-tray'
-import {Text} from '@instructure/ui-text'
-import {Heading} from '@instructure/ui-heading'
-import FilterNavFilter from './FilterNavFilter'
 import type {
   AssignmentGroup,
   Filter,
+  FilterDrilldownData,
   GradingPeriod,
   Module,
   Section,
   StudentGroupCategoryMap
 } from '../gradebook.d'
-import {getLabelForFilterCondition, doFilterConditionsMatch} from '../Gradebook.utils'
+import {getLabelForFilter, doFiltersMatch, isFilterNotEmpty} from '../Gradebook.utils'
 import useStore from '../stores/index'
+import FilterDropdown from './FilterDropdown'
+import FilterNavDateModal from './FilterDateModal'
+import FilterNavTray from './FilterTray'
 
 const I18n = useI18nScope('gradebook')
 
@@ -61,260 +58,310 @@ export default function FilterNav({
   studentGroupCategories
 }: FilterNavProps) {
   const [isTrayOpen, setIsTrayOpen] = useState(false)
-  const [stagedFilterName, setStagedFilterName] = useState('')
-  const filters = useStore(state => state.filters)
-  const stagedFilterConditions = useStore(state => state.stagedFilterConditions)
-  const saveStagedFilter = useStore(state => state.saveStagedFilter)
-  const updateFilter = useStore(state => state.updateFilter)
-  const deleteFilter = useStore(state => state.deleteFilter)
-  const applyConditions = useStore(state => state.applyConditions)
-  const appliedFilterConditions = useStore(state => state.appliedFilterConditions)
-  const updateStagedFilter = useStore(state => state.updateStagedFilter)
-  const deleteStagedFilter = useStore(state => state.deleteStagedFilter)
+  const [isDateModalOpen, setIsDateModalOpen] = useState(false)
+  const filterPresets = useStore(state => state.filterPresets)
+  const applyFilters = useStore(state => state.applyFilters)
+  const addFilters = useStore(state => state.addFilters)
+  const toggleFilter = useStore(state => state.toggleFilter)
+  const appliedFilters = useStore(state => state.appliedFilters)
 
-  const filterComponents = appliedFilterConditions
-    .filter(c => c.value)
-    .map(condition => {
-      const label = getLabelForFilterCondition(
-        condition,
-        assignmentGroups,
-        gradingPeriods,
-        modules,
-        sections,
-        studentGroupCategories
-      )
-      return (
-        <Tag
-          data-testid="staged-filter-condition-tag"
-          key={`staged-condition-${condition.id}`}
-          text={<AccessibleContent alt={I18n.t('Remove condition')}>{label}</AccessibleContent>}
-          dismissible
-          onClick={() =>
-            useStore.setState({
-              appliedFilterConditions: appliedFilterConditions.filter(c => c.id !== condition.id)
-            })
-          }
-          margin="0 xx-small 0 0"
-        />
-      )
-    })
-
-  const handleSaveStagedFilter = async () => {
-    await saveStagedFilter(stagedFilterName)
-    setStagedFilterName('')
+  const handleClearFilters = () => {
+    applyFilters([])
   }
+
+  const activeFilterComponents = appliedFilters.filter(isFilterNotEmpty).map(filter => {
+    const label = getLabelForFilter(
+      filter,
+      assignmentGroups,
+      gradingPeriods,
+      modules,
+      sections,
+      studentGroupCategories
+    )
+    return (
+      <Tag
+        data-testid="applied-filter-tag"
+        key={`staged-filter-${filter.id}`}
+        text={<AccessibleContent alt={I18n.t('Remove filter')}>{label}</AccessibleContent>}
+        dismissible={true}
+        onClick={() =>
+          useStore.setState({
+            appliedFilters: appliedFilters.filter(c => c.id !== filter.id)
+          })
+        }
+        margin="0 xx-small 0 0"
+      />
+    )
+  })
+
+  const dataMap: FilterDrilldownData = {
+    '1': {
+      id: '1',
+      parentId: null,
+      name: I18n.t('Saved Filter Presets'),
+      items: []
+    }
+  }
+
+  for (const filterPreset of filterPresets) {
+    const item = {
+      id: filterPreset.id,
+      parentId: '1',
+      name: filterPreset.name,
+      isSelected: doFiltersMatch(appliedFilters, filterPreset.filters),
+      onToggle: () => {
+        if (doFiltersMatch(appliedFilters, filterPreset.filters)) {
+          applyFilters([])
+        } else {
+          applyFilters(filterPreset.filters)
+        }
+      }
+    }
+    dataMap[filterPreset.id] = item
+    dataMap['1'].items?.push(item)
+  }
+
+  const filterItems: FilterDrilldownData = {}
+
+  if (sections.length > 0) {
+    filterItems.sections = {
+      id: 'sections',
+      name: I18n.t('Sections'),
+      parentId: '1',
+      isSelected: appliedFilters.some(c => c.type === 'section'),
+      items: sections.map(a => ({
+        id: a.id,
+        name: a.name,
+        isSelected: appliedFilters.some(c => c.type === 'section' && c.value === a.id),
+        onToggle: () => {
+          const filter: Filter = {
+            id: uuid(),
+            type: 'section',
+            value: a.id,
+            created_at: new Date().toISOString()
+          }
+          toggleFilter(filter)
+        }
+      }))
+    }
+    dataMap.sections = filterItems.sections
+  }
+
+  if (modules.length > 0) {
+    filterItems.modules = {
+      id: 'modules',
+      name: I18n.t('Modules'),
+      parentId: '1',
+      isSelected: appliedFilters.some(c => c.type === 'module'),
+      items: modules.map(m => ({
+        id: m.id,
+        name: m.name,
+        isSelected: appliedFilters.some(c => c.type === 'module' && c.value === m.id),
+        onToggle: () => {
+          const filter: Filter = {
+            id: uuid(),
+            type: 'module',
+            value: m.id,
+            created_at: new Date().toISOString()
+          }
+          toggleFilter(filter)
+        }
+      }))
+    }
+    dataMap.modules = filterItems.modules
+  }
+
+  if (gradingPeriods.length > 0) {
+    filterItems['grading-periods'] = {
+      id: 'grading-periods',
+      name: I18n.t('Grading Periods'),
+      parentId: '1',
+      isSelected: appliedFilters.some(c => c.type === 'grading-period'),
+      items: gradingPeriods.map(a => ({
+        id: a.id,
+        name: a.title,
+        isSelected: appliedFilters.some(c => c.type === 'grading-period' && c.value === a.id),
+        onToggle: () => {
+          const filter: Filter = {
+            id: uuid(),
+            type: 'grading-period',
+            value: a.id,
+            created_at: new Date().toISOString()
+          }
+          toggleFilter(filter)
+        }
+      })),
+      itemGroups: []
+    }
+    dataMap['grading-periods'] = filterItems['grading-periods']
+  }
+
+  if (assignmentGroups.length > 1) {
+    filterItems['assignment-groups'] = {
+      id: 'assignment-groups',
+      name: I18n.t('Assignment Groups'),
+      parentId: '1',
+      isSelected: appliedFilters.some(c => c.type === 'assignment-group'),
+      items: assignmentGroups.map(a => ({
+        id: a.id,
+        name: a.name,
+        isSelected: appliedFilters.some(c => c.type === 'assignment-group' && c.value === a.id),
+        onToggle: () => {
+          const filter: Filter = {
+            id: uuid(),
+            type: 'assignment-group',
+            value: a.id,
+            created_at: new Date().toISOString()
+          }
+          toggleFilter(filter)
+        }
+      })),
+      itemGroups: []
+    }
+    dataMap['assignment-groups'] = filterItems['assignment-groups']
+  }
+
+  if (Object.values(studentGroupCategories).length > 0) {
+    filterItems['student-groups'] = {
+      id: 'student-groups',
+      name: I18n.t('Student Groups'),
+      parentId: '1',
+      isSelected: appliedFilters.some(c => c.type === 'student-group'),
+      itemGroups: Object.values(studentGroupCategories).map(category => ({
+        id: category.id,
+        name: category.name,
+        items: category.groups.map(group => ({
+          id: group.id,
+          name: group.name,
+          isSelected: appliedFilters.some(c => c.type === 'student-group' && c.value === group.id),
+          onToggle: () => {
+            const filter: Filter = {
+              id: uuid(),
+              type: 'student-group',
+              value: group.id,
+              created_at: new Date().toISOString()
+            }
+            toggleFilter(filter)
+          }
+        }))
+      }))
+    }
+    dataMap['student-groups'] = filterItems['student-groups']
+  }
+
+  filterItems.submissions = {
+    id: 'submissions',
+    name: I18n.t('Submissions'),
+    parentId: '1',
+    isSelected: appliedFilters.some(c => c.type === 'submissions'),
+    items: [
+      {
+        id: '1',
+        name: 'Has Ungraded Submissions',
+        isSelected: appliedFilters.some(
+          c => c.type === 'submissions' && c.value === 'has-ungraded-submissions'
+        ),
+        onToggle: () => {
+          const filter: Filter = {
+            id: uuid(),
+            type: 'submissions',
+            value: 'has-ungraded-submissions',
+            created_at: new Date().toISOString()
+          }
+          toggleFilter(filter)
+        }
+      },
+      {
+        id: '2',
+        name: 'Has Submissions',
+        isSelected: appliedFilters.some(
+          c => c.type === 'submissions' && c.value === 'has-submissions'
+        ),
+        onToggle: () => {
+          const filter: Filter = {
+            id: uuid(),
+            type: 'submissions',
+            value: 'has-submissions',
+            created_at: new Date().toISOString()
+          }
+          toggleFilter(filter)
+        }
+      }
+    ]
+  }
+  dataMap.submissions = filterItems.submissions
+
+  filterItems.startAndEndDate = {
+    id: 'start-and-end-date',
+    name: I18n.t('Start & End Date'),
+    parentId: '1',
+    isSelected: appliedFilters.some(
+      f => (f.type === 'start-date' || f.type === 'end-date') && isFilterNotEmpty(f)
+    ),
+    onToggle: () => setIsDateModalOpen(true)
+  }
+
+  const startDate = appliedFilters.find((c: Filter) => c.type === 'start-date')?.value || null
+
+  const endDate = appliedFilters.find((c: Filter) => c.type === 'end-date')?.value || null
 
   return (
     <Flex justifyItems="space-between" padding="0 0 small 0">
       <FlexItem>
         <Flex>
-          <FlexItem padding="0 x-small 0 0">
-            <IconFilterLine /> <Text weight="bold">{I18n.t('Applied Filters:')}</Text>
+          <FlexItem padding="0 small 0 0">
+            <FilterDropdown
+              onOpenTray={() => setIsTrayOpen(true)}
+              dataMap={dataMap}
+              filterItems={filterItems}
+            />
           </FlexItem>
-          <FlexItem>
-            {filterComponents.length > 0 && filterComponents}
-            {!filterComponents.length && (
-              <Text color="secondary" weight="bold">
-                {I18n.t('None')}
-              </Text>
-            )}
+          <FlexItem data-testid="filter-tags">
+            {activeFilterComponents.length > 0 && activeFilterComponents}
           </FlexItem>
         </Flex>
       </FlexItem>
+
       <FlexItem>
-        <Button renderIcon={IconFilterSolid} color="secondary" onClick={() => setIsTrayOpen(true)}>
-          {I18n.t('Filters')}
-        </Button>
+        {activeFilterComponents.length > 0 && (
+          <CondensedButton color="primary" margin="0" onClick={handleClearFilters}>
+            {I18n.t('Clear All Filters')}
+          </CondensedButton>
+        )}
       </FlexItem>
-      <Tray
-        placement="end"
-        label="Tray Example"
-        open={isTrayOpen}
-        onDismiss={() => setIsTrayOpen(false)}
-        size="regular"
-        shouldCloseOnDocumentClick
-      >
-        <View as="div" padding="medium">
-          <Flex>
-            <FlexItem shouldGrow shouldShrink>
-              <Heading level="h3" as="h3" margin="0 0 x-small">
-                {I18n.t('Gradebook Filters')}
-              </Heading>
-            </FlexItem>
-            <FlexItem>
-              <CloseButton
-                placement="end"
-                offset="small"
-                screenReaderLabel="Close"
-                onClick={() => setIsTrayOpen(false)}
-              />
-            </FlexItem>
-          </Flex>
 
-          {filters.length === 0 && !stagedFilterConditions.length && (
-            <Flex as="div" margin="small">
-              <FlexItem display="inline-block" width="100px" height="128px">
-                <img
-                  src="/images/tutorial-tray-images/Panda_People.svg"
-                  alt={I18n.t('Friendly panda')}
-                  style={{
-                    width: '100px',
-                    height: '128px'
-                  }}
-                />
-              </FlexItem>
-              <FlexItem shouldShrink>
-                <ContextView
-                  padding="x-small small"
-                  margin="small"
-                  placement="end top"
-                  shadow="resting"
-                >
-                  {I18n.t(
-                    'Did you know you can now create detailed filters and save them for future use?'
-                  )}
-                </ContextView>
-              </FlexItem>
-            </Flex>
-          )}
+      <FilterNavTray
+        isTrayOpen={isTrayOpen}
+        setIsTrayOpen={setIsTrayOpen}
+        filterPresets={filterPresets}
+        assignmentGroups={assignmentGroups}
+        gradingPeriods={gradingPeriods}
+        studentGroupCategories={studentGroupCategories}
+        modules={modules}
+        sections={sections}
+      />
 
-          {filters.map(filter => (
-            <FilterNavFilter
-              assignmentGroups={assignmentGroups}
-              filter={filter}
-              isApplied={doFilterConditionsMatch(appliedFilterConditions, filter.conditions)}
-              gradingPeriods={gradingPeriods}
-              key={filter.id}
-              modules={modules}
-              onChange={updateFilter}
-              applyConditions={applyConditions}
-              onDelete={() => deleteFilter(filter)}
-              sections={sections}
-              studentGroupCategories={studentGroupCategories}
-            />
-          ))}
-          <View
-            as="div"
-            background="primary"
-            padding="small none none none"
-            borderWidth="small none none none"
-          >
-            {stagedFilterConditions.length > 0 ? (
-              <>
-                <FilterNavFilter
-                  assignmentGroups={assignmentGroups}
-                  filter={{
-                    name: '',
-                    conditions: stagedFilterConditions,
-                    created_at: new Date().toISOString()
-                  }}
-                  isApplied={doFilterConditionsMatch(
-                    appliedFilterConditions,
-                    stagedFilterConditions
-                  )}
-                  gradingPeriods={gradingPeriods}
-                  key="staged"
-                  modules={modules}
-                  applyConditions={applyConditions}
-                  onChange={(filter: Filter) => updateStagedFilter(filter.conditions)}
-                  onDelete={deleteStagedFilter}
-                  sections={sections}
-                  studentGroupCategories={studentGroupCategories}
-                />
-                <View as="div" padding="small" background="secondary" borderRadius="medium">
-                  <Flex alignItems="end">
-                    <FlexItem shouldGrow>
-                      <TextInput
-                        width="100%"
-                        renderLabel={I18n.t('Save these conditions as a filter')}
-                        placeholder={I18n.t('Give this filter a name')}
-                        value={stagedFilterName}
-                        onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                          setStagedFilterName(event.target.value)
-                        }
-                      />
-                    </FlexItem>
-                    <FlexItem margin="0 0 0 small">
-                      <Button
-                        color="secondary"
-                        data-testid="save-filter-button"
-                        margin="small 0 0 0"
-                        onClick={handleSaveStagedFilter}
-                        interaction={stagedFilterName.trim().length > 0 ? 'enabled' : 'disabled'}
-                      >
-                        {I18n.t('Save')}
-                      </Button>
-                    </FlexItem>
-                  </Flex>
-                </View>
-              </>
-            ) : (
-              <Button
-                renderIcon={IconFilterLine}
-                color="secondary"
-                onClick={() =>
-                  useStore.setState({
-                    stagedFilterConditions: [
-                      {
-                        id: uuid(),
-                        type: 'section',
-                        value: undefined,
-                        created_at: new Date().toISOString()
-                      },
-                      {
-                        id: uuid(),
-                        type: 'module',
-                        value: undefined,
-                        created_at: new Date().toISOString()
-                      },
-                      {
-                        id: uuid(),
-                        type: 'assignment-group',
-                        value: undefined,
-                        created_at: new Date().toISOString()
-                      },
-                      {
-                        id: uuid(),
-                        type: 'student-group',
-                        value: undefined,
-                        created_at: new Date().toISOString()
-                      },
-                      {
-                        id: uuid(),
-                        type: 'grading-period',
-                        value: undefined,
-                        created_at: new Date().toISOString()
-                      },
-                      {
-                        id: uuid(),
-                        type: 'submissions',
-                        value: undefined,
-                        created_at: new Date().toISOString()
-                      },
-                      {
-                        id: uuid(),
-                        type: 'start-date',
-                        value: undefined,
-                        created_at: new Date().toISOString()
-                      },
-                      {
-                        id: uuid(),
-                        type: 'end-date',
-                        value: undefined,
-                        created_at: new Date().toISOString()
-                      }
-                    ]
-                  })
-                }
-                margin="small 0 0 0"
-                data-testid="new-filter-button"
-              >
-                {I18n.t('Create New Filter')}
-              </Button>
-            )}
-          </View>
-        </View>
-      </Tray>
+      <FilterNavDateModal
+        startDate={startDate}
+        endDate={endDate}
+        isOpen={isDateModalOpen}
+        onCloseDateModal={() => setIsDateModalOpen(false)}
+        onSelectDates={(startDateValue, endDateValue) => {
+          const startDateCondition: Filter = {
+            id: uuid(),
+            type: 'start-date',
+            value: startDateValue,
+            created_at: new Date().toISOString()
+          }
+          const endDateCondition: Filter = {
+            id: uuid(),
+            type: 'end-date',
+            value: endDateValue,
+            created_at: new Date().toISOString()
+          }
+          addFilters([startDateCondition, endDateCondition])
+        }}
+      />
     </Flex>
   )
 }

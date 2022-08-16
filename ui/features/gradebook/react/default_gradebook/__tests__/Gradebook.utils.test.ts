@@ -26,13 +26,13 @@ import {
   getCustomColumnId,
   getAssignmentColumnId,
   getAssignmentGroupColumnId,
-  findConditionValuesOfType,
-  doFilterConditionsMatch
+  findFilterValuesOfType,
+  doFiltersMatch
 } from '../Gradebook.utils'
 import {isDefaultSortOrder, localeSort} from '../Gradebook.sorting'
 import {createGradebook} from './GradebookSpecHelper'
 import {fireEvent, screen, waitFor} from '@testing-library/dom'
-import type {Filter} from '../gradebook.d'
+import type {FilterPreset} from '../gradebook.d'
 
 describe('getGradeAsPercent', () => {
   it('returns a percent for a grade with points possible', () => {
@@ -274,11 +274,11 @@ describe('getAssignmentGroupColumnId', () => {
 })
 
 describe('findConditionValuesOfType', () => {
-  const filters: Filter[] = [
+  const filterPreset: FilterPreset[] = [
     {
       id: '1',
       name: 'Filter 1',
-      conditions: [
+      filters: [
         {id: '1', type: 'module', value: '1', created_at: ''},
         {id: '2', type: 'assignment-group', value: '2', created_at: ''},
         {id: '3', type: 'assignment-group', value: '7', created_at: ''},
@@ -289,7 +289,7 @@ describe('findConditionValuesOfType', () => {
     {
       id: '2',
       name: 'Filter 2',
-      conditions: [
+      filters: [
         {id: '1', type: 'module', value: '4', created_at: ''},
         {id: '2', type: 'assignment-group', value: '5', created_at: ''},
         {id: '3', type: 'module', value: '6', created_at: ''}
@@ -299,22 +299,20 @@ describe('findConditionValuesOfType', () => {
   ]
 
   it('returns module condition values', () => {
-    expect(findConditionValuesOfType('module', filters[0].conditions)).toStrictEqual(['1', '3'])
+    expect(findFilterValuesOfType('module', filterPreset[0].filters)).toStrictEqual(['1', '3'])
   })
 
   it('returns assignment-group condition values', () => {
-    expect(findConditionValuesOfType('assignment-group', filters[1].conditions)).toStrictEqual([
-      '5'
-    ])
+    expect(findFilterValuesOfType('assignment-group', filterPreset[1].filters)).toStrictEqual(['5'])
   })
 })
 
-describe('doFilterConditionsMatch', () => {
-  const filters: Filter[] = [
+describe('doFiltersMatch', () => {
+  const filterPreset: FilterPreset[] = [
     {
       id: '1',
       name: 'Filter 1',
-      conditions: [
+      filters: [
         {id: '1', type: 'module', value: '1', created_at: ''},
         {id: '2', type: 'assignment-group', value: '2', created_at: ''},
         {id: '3', type: 'assignment-group', value: '7', created_at: ''},
@@ -325,7 +323,7 @@ describe('doFilterConditionsMatch', () => {
     {
       id: '2',
       name: 'Filter 2',
-      conditions: [
+      filters: [
         {id: '1', type: 'module', value: '4', created_at: ''},
         {id: '2', type: 'assignment-group', value: '5', created_at: ''},
         {id: '3', type: 'module', value: '6', created_at: ''}
@@ -335,7 +333,7 @@ describe('doFilterConditionsMatch', () => {
     {
       id: '3',
       name: 'Filter 3',
-      conditions: [
+      filters: [
         {id: '1', type: 'module', value: '4', created_at: ''},
         {id: '2', type: 'assignment-group', value: '5', created_at: ''},
         {id: '3', type: 'module', value: '6', created_at: ''}
@@ -345,14 +343,10 @@ describe('doFilterConditionsMatch', () => {
   ]
 
   it('returns false if filter conditions are different', () => {
-    expect(doFilterConditionsMatch(filters[0].conditions, filters[1].conditions)).toStrictEqual(
-      false
-    )
+    expect(doFiltersMatch(filterPreset[0].filters, filterPreset[1].filters)).toStrictEqual(false)
   })
 
   it('returns true if filter conditions are the same', () => {
-    expect(doFilterConditionsMatch(filters[1].conditions, filters[2].conditions)).toStrictEqual(
-      true
-    )
+    expect(doFiltersMatch(filterPreset[1].filters, filterPreset[2].filters)).toStrictEqual(true)
   })
 })

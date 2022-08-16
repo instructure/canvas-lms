@@ -65,7 +65,7 @@ function updateColumnOrder(courseId, columnOrder) {
   return axios.post(url, {column_order: columnOrder})
 }
 
-function createGradebookFilter(courseId, filter) {
+function createGradebookFilterPreset(courseId, filter) {
   const {name, payload} = serializeFilter(filter)
   return doFetchApi({
     path: `/api/v1/courses/${courseId}/gradebook_filters`,
@@ -74,14 +74,14 @@ function createGradebookFilter(courseId, filter) {
   })
 }
 
-function deleteGradebookFilter(courseId, filterId) {
+function deleteGradebookFilterPreset(courseId, filterId) {
   return doFetchApi({
     path: `/api/v1/courses/${courseId}/gradebook_filters/${filterId}`,
     method: 'DELETE'
   })
 }
 
-function updateGradebookFilter(courseId, filter) {
+function updateGradebookFilterPreset(courseId, filter) {
   const {name, payload} = serializeFilter(filter)
   return doFetchApi({
     path: `/api/v1/courses/${courseId}/gradebook_filters/${filter.id}`,
@@ -92,12 +92,12 @@ function updateGradebookFilter(courseId, filter) {
 
 export default {
   applyScoreToUngradedSubmissions,
-  createGradebookFilter,
+  createGradebookFilterPreset,
   createTeacherNotesColumn,
-  deleteGradebookFilter,
+  deleteGradebookFilterPreset,
   saveUserSettings,
   updateColumnOrder,
-  updateGradebookFilter,
+  updateGradebookFilterPreset,
   updateSubmission,
   updateTeacherNotesColumn
 }

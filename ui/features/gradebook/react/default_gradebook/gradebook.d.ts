@@ -241,6 +241,12 @@ export type Submission = {
   assignment_visible: boolean
 }
 
+export type SubmissionCommentData = {
+  group_comment: 1 | 0
+  text_comment: string
+  attempt?: number
+}
+
 export type UserSubmissionGroup = {
   user_id: string
   submissions: Submission[]
@@ -309,7 +315,7 @@ export type SectionMap = {
   [key: string]: Section
 }
 
-export type FilterConditionType =
+export type FilterType =
   | 'section'
   | 'module'
   | 'assignment-group'
@@ -319,33 +325,42 @@ export type FilterConditionType =
   | 'end-date'
   | 'submissions'
 
-export type FilterCondition = {
+export type Filter = {
   id: string
-  type?: FilterConditionType
+  type?: FilterType
   value?: string
   created_at: string
 }
 
-export type SubmissionFilterConditionValue =
-  | 'has-ungraded-submissions'
-  | 'has-submissions'
-  | undefined
+export type SubmissionFilterValue = 'has-ungraded-submissions' | 'has-submissions' | undefined
 
-export type Filter = {
+export type FilterPreset = {
   id: string
   name: string
-  conditions: FilterCondition[]
+  filters: Filter[]
   created_at: string
 }
 
-export type PartialFilter = Omit<Filter, 'id'> & {id?: string}
+export type PartialFilterPreset = Omit<FilterPreset, 'id'> & {id?: string}
 
-// export type AppliedFilter = Omit<Filter, 'id'>
+export type FilterDrilldownData = {
+  [key: string]: FilterDrilldownMenuItem
+}
+
+export type FilterDrilldownMenuItem = {
+  id: string
+  parentId?: null | string
+  name: string
+  isSelected?: boolean
+  onToggle?: () => void
+  items?: FilterDrilldownMenuItem[]
+  itemGroups?: FilterDrilldownMenuItem[]
+}
 
 export type GradebookFilterApiRequest = {
   name: string
   payload: {
-    conditions: FilterCondition[]
+    conditions: Filter[]
   }
 }
 
@@ -359,7 +374,7 @@ export type GradebookFilterApiResponseFilter = {
   user_id: string
   name: string
   payload: {
-    conditions: FilterCondition[]
+    conditions: Filter[]
   }
   created_at: string
   updated_at: string

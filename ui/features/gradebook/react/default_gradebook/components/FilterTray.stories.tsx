@@ -17,12 +17,10 @@
  */
 
 import React from 'react'
-import FilterNavFilter from '../FilterTrayFilterPreset'
-import type {FilterTrayPresetProps} from '../FilterTrayFilterPreset'
-import type {FilterPreset} from '../../gradebook.d'
-import {render} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import '@testing-library/jest-dom/extend-expect'
+import FilterNavTray from './FilterTray'
+import type {FilterTrayProps} from './FilterTray'
+import type {FilterPreset} from '../gradebook.d'
+import {View} from '@instructure/ui-view'
 
 const defaultFilterPreset: FilterPreset = {
   id: '123',
@@ -30,13 +28,13 @@ const defaultFilterPreset: FilterPreset = {
   created_at: '2021-11-02T20:56:23.615Z',
   filters: [
     {
-      id: '456',
+      id: '2',
       created_at: '2021-11-02T20:56:23.616Z',
       type: 'module',
       value: undefined
     },
     {
-      id: '567',
+      id: '8',
       created_at: '2021-11-02T20:56:23.617Z',
       type: 'section',
       value: undefined
@@ -44,13 +42,8 @@ const defaultFilterPreset: FilterPreset = {
   ]
 }
 
-const defaultProps: FilterTrayPresetProps = {
-  filterPreset: defaultFilterPreset,
-  applyFilters: () => ({}),
-  onUpdate: () => Promise.resolve(),
-  isActive: false,
-  onChange: () => {},
-  onDelete: () => {},
+const props: FilterTrayProps = {
+  filterPresets: [defaultFilterPreset],
   modules: [
     {id: '1', name: 'Module 1', position: 1},
     {id: '2', name: 'Module 2', position: 2},
@@ -72,7 +65,7 @@ const defaultProps: FilterTrayPresetProps = {
     {id: '3', title: 'Grading Period 3', startDate: 3}
   ],
   studentGroupCategories: {
-    '1': {
+    1: {
       id: '1',
       name: 'Student Group Category 1',
       groups: [
@@ -80,23 +73,25 @@ const defaultProps: FilterTrayPresetProps = {
         {id: '2', name: 'Student Group 2'}
       ]
     }
-  }
+  },
+  isTrayOpen: true,
+  setIsTrayOpen: () => {}
 }
 
-describe('FilterNavFilter', () => {
-  it('clicking delete triggers onDelete', () => {
-    const onDelete = jest.fn()
-    const {getByTestId} = render(<FilterNavFilter {...defaultProps} onDelete={onDelete} />)
-    userEvent.click(getByTestId('delete-filter-preset-button'))
-    expect(onDelete).toHaveBeenCalledTimes(1)
-  })
+export default {
+  title: 'Examples/Evaluate/Gradebook/FilterTrayFilter',
+  component: FilterNavTray,
+  argTypes: {applyFilters: {action: 'applyFilters'}},
+  args: props
+}
 
-  it('clicking save after change triggers onSave', () => {
-    const onUpdate = jest.fn()
-    const {getByRole} = render(<FilterNavFilter {...defaultProps} onUpdate={onUpdate} />)
-    userEvent.click(getByRole('button', {name: 'Sections'}))
-    userEvent.click(getByRole('option', {name: 'Section 7'}))
-    userEvent.click(getByRole('button', {name: /Save Filter Preset/}))
-    expect(onUpdate).toHaveBeenCalledTimes(1)
-  })
-})
+const Wrapper = (props_: FilterTrayProps) => {
+  return (
+    <View maxWidth="450px" as="div">
+      <FilterNavTray {...props_} />
+    </View>
+  )
+}
+
+const Template = args => <Wrapper {...args} />
+export const Default = Template.bind({})
