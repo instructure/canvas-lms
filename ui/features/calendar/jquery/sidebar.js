@@ -29,6 +29,7 @@ import 'jquery-kyle-menu'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import 'jquery-tinypubsub'
 import 'jqueryui/tooltip'
+import AccountCalendarsModal from '../react/AccountCalendarsModal'
 
 const I18n = useI18nScope('calendar_sidebar')
 
@@ -45,7 +46,10 @@ class VisibleContextManager {
 
     if (!this.disabledContexts) {
       const disabledContexts = contexts
-        .filter(c => c.course_pacing_enabled && !(c.can_make_reservation || c.user_is_observer))
+        .filter(c => {
+          if (c.type === 'account') return false
+          return c.course_pacing_enabled && !(c.can_make_reservation || c.user_is_observer)
+        })
         .map(dC => dC.asset_string)
       this.disabledContexts = disabledContexts
     }
@@ -186,6 +190,10 @@ class VisibleContextManager {
       }
     })
   }
+
+  overrideEnabledAccounts = newEnabledAccounts => {
+    this.enabledAccounts = newEnabledAccounts
+  }
 }
 
 function generateEmptyState() {
@@ -218,14 +226,47 @@ function setupCalendarFeedsWithSpecialAccessibilityConsiderationsForNVDA() {
   })
 }
 
-export default function sidebar(contexts, selectedContexts, dataSource) {
+function setupAccountCalendarDialog(getSelectedOtherCalendars, onOtherCalendarsChange) {
+  ReactDOM.unmountComponentAtNode($(`#manage-accounts-btn`)[0])
+
+  ReactDOM.render(
+    <AccountCalendarsModal
+      getSelectedOtherCalendars={getSelectedOtherCalendars}
+      onSave={onOtherCalendarsChange}
+      calendarsPerRequest={100}
+    />,
+    $(`#manage-accounts-btn`)[0]
+  )
+}
+
+function refreshOtherCalendarsSection($holder, otherCalendars, notify) {
+  $holder.html(
+    contextListTemplate({
+      contexts: otherCalendars,
+      type: 'other-calendars',
+      includeRemoveOption: 'calendars'
+    })
+  )
+  notify()
+}
+
+function convertAccountCalendars(accountCalendars) {
+  return accountCalendars.map(oC => ({
+    id: oC.id,
+    name: oC.name,
+    asset_string: oC.asset_string,
+    type: oC.type
+  }))
+}
+
+export default function sidebar(contexts, selectedContexts, dataSource, colorizeContexts) {
   const $skipLink = $('.skip-to-calendar')
   const $colorPickerBtn = $('.ContextList__MoreBtn')
   const $calendarHolder = $('#calendar-list-holder')
   const $otherCalendarsHolder = $('#other-calendars-list-holder')
   const $combineHolder = $($calendarHolder).add($otherCalendarsHolder)
   const calendars = contexts.filter(c => c.type !== 'account')
-  const otherCalendars = contexts.filter(c => c.type === 'account')
+  let otherCalendars = contexts.filter(c => c.type === 'account')
 
   $skipLink.focus(() => {
     $skipLink.removeClass('screenreader-only')
@@ -240,16 +281,13 @@ export default function sidebar(contexts, selectedContexts, dataSource) {
   $calendarHolder.html(
     contextListTemplate({contexts: calendars, type: 'calendars', includeRemoveOption: 'calendars'})
   )
+  const visibleContexts = new VisibleContextManager(contexts, selectedContexts, $combineHolder)
 
   if ($otherCalendarsHolder.length) {
+    const syncOtherCalendars = (newCalendars, notify) =>
+      refreshOtherCalendarsSection($otherCalendarsHolder, newCalendars, notify)
     if (otherCalendars.length > 0) {
-      $otherCalendarsHolder.html(
-        contextListTemplate({
-          contexts: otherCalendars,
-          type: 'other-calendars',
-          includeRemoveOption: 'calendars'
-        })
-      )
+      syncOtherCalendars(otherCalendars, visibleContexts.notify)
     } else {
       $otherCalendarsHolder[0].appendChild(generateEmptyState())
     }
@@ -260,9 +298,32 @@ export default function sidebar(contexts, selectedContexts, dataSource) {
         })
       }
     })
-  }
 
-  const visibleContexts = new VisibleContextManager(contexts, selectedContexts, $combineHolder)
+    const onOtherCalendarsChange = newOtherCalendars => {
+      const newAddedCalendars = newOtherCalendars.filter(newAC => {
+        return !otherCalendars.some(oldAC => newAC.id === oldAC.id)
+      })
+      otherCalendars = newOtherCalendars
+      const contextAccountCodes = otherCalendars.map(nOC => nOC.asset_string)
+      syncOtherCalendars(otherCalendars, visibleContexts.notify)
+      visibleContexts.overrideEnabledAccounts(contextAccountCodes)
+      colorizeContexts(contextAccountCodes)
+      newAddedCalendars.forEach(newCalendar => {
+        if (!visibleContexts.contexts.includes(newCalendar)) {
+          visibleContexts.toggle(newCalendar.asset_string)
+        }
+      })
+      if (otherCalendars.length === 0) $otherCalendarsHolder[0].appendChild(generateEmptyState())
+    }
+
+    const getSelectedOtherCalendars = () => {
+      const currentSelection = otherCalendars.filter(oC =>
+        visibleContexts.enabledAccounts.includes(oC.asset_string)
+      )
+      return convertAccountCalendars(currentSelection)
+    }
+    setupAccountCalendarDialog(getSelectedOtherCalendars, onOtherCalendarsChange)
+  }
 
   $combineHolder.on('click keyclick', '.context-list-toggle-box', function (event) {
     const parent = $(this).closest('.context_list_context')
@@ -271,9 +332,11 @@ export default function sidebar(contexts, selectedContexts, dataSource) {
 
   $otherCalendarsHolder.on('click keyclick', '.ContextList__DeleteBtn', function (event) {
     const parent = $(this).closest('.context_list_context')
-    visibleContexts.toggleAccount($(parent).data('context'), parent)
+    const toRemove = $(parent).data('context')
+    const calendarToRemoveIndex = otherCalendars.findIndex(oC => oC.asset_string === toRemove)
+    otherCalendars.splice(calendarToRemoveIndex, 1)
+    visibleContexts.toggleAccount(toRemove, parent)
   })
-
 
   $combineHolder.on('click keyclick', '.ContextList__MoreBtn', function (event) {
     const positions = {

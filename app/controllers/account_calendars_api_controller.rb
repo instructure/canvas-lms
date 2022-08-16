@@ -62,6 +62,16 @@
 #           "description": "number of this account's direct sub-accounts",
 #           "example": 0,
 #           "type": "integer"
+#         },
+#         "asset_string": {
+#           "description": "Asset string of the account",
+#           "example": "account_4",
+#           "type": "string"
+#         },
+#         "type": {
+#           "description": "Object type",
+#           "example": "account",
+#           "type": "string"
 #         }
 #       }
 #     }
@@ -84,14 +94,18 @@ class AccountCalendarsApiController < ApplicationController
   #   curl https://<canvas>/api/v1/account_calendars \
   #     -H 'Authorization: Bearer <token>'
   #
-  # @returns [AccountCalendar]
+  # @returns { "account_calendars": [AccountCalendar], "total_results": "integer"}
   def index
     GuardRail.activate(:secondary) do
       search_term = params[:search_term]
       accounts = @current_user.associated_accounts.active.where(account_calendar_visible: true)
       accounts = Account.search_by_attribute(accounts, :name, search_term) if search_term.present?
-      paginated_accounts = Api.paginate(accounts.reorder(Account.best_unicode_collation_key("name"), :id), self, api_v1_account_calendars_url)
-      render json: account_calendars_json(paginated_accounts, @current_user, session)
+      paginated_accounts = Api.paginate(accounts.reorder(Account.best_unicode_collation_key("name"), :id), self, api_v1_account_calendars_url, total_entries: accounts.count)
+      json = {
+        account_calendars: account_calendars_json(paginated_accounts, @current_user, session),
+        total_results: accounts.count
+      }
+      render json: json
     end
   end
 

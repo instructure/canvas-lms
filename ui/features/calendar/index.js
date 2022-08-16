@@ -70,7 +70,12 @@ const start = () => {
 
   new MiniCalendar('#minical', calendar)
   new UndatedEventsList('#undated-events', eventDataSource, calendar)
-  drawSidebar(ENV.CALENDAR.CONTEXTS, ENV.CALENDAR.SELECTED_CONTEXTS, eventDataSource)
+  drawSidebar(
+    ENV.CALENDAR.CONTEXTS,
+    ENV.CALENDAR.SELECTED_CONTEXTS,
+    eventDataSource,
+    calendar.colorizeContexts
+  )
 }
 
 const startAnyway = error => {
@@ -84,9 +89,7 @@ let keyboardUser = true
 
 $('.calendar-button').on('mousedown', e => {
   keyboardUser = false
-  $(e.target)
-    .find('.accessibility-warning')
-    .addClass('screenreader-only')
+  $(e.target).find('.accessibility-warning').addClass('screenreader-only')
 })
 
 $(document).on('keydown', e => {
@@ -98,16 +101,12 @@ $(document).on('keydown', e => {
 
 $('.calendar-button').on('focus', e => {
   if (keyboardUser) {
-    $(e.target)
-      .find('.accessibility-warning')
-      .removeClass('screenreader-only')
+    $(e.target).find('.accessibility-warning').removeClass('screenreader-only')
   }
 })
 
 $('.calendar-button').on('focusout', e =>
-  $(e.target)
-    .find('.accessibility-warning')
-    .addClass('screenreader-only')
+  $(e.target).find('.accessibility-warning').addClass('screenreader-only')
 )
 
 $('.rs-section .accessibility-warning').on('focus', e =>
