@@ -48,6 +48,7 @@ export const ROSTER_QUERY = gql`
             htmlUrl
             totalActivityTime
             canBeRemoved
+            sisRole
             associatedUser {
               _id
               id

@@ -31,6 +31,7 @@ export const mockUser = ({
   lastActivityAt = '2022-07-07T10:01:14-06:00',
   totalActivityTime = 0,
   canBeRemoved = true,
+  sisRole = 'student',
   sectionID = '1',
   sectionName = 'Section 1',
   additionalEnrollments = []
@@ -52,6 +53,7 @@ export const mockUser = ({
       htmlUrl: `http://test.host/courses/${courseID}/users/${_id}`,
       totalActivityTime,
       canBeRemoved,
+      sisRole,
       associatedUser: null, // always null for user's own enrollment
       __typename: 'enrollment',
       section: {
@@ -73,6 +75,7 @@ export const mockEnrollment = ({
   lastActivityAt = '2022-07-07T10:01:14-06:00',
   totalActivityTime = 0,
   canBeRemoved = true,
+  sisRole = 'observer',
   associatedUserID = '2',
   associatedUserName = 'Test User',
   sectionID = '1',
@@ -85,6 +88,7 @@ export const mockEnrollment = ({
   htmlUrl: `http://test.host/courses/${courseID}/users/${_id}`,
   totalActivityTime,
   canBeRemoved,
+  sisRole,
   __typename: 'enrollment',
   associatedUser: {
     _id: associatedUserID,
