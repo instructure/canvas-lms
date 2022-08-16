@@ -51,7 +51,8 @@ describe('AccountCalendarSettings', () => {
     ).toBeInTheDocument()
   })
 
-  it('saves changes when clicking apply', async () => {
+  // skipped for LS-3360
+  it.skip('saves changes when clicking apply', async () => {
     fetchMock.put(/\/api\/v1\/accounts\/1\/account_calendars/, {message: 'Updated 1 account'})
     const {findByRole, getByRole, getByText, findAllByText} = render(
       <AccountCalendarSettings {...defaultProps} />
