@@ -41,7 +41,3 @@ def call() {
     }
   }
 }
-
-def shouldRun() {
-  return (configuration.isChangeMerged() && filesChangedStage.hasGraphqlFiles()) || configuration.apolloForceGraphqlSchemaCheck()
-}
