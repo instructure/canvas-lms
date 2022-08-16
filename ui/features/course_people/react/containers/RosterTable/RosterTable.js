@@ -22,13 +22,13 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
 import {ROSTER_QUERY} from '../../../graphql/Queries'
 import LoadingIndicator from '@canvas/loading-indicator'
-import {readableRoleName} from '@canvas/k5/react/utils'
 import AvatarLink from '../../components/AvatarLink/AvatarLink'
 import NameLink from '../../components/NameLink/NameLink'
 import StatusPill from '../../components/StatusPill/StatusPill'
 import RosterTableRowMenuButton from '../../components/RosterTableRowMenuButton/RosterTableRowMenuButton'
 import {secondsToStopwatchTime} from '../../../util/utils'
 import RosterTableLastActivity from '../../components/RosterTableLastActivity/RosterTableLastActivity'
+import RosterTableRoles from '../../components/RosterTableRoles/RosterTableRoles'
 
 const I18n = useI18nScope('course_people')
 
@@ -60,17 +60,6 @@ const RosterTable = () => {
       return <div key={`section-${enrollment.id}`}>{enrollment.section.name}</div>
     })
 
-    const enrollmentRoles = enrollments.map(enrollment => {
-      if (enrollment.type === OBSERVER_ENROLLMENT) {
-        return enrollment.associatedUser ? (
-          <div key={`role-${enrollment.associatedUser.id}`}>
-            {I18n.t('Observing: %{user_name}', {user_name: enrollment.associatedUser.name})}
-          </div>
-        ) : null
-      }
-      return <div key={`role-${enrollment.id}`}>{readableRoleName(enrollment.type)}</div>
-    })
-
     return (
       <Table.Row key={_id} data-testid="roster-table-data-row">
         <Table.Cell>
@@ -83,7 +72,9 @@ const RosterTable = () => {
         {view_user_logins && <Table.Cell>{loginId}</Table.Cell>}
         {read_sis && <Table.Cell>{sisId}</Table.Cell>}
         <Table.Cell>{sectionNames}</Table.Cell>
-        <Table.Cell>{enrollmentRoles}</Table.Cell>
+        <Table.Cell>
+          <RosterTableRoles enrollments={enrollments} />
+        </Table.Cell>
         <Table.Cell>
           <RosterTableLastActivity enrollments={enrollments} />
         </Table.Cell>

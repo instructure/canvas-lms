@@ -491,6 +491,15 @@ describe Types::CourseType do
         ).to eq [0, 0, 0, 0, 0, 0]
       end
 
+      it "returns the sisRole of each user" do
+        expect(
+          course_type.resolve(
+            "enrollmentsConnection { nodes { sisRole } }",
+            current_user: @teacher
+          )
+        ).to eq %w[teacher student teacher student student student]
+      end
+
       it "returns an htmlUrl for each enrollment" do
         expect(
           course_type.resolve(

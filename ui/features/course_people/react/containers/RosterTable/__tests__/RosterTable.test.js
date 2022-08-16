@@ -29,7 +29,8 @@ const designer1 = {
   _id: '10',
   sisId: 'Designer1-SIS-ID',
   loginId: 'Designer1@instructure.com',
-  enrollmentType: 'DesignerEnrollment'
+  enrollmentType: 'DesignerEnrollment',
+  sisRole: 'designer'
 }
 
 const teacher1 = {
@@ -40,6 +41,7 @@ const teacher1 = {
   sisId: 'Teacher1-SIS-ID',
   loginId: 'teacher1@instructure.com',
   enrollmentType: 'TeacherEnrollment',
+  sisRole: 'teacher',
   lastActivityAt: '2022-07-27T10:21:33-06:00',
   totalActivityTime: 60708
 }
@@ -51,6 +53,7 @@ const ta1 = {
   sisId: 'TA1-SIS-ID',
   loginId: 'TA1@instructure.com',
   enrollmentType: 'TaEnrollment',
+  sisRole: 'ta',
   lastActivityAt: '2022-08-16T14:08:13-06:00',
   totalActivityTime: 407
 }
@@ -88,6 +91,7 @@ const observer1 = {
   sisId: 'Observer1-SIS-ID',
   loginId: 'Observer1@instructure.com',
   enrollmentType: 'ObserverEnrollment',
+  sisRole: 'observer',
   additionalEnrollments: [
     mockEnrollment({
       _id: '40',
