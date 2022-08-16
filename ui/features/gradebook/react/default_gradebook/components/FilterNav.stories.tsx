@@ -17,40 +17,12 @@
  */
 
 import React from 'react'
-import FilterNavFilter from '../FilterTrayFilterPreset'
-import type {FilterTrayPresetProps} from '../FilterTrayFilterPreset'
-import type {FilterPreset} from '../../gradebook.d'
-import {render} from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import '@testing-library/jest-dom/extend-expect'
+import FilterNav from './FilterNav'
+import type {FilterNavProps} from './FilterNav'
+import {Filter} from '../gradebook.d'
+import store from '../stores/index'
 
-const defaultFilterPreset: FilterPreset = {
-  id: '123',
-  name: 'Label',
-  created_at: '2021-11-02T20:56:23.615Z',
-  filters: [
-    {
-      id: '456',
-      created_at: '2021-11-02T20:56:23.616Z',
-      type: 'module',
-      value: undefined
-    },
-    {
-      id: '567',
-      created_at: '2021-11-02T20:56:23.617Z',
-      type: 'section',
-      value: undefined
-    }
-  ]
-}
-
-const defaultProps: FilterTrayPresetProps = {
-  filterPreset: defaultFilterPreset,
-  applyFilters: () => ({}),
-  onUpdate: () => Promise.resolve(),
-  isActive: false,
-  onChange: () => {},
-  onDelete: () => {},
+const props: FilterNavProps = {
   modules: [
     {id: '1', name: 'Module 1', position: 1},
     {id: '2', name: 'Module 2', position: 2},
@@ -72,7 +44,7 @@ const defaultProps: FilterTrayPresetProps = {
     {id: '3', title: 'Grading Period 3', startDate: 3}
   ],
   studentGroupCategories: {
-    '1': {
+    1: {
       id: '1',
       name: 'Student Group Category 1',
       groups: [
@@ -83,20 +55,38 @@ const defaultProps: FilterTrayPresetProps = {
   }
 }
 
-describe('FilterNavFilter', () => {
-  it('clicking delete triggers onDelete', () => {
-    const onDelete = jest.fn()
-    const {getByTestId} = render(<FilterNavFilter {...defaultProps} onDelete={onDelete} />)
-    userEvent.click(getByTestId('delete-filter-preset-button'))
-    expect(onDelete).toHaveBeenCalledTimes(1)
+const appliedFilters: Filter[] = [
+  {
+    id: '2',
+    type: 'start-date',
+    value: '2022-08-02T06:00:00.000Z',
+    created_at: '2022-02-05T10:18:34-07:00'
+  },
+  {
+    id: '3',
+    type: 'end-date',
+    value: '2022-08-04T06:00:00.000Z',
+    created_at: '2022-02-05T10:18:34-07:00'
+  }
+]
+
+export default {
+  title: 'Examples/Evaluate/Gradebook/FilterNav',
+  component: FilterNav,
+  args: props
+}
+
+const Wrapper = (args: FilterNavProps) => {
+  store.setState({
+    appliedFilters
   })
 
-  it('clicking save after change triggers onSave', () => {
-    const onUpdate = jest.fn()
-    const {getByRole} = render(<FilterNavFilter {...defaultProps} onUpdate={onUpdate} />)
-    userEvent.click(getByRole('button', {name: 'Sections'}))
-    userEvent.click(getByRole('option', {name: 'Section 7'}))
-    userEvent.click(getByRole('button', {name: /Save Filter Preset/}))
-    expect(onUpdate).toHaveBeenCalledTimes(1)
-  })
-})
+  return (
+    <div>
+      <FilterNav {...args} />
+    </div>
+  )
+}
+
+const Template = args => <Wrapper {...args} />
+export const Default = Template.bind({})

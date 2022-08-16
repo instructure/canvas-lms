@@ -91,7 +91,7 @@ export const defaultGradebookEnv = {
 }
 
 export const defaultGradebookProps = {
-  appliedFilterConditions: [],
+  appliedFilters: [],
   hideGrid: true,
   isFiltersLoading: false,
   onFiltersChange: () => {},

@@ -25,7 +25,7 @@ import {MomentInput} from 'moment-timezone'
 import tz from '@canvas/timezone'
 import type {
   AssignmentGroup,
-  FilterCondition,
+  Filter,
   GradingPeriod,
   Module,
   Section,
@@ -38,14 +38,15 @@ const {Option, Group: OptionGroup} = SimpleSelect as any
 const formatDate = date => tz.format(date, 'date.formats.medium')
 const dateLabels = {'start-date': I18n.t('Start Date'), 'end-date': I18n.t('End Date')}
 
-type SubmissionTypeOption = ['has-ungraded-submissions' | 'has-submissions', string]
+type SubmissionTypeOption = ['has-ungraded-submissions' | 'has-submissions' | '__EMPTY__', string]
 
 const submissionTypeOptions: SubmissionTypeOption[] = [
+  ['__EMPTY__', I18n.t('--')],
   ['has-ungraded-submissions', I18n.t('Has ungraded submissions')],
   ['has-submissions', I18n.t('Has submissions')]
 ]
 
-const conditionTypeLabels = {
+const filterTypeLabels = {
   'assignment-group': I18n.t('Assignment Groups'),
   'grading-period': I18n.t('Grading Periods'),
   module: I18n.t('Modules'),
@@ -56,9 +57,9 @@ const conditionTypeLabels = {
   'end-date': I18n.t('End Date')
 }
 
-type Props = {
+export type FilterNavFilterProps = {
   assignmentGroups: AssignmentGroup[]
-  condition: FilterCondition
+  filter: Filter
   gradingPeriods: GradingPeriod[]
   modules: Module[]
   onChange: any
@@ -69,31 +70,34 @@ type Props = {
 type MenuItem = [id: string, name: string]
 
 export default function ({
-  condition,
+  filter,
   onChange,
   modules,
   assignmentGroups,
   gradingPeriods,
   sections,
   studentGroupCategories
-}: Props) {
+}: FilterNavFilterProps) {
   let items: MenuItem[] = []
   let itemGroups: [string, string, MenuItem[]][] = []
 
-  switch (condition.type) {
+  const blankItem: MenuItem = ['__EMPTY__', I18n.t('--')]
+
+  switch (filter.type) {
     case 'module': {
-      items = modules.map(({id, name}) => [id, name])
+      items = [blankItem].concat(modules.map(({id, name}) => [id, name]))
       break
     }
     case 'assignment-group': {
-      items = assignmentGroups.map(({id, name}) => [id, name])
+      items = [blankItem].concat(assignmentGroups.map(({id, name}) => [id, name]))
       break
     }
     case 'section': {
-      items = sections.map(({id, name}) => [id, name])
+      items = [blankItem].concat(sections.map(({id, name}) => [id, name]))
       break
     }
     case 'student-group': {
+      items = [blankItem]
       itemGroups = Object.values(studentGroupCategories).map(c => [
         c.id,
         c.name,
@@ -104,7 +108,7 @@ export default function ({
     case 'grading-period': {
       const all: MenuItem = ['0', I18n.t('All Grading Periods')]
       const periods: MenuItem[] = gradingPeriods.map(({id, title: name}) => [id, name])
-      items = [all, ...periods]
+      items = [blankItem, all, ...periods]
       break
     }
   }
@@ -113,22 +117,22 @@ export default function ({
     <>
       {(items.length > 0 || itemGroups.length > 0) && (
         <SimpleSelect
-          data-testid="select-condition"
-          key={condition.type} // resets dropdown when condition type is changed
-          renderLabel={conditionTypeLabels[condition.type || 'assignment-group']}
+          data-testid="select-filter"
+          key={filter.type} // resets dropdown when filter type is changed
+          renderLabel={filterTypeLabels[filter.type || 'assignment-group']}
           placeholder="--"
           size="small"
-          value={condition.value || '_'}
+          value={filter.value || '_'}
           onChange={(_event, {value}) => {
             onChange({
-              ...condition,
+              ...filter,
               value
             })
           }}
         >
           {items.map(([id, name]: [string, string]) => {
             return (
-              <Option key={id} id={`${condition.id}-item-${id}`} value={id}>
+              <Option key={id} id={`${filter.id}-item-${id}`} value={id}>
                 {name}
               </Option>
             )
@@ -139,7 +143,7 @@ export default function ({
               <OptionGroup value={id} renderLabel={name}>
                 {items_.map(([itemId, itemName]: [string, string]) => {
                   return (
-                    <Option key={itemId} id={`${condition.id}-item-${itemId}`} value={itemId}>
+                    <Option key={itemId} id={`${filter.id}-item-${itemId}`} value={itemId}>
                       {itemName}
                     </Option>
                   )
@@ -149,40 +153,40 @@ export default function ({
           })}
         </SimpleSelect>
       )}
-      {['start-date', 'end-date'].includes(condition.type || '') && (
+      {['start-date', 'end-date'].includes(filter.type || '') && (
         <CanvasDateInput
           size="small"
           dataTestid="date-input"
-          renderLabel={dateLabels[condition.type!]}
-          selectedDate={condition.value}
+          renderLabel={dateLabels[filter.type!]}
+          selectedDate={filter.value}
           formatDate={formatDate}
           interaction="enabled"
           onSelectedDateChange={(value: MomentInput) => {
             onChange({
-              ...condition,
+              ...filter,
               value: value ? moment(value).toISOString() : null
             })
           }}
         />
       )}
-      {condition.type === 'submissions' && (
+      {filter.type === 'submissions' && (
         <SimpleSelect
-          key={condition.type} // resets dropdown when condition type is changed
+          key={filter.type} // resets dropdown when filter type is changed
           renderLabel={I18n.t('Submissions')}
           size="small"
           data-testid="submissions-input"
           placeholder="--"
-          value={condition.value || '_'}
+          value={filter.value || '_'}
           onChange={(_event, {value}) => {
             onChange({
-              ...condition,
+              ...filter,
               value
             })
           }}
         >
           {submissionTypeOptions.map(([id, name]: SubmissionTypeOption) => {
             return (
-              <Option key={id} id={`${condition.id}-item-${id}`} value={id}>
+              <Option key={id} id={`${filter.id}-item-${id}`} value={id}>
                 {name}
               </Option>
             )

@@ -27,22 +27,22 @@ import type {
   Assignment,
   AssignmentGroup,
   Filter,
-  FilterCondition,
-  FilterConditionType,
+  FilterType,
+  FilterPreset,
   GradebookFilterApiRequest,
   GradebookFilterApiResponse,
   GradingPeriod,
   Module,
-  PartialFilter,
+  PartialFilterPreset,
   Section,
   SectionMap,
   StudentGroup,
   StudentGroupCategory,
   StudentGroupCategoryMap,
   Submission,
-  SubmissionFilterConditionValue
+  SubmissionFilterValue
 } from './gradebook.d'
-import filterConditionTypes from './constants/filterConditionTypes'
+import filterTypes from './constants/filterTypes'
 
 const I18n = useI18nScope('gradebook')
 
@@ -191,33 +191,31 @@ export function getAssignmentGroupColumnId(assignmentGroupId: string) {
   return `assignment_group_${assignmentGroupId}`
 }
 
-export function findConditionValuesOfType(
-  type: FilterConditionType,
-  appliedConditions: FilterCondition[]
-) {
-  return appliedConditions.reduce(
-    (values: string[], condition: FilterCondition) =>
-      condition.type === type && condition.value ? values.concat(condition.value) : values,
+export function findFilterValuesOfType(type: FilterType, appliedFilters: Filter[]) {
+  return appliedFilters.reduce(
+    (values: string[], filter: Filter) =>
+      filter.type === type && filter.value ? values.concat(filter.value) : values,
     []
   )
 }
 
-export function findSubmissionConditionValue(appliedConditions: FilterCondition[]) {
-  const conditions = findConditionValuesOfType('submissions', appliedConditions)
+export function findSubmissionFilterValue(appliedFilters: Filter[]) {
+  const values = findFilterValuesOfType('submissions', appliedFilters)
   return (
-    conditions.length && ['has-ungraded-submissions', 'has-submissions'].includes(conditions[0])
-      ? conditions[0]
+    values.length && ['has-ungraded-submissions', 'has-submissions'].includes(values[0])
+      ? values[0]
       : undefined
-  ) as SubmissionFilterConditionValue
+  ) as SubmissionFilterValue
 }
 
 // Extra normalization; comes from jsonb payload
-export const deserializeFilter = (json: GradebookFilterApiResponse): Filter => {
-  const filter = json.gradebook_filter
-  if (!filter.id || typeof filter.id !== 'string') throw new Error('invalid filter id')
-  if (!Array.isArray(filter.payload.conditions)) throw new Error('invalid filter conditions')
-  const conditions = filter.payload.conditions
-    .filter(c => c && (typeof c.type === 'undefined' || filterConditionTypes.includes(c.type)))
+export const deserializeFilter = (json: GradebookFilterApiResponse): FilterPreset => {
+  const filterPreset = json.gradebook_filter
+  if (!filterPreset.id || typeof filterPreset.id !== 'string') throw new Error('invalid filter id')
+  if (!Array.isArray(filterPreset.payload.conditions))
+    throw new Error('invalid filter preset filters (conditions)')
+  const filters = filterPreset.payload.conditions
+    .filter(c => c && (typeof c.type === 'undefined' || filterTypes.includes(c.type)))
     .map(c => ({
       id: c.id,
       type: c.type,
@@ -225,98 +223,95 @@ export const deserializeFilter = (json: GradebookFilterApiResponse): Filter => {
       created_at: String(c.created_at)
     }))
   return {
-    id: filter.id,
-    name: String(filter.name),
-    conditions,
-    created_at: String(filter.created_at)
+    id: filterPreset.id,
+    name: String(filterPreset.name),
+    filters,
+    created_at: String(filterPreset.created_at)
   }
 }
 
-export const serializeFilter = (filter: PartialFilter): GradebookFilterApiRequest => {
+export const serializeFilter = (filterPreset: PartialFilterPreset): GradebookFilterApiRequest => {
   return {
-    name: filter.name,
+    name: filterPreset.name,
     payload: {
-      conditions: filter.conditions
+      conditions: filterPreset.filters
     }
   }
 }
 
-export const compareFilterByDate = (a: Filter, b: Filter) =>
+export const compareFilterByDate = (a: FilterPreset, b: FilterPreset) =>
   new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
 
-export const getLabelForFilterCondition = (
-  condition: FilterCondition,
+export const getLabelForFilter = (
+  filter: Filter,
   assignmentGroups: Pick<AssignmentGroup, 'id' | 'name'>[],
   gradingPeriods: Pick<GradingPeriod, 'id' | 'title'>[],
   modules: Pick<Module, 'id' | 'name'>[],
   sections: Pick<Section, 'id' | 'name'>[],
   studentGroupCategories: StudentGroupCategoryMap
 ) => {
-  if (!condition.type) throw new Error('missing condition type')
+  if (!filter.type) throw new Error('missing condition type')
 
-  if (condition.type === 'section') {
-    return sections.find(s => s.id === condition.value)?.name || I18n.t('Section')
-  } else if (condition.type === 'module') {
-    return modules.find(m => m.id === condition.value)?.name || I18n.t('Module')
-  } else if (condition.type === 'assignment-group') {
-    return assignmentGroups.find(a => a.id === condition.value)?.name || I18n.t('Assignment Group')
-  } else if (condition.type === 'grading-period') {
-    return gradingPeriods.find(g => g.id === condition.value)?.title || I18n.t('Grading Period')
-  } else if (condition.type === 'student-group') {
+  if (filter.type === 'section') {
+    return sections.find(s => s.id === filter.value)?.name || I18n.t('Section')
+  } else if (filter.type === 'module') {
+    return modules.find(m => m.id === filter.value)?.name || I18n.t('Module')
+  } else if (filter.type === 'assignment-group') {
+    return assignmentGroups.find(a => a.id === filter.value)?.name || I18n.t('Assignment Group')
+  } else if (filter.type === 'grading-period') {
+    return gradingPeriods.find(g => g.id === filter.value)?.title || I18n.t('Grading Period')
+  } else if (filter.type === 'student-group') {
     const studentGroups: StudentGroup[] = Object.values(studentGroupCategories)
       .map((c: StudentGroupCategory) => c.groups)
       .flat()
     return (
-      studentGroups.find((g: StudentGroup) => g.id === condition.value)?.name ||
+      studentGroups.find((g: StudentGroup) => g.id === filter.value)?.name ||
       I18n.t('Student Group')
     )
-  } else if (condition.type === 'submissions') {
-    if (condition.value === 'has-ungraded-submissions') {
+  } else if (filter.type === 'submissions') {
+    if (filter.value === 'has-ungraded-submissions') {
       return I18n.t('Has ungraded submissions')
-    } else if (condition.value === 'has-submissions') {
+    } else if (filter.value === 'has-submissions') {
       return I18n.t('Has submissions')
     } else {
-      throw new Error('invalid submissions condition value')
+      throw new Error('invalid submissions filter value')
     }
-  } else if (condition.type === 'start-date') {
+  } else if (filter.type === 'start-date') {
     const options: any = {
       year: 'numeric',
       month: 'numeric',
       day: 'numeric'
     }
-    if (typeof condition.value !== 'string') throw new Error('invalid start-date value')
-    const value = Intl.DateTimeFormat(I18n.currentLocale(), options).format(
-      new Date(condition.value)
-    )
+    if (typeof filter.value !== 'string') throw new Error('invalid start-date value')
+    const value = Intl.DateTimeFormat(I18n.currentLocale(), options).format(new Date(filter.value))
     return I18n.t('Start Date %{value}', {value})
-  } else if (condition.type === 'end-date') {
+  } else if (filter.type === 'end-date') {
     const options: any = {
       year: 'numeric',
       month: 'numeric',
       day: 'numeric'
     }
-    if (typeof condition.value !== 'string') throw new Error('invalid end-date value')
-    const value = Intl.DateTimeFormat(I18n.currentLocale(), options).format(
-      new Date(condition.value)
-    )
+    if (typeof filter.value !== 'string') throw new Error('invalid end-date value')
+    const value = Intl.DateTimeFormat(I18n.currentLocale(), options).format(new Date(filter.value))
     return I18n.t('End Date %{value}', {value})
   }
 
   // unrecognized types should have been filtered out by deserializeFilter
-  throw new Error('invalid condition type')
+  throw new Error('invalid filter type')
 }
 
-export function doFilterConditionsMatch(
-  conditions1: FilterCondition[],
-  conditions2: FilterCondition[]
-) {
-  const conditionsWithValues1 = conditions1.filter(c => c.value)
-  const conditionsWithValues2 = conditions2.filter(c => c.value)
+export const isFilterNotEmpty = (filter: Filter) => {
+  return filter.value && filter.value !== '__EMPTY__'
+}
+
+export function doFiltersMatch(filters1: Filter[], filters2: Filter[]) {
+  const filtersWithValues1 = filters1.filter(isFilterNotEmpty)
+  const filtersWithValues2 = filters2.filter(isFilterNotEmpty)
   return (
-    conditionsWithValues1.length > 0 &&
-    conditionsWithValues1.length === conditionsWithValues2.length &&
-    conditionsWithValues1.every(c1 =>
-      conditionsWithValues2.some(c2 => c2.type === c1.type && c2.value === c1.value)
+    filtersWithValues1.length > 0 &&
+    filtersWithValues1.length === filtersWithValues2.length &&
+    filtersWithValues1.every(c1 =>
+      filtersWithValues2.some(c2 => c2.type === c1.type && c2.value === c1.value)
     )
   )
 }

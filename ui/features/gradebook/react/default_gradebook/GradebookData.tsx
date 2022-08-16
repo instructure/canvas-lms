@@ -36,7 +36,7 @@ export default function GradebookData(props) {
   const courseId = props.gradebookEnv.context_id
   const flashMessages = useStore(state => state.flashMessages)
 
-  const appliedFilterConditions = useStore(state => state.appliedFilterConditions, shallow)
+  const appliedFilters = useStore(state => state.appliedFilters, shallow)
   const isFiltersLoading = useStore(state => state.isFiltersLoading)
   const initializeStagedFilter = useStore(state => state.initializeStagedFilter)
   const fetchFilters = useStore(state => state.fetchFilters)
@@ -88,7 +88,7 @@ export default function GradebookData(props) {
       {...props}
       flashAlerts={flashMessages}
       hideGrid={false}
-      appliedFilterConditions={appliedFilterConditions}
+      appliedFilters={appliedFilters}
       isFiltersLoading={isFiltersLoading}
       isModulesLoading={isModulesLoading}
       modules={modules}
