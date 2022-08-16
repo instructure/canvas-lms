@@ -8,7 +8,7 @@ module Messages
       Setting.get("messages_precreate_tables", 2).to_i
     end
 
-    def self.process
+    def self.process(prune: false)
       Shard.current.database_server.unguard do
         GuardRail.activate(:deploy) do
           log "*" * 80
@@ -18,7 +18,11 @@ module Messages
 
           partman.ensure_partitions(precreate_tables)
 
-          Shard.current.database_server.unguard { partman.prune_partitions(Setting.get("messages_partitions_keep_weeks", 52).to_i) }
+          if prune
+            Shard.current.database_server.unguard do
+              partman.prune_partitions(Setting.get("messages_partitions_keep_weeks", 52).to_i)
+            end
+          end
 
           log "Done. Bye!"
           log "*" * 80
