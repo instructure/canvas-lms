@@ -173,4 +173,64 @@ describe "course pace page" do
       expect(assignment_due_date.text).to eq("Thu, Apr 28, 2022")
     end
   end
+
+  context "course with multiple modules" do
+    before :once do
+      create_published_course_pace("Pace Module 1", "Assignment 1")
+      @assignment_1 = @course_pace_assignment
+      create_assignment(@course, "Assignment 2", "Assignment 2", 10, "published")
+      @assignment_2 = @course_pace_assignment
+      @course_pace_module.add_item(id: @assignment_2.id, type: "assignment")
+      @course_pace.course_pace_module_items.last.update! duration: 2
+      create_course_pace_module_with_assignment("Pace Module 2", "Assignment 3")
+      @assignment_3 = @course_pace_assignment
+      run_jobs # Run the autopublish job
+    end
+
+    it "shows blackout dates in the correct range when assignments change modules" do
+      visit_course_paces_page
+
+      click_settings_button
+      click_manage_blackout_dates
+
+      blackout_date_title_input.send_keys("Course Break")
+      blackout_date_start_date_input.send_keys("2022-04-27")
+      click_blackout_dates_add_button
+
+      blackout_date_title_input.send_keys("Course Rest")
+      blackout_date_start_date_input.send_keys("2022-04-30")
+      click_blackout_dates_add_button
+
+      blackout_date_title_input.send_keys("Course Time Off")
+      blackout_date_start_date_input.send_keys("2022-05-04")
+      click_blackout_dates_add_button
+      click_blackout_dates_save_button
+
+      expect(blackout_module_items[0].text).to eq("Course Break\nBlackout Date\n1 Wed, Apr 27, 2022")
+      expect(assignment_due_dates[0].text).to eq("Thu, Apr 28, 2022")
+      expect(blackout_module_items[1].text).to eq("Course Rest\nBlackout Date\n1 Sat, Apr 30, 2022")
+      expect(assignment_due_dates[1].text).to eq("Mon, May 2, 2022")
+      expect(blackout_module_items[2].text).to eq("Course Time Off\nBlackout Date\n1 Wed, May 4, 2022")
+      expect(assignment_due_dates[2].text).to eq("Thu, May 5, 2022")
+
+      click_publish_button
+
+      get "/courses/#{@course.id}/modules"
+      wait_for_ajaximations
+      selector_1 = ".Assignment_#{@assignment_1.id} .move_item_link"
+      selector_2 = ".Assignment_#{@assignment_2.id} .move_item_link"
+      selector_3 = ".Assignment_#{@assignment_3.id} .move_item_link"
+      js_drag_and_drop(selector_3, selector_2)
+      js_drag_and_drop(selector_3, selector_1)
+      visit_course_paces_page
+      refresh_page
+
+      expect(blackout_module_items[0].text).to eq("Course Break\nBlackout Date\n1 Wed, Apr 27, 2022")
+      expect(assignment_due_dates[0].text).to eq("Thu, Apr 28, 2022")
+      expect(blackout_module_items[1].text).to eq("Course Rest\nBlackout Date\n1 Sat, Apr 30, 2022")
+      expect(assignment_due_dates[1].text).to eq("Mon, May 2, 2022")
+      expect(blackout_module_items[2].text).to eq("Course Time Off\nBlackout Date\n1 Wed, May 4, 2022")
+      expect(assignment_due_dates[2].text).to eq("Thu, May 5, 2022")
+    end
+  end
 end

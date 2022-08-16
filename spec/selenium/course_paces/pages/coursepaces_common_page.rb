@@ -93,12 +93,17 @@ module CoursePacesCommonPageObject
     Setting.set("course_pace_publish_interval", "0")
 
     course_pace_model(course: @course, end_date: Time.zone.now.advance(days: 30))
-    course_pace_module = create_course_module(module_title)
-    course_pace_assignment = create_assignment(@course, assignment_title, "Assignment 1", 10, "published")
-    course_pace_module.add_item(id: course_pace_assignment.id, type: "assignment")
+    create_course_pace_module_with_assignment(module_title, assignment_title)
+    @course_pace
+  end
+
+  def create_course_pace_module_with_assignment(module_title, assignment_title)
+    @course_pace_module = create_course_module(module_title)
+    @course_pace_assignment = create_assignment(@course, assignment_title, assignment_title, 10, "published")
+    @course_pace_module.add_item(id: @course_pace_assignment.id, type: "assignment")
     @course_pace.course_pace_module_items.last.update! duration: 2
     run_jobs # Run the autopublish job
-    @course_pace
+    @course_pace_module
   end
 
   def disable_course_paces_in_course
