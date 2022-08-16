@@ -424,7 +424,11 @@ export const mergeAssignmentsAndBlackoutDates = (
   const dueDateKeys = Object.keys(dueDates)
   let veryLastDueDate = moment('3000-01-01T00:00:00Z')
   if (dueDateKeys.length) {
-    veryLastDueDate = moment(dueDates[dueDateKeys[dueDateKeys.length - 1]])
+    let lastDueDate = moment(dueDates[dueDateKeys[0]])
+    dueDateKeys.forEach(key => {
+      if (moment(dueDates[key]).isAfter(lastDueDate)) lastDueDate = moment(dueDates[key])
+    })
+    veryLastDueDate = lastDueDate
   }
   const paceEnd = coursePace.end_date ? moment(coursePace.end_date) : veryLastDueDate
   const boDates: Array<any> = blackoutDates
