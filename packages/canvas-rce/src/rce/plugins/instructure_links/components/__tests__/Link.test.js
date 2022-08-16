@@ -52,7 +52,8 @@ describe('RCE "Links" Plugin > Link', () => {
       {type: 'assignments', icon: 'IconAssignment'},
       {type: 'discussions', icon: 'IconDiscussion'},
       {type: 'modules', icon: 'IconModule'},
-      {type: 'quizzes', icon: 'IconQuiz'},
+      {type: 'quizzes', icon: 'IconQuiz', quiz_type: 'assignment'},
+      {type: 'quizzes', icon: 'IconQuiz', quiz_type: 'quizzes.next'},
       {type: 'announcements', icon: 'IconAnnouncement'},
       {type: 'wikiPages', icon: 'IconDocument'},
       {type: 'navigation', icon: 'IconBlank'}
@@ -65,11 +66,18 @@ describe('RCE "Links" Plugin > Link', () => {
           title: 'object title',
           published: true
         }
-        const {container, getByText} = renderComponent({type: lt.type, link})
+        const {container, getByText} = renderComponent({
+          type: lt.type,
+          link: {...link, quiz_type: lt.quiz_type}
+        })
 
         expect(getByText(link.title)).toBeInTheDocument()
         expect(queryIconByName(container, 'IconPublish')).toBeInTheDocument()
-        expect(queryIconByName(container, lt.icon)).toBeInTheDocument()
+        const icon = queryIconByName(container, lt.icon)
+        expect(icon).toBeInTheDocument()
+        expect(icon.getAttribute('data-type')).toEqual(
+          lt.type === 'quizzes' && lt.quiz_type === 'quizzes.next' ? 'quizzes.next' : lt.type
+        )
       })
 
       it(`renders unpublished ${lt.type}`, () => {
