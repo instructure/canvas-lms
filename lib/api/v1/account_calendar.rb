@@ -30,6 +30,8 @@ module Api::V1::AccountCalendar
   def account_calendar_json(account, user, session, include: [])
     json = api_json(account, user, session, only: ACCOUNT_ATTRIBUTES)
     json["visible"] = account.account_calendar_visible
+    json["asset_string"] = account.asset_string
+    json["type"] = account.class.to_s.downcase
     json["sub_account_count"] = account.sub_accounts.count if include.include? "sub_account_count"
     json
   end

@@ -40,7 +40,7 @@ describe AccountCalendarsApiController do
 
       expect(response).to be_successful
       json = json_parse(response.body)
-      expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@root_account.id, @subaccount1.id, @subaccount1a.id)
+      expect(json["account_calendars"].map { |calendar| calendar["id"] }).to contain_exactly(@root_account.id, @subaccount1.id, @subaccount1a.id)
     end
 
     it "returns only visible calendars" do
@@ -54,7 +54,7 @@ describe AccountCalendarsApiController do
 
       expect(response).to be_successful
       json = json_parse(response.body)
-      expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@root_account.id, @subaccount2.id)
+      expect(json["account_calendars"].map { |calendar| calendar["id"] }).to contain_exactly(@root_account.id, @subaccount2.id)
     end
 
     context "with a search term" do
@@ -66,7 +66,7 @@ describe AccountCalendarsApiController do
 
         expect(response).to be_successful
         json = json_parse(response.body)
-        expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1.id, @subaccount1a.id)
+        expect(json["account_calendars"].map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1.id, @subaccount1a.id)
       end
 
       it "does not include hidden calendars in the search results" do
@@ -78,7 +78,7 @@ describe AccountCalendarsApiController do
 
         expect(response).to be_successful
         json = json_parse(response.body)
-        expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1a.id)
+        expect(json["account_calendars"].map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1a.id)
       end
 
       it "does not include accounts without an association" do
@@ -88,7 +88,7 @@ describe AccountCalendarsApiController do
 
         expect(response).to be_successful
         json = json_parse(response.body)
-        expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1.id)
+        expect(json["account_calendars"].map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1.id)
       end
     end
 
@@ -109,7 +109,7 @@ describe AccountCalendarsApiController do
 
       expect(response).to be_successful
       json = json_parse(response.body)
-      expect(json.map { |calendar| calendar["id"] }).to eq([@subaccount1.id, @subaccount1a.id, @subaccount2.id, @root_account.id])
+      expect(json["account_calendars"].map { |calendar| calendar["id"] }).to eq([@subaccount1.id, @subaccount1a.id, @subaccount2.id, @root_account.id])
     end
 
     it "returns an empty array for a user without any enrollments" do
@@ -118,7 +118,8 @@ describe AccountCalendarsApiController do
 
       expect(response).to be_successful
       json = json_parse(response.body)
-      expect(json).to eq []
+      expected_json = { "account_calendars" => [], "total_results" => 0 }
+      expect(json).to eq(expected_json)
     end
 
     it "requires the user to be logged in" do

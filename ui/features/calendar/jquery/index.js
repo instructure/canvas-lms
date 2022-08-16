@@ -1101,10 +1101,16 @@ export default class Calendar {
     return this.schedulerNavigator.hide()
   }
 
-  colorizeContexts = () => {
+  colorizeContexts = (additionalContexts) => {
     // Get any custom colors that have been set
     $.getJSON(`/api/v1/users/${this.options.userId}/colors/`, data => {
       const customColors = data.custom_colors
+      if (additionalContexts?.length > 0) {
+        additionalContexts.forEach((additionalContext) => {
+          if (this.contextCodes.indexOf(additionalContext) === -1)
+            this.contextCodes.push(additionalContext);
+        })
+      }
       const colors = colorSlicer.getColors(this.contextCodes.length, 275)
       const newCustomColors = {}
       const html = this.contextCodes

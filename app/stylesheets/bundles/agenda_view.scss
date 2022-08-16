@@ -299,7 +299,7 @@ span.agendaView--no-assignments {
 .rs-section {
   border: none;
   padding: 0;
-  margin: 0 0 $ic-sp*2;
+  margin: 0 0 $ic-sp*3;
   &:last-of-type { margin-bottom: 0; }
 }
 
@@ -351,15 +351,18 @@ span.agendaView--no-assignments {
 }
 
 #other-calendar-actions-row {
+  line-height: 1;
   .element_toggler {
     float: direction(left);
+    margin-top: 1rem !important;
   }
   div.manage-accounts-wrapper{
     float: direction(right);
-    max-width: 24rem;
-    line-height: 1;
+    display: flex;
+    max-width: 25rem;
     .new-feature-pill{
       max-width: 12rem;
+      margin-top: 1rem !important;
       float: direction(left);
       color: var(--ic-brand-primary);
       border-radius: 0.5rem;
@@ -371,14 +374,10 @@ span.agendaView--no-assignments {
     .manage-accounts-btn{
       float: direction(right);
       text-decoration: none;
-      color: inherit;
       cursor: pointer;
-      width: 1.5rem;
-      height: 1rem;
       text-align: center;
       font-size: 1.5rem;
       font-weight: 400;
-      line-height: 1rem;
     }
   }
 }

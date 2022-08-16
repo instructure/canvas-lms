@@ -92,3 +92,64 @@ export const eventFormProps = () => {
     timezone: 'Etc/UTC'
   }
 }
+
+export const accountCalendarsAPIPage1Response = {
+  account_calendars: [
+    {
+      id: '5',
+      name: 'Elementary courses',
+      parent_account_id: '1',
+      root_account_id: '0',
+      visible: true,
+      asset_string: 'account_5',
+      type: 'account'
+    },
+    {
+      id: '4',
+      name: 'High school courses',
+      parent_account_id: '1',
+      root_account_id: '2',
+      visible: true,
+      asset_string: 'account_4',
+      type: 'account'
+    }
+  ],
+  total_results: 4
+}
+
+export const accountCalendarsAPIPage2Response = {
+  account_calendars: [
+    {
+      id: '1',
+      name: 'School A',
+      parent_account_id: null,
+      root_account_id: '0',
+      visible: true,
+      asset_string: 'account_1',
+      type: 'account'
+    },
+    {
+      id: '2',
+      name: 'Super Courses',
+      parent_account_id: '1',
+      root_account_id: '0',
+      visible: true,
+      asset_string: 'account_2',
+      type: 'account'
+    }
+  ],
+  total_results: 4
+}
+
+export const allAccountCalendarsResponse = {
+  account_calendars: [
+    ...accountCalendarsAPIPage1Response.account_calendars,
+    ...accountCalendarsAPIPage2Response.account_calendars
+  ],
+  total_results: 4
+}
+
+export const emptyResponse = {
+  account_calendars: [],
+  total_results: 0
+}
