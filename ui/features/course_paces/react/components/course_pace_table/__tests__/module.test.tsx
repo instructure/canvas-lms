@@ -48,46 +48,46 @@ const defaultProps = {
 
 describe('Module', () => {
   it('is expanded by default, shows the module name always, and only shows column headers when expanded', () => {
-    const {getByRole, queryByRole, queryByText, queryByTestId} = renderConnected(
+    const {getByRole, queryByText, queryByTestId} = renderConnected(
       <Module {...defaultProps} />
     )
     const moduleHeader = getByRole('button', {name: '1. How 2 B A H4CK32'})
     expect(moduleHeader).toBeInTheDocument()
     expect(queryByText(PACE_MODULE_1.items[0].assignment_title)).toBeInTheDocument()
     expect(queryByTestId('pp-duration-columnheader')).toBeInTheDocument()
-    expect(queryByRole('columnheader', {name: 'Due Date'})).toBeInTheDocument()
-    expect(queryByRole('columnheader', {name: 'Status'})).toBeInTheDocument()
+    expect(queryByTestId('pp-due-date-columnheader')).toBeInTheDocument()
+    expect(queryByTestId('pp-status-columnheader')).toBeInTheDocument()
 
     act(() => moduleHeader.click())
     expect(getByRole('button', {name: '1. How 2 B A H4CK32'})).toBeInTheDocument()
     expect(queryByText(PACE_MODULE_1.items[0].assignment_title)).not.toBeInTheDocument()
     expect(queryByTestId('pp-duration-columnheader')).not.toBeInTheDocument()
-    expect(queryByRole('columnheader', {name: 'Due Date'})).not.toBeInTheDocument()
-    expect(queryByRole('columnheader', {name: 'Status'})).not.toBeInTheDocument()
+    expect(queryByTestId('pp-due-date-columnheader')).not.toBeInTheDocument()
+    expect(queryByTestId('pp-status-columnheader')).not.toBeInTheDocument()
   })
 
   it('does not show due date column header when hiding projections', () => {
-    const {queryByRole, getByTestId} = renderConnected(
+    const {queryByRole, queryByTestId} = renderConnected(
       <Module {...defaultProps} showProjections={false} />
     )
     expect(queryByRole('button', {name: '1. How 2 B A H4CK32'})).toBeInTheDocument()
-    expect(getByTestId('pp-duration-columnheader')).toBeInTheDocument()
-    expect(queryByRole('columnheader', {name: 'Due Date'})).not.toBeInTheDocument()
-    expect(queryByRole('columnheader', {name: 'Status'})).toBeInTheDocument()
+    expect(queryByTestId('pp-duration-columnheader')).toBeInTheDocument()
+    expect(queryByTestId('pp-due-date-columnheader')).not.toBeInTheDocument()
+    expect(queryByTestId('pp-status-columnheader')).toBeInTheDocument()
   })
 
   it('displays headers and values in stacked format when at small screen sizes', () => {
-    const {queryAllByRole, queryByRole, queryAllByTestId} = renderConnected(
+    const {queryByRole, queryAllByTestId} = renderConnected(
       <Module {...defaultProps} responsiveSize="small" showProjections />
     )
     expect(queryByRole('button', {name: '1. How 2 B A H4CK32'})).toBeInTheDocument()
     expect(queryByRole('columnheader')).not.toBeInTheDocument()
     expect(
-      queryByRole('cell', {name: 'Item : Basic encryption/decryption 100 pts'})
-    ).toBeInTheDocument()
+      queryAllByTestId('pp-title-cell')[0].textContent
+    ).toEqual('Item: Basic encryption/decryption100 pts')
     expect(queryAllByTestId('pp-duration-cell')[0]).toBeInTheDocument()
-    expect(queryByRole('cell', {name: 'Due Date : Tue, Mar 22, 2022'})).toBeInTheDocument()
-    expect(queryAllByRole('cell', {name: 'Status : Published'})[0]).toBeInTheDocument()
+    expect(queryAllByTestId('pp-due-date-cell')[1].textContent).toEqual('Due Date: Tue, Mar 22, 2022')
+    expect(queryAllByTestId('pp-status-cell')[0].textContent).toEqual('Status: Published')
   })
 
   it('includes the compressed dates warning tooltip if compressing', () => {
@@ -122,10 +122,10 @@ describe('Module', () => {
       end_date: moment('2022-03-22T00:00:00-06:00')
     })
 
-    const {queryAllByRole} = renderConnected(
+    const {queryAllByRole, queryAllByTestId} = renderConnected(
       <Module {...defaultProps} module={module2} responsiveSize="small" showProjections />
     )
     expect(queryAllByRole('row').length).toEqual(3)
-    expect(queryAllByRole('cell', {name: /Status/}).length).toEqual(2)
+    expect(queryAllByTestId('pp-status-cell').length).toEqual(2)
   })
 })
