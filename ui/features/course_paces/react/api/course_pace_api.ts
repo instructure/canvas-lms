@@ -108,7 +108,10 @@ export const getNewCoursePaceFor = (
   } else if (context === 'Enrollment') {
     url = `/api/v1/courses/${courseId}/course_pacing/new?enrollment_id=${contextId}`
   }
-  return doFetchApi<{course_pace: CoursePace}>({path: url}).then(({json}) => json?.course_pace)
+  return doFetchApi<{
+    course_pace: CoursePace
+    progress: Progress
+  }>({path: url}).then(({json}) => json)
 }
 
 export const relinkToParentPace = (paceId: string) =>
