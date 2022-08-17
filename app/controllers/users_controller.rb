@@ -435,12 +435,15 @@ class UsersController < ApplicationController
     end
 
     page_opts = { total_entries: nil }
-    if includes.include?("ui_invoked") && Setting.get("ui_invoked_count_pages", "true") == "true"
-      page_opts = {} # let Folio calculate total entries
-      includes.delete("ui_invoked")
-    end
 
     GuardRail.activate(:secondary) do
+      if includes.include?("ui_invoked") && Setting.get("ui_invoked_count_pages", "true") == "true"
+        # explicitly load the records, as the query in current form is much
+        # more efficient than calling the aggregate of this relation
+        users.load
+        page_opts[:total_entries] = users.size
+        includes.delete("total_entries")
+      end
       users = Api.paginate(users, self, api_v1_account_users_url, page_opts)
 
       user_json_preloads(users, includes.include?("email"))
@@ -1855,6 +1858,8 @@ class UsersController < ApplicationController
       respond_to do |format|
         format.json do
           if user.set_preference(:custom_colors, colors)
+            enrollment_types_tags = user.participating_enrollments.pluck(:type).uniq.map { |type| "enrollment_type:#{type}" }
+            InstStatsd::Statsd.increment("user.set_custom_color", tags: enrollment_types_tags)
             render(json: { hexcode: colors[context.asset_string] })
           else
             render(json: user.errors, status: :bad_request)
@@ -2007,12 +2012,12 @@ class UsersController < ApplicationController
   #   Adding and changing pronouns must be enabled on the root account.
   #
   # @argument user[event] [String, "suspend"|"unsuspend"]
-  #   suspends or unsuspends all logins for this user that the calling user
+  #   Suspends or unsuspends all logins for this user that the calling user
   #   has permission to
   #
   # @argument override_sis_stickiness [boolean]
-  #   by default and when the value is true it updates all the fields
-  #   when the value is false then fields which in stuck_sis_fields will not be updated
+  #   Default is true. If false, any fields containing “sticky” changes will not be updated.
+  #   See SIS CSV Format documentation for information on which fields can have SIS stickiness
   #
   # @example_request
   #

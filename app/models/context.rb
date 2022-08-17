@@ -303,6 +303,7 @@ module Context
     name ||= asset.title.presence if asset.respond_to?(:title)
     name ||= asset.short_description.presence if asset.respond_to?(:short_description)
     name ||= asset.name if asset.respond_to?(:name)
+    name ||= asset.asset_name if asset.respond_to?(:asset_name)
     name || ""
   end
 

@@ -19,6 +19,7 @@
 import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 import {PostToolbar} from '../PostToolbar'
+import {Discussion} from '../../../../graphql/Discussion'
 
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
@@ -38,7 +39,13 @@ beforeAll(() => {
 })
 
 const setup = props => {
-  return render(<PostToolbar onReadAll={Function.prototype} {...props} />)
+  return render(
+    <PostToolbar
+      onReadAll={Function.prototype}
+      {...props}
+      discussionTopic={props?.discussion || Discussion.mock()}
+    />
+  )
 }
 
 describe('PostToolbar', () => {
@@ -96,12 +103,54 @@ describe('PostToolbar', () => {
       const onToggleSubscriptionMock = jest.fn()
       const {queryByText, getByText} = setup({
         onToggleSubscription: onToggleSubscriptionMock,
-        isSubscribed: true
+        isSubscribed: true,
+        discussion: Discussion.mock({groupSet: null})
       })
       expect(queryByText('Subscribed')).toBeTruthy()
       expect(onToggleSubscriptionMock.mock.calls.length).toBe(0)
       fireEvent.click(getByText('Subscribed'))
       expect(onToggleSubscriptionMock.mock.calls.length).toBe(1)
+    })
+
+    it('displays if user does not have teacher, designer, ta', () => {
+      window.ENV.current_user_roles = ['student']
+      const onToggleSubscriptionMock = jest.fn()
+      const {queryByText} = setup({
+        onToggleSubscription: onToggleSubscriptionMock,
+        isSubscribed: true,
+        discussion: Discussion.mock({groupSet: null})
+      })
+      expect(queryByText('Subscribed')).toBeTruthy()
+    })
+
+    it('does not display if user has teacher', () => {
+      window.ENV.current_user_roles = ['teacher']
+      const onToggleSubscriptionMock = jest.fn()
+      const {queryByText} = setup({
+        onToggleSubscription: onToggleSubscriptionMock,
+        isSubscribed: true
+      })
+      expect(queryByText('Subscribed')).toBeFalsy()
+    })
+
+    it('does not display if user has designer', () => {
+      window.ENV.current_user_roles = ['designer']
+      const onToggleSubscriptionMock = jest.fn()
+      const {queryByText} = setup({
+        onToggleSubscription: onToggleSubscriptionMock,
+        isSubscribed: true
+      })
+      expect(queryByText('Subscribed')).toBeFalsy()
+    })
+
+    it('does not display if user has ta', () => {
+      window.ENV.current_user_roles = ['ta']
+      const onToggleSubscriptionMock = jest.fn()
+      const {queryByText} = setup({
+        onToggleSubscription: onToggleSubscriptionMock,
+        isSubscribed: true
+      })
+      expect(queryByText('Subscribed')).toBeFalsy()
     })
   })
 

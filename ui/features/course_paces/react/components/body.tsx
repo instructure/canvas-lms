@@ -19,6 +19,12 @@
 import React from 'react'
 import CoursePaceTable from './course_pace_table/course_pace_table'
 
-const Body: React.FC = () => <CoursePaceTable />
+interface PassedProps {
+  readonly blueprintLocked: boolean
+}
+
+const Body: React.FC<PassedProps> = ({blueprintLocked}) => (
+  <CoursePaceTable blueprintLocked={blueprintLocked} />
+)
 
 export default Body

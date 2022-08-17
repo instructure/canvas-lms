@@ -24,6 +24,7 @@ class Account < ActiveRecord::Base
   include Context
   include OutcomeImportContext
   include Pronouns
+  include SearchTermHelper
 
   INSTANCE_GUID_SUFFIX = "canvas-lms"
   # a list of columns necessary for validation and save callbacks to work on a slim object
@@ -1401,6 +1402,13 @@ class Account < ActiveRecord::Base
         (grants_right?(user, :view_notifications) || Account.site_admin.grants_right?(user, :read_messages))
     end
     can :view_bounced_emails
+
+    given do |user|
+      user &&
+        (user_account_associations.where(user_id: user).exists? || grants_right?(user, :read)) &&
+        (account_calendar_visible || grants_right?(user, :manage_account_calendar_visibility))
+    end
+    can :view_account_calendar_details
   end
 
   def reload(*)

@@ -87,12 +87,13 @@ describe('CanvasMediaPlayer', () => {
           media_sources={[defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]}
         />
       )
+      fireEvent.canPlay(container.querySelector('video'))
       // need queryAll because some of the buttons have tooltip and text
       expect(getAllByText('Play')[0]).toBeInTheDocument()
       expect(container.querySelector('video')).toBeInTheDocument()
     })
     it('sorts sources by bitrate, ascending', () => {
-      const {container, getAllByText} = render(
+      const {container, getAllByText, getByRole} = render(
         <CanvasMediaPlayer
           media_id="dummy_media_id"
           media_sources={[
@@ -102,11 +103,14 @@ describe('CanvasMediaPlayer', () => {
           ]}
         />
       )
-      const sourceChooser = getAllByText('Source Chooser')[0].closest('button')
+      fireEvent.canPlay(container.querySelector('video'))
+      const settings = getByRole('button', {
+        name: /settings/i
+      })
+      fireEvent.click(settings)
+      const sourceChooser = getAllByText('Quality')[0].closest('button')
       fireEvent.click(sourceChooser)
-      const sourceList = container.querySelectorAll(
-        'ul[aria-label="Source Chooser"] ul[role="menu"] li'
-      )
+      const sourceList = container.querySelectorAll('[role="menuitemradio"]')
       expect(domQueries.getByText(sourceList[0], '1000')).toBeInTheDocument()
       expect(domQueries.getByText(sourceList[1], '2000')).toBeInTheDocument()
       expect(domQueries.getByText(sourceList[2], '3000')).toBeInTheDocument()
@@ -140,13 +144,13 @@ describe('CanvasMediaPlayer', () => {
     describe('dealing with media_sources', () => {
       it('handles string-type media_sources', () => {
         // seen for audio files
-        const {getAllByText} = render(
+        const {getAllByText, container} = render(
           <CanvasMediaPlayer
             media_id="dummy_media_id"
             media_sources="http://localhost:3000/files/797/download?download_frd=1"
-            type="audio"
           />
         )
+        fireEvent.canPlay(container.querySelector('video'))
         // just make sure it doesn't blow up and renders the player
         expect(getAllByText('Play')[0]).toBeInTheDocument()
       })
@@ -321,48 +325,87 @@ describe('CanvasMediaPlayer', () => {
     describe('renders correct set of video controls', () => {
       it('renders all the buttons', () => {
         document.fullscreenEnabled = true
-        const {getAllByText, getByLabelText, queryAllByText, queryByLabelText} = render(
+        const {
+          getAllByText,
+          getByLabelText,
+          queryAllByText,
+          queryByLabelText,
+          container,
+          getByRole
+        } = render(
           <CanvasMediaPlayer
             media_id="dummy_media_id"
             media_sources={[defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]}
           />
         )
+        fireEvent.canPlay(container.querySelector('video'))
+        const settings = getByRole('button', {
+          name: /settings/i
+        })
+        fireEvent.click(settings)
         // need queryAll because some of the buttons have tooltip and text
         // (in v7 of the player, so let's just do it now)
         expect(getAllByText('Play')[0]).toBeInTheDocument()
         expect(getByLabelText('Timebar')).toBeInTheDocument()
         expect(getAllByText('Volume')[0]).toBeInTheDocument()
-        expect(getAllByText('Playback Speed')[0]).toBeInTheDocument()
-        expect(queryByLabelText('Source Chooser')).not.toBeInTheDocument()
+        expect(getAllByText('Speed')[0]).toBeInTheDocument()
+        expect(queryByLabelText('Quality')).not.toBeInTheDocument()
         expect(getAllByText('Full Screen')[0]).toBeInTheDocument()
         expect(queryAllByText('Video Track').length).toBe(0) // AKA CC
       })
       it('skips fullscreen button when not enabled', () => {
         document.fullscreenEnabled = false
-        const {getAllByText, getByLabelText, queryAllByText, queryByLabelText} = render(
+        const {
+          getAllByText,
+          getByLabelText,
+          queryAllByText,
+          queryByLabelText,
+          container,
+          getByRole
+        } = render(
           <CanvasMediaPlayer
             media_id="dummy_media_id"
             media_sources={[defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]}
           />
         )
+        fireEvent.canPlay(container.querySelector('video'))
+        const settings = getByRole('button', {
+          name: /settings/i
+        })
+        fireEvent.click(settings)
         expect(getAllByText('Play')[0]).toBeInTheDocument()
         expect(getByLabelText('Timebar')).toBeInTheDocument()
         expect(getAllByText('Volume')[0]).toBeInTheDocument()
-        expect(getAllByText('Playback Speed')[0]).toBeInTheDocument()
-        expect(queryByLabelText('Source Chooser')).not.toBeInTheDocument()
+        expect(getAllByText('Speed')[0]).toBeInTheDocument()
+        expect(queryByLabelText('Quality')).not.toBeInTheDocument()
         expect(queryAllByText('Full Screen').length).toBe(0)
         expect(queryAllByText('Video Track').length).toBe(0) // AKA CC
       })
       it('skips source chooser button when there is only 1 source', () => {
         document.fullscreenEnabled = true
-        const {getAllByText, getByLabelText, queryAllByText, queryByLabelText} = render(
-          <CanvasMediaPlayer media_id="dummy_media_id" media_sources={[defaultMediaObject()]} />
+        const {
+          getAllByText,
+          getByLabelText,
+          queryAllByText,
+          queryByLabelText,
+          container,
+          getByRole
+        } = render(
+          <CanvasMediaPlayer
+            media_id="dummy_media_id"
+            media_sources={[defaultMediaObject(), defaultMediaObject()]}
+          />
         )
+        fireEvent.canPlay(container.querySelector('video'))
+        const settings = getByRole('button', {
+          name: /settings/i
+        })
+        fireEvent.click(settings)
         expect(getAllByText('Play')[0]).toBeInTheDocument()
         expect(getByLabelText('Timebar')).toBeInTheDocument()
         expect(getAllByText('Volume')[0]).toBeInTheDocument()
-        expect(getAllByText('Playback Speed')[0]).toBeInTheDocument()
-        expect(queryByLabelText('Source Chooser')).not.toBeInTheDocument()
+        expect(getAllByText('Speed')[0]).toBeInTheDocument()
+        expect(queryByLabelText('Quality')).not.toBeInTheDocument()
         expect(getAllByText('Full Screen')[0]).toBeInTheDocument()
         expect(queryAllByText('Video Track').length).toBe(0) // AKA CC
       })
@@ -372,53 +415,62 @@ describe('CanvasMediaPlayer', () => {
         })
         it('renders all the buttons', () => {
           document.webkitFullscreenEnabled = true
-          const {getAllByText} = render(
+          const {getAllByText, container} = render(
             <CanvasMediaPlayer
               media_id="dummy_media_id"
               media_sources={[defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]}
             />
           )
+          fireEvent.canPlay(container.querySelector('video'))
           expect(getAllByText('Full Screen')[0]).toBeInTheDocument()
         })
         it('skips fullscreen button when not enabled', () => {
           document.webkitFullscreenEnabled = false
-          const {queryAllByText} = render(
+          const {queryAllByText, container} = render(
             <CanvasMediaPlayer
               media_id="dummy_media_id"
               media_sources={[defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]}
             />
           )
+          fireEvent.canPlay(container.querySelector('video'))
           expect(queryAllByText('Full Screen').length).toBe(0)
         })
         it('skips source chooser button when there is only 1 source', () => {
           document.webkitFullscreenEnabled = true
-          const {getAllByText} = render(
+          const {getAllByText, container, queryByLabelText} = render(
             <CanvasMediaPlayer media_id="dummy_media_id" media_sources={[defaultMediaObject()]} />
           )
+          fireEvent.canPlay(container.querySelector('video'))
           expect(getAllByText('Full Screen')[0]).toBeInTheDocument()
+          expect(queryByLabelText('Quality')).not.toBeInTheDocument()
         })
       })
       it('includes the CC button when there are subtitle track(s)', () => {
-        const {getAllByText, getByLabelText, queryByLabelText} = render(
+        const {getAllByText, getByLabelText, queryByLabelText, container, getByRole} = render(
           <CanvasMediaPlayer
             media_id="dummy_media_id"
-            media_sources={[defaultMediaObject()]}
+            media_sources={[defaultMediaObject(), defaultMediaObject()]}
             media_tracks={[
               {
                 id: '1',
+                src: '/media_objects/more/stuff',
                 label: 'English',
                 language: 'en',
-                src: '/media_objects/more/stuff',
                 type: 'subtitles'
               }
             ]}
           />
         )
+        fireEvent.canPlay(container.querySelector('video'))
+        const settings = getByRole('button', {
+          name: /settings/i
+        })
+        fireEvent.click(settings)
         expect(getAllByText('Play')[0]).toBeInTheDocument()
         expect(getByLabelText('Timebar')).toBeInTheDocument()
         expect(getAllByText('Volume')[0]).toBeInTheDocument()
-        expect(getAllByText('Playback Speed')[0]).toBeInTheDocument()
-        expect(queryByLabelText('Source Chooser')).not.toBeInTheDocument()
+        expect(getAllByText('Speed')[0]).toBeInTheDocument()
+        expect(queryByLabelText('Quality')).not.toBeInTheDocument()
         expect(getAllByText('Video Track')[0]).toBeInTheDocument() // AKA CC
       })
     })

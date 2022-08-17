@@ -228,5 +228,39 @@ describe AuthenticationProvidersController do
       expect(ap.log_out_url).to eq("https://sso.school.edu/idp/profile/SAML2/Redirect/SLO")
       expect(ap.certificate_fingerprint).to eq("8c:dd:28:ba:49:a2:ed:fb:ed:56:9a:2f:58:b2:79:e1:0b:46:6e:81")
     end
+
+    context "mfa_option into individual fields" do
+      before do
+        account.settings[:mfa_settings] = :optional
+        account.save!
+      end
+
+      it "handles required" do
+        post "create", params: { account_id: account.id, auth_type: "cas", auth_base: "http://example.com", mfa_option: "required" }
+        expect(response).to be_redirect
+
+        ap = account.authentication_providers.active.last
+        expect(ap.mfa_required).to eq(true)
+        expect(ap.skip_internal_mfa).to eq(false)
+      end
+
+      it "handles bypass" do
+        post "create", params: { account_id: account.id, auth_type: "cas", auth_base: "http://example.com", mfa_option: "bypass" }
+        expect(response).to be_redirect
+
+        ap = account.authentication_providers.active.last
+        expect(ap.mfa_required).to eq(false)
+        expect(ap.skip_internal_mfa).to eq(true)
+      end
+
+      it "handles default" do
+        post "create", params: { account_id: account.id, auth_type: "cas", auth_base: "http://example.com", mfa_option: "default" }
+        expect(response).to be_redirect
+
+        ap = account.authentication_providers.active.last
+        expect(ap.mfa_required).to eq(false)
+        expect(ap.skip_internal_mfa).to eq(false)
+      end
+    end
   end
 end

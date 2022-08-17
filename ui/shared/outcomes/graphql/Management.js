@@ -357,6 +357,54 @@ export const COURSE_ALIGNMENT_STATS = gql`
   }
 `
 
+export const SEARCH_OUTCOME_ALIGNMENTS = gql`
+  query SearchOutcomeAlignmentsQuery(
+    $id: ID!
+    $outcomesCursor: String
+    $outcomesContextId: ID!
+    $outcomesContextType: String!
+    $searchQuery: String
+    $searchFilter: String
+  ) {
+    group: legacyNode(type: LearningOutcomeGroup, _id: $id) {
+      ... on LearningOutcomeGroup {
+        _id
+        outcomesCount(searchQuery: $searchQuery)
+        outcomes(
+          searchQuery: $searchQuery
+          filter: $searchFilter
+          first: 10
+          after: $outcomesCursor
+        ) {
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+          edges {
+            node {
+              ... on LearningOutcome {
+                _id
+                title
+                description
+                alignments(contextId: $outcomesContextId, contextType: $outcomesContextType) {
+                  _id
+                  title
+                  contentType
+                  assignmentContentType
+                  url
+                  moduleName
+                  moduleUrl
+                  moduleWorkflowState
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
 export const removeOutcomeGroup = (contextType, contextId, groupId) =>
   axios.delete(
     `/api/v1/${pluralize(contextType).toLowerCase()}/${contextId}/outcome_groups/${groupId}`

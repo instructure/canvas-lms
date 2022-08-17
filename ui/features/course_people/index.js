@@ -19,8 +19,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ready from '@instructure/ready'
-import {PeoplePage} from './react/index'
+import {CoursePeopleApp} from './react/index'
 
 ready(() => {
-  ReactDOM.render(<PeoplePage />, document.getElementById('content'))
+  ReactDOM.render(<CoursePeopleApp />, document.getElementById('content'))
 })

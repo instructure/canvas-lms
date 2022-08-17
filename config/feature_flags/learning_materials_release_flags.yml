@@ -20,3 +20,8 @@ buttons_and_icons_cropper:
     When enabled, turns on the Button & Icons image cropper, course images
     source, and upload image source.
   applies_to: SiteAdmin
+rce_ux_improvements:
+  state: hidden
+  display_name: RCE UX Improvements
+  description: Improve and streamline the RCE button and tray UX
+  applies_to: SiteAdmin

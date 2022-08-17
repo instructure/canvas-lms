@@ -23,11 +23,13 @@ module Api::V1::Conversation
   include Api::V1::Attachment
 
   def conversations_json(conversations, current_user, session, options = {})
+    # only process conversations(actually ConversationParticipant) that actually have a Conversation tied to it
+    valid_convos = conversations.select(&:conversation)
     include_context_name = options.delete(:include_context_name)
     if include_context_name
-      context_names_by_type_and_id = Context.names_by_context_types_and_ids(conversations.map(&:conversation).map(&:context_components))
+      context_names_by_type_and_id = Context.names_by_context_types_and_ids(valid_convos.map(&:conversation).map(&:context_components))
     end
-    conversations.map do |c|
+    valid_convos.map do |c|
       result = conversation_json(c, current_user, session, options)
       result[:context_name] = context_names_by_type_and_id[c.context_components] if include_context_name
       result

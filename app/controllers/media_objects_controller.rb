@@ -266,6 +266,7 @@ class MediaObjectsController < ApplicationController
   def iframe_media_player
     # Exclude all global includes from this page
     @exclude_account_js = true
+    @embeddable = true
 
     js_env media_object: media_object_api_json(@media_object, @current_user, session) if @media_object
     js_bundle :media_player_iframe_content

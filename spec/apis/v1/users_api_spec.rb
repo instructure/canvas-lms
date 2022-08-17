@@ -2582,6 +2582,21 @@ describe "Users API", type: :request do
         )
         expect(json["hexcode"]).to eq "#ababab"
       end
+
+      it "emits user.set_custom_color to statsd" do
+        course_with_student(active_all: true)
+        allow(InstStatsd::Statsd).to receive(:increment)
+        api_call(
+          :put,
+          "/api/v1/users/#{@user.id}/colors/course_#{@course.id}",
+          { controller: "users", action: "set_custom_color", format: "json",
+            id: @user.to_param, asset_string: "course_#{@course.id}", hexcode: "ababab" },
+          {},
+          {},
+          { expected_status: 200 }
+        )
+        expect(InstStatsd::Statsd).to have_received(:increment).once.with("user.set_custom_color", tags: %w[enrollment_type:StudentEnrollment])
+      end
     end
 
     context "sharding" do

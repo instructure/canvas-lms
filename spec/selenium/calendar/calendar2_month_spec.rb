@@ -71,7 +71,7 @@ describe "calendar2" do
         @user.locale = "fa"
         @user.save!
         load_month_view
-        f("#create_new_event_link").click
+        calendar_create_event_button.click
         f("#edit_event .edit_assignment_option").click
         f("#assignment_title").send_keys("test assignment")
         f("#edit_assignment_form .ui-datepicker-trigger.btn").click
@@ -221,7 +221,7 @@ describe "calendar2" do
         f(".fc-event").click
         expect(fj(".popover-links-holder:visible")).not_to be_nil
         hover_and_click ".edit_event_link"
-        expect_new_page_load { hover_and_click "#edit_calendar_event_form .more_options_link" }
+        expect_new_page_load { edit_calendar_event_form_more_options.click }
         expect(find("#editCalendarEventFull .btn-primary").text).to eq "Update Event"
         expect(find("#breadcrumbs")).to include_text "Calendar Events"
       end
@@ -465,7 +465,7 @@ describe "calendar2" do
         f(".fc-event").click
 
         hover_and_click ".edit_event_link"
-        expect_new_page_load { f(".more_options_link").click }
+        expect_new_page_load { edit_calendar_event_form_more_options.click }
         cancel_btn = f(".form-actions a")
         expect(cancel_btn.text).to eq "Cancel"
         expect(cancel_btn["href"]).to include("view_name=month")

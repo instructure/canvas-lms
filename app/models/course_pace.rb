@@ -22,6 +22,11 @@ class CoursePace < ActiveRecord::Base
   include Workflow
   include Canvas::SoftDeletable
 
+  include MasterCourses::Restrictor
+  restrict_columns :content, [:duration]
+  restrict_columns :state, [:workflow_state]
+  restrict_columns :settings, %i[exclude_weekends hard_end_dates]
+
   extend RootAccountResolver
   resolves_root_account through: :course
 
@@ -56,6 +61,10 @@ class CoursePace < ActiveRecord::Base
   end
 
   self.ignored_columns = %i[start_date]
+
+  def asset_name
+    I18n.t("Course Pace")
+  end
 
   def valid_secondary_context
     if course_section_id.present? && user_id.present?
@@ -135,6 +144,11 @@ class CoursePace < ActiveRecord::Base
                   due_at: due_range
                 )
 
+              # If the assignment has already been submitted we are going to log that and continue
+              if assignment.submissions.find_by(user_id: user_id).submitted?
+                InstStatsd::Statsd.increment("course_pacing.submitted_assignment_date_change")
+              end
+
               # If it exists let's just add the student to it and remove them from the other
               if correct_date_override
                 AssignmentOverrideStudent.where(assignment: assignment, user_id: user_id).destroy_all
@@ -204,6 +218,7 @@ class CoursePace < ActiveRecord::Base
           .where
           .not(course_section_id: course_section_course_pace_section_ids)
       end
+    @student_enrollments.where.not(workflow_state: "deleted")
   end
 
   def start_date(with_context: false)

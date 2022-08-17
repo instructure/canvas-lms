@@ -31,6 +31,7 @@ module Types
 
     include SearchHelper
     include Api::V1::StreamItem
+    include ConversationsHelper
 
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
@@ -113,6 +114,24 @@ module Types
                required: false
     end
 
+    field :login_id, String, null: true
+    def login_id
+      course = context[:course]
+      return nil unless course
+
+      pseudonym = SisPseudonym.for(
+        object,
+        course,
+        type: :implicit,
+        require_sis: false,
+        root_account: context[:domain_root_account],
+        in_region: true
+      )
+      return nil unless pseudonym && course.grants_right?(context[:current_user], context[:session], :view_user_logins)
+
+      pseudonym.unique_id
+    end
+
     def enrollments(course_id: nil, current_only: false, order_by: [])
       course_ids = [course_id].compact
       Loaders::UserCourseEnrollmentLoader.for(
@@ -186,6 +205,17 @@ module Types
           conversations_scope
         end
       end
+    end
+
+    field :total_recipients, Integer, null: false do
+      argument :context, String, required: false
+    end
+    def total_recipients(context: nil)
+      return nil unless object == self.context[:current_user]
+
+      @current_user = object
+
+      normalize_recipients(recipients: context, context_code: context)&.count || 0
     end
 
     field :recipients, RecipientsType, null: true do

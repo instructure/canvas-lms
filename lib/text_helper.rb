@@ -246,7 +246,7 @@ module TextHelper
         next unless value.is_a?(String) && !value.is_a?(MarkdownSafeBuffer) && !value.is_a?(ActiveSupport::SafeBuffer)
         next if key == :wrapper
 
-        options[key] = markdown_escape(value).gsub(/\s+/, " ").strip
+        options[key] = markdown_escape(value).gsub("\\\*", "\\\\\\*").gsub(/\s+/, " ").strip
       end
     end
     translated = t(*args)

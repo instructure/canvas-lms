@@ -90,14 +90,6 @@ describe('FilterNavFilter', () => {
     expect(onDelete).toHaveBeenCalledTimes(1)
   })
 
-  it('switching condition type triggers onChange', async () => {
-    const onChange = jest.fn()
-    const {getAllByRole} = render(<FilterNavFilter {...defaultProps} onChange={onChange} />)
-    userEvent.click(getAllByRole('button', {name: /Condition type/})[0])
-    userEvent.click(getAllByRole('option', {name: /Assignment Group/})[0])
-    expect(onChange).toHaveBeenCalled()
-  })
-
   it('after renaming filter, focus should transfer to rename button', async () => {
     const onChange = jest.fn()
     const {getByRole, getByPlaceholderText} = render(
@@ -107,25 +99,5 @@ describe('FilterNavFilter', () => {
     userEvent.type(getByPlaceholderText('Name'), 'Sample filter name')
     userEvent.click(getByRole('button', {name: /Save label/}))
     expect(getByRole('button', {name: /Rename filter/})).toHaveFocus()
-  })
-
-  it('upon deleting second condition, focus transfers to delete button of previous condition', async () => {
-    const onChange = jest.fn()
-    const {getAllByRole} = render(<FilterNavFilter {...defaultProps} onChange={onChange} />)
-    const secondDeleteButton = getAllByRole('button', {name: /Delete condition/})[1]
-    secondDeleteButton.click()
-    const firstDeleteButton = getAllByRole('button', {name: /Delete condition/})[0]
-    expect(firstDeleteButton).toHaveFocus()
-  })
-
-  it('upon deleting first condition, focus transfers to delete button of previous condition', async () => {
-    const onChange = jest.fn()
-    const {getAllByRole, getByRole} = render(
-      <FilterNavFilter {...defaultProps} onChange={onChange} />
-    )
-    const firstDeleteButton = getAllByRole('button', {name: /Delete condition/})[0]
-    firstDeleteButton.click()
-    const renameButton = getByRole('button', {name: /Rename filter/})
-    expect(renameButton).toHaveFocus()
   })
 })

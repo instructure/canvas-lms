@@ -23,21 +23,27 @@ import {Spinner} from '@instructure/ui-spinner'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import AlignmentSummaryHeader from './AlignmentSummaryHeader'
 import AlignmentOutcomeItemList from './AlignmentOutcomeItemList'
-import useSearch from '@canvas/outcomes/react/hooks/useSearch'
 import useCourseAlignmentStats from '@canvas/outcomes/react/hooks/useCourseAlignmentStats'
-
-// Sample data - remove after integration with graphql
-import {generateOutcomes} from './__tests__/testData'
+import useCourseAlignments from '@canvas/outcomes/react/hooks/useCourseAlignments'
 
 const I18n = useI18nScope('AlignmentSummary')
 
 const AlignmentSummary = () => {
-  const {search, onChangeHandler, onClearHandler} = useSearch()
   const [scrollContainer, setScrollContainer] = useState(null)
   const {data: alignmentStatsData, loading: alignmentStatsLoading} = useCourseAlignmentStats()
   const courseAlignmentStats = alignmentStatsData?.course?.outcomeAlignmentStats || {}
   const {totalOutcomes, alignedOutcomes, totalAlignments, totalArtifacts, alignedArtifacts} =
     courseAlignmentStats
+
+  const {
+    rootGroup,
+    loading,
+    loadMore,
+    searchString,
+    onSearchChangeHandler: updateSearch,
+    onSearchClearHandler: clearSearch,
+    onFilterChangeHandler: updateFilter
+  } = useCourseAlignments()
 
   const renderAlignmentStatsLoader = () => (
     <div style={{textAlign: 'center'}} data-testid="outcome-alignment-summary-loading">
@@ -52,9 +58,10 @@ const AlignmentSummary = () => {
       totalAlignments={totalAlignments}
       totalArtifacts={totalArtifacts}
       alignedArtifacts={alignedArtifacts}
-      searchString={search}
-      updateSearchHandler={onChangeHandler}
-      clearSearchHandler={onClearHandler}
+      searchString={searchString}
+      updateSearchHandler={updateSearch}
+      clearSearchHandler={clearSearch}
+      updateFilterHandler={updateFilter}
       data-testid="outcome-alignment-summary-header"
     />
   )
@@ -78,7 +85,9 @@ const AlignmentSummary = () => {
         elementRef={el => setScrollContainer(el)}
       >
         <AlignmentOutcomeItemList
-          outcomes={generateOutcomes(5)}
+          rootGroup={rootGroup}
+          loading={loading}
+          loadMore={loadMore}
           scrollContainer={scrollContainer}
         />
       </View>

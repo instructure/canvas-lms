@@ -682,12 +682,12 @@ describe('Upload data actions', () => {
           )
         })
 
-        it('sets "disablePreview" embed data to true', () => {
+        it('sets "disableInlinePreview" embed data to true', () => {
           actions.embedUploadResult(uploadResult)
           sinon.assert.calledWithMatch(
             Bridge.insertLink,
             {
-              embed: {disablePreview: true}
+              embed: {disableInlinePreview: true}
             },
             false
           )

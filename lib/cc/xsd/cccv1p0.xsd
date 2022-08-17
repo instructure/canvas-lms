@@ -143,6 +143,7 @@
         <xs:element name="root_account_uuid" type="xs:string" minOccurs="0"/>
         <xs:element name="default_post_policy" type="postPolicyType" minOccurs="0"/>
         <xs:element name="late_policy" type="latePolicyType" minOccurs="0"/>
+        <xs:element name="enable_course_paces" type="xs:boolean" minOccurs="0"/>
       </xs:all>
       <xs:attribute name="identifier" type="xs:ID" use="required"/>
     </xs:complexType>

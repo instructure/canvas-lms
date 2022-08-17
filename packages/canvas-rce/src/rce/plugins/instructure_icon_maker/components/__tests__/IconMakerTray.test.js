@@ -24,29 +24,25 @@ import {IconMakerTray} from '../IconMakerTray'
 import {useStoreProps} from '../../../shared/StoreContext'
 import FakeEditor from '../../../shared/__tests__/FakeEditor'
 import RceApiSource from '../../../../../rcs/api'
+import bridge from '../../../../../bridge'
+import base64EncodedFont from '../../svg/font'
 
+jest.mock('../../../../../bridge')
+jest.mock('../../svg/font')
 jest.mock('../../../../../rcs/api')
 jest.mock('../../../shared/StoreContext')
 jest.mock('../../utils/useDebouncedValue', () =>
   jest.requireActual('../../utils/__tests__/useMockedDebouncedValue')
 )
 
-const startIconMakerUpload = jest.fn().mockResolvedValue({url: 'https://uploaded.url'})
+const startIconMakerUpload = jest
+  .fn()
+  .mockResolvedValue({url: 'https://uploaded.url', display_name: 'untitled.svg'})
+
 useStoreProps.mockReturnValue({startIconMakerUpload})
 
-const editor = {
-  dom: {
-    createHTML: jest.fn((tagName, {src, alt, ...rest}) => {
-      const element = document.createElement(tagName)
-      element.setAttribute('src', src)
-      element.setAttribute('alt', alt)
-      element.setAttribute('data-inst-icon-maker-icon', rest['data-inst-icon-maker-icon'])
-      return element
-    }),
-    create: name => document.createElement(name)
-  },
-  insertContent: jest.fn()
-}
+// The real font is massive so lets avoid it in snapshots
+base64EncodedFont.mockReturnValue('data:;base64,')
 
 const setIconColor = hex => {
   const input = screen.getByRole('textbox', {name: /icon color color picker/i})
@@ -55,7 +51,6 @@ const setIconColor = hex => {
 
 describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
   const defaults = {
-    editor,
     onUnmount: jest.fn(),
     editing: false
   }
@@ -69,14 +64,11 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
   const {confirm} = window.confirm
 
   beforeAll(() => {
-    global.fetch = jest.fn().mockResolvedValue({
-      blob: () => Promise.resolve(new Blob())
-    })
-
     rcs = {
       getFile: jest.fn(() => Promise.resolve({name: 'Test Icon.svg'})),
       canvasUrl: 'https://domain.from.env'
     }
+
     RceApiSource.mockImplementation(() => rcs)
 
     delete window.confirm
@@ -110,6 +102,13 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
     setIconColor('#000000')
     userEvent.click(screen.getByText(/close/i))
     expect(window.confirm).toHaveBeenCalled()
+  })
+
+  it('inserts a placeholder when an icon is inserted', async () => {
+    const {getByRole} = renderComponent(defaults)
+    setIconColor('#000000')
+    userEvent.click(getByRole('button', {name: /apply/i}))
+    await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
   })
 
   describe('when the user has not created a valid icon', () => {
@@ -180,66 +179,60 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
       await waitFor(() => {
         const result = startIconMakerUpload.mock.calls[0]
         if (startIconMakerUpload.mock.calls.length <= 0) throw new Error()
-        firstCall = startIconMakerUpload.mock.calls[0]
+        firstCall = startIconMakerUpload.mock.calls[0][0]
         expect(result[1].onDuplicate).toBe(false)
       })
 
-      // eslint-disable-next-line jest/no-large-snapshots
       expect(firstCall).toMatchInlineSnapshot(`
-        Array [
-          Object {
-            "domElement": <svg
+        Object {
+          "domElement": <svg
+            fill="none"
+            height="122px"
+            viewBox="0 0 122 122"
+            width="122px"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <metadata>
+              {"type":"image/svg+xml-icon-maker-icons","shape":"square","size":"small","color":"#000000","outlineColor":"#000000","outlineSize":"none","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"below","encodedImage":"","encodedImageType":"","encodedImageName":"","x":"50%","y":"50%","translateX":-54,"translateY":-54,"width":108,"height":108,"transform":"translate(-54,-54)","imageSettings":{"mode":"","image":"","imageName":"","icon":"","iconFillColor":"#000000","cropperSettings":null}}
+            </metadata>
+            <svg
               fill="none"
               height="122px"
               viewBox="0 0 122 122"
               width="122px"
-              xmlns="http://www.w3.org/2000/svg"
+              x="0"
             >
-              <metadata>
-                {"type":"image/svg+xml-icon-maker-icons","shape":"square","size":"small","color":"#000000","outlineColor":"#000000","outlineSize":"none","text":"","textSize":"small","textColor":"#000000","textBackgroundColor":null,"textPosition":"below","encodedImage":"","encodedImageType":"","encodedImageName":"","x":"50%","y":"50%","translateX":-54,"translateY":-54,"width":108,"height":108,"transform":"translate(-54,-54)","imageSettings":{"mode":"","image":"","imageName":"","icon":"","iconFillColor":"#000000","cropperSettings":null}}
-              </metadata>
-              <svg
-                fill="none"
-                height="122px"
-                viewBox="0 0 122 122"
-                width="122px"
-                x="0"
+              <g
+                fill="#000000"
+                stroke="#000000"
+                stroke-width="0"
               >
-                <g
-                  fill="#000000"
-                  stroke="#000000"
-                  stroke-width="0"
+                <clippath
+                  id="clip-path-for-embed"
                 >
-                  <clippath
-                    id="clip-path-for-embed"
-                  >
-                    <rect
-                      height="114"
-                      width="114"
-                      x="4"
-                      y="4"
-                    />
-                  </clippath>
                   <rect
                     height="114"
                     width="114"
                     x="4"
                     y="4"
                   />
-                </g>
-              </svg>
-              <style
-                type="text/css"
-              >
-                @font-face {font-family: "Lato Extended";font-weight: bold;src: url(data:;base64,);}
-              </style>
-            </svg>,
-            "name": "untitled.svg",
-          },
-          Object {
-            "onDuplicate": false,
-          },
-        ]
+                </clippath>
+                <rect
+                  height="114"
+                  width="114"
+                  x="4"
+                  y="4"
+                />
+              </g>
+            </svg>
+            <style
+              type="text/css"
+            >
+              @font-face {font-family: "Lato Extended";font-weight: bold;src: url(data:;base64,);}
+            </style>
+          </svg>,
+          "name": "untitled.svg",
+        }
       `)
 
       await waitFor(() => expect(defaults.onUnmount).toHaveBeenCalled())
@@ -274,11 +267,19 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
         fireEvent.change(document.querySelector('#icon-alt-text'), {target: {value: 'banana'}})
         setIconColor('#000000')
         userEvent.click(screen.getByRole('button', {name: /apply/i}))
-        await waitFor(() => expect(editor.insertContent).toHaveBeenCalled())
-        expect(editor.insertContent.mock.calls[0]).toMatchInlineSnapshot(`
-          Array [
-            "<img src=\\"https://uploaded.url\\" alt=\\"banana\\" data-inst-icon-maker-icon=\\"true\\" data-download-url=\\"https://uploaded.url/?icon_maker_icon=1\\">",
-          ]
+        await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
+        expect(bridge.embedImage.mock.calls[0][0]).toMatchInlineSnapshot(`
+          Object {
+            "STYLE": null,
+            "alt_text": "banana",
+            "data-download-url": "https://uploaded.url/?icon_maker_icon=1",
+            "data-inst-icon-maker-icon": true,
+            "display_name": "untitled.svg",
+            "height": null,
+            "isDecorativeImage": false,
+            "src": "https://uploaded.url",
+            "width": null,
+          }
         `)
 
         await waitFor(() => expect(defaults.onUnmount).toHaveBeenCalled())
@@ -289,11 +290,19 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
 
         setIconColor('#000000')
         userEvent.click(screen.getByRole('button', {name: /apply/i}))
-        await waitFor(() => expect(editor.insertContent).toHaveBeenCalled())
-        expect(editor.insertContent.mock.calls[0]).toMatchInlineSnapshot(`
-          Array [
-            "<img src=\\"https://uploaded.url\\" data-inst-icon-maker-icon=\\"true\\" data-download-url=\\"https://uploaded.url/?icon_maker_icon=1\\">",
-          ]
+        await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
+        expect(bridge.embedImage.mock.calls[0][0]).toMatchInlineSnapshot(`
+          Object {
+            "STYLE": null,
+            "alt_text": "",
+            "data-download-url": "https://uploaded.url/?icon_maker_icon=1",
+            "data-inst-icon-maker-icon": true,
+            "display_name": "untitled.svg",
+            "height": null,
+            "isDecorativeImage": false,
+            "src": "https://uploaded.url",
+            "width": null,
+          }
         `)
 
         await waitFor(() => expect(defaults.onUnmount).toHaveBeenCalled())
@@ -304,11 +313,19 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
         setIconColor('#000000')
         userEvent.click(screen.getByRole('checkbox', {name: /Decorative Icon/}))
         userEvent.click(screen.getByRole('button', {name: /apply/i}))
-        await waitFor(() => expect(editor.insertContent).toHaveBeenCalled())
-        expect(editor.insertContent.mock.calls[0]).toMatchInlineSnapshot(`
-          Array [
-            "<img src=\\"https://uploaded.url\\" alt=\\"\\" data-inst-icon-maker-icon=\\"true\\" data-download-url=\\"https://uploaded.url/?icon_maker_icon=1\\">",
-          ]
+        await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
+        expect(bridge.embedImage.mock.calls[0][0]).toMatchInlineSnapshot(`
+          Object {
+            "STYLE": null,
+            "alt_text": "",
+            "data-download-url": "https://uploaded.url/?icon_maker_icon=1",
+            "data-inst-icon-maker-icon": true,
+            "display_name": "untitled.svg",
+            "height": null,
+            "isDecorativeImage": true,
+            "src": "https://uploaded.url",
+            "width": null,
+          }
         `)
       })
     })
@@ -357,7 +374,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
       const button = getByRole('button', {name: /apply/i})
       userEvent.click(button)
 
-      const spinner = await waitFor(() => getByText('Loading...'))
+      const spinner = getByText('Loading...')
       expect(spinner).toBeInTheDocument()
     })
   })
@@ -450,6 +467,14 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
       expect(subject().getByRole('heading', {name: /edit icon/i})).toBeInTheDocument()
     })
 
+    it('inserts a placeholder when an icon is saved', async () => {
+      const {getByRole} = subject()
+      await waitFor(() => getByRole('textbox', {name: /icon color color picker/i}))
+      setIconColor('#000000')
+      userEvent.click(getByRole('button', {name: /save/i}))
+      await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
+    })
+
     it('loads the standard SVG metadata', async () => {
       const {getByLabelText, getByTestId} = subject()
 
@@ -485,13 +510,25 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
       })
 
       it('checks that the icon keeps attributes from RCE', async () => {
-        const {getByRole, getByAltText} = subject()
+        const {getByRole} = subject()
+        await waitFor(() => getByRole('textbox', {name: /icon color color picker/i}))
+        setIconColor('#000000')
+        expect(getByRole('button', {name: /save/i})).toBeEnabled()
         userEvent.click(getByRole('button', {name: /save/i}))
-        await waitFor(() =>
-          expect(getByAltText('one blue pine').outerHTML).toContain(
-            'style="display:block; margin-left:auto; margin-right:auto;" width="156" height="134"'
-          )
-        )
+        await waitFor(() => expect(bridge.embedImage).toHaveBeenCalled())
+        expect(bridge.embedImage.mock.calls[0][0]).toMatchInlineSnapshot(`
+          Object {
+            "STYLE": "display:block; margin-left:auto; margin-right:auto;",
+            "alt_text": "one blue pine",
+            "data-download-url": "https://uploaded.url/?icon_maker_icon=1",
+            "data-inst-icon-maker-icon": true,
+            "display_name": "untitled.svg",
+            "height": "134",
+            "isDecorativeImage": false,
+            "src": "https://uploaded.url",
+            "width": "156",
+          }
+        `)
       })
     })
 

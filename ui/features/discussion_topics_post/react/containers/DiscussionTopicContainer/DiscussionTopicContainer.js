@@ -412,6 +412,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                                   props.discussionTopic.permissions?.manageCourseContentDelete
                                 }
                                 discussionTopicId={props.discussionTopic._id}
+                                discussionTopic={props.discussionTopic}
                               />
                             }
                             author={props.discussionTopic.author}

@@ -156,6 +156,7 @@ module Types
         :read_roster, :view_all_grades, :manage_grades
       )
 
+      context.scoped_merge!(course: course)
       scope = UserSearch.scope_for(course, current_user,
                                    include_inactive_enrollments: true,
                                    enrollment_state: filter[:enrollment_states])
@@ -177,6 +178,7 @@ module Types
         :read_roster, :view_all_grades, :manage_grades
       )
 
+      context.scoped_merge!(course: course)
       scope = course.apply_enrollment_visibility(course.all_enrollments, current_user).active
       scope = scope.where(associated_user_id: filter[:associated_user_ids]) if filter[:associated_user_ids].present?
       scope = scope.where(type: filter[:types]) if filter[:types].present?

@@ -36,7 +36,7 @@ WORKSPACE=${WORKSPACE:-$(pwd)}
 # $WEBPACK_BUILDER_TAG: additional tag for the webpack-builder image
 #   - set to patchset unique ID for builds to reference without knowing about the hash ID
 
-export CACHE_VERSION="2022-05-19.1"
+export CACHE_VERSION="2022-07-27.1"
 
 source ./build/new-jenkins/docker-build-helpers.sh
 

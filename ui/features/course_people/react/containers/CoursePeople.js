@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -15,10 +15,17 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-export const mockRender = jest.fn()
-export const mockClear = jest.fn()
-const confetti = jest.fn().mockImplementation(() => {
-  return {render: mockRender, clear: mockClear}
-})
 
-export default confetti
+import React from 'react'
+import RosterTable from './RosterTable/RosterTable'
+
+const CoursePeople = () => {
+  return (
+    <>
+      {/* Additional People page containers/components will go here */}
+      <RosterTable />
+    </>
+  )
+}
+
+export default CoursePeople

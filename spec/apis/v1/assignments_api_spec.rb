@@ -6109,6 +6109,13 @@ describe AssignmentsApiController, type: :request do
       expect(@assignment.sis_source_id).to eq "BLAH"
     end
 
+    it "sets sis_source_id to nil when provided an empty string" do
+      params = ActionController::Parameters.new({ "sis_assignment_id" => "" })
+      account_admin_user_with_role_changes(role_changes: { manage_sis: true })
+      update_from_params(@assignment, params, @admin)
+      expect(@assignment.sis_source_id).to be_nil
+    end
+
     it "does not update anonymous grading if the anonymous marking feature flag is not set" do
       params = ActionController::Parameters.new({ "anonymous_grading" => "true" })
       update_from_params(@assignment, params, @teacher)

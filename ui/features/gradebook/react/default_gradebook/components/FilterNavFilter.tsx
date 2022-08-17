@@ -19,17 +19,12 @@
 import React, {useState, useRef, useEffect} from 'react'
 import uuid from 'uuid'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {chunk} from 'lodash'
 import {View} from '@instructure/ui-view'
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {
-  IconTrashLine,
-  IconAddLine,
-  IconXLine,
-  IconEditLine,
-  IconCheckDarkLine
-} from '@instructure/ui-icons'
+import {IconTrashLine, IconXLine, IconEditLine, IconCheckDarkLine} from '@instructure/ui-icons'
 import {TextInput} from '@instructure/ui-text-input'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Flex} from '@instructure/ui-flex'
@@ -40,14 +35,15 @@ import type {
   Module,
   PartialFilter,
   Filter,
+  FilterCondition,
+  FilterConditionType,
   Section,
   StudentGroupCategoryMap
 } from '../gradebook.d'
-import filterConditionTypes from '../constants/filterConditionTypes'
 
 const I18n = useI18nScope('gradebook')
 
-const {Item} = Flex as any
+const {Item: FlexItem} = Flex as any
 
 export type FilterNavFilterProps = {
   applyConditions: (conditions: PartialFilter['conditions']) => void
@@ -88,33 +84,6 @@ export default function FilterNavFilter({
     }
   }, [isRenaming, wasRenaming])
 
-  const onAddCondition = () => {
-    const id: string = uuid.v4()
-    onChange({
-      ...filter,
-      conditions: filter.conditions.concat({
-        id,
-        type: undefined,
-        value: undefined,
-        created_at: new Date().toISOString()
-      })
-    })
-  }
-  const onDeleteCondition = (condition_, divRef: React.RefObject<HTMLElement>) => {
-    if (divRef.current?.previousElementSibling) {
-      const buttons = Array.from(divRef.current.previousElementSibling.querySelectorAll('button'))
-      const lastButton = buttons[buttons.length - 1]
-      if (lastButton) {
-        lastButton.focus()
-      } else {
-        throw new Error('expected button missing')
-      }
-    }
-    onChange({
-      ...filter,
-      conditions: filter.conditions.filter(c => c.id !== condition_.id)
-    })
-  }
   const onChangeCondition = condition => {
     const otherConditions = filter.conditions.filter(c => c.id !== condition.id)
     if (otherConditions.find(c => c.type === condition.type)) {
@@ -133,13 +102,62 @@ export default function FilterNavFilter({
     applyConditions(isApplied ? [] : filter.conditions)
   }
 
+  const ensureCondition = (
+    conditions: FilterCondition[],
+    type: FilterConditionType
+  ): FilterCondition => {
+    return (
+      filter.conditions.find(condition => condition.type === type) || {
+        id: uuid.v4(),
+        type,
+        value: undefined,
+        created_at: new Date().toISOString()
+      }
+    )
+  }
+
+  const sectionCondition =
+    sections.length > 0 ? ensureCondition(filter.conditions, 'section') : undefined
+
+  const moduleCondition =
+    modules.length > 0 ? ensureCondition(filter.conditions, 'module') : undefined
+
+  const assignmentGroupCondition =
+    assignmentGroups.length > 0 ? ensureCondition(filter.conditions, 'assignment-group') : undefined
+
+  const studentGroupCondition =
+    studentGroupCategories.length > 0
+      ? ensureCondition(filter.conditions, 'student-group')
+      : undefined
+
+  // make the order of conditions consistent
+  const conditionsWithItemsChunks = chunk(
+    [sectionCondition, moduleCondition, assignmentGroupCondition, studentGroupCondition].filter(
+      x => x
+    ) as FilterCondition[],
+    2
+  )
+
+  const gradingPeriodCondition = ensureCondition(filter.conditions, 'grading-period')
+  const submissionCondition = ensureCondition(filter.conditions, 'submissions')
+  const startDateCondition = ensureCondition(filter.conditions, 'start-date')
+  const endDateCondition = ensureCondition(filter.conditions, 'end-date')
+
+  const conditionsAlwaysShownChunks = [
+    [gradingPeriodCondition, submissionCondition],
+    [startDateCondition, endDateCondition]
+  ]
+
+  // console.debug('conditionsWithItemsChunks', conditionsWithItemsChunks)
+  // console.debug('conditionsAlwaysShownChunks', conditionsAlwaysShownChunks)
+
   return (
     <View as="div" padding="small 0">
       {filter.id && (
         <>
           {isRenaming ? (
             <Flex>
-              <Item shouldGrow>
+              <FlexItem shouldGrow>
                 <TextInput
                   inputRef={ref => (inputRef.current = ref)}
                   width="100%"
@@ -148,8 +166,8 @@ export default function FilterNavFilter({
                   value={name}
                   onChange={(_event, value) => setName(value)}
                 />
-              </Item>
-              <Item>
+              </FlexItem>
+              <FlexItem>
                 <IconButton
                   color="primary"
                   margin="0 x-small"
@@ -173,7 +191,7 @@ export default function FilterNavFilter({
                 >
                   <IconXLine />
                 </IconButton>
-              </Item>
+              </FlexItem>
             </Flex>
           ) : (
             <View as="div" data-testid={`filter-name-${filter.id}`}>
@@ -196,66 +214,68 @@ export default function FilterNavFilter({
         </>
       )}
 
-      {filter.conditions.map(condition => (
-        <Condition
-          assignmentGroups={assignmentGroups}
-          condition={condition}
-          conditionsInFilter={filter.conditions}
-          gradingPeriods={gradingPeriods}
-          key={condition.id}
-          modules={modules}
-          onChange={onChangeCondition}
-          onDelete={onDeleteCondition}
-          sections={sections}
-          studentGroupCategories={studentGroupCategories}
-        />
-      ))}
-      <Flex justifyItems="space-between">
-        <Item>
-          {filter.conditions.length < filterConditionTypes.length && (
-            <Button
-              color="primary"
-              onClick={onAddCondition}
-              renderIcon={IconAddLine}
-              size="small"
-              withBackground={false}
-            >
-              {I18n.t('Add Condition')}
-            </Button>
-          )}
-        </Item>
-
-        <Item>
-          <Flex>
-            <Item>
-              <Checkbox
-                checked={isApplied}
-                label={I18n.t('Apply conditions')}
-                labelPlacement="start"
-                onChange={toggleApply}
-                size="small"
-                value="small"
-                variant="toggle"
+      {conditionsWithItemsChunks.map((conditions, index) => (
+        // eslint-disable-next-line react/no-array-index-key
+        <Flex justifyItems="space-between" margin="0 0 medium 0" key={`chunk-${index}`}>
+          {conditions.map(condition => (
+            <FlexItem key={condition.id}>
+              <Condition
+                assignmentGroups={assignmentGroups}
+                condition={condition}
+                gradingPeriods={gradingPeriods}
+                modules={modules}
+                onChange={onChangeCondition}
+                sections={sections}
+                studentGroupCategories={studentGroupCategories}
               />
-            </Item>
-            <Item>
-              <Tooltip
-                renderTip={I18n.t('Delete filter')}
-                placement="bottom"
-                on={['hover', 'focus']}
-              >
-                <IconButton
-                  withBackground={false}
-                  withBorder={false}
-                  screenReaderLabel={I18n.t('Delete filter')}
-                  onClick={onDelete}
-                >
-                  <IconTrashLine />
-                </IconButton>
-              </Tooltip>
-            </Item>
-          </Flex>
-        </Item>
+            </FlexItem>
+          ))}
+        </Flex>
+      ))}
+
+      {conditionsAlwaysShownChunks.map((conditions, index) => (
+        // eslint-disable-next-line react/no-array-index-key
+        <Flex justifyItems="space-between" margin="0 0 medium 0" key={`chunk-${index}`}>
+          {conditions.map(condition => (
+            <FlexItem key={condition.id}>
+              <Condition
+                assignmentGroups={assignmentGroups}
+                condition={condition}
+                gradingPeriods={gradingPeriods}
+                modules={modules}
+                onChange={onChangeCondition}
+                sections={sections}
+                studentGroupCategories={studentGroupCategories}
+              />
+            </FlexItem>
+          ))}
+        </Flex>
+      ))}
+
+      <Flex justifyItems="end">
+        <FlexItem>
+          <Checkbox
+            checked={isApplied}
+            label={I18n.t('Apply conditions')}
+            labelPlacement="start"
+            onChange={toggleApply}
+            size="small"
+            value="small"
+            variant="toggle"
+          />
+        </FlexItem>
+        <FlexItem>
+          <Tooltip renderTip={I18n.t('Delete filter')} placement="bottom" on={['hover', 'focus']}>
+            <IconButton
+              withBackground={false}
+              withBorder={false}
+              screenReaderLabel={I18n.t('Delete filter')}
+              onClick={onDelete}
+            >
+              <IconTrashLine />
+            </IconButton>
+          </Tooltip>
+        </FlexItem>
       </Flex>
     </View>
   )

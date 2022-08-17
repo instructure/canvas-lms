@@ -50,7 +50,8 @@ export default function getRCSProps() {
     features: {
       // This feature was re-named to match the updated name "Buttons and Icons" => "Icon Maker"
       // But the feature flag was NOT renamed so it's still "buttons_and_icons_cropper"
-      icon_maker_cropper: ENV.FEATURES?.buttons_and_icons_cropper
+      icon_maker_cropper: ENV.FEATURES?.buttons_and_icons_cropper,
+      rce_ux_improvements: ENV.FEATURES?.rce_ux_improvements
     }
   }
 }

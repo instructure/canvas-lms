@@ -59,7 +59,7 @@ export default class EditEventDetailsDialog {
     tabs
       .tabs()
       .bind('tabsselect', (event, ui) =>
-        $(ui.panel).closest('.tab_holder').data('form-widget').activate()
+        $(ui.panel).closest('.tab_holder').data('form-widget')?.activate()
       )
 
     // note: tabs should be removed in descending order, so numbers don't shift
@@ -70,7 +70,6 @@ export default class EditEventDetailsDialog {
       tabs.tabs('remove', 3)
       tabs.tabs('remove', 2)
       tabs.tabs('remove', 1)
-      this.calendarEventForm.activate()
     } else if (this.event.eventType.match(/assignment/)) {
       tabs.tabs('select', 1)
       if (this.canManageAppointments()) tabs.tabs('remove', 4)
@@ -120,8 +119,6 @@ export default class EditEventDetailsDialog {
         c => c.can_create_assignments
       )
       if (!can_create_assignments) tabs.tabs('remove', 1)
-
-      this.calendarEventForm.activate()
     }
   }
 
@@ -164,14 +161,13 @@ export default class EditEventDetailsDialog {
       dialog.children().replaceWith(html)
 
       if (this.event.isNewEvent() || this.event.eventType === 'calendar_event') {
-        formHolder = dialog.find('#edit_calendar_event_form_holder')
+        formHolder = document.getElementById('edit_calendar_event_form_holder')
         this.calendarEventForm = new EditCalendarEventDetails(
           formHolder,
           this.event,
           this.contextChange.bind(this),
           this.closeCB
         )
-        formHolder.data('form-widget', this.calendarEventForm)
       }
 
       if (this.event.isNewEvent() || this.event.eventType.match(/assignment/)) {

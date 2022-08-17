@@ -50,6 +50,7 @@ interface PassedProps {
   readonly responsiveSize: ResponsiveSizes
   readonly showProjections: boolean
   readonly compression: number
+  readonly blueprintLocked: boolean
 }
 
 type ComponentProps = PassedProps
@@ -133,6 +134,7 @@ export const Module: React.FC<ComponentProps> = props => {
         coursePaceItem={item}
         dueDate={item.date}
         isStacked={isTableStacked}
+        blueprintLocked={props.blueprintLocked}
       />
     )
   }

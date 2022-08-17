@@ -56,6 +56,8 @@ module Api::V1::MasterCourses
             course_outcome_url(course_id: asset.context&.id || @course.id, id: asset.id)
           when "LearningOutcomeGroup"
             course_outcome_group_url(course_id: asset.context.id, id: asset.id)
+          when "CoursePace"
+            course_course_pacing_url(course_id: @course.id)
           else
             polymorphic_url([asset.context, asset])
           end

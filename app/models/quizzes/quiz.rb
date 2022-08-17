@@ -285,6 +285,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
 
   def destroy
+    ContentTag.delete_for(self)
     self.workflow_state = "deleted"
     self.deleted_at = Time.now.utc
     res = save!
@@ -1449,6 +1450,10 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def excused_for_student?(student)
     assignment&.submission_for_student(student)&.excused?
+  end
+
+  def is_module_item?
+    context_module_tags.present?
   end
 
   def due_for_any_student_in_closed_grading_period?(periods = nil)

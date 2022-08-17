@@ -172,7 +172,7 @@ describe "teacher k5 dashboard important dates" do
       click_calendar_mark_important_dates
       click_calendar_event_more_options_button
 
-      expect(is_checked(calendar_mark_important_dates_selector)).to be_truthy
+      expect(is_checked(more_options_mark_important_dates_selector)).to be_truthy
     end
 
     it "shows Mark Important dates on Assignment Calendar tab when homeroom and subject calendar selected", custom_timeout: 20 do

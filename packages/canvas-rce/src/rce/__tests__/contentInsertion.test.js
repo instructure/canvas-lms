@@ -179,6 +179,14 @@ describe('contentInsertion', () => {
       })
     })
 
+    it('uses link data to set no_preview class', () => {
+      link.embed = {noPreview: true}
+      contentInsertion.insertLink(editor, link)
+      expect(editor.content).toEqual(
+        '<a class="instructure_file_link no_preview" href="/some/path" title="Here Be Links">Click On Me</a>'
+      )
+    })
+
     it('includes attributes', () => {
       link['data-canvas-previewable'] = true
       link.class = 'instructure_file_link foo'

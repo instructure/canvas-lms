@@ -222,6 +222,15 @@ export const handlers = [
     return res(ctx.data(data))
   }),
 
+  graphql.query('GetTotalRecipients', (req, res, ctx) => {
+    if (req.variables.context === null) {
+      return res(
+        ctx.data({legacyNode: {id: 'WXNlci0x', totalRecipients: null, __typename: 'User'}})
+      )
+    }
+    return res(ctx.data({legacyNode: {id: 'VXNlci0x', totalRecipients: 2, __typename: 'User'}}))
+  }),
+
   graphql.query('GetConversationMessagesQuery', (req, res, ctx) => {
     if (req.variables.conversationID === CONVERSATION_ID_WHERE_CAN_REPLY_IS_FALSE) {
       return res(ctx.data({legacyNode: Conversation.mock({canReply: false})}))

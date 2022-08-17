@@ -32,7 +32,7 @@ import {
   CELL_HEIGHT
 } from './constants'
 
-const Gradebook = ({courseId, students, outcomes, rollups}) => {
+const Gradebook = ({courseId, students, outcomes, rollups, visibleRatings}) => {
   const headerRow = useRef(null)
   const gridRef = useRef(null)
 
@@ -89,7 +89,12 @@ const Gradebook = ({courseId, students, outcomes, rollups}) => {
           elementRef={el => (gridRef.current = el)}
           width={outcomes.length * COLUMN_WIDTH}
         >
-          <ScoresGrid students={students} outcomes={outcomes} rollups={rollups} />
+          <ScoresGrid
+            students={students}
+            outcomes={outcomes}
+            rollups={rollups}
+            visibleRatings={visibleRatings}
+          />
         </View>
       </View>
     </>
@@ -100,7 +105,8 @@ Gradebook.propTypes = {
   courseId: PropTypes.string.isRequired,
   students: PropTypes.arrayOf(PropTypes.shape(studentShape)).isRequired,
   outcomes: PropTypes.arrayOf(PropTypes.shape(outcomeShape)).isRequired,
-  rollups: PropTypes.arrayOf(PropTypes.shape(studentRollupsShape)).isRequired
+  rollups: PropTypes.arrayOf(PropTypes.shape(studentRollupsShape)).isRequired,
+  visibleRatings: PropTypes.arrayOf(PropTypes.bool).isRequired
 }
 
 export default Gradebook

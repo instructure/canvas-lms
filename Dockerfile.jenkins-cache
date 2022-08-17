@@ -117,4 +117,7 @@ RUN --mount=target=/tmp/src \
     gulpfile.js \
     webpack.config.js \
     \
-    /tmp/dst
+    /tmp/dst && \
+  find /tmp/dst/ui /tmp/dst/gems/plugins \
+    -regex ".*__mocks__\|.*__tests__" -prune \
+    -exec rm -rf {} \;

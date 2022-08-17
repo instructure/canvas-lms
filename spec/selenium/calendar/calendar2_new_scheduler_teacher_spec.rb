@@ -37,7 +37,7 @@ describe "scheduler" do
 
     it "shows Appointment Group tab with new scheduler feature flag turned on", priority: "1" do
       get "/calendar"
-      f("#create_new_event_link").click
+      calendar_create_event_button.click
       expect(f("#edit_event_tabs")).to contain_css(".edit_appointment_group_option")
     end
 
@@ -48,7 +48,7 @@ describe "scheduler" do
       # navigate to the next month for end of month
       f(".navigate_next").click unless Time.now.utc.month == (Time.now.utc + 1.day).month
       f(".scheduler-event").click
-      f(".edit_event_link").click
+      calendar_edit_event_link.click
       expect(fj("span.ui-dialog-title:contains('Edit #{title}')")).not_to be_nil
     end
 
@@ -60,7 +60,7 @@ describe "scheduler" do
 
       get "/calendar"
 
-      f("#create_new_event_link").click
+      calendar_create_event_button.click
       wait_for_ajax_requests
       f(".edit_appointment_group_option").click
 
@@ -118,7 +118,7 @@ describe "scheduler" do
       f(".scheduler-event").click
       expect(f(".event-detail-overflow")).to include_text(description)
       expect(f(".event-detail-overflow a")).to have_attribute("href", "http://google.com/submit")
-      f(".edit_event_link").click
+      calendar_edit_event_link.click
       expect(f("#edit_appt_calendar_event_form textarea")).to include_text(description)
     end
   end

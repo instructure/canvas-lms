@@ -113,6 +113,7 @@ export default class LockManager {
 
   setupToggle(cb) {
     if (!this.props.toggleWrapperSelector) return
+    if (this.toggleNode && !this.toggleNode.parentElement) this.toggleNode = false
     if (!this.toggleNode) {
       LockToggle.setupRootNode(
         this.props.toggleWrapperSelector,

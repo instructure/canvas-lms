@@ -28,6 +28,7 @@ module LiveEvents
 
     MAX_BYTE_THRESHOLD = 5_000_000
     KINESIS_RECORD_SIZE_LIMIT = 1_000_000
+    RETRY_LIMIT = 3
 
     def initialize(start_thread = true, stream_client:, stream_name:)
       @queue = Queue.new
@@ -122,6 +123,7 @@ module LiveEvents
         LiveEvents.statsd.time("live_events.put_records") do
           res = yield
         end
+
       end
     end
 
@@ -146,13 +148,25 @@ module LiveEvents
     def process_results(res, records)
       res.records.each_with_index do |r, i|
         record = records[i]
-        if r.error_code.present?
+        if r.error_code == "InternalFailure"
+          record[:retries_count] ||= 0
+          record[:retries_count] += 1
+
+          if record[:retries_count] <= RETRY_LIMIT
+            @queue.push(record)
+            LiveEvents&.statsd&.increment("#{record[:statsd_prefix]}.retry", tags: record[:tags])
+          else
+            internal_error_message = "This record has failed too many times an will no longer be retried. #{r.error_message}"
+            log_unprocessed(record, r.error_code, internal_error_message)
+            LiveEvents&.statsd&.increment("#{record[:statsd_prefix]}.final_retry", tags: record[:tags])
+          end
+
+        elsif r.error_code.present?
           log_unprocessed(record, r.error_code, r.error_message)
         else
           LiveEvents&.statsd&.increment("#{record[:statsd_prefix]}.sends", tags: record[:tags])
-          nil
         end
-      end.compact
+      end
     end
 
     def log_unprocessed(record, error_code, error_message)

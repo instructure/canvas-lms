@@ -193,7 +193,6 @@ export default function FilterNav({
               studentGroupCategories={studentGroupCategories}
             />
           ))}
-
           <View
             as="div"
             background="primary"
@@ -258,7 +257,49 @@ export default function FilterNav({
                     stagedFilterConditions: [
                       {
                         id: uuid(),
-                        type: undefined,
+                        type: 'section',
+                        value: undefined,
+                        created_at: new Date().toISOString()
+                      },
+                      {
+                        id: uuid(),
+                        type: 'module',
+                        value: undefined,
+                        created_at: new Date().toISOString()
+                      },
+                      {
+                        id: uuid(),
+                        type: 'assignment-group',
+                        value: undefined,
+                        created_at: new Date().toISOString()
+                      },
+                      {
+                        id: uuid(),
+                        type: 'student-group',
+                        value: undefined,
+                        created_at: new Date().toISOString()
+                      },
+                      {
+                        id: uuid(),
+                        type: 'grading-period',
+                        value: undefined,
+                        created_at: new Date().toISOString()
+                      },
+                      {
+                        id: uuid(),
+                        type: 'submissions',
+                        value: undefined,
+                        created_at: new Date().toISOString()
+                      },
+                      {
+                        id: uuid(),
+                        type: 'start-date',
+                        value: undefined,
+                        created_at: new Date().toISOString()
+                      },
+                      {
+                        id: uuid(),
+                        type: 'end-date',
                         value: undefined,
                         created_at: new Date().toISOString()
                       }

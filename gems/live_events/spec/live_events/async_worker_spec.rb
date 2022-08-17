@@ -22,9 +22,10 @@ require "spec_helper"
 
 describe LiveEvents::AsyncWorker do
   let(:put_records_return) { [] }
-  let(:stream_client) { double(stream_name: stream_name, put_records: OpenStruct.new(records: [], error_code: nil, error_message: nil)) }
+  let(:stream_client) { double(stream_name: stream_name) }
   let(:stream_name) { "stream_name_x" }
   let(:event_name) { "event_name" }
+  let(:statsd_double) { double(increment: nil) }
   let(:event) do
     {
       event_name: event_name,
@@ -51,6 +52,9 @@ describe LiveEvents::AsyncWorker do
     allow(LiveEvents).to receive(:logger).and_return(double(info: nil, error: nil, debug: nil))
     @worker = LiveEvents::AsyncWorker.new(false, stream_client: stream_client, stream_name: stream_name)
     allow(@worker).to receive(:at_exit)
+    expect(LiveEvents.logger).to_not receive(:error).with(/Exception making LiveEvents async call/)
+    LiveEvents.statsd = statsd_double
+    allow(statsd_double).to receive(:time).and_yield
   end
 
   after do
@@ -88,10 +92,8 @@ describe LiveEvents::AsyncWorker do
       allow(results_double).to receive(:each_with_index).and_return([])
       allow(stream_client).to receive(:put_records).once.and_return(results)
 
-      statsd_double = double
-      expect(statsd_double).to receive(:time).once
+      expect(statsd_double).to receive(:time).once.and_yield
 
-      LiveEvents.statsd = statsd_double
       @worker.start!
 
       4.times { @worker.push event, partition_key }
@@ -107,13 +109,42 @@ describe LiveEvents::AsyncWorker do
     end
 
     context "with error putting to kinesis" do
+      let(:expected_batch) { { records: [{ data: /1234/, partition_key: instance_of(String) }], stream_name: "stream_name_x" } }
+
+      it "puts 'InternalFailure' records back in the queue for 1 extra retry that passes" do
+        results1 = double(records: [double(error_code: "InternalFailure", error_message: "internal failure message")])
+        results2 = double(records: [double(error_code: nil)])
+
+        expect(stream_client).to receive(:put_records).with(expected_batch).and_return(results1, results2)
+        expect(statsd_double).to receive(:time).and_yield.twice
+        expect(statsd_double).not_to receive(:increment).with("live_events.events.send_errors", any_args)
+        expect(statsd_double).to receive(:increment).with("live_events.events.sends", any_args)
+        expect(statsd_double).to receive(:increment).with("live_events.events.retry", any_args)
+
+        @worker.start!
+        @worker.push event, partition_key
+        @worker.stop!
+      end
+
+      it "puts 'InternalFailure' records back in the queue for 3 retries that fail" do
+        results = double(records: [double(error_code: "InternalFailure", error_message: "internal failure message")])
+
+        expect(stream_client).to receive(:put_records).exactly(4).times.and_return(results)
+        expect(statsd_double).to receive(:time).and_yield.exactly(4).times
+        expect(statsd_double).to receive(:increment).exactly(3).times.with("live_events.events.retry", any_args)
+        expect(statsd_double).to receive(:increment).once.with("live_events.events.final_retry", any_args)
+        expect(statsd_double).to receive(:increment).with("live_events.events.send_errors", any_args)
+
+        @worker.start!
+        @worker.push event, partition_key
+        @worker.stop!
+      end
+
       it "writes errors to logger" do
         results = OpenStruct.new(records: [
                                    OpenStruct.new(error_code: "failure", error_message: "failure message")
                                  ])
         allow(stream_client).to receive(:put_records).once.and_return(results)
-        statsd_double = double
-        LiveEvents.statsd = statsd_double
         expect(statsd_double).to receive(:time).and_yield
         expect(statsd_double).to receive(:increment).with("live_events.events.send_errors", any_args)
         @worker.start!

@@ -31,7 +31,7 @@ gem "rails", CANVAS_RAILS == "6.1" ? "6.1.4.6" : "7.0.3"
   gem "tzinfo", "2.0.4"
 gem_override "switchman", "3.1.3"
   gem "guardrail", "3.0.2"
-gem_override "switchman-inst-jobs", "4.0.8"
+gem_override "switchman-inst-jobs", "4.0.9"
   gem "irb", "1.4.1"
   gem "open4", "1.3.4", require: false
 
@@ -77,7 +77,7 @@ gem "hashery", "2.1.2", require: false
 gem "highline", "2.0.3", require: false
 gem "httparty", "0.18.1"
 gem "i18n", "1.8.5"
-gem "i18nliner", "0.1.2", github: "instructure/i18nliner", ref: "rails-61"
+gem "i18nliner", "0.2.2"
   gem "ruby2ruby", "2.4.4", require: false
   gem "ruby_parser", "3.18.1", require: false
 gem "icalendar", "2.7.0", require: false
@@ -125,7 +125,6 @@ gem "rack-test", "1.1.0"
 gem "rake", "13.0.3"
 gem "rails-observers", "0.1.5"
 gem "ratom-nokogiri", "0.10.11", require: false
-gem "rchardet", "1.8.0"
 gem "redcarpet", "3.5.0", require: false
 gem "retriable", "1.4.1"
 gem "ritex", "1.0.1", require: false

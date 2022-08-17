@@ -29,8 +29,8 @@ describe CalendarEventsApiController, type: :request do
 
   context "events" do
     expected_fields = %w[
-      all_context_codes all_day all_day_date child_events child_events_count comments
-      context_code created_at description duplicates end_at hidden html_url
+      all_context_codes all_day all_day_date blackout_date child_events child_events_count
+      comments context_code created_at description duplicates end_at hidden html_url
       id location_address location_name parent_event_id start_at
       title type updated_at url workflow_state context_name context_color important_dates
       series_uuid rrule
@@ -1168,6 +1168,49 @@ describe CalendarEventsApiController, type: :request do
       end
     end
 
+    describe "statsd metrics" do
+      it "emits calendar.calendar_event.create with single tag when creating a new event" do
+        course_with_student(course: @course, user: @user, active_all: true)
+        allow(InstStatsd::Statsd).to receive(:increment)
+        api_call(:post, "/api/v1/calendar_events",
+                 { controller: "calendar_events_api", action: "create", format: "json" },
+                 { calendar_event: { context_code: @course.asset_string, title: "single event" } })
+        expect(InstStatsd::Statsd).to have_received(:increment).once.with("calendar.calendar_event.create", tags: %w[enrollment_type:TeacherEnrollment enrollment_type:StudentEnrollment calendar_event_type:single])
+      end
+
+      it "emits calendar.calendar_event.create with recurring tag when creating a new recurring event" do
+        start_at = Time.zone.now.utc.change(hour: 0, min: 1)
+        end_at = Time.zone.now.utc.change(hour: 23)
+        allow(InstStatsd::Statsd).to receive(:increment)
+        api_call(:post, "/api/v1/calendar_events",
+                 { controller: "calendar_events_api", action: "create", format: "json" },
+                 { calendar_event: { context_code: @course.asset_string, title: "recurring event",
+                                     start_at: start_at.iso8601,
+                                     end_at: end_at.iso8601,
+                                     duplicate: {
+                                       count: "3",
+                                       interval: "1",
+                                       frequency: "weekly"
+                                     } } })
+        expect(InstStatsd::Statsd).to have_received(:increment).once.with("calendar.calendar_event.create", tags: %w[enrollment_type:TeacherEnrollment calendar_event_type:recurring])
+      end
+
+      it "emits calendar.calendar_event.create with series tag when creating a new event series" do
+        Account.site_admin.enable_feature!(:calendar_series)
+        start_at = Time.zone.now.utc.change(hour: 0, min: 1)
+        end_at = Time.zone.now.utc.change(hour: 23)
+        allow(InstStatsd::Statsd).to receive(:increment)
+        api_call(:post, "/api/v1/calendar_events",
+                 { controller: "calendar_events_api", action: "create", format: "json" },
+                 { calendar_event: { context_code: @course.asset_string,
+                                     title: "series",
+                                     start_at: start_at.iso8601,
+                                     end_at: end_at.iso8601,
+                                     rrule: "FREQ=WEEKLY;INTERVAL=1;COUNT=3" } })
+        expect(InstStatsd::Statsd).to have_received(:increment).once.with("calendar.calendar_event.create", tags: %w[enrollment_type:TeacherEnrollment calendar_event_type:series])
+      end
+    end
+
     it "updates an event" do
       event = @course.calendar_events.create(title: "event", start_at: "2012-01-08 12:00:00")
 
@@ -1991,6 +2034,23 @@ describe CalendarEventsApiController, type: :request do
                         })
         expect(json.size).to be 1
         expect(json[0]["important_dates"]).to be true
+      end
+    end
+
+    context "blackout date" do
+      before :once do
+        @course.calendar_events.create(title: "blackout date", start_at: Time.zone.today, blackout_date: true)
+        @course.calendar_events.create(title: "not blackout date", start_at: Time.zone.today)
+        @course.calendar_events.create(title: "undated blackout", blackout_date: true)
+      end
+
+      it "returns calendar events that have a date with blackout date if the param is sent" do
+        json = api_call(:get, "/api/v1/calendar_events?blackout_date=true&context_codes[]=course_#{@course.id}", {
+                          controller: "calendar_events_api", action: "index", format: "json",
+                          context_codes: ["course_#{@course.id}"], blackout_date: true
+                        })
+        expect(json.size).to be 1
+        expect(json[0]["blackout_date"]).to be true
       end
     end
   end
@@ -3429,6 +3489,30 @@ describe CalendarEventsApiController, type: :request do
                  selected_contexts: %w[course_1 course_2 course_3]
                })
       expect(@user.reload.get_preference(:selected_calendar_contexts)).to eq(%w[course_1 course_2 course_3])
+    end
+  end
+
+  context "save_enabled_account_calendars" do
+    it "persists enabled accounts" do
+      api_call(:post, "/api/v1/calendar_events/save_enabled_account_calendars", {
+                 controller: "calendar_events_api",
+                 action: "save_enabled_account_calendars",
+                 format: "json",
+                 enabled_account_calendars: %w[Account.default.id]
+               })
+
+      expect(@user.reload.get_preference(:enabled_account_calendars)).to eq(%w[Account.default.id])
+    end
+
+    it "marks feature as seen" do
+      api_call(:post, "/api/v1/calendar_events/save_enabled_account_calendars", {
+                 controller: "calendar_events_api",
+                 action: "save_enabled_account_calendars",
+                 format: "json",
+                 mark_feature_as_seen: true
+               })
+
+      expect(@user.reload.get_preference(:account_calendar_events_seen)).to eq(true)
     end
   end
 

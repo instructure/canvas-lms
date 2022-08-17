@@ -301,9 +301,9 @@ describe "dashcards" do
 
   def select_color_palette_from_calendar_page
     get "/calendar"
-    raise "Not the right course" unless f("#context-list li:nth-of-type(2)").text.include? @course1.name
+    raise "Not the right course" unless f("#calendars-context-list li:nth-of-type(2)").text.include? @course1.name
 
-    f("#context-list li:nth-of-type(2) .ContextList__MoreBtn").click
+    f("#calendars-context-list li:nth-of-type(2) .ContextList__MoreBtn").click
     wait_for_ajaximations
     expect(f(".ColorPicker__Container")).to be_displayed
   end

@@ -919,6 +919,26 @@ class RoleOverride < ActiveRecord::Base
         group_label: -> { t("Manage Assignments and Quizzes") },
         account_allows: ->(a) { a.root_account.feature_enabled?(:granular_permissions_manage_assignments) }
       },
+      manage_account_calendar_visibility: {
+        label: -> { t("Change visibility of account calendars") },
+        label_v2: -> { t("Account Calendars - change visibility") },
+        group: "manage_account_calendar",
+        group_label: -> { t("Manage Account Calendars") },
+        account_only: true,
+        available_to: %w[AccountAdmin AccountMembership],
+        true_for: %w[AccountAdmin],
+        account_allows: ->(_a) { Account.site_admin.feature_enabled?(:account_calendar_events) }
+      },
+      manage_account_calendar_events: {
+        label: -> { t("Add, edit and delete events on account calendars") },
+        label_v2: -> { t("Account Calendars - add / edit / delete events") },
+        group: "manage_account_calendar",
+        group_label: -> { t("Manage Account Calendars") },
+        account_only: true,
+        available_to: %w[AccountAdmin AccountMembership],
+        true_for: %w[AccountAdmin],
+        account_allows: ->(_a) { Account.site_admin.feature_enabled?(:account_calendar_events) }
+      },
       manage_calendar: {
         label: -> { t("permissions.manage_calendar", "Add, edit and delete events on the course calendar") },
         label_v2: -> { t("Course Calendar - add / edit / delete") },

@@ -22,6 +22,8 @@ import {
   IMAGE_EMBED_TYPE,
   NONE_TYPE,
   TEXT_TYPE,
+  DISPLAY_AS_LINK,
+  DISPLAY_AS_DOWNLOAD_LINK,
   getContentFromEditor,
   getContentFromElement,
   getLinkContentFromEditor,
@@ -126,6 +128,12 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
         expect(getContentFromElement($element, editor).isPreviewable).toEqual(false)
         $element.classList.add('instructure_scribd_file')
         expect(getContentFromElement($element, editor).isPreviewable).toEqual(true)
+      })
+
+      it('indicates the link displays as download link if it contains the "no_preview" class name', () => {
+        expect(getContentFromElement($element, editor).displayAs).toEqual(DISPLAY_AS_LINK)
+        $element.classList.add('no_preview')
+        expect(getContentFromElement($element, editor).displayAs).toEqual(DISPLAY_AS_DOWNLOAD_LINK)
       })
     })
 

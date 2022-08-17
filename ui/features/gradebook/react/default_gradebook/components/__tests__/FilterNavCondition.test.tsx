@@ -31,7 +31,7 @@ const defaultProps = {
   studentGroupCategories: {}
 }
 
-const dateTests = (testType: string, dateFieldName: string) => {
+const dateTests = (testType: string) => {
   let props, condition, onChange, onDelete
   beforeEach(() => {
     condition = {
@@ -77,44 +77,14 @@ const dateTests = (testType: string, dateFieldName: string) => {
     fireEvent.blur(dateComponent)
     expect(onChange).toHaveBeenCalled()
   })
-
-  it(`does not allow to create two ${dateFieldName} conditions`, () => {
-    props.condition.type = testType === 'start-date' ? 'end-date' : 'start-date'
-    props.conditionsInFilter = [
-      {
-        id: '458',
-        createdAt: '2021-11-02T20:56:23.616Z',
-        type: testType,
-        value: 'Fri Dec 05 2021 02:00:00 GMT-0500 (Colombia Standard Time)'
-      }
-    ]
-    const {queryByRole} = render(
-      <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
-    )
-    const select = queryByRole('button', {name: 'Condition type'})
-    fireEvent.click(select!)
-    const option = queryByRole('option', {name: dateFieldName})
-    expect(option).not.toBeInTheDocument()
-  })
-
-  it(`keeps the ${dateFieldName} option available when the current selected type is ${dateFieldName}`, () => {
-    props.conditionsInFilter = [condition]
-    const {getByRole} = render(
-      <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
-    )
-    const select = getByRole('button', {name: 'Condition type'})
-    fireEvent.click(select)
-    const option = getByRole('option', {name: dateFieldName})
-    expect(option).toBeInTheDocument()
-  })
 }
 
 describe('FilterNavCondition', () => {
   describe('Start Date', () => {
-    dateTests('start-date', 'Start Date')
+    dateTests('start-date')
   })
   describe('End Date', () => {
-    dateTests('end-date', 'End Date')
+    dateTests('end-date')
   })
 
   describe('submissions', () => {
@@ -138,7 +108,7 @@ describe('FilterNavCondition', () => {
       const {getByRole} = render(
         <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
       )
-      const button = getByRole('button', {name: 'Condition type'})
+      const button = getByRole('button', {name: 'Submissions'})
       expect(button).toBeInTheDocument()
     })
 
@@ -147,7 +117,7 @@ describe('FilterNavCondition', () => {
       const {getByRole} = render(
         <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
       )
-      const button: Partial<HTMLButtonElement> = getByRole('button', {name: 'Condition'})
+      const button: Partial<HTMLButtonElement> = getByRole('button', {name: 'Submissions'})
       expect(button?.value).toContain('Has ungraded submissions')
     })
 
@@ -155,7 +125,7 @@ describe('FilterNavCondition', () => {
       const {getByRole} = render(
         <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
       )
-      userEvent.click(getByRole('button', {name: 'Condition'}))
+      userEvent.click(getByRole('button', {name: 'Submissions'}))
       userEvent.click(getByRole('option', {name: 'Has ungraded submissions'}))
       expect(onChange).toHaveBeenLastCalledWith(
         expect.objectContaining({
@@ -192,7 +162,7 @@ describe('FilterNavCondition', () => {
       const {getByRole} = render(
         <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
       )
-      const button: Partial<HTMLButtonElement> = getByRole('button', {name: 'Condition'})
+      const button: Partial<HTMLButtonElement> = getByRole('button', {name: 'Sections'})
       expect(button.value).toContain('Section 1')
     })
 
@@ -200,7 +170,7 @@ describe('FilterNavCondition', () => {
       const {getByRole} = render(
         <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
       )
-      userEvent.click(getByRole('button', {name: 'Condition'}))
+      userEvent.click(getByRole('button', {name: 'Sections'}))
       userEvent.click(getByRole('option', {name: 'Section 1'}))
       expect(onChange).toHaveBeenLastCalledWith(
         expect.objectContaining({
@@ -239,7 +209,7 @@ describe('FilterNavCondition', () => {
       const {getByRole} = render(
         <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
       )
-      const button: Partial<HTMLButtonElement> = getByRole('button', {name: 'Condition'})
+      const button: Partial<HTMLButtonElement> = getByRole('button', {name: 'Grading Periods'})
       expect(button.value).toContain('Grading Period 1')
     })
 
@@ -247,7 +217,7 @@ describe('FilterNavCondition', () => {
       const {getByRole} = render(
         <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
       )
-      userEvent.click(getByRole('button', {name: 'Condition'}))
+      userEvent.click(getByRole('button', {name: 'Grading Periods'}))
       userEvent.click(getByRole('option', {name: 'Grading Period 1'}))
       expect(onChange).toHaveBeenLastCalledWith(
         expect.objectContaining({
@@ -299,7 +269,7 @@ describe('FilterNavCondition', () => {
       const {getByRole} = render(
         <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
       )
-      const button: Partial<HTMLButtonElement> = getByRole('button', {name: 'Condition'})
+      const button: Partial<HTMLButtonElement> = getByRole('button', {name: 'Student Groups'})
       expect(button.value).toContain('Student Group 1')
     })
 
@@ -307,7 +277,7 @@ describe('FilterNavCondition', () => {
       const {getByRole} = render(
         <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
       )
-      userEvent.click(getByRole('button', {name: 'Condition'}))
+      userEvent.click(getByRole('button', {name: 'Student Groups'}))
       userEvent.click(getByRole('option', {name: 'Student Group 1'}))
       expect(onChange).toHaveBeenLastCalledWith(
         expect.objectContaining({
@@ -316,42 +286,6 @@ describe('FilterNavCondition', () => {
           value: '1'
         })
       )
-    })
-
-    it(`does not allow to create two section conditions`, () => {
-      props.conditionsInFilter = [
-        {
-          id: '459',
-          createdAt: '2021-11-02T20:56:23.616Z',
-          type: 'section',
-          value: 'Fri Dec 05 2021 02:00:00 GMT-0500 (Colombia Standard Time)'
-        }
-      ]
-      const {queryByRole} = render(
-        <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
-      )
-      const select = queryByRole('button', {name: 'Condition type'})
-      fireEvent.click(select!)
-      const option = queryByRole('option', {name: 'Section'})
-      expect(option).not.toBeInTheDocument()
-    })
-
-    it(`does not allow to create two student group conditions`, () => {
-      props.conditionsInFilter = [
-        {
-          id: '460',
-          createdAt: '2021-11-02T20:56:23.616Z',
-          type: 'student-group',
-          value: 'Fri Dec 05 2021 02:00:00 GMT-0500 (Colombia Standard Time)'
-        }
-      ]
-      const {queryByRole} = render(
-        <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
-      )
-      const select = queryByRole('button', {name: 'Condition type'})
-      fireEvent.click(select!)
-      const option = queryByRole('option', {name: 'Student Group'})
-      expect(option).not.toBeInTheDocument()
     })
   })
 })

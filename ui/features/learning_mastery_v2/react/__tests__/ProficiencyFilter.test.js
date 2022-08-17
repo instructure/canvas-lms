@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 import ProficiencyFilter from '../ProficiencyFilter'
 
 describe('ProficiencyFilter', () => {
@@ -25,29 +25,39 @@ describe('ProficiencyFilter', () => {
     {
       color: 'blue',
       description: 'great!',
-      masteryAt: 3,
-      points: 5
+      masteryAt: 1,
+      points: 2
     },
     {
       color: 'green',
       description: 'mastery!',
-      masteryAt: 3,
-      points: 3
+      masteryAt: 1,
+      points: 1
     },
     {
       color: 'red',
       description: 'not great',
-      masteryAt: 3,
+      masteryAt: 1,
       points: 0
     }
   ]
 
+  let visibleRatings
+  let setVisibleRatings
+
   const defaultProps = (props = {}) => {
     return {
       ratings,
+      visibleRatings,
+      setVisibleRatings,
       ...props
     }
   }
+
+  beforeEach(() => {
+    visibleRatings = [true, true, true, true]
+    setVisibleRatings = jest.fn(newVisibleRatings => (visibleRatings = newVisibleRatings))
+  })
 
   it('renders a "Showing" header', () => {
     const {getByText} = render(<ProficiencyFilter {...defaultProps()} />)
@@ -59,5 +69,12 @@ describe('ProficiencyFilter', () => {
     ratings.forEach(rating => {
       expect(getByText(rating.description)).toBeInTheDocument()
     })
+  })
+
+  it('calls onClick method and sets rating to invisible', () => {
+    const {getByText} = render(<ProficiencyFilter {...defaultProps()} />)
+    expect(visibleRatings).toStrictEqual([true, true, true, true])
+    fireEvent.click(getByText('mastery!'))
+    expect(visibleRatings).toStrictEqual([true, true, false, true])
   })
 })

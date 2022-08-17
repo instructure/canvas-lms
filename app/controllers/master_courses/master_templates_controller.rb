@@ -417,8 +417,8 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   #
   def restrict_item
     content_type = params[:content_type]
-    unless %w[assignment attachment discussion_topic external_tool lti-quiz quiz wiki_page].include?(content_type)
-      return render json: { message: "Must be a valid content type (assignment,attachment,discussion_topic,external_tool,lti-quiz,quiz,wiki_page)" }, status: :bad_request
+    unless %w[assignment attachment course_pace discussion_topic external_tool lti-quiz quiz wiki_page].include?(content_type)
+      return render json: { message: "Must be a valid content type (assignment,attachment,course_pace,discussion_topic,external_tool,lti-quiz,quiz,wiki_page)" }, status: :bad_request
     end
     unless params.key?(:restricted)
       return render json: { message: "Must set 'restricted'" }, status: :bad_request
@@ -432,6 +432,8 @@ class MasterCourses::MasterTemplatesController < ApplicationController
         @course.attachments.not_deleted
       when "lti-quiz"
         @course.assignments.active
+      when "course_pace"
+        @course.course_paces
       else
         @course.send(content_type.pluralize).where.not(workflow_state: "deleted")
       end
@@ -479,6 +481,8 @@ class MasterCourses::MasterTemplatesController < ApplicationController
                        @course.assignments.include_submittables
                      when "DiscussionTopic"
                        @course.discussion_topics.only_discussion_topics
+                     when "CoursePace"
+                       @course.course_paces
                      else
                        klass.constantize.where(context_id: @course, context_type: "Course")
                      end

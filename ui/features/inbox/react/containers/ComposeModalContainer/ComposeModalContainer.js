@@ -230,7 +230,7 @@ const ComposeModalContainer = props => {
           bulkMessage: sendIndividualMessages,
           body,
           userNote,
-          contextCode: selectedContext?.contextID,
+          contextCode: selectedContext?.contextID || ENV?.CONVERSATIONS?.ACCOUNT_CONTEXT_CODE,
           recipients: props.selectedIds.map(rec => rec?._id || rec.id),
           subject,
           groupConversation: true,

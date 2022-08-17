@@ -24,6 +24,7 @@ import StudentViewContext from '../Context'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 
 jest.mock('../AttemptSelect')
+jest.mock('../CommentsTray', () => () => '')
 
 it('renders normally', async () => {
   const props = await mockAssignmentAndSubmission()
@@ -328,6 +329,26 @@ it('does not render the attempt select if the assignment has non-digital submiss
   expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()
 })
 
+it('does not render the attempt select if peerReviewModeEnabled is set to true', async () => {
+  const props = await mockAssignmentAndSubmission({
+    Submission: {...SubmissionMocks.submitted}
+  })
+  props.assignment.env.peerReviewModeEnabled = true
+  props.allSubmissions = [props.submission]
+  const {queryByTestId} = render(<Header {...props} />)
+  expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()
+})
+
+it('renders the attempt select if peerReviewModeEnabled is set to false', async () => {
+  const props = await mockAssignmentAndSubmission({
+    Submission: {...SubmissionMocks.submitted}
+  })
+  props.assignment.env.peerReviewModeEnabled = false
+  props.allSubmissions = [props.submission]
+  const {queryByTestId} = render(<Header {...props} />)
+  expect(queryByTestId('attemptSelect')).toBeInTheDocument()
+})
+
 describe('submission workflow tracker', () => {
   it('is rendered when a submission exists and the assignment is available', async () => {
     const props = await mockAssignmentAndSubmission()
@@ -359,6 +380,20 @@ describe('submission workflow tracker', () => {
   it('is not rendered when the assignment has uncompleted prerequisites', async () => {
     const props = await mockAssignmentAndSubmission()
     props.assignment.env.unlockDate = 'soon'
+    const {queryByTestId} = render(<Header {...props} />)
+    expect(queryByTestId('submission-workflow-tracker')).not.toBeInTheDocument()
+  })
+
+  it('is rendered if peerReviewModeEnabled is set to false', async () => {
+    const props = await mockAssignmentAndSubmission()
+    props.assignment.env.peerReviewModeEnabled = false
+    const {queryByTestId} = render(<Header {...props} />)
+    expect(queryByTestId('submission-workflow-tracker')).toBeInTheDocument()
+  })
+
+  it('is not rendered if peerReviewModeEnabled is set to true', async () => {
+    const props = await mockAssignmentAndSubmission()
+    props.assignment.env.peerReviewModeEnabled = true
     const {queryByTestId} = render(<Header {...props} />)
     expect(queryByTestId('submission-workflow-tracker')).not.toBeInTheDocument()
   })
@@ -473,5 +508,19 @@ describe('Add Comment/View Feedback button', () => {
         name: /After the first attempt, you cannot leave comments until you submit the assignment./
       })
     ).not.toBeInTheDocument()
+  })
+
+  it('does not show the unread comments badge if peerReviewModeEnabled is set to true ', async () => {
+    const props = await mockAssignmentAndSubmission({Submission: {unreadCommentCount: 1}})
+    props.assignment.env.peerReviewModeEnabled = true
+    const {queryByTestId} = render(<Header {...props} />)
+    expect(queryByTestId('unread_comments_badge')).not.toBeInTheDocument()
+  })
+
+  it('shows the unread comments badge if peerReviewModeEnabled is set to false ', async () => {
+    const props = await mockAssignmentAndSubmission({Submission: {unreadCommentCount: 1}})
+    props.assignment.env.peerReviewModeEnabled = false
+    const {getByTestId} = render(<Header {...props} />)
+    expect(getByTestId('unread_comments_badge')).toBeInTheDocument()
   })
 })

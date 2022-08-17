@@ -130,7 +130,7 @@ function renderContentBaseOnAvailability({assignment, submission}, alertContext)
     // NOTE: handles case where user is not logged in, or the course hasn't started yet
     return (
       <>
-        {renderAttemptsAndAvailability({assignment})}
+        {!assignment.env.peerReviewModeEnabled && renderAttemptsAndAvailability({assignment})}
         <AssignmentToggleDetails description={assignment.description} />
         <Suspense
           fallback={<Spinner renderTitle={I18n.t('Loading')} size="large" margin="0 0 0 medium" />}
@@ -145,7 +145,8 @@ function renderContentBaseOnAvailability({assignment, submission}, alertContext)
 
     return (
       <>
-        {renderAttemptsAndAvailability({assignment, submission})}
+        {!assignment.env.peerReviewModeEnabled &&
+          renderAttemptsAndAvailability({assignment, submission})}
         {assignment.submissionTypes.includes('student_annotation') && (
           <VisualOnFocusMessage
             message={I18n.t(

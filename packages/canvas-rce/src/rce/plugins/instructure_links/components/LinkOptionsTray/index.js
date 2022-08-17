@@ -33,7 +33,8 @@ import formatMessage from '../../../../../format-message'
 import {
   DISPLAY_AS_LINK,
   DISPLAY_AS_EMBED,
-  DISPLAY_AS_EMBED_DISABLED
+  DISPLAY_AS_EMBED_DISABLED,
+  DISPLAY_AS_DOWNLOAD_LINK
 } from '../../../shared/ContentSelection'
 import {getTrayHeight} from '../../../shared/trayUtils'
 
@@ -46,8 +47,11 @@ export default function LinkOptionsTray(props) {
   const [err, setErr] = useState(null)
   const [isValidURL, setIsValidURL] = useState(false)
   const [autoOpenPreview, setAutoOpenPreview] = useState(content.displayAs === DISPLAY_AS_EMBED)
-  const [disablePreview, setDisablePreview] = useState(
-    content.displayAs === DISPLAY_AS_EMBED_DISABLED
+  const [disableInlinePreview, setDisableInlinePreview] = useState(
+    content.displayAs === DISPLAY_AS_EMBED_DISABLED || content.displayAs === DISPLAY_AS_DOWNLOAD_LINK
+  )
+  const [displayOptionSelection, setDisplayOptionSelection] = useState(
+    initialPreviewSelection(content)
   )
 
   useEffect(() => {
@@ -69,8 +73,9 @@ export default function LinkOptionsTray(props) {
       embed: embedType
         ? {
             type: embedType,
-            autoOpenPreview: autoOpenPreview && !disablePreview,
-            disablePreview
+            autoOpenPreview: autoOpenPreview && !disableInlinePreview,
+            disableInlinePreview,
+            noPreview: displayOptionSelection === 'disable'
           }
         : null,
       text,
@@ -80,6 +85,15 @@ export default function LinkOptionsTray(props) {
     }
 
     props.onSave(linkAttrs)
+  }
+  function initialPreviewSelection(content) {
+    if (content.displayAs === DISPLAY_AS_DOWNLOAD_LINK) {
+      return 'disable'
+    } else if (content.displayAs === DISPLAY_AS_EMBED || content.displayAs === DISPLAY_AS_LINK) {
+      return 'inline'
+    } else {
+      return 'overlay'
+    }
   }
   function handleTextChange(event) {
     setText(event.target.value)
@@ -91,7 +105,8 @@ export default function LinkOptionsTray(props) {
     setAutoOpenPreview(event.target.checked)
   }
   function handlePreviewOptionChange(_event, value) {
-    setDisablePreview(value === 'overlay')
+    setDisableInlinePreview(value === 'overlay' || value === 'disable')
+    setDisplayOptionSelection(value)
   }
 
   function renderDisplayOptions() {
@@ -105,12 +120,13 @@ export default function LinkOptionsTray(props) {
           description=" " /* the FormFieldGroup is providing the label */
           name="preview_option"
           onChange={handlePreviewOptionChange}
-          value={disablePreview ? 'overlay' : 'inline'}
+          value={displayOptionSelection}
         >
+          <RadioInput key="disable" value="disable" label={formatMessage('Disable Preview')} />
           <RadioInput key="overlay" value="overlay" label={formatMessage('Preview in overlay')} />
           <RadioInput key="inline" value="inline" label={formatMessage('Preview inline')} />
         </RadioInputGroup>
-        {!disablePreview && (
+        {!disableInlinePreview && (
           <View as="div" margin="0 0 0 small">
             <Checkbox
               label={formatMessage('Expand preview by Default')}

@@ -20,6 +20,7 @@
 
 class StudentEnrollment < Enrollment
   belongs_to :student, foreign_key: :user_id, class_name: "User"
+
   after_save :evaluate_modules, if: proc { |e|
     # if enrollment switches sections or is created
     e.saved_change_to_course_section_id? || e.saved_change_to_course_id? ||
@@ -29,6 +30,7 @@ class StudentEnrollment < Enrollment
   }
   after_save :restore_submissions_and_scores
   after_save :republish_course_pace_if_needed
+  after_save :republish_base_pace_if_needed
 
   def student?
     true
@@ -129,15 +131,30 @@ class StudentEnrollment < Enrollment
   end
 
   def republish_course_pace_if_needed
-    return unless saved_change_to_id? || saved_change_to_start_at? || (saved_change_to_workflow_state? && workflow_state == "invited")
+    return unless saved_change_to_id? || saved_change_to_start_at? || (saved_change_to_workflow_state? && workflow_state != "deleted")
     return unless course.enable_course_paces?
 
-    section_pace = course.course_paces.published.where(course_section_id: course_section_id).take
-    if section_pace
-      section_pace&.create_publish_progress
-      return
+    pace = course.course_paces.published.where(course_section_id: course_section_id).last
+    pace ||= course.course_paces.published.for_user(user).take || course.course_paces.published.primary.take
+    pace&.create_publish_progress
+    track_multiple_section_paces
+  end
+
+  def republish_base_pace_if_needed
+    return unless course.enable_course_paces? && course_section_id && workflow_state == "deleted"
+
+    student_section_ids = user.enrollments.where(course: course).where.not(workflow_state: "deleted").pluck(:course_section_id)
+    pace = course.course_paces.published.where(course_section_id: student_section_ids).last
+    pace ||= course.course_paces.published.primary.take
+    pace&.create_publish_progress
+  end
+
+  def track_multiple_section_paces
+    section_ids_the_student_is_enrolled_in = user.student_enrollments.where.not(workflow_state: "deleted")
+                                                 .where(course_section: course.course_sections.pluck(:id))
+                                                 .pluck(:course_section_id)
+    if section_ids_the_student_is_enrolled_in.count > 1 && course.course_paces.published.for_section(section_ids_the_student_is_enrolled_in).size > 1
+      InstStatsd::Statsd.increment("course_pacing.student_with_multiple_sections_with_paces")
     end
-    course_pace = course.course_paces.published.for_user(user).take || course.course_paces.published.primary.take
-    course_pace&.create_publish_progress
   end
 end

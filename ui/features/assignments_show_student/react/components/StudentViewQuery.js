@@ -48,7 +48,8 @@ function getAssignmentEnvVariables() {
     moduleUrl: `${baseUrl}/modules`,
     belongsToUnpublishedModule: ENV.belongs_to_unpublished_module,
     peerReviewModeEnabled: ENV.peer_review_mode_enabled,
-    peerReviewAvailable: ENV.peer_review_available
+    peerReviewAvailable: ENV.peer_review_available,
+    peerDisplayName: ENV.peer_display_name
   }
 
   if (ENV.PREREQS?.items?.[0]?.prev) {

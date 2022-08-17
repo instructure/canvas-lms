@@ -1873,24 +1873,4 @@ describe SIS::CSV::UserImporter do
       expect(@shard1_user.email).to eq "shard1@example.com"
     end
   end
-
-  it "parses utf encoding" do
-    expect do
-      process_csv_data_cleanly(
-        File.read(File.expand_path("#{File.dirname(__FILE__)}/../../../fixtures/sis/users_utf.csv"))
-      )
-    end.not_to raise_error
-  end
-
-  it "parses iso-8859-1 encoding" do
-    expect do
-      process_csv_data(
-        "user_id,login_id,password,first_name,last_name,short_name,email,status,building",
-        +"P88430,SarimarCruz\xDD.21@icloud.com,,EMILIE,CRU PE\xD1A,,SarimarCruz\xDD.21@icloud.com,active,5015"
-      )
-    end.not_to raise_error
-
-    user = Pseudonym.where(sis_user_id: "P88430").first.user
-    expect(user.email).to eql("SarimarCruzÝ.21@icloud.com")
-  end
 end

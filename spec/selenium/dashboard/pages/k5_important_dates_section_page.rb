@@ -70,11 +70,11 @@ module K5ImportantDatesSectionPageObject
   end
 
   def calendar_event_submit_button_selector
-    ".event-details-footer button[type='submit']"
+    "button[type='submit']"
   end
 
   def calendar_for_subject_selector
-    ".context_id"
+    "[data-testid='edit-calendar-event-form-context']"
   end
 
   def calendars_left_text_selector
@@ -82,6 +82,10 @@ module K5ImportantDatesSectionPageObject
   end
 
   def calendar_mark_important_dates_selector
+    "label[for='k5-field'] div"
+  end
+
+  def more_options_mark_important_dates_selector
     "#calendar_event_important_dates"
   end
 

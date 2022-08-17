@@ -17,6 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
+import numberFormat from '@canvas/i18n/numberFormat'
 
 import {AssignmentAvailabilityContainer} from '../AssignmentAvailabilityContainer/AssignmentAvailabilityContainer'
 import PropTypes from 'prop-types'
@@ -33,6 +34,13 @@ const I18n = useI18nScope('discussion_posts')
 export function DiscussionDetails({...props}) {
   const pointsPossible = props.discussionTopic?.assignment?.pointsPossible || 0
 
+  const formattedPoints = pointsPossible
+    ? numberFormat._format(pointsPossible, {
+        precision: 2,
+        strip_insignificant_zeros: true
+      })
+    : 0
+
   return (
     <Responsive
       match="media"
@@ -42,10 +50,11 @@ export function DiscussionDetails({...props}) {
           text: I18n.t(
             {
               one: '1 point',
-              other: '%{count} points'
+              other: '%{formattedPoints} points'
             },
             {
-              count: pointsPossible
+              count: pointsPossible,
+              formattedPoints
             }
           ),
           textSize: 'x-small'
@@ -54,10 +63,11 @@ export function DiscussionDetails({...props}) {
           text: I18n.t(
             {
               one: '1 point possible',
-              other: '%{count} points possible'
+              other: '%{formattedPoints} points possible'
             },
             {
-              count: pointsPossible
+              count: pointsPossible,
+              formattedPoints
             }
           ),
           textSize: 'small'

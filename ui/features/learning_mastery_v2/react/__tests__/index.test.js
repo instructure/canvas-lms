@@ -93,7 +93,9 @@ describe('LearningMastery', () => {
   beforeEach(() => {
     useRollups.mockReturnValue({isLoading: false, students: users, outcomes, rollups})
     oldEnv = {...window.ENV}
-    window.ENV = {GRADEBOOK_OPTIONS: {outcome_proficiency: {ratings}}}
+    window.ENV = {
+      GRADEBOOK_OPTIONS: {outcome_proficiency: {ratings}, ACCOUNT_LEVEL_MASTERY_SCALES: true}
+    }
   })
 
   afterEach(() => {
