@@ -68,6 +68,7 @@ describe('loadEventListeners', () => {
 
   afterAll(() => {
     window.alert.restore && window.alert.restore()
+    window.getComputedStyle.restore && window.getComputedStyle.restore()
     console.log.restore && console.log.restore() // eslint-disable-line no-console
   })
   afterEach(() => {
@@ -75,6 +76,8 @@ describe('loadEventListeners', () => {
   })
 
   it('initializes equation editor plugin', done => {
+    window.getComputedStyle = jest.fn()
+
     loadEventListeners({
       equationCB: view => {
         expect(view instanceof EquationEditorView).toBeTruthy()
