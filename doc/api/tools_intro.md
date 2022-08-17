@@ -15,7 +15,7 @@ on external tools used inside of Canvas and by leveraging <a
 href="https://www.imsglobal.org/lti-advantage-overview" target="_blank">LTI
 Advantage services</a>.
 
-Because tools can be deployed at any level in the system heirarchy, they can be
+Because tools can be deployed at any level in the system hierarchy, they can be
 as general or specific as needed. The Chemistry Department can add chemistry-specific
 tools without those tools cluttering everyone else's interfaces. Or, a single teacher
 who is trying out some new web service can do so without needing the tool to be
@@ -31,7 +31,7 @@ External tool <a href="file.assignment_tools.html" target="_blank">assignments i
   <a href="http://www.imsglobal.org/LTI/v1p1/ltiIMGv1p1.html" target=_"blank">LTI 1.1
   Outcomes Service</a> or <a href="http://www.imsglobal.org/spec/lti-ags/v2p0/"
   target="_blank">LTI 1.3 Assignment and Grade Services</a> and allows external services to
-  syncronize grades, and other assignment details.
+  synchronize grades, and other assignment details.
 
    Example use cases might include:
 
