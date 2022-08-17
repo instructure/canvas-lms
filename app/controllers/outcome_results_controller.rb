@@ -292,6 +292,10 @@ class OutcomeResultsController < ApplicationController
   #   added to outcome ratings in the rollup. This will only take effect if
   #   the Account Level Mastery Scales FF is DISABLED
   #
+  # @argument contributing_scores [Boolean]
+  #   If contributing scores are requested, then each individual outcome score will
+  #   also include all graded artifacts that contributed to the outcome score
+  #
   # @example_response
   #    {
   #      "rollups": [OutcomeRollup],
