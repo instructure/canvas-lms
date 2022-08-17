@@ -127,9 +127,14 @@ module UserSearch
           end
         users_scope =
           if context.is_a?(Account)
-            users_scope.where(id: Enrollment.select(:user_id)
-                                            .where("enrollments.user_id = users.id")
-                                            .active.where(role_id: role_ids))
+            users_scope.where(
+              "users.id IN (
+                SELECT e.user_id
+                FROM #{Enrollment.quoted_table_name} e
+                WHERE e.role_id=?
+                AND e.workflow_state NOT IN ('rejected', 'inactive', 'deleted')
+              )", role_ids
+            )
           else
             users_scope.where(enrollments: { role_id: role_ids }).distinct
           end
