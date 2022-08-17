@@ -85,19 +85,19 @@ const defaultProps: FilterNavFilterProps = {
 describe('FilterNavFilter', () => {
   it('clicking delete triggers onDelete', () => {
     const onDelete = jest.fn()
-    const {getByRole} = render(<FilterNavFilter {...defaultProps} onDelete={onDelete} />)
-    userEvent.click(getByRole('button', {name: /Delete filter/}))
+    const {getByTestId} = render(<FilterNavFilter {...defaultProps} onDelete={onDelete} />)
+    userEvent.click(getByTestId('delete-filter'))
     expect(onDelete).toHaveBeenCalledTimes(1)
   })
 
   it('after renaming filter, focus should transfer to rename button', async () => {
     const onChange = jest.fn()
-    const {getByRole, getByPlaceholderText} = render(
+    const {getByPlaceholderText, getByTestId} = render(
       <FilterNavFilter {...defaultProps} onChange={onChange} />
     )
-    userEvent.click(getByRole('button', {name: /Rename filter/}))
-    userEvent.type(getByPlaceholderText('Name'), 'Sample filter name')
-    userEvent.click(getByRole('button', {name: /Save label/}))
-    expect(getByRole('button', {name: /Rename filter/})).toHaveFocus()
+    userEvent.click(getByTestId('rename-filter'))
+    userEvent.paste(getByPlaceholderText('Name'), 'Sample filter name')
+    userEvent.click(getByTestId('save-label'))
+    expect(getByTestId('rename-filter')).toHaveFocus()
   })
 })
