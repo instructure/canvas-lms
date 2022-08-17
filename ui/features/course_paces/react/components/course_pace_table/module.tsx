@@ -87,7 +87,7 @@ export const Module: React.FC<ComponentProps> = props => {
   const renderDateColHeader = () => {
     if (!props.showProjections && !actuallyExpanded && !datesVisible) return null
     return (
-      <ColHeader width={actuallyExpanded ? 'auto' : '0'} id={`module-${props.module.id}-duration`}>
+      <ColHeader data-testid="pp-due-date-columnheader" width={actuallyExpanded ? 'auto' : '0'} id={`module-${props.module.id}-duration`}>
         <Flex
           as="div"
           aria-labelledby="due-date-column-title"
@@ -233,7 +233,7 @@ export const Module: React.FC<ComponentProps> = props => {
                     </Flex>
                   </ColHeader>
                   {renderDateColHeader()}
-                  <ColHeader id={`module-${props.module.id}-status`} textAlign="center">
+                  <ColHeader data-testid="pp-status-columnheader" id={`module-${props.module.id}-status`} textAlign="center">
                     <Flex as="div" alignItems="end" justifyItems="center" padding={headerPadding}>
                       {I18n.t('Status')}
                     </Flex>
