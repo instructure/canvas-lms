@@ -2692,12 +2692,14 @@ nn:
       Gir ein brukar løyve til å søke i endringsloggar etter vurderar eller student i administrasjonsverktøyet.
   allows_user_to_view_login_logout_activity_of_users_e11dd2de: "Lar brukaren sjå innloggings-/utloggingsaktivitet til brukarar i administratorverktøy."
   allows_user_to_view_names_of_course_templates_in_t_12b87e7e: "Lar brukaren sjå namn på emnemalar i rotkontoen."
+  allows_user_to_view_page_history_and_set_front_pag_c2321326: "Lar brukaren sjå sidehistorikken og angi forsida."
   allows_user_to_view_previously_created_collaborati_31f4cfe2: |-
       Gir ein brukar løyve til å sjå tidlegare oppretta samarbeid.
       Gir ein brukar løyve til å endre tittel og skildring eller fjerne samarbeidspartnarar for alle samarbeid.
   allows_user_to_view_previously_created_collaborati_bb4b86f1: |-
       Gir ein brukar løyve til å sjå tidlegare oppretta samarbeid. 
       Gir ein brukar løyve til å endre tittel og skildring eller fjerne samarbeidspartnarar for alle samarbeid.
+  allows_user_to_view_previously_created_collaborati_d3a37402: "Lar brukaren sjå tidligare oppretta samarbeid."
   allows_user_to_view_prior_enrollments_df5286d: "Lar brukaren sjå tildlegare påmeldingar"
   allows_user_to_view_published_and_unpublished_cour_25a5dcc0: "Gir ein brukar løyve til å sjå publisert og upublisert emneinnhald."
   allows_user_to_view_recent_announcements_on_the_co_e56c881e: "Lar brukaren sjå dei siste kunngjeringane på emnets heimeside."
@@ -4016,6 +4018,9 @@ nn:
   associated_course_name_9b5b1945: "Tilknytte emnenamn"
   associated_courses_1fbc6202: "Tilknytte emne"
   associated_tool_domains_ba5767c5: "Tilknytta verktøy-domene"
+  associated_with_count_accounts_be191ced: 
+    one: "Tilknytt %{count} kontoar"
+    other: "Tilknytt %{count} kontoar"
   associations_3fd4abe8: Forbindelsar
   associations_saved_successfully_48b9eae3: "Forbindelsane er lagra"
   at_791460b3: på
@@ -4053,6 +4058,7 @@ nn:
   attempt_1_grade_484b35e4: "Forsøk 1: %{grade}"
   attempt_3dd42b18: forsøk
   attempt_attempt_d3911720: "Forsøk %{attempt}"
+  attempt_attempt_feedback_1b042ff5: "Forsøk %{attempt} tilbakemelding"
   attempt_attempt_grade_c01f45df: "Forsøk %{attempt}: %{grade}"
   attempt_count_267a4fc5: "Forsøk %{count}"
   attempt_current_attempt_ef626179: "Forsøk %{current_attempt}"
@@ -5893,6 +5899,7 @@ nn:
       importing_button: "Importerer... dette kan ta ei stund"
     titles: 
       home_page: Startside
+  content_items_with_errors_a9438fdb: "Innhaldselement med feil"
   content_link_error_assignment_name_course_name_b8be789a: "Feil ved innhaldslenke - %{assignment_name}, %{course_name}"
   content_locks: 
     buttons: 
@@ -10056,6 +10063,7 @@ nn:
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Kan ikkje laste Unsynced Changes-komponenten. Er internettkoplinga OK?"
   failed_please_report_the_following_error_code_to_y_42248d60: "Mislukkast, rapporter følgande feilkode til systemansvarleg: Feilrapport: %{error};"
   failed_retrieving_media_sources_32aed288: "Kan ikkje hente mediakjelder."
+  failed_sending_message_64001749: "Feil oppstod under sending av melding."
   failed_the_report_failed_to_generate_a_file_please_60a6582d: "Rapporten kan ikkje generere fil. Prøv på nytt seinare."
   failed_to_add_new_feed_ee1c5ea: "Kan ikkje legge til ny straum"
   failed_to_change_last_attended_date_1e340ba6: "Mislukkast å endre dato for siste deltaking"
@@ -10074,15 +10082,25 @@ nn:
   failed_to_import_media_objects_4c1fcb4f: "Kan ikkje importere medieobjekt"
   failed_to_invalidate_portal_path_5bc31b91: "Ugyldiggjering av portal path vart mislukka"
   failed_to_laod_more_submissions_990aacee: "Kunne ikkje laste fleire innleveringar"
+  failed_to_load_announcements_429c16fc: "Feil oppstod under lasting av kunngjeringar. "
+  failed_to_load_apps_db37e651: "Feil oppstod under lasting av apper. "
+  failed_to_load_conversation_messages_9b4546fc: "Feil oppstod under lasting av samtalemeldingar. "
   failed_to_load_csp_information_try_refreshing_the__4a056997: "Det oppstod ein feil under lasting av CSP-informasjon, forsøk å laste sida på nytt."
   failed_to_load_external_feeds_7ac8411d: "Kunne ikkje laste eksterne datastraumar"
+  failed_to_load_grades_for_the_requested_grading_pe_52cefa9: "Feil under lasting av karakterer for den forventa perioden for karaktersetting. "
+  failed_to_load_important_info_da5b24dc: "Feil oppstod under lasting av viktig informasjon. "
   failed_to_load_more_submissions_148ff11f: "Det oppstod ein feil under lasting av fleire innleveringar"
   failed_to_load_recent_activity_d3e5adeb: "Kan ikkje hente ny aktivitet"
+  failed_to_load_the_grades_tab_c6118c57: "Feil oppsto under lasting av karakterfana."
+  failed_to_load_the_schedule_tab_fd7b0911: "Feil oppsto under lasting av timeplanfana."
   failed_to_log_in_7ceec561: "Kan ikkje logge på"
   failed_to_perform_search_c918100f: "Kunne ikkje gjennomføre søk"
   failed_to_publish_draft_comment_853761e9: "Kunne ikkje publisere kommentar til utkast"
   failed_to_remove_catalog_settings_f5359b2b: "Kan ikkje fjerne kataloginnstillingar"
   failed_to_remove_special_catalog_users_8889b686: "Fjerning av spesielle katalogbrukarar vart mislukka"
+  failed_to_remove_the_image_please_try_again_bd3ca65d: "Kan ikkje slette bildet, ver venleg og prøv igjen. "
+  failed_to_remove_user_7ce5e427: "Kan ikkje slette brukar. "
+  failed_to_report_the_image_please_try_again_92398b47: "Kan ikkje rapportere bildet, ver venleg og prøv igjen. "
   failed_to_save_changes_errors_6920f334: "Kunne ikkje lagre endringar: %{errors}%"
   failed_to_save_dashboard_selection_32e71c72: "Kan ikkje lagre dashbordval"
   failed_to_save_please_try_again_later_bb7070fb: "Kan ikkje lagre. Prøv på nytt seinare."
@@ -10167,6 +10185,7 @@ nn:
   file_filename_could_not_be_included_in_the_epub_do_4bf71a87: "Får ikkje inkludert fila %{filename} i EPUB-dokumentet. Prøv anna ZIP-fil for tilgang."
   file_has_no_data_213a4540: "Fila har ikkje innhald"
   file_has_no_outcomes_data_1517801f: "Fila har ingen data om læringsmål"
+  file_has_not_finished_uploading_cfba3b2f: "Filen er ikkje ferdig opplasta. "
   file_list_350d08df: Filliste
   file_list_updated_38e2a5ad: "Fillista er oppdatert"
   file_menu_cc0ca54: Filmeny
@@ -10256,6 +10275,7 @@ nn:
   filter_9df28e5b: "Filter:"
   filter_announcements_by_unread_495eeeb3: "filtrer kunngjeringar som ulesne"
   filter_assignment_category_63acaed4: "Filtrer etter oppgåvekategori"
+  filter_by_2f4368a8: "Filtrer etter"
   filter_by_date_c076a845: "Filtrer etter dato"
   filter_by_ip_address_40965f66: "Filtrer etter IP-adresse"
   filter_by_name_34cbe139: "Filtrer etter namn"
@@ -10336,6 +10356,7 @@ nn:
   first_reviewer_sortorder_e2184140: "Første fagfellevurderar %{sortOrder}"
   fix_missing_policy_grade_change_records_c404507c: "Fiks manglande retningslinje for vurderingsendringsoversikt"
   flagged_as_possible_spam_ebbc4683: "Flagg som mogleg søppelpost"
+  flags_ce30e8e3: Flagg
   flash_6afbf65a: Flash
   flash_ab3ad95e: flash
   flickr_9bed633e: Flickr
@@ -10363,6 +10384,7 @@ nn:
     no_deleting_folders_with_content: "Kan ikkje slette ei mappe med innhald"
     no_deleting_root: "Kan ikkje slette rotmappa"
     only_one_folder: "Kan ikkje oppgi mappebane og mappe-ID"
+  food_drink_b0ea7e7b: "Mat & Drikke"
   for: for
   for_974cbb84: For
   for_all_devices_1f603968: "For alle einingar"
@@ -10371,6 +10393,7 @@ nn:
   for_course_level_users_deleting_a_course_is_part_o_932f7a98: "For brukarar på emnenivå er sletting av emne del av 'Emnestatus - administrer'-løyvet. For brukarar på kontonivå er dette løyvet naudsynt saman med 'Emne - legg til / endre / slett'."
   for_each_late_62aecf41: "For kvar seine"
   for_name_d5684bfd: "Til %{name}"
+  for_students_who_d0fd45d0: "For studentar som..."
   for_title_69d92b3a: "for %{title}"
   forgot_password_f0c3fbac: "Gløymt passord?"
   forgot_password_url_3f9c04b: "Gløymt URL-adresse for passord"
@@ -10388,6 +10411,8 @@ nn:
     other: "Fann %{count} ikkje-responsive lenker"
   france_33_90b595d7: "Frankrike (+33)"
   french_33881544: Fransk
+  french_canada_c3d92fa6: "Fransk (Canada)"
+  frequently_used_21a3eb8e: "Ofte brukt"
   from_date_must_be_before_to_date_79f00046: "'Frå'-dato må vere før 'Til'-dato"
   from_fdd4956d: Frå
   from_from_to_to_e31f6422: "Frå %{from} til %{to}"
@@ -10456,6 +10481,7 @@ nn:
   go_to_name_s_profile_eaa1826b: "Gå til %{name} sin profil"
   go_to_parent_7fb312b4: "Gå til overordna nivå"
   go_to_prerequisite_175c1f3f: "Gå til føresetnad"
+  go_to_reply_36fe5f51: "Gå til svar"
   go_to_settings_for_name_812308b5: "Gå til innstillingar for %{name}"
   go_to_statistics_for_name_2ee6b6f3: "Gå til statistikk for %{name}"
   go_to_topic_af6025fc: "Gå til emne"
@@ -11431,6 +11457,8 @@ nn:
   group_name_in_group_category_name_group_category_29bf3254: "%{group_name} i %{group_category_name} gruppekategori"
   group_name_is_required_5547bc0b: "Gruppenamn er obligatorisk"
   group_newoptiongroup_entered_newoptioncontextname_9eaf1b13: "Gruppe %{newOptionGroup} la inn. %{newOptionContextName}"
+  group_not_found_59f8bb27: "Fann ikkje gruppe"
+  group_not_found_d13d85b9: "fann ikkje gruppe"
   group_pages_656556f3: Gruppesider
   group_people_50e9785b: "Gruppér personar"
   group_roster_1846bf84: Gruppeliste
@@ -11787,6 +11815,7 @@ nn:
     unassigned_users: "Brukarar som ikkje er tilordna (%{count})"
   groups_6b3ce75c: grupper
   groups_6c90e26a: Grupper
+  groups_add_4038ae8a: "Grupper - legg til"
   groups_add_edit_delete_1536bbb4: "Grupper - legg til / endre / slett"
   groups_are_a_good_place_to_collaborate_on_projects_7386830f: |-
       Grupper fungerer flott for prosjektsamarbeid eller for planlegging av studiegrupper
@@ -11802,6 +11831,8 @@ nn:
       på eit meir fokusert prosjekt.
   groups_cannot_have_size_restrictions_to_assign_by__7d36fa32: "Grupper kan ikkje ha storleiksgrense ved seksjonstildeling"
   groups_course_c73e4c2c: "Grupper (emne)"
+  groups_delete_bb79a2b4: "Grupper - slett"
+  groups_manage_a5197479: "Grupper - administrer"
   groups_must_be_empty_to_assign_by_section_a9fafa72: "Grupper må vere tomme ved seksjonstildeling"
   groups_navigation_menu_76b5acc6: "Meny for gruppenavigasjon"
   groups_tray_ef3e2649: Gruppemeny
@@ -11816,6 +11847,8 @@ nn:
   has_similarity_score_d5f332b4: "Har likskapsresultat"
   has_syllabus_body_6f250277: has_syllabus_body
   has_turnitin_score_3e1cacf6: "Har Turnitin-resultat"
+  have_not_been_graded_df2a5fd2: "Har ikkje vorte vurdert"
+  have_not_yet_submitted_57e6a58b: "Har ikkje vorte levert"
   haven_t_been_graded_d7dee5bb: "Er ikkje vurdert"
   haven_t_submitted_yet_e63834db: "Ikkje har levert"
   he_him_99aea1a8: Han
@@ -22567,10 +22600,10 @@ nn:
   teacher_view_b2047bc6: "Sjå som Faglærar"
   teachers_52e2423f: Faglærarar
   teachers_add_d5258e33: "Faglærarar - legg til"
-  teachers_designers_and_tas_can_select_a_course_hom_30025956: "Faglærarar, designera, og undervisningsassistentar kan velje ei heimeside utan løyve \"Emne innhald - legg til/endra/slette\""
+  teachers_designers_and_tas_can_select_a_course_hom_30025956: "Faglærarar, designarar, og undervisningsassistentar kan velje ei Heim-side utan løyve \"Emne innhald - legg til/endra/slette\""
   teachers_over_time_1905603b: "faglærarar over tid"
   teachers_remove_5622b490: "Faglærarar - fjern"
-  teaching_assistant_9635edaf: Undervisingsassistent
+  teaching_assistant_9635edaf: Undervisningsassistent
   teal_f729a294: Blågrøn
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "Forklar oss korleis og når du vil motta meldingar om hendingar i Canvas."
   tempe_grade_export_c611da01: "Tempe vurderingseksport"
@@ -22578,7 +22611,7 @@ nn:
   templates_4ca13d07: Malar
   tenant_d2a41f78: Tenant
   tenant_missing_or_sync_disabled_check_the_microsof_7ac198e5: "Tenanten manglar, eller synkroniseringa er slått av. Sjekk integrasjonen for Microsoftsynkroniseringa for emne og kontoen. "
-  tenant_name_e174f404: "Tenantens namn"
+  tenant_name_e174f404: "Namn på tenanten"
   term_41f37cae: semester
   term_42976f1c: "Semester:"
   term_created_27d27c2b: "Semester oppretta"
@@ -22945,7 +22978,11 @@ nn:
   there_was_a_problem_updating_the_comment_5f3595b9: "Det oppstod eit problem under oppdatering av  kommentar"
   there_was_a_problem_updating_the_grade_1b6c8b4c: "Det oppstod eit problem ved oppdatering av vurderingsresultat."
   there_was_a_problem_updating_the_submission_6e5280a1: "Det oppstod eit problem under oppdatering av innleveringa. "
+  there_was_an_error_creating_a_new_filter_e93bb765: "Det oppstod ein feil når nytt filter skulle lagast."
+  there_was_an_error_deleting_name_aa3050e5: "Det oppstod ein feil ved sletting av \"%{name}\"."
   there_was_an_error_fetching_course_statistics_96e9dbad: "Det oppstod ein feil under henting av emnestatistikk"
+  there_was_an_error_fetching_data_for_gradebook_174e82f9: "Det oppstod ein feil ved henting av data for Vurderingsoversikta"
+  there_was_an_error_fetching_gradebook_filters_3b4607ac: "Det oppstod ein feil ved henting av filter for Vurderingsoversikt"
   there_was_an_error_fetching_modules_8ee451bb: "Det oppstod ein feil ved henting av modular."
   there_was_an_error_fetching_outcome_results_45c57590: "Det oppstod ein feil under henting av læringsmålresultat"
   there_was_an_error_fetching_submission_comments_ce153077: "Det oppstod ein feil under henting av innleveringskommentarar"
@@ -22954,11 +22991,14 @@ nn:
   there_was_an_error_in_processing_your_request_6513a49a: "Det oppstod ein feil under handsaming av førespurnaden"
   there_was_an_error_joining_the_conference_d2c3e4b0: "Det oppstod ein feil under tilkopling til konferansen."
   there_was_an_error_launching_to_the_configured_too_f8ed5767: "Det skjedde ein feil ved opning av det konfigurerte verktøyet."
+  there_was_an_error_linking_pace_7d2bb508: "Det oppstod ein feil ved lenking til framdriftsplan."
   there_was_an_error_loading_the_document_d80e57e0: "Det opptstod ein feil ved lasting av dokumentet."
-  there_was_an_error_loading_the_pace_810e3a7e: "Det oppstod ein feil ved innlasting av tempo"
+  there_was_an_error_loading_the_pace_810e3a7e: "Det oppstod ein feil ved innlasting av framdriftsplan."
+  there_was_an_error_publishing_your_course_pace_1aa5fdeb: "Det oppstod ein feil når framdriftsplanen for emnet skulle publiserast."
   there_was_an_error_removing_the_image_c83acffe: "Det oppstod feil under fjerning av bildet"
   there_was_an_error_removing_the_item_f8324776: "Det oppstod ein feil under fjerning av elementet"
   there_was_an_error_removing_the_notification_20a9de65: "Det oppstod ein feil ved fjerning av kunngjeringa"
+  there_was_an_error_resetting_to_the_previous_pace_83153ec2: "Det oppstod ein feil ved tilbakestilling til førre framdriftsplan."
   there_was_an_error_retrieving_assignment_dates_39320c15: "Det oppsto ein feil då eg skulle finne datoane for innlevering."
   there_was_an_error_retrieving_job_progress_266523f9: "Det oppstod ein feil under henting av jobbprogresjon"
   there_was_an_error_retrieving_the_course_image_d7ea094d: "Det oppstod ein feil under henting av emnebildet"
@@ -22968,6 +23008,7 @@ nn:
   there_was_an_error_setting_usage_rights_53739e1d: "Det oppstod ein feil under fastsetjinga av bruksrettar."
   there_was_an_error_starting_the_save_assignment_da_22ffb6a8: "Det oppsto ein feil under oppstart av lagre oppgåvedatoar-jobben"
   there_was_an_error_submitting_to_the_similarity_de_eb6a261: "Det oppstod ein feil under avlevering til tekstsamanlikningstenesta. Prøv å levere fila på nytt før du kontaktar brukarstøtte."
+  there_was_an_error_submitting_your_attempt_fdbe9259: "Det opptstod ein feil ved innleveringa di."
   there_was_an_error_updating_a_filter_2a5ebc87: "Det oppstod ein feil ved oppdateringa av eit filter."
   there_was_an_error_updating_this_assignment_please_59fc608d: "Det oppstod ein feil under oppdatering av oppgåva Oppdater sida og prøv på nytt."
   there_was_an_error_updating_view_options_d024a3ec: "Det oppstod ein feil under oppdateringa av visningsalternativa."
@@ -22976,8 +23017,13 @@ nn:
   there_was_an_error_uploading_your_file_please_try__ce458566: "Det oppstod ein feil under opplasting av fila. Prøv på nytt seinare."
   there_was_an_error_with_your_import_please_examine_7b42f29d: "Det var eit problem med importen. Sjå gjennom fila og prøv å laste opp på nytt. Sjekk e-post for detaljar."
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "Det oppstod ein feil med spørjinga, prøv eit anna søk"
-  there_was_an_unexpected_error_creating_the_discuss_8811a868: "Det oppstod ein uventa feil under opprettinga av diskusjoninnlegget."
+  there_was_an_unexpected_error_creating_the_discuss_8811a868: "Det oppstod ein uventa feil under opprettinga av diskusjonsinnlegget."
   there_was_an_unexpected_error_deleting_the_convers_412fd621: "Det oppstod ein uventa feil under sletting av innlegget."
+  there_was_an_unexpected_error_deleting_the_discuss_fe1022cb: "Det oppstod ein uventa feil under sletting av diskusjonstemaet."
+  there_was_an_unexpected_error_loading_the_replies_578d9738: "Det oppstod ein uventa feil når svara skulle lastas inn."
+  there_was_an_unexpected_error_marking_all_as_read_117fe739: "Det oppstod ein uventa feil når alle skulle markerast som leste"
+  there_was_an_unexpected_error_marking_all_as_unrea_e4658766: "Det oppstod ein uventa feil når alle skulle markerast som uleste"
+  there_was_an_unexpected_error_updating_the_convers_a1a37400: "Det oppsto ein uventa feil ved oppdatering av medlemar i samtalen"
   there_was_an_unexpected_problem_with_the_sync_be079a67: "Det oppstod ein uventa feil med synkroniseringa"
   there_was_an_unknown_error_registering_the_tool_b9a29954: "Det oppstod ein ukjend feil under registrering av verktøyet"
   there_were_a_total_of_count_errors_db1d89de: "Det er totalt %{count}feil."
@@ -23667,7 +23713,7 @@ nn:
   to_view_account_level_groups_groups_add_edit_delet_bf12e984: "For å sjå grupper på kontonivå, må 'Grupper - legg til / endre / slett' òg vere slått på."
   to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "Dersom du vil sjå alle varslingane som er sende til ein Canvas-brukar, må du markere brukaren og datointervallet for søket."
   to_view_announcements_announcements_view_must_also_75f652df: "For å sjå kunngjeringar, må 'Kunngjeringar - vis' òg vere slått på."
-  to_view_anonymous_discussion_c11482a3: "for å sjå anonyme diskusjonar"
+  to_view_anonymous_discussion_c11482a3: "for å sjå anonym diskusjon"
   to_view_discussions_in_a_course_discussions_view_m_18c3fa0b: |-
       For å sjå diskusjonar i eit emne, må 'Diskusjonar - vis' òg vere slått på.
       For å administrere diskusjonar, må 'Diskusjonar - moderer' vere slått på.
@@ -23693,7 +23739,7 @@ nn:
   to_view_module_progression_grades_view_all_grades__b9fc4d6f: "For å sjå modulprogresjon må 'Vurdering - sjå alle vurderingar' òg vere slått på."
   to_view_or_edit_a_user_s_sis_id_or_integration_id__76b8d055: "For å vise eller redigere ein brukar sin SIS-ID eller integrasjon-ID må både «Brukarar - vis liste» og «Brukarar - administrer innloggingsdetaljer» også være aktivert."
   to_view_or_edit_a_user_s_sis_id_or_integration_id__9abfc21d: "For å sjå eller endre SIS-ID eller integrasjons-ID til ein brukar, må 'Brukarar - vis liste' og 'Brukarar - administrer innloggingsdetaljar' òg vere slått på. "
-  to_view_recent_announcements_on_the_home_page_cour_5a91447e: "For å sjå nylege kunngjeringar på emneforsida, må \"Emneinnhald - vis\" vere slått på og boksen \"vis nylege kunngjeringar på emneforsida\" må vere haka av i emneinnstillingar"
+  to_view_recent_announcements_on_the_home_page_cour_5a91447e: "For å sjå nylege kunngjeringar på Heim-sida, må \"Emneinnhald - vis\" vere slått på og boksen \"vis nylege kunngjeringar på Heim-sida\" må vere haka av i emneinnstillingar"
   to_view_recent_announcements_on_the_home_page_cour_ffc52530: "For å sjå nylege kunngjeringar på emneforsida, må 'Emneinnhald - vis' vere slått på og boksen vis nylege kunngjeringar på emneforsida må vere haka av i emneinnstillingar. For å administrere kunngjeringar på emne, må 'Diskusjonar - moderer' òg vere slått på."
   to_view_recent_announcements_on_the_home_page_the__fbd8d115: "For å vise dei siste kunngjeringane på Heim-sida må valet \"Vis nyaste kunngjeringar på Heim-sida\" være haka av i emneinnstillingar"
   to_view_sis_ids_sis_data_read_must_be_enabled_12edce68: "For å sjå SIS ID må \"SIS Data - les\" være aktivert"
@@ -24748,7 +24794,7 @@ nn:
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Brukarar med skjermlesar bør skru av musepeikar for å nytte desse tastatursnarvegane"
   users_over_time_9a2ee74a: "brukarar over tid"
   users_students_ecbb43eb: "Brukarar - Studentar"
-  users_tas_27117894: "Brukarar - Teacher Assistants"
+  users_tas_27117894: "Brukarar - Undervisningsassistentar"
   users_teachers_a5d5d1af: "Brukarar - Faglærarar"
   users_view_list_861c7a3f: "Brukarar - vis liste"
   users_view_login_ids_a2e6a85: "Brukarar - vis innloggings-ID-ar"
