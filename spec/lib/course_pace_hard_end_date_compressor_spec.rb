@@ -25,7 +25,7 @@ describe CoursePaceHardEndDateCompressor do
     @course.root_account.enable_feature!(:course_paces)
     @course.enable_course_paces = true
     @course.save!
-    @course_pace = @course.course_paces.create! workflow_state: "active", end_date: "2021-09-10", hard_end_dates: true
+    @course_pace = @course.course_paces.create!(workflow_state: "active", end_date: "2021-09-10", hard_end_dates: true, published_at: Time.zone.now)
     @module = @course.context_modules.create!
   end
 
