@@ -54,8 +54,8 @@ const getTextInput = container => {
   })
 }
 
-const getLoginAttributeSelector = container => {
-  return container.getByRole('button', {name: /login attribute selector/i})
+const getLoginAttributeSelector = ({container}) => {
+  return container.querySelector('#microsoft_teams_sync_attribute_selector')
 }
 
 const getToggle = container => {
@@ -70,10 +70,8 @@ const getSuffixInput = container => {
   })
 }
 
-const getLookupFieldSelector = container => {
-  return container.getByRole('button', {
-    name: /active directory lookup attribute selector/i
-  })
+const getLookupFieldSelector = ({container}) => {
+  return container.querySelector('#microsoft_teams_sync_remote_attribute_lookup_attribute_selector')
 }
 
 describe('MicrosoftSyncAccountSettings', () => {
