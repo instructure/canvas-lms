@@ -482,6 +482,56 @@ describe Types::CourseType do
         ]
       end
 
+      it "returns nil for each user's initial lastActivityAt" do
+        expect(
+          course_type.resolve(
+            "enrollmentsConnection { nodes { lastActivityAt } }",
+            current_user: @teacher
+          )
+        ).to eq [nil, nil, nil, nil, nil, nil]
+      end
+
+      it "returns a datetime for each user enrollment once its last activity has been updated" do
+        last_activity = "2022-08-01T00:00:00Z"
+        course.enrollments.each do |enrollment|
+          enrollment.last_activity_at = last_activity
+          enrollment.save
+          last_activity = (Date.parse(last_activity) + 1.day).to_s
+        end
+
+        expect(
+          course_type.resolve(
+            "enrollmentsConnection { nodes { lastActivityAt } }",
+            current_user: @teacher
+          ).sort
+        ).to eq [
+          "2022-08-01T00:00:00Z",
+          "2022-08-02T00:00:00Z",
+          "2022-08-03T00:00:00Z",
+          "2022-08-04T00:00:00Z",
+          "2022-08-05T00:00:00Z",
+          "2022-08-06T00:00:00Z"
+        ]
+      end
+
+      it "returns nil for other users's initial lastActivityAt if current user does not have appropriate permissions" do
+        last_activity = "2022-08-01T00:00:00Z"
+        course.enrollments.each do |enrollment|
+          enrollment.last_activity_at = last_activity
+          enrollment.save
+          last_activity = (Date.parse(last_activity) + 1.day).to_s
+        end
+
+        student_last_activity = course_type.resolve(
+          "enrollmentsConnection { nodes { lastActivityAt } }",
+          current_user: @student1
+        ).compact
+
+        expect(student_last_activity).to have(1).items
+        expect(student_last_activity.first.to_datetime).to be_within(1.second).of \
+          @student1.enrollments.first.last_activity_at.to_datetime
+      end
+
       it "returns zero for each user's initial totalActivityTime" do
         expect(
           course_type.resolve(
@@ -489,6 +539,15 @@ describe Types::CourseType do
             current_user: @teacher
           )
         ).to eq [0, 0, 0, 0, 0, 0]
+      end
+
+      it "returns nil for other users's initial totalActivityTime if current user does not have appropriate permissions" do
+        expect(
+          course_type.resolve(
+            "enrollmentsConnection { nodes { totalActivityTime } }",
+            current_user: @student1
+          )
+        ).to eq [nil, 0, nil, nil, nil, nil]
       end
 
       it "returns the sisRole of each user" do
