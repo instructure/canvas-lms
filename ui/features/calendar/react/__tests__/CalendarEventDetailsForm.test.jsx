@@ -82,6 +82,14 @@ const testBlackoutDateSuccess = () => {
   defaultProps.event.blackout_date = false
 }
 
+const expectFieldsToBeEnabled = (component, fieldNames) => {
+  fieldNames.forEach(fieldName => expect(component.getByText(fieldName)).toBeEnabled())
+}
+
+const expectFieldsToBeDisabled = (component, fieldNames) => {
+  fieldNames.forEach(fieldName => expect(component.getByLabelText(fieldName)).toBeDisabled())
+}
+
 describe('CalendarEventDetailsForm', () => {
   beforeEach(() => {
     defaultProps = eventFormProps()
@@ -325,4 +333,18 @@ describe('CalendarEventDetailsForm', () => {
     expect(component.queryByRole('checkbox', {name: 'Add to Course Pacing blackout dates'})).not.toBeInTheDocument()
   })
 
+  it('only enables relevant fields when blackout date checkbox is checked', async () => {
+    ENV.FEATURES.account_level_blackout_dates = true
+    const component = render(<CalendarEventDetailsForm {...defaultProps} />)
+
+    expectFieldsToBeEnabled(component, 
+      ["Title:", "Location:", "Date:", "From:", "To:", "Calendar:", "More Options", "Submit"])
+
+    select(component, 'button', 'Calendar:')
+    select(component, 'option', 'Geometry')
+    select(component, 'checkbox', 'Add to Course Pacing blackout dates')
+
+    expectFieldsToBeEnabled(component, ["Title:", "Date:", "Calendar:", "More Options", "Submit"])
+    expectFieldsToBeDisabled(component, ["Location:", "From:", "To:"])
+  })
 })
