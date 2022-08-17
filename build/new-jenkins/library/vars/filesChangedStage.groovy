@@ -87,4 +87,10 @@ def postBuild(stageConfig) {
   dir(env.LOCAL_WORKDIR) {
     stageConfig.value('jsFiles', sh(script: "${WORKSPACE}/build/new-jenkins/js-changes.sh", returnStatus: true) == 0)
   }
+
+  // Remove the @tmp directory created by dir() for plugin builds, so bundler doesn't get confused.
+  // https://issues.jenkins.io/browse/JENKINS-52750
+  if (env.GERRIT_PROJECT != 'canvas-lms') {
+    sh "rm -vrf $LOCAL_WORKDIR@tmp"
+  }
 }
