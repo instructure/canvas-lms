@@ -30,7 +30,7 @@ describe CoursePace do
     @assignment = @course.assignments.create!
     @course_section = @course.course_sections.first
     @tag = @assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
-    @course_pace = @course.course_paces.create! workflow_state: "active"
+    @course_pace = @course.course_paces.create! workflow_state: "active", published_at: Time.zone.now
     @course_pace_module_item = @course_pace.course_pace_module_items.create! module_item: @tag
     @unpublished_assignment = @course.assignments.create! workflow_state: "unpublished"
     @unpublished_tag = @unpublished_assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module", workflow_state: "unpublished"

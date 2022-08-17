@@ -920,6 +920,7 @@ describe ContentTag do
       @context_module = @course.context_modules.create!
       @assignment = @course.assignments.create!
       @course_pace = @course.course_paces.create!
+      @course_pace.publish
       @context_module.add_item(id: @assignment.id, type: "assignment")
       @tag = @context_module.content_tags.first
     end
@@ -938,6 +939,17 @@ describe ContentTag do
       @tag.destroy
       @tag.update_course_pace_module_items
       expect(@course_pace.course_pace_module_items.where(module_item_id: @tag.id).exists?).to eq(false)
+    end
+
+    it "updates all published pace plans with content tags" do
+      section_pace = @course.course_paces.create!(course_section: @course.course_sections.create!)
+      section_pace.publish
+      assignment = @course.assignments.create!
+      @context_module.add_item(id: assignment.id, type: "assignment")
+      tag = @context_module.content_tags.find_by(content_id: assignment.id)
+      tag.update_course_pace_module_items
+      expect(@course_pace.course_pace_module_items.where(module_item_id: tag.id).exists?).to eq(true)
+      expect(section_pace.course_pace_module_items.where(module_item_id: tag.id).exists?).to eq(true)
     end
   end
 end
