@@ -58,16 +58,55 @@ describe('splitTextIntoLines()', () => {
   })
 
   it('does not count beginning or trailing whitespace when computing lines', () => {
-    const text = ' some text         '
-    const expectedLinesCount = 1
+    const text = ' icon maker rocks !       '
     const lines = splitTextIntoLines(text, MAX_TOTAL_TEXT_CHARS)
-    expect(lines.length).toBe(expectedLinesCount)
+    expect(lines).toStrictEqual(['icon maker rocks !'])
   })
 
   it('returns empty array when text is whitespace only', () => {
     const text = ''
     const lines = splitTextIntoLines(text, MAX_TOTAL_TEXT_CHARS)
     expect(lines).toStrictEqual([])
+  })
+
+  describe('ignores consecutive', () => {
+    it('whitespaces', () => {
+      const text = 'icon  maker   rocks !'
+      const lines = splitTextIntoLines(text, MAX_TOTAL_TEXT_CHARS)
+      expect(lines).toStrictEqual(['icon maker rocks !'])
+    })
+
+    it('tabs', () => {
+      const text = 'icon\t\tmaker\t\t\trocks\t!'
+      const lines = splitTextIntoLines(text, MAX_TOTAL_TEXT_CHARS)
+      expect(lines).toStrictEqual(['icon maker rocks !'])
+    })
+
+    it('line breaks', () => {
+      const text = 'icon\n\nmaker\n\n\nrocks\n!'
+      const lines = splitTextIntoLines(text, MAX_TOTAL_TEXT_CHARS)
+      expect(lines).toStrictEqual(['icon maker rocks !'])
+    })
+  })
+
+  describe('beginning or trailing', () => {
+    it('whitespaces', () => {
+      const text = '  icon maker rocks ! '
+      const lines = splitTextIntoLines(text, MAX_TOTAL_TEXT_CHARS)
+      expect(lines).toStrictEqual(['icon maker rocks !'])
+    })
+
+    it('tabs', () => {
+      const text = '\ticon maker rocks !\t'
+      const lines = splitTextIntoLines(text, MAX_TOTAL_TEXT_CHARS)
+      expect(lines).toStrictEqual(['icon maker rocks !'])
+    })
+
+    it('line breaks', () => {
+      const text = '\nicon maker rocks !\n'
+      const lines = splitTextIntoLines(text, MAX_TOTAL_TEXT_CHARS)
+      expect(lines).toStrictEqual(['icon maker rocks !'])
+    })
   })
 })
 
