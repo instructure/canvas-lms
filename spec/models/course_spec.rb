@@ -7342,5 +7342,59 @@ describe Course do
         expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.paced.has_end_date")
       end
     end
+
+    context "course with course pacing on or off" do
+      before do
+        Account.default.enable_feature!(:course_paces)
+        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+        @course = Course.create!
+      end
+
+      it "increments count for a course paced course when initially published" do
+        @course.enable_course_paces = true
+        @course.save!
+        @course.offer!
+
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.paced_courses").once
+        expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course.unpaced.paced_courses")
+      end
+
+      it "does not increment when only option is updated" do
+        @course.enable_course_paces = true
+        @course.save!
+
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.paced.paced_courses")
+      end
+
+      it "increments count for non-paced course when initially published" do
+        @course.offer!
+
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.paced_courses").once
+        expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course.paced.paced_courses")
+      end
+
+      it "increments paced count on already published course from when going from unpaced to paced" do
+        @course.offer!
+        @course.enable_course_paces = true
+        @course.save!
+
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.paced_courses").once
+        expect(InstStatsd::Statsd).to have_received(:decrement).with("course.unpaced.paced_courses").once
+      end
+
+      it "increments paced count on already published course from when going from paced to unpaced" do
+        @course.enable_course_paces = true
+        @course.save!
+        @course.offer!
+
+        @course.enable_course_paces = false
+        @course.save!
+
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.paced_courses").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.paced_courses").once
+        expect(InstStatsd::Statsd).to have_received(:decrement).with("course.paced.paced_courses").once
+      end
+    end
   end
 end

@@ -282,6 +282,9 @@ class Course < ActiveRecord::Base
   after_update :clear_cached_short_name, if: :saved_change_to_course_code?
   after_update :log_create_to_publish_time, if: :saved_change_to_workflow_state?
   after_update :track_end_date_stats
+  after_update :log_course_pacing_publish_update, if: :saved_change_to_workflow_state?
+  after_update :log_course_pacing_settings_update, if: :change_to_enable_paces?
+
   before_update :handle_syllabus_changes_for_master_migration
 
   before_save :touch_root_folder_if_necessary
@@ -4121,5 +4124,52 @@ class Course < ActiveRecord::Base
 
     statsd_bucket = enable_course_paces? ? "paced" : "unpaced"
     InstStatsd::Statsd.count("course.#{statsd_bucket}.assignment_count", assignments.published.size)
+  end
+
+  def change_to_enable_paces?
+    return unless saved_change_to_settings? && available?
+
+    # Get the settings changes into a parameter
+    setting_changes = saved_changes[:settings]
+    old_enable_paces_setting = setting_changes[0][:enable_course_paces]
+    new_enable_paces_setting = setting_changes[1][:enable_course_paces]
+
+    # Check to see if enable_course_paces is in list of updated items
+    return if new_enable_paces_setting.nil?
+
+    # If enable_course_paces IS in the list, then check to see if the original value is present or if it's nil
+    # It can be nil when a course is initially created and published without other settings present.
+    # In this case, then, it's going from nil to a value we care about one way or the other.
+    if old_enable_paces_setting.nil?
+      return true
+    end
+
+    # Finally this is the case where the list of settings may include enable_course_paces, but it didn't change --
+    # another setting changed.
+    old_enable_paces_setting != new_enable_paces_setting
+  end
+
+  def log_course_pacing_publish_update
+    valid_workflow_states = %w[created claimed]
+
+    return unless available? && valid_workflow_states.include?(workflow_state_before_last_save)
+
+    statsd_bucket = enable_course_paces? ? "paced" : "unpaced"
+
+    InstStatsd::Statsd.increment("course.#{statsd_bucket}.paced_courses")
+
+    unless workflow_state_before_last_save == "created"
+      InstStatsd::Statsd.decrement("course.#{statsd_bucket}.paced_courses")
+    end
+  end
+
+  def log_course_pacing_settings_update
+    setting_changes = saved_changes[:settings]
+    new_enable_paces_setting = setting_changes[1][:enable_course_paces]
+
+    statsd_bucket_list = new_enable_paces_setting ? %w[paced unpaced] : %w[unpaced paced]
+
+    InstStatsd::Statsd.increment("course.#{statsd_bucket_list[0]}.paced_courses")
+    InstStatsd::Statsd.decrement("course.#{statsd_bucket_list[1]}.paced_courses")
   end
 end
