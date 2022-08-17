@@ -49,7 +49,7 @@ const RosterTable = () => {
 
   if (loading) return <LoadingIndicator />
 
-  const {view_user_logins, read_sis} = ENV?.permissions || {}
+  const {view_user_logins, read_sis, read_reports} = ENV?.permissions || {}
 
   const tableRows = data.course.usersConnection.nodes.map(node => {
     const {name, _id, sisId, enrollments, loginId, avatarUrl, pronouns} = node
@@ -75,12 +75,16 @@ const RosterTable = () => {
         <Table.Cell>
           <RosterTableRoles enrollments={enrollments} />
         </Table.Cell>
-        <Table.Cell>
-          <RosterTableLastActivity enrollments={enrollments} />
-        </Table.Cell>
-        <Table.Cell>
-          {totalActivityTime ? secondsToStopwatchTime(totalActivityTime) : null}
-        </Table.Cell>
+        {read_reports && (
+          <Table.Cell>
+            <RosterTableLastActivity enrollments={enrollments} />
+          </Table.Cell>
+        )}
+        {read_reports && (
+          <Table.Cell>
+            {totalActivityTime > 0 && secondsToStopwatchTime(totalActivityTime)}
+          </Table.Cell>
+        )}
         <Table.Cell>
           <RosterTableRowMenuButton name={name} />
         </Table.Cell>
@@ -104,12 +108,16 @@ const RosterTable = () => {
           )}
           <Table.ColHeader {...idProps('colheader-section')}>{I18n.t('Section')}</Table.ColHeader>
           <Table.ColHeader {...idProps('colheader-role')}>{I18n.t('Role')}</Table.ColHeader>
-          <Table.ColHeader {...idProps('colheader-last-activity')}>
-            {I18n.t('Last Activity')}
-          </Table.ColHeader>
-          <Table.ColHeader {...idProps('colheader-total-activity')}>
-            {I18n.t('Total Activity')}
-          </Table.ColHeader>
+          {read_reports && (
+            <Table.ColHeader {...idProps('colheader-last-activity')}>
+              {I18n.t('Last Activity')}
+            </Table.ColHeader>
+          )}
+          {read_reports && (
+            <Table.ColHeader {...idProps('colheader-total-activity')}>
+              {I18n.t('Total Activity')}
+            </Table.ColHeader>
+          )}
           <Table.ColHeader {...idProps('colheader-context-menu')}>{}</Table.ColHeader>
         </Table.Row>
       </Table.Head>

@@ -106,6 +106,12 @@ const observer1 = {
   ]
 }
 
+const DATETIME_PATTERN = new RegExp(
+  /^[a-z]+ [0-3]?[0-9][, [0-9]*]? at [1]?[0-9]:[0-5][0-9](am|pm)$/, // Apr 16, 2021 at 12:34pm
+  'i'
+)
+const STOPWATCH_PATTERN = new RegExp(/^[0-9]+(:[0-5][0-9]){1,2}$/) // 00:00 or 00:00:00
+
 describe('RosterTable', () => {
   const setOnFailure = jest.fn()
   const setOnSuccess = jest.fn()
@@ -129,7 +135,8 @@ describe('RosterTable', () => {
       current_user: {id: '999'},
       permissions: {
         view_user_logins: true,
-        read_sis: true
+        read_sis: true,
+        read_reports: true
       }
     }
   })
@@ -205,10 +212,6 @@ describe('RosterTable', () => {
   })
 
   it('should display users last activity (if any) unless user is an observer', async () => {
-    const datetimePattern = new RegExp(
-      /^[a-z]+ [0-3]?[0-9][, [0-9]*]? at [1]?[0-9]:[0-5][0-9](am|pm)$/, // Apr 16, 2021 at 12:34pm
-      'i'
-    )
     const container = setup(getRosterQueryMock({mockUsers}))
     const rows = await container.findAllByTestId('roster-table-data-row')
     const lastActivityByUser = mockUsers.map(user => {
@@ -217,7 +220,7 @@ describe('RosterTable', () => {
         : user.enrollments[0].lastActivityAt
     })
     rows.forEach((row, index) => {
-      const lastActivity = queryAllByText(row, datetimePattern)
+      const lastActivity = queryAllByText(row, DATETIME_PATTERN)
       expect(lastActivity).toHaveLength(lastActivityByUser[index] ? 1 : 0)
     })
   })
@@ -227,8 +230,24 @@ describe('RosterTable', () => {
     const rows = await container.findAllByTestId('roster-table-data-row')
     const totalActivityByUser = mockUsers.map(user => user.enrollments[0].totalActivityTime)
     rows.forEach((row, index) => {
-      const totalActivity = queryAllByText(row, /^[0-9]+(:[0-5][0-9]){1,2}$/) // 00:00 or 00:00:00
+      const totalActivity = queryAllByText(row, STOPWATCH_PATTERN)
       expect(totalActivity).toHaveLength(totalActivityByUser[index] ? 1 : 0)
+    })
+  })
+
+  it('should not show the last activity or total activity time column if the read_reports permission is false', async () => {
+    window.ENV.permissions.read_reports = false
+    const container = setup(getRosterQueryMock({mockUsers}))
+    const rows = await container.findAllByTestId('roster-table-data-row')
+
+    // Check there is no column header
+    expect(container.queryAllByTestId('colheader-last-activity')).toHaveLength(0)
+    expect(container.queryAllByTestId('colheader-total-activity')).toHaveLength(0)
+
+    // Check there is no last activity or total activity time data
+    rows.forEach(row => {
+      expect(queryAllByText(row, DATETIME_PATTERN)).toHaveLength(0)
+      expect(queryAllByText(row, STOPWATCH_PATTERN)).toHaveLength(0)
     })
   })
 
