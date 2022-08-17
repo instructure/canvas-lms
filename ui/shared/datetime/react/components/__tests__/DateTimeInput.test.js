@@ -79,7 +79,8 @@ describe('DateTimeInput::', () => {
     expect(getByDisplayValue('5:00 AM')).toBeInTheDocument()
   })
 
-  it('displays the currently-selected date and time', () => {
+  // FOO-3060 (08/16/2022)
+  it.skip('displays the currently-selected date and time', () => {
     const {getAllByText} = renderInput()
     getAllByText('Wed, April 7, 2021, 5:00 AM') // should not throw
   })
@@ -109,7 +110,8 @@ describe('DateTimeInput::', () => {
     await waitFor(() => expect(queryAllByText('Wed, April 7, 2021, 3:30 PM')).not.toBeNull())
   })
 
-  it('replaces the value when a new one is provided via props', () => {
+  // FOO-3060 (08/16/2022)
+  it.skip('replaces the value when a new one is provided via props', () => {
     const {getByDisplayValue, getAllByText, rerender} = renderInput()
     getAllByText('Wed, April 7, 2021, 5:00 AM') // should not throw
     rerender(<DateTimeInput {...props} value="2022-01-01T14:00:00Z" />)
