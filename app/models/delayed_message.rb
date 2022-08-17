@@ -123,6 +123,10 @@ class DelayedMessage < ActiveRecord::Base
     context = delayed_messages.select{|m| m.context}.compact.first.try(:context)
     return nil unless context # the context for this message has already been deleted
     notification = BroadcastPolicy.notification_finder.by_name('Summaries')
+    if notification.nil?
+      Rails.logger.error "Failed to create notification. Notification 'Summaries' is null."
+      return nil
+    end
     path = HostUrl.outgoing_email_address
     root_account_id = delayed_messages.first.try(:root_account_id)
     locale = user.locale || (root_account_id && Account.where(id: root_account_id).first.try(:default_locale))
