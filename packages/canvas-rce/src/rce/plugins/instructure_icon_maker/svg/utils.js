@@ -25,12 +25,13 @@ export function createSvgElement(tag, attributes = {}) {
 }
 
 export function splitTextIntoLines(text, maxChars) {
-  const trimmedText = text.trim()
+  // Removes the beginning or trailing spaces, newlines or tabs.
+  const trimmedText = text.replace(/^\s+|\s+$/g, '')
   if (!text || trimmedText.length === 0 || maxChars <= 0) {
     return []
   }
   const lines = []
-  const words = trimmedText.split(' ')
+  const words = trimmedText.match(/\S+/g)
   while (words.length) {
     let newLineNeeded = false
     let line = ''
