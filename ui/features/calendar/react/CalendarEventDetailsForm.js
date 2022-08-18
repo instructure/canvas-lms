@@ -39,6 +39,7 @@ import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {DateTime} from '@instructure/ui-i18n'
+import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('calendar.edit_calendar_event')
 
@@ -317,7 +318,7 @@ const CalendarEventDetailsForm = ({
   }
 
   return (
-    <form data-testid="calendar-event-form" onSubmit={formSubmit}>
+    <View as="form" data-testid="calendar-event-form" onSubmit={formSubmit} margin="small">
       <FormFieldGroup description="" rowSpacing="small" vAlign="middle">
         <TextInput
           renderLabel={I18n.t('Title:')}
@@ -459,7 +460,7 @@ const CalendarEventDetailsForm = ({
             </Flex>
           </FormField>
         )}
-        <Flex justifyItems="end">
+        <Flex justifyItems="end" margin="medium none none none">
           <Flex.Item padding="none x-small" shouldShrink>
             <Button
               data-testid="edit-calendar-event-more-options-button"
@@ -478,7 +479,7 @@ const CalendarEventDetailsForm = ({
           </Flex.Item>
         </Flex>
       </FormFieldGroup>
-    </form>
+    </View>
   )
 }
 
