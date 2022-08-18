@@ -251,7 +251,7 @@ describe Attachment do
         end
       end
 
-      expect(created_jobs.size).to eq attempts
+      expect(created_jobs.count { |job| job.tag == "Attachment#submit_to_crocodoc" }).to eq attempts
     end
 
     it "submits to canvadocs if crocodoc fails to convert" do
@@ -536,7 +536,7 @@ describe Attachment do
       end
 
       expect(MediaObject.count).to eq 0
-      job = created_jobs.first
+      job = created_jobs.find { |j| j.tag == "MediaObject.add_media_files" }
       expect(job.tag).to eq "MediaObject.add_media_files"
       expect(job.run_at.to_i).to eq (now + 25.seconds).to_i
     end
@@ -2656,10 +2656,6 @@ describe Attachment do
     end
 
     describe "word count" do
-      before(:once) do
-        Account.site_admin.enable_feature!(:word_count_in_speed_grader)
-      end
-
       it "updates the word count for a PDF" do
         attachment_model(filename: "test.pdf", uploaded_data: fixture_file_upload("example.pdf", "application/pdf"))
         @attachment.update_word_count

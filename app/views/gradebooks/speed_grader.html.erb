@@ -167,9 +167,7 @@
             </div>
             <div id="submission_not_newest_notice" title='<%= t('titles.not_newest', "use the dropdown above to change which submission to look at") %>'><%= t(:not_newest_notice, "Note: This is not the most recent submission") %></div>
             <div id="submission_attachment_viewed_at_container"></div>
-            <% if Account.site_admin.feature_enabled?(:word_count_in_speed_grader) %>
-              <div id="submission_word_count"></div>
-            <% end %>
+            <div id="submission_word_count"></div>
             <div id="submission_files_container">
               <label><%= t("Submitted Files") %>: <span class="labelText--not-bold"><%= t("(click to load)") %></span>&nbsp;</label>
               <div id="submission_files_list">
