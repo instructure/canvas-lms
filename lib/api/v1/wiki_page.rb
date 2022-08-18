@@ -39,6 +39,7 @@ module Api::V1::WikiPage
     hash["front_page"] = wiki_page.is_front_page?
     hash["html_url"] = polymorphic_url([wiki_page.context, wiki_page])
     hash["todo_date"] = wiki_page.todo_date
+    hash["publish_at"] = wiki_page.publish_at
 
     hash["updated_at"] = wiki_page.revised_at
     if opts[:include_assignment] && wiki_page.for_assignment?

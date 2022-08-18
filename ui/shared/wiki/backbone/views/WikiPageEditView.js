@@ -182,6 +182,18 @@ export default class WikiPageEditView extends ValidatedFormView {
     if (!this.firstRender) {
       this.firstRender = true
       $(() => $('[autofocus]:not(:focus)').eq(0).focus())
+
+      const publishAtInput = $('#publish_at_input')
+      if (this.model.get('published')) {
+        publishAtInput.prop('disabled', true)
+      } else {
+        publishAtInput
+          .datetime_field()
+          .change(e => {
+            $('.save_and_publish').prop('disabled', e.target.value.length > 0)
+          })
+          .trigger('change')
+      }
     }
 
     this.reloadPending = false
@@ -314,6 +326,10 @@ export default class WikiPageEditView extends ValidatedFormView {
       page_data.student_todo_at = this.studentTodoAtDateValue
     } else {
       page_data.student_todo_at = null
+    }
+
+    if (page_data.publish_at) {
+      page_data.publish_at = $.unfudgeDateForProfileTimezone(page_data.publish_at)
     }
 
     if (this.shouldPublish) page_data.published = true

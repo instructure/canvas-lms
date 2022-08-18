@@ -234,6 +234,7 @@
             data-published="<%= module_item && item_data[:published_status] == 'published' %>"
             data-publishable="<%= module_item_publishable?(module_item) %>"
             data-unpublishable="<%= module_item_unpublishable?(module_item) %>"
+            data-publish-at="<%= module_item_publish_at(module_item) %>"
             data-publish-title="<%= module_item && module_item.title ? module_item.title : '' %>"
             title=""
             data-tooltip

@@ -86,6 +86,28 @@ describe ContextModule do
         expect(@file.reload.published?).to eql(true)
       end
     end
+
+    context "with scheduled page publication" do
+      before :once do
+        @page1 = @course.wiki_pages.create!(title: "foo", workflow_state: "unpublished")
+        @page2 = @course.wiki_pages.create!(title: "baz", workflow_state: "unpublished", publish_at: 1.week.from_now)
+        @module.add_item(id: @page1.id, type: "page")
+        @module.add_item(id: @page2.id, type: "page")
+      end
+
+      it "doesn't publish pages that are scheduled to be published" do
+        @course.root_account.enable_feature!(:scheduled_page_publication)
+        @module.publish_items!
+        expect(@page1.reload).to be_published
+        expect(@page2.reload).not_to be_published
+      end
+
+      it "ignores publish_at if the FF is off" do
+        @module.publish_items!
+        expect(@page1.reload).to be_published
+        expect(@page2.reload).to be_published
+      end
+    end
   end
 
   describe "can_be_duplicated?" do

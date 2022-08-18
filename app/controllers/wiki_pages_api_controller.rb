@@ -77,6 +77,11 @@
 #           "example": true,
 #           "type": "boolean"
 #         },
+#         "publish_at": {
+#           "description": "scheduled publication date for this page",
+#           "example": "2022-09-01T00:00:00",
+#           "type": "datetime"
+#         },
 #         "front_page": {
 #           "description": "whether this page is the front page for the wiki",
 #           "example": false,
@@ -326,6 +331,11 @@ class WikiPagesApiController < ApplicationController
   # @argument wiki_page[front_page] [Boolean]
   #   Set an unhidden page as the front page (if true)
   #
+  # @argument wiki_page[publish_at] [Optional, DateTime]
+  #   Schedule a future date/time to publish the page. This will have no effect unless the
+  #   "Scheduled Page Publication" feature is enabled in the account. If a future date is
+  #   supplied, the page will be unpublished and wiki_page[published] will be ignored.
+  #
   # @example_request
   #     curl -X POST -H 'Authorization: Bearer <token>' \
   #     https://<canvas>/api/v1/courses/123/pages \
@@ -395,6 +405,11 @@ class WikiPagesApiController < ApplicationController
   #
   # @argument wiki_page[published] [Boolean]
   #   Whether the page is published (true) or draft state (false).
+  #
+  # @argument wiki_page[publish_at] [Optional, DateTime]
+  #   Schedule a future date/time to publish the page. This will have no effect unless the
+  #   "Scheduled Page Publication" feature is enabled in the account. If a future date is
+  #   set and the page is already published, it will be unpublished.
   #
   # @argument wiki_page[front_page] [Boolean]
   #   Set an unhidden page as the front page (if true)
@@ -611,7 +626,7 @@ class WikiPagesApiController < ApplicationController
 
   def get_update_params(allowed_fields = Set[])
     # normalize parameters
-    page_params = params[:wiki_page] ? params[:wiki_page].permit(*%w[title body notify_of_update published front_page editing_roles]) : {}
+    page_params = params[:wiki_page] ? params[:wiki_page].permit(*%w[title body notify_of_update published front_page editing_roles publish_at]) : {}
 
     if page_params.key?(:published)
       published_value = page_params.delete(:published)

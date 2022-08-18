@@ -63,6 +63,10 @@ describe ContentMigration do
         @copy_from.calendar_events.create!(title: "an event",
                                            start_at: @old_start + 4.days,
                                            end_at: @old_start + 4.days + 1.hour)
+        @copy_from.wiki_pages.create!(title: "a page",
+                                      workflow_state: "unpublished",
+                                      todo_date: @old_start + 7.days,
+                                      publish_at: @old_start + 3.days)
         cm = @copy_from.context_modules.build(name: "some module", unlock_at: @old_start + 1.day)
         cm.save!
 
@@ -116,6 +120,10 @@ describe ContentMigration do
         new_event = @copy_to.calendar_events.first
         expect(new_event.start_at.to_i).to eq (@new_start + 4.days).to_i
         expect(new_event.end_at.to_i).to eq (@new_start + 4.days + 1.hour).to_i
+
+        new_page = @copy_to.wiki_pages.first
+        expect(new_page.todo_date.to_i).to eq (@new_start + 7.days).to_i
+        expect(new_page.publish_at.to_i).to eq (@new_start + 3.days).to_i
 
         new_mod = @copy_to.context_modules.first
         expect(new_mod.unlock_at.to_i).to eq (@new_start + 1.day).to_i
