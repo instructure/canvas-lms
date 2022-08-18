@@ -19,8 +19,7 @@ import I18n from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
 import {Model, Collection} from '@canvas/backbone'
-import TextHelper from '@canvas/util/TextHelper.coffee'
-
+import {formatMessage, plainText} from '@canvas/util/TextHelper'
 
 export default class Message extends Model
   initialize: ->
@@ -42,7 +41,7 @@ export default class Message extends Model
       data.messages.reverse()
       _.each data.messages, (message) ->
         message.author.name = message.author.display_name
-        message.bodyHTML = TextHelper.formatMessage(message.comment)
+        message.bodyHTML = formatMessage(message.comment)
         message.for_submission = true
       data.participants = _.uniq(_.map(data.submission_comments, (m) -> {name: m.author_name}), null, (u) -> u.name)
       data.last_authored_message_at = data.submission_comments[0].created_at
@@ -68,8 +67,8 @@ export default class Message extends Model
           message.hiddenParticipantCount = message.participants.length - 2
         message.context_name = data.context_name
         message.has_attachments = message.media_comment || message.attachments.length
-        message.bodyHTML = TextHelper.formatMessage(message.body)
-        message.text = TextHelper.plainText(message.body)
+        message.bodyHTML = formatMessage(message.body)
+        message.text = plainText(message.body)
     data
 
   handleMessages: ->

@@ -19,7 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
-import TextHelper from '@canvas/util/TextHelper.coffee'
+import {truncateText} from '@canvas/util/TextHelper'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/forms/jquery/jquery.instructure_forms'
 import 'jqueryui/dialog'
@@ -105,7 +105,7 @@ export function findLinkForService(service_type, callback) {
           for (const idx in data) {
             data[idx].short_title = data[idx].title
             if (data[idx].title == data[idx].description) {
-              data[idx].short_title = TextHelper.truncateText(data[idx].description, {max: 30})
+              data[idx].short_title = truncateText(data[idx].description, {max: 30})
             }
             $("<div class='bookmark'/>")
               .appendTo($dialog.find('.results'))

@@ -38,6 +38,7 @@ require "time" # https://github.com/rails/rails/pull/40859
 require "active_support/core_ext"
 require "sanitize"
 require "canvas_text_helper"
+require "twitter-text"
 
 module HtmlTextHelper
   def self.strip_tags(text)
@@ -222,34 +223,7 @@ module HtmlTextHelper
     txt
   end
 
-  # http://daringfireball.net/2010/07/improved_regex_for_matching_urls
-  # released to the public domain
-  AUTO_LINKIFY_PLACEHOLDER = "LINK-PLACEHOLDER"
-  AUTO_LINKIFY_REGEX = %r{
-    \b
-    (                                            # Capture 1: entire matched URL
-      (?:
-        https?://                                # http or https protocol
-        |                                        # or
-        www\d{0,3}[.]                            # "www.", "www1.", "www2." ... "www999."
-        |                                        # or
-        [a-z0-9.\-]+[.][a-z]{2,4}/               # looks like domain name followed by a slash
-      )
-
-      (?:
-        [^\s()<>]+                               # Run of non-space, non-()<>
-        |                                        # or
-        \([^\s()<>]*\)                           # balanced parens, single level
-      )+
-      (?:
-        \([^\s()<>]*\)                           # balanced parens, single level
-        |                                        # or
-        [^\s`!()\[\]{};:'".,<>?«»“”‘’]           # End with: not a space or one of these punct chars
-      )
-    ) | (
-      #{AUTO_LINKIFY_PLACEHOLDER}
-    )
-  }xi.freeze
+  AUTO_LINKIFY_PLACEHOLDER = "linkplaceholder.example.com"
 
   # Converts a plaintext message to html, with newlinification, quotification, and linkification
   def format_message(message, opts = { url: nil, notification_id: nil })
@@ -259,20 +233,23 @@ module HtmlTextHelper
     links = []
     placeholder_blocks = []
     message ||= ""
-    message = message.gsub(AUTO_LINKIFY_REGEX) do |match|
-      placeholder_blocks << if match == AUTO_LINKIFY_PLACEHOLDER
+    message = message.dup
+    # Process in reverse so indexes remain valid
+    Twitter::TwitterText::Extractor.extract_urls_with_indices(message).reverse_each do |data|
+      url = data[:url]
+      placeholder_blocks << if url == AUTO_LINKIFY_PLACEHOLDER
                               AUTO_LINKIFY_PLACEHOLDER
                             else
-                              s = $1
-                              link = s
-                              link = "http://#{link}" if link[0, 3] == "www"
+                              link = url
+                              link = "http://#{link}" unless link.start_with?(%r{https?://})
                               link = add_notification_to_link(link, opts[:notification_id]) if opts[:notification_id]
                               link = link.gsub("'", "%27")
                               links << link
-                              "<a href='#{ERB::Util.h(link)}'>#{ERB::Util.h(s)}</a>"
+                              "<a href='#{ERB::Util.h(link)}'>#{ERB::Util.h(url)}</a>"
                             end
-      AUTO_LINKIFY_PLACEHOLDER
+      message[data[:indices].first...data[:indices].last] = AUTO_LINKIFY_PLACEHOLDER
     end
+    placeholder_blocks.reverse!
 
     # now escape any html
     message = HtmlTextHelper.escape_html(message)

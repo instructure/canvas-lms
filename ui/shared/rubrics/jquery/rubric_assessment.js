@@ -21,7 +21,7 @@ import _ from 'lodash'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import htmlEscape from 'html-escape'
-import TextHelper from '@canvas/util/TextHelper.coffee'
+import {truncateText} from '@canvas/util/TextHelper'
 import round from 'round'
 import numberHelper from '@canvas/i18n/numberHelper'
 import '@canvas/forms/jquery/jquery.instructure_forms'/* fillFormData */
@@ -361,7 +361,7 @@ window.rubricAssessment = {
               '<option value="' +
                 htmlEscape(comments[jdx]) +
                 '">' +
-                htmlEscape(TextHelper.truncateText(comments[jdx], {max: 50})) +
+                htmlEscape(truncateText(comments[jdx], {max: 50})) +
                 '</option>'
             )
             $holder.show()

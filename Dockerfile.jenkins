@@ -42,6 +42,7 @@ RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
        python3-lxml \
        python-is-python3 \
        libicu-dev \
+       libidn11-dev \
        parallel \
        postgresql-client-$POSTGRES_CLIENT \
        unzip \

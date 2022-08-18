@@ -99,7 +99,7 @@ gem "inst-jobs-statsd", "2.2.0"
 # if updating json gem it will need to be hotfixed because if a newer version of
 # the json gem is installed, it will always use that one even before bundler
 # gets activated. Updating the gem in it's own commit will make this easier.
-gem "json", "2.6.1"
+gem "json", "~> 2.6.1"
 gem "json_schemer", "0.2.16", github: "robotdana/json_schemer", ref: "0d2ac359a87964f74c07a14cafeb98cfcae4e29f"
   gem "ecma-re-validator", "0.2.1"
 gem "json-jwt", "1.13.0", require: false
