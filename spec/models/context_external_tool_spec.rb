@@ -2492,6 +2492,16 @@ describe ContextExternalTool do
         tool.save!
         expect(tool.has_placement?(:link_selection)).to eq false
       end
+
+      it "returns true for module item if it is not selectable but has the explicit link_selection placement" do
+        tool = @course.context_external_tools.create!(name: "a", not_selectable: true, url: "http://google.com", consumer_key: "12345", shared_secret: "secret")
+        tool.link_selection = {
+          url: "http://google.com",
+          text: "Example"
+        }
+        tool.save!
+        expect(tool.has_placement?(:link_selection)).to eq true
+      end
     end
 
     describe ".find_tool_for_assignment" do
