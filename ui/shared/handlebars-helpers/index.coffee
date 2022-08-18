@@ -26,7 +26,7 @@ import semanticDateRange from '@canvas/datetime/semanticDateRange'
 import dateSelect from './dateSelect'
 import mimeClass from '@canvas/mime/mimeClass'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
-import textHelper from '@canvas/util/TextHelper.coffee'
+import {formatMessage, truncateText} from '@canvas/util/TextHelper'
 import numberFormat from '@canvas/i18n/numberFormat'
 import '@canvas/datetime'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
@@ -263,7 +263,7 @@ Handlebars.registerHelper name, fn for name, fn of {
   # Turns plaintext into HTML with links and newlines
   # Not for use by text in an RCE
   linkify: (text) ->
-    html = textHelper.formatMessage(text)
+    html = formatMessage(text)
     content = new Handlebars.SafeString html
     content
 
@@ -530,10 +530,10 @@ Handlebars.registerHelper name, fn for name, fn of {
     else
       ''
   truncate_left: ( string, max ) ->
-      return Handlebars.Utils.escapeExpression(textHelper.truncateText(string.split("").reverse().join(""), {max: max}).split("").reverse().join(""))
+      return Handlebars.Utils.escapeExpression(truncateText(string.split("").reverse().join(""), {max: max}).split("").reverse().join(""))
 
   truncate: ( string, max ) ->
-    return Handlebars.Utils.escapeExpression(textHelper.truncateText(string, {max: max}))
+    return Handlebars.Utils.escapeExpression(truncateText(string, {max: max}))
 
   escape_html: (string) ->
     htmlEscape string

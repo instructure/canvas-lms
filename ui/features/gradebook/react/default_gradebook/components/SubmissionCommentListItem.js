@@ -27,7 +27,7 @@ import {Button} from '@instructure/ui-buttons'
 import {IconEditLine, IconTrashLine} from '@instructure/ui-icons'
 
 import DateHelper from '@canvas/datetime/dateHelper'
-import TextHelper from '@canvas/util/TextHelper.coffee'
+import {truncateText} from '@canvas/util/TextHelper'
 import CommentPropTypes from '../propTypes/CommentPropTypes'
 import SubmissionCommentUpdateForm from './SubmissionCommentUpdateForm'
 
@@ -125,7 +125,7 @@ export default class SubmissionCommentListItem extends React.Component {
                   theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
                   margin="none none xxx-small"
                 >
-                  {TextHelper.truncateText(this.props.author, {max: 18})}
+                  {truncateText(this.props.author, {max: 18})}
                 </Link>
               </div>
 

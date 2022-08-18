@@ -18,7 +18,7 @@
 
 import Backbone from '@canvas/backbone'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import TextHelper from '@canvas/util/TextHelper.coffee'
+import * as TextHelper from '@canvas/util/TextHelper'
 
 const I18n = useI18nScope('modelsPageView')
 
