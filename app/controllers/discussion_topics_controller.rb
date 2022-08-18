@@ -662,7 +662,7 @@ class DiscussionTopicsController < ApplicationController
 
     set_master_course_js_env_data(@topic, @context)
     conditional_release_js_env(@topic.assignment)
-    render :edit
+    render :edit, layout: params[:embed] == "true" ? "mobile_embed" : true
   end
 
   def show
@@ -774,15 +774,19 @@ class DiscussionTopicsController < ApplicationController
         end
       end
 
+      edit_url = context_url(@topic.context, :edit_context_discussion_topic_url, @topic)
+      edit_url += "?embed=true" if params[:embed] == "true"
+
       js_env({
                course_id: params[:course_id] || @context.course&.id,
-               EDIT_URL: context_url(@topic.context, :edit_context_discussion_topic_url, @topic),
+               EDIT_URL: edit_url,
                PEER_REVIEWS_URL: @topic.assignment ? context_url(@topic.assignment.context, :context_assignment_peer_reviews_url, @topic.assignment.id) : nil,
                discussion_topic_id: params[:id],
                manual_mark_as_read: @current_user&.manual_mark_as_read?,
                discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),
                rce_mentions_in_discussions: @context.feature_enabled?(:react_discussions_post) && !@topic.anonymous?,
                isolated_view: Account.site_admin.feature_enabled?(:isolated_view),
+               discussion_grading_view: Account.site_admin.feature_enabled?(:discussion_grading_view),
                draft_discussions: Account.site_admin.feature_enabled?(:draft_discussions),
                discussion_anonymity_enabled: @context.feature_enabled?(:react_discussions_post),
                should_show_deeply_nested_alert: @current_user&.should_show_deeply_nested_alert?,

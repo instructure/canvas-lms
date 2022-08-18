@@ -31,6 +31,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import LatePolicyToolTipContent from './LatePolicyStatusDisplay/LatePolicyToolTipContent'
 import {Popover} from '@instructure/ui-popover'
 import {arrayOf, func} from 'prop-types'
+import OriginalityReport from './OriginalityReport'
 import React from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import StudentViewContext from './Context'
@@ -281,6 +282,17 @@ class Header extends React.Component {
                     !this.isPeerReviewModeEnabled() && (
                       <Flex.Item>
                         <SubmissionWorkflowTracker submission={this.props.submission} />
+                      </Flex.Item>
+                    )}
+
+                  {this.props.assignment.env.currentUser &&
+                    !lockAssignment &&
+                    (this.props.submission.submissionType === 'online_text_entry' ||
+                      this.props.submission.attachments.length === 1) &&
+                    this.props.submission.turnitinData &&
+                    this.props.submission.turnitinData.length !== 0 && (
+                      <Flex.Item>
+                        <OriginalityReport turnitinData={this.props.submission.turnitinData[0]} />
                       </Flex.Item>
                     )}
                 </Flex>

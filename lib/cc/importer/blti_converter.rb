@@ -91,6 +91,7 @@ module CC::Importer
           tool[:consumer_key] = ext[:custom_fields].delete "consumer_key"
           tool[:shared_secret] = ext[:custom_fields].delete "shared_secret"
           tool[:tool_id] = ext[:custom_fields].delete "tool_id"
+          tool[:lti_version] = ext[:custom_fields].delete "lti_version"
           if (tool[:assignment_points_possible] = ext[:custom_fields].delete("outcome"))
             tool[:assignment_points_possible] = tool[:assignment_points_possible].to_f
           end

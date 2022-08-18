@@ -21,6 +21,8 @@ import {fireEvent, render, waitFor} from '@testing-library/react'
 
 import {RotationControls} from '../RotationControls'
 
+jest.useFakeTimers()
+
 describe('RotationControls', () => {
   it('renders buttons', () => {
     const {container} = render(<RotationControls />)

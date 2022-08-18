@@ -628,6 +628,7 @@ CanvasRails::Application.routes.draw do
         delete :remove_role
       end
     end
+    get "calendar_settings", action: :account_calendar_settings, as: :calendar_settings
 
     scope(controller: :brand_configs) do
       get "theme_editor", action: :new, as: :theme_editor
@@ -647,6 +648,7 @@ CanvasRails::Application.routes.draw do
 
     resources :terms, except: %i[show new edit]
     resources :sub_accounts
+    resources :calendar_events
 
     get :avatars
     get :sis_import
@@ -1058,6 +1060,7 @@ CanvasRails::Application.routes.draw do
       put "account_calendars/:account_id", action: :update, as: :update_account_calendar
       put "accounts/:account_id/account_calendars", action: :bulk_update, as: :bulk_update_account_calendars
       get "accounts/:account_id/account_calendars", action: :all_calendars, as: :all_account_calendars
+      get "accounts/:account_id/visible_calendars_count", action: :visible_calendars_count, as: :visible_calendars_count
     end
 
     scope(controller: :account_notifications) do

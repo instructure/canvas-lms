@@ -151,24 +151,11 @@ def maybeRetrigger() {
 
 def maybeSlackSendFailure() {
   if (configuration.isChangeMerged()) {
-    def branchSegment = env.GERRIT_BRANCH ? "[$env.GERRIT_BRANCH]" : ''
-    def authorSlackId = env.GERRIT_EVENT_ACCOUNT_EMAIL ? slackUserIdFromEmail(email: env.GERRIT_EVENT_ACCOUNT_EMAIL, botUser: true, tokenCredentialId: 'slack-user-id-lookup') : ''
-    def authorSlackMsg = authorSlackId ? "<@$authorSlackId>" : env.GERRIT_EVENT_ACCOUNT_NAME
-    def authorSegment = "Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> by ${authorSlackMsg} failed against ${branchSegment}"
     def extra = 'Oh no! Your build failed the post-merge checks. If you have a test failure not related to your build, please reach out to the owning team and ask them to skip or fix the failed test. Spec flakiness can be investigated <https://inst.splunkcloud.com/en-US/app/search/canvas_spec_tracker|here>. Otherwise, tag our @ oncall for help in diagnosing the build issue if it is unclear.'
-
-    slackSend(
-      channel: getSlackChannel(),
-      color: 'danger',
-      message: "${authorSegment}. Build <${getSummaryUrl()}|#${env.BUILD_NUMBER}>\n\n$extra"
-    )
+    slackHelpers.sendSlackFailureWithMsg(getSlackChannel(), extra, true)
+  } else {
+    slackHelpers.sendSlackFailureWithDuration('#canvas_builds-noisy')
   }
-
-  slackSend(
-    channel: '#canvas_builds-noisy',
-    color: 'danger',
-    message: "${env.JOB_NAME} <${getSummaryUrl()}|#${env.BUILD_NUMBER}> failed. Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}>. (${currentBuild.durationString})"
-  )
 }
 
 def maybeSlackSendSuccess() {
@@ -295,7 +282,6 @@ pipeline {
     BASE_RUNNER_PREFIX = configuration.buildRegistryPath('base-runner')
     CASSANDRA_PREFIX = configuration.buildRegistryPath('cassandra-migrations')
     DYNAMODB_PREFIX = configuration.buildRegistryPath('dynamodb-migrations')
-    KARMA_BUILDER_PREFIX = configuration.buildRegistryPath('karma-builder')
     KARMA_RUNNER_PREFIX = configuration.buildRegistryPath('karma-runner')
     LINTERS_RUNNER_PREFIX = configuration.buildRegistryPath('linters-runner')
     POSTGRES_PREFIX = configuration.buildRegistryPath('postgres-migrations')
@@ -439,7 +425,7 @@ pipeline {
                     .hooks(buildSummaryReportHooks.call())
                     .obeysAllowStages(false)
                     .timeout(2)
-                    .execute(filesChangedStage.&call)
+                    .execute(filesChangedStage.&preBuild)
 
                   extendedStage('Build Docker Image (Pre-Merge)')
                     .hooks(buildSummaryReportHooks.call())
@@ -479,6 +465,12 @@ pipeline {
 
                       buildDockerImageStage.patchsetImage(asyncSteps.join("\n"))
                     }
+
+                  extendedStage(filesChangedStage.STAGE_NAME_POST_BUILD)
+                    .hooks(buildSummaryReportHooks.call())
+                    .obeysAllowStages(false)
+                    .timeout(2)
+                    .execute(filesChangedStage.&postBuild)
 
                   extendedStage(RUN_MIGRATIONS_STAGE)
                     .hooks(buildSummaryReportHooks.call())
@@ -545,8 +537,12 @@ pipeline {
                       sh 'build/new-jenkins/consumer-smoke-test.sh'
                     }
 
+                    def shouldRunJS = configuration.isChangeMerged() ||
+                      (!configuration.isChangeMerged() && (filesChangedStage.hasGraphqlFiles(buildConfig) || filesChangedStage.hasJsFiles(buildConfig)))
+
                     extendedStage(JS_BUILD_IMAGE_STAGE)
                       .hooks(buildSummaryReportHooks.call())
+                      .required(shouldRunJS)
                       .queue(stages, buildDockerImageStage.&jsImage)
 
                     extendedStage(LINTERS_BUILD_IMAGE_STAGE)
@@ -557,6 +553,14 @@ pipeline {
                       .hooks(buildSummaryReportHooks.call())
                       .required(configuration.isChangeMerged())
                       .queue(stages, buildDockerImageStage.&i18nExtract)
+
+                    def shouldRunGraphQL = (configuration.isChangeMerged() && filesChangedStage.hasGraphqlFiles(buildConfig)) || configuration.apolloForceGraphqlSchemaCheck()
+
+                    extendedStage('GraphQL Post-Merge Schema Check')
+                      .hooks(buildSummaryReportHooks.call())
+                      .required(shouldRunGraphQL)
+                      .timeout(2)
+                      .queue(stages, graphqlSchemaCheckStage.&call)
 
                     parallel(stages)
                   }

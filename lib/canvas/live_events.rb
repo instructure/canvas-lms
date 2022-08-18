@@ -1015,6 +1015,18 @@ module Canvas::LiveEvents
     }
   end
 
+  def self.default_blueprint_restrictions_updated(master_template)
+    post_event_stringified("default_blueprint_restrictions_updated", default_blueprint_restrictions_updated_data(master_template))
+  end
+
+  def self.default_blueprint_restrictions_updated_data(master_template)
+    {
+      canvas_course_id: master_template.course.id,
+      canvas_course_uuid: master_template.course.uuid,
+      restrictions: master_template.use_default_restrictions_by_type ? master_template.default_restrictions_by_type["Assignment"] : master_template.default_restrictions
+    }
+  end
+
   def self.heartbeat
     data = {
       environment: Canvas.environment,

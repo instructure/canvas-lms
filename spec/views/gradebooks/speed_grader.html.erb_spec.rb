@@ -85,18 +85,10 @@ describe "/gradebooks/speed_grader" do
     expect(rendered).to include '<div id="post-assignment-grades-tray"></div>'
   end
 
-  it "includes a mount point for editing submission status when feature flag is enabled" do
-    Account.site_admin.enable_feature!(:edit_submission_status_from_speedgrader)
+  it "includes a mount point for editing submission status" do
     render template: "gradebooks/speed_grader", locals: locals
     expect(rendered).to include '<div id="speed_grader_edit_status_mount_point"></div>'
     expect(rendered).to include '<div id="speed_grader_edit_status_secondary_mount_point"></div>'
-  end
-
-  it "does not include a mount point for editing submission status when feature flag is disabled" do
-    Account.site_admin.disable_feature!(:edit_submission_status_from_speedgrader)
-    render template: "gradebooks/speed_grader", locals: locals
-    expect(rendered).to_not include '<div id="speed_grader_edit_status_mount_point"></div>'
-    expect(rendered).to_not include '<div id="speed_grader_edit_status_secondary_mount_point"></div>'
   end
 
   it "includes a link back to the gradebook (gradebook by default)" do

@@ -76,6 +76,7 @@ class Account < ActiveRecord::Base
            -> { ordered },
            inverse_of: :account,
            extend: AuthenticationProvider::FindWithType
+  has_many :calendar_events, -> { where("calendar_events.workflow_state<>'cancelled'") }, as: :context, inverse_of: :context, dependent: :destroy
 
   has_many :account_reports, inverse_of: :account
   has_many :grading_standards, -> { where("workflow_state<>'deleted'") }, as: :context, inverse_of: :context
@@ -1797,6 +1798,7 @@ class Account < ActiveRecord::Base
   TAB_SEARCH = 18
   TAB_BRAND_CONFIGS = 19
   TAB_EPORTFOLIO_MODERATION = 20
+  TAB_ACCOUNT_CALENDARS = 21
 
   # site admin tabs
   TAB_PLUGINS = 14
@@ -1835,6 +1837,7 @@ class Account < ActiveRecord::Base
       tabs << { id: TAB_GRADING_STANDARDS, label: t("#account.tab_grading_standards", "Grading"), css_class: "grading_standards", href: :account_grading_standards_path } if user && grants_right?(user, :manage_grades)
       tabs << { id: TAB_QUESTION_BANKS, label: t("#account.tab_question_banks", "Question Banks"), css_class: "question_banks", href: :account_question_banks_path } if user && grants_any_right?(user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
       tabs << { id: TAB_SUB_ACCOUNTS, label: t("#account.tab_sub_accounts", "Sub-Accounts"), css_class: "sub_accounts", href: :account_sub_accounts_path } if manage_settings
+      tabs << { id: TAB_ACCOUNT_CALENDARS, label: t("Account Calendars"), css_class: "account_calendars", href: :account_calendar_settings_path } if user && grants_right?(user, :manage_account_calendar_visibility)
       tabs << { id: TAB_FACULTY_JOURNAL, label: t("#account.tab_faculty_journal", "Faculty Journal"), css_class: "faculty_journal", href: :account_user_notes_path } if enable_user_notes && user && grants_right?(user, :manage_user_notes)
       tabs << { id: TAB_TERMS, label: t("#account.tab_terms", "Terms"), css_class: "terms", href: :account_terms_path } if root_account? && manage_settings
       tabs << { id: TAB_AUTHENTICATION, label: t("#account.tab_authentication", "Authentication"), css_class: "authentication", href: :account_authentication_providers_path } if root_account? && manage_settings

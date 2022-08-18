@@ -74,7 +74,7 @@ module.exports = {
   moduleFileExtensions: [...defaults.moduleFileExtensions, 'coffee', 'handlebars'],
   restoreMocks: true,
 
-  testEnvironment: 'jsdom',
+  testEnvironment: '<rootDir>/jest/strictTimeLimitEnvironment.js',
 
   transform: {
     '\\.coffee$': '<rootDir>/jest/coffeeTransformer.js',

@@ -60,6 +60,17 @@ module Types
       value "inactive"
     end
 
+    class CourseFilterableEnrollmentType < BaseEnum
+      graphql_name "CourseFilterableEnrollmentType"
+      description "Users in a course can be returned based on these enrollment types"
+      value "StudentEnrollment"
+      value "TeacherEnrollment"
+      value "TaEnrollment"
+      value "ObserverEnrollment"
+      value "DesignerEnrollment"
+      value "StudentViewEnrollment"
+    end
+
     class CourseUsersFilterInputType < Types::BaseInputObject
       graphql_name "CourseUsersFilter"
 
@@ -73,6 +84,9 @@ module Types
                  only return users with the given enrollment state. defaults
                  to `invited`, `creation_pending`, `active`
                MD
+               required: false
+      argument :enrollment_types, [CourseFilterableEnrollmentType],
+               "Only return users with the specified enrollment types",
                required: false
     end
 
@@ -159,7 +173,8 @@ module Types
       context.scoped_merge!(course: course)
       scope = UserSearch.scope_for(course, current_user,
                                    include_inactive_enrollments: true,
-                                   enrollment_state: filter[:enrollment_states])
+                                   enrollment_state: filter[:enrollment_states],
+                                   enrollment_type: filter[:enrollment_types])
 
       user_ids = filter[:user_ids] || user_ids
       if user_ids.present?

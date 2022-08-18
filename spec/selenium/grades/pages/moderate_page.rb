@@ -146,6 +146,10 @@ class ModeratePage
       f(".GradesGrid__FinalGradeCell input", student_table_row_by_displayed_name(student.name))
     end
 
+    def selected_grade
+      ff("[data-testid='moderated-graded-select']")[0].attribute("value")
+    end
+
     def grade_input_dropdown_list(student)
       ff("ul##{grade_input(student).attribute("aria-controls")} li span[role='option']")
     end

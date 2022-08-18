@@ -36,9 +36,10 @@ import {
 } from '@canvas/outcomes/mocks/Management'
 import {clickEl} from '@canvas/outcomes/react/helpers/testHelpers'
 import resolveProgress from '@canvas/progress/resolve_progress'
+import {ROOT_GROUP} from '@canvas/outcomes/react/hooks/useOutcomesImport'
 
 jest.mock('@canvas/progress/resolve_progress')
-jest.useFakeTimers({ legacyFakeTimers: true })
+jest.useFakeTimers({legacyFakeTimers: true})
 
 const delayImportOutcomesProgress = () => {
   let realResolve
@@ -79,6 +80,8 @@ const defaultTreeGroupMocks = () =>
 describe('FindOutcomesModal', () => {
   let cache
   let onCloseHandlerMock
+  let setTargetGroupIdsToRefetchMock
+  let setImportsTargetGroupMock
   let showFlashAlertSpy
   let isMobileView
   const withFindGroupRefetch = true
@@ -95,12 +98,17 @@ describe('FindOutcomesModal', () => {
   ]
   const defaultProps = (props = {}) => ({
     open: true,
+    importsTargetGroup: {},
     onCloseHandler: onCloseHandlerMock,
+    setTargetGroupIdsToRefetch: setTargetGroupIdsToRefetchMock,
+    setImportsTargetGroup: setImportsTargetGroupMock,
     ...props
   })
 
   beforeEach(() => {
     onCloseHandlerMock = jest.fn()
+    setTargetGroupIdsToRefetchMock = jest.fn()
+    setImportsTargetGroupMock = jest.fn()
     cache = createCache()
     showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
     window.ENV = {}
@@ -428,6 +436,9 @@ describe('FindOutcomesModal', () => {
         await clickEl(getByText('Root Account Outcome Group 0'))
         await clickEl(getByText('Group 100 folder 0'))
         await clickEl(getByText('Add All Outcomes').closest('button'))
+        expect(setImportsTargetGroupMock).toHaveBeenCalledTimes(1)
+        expect(setImportsTargetGroupMock).toHaveBeenCalledWith({300: ROOT_GROUP})
+        expect(setTargetGroupIdsToRefetchMock).toHaveBeenCalledTimes(1)
         expect(
           getAllByText(
             'All outcomes from Group 300 have been successfully added to this account.'

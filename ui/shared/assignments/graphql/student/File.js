@@ -47,6 +47,7 @@ export const SubmissionFile = {
       id
       mimeClass
       submissionPreviewUrl(submissionId: $submissionID)
+      size
       thumbnailUrl
       url
     }
@@ -58,6 +59,7 @@ export const SubmissionFile = {
     id: string,
     mimeClass: string,
     submissionPreviewUrl: string,
+    size: string,
     thumbnailUrl: string,
     url: string
   })

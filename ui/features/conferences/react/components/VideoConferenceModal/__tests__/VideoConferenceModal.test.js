@@ -21,19 +21,47 @@ import {fireEvent, render} from '@testing-library/react'
 import {VideoConferenceModal} from '../VideoConferenceModal'
 import userEvent from '@testing-library/user-event'
 
+const userList = [
+  {displayName: 'Allison Pitler', id: '7'},
+  {displayName: 'Caleb Guanzon', id: '3'},
+  {displayName: 'Chawn Neal', id: '2'},
+  {displayName: 'Drake Harper', id: '1'},
+  {displayName: 'Jason Gillet', id: '5'},
+  {displayName: 'Jeffrey Johnson', id: '0'},
+  {displayName: 'Jewel Pearson', id: '8'},
+  {displayName: 'Nic Nolan', id: '6'},
+  {displayName: 'Omar Soto Fortuno', id: '4'}
+]
+
 describe('VideoConferenceModal', () => {
   const onDismiss = jest.fn()
   const onSubmit = jest.fn()
 
   const setup = (props = {}) => {
     return render(
-      <VideoConferenceModal open onDismiss={onDismiss} onSubmit={onSubmit} {...props} />
+      <VideoConferenceModal
+        open
+        availableAttendeesList={userList}
+        onDismiss={onDismiss}
+        onSubmit={onSubmit}
+        {...props}
+      />
     )
   }
 
   beforeEach(() => {
     onDismiss.mockClear()
     onSubmit.mockClear()
+    window.ENV.conference_type_details = [
+      {
+        name: 'BigBlueButton',
+        type: 'BigBlueButton',
+        settings: [],
+        free_trial: false,
+        lti_settings: null,
+        contexts: null
+      }
+    ]
   })
 
   it('should render', () => {
@@ -121,7 +149,8 @@ describe('VideoConferenceModal', () => {
       options: ['recording_enabled'],
       description: 'An introduction to PHP.',
       invitationOptions: [],
-      attendeesOptions: ['share_webcam']
+      attendeesOptions: ['share_webcam'],
+      type: 'BigBlueButton'
     })
 
     expect(container.getByText('Save')).toBeInTheDocument()

@@ -39,6 +39,14 @@ draft_discussions:
     in the discussions redesign
   applies_to: SiteAdmin
 
+discussion_grading_view:
+  state: hidden
+  beta: true
+  display_name: Discussion Redesign Grading View
+  description: |-
+    Will allow for graders to grade assigned discussions without leaving discussion page
+  applies_to: SiteAdmin
+
 isolated_view:
   state: hidden
   display_name: Discussions Redesign - Isolated View

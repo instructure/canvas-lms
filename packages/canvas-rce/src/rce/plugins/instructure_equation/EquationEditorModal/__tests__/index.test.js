@@ -17,10 +17,12 @@
  */
 
 import React from 'react'
-import {fireEvent, render, screen, waitFor} from '@testing-library/react'
+import {act, fireEvent, render, screen, waitFor} from '@testing-library/react'
 import EquationEditorModal from '../index'
 import mathml from '../mathml'
 import advancedPreference from '../advancedPreference'
+
+jest.useFakeTimers()
 
 const defaultProps = () => {
   return {
@@ -82,14 +84,14 @@ describe('EquationEditorModal', () => {
       }
     }
 
-    HTMLElement.prototype.getValue = jest.fn().mockImplementation(function () {
+    MathfieldElement.prototype.getValue = jest.fn().mockImplementation(function () {
       if (this.tagName === 'MATH-FIELD') {
         return this.innerHTML
       }
       return null
     })
 
-    HTMLElement.prototype.setValue = jest.fn().mockImplementation(function (value) {
+    MathfieldElement.prototype.setValue = jest.fn().mockImplementation(function (value) {
       if (this.tagName === 'MATH-FIELD') {
         this.innerHTML = value
       }
@@ -118,17 +120,17 @@ describe('EquationEditorModal', () => {
         })
       }
     }
-    HTMLElement.prototype.setOptions = jest.fn()
+    MathfieldElement.prototype.setOptions = jest.fn()
   })
 
   afterEach(() => {
     jest.clearAllMocks()
-    delete HTMLElement.prototype.setOptions
+    delete MathfieldElement.prototype.setOptions
   })
 
   it('disables all the basic editor macros', () => {
     renderModal({editor})
-    expect(HTMLElement.prototype.setOptions).toHaveBeenCalledWith({macros: {}})
+    expect(MathfieldElement.prototype.setOptions).toHaveBeenCalledWith({macros: {}})
   })
 
   describe('loadExistingFormula', () => {
@@ -408,6 +410,7 @@ describe('EquationEditorModal', () => {
       renderModal({editor})
       toggleMode()
       editInAdvancedMode('hello')
+      await act(async () => jest.runAllTimers())
       await waitFor(() => {
         expect(mathml.processNewMathInElem.mock.calls[0][0]).toMatchInlineSnapshot(`
           <span
@@ -567,22 +570,22 @@ describe('EquationEditorModal', () => {
 
     describe('original state is restored when', () => {
       it('the close button is clicked', () => {
-        const {getByRole} = renderModal()
-        const closeButton = getByRole('button', {name: /close/i})
+        const {getByTestId} = renderModal()
+        const closeButton = getByTestId('equation-editor-modal-close').querySelector('button')
         fireEvent.click(closeButton)
         expect(ENV.disable_keyboard_shortcuts).toBe(false)
       })
 
       it('the cancel button is clicked', () => {
-        const {getByRole} = renderModal()
-        const cancelButton = getByRole('button', {name: /cancel/i})
+        const {getByTestId} = renderModal()
+        const cancelButton = getByTestId('equation-editor-modal-cancel')
         fireEvent.click(cancelButton)
         expect(ENV.disable_keyboard_shortcuts).toBe(false)
       })
 
       it('the done button is clicked', () => {
-        const {getByRole} = renderModal()
-        const doneButton = getByRole('button', {name: /done/i})
+        const {getByTestId} = renderModal()
+        const doneButton = getByTestId('equation-editor-modal-done')
         fireEvent.click(doneButton)
         expect(ENV.disable_keyboard_shortcuts).toBe(false)
       })

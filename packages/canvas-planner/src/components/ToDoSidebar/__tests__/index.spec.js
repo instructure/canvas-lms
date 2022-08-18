@@ -184,3 +184,9 @@ it('renders an error message when loading fails', () => {
 
   expect(wrapper.text()).toContain('Failure loading the To Do list')
 })
+
+it('renders additional context title', () => {
+  const wrapper = mount(<ToDoSidebar {...defaultProps} additionalTitleContext />)
+
+  expect(wrapper.text()).toContain('Student To Do')
+})

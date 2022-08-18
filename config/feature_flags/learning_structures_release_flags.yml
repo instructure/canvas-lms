@@ -25,6 +25,11 @@ auto_show_cc:
     Automatically show closed captions in the user's current
     language (if available) when playing canvas media.
   applies_to: User
+confetti_branding:
+  state: 'hidden'
+  display_name: 'Account branding for confetti'
+  description: Applies account branding to confetti splashes
+  applies_to: SiteAdmin
 course_paces:
   state: hidden
   display_name: 'Course Pacing'
@@ -67,13 +72,6 @@ create_course_subaccount_picker:
     "Manually Created Courses" sub-account, when enabled, this feature allows
     people who can manually create courses to put those courses into any sub-account
     where they have enrollments.
-conferencing_in_planner:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Conferencing in planner
-  description: |-
-    When enabled, this flag shows a "Join" button on Canvas calendar
-    events in the student planner
 account_calendar_events:
   applies_to: SiteAdmin
   state: hidden
@@ -128,3 +126,9 @@ account_level_blackout_dates:
   display_name: Account-level course pacing blackout dates
   description: |-
     Allow course pacing blackout dates to be set for accounts instead of just courses.
+render_both_to_do_lists:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Render both To Do lists for teachers with student enrollments
+  description: |-
+    Renders both To Do lists on the dashboard sidebar for teachers with student enrollments.

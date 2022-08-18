@@ -128,6 +128,23 @@ describe Loaders::DiscussionEntryLoader do
     end
   end
 
+  it "includes all entries where user_search_id matches" do
+    de5 = @de4.discussion_subentries.create!(discussion_topic: @discussion, message: "grandchild but legacy false")
+    de6 = @de4.discussion_subentries.create!(discussion_topic: @discussion, message: "grandchild but legacy true")
+    # legacy gets set based on the feature flag state so explicitly updating the entries.
+    DiscussionEntry.where(id: de5).update_all(legacy: false, parent_id: @de4.id)
+    DiscussionEntry.where(id: de6).update_all(legacy: false, parent_id: @de4.id, user_id: @teacher.id)
+
+    GraphQL::Batch.batch do
+      Loaders::DiscussionEntryLoader.for(
+        current_user: @teacher,
+        user_search_id: @teacher.id
+      ).load(@de2).then do |discussion_entries|
+        expect(discussion_entries.map(&:id)).to match_array [@de4.id, de6.id]
+      end
+    end
+  end
+
   it "allows querying root discussion entries only" do
     GraphQL::Batch.batch do
       Loaders::DiscussionEntryLoader.for(

@@ -20,17 +20,49 @@ import React from 'react'
 
 import {VideoConferenceModal} from './VideoConferenceModal'
 
+const userList = [
+  {displayName: 'Allison Pitler', id: '7'},
+  {displayName: 'Caleb Guanzon', id: '3'},
+  {displayName: 'Chawn Neal', id: '2'},
+  {displayName: 'Drake Harper', id: '1'},
+  {displayName: 'Jason Gillet', id: '5'},
+  {displayName: 'Jeffrey Johnson', id: '0'},
+  {displayName: 'Jewel Pearson', id: '8'},
+  {displayName: 'Nic Nolan', id: '6'},
+  {displayName: 'Omar Soto Fortuno', id: '4'}
+]
+
 export default {
   title: 'Examples/Conferences/VideoConferenceModal',
   component: VideoConferenceModal,
   argTypes: {}
 }
 
+window.ENV.conference_type_details = [
+  {
+    name: 'Adobe Connect',
+    type: 'AdobeConnect',
+    settings: [],
+    free_trial: false,
+    lti_settings: null,
+    contexts: null
+  },
+  {
+    name: 'BigBlueButton',
+    type: 'BigBlueButton',
+    settings: [],
+    free_trial: false,
+    lti_settings: null,
+    contexts: null
+  }
+]
+
 const Template = args => <VideoConferenceModal {...args} />
 
 export const Default = Template.bind({})
 Default.args = {
-  open: true
+  open: true,
+  availableAttendeesList: userList
 }
 
 export const WhileEditing = Template.bind({})
@@ -42,5 +74,8 @@ WhileEditing.args = {
   options: ['recording_enabled'],
   description: 'An introduction to PHP.',
   invitationOptions: [],
-  attendeesOptions: ['share_webcam']
+  attendeesOptions: ['share_webcam'],
+  type: 'BigBlueButton',
+  availableAttendeesList: userList,
+  selectedAttendees: ['2', '3', '7']
 }

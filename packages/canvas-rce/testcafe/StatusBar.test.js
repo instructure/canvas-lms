@@ -100,7 +100,7 @@ test.skip('drag handle in rce mode also resizes the textarea', async t => {
   await t.expect(textareaHeight).eql(applicationHeight)
 })
 
-test('drag handle in textarea mode also resizes the rce', async t => {
+test.skip('drag handle in textarea mode also resizes the rce', async t => {
   await t.click(toggleButton).drag(dragHandle, 0, 400)
   const textareaHeight = await textArea.getStyleProperty('height')
   await t.click(toggleButton)

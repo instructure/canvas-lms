@@ -18,17 +18,19 @@
 
 import {MockedProvider} from '@apollo/react-testing'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {render, within} from '@testing-library/react'
+import {render, within, queryAllByText} from '@testing-library/react'
 import React from 'react'
 import RosterTable from '../RosterTable'
 import {mockUser, mockEnrollment, getRosterQueryMock} from '../../../../graphql/Mocks'
+import {ACTIVE_STATE, PILL_MAP} from '../../../components/StatusPill/StatusPill'
 
 const designer1 = {
   name: 'Designer 1',
   _id: '10',
   sisId: 'Designer1-SIS-ID',
   loginId: 'Designer1@instructure.com',
-  enrollmentType: 'DesignerEnrollment'
+  enrollmentType: 'DesignerEnrollment',
+  sisRole: 'designer'
 }
 
 const teacher1 = {
@@ -39,7 +41,8 @@ const teacher1 = {
   sisId: 'Teacher1-SIS-ID',
   loginId: 'teacher1@instructure.com',
   enrollmentType: 'TeacherEnrollment',
-  lastActivityAt: '2022-07-27T10:11:33-06:00',
+  sisRole: 'teacher',
+  lastActivityAt: '2022-07-27T10:21:33-06:00',
   totalActivityTime: 60708
 }
 
@@ -49,7 +52,10 @@ const ta1 = {
   pronouns: 'She/Her',
   sisId: 'TA1-SIS-ID',
   loginId: 'TA1@instructure.com',
-  enrollmentType: 'TaEnrollment'
+  enrollmentType: 'TaEnrollment',
+  sisRole: 'ta',
+  lastActivityAt: '2022-08-16T14:08:13-06:00',
+  totalActivityTime: 407
 }
 
 const student1 = {
@@ -57,7 +63,9 @@ const student1 = {
   _id: '31',
   pronouns: 'They/Them',
   sisId: 'Student1-SIS-ID',
-  loginId: 'Student1@instructure.com'
+  loginId: 'Student1@instructure.com',
+  lastActivityAt: '2021-11-04T09:54:01-06:00',
+  totalActivityTime: 90
 }
 
 const student2 = {
@@ -66,7 +74,7 @@ const student2 = {
   avatarUrl: 'https://gravatar.com/avatar/52c160622b09015c70fa0f4c25de6cca?s=200&d=identicon&r=pg',
   sisId: 'Student2-SIS-ID',
   loginId: 'Student2@instructure.com',
-  enrollmentStatus: 'pending'
+  enrollmentStatus: 'invited'
 }
 
 const student3 = {
@@ -83,6 +91,7 @@ const observer1 = {
   sisId: 'Observer1-SIS-ID',
   loginId: 'Observer1@instructure.com',
   enrollmentType: 'ObserverEnrollment',
+  sisRole: 'observer',
   additionalEnrollments: [
     mockEnrollment({
       _id: '40',
@@ -117,7 +126,11 @@ describe('RosterTable', () => {
   beforeEach(() => {
     window.ENV = {
       course: {id: '1'},
-      current_user: {id: '999'}
+      current_user: {id: '999'},
+      permissions: {
+        view_user_logins: true,
+        read_sis: true
+      }
     }
   })
 
@@ -159,32 +172,117 @@ describe('RosterTable', () => {
 
   it('should wrap the name of each user in a button', async () => {
     const container = setup(getRosterQueryMock({mockUsers}))
-    const rows = await container.findAllByTestId('roster-table-data-row')
-    const names = [designer1, teacher1, ta1, student1, student2, student3, observer1].map(
-      user => user.name
-    )
-    rows.forEach((row, index) => {
-      const button = within(row).getByRole('button', {name: names[index]})
+    const cells = await container.findAllByTestId('roster-table-name-cell')
+    const names = mockUsers.map(user => user.name)
+    cells.forEach((cell, index) => {
+      const nameMatch = new RegExp(names[index])
+      const button = within(cell).getByRole('button', {name: nameMatch})
       expect(button).toBeInTheDocument()
     })
   })
 
   it('should link the current_user to their user detail page when clicking their own name', async () => {
-    window.ENV = {...window.ENV, current_user: {id: '1'}}
-    const container = setup(getRosterQueryMock({mockUsers}))
-    const link = await container.findByRole('link', {name: teacher1.name})
-    expect(link).toHaveAttribute('href', mockUsers[1].node.enrollments.htmlUrl)
+    const self = teacher1
+    window.ENV = {...window.ENV, current_user: {id: self._id}}
+    const mockSelf = mockUser(self)
+    const nameMatch = new RegExp(self.name)
+
+    const container = setup(getRosterQueryMock({mockUsers: [mockSelf]}))
+    const cells = await container.findByTestId('roster-table-name-cell')
+    const link = within(cells).getByRole('link', {name: nameMatch})
+    expect(link).toHaveAttribute('href', mockSelf.enrollments.htmlUrl)
   })
 
   it('should not link the current_user to the user detail page when clicking a name that is not their own', async () => {
     const container = setup(getRosterQueryMock({mockUsers}))
-    const rows = await container.findAllByTestId('roster-table-data-row')
-    const names = [designer1, teacher1, ta1, student1, student2, student3, observer1].map(
-      user => user.name
-    )
-    rows.forEach((row, index) => {
-      const button = within(row).getByRole('button', {name: names[index]})
+    const cells = await container.findAllByTestId('roster-table-name-cell')
+    const names = mockUsers.map(user => user.name)
+    cells.forEach((cell, index) => {
+      const nameMatch = new RegExp(names[index])
+      const button = within(cell).getByRole('button', {name: nameMatch})
       expect(button).not.toHaveAttribute('href')
+    })
+  })
+
+  it('should display users last activity (if any) unless user is an observer', async () => {
+    const datetimePattern = new RegExp(
+      /^[a-z]+ [0-3]?[0-9][, [0-9]*]? at [1]?[0-9]:[0-5][0-9](am|pm)$/, // Apr 16, 2021 at 12:34pm
+      'i'
+    )
+    const container = setup(getRosterQueryMock({mockUsers}))
+    const rows = await container.findAllByTestId('roster-table-data-row')
+    const lastActivityByUser = mockUsers.map(user => {
+      return user.enrollments[0].type === 'ObserverEnrollment'
+        ? null
+        : user.enrollments[0].lastActivityAt
+    })
+    rows.forEach((row, index) => {
+      const lastActivity = queryAllByText(row, datetimePattern)
+      expect(lastActivity).toHaveLength(lastActivityByUser[index] ? 1 : 0)
+    })
+  })
+
+  it('should display users total activity time only if total time is greater than zero', async () => {
+    const container = setup(getRosterQueryMock({mockUsers}))
+    const rows = await container.findAllByTestId('roster-table-data-row')
+    const totalActivityByUser = mockUsers.map(user => user.enrollments[0].totalActivityTime)
+    rows.forEach((row, index) => {
+      const totalActivity = queryAllByText(row, /^[0-9]+(:[0-5][0-9]){1,2}$/) // 00:00 or 00:00:00
+      expect(totalActivity).toHaveLength(totalActivityByUser[index] ? 1 : 0)
+    })
+  })
+
+  it('should list the user pronouns if available', async () => {
+    const container = setup(getRosterQueryMock({mockUsers}))
+    const cells = await container.findAllByTestId('roster-table-name-cell')
+    const userPronouns = mockUsers.map(user => user.pronouns)
+    cells.forEach((cell, index) => {
+      if (userPronouns[index]) {
+        const pronounMatch = new RegExp(userPronouns[index], 'i')
+        expect(within(cell).getByText(pronounMatch)).toBeInTheDocument()
+      }
+    })
+  })
+
+  it('should list the user status if not active', async () => {
+    const container = setup(getRosterQueryMock({mockUsers}))
+    const cells = await container.findAllByTestId('roster-table-name-cell')
+    const userStatus = mockUsers.map(user => user.enrollments[0].state)
+    cells.forEach((cell, index) => {
+      if (userStatus[index] !== ACTIVE_STATE) {
+        const status = PILL_MAP[userStatus[index]].text
+        expect(within(cell).getByText(status)).toBeInTheDocument()
+      }
+    })
+  })
+
+  it('should not show the login ID column if the view_user_logins permission is false', async () => {
+    window.ENV.permissions.view_user_logins = false
+    const container = setup(getRosterQueryMock({mockUsers}))
+
+    // Check there is no column header
+    const rows = await container.findAllByTestId('roster-table-data-row')
+    expect(container.queryAllByTestId('colheader-login-id')).toHaveLength(0)
+
+    // Check there is no login id data
+    const loginIdByUser = mockUsers.map(user => user.enrollments[0].loginId)
+    rows.forEach((row, index) => {
+      loginIdByUser[index] && expect(queryAllByText(row, loginIdByUser[index])).toHaveLength(0)
+    })
+  })
+
+  it('should not show the SIS ID column if the read_sis permission is false', async () => {
+    window.ENV.permissions.read_sis = false
+    const container = setup(getRosterQueryMock({mockUsers}))
+    const rows = await container.findAllByTestId('roster-table-data-row')
+    const sisIdByUser = mockUsers.map(user => user.enrollments[0].sisId)
+
+    // Check there is no column header
+    expect(container.queryAllByTestId('colheader-sis-id')).toHaveLength(0)
+
+    // Check there is no SIS ID data
+    rows.forEach((row, index) => {
+      sisIdByUser[index] && expect(queryAllByText(row, sisIdByUser[index])).toHaveLength(0)
     })
   })
 })

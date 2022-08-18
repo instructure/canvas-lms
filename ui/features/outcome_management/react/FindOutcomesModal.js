@@ -37,26 +37,27 @@ import useResize from '@canvas/outcomes/react/hooks/useResize'
 import useBoolean from '@canvas/outcomes/react/hooks/useBoolean'
 import {FIND_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 import GroupActionDrillDown from './shared/GroupActionDrillDown'
-import useOutcomesImport, {IMPORT_COMPLETED} from '@canvas/outcomes/react/hooks/useOutcomesImport'
+import useOutcomesImport, {
+  IMPORT_COMPLETED,
+  ROOT_GROUP
+} from '@canvas/outcomes/react/hooks/useOutcomesImport'
+import {getOutcomeGroupAncestorsWithSelf} from '../helpers/getOutcomeGroupAncestorsWithSelf'
 
 const I18n = useI18nScope('FindOutcomesModal')
 
-const getSelectedGroupAncestorsWithSelf = (collections, selectedGroupId) => {
-  const resp = []
-  let currGroupId = selectedGroupId
-  while (currGroupId) {
-    resp.push(currGroupId)
-    currGroupId = collections[currGroupId]?.parentGroupId
-  }
-
-  return resp
-}
-
-const FindOutcomesModal = ({open, onCloseHandler, targetGroup}) => {
+const FindOutcomesModal = ({
+  open,
+  onCloseHandler,
+  targetGroup,
+  importsTargetGroup,
+  setImportsTargetGroup,
+  setTargetGroupIdsToRefetch
+}) => {
   const {isMobileView, isCourse, rootOutcomeGroup, rootIds} = useCanvasContext()
   const [showOutcomesView, setShowOutcomesView] = useState(false)
   const [scrollContainer, setScrollContainer] = useState(null)
   const [importedGroupIds, setImportedGroupIds] = useState([])
+  const [importedOutcomesIds, setImportedOutcomesIds] = useState([])
   const [importedGroupAncestors, setImportedGroupAncestors] = useState({})
   const [rhsGroupIdsToRefetch, setRhsGroupIdsToRefetch] = useState([])
   const {
@@ -139,11 +140,41 @@ const FindOutcomesModal = ({open, onCloseHandler, targetGroup}) => {
         []
       )
 
+      setTargetGroupIdsToRefetch([
+        ...new Set([...newlyImportedGroupIds].map(gid => importsTargetGroup[gid]))
+      ])
       setRhsGroupIdsToRefetch(gidsToRefetch => [
         ...new Set([...gidsToRefetch, ...newRhsGroupIdsToRefetch])
       ])
     }
   }, [importGroupsStatus]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    // after outcomes are imported set the target group to be refetched
+    const newlyImportedOutcomesIds = new Set(
+      Object.entries(importOutcomesStatus).reduce(
+        (acc, [oid, importStatus]) => (importStatus === IMPORT_COMPLETED ? [...acc, oid] : acc),
+        []
+      )
+    )
+    for (const importedOutcomeId of importedOutcomesIds) {
+      newlyImportedOutcomesIds.delete(importedOutcomeId)
+    }
+
+    if (newlyImportedOutcomesIds.size > 0) {
+      const targetGroupIdsToRefetch = new Set(
+        Object.entries(importsTargetGroup).reduce(
+          (acc, [oid, targetGroupId]) =>
+            newlyImportedOutcomesIds.has(oid) ? [...acc, targetGroupId] : acc,
+          []
+        )
+      )
+      setImportedOutcomesIds(importedOids => [
+        ...new Set([...importedOids, ...newlyImportedOutcomesIds])
+      ])
+      setTargetGroupIdsToRefetch([...targetGroupIdsToRefetch])
+    }
+  }, [importOutcomesStatus]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const onAddAllHandler = () => {
     const callImportApiToGroup = () => {
@@ -155,7 +186,11 @@ const FindOutcomesModal = ({open, onCloseHandler, targetGroup}) => {
       })
       setImportedGroupAncestors({
         ...importedGroupAncestors,
-        [selectedGroupId]: getSelectedGroupAncestorsWithSelf(collections, selectedGroupId)
+        [selectedGroupId]: getOutcomeGroupAncestorsWithSelf(collections, selectedGroupId)
+      })
+      setImportsTargetGroup({
+        ...importsTargetGroup,
+        [selectedGroupId]: targetGroup ? targetGroup._id : ROOT_GROUP
       })
     }
 
@@ -189,6 +224,10 @@ const FindOutcomesModal = ({open, onCloseHandler, targetGroup}) => {
       sourceContextId,
       sourceContextType
     })
+    setImportsTargetGroup({
+      ...importsTargetGroup,
+      [outcomeId]: targetGroup ? targetGroup._id : ROOT_GROUP
+    })
   }
 
   const modalLabel = targetGroup
@@ -200,7 +239,7 @@ const FindOutcomesModal = ({open, onCloseHandler, targetGroup}) => {
     : I18n.t('Add Outcomes to Account')
 
   const selfOrParentBeingImported =
-    getSelectedGroupAncestorsWithSelf(collections, selectedGroupId).find(
+    getOutcomeGroupAncestorsWithSelf(collections, selectedGroupId).find(
       gid => importGroupsStatus[gid]
     ) || selectedGroupId
 
@@ -365,7 +404,10 @@ FindOutcomesModal.propTypes = {
   targetGroup: PropTypes.shape({
     _id: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired
-  })
+  }),
+  setTargetGroupIdsToRefetch: PropTypes.func.isRequired,
+  importsTargetGroup: PropTypes.object.isRequired,
+  setImportsTargetGroup: PropTypes.func.isRequired
 }
 
 export default FindOutcomesModal

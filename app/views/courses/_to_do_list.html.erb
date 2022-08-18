@@ -24,6 +24,7 @@
 #
 # BTW if you add a new thing here, it probably needs adding to the /users/self/todo API
 show_legacy_todo_list ||= false
+additional_title_context ||= false
 %>
 <% if !show_legacy_todo_list %>
   <div class="todo-list Sidebar__TodoListContainer"></div>
@@ -34,7 +35,13 @@ show_legacy_todo_list ||= false
     presenter = ToDoListPresenter.new(self, @current_user, contexts)
 %>
   <% if presenter.any_assignments? %>
-    <h2 class="todo-list-header" tabindex="-1"><%= t('headings.to_do', %{To Do}) %></h2>
+    <h2 class="todo-list-header" tabindex="-1">
+      <% if Account.site_admin.feature_enabled?(:render_both_to_do_lists) && additional_title_context %>
+        <%= t("Teacher To Do") %>
+      <% else %>
+        <%= t('headings.to_do', %{To Do}) %>
+      <% end %>
+    </h2>
     <ul class="right-side-list to-do-list">
       <% presenter.needs_grading.each_with_index do |assignment, i| %>
         <li class="todo" style="<%= hidden if i >= presenter.visible_limit %>">

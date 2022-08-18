@@ -265,6 +265,10 @@ module CoursePacesPageObject
     f(assignment_due_date_selector)
   end
 
+  def assignment_due_dates
+    ff(assignment_due_date_selector)
+  end
+
   def blackout_dates_add
     fj(blackout_dates_add_selector)
   end
@@ -303,6 +307,10 @@ module CoursePacesPageObject
 
   def blackout_module_item
     f(blackout_module_item_selector)
+  end
+
+  def blackout_module_items
+    ff(blackout_module_item_selector)
   end
 
   def blueprint_child_course_label
@@ -494,6 +502,10 @@ module CoursePacesPageObject
 
   def click_cancel_button
     cancel_button.click
+  end
+
+  def click_publish_button
+    publish_button.click
   end
 
   def click_edit_tray_close_button

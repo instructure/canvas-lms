@@ -300,7 +300,7 @@ export default class AttemptTab extends Component {
             url: file.url,
             name: file.text,
             content_type: file.mediaType,
-            submit_assignment: false
+            submit_assignment: true
           },
           null,
           axios,
@@ -311,7 +311,8 @@ export default class AttemptTab extends Component {
           uploadUrl,
           {
             name: file.name,
-            content_type: file.type
+            content_type: file.type,
+            submit_assignment: true
           },
           file,
           axios,
@@ -335,10 +336,7 @@ export default class AttemptTab extends Component {
   renderFileAttempt = () => {
     return isSubmitted(this.props.submission) ? (
       <LazyLoad errorCategory="Assignments 2 FilePreview on AttemptTab">
-        <FilePreview
-          key={this.props.submission.attempt}
-          files={this.props.submission.attachments}
-        />
+        <FilePreview submission={this.props.submission} />
       </LazyLoad>
     ) : (
       this.renderFileUpload()

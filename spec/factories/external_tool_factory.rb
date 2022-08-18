@@ -35,7 +35,7 @@ module Factories
 
   def external_tool_1_3_model(context: nil, opts: {}, developer_key: nil)
     developer_key ||= DeveloperKey.create!
-    opts = { developer_key_id: developer_key.id, use_1_3: true }.merge(opts)
+    opts = { developer_key_id: developer_key.id, use_1_3: true, lti_version: "1.3" }.merge(opts)
     external_tool_model(context: context, opts: opts)
   end
 end

@@ -22,7 +22,7 @@ import NameLink from '../NameLink'
 
 const DEFAULT_PROPS = {
   _id: '2',
-  children: 'Test User',
+  name: 'Test User',
   htmlUrl: 'http://test.host/courses/1/users/2'
 }
 
@@ -42,29 +42,44 @@ describe('NameLink', () => {
     expect(container).toBeTruthy()
   })
 
-  it('should render children', () => {
+  it('should render the name', () => {
     const container = setup(DEFAULT_PROPS)
-    const children = container.getByText(DEFAULT_PROPS.children)
-    expect(children).toBeInTheDocument()
+    const name = container.getByText(DEFAULT_PROPS.name)
+    expect(name).toBeInTheDocument()
   })
 
   it('should link the current_user to their user detail page when curent_user id matches the argument _id', () => {
     window.ENV = {...window.ENV, current_user: {id: '2'}}
     const container = setup(DEFAULT_PROPS)
-    const link = container.getByRole('link', {name: DEFAULT_PROPS.children})
+    const link = container.getByRole('link', {name: DEFAULT_PROPS.name})
     expect(link).toHaveAttribute('href', DEFAULT_PROPS.htmlUrl)
   })
 
   it('should not have an href attribute when current_user id does not match argument _id', () => {
     const container = setup(DEFAULT_PROPS)
-    const button = container.getByRole('button', {name: DEFAULT_PROPS.children})
+    const button = container.getByRole('button', {name: DEFAULT_PROPS.name})
     expect(button).not.toHaveAttribute('href')
   })
 
   it('should trigger its onClick event when its children are clicked', () => {
     const mockCall = jest.fn()
     const container = setup({...DEFAULT_PROPS, onClick: mockCall})
-    fireEvent.click(container.getByRole('button', {name: DEFAULT_PROPS.children}))
+    fireEvent.click(container.getByRole('button', {name: DEFAULT_PROPS.name}))
     expect(mockCall).toHaveBeenCalled()
+  })
+
+  it('should not display the user pronouns element if no pronouns prop is passed', () => {
+    const container = setup(DEFAULT_PROPS)
+    expect(container.queryAllByTestId('user-pronouns')).toHaveLength(0)
+  })
+
+  it('should display pronouns if passed as a prop', () => {
+    const container = setup(DEFAULT_PROPS)
+    const pronounOptions = ['He/His', 'She/Her', 'They/Them']
+    pronounOptions.forEach(pronounOption => {
+      container.rerender(<NameLink {...DEFAULT_PROPS} pronouns={pronounOption} />)
+      const pronounElement = container.getByTestId('user-pronouns', {name: `(${pronounOption})`})
+      expect(pronounElement).toBeInTheDocument()
+    })
   })
 })

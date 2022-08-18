@@ -20,6 +20,7 @@ import React from 'react'
 import {mount} from 'enzyme'
 import {Provider} from 'react-redux'
 import fakeENV from 'helpers/fakeENV'
+import sinon from 'sinon'
 
 import * as StudentActions from 'ui/features/assignment_grade_summary/react/students/StudentActions'
 import * as GradeActions from 'ui/features/assignment_grade_summary/react/grades/GradeActions'
@@ -28,6 +29,7 @@ import Header from 'ui/features/assignment_grade_summary/react/components/Header
 import configureStore from 'ui/features/assignment_grade_summary/react/configureStore'
 
 QUnit.module('GradeSummary Header', suiteHooks => {
+  let clock
   let students
   let grades
   let store
@@ -35,6 +37,7 @@ QUnit.module('GradeSummary Header', suiteHooks => {
   let wrapper
 
   suiteHooks.beforeEach(() => {
+    clock = sinon.useFakeTimers()
     students = [
       {id: '1', displayName: 'Adam Jones'},
       {id: '2', displayName: 'Larry Brown'}
@@ -72,6 +75,7 @@ QUnit.module('GradeSummary Header', suiteHooks => {
 
   suiteHooks.afterEach(() => {
     wrapper.unmount()
+    clock.restore()
   })
 
   function mountComponent() {
@@ -170,48 +174,27 @@ QUnit.module('GradeSummary Header', suiteHooks => {
       equal(button.prop('releaseGradesStatus'), AssignmentActions.STARTED)
     })
 
-    test('displays a confirmation dialog when clicked', assert => {
-      const done = assert.async()
-
-      function waitForConfirm() {
-        if (window.confirm.callCount > 0) {
-          strictEqual(window.confirm.callCount, 1)
-          done()
-        } else requestAnimationFrame(waitForConfirm)
-      }
-
+    test('displays a confirmation dialog when clicked', () => {
       mountComponent()
       wrapper.find('ReleaseButton').simulate('click')
-      waitForConfirm()
+      clock.tick(100)
+      strictEqual(window.confirm.callCount, 1)
     })
 
-    test('releases grades when dialog is confirmed', assert => {
-      const done = assert.async()
-
-      function waitForConfirm() {
-        if (window.confirm.callCount > 0) {
-          equal(store.getState().assignment.releaseGradesStatus, AssignmentActions.STARTED)
-          done()
-        } else requestAnimationFrame(waitForConfirm)
-      }
+    test('releases grades when dialog is confirmed', () => {
       mountComponent()
       wrapper.find('ReleaseButton').simulate('click')
-      waitForConfirm()
+      clock.tick(100)
+      equal(store.getState().assignment.releaseGradesStatus, AssignmentActions.STARTED)
     })
 
-    test('does not release grades when dialog is dismissed', assert => {
-      const done = assert.async()
+    test('does not release grades when dialog is dismissed', () => {
       window.confirm.returns(false)
 
-      function waitForConfirm() {
-        if (window.confirm.callCount > 0) {
-          strictEqual(store.getState().assignment.releaseGradesStatus, null)
-          done()
-        } else requestAnimationFrame(waitForConfirm)
-      }
       mountComponent()
       wrapper.find('ReleaseButton').simulate('click')
-      waitForConfirm()
+      clock.tick(100)
+      strictEqual(store.getState().assignment.releaseGradesStatus, null)
     })
 
     test('enables onClick when there are no grades', () => {
@@ -281,47 +264,27 @@ QUnit.module('GradeSummary Header', suiteHooks => {
       equal(button.prop('unmuteAssignmentStatus'), AssignmentActions.STARTED)
     })
 
-    test('displays a confirmation dialog when clicked', assert => {
-      const done = assert.async()
-
-      function waitForConfirm() {
-        if (window.confirm.callCount > 0) {
-          strictEqual(window.confirm.callCount, 1)
-          done()
-        } else requestAnimationFrame(waitForConfirm)
-      }
+    test('displays a confirmation dialog when clicked', () => {
       mountComponent()
       wrapper.find('PostToStudentsButton').simulate('click')
-      waitForConfirm()
+      clock.tick(100)
+      strictEqual(window.confirm.callCount, 1)
     })
 
-    test('unmutes the assignment when dialog is confirmed', assert => {
-      const done = assert.async()
-
-      function waitForConfirm() {
-        if (window.confirm.callCount > 0) {
-          equal(store.getState().assignment.unmuteAssignmentStatus, AssignmentActions.STARTED)
-          done()
-        } else requestAnimationFrame(waitForConfirm)
-      }
+    test('unmutes the assignment when dialog is confirmed', () => {
       mountComponent()
       wrapper.find('PostToStudentsButton').simulate('click')
-      waitForConfirm()
+      clock.tick(100)
+      equal(store.getState().assignment.unmuteAssignmentStatus, AssignmentActions.STARTED)
     })
 
-    test('does not unmute the assignment when dialog is dismissed', assert => {
-      const done = assert.async()
+    test('does not unmute the assignment when dialog is dismissed', () => {
       window.confirm.returns(false)
 
-      function waitForConfirm() {
-        if (window.confirm.callCount > 0) {
-          strictEqual(store.getState().assignment.unmuteAssignmentStatus, null)
-          done()
-        } else requestAnimationFrame(waitForConfirm)
-      }
       mountComponent()
       wrapper.find('PostToStudentsButton').simulate('click')
-      waitForConfirm()
+      clock.tick(100)
+      strictEqual(store.getState().assignment.unmuteAssignmentStatus, null)
     })
   })
 })

@@ -269,64 +269,158 @@ describe('buildText()', () => {
   })
 
   describe('builds <text /> when text position', () => {
-    it('is middle', () => {
-      expect(buildText({...settings, textPosition: 'below'})).toMatchInlineSnapshot(`
-        <text
-          fill="#000000"
-          font-family="Lato Extended"
-          font-size="14"
-          font-weight="bold"
-          x="55"
-          y="144"
-        >
-          <tspan
-            dy="0"
+    describe('is middle', () => {
+      it('and it is a single line text', () => {
+        expect(buildText({...settings, textPosition: 'middle'})).toMatchInlineSnapshot(`
+          <text
+            fill="#000000"
+            font-family="Lato Extended"
+            font-size="14"
+            font-weight="bold"
             x="55"
+            y="67"
           >
-            Hello World!
-          </tspan>
-        </text>
-      `)
+            <tspan
+              dy="0"
+              x="55"
+            >
+              Hello World!
+            </tspan>
+          </text>
+        `)
+      })
+
+      it('and it is a multi line text', () => {
+        expect(
+          buildText({...settings, text: 'Hello World! Hello World! Bye!', textPosition: 'middle'})
+        ).toMatchInlineSnapshot(`
+          <text
+            fill="#000000"
+            font-family="Lato Extended"
+            font-size="14"
+            font-weight="bold"
+            x="48"
+            y="60"
+          >
+            <tspan
+              dy="0"
+              x="48"
+            >
+              Hello World! Hello World!
+            </tspan>
+            <tspan
+              dy="14"
+              x="59"
+            >
+              Bye!
+            </tspan>
+          </text>
+        `)
+      })
     })
 
-    it('is bottom-third', () => {
-      expect(buildText({...settings, textPosition: 'bottom-third'})).toMatchInlineSnapshot(`
-        <text
-          fill="#000000"
-          font-family="Lato Extended"
-          font-size="14"
-          font-weight="bold"
-          x="55"
-          y="125"
-        >
-          <tspan
-            dy="0"
+    describe('is bottom-third', () => {
+      it('and it is a single line text', () => {
+        expect(buildText({...settings, textPosition: 'bottom-third'})).toMatchInlineSnapshot(`
+          <text
+            fill="#000000"
+            font-family="Lato Extended"
+            font-size="14"
+            font-weight="bold"
             x="55"
+            y="121"
           >
-            Hello World!
-          </tspan>
-        </text>
-      `)
+            <tspan
+              dy="0"
+              x="55"
+            >
+              Hello World!
+            </tspan>
+          </text>
+        `)
+      })
+
+      it('and it is a multi line text', () => {
+        expect(
+          buildText({
+            ...settings,
+            text: 'Hello World! Hello World! Bye!',
+            textPosition: 'bottom-third'
+          })
+        ).toMatchInlineSnapshot(`
+          <text
+            fill="#000000"
+            font-family="Lato Extended"
+            font-size="14"
+            font-weight="bold"
+            x="48"
+            y="114"
+          >
+            <tspan
+              dy="0"
+              x="48"
+            >
+              Hello World! Hello World!
+            </tspan>
+            <tspan
+              dy="14"
+              x="59"
+            >
+              Bye!
+            </tspan>
+          </text>
+        `)
+      })
     })
 
-    it('is below', () => {
-      expect(buildText({...settings, textPosition: 'below'})).toMatchInlineSnapshot(`
-        <text
-          fill="#000000"
-          font-family="Lato Extended"
-          font-size="14"
-          font-weight="bold"
-          x="55"
-          y="144"
-        >
-          <tspan
-            dy="0"
+    describe('is below', () => {
+      it('and it is a single line text', () => {
+        expect(buildText({...settings, textPosition: 'below'})).toMatchInlineSnapshot(`
+          <text
+            fill="#000000"
+            font-family="Lato Extended"
+            font-size="14"
+            font-weight="bold"
             x="55"
+            y="144"
           >
-            Hello World!
-          </tspan>
-        </text>
-      `)
+            <tspan
+              dy="0"
+              x="55"
+            >
+              Hello World!
+            </tspan>
+          </text>
+        `)
+      })
+
+      it('and it is a multi line text', () => {
+        expect(
+          buildText({...settings, text: 'Hello World! Hello World! Bye!', textPosition: 'below'})
+        ).toMatchInlineSnapshot(`
+          <text
+            fill="#000000"
+            font-family="Lato Extended"
+            font-size="14"
+            font-weight="bold"
+            x="48"
+            y="144"
+          >
+            <tspan
+              dy="0"
+              x="48"
+            >
+              Hello World! Hello World!
+            </tspan>
+            <tspan
+              dy="14"
+              x="59"
+            >
+              Bye!
+            </tspan>
+          </text>
+        `)
+      })
     })
   })
 })
@@ -339,7 +433,7 @@ describe('buildTextBackground()', () => {
   it('builds <path /> if text is valid', () => {
     expect(buildTextBackground({...settings, text: 'Hello World!'})).toMatchInlineSnapshot(`
       <path
-        d="M55,128 h14 a4,4 0 0 1 4,4 v16 a4,4 0 0 1 -4,4 h-14 a4,4 0 0 1 -4,-4 v-16 a4,4 0 0 1 4,-4 z"
+        d="M55,127 h14 a4,4 0 0 1 4,4 v16 a4,4 0 0 1 -4,4 h-14 a4,4 0 0 1 -4,-4 v-16 a4,4 0 0 1 4,-4 z"
         fill=""
       />
     `)
@@ -351,6 +445,77 @@ describe('buildTextBackground()', () => {
 
   it('does not build <path /> if text has spaces', () => {
     expect(buildTextBackground({...settings, text: '  '})).toBeNull()
+  })
+
+  describe('builds <path /> when text position', () => {
+    describe('is middle', () => {
+      it('and it is a single line text', () => {
+        expect(buildTextBackground({...settings, textPosition: 'middle'})).toMatchInlineSnapshot(
+          `null`
+        )
+      })
+
+      it('and it is a multi line text', () => {
+        expect(
+          buildTextBackground({
+            ...settings,
+            text: 'Hello World! Hello World! Bye!',
+            textPosition: 'middle'
+          })
+        ).toMatchInlineSnapshot(`
+          <path
+            d="M48,43 h27 a4,4 0 0 1 4,4 v30 a4,4 0 0 1 -4,4 h-27 a4,4 0 0 1 -4,-4 v-30 a4,4 0 0 1 4,-4 z"
+            fill=""
+          />
+        `)
+      })
+    })
+
+    describe('is bottom-third', () => {
+      it('and it is a single line text', () => {
+        expect(
+          buildTextBackground({...settings, textPosition: 'bottom-third'})
+        ).toMatchInlineSnapshot(`null`)
+      })
+
+      it('and it is a multi line text', () => {
+        expect(
+          buildTextBackground({
+            ...settings,
+            text: 'Hello World! Hello World! Bye!',
+            textPosition: 'bottom-third'
+          })
+        ).toMatchInlineSnapshot(`
+          <path
+            d="M48,97 h27 a4,4 0 0 1 4,4 v30 a4,4 0 0 1 -4,4 h-27 a4,4 0 0 1 -4,-4 v-30 a4,4 0 0 1 4,-4 z"
+            fill=""
+          />
+        `)
+      })
+    })
+
+    describe('is below', () => {
+      it('and it is a single line text', () => {
+        expect(buildTextBackground({...settings, textPosition: 'below'})).toMatchInlineSnapshot(
+          `null`
+        )
+      })
+
+      it('and it is a multi line text', () => {
+        expect(
+          buildTextBackground({
+            ...settings,
+            text: 'Hello World! Hello World! Bye!',
+            textPosition: 'below'
+          })
+        ).toMatchInlineSnapshot(`
+          <path
+            d="M48,127 h27 a4,4 0 0 1 4,4 v30 a4,4 0 0 1 -4,4 h-27 a4,4 0 0 1 -4,-4 v-30 a4,4 0 0 1 4,-4 z"
+            fill=""
+          />
+        `)
+      })
+    })
   })
 })
 

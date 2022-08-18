@@ -91,7 +91,6 @@ def jsImage() {
         "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
         "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
         "CACHE_SAVE_SCOPE=${cacheScope}",
-        "KARMA_BUILDER_PREFIX=${env.KARMA_BUILDER_PREFIX}",
         "PATCHSET_TAG=${env.PATCHSET_TAG}",
         "RAILS_LOAD_ALL_LOCALES=${getRailsLoadAllLocales()}",
         "WEBPACK_BUILDER_IMAGE=${env.WEBPACK_BUILDER_IMAGE}",
@@ -102,7 +101,6 @@ def jsImage() {
 
       sh """
         ./build/new-jenkins/docker-with-flakey-network-protection.sh push $KARMA_RUNNER_IMAGE
-        ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $KARMA_BUILDER_PREFIX
       """
     } catch (e) {
       handleDockerBuildFailure(KARMA_RUNNER_IMAGE, e)

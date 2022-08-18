@@ -92,6 +92,13 @@ export const TEXT_SIZE = {
   [Size.ExtraLarge]: 28
 }
 
+export const TEXT_SIZE_FONT_DIFF = {
+  [Size.Small]: -1,
+  [Size.Medium]: 0,
+  [Size.Large]: 1,
+  [Size.ExtraLarge]: 2
+}
+
 export const MAX_CHAR_COUNT = {
   [Size.Small]: 21,
   [Size.Medium]: 18,

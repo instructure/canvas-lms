@@ -60,9 +60,17 @@ const thunkActions = {
       const course_id = getState().coursePace.course_id
       dispatch(regularActions.blackoutDatesSyncing())
 
-      return BlackoutDatesApi.sync(blackoutDates, course_id)
+      const filteredBlackoutDates = blackoutDates.filter(
+        (bd: BlackoutDate): boolean => !bd.is_calendar_event
+      )
+      return BlackoutDatesApi.sync(filteredBlackoutDates, course_id)
         .then(results => {
-          dispatch(regularActions.blackoutDatesSynced(results))
+          const filteredCalendarEvents = blackoutDates.filter(
+            (bd: BlackoutDate): boolean => !!bd.is_calendar_event
+          )
+          const remainingCalendarEvents =
+            BlackoutDatesApi.calendarEventsSync(filteredCalendarEvents)
+          dispatch(regularActions.blackoutDatesSynced(results.concat(remainingCalendarEvents)))
         })
         .catch(error => {
           dispatch(regularActions.blackoutDatesSyncFailed())

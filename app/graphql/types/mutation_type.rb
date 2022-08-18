@@ -101,6 +101,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :update_internal_setting, mutation: Mutations::UpdateInternalSetting
   field :delete_internal_setting, mutation: Mutations::DeleteInternalSetting
   field :update_submissions_read_state, mutation: Mutations::UpdateSubmissionsReadState
+  field :update_submission_grade, mutation: Mutations::UpdateSubmissionGrade
 
   # TODO: Remove the in active development string from here once this is more
   #       finalized.

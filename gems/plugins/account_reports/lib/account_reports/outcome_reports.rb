@@ -21,6 +21,7 @@
 module AccountReports
   class OutcomeReports
     include ReportHelper
+    include CanvasOutcomesHelper
 
     def initialize(account_report)
       @account_report = account_report
@@ -185,6 +186,28 @@ module AccountReports
 
       students = add_course_sub_account_scope(students, "c")
       add_term_scope(students, "c")
+    end
+
+    def outcomes_lmgb_results
+      id = account.root_account.id
+      courses = Course.where(root_account_id: id).filter { |c| c.feature_enabled?(:outcome_service_results_to_canvas) }
+      return if courses.empty?
+
+      results = courses.map do |c|
+        assignments = Assignment.where(root_account_id: id, context: c).type_quiz_lti.pluck(:id)
+        assignment_ids = assignments.join(",")
+
+        users = Enrollment.where(type: "StudentEnrollment", root_account_id: id, course: c)
+                          .joins(:user)
+                          .pluck("users.uuid")
+        uuids = users.join(",")
+
+        outcomes = ContentTag.active.where(root_account_id: id, context: c).learning_outcome_links.pluck(:content_id)
+        outcome_ids = outcomes.join(",")
+
+        [c.id, get_lmgb_results(c, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)]
+      end
+      results.to_h
     end
 
     def outcome_results_scope

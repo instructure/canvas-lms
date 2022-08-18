@@ -19,7 +19,8 @@
 import moment from 'moment-timezone'
 import {BlackoutDate} from '../shared/types'
 import * as DateHelpers from '../utils/date_stuff/date_helpers'
-import doFetchApi from '@canvas/do-fetch-api-effect'
+import doFetchApi, {DoFetchApiResults} from '@canvas/do-fetch-api-effect'
+import {initialCalendarEventBlackoutDates} from '../reducers/original'
 
 /* API methods */
 
@@ -48,11 +49,67 @@ export const sync = (blackoutDates: BlackoutDate[], course_id: string | number) 
     })
 }
 
+export const calendarEventsSync = (blackoutDates: BlackoutDate[]): BlackoutDate[] => {
+  const originalEvents = initialCalendarEventBlackoutDates
+
+  const deletedBlackoutDates = originalEvents.filter(bd => !blackoutDates.includes(bd))
+
+  for (const event of deletedBlackoutDates) {
+    deleteCalendarEvent(event)
+  }
+
+  return originalEvents.filter(bd => blackoutDates.includes(bd))
+}
+
+const deleteCalendarEvent = (event: BlackoutDate) => {
+  const path = `/api/v1/calendar_events/${event.id}`
+
+  return doFetchApi<ApiFormattedCalendarEventBlackoutDate>({
+    path,
+    method: 'DELETE',
+    body: {
+      calendar_event: event
+    }
+  })
+    .then(result => {
+      if (!result.response.ok) {
+        throw new Error(result.response.statusText)
+      }
+      return result
+    })
+    .then(result => {
+      return toBlackoutDate(result)
+    })
+}
+
+const toBlackoutDate = (
+  result: DoFetchApiResults<ApiFormattedCalendarEventBlackoutDate>
+): BlackoutDate => {
+  const event_title = result.json?.title || ''
+  const start_date = moment(result.json?.start_at)
+  const end_date = moment(result.json?.end_at)
+  return {
+    event_title,
+    start_date,
+    end_date,
+    is_calendar_event: true,
+    title: event_title,
+    start_at: start_date,
+    end_at: end_date
+  }
+}
+
 /* API transformers */
 interface ApiFormattedBlackoutDate {
   event_title: string
   start_date: string
   end_date: string
+}
+
+interface ApiFormattedCalendarEventBlackoutDate {
+  title: string
+  start_at: string
+  end_at: string
 }
 
 function transformBlackoutDateForApi(blackoutDate: BlackoutDate): ApiFormattedBlackoutDate {

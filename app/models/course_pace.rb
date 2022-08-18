@@ -39,6 +39,10 @@ class CoursePace < ActiveRecord::Base
   belongs_to :user
   belongs_to :root_account, class_name: "Account"
 
+  after_create :log_pace_counts
+  after_save :log_exclude_weekends_counts, if: :logging_for_weekends_required?
+  after_save :log_average_item_duration
+
   validates :course_id, presence: true
   validate :valid_secondary_context
 
@@ -187,6 +191,7 @@ class CoursePace < ActiveRecord::Base
       DueDateCacher.recompute_course(course, assignments: assignments_to_refresh, update_grades: true)
 
       # Mark as published
+      log_module_items_count
       update(workflow_state: "active", published_at: DateTime.current)
     end
   end
@@ -275,5 +280,42 @@ class CoursePace < ActiveRecord::Base
     else
       date&.in_time_zone(course.time_zone)
     end
+  end
+
+  def logging_for_weekends_required?
+    saved_change_to_exclude_weekends? || (saved_change_to_id? && exclude_weekends)
+  end
+
+  def log_pace_counts
+    if course_section_id.present?
+      InstStatsd::Statsd.increment("course_pacing.section_paces.count")
+    elsif user_id.present?
+      InstStatsd::Statsd.increment("course_pacing.user_paces.count")
+    else
+      InstStatsd::Statsd.increment("course_pacing.course_paces.count")
+    end
+  end
+
+  def log_exclude_weekends_counts
+    if exclude_weekends
+      InstStatsd::Statsd.increment("course_pacing.weekends_excluded")
+    else
+      # Only decrementing during an update (not initial create)
+      InstStatsd::Statsd.decrement("course_pacing.weekends_excluded") unless saved_change_to_id?
+    end
+  end
+
+  def log_average_item_duration
+    return if course_pace_module_items.empty?
+
+    average_duration = course_pace_module_items.pluck(:duration).sum / course_pace_module_items.length
+    InstStatsd::Statsd.count("course_pacing.average_assignment_duration", average_duration)
+  end
+
+  def log_module_items_count
+    all_active_course_module_items = course.context_module_tags.active
+    paced_course_module_items = all_active_course_module_items.where(id: course_pace_module_items.pluck(:module_item_id))
+    InstStatsd::Statsd.count("course.paced.paced_module_item_count", paced_course_module_items.size)
+    InstStatsd::Statsd.count("course.paced.all_module_item_count", all_active_course_module_items.size)
   end
 end

@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import {JSDOM} from 'jsdom'
 import {mount} from 'enzyme'
 import {merge} from 'lodash'
 import FilesCollection from '@canvas/files/backbone/collections/FilesCollection'
@@ -83,8 +82,6 @@ describe('SearchResults', () => {
     let wrapper
 
     beforeEach(() => {
-      // eslint-disable-next-line no-global-assign
-      document = new JSDOM('')
       document.body.appendChild(document.createElement('div'))
     })
 
@@ -111,8 +108,6 @@ describe('SearchResults', () => {
     let wrapper, menuItems
 
     beforeEach(() => {
-      // eslint-disable-next-line no-global-assign
-      document = new JSDOM('')
       document.body.appendChild(document.createElement('div'))
       const props = {...defaultProps()}
       const collection = new FilesCollection([{id: '1'}])
@@ -122,8 +117,6 @@ describe('SearchResults', () => {
     })
 
     afterEach(() => {
-      // eslint-disable-next-line no-global-assign
-      document = new JSDOM('')
       wrapper.detach()
     })
 

@@ -660,4 +660,5 @@
   <input type="text" style="width: 40px; display: none;" id="grade_entry" title="<%= t('titles.enter_score', "Enter a score to test") %>"/>
   <a href="#" id="revert_score_template" class="revert_score_link" title="<%= t('titles.revert_score', "Revert to original score") %>"><i class="icon-reply-2"></i></a>
   <a href="<%= context_url(@context, :context_assignment_submission_url, "{{ assignment_id }}", @presenter.student_id) %>" class="update_submission_url" style="display: none;">&nbsp;</a>
+  <% mark_grades_read_a2 %>
 </div>

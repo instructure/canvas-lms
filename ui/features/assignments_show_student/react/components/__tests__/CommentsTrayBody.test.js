@@ -98,8 +98,7 @@ function mockContext(children) {
   )
 }
 
-// To be unskipped in EVAL-2477
-describe.skip('CommentsTrayBody', () => {
+describe('CommentsTrayBody', () => {
   beforeAll(() => {
     $('body').append('<div role="alert" id=flash_screenreader_holder />')
   })
@@ -112,6 +111,130 @@ describe.skip('CommentsTrayBody', () => {
 
   afterEach(() => {
     window.ENV = originalENV
+  })
+
+  describe('read/unread comments', () => {
+    it('marks submission comments as read after timeout', async () => {
+      jest.useFakeTimers()
+
+      const props = await mockAssignmentAndSubmission({
+        Submission: {unreadCommentCount: 1}
+      })
+      const overrides = {
+        SubmissionCommentConnection: {
+          nodes: [{read: false}]
+        }
+      }
+      const mocks = [await mockSubmissionCommentQuery(overrides)]
+
+      const mockMutation = jest.fn()
+      apollo.useMutation = jest.fn(() => [mockMutation, {called: true, error: null}])
+
+      render(
+        mockContext(
+          <MockedProvider mocks={mocks}>
+            <CommentsTrayBody {...props} />
+          </MockedProvider>
+        )
+      )
+
+      act(() => jest.runAllTimers())
+      await waitFor(() =>
+        expect(mockMutation).toHaveBeenCalledWith({
+          variables: {commentIds: ['1'], submissionId: '1'}
+        })
+      )
+    })
+
+    it('does not mark submission comments as read for observers', async () => {
+      jest.useFakeTimers()
+
+      const props = await mockAssignmentAndSubmission({
+        Submission: {unreadCommentCount: 1}
+      })
+      const overrides = {
+        SubmissionCommentConnection: {
+          nodes: [{read: false}]
+        }
+      }
+      const mocks = [await mockSubmissionCommentQuery(overrides)]
+
+      const mockMutation = jest.fn()
+      apollo.useMutation = jest.fn(() => [mockMutation, {called: true, error: null}])
+
+      render(
+        mockContext(
+          <StudentViewContext.Provider value={{isObserver: true, allowChangesToSubmission: false}}>
+            <MockedProvider mocks={mocks}>
+              <CommentsTrayBody {...props} />
+            </MockedProvider>
+          </StudentViewContext.Provider>
+        )
+      )
+
+      act(() => jest.runAllTimers())
+      expect(mockMutation).not.toHaveBeenCalled()
+    })
+
+    it('renders an error when submission comments fail to be marked as read', async () => {
+      jest.useFakeTimers()
+
+      const props = await mockAssignmentAndSubmission({
+        Submission: {unreadCommentCount: 1}
+      })
+      const overrides = {
+        SubmissionCommentConnection: {
+          nodes: [{read: false}]
+        }
+      }
+      const mocks = [await mockSubmissionCommentQuery(overrides)]
+
+      apollo.useMutation = jest.fn(() => [jest.fn(), {called: true, error: true}])
+
+      render(
+        mockContext(
+          <MockedProvider mocks={mocks}>
+            <CommentsTrayBody {...props} />
+          </MockedProvider>
+        )
+      )
+
+      act(() => jest.advanceTimersByTime(3000))
+
+      expect(mockedSetOnFailure).toHaveBeenCalledWith(
+        'There was a problem marking submission comments as read'
+      )
+    })
+
+    it('alerts the screen reader when submission comments are marked as read', async () => {
+      jest.useFakeTimers()
+
+      const props = await mockAssignmentAndSubmission({
+        Submission: {unreadCommentCount: 1}
+      })
+      const overrides = {
+        SubmissionCommentConnection: {
+          nodes: [{read: false}]
+        }
+      }
+      const mocks = [await mockSubmissionCommentQuery(overrides)]
+
+      apollo.useMutation = jest.fn(() => [jest.fn(), {called: true, error: false}])
+
+      render(
+        mockContext(
+          <MockedProvider mocks={mocks}>
+            <CommentsTrayBody {...props} />
+          </MockedProvider>
+        )
+      )
+
+      act(() => jest.advanceTimersByTime(3000))
+
+      expect(mockedSetOnSuccess).toHaveBeenCalledWith(
+        'All submission comments have been marked as read'
+      )
+    })
   })
 
   describe('group assignments', () => {
@@ -240,10 +363,7 @@ describe.skip('CommentsTrayBody', () => {
     })
   })
 
-  // https://instructure.atlassian.net/browse/USERS-379
-  // eslint-disable-next-line jest/no-disabled-tests
-  it.skip('renders error alert when data returned from mutation fails', async () => {
-    // To be unskipped in EVAL-2477
+  it('renders error alert when data returned from mutation fails', async () => {
     const mocks = await Promise.all([mockSubmissionCommentQuery(), mockCreateSubmissionComment()])
     mocks[1].error = new Error('aw shucks')
     const props = await mockAssignmentAndSubmission()
@@ -474,126 +594,6 @@ describe.skip('CommentsTrayBody', () => {
     )
 
     expect(await waitFor(() => getByText('Sorry, Something Broke'))).toBeInTheDocument()
-  })
-
-  it('marks submission comments as read after timeout', async () => {
-    jest.useFakeTimers()
-
-    const props = await mockAssignmentAndSubmission({
-      Submission: {unreadCommentCount: 1}
-    })
-    const overrides = {
-      SubmissionCommentConnection: {
-        nodes: [{read: false}]
-      }
-    }
-    const mocks = [await mockSubmissionCommentQuery(overrides)]
-
-    const mockMutation = jest.fn()
-    apollo.useMutation = jest.fn(() => [mockMutation, {called: true, error: null}])
-
-    render(
-      mockContext(
-        <MockedProvider mocks={mocks}>
-          <CommentsTrayBody {...props} />
-        </MockedProvider>
-      )
-    )
-
-    act(() => jest.runAllTimers())
-    await waitFor(() =>
-      expect(mockMutation).toHaveBeenCalledWith({variables: {commentIds: ['1'], submissionId: '1'}})
-    )
-  })
-
-  it('does not mark submission comments as read for observers', async () => {
-    jest.useFakeTimers()
-
-    const props = await mockAssignmentAndSubmission({
-      Submission: {unreadCommentCount: 1}
-    })
-    const overrides = {
-      SubmissionCommentConnection: {
-        nodes: [{read: false}]
-      }
-    }
-    const mocks = [await mockSubmissionCommentQuery(overrides)]
-
-    const mockMutation = jest.fn()
-    apollo.useMutation = jest.fn(() => [mockMutation, {called: true, error: null}])
-
-    render(
-      mockContext(
-        <StudentViewContext.Provider value={{isObserver: true, allowChangesToSubmission: false}}>
-          <MockedProvider mocks={mocks}>
-            <CommentsTrayBody {...props} />
-          </MockedProvider>
-        </StudentViewContext.Provider>
-      )
-    )
-
-    act(() => jest.runAllTimers())
-    expect(mockMutation).not.toHaveBeenCalled()
-  })
-
-  it('renders an error when submission comments fail to be marked as read', async () => {
-    jest.useFakeTimers()
-
-    const props = await mockAssignmentAndSubmission({
-      Submission: {unreadCommentCount: 1}
-    })
-    const overrides = {
-      SubmissionCommentConnection: {
-        nodes: [{read: false}]
-      }
-    }
-    const mocks = [await mockSubmissionCommentQuery(overrides)]
-
-    apollo.useMutation = jest.fn(() => [jest.fn(), {called: true, error: true}])
-
-    render(
-      mockContext(
-        <MockedProvider mocks={mocks}>
-          <CommentsTrayBody {...props} />
-        </MockedProvider>
-      )
-    )
-
-    act(() => jest.advanceTimersByTime(3000))
-
-    expect(mockedSetOnFailure).toHaveBeenCalledWith(
-      'There was a problem marking submission comments as read'
-    )
-  })
-
-  it('alerts the screen reader when submission comments are marked as read', async () => {
-    jest.useFakeTimers()
-
-    const props = await mockAssignmentAndSubmission({
-      Submission: {unreadCommentCount: 1}
-    })
-    const overrides = {
-      SubmissionCommentConnection: {
-        nodes: [{read: false}]
-      }
-    }
-    const mocks = [await mockSubmissionCommentQuery(overrides)]
-
-    apollo.useMutation = jest.fn(() => [jest.fn(), {called: true, error: false}])
-
-    render(
-      mockContext(
-        <MockedProvider mocks={mocks}>
-          <CommentsTrayBody {...props} />
-        </MockedProvider>
-      )
-    )
-
-    act(() => jest.advanceTimersByTime(3000))
-
-    expect(mockedSetOnSuccess).toHaveBeenCalledWith(
-      'All submission comments have been marked as read'
-    )
   })
 
   it('renders place holder text when no comments', async () => {

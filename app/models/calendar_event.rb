@@ -52,7 +52,7 @@ class CalendarEvent < ActiveRecord::Base
     PERMITTED_ATTRIBUTES
   end
 
-  belongs_to :context, polymorphic: %i[course user group appointment_group course_section],
+  belongs_to :context, polymorphic: %i[course user group appointment_group course_section account],
                        polymorphic_prefix: true
   belongs_to :user
   belongs_to :parent_event, class_name: "CalendarEvent", foreign_key: :parent_calendar_event_id, inverse_of: :child_events
@@ -462,7 +462,7 @@ class CalendarEvent < ActiveRecord::Base
     dispatch :new_event_created
     to { participants(include_observers: true) - [@updating_user] }
     whenever do
-      !appointment_group && context.available? && just_created && !hidden? && !series_tail?
+      !appointment_group && !account && context.available? && just_created && !hidden? && !series_tail?
     end
     data { course_broadcast_data }
 
@@ -470,6 +470,7 @@ class CalendarEvent < ActiveRecord::Base
     to { participants(include_observers: true) - [@updating_user] }
     whenever do
       !appointment_group &&
+        !account &&
         context.available? && (
         changed_in_state(:active, fields: :start_at) ||
         changed_in_state(:active, fields: :end_at)
@@ -558,6 +559,10 @@ class CalendarEvent < ActiveRecord::Base
     elsif context_type == "AppointmentGroup"
       context
     end
+  end
+
+  def account
+    context_type == "Account" ? context : nil
   end
 
   class ReservationError < StandardError; end

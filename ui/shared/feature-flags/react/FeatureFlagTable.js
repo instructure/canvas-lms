@@ -30,7 +30,8 @@ const I18n = useI18nScope('feature_flags')
 
 const {Head, Body, ColHeader, Row, Cell} = Table
 
-function FeatureFlagFilterTable({title, rows, disableDefaults}) {
+function FeatureFlagTable({title, rows, disableDefaults}) {
+  rows.sort((a, b) => a.display_name.localeCompare(b.display_name))
   const [visibleTooltip, setVisibleTooltip] = useState(null)
   return (
     <>
@@ -90,63 +91,6 @@ function FeatureFlagFilterTable({title, rows, disableDefaults}) {
                     </Tooltip>
                   )}
                 </>
-              </Cell>
-              <Cell>
-                <FeatureFlagButton
-                  displayName={feature.display_name}
-                  featureFlag={feature.feature_flag}
-                  disableDefaults={disableDefaults}
-                />
-              </Cell>
-            </Row>
-          ))}
-        </Body>
-      </Table>
-    </>
-  )
-}
-
-function FeatureFlagTable({title, rows, disableDefaults}) {
-  rows.sort((a, b) => a.display_name.localeCompare(b.display_name))
-  if (ENV.FEATURES?.feature_flag_filters) {
-    return FeatureFlagFilterTable({title, rows, disableDefaults})
-  }
-  return (
-    <>
-      <Heading as="h2" level="h3" data-testid="ff-table-heading">
-        {title}
-      </Heading>
-      <Table caption={title} margin="medium 0">
-        <Head>
-          <Row>
-            <ColHeader id="display_name" width="100%">
-              {I18n.t('Feature')}
-            </ColHeader>
-            <ColHeader id="state">{I18n.t('State')}</ColHeader>
-          </Row>
-        </Head>
-        <Body>
-          {rows.map(feature => (
-            <Row key={feature.feature} data-testid="ff-table-row">
-              <Cell>
-                <ToggleDetails
-                  summary={
-                    <>
-                      {feature.display_name}
-                      {feature.feature_flag.hidden && (
-                        <Pill margin="0 x-small">{I18n.t('Hidden')}</Pill>
-                      )}
-                      {feature.beta && (
-                        <Pill color="info" margin="0 0 0 x-small">
-                          {I18n.t('Beta')}
-                        </Pill>
-                      )}
-                    </>
-                  }
-                  defaultExpanded={feature.autoexpand}
-                >
-                  <div dangerouslySetInnerHTML={{__html: feature.description}} />
-                </ToggleDetails>
               </Cell>
               <Cell>
                 <FeatureFlagButton

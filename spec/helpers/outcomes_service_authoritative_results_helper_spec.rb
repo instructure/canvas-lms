@@ -47,6 +47,8 @@
 #      - compare both results
 
 describe OutcomesServiceAuthoritativeResultsHelper do
+  include Outcomes::ResultAnalytics
+
   # helper matcher to assert that, after:
   #   - transforming a JSON AuthoritativeResult collection into LearningOutcomeResults, and,
   #   - calculating the resulting RollupScores
@@ -293,6 +295,64 @@ describe OutcomesServiceAuthoritativeResultsHelper do
       expect(from_lor.map(&:score).sort_by(&:to_f)).to eq [3.0, 3.75].sort_by(&:to_f)
 
       expect(from_lor).to be_eq_rollup from_ar
+    end
+  end
+
+  describe "#outcome_service_results_rollups" do
+    it "processes learning outcome results into rollups" do
+      create_outcome
+      create_alignment
+      create_learning_outcome_result @students[0], 1.0
+
+      create_outcome
+      create_alignment
+      create_learning_outcome_result @students[1], 3.0
+
+      create_outcome
+      create_alignment
+      create_learning_outcome_result @students[2], 2.0
+      results = json_to_outcome_results(authoritative_results_from_db)
+
+      rollups = outcome_results_rollups(results: results, users: @students)
+      os_rollups = outcome_service_results_rollups(results)
+
+      os_rollups.each_with_index do |r, i|
+        expect(r.context).to eq rollups[i].context
+        expect(r.scores.length).to eq rollups[i].scores.length
+        expect(r.scores.map(&:outcome_results).flatten).to eq rollups[i].scores.map(&:outcome_results).flatten
+      end
+    end
+
+    it "returns a rollup for each distinct user_id" do
+      create_outcome
+      create_alignment
+      create_learning_outcome_result @students[0], 1.0
+
+      create_outcome
+      create_alignment
+      create_learning_outcome_result @students[0], 2.0
+
+      create_outcome
+      create_alignment
+      create_learning_outcome_result @students[1], 3.0
+      results = json_to_outcome_results(authoritative_results_from_db)
+
+      rollups = outcome_service_results_rollups(results)
+      expect(rollups.count).to eq 2
+    end
+
+    it "returns a single rollup for a single user_id" do
+      create_outcome
+      create_alignment
+      create_learning_outcome_result @students[0], 1.0
+
+      create_outcome
+      create_alignment
+      create_learning_outcome_result @students[0], 3.0
+      results = json_to_outcome_results(authoritative_results_from_db)
+
+      rollups = outcome_service_results_rollups(results)
+      expect(rollups.count).to eq 1
     end
   end
 end

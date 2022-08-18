@@ -57,6 +57,34 @@ describe "dashboard" do
       end
     end
 
+    context "render both to do lists" do
+      before do
+        @assignment = assignment_model({ submission_types: "online_text_entry", course: @course })
+        student = user_with_pseudonym(active_user: true, username: "student@example.com", password: "qwertyuiop")
+        @course.enroll_user(student, "StudentEnrollment", enrollment_state: "active")
+        @assignment.reload
+        @assignment.submit_homework(student, { submission_type: "online_text_entry", body: "ABC" })
+        @assignment.reload
+        @course.enroll_user(@teacher, "StudentEnrollment", enrollment_state: "active")
+      end
+
+      it "displays teacher to do list if user has both enrollments when the feature is disabled", priority: "1" do
+        get "/"
+
+        expect(f(".todo-list-header")).to include_text("To Do")
+        expect(f(".to-do-list > li")).to include_text("Grade " + @assignment.title)
+      end
+
+      it "displays student and teacher to do lists if user has both enrollments when the feature is enabled", priority: "1" do
+        Account.site_admin.enable_feature!(:render_both_to_do_lists)
+        get "/"
+
+        todo_headers = ff(".todo-list-header")
+        expect(todo_headers[0]).to include_text("Student To Do")
+        expect(todo_headers[1]).to include_text("Teacher To Do")
+      end
+    end
+
     it "is able to ignore an assignment until the next submission", priority: "1" do
       assignment = assignment_model({ submission_types: "online_text_entry", course: @course })
       student = user_with_pseudonym(active_user: true, username: "student@example.com", password: "qwertyuiop")

@@ -16,6 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+const addrPromise = new Promise((resolve, reject) => {
+  require('dns').lookup(require('os').hostname(), function (_, addr, _) {
+    resolve(addr)
+  })
+})
+
 const karmaConfig = {
   basePath: '',
 
@@ -45,7 +51,7 @@ const karmaConfig = {
     showSpecTiming: true // print the time elapsed for each spec
   },
 
-  port: 9876,
+  port: process.env.KARMA_PORT || 9876,
 
   colors: true,
 
@@ -59,7 +65,7 @@ const karmaConfig = {
   // - Safari (only Mac; has to be installed with `npm install karma-safari-launcher`)
   // - PhantomJS (has to be installed with `npm install karma-phantomjs-launcher`))
   // - IE (only Windows; has to be installed with `npm install karma-ie-launcher`)
-  browsers: ['ChromeHeadlessNoSandbox'], // docker friendly
+  browsers: [process.env.KARMA_BROWSER || 'ChromeHeadlessNoSandbox'], // docker friendly
 
   customLaunchers: {
     // Chrome will sometimes be in the background when specs are running,
@@ -76,12 +82,20 @@ const karmaConfig = {
     ChromeHeadlessNoSandbox: {
       base: 'ChromeHeadless',
       flags: ['--no-sandbox', '--disable-renderer-backgrounding'] // needed for running tests in local docker
+    },
+
+    ChromeSeleniumGridHeadless: {
+      base: 'SeleniumGrid',
+      gridUrl: 'http://selenium-hub:4444/wd/hub',
+      browserName: 'chrome',
+      arguments: ['--no-sandbox', '--headless', '--disable-renderer-backgrounding']
     }
   },
 
   // If browser does not capture in given timeout [ms], kill it
   captureTimeout: 60000,
 
+  browserDisconnectTimeout: 100000,
   browserNoActivityTimeout: 2000000,
 
   reportSlowerThan: 1000,
@@ -129,7 +143,9 @@ if (process.env.COVERAGE === '1') {
   })
 }
 
-module.exports = function (config) {
+module.exports = async (config) => {
+  karmaConfig.hostname = await addrPromise;
+
   // config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
   karmaConfig.logLevel = config.LOG_INFO
   config.set(karmaConfig)

@@ -19,6 +19,7 @@
 import FilePreview from '../FilePreview'
 import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
+import {mockSubmission} from '@canvas/assignments/graphql/studentMocks'
 
 const files = [
   {
@@ -28,7 +29,8 @@ const files = [
     mimeClass: 'image',
     submissionPreviewUrl: '/preview_url',
     thumbnailUrl: '/thumbnail_url',
-    url: '/url'
+    url: '/url',
+    size: '670 Bytes'
   },
   {
     _id: '2',
@@ -37,54 +39,144 @@ const files = [
     mimeClass: 'file',
     submissionPreviewUrl: null,
     thumbnailUrl: null,
-    url: '/url'
+    url: '/url',
+    size: '107 GB'
+  }
+]
+
+const turnitin_data = [
+  {
+    score: 75,
+    state: 'problem',
+    reportUrl: 'http://example.com',
+    status: 'scored'
+  },
+  {
+    score: 10,
+    state: 'acceptable',
+    reportUrl: 'http://example.com',
+    status: 'scored'
   }
 ]
 
 describe('FilePreview', () => {
-  it('renders a message if there are no files to display', () => {
-    const {getByText} = render(<FilePreview files={[]} />)
+  it('renders a message if there are no files to display', async () => {
+    const props = {
+      submission: await mockSubmission({
+        Submission: {attachments: []}
+      })
+    }
+    const {getByText} = render(<FilePreview {...props} />)
     expect(getByText('No Submission')).toBeInTheDocument()
   })
 
-  it('renders the appropriate file icons', () => {
-    const {container, getByTestId} = render(<FilePreview files={files} />)
-    expect(getByTestId('assignments_2_file_icons')).toBeInTheDocument()
+  it('renders the appropriate file icons', async () => {
+    const props = {
+      submission: await mockSubmission({
+        Submission: {attachments: files}
+      })
+    }
+    const {container, getByTestId} = render(<FilePreview {...props} />)
+    expect(getByTestId('uploaded_files_table')).toBeInTheDocument()
 
     // renders a thumbnail for the file with a preview url
-    expect(getByTestId('assignments_2_file_icons')).toContainElement(
+    expect(getByTestId('uploaded_files_table')).toContainElement(
       container.querySelector('img[alt="file_1.png preview"]')
     )
 
     // renders an icon for the file without a preview url
-    expect(getByTestId('assignments_2_file_icons')).toContainElement(
+    expect(getByTestId('uploaded_files_table')).toContainElement(
       container.querySelector('svg[name="IconPaperclip"]')
     )
   })
 
-  it('does not render the file icons if there is only one file', () => {
-    const {queryByTestId} = render(<FilePreview files={[files[0]]} />)
+  it('does not render the file icons if there is only one file', async () => {
+    const props = {
+      submission: await mockSubmission({
+        Submission: {attachments: [files[0]]}
+      })
+    }
+    const {queryByTestId} = render(<FilePreview {...props} />)
     expect(queryByTestId('assignments_2_file_icons')).not.toBeInTheDocument()
   })
 
-  it('renders the file preview', () => {
-    const {getByTestId} = render(<FilePreview files={files} />)
+  it('renders orignality reports for each file if turnitin data exists and there is more than one attachment', async () => {
+    const props = {
+      submission: await mockSubmission({
+        Submission: {attachments: files, turnitinData: turnitin_data}
+      })
+    }
+    const {getAllByTestId} = render(<FilePreview {...props} />)
+    const reports = getAllByTestId('originality_report')
+
+    expect(reports.length).toBe(2)
+    expect(reports[0].textContent).toBe('75%')
+    expect(reports[1].textContent).toBe('10%')
+  })
+
+  it('does not render orignality reports if only one attachment exists', async () => {
+    const props = {
+      submission: await mockSubmission({
+        Submission: {attachments: [files[0]], turnitinData: turnitin_data}
+      })
+    }
+    const {queryByTestId} = render(<FilePreview {...props} />)
+
+    expect(queryByTestId('originality_report')).not.toBeInTheDocument()
+  })
+
+  it('renders the size of each file being uploaded', async () => {
+    const props = {
+      submission: await mockSubmission({
+        Submission: {attachments: files}
+      })
+    }
+    const {getAllByTestId} = render(<FilePreview {...props} />)
+
+    const sizes = getAllByTestId('file-size')
+
+    expect(sizes[0].textContent).toBe('670 Bytes')
+    expect(sizes[1].textContent).toBe('107 GB')
+  })
+
+  it('renders the file preview', async () => {
+    const props = {
+      submission: await mockSubmission({
+        Submission: {attachments: [files[0]]}
+      })
+    }
+    const {getByTestId} = render(<FilePreview {...props} />)
     expect(getByTestId('assignments_2_submission_preview')).toBeInTheDocument()
   })
 
-  it('renders no preview available if the given file has no preview url', () => {
-    const {getByText} = render(<FilePreview files={[files[1]]} />)
+  it('renders no preview available if the given file has no preview url', async () => {
+    const props = {
+      submission: await mockSubmission({
+        Submission: {attachments: [files[1]]}
+      })
+    }
+    const {getByText} = render(<FilePreview {...props} />)
     expect(getByText('Preview Unavailable')).toBeInTheDocument()
   })
 
-  it('renders a download button for files without canvadoc preview', () => {
-    const {container, getByText} = render(<FilePreview files={[files[1]]} />)
+  it('renders a download button for files without canvadoc preview', async () => {
+    const props = {
+      submission: await mockSubmission({
+        Submission: {attachments: [files[1]]}
+      })
+    }
+    const {container, getByText} = render(<FilePreview {...props} />)
     expect(getByText('Preview Unavailable')).toBeInTheDocument()
     expect(container.querySelector('a[href="/url"]')).toBeInTheDocument()
   })
 
-  it('changes the preview when a different file icon is clicked', () => {
-    const {container, getByTestId, getByText} = render(<FilePreview files={files} />)
+  it('changes the preview when a different file icon is clicked', async () => {
+    const props = {
+      submission: await mockSubmission({
+        Submission: {attachments: files}
+      })
+    }
+    const {container, getByTestId, getByText} = render(<FilePreview {...props} />)
     expect(getByTestId('assignments_2_submission_preview')).toBeInTheDocument()
 
     const secondFileIcon = container.querySelector('svg[name="IconPaperclip"]')

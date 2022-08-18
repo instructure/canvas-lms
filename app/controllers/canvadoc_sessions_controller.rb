@@ -82,7 +82,7 @@ class CanvadocSessionsController < ApplicationController
       opts = {
         preferred_plugins: [Canvadocs::RENDER_PDFJS, Canvadocs::RENDER_BOX, Canvadocs::RENDER_CROCODOC],
         enable_annotations: blob["enable_annotations"],
-        use_cloudfront: Account.site_admin.feature_enabled?(:use_cloudfront_for_docviewer)
+        use_cloudfront: true
       }
 
       submission_id = blob["submission_id"]

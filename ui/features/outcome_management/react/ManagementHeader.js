@@ -40,7 +40,10 @@ const ManagementHeader = ({
   handleFileDrop,
   handleAddOutcomes,
   onSuccessfulCreateOutcome,
-  lhsGroupId
+  lhsGroupId,
+  setTargetGroupIdsToRefetch,
+  importsTargetGroup,
+  setImportsTargetGroup
 }) => {
   const [isFindOutcomeModalOpen, openFindOutcomeModal, closeFindOutcomeModal] = useModal()
   const [isCreateOutcomeModalOpen, openCreateOutcomeModal, closeCreateOutcomeModal] = useModal()
@@ -115,7 +118,13 @@ const ManagementHeader = ({
           )}
         </View>
       </Flex>
-      <FindOutcomesModal open={isFindOutcomeModalOpen} onCloseHandler={handleCloseFindModal} />
+      <FindOutcomesModal
+        open={isFindOutcomeModalOpen}
+        onCloseHandler={handleCloseFindModal}
+        setTargetGroupIdsToRefetch={setTargetGroupIdsToRefetch}
+        importsTargetGroup={importsTargetGroup}
+        setImportsTargetGroup={setImportsTargetGroup}
+      />
       {isCreateOutcomeModalOpen && (
         <CreateOutcomeModal
           isOpen
@@ -136,7 +145,10 @@ ManagementHeader.propTypes = {
   handleFileDrop: PropTypes.func.isRequired,
   handleAddOutcomes: PropTypes.func.isRequired,
   onSuccessfulCreateOutcome: PropTypes.func,
-  lhsGroupId: PropTypes.string
+  lhsGroupId: PropTypes.string,
+  setTargetGroupIdsToRefetch: PropTypes.func.isRequired,
+  importsTargetGroup: PropTypes.object.isRequired,
+  setImportsTargetGroup: PropTypes.func.isRequired
 }
 
 export default ManagementHeader

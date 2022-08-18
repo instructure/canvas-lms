@@ -220,6 +220,25 @@ const useTreeBrowser = queryVariables => {
       })
   }
 
+  const refetchGroup = id => {
+    client
+      .query({
+        query: CHILD_GROUPS_QUERY,
+        variables: {
+          id,
+          type: 'LearningOutcomeGroup'
+        },
+        fetchPolicy: 'network-only'
+      })
+      .then(({data}) => {
+        addGroups(extractGroups(data.context))
+        addLoadedGroups([id])
+      })
+      .catch(err => {
+        setError(err.message)
+      })
+  }
+
   useEffect(() => {
     if (error) {
       const srOnlyAlert = Object.keys(collections).length === 0
@@ -256,11 +275,17 @@ const useTreeBrowser = queryVariables => {
     loadedGroups,
     addNewGroup,
     removeGroup,
-    setSelectedParentGroupId
+    setSelectedParentGroupId,
+    refetchGroup
   }
 }
 
-export const useManageOutcomes = ({collection, initialGroupId, importNumber = 0} = {}) => {
+export const useManageOutcomes = ({
+  collection,
+  initialGroupId,
+  importNumber = 0,
+  lhsGroupIdsToRefetch = []
+} = {}) => {
   const {contextId, contextType} = useCanvasContext()
   const client = useApolloClient()
   const {
@@ -281,7 +306,8 @@ export const useManageOutcomes = ({collection, initialGroupId, importNumber = 0}
     addNewGroup,
     removeGroup,
     loadedGroups,
-    setSelectedParentGroupId
+    setSelectedParentGroupId,
+    refetchGroup
   } = useTreeBrowser({
     collection
   })
@@ -332,6 +358,13 @@ export const useManageOutcomes = ({collection, initialGroupId, importNumber = 0}
       setIsLoading(false)
     }
   }, [collections, rootId, loadedGroups, error, isLoading, setIsLoading, initialGroupId])
+
+  useEffect(() => {
+    if (lhsGroupIdsToRefetch.length > 0) {
+      lhsGroupIdsToRefetch.map(groupId => refetchGroup(groupId))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lhsGroupIdsToRefetch])
 
   const saveRootGroupId = id => {
     addLoadedGroups([id])

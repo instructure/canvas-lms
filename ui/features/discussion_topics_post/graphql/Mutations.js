@@ -277,3 +277,22 @@ export const CREATE_DISCUSSION_ENTRY_DRAFT = gql`
   }
   ${DiscussionEntryDraft.fragment}
 `
+
+export const UPDATE_USER_GRADE = gql`
+  mutation UpdateUserGrade($submissionId: ID!, $score: Int!) {
+    __typename
+    updateSubmissionGrade(input: {submissionId: $submissionId, score: $score}) {
+      submission {
+        _id
+        id
+        grade
+        score
+        user {
+          _id
+          id
+          name
+        }
+      }
+    }
+  }
+`

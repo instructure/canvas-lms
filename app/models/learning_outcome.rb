@@ -268,6 +268,17 @@ class LearningOutcome < ActiveRecord::Base
     }
   end
 
+  # Set default mastery level and color scheme for outcome ratings
+  # will not override current values stored in ratings
+  def find_or_set_rating_defaults(ratings, mastery_points)
+    mastery_index = find_mastery_index(ratings, mastery_points)
+    set_mastery_level(ratings, mastery_index)
+    if meets_color_criteria(ratings, mastery_index)
+      find_or_set_default_mastery_colors(ratings, mastery_index)
+    end
+    ratings
+  end
+
   def rubric_criterion
     self.data ||= {}
     data[:rubric_criterion] ||= self.class.default_rubric_criterion
@@ -482,5 +493,93 @@ class LearningOutcome < ActiveRecord::Base
     return context.root_account.feature_enabled?(:improved_outcomes_management) if context
 
     LoadAccount.default_domain_root_account.feature_enabled?(:improved_outcomes_management)
+  end
+
+  # finds rating set as mastery and returns index of rating in ratings
+  def find_mastery_index(ratings, mastery_points)
+    length = ratings.length
+    mastery_index = case length
+                    when 1, 2, 3, 4
+                      0
+                    else
+                      1
+                    end
+
+    # If mastery_points exactly matches a rating, then set mastery_index to that rating
+    ratings.each_with_index do |rating, i|
+      if rating[:points] == mastery_points
+        mastery_index = i
+        break
+      end
+    end
+
+    mastery_index
+  end
+
+  # checks to see if ratings and mastery level meet certain criteria to be assigned default colors
+  def meets_color_criteria(ratings, mastery_index)
+    length = ratings.length
+    case length
+    # 1, 2, or 3 ratings will always get colors
+    when 1, 2, 3
+      true
+    # If mastery_index is set to 2 then use numbers
+    when 4
+      (mastery_index != 2)
+    # If mastery_index is set to 0, 2, 3, 4, or 5 then use numbers
+    when 5, 6
+      mastery_index == 1
+      # Anything larger than 6 ratings will use numbers
+    else
+      false
+    end
+  end
+
+  # set color defaults for ratings in an outcome
+  # rubocop:disable Lint/DuplicateBranch
+  def find_or_set_default_mastery_colors(ratings, mastery_index)
+    length = ratings.length
+    # apply appropriate defaults for each length if
+    case length
+    when 1
+      ratings[0][:color] ||= "0B874B"
+
+    when 2
+      ratings[0][:color] ||= "0B874B"
+      ratings[1][:color] ||= "555555"
+
+    when 3
+      ratings[0][:color] ||= (mastery_index == 1) ? "0374B5" : "0B874B"
+      ratings[1][:color] ||= (mastery_index == 1) ? "0B874B" : "FAB901"
+      ratings[2][:color] ||= "555555"
+
+    when 4
+      ratings[0][:color] ||= (mastery_index == 1) ? "0374B5" : "0B874B"
+      ratings[1][:color] ||= (mastery_index == 1) ? "0B874B" : "FAB901"
+      ratings[2][:color] ||= (mastery_index == 1) ? "FAB901" : "E0061F"
+      ratings[3][:color] ||= "555555"
+
+    when 5
+      ratings[0][:color] ||= "0374B5"
+      ratings[1][:color] ||= "0B874B"
+      ratings[2][:color] ||= "FAB901"
+      ratings[3][:color] ||= "E0061F"
+      ratings[4][:color] ||= "555555"
+
+    when 6
+      ratings[0][:color] ||= "0374B5"
+      ratings[1][:color] ||= "0B874B"
+      ratings[2][:color] ||= "FAB901"
+      ratings[3][:color] ||= "D97900"
+      ratings[4][:color] ||= "E0061F"
+      ratings[5][:color] ||= "555555"
+    end
+  end
+  # rubocop:enable Lint/DuplicateBranch
+
+  def set_mastery_level(ratings, mastery_index)
+    ratings.each_with_index do |rating, i|
+      rating[:mastery] = (i == mastery_index)
+    end
   end
 end

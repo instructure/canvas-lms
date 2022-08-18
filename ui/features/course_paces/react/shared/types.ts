@@ -22,10 +22,15 @@ export interface BlackoutDate {
   readonly id?: number | string
   temp_id?: string
   readonly course_id?: number | string
-  readonly event_title: string
+  event_title: string
   start_date: moment.Moment
   end_date: moment.Moment
   readonly admin_level?: boolean
+  is_calendar_event?: boolean
+  // Only for CalendarEvent blackout dates:
+  readonly title?: string
+  readonly start_at?: moment.Moment
+  readonly end_at?: moment.Moment
 }
 
 export enum SyncState {
