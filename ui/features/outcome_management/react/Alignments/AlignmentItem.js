@@ -71,7 +71,9 @@ const AlignmentItem = ({
           <Flex.Item as="div" padding="xxx-small">
             <Link interaction="enabled" isWithinText={false} href={url} target="_blank">
               <TruncateText>
-                <Text size="medium">{title}</Text>
+                <Text size="medium" data-testid="alignment-item-title">
+                  {title}
+                </Text>
               </TruncateText>
             </Link>
           </Flex.Item>
