@@ -59,14 +59,10 @@ const AccountCalendarResultsArea = ({
         </View>
         <View as="div" textAlign="center">
           <Text as="div" size="large">
-            {I18n.t('Hmm, we can’t find any matching Calendars.')}
+            {I18n.t('Hmm, we can’t find any matching calendars.')}
           </Text>
           <View as="div" margin="x-small none x-large none">
-            <Text as="div">
-              {I18n.t(
-                'Make sure you’ve spelled it correctly or type in fewer letters to see if the calendar shows up in the result.'
-              )}
-            </Text>
+            <Text as="div">{I18n.t('Check your spelling or try fewer letters.')}</Text>
           </View>
         </View>
       </View>

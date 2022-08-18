@@ -31,6 +31,7 @@ const defaultProps = {
 
 beforeEach(() => {
   fetchMock.get(/\/api\/v1\/accounts\/1\/account_calendars.*/, RESPONSE_ACCOUNT_1)
+  fetchMock.get(/\/api\/v1\/accounts\/1\/visible_calendars_count.*/, RESPONSE_ACCOUNT_1.length)
 })
 
 afterEach(() => {
@@ -46,7 +47,7 @@ describe('AccountCalendarSettings', () => {
     ).toBeInTheDocument()
     expect(
       getByText(
-        'Choose which calendars are visible in the Other Calendar section in the Canvas Calendar. Sub-account calendars are visible to users if they are associated with the account. By default, all calendars are hidden.'
+        'Choose which calendars your users can add in the "Other Calendars" section of their Canvas calendar. Users will only be able to add enabled calendars for the accounts they are associated with. By default, all calendars are disabled.'
       )
     ).toBeInTheDocument()
   })

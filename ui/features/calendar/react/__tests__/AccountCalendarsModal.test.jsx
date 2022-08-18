@@ -160,7 +160,7 @@ describe('Other Calendars modal ', () => {
             const searchBar = await findByTestId('search-input')
             fireEvent.change(searchBar, { target: { value: 'Test' } })
             advance(500)
-            expect(await findByText('Hmm, we can’t find any matching Calendars.')).toBeInTheDocument()
+            expect(await findByText('Hmm, we can’t find any matching calendars.')).toBeInTheDocument()
             expect(await findByTestId('account-calendars-empty-state')).toBeInTheDocument()
         })
     })
