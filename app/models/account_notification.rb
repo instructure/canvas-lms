@@ -385,15 +385,10 @@ class AccountNotification < ActiveRecord::Base
       end
 
       if roles.include?(nil)
-        Course.find_ids_in_ranges do |min_id, max_id|
-          course_ids = Course.active.where(id: min_id..max_id, account_id: all_account_ids).pluck(:id)
-          next unless course_ids.any?
-
-          course_ids.each_slice(50) do |sliced_course_ids|
-            scope = User.where.not(id: Enrollment.active_or_pending_by_date.where(course_id: sliced_course_ids).select(:user_id))
-            user_ids += scope.distinct.pluck(:id)
-          end
-        end
+        users_with_no_enrollments_from_given_accounts = User.joins(:user_account_associations).where(user_account_associations: { account_id: all_account_ids }).where.not(id: Enrollment.active_or_pending_by_date.select(:user_id))
+        users_with_no_enrollments_and_no_account_associations = User.left_joins(:user_account_associations).where.not(id: Enrollment.active_or_pending_by_date.select(:user_id)).where.not(id: User.joins(:user_account_associations).where.not(id: Enrollment.active_or_pending_by_date.select(:user_id)))
+        user_ids += users_with_no_enrollments_from_given_accounts.pluck(:id)
+        user_ids += users_with_no_enrollments_and_no_account_associations.pluck(:id)
       end
       user_ids.to_a.sort
     end
