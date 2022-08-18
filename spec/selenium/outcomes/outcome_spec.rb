@@ -456,6 +456,62 @@ describe "outcomes" do
           expect(ratings.length).to eq(1)
         end
       end
+
+      describe "with alignment_summary enabled" do
+        before do
+          enable_alignment_summary(Account.default)
+          context_outcome(@course, 3)
+          @assignment = assignment_model(course: @course)
+          @aligned_outcome = LearningOutcome.find_by(context: @course, short_description: "outcome 0")
+          @aligned_outcome.align(@assignment, @course)
+        end
+
+        it "shows outcomes with and without alignments" do
+          get outcome_url
+          click_alignments_tab
+          expect(alignment_summary_outcomes_list.length).to eq(3)
+          expect(alignment_summary_outcome_alignments(0)).to eq("1")
+          expect(alignment_summary_outcome_alignments(1)).to eq("0")
+          expect(alignment_summary_outcome_alignments(2)).to eq("0")
+        end
+
+        it "shows list of alignments when aligned outcome is expanded" do
+          get outcome_url
+          click_alignments_tab
+          alignment_summary_expand_outcome_description_button(0).click
+          expect(alignment_summary_outcome_alignments_list.length).to eq(1)
+        end
+
+        it "filters outcomes with and without alignments" do
+          get outcome_url
+          click_alignments_tab
+          expect(alignment_summary_outcomes_list.length).to eq(3)
+          # filters outcomes with alignments
+          click_option(alignment_summary_filter_all_input, "With Alignments")
+          expect(alignment_summary_outcomes_list.length).to eq(1)
+          expect(alignment_summary_outcome_alignments(0)).to eq("1")
+          # filters outcomes without alignments
+          click_option(alignment_summary_filter_with_alignments_input, "Without Alignments")
+          expect(alignment_summary_outcomes_list.length).to eq(2)
+          expect(alignment_summary_outcome_alignments(0)).to eq("0")
+          expect(alignment_summary_outcome_alignments(1)).to eq("0")
+        end
+
+        it "shows alignment summary statistics" do
+          get outcome_url
+          click_alignments_tab
+          expect(alignment_summary_alignment_stat_name(0)).to eq("3 OUTCOMES")
+          expect(alignment_summary_alignment_stat_percent(0)).to eq("33%")
+          expect(alignment_summary_alignment_stat_type(0)).to eq("Coverage")
+          expect(alignment_summary_alignment_stat_average(0)).to eq("0.3")
+          expect(alignment_summary_alignment_stat_description(0)).to eq("Avg. Alignments per Outcome")
+          expect(alignment_summary_alignment_stat_name(1)).to eq("1 ALIGNABLE ARTIFACT")
+          expect(alignment_summary_alignment_stat_percent(1)).to eq("100%")
+          expect(alignment_summary_alignment_stat_type(1)).to eq("With Alignments")
+          expect(alignment_summary_alignment_stat_average(1)).to eq("1.0")
+          expect(alignment_summary_alignment_stat_description(1)).to eq("Avg. Alignments per Artifact")
+        end
+      end
     end
   end
 end

@@ -94,7 +94,12 @@ const AlignmentStatItem = ({type, count, percent, average}) => {
         <Flex.Item as="div">
           <Flex>
             <Flex.Item>
-              <Text size={isMobileView ? 'medium' : 'large'}>{statName}</Text>
+              <Text
+                size={isMobileView ? 'medium' : 'large'}
+                data-testid="outcome-alignment-stat-name"
+              >
+                {statName}
+              </Text>
             </Flex.Item>
             {type === 'artifact' && <Flex.Item>{renderTooltip()}</Flex.Item>}
           </Flex>
@@ -106,19 +111,37 @@ const AlignmentStatItem = ({type, count, percent, average}) => {
             wrap={isMobileView ? 'no-wrap' : 'wrap'}
           >
             <Flex.Item as="div">
-              <Text size={isMobileView ? 'small' : 'large'} weight="bold">
+              <Text
+                size={isMobileView ? 'small' : 'large'}
+                weight="bold"
+                data-testid="outcome-alignment-stat-percent"
+              >
                 {`${(percent * 100).toFixed()}%`}
               </Text>
               <View padding="0 small 0 xx-small">
-                <Text size={isMobileView ? 'small' : 'medium'}>{statType}</Text>
+                <Text
+                  size={isMobileView ? 'small' : 'medium'}
+                  data-testid="outcome-alignment-stat-type"
+                >
+                  {statType}
+                </Text>
               </View>
             </Flex.Item>
             <Flex.Item as="div">
-              <Text size={isMobileView ? 'small' : 'large'} weight="bold">
+              <Text
+                size={isMobileView ? 'small' : 'large'}
+                weight="bold"
+                data-testid="outcome-alignment-stat-average"
+              >
                 {average.toFixed(1)}
               </Text>
               <View padding="0 small 0 xx-small">
-                <Text size={isMobileView ? 'small' : 'medium'}>{statDescription}</Text>
+                <Text
+                  size={isMobileView ? 'small' : 'medium'}
+                  data-testid="outcome-alignment-stat-description"
+                >
+                  {statDescription}
+                </Text>
               </View>
             </Flex.Item>
           </Flex>
