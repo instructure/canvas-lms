@@ -55,7 +55,8 @@ module Lti
       DesignerEnrollment => "http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper",
       ObserverEnrollment => "http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor",
       StudentViewEnrollment => "http://purl.imsglobal.org/vocab/lis/v2/membership#Learner",
-      Course => "http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering"
+      Course => "http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering",
+      Group => "http://purl.imsglobal.org/vocab/lis/v2/course#Group"
     }.freeze
 
     LIS_V2_ROLE_NONE = "http://purl.imsglobal.org/vocab/lis/v2/person#None"
