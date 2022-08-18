@@ -81,7 +81,7 @@ def computeTestCount() {
                  --env FSC_IGNORE_FILES \
                  -w=$DOCKER_WORKDIR \
                  $PATCHSET_TAG \
-          bash -c "flakey_spec_catcher --use-parent --list-child-specs --dry-run-quiet > $DOCKER_WORKDIR/tmp/test_list"
+          bash -c "git config --global --add safe.directory $DOCKER_WORKDIR; flakey_spec_catcher --use-parent --list-child-specs --dry-run-quiet > $DOCKER_WORKDIR/tmp/test_list"
     '''
 
     changedTests = readFile("$env.LOCAL_WORKDIR/tmp/test_list").trim()
