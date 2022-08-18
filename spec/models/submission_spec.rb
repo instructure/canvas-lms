@@ -8274,10 +8274,6 @@ describe Submission do
   end
 
   describe "word_count" do
-    before(:once) do
-      Account.site_admin.enable_feature!(:word_count_in_speed_grader)
-    end
-
     it "returns the word count" do
       submission.update(body: "test submission")
       expect(submission.word_count).to eq 2

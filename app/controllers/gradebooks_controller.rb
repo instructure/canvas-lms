@@ -786,9 +786,7 @@ class GradebooksController < ApplicationController
         include: { submission_history: { methods: %i[late missing], except: omitted_field } },
         except: [omitted_field, :submission_comments]
       }
-      if @domain_root_account.feature_enabled?(:word_count_in_speed_grader)
-        json_params[:include][:submission_history][:methods] << :word_count
-      end
+      json_params[:include][:submission_history][:methods] << :word_count
       json = submission.as_json(Submission.json_serialization_full_parameters.merge(json_params))
 
       json[:submission].tap do |submission_json|

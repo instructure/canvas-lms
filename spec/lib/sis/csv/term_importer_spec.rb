@@ -70,7 +70,7 @@ describe SIS::CSV::TermImporter do
       "T001,Winter11,active,2011-1-05 00:00:00,2011-4-14 00:00:00"
     )
     expect(EnrollmentTerm.where.not(sis_source_id: nil).count).to eq before_count + 1
-    EnrollmentTerm.last.tap do |t|
+    EnrollmentTerm.where.not(sis_source_id: nil).last.tap do |t|
       expect(t.name).to eq "Winter11"
       expect(t.start_at).to eq DateTime.parse("2011-1-05 00:00:00")
       expect(t.end_at).to eq DateTime.parse("2011-4-14 00:00:00")
@@ -80,7 +80,7 @@ describe SIS::CSV::TermImporter do
       "T001,Winter12,active,2010-1-05 00:00:00,2010-4-14 00:00:00"
     )
     expect(EnrollmentTerm.where.not(sis_source_id: nil).count).to eq before_count + 1
-    EnrollmentTerm.last.tap do |t|
+    EnrollmentTerm.where.not(sis_source_id: nil).last.tap do |t|
       expect(t.name).to eq "Winter12"
       expect(t.start_at).to eq DateTime.parse("2010-1-05 00:00:00")
       expect(t.end_at).to eq DateTime.parse("2010-4-14 00:00:00")
@@ -94,7 +94,7 @@ describe SIS::CSV::TermImporter do
       "T001,Fall12,active,2011-1-05 00:00:00,2011-4-14 00:00:00"
     )
     expect(EnrollmentTerm.where.not(sis_source_id: nil).count).to eq before_count + 1
-    EnrollmentTerm.last.tap do |t|
+    EnrollmentTerm.where.not(sis_source_id: nil).last.tap do |t|
       expect(t.name).to eq "Fall11"
       expect(t.start_at).to eq DateTime.parse("2009-1-05 00:00:00")
       expect(t.end_at).to eq DateTime.parse("2009-4-14 00:00:00")

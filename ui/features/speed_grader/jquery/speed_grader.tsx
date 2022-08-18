@@ -2169,7 +2169,7 @@ EG = {
 
   updateWordCount(wordCount) {
     if (
-      ENV.FEATURES?.word_count_in_speed_grader &&
+      this.currentStudent.submission?.submission_type &&
       !['basic_lti_launch', 'external_tool'].includes(
         this.currentStudent.submission.submission_type
       )
