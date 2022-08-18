@@ -147,7 +147,7 @@ const AccountCalendarsModal = ({getSelectedOtherCalendars, onSave, calendarsPerR
       if (json.status === 'ok') {
         showFlashAlert({
           type: 'success',
-          message: I18n.t('Calendars saved successfully')
+          message: I18n.t('Calendars added successfully')
         })
       }
       onSave(selectedCalendars)
@@ -176,7 +176,7 @@ const AccountCalendarsModal = ({getSelectedOtherCalendars, onSave, calendarsPerR
         size="small"
         onDismiss={closeModal}
         open={isOpen}
-        label={I18n.t('Choose Calendars to Add')}
+        label={I18n.t('Add Calendar')}
         theme={{smallMaxWidth: '34rem'}}
       >
         <Modal.Header>
@@ -188,13 +188,11 @@ const AccountCalendarsModal = ({getSelectedOtherCalendars, onSave, calendarsPerR
           >
             {I18n.t('Close')}
           </CloseButton>
-          <Heading>{I18n.t('Choose Calendars to Add')}</Heading>
+          <Heading>{I18n.t('Add Calendar')}</Heading>
         </Modal.Header>
         <Modal.Body padding="none">
           <View as="div" margin="small medium">
-            {I18n.t(
-              "Add calendars to view your institution's important dates such as the first day of classes, exam periods.. etc"
-            )}
+            {I18n.t('Choose additional calendars to add to your Canvas calendar.')}
           </View>
           <View as="div" margin="small medium medium" maxHeight={modalHeight}>
             <TextInput
@@ -222,7 +220,7 @@ const AccountCalendarsModal = ({getSelectedOtherCalendars, onSave, calendarsPerR
             margin="none none none small"
             onClick={onSubmit}
           >
-            {I18n.t('Save')}
+            {I18n.t('Add Calendars')}
           </Button>
         </Modal.Footer>
       </Modal>
