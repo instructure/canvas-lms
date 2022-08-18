@@ -235,6 +235,91 @@ describe WikiPage do
     end
   end
 
+  context "publish_at" do
+    before :once do
+      course_with_teacher
+      @page = @course.wiki_pages.create(title: "unpublished page", workflow_state: "unpublished")
+      @course.root_account.enable_feature! :scheduled_page_publication
+    end
+
+    it "schedules a job to publish a page" do
+      @page.publish_at = 1.hour.from_now
+      @page.save!
+
+      run_jobs
+      expect(@page.reload).to be_unpublished
+
+      Timecop.travel(61.minutes.from_now) do
+        run_jobs
+        expect(@page.reload).to be_published
+        expect(@page.publish_at).not_to be_nil
+      end
+    end
+
+    it "doesn't publish prematurely if the publish_at date changes" do
+      @page.update publish_at: 2.hours.from_now
+      @page.update publish_at: 4.hours.from_now
+
+      Timecop.travel(3.hours.from_now) do
+        run_jobs
+        expect(@page.reload).to be_unpublished
+      end
+    end
+
+    it "unpublishes when a future publish_at date is set" do
+      @page.publish!
+      mod = @course.context_modules.create! name: "the module"
+      tag = mod.add_item type: "page", id: @page.id
+      expect(tag).to be_published
+
+      @page.publish_at = 1.hour.from_now
+      @page.save!
+      expect(@page.reload).to be_unpublished
+      expect(tag.reload).to be_unpublished
+
+      Timecop.travel(61.minutes.from_now) do
+        run_jobs
+        expect(@page.reload).to be_published
+        expect(tag.reload).to be_published
+      end
+    end
+
+    it "clears a publish_at date when manually publishing" do
+      @page.publish_at = 1.hour.from_now
+      @page.save!
+
+      @page.publish!
+      expect(@page.reload.publish_at).to be_nil
+    end
+
+    it "clears a publish_at date when manually unpublishing" do
+      @page.publish_at = 1.hour.from_now
+      @page.save!
+
+      Timecop.travel(61.minutes.from_now) do
+        run_jobs
+        expect(@page.reload).to be_published
+        expect(@page.publish_at).not_to be_nil
+
+        new_page = WikiPage.find(@page.id)
+        new_page.unpublish!
+        expect(new_page.reload.publish_at).to be_nil
+      end
+    end
+
+    it "doesn't publish if the FF is off" do
+      @course.root_account.disable_feature! :scheduled_page_publication
+
+      @page.publish_at = 1.hour.from_now
+      @page.save!
+
+      Timecop.travel(61.minutes.from_now) do
+        run_jobs
+        expect(@page.reload).to be_unpublished
+      end
+    end
+  end
+
   describe "#can_edit_page?" do
     it "is true if the user has manage_wiki_update rights" do
       course_with_teacher(active_all: true)

@@ -57,6 +57,7 @@ module CC
             meta_fields[:only_visible_to_overrides] = page.assignment.only_visible_to_overrides
           end
           meta_fields[:todo_date] = page.todo_date
+          meta_fields[:publish_at] = page.publish_at
 
           File.open(path, "w") do |file|
             file << @html_exporter.html_page(page.body, page.title, meta_fields)

@@ -117,6 +117,7 @@ module Importers
       end
       item.migration_id = hash[:migration_id]
       item.todo_date = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:todo_date])
+      item.publish_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:publish_at])
 
       migration.add_imported_item(item)
 

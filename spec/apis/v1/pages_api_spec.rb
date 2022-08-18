@@ -306,7 +306,8 @@ describe "Pages API", type: :request do
                      "front_page" => false,
                      "locked_for_user" => false,
                      "page_id" => @hidden_page.id,
-                     "todo_date" => nil }
+                     "todo_date" => nil,
+                     "publish_at" => nil }
         expect(json).to eq expected
       end
 
@@ -329,7 +330,8 @@ describe "Pages API", type: :request do
                      "front_page" => true,
                      "locked_for_user" => false,
                      "page_id" => page.id,
-                     "todo_date" => nil, }
+                     "todo_date" => nil,
+                     "publish_at" => nil }
         expect(json).to eq expected
       end
 
@@ -620,6 +622,16 @@ describe "Pages API", type: :request do
         expect(page).to be_published
       end
 
+      it "creates a delayed-publish page" do
+        json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
+                        { controller: "wiki_pages_api", action: "create", format: "json", course_id: @course.to_param },
+                        { wiki_page: { published: false, publish_at: 1.day.from_now.beginning_of_day.iso8601, title: "New Wiki Page!", body: "hello new page" } })
+        page = @course.wiki_pages.where(url: json["url"]).first!
+        expect(page).to be_unpublished
+        expect(json["published"]).to eq false
+        expect(json["publish_at"]).to eq page.publish_at.iso8601
+      end
+
       it "allows teachers to set editing_roles" do
         @course.default_wiki_editing_roles = "teachers"
         @course.save
@@ -850,6 +862,15 @@ describe "Pages API", type: :request do
                           { controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param, url_or_id: @unpublished_page.url })
           expect(json["published"]).to be_falsey
           expect(@unpublished_page.reload).to be_unpublished
+        end
+
+        it "schedules future publication" do
+          json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@unpublished_page.url}",
+                          { controller: "wiki_pages_api", action: "update", format: "json", course_id: @course.to_param, url_or_id: @unpublished_page.url },
+                          { wiki_page: { "publish_at" => 1.day.from_now.beginning_of_day.iso8601 } })
+          expect(@unpublished_page.reload).to be_unpublished
+          expect(json["published"]).to eq false
+          expect(json["publish_at"]).to eq @unpublished_page.publish_at.iso8601
         end
       end
 

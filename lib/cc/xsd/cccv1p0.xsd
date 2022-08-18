@@ -295,6 +295,7 @@
         <xs:element name="only_graders_can_rate" type="xs:boolean" minOccurs="0"/>
         <xs:element name="sort_by_rating" type="xs:boolean" minOccurs="0"/>
         <xs:element name="todo_date" type="optional_dateTime" minOccurs="0"/>
+        <xs:element name="publish_at" type="optional_dateTime" minOccurs="0"/>
         <xs:element name="discussion_type" minOccurs="0">
           <xs:simpleType>
             <xs:restriction base="xs:string">
