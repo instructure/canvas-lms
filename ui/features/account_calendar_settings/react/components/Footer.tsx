@@ -78,6 +78,7 @@ export const Footer: React.FC<ComponentProps> = ({
         interaction={enableSaveButton ? 'enabled' : 'disabled'}
         onClick={onApplyClicked}
         margin="small"
+        data-testid="save-button"
       >
         {I18n.t('Apply Changes')}
       </Button>
