@@ -50,6 +50,7 @@ const RosterTable = () => {
   if (loading) return <LoadingIndicator />
 
   const {view_user_logins, read_sis, read_reports} = ENV?.permissions || {}
+  const showCourseSections = ENV?.course?.hideSectionsOnCourseUsersPage === false
 
   const tableRows = data.course.usersConnection.nodes.map(node => {
     const {name, _id, sisId, enrollments, loginId, avatarUrl, pronouns} = node
@@ -71,7 +72,7 @@ const RosterTable = () => {
         </Table.Cell>
         {view_user_logins && <Table.Cell>{loginId}</Table.Cell>}
         {read_sis && <Table.Cell>{sisId}</Table.Cell>}
-        <Table.Cell>{sectionNames}</Table.Cell>
+        {showCourseSections && <Table.Cell>{sectionNames}</Table.Cell>}
         <Table.Cell>
           <RosterTableRoles enrollments={enrollments} />
         </Table.Cell>
@@ -106,7 +107,9 @@ const RosterTable = () => {
           {read_sis && (
             <Table.ColHeader {...idProps('colheader-sis-id')}>{I18n.t('SIS ID')}</Table.ColHeader>
           )}
-          <Table.ColHeader {...idProps('colheader-section')}>{I18n.t('Section')}</Table.ColHeader>
+          {showCourseSections && (
+            <Table.ColHeader {...idProps('colheader-section')}>{I18n.t('Section')}</Table.ColHeader>
+          )}
           <Table.ColHeader {...idProps('colheader-role')}>{I18n.t('Role')}</Table.ColHeader>
           {read_reports && (
             <Table.ColHeader {...idProps('colheader-last-activity')}>

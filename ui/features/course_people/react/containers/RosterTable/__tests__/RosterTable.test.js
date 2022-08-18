@@ -18,11 +18,13 @@
 
 import {MockedProvider} from '@apollo/react-testing'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {render, within, queryAllByText} from '@testing-library/react'
+import {render, within, getByText, queryAllByText} from '@testing-library/react'
 import React from 'react'
 import RosterTable from '../RosterTable'
 import {mockUser, mockEnrollment, getRosterQueryMock} from '../../../../graphql/Mocks'
 import {ACTIVE_STATE, PILL_MAP} from '../../../components/StatusPill/StatusPill'
+
+const OBSERVER_ENROLLMENT = 'ObserverEnrollment'
 
 const designer1 = {
   name: 'Designer 1',
@@ -90,7 +92,7 @@ const observer1 = {
   _id: '40',
   sisId: 'Observer1-SIS-ID',
   loginId: 'Observer1@instructure.com',
-  enrollmentType: 'ObserverEnrollment',
+  enrollmentType: OBSERVER_ENROLLMENT,
   sisRole: 'observer',
   additionalEnrollments: [
     mockEnrollment({
@@ -131,7 +133,10 @@ describe('RosterTable', () => {
 
   beforeEach(() => {
     window.ENV = {
-      course: {id: '1'},
+      course: {
+        id: '1',
+        hideSectionsOnCourseUsersPage: false
+      },
       current_user: {id: '999'},
       permissions: {
         view_user_logins: true,
@@ -215,7 +220,7 @@ describe('RosterTable', () => {
     const container = setup(getRosterQueryMock({mockUsers}))
     const rows = await container.findAllByTestId('roster-table-data-row')
     const lastActivityByUser = mockUsers.map(user => {
-      return user.enrollments[0].type === 'ObserverEnrollment'
+      return user.enrollments[0].type === OBSERVER_ENROLLMENT
         ? null
         : user.enrollments[0].lastActivityAt
     })
@@ -302,6 +307,39 @@ describe('RosterTable', () => {
     // Check there is no SIS ID data
     rows.forEach((row, index) => {
       sisIdByUser[index] && expect(queryAllByText(row, sisIdByUser[index])).toHaveLength(0)
+    })
+  })
+
+  it('should show the section column if the hideSectionsOnCourseUsersPage permission is false', async () => {
+    window.ENV.course.hideSectionsOnCourseUsersPage = false
+    const container = setup(getRosterQueryMock({mockUsers}))
+    const rows = await container.findAllByTestId('roster-table-data-row')
+    const sectionByUser = mockUsers.map(user => {
+      if (user.enrollments[0].type === OBSERVER_ENROLLMENT) return null
+      return user.enrollments[0].section.name
+    })
+
+    // Check for column header
+    expect(container.getByTestId('colheader-section')).toBeInTheDocument()
+
+    // Check section name exists in row
+    rows.forEach((row, index) => {
+      sectionByUser[index] && expect(getByText(row, sectionByUser[index])).toBeInTheDocument()
+    })
+  })
+
+  it('should not show the section column if the hideSectionsOnCourseUsersPage permission is true', async () => {
+    window.ENV.course.hideSectionsOnCourseUsersPage = true
+    const container = setup(getRosterQueryMock({mockUsers}))
+    const rows = await container.findAllByTestId('roster-table-data-row')
+    const sectionByUser = mockUsers.map(user => user.enrollments[0].section.name)
+
+    // Check there is no column header
+    expect(container.queryAllByTestId('colheader-section')).toHaveLength(0)
+
+    // Check section name doesn't exist in row
+    rows.forEach((row, index) => {
+      sectionByUser[index] && expect(queryAllByText(row, sectionByUser[index])).toHaveLength(0)
     })
   })
 })
