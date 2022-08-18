@@ -372,8 +372,9 @@ class ContextExternalTool < ActiveRecord::Base
     # Only LTI 1.1 tools support default placements
     # (LTI 2 tools also, but those are not handled by this class)
     if lti_version == "1.1" &&
-       Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS.include?(type.to_s)
-      !!(selectable && (domain || url))
+       Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS.include?(type.to_s) &&
+       !!(selectable && (domain || url))
+      true
     else
       context_external_tool_placements.to_a.any? { |p| p.placement_type == type.to_s }
     end
