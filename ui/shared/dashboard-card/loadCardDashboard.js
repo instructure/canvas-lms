@@ -50,14 +50,22 @@ export class CardDashboardLoader {
   constructor() {
     this.promiseToGetDashboardCards = undefined
     this.errorShown = false
+    this.observedUserId = undefined
   }
 
   renderIntoDOM = dashboardCards => {
     const dashboardContainer = document.getElementById('DashboardCard_Container')
-    ReactDOM.render(createDashboardCards(dashboardCards), dashboardContainer)
+    ReactDOM.render(
+      createDashboardCards(dashboardCards, DashboardCard, {observedUserId: this.observedUserId}),
+      dashboardContainer
+    )
   }
 
   loadCardDashboard(renderFn = this.renderIntoDOM, observedUserId) {
+    if (observedUserId) {
+      this.observedUserId = observedUserId
+    }
+
     if (observedUserId && CardDashboardLoader.observedUsersDashboardCards[observedUserId]) {
       renderFn(CardDashboardLoader.observedUsersDashboardCards[observedUserId], true)
     } else if (this.promiseToGetDashboardCards) {
