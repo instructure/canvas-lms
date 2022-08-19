@@ -49,7 +49,17 @@ const AccountCalendarResultsArea = ({
   selectedCalendars,
   setSelectedCalendars
 }) => {
-  if (isLoading) return <Spinner size="large" renderTitle={I18n.t('Waiting for results to load')} />
+  if (isLoading) {
+    return (
+      <View as="div" textAlign="center">
+        <Spinner
+          size="large"
+          renderTitle={I18n.t('Waiting for results to load')}
+          margin="large small"
+        />
+      </View>
+    )
+  }
   if (typeof results === 'undefined') return null
   if (results.length === 0)
     return (
