@@ -2061,6 +2061,7 @@ nn:
   afrikaans_da0fe6ee: Afrikaans
   after_48b9d69: Etter..
   after_4c71e718: Etter
+  after_completing_the_above_configuration_please_us_c6440d32: "Etter å ha fullført konfigurasjonen over, følg denne lenka for å gje Canvas tilgang til din Microsoft tenant:  "
   after_date_981cd41b: "Etter %{date}"
   after_last_attempt_c9168da2: "Etter siste forsøk"
   after_the_assignment_is_graded_53754607: "Etter at oppgåva er vurdert"
@@ -2703,32 +2704,47 @@ nn:
   allows_user_to_view_prior_enrollments_df5286d: "Lar brukaren sjå tildlegare påmeldingar"
   allows_user_to_view_published_and_unpublished_cour_25a5dcc0: "Gir ein brukar løyve til å sjå publisert og upublisert emneinnhald."
   allows_user_to_view_recent_announcements_on_the_co_e56c881e: "Lar brukaren sjå dei siste kunngjeringane på emnets heimeside."
+  allows_user_to_view_student_analytics_89bfd9e8: "Lar ein brukar sjå studentstatistikk"
   allows_user_to_view_student_context_cards_in_annou_dadef934: "Gir ein brukar løyve til å sjå studentinformasjonskortet i svar på kunngjeringar og diskusjonar."
   allows_user_to_view_student_grades_pages_e0091b20: "Gir ein brukar løyve til å sjå studentvurderingar."
   allows_user_to_view_student_quiz_logs_e1c4491: "Gir ein brukar løyve til å sjå quizhistorikken til studentar."
   allows_user_to_view_student_results_and_or_access__60fac9: "Gir ein brukar løyve til å sjå studentvurderingar og/eller tilgang til quiz i SpeedGrader."
   allows_user_to_view_student_results_view_quiz_stat_7d77640a: "Tillet brukar å sjå studentresultat, sjå quizstatistikk, og ha tilgang til ein quiz SpeedGrader."
   allows_user_to_view_student_specific_data_in_analy_4abbf6be: "Gir ein brukar løyve til å sjå studentspesifikke data i Analytics."
+  allows_user_to_view_the_announcements_link_in_cour_b3522273: "Lar brukar sjå elementet Kunngjeringar i emnenavvigasjonen"
   allows_user_to_view_the_announcements_link_in_cour_f6b03e9a: "Gir ein brukar løyve til å sjå oppgåvelenker i emnenavigasjon. Gir ein brukar løyve til å sjå emnekunngjeringar."
+  allows_user_to_view_the_conclude_course_button_e90a1175: "Lar brukar sjå knappen for avslutt dette emnet"
   allows_user_to_view_the_course_grading_scheme_32a6042: "Gir brukar løyve til å sjå vurderingsoversikt for emnet."
+  allows_user_to_view_the_course_setup_checklist_but_4d7524f0: "Lar brukar sjå knappen for emne oppsett sjekkliste"
   allows_user_to_view_the_course_statistics_button_i_f44b2c7a: "Gir ein brukar løyve til å sjå knappen emnestatistikk i emneinnstillingar."
+  allows_user_to_view_the_delete_this_course_button_92a4c832: "Lar brukar sjå knappen slett dette emnet."
   allows_user_to_view_the_discussions_link_in_course_2604505d: |-
       Gir ein brukar løyve til å sjå diskusjonslenker i emnenavigasjon.
       Gir ein brukar løyve til å sjå emnediskusjonar.
+  allows_user_to_view_the_discussions_link_in_course_80ab2fca: "Lar brukar sjå elementet Diskusjonar i emnanavigasjonen"
   allows_user_to_view_the_eportfolio_moderation_page_5a6be051: "Lar brukarar vise sida Moderering av ePortfolio og administere spaminnhald i ePortfolio."
   allows_user_to_view_the_faculty_journal_link_in_gl_e3fd6889: "Gir løyve til å sjå lenke til faglærarprotokoll i global navigeringsmeny."
   allows_user_to_view_the_group_home_pages_of_all_st_9d747525: |-
       Gir ein brukar løyve til å sjå gruppeforsider på alle studentgrupper.
       Gir ein student løyve til å sjå andre studentgrupper innanfor eit gruppesett via ei direktelenke.
+  allows_user_to_view_the_group_home_pages_of_all_st_b463b0f9: "Lar brukar sjå gruppesida til alle studentgruppane"
   allows_user_to_view_the_moderate_button_for_modera_5f3c6d21: "Gir ein brukar løyve til å sjå moderer-knappen for modererte oppgåver. Merk: dette løyvet fasast ut. For å sikre at brukarar kan sjå moderer-knappen, slå på 'Vurderingar - vel å moderere sluttvurdering'."
   allows_user_to_view_the_new_announcement_button_in_4aa7f936: |-
       Gir ein brukar løyve til å sjå ny kunngjøring-knappen på forsida til eit emne.
       Gir ein brukar løyve til å legge til kunngjeringar frå kunngjeringssida.
+  allows_user_to_view_the_new_announcement_button_in_4f1a0a2b: "Lar brukar sjå knappen for Nye kunngjeringar på heimesida"
   allows_user_to_view_the_new_announcement_button_in_d21f2922: "Lar brukaren sjå knappen Ny kunngjering på heimesida. Lar brukaren legge til ny kunngjering på sida Kunngjeringar."
   allows_user_to_view_the_new_gradebook_50f53ef0: "Gir brukar løyve til å sjå ny vurderingsoversikt."
   allows_user_to_view_the_people_link_in_course_navi_58b38f5d: "Gir ein brukar løyve til å sjå personmenyvalet i emnenavigasjonen."
+  allows_user_to_view_the_prior_enrollments_button_i_b04b8132: "Lar brukar sjå knappen for Tidligare påmeldingar i emnets personside"
+  allows_user_to_view_the_publish_button_in_a_course_c18d0360: "Lar brukar sjå knappen for publisering i eit emnekort for eit upublisert emne (Kortvisning Dashbord)"
+  allows_user_to_view_the_publish_course_and_unpubli_55fcd20: "Lar brukar sjå knappane for publiser emne og avpubliser emne på emnets heimeside. Lar brukar sjå knappen for publisering i eit emnekort for eit upublisert emne (Kortvisning Dashbord)"
+  allows_user_to_view_the_publish_course_and_unpubli_aac98465: "Lar brukar sjå knappane for publiser emne og avpubliser emne på emnets heimeside"
+  allows_user_to_view_the_reset_course_content_butto_75c8c410: "Lar brukar sjå knappen for Tilbakestill emneinnhald"
+  allows_user_to_view_the_rubrics_link_in_course_nav_41052c80: "Lar brukar sjå elementet Rubrikkar i emnenavigasjonen"
   allows_user_to_view_the_sis_id_in_a_user_s_login_d_71e0922b: "Gir løyve til å sjå SIS-ID-en i innloggingsdetaljane til ein brukar."
   allows_user_to_view_the_user_sis_id_column_in_the__265cb234: "Gir ein brukar løyve til å sjå SIS-ID-kolonna for brukaridentifikator i CSV-fila for quizelement."
+  allows_user_to_view_user_details_for_course_users_ec1b6218: "Lar brukar sjå brukerdetaljar for personar i emnet"
   allows_user_to_view_user_sis_ids_68a9d218: "Gir ein brukar løyve til å sjå SIS-ID-ar til brukarar."
   allows_user_to_view_user_sis_ids_in_a_course_peopl_fc145ade: "Gir ein brukar løyve til å sjå SIS-ID-en til brukarar frå personoversikta på eit emne."
   allows_users_to_add_a_friendly_description_to_outc_7acf6286: "Tillet brukarar å legge til ei venleg skildring til læringsmål for student- og foreldrevisning i vurderingsoversikt for meistringsbasert læring"
@@ -3066,6 +3082,7 @@ nn:
   apply_score_1edd7cda: "Anvend poengsum"
   apply_settings_10409ad9: "Bruk innstillingar"
   apply_theme_7af08387: "Bruk tema"
+  apply_to_92f70c8c: "Skal gjelde for: "
   applying_new_styles_to_subaccounts_e8aeeef2: "Legg til nye stilar til underkontoar"
   applying_please_be_patient_f7b5f244: "Arbeider, ver tolmodig"
   appointment_group: 
@@ -3378,6 +3395,7 @@ nn:
   assignment_name_is_required_9d17311b: "Oppgåvenamn er obligatorisk"
   assignment_name_options_43b1795: "alternativ for oppgåve %{name} "
   assignment_name_z_a_34f92f4b: "Oppgåvenamn - Å-A"
+  assignment_names_858b1880: Oppgåvenamn
   assignment_options_1e5b7074: Oppgåvealternativ
   assignment_override: 
     student_count: 
@@ -16578,7 +16596,7 @@ nn:
   oops_something_went_wrong_importing_name_d382cac1: "Ops! Noke gjekk gale under importering av \"%{name}\""
   oops_something_went_wrong_with_making_a_copy_of_or_22787360: "Noko gjekk gale under kopiering av \"%{original_assignment_name}\"."
   oops_something_went_wrong_with_making_a_copy_of_or_7e9d6695: "Noko gjekk gale under kopiering av \"%{originalAssignmentName}\""
-  oops_something_went_wrong_with_migrating_name_acdbc98b: "Oops! Noko gjekk galt ved eksport av \"%{name}\""
+  oops_something_went_wrong_with_migrating_name_acdbc98b: "Oops! Noko gjekk gale ved eksport av \"%{name}\""
   oops_there_was_a_problem_re_uploading_submissions__276cb8a1: "Det skjedde ein feil under opplastning av oppgåvene. Sjekk zip fila for feil og prøv på ny."
   open_address_book_41ce8576: "Opne adressebok"
   open_color_picker_f117df0a: "Opne fargeveljar"
@@ -22508,7 +22526,7 @@ nn:
   sync_in_progress_12ff1d3c: "Synkronisering i gang"
   sync_not_enabled_88785878: "Synkronisering ikkje slått på"
   sync_now_9bb67e9f: "Synkroniser no"
-  sync_scheduled_successfully_you_may_safely_leave_t_492d42ee: "Synkronisering vellukka. Du kan trygt forlate denne sida."
+  sync_scheduled_successfully_you_may_safely_leave_t_492d42ee: "Vellukka planlegging av synkronisering. Du kan trygt forlate denne sida."
   sync_to_name_6f04716d: "Synkronisert til %{name}"
   sync_to_name_disabled_click_to_toggle_53a1396f: "Synkroniser til %{name}er deaktivert. Klikk for å slå på."
   sync_to_name_enabled_click_to_toggle_ddaef134: "Synkroniser til %{name} er aktivert. Klikk for å slå av."
@@ -22995,7 +23013,7 @@ nn:
   there_was_an_error_linking_pace_7d2bb508: "Det oppstod ein feil ved lenking til framdriftsplan."
   there_was_an_error_loading_the_document_d80e57e0: "Det opptstod ein feil ved lasting av dokumentet."
   there_was_an_error_loading_the_pace_810e3a7e: "Det oppstod ein feil ved innlasting av framdriftsplan."
-  there_was_an_error_publishing_your_course_pace_1aa5fdeb: "Det oppstod ein feil når framdriftsplanen for emnet skulle publiserast."
+  there_was_an_error_publishing_your_course_pace_1aa5fdeb: "Det oppstod ein feil under publisering av emnet sin framdriftsplan."
   there_was_an_error_removing_the_image_c83acffe: "Det oppstod feil under fjerning av bildet"
   there_was_an_error_removing_the_item_f8324776: "Det oppstod ein feil under fjerning av elementet"
   there_was_an_error_removing_the_notification_20a9de65: "Det oppstod ein feil ved fjerning av kunngjeringa"
@@ -23009,7 +23027,7 @@ nn:
   there_was_an_error_setting_usage_rights_53739e1d: "Det oppstod ein feil under fastsetjinga av bruksrettar."
   there_was_an_error_starting_the_save_assignment_da_22ffb6a8: "Det oppsto ein feil under oppstart av lagre oppgåvedatoar-jobben"
   there_was_an_error_submitting_to_the_similarity_de_eb6a261: "Det oppstod ein feil under avlevering til tekstsamanlikningstenesta. Prøv å levere fila på nytt før du kontaktar brukarstøtte."
-  there_was_an_error_submitting_your_attempt_fdbe9259: "Det opptstod ein feil ved innleveringa di."
+  there_was_an_error_submitting_your_attempt_fdbe9259: "Det opptstod ein feil under ditt innleveringsforsøk."
   there_was_an_error_updating_a_filter_2a5ebc87: "Det oppstod ein feil ved oppdateringa av eit filter."
   there_was_an_error_updating_this_assignment_please_59fc608d: "Det oppstod ein feil under oppdatering av oppgåva Oppdater sida og prøv på nytt."
   there_was_an_error_updating_view_options_d024a3ec: "Det oppstod ein feil under oppdateringa av visningsalternativa."
@@ -23021,11 +23039,11 @@ nn:
   there_was_an_unexpected_error_creating_the_discuss_8811a868: "Det oppstod ein uventa feil under opprettinga av diskusjonsinnlegget."
   there_was_an_unexpected_error_deleting_the_convers_412fd621: "Det oppstod ein uventa feil under sletting av innlegget."
   there_was_an_unexpected_error_deleting_the_discuss_fe1022cb: "Det oppstod ein uventa feil under sletting av diskusjonstemaet."
-  there_was_an_unexpected_error_loading_the_replies_578d9738: "Det oppstod ein uventa feil når svara skulle lastas inn."
-  there_was_an_unexpected_error_marking_all_as_read_117fe739: "Det oppstod ein uventa feil når alle skulle markerast som leste"
-  there_was_an_unexpected_error_marking_all_as_unrea_e4658766: "Det oppstod ein uventa feil når alle skulle markerast som uleste"
+  there_was_an_unexpected_error_loading_the_replies_578d9738: "Det oppstod ein uventa feil ved innlasting av svara."
+  there_was_an_unexpected_error_marking_all_as_read_117fe739: "Det oppstod ein uventa feil ved merking av alle som lesne."
+  there_was_an_unexpected_error_marking_all_as_unrea_e4658766: "Det oppstod ein uventa feil ved merking av alle som ulesne."
   there_was_an_unexpected_error_updating_the_convers_a1a37400: "Det oppsto ein uventa feil ved oppdatering av medlemar i samtalen"
-  there_was_an_unexpected_error_updating_the_convers_d44c9fde: "Det oppsto ein uventa feil ved oppdatering av medlemar i samtalen"
+  there_was_an_unexpected_error_updating_the_convers_d44c9fde: "Det oppstod ein uventa feil ved oppdatering av medlemar i samtalen"
   there_was_an_unexpected_error_updating_the_discuss_6cd3489c: "Det oppstod ein uventa feil under oppdataering av diskusjonstemaet."
   there_was_an_unexpected_error_updating_the_reply_a3eaf19f: "Det oppstod ein uventa feil ved oppdatering av svaret."
   there_was_an_unexpected_error_while_deleting_the_r_7df6ebe0: "Det oppstod ein uventa feil medan svaret vart sletta."
@@ -23042,12 +23060,12 @@ nn:
   these_credentials_are_for_academic_benchmark_api_v_324baaa4: "Denne legitimasjonen er for Academic Benchmark API v3. Ved å utelate partnarnøkkelen vil importfunksjonen bruke Academic Benchmark API v1 som standard. "
   these_credentials_are_for_academic_benchmark_api_v_952718b1: "Denne legitimasjonen er for Academic Benchmark API v1, som vil bli nedprioritert i framtidige versjonar. "
   these_grading_periods_were_created_for_you_by_an_a_e977c2b5: "Desse karaktersetjingsperiodane er oppretta for deg av ein administrator."
-  these_permissions_do_not_manage_discussions_discus_79defb66: "Desse løyva gjeld ikkje Diskusjonar. Diskusjonar handterast gjennom eigne diskusjonsløyve."
+  these_permissions_do_not_manage_discussions_discus_79defb66: "Desse løyva gjeld ikkje Diskusjonar. Diskusjonar blir handtert gjennom eigne diskusjonsløyve."
   these_pronouns_will_be_available_to_canvas_users_i_e8f474e5: "Disse pronomena kan veljast av Canvasbrukarar som tilhøyrer kontoen. "
   these_scores_are_out_of_order_4f0859ef: "Resultata er i feil rekkefølgje"
   they_them_f4d17a04: Dei/Dei
   they_were_merged_into_other_user_64758f01: "Dei vart slått saman med *%{other_user}*."
-  this_account_does_not_allow_for_microsoft_teams_sy_266f11c7: "Denne kontoen tillet ikkje synkronisering med Microsoft Teams. Du må slå på funksjonaliteten for \"Microsoft gruppepåmelding synkronisering\" før du får endra noken innstillingar."
+  this_account_does_not_allow_for_microsoft_teams_sy_266f11c7: "Denne kontoen tillet ikkje synkronisering med Microsoft Teams. Du må slå på funksjonaliteten for \"Microsoft gruppepåmelding synkronisering\" før du får endra nokon innstillingar."
   this_action_has_been_disabled_by_your_admin_5e34bfa0: "Funksjonen er deaktivert av administrator. "
   this_announcement_will_not_be_visible_until_delaye_88f7f5c: "Denne kunngjeringa vil ikkje visast før %{delayedPostAt}"
   this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: "Her skriv ein inn kommentarar som er relatert til kriteriet."
