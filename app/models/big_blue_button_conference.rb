@@ -50,6 +50,38 @@ class BigBlueButtonConference < WebConference
     visible: false
   }
 
+  user_setting_field :share_webcam, {
+    name: -> { t("Share webcam") },
+    description: -> { t("Share webcam") },
+    type: :boolean,
+    default: true,
+    visible: false
+  }
+
+  user_setting_field :share_microphone, {
+    name: -> { t("Share microphone") },
+    description: -> { t("Share microphone") },
+    type: :boolean,
+    default: true,
+    visible: false
+  }
+
+  user_setting_field :send_public_chat, {
+    name: -> { t("Send public chat messages") },
+    description: -> { t("Send public chat messages") },
+    type: :boolean,
+    default: true,
+    visible: false
+  }
+
+  user_setting_field :send_private_chat, {
+    name: -> { t("Send private chat messages") },
+    description: -> { t("Send private chat messages") },
+    type: :boolean,
+    default: true,
+    visible: false
+  }
+
   class << self
     def send_request(action, options, use_fallback_config: false)
       url_str = generate_request(action, options, use_fallback_config: use_fallback_config)
@@ -144,7 +176,11 @@ class BigBlueButtonConference < WebConference
                               :record => settings[:record] ? "true" : "false",
                               :welcome => settings[:record] ? t("This conference may be recorded.") : "",
                               "meta_canvas-recording-ready-user" => recording_ready_user,
-                              "meta_canvas-recording-ready-url" => recording_ready_url(current_host)
+                              "meta_canvas-recording-ready-url" => recording_ready_url(current_host),
+                              :lockSettingsDisableCam => settings[:share_webcam].nil? || settings[:share_webcam] ? "false" : "true",
+                              :lockSettingsDisableMic => settings[:share_microphone].nil? || settings[:share_microphone] ? "false" : "true",
+                              :lockSettingsDisablePublicChat => settings[:send_public_chat].nil? || settings[:send_public_chat] ? "false" : "true",
+                              :lockSettingsDisablePrivateChat => settings[:send_private_chat].nil? || settings[:send_private_chat] ? "false" : "true",
                             }) or return nil
     @conference_active = true
     settings[:create_time] = response[:createTime] if response.present?
