@@ -135,6 +135,27 @@ describe AccountCalendarsApiController do
 
       expect(response).to be_not_found
     end
+
+    context "metrics collection" do
+      before do
+        allow(InstStatsd::Statsd).to receive(:increment)
+        course_with_student_logged_in(user: @user, account: @root_account)
+        @metric_name = "account_calendars.available_calendars_requested"
+      end
+
+      it "emits account_calendars.available_calendars_requested to statsd" do
+        get :index
+        expect(InstStatsd::Statsd).to have_received(:increment).once.with(@metric_name)
+      end
+
+      it "does not emit account_calendars.available_calendars_requested to statsd if a search term is included or if we're not on the first page" do
+        get :index, params: { search_term: "sa-1" }
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with(@metric_name)
+
+        get :index, params: { per_page: "2", page: "2" }
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with(@metric_name)
+      end
+    end
   end
 
   describe "GET 'show'" do

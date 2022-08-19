@@ -1224,7 +1224,11 @@ class CalendarEventsApiController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   def save_enabled_account_calendars
     @current_user.set_preference(:account_calendar_events_seen, value_to_boolean(params[:mark_feature_as_seen])) if params.key?(:mark_feature_as_seen)
-    @current_user.set_preference(:enabled_account_calendars, params[:enabled_account_calendars]) if params.key?(:enabled_account_calendars)
+
+    if params.key?(:enabled_account_calendars)
+      @current_user.set_preference(:enabled_account_calendars, params[:enabled_account_calendars])
+      InstStatsd::Statsd.count("account_calendars.modal.enabled_calendars", params[:enabled_account_calendars].length)
+    end
 
     render json: { status: "ok" }
   end

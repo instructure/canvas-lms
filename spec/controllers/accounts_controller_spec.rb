@@ -1920,5 +1920,14 @@ describe AccountsController do
       expect(response).to be_successful
       expect(@user.reload.get_preference(:visited_tabs)).to eq(%w[other_tab account_calendars])
     end
+
+    it "emits account_calendars.settings.visit to statsd" do
+      allow(InstStatsd::Statsd).to receive(:increment)
+      account_admin_user(account: @account)
+      user_session(@user)
+      get "account_calendar_settings", params: { account_id: @account.id }
+
+      expect(InstStatsd::Statsd).to have_received(:increment).once.with("account_calendars.settings.visit")
+    end
   end
 end

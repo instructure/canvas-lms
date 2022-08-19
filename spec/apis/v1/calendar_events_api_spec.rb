@@ -3506,6 +3506,19 @@ describe CalendarEventsApiController, type: :request do
 
       expect(@user.reload.get_preference(:account_calendar_events_seen)).to eq(true)
     end
+
+    it "emits account_calendars.modal.enabled_calendars to statsd" do
+      allow(InstStatsd::Statsd).to receive(:count)
+      subaccount = Account.default.sub_accounts.create!
+      api_call(:post, "/api/v1/calendar_events/save_enabled_account_calendars", {
+                 controller: "calendar_events_api",
+                 action: "save_enabled_account_calendars",
+                 format: "json",
+                 enabled_account_calendars: [Account.default.id, subaccount.id]
+               })
+
+      expect(InstStatsd::Statsd).to have_received(:count).once.with("account_calendars.modal.enabled_calendars", 2)
+    end
   end
 
   context "visible_contexts" do

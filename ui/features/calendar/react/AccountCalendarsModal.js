@@ -46,6 +46,7 @@ const AccountCalendarsModal = ({getSelectedOtherCalendars, onSave, calendarsPerR
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [results, setResults] = useState(undefined)
+  const [cachedResults, setCachedResults] = useState(undefined)
   const [nextPage, setNextPage] = useState(null)
   const [totalAccounts, setTotalAccounts] = useState(null)
   const [selectedCalendars, setSelectedCalendars] = useState(getSelectedOtherCalendars())
@@ -86,9 +87,16 @@ const AccountCalendarsModal = ({getSelectedOtherCalendars, onSave, calendarsPerR
   }, [getSelectedOtherCalendars, isOpen])
 
   useEffect(() => {
-    fetchAccounts({next: false})
+    if (isOpen) {
+      if (!searchTerm && cachedResults) {
+        setResults(cachedResults)
+        setTotalAccounts(cachedResults.length)
+      } else {
+        fetchAccounts({next: false})
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchTerm])
+  }, [isOpen, searchTerm])
 
   const closeModal = () => {
     setSearchTerm('')
@@ -112,6 +120,9 @@ const AccountCalendarsModal = ({getSelectedOtherCalendars, onSave, calendarsPerR
       const newResults = next ? [...results, ...json.account_calendars] : json.account_calendars
 
       setResults(newResults)
+      if (!searchTerm) {
+        setCachedResults(newResults)
+      }
       setNextPage(link?.next?.page)
       setTotalAccounts(json.total_results)
     } catch (err) {
@@ -198,12 +209,17 @@ const AccountCalendarsModal = ({getSelectedOtherCalendars, onSave, calendarsPerR
               data-testid="search-input"
               type="search"
               theme={{borderRadius: '2rem'}}
-              placeholder={I18n.t('Search %{totalAccounts} calendars', {
-                totalAccounts
-              })}
+              placeholder={
+                isLoading
+                  ? undefined
+                  : I18n.t('Search %{totalAccounts} calendars', {
+                      totalAccounts
+                    })
+              }
               onChange={updateSearch}
               messages={messages}
               renderBeforeInput={<IconSearchLine inline={false} />}
+              interaction={isLoading ? 'disabled' : 'enabled'}
             />
             <AccountCalendarResultsArea {...resultsProps} />
           </View>

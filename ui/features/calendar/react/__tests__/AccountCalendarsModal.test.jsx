@@ -55,7 +55,7 @@ describe('Other Calendars modal ', () => {
         ...overrides
     })
 
-    const openModal = async (addCalendarButton) => {
+    const openModal = (addCalendarButton) => {
         expect(addCalendarButton).toBeInTheDocument()
         act(() => addCalendarButton.click())
     }
@@ -69,11 +69,11 @@ describe('Other Calendars modal ', () => {
     }
 
     it('renders "calendarsPerRequest" number of account calendars when open', async () => {
-        const { getByText, queryByText, findByTestId } = render(
+        const { getByText, queryByText, getByTestId, findByText } = render(
             <AccountCalendarsModal {...getProps()} />)
-        const addCalendarButton = await findByTestId('add-other-calendars-button')
+        const addCalendarButton = getByTestId('add-other-calendars-button')
         openModal(addCalendarButton)
-        expect(getByText(page1Results[0].name)).toBeInTheDocument()
+        expect(await findByText(page1Results[0].name)).toBeInTheDocument()
         expect(getByText(page1Results[1].name)).toBeInTheDocument()
         expect(queryByText(page2Results[0].name)).not.toBeInTheDocument()
     })
@@ -81,9 +81,9 @@ describe('Other Calendars modal ', () => {
     it('shows the calendars already enabled', async () => {
         const { getByTestId, findByTestId } = render(
             <AccountCalendarsModal {...getProps()} />)
-        const addCalendarButton = await findByTestId('add-other-calendars-button')
+        const addCalendarButton = getByTestId('add-other-calendars-button')
         openModal(addCalendarButton)
-        expect(getByTestId(`account-${page1Results[0].id}-checkbox`).checked).toBe(true)
+        expect((await findByTestId(`account-${page1Results[0].id}-checkbox`)).checked).toBe(true)
         expect(getByTestId(`account-${page1Results[1].id}-checkbox`).checked).toBe(false)
     })
 
@@ -92,9 +92,9 @@ describe('Other Calendars modal ', () => {
         fetchMock.post(onSaveUrl, JSON.stringify({ status: 'ok' }))
         const { findByTestId, getByTestId } = render(
             <AccountCalendarsModal {...getProps()} />)
-        const addCalendarButton = await findByTestId('add-other-calendars-button')
+        const addCalendarButton = getByTestId('add-other-calendars-button')
         openModal(addCalendarButton)
-        const calendarToEnable = getByTestId(`account-${page1Results[1].id}-checkbox`)
+        const calendarToEnable = await findByTestId(`account-${page1Results[1].id}-checkbox`)
         const saveButton = getByTestId('save-calendars-button')
         act(() => calendarToEnable.click())
         act(() => saveButton.click())
@@ -104,9 +104,9 @@ describe('Other Calendars modal ', () => {
 
     it('renders the "Show more" option when there are more calendars to fetch', async () => {
         const showMoreUrl = SEARCH_ENDPOINT.concat('?per_page=2&page=2')
-        const { findByText, findByTestId } = render(
+        const { findByText, getByTestId } = render(
             <AccountCalendarsModal {...getProps()} />)
-        const addCalendarButton = await findByTestId('add-other-calendars-button')
+        const addCalendarButton = getByTestId('add-other-calendars-button')
         openModal(addCalendarButton)
         const showMoreLink = await findByText('Show more')
         act(() => showMoreLink.click())
@@ -114,26 +114,27 @@ describe('Other Calendars modal ', () => {
     })
 
     it('does not render the "Show more" option when all the calendars have been fetched', async () => {
-        const { queryByText, findByTestId } = render(
+        const { queryByText, getByTestId, findByTestId } = render(
             <AccountCalendarsModal {...getProps({ calendarsPerRequest: 5 })} />)
-        const addCalendarButton = await findByTestId('add-other-calendars-button')
+        const addCalendarButton = getByTestId('add-other-calendars-button')
         openModal(addCalendarButton)
+        await findByTestId(`account-${page1Results[1].id}-checkbox`)
         expect(queryByText('Show more')).not.toBeInTheDocument()
     })
 
     describe('Search bar ', () => {
         it('shows the total number of available calendars to search through', async () => {
-            const { getByPlaceholderText, findByTestId } = render(
+            const { findByPlaceholderText, getByTestId } = render(
                 <AccountCalendarsModal {...getProps()} />)
-            const addCalendarButton = await findByTestId('add-other-calendars-button')
+            const addCalendarButton = getByTestId('add-other-calendars-button')
             openModal(addCalendarButton)
-            expect(getByPlaceholderText(`Search ${totalCalendars} calendars`)).toBeInTheDocument()
+            expect(await findByPlaceholderText(`Search ${totalCalendars} calendars`)).toBeInTheDocument()
         })
 
         it('fetches calendars that match with the input value', async () => {
-            const { findByTestId } = render(
+            const { getByTestId, findByTestId } = render(
                 <AccountCalendarsModal {...getProps()} />)
-            const addCalendarButton = await findByTestId('add-other-calendars-button')
+            const addCalendarButton = getByTestId('add-other-calendars-button')
             openModal(addCalendarButton)
             const searchBar = await findByTestId('search-input')
             fireEvent.change(searchBar, { target: { value: 'Test' } })
@@ -142,9 +143,9 @@ describe('Other Calendars modal ', () => {
         })
 
         it('does not trigger search requests if the user has not typed at least 3 characters', async () => {
-            const { findByTestId } = render(
+            const { findByTestId, getByTestId } = render(
                 <AccountCalendarsModal {...getProps()} />)
-            const addCalendarButton = await findByTestId('add-other-calendars-button')
+            const addCalendarButton = getByTestId('add-other-calendars-button')
             openModal(addCalendarButton)
             const searchBar = await findByTestId('search-input')
             fireEvent.change(searchBar, { target: { value: 'Te' } })
@@ -153,9 +154,9 @@ describe('Other Calendars modal ', () => {
         })
 
         it('shows an empty state if no calendar was found', async () => {
-            const { findByTestId, findByText } = render(
+            const { findByTestId, findByText, getByTestId } = render(
                 <AccountCalendarsModal {...getProps()} />)
-            const addCalendarButton = await findByTestId('add-other-calendars-button')
+            const addCalendarButton = getByTestId('add-other-calendars-button')
             openModal(addCalendarButton)
             const searchBar = await findByTestId('search-input')
             fireEvent.change(searchBar, { target: { value: 'Test' } })
