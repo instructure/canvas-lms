@@ -109,6 +109,40 @@ describe BigBlueButtonConference do
     end
   end
 
+  describe "testing of new BBB properties: lockSettingsDisableCam, lockSettingsDisableMic, lockSettingsDisablePublicChat and lockSettingsDisablePrivateChat" do
+    before do
+      allow(WebConference).to receive(:plugins).and_return([
+                                                             web_conference_plugin_mock("big_blue_button", {
+                                                                                          domain: "bbb.instructure.com",
+                                                                                          secret_dec: "secret",
+                                                                                          recording_enabled: true,
+                                                                                          use_fallback: true,
+                                                                                        })
+                                                           ])
+
+      @bbb = BigBlueButtonConference.new
+      @bbb.user = user_factory
+      @bbb.context = course_factory
+      @bbb.save!
+    end
+
+    it "all should be false if they aren enabled" do
+      @bbb.user_settings = { share_webcam: true, share_microphone: true, send_public_chat: true, send_private_chat: true }
+      @bbb.save!
+
+      expect(@bbb).to receive(:send_request).with(:create, hash_including(lockSettingsDisableCam: "false", lockSettingsDisableMic: "false", lockSettingsDisablePublicChat: "false", lockSettingsDisablePrivateChat: "false"))
+      @bbb.initiate_conference
+    end
+
+    it "all should be true if they are disabled" do
+      @bbb.user_settings = { share_webcam: false, share_microphone: false, send_public_chat: false, send_private_chat: false }
+      @bbb.save!
+
+      expect(@bbb).to receive(:send_request).with(:create, hash_including(lockSettingsDisableCam: "true", lockSettingsDisableMic: "true", lockSettingsDisablePublicChat: "true", lockSettingsDisablePrivateChat: "true"))
+      @bbb.initiate_conference
+    end
+  end
+
   describe "plugin setting recording_enabled is enabled" do
     let(:get_recordings_fixture) { Rails.root.join("spec/fixtures/files/conferences/big_blue_button_get_recordings_two.json").read }
     let(:get_recordings_bulk_fixture) { Rails.root.join("spec/fixtures/files/conferences/big_blue_button_get_recordings_bulk.json").read }

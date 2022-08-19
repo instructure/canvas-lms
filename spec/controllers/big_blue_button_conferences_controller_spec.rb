@@ -29,7 +29,7 @@ describe ConferencesController do
   end
 
   before do
-    allow(BigBlueButtonConference).to receive(:send_request).and_return("")
+    allow(BigBlueButtonConference).to receive(:send_request).and_return({ running: false })
     allow(BigBlueButtonConference).to receive(:get_auth_token).and_return("abc123")
   end
 
@@ -46,6 +46,19 @@ describe ConferencesController do
       @conference = @course.web_conferences.create!(conference_type: "BigBlueButton", duration: 60, user: @teacher)
       delete "recording", params: { course_id: @course.id, conference_id: @conference.id, recording_id: "abc123-xyz" }
       assert_unauthorized
+    end
+  end
+
+  describe "POST 'create'" do
+    it "creates a conference with user_settings" do
+      user_session(@teacher)
+      post "create", params: { course_id: @course.id, conference_type: "BigBlueButton", web_conference: { title: "My Conference", conference_type: "BigBlueButton", user_settings: { share_webcam: false, share_microphone: false, send_public_chat: false, send_private_chat: false } } }, format: "json"
+      conference = WebConference.last
+      expect(response).to be_successful
+      expect(conference.settings[:share_webcam]).to eq false
+      expect(conference.settings[:share_microphone]).to eq false
+      expect(conference.settings[:send_public_chat]).to eq false
+      expect(conference.settings[:send_private_chat]).to eq false
     end
   end
 end
