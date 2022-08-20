@@ -85,7 +85,7 @@ export default function ReleaseNotesList({badgeDisabled, setBadgeDisabled}) {
         </Flex>
         <hr role="presentation" style={{marginTop: '0'}} />
       </View>
-      <List variant="unstyled" margin="small 0" itemSpacing="small">
+      <List isUnstyled margin="small 0" itemSpacing="small">
         {releaseNotes.map(note => {
           const has_new_tag = note.new
           return (

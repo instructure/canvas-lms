@@ -48,7 +48,7 @@ export default class DateEventGroup extends PureComponent {
           {dateString(startDate)}
         </Text>
 
-        <List variant="unstyled">
+        <List isUnstyled>
           {auditEvents.map(({auditEvent, studentAnonymity}) => (
             <List.Item key={auditEvent.id} margin="small none none none">
               <AuditEvent auditEvent={auditEvent} studentAnonymity={studentAnonymity} />

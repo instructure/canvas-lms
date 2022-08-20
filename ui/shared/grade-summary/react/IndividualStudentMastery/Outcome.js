@@ -148,7 +148,7 @@ class Outcome extends React.Component {
         (a.assessment_id && !_.includes(assessmentsWithResults, a.assessment_id.toString()))
     )
     return (
-      <List variant="unstyled" delimiter="dashed">
+      <List isUnstyled delimiter="dashed">
         {results
           .sort(natcompare.byKey('submitted_or_assessed_at'))
           .reverse()

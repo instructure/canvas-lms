@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {shape, object, func, string, oneOfType, arrayOf, node, bool} from 'prop-types'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Badge} from '@instructure/ui-badge'
@@ -27,7 +26,7 @@ import {Text} from '@instructure/ui-text'
 import {List} from '@instructure/ui-list'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {
   IconXLine,
@@ -140,7 +139,7 @@ export default class MobileGlobalMenu extends React.Component {
             </Heading>
           </Flex.Item>
         </Flex>
-        <List variant="unstyled" itemSpacing="medium">
+        <List isUnstyled itemSpacing="medium">
           <List.Item>
             <Link href="/" isWithinText={false} size="small" display="block" textAlign="start">
               <Flex>
@@ -181,7 +180,7 @@ export default class MobileGlobalMenu extends React.Component {
                   </Flex>
                 }
               >
-                <List variant="unstyled" itemSpacing="small" margin="0 0 0 x-large">
+                <List isUnstyled itemSpacing="small" margin="0 0 0 x-large">
                   {this.props.DesktopNavComponent.state.profileAreLoaded ? (
                     this.props.DesktopNavComponent.state.profile.map(tab => (
                       <List.Item key={tab.id}>
@@ -239,7 +238,7 @@ export default class MobileGlobalMenu extends React.Component {
                   </Flex>
                 }
               >
-                <List variant="unstyled" itemSpacing="small" margin="0 0 0 x-large">
+                <List isUnstyled itemSpacing="small" margin="0 0 0 x-large">
                   {this.props.DesktopNavComponent.state.accountsAreLoaded ? (
                     this.props.DesktopNavComponent.state.accounts
                       .map(account => (
@@ -293,7 +292,7 @@ export default class MobileGlobalMenu extends React.Component {
                 </Flex>
               }
             >
-              <List variant="unstyled" itemSpacing="small" margin="0 0 0 x-large">
+              <List isUnstyled itemSpacing="small" margin="0 0 0 x-large">
                 {this.props.DesktopNavComponent.state.coursesAreLoaded ? (
                   courses
                     .map(course => (
@@ -352,7 +351,7 @@ export default class MobileGlobalMenu extends React.Component {
                   </Flex>
                 }
               >
-                <List variant="unstyled" itemSpacing="small" margin="0 0 0 x-large">
+                <List isUnstyled itemSpacing="small" margin="0 0 0 x-large">
                   {this.props.DesktopNavComponent.state.groupsAreLoaded ? (
                     this.props.DesktopNavComponent.state.groups
                       .map(group => (

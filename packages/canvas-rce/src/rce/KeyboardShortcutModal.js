@@ -52,7 +52,7 @@ export default function KeyboardShortcutModal(props) {
       </Modal.Header>
       <Modal.Body>
         <View as="div" margin="small">
-          <List variant="unstyled">
+          <List isUnstyled>
             <List.Item>
               <Text weight="bold">ALT+F8/ALT+0</Text>{' '}
               {formatMessage('Open this keyboard shortcuts dialog')}

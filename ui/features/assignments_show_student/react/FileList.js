@@ -22,7 +22,7 @@ import mimeClass from '@canvas/mime/mimeClass'
 import PropTypes from 'prop-types'
 import React from 'react'
 
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
@@ -52,7 +52,7 @@ const FileList = props => {
   const refsMap = {}
 
   return (
-    <List variant="unstyled" delimiter="solid">
+    <List isUnstyled delimiter="solid">
       <List.Item>
         <Text size="x-small" weight="bold">
           {I18n.t('Attached')}
