@@ -37,7 +37,7 @@
     "commitTranslations": "scripts/commitTranslations.sh",
     "build:all": "scripts/build.js",
     "build:es": "babel --out-dir es src --ignore '**/__tests__,**/__mocks__' --extensions '.ts,.tsx,.js'",
-    "build:cjs": "babel --out-dir lib src --ignore '**/__tests__,**/__mocks__' --config-file=./babel.config.cjs.js",
+    "build:cjs": "babel --out-dir lib src --ignore '**/__tests__,**/__mocks__' --config-file=./babel.config.cjs.js --extensions '.ts,.tsx,.js'",
     "build:canvas": "scripts/build-canvas",
     "build:watch": "rm -rf es && babel --out-dir es src --watch --verbose --extensions '.ts,.tsx,.js'",
     "build:cafe": "wp --config webpack.testcafe.config.js",

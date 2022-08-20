@@ -31,7 +31,7 @@ module.exports = {
   ],
   setupFilesAfterEnv: [
     '<rootDir>/jest/jest-setup-framework.js',
-    '<rootDir>/../../jest/stubInstUi.js',
+    '<rootDir>/../../jest/stubInstUi.js'
   ],
   testPathIgnorePatterns: ['<rootDir>/node_modules', '<rootDir>/lib', '<rootDir>/canvas'],
   testMatch: ['**/__tests__/**/?(*.)(spec|test).[jt]s?(x)'],
