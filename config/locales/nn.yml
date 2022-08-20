@@ -22427,8 +22427,8 @@ nn:
   submitted_files_82dd3009: "Leverte filer"
   submitted_late_3741af29: "Levert etter fristen"
   submitted_late_97730017: "Levert etter fristen"
-  submitted_on_a09f839e: LEVERT
-  submitted_on_bb3b53fc: Levert
+  submitted_on_a09f839e: "LEVERT den"
+  submitted_on_bb3b53fc: "Levert den"
   submitted_submitdate_bdd3bf09: "Innlevert %{submitDate}"
   submitting_types_7c5a7096: "Leverer: %{types}"
   subscribe_4b301fb7: Abonner
@@ -22451,7 +22451,7 @@ nn:
   successfully_created_a_set_38374719: "Settet er oppretta"
   successfully_deleted_discussion_title_a685f345: "Diskusjonen %{title} er sletta"
   successfully_deleted_the_comment_a8bbe561: "Kommentar er sletta"
-  successfully_deleted_the_conversation_message_2a546732: "Samtalemeldingen er sletta"
+  successfully_deleted_the_conversation_message_2a546732: "Samtalemeldinga er sletta"
   successfully_moved_model_to_newgroup_f7b7aa5a: "Flytta %{model} til %{newGroup}"
   successfully_posted_the_comment_12d95d56: "Kommentar er lagt til"
   successfully_resubmitted_to_turnitin_c908de0f: "Levert på nytt til Turnitin."
@@ -22513,7 +22513,7 @@ nn:
   syllabus_tab_enabled_62aebc2e: syllabus_tab_enabled
   syllabus_tutorial_tray_97e8ef82: "Emneoversikt opplæringsmeny"
   syllabus_visibility_options_a81ef419: "Alternativ for emneoversikt-synlegheit"
-  symbols_35065d67: Symbolar
+  symbols_35065d67: Symbol
   sync_68e5c167: Synkroniser
   sync_and_provision_microsoft_teams_with_your_canva_a8018b6c: "Synkroniser og tilby Microsoft Teams med ditt Canvasemne"
   sync_completed_successfully_8f68b542: "Synkronisering er fullført"
