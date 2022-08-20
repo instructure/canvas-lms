@@ -274,7 +274,7 @@ export class Whitelist extends Component {
                   <Table.Row key={domain}>
                     <Table.Cell>{domain}</Table.Cell>
                     <Table.Cell>
-                      <List variant="unstyled">
+                      <List isUnstyled>
                         {this.props.whitelistedDomains.tools[domain].map(associatedTool => (
                           <List.Item key={associatedTool.id}>{associatedTool.name}</List.Item>
                         ))}

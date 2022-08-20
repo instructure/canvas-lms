@@ -34,7 +34,7 @@ export default function AccountsTray({accounts, hasLoaded}) {
         {I18n.t('Admin')}
       </Heading>
       <hr role="presentation" />
-      <List variant="unstyled" margin="small 0" itemSpacing="small">
+      <List isUnstyled margin="small 0" itemSpacing="small">
         {hasLoaded ? (
           accounts
             .map(account => (

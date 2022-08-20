@@ -110,7 +110,7 @@ export function LtiToolsModal(props) {
 
   function renderTools(ltiButtons) {
     return (
-      <List variant="unstyled">
+      <List isUnstyled>
         {ltiButtons
           .sort((a, b) => a.title.localeCompare(b.title))
           .map(b => {

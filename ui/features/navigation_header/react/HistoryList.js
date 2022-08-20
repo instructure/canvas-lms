@@ -41,7 +41,7 @@ HistoryList.defaultProps = {
 
 export default function HistoryList({hasLoaded, history}) {
   return (
-    <List variant="unstyled" margin="small 0" itemSpacing="small">
+    <List isUnstyled margin="small 0" itemSpacing="small">
       {hasLoaded ? (
         _.uniqBy(history, entry => entry.asset_code).map(entry => (
           <List.Item key={entry.asset_code}>

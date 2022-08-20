@@ -93,7 +93,7 @@ class OutcomeGroup extends React.Component {
           expanded={expanded}
           onToggle={this.handleToggle}
         >
-          <List variant="unstyled" delimiter="solid">
+          <List isUnstyled delimiter="solid">
             {outcomes.sort(natcompare.byKey('title')).map(outcome => (
               <List.Item key={outcome.id} margin="0">
                 <Outcome

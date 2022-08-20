@@ -93,7 +93,7 @@ const AccountCalendarResultsArea = ({
           <Text weight="bold">{searchTerm}</Text>
         </View>
       )}
-      <List variant="unstyled" margin="small none">
+      <List isUnstyled margin="small none">
         {results.map(r => (
           <List.Item key={r.id}>
             <View as="div" borderWidth="none none small" theme={{borderColorPrimary: '#e6e6e6'}}>
