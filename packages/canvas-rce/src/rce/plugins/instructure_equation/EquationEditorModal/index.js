@@ -401,11 +401,10 @@ export default class EquationEditorModal extends Component {
             data-testid="equation-editor-modal-close"
             placement="end"
             offset="medium"
-            variant="icon"
+            color="primary"
             onClick={this.handleModalCancel}
-          >
-            {formatMessage('Close')}
-          </CloseButton>
+            screenReaderLabel={formatMessage('Close')}
+          />
           <Heading>{title || label}</Heading>
         </Modal.Header>
         <Modal.Body>

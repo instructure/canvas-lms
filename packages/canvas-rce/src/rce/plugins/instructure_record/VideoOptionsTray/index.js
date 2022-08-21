@@ -17,8 +17,7 @@
  */
 import React, {useState} from 'react'
 import {arrayOf, bool, func, number, shape, string} from 'prop-types'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {SimpleSelect} from '@instructure/ui-simple-select'
@@ -108,15 +107,19 @@ export default function VideoOptionsTray(props) {
         <Tooltip
           on={['hover', 'focus']}
           placement="top"
-          tip={
+          renderTip={
             <View display="block" id="alt-text-label-tooltip" maxWidth="14rem">
               {tooltipText}
             </View>
           }
         >
-          <Button icon={IconQuestionLine} size="small" variant="icon">
-            <ScreenReaderContent>{tooltipText}</ScreenReaderContent>
-          </Button>
+          <IconButton
+            renderIcon={IconQuestionLine}
+            size="small"
+            screenReaderLabel={tooltipText}
+            withBackground={false}
+            withBorder={false}
+          />
         </Tooltip>
       </Flex.Item>
     </Flex>
@@ -156,9 +159,11 @@ export default function VideoOptionsTray(props) {
                   <Heading as="h2">{formatMessage('Video Options')}</Heading>
                 </Flex.Item>
                 <Flex.Item>
-                  <CloseButton placemet="static" variant="icon" onClick={onRequestClose}>
-                    {formatMessage('Close')}
-                  </CloseButton>
+                  <CloseButton
+                    color="primary"
+                    onClick={onRequestClose}
+                    screenReaderLabel={formatMessage('Close')}
+                  />
                 </Flex.Item>
               </Flex>
             </Flex.Item>

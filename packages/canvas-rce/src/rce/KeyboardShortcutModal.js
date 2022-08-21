@@ -41,9 +41,13 @@ export default function KeyboardShortcutModal(props) {
       onDismiss={props.onDismiss}
     >
       <Modal.Header>
-        <CloseButton placement="end" offset="medium" variant="icon" onClick={props.onDismiss}>
-          {formatMessage('Close')}
-        </CloseButton>
+        <CloseButton
+          placement="end"
+          offset="medium"
+          color="primary"
+          onClick={props.onDismiss}
+          screenReaderLabel={formatMessage('Close')}
+        />
         <Heading>{formatMessage('Keyboard Shortcuts')}</Heading>
       </Modal.Header>
       <Modal.Body>

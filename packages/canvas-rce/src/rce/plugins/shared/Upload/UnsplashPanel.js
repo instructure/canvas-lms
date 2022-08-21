@@ -122,7 +122,8 @@ function Attribution({name, avatarUrl, profileUrl}) {
           href={profileUrl}
           target="_blank"
           rel="noopener"
-          fluidWidth
+          display="block"
+          textAlign="start"
         >
           {name}
         </Button>
@@ -214,7 +215,8 @@ export default function UnsplashPanel({source, setUnsplashData, brandColor, live
                 >
                   <Button
                     variant="link"
-                    fluidWidth
+                    display="block"
+                    textAlign="start"
                     theme={{
                       mediumPaddingHorizontal: '0'
                     }}

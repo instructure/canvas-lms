@@ -125,9 +125,11 @@ export const ColorInput = ({
           </IconButton>
         }
       >
-        <CloseButton placement="end" onClick={() => setIsOpen(false)}>
-          {formatMessage('Close')}
-        </CloseButton>
+        <CloseButton
+          placement="end"
+          onClick={() => setIsOpen(false)}
+          screenReaderLabel={formatMessage('Close')}
+        />
         <Flex
           alignItems="center"
           as="div"

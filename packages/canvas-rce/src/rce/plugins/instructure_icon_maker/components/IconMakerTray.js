@@ -70,13 +70,12 @@ function renderHeader(title, settings, onKeyDown, isInvalid, onAlertDismissal, o
             <Flex.Item>
               <CloseButton
                 placement="static"
-                variant="icon"
+                color="primary"
                 onClick={onClose}
                 onKeyDown={onKeyDown}
                 data-testid="icon-maker-close-button"
-              >
-                {formatMessage('Close')}
-              </CloseButton>
+                screenReaderLabel={formatMessage('Close')}
+              />
             </Flex.Item>
           </Flex>
         </Flex.Item>

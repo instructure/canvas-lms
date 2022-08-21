@@ -162,9 +162,11 @@ export default function LinkOptionsTray(props) {
             </Flex.Item>
 
             <Flex.Item>
-              <CloseButton placement="static" variant="icon" onClick={props.onRequestClose}>
-                {formatMessage('Close')}
-              </CloseButton>
+              <CloseButton
+                color="primary"
+                onClick={props.onRequestClose}
+                screenReaderLabel={formatMessage('Close')}
+              />
             </Flex.Item>
           </Flex>
         </Flex.Item>

@@ -28,9 +28,9 @@ import {StyleSheet, css} from 'aphrodite'
 import {FileDrop} from '@instructure/ui-file-drop'
 import {Billboard} from '@instructure/ui-billboard'
 import {Alert} from '@instructure/ui-alerts'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {px} from '@instructure/ui-utils'
-import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {PresentationContent} from '@instructure/ui-a11y-content'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {Img} from '@instructure/ui-img'
 import {Text} from '@instructure/ui-text'
@@ -205,29 +205,29 @@ export default function ComputerPanel({theFile, setFile, setError, accept, label
   }
 
   if (theFile) {
+    const filename = theFile.name
     return (
       <div style={{position: 'relative'}} ref={previewPanelRef}>
         <Flex direction="row-reverse" margin="none none medium">
           <Flex.Item>
-            <Button
-              buttonRef={el => {
+            <IconButton
+              elementRef={el => {
                 clearButtonRef.current = el
               }}
               onClick={() => {
                 setFile(null)
                 setPreview({preview: null, isLoading: false, error: null})
               }}
-              icon={IconTrashLine}
-            >
-              <ScreenReaderContent>
-                {formatMessage('Clear selected file: {filename}', {filename: theFile.name})}
-              </ScreenReaderContent>
-            </Button>
+              renderIcon={IconTrashLine}
+              withBackground={false}
+              withBorder={false}
+              screenReaderLabel={formatMessage('Clear selected file: {filename}', {filename})}
+            />
           </Flex.Item>
 
           <Flex.Item grow shrink>
             <PresentationContent>
-              <Text>{theFile.name}</Text>
+              <Text>{filename}</Text>
             </PresentationContent>
           </Flex.Item>
         </Flex>

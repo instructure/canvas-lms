@@ -76,9 +76,12 @@ export default function TodoEditorModal({
     >
       <Modal.Header>
         <Heading>{getModalLabel()}</Heading>
-        <CloseButton data-testid="close-editor-modal" placement="end" onClick={onClose}>
-          {formatMessage('Close')}
-        </CloseButton>
+        <CloseButton
+          data-testid="close-editor-modal"
+          placement="end"
+          onClick={onClose}
+          screenReaderLabel={formatMessage('Close')}
+        />
       </Modal.Header>
       <Modal.Body padding="none">
         <UpdateItemForm

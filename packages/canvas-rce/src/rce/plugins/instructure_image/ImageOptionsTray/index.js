@@ -154,9 +154,11 @@ export default function ImageOptionsTray(props) {
             </Flex.Item>
 
             <Flex.Item>
-              <CloseButton placemet="static" variant="icon" onClick={onRequestClose}>
-                {formatMessage('Close')}
-              </CloseButton>
+              <CloseButton
+                color="primary"
+                onClick={onRequestClose}
+                screenReaderLabel={formatMessage('Close')}
+              />
             </Flex.Item>
           </Flex>
         </Flex.Item>

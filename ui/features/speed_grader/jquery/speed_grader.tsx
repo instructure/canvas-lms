@@ -30,8 +30,7 @@ import type {
 import React from 'react'
 import ReactDOM from 'react-dom'
 import * as Alerts from '@instructure/ui-alerts'
-import {Button} from '@instructure/ui-buttons'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {IconButton} from '@instructure/ui-buttons'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import OutlierScoreHelper from '@canvas/grading/OutlierScoreHelper'
 import quizzesNextSpeedGrading from '../quizzesNextSpeedGrading'
@@ -707,10 +706,13 @@ function renderProgressIcon(attachment) {
   } else {
     const {icon, tip} = iconAndTipMap[attachment.upload_status] || iconAndTipMap.default
     const tooltip = (
-      <Tooltip tip={tip} on={['click', 'hover', 'focus']}>
-        <Button variant="icon" icon={icon}>
-          <ScreenReaderContent>toggle tooltip</ScreenReaderContent>
-        </Button>
+      <Tooltip renderTip={tip} on={['click', 'hover', 'focus']}>
+        <IconButton
+          renderIcon={icon}
+          withBorder={false}
+          withBackground={false}
+          screenReaderLabel={I18n.t('Toggle tooltip')}
+        />
       </Tooltip>
     )
     ReactDOM.render(tooltip, mountPoint)

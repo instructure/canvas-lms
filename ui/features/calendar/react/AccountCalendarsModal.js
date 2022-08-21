@@ -185,9 +185,8 @@ const AccountCalendarsModal = ({getSelectedOtherCalendars, onSave, calendarsPerR
             placement="end"
             offset="medium"
             onClick={closeModal}
-          >
-            {I18n.t('Close')}
-          </CloseButton>
+            screenReaderLabel={I18n.t('Close')}
+          />
           <Heading>{I18n.t('Add Calendar')}</Heading>
         </Modal.Header>
         <Modal.Body padding="none">
