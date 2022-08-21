@@ -20,8 +20,7 @@ import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 
 import {Tabs} from '@instructure/ui-tabs'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import buttons from './buttons'
 import MathIcon from '../MathIcon'
 
@@ -56,11 +55,13 @@ function EquationEditorToolbar(props) {
         // fix this, though.
         return (
           <div style={buttonContainerStyle} key={name}>
-            <Button onClick={() => props.executeCommand(command, advancedCommand)} icon={icon}>
-              <ScreenReaderContent>
-                {label}, LaTeX: {name}
-              </ScreenReaderContent>
-            </Button>
+            <IconButton
+              onClick={() => props.executeCommand(command, advancedCommand)}
+              renderIcon={icon}
+              withBackground={false}
+              withBorder={false}
+              screenReaderLabel={`${label}, LaTeX: ${name}`}
+            />
           </div>
         )
       })}

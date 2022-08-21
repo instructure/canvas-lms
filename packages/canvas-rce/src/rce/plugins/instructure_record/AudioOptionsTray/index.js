@@ -73,9 +73,12 @@ export default function AudioOptionsTray({
                   <Heading as="h2">{formatMessage('Audio Options')}</Heading>
                 </Flex.Item>
                 <Flex.Item>
-                  <CloseButton placement="static" variant="icon" onClick={onDismiss}>
-                    {formatMessage('Close')}
-                  </CloseButton>
+                  <CloseButton
+                    placement="static"
+                    color="primary"
+                    onClick={onDismiss}
+                    screenReaderLabel={formatMessage('Close')}
+                  />
                 </Flex.Item>
               </Flex>
             </Flex.Item>

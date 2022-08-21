@@ -63,9 +63,12 @@ export function LtiToolsModal(props) {
       shouldCloseOnDocumentClick={false}
     >
       <Modal.Header theme={{padding: '0.5rem'}}>
-        <CloseButton placement="end" offset="medium" onClick={props.onDismiss}>
-          {formatMessage('Close')}
-        </CloseButton>
+        <CloseButton
+          placement="end"
+          offset="medium"
+          onClick={props.onDismiss}
+          screenReaderLabel={formatMessage('Close')}
+        />
         <Heading margin="small">{formatMessage('All Apps')}</Heading>
         <View as="div" padding="x-small none x-small medium">
           <TextInput

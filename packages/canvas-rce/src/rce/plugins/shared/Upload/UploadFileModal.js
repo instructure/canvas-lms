@@ -24,7 +24,6 @@ import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Tabs} from '@instructure/ui-tabs'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
-import {Text} from '@instructure/ui-text'
 import formatMessage from '../../../../format-message'
 
 import RceApiSource from '../../../../rcs/api'
@@ -160,9 +159,12 @@ const UploadFileModal = React.forwardRef(
         liveRegion={trayProps.liveRegion}
       >
         <Modal.Header>
-          <CloseButton onClick={onDismiss} offset="small" placement="end">
-            {formatMessage('Close')}
-          </CloseButton>
+          <CloseButton
+            onClick={onDismiss}
+            offset="small"
+            placement="end"
+            screenReaderLabel={formatMessage('Close')}
+          />
           <Heading>{label}</Heading>
         </Modal.Header>
         <Modal.Body ref={ref}>
