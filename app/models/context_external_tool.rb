@@ -37,6 +37,7 @@ class ContextExternalTool < ActiveRecord::Base
   validates :context_id, :context_type, :workflow_state, presence: true
   validates :name, :consumer_key, :shared_secret, presence: true
   validates :name, length: { maximum: maximum_string_length }
+  validates :consumer_key, length: { maximum: 2048 }
   validates :config_url, presence: { if: ->(t) { t.config_type == "by_url" } }
   validates :config_xml, presence: { if: ->(t) { t.config_type == "by_xml" } }
   validates :domain, length: { maximum: 253, allow_blank: true }
