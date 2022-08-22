@@ -384,9 +384,27 @@ describe SectionTabHelper do
           expect(html.attributes).not_to include("title")
         end
       end
+
+      context "new tabs" do
+        let(:string) do
+          SectionTabHelperSpec::SectionTabTag.new(
+            tab_assignments.merge, course
+          ).a_tag
+        end
+
+        it "includes a new-tab-indicator span for new tabs" do
+          stub_const("SectionTabHelper::SectionTabTag::NEW_TABS", %w[assignments])
+          expect(string).to include("new-tab-indicator")
+        end
+
+        it "does not include the new-tab-indicator for tabs not marked as new" do
+          stub_const("SectionTabHelper::SectionTabTag::NEW_TABS", %w[other_stuff])
+          expect(string).not_to include("new-tab-indicator")
+        end
+      end
     end
 
-    describe "#li_classess" do
+    describe "#li_classes" do
       it "returns an array including element `section`" do
         tag = SectionTabHelperSpec::SectionTabTag.new(
           tab_assignments, course
