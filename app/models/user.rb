@@ -1778,6 +1778,11 @@ class User < ActiveRecord::Base
     set_preference(:unread_rubric_comments, submission.global_id, nil)
   end
 
+  def add_to_visited_tabs(tab_class)
+    visited_tabs = get_preference(:visited_tabs) || []
+    set_preference(:visited_tabs, [*visited_tabs, tab_class]) unless visited_tabs.include? tab_class
+  end
+
   def prefers_high_contrast?
     !!feature_enabled?(:high_contrast)
   end

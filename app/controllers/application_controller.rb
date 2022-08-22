@@ -212,6 +212,7 @@ class ApplicationController < ActionController::Base
           current_user_is_student: @context.respond_to?(:user_is_student?) && @context.user_is_student?(@current_user),
           current_user_types: @current_user.try { |u| u.account_users.active.map { |au| au.role.name } },
           current_user_disabled_inbox: @current_user&.disabled_inbox?,
+          current_user_visited_tabs: @current_user&.get_preference(:visited_tabs),
           discussions_reporting: @context.respond_to?(:feature_enabled?) && @context.feature_enabled?(:react_discussions_post),
           files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
           DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account&.global_id,

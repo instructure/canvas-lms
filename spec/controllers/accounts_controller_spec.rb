@@ -1910,5 +1910,15 @@ describe AccountsController do
       expect(response).to be_successful
       expect(assigns["js_env"][:ACCOUNT_ID]).to be(@account.id)
     end
+
+    it "adds account_calendars once to user's visited_tabs preference" do
+      account_admin_user(account: @account)
+      @user.set_preference(:visited_tabs, ["other_tab"])
+      user_session(@user)
+      get "account_calendar_settings", params: { account_id: @account.id }
+
+      expect(response).to be_successful
+      expect(@user.reload.get_preference(:visited_tabs)).to eq(%w[other_tab account_calendars])
+    end
   end
 end

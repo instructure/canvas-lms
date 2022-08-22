@@ -1721,6 +1721,7 @@ class AccountsController < ApplicationController
     @page_title = title
     add_crumb(title)
     set_active_tab "account_calendars"
+    @current_user.add_to_visited_tabs("account_calendars")
     js_env ACCOUNT_ID: @account.id
     css_bundle :account_calendar_settings
     js_bundle :account_calendar_settings
