@@ -254,16 +254,22 @@ QUnit.module('SpeedGrader', rootHooks => {
         submission: {
           score: 7,
           grade: 70,
+          missing: false,
+          late: false,
           submission_history: [
             {
               submission_type: 'basic_lti_launch',
               external_tool_url: 'foo',
-              submitted_at: new Date('Jan 1, 2010').toISOString()
+              submitted_at: new Date('Jan 1, 2010').toISOString(),
+              late: false,
+              missing: false
             },
             {
               submission_type: 'basic_lti_launch',
               external_tool_url: 'bar',
-              submitted_at: new Date('Feb 1, 2010').toISOString()
+              submitted_at: new Date('Feb 1, 2010').toISOString(),
+              late: false,
+              missing: false
             }
           ]
         }
@@ -328,6 +334,28 @@ QUnit.module('SpeedGrader', rootHooks => {
     SpeedGrader.EG.refreshSubmissionsToView()
     const submissionDropdown = document.getElementById('multiple_submissions')
     strictEqual(submissionDropdown.innerHTML, '')
+    SpeedGrader.teardown()
+  })
+
+  test('first submission that is not late is not tagged as late in the SpeedGrader submission view dropdown', () => {
+    SpeedGrader.setup()
+    SpeedGrader.EG.currentStudent.submission.late = true
+    SpeedGrader.EG.currentStudent.submission.submission_history[1].late = true
+    SpeedGrader.EG.refreshSubmissionsToView()
+    const submissionDropdown = document.getElementById('multiple_submissions')
+    const firstSubmission = submissionDropdown.getElementsByTagName('option')[0]
+    notOk(firstSubmission.innerHTML.includes('LATE'))
+    SpeedGrader.teardown()
+  })
+
+  test('first submission that is not missing is not tagged as missing in the SpeedGrader submission view dropdown', () => {
+    SpeedGrader.setup()
+    SpeedGrader.EG.currentStudent.submission.missing = true
+    SpeedGrader.EG.currentStudent.submission.submission_history[1].missing = true
+    SpeedGrader.EG.refreshSubmissionsToView()
+    const submissionDropdown = document.getElementById('multiple_submissions')
+    const firstSubmission = submissionDropdown.getElementsByTagName('option')[0]
+    notOk(firstSubmission.innerHTML.includes('MISSING'))
     SpeedGrader.teardown()
   })
 
