@@ -107,11 +107,13 @@ export default class GradesGrid extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.students !== this.props.students) {
-      const pages = studentsToPages(nextProps)
-      const currentPageIndex = Math.min(this.state.currentPageIndex, pages.length - 1)
-      this.setState({currentPageIndex, pages})
+      this.setState(oldState => {
+        const pages = studentsToPages(nextProps)
+        const currentPageIndex = Math.min(oldState.currentPageIndex, pages.length - 1)
+        return {currentPageIndex, pages}
+      })
     }
   }
 

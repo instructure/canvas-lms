@@ -72,7 +72,7 @@ export default function Image({focusRef, image, onClick}) {
           constrain="cover"
           draggable
           height="6rem"
-          inline={false}
+          display="block"
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
           src={image.thumbnail_url}

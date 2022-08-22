@@ -153,7 +153,7 @@ export const GradesPage = ({
         <Tabs.Panel
           renderTitle={<Text size="small">{I18n.t('Assignments')}</Text>}
           id="k5-assignments"
-          selected={selectedTab === 'k5-assignments'}
+          isSelected={selectedTab === 'k5-assignments'}
           padding="small 0"
         >
           {renderAssignments()}
@@ -161,7 +161,7 @@ export const GradesPage = ({
         <Tabs.Panel
           renderTitle={<Text size="small">{I18n.t('Learning Mastery')}</Text>}
           id="k5-outcomes"
-          selected={selectedTab === 'k5-outcomes'}
+          isSelected={selectedTab === 'k5-outcomes'}
           padding="small 0"
         >
           {renderOutcomes()}

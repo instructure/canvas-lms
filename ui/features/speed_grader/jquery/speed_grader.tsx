@@ -725,7 +725,9 @@ function renderHiddenSubmissionPill(submission) {
 
   if (isPostable(submission)) {
     ReactDOM.render(
-      <Pill variant="warning" text={I18n.t('Hidden')} margin="0 0 small" />,
+      <Pill color="warning" margin="0 0 small">
+        {I18n.t('Hidden')}
+      </Pill>,
       mountPoint
     )
   } else {

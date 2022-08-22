@@ -196,7 +196,6 @@ const AccountCalendarsModal = ({getSelectedOtherCalendars, onSave, calendarsPerR
           <View as="div" margin="small medium medium" maxHeight={modalHeight}>
             <TextInput
               data-testid="search-input"
-              label=""
               type="search"
               theme={{borderRadius: '2rem'}}
               placeholder={I18n.t('Search %{totalAccounts} calendars', {
