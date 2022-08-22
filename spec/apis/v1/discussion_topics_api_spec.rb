@@ -458,9 +458,7 @@ describe DiscussionTopicsController, type: :request do
     end
 
     context "student permissions" do
-      before do
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:react_discussions_post).and_return(true)
-      end
+      before { Account.site_admin.enable_feature!(:react_discussions_post) }
 
       it "unable to create an anonymous topic if course setting is turned off" do
         @user = @student

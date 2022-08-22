@@ -65,6 +65,12 @@ class AccessToken < ActiveRecord::Base
   scope :not_deleted, -> { where(workflow_state: "active") }
 
   TOKEN_SIZE = 64
+  TOKEN_TYPES = OpenStruct.new(
+    {
+      crypted_token: :crypted_token,
+      crypted_refresh_token: :crypted_refresh_token
+    }
+  )
 
   before_create :generate_token
   before_create :generate_refresh_token
@@ -77,11 +83,11 @@ class AccessToken < ActiveRecord::Base
     run_callbacks(:destroy) { save! }
   end
 
-  def self.authenticate(token_string, token_key = :crypted_token)
+  def self.authenticate(token_string, token_key = :crypted_token, access_token = nil)
     # hash the user supplied token with all of our known keys
     # attempt to find a token that matches one of the hashes
     hashed_tokens = all_hashed_tokens(token_string)
-    token = not_deleted.where(token_key => hashed_tokens).first
+    token = access_token || not_deleted.where(token_key => hashed_tokens).first
     if token && token.send(token_key) != hashed_tokens.first
       # we found the token but, its hashed using an old key. save the updated hash
       token.send("#{token_key}=", hashed_tokens.first)
@@ -95,16 +101,16 @@ class AccessToken < ActiveRecord::Base
     authenticate(token_string, :crypted_refresh_token)
   end
 
-  def self.hashed_token(token)
+  def self.hashed_token(token, key = Canvas::Security.encryption_key)
     # This use of hmac is a bit odd, since we aren't really signing a message
     # other than the random token string itself.
     # However, what we're essentially looking for is a hash of the token
     # "signed" or concatenated with the secret encryption key, so this is perfect.
-    Canvas::Security.hmac_sha1(token)
+    Canvas::Security.hmac_sha1(token, key)
   end
 
   def self.all_hashed_tokens(token)
-    Canvas::Security.encryption_keys.map { |key| Canvas::Security.hmac_sha1(token, key) }
+    Canvas::Security.encryption_keys.map { |key| hashed_token(token, key) }
   end
 
   def self.visible_tokens(tokens)
