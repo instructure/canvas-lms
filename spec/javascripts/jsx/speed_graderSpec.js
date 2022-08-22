@@ -1466,27 +1466,20 @@ QUnit.module('SpeedGrader', rootHooks => {
     })
 
     test('goToStudent is called with next student id', () => {
+      SpeedGrader.EG.anyUnpostedComment.restore()
+      sinon.stub(SpeedGrader.EG, 'anyUnpostedComment').returns(false)
       SpeedGrader.EG.skipRelativeToCurrentIndex(1)
       deepEqual(SpeedGrader.EG.goToStudent.firstCall.args, ['1103', 'push'])
     })
 
     test('goToStudent is called with prev student id', () => {
+      SpeedGrader.EG.anyUnpostedComment.restore()
+      sinon.stub(SpeedGrader.EG, 'anyUnpostedComment').returns(false)
       SpeedGrader.EG.skipRelativeToCurrentIndex(-1)
       deepEqual(SpeedGrader.EG.goToStudent.firstCall.args, ['1101', 'push'])
     })
 
-    QUnit.module('speed_grader#skipRelativeToCurrentIndex#warning_dialog', hooks => {
-      let originalFlag
-
-      hooks.beforeEach(() => {
-        originalFlag = ENV.speedgrader_dialog_for_unposted_comments
-        ENV.speedgrader_dialog_for_unposted_comments = true
-      })
-
-      hooks.afterEach(() => {
-        ENV.speedgrader_dialog_for_unposted_comments = originalFlag
-      })
-
+    QUnit.module('speed_grader#skipRelativeToCurrentIndex#warning_dialog', () => {
       test('goToStudent is called with prev student id with user setting to not show dialog', () => {
         sandbox.stub(userSettings, 'get').returns(true)
 
@@ -1495,14 +1488,12 @@ QUnit.module('SpeedGrader', rootHooks => {
       })
 
       test('goToStudent is called with prev student id on clicking proceed', () => {
-        sandbox.stub(userSettings, 'get').returns(false)
         SpeedGrader.EG.skipRelativeToCurrentIndex(-1)
         $(document).find('#unposted_comment_proceed').click()
         deepEqual(SpeedGrader.EG.goToStudent.firstCall.args, ['1101', 'push'])
       })
 
       test('goToStudent is not called on clicking cancel', () => {
-        sandbox.stub(userSettings, 'get').returns(false)
         SpeedGrader.EG.skipRelativeToCurrentIndex(-1)
         $(document).find('#unposted_comment_cancel').click()
         ok(SpeedGrader.EG.goToStudent.notCalled)

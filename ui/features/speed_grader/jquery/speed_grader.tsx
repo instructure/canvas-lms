@@ -1469,11 +1469,7 @@ EG = {
 
     const doNotShowModalSetting = 'speedgrader.dont_show_unposted_comment_dialog.' + assignmentUrl
 
-    if (
-      ENV.speedgrader_dialog_for_unposted_comments &&
-      !userSettings.get(doNotShowModalSetting) &&
-      this.anyUnpostedComment()
-    ) {
+    if (!userSettings.get(doNotShowModalSetting) && this.anyUnpostedComment()) {
       const closeDialog = () => {
         if ($(document).find('.do-not-show-again input').is(':checked')) {
           userSettings.set(doNotShowModalSetting, true)
