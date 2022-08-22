@@ -127,7 +127,7 @@ const UploadFileModal = React.forwardRef(
 
     return (
       <Modal
-        data-mce-component
+        data-mce-component={true}
         as="form"
         label={label}
         size="large"
@@ -154,7 +154,7 @@ const UploadFileModal = React.forwardRef(
             onDismiss
           )
         }}
-        open
+        open={true}
         shouldCloseOnDocumentClick={false}
         liveRegion={trayProps.liveRegion}
       >
@@ -178,7 +178,7 @@ const UploadFileModal = React.forwardRef(
                       renderTitle={function () {
                         return formatMessage('Computer')
                       }}
-                      selected={selectedPanel === 'COMPUTER'}
+                      isSelected={selectedPanel === 'COMPUTER'}
                     >
                       <Suspense
                         fallback={<Spinner renderTitle={formatMessage('Loading')} size="large" />}
@@ -202,7 +202,7 @@ const UploadFileModal = React.forwardRef(
                       renderTitle={function () {
                         return 'Unsplash'
                       }}
-                      selected={selectedPanel === 'UNSPLASH'}
+                      isSelected={selectedPanel === 'UNSPLASH'}
                     >
                       <Suspense
                         fallback={<Spinner renderTitle={formatMessage('Loading')} size="large" />}
@@ -224,7 +224,7 @@ const UploadFileModal = React.forwardRef(
                       renderTitle={function () {
                         return formatMessage('URL')
                       }}
-                      selected={selectedPanel === 'URL'}
+                      isSelected={selectedPanel === 'URL'}
                     >
                       <Suspense
                         fallback={<Spinner renderTitle={formatMessage('Loading')} size="large" />}
@@ -250,7 +250,7 @@ const UploadFileModal = React.forwardRef(
                     padding="medium"
                   >
                     <ToggleDetails
-                      defaultExpanded
+                      defaultExpanded={true}
                       summary={
                         <Heading level="h3">{formatMessage('Usage Rights (required)')}</Heading>
                       }
@@ -285,7 +285,7 @@ const UploadFileModal = React.forwardRef(
                         handleAltTextChange={handleAltTextChange}
                         handleIsDecorativeChange={handleIsDecorativeChange}
                         handleDisplayAsChange={handleDisplayAsChange}
-                        hideDimensions
+                        hideDimensions={true}
                       />
                     </ToggleDetails>
                   </View>

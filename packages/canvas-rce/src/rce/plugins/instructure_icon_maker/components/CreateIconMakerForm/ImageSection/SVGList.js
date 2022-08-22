@@ -51,7 +51,7 @@ const SVGList = ({type, onSelect, fillColor, onMount}) => {
       height="100%"
       margin="xx-small"
       padding="small"
-      wrapItems
+      wrap="wrap"
       data-testid={`${type}-svg-list`}
     >
       {Object.keys(svgSourceList).map(iconName => (

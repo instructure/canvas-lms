@@ -136,7 +136,7 @@ export const ColorInput = ({
           justifyItems={requireColor ? 'start' : 'center'}
           padding="x-large x-small small"
           width="175px"
-          wrapItems
+          wrap="wrap"
           data-testid={`${name}-popover`}
         >
           {requireColor ? colorPreviews.slice(0, -1) : colorPreviews}

@@ -71,7 +71,6 @@ function EquationEditorToolbar(props) {
   return (
     <Tabs
       variant="secondary"
-      size="medium"
       onRequestTabChange={handleTabChange}
       minHeight="10rem"
       maxHeight="10rem"

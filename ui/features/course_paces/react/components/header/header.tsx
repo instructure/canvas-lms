@@ -83,18 +83,18 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
             {NEW_PACE_ALERT_MESSAGES[props.context_type]}
           </Alert>
         )}
-        <Flex as="section" alignItems="end" wrapItems>
+        <Flex as="section" alignItems="end" wrap="wrap">
           <FlexItem margin="0 0 small">
             <PacePicker />
           </FlexItem>
           <FlexItem margin="0 0 small" shouldGrow>
             <Settings
-              isBlueprintLocked={props.isBlueprintLocked && props.context_type == 'Course'}
+              isBlueprintLocked={props.isBlueprintLocked && props.context_type === 'Course'}
               margin="0 0 0 small"
             />
             <BlueprintLock
               newPace={props.newPace}
-              contextIsCoursePace={props.context_type == 'Course'}
+              contextIsCoursePace={props.context_type === 'Course'}
               setIsBlueprintLocked={props.setIsBlueprintLocked}
             />
           </FlexItem>

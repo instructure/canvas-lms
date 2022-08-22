@@ -170,7 +170,7 @@ export default function ComputerPanel({theFile, setFile, setError, accept, label
             aria-label={formatMessage('{filename} image preview', {filename: theFile.name})}
             src={preview.preview}
             constrain="contain"
-            inline={false}
+            display="block"
           />
         )
       } else if (isText(theFile.type)) {

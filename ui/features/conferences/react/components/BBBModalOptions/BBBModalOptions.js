@@ -44,7 +44,7 @@ const BBBModalOptions = props => {
       <Tabs.Panel
         id={SETTINGS_TAB}
         renderTitle={I18n.t('Settings')}
-        selected={tab === SETTINGS_TAB}
+        isSelected={tab === SETTINGS_TAB}
       >
         <Flex margin="none none large" direction="column">
           <Flex.Item padding="small">
@@ -120,7 +120,7 @@ const BBBModalOptions = props => {
       <Tabs.Panel
         id={ATTENDEES_TAB}
         renderTitle={I18n.t('Attendees')}
-        selected={tab === ATTENDEES_TAB}
+        isSelected={tab === ATTENDEES_TAB}
       >
         <Flex margin="none none large" direction="column">
           <Flex.Item padding="small">

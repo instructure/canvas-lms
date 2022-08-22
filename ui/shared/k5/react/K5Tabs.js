@@ -102,7 +102,7 @@ const K5Tabs = ({children, currentTab, onTabChange, tabs, tabsRef, courseContext
                   courseContext={courseContext}
                 />
               }
-              selected={currentTab === id}
+              isSelected={currentTab === id}
             >
               <span />
             </Tabs.Panel>
