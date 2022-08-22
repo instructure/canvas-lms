@@ -43,7 +43,8 @@ module Exporters
           assignment_id: @assignment.global_id,
           title: @quiz.title,
           context_title: @quiz.context.name,
-          course_uuid: @course.uuid
+          course_uuid: @course.uuid,
+          points_possible: @assignment.points_possible
         }
       }
     end
