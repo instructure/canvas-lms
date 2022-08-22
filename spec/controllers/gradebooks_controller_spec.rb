@@ -2619,18 +2619,6 @@ describe GradebooksController do
     describe "js_env" do
       let(:js_env) { assigns[:js_env] }
 
-      it "sets speedgrader_dialog_for_unposted_comments in js_env as true if enabled" do
-        Account.site_admin.enable_feature!(:speedgrader_dialog_for_unposted_comments)
-        get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id }
-        expect(assigns[:js_env][:speedgrader_dialog_for_unposted_comments]).to eq(true)
-      end
-
-      it "sets speedgrader_dialog_for_unposted_comments in js_env as false if disabled" do
-        Account.site_admin.disable_feature!(:speedgrader_dialog_for_unposted_comments)
-        get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id }
-        expect(assigns[:js_env][:speedgrader_dialog_for_unposted_comments]).to eq(false)
-      end
-
       it "includes lti_retrieve_url" do
         get "speed_grader", params: { course_id: @course, assignment_id: @assignment.id }
         expect(js_env[:lti_retrieve_url]).not_to be_nil
