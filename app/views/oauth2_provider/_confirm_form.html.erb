@@ -32,6 +32,9 @@
     <%= t 'details.email', "Your email address is %{email}.", :email => @current_user.email %>
   <% end %>
 </p>
+<% if @special_confirm_message %>
+  <p><%= @special_confirm_message %></p>
+<% end %>
 <%= form_tag oauth2_auth_accept_path, id: "oauth2_accept_form" do %>
   <div class="button_box ic-Login-confirmation__actions">
     <%= link_to(t(:cancel, "Cancel"), oauth2_auth_deny_path, :class => "Button Button--block") %>

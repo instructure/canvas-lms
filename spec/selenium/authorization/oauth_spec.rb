@@ -136,5 +136,27 @@ describe "oauth2 flow" do
       }
       expect(AccessToken.last.permanent_expires_at).to be_nil
     end
+
+    context "when the using the Commons developer key" do
+      before { Setting.set("commons_developer_key_id", @key.global_id) }
+
+      after { Setting.set("commons_developer_key_id", nil) }
+
+      it "shows a data residency message" do
+        get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=http%3A%2F%2Fwww.example.com&scopes=url%3AGET%7C%2Fapi%2Fv1%2Faccounts"
+        expect(f("#content")).to include_text("Instructure hosts Canvas Commons in the USA")
+      end
+    end
+
+    context "when not using the Commons developer key" do
+      before { Setting.set("commons_developer_key_id", @key.global_id + 1) }
+
+      after { Setting.set("commons_developer_key_id", nil) }
+
+      it "does not show a data residency message" do
+        get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=http%3A%2F%2Fwww.example.com&scopes=url%3AGET%7C%2Fapi%2Fv1%2Faccounts"
+        expect(f("#content")).to_not include_text("Instructure hosts Canvas Commons in the USA")
+      end
+    end
   end
 end
