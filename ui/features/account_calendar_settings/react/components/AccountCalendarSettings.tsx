@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useLayoutEffect, useRef, useState} from 'react'
 
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
@@ -39,12 +39,35 @@ type ComponentProps = {
 }
 
 const BORDER_WIDTH = 'small'
+const BOTTOM_PADDING_OFFSET = 30
 
 export const AccountCalendarSettings: React.FC<ComponentProps> = ({accountId}) => {
   const [visibilityChanges, setVisibilityChanges] = useState<VisibilityChange[]>([])
   const [isLoading, setLoading] = useState(false)
   const [searchValue, setSearchValue] = useState('')
   const [filterValue, setFilterValue] = useState(FilterType.SHOW_ALL)
+  const [windowHeight, setWindowHeight] = useState(window.innerHeight)
+  const [accountTreeHeight, setAccountTreeHeight] = useState(0)
+  const accountTreeRef = useRef(null)
+  const footerRef = useRef(null)
+
+  useLayoutEffect(() => {
+    const updateWindowHeight = () => setWindowHeight(window.innerHeight)
+    window.addEventListener('resize', updateWindowHeight)
+    return () => window.removeEventListener('resize', updateWindowHeight)
+  }, [])
+
+  useLayoutEffect(() => {
+    // make the height of the main area fill the rest of the vertical space
+    if (accountTreeRef.current && footerRef.current) {
+      setAccountTreeHeight(
+        windowHeight -
+          accountTreeRef.current.getBoundingClientRect().top -
+          footerRef.current.offsetHeight -
+          BOTTOM_PADDING_OFFSET
+      )
+    }
+  }, [accountTreeRef, footerRef, windowHeight])
 
   const onAccountToggled = (id: number, visible: boolean) => {
     const existingChange = visibilityChanges.find(change => change.id === id)
@@ -95,7 +118,13 @@ export const AccountCalendarSettings: React.FC<ComponentProps> = ({accountId}) =
           setFilterValue={setFilterValue}
         />
       </View>
-      <View as="div" borderWidth={`0 ${BORDER_WIDTH} ${BORDER_WIDTH} ${BORDER_WIDTH}`}>
+      <View
+        as="div"
+        borderWidth={`0 ${BORDER_WIDTH} ${BORDER_WIDTH} ${BORDER_WIDTH}`}
+        elementRef={e => (accountTreeRef.current = e)}
+        height={`${accountTreeHeight}px`}
+        overflowY="auto"
+      >
         <div style={{display: showTree ? 'block' : 'none'}}>
           <AccountTree
             originAccountId={accountId}
@@ -117,6 +146,7 @@ export const AccountCalendarSettings: React.FC<ComponentProps> = ({accountId}) =
       <View
         as="div"
         borderWidth={`0 ${BORDER_WIDTH} ${BORDER_WIDTH} ${BORDER_WIDTH}`}
+        elementRef={e => (footerRef.current = e)}
         background="secondary"
       >
         <Footer
