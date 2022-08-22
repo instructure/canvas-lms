@@ -945,6 +945,31 @@ describe Enrollment do
         end
       end
 
+      describe "copying overridden scores on restoration" do
+        before(:once) do
+          teacher = User.create!
+          @course.enroll_teacher(teacher, active_all: true)
+          assignment = @course.assignments.create!(points_possible: 100)
+          assignment.grade_student(@enrollment.user, grade: 95, grader: teacher)
+          @enrollment.find_score.update!(override_score: 98)
+        end
+
+        it "restores override score from an existing enrollment" do
+          new_student_enrollment.find_score.update!(override_score: 88)
+          new_student_enrollment.destroy
+          new_student_enrollment.update!(workflow_state: :completed)
+          expect(new_student_enrollment.find_score.override_score).to eq 98
+        end
+
+        it "restores override score from soft-deleted scores when the existing enrollment does not have any scores" do
+          @enrollment.scores.update_all(workflow_state: :deleted)
+          new_student_enrollment.find_score.update!(override_score: 88)
+          new_student_enrollment.destroy
+          new_student_enrollment.update!(workflow_state: :completed)
+          expect(new_student_enrollment.find_score.override_score).to eq 88
+        end
+      end
+
       describe "copying current scores" do
         before(:once) do
           teacher = User.create!
