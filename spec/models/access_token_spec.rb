@@ -66,6 +66,48 @@ describe AccessToken do
 
       include_examples "#authenticate"
     end
+
+    context "when an access token argument is provided" do
+      subject { AccessToken.authenticate(token.full_token, AccessToken::TOKEN_TYPES.crypted_token, token) }
+
+      let(:token) { AccessToken.create!(user: user_model) }
+      let(:user) { user_model }
+
+      shared_examples_for "contexts with a provided access token" do
+        it "does not query the DB for an access token" do
+          expect(AccessToken).not_to receive(:not_deleted)
+          subject
+        end
+      end
+
+      context "and the token is valid" do
+        it_behaves_like "contexts with a provided access token"
+
+        it { is_expected.to eq token }
+      end
+
+      context "and the token is invalid" do
+        before { token.update!(permanent_expires_at: 1.hour.ago) }
+
+        it_behaves_like "contexts with a provided access token"
+
+        it { is_expected.to eq nil }
+      end
+
+      context "and the token is using an old hash" do
+        before { token.update_columns(crypted_token: "old-hashed-token") }
+
+        it_behaves_like "contexts with a provided access token"
+
+        it "persists the re-hashed token" do
+          expect { subject }.to change { token.reload.crypted_token }.from(
+            "old-hashed-token"
+          ).to(
+            CanvasSecurity.hmac_sha1(token.full_token.split("~").last)
+          )
+        end
+      end
+    end
   end
 
   context "hashed tokens" do
