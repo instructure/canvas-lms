@@ -40,6 +40,21 @@ describe('K5AppLink', () => {
     }
   })
 
+  let assign
+
+  beforeAll(() => {
+    assign = window.location.assign
+    Object.defineProperty(window, 'location', {
+      value: {assign: jest.fn()}
+    })
+  })
+
+  afterAll(() => {
+    Object.defineProperty(window, 'location', {
+      value: {assign}
+    })
+  })
+
   it('renders app name', () => {
     const {getByText} = render(<K5AppLink {...getProps()} />)
     expect(getByText('YouTube')).toBeInTheDocument()
@@ -70,13 +85,28 @@ describe('K5AppLink', () => {
     }
     const {getByText} = render(<K5AppLink {...getProps(overrides)} />)
     const button = getByText('YouTube')
-    const assign = window.location.assign
-    Object.defineProperty(window, 'location', {
-      value: {assign: jest.fn()}
-    })
     fireEvent.click(button)
     expect(window.location.assign).toHaveBeenCalledWith('/courses/14/external_tools/1')
-    window.location.assign = assign
+  })
+
+  it('adds display borderless to URL if windowTarget present in the app', () => {
+    const overrides = {
+      courses: [
+        {
+          id: '14',
+          name: 'Science'
+        }
+      ],
+      windowTarget: '_blank'
+    }
+    const {getByText} = render(<K5AppLink {...getProps(overrides)} />)
+    const button = getByText('YouTube')
+    Object.defineProperty(window, 'open', {value: jest.fn()})
+    fireEvent.click(button)
+    expect(window.open).toHaveBeenCalledWith(
+      '/courses/14/external_tools/1?display=borderless',
+      '_blank'
+    )
   })
 
   it('opens modal if installed in more than one course', () => {
@@ -94,5 +124,20 @@ describe('K5AppLink', () => {
     const englishTool = getByText('English')
     expect(physicsTool.href).toContain('/courses/1/external_tools/1')
     expect(englishTool.href).toContain('/courses/2/external_tools/1')
+  })
+
+  it('includes display borderless in links to launch tools in the modal if windowTarget is present', () => {
+    const overrides = {
+      windowTarget: '_blank'
+    }
+    const {getByText} = render(<K5AppLink {...getProps(overrides)} />)
+    const button = getByText('YouTube')
+    fireEvent.click(button)
+    const physicsTool = getByText('Physics')
+    const englishTool = getByText('English')
+    expect(physicsTool.href).toContain(encodeURI('/courses/1/external_tools/1?display=borderless'))
+    expect(physicsTool.target).toContain('_blank')
+    expect(englishTool.href).toContain(encodeURI('/courses/2/external_tools/1?display=borderless'))
+    expect(englishTool.target).toContain('_blank')
   })
 })
