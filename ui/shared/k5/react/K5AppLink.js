@@ -40,12 +40,17 @@ export default function K5AppLink({app}) {
   const launchApp = () => {
     if (app.courses.length > 1) {
       setModalOpen(true)
+    } else if (app.windowTarget) {
+      window.open(launchUrl(app.courses[0].id), app.windowTarget)
     } else {
       window.location.assign(launchUrl(app.courses[0].id))
     }
   }
 
-  const launchUrl = courseId => `/courses/${courseId}/external_tools/${app.id}`
+  const launchUrl = courseId =>
+    `/courses/${courseId}/external_tools/${app.id}${
+      app.windowTarget && app.windowTarget === '_blank' ? `?display=borderless` : ''
+    }`
 
   const renderButton = () => (
     <View
@@ -77,7 +82,7 @@ export default function K5AppLink({app}) {
             <IconLtiSolid data-testid="defaultIcon" />
           )}
         </Flex.Item>
-        <Flex.Item shouldGrow shouldShrink>
+        <Flex.Item shouldGrow={true} shouldShrink={true}>
           <Text size="small">
             <TruncateText maxLines="1" onUpdate={(truncated, _text) => setTruncated(truncated)}>
               {app.title}
@@ -110,6 +115,7 @@ export default function K5AppLink({app}) {
                     color: k5Theme.variables.colors.textDarkest,
                     hoverColor: k5Theme.variables.colors.textDarkest
                   }}
+                  target={app.windowTarget}
                 >
                   {course.name}
                 </Link>
@@ -131,7 +137,8 @@ export const AppShape = {
     PropTypes.shape({id: PropTypes.string.isRequired, name: PropTypes.string.isRequired})
   ).isRequired,
   title: PropTypes.string.isRequired,
-  icon: PropTypes.string
+  icon: PropTypes.string,
+  windowTarget: PropTypes.string
 }
 
 K5AppLink.propTypes = {
