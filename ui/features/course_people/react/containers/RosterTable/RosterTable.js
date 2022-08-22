@@ -29,6 +29,7 @@ import RosterTableRowMenuButton from '../../components/RosterTableRowMenuButton/
 import {secondsToStopwatchTime} from '../../../util/utils'
 import RosterTableLastActivity from '../../components/RosterTableLastActivity/RosterTableLastActivity'
 import RosterTableRoles from '../../components/RosterTableRoles/RosterTableRoles'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = useI18nScope('course_people')
 
@@ -39,6 +40,7 @@ const idProps = name => ({
 })
 
 const OBSERVER_ENROLLMENT = 'ObserverEnrollment'
+const STUDENT_ENROLLMENT = 'StudentEnrollment'
 
 const RosterTable = () => {
   const {loading, data} = useQuery(ROSTER_QUERY, {
@@ -49,13 +51,23 @@ const RosterTable = () => {
 
   if (loading) return <LoadingIndicator />
 
-  const {view_user_logins, read_sis, read_reports} = ENV?.permissions || {}
+  const {
+    view_user_logins,
+    read_sis,
+    read_reports,
+    can_allow_admin_actions,
+    manage_admin_users,
+    manage_students
+  } = ENV?.permissions || {}
   const showCourseSections = ENV?.course?.hideSectionsOnCourseUsersPage === false
 
   const tableRows = data.course.usersConnection.nodes.map(node => {
     const {name, _id, sisId, enrollments, loginId, avatarUrl, pronouns} = node
     const {totalActivityTime, htmlUrl, state} = enrollments[0]
-
+    const canRemoveUser = enrollments.every(enrollment => enrollment.canBeRemoved)
+    const canManageUser = enrollments.some(enrollment => enrollment.type !== STUDENT_ENROLLMENT)
+      ? can_allow_admin_actions || manage_admin_users
+      : manage_students
     const sectionNames = enrollments.map(enrollment => {
       if (enrollment.type === OBSERVER_ENROLLMENT) return null
       return <div key={`section-${enrollment.id}`}>{enrollment.section.name}</div>
@@ -87,7 +99,7 @@ const RosterTable = () => {
           </Table.Cell>
         )}
         <Table.Cell>
-          <RosterTableRowMenuButton name={name} />
+          {(canManageUser || canRemoveUser) && <RosterTableRowMenuButton name={name} />}
         </Table.Cell>
       </Table.Row>
     )
@@ -121,7 +133,9 @@ const RosterTable = () => {
               {I18n.t('Total Activity')}
             </Table.ColHeader>
           )}
-          <Table.ColHeader {...idProps('colheader-context-menu')}>{}</Table.ColHeader>
+          <Table.ColHeader {...idProps('colheader-administrative-links')}>
+            <ScreenReaderContent>{I18n.t('Administrative Links')}</ScreenReaderContent>
+          </Table.ColHeader>
         </Table.Row>
       </Table.Head>
       <Table.Body>{tableRows}</Table.Body>

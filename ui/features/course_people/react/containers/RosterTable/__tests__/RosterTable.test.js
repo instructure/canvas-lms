@@ -25,6 +25,7 @@ import {mockUser, mockEnrollment, getRosterQueryMock} from '../../../../graphql/
 import {ACTIVE_STATE, PILL_MAP} from '../../../components/StatusPill/StatusPill'
 
 const OBSERVER_ENROLLMENT = 'ObserverEnrollment'
+const STUDENT_ENROLLMENT = 'StudentEnrollment'
 
 const designer1 = {
   name: 'Designer 1',
@@ -141,7 +142,10 @@ describe('RosterTable', () => {
       permissions: {
         view_user_logins: true,
         read_sis: true,
-        read_reports: true
+        read_reports: true,
+        can_allow_admin_actions: true,
+        manage_admin_users: true,
+        manage_students: true
       }
     }
   })
@@ -340,6 +344,62 @@ describe('RosterTable', () => {
     // Check section name doesn't exist in row
     rows.forEach((row, index) => {
       sectionByUser[index] && expect(queryAllByText(row, sectionByUser[index])).toHaveLength(0)
+    })
+  })
+
+  describe('Administrative Links', () => {
+    const nonRemovableMockUsers = [...mockUsers]
+    nonRemovableMockUsers.forEach(user => (user.enrollments[0].canBeRemoved = false))
+    const nonRemovableMockAdmin = nonRemovableMockUsers.filter(
+      user => user.enrollments[0].type !== STUDENT_ENROLLMENT
+    )
+    const nonRemovableMockStudents = nonRemovableMockUsers.filter(
+      user => user.enrollments[0].type === STUDENT_ENROLLMENT
+    )
+    const checkContainerForButtons = async (container, users) => {
+      const rows = await container.findAllByTestId('roster-table-data-row')
+      const buttonNames = users.map(user => `Manage ${user.name}`)
+      rows.forEach((row, index) => {
+        const button = within(row).getByRole('button', {name: buttonNames[index]})
+        expect(button).toBeInTheDocument()
+      })
+    }
+
+    beforeEach(() => {
+      window.ENV.permissions = {
+        ...window.ENV.permissions,
+        can_allow_admin_actions: false,
+        manage_admin_users: false,
+        manage_students: false
+      }
+    })
+
+    it('should have an Administrative Links column', async () => {
+      const container = setup(getRosterQueryMock({mockUsers: nonRemovableMockUsers}))
+      expect(await container.findByTestId('colheader-administrative-links')).toBeInTheDocument()
+    })
+
+    it('should show the Administrative Link button if the user can be removed', () => {
+      const container = setup(getRosterQueryMock({mockUsers})) // Mock Users can be removed by default
+      checkContainerForButtons(container, mockUsers)
+    })
+
+    it('should show the Administrative Link button for students if the user has the manage_students permission', () => {
+      window.ENV.permissions.manage_students = true
+      const container = setup(getRosterQueryMock({mockUsers: nonRemovableMockStudents}))
+      checkContainerForButtons(container, nonRemovableMockStudents)
+    })
+
+    it('should show the Administrative Link button for admin roles if the user has the can_allow_admin_actions permission', () => {
+      window.ENV.permissions.can_allow_admin_actions = true
+      const container = setup(getRosterQueryMock({mockUsers: nonRemovableMockAdmin}))
+      checkContainerForButtons(container, nonRemovableMockAdmin)
+    })
+
+    it('should show the Administrative Link button for admin roles if the user has the manage_admin_users permission', () => {
+      window.ENV.permissions.manage_admin_users = true
+      const container = setup(getRosterQueryMock({mockUsers: nonRemovableMockAdmin}))
+      checkContainerForButtons(container, nonRemovableMockAdmin)
     })
   })
 })
