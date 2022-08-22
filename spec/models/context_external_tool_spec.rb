@@ -25,7 +25,7 @@ describe ContextExternalTool do
     course_model(account: @account)
   end
 
-  describe "associations" do
+  describe "associations and validations" do
     let_once(:developer_key) { DeveloperKey.create! }
     let_once(:tool) do
       ContextExternalTool.create!(
@@ -46,6 +46,8 @@ describe ContextExternalTool do
     it "allows setting the root account" do
       expect(tool.root_account).to eq @root_account
     end
+
+    it { expect(tool).to validate_length_of(:consumer_key).is_at_most(2048) }
   end
 
   describe "#permission_given?" do
