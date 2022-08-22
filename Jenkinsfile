@@ -332,6 +332,11 @@ pipeline {
         script {
           lock(label: 'canvas_build_global_mutex', quantity: 1) {
             timeout(60) {
+              // Skip translation builds for patchsets uploaded by svc.cloudjenkins
+              if (env.GERRIT_PATCHSET_UPLOADER_EMAIL == 'svc.cloudjenkins@instructure.com' && env.GERRIT_CHANGE_SUBJECT =~ /translation$/) {
+                return
+              }
+
               node('master') {
                 // For builds like Rails 6.1 prototype, we want to be able to see the build link, but
                 // not have Gerrit vote on it. This isn't currently supported through the Gerrit Trigger
@@ -341,12 +346,6 @@ pipeline {
                 // https://issues.jenkins.io/browse/JENKINS-28339
                 if (configuration.getBoolean('emulate-build-start', 'false')) {
                   gerrit.submitReview("", "Build Started ${RUN_DISPLAY_URL}")
-                }
-
-                // Skip builds for patchsets uploaded by svc.cloudjenkins, these are usually translation updates.
-                if (env.GERRIT_PATCHSET_UPLOADER_EMAIL == 'svc.cloudjenkins@instructure.com' && !configuration.isChangeMerged()) {
-                  currentBuild.result = 'ABORTED'
-                  error('No pre-merge builds for Service Cloud Jenkins user.')
                 }
 
                 if (configuration.skipCi()) {
