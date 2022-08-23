@@ -67,6 +67,10 @@ const start = () => {
       }
     }
   )
+  const onContextsChange = additionalContexts => {
+    calendar.syncNewContexts(additionalContexts)
+    eventDataSource.syncNewContexts(additionalContexts)
+  }
 
   new MiniCalendar('#minical', calendar)
   new UndatedEventsList('#undated-events', eventDataSource, calendar)
@@ -74,7 +78,7 @@ const start = () => {
     ENV.CALENDAR.CONTEXTS,
     ENV.CALENDAR.SELECTED_CONTEXTS,
     eventDataSource,
-    calendar.colorizeContexts
+    onContextsChange
   )
 }
 
