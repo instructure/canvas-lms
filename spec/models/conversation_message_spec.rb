@@ -240,6 +240,33 @@ describe ConversationMessage do
       end
     end
 
+    it "user_note uses the recipients shard" do
+      conversation = nil
+      acc = nil
+      @shard1.activate do
+        acc = Account.default
+        acc.enable_user_notes = true
+        acc.save!
+        course_with_teacher(active_all: true)
+      end
+      a = @teacher.shard.activate do
+        attachment_model(context: @teacher, folder: @teacher.conversation_attachments_folder)
+      end
+      m = nil
+      @shard2.activate do
+        student_in_course(active_all: true)
+        m = @teacher.initiate_conversation([@student]).add_message("test", attachment_ids: [a.id])
+        conversation = m.conversation
+      end
+      @shard1.activate do
+        allow(Account).to receive(:default) { acc }
+        conversation_participant = conversation.conversation_participants.where(user_id: @teacher.id).first
+        conversation_participant.add_message("reprimanded!", generate_user_note: true, root_account_id: acc)
+        conversation_participant.reload
+        expect(@student.user_notes.last.root_account_id).to eq(Shard.relative_id_for(acc.id, acc.shard, @student.shard))
+      end
+    end
+
     context "sharding" do
       specs_require_sharding
 
