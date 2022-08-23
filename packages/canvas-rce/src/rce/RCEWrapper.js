@@ -374,8 +374,9 @@ class RCEWrapper extends React.Component {
   }
 
   getRequiredFeatureStatuses() {
-    const {new_equation_editor, new_math_equation_handling} = this.props.features
-    return {new_equation_editor, new_math_equation_handling}
+    const {new_equation_editor, new_math_equation_handling, rce_ux_improvements} =
+      this.props.features
+    return {new_equation_editor, new_math_equation_handling, rce_ux_improvements}
   }
 
   getRequiredConfigValues() {
@@ -1899,7 +1900,7 @@ class RCEWrapper extends React.Component {
             />
           </Suspense>
         ) : null}
-        <Alert screenReaderOnly liveRegion={this.props.liveRegion}>
+        <Alert screenReaderOnly={true} liveRegion={this.props.liveRegion}>
           {this.state.announcement}
         </Alert>
       </div>
