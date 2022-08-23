@@ -259,7 +259,7 @@ function convertAccountCalendars(accountCalendars) {
   }))
 }
 
-export default function sidebar(contexts, selectedContexts, dataSource, colorizeContexts) {
+export default function sidebar(contexts, selectedContexts, dataSource, onContextsChange) {
   const $skipLink = $('.skip-to-calendar')
   const $colorPickerBtn = $('.ContextList__MoreBtn')
   const $calendarHolder = $('#calendar-list-holder')
@@ -307,7 +307,7 @@ export default function sidebar(contexts, selectedContexts, dataSource, colorize
       const contextAccountCodes = otherCalendars.map(nOC => nOC.asset_string)
       syncOtherCalendars(otherCalendars, visibleContexts.notify)
       visibleContexts.overrideEnabledAccounts(contextAccountCodes)
-      colorizeContexts(contextAccountCodes)
+      onContextsChange(otherCalendars)
       newAddedCalendars.forEach(newCalendar => {
         if (!visibleContexts.contexts.includes(newCalendar)) {
           visibleContexts.toggle(newCalendar.asset_string)

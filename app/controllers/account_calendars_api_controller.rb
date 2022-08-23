@@ -72,6 +72,26 @@
 #           "description": "Object type",
 #           "example": "account",
 #           "type": "string"
+#         },
+#         "calendar_event_url": {
+#           "description": "url to get full detailed events",
+#           "example": "/accounts/2/calendar_events/%7B%7B%20id%20%7D%7D",
+#           "type": "string"
+#         },
+#         "can_create_calendar_events": {
+#           "description": "whether the user can create calendar events",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "create_calendar_event_url": {
+#           "description": "API path to create events for the account",
+#           "example": "/accounts/2/calendar_events",
+#           "type": "string"
+#         },
+#         "new_calendar_event_url": {
+#           "description": "url to open the more options event editor",
+#           "example": "/accounts/6/calendar_events/new",
+#           "type": "string"
 #         }
 #       }
 #     }

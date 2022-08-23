@@ -188,6 +188,26 @@ describe "calendar2" do
           driver.navigate.refresh
           expect(f(".accounts-empty-state")).to be_displayed
         end
+
+        it "enables event creation for added calendar accounts" do
+          @course.account.account_calendar_visible = true
+          @course.account.save!
+          account_admin_user(account: @course.account)
+          user_session(@admin)
+          get "/calendar2"
+          event_title = "account event"
+          f("button[data-testid='add-other-calendars-button']").click
+          # because clicking the checkbox clicks on a sibling span
+          driver.execute_script("$('input[data-testid=account-#{@course.account.id}-checkbox]').click()")
+          f("button[data-testid='save-calendars-button']").click
+          f(".flashalert-message button").click
+          f("#create_new_event_link").click
+          replace_content(edit_calendar_event_form_title, event_title)
+          click_option(edit_calendar_event_form_context, @course.account.name)
+          edit_calendar_event_form_submit_button.click
+          wait_for_ajaximations
+          assert_title(event_title, false)
+        end
       end
 
       describe "undated calendar items" do

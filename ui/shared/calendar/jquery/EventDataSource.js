@@ -113,6 +113,18 @@ export default class EventDataSource {
     })
   }
 
+  syncNewContexts(additionalContexts) {
+    if (additionalContexts?.length > 0) {
+      additionalContexts.forEach(additionalContext => {
+        const context = this.contexts.find(c => c.asset_string === additionalContext.asset_string)
+        if (!context) {
+          this.contexts.push(additionalContext)
+        }
+      })
+      this.clearCache()
+    }
+  }
+
   removeCachedReservation(event) {
     const cached_ag = this.cache.appointmentGroups[event.appointment_group_id]
     if (cached_ag) {
