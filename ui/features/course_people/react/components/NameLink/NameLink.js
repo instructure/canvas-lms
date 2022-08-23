@@ -17,42 +17,49 @@
  */
 
 import React from 'react'
-import {string, func} from 'prop-types'
+import {arrayOf, shape, string} from 'prop-types'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
+import '@canvas/context-cards/react/StudentContextCardTrigger'
 
-const NameLink = ({_id, htmlUrl, name, pronouns, onClick}) => {
-  const isCurrentUser = _id === ENV.current_user.id
+const STUDENT_ENROLLMENT = 'StudentEnrollment'
+
+const NameLink = ({studentId, htmlUrl, name, pronouns, enrollments}) => {
   const formatPronouns = pronounString => {
-    if (pronounString === null) return ''
+    if (!pronounString) return ''
     return <Text fontStyle="italic" data-testid="user-pronouns">{` (${pronounString})`}</Text>
   }
 
   return (
-    <Link
-      isWithinText={false}
-      as="a"
-      href={isCurrentUser ? htmlUrl : null}
-      onClick={isCurrentUser ? null : () => onClick()}
-      margin="0 x-small 0 0"
+    // InstUI components remove className props so we wrap our component with a span
+    // to get the StudentContextCardTrigger to trigger when the link is clicked
+    <span
+      className={
+        enrollments.some(enrollment => enrollment.type === STUDENT_ENROLLMENT)
+          ? 'student_context_card_trigger'
+          : ''
+      }
+      data-student_id={studentId}
+      data-course_id={ENV.course.id}
     >
-      {name}
-      {formatPronouns(pronouns)}
-    </Link>
+      <Link isWithinText={false} href={htmlUrl} margin="0 x-small 0 0">
+        {name}
+        {formatPronouns(pronouns)}
+      </Link>
+    </span>
   )
 }
 
 NameLink.propTypes = {
-  _id: string.isRequired,
+  studentId: string.isRequired,
   htmlUrl: string.isRequired,
   name: string.isRequired,
   pronouns: string,
-  onClick: func
+  enrollments: arrayOf(shape({type: string}))
 }
 
 NameLink.defaultProps = {
-  pronouns: null,
-  onClick: () => {}
+  pronouns: null
 }
 
 export default NameLink

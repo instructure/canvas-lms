@@ -79,7 +79,13 @@ const RosterTable = () => {
           <AvatarLink avatarUrl={avatarUrl} name={name} href={htmlUrl} />
         </Table.Cell>
         <Table.Cell data-testid="roster-table-name-cell">
-          <NameLink _id={_id} htmlUrl={htmlUrl} pronouns={pronouns} name={name} />
+          <NameLink
+            studentId={_id}
+            htmlUrl={htmlUrl}
+            pronouns={pronouns}
+            name={name}
+            enrollments={enrollments}
+          />
           <StatusPill state={state} />
         </Table.Cell>
         {view_user_logins && <Table.Cell>{loginId}</Table.Cell>}
