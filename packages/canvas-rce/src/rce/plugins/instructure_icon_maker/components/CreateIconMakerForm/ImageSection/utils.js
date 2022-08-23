@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,28 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createSvgElement} from './utils'
+export const MAX_GIF_PNG_SIZE_BYTES = 250 * 1024
 
-export function buildMetadata(settings) {
-  // Pull off any instance specific settings
-  const {
-    name,
-    originalName,
-    alt,
-    isDecorative,
-    externalStyle,
-    externalWidth,
-    externalHeight,
-    error,
-    ...embedSettings
-  } = settings
-  const metadata = createSvgElement('metadata')
-  metadata.textContent = JSON.stringify(embedSettings)
-  return metadata
-}
-
-export function parseMetadata(svg) {
-  const metadata = svg.querySelector('metadata')
-  if (!metadata) return null
-  return JSON.parse(metadata.textContent)
+export const isAnUnsupportedGifPngImage = ({type, size}) => {
+  return ['image/gif', 'image/png'].includes(type) && size > MAX_GIF_PNG_SIZE_BYTES
 }
