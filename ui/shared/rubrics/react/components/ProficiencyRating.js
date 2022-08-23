@@ -129,8 +129,8 @@ export default class ProficiencyRating extends React.Component {
     this.props.onPointsChange(e.target.value)
   }
 
-  handleMenuToggle = show => {
-    this.setState({showColorPopover: show})
+  handleMenuOpen = () => {
+    this.setState({showColorPopover: true})
   }
 
   handleMenuClose = () => {
@@ -184,7 +184,8 @@ export default class ProficiencyRating extends React.Component {
             <Popover
               on="click"
               isShowingContent={this.state.showColorPopover}
-              onToggle={this.handleMenuToggle}
+              onShowContent={this.handleMenuOpen}
+              onHideContent={this.handleMenuClose}
               renderTrigger={
                 <CondensedButton ref={this.setColorRef}>
                   <div>
@@ -198,9 +199,9 @@ export default class ProficiencyRating extends React.Component {
                 parentComponent="ProficiencyRating"
                 colors={PREDEFINED_COLORS}
                 currentColor={formatColor(color)}
-                isOpen
-                hidePrompt
-                nonModal
+                isOpen={true}
+                hidePrompt={true}
+                nonModal={true}
                 hideOnScroll={false}
                 withAnimation={false}
                 withBorder={false}
