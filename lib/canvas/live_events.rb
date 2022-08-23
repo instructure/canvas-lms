@@ -1023,7 +1023,7 @@ module Canvas::LiveEvents
     {
       canvas_course_id: master_template.course.id,
       canvas_course_uuid: master_template.course.uuid,
-      restrictions: master_template.use_default_restrictions_by_type ? master_template.default_restrictions_by_type["Assignment"] : master_template.default_restrictions
+      restrictions: master_template.use_default_restrictions_by_type ? master_template.default_restrictions_by_type : master_template.default_restrictions
     }
   end
 
