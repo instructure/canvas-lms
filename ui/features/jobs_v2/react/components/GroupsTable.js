@@ -23,6 +23,7 @@ import {Responsive} from '@instructure/ui-responsive'
 import {Link} from '@instructure/ui-link'
 import {InfoColumn, GroupedInfoColumnHeader} from './InfoColumn'
 import SortColumnHeader from './SortColumnHeader'
+import OrphanedStrandIndicator from './OrphanedStrandIndicator'
 
 const I18n = useI18nScope('jobs_v2')
 
@@ -81,6 +82,9 @@ export default function GroupsTable({
                 return (
                   <Table.Row key={tag_or_strand}>
                     <Table.Cell>
+                      {group.orphaned ? (
+                        <OrphanedStrandIndicator name={tag_or_strand} type={type} />
+                      ) : null}
                       <Link onClick={() => onClickGroup(tag_or_strand)}>{tag_or_strand}</Link>
                     </Table.Cell>
                     <Table.Cell>{group.count}</Table.Cell>
