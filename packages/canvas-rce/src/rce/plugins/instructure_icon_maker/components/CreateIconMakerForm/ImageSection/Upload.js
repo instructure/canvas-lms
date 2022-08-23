@@ -17,11 +17,13 @@
  */
 
 import React from 'react'
-
+import PropTypes from 'prop-types'
 import formatMessage from '../../../../../../format-message'
 import {actions} from '../../../reducers/imageSection'
+import {actions as svgActions} from '../../../reducers/svgSettings'
 import {UploadFile} from '../../../../shared/Upload/UploadFile'
 import {canCompressImage, compressImage, shouldCompressImage} from './compressionUtils'
+import {isAnUnsupportedGifPngImage, MAX_GIF_PNG_SIZE_BYTES} from './utils'
 
 function dispatchCompressedImage(theFile, dispatch) {
   dispatch({...actions.SET_IMAGE, payload: ''})
@@ -41,8 +43,19 @@ function dispatchCompressedImage(theFile, dispatch) {
     })
 }
 
-export const onSubmit = dispatch => (_editor, _accept, _selectedPanel, uploadData) => {
+export const onSubmit = (dispatch, onChange) => (_editor, _accept, _selectedPanel, uploadData) => {
   const {theFile} = uploadData
+
+  if (isAnUnsupportedGifPngImage(theFile)) {
+    dispatch({...actions.SET_IMAGE_COLLECTION_OPEN, payload: false})
+    return onChange({
+      type: svgActions.SET_ERROR,
+      payload: formatMessage(
+        'GIF/PNG format images larger than {size} KB are not currently supported.',
+        {size: MAX_GIF_PNG_SIZE_BYTES / 1024}
+      )
+    })
+  }
 
   if (canCompressImage() && shouldCompressImage(theFile)) {
     return dispatchCompressedImage(theFile, dispatch)
@@ -54,7 +67,7 @@ export const onSubmit = dispatch => (_editor, _accept, _selectedPanel, uploadDat
   dispatch({...actions.SET_CROPPER_OPEN, payload: true})
 }
 
-const Upload = ({editor, dispatch}) => {
+const Upload = ({editor, dispatch, onChange}) => {
   return (
     <UploadFile
       accept="image/*"
@@ -65,9 +78,20 @@ const Upload = ({editor, dispatch}) => {
         dispatch(actions.CLEAR_MODE)
       }}
       requireA11yAttributes={false}
-      onSubmit={onSubmit(dispatch)}
+      onSubmit={onSubmit(dispatch, onChange)}
     />
   )
+}
+
+Upload.propTypes = {
+  editor: PropTypes.object.isRequired,
+  dispatch: PropTypes.func,
+  onChange: PropTypes.func
+}
+
+Upload.defaultProps = {
+  dispatch: () => {},
+  onChange: () => {}
 }
 
 export default Upload
