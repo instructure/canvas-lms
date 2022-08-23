@@ -586,6 +586,7 @@ class ActiveRecord::Base
         connection.clear_query_cache
         return result
       rescue ActiveRecord::RecordNotUnique
+        next
       end
     end
     result = transaction(:requires_new => true) { uncached { yield(retries) } }
