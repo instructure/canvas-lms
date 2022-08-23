@@ -140,22 +140,22 @@ export default function VideoOptionsTray(props) {
       {contentProps => (
         <Tray
           key="video-options-tray"
-          data-mce-component
+          data-mce-component={true}
           label={formatMessage('Video Options Tray')}
           onDismiss={onRequestClose}
           onEntered={onEntered}
           onExited={onExited}
           open={open}
           placement="end"
-          shouldCloseOnDocumentClick
-          shouldContainFocus
-          shouldReturnFocus
+          shouldCloseOnDocumentClick={true}
+          shouldContainFocus={true}
+          shouldReturnFocus={true}
           size="regular"
         >
           <Flex direction="column" height={getTrayHeight()}>
             <Flex.Item as="header" padding="medium">
               <Flex direction="row">
-                <Flex.Item grow shrink>
+                <Flex.Item shouldGrow={true} shouldShrink={true}>
                   <Heading as="h2">{formatMessage('Video Options')}</Heading>
                 </Flex.Item>
                 <Flex.Item>
@@ -167,9 +167,9 @@ export default function VideoOptionsTray(props) {
                 </Flex.Item>
               </Flex>
             </Flex.Item>
-            <Flex.Item as="form" grow margin="none" shrink>
+            <Flex.Item as="form" shouldGrow={true} margin="none" shouldShrink={true}>
               <Flex justifyItems="space-between" direction="column" height="100%">
-                <Flex.Item grow padding="small" shrink>
+                <Flex.Item shouldGrow={true} padding="small" shouldShrink={true}>
                   <Flex direction="column">
                     <Flex.Item padding="small">
                       <TextArea

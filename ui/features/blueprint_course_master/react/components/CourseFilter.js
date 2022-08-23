@@ -134,7 +134,7 @@ export default class CourseFilter extends React.Component {
         }}
       >
         <Flex wrap="wrap">
-          <Flex.Item grow padding="0 x-small x-small 0">
+          <Flex.Item shouldGrow={true} padding="0 x-small x-small 0">
             <TextInput
               ref={c => {
                 this.searchInput = c

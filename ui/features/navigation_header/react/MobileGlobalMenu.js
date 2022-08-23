@@ -129,7 +129,7 @@ export default class MobileGlobalMenu extends React.Component {
               screenReaderLabel="Close"
             />
           </Flex.Item>
-          <Flex.Item grow shrink>
+          <Flex.Item shouldGrow={true} shouldShrink={true}>
             <Heading>
               <a className="ic-brand-mobile-global-nav-logo" href="/">
                 <span className="screenreader-only">
@@ -139,7 +139,7 @@ export default class MobileGlobalMenu extends React.Component {
             </Heading>
           </Flex.Item>
         </Flex>
-        <List isUnstyled itemSpacing="medium">
+        <List isUnstyled={true} itemSpacing="medium">
           <List.Item>
             <Link href="/" isWithinText={false} size="small" display="block" textAlign="start">
               <Flex>
@@ -162,7 +162,7 @@ export default class MobileGlobalMenu extends React.Component {
             {this.props.current_user && Object.keys(this.props.current_user).length ? (
               <ToggleDetails
                 iconPosition="end"
-                fluidWidth
+                fluidWidth={true}
                 onToggle={ensureLoaded('profile')}
                 summary={
                   <Flex padding="xx-small small">
@@ -171,7 +171,7 @@ export default class MobileGlobalMenu extends React.Component {
                         name={this.props.current_user.display_name}
                         src={this.props.current_user.avatar_image_url}
                         size="x-small"
-                        data-fs-exclude
+                        data-fs-exclude={true}
                       />
                     </Flex.Item>
                     <Flex.Item>
@@ -180,7 +180,7 @@ export default class MobileGlobalMenu extends React.Component {
                   </Flex>
                 }
               >
-                <List isUnstyled itemSpacing="small" margin="0 0 0 x-large">
+                <List isUnstyled={true} itemSpacing="small" margin="0 0 0 x-large">
                   {this.props.DesktopNavComponent.state.profileAreLoaded ? (
                     this.props.DesktopNavComponent.state.profile.map(tab => (
                       <List.Item key={tab.id}>
@@ -200,10 +200,10 @@ export default class MobileGlobalMenu extends React.Component {
                     </List.Item>
                   )}
                   <List.Item>
-                    <LogoutButton variant="link" fluidWidth />
+                    <LogoutButton variant="link" fluidWidth={true} />
                   </List.Item>
                   <List.Item>
-                    <HighContrastModeToggle isMobile />
+                    <HighContrastModeToggle isMobile={true} />
                   </List.Item>
                 </List>
               </ToggleDetails>
@@ -225,7 +225,7 @@ export default class MobileGlobalMenu extends React.Component {
             <List.Item>
               <ToggleDetails
                 iconPosition="end"
-                fluidWidth
+                fluidWidth={true}
                 onToggle={ensureLoaded('accounts')}
                 summary={
                   <Flex padding="xx-small small">
@@ -238,7 +238,7 @@ export default class MobileGlobalMenu extends React.Component {
                   </Flex>
                 }
               >
-                <List isUnstyled itemSpacing="small" margin="0 0 0 x-large">
+                <List isUnstyled={true} itemSpacing="small" margin="0 0 0 x-large">
                   {this.props.DesktopNavComponent.state.accountsAreLoaded ? (
                     this.props.DesktopNavComponent.state.accounts
                       .map(account => (
@@ -277,7 +277,7 @@ export default class MobileGlobalMenu extends React.Component {
           <List.Item>
             <ToggleDetails
               iconPosition="end"
-              fluidWidth
+              fluidWidth={true}
               onToggle={ensureLoaded('courses')}
               summary={
                 <Flex padding="xx-small small">
@@ -292,7 +292,7 @@ export default class MobileGlobalMenu extends React.Component {
                 </Flex>
               }
             >
-              <List isUnstyled itemSpacing="small" margin="0 0 0 x-large">
+              <List isUnstyled={true} itemSpacing="small" margin="0 0 0 x-large">
                 {this.props.DesktopNavComponent.state.coursesAreLoaded ? (
                   courses
                     .map(course => (
@@ -338,7 +338,7 @@ export default class MobileGlobalMenu extends React.Component {
             <List.Item>
               <ToggleDetails
                 iconPosition="end"
-                fluidWidth
+                fluidWidth={true}
                 onToggle={ensureLoaded('groups')}
                 summary={
                   <Flex padding="xx-small small">
@@ -351,7 +351,7 @@ export default class MobileGlobalMenu extends React.Component {
                   </Flex>
                 }
               >
-                <List isUnstyled itemSpacing="small" margin="0 0 0 x-large">
+                <List isUnstyled={true} itemSpacing="small" margin="0 0 0 x-large">
                   {this.props.DesktopNavComponent.state.groupsAreLoaded ? (
                     this.props.DesktopNavComponent.state.groups
                       .map(group => (
@@ -417,7 +417,7 @@ export default class MobileGlobalMenu extends React.Component {
                   <Text size="medium">{I18n.t('Inbox')}</Text>
                   {!!this.props.DesktopNavComponent.state.unreadInboxCount && (
                     <Badge
-                      standalone
+                      standalone={true}
                       margin="0 small"
                       count={this.props.DesktopNavComponent.state.unreadInboxCount}
                     />
@@ -466,7 +466,7 @@ export default class MobileGlobalMenu extends React.Component {
           <List.Item>
             <ToggleDetails
               iconPosition="end"
-              fluidWidth
+              fluidWidth={true}
               onToggle={ensureLoaded('history')}
               summary={
                 <Flex padding="xx-small small">
@@ -492,7 +492,7 @@ export default class MobileGlobalMenu extends React.Component {
             <List.Item>
               <ToggleDetails
                 iconPosition="end"
-                fluidWidth
+                fluidWidth={true}
                 onToggle={ensureLoaded('help')}
                 summary={
                   <Flex padding="xx-small small">

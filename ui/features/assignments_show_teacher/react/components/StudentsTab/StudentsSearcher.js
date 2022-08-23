@@ -203,7 +203,7 @@ export default class StudentsSearcher extends React.Component {
     return (
       <>
         <Flex as="div" margin="0 0 medium 0" wrap="wrap">
-          <Flex.Item grow size="60%" margin="small 0 0 0">
+          <Flex.Item shouldGrow={true} size="60%" margin="small 0 0 0">
             <TextInput
               renderLabel={
                 <ScreenReaderContent>{I18n.t('Search by student name')}</ScreenReaderContent>

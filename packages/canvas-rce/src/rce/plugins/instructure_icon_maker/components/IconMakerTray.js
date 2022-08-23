@@ -64,7 +64,7 @@ function renderHeader(title, settings, onKeyDown, isInvalid, onAlertDismissal, o
       <Flex direction="column">
         <Flex.Item padding="medium medium small">
           <Flex direction="row">
-            <Flex.Item grow shrink>
+            <Flex.Item shouldGrow={true} shouldShrink={true}>
               <Heading as="h2">{title}</Heading>
             </Flex.Item>
             <Flex.Item>
@@ -324,7 +324,7 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
         renderFooter(status, onClose, handleSubmit, editing, replaceAll, setReplaceAll, applyRef)
       }
       bodyAs="form"
-      shouldJoinBodyAndFooter
+      shouldJoinBodyAndFooter={true}
     />
   )
 }

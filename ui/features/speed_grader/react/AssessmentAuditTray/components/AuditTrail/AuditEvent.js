@@ -99,7 +99,7 @@ export default class AuditEvent extends PureComponent {
           {iconView}
         </Flex.Item>
 
-        <Flex.Item as="div" grow margin="none none none x-small" shrink>
+        <Flex.Item as="div" showGrow={true} shouldShrink={true} margin="none none none x-small">
           <Text as="div" weight="bold">
             <TruncateText maxLines={2}>{label}</TruncateText>
           </Text>

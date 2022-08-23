@@ -48,7 +48,8 @@ export default function LinkOptionsTray(props) {
   const [isValidURL, setIsValidURL] = useState(false)
   const [autoOpenPreview, setAutoOpenPreview] = useState(content.displayAs === DISPLAY_AS_EMBED)
   const [disableInlinePreview, setDisableInlinePreview] = useState(
-    content.displayAs === DISPLAY_AS_EMBED_DISABLED || content.displayAs === DISPLAY_AS_DOWNLOAD_LINK
+    content.displayAs === DISPLAY_AS_EMBED_DISABLED ||
+      content.displayAs === DISPLAY_AS_DOWNLOAD_LINK
   )
   const [displayOptionSelection, setDisplayOptionSelection] = useState(
     initialPreviewSelection(content)
@@ -143,21 +144,21 @@ export default function LinkOptionsTray(props) {
   return (
     <Tray
       data-testid="RCELinkOptionsTray"
-      data-mce-component
+      data-mce-component={true}
       label={formatMessage('Link Options')}
       onDismiss={props.onRequestClose}
       onEntered={props.onEntered}
       onExited={props.onExited}
       open={props.open}
       placement="end"
-      shouldCloseOnDocumentClick
-      shouldContainFocus
-      shouldReturnFocus
+      shouldCloseOnDocumentClick={true}
+      shouldContainFocus={true}
+      shouldReturnFocus={true}
     >
       <Flex direction="column" height={getTrayHeight()}>
         <Flex.Item as="header" padding="medium">
           <Flex direction="row">
-            <Flex.Item grow shrink>
+            <Flex.Item shouldGrow={true} shouldShrink={true}>
               <Heading as="h2">{formatMessage('Link Options')}</Heading>
             </Flex.Item>
 
@@ -171,9 +172,15 @@ export default function LinkOptionsTray(props) {
           </Flex>
         </Flex.Item>
 
-        <Flex.Item as="form" grow margin="none" shrink onSubmit={handleSave}>
+        <Flex.Item
+          as="form"
+          shouldGrow={true}
+          margin="none"
+          shouldShrink={true}
+          onSubmit={handleSave}
+        >
           <Flex justifyItems="space-between" direction="column" height="100%">
-            <Flex.Item grow padding="small" shrink>
+            <Flex.Item shouldGrow={true} padding="small" shouldShrink={true}>
               <input type="submit" style={{display: 'none'}} />
               <Flex direction="column">
                 {showText && (

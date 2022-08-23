@@ -261,7 +261,7 @@ export default class EditableDateTime extends React.Component {
         {...containerProps}
       >
         <Flex display="inline-flex" direction="row" justifyItems="space-between" width="100%">
-          <Flex.Item grow shrink>
+          <Flex.Item shouldGrow={true} shouldShrink={true}>
             {this.renderEditor(getEditorProps())}
             {this.renderViewer(getViewerProps())}
           </Flex.Item>

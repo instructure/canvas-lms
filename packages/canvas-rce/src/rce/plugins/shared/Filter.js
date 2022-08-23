@@ -219,7 +219,7 @@ export default function Filter(props) {
       {renderType(contentType, contentSubtype, onChange, userContextType, containingContextType)}
       {contentType !== 'links' && (
         <Flex margin="small none none none">
-          <Flex.Item grow shrink margin="none xx-small none none">
+          <Flex.Item shouldGrow={true} shouldShrink={true} margin="none xx-small none none">
             <SimpleSelect
               renderLabel={
                 <ScreenReaderContent>{formatMessage('Content Subtype')}</ScreenReaderContent>
@@ -271,7 +271,7 @@ export default function Filter(props) {
             </SimpleSelect>
           </Flex.Item>
           {contentSubtype !== 'all' && (
-            <Flex.Item grow shrink margin="none none none xx-small">
+            <Flex.Item shouldGrow={true} shouldShrink={true} margin="none none none xx-small">
               <SimpleSelect
                 renderLabel={<ScreenReaderContent>{formatMessage('Sort By')}</ScreenReaderContent>}
                 assistiveText={formatMessage('Use arrow keys to navigate options.')}

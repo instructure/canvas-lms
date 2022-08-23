@@ -180,7 +180,7 @@ export class Whitelist extends Component {
           )}
 
           <Flex>
-            <Flex.Item grow shrink padding="0 medium 0 0">
+            <Flex.Item shouldGrow={true} shouldShrink={true} padding="0 medium 0 0">
               <TextInput
                 renderLabel={I18n.t('Domain Name')}
                 placeholder="http://somedomain.com"
@@ -274,7 +274,7 @@ export class Whitelist extends Component {
                   <Table.Row key={domain}>
                     <Table.Cell>{domain}</Table.Cell>
                     <Table.Cell>
-                      <List isUnstyled>
+                      <List isUnstyled={true}>
                         {this.props.whitelistedDomains.tools[domain].map(associatedTool => (
                           <List.Item key={associatedTool.id}>{associatedTool.name}</List.Item>
                         ))}

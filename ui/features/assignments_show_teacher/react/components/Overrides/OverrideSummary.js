@@ -45,8 +45,6 @@ export default class OverrideSummary extends React.Component {
   }
 
   renderAttemptsAllowedAndSubmissionTypes(override) {
-    const allowed = override.allowedAttempts
-    const attempts = Number.isInteger(allowed) ? allowed : 1
     return (
       <Text>
         <OverrideAttempts allowedAttempts={override.allowedAttempts} variant="summary" />
@@ -134,7 +132,7 @@ export default class OverrideSummary extends React.Component {
               <View as="div" data-testid="OverrideSummary">
                 {largerScreen ? (
                   <Flex justifyItems="space-between">
-                    <Flex.Item grow shrink>
+                    <Flex.Item shouldGrow={true} shouldShrink={true}>
                       {leftColumn}
                     </Flex.Item>
                     <Flex.Item textAlign="end">{rightColumn}</Flex.Item>

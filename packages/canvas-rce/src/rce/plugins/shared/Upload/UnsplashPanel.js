@@ -113,9 +113,9 @@ function Attribution({name, avatarUrl, profileUrl}) {
   return (
     <Flex>
       <Flex.Item margin="xx-small">
-        <Avatar name={name} src={avatarUrl} size="small" data-fs-exclude />
+        <Avatar name={name} src={avatarUrl} size="small" data-fs-exclude={true} />
       </Flex.Item>
-      <Flex.Item margin="xx-small" shrink>
+      <Flex.Item margin="xx-small" shouldShrink={true}>
         <Button
           size="small"
           variant="link-inverse"
@@ -145,7 +145,7 @@ function renderAlert(term, hasLoaded, totalResults, results, page, liveRegion) {
       <Alert
         variant="info"
         transition="none"
-        screenReaderOnly
+        screenReaderOnly={true}
         liveRegion={liveRegion}
         timeout={1000}
       >
@@ -244,7 +244,7 @@ export default function UnsplashPanel({source, setUnsplashData, brandColor, live
                         <Alert
                           variant="info"
                           transition="none"
-                          screenReaderOnly
+                          screenReaderOnly={true}
                           liveRegion={liveRegion}
                           timeout={1000}
                         >

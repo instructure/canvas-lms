@@ -114,7 +114,7 @@ export default class IndexHeader extends Component {
       <View>
         <View margin="0 0 medium" display="block">
           <Flex wrap="wrap" justifyItems="end">
-            <Flex.Item grow>
+            <Flex.Item shouldGrow={true}>
               <FormField
                 id="announcement-filter"
                 label={<ScreenReaderContent>{I18n.t('Announcement Filter')}</ScreenReaderContent>}
@@ -137,7 +137,7 @@ export default class IndexHeader extends Component {
               </FormField>
             </Flex.Item>
 
-            <Flex.Item grow margin="0 0 0 small">
+            <Flex.Item shouldGrow={true} margin="0 0 0 small">
               <TextInput
                 renderLabel={
                   <ScreenReaderContent>

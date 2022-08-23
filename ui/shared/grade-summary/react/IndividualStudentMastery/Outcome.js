@@ -102,13 +102,13 @@ class Outcome extends React.Component {
         alignItems={verticalLayout ? 'stretch' : null}
         data-selenium="outcome"
       >
-        <Flex.Item shrink as="div">
+        <Flex.Item shouldShrink={true} as="div">
           <Text size="medium">
             <Flex>
               <Flex.Item>
                 <OutcomePopover outcome={outcome} outcomeProficiency={outcomeProficiency} />
               </Flex.Item>
-              <Flex.Item shrink>
+              <Flex.Item shouldShrink={true}>
                 <TruncateWithTooltip>{display_name || title}</TruncateWithTooltip>
               </Flex.Item>
             </Flex>
@@ -148,7 +148,7 @@ class Outcome extends React.Component {
         (a.assessment_id && !_.includes(assessmentsWithResults, a.assessment_id.toString()))
     )
     return (
-      <List isUnstyled delimiter="dashed">
+      <List isUnstyled={true} delimiter="dashed">
         {results
           .sort(natcompare.byKey('submitted_or_assessed_at'))
           .reverse()

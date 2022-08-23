@@ -41,7 +41,7 @@ HistoryList.defaultProps = {
 
 export default function HistoryList({hasLoaded, history}) {
   return (
-    <List isUnstyled margin="small 0" itemSpacing="small">
+    <List isUnstyled={true} margin="small 0" itemSpacing="small">
       {hasLoaded ? (
         _.uniqBy(history, entry => entry.asset_code).map(entry => (
           <List.Item key={entry.asset_code}>
@@ -49,7 +49,7 @@ export default function HistoryList({hasLoaded, history}) {
               <Flex.Item align="start" padding="none x-small none none">
                 <i className={entry.asset_icon} aria-hidden="true" />
               </Flex.Item>
-              <Flex.Item grow>
+              <Flex.Item shouldGrow={true}>
                 <Link
                   href={entry.visited_url}
                   aria-label={`${entry.asset_name}, ${entry.asset_readable_category}`}

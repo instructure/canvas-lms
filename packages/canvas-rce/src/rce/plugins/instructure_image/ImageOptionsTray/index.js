@@ -117,7 +117,7 @@ export default function ImageOptionsTray(props) {
     } finally {
       setShowUrlField(isValidURL ? isExternalUrl(url) : true)
     }
-  }, [])
+  }, [url])
 
   const messagesForSize = []
   if (imageSize !== CUSTOM) {
@@ -135,21 +135,21 @@ export default function ImageOptionsTray(props) {
 
   return (
     <Tray
-      data-mce-component
+      data-mce-component={true}
       label={formatMessage('Image Options Tray')}
       onDismiss={onRequestClose}
       onEntered={onEntered}
       onExited={onExited}
       open={open}
       placement="end"
-      shouldCloseOnDocumentClick
-      shouldContainFocus
-      shouldReturnFocus
+      shouldCloseOnDocumentClick={true}
+      shouldContainFocus={true}
+      shouldReturnFocus={true}
     >
       <Flex direction="column" height={getTrayHeight()}>
         <Flex.Item as="header" padding="medium">
           <Flex direction="row">
-            <Flex.Item grow shrink>
+            <Flex.Item shouldGrow={true} shouldShrink={true}>
               <Heading as="h2">{formatMessage('Image Options')}</Heading>
             </Flex.Item>
 
@@ -163,7 +163,7 @@ export default function ImageOptionsTray(props) {
           </Flex>
         </Flex.Item>
 
-        <Flex.Item as="form" grow margin="none" shrink>
+        <Flex.Item as="form" shouldGrow={true} margin="none" shouldShrink={true}>
           <Flex justifyItems="space-between" direction="column" height="100%">
             <Flex direction="column">
               {showUrlField && (

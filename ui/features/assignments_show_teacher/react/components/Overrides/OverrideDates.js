@@ -119,7 +119,7 @@ export default class OverrideDates extends React.Component {
           wrap="wrap"
           data-testid="OverrideDates"
         >
-          <Flex.Item margin="0 x-small 0 0" as="div" grow width="30%">
+          <Flex.Item margin="0 x-small 0 0" as="div" shouldGrow={true} width="30%">
             {this.renderDate(
               'due_at',
               I18n.t('Due'),
@@ -131,7 +131,7 @@ export default class OverrideDates extends React.Component {
               this.invalidMessageDue
             )}
           </Flex.Item>
-          <Flex.Item margin="0 x-small 0 0" as="div" grow width="30%">
+          <Flex.Item margin="0 x-small 0 0" as="div" shouldGrow={true} width="30%">
             {this.renderDate(
               'unlock_at',
               I18n.t('Available'),
@@ -143,7 +143,7 @@ export default class OverrideDates extends React.Component {
               this.invalidMessageUnlock
             )}
           </Flex.Item>
-          <Flex.Item margin="0 0 0 0" as="div" grow width="30%">
+          <Flex.Item margin="0 0 0 0" as="div" shouldGrow={true} width="30%">
             {this.renderDate(
               'lock_at',
               I18n.t('Until'),
