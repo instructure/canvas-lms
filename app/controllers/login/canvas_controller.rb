@@ -29,6 +29,7 @@ class Login::CanvasController < ApplicationController
   protect_from_forgery except: :create, with: :exception
 
   def new
+    @allow_robot_indexing = true
     @pseudonym_session = PseudonymSession.new
     @headers = false
     flash.now[:error] = params[:message] if params[:message]
