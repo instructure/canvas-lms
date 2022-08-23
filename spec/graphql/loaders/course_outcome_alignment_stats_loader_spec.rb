@@ -24,7 +24,7 @@ describe Loaders::CourseOutcomeAlignmentStatsLoader do
     @course.account.enable_feature!(:outcome_alignment_summary)
   end
 
-  it "resolves to nil if course is invalid" do
+  it "returns nil if course is invalid" do
     GraphQL::Batch.batch do
       Loaders::CourseOutcomeAlignmentStatsLoader.load(nil).then do |alignment_stats|
         expect(alignment_stats).to be_nil
@@ -32,7 +32,7 @@ describe Loaders::CourseOutcomeAlignmentStatsLoader do
     end
   end
 
-  it "resolves to nil if outcome alignment summary FF is disabled" do
+  it "returns nil if outcome alignment summary FF is disabled" do
     @course.account.disable_feature!(:outcome_alignment_summary)
 
     GraphQL::Batch.batch do
@@ -42,15 +42,38 @@ describe Loaders::CourseOutcomeAlignmentStatsLoader do
     end
   end
 
-  it "resolves outcome alignment stats" do
+  it "returns outcome alignment stats" do
     GraphQL::Batch.batch do
       Loaders::CourseOutcomeAlignmentStatsLoader.load(@course).then do |stats|
         expect(stats).not_to be_nil
         expect(stats[:total_outcomes]).to eq 2
         expect(stats[:aligned_outcomes]).to eq 1
         expect(stats[:total_alignments]).to eq 3
-        expect(stats[:total_artifacts]).to eq 5
-        expect(stats[:aligned_artifacts]).to eq 3
+        expect(stats[:total_artifacts]).to eq 4
+        expect(stats[:aligned_artifacts]).to eq 2
+        expect(stats[:artifact_alignments]).to eq 2
+      end
+    end
+  end
+
+  context "when an outcome is aligned to a question bank" do
+    before do
+      assessment_question_bank_with_questions
+      @outcome3 = outcome_model(context: @course, title: "outcome 3 - aligned to question bank")
+      @outcome3.align(@bank, @bank.context)
+    end
+
+    it "returns correct outcome alignment stats" do
+      GraphQL::Batch.batch do
+        Loaders::CourseOutcomeAlignmentStatsLoader.load(@course).then do |stats|
+          expect(stats).not_to be_nil
+          expect(stats[:total_outcomes]).to eq 3
+          expect(stats[:aligned_outcomes]).to eq 2
+          expect(stats[:total_alignments]).to eq 4
+          expect(stats[:total_artifacts]).to eq 4
+          expect(stats[:aligned_artifacts]).to eq 2
+          expect(stats[:artifact_alignments]).to eq 2
+        end
       end
     end
   end
