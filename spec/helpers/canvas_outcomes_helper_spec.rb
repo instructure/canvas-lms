@@ -245,63 +245,63 @@ describe CanvasOutcomesHelper do
           end
 
           it "returns results with one assignment id" do
-            expected_json = { "results" => [{ "result" => "stuff" }] }.to_json
+            expected_results = [{ "result" => "stuff" }]
             stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}").to_return(status: 200, body: '{"results":[{"result":"stuff"}]}')
-            expect(subject.get_lmgb_results(@course, "1", "assign.type", "1", one_user_uuid)).to eq expected_json
+            expect(subject.get_lmgb_results(@course, "1", "assign.type", "1", one_user_uuid)).to eq expected_results
           end
 
           it "returns results with multiple assignment ids" do
-            expected_json = { "results" => [{ "result_one" => "stuff1" }, { "result_two" => "stuff2" }] }.to_json
+            expected_results = [{ "result_one" => "stuff1" }, { "result_two" => "stuff2" }]
             stub_get_lmgb_results("associated_asset_id_list=1,2&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}").to_return(status: 200, body: '{"results":[{"result_one":"stuff1"},{"result_two":"stuff2"}]}')
-            expect(subject.get_lmgb_results(@course, "1,2", "assign.type", "1", one_user_uuid)).to eq expected_json
+            expect(subject.get_lmgb_results(@course, "1,2", "assign.type", "1", one_user_uuid)).to eq expected_results
           end
 
           it "returns results with one outcome id" do
-            expected_json = { "results" => [{ "result_one" => "stuff" }] }.to_json
+            expected_results = [{ "result_one" => "stuff" }]
             stub_get_lmgb_results("associated_asset_id_list=1,2&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}").to_return(status: 200, body: '{"results":[{"result_one":"stuff"}]}')
-            expect(subject.get_lmgb_results(@course, "1,2", "assign.type", "1", one_user_uuid)).to eq expected_json
+            expect(subject.get_lmgb_results(@course, "1,2", "assign.type", "1", one_user_uuid)).to eq expected_results
           end
 
           it "returns results with multiple outcome ids" do
-            expected_json = { "results" => [{ "result_one" => "stuff1" }, { "result_two" => "stuff2" }] }.to_json
+            expected_results = [{ "result_one" => "stuff1" }, { "result_two" => "stuff2" }]
             stub_get_lmgb_results("associated_asset_id_list=1,2&associated_asset_type=assign.type&external_outcome_id_list=1,2&user_uuid_list=#{one_user_uuid}").to_return(status: 200, body: '{"results":[{"result_one":"stuff1"},{"result_two":"stuff2"}]}')
-            expect(subject.get_lmgb_results(@course, "1,2", "assign.type", "1,2", one_user_uuid)).to eq expected_json
+            expect(subject.get_lmgb_results(@course, "1,2", "assign.type", "1,2", one_user_uuid)).to eq expected_results
           end
 
           it "returns results with one user uuid" do
-            expected_json = { "results" => [{ "result_one" => "stuff1" }] }.to_json
+            expected_results = [{ "result_one" => "stuff1" }]
             stub_get_lmgb_results("associated_asset_id_list=1,2&associated_asset_type=assign.type&external_outcome_id_list=1,2&user_uuid_list=#{one_user_uuid}").to_return(status: 200, body: '{"results":[{"result_one":"stuff1"}]}')
-            expect(subject.get_lmgb_results(@course, "1,2", "assign.type", "1,2", one_user_uuid)).to eq expected_json
+            expect(subject.get_lmgb_results(@course, "1,2", "assign.type", "1,2", one_user_uuid)).to eq expected_results
           end
 
           it "returns results with multiple user uuids" do
-            expected_json = { "results" => [{ "result_one" => "stuff1" }, { "result_two" => "stuff2" }] }.to_json
+            expected_results = [{ "result_one" => "stuff1" }, { "result_two" => "stuff2" }]
             stub_get_lmgb_results("associated_asset_id_list=1,2&associated_asset_type=assign.type&external_outcome_id_list=1,2&user_uuid_list=#{multiple_user_uuids}").to_return(status: 200, body: '{"results":[{"result_one":"stuff1"},{"result_two":"stuff2"}]}')
-            expect(subject.get_lmgb_results(@course, "1,2", "assign.type", "1,2", multiple_user_uuids)).to eq expected_json
+            expect(subject.get_lmgb_results(@course, "1,2", "assign.type", "1,2", multiple_user_uuids)).to eq expected_results
           end
 
           it "returns empty array when assignment type is not matched" do
-            expected_json = { "results" => [] }.to_json
+            expected_results = []
             stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type.no.match&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}").to_return(status: 200, body: '{"results":[]}')
-            expect(subject.get_lmgb_results(@course, "1", "assign.type.no.match", "1", one_user_uuid)).to eq expected_json
+            expect(subject.get_lmgb_results(@course, "1", "assign.type.no.match", "1", one_user_uuid)).to eq expected_results
           end
 
           it "returns empty array when assignment ids are not matched" do
-            expected_json = { "results" => [] }.to_json
+            expected_results = []
             stub_get_lmgb_results("associated_asset_id_list=4,5&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}").to_return(status: 200, body: '{"results":[]}')
-            expect(subject.get_lmgb_results(@course, "4,5", "assign.type", "1", one_user_uuid)).to eq expected_json
+            expect(subject.get_lmgb_results(@course, "4,5", "assign.type", "1", one_user_uuid)).to eq expected_results
           end
 
           it "returns empty array when no outcome ids are matched" do
-            expected_json = { "results" => [] }.to_json
+            expected_results = []
             stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=5&user_uuid_list=#{one_user_uuid}").to_return(status: 200, body: '{"results":[]}')
-            expect(subject.get_lmgb_results(@course, "1", "assign.type", "5", one_user_uuid)).to eq expected_json
+            expect(subject.get_lmgb_results(@course, "1", "assign.type", "5", one_user_uuid)).to eq expected_results
           end
 
           it "returns empty array when no user uuids are matched" do
-            expected_json = { "results" => [] }.to_json
+            expected_results = []
             stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=fake_no_match_uuid").to_return(status: 200, body: '{"results":[]}')
-            expect(subject.get_lmgb_results(@course, "1", "assign.type", "1", "fake_no_match_uuid")).to eq expected_json
+            expect(subject.get_lmgb_results(@course, "1", "assign.type", "1", "fake_no_match_uuid")).to eq expected_results
           end
         end
 
@@ -341,9 +341,9 @@ describe CanvasOutcomesHelper do
         end
 
         it "returns results with one assignment id" do
-          expected_json = { "results" => [{ "result" => "stuff" }] }.to_json
+          expected_results = [{ "result" => "stuff" }]
           stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}").to_return(status: 200, body: '{"results":[{"result":"stuff"}]}')
-          expect(subject.get_lmgb_results(account, "1", "assign.type", "1", one_user_uuid)).to eq expected_json
+          expect(subject.get_lmgb_results(account, "1", "assign.type", "1", one_user_uuid)).to eq expected_results
         end
       end
     end
