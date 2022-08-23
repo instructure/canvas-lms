@@ -150,6 +150,28 @@ describe LoginController do
       get "session_token", format: :json, params: { return_to: "not-a url" }
       expect(response.status.to_i).to eq(400)
     end
+
+    describe "when user needs to accept terms of service" do
+      it "returns a payload with requires_terms_acceptance of true" do
+        user_session user_with_pseudonym(active: true)
+        request.headers.merge!({ "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@user)}" })
+        allow_any_instance_of(Account).to receive(:require_acceptance_of_terms?).and_return(true)
+
+        get "session_token", format: :json
+        expect(JSON.parse(response.body)["requires_terms_acceptance"]).to eq(true)
+      end
+    end
+
+    describe "when user does not need to accept terms of service" do
+      it "returns a payload with requires_terms_acceptance of false" do
+        user_session user_with_pseudonym(active: true)
+        request.headers.merge!({ "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{access_token_for_user(@user)}" })
+        allow_any_instance_of(Account).to receive(:require_acceptance_of_terms?).and_return(false)
+
+        get "session_token", format: :json
+        expect(JSON.parse(response.body)["requires_terms_acceptance"]).to eq(false)
+      end
+    end
   end
 
   describe "#logout" do
