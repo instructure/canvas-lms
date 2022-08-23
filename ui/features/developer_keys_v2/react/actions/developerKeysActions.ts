@@ -31,6 +31,12 @@ actions.listDeveloperKeysSuccessful = payload => ({
   payload
 })
 
+actions.LIST_REMAINING_DEVELOPER_KEYS_SUCCESSFUL = 'LIST_REMAINING_DEVELOPER_KEYS_SUCCESSFUL'
+actions.listRemainingDeveloperKeysSuccessful = payload => ({
+  type: actions.LIST_REMAINING_DEVELOPER_KEYS_SUCCESSFUL,
+  payload
+})
+
 actions.LIST_DEVELOPER_KEYS_FAILED = 'LIST_DEVELOPER_KEYS_FAILED'
 actions.listDeveloperKeysFailed = error => ({
   type: actions.LIST_DEVELOPER_KEYS_FAILED,
@@ -47,6 +53,13 @@ actions.listInheritedDeveloperKeysStart = payload => ({
 actions.LIST_INHERITED_DEVELOPER_KEYS_SUCCESSFUL = 'LIST_INHERITED_DEVELOPER_KEYS_SUCCESSFUL'
 actions.listInheritedDeveloperKeysSuccessful = payload => ({
   type: actions.LIST_INHERITED_DEVELOPER_KEYS_SUCCESSFUL,
+  payload
+})
+
+actions.LIST_REMAINING_INHERITED_DEVELOPER_KEYS_SUCCESSFUL =
+  'LIST_REMAINING_INHERITED_DEVELOPER_KEYS_SUCCESSFUL'
+actions.listRemainingInheritedDeveloperKeysSuccessful = payload => ({
+  type: actions.LIST_REMAINING_INHERITED_DEVELOPER_KEYS_SUCCESSFUL,
   payload
 })
 
@@ -193,13 +206,13 @@ actions.SET_BINDING_WORKFLOW_STATE_START = 'SET_BINDING_WORKFLOW_STATE_START'
 actions.setBindingWorkflowStateStart = () => ({type: actions.SET_BINDING_WORKFLOW_STATE_START})
 
 actions.SET_BINDING_WORKFLOW_STATE_SUCCESSFUL = 'SET_BINDING_WORKFLOW_STATE_SUCCESSFUL'
-actions.setBindingWorkflowStateSuccessful = (response) => ({
+actions.setBindingWorkflowStateSuccessful = response => ({
   type: actions.SET_BINDING_WORKFLOW_STATE_SUCCESSFUL,
   payload: response
 })
 
 actions.SET_BINDING_WORKFLOW_STATE_FAILED = 'SET_BINDING_WORKFLOW_STATE_FAILED'
-actions.setBindingWorkflowStateFailed = (payload) => ({
+actions.setBindingWorkflowStateFailed = payload => ({
   type: actions.SET_BINDING_WORKFLOW_STATE_FAILED,
   payload
 })
@@ -246,10 +259,12 @@ actions.setBindingWorkflowState = (developerKey, accountId, workflowState) => di
 
   const previousAccountBinding = developerKey.developer_key_account_binding || {}
 
-  dispatch(actions.listDeveloperKeysReplaceBindingState({
-    developerKeyId: developerKey.id,
-    newAccountBinding: {...previousAccountBinding, workflow_state: workflowState}
-  }))
+  dispatch(
+    actions.listDeveloperKeysReplaceBindingState({
+      developerKeyId: developerKey.id,
+      newAccountBinding: {...previousAccountBinding, workflow_state: workflowState}
+    })
+  )
   axios
     .post(url, {
       developer_key_account_binding: {
@@ -260,10 +275,12 @@ actions.setBindingWorkflowState = (developerKey, accountId, workflowState) => di
       dispatch(actions.setBindingWorkflowStateSuccessful(response.data))
     })
     .catch(error => {
-      dispatch(actions.setBindingWorkflowStateFailed({
-        developerKeyId: developerKey.id,
-        previousAccountBinding
-      }))
+      dispatch(
+        actions.setBindingWorkflowStateFailed({
+          developerKeyId: developerKey.id,
+          previousAccountBinding
+        })
+      )
       $.flashError(error.message)
     })
 }
@@ -295,7 +312,7 @@ actions.createOrEditDeveloperKey = (formData, url, method) => dispatch => {
 
 const inherited = 'inherited=true'
 
-function retrieveDevKeys(url, dispatch, success, failure) {
+function retrieveDevKeys({url, dispatch, success, failure}) {
   axios
     .get(url)
     .then(response => {
@@ -309,21 +326,21 @@ function retrieveDevKeys(url, dispatch, success, failure) {
 actions.getDeveloperKeys = (url, newSearch) => (dispatch, _getState) => {
   dispatch(actions.listDeveloperKeysStart(newSearch))
 
-  retrieveDevKeys(
+  retrieveDevKeys({
     url,
     dispatch,
-    actions.listDeveloperKeysSuccessful,
-    actions.listDeveloperKeysFailed
-  )
-  retrieveDevKeys(
-    `${url}?${inherited}`,
+    success: actions.listDeveloperKeysSuccessful,
+    failure: actions.listDeveloperKeysFailed
+  })
+  retrieveDevKeys({
+    url: `${url}?${inherited}`,
     dispatch,
-    actions.listInheritedDeveloperKeysSuccessful,
-    actions.listInheritedDeveloperKeysFailed
-  )
+    success: actions.listInheritedDeveloperKeysSuccessful,
+    failure: actions.listInheritedDeveloperKeysFailed
+  })
 }
 
-function retrieveRemainingDevKeys(
+function retrieveRemainingDevKeys({
   url,
   developerKeysPassedIn,
   dispatch,
@@ -331,7 +348,7 @@ function retrieveRemainingDevKeys(
   success,
   failure,
   callback
-) {
+}) {
   return axios
     .get(url)
     .then(response => {
@@ -355,29 +372,29 @@ function retrieveRemainingDevKeys(
 actions.getRemainingDeveloperKeys = (url, developerKeysPassedIn, callback) => dispatch => {
   dispatch(actions.listDeveloperKeysStart())
 
-  return retrieveRemainingDevKeys(
+  return retrieveRemainingDevKeys({
     url,
     developerKeysPassedIn,
     dispatch,
-    actions.getRemainingDeveloperKeys,
-    actions.listDeveloperKeysSuccessful,
-    actions.listDeveloperKeysFailed,
+    retrieve: actions.getRemainingDeveloperKeys,
+    success: actions.listRemainingDeveloperKeysSuccessful,
+    failure: actions.listDeveloperKeysFailed,
     callback
-  )
+  })
 }
 
 actions.getRemainingInheritedDeveloperKeys = (url, developerKeysPassedIn, callback) => dispatch => {
   dispatch(actions.listInheritedDeveloperKeysStart())
 
-  return retrieveRemainingDevKeys(
-    `${url}?${inherited}`,
+  return retrieveRemainingDevKeys({
+    url: `${url}?${inherited}`,
     developerKeysPassedIn,
     dispatch,
-    actions.getRemainingInheritedDeveloperKeys,
-    actions.listInheritedDeveloperKeysSuccessful,
-    actions.listInheritedDeveloperKeysFailed,
+    retrieve: actions.getRemainingInheritedDeveloperKeys,
+    success: actions.listRemainingInheritedDeveloperKeysSuccessful,
+    failure: actions.listInheritedDeveloperKeysFailed,
     callback
-  )
+  })
 }
 
 actions.deactivateDeveloperKey = developerKey => (dispatch, _getState) => {
