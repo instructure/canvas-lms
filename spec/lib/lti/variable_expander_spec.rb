@@ -52,6 +52,7 @@ module Lti
       allow(m).to receive(:shard).and_return(shard_mock)
       allow(m).to receive(:opaque_identifier_for).and_return("6cd2e0d65bd5aef3b5ee56a64bdcd595e447bc8f")
       allow(m).to receive(:use_1_3?).and_return(false)
+      allow(m).to receive(:launch_url).and_return("http://example.com/launch")
       m
     end
     let(:available_canvas_resources) do
@@ -222,6 +223,58 @@ module Lti
       )
       expect(expanded.count).to eq 1
       expect(expanded[:some_name]).to eq "my variables $variable1 is buried 2 in here $test_expan can you find them?"
+    end
+
+    context "launch_url" do
+      subject { variable_expander.instance_variable_get(:@launch_url) }
+
+      context "when no options are provided" do
+        let(:launch_url) { "default" }
+
+        before do
+          allow(tool).to receive(:launch_url).with(extension_type: nil).and_return(launch_url)
+        end
+
+        it { is_expected.to eq launch_url }
+      end
+
+      context "when placement is provided" do
+        let(:launch_url) { "placement" }
+        let(:placement) { "test" }
+
+        let(:variable_expander_opts) do
+          super().merge({ placement: placement })
+        end
+
+        before do
+          allow(tool).to receive(:launch_url).with(extension_type: anything).and_return(launch_url)
+        end
+
+        it "passes placement to tool's url method" do
+          subject
+          expect(tool).to have_received(:launch_url).with(extension_type: placement)
+        end
+
+        it { is_expected.to eq launch_url }
+      end
+
+      context "when launch_url is provided" do
+        let(:launch_url) { "launch" }
+        let(:variable_expander_opts) do
+          super().merge({ launch_url: launch_url })
+        end
+
+        before do
+          allow(tool).to receive(:launch_url)
+        end
+
+        it "uses it as launch_url without asking the tool" do
+          subject
+          expect(tool).not_to have_received(:launch_url)
+        end
+
+        it { is_expected.to eq launch_url }
+      end
     end
 
     describe "#self.expansion_keys" do
@@ -1081,14 +1134,14 @@ module Lti
           it "has a substitution for com.instructure.User.sectionNames" do
             exp_hash = { test: "$com.instructure.User.sectionNames" }
             variable_expander.expand_variables!(exp_hash)
-            expect(JSON.parse(exp_hash[:test])).to eq ["section one"]
+            expect(JSON.parse(exp_hash[:test])).to match_array ["section one"]
           end
 
           it "works with a user enrolled in both sections" do
             create_enrollment(course, user, { section: course.course_sections.find_by(name: "section two") })
             exp_hash = { test: "$com.instructure.User.sectionNames" }
             variable_expander.expand_variables!(exp_hash)
-            expect(JSON.parse(exp_hash[:test])).to eq ["section one", "section two"]
+            expect(JSON.parse(exp_hash[:test])).to match_array ["section one", "section two"]
           end
         end
 
@@ -1278,7 +1331,7 @@ module Lti
           create_enrollment(course, user, { section: second_section })
           exp_hash = { test: "$com.instructure.User.sectionNames" }
           variable_expander.expand_variables!(exp_hash)
-          expect(JSON.parse(exp_hash[:test])).to eq ["Section 1, M-T", "Section 2, W-Th"]
+          expect(JSON.parse(exp_hash[:test])).to match_array ["Section 1, M-T", "Section 2, W-Th"]
         end
 
         it "has substitution for $Canvas.xapi.url" do
