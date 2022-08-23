@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {func, string} from 'prop-types'
+import {bool, func, string} from 'prop-types'
 
 import React from 'react'
 import LinkSet from './LinkSet'
@@ -146,6 +146,8 @@ export default function NavigationPanel(props) {
           collection={collection}
           onLinkClick={props.onLinkClick}
           contextType={props.contextType}
+          isEdit={props.isEdit}
+          onEditClick={props.onEditClick}
         />
       </AccordionSection>
     </div>
@@ -157,5 +159,7 @@ NavigationPanel.propTypes = {
   contextId: string.isRequired,
   onChangeAccordion: func.isRequired,
   selectedAccordionIndex: string,
-  onLinkClick: func
+  onLinkClick: func,
+  isEdit: bool,
+  onEditClick: func
 }

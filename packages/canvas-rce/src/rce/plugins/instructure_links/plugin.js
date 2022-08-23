@@ -67,12 +67,22 @@ import bridge from '../../../bridge'
 import {getAnchorElement, isOKToLink} from '../../contentInsertionUtils'
 import LinkOptionsTrayController from './components/LinkOptionsTray/LinkOptionsTrayController'
 import {CREATE_LINK, EDIT_LINK} from './components/LinkOptionsDialog/LinkOptionsDialogController'
+import RCEGlobals from '../../RCEGlobals'
 
 const trayController = new LinkOptionsTrayController()
 
 const COURSE_PLUGIN_KEY = 'course_links'
 const GROUP_PLUGIN_KEY = 'group_links'
 
+function getCommandName(selectedNode) {
+  // show the Course Tray if it's a course link and the ux improvement flag is on,
+  // otherwise show the default Link Tray
+  const showCourseLinkTray = !!RCEGlobals.getFeatures()?.rce_ux_improvements
+  const isCourseLink = selectedNode.getAttribute('data-course-type')
+  return showCourseLinkTray && isCourseLink
+    ? 'instructureTrayForCourseLinks'
+    : 'instructureTrayToEditLink'
+}
 function selectedAnchorCount(ed) {
   return ed.selection.getRng().cloneContents().querySelectorAll('a').length
 }
@@ -85,7 +95,7 @@ function getMenuItems(ed) {
     items = [
       {
         text: formatMessage('Edit Link'),
-        value: 'instructureTrayToEditLink'
+        value: getCommandName(ed.selection.getNode())
       },
       {
         text: formatMessage('Remove Link'),
@@ -135,6 +145,7 @@ function removeAnchorFromSelectedElement(ed) {
 function doMenuItem(ed, value) {
   switch (value) {
     case 'instructureTrayToEditLink':
+    case 'instructureTrayForCourseLinks':
     case 'instructureLinkCreate':
       ed.execCommand(value)
       break
@@ -166,6 +177,10 @@ tinymce.create('tinymce.plugins.InstructureLinksPlugin', {
     })
     ed.addCommand('instructureTrayToEditLink', _ui => {
       trayController.showTrayForEditor(ed)
+    })
+    ed.addCommand('instructureTrayForCourseLinks', () => {
+      ed.selection.select(ed.selection.getNode())
+      return bridge.showTrayForPlugin('course_link_edit', ed.id)
     })
 
     // Register shortcuts
@@ -264,8 +279,7 @@ tinymce.create('tinymce.plugins.InstructureLinksPlugin', {
     // the context toolbar buttons
     ed.ui.registry.addButton('instructure-link-options', {
       onAction(/* buttonApi */) {
-        // show the tray
-        ed.execCommand('instructureTrayToEditLink', false, ed)
+        ed.execCommand(getCommandName(ed.selection.getNode()), false, ed)
       },
 
       text: formatMessage('Link Options'),

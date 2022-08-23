@@ -135,6 +135,21 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
         $element.classList.add('no_preview')
         expect(getContentFromElement($element, editor).displayAs).toEqual(DISPLAY_AS_DOWNLOAD_LINK)
       })
+
+      it('includes the content type if the link contains the data course type', () => {
+        $element.setAttribute('data-course-type', 'wikiPages')
+        expect(getContentFromElement($element, editor).contentType).toEqual('wikiPages')
+      })
+
+      it('includes the filename if the link contains the title', () => {
+        $element.title = 'Assignment 1'
+        expect(getContentFromElement($element, editor).fileName).toEqual('Assignment 1')
+      })
+
+      it('includes published if the link contains data-published', () => {
+        $element.setAttribute('data-published', true)
+        expect(getContentFromElement($element, editor).published).toEqual(true)
+      })
     })
 
     describe('when the given element is a video container element', () => {

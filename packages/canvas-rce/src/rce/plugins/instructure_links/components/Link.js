@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import {func, oneOf, string} from 'prop-types'
+import {bool, func, oneOf, string} from 'prop-types'
 import {linkShape} from './propTypes'
 import formatMessage from '../../../../format-message'
 import {renderLink as renderLinkHtml} from '../../../contentRendering'
@@ -75,7 +75,15 @@ export default function Link(props) {
 
   function handleLinkClick(e) {
     e.preventDefault()
-    props.onClick(props.link)
+    props.link.type = type
+    if (props.isEdit) {
+      props.onEditClick(props.link)
+    } else {
+      if (RCEGlobals.getFeatures()?.rce_ux_improvements) {
+        props.link.course_link = true
+      }
+      props.onClick(props.link)
+    }
   }
 
   function handleLinkKey(e) {
@@ -186,5 +194,7 @@ Link.propTypes = {
   ]).isRequired,
   onClick: func.isRequired,
   describedByID: string.isRequired,
-  elementRef: func
+  elementRef: func,
+  isEdit: bool,
+  onEditClick: func
 }

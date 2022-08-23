@@ -311,4 +311,36 @@ describe('RCE "Links" Plugin > Link', () => {
       expect(container.querySelectorAll('svg[name="IconDragHandle"]')).toHaveLength(1)
     })
   })
+
+  describe('When in edit link tray', () => {
+    const props = {
+      onEditClick: jest.fn(),
+      isEdit: true,
+      link: {
+        href: 'the_url',
+        title: 'object title',
+        published: true
+      }
+    }
+
+    it('calls onEditClick when clicked', () => {
+      const {getByText} = renderComponent(props)
+      getByText(props.link.title).click()
+      expect(props.onEditClick).toHaveBeenCalled()
+    })
+
+    it('calls onEditClick on <Enter>', () => {
+      const {getByText} = renderComponent(props)
+      const btn = getByText(props.link.title)
+      fireEvent.keyDown(btn, {keyCode: 13})
+      expect(props.onEditClick).toHaveBeenCalled()
+    })
+
+    it('calls onEditClick on <Space>', () => {
+      const {getByText} = renderComponent(props)
+      const btn = getByText(props.link.title)
+      fireEvent.keyDown(btn, {keyCode: 32})
+      expect(props.onEditClick).toHaveBeenCalled()
+    })
+  })
 })

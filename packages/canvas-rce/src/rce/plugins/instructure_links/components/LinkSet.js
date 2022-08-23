@@ -98,7 +98,7 @@ class LinkSet extends Component {
           {formatMessage('Click to insert a link into the editor.')}
         </ScreenReaderContent>
 
-        <List isUnstyled margin="0">
+        <List variant="unstyled" as="ul" margin="0">
           {this.props.collection.links.map((link, index, array) => (
             <List.Item key={link.href} spacing="none" padding="0">
               <Link
@@ -107,6 +107,8 @@ class LinkSet extends Component {
                 onClick={this.props.onLinkClick}
                 describedByID={this.describedByID}
                 elementRef={refFor(index, array)}
+                isEdit={this.props.isEdit}
+                onEditClick={this.props.onEditClick}
               />
             </List.Item>
           ))}
@@ -168,7 +170,9 @@ LinkSet.propTypes = {
   fetchInitialPage: func,
   fetchNextPage: func,
   suppressRenderEmpty: bool,
-  searchString: string
+  searchString: string,
+  isEdit: bool,
+  onEditClick: func
 }
 
 export default LinkSet
