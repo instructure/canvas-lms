@@ -19,7 +19,7 @@
 import React, {Suspense, useCallback, useEffect, useRef, useState} from 'react'
 import {bool, func, instanceOf, shape, string} from 'prop-types'
 import {Tray} from '@instructure/ui-tray'
-import {CloseButton} from '@instructure/ui-buttons'
+import {CloseButton, Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Flex} from '@instructure/ui-flex'
@@ -31,6 +31,9 @@ import Filter, {useFilterSettings} from './Filter'
 import {StoreProvider} from './StoreContext'
 import {getTrayHeight} from './trayUtils'
 import {ICON_MAKER_ICONS} from '../instructure_icon_maker/svg/constants'
+import {getLinkContentFromEditor} from './ContentSelection'
+import {getIcon} from './linkUtils'
+import {LinkDisplay} from './LinkDisplay'
 
 /**
  * Returns the translated tray label
@@ -180,6 +183,14 @@ const FILTER_SETTINGS_BY_PLUGIN = {
     sortDir: 'desc',
     searchString: ''
   },
+  course_link_edit: {
+    contextType: 'course',
+    contentType: 'links',
+    contentSubtype: 'edit',
+    sortValue: 'date_added',
+    sortDir: 'desc',
+    searchString: ''
+  },
   group_links: {
     contextType: 'group',
     contentType: 'links',
@@ -240,6 +251,11 @@ export default function CanvasContentTray(props) {
   const trayRef = useRef(null)
   const scrollingAreaRef = useRef(null)
   const [filterSettings, setFilterSettings] = useFilterSettings()
+  const [isEditTray, setIsEditTray] = useState(false)
+  const [link, setLink] = useState(null)
+  const [linkText, setLinkText] = useState(null)
+  const [placeholderText, setPlaceholderText] = useState(null)
+  const Icon = getIcon(link?.type)
 
   const {bridge, editor, onTrayClosing} = {...props}
 
@@ -262,6 +278,22 @@ export default function CanvasContentTray(props) {
         ++CanvasContentTray.globalOpenCount
         setFilterSettings(FILTER_SETTINGS_BY_PLUGIN[plugin])
         setIsOpen(true)
+        if (plugin === 'course_link_edit') {
+          setIsEditTray(true)
+          const {fileName, contentType, url, published, text} = getLinkContentFromEditor(
+            editor.editor
+          )
+          setLink({
+            title: fileName,
+            type: contentType,
+            href: url,
+            published
+          })
+          setLinkText(text)
+          setPlaceholderText(text)
+        } else {
+          setIsEditTray(false)
+        }
       },
       hideTray(forceClose) {
         if (forceClose || hidingTrayOnAction) {
@@ -303,6 +335,43 @@ export default function CanvasContentTray(props) {
     onTrayClosing && onTrayClosing(false) // tell RCEWrapper we're closed
   }
 
+  function handleReplaceButton() {
+    handleDismissTray()
+
+    const newLink = {
+      forceRename: true,
+      href: link.href,
+      text: linkText || placeholderText,
+      title: link.title,
+      type: link.type,
+      published:
+        link.type === 'navigation' || link.type === 'announcements' ? null : link.published,
+      course_link: true
+    }
+    bridge.insertLink(newLink)
+  }
+
+  function renderFooter() {
+    return (
+      <Flex.Item
+        background="secondary"
+        borderWidth="small none none none"
+        padding="small medium"
+        textAlign="end"
+      >
+        <Button onClick={handleDismissTray}>{formatMessage('Cancel')}</Button>
+        <Button
+          margin="0 0 0 x-small"
+          color="primary"
+          onClick={handleReplaceButton}
+          data-testid="replace-link-button"
+        >
+          {formatMessage('Replace')}
+        </Button>
+      </Flex.Item>
+    )
+  }
+
   function handleFilterChange(newFilter, onChangeContext, onChangeSearchString, onChangeSortBy) {
     const newFilterSettings = {...newFilter}
     if (newFilterSettings.sortValue) {
@@ -340,6 +409,10 @@ export default function CanvasContentTray(props) {
       onChangeContext({contextType, contextId})
     }
   }
+
+  function getHeader() {
+    return isEditTray ? formatMessage('Edit Course Link') : formatMessage('Add')
+  }
   return (
     <StoreProvider
       {...props}
@@ -348,7 +421,7 @@ export default function CanvasContentTray(props) {
     >
       {contentProps => (
         <Tray
-          data-mce-component
+          data-mce-component={true}
           data-testid="CanvasContentTray"
           label={getTrayLabel(
             filterSettings.contentType,
@@ -358,7 +431,7 @@ export default function CanvasContentTray(props) {
           open={isOpen}
           placement="end"
           size="regular"
-          shouldContainFocus
+          shouldContainFocus={true}
           shouldReturnFocus={false}
           shouldCloseOnDocumentClick={false}
           onDismiss={handleDismissTray}
@@ -396,12 +469,12 @@ export default function CanvasContentTray(props) {
               height={getTrayHeight()}
               overflowY="hidden"
               tabIndex="-1"
-              data-canvascontenttray-content
+              data-canvascontenttray-content={true}
             >
               <Flex.Item padding="medium" shadow="above">
                 <Flex margin="none none medium none">
-                  <Flex.Item shouldgrow shouldshrink>
-                    <Heading level="h2">{formatMessage('Add')}</Heading>
+                  <Flex.Item shouldgrow={true} shouldshrink={true}>
+                    <Heading level="h2">{getHeader()}</Heading>
                   </Flex.Item>
 
                   <Flex.Item>
@@ -413,7 +486,16 @@ export default function CanvasContentTray(props) {
                     />
                   </Flex.Item>
                 </Flex>
-
+                {isEditTray && (
+                  <LinkDisplay
+                    linkText={linkText}
+                    Icon={Icon}
+                    placeholderText={placeholderText}
+                    linkFileName={link?.title || ''}
+                    color={link?.published ? 'success' : 'primary'}
+                    handleTextChange={setLinkText}
+                  />
+                )}
                 <Filter
                   {...filterSettings}
                   userContextType={props.contextType}
@@ -430,27 +512,33 @@ export default function CanvasContentTray(props) {
                   use_rce_icon_maker={props.use_rce_icon_maker}
                 />
               </Flex.Item>
-
               <Flex.Item
-                shouldgrow
-                shouldshrink
+                grow={true}
+                shrink={true}
                 margin="xx-small xxx-small 0"
                 elementRef={el => (scrollingAreaRef.current = el)}
               >
-                <ErrorBoundary>
-                  <DynamicPanel
-                    contentType={filterSettings.contentType}
-                    contentSubtype={filterSettings.contentSubtype}
-                    sortBy={{sort: filterSettings.sortValue, order: filterSettings.sortDir}}
-                    searchString={filterSettings.searchString}
-                    source={props.source}
-                    jwt={props.jwt}
-                    host={props.host}
-                    refreshToken={props.refreshToken}
-                    context={{type: props.contextType, id: props.contextId}}
-                    {...contentProps}
-                  />
-                </ErrorBoundary>
+                <Flex justifyItems="space-between" direction="column" height="100%">
+                  <Flex.Item shouldGrow={true} shouldShrink={true}>
+                    <ErrorBoundary>
+                      <DynamicPanel
+                        contentType={filterSettings.contentType}
+                        contentSubtype={filterSettings.contentSubtype}
+                        sortBy={{sort: filterSettings.sortValue, order: filterSettings.sortDir}}
+                        searchString={filterSettings.searchString}
+                        source={props.source}
+                        jwt={props.jwt}
+                        host={props.host}
+                        refreshToken={props.refreshToken}
+                        context={{type: props.contextType, id: props.contextId}}
+                        isEdit={isEditTray}
+                        onEditClick={setLink}
+                        {...contentProps}
+                      />
+                    </ErrorBoundary>
+                  </Flex.Item>
+                  {isEditTray && renderFooter()}
+                </Flex>
               </Flex.Item>
             </Flex>
           ) : null}
@@ -495,6 +583,8 @@ CanvasContentTray.propTypes = {
   bridge: instanceOf(Bridge).isRequired,
   editor: shape({id: string}).isRequired,
   onTrayClosing: func, // called with true when the tray starts closing, false once closed
+  isEdit: bool,
+  onEditClick: func,
   ...trayPropsMap
 }
 
@@ -505,6 +595,7 @@ CanvasContentTray.defaultProps = {
   filesTabDisabled: false,
   refreshToken: null,
   source: null,
-  themeUrl: null
+  themeUrl: null,
+  isEdit: false
 }
 /* eslint-enable react/default-props-match-prop-types */

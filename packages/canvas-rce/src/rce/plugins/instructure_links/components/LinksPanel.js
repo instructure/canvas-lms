@@ -32,12 +32,13 @@ function LinksPanel(props) {
   const isGroup = props.contextType === 'group'
 
   const collectionProps = pickProps(props, CollectionPanel.propTypes)
-
   return (
     <View as="div" data-testid="instructure_links-LinksPanel">
       {(isCourse || isGroup) && (
         <CollectionPanel
           {...collectionProps}
+          isEdit={props.isEdit}
+          onEditClick={props.onEditClick}
           collection="wikiPages"
           label={formatMessage('Pages')}
         />
@@ -46,6 +47,8 @@ function LinksPanel(props) {
       {isCourse && (
         <CollectionPanel
           {...collectionProps}
+          isEdit={props.isEdit}
+          onEditClick={props.onEditClick}
           collection="assignments"
           label={formatMessage('Assignments')}
         />
@@ -54,6 +57,8 @@ function LinksPanel(props) {
       {isCourse && (
         <CollectionPanel
           {...collectionProps}
+          isEdit={props.isEdit}
+          onEditClick={props.onEditClick}
           collection="quizzes"
           label={formatMessage('Quizzes')}
         />
@@ -62,6 +67,8 @@ function LinksPanel(props) {
       {(isCourse || isGroup) && (
         <CollectionPanel
           {...collectionProps}
+          isEdit={props.isEdit}
+          onEditClick={props.onEditClick}
           collection="announcements"
           label={formatMessage('Announcements')}
         />
@@ -70,6 +77,8 @@ function LinksPanel(props) {
       {(isCourse || isGroup) && (
         <CollectionPanel
           {...collectionProps}
+          isEdit={props.isEdit}
+          onEditClick={props.onEditClick}
           collection="discussions"
           label={formatMessage('Discussions')}
         />
@@ -78,6 +87,8 @@ function LinksPanel(props) {
       {isCourse && (
         <CollectionPanel
           {...collectionProps}
+          isEdit={props.isEdit}
+          onEditClick={props.onEditClick}
           collection="modules"
           label={formatMessage('Modules')}
         />
@@ -89,6 +100,8 @@ function LinksPanel(props) {
         onLinkClick={props.onLinkClick}
         onChangeAccordion={props.onChangeAccordion}
         selectedAccordionIndex={props.selectedAccordionIndex}
+        isEdit={props.isEdit}
+        onEditClick={props.onEditClick}
       />
     </View>
   )
@@ -104,11 +117,14 @@ LinksPanel.propTypes = {
   fetchInitialPage: func,
   fetchNextPage: func,
   onLinkClick: func,
-  canCreatePages: bool
+  canCreatePages: bool,
+  isEdit: bool,
+  onEditClick: func
 }
 
 LinksPanel.defaultProps = {
-  selectedAccordionIndex: ''
+  selectedAccordionIndex: '',
+  isEdit: false
 }
 
 export default LinksPanel

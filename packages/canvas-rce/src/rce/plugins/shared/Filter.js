@@ -211,12 +211,15 @@ export default function Filter(props) {
     }
     return undefined
   }
+
   const searchMessage = formatMessage('Enter at least 3 characters to search')
   const loadingMessage = formatMessage('Loading, please wait')
   const msg = isContentLoading ? loadingMessage : searchMessage
+  const isEdit = contentSubtype === 'edit'
   return (
     <View display="block" direction="column">
-      {renderType(contentType, contentSubtype, onChange, userContextType, containingContextType)}
+      {!isEdit &&
+        renderType(contentType, contentSubtype, onChange, userContextType, containingContextType)}
       {contentType !== 'links' && (
         <Flex margin="small none none none">
           <Flex.Item shouldGrow={true} shouldShrink={true} margin="none xx-small none none">

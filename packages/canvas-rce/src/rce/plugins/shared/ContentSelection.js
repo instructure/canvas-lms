@@ -64,12 +64,14 @@ export function asLink($element, editor) {
   let displayAs = DISPLAY_AS_LINK
   if ($link.classList.contains('no_preview')) {
     displayAs = DISPLAY_AS_DOWNLOAD_LINK
-  }  else if ($link.classList.contains('auto_open')) {
+  } else if ($link.classList.contains('auto_open')) {
     displayAs = DISPLAY_AS_EMBED
   } else if ($link.classList.contains('inline_disabled')) {
     displayAs = DISPLAY_AS_EMBED_DISABLED
   }
-
+  const contentType = $link.getAttribute('data-course-type')
+  const fileName = $link.getAttribute('title')
+  const published = $link.getAttribute('data-published') === 'true'
   const isPreviewable =
     $link.hasAttribute('data-canvas-previewable') ||
     $link.classList.contains('instructure_scribd_file') // needed to cover docs linked while there was a bug didn't add the data attr.
@@ -81,7 +83,10 @@ export function asLink($element, editor) {
     onlyTextSelected: isOnlyTextSelected(editor.selection.getContent()),
     type,
     isPreviewable,
-    url: $link.href
+    url: $link.href,
+    contentType,
+    fileName,
+    published
   }
 }
 

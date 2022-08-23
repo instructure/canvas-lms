@@ -17,15 +17,29 @@
  */
 
 import React from 'react'
-import {act, render, waitFor, waitForElementToBeRemoved} from '@testing-library/react'
+import {act, render, waitFor, waitForElementToBeRemoved, fireEvent} from '@testing-library/react'
 
-import Bridge from '../../../../bridge/Bridge'
+import bridge from '../../../../bridge'
 import * as fakeSource from '../../../../rcs/fake'
 import CanvasContentTray from '../CanvasContentTray'
 
 jest.useFakeTimers()
 jest.mock('../../../../canvasFileBrowser/FileBrowser', () => {
   return jest.fn(() => 'Files Browser')
+})
+jest.mock('../ContentSelection', () => ({
+  getLinkContentFromEditor: jest.fn().mockReturnValue({
+    fileName: 'some filename',
+    contentType: 'wikiPages',
+    url: '/pages',
+    published: true,
+    text: 'some text'
+  })
+}))
+jest.mock('../../../../bridge', () => {
+  const original = jest.requireActual('../../../../bridge')
+  original.default.insertLink = jest.fn()
+  return original
 })
 
 describe('RCE Plugins > CanvasContentTray', () => {
@@ -35,7 +49,7 @@ describe('RCE Plugins > CanvasContentTray', () => {
 
   function getProps(override = {}) {
     props = {
-      bridge: new Bridge(),
+      bridge,
       editor,
       containingContext: {contextType: 'course', contextId: '1201', userId: '17'},
       contextId: '1201',
@@ -71,6 +85,41 @@ describe('RCE Plugins > CanvasContentTray', () => {
   function getTrayLabel() {
     return getTray().getAttribute('aria-label')
   }
+
+  describe('Edit Course Links Tray', () => {
+    beforeEach(async () => {
+      renderComponent()
+      await showTrayForPlugin('course_link_edit')
+    })
+
+    it('is labeled with "Edit Course Link"', async () => {
+      await waitFor(() => {
+        const header = getTray().querySelector('[data-cid="Heading"]').textContent
+        expect(header).toEqual('Edit Course Link')
+      })
+    })
+
+    it('renders the LinkDisplay Component', async () => {
+      await waitFor(() => {
+        expect(component.getByTestId('LinkDisplay')).toBeInTheDocument()
+      })
+    })
+
+    it('replaces the old link when the Replace button is clicked', async () => {
+      await waitFor(() => {
+        fireEvent.click(component.getByTestId('replace-link-button'))
+        expect(bridge.insertLink).toHaveBeenCalledWith({
+          forceRename: true,
+          href: '/pages',
+          text: 'some text',
+          title: 'some filename',
+          type: 'wikiPages',
+          published: true,
+          course_link: true
+        })
+      })
+    })
+  })
 
   describe('Tray Label in course context', () => {
     beforeEach(() => {
