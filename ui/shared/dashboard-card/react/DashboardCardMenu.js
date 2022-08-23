@@ -79,11 +79,11 @@ export default class DashboardCardMenu extends React.Component {
     return this.state !== nextState
   }
 
-  handleMenuToggle = show => {
-    this.setState({show})
+  handleMenuOpen = () => {
+    this.setState({show: true})
   }
 
-  handleClose = () => {
+  handleMenuClose = () => {
     this.setState({show: false})
   }
 
@@ -118,8 +118,8 @@ export default class DashboardCardMenu extends React.Component {
           ref={c => (this._colorPicker = c)}
           assetString={assetString}
           afterUpdateColor={afterUpdateColor}
-          hidePrompt
-          nonModal
+          hidePrompt={true}
+          nonModal={true}
           hideOnScroll={false}
           withAnimation={false}
           withBorder={false}
@@ -127,7 +127,7 @@ export default class DashboardCardMenu extends React.Component {
           withArrow={false}
           currentColor={currentColor}
           nicknameInfo={nicknameInfo}
-          afterClose={this.handleClose}
+          afterClose={this.handleMenuClose}
           parentComponent="DashboardCardMenu"
           focusOnMount={false}
         />
@@ -161,9 +161,10 @@ export default class DashboardCardMenu extends React.Component {
       <Popover
         on="click"
         isShowingContent={this.state.show}
-        onToggle={this.handleMenuToggle}
-        shouldContainFocus
-        shouldReturnFocus
+        onShowContent={this.handleMenuOpen}
+        onHideContent={this.handleMenuClose}
+        shouldContainFocus={true}
+        shouldReturnFocus={true}
         defaultFocusElement={() => this._colorTab}
         onPositioned={handleShow}
         contentRef={popoverContentRef}

@@ -118,7 +118,7 @@ export default function Link(props) {
       <Focusable>
         {({focused}) => (
           <View
-            focused={focused}
+            withFocusOutline={focused}
             focusPosition="inset"
             position="relative"
             as="div"
