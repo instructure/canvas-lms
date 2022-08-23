@@ -249,7 +249,7 @@ class ConversationMessage < ActiveRecord::Base
                 t(:subject, "Private message")
               end
       note = format_message(body).first
-      recipient.user_notes.create(creator: author, title: title, note: note, root_account_id: root_account_id)
+      recipient.user_notes.create(creator: author, title: title, note: note, root_account_id: Shard.relative_id_for(root_account_id, context.shard, recipient.shard))
     end
   end
 
