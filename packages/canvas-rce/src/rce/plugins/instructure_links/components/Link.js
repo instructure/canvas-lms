@@ -28,51 +28,9 @@ import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Focusable} from '@instructure/ui-focusable'
-import {SVGIcon} from '@instructure/ui-svg-images'
-import {
-  IconDragHandleLine,
-  IconAssignmentLine,
-  IconDiscussionLine,
-  IconModuleLine,
-  IconQuizLine,
-  IconQuizSolid as IconNewQuiz,
-  IconAnnouncementLine,
-  IconPublishSolid,
-  IconUnpublishedSolid,
-  IconDocumentLine
-} from '@instructure/ui-icons'
+import {IconDragHandleLine, IconPublishSolid, IconUnpublishedSolid} from '@instructure/ui-icons'
 import RCEGlobals from '../../../RCEGlobals'
-
-function IconBlank(props) {
-  return (
-    <SVGIcon name="IconBlank" viewBox="0 0 1920 1920" {...props}>
-      <g role="presentation" />
-    </SVGIcon>
-  )
-}
-
-function getIcon(type) {
-  switch (type) {
-    case 'assignments':
-      return IconAssignmentLine
-    case 'discussions':
-      return IconDiscussionLine
-    case 'modules':
-      return IconModuleLine
-    case 'quizzes':
-      return IconQuizLine
-    case 'quizzes.next':
-      return IconNewQuiz
-    case 'announcements':
-      return IconAnnouncementLine
-    case 'wikiPages':
-      return IconDocumentLine
-    case 'navigation':
-      return IconBlank
-    default:
-      return IconDocumentLine
-  }
-}
+import {getIcon} from '../../shared/linkUtils'
 
 export default function Link(props) {
   const [isHovering, setIsHovering] = useState(false)
@@ -142,7 +100,7 @@ export default function Link(props) {
   return (
     <div
       data-testid="instructure_links-Link"
-      draggable
+      draggable={true}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onMouseEnter={handleHover}
@@ -173,14 +131,14 @@ export default function Link(props) {
                 <Flex.Item margin="0 xx-small 0 0" size="1.125rem">
                   {isHovering ? <IconDragHandleLine size="x-small" inline={false} /> : null}
                 </Flex.Item>
-                <Flex.Item grow shrink>
+                <Flex.Item grow={true} shrink={true}>
                   <Flex>
                     <Flex.Item padding="0 x-small 0 0">
                       <Text color={color}>
                         <Icon size="x-small" inline={false} data-type={type} />
                       </Text>
                     </Flex.Item>
-                    <Flex.Item padding="0 x-small 0 0" grow shrink textAlign="start">
+                    <Flex.Item padding="0 x-small 0 0" grow={true} shrink={true} textAlign="start">
                       <View as="div" margin="0">
                         {title}
                       </View>
