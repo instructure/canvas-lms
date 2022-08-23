@@ -18,11 +18,10 @@
 
 import React, {PureComponent} from 'react'
 import {ApplyTheme} from '@instructure/ui-themeable'
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {IconWarningLine} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {Text} from '@instructure/ui-text'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
@@ -63,7 +62,7 @@ export default class CreatorEventGroup extends PureComponent {
             id={`creator-event-group-${creator.key}`}
             summary={
               <Flex as="div" direction="row">
-                <Flex.Item grow size="0" padding="none xx-small none none">
+                <Flex.Item shouldGrow={true} size="0" padding="none xx-small none none">
                   <Text as="h3">
                     <TruncateText maxLines={1}>
                       <Text weight="bold">{creatorName}</Text> ({roleLabel})

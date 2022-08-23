@@ -40,7 +40,7 @@ const outcomeGroupHeader = (outcomeGroup, numMastered, numGroup, isVertical) => 
     justifyItems={isVertical ? null : 'space-between'}
     direction={isVertical ? 'column' : 'row'}
   >
-    <Flex.Item padding="0 x-small 0 0" size={isVertical ? undefined : '0'} grow>
+    <Flex.Item padding="0 x-small 0 0" size={isVertical ? undefined : '0'} shouldGrow={true}>
       <Text size="large" weight="bold">
         <TruncateWithTooltip>{outcomeGroup.title}</TruncateWithTooltip>
       </Text>
@@ -93,7 +93,7 @@ class OutcomeGroup extends React.Component {
           expanded={expanded}
           onToggle={this.handleToggle}
         >
-          <List isUnstyled delimiter="solid">
+          <List isUnstyled={true} delimiter="solid">
             {outcomes.sort(natcompare.byKey('title')).map(outcome => (
               <List.Item key={outcome.id} margin="0">
                 <Outcome

@@ -19,8 +19,6 @@
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-
 import {bool, func} from 'prop-types'
 import {TeacherAssignmentShape, UserShape} from '../../assignmentData'
 import {View} from '@instructure/ui-view'
@@ -88,7 +86,12 @@ export default class StudentTray extends React.Component {
           aria-label={I18n.t("Go to %{name}'s profile", {name})}
           target="_blank"
         >
-          <Avatar size="x-large" name={name} src={this.props.student.avatarUrl} data-fs-exclude />
+          <Avatar
+            size="x-large"
+            name={name}
+            src={this.props.student.avatarUrl}
+            data-fs-exclude={true}
+          />
         </Link>
       </View>
     )
@@ -117,6 +120,7 @@ export default class StudentTray extends React.Component {
   }
 
   handleSubmitForStudent = () => {
+    // eslint-disable-next-line no-alert
     window.confirm('Submit for Student is not implemented yet')
   }
 
@@ -200,7 +204,7 @@ export default class StudentTray extends React.Component {
           <OverrideAttempts
             allowedAttempts={this.state.allowedAttempts}
             variant="detail"
-            stacked
+            stacked={true}
             onChange={this.onChangeAttempts}
           />
         </View>
@@ -218,7 +222,7 @@ export default class StudentTray extends React.Component {
 
     return (
       <Flex>
-        <Flex.Item grow textAlign="center">
+        <Flex.Item shouldGrow={true} textAlign="center">
           <Text as="p" weight="bold" lineHeight="fit">
             {this.props.assignment.name}
           </Text>
@@ -242,7 +246,7 @@ export default class StudentTray extends React.Component {
 
           <div style={{margin: '0 auto auto -10%', width: '120%'}}>
             <Flex>
-              <Flex.Item shrink textAlign="start">
+              <Flex.Item shouldShrink={true} textAlign="start">
                 <IconButton
                   size="small"
                   renderIcon={IconArrowOpenStartLine}
@@ -252,7 +256,7 @@ export default class StudentTray extends React.Component {
                   screenReaderLabel={I18n.t('Previous student')}
                 />
               </Flex.Item>
-              <Flex.Item grow textAlign="center">
+              <Flex.Item shouldGrow={true} textAlign="center">
                 <Heading level="h3" as="h2">
                   <Link
                     size="large"
@@ -266,7 +270,7 @@ export default class StudentTray extends React.Component {
                   </Link>
                 </Heading>
               </Flex.Item>
-              <Flex.Item shrink textAlign="end">
+              <Flex.Item shouldShrink={true} textAlign="end">
                 <IconButton
                   size="small"
                   renderIcon={IconArrowOpenEndLine}

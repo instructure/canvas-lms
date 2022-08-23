@@ -168,7 +168,7 @@ export default class HideAssignmentGradesTray extends PureComponent {
               <CloseButton onClick={this.dismiss} screenReaderLabel={I18n.t('Close')} />
             </Flex.Item>
 
-            <Flex.Item margin="0 0 0 small" shrink>
+            <Flex.Item margin="0 0 0 small" shouldShrink={true}>
               <Heading as="h2" level="h3">
                 <TruncateText maxLines={3}>{assignment.name}</TruncateText>
               </Heading>

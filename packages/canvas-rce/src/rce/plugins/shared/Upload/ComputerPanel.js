@@ -225,7 +225,7 @@ export default function ComputerPanel({theFile, setFile, setError, accept, label
             />
           </Flex.Item>
 
-          <Flex.Item grow shrink>
+          <Flex.Item shouldGrow={true} shouldShrink={true}>
             <PresentationContent>
               <Text>{filename}</Text>
             </PresentationContent>
