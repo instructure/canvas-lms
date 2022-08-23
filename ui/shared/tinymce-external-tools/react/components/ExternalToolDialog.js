@@ -87,7 +87,7 @@ export default class ExternalToolDialog extends React.Component {
     const contents = editor.getContent() || ''
     if (url == null) {
       // if we don't have a url on the page, build one using the current context.
-      // url should look like: /courses/2/external_tools/15/resoruce_selection?editor=1
+      // url should look like: /courses/2/external_tools/15/resource_selection?editor=1
       const asset = contextAssetString.split('_')
       url = `/${asset[0]}s/${asset[1]}/external_tools/${button.id}/resource_selection`
     }

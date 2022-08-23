@@ -20,11 +20,13 @@ const deepLinkingResponseMessageType = 'LtiDeepLinkingResponse'
 
 // Checks to see if a postMessage event is valid for
 // deep linking content item processing
+// the RCE handles deep linking separately in
+// ui/shared/tinymce-external-tools/react/components/ExternalToolDialog.js#handleDeepLinking
 export function isValidDeepLinkingEvent(event, env) {
   return !!(
     event.origin === env.DEEP_LINKING_POST_MESSAGE_ORIGIN &&
-    event.data &&
-    event.data.subject === deepLinkingResponseMessageType
+    event.data?.subject === deepLinkingResponseMessageType &&
+    event.data?.placement !== 'editor_button'
   )
 }
 
