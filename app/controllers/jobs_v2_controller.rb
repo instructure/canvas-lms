@@ -108,9 +108,11 @@ class JobsV2Controller < ApplicationController
       # This seems silly, but it forces postgres to use the available indicies.
       scope = scope.where("locked_by IS NULL OR locked_by IS NOT NULL") if @group == :singleton
 
-      tag_info = Api.paginate(scope, self, api_v1_jobs_grouped_info_url)
+      group_info = Api.paginate(scope, self, api_v1_jobs_grouped_info_url)
+      group_statuses = get_group_statuses(group_info, @group) if %i[strand singleton].include?(@group)
+
       now = Delayed::Job.db_time_now
-      render json: tag_info.map { |row| grouped_info_json(row, @group, base_time: now) }
+      render json: group_info.map { |row| grouped_info_json(row, @group, base_time: now, group_statuses: group_statuses) }
     end
   end
 
@@ -331,8 +333,14 @@ class JobsV2Controller < ApplicationController
     end
   end
 
-  def grouped_info_json(row, group, base_time:)
-    { :count => row.count, group => row[group], :info => grouped_info_data(row, base_time: base_time) }
+  def grouped_info_json(row, group, base_time:, group_statuses: nil)
+    json = {
+      :count => row.count,
+      group => row[group],
+      :info => grouped_info_data(row, base_time: base_time)
+    }
+    json[:orphaned] = group_statuses[row[group]] if group_statuses&.key?(row[group])
+    json
   end
 
   def job_json(job, base_time: nil)
@@ -436,5 +444,25 @@ class JobsV2Controller < ApplicationController
     if needed_jobs > 0
       Delayed::Job.where(strand: strand, next_in_strand: false, locked_by: nil, singleton: nil).order(:id).limit(needed_jobs).update_all(next_in_strand: true)
     end
+  end
+
+  # returns a hash from strand name to boolean indicating the strand or singleton is orphaned
+  # (i.e., no job in the group has next_in_strand set)
+  def get_group_statuses(jobs, strand_or_singleton)
+    return nil unless jobs.present? && %w[queued future].include?(@bucket)
+
+    scope = case strand_or_singleton
+            when :strand
+              Delayed::Job.where(strand: jobs.map(&:strand))
+            when :singleton
+              Delayed::Job.where(strand: nil, singleton: jobs.map(&:singleton))
+            else
+              raise ArgumentError, "strand_or_singleton must be one of those two"
+            end
+    scope
+      .group(strand_or_singleton)
+      .pluck("#{strand_or_singleton}, BOOL_OR(next_in_strand)")
+      .to_h
+      .transform_values(&:!)
   end
 end
