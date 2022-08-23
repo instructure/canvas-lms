@@ -2009,7 +2009,8 @@ class ApplicationController < ActionController::Base
                                                         content_tag: @module_tag || tag,
                                                         assignment: @assignment,
                                                         launch: @lti_launch,
-                                                        tool: @tool
+                                                        tool: @tool,
+                                                        launch_url: @resource_url
                                                       })
 
         adapter = if @tool.use_1_3?
