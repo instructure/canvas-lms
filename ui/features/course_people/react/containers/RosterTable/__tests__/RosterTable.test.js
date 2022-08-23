@@ -186,37 +186,15 @@ describe('RosterTable', () => {
     expect(within(rows[6]).getByText('Observing: Observed Student 2')).toBeInTheDocument()
   })
 
-  it('should wrap the name of each user in a button', async () => {
+  it('should wrap the name of each user in a link to their user detail page', async () => {
     const container = setup(getRosterQueryMock({mockUsers}))
     const cells = await container.findAllByTestId('roster-table-name-cell')
     const names = mockUsers.map(user => user.name)
+    const userDetailLinks = mockUsers.map(user => user.enrollments[0].htmlUrl)
     cells.forEach((cell, index) => {
-      const nameMatch = new RegExp(names[index])
-      const button = within(cell).getByRole('button', {name: nameMatch})
-      expect(button).toBeInTheDocument()
-    })
-  })
-
-  it('should link the current_user to their user detail page when clicking their own name', async () => {
-    const self = teacher1
-    window.ENV = {...window.ENV, current_user: {id: self._id}}
-    const mockSelf = mockUser(self)
-    const nameMatch = new RegExp(self.name)
-
-    const container = setup(getRosterQueryMock({mockUsers: [mockSelf]}))
-    const cells = await container.findByTestId('roster-table-name-cell')
-    const link = within(cells).getByRole('link', {name: nameMatch})
-    expect(link).toHaveAttribute('href', mockSelf.enrollments.htmlUrl)
-  })
-
-  it('should not link the current_user to the user detail page when clicking a name that is not their own', async () => {
-    const container = setup(getRosterQueryMock({mockUsers}))
-    const cells = await container.findAllByTestId('roster-table-name-cell')
-    const names = mockUsers.map(user => user.name)
-    cells.forEach((cell, index) => {
-      const nameMatch = new RegExp(names[index])
-      const button = within(cell).getByRole('button', {name: nameMatch})
-      expect(button).not.toHaveAttribute('href')
+      const nameMatch = new RegExp(names[index]) // Use regex to match names with pronouns
+      const nameLink = within(cell).getByRole('link', {name: nameMatch})
+      expect(nameLink).toHaveAttribute('href', userDetailLinks[index])
     })
   })
 
