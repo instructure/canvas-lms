@@ -367,9 +367,14 @@ class ConferencesController < ApplicationController
       respond_to do |format|
         params[:web_conference].try(:delete, :long_running)
         params[:web_conference].try(:delete, :conference_type)
+        sync_attendees = params[:web_conference].try(:delete, :sync_attendees)
+
+        @conference.invite_users_from_context if sync_attendees
+
         if @conference.update(conference_params)
           # TODO: ability to dis-invite people
-          @conference.invite_users_from_context(member_ids)
+          @conference.invite_users_from_context(member_ids) unless sync_attendees
+
           @conference.save
           format.html { redirect_to named_context_url(@context, :context_conference_url, @conference.id) }
           format.json do
@@ -520,7 +525,7 @@ class ConferencesController < ApplicationController
 
   def conference_params
     params.require(:web_conference)
-          .permit(:title, :duration, :description, :conference_type, user_settings: strong_anything, lti_settings: strong_anything)
+          .permit(:sync_attendees, :title, :duration, :description, :conference_type, user_settings: strong_anything, lti_settings: strong_anything)
   end
 
   def preload_recordings(conferences)

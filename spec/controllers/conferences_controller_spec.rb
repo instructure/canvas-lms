@@ -252,13 +252,34 @@ describe ConferencesController do
         course_id: @course.id,
         id: @conference,
         web_conference: {
-          title: "Something else",
+          title: "Something else"
         },
       }
       post :update, params: params, format: :json
       body = JSON.parse(response.body)
       expect(body["user_ids"]).to include(@teacher.id)
       expect(body["user_ids"]).to include(@student.id)
+    end
+
+    it "syncs attendees" do
+      @conference = @course.web_conferences.create!(conference_type: "Wimba", user: @teacher)
+      @student2 = User.create
+      @course.enroll_student(@student2, enrollment_state: "active")
+
+      params = {
+        course_id: @course.id,
+        id: @conference,
+        web_conference: {
+          title: "Something else",
+          sync_attendees: true
+        },
+      }
+      user_session(@teacher)
+      post :update, params: params, format: :json
+      body = JSON.parse(response.body)
+      expect(body["user_ids"]).to include(@teacher.id)
+      expect(body["user_ids"]).to include(@student.id)
+      expect(body["user_ids"]).to include(@student2.id)
     end
   end
 
