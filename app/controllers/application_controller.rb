@@ -73,6 +73,7 @@ class ApplicationController < ActionController::Base
   before_action :initiate_session_from_token
   before_action :fix_xhr_requests
   before_action :init_body_classes
+  before_action :manage_robots_meta
   # multiple actions might be called on a single controller instance in specs
   before_action :clear_js_env if Rails.env.test?
 
@@ -1476,6 +1477,10 @@ class ApplicationController < ActionController::Base
                                         else
                                           "no-store"
                                         end
+  end
+
+  def manage_robots_meta
+    @allow_robot_indexing = true if @domain_root_account&.enable_search_indexing? || Setting.get("enable_search_indexing", "false") == "true"
   end
 
   def set_page_view
