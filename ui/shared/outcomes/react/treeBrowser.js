@@ -17,11 +17,11 @@
  */
 
 import {useEffect, useMemo, useState} from 'react'
-import {uniqBy} from 'lodash'
+import {uniqBy, uniq} from 'lodash'
 import {useApolloClient, useQuery} from 'react-apollo'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {CHILD_GROUPS_QUERY, groupFields} from '../graphql/Management'
+import {CHILD_GROUPS_QUERY, groupFields, SEARCH_GROUP_OUTCOMES} from '../graphql/Management'
 import {FIND_GROUPS_QUERY} from '../graphql/Outcomes'
 import useSearch from './hooks/useSearch'
 import useGroupCreate from './hooks/useGroupCreate'
@@ -127,7 +127,18 @@ const useTreeBrowser = queryVariables => {
       query: LOADED_GROUPS_QUERY,
       variables: queryVariables,
       data: {
-        loadedGroups: [...loadedGroups, ...ids]
+        loadedGroups: uniq([...loadedGroups, ...ids])
+      }
+    })
+  }
+
+  const removeFromLoadedGroups = ids => {
+    const newLoadedGroups = loadedGroups.filter(val => ids.indexOf(val) === -1)
+    client.writeQuery({
+      query: LOADED_GROUPS_QUERY,
+      variables: queryVariables,
+      data: {
+        loadedGroups: [...newLoadedGroups]
       }
     })
   }
@@ -208,7 +219,8 @@ const useTreeBrowser = queryVariables => {
         variables: {
           id,
           type: 'LearningOutcomeGroup'
-        }
+        },
+        fetchPolicy: 'network-only'
       })
       .then(({data}) => {
         setSelectedParentGroupId(data.context.parentOutcomeGroup?._id)
@@ -238,7 +250,18 @@ const useTreeBrowser = queryVariables => {
         setError(err.message)
       })
   }
-
+  const refetchGroupOutcome = (groupId, contextId, contextType) => {
+    client.query({
+      query: SEARCH_GROUP_OUTCOMES,
+      variables: {
+        id: groupId,
+        outcomeIsImported: false,
+        outcomesContextId: contextId,
+        outcomesContextType: contextType
+      },
+      fetchPolicy: 'network-only'
+    })
+  }
   useEffect(() => {
     if (error) {
       const srOnlyAlert = Object.keys(collections).length === 0
@@ -271,12 +294,14 @@ const useTreeBrowser = queryVariables => {
     selectedParentGroupId,
     addGroups,
     addLoadedGroups,
+    removeFromLoadedGroups,
     clearCache,
     loadedGroups,
     addNewGroup,
     removeGroup,
     setSelectedParentGroupId,
-    refetchGroup
+    refetchGroup,
+    refetchGroupOutcome
   }
 }
 
@@ -284,7 +309,9 @@ export const useManageOutcomes = ({
   collection,
   initialGroupId,
   importNumber = 0,
-  lhsGroupIdsToRefetch = []
+  lhsGroupIdsToRefetch = [],
+  lhsGroupId = null,
+  parentsToUnload = []
 } = {}) => {
   const {contextId, contextType} = useCanvasContext()
   const client = useApolloClient()
@@ -302,12 +329,14 @@ export const useManageOutcomes = ({
     selectedParentGroupId,
     addGroups,
     addLoadedGroups,
+    removeFromLoadedGroups,
     clearCache: clearTreeBrowserCache,
     addNewGroup,
     removeGroup,
     loadedGroups,
     setSelectedParentGroupId,
-    refetchGroup
+    refetchGroup,
+    refetchGroupOutcome
   } = useTreeBrowser({
     collection
   })
@@ -416,6 +445,9 @@ export const useManageOutcomes = ({
           })
           saveRootGroupId(rootGroup._id)
           addGroups(extractGroups({...rootGroup, isRootGroup: true}))
+          if (lhsGroupId && lhsGroupId !== rootGroup._id && loadedGroups.includes(lhsGroupId)) {
+            removeFromLoadedGroups([lhsGroupId])
+          }
         })
         .catch(err => {
           setError(err.message)
@@ -431,6 +463,13 @@ export const useManageOutcomes = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [importNumber])
+  useEffect(() => {
+    if (parentsToUnload.length > 0) {
+      removeFromLoadedGroups(parentsToUnload)
+      parentsToUnload.forEach(id => refetchGroupOutcome(id, contextId, contextType))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [parentsToUnload])
 
   const createGroup = async (groupName, parentGroupId = rootId) => {
     const newGroup = await graphqlGroupCreate(groupName, parentGroupId)

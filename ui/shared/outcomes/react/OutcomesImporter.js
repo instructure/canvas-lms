@@ -51,7 +51,7 @@ export function showOutcomesImporterIfInProgress({mount, ...props}, userId) {
 }
 
 export function showOutcomesImporter({mount, ...props}) {
-  ReactDOM.render(<OutcomesImporter {...props} hide={unmount(mount)} invokedImport />, mount)
+  ReactDOM.render(<OutcomesImporter {...props} hide={unmount(mount)} invokedImport={true} />, mount)
 }
 
 export default class OutcomesImporter extends Component {
@@ -71,6 +71,7 @@ export default class OutcomesImporter extends Component {
   static defaultProps = {
     file: null,
     importId: null,
+    learningOutcomeGroupAncestorIds: [],
     onSuccessfulOutcomesImport: () => {}
   }
 
