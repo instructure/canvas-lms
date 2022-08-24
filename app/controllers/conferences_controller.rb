@@ -142,6 +142,7 @@
 #
 class ConferencesController < ApplicationController
   include Api::V1::Conferences
+  include CalendarConferencesHelper
 
   before_action :require_context, except: :for_user
   skip_before_action :load_user, only: [:recording_ready]
@@ -338,6 +339,13 @@ class ConferencesController < ApplicationController
     end
   end
 
+  def create_or_update_calendar_event_for_conference(conference, context)
+    return nil unless context.is_a?(Course)
+
+    calendar_event_data = { title: conference.title, web_conference: conference, context_code: context.asset_string, start_at: conference.start_at, end_at: conference.end_at }
+    find_and_update_or_initialize_calendar_event(context, calendar_event_data)
+  end
+
   def create
     if authorized_action(@context.web_conferences.temp_record, @current_user, :create)
       @conference = @context.web_conferences.build(conference_params)
@@ -345,6 +353,10 @@ class ConferencesController < ApplicationController
       @conference.user = @current_user
       respond_to do |format|
         if @conference.save
+          if params[:web_conference].try(:delete, :calendar_event)
+            calendar_event = create_or_update_calendar_event_for_conference(@conference, @context)
+            calendar_event&.save
+          end
           @conference.add_initiator(@current_user)
           @conference.invite_users_from_context(member_ids)
           @conference.save
@@ -525,7 +537,7 @@ class ConferencesController < ApplicationController
 
   def conference_params
     params.require(:web_conference)
-          .permit(:sync_attendees, :title, :duration, :description, :conference_type, user_settings: strong_anything, lti_settings: strong_anything)
+          .permit(:start_at, :end_at, :sync_attendees, :title, :duration, :description, :conference_type, user_settings: strong_anything, lti_settings: strong_anything)
   end
 
   def preload_recordings(conferences)

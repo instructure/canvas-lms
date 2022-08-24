@@ -230,6 +230,49 @@ describe ConferencesController do
         end
       end
     end
+
+    context "with calendar event" do
+      it "creates a conference and event correctly" do
+        user_session(@teacher)
+
+        post "create", params: { course_id: @course.id, web_conference: { title: "My Conference", conference_type: "Wimba", calendar_event: true } }, format: "json"
+        created_conference = WebConference.last
+        created_calendar_event = created_conference.calendar_event
+
+        expect(created_calendar_event).to be_truthy
+        expect(created_calendar_event.context).to eq @course
+        expect(response).to be_successful
+      end
+
+      it "does not create a calendar event when context is not a course" do
+        user_session(@teacher)
+        group = @course.groups.create!(name: "some group")
+        group.add_user(@student)
+
+        post "create", params: { group_id: group.id, web_conference: { title: "My Conference", conference_type: "Wimba", calendar_event: true } }, format: "json"
+        created_conference = WebConference.last
+        created_calendar_event = created_conference.calendar_event
+
+        expect(created_calendar_event).to be_falsey
+        expect(response).to be_successful
+      end
+
+      it "creates a conference when conference start and end date are set" do
+        user_session(@teacher)
+        start_time = Date.today
+        end_time = Date.today + 1.day
+
+        post "create", params: { course_id: @course.id, web_conference: { title: "My Conference", conference_type: "Wimba", calendar_event: true, start_at: start_time, end_at: end_time } }, format: "json"
+        created_conference = WebConference.last
+        created_calendar_event = created_conference.calendar_event
+
+        expect(created_calendar_event).to be_truthy
+        expect(created_calendar_event.context).to eq @course
+        expect(created_calendar_event.start_at).to eq start_time
+        expect(created_calendar_event.end_at).to eq end_time
+        expect(response).to be_successful
+      end
+    end
   end
 
   describe "POST 'update'" do
