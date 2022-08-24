@@ -352,6 +352,7 @@ export const COURSE_ALIGNMENT_STATS = gql`
         totalAlignments
         totalArtifacts
         alignedArtifacts
+        artifactAlignments
       }
     }
   }
