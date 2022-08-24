@@ -28,30 +28,19 @@ const EVENT_EXCEPTION_ELEMENT_IDS = [
   'imageCropperControls'
 ]
 
-export function useArrowKeys(translateX, translateY, dispatch) {
-  const [tempTranslateX, _setTempTranslateX] = useState(translateX)
-  const [tempTranslateY, _setTempTranslateY] = useState(translateY)
-  const [isMoving, setIsMoving] = useState(false)
-
-  // These are used to get the current values when the callback is called from outside.
-  const tempTranslateXRef = useRef(tempTranslateX)
-  const tempTranslateYRef = useRef(tempTranslateY)
-
+function useKeysEvents(
+  tempTranslateXRef,
+  tempTranslateYRef,
+  tempTranslateX,
+  tempTranslateY,
+  setTempTranslateX,
+  setTempTranslateY,
+  isMoving,
+  setIsMoving
+) {
   // Refs that manage the keydown acceleration
   const direction = useRef(0)
   const elapsedTime = useRef(0)
-
-  const setTempTranslateX = data => {
-    setIsMoving(true)
-    tempTranslateXRef.current = data
-    _setTempTranslateX(data)
-  }
-
-  const setTempTranslateY = data => {
-    setIsMoving(true)
-    tempTranslateYRef.current = data
-    _setTempTranslateY(data)
-  }
 
   const onKeyDownCallback = event => {
     // 37 = Left, 38 = Up, 39 = Right, 40 = Down
@@ -114,11 +103,106 @@ export function useArrowKeys(translateX, translateY, dispatch) {
   }, [])
 
   useEffect(() => {
-    if (isMoving) {
+    if (isMoving && direction.current !== 0) {
       stopMovementCallback()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tempTranslateX, tempTranslateY])
+}
+
+function useMouseEvents(
+  tempTranslateX,
+  tempTranslateY,
+  setTempTranslateX,
+  setTempTranslateY,
+  setIsMoving
+) {
+  const initialPageX = useRef(0)
+  const initialPageY = useRef(0)
+  const mouseDown = useRef(false)
+  const imgElement = useRef(null)
+  const containerElement = useRef(null)
+
+  const stoppedMovingCallback = () => {
+    mouseDown.current = false
+    initialPageX.current = 0
+    initialPageY.current = 0
+
+    imgElement.current.onmousemove = null
+    imgElement.current.onmouseup = null
+    imgElement.current = null
+
+    containerElement.current.onmouseout = null
+    containerElement.current = null
+
+    setIsMoving(false)
+  }
+
+  const startedMovingCallback = (target, clientX, clientY, container) => {
+    mouseDown.current = true
+    initialPageX.current = clientX
+    initialPageY.current = clientY
+
+    target.onmousemove = onMouseMoveCallback
+    target.onmouseup = stoppedMovingCallback
+    imgElement.current = target
+
+    // Should stop the movement when mouse leaves the preview
+    container.onmouseout = stoppedMovingCallback
+    containerElement.current = container
+
+    setIsMoving(true)
+  }
+
+  const onMouseMoveCallback = e => {
+    if (!mouseDown.current) {
+      return stoppedMovingCallback()
+    }
+    setTempTranslateX(tempTranslateX + e.clientX - initialPageX.current)
+    setTempTranslateY(tempTranslateY + e.clientY - initialPageY.current)
+  }
+
+  return (e, container) => startedMovingCallback(e.target, e.clientX, e.clientY, container)
+}
+
+export function useKeyMouseEvents(translateX, translateY, dispatch, imgRef) {
+  const [tempTranslateX, _setTempTranslateX] = useState(translateX)
+  const [tempTranslateY, _setTempTranslateY] = useState(translateY)
+  const [isMoving, setIsMoving] = useState(false)
+
+  // These are used to get the current values when the callback is called from outside.
+  const tempTranslateXRef = useRef(tempTranslateX)
+  const tempTranslateYRef = useRef(tempTranslateY)
+
+  const setTempTranslateX = data => {
+    setIsMoving(true)
+    tempTranslateXRef.current = data
+    _setTempTranslateX(data)
+  }
+
+  const setTempTranslateY = data => {
+    setIsMoving(true)
+    tempTranslateYRef.current = data
+    _setTempTranslateY(data)
+  }
+
+  useKeysEvents(
+    tempTranslateXRef,
+    tempTranslateYRef,
+    tempTranslateX,
+    tempTranslateY,
+    setTempTranslateX,
+    setTempTranslateY,
+    isMoving,
+    setIsMoving
+  )
+  const onMouseDownCallback = useMouseEvents(
+    tempTranslateX,
+    tempTranslateY,
+    setTempTranslateX,
+    setTempTranslateY,
+    setIsMoving
+  )
 
   // Updates the reducer state when user stops moving.
   useEffect(() => {
@@ -148,5 +232,5 @@ export function useArrowKeys(translateX, translateY, dispatch) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [translateX, translateY])
 
-  return [tempTranslateX, tempTranslateY, onKeyDownCallback]
+  return [tempTranslateX, tempTranslateY, onMouseDownCallback]
 }
