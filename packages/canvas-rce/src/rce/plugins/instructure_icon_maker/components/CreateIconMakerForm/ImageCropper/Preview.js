@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useRef, useEffect} from 'react'
+import React, {useEffect, createRef} from 'react'
 import PropTypes from 'prop-types'
 import formatMessage from '../../../../../../format-message'
 import {ImageCropperSettingsPropTypes} from './propTypes'
 import {buildSvg} from './svg'
 import {PREVIEW_WIDTH, PREVIEW_HEIGHT, BACKGROUND_SQUARE_SIZE} from './constants'
 import {useMouseWheel} from './useMouseWheel'
-import {useArrowKeys} from './useArrowKeys'
+import {useKeyMouseEvents} from './useKeyMouseEvents'
 import checkerboardStyle from '../../../../shared/CheckerboardStyling'
 
 /**
@@ -47,10 +47,22 @@ function getTransformValue({translateX, translateY, rotation, scaleRatio}) {
 }
 
 export const Preview = ({settings, dispatch}) => {
-  const shapeRef = useRef(null)
+  const previewRef = createRef()
+  const shapeRef = createRef()
+  const imgRef = createRef()
   const {image, shape, rotation, scaleRatio, translateX, translateY} = settings
   const [tempScaleRatio, onWheelCallback] = useMouseWheel(scaleRatio, dispatch)
-  const [tempTranslateX, tempTranslateY] = useArrowKeys(translateX, translateY, dispatch)
+  const [tempTranslateX, tempTranslateY, onMouseDownCallback] = useKeyMouseEvents(
+    translateX,
+    translateY,
+    dispatch,
+    imgRef
+  )
+
+  useEffect(() => {
+    imgRef.current.ondragstart = () => false
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     const svg = buildSvg(shape)
@@ -67,7 +79,11 @@ export const Preview = ({settings, dispatch}) => {
   return (
     <div
       id="cropper-preview"
+      ref={previewRef}
       style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
         position: 'relative',
         width: `${PREVIEW_WIDTH}px`,
         height: `${PREVIEW_HEIGHT}px`,
@@ -80,26 +96,25 @@ export const Preview = ({settings, dispatch}) => {
     >
       <img
         src={image}
+        ref={imgRef}
         alt={formatMessage('Image to crop')}
         style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
           height: '100%',
-          width: '100%',
           objectFit: 'contain',
           textAlign: 'center',
           transform: transformValue
         }}
+        onMouseDown={e => onMouseDownCallback(e, previewRef.current)}
       />
       <div
         id="cropShapeContainer"
+        ref={shapeRef}
         style={{
           position: 'absolute',
           top: 0,
-          left: 0
+          left: 0,
+          pointerEvents: 'none'
         }}
-        ref={shapeRef}
       />
     </div>
   )
