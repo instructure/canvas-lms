@@ -15589,7 +15589,7 @@ ca:
   outcomes_service_alignment_migration_5b4391ad: "Migració de l'alineació del servei de Resultats"
   outcomes_tutorial_tray_ebfce995: "Safata de tutorial sobre els resultats"
   over_time_bee1a733: "al llarg del temps"
-  override_3de65b2c: Substitueix
+  override_3de65b2c: "Nota total revisada"
   override_grade_385adf30: "nota de substitució"
   override_score_53994655: "puntuació de substitució"
   override_score_5f3c1189: "Substitueix la puntuació"
@@ -22354,7 +22354,7 @@ ca:
   top_box_background_6db383e9: "Fons del quadre superior"
   top_box_border_94cee4a7: "Vora del quadre superior"
   topic_podcast_feed_9ab6f5ac: "Tema: Canal de continguts del podcast"
-  total_71a4807: Total
+  total_71a4807: "Nota total"
   total_activity_21022e7c: "Activitat total"
   total_grade_b0c33841: "Total: %{grade}"
   total_messages_af025be6: "Missatges totals"
