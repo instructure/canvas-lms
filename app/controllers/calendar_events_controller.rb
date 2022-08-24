@@ -79,9 +79,6 @@ class CalendarEventsController < ApplicationController
     event_params = permit_params(params, [:title, :start_at, :end_at, :location_name, :location_address, web_conference: strong_anything])
     return unless authorize_user_for_conference(@current_user, event_params[:web_conference])
 
-    if @event.grants_right?(@current_user, session, :update)
-      @event.update!(event_params)
-    end
     if authorized_action(@event, @current_user, :update_content)
       add_conference_types_to_js_env([@context])
       render :new
