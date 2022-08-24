@@ -32,8 +32,14 @@ const AlignmentSummary = () => {
   const [scrollContainer, setScrollContainer] = useState(null)
   const {data: alignmentStatsData, loading: alignmentStatsLoading} = useCourseAlignmentStats()
   const courseAlignmentStats = alignmentStatsData?.course?.outcomeAlignmentStats || {}
-  const {totalOutcomes, alignedOutcomes, totalAlignments, totalArtifacts, alignedArtifacts} =
-    courseAlignmentStats
+  const {
+    totalOutcomes,
+    alignedOutcomes,
+    totalAlignments,
+    totalArtifacts,
+    alignedArtifacts,
+    artifactAlignments
+  } = courseAlignmentStats
 
   const {
     rootGroup,
@@ -58,6 +64,7 @@ const AlignmentSummary = () => {
       totalAlignments={totalAlignments}
       totalArtifacts={totalArtifacts}
       alignedArtifacts={alignedArtifacts}
+      artifactAlignments={artifactAlignments}
       searchString={searchString}
       updateSearchHandler={updateSearch}
       clearSearchHandler={clearSearch}

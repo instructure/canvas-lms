@@ -20,7 +20,7 @@ import PropTypes from 'prop-types'
 
 export const alignmentShape = PropTypes.shape({
   _id: PropTypes.string.isRequired,
-  contentType: PropTypes.oneOf(['Assignment', 'Rubric']).isRequired,
+  contentType: PropTypes.oneOf(['Assignment', 'Rubric', 'AssessmentQuestionBank']).isRequired,
   title: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
   moduleTitle: PropTypes.string,

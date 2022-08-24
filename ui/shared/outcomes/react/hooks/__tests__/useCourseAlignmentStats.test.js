@@ -31,9 +31,22 @@ describe('useCourseAlignmentStats', () => {
   let cache, showFlashAlertSpy
   const refetchMocks = [...courseAlignmentStatsMocks(), ...courseAlignmentStatsMocks({id: '2'})]
   const getStats = result => {
-    const {totalOutcomes, alignedOutcomes, totalAlignments, totalArtifacts, alignedArtifacts} =
-      result.current.data.course.outcomeAlignmentStats
-    return [totalOutcomes, alignedOutcomes, totalAlignments, totalArtifacts, alignedArtifacts]
+    const {
+      totalOutcomes,
+      alignedOutcomes,
+      totalAlignments,
+      totalArtifacts,
+      alignedArtifacts,
+      artifactAlignments
+    } = result.current.data.course.outcomeAlignmentStats
+    return [
+      totalOutcomes,
+      alignedOutcomes,
+      totalAlignments,
+      totalArtifacts,
+      alignedArtifacts,
+      artifactAlignments
+    ]
   }
 
   beforeEach(() => {
@@ -67,7 +80,7 @@ describe('useCourseAlignmentStats', () => {
     expect(result.current.data).toEqual({})
     await act(async () => jest.runAllTimers())
     expect(result.current.loading).toBe(false)
-    expect(getStats(result)).toEqual([2, 1, 4, 5, 4])
+    expect(getStats(result)).toEqual([2, 1, 4, 5, 3, 3])
   })
 
   it('displays flash error message when stats fail to load', async () => {
@@ -96,7 +109,7 @@ describe('useCourseAlignmentStats', () => {
     expect(hook.result.current.data).toEqual({})
     await act(async () => jest.runAllTimers())
     expect(hook.result.current.loading).toBe(false)
-    expect(getStats(hook.result)).toEqual([2, 1, 4, 5, 4])
+    expect(getStats(hook.result)).toEqual([2, 1, 4, 5, 3, 3])
 
     // fetch a different course to force hook rerender
     // then refetch the original course to test refetch
@@ -105,6 +118,6 @@ describe('useCourseAlignmentStats', () => {
     expect(hook.result.current.loading).toBe(true)
     await act(async () => jest.runAllTimers())
     expect(hook.result.current.loading).toBe(false)
-    expect(getStats(hook.result)).toEqual([12, 11, 14, 15, 14])
+    expect(getStats(hook.result)).toEqual([12, 11, 14, 15, 13, 13])
   })
 })
