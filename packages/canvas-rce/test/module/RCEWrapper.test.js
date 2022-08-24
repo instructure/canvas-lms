@@ -62,6 +62,9 @@ function createdMountedElement(additionalProps = {}) {
       liveRegion: () => document.getElementById('flash_screenreader_holder'),
       canUploadFiles: false,
       ...trayProps(),
+      features: {
+        new_equation_editor: true
+      },
       ...additionalProps
     })
   )
@@ -95,7 +98,10 @@ function defaultProps() {
     autosave: {enabled: false},
     ltiTools: [],
     editorOptions: {},
-    liveRegion: () => document.getElementById('flash_screenreader_holder')
+    liveRegion: () => document.getElementById('flash_screenreader_holder'),
+    features: {
+      new_equation_editor: true
+    }
   }
 }
 
