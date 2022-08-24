@@ -137,6 +137,7 @@ export default class Navigation extends React.Component {
     profileAreLoaded: false,
     historyLoading: false,
     historyAreLoaded: false,
+    releaseNotesPollInterval: 30000,
     releaseNotesBadgeDisabled:
       !ENV.FEATURES.embedded_release_notes || ENV.SETTINGS.release_notes_badge_disabled
   }
@@ -307,6 +308,14 @@ export default class Navigation extends React.Component {
         this.setState({type: null})
       }, 150)
     })
+  }
+
+  handlePollingInterval = count => {
+    if (count > 0) {
+      this.setState({releaseNotesPollInterval: 30000})
+    } else {
+      this.setState({releaseNotesPollInterval: 300000})
+    }
   }
 
   renderTrayContent() {
@@ -525,10 +534,8 @@ export default class Navigation extends React.Component {
             }
             dataUrl="/api/v1/release_notes/unread_count"
             srText={this.releaseNotesBadgeText}
-            // Don't bother re-fetching unless it's at least 5 minutes old
-            allowedAge={5 * 60 * 1000}
-            // Don't poll-this changes rarely enough and new features usually require a page refresh anyways
-            pollIntervalMs={0}
+            onUpdate={this.handlePollingInterval}
+            pollIntervalMs={this.state.releaseNotesPollInterval}
           />
         )}
       </>
