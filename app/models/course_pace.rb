@@ -113,14 +113,14 @@ class CoursePace < ActiveRecord::Base
       Assignment.suspend_due_date_caching do
         Assignment.suspend_grading_period_grade_recalculation do
           progress&.calculate_completion!(0, student_enrollments.size)
-          ordered_module_items = course_pace_module_items.not_deleted
-                                                         .sort_by { |ppmi| ppmi.module_item.position }
-                                                         .group_by { |ppmi| ppmi.module_item.context_module }
-                                                         .sort_by { |context_module, _items| context_module.position }
-                                                         .to_h.values.flatten
           student_enrollments.each do |enrollment|
+            compressed_module_items = compress_dates(start_date: nil, enrollment: enrollment)
+                                      .sort_by { |ppmi| ppmi.module_item.position }
+                                      .group_by { |ppmi| ppmi.module_item.context_module }
+                                      .sort_by { |context_module, _items| context_module.position }
+                                      .to_h.values.flatten
             dates =
-              CoursePaceDueDatesCalculator.new(self).get_due_dates(ordered_module_items, enrollment)
+              CoursePaceDueDatesCalculator.new(self).get_due_dates(compressed_module_items, enrollment)
             course_pace_module_items.each do |course_pace_module_item|
               content_tag = course_pace_module_item.module_item
               assignment = content_tag.assignment
@@ -190,16 +190,20 @@ class CoursePace < ActiveRecord::Base
       Assignment.clear_cache_keys(assignments_to_refresh, :availability)
       DueDateCacher.recompute_course(course, assignments: assignments_to_refresh, update_grades: true)
 
+      # Maintain the weights of the module items
+      course_pace_module_items.each(&:restore_attributes)
+
       # Mark as published
       log_module_items_count
       update(workflow_state: "active", published_at: DateTime.current)
     end
   end
 
-  def compress_dates(save: true, start_date: self.start_date)
+  def compress_dates(save: false, start_date: self.start_date, enrollment: nil)
     CoursePaceHardEndDateCompressor.compress(
       self,
       course_pace_module_items,
+      enrollment: enrollment,
       save: save,
       start_date: start_date
     )
