@@ -19,6 +19,8 @@ module.exports = {
   require: [
     '@instructure/canvas-theme',
     'jsdom-global/register',
-    require.resolve('./babel-register.js')
-  ]
+    require.resolve('./babel-register.js'),
+    'ts-node/register/transpile-only'
+  ],
+  extension: ['ts', 'tsx', 'js']
 }
