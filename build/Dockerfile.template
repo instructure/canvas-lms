@@ -8,7 +8,7 @@ FROM starlord.inscloudgate.net/jenkins/ruby-passenger:$RUBY
 <% end -%>
 LABEL maintainer="Instructure"
 
-ARG POSTGRES_CLIENT=12
+ARG POSTGRES_CLIENT=14
 ENV APP_HOME /usr/src/app/
 <% if development? -%>
 ENV RAILS_ENV development
