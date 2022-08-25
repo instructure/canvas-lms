@@ -162,8 +162,7 @@ const CalendarEventDetailsForm = ({
   }, [context, shouldShowConferenceWidget])
 
   const changeContext = value => {
-    // check conference is still valid in context, and remove it if it is not
-    const newContext = allContexts.find(ctxt => ctxt.name === value)
+    const newContext = contextFromCode(value)
 
     if (
       canUpdateConference() &&
@@ -409,16 +408,16 @@ const CalendarEventDetailsForm = ({
             data-testid="edit-calendar-event-form-context"
             renderLabel={I18n.t('Calendar:')}
             assistiveText={I18n.t('Use arrow keys to navigate options.')}
-            value={context.name}
+            value={context.asset_string}
             onChange={(e, {value}) => changeContext(value)}
           >
             {allContexts
               .filter(ctxt => ctxt.can_create_calendar_events)
               .map((ctxt, index) => (
                 <SimpleSelect.Option
-                  key={ctxt.name}
+                  key={ctxt.asset_string}
                   id={`opt-${index}`}
-                  value={ctxt.name}
+                  value={ctxt.asset_string}
                   renderLabel={ctxt.name}
                 >
                   {ctxt.name}
