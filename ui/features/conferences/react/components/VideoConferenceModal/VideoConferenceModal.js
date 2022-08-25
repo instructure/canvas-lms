@@ -36,9 +36,6 @@ export const VideoConferenceModal = ({
   onSubmit,
   ...props
 }) => {
-  const SETTINGS_TAB = 'settings'
-  const ATTENDEES_TAB = 'attendees'
-
   const OPTIONS_DEFAULT = ['recording_enabled', 'no_time_limit', 'enable_waiting_room']
   const INVITATION_OPTIONS_DEFAULT = ['invite_all']
   const ATTENDEES_OPTIONS_DEFAULT = [
@@ -78,7 +75,7 @@ export const VideoConferenceModal = ({
       <CloseButton
         placement="end"
         offset="medium"
-        onClick={props.onDismiss}
+        onClick={onDismiss}
         screenReaderLabel={I18n.t('Close')}
       />
     )
@@ -139,11 +136,13 @@ export const VideoConferenceModal = ({
         e.preventDefault()
         onSubmit(e, {
           name,
+          conferenceType,
           duration,
           options,
           description,
           invitationOptions,
-          attendeesOptions
+          attendeesOptions,
+          selectedAttendees
         })
       }}
       size="auto"

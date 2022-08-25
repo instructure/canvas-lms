@@ -40,7 +40,7 @@ describe('VideoConferenceModal', () => {
   const setup = (props = {}) => {
     return render(
       <VideoConferenceModal
-        open
+        open={true}
         availableAttendeesList={userList}
         onDismiss={onDismiss}
         onSubmit={onSubmit}
@@ -95,6 +95,7 @@ describe('VideoConferenceModal', () => {
       name: 'A great video conference name',
       duration: 60,
       options: ['recording_enabled', 'no_time_limit', 'enable_waiting_room'],
+      conferenceType: 'BigBlueButton',
       description: 'A great video conference description',
       invitationOptions: ['invite_all'],
       attendeesOptions: [
@@ -103,7 +104,8 @@ describe('VideoConferenceModal', () => {
         'share_microphone',
         'send_public_chat',
         'send_private_chat'
-      ]
+      ],
+      selectedAttendees: []
     })
   })
 
