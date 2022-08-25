@@ -4734,6 +4734,10 @@ describe CoursesController, type: :request do
         expect(json.keys).to contain_exactly(@assignment1.id.to_s, @assignment2.id.to_s)
       end
 
+      it "raises an error if the assignment_ids param is an array of non-numerics" do
+        api_call(:get, @effective_due_dates_path, @options.merge(assignment_ids: ["[#{@assignment1.id},#{@assignment2.id}]"]), {}, {}, expected_status: 422)
+      end
+
       it "each assignment only contains keys for students that are assigned to it" do
         @new_student = student_in_course(course: @test_course, active_all: true).user
         override = @assignment1.assignment_overrides.create!(
