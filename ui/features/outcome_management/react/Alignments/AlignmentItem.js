@@ -24,7 +24,8 @@ import {
   IconAssignmentLine,
   IconRubricLine,
   IconQuizLine,
-  IconDiscussionLine
+  IconDiscussionLine,
+  IconBankLine
 } from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -44,6 +45,8 @@ const AlignmentItem = ({
 }) => {
   const renderIcon = () => {
     if (contentType === 'Rubric') return <IconRubricLine data-testid="alignment-item-rubric-icon" />
+    if (contentType === 'AssessmentQuestionBank')
+      return <IconBankLine data-testid="alignment-item-bank-icon" />
     if (assignmentContentType === 'quiz')
       return <IconQuizLine data-testid="alignment-item-quiz-icon" />
     if (assignmentContentType === 'discussion')
@@ -66,7 +69,7 @@ const AlignmentItem = ({
           {renderIcon()}
         </div>
       </Flex.Item>
-      <Flex.Item size="50%" shouldGrow>
+      <Flex.Item size="50%" shouldGrow={true}>
         <Flex as="div" direction="column">
           <Flex.Item as="div" padding="xxx-small">
             <Link interaction="enabled" isWithinText={false} href={url} target="_blank">
@@ -82,7 +85,7 @@ const AlignmentItem = ({
               <Flex.Item size="3.5rem">
                 <Text size="small">{`${I18n.t('Module')}:`}</Text>
               </Flex.Item>
-              <Flex.Item size="50%" shouldGrow>
+              <Flex.Item size="50%" shouldGrow={true}>
                 {moduleTitle && moduleUrl ? (
                   <div style={{paddingTop: '0.14rem'}}>
                     <Text size="small">
