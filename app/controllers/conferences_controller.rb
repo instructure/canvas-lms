@@ -318,7 +318,8 @@ class ConferencesController < ApplicationController
       group_user_ids_map: @group_user_ids_map,
       section_user_ids_map: @section_user_ids_map,
       can_create_conferences: @context.grants_right?(@current_user, session, :create_conferences),
-      render_alternatives: @render_alternatives
+      render_alternatives: @render_alternatives,
+      bbb_modal_update: Account.site_admin.feature_enabled?(:bbb_modal_update)
     )
     set_tutorial_js_env
     flash[:error] = t("Some conferences on this page are hidden because of errors while retrieving their status") if @errors
