@@ -61,8 +61,12 @@ const Template = props => (
     onSetInvitationOptions={props.setInvitationOptions}
     attendeesOptions={props.attendeesOptions}
     onSetAttendeesOptions={props.setAttendeesOptions}
+    showCalendar={props.showCalendar}
   />
 )
 
 export const Default = Template.bind({})
 Default.args = {...defaultProps}
+
+export const WithCalendar = Template.bind({})
+WithCalendar.args = {...defaultProps, showCalendar: true}

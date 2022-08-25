@@ -63,12 +63,26 @@ export const VideoConferenceModal = ({
   const [selectedAttendees, setSelectedAttendees] = useState(
     props.selectedAttendees ? props.selectedAttendees : []
   )
+  const [startCalendarDate, setStartCalendarDate] = useState(
+    props.startCalendarDate ? props.startCalendarDate : new Date().toISOString()
+  )
+  const [endCalendarDate, setEndCalendarDate] = useState(
+    props.endCalendarDate ? props.endCalendarDate : new Date().toISOString()
+  )
+
+  const [showCalendarOptions, setShowCalendarOptions] = useState(false)
 
   // Detect initial state for address book display
   useEffect(() => {
     const inviteAll = invitationOptions.includes('invite_all')
     inviteAll ? setShowAddressBook(false) : setShowAddressBook(true)
   }, [invitationOptions])
+
+  // Detect initial state for calender picker display
+  useEffect(() => {
+    const addToCalendar = options.includes('add_to_calendar')
+    addToCalendar ? setShowCalendarOptions(true) : setShowCalendarOptions(false)
+  }, [options])
 
   const renderCloseButton = () => {
     return (
@@ -103,6 +117,11 @@ export const VideoConferenceModal = ({
           onAttendeesChange={setSelectedAttendees}
           availableAttendeesList={availableAttendeesList}
           selectedAttendees={selectedAttendees}
+          showCalendar={showCalendarOptions}
+          startDate={startCalendarDate}
+          endDate={endCalendarDate}
+          onStartDateChange={setStartCalendarDate}
+          onEndDateChange={setEndCalendarDate}
         />
       )
     }
@@ -142,12 +161,14 @@ export const VideoConferenceModal = ({
           description,
           invitationOptions,
           attendeesOptions,
-          selectedAttendees
+          selectedAttendees,
+          startCalendarDate,
+          endCalendarDate
         })
       }}
       size="auto"
       label={header}
-      shouldCloseOnDocumentClick
+      shouldCloseOnDocumentClick={true}
     >
       <Modal.Header>
         {renderCloseButton()}
@@ -185,7 +206,9 @@ VideoConferenceModal.propTypes = {
   attendeesOptions: PropTypes.arrayOf(PropTypes.string),
   type: PropTypes.string,
   availableAttendeesList: PropTypes.arrayOf(PropTypes.object),
-  selectedAttendees: PropTypes.arrayOf(PropTypes.string)
+  selectedAttendees: PropTypes.arrayOf(PropTypes.string),
+  startCalendarDate: PropTypes.string,
+  endCalendarDate: PropTypes.string
 }
 
 VideoConferenceModal.defaultProps = {
