@@ -259,6 +259,30 @@ describe "calendar2" do
         expect(@course.calendar_events.last.important_dates).to be_truthy
       end
 
+      context "with account level calendars" do
+        before do
+          Account.site_admin.enable_feature! :account_calendar_events # if needed
+          account = Account.default # or (Account.create!)
+          account.account_calendar_visible = true
+          account.save!
+        end
+
+        it "users can switch between an account calendar and a user calendar with the same name" do
+          @course.account.name = "nobody+1@example.com"
+          @course.account.save!
+          enable_course_account_calendar
+          calendar_create_event_button.click
+          replace_content(edit_calendar_event_form_title, "Pandamonium")
+          edit_calendar_event_form_context.click
+          edit_calendar_event_form_context.send_keys(:down)
+          edit_calendar_event_form_context.send_keys(:return)
+          edit_calendar_event_form_submit_button.click
+          wait_for_ajaximations
+          expect(@user.calendar_events.last).to be_nil
+          expect(@course.account.calendar_events.last.title).to eq("Pandamonium")
+        end
+      end
+
       context "with course pacing" do
         before do
           Account.site_admin.enable_feature! :account_level_blackout_dates
