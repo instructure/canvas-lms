@@ -59,6 +59,29 @@ describe "threaded discussions" do
       expect(f("iframe[src='https://example.com']")).to be_present
     end
 
+    it "only respects the 'n' shortcut when no rce editors are open" do
+      @topic.discussion_entries.create!(
+        user: @student,
+        message: "new threaded reply from student"
+      )
+      user_session(@teacher)
+      Discussion.visit(@course, @topic)
+
+      # verify n triggered editor to open
+      driver.action.send_keys("n").perform
+      expect(f(".tox-editor-container")).to be_present
+
+      fj("a:contains('Cancel')").click
+
+      # open the editor for a reply, then put focus outside of editor
+      f("a[data-event='addReply']").click
+      f("h1").click
+
+      # verify pressing n again does not open an additional editor
+      driver.action.send_keys("n").perform
+      expect(ff(".tox-editor-container").size).to eq 1
+    end
+
     it "allows edits to entries with replies", priority: "2" do
       user_session(@teacher)
       edit_text = "edit message"
