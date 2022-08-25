@@ -33,6 +33,9 @@ const userList = [
   {displayName: 'Omar Soto Fortuno', id: '4'}
 ]
 
+const startCalendarDate = new Date().toISOString()
+const endCalendarDate = new Date().toISOString()
+
 describe('VideoConferenceModal', () => {
   const onDismiss = jest.fn()
   const onSubmit = jest.fn()
@@ -44,6 +47,8 @@ describe('VideoConferenceModal', () => {
         availableAttendeesList={userList}
         onDismiss={onDismiss}
         onSubmit={onSubmit}
+        startCalendarDate={startCalendarDate}
+        endCalendarDate={endCalendarDate}
         {...props}
       />
     )
@@ -105,7 +110,9 @@ describe('VideoConferenceModal', () => {
         'send_public_chat',
         'send_private_chat'
       ],
-      selectedAttendees: []
+      selectedAttendees: [],
+      startCalendarDate,
+      endCalendarDate
     })
   })
 

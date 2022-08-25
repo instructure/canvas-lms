@@ -64,6 +64,9 @@ describe('BBBModalOptions', () => {
         onSetInvitationOptions={props.setInvitationOptions}
         attendeesOptions={props.attendeesOptions}
         onSetAttendeesOptions={props.setAttendeesOptions}
+        showCalendar={props.showCalendar}
+        startDate={props.startDate}
+        endDate={props.endDate}
       />
     )
   }
@@ -93,5 +96,29 @@ describe('BBBModalOptions', () => {
 
     fireEvent.click(container.getByText('Attendees'))
     expect(container.getByLabelText('Share webcam').checked).toBeTruthy()
+  })
+
+  it('it should set default calendar dates when provided', () => {
+    const customProps = defaultProps
+    customProps.showCalendar = true
+    const container = setup(customProps)
+
+    const startInput = container.getByLabelText('Start Date')
+    const endInput = container.getByLabelText('End Date')
+
+    expect(startInput).toBeTruthy()
+    expect(endInput).toBeTruthy()
+  })
+
+  it('it should not render calendar when prop is false', () => {
+    const customProps = defaultProps
+    customProps.showCalendar = false
+    const container = setup(customProps)
+
+    const startInput = container.queryByLabelText('Start Date')
+    const endInput = container.queryByLabelText('End Date')
+
+    expect(startInput).toBeFalsy()
+    expect(endInput).toBeFalsy()
   })
 })
