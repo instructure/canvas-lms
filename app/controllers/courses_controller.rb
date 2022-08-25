@@ -3488,6 +3488,10 @@ class CoursesController < ApplicationController
     return unless authorized_action(@context, @current_user, :read_as_admin)
 
     assignment_ids = effective_due_dates_params[:assignment_ids]
+    unless validate_assignment_ids(assignment_ids)
+      return render json: { errors: t("%{assignment_ids} param is invalid", assignment_ids: "assignment_ids") }, status: :unprocessable_entity
+    end
+
     due_dates = if assignment_ids.present?
                   EffectiveDueDates.for_course(@context, assignment_ids)
                 else
@@ -3962,6 +3966,10 @@ class CoursesController < ApplicationController
   helper_method :visible_self_enrollment_option
 
   private
+
+  def validate_assignment_ids(assignment_ids)
+    assignment_ids.nil? || assignment_ids.all?(/\A\d+\z/)
+  end
 
   def observee_selected?
     @selected_observed_user.present? && @selected_observed_user != @current_user
