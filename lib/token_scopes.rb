@@ -58,13 +58,6 @@ class TokenScopes
     LTI_NRPS_V2_SCOPE => I18n.t("Can retrieve user data associated with the context the tool is installed in."),
     LTI_UPDATE_PUBLIC_JWK_SCOPE => I18n.t("Can update public jwk for LTI services."),
     LTI_ACCOUNT_LOOKUP_SCOPE => I18n.t("Can lookup Account information"),
-    LTI_CREATE_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can create subscription to data service data."),
-    LTI_SHOW_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can show subscription to data service data."),
-    LTI_UPDATE_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can update subscription to data service data."),
-    LTI_LIST_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can list subscriptions to data service data."),
-    LTI_DESTROY_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can destroy subscription to data service data."),
-    LTI_LIST_EVENT_TYPES_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can list categorized event types."),
-    LTI_SHOW_FEATURE_FLAG_SCOPE => I18n.t("Can view feature flags"),
     LTI_AGS_SHOW_PROGRESS_SCOPE => I18n.t("Can view Progress records associated with the context the tool is installed in"),
   }.freeze
   LTI_AGS_SCOPES = [
@@ -80,6 +73,13 @@ class TokenScopes
     LTI_LIST_ACCOUNT_EXTERNAL_TOOLS_SCOPE => I18n.t("Can list external tools."),
     LTI_SHOW_ACCOUNT_EXTERNAL_TOOLS_SCOPE => I18n.t("Can show external tools."),
     LTI_UPDATE_ACCOUNT_EXTERNAL_TOOLS_SCOPE => I18n.t("Can update external tools."),
+    LTI_CREATE_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can create subscription to data service data."),
+    LTI_SHOW_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can show subscription to data service data."),
+    LTI_UPDATE_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can update subscription to data service data."),
+    LTI_LIST_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can list subscriptions to data service data."),
+    LTI_DESTROY_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can destroy subscription to data service data."),
+    LTI_LIST_EVENT_TYPES_DATA_SERVICE_SUBSCRIPTION_SCOPE => I18n.t("Can list categorized event types."),
+    LTI_SHOW_FEATURE_FLAG_SCOPE => I18n.t("Can view feature flags"),
   }.freeze
 
   def self.named_scopes
