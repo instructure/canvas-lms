@@ -452,7 +452,7 @@ describe AccountNotification do
         expected_users = []
 
         User.all.each do |u|
-          if u.enrollments.active_or_pending_by_date.count == 0
+          if u.enrollments.active_or_pending_by_date.count == 0 && u.user_account_associations.count > 0
             expected_users << u
           end
         end
@@ -479,11 +479,6 @@ describe AccountNotification do
 
         # Only the unenrolled user from the account1 and users without account associations should be notified
         expected_users = [user1]
-        User.all.each do |u|
-          if u.enrollments.active_or_pending_by_date.count == 0 && u.user_account_associations.count == 0
-            expected_users << u
-          end
-        end
 
         expect(an.applicable_user_ids).to match_array(expected_users.map(&:id))
       end
