@@ -6900,7 +6900,7 @@ es-ES:
     show_more_link: 
       show_less: "Mostrar menos"
       show_more: "Mostrar más"
-  dashboard_7f1dbf71: "Cuadro de mando"
+  dashboard_7f1dbf71: "Panel de control"
   dashboard_card_movement_menu_b65b98f5: "Menú de movimiento en la tarjeta del panel de control"
   dashboard_options_b240ed5a: "Opciones del panel de control"
   dashboard_view_d7d85969: "Vista del panel de control"
@@ -14681,7 +14681,7 @@ es-ES:
   outcomes_service_alignment_migration_5b4391ad: "Migración de la alineación de servicios de competencias"
   outcomes_tutorial_tray_ebfce995: "Bandeja de tutoriales: competencias"
   over_time_bee1a733: "durante un período"
-  override_3de65b2c: Anular
+  override_3de65b2c: "Nota total revisada"
   override_grade_385adf30: "anular nota"
   override_score_53994655: "anular puntuación"
   override_score_5f3c1189: "Anular puntuación"
@@ -18172,7 +18172,7 @@ es-ES:
       already_enrolled: "Ya estás inscrito en **%{course}**."
       buttons: 
         go_to_course: "Ir a la asignatura"
-        go_to_dashboard: "Ir al cuadro de mando"
+        go_to_dashboard: "Ir al panel de control"
     authenticate: 
       buttons: 
         enroll_in_course: "Inscribirse en la asignatura"
@@ -18206,7 +18206,7 @@ es-ES:
       already_enrolled: "Te has inscrito en **%{course}**."
       buttons: 
         go_to_course: "Ir a la asignatura"
-        go_to_dashboard: "Ir al cuadro de mando"
+        go_to_dashboard: "Ir al panel de control"
       not_available_yet: "Te enviaremos un correo electrónico antes de que comience la asignatura."
   self_registration_156392d6: Autorregistro
   self_service_user_merge_d66f3903: "Fusión de usuarios de autoservicio"
@@ -21068,7 +21068,7 @@ es-ES:
   top_box_background_6db383e9: "Fondo superior de la caja"
   top_box_border_94cee4a7: "Borde superior de la caja"
   topic_podcast_feed_9ab6f5ac: "Tema: Comentarios del pódcast"
-  total_71a4807: Total
+  total_71a4807: "Nota total"
   total_activity_21022e7c: "Actividad total"
   total_grade_b0c33841: "Total: %{grade}"
   total_messages_af025be6: "Total de mensajes"

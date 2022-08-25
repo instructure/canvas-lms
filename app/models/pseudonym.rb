@@ -26,6 +26,7 @@ class Pseudonym < ActiveRecord::Base
   attr_writer :current_user
 
   include Workflow
+  include SearchTermHelper
 
   has_many :session_persistence_tokens
   belongs_to :account
