@@ -53,7 +53,7 @@ export default function CollectionPanel(props) {
           suppressRenderEmpty={props.suppressRenderEmpty}
           contextType={props.contextType}
           searchString={props.searchString}
-          isEdit={props.isEdit}
+          editing={props.editing}
           onEditClick={props.onEditClick}
         />
       </AccordionSection>
@@ -77,12 +77,12 @@ CollectionPanel.propTypes = {
   toggleNewPageForm: func,
   onChangeAccordion: func.isRequired,
   selectedAccordionIndex: string,
-  isEdit: bool,
+  editing: bool,
   onEditClick: func
 }
 
 CollectionPanel.defaultProps = {
   renderNewPageLink: false,
   suppressRenderEmpty: false,
-  isEdit: false
+  editing: false
 }

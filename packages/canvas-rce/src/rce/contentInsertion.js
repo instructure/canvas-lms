@@ -232,12 +232,11 @@ function insertUndecoratedLink(editor, linkProps) {
     target: linkProps.target,
     class: linkProps.class,
     title: linkProps.title,
-    'data-canvas-previewable': linkProps['data-canvas-previewable']
+    'data-canvas-previewable': linkProps['data-canvas-previewable'],
+    'data-course-type': linkProps['data-course-type'],
+    'data-published': linkProps['data-published']
   }
-  if (linkProps.course_link) {
-    linkAttrs['data-course-type'] = linkProps.type
-    linkAttrs['data-published'] = linkProps.published
-  }
+
   if (linkAttrs.target === '_blank') {
     linkAttrs.rel = 'noopener noreferrer'
   }

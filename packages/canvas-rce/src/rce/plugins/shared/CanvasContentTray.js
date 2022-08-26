@@ -339,15 +339,11 @@ export default function CanvasContentTray(props) {
     handleDismissTray()
 
     const newLink = {
+      ...link,
       forceRename: true,
-      href: link.href,
-      text: linkText || placeholderText,
-      title: link.title,
-      type: link.type,
-      published:
-        link.type === 'navigation' || link.type === 'announcements' ? null : link.published,
-      course_link: true
+      text: linkText || placeholderText
     }
+
     bridge.insertLink(newLink)
   }
 
@@ -492,7 +488,7 @@ export default function CanvasContentTray(props) {
                     Icon={Icon}
                     placeholderText={placeholderText}
                     linkFileName={link?.title || ''}
-                    color={link?.published ? 'success' : 'primary'}
+                    published={link?.published || false}
                     handleTextChange={setLinkText}
                   />
                 )}
@@ -531,7 +527,7 @@ export default function CanvasContentTray(props) {
                         host={props.host}
                         refreshToken={props.refreshToken}
                         context={{type: props.contextType, id: props.contextId}}
-                        isEdit={isEditTray}
+                        editing={isEditTray}
                         onEditClick={setLink}
                         {...contentProps}
                       />
@@ -583,7 +579,6 @@ CanvasContentTray.propTypes = {
   bridge: instanceOf(Bridge).isRequired,
   editor: shape({id: string}).isRequired,
   onTrayClosing: func, // called with true when the tray starts closing, false once closed
-  isEdit: bool,
   onEditClick: func,
   ...trayPropsMap
 }
@@ -595,7 +590,6 @@ CanvasContentTray.defaultProps = {
   filesTabDisabled: false,
   refreshToken: null,
   source: null,
-  themeUrl: null,
-  isEdit: false
+  themeUrl: null
 }
 /* eslint-enable react/default-props-match-prop-types */

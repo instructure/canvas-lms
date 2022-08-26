@@ -20,20 +20,34 @@ import React from 'react'
 import {LinkDisplay} from '../LinkDisplay'
 import {render, fireEvent} from '@testing-library/react'
 import {IconBlank} from '../linkUtils'
+import {showFlashAlert} from '../../../../canvasFileBrowser/FlashAlert'
+
+jest.mock('../../../../canvasFileBrowser/FlashAlert')
 
 describe('LinkDisplay', () => {
+  let props
+
+  beforeEach(() => {
+    props = {
+      linkText: 'default text',
+      linkFileName: 'default link filename',
+      Icon: IconBlank,
+      placeholderText: 'default placeholder',
+      published: true,
+      handleTextChange: jest.fn()
+    }
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
+  afterAll(() => {
+    jest.resetAllMocks()
+  })
+
   const renderComponent = overrideProps => {
-    return render(
-      <LinkDisplay
-        linkText="default text"
-        Icon={IconBlank}
-        placeholderText="default placeholder"
-        linkFileName="default link filename"
-        color="primary"
-        handleTextChange={jest.fn()}
-        {...overrideProps}
-      />
-    )
+    return render(<LinkDisplay {...props} {...overrideProps} />)
   }
 
   it('text input displays link text prop', () => {
@@ -60,8 +74,14 @@ describe('LinkDisplay', () => {
     expect(linkName.innerHTML).toEqual('default link filename')
   })
 
-  it('icon color matches the prop', () => {
+  it('icon color is success when published', () => {
     const {getByTestId} = renderComponent()
+    const iconWrapper = getByTestId('icon-wrapper')
+    expect(iconWrapper).toHaveAttribute('color', 'success')
+  })
+
+  it('icon color is primary when not published', () => {
+    const {getByTestId} = renderComponent({published: false})
     const iconWrapper = getByTestId('icon-wrapper')
     expect(iconWrapper).toHaveAttribute('color', 'primary')
   })
@@ -72,5 +92,15 @@ describe('LinkDisplay', () => {
     const textInput = getByLabelText(/text \(optional\)/i)
     fireEvent.input(textInput, {target: {value: 'something'}})
     expect(callback).toHaveBeenCalledWith('something')
+  })
+
+  it('announces selection changes', () => {
+    const {rerender} = renderComponent()
+    rerender(<LinkDisplay {...props} linkFileName="Course Link 2" />)
+    expect(showFlashAlert).toHaveBeenLastCalledWith({
+      message: 'Selected Course Link 2',
+      srOnly: true,
+      type: 'info'
+    })
   })
 })
