@@ -413,8 +413,27 @@ describe('originality report', () => {
         data: '{}'
       }
     ]
+    props.assignment.env.originalityReportsForA2Enabled = true
     const {queryByTestId} = render(<Header {...props} />)
     expect(queryByTestId('originality_report')).toBeInTheDocument()
+  })
+
+  it('is not rendered when the originality reports for a2 FF is not enabled', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: {submissionType: 'online_text_entry'}
+    })
+    props.submission.turnitinData = [
+      {
+        similarity_score: 10,
+        state: 'acceptable',
+        report_url: 'http://example.com',
+        status: 'scored',
+        data: '{}'
+      }
+    ]
+    props.assignment.env.originalityReportsForA2Enabled = false
+    const {queryByTestId} = render(<Header {...props} />)
+    expect(queryByTestId('originality_report')).not.toBeInTheDocument()
   })
 
   it('is rendered when a submission exists with turnitinData attached and the assignment is available with a online upload submission with only one attachment', async () => {
@@ -439,6 +458,7 @@ describe('originality report', () => {
         data: '{}'
       }
     ]
+    props.assignment.env.originalityReportsForA2Enabled = true
     const {queryByTestId} = render(<Header {...props} />)
     expect(queryByTestId('originality_report')).toBeInTheDocument()
   })
