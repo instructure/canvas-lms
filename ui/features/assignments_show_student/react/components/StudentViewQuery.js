@@ -47,6 +47,7 @@ function getAssignmentEnvVariables() {
     modulePrereq: null,
     moduleUrl: `${baseUrl}/modules`,
     belongsToUnpublishedModule: ENV.belongs_to_unpublished_module,
+    originalityReportsForA2Enabled: ENV.originality_reports_for_a2_enabled,
     peerReviewModeEnabled: ENV.peer_review_mode_enabled,
     peerReviewAvailable: ENV.peer_review_available,
     peerDisplayName: ENV.peer_display_name

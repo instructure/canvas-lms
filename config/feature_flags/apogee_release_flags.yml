@@ -138,3 +138,15 @@ peer_reviews_for_a2:
   display_name: Peer Review Support in Assignment Enhancements
   description: Students will be able to provide feedback on another student's assignment submission
     using the enhanced assignment view
+originality_reports_for_a2:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Originality Reports with Assignment Enhancements
+  description: If set, displays originality reports with Assignment Enhancements turned on
+  environments:
+    ci:
+      state: on # enable for automated testings builds and local testing
+    development:
+      state: on # enable for local development
+    test:
+      state: on # enable for the deployed 'test' environment
