@@ -88,79 +88,91 @@ describe "calendar2" do
       expect(student2.conversations).to be_empty
     end
 
-    it "editing an existing assignment should select the correct assignment group" do
-      group1 = @course.assignment_groups.create!(name: "Assignment Group 1")
-      group2 = @course.assignment_groups.create!(name: "Assignment Group 2")
-      @course.active_assignments.create(name: "Assignment 1", assignment_group: group1, due_at: Time.zone.now)
-      assignment2 = @course.active_assignments.create(name: "Assignment 2", assignment_group: group2, due_at: Time.zone.now)
+    context "assignments" do
+      it "editing an existing assignment should select the correct assignment group" do
+        group1 = @course.assignment_groups.create!(name: "Assignment Group 1")
+        group2 = @course.assignment_groups.create!(name: "Assignment Group 2")
+        @course.active_assignments.create(name: "Assignment 1", assignment_group: group1, due_at: Time.zone.now)
+        assignment2 = @course.active_assignments.create(name: "Assignment 2", assignment_group: group2, due_at: Time.zone.now)
 
-      get "/calendar2"
-      events = ff(".fc-event")
-      event1 = events.detect { |e| e.text.include?("Assignment 1") }
-      event2 = events.detect { |e| e.text.include?("Assignment 2") }
-      expect(event1).not_to be_nil
-      expect(event2).not_to be_nil
-      expect(event1).not_to eq event2
+        get "/calendar2"
+        events = ff(".fc-event")
+        event1 = events.detect { |e| e.text.include?("Assignment 1") }
+        event2 = events.detect { |e| e.text.include?("Assignment 2") }
+        expect(event1).not_to be_nil
+        expect(event2).not_to be_nil
+        expect(event1).not_to eq event2
 
-      event1.click
-      wait_for_ajaximations
-      driver.execute_script("$('.edit_event_link').hover().click()")
-      wait_for_ajaximations
+        event1.click
+        wait_for_ajaximations
+        driver.execute_script("$('.edit_event_link').hover().click()")
+        wait_for_ajaximations
 
-      select = f("#edit_assignment_form .assignment_group")
-      expect(first_selected_option(select).attribute(:value).to_i).to eq group1.id
-      close_visible_dialog
+        select = f("#edit_assignment_form .assignment_group")
+        expect(first_selected_option(select).attribute(:value).to_i).to eq group1.id
+        close_visible_dialog
 
-      event2.click
-      wait_for_ajaximations
+        event2.click
+        wait_for_ajaximations
 
-      driver.execute_script("$('.edit_event_link').hover().click()")
-      wait_for_ajaximations
-      select = f("#edit_assignment_form .assignment_group")
-      expect(first_selected_option(select).attribute(:value).to_i).to eq group2.id
-      replace_content(f(".ui-dialog #assignment_title"), "Assignment 2!")
-      submit_form("#edit_assignment_form")
-      wait_for_ajaximations
-      expect(assignment2.reload.title).to include("Assignment 2!")
-      expect(assignment2.assignment_group).to eq group2
-    end
+        driver.execute_script("$('.edit_event_link').hover().click()")
+        wait_for_ajaximations
+        select = f("#edit_assignment_form .assignment_group")
+        expect(first_selected_option(select).attribute(:value).to_i).to eq group2.id
+        replace_content(f(".ui-dialog #assignment_title"), "Assignment 2!")
+        submit_form("#edit_assignment_form")
+        wait_for_ajaximations
+        expect(assignment2.reload.title).to include("Assignment 2!")
+        expect(assignment2.assignment_group).to eq group2
+      end
 
-    it "editing an existing assignment should preserve more options link", priority: "1" do
-      assignment = @course.active_assignments.create!(name: "to edit", due_at: Time.zone.now)
-      get "/calendar2"
-      f(".fc-event").click
-      wait_for_ajaximations
-      hover_and_click ".edit_event_link"
-      wait_for_ajaximations
-      original_more_options = f(".more_options_link")["href"]
-      expect(original_more_options).not_to match(/undefined/)
-      replace_content(f(".ui-dialog #assignment_title"), "edited title")
-      submit_form("#edit_assignment_form")
-      wait_for_ajaximations
-      assignment.reload
-      wait_for_ajaximations
-      expect(assignment.title).to include("edited title")
+      it "editing an existing assignment should preserve more options link", priority: "1" do
+        assignment = @course.active_assignments.create!(name: "to edit", due_at: Time.zone.now)
+        get "/calendar2"
+        f(".fc-event").click
+        wait_for_ajaximations
+        hover_and_click ".edit_event_link"
+        wait_for_ajaximations
+        original_more_options = f(".more_options_link")["href"]
+        expect(original_more_options).not_to match(/undefined/)
+        replace_content(f(".ui-dialog #assignment_title"), "edited title")
+        submit_form("#edit_assignment_form")
+        wait_for_ajaximations
+        assignment.reload
+        wait_for_ajaximations
+        expect(assignment.title).to include("edited title")
 
-      f(".fc-event").click
-      wait_for_ajaximations
-      hover_and_click ".edit_event_link"
-      wait_for_ajaximations
-      expect(f(".more_options_link")["href"]).to match(original_more_options)
-    end
+        f(".fc-event").click
+        wait_for_ajaximations
+        hover_and_click ".edit_event_link"
+        wait_for_ajaximations
+        expect(f(".more_options_link")["href"]).to match(original_more_options)
+      end
 
-    it "makes an assignment undated if you delete the start date" do
-      skip_if_chrome("can not replace content")
-      create_middle_day_assignment("undate me")
-      f(".fc-event:not(.event_pending)").click
-      hover_and_click ".popover-links-holder .edit_event_link"
-      expect(f(".ui-dialog #assignment_due_at")).to be_displayed
+      it "makes an assignment undated if you delete the start date" do
+        skip_if_chrome("can not replace content")
+        create_middle_day_assignment("undate me")
+        f(".fc-event:not(.event_pending)").click
+        hover_and_click ".popover-links-holder .edit_event_link"
+        expect(f(".ui-dialog #assignment_due_at")).to be_displayed
 
-      replace_content(f(".ui-dialog #assignment_due_at"), "")
-      submit_form("#edit_assignment_form")
-      wait_for_ajax_requests
-      f("#undated-events-button").click
-      expect(f("#content")).not_to contain_css(".fc-event")
-      expect(f(".undated_event_title")).to include_text("undate me")
+        replace_content(f(".ui-dialog #assignment_due_at"), "")
+        submit_form("#edit_assignment_form")
+        wait_for_ajax_requests
+        f("#undated-events-button").click
+        expect(f("#content")).not_to contain_css(".fc-event")
+        expect(f(".undated_event_title")).to include_text("undate me")
+      end
+
+      it "course pacing calendars' assignments should not appear on teachers' calendars" do
+        Account.site_admin.enable_feature! :account_level_blackout_dates
+        Account.site_admin.enable_feature! :course_paces
+        @course.enable_course_paces = true
+        @course.save!
+        @course.active_assignments.create!(name: "cp assignment", due_at: Time.zone.now)
+        get "/calendar2"
+        expect(f("#content")).not_to contain_css(".fc-event")
+      end
     end
 
     context "event editing", priority: "1" do

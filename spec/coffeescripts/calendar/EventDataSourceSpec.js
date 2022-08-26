@@ -35,9 +35,10 @@ QUnit.module('EventDataSource: getEvents', {
     this.source = new EventDataSource([
       {asset_string: 'course_1'},
       {asset_string: 'course_2'},
+      {asset_string: 'course_3'},
       {asset_string: 'group_1'}
     ])
-    this.contexts = ['course_1', 'course_2']
+    this.contexts = ['course_1', 'course_2', 'course_3']
 
     // a container for stubbing queries, along with helpers to populate
     // the stubbed results in individual specs and a slot for the most recent
@@ -103,7 +104,7 @@ QUnit.module('EventDataSource: getEvents', {
   }
 })
 
-test('addEventToCache handles cases where the contextCode returns a list', function() {
+test('addEventToCache handles cases where the contextCode returns a list', function () {
   const fakeEvent = {
     contextCode() {
       return 'course_1,course_2'
@@ -114,10 +115,10 @@ test('addEventToCache handles cases where the contextCode returns a list', funct
   ok(this.source.cache.contexts.course_1.events[42])
 })
 
-test('addEventToCache handles the case where contextCode contains context not in the cache', function() {
+test('addEventToCache handles the case where contextCode contains context not in the cache', function () {
   const fakeEvent = {
     contextCode() {
-      return 'course_3,course_2'
+      return 'course_4,course_2'
     },
     id: 42
   }
@@ -125,7 +126,7 @@ test('addEventToCache handles the case where contextCode contains context not in
   ok(this.source.cache.contexts.course_2.events[42])
 })
 
-test('addEventToCache handles cases where the contextCode is a single item', function() {
+test('addEventToCache handles cases where the contextCode is a single item', function () {
   const fakeEvent = {
     contextCode() {
       return 'course_1'
@@ -136,38 +137,38 @@ test('addEventToCache handles cases where the contextCode is a single item', fun
   ok(this.source.cache.contexts.course_1.events[42])
 })
 
-test('overlapping ranges: overlap at start shifts start to end of overlap', function() {
+test('overlapping ranges: overlap at start shifts start to end of overlap', function () {
   this.source.getEvents(this.date1, this.date2, this.contexts, () => {})
   this.source.getEvents(this.date1, this.date4, this.contexts, () => {})
   equal(this.server.lastQuery.start_date, fcUtil.unwrap(this.date2).toISOString())
 })
 
-test('overlapping ranges: no overlap at start leaves start alone', function() {
+test('overlapping ranges: no overlap at start leaves start alone', function () {
   this.source.getEvents(this.date1, this.date2, this.contexts, () => {})
   this.source.getEvents(this.date3, this.date4, this.contexts, () => {})
   equal(this.server.lastQuery.start_date, fcUtil.unwrap(this.date3).toISOString())
 })
 
-test('overlapping ranges: no overlap at end leaves end alone', function() {
+test('overlapping ranges: no overlap at end leaves end alone', function () {
   this.source.getEvents(this.date3, this.date4, this.contexts, () => {})
   this.source.getEvents(this.date1, this.date2, this.contexts, () => {})
   equal(this.server.lastQuery.end_date, fcUtil.unwrap(this.date2).toISOString())
 })
 
-test('overlapping ranges: overlap at end shifts end to start of overlap', function() {
+test('overlapping ranges: overlap at end shifts end to start of overlap', function () {
   this.source.getEvents(this.date3, this.date4, this.contexts, () => {})
   this.source.getEvents(this.date1, this.date4, this.contexts, () => {})
   equal(this.server.lastQuery.end_date, fcUtil.unwrap(this.date3).toISOString())
 })
 
-test('overlapping ranges: fully interior overlap leaves ends alone', function() {
+test('overlapping ranges: fully interior overlap leaves ends alone', function () {
   this.source.getEvents(this.date2, this.date3, this.contexts, () => {})
   this.source.getEvents(this.date1, this.date4, this.contexts, () => {})
   equal(this.server.lastQuery.start_date, fcUtil.unwrap(this.date1).toISOString())
   equal(this.server.lastQuery.end_date, fcUtil.unwrap(this.date4).toISOString())
 })
 
-test('overlapping ranges: both ends move if necessary', function() {
+test('overlapping ranges: both ends move if necessary', function () {
   this.source.getEvents(this.date1, this.date2, this.contexts, () => {})
   this.source.getEvents(this.date3, this.date4, this.contexts, () => {})
   this.source.getEvents(this.date1, this.date4, this.contexts, () => {})
@@ -175,7 +176,7 @@ test('overlapping ranges: both ends move if necessary', function() {
   equal(this.server.lastQuery.end_date, fcUtil.unwrap(this.date3).toISOString())
 })
 
-test('overlapping ranges: full overlap means no query', function() {
+test('overlapping ranges: full overlap means no query', function () {
   this.source.getEvents(this.date1, this.date3, this.contexts, () => {})
   this.source.getEvents(this.date2, this.date4, this.contexts, () => {})
   this.server.reset()
@@ -183,11 +184,8 @@ test('overlapping ranges: full overlap means no query', function() {
   ok(!this.server.lastQuery)
 })
 
-test('date-only boundaries: date-only end is treated as midnight in profile timezone (excludes that date)', function() {
-  const end = fcUtil
-    .clone(this.date4)
-    .stripTime()
-    .stripZone()
+test('date-only boundaries: date-only end is treated as midnight in profile timezone (excludes that date)', function () {
+  const end = fcUtil.clone(this.date4).stripTime().stripZone()
   this.server.addCalendarEvent('course_1', '1', fcUtil.unwrap(this.date3).toISOString())
   this.server.addCalendarEvent('course_2', '2', fcUtil.unwrap(this.date4).toISOString())
   this.source.getEvents(this.date1, end, this.contexts, list => {
@@ -197,11 +195,8 @@ test('date-only boundaries: date-only end is treated as midnight in profile time
   equal(this.server.lastQuery.end_date, '2015-11-04T07:00:00.000Z')
 })
 
-test('date-only boundaries: date-only start is treated as midnight in profile timezone (includes that date)', function() {
-  const start = fcUtil
-    .clone(this.date2)
-    .stripTime()
-    .stripZone()
+test('date-only boundaries: date-only start is treated as midnight in profile timezone (includes that date)', function () {
+  const start = fcUtil.clone(this.date2).stripTime().stripZone()
   this.server.addCalendarEvent('course_1', '1', fcUtil.unwrap(this.date1).toISOString())
   this.server.addCalendarEvent('course_2', '2', fcUtil.unwrap(this.date2).toISOString())
   this.source.getEvents(start, this.date4, this.contexts, list => {
@@ -211,7 +206,7 @@ test('date-only boundaries: date-only start is treated as midnight in profile ti
   equal(this.server.lastQuery.start_date, '2015-11-02T07:00:00.000Z')
 })
 
-test('pagination: both pages final returns full range and leaves nextPageDate unset', function() {
+test('pagination: both pages final returns full range and leaves nextPageDate unset', function () {
   this.server.addCalendarEvent('course_1', '1', fcUtil.unwrap(this.date1).toISOString())
   this.server.addCalendarEvent('course_2', '2', fcUtil.unwrap(this.date2).toISOString())
   this.server.addAssignment('course_2', '3', fcUtil.unwrap(this.date3).toISOString())
@@ -221,7 +216,7 @@ test('pagination: both pages final returns full range and leaves nextPageDate un
   })
 })
 
-test('pagination: one page final sets nextPageDate and returns only up to nextPageDate (exclusive)', function() {
+test('pagination: one page final sets nextPageDate and returns only up to nextPageDate (exclusive)', function () {
   // since the max calendarEvent date is @date2, nextPageDate will be @date2
   // and nothing >= @date2 will be included
   this.server.addCalendarEvent('course_1', '1', fcUtil.unwrap(this.date1).toISOString())
@@ -238,7 +233,7 @@ test('pagination: one page final sets nextPageDate and returns only up to nextPa
   })
 })
 
-test('pagination: both pages final sets nextPageDate and returns only up to nextPageDate (exclusive)', function() {
+test('pagination: both pages final sets nextPageDate and returns only up to nextPageDate (exclusive)', function () {
   // since assignments has the smallest max date at @date2, nextPageDate will be
   // @date2 and nothing >= @date2 will be included
   this.server.addCalendarEvent('course_1', '1', fcUtil.unwrap(this.date1).toISOString())
@@ -256,7 +251,7 @@ test('pagination: both pages final sets nextPageDate and returns only up to next
   })
 })
 
-test('pagination: calls data callback with each page of data if set', function() {
+test('pagination: calls data callback with each page of data if set', function () {
   this.server.addCalendarEvent('course_1', '1', fcUtil.unwrap(this.date1).toISOString())
   this.server.addAssignment('course_2', '3', fcUtil.unwrap(this.date3).toISOString())
   let pages = 0
@@ -275,7 +270,7 @@ test('pagination: calls data callback with each page of data if set', function()
   )
 })
 
-test('indexParams filters appointment_group_ids from params', function() {
+test('indexParams filters appointment_group_ids from params', function () {
   const p = this.source.indexParams({
     blah: 'blah',
     context_codes: ['course_1', 'appointment_group_2', 'group_3', 'appointment_group_1337']
@@ -285,7 +280,7 @@ test('indexParams filters appointment_group_ids from params', function() {
   equal(p.appointment_group_ids, '2,1337')
 })
 
-test('transforms course planner item', function() {
+test('transforms course planner item', function () {
   const date = fcUtil.unwrap(this.date2).toISOString()
   this.server.addPlannerItem('course', 1, 'discussion_topic', 3, 'blah', date)
   this.source.getEvents(this.date1, this.date4, this.contexts, events => {
@@ -301,7 +296,7 @@ test('transforms course planner item', function() {
   })
 })
 
-test('transforms group planner item', function() {
+test('transforms group planner item', function () {
   const date = fcUtil.unwrap(this.date2).toISOString()
   this.server.addPlannerItem('group', 1, 'assignment', 4, 'bleh', date)
   this.source.getEvents(this.date1, this.date4, ['group_1'], events => {
@@ -315,4 +310,38 @@ test('transforms group planner item', function() {
     equal(event.id, 'assignment_4')
     equal(event.title, 'bleh')
   })
+})
+
+test('filters out course pacing assignments for teachers', function () {
+  ENV.CALENDAR = {
+    CONTEXTS: [
+      {
+        asset_string: 'course_1',
+        can_make_reservation: false,
+        course_pacing_enabled: false
+      },
+      {
+        asset_string: 'course_2',
+        can_make_reservation: false,
+        course_pacing_enabled: true
+      },
+      {
+        asset_string: 'course_3',
+        can_make_reservation: true,
+        course_pacing_enabled: true
+      }
+    ]
+  }
+  this.server.addAssignment('course_1', '100', fcUtil.unwrap(this.date3).toISOString())
+  this.server.addAssignment('course_2', '200', fcUtil.unwrap(this.date3).toISOString())
+  this.server.addAssignment('course_3', '300', fcUtil.unwrap(this.date3).toISOString())
+  const params = {
+    context_codes: ['course_1', 'course_2', 'course_3'],
+    start_date: this.date1,
+    end_date: this.date4
+  }
+  const assignmentParameters = this.source.assignmentParams(params)
+  equal(assignmentParameters.context_codes.length, 2)
+  equal(assignmentParameters.context_codes[0], 'course_1')
+  equal(assignmentParameters.context_codes[1], 'course_3')
 })

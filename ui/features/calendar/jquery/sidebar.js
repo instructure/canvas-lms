@@ -28,7 +28,6 @@ import forceScreenreaderToReparse from 'force-screenreader-to-reparse'
 import 'jquery-kyle-menu'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import 'jquery-tinypubsub'
-import 'jqueryui/tooltip'
 import AccountCalendarsModal from '../react/AccountCalendarsModal'
 
 const I18n = useI18nScope('calendar_sidebar')
@@ -44,19 +43,7 @@ class VisibleContextManager {
       }
     })()
 
-    if (!this.disabledContexts) {
-      const disabledContexts = contexts
-        .filter(c => {
-          if (c.type === 'account') return false
-          return c.course_pacing_enabled && !(c.can_make_reservation || c.user_is_observer)
-        })
-        .map(dC => dC.asset_string)
-      this.disabledContexts = disabledContexts
-    }
-
-    const availableContexts = contexts
-      .filter(ctx => !this.disabledContexts?.includes(ctx.asset_string))
-      .map(c => c.asset_string)
+    const availableContexts = contexts.map(c => c.asset_string)
 
     if (fragmentData.show) {
       this.contexts = fragmentData.show.split(',')
@@ -74,7 +61,6 @@ class VisibleContextManager {
     this.contexts = this.contexts.slice(0, ENV.CALENDAR.VISIBLE_CONTEXTS_LIMIT)
 
     this.notify()
-    this.disableContexts()
 
     $.subscribe('Calendar/saveVisibleContextListAndClear', this.saveAndClear)
     $.subscribe('Calendar/restoreVisibleContextList', this.restoreList)
@@ -168,27 +154,6 @@ class VisibleContextManager {
     })
 
     return userSettings.set('checked_calendar_codes', this.contexts)
-  }
-
-  disableContexts = () => {
-    this.$holder.find('.context_list_context').each((i, li) => {
-      const $li = $(li)
-      const disabled = this.disabledContexts.includes($li.data('context'))
-      if (disabled) {
-        const label = document.createElement('label')
-        label.style.display = 'block'
-        label.innerHTML = I18n.t('Due dates managed by Course Pacing.')
-        $li[0].appendChild(label)
-        $li.toggleClass('disabled-context', disabled)
-        $li.attr('title', I18n.t('Course calendar view disabled.'))
-        $li.on('click keyclick', false)
-        $li.children().attr('tabindex', -1)
-        $($li).tooltip({
-          position: {my: 'left bottom', at: 'left top'},
-          tooltipClass: 'center bottom vertical'
-        })
-      }
-    })
   }
 
   overrideEnabledAccounts = newEnabledAccounts => {
@@ -351,7 +316,7 @@ export default function sidebar(contexts, selectedContexts, dataSource, onContex
 
     ReactDOM.render(
       <ColorPicker
-        isOpen
+        isOpen={true}
         positions={positions}
         assetString={assetString}
         afterClose={() => forceScreenreaderToReparse($('#application')[0])}
