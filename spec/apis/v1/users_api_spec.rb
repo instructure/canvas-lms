@@ -2526,20 +2526,6 @@ describe "Users API", type: :request do
         )
       end
 
-      it "does not allow creating entries for entities the user doesn't have read access to" do
-        course_with_teacher
-
-        api_call(
-          :put,
-          "/api/v1/users/#{@user.id}/colors/course_#{@course.id}",
-          { controller: "users", action: "set_custom_color", format: "json",
-            id: @user.to_param, asset_string: "course_#{@course.id}", hexcode: "ababab" },
-          {},
-          {},
-          { expected_status: 401 }
-        )
-      end
-
       it "throws a bad request if a color isn't provided" do
         course_with_student(active_all: true)
         @user = @student
