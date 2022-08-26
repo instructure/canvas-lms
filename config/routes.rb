@@ -1664,6 +1664,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :services_api) do
       get "services/kaltura", action: :show_kaltura_config
       post "services/kaltura_session", action: :start_kaltura_session
+      get "services/rce_config", action: :rce_config
     end
 
     scope(controller: :calendar_events_api) do

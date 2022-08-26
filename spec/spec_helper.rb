@@ -719,7 +719,8 @@ RSpec.configure do |config|
                                                                             "user_secret_key" => "1234821hrj3k21hjk4j3kl21j4kl321j4kl3j21kl4j3k2l1",
                                                                             "player_ui_conf" => "1",
                                                                             "kcw_ui_conf" => "1",
-                                                                            "upload_ui_conf" => "1"
+                                                                            "upload_ui_conf" => "1",
+                                                                            "hide_rte_button" => false
                                                                           })
   end
 
