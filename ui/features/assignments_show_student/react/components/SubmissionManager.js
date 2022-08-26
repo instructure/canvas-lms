@@ -430,6 +430,7 @@ export default class SubmissionManager extends Component {
               onContentsChanged={() => {
                 this.setState({draftStatus: 'saving'})
               }}
+              originalityReportsForA2={window.ENV.ORIGINALITY_REPORTS_FOR_A2}
               selectedExternalTool={
                 this.state.selectedExternalTool ||
                 this.props.submission?.submissionDraft?.externalTool
