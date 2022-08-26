@@ -1831,14 +1831,7 @@ class UsersController < ApplicationController
 
     return unless authorized_action(user, @current_user, [:manage, :manage_user_details])
 
-    # Make sure the user has rights to the actual context used.
-    context = Context.find_by_asset_string(params[:asset_string])
-
-    if context.nil?
-      raise(ActiveRecord::RecordNotFound, "Asset does not exist")
-    end
-
-    return unless authorized_action(context, @current_user, :read)
+    raise(ActiveRecord::RecordNotFound, "Asset does not exist") unless (context = Context.find_by_asset_string(params[:asset_string]))
 
     # Check if the hexcode is valid
     unless valid_hexcode?(params[:hexcode])
