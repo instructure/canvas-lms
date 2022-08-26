@@ -109,7 +109,7 @@ describe BigBlueButtonConference do
     end
   end
 
-  describe "testing of new BBB properties: lockSettingsDisableCam, lockSettingsDisableMic, lockSettingsDisablePublicChat and lockSettingsDisablePrivateChat" do
+  describe "testing of new BBB properties: lockSettingsDisableCam, lockSettingsDisableMic, lockSettingsDisablePublicChat, lockSettingsDisablePrivateChat, guestPolicy and webcamsOnlyForModerator" do
     before do
       allow(WebConference).to receive(:plugins).and_return([
                                                              web_conference_plugin_mock("big_blue_button", {
@@ -126,19 +126,19 @@ describe BigBlueButtonConference do
       @bbb.save!
     end
 
-    it "all should be false if they aren enabled" do
-      @bbb.user_settings = { share_webcam: true, share_microphone: true, send_public_chat: true, send_private_chat: true }
+    it "all should be false and guestPolicy should be ASK_MODERATOR if they are enabled" do
+      @bbb.user_settings = { share_webcam: true, share_microphone: true, send_public_chat: true, send_private_chat: true, enable_waiting_room: true, share_other_webcams: true }
       @bbb.save!
 
-      expect(@bbb).to receive(:send_request).with(:create, hash_including(lockSettingsDisableCam: "false", lockSettingsDisableMic: "false", lockSettingsDisablePublicChat: "false", lockSettingsDisablePrivateChat: "false"))
+      expect(@bbb).to receive(:send_request).with(:create, hash_including(lockSettingsDisableCam: "false", lockSettingsDisableMic: "false", lockSettingsDisablePublicChat: "false", lockSettingsDisablePrivateChat: "false", guestPolicy: "ASK_MODERATOR", webcamsOnlyForModerator: "false"))
       @bbb.initiate_conference
     end
 
-    it "all should be true if they are disabled" do
-      @bbb.user_settings = { share_webcam: false, share_microphone: false, send_public_chat: false, send_private_chat: false }
+    it "all should be true and guestPolicy should be ALWAYS_ACCEPT if they are disabled" do
+      @bbb.user_settings = { share_webcam: false, share_microphone: false, send_public_chat: false, send_private_chat: false, enable_waiting_room: false, share_other_webcams: false }
       @bbb.save!
 
-      expect(@bbb).to receive(:send_request).with(:create, hash_including(lockSettingsDisableCam: "true", lockSettingsDisableMic: "true", lockSettingsDisablePublicChat: "true", lockSettingsDisablePrivateChat: "true"))
+      expect(@bbb).to receive(:send_request).with(:create, hash_including(lockSettingsDisableCam: "true", lockSettingsDisableMic: "true", lockSettingsDisablePublicChat: "true", lockSettingsDisablePrivateChat: "true", guestPolicy: "ALWAYS_ACCEPT", webcamsOnlyForModerator: "true"))
       @bbb.initiate_conference
     end
   end

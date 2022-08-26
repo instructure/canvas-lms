@@ -139,16 +139,23 @@ const ConferencesRouter = Backbone.Router.extend({
         options.push('recording_enabled')
       }
 
-      // TBD Enable Waiting Room
+      if (attributes.user_settings.enable_waiting_room) {
+        options.push('enable_waiting_room')
+      }
+
       // TBD Add to Calendar
 
-      ;['share_webcam', 'share_microphone', 'send_public_chat', 'send_private_chat'].forEach(
-        option => {
-          if (attributes.user_settings[option]) {
-            attendeesOptions.push(option)
-          }
+      ;[
+        'share_webcam',
+        'share_other_webcams',
+        'share_microphone',
+        'send_public_chat',
+        'send_private_chat'
+      ].forEach(option => {
+        if (attributes.user_settings[option]) {
+          attendeesOptions.push(option)
         }
-      )
+      })
 
       ReactDOM.render(
         <VideoConferenceModal
@@ -180,6 +187,7 @@ const ConferencesRouter = Backbone.Router.extend({
             const noTimeLimit = data.options.includes('no_time_limit') ? 1 : 0
             const duration = noTimeLimit ? '' : data.duration
             const record = data.options.includes('recording_enabled') ? 1 : 0
+            const enableWaitingRoom = data.options.includes('enable_waiting_room') ? 1 : 0
             const payload = {
               _method: 'PUT',
               title: data.name,
@@ -190,6 +198,7 @@ const ConferencesRouter = Backbone.Router.extend({
               'web_conference[duration]': duration,
               'user_settings[record]': record,
               'web_conference[user_settings][record]': record,
+              'web_conference[user_settings][enable_waiting_room]': enableWaitingRoom,
               long_running: noTimeLimit,
               'web_conference[long_running]': noTimeLimit,
               description: data.description,
@@ -208,12 +217,19 @@ const ConferencesRouter = Backbone.Router.extend({
               })
             }
 
-            ;['share_webcam', 'share_microphone', 'send_public_chat', 'send_private_chat'].forEach(
-              option => {
-                payload[`web_conference[user_settings][${option}]`] =
-                  data.attendeesOptions.includes(option) ? 1 : 0
-              }
-            )
+            ;[
+              'share_webcam',
+              'share_other_webcams',
+              'share_microphone',
+              'send_public_chat',
+              'send_private_chat'
+            ].forEach(option => {
+              payload[`web_conference[user_settings][${option}]`] = data.attendeesOptions.includes(
+                option
+              )
+                ? 1
+                : 0
+            })
 
             const requestOptions = {
               credentials: 'same-origin',

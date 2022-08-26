@@ -82,6 +82,22 @@ class BigBlueButtonConference < WebConference
     visible: false
   }
 
+  user_setting_field :enable_waiting_room, {
+    name: -> { t("Enable waiting room") },
+    description: -> { t("Enable waiting room") },
+    type: :boolean,
+    default: true,
+    visible: false
+  }
+
+  user_setting_field :share_other_webcams, {
+    name: -> { t("See other viewers webcams") },
+    description: -> { t("See other viewers webcams") },
+    type: :boolean,
+    default: true,
+    visible: false
+  }
+
   class << self
     def send_request(action, options, use_fallback_config: false)
       url_str = generate_request(action, options, use_fallback_config: use_fallback_config)
@@ -181,6 +197,8 @@ class BigBlueButtonConference < WebConference
                               :lockSettingsDisableMic => settings[:share_microphone].nil? || settings[:share_microphone] ? "false" : "true",
                               :lockSettingsDisablePublicChat => settings[:send_public_chat].nil? || settings[:send_public_chat] ? "false" : "true",
                               :lockSettingsDisablePrivateChat => settings[:send_private_chat].nil? || settings[:send_private_chat] ? "false" : "true",
+                              :guestPolicy => settings[:enable_waiting_room].nil? || settings[:enable_waiting_room] ? "ASK_MODERATOR" : "ALWAYS_ACCEPT",
+                              :webcamsOnlyForModerator => settings[:share_other_webcams].nil? || settings[:share_other_webcams] ? "false" : "true",
                             }) or return nil
     @conference_active = true
     settings[:create_time] = response[:createTime] if response.present?

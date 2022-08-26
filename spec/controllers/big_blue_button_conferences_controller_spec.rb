@@ -52,13 +52,15 @@ describe ConferencesController do
   describe "POST 'create'" do
     it "creates a conference with user_settings" do
       user_session(@teacher)
-      post "create", params: { course_id: @course.id, conference_type: "BigBlueButton", web_conference: { title: "My Conference", conference_type: "BigBlueButton", user_settings: { share_webcam: false, share_microphone: false, send_public_chat: false, send_private_chat: false } } }, format: "json"
+      post "create", params: { course_id: @course.id, conference_type: "BigBlueButton", web_conference: { title: "My Conference", conference_type: "BigBlueButton", user_settings: { share_webcam: false, share_microphone: false, send_public_chat: false, send_private_chat: false, enable_waiting_room: false, share_other_webcams: false } } }, format: "json"
       conference = WebConference.last
       expect(response).to be_successful
       expect(conference.settings[:share_webcam]).to eq false
       expect(conference.settings[:share_microphone]).to eq false
       expect(conference.settings[:send_public_chat]).to eq false
       expect(conference.settings[:send_private_chat]).to eq false
+      expect(conference.settings[:enable_waiting_room]).to eq false
+      expect(conference.settings[:share_other_webcams]).to eq false
     end
   end
 end
