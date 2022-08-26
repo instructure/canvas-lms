@@ -263,7 +263,6 @@ describe "calendar2" do
         before do
           Account.site_admin.enable_feature! :account_level_blackout_dates
           Account.site_admin.enable_feature! :course_paces
-          @course.enroll_student(@user).accept! # We need to use this case where the teacher is also a student until calendar events are reenabled for teachers for course pacing courses.
           @course.enable_course_paces = true
           @course.save!
         end

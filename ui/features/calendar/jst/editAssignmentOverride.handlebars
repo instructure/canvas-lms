@@ -18,6 +18,19 @@
                  type="text"
                  aria-labelledby="calendar_assignment_override_due_date_accessible_label"
                  data-tooltip title="{{accessibleDateFormat}}"/>
+          <div id="assignment_override_course_pacing_message">
+            <i
+              class="icon-info"
+              style="margin-right: 5px;"
+              data-tooltip
+              title="{{#t}}To edit the due date, go to Course Pacing, change the number of days allotted to this assignment, and publish the updated pace.{{/t}}"
+            ></i>
+            {{#t}}This due date is managed by{{/t}}
+            <a id="assignment_override_course_pacing_link" href="#">
+              {{#t}}Course Pacing{{/t}}
+            </a>
+            .
+          </div>
         </td>
       </tr>
       <tr class="context_select">
