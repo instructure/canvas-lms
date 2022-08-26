@@ -33,12 +33,19 @@ import RCEGlobals from '../../../RCEGlobals'
 import {getIcon} from '../../shared/linkUtils'
 
 export default function Link(props) {
+  const internalLink = {...props.link}
   const [isHovering, setIsHovering] = useState(false)
   const {title, published, date, date_type} = props.link
   const type =
     props.type === 'quizzes' && props.link.quiz_type === 'quizzes.next'
       ? 'quizzes.next'
       : props.type
+  if (RCEGlobals.getFeatures()?.rce_ux_improvements) {
+    internalLink['data-course-type'] = type
+    // Only included published attr if it makes sense for the link type
+    const publishable = !['navigation', 'announcements'].includes(type)
+    internalLink['data-published'] = publishable ? published : null
+  }
   const Icon = getIcon(type)
   const color = published ? 'success' : 'primary'
   let dateString = null
@@ -75,14 +82,10 @@ export default function Link(props) {
 
   function handleLinkClick(e) {
     e.preventDefault()
-    props.link.type = type
-    if (props.isEdit) {
-      props.onEditClick(props.link)
+    if (props.editing) {
+      props.onEditClick({...internalLink, type})
     } else {
-      if (RCEGlobals.getFeatures()?.rce_ux_improvements) {
-        props.link.course_link = true
-      }
-      props.onClick(props.link)
+      props.onClick(internalLink)
     }
   }
 
@@ -94,7 +97,7 @@ export default function Link(props) {
   }
 
   function handleDragStart(e) {
-    dragHtml(e, renderLinkHtml(props.link, props.link.title))
+    dragHtml(e, renderLinkHtml(internalLink, internalLink.title))
   }
 
   function handleDragEnd(_e) {
@@ -108,7 +111,7 @@ export default function Link(props) {
   return (
     <div
       data-testid="instructure_links-Link"
-      draggable={true}
+      draggable={!props.editing}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onMouseEnter={handleHover}
@@ -137,7 +140,9 @@ export default function Link(props) {
             <div style={{pointerEvents: 'none'}}>
               <Flex>
                 <Flex.Item margin="0 xx-small 0 0" size="1.125rem">
-                  {isHovering ? <IconDragHandleLine size="x-small" inline={false} /> : null}
+                  {isHovering && !props.editing ? (
+                    <IconDragHandleLine size="x-small" inline={false} />
+                  ) : null}
                 </Flex.Item>
                 <Flex.Item shouldGrow={true} shouldShrink={true}>
                   <Flex>
@@ -195,6 +200,6 @@ Link.propTypes = {
   onClick: func.isRequired,
   describedByID: string.isRequired,
   elementRef: func,
-  isEdit: bool,
+  editing: bool,
   onEditClick: func
 }

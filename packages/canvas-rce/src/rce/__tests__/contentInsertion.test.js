@@ -196,13 +196,12 @@ describe('contentInsertion', () => {
       )
     })
 
-    it('includes attributes for course link', () => {
-      link.course_link = true
-      link.published = true
-      link.type = 'wikiPage'
+    it('includes attributes for course link when supplied', () => {
+      link['data-published'] = true
+      link['data-course-type'] = 'wikiPages'
       contentInsertion.insertLink(editor, link)
       expect(editor.content).toEqual(
-        '<a data-course-type="wikiPage" data-published="true" href="/some/path" title="Here Be Links">Click On Me</a>'
+        '<a data-course-type="wikiPages" data-published="true" href="/some/path" title="Here Be Links">Click On Me</a>'
       )
     })
 

@@ -315,13 +315,21 @@ describe('RCE "Links" Plugin > Link', () => {
   describe('When in edit link tray', () => {
     const props = {
       onEditClick: jest.fn(),
-      isEdit: true,
+      editing: true,
       link: {
         href: 'the_url',
         title: 'object title',
         published: true
       }
     }
+
+    beforeAll(() => {
+      RCEGlobals.getFeatures = jest.fn().mockReturnValue({rce_ux_improvements: true})
+    })
+
+    afterAll(() => {
+      jest.resetAllMocks()
+    })
 
     it('calls onEditClick when clicked', () => {
       const {getByText} = renderComponent(props)
@@ -341,6 +349,38 @@ describe('RCE "Links" Plugin > Link', () => {
       const btn = getByText(props.link.title)
       fireEvent.keyDown(btn, {keyCode: 32})
       expect(props.onEditClick).toHaveBeenCalled()
+    })
+
+    it('calls onEditClick with the appropriate args for a publishable link type', () => {
+      const {getByText} = renderComponent(props)
+      getByText(props.link.title).click()
+      expect(props.onEditClick).toHaveBeenCalledWith({
+        href: 'the_url',
+        published: true,
+        title: 'object title',
+        type: 'assignments',
+        'data-course-type': 'assignments',
+        'data-published': true
+      })
+    })
+
+    it('calls onEditClick with the appropriate args for a non-publishable link type', () => {
+      const {getByText} = renderComponent({...props, type: 'navigation'})
+      getByText(props.link.title).click()
+      expect(props.onEditClick).toHaveBeenCalledWith({
+        href: 'the_url',
+        published: true,
+        title: 'object title',
+        type: 'navigation',
+        'data-course-type': 'navigation',
+        'data-published': null
+      })
+    })
+
+    it('does not show the drag handle when hovering', () => {
+      const {container, getByTestId} = renderComponent(props)
+      fireEvent.mouseEnter(getByTestId('instructure_links-Link'))
+      expect(container.querySelectorAll('svg[name="IconDragHandle"]')).toHaveLength(0)
     })
   })
 })
