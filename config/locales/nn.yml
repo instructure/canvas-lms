@@ -4078,6 +4078,7 @@ nn:
   attempt_attempt_d3911720: "Forsøk %{attempt}"
   attempt_attempt_feedback_1b042ff5: "Forsøk %{attempt} tilbakemelding"
   attempt_attempt_grade_c01f45df: "Forsøk %{attempt}: %{grade}"
+  attempt_attempt_score_2a973edc: "Forsøk %{attempt} resultat:"
   attempt_count_267a4fc5: "Forsøk %{count}"
   attempt_current_attempt_ef626179: "Forsøk %{current_attempt}"
   attempt_current_attempt_of_max_attempts_427ed508: "Forsøk %{current_attempt} av %{max_attempts}"
@@ -4205,6 +4206,7 @@ nn:
   authorize_e3f25bb4: Autoriser
   authorize_url_f28167a3: "Godkjenn URL"
   auto_leader_7791c30a: auto_leader
+  auto_show_closed_captions_e4cd7aff: "Vis undertekstar automatisk"
   autodetect_field_separators_in_compatible_spreadsh_768067e1: "Autogjenkjenn feltskilje i kompatible reknearkeksportar"
   autodetect_field_separators_in_gradebook_exports_ed9a9d77: "Autogjenkjenn feltskilje ved eksport av vurderingsoversikt"
   automatically_apply_deduction_to_late_submissions_2b68166e: "Bruk automatisk resultatutrekning på for seine innleveringar"
@@ -4259,7 +4261,9 @@ nn:
   back_to_app_center_95420d83: "Tilbake til appsenteret"
   back_to_assignment_1df86a69: "Tilbake til oppgåve"
   back_to_attempt_attempt_ffb22bb8: "Tilbake til forsøk %{attempt}"
+  back_to_production_fed09f33: "Tilbake til produksjon"
   back_to_ref_title_377ea1f0: "Tilbake til %{ref_title}"
+  back_to_subject_80a1eb: "Tilbake til emne"
   back_to_table_of_contents_d878b315: "Tilbake til innhaldsliste"
   back_to_title_39e7a8f4: "Tilbake til %{title}"
   background_color_b92b52ac: Bakgrunnsfarge
@@ -4312,6 +4316,7 @@ nn:
   blank_38df4238: tom
   blocked_by_running_migration_d8a57cb7: "Blokkert av \"running migration\""
   blocked_domain_name_b5b93150: "Blokkert domenenamn"
+  blocked_emojis_9fbaca3a: "Emojiar som er blokkerte"
   blue_daf8fea9: Blå
   blueprint_5cca2ef: Blueprint
   blueprint_course_associations_72c9609: "Koplingane til Blueprint-emne"
@@ -4553,11 +4558,13 @@ nn:
   by_b90c6b6f: Av
   by_client_id_4f2fe02c: "Av klient-ID"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Som standard er alle koplingar aktiverte for eit emne.  Studentar ser ikkje lenker til seksjonar som er utan innhald.  Dersom du f.eks. ikkje har oppretta quizar, er ikkje koplinga til quizar synleg. Du kan sortere og spesifikt deaktivere koplingar dersom det er område i emnet du ikkje vil at studentane skal ha tilgang til."
+  by_default_students_are_able_to_create_groups_to_r_ac2a70bd: "Som standard kan studentar opprette grupper; for å hindre studentar i å opprette grupper, kan ikkje boksen 'La studentar organisere eigne grupper' i emneinnstillinger vere merka av. "
   by_default_students_are_able_to_create_groups_to_r_ba7f2450: |-
       Som standard kan studentar opprette grupper; for å hindre studentar i å opprette
       grupper, kan ikkje boksen 'La studentar organisere eigne grupper' i emneinnstillinger vere merka av.
   by_default_students_are_able_to_create_groups_to_r_d4901649: "Som standard kan studentar opprette grupper; for å hindre studentar i å opprette grupper, kan ikkje boksen 'La studentar organisere eigne grupper' i emneinnstillinger vere merka av. "
   by_default_students_can_always_create_groups_in_a__149d08b7: "Som standard kan studentar alltid opprette grupper i eit emne. For å hindre studentar frå å opprette grupper, må 'Emne - legg til / endre / slett' vere slått på og boksen 'La studentar organisere eigne grupper' i emneinnstillingar kan ikkje vere merka."
+  by_default_students_can_always_create_groups_in_a__5727f4cf: "Som standard kan studentar alltid opprette grupper i eit emne. For å hindre studentar frå å opprette grupper, må 'Emne - administrer' vere slått på og boksen 'La studentar organisere eigne grupper' i emneinnstillingar kan ikkje vere merka."
   by_lti_2_registration_url_e421e523: "Etter LTI 2 sin registrerings-URL"
   by_url_a163275e: "Etter URL"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
@@ -4924,6 +4931,7 @@ nn:
     ics_description_user: "Kalenderhendingar for brukaren %{user_name}"
     ics_title: "%{course_or_group_name}-kalender i Canvas"
     invalid_date_or_time: "Ugyldig dato eller ugyldig dato/klokkeslett for %{attr}"
+  calendar_series_e1b7a4bc: Kalenderserie
   calendars: 
     event: 
       due: frist
@@ -5199,6 +5207,7 @@ nn:
   change_image_14ad465b: "Endre bilde"
   change_image_d56c695f: "Endre bilde"
   change_mastery_f4d43c07: "Endre meistringsnivå"
+  change_mastery_points_c4f68a36: "Endre meistringspoeng"
   change_name_c8cce76c: "Endre namn"
   change_name_to_568374c8: "Endre \"%{name}\" til"
   change_points_9e5104ac: "Endre poeng"
@@ -5264,12 +5273,17 @@ nn:
   choose_one_submission_type_cf4eda5b: "Vel ein innleveringstype"
   choose_student_1513fcd1: "-- Vel student -- "
   choose_the_next_mastery_path_b035b727: "Vel neste meistringssti"
+  choose_up_to_count_subject_calendars_a7df06d7: 
+    one: "Velg opp til 1 emnekalender"
+    other: "Velg opp til %{count}emnekalendrar"
   choose_usage_rights_33683854: "Vel bruksrett..."
+  choose_your_default_skin_tone_f09bf0bd: "Velg din standard hudfarge"
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' er ikkje ein gyldig farge."
   chosencolor_is_not_a_valid_color_enter_a_valid_hex_9e2c7c42: "'%{chosenColor}' er ikkje ein gyldig farge. Vel ein gyldig hex-kode før lagring."
   clark_county_gradebook_c5ea74bb: "Clark County vurderingsoversikt"
   classic_quizzes_dee3c7b7: "Orinære quizar"
   classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "Ordinære quizar for tidsstyrte quizar utan innlevering"
+  classic_view_33f29576: "Ordinær visning"
   clear_2084585f: Fjern
   clear_all_da755751: "Fjern alt"
   clear_search_field_75f595c7: "Tøm søkefeltet"
@@ -5349,6 +5363,7 @@ nn:
   cloning_group_set_813b06f5: "Klonar gruppesett"
   close_17f50799: lukk
   close_and_return_to_canvas_80544344: "Lukk og returner til Canvas"
+  close_comment_library_cdcc2dde: "Lukk bibliotek av kommentarar"
   close_d634289d: Lukk
   close_date_9b52fb9b: "Lukkedato: "
   close_date_a2f617b3: Lukkedato
