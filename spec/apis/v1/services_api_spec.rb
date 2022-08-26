@@ -89,6 +89,7 @@ describe "Services API", type: :request do
                                                                       "uid" => "#{@user.id}_#{Account.default.id}",
                                                                       "kaltura_setting" => {
                                                                         "domain" => "kaltura.example.com",
+                                                                        "hide_rte_button" => false,
                                                                         "kcw_ui_conf" => "1",
                                                                         "max_file_size_bytes" => 534_773_760,
                                                                         "partner_id" => "100",
@@ -107,5 +108,72 @@ describe "Services API", type: :request do
                                                                         },
                                                                       },
                                                                     })
+  end
+
+  describe "#rce_config" do
+    let(:rce_config_api_call) do
+      course_with_student(active_all: true)
+      api_call_as_user(@student, :get, "/api/v1/services/rce_config",
+                       {
+                         controller: "services_api",
+                         action: "rce_config",
+                         format: "json",
+                         course_id: @course.to_param
+                       },
+                       { expected_status: 200 }).deep_symbolize_keys
+    end
+
+    it "checks for auth" do
+      get("/api/v1/services/rce_config")
+      assert_status(401)
+    end
+
+    it "test if all the nil values are converted to false in FEATURES hash" do
+      expect_any_instance_of(ApplicationController).to receive(:cached_js_env_account_features)
+        .and_return({ test_feature_flag: nil })
+
+      json = rce_config_api_call
+
+      expect(json[:FEATURES][:test_feature_flag]).to an_instance_of(FalseClass)
+    end
+
+    it "test the urls are enhanced with the base url when CDN is not configured" do
+      json = rce_config_api_call
+
+      expect(json[:url_for_high_contrast_tinymce_editor_css]).to all(starting_with("http://localhost/dist"))
+      expect(json[:url_to_what_gets_loaded_inside_the_tinymce_editor_css]).to all(starting_with("http://localhost/dist"))
+      expect(json[:active_brand_config_json_url]).to starting_with("http://localhost/dist")
+    end
+
+    it "test the contract of the RCE configuration" do
+      a_bool_value = be_in([true, false])
+      a_hash_with_only_bool_values = satisfy { |hash| hash.values.all? { |value| value.in? [true, false] } }
+      a_not_empty_string_array = have_at_least(1).items & all(an_instance_of(String))
+      an_instance_of_string = an_instance_of(String)
+      an_instance_of_integer = an_instance_of(Integer)
+
+      json = rce_config_api_call
+
+      expect(json).to include({
+                                kalturaSettings: { hide_rte_button: a_bool_value },
+                                RICH_CONTENT_CAN_UPLOAD_FILES: a_bool_value,
+                                RICH_CONTENT_INST_RECORD_TAB_DISABLED: a_bool_value,
+                                RICH_CONTENT_FILES_TAB_DISABLED: a_bool_value,
+                                RICH_CONTENT_CAN_EDIT_FILES: a_bool_value,
+                                LOCALE: an_instance_of_string,
+                                LOCALES: a_not_empty_string_array,
+                                rce_auto_save_max_age_ms: an_instance_of_integer,
+                                active_brand_config_json_url: an_instance_of_string,
+                                url_for_high_contrast_tinymce_editor_css: a_not_empty_string_array,
+                                url_to_what_gets_loaded_inside_the_tinymce_editor_css: a_not_empty_string_array,
+                                FEATURES: a_hash_with_only_bool_values,
+                                K5_SUBJECT_COURSE: a_bool_value,
+                                K5_HOMEROOM_COURSE: a_bool_value,
+                                context_asset_string: an_instance_of_string,
+                                DEEP_LINKING_POST_MESSAGE_ORIGIN: an_instance_of_string,
+                                current_user_id: an_instance_of_integer,
+                                disable_keyboard_shortcuts: a_bool_value
+                              })
+    end
   end
 end
