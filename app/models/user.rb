@@ -104,6 +104,7 @@ class User < ActiveRecord::Base
   has_many :current_group_memberships, -> { eager_load(:group).where("group_memberships.workflow_state = 'accepted' AND groups.workflow_state<>'deleted'") }, class_name: "GroupMembership"
   has_many :current_groups, through: :current_group_memberships, source: :group
   has_many :user_account_associations
+  has_many :unordered_associated_accounts, source: :account, through: :user_account_associations
   has_many :associated_accounts, -> { order("user_account_associations.depth") }, source: :account, through: :user_account_associations
   has_many :associated_root_accounts, -> { merge(Account.root_accounts.active) }, source: :account, through: :user_account_associations, multishard: true
   has_many :developer_keys
