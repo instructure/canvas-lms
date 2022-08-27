@@ -1187,7 +1187,7 @@ class ApplicationController < ActionController::Base
 
       if opts[:include_accounts]
         account_ids = @current_user.get_preference(:enabled_account_calendars) || []
-        accounts = Account.where(id: account_ids)
+        accounts = @current_user.associated_accounts.active.where(id: account_ids, account_calendar_visible: true)
       end
 
       if opts[:favorites_first]
