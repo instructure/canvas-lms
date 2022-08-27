@@ -152,55 +152,6 @@ describe "calendar2" do
         end
       end
 
-      describe "other calendars section" do
-        before :once do
-          Account.site_admin.enable_feature!(:account_calendar_events)
-        end
-
-        it "displays an empty state if there are no enabled accounts" do
-          @user.set_preference(:enabled_account_calendars, nil)
-
-          get "/calendar2"
-          expect(f("#other-calendars-list-holder")).to be_displayed
-          expect(f(".accounts-empty-state")).to be_displayed
-        end
-
-        it "displays accounts if the user has enabled them" do
-          @user.set_preference(:enabled_account_calendars, @course.account.id)
-          get "/calendar2"
-
-          account_calendar = ff("#other-calendars-context-list > .context_list_context > label")
-          expect(f("#other-calendars-list-holder")).to be_displayed
-          expect(account_calendar.first.text).to eq @course.account.name
-        end
-
-        it "removes the account if the delete button is clicked" do
-          @user.set_preference(:enabled_account_calendars, @course.account.id)
-          get "/calendar2"
-
-          account_calendar = ff("#other-calendars-context-list > .context_list_context > label")
-          expect(account_calendar.first.text).to eq @course.account.name
-
-          account_calendar_delete_btn = ff("#other-calendars-context-list > .context_list_context > .buttons-wrapper > .ContextList__DeleteBtn")
-          account_calendar_delete_btn.first.click
-
-          expect(f(".accounts-empty-state")).to be_displayed
-          driver.navigate.refresh
-          expect(f(".accounts-empty-state")).to be_displayed
-        end
-
-        it "enables event creation for added calendar accounts" do
-          enable_course_account_calendar
-          calendar_create_event_button.click
-          event_title = "account event"
-          replace_content(edit_calendar_event_form_title, event_title)
-          click_option(edit_calendar_event_form_context, @course.account.name)
-          edit_calendar_event_form_submit_button.click
-          wait_for_ajaximations
-          assert_title(event_title, false)
-        end
-      end
-
       describe "undated calendar items" do
         it "shows undated events after clicking link", priority: "1" do
           e = make_event start: nil, title: "pizza party"
@@ -224,6 +175,89 @@ describe "calendar2" do
           expect(undated_events.first.text).to eq "asdfjkasldfjklasdjfklasdjfklasjf..."
         end
       end
+    end
+  end
+
+  context "other calendars" do
+    before :once do
+      @root_account = Account.default
+      @subaccount1 = @root_account.sub_accounts.create!(name: "SA-1", account_calendar_visible: true)
+      @student = user_factory(active_all: true)
+      Account.site_admin.enable_feature!(:account_calendar_events)
+    end
+
+    before do
+      course_with_student_logged_in(user: @student, account: @subaccount1)
+    end
+
+    it "displays an empty state if there are no enabled accounts" do
+      @student.set_preference(:enabled_account_calendars, nil)
+
+      get "/calendar2"
+      expect(f("#other-calendars-list-holder")).to be_displayed
+      expect(f(".accounts-empty-state")).to be_displayed
+    end
+
+    it "displays accounts if the user has enabled them" do
+      @student.set_preference(:enabled_account_calendars, @subaccount1.id)
+      get "/calendar2"
+
+      account_calendar = ff("#other-calendars-context-list > .context_list_context > label")
+      expect(f("#other-calendars-list-holder")).to be_displayed
+      expect(account_calendar.first.text).to eq @subaccount1.name
+    end
+
+    it "removes the account if the delete button is clicked" do
+      @student.set_preference(:enabled_account_calendars, @subaccount1.id)
+      get "/calendar2"
+
+      account_calendar = ff("#other-calendars-context-list > .context_list_context > label")
+      expect(account_calendar.first.text).to eq @subaccount1.name
+
+      account_calendar_delete_btn = ff("#other-calendars-context-list > .context_list_context > .buttons-wrapper > .ContextList__DeleteBtn")
+      account_calendar_delete_btn.first.click
+
+      expect(f(".accounts-empty-state")).to be_displayed
+      driver.navigate.refresh
+      expect(f(".accounts-empty-state")).to be_displayed
+    end
+
+    it "enables event creation for added account calendars" do
+      account_admin_user(account: @subaccount1)
+      user_session(@admin)
+      get "/calendar2"
+      event_title = "account event"
+      f("button[data-testid='add-other-calendars-button']").click
+      # because clicking the checkbox clicks on a sibling span
+      driver.execute_script("$('input[data-testid=account-#{@subaccount1.id}-checkbox]').click()")
+      f("button[data-testid='save-calendars-button']").click
+      f(".flashalert-message button").click
+      f("#create_new_event_link").click
+      replace_content(edit_calendar_event_form_title, event_title)
+      click_option(edit_calendar_event_form_context, @subaccount1.name)
+      edit_calendar_event_form_submit_button.click
+      wait_for_ajaximations
+      assert_title(event_title, false)
+    end
+
+    it "does not show the account or its events if the account calendar is hidden" do
+      event_title = "subaccount 1 event"
+      @subaccount1.calendar_events.create!(title: event_title, start_at: 2.days.from_now)
+
+      @student.set_preference(:enabled_account_calendars, [@subaccount1])
+      user_session(@student)
+
+      get "/calendar2"
+      expect(f("#other-calendars-list-holder")).to contain_css("#other-calendars-context-list > li[data-context=account_#{@subaccount1.id}]")
+      expect(f(".fc-body")).to contain_css(".fc-event")
+      assert_title(event_title, false)
+
+      @subaccount1.account_calendar_visible = false
+      @subaccount1.save!
+
+      driver.navigate.refresh
+      expect(f("#other-calendars-list-holder")).not_to contain_css("#other-calendars-context-list > li[data-context=account_#{@subaccount1.id}]")
+      expect(f(".fc-body")).not_to contain_css(".fc-event")
     end
   end
 end
