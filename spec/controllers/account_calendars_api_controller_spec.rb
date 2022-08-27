@@ -57,6 +57,25 @@ describe AccountCalendarsApiController do
       expect(json["account_calendars"].map { |calendar| calendar["id"] }).to contain_exactly(@root_account.id, @subaccount2.id)
     end
 
+    context "sharding" do
+      specs_require_sharding
+
+      it "works fetching account associations across shards" do
+        @student = user_factory(active_all: true)
+        user_session @student
+
+        @shard2.activate { course_with_student(user: @student, active_all: true, account: Account.create!(account_calendar_visible: true)) }
+        course_with_student(user: @student, active_all: true, account: Account.default)
+
+        Account.last.trust_links.create!(managing_account: Account.default)
+        Account.default.trust_links.create!(managing_account: Account.last)
+
+        get :index
+        expect(response).to be_successful
+        expect(json_parse(response.body)["account_calendars"].map { |calendar| calendar["id"] }).to contain_exactly(Account.default.id, Account.last.id)
+      end
+    end
+
     context "with a search term" do
       it "includes matching results from all accounts if a search term is provided" do
         course_with_student_logged_in(user: @user, account: @subaccount1a)

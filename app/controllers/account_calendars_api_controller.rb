@@ -119,9 +119,9 @@ class AccountCalendarsApiController < ApplicationController
     GuardRail.activate(:secondary) do
       search_term = params[:search_term]
       InstStatsd::Statsd.increment("account_calendars.available_calendars_requested") if search_term.blank? && params[:page].nil?
-      accounts = @current_user.associated_accounts.active.where(account_calendar_visible: true)
+      accounts = @current_user.unordered_associated_accounts.shard(@current_user.in_region_associated_shards).active.where(account_calendar_visible: true)
       accounts = Account.search_by_attribute(accounts, :name, search_term) if search_term.present?
-      paginated_accounts = Api.paginate(accounts.reorder(Account.best_unicode_collation_key("name"), :id), self, api_v1_account_calendars_url, total_entries: accounts.count)
+      paginated_accounts = Api.paginate(accounts.sort_by { |a| Canvas::ICU.collation_key(a.name.to_s) }, self, api_v1_account_calendars_url, total_entries: accounts.count)
       json = {
         account_calendars: account_calendars_json(paginated_accounts, @current_user, session),
         total_results: accounts.count
