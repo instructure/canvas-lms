@@ -60,9 +60,10 @@ export default class EditConferenceView extends DialogBaseView
       success: (data) =>
         @model.set(data)
         @model.trigger('sync')
+        $.flashMessage(I18n.t("Conference Saved!"))
       error: =>
         @show(@model)
-        alert('Save failed.')
+        $.flashError(I18n.t('Save failed.'))
       processData: (formData) =>
         dkey = 'web_conference[duration]';
         if(numberHelper.validate(formData[dkey]))
