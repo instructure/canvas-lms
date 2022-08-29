@@ -29,6 +29,7 @@ if settings.present?
   Sentry.init do |config|
     config.dsn = settings[:dsn]
     config.breadcrumbs_logger = [:sentry_logger, :http_logger]
+    config.traces_sample_rate = 1.0
     config.capture_exception_frame_locals = true
     config.transport.ssl_verification = false
     config.release = Canvas.revision
