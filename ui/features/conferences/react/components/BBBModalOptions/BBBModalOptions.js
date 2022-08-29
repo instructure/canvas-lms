@@ -36,6 +36,7 @@ const BBBModalOptions = props => {
   const ATTENDEES_TAB = 'attendees'
 
   const [tab, setTab] = useState(SETTINGS_TAB)
+  const [noTimeLimit, setNoTimeLimit] = useState(props.options.includes('no_time_limit')) // match options.no_time_limit default
 
   return (
     <Tabs
@@ -65,7 +66,7 @@ const BBBModalOptions = props => {
               <NumberInput
                 renderLabel={I18n.t('Duration in Minutes')}
                 display="inline-block"
-                value={props.duration}
+                value={noTimeLimit ? '' : props.duration}
                 onChange={(e, value) => {
                   if (!Number.isInteger(Number(value))) return
 
@@ -82,7 +83,8 @@ const BBBModalOptions = props => {
 
                   props.onSetDuration(props.duration - 1)
                 }}
-                isRequired={true}
+                interaction={noTimeLimit ? 'disabled' : 'enabled'}
+                isRequired={!noTimeLimit}
               />
             </span>
           </Flex.Item>
@@ -103,6 +105,9 @@ const BBBModalOptions = props => {
               <Checkbox
                 label={I18n.t('No time limit (for long-running conferences)')}
                 value="no_time_limit"
+                onChange={event => {
+                  setNoTimeLimit(event.target.checked)
+                }}
               />
               <Checkbox label={I18n.t('Enable waiting room')} value="enable_waiting_room" />
               <Checkbox label={I18n.t('Add to Calendar')} value="add_to_calendar" />

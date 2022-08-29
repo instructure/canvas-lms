@@ -110,7 +110,105 @@ const ConferencesRouter = Backbone.Router.extend({
     const conference = new Conference(_.clone(ENV.default_conference))
     conference.once('startSync', () => this.currentConferences.unshift(conference))
     if (conference.get('permissions').create) {
-      this.editView.show(conference)
+      if (ENV.bbb_modal_update) {
+        const {attributes} = conference // || ENV.default_conference
+
+        const availableAttendeesList = ENV.users.map(({id, name}) => {
+          return {
+            displayName: name,
+            id
+          }
+        })
+
+        ReactDOM.render(
+          <VideoConferenceModal
+            open={true}
+            isEditing={false}
+            availableAttendeesList={availableAttendeesList}
+            onDismiss={() => {
+              window.location.hash = ''
+              ReactDOM.render(<span />, document.getElementById('react-conference-modal-container'))
+            }}
+            onSubmit={(e, data) => {
+              const context =
+                attributes.context_type === 'Course'
+                  ? 'courses'
+                  : attributes.context_type === 'Group'
+                  ? 'groups'
+                  : null
+              const contextId = attributes.context_id
+              const inviteAll = data.invitationOptions.includes('invite_all') ? 1 : 0
+              const noTimeLimit = data.options.includes('no_time_limit') ? 1 : 0
+              const enableWaitingRoom = data.options.includes('enable_waiting_room') ? 1 : 0
+              const duration = noTimeLimit ? '' : data.duration
+              const record = data.options.includes('recording_enabled') ? 1 : 0
+              const payload = {
+                _method: 'POST',
+                title: data.name,
+                'web_conference[title]': data.name,
+                conference_type: data.conferenceType,
+                'web_conference[conference_type]': data.conferenceType,
+                duration,
+                'web_conference[duration]': duration,
+                'user_settings[record]': record,
+                'web_conference[user_settings][record]': record,
+                'web_conference[user_settings][enable_waiting_room]': enableWaitingRoom,
+                long_running: noTimeLimit,
+                'web_conference[long_running]': noTimeLimit,
+                description: data.description,
+                'web_conference[description]': data.description,
+                'user[all]': inviteAll,
+                'observers[remove]': 0
+              }
+              if (inviteAll) {
+                ENV.users.forEach(userId => {
+                  payload[`user[${userId}]`] = 1
+                })
+              } else {
+                data.selectedAttendees.forEach(userId => {
+                  payload[`user[${userId}]`] = 1
+                })
+              }
+
+              ;[
+                'share_webcam',
+                'share_microphone',
+                'share_other_webcams',
+                'send_public_chat',
+                'send_private_chat'
+              ].forEach(option => {
+                payload[`web_conference[user_settings][${option}]`] =
+                  data.attendeesOptions.includes(option) ? 1 : 0
+              })
+
+              const requestOptions = {
+                credentials: 'same-origin',
+                method: 'POST',
+                body: new URLSearchParams(payload),
+                headers: {
+                  'X-CSRF-Token': getCookie('_csrf_token')
+                }
+              }
+
+              if (!context) {
+                return
+              }
+
+              fetch(`/${context}/${contextId}/conferences`, requestOptions)
+                .then(() => {
+                  // Remove the `conference_N` since it will cause the modal to reopen on the reload.
+                  window.location.href = window.location.href.split('#')[0]
+                })
+                .catch(err => {
+                  throw err
+                })
+            }}
+          />,
+          document.getElementById('react-conference-modal-container')
+        )
+      } else {
+        this.editView.show(conference)
+      }
     }
   },
 
