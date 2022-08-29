@@ -32,8 +32,7 @@ describe "allowed_attempts feature for assignments" do
     describe "the assignments page" do
       context "with allowed_attempts on the assignment" do
         before do
-          @assignment = @course.assignments.create!({ name: "Test Assignment", allowed_attempts: 2 })
-          @assignment.update_attribute(:submission_types, "online_text_entry")
+          @assignment = @course.assignments.create!({ name: "Test Assignment", submission_types: "online_text_entry", allowed_attempts: 2 })
         end
 
         it "prevents submitting if the student has exceeded the max number of attempts" do
@@ -53,8 +52,7 @@ describe "allowed_attempts feature for assignments" do
 
       context "without allowed_attempts on the assignment" do
         before do
-          @assignment = @course.assignments.create!({ name: "Test Assignment", allowed_attempts: -1 })
-          @assignment.update_attribute(:submission_types, "online_text_entry")
+          @assignment = @course.assignments.create!({ name: "Test Assignment", submission_types: "online_text_entry", allowed_attempts: -1 })
           @assignment.submit_homework(@student, { body: "blah" })
         end
 
@@ -69,8 +67,7 @@ describe "allowed_attempts feature for assignments" do
     describe "the assignments detail page" do
       context "with allowed_attempts on the assignment" do
         before do
-          @assignment = @course.assignments.create!({ name: "Test Assignment", allowed_attempts: 2 })
-          @assignment.update_attribute(:submission_types, "online_text_entry")
+          @assignment = @course.assignments.create!({ name: "Test Assignment", submission_types: "online_text_entry", allowed_attempts: 2 })
           @submission = @assignment.submit_homework(@student, { body: "blah" })
           @submission.update(submission_type: "online_text_entry")
         end
@@ -91,8 +88,7 @@ describe "allowed_attempts feature for assignments" do
 
       context "without allowed_attempts on the assignment" do
         before do
-          @assignment = @course.assignments.create!({ name: "Test Assignment", allowed_attempts: -1 })
-          @assignment.update_attribute(:submission_types, "online_text_entry")
+          @assignment = @course.assignments.create!({ name: "Test Assignment", submission_types: "online_text_entry", allowed_attempts: -1 })
           @submission = @assignment.submit_homework(@student, { body: "blah" })
           @submission.update(attempt: 2, submission_type: "online_text_entry")
         end
