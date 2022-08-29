@@ -170,6 +170,7 @@ export type FilterPreset = {
   name: string
   filters: Filter[]
   created_at: string
+  updated_at: string
 }
 
 export type PartialFilterPreset = Omit<FilterPreset, 'id'> & {id?: string}

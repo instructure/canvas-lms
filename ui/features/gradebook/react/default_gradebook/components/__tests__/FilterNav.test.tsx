@@ -22,7 +22,7 @@ import fetchMock from 'fetch-mock'
 import store from '../../stores/index'
 import type {FilterNavProps} from '../FilterNav'
 import type {FilterPreset, Filter} from '../../gradebook.d'
-import {render, waitFor} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/extend-expect'
 
@@ -82,7 +82,8 @@ const defaultFilterPresets: FilterPreset[] = [
         created_at: '2022-02-05T10:18:34-07:00'
       }
     ],
-    created_at: '2022-02-05T10:18:34-07:00'
+    created_at: '2022-02-05T10:18:34-07:00',
+    updated_at: '2022-02-05T10:18:34-07:00'
   },
   {
     id: 'preset-2',
@@ -95,7 +96,8 @@ const defaultFilterPresets: FilterPreset[] = [
         created_at: new Date().toISOString()
       }
     ],
-    created_at: '2022-02-06T10:18:34-07:00'
+    created_at: '2022-02-06T10:18:34-07:00',
+    updated_at: '2022-02-06T10:18:34-07:00'
   }
 ]
 
@@ -163,7 +165,7 @@ describe('FilterNav', () => {
     const {getByText, getByRole} = render(<FilterNav {...defaultProps} />)
     userEvent.click(getByText('Apply Filters'))
     userEvent.click(getByText('Create & Manage Filter Presets'))
-    expect(getByRole('heading')).toHaveTextContent('Gradebook Filter Presets')
+    expect(getByRole('heading')).toHaveTextContent('Saved Filter Presets')
   })
 
   it('shows friendly panda image when there are no filters', async () => {
@@ -181,20 +183,13 @@ describe('FilterNav', () => {
     expect(await queryByAltText('Friendly panda')).toBeNull()
   })
 
-  it('renders new filter button', () => {
-    const {getByText, getByTestId} = render(<FilterNav {...defaultProps} />)
-    userEvent.click(getByText('Apply Filters'))
-    userEvent.click(getByText('Create & Manage Filter Presets'))
-    expect(getByTestId('new-filter-button')).toBeInTheDocument()
-  })
-
   it('clicking Create New Filter Preset triggers onChange with filter', async () => {
     store.setState({filterPresets: []})
     const {getByText, queryByTestId, getByTestId} = render(<FilterNav {...defaultProps} />)
     expect(queryByTestId('save-filter-button')).toBeNull()
     userEvent.click(getByText('Apply Filters'))
     userEvent.click(getByText('Create & Manage Filter Presets'))
-    userEvent.click(getByTestId('new-filter-button'))
+    userEvent.click(getByText('Toggle Create Filter Preset'))
     expect(getByTestId('save-filter-button')).toBeVisible()
   })
 })
@@ -257,27 +252,28 @@ describe('FilterNav (save)', () => {
   })
 
   it('Save button is disabled if filter preset name is blank', async () => {
-    const {getByText, getByTestId, getAllByTestId} = render(<FilterNav {...defaultProps} />)
+    const {getByText, getByTestId} = render(<FilterNav {...defaultProps} />)
     userEvent.click(getByText('Apply Filters'))
     userEvent.click(getByText('Create & Manage Filter Presets'))
-    userEvent.click(getByTestId('new-filter-button'))
-    expect(getAllByTestId('save-filter-button')[2]).toBeDisabled()
+    userEvent.click(getByText('Toggle Create Filter Preset'))
+    expect(getByTestId('save-filter-button')).toBeDisabled()
   })
 
   it('clicking Save saves new filter', async () => {
-    const {getByText, queryAllByTestId, getAllByPlaceholderText, getByTestId, getAllByTestId} =
-      render(<FilterNav {...defaultProps} />)
+    const {getByText, getByPlaceholderText, getByTestId, queryByTestId} = render(
+      <FilterNav {...defaultProps} />
+    )
     userEvent.click(getByText('Apply Filters'))
     userEvent.click(getByText('Create & Manage Filter Presets'))
-    userEvent.click(getByTestId('new-filter-button'))
+    userEvent.click(getByText('Toggle Create Filter Preset'))
     // https://github.com/testing-library/user-event/issues/577
     // type() is very slow, so use paste() instead since we don't need to test anything specific to typing
     userEvent.paste(
-      getAllByPlaceholderText('Give your filter preset a name')[2],
+      getByPlaceholderText('Give your filter preset a name'),
       'Sample filter preset name'
     )
-    expect(getAllByTestId('delete-filter-preset-button')[2]).toBeVisible()
-    userEvent.click(getAllByTestId('save-filter-button')[2])
-    await waitFor(() => expect(queryAllByTestId('save-filter-button')[2]).toBeDisabled())
+    expect(getByTestId('delete-filter-preset-button')).toBeVisible()
+    userEvent.click(getByTestId('save-filter-button'))
+    expect(queryByTestId('save-filter-button')).toBeNull()
   })
 })

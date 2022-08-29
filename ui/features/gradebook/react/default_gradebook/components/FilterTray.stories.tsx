@@ -26,6 +26,7 @@ const defaultFilterPreset: FilterPreset = {
   id: '123',
   name: 'Label',
   created_at: '2021-11-02T20:56:23.615Z',
+  updated_at: '2021-11-02T20:56:23.615Z',
   filters: [
     {
       id: '2',
@@ -79,7 +80,7 @@ const props: FilterTrayProps = {
 }
 
 export default {
-  title: 'Examples/Evaluate/Gradebook/FilterTrayFilter',
+  title: 'Examples/Evaluate/Gradebook/FilterTray',
   component: FilterNavTray,
   argTypes: {applyFilters: {action: 'applyFilters'}},
   args: props

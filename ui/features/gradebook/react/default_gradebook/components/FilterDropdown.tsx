@@ -44,9 +44,9 @@ const FiltersDropdown = ({rootId = '1', onOpenTray, dataMap, filterItems}: Props
   const menuRef = useRef<HTMLElement>()
   const currentObj = dataMap[currentItemId]
 
-  const sortedItems = currentObj?.items?.concat().sort((a, b) => a.id.localeCompare(b.id)) || []
+  const items = currentObj?.items?.concat() || []
 
-  const selectedIndices = sortedItems.reduce<number[]>((acc, current, index) => {
+  const selectedIndices = items.reduce<number[]>((acc, current, index) => {
     if (current.isSelected) {
       return acc.concat(index)
     }
@@ -126,15 +126,15 @@ const FiltersDropdown = ({rootId = '1', onOpenTray, dataMap, filterItems}: Props
             }}
             onKeyDown={handleTabbingOut}
           >
-            {sortedItems.length > 0 && (
+            {items.length > 0 && (
               <MenuGroup
                 label={I18n.t('Saved Filter Presets')}
                 onSelect={(_event: MouseEvent, updated: [number, ...number[]]) => {
-                  sortedItems[updated[0]].onToggle?.()
+                  items[updated[0]].onToggle?.()
                 }}
                 selected={selectedIndices}
               >
-                {sortedItems.map(a => {
+                {items.map(a => {
                   return (
                     <MenuItem key={a.id} as="div">
                       <TruncateText>{a.name}</TruncateText>
@@ -233,16 +233,16 @@ const FiltersDropdown = ({rootId = '1', onOpenTray, dataMap, filterItems}: Props
                 )
               })}
 
-            {sortedItems.length > 0 && (
+            {items.length > 0 && (
               <MenuGroup
                 label={currentObj.name}
                 selected={selectedIndices}
                 onSelect={(_event: MouseEvent, updated: [number, ...number[]]) =>
-                  sortedItems[updated[0]].onToggle?.()
+                  items[updated[0]].onToggle?.()
                 }
               >
                 <MenuSeparator />
-                {sortedItems.map(a => {
+                {items.map(a => {
                   return (
                     <MenuItem key={a.id} as="div">
                       <TruncateText>{a.name}</TruncateText>
