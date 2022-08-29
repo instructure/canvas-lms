@@ -59,7 +59,9 @@ const ManagementHeader = ({
     <div className="management-header" data-testid="managementHeader">
       <Flex justifyItems="space-between" width="100%">
         <View as="div">
-          <h2 className="title">{I18n.t('Outcomes')}</h2>
+          <h2 aria-hidden="true" className="title">
+            {I18n.t('Outcomes')}
+          </h2>
         </View>
         <View as="div">
           {isMobileView && (canManage || canImport) ? (
