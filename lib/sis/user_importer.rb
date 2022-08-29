@@ -172,7 +172,7 @@ module SIS
                 next
               end
               user = if force_new_user?(user_row, pseudo)
-                       new_user(user_row)
+                       new_user(user_row, pseudo)
                      else
                        pseudo.user
                      end
@@ -210,7 +210,7 @@ module SIS
               user = nil
               pseudo = Pseudonym.new
               user = other_user(user_row, pseudo) if user_row.integration_id.present?
-              user = new_user(user_row) if user.blank? || force_new_user?(user_row, pseudo)
+              user = new_user(user_row, pseudo) if user.blank? || force_new_user?(user_row, pseudo)
             end
           rescue ImportError => e
             @messages << SisBatch.build_error(user_row.csv, e.message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
@@ -453,7 +453,7 @@ module SIS
         end
       end
 
-      def new_user(user_row)
+      def new_user(user_row, _pseudo)
         User.new.tap do |user|
           user.name = infer_user_name(user_row)
           user.sortable_name = infer_sortable_name(user_row)
