@@ -307,6 +307,14 @@ describe('OutcomeManagementPanel', () => {
         contextId: '2',
         withMorePage: false
       }),
+      ...groupDetailMocks({
+        title: 'Course folder 1',
+        description: 'Course folder 1 group description',
+        groupId: '2',
+        contextType: 'Course',
+        contextId: '2',
+        withMorePage: false
+      }),
       ...groupMocks({
         groupId: '300',
         childGroupOffset: 400,
