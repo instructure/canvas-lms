@@ -28,6 +28,7 @@ const defaultFilterPreset: FilterPreset = {
   id: '123',
   name: 'Label',
   created_at: '2021-11-02T20:56:23.615Z',
+  updated_at: '2021-11-02T20:56:23.615Z',
   filters: [
     {
       id: '456',
@@ -49,6 +50,8 @@ const defaultProps: FilterTrayPresetProps = {
   applyFilters: () => ({}),
   onUpdate: () => Promise.resolve(),
   isActive: false,
+  onToggle: () => ({}),
+  isExpanded: true,
   onChange: () => {},
   onDelete: () => {},
   modules: [
@@ -96,7 +99,7 @@ describe('FilterNavFilter', () => {
     const {getByRole} = render(<FilterNavFilter {...defaultProps} onUpdate={onUpdate} />)
     userEvent.click(getByRole('button', {name: 'Sections'}))
     userEvent.click(getByRole('option', {name: 'Section 7'}))
-    userEvent.click(getByRole('button', {name: /Save Filter Preset/}))
+    userEvent.click(getByRole('button', {name: 'Save Filter Preset'}))
     expect(onUpdate).toHaveBeenCalledTimes(1)
   })
 })

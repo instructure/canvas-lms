@@ -96,7 +96,8 @@ describe('filtersState', () => {
           created_at: '2022-01-01T00:00:00Z'
         }
       ],
-      created_at: '2022-01-01T00:00:00Z'
+      created_at: '2022-01-01T00:00:00Z',
+      updated_at: '2022-01-01T00:00:00Z'
     }
     const url = `/api/v1/courses/${courseId}/gradebook_filters`
     fetchMock.post(url, mockResponse[0])
@@ -108,7 +109,8 @@ describe('filtersState', () => {
         id: '321',
         name: 'filter 1',
         filters: [],
-        created_at: '2020-01-01T00:00:00Z'
+        created_at: '2020-01-01T00:00:00Z',
+        updated_at: '2020-01-01T00:00:00Z'
       }
     ])
   })
@@ -120,7 +122,8 @@ describe('filtersState', () => {
           id: '321',
           name: 'filter 1',
           filters: [],
-          created_at: '2020-01-01T00:00:00Z'
+          created_at: '2020-01-01T00:00:00Z',
+          updated_at: '2020-01-01T00:00:00Z'
         }
       ]
     })
@@ -135,7 +138,8 @@ describe('filtersState', () => {
       id: '321',
       name: 'filter 1 (renamed)',
       filters: [],
-      created_at: '2020-01-01T00:00:00Z'
+      created_at: '2020-01-01T00:00:00Z',
+      updated_at: '2020-01-01T00:00:00Z'
     })
     expect(fetchMock.called(url, 'PUT')).toBe(true)
     expect(store.getState().filterPresets).toMatchObject([
@@ -155,7 +159,8 @@ describe('filtersState', () => {
           id: '321',
           name: 'filter 1',
           filters: [],
-          created_at: '2020-01-01T00:00:00Z'
+          created_at: '2020-01-01T00:00:00Z',
+          updated_at: '2020-01-01T00:00:00Z'
         }
       ]
     })
@@ -165,7 +170,8 @@ describe('filtersState', () => {
       id: '321',
       name: 'filter 1 (renamed)',
       filters: [],
-      created_at: '2020-01-01T00:00:00Z'
+      created_at: '2020-01-01T00:00:00Z',
+      updated_at: '2020-01-01T00:00:00Z'
     })
     expect(fetchMock.called(url, 'DELETE')).toBe(true)
     expect(store.getState().filterPresets).toMatchObject([])
@@ -390,16 +396,19 @@ describe('filtersState', () => {
           id: '321',
           name: 'filter 1',
           filters: [],
-          created_at: '2020-01-01T00:00:00Z'
+          created_at: '2020-01-01T00:00:00Z',
+          updated_at: '2020-01-01T00:00:00Z'
         },
         {
           id: '432',
           name: 'filter 2',
           filters: [],
-          created_at: '2020-01-02T00:00:00Z'
+          created_at: '2020-01-02T00:00:00Z',
+          updated_at: '2020-01-02T00:00:00Z'
         }
       ]
     })
+
     fetchMock
       .putOnce(`/api/v1/courses/${courseId}/gradebook_filters/321`, mockResponse[0])
       .putOnce(`/api/v1/courses/${courseId}/gradebook_filters/432`, mockResponse[1], {
@@ -409,19 +418,22 @@ describe('filtersState', () => {
       id: '321',
       name: 'filter 1',
       filters: [],
-      created_at: '2020-01-01T00:00:00Z'
+      created_at: '2020-01-01T00:00:00Z',
+      updated_at: '2020-01-01T00:00:00Z'
     })
-    expect(store.getState().filterPresets[0]).toMatchObject({
+    expect(store.getState().filterPresets[1]).toMatchObject({
       id: '321',
       name: 'filter 1',
       filters: [],
-      created_at: '2020-01-01T00:00:00Z'
+      created_at: '2020-01-01T00:00:00Z',
+      updated_at: '2020-01-01T00:00:00Z'
     })
-    expect(store.getState().filterPresets[1]).toMatchObject({
+    expect(store.getState().filterPresets[0]).toMatchObject({
       id: '432',
       name: 'filter 2',
       filters: [],
-      created_at: '2020-01-02T00:00:00Z'
+      created_at: '2020-01-02T00:00:00Z',
+      updated_at: '2020-01-02T00:00:00Z'
     })
   })
 })

@@ -16,21 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {Button, CloseButton} from '@instructure/ui-buttons'
+import React, {useState} from 'react'
+import {CloseButton} from '@instructure/ui-buttons'
 import {Tray} from '@instructure/ui-tray'
-import {IconFilterLine} from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {View, ContextView} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import FilterTrayPreset from './FilterTrayFilterPreset'
 import useStore from '../stores/index'
-import uuid from 'uuid'
+
 import {doFiltersMatch} from '../Gradebook.utils'
 import type {
-  Filter,
   FilterPreset,
+  PartialFilterPreset,
   Module,
   AssignmentGroup,
   Section,
@@ -43,7 +42,7 @@ const {Item: FlexItem} = Flex as any
 const I18n = useI18nScope('gradebook')
 
 export type FilterTrayProps = {
-  isTrayOpen: any
+  isTrayOpen: boolean
   setIsTrayOpen: (isOpen: boolean) => void
   filterPresets: FilterPreset[]
   modules: Module[]
@@ -53,7 +52,7 @@ export type FilterTrayProps = {
   studentGroupCategories: StudentGroupCategoryMap
 }
 
-export default function FilterNavTray({
+export default function FilterTray({
   isTrayOpen,
   setIsTrayOpen,
   filterPresets,
@@ -63,79 +62,30 @@ export default function FilterNavTray({
   sections,
   studentGroupCategories
 }: FilterTrayProps) {
-  const stagedFilters = useStore(state => state.stagedFilters)
   const saveStagedFilter = useStore(state => state.saveStagedFilter)
   const updateFilterPreset = useStore(state => state.updateFilterPreset)
   const deleteFilterPreset = useStore(state => state.deleteFilterPreset)
-  const deleteStagedFilter = useStore(state => state.deleteStagedFilter)
   const applyFilters = useStore(state => state.applyFilters)
   const appliedFilters = useStore(state => state.appliedFilters)
-
-  const initialFilters: Filter[] = [
-    {
-      id: uuid(),
-      type: 'section',
-      value: undefined,
-      created_at: new Date().toISOString()
-    },
-    {
-      id: uuid(),
-      type: 'module',
-      value: undefined,
-      created_at: new Date().toISOString()
-    },
-    {
-      id: uuid(),
-      type: 'assignment-group',
-      value: undefined,
-      created_at: new Date().toISOString()
-    },
-    {
-      id: uuid(),
-      type: 'student-group',
-      value: undefined,
-      created_at: new Date().toISOString()
-    },
-    {
-      id: uuid(),
-      type: 'grading-period',
-      value: undefined,
-      created_at: new Date().toISOString()
-    },
-    {
-      id: uuid(),
-      type: 'submissions',
-      value: undefined,
-      created_at: new Date().toISOString()
-    },
-    {
-      id: uuid(),
-      type: 'start-date',
-      value: undefined,
-      created_at: new Date().toISOString()
-    },
-    {
-      id: uuid(),
-      type: 'end-date',
-      value: undefined,
-      created_at: new Date().toISOString()
-    }
-  ]
+  const [expandedFilterPresetId, setExpandedFilterPresetId] = useState<string | null>(null)
 
   return (
     <Tray
       placement="end"
       label="Tray Example"
       open={isTrayOpen}
-      onDismiss={() => setIsTrayOpen(false)}
+      onDismiss={() => {
+        setIsTrayOpen(false)
+        setExpandedFilterPresetId(null)
+      }}
       size="regular"
       shouldCloseOnDocumentClick={true}
     >
       <View as="div" padding="medium">
-        <Flex>
+        <Flex margin="0 0 small 0">
           <FlexItem shouldGrow={true} shouldShrink={true}>
             <Heading level="h3" as="h3" margin="0 0 x-small">
-              {I18n.t('Gradebook Filter Presets')}
+              {I18n.t('Saved Filter Presets')}
             </Heading>
           </FlexItem>
           <FlexItem>
@@ -148,7 +98,7 @@ export default function FilterNavTray({
           </FlexItem>
         </Flex>
 
-        {filterPresets.length === 0 && !stagedFilters.length && (
+        {filterPresets.length === 0 && (
           <Flex as="div" margin="small">
             <FlexItem display="inline-block" width="100px" height="128px">
               <img
@@ -160,7 +110,7 @@ export default function FilterNavTray({
                 }}
               />
             </FlexItem>
-            <FlexItem shouldShrink>
+            <FlexItem shouldShrink={true}>
               <ContextView
                 padding="x-small small"
                 margin="small"
@@ -175,55 +125,56 @@ export default function FilterNavTray({
           </Flex>
         )}
 
-        {filterPresets.map(filterPreset => (
+        <View as="div" borderWidth="0 0 small 0" padding="0 0 medium 0">
           <FilterTrayPreset
             applyFilters={applyFilters}
             assignmentGroups={assignmentGroups}
-            filterPreset={filterPreset}
-            isActive={doFiltersMatch(appliedFilters, filterPreset.filters)}
+            filterPreset={{
+              name: '',
+              filters: appliedFilters,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }}
+            isActive={true}
             gradingPeriods={gradingPeriods}
-            key={filterPreset.id}
             modules={modules}
-            onUpdate={updateFilterPreset}
-            onDelete={() => deleteFilterPreset(filterPreset)}
+            onCreate={(filterPreset: PartialFilterPreset) => {
+              saveStagedFilter(filterPreset)
+              setExpandedFilterPresetId(null)
+            }}
+            onToggle={() =>
+              setExpandedFilterPresetId(expandedFilterPresetId === 'new' ? null : 'new')
+            }
+            isExpanded={expandedFilterPresetId === 'new'}
             sections={sections}
             studentGroupCategories={studentGroupCategories}
           />
-        ))}
-        <View as="div">
-          {stagedFilters.length > 0 ? (
-            <FilterTrayPreset
-              applyFilters={applyFilters}
-              assignmentGroups={assignmentGroups}
-              filterPreset={{
-                name: '',
-                filters: stagedFilters,
-                created_at: new Date().toISOString()
-              }}
-              isActive={doFiltersMatch(appliedFilters, stagedFilters)}
-              gradingPeriods={gradingPeriods}
-              key="staged"
-              modules={modules}
-              onCreate={saveStagedFilter}
-              onDelete={deleteStagedFilter}
-              sections={sections}
-              studentGroupCategories={studentGroupCategories}
-            />
-          ) : (
-            <Button
-              renderIcon={IconFilterLine}
-              color="secondary"
-              onClick={() =>
-                useStore.setState({
-                  stagedFilters: initialFilters
-                })
-              }
-              margin="x-small 0 0 0"
-              data-testid="new-filter-button"
-            >
-              {I18n.t('Create New Filter Preset')}
-            </Button>
-          )}
+        </View>
+
+        <View as="div" margin="medium 0 0 0">
+          {filterPresets.map(filterPreset => (
+            <View as="div" margin="0 0 small 0">
+              <FilterTrayPreset
+                key={filterPreset.id}
+                applyFilters={applyFilters}
+                assignmentGroups={assignmentGroups}
+                filterPreset={filterPreset}
+                isActive={doFiltersMatch(appliedFilters, filterPreset.filters)}
+                gradingPeriods={gradingPeriods}
+                modules={modules}
+                onUpdate={updateFilterPreset}
+                onDelete={() => deleteFilterPreset(filterPreset)}
+                onToggle={() =>
+                  setExpandedFilterPresetId(
+                    expandedFilterPresetId === filterPreset.id ? null : filterPreset.id
+                  )
+                }
+                isExpanded={expandedFilterPresetId === filterPreset.id}
+                sections={sections}
+                studentGroupCategories={studentGroupCategories}
+              />
+            </View>
+          ))}
         </View>
       </View>
     </Tray>

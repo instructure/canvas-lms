@@ -25,6 +25,8 @@ import {Button} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'
 import {Flex} from '@instructure/ui-flex'
 import FilterComponent from './FilterTrayFilter'
+import {ToggleGroup} from '@instructure/ui-toggle-details'
+import {Text} from '@instructure/ui-text'
 import type {
   AssignmentGroup,
   GradingPeriod,
@@ -52,7 +54,9 @@ export type FilterTrayPresetProps = {
   onChange?: (filter: PartialFilterPreset) => void
   onCreate?: (filter: PartialFilterPreset) => void
   onUpdate?: (filter: FilterPreset) => Promise<void>
-  onDelete: () => void
+  onDelete?: () => void
+  onToggle: (boolean) => void
+  isExpanded: boolean
   sections: Section[]
   studentGroupCategories: StudentGroupCategoryMap
 }
@@ -67,6 +71,8 @@ export default function FilterTrayPreset({
   onCreate,
   onUpdate,
   onDelete,
+  onToggle,
+  isExpanded,
   sections,
   studentGroupCategories
 }: FilterTrayPresetProps) {
@@ -104,6 +110,8 @@ export default function FilterTrayPreset({
         name,
         filters: stagedFilters.filter(isFilterNotEmpty)
       })
+      setName('')
+      setStagedFilters(filterPreset.filters)
       setFilterPresetWasChanged(false)
     }
   }
@@ -139,10 +147,12 @@ export default function FilterTrayPreset({
   const moduleFilter = modules.length > 0 ? ensureFilter(stagedFilters, 'module') : undefined
 
   const assignmentGroupFilter =
-    assignmentGroups.length > 0 ? ensureFilter(stagedFilters, 'assignment-group') : undefined
+    assignmentGroups.length > 1 ? ensureFilter(stagedFilters, 'assignment-group') : undefined
 
   const studentGroupFilter =
-    studentGroupCategories.length > 0 ? ensureFilter(stagedFilters, 'student-group') : undefined
+    Object.values(studentGroupCategories).length > 0
+      ? ensureFilter(stagedFilters, 'student-group')
+      : undefined
 
   // make the order of filters consistent
   const filtersWithItemsChunks = chunk(
@@ -168,89 +178,128 @@ export default function FilterTrayPreset({
     (!filterPreset.id || filterPresetWasChanged)
 
   return (
-    <View
-      as="div"
-      background="secondary"
-      padding="small"
-      borderRadius="medium"
-      margin="0 0 x-small 0"
+    <ToggleGroup
+      toggleLabel={I18n.t('Toggle %{filterPresetName}', {
+        filterPresetName: filterPreset.name || I18n.t('Create Filter Preset')
+      })}
+      onToggle={(_event: React.MouseEvent, expanded: boolean) => {
+        onToggle(expanded)
+      }}
+      expanded={isExpanded}
+      summary={
+        <Flex margin="0 0 0 xxx-small">
+          <Flex direction="column">
+            <View>
+              <Text weight="bold">
+                {filterPreset.id ? filterPreset.name : I18n.t('Create Filter Preset')}
+              </Text>
+            </View>
+            {filterPreset.id && (
+              <View>
+                <Text size="small" color="secondary">
+                  {I18n.t(
+                    {
+                      zero: 'No Filters',
+                      one: '1 Filter',
+                      other: '{{count}} Filters'
+                    },
+                    {
+                      count: stagedFilters.filter(isFilterNotEmpty).length
+                    }
+                  )}
+                </Text>
+              </View>
+            )}
+          </Flex>
+        </Flex>
+      }
     >
-      <View as="div" padding="xx-small 0 xx-small xx-small">
-        <Flex margin="0 0 small 0" padding="0 xx-small 0 0">
-          <TextInput
-            inputRef={ref => (inputRef.current = ref)}
-            width="100%"
-            renderLabel={I18n.t('Filter preset name')}
-            placeholder={I18n.t('Give your filter preset a name')}
-            value={name}
-            onChange={(_event, value) => {
-              setName(value)
-              setFilterPresetWasChanged(true)
-            }}
-          />
-        </Flex>
-        {filtersWithItemsChunks.map((filters, index) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <Flex key={`chunk-${index}`} margin="small 0">
-            {filters.map(filter => (
-              <FlexItem key={filter.id} size="50%" padding="0 xx-small 0 0">
-                <FilterComponent
-                  assignmentGroups={assignmentGroups}
-                  filter={filter}
-                  gradingPeriods={gradingPeriods}
-                  modules={modules}
-                  onChange={onChangeFilter}
-                  sections={sections}
-                  studentGroupCategories={studentGroupCategories}
-                />
-              </FlexItem>
-            ))}
+      <View as="div" padding="small" borderRadius="medium">
+        <View as="div" padding="xx-small 0 xx-small xx-small">
+          <Flex margin="0 0 small 0" padding="0 xx-small 0 0">
+            <TextInput
+              inputRef={ref => (inputRef.current = ref)}
+              width="100%"
+              renderLabel={I18n.t('Filter preset name')}
+              placeholder={I18n.t('Give your filter preset a name')}
+              value={name}
+              onChange={(_event, value) => {
+                setName(value)
+                setFilterPresetWasChanged(true)
+              }}
+            />
           </Flex>
-        ))}
-        {filtersAlwaysShownChunks.map((filters, index) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <Flex key={`always-shown-${index}`} margin="small 0">
-            {filters.map(filter => (
-              <FlexItem key={filter.id} size="50%" padding="0 xx-small 0 0">
-                <FilterComponent
-                  assignmentGroups={assignmentGroups}
-                  filter={filter}
-                  gradingPeriods={gradingPeriods}
-                  modules={modules}
-                  onChange={onChangeFilter}
-                  sections={sections}
-                  studentGroupCategories={studentGroupCategories}
-                />
-              </FlexItem>
-            ))}
+
+          {filtersWithItemsChunks.map((filters, index) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <Flex key={`chunk-${index}`} margin="small 0">
+              {filters.map(filter => (
+                <FlexItem key={filter.id} size="50%" padding="0 xx-small 0 0">
+                  <FilterComponent
+                    assignmentGroups={assignmentGroups}
+                    filter={filter}
+                    gradingPeriods={gradingPeriods}
+                    modules={modules}
+                    onChange={onChangeFilter}
+                    sections={sections}
+                    studentGroupCategories={studentGroupCategories}
+                  />
+                </FlexItem>
+              ))}
+            </Flex>
+          ))}
+
+          {filtersAlwaysShownChunks.map((filters, index) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <Flex key={`always-shown-${index}`} margin="small 0">
+              {filters.map(filter => (
+                <FlexItem key={filter.id} size="50%" padding="0 xx-small 0 0">
+                  <FilterComponent
+                    assignmentGroups={assignmentGroups}
+                    filter={filter}
+                    gradingPeriods={gradingPeriods}
+                    modules={modules}
+                    onChange={onChangeFilter}
+                    sections={sections}
+                    studentGroupCategories={studentGroupCategories}
+                  />
+                </FlexItem>
+              ))}
+            </Flex>
+          ))}
+
+          <Flex justifyItems="end" margin="0 xx-small">
+            <FlexItem margin="0 0 0 small">
+              <Button
+                color="secondary"
+                data-testid="delete-filter-preset-button"
+                margin="small 0 0 0"
+                onClick={() => {
+                  if (filterPreset.id && onDelete) {
+                    onDelete()
+                  } else {
+                    setStagedFilters([])
+                  }
+                }}
+              >
+                {filterPreset.id ? I18n.t('Delete Preset') : I18n.t('Clear')}
+              </Button>
+            </FlexItem>
+
+            <FlexItem margin="0 0 0 small">
+              <Button
+                color="primary"
+                data-testid="save-filter-button"
+                margin="small 0 0 0"
+                onClick={filterPreset.id ? handleSaveFilter : handleCreateFilter}
+                interaction={isSaveButtonEnabled ? 'enabled' : 'disabled'}
+              >
+                {I18n.t('Save Filter Preset')}
+              </Button>
+            </FlexItem>
           </Flex>
-        ))}
-
-        <Flex justifyItems="end" margin="0 xx-small">
-          <FlexItem margin="0 0 0 small">
-            <Button
-              color="secondary"
-              data-testid="delete-filter-preset-button"
-              margin="small 0 0 0"
-              onClick={onDelete}
-            >
-              {filterPreset.id ? I18n.t('Delete Preset') : I18n.t('Clear')}
-            </Button>
-          </FlexItem>
-
-          <FlexItem margin="0 0 0 small">
-            <Button
-              color="primary"
-              data-testid="save-filter-button"
-              margin="small 0 0 0"
-              onClick={filterPreset.id ? handleSaveFilter : handleCreateFilter}
-              interaction={isSaveButtonEnabled ? 'enabled' : 'disabled'}
-            >
-              {I18n.t('Save Filter Preset')}
-            </Button>
-          </FlexItem>
-        </Flex>
+        </View>
       </View>
-    </View>
+    </ToggleGroup>
   )
 }

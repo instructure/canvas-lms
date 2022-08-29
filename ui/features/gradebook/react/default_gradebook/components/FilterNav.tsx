@@ -36,7 +36,7 @@ import {getLabelForFilter, doFiltersMatch, isFilterNotEmpty} from '../Gradebook.
 import useStore from '../stores/index'
 import FilterDropdown from './FilterDropdown'
 import FilterNavDateModal from './FilterDateModal'
-import FilterNavTray from './FilterTray'
+import FilterTray from './FilterTray'
 
 const I18n = useI18nScope('gradebook')
 
@@ -330,7 +330,7 @@ export default function FilterNav({
         )}
       </FlexItem>
 
-      <FilterNavTray
+      <FilterTray
         isTrayOpen={isTrayOpen}
         setIsTrayOpen={setIsTrayOpen}
         filterPresets={filterPresets}

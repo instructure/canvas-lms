@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -228,7 +228,8 @@ export const deserializeFilter = (json: GradebookFilterApiResponse): FilterPrese
     id: filterPreset.id,
     name: String(filterPreset.name),
     filters,
-    created_at: String(filterPreset.created_at)
+    created_at: String(filterPreset.created_at),
+    updated_at: String(filterPreset.updated_at)
   }
 }
 
@@ -241,8 +242,8 @@ export const serializeFilter = (filterPreset: PartialFilterPreset): GradebookFil
   }
 }
 
-export const compareFilterByDate = (a: FilterPreset, b: FilterPreset) =>
-  new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+export const compareFilterSetByUpdatedDate = (a: FilterPreset, b: FilterPreset) =>
+  new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
 
 export const getLabelForFilter = (
   filter: Filter,

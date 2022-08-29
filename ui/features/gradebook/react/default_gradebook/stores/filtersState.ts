@@ -22,7 +22,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import type {Filter, FilterPreset, PartialFilterPreset} from '../gradebook.d'
 import {
-  compareFilterByDate,
+  compareFilterSetByUpdatedDate,
   deserializeFilter,
   doFiltersMatch,
   isFilterNotEmpty
@@ -45,7 +45,6 @@ export type FiltersState = {
   fetchFilters: () => Promise<void>
   saveStagedFilter: (filterPreset: PartialFilterPreset) => Promise<void>
   updateStagedFilterPreset: (filters: Filter[]) => void
-  deleteStagedFilter: () => void
   updateFilterPreset: (filterPreset: FilterPreset) => Promise<void>
   deleteFilterPreset: (filterPreset: FilterPreset) => Promise<void>
 }
@@ -203,7 +202,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     return doFetchApi({path})
       .then(response => {
         set({
-          filterPresets: response.json.map(deserializeFilter),
+          filterPresets: response.json.map(deserializeFilter).sort(compareFilterSetByUpdatedDate),
           isFiltersLoading: false
         })
       })
@@ -220,15 +219,6 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
           ])
         })
       })
-  },
-
-  deleteStagedFilter: () => {
-    const appliedFilters = get().appliedFilters
-    const isFilterApplied = doFiltersMatch(get().stagedFilters, appliedFilters)
-    set({
-      stagedFilters: [],
-      appliedFilters: isFilterApplied ? [] : appliedFilters
-    })
   },
 
   updateStagedFilterPreset: (newStagedFilters: Filter[]) => {
@@ -252,12 +242,13 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
       id: uuid.v4(),
       name: filterPreset.name,
       filters,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     }
 
     // optimistic update
     set({
-      filterPresets: get().filterPresets.concat([stagedFilter]).sort(compareFilterByDate),
+      filterPresets: get().filterPresets.concat([stagedFilter]).sort(compareFilterSetByUpdatedDate),
       stagedFilters: []
     })
 
@@ -266,7 +257,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
         const newFilter = deserializeFilter(response.json)
         set({
           stagedFilters: [],
-          filterPresets: originalFilters.concat([newFilter]).sort(compareFilterByDate)
+          filterPresets: originalFilters.concat([newFilter]).sort(compareFilterSetByUpdatedDate)
         })
       })
       .catch(() => {
@@ -292,7 +283,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
 
     // optimistic update
     set({
-      filterPresets: otherFilters.concat([filterPreset]).sort(compareFilterByDate),
+      filterPresets: otherFilters.concat([filterPreset]).sort(compareFilterSetByUpdatedDate),
       appliedFilters: isFilterApplied ? filterPreset.filters : appliedFilters
     })
 
@@ -303,7 +294,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
         filterPresets: get()
           .filterPresets.filter(f => f.id !== filterPreset.id)
           .concat([updatedFilter])
-          .sort(compareFilterByDate),
+          .sort(compareFilterSetByUpdatedDate),
         appliedFilters: isFilterApplied ? updatedFilter.filters : appliedFilters
       })
     } catch (err) {
@@ -313,7 +304,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
           filterPresets: get()
             .filterPresets.filter(f => f.id !== filterPreset.id)
             .concat([originalFilter])
-            .sort(compareFilterByDate),
+            .sort(compareFilterSetByUpdatedDate),
           appliedFilters
         })
       }
@@ -344,7 +335,11 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
       // rewind
       const isAbsent = get().filterPresets.some(f => f.id === filterPreset.id)
       if (!isAbsent) {
-        set({filterPresets: get().filterPresets.concat([filterPreset]).sort(compareFilterByDate)})
+        set({
+          filterPresets: get()
+            .filterPresets.concat([filterPreset])
+            .sort(compareFilterSetByUpdatedDate)
+        })
       }
 
       set({
