@@ -104,7 +104,8 @@ describe('FilePreview', () => {
     const props = {
       submission: await mockSubmission({
         Submission: {attachments: files, turnitinData: turnitin_data}
-      })
+      }),
+      originalityReportsForA2: true
     }
     const {getAllByTestId} = render(<FilePreview {...props} />)
     const reports = getAllByTestId('originality_report')
@@ -118,7 +119,20 @@ describe('FilePreview', () => {
     const props = {
       submission: await mockSubmission({
         Submission: {attachments: [files[0]], turnitinData: turnitin_data}
-      })
+      }),
+      originalityReportsForA2: true
+    }
+    const {queryByTestId} = render(<FilePreview {...props} />)
+
+    expect(queryByTestId('originality_report')).not.toBeInTheDocument()
+  })
+
+  it('does not render orignality reports if FF prop is not enabled', async () => {
+    const props = {
+      submission: await mockSubmission({
+        Submission: {attachments: files, turnitinData: turnitin_data}
+      }),
+      originalityReportsForA2: false
     }
     const {queryByTestId} = render(<FilePreview {...props} />)
 

@@ -21,6 +21,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
 import previewUnavailable from '../../../images/PreviewUnavailable.svg'
 import React, {Component} from 'react'
+import {bool} from 'prop-types'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import elideString from '../../helpers/elideString'
 import OriginalityReport from '../OriginalityReport'
@@ -38,7 +39,8 @@ const I18n = useI18nScope('assignments_2')
 
 export default class FilePreview extends Component {
   static propTypes = {
-    submission: Submission.shape
+    submission: Submission.shape,
+    originalityReportsForA2: bool
   }
 
   state = {
@@ -155,7 +157,8 @@ export default class FilePreview extends Component {
               </Table.Cell>
               <Table.Cell theme={cellTheme}>
                 {this.props.submission.turnitinData &&
-                  this.props.submission.turnitinData.length !== 0 && (
+                  this.props.submission.turnitinData.length !== 0 &&
+                  this.props.originalityReportsForA2 && (
                     <Flex.Item>
                       <OriginalityReport turnitinData={this.props.submission.turnitinData[index]} />
                     </Flex.Item>
@@ -243,7 +246,7 @@ export default class FilePreview extends Component {
           src={selectedFile.submissionPreviewUrl}
           title="preview"
           style={iframeStyle}
-          allowFullScreen
+          allowFullScreen={true}
         />
       </div>
     )
