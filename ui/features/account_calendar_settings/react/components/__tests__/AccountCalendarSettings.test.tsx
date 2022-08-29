@@ -58,7 +58,7 @@ describe('AccountCalendarSettings', () => {
     const {findByText, getByText, findAllByText, getByTestId, getByRole} = render(
       <AccountCalendarSettings {...defaultProps} />
     )
-    expect(await findByText('University (24)')).toBeInTheDocument()
+    expect(await findByText('University (25)')).toBeInTheDocument()
     const universityCheckbox = getByRole('checkbox', {name: 'Show account calendar for University'})
     const applyButton = getByTestId('save-button')
     expect(applyButton).toBeDisabled()
@@ -71,7 +71,7 @@ describe('AccountCalendarSettings', () => {
 
   it('renders account tree when no filters are applied', async () => {
     const {findByText, getByLabelText} = render(<AccountCalendarSettings {...defaultProps} />)
-    await findByText('University (24)')
+    await findByText('University (25)')
     expect(
       getByLabelText(
         'Accounts tree: navigate the accounts tree hierarchically to toggle account calendar visibility'
@@ -83,7 +83,7 @@ describe('AccountCalendarSettings', () => {
     const {findByText, getByLabelText, getByPlaceholderText} = render(
       <AccountCalendarSettings {...defaultProps} />
     )
-    await findByText('University (24)')
+    await findByText('University (25)')
     fetchMock.restore()
     fetchMock.get('/api/v1/accounts/1/account_calendars?search_term=elemen&filter=&per_page=20', [
       {
