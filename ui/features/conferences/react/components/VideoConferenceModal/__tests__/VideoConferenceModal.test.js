@@ -100,7 +100,7 @@ describe('VideoConferenceModal', () => {
     expect(onSubmit.mock.calls[0][1]).toStrictEqual({
       name: 'A great video conference name',
       duration: 60,
-      options: ['no_time_limit', 'enable_waiting_room', 'recording_enabled'],
+      options: ['enable_waiting_room', 'recording_enabled'],
       conferenceType: 'BigBlueButton',
       description: 'A great video conference description',
       invitationOptions: ['invite_all'],
