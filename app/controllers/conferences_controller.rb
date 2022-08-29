@@ -306,6 +306,8 @@ class ConferencesController < ApplicationController
       end
     end
 
+    bbb_config = WebConference.config(class_name: BigBlueButtonConference.to_s)
+
     # exposing the initial data as json embedded on page.
     js_env(
       current_conferences: ui_conferences_json(@new_conferences, @context, @current_user, session),
@@ -319,7 +321,8 @@ class ConferencesController < ApplicationController
       section_user_ids_map: @section_user_ids_map,
       can_create_conferences: @context.grants_right?(@current_user, session, :create_conferences),
       render_alternatives: @render_alternatives,
-      bbb_modal_update: Account.site_admin.feature_enabled?(:bbb_modal_update)
+      bbb_modal_update: Account.site_admin.feature_enabled?(:bbb_modal_update),
+      bbb_recording_enabled: bbb_config ? bbb_config[:recording_enabled] : false
     )
     set_tutorial_js_env
     flash[:error] = t("Some conferences on this page are hidden because of errors while retrieving their status") if @errors

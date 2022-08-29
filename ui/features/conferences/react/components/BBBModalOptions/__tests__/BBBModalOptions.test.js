@@ -78,6 +78,8 @@ describe('BBBModalOptions', () => {
     setDescription.mockClear()
     setInvitationOptions.mockClear()
     setAttendeesOptions.mockClear()
+
+    window.ENV.bbb_recording_enabled = true
   })
 
   it('should render', () => {
@@ -92,6 +94,7 @@ describe('BBBModalOptions', () => {
       defaultProps.duration.toString()
     )
     expect(container.getByLabelText('Enable recording for this conference').checked).toBeTruthy()
+    expect(container.getByLabelText('Enable recording for this conference').disabled).toBeFalsy()
     expect(container.getByLabelText('Description')).toHaveValue(defaultProps.description)
 
     fireEvent.click(container.getByText('Attendees'))
@@ -120,5 +123,11 @@ describe('BBBModalOptions', () => {
 
     expect(startInput).toBeFalsy()
     expect(endInput).toBeFalsy()
+  })
+
+  it('should disable recording if setting is disabled', () => {
+    window.ENV.bbb_recording_enabled = false
+    const container = setup(defaultProps)
+    expect(container.getByLabelText('Enable recording for this conference').disabled).toBeTruthy()
   })
 })

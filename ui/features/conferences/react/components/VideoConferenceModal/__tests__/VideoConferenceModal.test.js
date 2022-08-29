@@ -67,6 +67,7 @@ describe('VideoConferenceModal', () => {
         contexts: null
       }
     ]
+    window.ENV.bbb_recording_enabled = true
   })
 
   it('should render', () => {
@@ -99,7 +100,7 @@ describe('VideoConferenceModal', () => {
     expect(onSubmit.mock.calls[0][1]).toStrictEqual({
       name: 'A great video conference name',
       duration: 60,
-      options: ['recording_enabled', 'no_time_limit', 'enable_waiting_room'],
+      options: ['no_time_limit', 'enable_waiting_room', 'recording_enabled'],
       conferenceType: 'BigBlueButton',
       description: 'A great video conference description',
       invitationOptions: ['invite_all'],
