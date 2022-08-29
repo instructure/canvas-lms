@@ -65,6 +65,8 @@ const Template = props => (
   />
 )
 
+window.ENV.bbb_recording_enabled = true
+
 export const Default = Template.bind({})
 Default.args = {...defaultProps}
 

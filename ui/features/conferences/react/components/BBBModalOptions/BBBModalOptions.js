@@ -57,7 +57,7 @@ const BBBModalOptions = props => {
               onChange={(e, value) => {
                 props.onSetName(value)
               }}
-              isRequired
+              isRequired={true}
             />
           </Flex.Item>
           <Flex.Item padding="small">
@@ -82,7 +82,7 @@ const BBBModalOptions = props => {
 
                   props.onSetDuration(props.duration - 1)
                 }}
-                isRequired
+                isRequired={true}
               />
             </span>
           </Flex.Item>
@@ -98,6 +98,7 @@ const BBBModalOptions = props => {
               <Checkbox
                 label={I18n.t('Enable recording for this conference')}
                 value="recording_enabled"
+                disabled={!ENV.bbb_recording_enabled}
               />
               <Checkbox
                 label={I18n.t('No time limit (for long-running conferences)')}

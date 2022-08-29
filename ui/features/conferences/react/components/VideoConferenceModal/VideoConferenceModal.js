@@ -36,7 +36,12 @@ export const VideoConferenceModal = ({
   onSubmit,
   ...props
 }) => {
-  const OPTIONS_DEFAULT = ['recording_enabled', 'no_time_limit', 'enable_waiting_room']
+  const OPTIONS_DEFAULT = ['no_time_limit', 'enable_waiting_room']
+
+  if (ENV.bbb_recording_enabled) {
+    OPTIONS_DEFAULT.push('recording_enabled')
+  }
+
   const INVITATION_OPTIONS_DEFAULT = ['invite_all']
   const ATTENDEES_OPTIONS_DEFAULT = [
     'share_webcam',
