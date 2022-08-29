@@ -958,6 +958,9 @@ class Assignment < ActiveRecord::Base
       ensure_assignment_group(false)
     end
     self.submission_types ||= "none"
+    if will_save_change_to_submission_types? && ["none", "on_paper"].include?(self.submission_types)
+      self.allowed_attempts = nil
+    end
     self.peer_reviews_assigned = false if peer_reviews_due_at_changed?
     %i[
       all_day could_be_locked grade_group_students_individually
