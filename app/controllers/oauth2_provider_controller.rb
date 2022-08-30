@@ -102,6 +102,7 @@ class OAuth2ProviderController < ApplicationController
   def confirm
     if session[:oauth2]
       @provider = Canvas::OAuth::Provider.new(session[:oauth2][:client_id], session[:oauth2][:redirect_uri], session[:oauth2][:scopes], session[:oauth2][:purpose])
+      @special_confirm_message = special_confirm_message(@provider)
 
       if mobile_device?
         render layout: "mobile_auth", action: "confirm_mobile"
@@ -202,5 +203,12 @@ class OAuth2ProviderController < ApplicationController
     @grant_type ||= params[:grant_type] || (
         !params[:grant_type] && params[:code] ? "authorization_code" : "__UNSUPPORTED_PLACEHOLDER__"
       )
+  end
+
+  def special_confirm_message(provider)
+    commons_dk_id = Setting.get("commons_developer_key_id", nil)
+    if commons_dk_id.present? && commons_dk_id.to_s == provider.key.global_id.to_s
+      mt "Please note: Instructure hosts Canvas Commons in the USA. This means that when you use Canvas Commons your personal data will be stored and processed in the USA. These personal data elements include: name, email address, Canvas User ID, Canvas login name, Canvas Avatar, IP Address, Canvas Commons resources favorited by you, and comments you make to any resources in Canvas Commons. You can find more information about Instructure’s privacy practices [here](%{url}).", url: "https://www.instructure.com/policies/privacy"
+    end
   end
 end
