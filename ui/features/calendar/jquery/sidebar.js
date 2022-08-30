@@ -29,6 +29,7 @@ import 'jquery-kyle-menu'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import 'jquery-tinypubsub'
 import AccountCalendarsModal from '../react/AccountCalendarsModal'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('calendar_sidebar')
 
@@ -199,6 +200,7 @@ function setupAccountCalendarDialog(getSelectedOtherCalendars, onOtherCalendarsC
       getSelectedOtherCalendars={getSelectedOtherCalendars}
       onSave={onOtherCalendarsChange}
       calendarsPerRequest={100}
+      featureSeen={ENV.CALENDAR.ACCOUNT_CALENDAR_EVENTS_SEEN}
     />,
     $(`#manage-accounts-btn`)[0]
   )
@@ -256,13 +258,6 @@ export default function sidebar(contexts, selectedContexts, dataSource, onContex
     } else {
       $otherCalendarsHolder[0].appendChild(generateEmptyState())
     }
-    $('.manage-accounts-btn').on('click keyclick', function () {
-      if (!ENV.CALENDAR.ACCOUNT_CALENDAR_EVENTS_SEEN) {
-        $.ajaxJSON('/api/v1/calendar_events/save_enabled_account_calendars', 'POST', {
-          mark_feature_as_seen: true
-        })
-      }
-    })
 
     const onOtherCalendarsChange = newOtherCalendars => {
       const newAddedCalendars = newOtherCalendars.filter(newAC => {
@@ -295,12 +290,25 @@ export default function sidebar(contexts, selectedContexts, dataSource, onContex
     visibleContexts.toggle($(parent).data('context'))
   })
 
-  $otherCalendarsHolder.on('click keyclick', '.ContextList__DeleteBtn', function (event) {
+  $otherCalendarsHolder.on('click keyclick', '.ContextList__DeleteBtn', async function (event) {
     const parent = $(this).closest('.context_list_context')
     const toRemove = $(parent).data('context')
     const calendarToRemoveIndex = otherCalendars.findIndex(oC => oC.asset_string === toRemove)
     otherCalendars.splice(calendarToRemoveIndex, 1)
-    visibleContexts.toggleAccount(toRemove, parent)
+    try {
+      const response = await visibleContexts.toggleAccount(toRemove, parent)
+      if (response.status === 'ok') {
+        showFlashAlert({
+          type: 'success',
+          message: I18n.t('Calendar removed')
+        })
+      }
+    } catch (err) {
+      showFlashAlert({
+        err,
+        message: I18n.t('An error occurred while removing the calendar')
+      })
+    }
   })
 
   $combineHolder.on('click keyclick', '.ContextList__MoreBtn', function (event) {

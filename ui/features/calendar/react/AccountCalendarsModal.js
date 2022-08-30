@@ -17,7 +17,7 @@
  */
 
 import React, {useState, useEffect, useMemo} from 'react'
-import {func, number} from 'prop-types'
+import {bool, func, number} from 'prop-types'
 import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
 import {Button, CloseButton} from '@instructure/ui-buttons'
@@ -41,7 +41,12 @@ export const SAVE_PREFERENCES_ENDPOINT = '/api/v1/calendar_events/save_enabled_a
 
 const getLiveRegion = () => document.getElementById('flash_screenreader_holder')
 
-const AccountCalendarsModal = ({getSelectedOtherCalendars, onSave, calendarsPerRequest = 100}) => {
+const AccountCalendarsModal = ({
+  getSelectedOtherCalendars,
+  onSave,
+  calendarsPerRequest = 100,
+  featureSeen
+}) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [isOpen, setIsOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -51,6 +56,7 @@ const AccountCalendarsModal = ({getSelectedOtherCalendars, onSave, calendarsPerR
   const [totalAccounts, setTotalAccounts] = useState(null)
   const [selectedCalendars, setSelectedCalendars] = useState(getSelectedOtherCalendars())
   const loadNextPage = () => fetchAccounts({next: true})
+  const [isFeatureSeen, setIsFeatureSeen] = useState(featureSeen)
   const resultsProps = {
     searchTerm,
     results,
@@ -97,6 +103,23 @@ const AccountCalendarsModal = ({getSelectedOtherCalendars, onSave, calendarsPerR
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, searchTerm])
+
+  useEffect(() => {
+    if (!isFeatureSeen && isOpen) {
+      const markAsSeen = async () => {
+        const {json} = await doFetchApi({
+          path: SAVE_PREFERENCES_ENDPOINT,
+          params: {mark_feature_as_seen: true},
+          method: 'POST'
+        })
+        if (json.status === 'ok') {
+          setIsFeatureSeen(true)
+        }
+      }
+      markAsSeen()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen])
 
   const closeModal = () => {
     setSearchTerm('')
@@ -208,6 +231,7 @@ const AccountCalendarsModal = ({getSelectedOtherCalendars, onSave, calendarsPerR
             <TextInput
               data-testid="search-input"
               type="search"
+              label=""
               theme={{borderRadius: '2rem'}}
               placeholder={
                 isLoading
@@ -245,7 +269,8 @@ const AccountCalendarsModal = ({getSelectedOtherCalendars, onSave, calendarsPerR
 AccountCalendarsModal.propTypes = {
   getSelectedOtherCalendars: func.isRequired,
   onSave: func.isRequired,
-  calendarsPerRequest: number
+  calendarsPerRequest: number,
+  featureSeen: bool
 }
 
 export default AccountCalendarsModal

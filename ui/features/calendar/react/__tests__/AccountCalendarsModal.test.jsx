@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { act, render, fireEvent } from '@testing-library/react'
+import { act, render, fireEvent, waitFor } from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import MockDate from 'mockdate'
 import { accountCalendarsAPIPage1Response, accountCalendarsAPIPage2Response, allAccountCalendarsResponse, emptyResponse } from './mocks'
@@ -28,6 +28,7 @@ describe('Other Calendars modal ', () => {
     const page2Results = accountCalendarsAPIPage2Response.account_calendars
     const totalCalendars = allAccountCalendarsResponse.total_results
     const getSearchUrl = (searchTerm) => SEARCH_ENDPOINT.concat(`?per_page=2&search_term=${searchTerm}`)
+    const markAsSeenUrl = encodeURI(SAVE_PREFERENCES_ENDPOINT.concat(`?mark_feature_as_seen=true`))
 
     beforeAll(() => {
         jest.useFakeTimers()
@@ -42,6 +43,7 @@ describe('Other Calendars modal ', () => {
         fetchMock.get(SEARCH_ENDPOINT.concat('?per_page=5'), JSON.stringify(allAccountCalendarsResponse))
         fetchMock.get(SEARCH_ENDPOINT.concat('?per_page=2&page=2'), JSON.stringify(accountCalendarsAPIPage2Response))
         fetchMock.get(getSearchUrl('Test'), JSON.stringify(emptyResponse))
+        fetchMock.post(markAsSeenUrl, JSON.stringify({ status: 'ok' }))
     })
 
     afterEach(() => {
@@ -52,6 +54,7 @@ describe('Other Calendars modal ', () => {
         getSelectedOtherCalendars: () => [page1Results[0]],
         onSave: jest.fn(),
         calendarsPerRequest: 2,
+        featureSeen: true,
         ...overrides
     })
 
@@ -120,6 +123,34 @@ describe('Other Calendars modal ', () => {
         openModal(addCalendarButton)
         await findByTestId(`account-${page1Results[1].id}-checkbox`)
         expect(queryByText('Show more')).not.toBeInTheDocument()
+    })
+
+    it('mark feature as seen when the modal is opened for the first time', async () => {
+        const { getByTestId } = render(
+            <AccountCalendarsModal {...getProps({ featureSeen: null })} />)
+        const addCalendarButton = getByTestId('add-other-calendars-button')
+        openModal(addCalendarButton)
+        advance(500)
+        expect(fetchMock.called(markAsSeenUrl)).toBe(true)
+        expect(fetchMock.calls(markAsSeenUrl)).toHaveLength(1)
+        const closeButton = getByTestId('footer-close-button')
+        act(() => closeButton.click())
+        // wait for the modal to be closed
+        await waitFor(() => expect(closeButton).not.toBeInTheDocument())
+        openModal(addCalendarButton)
+        advance(500)
+        // doesn't call the API if the modal is opened again
+        expect(fetchMock.calls(markAsSeenUrl)).toHaveLength(1)
+    })
+
+    it('does not try to mark the feature as seen if it is already seen', () => {
+        const { getByTestId } = render(
+            <AccountCalendarsModal {...getProps({ featureSeen: true })} />)
+        const addCalendarButton = getByTestId('add-other-calendars-button')
+        openModal(addCalendarButton)
+        advance(500)
+        expect(fetchMock.called(markAsSeenUrl)).toBe(false)
+        expect(fetchMock.calls(markAsSeenUrl)).toHaveLength(0)
     })
 
     describe('Search bar ', () => {
