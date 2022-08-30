@@ -17,11 +17,8 @@
  */
 
 import React from 'react'
-import {useQuery} from 'react-apollo'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
-import {ROSTER_QUERY} from '../../../graphql/Queries'
-import LoadingIndicator from '@canvas/loading-indicator'
 import AvatarLink from '../../components/AvatarLink/AvatarLink'
 import NameLink from '../../components/NameLink/NameLink'
 import StatusPill from '../../components/StatusPill/StatusPill'
@@ -30,6 +27,10 @@ import {secondsToStopwatchTime} from '../../../util/utils'
 import RosterTableLastActivity from '../../components/RosterTableLastActivity/RosterTableLastActivity'
 import RosterTableRoles from '../../components/RosterTableRoles/RosterTableRoles'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Text} from '@instructure/ui-text'
+import {arrayOf, object, shape} from 'prop-types'
+import {OBSERVER_ENROLLMENT, STUDENT_ENROLLMENT} from '../../../util/constants'
+import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('course_people')
 
@@ -39,18 +40,7 @@ const idProps = name => ({
   'data-testid': name
 })
 
-const OBSERVER_ENROLLMENT = 'ObserverEnrollment'
-const STUDENT_ENROLLMENT = 'StudentEnrollment'
-
-const RosterTable = () => {
-  const {loading, data} = useQuery(ROSTER_QUERY, {
-    variables: {courseID: ENV.course.id},
-    fetchPolicy: 'cache-and-network',
-    errorPolicy: 'all'
-  })
-
-  if (loading) return <LoadingIndicator />
-
+const RosterTable = ({data}) => {
   const {
     view_user_logins,
     read_sis,
@@ -70,7 +60,11 @@ const RosterTable = () => {
       : manage_students
     const sectionNames = enrollments.map(enrollment => {
       if (enrollment.type === OBSERVER_ENROLLMENT) return null
-      return <div key={`section-${enrollment.id}`}>{enrollment.section.name}</div>
+      return (
+        <Text as="div" wrap="break-word" key={`section-${enrollment.id}`}>
+          {enrollment.section.name}
+        </Text>
+      )
     })
 
     return (
@@ -88,8 +82,16 @@ const RosterTable = () => {
           />
           <StatusPill state={state} />
         </Table.Cell>
-        {view_user_logins && <Table.Cell>{loginId}</Table.Cell>}
-        {read_sis && <Table.Cell>{sisId}</Table.Cell>}
+        {view_user_logins && (
+          <Table.Cell>
+            <Text wrap="break-word">{loginId}</Text>
+          </Table.Cell>
+        )}
+        {read_sis && (
+          <Table.Cell>
+            <Text wrap="break-word">{sisId}</Text>
+          </Table.Cell>
+        )}
         {showCourseSections && <Table.Cell>{sectionNames}</Table.Cell>}
         <Table.Cell>
           <RosterTableRoles enrollments={enrollments} />
@@ -101,7 +103,9 @@ const RosterTable = () => {
         )}
         {read_reports && (
           <Table.Cell>
-            {totalActivityTime > 0 && secondsToStopwatchTime(totalActivityTime)}
+            <Text wrap="break-word">
+              {totalActivityTime > 0 && secondsToStopwatchTime(totalActivityTime)}
+            </Text>
           </Table.Cell>
         )}
         <Table.Cell>
@@ -115,7 +119,9 @@ const RosterTable = () => {
     <Table caption={I18n.t('Course Roster')}>
       <Table.Head data-testid="roster-table-head">
         <Table.Row>
-          <Table.ColHeader {...idProps('colheader-avatar')}>{}</Table.ColHeader>
+          <Table.ColHeader {...idProps('colheader-avatar')} width="64px">
+            <ScreenReaderContent>{I18n.t('Profile Pictures')}</ScreenReaderContent>
+          </Table.ColHeader>
           <Table.ColHeader {...idProps('colheader-name')}>{I18n.t('Name')}</Table.ColHeader>
           {view_user_logins && (
             <Table.ColHeader {...idProps('colheader-login-id')}>
@@ -128,7 +134,11 @@ const RosterTable = () => {
           {showCourseSections && (
             <Table.ColHeader {...idProps('colheader-section')}>{I18n.t('Section')}</Table.ColHeader>
           )}
-          <Table.ColHeader {...idProps('colheader-role')}>{I18n.t('Role')}</Table.ColHeader>
+          <Table.ColHeader {...idProps('colheader-role')}>
+            <View as="div" minWidth="9ch">
+              {I18n.t('Role')}
+            </View>
+          </Table.ColHeader>
           {read_reports && (
             <Table.ColHeader {...idProps('colheader-last-activity')}>
               {I18n.t('Last Activity')}
@@ -149,7 +159,15 @@ const RosterTable = () => {
   )
 }
 
-RosterTable.propTypes = {}
+RosterTable.propTypes = {
+  data: shape({
+    course: shape({
+      usersConnection: shape({
+        nodes: arrayOf(object).isRequired
+      }).isRequired
+    }).isRequired
+  }).isRequired
+}
 
 RosterTable.defaultProps = {}
 
