@@ -290,12 +290,15 @@ ca:
     tab_statistics: Estadístiques
     tab_sub_accounts: "Comptes secundaris"
     tab_terms: Termes
+  account_580e7fda: "compte d’usuari"
   account_97b34646: Usuari
   account_account_b6b3746b: "Usuari: %{account}"
   account_administrators_can_always_create_courses_926dc0cb: "Els administradors de l'usuari sempre poden crear assignatures"
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: "Escales de domini dels resultats a nivell d'usuari i d'assignatura"
   account_and_course_level_outcome_proficiencies_1cfa260: "Competències dels resultats a nivell de compte i de curs"
   account_and_subaccount_40c6430: "Usuari i usuari secundari"
+  account_branding_for_confetti_db2012a8: "Creació de marca del compte d’usuari per a confeti"
+  account_calendar_visibility_350b0475: "Visibilitat del calendari del compte d’usuari"
   account_calendars_4a4a79b2: "Calendaris del compte"
   account_calendars_add_edit_delete_events_1ef2b8bd: "Calendaris del compte: afegeix/edita/suprimeix esdeveniments"
   account_calendars_change_visibility_c795702a: "Calendaris del compte: canvia la visibilitat"
@@ -484,6 +487,7 @@ ca:
   account_user: 
     types: 
       account_admin: "Administrador de l'usuari"
+  accountname_subaccountcount_960a41c: "%{accountName} (%{subaccountCount})"
   accounts: 
     account_name_required: "El nom de l'usuari no pot estar en blanc."
     account_quotas_not_updated: "No s’han actualitzat les quotes de l'usuari"
@@ -1467,6 +1471,13 @@ ca:
             check_box: "Inclou l'estat d'inscripció"
       active: "Inscripcions actives"
       all: "Totes les inscripcions"
+    sumter: 
+      student_submissions: 
+        parameters: 
+          custom_reports: 
+            course_ids: 
+              parameters: 
+                header: "ID de l'assignatura"
     tempe_grade_export_csv_parameters: 
       account_reports: 
         tempe: 
@@ -1549,6 +1560,7 @@ ca:
             text: "Aquest informe mostra tots els usuaris inscrits en qualsevol assignatura d'un període acadèmic concret. El fitxer CSV resultant tindrà una fila per a cada usuari inscrit que no hagi visitat l'assignatura des de la data."
   accounts_752dc365: Comptes
   accounts_lti_546d15c7: "Comptes (LTI)"
+  accounts_tree_navigate_the_accounts_tree_hierarchi_8afea172: "Arbre de comptes d’usuari: navegueu jeràrquicament per l’arbre de comptes d’usuari per commutar la visibilitat del calendari del compte d’usuari"
   achieve_mastery_count_times_8c9bbcec: 
     one: "Assoleix el domini una vegada"
     other: "Assoleix el domini %{count} vegades"
@@ -1615,6 +1627,7 @@ ca:
   add_bank: 
     default_name: "Sense nom"
   add_blackout_dates_ui_to_course_pacing_requires_co_1b675701: "Afegiu la IU de les dates sense descomptes a Ritme de l'assignatura. Cal que course_paces estigui activat."
+  add_calendars_to_view_your_institution_s_important_df1e42d3: "Afegiu calendaris per veure les dates importants de la vostra institució, com ara el primer dia de classe, els períodes d’exàmens, etc."
   add_cc_subtitle_a9ef4a66: "Afegeix CC/subtítol"
   add_collaboration_da9665ac: "Afegeix una col·laboració"
   add_comment_3205529f: "Afegeix un comentari"
@@ -1725,6 +1738,7 @@ ca:
   add_tas_to_the_course_2aac6e02: "Afegeix auxiliars de professors a l'assignatura"
   add_teachers_to_courses_48ac7a7a: "Afegeix professors a les assignatures"
   add_to_calendar_1d4a0e81: "Afegeix al calendari"
+  add_to_course_pacing_blackout_dates_2459cfd2: "Afegiu-ho a les dates sense descomptes de Ritme de l’assignatura"
   add_to_library_30514daa: "Afegeix a la biblioteca"
   add_to_rce_toolbar_e5b3e3b4: "Afegeix a la barra d'eines d'RCE"
   add_to_student_to_do_58e66b4b: "Afegeix a les tasques pendents de l'estudiant"
@@ -1774,7 +1788,7 @@ ca:
       anotacions al document o comentaris a la rúbrica sense llegir
   adjusting_due_dates_a5918b9c: "S’estan ajustant les dates de venciment…"
   admin_4d3ba42f: Administrador
-  admin_analytics_description: "En fer l'activació, es mostra l’analítica d’administrador perquè es visualitzin les vistes generals de les assignatures i dels estudiants. Un cop feta l'activació, és possible que les dades tardin 24 hores a mostrar-se. Per obtenir més informació i fer suggeriments, participeu en el *grup de nous usuaris d’analítica* a la comunitat del Canvas."
+  admin_analytics_description: "En fer l'activació, es mostra l’analítica d’administrador perquè es visualitzin les vistes generals de les assignatures i dels estudiants. Un cop feta l'activació, és possible que les dades tardin 24 hores a mostrar-se. Per obtenir més informació i fer suggeriments, participeu en el *grup de nous usuaris d’analítica* a la comunitat del Canvas."
   admin_analytics_eacba735: "Analítica d’administrador"
   admin_csv_f8d1b3eb: "CSV d'administradors"
   admin_export_for_multiple_grading_periods_8a0c5ac1: "Exportació d’administrador per a diversos períodes de qualificació"
@@ -2587,10 +2601,12 @@ ca:
   an_error_occurred_while_saving_account_proficiency_43e7fb6a: "S'ha produït un error en desar les classificacions de competència de l'usuari"
   an_error_occurred_while_saving_account_proficiency_9f0f9208: "S'ha produït un error en desar les classificacions de competència del compte: %{message}"
   an_error_occurred_while_saving_associations_bd66f3f4: "S'ha produït un error en desar les associacions"
+  an_error_occurred_while_saving_changes_b42c9b84: "S'ha produït un error en desar els canvis"
   an_error_occurred_while_saving_the_assignment_post_94f1184e: "S'ha produït un error en desar la política de publicació de l'activitat"
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: "S'ha produït un error en desar la política de publicació de l'assignatura"
   an_error_occurred_while_saving_the_mastery_scale_m_30c15545: "S'ha produït un error en desar l’escala de domini: %{message}"
   an_error_occurred_while_saving_your_settings_b503a31c: "S'ha produït un error en desar la vostra configuració"
+  an_error_occurred_while_searching_accounts_calenda_9ce76068: "S'ha produït un error en cercar els calendaris dels comptes d’usuari"
   an_error_occurred_while_searching_for_your_institu_16a1ace4: "S’ha produït un error en cercar la vostra institució"
   an_error_occurred_while_starting_migration_8e6015e2: "S'ha produït un error en iniciar la migració"
   an_error_occurred_while_trying_to_change_the_ui_bca3b2d2: "S'ha produït un error en intentar canviar la IU."
@@ -2829,7 +2845,9 @@ ca:
   application_secret_e6803c7e: "Secret d'aplicació"
   applied_cc7be774: Aplicat
   applied_filters_63a90ccd: "Filtres aplicats:"
+  applies_account_branding_to_confetti_splashes_c5989dce: "Aplica la creació de marca del compte d’usuari als esquitxos de confeti"
   apply_781a2546: Aplica
+  apply_changes_b1dffc70: "Aplica els canvis"
   apply_conditions_9e941010: "Aplica les condicions"
   apply_date_range_selection_cc4351ed: "Aplica la selecció d'interval de dates"
   apply_filter_7e4f6113: "Aplica el filtre"
@@ -4467,6 +4485,7 @@ ca:
       page_title_header: Calendari
       undated_items: "Sense data"
   calendars_a756c286: Calendaris
+  calendars_saved_successfully_bcba8359: "S'han desat correctament els calendaris"
   calendars_toggle_list_visibility_488db143: "Els calendaris commuten la visibilitat de la llista"
   campbell_union_high_school_district_grade_report_7f3bb801: "Informe de notes de l’institut del districte de Campbell Union"
   campus_vue_non_graded_assignment_report_1cd8999a: "Informe d'activitats no qualificades de Campus Vue"
@@ -4766,6 +4785,7 @@ ca:
   choose_assignment_path_8ea55f3a: "Tria el camí de l'activitat"
   choose_assignment_set_415f1b3: "Tria el conjunt d'activitats"
   choose_attribute_to_add_866e128d: "Tria l'atribut per afegir"
+  choose_calendars_to_add_be60ea17: "Trieu els calendaris per afegir"
   choose_canvas_account_ec2f0279: CHCP
   choose_course_home_page_d8642f9e: "Tria la pàgina inicial de l'assignatura"
   choose_file_8d89ccab: "Tria un fitxer"
@@ -4780,6 +4800,7 @@ ca:
     one: "Seleccioneu un calendari de matèria."
     other: "Seleccioneu fins a %{count} calendaris de matèria."
   choose_usage_rights_33683854: "Tria els drets d'ús..."
+  choose_which_calendars_are_visible_in_the_other_ca_30fae128: "Trieu els calendaris que estan visibles a la secció Altres calendaris del Calendari del Canvas. Els calendaris dels comptes d’usuari secundaris estan visibles per als usuaris si estan associats al compte d’usuari. Per defecte, tots els calendaris estan amagats."
   choose_your_default_skin_tone_f09bf0bd: "Tria el to de màscara predeterminat"
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' no és un color vàlid."
   chosencolor_is_not_a_valid_color_enter_a_valid_hex_9e2c7c42: "'%{chosenColor}' no és un color vàlid. Introduïu un codi hexadecimal vàlid abans de desar."
@@ -5276,6 +5297,7 @@ ca:
   conference_participant_count_87e86c5c: "recompte de participants de la conferència"
   conference_recorded_7e776ec2: "s’ha enregistrat la conferència"
   conference_selection_ea4050bb: "Selecció de conferències"
+  conference_type_2f4ac9be: "Tipus de conferència"
   conference_type_7bd581e: "tipus de conferència"
   conference_type_names_bcdeb3ad: "%{conference_type_names}"
   conference_type_names_conferences_6c019253: "%{conference_type_names} (conferències)"
@@ -6090,8 +6112,14 @@ ca:
   couldn_t_find_valid_settings_for_this_link_resourc_24bd1e7a: "No s'ha trobat cap configuració vàlida per a aquest enllaç: No s'ha trobat l'enllaç del recurs"
   couldn_t_find_valid_settings_for_this_link_resourc_cab9f16a: "No s'ha trobat cap configuració vàlida per a aquest enllaç: Enllaç de recurs no vàlid per a l'eina"
   couldn_t_generate_diff_message_a0528b20: "No s'ha pogut generar la diferenciació: %{message}"
+  couldn_t_load_account_calendar_settings_c198189: "No s’ha pogut carregar la configuració del calendari del compte d’usuari"
+  couldn_t_save_account_calendar_visibilities_343459d1: "No s’han pogut desar les visibilitats del calendari del compte d’usuari"
   couldn_t_track_assigning_students_to_groups_but_it_b6510770: "No s’ha pogut fer un seguiment de l'assignació d’estudiants als grups, però encara s'hi estan assignant. Comproveu el resultat manualment més endavant. (%{errorMessage})"
   count_40eced3b: Recompte
+  count_account_calendars_selected_578d6db8: 
+    one: "S’ha seleccionat 1 calendari del compte d’usuari"
+    other: "S’han seleccionat %{count} calendaris del compte d’usuari"
+    zero: "No s’ha seleccionat cap calendari del compte d’usuari"
   count_alignable_artifacts_7779644a: 
     one: "%{count} ARTEFACTE ALINEABLE"
     other: "%{count} ARTEFACTES ALINEABLES"
@@ -6554,6 +6582,7 @@ ca:
       uuid: UUID
       wiki_id: "ID de wiki"
       workflow_state: "Estat del flux de treball"
+  course_members_124b2876: "Membres del curs"
   course_members_are_free_to_join_9b2603d4: "Els membres de l'assignatura poden unir-se"
   course_modules_795cb95e: "Continguts de l'assignatura"
   course_name_45175338: "nom de l'assignatura"
@@ -6581,6 +6610,7 @@ ca:
   course_pacing_40c14b61: "Ritme de l’assignatura"
   course_pacing_adds_support_for_rolling_enrollments_3331cbaa: "Ritme de l’assignatura permet inscriure's al Canvas de manera escalonada, així com una distribució màgica de les dates de lliurament d’estudiants amb diferents dates d’inici en funció del ritme definit per un instructor. Inscriviu-vos al Grup d’usuaris de Ritme de l’assignatura per obtenir més informació i fer comentaris."
   course_pacing_blackout_dates_1dfc8b61: "Dates sense descomptes de Ritme de l’assignatura"
+  course_pacing_d3025ecf: "Ritme de l’assignatura:"
   course_pacing_is_in_active_development_348e33cf: "Ritme de l'assignatura és un desenvolupament actiu."
   course_pages_449f1dd4: "Pàgines de l'assignatura"
   course_participation_and_access_settings_7a3d6297: "Participació a l'assignatura i configuració de l'accés"
@@ -7893,6 +7923,7 @@ ca:
   discussion_post_count_report_2da4c6c: "Informe posterior al recompte de fòrums"
   discussion_posts_c998c9ad: "Publicacions als fòrums"
   discussion_redesign_description: "Aquesta característica millora l’experiència del Canvas als Fòrums i als Anuncis. Si s’habilita aquesta marca, l'accés previ a les millores en curs es mostrarà automàticament amb cada llançament. Per obtenir informació completa, consulteu el *grup d’usuaris de Redisseny de Fòrums i d’Anuncis* a la Canvas Community."
+  discussion_redesign_grading_view_467bf307: "Vista de la qualificació del nou disseny dels fòrums"
   discussion_reply_sorting_6a14676e: "Ordenar les respostes al debat"
   discussion_settings_2fbf0b95: "Configuració del fòrum"
   discussion_submission_781d5d33: "Entrega de fòrum"
@@ -9255,6 +9286,8 @@ ca:
   expand_subdiscussion_cd226ed4: "Desplega el fòrum secundari"
   expand_tutorial_tray_22630c49: "Desplega la safata de tutorial"
   expanded_f4493860: Desplegat
+  expected_array_of_objects_b09ead01: "Matriu prevista d’objectes"
+  expected_filter_param_to_be_one_of_visible_hidden_c658bc3: "S'espera que el paràmetre %{filter} sigui un de: %{visible}, %{hidden}"
   expires_at_6214b43f: "Caduca el"
   explanation_of_statuses_90a26d07: "Explicació dels estats:"
   export_course_content_f4774b74: "Exporta el contingut de l'assignatura"
@@ -9589,6 +9622,7 @@ ca:
   filter_by_name_34cbe139: "Filtra per nom"
   filter_by_term_cfe778b2: "Filtra per període acadèmic"
   filter_by_user_type_dbbd3e3d: "Filtra per tipus d'usuari"
+  filter_calendars_62680a26: "Filtra els calendaris"
   filter_conversations_by_type_1ce8c064: "Filtra les converses per tipus"
   filter_e3398407: Filtre
   filter_features_388eafd8: "Filtra les característiques"
@@ -9712,11 +9746,11 @@ ca:
   formattedgrade_points_576abfea: "%{formattedGrade} *Punts*"
   formattedgrade_points_90505a61: "%{formattedGrade} punts"
   formattedpoints_points_c75261e2: 
-    one: 1 punt
-    other: "%{formattedPoints} punts"
+    one: "1 punt"
+    other: "%{formattedPoints} punts"
   formattedpoints_points_possible_dad9d40a: 
-    one: "1 punt possible"
-    other: "%{formattedPoints} punts possibles"
+    one: "1 punt possible"
+    other: "%{formattedPoints} punts possibles"
   formattedpoints_possible_points_b0473a26: 
     one: "*1* punt possible"
     other: "*%{formattedPoints}* punts possibles"
@@ -10758,6 +10792,7 @@ ca:
   hindi_9bcd4b34: Hindi
   history_cd3f60a9: Historial
   history_settings_c63dbaaf: "Configuració de l'historial"
+  hmm_we_can_t_find_any_matching_calendars_25983a51: "Oh, no podem trobar cap calendari coincident."
   hold_fb369624: reté
   home_351838cd: Inici
   home_page_is_not_valid_2e8a25ae: "La pàgina inicial no és vàlida"
@@ -12028,6 +12063,7 @@ ca:
   loading_6ac402e1: "s'està carregant..."
   loading_725811ca: "s'està carregant"
   loading_accounts_3364e7a0: "S'estan carregant els comptes..."
+  loading_accounts_a7606249: "S'estan carregant els comptes d’usuari"
   loading_additional_items_ed5f672d: "S'estan carregant els elements addicionals..."
   loading_additional_todo_details_acba0cf2: "S’estan penjant la informació de les tasques pendents addicionals"
   loading_announcement_content_4405470f: "S'està carregant el contingut de l’anunci"
@@ -12101,6 +12137,7 @@ ca:
   loading_section_header_616c8cdd: "S’està carregant la capçalera de la secció"
   loading_staff_1ce7d803: "S'està carregant el personal..."
   loading_students_30b71301: "S'estan carregant els estudiants"
+  loading_sub_accounts_a284e8a1: "S’estan carregant els comptes d’usuari secundaris"
   loading_sync_history_3eb11baf: "S'està carregant l'historial de sincronització..."
   loading_sync_history_9f342cbf: "S'està carregant l'historial de sincronització"
   loading_todo_course_name_b851e509: "S'està penjant el nom de l'assignatura de tasques pendents"
@@ -12305,6 +12342,7 @@ ca:
   make_key_visible_5c03fa34: "Fes visible la clau"
   make_sure_all_search_terms_are_spelled_correctly_9804cdb4: "Assegureu-vos que tots els termes de la cerca estiguin escrits correctament."
   make_sure_that_you_are_spelling_your_institution_c_19a8b7c6: "Assegureu-vos d’escriure correctament el nom de la vostra institució."
+  make_sure_you_ve_spelled_it_correctly_or_type_in_f_42876182: "Assegureu-vos d’haver-ho escrit correctament o escriviu algunes lletres per veure si el calendari es mostra al resultat."
   make_the_course_summary_list_of_assignments_and_ev_f739be33: "Permet fer que el resum del curs (llista de tasques i esdeveniments) sigui opcional al temari"
   make_your_course_your_own_upload_an_image_to_repre_ec57713e: |-
       Personalitzeu l'assignatura a la vostra mida! Carregueu una imatge que representi el vostre
@@ -14239,7 +14277,9 @@ ca:
   missing_d59852a7: "no presentat"
   missing_eaddacbd: "NO PRESENTAT"
   missing_interval_70679242: "Falta INTERVAL"
+  missing_key_s_4be3dc31: "Tecles que falten"
   missing_missing_c1010432: "%{missing} no presentat"
+  missing_param_param_78851fcd: "Paràmetre que falta: `%{param}`"
   missing_percent_94534638: "No presentat: %{percent}"
   missing_policies_4f195e0b: "Normes de les entregues no no presentades"
   missing_policy_applicator_emits_live_events_88b47396: "L'aplicador de polítiques no presentades emet esdeveniments en directe"
@@ -15759,6 +15799,7 @@ ca:
   peer_services_102357e3: "Serveis afins"
   pending_3e506a5b: Pendent
   pending_enforcement_eb32e3d: "Execució pendent"
+  pending_f1ed53c7: pendent
   pending_message_2d9a8796: "Pendent: %{message}"
   people_account_30bbffec: "Persones (Usuari)"
   people_account_course_97b2bbb6: "Persones (Usuari, Assignatura)"
@@ -15874,6 +15915,7 @@ ca:
   please_select_one_f931e883: "Seleccioneu una opció"
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "Especifiqueu si voleu habilitar o inhabilitar la sincronització de Microsoft Teams."
   please_try_again_4c3d11b4: "Torneu-ho a provar"
+  please_try_another_search_term_filter_or_search_wi_d6c4046a: "Proveu un altre terme de cerca, filtreu o feu la cerca amb menys caràcters"
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: "Torneu a provar de restablir la connexió amb l'eina seleccionant una altra vegada l'eina a la interfície de l'element del contingut o l'activitat i desant."
   please_upload_files_as_a_zip_5a2c799f: "Pengeu els fitxers com a .zip"
   please_visit_your_modules_page_for_more_informatio_846c5e32: "Aneu a la *pàgina de continguts* per obtenir més informació."
@@ -18340,6 +18382,8 @@ ca:
         am_pm: am/pm
         hour: h
         minute: min
+  render_both_to_do_lists_for_teachers_with_student__6fc0fdda: "Reproduïu les dues llistes de tasques pendents per a professors amb inscripcions d’estudiants"
+  renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: "Reprodueix les dues llistes de tasques pendents a la barra lateral del panell de control per a professors amb inscripcions d’estudiants."
   replace_attachmentdisplayname_button_94dd8ba1: "Substitueix el botó %{attachmentDisplayName}"
   replace_e61834a7: Substitueix
   replace_filename_png_button_cf5dc7c3: "Substitueix el botó filename.png"
@@ -18484,6 +18528,8 @@ ca:
   resubmitted_2080646f: "S'ha tornat a entregar"
   resubmitted_since_last_graded_8484d285: "S'ha tornat a entregar des de l'última qualificació"
   result_8f971a09: Resultat
+  result_for_19482b14: "resultat per a "
+  results_for_331ce107: "resultats per a "
   resume_quiz_afeceb87: "Reprèn la prova"
   resume_survey_58dce775: "Reprèn l'enquesta"
   resync_grades_to_sis_d4dcfe12: "Resincronitza les notes al SIS"
@@ -18759,6 +18805,7 @@ ca:
   school_of_rock_4b7b1fd0: "School of Rock"
   scope_9729c11e: "Abast:"
   scope_c59afc8a: Abast
+  score_68107950: "%{score}%"
   score_change_notifications_6b94f27f: "Notificacions de canvi de puntuació"
   score_does_not_include_groups_because_they_have_no_80d12f42: 
     one: "La puntuació no inclou %{groups} perquè no té punts possibles"
@@ -18909,6 +18956,7 @@ ca:
   search_by_title_or_author_273a8f49: "Cerca per títol o autor..."
   search_by_title_short_name_or_sis_id_fe84aa12: "Cerca per títol, nom curt o ID del SIS"
   search_by_user_dd3ad189: "Cerca per usuari"
+  search_calendars_f98d663: "Cerca els calendaris"
   search_courses_591bc900: "Cerca assignatures..."
   search_courses_7b5c4ab3: "Cerca assignatures"
   search_courses_by_teacher_e9760a48: "Cerca assignatures per professor..."
@@ -18935,6 +18983,7 @@ ca:
   search_students_e1f506c: "Cerca estudiants"
   search_term_is_mutually_exclusive_with_name_and_do_225d27f1: "search_term és mútuament exclusiu en nom i domini"
   search_term_must_be_at_least_num_characters_669098ed: "El terme de cerca ha de tenir %{num} caràcters com a mínim"
+  search_totalaccounts_calendars_b26322e0: "Cerca %{totalAccounts} calendaris"
   search_within_grouptitle_4d38272f: "Cerca dins de %{groupTitle}"
   search_within_outcome_group_7ac6ac88: "Cerca dins del grup de resultats"
   searching_b0207e7f: "S'està cercant"
@@ -19813,9 +19862,11 @@ ca:
       automàticament després que s'associïn i se sincronitzin amb un curs plantilla
   show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: "Mostra una llista de les pàgines visitades recentment a la navegació global del Canvas"
   show_accessibility_checker_notifications_while_edi_a7cb6449: "En editar, mostreu les notificacions del verificador d'accessibilitat."
+  show_account_calendar_for_name_c79359a0: "Mostreu el calendari del compte d’usuari per a %{name}"
   show_account_navigation_menu_d97270a9: "Mostra el menú de navegació de l'usuari"
   show_account_setting_to_allow_viewing_and_exportin_8f51281f: "Mostreu la configuració de l'usuari perquè es puguin visualitzar i exportar el nom i els cognoms dels estudiants en columnes separades al llibre de notes."
   show_admin_navigation_menu_92fb579f: "Mostra el menú de navegació de l'administrador"
+  show_all_967a90f0: "Mostra-ho tot"
   show_all_artifacts_34b91a83: "Mostra tots els artefactes"
   show_all_details_9879980c: "Mostra tots els detalls"
   show_all_keys_fa88c55c: "Mostra totes les claus"
@@ -19849,6 +19900,7 @@ ca:
   show_links_to_unpublished_content_30c0450d: "Mostra enllaços al contingut no publicat"
   show_more_8d5f918b: "mostra'n més"
   show_more_af9cbc16: "Mostra'n més"
+  show_more_fae1328: "Mostra'n més"
   show_name_and_profile_picture_9329d8f8: "Mostra el nom i la imatge del perfil"
   show_name_details_186d86e6: "Mostra els detalls de %{name}"
   show_name_of_observed_students_in_notifications_a56dd9e4: "Mostra el nom dels estudiants observats a les notificacions."
@@ -19861,6 +19913,8 @@ ca:
   show_one_question_at_a_time_271e346d: "Mostra una pregunta a la vegada"
   show_online_classes_only_f9d7b938: "Mostra només les classes en línia"
   show_only_blueprint_courses_9fb37b41: "Mostra només les assignatures plantilla"
+  show_only_disabled_calendars_cb8e2bdc: "Mostreu només els calendaris desactivats"
+  show_only_enabled_calendars_8caef0df: "Mostreu només els calendaris activats"
   show_params_3401895b: "Mostra els paràmetres"
   show_past_account_level_announcements_to_users_3b8208e2: "Mostra els anuncis del nivell del compte anterior als usuaris"
   show_past_account_level_announcements_to_users_all_36b50d74: |-
@@ -20833,6 +20887,7 @@ ca:
   teacher_dashboard_custom_report_6d20bef2: "Informe personalitzat del panell de control del professor"
   teacher_engagement_report_ec03613d: "Informe de participació del professor"
   teacher_s_fdefb2c: Professor(s)
+  teacher_to_do_19d00df5: "Tasques pendents del professor"
   teacher_tour_26282921: "Visita guiada per a professors"
   teachers_52e2423f: Professors
   teachers_add_d5258e33: "Professors - afegeix"
@@ -21564,6 +21619,7 @@ ca:
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: "Els professors utilitzaran aquest nom per a la qualificació."
   this_option_is_not_compatible_with_new_quizzes_ed489d7c: "Aquesta opció no és compatible amb les proves noves"
   this_outcome_has_been_used_to_assess_a_student_and_a3a48511: "Aquest resultat s'ha utilitzat per avaluar un estudiant i algunes edicions afectaran els resultats de l'estudiant."
+  this_outcome_has_not_been_aligned_320b20c2: "No s’ha alineat aquest resultat"
   this_outcome_was_successfully_removed_from_this_ac_ed855bcd: "El resultat s’ha suprimit correctament d’aquest compte."
   this_outcome_was_successfully_removed_from_this_co_da04ca85: "El resultat s’ha suprimit correctament d’aquest curs."
   this_outcome_was_successfully_updated_b323e27c: "Aquest resultat s’ha actualitzat correctament."
@@ -22476,7 +22532,7 @@ ca:
   type_of_item_8a37f69d: "Tipus d'element"
   type_or_use_arrow_keys_to_navigate_multiple_select_ec56e29c: "Escriviu o utilitzeu les tecles de fletxes per navegar. Es permeten diverses seleccions."
   type_or_use_arrow_keys_to_navigate_options_7507d3d2: "Escriviu o utilitzeu les tecles de fletxes per navegar per les opcions."
-  type_or_use_arrow_keys_to_navigate_options_multipl_230dbaf7: "Escriviu o utilitzeu les tecles de fletxes per navegar per les opcions. Es permeten diverses seleccions."
+  type_or_use_arrow_keys_to_navigate_options_multipl_230dbaf7: "Escriviu o utilitzeu les tecles de fletxa per desplaçar-vos per les opcions. Es permeten diverses seleccions."
   type_something_79a0f02c: "Escriviu alguna cosa…"
   type_to_search_de63ad38: "Escriu per cercar"
   type_to_search_use_arrow_keys_to_navigate_options_5d538c0: "Escriviu per cercar o utilitzeu les tecles de fletxes per navegar per les opcions."
@@ -22520,9 +22576,11 @@ ca:
   unable_to_get_accounts_cb825c43: "No s’han pogut obtenir els comptes"
   unable_to_get_homerooms_959dfe67: "No s’han pogut obtenir tutories"
   unable_to_get_observed_students_ff62d801: "No s’han pogut obtenir estudiants observats"
+  unable_to_load_calendar_count_5bb61cbe: "No s'ha pogut carregar el recompte de calendaris"
   unable_to_load_courses_menu_7074ea04: "No s’ha pogut carregar el menú d'assignatures."
   unable_to_load_messages_2b158fd0: "No s'han pogut carregar els missatges. "
   unable_to_load_messages_49a2942b: "No s'han pogut carregar els missatges."
+  unable_to_load_results_4e15a097: "No s'han pogut carregar els resultats"
   unable_to_load_this_control_543a8271: "No es pot carregar aquest control"
   unable_to_locate_sftp_key_selected_if_it_continues_c5768e01: |-
       No s’ha pogut trobar la clau d’SFTP seleccionada.
@@ -22579,6 +22637,7 @@ ca:
   unexpected_reponse_from_microsoft_api_got_status_c_cdbba851: "Resposta inesperada de l’API de Microsoft: s’ha rebut el codi d’estat de %{status_code}"
   unexpected_response_from_microsoft_api_got_status__86f7a95e: "Resposta inesperada de l’API de Microsoft: s’ha rebut el codi d’estat de %{status_code}"
   unexpected_response_from_microsoft_api_this_is_lik_fc892bab: "Resposta inesperada de l’API de Microsoft. Probablement és un error. Poseu-vos en contacte amb l'assistència tècnica."
+  unexpected_value_12f2d401: "Valor inesperat"
   unfavorite_cd0c113e: "Suprimeix dels preferits"
   unfavorite_coursename_32f77231: "Suprimeix %{courseName} dels preferits"
   ungraded_147a0dce: "no qualificat"
@@ -22727,6 +22786,9 @@ ca:
   updated_2c1e8615: Actualitzat
   updated_after_3a81825c: "S’ha actualitzat després del"
   updated_at_ab9f625d: updated_at
+  updated_count_accounts_5fe53c96: 
+    one: "S’ha actualitzat 1 compte d’usuari"
+    other: "S’han actualitzat %{count} comptes d’usuari"
   updated_group_group_name_727b1d98: "S'ha actualitzat el grup %{group_name}"
   updated_mastery_connect_icon_70b6a9b9: "Icona de connexió del domini actualitzada"
   updated_math_equation_display_583671a8: "Visualització de l'equació matemàtica actualitzada"
@@ -23683,6 +23745,7 @@ ca:
     cannot_update_published: "No teniu permís per actualitzar l'estat publicat d'aquesta pàgina wiki"
     cannot_update_title: "No teniu permís per actualitzar el títol d'aquesta pàgina wiki"
     invalid_editing_roles: "Els rols d'edició proporcionats no són vàlids"
+  will_allow_for_graders_to_grade_assigned_discussio_85a64ed2: "Permetrà als qualificadors qualificar els fòrums assignats sense sortir de la pàgina dels fòrums"
   will_allow_for_saving_drafts_as_students_type_thei_aa08586: |-
       Permetrà desar esborranys mentre els estudiants escriuen les seves respostes a un tema de debat
       al redisseny dels fòrums
