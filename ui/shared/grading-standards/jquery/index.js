@@ -21,11 +21,11 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import numberHelper from '@canvas/i18n/numberHelper'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms'/* fillFormData, getFormData */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* fillFormData, getFormData */
 import 'jqueryui/dialog'
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* ifExists, .dim, undim, confirmDelete */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* ifExists, .dim, undim, confirmDelete */
 import '@canvas/rails-flash-notifications'
-import '@canvas/util/templateData'/* fillTemplateData, getTemplateData */
+import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 
 const I18n = useI18nScope('grading_standards')
@@ -39,9 +39,7 @@ const MINIMUM_SCHEME_VALUE_DIFFERENCE = 0.01
 $(document).ready(() => {
   $('.add_standard_link').click(event => {
     event.preventDefault()
-    const $standard = $('#grading_standard_blank')
-      .clone(true)
-      .attr('id', 'grading_standard_new')
+    const $standard = $('#grading_standard_blank').clone(true).attr('id', 'grading_standard_new')
     $('#standards').append($standard.show())
     $standard.find('.edit_grading_standard_link').click()
   })
@@ -53,16 +51,14 @@ $(document).ready(() => {
       dialogClass: 'form-inline grading-standard-dialog',
       resizable: false,
       open() {
-        $('.grading-standard-dialog')
-          .find('.ui-dialog-titlebar-close')[0]
-          .focus()
+        $('.grading-standard-dialog').find('.ui-dialog-titlebar-close')[0].focus()
       },
       close() {
         $(event.target).focus()
       }
     })
   })
-  $('.grading_standard .delete_grading_standard_link').click(function(event) {
+  $('.grading_standard .delete_grading_standard_link').click(function (event) {
     event.preventDefault()
     const $standard = $(this).parents('.grading_standard')
     const url = $standard.find('.update_grading_standard_url').attr('href')
@@ -73,7 +69,7 @@ $(document).ready(() => {
         'Are you sure you want to delete this grading scheme?'
       ),
       success(data) {
-        $(this).slideUp(function() {
+        $(this).slideUp(function () {
           $(this).remove()
         })
       },
@@ -91,7 +87,7 @@ $(document).ready(() => {
     event.preventDefault()
     $('#edit_letter_grades_form').dialog('close')
   })
-  $('.grading_standard .remove_grading_standard_link').click(function(event) {
+  $('.grading_standard .remove_grading_standard_link').click(function (event) {
     event.preventDefault()
     const result = confirm(
       I18n.t(
@@ -119,12 +115,8 @@ $(document).ready(() => {
     }
     function removed() {
       $('#edit_assignment_form .grading_standard_id').val('')
-      $('#assignment_grading_type')
-        .val('points')
-        .change()
-      $('#course_grading_standard_enabled')
-        .attr('checked', false)
-        .change()
+      $('#assignment_grading_type').val('points').change()
+      $('#course_grading_standard_enabled').attr('checked', false).change()
       $('#course_form .grading_scheme_set').text(I18n.t('grading_scheme_not_set', 'Not Set'))
       $standard.addClass('editing')
       $standard
@@ -158,7 +150,7 @@ $(document).ready(() => {
       removed()
     }
   })
-  $('.grading_standard .edit_grading_standard_link').click(function(event) {
+  $('.grading_standard .edit_grading_standard_link').click(function (event) {
     event.preventDefault()
     const $standard = $(this).parents('.grading_standard')
     $standard.addClass('editing')
@@ -166,7 +158,7 @@ $(document).ready(() => {
     if ($(this).hasClass('read_only')) {
       $standard.attr('id', 'grading_standard_blank')
     }
-    $standard.find('.grading_standard_row').each(function() {
+    $standard.find('.grading_standard_row').each(function () {
       const data = $(this).getTemplateData({textValues: ['min_score', 'name']})
       $(this)
         .find('.standard_value')
@@ -178,21 +170,17 @@ $(document).ready(() => {
     $('#standards').ifExists(() => {
       $('html,body').scrollTo($standard)
     })
-    $standard
-      .find(':text:first')
-      .blur()
-      .focus()
-      .select()
+    $standard.find(':text:first').blur().focus().select()
   })
   $('.grading_standard .grading_standard_brief')
     .find('.collapse_data_link,.expand_data_link')
-    .click(function(event) {
+    .click(function (event) {
       event.preventDefault()
       const $brief = $(this).parents('.grading_standard_brief')
       $brief.find('.collapse_data_link,.expand_data_link').toggle()
       $brief.find('.details').slideToggle()
     })
-  $('.grading_standard_select').live('click', function(event) {
+  $('.grading_standard_select').live('click', function (event) {
     event.preventDefault()
     const id = $(this).getTemplateData({textValues: ['id']}).id
     $('.grading_standard .grading_standards_select .grading_standard_select').removeClass(
@@ -204,15 +192,13 @@ $(document).ready(() => {
   })
   $('.grading_standard')
     .find('.find_grading_standard_link,.cancel_find_grading_standard_link')
-    .click(function(event) {
+    .click(function (event) {
       event.preventDefault()
       $(this)
         .parents('.grading_standard')
         .find('.display_grading_standard,.find_grading_standard')
         .toggle()
-      const $find = $(this)
-        .parents('.grading_standard')
-        .find('.find_grading_standard:visible')
+      const $find = $(this).parents('.grading_standard').find('.find_grading_standard:visible')
       if ($find.length > 0 && !$find.hasClass('loaded')) {
         $find
           .find('.loading_message')
@@ -286,7 +272,7 @@ $(document).ready(() => {
         )
       }
     })
-  $('.grading_standard .grading_standard_brief .select_grading_standard_link').click(function(
+  $('.grading_standard .grading_standard_brief .select_grading_standard_link').click(function (
     event
   ) {
     event.preventDefault()
@@ -301,39 +287,27 @@ $(document).ready(() => {
     $(this)
       .parents('.grading_standard_brief')
       .find('.details_row:not(.blank)')
-      .each(function() {
-        const name = $(this)
-          .find('.name')
-          .text()
-        let val =
-          numberHelper.parse(
-            $(this)
-              .find('.next_value')
-              .text()
-          ) / 100.0
+      .each(function () {
+        const name = $(this).find('.name').text()
+        let val = numberHelper.parse($(this).find('.next_value').text()) / 100.0
         if (isNaN(val)) {
           val = ''
         }
         data.push([name, val])
       })
-    $(this)
-      .parents('.grading_standard')
-      .triggerHandler('grading_standard_updated', {
-        id,
-        data,
-        title
-      })
+    $(this).parents('.grading_standard').triggerHandler('grading_standard_updated', {
+      id,
+      data,
+      title
+    })
     const current_context_code = $('#edit_letter_grades_form').data().context_code
     $(this)
       .parents('.grading_standard')
       .find('.edit_grading_standard_link')
       .toggleClass('read_only', current_context_code != brief.context_code)
-    $(this)
-      .parents('.find_grading_standard')
-      .find('.cancel_find_grading_standard_link')
-      .click()
+    $(this).parents('.find_grading_standard').find('.cancel_find_grading_standard_link').click()
   })
-  $('.grading_standard .cancel_button').click(function(event) {
+  $('.grading_standard .cancel_button').click(function (event) {
     $(this)
       .parents('.grading_standard')
       .removeClass('editing')
@@ -342,15 +316,12 @@ $(document).ready(() => {
     const $standard = $(this).parents('.grading_standard')
     $standard.find('.max_score_cell').removeAttr('tabindex')
     $standard.find('.to_add').remove()
-    $standard
-      .find('.to_delete')
-      .removeClass('to_delete')
-      .show()
+    $standard.find('.to_delete').removeClass('to_delete').show()
     if ($standard.attr('id') == 'grading_standard_new') {
       $standard.remove()
     }
   })
-  $('.grading_standard').bind('grading_standard_updated', function(event, standard) {
+  $('.grading_standard').bind('grading_standard_updated', function (event, standard) {
     const $standard = $(this)
     $standard.addClass('editing')
     $standard
@@ -365,16 +336,12 @@ $(document).ready(() => {
       })
       .fillFormData(standard, {object_name: 'grading_standard'})
     const $link = $standard.find('.insert_grading_standard:first').clone(true)
-    const $row = $standard
-      .find('.grading_standard_row:first')
-      .clone(true)
-      .removeClass('blank')
+    const $row = $standard.find('.grading_standard_row:first').clone(true).removeClass('blank')
     const $table = $standard.find('.grading_standard_data')
     const $thead = $table.find('thead')
     $table.empty()
     $table.append($thead)
     $table.append($link.clone(true).show())
-    $table.append($row.hide())
     $table.append($link.hide())
     for (const idx in standard.data) {
       const $row_instance = $row.clone(true)
@@ -392,28 +359,16 @@ $(document).ready(() => {
       $table.append($link.clone(true).show())
     }
     $table.find(':text:first').blur()
-    $standard.find('.grading_standard_row').each(function() {
+    $standard.find('.grading_standard_row').each(function () {
       $(this)
         .find('.name')
-        .text(
-          $(this)
-            .find('.standard_name')
-            .val()
-        )
+        .text($(this).find('.standard_name').val())
         .end()
         .find('.min_score')
-        .text(
-          $(this)
-            .find('.standard_value')
-            .val()
-        )
+        .text($(this).find('.standard_value').val())
         .end()
         .find('.max_score')
-        .text(
-          $(this)
-            .find('.edit_max_score')
-            .text()
-        )
+        .text($(this).find('.edit_max_score').text())
     })
     $standard.removeClass('editing')
     $standard.find('.insert_grading_standard').hide()
@@ -451,7 +406,7 @@ $(document).ready(() => {
       $standard.find('.remove_grading_standard_link').addClass('read_only')
     }
   })
-  $('.grading_standard .save_button').click(function(event) {
+  $('.grading_standard .save_button').click(function (event) {
     const $standard = $(this).parents('.grading_standard')
     let url = $(
       '#edit_letter_grades_form .create_grading_standard_url,#create_grading_standard_url'
@@ -461,10 +416,7 @@ $(document).ready(() => {
       $standard.attr('id') != 'grading_standard_blank' &&
       $standard.attr('id') != 'grading_standard_new'
     ) {
-      url = $(this)
-        .parents('.grading_standard')
-        .find('.update_grading_standard_url')
-        .attr('href')
+      url = $(this).parents('.grading_standard').find('.update_grading_standard_url').attr('href')
       method = 'PUT'
     }
     const data = $standard.find('.standard_title,.grading_standard_row:visible').getFormData()
@@ -507,49 +459,28 @@ $(document).ready(() => {
       }
     )
   })
-  $('.grading_standard thead').mouseover(function(event) {
-    if (
-      !$(this)
-        .parents('.grading_standard')
-        .hasClass('editing')
-    ) {
+  $('.grading_standard thead').mouseover(function (event) {
+    if (!$(this).parents('.grading_standard').hasClass('editing')) {
       return
     }
-    $(this)
-      .parents('.grading_standard')
-      .find('.insert_grading_standard')
-      .hide()
-    $(this)
-      .parents('.grading_standard')
-      .find('.insert_grading_standard:first')
-      .show()
+    $(this).parents('.grading_standard').find('.insert_grading_standard').hide()
+    $(this).parents('.grading_standard').find('.insert_grading_standard:first').show()
   })
-  $('.grading_standard .grading_standard_row').mouseover(function(event) {
-    if (
-      !$(this)
-        .parents('.grading_standard')
-        .hasClass('editing')
-    ) {
+  $('.grading_standard .grading_standard_row').mouseover(function (event) {
+    if (!$(this).parents('.grading_standard').hasClass('editing')) {
       return
     }
-    $(this)
-      .parents('.grading_standard')
-      .find('.insert_grading_standard')
-      .hide()
+    $(this).parents('.grading_standard').find('.insert_grading_standard').hide()
     const y = event.pageY
     const offset = $(this).offset()
     const height = $(this).height()
     if (y > offset.top + height / 2) {
-      $(this)
-        .next('.insert_grading_standard')
-        .show()
+      $(this).next('.insert_grading_standard').show()
     } else {
-      $(this)
-        .prev('.insert_grading_standard')
-        .show()
+      $(this).prev('.insert_grading_standard').show()
     }
   })
-  $('.grading_standard *').focus(function(event) {
+  $('.grading_standard *').focus(function (event) {
     $(this).trigger('mouseover')
     if ($(this).hasClass('delete_row_link')) {
       $(this)
@@ -559,20 +490,13 @@ $(document).ready(() => {
         .trigger('mouseover')
     }
   })
-  $('.grading_standard .insert_grading_standard_link').click(function(event) {
+  $('.grading_standard .insert_grading_standard_link').click(function (event) {
     event.preventDefault()
-    if (
-      $(this)
-        .parents('.grading_standard')
-        .find('.grading_standard_row').length > 40
-    ) {
+    if ($(this).parents('.grading_standard').find('.grading_standard_row').length > 40) {
       return
     }
     const $standard = $(this).parents('.grading_standard')
-    const $row = $standard
-      .find('.grading_standard_row:first')
-      .clone(true)
-      .removeClass('blank')
+    const $row = $standard.find('.grading_standard_row:first').clone(true).removeClass('blank')
     const $link = $standard.find('.insert_grading_standard:first').clone(true)
     let temp_id = null
     while (
@@ -589,24 +513,15 @@ $(document).ready(() => {
     $row
       .find('.standard_value')
       .attr('name', `grading_standard[standard_data][scheme_${temp_id}][value]`)
-    $(this)
-      .parents('.insert_grading_standard')
-      .after($row.show())
+    $(this).parents('.insert_grading_standard').after($row.show())
     $row.after($link)
     $standard.find(':text:first').blur()
-    $row
-      .find(':text:first')
-      .focus()
-      .select()
+    $row.find(':text:first').focus().select()
     $row.addClass('to_add')
   })
-  $('.grading_standard .delete_row_link').click(function(event) {
+  $('.grading_standard .delete_row_link').click(function (event) {
     event.preventDefault()
-    if (
-      $(this)
-        .parents('.grading_standard')
-        .find('.grading_standard_row:visible').length < 2
-    ) {
+    if ($(this).parents('.grading_standard').find('.grading_standard_row:visible').length < 2) {
       return
     }
     const $standard = $(this).parents('.grading_standard_row')
@@ -615,25 +530,19 @@ $(document).ready(() => {
     } else {
       $standard.next('.insert_grading_standard').remove()
     }
-    $standard.fadeOut(function() {
+    $standard.fadeOut(function () {
       $(this).addClass('to_delete')
       // force refresh in case the deletion requires other changes
       $(".grading_standard input[type='text']:first").triggerHandler('change')
     })
   })
-  $(".grading_standard input[type='text']").bind('blur change', function() {
+  $(".grading_standard input[type='text']").bind('blur change', function () {
     const $standard = $(this).parents('.grading_standard')
     let val = numberHelper.parse(
-      $(this)
-        .parents('.grading_standard_row')
-        .find('.standard_value')
-        .val()
+      $(this).parents('.grading_standard_row').find('.standard_value').val()
     )
     val = round(val, 2)
-    $(this)
-      .parents('.grading_standard_row')
-      .find('.standard_value')
-      .val(I18n.n(val))
+    $(this).parents('.grading_standard_row').find('.standard_value').val(I18n.n(val))
 
     if (isNaN(val)) {
       val = null
@@ -720,13 +629,9 @@ $(document).ready(() => {
      * point value.
      */
     lastVal = 100
-    $list.each(function(idx) {
+    $list.each(function (idx) {
       // Parse the given point value from the input of the current row.
-      let points = numberHelper.parse(
-        $(this)
-          .find('.standard_value')
-          .val()
-      )
+      let points = numberHelper.parse($(this).find('.standard_value').val())
 
       var idx = $list.index(this)
       if (isNaN(points)) {
@@ -746,9 +651,7 @@ $(document).ready(() => {
         points = parseInt(lastVal) - 1
       }
 
-      $(this)
-        .find('.standard_value')
-        .val(I18n.n(points))
+      $(this).find('.standard_value').val(I18n.n(points))
       lastVal = points
     })
 
@@ -786,7 +689,7 @@ $(document).ready(() => {
       $row.find('.standard_value').val(I18n.n(points))
     }
 
-    $list.each(function(idx) {
+    $list.each(function (idx) {
       const $prev = $list.eq(idx - 1)
       let min_score = 0
       if ($prev && $prev.length > 0) {
@@ -799,21 +702,13 @@ $(document).ready(() => {
           .text(`< ${I18n.n(min_score)}`)
       }
     })
-    $list
-      .filter(':first')
-      .find('.edit_max_score')
-      .text(I18n.n(100))
-    $list.find('.max_score_cell').each(function() {
+    $list.filter(':first').find('.edit_max_score').text(I18n.n(100))
+    $list.find('.max_score_cell').each(function () {
       if (!$(this).data('label')) {
         $(this).data('label', $(this).attr('aria-label'))
       }
       const label = $(this).data('label')
-      $(this).attr(
-        'aria-label',
-        `${label} ${$(this)
-          .find('.edit_max_score')
-          .text()}%`
-      )
+      $(this).attr('aria-label', `${label} ${$(this).find('.edit_max_score').text()}%`)
     })
   })
 })
