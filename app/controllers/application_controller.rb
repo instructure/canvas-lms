@@ -1942,6 +1942,7 @@ class ApplicationController < ActionController::Base
         render "context_modules/url_show"
       end
     elsif tag.content_type == "ContextExternalTool"
+      timing_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       @tag = tag
 
       if tag.locked_for? @current_user
@@ -2068,6 +2069,9 @@ class ApplicationController < ActionController::Base
         flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
         redirect_to named_context_url(context, error_redirect_symbol)
       end
+      timing_end = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      tags = @tool ? { lti_version: @tool.lti_version } : {}
+      InstStatsd::Statsd.timing("lti.content_tag_redirect_time", timing_end - timing_start, tags: tags)
     else
       flash[:error] = t "#application.errors.invalid_tag_type", "Didn't recognize the item type for this tag"
       redirect_to named_context_url(context, error_redirect_symbol)
