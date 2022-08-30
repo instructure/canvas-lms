@@ -1082,6 +1082,18 @@ describe CalendarEventsApiController, type: :request do
       expect(json["title"]).to eql "ohai"
     end
 
+    context "account calendars" do
+      before :once do
+        Account.site_admin.enable_feature! :account_calendar_events
+      end
+
+      it "does not allow view-only users to create account calendar events" do
+        @user = account_admin_user_with_role_changes(account: Account.default, role_changes: { manage_account_calendar_visibility: true, manage_account_calendar_events: false })
+        api_call(:post, "/api/v1/calendar_events", { controller: "calendar_events_api", action: "create", format: "json" },
+                 { calendar_event: { context_code: "account_#{Account.default.id}", title: "API Test" } }, {}, { expected_status: 401 })
+      end
+    end
+
     it "creates recurring events if options have been specified" do
       start_at = Time.zone.now.utc.change(hour: 0, min: 1) # For pre-Normandy bug with all_day method in calendar_event.rb
       end_at = Time.zone.now.utc.change(hour: 23)
