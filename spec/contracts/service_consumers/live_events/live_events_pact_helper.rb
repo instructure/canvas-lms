@@ -85,12 +85,9 @@ module LiveEvents
 
       def contract_message
         # Canvas Live Event Subscribers
-        catalog  = PactConfig::LiveEventConsumers::CATALOG
         outcomes = PactConfig::LiveEventConsumers::OUTCOMES
 
         case event_subscriber
-        when catalog
-          LiveEvents::PactHelper.message_contract_for(catalog, event_name)
         when outcomes
           LiveEvents::PactHelper.message_contract_for(outcomes, event_name)
         else
