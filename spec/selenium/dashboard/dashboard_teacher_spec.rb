@@ -262,6 +262,7 @@ describe "dashboard" do
       end
 
       it "focuses on the 'To Do' header if there are no other todo items", custom_timeout: 25, priority: "1" do
+        skip("LS-3421 flaky -- won't update on page properly")
         enable_cache do
           get "/"
 

@@ -309,6 +309,7 @@ describe "calendar2" do
     end
 
     it "event appears on all calendars", priority: "1" do
+      skip("LS-3421 -- flaky about 20% of the time")
       title = "loom"
       due_time = 5.minutes.from_now
       @course.calendar_events.create!(title: title, start_at: due_time)
