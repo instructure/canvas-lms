@@ -21,7 +21,11 @@ module OutcomeResultResolverHelper
   include OutcomesServiceAuthoritativeResultsHelper
 
   def resolve_outcome_results(authoritative_results)
-    results = json_to_outcome_results(authoritative_results)
+    # TODO: Since get_lmgb_results returns a parsed JSON object
+    # we will need to update json_to_outcome_results to handle an already parsed object
+    # this will be done in a separate PS as it is not just a simple fix since this helper
+    # module is heavily dependent on the data to be in JSON. See OUT-5283
+    results = json_to_outcome_results({ results: authoritative_results }.to_json)
     rubric_results = LearningOutcomeResult.preload(:learning_outcome).active.where(association_type: "RubricAssociation")
     results.reject { |res| rubric_result?(res, rubric_results) }
   end
