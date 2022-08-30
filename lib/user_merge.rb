@@ -422,7 +422,11 @@ class UserMerge
 
     Shard.partition_by_shard(observer_links) do |shard_observer_links|
       # restore user observation links that are deleted on the target user but active on the from_user
-      UserObservationLink.where(observer_id: target_user, workflow_state: "deleted", user_id: shard_observer_links.map(&:user_id)).update_all(workflow_state: "active")
+      UserObservationLink.where(
+        observer_id: target_user,
+        workflow_state: "deleted",
+        user_id: shard_observer_links.map(&:user_id)
+      ).update_all(workflow_state: "active", updated_at: Time.now.utc)
       # delete links that are now duplicates between the from_user and target_user
       UserObservationLink.where(id: shard_observer_links).where(user_id: target_user.as_observer_observation_links.select(:user_id)).destroy_all
       # delete what would be observing themselves.
@@ -437,6 +441,12 @@ class UserMerge
     student_links = from_user.as_student_observation_links.shard(from_user)
     merge_data.build_more_data(student_links, data: data)
     Shard.partition_by_shard(student_links) do |shard_student_links|
+      # restore user observee links that are deleted on the target user but active on the from_user
+      UserObservationLink.where(
+        observer_id: shard_student_links.map(&:observer_id),
+        workflow_state: "deleted",
+        user_id: target_user
+      ).update_all(workflow_state: "active", updated_at: Time.now.utc)
       # delete links that are now duplicates between the from_user and target_user
       UserObservationLink.where(id: shard_student_links).where(observer_id: target_user.as_student_observation_links.select(:observer_id)).destroy_all
       # delete what would be observing themselves.
