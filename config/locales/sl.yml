@@ -293,11 +293,14 @@ sl:
     tab_statistics: "Statistični pregled"
     tab_sub_accounts: Podračuni
     tab_terms: Semestri
+  account_580e7fda: račun
   account_97b34646: Račun
   account_account_b6b3746b: "Račun: %{account}"
   account_administrators_can_always_create_courses_926dc0cb: "Skrbniki računa lahko vedno ustvarjajo predmete"
   account_and_course_level_outcome_mastery_scales_5bfe7a3b: "Lestvice doseganja učnih ciljev za rezultate na ravni računa in predmeta"
   account_and_subaccount_40c6430: "Račun in podračun"
+  account_branding_for_confetti_db2012a8: "Partnersko povezovanje računa za konfete"
+  account_calendar_visibility_350b0475: "Vidnost koledarjev računa"
   account_calendars_4a4a79b2: "Koledarji računa"
   account_calendars_add_edit_delete_events_1ef2b8bd: "Koledarji računa – dodaj/uredi/izbriši dogodke"
   account_calendars_change_visibility_c795702a: "Koledarji računa – spremeni vidnost"
@@ -485,6 +488,7 @@ sl:
   account_user: 
     types: 
       account_admin: "Skrbnik računa"
+  accountname_subaccountcount_960a41c: "%{accountName} (%{subaccountCount})"
   accounts: 
     account_name_required: "Ime računa ne more biti prazno."
     account_quotas_not_updated: "Kvote računa niso posodobljene."
@@ -1476,6 +1480,13 @@ sl:
             check_box: "Vključi sodelovanje pri predmetu"
       active: "aktivnih vpisov"
       all: "Vsi vpisi"
+    sumter: 
+      student_submissions: 
+        parameters: 
+          custom_reports: 
+            course_ids: 
+              parameters: 
+                header: "ID-ji predmeta"
     tempe_grade_export_csv_parameters: 
       account_reports: 
         tempe: 
@@ -1560,6 +1571,7 @@ sl:
             text: "V tem poročilu so prikazani vsi študenti, ki so v danem semestru vpisani v kateri koli predmet. V izhodni datoteki .csv je po ena vrstica na vpis uporabnika, ki ni obiskal predmeta od določenega datuma."
   accounts_752dc365: Računi
   accounts_lti_546d15c7: "Računi (LTI)"
+  accounts_tree_navigate_the_accounts_tree_hierarchi_8afea172: "Drevo računov: hierarhično krmarite po drevesu računov, da preklopite vidnost koledarjev računa"
   achieve_mastery_count_times_8c9bbcec: 
     one: "Učne cilje dosezite enkrat."
     other: "Učne cilje dosezite %{count}-krat."
@@ -1628,6 +1640,7 @@ sl:
   add_bank: 
     default_name: "Ni imena."
   add_blackout_dates_ui_to_course_pacing_requires_co_1b675701: "Dodajte uporabniški vmesnik za zatemnjene datume za hitrost napredovanja pri predmetu. Zahteva omogočeno možnost course_paces."
+  add_calendars_to_view_your_institution_s_important_df1e42d3: "Dodajte koledarje za ogled pomembnih datumov vaše ustanove, kot so prvi dan študija, izpitna obdobja itd."
   add_cc_subtitle_a9ef4a66: "Dodaj Kp/podnaslov"
   add_collaboration_da9665ac: "Dodaj skupinsko nalogo"
   add_comment_3205529f: "Dodaj komentar"
@@ -1728,6 +1741,7 @@ sl:
   add_teachers_to_courses_48ac7a7a: "Dodaj izvajalca predmetom"
   add_theme_32fa3d50: "Dodaj temo"
   add_to_calendar_1d4a0e81: "Dodaj v koledar"
+  add_to_course_pacing_blackout_dates_2459cfd2: "Dodaj zatemnjene datume pri funkciji hitrosti napredovanja pri predmetu"
   add_to_library_30514daa: "Dodaj v knjižnico"
   add_to_rce_toolbar_e5b3e3b4: "Dodaj v orodno vrstico RCE"
   add_to_student_to_do_58e66b4b: "Dodaj na študentov čakajoča opravila"
@@ -2563,10 +2577,12 @@ sl:
   an_error_occurred_while_retrieving_your_qr_code_5392e2da: "Med pridobivanjem vaše kode QR je prišlo do napake."
   an_error_occurred_while_saving_account_proficiency_43e7fb6a: "Med shranjevanjem vrednotenj znanja računa je prišlo do napake."
   an_error_occurred_while_saving_associations_bd66f3f4: "Med shranjevanjem povezav je prišlo do napake."
+  an_error_occurred_while_saving_changes_b42c9b84: "Med shranjevanjem sprememb je prišlo do napake"
   an_error_occurred_while_saving_the_assignment_post_94f1184e: "Pri shranjevanju pravil o objavah pri nalogi je prišlo do napake"
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: "Pri shranjevanju pravil o objavah pri predmetu je prišlo do napake"
   an_error_occurred_while_saving_the_mastery_scale_m_30c15545: "Pri shranjevanju lestvice doseganja učnih ciljev je prišlo do napake: %{message}"
   an_error_occurred_while_saving_your_settings_b503a31c: "Med shranjevanjem nastavitev je prišlo do napake"
+  an_error_occurred_while_searching_accounts_calenda_9ce76068: "Pri iskanju koledarjev računa je prišlo do napake"
   an_error_occurred_while_searching_for_your_institu_16a1ace4: "Pri iskanju ustanove je prišlo do napake"
   an_error_occurred_while_starting_migration_8e6015e2: "Med zagonom migracij je prišlo do napake."
   an_error_occurred_while_trying_to_change_the_ui_bca3b2d2: "Pri spreminjanju uporabniškega vmesnika je prišlo do napake"
@@ -2799,7 +2815,9 @@ sl:
   application_secret_e6803c7e: "Skrivnost aplikacije"
   applied_cc7be774: Uporabljeno
   applied_filters_63a90ccd: "Uporabljeni filtri:"
+  applies_account_branding_to_confetti_splashes_c5989dce: "Uporabi partnersko povezovanje računa za brizganje konfetov"
   apply_781a2546: Uporabi
+  apply_changes_b1dffc70: "Uveljavi spremembe"
   apply_conditions_9e941010: "Uveljavi pogoje"
   apply_date_range_selection_cc4351ed: "Uveljavi izbiro razpona datumov"
   apply_filter_7e4f6113: "Uporabljeni filter"
@@ -4575,6 +4593,7 @@ sl:
       skip_to_calendar: "Preskoči na koledar"
       undated_items: "Brez datuma"
   calendars_a756c286: Koledarji
+  calendars_saved_successfully_bcba8359: "Koledarji so bili uspešno shranjeni"
   calendars_toggle_list_visibility_488db143: "Koledarji preklapljajo vidnost seznama."
   campbell_union_high_school_district_grade_report_7f3bb801: "Poročilo o ocenah Campbell Union High School District"
   campus_vue_non_graded_assignment_report_1cd8999a: "Poročilo o neocenjeni nalogi Campus Vue"
@@ -4861,6 +4880,7 @@ sl:
   choose_assignment_path_8ea55f3a: "Izberi pot naloge"
   choose_assignment_set_415f1b3: "Izberi nabor nalog"
   choose_attribute_to_add_866e128d: "Izberi lastnost za dodajanje"
+  choose_calendars_to_add_be60ea17: "Izberi koledarje za dodajanje"
   choose_canvas_account_ec2f0279: "Izberi račun Canvas ..."
   choose_course_home_page_d8642f9e: "Izberi glavno stran predmeta"
   choose_file_8d89ccab: "Izberi datoteko"
@@ -4873,6 +4893,7 @@ sl:
     one: "Izberite do 1 koledar predmeta"
     other: "Izberite do %{count} koledarjev predmetov"
   choose_usage_rights_33683854: "Izberi pravice uporabe ..."
+  choose_which_calendars_are_visible_in_the_other_ca_30fae128: "Izberite, kateri koledarji bodo vidni v razdelku Drugi koledar v Canvas Calendar. Koledarji podračuna so uporabnikom vidni, če so povezani z računom. Privzeto so vsi koledarji skriti."
   choose_your_default_skin_tone_f09bf0bd: "Izberite privzeto polt."
   chosencolor_is_not_a_valid_color_5d542cc: "»%{chosenColor}« ni veljavna barva."
   chosencolor_is_not_a_valid_color_enter_a_valid_hex_9e2c7c42: "»%{chosenColor}« ni veljavna barva. Pred shranjevanjem vnesite veljavno šestnajstiško kodo."
@@ -5376,6 +5397,7 @@ sl:
   conference_participant_count_87e86c5c: "število udeležencev konference"
   conference_recorded_7e776ec2: "posneta konferenca"
   conference_selection_ea4050bb: "Izbira konference"
+  conference_type_2f4ac9be: "Vrsta konference"
   conference_type_7bd581e: "vrsta konference"
   conference_type_names_bcdeb3ad: "%{conference_type_names}"
   conference_type_names_conferences_6c019253: "%{conference_type_names} (Konference)"
@@ -6231,9 +6253,15 @@ sl:
   couldn_t_find_canvas_csv_import_headers_487f1b6c: "Ni mogoče najti glav za uvoz datoteke CSV v sistem Canvas"
   couldn_t_find_valid_settings_for_this_link_resourc_24bd1e7a: "Veljavnih nastavitev za to povezavo ni mogoče najti: Povezave do vira ni mogoče najti"
   couldn_t_generate_diff_message_a0528b20: "Ni mogoče izračunati razl.: %{message}"
+  couldn_t_load_account_calendar_settings_c198189: "Ni bilo mogoče naložiti nastavitev koledarjev računa"
+  couldn_t_save_account_calendar_visibilities_343459d1: "Ni bilo mogoče shraniti vidnosti koledarjev računa"
   couldn_t_track_assigning_students_to_groups_but_it_b6510770: "Dodeljevanju študentov v skupine ni bilo mogoče slediti, se pa kljub temu izvaja! Kasneje ročno preverite rezultat. (%{errorMessage})"
   couldn_t_update_standards_for_authority_auth_81206187: "Ni mogoče posodobiti standardov za overitelja %{auth}"
   count_40eced3b: Število
+  count_account_calendars_selected_578d6db8: 
+    one: "1 izbran koledar računa"
+    other: "%{count} izbranih koledarjev računa"
+    zero: "Izbran ni noben koledar računa"
   count_alignable_artifacts_7779644a: 
     one: "%{count} PORAVNANI IZDELEK"
     other: "%{count} PORAVNANIH IZDELKOV"
@@ -6672,6 +6700,7 @@ sl:
       uuid: UUID
       wiki_id: "ID strani wiki"
       workflow_state: "Stanje delovnega toka"
+  course_members_124b2876: "Člani predmeta"
   course_members_are_free_to_join_9b2603d4: "Člani predmeta se lahko pridružijo."
   course_modules_795cb95e: "Moduli predmeta"
   course_name_45175338: "ime predmeta"
@@ -6698,6 +6727,7 @@ sl:
   course_pacing_40c14b61: "Hitrost napredovanja pri predmetu"
   course_pacing_adds_support_for_rolling_enrollments_3331cbaa: "Funkcija hitrosti napredovanja pri predmetu sistemu Canvas doda podporo za tekoče vpise; omogoča čarobno porazdelitev rokov za študente z različnimi začetnimi datumi glede na izvajalčevo opredeljeno hitrost. Več informacij in povratne informacije z včlanitvijo v skupino uporabnikov zadevne hitrosti napredovanja pri predmetu."
   course_pacing_blackout_dates_1dfc8b61: "Zatemnjeni datumi za hitrosti napredovanja pri predmetu"
+  course_pacing_d3025ecf: "Hitrost napredovanja pri predmetu"
   course_pacing_is_in_active_development_348e33cf: "Hitrost napredovanja pri predmetu je v aktivnem razvoju."
   course_pages_449f1dd4: "Strani predmeta"
   course_participation_and_access_settings_7a3d6297: "Nastavitve udeležbe na tečaju in dostopa"
@@ -8007,6 +8037,7 @@ sl:
   discussion_post_count_report_2da4c6c: "Poročilo o štetju objav v razpravi"
   discussion_posts_c998c9ad: "Objave v razpravi"
   discussion_redesign_description: "Ta funkcija izboljša izkušnjo s sistemom Canvas v menijih Razprave in Obvestila. Če je ta zastavica omogočena, bodo ob vsaki izdaji samodejno prikazan zgodnji dostop do trenutnih izboljšav. Za vse *podrobnosti si oglejte uporabniško skupino Prestrukturiranje razprav/obvestil* v Canvas Community"
+  discussion_redesign_grading_view_467bf307: "Pogled ocenjevanja preoblikovanja razprav"
   discussion_settings_2fbf0b95: "Nastavitve razprave"
   discussion_submission_781d5d33: "Oddaja pri razpravi"
   discussion_topic: 
@@ -9316,6 +9347,8 @@ sl:
   expand_subdiscussion_cd226ed4: "Razširi podrazpravo"
   expand_tutorial_tray_22630c49: "Razširi trak vadnice"
   expanded_f4493860: Razširjeno
+  expected_array_of_objects_b09ead01: "Pričakovani nabor objektov"
+  expected_filter_param_to_be_one_of_visible_hidden_c658bc3: "Pričakovano je, da je parameter %{filter} eden od: %{visible}, %{hidden}"
   expires_at_6214b43f: Poteče
   explanation_of_statuses_90a26d07: "Razlaga statusov:"
   export_course_content_f4774b74: "Izvozi vsebino predmeta"
@@ -9655,6 +9688,7 @@ sl:
   filter_by_student_name_or_secondary_id_83dc524f: "Filter glede na ime študenta ali sekundarni ID"
   filter_by_term_cfe778b2: "Filter glede na semester"
   filter_by_user_type_dbbd3e3d: "Filter glede na vrsto uporabnika"
+  filter_calendars_62680a26: "Filtriraj koledarje"
   filter_conversations_by_type_1ce8c064: "Filtriraj pogovore glede na vrsto"
   filter_e3398407: Filter
   filter_features_388eafd8: "Funkcije filtrov"
@@ -10964,6 +10998,7 @@ sl:
   hindi_9bcd4b34: hindujščina
   history_cd3f60a9: Zgodovina
   history_settings_c63dbaaf: "Nastavitve zgodovine"
+  hmm_we_can_t_find_any_matching_calendars_25983a51: "Hm, ne najdemo nobenega ustreznega koledarja."
   hold_fb369624: zadrži
   home_351838cd: "Glavna stran"
   home_page_is_not_valid_2e8a25ae: "Glavna stran ni veljavna."
@@ -12219,6 +12254,7 @@ sl:
   loading_6ac402e1: "nalaganje ..."
   loading_725811ca: nalaganje
   loading_accounts_3364e7a0: "Nalaganje računov ..."
+  loading_accounts_a7606249: "Nalaganje računov"
   loading_additional_items_ed5f672d: "Nalaganje dodatnih elementov ..."
   loading_additional_todo_details_acba0cf2: "Nalaganje dodatnih podrobnosti o seznamu opravil"
   loading_announcement_content_4405470f: "Nalagam vsebino obvestila"
@@ -12290,6 +12326,7 @@ sl:
   loading_section_header_616c8cdd: "Nalaganje glave sekcije"
   loading_staff_1ce7d803: "Nalaganje osebja ..."
   loading_students_30b71301: "Nalaganje študentov"
+  loading_sub_accounts_a284e8a1: "Nalaganje podračunov"
   loading_sync_history_3eb11baf: "Nalagam zgodovino sinhronizacije ..."
   loading_sync_history_9f342cbf: "Nalaganje zgodovine sinhronizacije"
   loading_todo_course_name_b851e509: "Nalagam ime predmeta s seznamom opravil"
@@ -12498,6 +12535,7 @@ sl:
   make_key_invisible_e66af89: "Ključ naj bo neviden."
   make_key_visible_5c03fa34: "Ključ naj bo viden."
   make_sure_that_you_are_spelling_your_institution_c_19a8b7c6: "Preverite, ali ste pravilno vnesli svojo ustanovo."
+  make_sure_you_ve_spelled_it_correctly_or_type_in_f_42876182: "Preverite, ali ste ga pravilno črkovali ali pa vnesite manj črk, da vidite, ali se koledar prikaže v rezultatu."
   make_your_course_your_own_upload_an_image_to_repre_ec57713e: |-
       Naj bo vaš predmet urejen po vaše! Naložite sliko, ki bo predstavljala vaš
             predmet, študentom omogočite upravljanje vsebinskih področij in skrijte podrobnosti
@@ -14546,7 +14584,9 @@ sl:
   missing_d59852a7: manjkajoče
   missing_eaddacbd: MANJKAJOČE
   missing_interval_70679242: "Manjka INTERVAL"
+  missing_key_s_4be3dc31: "Manjkajoči ključ(i)"
   missing_missing_c1010432: "%{missing} manjka"
+  missing_param_param_78851fcd: "Manjkajoči parameter: `%{param}`"
   missing_percent_94534638: "Manjkajoče: %{percent}"
   missing_policies_4f195e0b: "Manjkajoče politike:"
   missing_policy_applicator_emits_live_events_88b47396: "Uveljavitelj pravil manjkajočih oddaj objavlja dogodke v živo"
@@ -16092,6 +16132,7 @@ sl:
   peer_services_102357e3: "Sorodne storitve"
   pending_3e506a5b: "V čakanju"
   pending_enforcement_eb32e3d: "Čaka uveljavitev"
+  pending_f1ed53c7: "v čakanju"
   pending_message_2d9a8796: "V čakanju: %{message}"
   people_account_30bbffec: "Sodelujoči (Račun)"
   people_account_course_305043bb: "Sodelujoči (Račun/Predmet)"
@@ -16204,6 +16245,7 @@ sl:
   please_select_a_user_role_for_this_link_9fb4e655: "Vnesite vlogo uporabnika za to povezavo."
   please_select_one_f931e883: "Izberite eno"
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "Določiti je treba, ali želite Microsoft Teams Sync omogočiti ali onemogočiti."
+  please_try_another_search_term_filter_or_search_wi_d6c4046a: "Poskusite z drugim iskalnim izrazom, filtrom ali iščite z manj znaki"
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: "Poskusite znova vzpostaviti povezavo z orodjem, tako da ponovno izberete nalogo ali vmesnik elementa modula ter shranite."
   please_upload_files_as_a_zip_5a2c799f: "Naložite datoteke v obliki zapisa .zip."
   please_visit_your_modules_page_for_more_informatio_846c5e32: "Za več informacij obiščite *stran z vašimi moduli*."
@@ -18819,6 +18861,8 @@ sl:
         am_pm: dop./pop.
         hour: ure
         minute: minute
+  render_both_to_do_lists_for_teachers_with_student__6fc0fdda: "Upodobi oba seznama opravil za izvajalce z vpisi študentov"
+  renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: "Upodobi oba seznama opravil v stranski vrstici preglednice za izvajalce z vpisi študentov"
   replace_attachmentdisplayname_button_94dd8ba1: "Gumb za zamenjavo %{attachmentDisplayName}"
   replace_e61834a7: Zamenjaj
   replace_filename_png_button_cf5dc7c3: "Zamenjaj gumb filename.png"
@@ -18951,6 +18995,8 @@ sl:
   resubmitted_2080646f: "Ponovno poslano"
   resubmitted_since_last_graded_8484d285: "Ponovno poslano od zadnjega ocenjevanja"
   result_8f971a09: Rezultat
+  result_for_19482b14: "rezultat za "
+  results_for_331ce107: "rezultati za "
   resume_quiz_afeceb87: "Nadaljevanje kviza"
   resume_survey_58dce775: "Nadaljuj anketo"
   resync_grades_to_sis_d4dcfe12: "Ponovno sinhroniziraj ocene v SIS"
@@ -19247,6 +19293,7 @@ sl:
   school_of_rock_4b7b1fd0: "School of Rock"
   scope_9729c11e: "Obseg:"
   scope_c59afc8a: Obseg
+  score_68107950: "%{score}%"
   score_change_notifications_6b94f27f: "Sporočila o sprememb števila točk pri tej nalogi"
   score_does_not_include_groups_because_they_have_no_80d12f42: 
     one: "Rezultat ne vključuje %{groups}, ker nima možnih točk."
@@ -19402,6 +19449,7 @@ sl:
   search_by_title_or_author_273a8f49: "Išči po naslovu ali avtorju ..."
   search_by_title_short_name_or_sis_id_fe84aa12: "Iskanje po imenu, kratkem imenu ali SIS ID"
   search_by_user_dd3ad189: "Iskanje po uporabniku"
+  search_calendars_f98d663: "Iskanje koledarjev"
   search_courses_591bc900: "Iskanje predmetov ..."
   search_courses_7b5c4ab3: "Iskanje predmetov"
   search_courses_by_teacher_e9760a48: "Iskanje predmetov po izvajalcu ..."
@@ -19428,6 +19476,7 @@ sl:
   search_students_e1f506c: "Išči študente"
   search_term_is_mutually_exclusive_with_name_and_do_225d27f1: "search_term se medsebojno izključujeta z imenom in domeno"
   search_term_must_be_at_least_num_characters_669098ed: "Iskalna beseda mora imeti vsaj %{num} znakov."
+  search_totalaccounts_calendars_b26322e0: "Iskanje koledarjev %{totalAccounts}"
   search_within_grouptitle_4d38272f: "Išči znotraj %{groupTitle}"
   searching_b0207e7f: Iskanje
   searching_for_announcements_in_sections_must_span__80e4dfe4: "Iskanje obvestil v sekcijah mora obsegati natanko en predmet."
@@ -20420,9 +20469,11 @@ sl:
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "bi moralo biti očitno; ID sistema Canvas uporabnika, ki poroča"
   show_76c0ed1c: Prikaži
   show_accessibility_checker_notifications_while_edi_a7cb6449: "Med urejanjem prikaži obvestila preverjevalnika dostopnosti."
+  show_account_calendar_for_name_c79359a0: "Prikaži koledar računa za %{name}"
   show_account_navigation_menu_d97270a9: "Prikaži meni navigacije po računu"
   show_account_setting_to_allow_viewing_and_exportin_8f51281f: "Pokaži nastavitve računa, ki omogočajo ogled in izvoz imen in priimkov študentov v ločenih stolpcih v redovalnici."
   show_admin_navigation_menu_92fb579f: "Prikaži skrbniški meni navigacije"
+  show_all_967a90f0: "Prikaži vse"
   show_all_artifacts_34b91a83: "Prikaži vse izdelke"
   show_all_details_9879980c: "Prikaži vse podrobnosti"
   show_all_keys_fa88c55c: "Prikaži vse ključe"
@@ -20458,6 +20509,7 @@ sl:
   show_links_to_unpublished_content_30c0450d: "Prikaži povezave na neobjavljeno vsebino"
   show_more_8d5f918b: "prikaži več"
   show_more_af9cbc16: "Prikaži več"
+  show_more_fae1328: "Prikaži več"
   show_name_and_profile_picture_9329d8f8: "Prikaži ime in sliko profila"
   show_name_details_186d86e6: "Prikaži podrobnosti %{name}"
   show_name_of_observed_students_in_notifications_a56dd9e4: "Prikaži ime opazovanih študentov v obvestilih."
@@ -20470,6 +20522,8 @@ sl:
   show_one_question_at_a_time_271e346d: "Prikaži po eno vprašanje naenkrat"
   show_online_classes_only_f9d7b938: "Prikaži samo spletne razrede"
   show_only_blueprint_courses_9fb37b41: "Prikaži samo šablonske predmete"
+  show_only_disabled_calendars_cb8e2bdc: "Prikaži samo onemogočene koledarje"
+  show_only_enabled_calendars_8caef0df: "Prikaži samo omogočene koledarje"
   show_originality_report_to_students_be22f5ee: "Prikaži poročilo o podobnosti vsebin študentom"
   show_params_3401895b: "Prikaži parametre"
   show_projections_32a3756: "Prikaži napovedi"
@@ -21418,6 +21472,7 @@ sl:
   teacher_dashboard_custom_report_6d20bef2: "Poročilo po meri nadzorne plošče za izvajalce"
   teacher_engagement_report_ec03613d: "Poročilo o sodelovanju izvajalca"
   teacher_s_fdefb2c: Izvajalci
+  teacher_to_do_19d00df5: "Seznam opravil izvajalca"
   teacher_tour_26282921: "Predstavitev za izvajalce"
   teachers_52e2423f: Izvajalci
   teachers_add_d5258e33: "Izvajalci – dodaj"
@@ -22102,6 +22157,7 @@ sl:
   this_option_is_not_compatible_with_new_quizzes_ed489d7c: "Ta možnost ni združljiva z New Quizzes"
   this_option_is_not_compatible_with_quizzes_next_6dacd0c1: "Ta možnost ni združljiva z mehanizmom Quizzes.Next."
   this_outcome_has_been_used_to_assess_a_student_and_a3a48511: "Ta izid je uporabljen za dostop študenta in določena urejanja bodo vplivala na rezultate študenta."
+  this_outcome_has_not_been_aligned_320b20c2: "Ta izidi ni bil poravnan"
   this_package_includes_apip_file_s_which_are_not_co_b50b30a7: "V tem paketu so datoteke APIP, ki niso združljive s sistemom Canvas in niso bile vključene v uvoz."
   this_package_includes_curriculum_standards_which_a_1a137060: "V tem paketu je uradni kurikulum, ki ni združljiv s sistemom Canvas in ni bil vključen v uvoz."
   this_package_includes_epub3_file_s_which_are_not_c_bbafef30: "V tem paketu so datoteke EPub3, ki niso združljive s sistemom Canvas in niso bile vključene v uvoz."
@@ -23003,9 +23059,11 @@ sl:
   unable_to_get_accounts_cb825c43: "Računov ni bilo mogoče pridobiti"
   unable_to_get_homerooms_959dfe67: "Matičnih razredov ni mogoče pridobiti"
   unable_to_get_observed_students_ff62d801: "Opazovanih študentov ni mogoče pridobiti"
+  unable_to_load_calendar_count_5bb61cbe: "Števila koledarjev ni mogoče naložiti"
   unable_to_load_courses_menu_7074ea04: "Menija predmetov ni bilo mogoče naložiti."
   unable_to_load_lti_1_3_tools_cf169f9: "Orodij LTI 1.3 ni mogoče naložiti."
   unable_to_load_messages_49a2942b: "Sporočil ni bilo mogoče naložiti."
+  unable_to_load_results_4e15a097: "Rezultatov ni mogoče naložiti"
   unable_to_load_this_control_543a8271: "Tega kontrolnika ni bilo mogoče naložiti"
   unable_to_locate_sftp_key_selected_if_it_continues_c5768e01: |-
       Izbranega ključa SFTP ni bilo mogoče najti.
@@ -23061,6 +23119,7 @@ sl:
   unexpected_error_while_performing_export_1e6b4207: "Nepričakovana napaka med izvedbo izvoza"
   unexpected_response_from_microsoft_api_got_status__86f7a95e: "Nepričakovan odziv Microsoft API: pridobljena je koda stanja %{status_code}"
   unexpected_response_from_microsoft_api_this_is_lik_fc892bab: "Nepričakovan odgovor Microsoftovega API. To je verjetno napaka. Obrnite se na podporo."
+  unexpected_value_12f2d401: "Nepričakovana vrednost"
   unfavorite_cd0c113e: "Ni dodano med priljubljene"
   unfavorite_coursename_32f77231: "Ni dodano med priljubljene %{courseName}"
   ungraded_147a0dce: neocenjeno
@@ -23209,6 +23268,9 @@ sl:
   updated_2c1e8615: Posodobljeno
   updated_after_3a81825c: "Posodobljeno po"
   updated_at_ab9f625d: updated_at
+  updated_count_accounts_5fe53c96: 
+    one: "Posodobljen je 1 račun"
+    other: "Posodobljenih je %{count} računov"
   updated_group_group_name_727b1d98: "Posodobljena skupina %{group_name}"
   updated_mastery_connect_icon_70b6a9b9: "Posodobljena ikona Mastery Connect"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Posodobljen uporabniški vmesnik za iskanje ter prikaz uporabnikov in predmetov v računu."
@@ -24192,6 +24254,7 @@ sl:
     cannot_update_published: "Nimate dovoljenja za posodobitev objavljenega stanja te strani wiki."
     cannot_update_title: "Nimate dovoljenja za posodobitev naslova te strani wiki."
     invalid_editing_roles: "Predložene vloge urejanja niso veljavne."
+  will_allow_for_graders_to_grade_assigned_discussio_85a64ed2: "Ocenjevalcem bo to omogočilo ocenjevanje dodeljenih razprav, ne da bi zapustili stran za razprave"
   will_allow_for_saving_drafts_as_students_type_thei_aa08586: |-
       Omogoča shranjevanje osnutkov, ko študenti vnesejo svoje odgovore na temo razprave
       pri prestrukturiranju razprav
