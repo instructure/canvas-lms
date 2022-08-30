@@ -190,6 +190,7 @@ class OutcomeResultsController < ApplicationController
   include Api::V1::OutcomeResults
   include Outcomes::Enrollments
   include Outcomes::ResultAnalytics
+  include CanvasOutcomesHelper
 
   before_action :require_user
   before_action :require_context
@@ -232,9 +233,14 @@ class OutcomeResultsController < ApplicationController
   #      outcome_results: [OutcomeResult]
   #    }
   def index
+    include_hidden_value = value_to_boolean(params[:include_hidden])
     @results = find_results(
-      include_hidden: value_to_boolean(params[:include_hidden])
+      include_hidden: include_hidden_value
     )
+    @outcome_service_results_rollups = find_outcomes_service_results(
+      include_hidden: include_hidden_value
+    )
+
     @results = Api.paginate(@results, self, api_v1_course_outcome_results_url)
     json = outcome_results_json(@results)
     json[:linked] = linked_include_collections if params[:include].present?
@@ -356,11 +362,21 @@ class OutcomeResultsController < ApplicationController
     )
   end
 
+  def find_outcomes_service_results(opts = {})
+    find_outcomes_service_outcome_results(
+      users: opts[:all_users] ? @all_users : @users,
+      context: @context,
+      outcomes: @outcomes,
+      **opts
+    )
+  end
+
   def user_rollups(opts = {})
     excludes = Api.value_to_array(params[:exclude]).uniq
     filter_users_by_excludes
 
     @results = find_results(opts).preload(:user)
+    @outcome_service_results_rollups = find_outcomes_service_results(opts)
     outcome_results_rollups(results: @results, users: @users, excludes: excludes, context: @context)
   end
 
@@ -384,8 +400,13 @@ class OutcomeResultsController < ApplicationController
     @users = @users.reject { |u| u.enrollments.all? { |e| filters.include? e.workflow_state } }
   end
 
+  # For merge & after performance testing
+  # Flagging potential issue - no reason to pull all the results for finding users
+  # why not send the already pulled results to the definition and use that to filter
   def remove_users_with_no_results
     userids_with_results = find_results.pluck(:user_id).uniq
+    @outcome_service_results_rollups = find_outcomes_service_results
+
     @users = @users.select { |u| userids_with_results.include? u.id }
   end
 
@@ -453,6 +474,8 @@ class OutcomeResultsController < ApplicationController
     # rollup, so don't paginate users in this method.
     filter_users_by_excludes(true)
     @results = find_results(all_users: false).preload(:user)
+    @outcome_service_results = find_outcomes_service_results(all_users: false)
+
     aggregate_rollups = [aggregate_outcome_results_rollup(@results, @context, params[:aggregate_stat])]
     aggregate_outcome_results_rollups_json(aggregate_rollups)
     # no pagination, so no meta field
