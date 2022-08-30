@@ -483,6 +483,8 @@ export default class EditView extends ValidatedFormView
     data.anonymous_state = $('input[name=anonymous_state]:checked').val()
     if data.delay_posting == "0"
       data.delayed_post_at = null
+    if data.lock_at != null && data.delayed_post_at > data.lock_at
+      errors['lock_at'] = [{message: I18n.t("Date must be after date available")}]
     if data.anonymous_state != 'full_anonymity' && data.anonymous_state != 'partial_anonymity'
       data.anonymous_state = null
     if @isTopic() && data.set_assignment is '1'
