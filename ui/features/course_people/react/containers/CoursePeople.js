@@ -17,13 +17,36 @@
  */
 
 import React from 'react'
+import LoadingIndicator from '@canvas/loading-indicator'
+import {ROSTER_QUERY} from '../../graphql/Queries'
+import {useQuery} from 'react-apollo'
+import {Responsive} from '@instructure/ui-responsive'
 import RosterTable from './RosterTable/RosterTable'
+import RosterCardView from './RosterCardView/RosterCardView'
+import {responsiveQuerySizes} from '../../util/utils'
 
 const CoursePeople = () => {
+  const {loading, data} = useQuery(ROSTER_QUERY, {
+    variables: {courseID: ENV.course.id},
+    fetchPolicy: 'cache-and-network',
+    errorPolicy: 'all'
+  })
+
+  const responsiveRoster = (
+    <Responsive
+      match="media"
+      query={responsiveQuerySizes({tablet: true})}
+      render={(props, matches) => {
+        if (matches.includes('tablet')) return <RosterCardView data={data} />
+        return <RosterTable data={data} />
+      }}
+    />
+  )
+
   return (
     <>
       {/* Additional People page containers/components will go here */}
-      <RosterTable />
+      {loading ? <LoadingIndicator /> : responsiveRoster}
     </>
   )
 }
