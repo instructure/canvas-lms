@@ -328,6 +328,7 @@ fr:
     tab_terms: Trimestres
     tab_users: Utilisateurs
     turnitin_pledge: "Le devoir envoyé est le résultat de mon travail personnel et individuel."
+  account_580e7fda: compte
   account_97b34646: Compte
   account_account_b6b3746b: "Compte : %{account}"
   account_administrators_can_always_create_courses_926dc0cb: "Les administrateurs pourront toujours créer des cours"
@@ -442,6 +443,8 @@ fr:
       discovery_url_description: "Si une URL de découverte est définie, Canvas y renverra tous les utilisateurs lorsqu'ils doivent être authentifiés. Cette page devra alors aider l’utilisateur à déterminer où il devra se rendre pour se connecter. Si aucune URL de découverte n’est configurée, la première configuration sera utilisée pour tenter d’authentifier l’utilisateur."
       login_handle_name_description: "Le libellé utilisé comme identifiants uniques de connexion. Exemples : nom de connexion, nom d’utilisateur, ID d’étudiant, etc."
       unknown_user_url_description: "L'URL de redirection à utiliser lorsqu’un utilisateur authentifié est introuvable dans Canvas."
+  account_branding_for_confetti_db2012a8: "Identité visuelle de compte pour les confettis"
+  account_calendar_visibility_350b0475: "Visibilité du calendrier de compte"
   account_calendars_4a4a79b2: "Calendriers de comptes"
   account_calendars_add_edit_delete_events_1ef2b8bd: "Calendriers de comptes - ajouter / modifier / supprimer des événements"
   account_calendars_change_visibility_c795702a: "Calendriers de comptes - modifier la visibilité"
@@ -638,6 +641,7 @@ fr:
   account_user: 
     types: 
       account_admin: "Administrateur de compte"
+  accountname_subaccountcount_960a41c: "%{accountName} (%{subaccountCount})"
   accounts: 
     account_name_required: "Le nom du compte ne doit pas être vide."
     account_quotas_not_updated: "Les quotas de compte n’ont pas été actualisés"
@@ -1786,6 +1790,13 @@ fr:
             check_box: "Inclure l’état de l’inscription"
       active: "Inscriptions actives"
       all: "Toutes les inscriptions"
+    sumter: 
+      student_submissions: 
+        parameters: 
+          custom_reports: 
+            course_ids: 
+              parameters: 
+                header: "Identifiants de cours"
     tempe_grade_export_csv_parameters: 
       account_reports: 
         tempe: 
@@ -1880,6 +1891,7 @@ fr:
             text: "Ce rapport montre tous les étudiants inscrits à un cours d’un trimestre donné. Le fichier CSV résultant contient une ligne par inscription d’utilisateurs qui n’ont pas consulté le cours depuis la date indiquée."
   accounts_752dc365: Comptes
   accounts_lti_546d15c7: "Comptes (LTI)"
+  accounts_tree_navigate_the_accounts_tree_hierarchi_8afea172: "Arbre à comptes : parcourez l’arbre à comptes de manière hiérarchique pour activer/désactiver la visibilité du calendrier de compte"
   achieve_mastery_count_times_8c9bbcec: 
     one: "Parvenir à la maîtrise une fois"
     other: "Parvenir à la maîtrise %{count} fois"
@@ -1957,6 +1969,7 @@ fr:
   add_bank: 
     default_name: "Pas de nom"
   add_blackout_dates_ui_to_course_pacing_requires_co_1b675701: "Ajouter l’interface pour les dates de fermeture pour la gestion d'allure de cours. Nécessite que course_paces soit activé."
+  add_calendars_to_view_your_institution_s_important_df1e42d3: "Ajoutez des calendriers pour voir les dates importantes de votre établissement, tels que les jours de rentrée, les périodes d’examens, etc."
   add_cc_subtitle_a9ef4a66: "Ajouter un sous-titre"
   add_collaboration_da9665ac: "Ajouter une collaboration"
   add_comment_3205529f: "Ajouter un commentaire"
@@ -2083,6 +2096,7 @@ fr:
   add_theme_32fa3d50: "Ajouter un thème"
   add_to_calendar_1d4a0e81: "Ajouter au calendrier"
   add_to_course_481a51c4: "Ajouter au cours..."
+  add_to_course_pacing_blackout_dates_2459cfd2: "Ajouter des dates d’interruption pour l’allure de cours"
   add_to_library_30514daa: "Ajouter à la bibliothèque"
   add_to_rce_toolbar_e5b3e3b4: "Ajouter à la barre d'outils de l’ECE"
   add_to_student_to_do_58e66b4b: "Ajouter à la liste des choses à faire de l’étudiant"
@@ -3166,10 +3180,12 @@ fr:
   an_error_occurred_while_saving_account_proficiency_43e7fb6a: "Une erreur s’est produite pendant l’enregistrement des notations de compétence du compte"
   an_error_occurred_while_saving_account_proficiency_9f0f9208: "Une erreur s'est produite lors de l'enregistrement des notations de compétence des comptes : %{message}"
   an_error_occurred_while_saving_associations_bd66f3f4: "Une erreur est survenue pendant l’enregistrement des associations"
+  an_error_occurred_while_saving_changes_b42c9b84: "Une erreur est survenue lors de l’enregistrement des modifications"
   an_error_occurred_while_saving_the_assignment_post_94f1184e: "Une erreur est survenue durant l’enregistrement de la politique de publication des travaux."
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: "Une erreur est survenue durant l’enregistrement de la politique de publication des cours"
   an_error_occurred_while_saving_the_mastery_scale_m_30c15545: "Une erreur est survenue lors de l’enregistrement de l’échelle de réussite : %{message}"
   an_error_occurred_while_saving_your_settings_b503a31c: "Une erreur est survenue lors de la sauvegarde de vos paramètres"
+  an_error_occurred_while_searching_accounts_calenda_9ce76068: "Une erreur est survenue lors de la recherche des calendriers de compte"
   an_error_occurred_while_searching_for_your_institu_16a1ace4: "Une erreur s’est produite pendant la recherche de votre établissement"
   an_error_occurred_while_starting_migration_8e6015e2: "Une erreur est survenue lors du démarrage de la migration"
   an_error_occurred_while_trying_to_change_the_ui_bca3b2d2: "Une erreur s’est produite lors d'une tentative de modification de l'UI"
@@ -3456,8 +3472,9 @@ fr:
   application_secret_e6803c7e: "Code secret de l'application"
   applied_cc7be774: Appliqué
   applied_filters_63a90ccd: "Filtres appliqués :"
+  applies_account_branding_to_confetti_splashes_c5989dce: "Applique un thème à l'image de votre marque aux écrans à confettis"
   apply_781a2546: Appliquer
-  apply_changes_b1dffc70: "Appliquer les changements"
+  apply_changes_b1dffc70: "Appliquer les modifications"
   apply_conditions_9e941010: "Appliquer les conditions"
   apply_date_range_selection_cc4351ed: "Appliquer la sélection d'une plage de dates"
   apply_filter_7e4f6113: "Appliquer les filtres."
@@ -5618,6 +5635,7 @@ fr:
         delete: "Supprimer un événement/une tâche"
         new: "Créer un événement"
   calendars_a756c286: Calendriers
+  calendars_saved_successfully_bcba8359: "Calendriers enregistrés avec succès"
   calendars_toggle_list_visibility_488db143: "Les calendriers permutent la visibilité de la liste"
   campbell_union_high_school_district_grade_report_7f3bb801: "Rapport de notes pour le Campbell Union High School District"
   campus_vue_non_graded_assignment_report_1cd8999a: "Rapport de travaux non notés pour le Campus Vue"
@@ -5945,6 +5963,7 @@ fr:
   choose_assignment_path_8ea55f3a: "Choisir un chemin de travail assigné"
   choose_assignment_set_415f1b3: "Choisir un ensemble de tâches assignés"
   choose_attribute_to_add_866e128d: "Choisissez un attribut à ajouter"
+  choose_calendars_to_add_be60ea17: "Sélectionnez les calendriers à ajouter"
   choose_canvas_account_ec2f0279: "Sélectionnez un compte Canvas"
   choose_course_home_page_d8642f9e: "Choisir la page d'accueil du cours"
   choose_file_8d89ccab: "Choisissez un fichier"
@@ -5959,6 +5978,7 @@ fr:
     one: "Choisissez 1 calendrier de sujet maximum"
     other: "Choisisez %{count} calendriers de sujet maximum"
   choose_usage_rights_33683854: "Choisir les droits d’utilisation..."
+  choose_which_calendars_are_visible_in_the_other_ca_30fae128: "Choisissez les calendriers que vous souhaitez rendre visibles dans la section « Autre calendrier » du calendrier Canvas. Les calendriers des sous-comptes sont visibles aux utilisateurs s'ils sont associés au compte. Par défaut, tous les calendriers sont masqués"
   choose_your_default_skin_tone_f09bf0bd: "Sélectionnez votre teint par défaut"
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' n'est pas une couleur valide."
   chosencolor_is_not_a_valid_color_enter_a_valid_hex_9e2c7c42: "'%{chosenColor}' n'est pas une couleur valide Saisissez un hexcode valide avant d'enregistrer."
@@ -5999,7 +6019,7 @@ fr:
   click_proceed_to_continue_b6eeffc6: "Cliquez sur « Continuer » quand vous êtes prêt."
   click_the_admin_navigation_button_to_access_accoun_38d881bf: "Cliquez sur le bouton de navigation de l'administrateur pour accéder aux paramètres du compte."
   click_the_button_above_to_add_content_4c7024a: "Cliquez sur le bouton ci-dessus pour ajouter du contenu"
-  click_the_icon_to_add_a_calendar_b9ab4f7f: "Cliquez sur l’icône « + » pour ajouter un calendrier"
+  click_the_icon_to_add_a_calendar_b9ab4f7f: "Cliquez sur l’icône « + » pour ajouter un calendrier"
   click_to_add_a_name_6cf551b0: "Cliquez pour ajouter un nom"
   click_to_change_profile_picture_for_display_name_6a4b41db: "Cliquez pour changer la photo de profil de %{display_name}"
   click_to_close_outcome_details_popover_d469d47d: "Cliquez pour fermer la fenêtre pop-over des détails des acquis"
@@ -6524,6 +6544,7 @@ fr:
   conference_participant_count_87e86c5c: "nombre de participants à la conférence"
   conference_recorded_7e776ec2: "conférence enregistrée"
   conference_selection_ea4050bb: "Sélection de conférences"
+  conference_type_2f4ac9be: "Type de conférence"
   conference_type_7bd581e: "type de conférence"
   conference_type_names_bcdeb3ad: "%{conference_type_names}"
   conference_type_names_conferences_6c019253: "%{conference_type_names} (Conférences)"
@@ -7564,9 +7585,15 @@ fr:
   couldn_t_find_valid_settings_for_this_link_resourc_24bd1e7a: "Paramètres valides introuvables pour ce lien : Lien de ressource introuvable"
   couldn_t_find_valid_settings_for_this_link_resourc_cab9f16a: "Paramètres valides introuvables pour ce lien : Lien de ressource non valide pour cet outil"
   couldn_t_generate_diff_message_a0528b20: "N'a pu produire de comparaison : %{message}"
+  couldn_t_load_account_calendar_settings_c198189: "Impossible de charger les paramètres du calendrier de compte"
+  couldn_t_save_account_calendar_visibilities_343459d1: "Impossible d’enregistrer les visibilités du calendrier de compte"
   couldn_t_track_assigning_students_to_groups_but_it_b6510770: "Impossible de suivre l'affectation des élèves aux groupes, mais l'affectation est en cours ! Revenez plus tard consulter manuellement le résultat. (%{errorMessage})"
   couldn_t_update_standards_for_authority_auth_81206187: "Impossible de mettre à jour les critères de l'autorisation %{auth}"
   count_40eced3b: Compter
+  count_account_calendars_selected_578d6db8: 
+    one: "1 calendrier de compte sélectionné"
+    other: "%{count} calendriers de compte sélectionnés"
+    zero: "Aucun calendrier de compte sélectionné"
   count_alignable_artifacts_7779644a: 
     one: "%{count} ARTEFACT POUVANT ÊTRE ALIGNÉ"
     other: "%{count} ARTEFACTS POUVANT ÊTRE ALIGNÉS"
@@ -8093,6 +8120,7 @@ fr:
       uuid: UUID
       wiki_id: "ID de Wiki"
       workflow_state: "État du flux de travail"
+  course_members_124b2876: "Membres du cours"
   course_members_are_free_to_join_9b2603d4: "Adhésion libre pour les membres du cours"
   course_modules_795cb95e: "Modules du cours"
   course_name_45175338: "Nom du cours"
@@ -8120,6 +8148,7 @@ fr:
   course_pacing_40c14b61: "Gestion d'allure de cours"
   course_pacing_adds_support_for_rolling_enrollments_3331cbaa: "La gestion d'allure de cours ajoute la prise en charge des inscriptions glissantes à Canvas ; elle permet une distribution automatique des dates d'échéances pour les élèves ayant démarré à des dates différentes, selon l’allure définie par l’instructeur. Pour en savoir plus et donner votre avis, vous pouvez rejoindre le groupe d’utilisateurs sur la gestion d'allure de cours."
   course_pacing_blackout_dates_1dfc8b61: "Dates de fermeture pour les allures de cours"
+  course_pacing_d3025ecf: "Allure de cours :"
   course_pacing_is_in_active_development_348e33cf: "La gestion d'allure est en plein développement."
   course_pages_449f1dd4: "Pages du cours"
   course_participation_and_access_settings_7a3d6297: "Paramètres de participation et d'accès aux cours"
@@ -9808,6 +9837,7 @@ fr:
   discussion_post_count_report_2da4c6c: "Rapport du nombre de messages pour la discussion"
   discussion_posts_c998c9ad: "Billets de discussions"
   discussion_redesign_description: "Cette fonctionnalité améliore l’expérience Canvas au niveau des discussions et annonces. Lorsque ce drapeau est activé, l'accès anticipé aux améliorations en cours s'affichera automatiquement à chaque nouvelle version. Pour de plus amples informations, consultez le *groupe d’utilisateurs sur le nouveau design des discussions/annonces* sur Canvas Community."
+  discussion_redesign_grading_view_467bf307: "Vue notation pour le redesign des discussions"
   discussion_reply_sorting_6a14676e: "Tri des réponses aux discussions"
   discussion_settings_2fbf0b95: "Paramètres de discussion"
   discussion_submission_781d5d33: "Soumission de la discussion"
@@ -11297,7 +11327,7 @@ fr:
     unsaved_changes: "Vous avez des modifications non enregistrées."
     wrong_file_extension: "Le fichier que vous avez sélectionné, avec l’extension %{extension}, n’est pas autorisé pour l’envoi."
   estonian_5e8e2fa4: Estonien
-  even_with_the_account_calendars_add_edit_delete_ev_4f9c50ac: "Même lorsque l'autorisation « Calendriers de comptes - ajouter / modifier / supprimer des événements » est activée, les événements ne peuvent être créés que dans les calendriers de comptes visibles."
+  even_with_the_account_calendars_add_edit_delete_ev_4f9c50ac: "Même lorsque l'autorisation « Calendriers de comptes - ajouter / modifier / supprimer des événements » est activée, les événements ne peuvent être créés que dans les calendriers de comptes visibles."
   event_creation_failed_71b75bea: "Échec de la création d'événement"
   event_date_c9459fe3: "Date de l'événement"
   event_date_f05219e7: "Date de l'événement :"
@@ -11431,6 +11461,8 @@ fr:
   expand_subdiscussion_cd226ed4: "Développer la sous-discussion"
   expand_tutorial_tray_22630c49: "Étendre le tiroir à didacticiel"
   expanded_f4493860: Développé(e)
+  expected_array_of_objects_b09ead01: "Un tableau d'objets est attendu"
+  expected_filter_param_to_be_one_of_visible_hidden_c658bc3: "Le paramètre %{filter} est censé être de l'un des types suivants : %{visible}, %{hidden}"
   experimental_graphql_api_75c5eb8f: "API EXPÉRIMENTAL GraphQL."
   expires_at_6214b43f: "Expire à"
   explanation_of_statuses_90a26d07: "Explication des états :"
@@ -11968,6 +12000,7 @@ fr:
   filter_by_student_name_or_secondary_id_83dc524f: "Filtrer par nom d'étudiant ou identifiant secondaire"
   filter_by_term_cfe778b2: "Filtrer par élément"
   filter_by_user_type_dbbd3e3d: "Filtrer par type d’utilisateur"
+  filter_calendars_62680a26: "Filtrer les calendriers"
   filter_conversations_by_course_or_group_38d0a55e: "Filtrer les conversations par cours ou groupe"
   filter_conversations_by_type_1ce8c064: "Filtrer les conversations par type"
   filter_discussions_by_assignments_757924ed: "filtrer les discussions par tâches"
@@ -13913,6 +13946,7 @@ fr:
   hindi_9bcd4b34: Hindi
   history_cd3f60a9: Historique
   history_settings_c63dbaaf: "Paramètres d'historique"
+  hmm_we_can_t_find_any_matching_calendars_25983a51: "Hmm, nous n'avons trouvé aucun calendrier correspondant."
   hold_fb369624: "mettre en attente"
   home_351838cd: Accueil
   home_page_is_not_valid_2e8a25ae: "La page d'accueil n'est pas valide"
@@ -14408,7 +14442,7 @@ fr:
   import_status_b147bd27: "Statut de l’importation"
   import_tutorial_tray_8b92e956: "Bac du didacticiel sur les imports"
   important_dates_304e306a: "Dates importantes"
-  important_dates_53df2d2b: "Dates importantes :"
+  important_dates_53df2d2b: "Dates importantes :"
   important_dates_tray_fa41a025: "Tiroir Dates importantes"
   important_info_3bda6406: "Informations importantes"
   important_info_for_course_baa4bce1: "Informations importantes pour %{course}"
@@ -15401,6 +15435,7 @@ fr:
   loading_6ac402e1: chargement...
   loading_725811ca: chargement
   loading_accounts_3364e7a0: "Chargement des comptes..."
+  loading_accounts_a7606249: "Chargement des comptes"
   loading_additional_items_ed5f672d: "Chargement des éléments supplémentaires..."
   loading_additional_todo_details_acba0cf2: "Chargement des détails supplémentaire des choses à faire"
   loading_announcement_content_4405470f: "Chargement du contenu de l’annonce"
@@ -15482,6 +15517,7 @@ fr:
   loading_section_header_616c8cdd: "Chargement de l’en-tête de section"
   loading_staff_1ce7d803: "Chargement du personnel..."
   loading_students_30b71301: "Chargement des élèves..."
+  loading_sub_accounts_a284e8a1: "Chargement des sous-comptes"
   loading_sync_history_3eb11baf: "Chargement de l'historique de synchronisation..."
   loading_sync_history_9f342cbf: "Chargement de l’historique de synchro"
   loading_todo_course_name_b851e509: "Chargement des nom de cours à faire"
@@ -15725,6 +15761,7 @@ fr:
   make_sure_all_search_terms_are_spelled_correctly_9804cdb4: "Vérifiez que tous les termes de recherche sont bien orthographiés."
   make_sure_that_you_are_spelling_your_institution_c_19a8b7c6: "Assurez-vous d'écrire correctement le nom de votre établissement"
   make_sure_you_choose_the_most_appropiate_option_as_93079937: "Assurez-vous que vous choisissez l’option la plus appropriée, car les notes des étudiants RISQUENT d’être affectées."
+  make_sure_you_ve_spelled_it_correctly_or_type_in_f_42876182: "Vérifiez que vous l’avez orthographié correctement ou saisissez moins de lettres pour voir si le calendrier apparaît dans les résultats."
   make_the_course_summary_list_of_assignments_and_ev_f739be33: "Rend le résumé de cours (liste des travaux et événements) facultatif au sein du programme"
   make_this_course_publicly_visible_student_data_wil_3954d6c8: "Rendre ce cours visible pour tous (les données des étudiants resteront privées)"
   make_your_course_your_own_upload_an_image_to_repre_ec57713e: |-
@@ -17993,7 +18030,9 @@ fr:
   missing_d59852a7: manquant
   missing_eaddacbd: MANQUANT
   missing_interval_70679242: "INTERVAL manquant"
+  missing_key_s_4be3dc31: "Clé(s) manquante(s)"
   missing_missing_c1010432: "%{missing} manquant"
+  missing_param_param_78851fcd: "Paramètre manquant : `%{param}`"
   missing_percent_94534638: "Manquant : %{percent}"
   missing_policies_4f195e0b: "Politiques manquantes"
   missing_policy_applicator_emits_live_events_88b47396: "Émission d'événements instantanés par l'applicateur de stratégies sur absences"
@@ -19873,7 +19912,7 @@ fr:
     exception: "Désolé, une erreur est survenue. Veuillez réessayer ultérieurement."
   pdf_4e842f10: pdf
   pdf_d8236d9a: PDF
-  peer_632472b7: "Pair :"
+  peer_632472b7: "Pair :"
   peer_review_assignment_7d314c59: "Travail revu par un pair"
   peer_review_due_dueattext_20987412: "Évaluation par un pair à rendre le %{dueAtText}"
   peer_review_due_eb63af38: "Évaluation par un pair à rendre le"
@@ -19893,6 +19932,7 @@ fr:
   penalty_adjusted_707df573: "*%{penalty}* **%{adjusted}**"
   pending_3e506a5b: "En attente"
   pending_enforcement_eb32e3d: "En attente de mise en application"
+  pending_f1ed53c7: "en attente"
   pending_message_2d9a8796: "En attente : %{message}"
   people_account_30bbffec: "Personnes (Compte)"
   people_account_course_305043bb: "Personnes (Compte / Cours)"
@@ -20032,6 +20072,7 @@ fr:
   please_select_one_f931e883: "Veuillez sélectionner une option"
   please_specify_whether_to_enable_or_disable_micros_10f43ce5: "Veuillez indiquer si vous souhaitez activer ou désactiver la synchronisation Microsoft Teams."
   please_try_again_4c3d11b4: "Veuillez réessayer."
+  please_try_another_search_term_filter_or_search_wi_d6c4046a: "Veuillez essayer un autre filtre ou un autre terme de recherche, ou bien effectuez votre recherche avec moins de caractères."
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: "Veuillez réessayer d'établir une connexion à l’outil en resélectionnant l’outil dans l’interface de l'élément de module ou de travail, puis en enregistrant."
   please_upload_files_as_a_zip_5a2c799f: "Veuillez télécharger les fichiers sous forme d'un fichier .zip"
   please_visit_your_modules_page_for_more_informatio_846c5e32: "Veuillez accéder à votre *page de modules* pour plus d’informations."
@@ -23085,6 +23126,8 @@ fr:
         am_pm: matin/après-midi
         hour: H
         minute: min
+  render_both_to_do_lists_for_teachers_with_student__6fc0fdda: "Afficher les deux listes de choses à faire pour les enseignants avec des élèves inscrits."
+  renders_both_to_do_lists_on_the_dashboard_sidebar__c7d38ae: "Affiche les deux listes de choses à faire dans la barre latérale du tableau de bord lorsque les enseignants ont des élèves inscrits."
   replace_attachmentdisplayname_button_94dd8ba1: "Bouton Remplacer %{attachmentDisplayName}"
   replace_e61834a7: Remplacer
   replace_filename_png_button_cf5dc7c3: "Remplacer le bouton filename.jpg"
@@ -23213,7 +23256,7 @@ fr:
   restore_6d523f1d: Restaurer
   restore_courses_182e162e: "Restaurer les cours"
   restored_course_association_course_c9e16045: "Association de cours restaurée %{course}"
-  restoring_122bdbbf: "Restauration : "
+  restoring_122bdbbf: "Restauration : "
   restrict_access_84ba6bb8: "Limiter l'accès"
   restrict_instructors_from_changing_mastery_scales_5af13053: "Empêcher les instructeurs de modifier les échelles de réussite"
   restrict_instructors_from_changing_proficiency_cal_b4e62c95: "Empêcher les instructeurs de modifier la méthode de calcul de maîtrise"
@@ -23249,6 +23292,8 @@ fr:
   resubmitted_2080646f: Renvoyer
   resubmitted_since_last_graded_8484d285: "Soumis à nouveau depuis la dernière notation"
   result_8f971a09: Résultats
+  result_for_19482b14: "résultat pour "
+  results_for_331ce107: "résultats pour "
   resume_quiz_afeceb87: "Reprendre le questionnaire"
   resume_survey_58dce775: "Reprendre l’enquête"
   resync_grades_to_sis_d4dcfe12: "Synchroniser à nouveau les notes vers SIS"
@@ -23777,6 +23822,7 @@ fr:
   search_by_title_or_author_273a8f49: "Rechercher par titre ou auteur..."
   search_by_title_short_name_or_sis_id_fe84aa12: "Rechercher par titre, nom court, ou identifiant SIS"
   search_by_user_dd3ad189: "Rechercher par utilisateur"
+  search_calendars_f98d663: "Rechercher des calendriers"
   search_courses_591bc900: "Chercher les cours..."
   search_courses_7b5c4ab3: "Rechercher des cours"
   search_courses_by_teacher_e9760a48: "Rechercher des cours par enseignant..."
@@ -23804,6 +23850,7 @@ fr:
   search_term_is_mutually_exclusive_with_name_and_do_225d27f1: "search_term exclut nécessairement nom et domaine, et vice-versa"
   search_term_must_be_at_least_num_characters_669098ed: "Le terme de recherche doit être long d'au moins %{num} caractères"
   search_title_body_or_author_1d26711f: "Rechercher un titre, bloc de texte ou auteur"
+  search_totalaccounts_calendars_b26322e0: "Rechercher %{totalAccounts} calendriers"
   search_users_48b1789e: "Chercher les utilisateurs..."
   search_within_grouptitle_4d38272f: "Rechercher dans %{groupTitle}"
   search_within_outcome_group_7ac6ac88: "Rechercher dans un groupe de résultats"
@@ -25042,9 +25089,11 @@ fr:
       automatiquement après association et synchronisation avec un projet de cours
   show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: "Afficher une liste des pages récemment visitées dans la navigation générale de Canvas"
   show_accessibility_checker_notifications_while_edi_a7cb6449: "Afficher les notifications du vérificateur d’accessibilité pendant les modifications."
+  show_account_calendar_for_name_c79359a0: "Afficher le calendrier de compte pour %{name}"
   show_account_navigation_menu_d97270a9: "Afficher le menu de navigation de comptes"
   show_account_setting_to_allow_viewing_and_exportin_8f51281f: "Afficher les paramètres de compte pour permettre l’affichage et l’export du nom/prénom d'un élève dans des colonnes séparées dans le Carnet de notes."
   show_admin_navigation_menu_92fb579f: "Afficher le menu de navigation de l’administrateur"
+  show_all_967a90f0: "Tout afficher"
   show_all_artifacts_34b91a83: "Afficher tous les artéfacts"
   show_all_details_9879980c: "Montrer tous les détails"
   show_all_developerkeyscount_keys_63ef34ca: "Afficher toutes les clés %{developerKeysCount}"
@@ -25090,6 +25139,7 @@ fr:
   show_me_76823679: "Me montrer"
   show_more_8d5f918b: "en afficher plus"
   show_more_af9cbc16: "En afficher plus"
+  show_more_fae1328: "En montrer plus"
   show_name_and_profile_picture_9329d8f8: "Afficher le nom et l’image de profil"
   show_name_details_186d86e6: "Afficher les détails %{name}"
   show_name_of_observed_students_in_notifications_a56dd9e4: "Afficher le nom des élèves observés dans les notifications."
@@ -25104,6 +25154,8 @@ fr:
   show_one_question_at_a_time_271e346d: "Montrer une question à la fois"
   show_online_classes_only_f9d7b938: "Afficher uniquement les classes en ligne"
   show_only_blueprint_courses_9fb37b41: "Montrer seulement les projets de cours"
+  show_only_disabled_calendars_cb8e2bdc: "Afficher seulement les calendriers désactivés"
+  show_only_enabled_calendars_8caef0df: "Afficher seulement les calendriers activés"
   show_originality_report_to_students_be22f5ee: "Montrer le rapport d’originalité aux élèves"
   show_params_3401895b: "Afficher paramètres"
   show_past_account_level_announcements_to_users_3b8208e2: "Afficher les anciennes annonces de niveau compte aux utilisateurs"
@@ -25286,11 +25338,11 @@ fr:
   smileys_emotion_edc2beac: "Smileys et émotions"
   sms_f0ddceeb: SMS
   sms_is_only_used_for_multi_factor_authentication_i_73a11abc: "Les SMS ne sont utilisés que pour l’authentification à plusieurs facteurs (si la fonction est activée sur votre compte)."
-  snapshot_failed_to_create_fc9f89d: "Échec de création de l'instantané !"
+  snapshot_failed_to_create_fc9f89d: "Échec de création de l'instantané !"
   snapshot_in_progress_8777b7a0: "Instantané en cours..."
-  snapshot_restore_failed_6e340ea9: "Échec de la restauration de l’Instantané !"
-  snapshot_successfully_created_1a707198: "Instantané créé avec succès !"
-  snapshot_successfully_restored_reloading_fc2c8f07: "Instantané restauré avec succès ! Rechargement..."
+  snapshot_restore_failed_6e340ea9: "Échec de la restauration de l’Instantané !"
+  snapshot_successfully_created_1a707198: "Instantané créé avec succès !"
+  snapshot_successfully_restored_reloading_fc2c8f07: "Instantané restauré avec succès ! Rechargement..."
   snapshots_6e1806b4: "Points de restauration"
   snapshots_are_backups_of_your_canvas_trial_taking__f18bd571: "Les points de restauration sont des sauvegardes de votre essai de Canvas. En enregistrant un point, vous créez une « version » unique, un enregistrement parfaitement conforme de l’état de votre essai au moment de cet enregistrement."
   some_assignments_could_not_be_created_because_they_d91f2f21: "Certains devoirs n'ont pas pu être créés car ils auraient lieu pendant une période non ouverte à la notation."
@@ -26221,6 +26273,7 @@ fr:
   teacher_dashboard_custom_report_6d20bef2: "Rapport personnalisé de tableau de bord de l’enseignant"
   teacher_engagement_report_ec03613d: "Rapport d’engagement de l’enseignant"
   teacher_s_fdefb2c: Enseignant(s)
+  teacher_to_do_19d00df5: "Liste de choses à faire de l’enseignant"
   teacher_tour_26282921: "Visite pour l’enseignant"
   teacher_view_b2047bc6: "Affichage enseignant"
   teachers_52e2423f: Enseignants
@@ -27054,6 +27107,7 @@ fr:
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Cet acquis a été utilisé pour évaluer un étudiant et ne peut ni être modifié, ni être supprimé. "
   this_outcome_has_been_used_to_assess_a_student_and_a3a48511: "Ce résultat a été utilisé pour évaluer un élève et certaines révisions auront une incidence sur les résultats des élèves."
   this_outcome_has_been_used_to_assess_a_student_onl_4b4c1e95: "Cet acquis a été utilisé pour évaluer un étudiant. Seuls les champs de texte peuvent être mis à jour"
+  this_outcome_has_not_been_aligned_320b20c2: "Ce résultat n’a pas été aligné"
   this_outcome_was_successfully_removed_from_this_ac_ed855bcd: "Ce résultat a été supprimé avec succès de ce compte."
   this_outcome_was_successfully_removed_from_this_co_da04ca85: "Ce résultat a été supprimé avec succès de ce cours."
   this_outcome_was_successfully_updated_b323e27c: "Ce résultat a été mis à jour avec succès."
@@ -28245,10 +28299,12 @@ fr:
   unable_to_get_accounts_cb825c43: "Impossible d'obtenir des comptes"
   unable_to_get_homerooms_959dfe67: "Impossible d'obtenir des salles de classe"
   unable_to_get_observed_students_ff62d801: "Impossible de récupérer les élèves observés"
+  unable_to_load_calendar_count_5bb61cbe: "Impossible de charger le nombre de calendriers"
   unable_to_load_courses_menu_7074ea04: "Impossible de charger le menu de cours"
   unable_to_load_lti_1_3_tools_cf169f9: "Impossible de charger les outils Lti 1.3"
   unable_to_load_messages_2b158fd0: "Impossible de charger les messages "
   unable_to_load_messages_49a2942b: "Impossible de charger les messages"
+  unable_to_load_results_4e15a097: "Impossible de charger les résultats"
   unable_to_load_this_control_543a8271: "Impossible de charger ce contrôle"
   unable_to_locate_sftp_key_selected_if_it_continues_c5768e01: |-
       Impossible de localiser la clé SFTP sélectionnée.
@@ -28309,6 +28365,7 @@ fr:
   unexpected_reponse_from_microsoft_api_got_status_c_cdbba851: "Réponse inattendue de la part de l’API Microsoft : code d’état %{status_code} reçu."
   unexpected_response_from_microsoft_api_got_status__86f7a95e: "Réponse inattendue de l’API Microsoft : code d'état %{status_code} reçu"
   unexpected_response_from_microsoft_api_this_is_lik_fc892bab: "Réponse inattendue de l'API de Microsoft. Il s'agit probablement d'un bogue. Veuillez contacter l’assistance."
+  unexpected_value_12f2d401: "Valeur inattendue"
   unfavorite_cd0c113e: "Retirer des favoris"
   unfavorite_coursename_32f77231: "Retirer des favoris %{courseName}"
   ungraded_147a0dce: "non noté"
@@ -28485,6 +28542,9 @@ fr:
   updated_2c1e8615: "Mis à jour"
   updated_after_3a81825c: "Mis à jour après"
   updated_at_ab9f625d: updated_at
+  updated_count_accounts_5fe53c96: 
+    one: "Un compte mise à jour"
+    other: "%{count} comptes mis à jour"
   updated_current_grade_to_be_empty_c2ce1d13: "Note actuelle effacée"
   updated_current_grade_to_currentgrade_bfe2ea14: "Note actuelle mise à jour à la valeur de  %{currentGrade}"
   updated_group_group_name_727b1d98: "A mis à jour le groupe %{group_name}"
@@ -29621,6 +29681,7 @@ fr:
     cannot_update_published: "Vous ne pouvez pas changer l’état « publié » de cette page Wiki"
     cannot_update_title: "Vous ne pouvez pas actualiser le titre de cette page Wiki"
     invalid_editing_roles: "Les rôles de modification fournis ne sont pas valides."
+  will_allow_for_graders_to_grade_assigned_discussio_85a64ed2: "Permet aux évaluateurs de noter les discussions assignées directement depuis la page de discussion."
   will_allow_for_saving_drafts_as_students_type_thei_aa08586: |-
       Permet l’enregistrement de brouillons à mesure que les élèves saisissent leurs réponses à un sujet de discussion
       dans le nouveau design de l’espace de discussions.
