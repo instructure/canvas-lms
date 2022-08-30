@@ -48,70 +48,97 @@ describe "BigBlueButton conferences" do
 
   before do
     user_session(@teacher)
-    get conferences_index_page
   end
 
   after { close_extra_windows }
 
-  context "when a conference is open" do
-    context "and the conference has no recordings" do
-      before(:once) do
-        stub_request(:get, /getRecordings/)
-          .with(query: bbb_fixtures[:get_recordings])
-          .to_return(body: big_blue_button_mock_response("get_recordings", "none"))
-        @conference = create_big_blue_button_conference(bbb_fixtures[:get_recordings]["meetingID"])
-      end
-
-      it "does not include list with recordings", priority: "2" do
-        verify_conference_does_not_include_recordings
-      end
+  context "when bbb_modal_update is ON" do
+    before(:once) do
+      Account.site_admin.enable_feature! :bbb_modal_update
     end
 
-    context "and the conference has recordings" do
-      before(:once) do
-        stub_request(:get, /getRecordings/)
-          .with(query: bbb_fixtures[:get_recordings])
-          .to_return(body: big_blue_button_mock_response("get_recordings", "two"))
-        @conference = create_big_blue_button_conference(bbb_fixtures[:get_recordings]["meetingID"])
-      end
+    it "syncs in unadded context users on option select" do
+      conf = create_big_blue_button_conference
+      conf.add_invitee(@ta)
+      expect(conf.invitees.pluck(:id)).to match_array [@ta.id]
 
-      it "includes list with recordings", priority: "2" do
-        verify_conference_includes_recordings
-      end
+      get conferences_index_page
+      fj("li.conference a:contains('Settings')").click
+      f(".sync_conference_link").click
+      wait_for_ajaximations
+      expect(conf.invitees.pluck(:id)).to include(@ta.id, @student.id)
+    end
+  end
+
+  context "when bbb_modal_update is OFF" do
+    before(:once) do
+      Account.site_admin.disable_feature! :bbb_modal_update
     end
 
-    context "and the conference has one recording and it is deleted" do
-      before(:once) do
-        stub_request(:get, /deleteRecordings/)
-          .with(query: bbb_fixtures[:delete_recordings])
-          .to_return(body: big_blue_button_mock_response("delete_recordings"))
-        stub_request(:get, /getRecordings/)
-          .with(query: bbb_fixtures[:get_recordings])
-          .to_return(body: big_blue_button_mock_response("get_recordings", "one"))
-        @conference = create_big_blue_button_conference(bbb_fixtures[:get_recordings]["meetingID"])
-      end
-
-      it "removes recording from the list", priority: "2" do
-        show_recordings_in_first_conference_in_list
-        delete_first_recording_in_first_conference_in_list
-        verify_conference_does_not_include_recordings
-      end
+    before do
+      get conferences_index_page
     end
 
-    context "and the conference has one recording with statistics" do
-      before(:once) do
-        stub_request(:get, /getRecordings/)
-          .with(query: bbb_fixtures[:get_recordings])
-          .to_return(body: big_blue_button_mock_response("get_recordings", "one"))
-        @conference = create_big_blue_button_conference(bbb_fixtures[:get_recordings]["meetingID"])
-        @conference.add_user(@student, "attendee")
+    context "when a conference is open" do
+      context "and the conference has no recordings" do
+        before(:once) do
+          stub_request(:get, /getRecordings/)
+            .with(query: bbb_fixtures[:get_recordings])
+            .to_return(body: big_blue_button_mock_response("get_recordings", "none"))
+          @conference = create_big_blue_button_conference(bbb_fixtures[:get_recordings]["meetingID"])
+        end
+
+        it "does not include list with recordings", priority: "2" do
+          verify_conference_does_not_include_recordings
+        end
       end
 
-      it "student should not see link for statistics", priority: "2" do
-        user_session(@student)
-        get conferences_index_page
-        show_recordings_in_first_conference_in_list
-        verify_conference_does_not_include_recordings_with_statistics
+      context "and the conference has recordings" do
+        before(:once) do
+          stub_request(:get, /getRecordings/)
+            .with(query: bbb_fixtures[:get_recordings])
+            .to_return(body: big_blue_button_mock_response("get_recordings", "two"))
+          @conference = create_big_blue_button_conference(bbb_fixtures[:get_recordings]["meetingID"])
+        end
+
+        it "includes list with recordings", priority: "2" do
+          verify_conference_includes_recordings
+        end
+      end
+
+      context "and the conference has one recording and it is deleted" do
+        before(:once) do
+          stub_request(:get, /deleteRecordings/)
+            .with(query: bbb_fixtures[:delete_recordings])
+            .to_return(body: big_blue_button_mock_response("delete_recordings"))
+          stub_request(:get, /getRecordings/)
+            .with(query: bbb_fixtures[:get_recordings])
+            .to_return(body: big_blue_button_mock_response("get_recordings", "one"))
+          @conference = create_big_blue_button_conference(bbb_fixtures[:get_recordings]["meetingID"])
+        end
+
+        it "removes recording from the list", priority: "2" do
+          show_recordings_in_first_conference_in_list
+          delete_first_recording_in_first_conference_in_list
+          verify_conference_does_not_include_recordings
+        end
+      end
+
+      context "and the conference has one recording with statistics" do
+        before(:once) do
+          stub_request(:get, /getRecordings/)
+            .with(query: bbb_fixtures[:get_recordings])
+            .to_return(body: big_blue_button_mock_response("get_recordings", "one"))
+          @conference = create_big_blue_button_conference(bbb_fixtures[:get_recordings]["meetingID"])
+          @conference.add_user(@student, "attendee")
+        end
+
+        it "student should not see link for statistics", priority: "2" do
+          user_session(@student)
+          get conferences_index_page
+          show_recordings_in_first_conference_in_list
+          verify_conference_does_not_include_recordings_with_statistics
+        end
       end
     end
   end
