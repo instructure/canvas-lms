@@ -79,7 +79,7 @@ describe('EquationEditorModal', () => {
   let editor, mockFn
 
   beforeAll(() => {
-    RCEGlobals.getFeatures = jest.fn().mockReturnValue({new_equation_editor: true})
+    RCEGlobals.setFeatures({new_equation_editor: true})
 
     MathfieldElement.prototype.getValue = jest.fn().mockImplementation(function () {
       if (this.tagName === 'MATH-FIELD') {
