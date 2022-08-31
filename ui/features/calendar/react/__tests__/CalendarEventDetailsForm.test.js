@@ -53,13 +53,13 @@ const testTimezone = (timezone, inputDate, expectedDate, halfHours) => {
   defaultProps.timezone = timezone
   const component = render(<CalendarEventDetailsForm {...defaultProps} />)
   const date = changeValue(component, 'combobox', 'Date:', inputDate)
-  expect(date.value).toBe("Thu, Jul 14, 2022")
-  if (halfHours) setTime(component, "From:", halfHours)
+  expect(date.value).toBe('Thu, Jul 14, 2022')
+  if (halfHours) setTime(component, 'From:', halfHours)
   select(component, 'button', 'Submit')
 
   expect(defaultProps.event.save).toHaveBeenCalledWith(
     expect.objectContaining({
-      'calendar_event[start_at]': expectedDate,
+      'calendar_event[start_at]': expectedDate
     }),
     expect.anything(),
     expect.anything()
@@ -146,16 +146,16 @@ describe('CalendarEventDetailsForm', () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
     let date = changeValue(component, 'combobox', 'Date:', '2022-07-03T00:00:00.000Z')
-    expect(date.value).toBe("Sun, Jul 3, 2022")
+    expect(date.value).toBe('Sun, Jul 3, 2022')
     date = changeValue(component, 'combobox', 'Date:', '2022-07-14T00:00:00.000Z')
-    expect(date.value).toBe("Thu, Jul 14, 2022")
+    expect(date.value).toBe('Thu, Jul 14, 2022')
     date = changeValue(component, 'combobox', 'Date:', '2022-07-23T00:00:00.000Z')
-    expect(date.value).toBe("Sat, Jul 23, 2022")
+    expect(date.value).toBe('Sat, Jul 23, 2022')
     select(component, 'button', 'Submit')
 
     expect(defaultProps.event.save).toHaveBeenCalledWith(
       expect.objectContaining({
-        'calendar_event[start_at]': '2022-07-23T00:00:00.000Z',
+        'calendar_event[start_at]': '2022-07-23T00:00:00.000Z'
       }),
       expect.anything(),
       expect.anything()
@@ -165,8 +165,8 @@ describe('CalendarEventDetailsForm', () => {
   it('can keep the same date when the date input is clicked and blurred', async () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
-    let date = changeValue(component, 'combobox', 'Date:', '2022-07-14T00:00:00.000Z')
-    expect(date.value).toBe("Thu, Jul 14, 2022")
+    const date = changeValue(component, 'combobox', 'Date:', '2022-07-14T00:00:00.000Z')
+    expect(date.value).toBe('Thu, Jul 14, 2022')
 
     for (let i = 0; i < 30; i++) {
       act(() => date.click())
@@ -177,7 +177,7 @@ describe('CalendarEventDetailsForm', () => {
 
     expect(defaultProps.event.save).toHaveBeenCalledWith(
       expect.objectContaining({
-        'calendar_event[start_at]': '2022-07-14T00:00:00.000Z',
+        'calendar_event[start_at]': '2022-07-14T00:00:00.000Z'
       }),
       expect.anything(),
       expect.anything()
@@ -323,28 +323,40 @@ describe('CalendarEventDetailsForm', () => {
     defaultProps.event.contextInfo = courseContext
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
-    expect(component.queryByRole('checkbox', {name: 'Add to Course Pacing blackout dates'})).not.toBeInTheDocument()
+    expect(
+      component.queryByRole('checkbox', {name: 'Add to Course Pacing blackout dates'})
+    ).not.toBeInTheDocument()
     defaultProps.event.contextInfo = userContext
   })
 
   it('does not render blackout checkbox in a user context', async () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
-    expect(component.queryByRole('checkbox', {name: 'Add to Course Pacing blackout dates'})).not.toBeInTheDocument()
+    expect(
+      component.queryByRole('checkbox', {name: 'Add to Course Pacing blackout dates'})
+    ).not.toBeInTheDocument()
   })
 
   it('only enables relevant fields when blackout date checkbox is checked', async () => {
     ENV.FEATURES.account_level_blackout_dates = true
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
-    expectFieldsToBeEnabled(component, 
-      ["Title:", "Location:", "Date:", "From:", "To:", "Calendar:", "More Options", "Submit"])
+    expectFieldsToBeEnabled(component, [
+      'Title:',
+      'Location:',
+      'Date:',
+      'From:',
+      'To:',
+      'Calendar:',
+      'More Options',
+      'Submit'
+    ])
 
     select(component, 'button', 'Calendar:')
     select(component, 'option', 'Geometry')
     select(component, 'checkbox', 'Add to Course Pacing blackout dates')
 
-    expectFieldsToBeEnabled(component, ["Title:", "Date:", "Calendar:", "More Options", "Submit"])
-    expectFieldsToBeDisabled(component, ["Location:", "From:", "To:"])
+    expectFieldsToBeEnabled(component, ['Title:', 'Date:', 'Calendar:', 'More Options', 'Submit'])
+    expectFieldsToBeDisabled(component, ['Location:', 'From:', 'To:'])
   })
 })
