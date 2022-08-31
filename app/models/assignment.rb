@@ -1091,7 +1091,8 @@ class Assignment < ActiveRecord::Base
 
     modules.each do |mod|
       if mod.context_module_progressions.where(current: true, user_id: student_ids).update_all(current: false) > 0
-        mod.delay_if_production(strand: "module_reeval_#{mod.global_context_id}").evaluate_all_progressions
+        mod.delay_if_production(n_strand: ["evaluate_module_progressions", global_context_id],
+                                singleton: "evaluate_module_progressions:#{mod.global_id}").evaluate_all_progressions
       end
     end
   end
