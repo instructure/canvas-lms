@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {memo} from 'react'
+import React, {memo, useState} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
@@ -44,6 +44,8 @@ const AlignmentItem = ({
   moduleWorkflowState,
   assignmentContentType
 }) => {
+  const [shouldUnderline, setShouldUnderline] = useState(false)
+  const handleLinkFocus = () => setShouldUnderline(prevState => !prevState)
   const renderIcon = () => {
     let icon
     let screenReaderText
@@ -89,7 +91,14 @@ const AlignmentItem = ({
       <Flex.Item size="50%" shouldGrow={true}>
         <Flex as="div" direction="column">
           <Flex.Item as="div" padding="xxx-small">
-            <Link interaction="enabled" isWithinText={false} href={url} target="_blank">
+            <Link
+              interaction="enabled"
+              isWithinText={shouldUnderline}
+              href={url}
+              target="_blank"
+              onFocus={handleLinkFocus}
+              onBlur={handleLinkFocus}
+            >
               <TruncateText>
                 <Text size="medium" data-testid="alignment-item-title">
                   {title}
