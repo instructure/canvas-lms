@@ -164,6 +164,14 @@ Which is you?", :count => @merge_opportunities.length %>
           <%= time_zone_select :user, :time_zone, I18nTimeZone.us_zones, :model => I18nTimeZone, :default => @pseudonym.account.default_time_zone %>
         </div>
       </div>
+      <% if @domain_root_account.allow_additional_email_at_registration? %>
+      <div class="control-group">
+        <%= form.blabel :personal_email, :en => "Personal Email (optional)", :class => 'control-label' %>
+        <div class="controls" style="padding-top: 5px">
+          <%= form.text_field :personal_email, :value => '' %>
+        </div>
+      </div>
+      <% end %>
       <% if @pseudonym.account == Account.default %>
       <div class="control-group">
         <div class="controls">

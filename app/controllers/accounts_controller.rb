@@ -1749,7 +1749,8 @@ class AccountsController < ApplicationController
   end
 
   PERMITTED_SETTINGS_FOR_UPDATE = [:admins_can_change_passwords, :admins_can_view_notifications,
-                                   :allow_invitation_previews, :allow_sending_scores_in_emails,
+                                   :allow_additional_email_at_registration, :allow_invitation_previews,
+                                   :allow_sending_scores_in_emails,
                                    :author_email_in_notifications, :canvadocs_prefer_office_online,
                                    :can_add_pronouns, :can_change_pronouns,
                                    :consortium_parent_account, :consortium_can_create_own_accounts,
