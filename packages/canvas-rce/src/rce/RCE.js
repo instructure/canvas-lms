@@ -197,7 +197,7 @@ RCE.propTypes = {
   // configurable default timeout value for flash alerts
   flashAlertTimeout: number,
   // user's timezone
-  timezone: string.isRequired,
+  timezone: string,
   // event handlers
   onFocus: func, // f(RCEWrapper component)
   onBlur: func, // f(event)

@@ -273,7 +273,7 @@ class RCEWrapper extends React.Component {
     use_rce_icon_maker: PropTypes.bool,
     features: PropTypes.objectOf(PropTypes.bool),
     flashAlertTimeout: PropTypes.number,
-    timezone: PropTypes.string.isRequired
+    timezone: PropTypes.string
   }
 
   static defaultProps = {
@@ -283,7 +283,8 @@ class RCEWrapper extends React.Component {
     highContrastCSS: [],
     ltiTools: [],
     maxInitRenderedRCEs: -1,
-    features: {}
+    features: {},
+    timezone: Intl?.DateTimeFormat()?.resolvedOptions()?.timeZone
   }
 
   static skinCssInjected = false
@@ -375,8 +376,11 @@ class RCEWrapper extends React.Component {
   }
 
   getRequiredFeatureStatuses() {
-    const {new_equation_editor, new_math_equation_handling, rce_ux_improvements} =
-      this.props.features
+    const {
+      new_equation_editor = false,
+      new_math_equation_handling = false,
+      rce_ux_improvements = false
+    } = this.props.features
     return {new_equation_editor, new_math_equation_handling, rce_ux_improvements}
   }
 
