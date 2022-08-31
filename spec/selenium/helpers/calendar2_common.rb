@@ -272,7 +272,7 @@ module Calendar2Common
   def test_timed_calendar_event_in_tz(time_zone, start_time = "6:30 AM", end_time = "6:30 PM")
     @user.time_zone = time_zone
     @user.save!
-    @date = Time.zone.now.beginning_of_day
+    @date = @user.time_zone.now.beginning_of_day
     new_date = @date
     new_date =
       new_date.to_date.mday == "15" ? new_date.change({ day: 20 }) : new_date.change({ day: 15 })
@@ -299,7 +299,7 @@ module Calendar2Common
   )
     @user.time_zone = time_zone
     @user.save!
-    @date = Time.zone.now.beginning_of_day
+    @date = @user.time_zone.now.beginning_of_day
     new_date = @date
     new_date =
       new_date.to_date.mday == "15" ? new_date.change({ day: 20 }) : new_date.change({ day: 15 })
@@ -314,7 +314,6 @@ module Calendar2Common
     more_options_submit_button.click
     wait_for_ajaximations
     refresh_page
-
     event_title_on_calendar.click
     expect(
       event_content.find_element(:css, ".event-details-timestring").text
