@@ -37,9 +37,9 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {IconCheckSolid, IconEndSolid, IconRefreshSolid} from '@instructure/ui-icons'
 import LoadingIndicator from '@canvas/loading-indicator'
 import MarkAsDoneButton from './MarkAsDoneButton'
-import {Mutation, useMutation} from 'react-apollo'
+import {useMutation, useApolloClient} from 'react-apollo'
 import PropTypes from 'prop-types'
-import React, {Component} from 'react'
+import React, {useState, useEffect, useContext} from 'react'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
 import SimilarityPledge from './SimilarityPledge'
 import StudentFooter from './StudentFooter'
@@ -47,11 +47,16 @@ import SubmissionCompletedModal from './SubmissionCompletedModal'
 import {
   STUDENT_VIEW_QUERY,
   SUBMISSION_HISTORIES_QUERY,
+  RUBRIC_QUERY,
 } from '@canvas/assignments/graphql/student/Queries'
 import StudentViewContext from './Context'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
+import {transformRubricAssessmentData} from '../helpers/RubricHelpers'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import qs from 'qs'
+import useStore from './stores/index'
 
 const I18n = useI18nScope('assignments_2_file_upload')
 
@@ -155,207 +160,293 @@ CancelAttemptButton.propTypes = {
   submission: PropTypes.object.isRequired,
 }
 
-export default class SubmissionManager extends Component {
-  static propTypes = {
-    assignment: Assignment.shape,
-    submission: Submission.shape,
-  }
+const SubmissionManager = ({assignment, submission}) => {
+  const [draftStatus, setDraftStatus] = useState(null)
+  const [editingDraft, setEditingDraft] = useState(false)
+  const [focusAttemptOnInit, setFocusAttemptOnInit] = useState(false)
+  const [similarityPledgeChecked, setSimilarityPledgeChecked] = useState(false)
+  const [showConfetti, setShowConfetti] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [uploadingFiles, setUploadingFiles] = useState(false)
+  const [submissionCompletedModalOpen, setSubmissionCompletedModalOpen] = useState(false)
+  const [activeSubmissionType, setActiveSubmissionType] = useState(null)
+  const [selectedExternalTool, setSelectedExternalTool] = useState(null)
+  const [rubricData, setRubricData] = useState(null)
 
-  state = {
-    draftStatus: null,
-    editingDraft: false,
-    focusAttemptOnInit: false,
-    similarityPledgeChecked: false,
-    showConfetti: false,
-    submittingAssignment: false,
-    uploadingFiles: false,
-    submissionCompletedModalOpen: false,
-  }
+  const displayedAssessment = useStore(state => state.displayedAssessment)
 
-  componentDidMount() {
-    this.setState({
-      activeSubmissionType: this.getActiveSubmissionTypeFromProps(),
-    })
-  }
+  const {setOnSuccess, setOnFailure} = useContext(AlertManagerContext)
+  const {
+    allowChangesToSubmission,
+    latestSubmission,
+    isLatestAttempt,
+    lastSubmittedSubmission,
+    cancelDraftAction,
+    showDraftAction,
+    startNewAttemptAction,
+  } = useContext(StudentViewContext)
 
-  componentDidUpdate(prevProps) {
-    // Clear the "draft saved" label when switching attempts
-    if (
-      this.props.submission.attempt !== prevProps.submission.attempt &&
-      this.state.draftStatus != null
-    ) {
-      // eslint-disable-next-line react/no-did-update-set-state
-      this.setState({draftStatus: null})
-    }
-  }
+  const apolloClient = useApolloClient()
 
-  getActiveSubmissionTypeFromProps() {
-    // use the draft's active type if one exists
-    if (this.props.submission?.submissionDraft != null) {
-      return this.props.submission?.submissionDraft.activeSubmissionType
-    }
-
-    // default to the assignment's submission type if there's only one
-    if (this.props.assignment.submissionTypes.length === 1) {
-      return this.props.assignment.submissionTypes[0]
-    }
-
-    // otherwise, don't stipulate an active submission type
-    return null
-  }
-
-  updateActiveSubmissionType = (activeSubmissionType, selectedExternalTool = null) => {
-    const focusAttemptOnInit = this.props.assignment.submissionTypes.length > 1
-    this.setState({activeSubmissionType, focusAttemptOnInit, selectedExternalTool})
-  }
-
-  updateEditingDraft = editingDraft => {
-    this.setState({editingDraft})
-  }
-
-  updateUploadingFiles = uploadingFiles => {
-    this.setState({uploadingFiles})
-  }
-
-  updateSubmissionDraftCache = (cache, result) => {
+  const updateSubmissionDraftCache = (cache, result) => {
     if (!result.data.createSubmissionDraft.errors) {
       const newDraft = result.data.createSubmissionDraft.submissionDraft
-      this.updateCachedSubmissionDraft(cache, newDraft)
+      updateCachedSubmissionDraft(cache, newDraft)
     }
   }
 
-  updateCachedSubmissionDraft = (cache, newDraft) => {
-    const {assignment, submission} = JSON.parse(
+  const [createSubmission] = useMutation(CREATE_SUBMISSION, {
+    onCompleted: data => {
+      data.createSubmission.errors
+        ? setOnSuccess(I18n.t('Error sending submission'))
+        : handleSuccess()
+    },
+    onError: () => {
+      setOnFailure(I18n.t('Error sending submission'))
+    },
+    refetchQueries: [{query: SUBMISSION_HISTORIES_QUERY, variables: {submissionID: submission.id}}],
+  })
+
+  const [createSubmissionDraft] = useMutation(CREATE_SUBMISSION_DRAFT, {
+    onCompleted: data => {
+      handleDraftComplete(
+        !data.createSubmissionDraft.errors,
+        data.createSubmissionDraft.submissionDraft?.body
+      )
+    },
+    onError: () => {
+      handleDraftComplete(false, null)
+    },
+    update: updateSubmissionDraftCache,
+  })
+
+  const fetchRubricData = async ({fromCache} = {fromCache: false}) => {
+    const {data} = await apolloClient.query({
+      query: RUBRIC_QUERY,
+      variables: {
+        assignmentLid: assignment._id,
+        submissionID: submission.id,
+        courseID: assignment.env.courseId,
+        submissionAttempt: submission.attempt,
+      },
+      fetchPolicy: fromCache ? 'cache-first' : 'network-only',
+    })
+    setRubricData(data)
+  }
+
+  useEffect(() => {
+    // use the draft's active type if one exists
+    let activeSubmissionTypeFromProps = null
+    if (submission?.submissionDraft != null) {
+      activeSubmissionTypeFromProps = submission?.submissionDraft.activeSubmissionType
+    }
+    // default to the assignment's submission type if there's only one
+    if (assignment.submissionTypes.length === 1) {
+      activeSubmissionTypeFromProps = assignment.submissionTypes[0]
+    }
+    setActiveSubmissionType(activeSubmissionTypeFromProps)
+
+    if (assignment.env.peerReviewModeEnabled && assignment.rubric) {
+      fetchRubricData().catch(() => {
+        setOnFailure(I18n.t('Error fetching rubric data'))
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    // Clear the "draft saved" label when switching attempts
+    if (draftStatus != null) {
+      setDraftStatus(null)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [submission.attempt])
+
+  const isRubricComplete = assessment => {
+    return (
+      assessment?.data.every(criterion => {
+        const points = criterion.points
+        const hasPoints = points?.value !== undefined
+        const hasComments = !!criterion.comments?.length
+        return (hasPoints || hasComments) && points?.valid
+      }) || false
+    )
+  }
+
+  const updateActiveSubmissionType = (activeSubmissionType, selectedExternalTool = null) => {
+    const focusAttemptOnInit = assignment.submissionTypes.length > 1
+    setActiveSubmissionType(activeSubmissionType)
+    setFocusAttemptOnInit(focusAttemptOnInit)
+    setSelectedExternalTool(selectedExternalTool)
+  }
+
+  const updateEditingDraft = editingDraft => {
+    setEditingDraft(editingDraft)
+  }
+
+  const updateUploadingFiles = uploadingFiles => {
+    setUploadingFiles(uploadingFiles)
+  }
+
+  const updateCachedSubmissionDraft = (cache, newDraft) => {
+    const {assignment: cachedAssignment, submission: cachedSubmission} = JSON.parse(
       JSON.stringify(
         cache.readQuery({
           query: STUDENT_VIEW_QUERY,
           variables: {
-            assignmentLid: this.props.assignment._id,
-            submissionID: this.props.submission.id,
+            assignmentLid: assignment._id,
+            submissionID: submission.id,
           },
         })
       )
     )
 
-    submission.submissionDraft = newDraft
+    cachedSubmission.submissionDraft = newDraft
     cache.writeQuery({
       query: STUDENT_VIEW_QUERY,
       variables: {
-        assignmentLid: this.props.assignment._id,
-        submissionID: this.props.submission.id,
+        assignmentLid: assignment._id,
+        submissionID: submission.id,
       },
-      data: {assignment, submission},
+      data: {assignment: cachedAssignment, submission: cachedSubmission},
     })
   }
 
-  submitToGraphql(submitMutation, submitVars) {
-    return submitMutation({
+  const prepareVariables = submitVars => {
+    return {
       variables: {
-        assignmentLid: this.props.assignment._id,
-        submissionID: this.props.submission.id,
+        assignmentLid: assignment._id,
+        submissionID: submission.id,
         ...submitVars,
       },
-    })
+    }
   }
 
-  async submitAssignment(submitMutation) {
-    if (this.state.submittingAssignment || this.state.activeSubmissionType === null) {
+  const submitAssignment = async () => {
+    if (isSubmitting || activeSubmissionType === null) {
       return
     }
-    this.setState({submittingAssignment: true})
+    setIsSubmitting(true)
 
-    switch (this.state.activeSubmissionType) {
+    switch (activeSubmissionType) {
       case 'basic_lti_launch':
-        if (this.props.submission.submissionDraft.ltiLaunchUrl) {
-          await this.submitToGraphql(submitMutation, {
-            resourceLinkLookupUuid: this.props.submission.submissionDraft.resourceLinkLookupUuid,
-            url: this.props.submission.submissionDraft.ltiLaunchUrl,
-            type: this.state.activeSubmissionType,
-          })
+        if (submission.submissionDraft.ltiLaunchUrl) {
+          await createSubmission(
+            prepareVariables({
+              resourceLinkLookupUuid: submission.submissionDraft.resourceLinkLookupUuid,
+              url: submission.submissionDraft.ltiLaunchUrl,
+              type: activeSubmissionType,
+            })
+          )
         }
         break
       case 'media_recording':
-        if (this.props.submission.submissionDraft.mediaObject?._id) {
-          await this.submitToGraphql(submitMutation, {
-            mediaId: this.props.submission.submissionDraft.mediaObject._id,
-            type: this.state.activeSubmissionType,
-          })
+        if (submission.submissionDraft.mediaObject?._id) {
+          await createSubmission(
+            prepareVariables({
+              mediaId: submission.submissionDraft.mediaObject._id,
+              type: activeSubmissionType,
+            })
+          )
         }
         break
       case 'online_upload':
         if (
-          this.props.submission.submissionDraft.attachments &&
-          this.props.submission.submissionDraft.attachments.length > 0
+          submission.submissionDraft.attachments &&
+          submission.submissionDraft.attachments.length > 0
         ) {
-          await this.submitToGraphql(submitMutation, {
-            fileIds: this.props.submission.submissionDraft.attachments.map(file => file._id),
-            type: this.state.activeSubmissionType,
-          })
+          await createSubmission(
+            prepareVariables({
+              fileIds: submission.submissionDraft.attachments.map(file => file._id),
+              type: activeSubmissionType,
+            })
+          )
         }
         break
       case 'online_text_entry':
-        if (
-          this.props.submission.submissionDraft.body &&
-          this.props.submission.submissionDraft.body.length > 0
-        ) {
-          await this.submitToGraphql(submitMutation, {
-            body: this.props.submission.submissionDraft.body,
-            type: this.state.activeSubmissionType,
-          })
+        if (submission.submissionDraft.body && submission.submissionDraft.body.length > 0) {
+          await createSubmission(
+            prepareVariables({
+              body: submission.submissionDraft.body,
+              type: activeSubmissionType,
+            })
+          )
         }
         break
       case 'online_url':
-        if (this.props.submission.submissionDraft.url) {
-          await this.submitToGraphql(submitMutation, {
-            url: this.props.submission.submissionDraft.url,
-            type: this.state.activeSubmissionType,
-          })
+        if (submission.submissionDraft.url) {
+          await createSubmission(
+            prepareVariables({
+              url: submission.submissionDraft.url,
+              type: activeSubmissionType,
+            })
+          )
         }
         break
       case 'student_annotation':
-        if (this.props.submission.submissionDraft) {
-          await this.submitToGraphql(submitMutation, {
-            type: this.state.activeSubmissionType,
-          })
+        if (submission.submissionDraft) {
+          await createSubmission(
+            prepareVariables({
+              type: activeSubmissionType,
+            })
+          )
         }
         break
       default:
         throw new Error('submission type not yet supported in A2')
     }
 
-    this.setState({submittingAssignment: false})
+    setIsSubmitting(false)
   }
 
-  shouldRenderNewAttempt(context) {
-    const {assignment, submission} = this.props
+  const shouldRenderNewAttempt = () => {
     const allowedAttempts = totalAllowedAttempts({assignment, submission})
     return (
-      context.allowChangesToSubmission &&
+      !assignment.env.peerReviewModeEnabled &&
+      allowChangesToSubmission &&
       !assignment.lockInfo.isLocked &&
       isSubmitted(submission) &&
       submission.gradingStatus !== 'excused' &&
-      context.latestSubmission.state !== 'unsubmitted' &&
+      latestSubmission.state !== 'unsubmitted' &&
       (allowedAttempts == null || submission.attempt < allowedAttempts)
     )
   }
 
-  shouldRenderSubmit(context) {
+  const shouldRenderSubmit = () => {
     return (
-      !this.state.uploadingFiles &&
-      !this.state.editingDraft &&
-      context.isLatestAttempt &&
-      context.allowChangesToSubmission &&
-      !this.props.assignment.lockInfo.isLocked &&
-      !this.shouldRenderNewAttempt(context) &&
-      context.lastSubmittedSubmission?.gradingStatus !== 'excused'
+      !assignment.env.peerReviewModeEnabled &&
+      !uploadingFiles &&
+      !editingDraft &&
+      isLatestAttempt &&
+      allowChangesToSubmission &&
+      !assignment.lockInfo.isLocked &&
+      !shouldRenderNewAttempt() &&
+      lastSubmittedSubmission?.gradingStatus !== 'excused'
     )
   }
 
-  handleDraftComplete(success, body, context) {
-    if (!context.allowChangesToSubmission) {
+  const hasSubmittedAssessment = () => {
+    const assessments = rubricData?.submission?.rubricAssessmentsConnection?.nodes?.map(
+      assessment => transformRubricAssessmentData(assessment)
+    )
+    return assessments?.some(assessment => assessment.assessor?._id === ENV.current_user.id)
+  }
+
+  const shouldRenderSubmitPeerReview = () => {
+    const hasRubrics = displayedAssessment !== null
+    return (
+      assignment.env.peerReviewModeEnabled &&
+      assignment.env.peerReviewAvailable &&
+      hasRubrics &&
+      !hasSubmittedAssessment()
+    )
+  }
+
+  const handleDraftComplete = (success, body) => {
+    if (!allowChangesToSubmission) {
       return
     }
-    this.updateUploadingFiles(false)
+    updateUploadingFiles(false)
     const element = document.createElement('div')
     if (body) {
       element.insertAdjacentHTML('beforeend', body)
@@ -363,26 +454,26 @@ export default class SubmissionManager extends Component {
 
     if (success) {
       if (!element.querySelector(`[data-placeholder-for]`)) {
-        this.setState({draftStatus: 'saved'})
-        this.context.setOnSuccess(I18n.t('Submission draft updated'))
+        setDraftStatus('saved')
+        setOnSuccess(I18n.t('Submission draft updated'))
       }
     } else {
-      this.setState({draftStatus: 'error'})
-      this.context.setOnFailure(I18n.t('Error updating submission draft'))
+      setDraftStatus('error')
+      setOnFailure(I18n.t('Error updating submission draft'))
     }
   }
 
-  handleSubmitConfirmation(submitMutation) {
-    this.submitAssignment(submitMutation)
-    this.setState({draftStatus: null})
+  const handleSubmitConfirmation = () => {
+    submitAssignment()
+    setDraftStatus(null)
   }
 
-  async handleSubmitButton(submitMutation) {
-    if (multipleTypesDrafted(this.props.submission)) {
+  const handleSubmitButton = async () => {
+    if (multipleTypesDrafted(submission)) {
       const confirmed = await showConfirmationDialog({
         body: I18n.t(
           'You are submitting a %{submissionType} submission. Only one submission type is allowed. All other submission types will be deleted.',
-          {submissionType: friendlyTypeName(this.state.activeSubmissionType)}
+          {submissionType: friendlyTypeName(activeSubmissionType)}
         ),
         confirmText: I18n.t('Okay'),
         label: I18n.t('Confirm Submission'),
@@ -393,33 +484,85 @@ export default class SubmissionManager extends Component {
       }
     }
 
-    this.handleSubmitConfirmation(submitMutation)
+    handleSubmitConfirmation()
   }
 
-  handleSuccess() {
-    this.context.setOnSuccess(I18n.t('Submission sent'))
-    const onTime = Date.now() < Date.parse(this.props.assignment.dueAt)
-    this.setState({showConfetti: window.ENV.CONFETTI_ENABLED && onTime})
-    setTimeout(() => {
-      // Confetti is cleaned up after 3000.
-      // Need to reset state after that in case they submit another attempt.
-      this.setState({showConfetti: false})
-    }, 4000)
-    if (this.props.submission.assignedAssessments.length > 0) {
-      this.handleOpenSubmissionCompletedModal()
+  const parseCriterion = data => {
+    const key = `criterion_${data.criterion_id}`
+    const criterion = assignment.rubric.criteria.find(
+      criterion => criterion.id === data.criterion_id
+    )
+    const rating = criterion.ratings.find(rating => rating.points == data.points?.value)
+
+    return {
+      [key]: {
+        rating_id: rating?.id,
+        points: data.points?.value,
+        description: data.description,
+        comments: data.comments,
+        save_comment: 1,
+      },
     }
   }
 
-  handleOpenSubmissionCompletedModal() {
-    this.setState({submissionCompletedModalOpen: true})
+  const handleSubmitPeerReviewButton = async () => {
+    try {
+      setIsSubmitting(true)
+      let params = displayedAssessment.data.reduce(
+        (result, item) => {
+          return {...result, ...parseCriterion(item)}
+        },
+        {
+          assessment_type: 'peer_review',
+          ...(assignment.env.revieweeId && {user_id: assignment.env.revieweeId}),
+          ...(assignment.env.anonymousAssetId && {anonymous_id: assignment.env.anonymousAssetId}),
+        }
+      )
+      params = {
+        rubric_assessment: params,
+        _method: 'POST',
+      }
+
+      const rubricAssociation = rubricData.assignment.rubricAssociation
+      await doFetchApi({
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        path: `/courses/${ENV.COURSE_ID}/rubric_associations/${rubricAssociation._id}/assessments`,
+        body: qs.stringify(params),
+      })
+
+      handleSuccess(I18n.t('Rubric was successfully submitted'))
+      fetchRubricData({fromCache: false})
+    } catch (err) {
+      setOnFailure(I18n.t('Error submitting rubric'))
+    }
+    setIsSubmitting(false)
   }
 
-  handleCloseSubmissionCompletedModal() {
-    this.setState({submissionCompletedModalOpen: false})
+  const handleSuccess = (message = I18n.t('Submission sent')) => {
+    setOnSuccess(message)
+    const onTime = Date.now() < Date.parse(assignment.dueAt)
+    setShowConfetti(window.ENV.CONFETTI_ENABLED && onTime)
+    setTimeout(() => {
+      // Confetti is cleaned up after 3000.
+      // Need to reset state after that in case they submit another attempt.
+      setShowConfetti(false)
+    }, 4000)
+    if (!assignment.env.peerReviewModeEnabled && submission.assignedAssessments.length > 0) {
+      handleOpenSubmissionCompletedModal()
+    }
   }
 
-  handleRedirectToFirstPeerReview() {
-    const assessment = this.props.submission.assignedAssessments[0]
+  const handleOpenSubmissionCompletedModal = () => {
+    setSubmissionCompletedModalOpen(true)
+  }
+
+  const handleCloseSubmissionCompletedModal = () => {
+    setSubmissionCompletedModalOpen(false)
+  }
+
+  const handleRedirectToFirstPeerReview = () => {
+    const assessment = submission.assignedAssessments[0]
     let url = `/courses/${ENV.COURSE_ID}/assignments/${ENV.ASSIGNMENT_ID}`
     if (assessment.anonymizedUser) {
       url += `?reviewee_id=${assessment.anonymizedUser._id}`
@@ -429,112 +572,87 @@ export default class SubmissionManager extends Component {
     window.location.assign(url)
   }
 
-  renderAttemptTab(context) {
+  const renderAttemptTab = () => {
     return (
-      <Mutation
-        mutation={CREATE_SUBMISSION_DRAFT}
-        onCompleted={data =>
-          this.handleDraftComplete(
-            !data.createSubmissionDraft.errors,
-            data.createSubmissionDraft.submissionDraft?.body,
-            context
-          )
-        }
-        onError={() => this.handleDraftComplete(false, null, context)}
-        update={this.updateSubmissionDraftCache}
-      >
-        {createSubmissionDraft => (
-          <View as="div" margin="auto auto large">
-            <AttemptTab
-              activeSubmissionType={this.state.activeSubmissionType}
-              assignment={this.props.assignment}
-              createSubmissionDraft={createSubmissionDraft}
-              editingDraft={this.state.editingDraft}
-              focusAttemptOnInit={this.state.focusAttemptOnInit}
-              onContentsChanged={() => {
-                this.setState({draftStatus: 'saving'})
-              }}
-              originalityReportsForA2={window.ENV.ORIGINALITY_REPORTS_FOR_A2}
-              selectedExternalTool={
-                this.state.selectedExternalTool ||
-                this.props.submission?.submissionDraft?.externalTool
-              }
-              submission={this.props.submission}
-              updateActiveSubmissionType={this.updateActiveSubmissionType}
-              updateEditingDraft={this.updateEditingDraft}
-              updateUploadingFiles={this.updateUploadingFiles}
-              uploadingFiles={this.state.uploadingFiles}
-            />
-          </View>
-        )}
-      </Mutation>
+      <View as="div" margin="auto auto large">
+        <AttemptTab
+          activeSubmissionType={activeSubmissionType}
+          assignment={assignment}
+          createSubmissionDraft={createSubmissionDraft}
+          editingDraft={editingDraft}
+          focusAttemptOnInit={focusAttemptOnInit}
+          onContentsChanged={() => {
+            setDraftStatus('saving')
+          }}
+          originalityReportsForA2={window.ENV.ORIGINALITY_REPORTS_FOR_A2}
+          selectedExternalTool={selectedExternalTool || submission?.submissionDraft?.externalTool}
+          submission={submission}
+          updateActiveSubmissionType={updateActiveSubmissionType}
+          updateEditingDraft={updateEditingDraft}
+          updateUploadingFiles={updateUploadingFiles}
+          uploadingFiles={uploadingFiles}
+        />
+      </View>
     )
   }
 
-  renderSimilarityPledge(context) {
+  const renderSimilarityPledge = () => {
     const {SIMILARITY_PLEDGE: pledgeSettings} = window.ENV
-    if (pledgeSettings == null || !this.shouldRenderSubmit(context)) {
+    if (pledgeSettings == null || !shouldRenderSubmit()) {
       return null
     }
 
     return (
       <SimilarityPledge
         eulaUrl={pledgeSettings.EULA_URL}
-        checked={this.state.similarityPledgeChecked}
+        checked={similarityPledgeChecked}
         comments={pledgeSettings.COMMENTS}
         onChange={() => {
-          this.setState(oldState => ({
-            similarityPledgeChecked: !oldState.similarityPledgeChecked,
-          }))
+          setSimilarityPledgeChecked(!similarityPledgeChecked)
         }}
         pledgeText={pledgeSettings.PLEDGE_TEXT}
       />
     )
   }
 
-  footerButtons() {
+  const footerButtons = () => {
     return [
       {
         key: 'draft-status',
-        shouldRender: context =>
-          context.isLatestAttempt &&
-          this.props.submission.state === 'unsubmitted' &&
-          this.state.activeSubmissionType === 'online_text_entry' &&
-          this.state.draftStatus != null,
-        render: _context => <DraftStatus status={this.state.draftStatus} />,
+        shouldRender: () =>
+          isLatestAttempt &&
+          submission.state === 'unsubmitted' &&
+          activeSubmissionType === 'online_text_entry' &&
+          draftStatus != null,
+        render: () => <DraftStatus status={draftStatus} />,
       },
       {
         key: 'cancel-draft',
-        shouldRender: context =>
-          this.props.submission === context.latestSubmission &&
-          context.latestSubmission.state === 'unsubmitted' &&
-          this.props.submission.attempt > 1,
-        render: context => {
+        shouldRender: () =>
+          submission === latestSubmission &&
+          latestSubmission.state === 'unsubmitted' &&
+          submission.attempt > 1,
+        render: () => {
           return (
             <CancelAttemptButton
               handleCacheUpdate={cache => {
-                this.updateCachedSubmissionDraft(cache, null)
+                updateCachedSubmissionDraft(cache, null)
               }}
-              onError={() => context.setOnFailure(I18n.t('Error canceling draft'))}
-              onSuccess={() => context.cancelDraftAction()}
-              submission={context.latestSubmission}
+              onError={() => setOnFailure(I18n.t('Error canceling draft'))}
+              onSuccess={() => cancelDraftAction()}
+              submission={latestSubmission}
             />
           )
         },
       },
       {
         key: 'back-to-draft',
-        shouldRender: context =>
-          this.props.submission !== context.latestSubmission &&
-          context.latestSubmission.state === 'unsubmitted',
-        render: context => {
-          const {attempt} = context.latestSubmission
+        shouldRender: () =>
+          submission !== latestSubmission && latestSubmission.state === 'unsubmitted',
+        render: () => {
+          const {attempt} = latestSubmission
           return (
-            <Button
-              data-testid="back-to-attempt-button"
-              color="primary"
-              onClick={context.showDraftAction}
-            >
+            <Button data-testid="back-to-attempt-button" color="primary" onClick={showDraftAction}>
               {I18n.t('Back to Attempt %{attempt}', {attempt})}
             </Button>
           )
@@ -542,14 +660,10 @@ export default class SubmissionManager extends Component {
       },
       {
         key: 'new-attempt',
-        shouldRender: context => this.shouldRenderNewAttempt(context),
-        render: context => {
+        shouldRender: () => shouldRenderNewAttempt(),
+        render: () => {
           return (
-            <Button
-              data-testid="try-again-button"
-              color="primary"
-              onClick={context.startNewAttemptAction}
-            >
+            <Button data-testid="try-again-button" color="primary" onClick={startNewAttemptAction}>
               {I18n.t('Try Again')}
             </Button>
           )
@@ -557,22 +671,27 @@ export default class SubmissionManager extends Component {
       },
       {
         key: 'mark-as-done',
-        shouldRender: _context => window.ENV.CONTEXT_MODULE_ITEM != null,
-        render: _context => this.renderMarkAsDoneButton(),
+        shouldRender: () => window.ENV.CONTEXT_MODULE_ITEM != null,
+        render: () => renderMarkAsDoneButton(),
       },
       {
         key: 'submit',
-        shouldRender: context => this.shouldRenderSubmit(context),
-        render: _context => this.renderSubmitButton(),
+        shouldRender: () => shouldRenderSubmit(),
+        render: () => renderSubmitButton(),
+      },
+      {
+        key: 'submit-peer-review',
+        shouldRender: () => shouldRenderSubmitPeerReview(),
+        render: () => renderSubmitPeerReviewButton(),
       },
     ]
   }
 
-  renderFooter(context) {
-    const buttons = this.footerButtons()
-      .filter(button => button.shouldRender(context))
+  const renderFooter = () => {
+    const buttons = footerButtons()
+      .filter(button => button.shouldRender())
       .map(button => ({
-        element: button.render(context),
+        element: button.render(),
         key: button.key,
       }))
 
@@ -581,75 +700,65 @@ export default class SubmissionManager extends Component {
     )
   }
 
-  renderSubmitButton() {
-    const mustAgreeToPledge =
-      window.ENV.SIMILARITY_PLEDGE != null && !this.state.similarityPledgeChecked
+  const renderSubmitButton = () => {
+    const mustAgreeToPledge = window.ENV.SIMILARITY_PLEDGE != null && !similarityPledgeChecked
 
     let activeTypeMeetsCriteria = false
-    switch (this.state.activeSubmissionType) {
+    switch (activeSubmissionType) {
       case 'media_recording':
-        activeTypeMeetsCriteria =
-          this.props.submission?.submissionDraft?.meetsMediaRecordingCriteria
+        activeTypeMeetsCriteria = submission?.submissionDraft?.meetsMediaRecordingCriteria
         break
       case 'online_text_entry':
-        activeTypeMeetsCriteria = this.props.submission?.submissionDraft?.meetsTextEntryCriteria
+        activeTypeMeetsCriteria = submission?.submissionDraft?.meetsTextEntryCriteria
         break
       case 'online_upload':
-        activeTypeMeetsCriteria = this.props.submission?.submissionDraft?.meetsUploadCriteria
+        activeTypeMeetsCriteria = submission?.submissionDraft?.meetsUploadCriteria
         break
       case 'online_url':
-        activeTypeMeetsCriteria = this.props.submission?.submissionDraft?.meetsUrlCriteria
+        activeTypeMeetsCriteria = submission?.submissionDraft?.meetsUrlCriteria
         break
       case 'student_annotation':
-        activeTypeMeetsCriteria =
-          this.props.submission?.submissionDraft?.meetsStudentAnnotationCriteria
+        activeTypeMeetsCriteria = submission?.submissionDraft?.meetsStudentAnnotationCriteria
         break
       case 'basic_lti_launch':
-        activeTypeMeetsCriteria =
-          this.props.submission?.submissionDraft?.meetsBasicLtiLaunchCriteria
+        activeTypeMeetsCriteria = submission?.submissionDraft?.meetsBasicLtiLaunchCriteria
         break
     }
 
     return (
-      <Mutation
-        mutation={CREATE_SUBMISSION}
-        onCompleted={data =>
-          data.createSubmission.errors
-            ? this.context.setOnFailure(I18n.t('Error sending submission'))
-            : this.handleSuccess()
+      <Button
+        id="submit-button"
+        data-testid="submit-button"
+        disabled={
+          !submission.submissionDraft ||
+          draftStatus === 'saving' ||
+          isSubmitting ||
+          mustAgreeToPledge ||
+          !activeTypeMeetsCriteria
         }
-        onError={() => this.context.setOnFailure(I18n.t('Error sending submission'))}
-        // refetch submission histories so we don't lose the currently
-        // displayed submission when a new submission is created and the current
-        // submission gets transitioned over to a submission history.
-        refetchQueries={() => [
-          {query: SUBMISSION_HISTORIES_QUERY, variables: {submissionID: this.props.submission.id}},
-        ]}
+        color="primary"
+        onClick={() => handleSubmitButton()}
       >
-        {submitMutation => (
-          <>
-            <Button
-              id="submit-button"
-              data-testid="submit-button"
-              disabled={
-                !this.props.submission.submissionDraft ||
-                this.state.draftStatus === 'saving' ||
-                this.state.submittingAssignment ||
-                mustAgreeToPledge ||
-                !activeTypeMeetsCriteria
-              }
-              color="primary"
-              onClick={() => this.handleSubmitButton(submitMutation)}
-            >
-              {I18n.t('Submit Assignment')}
-            </Button>
-          </>
-        )}
-      </Mutation>
+        {I18n.t('Submit Assignment')}
+      </Button>
     )
   }
 
-  renderMarkAsDoneButton() {
+  const renderSubmitPeerReviewButton = () => {
+    return (
+      <Button
+        id="submit-peer-review-button"
+        data-testid="submit-peer-review-button"
+        disabled={isSubmitting || !isRubricComplete(displayedAssessment)}
+        color="primary"
+        onClick={() => handleSubmitPeerReviewButton()}
+      >
+        {I18n.t('Submit')}
+      </Button>
+    )
+  }
+
+  const renderMarkAsDoneButton = () => {
     const errorMessage = I18n.t('Error updating status of module item')
 
     const {done, id: itemId, module_id: moduleId} = window.ENV.CONTEXT_MODULE_ITEM
@@ -660,38 +769,33 @@ export default class SubmissionManager extends Component {
         itemId={itemId}
         moduleId={moduleId}
         onError={() => {
-          this.context.setOnFailure(errorMessage)
+          setOnFailure(errorMessage)
         }}
       />
     )
   }
 
-  render() {
-    return (
-      <StudentViewContext.Consumer>
-        {context => (
-          <>
-            {this.state.submittingAssignment ? (
-              <LoadingIndicator />
-            ) : (
-              this.renderAttemptTab(context)
-            )}
-            <>
-              {this.renderSimilarityPledge(context)}
-              {this.renderFooter(context)}
-            </>
-            {this.state.showConfetti ? <Confetti /> : null}
-            <SubmissionCompletedModal
-              count={this.props.submission.assignedAssessments.length}
-              open={this.state.submissionCompletedModalOpen}
-              onClose={() => this.handleCloseSubmissionCompletedModal()}
-              onRedirect={() => this.handleRedirectToFirstPeerReview()}
-            />
-          </>
-        )}
-      </StudentViewContext.Consumer>
-    )
-  }
+  return (
+    <>
+      {isSubmitting ? <LoadingIndicator /> : renderAttemptTab()}
+      <>
+        {renderSimilarityPledge()}
+        {renderFooter()}
+      </>
+      {showConfetti ? <Confetti /> : null}
+      <SubmissionCompletedModal
+        count={submission.assignedAssessments.length}
+        open={submissionCompletedModalOpen}
+        onClose={() => handleCloseSubmissionCompletedModal()}
+        onRedirect={() => handleRedirectToFirstPeerReview()}
+      />
+    </>
+  )
 }
 
-SubmissionManager.contextType = AlertManagerContext
+SubmissionManager.propTypes = {
+  assignment: Assignment.shape,
+  submission: Submission.shape,
+}
+
+export default SubmissionManager

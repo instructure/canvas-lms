@@ -26,6 +26,7 @@ import {
 import {
   SUBMISSION_HISTORIES_QUERY,
   USER_GROUPS_QUERY,
+  RUBRIC_QUERY,
 } from '@canvas/assignments/graphql/student/Queries'
 import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/react'
 import ContextModuleApi from '../../apis/ContextModuleApi'
@@ -36,12 +37,16 @@ import StudentViewContext, {StudentViewContextDefaults} from '../Context'
 import SubmissionManager from '../SubmissionManager'
 import TextEntry from '../AttemptType/TextEntry'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
+import doFetchApi from '@canvas/do-fetch-api-effect'
+import store from '../stores'
 
 // Mock the RCE so we can test text entry submissions without loading the whole
 // editor
 jest.mock('@canvas/rce/RichContentEditor')
 
 jest.mock('../../apis/ContextModuleApi')
+
+jest.mock('@canvas/do-fetch-api-effect')
 
 jest.useFakeTimers()
 
@@ -51,6 +56,41 @@ function renderInContext(overrides = {}, children) {
   return render(
     <StudentViewContext.Provider value={contextProps}>{children}</StudentViewContext.Provider>
   )
+}
+
+function gradedOverrides() {
+  return {
+    Submission: {
+      rubricAssessmentsConnection: {
+        nodes: [
+          {
+            _id: 1,
+            score: 5,
+            assessor: {_id: 1, name: 'assessor1', enrollments: []},
+          },
+          {
+            _id: 2,
+            score: 10,
+            assessor: null,
+          },
+          {
+            _id: 3,
+            score: 8,
+            assessor: {_id: 2, name: 'assessor2', enrollments: [{type: 'TaEnrollment'}]},
+          },
+        ],
+      },
+    },
+    Course: {
+      account: {
+        outcomeProficiency: {
+          proficiencyRatingsConnection: {
+            nodes: [{}],
+          },
+        },
+      },
+    },
+  }
 }
 
 describe('SubmissionManager', () => {
@@ -83,6 +123,17 @@ describe('SubmissionManager', () => {
     )
 
     expect(getByText('Submit Assignment').closest('button')).toBeDisabled()
+  })
+
+  it('does not render a submit button when peer review mode is OFF', async () => {
+    const props = await mockAssignmentAndSubmission()
+    const {queryByText} = render(
+      <MockedProvider>
+        <SubmissionManager {...props} />
+      </MockedProvider>
+    )
+
+    expect(queryByText('Submit')).not.toBeInTheDocument()
   })
 
   it('renders a submit button when the draft criteria is met for the active type', async () => {
@@ -157,7 +208,9 @@ describe('SubmissionManager', () => {
 
     const {queryByText} = renderInContext(
       {isLatestAttempt: false, latestSubmission},
-      <SubmissionManager {...props} />
+      <MockedProvider>
+        <SubmissionManager {...props} />
+      </MockedProvider>
     )
     expect(queryByText('Submit Assignment')).not.toBeInTheDocument()
   })
@@ -746,7 +799,9 @@ describe('SubmissionManager', () => {
         })
         const {queryByTestId} = renderInContext(
           {allowChangesToSubmission: false, isObserver: true},
-          <SubmissionManager {...props} />
+          <MockedProvider>
+            <SubmissionManager {...props} />
+          </MockedProvider>
         )
         expect(queryByTestId('try-again-button')).not.toBeInTheDocument()
       })
@@ -757,7 +812,9 @@ describe('SubmissionManager', () => {
         })
         const {queryByTestId} = renderInContext(
           {allowChangesToSubmission: false},
-          <SubmissionManager {...props} />
+          <MockedProvider>
+            <SubmissionManager {...props} />
+          </MockedProvider>
         )
         expect(queryByTestId('try-again-button')).not.toBeInTheDocument()
       })
@@ -805,7 +862,11 @@ describe('SubmissionManager', () => {
         Assignment: {lockInfo: {isLocked: true}},
         Submission: {...SubmissionMocks.submitted},
       })
-      const {queryByTestId} = render(<SubmissionManager {...props} />)
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      )
       expect(queryByTestId('try-again-button')).not.toBeInTheDocument()
     })
 
@@ -814,7 +875,11 @@ describe('SubmissionManager', () => {
         Assignment: {allowedAttempts: 1},
         Submission: {...SubmissionMocks.submitted},
       })
-      const {queryByTestId} = render(<SubmissionManager {...props} />)
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      )
       expect(queryByTestId('try-again-button')).not.toBeInTheDocument()
     })
 
@@ -823,7 +888,11 @@ describe('SubmissionManager', () => {
         Assignment: {allowedAttempts: 1},
         Submission: {...SubmissionMocks.submitted, extraAttempts: 2},
       })
-      const {queryByTestId} = render(<SubmissionManager {...props} />)
+      const {queryByTestId} = render(
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      )
       expect(queryByTestId('try-again-button')).toBeInTheDocument()
     })
   })
@@ -835,7 +904,12 @@ describe('SubmissionManager', () => {
       })
       const latestSubmission = {attempt: 2, state: 'unsubmitted'}
 
-      const {getByTestId} = renderInContext({latestSubmission}, <SubmissionManager {...props} />)
+      const {getByTestId} = renderInContext(
+        {latestSubmission},
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      )
 
       expect(getByTestId('back-to-attempt-button')).toBeInTheDocument()
     })
@@ -846,7 +920,12 @@ describe('SubmissionManager', () => {
       })
       const latestSubmission = {attempt: 2, state: 'unsubmitted'}
 
-      const {getByTestId} = renderInContext({latestSubmission}, <SubmissionManager {...props} />)
+      const {getByTestId} = renderInContext(
+        {latestSubmission},
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      )
       const button = getByTestId('back-to-attempt-button')
       expect(button).toHaveTextContent('Back to Attempt 2')
     })
@@ -870,7 +949,12 @@ describe('SubmissionManager', () => {
       })
       const latestSubmission = props.submission
 
-      const {queryByTestId} = renderInContext({latestSubmission}, <SubmissionManager {...props} />)
+      const {queryByTestId} = renderInContext(
+        {latestSubmission},
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
+      )
       expect(queryByTestId('back-to-attempt-button')).not.toBeInTheDocument()
     })
 
@@ -888,7 +972,9 @@ describe('SubmissionManager', () => {
 
       const {getByTestId} = renderInContext(
         {latestSubmission, showDraftAction},
-        <SubmissionManager {...props} />
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
       )
 
       act(() => {
@@ -1262,7 +1348,9 @@ describe('SubmissionManager', () => {
 
       const {queryByTestId} = renderInContext(
         {allowChangesToSubmission: false},
-        <SubmissionManager {...props} />
+        <MockedProvider>
+          <SubmissionManager {...props} />
+        </MockedProvider>
       )
 
       expect(queryByTestId('student-footer')).not.toBeInTheDocument()
@@ -1415,6 +1503,331 @@ describe('SubmissionManager', () => {
 
       const submitButton = getByTestId('submit-button')
       expect(submitButton).not.toBeDisabled()
+    })
+  })
+
+  describe('peer reviews', () => {
+    describe('without rubrics', () => {
+      it('does not render a submit button', async () => {
+        const props = await mockAssignmentAndSubmission()
+        props.assignment.env.peerReviewModeEnabled = true
+        const {queryByText} = render(
+          <MockedProvider>
+            <SubmissionManager {...props} />
+          </MockedProvider>
+        )
+
+        expect(queryByText('Submit Assignment')).not.toBeInTheDocument()
+      })
+    })
+    describe('with rubrics', () => {
+      const originalENV = window.ENV
+      let props, fakeStore, mocks
+
+      function generateAssessmentItem(
+        criterionId,
+        {hasComments = false, hasValue = false, hasValidValue = true}
+      ) {
+        return {
+          commentFocus: true,
+          comments: hasComments ? 'foo bar' : '',
+          criterion_id: criterionId,
+          description: `Criterion ${criterionId}`,
+          editComments: true,
+          id: 'blank',
+          points: {
+            text: '',
+            valid: hasValidValue,
+            value: hasValue ? Math.floor(Math.random() * 10) : undefined,
+          },
+        }
+      }
+
+      function setCurrentUserAsAssessmentOwner() {
+        window.ENV = {...originalENV, COURSE_ID: '4', current_user: {id: '2'}}
+      }
+
+      function setOtherUserAsAssessmentOwner() {
+        window.ENV = {...originalENV, COURSE_ID: '4', current_user: {id: '4'}}
+      }
+
+      async function setMocks() {
+        const variables = {
+          courseID: '1',
+          assignmentLid: '1',
+          submissionID: '1',
+          submissionAttempt: 0,
+        }
+        const overrides = gradedOverrides()
+        const allOverrides = [
+          {
+            Node: {__typename: 'Assignment'},
+            Assignment: {rubric: {}, rubricAssociation: {}},
+            Rubric: {
+              criteria: [{}],
+            },
+            ...overrides,
+          },
+        ]
+        const fetchRubricResult = await mockQuery(RUBRIC_QUERY, allOverrides, variables)
+        mocks = [
+          {
+            request: {query: RUBRIC_QUERY, variables},
+            result: fetchRubricResult,
+          },
+          {
+            request: {query: RUBRIC_QUERY, variables},
+            result: fetchRubricResult,
+          },
+        ]
+      }
+
+      beforeAll(() => {
+        doFetchApi.mockResolvedValue({})
+      })
+
+      beforeEach(async () => {
+        doFetchApi.mockClear()
+        setCurrentUserAsAssessmentOwner()
+        await setMocks()
+        const rubricData = mocks[0].result.data
+        const assessments = rubricData.submission.rubricAssessmentsConnection.nodes
+
+        store.setState({
+          displayedAssessment: assessments[0],
+        })
+
+        props = await mockAssignmentAndSubmission()
+        props.assignment.rubric = rubricData.assignment.rubric
+        props.assignment.rubric.criteria.push({...props.assignment.rubric.criteria[0], id: '2'})
+        props.assignment.env.peerReviewModeEnabled = true
+        props.assignment.env.peerReviewAvailable = true
+        props.assignment.env.revieweeId = '4'
+      })
+
+      afterEach(() => {
+        window.ENV = originalENV
+        store.setState({
+          displayedAssessment: null,
+        })
+      })
+
+      it('renders a submit button when the assessment has not been submitted', async () => {
+        setOtherUserAsAssessmentOwner()
+        const {queryByText} = render(
+          <MockedProvider mocks={mocks}>
+            <SubmissionManager {...props} />
+          </MockedProvider>
+        )
+
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        expect(queryByText('Submit')).toBeInTheDocument()
+      })
+
+      it('does not render a submit button when the assessment has been submitted', async () => {
+        const {queryByText} = render(
+          <MockedProvider mocks={mocks}>
+            <SubmissionManager {...props} />
+          </MockedProvider>
+        )
+
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        expect(queryByText('Submit')).not.toBeInTheDocument()
+      })
+
+      it('renders a enabled submit button when every criterion has a comment', async () => {
+        setOtherUserAsAssessmentOwner()
+        store.setState({
+          displayedAssessment: {
+            score: 5,
+            data: [
+              generateAssessmentItem(props.assignment.rubric.criteria[0].id, {hasComments: true}),
+              generateAssessmentItem(props.assignment.rubric.criteria[1].id, {hasComments: true}),
+            ],
+          },
+        })
+
+        const {getByText} = render(
+          <MockedProvider mocks={mocks}>
+            <SubmissionManager {...props} />
+          </MockedProvider>
+        )
+
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        expect(getByText('Submit').closest('button')).toBeEnabled()
+      })
+
+      it('renders a enabled submit button when every criterion has a valid point', async () => {
+        setOtherUserAsAssessmentOwner()
+        store.setState({
+          displayedAssessment: {
+            score: 5,
+            data: [
+              generateAssessmentItem(props.assignment.rubric.criteria[0].id, {hasValue: true}),
+              generateAssessmentItem(props.assignment.rubric.criteria[1].id, {hasValue: true}),
+            ],
+          },
+        })
+
+        props.assignment.env.peerReviewModeEnabled = true
+        props.assignment.env.peerReviewAvailable = true
+
+        const {getByText} = render(
+          <MockedProvider mocks={mocks}>
+            <SubmissionManager {...props} />
+          </MockedProvider>
+        )
+
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        expect(getByText('Submit').closest('button')).toBeEnabled()
+      })
+
+      it('renders a disabled submit button when atleast one criterion has an invalid points value', async () => {
+        setOtherUserAsAssessmentOwner()
+        store.setState({
+          displayedAssessment: {
+            score: 5,
+            data: [
+              generateAssessmentItem(props.assignment.rubric.criteria[0].id, {hasValue: true}),
+              generateAssessmentItem(props.assignment.rubric.criteria[1].id, {
+                hasValue: true,
+                hasValidValue: false,
+              }),
+            ],
+          },
+        })
+
+        const {getByText} = render(
+          <MockedProvider mocks={mocks}>
+            <SubmissionManager {...props} />
+          </MockedProvider>
+        )
+
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        expect(getByText('Submit').closest('button')).toBeDisabled()
+      })
+
+      it('sends a http request with anonymous peer reviews disabled to the rubrics assessments endpoint when the user clicks on Submit button', async () => {
+        setOtherUserAsAssessmentOwner()
+        store.setState({
+          displayedAssessment: {
+            score: 5,
+            data: [
+              generateAssessmentItem(props.assignment.rubric.criteria[0].id, {hasComments: true}),
+              generateAssessmentItem(props.assignment.rubric.criteria[1].id, {hasComments: true}),
+            ],
+          },
+        })
+
+        const {queryByText} = render(
+          <MockedProvider mocks={mocks}>
+            <SubmissionManager {...props} />
+          </MockedProvider>
+        )
+
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        fireEvent.click(queryByText('Submit'))
+
+        const rubricAssociationId = mocks[0].result.data.assignment.rubricAssociation._id
+        expect(doFetchApi).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'POST',
+            path: `/courses/${window.ENV.COURSE_ID}/rubric_associations/${rubricAssociationId}/assessments`,
+            body: expect.stringContaining('user_id%5D=4'),
+          })
+        )
+      })
+
+      it('sends a http request with anonymous peer reviews enabled to the rubrics assessments endpoint when the user clicks on Submit button', async () => {
+        delete props.assignment.env.revieweeId
+        props.assignment.env.anonymousAssetId = 'ad0f'
+
+        setOtherUserAsAssessmentOwner()
+        store.setState({
+          displayedAssessment: {
+            score: 5,
+            data: [
+              generateAssessmentItem(props.assignment.rubric.criteria[0].id, {hasComments: true}),
+              generateAssessmentItem(props.assignment.rubric.criteria[1].id, {hasComments: true}),
+            ],
+          },
+        })
+
+        const {findByText} = render(
+          <MockedProvider mocks={mocks}>
+            <SubmissionManager {...props} />
+          </MockedProvider>
+        )
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        fireEvent.click(await findByText('Submit'))
+
+        const rubricAssociationId = mocks[0].result.data.assignment.rubricAssociation._id
+        expect(doFetchApi).toHaveBeenCalledWith(
+          expect.objectContaining({
+            method: 'POST',
+            path: `/courses/${window.ENV.COURSE_ID}/rubric_associations/${rubricAssociationId}/assessments`,
+            body: expect.stringContaining('anonymous_id%5D=ad0f'),
+          })
+        )
+      })
+
+      it('creates a success alert when the http request was sent successfully', async () => {
+        setOtherUserAsAssessmentOwner()
+        const setOnSuccess = jest.fn()
+        store.setState({
+          displayedAssessment: {
+            score: 5,
+            data: [
+              generateAssessmentItem(props.assignment.rubric.criteria[0].id, {hasComments: true}),
+              generateAssessmentItem(props.assignment.rubric.criteria[1].id, {hasComments: true}),
+            ],
+          },
+        })
+
+        const {findByText} = render(
+          <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess}}>
+            <MockedProvider mocks={mocks}>
+              <SubmissionManager {...props} />
+            </MockedProvider>
+          </AlertManagerContext.Provider>
+        )
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        fireEvent.click(await findByText('Submit'))
+
+        await waitFor(() => {
+          expect(setOnSuccess).toHaveBeenCalledWith('Rubric was successfully submitted')
+        })
+      })
+
+      it('creates an error alert when the http request fails', async () => {
+        setOtherUserAsAssessmentOwner()
+        doFetchApi.mockImplementation(() => Promise.reject(new Error('Network error')))
+        const setOnFailure = jest.fn()
+        store.setState({
+          displayedAssessment: {
+            score: 5,
+            data: [
+              generateAssessmentItem(props.assignment.rubric.criteria[0].id, {hasComments: true}),
+              generateAssessmentItem(props.assignment.rubric.criteria[1].id, {hasComments: true}),
+            ],
+          },
+        })
+
+        const {findByText} = render(
+          <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess: jest.fn()}}>
+            <MockedProvider mocks={mocks}>
+              <SubmissionManager {...props} />
+            </MockedProvider>
+          </AlertManagerContext.Provider>
+        )
+
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        fireEvent.click(await findByText('Submit'))
+
+        await waitFor(() => {
+          expect(setOnFailure).toHaveBeenCalledWith('Error submitting rubric')
+        })
+      })
     })
   })
 })

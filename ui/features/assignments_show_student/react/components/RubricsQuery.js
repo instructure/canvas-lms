@@ -20,12 +20,14 @@ import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
-import React from 'react'
+import React, {useEffect, useCallback} from 'react'
 import RubricTab from './RubricTab'
 import {RUBRIC_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {useQuery} from 'react-apollo'
 import {transformRubricData, transformRubricAssessmentData} from '../helpers/RubricHelpers'
+import useStore from './stores/index'
+import {fillAssessment} from '@canvas/rubrics/react/helpers'
 
 const I18n = useI18nScope('assignments_2')
 
@@ -36,6 +38,21 @@ export default function RubricsQuery(props) {
       submissionID: props.submission.id,
       courseID: props.assignment.env.courseId,
       submissionAttempt: props.submission.attempt,
+    },
+    onCompleted: data => {
+      const parsedAssessments = data.submission?.rubricAssessmentsConnection?.nodes?.map(
+        assessment => transformRubricAssessmentData(assessment)
+      )
+      const parsedRubric = transformRubricData(data.assignment.rubric)
+
+      const assessment = props.assignment.env.peerReviewModeEnabled
+        ? parsedAssessments?.find(assessment => assessment.assessor?._id === ENV.current_user.id)
+        : parsedAssessments?.[0]
+      const filledAssessment = fillAssessment(parsedRubric, assessment || {})
+
+      useStore.setState({
+        displayedAssessment: filledAssessment,
+      })
     },
   })
 

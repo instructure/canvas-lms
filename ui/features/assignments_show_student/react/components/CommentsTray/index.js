@@ -57,8 +57,8 @@ function TrayContent(props) {
       <CommentsTrayBody
         assignment={props.assignment}
         submission={props.submission}
-        isPeerReviewEnabled={props.isPeerReviewEnabled}
         reviewerSubmission={props.reviewerSubmission}
+        isPeerReviewEnabled={props.isPeerReviewEnabled}
       />
     </Suspense>
   )
