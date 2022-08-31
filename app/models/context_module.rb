@@ -92,7 +92,9 @@ class ContextModule < ActiveRecord::Base
       progression_scope = progression_scope.where(user_id: student_ids) if student_ids
 
       if progression_scope.update_all(["workflow_state = 'locked', lock_version = lock_version + 1, current = ?", false]) > 0
-        delay_if_production(strand: "module_reeval_#{global_context_id}").evaluate_all_progressions
+        delay_if_production(n_strand: ["evaluate_module_progressions", global_context_id],
+                            singleton: "evaluate_module_progressions:#{global_id}")
+          .evaluate_all_progressions
       end
 
       context.context_modules.each do |mod|
@@ -105,10 +107,14 @@ class ContextModule < ActiveRecord::Base
     self.class.connection.after_transaction_commit do
       if context_module_progressions.where(current: true).update_all(current: false) > 0
         # don't queue a job unless necessary
-        delay_if_production(strand: "module_reeval_#{global_context_id}").evaluate_all_progressions
+        delay_if_production(n_strand: ["evaluate_module_progressions", global_context_id],
+                            singleton: "evaluate_module_progressions:#{global_id}")
+          .evaluate_all_progressions
       end
       @discussion_topics_to_recalculate&.each do |dt|
-        dt.delay_if_production(strand: "module_reeval_#{global_context_id}").recalculate_context_module_actions!
+        dt.delay_if_production(n_strand: ["evaluate_discussion_topic_progressions", global_context_id],
+                               singleton: "evaluate_discussion_topic_progressions:#{dt.global_id}")
+          .recalculate_context_module_actions!
       end
     end
   end
