@@ -18,6 +18,8 @@
 
 import React, {useLayoutEffect, useRef, useState} from 'react'
 
+import {Flex} from '@instructure/ui-flex'
+import {Spinner} from '@instructure/ui-spinner'
 import {Heading} from '@instructure/ui-heading'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
@@ -43,7 +45,7 @@ const BOTTOM_PADDING_OFFSET = 30
 
 export const AccountCalendarSettings: React.FC<ComponentProps> = ({accountId}) => {
   const [visibilityChanges, setVisibilityChanges] = useState<VisibilityChange[]>([])
-  const [isLoading, setLoading] = useState(false)
+  const [isSaving, setSaving] = useState(false)
   const [searchValue, setSearchValue] = useState('')
   const [filterValue, setFilterValue] = useState(FilterType.SHOW_ALL)
   const [windowHeight, setWindowHeight] = useState(window.innerHeight)
@@ -81,19 +83,21 @@ export const AccountCalendarSettings: React.FC<ComponentProps> = ({accountId}) =
   }
 
   const onApplyClicked = () => {
-    setLoading(true)
+    setSaving(true)
     doFetchApi({
       path: `/api/v1/accounts/${accountId}/account_calendars`,
       method: 'PUT',
       body: visibilityChanges
     })
       .then(({json}) => {
+        setVisibilityChanges([])
         showFlashSuccess(json?.message)()
-        window.location.reload()
       })
       .catch(err => {
         showFlashError(I18n.t("Couldn't save account calendar visibilities"))(err)
-        setLoading(false)
+      })
+      .finally(() => {
+        setSaving(false)
       })
   }
 
@@ -125,23 +129,30 @@ export const AccountCalendarSettings: React.FC<ComponentProps> = ({accountId}) =
         height={`${accountTreeHeight}px`}
         overflowY="auto"
       >
-        <div style={{display: showTree ? 'block' : 'none'}}>
-          <AccountTree
-            originAccountId={accountId}
-            visibilityChanges={visibilityChanges}
-            onAccountToggled={onAccountToggled}
-            showSpinner={isLoading}
-          />
-        </div>
-        <div style={{display: showTree ? 'none' : 'block'}}>
-          <AccountList
-            originAccountId={accountId}
-            searchValue={searchValue}
-            filterValue={filterValue}
-            visibilityChanges={visibilityChanges}
-            onAccountToggled={onAccountToggled}
-          />
-        </div>
+        {!isSaving ? (
+          <div>
+            <div style={{display: showTree ? 'block' : 'none'}}>
+              <AccountTree
+                originAccountId={accountId}
+                visibilityChanges={visibilityChanges}
+                onAccountToggled={onAccountToggled}
+              />
+            </div>
+            <div style={{display: showTree ? 'none' : 'block'}}>
+              <AccountList
+                originAccountId={accountId}
+                searchValue={searchValue}
+                filterValue={filterValue}
+                visibilityChanges={visibilityChanges}
+                onAccountToggled={onAccountToggled}
+              />
+            </div>
+          </div>
+        ) : (
+          <Flex as="div" alignItems="center" justifyItems="center" padding="x-large">
+            <Spinner renderTitle={I18n.t('Loading accounts')} />
+          </Flex>
+        )}
       </View>
       <View
         as="div"
@@ -149,12 +160,14 @@ export const AccountCalendarSettings: React.FC<ComponentProps> = ({accountId}) =
         elementRef={e => (footerRef.current = e)}
         background="secondary"
       >
-        <Footer
-          originAccountId={accountId}
-          visibilityChanges={visibilityChanges}
-          onApplyClicked={onApplyClicked}
-          enableSaveButton={!isLoading && visibilityChanges.length > 0}
-        />
+        {!isSaving && (
+          <Footer
+            originAccountId={accountId}
+            visibilityChanges={visibilityChanges}
+            onApplyClicked={onApplyClicked}
+            enableSaveButton={visibilityChanges.length > 0}
+          />
+        )}
       </View>
     </section>
   )
