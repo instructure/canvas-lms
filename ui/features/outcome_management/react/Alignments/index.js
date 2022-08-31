@@ -81,7 +81,7 @@ const AlignmentSummary = () => {
         width="100%"
         display="inline-block"
         position="relative"
-        height="40vh"
+        height="50vh"
         elementRef={el => setScrollContainer(el)}
       >
         <AlignmentOutcomeItemList
