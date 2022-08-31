@@ -244,10 +244,12 @@ describe "calendar2" do
     end
 
     it "does not show the account or its events if the account calendar is hidden" do
+      @subaccount2 = @root_account.sub_accounts.create!(name: "SA-2", account_calendar_visible: true)
+      course_with_student_logged_in(user: @student, account: @subaccount2)
       event_title = "subaccount 1 event"
       @subaccount1.calendar_events.create!(title: event_title, start_at: 2.days.from_now)
 
-      @student.set_preference(:enabled_account_calendars, [@subaccount1])
+      @student.set_preference(:enabled_account_calendars, [@subaccount1, @subaccount2])
       user_session(@student)
 
       get "/calendar2"
@@ -261,6 +263,16 @@ describe "calendar2" do
       driver.navigate.refresh
       expect(f("#other-calendars-list-holder")).not_to contain_css("#other-calendars-context-list > li[data-context=account_#{@subaccount1.id}]")
       expect(f(".fc-body")).not_to contain_css(".fc-event")
+    end
+
+    it "does not show the other calendars section if there are no account calendars available for the user" do
+      @subaccount1.account_calendar_visible = false
+      @subaccount1.save!
+      user_session(@student)
+
+      get "/calendar2"
+      expect(f("#right-side-wrapper")).not_to contain_css("#other-calendars-list-holder")
+      expect(f("#right-side-wrapper")).not_to include_text("OTHER CALENDARS")
     end
   end
 end
