@@ -22950,6 +22950,7 @@ nn:
   the_date_is_not_valid_b6285fb5: "Datoen er ikkje gyldig."
   the_default_report_only_includes_course_section_da_729092f0: "Standardrapporten inkluderer kun emne-/seksjons-datoar dersom ein avgrensa påmeldingsperiode finst. "
   the_discussion_entry_was_successfully_created_7cddf67b: "Diskusjonsinnlegget vart laga"
+  the_discussion_topic_was_successfully_deleted_d8b93b70: "Diskusjonsemne vart sletta."
   the_download_process_has_started_this_can_take_awh_7e616db1: |-
       Nedlastingsprosessen har starta. Dette
       kan ta litt tid for store emne. Du kan forlate
@@ -22970,6 +22971,8 @@ nn:
   the_ending_date_range_for_the_courses_to_report_on_99e0ea8f: "Sluttdatointervall som emnerapporten viser treff innanfor"
   the_enrollment_type_to_include_in_the_report_accep_46835059: "Påmeldingstypen som vil bli inkludert i rapporten. Godtatte verdiar er 'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', og 'ObserverEnrollment'. Dersom utelaten, vil alle påmeldingstypar bli returnert."
   the_error_stack_trace_if_there_is_one_b7e008a1: "Feil stabelsporing, om gjeldande"
+  the_event_was_successfully_created_31326d98: "Hendinga vart oppretta."
+  the_event_was_successfully_updated_45944cd7: "Hendinga vart oppdatert."
   the_featured_link_was_moved_to_the_top_of_list_6cabcda9: "Lenka er flytta til toppen av lista."
   the_field_field_is_required_56512820: "Feltet \"%{field}\" er obligatorisk"
   the_field_field_must_have_no_spaces_d1c2fc37: "Feltet \"%{field}\" kan ikkje innehalde mellomrom"
@@ -23014,7 +23017,9 @@ nn:
   the_launched_tool_returned_an_invalid_resource_for_24512878: "Det oppstarta verktøyet returnerte ein ugyldig ressurs for denne oppgåva"
   the_link_you_used_has_expired_click_forgot_passwor_80569899: "Lenka du har brukt er utgått. Klikk \"Gløymd passord?\" for å få ei ny lenke for å tilbakestille passord."
   the_list_below_is_content_that_has_been_shared_wit_2b2648bc: "Lista nedanfor viser innhald som er delt med deg. Du kan førehandsvise innhald, importere det til emnet ditt, eller fjerne det frå lista. "
+  the_login_login_is_currently_suspended_and_will_no_472b19e9: "Innlogginga %{login} vart suspendert og vill ikkje gje tilgang til Canvas"
   the_lti_tool_was_deleted_on_3727da23: "LTI-verktøyet vart sletta"
+  the_lti_user_was_deleted_2a3b796f: "LTI brukaren vart sletta"
   the_material_is_in_the_public_domain_279c39a3: "Materialet er ikkje opphavsrettbeskytta"
   the_material_is_licensed_under_creative_commons_3242cb5e: "Materialet er lisensiert under Creative Commons"
   the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2: "Materialet er brukt i samsvar med sitatretten"
@@ -23037,25 +23042,50 @@ nn:
       
       Takk,
       Canvas Support
+  the_message_you_sent_with_the_subject_line_subject_ca925315: |-
+      Meldinga du sendte med emne "%{subject}" blei ikkje levert. For å svare på Canvas medlingar frå denne e-postadressa, må den være ein bekrefra kommunikasjonskanal i Canvas profilen din. Gå til profilen din og send bekreftelses e-posten på ny for denne e-postadressa. Du kan også kontakte denne personen frå meldingar. For hjelp, sjå kapittelet om meldingar for din brukarrolle i Canvas guides. [Sjå %{link}]
+      
+      Takk,
+      Canvas Brukerstøtte
   the_module_item_is_locked_27fe420b: "Modulelementet er låst."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Det siste resultata for brukar %{current_user_name} og læringsmål %{outcome_name}."
   the_next_available_appointment_in_this_course_is_o_da10316c: "Neste tilgjengelege avtale på dette emnet er *%{date}*"
+  the_original_quizzes_interface_fcda53bc: "Brukargrensesnitt for ordinær quiz"
   the_outcome_to_report_on_7d30886d: "Resultat å rapportere på"
+  the_outcomes_that_you_have_selected_cannot_be_remo_6d259ee0: 
+    one: "Læringsmålet som du har valt kan ikkje fjernast fordi det er knytta til innhald i denne kontoen"
+    other: "Læringsmåla som du har valt kan ikkje fjernast fordi dei er knytta til innhald i denne kontoen"
+  the_outcomes_that_you_have_selected_cannot_be_remo_fc7244f2: 
+    one: "Læringsmålet du har valt kan ikkje fjernast fordi det er knytta til innhald i dette emnet."
+    other: "Læringsmåla som du har valt kan ikkje fjernast fordi dei er knytta til innhald i dette emnet"
   the_preceding_content_is_partner_provided_d753928c: "Det føregåande innhaldet er lagt til av partnar"
   the_previous_sis_batch_was_aborted_d7d89955: "Førre SIS-jobb vart avbroten"
+  the_profile_picture_has_been_removed_74d50047: "Profilbildet er fjerna."
+  the_profile_picture_has_been_reported_762e3755: "Profilbildet er rapportert"
   the_profile_picture_has_been_reported_d609d6dd: "Profilbildet er rapportert"
   the_provided_academic_benchmark_file_has_an_error_4ad2c631: "Academic Benchmark-fila som ligg ved har ein feil"
   the_question_text_for_the_question_question_name_w_3a68a2c7: "Den importerte spørsmålsteksten for spørsmålet \"%{question_name}\" er for lang."
+  the_quiz_is_unavailable_if_you_are_not_logged_in_554dcd43: "Quizen er utilgjengeleg om du ikkje er logga inn"
   the_quiz_log_auditing_feature_option_must_be_enabl_77bf321e: "Funksjonsvalet Overvaking av quizlogg må vere aktivert i emneinnstillingar."
   the_quiz_name_must_be_under_length_characters_68e7de3a: "Quiz-namnet må vere under %{length} teikn"
+  the_replies_were_successfully_updated_56430189: "Svara vart oppdaterte"
+  the_reply_was_successfully_deleted_84f3e46e: "Svaret vart sletta."
+  the_reply_was_successfully_updated_18d7421f: "Svaret vart oppdatert."
   the_report_end_date_85f9cdb3: "Sluttdato for rapport"
   the_report_start_date_9b6954c0: "Startdato for rapport"
   the_roles_api_refers_to_this_permission_as_become__bededd25: "Rolle-API-et refererer til dette løyvet som become_user."
   the_roles_held_by_the_reporting_user_student_teach_8fa5a269: "rollene til rapporteringsbrukaren (student, faglærar, administrator osv.)"
   the_salesforce_account_id_if_it_exists_e7949706: "Salesforce-konto-ID-en (om den finst)"
   the_scheduler_tool_lets_you_set_up_time_slots_that_233345b1: "Planleggingsverktøyet gjer at du kan opprette tidsluker som studentane (eller studentgruppene) kan melde seg på. Når du skal starte, klikkar du på knappen nedanfor."
+  the_search_returned_no_results_c2e4d13c: "Søket ga ingen treff."
   the_section_to_report_on_11e3757b: "Seksjonen som rapporten gjeld for"
+  the_selected_date_is_on_a_blackout_day_bedcc1b8: "Den valte datoen er på ein markert dag"
+  the_selected_date_is_on_a_weekend_and_this_course__66d43756: "Den valte datoen er på ein helgedag, og dette emne har ikkje aktivitet i helgane."
+  the_selected_date_is_too_early_6173fe43: "Den valte dagen er for tidleg."
+  the_selected_date_is_too_late_cbe184a1: "Den valte dagen er for sein."
   the_selected_group_was_cleared_because_the_student_656e4f1c: "Den valde gruppa vart nulla ut fordi studenten du søkte fram ikkje er medlem av ei gruppe. Du kan velje ny gruppe i vurderingsoversikta."
+  the_settings_for_this_plugin_will_be_automatically_6069ba88: "Innstillingane for dette eksterne verktøyet vil automatisk bli del av ikkje-produksjonsmiljøet med mindre det vert overstyrt av dei spesifikke innstillingane. Ikkje-prod innstillingar vil trå i kraft ved neste oppdatering av det mijøet"
+  the_settings_for_this_plugin_will_not_be_inherited_a16e6119: "Innstillingane for dette eksterne verktøyet vil IKKJE bli del av ikkje-produksjonsmiljøet. For å gjera dei tilgjengelege i ikkje-prod miljøet må spesifikke innstillingar være definerte. Ikkje-prod innstillingar vil trå i kraft ved neste oppdatering av det mijøet"
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "Alvorsgrada til problemet, som brukaren har valt frå rullegardinmenyen."
   the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "Snarvegikonet for iOS- og Android-einingar. 180 x 180 .png"
   the_specified_assignment_could_not_be_found_c5dc34ab: "Oppgåva vart ikkje funne"
@@ -23066,13 +23096,16 @@ nn:
   the_start_date_was_set_to_1_month_ago_778e3d7f: "Startdato satt til 1 månad sidan."
   the_start_date_was_set_to_the_beginning_of_last_we_39f49e1d: "Startdato vart satt til byrjinga på førre veke."
   the_state_parameter_is_required_ffadf213: "Tilstandsparameter er nødvendig"
+  the_student_annotation_tab_includes_the_document_f_4cc5cac8: "Fana for studentmerknader inkluderer dokumentet for oppgåva. Fanar for fleire typar innlevering kan også være tilgjengelege"
   the_student_to_report_on_defaults_to_canvas_id_unl_9d76ffdf: "Studenten som rapporten gjeld for; Canvas-ID er standard om ikkje spesifisert som SIS i student_id_type"
   the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
       Emneoversikta lar deg ynskje studentane velkomne til
       emnet. Bruk oversikta til å spesifisere måla til emnet, vise til kontaktinformasjon og andre detaljar, eller du kan laste opp ei PDF med eit eksisterande
       emnesamandrag. Emneoversikta kan òg vise alle oppgåvefristar og kalenderhendingar
       i emnet.
+  the_sync_encountered_an_error_and_did_not_complete_538790b9: "Synkroniseringa støtte på ein feil og vart ikkje ferdig."
   the_sync_to_sis_setting_could_not_be_enabled_for_t_b2be4b66: "Synkroniser til SIS innstillinga kunne ikkje skrus på for denne oppgåva \"%{assignment_name}\" utan innleveringsfrist."
+  the_team_could_be_not_be_created_because_the_micro_1b5d2bea: "Teamet kunne ikkje bli oppretta fordi Microsoftgruppa ikkje har noken eigarar. Det kan vere ein midlertidig feil: prøv å synkronisera igjen, og hvis problemet vedvarer må du kontakte brukarstøtte."
   the_term_for_export_data_5aad7a0a: "Semester for eksport av data"
   the_term_for_grade_export_data_d55a6be7: "Semester for eksport av vurderingsdata"
   the_term_id_to_report_on_4479d2fc: "ID for terminen rapporten er for."
@@ -23110,15 +23143,21 @@ nn:
   there_are_currently_availablegraderscount_availabl_58f85403: "Det finst %{availableGradersCount}tilgjengelege vurderarar"
   there_are_currently_maxgradercount_available_grade_9ab81123: "Det finst %{maxGraderCount} tilgjengelege vurderarar"
   there_are_currently_no_associated_courses_fba1754f: "Det er ingen tilknytta emne akkurat no. "
+  there_are_new_comment_suggestions_available_press__7b8d4195: "Nye kommenteringsforslag er tilgjengelege. Trykk på fana for å sjå forslagsmenyen."
   there_are_no_announcements_for_this_course_5ee649c3: "Finn ikkje kunngjeringar for dette emnet."
   there_are_no_available_signups_for_this_course_26b05c56: "Det er ingen ledige plassar på dette emnet."
   there_are_no_discussions_to_show_in_this_section_e8f04ebd: "Det finst ingen diskusjonar å vise i denne seksjonen"
   there_are_no_outcomes_in_the_course_1d36d9c6: "Finn ingen læringsmål for emnet."
+  there_are_no_outcomes_in_this_group_9a70fa8a: "Det er ingen læringsmål i denne gruppa."
+  there_are_no_pending_changes_to_cancel_244389fe: "Det finns ingen ventande endringar å kansellere"
+  there_are_no_pending_changes_to_publish_b4ffc6a7: "Det finns ingen ventande endringar å publisere"
   there_are_no_reports_for_you_to_view_b716717a: "Det er ingen rapportar å sjå."
   there_are_no_unsaved_changes_9276e87c: "Det finst ingen endringar som ikkje er lagra"
   there_are_no_unsynced_changes_4e8f0838: "Det finst ingen endringar som ikkje er synkronisert"
   there_are_no_user_accounts_to_split_from_this_user_4e132eb1: "Det finnast ingen brukerkontoar å separere for denne brukaren."
+  there_are_unread_rubric_comments_337270ca: "Det er uleste kommentarer i rubrikken"
   there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "Det er ei grense på 2 for kor mange appar du kan ha i verktøylinja til editoren. Denne innstillinga gjeld kun for den forbetra editoren"
+  there_is_a_2_app_limit_for_placement_within_the_rc_971821a8: "Det er ei grense på 2 appar i editorens verktøylinje"
   there_is_currently_1_available_grader_758e4a21: "Det finst kun 1 vurderar"
   there_was_a_failure_logging_out_at_your_idp_30070527: "Det oppstod eit problem hjå IdP-en under utlogging"
   there_was_a_problem_creating_the_teacher_notes_col_dd73456f: "Det oppstod eit problem under oppretting av notatkolonne for faglærar. "
@@ -23131,6 +23170,7 @@ nn:
   there_was_a_problem_hiding_the_teacher_notes_colum_3f03014: "Det oppstod eit problem under skjuling av notatkolonnen for faglærar. "
   there_was_a_problem_importing_some_of_the_outcomes_482bac10: "Det oppstod eit problem under import av læringsmål frå den opplasta fila. Sjekk e-post for detaljar."
   there_was_a_problem_loading_final_grade_overrides_e269e08: "Det oppstod eit problem under overstyring av sluttvurderingar."
+  there_was_a_problem_loading_module_information_e79926f4: "Det oppsto eit problem ved lasting av modulinformasjon"
   there_was_a_problem_loading_students_5bdb6cf2: "Det oppstod eit problem under lastinga av studentar."
   there_was_a_problem_loading_submissions_39855ff0: "Det oppstod eit problem under lastinga av innleveringar."
   there_was_a_problem_loading_the_gradebook_69b2a17: "Det oppstod eit problem under lastinga av karakterboka."
@@ -23292,6 +23332,9 @@ nn:
   this_feature_flag_enables_discussions_reporting_in_ad613bb9: |-
       Denne funksjonaliteten slår på rapportering for diskusjonar inni det nye
       Discussions Redesign arbeidet
+  this_feature_flag_enables_isolated_view_inside_the_3db3f6f2: |-
+      Denne funksjonaliteten slår på Isolert Visning inni det nye
+      Discussions Redesign arbeidet.
   this_feature_makes_the_submissions_file_upload_api_aeb97ad6: "Funksjonen gjer at oppgåveinnleverings-API-et kontrollerer at filtypane er innafor dei gyldige filendingane angitt for oppgåva."
   this_feature_option_is_only_visible_to_users_with__d5e21cee: |-
       Denne funksjonaliteten er berre synleg for brukarar med Site Admin tilgang
@@ -23317,9 +23360,11 @@ nn:
       Denne har fleire spørmsålstyper som hotspot,
       kategoriar, mønstersamsvar og rekkefølgje. Den har òg
       fleire endrings- og tilpassingsalternativ.
+  this_homeroom_syncs_enrollments_and_subject_start__a3d539ff: "Denne heimesida synkroniserar påmeldingar og emnestart/slutt-datoar til: "
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Dette bildet er synleg som eit vassmerke i bakgrunnen på sida di. Godkjende format: .png, .svg, .gif og .jpeg"
   this_image_has_been_reported_9360e581: "Dette bildet har blitt rapportert."
   this_image_is_currently_unavailable_25c68857: "Dette bildet er for tida utilgjengeleg"
+  this_influences_the_user_interface_for_setting_due_12b7e7c0: "Dette påverkar brukargrensesnittet ved setting av innleveringsfristar. Det forandrar ikkje på eksisterande fristar."
   this_integration_is_not_enabled_please_enable_it_t_b9e8a997: "Denne integrasjonen er ikkje aktivert. Aktiver den for å samhandle med innstillingar."
   this_is_a_blueprint_course_5e7b47fe: Blueprint-emne
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Dette er ei kommadelt liste med klarerte URL-adresser. URL-adresser frå denne lista omgår CSRF-token ved pålogging i Canvas."
@@ -23345,11 +23390,13 @@ nn:
   this_is_an_anonymous_discussion_your_name_and_prof_72c49b77: "Dette er ein anonym diskusjon, ditt namn og profilbilde vil være skjult for andre studentar på emnet."
   this_is_just_a_dev_only_feature_you_can_turn_on_to_7f88c58f: "Dette er ein utviklarfunksjon som førehandsviser korleis sider vil sjå ut i eit høgre-til-venstre-miljø, utan å faktisk endre til eit språk som normalt brukar høgre-til-venstre-prinsippar."
   this_is_not_a_valid_grade_9cc2cb8: "Dette er ikkje ei gyldig vurdering"
+  this_is_technicaly_a_security_vulnerability_but_so_2a2dc89: "Dette er teknisk sett ein sikkerheitsrisiko, men nokre skolar treng å oppretthalde arbeidsflyten ei stund."
   this_is_the_currently_chosen_grade_for_this_studen_86118eb6: "Denne karakteren er valt for denne studenten akkurat no."
   this_is_the_default_email_address_f3c421fb: "Dette er standard e-postadresse"
   this_is_the_new_feature_preview_ui_it_is_currently_9cb4b80e: "Dette er det nye brukargrensesnittet for førehandsvising av funksjonsval. Førebels er det kun lesbart. For å få tilbake det gamle brukargrensesnittet må du klikke på knappen. Då deaktiverast \"nytt funksjonsval-merknad\"-funksjonen og sida lastast på nytt. "
   this_is_where_students_can_see_their_groups_7dd2dae3: "Det er her studentane kan sjå gruppene sine."
   this_is_where_you_can_leave_a_comment_and_view_you_a2259ec8: "Det er her du kan legge att ein kommentar og sjå din instruktør si tilbakemelding."
+  this_is_where_you_ll_land_when_your_home_is_comple_8ab4d2b8: "Dette er kor du landar når heimesida er komplett."
   this_is_your_anonymous_avatar_55211702: "Dette er din anonyme avatar"
   this_is_your_course_landing_page_33d445ec: "Dette er forsida til emnet ditt"
   this_is_your_current_theme_4331709b: "Dette er gjeldande tema"
