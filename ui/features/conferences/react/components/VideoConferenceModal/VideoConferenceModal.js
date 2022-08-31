@@ -50,7 +50,8 @@ export const VideoConferenceModal = ({
     'send_private_chat'
   ]
 
-  const [name, setName] = useState(isEditing ? props.name : '')
+  const defaultName = ENV.context_name ? `${ENV.context_name} Conference` : 'Conference'
+  const [name, setName] = useState(isEditing ? props.name : defaultName)
   const [conferenceType, setConferenceType] = useState(
     isEditing ? props.type : window.ENV.conference_type_details[0].type
   )
