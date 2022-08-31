@@ -90,6 +90,11 @@ require "securerandom"
 #           "example": false,
 #           "type": "boolean"
 #         },
+#         "visibility_level": {
+#           "example": "course",
+#           "type": "string",
+#           "description": "Changes who can access the file. Valid options are 'inherit' (the default), 'course', 'institution', and 'public'. Only valid in course endpoints."
+#         },
 #         "thumbnail_url": {
 #           "type": "string"
 #         },
@@ -147,7 +152,7 @@ class FilesController < ApplicationController
 
   before_action :check_file_access_flags, only: [:show_relative, :show]
 
-  skip_before_action :verify_authenticity_token, only: :api_create
+  skip_before_action :verify_authenticity_token # , only: [:api_create, :show]
   before_action :verify_api_id, only: %i[
     api_show api_create_success api_file_status api_update destroy icon_metadata reset_verifier
   ]
@@ -375,7 +380,7 @@ class FilesController < ApplicationController
       return render body: "endpoint does not support #{request.format.symbol}", status: :bad_request
     end
 
-    if authorized_action(@context, @current_user, [:read, *RoleOverride::GRANULAR_FILE_PERMISSIONS]) &&
+    if authorized_action(@context, @current_user, [:read_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS]) &&
        tab_enabled?(@context.class::TAB_FILES)
       @contexts = [@context]
       get_all_pertinent_contexts(include_groups: true, cross_shard: true) if @context == @current_user
@@ -1199,6 +1204,9 @@ class FilesController < ApplicationController
   # @argument hidden [Boolean]
   #   Flag the file as hidden
   #
+  # @argument visibility_level [String]
+  #   Configure which roles can access this file
+  #
   # @example_request
   #
   #   curl -X PUT 'https://<canvas>/api/v1/files/<file_id>' \
@@ -1225,6 +1233,7 @@ class FilesController < ApplicationController
       @attachment.unlock_at = params[:unlock_at] if params.key?(:unlock_at)
       @attachment.locked = value_to_boolean(params[:locked]) if params.key?(:locked)
       @attachment.hidden = value_to_boolean(params[:hidden]) if params.key?(:hidden)
+      @attachment.visibility_level = params[:visibility_level] if params.key?(:visibility_level)
 
       @attachment.set_publish_state_for_usage_rights if @attachment.context.is_a?(Group)
       if !@attachment.locked? && @attachment.locked_changed? && @attachment.usage_rights_id.nil? && @context.respond_to?(:usage_rights_required?) && @context.usage_rights_required?
@@ -1523,6 +1532,6 @@ class FilesController < ApplicationController
   end
 
   def strong_attachment_params
-    params.require(:attachment).permit(:display_name, :locked, :lock_at, :unlock_at, :uploaded_data, :hidden)
+    params.require(:attachment).permit(:display_name, :locked, :lock_at, :unlock_at, :uploaded_data, :hidden, :visibility_level)
   end
 end

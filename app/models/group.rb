@@ -521,11 +521,14 @@ class Group < ActiveRecord::Base
 
     use_additional_policy do
       given { |user| user && has_member?(user) }
-      can :read_forum and
-        can :read and
-        can :read_announcements and
-        can :read_roster and
-        can :view_unpublished_items
+      can %i[
+        read_forum
+        read
+        read_announcements
+        read_roster
+        view_unpublished_items
+        read_files
+      ]
 
       given do |user, session|
         user && has_member?(user) &&
@@ -565,16 +568,19 @@ class Group < ActiveRecord::Base
         !context.root_account.feature_enabled?(:granular_permissions_manage_groups) &&
           context.grants_right?(user, session, :manage_groups)
       end
-      can :create and can :create_collaborations and can :delete and can :manage and
-        can :manage_admin_users and can :allow_course_admin_actions and can :manage_calendar and
-        can :manage_content and can :manage_course_content_add and
-        can :manage_course_content_edit and can :manage_course_content_delete and
-        can :manage_files_add and can :manage_files_edit and can :manage_files_delete and
-        can :manage_students and can :manage_wiki_create and can :manage_wiki_delete and
-        can :manage_wiki_update and can :moderate_forum and can :post_to_forum and
-        can :create_forum and can :read and can :read_forum and can :read_announcements and
-        can :read_roster and can :send_messages and can :send_messages_all and can :update and
-        can :view_unpublished_items
+      can %i[
+        create create_collaborations delete manage
+        manage_admin_users allow_course_admin_actions manage_calendar
+        manage_content manage_course_content_add
+        manage_course_content_edit manage_course_content_delete
+        manage_files_add manage_files_edit manage_files_delete
+        manage_students manage_wiki_create manage_wiki_delete
+        manage_wiki_update moderate_forum post_to_forum
+        create_forum read read_forum read_announcements
+        read_roster send_messages send_messages_all update
+        view_unpublished_items
+        read_files
+      ]
 
       ##################### End legacy permission block ##########################
 
@@ -582,28 +588,31 @@ class Group < ActiveRecord::Base
         context.root_account.feature_enabled?(:granular_permissions_manage_groups) &&
           context.grants_right?(user, session, :manage_groups_add)
       end
-      can :read and can :create
+      can %i[read read_files create]
 
       # permissions to update a group and manage actions within the context of a group
       given do |user, session|
         context.root_account.feature_enabled?(:granular_permissions_manage_groups) &&
           context.grants_right?(user, session, :manage_groups_manage)
       end
-      can :read and can :update and can :create_collaborations and can :manage and
-        can :manage_admin_users and can :allow_course_admin_actions and can :manage_calendar and
-        can :manage_content and can :manage_course_content_add and
-        can :manage_course_content_edit and can :manage_course_content_delete and
-        can :manage_files_add and can :manage_files_edit and can :manage_files_delete and
-        can :manage_students and can :manage_wiki_create and can :manage_wiki_delete and
-        can :manage_wiki_update and can :moderate_forum and can :post_to_forum and
-        can :create_forum and can :read_forum and can :read_announcements and can :read_roster and
-        can :send_messages and can :send_messages_all and can :view_unpublished_items
+      can %i[
+        read update create_collaborations manage
+        manage_admin_users allow_course_admin_actions manage_calendar
+        manage_content manage_course_content_add
+        manage_course_content_edit manage_course_content_delete
+        manage_files_add manage_files_edit manage_files_delete
+        manage_students manage_wiki_create manage_wiki_delete
+        manage_wiki_update moderate_forum post_to_forum
+        create_forum read_forum read_announcements read_roster
+        send_messages send_messages_all view_unpublished_items
+        read_files
+      ]
 
       given do |user, session|
         context.root_account.feature_enabled?(:granular_permissions_manage_groups) &&
           context.grants_right?(user, session, :manage_groups_delete)
       end
-      can :read and can :delete
+      can %i[read read_files delete]
 
       given { |user, session| context&.grants_all_rights?(user, session, :read_as_admin, :post_to_forum) }
       can :post_to_forum
@@ -612,7 +621,7 @@ class Group < ActiveRecord::Base
       can :create_forum
 
       given { |user, session| context&.grants_right?(user, session, :view_group_pages) }
-      can :read and can :read_forum and can :read_announcements and can :read_roster
+      can %i[read read_forum read_announcements read_roster read_files]
 
       # Join is participate + the group being in a state that allows joining directly (free_association)
       given { |user| user && can_participate?(user) && free_association?(user) }

@@ -3918,7 +3918,17 @@ class CoursesController < ApplicationController
   end
 
   def visibility_configuration(params)
-    @course.apply_visibility_configuration(params[:course_visibility], params[:syllabus_visibility_option])
+    @course.apply_visibility_configuration(params[:course_visibility])
+
+    if params[:custom_course_visibility].present? && !value_to_boolean(params[:custom_course_visibility])
+      Course::CUSTOMIZABLE_PERMISSIONS.each do |key, _|
+        @course.apply_custom_visibility_configuration(key, "inherit")
+      end
+    else
+      Course::CUSTOMIZABLE_PERMISSIONS.each do |key, _|
+        @course.apply_custom_visibility_configuration(key, params[:"#{key}_visibility_option"])
+      end
+    end
   end
 
   def can_change_group_weighting_scheme?

@@ -1232,27 +1232,30 @@ class User < ActiveRecord::Base
 
   set_policy do
     given { |user| user == self }
-    can :read and
-      can :read_grades and
-      can :read_profile and
-      can :read_as_admin and
-      can :manage and
-      can :manage_content and
-      can :manage_course_content_add and
-      can :manage_course_content_edit and
-      can :manage_course_content_delete and
-      can :manage_files_add and
-      can :manage_files_edit and
-      can :manage_files_delete and
-      can :manage_calendar and
-      can :send_messages and
-      can :update_avatar and
-      can :view_feature_flags and
-      can :manage_feature_flags and
-      can :api_show_user and
-      can :read_email_addresses and
-      can :view_user_logins and
-      can :generate_observer_pairing_code
+    can %i[
+      read
+      read_grades
+      read_profile
+      read_files
+      read_as_admin
+      manage
+      manage_content
+      manage_course_content_add
+      manage_course_content_edit
+      manage_course_content_delete
+      manage_files_add
+      manage_files_edit
+      manage_files_delete
+      manage_calendar
+      send_messages
+      update_avatar
+      view_feature_flags
+      manage_feature_flags
+      api_show_user
+      read_email_addresses
+      view_user_logins
+      generate_observer_pairing_code
+    ]
 
     given { |user| user == self && user.user_can_edit_name? }
     can :rename
@@ -1287,7 +1290,7 @@ class User < ActiveRecord::Base
     can :read_profile and can :read_reports and can :read_grades
 
     given { |user| check_accounts_right?(user, :manage_user_logins) }
-    can :read and can :read_reports and can :read_profile and can :api_show_user and can :terminate_sessions
+    can %i[read read_reports read_profile api_show_user terminate_sessions read_files]
 
     given { |user| check_accounts_right?(user, :read_roster) }
     can :read_full_profile and can :api_show_user
@@ -1329,7 +1332,7 @@ class User < ActiveRecord::Base
     can :reset_mfa
 
     given { |user| user && user.as_observer_observation_links.where(user_id: id).exists? }
-    can :read and can :read_as_parent
+    can %i[read read_as_parent read_files]
 
     given { |user| check_accounts_right?(user, :moderate_user_content) }
     can :moderate_user_content

@@ -354,13 +354,22 @@ describe "course settings" do
       expect(@course.time_zone.name).to eq time_zone_value
     end
 
-    it "only allows less resrictive options in Customize visibility" do
+    it "only allows less resrictive options in Customize Syllabus visibility" do
       get "/courses/#{@course.id}/settings"
       click_option("#course_course_visibility", "institution", :value)
       f("#course_custom_course_visibility").click
       expect(ff("select[name*='course[syllabus_visibility_option]']")[0].text).to eq "Institution\nPublic"
       click_option("#course_course_visibility", "course", :value)
       expect(ff("select[name*='course[syllabus_visibility_option]']")[0].text).to eq "Course\nInstitution\nPublic"
+    end
+
+    it "allows any option in Customize Files visibility" do
+      get "/courses/#{@course.id}/settings"
+      click_option("#course_course_visibility", "institution", :value)
+      f("#course_custom_course_visibility").click
+      expect(ff("select[name*='course[files_visibility_option]']")[0].text).to eq "Course\nInstitution\nPublic"
+      click_option("#course_course_visibility", "course", :value)
+      expect(ff("select[name*='course[files_visibility_option]']")[0].text).to eq "Course\nInstitution\nPublic"
     end
 
     it "disables from Course Navigation tab", priority: "1" do

@@ -504,20 +504,20 @@ class Folder < ActiveRecord::Base
   alias_method :currently_locked?, :currently_locked
 
   set_policy do
-    given { |user, session| visible? && context.grants_right?(user, session, :read) }
+    given { |user, session| visible? && context.grants_right?(user, session, :read_files) }
     can :read
 
     given { |user, session| context.grants_right?(user, session, :read_as_admin) }
     can :read_as_admin, :read_contents, :read_contents_for_export
 
     given do |user, session|
-      visible? && !locked? && context.grants_right?(user, session, :read) &&
+      visible? && !locked? && context.grants_right?(user, session, :read_files) &&
         !(context.is_a?(Course) && context.tab_hidden?(Course::TAB_FILES))
     end
-    can :read_contents, :read_contents_for_export
+    can :read_contents
 
     given do |user, session|
-      !locked? && context.grants_right?(user, session, :read)
+      !locked? && context.grants_right?(user, session, :read_files)
     end
     can :read_contents_for_export
 
