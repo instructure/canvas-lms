@@ -129,6 +129,20 @@ describe ConferencesController do
       expect(assigns[:js_env][:section_user_ids_map]).to be_truthy
     end
 
+    it "assigns context_name to course name when context is course" do
+      user_session(@teacher)
+      get "index", params: { course_id: @course.id }
+      expect(assigns[:js_env][:context_name]).to eq @course.name
+    end
+
+    it "assigns context_name to group name when context is group" do
+      user_session(@teacher)
+      @group = @course.groups.create!(name: "some group")
+      @group.add_user(@student)
+      get "index", params: { group_id: @group.id }
+      expect(assigns[:js_env][:context_name]).to eq @group.name
+    end
+
     it "assigns only active sections in the js_env" do
       @section = @course.course_sections.create!(name: "test section")
       @section_deleted = @course.course_sections.create!(name: "test section deleted")
