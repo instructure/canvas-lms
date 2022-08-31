@@ -18,9 +18,12 @@
 import {fireEvent, render} from '@testing-library/react'
 import {mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import React from 'react'
+import $ from 'jquery'
 import RubricTab from '../RubricTab'
 import {RUBRIC_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {transformRubricData, transformRubricAssessmentData} from '../../helpers/RubricHelpers'
+import store from '../stores'
+import {fillAssessment} from '@canvas/rubrics/react/helpers'
 
 function gradedOverrides() {
   return {
@@ -30,7 +33,7 @@ function gradedOverrides() {
           {
             _id: 1,
             score: 5,
-            assessor: {name: 'assessor1', enrollments: []},
+            assessor: {_id: 1, name: 'assessor1', enrollments: []},
           },
           {
             _id: 2,
@@ -40,7 +43,7 @@ function gradedOverrides() {
           {
             _id: 3,
             score: 8,
-            assessor: {name: 'assessor2', enrollments: [{type: 'TaEnrollment'}]},
+            assessor: {_id: 2, name: 'assessor2', enrollments: [{type: 'TaEnrollment'}]},
           },
         ],
       },
@@ -93,14 +96,33 @@ async function makeProps(opts = {}) {
   const result = await mockQuery(RUBRIC_QUERY, allOverrides, variables)
   const assessments = result.data.submission.rubricAssessmentsConnection?.nodes
   return {
-    assessments: assessments?.map(assessment => transformRubricAssessmentData(assessment)),
+    assessments: assessments?.map(assessment => transformRubricAssessmentData(assessment)) || [],
     proficiencyRatings:
       result.data.course.account.outcomeProficiency?.proficiencyRatingsConnection?.nodes,
     rubric: transformRubricData(result.data.assignment.rubric),
   }
 }
 
+function makeStore(props) {
+  const assessment = props.peerReviewModeEnabled
+    ? props.assessments?.find(assessment => assessment.assessor?._id === ENV.current_user.id)
+    : props.assessments?.[0]
+  const displayedAssessment = fillAssessment(props.rubric, assessment || {})
+  store.setState({displayedAssessment})
+}
+const originalENV = window.ENV
+
 describe('RubricTab', () => {
+  beforeEach(() => {
+    $.screenReaderFlashMessage = jest.fn()
+    window.ENV = {...originalENV, current_user: {id: '2'}}
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+    window.ENV = originalENV
+  })
+
   describe('general', () => {
     it('contains "View Rubric" when peer review mode is OFF', async () => {
       const props = await makeProps({graded: false})
@@ -119,11 +141,49 @@ describe('RubricTab', () => {
       expect(await findByText('Fill Out Rubric')).toBeInTheDocument()
       expect(await queryByText('View Rubric')).not.toBeInTheDocument()
     })
+
+    it('disables interactions in the Rubric component by default', async () => {
+      const props = await makeProps({graded: false})
+      props.rubric.criteria[0].ratings[0].points = 9
+      makeStore(props)
+      const {findByText, queryByText} = render(<RubricTab {...props} />)
+      fireEvent.click(await findByText(`9 pts`))
+      expect(await queryByText(/^Total Points: 9 out of/)).not.toBeInTheDocument()
+    })
+  })
+
+  describe('peer reviews', () => {
+    it('enables interactions in the Rubric component by default', async () => {
+      const props = await makeProps({graded: false})
+      props.peerReviewModeEnabled = true
+      props.rubric.criteria[0].ratings[0].points = 9
+      makeStore(props)
+      const {findByText} = render(<RubricTab {...props} />)
+      fireEvent.click(await findByText(`9 pts`))
+      expect(await findByText(/^Total Points: 9 out of/)).toBeInTheDocument()
+    })
+
+    it('hides the grader selector', async () => {
+      const props = await makeProps({graded: true})
+      props.peerReviewModeEnabled = true
+      makeStore(props)
+      const {queryByText} = render(<RubricTab {...props} />)
+      expect(await queryByText('Select Grader')).not.toBeInTheDocument()
+    })
+
+    it('sets displayed assessment as the assessment of the reviewer', async () => {
+      const props = await makeProps({graded: true})
+      props.peerReviewModeEnabled = true
+      makeStore(props)
+      const {findByText} = render(<RubricTab {...props} />)
+      expect(await findByText('Total Points: 8')).toBeInTheDocument()
+    })
   })
 
   describe('ungraded rubric', () => {
     it('contains the rubric ratings heading', async () => {
       const props = await makeProps({graded: false})
+      makeStore(props)
       const {findAllByText} = render(<RubricTab {...props} />)
 
       expect((await findAllByText('Ratings'))[1]).toBeInTheDocument()
@@ -131,6 +191,7 @@ describe('RubricTab', () => {
 
     it('contains the rubric points heading', async () => {
       const props = await makeProps({graded: false})
+      makeStore(props)
       const {findAllByText} = render(<RubricTab {...props} />)
 
       expect((await findAllByText('Pts'))[1]).toBeInTheDocument()
@@ -139,6 +200,7 @@ describe('RubricTab', () => {
     it('shows possible points if the association does not hide points', async () => {
       const props = await makeProps({graded: false})
       props.rubricAssociation = {_id: '1', hide_score_total: false, use_for_grading: false}
+      makeStore(props)
 
       const {findByText} = render(<RubricTab {...props} />)
 
@@ -153,6 +215,7 @@ describe('RubricTab', () => {
         use_for_grading: false,
         hide_points: true,
       }
+      makeStore(props)
 
       const {queryByText} = render(<RubricTab {...props} />)
 
@@ -161,20 +224,27 @@ describe('RubricTab', () => {
   })
 
   describe('graded rubric', () => {
+    let props
+    beforeEach(async () => {
+      props = await makeProps({graded: true})
+      makeStore(props)
+    })
+
+    afterEach(() => {
+      props = null
+    })
+
     it('displays comments', async () => {
-      const props = await makeProps({graded: true})
       const {findAllByText} = render(<RubricTab {...props} />)
       expect((await findAllByText('Comments'))[0]).toBeInTheDocument()
     })
 
     it('displays the points for an individual criterion', async () => {
-      const props = await makeProps({graded: true})
       const {findByText} = render(<RubricTab {...props} />)
       expect(await findByText('6 / 6 pts')).toBeInTheDocument()
     })
 
     it('hides the points for an individual criterion if the association hides points', async () => {
-      const props = await makeProps({graded: true})
       props.rubricAssociation = {
         _id: '1',
         hide_score_total: false,
@@ -187,34 +257,29 @@ describe('RubricTab', () => {
     })
 
     it('displays the total points for the rubric assessment', async () => {
-      const props = await makeProps({graded: true})
       const {findByText} = render(<RubricTab {...props} />)
       expect(await findByText('Total Points: 5')).toBeInTheDocument()
     })
 
     it('displays the name of the assessor if present', async () => {
-      const props = await makeProps({graded: true})
       const {findByLabelText, findByText} = render(<RubricTab {...props} />)
       fireEvent.click(await findByLabelText('Select Grader'))
       expect(await findByText('assessor1')).toBeInTheDocument()
     })
 
     it('displays the assessor enrollment if present', async () => {
-      const props = await makeProps({graded: true})
       const {findByLabelText, findByText} = render(<RubricTab {...props} />)
       fireEvent.click(await findByLabelText('Select Grader'))
       expect(await findByText('assessor2 (TA)')).toBeInTheDocument()
     })
 
     it('displays "Anonymous" if the assessor is hidden', async () => {
-      const props = await makeProps({graded: true})
       const {findByLabelText, findByText} = render(<RubricTab {...props} />)
       fireEvent.click(await findByLabelText('Select Grader'))
       expect(await findByText('Anonymous')).toBeInTheDocument()
     })
 
     it('changes the score when selecting a different assessor', async () => {
-      const props = await makeProps({graded: true})
       const {findByLabelText, findByText} = render(<RubricTab {...props} />)
 
       expect(await findByText('Total Points: 5')).toBeInTheDocument()

@@ -36,6 +36,41 @@ jest.mock('../../../../../shared/immersive-reader/ImmersiveReader', () => {
   }
 })
 
+function gradedOverrides() {
+  return {
+    Submission: {
+      rubricAssessmentsConnection: {
+        nodes: [
+          {
+            _id: 1,
+            score: 5,
+            assessor: {_id: 1, name: 'assessor1', enrollments: []},
+          },
+          {
+            _id: 2,
+            score: 10,
+            assessor: null,
+          },
+          {
+            _id: 3,
+            score: 8,
+            assessor: {_id: 2, name: 'assessor2', enrollments: [{type: 'TaEnrollment'}]},
+          },
+        ],
+      },
+    },
+    Course: {
+      account: {
+        outcomeProficiency: {
+          proficiencyRatingsConnection: {
+            nodes: [{}],
+          },
+        },
+      },
+    },
+  }
+}
+
 describe('Assignment Student Content View', () => {
   beforeEach(() => {
     ContextModuleApi.getContextModuleData.mockResolvedValue({})
@@ -55,7 +90,37 @@ describe('Assignment Student Content View', () => {
     const props = await mockAssignmentAndSubmission({
       LockInfo: {isLocked: true},
     })
-    const {getByTestId} = render(<StudentContent {...props} />)
+
+    const variables = {
+      courseID: '1',
+      assignmentLid: '1',
+      submissionID: '1',
+      submissionAttempt: 0,
+    }
+    const overrides = gradedOverrides()
+    const allOverrides = [
+      {
+        Node: {__typename: 'Assignment'},
+        Assignment: {rubric: {}, rubricAssociation: {}},
+        Rubric: {
+          criteria: [{}],
+        },
+        ...overrides,
+      },
+    ]
+    const fetchRubricResult = await mockQuery(RUBRIC_QUERY, allOverrides, variables)
+    const mocks = [
+      {
+        request: {query: RUBRIC_QUERY, variables},
+        result: fetchRubricResult,
+      },
+    ]
+
+    const {getByTestId} = render(
+      <MockedProvider mocks={mocks}>
+        <StudentContent {...props} />
+      </MockedProvider>
+    )
     expect(getByTestId('assignment-student-header')).toBeInTheDocument()
   })
 
@@ -136,6 +201,7 @@ describe('Assignment Student Content View', () => {
     it('renders the rubric if the assignment has one', async () => {
       window.ENV.ASSIGNMENT_ID = '1'
       window.ENV.COURSE_ID = '1'
+      window.ENV.current_user = {id: '2'}
       props.assignment.rubric = {}
 
       const variables = {
@@ -304,6 +370,17 @@ describe('Assignment Student Content View', () => {
   })
 
   describe('number of attempts', () => {
+    let oldEnv
+
+    beforeEach(() => {
+      oldEnv = window.ENV
+      window.ENV = {...window.ENV}
+    })
+
+    afterEach(() => {
+      window.ENV = oldEnv
+    })
+
     it('renders the number of attempts with one attempt', async () => {
       const props = await mockAssignmentAndSubmission({
         Assignment: {allowedAttempts: 1},
@@ -355,6 +432,7 @@ describe('Assignment Student Content View', () => {
     })
 
     it('does not render the number of attempts if peer review mode is enabled', async () => {
+      window.ENV.current_user = {id: '2'}
       const props = await mockAssignmentAndSubmission({
         Assignment: {allowedAttempts: 3},
       })
