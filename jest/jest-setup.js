@@ -146,8 +146,7 @@ window.ENV = {
   use_rce_enhancements: true,
   FEATURES: {
     extended_submission_state: true
-  },
-  TIMEZONE: 'America/Denver'
+  }
 }
 
 Enzyme.configure({adapter: new Adapter()})
