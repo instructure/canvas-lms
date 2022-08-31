@@ -20,7 +20,7 @@
 full_path_glob = "(/*full_path)"
 
 # allow plugins to prepend routes
-Dir["{gems,vendor}/plugins/*/config/pre_routes.rb"].each do |pre_routes|
+Dir[Rails.root.join("{gems,vendor}/plugins/*/config/pre_routes.rb")].each do |pre_routes|
   load pre_routes
 end
 
