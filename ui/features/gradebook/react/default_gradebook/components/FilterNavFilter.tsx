@@ -170,6 +170,7 @@ export default function FilterNavFilter({
               <FlexItem>
                 <IconButton
                   color="primary"
+                  data-testid="save-label"
                   margin="0 x-small"
                   screenReaderLabel={I18n.t('Save label')}
                   onClick={() => {
@@ -197,6 +198,7 @@ export default function FilterNavFilter({
             <View as="div" data-testid={`filter-name-${filter.id}`}>
               {filter.name}
               <IconButton
+                data-testid="rename-filter"
                 elementRef={el => (renameButtonRef.current = el)}
                 color="primary"
                 onClick={() => {
@@ -267,6 +269,7 @@ export default function FilterNavFilter({
         <FlexItem>
           <Tooltip renderTip={I18n.t('Delete filter')} placement="bottom" on={['hover', 'focus']}>
             <IconButton
+              data-testid="delete-filter"
               withBackground={false}
               withBorder={false}
               screenReaderLabel={I18n.t('Delete filter')}

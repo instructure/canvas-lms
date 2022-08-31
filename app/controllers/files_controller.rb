@@ -968,7 +968,17 @@ class FilesController < ApplicationController
 
     model = Object.const_get(params[:context_type])
     @context = model.where(id: params[:context_id]).first
-    @attachment = @context.shard.activate { Attachment.where(context: @context).build }
+
+    @attachment = if params.key?(:precreated_attachment_id)
+                    att = Attachment.find(params[:precreated_attachment_id])
+                    if att.nil?
+                      reject! "Requested to use precreated attachment, but attachment with id #{params[:precreated_attachment_id]} doesn't exist", 422
+                    else
+                      att
+                    end
+                  else
+                    @context.shard.activate { Attachment.where(context: @context).build }
+                  end
 
     # service metadata
     #

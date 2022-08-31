@@ -138,6 +138,7 @@ module Types
 
     field :last_activity_at, DateTimeType, null: true
     field :total_activity_time, Integer, null: true
+    field :sis_role, String, null: true
 
     field :html_url, UrlType, null: true
     def html_url

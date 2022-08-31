@@ -27,6 +27,10 @@ export default {
 }
 
 const Template = args => {
+  window.ENV = {
+    confetti_branding_enabled: true,
+    ...args
+  }
   const [count, updateCount] = React.useState(0)
   return (
     <>
@@ -37,3 +41,60 @@ const Template = args => {
 }
 
 export const DefaultColors = Template.bind({})
+
+export const SingleCustomColor = Template.bind({})
+SingleCustomColor.args = {
+  active_brand_config: {
+    variables: {
+      'ic-brand-primary': '#0000ff'
+    }
+  }
+}
+
+export const MultipleCustomColors = Template.bind({})
+MultipleCustomColors.args = {
+  active_brand_config: {
+    variables: {
+      'ic-brand-primary': '#0000ff',
+      'ic-brand-global-nav-bgd': '#ff00ff'
+    }
+  }
+}
+
+export const CustomLogo = Template.bind({})
+CustomLogo.args = {
+  active_brand_config: {
+    variables: {
+      'ic-brand-header-image': '/favicon.ico'
+    }
+  }
+}
+
+export const FullyBranded = Template.bind({})
+FullyBranded.args = {
+  active_brand_config: {
+    variables: {
+      'ic-brand-primary': '#000000',
+      'ic-brand-global-nav-bgd': '#ff0000',
+      'ic-brand-header-image': '/favicon.ico'
+    }
+  }
+}
+
+export const TallLogo = Template.bind({})
+TallLogo.args = {
+  active_brand_config: {
+    variables: {
+      'ic-brand-header-image': 'http://placekitten.com/200/300'
+    }
+  }
+}
+
+export const WideLogo = Template.bind({})
+WideLogo.args = {
+  active_brand_config: {
+    variables: {
+      'ic-brand-header-image': 'http://placekitten.com/300/200'
+    }
+  }
+}

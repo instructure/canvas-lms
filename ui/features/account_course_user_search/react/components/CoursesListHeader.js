@@ -17,22 +17,26 @@
  */
 
 import {IconMiniArrowUpSolid, IconMiniArrowDownSolid} from '@instructure/ui-icons'
-import {CondensedButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
+import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import React from 'react'
 import {string, func} from 'prop-types'
 import preventDefault from 'prevent-default'
 
 export default function CourseListHeader({sort, order, onChangeSort, id, label, tipDesc, tipAsc}) {
+  const SortIcon = order === 'asc' ? IconMiniArrowUpSolid : IconMiniArrowDownSolid
   return (
     <Tooltip renderTip={sort === id && order === 'asc' ? tipAsc : tipDesc}>
-      <CondensedButton
+      <Link
+        isWithinText={false}
+        as="button"
+        renderIcon={sort === id ? <SortIcon /> : undefined}
+        iconPlacement="end"
         onClick={preventDefault(() => onChangeSort(id))}
-        theme={{fontWeight: '700', mediumPaddingHorizontal: '0', mediumHeight: '1.5rem'}}
       >
-        {label}
-        {sort === id ? order === 'asc' ? <IconMiniArrowUpSolid /> : <IconMiniArrowDownSolid /> : ''}
-      </CondensedButton>
+        <Text weight="bold">{label}</Text>
+      </Link>
     </Tooltip>
   )
 }

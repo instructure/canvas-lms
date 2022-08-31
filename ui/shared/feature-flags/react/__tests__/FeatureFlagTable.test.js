@@ -34,14 +34,6 @@ const rows = [
 const title = 'Section 123'
 
 describe('feature_flags::FeatureFlagTable', () => {
-  beforeEach(() => {
-    window.ENV = {FEATURES: {feature_flag_filters: true}}
-  })
-
-  afterEach(() => {
-    window.ENV = {}
-  })
-
   it('Shows the title', () => {
     const {getByTestId} = render(<FeatureFlagTable rows={rows} title={title} />)
 

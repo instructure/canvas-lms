@@ -68,6 +68,7 @@ module Importers
       item.consumer_key ||= hash[:consumer_key] || "fake"
       item.shared_secret ||= hash[:shared_secret] || "fake"
       item.developer_key_id ||= hash.dig(:settings, :client_id)
+      item.lti_version = hash[:lti_version] || (hash.dig(:settings, :client_id) && "1.3") || (hash.dig(:settings, :use_1_3) && "1.3") || "1.1"
       item.settings = create_tool_settings(hash)
 
       Lti::ResourcePlacement::PLACEMENTS.each do |placement|

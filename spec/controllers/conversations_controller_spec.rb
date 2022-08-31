@@ -127,6 +127,19 @@ describe ConversationsController do
       expect(assigns[:conversations_json].size).to eql 3
     end
 
+    it "returns all unread conversations" do
+      user_session(@student)
+      @c1 = conversation
+      @c2 = conversation
+      @c3 = conversation
+      @c3.update_attribute :workflow_state, "unread"
+
+      get "index", params: { scope: "unread" }, format: "json"
+      expect(response).to be_successful
+      expect(assigns[:conversations_json].size).to eql 1
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.unread.pages_loaded.legacy")
+    end
+
     it "returns conversations matching the specified filter" do
       user_session(@student)
       @c1 = conversation
@@ -333,6 +346,7 @@ describe ConversationsController do
       enrollment.save
       post "create", params: { recipients: [new_user.id.to_s], body: "yo" }
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.created.legacy")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.legacy")
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.legacy")
       expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.legacy", 1)
       expect(response).to be_successful
@@ -469,12 +483,21 @@ describe ConversationsController do
         end
       end
 
+      it "Creates one conversation per recipients if bulk_message is true" do
+        post "create", params: { recipients: [@new_user1.id.to_s, @new_user2.id.to_s], body: "yo", group_conversation: true, bulk_message: "1" }
+        expect(response).to be_successful
+
+        expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.individual_message_option.legacy")
+        expect(Conversation.count).to eql(@old_count + 2)
+      end
+
       [nil, "", "0", "false", "no", "off", "wat"].each do |falsish|
         it "creates one conversation per recipient if group_conversation=#{falsish.inspect}" do
           @teacher.media_objects.where(media_id: "m-whatever", media_type: "video/mp4").first_or_create!
           post "create", params: { recipients: [@new_user1.id.to_s, @new_user2.id.to_s], body: "yo", group_conversation: falsish, media_comment_id: "m-whatever", media_comment_type: "video" }
 
           expect(InstStatsd::Statsd).to have_received(:count).with("inbox.conversation.created.legacy", 2)
+          expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.legacy")
           expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.legacy")
           expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.media.legacy", 2)
           expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.legacy", 2)
@@ -642,12 +665,12 @@ describe ConversationsController do
   end
 
   describe "POST 'update'" do
-    it "updates the conversation" do
+    it "updates the conversation to be archived and starred" do
       course_with_student_logged_in(active_all: true)
       conversation(num_other_users: 2).update_attribute(:workflow_state, "unread")
 
       allow(InstStatsd::Statsd).to receive(:increment)
-      post "update", params: { id: @conversation.conversation_id, conversation: { subscribed: "0", workflow_state: "archived", starred: "1" } }
+      post "update", params: { id: @conversation.conversation_id, conversation: { subscribed: "0", workflow_state: "archived", starred: true } }
 
       expect(response).to be_successful
       @conversation.reload
@@ -655,7 +678,62 @@ describe ConversationsController do
       expect(@conversation).to be_archived
       expect(@conversation.starred).to be_truthy
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.archived.legacy")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.starred.legacy")
       expect(InstStatsd::Statsd).not_to have_received(:increment).with("inbox.conversation.archived.react")
+    end
+
+    it "updates the conversation to be unstarred" do
+      course_with_student_logged_in(active_all: true)
+      conversation(num_other_users: 2).update(starred: true)
+
+      post "update", params: { id: @conversation.conversation_id, conversation: { starred: false } }
+      expect(response).to be_successful
+      @conversation.reload
+      expect(@conversation.starred).to be_falsey
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.unstarred.legacy")
+    end
+
+    it "updates the conversation to be unread" do
+      course_with_student_logged_in(active_all: true)
+      conversation(num_other_users: 2).update(workflow_state: "read")
+
+      post "update", params: { id: @conversation.conversation_id, conversation: { workflow_state: "unread" } }
+      expect(response).to be_successful
+      @conversation.reload
+      expect(@conversation.starred).to be_falsey
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.unread.legacy")
+    end
+  end
+
+  describe "PUT 'batch_update'" do
+    it "calls batch update with star event" do
+      course_with_student_logged_in(active_all: true)
+      conversation(num_other_users: 2).update_attribute(:workflow_state, "unread")
+
+      allow(InstStatsd::Statsd).to receive(:count)
+      put "batch_update", params: { conversation_ids: [@conversation.id], event: "star" }
+
+      expect(InstStatsd::Statsd).to have_received(:count).with("inbox.conversation.starred.legacy", 1).once
+    end
+
+    it "calls batch update with unstar event" do
+      course_with_student_logged_in(active_all: true)
+      conversation(num_other_users: 2).update_attribute(:workflow_state, "unread")
+
+      allow(InstStatsd::Statsd).to receive(:count)
+      put "batch_update", params: { conversation_ids: [@conversation.id], event: "unstar" }
+
+      expect(InstStatsd::Statsd).to have_received(:count).with("inbox.conversation.unstarred.legacy", 1).once
+    end
+
+    it "calls batch update with unread event" do
+      course_with_student_logged_in(active_all: true)
+      conversation(num_other_users: 2).update_attribute(:workflow_state, "read")
+
+      allow(InstStatsd::Statsd).to receive(:count)
+      put "batch_update", params: { conversation_ids: [@conversation.id], event: "mark_as_unread" }
+
+      expect(InstStatsd::Statsd).to have_received(:count).with("inbox.conversation.unread.legacy", 1).once
     end
   end
 
@@ -669,6 +747,7 @@ describe ConversationsController do
 
       post "add_message", params: { conversation_id: @conversation.conversation_id, body: "hello world" }
 
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.legacy")
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.isReply.legacy")
       expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.legacy", 0)
       expect(response).to be_successful

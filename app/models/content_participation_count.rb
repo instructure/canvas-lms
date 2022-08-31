@@ -48,7 +48,10 @@ class ContentParticipationCount < ActiveRecord::Base
 
         # if the participant was just created, the count will already be correct
         if opts[:offset].present? && !participant.new_record?
-          participant.unread_count = participant.unread_count(refresh: false) + opts[:offset]
+          current_unread_count = participant.unread_count(refresh: false)
+          unless current_unread_count == 0 && opts[:offset] == -1
+            participant.unread_count = current_unread_count + opts[:offset]
+          end
         end
         participant.save if participant.new_record? || participant.changed?
       end

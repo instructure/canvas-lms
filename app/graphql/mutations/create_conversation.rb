@@ -117,6 +117,12 @@ class Mutations::CreateConversation < Mutations::BaseMutation
         if message.has_media_objects || input[:media_comment_id]
           InstStatsd::Statsd.count("inbox.message.sent.media.react", conversations.count)
         end
+        if input[:user_note]
+          InstStatsd::Statsd.increment("inbox.conversation.sent.faculty_journal.react")
+        end
+        if input[:bulk_message]
+          InstStatsd::Statsd.increment("inbox.conversation.sent.individual_message_option.react")
+        end
         return { conversations: conversations }
       else
         conversation = @current_user.initiate_conversation(
@@ -140,6 +146,12 @@ class Mutations::CreateConversation < Mutations::BaseMutation
         end
         if context_type == "Account" || context_type.nil?
           InstStatsd::Statsd.increment("inbox.conversation.sent.account_context.react")
+        end
+        if input[:user_note]
+          InstStatsd::Statsd.increment("inbox.conversation.sent.faculty_journal.react")
+        end
+        if input[:bulk_message]
+          InstStatsd::Statsd.increment("inbox.conversation.sent.individual_message_option.react")
         end
         return { conversations: [conversation] }
       end

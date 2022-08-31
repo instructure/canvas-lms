@@ -22,6 +22,8 @@ import {render} from '@testing-library/react'
 import VideoOptionsTray from '..'
 import VideoOptionsTrayDriver from './VideoOptionsTrayDriver'
 
+jest.useFakeTimers()
+
 describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
   let props
   let tray

@@ -269,14 +269,16 @@ module Interfaces::SubmissionInterface
   def turnitin_data
     return nil if object.turnitin_data.empty?
 
-    promises = object.turnitin_data.except(:last_processed_attempt, :webhook_info).map do |asset_string, data|
+    promises = object.turnitin_data.except(:last_processed_attempt, :webhook_info, :eula_agreement_timestamp, :assignment_error, :provider).map do |asset_string, data|
       Loaders::AssetStringLoader.load(asset_string).then do |turnitin_context|
         next if turnitin_context.nil?
 
         {
           target: turnitin_context,
+          reportUrl: data[:report_url],
           score: data[:similarity_score],
-          status: data[:status]
+          status: data[:status],
+          state: data[:state]
         }
       end
     end
@@ -334,4 +336,9 @@ module Interfaces::SubmissionInterface
   field :resource_link_lookup_uuid, String, null: true
 
   field :extra_attempts, Integer, null: true
+
+  field :assigned_assessments, [Types::AssessmentRequestType], null: true
+  def assigned_assessments
+    load_association(:assigned_assessments)
+  end
 end

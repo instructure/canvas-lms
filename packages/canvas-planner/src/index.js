@@ -327,6 +327,11 @@ export function renderToDoSidebar(element) {
     throw new Error('initializePlanner must be called before renderToDoSidebar')
 
   const env = initializedOptions.env
+  const additionalTitleContext =
+    initializedOptions.env.FEATURES?.render_both_to_do_lists &&
+    initializedOptions.env.current_user_roles &&
+    initializedOptions.env.current_user_roles.includes('teacher') &&
+    initializedOptions.env.current_user_roles.includes('student')
 
   ReactDOM.render(
     <Provider store={store}>
@@ -336,6 +341,7 @@ export function renderToDoSidebar(element) {
           locale={env.MOMENT_LOCALE}
           changeDashboardView={initializedOptions.changeDashboardView}
           forCourse={initializedOptions.forCourse}
+          additionalTitleContext={additionalTitleContext}
         />
       </Suspense>
     </Provider>,

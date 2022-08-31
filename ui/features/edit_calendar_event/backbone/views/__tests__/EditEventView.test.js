@@ -174,16 +174,14 @@ describe('EditEventView', () => {
     it('is not shown when account level blackout dates are disabled', () => {
       window.ENV.FEATURES = {account_level_blackout_dates: false}
       render()
-      expect(
-        within(document.body).queryByText('Extend assignment due dates in course pacing')
-      ).toBeNull()
+      expect(within(document.body).queryByText('Add to Course Pacing blackout dates')).toBeNull()
     })
 
     it('is shown when account level blackout dates are enabled', () => {
       window.ENV.FEATURES = {account_level_blackout_dates: true}
-      render()
+      render({context_type: 'course', course_pacing_enabled: 'true'})
       expect(
-        within(document.body).getByLabelText('Extend assignment due dates in course pacing', {
+        within(document.body).getByLabelText('Add to Course Pacing blackout dates', {
           exact: false
         })
       ).toBeInTheDocument()

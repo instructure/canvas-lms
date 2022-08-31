@@ -150,6 +150,7 @@ export const ColorInput = ({
   return (
     <View as="div">
       <TextInput
+        data-testid={`icon-maker-color-input-${name}`}
         display="inline-block"
         name={name}
         onBlur={handleInputBlur}

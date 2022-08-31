@@ -17,19 +17,27 @@
  */
 
 import React from 'react'
-import {string, oneOfType, arrayOf, node, func} from 'prop-types'
+import {string, func} from 'prop-types'
 import {Link} from '@instructure/ui-link'
+import {Text} from '@instructure/ui-text'
 
-const NameLink = ({_id, htmlUrl, children, onClick}) => {
+const NameLink = ({_id, htmlUrl, name, pronouns, onClick}) => {
   const isCurrentUser = _id === ENV.current_user.id
+  const formatPronouns = pronounString => {
+    if (pronounString === null) return ''
+    return <Text fontStyle="italic" data-testid="user-pronouns">{` (${pronounString})`}</Text>
+  }
+
   return (
     <Link
       isWithinText={false}
       as="a"
       href={isCurrentUser ? htmlUrl : null}
       onClick={isCurrentUser ? null : () => onClick()}
+      margin="0 x-small 0 0"
     >
-      {children}
+      {name}
+      {formatPronouns(pronouns)}
     </Link>
   )
 }
@@ -37,12 +45,13 @@ const NameLink = ({_id, htmlUrl, children, onClick}) => {
 NameLink.propTypes = {
   _id: string.isRequired,
   htmlUrl: string.isRequired,
-  children: oneOfType([arrayOf(node), node]),
+  name: string.isRequired,
+  pronouns: string,
   onClick: func
 }
 
 NameLink.defaultProps = {
-  children: null,
+  pronouns: null,
   onClick: () => {}
 }
 

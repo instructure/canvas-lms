@@ -21,34 +21,43 @@ import gql from 'graphql-tag'
 export const ROSTER_QUERY = gql`
   query getRosterQuery($courseID: ID!) {
     course(id: $courseID) {
-      usersConnection {
-        edges {
-          node {
-            name
-            _id
+      usersConnection(
+        filter: {
+          enrollmentTypes: [
+            StudentEnrollment
+            TeacherEnrollment
+            TaEnrollment
+            DesignerEnrollment
+            ObserverEnrollment
+          ]
+        }
+      ) {
+        nodes {
+          name
+          _id
+          id
+          sisId
+          avatarUrl
+          pronouns
+          loginId
+          enrollments(courseId: $courseID, excludeConcluded: true) {
             id
-            sisId
-            avatarUrl
-            pronouns
-            loginId
-            enrollments(courseId: $courseID) {
+            type
+            state
+            lastActivityAt
+            htmlUrl
+            totalActivityTime
+            canBeRemoved
+            sisRole
+            associatedUser {
+              _id
               id
-              type
-              state
-              lastActivityAt
-              htmlUrl
-              totalActivityTime
-              canBeRemoved
-              associatedUser {
-                _id
-                id
-                name
-              }
-              section {
-                _id
-                id
-                name
-              }
+              name
+            }
+            section {
+              _id
+              id
+              name
             }
           }
         }

@@ -63,7 +63,7 @@ const AlignmentOutcomeItemList = ({rootGroup, loading, loadMore, scrollContainer
   if (loading) return renderSearchLoader()
 
   return (
-    <View as="div" minWidth="300px" data-testid="alignment-items-list-container">
+    <View as="div" minWidth="260px" data-testid="alignment-items-list-container">
       {hasOutcomes ? (
         <InfiniteScroll
           hasMore={hasMoreOutcomes}

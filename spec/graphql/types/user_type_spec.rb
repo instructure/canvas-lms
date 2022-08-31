@@ -283,6 +283,12 @@ describe Types::UserType do
         user_type.resolve(%|enrollments(courseId: "#{@course2.id}") { _id }|)
       ).to eq []
     end
+
+    it "excludes concluded enrollments when excludeConcluded is true" do
+      expect(user_type.resolve("enrollments(excludeConcluded: true) { _id }").length).to eq 1
+      @student.enrollments.update_all workflow_state: "completed"
+      expect(user_type.resolve("enrollments(excludeConcluded: true) { _id }")).to eq []
+    end
   end
 
   context "email" do
@@ -485,6 +491,7 @@ describe Types::UserType do
     end
 
     it "scopes the conversations" do
+      allow(InstStatsd::Statsd).to receive(:increment)
       conversation(@student, @teacher, { body: "You get that thing I sent ya?" })
       conversation(@teacher, @student, { body: "oh yea =)" })
       conversation(@student, @random_person, { body: "Whats up?", starred: true })
@@ -503,6 +510,13 @@ describe Types::UserType do
       )
       expect(result.count).to eq 1
       expect(result[0][0]).to eq "Whats up?"
+
+      type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
+      result = type.resolve(
+        "conversationsConnection(scope: \"unread\") { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }"
+      )
+      expect(result.flatten.count).to eq 2
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.unread.pages_loaded.react")
 
       type = GraphQLTypeTester.new(
         @random_person,

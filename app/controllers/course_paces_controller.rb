@@ -21,6 +21,7 @@ class CoursePacesController < ApplicationController
   before_action :load_context
   before_action :load_course
   before_action :load_blackout_dates, only: %i[index]
+  before_action :load_calendar_event_blackout_dates, only: %i[index]
   before_action :require_feature_flag
   before_action :authorize_action
   before_action :load_course_pace, only: %i[api_show publish update]
@@ -65,6 +66,7 @@ class CoursePacesController < ApplicationController
 
     js_env({
              BLACKOUT_DATES: @blackout_dates.as_json(include_root: false),
+             CALENDAR_EVENT_BLACKOUT_DATES: @calendar_event_blackout_dates.as_json(include_root: false),
              COURSE: course_json(@context, @current_user, session, [], nil),
              ENROLLMENTS: enrollments_json(@context),
              SECTIONS: sections_json(@context),
@@ -266,6 +268,12 @@ class CoursePacesController < ApplicationController
 
   def load_blackout_dates
     @blackout_dates = @context.respond_to?(:blackout_dates) ? @context.blackout_dates : []
+  end
+
+  def load_calendar_event_blackout_dates
+    account_codes = Account.multi_account_chain_ids([@context.account.id]).map { |id| "account_#{id}" }
+    context_codes = account_codes.append("course_#{@context.id}")
+    @calendar_event_blackout_dates = CalendarEvent.with_blackout_date.active.for_context_codes(context_codes)
   end
 
   def update_params

@@ -23,11 +23,13 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {IconInfoLine} from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
+import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('AlignmentSummary')
 
 const AlignmentStatItem = ({type, count, percent, average}) => {
+  const {isMobileView} = useCanvasContext()
   let statName, statDescription, statType
   if (type === 'outcome') {
     statName = I18n.t(
@@ -65,7 +67,12 @@ const AlignmentStatItem = ({type, count, percent, average}) => {
         </View>
       }
     >
-      <div style={{padding: '0 0 0.2rem 0.3rem'}}>
+      <div
+        style={{
+          fontSize: isMobileView ? '0.75rem' : '1rem',
+          padding: isMobileView ? '0 0 0.15rem 0.2rem' : '0 0 0.2rem 0.3rem'
+        }}
+      >
         <IconInfoLine tabIndex="0" data-testid="outcome-alignment-stat-info-icon" />
       </div>
     </Tooltip>
@@ -75,8 +82,9 @@ const AlignmentStatItem = ({type, count, percent, average}) => {
     <View
       as="span"
       display="inline-block"
-      width="28rem"
+      width={isMobileView ? '17rem' : '30rem'}
       padding="small"
+      margin="0 small 0 0"
       borderRadius="medium"
       background="primary"
       shadow="resting"
@@ -86,24 +94,34 @@ const AlignmentStatItem = ({type, count, percent, average}) => {
         <Flex.Item as="div">
           <Flex>
             <Flex.Item>
-              <Text size="large">{statName}</Text>
+              <Text size={isMobileView ? 'medium' : 'large'}>{statName}</Text>
             </Flex.Item>
             {type === 'artifact' && <Flex.Item>{renderTooltip()}</Flex.Item>}
           </Flex>
         </Flex.Item>
         <Flex.Item as="div">
-          <Text size="large" weight="bold">
-            {`${(percent * 100).toFixed()}%`}
-          </Text>
-          <View padding="0 small 0 xx-small">
-            <Text size="small">{statType}</Text>
-          </View>
-          <Text size="large" weight="bold">
-            {average.toFixed(1)}
-          </Text>
-          <View padding="0 small 0 xx-small">
-            <Text size="small">{statDescription}</Text>
-          </View>
+          <Flex
+            as="div"
+            direction={isMobileView ? 'column' : 'row'}
+            wrap={isMobileView ? 'no-wrap' : 'wrap'}
+          >
+            <Flex.Item as="div">
+              <Text size={isMobileView ? 'small' : 'large'} weight="bold">
+                {`${(percent * 100).toFixed()}%`}
+              </Text>
+              <View padding="0 small 0 xx-small">
+                <Text size={isMobileView ? 'small' : 'medium'}>{statType}</Text>
+              </View>
+            </Flex.Item>
+            <Flex.Item as="div">
+              <Text size={isMobileView ? 'small' : 'large'} weight="bold">
+                {average.toFixed(1)}
+              </Text>
+              <View padding="0 small 0 xx-small">
+                <Text size={isMobileView ? 'small' : 'medium'}>{statDescription}</Text>
+              </View>
+            </Flex.Item>
+          </Flex>
         </Flex.Item>
       </Flex>
     </View>

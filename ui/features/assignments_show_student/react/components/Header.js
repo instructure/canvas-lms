@@ -31,6 +31,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import LatePolicyToolTipContent from './LatePolicyStatusDisplay/LatePolicyToolTipContent'
 import {Popover} from '@instructure/ui-popover'
 import {arrayOf, func} from 'prop-types'
+import OriginalityReport from './OriginalityReport'
 import React from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import StudentViewContext from './Context'
@@ -187,7 +188,7 @@ class Header extends React.Component {
 
               return (
                 <div data-testid="unread_comments_badge">
-                  <Badge pulse margin="x-small" count={unreadCount} countUntil={100}>
+                  <Badge pulse={true} margin="x-small" count={unreadCount} countUntil={100}>
                     {button}
                   </Badge>
                 </div>
@@ -237,11 +238,11 @@ class Header extends React.Component {
           </Heading>
 
           <Flex as="div" margin="0" wrap="wrap" alignItems="start">
-            <Flex.Item shouldShrink>
+            <Flex.Item shouldShrink={true}>
               <AssignmentDetails assignment={this.props.assignment} />
             </Flex.Item>
             {this.props.submission && (
-              <Flex.Item shouldGrow>
+              <Flex.Item shouldGrow={true}>
                 <Flex as="div" justifyItems="end" alignItems="center">
                   <Flex.Item margin="0 x-small 0 0">
                     <SubmissionStatusPill
@@ -263,7 +264,7 @@ class Header extends React.Component {
             )}
           </Flex>
           <Flex alignItems="center" wrap="wrap">
-            <Flex.Item shouldGrow>
+            <Flex.Item shouldGrow={true}>
               {this.props.submission && !this.props.assignment.nonDigitalSubmission && (
                 <Flex wrap="wrap">
                   {this.props.allSubmissions && !this.isPeerReviewModeEnabled() && (
@@ -283,10 +284,22 @@ class Header extends React.Component {
                         <SubmissionWorkflowTracker submission={this.props.submission} />
                       </Flex.Item>
                     )}
+
+                  {this.props.assignment.env.currentUser &&
+                    !lockAssignment &&
+                    (this.props.submission.submissionType === 'online_text_entry' ||
+                      this.props.submission.attachments.length === 1) &&
+                    this.props.submission.turnitinData &&
+                    this.props.submission.turnitinData.length !== 0 &&
+                    this.props.assignment.env.originalityReportsForA2Enabled && (
+                      <Flex.Item>
+                        <OriginalityReport turnitinData={this.props.submission.turnitinData[0]} />
+                      </Flex.Item>
+                    )}
                 </Flex>
               )}
             </Flex.Item>
-            <Flex.Item shouldShrink>
+            <Flex.Item shouldShrink={true}>
               <Flex as="div" wrap="wrap">
                 {!this.isPeerReviewModeEnabled() &&
                   this.props.submission &&

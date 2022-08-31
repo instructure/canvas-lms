@@ -45,6 +45,11 @@ module Types
 
     field :mime_class, String, null: true
 
+    field :size, String, null: true
+    def size
+      ActiveSupport::NumberHelper.number_to_human_size(object.size)
+    end
+
     field :thumbnail_url, Types::UrlType, null: true
     def thumbnail_url
       return if object.locked_for?(current_user, check_policies: true)

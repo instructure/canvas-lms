@@ -2065,6 +2065,85 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe "master_template" do
+    let(:assignment_restrictions) do
+      {
+        content: false,
+        points: true,
+        due_dates: false,
+        availability_dates: true
+      }
+    end
+
+    let(:all_restrictions) do
+      {
+        settings: false,
+        state: true
+      }.merge(assignment_restrictions)
+    end
+
+    def expect_restrictions(restrictions)
+      expect_event("default_blueprint_restrictions_updated", {
+                     canvas_course_id: @course.id.to_s,
+                     canvas_course_uuid: @course.uuid,
+                     restrictions: restrictions
+                   }).once
+    end
+
+    before do
+      @course = course_model
+      @master_template = MasterCourses::MasterTemplate.create!(
+        course: @course,
+        default_restrictions: all_restrictions,
+        default_restrictions_by_type: { "Assignment" => assignment_restrictions }
+      )
+    end
+
+    context "triggers a default_blueprint_restrictions_updated live event" do
+      context("when use_default_restrictions_by_type is true") do
+        before do
+          @master_template.update_attribute(:use_default_restrictions_by_type, true)
+        end
+
+        it "and default_restrictions updated" do
+          expect_restrictions(assignment_restrictions)
+          @master_template.update_attribute(:default_restrictions, { content: true })
+        end
+
+        it "and default_restrictions_by_type updated" do
+          expect_restrictions({ content: true })
+          @master_template.update_attribute(:default_restrictions_by_type, { "Assignment" => { content: true } })
+        end
+
+        it "and use_default_restrictions_by_type updated to false" do
+          expect_restrictions(all_restrictions)
+          @master_template.update_attribute(:use_default_restrictions_by_type, false)
+        end
+      end
+
+      context("when use_default_restrictions_by_type is false") do
+        before do
+          @master_template.update_attribute(:use_default_restrictions_by_type, false)
+        end
+
+        it "and default_restrictions updated" do
+          expect_restrictions({ content: true })
+          @master_template.update_attribute(:default_restrictions, { content: true })
+        end
+
+        it "and default_restrictions_by_type updated" do
+          expect_restrictions(all_restrictions)
+          @master_template.update_attribute(:default_restrictions_by_type, { "Assignment" => { content: true } })
+        end
+
+        it "and use_default_restrictions_by_type updated to true" do
+          expect_restrictions(assignment_restrictions)
+          @master_template.update_attribute(:use_default_restrictions_by_type, true)
+        end
+      end
+    end
+  end
+
   describe "heartbeat" do
     context "when database region is not set (local/open source)" do
       it "sets region to not_configured" do

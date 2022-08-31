@@ -267,6 +267,7 @@ export default function GradeSelect(props) {
       }}
       interaction={readOnly ? 'disabled' : 'enabled'}
       inputValue={state.input}
+      data-testid="moderated-graded-select"
       onFocus={handleFocus}
       onBlur={handleBlur}
       onInputChange={handleInputChange}

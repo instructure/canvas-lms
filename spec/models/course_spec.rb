@@ -7131,4 +7131,270 @@ describe Course do
       end
     end
   end
+
+  describe "#instructors_in_charge_of" do
+    it "excludes section-limited instructors from Section A when the student is concluded in Section B" do
+      course = Course.create!
+      section1 = course.course_sections.create!(name: "Section 1")
+      section2 = course.course_sections.create!(name: "Section 2")
+      student = User.create!
+      student_enrollment = course.enroll_student(
+        student,
+        section: section1,
+        enrollment_state: "active"
+      )
+      limited_teacher = User.create!
+      course.enroll_teacher(
+        limited_teacher,
+        limit_privileges_to_course_section: true,
+        section: section2,
+        enrollment_state: "active"
+      )
+      student_enrollment.conclude
+      expect(course.instructors_in_charge_of(student.id)).not_to include limited_teacher
+    end
+  end
+
+  describe "statsd logging for course actions" do
+    context "timing when course is published" do
+      let(:publish_time) { 300_000 }
+
+      before :once do
+        Account.default.enable_feature!(:course_paces)
+      end
+
+      it "logs the timing of a course to statsd with course pacing enabled" do
+        allow(InstStatsd::Statsd).to receive(:timing)
+
+        Timecop.freeze(Time.utc(2022, 3, 1, 12, 0)) do
+          a_course = Course.create!
+          a_course.enable_course_paces = true
+          a_course.save!
+        end
+
+        new_course = Course.last
+
+        Timecop.freeze(Time.utc(2022, 3, 1, 12, 5)) do
+          new_course.offer!
+        end
+
+        expect(InstStatsd::Statsd).to have_received(:timing).with("course.paced.create_to_publish_time", publish_time).once
+      end
+
+      it "doesn't log timing if moving from concluded back to available in paced course" do
+        allow(InstStatsd::Statsd).to receive(:timing)
+
+        Timecop.freeze(Time.utc(2022, 3, 1, 12, 0)) do
+          a_course = Course.create!
+          a_course.update!(enable_course_paces: true, workflow_state: "completed")
+        end
+
+        new_course = Course.last
+
+        Timecop.freeze(Time.utc(2022, 3, 1, 12, 5)) do
+          new_course.offer!
+        end
+
+        expect(InstStatsd::Statsd).not_to have_received(:timing).with("course.paced.create_to_publish_time", publish_time)
+      end
+
+      it "log timing if moving publishing from claimed in paced course" do
+        allow(InstStatsd::Statsd).to receive(:timing)
+
+        Timecop.freeze(Time.utc(2022, 3, 1, 12, 0)) do
+          a_course = Course.create!
+          a_course.update!(enable_course_paces: true, workflow_state: "claimed")
+        end
+
+        new_course = Course.last
+
+        Timecop.freeze(Time.utc(2022, 3, 1, 12, 5)) do
+          new_course.offer!
+        end
+
+        expect(InstStatsd::Statsd).to have_received(:timing).with("course.paced.create_to_publish_time", publish_time).once
+      end
+
+      it "logs the timing of a course to statsd with course pacing not enabled" do
+        allow(InstStatsd::Statsd).to receive(:timing)
+
+        Timecop.freeze(Time.utc(2022, 3, 1, 12, 0)) do
+          Course.create!
+        end
+
+        new_course = Course.last
+
+        Timecop.freeze(Time.utc(2022, 3, 1, 12, 5)) do
+          new_course.offer!
+        end
+
+        expect(InstStatsd::Statsd).to have_received(:timing).with("course.unpaced.create_to_publish_time", publish_time).once
+      end
+
+      it "doesn't log timing if moving from concluded back to available in unpaced course" do
+        allow(InstStatsd::Statsd).to receive(:timing)
+
+        Timecop.freeze(Time.utc(2022, 3, 1, 12, 0)) do
+          a_course = Course.create!
+          a_course.update!(workflow_state: "completed")
+        end
+
+        new_course = Course.last
+
+        Timecop.freeze(Time.utc(2022, 3, 1, 12, 5)) do
+          new_course.offer!
+        end
+
+        expect(InstStatsd::Statsd).not_to have_received(:timing).with("course.unpaced.create_to_publish_time", publish_time)
+      end
+
+      it "log timing if moving publishing from claimed in unpaced course" do
+        allow(InstStatsd::Statsd).to receive(:timing)
+
+        Timecop.freeze(Time.utc(2022, 3, 1, 12, 0)) do
+          a_course = Course.create!
+          a_course.update!(workflow_state: "claimed")
+        end
+
+        new_course = Course.last
+
+        Timecop.freeze(Time.utc(2022, 3, 1, 12, 5)) do
+          new_course.offer!
+        end
+
+        expect(InstStatsd::Statsd).to have_received(:timing).with("course.unpaced.create_to_publish_time", publish_time).once
+      end
+    end
+
+    context "assignment count when course is published" do
+      before do
+        Account.default.enable_feature!(:course_paces)
+        allow(InstStatsd::Statsd).to receive(:count)
+        @course = Course.create!
+        create_assignments([@course.id], 2)
+      end
+
+      it "logs assignment count in the paced bucket if course pacing is enabled" do
+        @course.offer!
+        expect(InstStatsd::Statsd).to have_received(:count).with("course.unpaced.assignment_count", 2).once
+      end
+
+      it "only logs published assignments" do
+        @course.assignments.last.unpublish
+        @course.offer!
+        expect(InstStatsd::Statsd).to have_received(:count).with("course.unpaced.assignment_count", 1).once
+      end
+
+      it "logs assignment count in the unpaced bucket if course pacing is enabled" do
+        @course.enable_course_paces = true
+        @course.save!
+        @course.offer!
+        expect(InstStatsd::Statsd).to have_received(:count).with("course.paced.assignment_count", 2).once
+      end
+    end
+
+    context "end date stats on date change or publishing" do
+      it "increments and decrements on end date existence change" do
+        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+
+        Course.create!(restrict_enrollments_to_course_dates: true, conclude_at: Time.now, settings: { enable_course_paces: true }).offer!
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.has_end_date").once
+
+        Course.last.update! restrict_enrollments_to_course_dates: false
+        expect(InstStatsd::Statsd).to have_received(:decrement).with("course.paced.has_end_date").once
+      end
+
+      it "increments and decrements on pace status change" do
+        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+
+        Course.create!(restrict_enrollments_to_course_dates: true, conclude_at: Time.now).offer!
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.has_end_date").once
+
+        Course.last.update! settings: { enable_course_paces: true }
+        expect(InstStatsd::Statsd).to have_received(:decrement).with("course.unpaced.has_end_date").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.has_end_date").once
+      end
+
+      it "increments and decrements on pace status and end date existence concurrently" do
+        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+        Course.create!(restrict_enrollments_to_course_dates: true, conclude_at: Time.now).offer!
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.has_end_date").once
+
+        Course.last.update! restrict_enrollments_to_course_dates: false, settings: { enable_course_paces: true }
+        expect(InstStatsd::Statsd).to have_received(:decrement).with("course.unpaced.has_end_date").once
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.paced.has_end_date")
+
+        Course.last.update! restrict_enrollments_to_course_dates: true, settings: { enable_course_paces: false }
+        expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course.paced.has_end_date")
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.has_end_date").twice
+      end
+
+      it "ignores unpublished date having changes" do
+        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+        Course.create!(restrict_enrollments_to_course_dates: true, conclude_at: Time.now)
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.unpaced.has_end_date")
+        Course.last.update! settings: { enable_course_paces: true }
+        expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course.unpaced.has_end_date")
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.paced.has_end_date")
+      end
+    end
+
+    context "course with course pacing on or off" do
+      before do
+        Account.default.enable_feature!(:course_paces)
+        allow(InstStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:decrement)
+        @course = Course.create!
+      end
+
+      it "increments count for a course paced course when initially published" do
+        @course.enable_course_paces = true
+        @course.save!
+        @course.offer!
+
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.paced_courses").once
+        expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course.unpaced.paced_courses")
+      end
+
+      it "does not increment when only option is updated" do
+        @course.enable_course_paces = true
+        @course.save!
+
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.paced.paced_courses")
+      end
+
+      it "increments count for non-paced course when initially published" do
+        @course.offer!
+
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.paced_courses").once
+        expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course.paced.paced_courses")
+      end
+
+      it "increments paced count on already published course from when going from unpaced to paced" do
+        @course.offer!
+        @course.enable_course_paces = true
+        @course.save!
+
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.paced_courses").once
+        expect(InstStatsd::Statsd).to have_received(:decrement).with("course.unpaced.paced_courses").once
+      end
+
+      it "increments paced count on already published course from when going from paced to unpaced" do
+        @course.enable_course_paces = true
+        @course.save!
+        @course.offer!
+
+        @course.enable_course_paces = false
+        @course.save!
+
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.paced_courses").once
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.paced_courses").once
+        expect(InstStatsd::Statsd).to have_received(:decrement).with("course.paced.paced_courses").once
+      end
+    end
+  end
 end

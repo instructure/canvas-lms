@@ -22,10 +22,13 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
 import {ROSTER_QUERY} from '../../../graphql/Queries'
 import LoadingIndicator from '@canvas/loading-indicator'
-import {readableRoleName} from '@canvas/k5/react/utils'
 import AvatarLink from '../../components/AvatarLink/AvatarLink'
 import NameLink from '../../components/NameLink/NameLink'
+import StatusPill from '../../components/StatusPill/StatusPill'
 import RosterTableRowMenuButton from '../../components/RosterTableRowMenuButton/RosterTableRowMenuButton'
+import {secondsToStopwatchTime} from '../../../util/utils'
+import RosterTableLastActivity from '../../components/RosterTableLastActivity/RosterTableLastActivity'
+import RosterTableRoles from '../../components/RosterTableRoles/RosterTableRoles'
 
 const I18n = useI18nScope('course_people')
 
@@ -46,29 +49,15 @@ const RosterTable = () => {
 
   if (loading) return <LoadingIndicator />
 
-  const tableRows = data.course.usersConnection.edges.map(edge => {
-    const {name, _id, sisId, enrollments, loginId, avatarUrl} = edge.node
-    const {totalActivityTime, htmlUrl} = enrollments[0]
+  const {view_user_logins, read_sis} = ENV?.permissions || {}
+
+  const tableRows = data.course.usersConnection.nodes.map(node => {
+    const {name, _id, sisId, enrollments, loginId, avatarUrl, pronouns} = node
+    const {totalActivityTime, htmlUrl, state} = enrollments[0]
 
     const sectionNames = enrollments.map(enrollment => {
       if (enrollment.type === OBSERVER_ENROLLMENT) return null
       return <div key={`section-${enrollment.id}`}>{enrollment.section.name}</div>
-    })
-
-    const enrollmentRoles = enrollments.map(enrollment => {
-      if (enrollment.type === OBSERVER_ENROLLMENT) {
-        return enrollment.associatedUser ? (
-          <div key={`role-${enrollment.associatedUser.id}`}>
-            {I18n.t('Observing: %{user_name}', {user_name: enrollment.associatedUser.name})}
-          </div>
-        ) : null
-      }
-      return <div key={`role-${enrollment.id}`}>{readableRoleName(enrollment.type)}</div>
-    })
-
-    const lastActivityAt = enrollments.map(enrollment => {
-      if (enrollment.type === OBSERVER_ENROLLMENT) return null
-      return <div key={`last-activity-${enrollment.id}`}>{enrollment.lastActivityAt}</div>
     })
 
     return (
@@ -76,17 +65,22 @@ const RosterTable = () => {
         <Table.Cell>
           <AvatarLink avatarUrl={avatarUrl} name={name} href={htmlUrl} />
         </Table.Cell>
-        <Table.Cell>
-          <NameLink _id={_id} htmlUrl={htmlUrl}>
-            {name}
-          </NameLink>
+        <Table.Cell data-testid="roster-table-name-cell">
+          <NameLink _id={_id} htmlUrl={htmlUrl} pronouns={pronouns} name={name} />
+          <StatusPill state={state} />
         </Table.Cell>
-        <Table.Cell>{loginId}</Table.Cell>
-        <Table.Cell>{sisId}</Table.Cell>
+        {view_user_logins && <Table.Cell>{loginId}</Table.Cell>}
+        {read_sis && <Table.Cell>{sisId}</Table.Cell>}
         <Table.Cell>{sectionNames}</Table.Cell>
-        <Table.Cell>{enrollmentRoles}</Table.Cell>
-        <Table.Cell>{lastActivityAt}</Table.Cell>
-        <Table.Cell>{totalActivityTime}</Table.Cell>
+        <Table.Cell>
+          <RosterTableRoles enrollments={enrollments} />
+        </Table.Cell>
+        <Table.Cell>
+          <RosterTableLastActivity enrollments={enrollments} />
+        </Table.Cell>
+        <Table.Cell>
+          {totalActivityTime ? secondsToStopwatchTime(totalActivityTime) : null}
+        </Table.Cell>
         <Table.Cell>
           <RosterTableRowMenuButton name={name} />
         </Table.Cell>
@@ -100,8 +94,14 @@ const RosterTable = () => {
         <Table.Row>
           <Table.ColHeader {...idProps('colheader-avatar')}>{}</Table.ColHeader>
           <Table.ColHeader {...idProps('colheader-name')}>{I18n.t('Name')}</Table.ColHeader>
-          <Table.ColHeader {...idProps('colheader-login-id')}>{I18n.t('Login ID')}</Table.ColHeader>
-          <Table.ColHeader {...idProps('colheader-sis-id')}>{I18n.t('SIS ID')}</Table.ColHeader>
+          {view_user_logins && (
+            <Table.ColHeader {...idProps('colheader-login-id')}>
+              {I18n.t('Login ID')}
+            </Table.ColHeader>
+          )}
+          {read_sis && (
+            <Table.ColHeader {...idProps('colheader-sis-id')}>{I18n.t('SIS ID')}</Table.ColHeader>
+          )}
           <Table.ColHeader {...idProps('colheader-section')}>{I18n.t('Section')}</Table.ColHeader>
           <Table.ColHeader {...idProps('colheader-role')}>{I18n.t('Role')}</Table.ColHeader>
           <Table.ColHeader {...idProps('colheader-last-activity')}>

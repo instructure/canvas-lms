@@ -19,7 +19,7 @@
 import React from 'react'
 import {act, fireEvent, render} from '@testing-library/react'
 import keycode from 'keycode'
-import {eventFormProps, conference} from './mocks'
+import {eventFormProps, conference, userContext, courseContext, accountContext} from './mocks'
 import CalendarEventDetailsForm from '../CalendarEventDetailsForm'
 
 let defaultProps = eventFormProps()
@@ -66,6 +66,22 @@ const testTimezone = (timezone, inputDate, expectedDate, halfHours) => {
   )
 }
 
+const testBlackoutDateSuccess = () => {
+  const component = render(<CalendarEventDetailsForm {...defaultProps} />)
+
+  select(component, 'checkbox', 'Add to Course Pacing blackout dates')
+  select(component, 'button', 'Submit')
+  expect(defaultProps.event.save).toHaveBeenCalledWith(
+    expect.objectContaining({
+      'calendar_event[blackout_date]': true
+    }),
+    expect.anything(),
+    expect.anything()
+  )
+  defaultProps.event.contextInfo = userContext
+  defaultProps.event.blackout_date = false
+}
+
 describe('CalendarEventDetailsForm', () => {
   beforeEach(() => {
     defaultProps = eventFormProps()
@@ -110,7 +126,8 @@ describe('CalendarEventDetailsForm', () => {
         'calendar_event[location_name]': 'The Zoo',
         'calendar_event[web_conference]': '',
         'calendar_event[context_code]': 'course_1',
-        'calendar_event[important_dates]': false
+        'calendar_event[important_dates]': false,
+        'calendar_event[blackout_date]': false
       }),
       expect.anything(),
       expect.anything()
@@ -277,5 +294,35 @@ describe('CalendarEventDetailsForm', () => {
       expect.anything(),
       expect.anything()
     )
+    defaultProps.event.contextInfo.k5_course = false
   })
+
+  it('can create a blackout date event for a course with course pacing enabled', async () => {
+    ENV.FEATURES.account_level_blackout_dates = true
+    defaultProps.event.contextInfo = courseContext
+    testBlackoutDateSuccess()
+  })
+
+  it('can create a blackout date event for an account with course pacing enabled', async () => {
+    ENV.FEATURES.account_level_blackout_dates = true
+    ENV.FEATURES.account_calendar_events = true
+    defaultProps.event.contextInfo = accountContext
+    testBlackoutDateSuccess()
+  })
+
+  it('does not render blackout checkbox when the feature flag is off', async () => {
+    ENV.FEATURES.account_level_blackout_dates = false
+    defaultProps.event.contextInfo = courseContext
+    const component = render(<CalendarEventDetailsForm {...defaultProps} />)
+
+    expect(component.queryByRole('checkbox', {name: 'Add to Course Pacing blackout dates'})).not.toBeInTheDocument()
+    defaultProps.event.contextInfo = userContext
+  })
+
+  it('does not render blackout checkbox in a user context', async () => {
+    const component = render(<CalendarEventDetailsForm {...defaultProps} />)
+
+    expect(component.queryByRole('checkbox', {name: 'Add to Course Pacing blackout dates'})).not.toBeInTheDocument()
+  })
+
 })

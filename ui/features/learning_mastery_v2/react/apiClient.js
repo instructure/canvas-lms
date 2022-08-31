@@ -17,14 +17,15 @@
  */
 import axios from '@canvas/axios'
 
-export const loadRollups = (courseId, page = 1) => {
+export const loadRollups = (courseId, needDefaults = false, page = 1) => {
   const params = {
     params: {
       rating_percents: true,
       per_page: 20,
       include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
       sort_by: 'student',
-      page
+      page,
+      ...(needDefaults && {add_defaults: true})
     }
   }
   return axios.get(`/api/v1/courses/${courseId}/outcome_rollups`, params)

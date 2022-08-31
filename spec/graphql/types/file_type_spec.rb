@@ -29,8 +29,12 @@ describe Types::FileType do
   let_once(:file) { attachment_with_context(course) }
   let(:file_type) { GraphQLTypeTester.new(file, current_user: @teacher) }
 
-  it "works" do
+  it "has display name" do
     expect(file_type.resolve("displayName")).to eq file.display_name
+  end
+
+  it "has the file's size" do
+    expect(file_type.resolve("size")).to eq "100 Bytes"
   end
 
   it "has modules" do

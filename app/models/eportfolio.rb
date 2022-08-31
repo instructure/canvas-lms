@@ -102,12 +102,13 @@ class Eportfolio < ActiveRecord::Base
     can :read
 
     # The eportfolio is private and the user has access to the private link
-    # (we know this by way of the session having the eportfolio id) and the
-    # eportfolio hasn't been flagged or marked as spam.
+    # (we know this by way of the session having the eportfolio id), the
+    # eportfolio hasn't been flagged or marked as spam, and eportfolios are
+    # enabled for the author in the context.
     given do |_, session|
       active? && session && session[:eportfolio_ids] &&
         session[:eportfolio_ids].include?(id) &&
-        !spam?
+        !spam? && self.user.eportfolios_enabled?
     end
     can :read
 

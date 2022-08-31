@@ -4,6 +4,9 @@
     "BuilderMethodWithSideEffects": {
       "enabled": false
     },
+    "CatchException": {
+      "enabled": false
+    },
     "ClassJavadoc": {
       "enabled": false
     },
@@ -11,6 +14,9 @@
       "enabled": false
     },
     "CouldBeSwitchStatement": {
+      "enabled": false
+    },
+    "DuplicateMapLiteral": {
       "enabled": false
     },
     "DuplicateNumberLiteral": {

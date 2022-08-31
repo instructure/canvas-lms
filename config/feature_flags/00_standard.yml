@@ -130,12 +130,6 @@ epub_export:
   description: This enables users to generate and download course ePub.
   applies_to: Course
   root_opt_in: true
-feature_flag_filters:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Flags tab updates
-  description: This flag updates the title of the feature flags tab to "Feature Options" and adds
-    a "Feature Preview" pill for feature preview projects.
 featured_help_links:
   state: hidden
   applies_to: SiteAdmin

@@ -139,7 +139,12 @@ export default class EditView extends ValidatedFormView
     if returnToHelper.isValid(params['return_to'])
       params['return_to']
     else
-      @model.get 'html_url'
+      url = new URL(window.location.href)
+      searchParams = new URLSearchParams(url.search)
+      if searchParams.get('embed') == 'true'
+        (@model.get 'html_url') + "?embed=true"
+      else
+        @model.get 'html_url'
 
   redirectAfterCancel: ->
     location = @locationAfterCancel(deparam())

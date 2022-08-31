@@ -133,10 +133,9 @@ describe('Assignment Student Content View', () => {
       expect(queryByRole('button', {name: 'Mark as done'})).not.toBeInTheDocument()
     })
 
-    it.skip('renders the rubric if the assignment has one', async () => {
-      // unskip in EVAL-1679
-      window.ENV.ASSIGNMENT_ID = 1
-      window.ENV.COURSE_ID = 1
+    it('renders the rubric if the assignment has one', async () => {
+      window.ENV.ASSIGNMENT_ID = '1'
+      window.ENV.COURSE_ID = '1'
       props.assignment.rubric = {}
 
       const variables = {

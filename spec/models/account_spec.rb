@@ -1212,21 +1212,43 @@ describe Account do
     end
 
     it "uses :manage_assignments to determine question bank tab visibility" do
-      account_admin_user_with_role_changes(acccount: @account, role_changes: { manage_assignments: true, manage_grades: false })
+      account_admin_user_with_role_changes(account: @account, role_changes: { manage_assignments: true, manage_grades: false })
       tabs = @account.tabs_available(@admin)
       expect(tabs.pluck(:id)).to be_include(Account::TAB_QUESTION_BANKS)
+    end
+
+    describe "account calendars tab" do
+      before :once do
+        Account.site_admin.enable_feature! :account_calendar_events
+      end
+
+      it "is shown if the user has manage_account_calendar_visibility permission" do
+        account_admin_user_with_role_changes(account: @account)
+        expect(@account.tabs_available(@admin).pluck(:id)).to include(Account::TAB_ACCOUNT_CALENDARS)
+      end
+
+      it "is not shown if the user lacks manage_account_calendar_visibility permission" do
+        account_admin_user_with_role_changes(account: @account, role_changes: { manage_account_calendar_visibility: false })
+        expect(@account.tabs_available(@admin).pluck(:id)).not_to include(Account::TAB_ACCOUNT_CALENDARS)
+      end
+
+      it "is not shown if the :account_calendar_events flag is disabled" do
+        Account.site_admin.disable_feature! :account_calendar_events
+        account_admin_user_with_role_changes(account: @account)
+        expect(@account.tabs_available(@admin).pluck(:id)).not_to include(Account::TAB_ACCOUNT_CALENDARS)
+      end
     end
 
     describe "'ePortfolio Moderation' tab" do
       let(:tab_ids) { @account.tabs_available(@admin).pluck(:id) }
 
       it "is shown if the user has the moderate_user_content permission" do
-        account_admin_user_with_role_changes(acccount: @account, role_changes: { moderate_user_content: true })
+        account_admin_user_with_role_changes(account: @account, role_changes: { moderate_user_content: true })
         expect(tab_ids).to include(Account::TAB_EPORTFOLIO_MODERATION)
       end
 
       it "is not shown if the user lacks the moderate_user_content permission" do
-        account_admin_user_with_role_changes(acccount: @account, role_changes: { moderate_user_content: false })
+        account_admin_user_with_role_changes(account: @account, role_changes: { moderate_user_content: false })
         expect(tab_ids).not_to include(Account::TAB_EPORTFOLIO_MODERATION)
       end
     end
@@ -1235,12 +1257,12 @@ describe Account do
       let(:tab_ids) { @account.tabs_available(@admin).pluck(:id) }
 
       it "returns the rubrics tab for admins by default" do
-        account_admin_user(acccount: @account)
+        account_admin_user(account: @account)
         expect(tab_ids).to include(Account::TAB_RUBRICS)
       end
 
       it "the rubrics tab is not shown if the user lacks permission (manage_rubrics)" do
-        account_admin_user_with_role_changes(acccount: @account, role_changes: { manage_rubrics: false })
+        account_admin_user_with_role_changes(account: @account, role_changes: { manage_rubrics: false })
         expect(tab_ids).not_to include(Account::TAB_RUBRICS)
       end
     end

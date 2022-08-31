@@ -202,6 +202,8 @@ class ApplicationController < ActionController::Base
         @js_env = {
           ASSET_HOST: Canvas::Cdn.config.host,
           active_brand_config_json_url: active_brand_config_url("json"),
+          active_brand_config: active_brand_config.as_json(include_root: false),
+          confetti_branding_enabled: Account.site_admin.feature_enabled?(:confetti_branding),
           url_to_what_gets_loaded_inside_the_tinymce_editor_css: editor_css,
           url_for_high_contrast_tinymce_editor_css: editor_hc_css,
           current_user_id: @current_user&.id,
@@ -313,9 +315,9 @@ class ApplicationController < ActionController::Base
   # put feature checks on Account.site_admin and @domain_root_account that we're loading for every page in here
   # so altogether we can get them faster the vast majority of the time
   JS_ENV_SITE_ADMIN_FEATURES = %i[
-    featured_help_links feature_flag_filters conferencing_in_planner word_count_in_speed_grader observer_picker
+    featured_help_links word_count_in_speed_grader observer_picker
     lti_platform_storage scale_equation_images new_equation_editor buttons_and_icons_cropper course_paces_for_sections
-    calendar_series account_level_blackout_dates account_calendar_events rce_ux_improvements
+    calendar_series account_level_blackout_dates account_calendar_events rce_ux_improvements render_both_to_do_lists
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = %i[
     product_tours files_dnd usage_rights_discussion_topics

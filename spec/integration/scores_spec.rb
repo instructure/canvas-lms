@@ -119,6 +119,7 @@ module Lti::IMS
           # get params sent to instfs for easier mocking of the instfs return request
           expect(CanvasHttp).to receive(:post) do |*args|
             upload_url, upload_params, _ = args
+            double(class: Net::HTTPCreated, code: 201, body: {})
           end
           post("/api/lti/courses/#{context.id}/line_items/#{line_item_id}/scores", params: line_item_params.to_json, headers: headers)
           # instfs return url posting

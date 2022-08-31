@@ -67,26 +67,6 @@ grade_calc_ignore_unposted_anonymous:
       state: on # enable for local development
     test:
       state: on # enable for the deployed 'test' environment
-use_cloudfront_for_docviewer:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Use CloudFront for DocViewer
-  description: Request that DocViewer use CloudFront for serving pdf assets.
-gradebook_csv_export_order_matches_gradebook_grid:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Gradebook CSV Export Assignment Order Matches the Gradebook Grid
-  description: If set, the order of assignments in Gradebook CSV exports will
-    match the order in the Gradebook grid.
-  environments:
-    ci:
-      state: on # enable for automated testings builds and local testing
-edit_submission_status_from_speedgrader:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Edit Submission Status from Speedgrader
-  description: If set, allows submission status to be changed from inside of
-    Speedgrader
 enhanced_gradebook_filters:
   beta: true
   state: allowed
@@ -100,11 +80,6 @@ enhanced_gradebook_filters:
       this flag is enabled, early access to ongoing improvements will be displayed
       automatically with every release. For full details, please see the *Gradebook
       Filters User Group* in the Canvas Community.
-remove_gradebook_student_search_delay:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Remove Delay for Gradebook Student Search
-  description: If set, removes the delay that normally occurs when searching for students.
 message_observers_of_students_who:
   state: hidden
   applies_to: SiteAdmin
@@ -168,18 +143,15 @@ peer_reviews_for_a2:
   display_name: Peer Review Support in Assignment Enhancements
   description: Students will be able to provide feedback on another student's assignment submission
     using the enhanced assignment view
-prioritize_individual_overrides:
+originality_reports_for_a2:
   state: hidden
   applies_to: SiteAdmin
-  display_name: Prioritize Individual Overrides
-  description: If multiple due date overrides apply to a student on a given assignment
-    and one of those overrides is an individual override, always use the date from the
-    individual override. Previous behavior was to always choose the date from the override
-    that granted the student the most amount of time to submit.
+  display_name: Originality Reports with Assignment Enhancements
+  description: If set, displays originality reports with Assignment Enhancements turned on
   environments:
     ci:
-      state: allowed_on # enable for automated testing builds and local testing
+      state: on # enable for automated testings builds and local testing
     development:
-      state: allowed_on # enable for local development
+      state: on # enable for local development
     test:
-      state: allowed_on # enable for the deployed 'test' environment
+      state: on # enable for the deployed 'test' environment

@@ -133,7 +133,7 @@ class AccountCalendarsApiController < ApplicationController
   def update
     account = api_find(Account.active, params[:account_id])
     return unless authorized_action(account, @current_user, :manage_account_calendar_visibility)
-    return render json: { errors: "Missing param: `visible`" }, status: :bad_request if params[:visible].nil?
+    return render json: { errors: t("Missing param: `%{param}`", { param: "visible" }) }, status: :bad_request if params[:visible].nil?
 
     account.account_calendar_visible = value_to_boolean(params[:visible])
     account.save!
@@ -161,8 +161,8 @@ class AccountCalendarsApiController < ApplicationController
     return unless authorized_action(account, @current_user, :manage_account_calendar_visibility)
 
     data = params.permit(_json: [:id, :visible]).to_h[:_json]
-    return render json: { errors: "Expected array of objects" }, status: :bad_request unless data.is_a?(Array) && !data.empty?
-    return render json: { errors: "Missing key(s)" }, status: :bad_request unless data.all? { |c| c.key?("id") && c.key?("visible") }
+    return render json: { errors: t("Expected array of objects") }, status: :bad_request unless data.is_a?(Array) && !data.empty?
+    return render json: { errors: t("Missing key(s)") }, status: :bad_request unless data.all? { |c| c.key?("id") && c.key?("visible") }
 
     account_ids = data.map { |c| c["id"].to_i }
     allowed_account_ids = [account.id] + Account.sub_account_ids_recursive(account.id)
@@ -170,11 +170,11 @@ class AccountCalendarsApiController < ApplicationController
 
     account_ids_to_enable = data.select { |c| value_to_boolean(c["visible"]) }.map { |c| c["id"] }
     account_ids_to_disable = data.reject { |c| value_to_boolean(c["visible"]) }.map { |c| c["id"] }
-    return render json: { errors: "Unexpected value" }, status: :bad_request unless account_ids_to_enable.length + account_ids_to_disable.length == data.length && account_ids_to_enable.intersection(account_ids_to_disable).empty?
+    return render json: { errors: t("Unexpected value") }, status: :bad_request unless account_ids_to_enable.length + account_ids_to_disable.length == data.length && account_ids_to_enable.intersection(account_ids_to_disable).empty?
 
     updated_accounts = Account.active.where(id: account_ids_to_enable).update_all(account_calendar_visible: true)
     updated_accounts += Account.active.where(id: account_ids_to_disable).update_all(account_calendar_visible: false)
-    render json: { message: "Updated #{updated_accounts} accounts" }
+    render json: { message: t({ one: "Updated 1 account", other: "Updated %{count} accounts" }, { count: updated_accounts }) }
   end
 
   # @API List all account calendars
@@ -185,7 +185,12 @@ class AccountCalendarsApiController < ApplicationController
   #
   # @argument search_term [Optional, String]
   #   When included, searches all descendent accounts of provided account for the
-  #   term. Returns matching results. Term must be at least 2 characters.
+  #   term. Returns matching results. Term must be at least 2 characters. Can be
+  #   combined with a filter value.
+  #
+  # @argument filter [Optional, String, "visible"|"hidden"]
+  #   When included, only returns calendars that are either visible or hidden. Can
+  #   be combined with a search term.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/accounts/1/account_calendars \
@@ -198,15 +203,44 @@ class AccountCalendarsApiController < ApplicationController
       search_term = params[:search_term]
       return unless authorized_action(account, @current_user, :manage_account_calendar_visibility)
 
-      accounts = if search_term.present?
+      filter = params[:filter]
+      if filter.present? && !%w[visible hidden].include?(filter)
+        return render json: { errors: t("Expected %{filter} param to be one of: %{visible}, %{hidden}", filter: "filter", visible: "visible", hidden: "hidden") }, status: :bad_request
+      end
+
+      accounts = if search_term.present? || filter.present?
+                   # search all descendants of account
                    searchable_account_ids = [account.id] + Account.sub_account_ids_recursive(account.id)
-                   Account.search_by_attribute(Account.active.where(id: searchable_account_ids), :name, params[:search_term]).order(Account.best_unicode_collation_key("name"), :id)
+                   scope = Account.active.where(id: searchable_account_ids)
+                   scope = scope.where(account_calendar_visible: filter == "visible") if filter.present?
+                   scope = Account.search_by_attribute(scope, :name, params[:search_term]) if search_term.present?
+                   scope.order(Account.best_unicode_collation_key("name"), :id)
                  else
+                   # include only first-level sub-accounts of account
                    [account] + account.sub_accounts.order(Account.best_unicode_collation_key("name"), :id)
                  end
 
       paginated_accounts = Api.paginate(accounts, self, api_v1_all_account_calendars_url)
       render json: account_calendars_json(paginated_accounts, @current_user, session, include: ["sub_account_count"])
+    end
+  end
+
+  # @API Count of all visible account calendars
+  #
+  # Returns the number of visible account calendars.
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/accounts/1/visible_calendars_count \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @returns { "count": "integer" }
+  def visible_calendars_count
+    GuardRail.activate(:secondary) do
+      account = api_find(Account.active, params[:account_id])
+      return unless authorized_action(account, @current_user, :manage_account_calendar_visibility)
+
+      count = Account.active.where(id: [account.id] + Account.sub_account_ids_recursive(account.id)).where(account_calendar_visible: true).count
+      render json: { count: count }
     end
   end
 

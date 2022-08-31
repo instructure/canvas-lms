@@ -293,7 +293,7 @@ require "csv"
 #     }
 
 class AccountsController < ApplicationController
-  before_action :require_user, only: %i[index help_links manually_created_courses_account]
+  before_action :require_user, only: %i[index help_links manually_created_courses_account account_calendar_settings]
   before_action :reject_student_view_student
   before_action :get_context
   before_action :rce_js_env, only: [:settings]
@@ -1712,6 +1712,19 @@ class AccountsController < ApplicationController
     return unless value_to_boolean(params.dig(:account, :settings, :force_default_dashboard_view))
 
     @account.update_user_dashboards
+  end
+
+  def account_calendar_settings
+    return unless authorized_action(@account, @current_user, :manage_account_calendar_visibility)
+
+    title = t("Account Calendars")
+    @page_title = title
+    add_crumb(title)
+    set_active_tab "account_calendars"
+    js_env ACCOUNT_ID: @account.id
+    css_bundle :account_calendar_settings
+    js_bundle :account_calendar_settings
+    render html: '<div id="account-calendar-settings-container"></div>'.html_safe, layout: true
   end
 
   def format_avatar_count(count = 0)

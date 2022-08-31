@@ -30,7 +30,7 @@ describe CoursePace do
     @assignment = @course.assignments.create!
     @course_section = @course.course_sections.first
     @tag = @assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
-    @course_pace = @course.course_paces.create! workflow_state: "active"
+    @course_pace = @course.course_paces.create! workflow_state: "active", published_at: Time.zone.now
     @course_pace_module_item = @course_pace.course_pace_module_items.create! module_item: @tag
     @unpublished_assignment = @course.assignments.create! workflow_state: "unpublished"
     @unpublished_tag = @unpublished_assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module", workflow_state: "unpublished"
@@ -513,6 +513,158 @@ describe CoursePace do
       result = @course_pace.effective_end_date(with_context: true)
       expect(result[:end_date]).to be_nil
       expect(result[:end_date_context]).to eq("hypothetical")
+    end
+  end
+
+  context "course pace creates" do
+    before :once do
+      course_with_student active_all: true
+      @course.root_account.enable_feature!(:course_paces)
+      @course.enable_course_paces = true
+      @course.save!
+      @module = @course.context_modules.create!
+      @assignment = @course.assignments.create!
+      @tag = @assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
+    end
+
+    it "writes the number of course-type course paces to statsd" do
+      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      @course_pace = @course.course_paces.create! workflow_state: "active"
+      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.course_paces.count").once
+    end
+
+    it "writes the number of section-type course paces to statsd" do
+      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      @new_section = @course.course_sections.create! name: "new_section"
+      @section_plan = @course.course_paces.create! course_section: @new_section
+      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.section_paces.count").once
+    end
+
+    it "writes the number of user-type course paces to statsd" do
+      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      @course.course_paces.create!(user: @student, workflow_state: "active")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.user_paces.count").once
+    end
+  end
+
+  context "course pace publish logs statsd for various values" do
+    before :once do
+      course_with_student active_all: true
+      @course.root_account.enable_feature!(:course_paces)
+      @course.enable_course_paces = true
+      @course.save!
+      @module = @course.context_modules.create!
+      @assignment = @course.assignments.create!
+      @tag = @assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
+    end
+
+    it "increments on initial publish when exclude_weekends set to true" do
+      allow(InstStatsd::Statsd).to receive(:increment)
+
+      @course_pace = @course.course_paces.create!(workflow_state: "active")
+
+      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+    end
+
+    it "does not decrement on initial publish when exclude_weekends set to false" do
+      allow(InstStatsd::Statsd).to receive(:decrement)
+
+      @course_pace = @course.course_paces.create!(workflow_state: "active", exclude_weekends: false)
+
+      expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course_pacing.weekends_excluded")
+    end
+
+    it "increments on subsequent publish when exclude_weekends initially false then set to true" do
+      allow(InstStatsd::Statsd).to receive(:increment)
+      allow(InstStatsd::Statsd).to receive(:decrement)
+
+      @course_pace = @course.course_paces.create!(workflow_state: "active", exclude_weekends: false)
+      @course_pace.update!(exclude_weekends: true)
+      @course_pace.publish
+
+      expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course_pacing.weekends_excluded")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+    end
+
+    it "decrements on subsequent publish when exclude_weekends initially true then set to false" do
+      allow(InstStatsd::Statsd).to receive(:increment)
+      allow(InstStatsd::Statsd).to receive(:decrement)
+
+      @course_pace = @course.course_paces.create!(workflow_state: "active")
+      @course_pace.update!(exclude_weekends: false)
+      @course_pace.publish
+
+      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.weekends_excluded")
+      expect(InstStatsd::Statsd).to have_received(:decrement).with("course_pacing.weekends_excluded")
+    end
+
+    it "logs the average module item duration as a count" do
+      allow(InstStatsd::Statsd).to receive(:count)
+
+      course_pace = @course.course_paces.create!(workflow_state: "active")
+      course_pace_module_item = course_pace.course_pace_module_items.create! module_item: @tag
+      course_pace_module_item.update duration: 2
+      course_pace.publish
+
+      expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.average_assignment_duration", 2)
+    end
+
+    it "logs updated average module item duration as a count when new assignment added" do
+      allow(InstStatsd::Statsd).to receive(:count)
+
+      course_pace = @course.course_paces.create!(workflow_state: "active")
+      course_pace_module_item = course_pace.course_pace_module_items.create! module_item: @tag
+      course_pace_module_item.update duration: 2
+      course_pace.publish
+
+      assignment = @course.assignments.create!
+      new_tag = assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
+
+      new_course_pace_module_item = course_pace.course_pace_module_items.create! module_item: new_tag
+      new_course_pace_module_item.update duration: 4
+      course_pace.publish
+
+      expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.average_assignment_duration", 3)
+    end
+
+    it "doesn't log when no context modules exist" do
+      allow(InstStatsd::Statsd).to receive(:count)
+
+      course_pace = @course.course_paces.create!(workflow_state: "active")
+      course_pace.publish
+
+      expect(InstStatsd::Statsd).not_to have_received(:count).with("course_pacing.average_assignment_duration", 0)
+    end
+
+    it "logs when no context modules item duration is o" do
+      allow(InstStatsd::Statsd).to receive(:count)
+
+      course_pace = @course.course_paces.create!(workflow_state: "active")
+      course_pace_module_item = course_pace.course_pace_module_items.create! module_item: @tag
+      course_pace_module_item.update duration: 0
+      course_pace.publish
+
+      expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.average_assignment_duration", 0)
+    end
+  end
+
+  describe "log_module_items_count" do
+    before do
+      rubric = @course.rubrics.create!(title: "rubric")
+      @course.context_module_tags.create!(content: rubric, context_module: @module, context: @course, workflow_state: "active")
+      allow(InstStatsd::Statsd).to receive(:count)
+    end
+
+    it "logs the number of module items to statsd" do
+      @course_pace.log_module_items_count
+      expect(InstStatsd::Statsd).to have_received(:count).with("course.paced.paced_module_item_count", 1)
+      expect(InstStatsd::Statsd).to have_received(:count).with("course.paced.all_module_item_count", 2)
+    end
+
+    it "logs during #publish" do
+      @course_pace.publish
+      expect(InstStatsd::Statsd).to have_received(:count).with("course.paced.paced_module_item_count", 1)
+      expect(InstStatsd::Statsd).to have_received(:count).with("course.paced.all_module_item_count", 2)
     end
   end
 end

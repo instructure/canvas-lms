@@ -95,6 +95,24 @@ describe ContentParticipation do
       cpc = ContentParticipationCount.where(user_id: @student).first
       expect(cpc.unread_count).to eq 0
     end
+
+    it "unread count does not decrement if unread count is at 0 and workflow state changes from unread to read" do
+      expect do
+        ContentParticipation.create_or_update({
+                                                content: @content,
+                                                user: @student,
+                                                workflow_state: "unread",
+                                              })
+      end.to change(ContentParticipationCount, :count).by 1
+
+      ContentParticipation.create_or_update({
+                                              content: @content,
+                                              user: @student,
+                                              workflow_state: "read",
+                                            })
+      cpc = ContentParticipationCount.where(user_id: @student).first
+      expect(cpc.unread_count).to eq 0
+    end
   end
 
   describe "create" do

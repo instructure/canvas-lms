@@ -46,8 +46,6 @@ describe('ContentTabs', () => {
     window.INST.editorButtons = []
   })
 
-  let fakeEditor
-
   const renderAttemptTab = async props => {
     const retval = render(
       <MockedProvider mocks={defaultMocks()}>
@@ -62,7 +60,6 @@ describe('ContentTabs', () => {
         },
         {timeout: 4000}
       )
-      fakeEditor = tinymce.editors[0]
       return retval
     } else {
       return Promise.resolve(retval)
@@ -693,8 +690,16 @@ describe('ContentTabs', () => {
 
       const {calls} = uploadFileModule.uploadFile.mock
       expect(calls).toHaveLength(2)
-      expect(calls[0][1]).toEqual({content_type: 'application/pdf', name: 'file1.pdf'})
-      expect(calls[1][1]).toEqual({content_type: 'application/pdf', name: 'file2.pdf'})
+      expect(calls[0][1]).toEqual({
+        content_type: 'application/pdf',
+        name: 'file1.pdf',
+        submit_assignment: true
+      })
+      expect(calls[1][1]).toEqual({
+        content_type: 'application/pdf',
+        name: 'file2.pdf',
+        submit_assignment: true
+      })
     })
 
     it('calls uploadFile with the URL pointing to the assignments api endpoint', async () => {
@@ -825,11 +830,10 @@ describe('ContentTabs', () => {
       const progressHandlers = []
 
       uploadFileModule.uploadFile.mockReset()
-      uploadFileModule.uploadFile
-        .mockImplementationOnce((url, data, file, ajaxLib, onProgress) => {
-          progressHandlers.push(onProgress)
-          return Promise.resolve({id: '1', name: 'file1.pdf'})
-        })
+      uploadFileModule.uploadFile.mockImplementationOnce((url, data, file, ajaxLib, onProgress) => {
+        progressHandlers.push(onProgress)
+        return Promise.resolve({id: '1', name: 'file1.pdf'})
+      })
 
       const props = await generatePropsWithAttempt(0)
       const {container, findAllByRole} = renderWithProps(props)
@@ -837,7 +841,7 @@ describe('ContentTabs', () => {
       // It seems to be necessary to wait for something if the test is run in isolation
       await waitFor(() => expect(container.querySelector('input[type="file"]')).toBeInTheDocument())
 
-      fireEventWithContentItem({ url: 'http://localhost/some-lti-file', mediaType: 'plain/txt' });
+      fireEventWithContentItem({url: 'http://localhost/some-lti-file', mediaType: 'plain/txt'})
 
       progressHandlers[0]({loaded: 10, total: 100})
 
@@ -857,11 +861,10 @@ describe('ContentTabs', () => {
       const progressHandlers = []
 
       uploadFileModule.uploadFile.mockReset()
-      uploadFileModule.uploadFile
-        .mockImplementationOnce((url, data, file, ajaxLib, onProgress) => {
-          progressHandlers.push(onProgress)
-          return Promise.resolve({id: '1', name: 'file1.pdf'})
-        })
+      uploadFileModule.uploadFile.mockImplementationOnce((url, data, file, ajaxLib, onProgress) => {
+        progressHandlers.push(onProgress)
+        return Promise.resolve({id: '1', name: 'file1.pdf'})
+      })
 
       const props = await generatePropsWithAttempt(0)
       const {container, findAllByRole} = renderWithProps(props)
@@ -871,9 +874,9 @@ describe('ContentTabs', () => {
 
       fireEventWithContentItem({
         url: 'http://localhost/some-lti-file',
-        text: "x.pdf",
+        text: 'x.pdf',
         mediaType: 'plain/txt'
-      });
+      })
 
       progressHandlers[0]({loaded: 10, total: 100})
 
@@ -882,9 +885,9 @@ describe('ContentTabs', () => {
 
       expect(uploadFileModule.uploadFile.mock.calls[0][1]).toEqual({
         url: 'http://localhost/some-lti-file',
-        name: "x.pdf",
+        name: 'x.pdf',
         content_type: 'plain/txt',
-        submit_assignment: false
+        submit_assignment: true
       })
     })
   })

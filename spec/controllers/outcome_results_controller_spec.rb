@@ -413,6 +413,24 @@ describe OutcomeResultsController do
           json = parse_response(get_rollups(sort_by: "student", sort_order: "desc", per_page: 1, page: 1))
           expect(json["rollups"][0]["scores"][0]["score"]).to eq 1.2 # ( score of 2 / possible 5) * outcome.points_possible
         end
+
+        it "contains mastery and color information for ratings" do
+          outcome_proficiency_model(@course)
+          create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+          json = parse_response(get_rollups(sort_by: "student", sort_order: "desc", add_defaults: true, per_page: 1, page: 1, include: ["outcomes"]))
+          ratings = json["linked"]["outcomes"][0]["ratings"]
+          expect(ratings.map { |r| r["mastery"] }).to eq [true, false]
+          expect(ratings.map { |r| r["color"] }).to eq ["0B874B", "555555"]
+        end
+
+        it "does not contain mastery and color information if \"add_defaults\" parameter is not provided" do
+          outcome_proficiency_model(@course)
+          create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+          json = parse_response(get_rollups(sort_by: "student", sort_order: "desc", per_page: 1, page: 1, include: ["outcomes"]))
+          ratings = json["linked"]["outcomes"][0]["ratings"]
+          expect(ratings.map { |r| r["mastery"] }).to eq [nil, nil]
+          expect(ratings.map { |r| r["color"] }).to eq [nil, nil]
+        end
       end
     end
 

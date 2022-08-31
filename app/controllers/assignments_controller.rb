@@ -138,7 +138,8 @@ class AssignmentsController < ApplicationController
     js_env({
              peer_review_mode_enabled: submission.present? && peer_review_mode_enabled,
              peer_review_available: submission.present? && submission.submitted? && current_user_submission.present? && current_user_submission.submitted?,
-             peer_display_name: @assignment.anonymous_peer_reviews? ? I18n.t("Anonymous student") : submission.user.name
+             peer_display_name: @assignment.anonymous_peer_reviews? ? I18n.t("Anonymous student") : submission.user.name,
+             originality_reports_for_a2_enabled: Account.site_admin.feature_enabled?(:originality_reports_for_a2)
            })
 
     graphql_submission_id = nil
@@ -190,6 +191,7 @@ class AssignmentsController < ApplicationController
              EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list],
              COURSE_ID: @context.id,
              ISOBSERVER: @context_enrollment&.observer?,
+             ORIGINALITY_REPORTS_FOR_A2: Account.site_admin.feature_enabled?(:originality_reports_for_a2),
              PREREQS: assignment_prereqs,
              SUBMISSION_ID: graphql_submission_id
            })
@@ -557,13 +559,10 @@ class AssignmentsController < ApplicationController
         return
       end
 
-      student_scope = if @assignment.differentiated_assignments_applies?
-                        @context.students_visible_to(@current_user).able_to_see_assignment_in_course_with_da(@assignment.id, @context.id)
-                      else
-                        @context.students_visible_to(@current_user)
-                      end
+      visible_students = @context.students_visible_to(@current_user).not_fake_student
+      visible_students_assigned_to_assignment = visible_students.joins(:submissions).where(submissions: { assignment: @assignment }).merge(Submission.active)
 
-      @students = student_scope.not_fake_student.distinct.order_by_sortable_name
+      @students = visible_students_assigned_to_assignment.distinct.order_by_sortable_name
       @submissions = @assignment.submissions.include_assessment_requests
     end
   end

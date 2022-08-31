@@ -546,6 +546,10 @@ module Lti::IMS
               end
 
               context "with FF on" do
+                let(:params_overrides) do
+                  super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items: content_items, new_submission: true, submitted_at: submitted_at })
+                end
+
                 before do
                   Account.root_accounts.first.enable_feature! :ags_scores_file_error_improvements
                 end
@@ -553,6 +557,34 @@ module Lti::IMS
                 it "sets submitted_at correctly" do
                   send_request
                   expect(result.submission.reload.submitted_at).to eq submitted_at
+                end
+
+                context "and multiple file content items" do
+                  let(:params_overrides) do
+                    super().merge(Lti::Result::AGS_EXT_SUBMISSION => { content_items: [
+                                    {
+                                      type: "file",
+                                      url: "https://filesamples.com/samples/document/txt/sample1.txt",
+                                      title: "sample1.txt"
+                                    },
+                                    {
+                                      type: "file",
+                                      url: "https://filesamples.com/samples/document/txt/sample2.txt",
+                                      title: "sample2.txt"
+                                    },
+                                  ], new_submission: true })
+                  end
+
+                  it "handles multiple attachments" do
+                    send_request
+                    expect(result.submission.reload.attachments.length).to eq 2
+                  end
+
+                  it "only creates one attempt" do
+                    attempt_count = result.submission.attempt || 0
+                    send_request
+                    expect(result.submission.reload.attempt).to eq(attempt_count + 1)
+                  end
                 end
               end
 

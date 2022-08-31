@@ -188,6 +188,7 @@ export default class AttemptTab extends Component {
     createSubmissionDraft: func,
     focusAttemptOnInit: bool.isRequired,
     onContentsChanged: func,
+    originalityReportsForA2: bool,
     selectedExternalTool: ExternalTool.shape,
     submission: Submission.shape.isRequired,
     updateActiveSubmissionType: func,
@@ -300,7 +301,7 @@ export default class AttemptTab extends Component {
             url: file.url,
             name: file.text,
             content_type: file.mediaType,
-            submit_assignment: false
+            submit_assignment: true
           },
           null,
           axios,
@@ -311,7 +312,8 @@ export default class AttemptTab extends Component {
           uploadUrl,
           {
             name: file.name,
-            content_type: file.type
+            content_type: file.type,
+            submit_assignment: true
           },
           file,
           axios,
@@ -336,8 +338,8 @@ export default class AttemptTab extends Component {
     return isSubmitted(this.props.submission) ? (
       <LazyLoad errorCategory="Assignments 2 FilePreview on AttemptTab">
         <FilePreview
-          key={this.props.submission.attempt}
-          files={this.props.submission.attachments}
+          submission={this.props.submission}
+          originalityReportsForA2={this.props.originalityReportsForA2}
         />
       </LazyLoad>
     ) : (

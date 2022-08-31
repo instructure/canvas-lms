@@ -125,6 +125,7 @@ describe('useRollups', () => {
           per_page: 20,
           include: ['outcomes', 'users', 'outcome_paths', 'alignments'],
           sort_by: 'student',
+          add_defaults: true,
           page: 1
         }
       }

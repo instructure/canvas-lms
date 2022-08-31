@@ -46,14 +46,16 @@ export class ToDoSidebar extends Component {
     changeDashboardView: func,
     forCourse: string,
     isObserving: bool,
-    loadingError: string
+    loadingError: string,
+    additionalTitleContext: bool
   }
 
   static defaultProps = {
     loaded: false,
     timeZone: moment.tz.guess(),
     locale: 'en',
-    forCourse: undefined
+    forCourse: undefined,
+    additionalTitleContext: false
   }
 
   constructor(props) {
@@ -148,11 +150,18 @@ export class ToDoSidebar extends Component {
     )
   }
 
+  renderTitle() {
+    if (this.props.additionalTitleContext) {
+      return formatMessage('Student To Do')
+    }
+    return formatMessage('To Do')
+  }
+
   render() {
     if (!this.props.loaded && !this.props.loadingError) {
       return (
         <div data-testid="ToDoSidebar">
-          <h2 className="todo-list-header">{formatMessage('To Do')}</h2>
+          <h2 className="todo-list-header">{this.renderTitle()}</h2>
           <View as="div" textAlign="center">
             <Spinner renderTitle={() => formatMessage('To Do Items Loading')} size="small" />
           </View>
@@ -162,7 +171,7 @@ export class ToDoSidebar extends Component {
     if (this.props.loadingError) {
       return (
         <div data-testid="ToDoSidebar">
-          <h2 className="todo-list-header">{formatMessage('To Do')}</h2>
+          <h2 className="todo-list-header">{this.renderTitle()}</h2>
           <Flex justifyItems="start">
             <Flex.Item>
               <IconWarningLine color="error" />
@@ -184,7 +193,7 @@ export class ToDoSidebar extends Component {
               this.titleFocus = elt
             }}
           >
-            {formatMessage('To Do')}
+            {this.renderTitle()}
           </span>
         </h2>
         {this.renderItems()}

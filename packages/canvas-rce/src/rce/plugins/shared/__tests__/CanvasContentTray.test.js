@@ -23,6 +23,7 @@ import Bridge from '../../../../bridge/Bridge'
 import * as fakeSource from '../../../../rcs/fake'
 import CanvasContentTray from '../CanvasContentTray'
 
+jest.useFakeTimers()
 jest.mock('../../../../canvasFileBrowser/FileBrowser', () => {
   return jest.fn(() => 'Files Browser')
 })
@@ -206,7 +207,7 @@ describe('RCE Plugins > CanvasContentTray', () => {
         expect(component.getByTestId('instructure_links-LinksPanel')).toBeInTheDocument()
       )
 
-      const closeBtn = component.getByRole('button', {name: 'Close'})
+      const closeBtn = component.getByTestId('CloseButton_ContentTray').querySelector('button')
       closeBtn.focus()
       closeBtn.click()
       // immediately after being asked to close, INSTUI Tray removes role='dialog' and

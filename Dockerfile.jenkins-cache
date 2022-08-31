@@ -121,3 +121,39 @@ RUN --mount=target=/tmp/src \
   find /tmp/dst/ui /tmp/dst/gems/plugins \
     -regex ".*__mocks__\|.*__tests__" -prune \
     -exec rm -rf {} \;
+
+FROM starlord.inscloudgate.net/jenkins/busybox AS cache-helper-collect-js
+WORKDIR /tmp/src
+RUN --mount=target=/tmp/src \
+  mkdir -p /tmp/dst && \
+  find gems/plugins \( \
+    -path "*/app/coffeescripts" -o \
+    -path "*/app/jsx" -o \
+    -path "*/app/stylesheets" -o \
+    -path "*/public" -o \
+    -path "*/spec_canvas/coffeescripts" -o \
+  \) -exec cp -rf --parents {} /tmp/dst \; && \
+  cp --parents -rf \
+    app/stylesheets \
+    config/brandable_css.yml \
+    config/browsers.yml \
+    jest \
+    packages \
+    public \
+    spec/coffeescripts \
+    spec/javascripts \
+    spec/selenium/helpers/jquery.simulate.js \
+    tmp \
+    ui \
+    ui-build \
+    jest.config.js \
+    karma.conf.js \
+    package.json \
+    tsconfig.json \
+    yarn.lock \
+    \
+    /tmp/dst
+
+FROM local/cache-helper-collect-js AS cache-helper-collect-js-graphql
+RUN --mount=target=/tmp/src \
+  cp /tmp/src/schema.graphql /tmp/dst/schema.graphql
