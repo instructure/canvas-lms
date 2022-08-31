@@ -226,7 +226,10 @@ class CommunicationChannelsController < ApplicationController
     cc ||= @current_user && @current_user.communication_channels.unretired.where.not(path_type: CommunicationChannel::TYPE_PUSH).find_by_confirmation_code(@nonce)
 
     @headers = false
-    if !cc || (cc.path_type == "email" && !EmailAddressValidator.valid?(cc.path))
+    if (!cc || (cc.path_type == "email" && !EmailAddressValidator.valid?(cc.path))) ||
+       (@domain_root_account.allow_additional_email_at_registration? &&
+        params.dig(:pseudonym, :personal_email).present? &&
+        !EmailAddressValidator.valid?(params[:pseudonym][:personal_email]))
       failed = true
     else
       @communication_channel = cc
@@ -255,6 +258,7 @@ class CommunicationChannelsController < ApplicationController
       end
 
       if @user.registered? && cc.unconfirmed?
+        add_additional_email_if_allowed
         unless @current_user == @user
           session[:return_to] = request.url
           flash[:notice] = t "notices.login_to_confirm", "Please log in to confirm your e-mail address"
@@ -341,6 +345,7 @@ class CommunicationChannelsController < ApplicationController
         pseudonym = @root_account.pseudonyms.active_only.where(user_id: @user).exists?
         if @user.pre_registered? && pseudonym
           @user.register
+          add_additional_email_if_allowed
           return redirect_with_success_flash
         else
           failed = true
@@ -429,6 +434,7 @@ class CommunicationChannelsController < ApplicationController
         format.json { render json: {}, status: :bad_request }
       end
     else
+      add_additional_email_if_allowed
       # make sure additions take the above use of
       # redirect_with_success_flash into account
       redirect_with_success_flash
@@ -617,6 +623,21 @@ class CommunicationChannelsController < ApplicationController
   def has_api_permissions?
     @user == @current_user ||
       @user.grants_right?(@current_user, session, :manage_user_details)
+  end
+
+  def add_additional_email_if_allowed
+    if @domain_root_account.allow_additional_email_at_registration? && params.dig(:pseudonym, :personal_email).present?
+      personal_email = params[:pseudonym][:personal_email]
+      new_cc = @user.communication_channels.email.by_path(personal_email).first
+      # Don't do anything if for whatever reason the user has already registered the email as a cc.
+      unless new_cc
+        new_cc = @user.communication_channels.build(path: personal_email, path_type: "personal_email")
+        new_cc.user = @user
+        new_cc.workflow_state = "unconfirmed"
+        new_cc.send_confirmation!(@root_account)
+        new_cc.save!
+      end
+    end
   end
 
   def require_terms?
