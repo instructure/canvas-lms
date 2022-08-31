@@ -1425,7 +1425,7 @@ class ExternalToolsController < ApplicationController
       # initialize a Canvas session and launch the tool.
       begin
         launch_link = sessionless_launch_link(
-          options,
+          options.merge(id: tool_id, launch_type: launch_type),
           @context,
           @tool,
           generate_session_token
