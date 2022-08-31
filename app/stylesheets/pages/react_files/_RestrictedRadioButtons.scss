@@ -25,3 +25,22 @@
   color: $ic-font-color-dark;
   padding: direction-sides(0px 10px 0px 5px);
 }
+
+.RestrictedRadioButtons__wrapper {
+  display: flex;
+  flex-direction: row;
+
+  label.control-label.label-offline {
+    text-align: #{direction(left)};
+    float: none;
+    margin-bottom: 12px;
+  }
+
+  >div {
+    flex: 1;
+  }
+
+  >div.RestrictedRadioButtons__visibility_wrapper {
+    flex: 0 1;
+  }
+}

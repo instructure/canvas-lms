@@ -1378,7 +1378,7 @@ class Account < ActiveRecord::Base
     end
 
     given { |user| !cached_account_users_for(user).empty? }
-    can :read and can :read_as_admin and can :manage and can :update and can :delete and can :read_outcomes and can :read_terms
+    can %i[read read_as_admin manage update delete read_outcomes read_terms read_files]
 
     given { |user| root_account? && cached_all_account_users_for(user).any? }
     can :read_terms
@@ -1400,7 +1400,7 @@ class Account < ActiveRecord::Base
 
     # any user with an admin enrollment in one of the courses can read
     given { |user| user && courses.where(id: user.enrollments.active.admin.pluck(:course_id)).exists? }
-    can :read
+    can [:read, :read_files]
 
     given { |user| !site_admin? && primary_settings_root_account? && grants_right?(user, :manage_site_settings) }
     can :manage_privacy_settings

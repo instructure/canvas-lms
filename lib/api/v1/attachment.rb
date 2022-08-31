@@ -125,10 +125,15 @@ module Api::V1::Attachment
       "media_entry_id" => attachment.media_entry_id,
       "category" => attachment.category
     )
+
     if skip_permission_checks
       hash["locked_for_user"] = false
     else
       locked_json(hash, attachment, user, "file")
+    end
+
+    if attachment.supports_visibility?
+      hash["visibility_level"] = attachment.visibility_level
     end
 
     if includes.include? "user"

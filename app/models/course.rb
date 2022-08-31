@@ -328,6 +328,18 @@ class Course < ActiveRecord::Base
   # assignment can have.
   MODERATED_GRADING_GRADER_LIMIT = 10
 
+  CUSTOMIZABLE_PERMISSIONS = ActiveSupport::OrderedHash[
+    "syllabus", {
+      setting: t("syllabus", "Syllabus"),
+      flex: :looser,
+      as_bools: true,
+    },
+    "files", {
+      setting: t("files", "Files"),
+      flex: :any
+    },
+  ].freeze
+
   def [](attr)
     attr.to_s == "asset_string" ? asset_string : super
   end
@@ -638,26 +650,35 @@ class Course < ActiveRecord::Base
   end
 
   def custom_course_visibility
-    !(public_syllabus == is_public && is_public_to_auth_users == public_syllabus_to_auth)
-  end
-
-  def customize_course_visibility_list
-    ActiveSupport::OrderedHash[
-        "syllabus",
-        {
-          setting: t("syllabus", "Syllabus")
-        }
-      ]
-  end
-
-  def syllabus_visibility_option
-    if public_syllabus == true
-      "public"
-    elsif public_syllabus_to_auth == true
-      "institution"
-    else
-      "course"
+    CUSTOMIZABLE_PERMISSIONS.any? do |k, _v|
+      custom_visibility_option(k) != course_visibility
     end
+  end
+
+  def custom_visibility_option(key)
+    perm_cfg = CUSTOMIZABLE_PERMISSIONS[key.to_s]
+
+    if perm_cfg[:as_bools]
+      if send(:"public_#{key}") == true
+        "public"
+      elsif send(:"public_#{key}_to_auth") == true
+        "institution"
+      else
+        "course"
+      end
+    else
+      send(:"#{key}_visibility")
+    end
+  end
+
+  # DEPRECATED - Used only by View
+  def syllabus_visibility_option
+    custom_visibility_option(:syllabus)
+  end
+
+  # DEPRECATED - Used only by View
+  def files_visibility_option
+    custom_visibility_option(:files)
   end
 
   def course_visibility
@@ -1665,8 +1686,12 @@ class Course < ActiveRecord::Base
     given { |user, session| available? && unenrolled_user_can_read?(user, session) }
     can :read and can :read_outcomes and can :read_syllabus
 
-    given { |_user, session| available? && (public_syllabus || (public_syllabus_to_auth && session.present? && session.key?(:user_id))) }
-    can :read_syllabus
+    CUSTOMIZABLE_PERMISSIONS.each_key do |type|
+      given do |user|
+        available? && (custom_visibility_option(type) == "public" || (custom_visibility_option(type) == "institution" && user&.persisted?) || grants_right?(user, :read_as_member))
+      end
+      can :"read_#{type}"
+    end
 
     RoleOverride.permissions.each do |permission, details|
       given do |user|
@@ -1677,16 +1702,16 @@ class Course < ActiveRecord::Base
     end
 
     given { |_user, session| session && session[:enrollment_uuid] && (hash = Enrollment.course_user_state(self, session[:enrollment_uuid]) || {}) && (hash[:enrollment_state] == "invited" || (hash[:enrollment_state] == "active" && hash[:user_state].to_s == "pre_registered")) && (available? || completed? || (claimed? && hash[:is_admin])) }
-    can :read and can :read_outcomes
+    can :read, :read_outcomes, :read_as_member
 
     given { |user| (available? || completed?) && user && fetch_on_enrollments("has_not_inactive_enrollment", user) { enrollments.for_user(user).not_inactive_by_date.exists? } }
-    can :read and can :read_outcomes
+    can :read, :read_outcomes, :read_as_member
 
     # Active students
     given do |user|
       available? && user && fetch_on_enrollments("has_active_student_enrollment", user) { enrollments.for_user(user).active_by_date.of_student_type.exists? }
     end
-    can :read and can :participate_as_student and can :read_grades and can :read_outcomes
+    can :read, :participate_as_student, :read_grades, :read_outcomes, :read_as_member
 
     given do |user|
       (available? || completed?) && user &&
@@ -1720,9 +1745,11 @@ class Course < ActiveRecord::Base
           enrollments.for_user(user).of_admin_type.active_by_date.exists?
         end
     end
-    can :read_as_admin and can :read and can :manage and can :update and
-      can :read_outcomes and can :view_unpublished_items and can :manage_feature_flags and
-      can :view_feature_flags and can :read_rubrics and can :use_student_view
+    can %i[
+      read_as_admin read read_as_member manage update
+      read_outcomes view_unpublished_items manage_feature_flags
+      view_feature_flags read_rubrics use_student_view
+    ]
 
     # Teachers and Designers can reset content, but not TAs
     given do |user|
@@ -1746,21 +1773,21 @@ class Course < ActiveRecord::Base
 
     # Student view student
     given { |user| user&.fake_student? && current_enrollments.for_user(user).exists? }
-    can :read and can :participate_as_student and can :read_grades and can :read_outcomes
+    can %i[read participate_as_student read_grades read_outcomes read_as_member]
 
     # Prior users
     given do |user|
       (available? || completed?) && user &&
         fetch_on_enrollments("has_completed_enrollment", user) { enrollments.for_user(user).completed_by_date.exists? }
     end
-    can :read, :read_outcomes
+    can :read, :read_outcomes, :read_as_member
 
     # Admin (Teacher/TA/Designer) of a concluded course
     given do |user|
       !deleted? && user &&
         fetch_on_enrollments("has_completed_admin_enrollment", user) { enrollments.for_user(user).of_admin_type.completed_by_date.exists? }
     end
-    can %i[read read_as_admin use_student_view read_outcomes view_unpublished_items read_rubrics]
+    can %i[read read_as_admin use_student_view read_outcomes view_unpublished_items read_rubrics read_as_member]
 
     # overrideable permissions for concluded users
     RoleOverride.concluded_permission_types.each do |permission, details|
@@ -1802,7 +1829,7 @@ class Course < ActiveRecord::Base
                      .where("enrollments.type = ? OR (enrollments.type = ? AND enrollments.associated_user_id IS NOT NULL)", "StudentEnrollment", "ObserverEnrollment").exists?
         end
     end
-    can :read, :read_grades, :read_outcomes
+    can :read, :read_grades, :read_outcomes, :read_as_member
 
     # Admin
     #################### Begin legacy permission block #########################
@@ -1858,7 +1885,7 @@ class Course < ActiveRecord::Base
     can :delete
 
     given { |user| account_membership_allows(user, :read_course_content) }
-    can :read and can :read_outcomes
+    can %i[read read_outcomes read_as_member]
 
     # Admins with read_roster can see prior enrollments (can't just check read_roster directly,
     # because students can't see prior enrollments)
@@ -2671,8 +2698,9 @@ class Course < ActiveRecord::Base
   end
 
   def self.clonable_attributes
-    %i[group_weighting_scheme grading_standard_id is_public is_public_to_auth_users public_syllabus
-       public_syllabus_to_auth allow_student_wiki_edits show_public_context_messages
+    %i[group_weighting_scheme grading_standard_id is_public is_public_to_auth_users
+       public_syllabus public_syllabus_to_auth files_visibility
+       allow_student_wiki_edits show_public_context_messages
        syllabus_body syllabus_course_summary allow_student_forum_attachments
        lock_all_announcements default_wiki_editing_roles allow_student_organized_groups
        default_view show_total_grade_as_points allow_final_grade_override
@@ -3287,7 +3315,7 @@ class Course < ActiveRecord::Base
         delete_unless.call([TAB_SETTINGS], :read_as_admin)
         delete_unless.call([TAB_ANNOUNCEMENTS], :read_announcements)
         delete_unless.call([TAB_RUBRICS], :read_rubrics, :manage_rubrics)
-        delete_unless.call([TAB_FILES], :read, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
+        delete_unless.call([TAB_FILES], :read_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
 
         if item_banks_tab &&
            !check_for_permission.call(:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
@@ -3426,8 +3454,6 @@ class Course < ActiveRecord::Base
   add_setting :filter_speed_grader_by_student_group, boolean: true, default: false
   add_setting :lock_all_announcements, boolean: true, default: false, inherited: true
   add_setting :large_roster, boolean: true, default: ->(c) { c.root_account.large_course_rosters? }
-  add_setting :public_syllabus, boolean: true, default: false
-  add_setting :public_syllabus_to_auth, boolean: true, default: false
   add_setting :course_format
   add_setting :newquizzes_engine_selected
   add_setting :image_id
@@ -4010,6 +4036,15 @@ class Course < ActiveRecord::Base
     end
   end
 
+  CUSTOMIZABLE_PERMISSIONS.each do |key, cfg|
+    if cfg[:as_bools]
+      add_setting :"public_#{key}", boolean: true, default: ->(c) { c.is_public }
+      add_setting :"public_#{key}_to_auth", boolean: true, default: ->(c) { c.is_public_to_auth_users }
+    else
+      add_setting :"#{key}_visibility", default: ->(c) { c.course_visibility }
+    end
+  end
+
   def apply_overridden_course_visibility(visibility)
     self.overridden_course_visibility = if !%w[institution public course].include?(visibility) &&
                                            root_account.available_course_visibility_override_options.key?(visibility)
@@ -4019,7 +4054,7 @@ class Course < ActiveRecord::Base
                                         end
   end
 
-  def apply_visibility_configuration(course_visibility, syllabus_visibility)
+  def apply_visibility_configuration(course_visibility)
     apply_overridden_course_visibility(course_visibility)
     case course_visibility
     when "institution"
@@ -4031,16 +4066,38 @@ class Course < ActiveRecord::Base
       self.is_public_to_auth_users = false
       self.is_public = false
     end
+  end
 
-    if syllabus_visibility.present?
-      if is_public || syllabus_visibility == "public"
-        self.public_syllabus = true
-      elsif is_public_to_auth_users || syllabus_visibility == "institution"
-        self.public_syllabus_to_auth = true
-        self.public_syllabus = false
+  def apply_custom_visibility_configuration(key, visibility)
+    return unless visibility.present?
+
+    perm_cfg = CUSTOMIZABLE_PERMISSIONS[key.to_s]
+
+    if visibility.to_s == "inherit"
+      if perm_cfg[:as_bools]
+        settings_frd.delete(:"public_#{key}")
+        settings_frd.delete(:"public_#{key}_to_auth")
       else
-        self.public_syllabus = false
-        self.public_syllabus_to_auth = false
+        settings_frd.delete(:"#{key}_visibility")
+      end
+    else
+      flex = perm_cfg[:flex]
+      allow_tighter = [:tighter, :any].include?(flex)
+      allow_looser = [:looser, :any, nil].include?(flex)
+
+      visibility_levels = course_visibility_options.keys
+      course_level = visibility_levels.index(course_visibility)
+      key_level = visibility_levels.index(visibility)
+
+      if (!allow_tighter && key_level < course_level) || (!allow_looser && key_level > course_level)
+        visibility = visibility_levels[course_level]
+      end
+
+      if perm_cfg[:as_bools]
+        send(:"public_#{key}=", visibility == "public")
+        send(:"public_#{key}_to_auth=", visibility == "institution")
+      else
+        send(:"#{key}_visibility=", visibility)
       end
     end
   end

@@ -5819,7 +5819,7 @@ describe Course do
     end
 
     it "can be read by a nil user if public and available" do
-      expect(@course.check_policy(nil)).to eq %i[read read_outcomes read_syllabus]
+      expect(@course.check_policy(nil)).to eq %i[read read_outcomes read_syllabus read_files]
     end
 
     it "cannot be read by a nil user if public but not available" do
@@ -5844,7 +5844,7 @@ describe Course do
 
       it "can be read by a prior user" do
         user.student_enrollments.create!(workflow_state: "completed", course: @course)
-        expect(@course.check_policy(user).sort).to eq %i[read read_announcements read_forum read_grades read_outcomes]
+        expect(@course.check_policy(user).sort).to eq %i[read read_announcements read_as_member read_files read_forum read_grades read_outcomes read_syllabus]
       end
 
       it "can have its forum read by an observer" do

@@ -86,6 +86,7 @@
         <xs:element name="storage_quota" type="optional_float" minOccurs="0"/>
         <xs:element name="lock_all_announcements" type="xs:boolean" minOccurs="0"/>
         <xs:element name="public_syllabus" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="files_visibility" type="xs:string" minOccurs="0"/>
         <xs:element name="hide_distribution_graphs" type="xs:boolean" minOccurs="0"/>
         <xs:element name="usage_rights_required" type="xs:boolean" minOccurs="0"/>
         <xs:element name="allow_student_discussion_topics" type="xs:boolean" minOccurs="0"/>

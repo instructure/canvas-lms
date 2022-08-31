@@ -23,10 +23,21 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import customPropTypes from '../modules/customPropTypes'
 import Folder from '../../backbone/models/Folder'
+import File from '../../backbone/models/File.coffee'
 import '@canvas/datetime'
 import accessibleDateFormat from '@canvas/datetime/accessibleDateFormat'
+import filesEnv from '../modules/filesEnv'
 
 const I18n = useI18nScope('restrict_student_access')
+
+const allAreEqual = (models, fields) =>
+  models.every(model =>
+    fields.every(
+      attribute =>
+        models[0].get(attribute) === model.get(attribute) ||
+        (!models[0].get(attribute) && !model.get(attribute))
+    )
+  )
 
 class RestrictedRadioButtons extends React.Component {
   static propTypes = {
@@ -36,18 +47,11 @@ class RestrictedRadioButtons extends React.Component {
 
   constructor(props) {
     super(props)
-    let allAreEqual, initialState, permissionAttributes
+    let initialState, permissionAttributes
 
     permissionAttributes = ['hidden', 'locked', 'lock_at', 'unlock_at']
     initialState = {}
-    allAreEqual = props.models.every(model =>
-      permissionAttributes.every(
-        attribute =>
-          props.models[0].get(attribute) === model.get(attribute) ||
-          (!props.models[0].get(attribute) && !model.get(attribute))
-      )
-    )
-    if (allAreEqual) {
+    if (allAreEqual(props.models, permissionAttributes)) {
       initialState = props.models[0].pick(permissionAttributes)
       if (initialState.locked) {
         initialState.selectedOption = 'unpublished'
@@ -86,7 +90,7 @@ class RestrictedRadioButtons extends React.Component {
     {
       ref: 'linkOnly',
       selectedOptionKey: 'link_only',
-      text: I18n.t('Only available to students with link'),
+      text: I18n.t('Only available with link'),
       iconClasses: 'icon-line icon-off RestrictedRadioButtons__icon',
       onChange() {
         this.updateBtnEnable()
@@ -96,7 +100,7 @@ class RestrictedRadioButtons extends React.Component {
     {
       ref: 'dateRange',
       selectedOptionKey: 'date_range',
-      text: I18n.t('Schedule student availability'),
+      text: I18n.t('Schedule availability'),
       iconClasses: 'icon-line icon-calendar-month RestrictedRadioButtons__icon',
       onChange() {
         this.updateBtnEnable()
@@ -109,14 +113,24 @@ class RestrictedRadioButtons extends React.Component {
     return $([this.unlock_at, this.lock_at]).datetime_field()
   }
 
-  extractFormValues = () => ({
-    hidden: this.state.selectedOption === 'link_only',
-    unlock_at:
-      (this.state.selectedOption === 'date_range' && $(this.unlock_at).data('unfudged-date')) || '',
-    lock_at:
-      (this.state.selectedOption === 'date_range' && $(this.lock_at).data('unfudged-date')) || '',
-    locked: this.state.selectedOption === 'unpublished'
-  })
+  extractFormValues = () => {
+    const opts = {
+      hidden: this.state.selectedOption === 'link_only',
+      unlock_at:
+        (this.state.selectedOption === 'date_range' && $(this.unlock_at).data('unfudged-date')) ||
+        '',
+      lock_at:
+        (this.state.selectedOption === 'date_range' && $(this.lock_at).data('unfudged-date')) || '',
+      locked: this.state.selectedOption === 'unpublished'
+    }
+
+    const vis_val = $(this.visibility_field).val()
+    if (filesEnv.enableVisibility && vis_val) {
+      opts.visibility_level = vis_val
+    }
+
+    return opts
+  }
 
   allFolders = () => this.props.models.every(model => model instanceof Folder)
 
@@ -135,22 +149,30 @@ class RestrictedRadioButtons extends React.Component {
     this.state.selectedOption === option.selectedOptionKey ||
     _.includes(option.selectedOptionKey, this.state.selectedOption)
 
-  renderPermissionOptions = () =>
-    this.permissionOptions.map((option, index) => (
-      <div className="radio" key={index}>
-        <label>
-          <input
-            ref={e => (this[option.ref] = e)}
-            type="radio"
-            name="permissions"
-            checked={this.isPermissionChecked(option)}
-            onChange={option.onChange.bind(this)}
-          />
-          <i className={option.iconClasses} aria-hidden />
-          {option.text}
-        </label>
+  renderPermissionOptions = () => (
+    <div>
+      <label className="control-label label-offline" htmlFor="availabilitySelector">
+        {I18n.t('Availability:')}
+      </label>
+      <div>
+        {this.permissionOptions.map((option, index) => (
+          <div className="radio" key={index}>
+            <label>
+              <input
+                ref={e => (this[option.ref] = e)}
+                type="radio"
+                name="permissions"
+                checked={this.isPermissionChecked(option)}
+                onChange={option.onChange.bind(this)}
+              />
+              <i className={option.iconClasses} aria-hidden={true} />
+              {option.text}
+            </label>
+          </div>
+        ))}
       </div>
-    ))
+    </div>
+  )
 
   renderDatePickers = () => {
     const styleObj = {}
@@ -195,10 +217,45 @@ class RestrictedRadioButtons extends React.Component {
     )
   }
 
+  renderVisibilityOptions = () => {
+    const equal = allAreEqual(
+      this.props.models.filter(model => model instanceof File),
+      ['visibility_level']
+    )
+
+    return (
+      <div className="control-group">
+        <label className="control-label label-offline" htmlFor="visibilitySelector">
+          {I18n.t('Visibility:')}
+        </label>
+        <select
+          id="visibilitySelector"
+          className=""
+          disabled={this.state.selectedOption === 'unpublished'}
+          defaultValue={equal ? this.props.models[0].get('visibility_level') : null}
+          ref={e => (this.visibility_field = e)}
+        >
+          {!equal && <option value="">-- {I18n.t('Keep')} --</option>}
+          <option value="inherit">{I18n.t('Inherit from Course')}</option>
+          <option value="context">{I18n.t('Course Members')}</option>
+          <option value="institution">{I18n.t('Institution Members')}</option>
+          <option value="public">{I18n.t('Public')}</option>
+        </select>
+      </div>
+    )
+  }
+
   renderRestrictedRadioButtons = () => (
-    <div>
-      {this.renderPermissionOptions()}
-      {this.renderDatePickers()}
+    <div className="RestrictedRadioButtons__wrapper">
+      <div>
+        {this.renderPermissionOptions()}
+        {this.renderDatePickers()}
+      </div>
+      {filesEnv.enableVisibility && !this.allFolders() && (
+        <div className="RestrictedRadioButtons__visibility_wrapper">
+          {this.renderVisibilityOptions()}
+        </div>
+      )}
     </div>
   )
 
