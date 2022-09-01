@@ -10,14 +10,8 @@ services:
       - brandable_css_brands:/usr/src/app/app/stylesheets/brandable_css_brands
       - bundler:/home/docker/.bundle/
       - canvas-docker-gems:/home/docker/.gem/
-      - canvas-media_es:/usr/src/app/packages/canvas-media/es
-      - canvas-media_lib:/usr/src/app/packages/canvas-media/lib
-      - canvas-media_node_modules:/usr/src/app/packages/canvas-media/node_modules
       - canvas-planner_node_modules:/usr/src/app/packages/canvas-planner/node_modules
       - canvas-planner_lib:/usr/src/app/packages/canvas-planner/lib
-      - canvas-rce_canvas:/usr/src/app/packages/canvas-rce/canvas
-      - canvas-rce_lib:/usr/src/app/packages/canvas-rce/lib
-      - canvas-rce_node_modules:/usr/src/app/packages/canvas-rce/node_modules
       - jest-moxios-utils_node_modules:/usr/src/app/packages/jest-moxios-utils/node_modules
       - js-utils_es:/usr/src/app/packages/js-utils/es
       - js-utils_lib:/usr/src/app/packages/js-utils/lib
@@ -75,14 +69,8 @@ volumes:
   brandable_css_brands: {}
   bundler: {}
   canvas-docker-gems: {}
-  canvas-media_es: {}
-  canvas-media_lib: {}
-  canvas-media_node_modules: {}
   canvas-planner_node_modules: {}
   canvas-planner_lib: {}
-  canvas-rce_canvas: {}
-  canvas-rce_lib: {}
-  canvas-rce_node_modules: {}
   i18nliner_node_modules: {}
   jest-moxios-utils_node_modules: {}
   js-utils_es: {}
