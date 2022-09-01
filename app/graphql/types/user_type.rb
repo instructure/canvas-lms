@@ -197,10 +197,13 @@ module Types
                                   InstStatsd::Statsd.increment("inbox.visit.scope.starred.pages_loaded.react")
                                   object.starred_conversations
                                 when "sent"
+                                  InstStatsd::Statsd.increment("inbox.visit.scope.sent.pages_loaded.react")
                                   object.all_conversations.sent
                                 when "archived"
+                                  InstStatsd::Statsd.increment("inbox.visit.scope.archived.pages_loaded.react")
                                   object.conversations.archived
                                 else
+                                  InstStatsd::Statsd.increment("inbox.visit.scope.inbox.pages_loaded.react")
                                   object.conversations.default
                                 end
 
