@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {act, fireEvent, render} from '@testing-library/react'
-import keycode from 'keycode'
 import {eventFormProps, conference, userContext, courseContext, accountContext} from './mocks'
 import CalendarEventDetailsForm from '../CalendarEventDetailsForm'
 
@@ -33,13 +32,10 @@ const changeValue = (component, role, name, value) => {
   return child
 }
 
-const setTime = (component, label, halfHours) => {
+const setTime = (component, label, time) => {
   const clock = component.getByRole('combobox', {name: label})
   act(() => clock.click())
-  for (let i = 0; i <= halfHours; i++) {
-    fireEvent.keyDown(clock, {keyCode: keycode.codes.down})
-  }
-  fireEvent.keyDown(clock, {keyCode: keycode.codes.enter})
+  fireEvent.click(component.getByText(time))
   return clock
 }
 
@@ -49,17 +45,17 @@ const select = (component, role, name) => {
   act(() => child.click())
 }
 
-const testTimezone = (timezone, inputDate, expectedDate, halfHours) => {
+const testTimezone = (timezone, inputDate, expectedDate, time) => {
   defaultProps.timezone = timezone
   const component = render(<CalendarEventDetailsForm {...defaultProps} />)
   const date = changeValue(component, 'combobox', 'Date:', inputDate)
-  expect(date.value).toBe("Thu, Jul 14, 2022")
-  if (halfHours) setTime(component, "From:", halfHours)
+  expect(date.value).toBe('Thu, Jul 14, 2022')
+  if (time) setTime(component, 'From:', time)
   select(component, 'button', 'Submit')
 
   expect(defaultProps.event.save).toHaveBeenCalledWith(
     expect.objectContaining({
-      'calendar_event[start_at]': expectedDate,
+      'calendar_event[start_at]': expectedDate
     }),
     expect.anything(),
     expect.anything()
@@ -118,8 +114,8 @@ describe('CalendarEventDetailsForm', () => {
     changeValue(component, 'textbox', 'Title:', 'Class Party')
     changeValue(component, 'textbox', 'Location:', 'The Zoo')
     changeValue(component, 'combobox', 'Date:', '2022-07-23T00:00:00.000Z')
-    setTime(component, 'From:', 4) // 2:00
-    setTime(component, 'To:', 30) // 15:00
+    setTime(component, 'From:', '2:00 AM')
+    setTime(component, 'To:', '3:00 PM')
     select(component, 'button', 'Calendar:')
     select(component, 'option', 'Geometry')
     expect(component.getByText('More Options')).toBeInTheDocument()
@@ -146,16 +142,16 @@ describe('CalendarEventDetailsForm', () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
     let date = changeValue(component, 'combobox', 'Date:', '2022-07-03T00:00:00.000Z')
-    expect(date.value).toBe("Sun, Jul 3, 2022")
+    expect(date.value).toBe('Sun, Jul 3, 2022')
     date = changeValue(component, 'combobox', 'Date:', '2022-07-14T00:00:00.000Z')
-    expect(date.value).toBe("Thu, Jul 14, 2022")
+    expect(date.value).toBe('Thu, Jul 14, 2022')
     date = changeValue(component, 'combobox', 'Date:', '2022-07-23T00:00:00.000Z')
-    expect(date.value).toBe("Sat, Jul 23, 2022")
+    expect(date.value).toBe('Sat, Jul 23, 2022')
     select(component, 'button', 'Submit')
 
     expect(defaultProps.event.save).toHaveBeenCalledWith(
       expect.objectContaining({
-        'calendar_event[start_at]': '2022-07-23T00:00:00.000Z',
+        'calendar_event[start_at]': '2022-07-23T00:00:00.000Z'
       }),
       expect.anything(),
       expect.anything()
@@ -165,8 +161,8 @@ describe('CalendarEventDetailsForm', () => {
   it('can keep the same date when the date input is clicked and blurred', async () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
-    let date = changeValue(component, 'combobox', 'Date:', '2022-07-14T00:00:00.000Z')
-    expect(date.value).toBe("Thu, Jul 14, 2022")
+    const date = changeValue(component, 'combobox', 'Date:', '2022-07-14T00:00:00.000Z')
+    expect(date.value).toBe('Thu, Jul 14, 2022')
 
     for (let i = 0; i < 30; i++) {
       act(() => date.click())
@@ -177,7 +173,7 @@ describe('CalendarEventDetailsForm', () => {
 
     expect(defaultProps.event.save).toHaveBeenCalledWith(
       expect.objectContaining({
-        'calendar_event[start_at]': '2022-07-14T00:00:00.000Z',
+        'calendar_event[start_at]': '2022-07-14T00:00:00.000Z'
       }),
       expect.anything(),
       expect.anything()
@@ -189,7 +185,12 @@ describe('CalendarEventDetailsForm', () => {
   })
 
   it('can change the date in Denver at 11:30 PM', async () => {
-    testTimezone('America/Denver', '2022-07-14T06:00:00.000Z', '2022-07-15T05:30:00.000Z', 47)
+    testTimezone(
+      'America/Denver',
+      '2022-07-14T06:00:00.000Z',
+      '2022-07-15T05:30:00.000Z',
+      '11:30 PM'
+    )
   })
 
   it('can change the date in Shanghai at 12:00 AM', async () => {
@@ -197,7 +198,12 @@ describe('CalendarEventDetailsForm', () => {
   })
 
   it('can change the date in Shanghai at 11:30 PM', async () => {
-    testTimezone('Asia/Shanghai', '2022-07-13T16:00:00.000Z', '2022-07-14T15:30:00.000Z', 47)
+    testTimezone(
+      'Asia/Shanghai',
+      '2022-07-13T16:00:00.000Z',
+      '2022-07-14T15:30:00.000Z',
+      '11:30 PM'
+    )
   })
 
   it('can change the date in Adelaide at 12:00 AM', async () => {
@@ -205,7 +211,12 @@ describe('CalendarEventDetailsForm', () => {
   })
 
   it('can change the date in Adelaide at 11:30 PM', async () => {
-    testTimezone('Australia/Adelaide', '2022-07-13T14:30:00.000Z', '2022-07-14T14:00:00.000Z', 47)
+    testTimezone(
+      'Australia/Adelaide',
+      '2022-07-13T14:30:00.000Z',
+      '2022-07-14T14:00:00.000Z',
+      '11:30 PM'
+    )
   })
 
   it('can change the date in Tokyo at 12:00 AM', async () => {
@@ -213,7 +224,7 @@ describe('CalendarEventDetailsForm', () => {
   })
 
   it('can change the date in Tokyo at 11:30 PM', async () => {
-    testTimezone('Asia/Tokyo', '2022-07-13T15:00:00.000Z', '2022-07-14T14:30:00.000Z', 47)
+    testTimezone('Asia/Tokyo', '2022-07-13T15:00:00.000Z', '2022-07-14T14:30:00.000Z', '11:30 PM')
   })
 
   it('can change the date in the UK at 12:00 AM', async () => {
@@ -221,7 +232,7 @@ describe('CalendarEventDetailsForm', () => {
   })
 
   it('can change the date in the UK at 11:30 PM', async () => {
-    testTimezone('Etc/UTC', '2022-07-14T00:00:00.000Z', '2022-07-14T23:30:00.000Z', 47)
+    testTimezone('Etc/UTC', '2022-07-14T00:00:00.000Z', '2022-07-14T23:30:00.000Z', '11:30 PM')
   })
 
   it('can change the date in eastern Brazil at 12:00 AM', async () => {
@@ -229,14 +240,14 @@ describe('CalendarEventDetailsForm', () => {
   })
 
   it('can change the date in eastern Brazil at 11:30 PM', async () => {
-    testTimezone('Brazil/East', '2022-07-14T03:00:00.000Z', '2022-07-15T02:30:00.000Z', 47)
+    testTimezone('Brazil/East', '2022-07-14T03:00:00.000Z', '2022-07-15T02:30:00.000Z', '11:30 PM')
   })
 
   it('cannot have end time before start time', async () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
-    const start = setTime(component, 'From:', 9)
-    setTime(component, 'To:', 8)
+    const start = setTime(component, 'From:', '5:00 AM')
+    setTime(component, 'To:', '4:00 AM')
 
     const errMessage = component.getByText('End time cannot be before Start time')
     expect(errMessage).toBeInTheDocument()
@@ -248,8 +259,8 @@ describe('CalendarEventDetailsForm', () => {
   it('cannot have start time after end time', async () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
-    const end = setTime(component, 'To:', 4)
-    setTime(component, 'From:', 5)
+    const end = setTime(component, 'To:', '2:00 AM')
+    setTime(component, 'From:', '2:30 AM')
 
     const errMessage = component.getByText('Start Time cannot be after End Time')
     expect(errMessage).toBeInTheDocument()
@@ -323,28 +334,40 @@ describe('CalendarEventDetailsForm', () => {
     defaultProps.event.contextInfo = courseContext
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
-    expect(component.queryByRole('checkbox', {name: 'Add to Course Pacing blackout dates'})).not.toBeInTheDocument()
+    expect(
+      component.queryByRole('checkbox', {name: 'Add to Course Pacing blackout dates'})
+    ).not.toBeInTheDocument()
     defaultProps.event.contextInfo = userContext
   })
 
   it('does not render blackout checkbox in a user context', async () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
-    expect(component.queryByRole('checkbox', {name: 'Add to Course Pacing blackout dates'})).not.toBeInTheDocument()
+    expect(
+      component.queryByRole('checkbox', {name: 'Add to Course Pacing blackout dates'})
+    ).not.toBeInTheDocument()
   })
 
   it('only enables relevant fields when blackout date checkbox is checked', async () => {
     ENV.FEATURES.account_level_blackout_dates = true
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
-    expectFieldsToBeEnabled(component, 
-      ["Title:", "Location:", "Date:", "From:", "To:", "Calendar:", "More Options", "Submit"])
+    expectFieldsToBeEnabled(component, [
+      'Title:',
+      'Location:',
+      'Date:',
+      'From:',
+      'To:',
+      'Calendar:',
+      'More Options',
+      'Submit'
+    ])
 
     select(component, 'button', 'Calendar:')
     select(component, 'option', 'Geometry')
     select(component, 'checkbox', 'Add to Course Pacing blackout dates')
 
-    expectFieldsToBeEnabled(component, ["Title:", "Date:", "Calendar:", "More Options", "Submit"])
-    expectFieldsToBeDisabled(component, ["Location:", "From:", "To:"])
+    expectFieldsToBeEnabled(component, ['Title:', 'Date:', 'Calendar:', 'More Options', 'Submit'])
+    expectFieldsToBeDisabled(component, ['Location:', 'From:', 'To:'])
   })
 })
