@@ -34,6 +34,13 @@ describe ActiveSupport::Cache::HaStore do
     end
   end
 
+  describe "#delete_matched" do
+    it "triggers a consul event when configured" do
+      expect(Diplomat::Event).to receive(:fire).with("invalidate", match(%r{^DELETE_MATCHED|rails\?\?:mykey/\*$}), nil, nil, nil, nil)
+      store.delete_matched("mykey/*")
+    end
+  end
+
   describe "consume_consul_events" do
     it "works" do
       # check that Canvas.redis is equivalent to Redis.new that consume_consule_events uses
@@ -44,13 +51,60 @@ describe ActiveSupport::Cache::HaStore do
       skip "Can't run this spec unless redis is default configured" unless (redis.get(secret_key) rescue nil) == "1"
       consul_event_id = SecureRandom.uuid
 
-      Bundler.with_clean_env do
+      Bundler.with_unbundled_env do
         payload = [{ ID: consul_event_id, Payload: Base64.strict_encode64(secret_key) }].to_json
 
         `echo #{Shellwords.escape(payload)} | #{Rails.root}/script/consume_consul_events`
         expect($?).to be_success
       end
       expect(redis.get(secret_key)).to be_nil
+      expect(redis.zrank("consul_events", consul_event_id)).not_to be_nil
+    end
+
+    it "deletes single keys" do
+      # check that Canvas.redis is equivalent to Redis.new that consume_consule_events uses
+      # I would normally compare against `id`, but that might have localhost vs. 127.0.0.1
+      redis = Redis.new(connect_timeout: 0.5)
+      secret_key = "prefix1/#{SecureRandom.uuid}"
+      Canvas.redis.set(secret_key, "1", ex: 5)
+      secret_key2 = "prefix1/#{SecureRandom.uuid}"
+      Canvas.redis.set(secret_key2, "1", ex: 5)
+      secret_key3 = "prefix2/#{SecureRandom.uuid}"
+      Canvas.redis.set(secret_key3, "1", ex: 5)
+      skip "Can't run this spec unless redis is default configured" unless (redis.get(secret_key) rescue nil) == "1"
+      consul_event_id = SecureRandom.uuid
+
+      Bundler.with_unbundled_env do
+        payload = [{ ID: consul_event_id, Payload: Base64.strict_encode64("DELETE_MATCHED|prefix1/*") }].to_json
+
+        `echo #{Shellwords.escape(payload)} | #{Rails.root}/script/consume_consul_events`
+        expect($?).to be_success
+      end
+      expect(redis.get(secret_key)).to be_nil
+      expect(redis.get(secret_key2)).to be_nil
+      expect(redis.get(secret_key3)).to eq("1")
+      expect(redis.zrank("consul_events", consul_event_id)).not_to be_nil
+    end
+
+    it "deletes maching keys" do
+      # check that Canvas.redis is equivalent to Redis.new that consume_consule_events uses
+      # I would normally compare against `id`, but that might have localhost vs. 127.0.0.1
+      redis = Redis.new(connect_timeout: 0.5)
+      secret_key = SecureRandom.uuid
+      Canvas.redis.set(secret_key, "1", ex: 5)
+      secret_key2 = SecureRandom.uuid
+      Canvas.redis.set(secret_key2, "1", ex: 5)
+      skip "Can't run this spec unless redis is default configured" unless (redis.get(secret_key) rescue nil) == "1"
+      consul_event_id = SecureRandom.uuid
+
+      Bundler.with_unbundled_env do
+        payload = [{ ID: consul_event_id, Payload: Base64.strict_encode64("DELETE|#{secret_key}") }].to_json
+
+        `echo #{Shellwords.escape(payload)} | #{Rails.root}/script/consume_consul_events`
+        expect($?).to be_success
+      end
+      expect(redis.get(secret_key)).to be_nil
+      expect(redis.get(secret_key2)).to eq("1")
       expect(redis.zrank("consul_events", consul_event_id)).not_to be_nil
     end
 
@@ -65,7 +119,7 @@ describe ActiveSupport::Cache::HaStore do
       skip "Can't run this spec unless redis is default configured" unless (redis.get(secret_key) rescue nil) == "1"
       consul_event_id = SecureRandom.uuid
 
-      Bundler.with_clean_env do
+      Bundler.with_unbundled_env do
         payload = [{ ID: consul_event_id, Payload: Base64.strict_encode64("FLUSHDB") }].to_json
 
         `echo #{Shellwords.escape(payload)} | #{Rails.root}/script/consume_consul_events`
