@@ -30,6 +30,7 @@ import {
 import {Link} from '@instructure/ui-link'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {alignmentShape} from './propTypeShapes'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = useI18nScope('AlignmentSummary')
 
@@ -44,30 +45,46 @@ const AlignmentItem = ({
   assignmentContentType
 }) => {
   const renderIcon = () => {
-    if (contentType === 'Rubric') return <IconRubricLine data-testid="alignment-item-rubric-icon" />
-    if (contentType === 'AssessmentQuestionBank')
-      return <IconBankLine data-testid="alignment-item-bank-icon" />
-    if (assignmentContentType === 'quiz')
-      return <IconQuizLine data-testid="alignment-item-quiz-icon" />
-    if (assignmentContentType === 'discussion')
-      return <IconDiscussionLine data-testid="alignment-item-discussion-icon" />
-    // by default we show Assignment icon
-    return <IconAssignmentLine data-testid="alignment-item-assignment-icon" />
+    let icon
+    let screenReaderText
+    if (contentType === 'Rubric') {
+      icon = <IconRubricLine data-testid="alignment-item-rubric-icon" />
+      screenReaderText = I18n.t('Rubric')
+    } else if (contentType === 'AssessmentQuestionBank') {
+      icon = <IconBankLine data-testid="alignment-item-bank-icon" />
+      screenReaderText = I18n.t('Assessment Question Bank')
+    } else if (assignmentContentType === 'quiz') {
+      icon = <IconQuizLine data-testid="alignment-item-quiz-icon" />
+      screenReaderText = I18n.t('Quiz')
+    } else if (assignmentContentType === 'discussion') {
+      icon = <IconDiscussionLine data-testid="alignment-item-discussion-icon" />
+      screenReaderText = I18n.t('Discussion')
+    } else {
+      // by default we show Assignment icon
+      icon = <IconAssignmentLine data-testid="alignment-item-assignment-icon" />
+      screenReaderText = I18n.t('Assignment')
+    }
+    return (
+      <div
+        style={{
+          display: 'inline-flex',
+          alignSelf: 'center',
+          fontSize: '1rem',
+          padding: '0.5rem 0 0'
+        }}
+      >
+        {icon}
+        <div style={{position: 'relative'}}>
+          <ScreenReaderContent>{screenReaderText}</ScreenReaderContent>
+        </div>
+      </div>
+    )
   }
 
   return (
     <Flex key={id} as="div" alignItems="start" padding="x-small 0 0" data-testid="alignment-item">
       <Flex.Item as="div" size="1.5rem">
-        <div
-          style={{
-            display: 'inline-flex',
-            alignSelf: 'center',
-            fontSize: '1rem',
-            padding: '0.5rem 0 0'
-          }}
-        >
-          {renderIcon()}
-        </div>
+        {renderIcon()}
       </Flex.Item>
       <Flex.Item size="50%" shouldGrow={true}>
         <Flex as="div" direction="column">
