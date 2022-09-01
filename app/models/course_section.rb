@@ -174,19 +174,15 @@ class CourseSection < ActiveRecord::Base
     given { |user| course.account_membership_allows(user, :read_roster) }
     can :read
 
-    given do |user, session|
-      if Account.site_admin.feature_enabled?(:section_level_calendar_permissions)
-        if user
-          enrollments = user.enrollments.shard(self).active_by_date.where(course: course)
-          enrollments.where(limit_privileges_to_course_section: false).or(enrollments.where(course_section: self)).any? { |e| e.has_permission_to?(:manage_calendar) }
-        end
-      else
-        course.grants_right?(user, session, :manage_calendar)
+    given do |user, _session|
+      if user
+        enrollments = user.enrollments.shard(self).active_by_date.where(course: course)
+        enrollments.where(limit_privileges_to_course_section: false).or(enrollments.where(course_section: self)).any? { |e| e.has_permission_to?(:manage_calendar) }
       end
     end
     can :manage_calendar
 
-    given { |user| Account.site_admin.feature_enabled?(:section_level_calendar_permissions) && course.account_membership_allows(user, :manage_calendar) }
+    given { |user| course.account_membership_allows(user, :manage_calendar) }
     can :manage_calendar
 
     given do |user, session|
