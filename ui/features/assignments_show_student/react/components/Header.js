@@ -43,6 +43,7 @@ import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import CommentsTray from './CommentsTray/index'
+import {getOriginalityData} from '@canvas/grading/originalityReportHelper'
 
 const I18n = useI18nScope('assignments_2_student_header')
 
@@ -317,11 +318,13 @@ class Header extends React.Component {
                     !lockAssignment &&
                     (this.props.submission.submissionType === 'online_text_entry' ||
                       this.props.submission.attachments.length === 1) &&
-                    this.props.submission.turnitinData &&
-                    this.props.submission.turnitinData.length !== 0 &&
-                    this.props.assignment.env.originalityReportsForA2Enabled && (
+                    this.props.submission.originalityData &&
+                    this.props.assignment.env.originalityReportsForA2Enabled &&
+                    getOriginalityData(this.props.submission, 0) && (
                       <Flex.Item>
-                        <OriginalityReport turnitinData={this.props.submission.turnitinData[0]} />
+                        <OriginalityReport
+                          originalityData={getOriginalityData(this.props.submission, 0)}
+                        />
                       </Flex.Item>
                     )}
                 </Flex>

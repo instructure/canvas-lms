@@ -20,7 +20,7 @@ import $ from 'jquery'
 import submissionDetailsDialog from '../jst/SubmissionDetailsDialog.handlebars'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
-import originalityReportSubmissionKey from '@canvas/grading/originalityReportSubmissionKey'
+import {originalityReportSubmissionKey} from '@canvas/grading/originalityReportHelper'
 import {extractDataForTurnitin} from '@canvas/grading/Turnitin'
 import OutlierScoreHelper from '@canvas/grading/OutlierScoreHelper'
 import '../jst/_submission_detail.handlebars' // a partial needed by the SubmissionDetailsDialog template

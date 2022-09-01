@@ -424,15 +424,16 @@ describe('originality report', () => {
     const props = await mockAssignmentAndSubmission({
       Submission: {submissionType: 'online_text_entry'}
     })
-    props.submission.turnitinData = [
-      {
+
+    props.submission.originalityData = {
+      submission_1: {
         similarity_score: 10,
         state: 'acceptable',
         report_url: 'http://example.com',
         status: 'scored',
         data: '{}'
       }
-    ]
+    }
     props.assignment.env.originalityReportsForA2Enabled = true
     const {queryByTestId} = render(<Header {...props} />)
     expect(queryByTestId('originality_report')).toBeInTheDocument()
@@ -442,15 +443,15 @@ describe('originality report', () => {
     const props = await mockAssignmentAndSubmission({
       Submission: {submissionType: 'online_text_entry'}
     })
-    props.submission.turnitinData = [
-      {
+    props.submission.originalityData = {
+      submission_1: {
         similarity_score: 10,
         state: 'acceptable',
         report_url: 'http://example.com',
         status: 'scored',
         data: '{}'
       }
-    ]
+    }
     props.assignment.env.originalityReportsForA2Enabled = false
     const {queryByTestId} = render(<Header {...props} />)
     expect(queryByTestId('originality_report')).not.toBeInTheDocument()
@@ -469,15 +470,15 @@ describe('originality report', () => {
     const props = await mockAssignmentAndSubmission({
       Submission: {submissionType: 'online_upload', attachments: [file]}
     })
-    props.submission.turnitinData = [
-      {
+    props.submission.originalityData = {
+      attachment_1: {
         similarity_score: 10,
         state: 'acceptable',
         report_url: 'http://example.com',
         status: 'scored',
         data: '{}'
       }
-    ]
+    }
     props.assignment.env.originalityReportsForA2Enabled = true
     const {queryByTestId} = render(<Header {...props} />)
     expect(queryByTestId('originality_report')).toBeInTheDocument()

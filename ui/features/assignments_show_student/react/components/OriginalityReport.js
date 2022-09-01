@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -21,17 +21,18 @@ import {View} from '@instructure/ui-view'
 import {TurnitinData} from '@canvas/assignments/graphql/student/TurnitinData'
 
 const I18n = useI18nScope('assignments_2')
-export default function OriginalityReport({turnitinData}) {
+export default function OriginalityReport({originalityData}) {
   return (
     <View as="div">
       <span className="turnitin_score_container" data-testid="originality_report">
-        <span className={'turnitin_score_container_caret ' + turnitinData.state + '_score'} />
+        <span className={'turnitin_score_container_caret ' + originalityData.state + '_score'} />
         <a
-          href={turnitinData.reportUrl}
-          className={'turnitin_similarity_score ' + turnitinData.state + '_score'}
+          href={originalityData.reportUrl}
+          className={'turnitin_similarity_score ' + originalityData.state + '_score'}
           data-testid="originality_report_url"
+          title={I18n.t('Similarity score -- %{state}', {state: originalityData.state})}
         >
-          {turnitinData.score && I18n.t('%{score}%', {score: turnitinData.score})}
+          {originalityData.score}%
         </a>
       </span>
     </View>
@@ -39,5 +40,5 @@ export default function OriginalityReport({turnitinData}) {
 }
 
 OriginalityReport.propTypes = {
-  turnitinData: TurnitinData.shape.isRequired
+  originalityData: TurnitinData.shape.isRequired
 }
