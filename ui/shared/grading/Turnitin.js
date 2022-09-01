@@ -18,11 +18,11 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {max, invert} from 'underscore'
-import originalityReportSubmissionKey from './originalityReportSubmissionKey'
+import {originalityReportSubmissionKey} from './originalityReportHelper'
 
 const I18n = useI18nScope('turnitin')
 
-export const extractDataTurnitin = function(submission) {
+export const extractDataTurnitin = function (submission) {
   let attachment, i, item, len, plagData, ref, turnitin
   plagData = submission != null ? submission.turnitin_data : undefined
   if (plagData == null) {
@@ -67,7 +67,7 @@ export const extractDataTurnitin = function(submission) {
     'error'
   ]
   const stateMap = invert(stateList)
-  const states = (function() {
+  const states = (function () {
     let j, len1
     const ref2 = data.items
     const results = []
@@ -81,7 +81,7 @@ export const extractDataTurnitin = function(submission) {
   return data
 }
 
-export const extractDataForTurnitin = function(submission, key, urlPrefix) {
+export const extractDataForTurnitin = function (submission, key, urlPrefix) {
   let data, type
   data = submission?.turnitin_data
   type = 'turnitin'

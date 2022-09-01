@@ -285,6 +285,9 @@ module Interfaces::SubmissionInterface
     Promise.all(promises).then(&:compact)
   end
 
+  field :originality_data, GraphQL::Types::JSON, null: true
+  delegate :originality_data, to: :submission
+
   field :submission_draft, Types::SubmissionDraftType, null: true
   def submission_draft
     # Other users (e.g. Observers) should not be able to see submission drafts
