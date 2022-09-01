@@ -92,7 +92,7 @@ export const RESPONSE_ACCOUNT_4 = [
 export const COLLECTION_ACCOUNT_1 = {
   '1': {
     id: 1,
-    name: 'University (24)',
+    name: 'University (25)',
     collections: [11, 4, 6],
     children: [
       {
@@ -109,7 +109,7 @@ export const COLLECTION_ACCOUNT_1 = {
   },
   '4': {
     id: 4,
-    name: 'CPMS (2)',
+    name: 'CPMS (3)',
     collections: [],
     children: [
       {
@@ -121,13 +121,13 @@ export const COLLECTION_ACCOUNT_1 = {
   },
   '6': {
     id: 6,
-    name: 'Elementary (1)',
+    name: 'Elementary (2)',
     collections: [],
     children: [{visible: true, id: 6, name: 'Elementary'}]
   },
   '11': {
     id: 11,
-    name: 'Big Account (15)',
+    name: 'Big Account (16)',
     collections: [],
     children: [{visible: true, id: 11, name: 'Big Account'}]
   }
@@ -136,7 +136,7 @@ export const COLLECTION_ACCOUNT_1 = {
 export const COLLECTION_ACCOUNT_1_4 = {
   '1': {
     id: 1,
-    name: 'University (24)',
+    name: 'University (25)',
     collections: [11, 4, 6],
     children: [
       {
@@ -153,7 +153,7 @@ export const COLLECTION_ACCOUNT_1_4 = {
   },
   '4': {
     id: 4,
-    name: 'CPMS (2)',
+    name: 'CPMS (3)',
     collections: [5],
     children: [
       {
@@ -165,19 +165,19 @@ export const COLLECTION_ACCOUNT_1_4 = {
   },
   '5': {
     id: 5,
-    name: 'CS (1)',
+    name: 'CS (2)',
     collections: [],
     children: [{visible: true, id: 5, name: 'CS'}]
   },
   '6': {
     id: 6,
-    name: 'Elementary (1)',
+    name: 'Elementary (2)',
     collections: [],
     children: [{visible: true, id: 6, name: 'Elementary'}]
   },
   '11': {
     id: 11,
-    name: 'Big Account (15)',
+    name: 'Big Account (16)',
     collections: [],
     children: [{visible: true, id: 11, name: 'Big Account'}]
   }
@@ -186,7 +186,7 @@ export const COLLECTION_ACCOUNT_1_4 = {
 export const COLLECTION_ACCOUNT_3 = {
   '3': {
     id: 3,
-    name: 'Manually-Created Courses (0)',
+    name: 'Manually-Created Courses (1)',
     collections: [],
     children: [{visible: true, id: 3, name: 'Manually-Created Courses'}]
   }

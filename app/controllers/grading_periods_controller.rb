@@ -168,6 +168,40 @@ class GradingPeriodsController < ApplicationController
     end
   end
 
+  # @API Batch update grading periods
+  #
+  # Update multiple grading periods
+  #
+  # @argument set_id [Required, String]
+  #   The id of the grading period set.
+  #
+  # @argument grading_periods[][id] [String]
+  #   The id of the grading period. If the id parameter does not exist, a new grading period will be created.
+  #
+  # @argument grading_periods[][title] [Required, String]
+  #   The title of the grading period.
+  #   The title is required for creating a new grading period, but not for updating an existing grading period.
+  #
+  # @argument grading_periods[][start_date] [Required, Date]
+  #   The date the grading period starts.
+  #   The start_date is required for creating a new grading period, but not for updating an existing grading period.
+  #
+  # @argument grading_periods[][end_date] [Required, Date]
+  #   The date the grading period ends.
+  #   The end_date is required for creating a new grading period, but not for updating an existing grading period.
+  #
+  # @argument grading_periods[][close_date] [Required, Date]
+  #   The date after which grades can no longer be changed for a grading period.
+  #   The close_date is required for creating a new grading period, but not for updating an existing grading period.
+  #
+  # @argument grading_periods[][weight] [Float]
+  #   A weight value that contributes to the overall weight of a grading period set which is used to calculate how much assignments in this period contribute to the total grade
+  #
+  # @example_response
+  #   {
+  #     "grading_periods": [GradingPeriod]
+  #   }
+  #
   def batch_update
     if authorized_action(@context, @current_user, :manage_grades)
       DueDateCacher.with_executing_user(@current_user) do

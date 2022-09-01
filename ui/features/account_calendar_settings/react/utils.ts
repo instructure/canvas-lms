@@ -47,9 +47,9 @@ export const addAccountsToTree = (
     ) {
       newCollections[account.id] = {
         id: account.id,
-        name: I18n.t('%{accountName} (%{subaccountCount})', {
+        name: I18n.t('%{accountName} (%{accountCount})', {
           accountName: account.name,
-          subaccountCount: account.sub_account_count
+          accountCount: account.sub_account_count + 1 // to include parent account in the count
         }),
         collections: [],
         children: [{id: account.id, name: account.name, visible: account.visible}]

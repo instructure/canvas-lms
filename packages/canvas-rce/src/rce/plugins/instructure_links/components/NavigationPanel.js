@@ -146,7 +146,7 @@ export default function NavigationPanel(props) {
           collection={collection}
           onLinkClick={props.onLinkClick}
           contextType={props.contextType}
-          isEdit={props.isEdit}
+          editing={props.editing}
           onEditClick={props.onEditClick}
         />
       </AccordionSection>
@@ -160,6 +160,6 @@ NavigationPanel.propTypes = {
   onChangeAccordion: func.isRequired,
   selectedAccordionIndex: string,
   onLinkClick: func,
-  isEdit: bool,
+  editing: bool,
   onEditClick: func
 }

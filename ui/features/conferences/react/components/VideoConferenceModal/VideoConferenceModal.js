@@ -36,12 +36,11 @@ export const VideoConferenceModal = ({
   onSubmit,
   ...props
 }) => {
-  const OPTIONS_DEFAULT = ['no_time_limit', 'enable_waiting_room']
+  const OPTIONS_DEFAULT = ['enable_waiting_room']
 
   if (ENV.bbb_recording_enabled) {
     OPTIONS_DEFAULT.push('recording_enabled')
   }
-
   const INVITATION_OPTIONS_DEFAULT = ['invite_all']
   const ATTENDEES_OPTIONS_DEFAULT = [
     'share_webcam',
@@ -51,7 +50,8 @@ export const VideoConferenceModal = ({
     'send_private_chat'
   ]
 
-  const [name, setName] = useState(isEditing ? props.name : '')
+  const defaultName = ENV.context_name ? `${ENV.context_name} Conference` : 'Conference'
+  const [name, setName] = useState(isEditing ? props.name : defaultName)
   const [conferenceType, setConferenceType] = useState(
     isEditing ? props.type : window.ENV.conference_type_details[0].type
   )

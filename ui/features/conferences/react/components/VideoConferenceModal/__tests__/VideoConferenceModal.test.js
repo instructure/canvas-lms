@@ -68,6 +68,7 @@ describe('VideoConferenceModal', () => {
       }
     ]
     window.ENV.bbb_recording_enabled = true
+    window.ENV.context_name = 'Amazing Course'
   })
 
   it('should render', () => {
@@ -84,7 +85,8 @@ describe('VideoConferenceModal', () => {
 
   it('do not submit without a conference name', () => {
     const container = setup()
-
+    expect(container.getByLabelText('Name')).toHaveValue('Amazing Course Conference')
+    userEvent.clear(container.getByLabelText('Name'))
     fireEvent.click(container.getByTestId('submit-button'))
     expect(onSubmit).not.toHaveBeenCalled()
   })
@@ -92,6 +94,7 @@ describe('VideoConferenceModal', () => {
   it('submit when correct fields are filled', () => {
     const container = setup()
 
+    userEvent.clear(container.getByLabelText('Name'))
     userEvent.type(container.getByLabelText('Name'), 'A great video conference name')
     userEvent.type(container.getByLabelText('Description'), 'A great video conference description')
     fireEvent.click(container.getByTestId('submit-button'))
@@ -100,7 +103,7 @@ describe('VideoConferenceModal', () => {
     expect(onSubmit.mock.calls[0][1]).toStrictEqual({
       name: 'A great video conference name',
       duration: 60,
-      options: ['no_time_limit', 'enable_waiting_room', 'recording_enabled'],
+      options: ['enable_waiting_room', 'recording_enabled'],
       conferenceType: 'BigBlueButton',
       description: 'A great video conference description',
       invitationOptions: ['invite_all'],

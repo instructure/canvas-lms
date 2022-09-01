@@ -30,7 +30,8 @@ export const actions = {
   SET_TRANSLATE_X: 'SetTranslateX',
   SET_TRANSLATE_Y: 'SetTranslateY',
   SET_WIDTH: 'SetWidth',
-  SET_HEIGHT: 'SetHeight'
+  SET_HEIGHT: 'SetHeight',
+  SET_ERROR: 'SetError'
 }
 
 const buildTransformString = state => {
@@ -67,6 +68,8 @@ export const svgSettings = (state, action) => {
       return {...state, width: action.payload}
     case actions.SET_HEIGHT:
       return {...state, height: action.payload}
+    case actions.SET_ERROR:
+      return {...state, error: action.payload}
     case actions.SET_TRANSLATE_X:
       return nextStateForTransform(state, 'translateX', action.payload)
     case actions.SET_TRANSLATE_Y:

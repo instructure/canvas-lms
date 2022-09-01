@@ -2527,8 +2527,8 @@ EG = {
         return {
           value: i,
           late_policy_status: EG.currentStudent.submission.late_policy_status,
-          late: EG.currentStudent.submission.late,
-          missing: EG.currentStudent.submission.missing,
+          late: s.late,
+          missing: s.missing,
           excused: EG.currentStudent.submission.excused,
           selected: selectedIndex === i,
           submittedAt: $.datetimeString(s.submitted_at) || noSubmittedAt,

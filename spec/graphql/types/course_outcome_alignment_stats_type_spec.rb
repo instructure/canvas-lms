@@ -53,13 +53,19 @@ describe Types::CourseOutcomeAlignmentStatsType do
     it "total_artifacts" do
       expect(
         course_type.resolve("outcomeAlignmentStats { totalArtifacts }")
-      ).to eq 5
+      ).to eq 4
     end
 
     it "aligned_artifacts" do
       expect(
         course_type.resolve("outcomeAlignmentStats { alignedArtifacts }")
-      ).to eq 3
+      ).to eq 2
+    end
+
+    it "artifact_alignments" do
+      expect(
+        course_type.resolve("outcomeAlignmentStats { artifactAlignments }")
+      ).to eq 2
     end
   end
 end

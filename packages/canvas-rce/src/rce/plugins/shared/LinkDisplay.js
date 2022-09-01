@@ -16,12 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
 import {TextInput} from '@instructure/ui-text-input'
 import formatMessage from '../../../format-message'
+import {showFlashAlert} from '../../../canvasFileBrowser/FlashAlert'
 
 const EDIT_MESSAGE = formatMessage('If left empty link, text will display as course link name')
 
@@ -30,9 +31,17 @@ export const LinkDisplay = ({
   Icon,
   placeholderText,
   linkFileName,
-  color,
+  published,
   handleTextChange
 }) => {
+  useEffect(() => {
+    showFlashAlert({
+      message: formatMessage('Selected {linkFileName}', {linkFileName}),
+      type: 'info',
+      srOnly: true
+    })
+  }, [linkFileName])
+
   return (
     <View as="div" data-testid="LinkDisplay">
       <View as="div">
@@ -54,7 +63,7 @@ export const LinkDisplay = ({
         </Flex>
         <Flex margin="small none none none">
           <Flex.Item padding="0 x-small 0 small">
-            <Text data-testid="icon-wrapper" color={color}>
+            <Text data-testid="icon-wrapper" color={published ? 'success' : 'primary'}>
               <Icon size="x-small" />
             </Text>
           </Flex.Item>

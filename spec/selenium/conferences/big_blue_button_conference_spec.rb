@@ -57,6 +57,38 @@ describe "BigBlueButton conferences" do
       Account.site_admin.enable_feature! :bbb_modal_update
     end
 
+    it "persists selected settings", ignore_js_errors: true do
+      get conferences_index_page
+      f("button[title='New Conference']").click
+
+      f("input[placeholder='Conference Name']").send_keys "banana"
+      # check it
+      fj("label:contains('No time limit')").click
+
+      f("div#tab-attendees").click
+
+      # unchecks the following
+      fj("label:contains('Share webcam')").click
+      fj("label:contains('See other viewers webcams')").click
+      fj("label:contains('Share microphone')").click
+      fj("label:contains('Send public chat messages')").click
+      fj("label:contains('Send private chat messages')").click
+      fj("button:contains('Create')").click
+      wait_for_ajaximations
+
+      fj("li.conference a:contains('Settings')").click
+      fj("a:contains('Edit')").click
+
+      expect(f("input[value='no_time_limit']").attribute("checked")).to be_truthy
+
+      f("div#tab-attendees").click
+      expect(f("input[value='share_webcam']").attribute("checked")).to be_falsey
+      expect(f("input[value='share_other_webcams']").attribute("checked")).to be_falsey
+      expect(f("input[value='share_microphone']").attribute("checked")).to be_falsey
+      expect(f("input[value='send_public_chat']").attribute("checked")).to be_falsey
+      expect(f("input[value='send_private_chat']").attribute("checked")).to be_falsey
+    end
+
     it "syncs in unadded context users on option select" do
       conf = create_big_blue_button_conference
       conf.add_invitee(@ta)

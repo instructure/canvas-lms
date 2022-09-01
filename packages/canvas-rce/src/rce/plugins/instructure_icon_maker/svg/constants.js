@@ -68,7 +68,8 @@ export const DEFAULT_SETTINGS = {
   width: 0,
   height: 0,
   transform: '',
-  imageSettings: null
+  imageSettings: null,
+  error: null
 }
 
 export const BASE_SIZE = {

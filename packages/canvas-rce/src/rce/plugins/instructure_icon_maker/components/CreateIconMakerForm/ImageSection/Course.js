@@ -24,9 +24,24 @@ import {useStoreProps} from '../../../../shared/StoreContext'
 import useDataUrl from '../../../../shared/useDataUrl'
 import {actions} from '../../../reducers/imageSection'
 import {canCompressImage, compressImage, shouldCompressImage} from './compressionUtils'
+import {isAnUnsupportedGifPngImage, MAX_GIF_PNG_SIZE_BYTES} from './utils'
+import {actions as svgActions} from '../../../reducers/svgSettings'
+import formatMessage from '../../../../../../format-message'
 
-const dispatchImage = async (dispatch, dataUrl, dataBlob) => {
+const dispatchImage = async (dispatch, onChange, dataUrl, dataBlob) => {
   let image = dataUrl
+
+  if (isAnUnsupportedGifPngImage(dataBlob)) {
+    dispatch({...actions.CLEAR_IMAGE})
+    return onChange({
+      type: svgActions.SET_ERROR,
+      payload: formatMessage(
+        'GIF/PNG format images larger than {size} KB are not currently supported.',
+        {size: MAX_GIF_PNG_SIZE_BYTES / 1024}
+      )
+    })
+  }
+
   dispatch({...actions.SET_IMAGE, payload: ''})
   dispatch({...actions.SET_CROPPER_OPEN, payload: true})
   if (canCompressImage() && shouldCompressImage(dataBlob)) {
@@ -43,7 +58,7 @@ const dispatchImage = async (dispatch, dataUrl, dataBlob) => {
   dispatch({...actions.SET_IMAGE, payload: image})
 }
 
-const Course = ({dispatch, onLoading, onLoaded}) => {
+const Course = ({dispatch, onChange, onLoading, onLoaded}) => {
   const storeProps = useStoreProps()
   const {files, bookmark, isLoading, hasMore} = storeProps.images[storeProps.contextType]
   const {setUrl, dataUrl, dataLoading, dataBlob} = useDataUrl()
@@ -54,7 +69,7 @@ const Course = ({dispatch, onLoading, onLoaded}) => {
   useEffect(() => {
     // Don't clear the current image on re-render
     if (!dataUrl || !dataBlob) return
-    dispatchImage(dispatch, dataUrl, dataBlob)
+    dispatchImage(dispatch, onChange, dataUrl, dataBlob)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataUrl, dataBlob])
 
@@ -103,12 +118,14 @@ const Course = ({dispatch, onLoading, onLoaded}) => {
 
 Course.propTypes = {
   dispatch: PropTypes.func,
+  onChange: PropTypes.func,
   onLoading: PropTypes.func,
   onLoaded: PropTypes.func
 }
 
 Course.defaultProps = {
   dispatch: () => {},
+  onChange: () => {},
   onLoading: () => {},
   onLoaded: () => {}
 }

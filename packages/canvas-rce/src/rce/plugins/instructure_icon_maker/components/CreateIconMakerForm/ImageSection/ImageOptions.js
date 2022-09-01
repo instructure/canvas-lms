@@ -48,7 +48,7 @@ function renderImagePreview({image, loading}) {
       testId="selected-image-preview"
       image={image}
       loading={loading}
-      checkered
+      checkered={true}
     />
   )
 }
@@ -150,7 +150,7 @@ ImageOptions.propTypes = {
     loading: PropTypes.bool.isRequired,
     cropperOpen: PropTypes.bool.isRequired,
     cropperSettings: ImageCropperSettingsPropTypes,
-    compressed: PropTypes.string
+    compressed: PropTypes.bool.isRequired
   }).isRequired,
   dispatch: PropTypes.func.isRequired,
   rcsConfig: PropTypes.object.isRequired

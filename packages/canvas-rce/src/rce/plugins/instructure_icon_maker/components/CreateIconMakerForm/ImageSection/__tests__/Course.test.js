@@ -23,7 +23,8 @@ import {render, fireEvent, waitFor} from '@testing-library/react'
 import Course from '../Course'
 import {actions} from '../../../../reducers/imageSection'
 import {useStoreProps} from '../../../../../shared/StoreContext'
-import {compressImage, shouldCompressImage, canCompressImage} from '../compressionUtils'
+import {compressImage, shouldCompressImage} from '../compressionUtils'
+import {isAnUnsupportedGifPngImage} from '../utils'
 
 const storeProps = {
   images: {
@@ -103,6 +104,11 @@ jest.mock('../compressionUtils', () => ({
   canCompressImage: jest.fn().mockReturnValue(true)
 }))
 
+jest.mock('../utils', () => ({
+  ...jest.requireActual('../utils'),
+  isAnUnsupportedGifPngImage: jest.fn().mockReturnValue(false)
+}))
+
 describe('Course()', () => {
   let props
   const subject = (customProps = {}) => render(<Course {...props} {...customProps} />)
@@ -110,7 +116,8 @@ describe('Course()', () => {
   beforeEach(() => {
     useStoreProps.mockReturnValue(storeProps)
     props = {
-      dispatch: jest.fn()
+      dispatch: jest.fn(),
+      onChange: jest.fn()
     }
   })
 
@@ -193,6 +200,33 @@ describe('Course()', () => {
           payload: false
         })
       )
+    })
+
+    describe('and is unsupported', () => {
+      beforeAll(() => {
+        isAnUnsupportedGifPngImage.mockReturnValue(true)
+      })
+
+      afterAll(() => {
+        isAnUnsupportedGifPngImage.mockReturnValue(false)
+      })
+
+      it('dispatches a "clear image" action', async () => {
+        await waitFor(() => {
+          expect(props.dispatch).toHaveBeenCalledWith({
+            type: 'ClearImage'
+          })
+        })
+      })
+
+      it('invokes onChange action "set error"', async () => {
+        await waitFor(() => {
+          expect(props.onChange).toHaveBeenCalledWith({
+            type: 'SetError',
+            payload: 'GIF/PNG format images larger than 250 KB are not currently supported.'
+          })
+        })
+      })
     })
   })
 

@@ -106,16 +106,16 @@ describe('RCE Plugins > CanvasContentTray', () => {
     })
 
     it('replaces the old link when the Replace button is clicked', async () => {
+      const button = await component.findByTestId('replace-link-button')
+      fireEvent.click(button)
       await waitFor(() => {
-        fireEvent.click(component.getByTestId('replace-link-button'))
         expect(bridge.insertLink).toHaveBeenCalledWith({
           forceRename: true,
           href: '/pages',
           text: 'some text',
           title: 'some filename',
           type: 'wikiPages',
-          published: true,
-          course_link: true
+          published: true
         })
       })
     })

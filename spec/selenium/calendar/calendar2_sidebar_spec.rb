@@ -215,8 +215,11 @@ describe "calendar2" do
       expect(account_calendar.first.text).to eq @subaccount1.name
 
       account_calendar_delete_btn = ff("#other-calendars-context-list > .context_list_context > .buttons-wrapper > .ContextList__DeleteBtn")
+      hover(ff("#other-calendars-context-list > .context_list_context").first)
       account_calendar_delete_btn.first.click
 
+      expect(f(".flashalert-message")).to be_displayed
+      expect(f(".flashalert-message").text).to include "Calendar removed"
       expect(f(".accounts-empty-state")).to be_displayed
       driver.navigate.refresh
       expect(f(".accounts-empty-state")).to be_displayed

@@ -36,6 +36,12 @@ describe('StatusPill', () => {
       const pillText = PILL_MAP[INACTIVE_STATE].text
       expect(container.getByText(pillText)).toBeInTheDocument()
     })
+
+    it('should have hint text', () => {
+      const container = setup(INACTIVE_STATE)
+      const hintText = PILL_MAP[INACTIVE_STATE].hintText
+      expect(container.getByText(hintText)).toBeInTheDocument()
+    })
   })
 
   describe('Test when status is pending', () => {
@@ -48,6 +54,12 @@ describe('StatusPill', () => {
       const container = setup(PENDING_STATE)
       const pillText = PILL_MAP[PENDING_STATE].text
       expect(container.getByText(pillText)).toBeInTheDocument()
+    })
+
+    it('should have hint text', () => {
+      const container = setup(PENDING_STATE)
+      const hintText = PILL_MAP[PENDING_STATE].hintText
+      expect(container.getByText(hintText)).toBeInTheDocument()
     })
   })
 

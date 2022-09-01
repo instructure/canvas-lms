@@ -282,7 +282,8 @@ class RCEWrapper extends React.Component {
     autosave: {enabled: false},
     highContrastCSS: [],
     ltiTools: [],
-    maxInitRenderedRCEs: -1
+    maxInitRenderedRCEs: -1,
+    features: {}
   }
 
   static skinCssInjected = false
