@@ -21,7 +21,7 @@ tools without those tools cluttering everyone else's interfaces. Or, a single te
 who is trying out some new web service can do so without needing the tool to be
 set up at the account level.
 
-### Types of Tool Integrations
+## Types of Tool Integrations
 
 Canvas currently supports the following types of tool placements:
 
@@ -104,9 +104,9 @@ href="file.deep_linking.html" target="_blank">LTI deep links</a>:
 
 
 
-### How to Configure/Import Integrated Tools
+## How to Configure/Import Integrated Tools
 
-#### LTI 1.1
+### LTI 1.1
 Tool's placements can be configured using
 <a href="file.tools_xml.html">LTI configuration XML</a>
 as specified in the IMS Common Cartridge specification, or using the <a
@@ -121,12 +121,30 @@ For information on how to programmatically configured external tools, so users
 don't have to copy and paste URLs or XML, please see the Canvas
 <a href="external_tools.html">external tools API</a>.
 
-#### LTI 1.3
+### LTI 1.3
 Similar to LTI 1.1, tools built on the <a href="https://www.imsglobal.org/spec/lti/v1p3/"
 target="_blank">LTI 1.3 specification</a> can be configured by either supplying clients with a
 JSON block or URL that hosts the JSON. This JSON is used to determine the behavior of the tool
 within Canvas by <a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-an-LTI-key-for-an-account/ta-p/140"
 target="_blank">configuring and LTI Developer Key</a>. Once the developer key is created and
 turned on, users with sufficient permissions can
-<a href=https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-an-external-app-for-an-account-using-a-client/ta-p/202 target="_blank">install the 
+<a href=https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-an-external-app-for-an-account-using-a-client/ta-p/202 target="_blank">install the
 tool using the developer key's client ID</a>.
+
+#### LTI Advantage Services permissions
+
+When setting up Developer Keys, the section “LTI Advantage Services” allows you to enable or disable permissions for 
+access via that developer key. Below is the list of permissions available:
+
+| Permission name                                                                       | What it does                                                                                                                                                | IMS / Canvas scope                                                        |
+|---------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------|
+| **Can create and view assignment data in the gradebook associated with the tool**     | Allows use of all functionality of the <a href="/doc/api/line_items.html" target="_blank">LTI LineItems API</a>                                             | https://purl.imsglobal.org/spec/lti-ags/scope/lineitem                    |
+| **Can view assignment data in the gradebook associated with the tool**                | Allows use of the “show” and “list” endpoints of the <a href="/doc/api/line_items.html" target="_blank">LTI LineItems API</a>                               | https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly           |
+| **Can view submission data for assignments associated with the tool.**                | Allows use of the <a href="/doc/api/result.html" target="_blank">LTI Advantage Result API</a>                                                               | https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly             |
+| **Can create and update submission results for assignments associated with the tool** | Allows use of the <a href="/doc/api/score.html" target="_blank">LTI Advantage Score API</a>                                                                 | https://purl.imsglobal.org/spec/lti-ags/scope/score                       |
+| **Can view Progress records associated with the context the tool is installed in**    | Allows use of the <a href="/doc/api/progress.html" target="_blank">Canvas LTI Progress API</a>, which is used during Score creation with an associated file | https://canvas.instructure.com/lti-ags/progress/scope/show                |
+| **Can retrieve user data associated with the context the tool is installed in**       | Allows use of the <a href="/doc/api/names_and_role.html" target="_blank">LTI Advantage Names and Roles Provisioning Service</a>                             | https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly |
+| **Can update public jwk for LTI services**                                            | Allows to update the public JWT                                                                                                                             | https://canvas.instructure.com/lti/public_jwk/scope/update                |
+| **Can lookup Account information**                                                    | Allows use of the <a href="/doc/api/accounts_(lti).html" target="_blank">Canvas LTI Account API</a> (read only)                                             | https://canvas.instructure.com/lti/account_lookup/scope/show              |
+
+NOTE: scopes with "https://canvas.instructure.com" are Canvas specific while others are LTI specifications

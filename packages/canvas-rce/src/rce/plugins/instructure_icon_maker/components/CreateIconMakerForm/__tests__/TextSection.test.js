@@ -38,11 +38,40 @@ function selectOption(button, option) {
 describe('<TextSection />', () => {
   it('changes the icon text', async () => {
     const onChange = jest.fn()
-    render(<TextSection settings={DEFAULT_SETTINGS} onChange={onChange} />)
-    const input = document.querySelector('#icon-text')
+    const {container} = render(<TextSection settings={DEFAULT_SETTINGS} onChange={onChange} />)
+    const input = container.querySelector('#icon-text')
     fireEvent.change(input, {target: {value: 'Hello World!'}})
 
     await waitFor(() => expect(onChange).toHaveBeenCalledWith({text: 'Hello World!'}))
+  })
+
+  it("doesn't change the icon text when reaches the limit when typing", async () => {
+    const onChange = jest.fn()
+    const {container} = render(
+      <TextSection
+        settings={{...DEFAULT_SETTINGS, text: 'Hello World!Hello World!Hello!12'}}
+        onChange={onChange}
+      />
+    )
+    const input = container.querySelector('#icon-text')
+    fireEvent.change(input, {target: {value: 'Hello World!Hello World!Hello!123'}})
+
+    await waitFor(() => expect(onChange).not.toHaveBeenCalled())
+  })
+
+  it("doesn't change the icon text when reaches the limit when pasting", async () => {
+    const onChange = jest.fn()
+    const {container} = render(
+      <TextSection settings={{...DEFAULT_SETTINGS, text: 'Hello World!'}} onChange={onChange} />
+    )
+    const input = container.querySelector('#icon-text')
+    fireEvent.change(input, {
+      target: {value: 'Hello World!Hello World!Hello World!Hello World!Hello World!'}
+    })
+
+    await waitFor(() =>
+      expect(onChange).toHaveBeenCalledWith({text: 'Hello World!Hello World!Hello Wo'})
+    )
   })
 
   it('changes the icon text size', () => {

@@ -32,7 +32,7 @@ export default function LtiTool(props) {
     <>
       <View
         as="span"
-        focused={focused}
+        withFocusOutline={focused}
         className={css(styles.appButton)}
         padding="xxx-small xxx-small xx-small"
         borderRadius="medium"

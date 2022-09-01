@@ -36,10 +36,12 @@ export const VideoConferenceModal = ({
   onSubmit,
   ...props
 }) => {
-  const SETTINGS_TAB = 'settings'
-  const ATTENDEES_TAB = 'attendees'
+  const OPTIONS_DEFAULT = ['no_time_limit', 'enable_waiting_room']
 
-  const OPTIONS_DEFAULT = ['recording_enabled', 'no_time_limit', 'enable_waiting_room']
+  if (ENV.bbb_recording_enabled) {
+    OPTIONS_DEFAULT.push('recording_enabled')
+  }
+
   const INVITATION_OPTIONS_DEFAULT = ['invite_all']
   const ATTENDEES_OPTIONS_DEFAULT = [
     'share_webcam',
@@ -66,6 +68,14 @@ export const VideoConferenceModal = ({
   const [selectedAttendees, setSelectedAttendees] = useState(
     props.selectedAttendees ? props.selectedAttendees : []
   )
+  const [startCalendarDate, setStartCalendarDate] = useState(
+    props.startCalendarDate ? props.startCalendarDate : new Date().toISOString()
+  )
+  const [endCalendarDate, setEndCalendarDate] = useState(
+    props.endCalendarDate ? props.endCalendarDate : new Date().toISOString()
+  )
+
+  const [showCalendarOptions, setShowCalendarOptions] = useState(false)
 
   // Detect initial state for address book display
   useEffect(() => {
@@ -73,12 +83,18 @@ export const VideoConferenceModal = ({
     inviteAll ? setShowAddressBook(false) : setShowAddressBook(true)
   }, [invitationOptions])
 
+  // Detect initial state for calender picker display
+  useEffect(() => {
+    const addToCalendar = options.includes('add_to_calendar')
+    addToCalendar ? setShowCalendarOptions(true) : setShowCalendarOptions(false)
+  }, [options])
+
   const renderCloseButton = () => {
     return (
       <CloseButton
         placement="end"
         offset="medium"
-        onClick={props.onDismiss}
+        onClick={onDismiss}
         screenReaderLabel={I18n.t('Close')}
       />
     )
@@ -106,6 +122,11 @@ export const VideoConferenceModal = ({
           onAttendeesChange={setSelectedAttendees}
           availableAttendeesList={availableAttendeesList}
           selectedAttendees={selectedAttendees}
+          showCalendar={showCalendarOptions}
+          startDate={startCalendarDate}
+          endDate={endCalendarDate}
+          onStartDateChange={setStartCalendarDate}
+          onEndDateChange={setEndCalendarDate}
         />
       )
     }
@@ -139,16 +160,20 @@ export const VideoConferenceModal = ({
         e.preventDefault()
         onSubmit(e, {
           name,
+          conferenceType,
           duration,
           options,
           description,
           invitationOptions,
-          attendeesOptions
+          attendeesOptions,
+          selectedAttendees,
+          startCalendarDate,
+          endCalendarDate
         })
       }}
       size="auto"
       label={header}
-      shouldCloseOnDocumentClick
+      shouldCloseOnDocumentClick={true}
     >
       <Modal.Header>
         {renderCloseButton()}
@@ -186,7 +211,9 @@ VideoConferenceModal.propTypes = {
   attendeesOptions: PropTypes.arrayOf(PropTypes.string),
   type: PropTypes.string,
   availableAttendeesList: PropTypes.arrayOf(PropTypes.object),
-  selectedAttendees: PropTypes.arrayOf(PropTypes.string)
+  selectedAttendees: PropTypes.arrayOf(PropTypes.string),
+  startCalendarDate: PropTypes.string,
+  endCalendarDate: PropTypes.string
 }
 
 VideoConferenceModal.defaultProps = {

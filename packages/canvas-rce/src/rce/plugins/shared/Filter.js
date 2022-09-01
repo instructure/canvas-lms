@@ -211,15 +211,18 @@ export default function Filter(props) {
     }
     return undefined
   }
+
   const searchMessage = formatMessage('Enter at least 3 characters to search')
   const loadingMessage = formatMessage('Loading, please wait')
   const msg = isContentLoading ? loadingMessage : searchMessage
+  const isEdit = contentSubtype === 'edit'
   return (
     <View display="block" direction="column">
-      {renderType(contentType, contentSubtype, onChange, userContextType, containingContextType)}
+      {!isEdit &&
+        renderType(contentType, contentSubtype, onChange, userContextType, containingContextType)}
       {contentType !== 'links' && (
         <Flex margin="small none none none">
-          <Flex.Item grow shrink margin="none xx-small none none">
+          <Flex.Item shouldGrow={true} shouldShrink={true} margin="none xx-small none none">
             <SimpleSelect
               renderLabel={
                 <ScreenReaderContent>{formatMessage('Content Subtype')}</ScreenReaderContent>
@@ -271,7 +274,7 @@ export default function Filter(props) {
             </SimpleSelect>
           </Flex.Item>
           {contentSubtype !== 'all' && (
-            <Flex.Item grow shrink margin="none none none xx-small">
+            <Flex.Item shouldGrow={true} shouldShrink={true} margin="none none none xx-small">
               <SimpleSelect
                 renderLabel={<ScreenReaderContent>{formatMessage('Sort By')}</ScreenReaderContent>}
                 assistiveText={formatMessage('Use arrow keys to navigate options.')}

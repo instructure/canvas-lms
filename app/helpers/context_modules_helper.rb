@@ -98,6 +98,10 @@ module ContextModulesHelper
     item.content.can_publish?
   end
 
+  def module_item_publish_at(item)
+    (item&.content.respond_to?(:publish_at) && item.content.publish_at&.iso8601) || nil
+  end
+
   def prerequisite_list(prerequisites)
     prerequisites.pluck(:name).join(", ")
   end

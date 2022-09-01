@@ -28,13 +28,15 @@ export const initialState = {
   loading: false,
   error: undefined,
   cropperOpen: false,
-  cropperSettings: null
+  cropperSettings: null,
+  compressed: false
 }
 
 export const actions = {
   RESET_ALL: {type: 'ResetAll'},
   SET_IMAGE: {type: 'SetImage'},
   SET_IMAGE_NAME: {type: 'SetImageName'},
+  SET_COMPRESSION_STATUS: {type: 'SetCompressionStatus'},
   CLEAR_IMAGE: {type: 'ClearImage'},
   SET_ICON: {type: 'SetIcon'},
   SET_ICON_FILL_COLOR: {type: 'SetIconFillColor'},
@@ -64,8 +66,10 @@ const imageSection = (state, action) => {
       return {...state, image: action.payload}
     case actions.SET_IMAGE_NAME.type:
       return {...state, imageName: action.payload}
+    case actions.SET_COMPRESSION_STATUS.type:
+      return {...state, compressed: action.payload}
     case actions.CLEAR_IMAGE.type:
-      return {...state, image: '', imageName: ''}
+      return {...state, image: '', imageName: '', compressed: false}
     case actions.SET_ICON.type:
       return {...state, icon: action.payload}
     case actions.SET_ICON_FILL_COLOR.type:

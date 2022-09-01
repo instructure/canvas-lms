@@ -208,12 +208,12 @@ function filterStudents(criterion, students, cutoff) {
         }
         break
       case 'scored_more_than':
-        if (parseInt(student.score, 10) > cutoff) {
+        if (parseFloat(student.score) > cutoff) {
           newfilteredStudents.push(student)
         }
         break
       case 'scored_less_than':
-        if (parseInt(student.score, 10) < cutoff) {
+        if (parseFloat(student.score) < cutoff) {
           newfilteredStudents.push(student)
         }
         break

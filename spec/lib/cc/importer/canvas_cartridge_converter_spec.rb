@@ -580,7 +580,7 @@ describe "Canvas Cartridge importing" do
 
       context "that use LTI 1.3" do
         let(:context_module) { @copy_from.context_modules.create!(name: "test module") }
-        let(:tool) { external_tool_model(context: @copy_from, opts: { use_1_3: true, developer_key: developer_key }) }
+        let(:tool) { external_tool_1_3_model(context: @copy_from, opts: { developer_key: developer_key }) }
         let(:developer_key) { DeveloperKey.create!(account: @copy_from.root_account) }
         let(:content_tag) do
           context_module.add_item({ name: "Test Tool", content: tool, url: tool.url,

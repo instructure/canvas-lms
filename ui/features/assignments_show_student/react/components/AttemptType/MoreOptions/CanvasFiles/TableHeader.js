@@ -32,7 +32,7 @@ const TableHeader = props => {
   }
 
   const renderTableHeader = (name, size, key, grow) => (
-    <Flex.Item padding="xx-small" size={size} key={key} grow={grow}>
+    <Flex.Item padding="xx-small" size={size} key={key} shouldGrow={grow}>
       <Text size="small" weight="bold">
         {name}
       </Text>
@@ -50,7 +50,7 @@ const TableHeader = props => {
 
   return (
     <div style={headerStyle}>
-      <Flex aria-hidden>
+      <Flex aria-hidden={true}>
         {tableHeadings.map((header, index) =>
           renderTableHeader(header.name, header.size, index, header.grow)
         )}

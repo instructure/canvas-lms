@@ -194,6 +194,7 @@ module Types
                                   InstStatsd::Statsd.increment("inbox.visit.scope.unread.pages_loaded.react")
                                   object.conversations.unread
                                 when "starred"
+                                  InstStatsd::Statsd.increment("inbox.visit.scope.starred.pages_loaded.react")
                                   object.starred_conversations
                                 when "sent"
                                   object.all_conversations.sent

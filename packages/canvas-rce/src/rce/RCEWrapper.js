@@ -36,6 +36,7 @@ import editorLanguage from './editorLanguage'
 import normalizeLocale from './normalizeLocale'
 import {sanitizePlugins} from './sanitizePlugins'
 import {getCanvasUrl} from './getCanvasUrl'
+import RCEGlobals from './RCEGlobals'
 
 import indicate from '../common/indicate'
 import bridge from '../bridge'
@@ -269,7 +270,10 @@ class RCEWrapper extends React.Component {
     instRecordDisabled: PropTypes.bool,
     highContrastCSS: PropTypes.arrayOf(PropTypes.string),
     maxInitRenderedRCEs: PropTypes.number,
-    use_rce_icon_maker: PropTypes.bool
+    use_rce_icon_maker: PropTypes.bool,
+    features: PropTypes.objectOf(PropTypes.bool),
+    flashAlertTimeout: PropTypes.number,
+    timezone: PropTypes.string.isRequired
   }
 
   static defaultProps = {
@@ -285,6 +289,12 @@ class RCEWrapper extends React.Component {
 
   constructor(props) {
     super(props)
+
+    // Set up some limited global state that can be referenced
+    // as needed in RCE's components and function / plugin definitions
+    // Not intended to be dynamically changed!
+    RCEGlobals.setFeatures(this.getRequiredFeatureStatuses())
+    RCEGlobals.setConfig(this.getRequiredConfigValues())
 
     this.editor = null // my tinymce editor instance
     this.language = normalizeLocale(this.props.language)
@@ -361,6 +371,20 @@ class RCEWrapper extends React.Component {
         // eslint-disable-next-line no-console
         console.error('Failed initializing a11y checker', err)
       })
+  }
+
+  getRequiredFeatureStatuses() {
+    const {new_equation_editor, new_math_equation_handling, rce_ux_improvements} =
+      this.props.features
+    return {new_equation_editor, new_math_equation_handling, rce_ux_improvements}
+  }
+
+  getRequiredConfigValues() {
+    return {
+      locale: normalizeLocale(this.props.language),
+      flashAlertTimeout: this.props.flashAlertTimeout,
+      timezone: this.props.timezone
+    }
   }
 
   getCanvasUrl() {
@@ -1026,7 +1050,7 @@ class RCEWrapper extends React.Component {
     // This propagates click events on the editor out of the iframe to the parent
     // document. We need this so that click events get captured properly by instui
     // focus-trapping components, so they properly ignore trapping focus on click.
-    editor.on('click', () => window.top.document.body.click(), true)
+    editor.on('click', () => window.document.body.click(), true)
     editor.on('Cut Paste Change input Undo Redo', debounce(this.handleInputChange, 1000))
     this.announceContextToolbars(editor)
 
@@ -1054,25 +1078,21 @@ class RCEWrapper extends React.Component {
   }
 
   _toggleFullscreen = event => {
+    const isTinyFullscreen = event.state
+
+    const fullscreenState = {isTinyFullscreen}
+
     const header = document.getElementById('header')
     if (header) {
-      if (event.state) {
-        this.setState({
-          fullscreenState: {
-            headerDisp: header.style.display,
-            isTinyFullscreen: true
-          }
-        })
+      if (isTinyFullscreen) {
+        fullscreenState.headerDisp = header.style.display
         header.style.display = 'none'
       } else {
         header.style.display = this.state.fullscreenState.headerDisp
-        this.setState({
-          fullscreenState: {
-            isTinyFullscreen: false
-          }
-        })
       }
     }
+
+    this.setState({fullscreenState})
 
     // if we're leaving fullscreen, remove event listeners on the fullscreen element
     if (!document[FS_ELEMENT] && this.state.fullscreenElem) {
@@ -1880,7 +1900,7 @@ class RCEWrapper extends React.Component {
             />
           </Suspense>
         ) : null}
-        <Alert screenReaderOnly liveRegion={this.props.liveRegion}>
+        <Alert screenReaderOnly={true} liveRegion={this.props.liveRegion}>
           {this.state.announcement}
         </Alert>
       </div>

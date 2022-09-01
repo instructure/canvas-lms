@@ -25,8 +25,11 @@ import {Modal} from '@instructure/ui-modal'
 import {CloseButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import formatMessage from '../format-message'
+import {determineOSDependentKey} from './userOS'
 
 export default function KeyboardShortcutModal(props) {
+  const OSKey = determineOSDependentKey()
+
   return (
     <Modal
       data-testid="RCE_KeyboardShortcutModal"
@@ -41,26 +44,32 @@ export default function KeyboardShortcutModal(props) {
       onDismiss={props.onDismiss}
     >
       <Modal.Header>
-        <CloseButton placement="end" offset="medium" variant="icon" onClick={props.onDismiss}>
-          {formatMessage('Close')}
-        </CloseButton>
+        <CloseButton
+          placement="end"
+          offset="medium"
+          color="primary"
+          onClick={props.onDismiss}
+          screenReaderLabel={formatMessage('Close')}
+        />
         <Heading>{formatMessage('Keyboard Shortcuts')}</Heading>
       </Modal.Header>
       <Modal.Body>
         <View as="div" margin="small">
-          <List variant="unstyled">
+          <List isUnstyled>
             <List.Item>
-              <Text weight="bold">ALT+F8/ALT+0</Text>{' '}
+              <Text weight="bold">
+                {OSKey}+F8/{OSKey}+0
+              </Text>{' '}
               {formatMessage('Open this keyboard shortcuts dialog')}
             </List.Item>
             <List.Item>
               <Text weight="bold">CTRL+F9</Text> {formatMessage('Focus element options toolbar')}
             </List.Item>
             <List.Item>
-              <Text weight="bold">ALT+F9</Text> {formatMessage("Go to the editor's menubar")}
+              <Text weight="bold">{OSKey}+F9</Text> {formatMessage("Go to the editor's menubar")}
             </List.Item>
             <List.Item>
-              <Text weight="bold">ALT+F10</Text> {formatMessage("Go to the editor's toolbar")}
+              <Text weight="bold">{OSKey}+F10</Text> {formatMessage("Go to the editor's toolbar")}
             </List.Item>
             <List.Item>
               <Text weight="bold">ESC</Text>{' '}

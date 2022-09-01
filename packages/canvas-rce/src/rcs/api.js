@@ -18,11 +18,10 @@
 
 import 'isomorphic-fetch'
 import {parse} from 'url'
-import {saveClosedCaptions} from '@instructure/canvas-media'
+import {saveClosedCaptions, CONSTANTS} from '@instructure/canvas-media'
 import {downloadToWrap, fixupFileUrl} from '../common/fileUrl'
 import formatMessage from '../format-message'
 import alertHandler from '../rce/alertHandler'
-import {RCS_MAX_BODY_SIZE, RCS_REQUEST_SIZE_BUFFER} from '../rce/plugins/shared/Upload/constants'
 import {DEFAULT_FILE_CATEGORY} from '../sidebar/containers/sidebarHandlers'
 import buildError from './buildError'
 
@@ -240,7 +239,7 @@ class RceApiSource {
         origin: originFromHost(apiProps.host),
         headers: headerFor(apiProps.jwt)
       },
-      maxBytes || RCS_MAX_BODY_SIZE - RCS_REQUEST_SIZE_BUFFER
+      maxBytes || CONSTANTS.CC_FILE_MAX_BYTES
     ).catch(e => {
       console.error('Failed saving CC', e)
       this.alertFunc(buildError({message: 'failed to save captions'}, e))
@@ -348,10 +347,12 @@ class RceApiSource {
     data.append('file', fileDomObject)
     const fetchOptions = {method: 'POST', body: data}
 
-    if (!preflightProps.upload_params['x-amz-signature'] &&
-        !preflightProps.upload_url.includes('files_api')) {
-         // _not_ an S3 upload, include the credentials in the upload POST
-         // local uploads can include crendentials for same-origin requests
+    if (
+      !preflightProps.upload_params['x-amz-signature'] &&
+      !preflightProps.upload_url.includes('files_api')
+    ) {
+      // _not_ an S3 upload, include the credentials in the upload POST
+      // local uploads can include crendentials for same-origin requests
       fetchOptions.credentials = 'include'
     }
     return fetch(preflightProps.upload_url, fetchOptions)

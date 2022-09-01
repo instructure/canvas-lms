@@ -23,6 +23,7 @@ import {render, fireEvent, waitFor} from '@testing-library/react'
 import Course from '../Course'
 import {actions} from '../../../../reducers/imageSection'
 import {useStoreProps} from '../../../../../shared/StoreContext'
+import {compressImage, shouldCompressImage, canCompressImage} from '../compressionUtils'
 
 const storeProps = {
   images: {
@@ -96,6 +97,12 @@ jest.mock('../../../../../shared/StoreContext', () => {
   }
 })
 
+jest.mock('../compressionUtils', () => ({
+  shouldCompressImage: jest.fn().mockReturnValue(false),
+  compressImage: jest.fn().mockReturnValue(Promise.resolve('data:image/jpeg;base64,abcdefghijk==')),
+  canCompressImage: jest.fn().mockReturnValue(true)
+}))
+
 describe('Course()', () => {
   let props
   const subject = (customProps = {}) => render(<Course {...props} {...customProps} />)
@@ -166,6 +173,106 @@ describe('Course()', () => {
         expect(props.dispatch).toHaveBeenCalledWith({
           type: 'SetImage',
           payload: 'data:text/png;base64,SGVsbG8sIFdvcmxkIQ=='
+        })
+      })
+    })
+
+    it('dispatches a "open cropper" action', async () => {
+      await waitFor(() => {
+        expect(props.dispatch).toHaveBeenCalledWith({
+          type: 'SetCropperOpen',
+          payload: true
+        })
+      })
+    })
+
+    it('dispatches a "set image collection open" action', async () => {
+      await waitFor(() =>
+        expect(props.dispatch).toHaveBeenCalledWith({
+          ...actions.SET_IMAGE_COLLECTION_OPEN,
+          payload: false
+        })
+      )
+    })
+  })
+
+  describe('when a image to be compressed is clicked', () => {
+    let originalResponse
+
+    beforeAll(() => {
+      const image = new Blob(['somedata'], {type: 'image/jpeg', size: 600000})
+      fetchMock.mock('http://canvas.docker/files/722/download?download_frd=1', {
+        body: image,
+        sendAsJson: false
+      })
+
+      jest.spyOn(global, 'FileReader').mockImplementation(function () {
+        this.readAsDataURL = () => {
+          this.result = 'data:image/jpeg;base64,SGVsbG8sIFdvcmxkIQ=='
+          this.onloadend()
+        }
+      })
+
+      originalResponse = global.Response
+      global.Response = function () {
+        this.blob = () => {
+          return Promise.resolve('XXXXXXXX')
+        }
+      }
+      shouldCompressImage.mockReturnValue(true)
+    })
+
+    beforeEach(() => {
+      const {getByTitle} = subject()
+
+      // Click the first image
+      fireEvent.click(getByTitle('Click to embed image_one.png'))
+    })
+
+    afterAll(() => {
+      fetchMock.restore()
+      global.Response = originalResponse
+    })
+
+    it('dispatches a "stop loading" action', () => {
+      expect(props.dispatch.mock.calls[0][0]).toEqual({
+        type: 'StopLoading'
+      })
+    })
+
+    it('dispatches a "set image name" action', () => {
+      expect(props.dispatch.mock.calls[1][0]).toEqual({
+        type: 'SetImageName',
+        payload: 'grid.png'
+      })
+    })
+
+    it('dispatches a "loading" action', () => {
+      expect(props.dispatch.mock.calls[2][0]).toEqual({
+        type: 'StartLoading'
+      })
+    })
+
+    it('compressImage() was called', async () => {
+      await waitFor(() => {
+        expect(compressImage).toHaveBeenCalledWith('data:image/jpeg;base64,SGVsbG8sIFdvcmxkIQ==')
+      })
+    })
+
+    it('dispatches a "set compression status" action', async () => {
+      await waitFor(() => {
+        expect(props.dispatch).toHaveBeenCalledWith({
+          type: 'SetCompressionStatus',
+          payload: true
+        })
+      })
+    })
+
+    it('dispatches a "set image" action', async () => {
+      await waitFor(() => {
+        expect(props.dispatch).toHaveBeenCalledWith({
+          type: 'SetImage',
+          payload: 'data:image/jpeg;base64,abcdefghijk=='
         })
       })
     })

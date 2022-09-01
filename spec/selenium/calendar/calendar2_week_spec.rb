@@ -59,7 +59,9 @@ describe "calendar2" do
         event_dialog.find("#assignment_title").send_keys("saturday assignment")
         # take next week's monday and advance to saturday from the current date
         due_date = "Dec 26, 2015 at 8pm"
-        replace_content(event_dialog.find(".datetime_field"), due_date)
+        due_date_field = event_dialog.find(".datetime_field")
+        replace_content(due_date_field, due_date)
+        driver.action.send_keys(due_date_field, :return)
         assignment_form = event_dialog.find("#edit_assignment_form")
         submit_form(assignment_form)
         wait_for_ajaximations

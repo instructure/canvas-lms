@@ -680,6 +680,14 @@ describe DueDateCacher do
           }.from(0).to(1)
         end
 
+        it "doesn't blow up when handling BC dates" do
+          bc_date = 5000.years.ago
+          @assignment.update_columns(due_at: bc_date)
+          expect { cacher.recompute }.to change {
+            Submission.find_by(assignment: @assignment, user: @student)&.cached_due_date
+          }.from(nil).to(bc_date.change(usec: 0))
+        end
+
         it "deletes submissions for enrollments that are deleted" do
           @course.student_enrollments.update_all(workflow_state: "deleted")
 

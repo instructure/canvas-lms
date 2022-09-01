@@ -39,6 +39,7 @@ import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {DateTime} from '@instructure/ui-i18n'
+import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('calendar.edit_calendar_event')
 
@@ -71,6 +72,21 @@ const CalendarEventDetailsForm = ({
 
   const allContexts = event.allPossibleContexts
 
+  const shouldEnableTimeFields = () => !isBlackout
+  const shouldShowLocationField = () => !isChild
+  const shouldEnableLocationField = () => !isBlackout
+  const shouldShowConferenceField = () => shouldShowConferences
+  const shouldEnableConferenceField = () => !isBlackout
+  const shouldShowContextField = () => event.can_change_context
+  const shouldShowImportantDatesField = () => context.k5_course
+  const shouldShowBlackoutDateCheckbox = useCallback(() => {
+    return (
+      ENV.FEATURES.account_level_blackout_dates &&
+      ((context.type === 'account' && ENV.FEATURES.account_calendar_events) ||
+        (context.type === 'course' && context.course_pacing_enabled))
+    )
+  }, [context])
+
   const getMoreOptionsHref = useCallback(() => {
     // Update the edit and more option urls
     if (event.isNewEvent()) {
@@ -83,13 +99,21 @@ const CalendarEventDetailsForm = ({
   const onContextChange = useCallback(
     propagate => {
       if (context == null) return
+
       event.contextInfo = context
+      if (!shouldShowBlackoutDateCheckbox()) setBlackout(false)
 
       if (propagate !== false) contextChangeCB(context.asset_string)
 
       setMoreOptionsLink(getMoreOptionsHref())
     },
-    [context, event, contextChangeCB, getMoreOptionsHref]
+    [
+      context,
+      event.contextInfo,
+      shouldShowBlackoutDateCheckbox,
+      contextChangeCB,
+      getMoreOptionsHref
+    ]
   )
 
   const contextFromCode = useCallback(
@@ -138,8 +162,7 @@ const CalendarEventDetailsForm = ({
   }, [context, shouldShowConferenceWidget])
 
   const changeContext = value => {
-    // check conference is still valid in context, and remove it if it is not
-    const newContext = allContexts.find(ctxt => ctxt.name === value)
+    const newContext = contextFromCode(value)
 
     if (
       canUpdateConference() &&
@@ -179,14 +202,6 @@ const CalendarEventDetailsForm = ({
 
   const setConference = conference => {
     if (canUpdateConference()) setWebConference(conference)
-  }
-
-  const shouldShowBlackoutDateCheckbox = () => {
-    return (
-      ENV.FEATURES.account_level_blackout_dates &&
-      ((context.type === 'account' && ENV.FEATURES.account_calendar_events) ||
-        (context.type === 'course' && context.course_pacing_enabled))
-    )
   }
 
   const moreOptionsClick = jsEvent => {
@@ -236,14 +251,16 @@ const CalendarEventDetailsForm = ({
 
     const params = {
       'calendar_event[title]': title != null ? title : event.title,
-      'calendar_event[start_at]': startAt ? startAt.toISOString() : '',
-      'calendar_event[end_at]': endAt ? endAt.toISOString() : '',
-      'calendar_event[location_name]': location,
+      'calendar_event[start_at]':
+        startAt && shouldEnableTimeFields() ? startAt.toISOString() : date.toISOString(),
+      'calendar_event[end_at]':
+        endAt && shouldEnableTimeFields() ? endAt.toISOString() : date.toISOString(),
+      'calendar_event[location_name]': location && shouldEnableLocationField() ? location : '',
       'calendar_event[important_dates]': isImportant,
       'calendar_event[blackout_date]': isBlackout
     }
     if (canUpdateConference()) {
-      if (webConference) {
+      if (webConference && shouldEnableConferenceField()) {
         const webConf = {
           ...webConference,
           title:
@@ -275,11 +292,11 @@ const CalendarEventDetailsForm = ({
       const objectData = {
         calendar_event: {
           title: params['calendar_event[title]'],
-          start_at: startAt ? startAt.toISOString() : null,
-          end_at: endAt ? endAt.toISOString() : null,
-          location_name: location,
+          start_at: startAt && shouldEnableTimeFields() ? startAt.toISOString() : null,
+          end_at: endAt && shouldEnableTimeFields() ? endAt.toISOString() : null,
+          location_name: shouldEnableLocationField() ? location : null,
           context_code: context.asset_string,
-          webConference,
+          webConference: shouldEnableConferenceField() ? webConference : null,
           important_info: isImportant,
           blackout_date: isBlackout
         }
@@ -293,10 +310,10 @@ const CalendarEventDetailsForm = ({
     } else {
       event.title = params['calendar_event[title]']
       // event unfudges/unwraps values when sending to server (so wrap here)
-      event.start = fcUtil.wrap(startAt)
-      event.end = fcUtil.wrap(endAt)
-      event.location_name = location
-      event.webConference = webConference
+      event.start = shouldEnableTimeFields() ? fcUtil.wrap(startAt) : fcUtil.wrap(date)
+      event.end = shouldEnableTimeFields() ? fcUtil.wrap(endAt) : fcUtil.wrap(date)
+      event.location_name = shouldEnableLocationField() ? location : null
+      event.webConference = shouldEnableConferenceField() ? webConference : null
       event.important_info = isImportant
       event.blackout_date = isBlackout
       if (event.can_change_context && context.asset_string !== event.object.context_code) {
@@ -317,7 +334,7 @@ const CalendarEventDetailsForm = ({
   }
 
   return (
-    <form data-testid="calendar-event-form" onSubmit={formSubmit}>
+    <View as="form" data-testid="calendar-event-form" onSubmit={formSubmit} margin="small">
       <FormFieldGroup description="" rowSpacing="small" vAlign="middle">
         <TextInput
           renderLabel={I18n.t('Title:')}
@@ -337,11 +354,12 @@ const CalendarEventDetailsForm = ({
           timezone={timezone}
         />
         <Flex justifyItems="space-between" alignItems="start">
-          <Flex.Item padding="none small none none" shouldShrink>
+          <Flex.Item padding="none small none none" shouldShrink={true}>
             <TimeSelect
+              disabled={!shouldEnableTimeFields()}
               data-testid="event-form-start-time"
               renderLabel={I18n.t('From:')}
-              value={startTime}
+              value={shouldEnableTimeFields() ? startTime : ''}
               placeholder={I18n.t('Start Time')}
               onChange={(e, {value}) => trySetStartTime(value)}
               onBlur={clearMessages}
@@ -350,11 +368,12 @@ const CalendarEventDetailsForm = ({
               timezone={timezone}
             />
           </Flex.Item>
-          <Flex.Item padding="none none none small" shouldShrink>
+          <Flex.Item padding="none none none small" shouldShrink={true}>
             <TimeSelect
+              disabled={!shouldEnableTimeFields()}
               data-testid="event-form-end-time"
               renderLabel={I18n.t('To:')}
-              value={endTime}
+              value={shouldEnableTimeFields() ? endTime : ''}
               placeholder={I18n.t('End Time')}
               onChange={(e, {value}) => trySetEndTime(value)}
               onBlur={clearMessages}
@@ -364,39 +383,41 @@ const CalendarEventDetailsForm = ({
             />
           </Flex.Item>
         </Flex>
-        {!isChild && (
+        {shouldShowLocationField() && (
           <TextInput
+            disabled={!shouldEnableLocationField()}
             renderLabel={I18n.t('Location:')}
-            value={location}
+            value={shouldEnableLocationField() ? location : ''}
             placeholder={I18n.t('Input Event Location...')}
             onChange={(e, value) => setLocation(value)}
           />
         )}
-        {shouldShowConferences && (
+        {shouldShowConferenceField() && (
           <FormField id="edit-calendar-event-form-conferencing" label={I18n.t('Conferencing:')}>
             <CalendarConferenceWidget
+              disabled={!shouldEnableConferenceField()}
               context={context.asset_string}
-              conference={webConference}
+              conference={shouldEnableConferenceField() ? webConference : null}
               setConference={setConference}
               conferenceTypes={getActiveConferenceTypes()}
             />
           </FormField>
         )}
-        {event.can_change_context && (
+        {shouldShowContextField() && (
           <SimpleSelect
             data-testid="edit-calendar-event-form-context"
             renderLabel={I18n.t('Calendar:')}
             assistiveText={I18n.t('Use arrow keys to navigate options.')}
-            value={context.name}
+            value={context.asset_string}
             onChange={(e, {value}) => changeContext(value)}
           >
             {allContexts
               .filter(ctxt => ctxt.can_create_calendar_events)
               .map((ctxt, index) => (
                 <SimpleSelect.Option
-                  key={ctxt.name}
+                  key={ctxt.asset_string}
                   id={`opt-${index}`}
-                  value={ctxt.name}
+                  value={ctxt.asset_string}
                   renderLabel={ctxt.name}
                 >
                   {ctxt.name}
@@ -404,10 +425,10 @@ const CalendarEventDetailsForm = ({
               ))}
           </SimpleSelect>
         )}
-        {context.k5_course && (
+        {shouldShowImportantDatesField() && (
           <FormField id="k5-field" label={I18n.t('Important Dates:')}>
             <Flex justifyItems="space-between">
-              <Flex.Item padding="none x-small" shouldShrink>
+              <Flex.Item padding="none x-small" shouldShrink={true}>
                 <Checkbox
                   data-testid="calendar-event-important-dates"
                   label={I18n.t('Mark as Important Date')}
@@ -415,7 +436,7 @@ const CalendarEventDetailsForm = ({
                   onChange={e => setImportant(e.currentTarget.checked)}
                 />
               </Flex.Item>
-              <Flex.Item padding="none xxx-small" shouldShrink>
+              <Flex.Item padding="none xxx-small" shouldShrink={true}>
                 <Tooltip
                   renderTip={I18n.t('Show event on homeroom sidebar')}
                   on={['click', 'hover', 'focus']}
@@ -434,17 +455,17 @@ const CalendarEventDetailsForm = ({
         {shouldShowBlackoutDateCheckbox() && (
           <FormField id="course-pacing-field" label={I18n.t('Course Pacing:')}>
             <Flex justifyItems="space-between">
-              <Flex.Item padding="none x-small" shouldShrink>
+              <Flex.Item padding="none x-small" shouldShrink={true}>
                 <Checkbox
                   label={I18n.t('Add to Course Pacing blackout dates')}
                   checked={isBlackout}
                   onChange={e => setBlackout(e.currentTarget.checked)}
                 />
               </Flex.Item>
-              <Flex.Item padding="none x-small" shouldShrink>
+              <Flex.Item padding="none x-small" shouldShrink={true}>
                 <Tooltip
                   renderTip={I18n.t(
-                    'Enabling this option automatically moves Course Pacing assignment due dates to after the end date.'
+                    'Enabling this option automatically moves Course Pacing assignment due dates to after the end date. Input for Time, Location and Calendar will be disabled.'
                   )}
                   on={['click', 'hover', 'focus']}
                 >
@@ -459,8 +480,8 @@ const CalendarEventDetailsForm = ({
             </Flex>
           </FormField>
         )}
-        <Flex justifyItems="end">
-          <Flex.Item padding="none x-small" shouldShrink>
+        <Flex justifyItems="end" margin="medium none none none">
+          <Flex.Item padding="none x-small" shouldShrink={true}>
             <Button
               data-testid="edit-calendar-event-more-options-button"
               href={moreOptionsLink}
@@ -471,14 +492,14 @@ const CalendarEventDetailsForm = ({
               {I18n.t('More Options')}
             </Button>
           </Flex.Item>
-          <Flex.Item padding="none xxx-small" shouldShrink>
+          <Flex.Item padding="none xxx-small" shouldShrink={true}>
             <Button type="submit" color="primary">
               {I18n.t('Submit')}
             </Button>
           </Flex.Item>
         </Flex>
       </FormFieldGroup>
-    </form>
+    </View>
   )
 }
 

@@ -125,16 +125,18 @@ export const ColorInput = ({
           </IconButton>
         }
       >
-        <CloseButton placement="end" onClick={() => setIsOpen(false)}>
-          {formatMessage('Close')}
-        </CloseButton>
+        <CloseButton
+          placement="end"
+          onClick={() => setIsOpen(false)}
+          screenReaderLabel={formatMessage('Close')}
+        />
         <Flex
           alignItems="center"
           as="div"
           justifyItems={requireColor ? 'start' : 'center'}
           padding="x-large x-small small"
           width="175px"
-          wrapItems
+          wrap="wrap"
           data-testid={`${name}-popover`}
         >
           {requireColor ? colorPreviews.slice(0, -1) : colorPreviews}

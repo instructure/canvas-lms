@@ -22,7 +22,6 @@ import {Heading} from '@instructure/ui-heading'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {List} from '@instructure/ui-list'
-import {Button} from '@instructure/ui-buttons'
 import {
   IconSettingsLine,
   IconSyllabusLine,
@@ -115,7 +114,7 @@ export default function ValidatorResultsRow(props) {
     rows.push(
       <List.Item key={reason}>
         {REASON_DESCRIPTION[reason]}
-        <List variant="unstyled" margin="none x-small small small">
+        <List isUnstyled margin="none x-small small small">
           {links}
         </List>
       </List.Item>

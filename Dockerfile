@@ -7,7 +7,7 @@ ARG RUBY=2.7
 FROM instructure/ruby-passenger:$RUBY
 LABEL maintainer="Instructure"
 
-ARG POSTGRES_CLIENT=12
+ARG POSTGRES_CLIENT=14
 ENV APP_HOME /usr/src/app/
 ENV RAILS_ENV development
 ENV NGINX_MAX_UPLOAD_SIZE 10g
@@ -48,6 +48,7 @@ RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
        python3-lxml \
        python-is-python3 \
        libicu-dev \
+       libidn11-dev \
        parallel \
        postgresql-client-$POSTGRES_CLIENT \
        unzip \

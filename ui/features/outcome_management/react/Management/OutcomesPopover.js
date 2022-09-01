@@ -53,9 +53,10 @@ const OutcomesPopover = forwardRef(({outcomes, outcomeCount, onClearHandler}, re
         placement="top center"
         screenReaderLabel={I18n.t('Outcomes Selected')}
         isShowingContent={showOutcomesList}
-        onToggle={setShowOutcomesList}
-        shouldContainFocus
-        shouldReturnFocus
+        onShowContent={setShowOutcomesList.bind(null, true)}
+        onHideContent={setShowOutcomesList.bind(null, false)}
+        shouldContainFocus={true}
+        shouldReturnFocus={true}
         positionTarget={() => (ref?.current == null ? null : ref.current)}
         renderTrigger={
           <Button
@@ -95,7 +96,7 @@ const OutcomesPopover = forwardRef(({outcomes, outcomeCount, onClearHandler}, re
             overflowX="hidden"
             tabIndex={outcomeCount > 10 ? '0' : '-1'}
           >
-            <List isUnstyled size="small" margin="none small none none">
+            <List isUnstyled={true} size="small" margin="none small none none">
               {Object.values(outcomes)
                 .sort((a, b) => a.title.localeCompare(b.title, ENV.LOCALE, {numeric: true}))
                 .map(({linkId, title}) => (

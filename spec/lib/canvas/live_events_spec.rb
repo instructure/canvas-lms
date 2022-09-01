@@ -2066,20 +2066,26 @@ describe Canvas::LiveEvents do
   end
 
   describe "master_template" do
-    let(:assignment_restrictions) do
+    let(:default_restrictions) do
       {
         content: false,
         points: true,
         due_dates: false,
-        availability_dates: true
+        availability_dates: true,
+        settings: false,
+        state: true
       }
     end
 
-    let(:all_restrictions) do
+    let(:default_restrictions_by_type) do
       {
-        settings: false,
-        state: true
-      }.merge(assignment_restrictions)
+        "Assignment" => { content: false, points: false, due_dates: false, availability_dates: false },
+        "DiscussionTopic" => { content: false, points: false, due_dates: false, availability_dates: false },
+        "WikiPage" => { content: false },
+        "Attachment" => { content: false },
+        "Quizzes::Quiz" => { content: false, points: false, due_dates: false, availability_dates: false },
+        "CoursePace" => { content: false }
+      }
     end
 
     def expect_restrictions(restrictions)
@@ -2094,8 +2100,8 @@ describe Canvas::LiveEvents do
       @course = course_model
       @master_template = MasterCourses::MasterTemplate.create!(
         course: @course,
-        default_restrictions: all_restrictions,
-        default_restrictions_by_type: { "Assignment" => assignment_restrictions }
+        default_restrictions: default_restrictions,
+        default_restrictions_by_type: default_restrictions_by_type
       )
     end
 
@@ -2106,17 +2112,17 @@ describe Canvas::LiveEvents do
         end
 
         it "and default_restrictions updated" do
-          expect_restrictions(assignment_restrictions)
+          expect_restrictions(default_restrictions_by_type)
           @master_template.update_attribute(:default_restrictions, { content: true })
         end
 
         it "and default_restrictions_by_type updated" do
-          expect_restrictions({ content: true })
+          expect_restrictions({ "Assignment" => { content: true } })
           @master_template.update_attribute(:default_restrictions_by_type, { "Assignment" => { content: true } })
         end
 
         it "and use_default_restrictions_by_type updated to false" do
-          expect_restrictions(all_restrictions)
+          expect_restrictions(default_restrictions)
           @master_template.update_attribute(:use_default_restrictions_by_type, false)
         end
       end
@@ -2132,15 +2138,46 @@ describe Canvas::LiveEvents do
         end
 
         it "and default_restrictions_by_type updated" do
-          expect_restrictions(all_restrictions)
+          expect_restrictions(default_restrictions)
           @master_template.update_attribute(:default_restrictions_by_type, { "Assignment" => { content: true } })
         end
 
         it "and use_default_restrictions_by_type updated to true" do
-          expect_restrictions(assignment_restrictions)
+          expect_restrictions(default_restrictions_by_type)
           @master_template.update_attribute(:use_default_restrictions_by_type, true)
         end
       end
+    end
+  end
+
+  describe ".blueprint_restrictions_updated" do
+    before do
+      course_model
+      default_restrictions = { content: true, points: false, due_dates: false, availability_dates: false }
+      master_template =
+        MasterCourses::MasterTemplate.create!(course: @course, default_restrictions: default_restrictions)
+      assignment = @course.assignments.create!
+      master_content_tag_params = {
+        master_template_id: master_template.id,
+        content_type: "Assignment",
+        content_id: assignment.id,
+        restrictions: default_restrictions,
+        migration_id: "mastercourse_1_3_f9ca51a6679e4779d0d68ef2dc33bc0a",
+        use_default_restrictions: true
+      }
+      @master_content_tag =
+        MasterCourses::MasterContentTag.create!(master_content_tag_params)
+    end
+
+    it "triggers a blueprint_restrictions_updated live event" do
+      expect_event("blueprint_restrictions_updated", {
+                     canvas_assignment_id: @master_content_tag.content_id.to_s,
+                     canvas_course_id: @master_content_tag.master_template.course_id.to_s,
+                     canvas_course_uuid: @master_content_tag.master_template.course.uuid,
+                     restrictions: @master_content_tag.restrictions,
+                     use_default_restrictions: @master_content_tag.use_default_restrictions
+                   }).once
+      Canvas::LiveEvents.blueprint_restrictions_updated(@master_content_tag)
     end
   end
 

@@ -18,7 +18,7 @@
 
 import {useEffect, useState, useRef, useCallback} from 'react'
 import {debounce} from '@instructure/debounce'
-import {round} from './controls/utils'
+import round from '../../../utils/round'
 import {KEY_EVENT_DELAY, KEY_EVENT_STEP} from './constants'
 import {actions} from '../../../reducers/imageCropper'
 

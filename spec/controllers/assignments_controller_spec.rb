@@ -688,16 +688,13 @@ describe AssignmentsController do
         end
 
         let(:external_tool) do
-          tool = external_tool_model(
+          external_tool_1_3_model(
             context: assignment.course,
             opts: {
               url: launch_url,
               developer_key: key
             }
           )
-          tool.settings[:use_1_3] = true
-          tool.save!
-          tool
         end
 
         before do

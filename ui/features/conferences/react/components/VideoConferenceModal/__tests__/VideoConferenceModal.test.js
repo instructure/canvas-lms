@@ -33,6 +33,9 @@ const userList = [
   {displayName: 'Omar Soto Fortuno', id: '4'}
 ]
 
+const startCalendarDate = new Date().toISOString()
+const endCalendarDate = new Date().toISOString()
+
 describe('VideoConferenceModal', () => {
   const onDismiss = jest.fn()
   const onSubmit = jest.fn()
@@ -40,10 +43,12 @@ describe('VideoConferenceModal', () => {
   const setup = (props = {}) => {
     return render(
       <VideoConferenceModal
-        open
+        open={true}
         availableAttendeesList={userList}
         onDismiss={onDismiss}
         onSubmit={onSubmit}
+        startCalendarDate={startCalendarDate}
+        endCalendarDate={endCalendarDate}
         {...props}
       />
     )
@@ -62,6 +67,7 @@ describe('VideoConferenceModal', () => {
         contexts: null
       }
     ]
+    window.ENV.bbb_recording_enabled = true
   })
 
   it('should render', () => {
@@ -94,7 +100,8 @@ describe('VideoConferenceModal', () => {
     expect(onSubmit.mock.calls[0][1]).toStrictEqual({
       name: 'A great video conference name',
       duration: 60,
-      options: ['recording_enabled', 'no_time_limit', 'enable_waiting_room'],
+      options: ['no_time_limit', 'enable_waiting_room', 'recording_enabled'],
+      conferenceType: 'BigBlueButton',
       description: 'A great video conference description',
       invitationOptions: ['invite_all'],
       attendeesOptions: [
@@ -103,7 +110,10 @@ describe('VideoConferenceModal', () => {
         'share_microphone',
         'send_public_chat',
         'send_private_chat'
-      ]
+      ],
+      selectedAttendees: [],
+      startCalendarDate,
+      endCalendarDate
     })
   })
 

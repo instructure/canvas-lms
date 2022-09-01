@@ -46,7 +46,7 @@ export default function ExpandoText(props) {
         padding="none none none xx-small"
         aria-expanded={descExpanded}
         borderRadius="medium"
-        focused={focused}
+        withFocusOutline={focused}
         onClick={() => {
           setDescExpanded(!descExpanded)
         }}

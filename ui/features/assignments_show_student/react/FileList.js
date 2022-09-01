@@ -22,7 +22,7 @@ import mimeClass from '@canvas/mime/mimeClass'
 import PropTypes from 'prop-types'
 import React from 'react'
 
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
@@ -52,7 +52,7 @@ const FileList = props => {
   const refsMap = {}
 
   return (
-    <List variant="unstyled" delimiter="solid">
+    <List isUnstyled={true} delimiter="solid">
       <List.Item>
         <Text size="x-small" weight="bold">
           {I18n.t('Attached')}
@@ -64,13 +64,13 @@ const FileList = props => {
             <Flex.Item size="40px" padding="x-small small">
               {getIcon(file)}
             </Flex.Item>
-            <Flex.Item grow shrink>
+            <Flex.Item shouldGrow={true} shouldShrink={true}>
               <Text size="x-small">{file.name}</Text>
             </Flex.Item>
             {file.embedded_iframe_url && (
               <Flex.Item>
                 <Link href={file.embedded_iframe_url} target="_blank">
-                  <span aria-hidden title={I18n.t('Preview')}>
+                  <span aria-hidden={true} title={I18n.t('Preview')}>
                     {I18n.t('Preview')}
                   </span>
                   <ScreenReaderContent>

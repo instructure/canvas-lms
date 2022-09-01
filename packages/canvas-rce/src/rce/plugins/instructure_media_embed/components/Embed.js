@@ -37,9 +37,12 @@ export function Embed({onSubmit, onDismiss}) {
       shouldCloseOnDocumentClick={false}
     >
       <Modal.Header>
-        <CloseButton onClick={onDismiss} offset="medium" placement="end">
-          {formatMessage('Close')}
-        </CloseButton>
+        <CloseButton
+          onClick={onDismiss}
+          offset="medium"
+          placement="end"
+          screenReaderLabel={formatMessage('Close')}
+        />
         <Heading>{formatMessage('Embed')}</Heading>
       </Modal.Header>
       <Modal.Body>

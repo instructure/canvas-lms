@@ -1511,7 +1511,6 @@ describe "RCE next tests", ignore_js_errors: true do
       end
 
       it "sanitizes the HTML set in the HTML editor" do
-        skip "still flakey. Needs to be addressed in MAT-386"
         get "/"
 
         html = <<~HTML

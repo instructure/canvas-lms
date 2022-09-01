@@ -31,6 +31,8 @@ const defaultProps = {
 
 beforeEach(() => {
   fetchMock.get(/\/api\/v1\/accounts\/1\/account_calendars.*/, RESPONSE_ACCOUNT_1)
+  fetchMock.get(/\/api\/v1\/accounts\/1\/visible_calendars_count.*/, RESPONSE_ACCOUNT_1.length)
+  jest.useFakeTimers()
 })
 
 afterEach(() => {
@@ -46,20 +48,19 @@ describe('AccountCalendarSettings', () => {
     ).toBeInTheDocument()
     expect(
       getByText(
-        'Choose which calendars are visible in the Other Calendar section in the Canvas Calendar. Sub-account calendars are visible to users if they are associated with the account. By default, all calendars are hidden.'
+        'Choose which calendars your users can add in the "Other Calendars" section of their Canvas calendar. Users will only be able to add enabled calendars for the accounts they are associated with. By default, all calendars are disabled.'
       )
     ).toBeInTheDocument()
   })
 
-  // skipped for LS-3360
-  it.skip('saves changes when clicking apply', async () => {
+  it('saves changes when clicking apply', async () => {
     fetchMock.put(/\/api\/v1\/accounts\/1\/account_calendars/, {message: 'Updated 1 account'})
-    const {findByRole, getByRole, getByText, findAllByText} = render(
+    const {findByText, getByText, findAllByText, getByTestId, getByRole} = render(
       <AccountCalendarSettings {...defaultProps} />
     )
-    expect(await findByRole('button', {name: 'University (24)'})).toBeInTheDocument()
+    expect(await findByText('University (24)')).toBeInTheDocument()
     const universityCheckbox = getByRole('checkbox', {name: 'Show account calendar for University'})
-    const applyButton = getByRole('button', {name: 'Apply Changes'})
+    const applyButton = getByTestId('save-button')
     expect(applyButton).toBeDisabled()
     act(() => universityCheckbox.click())
     expect(applyButton).toBeEnabled()
@@ -69,8 +70,8 @@ describe('AccountCalendarSettings', () => {
   })
 
   it('renders account tree when no filters are applied', async () => {
-    const {findByRole, getByLabelText} = render(<AccountCalendarSettings {...defaultProps} />)
-    await findByRole('button', {name: 'University (24)'})
+    const {findByText, getByLabelText} = render(<AccountCalendarSettings {...defaultProps} />)
+    await findByText('University (24)')
     expect(
       getByLabelText(
         'Accounts tree: navigate the accounts tree hierarchically to toggle account calendar visibility'
@@ -79,10 +80,10 @@ describe('AccountCalendarSettings', () => {
   })
 
   it('renders account list when filters are applied', async () => {
-    const {findByRole, getByLabelText, findByText, getByPlaceholderText} = render(
+    const {findByText, getByLabelText, getByPlaceholderText} = render(
       <AccountCalendarSettings {...defaultProps} />
     )
-    await findByRole('button', {name: 'University (24)'})
+    await findByText('University (24)')
     fetchMock.restore()
     fetchMock.get('/api/v1/accounts/1/account_calendars?search_term=elemen&filter=&per_page=20', [
       {

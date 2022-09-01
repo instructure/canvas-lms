@@ -277,7 +277,7 @@ module BrandableCSS
           v.symbolize_keys.slice(:combinedChecksum, :includesNoVariables)
         end.freeze
       elsif defined?(Rails) && Rails.env.production?
-        raise "#{file.expand_path} does not exist. You need to run brandable_css before you can serve css."
+        raise "#{file.expand_path} does not exist. You need to run `yarn run build:css` before you can serve css."
       else
         # for dev/test there might be cases where you don't want it to raise an exception
         # if you haven't ran `brandable_css` and the manifest file doesn't exist yet.
@@ -298,7 +298,7 @@ module BrandableCSS
 
       file = APP_ROOT.join(CONFIG.dig("indices", "handlebars", "path"))
       unless file.exist?
-        raise "#{file.expand_path} does not exist. You need to run brandable_css before you can serve css."
+        raise "#{file.expand_path} does not exist. You need to run `yarn run build:css` before you can serve css."
       end
 
       @handlebars_index_json = file.read

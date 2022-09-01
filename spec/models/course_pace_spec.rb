@@ -391,6 +391,15 @@ describe CoursePace do
       expect(@course_pace.publish).to eq(true)
       expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.submitted_assignment_date_change")
     end
+
+    it "compresses to hard end dates" do
+      @course_pace.course_pace_module_items.update(duration: 900)
+      expect(AssignmentOverride.count).to eq(0)
+      expect(@course_pace.publish).to eq(true)
+      expect(AssignmentOverride.count).to eq(2)
+      expect(AssignmentOverride.last.due_at).to eq(fancy_midnight_rounded_to_last_second(@course_pace.end_date.to_s))
+      expect(@course_pace.course_pace_module_items.reload.pluck(:duration)).to eq([900, 900])
+    end
   end
 
   describe "default plan start_at" do

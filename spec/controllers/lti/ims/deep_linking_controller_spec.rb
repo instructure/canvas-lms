@@ -79,16 +79,13 @@ module Lti
             ]
           end
           let!(:tool) do
-            tool = external_tool_model(
+            external_tool_1_3_model(
               context: account,
               opts: {
                 url: "http://tool.url/login",
                 developer_key: developer_key
               }
             )
-            tool.settings[:use_1_3] = true
-            tool.save!
-            tool
           end
 
           shared_examples_for "creates resource links in context" do
@@ -140,6 +137,11 @@ module Lti
           let(:response_message) { raise "set in examples" }
 
           it { is_expected.to be_bad_request }
+
+          it "reports error metric" do
+            expect(InstStatsd::Statsd).to receive(:increment).with("canvas.deep_linking_controller.request_error", tags: { code: 400 })
+            subject
+          end
 
           it "responds with an error" do
             subject
@@ -326,7 +328,7 @@ module Lti
               shared_secret: "secret",
               consumer_key: "key",
               developer_key: developer_key,
-              settings: { use_1_3: true }
+              lti_version: "1.3"
             )
           end
           let(:launch_url) { "http://tool.url/launch" }

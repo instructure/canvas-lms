@@ -92,9 +92,10 @@ class StatusColorListItem extends React.Component {
               <Popover
                 on="click"
                 isShowingContent={isColorPickerShown}
-                onToggle={colorPickerOnToggle}
+                onShowContent={colorPickerOnToggle.bind(null, true)}
+                onHideContent={colorPickerOnToggle.bind(null, false)}
                 contentRef={colorPickerContentRef}
-                shouldReturnFocus
+                shouldReturnFocus={true}
                 renderTrigger={
                   <IconButton
                     size="small"
@@ -113,10 +114,10 @@ class StatusColorListItem extends React.Component {
                   currentColor={this.state.color}
                   afterClose={colorPickerAfterClose}
                   hideOnScroll={false}
-                  allowWhite
-                  nonModal
-                  hidePrompt
-                  withDarkCheck
+                  allowWhite={true}
+                  nonModal={true}
+                  hidePrompt={true}
+                  withDarkCheck={true}
                   animate={false}
                   withAnimation={false}
                   withArrow={false}

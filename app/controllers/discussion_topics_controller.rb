@@ -530,7 +530,8 @@ class DiscussionTopicsController < ApplicationController
         CAN_CREATE_ASSIGNMENT: @context.respond_to?(:assignments) && @context.assignments.temp_record.grants_right?(@current_user, session, :create),
         CAN_ATTACH: @topic.grants_right?(@current_user, session, :attach),
         CAN_MODERATE: user_can_moderate,
-        CAN_SET_GROUP: can_set_group_category
+        CAN_SET_GROUP: can_set_group_category,
+        CAN_EDIT_GRADES: can_do(@context, @current_user, :manage_grades)
       }
     }
 

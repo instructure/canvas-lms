@@ -127,6 +127,19 @@ describe ConversationsController do
       expect(assigns[:conversations_json].size).to eql 3
     end
 
+    it "returns all starred conversations" do
+      user_session(@student)
+      @c1 = conversation
+      @c2 = conversation
+      @c3 = conversation
+      [@c1, @c2, @c3].each { |c| c.update(starred: true) }
+
+      get "index", params: { scope: "starred" }, format: "json"
+      expect(response).to be_successful
+      expect(assigns[:conversations_json].size).to eql 3
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.starred.pages_loaded.legacy")
+    end
+
     it "returns all unread conversations" do
       user_session(@student)
       @c1 = conversation

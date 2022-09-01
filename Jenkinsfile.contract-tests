@@ -65,13 +65,6 @@ pipeline {
               command: 'cd /usr/src/app && bundle exec rake pact:verify'
             )
 
-            callableWithDelegate(contractTestsStage.queueTestStage('Quiz LTI'))(stages,
-              databaseName: 'pact_test3',
-              consumerName: 'Quiz LTI',
-              envVars: consumerEnvVars,
-              command: 'cd /usr/src/app && bundle exec rake pact:verify'
-            )
-
             callableWithDelegate(contractTestsStage.queueTestStage('Sistemic'))(stages,
               databaseName: 'pact_test4',
               consumerName: 'Sistemic',

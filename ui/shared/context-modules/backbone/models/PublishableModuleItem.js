@@ -31,6 +31,7 @@ export default class PublishableModuleItem extends Model {
       published: true,
       publishable: true,
       unpublishable: true,
+      publish_at: null,
       module_item_name: null
     }
 

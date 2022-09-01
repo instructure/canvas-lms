@@ -62,6 +62,33 @@ describe I18nTasks::GenerateJs do
       )
     end
 
+    it "conforms with I18n pluralization interface" do
+      provide("a.some_phrase.one" => "kek")
+      provide("a.some_phrase.other" => "bur")
+
+      subject = described_class.new(
+        index: [
+          {
+            "key" => "a.some_phrase.one",
+            "scope" => "a"
+          },
+          {
+            "key" => "a.some_phrase.other",
+            "scope" => "a"
+          }
+        ]
+      ).translations("en")
+
+      expect(subject).to eq(
+        {
+          "a.some_phrase" => {
+            "one" => "kek",
+            "other" => "bur"
+          }
+        }
+      )
+    end
+
     it "sorts phrases by their keys" do
       provide(
         "date.datepicker.column_headings" => ["1", "2"],

@@ -32,6 +32,7 @@ module Lti::IMS::Concerns
     end
 
     def render_error(errors)
+      InstStatsd::Statsd.increment("canvas.deep_linking_controller.request_error", tags: { code: 400 })
       render json: errors, status: :bad_request
     end
 

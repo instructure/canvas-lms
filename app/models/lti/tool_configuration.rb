@@ -55,7 +55,6 @@ module Lti
       )
       tool.developer_key = developer_key
       tool.workflow_state = (tool_is_disabled && ContextExternalTool::DISABLED_STATE) || canvas_extensions["privacy_level"] || DEFAULT_PRIVACY_LEVEL
-      tool.use_1_3 = true
       tool
     end
 

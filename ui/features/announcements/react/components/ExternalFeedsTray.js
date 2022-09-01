@@ -74,7 +74,7 @@ export default class ExternalFeedsTray extends Component {
         <View margin="medium" as="div" textAlign="start">
           <Link
             id="rss-feed-link"
-            linkRef={link => {
+            elementRef={link => {
               this.rssFeedLink = link
             }}
             href={this.props.atomFeedUrl}
@@ -118,7 +118,9 @@ export default class ExternalFeedsTray extends Component {
           id="external_feed"
           aria-haspopup="dialog"
           elementRef={link => (this.externalFeedRef = link)}
-          onClick={() => this.setState({open: !this.state.open})}
+          onClick={() => {
+            this.setState(oldState => ({open: !oldState.open}))
+          }}
           variant="link"
         >
           {I18n.t('External Feeds')}

@@ -164,7 +164,7 @@ describe('saveMediaRecording', () => {
       status: 200,
       response: mediaServerSession()
     })
-    moxios.stubRequest('/api/v1/media_objects', {
+    moxios.stubRequest('http://host:port/api/media_objects', {
       status: 200,
       response: {data: 'media object data'}
     })
@@ -189,7 +189,7 @@ describe('saveMediaRecording', () => {
       status: 200,
       response: mediaServerSession()
     })
-    moxios.stubRequest('/api/v1/media_objects', {
+    moxios.stubRequest('http://host:port/api/media_objects', {
       status: 500,
       response: {error: 'womp womp'}
     })

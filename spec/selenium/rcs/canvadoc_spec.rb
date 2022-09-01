@@ -64,6 +64,8 @@ describe "Canvadoc" do
     end
 
     it "allows annotations settings to be saved", priority: "1" do
+      skip "CAS-918 (8/25/2022)"
+
       turn_on_plugin_settings
       fj("#settings_annotations_supported").click
       f(".save_button").click

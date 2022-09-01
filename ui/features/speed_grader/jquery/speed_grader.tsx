@@ -30,8 +30,7 @@ import type {
 import React from 'react'
 import ReactDOM from 'react-dom'
 import * as Alerts from '@instructure/ui-alerts'
-import {Button} from '@instructure/ui-buttons'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {IconButton} from '@instructure/ui-buttons'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import OutlierScoreHelper from '@canvas/grading/OutlierScoreHelper'
 import quizzesNextSpeedGrading from '../quizzesNextSpeedGrading'
@@ -707,10 +706,13 @@ function renderProgressIcon(attachment) {
   } else {
     const {icon, tip} = iconAndTipMap[attachment.upload_status] || iconAndTipMap.default
     const tooltip = (
-      <Tooltip tip={tip} on={['click', 'hover', 'focus']}>
-        <Button variant="icon" icon={icon}>
-          <ScreenReaderContent>toggle tooltip</ScreenReaderContent>
-        </Button>
+      <Tooltip renderTip={tip} on={['click', 'hover', 'focus']}>
+        <IconButton
+          renderIcon={icon}
+          withBorder={false}
+          withBackground={false}
+          screenReaderLabel={I18n.t('Toggle tooltip')}
+        />
       </Tooltip>
     )
     ReactDOM.render(tooltip, mountPoint)
@@ -723,7 +725,9 @@ function renderHiddenSubmissionPill(submission) {
 
   if (isPostable(submission)) {
     ReactDOM.render(
-      <Pill variant="warning" text={I18n.t('Hidden')} margin="0 0 small" />,
+      <Pill color="warning" margin="0 0 small">
+        {I18n.t('Hidden')}
+      </Pill>,
       mountPoint
     )
   } else {
@@ -2169,7 +2173,7 @@ EG = {
 
   updateWordCount(wordCount) {
     if (
-      ENV.FEATURES?.word_count_in_speed_grader &&
+      this.currentStudent.submission?.submission_type &&
       !['basic_lti_launch', 'external_tool'].includes(
         this.currentStudent.submission.submission_type
       )

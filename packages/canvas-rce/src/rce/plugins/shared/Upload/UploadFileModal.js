@@ -24,7 +24,6 @@ import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Tabs} from '@instructure/ui-tabs'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
-import {Text} from '@instructure/ui-text'
 import formatMessage from '../../../../format-message'
 
 import RceApiSource from '../../../../rcs/api'
@@ -128,7 +127,7 @@ const UploadFileModal = React.forwardRef(
 
     return (
       <Modal
-        data-mce-component
+        data-mce-component={true}
         as="form"
         label={label}
         size="large"
@@ -155,14 +154,17 @@ const UploadFileModal = React.forwardRef(
             onDismiss
           )
         }}
-        open
+        open={true}
         shouldCloseOnDocumentClick={false}
         liveRegion={trayProps.liveRegion}
       >
         <Modal.Header>
-          <CloseButton onClick={onDismiss} offset="small" placement="end">
-            {formatMessage('Close')}
-          </CloseButton>
+          <CloseButton
+            onClick={onDismiss}
+            offset="small"
+            placement="end"
+            screenReaderLabel={formatMessage('Close')}
+          />
           <Heading>{label}</Heading>
         </Modal.Header>
         <Modal.Body ref={ref}>
@@ -176,7 +178,7 @@ const UploadFileModal = React.forwardRef(
                       renderTitle={function () {
                         return formatMessage('Computer')
                       }}
-                      selected={selectedPanel === 'COMPUTER'}
+                      isSelected={selectedPanel === 'COMPUTER'}
                     >
                       <Suspense
                         fallback={<Spinner renderTitle={formatMessage('Loading')} size="large" />}
@@ -200,7 +202,7 @@ const UploadFileModal = React.forwardRef(
                       renderTitle={function () {
                         return 'Unsplash'
                       }}
-                      selected={selectedPanel === 'UNSPLASH'}
+                      isSelected={selectedPanel === 'UNSPLASH'}
                     >
                       <Suspense
                         fallback={<Spinner renderTitle={formatMessage('Loading')} size="large" />}
@@ -222,7 +224,7 @@ const UploadFileModal = React.forwardRef(
                       renderTitle={function () {
                         return formatMessage('URL')
                       }}
-                      selected={selectedPanel === 'URL'}
+                      isSelected={selectedPanel === 'URL'}
                     >
                       <Suspense
                         fallback={<Spinner renderTitle={formatMessage('Loading')} size="large" />}
@@ -248,7 +250,7 @@ const UploadFileModal = React.forwardRef(
                     padding="medium"
                   >
                     <ToggleDetails
-                      defaultExpanded
+                      defaultExpanded={true}
                       summary={
                         <Heading level="h3">{formatMessage('Usage Rights (required)')}</Heading>
                       }
@@ -283,7 +285,7 @@ const UploadFileModal = React.forwardRef(
                         handleAltTextChange={handleAltTextChange}
                         handleIsDecorativeChange={handleIsDecorativeChange}
                         handleDisplayAsChange={handleDisplayAsChange}
-                        hideDimensions
+                        hideDimensions={true}
                       />
                     </ToggleDetails>
                   </View>

@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
 import '@canvas/backbone'
 import _ from 'lodash'
 import {within, getByText} from '@testing-library/dom'
@@ -171,6 +172,16 @@ describe('EditEventView', () => {
   })
 
   describe('blackout date checkbox', () => {
+    const expectEnabled = id => {
+      const element = within(document.body).queryByTestId(id)
+      expect(element).toBeEnabled()
+    }
+
+    const expectDisabled = id => {
+      const element = within(document.body).queryByTestId(id)
+      expect(element).toBeDisabled()
+    }
+
     it('is not shown when account level blackout dates are disabled', () => {
       window.ENV.FEATURES = {account_level_blackout_dates: false}
       render()
@@ -185,6 +196,29 @@ describe('EditEventView', () => {
           exact: false
         })
       ).toBeInTheDocument()
+    })
+
+    it('erases and renders irrelevant fields when checked', () => {
+      window.ENV.FEATURES = {account_level_blackout_dates: true}
+      render({
+        context_type: 'course',
+        course_pacing_enabled: 'true',
+        web_conference: {id: 1, conference_type: 'LtiConference', title: 'FooConf'}
+      })
+      const ids = [
+        'more_options_start_time',
+        'more_options_end_time',
+        'calendar_event_location_name',
+        'calendar_event_location_address',
+        'calendar_event_conference_field'
+      ]
+      ids.forEach(id => expectEnabled(id))
+      $('#calendar_event_blackout_date').attr('checked', true)
+      $('#calendar_event_blackout_date').trigger('change')
+      ids.forEach(id => expectDisabled(id))
+      $('#calendar_event_blackout_date').attr('checked', false)
+      $('#calendar_event_blackout_date').trigger('change')
+      ids.forEach(id => expectEnabled(id))
     })
   })
 })

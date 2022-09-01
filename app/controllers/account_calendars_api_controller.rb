@@ -62,6 +62,36 @@
 #           "description": "number of this account's direct sub-accounts",
 #           "example": 0,
 #           "type": "integer"
+#         },
+#         "asset_string": {
+#           "description": "Asset string of the account",
+#           "example": "account_4",
+#           "type": "string"
+#         },
+#         "type": {
+#           "description": "Object type",
+#           "example": "account",
+#           "type": "string"
+#         },
+#         "calendar_event_url": {
+#           "description": "url to get full detailed events",
+#           "example": "/accounts/2/calendar_events/%7B%7B%20id%20%7D%7D",
+#           "type": "string"
+#         },
+#         "can_create_calendar_events": {
+#           "description": "whether the user can create calendar events",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "create_calendar_event_url": {
+#           "description": "API path to create events for the account",
+#           "example": "/accounts/2/calendar_events",
+#           "type": "string"
+#         },
+#         "new_calendar_event_url": {
+#           "description": "url to open the more options event editor",
+#           "example": "/accounts/6/calendar_events/new",
+#           "type": "string"
 #         }
 #       }
 #     }
@@ -84,14 +114,19 @@ class AccountCalendarsApiController < ApplicationController
   #   curl https://<canvas>/api/v1/account_calendars \
   #     -H 'Authorization: Bearer <token>'
   #
-  # @returns [AccountCalendar]
+  # @returns { "account_calendars": [AccountCalendar], "total_results": "integer"}
   def index
     GuardRail.activate(:secondary) do
       search_term = params[:search_term]
-      accounts = @current_user.associated_accounts.active.where(account_calendar_visible: true)
+      InstStatsd::Statsd.increment("account_calendars.available_calendars_requested") if search_term.blank? && params[:page].nil?
+      accounts = @current_user.unordered_associated_accounts.shard(@current_user.in_region_associated_shards).active.where(account_calendar_visible: true)
       accounts = Account.search_by_attribute(accounts, :name, search_term) if search_term.present?
-      paginated_accounts = Api.paginate(accounts.reorder(Account.best_unicode_collation_key("name"), :id), self, api_v1_account_calendars_url)
-      render json: account_calendars_json(paginated_accounts, @current_user, session)
+      paginated_accounts = Api.paginate(accounts.sort_by { |a| Canvas::ICU.collation_key(a.name.to_s) }, self, api_v1_account_calendars_url, total_entries: accounts.count)
+      json = {
+        account_calendars: account_calendars_json(paginated_accounts, @current_user, session),
+        total_results: accounts.count
+      }
+      render json: json
     end
   end
 

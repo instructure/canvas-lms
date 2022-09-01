@@ -161,7 +161,7 @@ class Attachment < ActiveRecord::Base
   after_save_and_attachment_processing :ensure_media_object
 
   # this mixin can be added to a has_many :attachments association, and it'll
-  # handle finding replaced attachments. In other words, if an attachment fond
+  # handle finding replaced attachments. In other words, if an attachment found
   # by id is deleted but an active attachment in the same context has the same
   # path, it'll return that attachment.
   module FindInContextAssociation
@@ -538,7 +538,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def set_word_count
-    if word_count.nil? && !deleted? && file_state != "broken" && Account.site_admin.feature_enabled?(:word_count_in_speed_grader)
+    if word_count.nil? && !deleted? && file_state != "broken"
       delay(singleton: "attachment_set_word_count_#{global_id}").update_word_count
     end
   end

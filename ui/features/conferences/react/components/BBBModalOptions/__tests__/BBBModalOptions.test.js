@@ -64,6 +64,9 @@ describe('BBBModalOptions', () => {
         onSetInvitationOptions={props.setInvitationOptions}
         attendeesOptions={props.attendeesOptions}
         onSetAttendeesOptions={props.setAttendeesOptions}
+        showCalendar={props.showCalendar}
+        startDate={props.startDate}
+        endDate={props.endDate}
       />
     )
   }
@@ -75,6 +78,8 @@ describe('BBBModalOptions', () => {
     setDescription.mockClear()
     setInvitationOptions.mockClear()
     setAttendeesOptions.mockClear()
+
+    window.ENV.bbb_recording_enabled = true
   })
 
   it('should render', () => {
@@ -89,9 +94,40 @@ describe('BBBModalOptions', () => {
       defaultProps.duration.toString()
     )
     expect(container.getByLabelText('Enable recording for this conference').checked).toBeTruthy()
+    expect(container.getByLabelText('Enable recording for this conference').disabled).toBeFalsy()
     expect(container.getByLabelText('Description')).toHaveValue(defaultProps.description)
 
     fireEvent.click(container.getByText('Attendees'))
     expect(container.getByLabelText('Share webcam').checked).toBeTruthy()
+  })
+
+  it('it should set default calendar dates when provided', () => {
+    const customProps = defaultProps
+    customProps.showCalendar = true
+    const container = setup(customProps)
+
+    const startInput = container.getByLabelText('Start Date')
+    const endInput = container.getByLabelText('End Date')
+
+    expect(startInput).toBeTruthy()
+    expect(endInput).toBeTruthy()
+  })
+
+  it('it should not render calendar when prop is false', () => {
+    const customProps = defaultProps
+    customProps.showCalendar = false
+    const container = setup(customProps)
+
+    const startInput = container.queryByLabelText('Start Date')
+    const endInput = container.queryByLabelText('End Date')
+
+    expect(startInput).toBeFalsy()
+    expect(endInput).toBeFalsy()
+  })
+
+  it('should disable recording if setting is disabled', () => {
+    window.ENV.bbb_recording_enabled = false
+    const container = setup(defaultProps)
+    expect(container.getByLabelText('Enable recording for this conference').disabled).toBeTruthy()
   })
 })

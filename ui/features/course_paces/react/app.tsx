@@ -83,7 +83,7 @@ export const App: React.FC<ResponsiveComponentProps> = ({
     <View>
       <Overlay open={showLoadingOverlay} transition="fade" label={loadingMessage}>
         <Mask>
-          <Spinner title="Loading" size="large" margin="0 0 0 medium" />
+          <Spinner renderTitle="Loading" size="large" margin="0 0 0 medium" />
         </Mask>
       </Overlay>
       <Flex as="div" direction="column" margin="small">

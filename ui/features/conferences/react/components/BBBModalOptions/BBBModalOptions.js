@@ -26,6 +26,8 @@ import {NumberInput} from '@instructure/ui-number-input'
 import {Flex} from '@instructure/ui-flex'
 import {TextArea} from '@instructure/ui-text-area'
 import {Tabs} from '@instructure/ui-tabs'
+import {DateTimeInput} from '@instructure/ui-forms'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = useI18nScope('video_conference')
 
@@ -44,7 +46,7 @@ const BBBModalOptions = props => {
       <Tabs.Panel
         id={SETTINGS_TAB}
         renderTitle={I18n.t('Settings')}
-        selected={tab === SETTINGS_TAB}
+        isSelected={tab === SETTINGS_TAB}
       >
         <Flex margin="none none large" direction="column">
           <Flex.Item padding="small">
@@ -55,7 +57,7 @@ const BBBModalOptions = props => {
               onChange={(e, value) => {
                 props.onSetName(value)
               }}
-              isRequired
+              isRequired={true}
             />
           </Flex.Item>
           <Flex.Item padding="small">
@@ -80,7 +82,7 @@ const BBBModalOptions = props => {
 
                   props.onSetDuration(props.duration - 1)
                 }}
-                isRequired
+                isRequired={true}
               />
             </span>
           </Flex.Item>
@@ -96,6 +98,7 @@ const BBBModalOptions = props => {
               <Checkbox
                 label={I18n.t('Enable recording for this conference')}
                 value="recording_enabled"
+                disabled={!ENV.bbb_recording_enabled}
               />
               <Checkbox
                 label={I18n.t('No time limit (for long-running conferences)')}
@@ -105,6 +108,50 @@ const BBBModalOptions = props => {
               <Checkbox label={I18n.t('Add to Calendar')} value="add_to_calendar" />
             </CheckboxGroup>
           </Flex.Item>
+          {props.showCalendar && (
+            <Flex.Item>
+              <Flex>
+                <Flex.Item padding="small" align="start">
+                  <DateTimeInput
+                    data-testId="start-date-input"
+                    onChange={(e, newValue) => {
+                      props.onStartDateChange(newValue)
+                    }}
+                    layout="columns"
+                    dateLabel={I18n.t('Start Date')}
+                    timeLabel={I18n.t('Start Time')}
+                    value={props.startDate}
+                    invalidDateTimeMessage={I18n.t('Invalid date and time')}
+                    dateNextLabel={I18n.t('Next Month')}
+                    datePreviousLabel={I18n.t('Previous Month')}
+                    description={
+                      <ScreenReaderContent>
+                        {I18n.t('Start Date for Conference')}
+                      </ScreenReaderContent>
+                    }
+                  />
+                </Flex.Item>
+                <Flex.Item padding="small" align="start">
+                  <DateTimeInput
+                    data-testId="end-date-input"
+                    onChange={(e, newValue) => {
+                      props.onEndDateChange(newValue)
+                    }}
+                    layout="columns"
+                    dateLabel={I18n.t('End Date')}
+                    timeLabel={I18n.t('End Time')}
+                    value={props.endDate}
+                    invalidDateTimeMessage={I18n.t('Invalid date and time')}
+                    dateNextLabel={I18n.t('Next Month')}
+                    datePreviousLabel={I18n.t('Previous Month')}
+                    description={
+                      <ScreenReaderContent>{I18n.t('End Date for Conference')}</ScreenReaderContent>
+                    }
+                  />
+                </Flex.Item>
+              </Flex>
+            </Flex.Item>
+          )}
           <Flex.Item padding="small">
             <TextArea
               label={I18n.t('Description')}
@@ -120,7 +167,7 @@ const BBBModalOptions = props => {
       <Tabs.Panel
         id={ATTENDEES_TAB}
         renderTitle={I18n.t('Attendees')}
-        selected={tab === ATTENDEES_TAB}
+        isSelected={tab === ATTENDEES_TAB}
       >
         <Flex margin="none none large" direction="column">
           <Flex.Item padding="small">
@@ -189,7 +236,12 @@ BBBModalOptions.propTypes = {
   showAddressBook: PropTypes.bool,
   onAttendeesChange: PropTypes.func,
   availableAttendeesList: PropTypes.arrayOf(PropTypes.object),
-  selectedAttendees: PropTypes.arrayOf(PropTypes.string)
+  selectedAttendees: PropTypes.arrayOf(PropTypes.string),
+  showCalendar: PropTypes.bool,
+  onEndDateChange: PropTypes.func,
+  onStartDateChange: PropTypes.func,
+  startDate: PropTypes.string,
+  endDate: PropTypes.string
 }
 
 export default BBBModalOptions

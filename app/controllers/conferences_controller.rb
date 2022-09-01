@@ -142,6 +142,7 @@
 #
 class ConferencesController < ApplicationController
   include Api::V1::Conferences
+  include CalendarConferencesHelper
 
   before_action :require_context, except: :for_user
   skip_before_action :load_user, only: [:recording_ready]
@@ -305,6 +306,8 @@ class ConferencesController < ApplicationController
       end
     end
 
+    bbb_config = WebConference.config(class_name: BigBlueButtonConference.to_s)
+
     # exposing the initial data as json embedded on page.
     js_env(
       current_conferences: ui_conferences_json(@new_conferences, @context, @current_user, session),
@@ -317,7 +320,9 @@ class ConferencesController < ApplicationController
       group_user_ids_map: @group_user_ids_map,
       section_user_ids_map: @section_user_ids_map,
       can_create_conferences: @context.grants_right?(@current_user, session, :create_conferences),
-      render_alternatives: @render_alternatives
+      render_alternatives: @render_alternatives,
+      bbb_modal_update: Account.site_admin.feature_enabled?(:bbb_modal_update),
+      bbb_recording_enabled: bbb_config ? bbb_config[:recording_enabled] : false
     )
     set_tutorial_js_env
     flash[:error] = t("Some conferences on this page are hidden because of errors while retrieving their status") if @errors
@@ -338,6 +343,13 @@ class ConferencesController < ApplicationController
     end
   end
 
+  def create_or_update_calendar_event_for_conference(conference, context)
+    return nil unless context.is_a?(Course)
+
+    calendar_event_data = { title: conference.title, web_conference: conference, context_code: context.asset_string, start_at: conference.start_at, end_at: conference.end_at }
+    find_and_update_or_initialize_calendar_event(context, calendar_event_data)
+  end
+
   def create
     if authorized_action(@context.web_conferences.temp_record, @current_user, :create)
       @conference = @context.web_conferences.build(conference_params)
@@ -345,6 +357,10 @@ class ConferencesController < ApplicationController
       @conference.user = @current_user
       respond_to do |format|
         if @conference.save
+          if params[:web_conference].try(:delete, :calendar_event)
+            calendar_event = create_or_update_calendar_event_for_conference(@conference, @context)
+            calendar_event&.save
+          end
           @conference.add_initiator(@current_user)
           @conference.invite_users_from_context(member_ids)
           @conference.save
@@ -367,9 +383,14 @@ class ConferencesController < ApplicationController
       respond_to do |format|
         params[:web_conference].try(:delete, :long_running)
         params[:web_conference].try(:delete, :conference_type)
+        sync_attendees = params[:web_conference].try(:delete, :sync_attendees)
+
+        @conference.invite_users_from_context if sync_attendees
+
         if @conference.update(conference_params)
           # TODO: ability to dis-invite people
-          @conference.invite_users_from_context(member_ids)
+          @conference.invite_users_from_context(member_ids) unless sync_attendees
+
           @conference.save
           format.html { redirect_to named_context_url(@context, :context_conference_url, @conference.id) }
           format.json do
@@ -520,7 +541,7 @@ class ConferencesController < ApplicationController
 
   def conference_params
     params.require(:web_conference)
-          .permit(:title, :duration, :description, :conference_type, user_settings: strong_anything, lti_settings: strong_anything)
+          .permit(:start_at, :end_at, :sync_attendees, :title, :duration, :description, :conference_type, user_settings: strong_anything, lti_settings: strong_anything)
   end
 
   def preload_recordings(conferences)

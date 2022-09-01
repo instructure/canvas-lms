@@ -18,11 +18,14 @@
 
 import {MockedProvider} from '@apollo/react-testing'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {render, within, queryAllByText} from '@testing-library/react'
+import {render, within, getByText, queryAllByText} from '@testing-library/react'
 import React from 'react'
 import RosterTable from '../RosterTable'
 import {mockUser, mockEnrollment, getRosterQueryMock} from '../../../../graphql/Mocks'
 import {ACTIVE_STATE, PILL_MAP} from '../../../components/StatusPill/StatusPill'
+
+const OBSERVER_ENROLLMENT = 'ObserverEnrollment'
+const STUDENT_ENROLLMENT = 'StudentEnrollment'
 
 const designer1 = {
   name: 'Designer 1',
@@ -90,7 +93,7 @@ const observer1 = {
   _id: '40',
   sisId: 'Observer1-SIS-ID',
   loginId: 'Observer1@instructure.com',
-  enrollmentType: 'ObserverEnrollment',
+  enrollmentType: OBSERVER_ENROLLMENT,
   sisRole: 'observer',
   additionalEnrollments: [
     mockEnrollment({
@@ -105,6 +108,12 @@ const observer1 = {
     })
   ]
 }
+
+const DATETIME_PATTERN = new RegExp(
+  /^[a-z]+ [0-3]?[0-9][, [0-9]*]? at [1]?[0-9]:[0-5][0-9](am|pm)$/, // Apr 16, 2021 at 12:34pm
+  'i'
+)
+const STOPWATCH_PATTERN = new RegExp(/^[0-9]+(:[0-5][0-9]){1,2}$/) // 00:00 or 00:00:00
 
 describe('RosterTable', () => {
   const setOnFailure = jest.fn()
@@ -125,11 +134,18 @@ describe('RosterTable', () => {
 
   beforeEach(() => {
     window.ENV = {
-      course: {id: '1'},
+      course: {
+        id: '1',
+        hideSectionsOnCourseUsersPage: false
+      },
       current_user: {id: '999'},
       permissions: {
         view_user_logins: true,
-        read_sis: true
+        read_sis: true,
+        read_reports: true,
+        can_allow_admin_actions: true,
+        manage_admin_users: true,
+        manage_students: true
       }
     }
   })
@@ -170,54 +186,28 @@ describe('RosterTable', () => {
     expect(within(rows[6]).getByText('Observing: Observed Student 2')).toBeInTheDocument()
   })
 
-  it('should wrap the name of each user in a button', async () => {
+  it('should wrap the name of each user in a link to their user detail page', async () => {
     const container = setup(getRosterQueryMock({mockUsers}))
     const cells = await container.findAllByTestId('roster-table-name-cell')
     const names = mockUsers.map(user => user.name)
+    const userDetailLinks = mockUsers.map(user => user.enrollments[0].htmlUrl)
     cells.forEach((cell, index) => {
-      const nameMatch = new RegExp(names[index])
-      const button = within(cell).getByRole('button', {name: nameMatch})
-      expect(button).toBeInTheDocument()
-    })
-  })
-
-  it('should link the current_user to their user detail page when clicking their own name', async () => {
-    const self = teacher1
-    window.ENV = {...window.ENV, current_user: {id: self._id}}
-    const mockSelf = mockUser(self)
-    const nameMatch = new RegExp(self.name)
-
-    const container = setup(getRosterQueryMock({mockUsers: [mockSelf]}))
-    const cells = await container.findByTestId('roster-table-name-cell')
-    const link = within(cells).getByRole('link', {name: nameMatch})
-    expect(link).toHaveAttribute('href', mockSelf.enrollments.htmlUrl)
-  })
-
-  it('should not link the current_user to the user detail page when clicking a name that is not their own', async () => {
-    const container = setup(getRosterQueryMock({mockUsers}))
-    const cells = await container.findAllByTestId('roster-table-name-cell')
-    const names = mockUsers.map(user => user.name)
-    cells.forEach((cell, index) => {
-      const nameMatch = new RegExp(names[index])
-      const button = within(cell).getByRole('button', {name: nameMatch})
-      expect(button).not.toHaveAttribute('href')
+      const nameMatch = new RegExp(names[index]) // Use regex to match names with pronouns
+      const nameLink = within(cell).getByRole('link', {name: nameMatch})
+      expect(nameLink).toHaveAttribute('href', userDetailLinks[index])
     })
   })
 
   it('should display users last activity (if any) unless user is an observer', async () => {
-    const datetimePattern = new RegExp(
-      /^[a-z]+ [0-3]?[0-9][, [0-9]*]? at [1]?[0-9]:[0-5][0-9](am|pm)$/, // Apr 16, 2021 at 12:34pm
-      'i'
-    )
     const container = setup(getRosterQueryMock({mockUsers}))
     const rows = await container.findAllByTestId('roster-table-data-row')
     const lastActivityByUser = mockUsers.map(user => {
-      return user.enrollments[0].type === 'ObserverEnrollment'
+      return user.enrollments[0].type === OBSERVER_ENROLLMENT
         ? null
         : user.enrollments[0].lastActivityAt
     })
     rows.forEach((row, index) => {
-      const lastActivity = queryAllByText(row, datetimePattern)
+      const lastActivity = queryAllByText(row, DATETIME_PATTERN)
       expect(lastActivity).toHaveLength(lastActivityByUser[index] ? 1 : 0)
     })
   })
@@ -227,8 +217,24 @@ describe('RosterTable', () => {
     const rows = await container.findAllByTestId('roster-table-data-row')
     const totalActivityByUser = mockUsers.map(user => user.enrollments[0].totalActivityTime)
     rows.forEach((row, index) => {
-      const totalActivity = queryAllByText(row, /^[0-9]+(:[0-5][0-9]){1,2}$/) // 00:00 or 00:00:00
+      const totalActivity = queryAllByText(row, STOPWATCH_PATTERN)
       expect(totalActivity).toHaveLength(totalActivityByUser[index] ? 1 : 0)
+    })
+  })
+
+  it('should not show the last activity or total activity time column if the read_reports permission is false', async () => {
+    window.ENV.permissions.read_reports = false
+    const container = setup(getRosterQueryMock({mockUsers}))
+    const rows = await container.findAllByTestId('roster-table-data-row')
+
+    // Check there is no column header
+    expect(container.queryAllByTestId('colheader-last-activity')).toHaveLength(0)
+    expect(container.queryAllByTestId('colheader-total-activity')).toHaveLength(0)
+
+    // Check there is no last activity or total activity time data
+    rows.forEach(row => {
+      expect(queryAllByText(row, DATETIME_PATTERN)).toHaveLength(0)
+      expect(queryAllByText(row, STOPWATCH_PATTERN)).toHaveLength(0)
     })
   })
 
@@ -283,6 +289,95 @@ describe('RosterTable', () => {
     // Check there is no SIS ID data
     rows.forEach((row, index) => {
       sisIdByUser[index] && expect(queryAllByText(row, sisIdByUser[index])).toHaveLength(0)
+    })
+  })
+
+  it('should show the section column if the hideSectionsOnCourseUsersPage permission is false', async () => {
+    window.ENV.course.hideSectionsOnCourseUsersPage = false
+    const container = setup(getRosterQueryMock({mockUsers}))
+    const rows = await container.findAllByTestId('roster-table-data-row')
+    const sectionByUser = mockUsers.map(user => {
+      if (user.enrollments[0].type === OBSERVER_ENROLLMENT) return null
+      return user.enrollments[0].section.name
+    })
+
+    // Check for column header
+    expect(container.getByTestId('colheader-section')).toBeInTheDocument()
+
+    // Check section name exists in row
+    rows.forEach((row, index) => {
+      sectionByUser[index] && expect(getByText(row, sectionByUser[index])).toBeInTheDocument()
+    })
+  })
+
+  it('should not show the section column if the hideSectionsOnCourseUsersPage permission is true', async () => {
+    window.ENV.course.hideSectionsOnCourseUsersPage = true
+    const container = setup(getRosterQueryMock({mockUsers}))
+    const rows = await container.findAllByTestId('roster-table-data-row')
+    const sectionByUser = mockUsers.map(user => user.enrollments[0].section.name)
+
+    // Check there is no column header
+    expect(container.queryAllByTestId('colheader-section')).toHaveLength(0)
+
+    // Check section name doesn't exist in row
+    rows.forEach((row, index) => {
+      sectionByUser[index] && expect(queryAllByText(row, sectionByUser[index])).toHaveLength(0)
+    })
+  })
+
+  describe('Administrative Links', () => {
+    const nonRemovableMockUsers = [...mockUsers]
+    nonRemovableMockUsers.forEach(user => (user.enrollments[0].canBeRemoved = false))
+    const nonRemovableMockAdmin = nonRemovableMockUsers.filter(
+      user => user.enrollments[0].type !== STUDENT_ENROLLMENT
+    )
+    const nonRemovableMockStudents = nonRemovableMockUsers.filter(
+      user => user.enrollments[0].type === STUDENT_ENROLLMENT
+    )
+    const checkContainerForButtons = async (container, users) => {
+      const rows = await container.findAllByTestId('roster-table-data-row')
+      const buttonNames = users.map(user => `Manage ${user.name}`)
+      rows.forEach((row, index) => {
+        const button = within(row).getByRole('button', {name: buttonNames[index]})
+        expect(button).toBeInTheDocument()
+      })
+    }
+
+    beforeEach(() => {
+      window.ENV.permissions = {
+        ...window.ENV.permissions,
+        can_allow_admin_actions: false,
+        manage_admin_users: false,
+        manage_students: false
+      }
+    })
+
+    it('should have an Administrative Links column', async () => {
+      const container = setup(getRosterQueryMock({mockUsers: nonRemovableMockUsers}))
+      expect(await container.findByTestId('colheader-administrative-links')).toBeInTheDocument()
+    })
+
+    it('should show the Administrative Link button if the user can be removed', () => {
+      const container = setup(getRosterQueryMock({mockUsers})) // Mock Users can be removed by default
+      checkContainerForButtons(container, mockUsers)
+    })
+
+    it('should show the Administrative Link button for students if the user has the manage_students permission', () => {
+      window.ENV.permissions.manage_students = true
+      const container = setup(getRosterQueryMock({mockUsers: nonRemovableMockStudents}))
+      checkContainerForButtons(container, nonRemovableMockStudents)
+    })
+
+    it('should show the Administrative Link button for admin roles if the user has the can_allow_admin_actions permission', () => {
+      window.ENV.permissions.can_allow_admin_actions = true
+      const container = setup(getRosterQueryMock({mockUsers: nonRemovableMockAdmin}))
+      checkContainerForButtons(container, nonRemovableMockAdmin)
+    })
+
+    it('should show the Administrative Link button for admin roles if the user has the manage_admin_users permission', () => {
+      window.ENV.permissions.manage_admin_users = true
+      const container = setup(getRosterQueryMock({mockUsers: nonRemovableMockAdmin}))
+      checkContainerForButtons(container, nonRemovableMockAdmin)
     })
   })
 })

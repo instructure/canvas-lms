@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import round from 'round'
+import round from '../../../../utils/round'
 import {SHAPE_CONTAINER_LENGTH} from '../constants'
 import {createSvgElement} from './utils'
 import {Shape} from '../../../../svg/shape'

@@ -297,8 +297,10 @@ describe "calendar2" do
 
           # Edit title and date
           replace_content(fj(".ui-dialog:visible #assignment_title"), test_name)
-          replace_content(fj(".ui-dialog:visible #assignment_due_at"), test_date.to_formatted_s(:long))
-          fj(".ui-dialog:visible .btn-primary").click
+          due_at_field = fj(".ui-dialog:visible #assignment_due_at")
+          replace_content(due_at_field, test_date.to_formatted_s(:long))
+          driver.action.send_keys(due_at_field, :return)
+          f("[class='event_button btn btn-primary save_assignment']").click
           wait_for_ajaximations
 
           # Verify edits

@@ -287,7 +287,6 @@ describe "speed grader submissions" do
     end
 
     it "displays word count for text submission" do
-      Account.site_admin.enable_feature!(:word_count_in_speed_grader)
       student_submission
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}&student_id=#{@submission.student.id}"

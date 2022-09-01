@@ -20,6 +20,7 @@
 
 require_relative "../api_spec_helper"
 require_relative "../locked_examples"
+require "webmock/rspec"
 
 RSpec.configure do |config|
   config.include ApplicationHelper
@@ -1406,6 +1407,102 @@ describe "Files API", type: :request do
         @file_path_options[:replace] = false
         api_call(:delete, @file_path, @file_path_options,
                  {}, {}, expected_status: 401)
+      end
+    end
+  end
+
+  describe "#icon_metadata" do
+    context "instfs file" do
+      before do
+        @root = Folder.root_folders(@course).first
+        @icon = Attachment.create!(filename: "icon.svg", display_name: "icon.svg", uploaded_data: File.open("spec/fixtures/icon.svg"),
+                                   folder: @root, context: @course, category: Attachment::ICON_MAKER_ICONS, instfs_uuid: "yes")
+        @file_path = "/api/v1/files/#{@icon.id}/icon_metadata"
+        @file_path_options = { controller: "files", action: "icon_metadata", format: "json", id: @icon.id.to_param }
+        allow(InstFS).to receive(:authenticated_url).and_return(@icon.authenticated_s3_url)
+        allow(CanvasHttp).to receive(:validate_url).and_return([@icon.authenticated_s3_url, URI.parse(@icon.authenticated_s3_url)])
+        stub_request(:get, @icon.authenticated_s3_url).to_return(body: File.open("spec/fixtures/icon.svg"))
+      end
+
+      it "returns metadata from the icon" do
+        api_call(:get, @file_path, @file_path_options, {}, {}, expected_status: 200)
+        json = JSON.parse(response.body)
+        expect(json["type"]).to eq "image/svg+xml-icon-maker-icons"
+        expect(json["encodedImage"]).to be_starts_with "data:image/svg+xml;base64,PHN2ZyB3aWR0aD"
+      end
+
+      it "gives unauthorized errors if the user is not authorized to view the file" do
+        @icon.update(locked: true)
+        course_with_student_logged_in(course: @course)
+        api_call(:get, @file_path, @file_path_options, {}, {}, expected_status: 401)
+      end
+
+      it "gives bad request errors if the file is not an icon" do
+        @icon.update(category: Attachment::UNCATEGORIZED)
+        api_call(:get, @file_path, @file_path_options, {}, {}, expected_status: 400)
+      end
+
+      it "return 'no content' if the file doesn't have any metadata" do
+        stub_request(:get, @icon.public_url).to_return(body: "<html>something that doesn't have any metadata</html>")
+        raw_api_call(:get, @file_path, @file_path_options)
+        assert_status(204)
+      end
+
+      context "streaming" do
+        before do
+          # force chunking so streaming will actually act like a stream
+          mocked_http = Class.new(Net::HTTP) do
+            def request(*)
+              super do |response|
+                response.instance_eval do
+                  def read_body(*, &block)
+                    @body.each_char(&block)
+                  end
+                end
+                yield response if block_given?
+                response
+              end
+            end
+          end
+
+          @original_net_http = Net.send(:remove_const, :HTTP)
+          Net.send(:const_set, :HTTP, mocked_http)
+        end
+
+        after do
+          Net.send(:remove_const, :HTTP)
+          Net.send(:const_set, :HTTP, @original_net_http)
+        end
+
+        it "only downloads data until the end of the metadata tag" do
+          # I cut most of the original icon file off so that the XML is invalid if you read the whole thing,
+          # but left enough that the metadata will be present and there will be a buffer for the http request
+          # to read without erroring unless it downloads/parses too much of the file
+          stub_request(:get, @icon.public_url).to_return(body: File.open("spec/fixtures/icon_with_bad_xml.svg"))
+          api_call(:get, @file_path, @file_path_options, {}, {}, expected_status: 200)
+          json = JSON.parse(response.body)
+          expect(json["type"]).to eq "image/svg+xml-icon-maker-icons"
+          expect(json["encodedImage"]).to be_starts_with "data:image/svg+xml;base64,PHN2ZyB3aWR0aD"
+        end
+      end
+    end
+
+    context "local file" do
+      before do
+        @root = Folder.root_folders(@course).first
+        @icon = Attachment.create!(filename: "icon.svg", display_name: "icon.svg", uploaded_data: File.open("spec/fixtures/icon.svg"),
+                                   folder: @root, context: @course, category: Attachment::ICON_MAKER_ICONS)
+        @file_path = "/api/v1/files/#{@icon.id}/icon_metadata"
+        @file_path_options = { controller: "files", action: "icon_metadata", format: "json", id: @icon.id.to_param }
+        allow(CanvasHttp).to receive(:validate_url).and_return([@icon.authenticated_s3_url, URI.parse(@icon.authenticated_s3_url)])
+        stub_request(:get, @icon.authenticated_s3_url).to_return(body: File.open("spec/fixtures/icon.svg"))
+      end
+
+      it "returns metadata from the icon" do
+        api_call(:get, @file_path, @file_path_options, {}, {}, expected_status: 200)
+        json = JSON.parse(response.body)
+        expect(json["type"]).to eq "image/svg+xml-icon-maker-icons"
+        expect(json["encodedImage"]).to be_starts_with "data:image/svg+xml;base64,PHN2ZyB3aWR0aD"
       end
     end
   end

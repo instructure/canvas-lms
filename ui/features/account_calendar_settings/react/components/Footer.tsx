@@ -60,9 +60,9 @@ export const Footer: React.FC<ComponentProps> = ({
         <Text>
           {I18n.t(
             {
-              zero: 'No Account Calendars selected',
-              one: '1 Account Calendar selected',
-              other: '%{count} Account Calendars selected'
+              zero: 'No account calendars selected',
+              one: '1 Account calendar selected',
+              other: '%{count} Account calendars selected'
             },
             {
               count:
@@ -78,6 +78,7 @@ export const Footer: React.FC<ComponentProps> = ({
         interaction={enableSaveButton ? 'enabled' : 'disabled'}
         onClick={onApplyClicked}
         margin="small"
+        data-testid="save-button"
       >
         {I18n.t('Apply Changes')}
       </Button>

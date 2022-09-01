@@ -1432,7 +1432,8 @@ class UsersController < ApplicationController
     variable_expander = Lti::VariableExpander.new(@domain_root_account, @context, self, {
                                                     current_user: @current_user,
                                                     current_pseudonym: @current_pseudonym,
-                                                    tool: @tool
+                                                    tool: @tool,
+                                                    placement: :user_navigation
                                                   })
     Canvas::LiveEvents.asset_access(@tool, "external_tools", @current_user.class.name, nil)
     adapter = if @tool.use_1_3?
@@ -1831,14 +1832,7 @@ class UsersController < ApplicationController
 
     return unless authorized_action(user, @current_user, [:manage, :manage_user_details])
 
-    # Make sure the user has rights to the actual context used.
-    context = Context.find_by_asset_string(params[:asset_string])
-
-    if context.nil?
-      raise(ActiveRecord::RecordNotFound, "Asset does not exist")
-    end
-
-    return unless authorized_action(context, @current_user, :read)
+    raise(ActiveRecord::RecordNotFound, "Asset does not exist") unless (context = Context.find_by_asset_string(params[:asset_string]))
 
     # Check if the hexcode is valid
     unless valid_hexcode?(params[:hexcode])

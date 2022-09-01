@@ -43,6 +43,7 @@ describe Lti::Messages::JwtMessage do
   let(:pub_key) do
     Lti::KeyStorage.present_key.to_key.public_key
   end
+  let(:context) { course }
 
   let_once(:course) do
     course_with_student
@@ -76,7 +77,7 @@ describe Lti::Messages::JwtMessage do
   def jwt_message
     Lti::Messages::JwtMessage.new(
       tool: tool,
-      context: course,
+      context: context,
       user: user,
       expander: expander,
       return_url: return_url,
@@ -249,6 +250,16 @@ describe Lti::Messages::JwtMessage do
       expect(message_context["type"]).to match_array [
         Lti::SubstitutionsHelper::LIS_V2_ROLE_MAP[Course]
       ]
+    end
+
+    context "when context is a group" do
+      let(:context) { group_model }
+
+      it "sets context type to the full LIS role" do
+        expect(message_context["type"]).to match_array [
+          "http://purl.imsglobal.org/vocab/lis/v2/course#Group"
+        ]
+      end
     end
 
     context "when context claim group disabled" do

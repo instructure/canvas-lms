@@ -687,9 +687,9 @@ describe "content migrations", :non_parallel do
       migration_type_values = migration_type_options.map { |op| op["value"] }
       migration_type_texts = migration_type_options.map(&:text)
       expect(migration_type_values).to include(import_tool.asset_string)
-      expect(migration_type_texts).to include(import_tool.name)
+      expect(migration_type_texts).to include(import_tool.label_for(:migration_selection))
       expect(migration_type_values).not_to include(other_tool.asset_string)
-      expect(migration_type_texts).not_to include(other_tool.name)
+      expect(migration_type_texts).not_to include(other_tool.label_for(:resource_selection))
     end
 
     it "shows LTI view when LTI tool selected" do

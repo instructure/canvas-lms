@@ -76,9 +76,7 @@ export default class ScopesList extends React.Component {
   delayedRender = () => {
     // Load the rest of the groups once the modal is open
     setTimeout(() => {
-      this.setState({
-        availableScopes: this.state.formattedScopesArray.slice()
-      })
+      this.setState(oldState => ({availableScopes: oldState.formattedScopesArray.slice()}))
     }, 0)
   }
 
@@ -133,7 +131,7 @@ export default class ScopesList extends React.Component {
                       }
                       onChange={this.handleReadOnlySelected}
                       checked={this.state.readOnlySelected}
-                      inline
+                      inline={true}
                     />
                     <PresentationContent>
                       <Text size="medium" weight="bold">
@@ -145,7 +143,7 @@ export default class ScopesList extends React.Component {
                 </Flex>
               </View>
             </Flex.Item>
-            <Flex.Item grow shrink>
+            <Flex.Item shouldGrow={true} shouldShrink={true}>
               {this.state.availableScopes.map(scopeGroup => {
                 return Object.keys(scopeGroup).reduce((result, key) => {
                   if (

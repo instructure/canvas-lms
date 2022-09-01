@@ -101,12 +101,12 @@ export default function CommentsTrayBody(props) {
       }
     >
       <Flex as="div" direction="column" height="100%" data-testid="comments-container">
-        <Flex.Item grow>
+        <Flex.Item shouldGrow={true}>
           {props.submission.gradeHidden && comments.length === 0 && (
             <SVGWithTextPlaceholder
               text={hiddenCommentsMessage}
               url={ClosedDiscussionSVG}
-              addMargin
+              addMargin={true}
             />
           )}
 

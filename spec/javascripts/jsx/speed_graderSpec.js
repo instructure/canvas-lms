@@ -1743,23 +1743,13 @@ QUnit.module('SpeedGrader', rootHooks => {
         SpeedGrader.EG.currentStudent.submission.submission_type = 'basic_lti_launch'
       })
 
-      test('does not show the word count for online text entry submission with feature disabled', () => {
-        ENV.FEATURES.word_count_in_speed_grader = false
-        finishSetup()
-        SpeedGrader.EG.currentStudent.submission.submission_type = 'online_text_entry'
-        SpeedGrader.EG.handleSubmissionSelectionChange()
-        strictEqual(document.getElementById('submission_word_count').children.length, 0)
-      })
-
       test('does not show the word count for basic lti submission', () => {
-        ENV.FEATURES.word_count_in_speed_grader = true
         finishSetup()
         SpeedGrader.EG.handleSubmissionSelectionChange()
         strictEqual(document.getElementById('submission_word_count').children.length, 0)
       })
 
       test('does not show the word count for external tool submission', () => {
-        ENV.FEATURES.word_count_in_speed_grader = true
         finishSetup()
         SpeedGrader.EG.currentStudent.submission.submission_type = 'external_tool'
         SpeedGrader.EG.handleSubmissionSelectionChange()
@@ -1767,7 +1757,6 @@ QUnit.module('SpeedGrader', rootHooks => {
       })
 
       test('shows the word count for online text entry submission', () => {
-        ENV.FEATURES.word_count_in_speed_grader = true
         finishSetup()
         SpeedGrader.EG.currentStudent.submission.submission_type = 'online_text_entry'
         SpeedGrader.EG.handleSubmissionSelectionChange()

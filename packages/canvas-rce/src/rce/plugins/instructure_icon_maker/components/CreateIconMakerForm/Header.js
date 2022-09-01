@@ -24,7 +24,7 @@ import formatMessage from '../../../../../format-message'
 import {TextArea} from '@instructure/ui-text-area'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {IconQuestionLine} from '@instructure/ui-icons'
 import {decode} from '../../svg/utils'
@@ -63,13 +63,19 @@ export const Header = ({settings, onChange, allowNameChange, nameRef}) => {
         <Tooltip
           on={['hover', 'focus']}
           placement="top"
-          tip={
+          renderTip={
             <View display="block" id="alt-text-label-tooltip" maxWidth="14rem">
               {tooltipText}
             </View>
           }
         >
-          <Button icon={IconQuestionLine} size="small" variant="icon" />
+          <IconButton
+            renderIcon={IconQuestionLine}
+            withBackground={false}
+            withBorder={false}
+            size="small"
+            screenReaderLabel={formatMessage('Toggle tooltip')}
+          />
         </Tooltip>
       </Flex.Item>
     </Flex>

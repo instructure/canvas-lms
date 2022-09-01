@@ -8,7 +8,7 @@ FROM starlord.inscloudgate.net/jenkins/ruby-passenger:$RUBY
 <% end -%>
 LABEL maintainer="Instructure"
 
-ARG POSTGRES_CLIENT=12
+ARG POSTGRES_CLIENT=14
 ENV APP_HOME /usr/src/app/
 <% if development? -%>
 ENV RAILS_ENV development
@@ -56,6 +56,7 @@ RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - \
        python3-lxml \
        python-is-python3 \
        libicu-dev \
+       libidn11-dev \
        parallel \
        postgresql-client-$POSTGRES_CLIENT \
        unzip \

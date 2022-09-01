@@ -87,7 +87,7 @@ export default function DimensionsInput(props) {
           <Flex alignItems="start" direction="row" data-testid="input-number-container">
             {dimensionsState.usePercentageUnits ? (
               <>
-                <Flex.Item shouldShrink shouldGrow>
+                <Flex.Item shouldShrink={true} shouldGrow={true}>
                   <DimensionInput
                     dimensionState={dimensionsState.percentageState}
                     label={formatMessage('Percentage')}
@@ -98,7 +98,7 @@ export default function DimensionsInput(props) {
               </>
             ) : (
               <>
-                <Flex.Item shrink>
+                <Flex.Item shouldShrink={true}>
                   <DimensionInput
                     dimensionState={dimensionsState.widthState}
                     label={formatMessage('Width')}
@@ -110,7 +110,7 @@ export default function DimensionsInput(props) {
                   <IconLockLine />
                 </Flex.Item>
 
-                <Flex.Item shrink>
+                <Flex.Item shouldShrink={true}>
                   <DimensionInput
                     dimensionState={dimensionsState.heightState}
                     label={formatMessage('Height')}

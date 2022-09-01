@@ -44,22 +44,22 @@ describe('JobManager', () => {
   })
 
   it("doesn't render a button if a strand isn't selected", async () => {
-    const {queryByRole} = renderWithMocks(
+    const {queryByText} = renderWithMocks(
       <JobManager groupType="tag" groupText="foobar" jobs={[fakeJob]} onUpdate={jest.fn()} />
     )
-    expect(queryByRole('button', {name: /Manage strand/})).not.toBeInTheDocument()
+    expect(queryByText('Manage strand "foobar"', {selector: 'button span'})).not.toBeInTheDocument()
   })
 
   it('edits priority but not concurrency for normal strand', async () => {
     const onUpdate = jest.fn()
-    const {getByRole, getByLabelText, queryByLabelText} = renderWithMocks(
+    const {getByText, getByLabelText, queryByLabelText} = renderWithMocks(
       <JobManager groupType="strand" groupText="foobar" jobs={[fakeJob]} onUpdate={onUpdate} />
     )
-    fireEvent.click(getByRole('button', {name: /Manage strand/}))
+    fireEvent.click(getByText('Manage strand "foobar"', {selector: 'button span'}))
     expect(queryByLabelText('Dynamic concurrency')).not.toBeInTheDocument()
     expect(queryByLabelText('Permanent num_strands setting')).not.toBeInTheDocument()
     fireEvent.change(getByLabelText('Priority'), {target: {value: '11'}})
-    fireEvent.click(getByRole('button', {name: 'Apply'}))
+    fireEvent.click(getByText('Apply'))
     expect(doFetchApi).toHaveBeenCalledWith({
       path: '/api/v1/jobs2/manage',
       method: 'PUT',
@@ -71,7 +71,7 @@ describe('JobManager', () => {
 
   it('edits both priority and concurrency for n_strand', async () => {
     const onUpdate = jest.fn()
-    const {getByRole, getByLabelText} = renderWithMocks(
+    const {getByText, getByLabelText} = renderWithMocks(
       <JobManager
         groupType="strand"
         groupText="foobar"
@@ -80,11 +80,11 @@ describe('JobManager', () => {
       />
     )
     await flushPromises()
-    fireEvent.click(getByRole('button', {name: /Manage strand/}))
+    fireEvent.click(getByText('Manage strand "foobar"', {selector: 'button span'}))
     fireEvent.change(getByLabelText('Priority'), {target: {value: '11'}})
     fireEvent.change(getByLabelText('Dynamic concurrency'), {target: {value: '7'}})
     fireEvent.change(getByLabelText('Permanent num_strands setting'), {target: {value: '14'}})
-    fireEvent.click(getByRole('button', {name: 'Apply'}))
+    fireEvent.click(getByText('Apply'))
     expect(doFetchApi).toHaveBeenCalledWith({
       path: '/api/v1/jobs2/manage',
       method: 'PUT',
@@ -97,7 +97,7 @@ describe('JobManager', () => {
 
   it("doesn't mutate the num_strands setting if unchanged", async () => {
     const onUpdate = jest.fn()
-    const {getByRole, getByLabelText} = renderWithMocks(
+    const {getByText, getByLabelText} = renderWithMocks(
       <JobManager
         groupType="strand"
         groupText="foobar"
@@ -106,10 +106,10 @@ describe('JobManager', () => {
       />
     )
     await flushPromises()
-    fireEvent.click(getByRole('button', {name: /Manage strand/}))
+    fireEvent.click(getByText('Manage strand "foobar"', {selector: 'button span'}))
     fireEvent.change(getByLabelText('Priority'), {target: {value: '15'}})
     fireEvent.change(getByLabelText('Dynamic concurrency'), {target: {value: '8'}})
-    fireEvent.click(getByRole('button', {name: 'Apply'}))
+    fireEvent.click(getByText('Apply'))
     expect(doFetchApi).toHaveBeenCalledWith({
       path: '/api/v1/jobs2/manage',
       method: 'PUT',

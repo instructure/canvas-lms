@@ -928,10 +928,8 @@ describe GradebookImporter do
         expect(student.keys).to match_array(student_keys)
       end
 
-      context "when importing override scores is enabled" do
+      context "importing override scores" do
         before do
-          Account.site_admin.enable_feature!(:import_override_scores_in_gradebook)
-
           @course.enable_feature!(:final_grades_override)
           @course.allow_final_grade_override = true
           @course.save!
@@ -1570,7 +1568,6 @@ describe GradebookImporter do
 
   describe "override score changes" do
     before(:once) do
-      Account.site_admin.enable_feature!(:import_override_scores_in_gradebook)
       course_model
       @course.enable_feature!(:final_grades_override)
       @course.allow_final_grade_override = true
@@ -1896,19 +1893,6 @@ describe GradebookImporter do
         expect(student_without_override_data[:override_scores].length).to eq 1
         expect(student_without_override_data.dig(:override_scores, 0, :new_score)).to eq nil
       end
-    end
-
-    it "ignores changes to override scores if the feature flag is turned off" do
-      Account.site_admin.disable_feature!(:import_override_scores_in_gradebook)
-
-      importer = importer_with_rows(
-        "Student,ID,Section,Final Score,Override Score",
-        "Cyrus,#{student_with_override.id},My Course,0,60"
-      )
-
-      output = importer.as_json
-
-      expect(output[:students]).to be_empty
     end
 
     it "ignores changes to override scores if the course does not allow override grades" do

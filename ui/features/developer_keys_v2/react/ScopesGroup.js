@@ -32,7 +32,7 @@ const I18n = useI18nScope('react_developer_keys')
 export default class ScopesGroup extends React.Component {
   state = {groupChecked: this.allScopesAreSelected(this.props)}
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState({
       groupChecked: this.allScopesAreSelected(nextProps)
     })
@@ -137,14 +137,14 @@ export default class ScopesGroup extends React.Component {
                   {I18n.t('All %{scopeName} scopes', {scopeName: this.props.name})}
                 </ScreenReaderContent>
               }
-              inline
+              inline={true}
               checked={this.state.groupChecked}
               onChange={this.handleGroupChange}
             />
           </Flex.Item>
-          <Flex.Item grow padding="none small none none">
+          <Flex.Item shouldGrow={true} padding="none small none none">
             <div data-automation="toggle-scope-group">
-              <ToggleDetails summary={this.groupSummary()} fluidWidth>
+              <ToggleDetails summary={this.groupSummary()} fluidWidth={true}>
                 {this.props.scopes.map(scope => (
                   <DeveloperKeyScope
                     checked={this.props.selectedScopes.includes(scope.scope)}

@@ -462,6 +462,19 @@ module Calendar2Common
     expect_new_page_load { edit_calendar_event_form_more_options.click }
   end
 
+  def enable_course_account_calendar
+    @course.account.account_calendar_visible = true
+    @course.account.save!
+    account_admin_user(account: @course.account)
+    user_session(@admin)
+    get "/calendar2"
+    add_other_calendars_button.click
+    # because clicking the checkbox clicks on a sibling span
+    click_account_calendar_modal_checkbox
+    click_account_calendar_modal_save_button.click
+    calendar_flash_alert_message_button.click
+  end
+
   def event_title_on_calendar
     f(".fc-content .fc-title")
   end
@@ -589,5 +602,21 @@ module Calendar2Common
 
   def event_content
     fj(".event-details-content:visible")
+  end
+
+  def add_other_calendars_button
+    f("button[data-testid='add-other-calendars-button']")
+  end
+
+  def click_account_calendar_modal_checkbox
+    driver.execute_script("$('input[data-testid=account-#{@course.account.id}-checkbox]').click()")
+  end
+
+  def click_account_calendar_modal_save_button
+    f("button[data-testid='save-calendars-button']")
+  end
+
+  def calendar_flash_alert_message_button
+    f(".flashalert-message button")
   end
 end

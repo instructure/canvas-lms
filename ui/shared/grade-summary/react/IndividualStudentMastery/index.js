@@ -161,7 +161,7 @@ class IndividualStudentMastery extends React.Component {
     const {outcomeProficiency} = this.props
     return (
       <div>
-        <List variant="unstyled">
+        <List isUnstyled>
           {outcomeGroups.sort(natcompare.byKey('title')).map(outcomeGroup => (
             <List.Item key={outcomeGroup.id}>
               <OutcomeGroup

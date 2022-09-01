@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import {func, oneOf, string} from 'prop-types'
+import {bool, func, oneOf, string} from 'prop-types'
 import {linkShape} from './propTypes'
 import formatMessage from '../../../../format-message'
 import {renderLink as renderLinkHtml} from '../../../contentRendering'
@@ -28,52 +28,18 @@ import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Focusable} from '@instructure/ui-focusable'
-import {SVGIcon} from '@instructure/ui-svg-images'
-import {
-  IconDragHandleLine,
-  IconAssignmentLine,
-  IconDiscussionLine,
-  IconModuleLine,
-  IconQuizLine,
-  IconAnnouncementLine,
-  IconPublishSolid,
-  IconUnpublishedSolid,
-  IconDocumentLine
-} from '@instructure/ui-icons'
-
-function IconBlank() {
-  return (
-    <SVGIcon name="IconBlank" viewBox="0 0 1920 1920">
-      <g role="presentation" />
-    </SVGIcon>
-  )
-}
-
-function getIcon(type) {
-  switch (type) {
-    case 'assignments':
-      return IconAssignmentLine
-    case 'discussions':
-      return IconDiscussionLine
-    case 'modules':
-      return IconModuleLine
-    case 'quizzes':
-      return IconQuizLine
-    case 'announcements':
-      return IconAnnouncementLine
-    case 'wikiPages':
-      return IconDocumentLine
-    case 'navigation':
-      return IconBlank
-    default:
-      return IconDocumentLine
-  }
-}
+import {IconDragHandleLine, IconPublishSolid, IconUnpublishedSolid} from '@instructure/ui-icons'
+import RCEGlobals from '../../../RCEGlobals'
+import {getIcon} from '../../shared/linkUtils'
 
 export default function Link(props) {
   const [isHovering, setIsHovering] = useState(false)
   const {title, published, date, date_type} = props.link
-  const Icon = getIcon(props.type)
+  const type =
+    props.type === 'quizzes' && props.link.quiz_type === 'quizzes.next'
+      ? 'quizzes.next'
+      : props.type
+  const Icon = getIcon(type)
   const color = published ? 'success' : 'primary'
   let dateString = null
   if (date) {
@@ -81,7 +47,8 @@ export default function Link(props) {
       dateString = formatMessage('Due: Multiple Dates')
     } else {
       // Uses user locale and timezone
-      const when = formatMessage.date(applyTimezoneOffsetToDate(date, ENV.TIMEZONE), 'long')
+      const configuredTimezone = RCEGlobals.getConfig()?.timezone
+      const when = formatMessage.date(applyTimezoneOffsetToDate(date, configuredTimezone), 'long')
       switch (date_type) {
         case 'todo':
           dateString = formatMessage('To Do: {when}', {when})
@@ -108,7 +75,15 @@ export default function Link(props) {
 
   function handleLinkClick(e) {
     e.preventDefault()
-    props.onClick(props.link)
+    props.link.type = type
+    if (props.isEdit) {
+      props.onEditClick(props.link)
+    } else {
+      if (RCEGlobals.getFeatures()?.rce_ux_improvements) {
+        props.link.course_link = true
+      }
+      props.onClick(props.link)
+    }
   }
 
   function handleLinkKey(e) {
@@ -133,7 +108,7 @@ export default function Link(props) {
   return (
     <div
       data-testid="instructure_links-Link"
-      draggable
+      draggable={true}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onMouseEnter={handleHover}
@@ -143,7 +118,7 @@ export default function Link(props) {
       <Focusable>
         {({focused}) => (
           <View
-            focused={focused}
+            withFocusOutline={focused}
             focusPosition="inset"
             position="relative"
             as="div"
@@ -164,14 +139,19 @@ export default function Link(props) {
                 <Flex.Item margin="0 xx-small 0 0" size="1.125rem">
                   {isHovering ? <IconDragHandleLine size="x-small" inline={false} /> : null}
                 </Flex.Item>
-                <Flex.Item grow shrink>
+                <Flex.Item shouldGrow={true} shouldShrink={true}>
                   <Flex>
                     <Flex.Item padding="0 x-small 0 0">
                       <Text color={color}>
-                        <Icon size="x-small" inline={false} />
+                        <Icon size="x-small" inline={false} data-type={type} />
                       </Text>
                     </Flex.Item>
-                    <Flex.Item padding="0 x-small 0 0" grow shrink textAlign="start">
+                    <Flex.Item
+                      padding="0 x-small 0 0"
+                      shouldGrow={true}
+                      shouldShrink={true}
+                      textAlign="start"
+                    >
                       <View as="div" margin="0">
                         {title}
                       </View>
@@ -214,5 +194,7 @@ Link.propTypes = {
   ]).isRequired,
   onClick: func.isRequired,
   describedByID: string.isRequired,
-  elementRef: func
+  elementRef: func,
+  isEdit: bool,
+  onEditClick: func
 }

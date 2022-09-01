@@ -19,6 +19,7 @@
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import Link from '../Link'
+import RCEGlobals from '../../../../RCEGlobals'
 
 function renderComponent(props) {
   return render(
@@ -38,10 +39,12 @@ function queryIconByName(elem, name) {
 
 describe('RCE "Links" Plugin > Link', () => {
   beforeAll(() => {
-    ENV = {
-      // 	UTC/GMT -7 hours
-      TIMEZONE: 'America/Denver'
-    }
+    // UTC/GMT -7 hours
+    RCEGlobals.getConfig = jest.fn().mockReturnValue({timezone: 'America/Denver'})
+  })
+
+  afterAll(() => {
+    jest.resetAllMocks()
   })
 
   describe('object type variant', () => {
@@ -49,7 +52,8 @@ describe('RCE "Links" Plugin > Link', () => {
       {type: 'assignments', icon: 'IconAssignment'},
       {type: 'discussions', icon: 'IconDiscussion'},
       {type: 'modules', icon: 'IconModule'},
-      {type: 'quizzes', icon: 'IconQuiz'},
+      {type: 'quizzes', icon: 'IconQuiz', quiz_type: 'assignment'},
+      {type: 'quizzes', icon: 'IconQuiz', quiz_type: 'quizzes.next'},
       {type: 'announcements', icon: 'IconAnnouncement'},
       {type: 'wikiPages', icon: 'IconDocument'},
       {type: 'navigation', icon: 'IconBlank'}
@@ -62,11 +66,18 @@ describe('RCE "Links" Plugin > Link', () => {
           title: 'object title',
           published: true
         }
-        const {container, getByText} = renderComponent({type: lt.type, link})
+        const {container, getByText} = renderComponent({
+          type: lt.type,
+          link: {...link, quiz_type: lt.quiz_type}
+        })
 
         expect(getByText(link.title)).toBeInTheDocument()
         expect(queryIconByName(container, 'IconPublish')).toBeInTheDocument()
-        expect(queryIconByName(container, lt.icon)).toBeInTheDocument()
+        const icon = queryIconByName(container, lt.icon)
+        expect(icon).toBeInTheDocument()
+        expect(icon.getAttribute('data-type')).toEqual(
+          lt.type === 'quizzes' && lt.quiz_type === 'quizzes.next' ? 'quizzes.next' : lt.type
+        )
       })
 
       it(`renders unpublished ${lt.type}`, () => {
@@ -298,6 +309,38 @@ describe('RCE "Links" Plugin > Link', () => {
       expect(container.querySelectorAll('svg[name="IconDragHandle"]')).toHaveLength(0)
       fireEvent.mouseEnter(getByTestId('instructure_links-Link'))
       expect(container.querySelectorAll('svg[name="IconDragHandle"]')).toHaveLength(1)
+    })
+  })
+
+  describe('When in edit link tray', () => {
+    const props = {
+      onEditClick: jest.fn(),
+      isEdit: true,
+      link: {
+        href: 'the_url',
+        title: 'object title',
+        published: true
+      }
+    }
+
+    it('calls onEditClick when clicked', () => {
+      const {getByText} = renderComponent(props)
+      getByText(props.link.title).click()
+      expect(props.onEditClick).toHaveBeenCalled()
+    })
+
+    it('calls onEditClick on <Enter>', () => {
+      const {getByText} = renderComponent(props)
+      const btn = getByText(props.link.title)
+      fireEvent.keyDown(btn, {keyCode: 13})
+      expect(props.onEditClick).toHaveBeenCalled()
+    })
+
+    it('calls onEditClick on <Space>', () => {
+      const {getByText} = renderComponent(props)
+      const btn = getByText(props.link.title)
+      fireEvent.keyDown(btn, {keyCode: 32})
+      expect(props.onEditClick).toHaveBeenCalled()
     })
   })
 })

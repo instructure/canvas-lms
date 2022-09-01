@@ -1766,6 +1766,7 @@ CanvasRails::Application.routes.draw do
 
       # 'attachment' (rather than 'file') is used below so modules API can use polymorphic_url to generate an item API link
       get "files/:id", action: :api_show, as: "attachment"
+      get "files/:id/icon_metadata", action: :icon_metadata
       delete "files/:id", action: :destroy
       put "files/:id", action: :api_update
       post "files/:id/reset_verifier", action: :reset_verifier

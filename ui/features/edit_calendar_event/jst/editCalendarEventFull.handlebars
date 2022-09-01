@@ -102,19 +102,21 @@
              aria-labelledby='calendar_event_date_accessible_label'
              data-tooltip title="{{accessibleDateFormat 'date'}}"/>
     </div>
-    <div class="time_range_container">
+    <div id="start_and_end_times" class="time_range_container" data-testid="start_and_end_times">
       <div class='date_field_container'>
         <label class='screenreader-only' id='calendar_event_start_time_accessible_label'>
           {{#t}}Event Start Time{{/t}}
           {{datepickerScreenreaderPrompt 'time'}}
         </label>
-        <input type="text"
-               name="start_time"
-               class="time_field start_time"
-               {{#unless all_day}} value="{{tTimeToString start_at "tiny"}}" {{/unless}}
-               placeholder="{{#t "start_time"}}Start Time{{/t}}"
-               aria-labelledby='calendar_event_start_time_accessible_label'
-               data-tooltip title="{{accessibleDateFormat 'time'}}"/>
+        <input id="more_options_start_time"
+              data-testid="more_options_start_time"
+              type="text"
+              name="start_time"
+              class="time_field start_time"
+              {{#unless all_day}} value="{{tTimeToString start_at "tiny"}}" {{/unless}}
+              placeholder="{{#t "start_time"}}Start Time{{/t}}"
+              aria-labelledby='calendar_event_start_time_accessible_label'
+              data-tooltip title="{{accessibleDateFormat 'time'}}"/>
       </div>
       <span class="time_separator">-</span>
       <div class='date_field_container'>
@@ -122,28 +124,30 @@
           {{#t}}Event End Time{{/t}}
           {{datepickerScreenreaderPrompt 'time'}}
         </label>
-        <input type="text"
-               name="end_time"
-               class="time_field end_time"
-               {{#unless all_day}} value="{{tTimeToString end_at "tiny"}}" {{/unless}}
-               placeholder="{{#t "end_time"}}End Time{{/t}}"
-               aria-labelledby='calendar_event_end_time_accessible_label'
-               data-tooltip title="{{accessibleDateFormat 'time'}}"/>
+        <input id="more_options_end_time"
+              data-testid="more_options_end_time"
+              type="text"
+              name="end_time"
+              class="time_field end_time"
+              {{#unless all_day}} value="{{tTimeToString end_at "tiny"}}" {{/unless}}
+              placeholder="{{#t "end_time"}}End Time{{/t}}"
+              aria-labelledby='calendar_event_end_time_accessible_label'
+              data-tooltip title="{{accessibleDateFormat 'time'}}"/>
       </div>
     </div>
   </div>
 
   <fieldset>
     <label class="location_label" for="calendar_event_location_name">{{#t "location_name"}}Location:{{/t}}</label>
-    <input id="calendar_event_location_name" name="location_name" size="30" maxlength="255" type="text" value="{{location_name}}"/>
+    <input id="calendar_event_location_name" data-testid="calendar_event_location_name" name="location_name" size="30" maxlength="255" type="text" value="{{location_name}}"/>
   </fieldset>
 
   <fieldset>
     <label class="location_label" for="calendar_event_location_address">{{#t "location_address"}}Address:{{/t}}</label>
-    <input id="calendar_event_location_address" name="location_address" size="30" maxlength="255" type="text" value="{{location_address}}"/>
+    <input id="calendar_event_location_address" data-testid="calendar_event_location_address" name="location_address" size="30" maxlength="255" type="text" value="{{location_address}}"/>
   </fieldset>
 
-  <fieldset>
+  <fieldset id="calendar_event_conference_field" data-testid="calendar_event_conference_field">
     <label for="calendar_event_conference_selection">{{#t}}Conferencing:{{/t}}</label>
     <div id="calendar_event_conference_selection"></div>
   </fieldset>
@@ -153,7 +157,7 @@
     <label class="label_with_checkbox">
       <input type="checkbox" id="calendar_event_blackout_date" {{#if blackout_date}}checked{{/if}} />
       {{#t}}Add to Course Pacing blackout dates{{/t}}
-      <i class="icon-info" style="margin-left: 10px;" data-tooltip title="{{#t}}Enabling this option automatically moves Course Pacing assignment due dates to after the end date.{{/t}}"></i>
+      <i class="icon-info" style="margin-left: 10px;" data-tooltip title="{{#t}}Enabling this option automatically moves Course Pacing assignment due dates to after the end date. Input for Time, Location and Calendar will be disabled.{{/t}}"></i>
     </label>
   </fieldset>
   {{/if}}

@@ -137,7 +137,19 @@ module Types
     private :load_grades
 
     field :last_activity_at, DateTimeType, null: true
+    def last_activity_at
+      return nil unless enrollment.user == current_user || enrollment.course.grants_right?(current_user, session, :read_reports)
+
+      object.last_activity_at
+    end
+
     field :total_activity_time, Integer, null: true
+    def total_activity_time
+      return nil unless enrollment.user == current_user || enrollment.course.grants_right?(current_user, session, :read_reports)
+
+      object.total_activity_time
+    end
+
     field :sis_role, String, null: true
 
     field :html_url, UrlType, null: true
