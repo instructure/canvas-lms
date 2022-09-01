@@ -58,8 +58,6 @@ function EquationEditorToolbar(props) {
             <IconButton
               onClick={() => props.executeCommand(command, advancedCommand)}
               renderIcon={icon}
-              withBackground={false}
-              withBorder={false}
               screenReaderLabel={`${label}, LaTeX: ${name}`}
             />
           </div>
