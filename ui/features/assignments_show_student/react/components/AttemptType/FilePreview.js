@@ -34,6 +34,7 @@ import {Text} from '@instructure/ui-text'
 import theme from '@instructure/canvas-theme'
 import {Table} from '@instructure/ui-table'
 import {Link} from '@instructure/ui-link'
+import {getOriginalityData} from '@canvas/grading/originalityReportHelper'
 
 const I18n = useI18nScope('assignments_2')
 
@@ -159,11 +160,13 @@ export default class FilePreview extends Component {
                 {file.size}
               </Table.Cell>
               <Table.Cell theme={cellTheme}>
-                {this.props.submission.turnitinData &&
-                  this.props.submission.turnitinData.length !== 0 &&
-                  this.props.originalityReportsForA2 && (
+                {this.props.submission.originalityData &&
+                  this.props.originalityReportsForA2 &&
+                  getOriginalityData(this.props.submission, index) && (
                     <Flex.Item>
-                      <OriginalityReport turnitinData={this.props.submission.turnitinData[index]} />
+                      <OriginalityReport
+                        originalityData={getOriginalityData(this.props.submission, index)}
+                      />
                     </Flex.Item>
                   )}
               </Table.Cell>
