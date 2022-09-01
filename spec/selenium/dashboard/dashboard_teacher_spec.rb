@@ -237,6 +237,7 @@ describe "dashboard" do
       end
 
       it "focuses on the previous ignore link after ignoring a todo item", custom_timeout: 25, priority: "1" do
+        skip("LS-3421 -- multiple attempts not working here either")
         assignment2 = assignment_model({ submission_types: "online_text_entry", course: @course })
         assignment2.submit_homework(@student, { submission_type: "online_text_entry", body: "Number2" })
         enable_cache do
