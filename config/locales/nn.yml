@@ -7683,6 +7683,7 @@ nn:
         default_due_time: "Standard forfallstidspunkt"
         enrollment_term_id: Semester
         enrollments_from_homeroom: Påmeldingar
+        friendly_name: "Vennleg namn"
         grading_scheme: "Oppsett for karaktersetjing"
         grading_standard_enabled: "Aktiver oppsett for karaktersetjing"
         hide_distribution_graphs: "Skjul grafar for resultatfordeling for studentane"
@@ -7921,6 +7922,7 @@ nn:
   create_14873ed7: opprett
   create_a_64f6f82: Opprett
   create_a_new_account_4cf7c0f9: "Opprett ny konto"
+  create_a_new_announcement_for_coursename_8dede2d0: "Lag ei ny kunngjering for %{courseName}"
   create_a_new_domain_lookup_1830a512: "Opprett nytt domeneoppslag"
   create_a_new_module_6f31b0fe: "Opprett ein ny modul"
   create_a_new_user_for_address_7487e9c9: "Opprett ein ny brukar for \"%{address}\""
@@ -7952,6 +7954,7 @@ nn:
   create_discussion_topics_8330d52b: "Opprett diskusjonsemne"
   create_educational_resources_8219326e: "Opprett utdanningsressursar"
   create_failed_15d07ad4: "Oppretting mislukkast"
+  create_file_s_188549e6: "[ Opprett fil(er) ]"
   create_files_after_rce_media_upload_recording_77d75a96: "Opprett fil etter opplasting eller innspeling av media i teksteditoren"
   create_interactive_course_content_76665336: "Lag interaktivt emneinnhald"
   create_lookup_7ceb6d90: "Lag oppslag"
@@ -7985,6 +7988,7 @@ nn:
   created_descending_e9a1b097: "Oppretta: i avtakande rekkefølge"
   created_group_group_name_2097306b: "Oppretta gruppa %{group_name}"
   created_group_group_name_224ce5f9: "Oppretta gruppe: %{group_name}"
+  created_timingdisplay_82e15b1e: "Oppretta %{timingDisplay}"
   creates_file_objects_initially_hidden_to_students__7f333bf0: |-
       Opprettar filobjekt (I første omgang gøymd for studentar dersom i eit emne) etter
       at media er opplasta eller innspelt gjennom RCEen.
@@ -8156,6 +8160,7 @@ nn:
   d_b59e2d8d: d
   daily_summary_cf43f37c: "Dagleg samandrag"
   danish_c18cdac8: Dansk
+  dark_skin_tone_6c9e7c7c: "Mørk hudfarge"
   dashboard: 
     announcements_collapse: 
       one: "Skjul %{count} kunngjering"
@@ -8199,6 +8204,9 @@ nn:
   data_set_identifier_data_set_id_c228b5df: "Datasett-ID: %{data_set_id}"
   database_error_3d543659: Databasefeil
   database_error_err_6393d244: "Databasefeil (%{err})"
+  database_error_please_try_again_if_it_continues_to_3767972c: |-
+      Databasefeil. Prøv på nytt.
+      Dersom feilen er vedvarande, gi beskjed på #canvas-sre i Slack.
   datadog_rum_js_agent_4c3bea75: "Datadog RUM JS Agent"
   date: 
     abbr_day_names: 
@@ -8300,6 +8308,7 @@ nn:
   dates: 
     no_date: "Ingen dato"
   dates_6e416047: Datoar
+  dates_shown_in_course_time_zone_da2f77d5: "Datoar vist i emnets tidssone"
   datetime: 
     distance_in_words: 
       about_x_hours: 
@@ -8355,6 +8364,7 @@ nn:
   decrease_indent_d9cf469d: "Reduser innrykk"
   decrease_indent_de6343ab: "Reduser innrykk"
   deduct_104e8866: Utrekne
+  deduction_interval_e18bd51: Frådragsintervall
   deep_orange_4c7eea99: "Mørk oransje"
   deep_purple_bb3e2907: "Mørk lilla"
   default_9db103d: Standard
@@ -8369,6 +8379,7 @@ nn:
   default_question_name: Spørsmål
   default_question_text: Spørsmålstekst
   default_sis_sync_for_assignments_quizzes_grade_dis_3b2b4878: "Standard SIS-synkronisering for oppgåver, testar, vurdert diskusjon"
+  default_skin_tone_f378d31c: "Standard hudfarge"
   default_template_f2a759ed: Standardmal
   default_templates_are_used_as_starting_points_for__f06f9e33: "Standardmalar blir nytta som utgangspunkt for nye tema og kan ikke slettast. "
   default_to_modules_for_the_course_home_page_d6a951a7: "Standard for modular på emnet si startside"
@@ -8391,6 +8402,7 @@ nn:
   delete_collaboration_23035eaf: "Slett samarbeid"
   delete_comment_a71040c3: "Slett kommentar"
   delete_comment_comment_d32ffc85: "Slett kommentar: %{comment}"
+  delete_comment_comment_f5ab8a91: "Slett kommentar: %{comment}"
   delete_comment_commenttext_c8afe129: "Slett kommentar: %{commentText}"
   delete_condition_622401ca: "Slett krav"
   delete_course_files_ee9e769: "Slett emnefiler"
@@ -8464,6 +8476,8 @@ nn:
   delete_work_e377128b: "Slett arbeid"
   delete_your_work_fe136221: "Slette arbeidet ditt? "
   deleted_1be5ed1: Sletta
+  deleted_by_deletername_f269211a: "Sletta av %{deleterName}"
+  deleted_by_editor_d3fdc2ee: "Sletta av %{editor}"
   deleted_caption_b5c66807: "Sletta bildetekst"
   deleted_ce03674d: sletta
   deleted_content_exceptions_237e809d: "Unntak: sletta innhald:"
@@ -8563,9 +8577,14 @@ nn:
   deployment_id_for_tool_app_cb59335: "Utrullings-ID for %{tool}-appen"
   deployment_id_for_toolname_app_e54a7364: "Utrullings-ID for %{toolName}-appen"
   desc_12ad2869: "%{desc}"
+  descending_b7828162: Synkande
   description_436c48d7: Skildring
   description_61f4296: "* Skildring"
   description_for_mastery_level_position_description_cc17114b: "Skildring av ekspertisenivå %{position}: %{description}"
+  descriptivename_was_changed_from_formattedoldvalue_47623537: "%{descriptiveName} vart endra frå %{formattedOldValue} til %{formattedNewValue}."
+  descriptivename_was_set_to_formattednewvalue_cd78b357: "%{descriptiveName} vart satt til %{formattedNewValue}."
+  descriptivename_was_turned_off_38771a19: "%{descriptiveName} vart skrudd av."
+  descriptivename_was_turned_on_132583bb: "%{descriptiveName} vart skrudd på."
   designer_c458392: Designar
   designers_add_c6335849: "Designarar - legg til"
   designers_add_fe7e1ea9: "Designarar - Legg til"
@@ -8577,19 +8596,24 @@ nn:
       Avgjer synlegheit og bruk av menyvalet for læringsmål i kontonavigasjon.
       Gir ein brukar løyve til å opprette, importere, endre og slette læringsmål og læringsmålgrupper på konto- og emnenivå.
   determines_visibility_and_management_of_rubrics_li_83a26d8e: "Avgjer administrering av vurderingsskjema-fanen i Kontonavigering og kor synleg den skal vere. Lar ein brukar vise vurderingsskjema-lenka i Emnenavigasjon. Lar ein brukar legge til, endre og slette emnevurderingsskjema."
+  determines_visibility_and_management_of_rubrics_li_9b974d71: "Avgjer synlegheit og administrering av vurderingsskjema-fana i kontonavigasjonen."
   determines_visibility_and_management_of_rubrics_ta_88a65a22: |-
       Avgjer synlegheit og bruk av menyvalet vurderingsskjema i kontonavigasjon.
       Gir brukar løyve til å administrere vurderingsskjema.
   determines_visibility_and_management_of_sis_import_a91ed255: "Avgjer synlegheit og bruk av SIS-importvalet i kontonavigasjonen."
   determines_visibility_and_management_of_sis_import_bf386823: "Avgjer synligheit og administrering av SIS-import-fana i Kontonavigering."
+  determines_visibility_and_management_of_the_outcom_aace9659: "Avgjer synlegheit og administrering av læringsmål-fana i kontonavigasjonen"
   determines_visibility_and_management_of_the_questi_c57c5b31: "Avgjer synlegheit og administrasjon av Spørsmålsbanker-fana i Kontonavigering"
   determines_visibility_and_management_of_the_questi_fbf70ba9: "Avgjer synlegheit og administrasjon av menyvalet spørsmålsbankar på kontonivå."
+  determines_visibility_and_management_of_the_rubric_533da0b8: "Avgjer synlegheit og administrering av vurderingsskjema-fana i kontonavigering."
   determines_visibility_and_management_of_the_rubric_55b55b25: "Avgjer administrering av Vurderingsskjema-fanen i Kontonavigering og kor synleg den skal vere. Lar ein brukar legge til, endre og slette vurderingsskjema."
+  determines_visibility_of_sis_import_link_in_accoun_53da8632: "Avgjer synlegheit av SIS import-fana i kontonavigering"
   determines_visibility_of_sis_import_link_in_accoun_6f8cecdf: "Avgjer synligheit for SIS-import-fana i Kontonavigering. Lar ein brukar vise tidligeare SIS-import-datoar, -feilmeldingar og importerte element."
   determines_visibility_of_sis_import_tab_in_account_5180b8e8: |-
       Avgjer synlegheita til SIS-importfana i kontonavigasjonen.
       Gir ein brukar løyve til å sjå tidlegare SIS-importdatoar, -feil og importerte element.
   determines_visibility_of_the_course_activity_optio_2446c4b3: "Avgjer om emneaktivet skal vise som eiget val i administrasjonsverktøyfana for loggar. Gir ein brukar løyve til å sjå emneaktivitet for kontoen."
+  determines_visibility_of_the_course_activity_optio_6dc5ceb9: "Avgjer synlegheit til alternativet for emneaktivitet i loggfana til administratorverktøyet."
   determines_visibility_of_the_grade_change_activity_6c23036b: "Avgjer om valet endringsaktivitet for vurderingar er synleg under fana logging i administrasjonsverktøy."
   determines_whether_a_publish_button_is_included_in_f7ad9b56: "Avgjer om ein “Publiser”-knapp er inkludert i emnekortet til eit upublisert emne (Kortvisningsbord)."
   determines_whether_a_publish_course_option_is_incl_9bf770e9: "Avgjer om publiser emne-val er inkludert på emneforsida."
@@ -8647,6 +8671,7 @@ nn:
     cancel: Avbryt
     save_settings: "Lagre innstillingar"
     saving: Lagrar...
+  did_you_know_you_can_now_create_detailed_filters_a_c6b8756c: "Visste du at du no kan lage detaljerte filter og lagre dei til framtidig bruk?"
   did_you_mean_id_241c900c: "Meinte du *%{id}*?"
   didn_t_find_what_you_are_looking_for_keep_trying_ee5b508c: "Fann du ikkje det du leita etter? Forsøk vidare!"
   different_course_b875770e: "anna emne"
@@ -9318,10 +9343,12 @@ nn:
   edit_grading_scheme_title_ff41d916: "Endre vurderingsskjema %{title}"
   edit_group_c8679dba: "Rediger gruppe"
   edit_home_page_ee907de9: "Rediger nettside"
+  edit_important_info_for_coursename_bdb3eb6c: "Rediger viktig informasjon for %{courseName}"
   edit_item_details_c9a7b9c5: "Rediger elementdetaljar"
   edit_key_developername_2980f240: "Endre nøkkel %{developerName}"
   edit_key_name_5c7d2f46: "Rediger nøkkel %{name}"
   edit_label_769ed6c5: "Rediger %{label}"
+  edit_lti_16f9e6ea: "Rediger LTI"
   edit_mastery_paths_for_name_c9fc59f9: "Rediger meistringsstiar for %{name}"
   edit_mastery_paths_for_title_3c0a15e1: "Rediger meistringsstiar for %{title}"
   edit_mastery_paths_for_title_label_41d81451: "Rediger meistringsstiar for %{title_label}"
@@ -9355,6 +9382,9 @@ nn:
     prompts: 
       confirm_delete: "Er du sikker på at du vil slette dette vurderingsskjemaet?"
       read_only_rubric: "Dette vurderingsskjemaet er i bruk fleire stader. Dersom du redigerer her, vil det bli oppretta ein kopi av vurderingsskjemaet og endringane vil ikkje påverka det opphavlege skjemaet. Vil du halde fram likevel?"
+    rubric: 
+      import_outcome: 
+        duplicated_outcome: "Dette læringsmålet blei ikkje lagt til sidan det allereie finnest i vurderingsskjemaet."
     titles: 
       criterion_long_description: "Lang skildring av kriterium"
       edit_rubric_rating: "Rediger vurdering"
@@ -10518,6 +10548,7 @@ nn:
   french_33881544: Fransk
   french_canada_c3d92fa6: "Fransk (Canada)"
   frequently_used_21a3eb8e: "Ofte brukt"
+  friendly_name_601153fb: "Vennleg namn"
   from_date_must_be_before_to_date_79f00046: "'Frå'-dato må vere før 'Til'-dato"
   from_fdd4956d: Frå
   from_from_to_to_e31f6422: "Frå %{from} til %{to}"
@@ -16058,6 +16089,7 @@ nn:
   no_file_selected_92d2ac30: "Inga fil valt"
   no_file_submitted_a879fa53: "Inga fil er levert"
   no_final_grade_selected_3595c9c: "Ingen sluttkarakter er vald"
+  no_first_name_4b772708: "<No first name>"
   no_grade_3fa326c: "inga vurdering"
   no_grade_assigned_90e531f5: "Ingen karakter er satt."
   no_grade_for_assignment_97c9bc75: "Ingen vurderingar for %{assignment}"
