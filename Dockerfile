@@ -75,14 +75,8 @@ RUN set -eux; \
     config/locales/generated \
     log \
     node_modules \
-    packages/canvas-media/es \
-    packages/canvas-media/lib \
-    packages/canvas-media/node_modules \
     packages/canvas-planner/lib \
     packages/canvas-planner/node_modules \
-    packages/canvas-rce/canvas \
-    packages/canvas-rce/lib \
-    packages/canvas-rce/node_modules \
     packages/jest-moxios-utils/node_modules \
     packages/js-utils/es \
     packages/js-utils/lib \
