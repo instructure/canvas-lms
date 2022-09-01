@@ -219,8 +219,6 @@ export default function ComputerPanel({theFile, setFile, setError, accept, label
                 setPreview({preview: null, isLoading: false, error: null})
               }}
               renderIcon={IconTrashLine}
-              withBackground={false}
-              withBorder={false}
               screenReaderLabel={formatMessage('Clear selected file: {filename}', {filename})}
             />
           </Flex.Item>
