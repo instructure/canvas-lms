@@ -130,7 +130,9 @@ describe('ImageSection', () => {
   })
 
   afterEach(async () => {
-    await act(async() => { jest.runOnlyPendingTimers() })
+    await act(async () => {
+      jest.runOnlyPendingTimers()
+    })
     jest.clearAllMocks()
   })
 
@@ -260,7 +262,9 @@ describe('ImageSection', () => {
       it('when select mode', async () => {
         fireEvent.click(getByText('Add Image'))
         fireEvent.click(getByText('Course Images'))
-        await act(async() => { jest.runOnlyPendingTimers() })
+        await act(async () => {
+          jest.runOnlyPendingTimers()
+        })
         const payload = lastPayloadOfActionType(defaultProps.onChange, 'SetImageSettings')
         expect(payload.mode).toEqual('Course')
       })
@@ -268,9 +272,13 @@ describe('ImageSection', () => {
       it('when select image', async () => {
         fireEvent.click(getByText('Add Image'))
         fireEvent.click(getByText('Course Images'))
-        await act(async() => { jest.runOnlyPendingTimers() })
+        await act(async () => {
+          jest.runOnlyPendingTimers()
+        })
         fireEvent.click(getByTitle('Click to embed image_one.png'))
-        await act(async() => { jest.runOnlyPendingTimers() })
+        await act(async () => {
+          jest.runOnlyPendingTimers()
+        })
         const payload = lastPayloadOfActionType(defaultProps.onChange, 'SetImageSettings')
         expect(payload.image).toEqual('data:image/png;base64,asdfasdfjksdf==')
         expect(payload.imageName).toEqual('grid.png')
@@ -280,17 +288,19 @@ describe('ImageSection', () => {
         fireEvent.click(getByText('Add Image'))
         fireEvent.click(getByText('Course Images'))
         fireEvent.click(getByTitle('Click to embed image_one.png'))
-        await act(async() => { jest.runOnlyPendingTimers() })
+        await act(async () => {
+          jest.runOnlyPendingTimers()
+        })
         fireEvent.click(getByRole('button', {name: /crop image/i}))
-        await act(async() => { jest.runOnlyPendingTimers() })
+        await act(async () => {
+          jest.runOnlyPendingTimers()
+        })
         // Zooms in just to change cropper settings
-        fireEvent.click(
-          document.querySelector(
-            '[data-cid="Modal"] [data-cid="ModalBody"] [direction="row"] span:last-child button'
-          )
-        )
+        fireEvent.click(getByTestId('zoom-in-button'))
         fireEvent.click(document.querySelector('[data-cid="Modal"] [type="submit"]'))
-        await act(async() => { jest.runOnlyPendingTimers() })
+        await act(async () => {
+          jest.runOnlyPendingTimers()
+        })
         const payload = lastPayloadOfActionType(defaultProps.onChange, 'SetImageSettings')
         expect(payload.cropperSettings).toEqual({
           image: 'data:image/png;base64,asdfasdfjksdf==',
@@ -308,7 +318,9 @@ describe('ImageSection', () => {
       fireEvent.click(getByText('Multi Color Image'))
       await waitFor(() => expect(getByTestId('multicolor-svg-list')).toBeInTheDocument())
       fireEvent.click(getByTestId('icon-maker-art'))
-      await act(async() => { jest.runOnlyPendingTimers() })
+      await act(async () => {
+        jest.runOnlyPendingTimers()
+      })
       const payload = lastPayloadOfActionType(defaultProps.onChange, 'SetImageSettings')
       expect(payload.imageName).toEqual('Art Icon')
     })
@@ -318,14 +330,18 @@ describe('ImageSection', () => {
       fireEvent.click(getByText('Single Color Image'))
       await waitFor(() => expect(getByTestId('singlecolor-svg-list')).toBeInTheDocument())
       fireEvent.click(getByTestId('icon-maker-art'))
-      await act(async() => { jest.runOnlyPendingTimers() })
+      await act(async () => {
+        jest.runOnlyPendingTimers()
+      })
       await waitFor(() => {
         expect(container.querySelector('[name="single-color-image-fill"]')).toBeInTheDocument()
       })
       fireEvent.change(container.querySelector('[name="single-color-image-fill"]'), {
         target: {value: '#00FF00'}
       })
-      await act(async() => { jest.runOnlyPendingTimers() })
+      await act(async () => {
+        jest.runOnlyPendingTimers()
+      })
       const payload = lastPayloadOfActionType(defaultProps.onChange, 'SetImageSettings')
       expect(payload.iconFillColor).toEqual('#00FF00')
     })
@@ -419,7 +435,9 @@ describe('ImageSection', () => {
       })
 
       it('dispatches an action to update parent state image', async () => {
-        await act(async() => { jest.runOnlyPendingTimers() })
+        await act(async () => {
+          jest.runOnlyPendingTimers()
+        })
         expect(defaultProps.onChange).toHaveBeenCalledWith({
           type: 'SetEncodedImage',
           payload: 'data:image/png;base64,asdfasdfjksdf=='
@@ -427,7 +445,9 @@ describe('ImageSection', () => {
       })
 
       it('dispatches an action to update parent state image type', async () => {
-        await act(async() => { jest.runOnlyPendingTimers() })
+        await act(async () => {
+          jest.runOnlyPendingTimers()
+        })
         expect(defaultProps.onChange).toHaveBeenCalledWith({
           type: 'SetEncodedImageType',
           payload: 'Course'
@@ -435,7 +455,9 @@ describe('ImageSection', () => {
       })
 
       it('dispatches an action to update parent state image name', async () => {
-        await act(async() => { jest.runOnlyPendingTimers() })
+        await act(async () => {
+          jest.runOnlyPendingTimers()
+        })
         expect(defaultProps.onChange).toHaveBeenCalledWith({
           type: 'SetEncodedImageName',
           payload: 'grid.png'
@@ -519,7 +541,9 @@ describe('ImageSection', () => {
             target: {value: '#00FF00'}
           })
         })
-        await act(async() => { jest.runOnlyPendingTimers() })
+        await act(async () => {
+          jest.runOnlyPendingTimers()
+        })
         await waitFor(() => {
           expect(spyFn).toHaveBeenCalledWith('#00FF00')
           expect(getByTestId('selected-image-preview')).toHaveStyle(
@@ -621,7 +645,9 @@ describe('ImageSection', () => {
           }}
         />
       )
-      await act(async() => { jest.runOnlyPendingTimers() })
+      await act(async () => {
+        jest.runOnlyPendingTimers()
+      })
       expect(rendered.container.querySelector('[name="single-color-image-fill"]')).toHaveValue(
         '#00FF00'
       )
