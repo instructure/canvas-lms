@@ -28,26 +28,23 @@ import {TextArea} from '@instructure/ui-text-area'
 import {Tabs} from '@instructure/ui-tabs'
 import {DateTimeInput} from '@instructure/ui-forms'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {SETTINGS_TAB, ATTENDEES_TAB} from '../../../util/constants'
 
 const I18n = useI18nScope('video_conference')
 
 const BBBModalOptions = props => {
-  const SETTINGS_TAB = 'settings'
-  const ATTENDEES_TAB = 'attendees'
-
-  const [tab, setTab] = useState(SETTINGS_TAB)
   const [noTimeLimit, setNoTimeLimit] = useState(props.options.includes('no_time_limit')) // match options.no_time_limit default
 
   return (
     <Tabs
       onRequestTabChange={(e, {id}) => {
-        setTab(id)
+        props.setTab(id)
       }}
     >
       <Tabs.Panel
         id={SETTINGS_TAB}
         renderTitle={I18n.t('Settings')}
-        isSelected={tab === SETTINGS_TAB}
+        isSelected={props.tab === SETTINGS_TAB}
       >
         <Flex margin="none none large" direction="column">
           <Flex.Item padding="small">
@@ -172,7 +169,7 @@ const BBBModalOptions = props => {
       <Tabs.Panel
         id={ATTENDEES_TAB}
         renderTitle={I18n.t('Attendees')}
-        isSelected={tab === ATTENDEES_TAB}
+        isSelected={props.tab === ATTENDEES_TAB}
       >
         <Flex margin="none none large" direction="column">
           <Flex.Item padding="small">
@@ -246,7 +243,9 @@ BBBModalOptions.propTypes = {
   onEndDateChange: PropTypes.func,
   onStartDateChange: PropTypes.func,
   startDate: PropTypes.string,
-  endDate: PropTypes.string
+  endDate: PropTypes.string,
+  tab: PropTypes.string,
+  setTab: PropTypes.func
 }
 
 export default BBBModalOptions

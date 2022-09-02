@@ -25,6 +25,7 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import VideoConferenceTypeSelect from '../VideoConferenceTypeSelect/VideoConferenceTypeSelect'
 import BBBModalOptions from '../BBBModalOptions/BBBModalOptions'
 import BaseModalOptions from '../BaseModalOptions/BaseModalOptions'
+import {SETTINGS_TAB, ATTENDEES_TAB} from '../../../util/constants'
 
 const I18n = useI18nScope('video_conference')
 
@@ -50,6 +51,7 @@ export const VideoConferenceModal = ({
     'send_private_chat'
   ]
 
+  const [tab, setTab] = useState(SETTINGS_TAB)
   const defaultName = ENV.context_name ? `${ENV.context_name} Conference` : 'Conference'
   const [name, setName] = useState(isEditing ? props.name : defaultName)
   const [conferenceType, setConferenceType] = useState(
@@ -127,6 +129,8 @@ export const VideoConferenceModal = ({
           endDate={endCalendarDate}
           onStartDateChange={setStartCalendarDate}
           onEndDateChange={setEndCalendarDate}
+          tab={tab}
+          setTab={setTab}
         />
       )
     }
@@ -158,6 +162,14 @@ export const VideoConferenceModal = ({
       onDismiss={onDismiss}
       onSubmit={e => {
         e.preventDefault()
+        if (tab === ATTENDEES_TAB) {
+          setTab(SETTINGS_TAB)
+          setTimeout(() => {
+            document.querySelector('button[type=submit]').click()
+          }, 200)
+          return
+        }
+
         onSubmit(e, {
           name,
           conferenceType,
