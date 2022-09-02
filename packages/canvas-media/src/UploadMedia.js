@@ -198,7 +198,11 @@ export default class UploadMedia extends React.Component {
     // and endless loop).
     if (isEqual(prevProps.tabs, this.props.tabs)) return
 
-    if (prevState.selectedPanel === -1) {
+    const invalidPanelSelected = () =>
+      (this.state.selectedPanel === PANELS.COMPUTER && !this.props.tabs.upload) ||
+      (this.state.selectedPanel === PANELS.RECORD && !this.props.tabs.record)
+
+    if (prevState.selectedPanel === -1 || invalidPanelSelected()) {
       // The tabs prop has changed and the selectedPanel was
       // never set in the constructor. Attempt to infer the
       // selected panel based on the new tabs list
