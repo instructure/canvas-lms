@@ -259,7 +259,7 @@ export const CourseHeaderHero = forwardRef(
           >
             <Flex alignItems="center" padding="small medium" height="100%">
               {!showingMobileNav && (
-                <Flex.Item shouldGrow shouldShrink margin="0 small 0 0">
+                <Flex.Item shouldGrow={true} shouldShrink={true} margin="0 small 0 0">
                   <Heading as="h1" aria-hidden={observerMode} color="primary-inverse">
                     {possiblyTruncatedName}
                   </Heading>
@@ -390,7 +390,7 @@ export const CourseHeaderOptions = forwardRef(
         >
           <Flex alignItems="center" justifyItems="space-between">
             <Flex.Item>{showManageButton && <ManageButton />}</Flex.Item>
-            <Flex.Item textAlign="end" shouldGrow margin={`0 ${rightOptionsMargin} 0 0`}>
+            <Flex.Item textAlign="end" shouldGrow={true} margin={`0 ${rightOptionsMargin} 0 0`}>
               {showObserverOptions && <ObserverOptionsContainer />}
               {showStudentViewButton && <StudentViewButton />}
             </Flex.Item>
@@ -649,9 +649,9 @@ export function K5Course({
           plannerEnabled={plannerEnabled}
           plannerInitialized={plannerInitialized}
           timeZone={timeZone}
-          userHasEnrollments
+          userHasEnrollments={true}
           visible={currentTab === TAB_IDS.SCHEDULE}
-          singleCourse
+          singleCourse={true}
           observedUserId={observedUserId}
           contextCodes={[`course_${id}`]}
         />
@@ -670,10 +670,10 @@ export function K5Course({
         )}
         <ResourcesPage
           cards={[{id, originalName: name, shortName: name, isHomeroom: false, canManage}]}
-          cardsSettled
+          cardsSettled={true}
           visible={currentTab === TAB_IDS.RESOURCES}
           showStaff={false}
-          isSingleCourse
+          isSingleCourse={true}
         />
         {currentTab === TAB_IDS.MODULES && !modulesExist && !canManage && <EmptyModules />}
         {currentTab === TAB_IDS.GROUPS && (

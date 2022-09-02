@@ -18,7 +18,6 @@
 
 import React from 'react'
 import moxios from 'moxios'
-import tz from '@canvas/timezone'
 import {render, waitFor, act} from '@testing-library/react'
 import {K5Course} from '../K5Course'
 import fetchMock from 'fetch-mock'
@@ -55,6 +54,20 @@ const defaultEnv = {
   MOMENT_LOCALE: 'en',
   TIMEZONE: 'America/Denver'
 }
+
+const dtf = new Intl.DateTimeFormat('en', {
+  // MMM D, YYYY h:mma
+  weekday: 'short',
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+  hour: 'numeric',
+  minute: 'numeric',
+  timeZone: defaultEnv.TIMEZONE
+})
+
+const dateFormatter = d => dtf.format(d instanceof Date ? d : new Date(d))
+
 const defaultTabs = [
   {id: '0'},
   {id: '19'},
@@ -310,7 +323,7 @@ describe('K-5 Subject Course', () => {
 
     it('renders a link to update tab settings if no tabs are provided and the user has manage permissions', () => {
       const {getByRole} = render(
-        <K5Course {...defaultProps} canManage tabs={[]} hasSyllabusBody={false} />
+        <K5Course {...defaultProps} canManage={true} tabs={[]} hasSyllabusBody={false} />
       )
       const link = getByRole('link', {name: 'Reestablish your world'})
       expect(link).toBeInTheDocument()
@@ -318,7 +331,7 @@ describe('K-5 Subject Course', () => {
     })
 
     it('does not render anything when tabContentOnly is true', () => {
-      const {queryByText} = render(<K5Course {...defaultProps} tabContentOnly />)
+      const {queryByText} = render(<K5Course {...defaultProps} tabContentOnly={true} />)
 
       // Course hero shouldn't be shown
       expect(queryByText(defaultProps.name)).not.toBeInTheDocument()
@@ -332,13 +345,13 @@ describe('K-5 Subject Course', () => {
 
   describe('Manage course functionality', () => {
     it('Shows a manage button when the user has read_as_admin permissions', () => {
-      const {getByText, getByRole} = render(<K5Course {...defaultProps} canReadAsAdmin />)
+      const {getByText, getByRole} = render(<K5Course {...defaultProps} canReadAsAdmin={true} />)
       expect(getByRole('link', {name: 'Manage Subject: Arts and Crafts'})).toBeInTheDocument()
       expect(getByText('Manage Subject')).toBeInTheDocument()
     })
 
     it('Should redirect to course settings path when clicked', async () => {
-      const {getByRole} = render(<K5Course {...defaultProps} canReadAsAdmin />)
+      const {getByRole} = render(<K5Course {...defaultProps} canReadAsAdmin={true} />)
       const manageSubjectBtn = getByRole('link', {name: 'Manage Subject: Arts and Crafts'})
       expect(manageSubjectBtn.href).toBe('http://localhost/courses/30/settings')
     })
@@ -351,7 +364,7 @@ describe('K-5 Subject Course', () => {
 
   describe('Student View Button functionality', () => {
     it('Shows the Student View button when the user has student view mode access', () => {
-      const {queryByRole} = render(<K5Course {...defaultProps} showStudentView />)
+      const {queryByRole} = render(<K5Course {...defaultProps} showStudentView={true} />)
       expect(queryByRole('link', {name: 'Student View'})).toBeInTheDocument()
     })
 
@@ -361,13 +374,13 @@ describe('K-5 Subject Course', () => {
     })
 
     it('Should open student view path when clicked', () => {
-      const {getByRole} = render(<K5Course {...defaultProps} showStudentView />)
+      const {getByRole} = render(<K5Course {...defaultProps} showStudentView={true} />)
       const studentViewBtn = getByRole('link', {name: 'Student View'})
       expect(studentViewBtn.href).toBe('http://localhost/courses/30/student_view/1')
     })
 
     it('Should keep the navigation tab when accessing student view mode', () => {
-      const {getByRole} = render(<K5Course {...defaultProps} showStudentView />)
+      const {getByRole} = render(<K5Course {...defaultProps} showStudentView={true} />)
       getByRole('tab', {name: 'Arts and Crafts Grades'}).click()
       const studentViewBtn = getByRole('link', {name: 'Student View'})
       expect(studentViewBtn.href).toBe('http://localhost/courses/30/student_view/1#grades')
@@ -383,14 +396,14 @@ describe('K-5 Subject Course', () => {
       })
 
       it('Should keep the navigation tab when the fake student is reset', () => {
-        const {getByRole} = render(<K5Course {...defaultProps} showStudentView />)
+        const {getByRole} = render(<K5Course {...defaultProps} showStudentView={true} />)
         const resetStudentBtn = getByRole('link', {name: 'Reset student'})
         getByRole('tab', {name: 'Arts and Crafts Resources'}).click()
         expect(resetStudentBtn.href).toBe('http://localhost/courses/30/test_student#resources')
       })
 
       it('Should keep the navigation tab when leaving student view mode', () => {
-        const {getByRole} = render(<K5Course {...defaultProps} showStudentView />)
+        const {getByRole} = render(<K5Course {...defaultProps} showStudentView={true} />)
         const leaveStudentViewBtn = getByRole('link', {name: 'Leave student view'})
         getByRole('tab', {name: 'Arts and Crafts Grades'}).click()
         expect(leaveStudentViewBtn.href).toBe('http://localhost/courses/30/student_view#grades')
@@ -458,7 +471,7 @@ describe('K-5 Subject Course', () => {
 
   describe('Subject announcements', () => {
     it('shows the latest announcement, attachment, date, and edit button on the subject home', () => {
-      const {getByText, getByRole} = render(<K5Course {...defaultProps} canManage />)
+      const {getByText, getByRole} = render(<K5Course {...defaultProps} canManage={true} />)
       expect(getByText('Important announcement')).toBeInTheDocument()
       expect(getByText('Read this closely.')).toBeInTheDocument()
       const button = getByRole('link', {name: 'Edit announcement Important announcement'})
@@ -467,9 +480,21 @@ describe('K-5 Subject Course', () => {
       const attachment = getByRole('link', {name: 'hw.pdf'})
       expect(attachment).toBeInTheDocument()
       expect(attachment.href).toBe('http://address/to/hw.pdf')
-      expect(
-        getByText(tz.format('2021-05-14T17:06:21-06:00', 'date.formats.date_at_time'))
-      ).toBeInTheDocument()
+      const targetDate = new Date('2021-05-14T17:06:21Z')
+      const datePortion = new Intl.DateTimeFormat('en', {
+        month: 'short',
+        day: 'numeric',
+        timeZone: defaultEnv.TIMEZONE
+      }).format(targetDate)
+      const timePortion = new Intl.DateTimeFormat('en', {
+        hour: 'numeric',
+        minute: 'numeric',
+        timeZone: defaultEnv.TIMEZONE
+      })
+        .format(targetDate)
+        .replace(/ [AP]M$/i, '')
+      expect(getByText(new RegExp(datePortion))).toBeInTheDocument()
+      expect(getByText(new RegExp(timePortion))).toBeInTheDocument()
     })
 
     it('hides the edit button if student', () => {
@@ -526,7 +551,7 @@ describe('K-5 Subject Course', () => {
             {...defaultProps}
             courseOverview={emptyCourseOverview}
             defaultTab={TAB_IDS.HOME}
-            canManage
+            canManage={true}
           />
         )
         expect(getByTestId('manage-home-button')).toBeInTheDocument()
@@ -549,7 +574,7 @@ describe('K-5 Subject Course', () => {
             {...defaultProps}
             courseOverview={emptyCourseOverview}
             defaultTab={TAB_IDS.HOME}
-            canManage
+            canManage={true}
           />
         )
         const manageHomeLink = getByTestId('manage-home-button')
@@ -563,7 +588,7 @@ describe('K-5 Subject Course', () => {
             hasWikiPages={false}
             courseOverview={emptyCourseOverview}
             defaultTab={TAB_IDS.HOME}
-            canManage
+            canManage={true}
           />
         )
         const manageHomeLink = getByTestId('manage-home-button')
@@ -578,8 +603,8 @@ describe('K-5 Subject Course', () => {
         <K5Course
           {...defaultProps}
           defaultTab={TAB_IDS.SCHEDULE}
-          canManage
-          canReadAsAdmin
+          canManage={true}
+          canReadAsAdmin={true}
           userIsStudent={false}
         />
       )
@@ -643,7 +668,11 @@ describe('K-5 Subject Course', () => {
 
     it('shows tab for LMGB if enabled', () => {
       const {getByRole} = render(
-        <K5Course {...defaultProps} showLearningMasteryGradebook defaultTab={TAB_IDS.GRADES} />
+        <K5Course
+          {...defaultProps}
+          showLearningMasteryGradebook={true}
+          defaultTab={TAB_IDS.GRADES}
+        />
       )
       expect(getByRole('tab', {name: 'Learning Mastery'})).toBeInTheDocument()
     })
@@ -663,7 +692,7 @@ describe('K-5 Subject Course', () => {
     describe('user is an instructor', () => {
       it('displays welcome page', () => {
         const {getByText} = render(
-          <K5Course {...defaultProps} canReadAsAdmin defaultTab={TAB_IDS.GROUPS} />
+          <K5Course {...defaultProps} canReadAsAdmin={true} defaultTab={TAB_IDS.GROUPS} />
         )
         expect(getByText('This is where students can see their groups.')).toBeInTheDocument()
       })
@@ -673,8 +702,8 @@ describe('K-5 Subject Course', () => {
           const {getByText} = render(
             <K5Course
               {...defaultProps}
-              canManageGroups
-              canReadAsAdmin
+              canManageGroups={true}
+              canReadAsAdmin={true}
               defaultTab={TAB_IDS.GROUPS}
             />
           )
@@ -685,7 +714,7 @@ describe('K-5 Subject Course', () => {
       describe('can not manage groups', () => {
         it('displays a View Groups button', () => {
           const {getByText} = render(
-            <K5Course {...defaultProps} canReadAsAdmin defaultTab={TAB_IDS.GROUPS} />
+            <K5Course {...defaultProps} canReadAsAdmin={true} defaultTab={TAB_IDS.GROUPS} />
           )
           expect(getByText('View Groups')).toBeInTheDocument()
         })
@@ -697,7 +726,7 @@ describe('K-5 Subject Course', () => {
     describe('important info section', () => {
       it('shows syllabus content with link to edit if teacher', async () => {
         const {findByText, getByRole} = render(
-          <K5Course {...defaultProps} canManage defaultTab={TAB_IDS.RESOURCES} />
+          <K5Course {...defaultProps} canManage={true} defaultTab={TAB_IDS.RESOURCES} />
         )
         expect(await findByText('This is really important.')).toBeInTheDocument()
         const editLink = getByRole('link', {name: 'Edit important info for Arts and Crafts'})
@@ -809,23 +838,16 @@ describe('K-5 Subject Course', () => {
           defaultTab={TAB_IDS.GRADES}
         />
       )
+      const formattedSubmittedDate = `Submitted ${dateFormatter('2021-09-20T23:55:08Z')}`
       const select = getByRole('combobox', {name: 'Select a student to view'})
       act(() => select.click())
       act(() => getByText('Student 5').click())
       await waitFor(() => {
-        const formattedSubmittedDate = tz.format(
-          '2021-09-20T23:55:08Z',
-          'date.formats.full_with_weekday'
+        ;['Assignment 3', formattedSubmittedDate, 'Assignments', '6 pts', 'Out of 10 pts'].forEach(
+          label => {
+            expect(getByText(label)).toBeInTheDocument()
+          }
         )
-        ;[
-          'Assignment 3',
-          `Submitted ${formattedSubmittedDate}`,
-          'Assignments',
-          '6 pts',
-          'Out of 10 pts'
-        ].forEach(label => {
-          expect(getByText(label)).toBeInTheDocument()
-        })
       })
     })
   })
