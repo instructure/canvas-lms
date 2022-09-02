@@ -47,7 +47,7 @@ function renderComponent(overrideProps = {}) {
         origin: 'http://host:port',
         jwt: 'whocares'
       }}
-      open
+      open={true}
       liveRegion={() => null}
       onStartUpload={() => {}}
       onComplete={() => {}}
@@ -91,7 +91,7 @@ describe('Upload Media', () => {
             origin: 'http://host:port',
             jwt: 'whocares'
           }}
-          open
+          open={true}
           liveRegion={() => null}
           onStartUpload={() => {}}
           onComplete={() => {}}
@@ -102,7 +102,7 @@ describe('Upload Media', () => {
       )
 
       // rerender, setting the record tab to true
-      const container = rerender(
+      rerender(
         <UploadMedia
           rcsConfig={{
             contextType: 'course',
@@ -110,7 +110,7 @@ describe('Upload Media', () => {
             origin: 'http://host:port',
             jwt: 'whocares'
           }}
-          open
+          open={true}
           liveRegion={() => null}
           onStartUpload={() => {}}
           onComplete={() => {}}
@@ -121,6 +121,52 @@ describe('Upload Media', () => {
       )
 
       expect(setStateSpy).toHaveBeenCalledWith({selectedPanel: 0})
+
+      setStateSpy.mockRestore()
+    })
+
+    it('recomputes the selected panel when the current selected panel is no longer visible', () => {
+      const setStateSpy = jest.spyOn(UploadMedia.prototype, 'setState')
+
+      // Initial render with upload tab
+      const {rerender} = render(
+        <UploadMedia
+          rcsConfig={{
+            contextType: 'course',
+            contextId: '17',
+            origin: 'http://host:port',
+            jwt: 'whocares'
+          }}
+          open={true}
+          liveRegion={() => null}
+          onStartUpload={() => {}}
+          onComplete={() => {}}
+          onDismiss={() => {}}
+          tabs={{record: false, upload: true}}
+          uploadMediaTranslations={uploadMediaTranslations}
+        />
+      )
+
+      // rerender, showing the record tab and hiding the upload tab
+      rerender(
+        <UploadMedia
+          rcsConfig={{
+            contextType: 'course',
+            contextId: '17',
+            origin: 'http://host:port',
+            jwt: 'whocares'
+          }}
+          open={true}
+          liveRegion={() => null}
+          onStartUpload={() => {}}
+          onComplete={() => {}}
+          onDismiss={() => {}}
+          tabs={{record: true, upload: false}}
+          uploadMediaTranslations={uploadMediaTranslations}
+        />
+      )
+
+      expect(setStateSpy).toHaveBeenLastCalledWith({selectedPanel: 1})
 
       setStateSpy.mockRestore()
     })
