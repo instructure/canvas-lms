@@ -36,7 +36,7 @@ export const VideoConferenceModal = ({
   onSubmit,
   ...props
 }) => {
-  const OPTIONS_DEFAULT = ['enable_waiting_room']
+  const OPTIONS_DEFAULT = []
 
   if (ENV.bbb_recording_enabled) {
     OPTIONS_DEFAULT.push('recording_enabled')
