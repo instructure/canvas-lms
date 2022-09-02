@@ -18,11 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class FixupDeveloperKeyScopes < ActiveRecord::Migration[6.1]
-  # This migration is a postdeploy in order to make sure that the
-  # UpdateDeveloperKeyScopes method has been deployed before this
-  # migration runs.
-  # If this fixup needs to be run in the future, though, it should be a
-  # predeploy to avoid breaking developer keys in production.
   tag :postdeploy
   disable_ddl_transaction!
 
