@@ -43,6 +43,7 @@ describe('Other Calendars modal ', () => {
         fetchMock.get(SEARCH_ENDPOINT.concat('?per_page=5'), JSON.stringify(allAccountCalendarsResponse))
         fetchMock.get(SEARCH_ENDPOINT.concat('?per_page=2&page=2'), JSON.stringify(accountCalendarsAPIPage2Response))
         fetchMock.get(getSearchUrl('Test'), JSON.stringify(emptyResponse))
+        fetchMock.get(getSearchUrl('T'), JSON.stringify(emptyResponse))
         fetchMock.post(markAsSeenUrl, JSON.stringify({ status: 'ok' }))
     })
 
@@ -153,6 +154,18 @@ describe('Other Calendars modal ', () => {
         expect(fetchMock.calls(markAsSeenUrl)).toHaveLength(0)
     })
 
+    it('disables the save button if the user has not made any change', async ()=>{
+        const { getByTestId, findByTestId } = render(
+            <AccountCalendarsModal {...getProps()} />)
+        const addCalendarButton = getByTestId('add-other-calendars-button')
+        openModal(addCalendarButton)
+        const saveButton = getByTestId('save-calendars-button')
+        expect(saveButton).toHaveAttribute('disabled');
+        const calendarToEnable = await findByTestId(`account-${page1Results[1].id}-checkbox`)
+        act(() => calendarToEnable.click())
+        expect(saveButton).not.toHaveAttribute('disabled');
+    })
+
     describe('Search bar ', () => {
         it('shows the total number of available calendars to search through', async () => {
             const { findByPlaceholderText, getByTestId } = render(
@@ -173,15 +186,15 @@ describe('Other Calendars modal ', () => {
             expect(fetchMock.called(getSearchUrl('Test'))).toBe(true)
         })
 
-        it('does not trigger search requests if the user has not typed at least 3 characters', async () => {
+        it('does not trigger search requests if the user has not typed at least 2 characters', async () => {
             const { findByTestId, getByTestId } = render(
                 <AccountCalendarsModal {...getProps()} />)
             const addCalendarButton = getByTestId('add-other-calendars-button')
             openModal(addCalendarButton)
             const searchBar = await findByTestId('search-input')
-            fireEvent.change(searchBar, { target: { value: 'Te' } })
+            fireEvent.change(searchBar, { target: { value: 'T' } })
             advance(500)
-            expect(fetchMock.called(getSearchUrl('Te'))).toBe(false)
+            expect(fetchMock.called(getSearchUrl('T'))).toBe(false)
         })
 
         it('shows an empty state if no calendar was found', async () => {
