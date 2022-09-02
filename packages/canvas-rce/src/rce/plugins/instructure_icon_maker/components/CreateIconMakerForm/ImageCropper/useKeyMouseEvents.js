@@ -224,10 +224,12 @@ export function useKeyMouseEvents(translateX, translateY, dispatch, imgRef) {
       return
     }
     if (translateX !== tempTranslateX) {
-      setTempTranslateX(translateX)
+      tempTranslateXRef.current = translateX
+      _setTempTranslateX(translateX)
     }
     if (translateY !== tempTranslateY) {
-      setTempTranslateY(translateY)
+      tempTranslateYRef.current = translateY
+      _setTempTranslateY(translateX)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [translateX, translateY])

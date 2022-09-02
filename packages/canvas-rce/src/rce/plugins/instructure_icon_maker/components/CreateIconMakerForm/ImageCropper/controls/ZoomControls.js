@@ -90,6 +90,7 @@ export const ZoomControls = ({scaleRatio, onChange}) => {
       </Flex.Item>
       <Flex.Item>
         <IconButton
+          data-testid="zoom-in-button"
           onClick={zoomInCallback}
           interaction={scaleRatio < MAX_SCALE_RATIO ? 'enabled' : 'disabled'}
           screenReaderLabel={formatMessage('Zoom in image')}

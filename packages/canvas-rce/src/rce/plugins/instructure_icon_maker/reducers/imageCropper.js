@@ -27,7 +27,8 @@ export const actions = {
   SET_SCALE_RATIO: 'SetScaleRatio',
   SET_TRANSLATE_X: 'SetTranslateX',
   SET_TRANSLATE_Y: 'SetTranslateY',
-  UPDATE_SETTINGS: 'UpdateSettings'
+  UPDATE_SETTINGS: 'UpdateSettings',
+  RESET_SETTINGS: 'ResetSettings'
 }
 
 export const cropperSettingsReducer = (state, action) => {
@@ -46,6 +47,14 @@ export const cropperSettingsReducer = (state, action) => {
       return {...state, translateY: action.payload}
     case actions.UPDATE_SETTINGS:
       return {...state, ...action.payload}
+    case actions.RESET_SETTINGS:
+      return {
+        ...state,
+        rotation: defaultState.rotation,
+        scaleRatio: defaultState.scaleRatio,
+        translateX: defaultState.translateX,
+        translateY: defaultState.translateY
+      }
     default:
       throw Error('Unknown action for image cropper reducer')
   }
