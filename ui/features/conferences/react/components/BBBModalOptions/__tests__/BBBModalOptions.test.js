@@ -17,8 +17,9 @@
  */
 
 import React from 'react'
-import {fireEvent, render} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import BBBModalOptions from '../BBBModalOptions'
+import {SETTINGS_TAB, ATTENDEES_TAB} from '../../../../util/constants'
 
 describe('BBBModalOptions', () => {
   const setName = jest.fn()
@@ -46,7 +47,8 @@ describe('BBBModalOptions', () => {
       'send_public_chat',
       'send_private_chat'
     ],
-    setAttendeesOptions
+    setAttendeesOptions,
+    tab: SETTINGS_TAB
   }
 
   const setup = (props = {}) => {
@@ -67,6 +69,7 @@ describe('BBBModalOptions', () => {
         showCalendar={props.showCalendar}
         startDate={props.startDate}
         endDate={props.endDate}
+        tab={props.tab}
       />
     )
   }
@@ -94,8 +97,10 @@ describe('BBBModalOptions', () => {
     expect(container.getByLabelText('Enable recording for this conference').checked).toBeTruthy()
     expect(container.getByLabelText('Enable recording for this conference').disabled).toBeFalsy()
     expect(container.getByLabelText('Description')).toHaveValue(defaultProps.description)
+  })
 
-    fireEvent.click(container.getByText('Attendees'))
+  it('should render attendees tab', () => {
+    const container = setup({...defaultProps, tab: ATTENDEES_TAB})
     expect(container.getByLabelText('Share webcam').checked).toBeTruthy()
   })
 

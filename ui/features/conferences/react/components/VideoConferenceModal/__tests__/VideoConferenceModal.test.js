@@ -176,4 +176,22 @@ describe('VideoConferenceModal', () => {
     fireEvent.click(container.getByText('Attendees'))
     expect(container.getByLabelText('Share webcam').checked).toBeTruthy()
   })
+
+  it('doesnt call onSubmit when there is an error and you are on the Attendees tab', () => {
+    const container = setup({
+      isEditing: true,
+      name: '',
+      duration: 45,
+      options: ['recording_enabled'],
+      description: '',
+      invitationOptions: [],
+      attendeesOptions: ['share_webcam'],
+      type: 'BigBlueButton'
+    })
+
+    fireEvent.click(container.getByText('Attendees'))
+    fireEvent.click(container.getByTestId('submit-button'))
+
+    expect(onSubmit).not.toHaveBeenCalled()
+  })
 })
