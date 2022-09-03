@@ -23443,6 +23443,11 @@ nn:
   this_message_includes_media_comments_to_listen_or__75ea03a1: "Meldinga inneheld mediekommentarar. Om du vil lytte eller svare, kan du klikke på lenka nedanfor:"
   this_message_includes_media_comments_to_listen_or__df72d662: "Meldinga inkluderer multimediainnhald og -kommentarar. For å høyre på eller svare, klikk på lenka: %{link}.  Om du vil sende med eit vedlegg, må du logge inn i Canvas og kommentere innleveringa der. "
   this_message_was_truncated_a32901df: "... Denne meldinga vart avkorta."
+  this_metric_provides_a_measure_of_how_well_a_singl_a9aa334e: |-
+      
+      Denne utrekninga gir eit mål på kor godt eit enkelt spørsmål kan visa
+      forskjellen (eller laga forskjel) mellom studentar som gjer det bra på eksamen og
+      dei som ikkje gjer det bra.
   this_module_is_locked_until_completing_all_of_the__ddf06070: "Modulen er låst til alle krav for følgande modular er fullførte: %{prerequisites}"
   this_module_is_locked_until_datetime_b2486751: "Modulen er låst til %{datetime}"
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Mest sannsynleg skjedde dette fordi du har importert emneinnhald utan tilknytte filer."
@@ -23468,6 +23473,7 @@ nn:
   this_permission_only_controls_adding_users_at_the__f33e8ae8: |-
       Dette løyvet styrer kun oppretting av brukarar på kontonivå. For å legge til brukarar
       på eit emne, må 'Brukarar - legg til / fjern studentar frå emne' eller 'Brukarar - legg til / fjern faglærarar, designarar eller undervisingsassistentar frå andre emne til dette emnet' må vere slått på.
+  this_permission_should_only_be_assigned_to_users_t_231c182e: "Dette løyve bør kun bli gitt til brukarar som institusjonen har gjeve løyve til å opptre som andre brukarar i heile kontoen"
   this_placement_requires_deep_link_support_by_the_v_702d554f: "Plasseringa krev at leverandør støttar dyplenking. Sjekk med leverandør om dei har støtte for ein slik funksjonalitet"
   this_pronoun_will_appear_after_your_name_when_enab_473d8e1d: "Dette pronomenet vil visast etter namnet ditt når det er skrudd på"
   this_question_group_is_set_to_pick_more_questions__2e3552c4: "Spørsmålsgruppa er stilt inn på fleire spørsmålsval enn det som er tilgjengeleg."
@@ -23768,6 +23774,7 @@ nn:
     new_topic: "Nytt diskusjonsemne"
   title_52b8638d: "Tittel:"
   title_appointment_group_you_can_sign_up_for_this_1c254712: "*%{title} avtalegruppe* Du kan **melde deg** på."
+  title_current_750a3c65: "%{title}(nåværande)"
   title_eb77c512: "%{title}"
   title_ee03d132: Tittel
   title_f8e03596: "* Tittel"
@@ -23802,12 +23809,19 @@ nn:
   to_1126ab55: til
   to_35c6baa2: "til "
   to_51406be9: Til
+  to_access_a_course_people_page_users_view_list_mus_5a4ee1a5: "For å sjå personoversikta i eit emne, må 'Brukarar - vis liste' vere slått på."
+  to_access_item_banks_for_a_course_item_banks_manag_a60a144f: "For å ha tilgang til Spørsmålsbankar i eit emne så må \"Spørsmålsbankar - administrer konto\" vere slått på"
+  to_access_item_banks_for_a_course_or_account_item__f1f7b0af: "For å ha tilgang til Spørsmålsbankar i eit emne eller ein konto så må \"Spørsmålsbankar - administrer konto\" vere slått på"
   to_access_the_account_courses_page_courses_view_li_e1da6165: "For tilgang til emneoversikta på kontonivå, må 'Emne - vis liste' vere slått på."
+  to_access_the_account_settings_tab_account_level_s_9676d44b: "For å ha tilgang til Kontoinnstillingar så må \"Kontonivå innstillingar - administrer\" vere slått på"
   to_access_the_assignments_index_page_course_conten_a5b00f98: "For å sjå oppgåveoversikta må 'Emneinnhald - vis' vere slått på. For å skilje mellom oppgåver fordelt på enkeltstudentar må 'Brukarar - vis liste' òg vere slått på."
   to_access_the_courses_link_in_account_navigation_c_5aa3d76c: "For å få tilgang til Emner-fana under Kontonavigering-, må ‘Emner - vis liste’ være aktivert."
+  to_access_the_people_page_and_view_course_groups_u_e2dc13eb: "For å sjå personoversikta og grupper, må 'Brukarar - vis liste' òg vere slått på."
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "For å sjå personoversikta og grupper, må 'Brukarar - vis liste' òg vere slått på."
   to_access_the_people_page_users_view_list_must_be__2f01333b: "For å sjå personoversikta må 'Brukarar - vis liste' vere aktivert. Dersom denne løyva er aktivert samstundes som 'Brukarar - sjå primær e-postadresse' er deaktivert, vil brukarane sjå e-postadresser som login-ID. For å sjå login-ID må 'Personar - legg til / fjern studentar i emne' og 'Brukarar - legg til / fjern faglærarar, kursdesignarar eller undervisingsassistentar i emne' óg vere aktivert."
   to_access_the_people_page_users_view_list_must_be__5a5475fe: "For å sjå personoversikta, må 'Brukarar - vis liste' vere slått på."
+  to_access_the_people_page_users_view_list_must_be__5dfdbe23: "For å sjå personoversikta, må 'Brukarar - vis liste' vere slått på."
+  to_access_the_people_page_users_view_list_must_be__6f42bf9e: "For å sjå personoversikta, må 'Brukarar - vis liste' vere slått på."
   to_access_the_people_page_users_view_list_must_be__756d7188: |-
       For å sjå sida Personar må 'Brukarar - vis liste' vere slått på.
       Dersom open registrering er slått på for konto, kan brukarar med dette løyvet legge til studentar på eit emne via e-postadresse dersom ikkje brukaren allereie har ein Canvas-konto.
@@ -23818,14 +23832,22 @@ nn:
       For å sjå Personoversikta på kontonivå, må 'Brukarar - vis liste' vere slått på.
       
       Dersom løyvet er slått av medan 'Brukarar - vis innloggings-ID' er slått på, vil ein brukar sjå e-postadressar som innloggings-ID-ar.
+  to_act_as_other_users_users_act_as_must_also_be_en_cc96faf1: "For å kunne opptre som anna bruker må \"Brukarar - opptre som\" vere slått på"
   to_activate_sms_enter_the_four_character_confirmat_3982a3ec: "For å aktivere SMS må du leggje inn den firesifra koden som blei sendt til %{sms_number}."
   to_activate_this_communication_channel_enter_the_f_f465efc5: "For å aktivere denne kommunikasjonskanalen må du leggje inn den firesifra koden som blei sendt til %{sms_number}."
+  to_add_a_course_courses_add_must_also_be_enabled_8c2231d9: "For å legge til eit emne må \"Emne - legg til\" vere slått på"
   to_add_announcements_discussions_moderate_must_als_2496cbd7: "For å legge til kunngjeringar, må 'Diskusjonar - moderer' òg vere slått på. For å sjå dei siste kunngjeringane på forsida, må boksen 'Vis siste kunngjeringar på forsida til emnet' vere merka av i emneinnstillingar."
+  to_add_announcements_discussions_moderate_must_als_a83fd681: "For å opprette kunngjeringar, må 'Diskusjonar - moderer' óg vere slått på."
   to_add_associated_courses_blueprint_courses_add_ed_4c801a6b: "For å legge til tilknytta emne, må 'Blueprint-emne - legg til / endre / slett' og 'Emne - legg til / endre / slett' óg vere slått på."
+  to_add_associated_courses_blueprint_courses_add_ed_c1567d8a: "For å legge til tilknytta emne, må 'Blueprint-emne - legg til / endre / slett' og 'Emne - legg til' óg vere slått på."
   to_add_bulk_users_courses_and_enrollments_click_si_4395c26: "For å legge til fleire brukarar, emne, og påmeldingar, klikk på SIS importeringar."
   to_add_edit_or_delete_groups_groups_add_edit_delet_b826f547: "For å legge til, endre eller slette grupper må 'Grupper - legg til / endre / slette' òg vere slått på."
+  to_add_groups_groups_add_must_also_be_enabled_33680f91: "For å legge til grupper må \"Grupper - legg til\" vere slått på"
   to_add_individual_courses_click_courses_c5355180: "For å legge til individuelle emne, klikk på Emne."
   to_add_individual_users_click_people_4d6de56a: "For å legge til individuelle brukarar klikker du på Personar."
+  to_add_or_remove_a_student_to_or_from_a_course_the_a357b751: "For å legge til eller fjerne ein student i eit emne må løyve for \"Brukarar - Student\" vere slått på"
+  to_add_or_remove_a_student_to_or_from_a_course_the_b6001e67: "For å legge til eller fjerne ein student i eit emne må løyve for \"Brukarar - Student\" vere slått på"
+  to_add_or_remove_users_to_a_course_the_appropriate_139d5f3f: "For å legge til eller fjerne brukarar i eit emne må det naudsynte løyve vere slått på (f.eks Brukarar - Faglærar)"
   to_add_users_to_a_course_users_add_remove_students_5036ad25: "For å legge til brukarar i eit emne, må 'Brukarar - legg til / fjern studentar frå andre emne til dette emnet' og/eller 'Brukarar - legg til / fjern faglærarar, designarar eller undervisingsassitentar' òg vere slått på."
   to_add_users_to_a_course_users_add_remove_students_888b391e: |-
       For å legge brukarar til eit emne, må 'Brukarar - legg til / fjern studentar frå emne' og/eller 'Brukarar - legg til / fjern faglærarar, designarar eller undervisingsassistentar frå emne' òg vere slått på.
