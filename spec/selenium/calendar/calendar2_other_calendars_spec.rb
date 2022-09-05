@@ -1,0 +1,191 @@
+# frozen_string_literal: true
+
+#
+# Copyright (C) 2022 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+
+require_relative "../helpers/calendar2_common"
+require_relative "./pages/calendar_other_calendars_page"
+
+describe "calendar2" do
+  include_context "in-process server selenium tests"
+  include Calendar2Common
+  include CalendarOtherCalendarsPage
+
+  context "other calendars" do
+    before :once do
+      @root_account = Account.default
+      @subaccount1 = @root_account.sub_accounts.create!(name: "SA-1", account_calendar_visible: true)
+      @student = user_factory(active_all: true)
+      Account.site_admin.enable_feature!(:account_calendar_events)
+    end
+
+    before do
+      course_with_student_logged_in(user: @student, account: @subaccount1)
+    end
+
+    it "displays an empty state if there are no enabled accounts" do
+      @student.set_preference(:enabled_account_calendars, nil)
+
+      get "/calendar2"
+      expect(other_calendars_container).to be_displayed
+      expect(modal_empty_state).to be_displayed
+    end
+
+    it "displays accounts if the user has enabled them" do
+      @student.set_preference(:enabled_account_calendars, @subaccount1.id)
+      get "/calendar2"
+
+      account_calendar = other_calendars_context_labels
+      expect(other_calendars_container).to be_displayed
+      expect(account_calendar.first.text).to eq @subaccount1.name
+    end
+
+    it "displays a NEW pill to indicate the feature is new" do
+      @student.set_preference(:enabled_account_calendars, @subaccount1.id)
+      get "/calendar2"
+
+      expect(sidebar).to contain_css(".new-feature-pill")
+      open_other_calendars_modal
+      wait_for_ajaximations
+      modal_cancel_btn.click
+      driver.navigate.refresh
+      expect(sidebar).not_to contain_css(".new-feature-pill")
+    end
+
+    it "removes the account if the delete button is clicked" do
+      @student.set_preference(:enabled_account_calendars, @subaccount1.id)
+      get "/calendar2"
+
+      account_calendar = other_calendars_context_labels
+      expect(account_calendar.first.text).to eq @subaccount1.name
+
+      hover(other_calendars_context.first)
+      delete_calendar_btn.first.click
+
+      expect(flash_alert).to be_displayed
+      expect(flash_alert.text).to include "Calendar removed"
+      expect(modal_empty_state).to be_displayed
+      driver.navigate.refresh
+      expect(modal_empty_state).to be_displayed
+    end
+
+    it "does not show the account or its events if the account calendar is hidden" do
+      @subaccount2 = @root_account.sub_accounts.create!(name: "SA-2", account_calendar_visible: true)
+      course_with_student_logged_in(user: @student, account: @subaccount2)
+      event_title = "subaccount 1 event"
+      @subaccount1.calendar_events.create!(title: event_title, start_at: 2.days.from_now)
+
+      @student.set_preference(:enabled_account_calendars, [@subaccount1, @subaccount2])
+      user_session(@student)
+
+      get "/calendar2"
+      expect(other_calendars_container).to contain_css(context_list_item_selector(@subaccount1.id))
+      expect(calendar_body).to contain_css(calendar_event_selector)
+      assert_title(event_title, false)
+
+      @subaccount1.account_calendar_visible = false
+      @subaccount1.save!
+
+      driver.navigate.refresh
+      expect(other_calendars_container).not_to contain_css(context_list_item_selector(@subaccount1.id))
+      expect(calendar_body).not_to contain_css(calendar_event_selector)
+    end
+
+    it "does not show the other calendars section if there are no account calendars available for the user" do
+      @subaccount1.account_calendar_visible = false
+      @subaccount1.save!
+      user_session(@student)
+
+      get "/calendar2"
+      expect(sidebar).not_to contain_css(other_calendars_container_selector)
+      expect(sidebar).not_to include_text("OTHER CALENDARS")
+    end
+
+    context "Add other calendars modal" do
+      it "adds an account calendar to the list of other calendars and shows its events" do
+        account_admin_user(account: @subaccount1)
+        user_session(@admin)
+        event_title = "event of #{@subaccount1.name}"
+        @subaccount1.calendar_events.create!(title: event_title, start_at: 2.days.from_now)
+        get "/calendar2"
+        open_other_calendars_modal
+        select_other_calendar(@subaccount1.id)
+        click_modal_save_btn
+        wait_for_ajaximations
+        account_calendar = other_calendars_context_labels
+        expect(other_calendars_container).to be_displayed
+        expect(account_calendar.first.text).to eq @subaccount1.name
+        assert_title(event_title, false)
+      end
+
+      it "keeps added account calendars as selected context after refreshing the page" do
+        account_admin_user(account: @subaccount1)
+        user_session(@admin)
+        event_title = "event of #{@subaccount1.name}"
+        @subaccount1.calendar_events.create!(title: event_title, start_at: 2.days.from_now)
+        get "/calendar2"
+        open_other_calendars_modal
+        select_other_calendar(@subaccount1.id)
+        click_modal_save_btn
+        driver.navigate.refresh
+        expect(other_calendars_container).to be_displayed
+        expect(other_calendars_context_labels.first.text).to eq @subaccount1.name
+        assert_title(event_title, false)
+      end
+
+      it "adds multiple account calendars at once to the list of other calendars" do
+        @subaccount2 = @root_account.sub_accounts.create!(name: "SA-2", account_calendar_visible: true)
+        course_with_student_logged_in(user: @student, account: @subaccount2)
+        user_session(@student)
+        get "/calendar2"
+        open_other_calendars_modal
+        select_other_calendar(@subaccount1.id)
+        select_other_calendar(@subaccount2.id)
+        click_modal_save_btn
+        expect(other_calendars_container).to be_displayed
+        expect(other_calendars_context_labels.first.text).to eq @subaccount1.name
+        expect(other_calendars_context_labels.second.text).to eq @subaccount2.name
+      end
+
+      it "cancels account calendars selection" do
+        user_session(@student)
+        get "/calendar2"
+        open_other_calendars_modal
+        select_other_calendar(@subaccount1.id)
+        click_modal_cancel_btn
+        expect(other_calendars_container).not_to contain_css(context_list_item_selector(@subaccount1.id))
+      end
+
+      it "enables event creation for added account calendars" do
+        account_admin_user(account: @subaccount1)
+        user_session(@admin)
+        get "/calendar2"
+        event_title = "account event"
+        open_other_calendars_modal
+        select_other_calendar(@subaccount1.id)
+        click_modal_save_btn
+        close_flash_alert
+        open_create_new_event_modal
+        replace_content(edit_calendar_event_form_title, event_title)
+        click_option(edit_calendar_event_form_context, @subaccount1.name)
+        edit_calendar_event_form_submit_button.click
+        wait_for_ajaximations
+        assert_title(event_title, false)
+      end
+    end
+  end
+end
