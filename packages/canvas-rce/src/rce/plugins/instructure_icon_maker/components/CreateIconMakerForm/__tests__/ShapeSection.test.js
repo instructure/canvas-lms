@@ -17,10 +17,28 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, screen, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {DEFAULT_SETTINGS} from '../../../svg/constants'
 import {ShapeSection} from '../ShapeSection'
+import {createCroppedImageSvg} from '../ImageCropper/imageCropUtils'
+import {convertFileToBase64} from '../../../svg/utils'
+
+jest.mock('../ImageCropper/imageCropUtils', () => {
+  return {
+    createCroppedImageSvg: jest
+      .fn()
+      .mockImplementation(() => Promise.resolve({outerHTML: '<svg />'}))
+  }
+})
+
+jest.mock('../../../svg/utils', () => {
+  return {
+    convertFileToBase64: jest
+      .fn()
+      .mockImplementation(() => Promise.resolve('data:image/svg+xml;base64,PHN2Zaaaaaaaaa'))
+  }
+})
 
 function selectOption(button, option) {
   userEvent.click(
@@ -48,5 +66,32 @@ describe('<ShapeSection />', () => {
     render(<ShapeSection settings={{...DEFAULT_SETTINGS, size: 'small'}} onChange={onChange} />)
     selectOption(/icon size/i, /extra small/i)
     expect(onChange).toHaveBeenCalledWith({size: 'x-small'})
+  })
+
+  describe('when there is an embedded image', () => {
+    const settings = {
+      ...DEFAULT_SETTINGS,
+      shape: 'triangle',
+      imageSettings: {
+        cropperSettings: {}
+      }
+    }
+
+    it('recrops the embedded image', () => {
+      render(<ShapeSection settings={settings} onChange={() => {}} />)
+      expect(createCroppedImageSvg).toHaveBeenCalledWith({shape: 'triangle'})
+    })
+
+    it('sets the encoded image to the newly cropped base64 encoded image', async () => {
+      const onChange = jest.fn()
+      render(<ShapeSection settings={settings} onChange={onChange} />)
+      expect(convertFileToBase64).toHaveBeenCalled()
+      await waitFor(() =>
+        expect(onChange).toHaveBeenCalledWith({
+          payload: 'data:image/svg+xml;base64,PHN2Zaaaaaaaaa',
+          type: 'SetEncodedImage'
+        })
+      )
+    })
   })
 })

@@ -87,7 +87,8 @@ export const ImageCropperModal = ({
   image,
   message,
   cropSettings,
-  loading
+  loading,
+  trayDispatch
 }) => {
   const [settings, dispatch] = useReducer(cropperSettingsReducer, defaultState)
   useEffect(() => {
@@ -108,6 +109,7 @@ export const ImageCropperModal = ({
       onDismiss={onClose}
       onSubmit={e => {
         e.preventDefault()
+        trayDispatch({shape: settings.shape})
         handleSubmit(onSubmit, settings).then(onClose).catch(onClose)
       }}
       shouldCloseOnDocumentClick={false}
@@ -136,7 +138,8 @@ ImageCropperModal.propTypes = {
   open: PropTypes.bool,
   onClose: PropTypes.func,
   onSubmit: PropTypes.func,
-  loading: PropTypes.bool
+  loading: PropTypes.bool,
+  trayDispatch: PropTypes.func.isRequired
 }
 
 ImageCropperModal.defaultProps = {

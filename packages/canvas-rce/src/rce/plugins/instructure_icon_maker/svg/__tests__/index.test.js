@@ -61,6 +61,23 @@ describe('buildSvg()', () => {
         >
           <g
             fill="#000"
+          >
+            <clippath
+              id="clip-path-for-embed"
+            >
+              <circle
+                cx="109"
+                cy="109"
+                r="105"
+              />
+            </clippath>
+            <circle
+              cx="109"
+              cy="109"
+              r="105"
+            />
+          </g>
+          <g
             stroke="#fff"
             stroke-width="8"
           >
@@ -105,6 +122,23 @@ describe('buildSvg()', () => {
         >
           <g
             fill="none"
+          >
+            <clippath
+              id="clip-path-for-embed"
+            >
+              <circle
+                cx="109"
+                cy="109"
+                r="105"
+              />
+            </clippath>
+            <circle
+              cx="109"
+              cy="109"
+              r="105"
+            />
+          </g>
+          <g
             stroke="#fff"
             stroke-width="8"
           >
@@ -150,6 +184,23 @@ describe('buildSvg()', () => {
         >
           <g
             fill="#000"
+          >
+            <clippath
+              id="clip-path-for-embed"
+            >
+              <circle
+                cx="109"
+                cy="109"
+                r="105"
+              />
+            </clippath>
+            <circle
+              cx="109"
+              cy="109"
+              r="105"
+            />
+          </g>
+          <g
             stroke="#fff"
             stroke-width="8"
           >
@@ -252,91 +303,80 @@ describe('buildGroup()', () => {
     settings = {...DEFAULT_SETTINGS, color: '#f00', outlineColor: '#0f0', outlineSize: 'small'}
   })
 
-  it('builds the <g /> element when color is set', () => {
-    expect(buildGroup(settings)).toMatchInlineSnapshot(`
-      <g
-        fill="#f00"
-        stroke="#0f0"
-        stroke-width="2"
-      />
-    `)
-  })
-
-  it('builds the <g /> element when color is not set', () => {
-    settings = {...settings, color: null}
-    expect(buildGroup(settings)).toMatchInlineSnapshot(`
-      <g
-        fill="none"
-        stroke="#0f0"
-        stroke-width="2"
-      />
-    `)
-  })
-
-  it('builds the <g /> element when color is not set and is preview mode', () => {
-    settings = {...settings, color: null}
-    options = {...options, isPreview: true}
-    expect(buildGroup(settings, options)).toMatchInlineSnapshot(`
-      <g
-        fill="none"
-        stroke="#0f0"
-        stroke-width="2"
-      />
-    `)
-  })
-
-  it('builds the <g /> element when outlineColor is not set', () => {
-    settings = {...settings, outlineColor: null}
-    expect(buildGroup(settings)).toMatchInlineSnapshot(`
-      <g
-        fill="#f00"
-      />
-    `)
-  })
-
-  describe('when outlineSize is set', () => {
-    it('builds the <g /> element when outlineSize is "none"', () => {
-      settings = {...settings, outlineSize: 'none'}
-      expect(buildGroup(settings)).toMatchInlineSnapshot(`
+  describe('when fill is true', () => {
+    it('builds the fill <g /> element with color when color is set', () => {
+      expect(buildGroup(settings, {fill: true})).toMatchInlineSnapshot(`
         <g
           fill="#f00"
-          stroke="#0f0"
-          stroke-width="0"
         />
       `)
     })
 
-    it('builds the <g /> element when outlineSize is "small"', () => {
-      settings = {...settings, outlineSize: 'small'}
+    it('builds the fill <g /> element with none when color is not set', () => {
+      settings = {...settings, color: null}
+      expect(buildGroup(settings, {fill: true})).toMatchInlineSnapshot(`
+        <g
+          fill="none"
+        />
+      `)
+    })
+  })
+
+  describe('when fill is not true', () => {
+    it('builds the border <g /> element', () => {
       expect(buildGroup(settings)).toMatchInlineSnapshot(`
         <g
-          fill="#f00"
           stroke="#0f0"
           stroke-width="2"
         />
       `)
     })
 
-    it('builds the <g /> element when outlineSize is "medium"', () => {
-      settings = {...settings, outlineSize: 'medium'}
-      expect(buildGroup(settings)).toMatchInlineSnapshot(`
-        <g
-          fill="#f00"
-          stroke="#0f0"
-          stroke-width="4"
-        />
-      `)
+    it('builds the <g /> element when outlineColor is not set', () => {
+      settings = {...settings, outlineColor: null}
+      expect(buildGroup(settings)).toMatchInlineSnapshot(`<g />`)
     })
 
-    it('builds the <g /> element when outlineSize is "large"', () => {
-      settings = {...settings, outlineSize: 'large'}
-      expect(buildGroup(settings)).toMatchInlineSnapshot(`
-        <g
-          fill="#f00"
-          stroke="#0f0"
-          stroke-width="8"
-        />
-      `)
+    describe('when outlineSize is set', () => {
+      it('builds the border <g /> element when outlineSize is "none"', () => {
+        settings = {...settings, outlineSize: 'none'}
+        expect(buildGroup(settings)).toMatchInlineSnapshot(`
+          <g
+            stroke="#0f0"
+            stroke-width="0"
+          />
+        `)
+      })
+
+      it('builds the border <g /> element when outlineSize is "small"', () => {
+        settings = {...settings, outlineSize: 'small'}
+        expect(buildGroup(settings)).toMatchInlineSnapshot(`
+          <g
+            stroke="#0f0"
+            stroke-width="2"
+          />
+        `)
+      })
+
+      it('builds the border <g /> element when outlineSize is "medium"', () => {
+        settings = {...settings, outlineSize: 'medium'}
+        expect(buildGroup(settings)).toMatchInlineSnapshot(`
+          <g
+            stroke="#0f0"
+            stroke-width="4"
+          />
+        `)
+      })
+
+      it('builds the border <g /> element when outlineSize is "large"', () => {
+        settings = {...settings, outlineSize: 'large'}
+        expect(buildGroup(settings)).toMatchInlineSnapshot(`
+          <g
+            stroke="#0f0"
+            stroke-width="8"
+          />
+        `)
+      })
     })
   })
 })

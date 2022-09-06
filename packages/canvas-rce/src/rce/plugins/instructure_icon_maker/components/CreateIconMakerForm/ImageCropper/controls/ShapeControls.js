@@ -44,6 +44,7 @@ export const ShapeControls = ({shape, onChange}) => {
         value={shape}
         onChange={(event, {id}) => onChange(id)}
         renderLabel={null}
+        data-testid="shape-select-dropdown"
       >
         {SHAPE_OPTIONS.map(option => (
           <SimpleSelect.Option key={option.id} id={option.id} value={option.id}>

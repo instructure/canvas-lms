@@ -91,7 +91,7 @@ function renderImageActionButtons({mode, collectionOpen}, dispatch, setFocus, re
   )
 }
 
-export const ImageOptions = ({state, dispatch, rcsConfig}) => {
+export const ImageOptions = ({state, dispatch, rcsConfig, trayDispatch}) => {
   const [isImageActionFocused, setIsImageActionFocused] = useState(false)
   const imageActionRef = useCallback(
     el => {
@@ -135,6 +135,7 @@ export const ImageOptions = ({state, dispatch, rcsConfig}) => {
             cropSettings={state.cropperSettings}
             message={state.compressed ? getCompressionMessage() : null}
             loading={!image}
+            trayDispatch={trayDispatch}
           />
         )}
       </Flex.Item>
@@ -153,5 +154,6 @@ ImageOptions.propTypes = {
     compressed: PropTypes.bool.isRequired
   }).isRequired,
   dispatch: PropTypes.func.isRequired,
-  rcsConfig: PropTypes.object.isRequired
+  rcsConfig: PropTypes.object.isRequired,
+  trayDispatch: PropTypes.func.isRequired
 }
