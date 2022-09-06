@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import {mount} from 'enzyme'
 import {render, fireEvent} from '@testing-library/react'
 import AlignmentStatItem from '../AlignmentStatItem'
 
@@ -76,11 +77,17 @@ describe('AlignmentStatItem', () => {
   })
 
   it('displays info tooltip if type is artifact', () => {
-    const {getByText, getByTestId} = render(
+    const {getAllByText, getByTestId} = render(
       <AlignmentStatItem {...defaultProps({type: 'artifact'})} />
     )
     fireEvent.click(getByTestId('outcome-alignment-stat-info-icon'))
-    expect(getByText(/Outcomes may be aligned/)).toBeInTheDocument()
+    getAllByText(/Outcomes may be aligned/).forEach(text => expect(text).toBeInTheDocument())
+  })
+
+  it('ScreenReaderContent is available when tooltip is displayed', () => {
+    const tree = mount(<AlignmentStatItem {...defaultProps({type: 'artifact'})} />)
+    const screenReaderNode = tree.find('ScreenReaderContent')
+    expect(screenReaderNode.text()).toBe('Outcomes may be aligned to rubrics and quizzes')
   })
 
   it('does not display info tooltip if type is outcome', () => {

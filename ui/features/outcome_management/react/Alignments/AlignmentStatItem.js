@@ -23,6 +23,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {IconInfoLine} from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -57,26 +58,32 @@ const AlignmentStatItem = ({type, count, percent, average}) => {
     statDescription = I18n.t('Avg. Alignments per Artifact')
   }
 
-  const renderTooltip = () => (
-    <Tooltip
-      on={['click', 'hover', 'focus']}
-      color="primary"
-      renderTip={
-        <View as="div" width="12rem" textAlign="center">
-          <Text size="small">{I18n.t('Outcomes may be aligned to rubrics and quizzes')}</Text>
-        </View>
-      }
-    >
-      <div
-        style={{
-          fontSize: isMobileView ? '0.75rem' : '1rem',
-          padding: isMobileView ? '0 0 0.15rem 0.2rem' : '0 0 0.2rem 0.3rem'
-        }}
+  const renderTooltip = () => {
+    const tooltipText = I18n.t('Outcomes may be aligned to rubrics and quizzes')
+    return (
+      <Tooltip
+        on={['click', 'hover', 'focus']}
+        color="primary"
+        renderTip={
+          <View as="div" width="12rem" textAlign="center">
+            <Text size="small">{tooltipText}</Text>
+          </View>
+        }
       >
-        <IconInfoLine tabIndex="0" data-testid="outcome-alignment-stat-info-icon" />
-      </div>
-    </Tooltip>
-  )
+        <div
+          style={{
+            fontSize: isMobileView ? '0.75rem' : '1rem',
+            padding: isMobileView ? '0 0 0.15rem 0.2rem' : '0 0 0.2rem 0.3rem'
+          }}
+        >
+          <IconInfoLine tabIndex="0" data-testid="outcome-alignment-stat-info-icon" />
+          <div style={{position: 'relative'}}>
+            <ScreenReaderContent>{tooltipText}</ScreenReaderContent>
+          </div>
+        </div>
+      </Tooltip>
+    )
+  }
 
   return (
     <View
