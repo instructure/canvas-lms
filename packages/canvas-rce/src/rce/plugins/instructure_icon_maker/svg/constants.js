@@ -110,3 +110,5 @@ export const MAX_CHAR_COUNT = {
 export const MAX_TOTAL_TEXT_CHARS = 32
 
 export const TEXT_BACKGROUND_PADDING = 4
+
+export const ICON_PADDING = 4

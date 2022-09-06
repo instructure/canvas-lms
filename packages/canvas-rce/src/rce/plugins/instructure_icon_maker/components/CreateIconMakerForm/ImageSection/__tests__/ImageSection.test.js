@@ -212,20 +212,20 @@ describe('ImageSection', () => {
   })
 
   describe('calls onChange passing metadata when state prop changes', () => {
-    let getByTestId, getByText, getByTitle, getByRole, container
+    let getByTestId, getByText, getByTitle, container
 
     const lastPayloadOfActionType = (mockFn, type) =>
       mockFn.mock.calls.reverse().find(call => call[0].type === type)[0].payload
 
     beforeEach(() => {
       const rendered = subject({
-        rcsConfig: {features: {icon_maker_cropper: true}}
+        rcsConfig: {features: {icon_maker_cropper: true}},
+        settings: {size: Size.Small, shape: 'square'}
       })
 
       getByTestId = rendered.getByTestId
       getByText = rendered.getByText
       getByTitle = rendered.getByTitle
-      getByRole = rendered.getByRole
       container = rendered.container
     })
 
@@ -291,12 +291,11 @@ describe('ImageSection', () => {
         await act(async () => {
           jest.runOnlyPendingTimers()
         })
-        fireEvent.click(getByRole('button', {name: /crop image/i}))
-        await act(async () => {
-          jest.runOnlyPendingTimers()
-        })
         // Zooms in just to change cropper settings
         fireEvent.click(getByTestId('zoom-in-button'))
+        await waitFor(() =>
+          expect(document.querySelector('[data-cid="Modal"] [type="submit"]')).toBeInTheDocument()
+        )
         fireEvent.click(document.querySelector('[data-cid="Modal"] [type="submit"]'))
         await act(async () => {
           jest.runOnlyPendingTimers()
