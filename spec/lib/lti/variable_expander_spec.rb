@@ -853,6 +853,12 @@ module Lti
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq "$ToolProxyBinding.memberships.url"
         end
+
+        it "does not substitute $Context.sourcedId when the context is not a course" do
+          exp_hash = { test: "$Context.sourcedId" }
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq "$Context.sourcedId"
+        end
       end
 
       context "when launching from a group assignment" do

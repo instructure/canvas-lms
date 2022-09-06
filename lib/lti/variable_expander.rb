@@ -463,7 +463,8 @@ module Lti
     #   1234
     #   ```
     register_expansion "Context.sourcedId", [],
-                       -> { @context.sis_source_id }
+                       -> { @context.sis_source_id },
+                       COURSE_GUARD
 
     # Returns a string with a comma-separated list of the context ids of the
     # courses in reverse chronological order from which content has been copied.
