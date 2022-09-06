@@ -923,9 +923,11 @@ describe Types::UserType do
       end
 
       it "can retrieve submission comments" do
+        allow(InstStatsd::Statsd).to receive(:increment)
         query_result = teacher_type.resolve("viewableSubmissionsConnection { nodes { commentsConnection { nodes { comment }} }  }")
         expect(query_result[0].count).to eq 3
         expect(query_result[0]).to match_array ["First comment", "Second comment", "Third comment"]
+        expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.submission_comments.pages_loaded.react")
       end
 
       it "can get createdAt" do
