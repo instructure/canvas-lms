@@ -95,13 +95,17 @@ export default class FilePreview extends Component {
 
   renderThumbnail = (file, index) => {
     return (
-      <Button variant="icon" size="large" onClick={() => this.selectFile(index)}>
+      <IconButton
+        onClick={() => this.selectFile(index)}
+        size="large"
+        screenReaderLabel={file.displayName}
+        withBorder={false}
+      >
         <img
           alt={I18n.t('%{filename} preview', {filename: file.displayName})}
           src={file.thumbnailUrl}
         />
-        <ScreenReaderContent>{file.displayName}</ScreenReaderContent>
-      </Button>
+      </IconButton>
     )
   }
 
@@ -120,7 +124,6 @@ export default class FilePreview extends Component {
 
   renderFileIcons = () => {
     const cellTheme = {background: theme.variables.colors.backgroundLight}
-
     return (
       <Table caption={I18n.t('Uploaded files')} data-testid="uploaded_files_table">
         <Table.Head>
