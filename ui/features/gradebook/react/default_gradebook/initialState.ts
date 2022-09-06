@@ -19,7 +19,7 @@
 import studentRowHeaderConstants from './constants/studentRowHeaderConstants'
 import StudentDatastore from './stores/StudentDatastore'
 import type {InitialActionStates, CourseContent, ContentLoadStates} from './gradebook.d'
-import type {GridDisplaySettings} from './grid.d'
+import type {GridDisplaySettings, FilterColumnsOptions} from './grid.d'
 import {camelize} from 'convert-case'
 
 export function getInitialGradebookContent(options) {
@@ -38,13 +38,13 @@ export function getInitialGridDisplaySettings(settings, colors): GridDisplaySett
   const sortRowsByColumnId = settings.sort_rows_by_column_id || 'student'
   const sortRowsBySettingKey = settings.sort_rows_by_setting_key || 'sortable_name'
   const sortRowsByDirection = settings.sort_rows_by_direction || 'ascending'
-  const filterColumnsBy = {
+  const filterColumnsBy: FilterColumnsOptions = {
     assignmentGroupId: null,
     contextModuleId: null,
     gradingPeriodId: null,
     submissions: null,
-    start_date: null,
-    end_date: null
+    startDate: null,
+    endDate: null
   }
   if (settings.filter_columns_by != null) {
     Object.assign(filterColumnsBy, camelize(settings.filter_columns_by))

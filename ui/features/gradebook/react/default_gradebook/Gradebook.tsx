@@ -31,34 +31,36 @@ import type PerformanceControls from './PerformanceControls'
 import type {ActionMenuProps} from './components/ActionMenu'
 import type {
   Assignment,
-  AttachmentData,
   AssignmentDueDate,
   AssignmentGroup,
   AssignmentGroupMap,
   AssignmentMap,
+  AttachmentData,
+  Course,
+  EffectiveDueDateAssignmentUserMap,
+  Module,
+  Section,
+  SectionMap,
+  Student,
+  StudentGroup,
+  StudentGroupCategory,
+  StudentGroupCategoryMap,
+  StudentGroupMap,
+  StudentMap,
+  Submission,
+  SubmissionCommentData,
+  UserSubmissionGroup
+} from '../../../../api.d'
+import type {
   ColumnSizeSettings,
   ContentLoadStates,
-  Course,
   CourseContent,
-  EffectiveDueDateAssignmentUserMap,
   Filter,
   FilteredContentInfo,
   FlashAlertType,
   GradebookOptions,
   GradingPeriodSet,
   InitialActionStates,
-  Module,
-  Section,
-  SectionMap,
-  Student,
-  StudentMap,
-  StudentGroup,
-  StudentGroupMap,
-  StudentGroupCategory,
-  StudentGroupCategoryMap,
-  Submission,
-  UserSubmissionGroup,
-  SubmissionCommentData,
   SubmissionFilterValue
 } from './gradebook.d'
 import type {GridColumn, GridData, GridDisplaySettings} from './grid.d'
@@ -148,6 +150,7 @@ import '@canvas/util/jquery/fixDialogButtons'
 import {
   compareAssignmentDueDates,
   confirmViewUngradedAsZero,
+  doesSubmissionNeedGrading,
   ensureAssignmentVisibility,
   findFilterValuesOfType,
   findSubmissionFilterValue,
@@ -1180,13 +1183,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
     const submissions = this.submissionStateMap.getSubmissions(assignment.id)
     const wasSubmitted = s => !['unsubmitted', 'deleted'].includes(s.workflow_state)
-    const isGraded = s => s.excused || (!!s.score && s.workflow_state === 'graded')
 
     return (
       submissionFilters.length === 0 ||
       submissionFilters.some(filter => {
         if (filter === 'has-ungraded-submissions') {
-          return submissions.some(s => wasSubmitted(s) && !isGraded(s))
+          return submissions.some(s => doesSubmissionNeedGrading(s))
         } else if (filter === 'has-submissions') {
           return submissions.some(wasSubmitted)
         } else {

@@ -18,6 +18,7 @@
 
 import StudentDatastore from './stores/StudentDatastore'
 import type {StatusColors} from './constants/colors'
+import type {AttachmentData, Section, StudentGroupCategoryMap, AssignmentGroup} from '../api.d'
 
 export type CourseSettingsType = {
   filter_speed_grader_by_student_group: boolean
@@ -97,160 +98,6 @@ export type GradebookOptions = {
   user_asset_string: string
 }
 
-export type Course = {
-  id: string
-}
-
-export type Enrollment = {
-  course_section_id: string
-  type: string
-  grades: {
-    html_url: string
-  }
-}
-
-export type Student = {
-  id: string
-  name: string
-  displayName: string
-  sortable_name: string
-  avatar_url: string
-  enrollments: Enrollment[]
-  loaded: boolean
-  initialized: boolean
-  isConcluded: boolean
-  total_grade: number
-} & {
-  // computed values
-  computed_current_score: number
-  computed_final_score: number
-  isInactive: boolean
-  cssClass: string
-  sections: string[]
-}
-
-export type StudentMap = {
-  [key: string]: Student
-}
-
-export type StudentGroup = Partial<
-  {
-    avatar_url: null | string
-    concluded: boolean
-    context_type: string
-    course_id: string
-    created_at: string
-    description: null | string
-    group_category_id: string
-    has_submission: boolean
-    id: string
-    is_public: boolean
-    join_level: string
-    leader: null | string
-    max_membership: null | string
-    members_count: string
-    name: string
-    role: null | string
-    sis_group_id: null | string
-    sis_import_id: null | string
-    storage_quota_mb: string
-  },
-  'id' | 'name'
->
-
-export type StudentGroupMap = {
-  [key: string]: StudentGroup
-}
-
-export type StudentGroupCategory = Partial<
-  {
-    allows_multiple_memberships: boolean
-    auto_leader: null | string
-    context_type: string
-    course_id: string
-    created_at: string
-    group_limit: null
-    groups: StudentGroup[]
-    id: string
-    is_member: boolean
-    name: string
-    protected: boolean
-    role: null | string
-    self_signup: null | string
-    sis_group_category_id: null | string
-    sis_import_id: null | string
-  },
-  'id' | 'name' | 'groups'
->
-
-export type StudentGroupCategoryMap = {
-  [key: string]: StudentGroupCategory
-}
-
-export type Assignment = {
-  id: string
-  name: string
-  assignment_id: string
-  user_id: string
-  hidden: boolean
-  anonymize_students: boolean
-  published: boolean
-  submission_types: string
-  assignment_group_id: string
-  module_ids: string[]
-  effectiveDueDates: EffectiveDueDateUserMap
-  inClosedGradingPeriod: boolean
-  grading_type: string
-  points_possible: number
-  omit_from_final_grade: boolean
-  only_visible_to_overrides: boolean
-  assignment_visibility: string[]
-  grading_standard_id: string | null
-  hasDownloadedSubmissions: boolean
-  overrides: any
-}
-
-export type AssignmentMap = {
-  [key: string]: Assignment
-}
-
-export type AssignmentGroup = {
-  id: string
-  name: string
-  position: number
-  group_weight: number
-  assignments: Assignment[]
-}
-
-export type AssignmentGroupMap = {
-  [key: string]: AssignmentGroup
-}
-
-export type Submission = {
-  attempt: number | null
-  user_id: string
-  assignment_id: string
-  submitted_at: string
-  gradingType: string
-  excused: boolean
-  hidden: boolean
-  rawGrade: string | null
-  grade: string | null
-  posted_at: string
-  assignment_visible: boolean
-}
-
-export type SubmissionCommentData = {
-  group_comment: 1 | 0
-  text_comment: string
-  attempt?: number
-}
-
-export type UserSubmissionGroup = {
-  user_id: string
-  submissions: Submission[]
-}
-
 export type CourseContent = {
   contextModules: any[]
   courseGradingScheme: {
@@ -297,21 +144,6 @@ export type FlashAlertType = {
   key: string
   message: string
   variant: string
-}
-
-export type Module = {
-  id: string
-  name: string
-  position: number
-}
-
-export type Section = {
-  id: string
-  name: string
-}
-
-export type SectionMap = {
-  [key: string]: Section
 }
 
 export type FilterType =
@@ -379,20 +211,6 @@ export type GradebookFilterApiResponseFilter = {
   updated_at: string
 }
 
-export type AssignmentDueDate = {
-  due_at: string
-  grading_period_id: string | null
-  in_closed_grading_period: boolean
-}
-
-export type EffectiveDueDateUserMap = {
-  [user_id: string]: AssignmentDueDate
-}
-
-export type EffectiveDueDateAssignmentUserMap = {
-  [assignment_id: string]: EffectiveDueDateUserMap
-}
-
 export type GradingPeriod = {
   id: string
   title: string
@@ -407,16 +225,6 @@ export type GradingPeriodSet = {
 
 export type ColumnSizeSettings = {
   [key: string]: string
-}
-
-export type AttachmentData = {
-  attachment: Attachment
-}
-
-export type Attachment = {
-  id: string
-  updated_at: string
-  created_at: string
 }
 
 export type Lti = {

@@ -18,21 +18,86 @@
 
 import {
   confirmViewUngradedAsZero,
-  getStudentGradeForColumn,
-  getGradeAsPercent,
-  onGridKeyDown,
-  getDefaultSettingKeyForColumnType,
-  sectionList,
-  getCustomColumnId,
+  doesSubmissionNeedGrading,
+  doFiltersMatch,
+  findFilterValuesOfType,
   getAssignmentColumnId,
   getAssignmentGroupColumnId,
-  findFilterValuesOfType,
-  doFiltersMatch
+  getCustomColumnId,
+  getDefaultSettingKeyForColumnType,
+  getGradeAsPercent,
+  getStudentGradeForColumn,
+  onGridKeyDown,
+  sectionList
 } from '../Gradebook.utils'
 import {isDefaultSortOrder, localeSort} from '../Gradebook.sorting'
 import {createGradebook} from './GradebookSpecHelper'
 import {fireEvent, screen, waitFor} from '@testing-library/dom'
 import type {FilterPreset} from '../gradebook.d'
+import type {Submission} from '../../../../../api.d'
+
+const unsubmittedSubmission: Submission = {
+  anonymous_id: 'dNq5T',
+  assignment_id: '32',
+  attempt: 1,
+  cached_due_date: null,
+  drop: undefined,
+  entered_grade: null,
+  entered_score: null,
+  excused: false,
+  grade: null,
+  gradeLocked: false,
+  grade_matches_current_submission: true,
+  gradingType: 'points',
+  grading_period_id: '2',
+  has_postable_comments: false,
+  hidden: false,
+  id: '160',
+  late: false,
+  late_policy_status: null,
+  missing: false,
+  points_deducted: null,
+  posted_at: null,
+  rawGrade: null,
+  redo_request: false,
+  score: null,
+  seconds_late: 0,
+  submission_type: 'online_text_entry',
+  submitted_at: new Date(),
+  url: null,
+  user_id: '28',
+  workflow_state: 'unsubmitted'
+}
+
+const ungradedSubmission: Submission = {
+  ...unsubmittedSubmission,
+  attempt: 1,
+  workflow_state: 'submitted'
+}
+
+const zeroGradedSubmission: Submission = {
+  ...unsubmittedSubmission,
+  attempt: 1,
+  entered_grade: '0',
+  entered_score: 0,
+  grade: '0',
+  grade_matches_current_submission: true,
+  rawGrade: '0',
+  score: 0,
+  workflow_state: 'graded'
+}
+
+const gradedSubmission: Submission = {
+  ...unsubmittedSubmission,
+  attempt: 1,
+  entered_grade: '5',
+  entered_score: 5,
+  grade: '5',
+  grade_matches_current_submission: true,
+  rawGrade: '5',
+  score: 5,
+  workflow_state: 'graded'
+}
 
 describe('getGradeAsPercent', () => {
   it('returns a percent for a grade with points possible', () => {
@@ -217,16 +282,12 @@ describe('getDefaultSettingKeyForColumnType', () => {
   it('relies on localeSort when rows have equal sorting criteria results', () => {
     const gradebook = createGradebook()
     gradebook.gridData.rows = [
-      // @ts-expect-error
       {id: '3', sortable_name: 'Z Lastington', someProperty: false},
-      // @ts-expect-error
       {id: '4', sortable_name: 'A Firstington', someProperty: true}
     ]
 
     const value = 0
-    // @ts-expect-error
     gradebook.gridData.rows[0].someProperty = value
-    // @ts-expect-error
     gradebook.gridData.rows[1].someProperty = value
     const sortFn = row => row.someProperty
     gradebook.sortRowsWithFunction(sortFn)
@@ -348,5 +409,23 @@ describe('doFiltersMatch', () => {
 
   it('returns true if filter conditions are the same', () => {
     expect(doFiltersMatch(filterPreset[1].filters, filterPreset[2].filters)).toStrictEqual(true)
+  })
+})
+
+describe('doesSubmissionNeedGrading', () => {
+  it('unsubmitted submission does not need grading', () => {
+    expect(doesSubmissionNeedGrading(unsubmittedSubmission)).toStrictEqual(false)
+  })
+
+  it('submitted but ungraded submission needs grading', () => {
+    expect(doesSubmissionNeedGrading(ungradedSubmission)).toStrictEqual(true)
+  })
+
+  it('zero-graded submission does not need grading', () => {
+    expect(doesSubmissionNeedGrading(zeroGradedSubmission)).toStrictEqual(false)
+  })
+
+  it('none-zero graded submission does not needs grading', () => {
+    expect(doesSubmissionNeedGrading(gradedSubmission)).toStrictEqual(false)
   })
 })
