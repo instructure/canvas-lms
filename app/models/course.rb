@@ -4130,27 +4130,31 @@ class Course < ActiveRecord::Base
     available? && valid_workflow_states.include?(workflow_state_before_last_save)
   end
 
-  def log_course_pacing_publish_update
-    return unless publishing?
+  def unpublishing?
+    workflow_state_before_last_save == "available" && workflow_state == "claimed"
+  end
 
+  def log_course_pacing_publish_update
     statsd_bucket = enable_course_paces? ? "paced" : "unpaced"
 
-    InstStatsd::Statsd.increment("course.#{statsd_bucket}.paced_courses")
+    if publishing?
+      InstStatsd::Statsd.increment("course.#{statsd_bucket}.paced_courses")
+    end
 
-    unless workflow_state_before_last_save == "created"
+    if unpublishing?
       InstStatsd::Statsd.decrement("course.#{statsd_bucket}.paced_courses")
     end
   end
 
   def log_course_format_publish_update
-    return unless publishing?
-
     statsd_bucket = enable_course_paces? ? "paced" : "unpaced"
     course_format_value = course_format.nil? ? "unset" : course_format
 
-    InstStatsd::Statsd.increment("course.#{statsd_bucket}.#{course_format_value}")
+    if publishing?
+      InstStatsd::Statsd.increment("course.#{statsd_bucket}.#{course_format_value}")
+    end
 
-    unless workflow_state_before_last_save == "created"
+    if unpublishing?
       InstStatsd::Statsd.decrement("course.#{statsd_bucket}.#{course_format_value}")
     end
   end
