@@ -49,7 +49,7 @@ module CalendarConferencesHelper
           conf.assign_attributes(valid_params)
         end
       end
-    elsif conference_params[:title].present?
+    else
       context.web_conferences.build(valid_params).tap do |conf|
         conf.user = @current_user
         conf.settings[:default_return_url] = named_context_url(context, :context_url, include_host: true)

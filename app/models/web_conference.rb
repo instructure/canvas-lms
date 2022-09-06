@@ -310,7 +310,9 @@ class WebConference < ActiveRecord::Base
     self.conference_type ||= config && config[:conference_type]
     self.context_code = "#{context_type.underscore}_#{context_id}" rescue nil
     self.added_user_ids ||= ""
-    self.title ||= context.is_a?(Course) ? t("#web_conference.default_name_for_courses", "Course Web Conference") : t("#web_conference.default_name_for_groups", "Group Web Conference")
+    if title.blank?
+      self.title = context.is_a?(Course) ? t("#web_conference.default_name_for_courses", "Course Web Conference") : t("#web_conference.default_name_for_groups", "Group Web Conference")
+    end
     self.start_at ||= self.started_at
     self.end_at ||= ended_at
     self.end_at ||= self.start_at + duration.minutes if self.start_at && duration
