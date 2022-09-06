@@ -138,7 +138,7 @@ class AssignmentsController < ApplicationController
     js_env({
              peer_review_mode_enabled: submission.present? && peer_review_mode_enabled,
              peer_review_available: submission.present? && submission.submitted? && current_user_submission.present? && current_user_submission.submitted?,
-             peer_display_name: @assignment.anonymous_peer_reviews? ? I18n.t("Anonymous student") : submission.user.name,
+             peer_display_name: @assignment.anonymous_peer_reviews? ? I18n.t("Anonymous student") : submission&.user&.name,
              originality_reports_for_a2_enabled: Account.site_admin.feature_enabled?(:originality_reports_for_a2)
            })
 
