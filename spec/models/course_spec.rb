@@ -7387,13 +7387,34 @@ describe Course do
         @course.enable_course_paces = true
         @course.save!
         @course.offer!
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.paced_courses").once
 
         @course.enable_course_paces = false
         @course.save!
 
-        expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.paced_courses").once
         expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.paced_courses").once
         expect(InstStatsd::Statsd).to have_received(:decrement).with("course.paced.paced_courses").once
+      end
+
+      it "increments and decrements the appropriate bucket when republishing" do
+        @course.enable_course_paces = true
+        @course.save!
+        @course.offer!
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.paced_courses").once
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.unpaced.paced_courses")
+        expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course.paced.paced_courses")
+
+        @course.claim!
+
+        expect(InstStatsd::Statsd).to have_received(:decrement).with("course.paced.paced_courses").once
+        expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course.unpaced.paced_courses")
+
+        @course.enable_course_paces = false
+        @course.save!
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.unpaced.paced_courses")
+        @course.offer!
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.paced_courses").once
+        expect(InstStatsd::Statsd).not_to have_received(:decrement).with("course.unpaced.paced_courses")
       end
     end
 
@@ -7543,6 +7564,17 @@ describe Course do
 
         expect(InstStatsd::Statsd).to have_received(:decrement).with("course.paced.blended").once
         expect(InstStatsd::Statsd).to have_received(:increment).with("course.unpaced.unset").once
+      end
+
+      it "decrements the course format stat when unpublishing" do
+        @course.enable_course_paces = true
+        @course.course_format = "blended"
+        @course.save!
+        @course.offer!
+        expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.blended").once
+
+        @course.claim!
+        expect(InstStatsd::Statsd).to have_received(:decrement).with("course.paced.blended").once
       end
     end
   end
