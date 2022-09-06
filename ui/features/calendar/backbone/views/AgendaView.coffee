@@ -27,6 +27,7 @@ import ShowEventDetailsDialog from '../../jquery/ShowEventDetailsDialog'
 import template from '../../jst/agendaView.handlebars'
 import '../../fcMomentHandlebarsHelpers' # make sure fcMomentToString is available to agendaView.handlebars
 import 'jquery-tinypubsub'
+import userSettings from '@canvas/user-settings'
 
 I18n = useI18nScope('calendar')
 
@@ -57,6 +58,7 @@ export default class AgendaView extends Backbone.View
   constructor: ->
     super
     @dataSource = @options.dataSource
+    @contextObjects = @options.contextObjects
     @viewingGroup = null
 
     $.subscribe
@@ -132,6 +134,9 @@ export default class AgendaView extends Backbone.View
     currentIndex = -1 #Default currentIndex to be -1 just in case we don't find any event.
     @collection.forEach((val, index, list) => currentIndex = index if val.id == eventId)
     event = @dataSource.eventWithId(eventId)
+    if event.can_change_context
+      allowedContexts = userSettings.get('checked_calendar_codes') || _.pluck(@contextObjects, 'asset_string')
+      event.allPossibleContexts = _.filter @contextObjects, (c) -> _.include allowedContexts, c.asset_string
     new ShowEventDetailsDialog(event, @dataSource).show e
 
   handleNewEvent: (e) ->
