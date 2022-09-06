@@ -46,17 +46,19 @@ export type GridData = {
   rows: Student[]
 }
 
+export type FilterColumnsOptions = {
+  assignmentGroupId: null | string
+  contextModuleId: null | string
+  gradingPeriodId: null | string
+  submissions: null | 'has-ungraded-submissions' | 'has-submissions'
+  startDate: null | string
+  endDate: null | string
+}
+
 export type GridDisplaySettings = {
   colors: StatusColors
   enterGradesAs: string
-  filterColumnsBy: {
-    assignmentGroupId: null | string
-    contextModuleId: null | string
-    gradingPeriodId: null | string
-    submissions: null | 'has-ungraded-submissions' | 'has-submissions'
-    startDate: null | string
-    endDate: null | string
-  }
+  filterColumnsBy: FilterColumnsOptions
   filterRowsBy: {sectionId: null; studentGroupId: null}
   hideTotal: boolean
   selectedPrimaryInfo: string

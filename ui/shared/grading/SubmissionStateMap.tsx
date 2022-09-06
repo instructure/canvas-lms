@@ -18,8 +18,25 @@
 
 import _ from 'underscore'
 import GradingPeriodsHelper from './GradingPeriodsHelper'
+import type {Assignment, Student, Submission} from '../../api.d'
 
-function submissionGradingPeriodInformation(assignment, student) {
+type Cell = {
+  locked: boolean
+  hideGrade: boolean
+  inNoGradingPeriod?: boolean
+  inOtherGradingPeriod?: boolean
+  inClosedGradingPeriod?: boolean
+}
+
+type StudentSubmissionCellMap = {[studentId: string]: SubmissionCellMap}
+
+type SubmissionCellMap = {[assignmentId: string]: Cell}
+
+type StudentSubmissionMap = {
+  [studentId: string]: Submission
+}
+
+function submissionGradingPeriodInformation(assignment: Assignment, student: Submission) {
   const submissionInfo = assignment.effectiveDueDates[student.id] || {}
   return {
     gradingPeriodID: submissionInfo.grading_period_id,
@@ -27,7 +44,7 @@ function submissionGradingPeriodInformation(assignment, student) {
   }
 }
 
-function hiddenFromStudent(assignment, student) {
+function hiddenFromStudent(assignment: Assignment, student: Student) {
   if (assignment.only_visible_to_overrides) {
     return !_.includes(assignment.assignment_visibility, student.id)
   }
@@ -77,12 +94,12 @@ function cellMappingsForMultipleGradingPeriods(
 }
 
 function cellMapForSubmission(
-  assignment,
-  student,
-  hasGradingPeriods,
-  selectedGradingPeriodID,
-  isAdmin
-) {
+  assignment: Assignment,
+  student: Student,
+  hasGradingPeriods: boolean,
+  selectedGradingPeriodID: string,
+  isAdmin: boolean
+): Cell {
   if (!assignment.published || assignment.anonymize_students) {
     return {locked: true, hideGrade: true}
   } else if (assignment.moderated_grading && !assignment.grades_published) {
@@ -118,6 +135,16 @@ function missingSubmission(student, assignment) {
 }
 
 class SubmissionStateMap {
+  hasGradingPeriods: boolean
+
+  isAdmin: boolean
+
+  submissionMap: {[studentId: string]: StudentSubmissionMap}
+
+  selectedGradingPeriodID?: string
+
+  submissionCellMap: StudentSubmissionCellMap
+
   constructor({hasGradingPeriods, selectedGradingPeriodID, isAdmin}) {
     this.hasGradingPeriods = hasGradingPeriods
     this.selectedGradingPeriodID = selectedGradingPeriodID
@@ -139,30 +166,36 @@ class SubmissionStateMap {
   setSubmissionCellState(student, assignment, submission) {
     this.submissionMap[student.id][assignment.id] =
       submission || missingSubmission(student, assignment)
-    const params = [
+
+    if (!this.selectedGradingPeriodID) {
+      throw new Error('selectedGradingPeriodID is required')
+    }
+
+    this.submissionCellMap[student.id][assignment.id] = cellMapForSubmission(
       assignment,
       student,
       this.hasGradingPeriods,
       this.selectedGradingPeriodID,
       this.isAdmin
-    ]
-
-    this.submissionCellMap[student.id][assignment.id] = cellMapForSubmission(...params)
+    )
   }
 
-  getSubmission(userId, assignmentId) {
+  getSubmission(userId: string, assignmentId: string) {
     return (this.submissionMap[userId] || {})[assignmentId]
   }
 
-  getSubmissions(assignmentId) {
+  getSubmissions(assignmentId: string): Submission[] {
     const submissionsByStudent = Object.values(this.submissionMap)
-    return submissionsByStudent.reduce((accumulator, submissionsByUserId) => {
-      const submissions = Object.values(submissionsByUserId).filter(
-        submission => submission.assignment_id === assignmentId
-      )
-      accumulator = [...accumulator, ...submissions]
-      return accumulator
-    }, [])
+    return submissionsByStudent.reduce(
+      (accumulator: Submission[], submissionsByUserId: StudentSubmissionMap) => {
+        const submissions = Object.values(submissionsByUserId).filter(
+          submission => submission.assignment_id === assignmentId
+        )
+        accumulator = [...accumulator, ...submissions]
+        return accumulator
+      },
+      []
+    )
   }
 
   getSubmissionState({user_id: userId, assignment_id: assignmentId}) {

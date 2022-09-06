@@ -19,7 +19,7 @@
 import {GetState, SetState} from 'zustand'
 // @ts-ignore
 import {useScope as useI18nScope} from '@canvas/i18n'
-import type {Module} from '../gradebook.d'
+import type {Module} from '../../../../../api.d'
 import type {GradebookStore} from './index'
 
 const I18n = useI18nScope('gradebook')
@@ -50,7 +50,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): M
       })
       .catch(() => {
         set({
-          filters: [],
+          filterPresets: [],
           isFiltersLoading: false,
           flashMessages: get().flashMessages.concat([
             {

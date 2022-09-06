@@ -24,24 +24,26 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'lodash'
 import htmlEscape from 'html-escape'
 import type {
-  Assignment,
-  AssignmentGroup,
   Filter,
   FilterType,
   FilterPreset,
   GradebookFilterApiRequest,
   GradebookFilterApiResponse,
   GradingPeriod,
-  Module,
   PartialFilterPreset,
+  SubmissionFilterValue
+} from './gradebook.d'
+import type {
+  Assignment,
+  AssignmentGroup,
+  Module,
   Section,
   SectionMap,
   StudentGroup,
   StudentGroupCategory,
   StudentGroupCategoryMap,
-  Submission,
-  SubmissionFilterValue
-} from './gradebook.d'
+  Submission
+} from '../../../../api.d'
 import filterTypes from './constants/filterTypes'
 
 const I18n = useI18nScope('gradebook')
@@ -314,4 +316,17 @@ export function doFiltersMatch(filters1: Filter[], filters2: Filter[]) {
       filtersWithValues2.some(c2 => c2.type === c1.type && c2.value === c1.value)
     )
   )
+}
+
+// logic taken from needs_grading_conditions in submission.rb
+export function doesSubmissionNeedGrading(s: Submission) {
+  if (s.excused) return false
+
+  if (s.workflow_state === 'pending_review') return true
+
+  if (!['submitted', 'graded'].includes(s.workflow_state)) return false
+
+  if (!s.grade_matches_current_submission) return true
+
+  return typeof s.score !== 'number'
 }
