@@ -1958,6 +1958,21 @@ describe CalendarEventsApiController, type: :request do
         expect(conference.user).to eq @user
       end
 
+      it "does not fail with blank titles" do
+        json = api_call(:post, "/api/v1/calendar_events.json", {
+                          controller: "calendar_events_api", action: "create", format: "json"
+                        }, {
+                          calendar_event: {
+                            context_code: "course_#{@course.id}",
+                            title: "",
+                            web_conference: { conference_type: "BigBlueButton", title: "" }
+                          }
+                        })
+        conference = CalendarEvent.find(json["id"]).web_conference
+        expect(conference.settings[:default_return_url]).to match(%r{/courses/#{@course.id}$})
+        expect(conference.user).to eq @user
+      end
+
       it "fails to create with invald web_conference" do
         json = api_call(:post, "/api/v1/calendar_events.json", {
                           controller: "calendar_events_api", action: "create", format: "json"
