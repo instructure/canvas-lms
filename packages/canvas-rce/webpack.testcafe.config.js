@@ -23,37 +23,38 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(js|ts|jsx)$/,
+        test: /\.(js|ts|jsx|tsx)$/,
         exclude: /node_modules/,
         loader: 'babel-loader',
         options: {
-          plugins: ['@babel/plugin-proposal-class-properties']
-        }
+          plugins: ['@babel/plugin-proposal-class-properties'],
+          presets: [['@babel/preset-react'], ['@babel/preset-typescript']],
+        },
       },
       {test: /(\.css$)/, include: /node_modules/, loaders: ['style-loader', 'css-loader']},
-      {test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000'}
+      {test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000'},
     ],
     noParse: [
-      /i18nliner\/dist\/lib\/i18nliner/ // i18nLiner has a `require('fs')` that it doesn't actually need, ignore it.
-    ]
+      /i18nliner\/dist\/lib\/i18nliner/, // i18nLiner has a `require('fs')` that it doesn't actually need, ignore it.
+    ],
   },
   resolve: {
-    extensions: ['.ts', '.js']
+    extensions: ['.ts', '.js', '.tsx', '.jsx'],
   },
   plugins: [
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
       'process.env.DEBUG': JSON.stringify(process.env.DEBUG),
-      ENV: JSON.stringify(process.env.NODE_ENV)
-    })
+      ENV: JSON.stringify(process.env.NODE_ENV),
+    }),
   ],
   mode: 'development',
   entry: {
-    testcafe: [path.join(__dirname, 'testcafe', 'entry.js')]
+    testcafe: [path.join(__dirname, 'testcafe', 'entry.js')],
   },
   output: {
     path: path.join(__dirname, 'testcafe/build'),
     filename: '[name].js',
-    publicPath: path.join(__dirname, 'testcafe/build/')
-  }
+    publicPath: path.join(__dirname, 'testcafe/build/'),
+  },
 }

@@ -47,7 +47,7 @@ jest.mock('../../../../../shared/StoreContext', () => {
               unlock_at: null,
               lock_at: null,
               date: '2021-11-03T19:21:27Z',
-              uuid: 'E6uaQSJaQYl95XaVMnoqYU7bOlt0WepMsTB9MJ8b'
+              uuid: 'E6uaQSJaQYl95XaVMnoqYU7bOlt0WepMsTB9MJ8b',
             },
             {
               id: 716,
@@ -64,7 +64,7 @@ jest.mock('../../../../../shared/StoreContext', () => {
               unlock_at: null,
               lock_at: null,
               date: '2021-10-27T21:49:19Z',
-              uuid: '9zLFcMIFlNPVtkTHulDGRS1bhiBg8hsL0ms6VeMt'
+              uuid: '9zLFcMIFlNPVtkTHulDGRS1bhiBg8hsL0ms6VeMt',
             },
             {
               id: 715,
@@ -81,26 +81,26 @@ jest.mock('../../../../../shared/StoreContext', () => {
               unlock_at: null,
               lock_at: null,
               date: '2021-10-27T21:49:18Z',
-              uuid: 'rIlrdxCJ1h5Ff18Y4C6KJf7HIvCDn5ZAbtnVpNcw'
-            }
+              uuid: 'rIlrdxCJ1h5Ff18Y4C6KJf7HIvCDn5ZAbtnVpNcw',
+            },
           ],
           bookmark: 'bookmark',
           isLoading: false,
-          hasMore: false
-        }
+          hasMore: false,
+        },
       },
       contextType: 'Course',
       fetchInitialImages: jest.fn(),
-      fetchNextImages: jest.fn()
-    })
+      fetchNextImages: jest.fn(),
+    }),
   }
 })
 
 jest.mock('../../../../../../../bridge', () => {
   return {
     trayProps: {
-      get: () => ({foo: 'bar'})
-    }
+      get: () => ({foo: 'bar'}),
+    },
   }
 })
 
@@ -108,8 +108,8 @@ jest.mock('../../ImageCropper/imageCropUtils', () => {
   return {
     createCroppedImageSvg: () =>
       Promise.resolve({
-        outerHTML: '<svg />'
-      })
+        outerHTML: '<svg />',
+      }),
   }
 })
 
@@ -119,7 +119,7 @@ describe('ImageSection', () => {
     settings: {size: Size.Small},
     editing: false,
     editor: {},
-    onChange: jest.fn()
+    onChange: jest.fn(),
   }
 
   const subject = overrides => render(<ImageSection {...{...defaultProps, ...overrides}} />)
@@ -151,32 +151,32 @@ describe('ImageSection', () => {
 
     expect(defaultProps.onChange).toHaveBeenCalledWith({
       type: 'SetX',
-      payload: '50%'
+      payload: '50%',
     })
 
     expect(defaultProps.onChange).toHaveBeenCalledWith({
       type: 'SetY',
-      payload: '50%'
+      payload: '50%',
     })
 
     expect(defaultProps.onChange).toHaveBeenCalledWith({
       type: 'SetWidth',
-      payload: 75
+      payload: 75,
     })
 
     expect(defaultProps.onChange).toHaveBeenCalledWith({
       type: 'SetHeight',
-      payload: 75
+      payload: 75,
     })
 
     expect(defaultProps.onChange).toHaveBeenCalledWith({
       type: 'SetTranslateX',
-      payload: -37.5
+      payload: -37.5,
     })
 
     expect(defaultProps.onChange).toHaveBeenCalledWith({
       type: 'SetTranslateY',
-      payload: -37.5
+      payload: -37.5,
     })
   })
 
@@ -188,7 +188,7 @@ describe('ImageSection', () => {
 
       rendered = subject({
         editor: new FakeEditor(),
-        rcsConfig: {features: {icon_maker_cropper: false}}
+        rcsConfig: {features: {icon_maker_cropper: false}},
       })
       fireEvent.click(rendered.getByText('Add Image'))
     })
@@ -220,7 +220,7 @@ describe('ImageSection', () => {
     beforeEach(() => {
       const rendered = subject({
         rcsConfig: {features: {icon_maker_cropper: true}},
-        settings: {size: Size.Small, shape: 'square'}
+        settings: {size: Size.Small, shape: 'square'},
       })
 
       getByTestId = rendered.getByTestId
@@ -246,8 +246,8 @@ describe('ImageSection', () => {
               // Used to fetch url
               this.onloadend && this.onloadend()
             },
-            result: 'data:image/png;base64,asdfasdfjksdf=='
-          }))
+            result: 'data:image/png;base64,asdfasdfjksdf==',
+          })),
         })
       })
 
@@ -255,7 +255,7 @@ describe('ImageSection', () => {
         fetchMock.restore('http://canvas.docker/files/722/download?download_frd=1')
         Object.defineProperty(global, 'FileReader', {
           writable: true,
-          value: originalFileReader
+          value: originalFileReader,
         })
       })
 
@@ -307,7 +307,7 @@ describe('ImageSection', () => {
           rotation: 0,
           scaleRatio: 1.1,
           translateX: 0,
-          translateY: 0
+          translateY: 0,
         })
       })
     })
@@ -336,7 +336,7 @@ describe('ImageSection', () => {
         expect(container.querySelector('[name="single-color-image-fill"]')).toBeInTheDocument()
       })
       fireEvent.change(container.querySelector('[name="single-color-image-fill"]'), {
-        target: {value: '#00FF00'}
+        target: {value: '#00FF00'},
       })
       await act(async () => {
         jest.runOnlyPendingTimers()
@@ -354,7 +354,7 @@ describe('ImageSection', () => {
 
       rendered = subject({
         editor: new FakeEditor(),
-        rcsConfig: {features: {icon_maker_cropper: true}}
+        rcsConfig: {features: {icon_maker_cropper: true}},
       })
 
       fireEvent.click(rendered.getByText('Add Image'))
@@ -417,8 +417,8 @@ describe('ImageSection', () => {
             readAsDataURL() {
               this.onloadend()
             },
-            result: 'data:image/png;base64,asdfasdfjksdf=='
-          }))
+            result: 'data:image/png;base64,asdfasdfjksdf==',
+          })),
         })
 
         // Click the first image
@@ -429,7 +429,7 @@ describe('ImageSection', () => {
         fetchMock.restore('http://canvas.docker/files/722/download?download_frd=1')
         Object.defineProperty(global, 'FileReader', {
           writable: true,
-          value: originalFileReader
+          value: originalFileReader,
         })
       })
 
@@ -439,7 +439,7 @@ describe('ImageSection', () => {
         })
         expect(defaultProps.onChange).toHaveBeenCalledWith({
           type: 'SetEncodedImage',
-          payload: 'data:image/png;base64,asdfasdfjksdf=='
+          payload: 'data:image/png;base64,asdfasdfjksdf==',
         })
       })
 
@@ -449,7 +449,7 @@ describe('ImageSection', () => {
         })
         expect(defaultProps.onChange).toHaveBeenCalledWith({
           type: 'SetEncodedImageType',
-          payload: 'Course'
+          payload: 'Course',
         })
       })
 
@@ -459,7 +459,7 @@ describe('ImageSection', () => {
         })
         expect(defaultProps.onChange).toHaveBeenCalledWith({
           type: 'SetEncodedImageName',
-          payload: 'grid.png'
+          payload: 'grid.png',
         })
       })
     })
@@ -537,7 +537,7 @@ describe('ImageSection', () => {
         await waitFor(() => {
           expect(container.querySelector('[name="single-color-image-fill"]')).toBeInTheDocument()
           fireEvent.change(container.querySelector('[name="single-color-image-fill"]'), {
-            target: {value: '#00FF00'}
+            target: {value: '#00FF00'},
           })
         })
         await act(async () => {
@@ -564,10 +564,10 @@ describe('ImageSection', () => {
               settings: {
                 encodedImage: 'data:image/jpg;base64,asdfasdfjksdf==',
                 encodedImageType: 'Course',
-                encodedImageName: 'banana.jpg'
+                encodedImageName: 'banana.jpg',
               },
-              editing: true
-            }
+              editing: true,
+            },
           }}
         />
       )
@@ -584,10 +584,10 @@ describe('ImageSection', () => {
               settings: {
                 encodedImage: 'data:image/jpg;base64,asdfasdfjksdf==',
                 encodedImageType: 'Course',
-                encodedImageName: 'banana.jpg'
+                encodedImageName: 'banana.jpg',
               },
-              editing: true
-            }
+              editing: true,
+            },
           }}
         />
       )
@@ -609,11 +609,11 @@ describe('ImageSection', () => {
                 encodedImageName: 'banana.jpg',
                 imageSettings: {
                   mode: 'SingleColor',
-                  icon: 'art'
-                }
+                  icon: 'art',
+                },
               },
-              editing: true
-            }
+              editing: true,
+            },
           }}
         />
       )
@@ -636,11 +636,11 @@ describe('ImageSection', () => {
                 imageSettings: {
                   mode: 'SingleColor',
                   icon: 'art',
-                  iconFillColor: '#00FF00'
-                }
+                  iconFillColor: '#00FF00',
+                },
               },
-              editing: true
-            }
+              editing: true,
+            },
           }}
         />
       )
