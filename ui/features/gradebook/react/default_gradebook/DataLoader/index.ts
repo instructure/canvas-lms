@@ -20,7 +20,6 @@ import {difference} from 'lodash'
 
 import AssignmentGroupsLoader from './AssignmentGroupsLoader'
 import CustomColumnsDataLoader from './CustomColumnsDataLoader'
-import CustomColumnsLoader from './CustomColumnsLoader'
 import GradingPeriodAssignmentsLoader from './GradingPeriodAssignmentsLoader'
 import SisOverridesLoader from './SisOverridesLoader'
 import StudentContentDataLoader from './StudentContentDataLoader'
@@ -38,7 +37,6 @@ export default class DataLoader {
     }
     this.assignmentGroupsLoader = new AssignmentGroupsLoader(loaderConfig)
     this.customColumnsDataLoader = new CustomColumnsDataLoader(loaderConfig)
-    this.customColumnsLoader = new CustomColumnsLoader(loaderConfig)
     this.gradingPeriodAssignmentsLoader = new GradingPeriodAssignmentsLoader(loaderConfig)
     this.sisOverridesLoader = new SisOverridesLoader(loaderConfig)
     this.studentContentDataLoader = new StudentContentDataLoader(loaderConfig)
@@ -53,7 +51,6 @@ export default class DataLoader {
       gradebook,
       getAssignmentGroups: true,
       getModules: gradebook.options.has_modules,
-      getCustomColumns: true,
       getGradingPeriodAssignments: gradebook.gradingPeriodSet != null
     })
   }
@@ -125,10 +122,6 @@ export default class DataLoader {
       } else {
         dataLoader.assignmentGroupsLoader.loadAssignmentGroups()
       }
-    }
-
-    if (options.getCustomColumns) {
-      dataLoader.customColumnsLoader.loadCustomColumns()
     }
 
     await gotStudentIds

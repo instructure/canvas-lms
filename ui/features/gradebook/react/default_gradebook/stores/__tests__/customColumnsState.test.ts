@@ -19,13 +19,29 @@
 import PerformanceControls from '../../PerformanceControls'
 import {NetworkFake, setPaginationLinkHeader} from '@canvas/network/NetworkFake/index'
 import store from '../index'
+import type {CustomColumn} from '../../gradebook.d'
 
-const exampleData = {
-  contextModules: [{id: '2601'}, {id: '2602 '}, {id: '2603'}]
-}
+const exampleCustomColumns: CustomColumn[] = [
+  {
+    hidden: false,
+    id: '2401',
+    position: 0,
+    read_only: false,
+    teacher_notes: false,
+    title: 'Custom Column 1'
+  },
+  {
+    hidden: false,
+    id: '2402',
+    position: 1,
+    read_only: false,
+    teacher_notes: false,
+    title: 'Custom Column 2'
+  }
+]
 
-describe('modulesState', () => {
-  const url = '/api/v1/courses/1/modules'
+describe('customColumnsState', () => {
+  const url = '/api/v1/courses/1/custom_gradebook_columns'
   let network
 
   function getRequests() {
@@ -36,8 +52,8 @@ describe('modulesState', () => {
     network = new NetworkFake()
   })
 
-  it('sends a request to the context modules url', async () => {
-    store.getState().fetchModules()
+  it('sends a request to the custom columns url', async () => {
+    store.getState().fetchCustomColumns()
     await network.allRequestsReady()
     const requests = getRequests()
     expect(requests.length).toStrictEqual(1)
@@ -46,9 +62,9 @@ describe('modulesState', () => {
   describe('when sending the initial request', () => {
     it('sets the `per_page` parameter to the configured per page maximum', async () => {
       store.setState({
-        performanceControls: new PerformanceControls({contextModulesPerPage: 45})
+        performanceControls: new PerformanceControls({customColumnsPerPage: 45})
       })
-      store.getState().fetchModules()
+      store.getState().fetchCustomColumns()
       await network.allRequestsReady()
       const [{params}] = getRequests()
       expect(params.per_page).toStrictEqual('45')
@@ -57,11 +73,11 @@ describe('modulesState', () => {
 
   describe('when the first page resolves', () => {
     beforeEach(async () => {
-      store.getState().fetchModules()
+      store.getState().fetchCustomColumns()
       await network.allRequestsReady()
       const [{response}] = getRequests()
       setPaginationLinkHeader(response, {first: 1, current: 1, next: 2, last: 3})
-      response.setJson(exampleData.contextModules.slice(0, 1))
+      response.setJson(exampleCustomColumns.slice(0, 1))
       response.send()
       await network.allRequestsReady()
     })
@@ -95,38 +111,38 @@ describe('modulesState', () => {
 
   describe('when all pages have resolved', () => {
     beforeEach(async () => {
-      store.getState().fetchModules()
+      store.getState().fetchCustomColumns()
       await network.allRequestsReady()
 
       // Resolve the first page
       const [{response}] = getRequests()
       setPaginationLinkHeader(response, {first: 1, current: 1, next: 2, last: 3})
-      response.setJson(exampleData.contextModules.slice(0, 1))
+      response.setJson(exampleCustomColumns.slice(0, 1))
       response.send()
       await network.allRequestsReady()
 
       // Resolve the remaining pages
       const [request2, request3] = getRequests().slice(1)
       setPaginationLinkHeader(response, {first: 1, current: 1, next: 2, last: 3})
-      request2.response.setJson(exampleData.contextModules.slice(1, 2))
+      request2.response.setJson(exampleCustomColumns.slice(1, 2))
       request2.response.send()
 
       setPaginationLinkHeader(response, {first: 1, current: 1, next: 2, last: 3})
-      request3.response.setJson(exampleData.contextModules.slice(2, 3))
+      request3.response.setJson(exampleCustomColumns.slice(2, 3))
       request3.response.send()
     })
 
-    it('includes the loaded context modules when updating the gradebook', () => {
-      expect(store.getState().modules).toStrictEqual(exampleData.contextModules)
+    it('includes the loaded custom columns when updating the gradebook', () => {
+      expect(store.getState().customColumns).toStrictEqual(exampleCustomColumns)
     })
   })
 
   describe('if the first response does not link to the last page', () => {
     beforeEach(async () => {
-      store.getState().fetchModules()
+      store.getState().fetchCustomColumns()
       await network.allRequestsReady()
       const [{response}] = getRequests()
-      response.setJson(exampleData.contextModules.slice(0, 1))
+      response.setJson(exampleCustomColumns.slice(0, 1))
       response.send()
       await network.allRequestsReady()
     })

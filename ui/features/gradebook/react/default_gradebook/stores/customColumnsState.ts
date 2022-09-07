@@ -18,43 +18,47 @@
 
 import {GetState, SetState} from 'zustand'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import type {Module} from '../../../../../api.d'
+import type {CustomColumn} from '../gradebook.d'
 import type {GradebookStore} from './index'
 
 const I18n = useI18nScope('gradebook')
 
-export type ModulesState = {
-  modules: Module[]
-  isModulesLoading: boolean
-  fetchModules: () => Promise<any>
+export type CustomColumnsState = {
+  customColumns: CustomColumn[]
+  isCustomColumnsLoading: boolean
+  fetchCustomColumns: () => Promise<any>
 }
 
-export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): ModulesState => ({
-  modules: [],
+export default (
+  set: SetState<GradebookStore>,
+  get: GetState<GradebookStore>
+): CustomColumnsState => ({
+  customColumns: [],
 
-  isModulesLoading: false,
+  isCustomColumnsLoading: false,
 
-  fetchModules: () => {
+  fetchCustomColumns: () => {
     const dispatch = get().dispatch
     const courseId = get().courseId
-    const contextModulesPerPage = get().performanceControls.contextModulesPerPage
-
-    set({isModulesLoading: true})
-    const url = `/api/v1/courses/${courseId}/modules`
-    const params = {per_page: contextModulesPerPage}
+    set({isCustomColumnsLoading: true})
+    const url = `/api/v1/courses/${courseId}/custom_gradebook_columns`
+    const params = {
+      include_hidden: true,
+      per_page: get().performanceControls.customColumnsPerPage
+    }
     return dispatch
       .getDepaginated(url, params)
-      .then(modules => {
-        set({modules, isModulesLoading: false})
+      .then((customColumns: CustomColumn[]) => {
+        set({customColumns, isCustomColumnsLoading: false})
       })
       .catch(() => {
         set({
-          filterPresets: [],
-          isFiltersLoading: false,
+          customColumns: [],
+          isCustomColumnsLoading: false,
           flashMessages: get().flashMessages.concat([
             {
-              key: 'modules-loading-error',
-              message: I18n.t('There was an error fetching modules.'),
+              key: 'custom-columns-loading-error',
+              message: I18n.t('There was an error fetching custom columns.'),
               variant: 'error'
             }
           ])

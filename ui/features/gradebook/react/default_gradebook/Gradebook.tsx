@@ -57,6 +57,7 @@ import type {
   ColumnSizeSettings,
   ContentLoadStates,
   CourseContent,
+  CustomColumn,
   Filter,
   FilteredContentInfo,
   FlashAlertType,
@@ -222,6 +223,7 @@ type GradebookProps = {
   appliedFilters: Filter[]
   applyScoreToUngradedModalNode: HTMLElement
   colors: StatusColors
+  customColumns: CustomColumn[]
   dispatch: RequestDispatch
   filterNavNode: HTMLElement
   flashAlerts: FlashAlertType[]
@@ -232,6 +234,7 @@ type GradebookProps = {
   gradingPeriodsFilterContainer: HTMLElement
   gridColorNode: HTMLElement
   hideGrid?: false
+  isCustomColumnsLoading: boolean
   isFiltersLoading: boolean
   isModulesLoading: boolean
   modules: Module[]
@@ -360,7 +363,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   courseContent: CourseContent
 
   gradebookContent: {
-    customColumns: GridColumn[]
+    customColumns: CustomColumn[]
   }
 
   actionStates?: InitialActionStates
@@ -656,7 +659,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     assignment.assignment_visibility = filteredVisibility
   }
 
-  gotCustomColumns = columns => {
+  gotCustomColumns = (columns: CustomColumn[]) => {
     this.gradebookContent.customColumns = columns
     columns.forEach(column => {
       const customColumn = this.buildCustomColumn(column)
@@ -2497,7 +2500,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   // Custom Column
-  buildCustomColumn = (customColumn: GridColumn) => {
+  buildCustomColumn = (customColumn: CustomColumn) => {
     const columnId = getCustomColumnId(customColumn.id)
     return {
       id: columnId,
@@ -4696,11 +4699,21 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
     // Here we keep track of data loading states
     //   and filter changes until we use hooks
+
+    // modules
     if (
       prevProps.isModulesLoading !== this.props.isModulesLoading &&
       !this.props.isModulesLoading
     ) {
       this.updateContextModules(this.props.modules)
+    }
+
+    // custom columns
+    if (
+      prevProps.isCustomColumnsLoading !== this.props.isCustomColumnsLoading &&
+      !this.props.isCustomColumnsLoading
+    ) {
+      this.gotCustomColumns(this.props.customColumns)
     }
 
     const didAppliedFilterValuesChange =
