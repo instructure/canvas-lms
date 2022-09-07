@@ -64,9 +64,9 @@
         <span class="user_id student_review_id" style="display: none;"><%= student.id %></span>
       </a>
       <ul class="unstyled_list peer_reviews" style="padding-<%= direction('left') %>: 21px; font-size: 0.8em; width: 50%;">
-        <li class="peer_review no_requests_message" style="<%= hidden unless !submission || submission.assigned_assessments.empty? %>"><%= t :none_assigned, "None Assigned" %></li>
+        <li class="peer_review no_requests_message" style="<%= hidden unless !submission || submission.assigned_assessments.for_active_users(@context).empty? %>"><%= t :none_assigned, "None Assigned" %></li>
         <% if submission %>
-        <% Canvas::ICU.collate_by(submission.assigned_assessments) {|r| r.asset.user.sortable_name }.each do |request| %>
+        <% Canvas::ICU.collate_by(submission.assigned_assessments.for_active_users(@context)) {|r| r.asset.user.sortable_name }.each do |request| %>
           <% if (request && request.asset && request.asset.user) %>
             <%= render :partial => 'peer_review_assignment', :locals => {:request => request} %>
           <% end %>

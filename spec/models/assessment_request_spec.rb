@@ -234,4 +234,21 @@ describe AssessmentRequest do
       expect(assessment_request.available?).to eq false
     end
   end
+
+  describe "#for_active_users" do
+    it "excludes users that aren't active" do
+      course = @assignment.course
+      course.enrollments.find_by(user: @submission_student).destroy
+      user_ids = AssessmentRequest.for_active_users(course).pluck(:user_id)
+
+      expect(user_ids).not_to include @submission_student.id
+    end
+
+    it "includes users that are active" do
+      course = @assignment.course
+      user_ids = AssessmentRequest.for_active_users(course).pluck(:user_id)
+
+      expect(user_ids).to include @submission_student.id
+    end
+  end
 end
