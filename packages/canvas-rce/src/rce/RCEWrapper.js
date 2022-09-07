@@ -37,6 +37,7 @@ import normalizeLocale from './normalizeLocale'
 import {sanitizePlugins} from './sanitizePlugins'
 import {getCanvasUrl} from './getCanvasUrl'
 import RCEGlobals from './RCEGlobals'
+import defaultTinymceConfig from '../defaultTinymceConfig'
 
 import indicate from '../common/indicate'
 import bridge from '../bridge'
@@ -1470,6 +1471,7 @@ class RCEWrapper extends React.Component {
       : undefined
 
     const wrappedOpts = {
+      ...defaultTinymceConfig,
       ...options,
 
       readonly: this.props.readOnly,
@@ -1816,7 +1818,6 @@ class RCEWrapper extends React.Component {
         <div
           ref={this._editorPlaceholderRef}
           style={{
-            width: `${this.props.editorOptions.width}px`,
             height: `${this.props.editorOptions.height}px`,
             border: '1px solid grey'
           }}
