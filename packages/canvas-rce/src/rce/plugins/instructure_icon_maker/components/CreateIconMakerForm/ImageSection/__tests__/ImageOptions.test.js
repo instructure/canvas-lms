@@ -24,9 +24,9 @@ import {actions} from '../../../../reducers/imageSection'
 jest.mock('../../ImageCropper/imageCropUtils', () => ({
   createCroppedImageSvg: jest.fn(() =>
     Promise.resolve({
-      outerHTML: null
+      outerHTML: null,
     })
-  )
+  ),
 }))
 
 describe('ImageOptions', () => {
@@ -38,16 +38,16 @@ describe('ImageOptions', () => {
       mode: null,
       collectionOpen: false,
       cropperOpen: false,
-      loading: false
+      loading: false,
     },
     dispatch: dispatchFn,
     rcsConfig: {},
-    trayDispatch: () => {}
+    trayDispatch: () => {},
   }
 
   beforeAll(() => {
     global.fetch = jest.fn().mockResolvedValue({
-      blob: () => Promise.resolve(new Blob(['somedata'], {type: 'image/svg+xml'}))
+      blob: () => Promise.resolve(new Blob(['somedata'], {type: 'image/svg+xml'})),
     })
   })
 
@@ -81,8 +81,8 @@ describe('ImageOptions', () => {
           mode: 'Course',
           collectionOpen: false,
           cropperOpen: true,
-          loading: false
-        }
+          loading: false,
+        },
       })
     })
 
@@ -97,7 +97,7 @@ describe('ImageOptions', () => {
         fireEvent.click(document.querySelector('[data-cid="Modal"] [type="submit"]'))
         expect(dispatchFn.mock.calls[0][0]).toEqual({
           type: 'SetImage',
-          payload: 'data:image/svg+xml;base64,bnVsbA=='
+          payload: 'data:image/svg+xml;base64,bnVsbA==',
         })
       })
     })
@@ -113,8 +113,8 @@ describe('ImageOptions', () => {
             scaleRatio: 1,
             shape: 'square',
             translateX: 0,
-            translateY: 0
-          }
+            translateY: 0,
+          },
         })
       })
     })
@@ -127,7 +127,7 @@ describe('ImageOptions', () => {
       mode: 'Course',
       collectionOpen: false,
       cropperOpen: false,
-      loading: false
+      loading: false,
     }
 
     it('focuses Clear button when an image is selected', async () => {
@@ -165,12 +165,12 @@ describe('ImageOptions', () => {
       mode: 'Course',
       collectionOpen: false,
       cropperOpen: false,
-      loading: false
+      loading: false,
     }
 
     beforeEach(() => {
       const component = subject({
-        state: initialState
+        state: initialState,
       })
       getByText = component.getByText
       getByTestId = component.getByTestId
@@ -218,7 +218,7 @@ describe('ImageOptions', () => {
 
         expect(dispatchFn.mock.calls[0][0]).toEqual({
           type: 'SetCropperOpen',
-          payload: true
+          payload: true,
         })
       })
     })

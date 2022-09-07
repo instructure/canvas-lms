@@ -24,9 +24,9 @@ import userEvent from '@testing-library/user-event'
 jest.mock('../imageCropUtils', () => ({
   createCroppedImageSvg: jest.fn(() =>
     Promise.resolve({
-      outerHTML: null
+      outerHTML: null,
     })
-  )
+  ),
 }))
 
 describe('ImageCropperModal', () => {
@@ -41,13 +41,13 @@ describe('ImageCropperModal', () => {
       open: true,
       onSubmit: jest.fn(),
       image: 'data:image/png;base64,asdfasdfjksdf==',
-      trayDispatch: jest.fn()
+      trayDispatch: jest.fn(),
     }
   })
 
   beforeAll(() => {
     global.fetch = jest.fn().mockResolvedValue({
-      blob: () => Promise.resolve(new Blob(['somedata'], {type: 'image/svg+xml'}))
+      blob: () => Promise.resolve(new Blob(['somedata'], {type: 'image/svg+xml'})),
     })
   })
 
@@ -87,7 +87,7 @@ describe('ImageCropperModal', () => {
           scaleRatio: 1,
           shape: 'square',
           translateX: 0,
-          translateY: 0
+          translateY: 0,
         },
         'data:image/svg+xml;base64,bnVsbA=='
       )

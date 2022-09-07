@@ -37,5 +37,6 @@ export const DEFAULT_CROPPER_SETTINGS = {
   rotation: 0,
   scaleRatio: MIN_SCALE_RATIO,
   translateX: 0,
-  translateY: 0
+  translateY: 0,
+  direction: 0,
 }

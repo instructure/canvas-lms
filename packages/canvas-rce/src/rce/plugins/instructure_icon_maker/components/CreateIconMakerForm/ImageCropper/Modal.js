@@ -30,6 +30,7 @@ import {Controls} from './controls'
 import {convertFileToBase64} from '../../../svg/utils'
 import {createCroppedImageSvg} from './imageCropUtils'
 import {ImageCropperSettingsPropTypes} from './propTypes'
+import {DirectionRegion} from './DirectionRegion'
 
 const handleSubmit = (onSubmit, settings) =>
   createCroppedImageSvg(settings)
@@ -63,6 +64,7 @@ const renderBody = (settings, dispatch, message, loading) => {
       <Flex.Item>
         <Preview settings={settings} dispatch={dispatch} />
       </Flex.Item>
+      <DirectionRegion direction={settings.direction} />
     </Flex>
   )
 }
@@ -88,7 +90,7 @@ export const ImageCropperModal = ({
   message,
   cropSettings,
   loading,
-  trayDispatch
+  trayDispatch,
 }) => {
   const [settings, dispatch] = useReducer(cropperSettingsReducer, defaultState)
   useEffect(() => {
@@ -110,7 +112,10 @@ export const ImageCropperModal = ({
       onSubmit={e => {
         e.preventDefault()
         trayDispatch({shape: settings.shape})
-        handleSubmit(onSubmit, settings).then(onClose).catch(onClose)
+        // Direction is only used while in cropper and
+        // should not be embedded in the icon's metadata
+        const {direction, ...otherSettings} = settings
+        handleSubmit(onSubmit, otherSettings).then(onClose).catch(onClose)
       }}
       shouldCloseOnDocumentClick={false}
     >
@@ -139,7 +144,7 @@ ImageCropperModal.propTypes = {
   onClose: PropTypes.func,
   onSubmit: PropTypes.func,
   loading: PropTypes.bool,
-  trayDispatch: PropTypes.func.isRequired
+  trayDispatch: PropTypes.func.isRequired,
 }
 
 ImageCropperModal.defaultProps = {
@@ -148,5 +153,5 @@ ImageCropperModal.defaultProps = {
   message: null,
   loading: false,
   onClose: () => {},
-  onSubmit: () => {}
+  onSubmit: () => {},
 }

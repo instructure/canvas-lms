@@ -36,7 +36,8 @@ function useKeysEvents(
   setTempTranslateX,
   setTempTranslateY,
   isMoving,
-  setIsMoving
+  setIsMoving,
+  dispatch
 ) {
   // Refs that manage the keydown acceleration
   const direction = useRef(0)
@@ -56,6 +57,7 @@ function useKeysEvents(
       increment = Math.floor(elapsedTime.current / KEY_EVENT_STEP) + 1
     } else {
       direction.current = keyCode
+      dispatch({type: actions.UPDATE_SETTINGS, payload: {direction: keyCode}})
       elapsedTime.current = 0
     }
 
@@ -121,35 +123,32 @@ function useMouseEvents(
   const initialPageY = useRef(0)
   const mouseDown = useRef(false)
   const imgElement = useRef(null)
-  const containerElement = useRef(null)
 
   const stoppedMovingCallback = () => {
     mouseDown.current = false
     initialPageX.current = 0
     initialPageY.current = 0
 
-    imgElement.current.onmousemove = null
-    imgElement.current.onmouseup = null
-    imgElement.current = null
-
-    containerElement.current.onmouseout = null
-    containerElement.current = null
+    if (imgElement.current) {
+      imgElement.current.onmousemove = null
+      imgElement.current.onmouseup = null
+      imgElement.current = null
+    }
 
     setIsMoving(false)
   }
 
-  const startedMovingCallback = (target, clientX, clientY, container) => {
+  const startedMovingCallback = (target, clientX, clientY) => {
     mouseDown.current = true
     initialPageX.current = clientX
     initialPageY.current = clientY
 
     target.onmousemove = onMouseMoveCallback
     target.onmouseup = stoppedMovingCallback
-    imgElement.current = target
-
     // Should stop the movement when mouse leaves the preview
-    container.onmouseout = stoppedMovingCallback
-    containerElement.current = container
+    target.onmouseout = stoppedMovingCallback
+
+    imgElement.current = target
 
     setIsMoving(true)
   }
@@ -162,7 +161,7 @@ function useMouseEvents(
     setTempTranslateY(tempTranslateY + e.clientY - initialPageY.current)
   }
 
-  return (e, container) => startedMovingCallback(e.target, e.clientX, e.clientY, container)
+  return e => startedMovingCallback(e.target, e.clientX, e.clientY)
 }
 
 export function useKeyMouseEvents(translateX, translateY, dispatch, imgRef) {
@@ -194,7 +193,8 @@ export function useKeyMouseEvents(translateX, translateY, dispatch, imgRef) {
     setTempTranslateX,
     setTempTranslateY,
     isMoving,
-    setIsMoving
+    setIsMoving,
+    dispatch
   )
   const onMouseDownCallback = useMouseEvents(
     tempTranslateX,
