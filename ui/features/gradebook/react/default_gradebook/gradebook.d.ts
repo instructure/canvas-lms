@@ -333,3 +333,12 @@ export type GradebookStudent = Student & {
 export type GradebookStudentMap = {
   [studentId: string]: GradebookStudent
 }
+
+export type CustomColumn = {
+  hidden: boolean
+  id: string
+  position: number
+  read_only: boolean
+  teacher_notes: boolean
+  title: string
+}

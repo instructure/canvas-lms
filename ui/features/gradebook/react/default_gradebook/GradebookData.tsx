@@ -45,6 +45,10 @@ export default function GradebookData(props) {
   const isModulesLoading = useStore(state => state.isModulesLoading)
   const fetchModules = useStore(state => state.fetchModules)
 
+  const customColumns = useStore(state => state.customColumns, shallow)
+  const isCustomColumnsLoading = useStore(state => state.isCustomColumnsLoading)
+  const fetchCustomColumns = useStore(state => state.fetchCustomColumns)
+
   // Initial state
   // We might be able to do this in gradebook/index.tsx instead
   useEffect(() => {
@@ -73,9 +77,11 @@ export default function GradebookData(props) {
     if (props.gradebookEnv.has_modules) {
       fetchModules()
     }
+    fetchCustomColumns()
   }, [
     fetchFilters,
     fetchModules,
+    fetchCustomColumns,
     props.gradebookEnv.enhanced_gradebook_filters,
     props.gradebookEnv.has_modules,
     initializeStagedFilter,
@@ -92,6 +98,8 @@ export default function GradebookData(props) {
       isFiltersLoading={isFiltersLoading}
       isModulesLoading={isModulesLoading}
       modules={modules}
+      customColumns={customColumns}
+      isCustomColumnsLoading={isCustomColumnsLoading}
       // when the rest of DataLoader is moved we can remove these
       performanceControls={performanceControls.current}
       dispatch={dispatch.current}
