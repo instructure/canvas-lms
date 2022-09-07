@@ -112,14 +112,14 @@ export default class RSSFeedList extends React.Component {
                 <Button
                   id={`feed-row-${index}`}
                   className="external-rss-feed__delete-button"
-                  variant="icon"
+                  renderIcon={
+                    <IconXLine title={I18n.t('Delete %{feedName}', {feedName: display_name})} />
+                  }
                   onClick={() => this.deleteExternalFeed(id, index)}
                   offset="none"
                   size="small"
                   placement="end"
-                >
-                  <IconXLine title={I18n.t('Delete %{feedName}', {feedName: display_name})} />
-                </Button>
+                />
               </Grid.Col>
             </Grid.Row>
           </Grid>
