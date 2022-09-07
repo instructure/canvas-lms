@@ -65,7 +65,7 @@ const LongDescriptionDialog = ({open, close, longDescription}) => {
       onDismiss={close}
       size="medium"
       label={modalHeader}
-      shouldCloseOnDocumentClick
+      shouldCloseOnDocumentClick={true}
     >
       <Modal.Header>
         <CloseButton
@@ -175,7 +175,9 @@ export default class Criterion extends React.Component {
         />
       )
 
-    const pointsComment = () => <CommentText key="comment" assessment={assessment} weight="light" />
+    const pointsComment = () => (
+      <CommentText key="comment" assessment={assessment} weight="normal" />
+    )
 
     const summaryFooter = () => [pointsComment(), pointsElement()]
 
@@ -198,7 +200,7 @@ export default class Criterion extends React.Component {
 
     const ratingsFooter = () => {
       if (editingComments) {
-        return commentFocus ? <Dialog open>{commentRating}</Dialog> : commentRating
+        return commentFocus ? <Dialog open={true}>{commentRating}</Dialog> : commentRating
       }
     }
 
