@@ -442,10 +442,9 @@ class ContextModuleProgression < ActiveRecord::Base
     Shackles.activate(:master) do
       ContextModuleProgression.where(:id => progressions, :current => true).update_all(:current => false)
       User.where(:id => progressions.map(&:user_id)).touch_all
-
       progressions.each do |progression|
         progression.send_later_if_production_enqueue_args(:evaluate!,
-          {:n_strand => ["dependent_progression_reevaluation", context_module.global_context_id]}, self)
+          {:n_strand => ["dependent_progression_reevaluation", context_module.global_context_id]}, self.truncate(255))
       end
     end
   end
