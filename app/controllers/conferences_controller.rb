@@ -371,6 +371,7 @@ class ConferencesController < ApplicationController
                                                                     url: named_context_url(@context, :context_conference_url, @conference))
           end
         else
+          flash[:error] = t("errors.create_failed", "Conference creation failed")
           format.html { render :index }
           format.json { render json: @conference.errors, status: :bad_request }
         end
