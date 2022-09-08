@@ -58,18 +58,18 @@
   <% if @show_account_calendars %>
     <div id="select-other-calendars-component" class="rs-section"></div>
     <div class="rs-section">
+      <div id="other-calendars-section-header">
         <h2 tabindex="-1" id="other-calendar-actions-row">
           <span role="button" id="other-calendars-toggle-button"   class="element_toggler" aria-controls="other-calendars-list-holder"   aria-expanded="true"
             aria-label="<%= t("Other Calendars toggle list visibility") %>" tabindex="0">
             <i class="icon-mini-arrow-down auto_rotate"></i> <%= t(:other_calendars, "Other Calendars") %>
           </span>
-          <div class="manage-accounts-wrapper">
           <% if !@account_calendar_events_seen %>
           <div class="new-feature-pill"><%= t("New") %></div>
           <% end %>
-          <div id="manage-accounts-btn" />
-          </div>
         </h2>
+        <div id="manage-accounts-btn" ></div>
+      </div>
       <div id="other-calendars-list-holder" class="editable-list-holder"></div>
     </div>
   <% end %>
