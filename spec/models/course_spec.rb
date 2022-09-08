@@ -2893,14 +2893,6 @@ describe Course do
         expect(tab_ids).to be_include(Course::TAB_PEOPLE)
       end
 
-      it "doesn't include the people tab if it's a template" do
-        admin = account_admin_user
-        course = course_factory
-        course.update!(template: true)
-        tab_ids = course.tabs_available(admin).pluck(:id)
-        expect(tab_ids).not_to include(Course::TAB_PEOPLE)
-      end
-
       it "enables the home tab and puts it first if it was hidden" do
         @course.tab_configuration = [
           { id: Course::TAB_PEOPLE },
