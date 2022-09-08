@@ -26,6 +26,7 @@ import VideoConferenceTypeSelect from '../VideoConferenceTypeSelect/VideoConfere
 import BBBModalOptions from '../BBBModalOptions/BBBModalOptions'
 import BaseModalOptions from '../BaseModalOptions/BaseModalOptions'
 import {SETTINGS_TAB, ATTENDEES_TAB} from '../../../util/constants'
+import {Spinner} from '@instructure/ui-spinner'
 
 const I18n = useI18nScope('video_conference')
 
@@ -78,6 +79,7 @@ export const VideoConferenceModal = ({
   )
 
   const [showCalendarOptions, setShowCalendarOptions] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   // Detect initial state for address book display
   useEffect(() => {
@@ -160,7 +162,7 @@ export const VideoConferenceModal = ({
       as="form"
       open={open}
       onDismiss={onDismiss}
-      onSubmit={e => {
+      onSubmit={async e => {
         e.preventDefault()
         if (tab === ATTENDEES_TAB) {
           setTab(SETTINGS_TAB)
@@ -170,7 +172,9 @@ export const VideoConferenceModal = ({
           return
         }
 
-        onSubmit(e, {
+        setIsLoading(true)
+
+        const submitted = await onSubmit(e, {
           name,
           conferenceType,
           duration,
@@ -182,6 +186,10 @@ export const VideoConferenceModal = ({
           startCalendarDate,
           endCalendarDate
         })
+
+        if (!submitted) {
+          setIsLoading(false)
+        }
       }}
       size="auto"
       label={header}
@@ -199,11 +207,27 @@ export const VideoConferenceModal = ({
         {renderModalOptions()}
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={onDismiss} margin="0 x-small 0 0" data-testid="cancel-button">
+        <Button
+          disabled={isLoading}
+          onClick={onDismiss}
+          margin="0 x-small 0 0"
+          data-testid="cancel-button"
+        >
           {I18n.t('Cancel')}
         </Button>
-        <Button color="primary" type="submit" data-testid="submit-button">
-          {isEditing ? I18n.t('Save') : I18n.t('Create')}
+        <Button color="primary" type="submit" data-testid="submit-button" disabled={isLoading}>
+          {isLoading ? (
+            <div style={{display: 'inline-block', margin: '-0.5rem 0.9rem'}}>
+              <Spinner
+                renderTitle={isEditing ? I18n.t('Saving') : I18n.t('Creating')}
+                size="x-small"
+              />
+            </div>
+          ) : isEditing ? (
+            I18n.t('Save')
+          ) : (
+            I18n.t('Create')
+          )}
         </Button>
       </Modal.Footer>
     </Modal>
