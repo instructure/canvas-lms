@@ -36,7 +36,7 @@ type StudentSubmissionMap = {
   [studentId: string]: Submission
 }
 
-function submissionGradingPeriodInformation(assignment: Assignment, student: Submission) {
+function submissionGradingPeriodInformation(assignment: Assignment, student: Student) {
   const submissionInfo = assignment.effectiveDueDates[student.id] || {}
   return {
     gradingPeriodID: submissionInfo.grading_period_id,
@@ -51,7 +51,11 @@ function hiddenFromStudent(assignment: Assignment, student: Student) {
   return false
 }
 
-function gradingPeriodInfoForCell(assignment, student, selectedGradingPeriodID) {
+function gradingPeriodInfoForCell(
+  assignment: Assignment,
+  student: Student,
+  selectedGradingPeriodID: string
+) {
   const specificPeriodSelected = !GradingPeriodsHelper.isAllGradingPeriods(selectedGradingPeriodID)
   const {gradingPeriodID, inClosedGradingPeriod} = submissionGradingPeriodInformation(
     assignment,
@@ -118,7 +122,7 @@ function cellMapForSubmission(
   }
 }
 
-function missingSubmission(student, assignment) {
+function missingSubmission(student: Student, assignment: Assignment) {
   const submission = {
     assignment_id: assignment.id,
     user_id: student.id,
@@ -153,7 +157,7 @@ class SubmissionStateMap {
     this.submissionMap = {}
   }
 
-  setup(students, assignments) {
+  setup(students: Student[], assignments: Assignment[]) {
     students.forEach(student => {
       this.submissionCellMap[student.id] = {}
       this.submissionMap[student.id] = {}
@@ -163,7 +167,7 @@ class SubmissionStateMap {
     })
   }
 
-  setSubmissionCellState(student, assignment, submission) {
+  setSubmissionCellState(student: Student, assignment: Assignment, submission: Submission) {
     this.submissionMap[student.id][assignment.id] =
       submission || missingSubmission(student, assignment)
 
