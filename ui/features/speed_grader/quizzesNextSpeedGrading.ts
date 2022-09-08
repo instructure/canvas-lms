@@ -30,6 +30,9 @@
 // refreshGradesCb executes the normal speedGrader refresh grades
 // actions, plus whatever callback is passed in as an argument
 
+import type {Submission} from './jquery/speed_grader.d'
+import $ from 'jquery'
+
 function quizzesNextSpeedGrading(
   EG,
   $iframe_holder,
@@ -50,6 +53,19 @@ function quizzesNextSpeedGrading(
     EG.updateStatsInHeader()
     EG.refreshFullRubric()
     EG.setGradeReadOnly(true)
+  }
+
+  function retryRefreshGrades(
+    submission: Submission,
+    originalSubmission: Submission,
+    numRequests: number
+  ) {
+    const maxRequests = 5
+    if (numRequests >= maxRequests) return false
+    if (!originalSubmission.graded_at) return !submission.graded_at
+    if (!submission.graded_at) return true
+
+    return Date.parse(submission.graded_at) <= Date.parse(originalSubmission.graded_at)
   }
 
   // gets the submission from the speed_grader.js
@@ -74,11 +90,9 @@ function quizzesNextSpeedGrading(
     switch (message.subject) {
       case 'quizzesNext.register':
         EG.setGradeReadOnly(true)
-        registerCb(postChangeSubmissionMessage)
-        break
+        return registerCb(postChangeSubmissionMessage)
       case 'quizzesNext.submissionUpdate':
-        refreshGradesCb(quizzesNextChange)
-        break
+        return refreshGradesCb(quizzesNextChange, retryRefreshGrades, 1000)
     }
   }
 

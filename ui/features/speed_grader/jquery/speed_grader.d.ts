@@ -52,6 +52,7 @@ export type TurnitinAsset = {
 export type Submission = {
   attempt?: number
   excused?: boolean
+  graded_at: string | null
   has_originality_score?: any
   id?: string
   late?: boolean
